@@ -93,10 +93,10 @@
 	<descr></descr>
 	<website>http://www.postfix.com/</website>
 	<category>Mail</category>
-	<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-	<depends_on_package>postfix.tbz</depends_on_package>
-	<version>2.9.16_4</version>
-	<status>ALPHA (NO PACKAGE CREATED YET)</status>
+	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/mail</depends_on_package_base_url>
+	<depends_on_package>postfix-1.1.12_1%2c1.tbz</depends_on_package>
+	<version>1.1.12_1</version>
+	<status>ALPHA</status>
 	<config_file>http://www.pfsense.com/packages/config/postfix.xml</config_file>
 	<configurationfile>postfix.xml</configurationfile>
     </package>
