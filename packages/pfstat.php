@@ -58,7 +58,7 @@ if($config['installedpackages']['pfstat']['config'] <> "") {
 	echo "<table BORDERCOLOR=\"#990000\" width=\"100%\" border=\"1\" cellpadding=\"0\" cellspacing=\"0\">";
 	echo "<tr bgcolor='#990000'><td><center><font color='white'>" . $graph['graphname'] . "</td></tr>\n";
 	echo "<td><center><table width=\"100%\"><tr><td width='100%'>";
-	echo "<center><br><img src='/pfstat/" . $graph['imagename'] . "'>";
+	echo "<center><br><a href=\"" . $graph['imagename'] . "\"><img border=\"0\" width=\"400\" \"height\" src='/pfstat/" . $graph['imagename'] . "'></a>";
 	echo "</td></tr>";
 	echo "<tr bgcolor='#990000'><td><center><font color='white'>" . $graph['description'] . "</td></tr>";
 	echo "</table>\n";
