@@ -173,7 +173,7 @@
 	  <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5-stable/All/</depends_on_package_base_url>
 	  <depends_on_package>pfflowd-0.6.tbz</depends_on_package>
 	  <version>0.6</version>
-	  <status>ALPHA</status>
+	  <status>BETA</status>
 	  <configurationfile>pfflowd.xml</configurationfile>
     </package>
   </packages>
