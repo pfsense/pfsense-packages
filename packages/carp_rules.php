@@ -28,7 +28,7 @@
 */
 
 /* return if there are no carp configured items */
-if(!$config['installedpackages']['carp']['config']) return;
+//if($config['installedpackages']['carp']['config']) return;
 
 mwexec("/sbin/pfctl -a carp -Fr");
 
@@ -38,10 +38,11 @@ foreach($config['installedpackages']['carp']['config'] as $carp) {
     $ip = $carp['ipaddress'];
     $int = find_ip_interface($ip);
     $carp_int = find_carp_interface($ip);
+    $carp_sync_int = convert_friendly_interface_to_real_interface_name($carp['synciface']);
     add_rule_to_anchor("carp", "pass out quick on {$carp_int} keep state", $carp_int . "1");
-    if($carp['synciface']) {
-	add_rule_to_anchor("carp", "pass quick on {$carp['synciface']} proto carp from {$carp['synciface']}:network to 224.0.0.18 keep state \(no-sync\)", $carp['synciface'] . "2");
-	add_rule_to_anchor("carp", "pass quick on {$carp['synciface']} proto pfsync keep state", $carp['synciface'] . "3");
+    if($carp_sync_int <> "") {
+	add_rule_to_anchor("carp", "pass quick on {$carp_sync_int}", $carp_sync_int . "3");
+	add_rule_to_anchor("carp", "pass quick on {$carp_sync_int} proto carp from {$carp_sync_int}:network to 224.0.0.18 keep state \(no-sync\)", $carp_sync_int . "2");
     }
     if($int <> false and $int <> $wan_interface) {
 	$ipnet = convert_ip_to_network_format($ip, $carp['netmask']);
