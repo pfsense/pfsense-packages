@@ -4,6 +4,7 @@
 	<version>1.0.20_1</version>
 	<title>Services: PureFTPD Accounts</title>
 	<!-- Menu is where this packages menu will appear -->
+	<aftersaveredirect>pkg_edit.php?xml=pure-ftpd.xml&amp;id=1</aftersaveredirect>
 	<menu>
 		<name>Pure FTPD Accounts</name>
 		<tooltiptext>Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerability, it is trivial to set up, and it is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</tooltiptext>
@@ -80,12 +81,13 @@
 		config_lock();
 		$expires = "";
 		if($_POST['expiration']) $expires = " -e " . $_POST['expiration'];
-		mwexec("/usr/sbin/pw useradd " . $_POST['username'] . $expires . " -m -k /home/ " . $_POST['username'] . " -s ftp");
+		mwexec("/usr/sbin/pw useradd " . $_POST['username'] . $expires . " -m -k /home/ " . $_POST['username'] . " -s \"/usr/sbin/nologin\"");
 		$fd = popen("/usr/sbin/pw usermod -n " . $_POST['username'] . " -H 0", "w");
 		$salt = md5(time());
 		$crypted_pw = crypt($_POST['password'],$salt);
 		fwrite($fd, $crypted_pw);
 		pclose($fd);
+		mwexec("/usr/sbin/pw usermod " . $_POST['username'] . " -s /nonexistent");
 		conf_mount_ro();
 		config_unlock();
 		$savemsg = "User has been added.";
