@@ -124,5 +124,28 @@
 	<status>BETA</status>
 	<configurationfile>freeradius.xml</configurationfile>
     </package>
-  </packages>
+    <package>
+	<name>ifstated</name>
+	<website>http://www.openbsd.org/</website>
+	<descr>
+	 The ifstated daemon runs commands in response to network state changes,
+which it determines by monitoring interface link state or running exter-
+nal tests.  For example, it can be used with carp(4) to change running
+services or to ensure that carp(4) interfaces stay in sync, or with pf(4)
+to test server or link availability and modify translation or routing
+rules. This package is currently useless without the carp package installed.
+	</descr>
+	<category>Network Management</category>
+	<config_file>
+	 http://www.pfsense.com/packages/config/ifstated.xml
+	</config_file>
+	<depends_on_package_base_url>
+	 http://www.pfsense.com/packages/All
+	</depends_on_package_base_url>
+	<depends_on_package>ifstated-20041117.tbz</depends_on_package>
+	<version>20041117</version>
+	<status>ALPHA</status>
+	<configurationfile>ifstated.xml</configurationfile>
+    </package>
+</packages>
 </pfsensepkgs>

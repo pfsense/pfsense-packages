@@ -1,0 +1,92 @@
+<packagegui>
+	<name>ifstated</name>
+	<title>ifstated: Settings</title>
+	<menu>
+		<name>ifstated</name>
+		<tooltiptext>Modify ifstated settings.</tooltiptext>
+		<section>Services</section>
+		<configfile>ifstated.xml</configfile>
+	</menu>
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<modify_system>
+		<item>
+			<modifyfilename>/etc/sysctl.conf</modifyfilename>
+			<textneeded>
+			net.inet.carp.preempt=1
+			</textneeded>
+		</item>
+	</modify_system>
+	<fields>
+		<field>
+			<fielddescr>External Test IP</fielddescr>
+			<fieldname>exttestip</fieldname>
+			<description>Enter an IP to test external connectivity with. This should be a host with extremely high availability.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Internal Test IP</fielddescr>
+			<fieldname>inttestip</fieldname>
+			<description>Enter an IP to test internal connectivity with. This should be a host with extremely high availability.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Paired Firewall External IP</fielddescr>
+			<fieldname>pairextip</fieldname>
+			<description>Enter the real IP of the other firewall's external interface.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Paired Firewall Internal IP</fielddescr>
+			<fieldname>pairintip</fieldname>
+			<description>Enter the real IP of the other firewall's internal interface.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Initial State</fielddescr>
+			<fieldname>initstate</fieldname>
+			<description>Enter the desired initial state for this firewall.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>Primary</name>
+					<value>primary</value>
+				</option>
+				<option>
+					<name>Backup</name>
+					</value>backup</value>
+				</option>
+			</options>
+		</field>
+	</fields>
+	<custom_php_install_command>
+		global $config;
+		mwexec("rm /usr/local/etc/rc.d/ifstated*");
+		$fout = fopen("/usr/local/etc/rc.d/ifstated.sh","w");
+		fwrite($fout,"#!/bin/sh\n\n/usr/local/sbin/ifstated\n");
+		fclose($fout);
+		mwexec("chmod a+x /usr/local/etc/rc.d/radiusd.sh");
+	</custom_php_install_command>
+	<custom_php_command_before_form>
+		function sync_package()
+		{
+			global $config;
+			$fout = fopen("/usr/local/etc/ifstated.conf","w");
+			if($config['installedpackages']['ifstated']['config'] != "") {
+			fwrite($fout, "init-state " . $initstate . "\n\n");
+			fwrite($fout, "carp_up = \"((carp0 link up) and (carp1 link up))\"\ncarp_down = \"((! carp0 link up) and (! carp1 link up))\"\ncarp_sync = \"((carp0 link up and carp1 link up) or ((!carp0 link up) and (!carp1 link up)))\"\n\n");
+			fwrite($fout, "net = '( \"ping -q -c 1 -t 1 " . $exttestip . " > /dev/null\" every 10 and \"ping -q -c 1 -t 1 " . $inttestip . " > /dev/null\" every 10)'\n\n");
+			fwrite($fout, "peer = '( \"ping -q -c 1 -t 1 " . $pairextip . " > /dev/null\" every 10 and \"ping -q -c 1 -t 1 " . $pairintip . " > /dev/null\" every 10)'\n\n");
+			fwrite($fout, "state auto {\nif $carp_up {\nset-state primary\n}\nif $carp_down {\nset-state backup\n}\n}\n\n");
+			fwrite($fout, "state primary {\ninit {\nrun \"ifconfig carp0 advskew 10\"\nrun \"ifconfig carp1 advskew 10\"\n}if ! $net {\nset-state demoted\n}\n}\n\nstate demoted {\ninet {\nrun \"ifconfig carp0 advskew 254\"\nrun \"ifconfig carp1 advskew 254\"\n}\nif $net {\nset-state primary\n}\n}\n\n");
+			fwrite($fout, "state promoted {\ninit {\nrun \"ifconfig carp0 advskew 100\"\nrun \"ifconfig carp1 advskew 100\"\n}\nif ! $carp_sync and $net and \"sleep 5\" every 10 {\nif(! $carp_sync) and $net {\nset-state promoted\n}\n}\n}");
+			}
+		 	fclose($fout);
+			mwexec("/usr/bin/killall -HUP ifstated");
+			mwexec("/usr/local/etc/rc.d/ifstated.sh");
+		}
+	</custom_php_command_before_form>
+	<custom_add_php_command>
+		sync_package();
+	</custom_add_php_command>
+</packagegui>
+
