@@ -40,7 +40,8 @@
 	</custom_php_global_functions>
 	<custom_add_php_command>
 		sync_package_arpwatch();
-		mwexec("/usr/bin/killall -HUP arpwatch");
+		mwexec("/usr/bin/killall arpwatch");
+		mwexec("/usr/local/etc/rc.d/arpwatch.sh");
 	</custom_add_php_command>
 </packagegui>
 
