@@ -136,12 +136,8 @@ to test server or link availability and modify translation or routing
 rules. This package is currently useless without the carp package installed.
 	</descr>
 	<category>Network Management</category>
-	<config_file>
-	 http://www.pfsense.com/packages/config/ifstated.xml
-	</config_file>
-	<depends_on_package_base_url>
-	 http://www.pfsense.com/packages/All
-	</depends_on_package_base_url>
+	<config_file>http://www.pfsense.com/packages/config/ifstated.xml</config_file>
+	<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
 	<depends_on_package>ifstated-20041117.tbz</depends_on_package>
 	<version>20041117</version>
 	<status>ALPHA</status>
