@@ -42,7 +42,7 @@
 		$netio_options = "";
 		if($_POST['port'] != "") $netio_options .= " -p {$_POST['port']}";
 		$netio_options .= $_POST['hostname'];
-		system("/usr/local/bin/netio" . $netio_options);
+		system("/usr/local/bin/netio " . $netio_options);
 	</custom_add_php_command>
 </packagegui>
 

@@ -21,6 +21,7 @@
 			<active/>
 		</tab>
 	</tabs>
+	<fields>
 		<field>
 			<fielddescr>Port</fielddescr>
 			<fieldname>port</fieldname>
