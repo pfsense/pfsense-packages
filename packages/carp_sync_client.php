@@ -28,8 +28,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
-require("xmlparse_pkg.inc");
+
 
 if($config['installedpackages']['carpsettings']['config'] != "")
     foreach($config['installedpackages']['carpsettings']['config'] as $carp)
