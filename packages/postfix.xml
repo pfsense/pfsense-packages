@@ -52,14 +52,14 @@
             <template>
                 <filename>/usr/local/etc/postfix/main.cf</filename>
                 <templatecontents>
-                    myhostname = hostname_fieldvalue\n
-                    mydomain = primarydomain_fieldvalue\n
-                    relay_domains = domain_fieldvalue[ ]
+myhostname = hostname_fieldvalue\n
+mydomain = primarydomain_fieldvalue\n
+relay_domains = domain_fieldvalue[ ]\n
                 </templatecontents>
             </template>
             <template>
                 <filename>/usr/local/etc/postfix/transport</filename>
-                <templatecontents>domain_fieldvalue smtp:[mailserverip_fieldvalue]</templatecontents>
+                <templatecontents>domain_fieldvalue smtp:[mailserverip_fieldvalue]\n</templatecontents>
             </template>
         </templates>
         <start_command>/usr/local/sbin/postfix start</start_command>
