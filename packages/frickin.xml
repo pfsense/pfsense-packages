@@ -14,8 +14,8 @@
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
-		<chmod>a+x</chmod>
-		<item>http://www.pfsense.com/packages/config/frickin.xml</item>
+		<chmod>a+rx</chmod>
+		<item>http://www.pfsense.com/packages/All/frickin</item>
         </additional_files_needed>
 	<fields>
 		<field>
@@ -40,10 +40,11 @@
 			fwrite($fout, "/usr/local/bin/frickin");
 			if($frickin_config['serveraddress'] != "") fwrite($fout, " -s " . $frickin_config['serveraddress']);
 			if($frickin_config['maxtunnels'] != "") fwrite($fout, " -c " . $frickin_config['maxtunnels']);
-			fwrite($fout, "\n");
-                        mwexec("/usr/bin/killall frickin");
-                        mwexec("/usr/local/etc/rc.d/frickin.sh");
+			fwrite($fout, " &amp;\n");
 			fclose($fout);
+                        mwexec("/usr/bin/killall frickin");
+			mwexec("chmod a+rx /usr/local/etc/rc.d/frickin.sh");
+                        mwexec("/usr/local/etc/rc.d/frickin.sh");
                 }
 	</custom_php_global_functions>
         <custom_add_php_command>
