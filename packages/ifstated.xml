@@ -68,6 +68,8 @@
 	mwexec("chmod a+x /usr/local/etc/rc.d/radiusd.sh");
     </custom_php_install_command>
     <custom_add_php_command>
+	conf_mount_rw();
+	config_lock();
 	global $config;
 	$fout = fopen("/usr/local/etc/ifstated.conf","w");
 	if($config['installedpackages']['ifstated']['config'] != "") {
@@ -82,6 +84,8 @@
 	fwrite($fout, "state backup {\ninit {\nrun \"ifconfig carp0 advskew 100\"\nrun \"ifconfig carp1 advskew 100\"\n}\nif ! \$carp_sync and \$net and \"sleep 5\" every 10 {\nif (! \$carp_sync) and \$net {\nset-state promoted\n}\n}\n}\n");
 	}
 	fclose($fout);
+	conf_mount_ro();
+	config_unlock();
 	mwexec("/usr/bin/killall -HUP ifstated");
     </custom_add_php_command>
 </packagegui>

@@ -87,6 +87,8 @@
 		system("rm -rf /usr/local/etc/stunnel*");
 	</custom_php_deinstall_command>
 	<custom_add_php_command_late>
+		    conf_mount_rw();
+		    config_lock();
 		    $fout = fopen("/usr/local/etc/stunnel/stunnel.conf","w");
 		    fwrite($fout, "cert = /usr/local/etc/stunnel/mail.pem \n");
 		    fwrite($fout, "chroot = /var/tmp/stunnel \n");
@@ -99,6 +101,8 @@
 			fwrite($fout, "TIMEOUTclose = 0\n\n");
 		    }
 		    fclose($fout);
+		    conf_mount_ro();
+		    config_unlock();
 		    system("/usr/bin/killall stunnel 2>/dev/null");
 		    system("/usr/local/etc/rc.d/stunnel.sh start 2>/dev/null");
 	</custom_add_php_command_late>

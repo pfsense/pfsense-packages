@@ -53,6 +53,8 @@
 		</field>
     </fields>
 	<custom_add_php_command>
+	conf_mount_rw();
+	config_lock();
 	if($_POST['password'] == $_POST['passwordagain']) {
 		$interfaces = " -i ";
 		$ifaces=$_POST['iface'];
@@ -70,6 +72,8 @@
 		fwrite($fout, "#!/bin/sh\n\n");
 		fwrite($fout, "/usr/local/bin/ntop " . $interfaces . " -u root -d --ipv4 -M\n\n");
 		fclose($fout);
+		conf_mount_ro();
+		config_unlock();
 		system("chmod 555 /usr/local/etc/rc.d/ntop.sh");
 		system("killall ntop 2>/dev/null");
 		system("/usr/local/etc/rc.d/ntop.sh");

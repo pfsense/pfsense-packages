@@ -206,6 +206,8 @@
 	</fields>
 	<custom_php_command_before_form>
 	function sync_package() {
+	  conf_mount_rw();
+	  config_lock();
 	  global $config;
 	  $fout = fopen("/usr/local/etc/pfstat.conf","w");
 	  if($config['installedpackages']['pfstat']['config'] != "") {
@@ -250,6 +252,8 @@
 		}
 	  }
 	  fclose($fout);
+	  conf_mount_ro();
+	  config_unlock();
 	}
 	sync_package();
 	</custom_php_command_before_form>

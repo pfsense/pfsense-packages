@@ -81,6 +81,8 @@
 	<custom_php_deinstall_command>
 	</custom_php_deinstall_command>
 	<custom_add_php_command>
+		conf_mount_rw();
+		config_lock();
 		mwexec("rm /usr/local/etc/rc.d/pure-ftp*");
 		$fout = fopen("/usr/local/etc/rc.d/pure-ftpd.sh","w");
 		fwrite($fout, "#!/bin/sh\n\n");
@@ -95,6 +97,8 @@
 		$startline .= " -B /usr/local/etc/pure-ftpd.conf";
 		fwrite($fout, $startline . "\n");
 		fclose($fout);
+		conf_mount_ro();
+		config_unlock();
 		mwexec("chmod a+x /usr/local/etc/rc.d/pure-ftpd.sh");
 		mwexec("/usr/local/etc/rc.d/pure-ftpd.sh");
 	</custom_add_php_command>

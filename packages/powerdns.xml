@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-	<name>nmap</name>
+	<name>powerdns</name>
 	<version>2.9.16_4</version>
 	<title>Services: PowerDNS</title>
 	<donotsave>true</donotsave>
@@ -120,6 +120,8 @@
 	</custom_php_install_command>
 	<custom_add_php_command>
 		if($password == $passwordagain) {
+			conf_mount_rw();
+			config_lock();
 			$fd = popen("/usr/sbin/pw usermod -n pgsql -H 0", "w");
 			$salt = md5(time());
 			$crypted_pw = crypt($_POST['password'],$salt);
@@ -189,6 +191,8 @@
 			fwrite($fout, "# wildcard-url=no\n");
 			fwrite($fout, "# wildcards=\n");
 			fclose($fout);
+			conf_mount_ro();
+			config_unlock();
 			system("/usr/local/bin/pg_ctl -m smart 2>/dev/null");
 			system("/usr/local/bin/pg_ctl -D /usr/local/pgsql/data -l logfile start 2>/dev/null");
 		} else {

@@ -61,6 +61,8 @@
      </fields>
     <custom_php_command_before_form>
 	function sync_package() {
+	    conf_mount_rw();
+	    config_lock();
 	    system("/bin/mkdir /usr/local/etc/squid 2>/dev/null");
 	    $lancfg = $config['interfaces']['lan'];
 	    $lanif = $lancfg['if'];
@@ -97,6 +99,8 @@
 	    fwrite($fout, "#!/bin/sh\n");
 	    fwrite($fout, "/usr/local/sbin/squid\n\n");
 	    fclose($fout);
+	    conf_mount_ro();
+	    config_unlock();
 	    system("chmod a+x /usr/local/etc/rc.d/squid.sh");
 	    system("/usr/local/sbin/squid -z");
 	    system("/usr/local/sbin/squid");
