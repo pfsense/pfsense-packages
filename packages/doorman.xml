@@ -68,7 +68,7 @@
 		$fout = fopen("/usr/local/etc/rc.d/doormand.sh","w");
 		fwrite($fout, "#!/bin/sh\n\n/usr/local/sbin/doormand -D &amp;\n");
 		fclose($fout);
-		mwexec("chmod a+x /usr/local/etc/rc.d/doormand.sh");
+		chmod("/usr/local/etc/rc.d/doormand.sh", 0755);
 	</custom_php_install_command>
 	<custom_php_command_before_form>
 	function sync_package_doorman() {

@@ -64,7 +64,7 @@
 	$fout = fopen("/usr/local/etc/rc.d/ifstated.sh","w");
 	fwrite($fout,"#!/bin/sh\n\n/usr/local/sbin/ifstated\n");
 	fclose($fout);
-	mwexec("chmod a+x /usr/local/etc/rc.d/radiusd.sh");
+	chmod("/usr/local/etc/rc.d/radiusd.sh", 0755);
     </custom_php_install_command>
     <custom_add_php_command>
 	conf_mount_rw();
