@@ -86,7 +86,7 @@ if($config['installedpackages']['carp']['config'] <> "")
 		if(isset($carp['premtpion'])) $premption = "true"; else $premption = "false";
 		if($synciface <> "") $sync_status = get_pfsync_interface_status($synciface);
 		echo "<tr>";
-		echo "<td class=\"listlr\"><center>" . $ipaddress . "</td>";
+		echo "<td class=\"listlr\"><center>" . $ipaddress . " - " . $carp_int . "</td>";
 		echo "<td class=\"listlr\"><center>" . $status . "<br>" . $sync_status . "</td>";
 		echo "<td class=\"listlr\"><center>" . $synciface . "</td>";
 		echo "</tr>";
