@@ -216,10 +216,11 @@
 		system("/usr/bin/killall cron 2>/dev/null");
 		system("/usr/sbin/cron 2>/dev/null");
 	</custom_php_install_command>
+	<custom_php_deinstall_command>
+	  system("rm /usr/local/etc/pfstat*");
+	</custom_php_deinstall_command>
 	<!--
 	<custom_php_install_command>
 	</custom_php_install_command>
-	<custom_php_deinstall_command>
-	</custom_php_deinstall_command>
 	-->
 </packagegui>
