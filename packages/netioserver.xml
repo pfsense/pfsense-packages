@@ -1,0 +1,36 @@
+<packagegui>
+	<name>netioserver</name>
+	<version>1.14</version>
+	<title>netio: Server</title>
+	<donotsave>true</donotsave>
+	<preoutput>yes</preoutput>
+	<menu>
+		<name>netio</name>
+		<tooltiptext>Run netio in client or server mode.</tooltiptext>
+		<section>Diagnostics</section>
+		<configfile>netio.xml</configfile>
+	</menu>
+	<tabs>
+		<tab>
+			<text>Client</text>
+			<url>/pkg_edit.php?xml=netio.xml</url>
+		</tab>
+		<tab>
+			<text>Server</text>
+			<url>/pkg_edit.php?xml=netioserver.xml</url>
+			<active/>
+		</tab>
+	</tabs>
+		<field>
+			<fielddescr>Port</fielddescr>
+			<fieldname>port</fieldname>
+			<description>Enter the port that iperf will connect to. (default 5001)</description>
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_add_php_command>
+		if($_POST['port'] != "") $netioserver_options = " -p {$_POST['port']}";
+		system("/usr/local/bin/netio -s" . $netioserver_options);
+	</custom_add_php_command>
+</packagegui>
+

@@ -1,0 +1,48 @@
+<packagegui>
+	<name>netio</name>
+	<version>1.14</version>
+	<title>netio: Client</title>
+	<donotsave>true</donotsave>
+	<preoutput>yes</preoutput>
+	<menu>
+		<name>netio</name>
+		<tooltiptext>Run netio in client or server mode.</tooltiptext>
+		<section>Diagnostics</section>
+		<configfile>netio.xml</configfile>
+	</menu>
+	<tabs>
+		<tab>
+			<text>Client</text>
+			<url>/pkg_edit.php?xml=netio.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Server</text>
+			<url>/pkg_edit.php?xml=netioserver.xml</url>
+		</tab>
+	</tabs>
+	<additional_files_needed>
+		<item>http://www.pfsense.com/packages/config/netioserver.xml</item>
+	</additional_files_needed>
+	<fields>
+		<field>
+			<fielddescr>Server</fielddescr>
+			<fieldname>hostname</fieldname>
+			<description>Enter the IP address or hostname that iperf will connect to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Port</fielddescr>
+			<fieldname>port</fieldname>
+			<description>Enter the port that iperf will connect to. (default 5001)</description>
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_add_php_command>
+		$netio_options = "";
+		if($_POST['port'] != "") $netio_options .= " -p {$_POST['port']}";
+		$netio_options .= $_POST['hostname'];
+		system("/usr/local/bin/netio" . $netio_options);
+	</custom_add_php_command>
+</packagegui>
+
