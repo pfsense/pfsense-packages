@@ -65,24 +65,14 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Color</fielddescr>
-			<fieldname>color</fieldname>
-			<description>Color of graph</description>
-			<type>select</type>
-			<options>
-				<option><name>Blue</name><value>blue</value></option>
-				<option><name>Red</name><value>red</value></option>
-				<option><name>Green</name><value>green</value></option>
-			</options>
-		</field>
-		<field>
-			<fielddescr>Left Counters</fielddescr>
-			<fieldname>leftcounters</fieldname>
-			<description></description>
-			<type>select</type>
-			<size>4</size>
-			<multiple>yes</multiple>
-			<options>
+		    <type>rowhelper</type>
+		    <rowhelper>
+			<rowhelperfield>
+			    <fielddescr>Left Counters</fielddescr>
+			    <fieldname>leftcounters</fieldname>
+			    <description></description>
+			    <type>select</type>
+			    <options>
 				<option><value>BytesinIPv4</value><name>Bytes in (IPv4)</name></option>
 				<option><value>BytesoutIPv4</value><name>Bytes out (IPv4)</name></option>
 				<option><value>BytesinIPv6</value><name>Bytes in (IPv6)</name></option>
@@ -105,39 +95,26 @@
 				<option><value>ShortCounter</value><name>Short Counter</name></option>
 				<option><value>NormalizeCounter</value><name>Normalize Counter</name></option>
 				<option><value>MemoryCounter</value><name>Memory Counter</name></option>
-			</options>
-		</field>
-		<field>
-			<fielddescr>Right Counters</fielddescr>
-			<fieldname>rightcounters</fieldname>
-			<description></description>
-			<type>select</type>
-			<size>4</size>
-			<multiple>yes</multiple>
-			<options>
-				<option><value>BytesinIPv4</value><name>Bytes in (IPv4)</name></option>
-				<option><value>BytesoutIPv4</value><name>Bytes out (IPv4)</name></option>
-				<option><value>BytesinIPv6</value><name>Bytes in (IPv6)</name></option>
-				<option><value>BytesoutIPv6</value><name>Bytes out (IPv6)</name></option>
-				<option><value>PacketsinpassedIPv4</value><name>Packets in passed (IPv4)</name></option>
-				<option><value>PacketsindroppedIPv4</value><name>Packets in dropped (IPv4)</name></option>
-				<option><value>PacketsoutpassedIPv4</value><name>Packets out passed (IPv4)</name></option>
-				<option><value>PacketsoutdroppedIPv4</value><name>Packets out dropped (IPv4)</name></option>
-				<option><value>PacketsinpassedIPv6</value><name>Packets in passed (IPv6)</name></option>
-				<option><value>PacketsindroppedIPv6</value><name>Packets in dropped (IPv6)</name></option>
-				<option><value>PacketsoutpassedIPv6</value><name>Packets out passed (IPv6)</name></option>
-				<option><value>PacketsoutdroppedIPv6</value><name>Packets out dropped (IPv6)</name></option>
-				<option><value>statetableentries</value><name>State table entries</name></option>
-				<option><value>statesearches</value><name>State searches</name></option>
-				<option><value>StateTableInsertions</value><name>State Table Insertions</name></option>
-				<option><value>StateTableRemovals</value><name>State Table Removals</name></option>
-				<option><value>MatchCounter</value><name>Match Counter</name></option>
-				<option><value>BadOffsetCounter</value><name>Bad Offset Counter</name></option>
-				<option><value>FragmentCounter</value><name>Fragment Counter</name></option>
-				<option><value>ShortCounter</value><name>Short Counter</name></option>
-				<option><value>NormalizeCounter</value><name>Normalize Counter</name></option>
-				<option><value>MemoryCounter</value><name>Memory Counter</name></option>
-			</options>
+			    </options>
+			</rowhelperfield>
+			<rowhelperfield>
+			    <fielddescr>Color</fielddescr>
+			    <fieldname>color</fieldname>
+			    <description>Color of graph</description>
+			    <type>select</type>
+			    <options>
+				<option><name>Blue</name><value>#0000FF</value></option>
+				<option><name>Red</name><value>#FF0000</value></option>
+				<option><name>Green</name><value>#00FF00</value></option>
+				<option><name>Yellow</name><value>#bebe00</value></option>
+				<option><name>Purple</name><value>#7200be</value></option>
+				<option><name>Cyan</name><value>#00bebe</value></option>
+				<option><name>Orange</name><value>#be7e00</value></option>
+				<option><name>Grey</name><value>#bebebe</value></option>
+				<option><name>Black</name><value>#000000</value></option>
+			    </options>
+			</rowhelperfield>			
+		    </rowhelper>
 		</field>
 	</fields>
 </packagegui>
