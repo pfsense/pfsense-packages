@@ -53,6 +53,7 @@ include("fbegin.inc");
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <?php
+if($config['installedpackages']['pfstat']['config'] <> "") {
   foreach($config['installedpackages']['pfstat']['config'] as $graph) {
 	echo "<table BORDERCOLOR=\"#990000\" width=\"100%\" border=\"1\" cellpadding=\"0\" cellspacing=\"0\">";
 	echo "<tr bgcolor='#990000'><td><center><font color='white'>" . $graph['graphname'] . "</td></tr>\n";
@@ -64,6 +65,7 @@ include("fbegin.inc");
 	echo "</td></tr>\n";
 	echo "</table>&nbsp;<br>";
   }
+}
 ?>
 
 </form>
