@@ -68,7 +68,7 @@
 			    $interfaces .= convert_friendly_interface_to_real_interface_name($ifaces[$element]);
 			    $isfirst = 1;
 		    }
-		    $if($interfaces == "") {
+		    if($interfaces == "") {
 			$interfaces = $lan;
 		    }
 		    system("/usr/local/bin/ntop --set-admin-password=" . $_POST['password']);
