@@ -29,7 +29,6 @@
 
 /* return if there are no carp configured items */
 if($config['installedpackages']['carp']['config'] <> "") {
-    mwexec("/sbin/pfctl -a carp -Fr");
     /* carp records exist, lets process */
     $wan_interface = get_real_wan_interface();
     $i = 0;
