@@ -91,7 +91,7 @@
 		if($_POST['uploadbw'] and $_POST['downloadbw']) $startline .= " -T " . $_POST['uploadbw'] . ":" . $_POST['downloadbw'];;
 		if($_POST['natworkaround']) $startline .= " -N";
 		if($_POST['filedeletion']) $startline .= " -K";
-		$startline .= "-B /usr/local/etc/pure-ftpd.conf";
+		$startline .= " -B /usr/local/etc/pure-ftpd.conf";
 		fwrite($fout, $startline . "\n");
 		fclose($fout);
 		mwexec("chmod a+x /usr/local/etc/rc.d/pure-ftpd.sh");
