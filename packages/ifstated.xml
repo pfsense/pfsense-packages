@@ -6,7 +6,9 @@
 		<tooltiptext>Modify ifstated settings.</tooltiptext>
 		<section>Services</section>
 		<configfile>ifstated.xml</configfile>
+		<url>/pkg_edit.php?xml=ifstated.xml&amp;id=0</url>
 	</menu>
+	<aftersaveredirect>pkg_edit.php?xml=ifstated.xml&amp;id=0</aftersaveredirect>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<modify_system>
 		<item>
@@ -66,27 +68,30 @@
 		fclose($fout);
 		mwexec("chmod a+x /usr/local/etc/rc.d/radiusd.sh");
 	</custom_php_install_command>
-	<custom_php_command_before_form>
-		function sync_package()
-		{
-			global $config;
-			$fout = fopen("/usr/local/etc/ifstated.conf","w");
-			if($config['installedpackages']['ifstated']['config'] != "") {
-			fwrite($fout, "init-state " . $initstate . "\n\n");
-			fwrite($fout, "carp_up = \"((carp0 link up) and (carp1 link up))\"\ncarp_down = \"((! carp0 link up) and (! carp1 link up))\"\ncarp_sync = \"((carp0 link up and carp1 link up) or ((!carp0 link up) and (!carp1 link up)))\"\n\n");
-			fwrite($fout, "net = '( \"ping -q -c 1 -t 1 " . $exttestip . " > /dev/null\" every 10 and \"ping -q -c 1 -t 1 " . $inttestip . " > /dev/null\" every 10)'\n\n");
-			fwrite($fout, "peer = '( \"ping -q -c 1 -t 1 " . $pairextip . " > /dev/null\" every 10 and \"ping -q -c 1 -t 1 " . $pairintip . " > /dev/null\" every 10)'\n\n");
-			fwrite($fout, "state auto {\nif $carp_up {\nset-state primary\n}\nif $carp_down {\nset-state backup\n}\n}\n\n");
-			fwrite($fout, "state primary {\ninit {\nrun \"ifconfig carp0 advskew 10\"\nrun \"ifconfig carp1 advskew 10\"\n}if ! $net {\nset-state demoted\n}\n}\n\nstate demoted {\ninet {\nrun \"ifconfig carp0 advskew 254\"\nrun \"ifconfig carp1 advskew 254\"\n}\nif $net {\nset-state primary\n}\n}\n\n");
-			fwrite($fout, "state promoted {\ninit {\nrun \"ifconfig carp0 advskew 100\"\nrun \"ifconfig carp1 advskew 100\"\n}\nif ! $carp_sync and $net and \"sleep 5\" every 10 {\nif(! $carp_sync) and $net {\nset-state promoted\n}\n}\n}");
-			}
-		 	fclose($fout);
-			mwexec("/usr/bin/killall -HUP ifstated");
-			mwexec("/usr/local/etc/rc.d/ifstated.sh");
-		}
-	</custom_php_command_before_form>
 	<custom_add_php_command>
-		sync_package();
+                        global $config;
+                        $fout = fopen("/usr/local/etc/ifstated.conf","w");
+                        if($config['installedpackages']['ifstated']['config'] != "") {
+                        fwrite($fout, "init-state " . $_POST['initstate'] . "\n\n");
+                        fwrite($fout, "carp_up = \"((carp0 link up) and (carp1 link up))\"\ncarp_down = \"((! carp0
+ link up) and (! carp1 link up))\"\ncarp_sync = \"((carp0 link up and carp1 link up) or ((!carp0 link up) and (!car
+p1 link up)))\"\n\n");
+                        fwrite($fout, "net = '( \"ping -q -c 1 -t 1 " . $_POST['exttestip'] . " > /dev/null\" every 10 and \
+"ping -q -c 1 -t 1 " . $_POST['inttestip'] . " > /dev/null\" every 10)'\n\n");
+                        fwrite($fout, "peer = '( \"ping -q -c 1 -t 1 " . $_POST['pairextip'] . " > /dev/null\" every 10 and
+\"ping -q -c 1 -t 1 " . $_POST['pairintip'] . " > /dev/null\" every 10)'\n\n");
+                        fwrite($fout, "state auto {\nif \$carp_up {\nset-state primary\n}\nif \$carp_down {\nset-stat
+e backup\n}\n}\n\n");
+                        fwrite($fout, "state primary {\ninit {\nrun \"ifconfig carp0 advskew 10\"\nrun \"ifconfig c
+arp1 advskew 10\"\n}if ! \$net {\nset-state demoted\n}\n}\n\nstate demoted {\ninet {\nrun \"ifconfig carp0 advskew 2
+54\"\nrun \"ifconfig carp1 advskew 254\"\n}\nif \$net {\nset-state primary\n}\n}\n\n");
+                        fwrite($fout, "state backup {\ninit {\nrun \"ifconfig carp0 advskew 100\"\nrun \"ifconfig
+ carp1 advskew 100\"\n}\nif ! \$carp_sync and \$net and \"sleep 5\" every 10 {\nif(! \$carp_sync) and \$net {\nset-stat
+e promoted\n}\n}\n}\n\nstate promoted {\ninit {\nrun \"ifconfig carp0 advskew 0\"\nrun \"ifconfig carp1 advskew 0\"\n}\nif \$peer or ! \$net {\nset-state backup\n}\n}");
+                        }
+                        fclose($fout);
+                        mwexec("/usr/bin/killall -HUP ifstated");
+
 	</custom_add_php_command>
 </packagegui>
 
