@@ -226,5 +226,4 @@
         <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
         <configurationfile>squidGuard.xml</configurationfile>
     </package>
-  </packages>
 </pfsensepkgs>
