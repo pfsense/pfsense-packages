@@ -15,7 +15,7 @@
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Username</fielddescr>
-			<fieldname>graphname</fieldname>
+			<fieldname>username</fieldname>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Description</fielddescr>
@@ -63,6 +63,7 @@
 		mwexec("/usr/bin/killall pure-ftpd");
 	</custom_deinstall_php_command>
 	<custom_add_php_command>
+		$expires = "";
 		if($_POST['expiration']) $expires = " -e " . $_POST['expiration'];
 		mwexec("/usr/sbin/pw useradd " . $_POST['username'] . $expires . " -m -k /home/ " . $_POST['username'] . " -s /usr/sbin/nologin");
 		$fd = popen("/usr/sbin/pw usermod -n " . $_POST['username'] . " -H 0", "w");
@@ -73,6 +74,6 @@
 		$savemsg = "User has been added.";
 	</custom_add_php_command>
 	<custom_delete_php_command>
-		mwexec("/usr/sbin/pw userdel " . $_POST['username']);
+		system("/usr/sbin/pw userdel " . $username);
 	</custom_delete_php_command>
 </packagegui>

@@ -23,7 +23,7 @@
                     <fielddescr>NTOP Admin Password AGAIN</fielddescr>
                     <fieldname>passwordagain</fieldname>
                     <type>input</type>
-		</field>		    
+		</field>
         </fields>
         <custom_add_php_command>
 	    if($_POST['password'] == $_POST['passwordagain']) {
@@ -37,7 +37,7 @@
         </custom_add_php_command>
 	<custom_deinstall_php_command>
 		mwexec("/usr/bin/killall ntop");
-	</custom_deinstall_php_command>	
+	</custom_deinstall_php_command>
 	<custom_php_install_command>
 	    system("rm /usr/local/etc/rc.d/ntop.sh");
 	    $fout = fopen("/usr/local/etc/rc.d/ntop.sh","w");
