@@ -34,6 +34,8 @@
 		<field>
 			<fielddescr>Interface</fielddescr>
 			<fieldname>iface</fieldname>
+			<size>3</size>
+			<multiselect>true</multiselect>
 			<type>interfaces_selection</type>
 		</field>
     </fields>
