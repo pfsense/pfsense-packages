@@ -176,6 +176,7 @@
 	  <status>BETA</status>
 	  <configurationfile>pfflowd.xml</configurationfile>
     </package>
+<!--
     <package>
 	  <name>siproxd</name>
 	  <website>http://siproxd.sourceforge.net/</website>
@@ -188,5 +189,6 @@
 	  <status>ALPHA</status>
 	  <configurationfile>siproxd.xml</configurationfile>
     </package>
+-->
   </packages>
 </pfsensepkgs>
