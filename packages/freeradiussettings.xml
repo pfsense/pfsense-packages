@@ -36,7 +36,8 @@
 	Function sync_package()	{
 		global $config;
 		$fout = fopen("/usr/local/etc/raddb/radiusd.conf.dynamic","w");
-		$int_ip = find_interface_ip($config['interfaces'][$_POST['interface']]['if']);
+		$int = $config['installedpackages']['freeradiussettings']['config']['0']['interface'];
+		$int_ip = find_interface_ip($int);
 		$port = $config['installedpackages']['freeradiussettings']['config'][0]['port'];
 		fwrite($fout, "{\nipaddr = " . $int_ip);
 		if($port != "") {
