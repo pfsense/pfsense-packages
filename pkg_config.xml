@@ -213,7 +213,6 @@
           <status>ALPHA</status>
           <configurationfile>doorman.xml</configurationfile>
     </package>
-  </packages>
     <package>
 	<name>squid</name>
 	<descr>High performance Web proxy cache</descr>
@@ -222,7 +221,7 @@
 	<depends_on_package_base_url>http://www.pfSense.com/packages/All</depends_on_package_base_url>
 	<depends_on_package>squid-2.5.7_5.tbz</depends_on_package>
 	<version>2.5.7_5</version>
-	<status>BETA</status>
+	<status>Alpha Alpha Alpha</status>
 	<config_file>http://www.pfsense.com/packages/config/squid.xml</config_file>
 	<configurationfile>squid.xml</configurationfile>
     </package>
@@ -234,8 +233,9 @@
         <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/releases/i386/5.3-RELEASE/packages/All</depends_on_package_base_url>
         <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
         <version>1.2.0_1</version>
-        <status>Alpha Alpha</status>
+        <status>Alpha Alpha Alpha</status>
         <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
         <configurationfile>squidGuard.xml</configurationfile>
     </package>
+  </packages>
 </pfsensepkgs>
