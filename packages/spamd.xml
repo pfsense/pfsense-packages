@@ -44,6 +44,7 @@
 			<fielddescr>Provider Name</fielddescr>
 			<fieldname>provider_name</fieldname>
 			<description>Enter the name of the source</description>
+			<size>30</size>
 			<type>input</type>
 		</field>
 		<field>
@@ -52,6 +53,7 @@
 			<description>Select the Provider Type</description>
 			<type>select</type>
 			<value>black</value>
+			<size>1</size>
 			<options>
 			    <option><value>black</value><name>Black List</name></option>
 			    <option><value>white</value><name>White List</name></option>
@@ -62,19 +64,22 @@
 			<fieldname>provider_description</fieldname>
 			<description>Enter the description for this item</description>
 			<type>input</type>
+			<size>30</size>
 		</field>
 		<field>
 			<fielddescr>Reject message</fielddescr>
 			<fieldname>reject_message</fieldname>
 			<description>Enter the message to display to emailing parties that are on this providers list</description>
 			<type>input</type>
+			<size>30</size>
 		</field>
 		<field>
 			<fielddescr>Provider Method</fielddescr>
 			<fieldname>provider_method</fieldname>
-			<description>Select the Provider Metho</description>
+			<description>Select the Provider Method</description>
 			<type>select</type>
 			<value>http</value>
+			<size>1</size>
 			<options>
 			    <option><value>http</value><name>URL</name></option>
 			    <option><value>exec</value><name>Execute command</name></option>
