@@ -68,18 +68,18 @@
 		</field>
 	</fields>
 	<custom_php_install_command>
-		mwexec("rm /usr/local/etc/rc.d/pure-ftp*");
+		mwexec("/bin/rm /usr/local/etc/rc.d/pure-ftp*");
 		$fout = fopen("/usr/local/etc/rc.d/pure-ftpd.sh","w");
 		fwrite($fout, "#!/bin/sh\n\n");
 		fwrite($fout, "/usr/local/sbin/pure-ftpd -A -B /usr/local/etc/pure-ftpd.conf\n");
 		fclose($fout);
-		mwexec("chmod a+x /usr/local/etc/rc.d/pure-ftpd.sh");
+		mwexec("/bin/chmod a+x /usr/local/etc/rc.d/pure-ftpd.sh");
 		mwexec("/usr/local/etc/rc.d/pure-ftpd.sh");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		mwexec("/usr/bin/killall pure-ftpd");
-		system("rm -rf /usr/local/etc/pure*");
-		system("rm -rf /usr/local/etc/rc.d/pure*");
+		system("/bin/rm -rf /usr/local/etc/pure*");
+		system("/bin/rm -rf /usr/local/etc/rc.d/pure*");
 	</custom_php_deinstall_command>
 	<custom_add_php_command>
 		conf_mount_rw();
