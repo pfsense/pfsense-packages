@@ -25,6 +25,6 @@
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 	    system("rm -rf /usr/local/assp");
-	    system("rm /usr/local/assp/etc/rc.d/assp.sh");
+	    system("rm /usr/local/etc/rc.d/assp.sh");
 	</custom_php_deinstall_command>
 </packagegui>
