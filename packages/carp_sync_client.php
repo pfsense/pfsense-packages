@@ -41,7 +41,7 @@ if($already_processed != 1)
 		    fwrite($fout, $current_rules_section);
 		    fclose($fout);
 		    mwexec("/usr/bin/scp {$g['tmp_path']}/filter_section.txt root@{$synchronizetoip}:/tmp/");
-		    unlink("{$g['tmp_path']}/rules_section.txt");
+		    unlink("{$g['tmp_path']}/filter_section.txt");
 		}
 		if($carp['synchronizenat'] <> "") {
 		    $current_nat_section = backup_config_section("nat");
