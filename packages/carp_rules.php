@@ -25,7 +25,7 @@
 	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
-
+*/
 
 /* return if there are no carp configured items */
 if(!$config['installedpackages']['carp']['config']) return;
