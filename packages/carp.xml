@@ -263,7 +263,6 @@
 		  if($using_arp_balance == 1) system("sysctl net.inet.arpbalance=1");
 		  if($preempt == 1) system("sysctl net.inet.carp.preempt=1");
 	      }
-	      sync_package();
 	</custom_php_command_before_form>
 	<custom_php_resync_config_command>
 	    sync_package();
