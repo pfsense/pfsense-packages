@@ -268,7 +268,6 @@
 			      fwrite($fout, "/sbin/ifconfig pfsync" . $pfsync_instances_counter . " up syncif " . convert_friendly_interface_to_real_interface_name($carp['synciface']) . "\n");
 			      $pfsync_instances_counter++;
 			  }
-			  fwrite($fout, "sleep 1\n");
 			  $carp_instances_counter++;
 		      }
 		  }
