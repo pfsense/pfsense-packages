@@ -80,13 +80,24 @@
 			<description>When preemption is enabled, each CARP host will look at the advskew (Advertising Frequency) parameter in the advertisements it receives from the master, to try to determine whether it can advertise more frequently. If so, it will begin advertising, and the current master, seeing that there is another host with a lower advskew, will bow out.</description>
 			<type>checkbox</type>
 		</field>
-
 		<field>
 			<fielddescr>Synchronize rules</fielddescr>
 			<fieldname>synchronizerules</fieldname>
 			<description>When this option is enabled, this system will automatically sync the firewalls rules over to the other carp host every 5 minutes.</description>
 			<type>checkbox</type>
 		</field>
+		<field>
+			<fielddescr>Synchronize aliases</fielddescr>
+			<fieldname>synchronizealiases</fieldname>
+			<description>When this option is enabled, this system will automatically sync the aliases over to the other carp host every 5 minutes.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Synchronize nat</fielddescr>
+			<fieldname>synchronizenat</fieldname>
+			<description>When this option is enabled, this system will automatically sync the nat rules over to the other carp host every 5 minutes.</description>
+			<type>checkbox</type>
+		</field>			
 		<field>
 			<fielddescr>Synchronize to IP</fielddescr>
 			<fieldname>synchronizetoip</fieldname>
