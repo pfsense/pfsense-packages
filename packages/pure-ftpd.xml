@@ -93,6 +93,7 @@
 		$savemsg = "User has been added.";
 	</custom_add_php_command>
 	<custom_delete_php_command>
+		system("/bin/rm -rf /home/" . $username);
 		system("/usr/sbin/pw userdel " . $username);
 	</custom_delete_php_command>
 </packagegui>
