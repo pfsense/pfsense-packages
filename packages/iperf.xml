@@ -3,6 +3,7 @@
 	<version>1.7.0</version>
 	<title>iperf: Client</title>
 	<donotsave>true</donotsave>
+	<preoutput>yes</preoutput>
 	<menu>
 		<name>iperf</name>
 		<tooltiptext>Run iperf in client or server mode.</tooltiptext>
@@ -39,7 +40,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>TCP/UDP</fielddescr>
+			<fielddescr>Protocol</fielddescr>
 			<fieldname>protocol</fieldname>
 			<description>Choose whether to use TCP or UDP here. (default is TCP)</description>
 			<type>select</type>
@@ -55,7 +56,7 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>bits/sec or bytes/sec</fielddescr>
+			<fielddescr>Output format</fielddescr>
 			<fieldname>format</fieldname>
 			<description>Choose to display output in bits/sec or bytes/sec. (default is bits)</description>
 			<type>select</type>
@@ -83,7 +84,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Socket buffer sizes</fielddescr>
+			<fielddescr>Socket buffer bize</fielddescr>
 			<fieldname>window</fieldname>
 			<description>Enter the desired socket buffer size, if needed.</description>
 			<type>input</type>
