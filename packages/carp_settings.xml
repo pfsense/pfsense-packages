@@ -80,6 +80,36 @@
 			<description>When preemption is enabled, each CARP host will look at the advskew (Advertising Frequency) parameter in the advertisements it receives from the master, to try to determine whether it can advertise more frequently. If so, it will begin advertising, and the current master, seeing that there is another host with a lower advskew, will bow out.</description>
 			<type>checkbox</type>
 		</field>
+
+		<field>
+			<fielddescr>Synchronize rules</fielddescr>
+			<fieldname>synchronizerules</fieldname>
+			<description>When this option is enabled, this system will automatically sync the firewalls rules over to the other carp host every 5 minutes.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Synchronize to IP</fielddescr>
+			<fieldname>synchronizetoip</fieldname>
+			<description>Enter the IP address of the firewall you would like to synchornize your rules to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Known Hosts</fielddescr>
+			<fieldname>knownhosts</fieldname>
+			<description>Paste in your authorized hosts file generated from OpenSSH.</description>
+			<rows>4</rows>
+			<cols>50</cols>
+			<type>textarea</type>
+		</field>
+		<field>
+			<fielddescr>Authorized Keys</fielddescr>
+			<fieldname>authorizedkeys</fieldname>
+			<description>Paste in your Authorized Keys file generated from OpenSSH.</description>
+			<rows>4</rows>
+			<cols>50</cols>
+			<type>textarea</type>
+		</field>
+
 	</fields>
 	<custom_php_command_before_form>
 	</custom_php_command_before_form>
