@@ -21,7 +21,7 @@
 	<tabs>
 		<tab>
 			<text>NTop Settings</text>
-			<url>/pkg_edit.php?xml=ntop.xml</url>
+			<url>/pkg_edit.php?xml=ntop.xml&amp;id=0</url>
 			<active/>
 		</tab>
 		<tab>
