@@ -39,6 +39,7 @@
 		</field>
 	</fields>
 	<custom_add_php_command>
+		mwexec("killall netio");
 		$netio_options = "";
 		if($_POST['port'] != "") $netio_options .= " -p {$_POST['port']}";
 		$netio_options .= $_POST['hostname'];

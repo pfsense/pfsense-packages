@@ -80,6 +80,7 @@
 		</field>
 	</fields>
 	<custom_add_php_command>
+		mwexec("killall iperf");
 		$iperf_options = "";
 		if($_POST['protocol'] == "udp") $iperf_options .= " -u";
 		if($_POST['format'] == "bytes") $iperf_options .= " -f A";

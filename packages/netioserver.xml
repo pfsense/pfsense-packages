@@ -30,6 +30,7 @@
 		</field>
 	</fields>
 	<custom_add_php_command>
+		mwexec("killall netio");
 		if($_POST['port'] != "") $netioserver_options = " -p {$_POST['port']}";
 		system("/usr/local/bin/netio -s" . $netioserver_options);
 	</custom_add_php_command>
