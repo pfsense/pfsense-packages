@@ -33,8 +33,8 @@
 
 */
 
-require_once("xmlrpc_client.inc"); // Include client classes from our XMLRPC implementation.
-require_once("xmlparse_pkg.inc");  // Include pfSense helper functions.
+require_once("xmlrpc_client.inc"); /* Include client classes from our XMLRPC implementation. */
+require_once("xmlparse_pkg.inc");  /* Include pfSense helper functions. */
 require_once("config.inc");
 require_once("functions.inc");
 
@@ -54,7 +54,7 @@ if($already_processed != 1)
       is_array($config['installedpackages']['carpsettings']['config'])) {
 	$already_processed = 1;
 	foreach($config['installedpackages']['carpsettings']['config'] as $carp) {
-	    if($carp['synchronizetoip'] <> "" ) {
+	    if($carp['synchronizetoip'] != "" ) {
 		$synchronizetoip = $carp['synchronizetoip'];
 		if($carp['synchronizerules'] != "" and is_array($config['filter'])) {
 		    $current_rules_section = backup_config_section("filter");
