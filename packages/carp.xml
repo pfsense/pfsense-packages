@@ -36,7 +36,7 @@
 	    <item>http://www.pfsense.com/packages/config/carp_sync_client.php</item>
 	</additional_files_needed>
     	<additional_files_needed>
-	    <prefix>/usr/local/pkg/pf/</prefix>
+	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>a+x</chmod>
 	    <nosync/>
 	    <item>http://www.pfsense.com/packages/config/carp_sync_server.php</item>
