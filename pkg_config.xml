@@ -66,7 +66,20 @@
       <config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
       <configurationfile>stunnel.xml</configurationfile>
     </package>
-    
+
+    <package>
+      <name>squid</name>
+      <descr>High performance Web proxy cache</descr>
+      <website>http://www.squid.org</website>
+      <category>Network Management</category>
+      <depends_on_package_base_url>http://www.pfSense.com/packages/All</depends_on_package_base_url>
+      <depends_on_package>squid-2.5.7_5.tbz</depends_on_package>
+      <version></version>
+      <status>ALPHA</status>
+      <config_file>http://www.pfsense.com/packages/config/squid.xml</config_file>
+      <configurationfile>squid.xml</configurationfile>
+    </package>
+
     <package>
       <name>carp</name>
       <descr>CARP is a tool to help achieve system redundancy, by having multiple computers creating a single, virtual network interface between them, so that if any machine fails, another can respond instead, and/or allowing a degree of load sharing between systems. CARP is an improvement over the Virtual Router Redundancy Protocol (VRRP) standard. It was developed after VRRP was deemed to be not free enough because of a possibly-overlapping Cisco patent.</descr>
@@ -81,7 +94,7 @@
       <config_file>http://www.pfsense.com/packages/config/carp.xml</config_file>
       <configurationfile>carp.xml</configurationfile>
     </package>
-        
+
     <package>
       <name>powerdns</name>
       <descr>PowerDNS (AKA pdns) is an advanced high performance authoritative nameserver with MANY advanced features</descr>
