@@ -68,8 +68,7 @@
 				}
 			}
 		 	fclose($fout);
-			mwexec("killall -HUP radiusd");
-			mwexec("/usr/local/etc/rc.d/radiusd");
+			system("killall -HUP radiusd");
 		}
 		sync_package();
 	</custom_php_command_before_form>

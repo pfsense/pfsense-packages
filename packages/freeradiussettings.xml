@@ -49,8 +49,7 @@
 		fwrite($fout, "{\nipaddr = 127.0.0.1\nport = 0\ntype = auth\n}\n\n");
 		fclose($fout);
 		}
-	mwexec("killall -HUP radiusd");
-	mwexec("/usr/local/etc/rc.d/radiusd");
+	system("killall -HUP radiusd");
 	sync_package();
 	</custom_php_command_before_form>
 	<custom_add_php_command>
