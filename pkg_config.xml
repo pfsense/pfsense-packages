@@ -213,6 +213,18 @@
 	<config_file>http://www.pfsense.com/packages/config/squid.xml</config_file>
 	<configurationfile>squid.xml</configurationfile>
     </package>
+    <package> 
+        <name>ifdepd</name>
+        <descr>The ifdepd daemon implements dependencies between network interfaces in a reliable fashion. If any of the source interfaces fails, ifdepd sets all destination interfaces to state down. If all source interfaces are up, ifdepd sets all destination interfaces to state up.</descr> 
+        <website>http://hugo.bmg.gv.at</website>
+        <category>Network Management</category>
+        <depends_on_package_base_url>http://www.pfSense.com/~colin/All</depends_on_package_base_url>
+        <depends_on_package>ifdepd-20050303.tbz</depends_on_package>
+        <version>20050303</version>
+        <status>ALPHA</status>
+        <config_file>http://www.pfsense.com/packages/config/ifdepd.xml</config_file>
+        <configurationfile>ifdepd.xml</configurationfile>
+    </package>
   </packages>
     <package>
         <name>squidGuard</name>
