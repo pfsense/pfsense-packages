@@ -1,5 +1,3 @@
-#!/usr/local/bin/php
-<?php
 /*
 	carp_sync.php
         part of pfSense (www.pfSense.com)
@@ -85,4 +83,3 @@ if($already_processed != 1) {
 	}
     }
 }
-?>
