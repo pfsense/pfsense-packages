@@ -2,24 +2,6 @@
 <packagegui>
         <name>squid</name>
         <version>2.5.7_5</version>
-	<title>Squid: Settings</title>
-        <menu>
-                <name>Squid</name>
-                <tooltiptext>Change Squid settings.</tooltiptext>
-                <section>Services</section>
-                <configfile>squid.xml</configfile>
-		<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
-        </menu>
-	<aftersaveredirect>pkg_edit.php?xml=squid.xml&amp;id=0</aftersaveredirect>
-	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
-        <fields>
-                <field>
-                	<fielddescr>Cache size</fielddescr>
-                	<fieldname>cache_size</fieldname>
-                	<description>Enter cache size limit in RAM (MB).</description>
-                	<type>input</type>
-                </field>
-        </fields>
 	<custom_php_global_functions>
 		function write_squid_static_config() {
                         global $config;
