@@ -6,21 +6,23 @@
         <name>pfstat</name>
         <descr>pfstat is a small utility that collects packet filter statistics and produces graphs.</descr>
         <category>Network Management</category>
-        <pfsense_package_base>http://www.pfsense.com/packages/pfSense</pfsense_package_base>
-        <pfsense_package>pfstat.tbz</pfsense_package>
-        <depends_on_package_base>http://www.pfsense.com/packages/All</depends_on_package_base>
+		<config_file>http://www.pfsense.com/packages/config/pfstat.xml</config_file>
+        <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
         <depends_on_package>pfstat-1.7.tbz</depends_on_package>
         <configurationfile>pfstat.xml</configurationfile>
     </package>
     <package>
-        <name>test</name>
-        <descr>test package</descr>
-        <category>Network Management</category>
-        <pfsense_package_base>http://www.pfsense.com/packages/pfSense</pfsense_package_base>
-        <pfsense_package>test.tbz</pfsense_package>
-        <depends_on_package_base>http://www.pfsense.com/packages/All</depends_on_package_base>
-        <depends_on_package>test-1.7.tbz</depends_on_package>
-        <configurationfile>test.xml</configurationfile>
+        <name>pure-ftpd</name>
+        <descr>Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerability, it is trivial to set up, and it is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
+        <category>FTP</category>
+		<config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
+        <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+        <depends_on_package>pure-ftpd-1.0.20_1.tbz</depends_on_package>
+        <configurationfile>pure-ftpd.xml</configurationfile>
+		<logging>
+			<facility_name>ftp</facility_name>
+			<logfile_name>pure-ftpd.log</logfile_name>
+		</logging>
     </package>
   </packages>
 </pfsensepkgs>
