@@ -79,6 +79,18 @@
 	<configurationfile>squid.xml</configurationfile>
     </package>
     <package>
+        <name>squidGuard</name>
+        <descr>High performance Web proxy Guard</descr>
+        <website>http://www.squidguard.org/</website>
+        <category>Network Management</category>
+        <depends_on_package_base_url>ftp://ftp2.freebsd.org/pub/FreeBSD/releases/i386/5.3-RELEASE/packages/All</depends_on_package_base_url>
+        <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
+        <version>1.2.0_1</version>
+        <status>Alpha Alpha</status>
+        <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
+        <configurationfile>squidGuard.xml</configurationfile>
+    </package>
+    <package>
 	<name>carp</name>
 	<descr>CARP is a tool to help achieve system redundancy by having multiple computers creating a single, virtual network interface between them. This allows another machine to respond in the event a server fails, and allows a degree of load sharing between systems. CARP is an improvement over the Virtual Router Redundancy Protocol (VRRP) standard. It was developed after VRRP was shown to possibly overlap a Cisco patent.</descr>
 	<website>http://www.openbsd.org/faq/faq6.html#CARP</website>
