@@ -202,19 +202,6 @@
           <configurationfile>siproxd.xml</configurationfile>
     </package>
     <package>
-	  <name>hula</name>
-	  <website>http://www.hula-project.org</website>
-	  <descr>Hula is a calendar and mail server. We are focused on building a calendar and mail server that people love to use, instead of broadly trying to build a "groupware server" that managers want to deploy.</descr>
-	  <category>Services</category>
-	  <config_file>http://www.pfsense.com/packages/config/hula.xml</config_file>
-	  <depends_on_package_base_url>http://www.pfSense.com/packages/All/</depends_on_package_base_url>
-	  <depends_on_package>hula.tgz</depends_on_package>
-	  <verifyinstalledpkg>""</verifyinstalledpkg>
-	  <version>0.1</version>
-	  <status>ALPHA-ALPHA</status>
-	  <configurationfile>hula.xml</configurationfile>
-    </package>
-    <package>
           <name>netio</name>                                                                                                  
           <website>http://freshmeat.net/projects/netio/</website>            
           <descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and DOS only support TCP/IP) using various different packet sizes.</descr>
@@ -227,4 +214,18 @@
           <configurationfile>netio.xml</configurationfile>
     </package>
   </packages>
+    <package>
+          <name>hula</name>
+          <website>http://www.hula-project.org</website>
+          <descr>Hula is a calendar and mail server. We are focused on building a calendar and mail server that people love to use, instead of broadly trying to build
+a "groupware server" that managers want to deploy.</descr>
+          <category>Services</category>
+          <config_file>http://www.pfsense.com/packages/config/hula.xml</config_file>
+          <depends_on_package_base_url>http://www.pfSense.com/packages/All/</depends_on_package_base_url>
+          <depends_on_package>hula.tgz</depends_on_package>
+          <verifyinstalledpkg>""</verifyinstalledpkg>
+          <version>0.1</version>
+          <status>ALPHA-ALPHA</status>
+          <configurationfile>hula.xml</configurationfile>
+    </package>
 </pfsensepkgs>
