@@ -193,46 +193,47 @@
 	</fields>
 	<custom_php_command_before_form>
 	    function sync_package() {
-	    /*
-	     *  XXX: find out how many carp and pfsync interfaces are established
-	     *       and destroy/down them before sweeping through the list
-	     */
-	    $fout = fopen("/usr/local/etc/rc.d/carp.sh","w");
-	    fwrite($fout, "#!/bin/sh \n");
-	    global $config;
-	    $using_arp_balance = 0;
-	    $using_preempt = 0;
-	    $carp_instances_counter = 0;
-	    $pfsync_instances_counter = 0;
-	    if($config['installedpackages']['carp']['config'] != "") {
-		  foreach($config['installedpackages']['carp']['config'] as $carp) {
-		      $pfsync = 0;
-		      /*
-		       *  create the carp interface
-		       */
-		      system("/sbin/ifconfig carp" . $carp_instances_counter . " create");
-		      $broadcast_address = gen_subnet_max($carp['ipaddress'], $carp['netmask']);
-		      $carp_command = "/sbin/ifconfig carp" . $carp_instances_counter . " " . $carp['ipaddress'] . " " . $carp['netmask'] . " broadcast " . $broadcast_address . " vhid " . $carp['vhid'] . $carp['advskew '] . " pass " . $carp['password'];
-		      if($carp['balancing'] == "true") $using_arp_balance = 1;
-		      if($carp['preempt'] == "true") $using_preempt = 1;
-		      fwrite($fout, $carp_command . "\n");
-		      if($carp['pfsync'] != "") $pfsync = 1;
-		      if($pfsync != 0) {
+		/*
+		 *  XXX: find out how many carp and pfsync interfaces are established
+		 *       and destroy/down them before sweeping through the list
+		 */
+		$fout = fopen("/usr/local/etc/rc.d/carp.sh","w");
+		fwrite($fout, "#!/bin/sh \n");
+		global $config;
+		$using_arp_balance = 0;
+		$using_preempt = 0;
+		$carp_instances_counter = 0;
+		$pfsync_instances_counter = 0;
+		if($config['installedpackages']['carp']['config'] != "") {
+		      foreach($config['installedpackages']['carp']['config'] as $carp) {
+			  $pfsync = 0;
 			  /*
-			   * user has selected pfsync, bring it up.
+			   *  create the carp interface
 			   */
-			  fwrite($fout, "/sbin/ifconfig pfsync" . $pfsync_instances_counter . " create \n");
-			  fwrite($fout, "/sbin/ifconfig pfsync" . $pfsync_instances_counter . " up syncif " . $carp['synciface'] . "\n");
-			  $pfsync_instances_counter++;
+			  system("/sbin/ifconfig carp" . $carp_instances_counter . " create");
+			  $broadcast_address = gen_subnet_max($carp['ipaddress'], $carp['netmask']);
+			  $carp_command = "/sbin/ifconfig carp" . $carp_instances_counter . " " . $carp['ipaddress'] . " " . $carp['netmask'] . " broadcast " . $broadcast_address . " vhid " . $carp['vhid'] . $carp['advskew '] . " pass " . $carp['password'];
+			  if($carp['balancing'] == "true") $using_arp_balance = 1;
+			  if($carp['preempt'] == "true") $using_preempt = 1;
+			  fwrite($fout, $carp_command . "\n");
+			  if($carp['pfsync'] != "") $pfsync = 1;
+			  if($pfsync != 0) {
+			      /*
+			       * user has selected pfsync, bring it up.
+			       */
+			      fwrite($fout, "/sbin/ifconfig pfsync" . $pfsync_instances_counter . " create \n");
+			      fwrite($fout, "/sbin/ifconfig pfsync" . $pfsync_instances_counter . " up syncif " . $carp['synciface'] . "\n");
+			      $pfsync_instances_counter++;
+			  }
+			  $carp_instances_counter++;
 		      }
-		      $carp_instances_counter++;
 		  }
+		  fclose($fout);
+		  system("chmod a+x /usr/local/etc/rc.d/carp.sh");
+		  system("/usr/local/etc/rc.d/carp.sh");
+		  if($using_arp_balance == 1) system("sysctl net.inet.arpbalance=1");
+		  if($preempt == 1) system("sysctl net.inet.carp.preempt=1");
 	      }
-	      fclose($fout);
-	      system("chmod a+x /usr/local/etc/rc.d/carp.sh");
-	      system("/usr/local/etc/rc.d/carp.sh");
-	      if($using_arp_balance == 1) system("sysctl net.inet.arpbalance=1");
-	      if($preempt == 1) system("sysctl net.inet.carp.preempt=1");
 	      sync_package();
 	</custom_php_command_before_form>
 	<custom_php_resync_config_command>
