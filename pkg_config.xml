@@ -75,7 +75,7 @@
       <depends_on_package_base_url>http://www.pfSense.com/packages/All</depends_on_package_base_url>
       <depends_on_package>squid-2.5.7_5.tbz</depends_on_package>
       <version></version>
-      <status>ALPHA</status>
+      <status>ALPHA! ALPHA!</status>
       <config_file>http://www.pfsense.com/packages/config/squid.xml</config_file>
       <configurationfile>squid.xml</configurationfile>
     </package>
