@@ -190,6 +190,11 @@
 		  $rightgraphtext = "";
 		  $isfirstleft = 0;
 		  $isfirstright = 0;
+		  $fromclassification = $rowhelper['fromclassification'];
+		  $imagename = $rowhelper['imagename'];
+		  $from = $rowhelper['from'];
+		  $graphsizewidth = $rowhelper['graphsizewidth'];
+		  $graphsizeheight = $rowhelper['graphsizeheight'];
 		  foreach($rowhelper['row'] as $row) {
 			if($row['location'] == "left") {
 			  if($isfirstleft == 1) $leftgraphtext .= ",\n";
@@ -201,11 +206,10 @@
 			  $isfirstright = 1;
 			}
 		  }
-		  fwrite($fout, "image \"/usr/local/www/pfstat/" . $rowhelper['imagename'] ."\" { \n");
-		  $from = $rowhelper['from'];
+		  fwrite($fout, "image \"/usr/local/www/pfstat/" . $imagename ."\" { \n");
 		  if($from == "") $from = "30";
-		  fwrite($fout, "from " . $from . " " . $rowhelper['fromclassification'] . " to now  \n");
-		  fwrite($fout, "width " . $row['graphsizewidth'] . " height " . $rowhelper['graphsizeheight'] . "  \n");
+		  fwrite($fout, "from " . $from . " " . $fromclassification . " to now  \n");
+		  fwrite($fout, "width " . $graphsizewidth  . " height " . $graphsizeheight . "  \n");
 		  if($leftgraphtext != "") {
 			fwrite($fout, "	left  \n");
 			fwrite($fout, "		" . $leftgraphtext . "\n");
