@@ -4,7 +4,7 @@
 	<version>0.5.9</version>
 	<menu>
 		<name>siproxd</name>
-		<tooltiptext>Modify siproxd uses and settings.</tooltiptext>
+		<tooltiptext>Modify siproxd users and settings.</tooltiptext>
 		<section>Services</section>
 		<configfile>siproxd.xml</configfile>
 		<url>/pkg_edit.php?xml=siproxd.xml&amp;id=0</url>
