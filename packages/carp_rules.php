@@ -1,4 +1,4 @@
-<?php
+
 /*
 	carp_rules.inc
         part of pfSense (www.pfSense.com)
@@ -26,26 +26,6 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
-*/
-
-require("guiconfig.inc");
-require("xmlparse_pkg.inc");
-
-/*
- *  available anchors:
- *   anchor natrules
- *   anchor firewallrules
- *   anchor loopback
- *   anchor firewallout
- *   anchor ftpproxy
- *   anchor dhcpserverlan
- *   anchor dhcpserver
- *   anchor staticrouted
- *   anchor wanspoof
- *   anchor wandhcp
- *   anchor anti-lockout
- *   anchor pptp
- */
 
 /* return if there are no carp configured items */
 if(!$config['installedpackages']['carp']['config']) return;
@@ -63,4 +43,3 @@ foreach($config['installedpackages']['carp']['config'] as $carp) {
     }
 }
 
-?>
