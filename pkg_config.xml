@@ -20,8 +20,8 @@
         <depends_on_package>pure-ftpd-1.0.20_1.tbz</depends_on_package>
         <configurationfile>pure-ftpd.xml</configurationfile>
 		<logging>
-			<facility_name>ftp</facility_name>
-			<logfile_name>pure-ftpd.log</logfile_name>
+			<facilityname>ftp</facilityname>
+			<logfilename>pure-ftpd.log</logfilename>
 		</logging>
     </package>
   </packages>
