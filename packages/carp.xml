@@ -19,6 +19,9 @@
 			<url>carp_status.php</url>
 		</tab>
 	</tabs>
+    	<additional_files_needed>
+		<item>http://www.pfsense.com/packages/config/carp.tgz</item>
+	</additional_files_needed>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->
 	<configpath>['installedpackages']['carp']['config']</configpath>
