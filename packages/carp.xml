@@ -260,8 +260,8 @@
 		  }
 
 		fclose($fout);
-		chmod("/usr/local/etc/rc.d/carp.sh", 0755);
-		mwexec("/usr/local/etc/rc.d/carp.sh");
+		chmod("/usr/local/pkg/pf/carp.sh", 0755);
+		mwexec("/usr/local/pkg/pf/carp.sh");
 		if($using_arp_balance == 1) mwexec("sysctl net.inet.arpbalance=1");
 		if($preempt == 1) mwexec("sysctl net.inet.carp.preempt=1");
 		conf_mount_ro();
@@ -279,5 +279,6 @@
 	    unlink_if_exists("/usr/local/pkg/carp*");
 	    unlink_if_exists("/usr/local/pkg/pf/carp*");
 	    unlink_if_exists("/usr/local/etc/rc.d/carp*");
+	    unlink_if_exists("/usr/local/pkg/pf/carp*");
 	</custom_php_deinstall_command>
 </packagegui>
