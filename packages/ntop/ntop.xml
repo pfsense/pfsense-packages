@@ -63,7 +63,7 @@
 		foreach($ifaces as $element=>$if)
 		{
 			if($isfirst == 1) $interfaces .= ",";
-			$interfaces .= $ifaces[$element];
+			$interfaces .= convert_real_interface_to_friendly_interface_name($ifaces[$element]);
 			$isfirst = 1;
 		}
 		system("/usr/local/bin/ntop --set-admin-password=" . $_POST['password']);
