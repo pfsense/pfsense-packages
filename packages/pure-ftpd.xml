@@ -12,7 +12,7 @@
 		<name>Pure FTPD Settings</name>
 		<tooltiptext>Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerability, it is trivial to set up, and it is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</tooltiptext>
 		<section>Services</section>
-		<url>/pkg_edit.php?xml=pureftpdsettings.xml</url>
+		<url>/pkg_edit.php?xml=pure-ftpdsettings.xml</url>
 	</menu>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location seperated with -> -->
