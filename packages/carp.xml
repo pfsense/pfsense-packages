@@ -5,60 +5,67 @@
 	<title>Services: CARP (failover)</title>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
-		<name>CARP (failover)</name>
-		<tooltiptext>CARP is a tool to help achieve system redundancy, by having multiple computers creating a single, virtual network interface between them, so that if any machine fails, another can respond instead, and/or allowing a degree of load sharing between systems. CARP is an improvement over the Virtual Router Redundancy Protocol (VRRP) standard. It was developed after VRRP was deemed to be not free enough because of a possibly-overlapping Cisco patent.</tooltiptext>
-		<section>Services</section>
-		<configfile>carp.xml</configfile>
+	    <name>CARP (failover)</name>
+	    <tooltiptext>CARP is a tool to help achieve system redundancy, by having multiple computers creating a single, virtual network interface between them, so that if any machine fails, another can respond instead, and/or allowing a degree of load sharing between systems. CARP is an improvement over the Virtual Router Redundancy Protocol (VRRP) standard. It was developed after VRRP was deemed to be not free enough because of a possibly-overlapping Cisco patent.</tooltiptext>
+	    <section>Services</section>
+	    <configfile>carp.xml</configfile>
 	</menu>
 	<tabs>
-		<tab>
-			<text>CARP Settings</text>
-			<url>/pkg_edit.php?xml=carp.xml</url>
-			<active/>
-		</tab>
-		<tab>
-			<text>CARP Status</text>
-			<url>carp_status.php</url>
-		</tab>
+	    <tab>
+		<text>CARP Settings</text>
+		<url>/pkg_edit.php?xml=carp.xml</url>
+		<active/>
+	    </tab>
+	    <tab>
+		<text>CARP Status</text>
+		<url>carp_status.php</url>
+	    </tab>
 	</tabs>
     	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/carp.tgz</item>
+	    <prefix>/usr/local/pkg/pf/</prefix>
+	    <chmod>a+x</chmod>
+	    <item>http://www.pfsense.com/packages/config/carp_rules.php</item>
+	</additional_files_needed>
+    	<additional_files_needed>
+	    <prefix>/usr/local/www/</prefix>
+	    <chmod>a+x</chmod>
+	    <item>http://www.pfsense.com/packages/config/carp_status.php</item>
 	</additional_files_needed>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->
 	<configpath>['installedpackages']['carp']['config']</configpath>
 	<adddeleteeditpagefields>
-		<columnitem>
-			<fielddescr>VHID Group</fielddescr>
-			<fieldname>vhid</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Virtual IP Address</fielddescr>
-			<fieldname>ipaddress</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Advertising Frequency</fielddescr>
-			<fieldname>advskew</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Synchronize State</fielddescr>
-			<fieldname>pfsync</fieldname>
-			<type>checkbox</type>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Load Balancing</fielddescr>
-			<fieldname>balancing</fieldname>
-			<type>checkbox</type>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Netmask</fielddescr>
-			<fieldname>netmask</fieldname>
-		</columnitem>		
-		<columnitem>
-			<fielddescr>Preemption</fielddescr>
-			<fieldname>premption</fieldname>
-			<type>checkbox</type>
-		</columnitem>
+	    <columnitem>
+		    <fielddescr>VHID Group</fielddescr>
+		    <fieldname>vhid</fieldname>
+	    </columnitem>
+	    <columnitem>
+		    <fielddescr>Virtual IP Address</fielddescr>
+		    <fieldname>ipaddress</fieldname>
+	    </columnitem>
+	    <columnitem>
+		    <fielddescr>Advertising Frequency</fielddescr>
+		    <fieldname>advskew</fieldname>
+	    </columnitem>
+	    <columnitem>
+		    <fielddescr>Synchronize State</fielddescr>
+		    <fieldname>pfsync</fieldname>
+		    <type>checkbox</type>
+	    </columnitem>
+	    <columnitem>
+		    <fielddescr>Load Balancing</fielddescr>
+		    <fieldname>balancing</fieldname>
+		    <type>checkbox</type>
+	    </columnitem>
+	    <columnitem>
+		    <fielddescr>Netmask</fielddescr>
+		    <fieldname>netmask</fieldname>
+	    </columnitem>
+	    <columnitem>
+		    <fielddescr>Preemption</fielddescr>
+		    <fieldname>premption</fieldname>
+		    <type>checkbox</type>
+	    </columnitem>
 	</adddeleteeditpagefields>
 	<!-- fields gets invoked when the user adds or edits a item.   the following items
          will be parsed and rendered for the user as a gui with input, and selectboxes. -->
