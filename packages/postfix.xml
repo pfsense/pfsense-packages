@@ -58,7 +58,7 @@
                 <templatecontents>
                     myhostname = hostname_fieldvalue\n
                     mydomain = primarydomain_fieldvalue\n
-                    relay_domains = domain_fieldvalue[1-$domain_total_rows]
+                    relay_domains = domain_fieldvalue[ ]
                 </templatecontents>
             </template>
             <template>
@@ -68,5 +68,4 @@
         </templates>
         <start_command>/usr/local/sbin/postfix start</start_command>
         <restart_command>/usr/local/sbin/postmap /usr/local/etc/postfix/transport ; /usr/local/sbin/postfix reload</restart_command>
-                
 </packagegui>
