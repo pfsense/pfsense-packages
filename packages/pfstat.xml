@@ -7,6 +7,12 @@
 		<tooltiptext>pfstat is a small utility that collects packet filter statistics and produces graphs.</tooltiptext>
 		<section>Services</section>
 	</menu>
+	<menu>
+		<name>PFStat Graphs</name>
+		<tooltiptext>pfstat is a small utility that collects packet filter statistics and produces graphs.</tooltiptext>
+		<url>/pfstat/</url>
+		<section>Services</section>
+	</menu>	
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->
 	<configpath>['installedpackages']['package']['$packagename']['configuration']</configpath>
@@ -181,7 +187,7 @@
 		}
 	  }
 	  foreach($config['installedpackages']['pfstat']['config'] as $pkgconfig) {
-		fwrite($fout, "image \"" . $pkgconfig['imagename'] ."\" { \n");
+		fwrite($fout, "image \"/usr/local/www/pfstat/" . $pkgconfig['imagename'] ."\" { \n");
 		fwrite($fout, "from " . $pkgconfig['from'] . " " . $pkgconfig['fromclassification'] . " to now  \n");
 		fwrite($fout, "width " . $pkgconfig['graphsizewidth'] . " height " . $pkgconfig['graphsizeheight'] . "  \n");
 		fwrite($fout, "	left  \n");
@@ -191,6 +197,7 @@
 		fwrite($fout, "}\n\n");
 	  }
 	  fclose($fout);
+	  system("mkdir -p /usr/local/www/pfstat 2>/dev/null");
 	  system("/usr/bin/killall cron 2>/dev/null");
 	  system("/usr/sbin/cron 2>/dev/null");
 	</custom_add_php_command_late>
