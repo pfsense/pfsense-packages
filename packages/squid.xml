@@ -7,9 +7,6 @@
 	<fields/>
 	<custom_php_install_command>
 		echo "&lt;pre&gt;";
-		system("/bin/mkdir /usr/local/etc/squid");
-		system("/usr/sbin/pw adduser squid -s /bin/false");
-		system("/usr/sbin/pw addgroup squid");
 		$lancfg = $config['interfaces']['lan'];
 		$lanif = $lancfg['if'];
 		$lanip = $lancfg['ipaddr'];
@@ -45,20 +42,6 @@
 		fwrite($fout, "/usr/local/sbin/squid\n\n");
 		fclose($fout);
 		system("chmod a+x /usr/local/etc/rc.d/squid.sh");
-		system("/usr/bin/touch /usr/local/etc/squid/mime.conf");
-		system("/bin/mkdir /usr/local/squid");
-		system("/bin/mkdir /usr/local/squid/cache");
-		system("/bin/mkdir /usr/local/etc/squid/errors");
-        system("/usr/bin/touch /usr/local/etc/squid/errors/English");
-		system("/usr/bin/touch /usr/local/etc/squid/icons");
-		system("/bin/mkdir /usr/local/libexec/squid");
-        system("/usr/bin/touch /usr/local/libexec/squid/unlinkd");
-		system("/bin/chmod -R 750 /usr/local/libexec/squid");
-        system("/usr/sbin/chown -R squid:squid /usr/local/squid");
-		system("/usr/sbin/chown -R squid:squid /usr/local/etc/squid");
-		system("/usr/sbin/chown -R squid:squid /usr/local/libexec/squid");
-		system("/bin/chmod -R 750 /usr/local/squid");
-        system("/bin/chmod -R 750 /usr/local/etc/squid");
         system("/usr/local/sbin/squid -z");
 		system("/usr/local/sbin/squid");
 		filter_configure();
@@ -69,11 +52,6 @@
 		exec("mv /tmp/squid* /var/db/pkg/");
 	</custom_php_pre_deinstall_command>
 	<custom_php_deinstall_command>
-		exec("rm -rf /usr/local/squid/");
-		exec("rm -rf /usr/local/etc/squid/");
-		exec("rm -rf /usr/local/libexec/squid/");
-		exec("/usr/sbin/pw deluser squid");
-		exec("/usr/sbin/pw delgroup squid");
         </custom_php_deinstall_command>
 	<start_command>/usr/local/sbin/squid</start_command>
 	<process_kill_command>squid</process_kill_command>
