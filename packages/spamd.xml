@@ -99,7 +99,7 @@
 		foreach($config['installedpackages']['spamd']['config'] as $spamd) {
 		    fwrite($fd, $spamd['provider_name'] . ":\\ \n");
 		    fwrite($fd, ":" . $spamd['provider_method'] . ":\\ \n");
-		    fwrite($fd, ":msg=\"" . $spamd['reject_message'] . "\":\\ \n":
+		    fwrite($fd, ":msg=\"" . $spamd['reject_message'] . "\":\\ \n";
 		    fwrite($fd, ":" . $spamd['provider_method'] . ":\\ \n");
 		    fwrite($fd, ":file=" . $spamd['provider_url'] . ":\n\n");
 		}
