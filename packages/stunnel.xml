@@ -6,6 +6,7 @@
 		<name>STunnel</name>
 		<tooltiptext>The stunnel program is designed to work as an SSL encryption wrapper between remote client and local (inetd-startable) or remote server. It can be used to add SSL functionality to commonly used inetd daemons like POP2, POP3, and IMAP servers without any changes in the programs' code. It will negotiate an SSL connection using the OpenSSL or SSLeay libraries. It calls the underlying crypto libraries, so stunnel supports whatever cryptographic algorithms you compiled into your crypto package.</tooltiptext>
 		<section>Services</section>
+		<configfile>stunnel.xml</configfile>
 	</menu>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->

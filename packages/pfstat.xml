@@ -6,13 +6,14 @@
 		<name>PFStat Settings</name>
 		<tooltiptext>pfstat is a small utility that collects packet filter statistics and produces graphs.</tooltiptext>
 		<section>Services</section>
+		<configfile>pfstat.xml</configfile>
 	</menu>
 	<menu>
 		<name>PFStat Graphs</name>
 		<tooltiptext>pfstat is a small utility that collects packet filter statistics and produces graphs.</tooltiptext>
-		<url>/pfstat/</url>actually
+		<url>/pfstat/</url>
 		<section>Services</section>
-	</menu>	
+	</menu>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->
 	<configpath>['installedpackages']['package']['$packagename']['configuration']</configpath>
