@@ -11,7 +11,7 @@
 	</additional_files_needed>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
-	    <name>Hula Default Settings</name>
+	    <name>Hula Setup</name>
 	    <tooltiptext>This area will help setup Hula for the first time.</tooltiptext>
 	    <section>Services</section>
 	    <configfile>hula.xml</configfile>
@@ -23,7 +23,7 @@
 	    <url>http://$myurl:89</url>
 	</menu>
     	<menu>
-	    <name>Hula User Login</name>
+	    <name>Hula Users</name>
 	    <tooltiptext>This area is for user logins.</tooltiptext>
 	    <section>Services</section>
 	    <url>http://$myurl:8080</url>
