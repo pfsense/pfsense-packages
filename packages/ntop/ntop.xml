@@ -49,6 +49,7 @@
 			<fieldname>iface</fieldname>
 			<size>3</size>
 			<multiple>true</multiple>
+			<value>lan</value>
 			<type>interfaces_selection</type>
 		</field>
     </fields>
