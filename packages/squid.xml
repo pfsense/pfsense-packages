@@ -15,7 +15,7 @@
                 <field>
                 	<fielddescr>Cache size</fielddescr>
                 	<fieldname>cache_size</fieldname>
-                	<description>Enter cache size limit in MB.</description>
+                	<description>Enter cache size limit in RAM (MB).</description>
                 	<type>input</type>
                 </field>
         </fields>
@@ -83,6 +83,7 @@
 	<custom_php_deinstall_command>
 	        mwexec("/bin/rm -rf /usr/local/squid");
 		filter_configure();
+        exec("/etc/etc/rc.filter_configure");
         </custom_php_deinstall_command>
 	<start_command>/usr/local/sbin/squid</start_command>
 	<process_kill_command>squid</process_kill_command>
