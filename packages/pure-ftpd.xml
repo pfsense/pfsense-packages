@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+<packagegui>
+	<name>pure-ftpd</name>
+	<!-- Menu is where this packages menu will appear -->
+	<menu>
+		<name>Pure FTPD</name>
+		<tooltiptext>Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerability, it is trivial to set up, and it is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</tooltiptext>
+		<section>Services</section>
+	</menu>
+	<!-- configpath gets expanded out automatically and config items will be
+         stored in that location seperated with -> -->
+	<configpath>installedpackages->package->$packagename->configuration</configpath>
+	<!-- adddeleteeditpagefields items will appear on the first page where you can add / delete or edit
+         items.  An example of this would be the nat page where you add new nat redirects -->
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Username</fielddescr>
+			<fieldname>graphname</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<!-- fields gets invoked when the user adds or edits a item.   the following items
+         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
+	<fields>
+		<field>
+			<fielddescr>Username</fielddescr>
+			<fieldname>username</fieldname>
+			<description>Enter the username here</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Password</fielddescr>
+			<fieldname>password</fieldname>
+			<description>Enter the password here</description>
+			<type>password</type>
+		</field>
+		<field>
+			<fielddescr>Username Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter the description of the user here</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Account Expiration</fielddescr>
+			<fieldname>expiration</fieldname>
+			<description>Amount of days when account expires.  Leave blank for never.</description>
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_php_install_command>
+		mwexec("rm /usr/local/etc/rc.d/pure-ftp*");
+		$fout = fopen("/usr/local/etc/rc.d/pure-ftpd.sh","w");
+		fwrite($fout, "#!/bin/sh\n\n");
+		fwrite($fout, "/usr/local/sbin/pure-ftpd -A -B /usr/local/etc/pure-ftpd.conf\n");
+		fclose($fout);
+		mwexec("chmod a+x /usr/local/etc/rc.d/pure-ftpd.sh");
+		mwexec("/usr/local/etc/rc.d/pure-ftpd.sh");
+	</custom_php_install_command>	
+	<custom_deinstall_php_command>
+		mwexec("/usr/bin/killall pure-ftpd");
+	</custom_deinstall_php_command>
+	<custom_add_php_command>
+		if($_POST['expiration']) $expires = " -e " . $_POST['expiration'];
+		mwexec("/usr/sbin/pw useradd " . $_POST['username'] . $expires . " -m -k /home/ " . $_POST['username'] . " -s /usr/sbin/nologin");
+		//mwexec("/bin/mkdir -p /home/" . $_POST['username']);
+		$fd = popen("/usr/sbin/pw usermod -n " . $_POST['username'] . " -H 0", "w");
+		$salt = md5(time());
+		$crypted_pw = crypt($_POST['password'],$salt);
+		fwrite($fd, $crypted_pw);
+		pclose($fd);			
+	</custom_add_php_command>
+	<custom_delete_php_command>
+		mwexec("/usr/sbin/pw userdel " . $_POST['username']);
+	</custom_delete_php_command>	
+</packagegui>
