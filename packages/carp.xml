@@ -242,7 +242,8 @@
 			$carp_sync_ip  = $carp['pfsyncip'];
 			fwrite($fout, "/sbin/ifconfig pfsync0 create\n");
 			fwrite($fout, "/sbin/ifconfig pfsync0 {$carp_sync_ip}/24\n");
-			fwrite($fout, "/sbin/ifconfig pfsync0 up syncif " . carp_sync_ip . "\n");
+			fwrite($fout, "/sbin/ifconfig pfsync0 syncif " . $carp_sync_int . "\n");
+			fwrite($fout, "/sbin/ifconfig pfsync0 up\n");
 			$pfsync_instances_counter++;
 		  }
 		fwrite($fout, "/etc/rc.filter_configure");
