@@ -84,7 +84,8 @@
 			}
 		}
 		fclose($fout);
-		mwexec("killall -HUP doormand");
+		mwexec("killall doormand");
+		mwexec("/usr/local/etc/rc.d/doormand.sh");
 		conf_mount_ro();
 		config_unlock();
 		}
