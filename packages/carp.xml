@@ -27,14 +27,17 @@
 		<columnitem>
 			<fielddescr>Synchronize State</fielddescr>
 			<fieldname>pfsync</fieldname>
+			<type>checkbox</type>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Load Balancing</fielddescr>
 			<fieldname>balancing</fieldname>
+			<type>checkbox</type>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Premption</fielddescr>
 			<fieldname>premption</fieldname>
+			<type>checkbox</type>
 		</columnitem>
 	</adddeleteeditpagefields>
 	<!-- fields gets invoked when the user adds or edits a item.   the following items
