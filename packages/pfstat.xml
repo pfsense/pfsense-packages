@@ -198,10 +198,12 @@
 		fwrite($fout, "}\n\n");
 	  }
 	  fclose($fout);
-	  system("mkdir -p /usr/local/www/pfstat 2>/dev/null");
-	  system("/usr/bin/killall cron 2>/dev/null");
-	  system("/usr/sbin/cron 2>/dev/null");
 	</custom_add_php_command_late>
+	<custom_php_install_command>
+		system("mkdir -p /usr/local/www/pfstat 2>/dev/null");
+		system("/usr/bin/killall cron 2>/dev/null");
+		system("/usr/sbin/cron 2>/dev/null");
+	</custom_php_install_command>
 	<!--
 	<custom_php_install_command>
 	</custom_php_install_command>
