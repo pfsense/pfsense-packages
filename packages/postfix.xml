@@ -5,10 +5,10 @@
         <savetext>Change</savetext>
 	<aftersaveredirect>pkg_edit.php?xml=postfix.xml&amp;id=1</aftersaveredirect>
 	<menu>
-		<name>Postfix Settings</name>
+		<name>Postfix Forwarder</name>
 		<tooltiptext>Configure Postfix Forwarder</tooltiptext>
 		<section>Services</section>
-		<configfile>postfix.xml</configfile>
+		<url>pkg_edit.php?xml=postfix.xml&amp;id=1</url>
 	</menu>
 	<fields>
 		<field>
