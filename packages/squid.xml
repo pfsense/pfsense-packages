@@ -11,12 +11,6 @@
 		<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
         </menu>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
-        <adddeleteeditpagefields>
-        	<columnitem>
-        		<fielddescr>Cache size</fielddescr>
-        		<fieldname>cache_size</fieldname>
-        	</columnitem>
-        </adddeleteeditpagefields>
         <fields>
                 <field>
                 	<fielddescr>Cache size</fielddescr>
