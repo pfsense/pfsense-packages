@@ -65,6 +65,10 @@ if($config['installedpackages']['pfstat']['config'] <> "") {
 	echo "</td></tr>\n";
 	echo "</table>&nbsp;<br>";
   }
+} else {
+
+echo "<center>There are currently no graphs defined.";
+
 }
 ?>
 
