@@ -1,5 +1,7 @@
 #!/usr/bin/php
 
+<?php
+
 /*
 	carp_sync.php
         part of pfSense (www.pfSense.com)
@@ -45,3 +47,4 @@ if($config['installedpackages']['carpsettings']['config'] != "")
 	    mwexec("/usr/bin/ssh /usr/local/pkg/carp_sync_server.php");
 	}
 
+?>

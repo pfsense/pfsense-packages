@@ -1,5 +1,7 @@
 #!/usr/bin/php
 
+<?php
+
 /*
 	carp_sync.php
         part of pfSense (www.pfSense.com)
@@ -38,3 +40,4 @@ if($config['installedpackages']['carpsettings']['config'] != "")
 	    restore_config_section("rules", $rules);
 	}
 
+?>
