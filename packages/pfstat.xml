@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<packagegui>
+	<name>pfstat</name>
+	<!-- Menu is where this packages menu will appear -->
+	<menu>
+		<name>PFStat</name>
+		<tooltiptext>pfstat is a small utility that collects packet filter statistics and produces graphs.</tooltiptext>
+		<section>Services</section>
+	</menu>
+	<!-- configpath gets expanded out automatically and config items will be
+         stored in that location -->
+	<configpath>['installedpackages']['package']['$packagename']['configuration']</configpath>
+	<!-- modify system will modify a file and make sure the text needed to run the
+         package is in place.  The following example edits /etc/crontab and adds the
+         code necessart to invoke the pfstat command every 5 minutes. -->
+	<modify_system>
+		<item>
+			<modifyfilename>/etc/crontab</modifyfilename>
+			<textneeded>*    *    *    *    *    root   /usr/local/bin/pfstat -q >> /var/log/pfstat\n*/5  *    *    *    *    root   /usr/local/bin/pfstat -c /usr/local/etc/pfstat.conf -d /var/log/pfstat\n</textneeded>
+		</item>
+	</modify_system>
+	<!-- adddeleteeditpagefields items will appear on the first page where you can add / delete or edit
+         items.  An example of this would be the nat page where you add new nat redirects -->
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Graph Name</fielddescr>
+			<fieldname>graphname</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<!-- fields gets invoked when the user adds or edits a item.   the following items
+         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
+	<fields>
+		<field>
+			<fielddescr>Graph Name</fielddescr>
+			<fieldname>graphname</fieldname>
+			<description>Enter the name of the graph here</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Graph Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter the description of the graph here</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Image Name</fielddescr>
+			<fieldname>imagename</fieldname>
+			<description>Enter the filename for this image.  Must end in .jpg.  ex. filename.jpg</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Graph Size Width</fielddescr>
+			<fieldname>graphsizewidth</fieldname>
+			<description>Graph width in pixels.  Recommend 960 for large images, 320 for small images.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Graph Size Height</fielddescr>
+			<fieldname>graphsizeheight</fieldname>
+			<description>Graph height in pixels.  Recommend 300 for large images, 200 for small images.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Color</fielddescr>
+			<fieldname>color</fieldname>
+			<description>Color of graph</description>
+			<type>select</type>
+			<options>
+				<option><name>Blue</name><value>blue</value></option>
+				<option><name>Red</name><value>red</value></option>
+				<option><name>Green</name><value>green</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Left Counters</fielddescr>
+			<fieldname>leftcounters</fieldname>
+			<description></description>
+			<type>select</type>
+			<size>4</size>
+			<multiple>yes</multiple>
+			<options>
+				<option><value>BytesinIPv4</value><name>Bytes in (IPv4)</name></option>
+				<option><value>BytesoutIPv4</value><name>Bytes out (IPv4)</name></option>
+				<option><value>BytesinIPv6</value><name>Bytes in (IPv6)</name></option>
+				<option><value>BytesoutIPv6</value><name>Bytes out (IPv6)</name></option>
+				<option><value>PacketsinpassedIPv4</value><name>Packets in passed (IPv4)</name></option>
+				<option><value>PacketsindroppedIPv4</value><name>Packets in dropped (IPv4)</name></option>
+				<option><value>PacketsoutpassedIPv4</value><name>Packets out passed (IPv4)</name></option>
+				<option><value>PacketsoutdroppedIPv4</value><name>Packets out dropped (IPv4)</name></option>
+				<option><value>PacketsinpassedIPv6</value><name>Packets in passed (IPv6)</name></option>
+				<option><value>PacketsindroppedIPv6</value><name>Packets in dropped (IPv6)</name></option>
+				<option><value>PacketsoutpassedIPv6</value><name>Packets out passed (IPv6)</name></option>
+				<option><value>PacketsoutdroppedIPv6</value><name>Packets out dropped (IPv6)</name></option>
+				<option><value>statetableentries</value><name>State table entries</name></option>
+				<option><value>statesearches</value><name>State searches</name></option>
+				<option><value>StateTableInsertions</value><name>State Table Insertions</name></option>
+				<option><value>StateTableRemovals</value><name>State Table Removals</name></option>
+				<option><value>MatchCounter</value><name>Match Counter</name></option>
+				<option><value>BadOffsetCounter</value><name>Bad Offset Counter</name></option>
+				<option><value>FragmentCounter</value><name>Fragment Counter</name></option>
+				<option><value>ShortCounter</value><name>Short Counter</name></option>
+				<option><value>NormalizeCounter</value><name>Normalize Counter</name></option>
+				<option><value>MemoryCounter</value><name>Memory Counter</name></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Right Counters</fielddescr>
+			<fieldname>rightcounters</fieldname>
+			<description></description>
+			<type>select</type>
+			<size>4</size>
+			<multiple>yes</multiple>
+			<options>
+				<option><value>BytesinIPv4</value><name>Bytes in (IPv4)</name></option>
+				<option><value>BytesoutIPv4</value><name>Bytes out (IPv4)</name></option>
+				<option><value>BytesinIPv6</value><name>Bytes in (IPv6)</name></option>
+				<option><value>BytesoutIPv6</value><name>Bytes out (IPv6)</name></option>
+				<option><value>PacketsinpassedIPv4</value><name>Packets in passed (IPv4)</name></option>
+				<option><value>PacketsindroppedIPv4</value><name>Packets in dropped (IPv4)</name></option>
+				<option><value>PacketsoutpassedIPv4</value><name>Packets out passed (IPv4)</name></option>
+				<option><value>PacketsoutdroppedIPv4</value><name>Packets out dropped (IPv4)</name></option>
+				<option><value>PacketsinpassedIPv6</value><name>Packets in passed (IPv6)</name></option>
+				<option><value>PacketsindroppedIPv6</value><name>Packets in dropped (IPv6)</name></option>
+				<option><value>PacketsoutpassedIPv6</value><name>Packets out passed (IPv6)</name></option>
+				<option><value>PacketsoutdroppedIPv6</value><name>Packets out dropped (IPv6)</name></option>
+				<option><value>statetableentries</value><name>State table entries</name></option>
+				<option><value>statesearches</value><name>State searches</name></option>
+				<option><value>StateTableInsertions</value><name>State Table Insertions</name></option>
+				<option><value>StateTableRemovals</value><name>State Table Removals</name></option>
+				<option><value>MatchCounter</value><name>Match Counter</name></option>
+				<option><value>BadOffsetCounter</value><name>Bad Offset Counter</name></option>
+				<option><value>FragmentCounter</value><name>Fragment Counter</name></option>
+				<option><value>ShortCounter</value><name>Short Counter</name></option>
+				<option><value>NormalizeCounter</value><name>Normalize Counter</name></option>
+				<option><value>MemoryCounter</value><name>Memory Counter</name></option>
+			</options>
+		</field>
+	</fields>
+</packagegui>
