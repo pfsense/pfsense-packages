@@ -216,6 +216,7 @@
 		 */
 		conf_mount_rw();
 		config_lock();
+		if(file_exists("/usr/local/etc/rc.d/carp.sh")) system("rm /usr/local/etc/rc.d/carp.sh");
 		$fout = fopen("/usr/local/pkg/pf/carp.sh","w");
 		fwrite($fout, "#!/bin/sh \n");
 		global $config;
