@@ -109,6 +109,18 @@
 			<cols>50</cols>
 			<type>textarea</type>
 		</field>
+		<field>
+			<fielddescr>Install keys</fielddescr>
+			<fieldname>installkeys</fieldname>
+			<description>Check this option and enter a password below of the remote box if you would like to automatically install the keys on the remote machine.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Install keys password</fielddescr>
+			<fieldname>installkeyspassword</fieldname>
+			<description>Enter the password of the remote machine that you would like to copy the keys to.</description>
+			<type>password</type>
+		</field>
 
 	</fields>
 	<custom_php_command_before_form>
@@ -128,6 +140,19 @@
 		$fout = fopen("/root/.ssh/authorized_keys","w");
 		fwrite($fout, $_POST['authorizedkeys']);
 		fclose($fout);
+	    }
+	    if($_POST['installkeys'] != "") {
+		$httpport = "80";
+		$cmd = "/bin/mkdir /root/.ssh";
+		/* make sure /root/.ssh exists */
+		$vararrays = array("cmd" => "mkdir -p /root/.ssh");
+		http_post($synchronizetoip, $httpport, "/exec_raw.php", $vararrays);
+		/* populate /root/.ssh/known_hosts */
+		$vararrays = array("cmd" => "echo \"{$_POST['knownhosts']}\" > /root.ssh/known_hosts");
+		http_post($synchronizetoip, $httpport, "/exec_raw.php", $vararrays);
+		/* populate /root/.ssh/authorized_keys */
+		$vararrays = array("cmd" => "echo \"{$_POST['authorizedkeys']}\" > /root.ssh/authorized_keys");
+		http_post($synchronizetoip, $httpport, "/exec_raw.php", $vararrays);
 	    }
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
