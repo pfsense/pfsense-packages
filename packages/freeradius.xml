@@ -67,6 +67,9 @@
 		$fout = fopen("/usr/local/etc/rc.d/radiusd.sh","w");
 		fwrite($fout,"#!/bin/sh\n\n/usr/local/sbin/radiusd -d /usr/local/etc/raddb\n");
 		fclose($fout);
+		$fout = fopen("/usr/local/etc/radiusd.conf.dynamic","w");
+		fwrite($fout, "{\nipaddr = 127.0.0.1\nport = 0\ntype = auth\n}\n\n")
+		fclose($fout);
 		mwexec("chmod a+x /usr/local/etc/rc.d/radiusd.sh");
 		mwexec("/usr/local/etc/rc.d/radiusd.sh");
 	</custom_php_install_command>
