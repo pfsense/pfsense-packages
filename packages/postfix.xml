@@ -26,6 +26,19 @@
 			<description>Enter the hostname of this system to be used by Postfix.  (ex: mail.example.com)</description>
                         <type>input</type>
 		</field>
+                <field>
+			<fielddescr>Domain</fielddescr>
+			<fieldname>domain</fieldname>
+			<description>Enter the domain here (ex: example.com)</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Mail Server IP</fielddescr>
+			<fieldname>mailserverip</fieldname>
+			<description>Enter the IP of the mail server to forward to here.</description>
+			<type>input</type>
+		</field>
+
         </fields>
     	<adddeleteeditpagefields>
 		<columnitem>
@@ -39,20 +52,6 @@
 	</adddeleteeditpagefields>
 	<!-- fields gets invoked when the user adds or edits a item.   the following items
          will be parsed and rendered for the user as a gui with input, and selectboxes. -->
-	<fields>
-		<field>
-			<fielddescr>Domain</fielddescr>
-			<fieldname>domain</fieldname>
-			<description>Enter the domain here (ex: example.com)</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Mail Server IP</fielddescr>
-			<fieldname>mailserverip</fieldname>
-			<description>Enter the IP of the mail server to forward to here.</description>
-			<type>input</type>
-		</field>
-	</fields>
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_deinstall_command>
