@@ -75,15 +75,19 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>From</fielddescr>
+			<fielddescr>Update interval</fielddescr>
 			<fieldname>from</fieldname>
 			<description></description>
 			<type>input</type>
 			<size>1</size>
 			<value>1</value>
+			<combinefieldsbegin>true</combinefieldsbegin>
 		</field>
 		<field>
-			<fielddescr>From Class</fielddescr>
+			<combinefieldsend>true</combinefieldsend>
+			<dontdisplayname>true</dontdisplayname>
+			<dontcombinecells>true</dontcombinecells>
+			<fielddescr>Update interval duration</fielddescr>
 			<fieldname>fromclassification</fieldname>
 			<description></description>
 			<type>select</type>
@@ -114,28 +118,28 @@
 			    <description></description>
 			    <type>select</type>
 			    <options>
-				<option><value>BytesinIPv4</value><name>Bytes in (IPv4)</name></option>
-				<option><value>BytesoutIPv4</value><name>Bytes out (IPv4)</name></option>
-				<option><value>BytesinIPv6</value><name>Bytes in (IPv6)</name></option>
-				<option><value>BytesoutIPv6</value><name>Bytes out (IPv6)</name></option>
-				<option><value>PacketsinpassedIPv4</value><name>Packets in passed (IPv4)</name></option>
-				<option><value>PacketsindroppedIPv4</value><name>Packets in dropped (IPv4)</name></option>
-				<option><value>PacketsoutpassedIPv4</value><name>Packets out passed (IPv4)</name></option>
-				<option><value>PacketsoutdroppedIPv4</value><name>Packets out dropped (IPv4)</name></option>
-				<option><value>PacketsinpassedIPv6</value><name>Packets in passed (IPv6)</name></option>
-				<option><value>PacketsindroppedIPv6</value><name>Packets in dropped (IPv6)</name></option>
-				<option><value>PacketsoutpassedIPv6</value><name>Packets out passed (IPv6)</name></option>
-				<option><value>PacketsoutdroppedIPv6</value><name>Packets out dropped (IPv6)</name></option>
-				<option><value>statetableentries</value><name>State table entries</name></option>
-				<option><value>statesearches</value><name>State searches</name></option>
-				<option><value>StateTableInsertions</value><name>State Table Insertions</name></option>
-				<option><value>StateTableRemovals</value><name>State Table Removals</name></option>
-				<option><value>MatchCounter</value><name>Match Counter</name></option>
-				<option><value>BadOffsetCounter</value><name>Bad Offset Counter</name></option>
-				<option><value>FragmentCounter</value><name>Fragment Counter</name></option>
-				<option><value>ShortCounter</value><name>Short Counter</name></option>
-				<option><value>NormalizeCounter</value><name>Normalize Counter</name></option>
-				<option><value>MemoryCounter</value><name>Memory Counter</name></option>
+				<option><value>bytes_v4_in</value><name>Bytes in (IPv4)</name></option>
+				<option><value>bytes_v4_out</value><name>Bytes out (IPv4)</name></option>
+				<option><value>bytes_v6_in</value><name>Bytes in (IPv6)</name></option>
+				<option><value>bytes_v6_out</value><name>Bytes out (IPv6)</name></option>
+				<option><value>packets_v4_in_pass</value><name>Packets in passed (IPv4)</name></option>
+				<option><value>packets_v4_in_drop</value><name>Packets in dropped (IPv4)</name></option>
+				<option><value>packets_v4_out_pass</value><name>Packets out passed (IPv4)</name></option>
+				<option><value>packets_v4_out_drop</value><name>Packets out dropped (IPv4)</name></option>
+				<option><value>packets_v6_in_pass</value><name>Packets in passed (IPv6)</name></option>
+				<option><value>packets_v6_in_drop</value><name>Packets in dropped (IPv6)</name></option>
+				<option><value>packets_v6_out_pass</value><name>Packets out passed (IPv6)</name></option>
+				<option><value>packets_v6_out_drop</value><name>Packets out dropped (IPv6)</name></option>
+				<option><value>states_entries</value><name>State table entries</name></option>
+				<option><value>states_searches</value><name>State searches</name></option>
+				<option><value>states_inserts</value><name>State Table Insertions</name></option>
+				<option><value>states_removals</value><name>State Table Removals</name></option>
+				<option><value>counters_match</value><name>Match Counter</name></option>
+				<option><value>counters_badoffset</value><name>Bad Offset Counter</name></option>
+				<option><value>counters_fragment</value><name>Fragment Counter</name></option>
+				<option><value>counters_short</value><name>Short Counter</name></option>
+				<option><value>counters_normalize</value><name>Normalize Counter</name></option>
+				<option><value>counters_memory</value><name>Memory Counter</name></option>
 			    </options>
 			</rowhelperfield>
 			<rowhelperfield>
@@ -169,6 +173,8 @@
 		</field>
 	</fields>
 	<custom_add_php_command_late>
+	</custom_add_php_command_late>
+	<custom_php_resync_config_command>
 	  $fout = fopen("/usr/local/etc/pfstat.conf","w");
 	  $leftgraphtext = "";
 	  $rightgraphtext = "";
@@ -189,16 +195,22 @@
 	  }
 	  foreach($config['installedpackages']['pfstat']['config'] as $pkgconfig) {
 		fwrite($fout, "image \"/usr/local/www/pfstat/" . $pkgconfig['imagename'] ."\" { \n");
-		fwrite($fout, "from " . $pkgconfig['from'] . " " . $pkgconfig['fromclassification'] . " to now  \n");
+		$from = $pkgconfig['from'];
+		if($from == "") $from = "30";
+		fwrite($fout, "from " . $from . " " . $pkgconfig['fromclassification'] . " to now  \n");
 		fwrite($fout, "width " . $pkgconfig['graphsizewidth'] . " height " . $pkgconfig['graphsizeheight'] . "  \n");
-		fwrite($fout, "	left  \n");
-		fwrite($fout, "		" . $leftgraphtext . "\n");
-		fwrite($fout, "	right \n");
-		fwrite($fout, "		" . $rightgraphtext . "\n");
+		if($leftgraphtext != "") {
+		  fwrite($fout, "	left  \n");
+		  fwrite($fout, "		" . $leftgraphtext . "\n");
+		}
+		if($rightgraphtext != "") {
+		  fwrite($fout, "	right \n");
+		  fwrite($fout, "		" . $rightgraphtext . "\n");
+		}
 		fwrite($fout, "}\n\n");
 	  }
 	  fclose($fout);
-	</custom_add_php_command_late>
+	</custom_php_resync_config_command>
 	<custom_php_install_command>
 		system("mkdir -p /usr/local/www/pfstat 2>/dev/null");
 		system("/usr/bin/killall cron 2>/dev/null");
