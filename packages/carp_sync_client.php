@@ -35,7 +35,7 @@ if($already_processed != 1)
 		/* lets sync! */
 		$synchronizetoip = $carp['synchronizetoip'];
 		$files_to_copy = "";
-		if($carp['synchronizerules'] <> "") {
+		if($carp['synchronizerules'] <> "" and is_array($config['filter'])) {
 		    $current_rules_section = backup_config_section("filter");
 		    /* generate firewall rules xml */
 		    $fout = fopen("{$g['tmp_path']}/filter_section.txt","w");
@@ -43,7 +43,7 @@ if($already_processed != 1)
 		    fclose($fout);
                     $files_to_copy .= "{$g['tmp_path']}/filter_section.txt";
 		}
-		if($carp['synchronizenat'] <> "") {
+		if($carp['synchronizenat'] <> "" and is_array($config['nat'])) {
 		    $current_nat_section = backup_config_section("nat");
 		    /* generate nat rules xml */
 		    $fout = fopen("{$g['tmp_path']}/nat_section.txt","w");
@@ -51,7 +51,7 @@ if($already_processed != 1)
 		    fclose($fout);
                     $files_to_copy .= " {$g['tmp_path']}/nat_section.txt";
 		}
-		if($carp['synchronizealiases'] <> "") {
+		if($carp['synchronizealiases'] <> "" and is_array($config['aliases'])) {
 		    $current_aliases_section = backup_config_section("aliases");
 		    /* generate aliases xml */
 		    $fout = fopen("{$g['tmp_path']}/aliases_section.txt","w");
@@ -59,7 +59,7 @@ if($already_processed != 1)
 		    fclose($fout);
                     $files_to_copy .= " {$g['tmp_path']}/aliases_section.txt";
 		}
-		if($carp['synchronizetrafficshaper'] <> "") {
+		if($carp['synchronizetrafficshaper'] <> "" and is_array($config['shaper'])) {
 		    $current_trafficshaper_section = backup_config_section("shaper");
 		    /* generate aliases xml */
 		    $fout = fopen("{$g['tmp_path']}/shaper_section.txt","w");
