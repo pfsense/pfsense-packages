@@ -7,6 +7,7 @@
                 <tooltiptext>Modify doormand settings and users.</tooltiptext>
                 <section>Services</section>
                 <configfile>doorman.xml</configfile>
+		<url>/pkg_edit.php?xml=doorman.xml&amp;id=0</url>
         </menu>
 	<tabs>
 		<tab> 
