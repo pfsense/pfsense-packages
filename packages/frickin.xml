@@ -50,6 +50,18 @@
         <custom_add_php_command>
 		sync_package_frickin();
         </custom_add_php_command>
+	<custom_php_install_command>
+	    $fout = fopen("/usr/local/etc/rc.d/frickin.sh", "w");
+	    fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");
+	    fwrite($fout, "/usr/local/bin/frickin");
+	    fwrite($fout, " -s 127.0.0.1");
+	    fwrite($fout, " -c 20");
+	    fwrite($fout, " &amp;\n");
+	    fclose($fout);
+	    mwexec("/usr/bin/killall frickin");
+	    mwexec("chmod a+rx /usr/local/etc/rc.d/frickin.sh");
+	    mwexec("/usr/local/etc/rc.d/frickin.sh");
+	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		unlink_if_exists("/usr/local/etc/rc.d/frickin.sh");
 		unlink_if_exists("/usr/local/bin/frickin");
