@@ -1,19 +1,29 @@
 <packagegui>
 	<name>freeradius</name>
 	<menu>
-		<name>RADIUS Users</name>
-		<tooltiptext>Add, edit, and delete RADIUS users.</tooltiptext>
+		<name>FreeRADIUS</name>
+		<tooltiptext>Modify FreeRADIUS users, clients, and settings.</tooltiptext>
 		<section>Services</section>
 		<configfile>freeradius.xml</configfile>
 	</menu>
-	<menu>
-		<name>RADIUS Clients</name>
-		<tooltiptext>Add, edit, and delete RADIUS clients.</tooltiptext>
-		<section>Services</section>
-		<configfile>freeradiusclients.xml</configfile>
-	</menu>
+	<tabs>
+		<tab>
+			<text>Users</text>
+			<url>/pkg_edit.php?xml=freeradius.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Clients</text>
+			<url>/pkg_edit.php?xml=freeradiusclients.xml</url>
+		</tab>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=freeradiussettings.xml</url>
+		</tab>
+	</tabs>
 	<additional_files_needed>
 		<item>http://www.pfsense.com/packages/config/freeradiusclients.xml</item>
+		<item>http://www.pfsense.com/packages/config/freeradiussettings.xml</item>
 	</additional_files_needed>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<adddeleteeditpagefields>
@@ -46,6 +56,18 @@
 			<type>input</type>
 		</field>
 	</fields>
+	<custom_php_install_command>
+		global $config;
+		$fout = fopen("/usr/local/etc/raddb/clients.conf","w");
+		fwrite($fout, "client 127.0.0.1" . "{\n" . "secret = pfsense\n" . "shortname = localhost\n}\n\n");
+		fclose($fout);
+		mwexec("rm /usr/local/etc/rc.d/radiusd*");
+		$fout = fopen("/usr/local/etc/rc.d/radiusd.sh","w");
+		fwrite($fout,"#!/bin/sh\n\n/usr/local/sbin/radiusd -d /usr/local/etc/raddb\n");
+		fclose($fout);
+		mwexec("chmod a+x /usr/local/etc/rc.d/radiusd.sh");
+		mwexec("/usr/local/etc/rc.d/radiusd.sh");
+	</custom_php_install_command>
 	<custom_php_command_before_form>
 		function sync_package()
 		{
