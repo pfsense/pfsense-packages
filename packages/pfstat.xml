@@ -24,8 +24,8 @@
 		<item>
 			<modifyfilename>/etc/crontab</modifyfilename>
 			<textneeded>
-			  *    *    *    *    *    root   /usr/local/bin/pfstat -q >> /var/log/pfstat
-			  */5  *    *    *    *    root   /usr/local/bin/pfstat -c /usr/local/etc/pfstat.conf -d /var/log/pfstat
+*	*	*	*	*	root	/usr/local/bin/pfstat -q >> /var/log/pfstat
+*/5	*	*	*	*	root	/usr/local/bin/pfstat -c /usr/local/etc/pfstat.conf -d /var/log/pfstat
 			</textneeded>
 		</item>
 	</modify_system>
