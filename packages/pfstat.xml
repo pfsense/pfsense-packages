@@ -12,7 +12,7 @@
 		<name>PFStat Graphs</name>
 		<tooltiptext>pfstat is a small utility that collects packet filter statistics and produces graphs.</tooltiptext>
 		<url>/pfstat.php</url>
-		<section>Services</section>
+		<section>Status</section>
 	</menu>
 	<additional_files_needed>
 		<item>http://www.pfsense.com/packages/config/pfstat.tgz</item>
