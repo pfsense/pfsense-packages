@@ -22,7 +22,7 @@
 	    </tab>
 	    <tab>
 		<text>CARP Settings</text>
-		<xml>carp_settings.xml</xml>
+		<url>pkg_edit.php?xml=pure-carp_settings.xml&amp;id=0</url>
 	    </tab>
 	</tabs>
     	<additional_files_needed>

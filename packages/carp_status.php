@@ -58,7 +58,7 @@ include("fbegin.inc");
  <ul id="tabnav">
   <li class="tabinact"><a href="/pkg.php?xml=carp.xml">CARP Virtual IPs</a></li>
   <li class="tabact">CARP Status</li>
-  <li class="tabinact"><a href="/pkg.php?xml=carp_settings.xml">CARP Settings</a></li>
+  <li class="tabinact"><a href="/pkg_edit.php?xml=carp_settings.xml&id=0">CARP Settings</a></li>
  </ul>
 </td></tr>
 <tr><td class="tabcont">
