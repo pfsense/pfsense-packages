@@ -84,6 +84,8 @@
 			<fielddescr>Provider URL or Filename</fielddescr>
 			<fieldname>provider_url</fieldname>
 			<description>Enter the URL to the provider.</description>
+			<rows>3</rows>
+			<cols>40</cols>
 			<type>textarea</type>
 		</field>
 	</fields>
