@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>pfstat</name>
 	<!-- Menu is where this packages menu will appear -->
@@ -65,11 +65,42 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>From</fielddescr>
+			<fieldname>from</fieldname>
+			<description></description>
+			<type>input</type>
+			<size>1</size>
+			<value>1</value>
+		</field>
+		<field>
+			<fielddescr>From Class</fielddescr>
+			<fieldname>fromclassification</fieldname>
+			<description></description>
+			<type>select</type>
+			<options>
+			<option><name>Minutes</name><value>minutes</value></option>
+			<option><name>Hours</name><value>hours</value></option>
+			<option><name>Days</name><value>days</value></option>
+			<option><name>Weeks</name><value>weeks</value></option>
+			<option><name>Months</name><value>months</value></option>
+			</options>
+		</field>
+		<field>
 		    <type>rowhelper</type>
 		    <rowhelper>
 			<rowhelperfield>
-			    <fielddescr>Left Counters</fielddescr>
-			    <fieldname>leftcounters</fieldname>
+			    <fielddescr>Location</fielddescr>
+			    <fieldname>location</fieldname>
+			    <description>Location of graph</description>
+			    <type>select</type>
+			    <options>
+				<option><name>Left</name><value>left</value></option>
+				<option><name>Right</name><value>right</value></option>
+			    </options>
+			</rowhelperfield>
+			<rowhelperfield>
+			    <fielddescr>Graph Source</fielddescr>
+			    <fieldname>counters</fieldname>
 			    <description></description>
 			    <type>select</type>
 			    <options>
@@ -103,18 +134,65 @@
 			    <description>Color of graph</description>
 			    <type>select</type>
 			    <options>
-				<option><name>Blue</name><value>#0000FF</value></option>
-				<option><name>Red</name><value>#FF0000</value></option>
-				<option><name>Green</name><value>#00FF00</value></option>
-				<option><name>Yellow</name><value>#bebe00</value></option>
-				<option><name>Purple</name><value>#7200be</value></option>
-				<option><name>Cyan</name><value>#00bebe</value></option>
-				<option><name>Orange</name><value>#be7e00</value></option>
-				<option><name>Grey</name><value>#bebebe</value></option>
-				<option><name>Black</name><value>#000000</value></option>
+				<option><name>Blue</name><value>0 0 255</value></option>
+				<option><name>Red</name><value>255 0 0</value></option>
+				<option><name>Green</name><value>0 255 0</value></option>
+				<option><name>Yellow</name><value>125 125 0</value></option>
+				<option><name>Purple</name><value>72 00 190</value></option>
+				<option><name>Cyan</name><value>00 120 120</value></option>
+				<option><name>Orange</name><value>255 255 0</value></option>
+				<option><name>Grey</name><value>125 125 125</value></option>
+				<option><name>Black</name><value>0 0 0</value></option>
 			    </options>
-			</rowhelperfield>			
+			</rowhelperfield>
+			<rowhelperfield>
+			    <fielddescr>Appearance</fielddescr>
+			    <fieldname>appearance</fieldname>
+			    <description>Appearance type</description>
+			    <type>select</type>
+			    <options>
+				<option><name>Filled</name><value>filled</value></option>
+				<option><name>Unfilled</name><value></value></option>
+			    </options>
+			</rowhelperfield>
 		    </rowhelper>
 		</field>
 	</fields>
+	<custom_add_php_command_late>
+	  $fout = fopen("/usr/local/etc/pfstat.conf","w");
+	  $leftgraphtext = "";
+	  $rightgraphtext = "";
+	  $isfirstleft = 0;
+	  $isfirstright = 0;
+	  foreach($config['installedpackages']['pfstat']['config'] as $rowhelper) {
+		foreach($rowhelper['row'] as $row) {
+		  if($row['location'] == "left") {
+			if($isfirstleft == 1) $leftgraphtext .= ",\n";
+			$leftgraphtext .= $row['counters'] . "	label \"" . $row['counters'] . "\" color " . $row['color'] . " " . $row['appearance'];
+			$isfirstleft = 1;
+		  } else {
+			if($isfirstright == 1) $rightgraphtext .= ",\n";
+			$rightgraphtext .= $row['counters'] . "	label \"" . $row['counters'] . "\" color " . $row['color'] . " " . $row['appearance'];
+			$isfirstright = 1;
+		  }
+		}
+	  }
+	  foreach($config['installedpackages']['pfstat']['config'] as $pkgconfig) {
+		fwrite($fout, "image \"" . $pkgconfig['imagename'] ."\" { \n");
+		fwrite($fout, "from " . $pkgconfig['from'] . " " . $pkgconfig['fromclassification'] . " to now  \n");
+		fwrite($fout, "width " . $pkgconfig['graphsizewidth'] . " height " . $pkgconfig['graphsizeheight'] . "  \n");
+		fwrite($fout, "	left  \n");
+		fwrite($fout, "		" . $leftgraphtext . "\n");
+		fwrite($fout, "	right \n");
+		fwrite($fout, "		" . $rightgraphtext . "\n");
+		fwrite($fout, "}\n\n");
+	  }
+	  fclose($fout);
+	</custom_add_php_command_late>
+	<!--
+	<custom_php_install_command>
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+	</custom_php_deinstall_command>
+	-->
 </packagegui>
