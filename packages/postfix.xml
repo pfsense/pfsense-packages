@@ -62,9 +62,11 @@
             <template>
                 <filename>/usr/local/etc/postfix/main.cf</filename>
             </template>
-            <templatecontents>myhostname = hostname</templatecontents>
-            <templatecontents>mydomain = primarydomain</templatecontents>
-            <templatecontents>relay_domains = domain</templatecontents>
+            <templatecontents>
+                myhostname = hostname
+                mydomain = primarydomain
+                relay_domains = domain
+            </templatecontents>
             <template>
                 <filename>/usr/local/etc/postfix/transport</filename>
             </template>
