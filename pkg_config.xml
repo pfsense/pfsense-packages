@@ -6,7 +6,7 @@
         <name>pfstat</name>
         <descr>pfstat is a small utility that collects packet filter statistics and produces graphs.</descr>
         <category>Network Management</category>
-		<config_file>http://www.pfsense.com/packages/config/pfstat.xml</config_file>
+        <config_file>http://www.pfsense.com/packages/config/pfstat.xml</config_file>
         <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
         <depends_on_package>pfstat-1.7.tbz</depends_on_package>
         <configurationfile>pfstat.xml</configurationfile>
@@ -15,14 +15,23 @@
         <name>pure-ftpd</name>
         <descr>Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerability, it is trivial to set up, and it is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
         <category>FTP</category>
-		<config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
+	<config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
         <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
         <depends_on_package>pure-ftpd-1.0.20_1.tbz</depends_on_package>
         <configurationfile>pure-ftpd.xml</configurationfile>
-		<logging>
-			<facilityname>ftp</facilityname>
-			<logfilename>pure-ftpd.log</logfilename>
-		</logging>
+        <logging>
+                <facilityname>ftp</facilityname>
+                <logfilename>pure-ftpd.log</logfilename>
+        </logging>
+    </package>
+    <package>
+      <name>nmap</name>
+      <descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
+      <category>Security</category>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+      <depends_on_package>nmap-3.70.tbz</depends_on_package>
+      <config_file>http://www.pfsense.com/packages/config/nmap.xml</config_file>
+      <configurationfile>nmap.xml</configurationfile>
     </package>
   </packages>
 </pfsensepkgs>
