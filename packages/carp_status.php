@@ -67,7 +67,6 @@ include("fbegin.inc");
 <tr>
   <td class="listhdrr"><b><center>Interface</center></b></td>
   <td class="listhdrr"><b><center>Status</center></b></td>
-  <td class="listhdrr"><b><center>Sync Status</center></b></td>
 </tr>
 <?php
 
@@ -89,7 +88,6 @@ if($config['installedpackages']['carp']['config'] <> "")
 		echo "<tr>";
 		echo "<td class=\"listlr\"><center>" . $ipaddress . " - " . $carp_int . "</td>";
 		echo "<td class=\"listlr\"><center>" . $status . "<br>" . $sync_status . "</td>";
-		echo "<td class=\"listlr\"><center>" . $synciface . " - " . convert_friendly_interface_to_real_interface_name($synciface) . "</td>";
 		echo "</tr>";
 	}
 
