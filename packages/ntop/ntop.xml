@@ -35,18 +35,27 @@
 			<fielddescr>Interface</fielddescr>
 			<fieldname>iface</fieldname>
 			<size>3</size>
-			<multiselect>true</multiselect>
+			<multiple>true</multiple>
 			<type>interfaces_selection</type>
 		</field>
     </fields>
 	<custom_add_php_command>
 	if($_POST['password'] == $_POST['passwordagain']) {
+		$interfaces = " -i ";
+		$ifaces=$_POST['iface'];
+		$isfirst = 0;
+		foreach($ifaces as $element=>$if)
+		{
+			if($isfirst == 1) $interfaces .= ",";
+			$interfaces .= $ifaces[$element];
+			$isfirst = 1;
+		}
 		system("/usr/local/bin/ntop --set-admin-password=" . $_POST['password']);
 		system("killall ntop 2>/dev/null");
 	    system("rm /usr/local/etc/rc.d/ntop.sh");
 	    $fout = fopen("/usr/local/etc/rc.d/ntop.sh","w");
 	    fwrite($fout, "#!/bin/sh\n\n");
-	    fwrite($fout, "/usr/local/bin/ntop -i " . $_POST['iface'] . " -u root -d --ipv4 -M\n\n");
+	    fwrite($fout, "/usr/local/bin/ntop " . $interfaces . " -u root -d --ipv4 -M\n\n");
 	    fclose($fout);
 	    system("chmod 555 /usr/local/etc/rc.d/ntop.sh");
 		system("/usr/local/etc/rc.d/ntop.sh");
