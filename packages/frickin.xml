@@ -61,11 +61,9 @@
 	    mwexec("/usr/bin/killall frickin");
 	    mwexec("chmod a+rx /usr/local/etc/rc.d/frickin.sh");
 	    mwexec("/usr/local/etc/rc.d/frickin.sh");
-	    filter_configure();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 	    unlink_if_exists("/usr/local/etc/rc.d/frickin.sh");
 	    unlink_if_exists("/usr/local/bin/frickin");
-	    filter_configure();
 	</custom_php_deinstall_command>
 </packagegui>
