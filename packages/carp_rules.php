@@ -46,11 +46,11 @@ foreach($config['installedpackages']['carp']['config'] as $carp) {
 	add_rule_to_anchor("natrules", $rule, $ip);
     }
 }
-add_rule_to_anchor("carp", "pass quick on pfsync0", "pfsync0" . "3");
+add_rule_to_anchor("carp", "pass quick on pfsync0 keep state", "pfsync0" . "3");
 foreach($config['installedpackages']['carpsettings']['config'] as $carp)
 $carp_sync_int = convert_friendly_interface_to_real_interface_name($carp['pfsyncinterface']);    
 if($carp_sync_int <> "") {
-    add_rule_to_anchor("carp", "pass quick on {$carp_sync_int}", $carp_sync_int . "3");
+    add_rule_to_anchor("carp", "pass quick on {$carp_sync_int} keep state", $carp_sync_int . "3");
     add_rule_to_anchor("carp", "pass quick on {$carp_sync_int} proto carp from {$carp_sync_int}:network to 224.0.0.18 keep state \(no-sync\)", $carp_sync_int . "2");
 }
 
