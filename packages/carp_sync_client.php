@@ -1,5 +1,4 @@
 #!/usr/bin/php
-
 /*
 	carp_sync.php
         part of pfSense (www.pfSense.com)
@@ -28,19 +27,32 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-
-
-if($config['installedpackages']['carpsettings']['config'] != "")
-    foreach($config['installedpackages']['carpsettings']['config'] as $carp)
+if($config['installedpackages']['carpsettings']['config'] != "") {
+    foreach($config['installedpackages']['carpsettings']['config'] as $carp) {
 	if($carp['synchronizerules'] <> "") {
 	    /* lets sync! */
 	    $synchronizetoip = $carp['synchronizetoip'];
 	    $current_rules_section = backup_config_section("rules");
+	    $current_nat_section = backup_config_section("nat");
+	    $current_aliases_section = backup_config_section("aliases");
+	    /* generate firewall rules xml */
 	    $fout = fopen("{$g['tmp_path']}/rules_section.txt","w");
 	    fwrite($fout, $current_rules_section);
 	    fclose($fout);
+	    /* generate nat rules xml */
+	    $fout = fopen("{$g['tmp_path']}/nat_section.txt","w");
+	    fwrite($fout, $current_nat_section);
+	    fclose($fout);
+	    /* generate aliases xml */
+	    $fout = fopen("{$g['tmp_path']}/aliases_section.txt","w");
+	    fwrite($fout, $current_aliases_section);
+	    fclose($fout);	    
 	    /* copy configuration to remote host */
 	    mwexec("/usr/bin/scp {$g['tmp_path']}/rules_section.txt root@{$synchronizetoip}:/tmp/");
+	    mwexec("/usr/bin/scp {$g['tmp_path']}/aliases_section.txt root@{$synchronizetoip}:/tmp/");
+	    mwexec("/usr/bin/scp {$g['tmp_path']}/nat_section.txt root@{$synchronizetoip}:/tmp/");
 	    mwexec("/usr/bin/ssh {$synchronizetoip} /usr/local/pkg/carp_sync_server.php");
 	}
+    }
+}
 
