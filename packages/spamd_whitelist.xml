@@ -31,7 +31,7 @@
 		</columnitem>
 		<columnitem>
 			<fielddescr>Description</fielddescr>
-			<fieldname>descr</fieldname>
+			<fieldname>description</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
 	<!-- fields gets invoked when the user adds or edits a item.   the following items
