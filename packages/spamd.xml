@@ -147,7 +147,7 @@
 	    fwrite($fd, "#!/bin/sh\n\n");
 	    fwrite($fd, "/usr/bin/killall spamd-setup 2>/dev/null\n");
 	    fwrite($fd, "/usr/local/sbin/spamd-setup &amp;\n");
-	    fwrite($fd, "/usr/libexec/spamlogd &amp;\n");
+	    fwrite($fd, "/usr/local/libexec/spamlogd &amp;\n");
 	    fclose($fd);
 	    system("chmod a+x /usr/local/etc/rc.d/spamd 2>/dev/null");
 	    system("/usr/local/etc/rc.d/spamd 2>/dev/null");
