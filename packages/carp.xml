@@ -3,7 +3,7 @@
 	<name>carp</name>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
-		<name>CARP Settings</name>
+		<name>CARP (failover)</name>
 		<tooltiptext>CARP is a tool to help achieve system redundancy, by having multiple computers creating a single, virtual network interface between them, so that if any machine fails, another can respond instead, and/or allowing a degree of load sharing between systems. CARP is an improvement over the Virtual Router Redundancy Protocol (VRRP) standard. It was developed after VRRP was deemed to be not free enough because of a possibly-overlapping Cisco patent.</tooltiptext>
 		<section>Services</section>
 		<configfile>carp.xml</configfile>
@@ -50,7 +50,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Password</fielddescr>
+			<fielddescr>Virtual IP Password</fielddescr>
 			<fieldname>password</fieldname>
 			<description>Enter the VHID group password.</description>
 			<type>password</type>
@@ -219,12 +219,13 @@
 			  /*
 			   *  create the carp interface
 			   */
-			  system("/sbin/ifconfig carp" . $carp_instances_counter . " create");
+			  fwrite($fout, "/sbin/ifconfig carp" . $carp_instances_counter . " create\n");
 			  $broadcast_address = gen_subnet_max($carp['ipaddress'], $carp['netmask']);
 			  if($carp['password'] != "") {
 			    $password = " pass " . $carp['password'];
 			  }
-			  $carp_command = "/sbin/ifconfig carp" . $carp_instances_counter . " " . $carp['ipaddress'] . " " . $carp['netmask'] . " broadcast " . $broadcast_address . " vhid " . $carp['vhid'] . $carp['advskew '] . $password;
+			  $carp_command = "/sbin/ifconfig carp" . $carp_instances_counter . " " . $carp['ipaddress'] . "/" . $carp['netmask'];
+			  $carp_command .= " broadcast " . $broadcast_address . " vhid " . $carp['vhid'] . $carp['advskew '] . $password;
 			  if($carp['balancing'] == "true") $using_arp_balance = 1;
 			  if($carp['preempt'] == "true") $using_preempt = 1;
 			  fwrite($fout, $carp_command . "\n");

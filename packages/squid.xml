@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>squid</name>
+	<!-- Menu is where this packages menu will appear -->
+	<!-- configpath gets expanded out automatically and config items will be
+         stored in that location -->
+	<configpath>['installedpackages']['squid']['config']</configpath>
+	<fields/>
+	<custom_php_install_command>
+	    echo "&lt;pre&gt;";
+	    system("/bin/mkdir /usr/local/etc/squid");
+	    $fout = fopen("/usr/local/etc/squid/squid.conf","w");
+	    fwrite($fout, "http_port 127.0.0.1:3128\n");
+	    fwrite($fout, "http_access deny to_localhost\n");
+	    fwrite($fout, "acl our_networks src 10.0.0.0/8\n");
+	    fwrite($fout, "http_access allow our_networks\n");
+	    fwrite($fout, "visible_hostname insomnia.benzedrine.cx\n");
+	    fwrite($fout, "httpd_accel_host virtual\n");
+	    fwrite($fout, "httpd_accel_port 80\n");
+	    fwrite($fout, "httpd_accel_with_proxy on\n");
+	    fwrite($fout, "httpd_accel_uses_host_header on\n");
+	    fclose($fout);
+	    $fout = fopen("/usr/local/etc/rc.d/squid.sh","w");
+	    fwrite($fout, "#!/bin/sh\n");
+	    fwrite($fout, "/usr/local/sbin/squid\n\n");
+	    fclose($fout);
+	    system("chmod a+x /usr/local/etc/rc.d/squid.sh");
+	    system("/usr/local/sbin/squid -z");
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+	    system("/usr/bin/killall squid");
+	</custom_php_deinstall_command>
+</packagegui>
