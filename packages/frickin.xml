@@ -32,24 +32,21 @@
                 </field>
 	</fields>
 	<custom_php_global_functions>
-		function write_frickin_static_config() {
-			$fout = fopen("/usr/local/etc/rc.d/frickin.sh", "w");
-			fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");
-			fwrite($fout, "/usr/local/bin/frickin ");
-			fclose($fout);
-		}
 		function sync_package_frickin() {
-                        $frickin_options = "";           
-                        if($_POST['serveraddress'] != "") $frickin_options .= "-s {$_POST['serveraddress']} ";
-                        if($_POST['maxtunnels'] != "") $frickin_options .= "-c {$_POST['maxtunnels']}";
-                        $fout = fopen("/usr/local/etc/rc.d/frickin.sh", "a");
-                        $fwrite($fout, $frickin_options . "\n");
+			global $config;
+			$frickin_config = $config['installedpackages']['frickin']['config'][0];
+                        $fout = fopen("/usr/local/etc/rc.d/frickin.sh", "w");
+			fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");
+			fwrite($fout, "/usr/local/bin/frickin");
+			if($frickin_config['serveraddress'] != "") fwrite($fout, " -s " . $frickin_config['serveraddress']);
+			if($frickin_config['maxtunnels'] != "") fwrite($fout, " -c " . $frickin_config['maxtunnels']);
+			fwrite($fout, "\n");
                         mwexec("/usr/bin/killall frickin");
                         mwexec("/usr/local/etc/rc.d/frickin.sh");
+			fclose($fout);
                 }
 	</custom_php_global_functions>
         <custom_add_php_command>
-		write_frickin_static_config();
 		sync_package_frickin();
         </custom_add_php_command>
 	<custom_php_deinstall_command>
