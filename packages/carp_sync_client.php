@@ -27,50 +27,52 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-if($config['installedpackages']['carpsettings']['config'] != "") {
-    foreach($config['installedpackages']['carpsettings']['config'] as $carp) {
-	if($carp['synchronizetoip'] <> "" ) {
-	    /* lets sync! */
-	    $synchronizetoip = $carp['synchronizetoip'];
-	    if($carp['synchronizerules'] <> "") {
-		$current_rules_section = backup_config_section("filter");
-		/* generate firewall rules xml */
-		$fout = fopen("{$g['tmp_path']}/rules_section.txt","w");
-		fwrite($fout, $current_rules_section);
-		fclose($fout);
-		mwexec("/usr/bin/scp {$g['tmp_path']}/rules_section.txt root@{$synchronizetoip}:/tmp/");
-		unlink("{$g['tmp_path']}/rules_section.txt");
+if($already_processed != 1)
+    if($config['installedpackages']['carpsettings']['config'] != "") {
+	$already_processed = 1;
+	foreach($config['installedpackages']['carpsettings']['config'] as $carp) {
+	    if($carp['synchronizetoip'] <> "" ) {
+		/* lets sync! */
+		$synchronizetoip = $carp['synchronizetoip'];
+		if($carp['synchronizerules'] <> "") {
+		    $current_rules_section = backup_config_section("filter");
+		    /* generate firewall rules xml */
+		    $fout = fopen("{$g['tmp_path']}/rules_section.txt","w");
+		    fwrite($fout, $current_rules_section);
+		    fclose($fout);
+		    mwexec("/usr/bin/scp {$g['tmp_path']}/rules_section.txt root@{$synchronizetoip}:/tmp/");
+		    unlink("{$g['tmp_path']}/rules_section.txt");
+		}
+		if($carp['synchronizenat'] <> "") {
+		    $current_nat_section = backup_config_section("nat");
+		    /* generate nat rules xml */
+		    $fout = fopen("{$g['tmp_path']}/nat_section.txt","w");
+		    fwrite($fout, $current_nat_section);
+		    fclose($fout);
+		    mwexec("/usr/bin/scp {$g['tmp_path']}/nat_section.txt root@{$synchronizetoip}:/tmp/");
+		    unlink("{$g['tmp_path']}/nat_section.txt");
+		}
+		if($carp['synchronizealiases'] <> "") {
+		    $current_aliases_section = backup_config_section("aliases");
+		    /* generate aliases xml */
+		    $fout = fopen("{$g['tmp_path']}/aliases_section.txt","w");
+		    fwrite($fout, $current_aliases_section);
+		    fclose($fout);
+		    mwexec("/usr/bin/scp {$g['tmp_path']}/aliases_section.txt root@{$synchronizetoip}:/tmp/");
+		    unlink("{$g['tmp_path']}/aliases_section.txt");
+		}
+		if($carp['synchronizetrafficshaper'] <> "") {
+		    $current_trafficshaper_section = backup_config_section("shaper");
+		    /* generate aliases xml */
+		    $fout = fopen("{$g['tmp_path']}/trafficshaper_section.txt","w");
+		    fwrite($fout, $current_trafficshaper_section);
+		    fclose($fout);
+		    mwexec("/usr/bin/scp {$g['tmp_path']}/trafficshaper_section.txt root@{$synchronizetoip}:/tmp/");
+		    unlink("{$g['tmp_path']}/trafficshaper_section.txt");
+		}
+		/* copy configuration to remote host */
+		mwexec("/usr/bin/ssh {$synchronizetoip} /usr/local/pkg/carp_sync_server.php");
 	    }
-	    if($carp['synchronizenat'] <> "") {
-		$current_nat_section = backup_config_section("nat");
-		/* generate nat rules xml */
-		$fout = fopen("{$g['tmp_path']}/nat_section.txt","w");
-		fwrite($fout, $current_nat_section);
-		fclose($fout);
-		mwexec("/usr/bin/scp {$g['tmp_path']}/nat_section.txt root@{$synchronizetoip}:/tmp/");
-		unlink("{$g['tmp_path']}/nat_section.txt");
-	    }
-	    if($carp['synchronizealiases'] <> "") {
-		$current_aliases_section = backup_config_section("aliases");
-		/* generate aliases xml */
-		$fout = fopen("{$g['tmp_path']}/aliases_section.txt","w");
-		fwrite($fout, $current_aliases_section);
-		fclose($fout);
-		mwexec("/usr/bin/scp {$g['tmp_path']}/aliases_section.txt root@{$synchronizetoip}:/tmp/");
-		unlink("{$g['tmp_path']}/aliases_section.txt");
-	    }
-	    if($carp['synchronizetrafficshaper'] <> "") {
-		$current_trafficshaper_section = backup_config_section("shaper");
-		/* generate aliases xml */
-		$fout = fopen("{$g['tmp_path']}/trafficshaper_section.txt","w");
-		fwrite($fout, $current_trafficshaper_section);
-		fclose($fout);
-		mwexec("/usr/bin/scp {$g['tmp_path']}/trafficshaper_section.txt root@{$synchronizetoip}:/tmp/");
-		unlink("{$g['tmp_path']}/trafficshaper_section.txt");
-	    }
-	    /* copy configuration to remote host */
-	    mwexec("/usr/bin/ssh {$synchronizetoip} /usr/local/pkg/carp_sync_server.php");
 	}
     }
-}
-
+    
