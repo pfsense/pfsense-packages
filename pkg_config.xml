@@ -201,6 +201,7 @@
           <status>ALPHA</status>
           <configurationfile>siproxd.xml</configurationfile>
     </package>
+  </packages>
     <package>
 	  <name>hula</name>
 	  <website>http://www.hula-project.org</website>
@@ -214,5 +215,4 @@
 	  <status>ALPHA-ALPHA</status>
 	  <configurationfile>hula.xml</configurationfile>
     </package>
-  </packages>
 </pfsensepkgs>
