@@ -36,7 +36,7 @@ foreach($config['installedpackages']['carp']['config'] as $carp) {
     $ip = $carp['ipaddress'];
     $int = find_ip_interface($ip);
     $carp_int = find_carp_interface($ip);
-    add_rule_to_anchor("firewallout", "pass out quick on {$carp_int} keep state", $carp_int)
+    add_rule_to_anchor("carp", "pass out quick on {$carp_int} keep state", $carp_int)
     if($int <> false && $int <> $wan_interface) {
 	$ipnet = convert_ip_to_network_format($ip, $carp['netmask']);
 	$rule = "nat on {$int} inet from {$ipnet} to any -> ({$carp_int}) \n";
