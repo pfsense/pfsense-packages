@@ -240,7 +240,7 @@
 			      if($carp['balancing'] != "")
 				      $using_arp_balance = 1;
 			      $carp_sync_int = convert_friendly_interface_to_real_interface_name($carp['pfsyncinterface']);
-			      $carp_sync_ip  = $carp['pfsyncip'];
+			      $carp_sync_ip = find_interface_ip($carp_sync_int);
 			      fwrite($fout, "/sbin/ifconfig pfsync0 create\n");
 			      fwrite($fout, "/sbin/ifconfig pfsync0 {$carp_sync_ip}/24\n");
 			      fwrite($fout, "/sbin/ifconfig pfsync0 syncif " . $carp_sync_int . "\n");

@@ -63,16 +63,10 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Synchronize IP Address</fielddescr>
-			<fieldname>pfsyncip</fieldname>
-			<description>PFSync IP Address</description>
-			<type>input</type>
-		</field>
-		<field>
 			<fielddescr>Synchronize Interface</fielddescr>
 			<fieldname>pfsyncinterface</fieldname>
 			<type>interfaces_selection</type>
-			<description>If Synchronize State is enabled, it will utilize this interface for communication.  NOTE!  You must define a IP on each machin participating in this failver group.</description>
+			<description>If Synchronize State is enabled, it will utilize this interface for communication.  NOTE!  You must define a IP on each machin participating in this failver group.  NOTE: You must have an IP assigned to the interface on any participating sync nodes.</description>
 		</field>
 		<field>
 			<fielddescr>Load Balancing</fielddescr>
