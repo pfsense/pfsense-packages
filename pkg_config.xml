@@ -249,7 +249,6 @@ test server or link availability and modify translation or routing rules. This p
         <config_file>http://www.pfsense.com/packages/config/frickin.xml</config_file>
         <configurationfile>frickin.xml</configurationfile>
     </package>
-  </packages>
     <package>
         <name>squidGuard</name>
         <descr>High performance Web proxy Guard</descr>
@@ -261,5 +260,6 @@ test server or link availability and modify translation or routing rules. This p
         <status>Alpha Alpha Alpha</status>
         <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
         <configurationfile>squidGuard.xml</configurationfile>
-    </package>
+    </package>    
+  </packages>
 </pfsensepkgs>
