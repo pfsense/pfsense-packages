@@ -276,9 +276,9 @@
 	<custom_php_install_command>
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-	    system("/bin/rm /usr/local/www/carp* 2>/dev/null");
-	    system("/bin/rm /usr/local/pkg/carp* 2>/dev/null");
-	    system("/bin/rm /usr/local/pkg/pf/carp* 2>/dev/null");
-	    system("/bin/rm /usr/local/etc/rc.d/carp* 2>/dev/null");
+	    unlink_if_exists("/usr/local/www/carp*");
+	    unlink_if_exists("/usr/local/pkg/carp*");
+	    unlink_if_exists("/usr/local/pkg/pf/carp*");
+	    unlink_if_exists("/usr/local/etc/rc.d/carp*");
 	</custom_php_deinstall_command>
 </packagegui>
