@@ -1,0 +1,16 @@
+<pfSense>
+    <package>
+	<name>pfStat</name>
+	<descr>pfstat is a small utility that collects packet filter statistics and produces graphs.</descr>
+	<pfSense_package>http://www.pfsense.com/packages/pfstat.tbz</pfSense_package>
+	<depends_on_package>ftp://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/net/pfstat-1.7.tbz</depends_on_package>
+    </package>
+    <!--
+     <package>
+	<name></name>
+	<description></description>
+	<pfSense_package></pfSense_package>
+	<depends_on_package></depends_on_package>
+     </package>
+    -->
+</pfSense>
