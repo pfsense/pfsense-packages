@@ -6,7 +6,7 @@
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->
 	<configpath>['installedpackages']['carpsettings']['config']</configpath>
-	<aftersaveredirect>pkg_edit.php?xml=pure-carp_settings.xml&amp;id=0</aftersaveredirect>
+	<aftersaveredirect>pkg_edit.php?xml=carp_settings.xml&amp;id=0</aftersaveredirect>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
 	    <name>CARP (failover)</name>
