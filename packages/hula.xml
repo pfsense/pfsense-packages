@@ -38,25 +38,26 @@
 		<type>input</type>
 	    </field>
     </fields>
-	<custom_add_php_command>
-	    conf_mount_rw();
-	    config_lock();
-	    system("/usr/local/hula/sbin/hulasetup --domain=" . $_POST['domain']);
-	    system("/usr/local/etc/rc.d/hula.sh &amp;");
-	    conf_mount_ro();
-	    config_unlock();
-	</custom_add_php_command>
-	<custom_php_deinstall_command>
-	    system("/usr/bin/killall -9 hulamanager");
-	    system("rm -rf /usr/local/hula");
-	</custom_php_deinstall_command>
-	<custom_php_install_command>
-	    system("rm /usr/local/etc/rc.d/hula.sh");
-	    $fout = fopen("/usr/local/etc/rc.d/hula.sh","w");
-	    fwrite($fout, "#!/bin/sh\n\n");
-	    fwrite($fout, "/sbin/mount -t linprocfs linprocfs /proc\n");
-	    fwrite($fout, "/usr/local/hula/sbin/hulamanager &amp;\n");
-	    fclose($fout);
-	    system("chmod 555 /usr/local/etc/rc.d/hula.sh &amp;");
-	</custom_php_install_command>
+    <custom_add_php_command>
+	conf_mount_rw();
+	config_lock();
+	system("/usr/local/hula/sbin/hulasetup --domain=" . $_POST['domain']);
+	system("/usr/local/etc/rc.d/hula.sh &amp;");
+	conf_mount_ro();
+	config_unlock();
+    </custom_add_php_command>
+    <custom_php_deinstall_command>
+	system("/usr/bin/killall -9 hulamanager");
+	system("rm -rf /usr/local/hula");
+	system("rm /usr/local/etc/rc.d/hula.sh");
+    </custom_php_deinstall_command>
+    <custom_php_install_command>
+	system("rm /usr/local/etc/rc.d/hula.sh");
+	$fout = fopen("/usr/local/etc/rc.d/hula.sh","w");
+	fwrite($fout, "#!/bin/sh\n\n");
+	fwrite($fout, "/sbin/mount -t linprocfs linprocfs /proc\n");
+	fwrite($fout, "/usr/local/hula/sbin/hulamanager &amp;\n");
+	fclose($fout);
+	system("chmod 555 /usr/local/etc/rc.d/hula.sh &amp;");
+    </custom_php_install_command>
 </packagegui>
