@@ -156,14 +156,30 @@
 			    <description>Color of graph</description>
 			    <type>select</type>
 			    <options>
+				<option><name>Light Hard Azure</name><value>51 153 255</value></option>
+				<option><name>Light Faded Blue</name><value>102 102 255</value></option>
 				<option><name>Blue</name><value>0 0 255</value></option>
-				<option><name>Red</name><value>255 0 0</value></option>
+				<option><name>Dark Dull Red</name><value>153 51 51</value></option>
+				<option><name>Pale Weak Red</name><value>255 204 204</value></option>
+				<option><name>Red</name><value>255 204 204</value></option>
+				<option><name>Pale Weak Red</name><value>255 0 0</value></option>
+				<option><name>Light Hard Pink</name><value>255 51 153</value></option>
+				<option><name>Dark Dull Pink</name><value>153 51 102</value></option>
+				<option><name>Light Faded Red</name><value>255 102 102</value></option>
+				<option><name>Pale Weak Green</name><value>204 255 204</value></option>
 				<option><name>Green</name><value>0 255 0</value></option>
+				<option><name>Pale Weak Yellow</name><value>255 255 204</value></option>
 				<option><name>Yellow</name><value>125 125 0</value></option>
 				<option><name>Purple</name><value>72 00 190</value></option>
+				<option><name>Pale Weak Magenta</name><value>255 204 255</value></option>
+				<option><name>Pale Weak Cyan</name><value>204 255 255</value></option>
 				<option><name>Cyan</name><value>00 120 120</value></option>
+				<option><name>Dark Dull Cyan</name><value>51 153 153</value></option>
 				<option><name>Orange</name><value>255 255 0</value></option>
+				<option><name>Dark Dull Orange</name><value>153 102 51</value></option>
+				<option><name>Pale Dull Orange</name><value>255 204 153</value></option>
 				<option><name>Grey</name><value>125 125 125</value></option>
+				<option><name>Pale Gray</name><value>204 204 204</value></option>
 				<option><name>Black</name><value>0 0 0</value></option>
 			    </options>
 			</rowhelperfield>
