@@ -6,7 +6,7 @@
 		<name>Pure FTPD Accounts</name>
 		<tooltiptext>Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerability, it is trivial to set up, and it is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</tooltiptext>
 		<section>Services</section>
-		<configfile>pureftpd.xml</configfile>
+		<configfile>pure-ftpd.xml</configfile>
 	</menu>
 	<menu>
 		<name>Pure FTPD Settings</name>
@@ -14,6 +14,9 @@
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=pure-ftpdsettings.xml</url>
 	</menu>
+	<additional_files_needed>
+		<item>http://www.pfsense.com/packages/config/pure-ftpdsettings.xml</item>
+	</additional_files_needed>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location seperated with -> -->
 	<configpath>installedpackages->package->$packagename->configuration</configpath>
