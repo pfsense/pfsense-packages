@@ -240,6 +240,7 @@ test server or link availability and modify translation or routing rules. This p
         <configurationfile>arpwatch.xml</configurationfile>
     </package>
   </packages>
+  <!-- BEGIN - these packages are inactive -->
     <package>
 	<name>powerdns</name>
 	<descr>PowerDNS (AKA pdns) is an advanced high performance authoritative nameserver with MANY advanced features</descr>
@@ -274,4 +275,5 @@ test server or link availability and modify translation or routing rules. This p
 	<config_file>http://www.pfsense.com/packages/config/postfix.xml</config_file>
 	<configurationfile>postfix.xml</configurationfile>
     </package>
+    <!-- END - these packages are inactive -->
 </pfsensepkgs>
