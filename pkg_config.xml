@@ -83,7 +83,7 @@
         <descr>High performance Web proxy Guard</descr>
         <website>http://www.squidguard.org/</website>
         <category>Network Management</category>
-        <depends_on_package_base_url>ftp://ftp2.freebsd.org/pub/FreeBSD/releases/i386/5.3-RELEASE/packages/All</depends_on_package_base_url>
+        <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/releases/i386/5.3-RELEASE/packages/All</depends_on_package_base_url>
         <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
         <version>1.2.0_1</version>
         <status>Alpha Alpha</status>
