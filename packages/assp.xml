@@ -23,7 +23,7 @@
 	    system("chmod 555 /usr/local/etc/rc.d/assp.sh");
 	    system("/usr/local/etc/rc.d/assp.sh &amp;");
 	</custom_php_install_command>
-	<custom_delete_php_command>
+	<custom_php_deinstall_command>
 	    system("rm -rf /usr/local/assp");
-	</custom_delete_php_command>
+	</custom_php_deinstall_command>
 </packagegui>
