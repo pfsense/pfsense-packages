@@ -191,6 +191,8 @@
 		fwrite($fout, "}\n\n");
 	  }
 	  fclose($fout);
+	  system("/usr/bin/killall cron 2>/dev/null");
+	  system("/usr/sbin/cron 2>/dev/null");
 	</custom_add_php_command_late>
 	<!--
 	<custom_php_install_command>
