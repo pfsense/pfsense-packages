@@ -27,19 +27,19 @@
 		<item>
 			<modifyfilename>/etc/crontab</modifyfilename>
 			<textneeded>
-*	*	*	*	*	root	/usr/local/bin/pfstat -q >> /var/log/pfstat
+*/5	*	*	*	*	root	nice -n 20 /usr/local/bin/pfstat -q >> /var/log/pfstat
 			</textneeded>
 		</item>
 		<item>
 			<modifyfilename>/etc/crontab</modifyfilename>
 			<textneeded>
-*/5	*	*	*	*	root	nice -n 20 /usr/local/bin/pfstat -c /usr/local/etc/pfstat.conf -d /var/log/pfstat
+*/10	*	*	*	*	root	nice -n 20 /usr/local/bin/pfstat -c /usr/local/etc/pfstat.conf -d /var/log/pfstat
 			</textneeded>
 		</item>
 		<item>
 			<modifyfilename>/etc/crontab</modifyfilename>
 			<textneeded>
-1	1	*	*	1	root	tail -n 50000 /var/log/pfstat >/tmp/pfstat &amp;&amp; mv /tmp/pfstat /var/log/pfstat		
+1	1	*	*	1	root	nice -n 20 tail -n 50000 /var/log/pfstat >/tmp/pfstat &amp;&amp; mv /tmp/pfstat /var/log/pfstat		
 			</textneeded>
 		</item>
 	</modify_system>
