@@ -20,10 +20,11 @@
 			<text>Settings</text>
 			<url>/pkg_edit.php?xml=freeradiussettings.xml</url>
 		</tab>
-	</tabs>
+	</tabs>	
 	<additional_files_needed>
 		<item>http://www.pfsense.com/packages/config/freeradiusclients.xml</item>
 		<item>http://www.pfsense.com/packages/config/freeradiussettings.xml</item>
+		<item>http://www.pfsense.com/packages/config/freeradiusconfig.tgz</item>
 	</additional_files_needed>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<adddeleteeditpagefields>
@@ -86,3 +87,4 @@
 		sync_package();
 	</custom_add_php_command>
 </packagegui>
+

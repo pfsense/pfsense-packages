@@ -1,0 +1,66 @@
+<packagegui>
+	<name>freeradiussettings</name>
+	<tabs>          
+                <tab>   
+                        <text>Users</text>
+                        <url>/pkg_edit.php?xml=freeradius.xml</url>
+                </tab>  
+                <tab>
+                        <text>Clients</text>
+                        <url>/pkg_edit.php?xml=freeradiusclients.xml</url>
+                </tab>  
+                <tab>
+                        <text>Settings</text>
+                        <url>/pkg_edit.php?xml=freeradiussettings.xml</url>
+			<active/>
+                </tab>
+        </tabs> 
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<fields>
+		<field>
+			<fielddescr>Listening Interface(s)</fielddescr>
+			<fieldname>interface</fieldname>
+			<description>Enter the desired listening interface(s) here</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Port</fielddescr>
+			<fieldname>port</fieldname>
+			<description>Enter the desired port here</description>
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_php_command_before_form>
+		function sync_package() {
+			global $config;
+			$fout = fopen("/usr/local/etc/raddb/radiusd.conf.dynamic","w");
+			if($config['installedpackages']['freeradiusclients']['config'] != "") {
+				/* Comment out port entries to use listen directives instead.
+				if($config['installedpackages']['freeradiussettings']['config']['port'] != "") {
+					fwrite($fout, "port = " . $port . "\n\n");
+				} else {
+					fwrite($fout, "port = 0\n\n");
+				}
+				*/
+				if($config['installedpackages']['freeradiussettings']['config']['interface'] != "") {
+					$split_int = split(" ", $config['installedpackages']['freeradiussettings']['config']['interface']);
+					foreach($split_int as $int) {
+						$int_ip = find_interface_ip($int);
+						fwrite($fout, "{\nipaddr = " . $int_ip . "\n");
+						if($config['installedpackages']['freeradiussettings']['config']['port'] != "") {
+							fwrite($fout, "port = " . $port . "\n");
+						} else {
+							fwrite($fout, "port = 0\n");
+						}
+						fwrite($fout, "type = auth\n}";
+				}
+			}
+		 	fclose($fout);
+		}
+		sync_package();
+	</custom_php_command_before_form>
+	<custom_add_php_command>
+		sync_package();
+	</custom_add_php_command>
+</packagegui>
+

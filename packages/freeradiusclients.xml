@@ -1,26 +1,20 @@
 <packagegui>
 	<name>freeradiusclients</name>
-	<menu>
-		<name>RADIUS Clients</name>
-		<tooltiptext>Add, edit, and delete RADIUS clients.</tooltiptext>
-		<section>Services</section>
-		<configfile>freeradiusclients.xml</configfile>
-	</menu>
-	<tabs>
-                <tab>
+	<tabs>          
+                <tab>   
                         <text>Users</text>
                         <url>/pkg_edit.php?xml=freeradius.xml</url>
-                </tab>
+                </tab>  
                 <tab>
                         <text>Clients</text>
                         <url>/pkg_edit.php?xml=freeradiusclients.xml</url>
 			<active/>
-                </tab>
+                </tab>  
                 <tab>
                         <text>Settings</text>
                         <url>/pkg_edit.php?xml=freeradiussettings.xml</url>
                 </tab>
-        </tabs>
+        </tabs> 
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<adddeleteeditpagefields>
 		<columnitem>
@@ -80,3 +74,4 @@
 		sync_package();
 	</custom_add_php_command>
 </packagegui>
+
