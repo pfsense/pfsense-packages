@@ -63,7 +63,7 @@
 		<field>
 			<fielddescr>RTP port range (lower)</fielddescr>
 			<fieldname>rtplower</fieldname>
-			<description>Enter the bottom edge of the port range siproxd will allocate for incoming RTP traffic. This range must be one not blocked by the firewall (default 7070).</description> 
+			<description>Enter the bottom edge of the port range siproxd will allocate for incoming RTP traffic. This range must be one not blocked by the firewall (default 7070).</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -92,7 +92,7 @@
 		</field>
 		<field>
 			<fielddescr>Outbound proxy hostname</fielddescr>
-			<fieldname>outboundproxyhost</fieldname>	
+			<fieldname>outboundproxyhost</fieldname>
 			<type>input</type>
 			<description>Enter the hostname of an outbound proxy to send all traffic to. This is only useful if you have multiple masquerading firewalls to cross.</description>
 		</field>
@@ -110,8 +110,11 @@
 	fwrite($fout, "#!/bin/sh\n\n/usr/local/sbin/siproxd\n");
 	fclose($fout);
 	</custom_php_install_command>
+	<custom_php_resync_config_command>
+	    sync_package_sipproxd();
+	</custom_php_resync_config_command>
 	<custom_add_php_command>
-	function sync_package()	{
+	function sync_package_sipproxd()	{
 		conf_mount_rw();
 		config_lock();
 		global $config;
@@ -166,7 +169,7 @@
 		conf_mount_ro();
 		config_unlock();
 		}
-	sync_package();
+	sync_package_sipproxd();
 	</custom_add_php_command>
 </packagegui>
 

@@ -205,7 +205,7 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
-	function sync_package() {
+	function sync_package_pfstat() {
 	  conf_mount_rw();
 	  config_lock();
 	  global $config;
@@ -255,12 +255,12 @@
 	  conf_mount_ro();
 	  config_unlock();
 	}
-	sync_package();
+	sync_package_pfstat();
 	</custom_php_command_before_form>
 	<custom_add_php_command_late>
 	</custom_add_php_command_late>
 	<custom_php_resync_config_command>
-	  sync_package();
+	  sync_package_pfstat();
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
 		system("mkdir -p /usr/local/www/pfstat 2>/dev/null");

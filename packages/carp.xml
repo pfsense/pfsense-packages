@@ -228,7 +228,7 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
-	    function sync_package() {
+	    function sync_package_carp() {
 		/*
 		 *  XXX: find out how many carp and pfsync interfaces are established
 		 *       and destroy/down them before sweeping through the list
@@ -283,10 +283,10 @@
 	      }
 	</custom_php_command_before_form>
 	<custom_php_resync_config_command>
-	    sync_package();
+	    sync_package_carp();
 	</custom_php_resync_config_command>
 	<custom_delete_php_command>
-	    sync_package();
+	    sync_package_carp();
 	</custom_delete_php_command>
 	<custom_php_install_command>
 	</custom_php_install_command>

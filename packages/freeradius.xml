@@ -79,7 +79,7 @@
 		mwexec("/usr/local/etc/rc.d/radiusd.sh");
 	</custom_php_install_command>
 	<custom_php_command_before_form>
-		function sync_package()
+		function sync_package_freeradius()
 		{
 			conf_mount_rw();
 			config_lock();
@@ -98,7 +98,7 @@
 		}
 	</custom_php_command_before_form>
 	<custom_add_php_command>
-		sync_package();
+		sync_package_freeradius();
 		system("/usr/bin/killall -HUP radiusd");
 	</custom_add_php_command>
 </packagegui>

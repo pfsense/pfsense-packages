@@ -72,38 +72,38 @@
 		</field>
 	</fields>
 	<custom_php_install_command>
-		system("mkdir /usr/local/etc/stunnel 2>/dev/null");
-	    system("mkdir /var/tmp/stunnel 2>/dev/null");
-		system("/usr/bin/openssl req -new -x509 -days 365 -nodes -out /usr/local/etc/stunnel/stunnel.pem -keyout /usr/local/etc/stunnel/stunnel.pem 2>/dev/null");
-		system("chmod a-r /usr/local/etc/stunnel/stunnel.pem");
-		system("chmod u+r /usr/local/etc/stunnel/stunnel.pem");
-		system("mkdir -p /var/tmp/stunnel/var/tmp");
-		system("chmod a+rw /var/tmp/stunnel/var/tmp/.");
-		system("mv /usr/local/etc/rc.d/stunnel.sh.sample /usr/local/etc/rc.d/stunnel.sh");
-		system("chmod 555 /usr/local/etc/rc.d/stunnel.sh");
+	  system("mkdir /usr/local/etc/stunnel 2>/dev/null");
+	  system("mkdir /var/tmp/stunnel 2>/dev/null");
+	  system("/usr/bin/openssl req -new -x509 -days 365 -nodes -out /usr/local/etc/stunnel/stunnel.pem -keyout /usr/local/etc/stunnel/stunnel.pem 2>/dev/null");
+	  system("chmod a-r /usr/local/etc/stunnel/stunnel.pem");
+	  system("chmod u+r /usr/local/etc/stunnel/stunnel.pem");
+	  system("mkdir -p /var/tmp/stunnel/var/tmp");
+	  system("chmod a+rw /var/tmp/stunnel/var/tmp/.");
+	  system("mv /usr/local/etc/rc.d/stunnel.sh.sample /usr/local/etc/rc.d/stunnel.sh");
+	  system("chmod 555 /usr/local/etc/rc.d/stunnel.sh");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-	    system("rm -rf /var/tmp/stunnel 2>/dev/null");
-		system("rm -rf /usr/local/etc/stunnel*");
+	  system("rm -rf /var/tmp/stunnel 2>/dev/null");
+	  system("rm -rf /usr/local/etc/stunnel*");
 	</custom_php_deinstall_command>
 	<custom_add_php_command_late>
-		    conf_mount_rw();
-		    config_lock();
-		    $fout = fopen("/usr/local/etc/stunnel/stunnel.conf","w");
-		    fwrite($fout, "cert = /usr/local/etc/stunnel/mail.pem \n");
-		    fwrite($fout, "chroot = /var/tmp/stunnel \n");
-		    fwrite($fout, "setuid = stunnel \n");
-		    fwrite($fout, "setgid = stunnel \n");
-		    foreach($config['installedpackages']['stunnel']['config'] as $pkgconfig) {
-			fwrite($fout, "\n[" . $pkgconfig['description'] . "]\n");
-			fwrite($fout, "accept = " . $pkgconfig['localip'] . ":" . $pkgconfig['localport'] . "\n");
-			fwrite($fout, "connect = " . $pkgconfig['redirectip'] . ":" . $pkgconfig['redirectport'] . "\n");
-			fwrite($fout, "TIMEOUTclose = 0\n\n");
-		    }
-		    fclose($fout);
-		    conf_mount_ro();
-		    config_unlock();
-		    system("/usr/bin/killall stunnel 2>/dev/null");
-		    system("/usr/local/etc/rc.d/stunnel.sh start 2>/dev/null");
+	  conf_mount_rw();
+	  config_lock();
+	  $fout = fopen("/usr/local/etc/stunnel/stunnel.conf","w");
+	  fwrite($fout, "cert = /usr/local/etc/stunnel/mail.pem \n");
+	  fwrite($fout, "chroot = /var/tmp/stunnel \n");
+	  fwrite($fout, "setuid = stunnel \n");
+	  fwrite($fout, "setgid = stunnel \n");
+	  foreach($config['installedpackages']['stunnel']['config'] as $pkgconfig) {
+	    fwrite($fout, "\n[" . $pkgconfig['description'] . "]\n");
+	    fwrite($fout, "accept = " . $pkgconfig['localip'] . ":" . $pkgconfig['localport'] . "\n");
+	    fwrite($fout, "connect = " . $pkgconfig['redirectip'] . ":" . $pkgconfig['redirectport'] . "\n");
+	    fwrite($fout, "TIMEOUTclose = 0\n\n");
+	  }
+	  fclose($fout);
+	  conf_mount_ro();
+	  config_unlock();
+	  system("/usr/bin/killall stunnel 2>/dev/null");
+	  system("/usr/local/etc/rc.d/stunnel.sh start 2>/dev/null");
 	</custom_add_php_command_late>
 </packagegui>

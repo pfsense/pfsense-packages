@@ -44,8 +44,11 @@
 			<type>input</type>
 		</field>
 	</fields>
+	<custom_php_resync_config_command>
+	    sync_package_sipproxd_users();
+	</custom_php_resync_config_command>
 	<custom_add_php_command>
-		function sync_package()
+		function sync_package_sipproxd_users()
 		{
 			conf_mount_rw();
 			config_lock();
@@ -62,7 +65,7 @@
 			config_unlock();
 			system("/usr/bin/killall -HUP siproxd");
 		}
-		sync_package();
+		sync_package_sipproxd_users();
 	</custom_add_php_command>
 </packagegui>
 

@@ -51,7 +51,7 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
-	    function sync_package() {
+	    function sync_package_spamd_whitelist() {
 		global $config;
 		conf_mount_rw();
 		config_lock();
@@ -67,9 +67,9 @@
 	    }
 	</custom_php_command_before_form>
 	<custom_php_resync_config_command>
-	    sync_package();
+	    sync_package_spamd_whitelist();
 	</custom_php_resync_config_command>
 	<custom_delete_php_command>
-	    sync_package();
+	    sync_package_spamd_whitelist();
 	</custom_delete_php_command>
 </packagegui>
