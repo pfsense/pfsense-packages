@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>postfix</name>
+        <donotsave>true</donotsave>
+        <preoutput>yes</preoutput>
+        <savetext>Change</savetext>
+	<!-- Menu is where this packages menu will appear -->
+	<menu>
+		<name>Postfix Settings</name>
+		<tooltiptext>Configure Postfix Forwarder</tooltiptext>
+		<section>Services</section>
+		<configfile>postfix.xml</configfile>
+	</menu>
+        <!-- Do not save invokes a simple input menu and will not update
+             the configuration database. -->
+	<fields>
+		<field>
+			<fielddescr>Primary Domain</fielddescr>
+			<fieldname>primarydomain</fieldname>
+			<description>Enter your primary domain.  (ex: example.com)</description>
+			<type>domain</type>
+		</field>
+		<field>
+			<fielddescr></fielddescr>
+			<fieldname></fieldname>
+			<type></type>
+		</field>
+		<field>
+			<fielddescr>Interface</fielddescr>
+			<fieldname>iface</fieldname>
+			<size>3</size>
+			<multiple>true</multiple>
+			<type>interfaces_selection</type>
+		</field>
+    </fields>
+	<custom_add_php_command>
+	</custom_add_php_command>
+	<custom_php_deinstall_command>
+	</custom_php_deinstall_command>
+	<custom_php_install_command>
+	</custom_php_install_command>
+</packagegui>
