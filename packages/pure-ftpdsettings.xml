@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>pure-ftpdsettings</name>
+	<title>Services: PureFTPD Settings</title>
         <aftersaveredirect>pkg_edit.php?xml=pure-ftpdsettings.xml&amp;id=1</aftersaveredirect>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>

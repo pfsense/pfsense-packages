@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>postfix</name>
+	<title>Services: Postfix Forwarder</title>
         <preoutput>yes</preoutput>
         <savetext>Change</savetext>
 	<aftersaveredirect>pkg_edit.php?xml=postfix.xml&amp;id=1</aftersaveredirect>

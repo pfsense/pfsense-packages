@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>pfstat</name>
+	<title>Services: PFStat Settings</title>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>PFStat Settings</name>
@@ -39,7 +40,7 @@
 		<item>
 			<modifyfilename>/etc/crontab</modifyfilename>
 			<textneeded>
-1	1	*	*	1	root	nice -n 20 tail -n 50000 /var/log/pfstat >/tmp/pfstat &amp;&amp; mv /tmp/pfstat /var/log/pfstat		
+1	1	*	*	1	root	nice -n 20 tail -n 50000 /var/log/pfstat >/tmp/pfstat &amp;&amp; mv /tmp/pfstat /var/log/pfstat
 			</textneeded>
 		</item>
 	</modify_system>

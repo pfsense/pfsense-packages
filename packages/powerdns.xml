@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>nmap</name>
+	<title>Services: PowerDNS</title>
 	<donotsave>true</donotsave>
 	<preoutput>yes</preoutput>
 	<!-- Menu is where this packages menu will appear -->
