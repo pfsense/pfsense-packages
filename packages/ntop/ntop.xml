@@ -43,6 +43,12 @@
 	if($_POST['password'] == $_POST['passwordagain']) {
 		system("/usr/local/bin/ntop --set-admin-password=" . $_POST['password']);
 		system("killall ntop 2>/dev/null");
+	    system("rm /usr/local/etc/rc.d/ntop.sh");
+	    $fout = fopen("/usr/local/etc/rc.d/ntop.sh","w");
+	    fwrite($fout, "#!/bin/sh\n\n");
+	    fwrite($fout, "/usr/local/bin/ntop -i " . $_POST['iface'] . " -u root -d --ipv4 -M\n\n");
+	    fclose($fout);
+	    system("chmod 555 /usr/local/etc/rc.d/ntop.sh");
 		system("/usr/local/etc/rc.d/ntop.sh");
 	} else {
 		echo "Passwords do not match!";
@@ -56,7 +62,7 @@
 	    system("rm /usr/local/etc/rc.d/ntop.sh");
 	    $fout = fopen("/usr/local/etc/rc.d/ntop.sh","w");
 	    fwrite($fout, "#!/bin/sh\n\n");
-	    fwrite($fout, "/usr/local/bin/ntop -i " . $_POST['iface'] . " -u root -d --ipv4 -M\n\n");
+	    fwrite($fout, "/usr/local/bin/ntop -u root -d --ipv4 -M\n\n");
 	    fclose($fout);
 	    system("chmod 555 /usr/local/etc/rc.d/ntop.sh");
 	</custom_php_install_command>
