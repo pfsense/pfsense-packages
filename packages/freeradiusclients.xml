@@ -73,7 +73,7 @@
 		 	fclose($fout);
 			conf_mount_ro();
 			config_unlock();
-			system("killall -HUP radiusd");
+			mwexec("killall -HUP radiusd");
 		}
 		sync_package_freeradius_clients();
 	</custom_php_command_before_form>

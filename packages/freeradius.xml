@@ -131,7 +131,7 @@
 		 	fclose($fout);
 			conf_mount_ro();
 			config_unlock();
-			system("/usr/bin/killall -HUP radiusd");
+			mwexec("/usr/bin/killall -HUP radiusd");
 		}
 	</custom_php_command_before_form>
 	<custom_php_resync_config_command>

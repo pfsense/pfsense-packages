@@ -54,7 +54,7 @@
 		conf_mount_ro();
 		config_unlock();
 		}
-	system("killall -HUP radiusd");
+	mwexec("killall -HUP radiusd");
 	</custom_php_command_before_form>
 	<custom_add_php_command>
 		sync_package_freeradius_settings();
