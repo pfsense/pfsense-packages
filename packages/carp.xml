@@ -226,7 +226,7 @@
 			  /*
 			   *  create the carp interface
 			   */
-			  fwrite($fout, "echo Creating {$pfsync_instances_counter} ...\n");
+			  fwrite($fout, "echo Creating {$carp_instances_counter} ...\n");
 			  fwrite($fout, "/sbin/ifconfig carp" . $carp_instances_counter . " create\n");
 			  $broadcast_address = gen_subnet_max($carp['ipaddress'], $carp['netmask']);
 			  if($carp['password'] != "") {
