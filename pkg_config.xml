@@ -257,9 +257,21 @@ test server or link availability and modify translation or routing rules. This p
         <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/releases/i386/5.3-RELEASE/packages/All</depends_on_package_base_url>
         <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
         <version>1.2.0_1</version>
-        <status>Alpha Alpha Alpha</status>
+        <status>ALPHA</status>
         <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
         <configurationfile>squidGuard.xml</configurationfile>
-    </package>    
+    </package>
+    <package>
+        <name>arpwatch</name>
+        <descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
+        <website>http://www-nrg.ee.lbl.gov/</website>
+        <category>Security</category>
+        <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5-stable/All</depends_on_package_base_url>
+        <depends_on_package>arpwatch-2.1.a13.tbz</depends_on_package>
+        <version>2.1.a13</version>
+        <status>ALPHA</status>                                                      
+        <config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>                     
+        <configurationfile>arpwatch.xml</configurationfile>
+    </package>
   </packages>
 </pfsensepkgs>
