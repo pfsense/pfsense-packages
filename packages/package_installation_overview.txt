@@ -1,0 +1,29 @@
+		Package installation process for pfSense
+
+
+		Client downloads pkg_config.xml
+				|
+				|
+	Client parses pkg_config.xml and generates a interface 
+	of installable packages	|
+				|
+				|
+		User selects a package to install
+				|
+				|
+	pkg_mgr.php downloads package master configuration files
+				|
+				|
+	pkg_mgr.php downloads master package and installs.  pkg_add -r
+	takes care of downloading and installing all dependencies
+				|
+				|
+	pkg_mgr.php downloads "extra" files that are required such
+	as customized helper scripts, etc.
+				|
+				|
+	pkg_mgr.php interates through the menu section installing
+	needed menu items.  	|
+				|
+	Package and supporting items are now installed.  The package
+	will be listed in "Installed Packages"
