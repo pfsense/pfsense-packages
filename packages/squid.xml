@@ -1,69 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-    <configpath>['installedpackages']['squid']['config']</configpath>
-    <aftersaveredirect>pkg_edit.php?xml=squid.xml&amp;id=0&amp;savemsg=Settings%20saved.</aftersaveredirect>
-    <name>squid</name>
-    <version>2.5.7_5</version>
-    <menu>
-        <name>Squid</name>
-        <tooltiptext>Squid-Cache Proxy</tooltiptext>
-        <section>Services</section>
-        <url>pkg_edit.php?xml=squid.xml&amp;id=0</url>
-    </menu>
-    <fields>
-	<field>
-	    <fielddescr>hostname</fielddescr>
-	    <fieldname>visable_hostname</fieldname>
-	    <description>note: if left empty your default hostname will be used.</description>
-	    <type>input</type>
-	</field>
-	<field>
-	    <fielddescr>http_port</fielddescr>
-	    <fieldname>http_port</fieldname>
-	    <description>note: default proxy port is 3128.</description>
-	    <type>input</type>
-	</field>
-	<field>
-	    <fielddescr>httpd_accel_with_proxy</fielddescr>
-	    <fieldname>httpd_accel_with_proxy</fieldname>
-	    <description>enabled by default</description>
-	    <type>select</type>
-	    <options>
-	    <option><name>On</name><value>on</value></option>
-	    <option><name>Off</name><value>off</value></option>
-	    </options>
-	</field>
-	<field>
-	    <fielddescr>cache size [MB]</fielddescr>
-	    <fieldname>cache_mem</fieldname>
-	    <description>hint: fill 1/3 of the cache memory size you want squid to use.</description>
-	    <type>input</type>
-	</field>
-	<field>
-	    <fielddescr>admin email</fielddescr>
-	    <fieldname>cache_mgr</fieldname>
-	    <description></description>
-	    <type>input</type>
-	</field>
-	<field>
-	    <fielddescr>blocked words</fielddescr>
-	    <type>rowhelper</type>
-	    <rowhelper>
-	    <rowhelperfield>
-	    <fieldname>badURL</fieldname>
-	    <description>url that contain any of the words will be blocked.</description>
-	    <type>input</type>
-	    <options>
-	    </options>
-	    </rowhelperfield>
-	    </rowhelper>
-	</field>
-     </fields>
-    <custom_php_command_before_form>
-	function sync_package() {
-	    conf_mount_rw();
-	    config_lock();
-	    system("/bin/mkdir /usr/local/etc/squid 2>/dev/null");
+	<name>squid</name>
+	<!-- Menu is where this packages menu will appear -->
+	<!-- configpath gets expanded out automatically and config items will be
+         stored in that location -->
+	<configpath>['installedpackages']['squid']['config']</configpath>
+	<fields/>
+	<custom_php_install_command>
+	    echo "&lt;pre&gt;";
+	    system("/bin/mkdir /usr/local/etc/squid");
 	    $lancfg = $config['interfaces']['lan'];
 	    $lanif = $lancfg['if'];
 	    $lanip = $lancfg['ipaddr'];
@@ -72,11 +17,6 @@
 	    $netmask = "";
 	    $fout = fopen("/usr/local/etc/squid/squid.conf","w");
 	    fwrite($fout, "# cat squid.conf\n");
-	    fwrite($fout, "visable_hostname " . $_POST['hostname'] . "\n");
-	    fwrite($fout, "http_port " . $_POST['http_port'] . "\n");
-	    fwrite($fout, "httpd_accel_with_proxy " . $_POST['httpd_accel_with_proxy'] . "\n");
-	    fwrite($fout, "cache_mem " . $_POST['cache_mem'] . "\n");
-	    fwrite($fout, "cache_mgr " . $_POST['cache_mgr'] . "\n");
 	    fwrite($fout, "http_port 3128\n");
 	    fwrite($fout, "icp_port 0\n");
 	    fwrite($fout, "acl localnet src " . $lansa . "/" . $lansn . "\n");
@@ -89,36 +29,28 @@
 	    fwrite($fout, "http_access deny !Safe_ports\n");
 	    fwrite($fout, "http_access deny CONNECT\n");
 	    fwrite($fout, "http_access deny all\n");
+	    fwrite($fout, "visible_hostname pfSense\n");
 	    fwrite($fout, "httpd_accel_host virtual\n");
 	    fwrite($fout, "httpd_accel_port 80\n");
 	    fwrite($fout, "httpd_accel_with_proxy on\n");
 	    fwrite($fout, "httpd_accel_uses_host_header on\n");
-	    /* fwrite($fout, "badURL " . $_POST['badURL'] . "\n"); */
 	    fclose($fout);
 	    $fout = fopen("/usr/local/etc/rc.d/squid.sh","w");
 	    fwrite($fout, "#!/bin/sh\n");
 	    fwrite($fout, "/usr/local/sbin/squid\n\n");
 	    fclose($fout);
-	    conf_mount_ro();
-	    config_unlock();
 	    system("chmod a+x /usr/local/etc/rc.d/squid.sh");
 	    system("/usr/local/sbin/squid -z");
 	    system("/usr/local/sbin/squid");
 	    filter_configure();
-	}
-    </custom_php_command_before_form>
-    <custom_php_resync_config_command>
-	sync_package();
-    </custom_php_resync_config_command>
-    <custom_php_install_command>
-	sync_package();
-    </custom_php_install_command>
-    <start_command>/usr/local/sbin/squid</start_command>
-    <custom_php_pre_deinstall_command>
-	exec("mv /var/db/pkg/squid* /tmp/ 2>/dev/null");
-	filter_configure();
-    </custom_php_pre_deinstall_command>
-    <custom_php_deinstall_command>
-    </custom_php_deinstall_command>
-    <process_kill_command>squid</process_kill_command>
+	</custom_php_install_command>
+	<start_command>/usr/local/sbin/squid</start_command>
+	<custom_php_pre_deinstall_command>
+	    exec("mv /var/db/pkg/squid* /tmp/");
+	    filter_configure();
+	    exec("mv /tmp/squid* /var/db/pkg/");
+	</custom_php_pre_deinstall_command>
+	<custom_php_deinstall_command>
+	</custom_php_deinstall_command>
+	<process_kill_command>squid</process_kill_command>
 </packagegui>
