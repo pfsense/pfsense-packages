@@ -60,6 +60,6 @@ if($config['installedpackages']['carp']['config'] <> "") {
 	foreach($config['installedpackages']['carpsettings']['config'] as $carp)
 	    $carp_sync_int = convert_friendly_interface_to_real_interface_name($carp['pfsyncinterface']);
     if($carp_sync_int <> "") {
-	add_rule_to_anchor("carp", "pass quick on {$carp_sync_int} keep state", $carp_sync_int . "3");
+	add_rule_to_anchor("carp", "pass quick on {$carp_sync_int} proto pfsync", $carp_sync_int . "3");
     }
 }
