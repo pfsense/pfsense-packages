@@ -75,6 +75,8 @@
 		system("chmod u+r /usr/local/etc/stunnel/stunnel.pem");
 		system("mkdir -p /var/tmp/stunnel/var/tmp");
 		system("chmod a+rw /var/tmp/stunnel/var/tmp/.");
+		system("mv /usr/local/etc/rc.d/stunnel.sh.sample /usr/local/etc/rc.d/stunnel.sh");
+		system("chmod 555 /usr/local/etc/rc.d/stunnel.sh");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 	    system("rm -rf /var/tmp/stunnel 2>/dev/null");
