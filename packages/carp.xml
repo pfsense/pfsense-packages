@@ -23,7 +23,6 @@
 	    <tab>
 		<text>CARP Settings</text>
 		<xml>carp_settings.xml</xml>
-		<active/>
 	    </tab>
 	</tabs>
     	<additional_files_needed>
