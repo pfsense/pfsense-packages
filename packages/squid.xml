@@ -83,7 +83,6 @@
 	<custom_php_deinstall_command>
 	        mwexec("/bin/rm -rf /usr/local/squid");
 		filter_configure();
-	        mwexec("/etc/rc.filter_configure");
         </custom_php_deinstall_command>
 	<start_command>/usr/local/etc/rc.d/squid.sh</start_command>
 	<process_kill_command>squid</process_kill_command>
