@@ -1,40 +1,25 @@
 <packagegui>
 	<name>iperf</name>
 	<version>1.7.0</version>
-	<title>iperf: Client</title>
+	<title>iperf: Server</title>
 	<donotsave>true</donotsave>
 	<preoutput>yes</preoutput>
-	<menu>
-		<name>iperf</name>
-		<tooltiptext>Run iperf in client or server mode.</tooltiptext>
-		<section>Diagnostics</section>
-		<configfile>iperf.xml</configfile>
-	</menu>
 	<tabs>
 		<tab>
 			<text>Client</text>
 			<url>/pkg_edit.php?xml=iperf.xml</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>Server</text>
 			<url>/pkg_edit.php?xml=iperfserver.xml</url>
+			<active/>
 		</tab>
 	</tabs>
-	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/iperfserver.xml</item>
-	</additional_files_needed>
 	<fields>
-		<field>
-			<fielddescr>Server</fielddescr>
-			<fieldname>hostname</fieldname>
-			<description>Enter the IP address or hostname that iperf will connect to.</description>
-			<type>input</type>
-		</field>
 		<field>
 			<fielddescr>Port</fielddescr>
 			<fieldname>port</fieldname>
-			<description>Enter the port that iperf will connect to. (default 5001)</description>
+			<description>Enter the port that iperf will listen for connections on. (default 5001)</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -87,12 +72,6 @@
 			<description>Enter the desired socket buffer size, if needed.</description>
 			<type>input</type>
 		</field>
-		<field>
-			<fielddescr>UDP Bandwidth</fielddescr>
-			<fieldname>udpbandwidth</fieldname>
-			<description>Enter the UDP bandwidth to send at in bits/sec. (default is 1Mbit/sec)</description>
-			<type>input</type>
-		</field>
 	</fields>
 	<custom_add_php_command>
 		$iperf_options = "";
@@ -101,9 +80,8 @@
 		if($_POST['interval'] != "") $iperf_options .= " -i {$_POST['interval']}";
 		if($_POST['length'] != "") $iperf_options .= " -l {$_POST['length']}";
 		if($_POST['window'] != "") $iperf_options .= " -w {$_POST['window']}";
-		if($_POST['udpbandwidth'] != "") $iperf_options .= " -b {$_POST['udpbandwidth']}";
 		if($_POST['port'] != "") $iperf_options .= " -p {$_POST['port']}";
-		$iperf_options .= " -c {$_POST['hostname']}";
+		$iperf_options .= " -s";
 		system("/usr/local/bin/iperf" . $iperf_options);
 	</custom_add_php_command>
 </packagegui>
