@@ -4,7 +4,6 @@
 	<!-- Menu is where this packages menu will appear -->
 	<!-- configpath gets expanded out automatically and config items will be stored in that location -->
 	<configpath>['installedpackages']['squid']['config']</configpath>
-	<fields/>
 	<custom_php_install_command>
 		echo "&lt;pre&gt;";
 		$lancfg = $config['interfaces']['lan'];
