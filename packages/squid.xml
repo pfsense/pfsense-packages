@@ -42,6 +42,7 @@
 	    system("chmod a+x /usr/local/etc/rc.d/squid.sh");
 	    system("/usr/local/sbin/squid -z");
 	    filter_configure();
+	    system("/usr/local/sbin/squid");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 	    system("/usr/bin/killall squid");
