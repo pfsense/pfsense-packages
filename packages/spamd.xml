@@ -90,10 +90,12 @@
 		foreach($config['installedpackages']['spamd']['config'] as $spamd) {
 		    fwrite($fd, ":" . $spamd['provider_name']);
 		}
-		fwrite($fd, "whitelist:\\ \n");
+		fwrite($fd, "# begin of whitelist\n");
+		fwrite($fd, ":whitelist:\\ \n");
 		fwrite($fd, ":white:\\ \n");
 	        fwrite($fd, ":file=/var/mail/whitelist.txt\n\n");
 		/* loop through each item and write out its configuration */
+		fwrite($fd, "\n# begin of user created entries\n");
 		foreach($config['installedpackages']['spamd']['config'] as $spamd) {
 		    fwrite($fd, $spamd['provider_name'] . ":\\ \n");
 		    fwrite($fd, ":" . $spamd['provider_method'] . ":\\ \n");
@@ -101,7 +103,7 @@
 		    fwrite($fd, ":" . $spamd['provider_method'] . ":\\ \n");
 		    fwrite($fd, ":file=" . $spamd['provider_url'] . ":\n\n");
 		}
-		fwrite($fd, ":\n\n");
+		fwrite($fd, ":\n");
 		fclose($fd);
 		$fd = fopen("/var/mail/whitelist.txt","w");
 		foreach($config['installedpackages']['spamd-whitelist']['config'] as $spamd) {
