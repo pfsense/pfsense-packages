@@ -1,22 +1,22 @@
 <packagegui>
 	<name>freeradiussettings</name>
 	<title>FreeRADIUS: Settings</title>
-	<aftersaveredirect>pkg_edit.php?xml=freeradiussettings.xml&amp;id=1</aftersaveredirect>
-	<tabs>
-                <tab>
+	<aftersaveredirect>pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</aftersaveredirect>
+	<tabs>          
+                <tab>   
                         <text>Users</text>
                         <url>/pkg.php?xml=freeradius.xml</url>
-                </tab>
+                </tab>  
                 <tab>
                         <text>Clients</text>
                         <url>/pkg.php?xml=freeradiusclients.xml</url>
-                </tab>
+                </tab>  
                 <tab>
                         <text>Settings</text>
                         <url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
 			<active/>
                 </tab>
-        </tabs>
+        </tabs> 
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<fields>
 		<field>
@@ -33,22 +33,23 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
-	    function sync_package() {
-                        global $config;
-                        $fout = fopen("/usr/local/etc/raddb/radiusd.conf.dynamic","w");
-                                $int_ip = find_interface_ip($config['installedpackages']['freeradiussettings']['config']['interface']);
-				fwrite($fout, "{\nipaddr = " . $int_ip);
-                                if($config['installedpackages']['freeradiussettings']['config']['port'] != "") {
-                                        fwrite($fout, "port = " . $port . "\n");
-                                } else {
-                                        fwrite($fout, "port = 0\n");
-                                }
-                                fwrite($fout, "type = auth\n}\n\n") ;
-                                fclose($fout);
-                        }
-                        mwexec("killall radiusd");
-                        mwexec("/usr/local/etc/rc.d/radiusd");
-                sync_package();
+	Function sync_package()	{
+		global $config;
+		$fout = fopen("/usr/local/etc/raddb/radiusd.conf.dynamic","w");
+		$int_ip = find_interface_ip($config['interfaces'][$_POST['interface']]['if']);
+		$port = $config['installedpackages']['freeradiussettings']['config'][0]['port'];
+		fwrite($fout, "{\nipaddr = " . $int_ip);
+		if($port != "") {
+		fwrite($fout, "port = " . $port . "\n");
+		} else {
+		fwrite($fout, "port = 0\n");
+		}
+		fwrite($fout, "type = auth\n}\n\n");
+		fclose($fout);
+		}
+	mwexec("killall radiusd");
+	mwexec("/usr/local/etc/rc.d/radiusd");
+	sync_package();	
 	</custom_php_command_before_form>
 	<custom_add_php_command>
 		sync_package();
