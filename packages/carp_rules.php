@@ -38,8 +38,8 @@ foreach($config['installedpackages']['carp']['config'] as $carp) {
     $ip = $carp['ipaddress'];
     $int = find_ip_interface($ip);
     $carp_int = find_carp_interface($ip);
-    $carp_sync_int = convert_friendly_interface_to_real_interface_name($carp['pfsyncinterface']);    
     add_rule_to_anchor("carp", "pass out quick on {$carp_int} keep state", $carp_int . "1");
+    add_rule_to_anchor("carp", "pass quick on {$carp_int} proto carp keep state", $carp_int . "41");
     if($int <> false and $int <> $wan_interface) {
 	$ipnet = convert_ip_to_network_format($ip, $carp['netmask']);
 	$rule = "nat on {$int} inet from {$ipnet} to any -> ({$carp_int}) \n";
@@ -47,6 +47,8 @@ foreach($config['installedpackages']['carp']['config'] as $carp) {
     }
 }
 add_rule_to_anchor("carp", "pass quick on pfsync0", "pfsync0" . "3");
+foreach($config['installedpackages']['carpsettings']['config'] as $carp)
+$carp_sync_int = convert_friendly_interface_to_real_interface_name($carp['pfsyncinterface']);    
 if($carp_sync_int <> "") {
     add_rule_to_anchor("carp", "pass quick on {$carp_sync_int}", $carp_sync_int . "3");
     add_rule_to_anchor("carp", "pass quick on {$carp_sync_int} proto carp from {$carp_sync_int}:network to 224.0.0.18 keep state \(no-sync\)", $carp_sync_int . "2");
