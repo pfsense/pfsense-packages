@@ -235,7 +235,7 @@
 			  /*
 			   *  create the carp interface
 			   */
-			  fwrite($fout, "echo Creating {$pfsync_instances_counter} ...");
+			  fwrite($fout, "echo Creating {$pfsync_instances_counter} ...\n");
 			  fwrite($fout, "/sbin/ifconfig carp" . $carp_instances_counter . " create\n");
 			  $broadcast_address = gen_subnet_max($carp['ipaddress'], $carp['netmask']);
 			  if($carp['password'] != "") {
@@ -255,7 +255,7 @@
 			      fwrite($fout, "/sbin/ifconfig pfsync" . $pfsync_instances_counter . " up syncif " . $carp['synciface'] . "\n");
 			      $pfsync_instances_counter++;
 			  }
-			  fwrite($fout, "sleep 1");
+			  fwrite($fout, "sleep 1\n");
 			  $carp_instances_counter++;
 		      }
 		  }
