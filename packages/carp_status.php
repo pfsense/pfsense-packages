@@ -88,7 +88,7 @@ if($config['installedpackages']['carp']['config'] <> "")
 		echo "<tr>";
 		echo "<td class=\"listlr\"><center>" . $ipaddress . " - " . $carp_int . "</td>";
 		echo "<td class=\"listlr\"><center>" . $status . "<br>" . $sync_status . "</td>";
-		echo "<td class=\"listlr\"><center>" . $synciface . "</td>";
+		echo "<td class=\"listlr\"><center>" . $synciface . " - " . convert_friendly_interface_to_real_interface_name($synciface) . "</td>";
 		echo "</tr>";
 	}
 
