@@ -12,7 +12,7 @@
 	</menu>
 	<tabs>
 	    <tab>
-		<text>CARP Settings</text>
+		<text>CARP Virtual IPs</text>
 		<url>/pkg_edit.php?xml=carp.xml</url>
 		<active/>
 	    </tab>
@@ -20,7 +20,17 @@
 		<text>CARP Status</text>
 		<url>carp_status.php</url>
 	    </tab>
+	    <tab>
+		<text>CARP Settings</text>
+		<xml>carp_settings.xml</xml>
+		<active/>
+	    </tab>
 	</tabs>
+    	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>a+x</chmod>
+	    <item>http://www.pfsense.com/packages/config/carp_settings.xml</item>
+	</additional_files_needed>
     	<additional_files_needed>
 	    <prefix>/usr/local/pkg/pf/</prefix>
 	    <chmod>a+x</chmod>
@@ -46,11 +56,6 @@
 	    <columnitem>
 		    <fielddescr>Advertising Frequency</fielddescr>
 		    <fieldname>advskew</fieldname>
-	    </columnitem>
-	    <columnitem>
-		    <fielddescr>Synchronize State</fielddescr>
-		    <fieldname>pfsync</fieldname>
-		    <type>checkbox</type>
 	    </columnitem>
 	    <columnitem>
 		    <fielddescr>Load Balancing</fielddescr>
@@ -203,18 +208,6 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>Synchrnoize State</fielddescr>
-			<fieldname>pfsync</fieldname>
-			<description>PFSync transfers state insertion, update, and deletion messages between firewalls. Each firewall sends these messages out via multicast on a specified interface, using the PFSYNC protocol (IP Protocol 240). It also listens on that interface for similar messages from other firewalls, and imports them into the local state table.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>Synchronize Interface</fielddescr>
-			<fieldname>synciface</fieldname>
-			<type>interfaces_selection</type>
-			<description>If Synchronize State is enabled, it will utilize this interface for communication.</description>
-		</field>
-		<field>
 			<fielddescr>Load Balancing</fielddescr>
 			<fieldname>balancing</fieldname>
 			<description>If this feature is enabled, CARP source-hashes the originating IP of a request. The hash is then used to select a virtual host from the available pool to handle the request. This is disabled by default.</description>
@@ -261,17 +254,20 @@
 			  fwrite($fout, $carp_command . "\n");
 			  fwrite($fout, "/sbin/ifconfig carp{$carp_instances_counter} up\n");
 			  if($carp['pfsync'] != "") $pfsync = 1;
-			  if($pfsync != 0) {
-			      /*
-			       * user has selected pfsync, bring it up.
-			       */
-			      fwrite($fout, "/sbin/ifconfig pfsync" . $pfsync_instances_counter . " create \n");
-			      fwrite($fout, "/sbin/ifconfig pfsync" . $pfsync_instances_counter . " up syncif " . convert_friendly_interface_to_real_interface_name($carp['synciface']) . "\n");
-			      $pfsync_instances_counter++;
-			  }
 			  $carp_instances_counter++;
 		      }
 		  }
+		    if($pfsync != 0) {
+			/*
+			 * user has selected pfsync, bring it up.
+			 */
+			$carp_sync_int = convert_friendly_interface_to_real_interface_name($config['installedpackages']['carpsettings']['config']['pfsyncinterface']);
+			$carp_sync_ip  = $config['installedpackages']['carpsettings']['config']['pfsyncip'];
+			fwrite($fout, "/sbin/ifconfig pfsync0 create\n");
+			fwrite($fout, "/sbin/ifconfig pfsync0 {$carp_sync_ip}/24\n");
+			fwrite($fout, "/sbin/ifconfig pfsync0 up syncif " . carp_sync_ip . "\n");
+			$pfsync_instances_counter++;
+		    }
 		  fwrite($fout, "/etc/rc.filter_configure");
 		  fclose($fout);
 		  mwexec("chmod a+x /usr/local/etc/rc.d/carp.sh");

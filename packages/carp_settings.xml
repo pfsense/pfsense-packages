@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>carpsettings</name>
+	<version>0.1.0</version>
+	<title>Services: CARP Settings</title>
+	<!-- configpath gets expanded out automatically and config items will be
+         stored in that location -->
+	<configpath>['installedpackages']['carpsettings']['config']</configpath>
+	<!-- Menu is where this packages menu will appear -->
+	<menu>
+	    <name>CARP (failover)</name>
+	    <tooltiptext>CARP is a tool to help achieve system redundancy, by having multiple computers creating a single, virtual network interface between them, so that if any machine fails, another can respond instead, and/or allowing a degree of load sharing between systems. CARP is an improvement over the Virtual Router Redundancy Protocol (VRRP) standard. It was developed after VRRP was deemed to be not free enough because of a possibly-overlapping Cisco patent.</tooltiptext>
+	    <section>Services</section>
+	    <configfile>carp.xml</configfile>
+	</menu>
+	<tabs>
+	    <tab>
+		<text>CARP Virtual IPs</text>
+		<url>/pkg_edit.php?xml=carp.xml</url>
+		<active/>
+	    </tab>
+	    <tab>
+		<text>CARP Status</text>
+		<url>carp_status.php</url>
+	    </tab>
+	    <tab>
+		<text>CARP Settings</text>
+		<xml>carp_settings.xml</xml>
+		<active/>
+	    </tab>
+	</tabs>
+	<adddeleteeditpagefields>
+	    <columnitem>
+		    <fielddescr>PFSync Enabled</fielddescr>
+		    <fieldname>pfsyncenabled</fieldname>
+	    </columnitem>
+	    <columnitem>
+		    <fielddescr>PFSync IP</fielddescr>
+		    <fieldname>pfsyncip</fieldname>
+	    </columnitem>
+	    <columnitem>
+		    <fielddescr>PFSync Interface</fielddescr>
+		    <fieldname>pfsyncinterface</fieldname>
+	    </columnitem>
+	</adddeleteeditpagefields>
+	<!-- fields gets invoked when the user adds or edits a item.   the following items
+         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
+	<fields>
+		<field>
+			<fielddescr>Synchrnoize Enabled</fielddescr>
+			<fieldname>pfsyncenabled</fieldname>
+			<description>PFSync transfers state insertion, update, and deletion messages between firewalls. Each firewall sends these messages out via multicast on a specified interface, using the PFSYNC protocol (IP Protocol 240). It also listens on that interface for similar messages from other firewalls, and imports them into the local state table.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Synchronize IP Address</fielddescr>
+			<fieldname>pfsyncip</fieldname>
+			<description>PFSync IP Address</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Synchronize Interface</fielddescr>
+			<fieldname>pfsyncinterface</fieldname>
+			<type>interfaces_selection</type>
+			<description>If Synchronize State is enabled, it will utilize this interface for communication.</description>
+		</field>
+	</fields>
+	<custom_php_command_before_form>
+	</custom_php_command_before_form>
+	<custom_php_resync_config_command>
+	</custom_php_resync_config_command>
+	<custom_delete_php_command>
+	</custom_delete_php_command>
+	<custom_php_install_command>
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+	</custom_php_deinstall_command>
+</packagegui>
