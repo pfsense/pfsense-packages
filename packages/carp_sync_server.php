@@ -42,7 +42,7 @@ if($config['installedpackages']['carpsettings']['config'] != "")
 	$trafficshaper = return_filename_as_string("{$g['tmp_path']}/trafficshaper_section.txt");
 	if($rules <> "") {
 	    restore_config_section("filter", $rules);
-	    unlink("{$g['tmp_path']}/rules_section.txt");
+	    unlink("{$g['tmp_path']}/filter_section.txt");
 	}
 	if($aliases <> "") {
 	    restore_config_section("aliases", $aliases);
@@ -54,7 +54,7 @@ if($config['installedpackages']['carpsettings']['config'] != "")
 	}
 	if($trafficshaper <> "") {
 	    restore_config_section("shaper", $trafficshaper);
-	    unlink("{$g['tmp_path']}/nat_section.txt");
+	    unlink("{$g['tmp_path']}/shaper_section.txt");
 	}
 	filter_configure();
 
