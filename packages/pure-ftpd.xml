@@ -67,18 +67,17 @@
 		</field>
 	</fields>
 	<custom_php_install_command>
-		mwexec("/bin/rm /usr/local/etc/rc.d/pure-ftp*");
 		$fout = fopen("/usr/local/etc/rc.d/pure-ftpd.sh","w");
 		fwrite($fout, "#!/bin/sh\n\n");
 		fwrite($fout, "/usr/local/sbin/pure-ftpd -A -B /usr/local/etc/pure-ftpd.conf\n");
 		fclose($fout);
-		mwexec("/bin/chmod a+x /usr/local/etc/rc.d/pure-ftpd.sh");
+		chmod("/usr/local/etc/rc.d/pure-ftpd.sh", 0755);
 		mwexec("/usr/local/etc/rc.d/pure-ftpd.sh");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		mwexec("/usr/bin/killall pure-ftpd");
-		system("/bin/rm -rf /usr/local/etc/pure*");
-		system("/bin/rm -rf /usr/local/etc/rc.d/pure*");
+		rmdir_recursive("/usr/local/etc/pure*");
+		rmdir_recursive("/usr/local/etc/rc.d/pure*");
 	</custom_php_deinstall_command>
 	<custom_add_php_command>
 		conf_mount_rw();
@@ -97,7 +96,7 @@
 		$savemsg = "User has been added.";
 	</custom_add_php_command>
 	<custom_delete_php_command>
-		system("/bin/rm -rf /home/" . $username);
+		rmdir_recursive("/home/" . $username);
 		system("/usr/sbin/pw userdel " . $username);
 	</custom_delete_php_command>
 </packagegui>

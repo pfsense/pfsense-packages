@@ -61,7 +61,7 @@
 	</fields>
 	<custom_php_deinstall_command>
 		system("/usr/local/bin/pg_ctl -m immediate");
-		system("rm -rf /usr/local/pgsql");
+		rmdir_recursive("/usr/local/pgsql");
 		system("/usr/sbin/pw userdel pgsql");
 		system("/usr/bin/killall -9 postgres");
 		echo "&lt;p&gt;";

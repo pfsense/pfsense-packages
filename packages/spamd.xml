@@ -153,6 +153,7 @@
 	    system("/usr/local/etc/rc.d/spamd 2>/dev/null");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-	    system("/bin/rm /usr/local/pkg/spamd* /usr/local/www/spam*");
+	    unlink_if_exists("/usr/local/pkg/spamd*");
+	    unlink_if_exists("/usr/local/www/spam*");
 	</custom_php_deinstall_command>
 </packagegui>

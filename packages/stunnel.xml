@@ -83,8 +83,8 @@
 	  system("chmod 555 /usr/local/etc/rc.d/stunnel.sh");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-	  system("rm -rf /var/tmp/stunnel 2>/dev/null");
-	  system("rm -rf /usr/local/etc/stunnel*");
+	  rmdir_recursive("/var/tmp/stunnel");
+	  rmdir_recursive("/usr/local/etc/stunnel*");
 	</custom_php_deinstall_command>
 	<custom_add_php_command_late>
 	  conf_mount_rw();

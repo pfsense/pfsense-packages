@@ -61,7 +61,6 @@
     </fields>
     <custom_php_install_command>
 	global $config;
-	mwexec("rm /usr/local/etc/rc.d/ifstated*");
 	$fout = fopen("/usr/local/etc/rc.d/ifstated.sh","w");
 	fwrite($fout,"#!/bin/sh\n\n/usr/local/sbin/ifstated\n");
 	fclose($fout);

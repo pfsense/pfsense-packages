@@ -73,18 +73,17 @@
 			$interfaces = $lan;
 		    }
 		    echo "Using interface(s): " . $interfaces . "\n";
-		    system("/usr/local/bin/ntop --set-admin-password=" . $_POST['password']);
-		    system("killall ntop 2>/dev/null");
-		    system("rm /usr/local/etc/rc.d/ntop.sh");
+		    mwexec("/usr/local/bin/ntop --set-admin-password=" . $_POST['password']);
+		    mwexec("killall ntop 2>/dev/null");
 		    $fout = fopen("/usr/local/etc/rc.d/ntop.sh","w");
 		    fwrite($fout, "#!/bin/sh\n\n");
 		    fwrite($fout, "/usr/local/bin/ntop -i " . $interfaces . " -u root -d --ipv4 -M\n\n");
 		    fclose($fout);
 		    conf_mount_ro();
 		    config_unlock();
-		    system("chmod 555 /usr/local/etc/rc.d/ntop.sh");
-		    system("killall ntop 2>/dev/null");
-		    system("/usr/local/etc/rc.d/ntop.sh");
+		    chmod("/usr/local/etc/rc.d/ntop.sh", 0555);
+		    mwexec("killall ntop");
+		    mwexec("/usr/local/etc/rc.d/ntop.sh");
 	    } else {
 		    echo "Passwords do not match!";
 		    exit;
@@ -99,11 +98,10 @@
 		mwexec("/usr/bin/killall ntop");
 	</custom_php_deinstall_command>
 	<custom_php_install_command>
-	    system("rm /usr/local/etc/rc.d/ntop.sh");
 	    $fout = fopen("/usr/local/etc/rc.d/ntop.sh","w");
 	    fwrite($fout, "#!/bin/sh\n\n");
 	    fwrite($fout, "/usr/local/bin/ntop -u root -d --ipv4 -M\n\n");
 	    fclose($fout);
-	    system("chmod 555 /usr/local/etc/rc.d/ntop.sh");
+	    chmod("/usr/local/etc/rc.d/ntop.sh", 0555);
 	</custom_php_install_command>
 </packagegui>

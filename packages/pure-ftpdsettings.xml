@@ -89,7 +89,7 @@
 	<custom_add_php_command>
 		conf_mount_rw();
 		config_lock();
-		mwexec("rm /usr/local/etc/rc.d/pure-ftp*");
+		unlink_if_exists("/usr/local/etc/rc.d/pure-ftp*");
 		$fout = fopen("/usr/local/etc/rc.d/pure-ftpd.sh","w");
 		fwrite($fout, "#!/bin/sh\n\n");
 		$startline = "/usr/local/sbin/pure-ftpd";

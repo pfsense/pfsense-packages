@@ -268,8 +268,8 @@
 		system("/usr/sbin/cron 2>/dev/null");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-	  system("rm /usr/local/etc/pfstat 2>/dev/null");
-	  system("rm -rf /usr/local/www/pfstat* 2>/dev/null");
+	  unlink_if_exists("/usr/local/etc/pfstat");
+	  rmdir_recursive("/usr/local/www/pfstat");
 	</custom_php_deinstall_command>
 	<!--
 	<custom_php_install_command>

@@ -47,12 +47,11 @@
 	config_unlock();
     </custom_add_php_command>
     <custom_php_deinstall_command>
-	system("/usr/bin/killall -9 hulamanager");
-	system("rm -rf /usr/local/hula");
-	system("rm /usr/local/etc/rc.d/hula.sh");
+	mwexec("/usr/bin/killall -9 hulamanager");
+	rmdir_recursive("/usr/local/hula");
+	unlink_if_exists("/usr/local/etc/rc.d/hula.sh");
     </custom_php_deinstall_command>
     <custom_php_install_command>
-	system("rm /usr/local/etc/rc.d/hula.sh");
 	$fout = fopen("/usr/local/etc/rc.d/hula.sh","w");
 	fwrite($fout, "#!/bin/sh\n\n");
 	fwrite($fout, "/sbin/mount -t linprocfs linprocfs /proc\n");
