@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>carp</name>
-	<version/>
+	<version>0.1.0</version>
 	<title>Services: CARP (failover)</title>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>

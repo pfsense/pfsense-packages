@@ -83,7 +83,7 @@
 	<descr>CARP is a tool to help achieve system redundancy by having multiple computers creating a single, virtual network interface between them. This allows another machine to respond in the event a server fails, and allows a degree of load sharing between systems. CARP is an improvement over the Virtual Router Redundancy Protocol (VRRP) standard. It was developed after VRRP was shown to possibly overlap a Cisco patent.</descr>
 	<website>http://www.openbsd.org/faq/faq6.html#CARP</website>
 	<category>Network Management</category>
-	<version></version>
+	<version>0.1.0</version>
 	<status>ALPHA</status>
 	<config_file>http://www.pfsense.com/packages/config/carp.xml</config_file>
 	<configurationfile>carp.xml</configurationfile>
