@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>frickin</name>
+	<version>1.2</version>
+	<title>Services: Frickin</title>
+	<menu>
+		<name>Frickin</name>
+		<tooltiptext>Modify settings for the Frickin PPTP proxy.</tooltiptext>
+		<section>Diagnostics</section>
+		<configfile>frickin.xml</configfile>
+	</menu>
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<additional_files_needed>
+		<prefix>/usr/local/bin/</prefix>
+		<chmod>a+x</chmod>
+		<item>http://www.pfsense.com/packages/config/frickin.xml</item>
+        </additional_files_needed>
+	<fields>
+		<field>
+                    <fielddescr>PPTP Server Address</fielddescr>
+                    <fieldname>serveraddress</fieldname>
+                    <description>Enter the PPTP server's IP address.</description>
+                    <type>input</type>
+		</field>
+                <field>
+                    <fielddescr>Maximum Concurrent Tunnels</fielddescr>
+                    <fieldname>maxtunnels</fieldname>
+                    <description>Enter the maximum number of concurrent tunnels to allow at any given time.</description>
+                    <type>input</type>
+                </field>
+	</fields>
+	<custom_php_global_functions>
+		function write_frickin_static_config() {
+			$fout = fopen("/usr/local/etc/rc.d/frickin.sh", "w");
+			fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");
+			fwrite($fout, "/usr/local/bin/frickin ");
+			fclose($fout);
+		}
+		function sync_package_frickin() {
+                        $frickin_options = "";           
+                        if($_POST['serveraddress'] != "") $frickin_options .= "-s {$_POST['serveraddress']} ";
+                        if($_POST['maxtunnels'] != "") $frickin_options .= "-c {$_POST['maxtunnels']}";
+                        $fout = fopen("/usr/local/etc/rc.d/frickin.sh", "a");
+                        $fwrite($fout, $frickin_options . "\n");
+                        mwexec("/usr/bin/killall frickin");
+                        mwexec("/usr/local/etc/rc.d/frickin.sh");
+                }
+	</custom_php_global_functions>
+        <custom_add_php_command>
+		write_frickin_static_config();
+		sync_package_frickin();
+        </custom_add_php_command>
+	<custom_php_deinstall_command>
+		unlink_if_exists("/usr/local/etc/rc.d/frickin.sh");
+	</custom_php_deinstall_command>
+</packagegui>
