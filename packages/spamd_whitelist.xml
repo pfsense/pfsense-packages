@@ -23,7 +23,7 @@
 	</tabs>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->
-	<configpath>['installedpackages']['spamd-whitelist']['config']</configpath>
+	<configpath>['installedpackages']['spamdwhitelist']['config']</configpath>
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Exempted IP</fielddescr>
@@ -50,4 +50,25 @@
 			<type>input</type>
 		</field>
 	</fields>
+	<custom_php_command_before_form>
+	    function sync_package() {
+		global $config;
+		conf_mount_rw();
+		config_lock();
+		$fd = fopen("/var/mail/whitelist.txt","w");
+		if($config['installedpackages']['spamdwhitelist']['config'] != "")
+		    foreach($config['installedpackages']['spamdwhitelist']['config'] as $spamd) {
+			fwrite($fd, $spamd['ip'] . "\n");
+		    }
+		fclose($fd);
+		conf_mount_ro();
+		config_unlock();
+	    }
+	</custom_php_command_before_form>
+	<custom_php_resync_config_command>
+	    sync_package();
+	</custom_php_resync_config_command>
+	<custom_delete_php_command>
+	    sync_package();
+	</custom_delete_php_command>
 </packagegui>

@@ -122,8 +122,8 @@
 		}
 		fclose($fd);
 		$fd = fopen("/var/mail/whitelist.txt","w");
-		if($config['installedpackages']['spamd-whitelist']['config'] != "")
-		    foreach($config['installedpackages']['spamd-whitelist']['config'] as $spamd) {
+		if($config['installedpackages']['spamdwhitelist']['config'] != "")
+		    foreach($config['installedpackages']['spamdwhitelist']['config'] as $spamd) {
 			fwrite($fd, $spamd['ip'] . "\n");
 		    }
 		fclose($fd);
