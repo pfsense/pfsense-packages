@@ -16,6 +16,18 @@
 	    <section>Services</section>
 	    <configfile>hula.xml</configfile>
 	</menu>
+    	<menu>
+	    <name>Hula Admin</name>
+	    <tooltiptext>This area will help manage Hula from day to day.</tooltiptext>
+	    <section>Services</section>
+	    <url>http://$myurl:89</url>
+	</menu>
+    	<menu>
+	    <name>Hula User Login</name>
+	    <tooltiptext>This area is for user logins.</tooltiptext>
+	    <section>Services</section>
+	    <url>http://$myurl:8080</url>
+	</menu>
         <!-- Do not save invokes a simple input menu and will not update
              the configuration database. -->
 	<fields>
