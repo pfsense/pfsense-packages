@@ -2,7 +2,7 @@
 /*
 	carp_sync.php
         part of pfSense (www.pfSense.com)
-	Copyright (C) 2004 Scott Ullrich (sullrich@gmail.com)
+	Copyright (C) 2005 Scott Ullrich (sullrich@gmail.com) and Colin Smith (ethethlay@gmail.com)
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,19 @@
 	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
+
+	TODO:
+		* SSL support!
+
 */
+
+require_once("xmlrpc_client.inc"); // Include client classes from our XMLRPC implementation.
+require_once("xmlparse_pkg.inc");  // Include pfSense helper functions.
+require_once("config.inc");
+require_once("functions.inc");
+
+function carp_sync_xml($url, $password, $section, $section_xml) {
+	$params = array(new XML_R
 
 if($already_processed != 1)
     if($config['installedpackages']['carpsettings']['config'] <> "" and
@@ -33,17 +45,10 @@ if($already_processed != 1)
 	$already_processed = 1;
 	foreach($config['installedpackages']['carpsettings']['config'] as $carp) {
 	    if($carp['synchronizetoip'] <> "" ) {
-		/* lets sync! */
 		$synchronizetoip = $carp['synchronizetoip'];
-		$files_to_copy = "";
 		if($carp['synchronizerules'] <> "" and is_array($config['filter'])) {
 		    $current_rules_section = backup_config_section("filter");
-		    $current_rules_section = str_replace("<?xml version=\"1.0\"?>", "", $current_rules_section);
-		    /* generate firewall rules xml */
-		    $fout = fopen("{$g['tmp_path']}/filter_section.txt","w");
-		    fwrite($fout, $current_rules_section);
-		    fclose($fout);
-                    $files_to_copy .= "{$g['tmp_path']}/filter_section.txt";
+		    //$current_rules_section = str_replace("<?xml version=\"1.0\"?>", "", $current_rules_section);
 		}
 		if($carp['synchronizenat'] <> "" and is_array($config['nat'])) {
 		    $current_nat_section = backup_config_section("nat");
