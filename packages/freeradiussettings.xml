@@ -22,8 +22,6 @@
 		<field>
 			<fielddescr>Listening Interface(s)</fielddescr>
 			<fieldname>interface</fieldname>
-			<size>3</size>
-			<multiple>true</multiple>
 			<description>Enter the desired listening interface here</description>
 			<type>interfaces_selection</type>
 		</field>
