@@ -58,7 +58,7 @@
                 <templatecontents>
                     myhostname = hostname_fieldvalue\n
                     mydomain = primarydomain_fieldvalue\n
-                    relay_domains = domain_fieldvalue
+                    relay_domains = domain_fieldvalue[1-$domain_total_rows]
                 </templatecontents>
             </template>
             <template>
