@@ -2,54 +2,12 @@
 <packagegui>
 	<name>frickin</name>
 	<version>1.2</version>
-	<title>Services: Frickin</title>
-	<aftersaveredirect>pkg_edit.php?xml=frickin.xml&amp;id=0</aftersaveredirect>
-	<menu>
-		<name>Frickin</name>
-		<tooltiptext>Modify settings for the Frickin PPTP proxy.</tooltiptext>
-		<section>Services</section>
-		<configfile>frickin.xml</configfile>
-		<url>/pkg_edit.php?xml=frickin.xml&amp;id=0</url>
-	</menu>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>a+rx</chmod>
 		<item>http://www.pfsense.com/packages/All/frickin</item>
         </additional_files_needed>
-	<fields>
-		<field>
-                    <fielddescr>PPTP Server Address</fielddescr>
-                    <fieldname>serveraddress</fieldname>
-                    <description>Enter the PPTP server's IP address.</description>
-                    <type>input</type>
-		</field>
-                <field>
-                    <fielddescr>Maximum Concurrent Tunnels</fielddescr>
-                    <fieldname>maxtunnels</fieldname>
-                    <description>Enter the maximum number of concurrent tunnels to allow at any given time.</description>
-                    <type>input</type>
-                </field>
-	</fields>
-	<custom_php_global_functions>
-		function sync_package_frickin() {
-		    global $config;
-		    $frickin_config = $config['installedpackages']['frickin']['config'][0];
-		    $fout = fopen("/usr/local/etc/rc.d/frickin.sh", "w");
-		    fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");
-		    fwrite($fout, "/usr/local/bin/frickin");
-		    if($frickin_config['serveraddress'] != "") fwrite($fout, " -s " . $frickin_config['serveraddress']);
-		    if($frickin_config['maxtunnels'] != "") fwrite($fout, " -c " . $frickin_config['maxtunnels']);
-		    fwrite($fout, " &amp;\n");
-		    fclose($fout);
-		    mwexec("/usr/bin/killall frickin");
-		    mwexec("chmod a+rx /usr/local/etc/rc.d/frickin.sh");
-		    mwexec("/usr/local/etc/rc.d/frickin.sh");
-                }
-	</custom_php_global_functions>
-        <custom_add_php_command>
-		sync_package_frickin();
-        </custom_add_php_command>
 	<custom_php_install_command>
 	    $fout = fopen("/usr/local/etc/rc.d/frickin.sh", "w");
 	    fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");
