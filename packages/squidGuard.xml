@@ -13,9 +13,9 @@
 	    fwrite($fout, "dbhome /var/db/squidGuard\n");
 	    fwrite($fout, "logdir /usr/local/squid/logs\n");
 	    fwrite($fout, "acl {"\n");
-	    fwrite($fout, "\t default {\n");
-	    fwrite($fout, "\t pass all\n");
-	    fwrite($fout, "\t }\n");
+	    fwrite($fout, "\\t default {\n");
+	    fwrite($fout, "\\t pass all\n");
+	    fwrite($fout, "\\t }\n");
 	    fwrite($fout, "}\n");
         fclose($fout);
 	$fout = fopen("/usr/local/etc/squid/squid.conf","w");
@@ -30,7 +30,6 @@
 	exec("/usr/bin/chgrp -R squid /var/db/squidGuard");
 	exec("/bin/chmod -R 755 /var/db/squidGuard");
 	system("/usr/local/sbin/squid -k reconfigure");
-	    filter_configure();
 	</custom_php_install_command>
 	<custom_php_pre_deinstall_command>
     </custom_php_pre_deinstall_command>
