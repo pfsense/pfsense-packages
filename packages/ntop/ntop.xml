@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<title>Diagnostics: NTop</title>
+	<aftersaveredirect>pkg_edit.php?xml=ntop.xml&amp;id=0</aftersaveredirect>
 	<name>ntop</name>
 	<version>3.0</version>
         <preoutput>yes</preoutput>
