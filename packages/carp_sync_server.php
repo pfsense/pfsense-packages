@@ -1,4 +1,4 @@
-#!/usr/bin/php
+#!/usr/local/bin/php
 
 <?php
 
@@ -30,14 +30,16 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
-require("xmlparse_pkg.inc");
+require_once("config.inc");
+require_once("xmlparse_pkg.inc");
+require_once("filter.inc");
 
 if($config['installedpackages']['carpsettings']['config'] != "")
     foreach($config['installedpackages']['carpsettings']['config'] as $carp)
 	if($carp['synchronizerules'] <> "") {
 	    $rules = return_filename_as_string("{$g['tmp_path']}/rules_section.txt");
 	    restore_config_section("rules", $rules);
+	    filter_configure();
 	}
 
 ?>
