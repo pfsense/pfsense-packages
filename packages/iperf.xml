@@ -1,0 +1,110 @@
+<packagegui>
+	<name>iperf</name>
+	<version>1.7.0</version>
+	<title>iperf: Client</title>
+	<donotsave>true</donotsave>
+	<menu>
+		<name>iperf</name>
+		<tooltiptext>Run iperf in client or server mode.</tooltiptext>
+		<section>Diagnostics</section>
+		<configfile>iperf.xml</configfile>
+	</menu>
+	<!-- Do not implement server functionality yet.
+	<tabs>
+		<tab>
+			<text>Client</text>
+			<url>/pkg_edit.php?xml=iperf.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Server</text>
+			<url>/pkg_edit.php?xml=iperfserver.xml</url>
+		</tab>
+	</tabs>
+	<additional_files_needed>
+		<item>http://www.pfsense.com/packages/config/iperfserver.xml</item>
+	</additional_files_needed>
+	-->
+	<fields>
+		<field>
+			<fielddescr>Server</fielddescr>
+			<fieldname>hostname</fieldname>
+			<description>Enter the IP address or hostname that iperf will connect to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Port</fielddescr>
+			<fieldname>port</fieldname>
+			<description>Enter the port that iperf will connect to. (default 5001)</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>TCP/UDP</fielddescr>
+			<fieldname>protocol</fieldname>
+			<description>Choose whether to use TCP or UDP here. (default is TCP)</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>TCP</name>
+					<value>tcp</value>
+				</option>
+				<option>
+					<name>UDP</name>
+					<value>udp</value>
+				</option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>bits/sec or bytes/sec</fielddescr>
+			<fieldname>format</fieldname>
+			<description>Choose to display output in bits/sec or bytes/sec. (default is bits)</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>bits/sec</name>
+					<value>bits</value>
+				</option>
+				<option>
+					<name>bytes/sec</name>
+					<value>bytes</value>
+				</option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Interval</fielddescr>
+			<fieldname>interval</fieldname>
+			<description>Enter the desired interval between bandwidth, jitter and loss reports here. (default is 0 for no periodic reports)</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Buffer length</fielddescr>
+			<fieldname>length</fieldname>
+			<description>Enter the length of buffers to read or write here. (default 8KB for TCP, 1470B for UDP)
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Socket buffer sizes</fielddescr>
+			<fieldname>window</fieldname>
+			<description>Enter the desired socket buffer size, if needed.</description>
+		</field>
+		<field>
+			<fielddescr>UDP Bandwidth</fielddescr>
+			<fieldname>udpbandwidth</fieldname>
+			<description>Enter the UDP bandwidth to send at in bits/sec. (default is 1Mbit/sec)
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_add_php_command>
+		$iperf_options = "";
+		if($_POST['protocol'] == "udp") $iperf_options .= " -u";
+		if($_POST['format'] == "bytes") $iperf_options .= " -f A";
+		if($_POST['interval'] != "") $iperf_options .= " -i {$_POST['interval']}";
+		if($_POST['length'] != "") $iperf_options .= " -l {$_POST['length']}";
+		if($_POST['window'] != "") $iperf_options .= " -w {$_POST['window']}";
+		if($_POST['udpbandwidth'] != "") $iperf_options .= " -b {$_POST['udpbandwidth']}";
+		if($_POST['port'] != "") $iperf_options .= " -p {$_POST['port']}";
+		$iperf_options .= " -c {$_POST['hostname']}";
+		system("/usr/local/bin/iperf" . $iperf_options);
+	</custom_add_php_command>
+</packagegui>
+
