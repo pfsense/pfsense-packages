@@ -257,7 +257,7 @@
 			  $carp_instances_counter++;
 		      }
 		  }
-		  fwritw($fout, "/etc/rc.filter_configure");
+		  fwrite($fout, "/etc/rc.filter_configure");
 		  fclose($fout);
 		  mwexec("chmod a+x /usr/local/etc/rc.d/carp.sh");
 		  mwexec("/usr/local/etc/rc.d/carp.sh");
