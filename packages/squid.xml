@@ -41,11 +41,16 @@
 	    fclose($fout);
 	    system("chmod a+x /usr/local/etc/rc.d/squid.sh");
 	    system("/usr/local/sbin/squid -z");
-	    filter_configure();
 	    system("/usr/local/sbin/squid");
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-	    system("/usr/bin/killall squid");
 	    filter_configure();
+	</custom_php_install_command>
+	<start_command>/usr/local/sbin/squid</start_command>
+	<custom_php_pre_deinstall_command>
+	    exec("mv /var/db/pkg/squid* /tmp/");
+	    filter_configure();
+	    exec("mv /tmp/squid* /var/db/pkg/");
+	</custom_php_pre_deinstall_command>
+	<custom_php_deinstall_command>
 	</custom_php_deinstall_command>
+	<process_kill_command>squid</process_kill_command>
 </packagegui>
