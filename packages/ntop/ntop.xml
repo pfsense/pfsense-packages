@@ -3,7 +3,6 @@
 	<title>Diagnostics: NTop</title>
 	<name>ntop</name>
 	<version>3.0</version>
-        <donotsave>true</donotsave>
         <preoutput>yes</preoutput>
         <savetext>Change</savetext>
 	<!-- Menu is where this packages menu will appear -->
@@ -54,8 +53,10 @@
 		</field>
     </fields>
 	<custom_add_php_command>
+	function sync_package_ntop() {
 	conf_mount_rw();
 	config_lock();
+	if($_POST == "") $_POST = $config['installedpackages']['ntop']['config'];
 	if($_POST['password'] == $_POST['passwordagain']) {
 		$interfaces = " -i ";
 		$ifaces=$_POST['iface'];
@@ -82,7 +83,11 @@
 		echo "Passwords do not match!";
 		exit;
 	}
+	}
 	</custom_add_php_command>
+	<custom_php_resync_command>
+		sync_package_ntop();
+	</custom_php_resync_command>
 	<custom_php_deinstall_command>
 		mwexec("/usr/bin/killall ntop");
 	</custom_php_deinstall_command>
