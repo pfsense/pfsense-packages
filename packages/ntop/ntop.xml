@@ -58,25 +58,27 @@
 	    config_lock();
 	    if($_POST == "") $_POST = $config['installedpackages']['ntop']['config'];
 	    if($_POST['password'] == $_POST['passwordagain']) {
-		    $interfaces = " -i ";
 		    $ifaces=$_POST['iface'];
 		    $isfirst = 0;
 		    $lan = $config['interfaces']['lan']['if'];
-		    foreach($ifaces as $element=>$if)
+		    $ifaces = split(" ", $iface);
+		    foreach($ifaces as $if)
 		    {
 			    if($isfirst == 1) $interfaces .= ",";
-			    $interfaces .= convert_friendly_interface_to_real_interface_name($ifaces[$element]);
+			    echo $if . " " ;
+			    $interfaces .= convert_friendly_interface_to_real_interface_name($if);
 			    $isfirst = 1;
 		    }
 		    if($interfaces == "") {
 			$interfaces = $lan;
 		    }
+		    echo "Using interface(s): " . $interfaces . "\n";
 		    system("/usr/local/bin/ntop --set-admin-password=" . $_POST['password']);
 		    system("killall ntop 2>/dev/null");
 		    system("rm /usr/local/etc/rc.d/ntop.sh");
 		    $fout = fopen("/usr/local/etc/rc.d/ntop.sh","w");
 		    fwrite($fout, "#!/bin/sh\n\n");
-		    fwrite($fout, "/usr/local/bin/ntop " . $interfaces . " -u root -d --ipv4 -M\n\n");
+		    fwrite($fout, "/usr/local/bin/ntop -i " . $interfaces . " -u root -d --ipv4 -M\n\n");
 		    fclose($fout);
 		    conf_mount_ro();
 		    config_unlock();
