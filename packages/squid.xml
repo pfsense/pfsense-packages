@@ -3,6 +3,7 @@
     <configpath>['installedpackages']['squid']['config']</configpath>
     <aftersaveredirect>pkg_edit.php?xml=squid.xml&amp;id=0&amp;savemsg=Settings%20saved.</aftersaveredirect>
     <name>squid</name>
+    <version>2.5.7_5</version>
     <menu>
         <name>Squid</name>
         <tooltiptext>Squid-Cache Proxy</tooltiptext>

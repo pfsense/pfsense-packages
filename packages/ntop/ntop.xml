@@ -2,6 +2,7 @@
 <packagegui>
 	<title>Diagnostics: NTop</title>
 	<name>ntop</name>
+	<version>3.0</version>
         <donotsave>true</donotsave>
         <preoutput>yes</preoutput>
         <savetext>Change</savetext>

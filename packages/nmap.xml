@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>nmap</name>
+	<version>3.70</version>
 	<title>Diagnostics: NMap</title>
 	<donotsave>true</donotsave>
 	<preoutput>yes</preoutput>

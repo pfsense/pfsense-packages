@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>pfstat</name>
+	<version>1.7</version>
 	<title>Services: PFStat Settings</title>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>

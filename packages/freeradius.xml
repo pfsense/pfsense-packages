@@ -1,5 +1,6 @@
 <packagegui>
 	<name>freeradius</name>
+	<version>1.0.1</version>
 	<title>FreeRADIUS: Users</title>
 	<menu>
 		<name>FreeRADIUS</name>

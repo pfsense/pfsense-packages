@@ -1,5 +1,6 @@
 <packagegui>
 	<name>ifstated</name>
+	<version>20041117</version>
 	<title>ifstated: Settings</title>
 	<menu>
 		<name>ifstated</name>
