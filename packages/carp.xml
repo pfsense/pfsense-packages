@@ -6,7 +6,7 @@
 		<name>CARP Settings</name>
 		<tooltiptext>CARP is a tool to help achieve system redundancy, by having multiple computers creating a single, virtual network interface between them, so that if any machine fails, another can respond instead, and/or allowing a degree of load sharing between systems. CARP is an improvement over the Virtual Router Redundancy Protocol (VRRP) standard. It was developed after VRRP was deemed to be not free enough because of a possibly-overlapping Cisco patent.</tooltiptext>
 		<section>Services</section>
-		<configfile>pfstat.xml</configfile>
+		<configfile>carp.xml</configfile>
 	</menu>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->
@@ -27,7 +27,7 @@
 		<columnitem>
 			<fielddescr>Synchronize State</fielddescr>
 			<fieldname>pfsync</fieldname>
-		</columnitem>		
+		</columnitem>
 		<columnitem>
 			<fielddescr>Load Balancing</fielddescr>
 			<fieldname>balancing</fieldname>
@@ -35,11 +35,17 @@
 		<columnitem>
 			<fielddescr>Premption</fielddescr>
 			<fieldname>premption</fieldname>
-		</columnitem>		
+		</columnitem>
 	</adddeleteeditpagefields>
 	<!-- fields gets invoked when the user adds or edits a item.   the following items
          will be parsed and rendered for the user as a gui with input, and selectboxes. -->
 	<fields>
+		<field>
+			<fielddescr>Virtual IP Address</fielddescr>
+			<fieldname>ipaddress</fieldname>
+			<description>Enter the IPAddress that you would like to share on both machines</description>
+			<type>input</type>
+		</field>
 		<field>
 			<fielddescr>VHID Group</fielddescr>
 			<fieldname>vhid</fieldname>
@@ -78,12 +84,6 @@
 			    <option><value>29</value><name>29</name></option>
 			    <option><value>30</value><name>30</name></option>
 			</options>
-		</field>
-		<field>
-			<fielddescr>Virtual IP Address</fielddescr>
-			<fieldname>ipaddress</fieldname>
-			<description>Enter the IPAddress that you would like to share on both machines</description>
-			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Advertising Frequency</fielddescr>
@@ -130,7 +130,13 @@
 			<fieldname>pfsync</fieldname>
 			<description>PFSync transfers state insertion, update, and deletion messages between firewalls. Each firewall sends these messages out via multicast on a specified interface, using the PFSYNC protocol (IP Protocol 240). It also listens on that interface for similar messages from other firewalls, and imports them into the local state table.</description>
 			<type>checkbox</type>
-		</field>			
+		</field>
+		<field>
+			<fielddescr>Synchronize Interface</fielddescr>
+			<fieldname>synciface</fieldname>
+			<type>interfaces_selection</type>
+			<description>If Synchronize State is enabled, it will utilize this interface for communication.</description>
+		</field>
 		<field>
 			<fielddescr>Load Balancing</fielddescr>
 			<fieldname>balancing</fieldname>
@@ -142,13 +148,13 @@
 			<fieldname>premption</fieldname>
 			<description>When preemption is enabled, each CARP host will look at the advskew (Advertising Frequency) parameter in the advertisements it receives from the master, to try to determine whether it can advertise more frequently. If so, it will begin advertising, and the current master, seeing that there is another host with a lower advskew, will bow out.</description>
 			<type>checkbox</type>
-		</field>			
+		</field>
 	</fields>
 	<custom_php_command_before_form>
 	    function sync_package() {
 	      global $config;
 	      /* create /usr/local/etc/rc.d/carp.sh here */
-	      
+
 	    }
 	    sync_package();
 	</custom_php_command_before_form>
