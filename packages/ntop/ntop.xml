@@ -6,8 +6,8 @@
         <savetext>Change</savetext>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
-		<name>NTop Password</name>
-		<tooltiptext>Set NTop password.</tooltiptext>
+		<name>NTop Settings</name>
+		<tooltiptext>Set NTop settings such as password and port.</tooltiptext>
 		<section>Diagnostics</section>
 		<configfile>ntop.xml</configfile>
 	</menu>
@@ -21,27 +21,32 @@
              the configuration database. -->
 	<fields>
 		<field>
-                    <fielddescr>NTOP Admin Password</fielddescr>
-                    <fieldname>password</fieldname>
-                    <description>Enter the password for the NTOP Web GUI.  Minimum 5 characters.</description>
-                    <type>password</type>
+			<fielddescr>NTOP Admin Password</fielddescr>
+			<fieldname>password</fieldname>
+			<description>Enter the password for the NTOP Web GUI.  Minimum 5 characters.</description>
+			<type>password</type>
 		</field>
 		<field>
-                    <fielddescr>NTOP Admin Password AGAIN</fielddescr>
-                    <fieldname>passwordagain</fieldname>
-                    <type>password</type>
+			<fielddescr>NTOP Admin Password AGAIN</fielddescr>
+			<fieldname>passwordagain</fieldname>
+			<type>password</type>
 		</field>
-        </fields>
-        <custom_add_php_command>
-	    if($_POST['password'] == $_POST['passwordagain']) {
+		<field>
+			<fielddescr>Interface</fielddescr>
+			<fieldname>iface</fieldname>
+			<type>interfaces_selection</type>
+		</field>
+    </fields>
+	<custom_add_php_command>
+	if($_POST['password'] == $_POST['passwordagain']) {
 		system("/usr/local/bin/ntop --set-admin-password=" . $_POST['password']);
 		system("killall ntop 2>/dev/null");
 		system("/usr/local/etc/rc.d/ntop.sh");
-	    } else {
+	} else {
 		echo "Passwords do not match!";
 		exit;
-	    }
-        </custom_add_php_command>
+	}
+	</custom_add_php_command>
 	<custom_php_deinstall_command>
 		mwexec("/usr/bin/killall ntop");
 	</custom_php_deinstall_command>
@@ -49,7 +54,7 @@
 	    system("rm /usr/local/etc/rc.d/ntop.sh");
 	    $fout = fopen("/usr/local/etc/rc.d/ntop.sh","w");
 	    fwrite($fout, "#!/bin/sh\n\n");
-	    fwrite($fout, "/usr/local/bin/ntop -u root -d --ipv4 -M\n\n");
+	    fwrite($fout, "/usr/local/bin/ntop -i " . $_POST['iface'] . " -u root -d --ipv4 -M\n\n");
 	    fclose($fout);
 	    system("chmod 555 /usr/local/etc/rc.d/ntop.sh");
 	</custom_php_install_command>
