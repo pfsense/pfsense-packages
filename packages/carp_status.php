@@ -70,26 +70,27 @@ include("fbegin.inc");
 </tr>
 <?php
 
-foreach($config['installedpackages']['carp']['config'] as $carp) {
-	$ipaddress = $carp['ipaddress'];
-	$premption = $carp['premption'];
-	$password = $carp['password'];
-	$netmask = $carp['netmask'];
-	$vhid = $carp['vhid'];
-	$advskew = $carp['advskew'];
-	$pfsync = $carp['pfsync'];
-	$synciface = $carp['synciface'];
-	$carp_int = find_carp_interface($ipaddress);
-	$status = get_carp_interface_status($carp_int);
-	if(isset($carp['balancing'])) $balancing = "true"; else $balancing = "false";
-	if(isset($carp['premtpion'])) $premption = "true"; else $premption = "false";
-	if($synciface <> "") $sync_status = get_pfsync_interface_status($synciface);
-	echo "<tr>";
-	echo "<td class=\"listlr\"><center>" . $ipaddress . "</td>";
-	echo "<td class=\"listlr\"><center>" . $status . "<br>" . $sync_status . "</td>";
-	echo "<td class=\"listlr\"><center>" . $synciface . "</td>";
-	echo "</tr>";
-}
+if($config['installedpackages']['carp']['config'] <> "")
+	foreach($config['installedpackages']['carp']['config'] as $carp) {
+		$ipaddress = $carp['ipaddress'];
+		$premption = $carp['premption'];
+		$password = $carp['password'];
+		$netmask = $carp['netmask'];
+		$vhid = $carp['vhid'];
+		$advskew = $carp['advskew'];
+		$pfsync = $carp['pfsync'];
+		$synciface = $carp['synciface'];
+		$carp_int = find_carp_interface($ipaddress);
+		$status = get_carp_interface_status($carp_int);
+		if(isset($carp['balancing'])) $balancing = "true"; else $balancing = "false";
+		if(isset($carp['premtpion'])) $premption = "true"; else $premption = "false";
+		if($synciface <> "") $sync_status = get_pfsync_interface_status($synciface);
+		echo "<tr>";
+		echo "<td class=\"listlr\"><center>" . $ipaddress . "</td>";
+		echo "<td class=\"listlr\"><center>" . $status . "<br>" . $sync_status . "</td>";
+		echo "<td class=\"listlr\"><center>" . $synciface . "</td>";
+		echo "</tr>";
+	}
 
 ?>
 
