@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>nmap</name>
+	<donotsave>true</donotsave>
+	<preoutput>yes</preoutput>
+	<additional_files_needed>
+		<item>http://www.pfsense.com/packages/config/powerdns.schema</item>
+	</additional_files_needed>
+	<!-- Menu is where this packages menu will appear -->
+	<menu>
+		<name>PowerDNS</name>
+		<tooltiptext></tooltiptext>
+		<section>Services</section>
+		<configfile>powerdns.xml</configfile>
+	</menu>
+        <!-- Do not save invokes a simple input menu and will not update
+             the configuration database. -->
+	<fields>
+        </fields>
+		<custom_php_deinstall_command>
+			system("rm -rf /usr/local/pgsql");
+			system("/usr/sbin/pw userdel pgsql");
+			system("/usr/bin/killall -9 postgres");
+			echo "&lt;p&gt;";
+			echo "Reboot required... One moment...";
+			echo "&lt;p&gt;";
+			system("/sbin/shutdown -r now");
+		</custom_php_deinstall_command>
+		<custom_php_install_command>
+			echo "&lt;pre&gt;";
+			echo "Creating DB...";
+			system("/usr/bin/su -l pgsql -c initdb");
+			echo "Starting DB...";
+			system("/usr/local/etc/rc.d/010.pgsql.sh start");
+			system("/usr/bin/su -l pgsql -c \"dropdb powerdns\" ");
+			system("/usr/bin/su -l pgsql -c \"createdb powerdns\" ");
+			echo "Creating DB Schema...";
+			system("cat /usr/local/pkg/powerdns.schema | /usr/bin/su -l pgsql -c \"psql powerdns\" ");
+			system("cat /usr/local/www/powerdnsadmin-0.3/docs/postgresql.sql | /usr/bin/su -l pgsql -c \"psql powerdns\" ");
+		</custom_php_install_command>
+        <custom_add_php_command>
+        </custom_add_php_command>
+</packagegui>

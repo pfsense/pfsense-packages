@@ -56,5 +56,17 @@
       <config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
       <configurationfile>stunnel.xml</configurationfile>
     </package>
+
+    <package>
+      <name>powerdns</name>
+      <descr>(BETA PACKAGE!) PDNS is an advanced high performance authoritative nameserver</descr>
+      <category>Network Management</category>
+      <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
+      <depends_on_package>powerdns-2.9.16_4.tbz</depends_on_package>
+	  <version>2.9.16_4</version>
+      <config_file>http://www.pfsense.com/packages/config/powerdns.xml</config_file>
+      <configurationfile>powerdns.xml</configurationfile>
+    </package>
+
   </packages>
 </pfsensepkgs>
