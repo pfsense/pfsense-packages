@@ -6,7 +6,7 @@
 	<menu>
 		<name>Frickin</name>
 		<tooltiptext>Modify settings for the Frickin PPTP proxy.</tooltiptext>
-		<section>Diagnostics</section>
+		<section>Services</section>
 		<configfile>frickin.xml</configfile>
 	</menu>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
