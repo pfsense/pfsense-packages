@@ -83,8 +83,6 @@
 	<custom_php_deinstall_command>
 	    system("rm -rf /var/tmp/stunnel 2>/dev/null");
 		system("rm -rf /usr/local/etc/stunnel*");
-		system("pw userdel stunnel");
-		system("pw groupdel stunnel");
 	</custom_php_deinstall_command>
 	<custom_add_php_command_late>
 		    $fout = fopen("/usr/local/etc/stunnel/stunnel.conf","w");
