@@ -10,7 +10,7 @@
 		<name>NTop Settings</name>
 		<tooltiptext>Set NTop settings such as password and port.</tooltiptext>
 		<section>Diagnostics</section>
-		<configfile>ntop.xml</configfile>
+		<url>/pkg_edit.php?xml=ntop.xml&amp;id=0</url>
 	</menu>
 	<menu>
 		<name>NTop</name>
