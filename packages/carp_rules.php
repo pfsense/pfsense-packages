@@ -40,8 +40,8 @@ foreach($config['installedpackages']['carp']['config'] as $carp) {
     $carp_int = find_carp_interface($ip);
     add_rule_to_anchor("carp", "pass out quick on {$carp_int} keep state", $carp_int . "1");
     if($carp['synciface']) {
-	add_rule_to_anchor("carp", "pass quick on xl0 proto carp from {$carp['synciface']}:network to 224.0.0.18 keep state \(no-sync\)", $carp['synciface'] . "2");
-	add_rule_to_anchor("carp", "pass quick on xl0 proto pfsync keep state", $carp['synciface'] . "3");
+	add_rule_to_anchor("carp", "pass quick on {$carp['synciface']} proto carp from {$carp['synciface']}:network to 224.0.0.18 keep state \(no-sync\)", $carp['synciface'] . "2");
+	add_rule_to_anchor("carp", "pass quick on {$carp['synciface']} proto pfsync keep state", $carp['synciface'] . "3");
     }
     if($int <> false and $int <> $wan_interface) {
 	$ipnet = convert_ip_to_network_format($ip, $carp['netmask']);
