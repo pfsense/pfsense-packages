@@ -258,7 +258,6 @@
 		      }
 		  }
 
-		fwrite($fout, "/etc/rc.filter_configure");
 		fclose($fout);
 		chmod("/usr/local/etc/rc.d/carp.sh", 0755);
 		mwexec("/usr/local/etc/rc.d/carp.sh");
