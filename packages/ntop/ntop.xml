@@ -17,12 +17,12 @@
                     <fielddescr>NTOP Admin Password</fielddescr>
                     <fieldname>password</fieldname>
                     <description>Enter the password for the NTOP Web GUI.  Minimum 5 characters.</description>
-                    <type>input</type>
+                    <type>password</type>
 		</field>
 		<field>
                     <fielddescr>NTOP Admin Password AGAIN</fielddescr>
                     <fieldname>passwordagain</fieldname>
-                    <type>input</type>
+                    <type>password</type>
 		</field>
         </fields>
         <custom_add_php_command>
