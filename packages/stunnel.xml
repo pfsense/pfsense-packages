@@ -61,13 +61,13 @@
 		<field>
 			<fielddescr>Redirects to IP</fielddescr>
 			<fieldname>redirectip</fieldname>
-			<description>Enter the local IP address to redirect this to.</description>
+			<description>Enter the IP address to redirect this to.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Redirects to Port</fielddescr>
 			<fieldname>redirectport</fieldname>
-			<description>Enter the local port to rediect to.</description>
+			<description>Enter the port to redirect to.</description>
 			<type>input</type>
 		</field>
 	</fields>
