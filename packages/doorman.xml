@@ -46,6 +46,7 @@
 			<type>input</type>
 			<value>10</value>
 		</field>
+		<!--
 		<field>
 			<fielddescr>Listening interface(s)</fielddescr>
 			<fieldname>interface</fieldname>
@@ -53,6 +54,7 @@
 			<value>wan</value>
 			<type>interfaces_selection</type>
 		</field>
+		-->
 		<field>
 			<fielddescr>Listening port</fielddescr>
 			<fieldname>port</fieldname>
