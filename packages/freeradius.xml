@@ -1,0 +1,66 @@
+<packagegui>
+	<name>freeradius</name>
+	<menu>
+		<name>RADIUS Users</name>
+		<tooltiptext>Add, edit, and delete RADIUS users.</tooltiptext>
+		<section>Services</section>
+		<configfile>freeradius.xml</configfile>
+	</menu>
+	<menu>
+		<name>RADIUS Clients</name>
+		<tooltiptext>Add, edit, and delete RADIUS clients.</tooltiptext>
+		<section>Services</section>
+		<configfile>freeradiusclients.xml</configfile>
+	</menu>
+	<additional_files_needed>
+		<item>http://www.pfsense.com/packages/config/freeradiusclients.xml</item>
+	</additional_files_needed>
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Username</fielddescr>
+			<fieldname>username</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<fielddescr>Username</fielddescr>
+			<fieldname>username</fieldname>
+			<description>Enter the username here</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Password</fielddescr>
+			<fieldname>password</fieldname>
+			<description>Enter the password here</description>
+			<type>password</type>
+		</field>
+		<field>
+			<fielddescr>Username Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter the description of the user here</description>
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_php_command_before_form>
+		function sync_package()
+		{
+			global $config;
+			$fout = fopen("/usr/local/etc/raddb/users","w");
+			if($config['installedpackages']['freeradius']['config'] != "") {
+				foreach($config['installedpackages']['freeradius']['config'] as $rowhelper) {
+					fwrite($fout, $rowhelper['username'] . " User-Password == \"" . $rowhelper['password'] . "\"\n");
+				}
+			}
+		 	fclose($fout);
+		}
+		sync_package();
+	</custom_php_command_before_form>
+	<custom_add_php_command>
+		sync_package();
+	</custom_add_php_command>
+</packagegui>

@@ -1,0 +1,71 @@
+<packagegui>
+	<name>freeradiusclients</name>
+	<menu>
+		<name>RADIUS Clients</name>
+		<tooltiptext>Add, edit, and delete RADIUS clients.</tooltiptext>
+		<section>Services</section>
+		<configfile>freeradiusclients.xml</configfile>
+	</menu>
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Client</fielddescr>
+			<fieldname>client</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Shortname</fielddescr>
+			<fieldname>shortname</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<fielddescr>Client</fielddescr>
+			<fieldname>client</fieldname>
+			<description>Enter the client's IP address here</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Shortname</fielddescr>
+			<fieldname>shortname</fieldname>
+			<description>Enter the client's shortname here</description>
+			<type>input</type>
+		</field>
+			<fielddescr>Shared Secret</fielddescr>
+			<fieldname>sharedsecret</fieldname>
+			<description>Enter the client's shared secret here</description>
+			<type>password</type>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter the description of the user here</description>
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_php_install_command>
+		global $config;
+		system("rm /usr/local/etc/raddb/clients*");
+		$fout = fopen("/usr/local/etc/raddb/clients.conf","w");
+		fwrite($fout, "client 127.0.0.1 {\n secret = pfsense\n shortname = localhost\n}\n\n");
+		fclose($fout);
+	</custom_php_install_command>
+	<custom_php_command_before_form>
+		function sync_package() {
+			global $config;
+			$fout = fopen("/usr/local/etc/raddb/clients.conf","w");
+			if($config['installedpackages']['freeradius']['config'] != "") {
+				foreach($config['installedpackages']['freeradius']['config'] as $rowhelper) {
+					fwrite($fout, "client " . $rowhelper['client'] . "{\n" . "secret = " . $rowhelper['sharedsecret'] . "\nshortname = " . $rowhelper['shortname'] . "\n}\n\n");
+				}
+			}
+		 	fclose($fout);
+		}
+		sync_package();
+	</custom_php_command_before_form>
+	<custom_add_php_command>
+		sync_package();
+	</custom_add_php_command>
+</packagegui>
