@@ -17,7 +17,7 @@
 	    fwrite($fout, "\t }\n");
 	    fwrite($fout, "}\n");
 	    fclose($fout);
-	    $fout = fopen("/usr/local/etc/squid/squid.conf","w");
+	    $fout = fopen("/usr/local/etc/squid/squid.conf","a");
 	    fwrite($fout, "redirect_program /usr/local/bin/squidGuard -c /usr/local/etc/squid/squidGuard.conf\n");
 	    fwrite($fout, "redirect_children 4\n");
 	    fclose($fout);
