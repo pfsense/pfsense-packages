@@ -105,6 +105,7 @@
 		foreach($config['installedpackages']['spamd-greylist']['config'] as $spamd) {
 		    fwrite($fd, $spamd['ip'] . "\n");
 		}
+		fclose($fd);
 	    }
 	</custom_php_command_before_form>
 	<custom_php_resync_config_command>
@@ -114,9 +115,14 @@
 	    sync_package();
 	</custom_delete_php_command>
 	<custom_php_install_command>
-	    mwexc("touch /var/db/spammer-whitelist");
+	    mwexc("touch /var/mail/whitelist.txt");
 	    mwexec("/usr/libexec/spamd-setup &amp;");
 	    mwexec("/usr/libexec/spamlogd &amp;");
+	    $fd = fopen("/usr/local/etc/rc.d/spamd","w");
+	    fwrite($fd, "/usr/libexec/spamd-setup &amp;\n");
+	    fwrite($fd, "/usr/libexec/spamlogd &amp;\n");
+	    fclose($fd);
+	    mwexec("/usr/local/etc/rc.d/spamd");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 	</custom_php_deinstall_command>
