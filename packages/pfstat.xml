@@ -19,7 +19,7 @@
 	</additional_files_needed>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->
-	<configpath>['installedpackages']['package']['$packagename']['configuration']</configpath>
+	<configpath>['installedpackages']['pfstat']['config']</configpath>
 	<!-- modify system will modify a file and make sure the text needed to run the
          package is in place.  The following example edits /etc/crontab and adds the
          code necessart to invoke the pfstat command every 5 minutes. -->
