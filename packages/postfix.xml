@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>postfix</name>
-        <donotsave>true</donotsave>
+        <donotsave>false</donotsave>
         <preoutput>yes</preoutput>
         <savetext>Change</savetext>
 	<!-- Menu is where this packages menu will appear -->
