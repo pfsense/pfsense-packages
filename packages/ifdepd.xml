@@ -31,33 +31,38 @@
 		<type>input</type>
 	</field>
     </fields>
+    <custom_php_global_functions>
+	functionn sync_package_ifdepd() {
+                conf_mount_rw();
+                config_lock();
+                global $config;
+                if ($_POST[0] == "") $_POST = $config['installedpackages']['ifdepd']['config'];
+                if($config['installedpackages']['ifdepd']['config'] != "") {
+                        $fout = fopen("/usr/local/etc/rc.d/ifdepd.sh","w");
+                        fwrite($fout, "#!/bin/sh\n\n");
+                        if(isset($_POST['usedefaults'])) {
+                                $lan_int = $config['interfaces']['lan']['if'];
+                                $wan_int = $config['interfaces']['wan']['if'];
+                                fwrite($fout, "/usr/local/bin/ifdepd -d -S " . $lan_int . ":" . $wan_int . " -D carp0:carp1\n");
+                        } else {
+                                fwrite($fout, "/usr/local/bin/ifdepd -d -S " . $_POST['srcinterface'] . " -D " . $_POST['destinterface'] . "\n");
+                        }
+                        fclose($fout);
+                }
+                conf_mount_ro();
+                config_unlock();
+        }
+    </custom_php_global_functions>
     <custom_php_install_command>
 	unlink_if_exists("/usr/local/etc/rc.d/ifdep*");
     </custom_php_install_command>
     <custom_add_php_command>
-	function sync_package_ifdepd() {
-		conf_mount_rw();
-		config_lock();
-		global $config;
-		if ($_POST[0] == "") $_POST = $config['installedpackages']['ifdepd']['config'];
-		if($config['installedpackages']['ifdepd']['config'] != "") {
-			$fout = fopen("/usr/local/etc/rc.d/ifdepd.sh","w");
-			fwrite($fout, "#!/bin/sh\n\n");
-			if(isset($_POST['usedefaults'])) {
-				$lan_int = $config['interfaces']['lan']['if'];
-				$wan_int = $config['interfaces']['wan']['if'];
-				fwrite($fout, "/usr/local/bin/ifdepd -d -S " . $lan_int . ":" . $wan_int . " -D carp0:carp1\n");
-			} else {
-				fwrite($fout, "/usr/local/bin/ifdepd -d -S " . $_POST['srcinterface'] . " -D " . $_POST['destinterface'] . "\n");
-			}
-			fclose($fout);
-		}
-		conf_mount_ro();
-		config_unlock();
-	}
 	sync_package_ifdepd();
 	mwexec("/usr/bin/killall ifdepd");
 	mwexec("/usr/local/etc/rc.d/ifdepd.sh");
     </custom_add_php_command>
+    <custom_php_resync_command>
+	sync_package_ifdepd();
+    </custom_php_resync_command>
 </packagegui>
 
