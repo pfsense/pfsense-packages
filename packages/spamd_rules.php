@@ -27,7 +27,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$anchor = "nat-anchor";
+$anchor = "natrules";
 $rule = "rdr pass inet proto tcp from <spamd> to any port smtp -> 127.0.0.1 port 8025";
 $label = "spamd";
 add_rule_to_anchor($anchor, $rule, $label);
