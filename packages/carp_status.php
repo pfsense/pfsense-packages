@@ -95,7 +95,14 @@ if($config['installedpackages']['carp']['config'] <> "")
 
 ?>
 <tr><td>
-<center>Nodes syncing: <?php `/sbin/pfctl -vvss |/usr/bin/grep creator |/usr/bin/nawk '{print $4;}' |/usr/bin/sort -u`; ?></center>
+<center>
+<?php
+  echo "<br>Nodes syncing:<br>";
+  echo "<pre>";
+  system("/sbin/pfctl -vvss | /usr/bin/grep creator | /usr/bin/cut -d\" \" -f7 | /usr/bin/sort -u");
+  echo "</pre>";
+?>
+</center>
 </td></tr>
 </table>
 </td></tr>
