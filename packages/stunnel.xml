@@ -89,7 +89,8 @@
 		    foreach($config['installedpackages']['stunnel']['config'] as $pkgconfig) {
 			fwrite($fout, "\n[" . $pkgconfig['description'] . "]\n");
 			fwrite($fout, "accept = " . $pkgconfig['localip'] . ":" . $pkgconfig['localport'] . "\n");
-			fwrite($fout, "connect = " . $pkgconfig['redirectip'] . ":" . $pkgconfig['redirectport'] . "\n\n");
+			fwrite($fout, "connect = " . $pkgconfig['redirectip'] . ":" . $pkgconfig['redirectport'] . "\n");
+			fwrite($fout, "TIMEOUTclose = 0\n\n");
 		    }
 		    fclose($fout);
 		    system("/usr/bin/killall stunnel 2>/dev/null");
