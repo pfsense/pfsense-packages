@@ -11,9 +11,12 @@
 	<menu>
 		<name>PFStat Graphs</name>
 		<tooltiptext>pfstat is a small utility that collects packet filter statistics and produces graphs.</tooltiptext>
-		<url>/pfstat/</url>
+		<url>/pfstat.php</url>
 		<section>Services</section>
 	</menu>
+	<additional_files_needed>
+		<item>http://www.pfsense.com/packages/config/pfstat.tgz</item>
+	</additional_files_needed>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->
 	<configpath>['installedpackages']['package']['$packagename']['configuration']</configpath>
@@ -181,12 +184,12 @@
 	function sync_package() {
 	  global $config;
 	  $fout = fopen("/usr/local/etc/pfstat.conf","w");
-	  $leftgraphtext = "";
-	  $rightgraphtext = "";
-	  $isfirstleft = 0;
-	  $isfirstright = 0;
 	  if($config['installedpackages']['pfstat']['config'] != "") {
 		foreach($config['installedpackages']['pfstat']['config'] as $rowhelper) {
+		  $leftgraphtext = "";
+		  $rightgraphtext = "";
+		  $isfirstleft = 0;
+		  $isfirstright = 0;
 		  foreach($rowhelper['row'] as $row) {
 			if($row['location'] == "left") {
 			  if($isfirstleft == 1) $leftgraphtext .= ",\n";
@@ -198,13 +201,11 @@
 			  $isfirstright = 1;
 			}
 		  }
-		}
-		foreach($config['installedpackages']['pfstat']['config'] as $pkgconfig) {
-		  fwrite($fout, "image \"/usr/local/www/pfstat/" . $pkgconfig['imagename'] ."\" { \n");
-		  $from = $pkgconfig['from'];
+		  fwrite($fout, "image \"/usr/local/www/pfstat/" . $rowhelper['imagename'] ."\" { \n");
+		  $from = $rowhelper['from'];
 		  if($from == "") $from = "30";
-		  fwrite($fout, "from " . $from . " " . $pkgconfig['fromclassification'] . " to now  \n");
-		  fwrite($fout, "width " . $pkgconfig['graphsizewidth'] . " height " . $pkgconfig['graphsizeheight'] . "  \n");
+		  fwrite($fout, "from " . $from . " " . $rowhelper['fromclassification'] . " to now  \n");
+		  fwrite($fout, "width " . $row['graphsizewidth'] . " height " . $rowhelper['graphsizeheight'] . "  \n");
 		  if($leftgraphtext != "") {
 			fwrite($fout, "	left  \n");
 			fwrite($fout, "		" . $leftgraphtext . "\n");
@@ -215,8 +216,8 @@
 		  }
 		  fwrite($fout, "}\n\n");
 		}
-		fclose($fout);
 	  }
+	  fclose($fout);
 	}
 	sync_package();
 	</custom_php_command_before_form>
@@ -232,6 +233,7 @@
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 	  system("rm /usr/local/etc/pfstat*");
+	  system("rm -rf /usr/local/www/pfstat*");
 	</custom_php_deinstall_command>
 	<!--
 	<custom_php_install_command>
