@@ -216,7 +216,7 @@
 		 */
 		conf_mount_rw();
 		config_lock();
-		$fout = fopen("/usr/local/etc/rc.d/carp.sh","w");
+		$fout = fopen("/usr/local/pkg/pf/carp.sh","w");
 		fwrite($fout, "#!/bin/sh \n");
 		global $config;
 		$carp_instances_counter = 0;
