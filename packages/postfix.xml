@@ -58,4 +58,19 @@
 	</custom_php_deinstall_command>
 	<custom_php_install_command>
 	</custom_php_install_command>
+        <templates>
+            <template>
+                <filename>/usr/local/etc/postfix/main.cf</filename>
+            </template>
+            <templatecontents>myhostname = hostname</templatecontents>
+            <templatecontents>mydomain = primarydomain</templatecontents>
+            <templatecontents>relay_domains = domain</templatecontents>
+            <template>
+                <filename>/usr/local/etc/postfix/transport</filename>
+            </template>
+            <templatecontents>domain smtp:[mailserverip]</templatecontents>
+        </templates>
+        
+                
+                
 </packagegui>
