@@ -58,6 +58,7 @@
 		fwrite($fout, "/usr/local/bin/ntop " . $interfaces . " -u root -d --ipv4 -M\n\n");
 		fclose($fout);
 		system("chmod 555 /usr/local/etc/rc.d/ntop.sh");
+		system("killall ntop 2>/dev/null");
 		system("/usr/local/etc/rc.d/ntop.sh");
 	} else {
 		echo "Passwords do not match!";
