@@ -4,6 +4,7 @@
   <packages>
     <package>
         <name>pfstat</name>
+		<website>http://www.benzedrine.cx/pfstat.html</website>
         <descr>pfstat is a small utility that collects packet filter statistics and produces graphs.</descr>
         <category>Network Management</category>
         <config_file>http://www.pfsense.com/packages/config/pfstat.xml</config_file>
@@ -15,6 +16,7 @@
     </package>
     <package>
         <name>pure-ftpd</name>
+		<website>http://www.pureftpd.org/</website>
         <descr>Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerability, it is trivial to set up, and it is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
         <category>FTP</category>
 		<config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
@@ -30,6 +32,7 @@
     </package>
     <package>
       <name>nmap</name>
+	  <website>http://www.insecure.org/nmap/</website>
       <descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
       <category>Security</category>
       <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
@@ -41,6 +44,7 @@
     </package>
     <package>
       <name>ntop</name>
+	  <website>http://www.ntop.org/</website>
       <descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode, it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
       <category>Network Management</category>
       <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
@@ -52,6 +56,7 @@
     </package>
     <package>
       <name>stunnel</name>
+	  <website>http://www.stunnel.org/</website>
       <descr>The stunnel program is designed to work as an SSL encryption wrapper between remote client and local (inetd-startable) or remote server. It can be used to add SSL functionality to commonly used inetd daemons like POP2, POP3, and IMAP servers without any changes in the programs' code. It will negotiate an SSL connection using the OpenSSL or SSLeay libraries. It calls the underlying crypto libraries, so stunnel supports whatever cryptographic algorithms you compiled into your crypto package.</descr>
       <category>Network Management</category>
       <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
@@ -61,10 +66,10 @@
       <config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
       <configurationfile>stunnel.xml</configurationfile>
     </package>
-
     <package>
       <name>powerdns</name>
-      <descr>PowerDNS (AKA pdns) is an advanced high performance authoritative nameserver</descr>
+      <descr>PowerDNS (AKA pdns) is an advanced high performance authoritative nameserver with MANY advanced features</descr>
+	  <website>http://www.powerdns.com/</website>
       <category>Network Management</category>
       <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
       <depends_on_package>powerdns-2.9.16_4.tbz</depends_on_package>
@@ -73,6 +78,5 @@
       <config_file>http://www.pfsense.com/packages/config/powerdns.xml</config_file>
       <configurationfile>powerdns.xml</configurationfile>
     </package>
-
   </packages>
 </pfsensepkgs>
