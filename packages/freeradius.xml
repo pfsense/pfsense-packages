@@ -99,7 +99,6 @@
 	</custom_php_command_before_form>
 	<custom_add_php_command>
 		sync_package_freeradius();
-		system("/usr/bin/killall -HUP radiusd");
 	</custom_add_php_command>
 </packagegui>
 
