@@ -11,7 +11,7 @@
 	    fwrite($fout, "# cat squidGuard.conf\n");
 	    fwrite($fout, "dbhome /var/db/squidGuard\n");
 	    fwrite($fout, "logdir /usr/local/squid/logs\n");
-	    fwrite($fout, "acl {"\n");
+	    fwrite($fout, "acl {\n");
 	    fwrite($fout, "\t default {\n");
 	    fwrite($fout, "\t pass all\n");
 	    fwrite($fout, "\t }\n");
