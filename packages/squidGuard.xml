@@ -33,9 +33,9 @@
 	<custom_php_pre_deinstall_command>
         </custom_php_pre_deinstall_command>
 	<custom_php_deinstall_command>
-	    mwexec("/usr/bin/sed '$d' /usr/local/etc/squid/squid.conf > /tmp/squidtmp.conf");
+	    mwexec("/usr/bin/sed '\$d' /usr/local/etc/squid/squid.conf > /tmp/squidtmp.conf");
 	    mwexec("/bin/cp /tmp/squidtmp.conf /usr/local/etc/squid/squid.conf");
-	    mwexec("/usr/bin/sed '$d' /usr/local/etc/squid/squid.conf > /tmp/squidtmp.conf");
+	    mwexec("/usr/bin/sed '\$d' /usr/local/etc/squid/squid.conf > /tmp/squidtmp.conf");
 	    mwexec("/bin/cp /tmp/squidtmp.conf /usr/local/etc/squid/squid.conf");
 	    mwexec("/bin/rm /tmp/squidtmp.conf");
 	    mwexec("/bin/rm -rf /var/db/squidGuard");
