@@ -239,6 +239,16 @@ test server or link availability and modify translation or routing rules. This p
         <config_file>http://www.pfsense.com/packages/config/ifdepd.xml</config_file>
         <configurationfile>ifdepd.xml</configurationfile>
     </package>
+    <package>
+        <name>frickin</name>
+        <descr>The Frickin PPTP Proxy allows a Point-to-Point Tunneling Protocol (PPTP) client to connect to a PPTP server through Network Address Translation.</descr>
+        <website>http://www.placid.tv</website>                                                                                                            
+        <category>Services</category>                                 
+        <version>1.2</version>
+        <status>ALPHA</status>
+        <config_file>http://www.pfsense.com/packages/config/frickin.xml</config_file>
+        <configurationfile>frickin.xml</configurationfile>
+    </package>
   </packages>
     <package>
         <name>squidGuard</name>
