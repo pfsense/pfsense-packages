@@ -52,5 +52,6 @@
         </custom_add_php_command>
 	<custom_php_deinstall_command>
 		unlink_if_exists("/usr/local/etc/rc.d/frickin.sh");
+		unlink_if_exists("/usr/local/bin/frickin");
 	</custom_php_deinstall_command>
 </packagegui>
