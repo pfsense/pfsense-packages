@@ -1,7 +1,6 @@
 <packagegui>
 	<name>doormanusers</name>
 	<title>Doorman: Users</title>
-	<aftersaveredirect>pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</aftersaveredirect>
 	<menu>
                 <name>Doorman</name>
                 <tooltiptext>Modify doormand settings and users.</tooltiptext>
