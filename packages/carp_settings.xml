@@ -103,7 +103,7 @@
 			<fieldname>synchronizetrafficshaper</fieldname>
 			<description>When this option is enabled, this system will automatically sync the traffic shaper rules over to the other carp host every 5 minutes.</description>
 			<type>checkbox</type>
-		</field>			
+		</field>
 		<field>
 			<fielddescr>Synchronize to IP</fielddescr>
 			<fieldname>synchronizetoip</fieldname>
@@ -143,6 +143,7 @@
 	<custom_php_command_before_form>
 	</custom_php_command_before_form>
 	<custom_php_resync_config_command>
+	    system("/etc/rc.packages >/dev/null 2>&amp;1 &amp;");
 	</custom_php_resync_config_command>
 	<custom_delete_php_command>
 	</custom_delete_php_command>
