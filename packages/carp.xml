@@ -51,6 +51,10 @@
 			<type>checkbox</type>
 		</columnitem>
 		<columnitem>
+			<fielddescr>Netmask</fielddescr>
+			<fieldname>netmask</fieldname>
+		</columnitem>		
+		<columnitem>
 			<fielddescr>Preemption</fielddescr>
 			<fieldname>premption</fieldname>
 			<type>checkbox</type>
