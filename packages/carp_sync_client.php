@@ -78,7 +78,7 @@ if($already_processed != 1)
 		unlink_if_exists("{$g['tmp_path']}/shaper_section.txt");
 
 		/* execute configuration on remote host */
-		mwexec("/usr/bin/ssh {$synchronizetoip} /usr/local/pkg/carp_sync_server.php");
+		mwexec("/usr/bin/ssh {$synchronizetoip} /usr/local/pkg/carp_sync_server.php &");
 	    }
 	}
     }
