@@ -291,8 +291,8 @@
 	<custom_php_install_command>
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-	    system("rm /usr/local/www/carp*");
-	    system("rm /usr/local/pkg/pf/carp*");
-	    system("rm /usr/local/etc/rc.d/carp*");
+	    system("/bin/rm /usr/local/www/carp*");
+	    system("/bin/rm /usr/local/pkg/pf/carp*");
+	    system("/bin/rm /usr/local/etc/rc.d/carp*");
 	</custom_php_deinstall_command>
 </packagegui>
