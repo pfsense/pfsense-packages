@@ -41,13 +41,8 @@
 	<custom_add_php_command>
 	    conf_mount_rw();
 	    config_lock();
-	    $fout = fopen("/usr/local/etc/rc.d/hula.sh","w");
-	    fwrite($fout, "#!/bin/sh\n\n");
-	    fwrite($fout, "/usr/local/hula/sbin/hulamanager &amp;\n");
-	    fclose($fout);
-	    system("chmod 555 /usr/local/etc/rc.d/hula.sh");
 	    system("/usr/local/hula/sbin/hulasetup --domain=" . $_POST['domain']);
-	    system("/usr/local/etc/rc.d/hula.sh");
+	    system("/usr/local/etc/rc.d/hula.sh &amp;");
 	    conf_mount_ro();
 	    config_unlock();
 	</custom_add_php_command>
