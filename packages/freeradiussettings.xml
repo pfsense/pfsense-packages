@@ -45,6 +45,7 @@
 		fwrite($fout, "port = 0\n");
 		}
 		fwrite($fout, "type = auth\n}\n\n");
+		fwrite($fout, "{\nipaddr = 127.0.0.1\nport = 0\ntype = auth\n}\n\n");
 		fclose($fout);
 		}
 	mwexec("killall radiusd");
