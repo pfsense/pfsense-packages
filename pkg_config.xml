@@ -205,7 +205,7 @@
           <name>netio</name>
           <website>http://freshmeat.net/projects/netio/</website>            
           <descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and DOS only support TCP/IP) using various different packet sizes.</descr>
-          <category>Services</category>
+          <category>Network Management</category>
           <config_file>http://www.pfsense.com/packages/config/netio.xml</config_file>
           <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5-stable/All</depends_on_package_base_url>
           <depends_on_package>netio-1.14.tbz</depends_on_package>
@@ -217,7 +217,7 @@
           <name>doorman</name>
           <website>http://doorman.sourceforge.net</website>
           <descr>Doorman is a port knocking implementation which allows a server to run silently, invisibly, with all TCP ports closed except to those who know the secret knock.</descr>
-          <category>Services</category>
+          <category>Security</category>
           <config_file>http://www.pfsense.com/packages/config/doorman.xml</config_file>
           <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5-stable/All</depends_on_package_base_url>
           <depends_on_package>doorman-0.8.tbz</depends_on_package>
