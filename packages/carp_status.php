@@ -65,7 +65,8 @@ include("fbegin.inc");
 
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 <tr>
-  <td class="listhdrr"><b><center>Interface</center></b></td>
+  <td class="listhdrr"><b><center>Carp Interface</center></b></td>
+  <td class="listhdrr"><b><center>Virtual IP</center></b></td>
   <td class="listhdrr"><b><center>Status</center></b></td>
 </tr>
 <?php
@@ -86,7 +87,8 @@ if($config['installedpackages']['carp']['config'] <> "")
 		if(isset($carp['premtpion'])) $premption = "true"; else $premption = "false";
 		if($synciface <> "") $sync_status = get_pfsync_interface_status($synciface);
 		echo "<tr>";
-		echo "<td class=\"listlr\"><center>" . $ipaddress . " - " . $carp_int . "</td>";
+		echo "<td class=\"listlr\"><center>" . $carp_int . "</td>";
+		echo "<td class=\"listlr\"><center>" . $ipaddress . "</td>";
 		echo "<td class=\"listlr\"><center>" . $status . "<br>" . $sync_status . "</td>";
 		echo "</tr>";
 	}
