@@ -72,7 +72,7 @@
 			<fielddescr>Synchronize Interface</fielddescr>
 			<fieldname>pfsyncinterface</fieldname>
 			<type>interfaces_selection</type>
-			<description>If Synchronize State is enabled, it will utilize this interface for communication.</description>
+			<description>If Synchronize State is enabled, it will utilize this interface for communication.  NOTE!  You must define a IP on each machin participating in this failver group.</description>
 		</field>
 		<field>
 			<fielddescr>Load Balancing</fielddescr>
