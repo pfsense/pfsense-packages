@@ -66,7 +66,6 @@
 			fwrite($fout, "httpd_accel_uses_host_header on\n");
 			fwrite($fout, "cache_effective_user squid\n");
 			fwrite($fout, "cache_effective_group squid\n");
-			fwrite($fout, "cache_mem $cache MB\n");
         		fclose($fout);
 		}
 		write_squid_static_config();
