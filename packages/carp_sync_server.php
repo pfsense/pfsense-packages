@@ -35,26 +35,34 @@ require_once("xmlparse_pkg.inc");
 require_once("filter.inc");
 
 if($config['installedpackages']['carpsettings']['config'] != "") {
-	$rules = return_filename_as_string("{$g['tmp_path']}/filter_section.txt");
-	$aliases = return_filename_as_string("{$g['tmp_path']}/aliases_section.txt");
-	$nat = return_filename_as_string("{$g['tmp_path']}/nat_section.txt");
-	$trafficshaper = return_filename_as_string("{$g['tmp_path']}/shaper_section.txt");
-	if($rules <> "") {
-	    restore_config_section("filter", $rules);
-	    unlink("{$g['tmp_path']}/filter_section.txt");
+
+	/* load and restore all files */
+	if (file_exists("{$g['tmp_path']}/filter_section.txt")) {
+		$rules = return_filename_as_string("{$g['tmp_path']}/filter_section.txt");
+		if($rules <> "")
+	    		restore_config_section("filter", $rules);
+	    	unlink("{$g['tmp_path']}/filter_section.txt");
 	}
-	if($aliases <> "") {
-	    restore_config_section("aliases", $aliases);
-	    unlink("{$g['tmp_path']}/aliases_section.txt");
+	if (file_exists("{$g['tmp_path']}/aliases_section.txt")) {
+		$aliases = return_filename_as_string("{$g['tmp_path']}/aliases_section.txt");
+		if($aliases <> "")
+	    		restore_config_section("aliases", $aliases);
+	    	unlink("{$g['tmp_path']}/aliases_section.txt");
 	}
-	if($nat <> "") {
-	    restore_config_section("nat", $nat);
-	    unlink("{$g['tmp_path']}/nat_section.txt");
+	if (file_exists("{$g['tmp_path']}/nat_section.txt")) {
+		$nat = return_filename_as_string("{$g['tmp_path']}/nat_section.txt");
+		if($nat <> "")
+	    		restore_config_section("nat", $nat);
+	    	unlink("{$g['tmp_path']}/nat_section.txt");
 	}
-	if($trafficshaper <> "") {
-	    restore_config_section("shaper", $trafficshaper);
-	    unlink("{$g['tmp_path']}/shaper_section.txt");
+	if (file_exists("{$g['tmp_path']}/shaper_section.txt")) {
+		$shaper = return_filename_as_string("{$g['tmp_path']}/shaper_section.txt");
+		if($shaper <> "")
+	    		restore_config_section("shaper", $shaper);
+	    	unlink("{$g['tmp_path']}/shaper_section.txt");
 	}
+
+	/* reconfigure */
 	filter_configure();
 }
 
