@@ -32,6 +32,10 @@
 			<fielddescr>Provider Name</fielddescr>
 			<fieldname>provider_name</fieldname>
 		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>provider_description</fieldname>
+		</columnitem>
 	</adddeleteeditpagefields>
 	<!-- fields gets invoked when the user adds or edits a item.   the following items
          will be parsed and rendered for the user as a gui with input, and selectboxes. -->
@@ -52,6 +56,12 @@
 			    <option><value>black</value><name>Black List</name></option>
 			    <option><value>white</value><name>White List</name></option>
 			</options>
+		</field>
+		<field>
+			<fielddescr>Provider Description</fielddescr>
+			<fieldname>provider_description</fieldname>
+			<description>Enter the description for this item</description>
+			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Reject message</fielddescr>
