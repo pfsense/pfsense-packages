@@ -192,6 +192,10 @@
 		  $isfirstright = 0;
 		  $fromclassification = $rowhelper['fromclassification'];
 		  $imagename = $rowhelper['imagename'];
+		  $pos = strrpos($imagename, ".jpg");
+		  if ($pos === false) {
+		   $imagename .= ".jpg";
+		  }
 		  $from = $rowhelper['from'];
 		  $graphsizewidth = $rowhelper['graphsizewidth'];
 		  $graphsizeheight = $rowhelper['graphsizeheight'];
