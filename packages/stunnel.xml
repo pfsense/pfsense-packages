@@ -96,6 +96,6 @@
 		    }
 		    fclose($fout);
 		    system("/usr/bin/killall stunnel 2>/dev/null");
-		    system("/usr/local/sbin/stunnel 2>/dev/null");
+		    system("/usr/local/etc/rc.d/stunnel.sh start 2>/dev/null");
 	</custom_add_php_command_late>
 </packagegui>
