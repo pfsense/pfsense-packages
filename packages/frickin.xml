@@ -3,11 +3,13 @@
 	<name>frickin</name>
 	<version>1.2</version>
 	<title>Services: Frickin</title>
+	<aftersaveredirect>pkg_edit.php?xml=frickin.xml&amp;id=0</aftersaveredirect>
 	<menu>
 		<name>Frickin</name>
 		<tooltiptext>Modify settings for the Frickin PPTP proxy.</tooltiptext>
 		<section>Services</section>
 		<configfile>frickin.xml</configfile>
+		<url>/pkg_edit.php?xml=frickin.xml&amp;id=0</url>
 	</menu>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<additional_files_needed>
