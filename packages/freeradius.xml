@@ -96,7 +96,7 @@
 		$fout = fopen("/usr/local/etc/raddb/clients.conf","w");
 		fwrite($fout, "client 127.0.0.1" . "{\n" . "secret = pfsense\n" . "shortname = localhost\n}\n\n");
 		fclose($fout);
-		unlink_if_exists(/usr/local/etc/rc.d/radiusd*");
+		unlink_if_exists("/usr/local/etc/rc.d/radiusd*");
 		$fout = fopen("/usr/local/etc/rc.d/radiusd.sh","w");
 		fwrite($fout,"#!/bin/sh\n\n/usr/local/sbin/radiusd -X -d /usr/local/etc/raddb &amp;\n");
 		fclose($fout);
