@@ -182,8 +182,8 @@
 	  <descr>Siproxd is a proxy/masquerading daemon for the SIP protocol. It handles registrations of SIP clients on a private IP network and performs rewriting of the SIP message bodies to make SIP connections possible via a masquerading firewall. It allows SIP clients (like kphone, linphone) to work behind an IP masquerading firewall or router.</descr>
 	  <category>Services</category>
 	  <config_file>http://www.pfsense.com/packages/config/siproxd.xml</config_file>
-	  <depends_on_package_base_url>http://www.pfsense.com/~colin/All</depends_on_package_base_url>
-	  <depends_on_package>siproxd-0.5.9.tbz</depends_on_package>
+	  <depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-5-stable/Latest<depends_on_package_base_url>
+	  <depends_on_package>siproxd.tbz</depends_on_package>
 	  <version>0.5.9</version>
 	  <status>ALPHA</status>
 	  <configurationfile>siproxd.xml</configurationfile>
