@@ -2,17 +2,18 @@
 	<name>siproxd</name>
 	<title>siproxd: Settings</title>
 	<version>0.5.9</version>
-	<aftersaveredirect>pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</aftersaveredirect>
 	<menu>
 		<name>siproxd</name>
 		<tooltiptext>Modify siproxd uses and settings.</tooltiptext>
 		<section>Services</section>
 		<configfile>siproxd.xml</configfile>
+		<url>/pkg_edit.php?xml=siproxd.xml&amp;id=0</url>
 	</menu>
+	<aftersaveredirect>pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</aftersaveredirect>
 	<tabs>
                 <tab>
                         <text>Settings</text>
-                        <url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
+                        <url>/pkg_edit.php?xml=siproxd.xml&amp;id=0</url>
 			<active/>
                 </tab>
 		<tab>
