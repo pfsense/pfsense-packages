@@ -90,7 +90,7 @@
     </package>
     <package>
 	<name>postfix</name>
-	<descr></descr>
+	<descr>Postfix mail forwarder.  Forwards mail to another mail server.</descr>
 	<website>http://www.postfix.com/</website>
 	<category>Mail</category>
 	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/mail</depends_on_package_base_url>
