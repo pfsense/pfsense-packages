@@ -69,7 +69,7 @@
     <package>
 	<name>squid</name>
 	<descr>High performance Web proxy cache</descr>
-	<website>http://www.squid.org</website>
+	<website>http://www.squid-cache.org/</website>
 	<category>Network Management</category>
 	<depends_on_package_base_url>http://www.pfSense.com/packages/All</depends_on_package_base_url>
 	<depends_on_package>squid-2.5.7_5.tbz</depends_on_package>
@@ -111,6 +111,18 @@
 	<status>ALPHA (NO GUI)</status>
 	<config_file>http://www.pfsense.com/packages/config/powerdns.xml</config_file>
 	<configurationfile>powerdns.xml</configurationfile>
+    </package>
+    <package>
+	<name>freeradius</name>
+	<website>http://www.freeradius.org/</website>
+	<descr>FreeRADIUS is the premiere open source RADIUS server. It is fast, flexible, configurable, and supports more authentication protocols than many commercial servers. A client entry for localhost with the shared secret "pfsense" is defined on installation for easy integration with the captive portal.</descr>
+	<category>Security</category>
+	<config_file>http://www.pfsense.com/packages/config/freeradius.xml</config_file>
+	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
+	<depends_on_package>freeradius-1.0.1.tbz</depends_on_package>
+	<version>1.0.1</version>
+	<status>BETA</status>
+	<configurationfile>freeradius.xml</configurationfile>
     </package>
   </packages>
 </pfsensepkgs>
