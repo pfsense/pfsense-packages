@@ -28,7 +28,7 @@
 */
 
 /* return if there are no carp configured items */
-if($config['installedpackages']['carp']['config']) return;
+//if($config['installedpackages']['carp']['config']) return;
 
 mwexec("/sbin/pfctl -a carp -Fr");
 
