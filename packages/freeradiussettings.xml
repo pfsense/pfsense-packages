@@ -1,18 +1,19 @@
 <packagegui>
 	<name>freeradiussettings</name>
 	<title>FreeRADIUS: Settings</title>
+	<aftersaveredirect>pkg_edit.php?xml=freeradiussettings.xml&amp;id=1</aftersaveredirect>
 	<tabs>          
                 <tab>   
                         <text>Users</text>
-                        <url>/pkg_edit.php?xml=freeradius.xml</url>
+                        <url>/pkg.php?xml=freeradius.xml</url>
                 </tab>  
                 <tab>
                         <text>Clients</text>
-                        <url>/pkg_edit.php?xml=freeradiusclients.xml</url>
+                        <url>/pkg.php?xml=freeradiusclients.xml</url>
                 </tab>  
                 <tab>
                         <text>Settings</text>
-                        <url>/pkg_edit.php?xml=freeradiussettings.xml</url>
+                        <url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=1</url>
 			<active/>
                 </tab>
         </tabs> 
@@ -27,7 +28,7 @@
 		<field>
 			<fielddescr>Port</fielddescr>
 			<fieldname>port</fieldname>
-			<description>Enter the desired port here</description>
+			<description>Enter the desired port here (default 1812)</description>
 			<type>input</type>
 		</field>
 	</fields>
@@ -58,6 +59,8 @@
 			}
 			}
 		 	fclose($fout);
+			mwexec("killall radiusd");
+			mwexec("/usr/local/etc/rc.d/radiusd");
 		}
 		sync_package();
 	</custom_php_command_before_form>
@@ -65,4 +68,5 @@
 		sync_package();
 	</custom_add_php_command>
 </packagegui>
+
 

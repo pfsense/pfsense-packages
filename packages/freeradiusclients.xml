@@ -4,16 +4,16 @@
 	<tabs>          
                 <tab>   
                         <text>Users</text>
-                        <url>/pkg_edit.php?xml=freeradius.xml</url>
+                        <url>/pkg.php?xml=freeradius.xml</url>
                 </tab>  
                 <tab>
                         <text>Clients</text>
-                        <url>/pkg_edit.php?xml=freeradiusclients.xml</url>
+                        <url>/pkg.php?xml=freeradiusclients.xml</url>
 			<active/>
                 </tab>  
                 <tab>
                         <text>Settings</text>
-                        <url>/pkg_edit.php?xml=freeradiussettings.xml</url>
+                        <url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=1</url>
                 </tab>
         </tabs> 
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
@@ -61,13 +61,15 @@
 		function sync_package() {
 			global $config;
 			$fout = fopen("/usr/local/etc/raddb/clients.conf","w");
+			fwrite($fout, "client 127.0.0.1" . "{\n" . "secret = pfsense\n" . "shortname = localhost\n}\n\n");
 			if($config['installedpackages']['freeradiusclients']['config'] != "") {
-				fwrite($fout, "client 127.0.0.1" . "{\n" . "secret = pfsense\n" . "shortname = localhost\n}\n\n");
 				foreach($config['installedpackages']['freeradiusclients']['config'] as $rowhelper) {
 					fwrite($fout, "client " . $rowhelper['client'] . "{\n" . "secret = " . $rowhelper['sharedsecret'] . "\nshortname = " . $rowhelper['shortname'] . "\n}\n\n");
 				}
 			}
 		 	fclose($fout);
+			mwexec("killall radiusd");
+			mwexec("/usr/local/etc/rc.d/radiusd");
 		}
 		sync_package();
 	</custom_php_command_before_form>
@@ -75,4 +77,5 @@
 		sync_package();
 	</custom_add_php_command>
 </packagegui>
+
 
