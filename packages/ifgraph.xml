@@ -1,0 +1,137 @@
+﻿<?xml version="1.0"?>
+<packagegui>
+	<name>pfstat</name>
+	<!-- Menu is where this packages menu will appear -->
+	<menu>
+		<name>IFGraph</name>
+		<tooltiptext>pfstat is a small utility that collects packet filter statistics and produces graphs.</tooltiptext>
+		<section>System</section>
+	</menu>
+	<!-- configpath gets expanded out automatically and config items will be
+         stored in that location -->
+	<configpath>installedpackages->package->$packagename->configuration</configpath>
+	<!-- modify system will modify a file and make sure the text needed to run the 
+         package is in place.  The following example edits /etc/crontab and adds the
+         code necessart to invoke the pfstat command every 5 minutes. -->
+	<modify_system>
+		<item>
+			<modifyfilename>/etc/crontab</modifyfilename>
+			<textneeded>*    *    *    *    *    root   /usr/local/bin/pfstat -q >> /var/log/pfstat\n*/5  *    *    *    *    root   /usr/local/bin/pfstat -c /usr/local/etc/pfstat.conf -d /var/log/pfstat</textneeded>			
+		</item>
+	</modify_system>
+	<!-- adddeleteeditpagefields items will appear on the first page where you can add / delete or edit
+         items.  An example of this would be the nat page where you add new nat redirects -->
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Graph Name</fielddescr>
+			<fieldname>graphname</fieldname>
+		</columnitem>
+		<columnitem>
+			<fieldname>Description</fieldname>
+			<fieldname>description</fieldname>
+		</columnitem>		
+	</adddeleteeditpagefields>
+	<!-- fields gets invoked when the user adds or edits a item.   the following items
+         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
+	<fields>
+		<field>
+			<fielddescr>Graph Name</fielddescr>
+			<fieldname>graphname</fieldname>
+			<description>Enter the name of the graph here</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Graph Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter the description of the graph here</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Image Name</fielddescr>
+			<fieldname>imagename</fieldname>
+			<description>Enter the filename for this image.  Must end in .jpg.  ex. filename.jpg</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Graph Size Width</fielddescr>
+			<fieldname>graphsizewidth</fieldname>
+			<description></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Graph Size Height</fielddescr>
+			<fieldname>graphsizeheight</fieldname>
+			<description>Graph size in pixels.  Recommend 960x300 for large images, 320x200 for small images.</description>
+			<type>input</type>
+		</field>
+			<fielddescr>Color</fielddescr>
+			<fieldname>color</fieldname>
+			<description>Color of graph</description>
+			<type>select</type>
+			<options>
+				<option>Blue</option>
+				<option>Red</option>
+				<option>Green</option>
+			</options>
+		<field>
+			<fielddescr>Left Counters</fielddescr>
+			<fieldname>leftcounters</fieldname>
+			<description></description>
+			<type>select</type>
+			<options>
+				<option value="BytesinIPv4">Bytes in (IPv4)</option>
+				<option value="BytesoutIPv4">Bytes out (IPv4)</option>
+				<option value="BytesinIPv6">Bytes in (IPv6)</option>
+				<option value="BytesoutIPv6">Bytes out (IPv6)</option>
+				<option value="PacketsinpassedIPv4">Packets in passed (IPv4)</option>
+				<option value="PacketsindroppedIPv4">Packets in dropped (IPv4)</option>
+				<option value="PacketsoutpassedIPv4">Packets out passed (IPv4)</option>
+				<option value="PacketsoutdroppedIPv4">Packets out dropped (IPv4)</option>
+				<option value="PacketsinpassedIPv6">Packets in passed (IPv6)</option>
+				<option value="PacketsindroppedIPv6">Packets in dropped (IPv6)</option>
+				<option value="PacketsoutpassedIPv6">Packets out passed (IPv6)</option>
+				<option value="PacketsoutdroppedIPv6">Packets out dropped (IPv6)</option>
+				<option value="statetableentries">State table entries</option>
+				<option value="statesearches">State searches</option>
+				<option value="StateTableInsertions">State Table Insertions</option>
+				<option value="StateTableRemovals">State Table Removals</option>
+				<option value="MatchCounter">Match Counter</option>
+				<option value="BadOffsetCounter">Bad Offset Counter</option>
+				<option value="FragmentCounter">Fragment Counter</option>
+				<option value="ShortCounter">Short Counter</option>
+				<option value="NormalizeCounter">Normalize Counter</option>
+				<option value="MemoryCounter">Memory Counter</option>
+			</options>
+		<field>
+			<fielddescr>Right Counters</fielddescr>
+			<fieldname>rightcounters</fieldname>
+			<description></description>
+			<type>select</type>
+			<options>
+				<option value="BytesinIPv4">Bytes in (IPv4)</option>
+				<option value="BytesoutIPv4">Bytes out (IPv4)</option>
+				<option value="BytesinIPv6">Bytes in (IPv6)</option>
+				<option value="BytesoutIPv6">Bytes out (IPv6)</option>
+				<option value="PacketsinpassedIPv4">Packets in passed (IPv4)</option>
+				<option value="PacketsindroppedIPv4">Packets in dropped (IPv4)</option>
+				<option value="PacketsoutpassedIPv4">Packets out passed (IPv4)</option>
+				<option value="PacketsoutdroppedIPv4">Packets out dropped (IPv4)</option>
+				<option value="PacketsinpassedIPv6">Packets in passed (IPv6)</option>
+				<option value="PacketsindroppedIPv6">Packets in dropped (IPv6)</option>
+				<option value="PacketsoutpassedIPv6">Packets out passed (IPv6)</option>
+				<option value="PacketsoutdroppedIPv6">Packets out dropped (IPv6)</option>
+				<option value="statetableentries">State table entries</option>
+				<option value="statesearches">State searches</option>
+				<option value="StateTableInsertions">State Table Insertions</option>
+				<option value="StateTableRemovals">State Table Removals</option>
+				<option value="MatchCounter">Match Counter</option>
+				<option value="BadOffsetCounter">Bad Offset Counter</option>
+				<option value="FragmentCounter">Fragment Counter</option>
+				<option value="ShortCounter">Short Counter</option>
+				<option value="NormalizeCounter">Normalize Counter</option>
+				<option value="MemoryCounter">Memory Counter</option>				
+			</options>
+		</field>	
+	</fields>
+
+</packagegui>
