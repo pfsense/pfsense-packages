@@ -61,11 +61,15 @@
 		    $interfaces = " -i ";
 		    $ifaces=$_POST['iface'];
 		    $isfirst = 0;
+		    $lan = $config['interfaces']['lan']['if'];
 		    foreach($ifaces as $element=>$if)
 		    {
 			    if($isfirst == 1) $interfaces .= ",";
 			    $interfaces .= convert_friendly_interface_to_real_interface_name($ifaces[$element]);
 			    $isfirst = 1;
+		    }
+		    $if($interfaces == "") {
+			$interfaces = $lan;
 		    }
 		    system("/usr/local/bin/ntop --set-admin-password=" . $_POST['password']);
 		    system("killall ntop 2>/dev/null");
