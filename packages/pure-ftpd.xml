@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?> 
+<?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>pure-ftpd</name>
 	<!-- Menu is where this packages menu will appear -->
@@ -58,7 +58,7 @@
 		fclose($fout);
 		mwexec("chmod a+x /usr/local/etc/rc.d/pure-ftpd.sh");
 		mwexec("/usr/local/etc/rc.d/pure-ftpd.sh");
-	</custom_php_install_command>	
+	</custom_php_install_command>
 	<custom_deinstall_php_command>
 		mwexec("/usr/bin/killall pure-ftpd");
 	</custom_deinstall_php_command>
@@ -70,9 +70,10 @@
 		$salt = md5(time());
 		$crypted_pw = crypt($_POST['password'],$salt);
 		fwrite($fd, $crypted_pw);
-		pclose($fd);			
+		pclose($fd);
+		$savemsg = "User has been added.";
 	</custom_add_php_command>
 	<custom_delete_php_command>
 		mwexec("/usr/sbin/pw userdel " . $_POST['username']);
-	</custom_delete_php_command>	
+	</custom_delete_php_command>
 </packagegui>
