@@ -2,26 +2,28 @@
 	<name>freeradiussettings</name>
 	<title>FreeRADIUS: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</aftersaveredirect>
-	<tabs>          
-                <tab>   
+	<tabs>
+                <tab>
                         <text>Users</text>
                         <url>/pkg.php?xml=freeradius.xml</url>
-                </tab>  
+                </tab>
                 <tab>
                         <text>Clients</text>
                         <url>/pkg.php?xml=freeradiusclients.xml</url>
-                </tab>  
+                </tab>
                 <tab>
                         <text>Settings</text>
                         <url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
 			<active/>
                 </tab>
-        </tabs> 
+        </tabs>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<fields>
 		<field>
 			<fielddescr>Listening Interface(s)</fielddescr>
 			<fieldname>interface</fieldname>
+			<size>3</size>
+			<multiple>true</multiple>
 			<description>Enter the desired listening interface here</description>
 			<type>interfaces_selection</type>
 		</field>
@@ -51,7 +53,7 @@
 		}
 	mwexec("killall radiusd");
 	mwexec("/usr/local/etc/rc.d/radiusd");
-	sync_package();	
+	sync_package();
 	</custom_php_command_before_form>
 	<custom_add_php_command>
 		sync_package();
