@@ -82,8 +82,7 @@
 		 *	fwrite($fout, "interface " . $int . "\n");
 		 */
 		
-		$int = convert_friendly_interface_to_real_interface_name(wan);
-		fwrite($fout, "interface " . $int . "\n");
+		fwrite($fout, "interface " . $config['interfaces']['wan']['if'] . "\n");
 		if($_POST['port'] != "") fwrite($fout, "port " . $_POST['port'] . "\n");
 		if($_POST['inittimeout'] != "") fwrite($fout, "waitfor " . $_POST['inittimeout'] . "\n");
 		if($_POST['initdelay'] != "") fwrite($fout, "connection_delay_1 " . $_POST['initdelay'] . "\n");
