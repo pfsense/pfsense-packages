@@ -33,7 +33,7 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
-	function sync_package()	{
+	function sync_package_freeradius_settings() {
 		conf_mount_rw();
 		config_lock();
 		global $config;
@@ -57,7 +57,7 @@
 	system("killall -HUP radiusd");
 	</custom_php_command_before_form>
 	<custom_add_php_command>
-		sync_package();
+		sync_package_freeradius_settings();
 	</custom_add_php_command>
 </packagegui>
 
