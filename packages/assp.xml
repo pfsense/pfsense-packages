@@ -24,7 +24,7 @@
 	    system("/usr/local/etc/rc.d/assp.sh &amp;");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-	    system("rm -rf /usr/local/assp");
-	    system("rm /usr/local/etc/rc.d/assp.sh");
+	    rmdir_recursive("/usr/local/assp");
+	    unlink_if_exists("/usr/local/etc/rc.d/assp.sh");
 	</custom_php_deinstall_command>
 </packagegui>
