@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>pure-ftpdsettings</name>
+	<!-- Menu is where this packages menu will appear -->
+	<menu>
+		<name>Pure FTPD Settings</name>
+		<tooltiptext>Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerability, it is trivial to set up, and it is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</tooltiptext>
+		<section>Services</section>
+		<configfile>pureftpdsettings.xml</configfile>
+	</menu>
+	<!-- configpath gets expanded out automatically and config items will be
+         stored in that location seperated with -> -->
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<!-- fields gets invoked when the user adds or edits a item.   the following items
+         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
+	<fields>
+		<field>
+			<fielddescr>Maximum connections</fielddescr>
+			<fieldname>connections</fieldname>
+			<description>Maximum number of clients allowed</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Maximum connections per ip address</fielddescr>
+			<fieldname>connectionsperip</fieldname>
+			<description>Maximum number of clients allowed to connect per ip address</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Maximum connections per ip address</fielddescr>
+			<fieldname>connectionsperip</fieldname>
+			<description>Maximum number of clients allowed to connect per ip address</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Upload cutoff threshold</fielddescr>
+			<fieldname>cutoffthreshold</fieldname>
+			<description>Disallow  upload  if the partition is more than percentage full.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Begin tcp port range</fielddescr>
+			<fieldname>beginport</fieldname>
+			<description>Specify that client connections begin at this port.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>End tcp port range</fielddescr>
+			<fieldname>endport</fieldname>
+			<description>Specify that client connections end at this port.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Limit upload bandwidth</fielddescr>
+			<fieldname>uploadbw</fieldname>
+			<description>Limit the upload bandwdith.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Limit download bandwidth</fielddescr>
+			<fieldname>downloadbw</fieldname>
+			<description>Limit the download bandwdith.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Client File Deletion</fielddescr>
+			<fieldname>filedeletion</fieldname>
+			<description>Allow clients to upload files but disallow their ability to delete uploaded items.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Client File Deletion</fielddescr>
+			<fieldname>filedeletion</fieldname>
+			<description>Allow clients to upload files but disallow their ability to delete uploaded items.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>NAT Workaround mode</fielddescr>
+			<fieldname>natworkaround</fieldname>
+			<description>NAT  mode. Force active mode. If your FTP server is behind a NAT box that doesn't support applicative FTP proxying, or if you use port  redirection  without  a  transparent  FTP proxy, use this. Well... the previous sentence isn't very clear.  Okay:  if  your network looks like this: FTP--NAT.gateway/router--Internet and  if  you want people coming from the internet to have access to your FTP server, please try without  this  option  first.  If Netscape clients can connect without any problem, your NAT gate-way rulez. If Netscape doesn't display directory listings,  your NAT gateway sucks.</description>
+			<type>checkbox</type>
+		</field>
+	</fields>
+	<custom_php_install_command>
+	</custom_php_install_command>
+	<custom_deinstall_php_command>
+	</custom_deinstall_php_command>
+	<custom_add_php_command>
+	</custom_add_php_command>
+	<custom_delete_php_command>
+	</custom_delete_php_command>
+</packagegui>
