@@ -25,7 +25,11 @@
 	    mwexec("/usr/sbin/chown squid /usr/local/squid/logs/squidGuard.log");
 	    mwexec("/usr/bin/chgrp squid /usr/local/squid/logs/squidGuard.log");
 	    mwexec("/bin/chmod 744 /usr/local/squid/logs/squidGuard.log");
-	    mwexec("/usr/sbin/chown -R squid /var/db/squidGuard");
+	    mwexec("/usr/bin/touch /var/log/squidGuard.log");
+        mwexec("/usr/sbin/chown squid /var/log/squidGuard.log");
+        mwexec("/usr/bin/chgrp squid /var/log/squidGuard.log");
+        mwexec("/bin/chmod 744 /var/log/squidGuard.log");
+        mwexec("/usr/sbin/chown -R squid /var/db/squidGuard");
 	    mwexec("/usr/bin/chgrp -R squid /var/db/squidGuard");
 	    mwexec("/bin/chmod -R 755 /var/db/squidGuard");
 	    system("/usr/local/sbin/squid -k reconfigure");
@@ -38,7 +42,8 @@
 	    mwexec("/usr/bin/sed '\$d' /usr/local/etc/squid/squid.conf > /tmp/squidtmp.conf");
 	    mwexec("/bin/cp /tmp/squidtmp.conf /usr/local/etc/squid/squid.conf");
 	    mwexec("/bin/rm /tmp/squidtmp.conf");
-	    mwexec("/bin/rm -rf /var/db/squidGuard");
+	    mwexec("/bin/rm /var/log/squidGuard.lovar/log/squidGuard.log
+        mwexec("/bin/rm -rf /var/db/squidGuard");
 	    system("/usr/local/sbin/squid -k reconfigure");
         </custom_php_deinstall_command>
     	<process_kill_command>squidGuard</process_kill_command>
