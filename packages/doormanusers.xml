@@ -27,11 +27,11 @@
 		</columnitem>
 		<columnitem>
 			<fielddescr>Ports</fielddescr>
-			<fieldname>ports</fielddescr>
+			<fieldname>ports</fieldname>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Addresses</fielddescr>
-			<fieldname>addresses</fielddescr>
+			<fieldname>addresses</fieldname>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Description</fielddescr>

@@ -44,6 +44,7 @@
 			<description>Enter the desired number of *seconds* to wait for a connection to be established after a successful knock.i (default 10 seconds)</description>
 			<type>input</type>
 			<value>10</value>
+		</field>
 		<field>
 			<fielddescr>Listening interface(s)</fielddescr>
 			<fieldname>interface</fieldname>
