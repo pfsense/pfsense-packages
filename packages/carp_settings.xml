@@ -57,7 +57,7 @@
          will be parsed and rendered for the user as a gui with input, and selectboxes. -->
 	<fields>
 		<field>
-			<fielddescr>Synchrnoize Enabled</fielddescr>
+			<fielddescr>Synchronize Enabled</fielddescr>
 			<fieldname>pfsyncenabled</fieldname>
 			<description>PFSync transfers state insertion, update, and deletion messages between firewalls. Each firewall sends these messages out via multicast on a specified interface, using the PFSYNC protocol (IP Protocol 240). It also listens on that interface for similar messages from other firewalls, and imports them into the local state table.</description>
 			<type>checkbox</type>
@@ -66,7 +66,7 @@
 			<fielddescr>Synchronize Interface</fielddescr>
 			<fieldname>pfsyncinterface</fieldname>
 			<type>interfaces_selection</type>
-			<description>If Synchronize State is enabled, it will utilize this interface for communication.  NOTE!  You must define a IP on each machin participating in this failver group.  NOTE: You must have an IP assigned to the interface on any participating sync nodes.</description>
+			<description>If Synchronize State is enabled, it will utilize this interface for communication.  NOTE!  You must define a IP on each machine participating in this failover group.  NOTE: You must have an IP assigned to the interface on any participating sync nodes.</description>
 		</field>
 		<field>
 			<fielddescr>Load Balancing</fielddescr>
@@ -113,7 +113,7 @@
 		<field>
 			<fielddescr>Known Hosts</fielddescr>
 			<fieldname>knownhosts</fieldname>
-			<description>Paste in your authorized hosts file generated from OpenSSH.</description>
+			<description>Paste in the /etc/ssh/ssh_host_dsa_key.pub file generated from the destination server.</description>
 			<rows>4</rows>
 			<cols>50</cols>
 			<type>textarea</type>
@@ -165,10 +165,10 @@
 		$vararrays = array("cmd" => "mkdir -p /root/.ssh");
 		http_post($synchronizetoip, $httpport, "/exec_raw.php", $vararrays);
 		/* populate /root/.ssh/known_hosts */
-		$vararrays = array("cmd" => "echo \"{$_POST['knownhosts']}\" > /root.ssh/known_hosts");
+		$vararrays = array("cmd" => "echo \"{$_POST['knownhosts']}\" > /root/.ssh/known_hosts");
 		http_post($synchronizetoip, $httpport, "/exec_raw.php", $vararrays);
 		/* populate /root/.ssh/authorized_keys */
-		$vararrays = array("cmd" => "echo \"{$_POST['authorizedkeys']}\" > /root.ssh/authorized_keys");
+		$vararrays = array("cmd" => "echo \"{$_POST['authorizedkeys']}\" > /root/.ssh/authorized_keys");
 		http_post($synchronizetoip, $httpport, "/exec_raw.php", $vararrays);
 	    }
 	</custom_php_install_command>
