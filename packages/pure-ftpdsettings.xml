@@ -28,13 +28,6 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Maximum connections per ip address</fielddescr>
-			<fieldname>connectionsperip</fieldname>
-			<description>Maximum number of clients allowed to connect per ip address</description>
-			<type>input</type>
-			<validationtype>number</validationtype>
-		</field>
-		<field>
 			<fielddescr>Upload cutoff threshold</fielddescr>
 			<fieldname>cutoffthreshold</fieldname>
 			<description>Disallow  upload  if the partition is more than percentage full.</description>
