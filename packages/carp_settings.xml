@@ -118,6 +118,17 @@
 	<custom_delete_php_command>
 	</custom_delete_php_command>
 	<custom_php_install_command>
+	    system("/bin/mkdir -p /root/.ssh");
+	    if($_POST['knownhosts'] != "") {
+		$fout = fopen("/root/.ssh/known_hosts","w");
+		fwrite($fout, $_POST['knownhosts']);
+		fclose($fout);
+	    }
+	    if($_POST['authorizedkeys'] != "") {
+		$fout = fopen("/root/.ssh/authorized_keys","w");
+		fwrite($fout, $_POST['authorizedkeys']);
+		fclose($fout);
+	    }
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 	</custom_php_deinstall_command>
