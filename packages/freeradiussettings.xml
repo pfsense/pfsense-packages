@@ -2,21 +2,21 @@
 	<name>freeradiussettings</name>
 	<title>FreeRADIUS: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=freeradiussettings.xml&amp;id=1</aftersaveredirect>
-	<tabs>          
-                <tab>   
+	<tabs>
+                <tab>
                         <text>Users</text>
                         <url>/pkg.php?xml=freeradius.xml</url>
-                </tab>  
+                </tab>
                 <tab>
                         <text>Clients</text>
                         <url>/pkg.php?xml=freeradiusclients.xml</url>
-                </tab>  
+                </tab>
                 <tab>
                         <text>Settings</text>
-                        <url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=1</url>
+                        <url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
 			<active/>
                 </tab>
-        </tabs> 
+        </tabs>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<fields>
 		<field>

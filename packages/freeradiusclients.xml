@@ -1,21 +1,21 @@
 <packagegui>
 	<name>freeradiusclients</name>
 	<title>FreeRADIUS: Clients</title>
-	<tabs>          
-                <tab>   
+	<tabs>
+                <tab>
                         <text>Users</text>
                         <url>/pkg.php?xml=freeradius.xml</url>
-                </tab>  
+                </tab>
                 <tab>
                         <text>Clients</text>
                         <url>/pkg.php?xml=freeradiusclients.xml</url>
 			<active/>
-                </tab>  
+                </tab>
                 <tab>
                         <text>Settings</text>
-                        <url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=1</url>
+                        <url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
                 </tab>
-        </tabs> 
+        </tabs>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<adddeleteeditpagefields>
 		<columnitem>

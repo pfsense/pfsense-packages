@@ -19,9 +19,9 @@
 		</tab>
 		<tab>
 			<text>Settings</text>
-			<url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=1</url>
+			<url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
 		</tab>
-	</tabs>	
+	</tabs>
 	<additional_files_needed>
 		<item>http://www.pfsense.com/packages/config/freeradiusclients.xml</item>
 		<item>http://www.pfsense.com/packages/config/freeradiussettings.xml</item>
