@@ -84,7 +84,7 @@
 				}
 			}
 		 	fclose($fout);
-			mwexec("/usr/bin/killall radiusd");
+			mwexec("/usr/bin/killall -HUP radiusd");
 			mwexec("/usr/local/etc/rc.d/radiusd.sh");
 		}
 	</custom_php_command_before_form>

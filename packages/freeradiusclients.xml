@@ -68,7 +68,7 @@
 				}
 			}
 		 	fclose($fout);
-			mwexec("killall radiusd");
+			mwexec("killall -HUP radiusd");
 			mwexec("/usr/local/etc/rc.d/radiusd");
 		}
 		sync_package();
