@@ -28,7 +28,8 @@
 */
 
 if($already_processed != 1)
-    if($config['installedpackages']['carpsettings']['config'] != "") {
+    if($config['installedpackages']['carpsettings']['config'] <> "" and
+      is_array($config['installedpackages']['carpsettings']['config'])) {
 	$already_processed = 1;
 	foreach($config['installedpackages']['carpsettings']['config'] as $carp) {
 	    if($carp['synchronizetoip'] <> "" ) {
