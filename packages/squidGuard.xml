@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>squidGuard</name>
-	<!-- Menu is where this packages menu will appear -->
-	<!-- configpath gets expanded out automatically and config items will be
-         stored in that location -->
 	<configpath>['installedpackages']['squidGuard']['config']</configpath>
 	<custom_php_install_command>
 	    echo "&lt;pre&gt;";
