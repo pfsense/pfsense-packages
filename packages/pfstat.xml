@@ -33,7 +33,13 @@
 		<item>
 			<modifyfilename>/etc/crontab</modifyfilename>
 			<textneeded>
-*/5	*	*	*	*	root	/usr/local/bin/pfstat -c /usr/local/etc/pfstat.conf -d /var/log/pfstat
+*	*	*	*	*	root	/usr/local/bin/pfstat -c /usr/local/etc/pfstat.conf -d /var/log/pfstat
+			</textneeded>
+		</item>
+		<item>
+			<modifyfilename>/etc/crontab</modifyfilename>
+			<textneeded>
+1	1	*	*	1	root	tail -n 50000 /var/log/pfstat >/tmp/pfstat &amp;&amp; mv /tmp/pfstat /var/log/pfstat		
 			</textneeded>
 		</item>
 	</modify_system>
