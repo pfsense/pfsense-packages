@@ -46,7 +46,7 @@
 	    fwrite($fout, "/usr/local/hula/sbin/hulamanager &amp;\n");
 	    fclose($fout);
 	    system("chmod 555 /usr/local/etc/rc.d/hula.sh");
-	    system("/usr/local/hula/hulasetup --domain " . $_POST['domain']);
+	    system("/usr/local/hula/sbin/hulasetup --domain " . $_POST['domain']);
 	    system("/usr/local/etc/rc.d/hula.sh");
 	    conf_mount_ro();
 	    config_unlock();
@@ -61,6 +61,6 @@
 	    fwrite($fout, "#!/bin/sh\n\n");
 	    fwrite($fout, "/usr/local/hula/sbin/hulamanager &amp;\n");
 	    fclose($fout);
-	    system("chmod 555 /usr/local/etc/rc.d/hula.sh");
+	    system("chmod 555 /usr/local/etc/rc.d/hula.sh &amp;");
 	</custom_php_install_command>
 </packagegui>
