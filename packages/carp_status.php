@@ -94,7 +94,9 @@ if($config['installedpackages']['carp']['config'] <> "")
 	}
 
 ?>
-
+<tr><td>
+<center>Nodes syncing: <?php system("/sbin/pfctl -vvss |/usr/bin/grep creator |/usr/bin/nawk '{print $4;}' |/usr/bin/sort -u"); ?></center>
+</td></tr>
 </table>
 </td></tr>
 </table>
