@@ -40,13 +40,24 @@ if($config['installedpackages']['carpsettings']['config'] != "")
 	    $rules = return_filename_as_string("{$g['tmp_path']}/rules_section.txt");
 	    $aliases = return_filename_as_string("{$g['tmp_path']}/aliases_section.txt");
 	    $nat = return_filename_as_string("{$g['tmp_path']}/nat_section.txt");
-	    restore_config_section("filter", $rules);
-	    restore_config_section("aliases", $aliases);
-	    restore_config_section("nat", $nat);
+	    $trafficshaper = return_filename_as_string("{$g['tmp_path']}/trafficshaper_section.txt");
+	    if($rules <> "") {
+		restore_config_section("filter", $rules);
+		unlink("{$g['tmp_path']}/rules_section.txt");
+	    }
+	    if($aliases <> "") {
+		restore_config_section("aliases", $aliases);
+		unlink("{$g['tmp_path']}/aliases_section.txt");
+	    }
+	    if($nat <> "") {
+		restore_config_section("nat", $nat);
+		unlink("{$g['tmp_path']}/nat_section.txt");
+	    }
+	    if($trafficshaper <> "") {
+	        restore_config_section("shaper", $trafficshaper);
+		unlink("{$g['tmp_path']}/nat_section.txt");
+	    }
 	    filter_configure();
-	    unlink("{$g['tmp_path']}/rules_section.txt");
-	    unlink("{$g['tmp_path']}/aliases_section.txt");
-	    unlink("{$g['tmp_path']}/nat_section.txt");	    
 	}
 
 ?>
