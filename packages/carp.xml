@@ -212,7 +212,6 @@
 		$pfsync_instances_counter = 0;
 		if($config['installedpackages']['carp']['config'] != "") {
 		      foreach($config['installedpackages']['carp']['config'] as $carp) {
-			  $pfsync = 0;
 			  /*
 			   *  create the carp interface
 			   */
@@ -232,23 +231,20 @@
 			  $carp_instances_counter++;
 		      }
 		  }
-		if($pfsync != 0) {
-		    /*
-		     * user has selected pfsync, bring it up.
-		     */
-		    $carp_sync_int = convert_friendly_interface_to_real_interface_name($config['installedpackages']['package']['carpsettings']['config']['pfsyncinterface']);
-		    $carp_sync_ip  = $config['installedpackages']['package']['carpsettings']['config']['pfsyncip'];
-		    fwrite($fout, "/sbin/ifconfig pfsync0 create\n");
-		    fwrite($fout, "/sbin/ifconfig pfsync0 {$carp_sync_ip}/24\n");
-		    fwrite($fout, "/sbin/ifconfig pfsync0 up syncif " . carp_sync_ip . "\n");
-		    $pfsync_instances_counter++;
-		}
-		$using_arp_balance = 0;
-		$preempt = 0;
-		if($config['installedpackages']['package']['carpsettings']['premption'] != "")
-			$preempt = 1;
-		if($config['installedpackages']['package']['carpsettings']['balancing'] != "")
-			$using_arp_balance = 1;
+		  foreach($config['installedpackages']['carpsettings']['config'] as $carp)
+		  if($carp['pfsyncenabled'] != "") {
+			$pfsync = 1;
+			if($carp['premption'] != "")
+				$preempt = 1;
+			if($carp['balancing'] != "")
+				$using_arp_balance = 1;
+			$carp_sync_int = convert_friendly_interface_to_real_interface_name($carp['pfsyncinterface']);
+			$carp_sync_ip  = $carp['pfsyncip'];
+			fwrite($fout, "/sbin/ifconfig pfsync0 create\n");
+			fwrite($fout, "/sbin/ifconfig pfsync0 {$carp_sync_ip}/24\n");
+			fwrite($fout, "/sbin/ifconfig pfsync0 up syncif " . carp_sync_ip . "\n");
+			$pfsync_instances_counter++;
+		  }
 		fwrite($fout, "/etc/rc.filter_configure");
 		fclose($fout);
 		mwexec("chmod a+x /usr/local/etc/rc.d/carp.sh");
