@@ -1,4 +1,4 @@
-#!/usr/bin/php
+
 <?php
 /*
 	carp_sync.php
@@ -49,25 +49,25 @@ function carp_sync_xml($url, $password, $section, $section_xml, $method = 'pfsen
 }
 
 if($already_processed != 1)
-    if($config['installedpackages']['carpsettings']['config'] <> "" and
+    if($config['installedpackages']['carpsettings']['config'] != "" and
       is_array($config['installedpackages']['carpsettings']['config'])) {
 	$already_processed = 1;
 	foreach($config['installedpackages']['carpsettings']['config'] as $carp) {
 	    if($carp['synchronizetoip'] <> "" ) {
 		$synchronizetoip = $carp['synchronizetoip'];
-		if($carp['synchronizerules'] <> "" and is_array($config['filter'])) {
+		if($carp['synchronizerules'] != "" and is_array($config['filter'])) {
 		    $current_rules_section = backup_config_section("filter");
 		    carp_sync_xml($carp['synchronizetoip'], $carp['password'], 'filter', $current_rules_section);
 		}
-		if($carp['synchronizenat'] <> "" and is_array($config['nat'])) {
+		if($carp['synchronizenat'] != "" and is_array($config['nat'])) {
 		    $current_nat_section = backup_config_section("nat");
 		    carp_sync_xml($carp['synchronizetoip'], $carp['password'], 'nat', $current_nat_section);
 		}
-		if($carp['synchronizealiases'] <> "" and is_array($config['aliases'])) {
+		if($carp['synchronizealiases'] != "" and is_array($config['aliases'])) {
 		    $current_aliases_section = backup_config_section("aliases");
 		    carp_sync_xml($carp['synchronizetoip'], $carp['password'], 'alias', $current_aliases_section);
 		}
-		if($carp['synchronizetrafficshaper'] <> "" and is_array($config['shaper'])) {
+		if($carp['synchronizetrafficshaper'] != "" and is_array($config['shaper'])) {
 		    $current_shaper_section = backup_config_section("shaper");
 		    carp_sync_xml($carp['synchronizetoip'], $carp['password'], 'shaper', $current_shaper_section);
 		}
