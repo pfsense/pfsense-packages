@@ -32,13 +32,13 @@
 		<field>
 			<fielddescr>Paired Firewall External IP</fielddescr>
 			<fieldname>pairextip</fieldname>
-			<description>Enter the real IP of the other firewall's external interface.</description>
+			<description>Enter the real IP of the other firewall's (real) external interface.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Paired Firewall Internal IP</fielddescr>
 			<fieldname>pairintip</fieldname>
-			<description>Enter the real IP of the other firewall's internal interface.</description>
+			<description>Enter the real IP of the other firewall's  (real) internal interface.</description>
 			<type>input</type>
 		</field>
 		<field>
