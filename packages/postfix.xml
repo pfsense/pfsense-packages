@@ -3,6 +3,7 @@
 	<name>postfix</name>
         <preoutput>yes</preoutput>
         <savetext>Change</savetext>
+	<aftersaveredirect>pkg_edit.php?xml=postfix.xml&amp;id=1</aftersaveredirect>
 	<menu>
 		<name>Postfix Settings</name>
 		<tooltiptext>Configure Postfix Forwarder</tooltiptext>
