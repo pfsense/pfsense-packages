@@ -13,11 +13,11 @@
 	<tabs>
 		<tab>
 			<text>SpamD Settings</text>
-			<url>/pkg_edit.php?xml=spamd.xml</url>
+			<url>/pkg.php?xml=spamd.xml</url>
 		</tab>
 		<tab>
 			<text>SpamD Whitelist</text>
-			<url>/pkg_edit.php?xml=spamd_whitelist.xml</url>
+			<url>/pkg.php?xml=spamd_whitelist.xml</url>
 			<active/>
 		</tab>
 	</tabs>
