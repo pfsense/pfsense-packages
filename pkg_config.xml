@@ -77,18 +77,6 @@
 	<configurationfile>carp.xml</configurationfile>
     </package>
     <package>
-	<name>postfix</name>
-	<descr>Postfix mail forwarder.  Forwards mail to another mail server.</descr>
-	<website>http://www.postfix.com/</website>
-	<category>Mail</category>
-	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/mail</depends_on_package_base_url>
-	<depends_on_package>postfix-1.1.12_1%2c1.tbz</depends_on_package>
-	<version>1.1.12_1</version>
-	<status>ALPHA</status>
-	<config_file>http://www.pfsense.com/packages/config/postfix.xml</config_file>
-	<configurationfile>postfix.xml</configurationfile>
-    </package>
-    <package>
 	<name>freeradius</name>
 	<website>http://www.freeradius.org/</website>
 	<descr>FreeRADIUS is the premiere open source RADIUS server. It is fast, flexible, configurable, and supports more authentication protocols than many commercial servers. A client entry for localhost with the shared secret "pfsense" is defined on installation for easy integration with the captive portal. This package is currently intended to provide a local user database for captive portal and pptp - it does not employ SQL and is not meant to supplant an external RADIUS server for advanced tasks.</descr>
@@ -273,5 +261,17 @@ test server or link availability and modify translation or routing rules. This p
         <status>ALPHA</status>
         <config_file>http://www.pfsense.com/packages/config/frickin.xml</config_file>
         <configurationfile>frickin.xml</configurationfile>
+    </package>
+    <package>
+	<name>postfix</name>
+	<descr>Postfix mail forwarder.  Forwards mail to another mail server.</descr>
+	<website>http://www.postfix.com/</website>
+	<category>Mail</category>
+	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/mail</depends_on_package_base_url>
+	<depends_on_package>postfix-1.1.12_1%2c1.tbz</depends_on_package>
+	<version>1.1.12_1</version>
+	<status>ALPHA</status>
+	<config_file>http://www.pfsense.com/packages/config/postfix.xml</config_file>
+	<configurationfile>postfix.xml</configurationfile>
     </package>
 </pfsensepkgs>
