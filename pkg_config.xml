@@ -1,16 +1,26 @@
-<pfSense>
+<?xml version="1.0"?>
+<!-- pfsense packages -->
+<pfsensepkgs>
+  <packages>
     <package>
-	<name>pfStat</name>
-	<descr>pfstat is a small utility that collects packet filter statistics and produces graphs.</descr>
-	<pfSense_package>http://www.pfsense.com/packages/pfstat.tbz</pfSense_package>
-	<depends_on_package>ftp://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/net/pfstat-1.7.tbz</depends_on_package>
+        <name>pfstat</name>
+        <descr>pfstat is a small utility that collects packet filter statistics and produces graphs.</descr>
+        <category>Network Management</category>
+        <pfsense_package_base>http://www.pfsense.com/packages/pfSense</pfsense_package_base>
+        <pfsense_package>pfstat.tbz</pfsense_package>
+        <depends_on_package_base>http://www.pfsense.com/packages/All</depends_on_package_base>
+        <depends_on_package>pfstat-1.7.tbz</depends_on_package>
+        <configurationfile>pfstat.xml</configurationfile>
     </package>
-    <!--
-     <package>
-	<name></name>
-	<description></description>
-	<pfSense_package></pfSense_package>
-	<depends_on_package></depends_on_package>
-     </package>
-    -->
-</pfSense>
+    <package>
+        <name>test</name>
+        <descr>test package</descr>
+        <category>Network Management</category>
+        <pfsense_package_base>http://www.pfsense.com/packages/pfSense</pfsense_package_base>
+        <pfsense_package>test.tbz</pfsense_package>
+        <depends_on_package_base>http://www.pfsense.com/packages/All</depends_on_package_base>
+        <depends_on_package>test-1.7.tbz</depends_on_package>
+        <configurationfile>test.xml</configurationfile>
+    </package>
+  </packages>
+</pfsensepkgs>
