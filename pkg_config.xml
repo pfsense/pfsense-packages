@@ -225,6 +225,7 @@
 	<config_file>http://www.pfsense.com/packages/config/squid.xml</config_file>
 	<configurationfile>squid.xml</configurationfile>
     </package>
+  </packages>
     <package>
         <name>squidGuard</name>
         <descr>High performance Web proxy Guard</descr>
@@ -237,5 +238,4 @@
         <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
         <configurationfile>squidGuard.xml</configurationfile>
     </package>
-  </packages>
 </pfsensepkgs>
