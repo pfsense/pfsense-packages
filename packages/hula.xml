@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<title>Services: Hula</title>
+	<name>hula</name>
+	<version>3.0</version>
+        <donotsave>true</donotsave>
+        <preoutput>yes</preoutput>
+        <savetext>Change</savetext>
+    	<additional_files_needed>
+		<item>http://www.pfsense.com/packages/All/hula.tgz</item>
+	</additional_files_needed>
+	<!-- Menu is where this packages menu will appear -->
+	<menu>
+	    <name>Hula Default Settings</name>
+	    <tooltiptext>This area will help setup Hula for the first time.</tooltiptext>
+	    <section>Services</section>
+	    <configfile>hula.xml</configfile>
+	</menu>
+        <!-- Do not save invokes a simple input menu and will not update
+             the configuration database. -->
+	<fields>
+	    <field>
+		<fielddescr>Hula Default Domain</fielddescr>
+		<fieldname>domain</fieldname>
+		<description>Enter the default domain that hula will use.</description>
+		<type>input</type>
+	    </field>
+    </fields>
+	<custom_add_php_command>
+	    conf_mount_rw();
+	    config_lock();
+	    $fout = fopen("/usr/local/etc/rc.d/hula.sh","w");
+	    fwrite($fout, "#!/bin/sh\n\n");
+	    fwrite($fout, "/usr/local/hula/sbin/hulamanager &amp;\n");
+	    fclose($fout);
+	    system("chmod 555 /usr/local/etc/rc.d/hula.sh");
+	    system("/usr/local/hula/hulasetup --domain " . $_POST['domain']);
+	    system("/usr/local/etc/rc.d/hula.sh");
+	    conf_mount_ro();
+	    config_unlock();
+	</custom_add_php_command>
+	<custom_php_deinstall_command>
+	    system("/usr/bin/killall -9 hulamanager");
+	    system("rm -rf /usr/local/hula");
+	</custom_php_deinstall_command>
+	<custom_php_install_command>
+	    system("rm /usr/local/etc/rc.d/hula.sh");
+	    $fout = fopen("/usr/local/etc/rc.d/hula.sh","w");
+	    fwrite($fout, "#!/bin/sh\n\n");
+	    fwrite($fout, "/usr/local/hula/sbin/hulamanager &amp;\n");
+	    fclose($fout);
+	    system("chmod 555 /usr/local/etc/rc.d/hula.sh");
+	</custom_php_install_command>
+</packagegui>
