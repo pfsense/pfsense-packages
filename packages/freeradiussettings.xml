@@ -33,7 +33,7 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
-	Function sync_package()	{
+	function sync_package()	{
 		global $config;
 		$fout = fopen("/usr/local/etc/raddb/radiusd.conf.dynamic","w");
 		$int = $config['installedpackages']['freeradiussettings']['config']['0']['interface'];
