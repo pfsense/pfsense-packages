@@ -65,7 +65,7 @@
 		echo "&lt;p&gt;";
 		echo "Reboot required... One moment...";
 		echo "&lt;p&gt;";
-		system("/sbin/shutdown -r now");
+		/* system("/sbin/shutdown -r now"); */
 	</custom_php_deinstall_command>
 	<custom_php_install_command>
 		echo "&lt;pre&gt;";
