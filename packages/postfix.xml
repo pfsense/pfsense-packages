@@ -67,6 +67,6 @@
             </template>
         </templates>
         <start_command>/usr/local/sbin/postfix start</start_command>
-        <restart_command>/usr/local/sbin/postfix reload</restart_command>
+        <restart_command>/usr/local/sbin/postmap /usr/local/etc/postfix/transport ; /usr/local/sbin/postfix reload</restart_command>
                 
 </packagegui>
