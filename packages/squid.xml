@@ -10,6 +10,7 @@
                 <configfile>squid.xml</configfile>
 		<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
         </menu>
+	<aftersaveredirect>pkg_edit.php?xml=squid.xml&amp;id=0</aftersaveredirect>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
         <fields>
                 <field>
