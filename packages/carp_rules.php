@@ -28,14 +28,17 @@
 */
 
 /* return if there are no carp configured items */
-if($config['installedpackages']['carp']['config']) return;
+//if($config['installedpackages']['carp']['config']) return;
+
 mwexec("/sbin/pfctl -a carp -Fr");
+
 /* carp records exist, lets process */
 $wan_interface = get_real_wan_interface();
 foreach($config['installedpackages']['carp']['config'] as $carp) {
     $ip = $carp['ipaddress'];
     $int = find_ip_interface($ip);
     $carp_int = find_carp_interface($ip);
+    $carp_sync_int = convert_friendly_interface_to_real_interface_name($carp['pfsyncinterface']);    
     add_rule_to_anchor("carp", "pass out quick on {$carp_int} keep state", $carp_int . "1");
     if($int <> false and $int <> $wan_interface) {
 	$ipnet = convert_ip_to_network_format($ip, $carp['netmask']);
@@ -43,10 +46,9 @@ foreach($config['installedpackages']['carp']['config'] as $carp) {
 	add_rule_to_anchor("natrules", $rule, $ip);
     }
 }
-$carp_sync_int = convert_friendly_interface_to_real_interface_name($config['installedpackages']['carpsettings']['config']['pfsyncinterface']);
+add_rule_to_anchor("carp", "pass quick on pfsync0", "pfsync0" . "3");
 if($carp_sync_int <> "") {
     add_rule_to_anchor("carp", "pass quick on {$carp_sync_int}", $carp_sync_int . "3");
-    add_rule_to_anchor("carp", "pass quick on pfsync0", "pfsync0" . "3");
     add_rule_to_anchor("carp", "pass quick on {$carp_sync_int} proto carp from {$carp_sync_int}:network to 224.0.0.18 keep state \(no-sync\)", $carp_sync_int . "2");
 }
 
