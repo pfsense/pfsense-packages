@@ -86,11 +86,12 @@
 			<fielddescr>Socket buffer sizes</fielddescr>
 			<fieldname>window</fieldname>
 			<description>Enter the desired socket buffer size, if needed.</description>
+			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>UDP Bandwidth</fielddescr>
 			<fieldname>udpbandwidth</fieldname>
-			<description>Enter the UDP bandwidth to send at in bits/sec. (default is 1Mbit/sec)
+			<description>Enter the UDP bandwidth to send at in bits/sec. (default is 1Mbit/sec)</description>
 			<type>input</type>
 		</field>
 	</fields>
