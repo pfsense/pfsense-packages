@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>spamd-whitelist</name>
+	<version>0.1.0</version>
+	<title></title>
+	<!-- Menu is where this packages menu will appear -->
+	<menu>
+		<name>SpamD Whitelist</name>
+		<tooltiptext></tooltiptext>
+		<section>Services</section>
+		<configfile>spamd.xml</configfile>
+	</menu>
+	<tabs>
+		<tab>
+			<text>SpamD Settings</text>
+			<url>/pkg_edit.php?xml=spamd.xml</url>
+		</tab>
+		<tab>
+			<text>SpamD Whitelist</text>
+			<url>/pkg_edit.php?xml=spamd_whitelist.xml</url>
+			<active/>
+		</tab>
+	</tabs>
+	<!-- configpath gets expanded out automatically and config items will be
+         stored in that location -->
+	<configpath>['installedpackages']['spamd-whitelist']['config']</configpath>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Exempted IP</fielddescr>
+			<fieldname>ip</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<!-- fields gets invoked when the user adds or edits a item.   the following items
+         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
+	<fields>
+		<field>
+			<fielddescr>Exempted IP</fielddescr>
+			<fieldname>ip</fieldname>
+			<description>Enter the IP to exempt from blacklisting</description>
+			<type>input</type>
+		</field>
+	</fields>
+</packagegui>
