@@ -127,7 +127,7 @@
 			fwrite($fout, "launch=gpgsql\n");
 			fwrite($fout, "gpgsql-host=127.0.0.1\n");
 			fwrite($fout, "gpgsql-dbname=powerdns\n");
-			fwrite($fout, "fwrite($fout, "gpgsql-user=pgsql\n");
+			fwrite($fout, "gpgsql-user=pgsql\n");
 			fwrite($fout, "gpgsql-password=" . $_POST['password'] . "\n");
 			fwrite($fout, "chroot=/var/empty\n");
 			fwrite($fout, "disable-tcp=no\n");
@@ -135,10 +135,10 @@
 			fwrite($fout, "webserver=yes\n");
 			fwrite($fout, "webserver-address=127.0.0.1\n");
 			fwrite($fout, "webserver-port=8081\n");
-			fwrite($fout, "local-address=" . $ipaddress . "\n";");
-			fwrite($fout, "master=" . $POST['master'] . "\n");
-			fwrite($fout, "slave=" . $POST['slave'] . "\n");
-			fwrite($fout, "cache-ttl=" . $POST['cachettl'] . "\n");
+			fwrite($fout, "local-address=" . $_POST['ipaddress'] . "\n");
+			fwrite($fout, "master=" . $_POST['master'] . "\n");
+			fwrite($fout, "slave=" . $_POST['slave'] . "\n");
+			fwrite($fout, "cache-ttl=" . $_POST['cachettl'] . "\n");
 			/* XXX: TODO */
 			fwrite($fout, "# allow-axfr-ips=\n");
 			fwrite($fout, "# allow-recursion=\n");
@@ -187,10 +187,10 @@
 			fwrite($fout, "# wildcard-url=no\n");
 			fwrite($fout, "# wildcards=\n");
 			fclose($fout);
-			system("/usr/local/bin/pg_ctl -m smart");
-			system("/usr/local/bin/pg_ctl -D /usr/local/pgsql/data -l logfile start");
+			system("/usr/local/bin/pg_ctl -m smart 2>/dev/null");
+			system("/usr/local/bin/pg_ctl -D /usr/local/pgsql/data -l logfile start 2>/dev/null");
 		} else {
-			echo "Passwords do not much!
+			echo "Passwords do not much!";
 			exit;
 		}
 	</custom_add_php_command>
