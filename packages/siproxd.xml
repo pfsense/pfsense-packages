@@ -61,12 +61,13 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>RTP port range</fielddescr>
+			<fielddescr>RTP port range (lower)</fielddescr>
 			<fieldname>rtplower</fieldname>
 			<description>Enter the bottom edge of the port range siproxd will allocate for incoming RTP traffic. This range must be one not blocked by the firewall (default 7070).</description> 
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>RTP port range (upper)</fielddescr>
 			<fieldname>rtpupper</fieldname>
 			<description>Enter the top edge of the port range siproxd will allocate for incoming RTP traffic. This range must be one not blocked by the firewall (default 7079).</description>
 			<type>input</type>
@@ -93,11 +94,13 @@
 			<fielddescr>Outbound proxy hostname</fielddescr>
 			<fieldname>outboundproxyhost</fieldname>	
 			<type>input</type>
+			<description>Enter the hostname of an outbound proxy to send all traffic to. This is only useful if you have multiple masquerading firewalls to cross.</description>
 		</field>
 		<field>
 			<fielddescr>Outbound proxy port</fielddescr>
 			<fieldname>outboundproxyport</fieldname>
-			<description>Enter the hostname and port of an outbound proxy to send all traffic to. This is only useful if you have multiple masquerading firewalls to cross.</description>
+			<type>input</type>
+			<description>Enter the port of the outbound proxy to send all traffic to. This is only useful if you have multiple masquerading firewalls to cross.</description>
 		</field>
 	</fields>
 	<custom_php_install_command>
