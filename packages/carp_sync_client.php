@@ -30,7 +30,8 @@
 if($already_processed != 1)
     if($config['installedpackages']['carpsettings']['config'] != "") {
 	$already_processed = 1;
-	if($config['installedpackages']['carpsettings']['config']['synchronizetoip'] <> "" ) {
+	foreach($config['installedpackages']['carpsettings']['config'] as $carp) {
+	    if($carp['synchronizetoip'] <> "" ) {
 		/* lets sync! */
 		$synchronizetoip = $carp['synchronizetoip'];
 		if($carp['synchronizerules'] <> "") {
@@ -71,6 +72,7 @@ if($already_processed != 1)
 		}
 		/* copy configuration to remote host */
 		mwexec("/usr/bin/ssh {$synchronizetoip} /usr/local/pkg/carp_sync_server.php");
+	    }
 	}
     }
 
