@@ -42,6 +42,6 @@ if($config['installedpackages']['carpsettings']['config'] != "")
 	    fclose($fout);
 	    /* copy configuration to remote host */
 	    mwexec("/usr/bin/scp {$g['tmp_path']}/rules_section.txt root@{$synchronizetoip}:/tmp/");
-	    mwexec("/usr/bin/ssh /usr/local/pkg/carp_sync_server.php");
+	    mwexec("/usr/bin/ssh {$synchronizetoip} /usr/local/pkg/carp_sync_server.php");
 	}
 
