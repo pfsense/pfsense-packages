@@ -179,7 +179,7 @@
     <package>
 	  <name>assp</name>
 	  <website>http://assp.sourceforge.net</website>
-	  <descr></descr>
+	  <descr>The Anti-Spam SMTP Proxy (ASSP) Server project is an open source platform-independent SMTP Proxy server which implements whitelists and Bayesian filtering to rid the planet of the blight of unsolicited email (UCE). UCE must be stopped at the SMTP server. Anti-spam tools must be adaptive to new spam and customized for each site's mail patterns. This free, easy-to-use tool works with any mail transport and achieves these goals requiring no operator intervention after the initial setup phase.</descr>
 	  <category>Network Management</category>
 	  <config_file>http://www.pfsense.com/packages/config/assp.xml</config_file>
 	  <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5-stable/All/</depends_on_package_base_url>
@@ -199,6 +199,6 @@
           <version>0.5.9</version>
           <status>ALPHA</status>
           <configurationfile>siproxd.xml</configurationfile>
-    </package>                                              
+    </package>
   </packages>
 </pfsensepkgs>
