@@ -36,15 +36,17 @@ require_once("xmlparse_pkg.inc");  /* Include pfSense helper functions. */
 require_once("config.inc");
 require_once("functions.inc");
 
-function carp_sync_xml($url, $password, $section, $section_xml, $method = 'pfsense.restore_config_section') {
-	$params = array(new XML_RPC_Value($password, 'string'),
-			new XML_RPC_Value($section, 'string'),
-			new XML_RPC_Value($section_xml, 'string'));
-	$msg = new XML_RPC_Message($method, $params);
-	$cli = new XML_RPC_Client($url, '/xmlrpc.php');
-	$cli->setCredentials('admin', $password);
-	$resp = $cli->send($msg);
-	return true;
+if(!function_exists('carp_sync_xml')) {
+	function carp_sync_xml($url, $password, $section, $section_xml, $method = 'pfsense.restore_config_section') {
+		$params = array(new XML_RPC_Value($password, 'string'),
+				new XML_RPC_Value($section, 'string'),
+				new XML_RPC_Value($section_xml, 'string'));
+		$msg = new XML_RPC_Message($method, $params);
+		$cli = new XML_RPC_Client($url, '/xmlrpc.php');
+		$cli->setCredentials('admin', $password);
+		$resp = $cli->send($msg);
+		return true;
+	}
 }
 
 if($already_processed != 1) {
