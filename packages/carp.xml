@@ -3,6 +3,14 @@
 	<name>carp</name>
 	<version>0.1.0</version>
 	<title>Services: CARP (failover)</title>
+	<modify_system>
+		<item>
+			<modifyfilename>/etc/crontab</modifyfilename>
+			<textneeded>
+*/5	*	*	*	*	root	nice -n 20 /usr/local/pkg/pf/carp_sync_client.php
+			</textneeded>
+		</item>
+	</modify_system>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
 	    <name>CARP (failover)</name>
