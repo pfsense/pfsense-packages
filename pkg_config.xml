@@ -48,9 +48,9 @@
 	<descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
 	<category>Network Management</category>
 	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
-	<depends_on_package>ntop-3.0.tbz</depends_on_package>
-	<version>3.0</version>
-	<status>Stable</status>
+	<depends_on_package>ntop-3.1.tbz</depends_on_package>
+	<version>3.1</version>
+	<status>BETA</status>
 	<config_file>http://www.pfsense.com/packages/config/ntop.xml</config_file>
 	<configurationfile>ntop.xml</configurationfile>
     </package>
@@ -65,30 +65,6 @@
 	<status>Stable</status>
 	<config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
 	<configurationfile>stunnel.xml</configurationfile>
-    </package>
-    <package>
-	<name>squid</name>
-	<descr>High performance Web proxy cache</descr>
-	<website>http://www.squid-cache.org/</website>
-	<category>Network Management</category>
-	<depends_on_package_base_url>http://www.pfSense.com/packages/All</depends_on_package_base_url>
-	<depends_on_package>squid-2.5.7_5.tbz</depends_on_package>
-	<version>2.5.7_5</version>
-	<status>BETA</status>
-	<config_file>http://www.pfsense.com/packages/config/squid.xml</config_file>
-	<configurationfile>squid.xml</configurationfile>
-    </package>
-    <package>
-        <name>squidGuard</name>
-        <descr>High performance Web proxy Guard</descr>
-        <website>http://www.squidguard.org/</website>
-        <category>Network Management</category>
-        <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/releases/i386/5.3-RELEASE/packages/All</depends_on_package_base_url>
-        <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
-        <version>1.2.0_1</version>
-        <status>Alpha Alpha</status>
-        <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
-        <configurationfile>squidGuard.xml</configurationfile>
     </package>
     <package>
 	<name>carp</name>
@@ -215,7 +191,7 @@
     </package>
     <package>
           <name>netio</name>
-          <website>http://freshmeat.net/projects/netio/</website>            
+          <website>http://freshmeat.net/projects/netio/</website>
           <descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and DOS only support TCP/IP) using various different packet sizes.</descr>
           <category>Network Management</category>
           <config_file>http://www.pfsense.com/packages/config/netio.xml</config_file>
@@ -239,17 +215,27 @@
     </package>
   </packages>
     <package>
-          <name>hula</name>
-          <website>http://www.hula-project.org</website>
-          <descr>Hula is a calendar and mail server. We are focused on building a calendar and mail server that people love to use, instead of broadly trying to build
-a "groupware server" that managers want to deploy.</descr>
-          <category>Services</category>
-          <config_file>http://www.pfsense.com/packages/config/hula.xml</config_file>
-          <depends_on_package_base_url>http://www.pfSense.com/packages/All/</depends_on_package_base_url>
-          <depends_on_package>hula.tgz</depends_on_package>
-          <verifyinstalledpkg>""</verifyinstalledpkg>
-          <version>0.1</version>
-          <status>ALPHA-ALPHA</status>
-          <configurationfile>hula.xml</configurationfile>
+	<name>squid</name>
+	<descr>High performance Web proxy cache</descr>
+	<website>http://www.squid-cache.org/</website>
+	<category>Network Management</category>
+	<depends_on_package_base_url>http://www.pfSense.com/packages/All</depends_on_package_base_url>
+	<depends_on_package>squid-2.5.7_5.tbz</depends_on_package>
+	<version>2.5.7_5</version>
+	<status>BETA</status>
+	<config_file>http://www.pfsense.com/packages/config/squid.xml</config_file>
+	<configurationfile>squid.xml</configurationfile>
+    </package>
+    <package>
+        <name>squidGuard</name>
+        <descr>High performance Web proxy Guard</descr>
+        <website>http://www.squidguard.org/</website>
+        <category>Network Management</category>
+        <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/releases/i386/5.3-RELEASE/packages/All</depends_on_package_base_url>
+        <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
+        <version>1.2.0_1</version>
+        <status>Alpha Alpha</status>
+        <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
+        <configurationfile>squidGuard.xml</configurationfile>
     </package>
 </pfsensepkgs>
