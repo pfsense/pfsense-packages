@@ -4,6 +4,12 @@
 	<title>iperf: Server</title>
 	<donotsave>true</donotsave>
 	<preoutput>yes</preoutput>
+	<menu>
+		<name>iperf</name>
+		<tooltiptext>Run iperf in client or server mode.</tooltiptext>
+		<section>Diagnostics</section>
+		<configfile>iperf.xml</configfile>
+	</menu>
 	<tabs>
 		<tab>
 			<text>Client</text>
