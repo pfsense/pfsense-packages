@@ -89,18 +89,6 @@
 	<configurationfile>postfix.xml</configurationfile>
     </package>
     <package>
-	<name>powerdns</name>
-	<descr>PowerDNS (AKA pdns) is an advanced high performance authoritative nameserver with MANY advanced features</descr>
-	<website>http://www.powerdns.com/</website>
-	<category>Network Management</category>
-	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
-	<depends_on_package>powerdns-2.9.16_4.tbz</depends_on_package>
-	<version>2.9.16_4</version>
-	<status>ALPHA (NO GUI)</status>
-	<config_file>http://www.pfsense.com/packages/config/powerdns.xml</config_file>
-	<configurationfile>powerdns.xml</configurationfile>
-    </package>
-    <package>
 	<name>freeradius</name>
 	<website>http://www.freeradius.org/</website>
 	<descr>FreeRADIUS is the premiere open source RADIUS server. It is fast, flexible, configurable, and supports more authentication protocols than many commercial servers. A client entry for localhost with the shared secret "pfsense" is defined on installation for easy integration with the captive portal. This package is currently intended to provide a local user database for captive portal and pptp - it does not employ SQL and is not meant to supplant an external RADIUS server for advanced tasks.</descr>
@@ -227,9 +215,9 @@ test server or link availability and modify translation or routing rules. This p
         <status>ALPHA</status>
         <configurationfile>ifstated.xml</configurationfile>
     </package>
-    <package> 
+    <package>
         <name>ifdepd</name>
-        <descr>The ifdepd daemon implements dependencies between network interfaces in a reliable fashion. If any of the source interfaces fails, ifdepd sets all destination interfaces to state down. If all source interfaces are up, ifdepd sets all destination interfaces to state up.</descr> 
+        <descr>The ifdepd daemon implements dependencies between network interfaces in a reliable fashion. If any of the source interfaces fails, ifdepd sets all destination interfaces to state down. If all source interfaces are up, ifdepd sets all destination interfaces to state up.</descr>
         <website>http://hugo.bmg.gv.at</website>
         <category>Network Management</category>
         <depends_on_package_base_url>http://www.pfSense.com/~colin/All</depends_on_package_base_url>
@@ -242,8 +230,8 @@ test server or link availability and modify translation or routing rules. This p
     <package>
         <name>frickin</name>
         <descr>The Frickin PPTP Proxy allows a Point-to-Point Tunneling Protocol (PPTP) client to connect to a PPTP server through Network Address Translation.</descr>
-        <website>http://www.placid.tv</website>                                                                                                            
-        <category>Services</category>                                 
+        <website>http://www.placid.tv</website>
+        <category>Services</category>
         <version>1.2</version>
         <status>ALPHA</status>
         <config_file>http://www.pfsense.com/packages/config/frickin.xml</config_file>
@@ -269,9 +257,21 @@ test server or link availability and modify translation or routing rules. This p
         <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5-stable/All</depends_on_package_base_url>
         <depends_on_package>arpwatch-2.1.a13.tbz</depends_on_package>
         <version>2.1.a13</version>
-        <status>ALPHA</status>                                                      
-        <config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>                     
+        <status>ALPHA</status>
+        <config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
         <configurationfile>arpwatch.xml</configurationfile>
     </package>
   </packages>
+    <package>
+	<name>powerdns</name>
+	<descr>PowerDNS (AKA pdns) is an advanced high performance authoritative nameserver with MANY advanced features</descr>
+	<website>http://www.powerdns.com/</website>
+	<category>Network Management</category>
+	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
+	<depends_on_package>powerdns-2.9.16_4.tbz</depends_on_package>
+	<version>2.9.16_4</version>
+	<status>ALPHA (NO GUI)</status>
+	<config_file>http://www.pfsense.com/packages/config/powerdns.xml</config_file>
+	<configurationfile>powerdns.xml</configurationfile>
+    </package>
 </pfsensepkgs>
