@@ -66,6 +66,22 @@
       <config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
       <configurationfile>stunnel.xml</configurationfile>
     </package>
+    
+    <package>
+      <name>carp</name>
+      <descr>CARP is a tool to help achieve system redundancy, by having multiple computers creating a single, virtual network interface between them, so that if any machine fails, another can respond instead, and/or allowing a degree of load sharing between systems. CARP is an improvement over the Virtual Router Redundancy Protocol (VRRP) standard. It was developed after VRRP was deemed to be not free enough because of a possibly-overlapping Cisco patent.</descr>
+      <website>http://www.openbsd.org/faq/faq6.html#CARP</website>
+      <category>Network Management</category>
+      <!--
+      <depends_on_package_base_url></depends_on_package_base_url>
+      <depends_on_package>powerdns-2.9.16_4.tbz</depends_on_package>
+      -->
+      <version></version>
+      <status>ALPHA</status>
+      <config_file>http://www.pfsense.com/packages/config/carp.xml</config_file>
+      <configurationfile>carp.xml</configurationfile>
+    </package>
+        
     <package>
       <name>powerdns</name>
       <descr>PowerDNS (AKA pdns) is an advanced high performance authoritative nameserver with MANY advanced features</descr>
@@ -74,7 +90,7 @@
       <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
       <depends_on_package>powerdns-2.9.16_4.tbz</depends_on_package>
 	  <version>2.9.16_4</version>
-	  <status>Beta</status>
+	  <status>ALPHA (NO GUI)</status>
       <config_file>http://www.pfsense.com/packages/config/powerdns.xml</config_file>
       <configurationfile>powerdns.xml</configurationfile>
     </package>
