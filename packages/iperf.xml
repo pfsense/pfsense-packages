@@ -79,7 +79,7 @@
 		<field>
 			<fielddescr>Buffer length</fielddescr>
 			<fieldname>length</fieldname>
-			<description>Enter the length of buffers to read or write here. (default 8KB for TCP, 1470B for UDP)
+			<description>Enter the length of buffers to read or write here. (default 8KB for TCP, 1470B for UDP)</description>
 			<type>input</type>
 		</field>
 		<field>
