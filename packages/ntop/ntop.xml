@@ -17,6 +17,17 @@
 		<url>http://$myurl:3000</url>
 		<section>Services</section>
 	</menu>
+	<tabs>
+		<tab>
+			<text>NTop Settings</text>
+			<url>/pkg_edit.php?xml=ntop.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>NTop</text>
+			<url>http://$myurl:3000</url>
+		</tab>
+	</tabs>
         <!-- Do not save invokes a simple input menu and will not update
              the configuration database. -->
 	<fields>
