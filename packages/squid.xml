@@ -49,14 +49,17 @@
 		system("/bin/mkdir /usr/local/squid");
 		system("/bin/mkdir /usr/local/squid/cache");
 		system("/bin/mkdir /usr/local/etc/squid/errors");
-		system("/usr/bin/touch /usr/local/etc/squid/errors/English");
+        system("/usr/bin/touch /usr/local/etc/squid/errors/English");
 		system("/usr/bin/touch /usr/local/etc/squid/icons");
 		system("/bin/mkdir /usr/local/libexec/squid");
-		system("/usr/bin/touch /usr/local/libexec/squid/unlinkd");
-		system("/usr/sbin/chown -R squid:squid /usr/local/squid");
+        system("/usr/bin/touch /usr/local/libexec/squid/unlinkd");
+		system("/usr/sbin/chown -R 750 /usr/local/libexec/squid");
+        system("/usr/sbin/chown -R squid:squid /usr/local/squid");
 		system("/usr/sbin/chown -R squid:squid /usr/local/etc/squid");
 		system("/usr/sbin/chown -R squid:squid /usr/local/libexec/squid");
-		system("/usr/local/sbin/squid -z");
+		system("/usr/sbin/chown -R 750 /usr/local/squid");
+        system("/usr/sbin/chown -R 750 /usr/local/etc/squid");
+        system("/usr/local/sbin/squid -z");
 		system("/usr/local/sbin/squid");
 		filter_configure();
 	</custom_php_install_command>
