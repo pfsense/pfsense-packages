@@ -250,7 +250,7 @@
 		fwrite($fout, "/etc/rc.filter_configure");
 		fclose($fout);
 		mwexec("chmod a+x /usr/local/etc/rc.d/carp.sh");
-		system("/usr/local/etc/rc.d/carp.sh >/dev/null &amp;");
+		system("/usr/local/etc/rc.d/carp.sh >/dev/null 2>&amp;1 &amp;");
 		if($using_arp_balance == 1) mwexec("sysctl net.inet.arpbalance=1");
 		if($preempt == 1) mwexec("sysctl net.inet.carp.preempt=1");
 		conf_mount_ro();
