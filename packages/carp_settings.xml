@@ -17,7 +17,7 @@
 	<tabs>
 	    <tab>
 		<text>CARP Virtual IPs</text>
-		<xml>carp.xml</xml>
+		<url>/pkg.php?xml=carp.xml</url>
 	    </tab>
 	    <tab>
 		<text>CARP Status</text>

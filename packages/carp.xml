@@ -236,8 +236,8 @@
 		    /*
 		     * user has selected pfsync, bring it up.
 		     */
-		    $carp_sync_int = convert_friendly_interface_to_real_interface_name($config['installedpackages']['carpsettings']['config']['pfsyncinterface']);
-		    $carp_sync_ip  = $config['installedpackages']['carpsettings']['config']['pfsyncip'];
+		    $carp_sync_int = convert_friendly_interface_to_real_interface_name($config['installedpackages']['package']['carpsettings']['config']['pfsyncinterface']);
+		    $carp_sync_ip  = $config['installedpackages']['package']['carpsettings']['config']['pfsyncip'];
 		    fwrite($fout, "/sbin/ifconfig pfsync0 create\n");
 		    fwrite($fout, "/sbin/ifconfig pfsync0 {$carp_sync_ip}/24\n");
 		    fwrite($fout, "/sbin/ifconfig pfsync0 up syncif " . carp_sync_ip . "\n");
@@ -245,9 +245,9 @@
 		}
 		$using_arp_balance = 0;
 		$preempt = 0;
-		if($config['installedpackages']['carpsettings']['premption'] != "")
+		if($config['installedpackages']['package']['carpsettings']['premption'] != "")
 			$preempt = 1;
-		if($config['installedpackages']['carpsettings']['balancing'] != "")
+		if($config['installedpackages']['package']['carpsettings']['balancing'] != "")
 			$using_arp_balance = 1;
 		fwrite($fout, "/etc/rc.filter_configure");
 		fclose($fout);
