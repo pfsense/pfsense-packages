@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-        <name>squidsettings</name>
+        <name>squid</name>
         <version>2.5.7_5</version>
 	<title>Squid: Settings</title>
         <menu>
@@ -58,7 +58,7 @@
 			conf_mount_rw();
 			config_lock();
 			global $config;
-			if ($_POST[0] == "") $_POST = $config['installedpackages']['package']['squidsettings']['config'];
+			if ($_POST[0] == "") $_POST = $config['installedpackages']['package']['squid']['config'];
 			write_squid_static_config();
 			$fout = fopen("/usr/local/etc/squid/squid.conf", "a");
 			if ($_POST['cache_size'] != "") fwrite($fout, "cache_mem " . $_POST['cache_size'] . " MB\n");
