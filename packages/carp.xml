@@ -50,7 +50,7 @@
 			<type>checkbox</type>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Premption</fielddescr>
+			<fielddescr>Preemption</fielddescr>
 			<fieldname>premption</fieldname>
 			<type>checkbox</type>
 		</columnitem>
