@@ -63,6 +63,12 @@
 			<description>Enter a whitespace-delimited list of the IP addresses or hostnames *from* which this user may connect. Addresses may be unique or expressed as ranges using CIDR notation.</description>
 			<type>input</type>
 		</field>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter a description for this user here.</description>
+			<type>input</type>
+		</field>
 	</fields>
 	<custom_php_command_before_form>
 	function sync_package_doorman_users() {
