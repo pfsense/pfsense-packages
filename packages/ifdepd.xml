@@ -1,0 +1,63 @@
+<packagegui>
+    <name>ifdepd</name>
+    <version>20050303</version>
+    <title>ifdepd: Settings</title>
+    <menu>
+	<name>ifdepd</name>
+	<tooltiptext>Modify ifdepd settings.</tooltiptext>
+	<section>Services</section>
+	<configfile>ifdepd.xml</configfile>
+	<url>/pkg_edit.php?xml=ifdepd.xml&amp;id=0</url>
+    </menu>
+    <aftersaveredirect>pkg_edit.php?xml=ifdepd.xml&amp;id=0</aftersaveredirect>
+    <configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+    <fields>
+	<field>
+		<fielddescr>Use default values</fielddescr>
+		<fieldname>usedefaults</fieldname>
+		<description>If this is checked ifdepd will monitor the WAN and LAN interfaces for connectivity and will disable carp0 and carp1 upon their failure.</description>
+		<type>checkbox</type>
+	</field>
+	<field>
+		<fielddescr>Source interfaces</fielddescr>
+		<fieldname>srcinterface</fieldname>
+		<description>Enter a colon seperated list of interfaces to monitor for connectivity. You must use the physical interface names.</description>
+		<type>input</type>
+	</field>
+	<field>
+		<fielddescr>Destination interfaces</fielddescr>
+		<fieldname>destinterface</fieldname>
+		<description>Enter a colon seperated list of interfaces to disable once one of the source interfaces loses connectivity. You must specify physical interface names.</description>
+		<type>input</type>
+	</field>
+    </fields>
+    <custom_php_install_command>
+	unlink_if_exists("/usr/local/etc/rc.d/ifdep*");
+    </custom_php_install_command>
+    <custom_add_php_command>
+	function sync_package_ifdepd() {
+		conf_mount_rw();
+		config_lock();
+		global $config;
+		if ($_POST[0] == "") $_POST = $config['installedpackages']['ifdepd']['config'];
+		if($config['installedpackages']['ifdepd']['config'] != "") {
+			$fout = fopen("/usr/local/etc/rc.d/ifdepd.sh","w");
+			fwrite($fout, "#!/bin/sh\n\n");
+			if(isset($_POST['usedefaults'])) {
+				$lan_int = $config['interfaces']['lan']['if'];
+				$wan_int = $config['interfaces']['wan']['if'];
+				fwrite($fout, "/usr/local/bin/ifdepd -d -S " . $lan_int . ":" . $wan_int . " -D carp0:carp1\n");
+			} else {
+				fwrite($fout, "/usr/local/bin/ifdepd -d -S " . $_POST['srcinterface'] . " -D " . $_POST['destinterface'] . "\n");
+			}
+			fclose($fout);
+		}
+		conf_mount_ro();
+		config_unlock();
+	}
+	sync_package_ifdepd();
+	mwexec("/usr/bin/killall ifdepd");
+	mwexec("/usr/local/etc/rc.d/ifdepd.sh");
+    </custom_add_php_command>
+</packagegui>
+
