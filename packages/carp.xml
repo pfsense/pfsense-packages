@@ -50,12 +50,6 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Virtual IP Password</fielddescr>
-			<fieldname>password</fieldname>
-			<description>Enter the VHID group password.</description>
-			<type>password</type>
-		</field>
-		<field>
 			<fielddescr>Virtual IP Netmask</fielddescr>
 			<fieldname>netmask</fieldname>
 			<description>Enter the IP Address's netmask that you would like to share on both machines</description>
@@ -95,6 +89,12 @@
 			    <option><value>30</value><name>31</name></option>
 			    <option><value>30</value><name>32</name></option>
 			</options>
+		</field>
+		<field>
+			<fielddescr>Virtual IP Password</fielddescr>
+			<fieldname>password</fieldname>
+			<description>Enter the VHID group password.</description>
+			<type>password</type>
 		</field>
 		<field>
 			<fielddescr>VHID Group</fielddescr>

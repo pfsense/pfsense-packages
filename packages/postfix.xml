@@ -53,9 +53,9 @@
             <template>
                 <filename>/usr/local/etc/postfix/main.cf</filename>
                 <templatecontents>
-myhostname = hostname_fieldvalue\n
-mydomain = primarydomain_fieldvalue\n
-relay_domains = domain_fieldvalue[ ]\n
+myhostname = hostname_fieldvalue \n
+mydomain = primarydomain_fieldvalue \n
+relay_domains = domain_fieldvalue[ ] \n
                 </templatecontents>
             </template>
             <template>
