@@ -17,7 +17,7 @@
 		<name>NTop</name>
 		<tooltiptext>Access ntop</tooltiptext>
 		<url>http://$myurl:3000</url>
-		<section>Services</section>
+		<section>Diagnostics</section>
 	</menu>
 	<tabs>
 		<tab>
