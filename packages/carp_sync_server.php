@@ -35,7 +35,7 @@ require_once("xmlparse_pkg.inc");
 require_once("filter.inc");
 
 if($config['installedpackages']['carpsettings']['config'] != "") {
-	$rules = return_filename_as_string("{$g['tmp_path']}/rules_section.txt");
+	$rules = return_filename_as_string("{$g['tmp_path']}/filter_section.txt");
 	$aliases = return_filename_as_string("{$g['tmp_path']}/aliases_section.txt");
 	$nat = return_filename_as_string("{$g['tmp_path']}/nat_section.txt");
 	$trafficshaper = return_filename_as_string("{$g['tmp_path']}/shaper_section.txt");
