@@ -79,6 +79,8 @@
 	</fields>
 	<custom_php_command_before_form>
 	    function sync_package() {
+		conf_mount_rw();
+		config_lock();
 		global $config;
 		$fd = fopen("/usr/local/etc/spamd.conf","w");
 		/* all header */
@@ -106,6 +108,8 @@
 		    fwrite($fd, $spamd['ip'] . "\n");
 		}
 		fclose($fd);
+		conf_mount_ro();
+		config_unlock();
 	    }
 	</custom_php_command_before_form>
 	<custom_php_resync_config_command>
@@ -119,6 +123,7 @@
 	    mwexec("/usr/libexec/spamd-setup &amp;");
 	    mwexec("/usr/libexec/spamlogd &amp;");
 	    $fd = fopen("/usr/local/etc/rc.d/spamd","w");
+	    fwrite($fd, "#!/bin/sh\n\n");
 	    fwrite($fd, "/usr/libexec/spamd-setup &amp;\n");
 	    fwrite($fd, "/usr/libexec/spamlogd &amp;\n");
 	    fclose($fd);
