@@ -24,7 +24,7 @@
 		<field>
 			<fielddescr>Port</fielddescr>
 			<fieldname>port</fieldname>
-			<description>Enter the port that iperf will connect to. (default 5001)</description>
+			<description>Enter the port that netio will bind to. (default 18767)</description>
 			<type>input</type>
 		</field>
 	</fields>
