@@ -32,7 +32,7 @@ if($config['installedpackages']['carpsettings']['config'] != "") {
 	if($carp['synchronizerules'] <> "" and $carp['synchronizetoip'] <> "" ) {
 	    /* lets sync! */
 	    $synchronizetoip = $carp['synchronizetoip'];
-	    $current_rules_section = backup_config_section("rules");
+	    $current_rules_section = backup_config_section("filter");
 	    $current_nat_section = backup_config_section("nat");
 	    $current_aliases_section = backup_config_section("aliases");
 	    /* generate firewall rules xml */

@@ -40,9 +40,9 @@ if($config['installedpackages']['carpsettings']['config'] != "")
 	    $rules = return_filename_as_string("{$g['tmp_path']}/rules_section.txt");
 	    $aliases = return_filename_as_string("{$g['tmp_path']}/aliases_section.txt");
 	    $nat = return_filename_as_string("{$g['tmp_path']}/nat_section.txt");
-	    restore_config_section("rules", $rules);
-	    restore_config_section("nat", $nat);
+	    restore_config_section("filter", $rules);
 	    restore_config_section("aliases", $aliases);
+	    restore_config_section("nat", $nat);
 	    filter_configure();
 	}
 
