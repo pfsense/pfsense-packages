@@ -19,6 +19,7 @@
 			<fieldname>connections</fieldname>
 			<description>Maximum number of clients allowed</description>
 			<type>input</type>
+			<validationtype>number</validationtype>
 		</field>
 		<field>
 			<fielddescr>Maximum connections per ip address</fielddescr>
@@ -31,12 +32,14 @@
 			<fieldname>connectionsperip</fieldname>
 			<description>Maximum number of clients allowed to connect per ip address</description>
 			<type>input</type>
+			<validationtype>number</validationtype>
 		</field>
 		<field>
 			<fielddescr>Upload cutoff threshold</fielddescr>
 			<fieldname>cutoffthreshold</fieldname>
 			<description>Disallow  upload  if the partition is more than percentage full.</description>
 			<type>input</type>
+			<validationtype>number</validationtype>
 		</field>
 		<field>
 			<fielddescr>Begin tcp port range</fielddescr>
@@ -49,18 +52,21 @@
 			<fieldname>endport</fieldname>
 			<description>Specify that client connections end at this port.</description>
 			<type>input</type>
+			<validationtype>number</validationtype>
 		</field>
 		<field>
 			<fielddescr>Limit upload bandwidth</fielddescr>
 			<fieldname>uploadbw</fieldname>
 			<description>Limit the upload bandwdith.</description>
 			<type>input</type>
+			<validationtype>number</validationtype>
 		</field>
 		<field>
 			<fielddescr>Limit download bandwidth</fielddescr>
 			<fieldname>downloadbw</fieldname>
 			<description>Limit the download bandwdith.</description>
 			<type>input</type>
+			<validationtype>number</validationtype>
 		</field>
 		<field>
 			<fielddescr>Client File Deletion</fielddescr>
