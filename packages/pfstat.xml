@@ -3,14 +3,14 @@
 	<name>pfstat</name>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
-		<name>PFStat</name>
+		<name>PFStat Settings</name>
 		<tooltiptext>pfstat is a small utility that collects packet filter statistics and produces graphs.</tooltiptext>
 		<section>Services</section>
 	</menu>
 	<menu>
 		<name>PFStat Graphs</name>
 		<tooltiptext>pfstat is a small utility that collects packet filter statistics and produces graphs.</tooltiptext>
-		<url>/pfstat/</url>
+		<url>/pfstat/</url>actually
 		<section>Services</section>
 	</menu>	
 	<!-- configpath gets expanded out automatically and config items will be
