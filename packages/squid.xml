@@ -53,12 +53,12 @@
 		system("/usr/bin/touch /usr/local/etc/squid/icons");
 		system("/bin/mkdir /usr/local/libexec/squid");
         system("/usr/bin/touch /usr/local/libexec/squid/unlinkd");
-		system("/usr/sbin/chown -R 750 /usr/local/libexec/squid");
+		system("/bin/chmod -R 750 /usr/local/libexec/squid");
         system("/usr/sbin/chown -R squid:squid /usr/local/squid");
 		system("/usr/sbin/chown -R squid:squid /usr/local/etc/squid");
 		system("/usr/sbin/chown -R squid:squid /usr/local/libexec/squid");
-		system("/usr/sbin/chown -R 750 /usr/local/squid");
-        system("/usr/sbin/chown -R 750 /usr/local/etc/squid");
+		system("/bin/chmod -R 750 /usr/local/squid");
+        system("/bin/chmod -R 750 /usr/local/etc/squid");
         system("/usr/local/sbin/squid -z");
 		system("/usr/local/sbin/squid");
 		filter_configure();
