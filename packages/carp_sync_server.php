@@ -44,6 +44,9 @@ if($config['installedpackages']['carpsettings']['config'] != "")
 	    restore_config_section("aliases", $aliases);
 	    restore_config_section("nat", $nat);
 	    filter_configure();
+	    unlink("{$g['tmp_path']}/rules_section.txt");
+	    unlink("{$g['tmp_path']}/aliases_section.txt");
+	    unlink("{$g['tmp_path']}/nat_section.txt");	    
 	}
 
 ?>

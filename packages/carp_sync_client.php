@@ -52,6 +52,9 @@ if($config['installedpackages']['carpsettings']['config'] != "") {
 	    mwexec("/usr/bin/scp {$g['tmp_path']}/aliases_section.txt root@{$synchronizetoip}:/tmp/");
 	    mwexec("/usr/bin/scp {$g['tmp_path']}/nat_section.txt root@{$synchronizetoip}:/tmp/");
 	    mwexec("/usr/bin/ssh {$synchronizetoip} /usr/local/pkg/carp_sync_server.php");
+	    unlink("{$g['tmp_path']}/rules_section.txt");
+	    unlink("{$g['tmp_path']}/aliases_section.txt");
+	    unlink("{$g['tmp_path']}/nat_section.txt");
 	}
     }
 }
