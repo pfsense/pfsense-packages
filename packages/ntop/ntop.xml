@@ -62,7 +62,6 @@
                     $ifaces=$_POST['iface'];
                     $isfirst = 0;
                     $lan = $config['interfaces']['lan']['if'];
-                    /* $ifaces = split(" ", $ifaces); */
                     foreach($ifaces as $if)
                     {
                             if($isfirst == 1) $if_final .= ",";
@@ -72,7 +71,6 @@
                     if($if_final == "") {
                         $if_final = $lan;
                     }
-                    echo "Using interface(s): " . $if_final . "\n";
                     exec("/usr/local/bin/ntop --set-admin-password=" . $_POST['password']);
                     mwexec("killall ntop 2>/dev/null");
                     $fout = fopen("/usr/local/etc/rc.d/ntop.sh","w");
