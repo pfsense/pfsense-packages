@@ -63,8 +63,8 @@
                 <filename>/usr/local/etc/postfix/main.cf</filename>
             </template>
             <templatecontents>
-                myhostname = hostname
-                mydomain = primarydomain
+                myhostname = hostname\n
+                mydomain = primarydomain\n
                 relay_domains = domain
             </templatecontents>
             <template>
