@@ -129,6 +129,7 @@
 	    fwrite($fd, "/usr/libexec/spamd-setup &amp;\n");
 	    fwrite($fd, "/usr/libexec/spamlogd &amp;\n");
 	    fclose($fd);
+	    system("chmod a+x /usr/local/etc/rc.d/spamd 2>/dev/null");
 	    system("/usr/local/etc/rc.d/spamd 2>/dev/null");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
