@@ -116,8 +116,5 @@
                         <description>Enter the webGUI password of the system that you would like to synchronize with.</description>
                         <type>input</type>
                 </field>
-		<field>
-			<note>Note: CARP sync is currently only supported over http connections - make sure the remote system's WebGUI protocol is set to this!</note>
-		</field>
 	</fields>
 </packagegui>
