@@ -201,7 +201,6 @@
           <status>ALPHA</status>
           <configurationfile>siproxd.xml</configurationfile>
     </package>
-  </packages>
     <package>
 	  <name>hula</name>
 	  <website>http://www.hula-project.org</website>
@@ -227,5 +226,5 @@
           <status>ALPHA</status>
           <configurationfile>netio.xml</configurationfile>
     </package>
-
+  </packages>
 </pfsensepkgs>
