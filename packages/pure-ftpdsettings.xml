@@ -76,8 +76,8 @@
 	</fields>
 	<custom_php_install_command>
 	</custom_php_install_command>
-	<custom_deinstall_php_command>
-	</custom_deinstall_php_command>
+	<custom_php_deinstall_command>
+	</custom_php_deinstall_command>
 	<custom_add_php_command>
 		mwexec("rm /usr/local/etc/rc.d/pure-ftp*");
 		$fout = fopen("/usr/local/etc/rc.d/pure-ftpd.sh","w");

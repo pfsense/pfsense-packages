@@ -42,9 +42,9 @@
 		exit;
 	    }
         </custom_add_php_command>
-	<custom_deinstall_php_command>
+	<custom_php_deinstall_command>
 		mwexec("/usr/bin/killall ntop");
-	</custom_deinstall_php_command>
+	</custom_php_deinstall_command>
 	<custom_php_install_command>
 	    system("rm /usr/local/etc/rc.d/ntop.sh");
 	    $fout = fopen("/usr/local/etc/rc.d/ntop.sh","w");

@@ -69,10 +69,10 @@
 		mwexec("chmod a+x /usr/local/etc/rc.d/pure-ftpd.sh");
 		mwexec("/usr/local/etc/rc.d/pure-ftpd.sh");
 	</custom_php_install_command>
-	<custom_deinstall_php_command>
+	<custom_php_deinstall_command>
 		mwexec("/usr/bin/killall pure-ftpd");
 		system("rm -rf /usr/local/etc/pure*");
-	</custom_deinstall_php_command>
+	</custom_php_deinstall_command>
 	<custom_add_php_command>
 		$expires = "";
 		if($_POST['expiration']) $expires = " -e " . $_POST['expiration'];

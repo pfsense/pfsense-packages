@@ -49,6 +49,8 @@
                     <type>checkbox</type>
                 </field>
         </fields>
+		<custom_php_deinstall_command>
+		</custom_php_deinstall_command>
         <custom_add_php_command>
             $nmap_options = "";
             if($_POST['option'] == "-sT: TCP connect() scan.") $nmap_options .= " -sT";
