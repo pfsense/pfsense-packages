@@ -11,6 +11,10 @@
 		<section>Services</section>
 		<configfile>pure-ftpd.xml</configfile>
 	</menu>
+	<rendevouz>
+	    <name>pfSense pureFTPD server</name>
+	    <protocol>ftp</protocol>
+	</rendevouz>
 	<menu>
 		<name>Pure FTPD Settings</name>
 		<tooltiptext>Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerability, it is trivial to set up, and it is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</tooltiptext>
@@ -75,6 +79,7 @@
 	<custom_php_deinstall_command>
 		mwexec("/usr/bin/killall pure-ftpd");
 		system("rm -rf /usr/local/etc/pure*");
+		system("rm -rf /usr/local/etc/rc.d/pure*");
 	</custom_php_deinstall_command>
 	<custom_add_php_command>
 		conf_mount_rw();
