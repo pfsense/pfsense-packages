@@ -177,6 +177,18 @@
 	  <configurationfile>pfflowd.xml</configurationfile>
     </package>
     <package>
+	  <name>assp</name>
+	  <website>http://assp.sourceforge.net</website>
+	  <descr></descr>
+	  <category>Network Management</category>
+	  <config_file>http://www.pfsense.com/packages/config/assp.xml</config_file>
+	  <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5-stable/All/</depends_on_package_base_url>
+	  <depends_on_package>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5-stable/All/perl-5.8.6_2.tbz</depends_on_package>
+	  <version>0.1</version>
+	  <status>ALPHA</status>
+	  <configurationfile>assp.xml</configurationfile>
+    </package>
+    <package>
           <name>siproxd</name>
           <website>http://siproxd.sourceforge.net/</website>
           <descr>Siproxd is a proxy/masquerading daemon for the SIP protocol. It handles registrations of SIP clients on a private IP network and performs rewriting of the SIP message bodies to make SIP connections possible via a masquerading firewall. It allows SIP clients (like kphone, linphone) to work behind an IP masquerading firewall or router.</descr>
