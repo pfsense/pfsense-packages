@@ -86,7 +86,7 @@
 		fwrite($fd, "# package management system\n\n");
 		fwrite($fd, "all:whitelist:\\\n\t");
 		foreach($config['installedpackages']['spamd']['config'] as $spamd) {
-		    fwrite($fd, ":" . $spamd['provider_name'];
+		    fwrite($fd, ":" . $spamd['provider_name']);
 		}
 		fwrite($fd, "whitelist:\\ \n");
 		fwrite($fd, ":white:\\ \n");
@@ -97,7 +97,7 @@
 		    fwrite($fd, ":" . $spamd['provider_method'] . ":\\ \n");
 		    fwrite($fd, ":msg=\"" . $spamd['reject_message'] . "\":\\ \n":
 		    fwrite($fd, ":" . $spamd['provider_method'] . ":\\ \n");
-		    fwrite($fd, ":file=" . $spamd['provider_url'] . ":\n\m");
+		    fwrite($fd, ":file=" . $spamd['provider_url'] . ":\n\n");
 		}
 		fwrite($fd, ":\n\n");
 		fclose($fd);
