@@ -259,6 +259,7 @@
 			  if($carp['balancing'] == "true") $using_arp_balance = 1;
 			  if($carp['preempt'] == "true") $using_preempt = 1;
 			  fwrite($fout, $carp_command . "\n");
+			  fwrite($fout, "/sbin/ifconfig carp{$carp_instances_counter} up\n");
 			  if($carp['pfsync'] != "") $pfsync = 1;
 			  if($pfsync != 0) {
 			      /*
