@@ -25,7 +25,11 @@
 	</tabs>
 	<additional_files_needed>
 		<item>http://www.pfsense.com/packages/config/freeradiusclients.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
 		<item>http://www.pfsense.com/packages/config/freeradiussettings.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
 		<item>http://www.pfsense.com/packages/config/freeradiusconfig.tgz</item>
 	</additional_files_needed>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
