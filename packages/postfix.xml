@@ -61,16 +61,16 @@
         <templates>
             <template>
                 <filename>/usr/local/etc/postfix/main.cf</filename>
+                <templatecontents>
+                    myhostname = hostname\n
+                    mydomain = primarydomain\n
+                    relay_domains = domain
+                </templatecontents>
             </template>
-            <templatecontents>
-                myhostname = hostname\n
-                mydomain = primarydomain\n
-                relay_domains = domain
-            </templatecontents>
             <template>
                 <filename>/usr/local/etc/postfix/transport</filename>
+                <templatecontents>domain smtp:[mailserverip]</templatecontents>
             </template>
-            <templatecontents>domain smtp:[mailserverip]</templatecontents>
         </templates>
         
                 
