@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>nmap</name>
-        <donotsave>true</donotsave>
-        <preoutput>yes</preoutput>
-        <savetext>Scan</savetext>
+	<donotsave>true</donotsave>
+	<preoutput>yes</preoutput>
+	<savetext>Scan</savetext>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>NMap</name>
@@ -42,7 +42,7 @@
                 </field>
                 <field>
                     <fielddescr>-P0</fielddescr>
-                    <typehint>Do not try to ping hosts at all before scanning them.</typehint>                    
+                    <typehint>Do not try to ping hosts at all before scanning them.</typehint>
                     <fieldname>noping</fieldname>
                     <description>This allows the scanning of networks that don't allow ICMP  echo requests  (or  responses) through their firewall.  microsoft.com is an example of such a network, and thus you should always  use -P0  or  -PT80 when portscanning microsoft.com.  Note tht "ping" in this contect may involve more than the traditional ICMP  echo request packet.  Nmap supports many such probes, including arbi- trary combinations of TCP, UDP, and ICMP  probes.   By  default, Nmap sends an ICMP echo request and a TCP ACK packet to port 80.</description>
                     <type>checkbox</type>
@@ -51,7 +51,7 @@
         <custom_add_php_command>
             $nmap_options = "";
             if($_POST['option'] == "-sT: TCP connect() scan.") $nmap_options .= " -sT";
-            if($_POST['option'] == "-sP: Ping canning") $nmap_options .= " -sP";
+            if($_POST['option'] == "-sP: Ping scanning") $nmap_options .= " -sP";
             if($_POST['option'] == "-sU: UDP Scanning") $nmap_options .= " -sU";
             if($_POST['noping']) $nmap_options .= " -P0";
             $nmap_options .= " " . $_POST['hostname'];
