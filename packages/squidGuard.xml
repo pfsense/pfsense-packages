@@ -39,8 +39,8 @@
 	<custom_php_pre_deinstall_command>
         </custom_php_pre_deinstall_command>
 	<custom_php_deinstall_command>
-	    mwexec("/bin/rm -rf /var/log/squidGuard.lovar/log/squidGuard.log
-	    mwexec("/bin/rm -rf /var/db/squidGuard");
+	    unlink_if_exists("/var/log/squidGuard.log");
+	    rmdir_recursive("/var/db/squidGuard");
 	    sync_package("squid");
 	    system("/usr/local/sbin/squid -k reconfigure");
         </custom_php_deinstall_command>
