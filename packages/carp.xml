@@ -10,7 +10,7 @@
 	</menu>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->
-	<configpath>['carp']</configpath>
+	<configpath>['installedpackages']['carp']['config']</configpath>
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>VHID Group</fielddescr>
@@ -43,8 +43,49 @@
 		<field>
 			<fielddescr>Virtual IP Address</fielddescr>
 			<fieldname>ipaddress</fieldname>
-			<description>Enter the IPAddress that you would like to share on both machines</description>
+			<description>Enter the IP Address that you would like to share on both machines</description>
 			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Virtual IP Netmask</fielddescr>
+			<fieldname>netmask</fieldname>
+			<description>Enter the IP Address's netmask that you would like to share on both machines</description>
+			<type>select</type>
+			<value>24</value>
+			<options>
+			    <option><value>1</value><name>1</name></option>
+			    <option><value>2</value><name>2</name></option>
+			    <option><value>3</value><name>3</name></option>
+			    <option><value>4</value><name>4</name></option>
+			    <option><value>5</value><name>5</name></option>
+			    <option><value>6</value><name>6</name></option>
+			    <option><value>7</value><name>7</name></option>
+			    <option><value>8</value><name>8</name></option>
+			    <option><value>9</value><name>9</name></option>
+			    <option><value>10</value><name>10</name></option>
+			    <option><value>11</value><name>11</name></option>
+			    <option><value>12</value><name>12</name></option>
+			    <option><value>13</value><name>13</name></option>
+			    <option><value>14</value><name>14</name></option>
+			    <option><value>15</value><name>15</name></option>
+			    <option><value>16</value><name>16</name></option>
+			    <option><value>17</value><name>17</name></option>
+			    <option><value>18</value><name>18</name></option>
+			    <option><value>19</value><name>19</name></option>
+			    <option><value>20</value><name>20</name></option>
+			    <option><value>21</value><name>21</name></option>
+			    <option><value>22</value><name>22</name></option>
+			    <option><value>23</value><name>23</name></option>
+			    <option><value>24</value><name>24</name></option>
+			    <option><value>25</value><name>25</name></option>
+			    <option><value>26</value><name>26</name></option>
+			    <option><value>27</value><name>27</name></option>
+			    <option><value>28</value><name>28</name></option>
+			    <option><value>29</value><name>29</name></option>
+			    <option><value>30</value><name>30</name></option>
+			    <option><value>30</value><name>31</name></option>
+			    <option><value>30</value><name>32</name></option>
+			</options>
 		</field>
 		<field>
 			<fielddescr>VHID Group</fielddescr>
@@ -53,7 +94,7 @@
 			<type>select</type>
 			<value>1</value>
 			<options>
-			    <option><value>1</value><name>1 (DEAFULT)</name></option>
+			    <option><value>1</value><name>1 (DEFAULT)</name></option>
 			    <option><value>2</value><name>2</name></option>
 			    <option><value>3</value><name>3</name></option>
 			    <option><value>4</value><name>4</name></option>
@@ -152,11 +193,47 @@
 	</fields>
 	<custom_php_command_before_form>
 	    function sync_package() {
-	      global $config;
-	      /* create /usr/local/etc/rc.d/carp.sh here */
-
-	    }
-	    sync_package();
+	    /*
+	     *  XXX: find out how many carp and pfsync interfaces are established
+	     *       and destroy/down them before sweeping through the list
+	     */
+	    $fout = fopen("/usr/local/etc/rc.d/carp.sh","w");
+	    fwrite($fout, "#!/bin/sh \n");
+	    global $config;
+	    $using_arp_balance = 0;
+	    $using_preempt = 0;
+	    $carp_instances_counter = 0;
+	    $pfsync_instances_counter = 0;
+	    if($config['installedpackages']['carp']['config'] != "") {
+		  foreach($config['installedpackages']['carp']['config'] as $carp) {
+		      $pfsync = 0;
+		      /*
+		       *  create the carp interface
+		       */
+		      system("/sbin/ifconfig carp" . $carp_instances_counter . " create");
+		      $broadcast_address = gen_subnet_max($carp['ipaddress'], $carp['netmask']);
+		      $carp_command = "/sbin/ifconfig carp" . $carp_instances_counter . " " . $carp['ipaddress'] . " " . $carp['netmask'] . " broadcast " . $broadcast_address . " vhid " . $carp['vhid'] . $carp['advskew '] . " pass " . $carp['password'];
+		      if($carp['balancing'] == "true") $using_arp_balance = 1;
+		      if($carp['preempt'] == "true") $using_preempt = 1;
+		      fwrite($fout, $carp_command . "\n");
+		      if($carp['pfsync'] != "") $pfsync = 1;
+		      if($pfsync != 0) {
+			  /*
+			   * user has selected pfsync, bring it up.
+			   */
+			  fwrite($fout, "/sbin/ifconfig pfsync" . $pfsync_instances_counter . " create \n");
+			  fwrite($fout, "/sbin/ifconfig pfsync" . $pfsync_instances_counter . " up syncif " . $carp['synciface'] . "\n");
+			  $pfsync_instances_counter++;
+		      }
+		      $carp_instances_counter++;
+		  }
+	      }
+	      fclose($fout);
+	      system("chmod a+x /usr/local/etc/rc.d/carp.sh");
+	      system("/usr/local/etc/rc.d/carp.sh");
+	      if($using_arp_balance == 1) system("sysctl net.inet.arpbalance=1");
+	      if($preempt == 1) system("sysctl net.inet.carp.preempt=1");
+	      sync_package();
 	</custom_php_command_before_form>
 	<custom_php_resync_config_command>
 	    sync_package();
