@@ -255,7 +255,7 @@
 			    $password = " pass " . $carp['password'];
 			  }
 			  $carp_command = "/sbin/ifconfig carp" . $carp_instances_counter . " " . $carp['ipaddress'] . "/" . $carp['netmask'];
-			  $carp_command .= " broadcast " . $broadcast_address . " vhid " . $carp['vhid'] . $carp['advskew'] . $password;
+			  $carp_command .= " broadcast " . $broadcast_address . " vhid " . $carp['vhid'] . " advskew " . $carp['advskew'] . $password;
 			  if($carp['balancing'] == "true") $using_arp_balance = 1;
 			  if($carp['preempt'] == "true") $using_preempt = 1;
 			  fwrite($fout, $carp_command . "\n");
