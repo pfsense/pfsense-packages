@@ -29,7 +29,7 @@
 
 if($config['installedpackages']['carpsettings']['config'] != "") {
     foreach($config['installedpackages']['carpsettings']['config'] as $carp) {
-	if($carp['synchronizerules'] <> "") {
+	if($carp['synchronizerules'] <> "" and $carp['synchronizetoip'] <> "" ) {
 	    /* lets sync! */
 	    $synchronizetoip = $carp['synchronizetoip'];
 	    $current_rules_section = backup_config_section("rules");
