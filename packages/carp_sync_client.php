@@ -3,7 +3,8 @@
 /*
 	carp_sync.php
         part of pfSense (www.pfSense.com)
-	Copyright (C) 2005 Scott Ullrich (sullrich@gmail.com) and Colin Smith (ethethlay@gmail.com)
+	Copyright (C) 2005 Scott Ullrich (sullrich@gmail.com) and
+        Colin Smith (ethethlay@gmail.com)
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
