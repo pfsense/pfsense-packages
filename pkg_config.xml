@@ -202,7 +202,7 @@
           <configurationfile>siproxd.xml</configurationfile>
     </package>
     <package>
-          <name>netio</name>                                                                                                  
+          <name>netio</name>
           <website>http://freshmeat.net/projects/netio/</website>            
           <descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and DOS only support TCP/IP) using various different packet sizes.</descr>
           <category>Services</category>
