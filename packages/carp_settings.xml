@@ -25,7 +25,7 @@
 	    </tab>
 	    <tab>
 		<text>CARP Settings</text>
-		<url>pkg_edit.php?xml=pure-carp_settings.xml&amp;id=0</url>
+		<url>pkg_edit.php?xml=carp_settings.xml&amp;id=0</url>
 		<active/>
 	    </tab>
 	</tabs>
