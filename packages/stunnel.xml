@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>stunnel</name>
+	<!-- Menu is where this packages menu will appear -->
+	<menu>
+		<name>STunnel</name>
+		<tooltiptext>The stunnel program is designed to work as an SSL encryption wrapper between remote client and local (inetd-startable) or remote server. It can be used to add SSL functionality to commonly used inetd daemons like POP2, POP3, and IMAP servers without any changes in the programs' code. It will negotiate an SSL connection using the OpenSSL or SSLeay libraries. It calls the underlying crypto libraries, so stunnel supports whatever cryptographic algorithms you compiled into your crypto package.</tooltiptext>
+		<section>Services</section>
+	</menu>
+	<!-- configpath gets expanded out automatically and config items will be
+         stored in that location -->
+	<configpath>['installedpackages']['package']['$packagename']['configuration']</configpath>
+	<!-- adddeleteeditpagefields items will appear on the first page where you can add / delete or edit
+         items.  An example of this would be the nat page where you add new nat redirects -->
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Listen on IP</fielddescr>
+			<fieldname>localip</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Listen on Port</fielddescr>
+			<fieldname>localport</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Redirects to IP</fielddescr>
+			<fieldname>redirectip</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Redirects to Port</fielddescr>
+			<fieldname>redirectport</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<!-- fields gets invoked when the user adds or edits a item.   the following items
+         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
+	<fields>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter a description for this redirection.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Listen on IP</fielddescr>
+			<fieldname>localip</fieldname>
+			<description>Enter the local IP address to bind this redirection to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Listen on port</fielddescr>
+			<fieldname>localport</fieldname>
+			<description>Enter the local port to bind this redirection to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Redirects to IP</fielddescr>
+			<fieldname>redirectip</fieldname>
+			<description>Enter the local IP address to redirect this to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Redirects to Port</fielddescr>
+			<fieldname>redirectport</fieldname>
+			<description>Enter the local port to rediect to.</description>
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_php_install_command>
+	    system("mkdir /var/tmp/stunnel 2>/dev/null");
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+	    system("rm -rf /var/tmp/stunnel 2>/dev/null");
+	</custom_php_deinstall_command>
+	<custom_add_php_command>
+			global $config;
+		    $fout = fopen("/usr/local/etc/stunnel.conf","w");
+		    fwrite($fout, "cert = /usr/local/etc/stunnel/mail.pem \n");
+		    fwrite($fout, "chroot = /var/tmp/stunnel \n");
+		    fwrite($fout, "setuid = stunnel \n");
+		    fwrite($fout, "setgid = stunnel \n");
+		    foreach($config['installedpackages']['stunnel']['config'] as $pkgconfig) {
+			fwrite($fout, "\n[" . $pkgconfig['description'] . "]\n");
+			fwrite($fout, "accept = " . $pkgconfig['localip'] . ":" . $pkgconfig['localport'] . "\n");
+			fwrite($fout, "accept = " . $pkgconfig['redirectip'] . ":" . $pkgconfig['redirectport'] . "\n\n");
+		    }
+		    fclose($fout);
+		    system("/usr/bin/killall stunnel 2>/dev/null");
+		    system("/usr/local/sbin/stunnel 2>/dev/null");
+	</custom_add_php_command>
+</packagegui>
