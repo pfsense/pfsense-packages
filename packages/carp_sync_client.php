@@ -1,4 +1,3 @@
-
 /*
 	carp_sync.php
         part of pfSense (www.pfSense.com)
@@ -48,7 +47,7 @@ function carp_sync_xml($url, $password, $section, $section_xml, $method = 'pfsen
 	return true;
 }
 
-if($already_processed != 1)
+if($already_processed != 1) {
     if($config['installedpackages']['carpsettings']['config'] != "" and
       is_array($config['installedpackages']['carpsettings']['config'])) {
 	$already_processed = 1;
@@ -57,24 +56,25 @@ if($already_processed != 1)
 		$synchronizetoip = $carp['synchronizetoip'];
 		if($carp['synchronizerules'] != "" and is_array($config['filter'])) {
 		    $current_rules_section = backup_config_section("filter");
-		    carp_sync_xml($carp['synchronizetoip'], $carp['password'], 'filter', $current_rules_section);
+		    carp_sync_xml($synchronizetoip, $carp['password'], 'filter', $current_rules_section);
 		}
 		if($carp['synchronizenat'] != "" and is_array($config['nat'])) {
 		    $current_nat_section = backup_config_section("nat");
-		    carp_sync_xml($carp['synchronizetoip'], $carp['password'], 'nat', $current_nat_section);
+		    carp_sync_xml($synchronizetoip, $carp['password'], 'nat', $current_nat_section);
 		}
 		if($carp['synchronizealiases'] != "" and is_array($config['aliases'])) {
 		    $current_aliases_section = backup_config_section("aliases");
-		    carp_sync_xml($carp['synchronizetoip'], $carp['password'], 'alias', $current_aliases_section);
+		    carp_sync_xml($synchronizetoip, $carp['password'], 'alias', $current_aliases_section);
 		}
 		if($carp['synchronizetrafficshaper'] != "" and is_array($config['shaper'])) {
 		    $current_shaper_section = backup_config_section("shaper");
-		    carp_sync_xml($carp['synchronizetoip'], $carp['password'], 'shaper', $current_shaper_section);
+		    carp_sync_xml($synchronizetoip, $carp['password'], 'shaper', $current_shaper_section);
 		}
-        	$msg = new XML_RPC_Message('pfsense.filter_configure', array(new XML_RPC_Value($password, 'string')));
+        	$msg = new XML_RPC_Message('pfsense.filter_configure', array(new XML_RPC_Value($carp['password'], 'string')));
         	$cli = new XML_RPC_Client($url, '/xmlrpc.php');
         	$cli->setCredentials('admin', $carp['password']);
         	$cli->send($msg);
 	    }
 	}
     }
+}
