@@ -1,5 +1,6 @@
 <packagegui>
 	<name>freeradius</name>
+	<title>FreeRADIUS: Users</title>
 	<menu>
 		<name>FreeRADIUS</name>
 		<tooltiptext>Modify FreeRADIUS users, clients, and settings.</tooltiptext>

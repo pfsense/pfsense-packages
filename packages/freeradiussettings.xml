@@ -1,5 +1,6 @@
 <packagegui>
 	<name>freeradiussettings</name>
+	<title>FreeRADIUS: Settings</title>
 	<tabs>          
                 <tab>   
                         <text>Users</text>
@@ -21,7 +22,7 @@
 			<fielddescr>Listening Interface(s)</fielddescr>
 			<fieldname>interface</fieldname>
 			<description>Enter the desired listening interface(s) here</description>
-			<type>input</type>
+			<type>interfaces_selection</type>
 		</field>
 		<field>
 			<fielddescr>Port</fielddescr>
@@ -48,12 +49,13 @@
 						$int_ip = find_interface_ip($int);
 						fwrite($fout, "{\nipaddr = " . $int_ip . "\n");
 						if($config['installedpackages']['freeradiussettings']['config']['port'] != "") {
-							fwrite($fout, "port = " . $port . "\n");
+							fwrite($fout, "port = " . $config['installedpackages']['freeradiussettings']['config']['port'] . "\n");
 						} else {
 							fwrite($fout, "port = 0\n");
 						}
-						fwrite($fout, "type = auth\n}";
+						fwrite($fout, "type = auth\n}");
 				}
+			}
 			}
 		 	fclose($fout);
 		}

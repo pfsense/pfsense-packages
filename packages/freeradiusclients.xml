@@ -1,5 +1,6 @@
 <packagegui>
 	<name>freeradiusclients</name>
+	<title>FreeRADIUS: Clients</title>
 	<tabs>          
                 <tab>   
                         <text>Users</text>
