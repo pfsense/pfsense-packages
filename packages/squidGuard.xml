@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>squidGuard</name>
+	<!-- Menu is where this packages menu will appear -->
+	<!-- configpath gets expanded out automatically and config items will be
+         stored in that location -->
+	<configpath>['installedpackages']['squidGuard']['config']</configpath>
+	<fields/>
+	<custom_php_install_command>
+	    echo "&lt;pre&gt;";
+	$fout = fopen("/usr/local/etc/squid/squidGuard.conf","w");
+	    fwrite($fout, "# cat squidGuard.conf\n");
+	    fwrite($fout, "dbhome /var/db/squidGuard\n");
+	    fwrite($fout, "logdir /usr/local/squid/logs\n");
+	    fwrite($fout, "acl {"\n");
+	    fwrite($fout, "\t default {\n");
+	    fwrite($fout, "\t pass all\n");
+	    fwrite($fout, "\t }\n");
+	    fwrite($fout, "}\n");
+        fclose($fout);
+	$fout = fopen("/usr/local/etc/squid/squid.conf","w");
+	    fwrite($fout, "redirect_program /usr/local/bin/squidGuard -c /usr/local/etc/squid/squidGuard.conf\n");
+	    fwrite($fout, "redirect_children 4\n");
+	fclose($fout);
+	exec("/usr/bin/touch /usr/local/squid/logs/squidGuard.log");
+	exec("/usr/sbin/chown squid /usr/local/squid/logs/squidGuard.log");	
+	exec("/usr/bin/chgrp squid /usr/local/squid/logs/squidGuard.log");
+	exec("/bin/chmod 744 /usr/local/squid/logs/squidGuard.log");
+	exec("/usr/sbin/chown -R squid /var/db/squidGuard");
+	exec("/usr/bin/chgrp -R squid /var/db/squidGuard");
+	exec("/bin/chmod -R 755 /var/db/squidGuard");
+	system("/usr/local/sbin/squid -k reconfigure");
+	    filter_configure();
+	</custom_php_install_command>
+	<custom_php_pre_deinstall_command>
+    </custom_php_pre_deinstall_command>
+	<custom_php_deinstall_command>
+        exec("/usr/bin/sed '$d' /usr/local/etc/squid/squid.conf > /tmp/squidtmp.conf");
+        exec("/bin/cp /tmp/squidtmp.conf /usr/local/etc/squid/squid.conf");        
+        exec("/usr/bin/sed '$d' /usr/local/etc/squid/squid.conf > /tmp/squidtmp.conf");
+        exec("/bin/cp /tmp/squidtmp.conf /usr/local/etc/squid/squid.conf");
+	exec("/bin/rm /tmp/squidtmp.conf");
+	exec("/bin/rm -rf /var/db/squidGuard");
+	system("/usr/local/sbin/squid -k reconfigure");
+    </custom_php_deinstall_command>
+	<process_kill_command>squidGuard</process_kill_command>
+</packagegui>
