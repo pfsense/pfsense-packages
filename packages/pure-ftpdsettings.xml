@@ -52,14 +52,14 @@
 		<field>
 			<fielddescr>Limit upload bandwidth</fielddescr>
 			<fieldname>uploadbw</fieldname>
-			<description>Limit the upload bandwdith.</description>
+			<description>Limit the upload bandwdith in KB/s</description>
 			<type>input</type>
 			<validationtype>number</validationtype>
 		</field>
 		<field>
 			<fielddescr>Limit download bandwidth</fielddescr>
 			<fieldname>downloadbw</fieldname>
-			<description>Limit the download bandwdith.</description>
+			<description>Limit the download bandwdith in KB/s</description>
 			<type>input</type>
 			<validationtype>number</validationtype>
 		</field>
@@ -75,7 +75,13 @@
 			<description>NAT  mode. Force active mode. If your FTP server is behind a NAT box that doesn't support applicative FTP proxying, or if you use port  redirection  without  a  transparent  FTP proxy, use this. Well... the previous sentence isn't very clear.  Okay:  if  your network looks like this: FTP--NAT.gateway/router--Internet and  if  you want people coming from the internet to have access to your FTP server, please try without  this  option  first.  If Netscape clients can connect without any problem, your NAT gate-way rulez. If Netscape doesn't display directory listings,  your NAT gateway sucks.</description>
 			<type>checkbox</type>
 		</field>
-	</fields>
+	    <field>
+            <fielddescr>Chroot environment</fielddescr>
+            <fieldname>chroot</fieldname>
+            <description>Allow users (but root) to only see their ~ and no system files.</description>
+            <type>checkbox</type>
+        </field>
+        </fields>
 	<custom_php_install_command>
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
@@ -94,6 +100,7 @@
 		if($_POST['uploadbw'] and $_POST['downloadbw']) $startline .= " -T " . $_POST['uploadbw'] . ":" . $_POST['downloadbw'];;
 		if($_POST['natworkaround']) $startline .= " -N";
 		if($_POST['filedeletion']) $startline .= " -K";
+		if($_POST['chroot']) $startline .= " -A";
 		$startline .= " -B /usr/local/etc/pure-ftpd.conf";
 		fwrite($fout, $startline . "\n");
 		fclose($fout);
@@ -105,3 +112,4 @@
 	<custom_delete_php_command>
 	</custom_delete_php_command>
 </packagegui>
+
