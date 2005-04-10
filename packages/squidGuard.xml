@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>squidGuard</name>
-	<configpath>['installedpackages']['squidGuard']['config']</configpath>
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<custom_php_install_command>
 	    echo "&lt;pre&gt;";
 	    $fout = fopen("/usr/local/etc/squid/squidGuard.conf","w");
