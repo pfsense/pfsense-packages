@@ -33,8 +33,6 @@
 	    mwexec("/bin/chmod -R 755 /var/db/squidGuard");
 	    system("/usr/local/sbin/squid -k reconfigure");
 	</custom_php_install_command>
-	<custom_php_pre_deinstall_command>
-        </custom_php_pre_deinstall_command>
 	<custom_php_deinstall_command>
 	    unlink_if_exists("/var/log/squidGuard.log");
 	    rmdir_recursive("/var/db/squidGuard");
