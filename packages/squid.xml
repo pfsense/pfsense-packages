@@ -70,7 +70,7 @@
 		unlink_if_exists("/usr/local/etc/squid/squid.conf");
 		rmdir_recursive("/usr/local/etc/squid");
 		rmdir_recursive("/usr/local/libexec/squid");
-        filter_configure();
+        	filter_configure();
         </custom_php_deinstall_command>
 	<start_command>/usr/local/etc/rc.d/squid.sh</start_command>
 	<process_kill_command>squid</process_kill_command>
