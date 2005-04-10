@@ -36,7 +36,6 @@
 	    unlink_if_exists("/var/log/squidGuard.log");
 	    rmdir_recursive("/var/db/squidGuard");
 	    sync_package("squid");
-	    system("/usr/local/sbin/squid -k reconfigure");
         </custom_php_deinstall_command>
     	<process_kill_command>squid</process_kill_command>
 </packagegui>
