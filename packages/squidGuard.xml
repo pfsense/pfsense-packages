@@ -16,7 +16,7 @@
 	    fclose($fout);
 	    sync_package("squid");
 	    $fout = fopen("/usr/local/etc/squid/squid.conf","a");
-	    fwrite($fout, "redirect_program /usr/local/bin/squidGuard -c /usr/local/etc/squid/squidGuard.conf\\n");
+	    fwrite($fout, "redirect_program /usr/local/bin/squidGuard -c /usr/local/etc/squid/squidGuard.conf\n");
 	    fwrite($fout, "redirect_children 4\n");
 	    fclose($fout);
 	    mwexec("/usr/bin/touch /usr/local/squid/logs/squidGuard.log");
@@ -30,7 +30,7 @@
 	    mwexec("/usr/sbin/chown -R squid /var/db/squidGuard");
 	    mwexec("/usr/bin/chgrp -R squid /var/db/squidGuard");
 	    mwexec("/bin/chmod -R 755 /var/db/squidGuard");
-	    system("/usr/local/sbin/squid -k reconfigure");
+	    mwexec("/usr/local/sbin/squid -k reconfigure");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 	    unlink_if_exists("/var/log/squidGuard.log");
