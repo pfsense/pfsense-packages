@@ -82,14 +82,16 @@ if($config['installedpackages']['carp']['config'] <> "")
 		$pfsync = $carp['pfsync'];
 		$synciface = $carp['synciface'];
 		$carp_int = find_carp_interface($ipaddress);
+		// XXX - billm - should really 'ifconfig -a |grep carp:' and assign each interface found to an array
+		// using vhid as identifier and pull from that instead of hitting ifconfig every time through this loop
 		$status = get_carp_interface_status($carp_int);
 		if(isset($carp['balancing'])) $balancing = "true"; else $balancing = "false";
-		if(isset($carp['premtpion'])) $premption = "true"; else $premption = "false";
-		if($synciface <> "") $sync_status = get_pfsync_interface_status($synciface);
+		if(isset($carp['premption'])) $premption = "true"; else $premption = "false";
+		// if($synciface <> "") $sync_status = get_pfsync_interface_status($synciface);
 		echo "<tr>";
 		echo "<td class=\"listlr\"><center>" . $carp_int . "</td>";
 		echo "<td class=\"listlr\"><center>" . $ipaddress . "</td>";
-		echo "<td class=\"listlr\"><center>" . $status . "<br>" . $sync_status . "</td>";
+		echo "<td class=\"listlr\"><center>" . $status . "</td>";
 		echo "</tr>";
 	}
 
