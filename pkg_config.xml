@@ -178,18 +178,6 @@
           <configurationfile>doorman.xml</configurationfile>
     </package>
     <package>
-	<name>squid</name>
-	<descr>High performance Web proxy cache</descr>
-	<website>http://www.squid-cache.org/</website>
-	<category>Network Management</category>
-	<depends_on_package_base_url>http://www.pfSense.com/packages/All</depends_on_package_base_url>
-	<depends_on_package>squid-2.5.7_5.tbz</depends_on_package>
-	<version>2.5.7_5</version>
-	<status>Stable</status>
-	<config_file>http://www.pfsense.com/packages/config/squid.xml</config_file>
-	<configurationfile>squid.xml</configurationfile>
-    </package>
-    <package>
         <name>ifstated</name>
         <website>http://www.openbsd.org/</website>
         <descr>The ifstated daemon runs commands in response to network state changes, which it determines by monitoring interface link state or running e
@@ -214,18 +202,6 @@ test server or link availability and modify translation or routing rules. This p
         <status>ALPHA</status>
         <config_file>http://www.pfsense.com/packages/config/ifdepd.xml</config_file>
         <configurationfile>ifdepd.xml</configurationfile>
-    </package>
-    <package>
-        <name>squidGuard</name>
-        <descr>High performance Web proxy Guard</descr>
-        <website>http://www.squidguard.org/</website>
-        <category>Network Management</category>
-        <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/releases/i386/5.3-RELEASE/packages/All</depends_on_package_base_url>
-        <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
-        <version>1.2.0_1</version>
-        <status>ALPHA</status>
-        <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
-        <configurationfile>squidGuard.xml</configurationfile>
     </package>
     <package>
         <name>arpwatch</name>
@@ -275,5 +251,41 @@ test server or link availability and modify translation or routing rules. This p
 	<config_file>http://www.pfsense.com/packages/config/postfix.xml</config_file>
 	<configurationfile>postfix.xml</configurationfile>
     </package>
+    <package>
+        <name>squidGuard</name>
+        <descr>High performance Web proxy Guard</descr>
+        <website>http://www.squidguard.org/</website>
+        <category>Network Management</category>
+        <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/releases/i386/5.3-RELEASE/packages/All</depends_on_package_base_url>
+        <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
+        <version>1.2.0_1</version>
+        <status>ALPHA</status>
+        <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
+        <configurationfile>squidGuard.xml</configurationfile>
+    </package>
+        <package>
+	<name>squid</name>
+	<descr>High performance Web proxy cache</descr>
+	<website>http://www.squid-cache.org/</website>
+	<category>Network Management</category>
+	<depends_on_package_base_url>http://www.pfSense.com/packages/All</depends_on_package_base_url>
+	<depends_on_package>squid-2.5.7_5.tbz</depends_on_package>
+	<version>2.5.7_5</version>
+	<status>Stable</status>
+	<config_file>http://www.pfsense.com/packages/config/squid.xml</config_file>
+	<configurationfile>squid.xml</configurationfile>
+    </package>
+    <package>
+	<name>squid</name>
+	<descr>High performance Web proxy cache</descr>
+	<website>http://www.squid-cache.org/</website>
+	<category>Network Management</category>
+	<depends_on_package_base_url>http://www.pfSense.com/packages/All</depends_on_package_base_url>
+	<depends_on_package>squid-2.5.7_5.tbz</depends_on_package>
+	<version>2.5.7_5</version>
+	<status>Stable</status>
+	<config_file>http://www.pfsense.com/packages/config/squid.xml</config_file>
+	<configurationfile>squid.xml</configurationfile>
+    </package>	
     <!-- END - these packages are inactive -->
 </pfsensepkgs>
