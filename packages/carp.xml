@@ -227,9 +227,9 @@
 			if($carp['pfsyncenabled'] != "") {
 			      $pfsync = 1;
 			      if($carp['premption'] != "")
-				      $preempt = 1;
+					fwrite($fout, "sysctl net.inet.carp.preempt=1\n");
 			      if($carp['balancing'] != "")
-				      $using_arp_balance = 1;
+					fwrite($fout, "sysctl net.inet.arpbalance=1\n");
 			      $carp_sync_int = convert_friendly_interface_to_real_interface_name($carp['pfsyncinterface']);
 			      fwrite($fout, "/sbin/ifconfig pfsync0 create\n");
 			      fwrite($fout, "/sbin/ifconfig pfsync0 syncif " . $carp_sync_int . "\n");
@@ -250,11 +250,8 @@
 			  }
 			  $carp_command = "/sbin/ifconfig carp" . $carp_instances_counter . " " . $carp['ipaddress'] . "/" . $carp['netmask'];
 			  $carp_command .= " broadcast " . $broadcast_address . " vhid " . $carp['vhid'] . " advskew " . $carp['advskew'] . $password;
-			  if($carp['balancing'] == "true") $using_arp_balance = 1;
-			  if($carp['preempt'] == "true") $using_preempt = 1;
 			  fwrite($fout, $carp_command . "\n");
 			  fwrite($fout, "/sbin/ifconfig carp{$carp_instances_counter} up\n");
-			  if($carp['pfsync'] != "") $pfsync = 1;
 			  $carp_instances_counter++;
 		      }
 		  }
@@ -262,8 +259,6 @@
 		fclose($fout);
 		chmod("/usr/local/pkg/pf/carp.sh", 0755);
 		mwexec("/usr/local/pkg/pf/carp.sh");
-		if($using_arp_balance == 1) mwexec("sysctl net.inet.arpbalance=1");
-		if($preempt == 1) mwexec("sysctl net.inet.carp.preempt=1");
 		conf_mount_ro();
 		config_unlock();
 	      }
