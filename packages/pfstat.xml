@@ -263,7 +263,7 @@
 	  sync_package_pfstat();
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
-		system("mkdir -p /usr/local/www/pfstat 2>/dev/null");
+		make_dirs("/usr/local/www/pfstat");
 		system("/usr/bin/killall cron 2>/dev/null");
 		system("/usr/sbin/cron 2>/dev/null");
 	</custom_php_install_command>
