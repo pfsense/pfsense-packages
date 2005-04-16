@@ -216,7 +216,7 @@
 		 */
 		conf_mount_rw();
 		config_lock();
-		if(file_exists("/usr/local/etc/rc.d/carp.sh")) system("rm /usr/local/etc/rc.d/carp.sh");
+		unlink_if_exists("/usr/local/etc/rc.d/carp.sh");
 		$fout = fopen("/usr/local/pkg/pf/carp.sh","w");
 		fwrite($fout, "#!/bin/sh \n");
 		global $config;
@@ -227,9 +227,9 @@
 			if($carp['pfsyncenabled'] != "") {
 			      $pfsync = 1;
 			      if($carp['premption'] != "")
-					fwrite($fout, "sysctl net.inet.carp.preempt=1\n");
+					fwrite($fout, "/sbin/sysctl net.inet.carp.preempt=1\n");
 			      if($carp['balancing'] != "")
-					fwrite($fout, "sysctl net.inet.arpbalance=1\n");
+					fwrite($fout, "/sbin/sysctl net.inet.arpbalance=1\n");
 			      $carp_sync_int = convert_friendly_interface_to_real_interface_name($carp['pfsyncinterface']);
 			      fwrite($fout, "/sbin/ifconfig pfsync0 create\n");
 			      fwrite($fout, "/sbin/ifconfig pfsync0 syncif " . $carp_sync_int . "\n");
