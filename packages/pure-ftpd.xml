@@ -84,7 +84,7 @@
 		config_lock();
 		$expires = "";
 		if($_POST['expiration']) $expires = " -e " . $_POST['expiration'];
-		mwexec("/usr/sbin/pw useradd " . $_POST['username'] . $expires . " -m -k /home/ " . $_POST['username'] . " -s \"/usr/sbin/nologin\"");
+		mwexec("/usr/sbin/pw useradd " . $_POST['username'] . $expires . " -m -k /home/ " . $_POST['username'] . "/./ -s \"/usr/sbin/nologin\"");
 		$fd = popen("/usr/sbin/pw usermod -n " . $_POST['username'] . " -H 0", "w");
 		$salt = md5(time());
 		$crypted_pw = crypt($_POST['password'],$salt);
