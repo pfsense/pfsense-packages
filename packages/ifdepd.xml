@@ -32,7 +32,7 @@
 	</field>
     </fields>
     <custom_php_global_functions>
-	functionn sync_package_ifdepd() {
+	function sync_package_ifdepd() {
                 conf_mount_rw();
                 config_lock();
                 global $config;
