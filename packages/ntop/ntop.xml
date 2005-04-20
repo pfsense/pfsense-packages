@@ -75,7 +75,7 @@
                     mwexec("killall ntop 2>/dev/null");
                     $fout = fopen("/usr/local/etc/rc.d/ntop.sh","w");
                     fwrite($fout, "#!/bin/sh\n\n");
-                    fwrite($fout, "/usr/local/bin/ntop -i " . $if_final . " -u root -d --ipv4 -M -X 8192\n\n");
+                    fwrite($fout, "/usr/local/bin/ntop -i " . $if_final . " -u root -d --ipv4 -M -x 8192 -X 8192\n\n");
                     fclose($fout);
                     conf_mount_ro();
                     config_unlock();
