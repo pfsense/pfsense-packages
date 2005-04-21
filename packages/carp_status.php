@@ -35,6 +35,20 @@ function gentitle_pkg($pgname) {
 	return $config['system']['hostname'] . "." . $config['system']['domain'] . " - " . $pgname;
 }
 
+$carp_counter=0;
+if($_POST['disablecarp'] <> "") {
+	if($config['installedpackages']['carpsettings']['config'] != "") {
+		foreach($config['installedpackages']['carpsettings']['config'] as $carp) {
+			$carp_counter++;
+		}
+	}
+	if($carp_counter > 0) {
+		for($x=0; $x<$carp_counter; $x++) {
+			mwexec("/sbin/ifconfig carp{$x} delete");
+		}
+	}
+}
+
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -50,6 +64,7 @@ function gentitle_pkg($pgname) {
 include("fbegin.inc");
 ?>
 <p class="pgtitle"><?=$title?></p>
+<form action="carp_status.php" method="post">
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -63,6 +78,10 @@ include("fbegin.inc");
 <tr><td class="tabcont">
 
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
+<tr>
+  <td colspan="5"><center><input name="disablecarp" value="Disable Carp Temporarily"></td>
+</tr>
+</tr>
 <tr>
   <td class="listhdrr"><b><center>Carp Interface</center></b></td>
   <td class="listhdrr"><b><center>Virtual IP</center></b></td>
