@@ -47,9 +47,9 @@
 	<website>http://www.ntop.org/</website>
 	<descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
 	<category>Network Management</category>
-	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
-	<depends_on_package>ntop-3.0.tbz</depends_on_package>
-	<version>3.0</version>
+	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/packages/All//depends_on_package_base_url</depends_on_package_base_url>
+	<depends_on_package>ntop-3.1_1.tgz</depends_on_package>
+	<version>3.1.1</version>
 	<status>BETA</status>
 	<config_file>http://www.pfsense.com/packages/config/ntop.xml</config_file>
 	<configurationfile>ntop.xml</configurationfile>
