@@ -49,7 +49,7 @@
 	<category>Network Management</category>
 	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.4-release/All</depends_on_package_base_url>
 	<depends_on_package>ntop-3.1_1.tbz</depends_on_package>
-	<version>3.1.1</version>
+	<version>3.1_1</version>
 	<status>BETA</status>
 	<config_file>http://www.pfsense.com/packages/config/ntop.xml</config_file>
 	<configurationfile>ntop.xml</configurationfile>
