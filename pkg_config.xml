@@ -87,10 +87,6 @@
 	<version>1.0.1</version>
 	<status>Stable</status>
 	<configurationfile>freeradius.xml</configurationfile>
-        <logging>
-        <facilityname>radius</facilityname>
-        <logfilename>radius.log</logfilename>
-        </logging>
     </package>
     <package>
 	<name>iperf</name>
