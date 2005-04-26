@@ -79,7 +79,7 @@ include("fbegin.inc");
 
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 <tr>
-  <td colspan="5"><center><input name="disablecarp" value="Disable Carp Temporarily"></td>
+  <td colspan="5"><center><input type="button" name="disablecarp" value="Disable Carp Temporarily"></td>
 </tr>
 </tr>
 <tr>
