@@ -55,7 +55,7 @@ if($config['installedpackages']['carp']['config'] != "") {
 	    }
 	}
     add_rule_to_anchor("carp", "pass quick on pfsync0 keep state", "pfsync0" . "3");
-    if($config['installedpackages']['carp']['config'] != "")
+    if($config['installedpackages']['carpsettings']['config'] != "")
 	foreach($config['installedpackages']['carpsettings']['config'] as $carp)
 	    $carp_sync_int = convert_friendly_interface_to_real_interface_name($carp['pfsyncinterface']);
     if($carp_sync_int != "") {
