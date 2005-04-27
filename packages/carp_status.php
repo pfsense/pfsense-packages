@@ -35,20 +35,36 @@ function gentitle_pkg($pgname) {
 	return $config['system']['hostname'] . "." . $config['system']['domain'] . " - " . $pgname;
 }
 
+/* grab the current status of carp */
+$status = `/sbin/sysctl net.inet.carp.allow`;
+$status = str_replace("\n","",$status);
+$status = str_replace(" ","",$status);
+$status = split(":", $status);
+
 $carp_counter=0;
 if($_POST['disablecarp'] <> "") {
-	if($config['installedpackages']['carpsettings']['config'] != "") {
-		foreach($config['installedpackages']['carpsettings']['config'] as $carp) {
-			$carp_counter++;
-		}
-	}
-	if($carp_counter > 0) {
-		for($x=0; $x<$carp_counter; $x++) {
+	$status = `/sbin/sysctl net.inet.carp.allow`;
+	$status = str_replace("\n","",$status);
+	$status = str_replace(" ","",$status);
+	$status = split(":", $status);
+	if($status[1] == "1") {
+		$savemsg = "{$carp_counter} items have been disabled.";
+		$carp_counter=find_number_of_created_carp_interfaces();
+		for($x=0; $x<$carp_counter; $x++)
 			mwexec("/sbin/ifconfig carp{$x} delete");
-		}
+		mwexec("/sbin/sysctl net.inet.carp.allow=0");
+	} else {
+		$savemsg = "Carp has been enabled.";
+		mwexec("/sbin/sysctl net.inet.carp.allow=1");
+		mwexec("/usr/local/pkg/pf/carp.sh");
 	}
 }
 
+/* grab the current status of carp */
+$status = `/sbin/sysctl net.inet.carp.allow`;
+$status = str_replace("\n","",$status);
+$status = str_replace(" ","",$status);
+$status = split(":", $status);
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -79,7 +95,14 @@ include("fbegin.inc");
 
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 <tr>
-  <td colspan="5"><center><input type="button" name="disablecarp" value="Disable Carp Temporarily"></td>
+<?php
+	if($status[1] == "0") {
+		echo "<td colspan=\"6\"><center><input type=\"submit\" name=\"disablecarp\" id=\"disablecarp\" value=\"Enable Carp\"></td>";
+	} else {
+		echo "<td colspan=\"6\"><center><input type=\"submit\" name=\"disablecarp\" id=\"disablecarp\" value=\"Disable Carp\"></td>";
+	}
+?>
+  
 </tr>
 </tr>
 <tr>
