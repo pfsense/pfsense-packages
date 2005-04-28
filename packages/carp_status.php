@@ -35,20 +35,10 @@ function gentitle_pkg($pgname) {
 	return $config['system']['hostname'] . "." . $config['system']['domain'] . " - " . $pgname;
 }
 
-/* grab the current status of carp */
-$status = `/sbin/sysctl net.inet.carp.allow`;
-$status = str_replace("\n","",$status);
-$status = str_replace(" ","",$status);
-$status = split(":", $status);
-
-$carp_counter=0;
+$status = get_carp_status();
 if($_POST['disablecarp'] <> "") {
-	$status = `/sbin/sysctl net.inet.carp.allow`;
-	$status = str_replace("\n","",$status);
-	$status = str_replace(" ","",$status);
-	$status = split(":", $status);
-	if($status[1] == "1") {
-		$savemsg = "{$carp_counter} items have been disabled.";
+	if($status == true) {
+		$savemsg = "{$carp_counter} ip's have been disabled.";
 		$carp_counter=find_number_of_created_carp_interfaces();
 		for($x=0; $x<$carp_counter; $x++)
 			mwexec("/sbin/ifconfig carp{$x} delete");
@@ -60,11 +50,7 @@ if($_POST['disablecarp'] <> "") {
 	}
 }
 
-/* grab the current status of carp */
-$status = `/sbin/sysctl net.inet.carp.allow`;
-$status = str_replace("\n","",$status);
-$status = str_replace(" ","",$status);
-$status = split(":", $status);
+$status = get_carp_status();
 ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
@@ -93,17 +79,17 @@ include("fbegin.inc");
 </td></tr>
 <tr><td class="tabcont">
 
-<table width="100%" border="0" cellpadding="6" cellspacing="0">
-<tr>
 <?php
-	if($status[1] == "0") {
-		echo "<td colspan=\"6\"><center><input type=\"submit\" name=\"disablecarp\" id=\"disablecarp\" value=\"Enable Carp\"></td>";
+	if($status == false) {
+		echo "<input type=\"submit\" name=\"disablecarp\" id=\"disablecarp\" value=\"Enable Carp\">";
 	} else {
-		echo "<td colspan=\"6\"><center><input type=\"submit\" name=\"disablecarp\" id=\"disablecarp\" value=\"Disable Carp\"></td>";
+		echo "<input type=\"submit\" name=\"disablecarp\" id=\"disablecarp\" value=\"Disable Carp\">";
 	}
 ?>
-  
-</tr>
+
+<p>
+
+<table width="100%" border="0" cellpadding="6" cellspacing="0">
 </tr>
 <tr>
   <td class="listhdrr"><b><center>Carp Interface</center></b></td>
