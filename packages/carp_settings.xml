@@ -116,7 +116,7 @@
                         <fielddescr>Remote System Password</fielddescr>
                         <fieldname>password</fieldname>
                         <description>Enter the webGUI password of the system that you would like to synchronize with.</description>
-                        <type>input</type>
+                        <type>password</type>
                 </field>
 	</fields>
 </packagegui>
