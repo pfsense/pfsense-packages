@@ -216,9 +216,8 @@ test server or link availability and modify translation or routing rules. This p
 	<descr>High performance Web proxy cache</descr>
 	<website>http://www.squid-cache.org/</website>
 	<category>Network Management</category>
-	<depends_on_package_base_url>http://www.pfSense.com/packages/All</depends_on_package_base_url>
+	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
 	<depends_on_package>squid-2.5.7_5.tbz</depends_on_package>
-	<exclude_dependency>perl</exclude_dependency>
 	<version>2.5.7_5</version>
 	<status>ALPHA ALPHA</status>
 	<config_file>http://www.pfsense.com/packages/config/squid.xml</config_file>
