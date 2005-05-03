@@ -220,7 +220,7 @@ test server or link availability and modify translation or routing rules. This p
 	<depends_on_package>squid-2.5.7_5.tbz</depends_on_package>
 	<exclude_dependency>perl</exclude_dependency>
 	<version>2.5.7_5</version>
-	<status>Stable</status>
+	<status>ALPHA ALPHA</status>
 	<config_file>http://www.pfsense.com/packages/config/squid.xml</config_file>
 	<configurationfile>squid.xml</configurationfile>
     </package>    
