@@ -217,8 +217,8 @@ test server or link availability and modify translation or routing rules. This p
 	<website>http://www.squid-cache.org/</website>
 	<category>Network Management</category>
 	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
-	<depends_on_package>squid-2.5.7_5.tbz</depends_on_package>
-	<version>2.5.7_5</version>
+	<depends_on_package>squid-2.5.6_12.tbz</depends_on_package>
+	<version>2.5.6_12</version>
 	<status>ALPHA ALPHA</status>
 	<config_file>http://www.pfsense.com/packages/config/squid.xml</config_file>
 	<configurationfile>squid.xml</configurationfile>
