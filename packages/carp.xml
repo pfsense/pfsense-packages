@@ -222,7 +222,25 @@
 		global $config;
 		$carp_instances_counter = 0;
 		$pfsync_instances_counter = 0;
-		  if($config['installedpackages']['carpsettings']['config'] != "")
+		if($config['installedpackages']['carp']['config'] != "") {
+		        foreach($config['installedpackages']['carp']['config'] as $carp) {
+			  /*
+			   *  create the carp interface
+			   */
+			  fwrite($fout, "echo Creating {$carp_instances_counter} ...\n");
+			  fwrite($fout, "/sbin/ifconfig carp" . $carp_instances_counter . " create\n");
+			  $broadcast_address = gen_subnet_max($carp['ipaddress'], $carp['netmask']);
+			  if($carp['password'] != "") {
+			    $password = " pass " . $carp['password'];
+			  }
+			  $carp_command = "/sbin/ifconfig carp" . $carp_instances_counter . " " . $carp['ipaddress'] . "/" . $carp['netmask'];
+			  $carp_command .= " broadcast " . $broadcast_address . " vhid " . $carp['vhid'] . " advskew " . $carp['advskew'] . $password;
+			  fwrite($fout, $carp_command . "\n");
+			  fwrite($fout, "/sbin/ifconfig carp{$carp_instances_counter} up\n");
+			  $carp_instances_counter++;
+		        }
+		}
+		if($config['installedpackages']['carpsettings']['config'] != "") {
 			foreach($config['installedpackages']['carpsettings']['config'] as $carp)
 			if($carp['pfsyncenabled'] != "") {
 			      $pfsync = 1;
@@ -238,25 +256,7 @@
 			      fwrite($fout, "sleep 10\n");
 			      $pfsync_instances_counter++;
 			}
-		if($config['installedpackages']['carp']['config'] != "") {
-		      foreach($config['installedpackages']['carp']['config'] as $carp) {
-			  /*
-			   *  create the carp interface
-			   */
-			  fwrite($fout, "echo Creating {$carp_instances_counter} ...\n");
-			  fwrite($fout, "/sbin/ifconfig carp" . $carp_instances_counter . " create\n");
-			  $broadcast_address = gen_subnet_max($carp['ipaddress'], $carp['netmask']);
-			  if($carp['password'] != "") {
-			    $password = " pass " . $carp['password'];
-			  }
-			  $carp_command = "/sbin/ifconfig carp" . $carp_instances_counter . " " . $carp['ipaddress'] . "/" . $carp['netmask'];
-			  $carp_command .= " broadcast " . $broadcast_address . " vhid " . $carp['vhid'] . " advskew " . $carp['advskew'] . $password;
-			  fwrite($fout, $carp_command . "\n");
-			  fwrite($fout, "/sbin/ifconfig carp{$carp_instances_counter} up\n");
-			  $carp_instances_counter++;
-		      }
-		  }
-
+		}
 		fclose($fout);
 		chmod("/usr/local/pkg/pf/carp.sh", 0755);
 		mwexec("/usr/local/pkg/pf/carp.sh");
