@@ -233,6 +233,7 @@
 			      $carp_sync_int = convert_friendly_interface_to_real_interface_name($carp['pfsyncinterface']);
 			      fwrite($fout, "/sbin/ifconfig pfsync0 create\n");
 			      fwrite($fout, "/sbin/ifconfig pfsync0 syncdev " . $carp_sync_int . "\n");
+			      fwrite($fout, "/sbin/ifconfig pfsync0 syncif " . $carp_sync_int . "\n");
 			      fwrite($fout, "/sbin/ifconfig {$carp_sync_int} up\n");
 			      fwrite($fout, "/sbin/ifconfig pfsync0 up\n");
 			      $pfsync_instances_counter++;
