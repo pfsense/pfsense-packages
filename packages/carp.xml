@@ -204,60 +204,6 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
-	    function sync_package_carp() {
-		/*
-		 *  XXX: find out how many carp and pfsync interfaces are established
-		 *       and destroy/down them before sweeping through the list
-		 */
-		conf_mount_rw();
-		config_lock();
-		unlink_if_exists("/usr/local/etc/rc.d/carp.sh");
-		$fout = fopen("/usr/local/pkg/pf/carp.sh","w");
-		fwrite($fout, "#!/bin/sh \n");
-		global $config;
-		$carp_instances_counter = 0;
-		$pfsync_instances_counter = 0;
-		if($config['installedpackages']['carpsettings']['config'] != "") {
-			foreach($config['installedpackages']['carpsettings']['config'] as $carp)
-			if($carp['pfsyncenabled'] != "") {
-			      $pfsync = 1;
-			      if($carp['premption'] != "")
-					fwrite($fout, "/sbin/sysctl net.inet.carp.preempt=1\n");
-			      if($carp['balancing'] != "")
-					fwrite($fout, "/sbin/sysctl net.inet.arpbalance=1\n");
-			      $carp_sync_int = convert_friendly_interface_to_real_interface_name($carp['pfsyncinterface']);
-			      fwrite($fout, "/sbin/ifconfig pfsync0 create\n");
-			      fwrite($fout, "/sbin/ifconfig pfsync0 syncdev " . $carp_sync_int . "\n");
-			      fwrite($fout, "/sbin/ifconfig pfsync0 syncif " . $carp_sync_int . "\n");
-			      fwrite($fout, "/sbin/ifconfig {$carp_sync_int} up\n");
-			      fwrite($fout, "/sbin/ifconfig pfsync0 up\n");
-			      $pfsync_instances_counter++;
-			}
-		}		
-		if($config['installedpackages']['carp']['config'] != "") {
-		        foreach($config['installedpackages']['carp']['config'] as $carp) {
-			  /*
-			   *  create the carp interface
-			   */
-			  fwrite($fout, "echo Creating {$carp_instances_counter} ...\n");
-			  fwrite($fout, "/sbin/ifconfig carp" . $carp_instances_counter . " create\n");
-			  $broadcast_address = gen_subnet_max($carp['ipaddress'], $carp['netmask']);
-			  if($carp['password'] != "") {
-			    $password = " pass " . $carp['password'];
-			  }
-			  $carp_command = "/sbin/ifconfig carp" . $carp_instances_counter . " " . $carp['ipaddress'] . "/" . $carp['netmask'];
-			  $carp_command .= " broadcast " . $broadcast_address . " vhid " . $carp['vhid'] . " advskew " . $carp['advskew'] . $password;
-			  fwrite($fout, $carp_command . "\n");
-			  fwrite($fout, "/sbin/ifconfig carp{$carp_instances_counter} up\n");
-			  $carp_instances_counter++;
-		        }
-		}
-		fclose($fout);
-		chmod("/usr/local/pkg/pf/carp.sh", 0755);
-		mwexec("/usr/local/pkg/pf/carp.sh");
-		conf_mount_ro();
-		config_unlock();
-	      }
 	</custom_php_command_before_form>
 	<custom_php_resync_config_command>
 	    sync_package_carp();
