@@ -74,11 +74,13 @@ if($already_processed != 1) {
 		    $sections_xml[] = new XML_RPC_Value(backup_config_section("shaper"), 'string');
                     $sections[] = new XML_RPC_Value('shaper', 'string');
 		}
-		carp_sync_xml($synchronizetoip, $carp['password'], $sections, $sections_xml);
-		$cli = new XML_RPC_Client('/xmlrpc.php', $synchronizetoip);
-        	$msg = new XML_RPC_Message('pfsense.filter_configure', array(new XML_RPC_Value($carp['password'], 'string')));
-        	$cli->setCredentials('admin', $carp['password']);
-        	$cli->send($msg);
+		if(count($sections) > 0) {
+			carp_sync_xml($synchronizetoip, $carp['password'], $sections, $sections_xml);
+			$cli = new XML_RPC_Client('/xmlrpc.php', $synchronizetoip);
+        		$msg = new XML_RPC_Message('pfsense.filter_configure', array(new XML_RPC_Value($carp['password'], 'string')));
+        		$cli->setCredentials('admin', $carp['password']);
+        		$cli->send($msg);
+		}
 	    }
 	}
     }
