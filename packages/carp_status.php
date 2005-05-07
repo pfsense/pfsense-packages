@@ -104,6 +104,7 @@ include("fbegin.inc");
 <?php
 
 if($config['installedpackages']['carp']['config'] <> "")
+	$carpint=0;
 	foreach($config['installedpackages']['carp']['config'] as $carp) {
 		$ipaddress = $carp['ipaddress'];
 		$premption = $carp['premption'];
@@ -116,15 +117,16 @@ if($config['installedpackages']['carp']['config'] <> "")
 		$carp_int = find_carp_interface($ipaddress);
 		// XXX - billm - should really 'ifconfig -a |grep carp:' and assign each interface found to an array
 		// using vhid as identifier and pull from that instead of hitting ifconfig every time through this loop
+                // actually what should happen is find_carp_interface() should cache these items. -sullrich
 		$status = get_carp_interface_status($carp_int);
 		if(isset($carp['balancing'])) $balancing = "true"; else $balancing = "false";
 		if(isset($carp['premption'])) $premption = "true"; else $premption = "false";
-		// if($synciface <> "") $sync_status = get_pfsync_interface_status($synciface);
 		echo "<tr>";
 		$align = "valign='middle'";
 		if($carp_enabled == false) {
 			$icon = "<img {$align} src='/block.gif'>";
 			$status = "DISABLED";
+			$carp_int = "carp" . $carpint;
 		} else {
 			if($status == "MASTER") {
 				$icon = "<img {$align} src='/pass.gif'>";
@@ -136,6 +138,7 @@ if($config['installedpackages']['carp']['config'] <> "")
 		echo "<td class=\"listlr\"><center>" . $ipaddress . "&nbsp;</td>";
 		echo "<td class=\"listlr\"><center>{$icon}&nbsp;&nbsp;" . $status . "&nbsp;</td>";
 		echo "</tr>";
+		$carpint++;
 	}
 
 ?>
