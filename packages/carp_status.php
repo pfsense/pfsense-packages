@@ -145,7 +145,7 @@ if($config['installedpackages']['carp']['config'] <> "")
 <tr><td>
 <center>
 <?php
-  echo "<br>Nodes syncing:<br>";
+  echo "<br>pfsync nodes:<br>";
   echo "<pre>";
   system("/sbin/pfctl -vvss | /usr/bin/grep creator | /usr/bin/cut -d\" \" -f7 | /usr/bin/sort -u");
   echo "</pre>";
