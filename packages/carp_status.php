@@ -124,6 +124,7 @@ if($config['installedpackages']['carp']['config'] <> "")
 		$align = "valign='middle'";
 		if($carp_enabled == false) {
 			$icon = "<img {$align} src='/block.gif'>";
+			$status = "DISABLED";
 		} else {
 			if($status == "MASTER") {
 				$icon = "<img {$align} src='/pass.gif'>";
