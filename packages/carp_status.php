@@ -84,8 +84,10 @@ include("fbegin.inc");
 
 <?php
 	if($status == false) {
+		$carp_enabled = false;
 		echo "<input type=\"submit\" name=\"disablecarp\" id=\"disablecarp\" value=\"Enable Carp\">";
 	} else {
+		$carp_enabled = true;
 		echo "<input type=\"submit\" name=\"disablecarp\" id=\"disablecarp\" value=\"Disable Carp\">";
 	}
 ?>
@@ -119,9 +121,19 @@ if($config['installedpackages']['carp']['config'] <> "")
 		if(isset($carp['premption'])) $premption = "true"; else $premption = "false";
 		// if($synciface <> "") $sync_status = get_pfsync_interface_status($synciface);
 		echo "<tr>";
+		$align = "valign='middle'";
+		if($carp_enabled == false) {
+			$icon = "<img {$align} src='/block.gif'>";
+		} else {
+			if($status == "MASTER") {
+				$icon = "<img {$align} src='/pass.gif'>";
+			} else {
+				$icon = "<img {$align} src='/pass_d.gif'>";
+			}
+		}
 		echo "<td class=\"listlr\"><center>" . $carp_int . "&nbsp;</td>";
 		echo "<td class=\"listlr\"><center>" . $ipaddress . "&nbsp;</td>";
-		echo "<td class=\"listlr\"><center>" . $status . "&nbsp;</td>";
+		echo "<td class=\"listlr\"><center>{$icon}&nbsp;&nbsp;" . $status . "&nbsp;</td>";
 		echo "</tr>";
 	}
 
