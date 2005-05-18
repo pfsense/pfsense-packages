@@ -83,25 +83,25 @@
 		<field>
 			<fielddescr>Synchronize rules</fielddescr>
 			<fieldname>synchronizerules</fieldname>
-			<description>When this option is enabled, this system will automatically sync the firewalls rules over to the other carp host every 5 minutes.</description>
+			<description>When this option is enabled, this system will automatically sync the firewalls rules over to the other carp when changes are made..</description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Synchronize aliases</fielddescr>
 			<fieldname>synchronizealiases</fieldname>
-			<description>When this option is enabled, this system will automatically sync the aliases over to the other carp host every 5 minutes.</description>
+			<description>When this option is enabled, this system will automatically sync the aliases over to the other carp when changes are made.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Synchronize nat</fielddescr>
 			<fieldname>synchronizenat</fieldname>
-			<description>When this option is enabled, this system will automatically sync the nat rules over to the other carp host every 5 minutes.</description>
+			<description>When this option is enabled, this system will automatically sync the nat rules over to the other carp host when changes are made.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Synchronize traffic shaper</fielddescr>
 			<fieldname>synchronizetrafficshaper</fieldname>
-			<description>When this option is enabled, this system will automatically sync the traffic shaper rules over to the other carp host every 5 minutes.</description>
+			<description>When this option is enabled, this system will automatically sync the traffic shaper rules over to the other carp host when changes are made.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
