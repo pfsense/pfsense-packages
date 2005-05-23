@@ -77,6 +77,14 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>Bind Virtual IP to interface</fielddescr>
+			<fieldname>interface</fieldname>
+			<description>Select the interface that this IP should bind to (carpdev).</description>
+			<add_to_interfaces_selection>AUTO</add_to_interfaces_selection>
+			<size>3</size>
+			<type>interfaces_selection</type>			
+		</field>
+		<field>
 			<fielddescr>Virtual IP Netmask</fielddescr>
 			<fieldname>netmask</fieldname>
 			<description>Enter the IP Address's netmask that you would like to share on both machines</description>
