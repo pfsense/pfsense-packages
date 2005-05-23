@@ -213,6 +213,18 @@ test server or link availability and modify translation or routing rules. This p
         <configurationfile>arpwatch.xml</configurationfile>
     </package>
     <package>
+	<name>mtr</name>
+	<descr>Enhanced traceroute replacement</descr>
+	<website>http://www.bitwizard.nl/mtr/</website>
+	<category>Network Management</category>
+	<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+	<depends_on_package>http://www.pfsense.com/packages/All/mtr-nox11-0.65_2.tbz</depends_on_package>
+	<version>0.65_2</version>
+	<status>ALPHA ALPHA</status>
+	<config_file>http://www.pfsense.com/packages/config/mtr.xml</config_file>
+	<configurationfile>mtr.xml</configurationfile>
+    </package>       
+    <package>
 	<name>squid</name>
 	<descr>High performance Web proxy cache</descr>
 	<website>http://www.squid-cache.org/</website>
