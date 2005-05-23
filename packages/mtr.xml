@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>mtr</name>
+	<version>0.65_2</version>
+	<title>Diagnostics: mtr</title>
+	<donotsave>true</donotsave>
+	<preoutput>yes</preoutput>
+	<savetext>mtr</savetext>
+	<!-- Menu is where this packages menu will appear -->
+	<menu>
+		<name>mtr</name>
+		<tooltiptext>mtr combines the functionality of the "traceroute" and "ping" programs into a single network diagnostic tool</tooltiptext>
+		<section>Diagnostics</section>
+		<configfile>mtr.xml</configfile>
+	</menu>
+        <!-- Do not save invokes a simple input menu and will not update
+             the configuration database. -->
+	<fields>
+		<field>
+                    <fielddescr>IP or Hostname</fielddescr>
+                    <fieldname>hostname</fieldname>
+                    <description>Enter the IP address or hostname that you would like to traceroute to.</description>
+                    <type>input</type>
+		</field>
+                <field>
+                    <fielddescr>Count</fielddescr>
+                    <fieldname>count</fieldname>
+                    <description>This is the number of pings to send, each one takes 1 second</description>
+                    <type>input</type>
+                    <typehint>Defaults to 10</typehint>
+                </field>
+                <field>
+                    <fielddescr>No DNS Lookup</fielddescr>
+                    <fieldname>nodns</fieldname>
+                    <description>Use this option to force mtr to display numeric IP numbers and not try to resolve the host names</description>
+		    <type>checkbox</type>
+                </field>
+        </fields>
+		<custom_php_deinstall_command>
+		</custom_php_deinstall_command>
+        <custom_add_php_command>
+            $mtr_options = " -r";
+            if($_POST['count']) $mtr_options .= " -c " . $_POST['count'];
+	    if($_POST['nodns']) $mtr_options .= " -n";
+            $mtr_options .= " " . $_POST['hostname'];
+            system("/usr/local/sbin/mtr" . $mtr_options);
+        </custom_add_php_command>
+</packagegui>
