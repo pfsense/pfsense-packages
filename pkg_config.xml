@@ -218,7 +218,7 @@ test server or link availability and modify translation or routing rules. This p
 	<website>http://www.bitwizard.nl/mtr/</website>
 	<category>Network Management</category>
 	<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-	<depends_on_package>http://www.pfsense.com/packages/All/mtr-nox11-0.65_2.tbz</depends_on_package>
+	<depends_on_package>mtr-nox11-0.65_2.tbz</depends_on_package>
 	<version>0.65_2</version>
 	<status>ALPHA ALPHA</status>
 	<config_file>http://www.pfsense.com/packages/config/mtr.xml</config_file>
