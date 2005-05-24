@@ -213,7 +213,7 @@ test server or link availability and modify translation or routing rules. This p
         <configurationfile>arpwatch.xml</configurationfile>
     </package>
     <package>
-	<name>mtr</name>
+	<name>mtr-nox11</name>
 	<descr>Enhanced traceroute replacement</descr>
 	<website>http://www.bitwizard.nl/mtr/</website>
 	<category>Network Management</category>
