@@ -221,7 +221,7 @@ test server or link availability and modify translation or routing rules. This p
 	<depends_on_package>mtr-nox11-0.65_2.tbz</depends_on_package>
 	<version>0.65_2</version>
 	<status>ALPHA ALPHA</status>
-	<config_file>http://www.pfsense.com/packages/config/mtr-nox11</config_file>
+	<config_file>http://www.pfsense.com/packages/config/mtr-nox11.xml</config_file>
 	<configurationfile>mtr.xml</configurationfile>
     </package>       
     <package>
