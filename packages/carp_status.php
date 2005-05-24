@@ -130,8 +130,10 @@ if($config['installedpackages']['carp']['config'] <> "")
 		} else {
 			if($status == "MASTER") {
 				$icon = "<img {$align} src='/pass.gif'>";
-			} else {
+			} else if($status == "BACKUP") {
 				$icon = "<img {$align} src='/pass_d.gif'>";
+			} else if($status == "INIT") {
+				$icon = "<img {$align} src='/log.gif'>";
 			}
 		}
 		echo "<td class=\"listlr\"><center>" . $carp_int . "&nbsp;</td>";
