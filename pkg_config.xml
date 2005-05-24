@@ -222,7 +222,7 @@ test server or link availability and modify translation or routing rules. This p
 	<version>0.65_2</version>
 	<status>ALPHA ALPHA</status>
 	<config_file>http://www.pfsense.com/packages/config/mtr-nox11.xml</config_file>
-	<configurationfile>mtr.xml</configurationfile>
+	<configurationfile>mtr-nox11.xml</configurationfile>
     </package>       
     <package>
 	<name>squid</name>

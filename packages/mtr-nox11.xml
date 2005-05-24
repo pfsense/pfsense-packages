@@ -8,10 +8,10 @@
 	<savetext>mtr</savetext>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
-		<name>mtr</name>
+		<name>mtr-nox11</name>
 		<tooltiptext>mtr combines the functionality of the "traceroute" and "ping" programs into a single network diagnostic tool</tooltiptext>
 		<section>Diagnostics</section>
-		<configfile>mtr.xml</configfile>
+		<configfile>mtr-nox11.xml</configfile>
 	</menu>
         <!-- Do not save invokes a simple input menu and will not update
              the configuration database. -->
