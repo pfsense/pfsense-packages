@@ -90,6 +90,11 @@ include("fbegin.inc");
 		$carp_enabled = true;
 		echo "<input type=\"submit\" name=\"disablecarp\" id=\"disablecarp\" value=\"Disable Carp\">";
 	}
+
+if(!is_array($config['installedpackages']['carp']['config'])) {
+	echo "Could not locate any defined CARP interfaces.";
+	exit;
+}
 ?>
 
 <p>
@@ -102,11 +107,6 @@ include("fbegin.inc");
   <td class="listhdrr"><b><center>Status</center></b></td>
 </tr>
 <?php
-
-if(!is_array($config['installedpackages']['carp']['config'])) {
-	echo "<tr><td></td></tr><tr><td></td></tr>Could not locate any defined CARP interfaces.<tr><td></td></tr><tr><td></td></tr></table>";
-	exit;
-}
 
 if($config['installedpackages']['carp']['config'] <> "")
 	$carpint=0;
