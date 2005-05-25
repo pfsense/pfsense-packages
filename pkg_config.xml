@@ -146,7 +146,7 @@
           <config_file>http://www.pfsense.com/packages/config/siproxd.xml</config_file>
           <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6-current/All/</depends_on_package_base_url>
           <depends_on_package>siproxd-0.5.10.tbz</depends_on_package>
-          <version>0.5.9</version>
+          <version>0.5.10</version>
           <status>ALPHA</status>
           <configurationfile>siproxd.xml</configurationfile>
     </package>
