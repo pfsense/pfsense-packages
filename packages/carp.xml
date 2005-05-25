@@ -79,7 +79,7 @@
 		<field>
 			<fielddescr>Bind Virtual IP to interface</fielddescr>
 			<fieldname>interface</fieldname>
-			<description>Select the interface that this IP should bind to (carpdev).</description>
+			<description>Select the interface that this IP should bind to (carpdev).  Leave this set to AUTO for the system to automatically deterimine where to setup the IP.</description>
 			<add_to_interfaces_selection>AUTO</add_to_interfaces_selection>
 			<size>3</size>
 			<type>interfaces_selection</type>			
@@ -173,7 +173,7 @@
 		<field>
 			<fielddescr>Advertising Frequency</fielddescr>
 			<fieldname>advskew</fieldname>
-			<description>The frequency that this machine will advertise</description>
+			<description>The frequency that this machine will advertise.  0 = master.   Anything above 0 designates a backup.</description>
 			<type>select</type>
 			<value>0</value>
 			<options>
