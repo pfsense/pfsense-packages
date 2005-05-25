@@ -92,7 +92,7 @@ include("fbegin.inc");
 	}
 
 if(!is_array($config['installedpackages']['carp']['config'])) {
-	echo "Could not locate any defined CARP interfaces.";
+	echo "</td></tr></table>Could not locate any defined CARP interfaces.";
 	exit;
 }
 ?>
