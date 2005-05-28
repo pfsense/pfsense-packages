@@ -42,16 +42,6 @@
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>
-		<columnitem>
-			<fielddescr>Upload bandwidth</fielddescr>
-			<fieldname>uploadbw</fieldname>
-			<suffix> Kbit/s</suffix>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Download bandwidth</fielddescr>
-			<fieldname>downloadbw</fieldname>
-			<suffix> Kbit/s</suffix>
-		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
@@ -70,24 +60,6 @@
 			<fielddescr>Username Description</fielddescr>
 			<fieldname>description</fieldname>
 			<description>Enter the description of the user here</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Enable bandwidth restriction</fielddescr>
-			<fieldname>bwrestriction</fieldname>
-			<description>If this option is set, the captive portal will restrict this user to the bandwidth defined below.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>Upload bandwidth</fielddescr>
-			<fieldname>uploadbw</fieldname>
-			<description>Enter the desired upload bandwidth cap for this user in Kbit/s.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Download bandwidth</fielddescr>
-			<fieldname>downloadbw</fieldname>
-			<description>Enter the desired download bandwidth cap for this user in Kbit/s.</description>
 			<type>input</type>
 		</field>
 	</fields>
