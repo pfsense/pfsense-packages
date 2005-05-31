@@ -120,9 +120,6 @@ if($config['installedpackages']['carp']['config'] <> "")
 		$pfsync = $carp['pfsync'];
 		$synciface = $carp['synciface'];
 		$carp_int = find_carp_interface($ipaddress);
-		// XXX - billm - should really 'ifconfig -a |grep carp:' and assign each interface found to an array
-		// using vhid as identifier and pull from that instead of hitting ifconfig every time through this loop
-                // actually what should happen is find_carp_interface() should cache these items. -sullrich
 		$status = get_carp_interface_status($carp_int);
 		if(isset($carp['balancing'])) $balancing = "true"; else $balancing = "false";
 		if(isset($carp['premption'])) $premption = "true"; else $premption = "false";
