@@ -162,7 +162,7 @@
 	    mwexec("/usr/local/etc/rc.d/spamd");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-	    unlink_if_exists("/usr/local/pkg/spamd*");
+	    unlink_if_exists("/usr/local/pkg/spamd.sh");
 	    unlink_if_exists("/usr/local/www/spam*");
 	</custom_php_deinstall_command>
 </packagegui>
