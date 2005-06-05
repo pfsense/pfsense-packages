@@ -150,7 +150,7 @@
 	    system("touch /var/mail/whitelist.txt 2>/dev/null");
 	    system("/usr/libexec/spamd-setup 2>/dev/null &amp;");
 	    system("/usr/libexec/spamlogd 2>/dev/null &amp;");
-	    $fd = fopen("/usr/local/etc/rc.d/spamd","w");
+	    $fd = fopen("/usr/local/etc/rc.d/spamd.sh","w");
 	    fwrite($fd, "#!/bin/sh\n\n");
 	    fwrite($fd, "# PACKAGE: STunnel\n");
 	    fwrite($fd, "# EXECUTABLE: stunnel\n");
