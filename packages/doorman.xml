@@ -67,7 +67,7 @@
 		global $config;
 		$fout = fopen("/usr/local/etc/rc.d/doormand.sh","w");
 		fwrite($fout, "#!/bin/sh\n\n/usr/local/sbin/doormand -D &amp;\n");
-                fwrite($fout, "# PACKAGE: doorman\n");
+                fwrite($fout, "# PACKAGE: Doorman\n");
                 fwrite($fout, "# EXECUTABLE: doorman\n");                
 		fclose($fout);
 		chmod("/usr/local/etc/rc.d/doormand.sh", 0755);
