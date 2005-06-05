@@ -56,6 +56,8 @@
 		write_squid_static_config();
 		$fout = fopen("/usr/local/etc/rc.d/squid.sh","w");
 		fwrite($fout, "#!/bin/sh\n");
+                fwrite($fout, "# PACKAGE: Squid\n");
+                fwrite($fout, "# EXECUTABLE: squid\n");
 		fwrite($fout, "/usr/local/sbin/squid\n\n");
 		fclose($fout);
 		chmod("/usr/local/etc/rc.d/squid.sh", 755);

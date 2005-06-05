@@ -152,6 +152,8 @@
 	    system("/usr/libexec/spamlogd 2>/dev/null &amp;");
 	    $fd = fopen("/usr/local/etc/rc.d/spamd","w");
 	    fwrite($fd, "#!/bin/sh\n\n");
+	    fwrite($fout, "# PACKAGE: STunnel\n");
+	    fwrite($fout, "# EXECUTABLE: stunnel\n");
 	    fwrite($fd, "/usr/bin/killall spamd-setup 2>/dev/null\n");
 	    fwrite($fd, "/usr/local/sbin/spamd-setup &amp;\n");
 	    fwrite($fd, "/usr/local/libexec/spamlogd &amp;\n");

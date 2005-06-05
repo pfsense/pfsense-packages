@@ -40,6 +40,8 @@
                 if($config['installedpackages']['ifdepd']['config'] != "") {
                         $fout = fopen("/usr/local/etc/rc.d/ifdepd.sh","w");
                         fwrite($fout, "#!/bin/sh\n\n");
+                        fwrite($fout, "# PACKAGE: ifdepd\n");
+                        fwrite($fout, "# EXECUTABLE: ifdepd\n");                        
                         if(isset($_POST['usedefaults'])) {
                                 $lan_int = $config['interfaces']['lan']['if'];
                                 $wan_int = $config['interfaces']['wan']['if'];

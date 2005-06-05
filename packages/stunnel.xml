@@ -72,17 +72,23 @@
 		</field>
 	</fields>
 	<custom_php_install_command>
-	  safe_mkdir("/usr/local/etc/stunnel");
-	  system("/usr/bin/openssl req -new -x509 -days 365 -nodes -out /usr/local/etc/stunnel/stunnel.pem -keyout /usr/local/etc/stunnel/stunnel.pem 2>/dev/null");
-	  chmod("/usr/local/etc/stunnel/stunnel.pem", 600);
-	  make_dirs("/var/tmp/stunnel/var/tmp");
-	  chmod("/var/tmp/stunnel/var/tmp/", 1777);
-	  copy("/usr/local/etc/rc.d/stunnel.sh.sample", "/usr/local/etc/rc.d/stunnel.sh");
-	  chmod("/usr/local/etc/rc.d/stunnel.sh", 0555);
+	    safe_mkdir("/usr/local/etc/stunnel");
+	    system("/usr/bin/openssl req -new -x509 -days 365 -nodes -out /usr/local/etc/stunnel/stunnel.pem -keyout /usr/local/etc/stunnel/stunnel.pem 2>/dev/null");
+	    chmod("/usr/local/etc/stunnel/stunnel.pem", 600);
+	    make_dirs("/var/tmp/stunnel/var/tmp");
+	    chmod("/var/tmp/stunnel/var/tmp/", 1777);
+	    copy("/usr/local/etc/rc.d/stunnel.sh.sample", "/usr/local/etc/rc.d/stunnel.sh");
+	    $fout = fopen("/usr/local/etc/rc.d/stunnel.sh","w");
+	    fwrite($fout, "#!/bin/sh\n");
+	    fwrite($fout, "# PACKAGE: STunnel\n");
+	    fwrite($fout, "# EXECUTABLE: stunnel\n");
+	    fwrite($fout, "/usr/local/sbin/stunnel /usr/local/etc/stunnel/stunnel.conf\n\n");
+	    fclose($fout);
+	    chmod("/usr/local/etc/rc.d/stunnel.sh", 0555);
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-	  rmdir_recursive("/var/tmp/stunnel");
-	  rmdir_recursive("/usr/local/etc/stunnel*");
+	    rmdir_recursive("/var/tmp/stunnel");
+	    rmdir_recursive("/usr/local/etc/stunnel*");
 	</custom_php_deinstall_command>
 	<custom_add_php_command_late>
 	  conf_mount_rw();

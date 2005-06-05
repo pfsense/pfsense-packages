@@ -69,6 +69,8 @@
 	<custom_php_install_command>
 		$fout = fopen("/usr/local/etc/rc.d/pure-ftpd.sh","w");
 		fwrite($fout, "#!/bin/sh\n\n");
+                fwrite($fout, "# PACKAGE: Pure-FTPD\n");
+                fwrite($fout, "# EXECUTABLE: pure-ftpd\n");
 		fwrite($fout, "/usr/local/sbin/pure-ftpd -A -B /usr/local/etc/pure-ftpd.conf\n");
 		fclose($fout);
 		chmod("/usr/local/etc/rc.d/pure-ftpd.sh", 0755);

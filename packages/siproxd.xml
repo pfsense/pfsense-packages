@@ -106,6 +106,8 @@
 	<custom_php_install_command>
 	mwexec("pkg_add -rv libosip2");
 	$fout = fopen("/usr/local/etc/rc.d/siproxd.sh","w");
+	fwrite($fout, "# PACKAGE: SipProxD\n");
+	fwrite($fout, "# EXECUTABLE: siproxd\n");
 	fwrite($fout, "#!/bin/sh\n\n/usr/local/sbin/siproxd\n");
 	fclose($fout);
 	</custom_php_install_command>

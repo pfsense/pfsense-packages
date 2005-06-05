@@ -11,6 +11,8 @@
 	<custom_php_install_command>
 	    $fout = fopen("/usr/local/etc/rc.d/frickin.sh", "w");
 	    fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");
+            fwrite($fout, "# PACKAGE: frickin\n");
+            fwrite($fout, "# EXECUTABLE: frickin\n");
 	    fwrite($fout, "/usr/local/bin/frickin");
 	    fwrite($fout, " -s 127.0.0.1");
 	    fwrite($fout, " -c 20");
