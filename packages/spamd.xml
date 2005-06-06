@@ -163,6 +163,7 @@
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 	    unlink_if_exists("/usr/local/pkg/spamd.sh");
+	    unlink_if_exists("/usr/local/pkg/pf/spamd_rules.php");
 	    unlink_if_exists("/usr/local/www/spamd_rules.php");
 	</custom_php_deinstall_command>
 </packagegui>
