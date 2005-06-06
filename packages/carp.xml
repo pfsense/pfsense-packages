@@ -2,6 +2,7 @@
 <packagegui>
 	<name>carp</name>
 	<version>0.1.0</version>
+	<xmlver>$Revision$</xmlver>
 	<title>Services: CARP (failover)</title>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
