@@ -226,8 +226,8 @@ test server or link availability and modify translation or routing rules. This p
     </package>    
     <package>
 	<name>upnpd</name>
-	<descr></descr>
-	<website>http://www.squid-cache.org/</website>
+	<descr>Emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP Internet Gateway Device specification (IGD) and allows UPnP aware clients, such as MSN Messenger to work properly from behind a NAT firewall.</descr>
+	<website>http://linux-igd.sourceforge.net/</website>
 	<category>Network Management</category>
 	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6-current/All</depends_on_package_base_url>
 	<depends_on_package>linuxigd-0.92_2.tbz</depends_on_package>
