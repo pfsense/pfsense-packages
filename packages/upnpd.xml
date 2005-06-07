@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-	<name>upnpd</name>
+	<name>upnp</name>
 	<version>0.92_2</version>
 	<custom_php_resync_config_command>
 		$lanif = $config['interfaces']['lan']['if'];
@@ -32,6 +32,7 @@
 		mwexec("cp /usr/local/etc/linuxigd/gatedesc.xml /usr/local/etc/linuxigd/gatedesc.xml.bak");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		mwexec("rm /usr/local/etc/rc.d/upnpd.sh");
+		mwexec("rm -rf /usr/local/etc/rc.d/upnpd.sh");
+		mwexec("rm -rf /usr/local/etc/linuxigd");
 	</custom_php_deinstall_command>
 </packagegui>
