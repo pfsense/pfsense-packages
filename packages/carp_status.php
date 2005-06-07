@@ -44,9 +44,9 @@ if($_POST['disablecarp'] <> "") {
 			mwexec("/sbin/ifconfig carp{$x} down");
 			mwexec("/sbin/ifconfig carp{$x} destroy");
 		}
-		$savemsg = "{$carp_counter} ip's have been disabled.";
+		$savemsg = "{$carp_counter} IPs have been disabled.";
 	} else {
-		$savemsg = "Carp has been enabled.";
+		$savemsg = "CARP has been enabled.";
 		mwexec("/sbin/sysctl net.inet.carp.allow=1");
 		interfaces_carp_configure();
 		interfaces_carp_bringup();
