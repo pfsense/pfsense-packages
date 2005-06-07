@@ -7,7 +7,7 @@
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
 	    <name>CARP (failover)</name>
-	    <tooltiptext>CARP is a tool to help achieve system redundancy, by having multiple computers creating a single, virtual network interface between them, so that if any machine fails, another can respond instead, and/or allowing a degree of load sharing between systems. CARP is an improvement over the Virtual Router Redundancy Protocol (VRRP) standard. It was developed after VRRP was deemed to be not free enough because of a possibly-overlapping Cisco patent.</tooltiptext>
+	    <tooltiptext>CARP is a tool to help achieve system redundancy, by having multiple computers creating a single, virtual network interface between them.</tooltiptext>
 	    <section>Services</section>
 	    <url>carp_status.php</url>
 	</menu>
