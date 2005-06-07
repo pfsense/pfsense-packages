@@ -6,10 +6,10 @@
 		function sync_upnp() {
 			$lanif = $config['interfaces']['lan']['if'];
 			$wanif = get_real_wan_interface();
-			$lanip = find_interface_ip($lanif);		
-			/* copy original, we're going to overwrite !ADDR! with our internal ip */
+			$lanip = find_interface_ip($lanif);
+			/* copy original, we're going to overwrite ADDR with our internal ip */
 			mwexec("cp /usr/local/etc/linuxigd/gatedesc.xml.bak /usr/local/etc/linuxigd/gatedesc.xml");
-			/* replace !ADDR! with LAN ip */
+			/* replace ADDR with LAN ip */
 			$file_contents = return_filename_as_string("/usr/local/etc/linuxigd/gatedesc.xml");
 			$file_contents = str_replace("!ADDR!","{$lanip}",$file_contents);
 			$fout = fopen("/usr/local/etc/linuxigd/gatedesc.xml", "w");
@@ -25,13 +25,13 @@
 			chmod("/usr/local/etc/rc.d/upnpd.sh", 0755);
 			/* kill it off if its running */
 			mwexec("killall upnpd");
-			/* alright, thats all we need.  start 'er up! */
+			/* alright, thats all we need.  start up! */
 			mwexec("/usr/local/etc/rc.d/upnpd.sh");
 		}
 		function sync_upnp();
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
-		/* we need to update the files !ADDR! from time to time which is the lan ip */
+		/* we need to update the files ADDR from time to time which is the lan ip */
 		mwexec("cp /usr/local/etc/linuxigd/gatedesc.xml /usr/local/etc/linuxigd/gatedesc.xml.bak");
 		function sync_upnp();
 	</custom_php_install_command>
