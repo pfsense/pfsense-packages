@@ -3,33 +3,37 @@
 	<name>upnp</name>
 	<version>0.92_2</version>
 	<custom_php_resync_config_command>
-		$lanif = $config['interfaces']['lan']['if'];
-		$wanif = get_real_wan_interface();
-		$lanip = find_interface_ip($lanif);		
-		/* copy original, we're going to overwrite !ADDR! with our internal ip */
-		mwexec("cp /usr/local/etc/linuxigd/gatedesc.xml.bak /usr/local/etc/linuxigd/gatedesc.xml");
-		/* replace !ADDR! with LAN ip */
-		$file_contents = return_filename_as_string("/usr/local/etc/linuxigd/gatedesc.xml");
-		$file_contents = str_replace("!ADDR!","{$lanip}",$file_contents);
-		$fout = fopen("/usr/local/etc/linuxigd/gatedesc.xml", "w");
-		fwrite($fout, $file_contents);
-		fclose($fout);
-		/* write out custom rc.d starter script */
-		$fout = fopen("/usr/local/etc/rc.d/upnpd.sh", "w");
-		fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");
-		fwrite($fout, "# PACKAGE: UPNPD\n");
-		fwrite($fout, "# EXECUTABLE: upnpd\n\n");
-		fwrite($fout, "/usr/local/bin/upnpd {$wanif} {$lanif}");
-		fclose($fout);
-		chmod("/usr/local/etc/rc.d/upnpd.sh", 0755);
-		/* kill it off if its running */
-		mwexec("killall upnpd");
-		/* alright, thats all we need.  start 'er up! */
-		mwexec("/usr/local/etc/rc.d/upnpd.sh");
+		function sync_upnp() {
+			$lanif = $config['interfaces']['lan']['if'];
+			$wanif = get_real_wan_interface();
+			$lanip = find_interface_ip($lanif);		
+			/* copy original, we're going to overwrite !ADDR! with our internal ip */
+			mwexec("cp /usr/local/etc/linuxigd/gatedesc.xml.bak /usr/local/etc/linuxigd/gatedesc.xml");
+			/* replace !ADDR! with LAN ip */
+			$file_contents = return_filename_as_string("/usr/local/etc/linuxigd/gatedesc.xml");
+			$file_contents = str_replace("!ADDR!","{$lanip}",$file_contents);
+			$fout = fopen("/usr/local/etc/linuxigd/gatedesc.xml", "w");
+			fwrite($fout, $file_contents);
+			fclose($fout);
+			/* write out custom rc.d starter script */
+			$fout = fopen("/usr/local/etc/rc.d/upnpd.sh", "w");
+			fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");
+			fwrite($fout, "# PACKAGE: UPNPD\n");
+			fwrite($fout, "# EXECUTABLE: upnpd\n\n");
+			fwrite($fout, "/usr/local/bin/upnpd {$wanif} {$lanif}");
+			fclose($fout);
+			chmod("/usr/local/etc/rc.d/upnpd.sh", 0755);
+			/* kill it off if its running */
+			mwexec("killall upnpd");
+			/* alright, thats all we need.  start 'er up! */
+			mwexec("/usr/local/etc/rc.d/upnpd.sh");
+		}
+		function sync_upnp();
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
 		/* we need to update the files !ADDR! from time to time which is the lan ip */
 		mwexec("cp /usr/local/etc/linuxigd/gatedesc.xml /usr/local/etc/linuxigd/gatedesc.xml.bak");
+		function sync_upnp();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		mwexec("rm -rf /usr/local/etc/rc.d/upnpd.sh");
