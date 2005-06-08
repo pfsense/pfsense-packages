@@ -28,7 +28,7 @@
 			/* alright, thats all we need.  start up! */
 			mwexec("/usr/local/etc/rc.d/upnpd.sh");
 		}
-		function sync_upnp();
+		sync_upnp();
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
 		/* we need to update the files ADDR from time to time which is the lan ip */
