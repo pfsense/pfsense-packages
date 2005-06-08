@@ -6,6 +6,7 @@
 	</custom_php_command_before_form>		
 	<custom_php_resync_config_command>
 		function sync_upnp() {
+			global $config, $g;
 			$lanif = $config['interfaces']['lan']['if'];
 			$wanif = get_real_wan_interface();
 			$lanip = find_interface_ip($lanif);
