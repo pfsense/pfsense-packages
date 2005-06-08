@@ -232,7 +232,7 @@ test server or link availability and modify translation or routing rules. This p
 	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6-current/All</depends_on_package_base_url>
 	<depends_on_package>linuxigd-0.92_2.tbz</depends_on_package>
 	<version>1.0.4_1,1</version>
-	<status>*NOT FULLY TESTED*</status>
+	<status>*TESTED. NEEDS MORE TESTING!*</status>
 	<config_file>http://www.pfsense.com/packages/config/upnpd.xml</config_file>
 	<configurationfile>upnpd.xml</configurationfile>
     </package>
