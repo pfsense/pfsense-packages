@@ -3,6 +3,8 @@
 	<name>upnp</name>
 	<version>0.92_2</version>
 	<custom_php_command_before_form>
+	</custom_php_command_before_form>		
+	<custom_php_resync_config_command>
 		function sync_upnp() {
 			$lanif = $config['interfaces']['lan']['if'];
 			$wanif = get_real_wan_interface();
@@ -28,14 +30,11 @@
 			/* alright, thats all we need.  start up! */
 			mwexec("/usr/local/etc/rc.d/upnpd.sh");
 		}
-	</custom_php_command_before_form>		
-	<custom_php_resync_config_command>
-		sync_upnp();
+		sync_upnp();		
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
 		/* we need to update the files ADDR from time to time which is the lan ip */
 		copy("/usr/local/etc/linuxigd/gatedesc.xml", "/usr/local/etc/linuxigd/gatedesc.xml.bak");
-		sync_upnp();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		mwexec("rm -rf /usr/local/etc/rc.d/upnpd.sh");
