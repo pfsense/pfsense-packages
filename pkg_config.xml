@@ -151,18 +151,6 @@
           <configurationfile>netio.xml</configurationfile>
     </package>
     <package>
-          <name>doorman</name>
-          <website>http://doorman.sourceforge.net</website>
-          <descr>Doorman is a port knocking implementation which allows a server to run silently, invisibly, with all TCP ports closed except to those who know the secret knock.</descr>
-          <category>Security</category>
-          <config_file>http://www.pfsense.com/packages/config/doorman.xml</config_file>
-          <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-          <depends_on_package>doorman-0.8_1.tbz</depends_on_package>
-          <version>0.8_1</version>
-          <status>ALPHA</status>
-          <configurationfile>doorman.xml</configurationfile>
-    </package>
-    <package>
         <name>ifstated</name>
         <website>http://www.openbsd.org/</website>
         <descr>The ifstated daemon runs commands in response to network state changes, which it determines by monitoring interface link state or running e
@@ -295,6 +283,18 @@ test server or link availability and modify translation or routing rules. This p
 	<version>1.0.2_1</version>
 	<status>Stable</status>
 	<configurationfile>freeradius.xml</configurationfile>
+    </package>
+    <package>
+          <name>doorman</name>
+          <website>http://doorman.sourceforge.net</website>
+          <descr>Doorman is a port knocking implementation which allows a server to run silently, invisibly, with all TCP ports closed except to those who know the secret knock.</descr>
+          <category>Security</category>
+          <config_file>http://www.pfsense.com/packages/config/doorman.xml</config_file>
+          <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+          <depends_on_package>doorman-0.8_1.tbz</depends_on_package>
+          <version>0.8_1</version>
+          <status>ALPHA</status>
+          <configurationfile>doorman.xml</configurationfile>
     </package>
     <!-- END - these packages are inactive -->
 </pfsensepkgs>
