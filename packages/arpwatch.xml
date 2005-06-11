@@ -11,10 +11,6 @@
                 <configfile>arpwatch.xml</configfile>
                 <url>/pkg_edit.php?xml=arpwatch.xml&amp;id=0</url>
         </menu>
-	<logging>
-		<logtab>arpwatch</logtab>
-		<grepfor>arpwatch</grepfor>
-	</logging>
 	<fields>
 		<field>
 			<fielddescr>Listening Interface</fielddescr>
