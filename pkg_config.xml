@@ -187,6 +187,10 @@ test server or link availability and modify translation or routing rules. This p
         <status>ALPHA</status>
         <config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
         <configurationfile>arpwatch.xml</configurationfile>
+        <logging>
+        <facilityname>arpwatch</facilityname>
+        <logfilename>arpwatch.log</logfilename>
+        </logging> 
     </package>
     <package>
 	<name>mtr-nox11</name>
