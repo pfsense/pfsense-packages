@@ -147,7 +147,8 @@
           <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6-current/All</depends_on_package_base_url>
           <depends_on_package>netio-1.14.tbz</depends_on_package>
           <version>1.14</version>
-          <status>ALPHA</status>
+          <xmlver>0.1</xmlver>
+	  <status>ALPHA</status>
           <configurationfile>netio.xml</configurationfile>
     </package>
     <package>
