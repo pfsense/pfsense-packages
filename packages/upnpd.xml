@@ -21,7 +21,7 @@
 			/* write out custom rc.d starter script */
 			$fout = fopen("/usr/local/etc/rc.d/upnpd.sh", "w");
 			fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");
-			fwrite($fout, "# PACKAGE: UPNPD\n");
+			fwrite($fout, "# PACKAGE: UPNP\n");
 			fwrite($fout, "# EXECUTABLE: upnpd\n\n");
 			fwrite($fout, "/usr/local/bin/upnpd {$wanif} {$lanif}");
 			fclose($fout);
