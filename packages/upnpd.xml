@@ -36,6 +36,7 @@
 	<custom_php_install_command>
 		/* we need to update the files ADDR from time to time which is the lan ip */
 		copy("/usr/local/etc/linuxigd/gatedesc.xml", "/usr/local/etc/linuxigd/gatedesc.xml.bak");
+		unlink("/usr/local/etc/rc.d/linuxigd.sh.sample");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		mwexec("rm -rf /usr/local/etc/rc.d/upnpd.sh");
