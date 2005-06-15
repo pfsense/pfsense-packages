@@ -123,7 +123,6 @@
 	  <verifyinstalledpkg>perl</verifyinstalledpkg>
 	  <version>0.1</version>
 	  <status>ALPHA</status>
-	  <skip_install_checks/>
 	  <configurationfile>assp.xml</configurationfile>
     </package>
     <package>
