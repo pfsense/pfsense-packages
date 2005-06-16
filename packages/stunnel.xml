@@ -77,7 +77,6 @@
 	    chmod("/usr/local/etc/stunnel/stunnel.pem", 600);
 	    make_dirs("/var/tmp/stunnel/var/tmp");
 	    chmod("/var/tmp/stunnel/var/tmp/", 1777);
-	    copy("/usr/local/etc/rc.d/stunnel.sh.sample", "/usr/local/etc/rc.d/stunnel.sh");
 	    $fout = fopen("/usr/local/etc/rc.d/stunnel.sh","w");
 	    fwrite($fout, "#!/bin/sh\n");
 	    fwrite($fout, "# PACKAGE: STunnel\n");
