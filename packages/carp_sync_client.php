@@ -31,8 +31,7 @@
 
 */
 
-require_once("xmlrpc_client.inc"); /* Include client classes from our XMLRPC implementation. */
-require_once("xmlparse_pkg.inc");  /* Include pfSense helper functions. */
+require_once("xmlrpc.inc"); /* Include client classes and helper functions from our XMLRPC implementation. */
 require_once("config.inc");
 require_once("functions.inc");
 
