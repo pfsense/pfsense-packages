@@ -9,11 +9,12 @@
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
 		<configfile>spamd.xml</configfile>
+		<url>/pkg_edit.php?xml=spamd.xml</url>
 	</menu>
 	<tabs>
 		<tab>
 			<text>SpamD Settings</text>
-			<url>/pkg.php?xml=spamd.xml</url>
+			<url>/pkg_edit.php?xml=spamd.xml</url>
 			<active/>
 		</tab>
 		<tab>
