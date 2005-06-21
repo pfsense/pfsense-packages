@@ -24,6 +24,7 @@
 	    fclose($fout);
 	    chmod("/usr/local/etc/rc.d/assp.sh", 0755);
 	    system("/usr/local/etc/rc.d/assp.sh &amp;");
+	    echo "ASSP is now installed.  You can access it from the left hand menu.";
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 	    rmdir_recursive("/usr/local/assp");
