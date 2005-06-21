@@ -158,8 +158,8 @@
 	    fwrite($fd, "/usr/local/sbin/spamd-setup &amp;\n");
 	    fwrite($fd, "/usr/local/libexec/spamlogd &amp;\n");
 	    fclose($fd);
-	    chmod("/usr/local/etc/rc.d/spamd", 0755);
-	    mwexec("/usr/local/etc/rc.d/spamd");
+	    chmod("/usr/local/etc/rc.d/spamd.sh", 0755);
+	    mwexec("/usr/local/etc/rc.d/spamd.sh");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 	    unlink_if_exists("/usr/local/pkg/spamd.sh");
