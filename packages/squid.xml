@@ -61,7 +61,7 @@
 		fwrite($fout, "/usr/local/sbin/squid\n\n");
 		fclose($fout);
 		chmod("/usr/local/etc/rc.d/squid.sh", 755);
-		update_output_window("Configuring Squid...");
+		update_output_window("Configuring Squid... This may take a moment...");
 		mwexec("/usr/local/sbin/squid -z");
 		update_output_window("Starting Squid...");
 		mwexec_bg("/usr/local/etc/rc.d/squid.sh");
