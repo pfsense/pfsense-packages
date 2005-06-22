@@ -13,8 +13,6 @@
 		<file>/usr/local/etc/rc.d/freeradius.sh</file>
 		<description>FreeRADIUS daemon</description>
 		<rcfile>radiusd.sh</rcfile>
-		<startcmd>/usr/local/sbin/radiusd -X -d /usr/local/etc/raddb &amp;</startcmd>
-		<stopcmd>killall radiusd</stopcmd>
 	</service>
 	<tabs>
 		<tab>
@@ -79,17 +77,15 @@
 		$fout = fopen("/usr/local/etc/raddb/clients.conf","w");
 		fwrite($fout, "client 127.0.0.1" . "{\n" . "secret = pfsense\n" . "shortname = localhost\n}\n\n");
 		fclose($fout);
-		unlink_if_exists("/usr/local/etc/rc.d/radiusd*");
-		$fout = fopen("/usr/local/etc/rc.d/radiusd.sh","w");
-                fwrite($fout, "# PACKAGE: FreeRadius\n");
-                fwrite($fout, "# EXECUTABLE: radiusd\n");
-		fwrite($fout,"#!/bin/sh\n\n/usr/local/sbin/radiusd -X -d /usr/local/etc/raddb &amp;\n");
-		fclose($fout);
+		write_rcfile(array(
+					"file" => "radiusd.sh",
+					"start" => "/usr/local/sbin/radiusd -X -d /usr/local/etc/raddb &amp;",
+					"stop" => "/usr/bin/killall radiusd"
+				)
+		);
 		$fout = fopen("/usr/local/etc/radiusd.conf.dynamic","w");
 		fwrite($fout, "{\nipaddr = 127.0.0.1\nport = 0\ntype = auth\n}\n\n");
 		fclose($fout);
-		chmod("/usr/local/etc/rc.d/radiusd.sh", 0755);
-		mwexec("/usr/local/etc/rc.d/radiusd.sh");
 	</custom_php_install_command>
 	<custom_php_command_before_form>
 		function sync_package_freeradius() {
