@@ -5,19 +5,22 @@
 	<title></title>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
-		<name>SpamD</name>
-		<tooltiptext></tooltiptext>
+		<name>spamd</name>
 		<section>Services</section>
 		<configfile>spamd.xml</configfile>
 	</menu>
+	<service>
+                <name>spamd</name>
+                <rcfile>spamd.sh</rcfile>
+        </service>
 	<tabs>
 		<tab>
-			<text>SpamD Settings</text>
+			<text>spamd Settings</text>
 			<url>/pkg.php?xml=spamd.xml</url>
 			<active/>
 		</tab>
 		<tab>
-			<text>SpamD Whitelist</text>
+			<text>spamd Whitelist</text>
 			<url>/pkg.php?xml=spamd_whitelist.xml</url>
 		</tab>
 	</tabs>
@@ -136,11 +139,9 @@
 			fwrite($fd, $spamd['ip'] . "\n");
 		    }
 		fclose($fd);
-		update_output_window("Starting spamd...");
-		mwexec_bg("/usr/local/etc/rc.d/spamd.sh start");
-		update_output_window("done.\n");
 		conf_mount_ro();
 		config_unlock();
+		restart_service("spamd");
 	    }
 	</custom_php_command_before_form>
 	<custom_php_resync_config_command>
@@ -153,16 +154,17 @@
 	    system("touch /var/mail/whitelist.txt 2>/dev/null");
 	    system("/usr/libexec/spamd-setup 2>/dev/null &amp;");
 	    system("/usr/libexec/spamlogd 2>/dev/null &amp;");
-	    $fd = fopen("/usr/local/etc/rc.d/spamd.sh","w");
-	    fwrite($fd, "#!/bin/sh\n\n");
-	    fwrite($fd, "# PACKAGE: STunnel\n");
-	    fwrite($fd, "# EXECUTABLE: stunnel\n");
-	    fwrite($fd, "/usr/bin/killall spamd-setup 2>/dev/null\n");
-	    fwrite($fd, "/usr/local/sbin/spamd-setup &amp;\n");
-	    fwrite($fd, "/usr/local/libexec/spamlogd &amp;\n");
-	    fclose($fd);
-	    chmod("/usr/local/etc/rc.d/spamd.sh", 0755);
-	    mwexec("/usr/local/etc/rc.d/spamd.sh");
+	    $start = "/usr/local/sbin/spamd-setup &amp;\n" .
+		     "/usr/local/libexec/spamlogd &amp;";
+	    $stop  = "/usr/bin/killall spamd-setup\n" .
+		     "/usr/bin/killall spamlogd";
+	    write_rcfile(array(
+                                        "file" => "spamd.sh",
+                                        "start" => $start,
+                                        "stop" =>  $stop
+                                )
+            );
+	    start_service("spamd");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 	    unlink_if_exists("/usr/local/pkg/spamd.sh");
