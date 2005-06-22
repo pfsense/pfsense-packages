@@ -120,7 +120,7 @@
 	        fwrite($fd, "\t:file=/var/mail/whitelist.txt\n");
 		/* loop through each item and write out its configuration */
 		fwrite($fd, "\n# begin of user created entries\n");
-		if($config['installedpackages']['spamd']['config']) {
+		if($config['installedpackages']['spamd']['config'] != "") {
 		    foreach($config['installedpackages']['spamd']['config'] as $spamd) {
 			fwrite($fd, rtrim($spamd['providername']) . ":\\\n");
 			fwrite($fd, "\t:" . rtrim($spamd['providertype']) . ":\\\n");
@@ -137,7 +137,7 @@
 			fwrite($fd, $spamd['ip'] . "\n");
 		    }
 		fclose($fd);
-		system("/usr/local/etc/rc.d/spamd 2>/dev/null");
+		system("/usr/local/etc/rc.d/spamd start");
 		conf_mount_ro();
 		config_unlock();
 	    }
