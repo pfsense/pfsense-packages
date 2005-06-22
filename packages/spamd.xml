@@ -136,7 +136,7 @@
 			fwrite($fd, $spamd['ip'] . "\n");
 		    }
 		fclose($fd);
-		system("/usr/local/etc/rc.d/spamd start");
+		system("/usr/local/etc/rc.d/spamd.sh start");
 		conf_mount_ro();
 		config_unlock();
 	    }
