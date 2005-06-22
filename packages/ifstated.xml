@@ -9,7 +9,7 @@
 	<configfile>ifstated.xml</configfile>
 	<url>/pkg_edit.php?xml=ifstated.xml&amp;id=0</url>
     </menu>
-    <aftersaveredirect>pkg_edit.php?xml=ifstated.xml&amp;id=0</aftersaveredirect>
+    <aftersaveredirect>pkg_edit.php?xml=ifstated.xml&amp;id=0&amp;savemsg=Updated</aftersaveredirect>
     <configpath>installedpackages->package->$packagename->configuration->settings</configpath>
     <modify_system>
 	<item>
