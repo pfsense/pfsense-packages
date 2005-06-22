@@ -61,8 +61,10 @@
 		fwrite($fout, "/usr/local/sbin/squid\n\n");
 		fclose($fout);
 		chmod("/usr/local/etc/rc.d/squid.sh", 755);
+		update_output_window("Configuring Squid...");
 		mwexec("/usr/local/sbin/squid -z");
-		mwexec("/usr/local/etc/rc.d/squid.sh");
+		update_output_window("Starting Squid...");
+		mwexec_bg("/usr/local/etc/rc.d/squid.sh");
 		filter_configure();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
