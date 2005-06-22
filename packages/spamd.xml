@@ -120,13 +120,15 @@
 	        fwrite($fd, "\t:file=/var/mail/whitelist.txt\n");
 		/* loop through each item and write out its configuration */
 		fwrite($fd, "\n# begin of user created entries\n");
-		foreach($config['installedpackages']['spamd']['config'] as $spamd) {
-		    fwrite($fd, rtrim($spamd['providername']) . ":\\\n");
-		    fwrite($fd, "\t:" . rtrim($spamd['providertype']) . ":\\\n");
-		    fwrite($fd, "\t:msg=\"" . rtrim($spamd['rejectmessage']) . "\":\\\n");
-		    fwrite($fd, "\t:method=" . rtrim($spamd['providermethod']) . ":\\\n");
-		    fwrite($fd, "\t:" . rtrim($spamd['providermethod']) . ":\\\n");
-		    fwrite($fd, "\t:file=" . rtrim($spamd['providerurl']) . ":\n\n");
+		if($config['installedpackages']['spamd']['config']) {
+		    foreach($config['installedpackages']['spamd']['config'] as $spamd) {
+			fwrite($fd, rtrim($spamd['providername']) . ":\\\n");
+			fwrite($fd, "\t:" . rtrim($spamd['providertype']) . ":\\\n");
+			fwrite($fd, "\t:msg=\"" . rtrim($spamd['rejectmessage']) . "\":\\\n");
+			fwrite($fd, "\t:method=" . rtrim($spamd['providermethod']) . ":\\\n");
+			fwrite($fd, "\t:" . rtrim($spamd['providermethod']) . ":\\\n");
+			fwrite($fd, "\t:file=" . rtrim($spamd['providerurl']) . ":\n\n");
+		    }
 		}
 		fclose($fd);
 		$fd = fopen("/var/mail/whitelist.txt","w");
