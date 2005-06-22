@@ -66,7 +66,7 @@
 	fwrite($fout, "# PACKAGE: IFStated\n");
 	fwrite($fout, "# EXECUTABLE: ifstated\n");
 	fclose($fout);
-	chmod("/usr/local/etc/rc.d/radiusd.sh", 0755);
+	chmod("/usr/local/etc/rc.d/ifstated.sh", 0755);
     </custom_php_install_command>
     <custom_add_php_command>
 	conf_mount_rw();
