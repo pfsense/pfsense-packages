@@ -8,6 +8,14 @@
 		<section>Services</section>
 		<configfile>freeradius.xml</configfile>
 	</menu>
+	<service>
+		<name>FreeRADIUS</name>
+		<file>/usr/local/etc/rc.d/freeradius.sh</file>
+		<description>FreeRADIUS daemon</description>
+		<rcfile>radiusd.sh</rcfile>
+		<startcmd>/usr/local/sbin/radiusd -X -d /usr/local/etc/raddb &amp;</startcmd>
+		<stopcmd>killall radiusd</stopcmd>
+	</service>
 	<tabs>
 		<tab>
 			<text>Users</text>
