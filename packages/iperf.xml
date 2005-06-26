@@ -11,6 +11,10 @@
 		<section>Diagnostics</section>
 		<configfile>iperf.xml</configfile>
 	</menu>
+	<service>
+                <name>iperf</name>
+                <executable>iperf</executable>
+        </service>
 	<tabs>
 		<tab>
 			<text>Client</text>
