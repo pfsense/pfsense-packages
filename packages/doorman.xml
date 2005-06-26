@@ -1,14 +1,19 @@
 <packagegui>
 	<name>doorman</name>
-	<title>Doorman: Settings</title>
+	<title>doorman: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=doorman.xml&amp;id=0</aftersaveredirect>
 	<menu>
-		<name>Doorman</name>
-		<tooltiptext>Modify doormand settings and users.</tooltiptext>
+		<name>doorman</name>
+		<tooltiptext>Modify doorman settings and users.</tooltiptext>
 		<section>Services</section>
 		<configfile>doorman.xml</configfile>
 		<url>/pkg_edit.php?xml=doorman.xml&amp;id=0</url>
 	</menu>
+	<service>
+                <name>doorman</name>
+                <rcfile>doorman.sh</rcfile>
+                <executable>doormand</executable>
+        </service>
 	<tabs>
 		<tab> 
                         <text>Settings</text>
@@ -65,16 +70,16 @@
 	</fields>
 	<custom_php_install_command>
 		global $config;
-		$fout = fopen("/usr/local/etc/rc.d/doormand.sh","w");
-		fwrite($fout, "#!/bin/sh\n\n/usr/local/sbin/doormand -D &amp;\n");
-                fwrite($fout, "# PACKAGE: Doorman\n");
-                fwrite($fout, "# EXECUTABLE: doorman\n");                
-		fclose($fout);
-		chmod("/usr/local/etc/rc.d/doormand.sh", 0755);
+		$start = "/usr/local/sbin/doormand -D &amp;";
+		write_rcfile(array(
+					"file" => "doorman.sh",
+					"start" => $start,
+					"stop" => "/usr/bin/killall doormand"
+				)
+		);
 	</custom_php_install_command>
-	<custom_php_command_before_form>
+	<custom_php_global_functions>
 	function sync_package_doorman() {
-		if ($_POST == "") $_POST = $config['installedpackages']['doorman']['config'];
 		conf_mount_rw();
 		config_lock();
 		global $config;
@@ -84,7 +89,6 @@
 		 *	$int = convert_friendly_interface_to_real_interface_name($_POST['interface']);
 		 *	fwrite($fout, "interface " . $int . "\n");
 		 */
-		
 		fwrite($fout, "interface " . $config['interfaces']['wan']['if'] . "\n");
 		if($_POST['port'] != "") fwrite($fout, "port " . $_POST['port'] . "\n");
 		if($_POST['inittimeout'] != "") fwrite($fout, "waitfor " . $_POST['inittimeout'] . "\n");
@@ -96,8 +100,8 @@
 		mwexec("/usr/local/etc/rc.d/doormand.sh");
 		conf_mount_ro();
 		config_unlock();
-		}
-	</custom_php_command_before_form>
+	}
+	</custom_php_global_functions>
 	<custom_add_php_command>
 		sync_package_doorman();
 	</custom_add_php_command>
