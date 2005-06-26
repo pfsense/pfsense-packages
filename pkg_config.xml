@@ -164,6 +164,7 @@
 	  <status>ALPHA</status>
           <configurationfile>netio.xml</configurationfile>
     </package>
+<!--
     <package>
         <name>ifstated</name>
         <website>http://www.openbsd.org/</website>
@@ -178,6 +179,7 @@ test server or link availability and modify translation or routing rules. This p
         <status>ALPHA</status>
         <configurationfile>ifstated.xml</configurationfile>
     </package>
+-->
     <package>
         <name>ifdepd</name>
         <descr>The ifdepd daemon implements dependencies between network interfaces in a reliable fashion. If any of the source interfaces fails, ifdepd sets all destination interfaces to state down. If all source interfaces are up, ifdepd sets all destination interfaces to state up.</descr>
