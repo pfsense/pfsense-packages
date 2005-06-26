@@ -9,7 +9,6 @@
 	<configfile>ifdepd.xml</configfile>
 	<url>/pkg_edit.php?xml=ifdepd.xml&amp;id=0</url>
     </menu>
-    <aftersaveredirect>pkg_edit.php?xml=ifdepd.xml&amp;id=0</aftersaveredirect>
     <configpath>installedpackages->package->$packagename->configuration->settings</configpath>
     <fields>
 	<field>
@@ -36,7 +35,6 @@
                 conf_mount_rw();
                 config_lock();
                 global $config;
-                if ($_POST[0] == "") $_POST = $config['installedpackages']['ifdepd']['config'];
                 if($config['installedpackages']['ifdepd']['config'] != "") {
                         $fout = fopen("/usr/local/etc/rc.d/ifdepd.sh","w");
                         fwrite($fout, "#!/bin/sh\n\n");
