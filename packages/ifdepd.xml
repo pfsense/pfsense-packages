@@ -61,13 +61,8 @@
                 config_unlock();
         }
     </custom_php_global_functions>
-    <custom_php_install_command>
-	unlink_if_exists("/usr/local/etc/rc.d/ifdepd.sh");
-    </custom_php_install_command>
     <custom_add_php_command>
 	sync_package_ifdepd();
-	mwexec("/usr/bin/killall ifdepd");
-	mwexec("/usr/local/etc/rc.d/ifdepd.sh");
     </custom_add_php_command>
     <custom_php_resync_command>
 	sync_package_ifdepd();
