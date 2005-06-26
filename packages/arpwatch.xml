@@ -41,7 +41,7 @@
 			"stop" =>  $stop
 			)
 		);
-		start_service("arpwatch")
+		restart_service("arpwatch");
                 conf_mount_ro();
                 config_unlock();
         }
