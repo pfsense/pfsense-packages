@@ -107,6 +107,7 @@
 				}
 			}
 		 	fclose($fout);
+			chmod("/usr/local/etc/raddb/users", 0600);
 			conf_mount_ro();
 			config_unlock();
 			restart_service("freeradius");
