@@ -2,6 +2,7 @@
     <name>ifdepd</name>
     <version>20050303</version>
     <title>ifdepd: Settings</title>
+    <aftersaveredirect>pkg_edit.php?xml=ifdepd.xml&amp;id=0</aftersaveredirect>
     <menu>
 	<name>ifdepd</name>
 	<tooltiptext>Modify ifdepd settings.</tooltiptext>
