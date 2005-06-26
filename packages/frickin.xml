@@ -5,7 +5,7 @@
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
-		<chmod>a+rx</chmod>
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/All/frickin</item>
         </additional_files_needed>
 	<custom_php_install_command>
