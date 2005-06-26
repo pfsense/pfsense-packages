@@ -47,7 +47,7 @@
                                 $wan_int = $config['interfaces']['wan']['if'];
                                 $start = "/usr/local/bin/ifdepd -d -S " . $lan_int . ":" . $wan_int . " -D carp0:carp1\n";
                         } else {
-                                $start = "/usr/local/bin/ifdepd -d -S " . $ifdepd_config['srcinterface'] . " -D " . $_POST['destinterface'] . "\n");
+                                $start = "/usr/local/bin/ifdepd -d -S " . $ifdepd_config['srcinterface'] . " -D " . $_POST['destinterface'] . "\n";
                         }
 			write_rcfile(array(
 						"file" => "ifdepd.sh",
