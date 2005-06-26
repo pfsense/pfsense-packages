@@ -84,8 +84,7 @@
 			}
 		}
 		fclose($fout);
-		mwexec("killall doormand");
-		mwexec("/usr/local/etc/rc.d/doormand.sh");
+		restart_service("doorman");
 		conf_mount_ro();
 		config_unlock();
 		}

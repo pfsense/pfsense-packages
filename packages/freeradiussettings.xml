@@ -53,8 +53,8 @@
 		fclose($fout);
 		conf_mount_ro();
 		config_unlock();
+		restart_service("freeradius");
 		}
-	mwexec("killall -HUP radiusd");
 	</custom_php_command_before_form>
 	<custom_add_php_command>
 		sync_package_freeradius_settings();
