@@ -9,6 +9,11 @@
 	<configfile>ifdepd.xml</configfile>
 	<url>/pkg_edit.php?xml=ifdepd.xml&amp;id=0</url>
     </menu>
+    <service>
+	<name>ifdepd</name>
+	<rcfile>ifdepd.sh</rcfile>
+	<executable>ifdepd</executable>
+    </service>
     <configpath>installedpackages->package->$packagename->configuration->settings</configpath>
     <fields>
 	<field>
@@ -35,19 +40,22 @@
                 conf_mount_rw();
                 config_lock();
                 global $config;
-                if($config['installedpackages']['ifdepd']['config'] != "") {
-                        $fout = fopen("/usr/local/etc/rc.d/ifdepd.sh","w");
-                        fwrite($fout, "#!/bin/sh\n\n");
-                        fwrite($fout, "# PACKAGE: IFDepd\n");
-                        fwrite($fout, "# EXECUTABLE: ifdepd\n");                        
-                        if(isset($_POST['usedefaults'])) {
+		$ifdepd_config =& $config['installedpackages']['ifdepd']['config'];
+                if($ifdepd_config != "") {
+                        if(isset($ifdepd_config['usedefaults'])) {
                                 $lan_int = $config['interfaces']['lan']['if'];
                                 $wan_int = $config['interfaces']['wan']['if'];
-                                fwrite($fout, "/usr/local/bin/ifdepd -d -S " . $lan_int . ":" . $wan_int . " -D carp0:carp1\n");
+                                $start = "/usr/local/bin/ifdepd -d -S " . $lan_int . ":" . $wan_int . " -D carp0:carp1\n";
                         } else {
-                                fwrite($fout, "/usr/local/bin/ifdepd -d -S " . $_POST['srcinterface'] . " -D " . $_POST['destinterface'] . "\n");
+                                $start = "/usr/local/bin/ifdepd -d -S " . $ifdepd_config['srcinterface'] . " -D " . $_POST['destinterface'] . "\n");
                         }
-                        fclose($fout);
+			write_rcfile(array(
+						"file" => "ifdepd.sh",
+						"start" => $start,
+						"stop" => "/usr/bin/killall ifdepd"
+					)
+			);
+			restart_service("ifdepd");
                 }
                 conf_mount_ro();
                 config_unlock();
