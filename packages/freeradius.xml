@@ -74,7 +74,7 @@
 		fwrite($fout, "client 127.0.0.1" . "{\n" . "secret = pfsense\n" . "shortname = localhost\n}\n\n");
 		fclose($fout);
 		write_rcfile(array(
-					"file" => "radiusd.sh",
+					"file" => "freeradius.sh",
 					"start" => "/usr/local/sbin/radiusd -X -d /usr/local/etc/raddb &amp;",
 					"stop" => "/usr/bin/killall radiusd"
 				)
