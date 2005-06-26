@@ -70,7 +70,7 @@
 			<type>input</type>
 		</field>
 	</fields>
-	<custom_php_command_before_form>
+	<custom_php_global_functions>
 	function sync_package_doorman_users() {
 		if ($_POST == "") $_POST = $config['installedpackages']['doormanusers']['config'];
 		conf_mount_rw();
@@ -87,8 +87,8 @@
 		restart_service("doorman");
 		conf_mount_ro();
 		config_unlock();
-		}
-	</custom_php_command_before_form>
+	}
+	</custom_php_global_functions>
 	<custom_add_php_command>
 		sync_package_doorman_users();
 	</custom_add_php_command>
