@@ -2,13 +2,13 @@
     <name>ifdepd</name>
     <version>20050303</version>
     <title>ifdepd: Settings</title>
-    <aftersaveredirect>pkg_edit.php?xml=ifdepd.xml&amp;id=0</aftersaveredirect>
+    <aftersaveredirect>/pkg_edit.php?xml=ifdepd.xml&amp;id=0</aftersaveredirect>
     <menu>
 	<name>ifdepd</name>
 	<tooltiptext>Modify ifdepd settings.</tooltiptext>
 	<section>Services</section>
 	<configfile>ifdepd.xml</configfile>
-	<url>/pkg_edit.php?xml=ifdepd.xml&amp;id=0</url>
+	<url>pkg_edit.php?xml=ifdepd.xml&amp;id=0</url>
     </menu>
     <service>
 	<name>ifdepd</name>
@@ -41,7 +41,7 @@
                 conf_mount_rw();
                 config_lock();
                 global $config;
-		$ifdepd_config =&amp; $config['installedpackages']['ifdepd']['config'];
+		$ifdepd_config =&amp; $config['installedpackages']['ifdepd']['config'][0];
                 if($ifdepd_config != "") {
                         if(isset($ifdepd_config['usedefaults'])) {
                                 $lan_int = $config['interfaces']['lan']['if'];
