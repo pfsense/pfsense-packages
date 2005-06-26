@@ -10,9 +10,8 @@
 	</menu>
 	<service>
 		<name>FreeRADIUS</name>
-		<file>/usr/local/etc/rc.d/freeradius.sh</file>
-		<description>FreeRADIUS daemon</description>
-		<rcfile>radiusd.sh</rcfile>
+		<rcfile>freeradius.sh</rcfile>
+		<executable>radiusd</executable>
 	</service>
 	<tabs>
 		<tab>
@@ -69,9 +68,6 @@
 			<type>input</type>
 		</field>
 	</fields>
-	<custom_php_deinstall_command>
-		mwexec("rm /usr/local/etc/rc.d/radius*");
-	</custom_php_deinstall_command>
 	<custom_php_install_command>
 		global $config;
 		$fout = fopen("/usr/local/etc/raddb/clients.conf","w");
@@ -86,8 +82,9 @@
 		$fout = fopen("/usr/local/etc/radiusd.conf.dynamic","w");
 		fwrite($fout, "{\nipaddr = 127.0.0.1\nport = 0\ntype = auth\n}\n\n");
 		fclose($fout);
+		start_service("freeradius");
 	</custom_php_install_command>
-	<custom_php_command_before_form>
+	<custom_php_global_functions>
 		function sync_package_freeradius() {
 			conf_mount_rw();
 			config_lock();
@@ -112,9 +109,9 @@
 		 	fclose($fout);
 			conf_mount_ro();
 			config_unlock();
-			mwexec("/usr/bin/killall -HUP radiusd");
+			restart_service("freeradius");
 		}
-	</custom_php_command_before_form>
+	</custom_php_global_functions>
 	<custom_php_resync_config_command>
 		sync_package_freeradius();
 	</custom_php_resync_config_command>
