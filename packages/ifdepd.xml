@@ -40,7 +40,7 @@
                 conf_mount_rw();
                 config_lock();
                 global $config;
-		$ifdepd_config =& $config['installedpackages']['ifdepd']['config'];
+		$ifdepd_config =&amp; $config['installedpackages']['ifdepd']['config'];
                 if($ifdepd_config != "") {
                         if(isset($ifdepd_config['usedefaults'])) {
                                 $lan_int = $config['interfaces']['lan']['if'];
