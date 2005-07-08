@@ -5,6 +5,7 @@
 	<version>3.0</version>
         <preoutput>yes</preoutput>
         <savetext>Change</savetext>
+	<aftersaveredirect>pkg_edit.php?xml=ntop.xml&amp;id=0</aftersaveredirect>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>NTop Settings</name>
