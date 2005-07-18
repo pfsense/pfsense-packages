@@ -50,6 +50,20 @@
                     <description>This allows the scanning of networks that don't allow ICMP  echo requests  (or  responses) through their firewall.  microsoft.com is an example of such a network, and thus you should always  use -P0  or  -PT80 when portscanning microsoft.com.  Note tht "ping" in this contect may involve more than the traditional ICMP  echo request packet.  Nmap supports many such probes, including arbi- trary combinations of TCP, UDP, and ICMP  probes.   By  default, Nmap sends an ICMP echo request and a TCP ACK packet to port 80.</description>
                     <type>checkbox</type>
                 </field>
+		<field>
+		    <fielddescr>-sV</fielddescr>
+		    <typehint>Try to identify service versions</typehint>
+		    <fieldname>servicever</fieldname>
+		    <description>After TCP and/or  UDP  ports  are  discovered using  one of the other scan methods, version detection communicates with those ports to try and determine more about  what  is actually  running.  A file called nmap-service-probes is used to determine the best probes for detecting various services and the match  strings  to  expect.  Nmap tries to determine the service protocol (e.g. ftp, ssh, telnet,  http),  the  application  name (e.g. ISC Bind, Apache httpd, Solaris telnetd), the version number, and sometimes  miscellaneous  details  like  whether  an  X server  is open to connections or the SSH protocol version)</description>
+		    <type>checkbox</type>
+		</field>
+		<field>
+		    <fielddescr>-O</fielddescr>
+		    <typehint>Turn on OS detection</typehint>
+		    <fieldname>osdetect</fieldname>
+		    <description>This option activates remote host identification via TCP/IP fingerprinting.   In  other words, it uses a bunch of techniques to detect subtleties in the  underlying  operating  system  network stack  of the computers you are scanning.  It uses this informa- tion to create a "fingerprint" which it compares with its  database of known OS fingerprints (the nmap-os-fingerprints file) to decide what type of system you are scanning</description>
+		    <type>checkbox</type>
+		</field>
         </fields>
 		<custom_php_deinstall_command>
 		</custom_php_deinstall_command>
@@ -59,6 +73,8 @@
             if($_POST['option'] == "-sP: Ping scanning") $nmap_options .= " -sP";
             if($_POST['option'] == "-sU: UDP Scanning") $nmap_options .= " -sU";
             if($_POST['noping']) $nmap_options .= " -P0";
+	    if($_POST['servicever']) $nmap_options .= " -sV";
+	    if($_POST['osdetect']) $nmap_options .= " -O";
             $nmap_options .= " " . $_POST['hostname'];
             system("/usr/local/bin/nmap" . $nmap_options);
         </custom_add_php_command>
