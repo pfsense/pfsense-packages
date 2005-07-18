@@ -8,7 +8,7 @@
 	<savetext>mtr</savetext>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
-		<name>mtr-nox11</name>
+		<name>mtr</name>
 		<tooltiptext>mtr combines the functionality of the "traceroute" and "ping" programs into a single network diagnostic tool</tooltiptext>
 		<section>Diagnostics</section>
 		<configfile>mtr-nox11.xml</configfile>
