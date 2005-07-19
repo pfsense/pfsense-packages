@@ -107,6 +107,7 @@
 		conf_mount_ro();
 		config_unlock();
 		chmod("/usr/local/etc/rc.d/pure-ftpd.sh", 0755);
+		mwexec("killall pure-ftpd");
 		mwexec("/usr/local/etc/rc.d/pure-ftpd.sh");
 	</custom_add_php_command>
 	<custom_delete_php_command>
