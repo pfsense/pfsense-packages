@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-	<title>Diagnostics: NTop</title>
+	<title>Diagnostics: ntop Settings</title>
 	<name>ntop</name>
 	<version>3.0</version>
         <preoutput>yes</preoutput>
@@ -8,25 +8,31 @@
 	<aftersaveredirect>pkg_edit.php?xml=ntop.xml&amp;id=0</aftersaveredirect>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
-		<name>NTop Settings</name>
-		<tooltiptext>Set NTop settings such as password and port.</tooltiptext>
+		<name>ntop Settings</name>
+		<tooltiptext>Set ntop settings such as password and port.</tooltiptext>
 		<section>Diagnostics</section>
 		<url>/pkg_edit.php?xml=ntop.xml&amp;id=0</url>
 	</menu>
 	<menu>
-		<name>NTop</name>
+		<name>ntop</name>
 		<tooltiptext>Access ntop</tooltiptext>
 		<url>http://$myurl:3000</url>
 		<section>Diagnostics</section>
+		<depends_on_service>ntop</depends_on_service>
 	</menu>
+	<service>
+                        <name>ntop</name>
+                        <rcfile>ntop.sh</rcfile>
+                        <executable>ntop</executable>
+        </service>
 	<tabs>
 		<tab>
-			<text>NTop Settings</text>
+			<text>ntop Settings</text>
 			<url>/pkg_edit.php?xml=ntop.xml&amp;id=0</url>
 			<active/>
 		</tab>
 		<tab>
-			<text>NTop</text>
+			<text>Access ntop</text>
 			<url>http://$myurl:3000</url>
 		</tab>
 	</tabs>
@@ -34,13 +40,13 @@
              the configuration database. -->
 	<fields>
 		<field>
-			<fielddescr>NTOP Admin Password</fielddescr>
+			<fielddescr>ntop Admin Password</fielddescr>
 			<fieldname>password</fieldname>
 			<description>Enter the password for the NTOP Web GUI.  Minimum 5 characters.</description>
 			<type>password</type>
 		</field>
 		<field>
-			<fielddescr>NTOP Admin Password AGAIN</fielddescr>
+			<fielddescr>ntop Admin Password AGAIN</fielddescr>
 			<fieldname>passwordagain</fieldname>
 			<type>password</type>
 		</field>
@@ -53,57 +59,50 @@
 			<type>interfaces_selection</type>
 		</field>
     </fields>
+	<custom_php_global_functions>
+	function sync_package_ntop() {
+			        conf_mount_rw();
+			        config_lock();
+                                global $config;
+                                global $input_errors;
+                                $ntop_config =&amp; $config['installedpackages']['ntop']['config'][0];
+                                $if_final = "";
+                                if($ntop_config['password'] and $ntop_config['passwordagain']) {
+                                        if($ntop_config['password'] == $ntop_config['passwordagain']) {
+                                                $ifaces = $ntop_config['iface'];
+                                                $isfirst = 0;
+                                                $lan = $config['interfaces']['lan']['if'];
+                                                foreach($ifaces as $if) {
+                                                        if($isfirst == 1) $if_final = ",";
+                                                        $if_final .= convert_friendly_interface_to_real_interface_name($if);
+                                                        $isfirst = 1;
+                                                }
+                                                if(!$if_final) {
+                                                        $if_final = $lan;
+                                                }
+                                                system("/usr/local/bin/ntop --set-admin-password=" . $_POST['password'] . " &amp;");
+                                                $start = "/usr/local/bin/ntop -i " . $if_final . " -u root -d --ipv4 -M -x 8102 -X 8192 &amp;";
+                                                write_rcfile(array(
+                                                                        "file" => "ntop.sh",
+                                                                        "start" => $start,  
+                                                                        "stop" => "/usr/bin/killall ntop"
+                                                                )
+                                                );
+                                                restart_service_if_running("ntop");
+                                        } else {
+                                                $input_errors[] = "The provided passwords did not match.";
+                                        }
+                                } else {
+                                        $input_errors[] = "You must provide (and confirm) ntop's password.";
+                                }
+                                conf_mount_ro();
+                                config_unlock();
+                        }
+	</custom_php_global_functions>
 	<custom_add_php_command>
-        function sync_package_ntop() {
-            conf_mount_rw();
-            config_lock();
-            if($_POST == "") $_POST = $config['installedpackages']['ntop']['config'];
-            $if_final = "";
-            if($_POST['password'] == $_POST['passwordagain']) {
-                    $ifaces=$_POST['iface'];
-                    $isfirst = 0;
-                    $lan = $config['interfaces']['lan']['if'];
-                    foreach($ifaces as $if)
-                    {
-                            if($isfirst == 1) $if_final .= ",";
-                            $if_final .= convert_friendly_interface_to_real_interface_name($if);
-                            $isfirst = 1;
-                    }
-                    if($if_final == "") {
-                        $if_final = $lan;
-                    }
-                    exec("/usr/local/bin/ntop --set-admin-password=" . $_POST['password']);
-                    mwexec("killall ntop 2>/dev/null");
-                    $fout = fopen("/usr/local/etc/rc.d/ntop.sh","w");
-                    fwrite($fout, "#!/bin/sh\n\n");
-                    fwrite($fout, "/usr/local/bin/ntop -i " . $if_final . " -u root -d --ipv4 -M -x 8192 -X 8192\n\n");
-                    fclose($fout);
-                    conf_mount_ro();
-                    config_unlock();
-                    chmod("/usr/local/etc/rc.d/ntop.sh", 0555);
-                    mwexec("killall ntop");
-                    exec("/usr/local/etc/rc.d/ntop.sh");
-            } else {
-                    echo "Passwords do not match!";
-                    exit;
-            }
-        }
-        sync_package_ntop();
-
+        	sync_package_ntop();
 	</custom_add_php_command>
 	<custom_php_resync_command>
 		sync_package_ntop();
 	</custom_php_resync_command>
-	<custom_php_deinstall_command>
-		mwexec("/usr/bin/killall ntop");
-	</custom_php_deinstall_command>
-	<custom_php_install_command>
-	    $fout = fopen("/usr/local/etc/rc.d/ntop.sh","w");
-	    fwrite($fout, "#!/bin/sh\n\n");
-	    fwrite($fout, "# PACKAGE: NTop\n");
-	    fwrite($fout, "# EXECUTABLE: ntop\n");		
-	    fwrite($fout, "/usr/local/bin/ntop -u root -d --ipv4 -M\n\n");
-	    fclose($fout);
-	    chmod("/usr/local/etc/rc.d/ntop.sh", 0555);
-	</custom_php_install_command>
 </packagegui>
