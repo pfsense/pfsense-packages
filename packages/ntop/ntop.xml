@@ -3,7 +3,6 @@
 	<title>Diagnostics: ntop Settings</title>
 	<name>ntop</name>
 	<version>3.0</version>
-        <preoutput>yes</preoutput>
         <savetext>Change</savetext>
 	<aftersaveredirect>pkg_edit.php?xml=ntop.xml&amp;id=0</aftersaveredirect>
 	<!-- Menu is where this packages menu will appear -->
@@ -53,8 +52,6 @@
 		<field>
 			<fielddescr>Interface</fielddescr>
 			<fieldname>iface</fieldname>
-			<size>3</size>
-			<multiple>true</multiple>
 			<value>lan</value>
 			<type>interfaces_selection</type>
 		</field>
@@ -65,22 +62,17 @@
 			        config_lock();
                                 global $config;
                                 global $input_errors;
-                                $ntop_config =&amp; $config['installedpackages']['ntop']['config'][0];
+                                $ntop_config =&amp; $_POST;
                                 $if_final = "";
                                 if($ntop_config['password'] and $ntop_config['passwordagain']) {
                                         if($ntop_config['password'] == $ntop_config['passwordagain']) {
                                                 $ifaces = $ntop_config['iface'];
-                                                $isfirst = 0;
                                                 $lan = $config['interfaces']['lan']['if'];
-                                                foreach($ifaces as $if) {
-                                                        if($isfirst == 1) $if_final = ",";
-                                                        $if_final .= convert_friendly_interface_to_real_interface_name($if);
-                                                        $isfirst = 1;
-                                                }
+                                                $if_final .= convert_friendly_interface_to_real_interface_name($if);
                                                 if(!$if_final) {
                                                         $if_final = $lan;
                                                 }
-                                                system("/usr/local/bin/ntop --set-admin-password=" . $_POST['password'] . " &amp;");
+                                                exec("/usr/local/bin/ntop --set-admin-password=" . $_POST['password'] . " &amp;", $ntopout);
                                                 $start = "/usr/local/bin/ntop -i " . $if_final . " -u root -d --ipv4 -M -x 8102 -X 8192 &amp;";
                                                 write_rcfile(array(
                                                                         "file" => "ntop.sh",
