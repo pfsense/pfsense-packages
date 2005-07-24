@@ -80,7 +80,7 @@
                                                                         "stop" => "/usr/bin/killall ntop"
                                                                 )
                                                 );
-                                                restart_service_if_running("ntop");
+                                                restart_service("ntop");
                                         } else {
                                                 $input_errors[] = "The provided passwords did not match.";
                                         }
