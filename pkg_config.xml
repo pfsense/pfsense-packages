@@ -55,14 +55,8 @@
           <configurationfile>doorman.xml</configurationfile>
     </package>
     <package>
-	<name>nmap</name>
-	<website>http://www.insecure.org/nmap/</website>
-	<descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
-	<category>Security</category>
 	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6-current/All</depends_on_package_base_url>
 	<depends_on_package>nmap-3.81.tbz</depends_on_package>
-	<version>3.81</version>
-	<status>Stable</status>
 	<config_file>http://www.pfsense.com/packages/config/nmap.xml</config_file>
 	<configurationfile>nmap.xml</configurationfile>
     </package>
@@ -165,6 +159,20 @@
           <xmlver>0.1</xmlver>
 	  <status>ALPHA</status>
           <configurationfile>netio.xml</configurationfile>
+    </package>
+    <package> 
+          <name>netio-newpkg</name>
+          <website>http://freshmeat.net/projects/netio/</website>
+          <descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and
+ DOS only support TCP/IP) using various different packet sizes.</descr>
+          <category>Network Management</category>
+          <config_file>http://www.pfsense.com/packages/config/netio-newpkg.xml</config_file>
+          <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6-current/All</depends_on_package_base_url>
+          <depends_on_package>netio-1.14.tbz</depends_on_package>
+          <version>1.14</version>
+          <xmlver>0.1</xmlver>
+          <status>ALPHA</status>
+          <configurationfile>netio-newpkg.xml</configurationfile>
     </package>
 <!--
     <package>
