@@ -2,7 +2,7 @@
 <package>
 	<nosync/>
 	<info>
-		<name>netio</name>
+		<name>netio-newpkg</name>
 		<descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and DOS only support TCP/IP) using various different packet sizes.</descr>
 		<category>Network Management</category>
 		<version>1.14</version>
@@ -15,12 +15,12 @@
 		</file>
 		<file>
 			<type>configfile</type>
-			<location>http://www.pfsense.com/packages/config/netioserver.xml</location>
+			<location>http://www.pfsense.com/packages/config/netioserver-newpkg.xml</location>
 		</file>
 	</files>
 	<services>
 		<service>
-			<name>netio</name>
+			<name>netio-newpkg</name>
 			<executable>netio</executable>
 		</service>
 	</services>
@@ -33,18 +33,18 @@
 				<name>netio</name>
 				<tooltiptext>Run netio in client or server mode.</tooltiptext>
 				<section>Diagnostics</section>
-				<configfile>netio.xml</configfile>
+				<configfile>netio-newpkg.xml</configfile>
 			</menu>
 		</menus>
 		<tabs>
 			<tab>
 				<text>Client</text>
-				<url>/pkg_edit.php?xml=netio.xml</url>
+				<url>/pkg_edit.php?xml=netio-newpkg.xml</url>
 				<active/>
 			</tab>
 			<tab>
 				<text>Server</text>
-				<url>/pkg_edit.php?xml=netioserver.xml</url>
+				<url>/pkg_edit.php?xml=netioserver-newpkg.xml</url>
 			</tab>
 		</tabs>
 		<fields>
@@ -64,7 +64,7 @@
 	</gui>
 	<commands>
 		<add_commands>
-			stop_service("netio");
+			stop_service("netio-newpkg");
 			$netio_options = "";
 			if($_POST['port'] != "") $netio_options .= " -p {$_POST['port']}";
 			$netio_options .= $_POST['hostname'];
