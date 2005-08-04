@@ -55,10 +55,13 @@
           <configurationfile>doorman.xml</configurationfile>
     </package>
     <package>
-	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6-current/All</depends_on_package_base_url>
-	<depends_on_package>nmap-3.81.tbz</depends_on_package>
-	<config_file>http://www.pfsense.com/packages/config/nmap.xml</config_file>
-	<configurationfile>nmap.xml</configurationfile>
+      <name>nmap</name>
+      <descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
+      <category>Security</category>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+      <depends_on_package>nmap.tbz</depends_on_package>
+      <config_file>http://www.pfsense.com/packages/config/nmap.xml</config_file>
+      <configurationfile>nmap.xml</configurationfile>
     </package>
     <package>
 	<name>ntop</name>
