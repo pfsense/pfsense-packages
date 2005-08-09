@@ -9,7 +9,6 @@
 	<category>Network Management</category>
 	<config_file>http://www.pfsense.com/packages/config/pfstat.xml</config_file>
 	<depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6-current/All</depends_on_package_base_url>
-	<depends_on_package>pfstat-1.7.tbz</depends_on_package>
 	<status>Stable</status>
 	<version>1.7</version>
 	<configurationfile>pfstat.xml</configurationfile>
