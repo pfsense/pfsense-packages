@@ -89,6 +89,7 @@
                                 }
                                 conf_mount_ro();
                                 config_unlock();
+				echo "NTOP Setup complete.  You can now access NTOP under the Diagnostics menu.";
                         }
 	</custom_php_global_functions>
 	<custom_add_php_command>
