@@ -16,9 +16,11 @@
 		<url>/pfstat.php</url>
 		<section>Status</section>
 	</menu>
-	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/pfstat.tgz</item>
-	</additional_files_needed>
+    	<additional_files_needed>
+	    <prefix>/usr/local/www/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://www.pfsense.com/packages/config/pfstat.php</item>
+	</additional_files_needed>	
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->
 	<configpath>['installedpackages']['pfstat']['config']</configpath>
