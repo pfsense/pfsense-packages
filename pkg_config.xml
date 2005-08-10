@@ -113,7 +113,6 @@
 	<status>ALPHA</status>
 	<configurationfile>spamd.xml</configurationfile>
     </package>
-<!--
     <package>
 	  <name>pfflowd</name>
 	  <website>http://www.mindrot.org/pfflowd.html</website>
@@ -126,7 +125,6 @@
 	  <status>BETA</status>
 	  <configurationfile>pfflowd.xml</configurationfile>
     </package>
--->
     <package>
 	  <name>assp</name>
 	  <website>http://assp.sourceforge.net</website>
