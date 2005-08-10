@@ -134,7 +134,7 @@
 	  <category>Network Management</category>
 	  <config_file>http://www.pfsense.com/packages/config/assp.xml</config_file>
 	  <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6-current/All/</depends_on_package_base_url>
-	  <depends_on_package>perl-5.8.6_2.tbz</depends_on_package>
+	  <depends_on_package>perl-5.8.7.tbz</depends_on_package>
 	  <verifyinstalledpkg>perl</verifyinstalledpkg>
 	  <version>0.1</version>
 	  <status>ALPHA</status>
