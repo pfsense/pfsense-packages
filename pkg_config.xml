@@ -30,7 +30,6 @@
 	<logfilename>pure-ftpd.log</logfilename>
 	</logging>
     </package>
-<!--
     <package>
         <name>freeradius</name>
         <website>http://www.freeradius.org/</website>
@@ -43,7 +42,6 @@
         <status>Stable</status>
         <configurationfile>freeradius.xml</configurationfile>
     </package>
--->
     <package>
           <name>doorman</name>
           <website>http://doorman.sourceforge.net</website>
