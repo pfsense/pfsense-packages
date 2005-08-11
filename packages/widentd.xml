@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>widentd</name>
+	<version>1.03</version>
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<title>Services: widentd</title>
+	<menu>
+		<name>widentd</name>
+		<tooltiptext>Modify widentd settings.</tooltiptext>
+		<section>Services</section>
+		<configfile>widentd.xml</configfile>
+	</menu>
+	<service>
+		<name>widentd</name>
+		<rcfile>widentd.sh</rcfile>
+		<executable>widentd</executable>
+	</service>
+	<fields>
+		<field>
+		    <fielddescr>Listening interface</fielddescr>
+		    <fieldname>interface</fieldname>
+		    <description>Enter the desired listening interface here.</description>
+		    <type>interfaces_selection</type>
+		</field>
+		<field>
+                    <fielddescr>Username</fielddescr>
+                    <fieldname>username</fieldname>
+                    <description>Enter the username you'd like displayed via widentd.</description>
+                    <type>input</type>
+		</field>
+		<field>
+		    <fielddescr>System name</fielddescr>
+		    <fieldname>sysname</fieldname>
+		    <description>Enter the system name you'd like displayed via widentd</description>
+		    <value>pfSense</value>
+		    <type>input</type>
+		</field>
+        </fields>
+	<custom_php_install_command>
+		unlink_if_exists("/usr/local/etc/rc.d/widentd.sh");
+	</custom_php_install_command>
+	<custom_php_global_functions>
+	function sync_package_widentd() {
+		conf_mount_rw();
+		config_lock();
+		global $config;
+        if (!isset($config['installedpackages']['widentd']['config'][0]['interface']) {
+            $config['installedpackages']['widentd']['config'][0]['interface'] = 'WAN';
+        }
+        if (!isset($config['installedpackages']['widentd']['config'][0]['username'])) {
+            $config['installedpackages']['widentd']['config'][0]['username'] = 'user';
+        }
+        if (!isset($config['installedpackages']['widentd']['config'][0]['sysname'])) {
+            $config['installedpackages']['widentd']['config'][0]['sysname'] = 'UNIX';
+        }
+		$int = convert_friendly_interface_to_real_interface_name($config['installedpackages']['widentd']['config'][0]['interface']);
+		$ip = find_interface_ip($int);
+		$user = $config['installedpackages']['widentd']['config'][0]['username'];
+		$system = $config['installedpackages']['widentd']['config'][0]['sysname'];
+		$start = "/usr/local/sbin/widentd -u {$user} -o {$system} -i {$ip}";
+		$stop = "/usr/bin/killall widentd";
+		write_rcfile(array(
+			"file" => "widentd.sh",
+			"start" => $start,
+			"stop" =>  $stop
+			)
+		);
+		restart_service("widentd");
+		conf_mount_ro();
+		config_unlock();
+	}
+	</custom_php_global_functions>
+	<custom_add_php_command>
+		sync_package_widentd();
+	</custom_add_php_command>
+</packagegui>
+
