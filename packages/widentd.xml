@@ -44,7 +44,7 @@
 		conf_mount_rw();
 		config_lock();
 		global $config;
-        if (!isset($config['installedpackages']['widentd']['config'][0]['interface']) {
+        if (!isset($config['installedpackages']['widentd']['config'][0]['interface'])) {
             $config['installedpackages']['widentd']['config'][0]['interface'] = 'WAN';
         }
         if (!isset($config['installedpackages']['widentd']['config'][0]['username'])) {
