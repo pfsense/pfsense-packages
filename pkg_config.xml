@@ -22,9 +22,6 @@
 	<version>0.1</version>
 	<status>ALPHA</status>
 	<configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
-	<logging>
-	<facilityname>services</facilityname>
-	</logging>
     </package>    
     <package>
 	<name>pure-ftpd</name>
