@@ -18,7 +18,7 @@
 		<field>
 			<fielddescr>Bandwidth</fielddescr>
 			<fieldname>bandwidth</fieldname>
-			<description>Enter the bandwidth you would like to distribute:</description>
+			<description>Enter the bandwidth you would like to distribute fairly among the clients:</description>
 			<type>input</type>
 		</field>
 		<field>
