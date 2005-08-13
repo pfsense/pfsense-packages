@@ -15,6 +15,18 @@
 	<configurationfile>pfstat.xml</configurationfile>
     </package>
     <package>
+	<name>BWDistribute</name>
+	<descr>Adds a per user bandwidth distribution option.  Requires 0.76 or better.</descr>
+	<category>FTP</category>
+	<config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
+	<version>0.1</version>
+	<status>ALPHA</status>
+	<configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
+	<logging>
+	<facilityname>services</facilityname>
+	</logging>
+    </package>    
+    <package>
 	<name>pure-ftpd</name>
 	<website>http://www.pureftpd.org/</website>
 	<descr>Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerabilities, is trivial to set up, and is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
