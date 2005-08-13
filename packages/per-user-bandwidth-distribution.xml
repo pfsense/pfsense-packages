@@ -44,11 +44,11 @@
 	<custom_add_php_command>
 		$fd = fopen("/usr/local/etc/rc.d/per_user_bandwidth_distribution.sh","w");
 		fwrite($fd, "/sbin/kldload dummynet");
+		fwrite($fd, "/sbin/ipfw pipe 1 config mask src-ip 0x000000ff bw {$_POST['bandwidth']}{$_POST['bandwidthtype']}");
+		fwrite($fd, "/sbin/ipfw pipe 2 config mask dst-ip 0x000000ff bw {$_POST['bandwidth']}{$_POST['bandwidthtype']}");
 		fwrite($fd, "/sbin/ipfw add 10 pipe 1 ip from any to any out via {$wanif}");
 		fwrite($fd, "/sbin/ipfw add 10 pipe 2 ip from any to any in via {$wanif}");
 		fwrite($fd, "/sbin/ipfw add allow all from any to any");
-		fwrite($fd, "/sbin/ipfw pipe 1 config mask src-ip 0x000000ff bw {$_POST['bandwidth']}{$_POST['bandwidthtype']}");
-		fwrite($fd, "/sbin/ipfw pipe 2 config mask dst-ip 0x000000ff bw {$_POST['bandwidth']}{$_POST['bandwidthtype']}");
 		fclose($fd);
 		mwexec("chmod a+rx /usr/local/etc/rc.d/per_user_bandwidth_distribution.sh");
 	</custom_add_php_command>
