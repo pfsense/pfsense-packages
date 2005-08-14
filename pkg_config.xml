@@ -17,7 +17,7 @@
     <package>
 	<name>BWDistribute</name>
 	<descr>Adds a per user bandwidth distribution option.  Requires 0.76 or better.</descr>
-	<category>FTP</category>
+	<category>NET</category>
 	<config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
 	<version>0.1</version>
 	<status>ALPHA</status>
