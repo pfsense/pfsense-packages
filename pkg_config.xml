@@ -59,8 +59,8 @@
         <config_file>http://www.pfsense.com/packages/config/freeradius.xml</config_file>                       
         <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/packages/Latest</depends_on_package_base_url>                                                                         
         <depends_on_package>freeradius.tbz</depends_on_package>
-        <version>1.0.1</version>
-        <status>Stable</status>
+        <version>1.0.4</version>
+        <status>BETA</status>
         <configurationfile>freeradius.xml</configurationfile>
     </package>
     <package>
