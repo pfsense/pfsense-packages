@@ -7,7 +7,7 @@
 		<name>Per User Bandwidth</name>
 		<tooltiptext>Enforce a fair use bandwidth policy</tooltiptext>
 		<section>Services</section>
-		<configfile>per-user-bandwidth-distribution.xml</configfile>
+		<url>pkg_edit.php?xml=per-user-bandwidth-distribution.xml&amp;id=0</url>
 	</menu>
 	<service>
 		<name>PerUserBandwidth</name>
