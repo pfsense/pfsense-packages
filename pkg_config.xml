@@ -15,7 +15,7 @@
 	<configurationfile>pfstat.xml</configurationfile>
     </package>
     <package>
-	<name>BWDistribute</name>
+	<name>PerUserBW</name>
 	<descr>Adds a per user bandwidth distribution option.  Requires 0.76.4 or better.</descr>
 	<category>NET</category>
 	<config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
