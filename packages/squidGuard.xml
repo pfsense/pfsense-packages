@@ -56,10 +56,10 @@
 		fwrite($fout, "\t }\n");
 		fwrite($fout, "}\n");	
 		fclose($fout);
-		sync_package("squid");
-		$fout = fopen("/usr/local/etc/squid/squid.conf","a");
+        add_text_to_file("/usr/local/etc/squid/squid.conf", "redirect_program /usr/local/bin/squidGuard -c /usr/local/etc/squid/squidGuard.conf");
+        <-- $fout = fopen("/usr/local/etc/squid/squid.conf","a");
 		fwrite($fout, "redirect_program /usr/local/bin/squidGuard -c /usr/local/etc/squid/squidGuard.conf\n");
-		fclose($fout);
+		fclose($fout); -->
 		mwexec("/usr/bin/touch /usr/local/squid/logs/squidGuard.log");
 		mwexec("/usr/sbin/chown squid /usr/local/squid/logs/squidGuard.log");
 		mwexec("/usr/bin/chgrp squid /usr/local/squid/logs/squidGuard.log");
