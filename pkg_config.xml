@@ -21,6 +21,7 @@
         <category>Network Management</category>
         <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6-current/All/</depends_on_package_base_url>
         <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
+	<depends_on_package>squid-2.5.10_4.tbz</depends_on_package>
         <version>1.2.0_1</version>
         <status>ALPHA</status>
         <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
