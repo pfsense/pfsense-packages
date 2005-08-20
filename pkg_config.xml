@@ -15,6 +15,18 @@
 	<configurationfile>pfstat.xml</configurationfile>
     </package>
     <package>
+        <name>squidGuard</name>
+        <descr>High performance Web proxy Guard</descr>
+        <website>http://www.squidguard.org/</website>
+        <category>Network Management</category>
+        <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/releases/i386/5.3-RELEASE/packages/All</depends_on_package_base_url>
+        <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
+        <version>1.2.0_1</version>
+        <status>ALPHA</status>
+        <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
+        <configurationfile>squidGuard.xml</configurationfile>
+    </package>    
+    <package>
 	<name>PerUserBW</name>
 	<descr>Adds a per user bandwidth distribution option.  Requires 0.76.4 or better.</descr>
 	<category>NET</category>
@@ -298,18 +310,6 @@ test server or link availability and modify translation or routing rules. This p
 	<status>ALPHA</status>
 	<config_file>http://www.pfsense.com/packages/config/postfix.xml</config_file>
 	<configurationfile>postfix.xml</configurationfile>
-    </package>
-    <package>
-        <name>squidGuard</name>
-        <descr>High performance Web proxy Guard</descr>
-        <website>http://www.squidguard.org/</website>
-        <category>Network Management</category>
-        <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/releases/i386/5.3-RELEASE/packages/All</depends_on_package_base_url>
-        <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
-        <version>1.2.0_1</version>
-        <status>ALPHA</status>
-        <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
-        <configurationfile>squidGuard.xml</configurationfile>
     </package>
     <package>
           <name>doorman</name>
