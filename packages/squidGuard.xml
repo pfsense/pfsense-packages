@@ -26,10 +26,6 @@
 		fwrite($fout, "\t domainlist\t gambling/domains\n");
 		fwrite($fout, "\t urllist\t gambling/urls\n");
 		fwrite($fout, "}\n");
-		fwrite($fout, "dest gambling {\n");
-		fwrite($fout, "\t domainlist\t gambling/domains\n");
-		fwrite($fout, "\t urllist\t gambling/urls\n");
-		fwrite($fout, "}\n");
 		fwrite($fout, "dest hacking {\n");
 		fwrite($fout, "\t domainlist\t hacking/domains\n");
 		fwrite($fout, "\t urllist\t hacking/urls\n");
