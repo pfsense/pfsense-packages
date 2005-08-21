@@ -26,15 +26,7 @@
         <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
         <configurationfile>squidGuard.xml</configurationfile>
     </package>    
-    <package>
-	<name>PerUserBW</name>
-	<descr>Adds a per user bandwidth distribution option.  Requires 0.79.4 or newer.</descr>
-	<category>NET</category>
-	<config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
-	<version>0.1</version>
-	<status>ALPHA</status>
-	<configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
-    </package>    
+
     <package>
 	<name>pure-ftpd</name>
 	<website>http://www.pureftpd.org/</website>
@@ -334,5 +326,14 @@ test server or link availability and modify translation or routing rules. This p
 	<status>*TESTED. NEEDS MORE TESTING!*</status>
 	<config_file>http://www.pfsense.com/packages/config/upnpd.xml</config_file>
 	<configurationfile>upnpd.xml</configurationfile>
+    </package>
+    <package>
+	<name>PerUserBW</name>
+	<descr>Adds a per user bandwidth distribution option.  Requires 0.79.4 or newer.</descr>
+	<category>NET</category>
+	<config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
+	<version>0.1</version>
+	<status>ALPHA</status>
+	<configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
     </package>
 </pfsensepkgs>
