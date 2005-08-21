@@ -4,13 +4,13 @@
 	<title>Services: Per User Bandwidth</title>
 	<aftersaveredirect>pkg_edit.php?xml=per-user-bandwidth-distribution.xml&amp;id=0</aftersaveredirect>
 	<menu>
-		<name>Per User Bandwidth</name>
+		<name>PerUserBW</name>
 		<tooltiptext>Enforce a fair use bandwidth policy</tooltiptext>
 		<section>Services</section>
 		<url>pkg_edit.php?xml=per-user-bandwidth-distribution.xml&amp;id=0</url>
 	</menu>
 	<service>
-		<name>PerUserBandwidth</name>
+		<name>PerUserBW</name>
 		<rcfile>per_user_bandwidth_distribution.sh</rcfile>
 	</service>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
