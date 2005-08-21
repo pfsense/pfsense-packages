@@ -83,9 +83,9 @@
 		mwexec("chmod a+rx /usr/local/etc/rc.d/per_user_bandwidth_distribution.sh");
 		mwexec_bg("/usr/local/etc/rc.d/per_user_bandwidth_distribution.sh");
 	</custom_add_php_command>
-	<custom_deinstall_php_command>
+	<custom_php_deinstall_command>
 		mwexec("/sbin/ipfw delete 10");
 		mwexec("/sbin/kldunload dummynet");
 		mwexec("/sbin/kldunload ipfw");
-	</custom_deinstall_php_command>
+	</custom_php_deinstall_command>
 </packagegui>
