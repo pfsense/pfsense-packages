@@ -16,14 +16,39 @@
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<fields>
 		<field>
-			<fielddescr>Bandwidth</fielddescr>
-			<fieldname>bandwidth</fieldname>
+			<fielddescr>Incoming Bandwidth</fielddescr>
+			<fieldname>incoming_bandwidth</fieldname>
 			<description>Enter the bandwidth you would like to distribute fairly among the clients:</description>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Bandwidth Type</fielddescr>
-			<fieldname>bandwidthtype</fieldname>
+			<fielddescr>Incoming Bandwidth Type</fielddescr>
+			<fieldname>incoming_bandwidthtype</fieldname>
+			<type>select</type>
+			<options>
+			    <option>
+				<value>Byte/s</value>
+				<name>Byte/s</name>
+			    </option>
+			    <option>
+				<value>KByte/s</value>
+				<name>KByte/s</name>
+			    </option>
+			    <option>
+				<value>MByte/s</value>
+				<name>MByte/s</name>
+			    </option>
+			</options>			
+		</field>
+		<field>
+			<fielddescr>Outgoing Bandwidth</fielddescr>
+			<fieldname>outgoing_bandwidth</fieldname>
+			<description>Enter the bandwidth you would like to distribute fairly among the clients:</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Outgoing Bandwidth Type</fielddescr>
+			<fieldname>outgoing_bandwidthtype</fieldname>
 			<type>select</type>
 			<options>
 			    <option>
@@ -48,10 +73,10 @@
 		fwrite($fd, "/sbin/kldload ipfw\n");
 		fwrite($fd, "/sbin/kldload dummynet\n");
 		fwrite($fd, "/sbin/ipfw delete 10\n");
-		fwrite($fd, "/sbin/ipfw pipe 1 config mask src-ip 0x000000ff bw {$_POST['bandwidth']}{$_POST['bandwidthtype']}\n");
-		fwrite($fd, "/sbin/ipfw pipe 2 config mask dst-ip 0x000000ff bw {$_POST['bandwidth']}{$_POST['bandwidthtype']}\n");
-		fwrite($fd, "/sbin/ipfw add 10 pipe 1 ip from any to any out via {$wanif}\n");
-		fwrite($fd, "/sbin/ipfw add 10 pipe 2 ip from any to any in via {$wanif}\n");
+		fwrite($fd, "/sbin/ipfw pipe 1 config mask src-ip 0x000000ff bw {$_POST['incoming_bandwidth']}{$_POST['incoming_bandwidthtype']}\n");
+		fwrite($fd, "/sbin/ipfw pipe 2 config mask dst-ip 0x000000ff bw {$_POST['outgoing_bandwidth']}{$_POST['outgoing_bandwidthtype']}\n");
+		fwrite($fd, "/sbin/ipfw add 10 pipe 2 ip from any to any out via {$wanif}\n");
+		fwrite($fd, "/sbin/ipfw add 10 pipe 1 ip from any to any in via {$wanif}\n");
 		fwrite($fd, "/sbin/ipfw add 10 allow all from any to any\n");
 		fclose($fd);
 		mwexec("chmod a+rx /usr/local/etc/rc.d/per_user_bandwidth_distribution.sh");
