@@ -15,19 +15,6 @@
 	<configurationfile>pfstat.xml</configurationfile>
     </package>
     <package>
-        <name>squidGuard</name>
-        <descr>High performance Web proxy Guard</descr>
-        <website>http://www.squidguard.org/</website>
-        <category>Network Management</category>
-        <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6-current/All/</depends_on_package_base_url>
-        <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
-        <version>1.2.0_1</version>
-        <status>ALPHA</status>
-        <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
-        <configurationfile>squidGuard.xml</configurationfile>
-    </package>    
-
-    <package>
 	<name>pure-ftpd</name>
 	<website>http://www.pureftpd.org/</website>
 	<descr>Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerabilities, is trivial to set up, and is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
@@ -336,4 +323,16 @@ test server or link availability and modify translation or routing rules. This p
 	<status>ALPHA</status>
 	<configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
     </package>
+    <package>
+        <name>squidGuard</name>
+        <descr>High performance Web proxy Guard</descr>
+        <website>http://www.squidguard.org/</website>
+        <category>Network Management</category>
+        <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6-current/All/</depends_on_package_base_url>
+        <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
+        <version>1.2.0_1</version>
+        <status>ALPHA</status>
+        <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
+        <configurationfile>squidGuard.xml</configurationfile>
+    </package>    
 </pfsensepkgs>
