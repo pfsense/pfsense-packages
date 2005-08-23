@@ -226,9 +226,9 @@ test server or link availability and modify translation or routing rules. This p
         <status>ALPHA</status>
         <config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
         <configurationfile>arpwatch.xml</configurationfile>
-        <facilityname>arpwatch</facilityname>
-	<logging>true</logging>
-        <logfilename>arpwatch.log</logfilename>
+        <logging>
+	  <facilityname>arpwatch</facilityname>
+	  <logfilename>arpwatch.log</logfilename>
         </logging> 
     </package>
     <package>
