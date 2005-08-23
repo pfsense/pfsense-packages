@@ -228,6 +228,7 @@ test server or link availability and modify translation or routing rules. This p
         <configurationfile>arpwatch.xml</configurationfile>
         <logging>
         <facilityname>arpwatch</facilityname>
+	<logging>true</logging>
         <logfilename>arpwatch.log</logfilename>
         </logging> 
     </package>
