@@ -13,7 +13,7 @@
 	<service>
                 <name>assp</name>
                 <rcfile>assp.sh</rcfile>
-                <executable>assp</executable>
+                <executable>perl</executable>
         </service>
     	<additional_files_needed>
 		<item>http://www.pfsense.com/packages/All/assp-1.0.tgz</item>
