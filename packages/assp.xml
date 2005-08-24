@@ -23,7 +23,7 @@
 	    write_rcfile(array(
 				"file" => 'assp.sh',
 				"start" => $start,
-				"stop" => '/usr/bin/kill `cat /var/run/assp.pid`'
+				"stop" => '/usr/bin/killall perl'
 			)
 	    );
 	    start_service("assp");
