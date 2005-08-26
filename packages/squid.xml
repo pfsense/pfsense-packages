@@ -58,7 +58,7 @@
 		fwrite($fout, "#!/bin/sh\n");
                 fwrite($fout, "# PACKAGE: Squid\n");
                 fwrite($fout, "# EXECUTABLE: squid\n");
-		fwrite($fout, "/usr/local/sbin/squid\n\n");
+		fwrite($fout, "/usr/local/sbin/squid -D\n\n");
                 fwrite($fout, "touch /tmp/filter_dirty\n\n");
 		fclose($fout);
 		chmod("/usr/local/etc/rc.d/squid.sh", 755);
