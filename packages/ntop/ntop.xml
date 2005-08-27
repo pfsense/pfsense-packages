@@ -51,8 +51,10 @@
 		</field>
 		<field>
 			<fielddescr>Interface</fielddescr>
-			<fieldname>iface</fieldname>
+			<fieldname>interface_array</fieldname>
 			<value>lan</value>
+			<multiple>true</multiple>
+			<size>3</size>
 			<type>interfaces_selection</type>
 		</field>
     </fields>
@@ -64,16 +66,18 @@
                                 global $input_errors;
                                 $ntop_config =&amp; $_POST;
                                 $if_final = "";
+				$ifaces_final = "";
                                 if($ntop_config['password'] and $ntop_config['passwordagain']) {
                                         if($ntop_config['password'] == $ntop_config['passwordagain']) {
-                                                $ifaces = $ntop_config['iface'];
-                                                $lan = $config['interfaces']['lan']['if'];
-                                                $if_final .= convert_friendly_interface_to_real_interface_name($if);
-                                                if(!$if_final) {
-                                                        $if_final = $lan;
-                                                }
+						foreach($_POST['interface_array'] as $iface) {
+						    $if = convert_friendly_interface_to_real_interface_name($iface);
+						    echo $if;
+						    if($if) {
+							$ifaces_final .= $if . " ";
+						    }
+						}
                                                 exec("/usr/local/bin/ntop --set-admin-password=" . $_POST['password'] . " &amp;", $ntopout);
-                                                $start = "/usr/local/bin/ntop -i " . $if_final . " -u root -d --ipv4 -M -x 8102 -X 8192 &amp;";
+                                                $start = "/usr/local/bin/ntop -i " . $ifaces_final . " -u root -d --ipv4 -M -x 8102 -X 8192 &amp;";
                                                 write_rcfile(array(
                                                                         "file" => "ntop.sh",
                                                                         "start" => $start,  
