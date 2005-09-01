@@ -8,7 +8,7 @@
 		<name>widentd</name>
 		<tooltiptext>Modify widentd settings.</tooltiptext>
 		<section>Services</section>
-		<configfile>widentd.xml</configfile>
+                <url>pkg_edit.php?xml=widentd.xml&amp;id=0</url>
 	</menu>
 	<service>
 		<name>widentd</name>
