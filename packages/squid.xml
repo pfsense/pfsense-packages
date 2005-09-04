@@ -57,7 +57,9 @@
 		$fout = fopen("/usr/local/etc/rc.d/squid.sh","w");
 		fwrite($fout, "#!/bin/sh\n");
                 fwrite($fout, "# PACKAGE: Squid\n");
-                fwrite($fout, "# EXECUTABLE: squid\n");
+                fwrite($fout, "# EXECUTABLE: squid\n\n");
+		fwrite($fout, "# Alert system that we need the / mount rw\n");
+		fwrite($fout, "touch /tmp/ro_root_mount\n\n");
 		fwrite($fout, "/usr/local/sbin/squid -D\n\n");
                 fwrite($fout, "touch /tmp/filter_dirty\n\n");
 		fclose($fout);
