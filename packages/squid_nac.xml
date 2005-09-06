@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<packagegui>
+	<info>
+		<name>Squid Cache Management</name>
+	</info>
+	
+	<files></files>
+	<menus></menus>
+	
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	
+	<tabs>
+		<tab>
+			<text>General Settings</text>
+			<url>/pkg_edit.php?xml=squid1.xml&amp;id=0</url>
+		</tab>
+		
+		<tab>
+			<text>Upstream Proxy</text>
+			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
+		</tab>
+		
+		<tab>
+			<text>Cache Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
+		</tab>
+			
+		<tab>
+			<text>Network Access Control</text>
+			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
+			<active/>
+		</tab>
+			
+		<tab>
+			<text>Traffic Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
+		</tab>
+			
+		<tab>
+			<text>Authentication Settings</text>
+			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
+		</tab>
+		
+		<tab>
+			<text>Users</text>
+			<url>/pkg_edit.php?xml=squid_users.xml&amp;id=0</url>
+		</tab>		
+	</tabs>
+	
+	<fields>
+		<field>
+			<fielddescr>Allowed Subnets</fielddescr>
+			<fieldname>allowed_subnets</fieldname>
+			<type>rowhelper</type>
+			<rowhelper>
+				<rowhelperfield>
+					<fielddescr>Network Address</fielddescr>
+					<fieldname>allowed_network_address</fieldname>
+					<type>input</type>
+					<size>32</size>
+					<validation>number</validation>
+				</rowhelperfield>
+				
+				<rowhelperfield>
+					<fielddescr>Subnet Mask</fielddescr>
+					<fieldname>allowed_subnet_mask</fieldname>
+					<type>select</type>
+					<options>
+						<option><name>1</name><value>1</value></option>
+						<option><name>2</name><value>2</value></option>
+						<option><name>3</name><value>3</value></option>
+						<option><name>4</name><value>4</value></option>
+						<option><name>5</name><value>4</value></option>
+						<option><name>6</name><value>4</value></option>
+						<option><name>7</name><value>4</value></option>
+						<option><name>8</name><value>4</value></option>
+						<option><name>9</name><value>4</value></option>
+						<option><name>10</name><value>4</value></option>
+						<option><name>11</name><value>4</value></option>
+						<option><name>12</name><value>4</value></option>
+						<option><name>13</name><value>4</value></option>
+						<option><name>14</name><value>4</value></option>
+						<option><name>15</name><value>4</value></option>
+						<option><name>16</name><value>4</value></option>
+						<option><name>17</name><value>4</value></option>
+						<option><name>18</name><value>4</value></option>
+						<option><name>19</name><value>4</value></option>
+						<option><name>20</name><value>4</value></option>
+						<option><name>21</name><value>4</value></option>
+						<option><name>22</name><value>4</value></option>
+						<option><name>23</name><value>4</value></option>
+						<option><name>24</name><value>4</value></option>
+						<option><name>25</name><value>4</value></option>
+						<option><name>26</name><value>4</value></option>
+						<option><name>27</name><value>4</value></option>
+						<option><name>28</name><value>4</value></option>
+						<option><name>29</name><value>4</value></option>
+						<option><name>30</name><value>4</value></option>
+						<option><name>31</name><value>4</value></option>
+						<option><name>32</name><value>4</value></option>	
+					</options>
+				</rowhelperfield>
+			</rowhelper>
+		</field>
+		
+		<field>
+			<fielddescr>Unrestricted IP Addresses</fielddescr>
+			<fieldname>unrestricted_ip_address</fieldname>
+			<type>rowhelper</type>
+			<rowhelper>
+				<rowhelperfield>
+					<fielddescr>IP Address</fielddescr>
+					<fieldname>unrestricted_ip_address</fieldname>
+					<type>input</type>
+				</rowhelperfield>
+			</rowhelper>
+		</field>
+	
+	</fields>
+</packagegui>

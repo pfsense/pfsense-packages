@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<packagegui>
+	<info>
+		<name>Squid Cache Management</name>
+	</info>
+	
+	<files></files>
+	<menus></menus>
+	
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	
+	<tabs>
+		<tab>
+			<text>General Settings</text>
+			<url>/pkg_edit.php?xml=squid1.xml&amp;id=0</url>
+		</tab>
+		
+		<tab>
+			<text>Upstream Proxy</text>
+			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
+		</tab>
+		
+		<tab>
+			<text>Cache Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
+			<active/>
+		</tab>
+			
+		<tab>
+			<text>Network Access Control</text>
+			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
+		</tab>
+			
+		<tab>
+			<text>Traffic Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
+		</tab>
+			
+		<tab>
+			<text>Authentication Settings</text>
+			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
+		</tab>
+		
+		<tab>
+			<text>Users</text>
+			<url>/pkg_edit.php?xml=squid_users.xml&amp;id=0</url>
+		</tab>		
+	</tabs>
+	
+	<fields>
+		<field>
+			<fielddescr>Memory Cache Size (MB)</fielddescr>
+			<fieldname>memory_cache_size</fieldname>
+			<description>This is the amount of physical RAM to be used for negative cache and in-transit objects.  This value should not exceed more than 50% of installed RAM.  The minimum value is 1MB; the default is 2MB</description>
+			<size>4</size>
+			<type>input</type>
+			<validation>number</validation>
+		</field>
+		
+		<field>
+			<fielddescr>Hard Disk Cache Size (MB)</fielddescr>
+			<fieldname>harddisk_cache_size</fieldname>
+			<description>This is the amount of disk space (MB) to use for cached objects.  The default is 50MB.</description>
+			<size>4</size>
+			<type>input</type>
+			<validation>number</validation>
+		</field>
+		
+		<field>
+			<fielddescr>Minimum Object Size (KB)</fielddescr>
+			<fieldname>minimum_object_size</fieldname>
+			<description>Objects smaller than the size specified will not be saved on disk.  This value is specified in kilobytes and the default is 0, meaning there is no minimum.</description>
+			<size>4</size>
+			<type>input</type>
+			<validation>number</validation>
+		</field>
+		
+		<field>
+			<fielddescr>Maximum Object Size (KB)</fielddescr>
+			<fieldname>maximum_object_size</fieldname>
+			<description>Objects larger than the size specified will not be saved on disk.  This value is specified in kilobytes and the default is 4MB.  If you wish to increase speed more than you want to save bandwidth, this should be set to a low value.</description>
+			<size>4</size>
+			<type>input</type>
+			<validation>number</validation>
+		</field>
+		
+		<field>
+			<fielddescr>Number of Level-1 Subdirectories</fielddescr>
+			<fieldname>level_subdirs</fieldname>
+			<description>The default for this value is 16.  Each level-1 directory contains 256 subdirectories, so a value of 256 level-1 directories will use a total of 65536 directories for the hard disk cache.  This will significantly slow down the startup process of the proxy service, but can speed up the caching under certain conditions.</description>
+			<type>select</type>
+			<options>
+				<option><name>16</name><value>16</value></option>
+				<option><name>32</name><value>32</value></option>
+				<option><name>64</name><value>64</value></option>
+				<option><name>128</name><value>128</value></option>
+				<option><name>256</name><value>256</value></option>
+			</options>
+		</field>
+		
+		<field>
+			<fielddescr>Memory Replacement Policy</fielddescr>
+			<fieldname>memory_replacement</fieldname>
+			<description>The memory replacement policy determines which objects are purged from memory when space is needed.  The default policy for memory replacement is GSDF.  &lt;p&gt; &lt;b&gt; LRU: Last Recently Used Policy &lt;/b&gt; - The LRU policies keep recently referenced objects.  i.e., it replaces the object that has not been accessed for the longest time. &lt;p&gt; &lt;b&gt; Heap GSDF: Greedy-Dual Size Frequency &lt;/b&gt; - The Heap GSDF policy optimizes object-hit rate by keeping smaller, popular objects in cache.  It achieves a lower byte hit rate than LFUDA though, since it evicts larger (possibly popular) objects.  &lt;p&gt; &lt;b&gt; Heap LFUDA: Least Frequently Used with Dynamic Aging &lt;/b&gt; - The Heap LFUDA policy keeps popular objects in cache regardless of their size and thus optimizes byte hit rate at the expense of hit rate since one large, popular object will prevent many smaller, slightly less popular objects from being cached.  &lt;p&gt; &lt;b&gt; Heap LRU: Last Recently Used &lt;/b&gt; - Works like LRU, but uses a heap instead. &lt;p&gt; Note: If using the LFUDA replacement policy, the value of Maximum Object Size should be increased above its default of 4096 KB to maximuze the potential byte hit rate improvement of LFUDA.</description>
+			<type>select</type>
+			<options>
+				<option><name>LRU</name><value>lru</value></option>
+				<option><name>Heap LFUDA</name><value>heap_lfuda</value></option>
+				<option><name>Heap GDSF</name><value>heap_gdsf</value></option>
+				<option><name>Heap LRU</name><value>heap_lru</value></option>
+			</options>
+		</field>
+		
+		<field>
+			<fielddescr>Cache Replacement Policy</fielddescr>
+			<fieldname>cache_replacement</fieldname>
+			<description>The cache replacement policy decides which objects will remain in cache and which objects are replaced to create space for the new objects.  The default policy for cache replacement is LFUDA.</description>
+			<type>select</type>
+			<options>
+				<option><name>LRU</name><value>lru</value></option>
+				<option><name>Heap LFUDA</name><value>heap_lfuda</value></option>
+				<option><name>Heap GDSF</name><value>heap_gdsf</value></option>
+				<option><name>Heap LRU</name><value>heap_lru</value></option>
+			</options>
+		</field>
+
+		<field>
+			<fielddescr>Do not cache these domains</fielddescr>
+			<fieldname>no_cache_domains</fieldname>
+			<type>rowhelper</type>
+			<rowhelper>
+				<rowhelperfield>
+					<fielddescr>Domain</fielddescr>
+					<fieldname>domain</fieldname>
+					<description>If required, the specified domains will never be cached.</description>
+					<type>input</type>
+					<size>40</size>
+				</rowhelperfield>
+			</rowhelper>
+		</field>
+				
+		<field>
+			<fielddescr>Enable Offline Mode</fielddescr>
+			<fieldname>enable_offline</fieldname>
+			<description></description>
+			<type>checkbox</type>
+		</field>
+						
+	</fields>
+</packagegui>

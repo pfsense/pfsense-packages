@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<packagegui>
+	<info>
+		<name>Squid Upstream Proxy</name>
+	</info>
+	
+	<files></files>
+	<menus></menus>
+	
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	
+	<tabs>
+		<tab>
+			<text>General Settings</text>
+			<url>/pkg_edit.php?xml=squid1.xml&amp;id=0</url>
+		</tab>
+		
+		<tab>
+			<text>Upstream Proxy</text>
+			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		
+		<tab>
+			<text>Cache Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_cache&.xmlamp;id=0</url>
+		</tab>
+			
+		<tab>
+			<text>Network Access Control</text>
+			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
+		</tab>
+			
+		<tab>
+			<text>Traffic Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
+		</tab>
+			
+		<tab>
+			<text>Authentication Settings</text>
+			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
+		</tab>
+		
+		<tab>
+			<text>Users</text>
+			<url>/pkg_edit.php?xml=squid_users.xml&amp;id=0</url>
+		</tab>
+	</tabs>
+	
+	<fields>
+		<field>
+			<fielddescr>Proxy Address Forwarding</fielddescr>
+			<fieldname>proxy_forwarding</fieldname>
+			<description>This option will enable the Proxy Server to forward requests to an upstream server.</description>
+			<type>checkbox</type>
+		</field>
+		
+		<field>
+			<fielddescr>Client IP Address Forwarding</fielddescr>
+			<fieldname>client_ip_forwardining</fieldname>
+			<description>This option will enable the client IP address to be forwarded to the upstream proxy server.</description>
+			<type>checkbox</type>
+		</field>
+		
+		<field>
+			<fielddescr>Username Forwarding</fielddescr>
+			<fieldname>user_forwarding</fieldname>
+			<description>This option will enable the username to be forwarded to the upstream proxy server.</description>
+			<type>checkbox</type>
+		</field>
+		
+		<field>
+			<fielddescr>Upstream Proxy Hostname</fielddescr>
+			<fieldname>upstream_proxy</fieldname>
+			<description>Enter the IP address or host name of the upstream proxy server.</description>
+			<type>input</type>
+			<validation>number</validation>
+		</field>
+		
+		<field>
+			<fielddescr>Upstream Proxy Port</fielddescr>
+			<fieldname>upstream_proxy_port</fieldname>
+			<description>Enter the port to use with the upstream proxy server.  If no port is specified, the default is set to port "80".</description>
+			<size>4</size>
+			<type>input</type>
+			<validation>number</validation>
+		</field>
+		
+		<field>
+			<fielddescr>Upstream Username</fielddescr>
+			<fieldname>upstream_username</fieldname>
+			<description>If the upstream proxy requires a username, specify it here.</description>
+			<type>input</type>
+		</field>
+		
+		<field>
+			<fielddescr>Upstream Password</fielddescr>
+			<fieldname>upstream_password</fieldname>
+			<description>If the upstream proxy server requires a password with the above username, specify it here.</description>
+			<type>password</type>
+		</field>
+	</fields>
+	
+</packagegui>	

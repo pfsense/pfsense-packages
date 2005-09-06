@@ -1,0 +1,305 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<packagegui>
+	<info>
+		<name>Squid</name>
+		<category>Security</category>
+		<version>2.5.10_4</version>
+		<status>Alpha</status>
+	</info>
+	
+	<files>
+		<file>
+			<type>package</type>
+			<location>ftp://ftp.freebsd.org/pub/FreeBSD/ports/packages/www/squid-2.5.10_4.tbz</location>
+		</file>
+		<file>
+			<type>package</type>
+			<location>ftp://ftp.freebsd.org/pub/FreeBSD/ports/packages/www/squidGuard-1.2.0_1.tbz</location>
+		</file>
+		
+		<!-- retrieves the configuration file for upstream proxy settings -->
+		<file>
+			<type>configfile</type>
+			<location>http://www.pfsense.com/packages/config/squid_upstream.xml</location>
+		</file>
+		
+		<!-- retrieves the configuration file for cache management -->
+		<file>
+			<type>configfile</type>
+			<location>http://www.pfsense.com/packages/config/squid_cache.xml</location>
+		</file>
+		
+		<!-- retrieves the configuration file for network access control -->
+		<file>
+			<type>configfile</type>
+			<location>http://www.pfsense.com/packages/config/squid_nac.xml</location>
+		</file>
+		
+		<!-- retrieves the configuration file for traffic management -->
+		<file>
+			<type>configfile</type>
+			<location>http://www.pfsense.com/packages/config/squid_traffic.xml</location>
+		</file>
+		
+		<!-- retrieves the configuration file for authentication settings -->
+		<file>
+			<type>configfile</type>
+			<location>http://www.pfsense.com/packages/config/squid_auth.xml</location>
+		</file>
+		
+		<!-- retrieves the configuration file for user definitions -->
+		<file>
+			<type>configfile</type>
+			<location>http://www.pfsense.com/packages/config/squid_users.xml</location>
+		</file>
+		
+	</files>
+	
+	<menus>	
+		<menu>
+			<name>Squid Advanced Proxy</name>
+			<tooltiptext>Modify settings for Squid Advanced Proxy</tooltiptext>
+			<section>Services</section>
+		</menu>
+	</menus>
+	
+	<!-- This defines the location where the config is stored within pfSense's
+	     xml based global store -->
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	
+	<tabs>
+		<tab>
+			<text>General Settings</text>
+			<url>/pkg_edit.php?xml=squid1.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		
+		<tab>
+			<text>Upstream Proxy</text>
+			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
+		</tab>
+		
+		<tab>
+			<text>Cache Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
+		</tab>
+			
+		<tab>
+			<text>Network Access Control</text>
+			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
+		</tab>
+			
+		<tab>
+			<text>Traffic Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
+		</tab>
+			
+		<tab>
+			<text>Authentication Settings</text>
+			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
+		</tab>
+		
+		<tab>
+			<text>Users</text>
+			<url>/pkg_edit.php?xml=squid_users.xml&amp;id=0</url>
+		</tab>
+	</tabs>
+	
+	<fields>	
+		<field>
+			<fielddescr>Listening Interface</fielddescr>
+			<fieldname>active_interface</fieldname>
+			<description>This defines the active listening interface to which the proxy server will listen for its requests.</description>
+			<type>interfaces_selection</type>
+		</field>
+		
+		<field>
+			<fielddescr>Transparent Proxy</fielddescr>
+			<fieldname>transparent_proxy</fieldname>
+			<description>If transparent mode is enabled; all requests for destination port 80 will be forwarded to the proxy server without any additional configuration necessary.</description>
+			<type>checkbox</type>
+		</field>
+		
+		<field>
+			<fielddescr>Log Enabled</fielddescr>
+			<fieldname>log_enabled</fieldname>
+			<description>This enables the Web Proxy logging feature.  All clients requests will be written to a log file viewable under Services -> Proxy Log.</description>
+			<type>checkbox</type>
+		</field>
+		
+		<field>
+			<fielddescr>Log Query Terms</fielddescr>
+			<fieldname>log_query_terms</fieldname>
+			<description>This will log the complete URL rather than the part of the URL containing dynamic queries.</description>
+			<type>checkbox</type>
+		</field>
+		
+		<field>
+			<fielddescr>Log User Agents</fielddescr>
+			<fieldname>log_user_agents</fieldname>
+			<description>This will enable the useragent string to be written to a separate log.  The results are not shown in the GUI and should only be used for debugging purposes.</description>
+			<type>checkbox</type>
+		</field>
+		
+		<field>
+			<combinefieldsend>true</combinefieldsend>
+			<fielddescr>Proxy Port</fielddescr>
+			<fieldname>proxy_port</fieldname>
+			<description>This is the port the Proxy Server will listen for client requests on.  The default is 3128.</description>
+			<size>4</size>
+			<type>input</type>
+		</field>
+		
+		<field>
+			<fielddescr>Visible Hostname</fielddescr>
+			<fieldname>visible_hostname</fieldname>
+			<description>This URL is displayed on the Proxy Server error messages.</description>
+			<size>35</size>
+			<type>input</type>
+		</field>
+		
+		<field>
+			<fielddescr>Cache Administrator E-Mail</fielddescr>
+			<fieldname>cache_admin_email</fieldname>
+			<description>This E-Mail address is displayed on the Proxy Server error messages.</description>
+			<size>35</size>
+			<type>input</type>
+		</field>
+		
+		<field>
+			<fielddescr>Error Messages Language</fielddescr>
+			<fieldname>error_language</fieldname>
+			<description>Select the language in which the Proxy Server shall display error messages to users.</description>
+			<type>select</type>
+			<options>
+				<option><name>Bulgarian</name><value>bulgarian</value></option>
+				<option><name>Catalan</name><value>catalan</value></option>
+				<option><name>Czech</name><value>czech</value></option>
+				<option><name>Danish</name><value>danish</value></option>
+				<option><name>Dutch</name><value>dutch</value></option>
+				<option><name>English</name><value>english</value></option>
+				<option><name>Estonian</name><value>estonian</value></option>
+				<option><name>Finnish</name><value>finnish</value></option>
+				<option><name>French</name><value>french</value></option>
+				<option><name>German</name><value>german</value></option>
+				<option><name>Hebrew</name><value>hebrew</value></option>
+				<option><name>Hungarian</name><value>hungarian</value></option>
+				<option><name>Italian</name><value>italian</value></option>
+				<option><name>Japanese</name><value>japanese</value></option>
+				<option><name>Korean</name><value>korean</value></option>
+				<option><name>Lithuanian</name><value>lithuanian</value></option>
+				<option><name>Polish</name><value>polish</value></option>
+				<option><name>Portuguese</name><value>portuguese</value></option>
+				<option><name>Romanian</name><value>romanian</value></option>
+				<option><name>Russian-1251</name><value>russian_1251</value></option>
+				<option><name>Russian-koi8-r</name><value>russian_koi8</value></option>
+				<option><name>Serbian</name><value>serbian</value></option>
+				<option><name>Simplified Chinese</name><value>simplified_chinese</value></option>
+				<option><name>Slovak</name><value>slovak</value></option>
+				<option><name>Spanish</name><value>spanish</value></option>
+				<option><name>Swedish</name><value>swedish</value></option>
+				<option><name>Traditional Chinese</name><value>traditional_chinese</value></option>
+				<option><name>Turkish</name><value>turkish</value></option>
+			</options>
+		</field>
+				
+	</fields>
+		
+	<!-- The below writes the configuration as defined by the GUI options -->
+	
+	<custom_php_global_functions>
+		function write_squid_config() {
+			conf_mount_rw();	<!-- mounts filesystems in read/write mode -->
+			config_lock();		<!-- locks the config file -->
+			global $config;
+			
+			$fout = fopen("/usr/local/etc/squid/squid.conf","w");
+			
+			<!-- if listening interface is specified, identifies the ip address -->
+			if ($active_interface != "") {
+				lan_iface = $active_interface['if'];
+				listen_ip = $lan_iface['ipaddr'];
+				iface_subnet_address = gen_subnet($lan_iface['ipaddr'], $lan_iface['subnet']);
+				iface_subnet_network = $lan_iface['subnet'];
+			}				
+				
+			<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				 option shutdown_lifetime:
+				 this puts squid into shutdown pending mode until all sockets are 
+				 closed.  any active clients after the specified seconds will 
+				 receive a 'timeout'. 
+			~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->			
+			fwrite($fout, "shutdown_lifetime 5 seconds\n");
+			
+			<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				 option icp_port:
+				 the port where squid sends and receives ICP queries to and from
+				 neighbor caches.  a value of "0" disables this feature.  default
+				 is "3130". 
+			~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->			
+			fwrite($fout, "icp_port 3130\n");
+			fwrite($fout, "\n");
+			
+			<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				 option http_port:
+				 this specifies the ip address/port that squid will be listening
+				 on for requests.  the below evaluates if a value was entered for
+				 the listening port and defines the value.
+			~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->			
+			if ($http_port == "") $http_port="3128";
+			fwrite($fout, "http_port " . $listen_ip . " " . $proxy_port . "\n");
+			
+			fwrite($fout, "\n");
+			
+			<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+				 option acl QUERY urlpath_regex cgi-bin \?:
+			     option non_cache deny QUERY:
+				 this forces squid to never cache files in the below specified
+				 directory for security and performance reasons.
+			~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->			
+			fwrite($fout, "acl QUERY urlpath_regex cgi-bin \?\n");
+			fwrite($fout, "non_cache deny QUERY\n");
+			
+			<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			     option cache_effective_user:
+			     option cache_effective_group:
+				 this specifies the UID/GID that the cache process will run on.
+			~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->			
+			fwrite($fout, "cache_effective_user squid\n");
+			fwrite($fout, "cache_effective_group squid\n");
+			
+			<!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+			     option pid_filename:
+				 this specifies the path and filename to write the process-id to. 
+			~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->			
+			fwrite($fout, "pid_filename /var/run/squid.pid\n");
+					
+			fclose($fout);
+		}
+	</custom_php_global_functions>
+	
+	<custom_add_php_command>
+		function sync_package_squid;
+			write_squid_config();
+			mwexec("/usr/local/sbin/squid -k reconfigure");
+			conf_mount_ro();	<!-- mounts filesystems in read only mode -->
+			config_unlock();	<!-- unlock the config file -->
+		}
+		
+		sync_package_squid();
+	</custom_add_php_command>
+	
+	<custom_php_resync_command>
+		function sync_package_squid;
+			write_squid_config();
+			mwexec("/usr/local/sbin/squid -k reconfigure");
+			conf_mount_ro();	<!-- mounts filesystems in read only mode -->
+			config_unlock();	<!-- unlock the config file -->
+		}
+		
+		sync_package_squid();
+	</custom_php_resync_command>
+	
+</packagegui>
+			
