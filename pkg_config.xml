@@ -48,8 +48,8 @@
         <descr>FreeRADIUS is the premiere open source RADIUS server. It is fast, flexible, configurable, and supports more authentication protocols than many commercial servers. A client entry for localhost with the shared secret "pfsense" is defined on installation for easy integration with the captive portal. This package is currently intended to provide a local user database for captive portal and pptp - it does not employ SQL and is not meant to supplant an external RADIUS server for advanced tasks.</descr>
         <category>Security</category>
         <config_file>http://www.pfsense.com/packages/config/freeradius.xml</config_file>                       
-        <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/packages/Latest</depends_on_package_base_url>                                                                         
-        <depends_on_package>freeradius.tbz</depends_on_package>
+        <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/packages/All</depends_on_package_base_url>                                                                         
+        <depends_on_package>freeradius-1.0.4.tbz</depends_on_package>
         <version>1.0.4</version>
         <status>BETA</status>
         <configurationfile>freeradius.xml</configurationfile>
