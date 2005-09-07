@@ -51,7 +51,7 @@
         <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>                                                                         
         <depends_on_package>freeradius-1.0.4.tbz</depends_on_package>
         <version>1.0.4</version>
-        <status>BETA</status>
+        <status>BROKEN</status>
         <configurationfile>freeradius.xml</configurationfile>
     </package>
     <package>
