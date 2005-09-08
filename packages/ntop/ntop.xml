@@ -71,7 +71,6 @@
                                         if($ntop_config['password'] == $ntop_config['passwordagain']) {
 						foreach($_POST['interface_array'] as $iface) {
 						    $if = convert_friendly_interface_to_real_interface_name($iface);
-						    echo $if;
 						    if($if) {
 							$ifaces_final .= $if . " ";
 						    }
