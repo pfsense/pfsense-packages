@@ -122,7 +122,11 @@
                         fwrite($fout, "if_inbound = " . convert_friendly_interface_to_real_interface_name($_POST['if_inbound']) . "\n");
                 }
                 if($_POST['if_outbound'] != "") {
+                    if($config['interfaces'][$_POST['if_outbound']]['ipaddr'] == "pppoe") {
+                        fwrite($fout, "if_outbound = " . get_real_wan_interface() . "\n\n");
+                    } else {
                         fwrite($fout, "if_outbound = " . convert_friendly_interface_to_real_interface_name($_POST['if_outbound']) . "\n\n");
+                    }
                 }
                 if($_POST['port'] != "") {
                         fwrite($fout, "sip_listen_port = " . $_POST['port'] . "\n\n");
