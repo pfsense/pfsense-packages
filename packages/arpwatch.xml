@@ -35,7 +35,10 @@
 		foreach($config['installedpackages']['arpwatch']['config'] as $arpw) {
 		    $ints = $arpw['interface'];
 		}
-		if($ints == "") $ints = "lan";
+		if($ints == "") {
+		    $ints = "lan";
+		    log_error("Could not find a interface for arpwatch.  Defaulting to LAN");
+		}
                 global $config;
 		$int = convert_friendly_interface_to_real_interface_name($ints);
 		$start = "/usr/local/sbin/arpwatch -d -i {$int} &amp;";
