@@ -29,10 +29,15 @@
         </custom_php_install_command>
 	<custom_php_global_functions>
 	function sync_package_arpwatch() {
+		global $config;
                 conf_mount_rw();
                 config_lock();
+		foreach($config['installedpackages']['arpwatch']['config'] as $arpw) {
+		    $ints = $arpw['interface'];
+		}
+		if($ints == "") $ints = "lan";
                 global $config;
-		$int = convert_friendly_interface_to_real_interface_name($config['installedpackages']['arpwatch']['config']['interface']);
+		$int = convert_friendly_interface_to_real_interface_name($ints);
 		$start = "/usr/local/sbin/arpwatch -d -i {$int} &amp;";
 		$stop = "/usr/bin/killall arpwatch";
 		write_rcfile(array(
