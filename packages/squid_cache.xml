@@ -2,18 +2,19 @@
 
 <packagegui>
 	<info>
-		<name>Squid Cache Management</name>
+		<name>squidcache</name>
 	</info>
 	
 	<files></files>
 	<menus></menus>
 	
-	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
-	
+	<configpath>['installedpackages']['package']['squidcache']['configuration']['settings']</configpath>
+	<aftersaveredirect>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</aftersaveredirect>
+
 	<tabs>
 		<tab>
 			<text>General Settings</text>
-			<url>/pkg_edit.php?xml=squid1.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</url>
 		</tab>
 		
 		<tab>
@@ -37,7 +38,7 @@
 			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
 		</tab>
 			
-		<tab>
+		<!-- <tab>
 			<text>Authentication Settings</text>
 			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
 		</tab>
@@ -45,7 +46,8 @@
 		<tab>
 			<text>Users</text>
 			<url>/pkg_edit.php?xml=squid_users.xml&amp;id=0</url>
-		</tab>		
+		</tab>
+		-->
 	</tabs>
 	
 	<fields>
@@ -105,10 +107,10 @@
 			<description>The memory replacement policy determines which objects are purged from memory when space is needed.  The default policy for memory replacement is GSDF.  &lt;p&gt; &lt;b&gt; LRU: Last Recently Used Policy &lt;/b&gt; - The LRU policies keep recently referenced objects.  i.e., it replaces the object that has not been accessed for the longest time. &lt;p&gt; &lt;b&gt; Heap GSDF: Greedy-Dual Size Frequency &lt;/b&gt; - The Heap GSDF policy optimizes object-hit rate by keeping smaller, popular objects in cache.  It achieves a lower byte hit rate than LFUDA though, since it evicts larger (possibly popular) objects.  &lt;p&gt; &lt;b&gt; Heap LFUDA: Least Frequently Used with Dynamic Aging &lt;/b&gt; - The Heap LFUDA policy keeps popular objects in cache regardless of their size and thus optimizes byte hit rate at the expense of hit rate since one large, popular object will prevent many smaller, slightly less popular objects from being cached.  &lt;p&gt; &lt;b&gt; Heap LRU: Last Recently Used &lt;/b&gt; - Works like LRU, but uses a heap instead. &lt;p&gt; Note: If using the LFUDA replacement policy, the value of Maximum Object Size should be increased above its default of 4096 KB to maximuze the potential byte hit rate improvement of LFUDA.</description>
 			<type>select</type>
 			<options>
-				<option><name>LRU</name><value>lru</value></option>
-				<option><name>Heap LFUDA</name><value>heap_lfuda</value></option>
-				<option><name>Heap GDSF</name><value>heap_gdsf</value></option>
-				<option><name>Heap LRU</name><value>heap_lru</value></option>
+				<option><name>LRU</name><value>LRU</value></option>
+				<option><name>Heap LFUDA</name><value>heap LFUDA</value></option>
+				<option><name>Heap GDSF</name><value>heap GSDF</value></option>
+				<option><name>Heap LRU</name><value>heap LRU</value></option>
 			</options>
 		</field>
 		
@@ -118,34 +120,35 @@
 			<description>The cache replacement policy decides which objects will remain in cache and which objects are replaced to create space for the new objects.  The default policy for cache replacement is LFUDA.</description>
 			<type>select</type>
 			<options>
-				<option><name>LRU</name><value>lru</value></option>
-				<option><name>Heap LFUDA</name><value>heap_lfuda</value></option>
-				<option><name>Heap GDSF</name><value>heap_gdsf</value></option>
-				<option><name>Heap LRU</name><value>heap_lru</value></option>
+				<option><name>LRU</name><value>LRU</value></option>
+				<option><name>Heap LFUDA</name><value>heap LFUDA</value></option>
+				<option><name>Heap GDSF</name><value>heap GSDF</value></option>
+				<option><name>Heap LRU</name><value>heap LRU</value></option>
 			</options>
 		</field>
-
+	
 		<field>
-			<fielddescr>Do not cache these domains</fielddescr>
-			<fieldname>no_cache_domains</fieldname>
-			<type>rowhelper</type>
-			<rowhelper>
-				<rowhelperfield>
-					<fielddescr>Domain</fielddescr>
-					<fieldname>domain</fieldname>
-					<description>If required, the specified domains will never be cached.</description>
-					<type>input</type>
-					<size>40</size>
-				</rowhelperfield>
-			</rowhelper>
+			<fielddescr>Domain</fielddescr>
+			<fieldname>domain</fieldname>
+			<description>If required, the specified domains will never be cached.  Only enter one domain per line.</description>
+			<type>textarea</type>
+			<rows>10</rows>
+			<cols>50</cols>
 		</field>
-				
+
 		<field>
 			<fielddescr>Enable Offline Mode</fielddescr>
 			<fieldname>enable_offline</fieldname>
 			<description></description>
 			<type>checkbox</type>
 		</field>
-						
+					
 	</fields>
+	
+	<custom_php_global_functions>
+	</custom_php_global_functions>
+	
+	<custom_add_php_command>
+	</custom_add_php_command>
+
 </packagegui>

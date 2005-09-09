@@ -2,18 +2,20 @@
 
 <packagegui>
 	<info>
-		<name>Squid Upstream Proxy</name>
+		<name>squidupstream</name>
 	</info>
 	
 	<files></files>
 	<menus></menus>
 	
-	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<configpath>['installedpackages']['package']['squidupstream']['configuration']['settings']</configpath>
+	<aftersaveredirect>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</aftersaveredirect>
+
 	
 	<tabs>
 		<tab>
 			<text>General Settings</text>
-			<url>/pkg_edit.php?xml=squid1.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</url>
 		</tab>
 		
 		<tab>
@@ -24,7 +26,7 @@
 		
 		<tab>
 			<text>Cache Mgmt</text>
-			<url>/pkg_edit.php?xml=squid_cache&.xmlamp;id=0</url>
+			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
 		</tab>
 			
 		<tab>
@@ -37,7 +39,7 @@
 			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
 		</tab>
 			
-		<tab>
+		<!-- <tab>
 			<text>Authentication Settings</text>
 			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
 		</tab>
@@ -46,6 +48,7 @@
 			<text>Users</text>
 			<url>/pkg_edit.php?xml=squid_users.xml&amp;id=0</url>
 		</tab>
+		-->
 	</tabs>
 	
 	<fields>
@@ -58,7 +61,7 @@
 		
 		<field>
 			<fielddescr>Client IP Address Forwarding</fielddescr>
-			<fieldname>client_ip_forwardining</fieldname>
+			<fieldname>client_ip_forwarding</fieldname>
 			<description>This option will enable the client IP address to be forwarded to the upstream proxy server.</description>
 			<type>checkbox</type>
 		</field>
@@ -101,5 +104,8 @@
 			<type>password</type>
 		</field>
 	</fields>
+	
+	<custom_php_global_functions>
+	</custom_php_global_functions>
 	
 </packagegui>	

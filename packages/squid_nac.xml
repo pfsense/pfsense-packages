@@ -2,18 +2,19 @@
 
 <packagegui>
 	<info>
-		<name>Squid Cache Management</name>
+		<name>squidnac</name>
 	</info>
 	
 	<files></files>
 	<menus></menus>
 	
-	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
-	
+	<configpath>['installedpackages']['package']['squidnac']['configuration']['settings']</configpath>
+	<aftersaveredirect>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</aftersaveredirect>
+
 	<tabs>
 		<tab>
 			<text>General Settings</text>
-			<url>/pkg_edit.php?xml=squid1.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</url>
 		</tab>
 		
 		<tab>
@@ -37,7 +38,7 @@
 			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
 		</tab>
 			
-		<tab>
+		<!-- <tab>
 			<text>Authentication Settings</text>
 			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
 		</tab>
@@ -46,6 +47,7 @@
 			<text>Users</text>
 			<url>/pkg_edit.php?xml=squid_users.xml&amp;id=0</url>
 		</tab>		
+		-->
 	</tabs>
 	
 	<fields>
@@ -107,14 +109,9 @@
 		<field>
 			<fielddescr>Unrestricted IP Addresses</fielddescr>
 			<fieldname>unrestricted_ip_address</fieldname>
-			<type>rowhelper</type>
-			<rowhelper>
-				<rowhelperfield>
-					<fielddescr>IP Address</fielddescr>
-					<fieldname>unrestricted_ip_address</fieldname>
-					<type>input</type>
-				</rowhelperfield>
-			</rowhelper>
+			<type>textarea</type>
+			<rows>10</rows>
+			<cols>50</cols>
 		</field>
 	
 	</fields>
