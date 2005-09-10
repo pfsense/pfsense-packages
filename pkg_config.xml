@@ -220,7 +220,7 @@ test server or link availability and modify translation or routing rules. This p
         <descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
         <website>http://www-nrg.ee.lbl.gov/</website>
         <category>Security</category>
-        <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6-current/All</depends_on_package_base_url>
+        <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
         <depends_on_package>arpwatch-2.1.a13.tbz</depends_on_package>
         <version>2.1.a13</version>
         <status>ALPHA</status>

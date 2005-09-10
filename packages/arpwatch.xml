@@ -41,7 +41,7 @@
 		}
                 global $config;
 		$int = convert_friendly_interface_to_real_interface_name($ints);
-		$start = "/usr/local/sbin/arpwatch -d -i {$int} &amp;";
+		$start = "/usr/local/sbin/arpwatch -d -d -i {$int} | logger -p daemon.info -i -t arpwatch";
 		$stop = "/usr/bin/killall arpwatch";
 		write_rcfile(array(
 			"file" => "arpwatch.sh",
