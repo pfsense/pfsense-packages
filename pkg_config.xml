@@ -216,22 +216,6 @@ test server or link availability and modify translation or routing rules. This p
         <configurationfile>ifdepd.xml</configurationfile>
     </package>
     <package>
-        <name>arpwatch</name>
-        <descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
-        <website>http://www-nrg.ee.lbl.gov/</website>
-        <category>Security</category>
-        <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-        <depends_on_package>arpwatch-2.1.a13.tbz</depends_on_package>
-        <version>2.1.a13</version>
-        <status>ALPHA</status>
-        <config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
-        <configurationfile>arpwatch.xml</configurationfile>
-        <logging>
-	  <facilityname>arpwatch</facilityname>
-	  <logfilename>arpwatch.log</logfilename>
-        </logging> 
-    </package>
-    <package>
 	<name>mtr-nox11</name>
 	<descr>Enhanced traceroute replacement</descr>
 	<website>http://www.bitwizard.nl/mtr/</website>
@@ -346,5 +330,21 @@ test server or link availability and modify translation or routing rules. This p
         <status>ALPHA</status>
         <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
         <configurationfile>squidGuard.xml</configurationfile>
+    </package>
+    <package>
+        <name>arpwatch</name>
+        <descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
+        <website>http://www-nrg.ee.lbl.gov/</website>
+        <category>Security</category>
+        <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+        <depends_on_package>arpwatch-2.1.a13.tbz</depends_on_package>
+        <version>2.1.a13</version>
+        <status>ALPHA</status>
+        <config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
+        <configurationfile>arpwatch.xml</configurationfile>
+        <logging>
+	  <facilityname>arpwatch</facilityname>
+	  <logfilename>arpwatch.log</logfilename>
+        </logging> 
     </package>    
 </pfsensepkgs>
