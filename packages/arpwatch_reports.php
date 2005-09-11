@@ -36,17 +36,20 @@ $logfile = "/usr/local/arpwatch/arp.dat";
 if ($_POST['clear']) {
         stop_service("arpwatch");
 	unlink_if_exists($logfile);
+	touch($logfile);
 	start_service("arpwatch");
 }
 
-$rawrep = file($logfile);
-foreach($rawrep as $line) {
-        $todo = preg_split('/\s/', $line);
-        $report[$todo[1]][] = array(
-                                        "mac" => trim($todo[0]),
-                                        "timestamp" => trim($todo[2]),
-                                        "hostname" => trim($todo[3]) ? trim($todo[3]) : "Unknown"
-                        );
+if(file_exists($logfile)) {
+	$rawrep = file($logfile);
+	foreach($rawrep as $line) {
+	      	$todo = preg_split('/\s/', $line);
+	        $report[$todo[1]][] = array(
+	                                        "mac" => trim($todo[0]),
+	                                        "timestamp" => trim($todo[2]),
+	                                        "hostname" => trim($todo[3]) ? trim($todo[3]) : "Unknown"
+	                        );
+	}
 }
 $pgtitle = "arpwatch: Reports";
 include("head.inc");
@@ -108,7 +111,7 @@ include("head.inc");
                                 <tr>
                                         <td>
                                                 <br>
-                                                <form action="diag_logs.php" method="post">
+                                                <form action="arpwatch_reports.php" method="post">
                                                 <input name="clear" type="submit" class="formbtn" value="Clear log">
                                                 </form>
                                         </td>
