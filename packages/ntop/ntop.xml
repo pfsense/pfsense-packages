@@ -60,40 +60,40 @@
     </fields>
 	<custom_php_global_functions>
 	function sync_package_ntop() {
-			        conf_mount_rw();
-			        config_lock();
-                                global $config;
-                                global $input_errors;
-                                $ntop_config =&amp; $_POST;
-                                $if_final = "";
-				$ifaces_final = "";
-                                if($ntop_config['password'] and $ntop_config['passwordagain']) {
-                                        if($ntop_config['password'] == $ntop_config['passwordagain']) {
-						foreach($_POST['interface_array'] as $iface) {
-						    $if = convert_friendly_interface_to_real_interface_name($iface);
-						    if($if) {
-							$ifaces_final .= $if . " ";
-						    }
-						}
-                                                exec("/usr/local/bin/ntop --set-admin-password=" . $_POST['password'] . " &amp;", $ntopout);
-                                                $start = "/usr/local/bin/ntop -i " . $ifaces_final . " -u root -d --ipv4 -M -x 8102 -X 8192 &amp;";
-                                                write_rcfile(array(
-                                                                        "file" => "ntop.sh",
-                                                                        "start" => $start,  
-                                                                        "stop" => "/usr/bin/killall ntop"
-                                                                )
-                                                );
-                                                restart_service("ntop");
-                                        } else {
-                                                $input_errors[] = "The provided passwords did not match.";
-                                        }
-                                } else {
-                                        $input_errors[] = "You must provide (and confirm) ntop's password.";
-                                }
-                                conf_mount_ro();
-                                config_unlock();
-				echo "NTOP Setup complete.  You can now access NTOP under the Diagnostics menu.";
-                        }
+	    conf_mount_rw();
+	    config_lock();
+	    global $config;
+	    global $input_errors;
+	    $ntop_config =&amp; $_POST;
+	    $if_final = "";
+	    $ifaces_final = "";
+	    if($ntop_config['password'] and $ntop_config['passwordagain']) {
+		    if($ntop_config['password'] == $ntop_config['passwordagain']) {
+			    foreach($_POST['interface_array'] as $iface) {
+				$if = convert_friendly_interface_to_real_interface_name($iface);
+				if($if) {
+				    $ifaces_final .= $if . " ";
+				}
+			    }
+			    exec("/usr/local/bin/ntop --set-admin-password=" . $_POST['password'] . " &amp;", $ntopout);
+			    $start = "/usr/local/bin/ntop -i " . $ifaces_final . " -u root -d --ipv4 -M -x 8102 -X 8192 &amp;";
+			    write_rcfile(array(
+						    "file" => "ntop.sh",
+						    "start" => $start,  
+						    "stop" => "/usr/bin/killall ntop"
+					    )
+			    );
+			    restart_service("ntop");
+		    } else {
+			    $input_errors[] = "The provided passwords did not match.";
+		    }
+	    } else {
+		    $input_errors[] = "You must provide (and confirm) ntop's password.";
+	    }
+	    conf_mount_ro();
+	    config_unlock();
+	    echo "NTOP Setup complete.  You can now access NTOP under the Diagnostics menu.";
+	}
 	</custom_php_global_functions>
 	<custom_add_php_command>
         	sync_package_ntop();
