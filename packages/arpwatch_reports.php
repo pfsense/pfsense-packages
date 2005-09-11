@@ -77,32 +77,33 @@ include("head.inc");
 				<tr>
 					<td width="15%" class="listhdrr">IP</td>
 					<td width="25%" class="listhdrr">Timestamp</td>
-					<td width="25%" class="listhdrr">MAC</td>
-					<td width="35%" class="listhdrr">Hostname</td>
+					<td width="15%" class="listhdrr">MAC</td>
+					<td width="45%" class="listhdrr">Hostname</td>
 				</tr>
 				<?php
-					foreach($report as $ip => $rawentries) {
-						$printip = true;
-						$entries = $rawentries;
-						sort($entries);
-						foreach($entries as $entry) {
-							echo '<tr>';
-							if($printip) {
-								echo '<td class="listlr">' . $ip . '</td>';
-								$stampclass = "listr";
-								$printip = false;
-							} else {
-								$stampclass = "listlr";
-								echo '<td></td>';
+					if($report)
+						foreach($report as $ip => $rawentries) {
+							$printip = true;
+							$entries = $rawentries;
+							sort($entries);
+							foreach($entries as $entry) {
+								echo '<tr>';
+								if($printip) {
+									echo '<td class="listlr">' . $ip . '</td>';
+									$stampclass = "listr";
+									$printip = false;
+								} else {
+									$stampclass = "listlr";
+									echo '<td></td>';
+								}
+								echo '<td class="' . $stampclass . '">' .
+								date("D M j G:i:s", $entry['timestamp']) .
+								'</td>';
+								echo '<td class="listr">' . $entry['mac'] . '</td>';
+								echo '<td class="listr">' . $entry['hostname'] . '</td>';
+								echo '</tr>';
 							}
-							echo '<td class="' . $stampclass . '">' .
-							date("D M j G:i:s", $entry['timestamp']) .
-							'</td>';
-							echo '<td class="listr">' . $entry['mac'] . '</td>';
-							echo '<td class="listr">' . $entry['hostname'] . '</td>';
-							echo '</tr>';
 						}
-					}
 				?>
                                 <tr>
                                         <td>
