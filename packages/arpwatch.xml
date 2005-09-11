@@ -16,6 +16,17 @@
                 <rcfile>arpwatch.sh</rcfile>
                 <executable>arpwatch</executable>
         </service>
+	<tabs>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=arpwatch.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Reports</text>
+			<url>/arpwatch_reports.php</url>
+		</tab>
+	</tabs>
 	<fields>
 		<field>
 			<fielddescr>Listening Interface</fielddescr>
@@ -32,16 +43,9 @@
 		global $config;
                 conf_mount_rw();
                 config_lock();
-		foreach($config['installedpackages']['arpwatch']['config'] as $arpw) {
-		    $ints = $arpw['interface'];
-		}
-		if($ints == "") {
-		    $ints = "lan";
-		    log_error("Could not find a interface for arpwatch.  Defaulting to LAN");
-		}
-                global $config;
-		$int = convert_friendly_interface_to_real_interface_name($ints);
-		$start = "/usr/local/sbin/arpwatch -d -d -i {$int} | logger -p daemon.info -i -t arpwatch";
+		$int = $config['installedpackages']['arpwatch']['config'][0]['interface'];
+		$int = convert_friendly_interface_to_real_interface_name($int);
+		$start = "/usr/local/sbin/arpwatch -d -i {$int} > /var/log/arpwatch.reports 2>&amp;1";
 		$stop = "/usr/bin/killall arpwatch";
 		write_rcfile(array(
 			"file" => "arpwatch.sh",
