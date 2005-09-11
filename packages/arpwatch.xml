@@ -27,6 +27,11 @@
 			<url>/arpwatch_reports.php</url>
 		</tab>
 	</tabs>
+	<additional_files_needed>
+            <prefix>/usr/local/www/</prefix>
+            <chmod>a+rx</chmod>
+            <item>http://www.pfsense.com/packages/config/arpwatch_reports.php</item>
+        </additional_files_needed>
 	<fields>
 		<field>
 			<fielddescr>Listening Interface</fielddescr>
