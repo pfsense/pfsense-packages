@@ -44,11 +44,15 @@ if(file_exists($logfile)) {
 	$rawrep = file($logfile);
 	foreach($rawrep as $line) {
 	      	$todo = preg_split('/\s/', $line);
+		$rawmac = explode(":", trim($todo[0]));
+		foreach($rawmac as $set) $mac[] = str_pad($set, 2, "0", STR_PAD_LEFT);
+		$newmac = implode(":", $mac);
 	        $report[$todo[1]][] = array(
-	                                        "mac" => trim($todo[0]),
+	                                        "mac" => $newmac,
 	                                        "timestamp" => trim($todo[2]),
 	                                        "hostname" => trim($todo[3]) ? trim($todo[3]) : "Unknown"
 	                        );
+		unset($mac);
 	}
 }
 $pgtitle = "arpwatch: Reports";
