@@ -50,7 +50,7 @@
                 config_lock();
 		$int = $config['installedpackages']['arpwatch']['config'][0]['interface'];
 		$int = convert_friendly_interface_to_real_interface_name($int);
-		$start = "/usr/local/sbin/arpwatch -d -i {$int} > /var/log/arpwatch.reports 2>&amp;1";
+		$start = "/usr/local/sbin/arpwatch -d -i {$int} > /var/log/arpwatch.reports 2>&amp;1 &amp;";
 		$stop = "/usr/bin/killall arpwatch";
 		write_rcfile(array(
 			"file" => "arpwatch.sh",
