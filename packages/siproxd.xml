@@ -121,7 +121,7 @@
                 }
                 if($_POST['if_outbound'] != "") {
                     if($config['interfaces'][$_POST['if_outbound']]['ipaddr'] == "pppoe") {
-                        fwrite($fout, "if_outbound = " . get_real_wan_interface() . "\n\n");
+                        fwrite($fout, "if_outbound = ng0\n\n");
                     } else {
                         fwrite($fout, "if_outbound = " . convert_friendly_interface_to_real_interface_name($_POST['if_outbound']) . "\n\n");
                     }
@@ -131,8 +131,7 @@
                 } else {
                         fwrite($fout, "sip_listen_port = 5060\n\n");
                 }
-                fwrite($fout, "daemonize = 1\n\nsilence_log = 0\n\nlog_calls = 1\n\nuser = nobody\nchrootjail = /usr/local/siproxd/\n\nregistration
-_file = siproxd_registrations\n\npid_file = siproxd.pid\n\n");
+                fwrite($fout, "daemonize = 1\n\nsilence_log = 0\n\nlog_calls = 1\n\nuser = nobody\nchrootjail = /usr/local/siproxd/\n\nregistration_file = siproxd_registrations\n\npid_file = siproxd.pid\n\n");
                 if($_POST['rtpenable'] != "") {
                         fwrite($fout, "rtp_proxy_enable = " . $_POST['rtpenable'] . "\n\n");
                 } else {
