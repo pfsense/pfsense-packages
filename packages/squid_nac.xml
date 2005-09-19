@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <packagegui>
-	<info>
-		<name>squidnac</name>
-	</info>
-	
-	<files></files>
-	<menus></menus>
-	
-	<configpath>['installedpackages']['package']['squidnac']['configuration']['settings']</configpath>
+	<name>squidnac</name>
+	<title>Services: Squid Advanced Proxy</title>		
+	<configpath>installedpackages->package->squidnac->configuration->settings</configpath>		
+
 	<aftersaveredirect>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</aftersaveredirect>
 
 	<tabs>
@@ -40,12 +36,12 @@
 			
 		<!-- <tab>
 			<text>Authentication Settings</text>
-			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=squidauth.xml&amp;id=0</url>
 		</tab>
 		
 		<tab>
 			<text>Users</text>
-			<url>/pkg_edit.php?xml=squid_users.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=squidusers.xml&amp;id=0</url>
 		</tab>		
 		-->
 	</tabs>
@@ -54,65 +50,55 @@
 		<field>
 			<fielddescr>Allowed Subnets</fielddescr>
 			<fieldname>allowed_subnets</fieldname>
-			<type>rowhelper</type>
-			<rowhelper>
-				<rowhelperfield>
-					<fielddescr>Network Address</fielddescr>
-					<fieldname>allowed_network_address</fieldname>
-					<type>input</type>
-					<size>32</size>
-					<validation>number</validation>
-				</rowhelperfield>
-				
-				<rowhelperfield>
-					<fielddescr>Subnet Mask</fielddescr>
-					<fieldname>allowed_subnet_mask</fieldname>
-					<type>select</type>
-					<options>
-						<option><name>1</name><value>1</value></option>
-						<option><name>2</name><value>2</value></option>
-						<option><name>3</name><value>3</value></option>
-						<option><name>4</name><value>4</value></option>
-						<option><name>5</name><value>4</value></option>
-						<option><name>6</name><value>4</value></option>
-						<option><name>7</name><value>4</value></option>
-						<option><name>8</name><value>4</value></option>
-						<option><name>9</name><value>4</value></option>
-						<option><name>10</name><value>4</value></option>
-						<option><name>11</name><value>4</value></option>
-						<option><name>12</name><value>4</value></option>
-						<option><name>13</name><value>4</value></option>
-						<option><name>14</name><value>4</value></option>
-						<option><name>15</name><value>4</value></option>
-						<option><name>16</name><value>4</value></option>
-						<option><name>17</name><value>4</value></option>
-						<option><name>18</name><value>4</value></option>
-						<option><name>19</name><value>4</value></option>
-						<option><name>20</name><value>4</value></option>
-						<option><name>21</name><value>4</value></option>
-						<option><name>22</name><value>4</value></option>
-						<option><name>23</name><value>4</value></option>
-						<option><name>24</name><value>4</value></option>
-						<option><name>25</name><value>4</value></option>
-						<option><name>26</name><value>4</value></option>
-						<option><name>27</name><value>4</value></option>
-						<option><name>28</name><value>4</value></option>
-						<option><name>29</name><value>4</value></option>
-						<option><name>30</name><value>4</value></option>
-						<option><name>31</name><value>4</value></option>
-						<option><name>32</name><value>4</value></option>	
-					</options>
-				</rowhelperfield>
-			</rowhelper>
+			<description>Subnets must be entered in the format of Network Address / Subnet Mask (e.g.: 192.168.1.0/24).  Enter domains separated by a semicolon (;).</description>
+			<type>textarea</type>
+			<rows>5</rows>
+			<cols>50</cols>
 		</field>
 		
 		<field>
 			<fielddescr>Unrestricted IP Addresses</fielddescr>
 			<fieldname>unrestricted_ip_address</fieldname>
+			<description>Specify each unrestricted IP address separated by a semicolon (;).</description>
 			<type>textarea</type>
-			<rows>10</rows>
+			<rows>5</rows>
+			<cols>50</cols>
+		</field>
+		
+		<field>
+			<fielddescr>Unrestricted MAC Addresses</fielddescr>
+			<fieldname>unrestricted_mac_addresses</fieldname>
+			<description>Specify each unrestricted MAC address separated by a semicolon (;).</description>
+			<type>textarea</type>
+			<rows>5</rows>
+			<cols>50</cols>		
+		</field>
+		
+		<field>
+			<fielddescr>Banned IP Addresses</fielddescr>
+			<fieldname>banned_ip_addresses</fieldname>
+			<description>Specify each banned IP address separated by a semicolon (l).</description>
+			<type>textarea</type>
+			<rows>5</rows>
+			<cols>50</cols>
+		</field>	
+		
+		<field>
+			<fielddescr>Banned MAC Addresses</fielddescr>
+			<fieldname>banned_mac_addresses</fieldname>
+			<description>Specify each banned MAC address separated by a semicolon (;).</description>
+			<type>textarea</type>
+			<rows>5</rows>
 			<cols>50</cols>
 		</field>
 	
 	</fields>
+
+	<custom_add_php_command_late>	
+		require_once("/usr/local/pkg/squid_ng.inc");
+
+		global_write_squid_config();
+		mwexec("/usr/local/sbin/squid -k reconfigure");
+	</custom_add_php_command_late>
+
 </packagegui>

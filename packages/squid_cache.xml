@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <packagegui>
-	<info>
-		<name>squidcache</name>
-	</info>
-	
-	<files></files>
-	<menus></menus>
-	
-	<configpath>['installedpackages']['package']['squidcache']['configuration']['settings']</configpath>
+	<name>squidcache</name>
+	<title>Services: Squid Advanced Proxy</title>		
+	<configpath>installedpackages->package->squidcache->configuration->settings</configpath>
+		
 	<aftersaveredirect>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</aftersaveredirect>
 
 	<tabs>
@@ -40,12 +36,12 @@
 			
 		<!-- <tab>
 			<text>Authentication Settings</text>
-			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=squidauth.xml&amp;id=0</url>
 		</tab>
 		
 		<tab>
 			<text>Users</text>
-			<url>/pkg_edit.php?xml=squid_users.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=squidusers.xml&amp;id=0</url>
 		</tab>
 		-->
 	</tabs>
@@ -54,7 +50,7 @@
 		<field>
 			<fielddescr>Memory Cache Size (MB)</fielddescr>
 			<fieldname>memory_cache_size</fieldname>
-			<description>This is the amount of physical RAM to be used for negative cache and in-transit objects.  This value should not exceed more than 50% of installed RAM.  The minimum value is 1MB; the default is 2MB</description>
+			<description>This is the amount of physical RAM to be used for negative cache and in-transit objects.  This value should not exceed more than 50% of installed RAM.  The minimum value is 1MB; the default is 8MB</description>
 			<size>4</size>
 			<type>input</type>
 			<validation>number</validation>
@@ -130,7 +126,7 @@
 		<field>
 			<fielddescr>Domain</fielddescr>
 			<fieldname>domain</fieldname>
-			<description>If required, the specified domains will never be cached.  Only enter one domain per line.</description>
+			<description>If required, the specified domains will never be cached.  Enter domains separated by a semicolon (;).</description>
 			<type>textarea</type>
 			<rows>10</rows>
 			<cols>50</cols>
@@ -145,10 +141,11 @@
 					
 	</fields>
 	
-	<custom_php_global_functions>
-	</custom_php_global_functions>
-	
-	<custom_add_php_command>
-	</custom_add_php_command>
+	<custom_add_php_command_late>	
+		require_once("/usr/local/pkg/squid_ng.inc");
 
+		global_write_squid_config();
+		mwexec("/usr/local/sbin/squid -k reconfigure");
+	</custom_add_php_command_late>
+	
 </packagegui>

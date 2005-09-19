@@ -1,14 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <packagegui>
-	<info>
-		<name>squidtraffic</name>
-	</info>
-	
-	<files></files>
-	<menus></menus>
-	
-	<configpath>['installedpackages']['package']['squidtraffic']['configuration']['settings']</configpath>
+	<name>squidtraffic</name>
+	<title>Services: Squid Advanced Proxy</title>		
+	<configpath>installedpackages->package->squidtraffic->configuration->settings</configpath>
+		
 	<aftersaveredirect>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</aftersaveredirect>
 
 	<tabs>
@@ -40,12 +36,12 @@
 			
 		<!--<tab>
 			<text>Authentication Settings</text>
-			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=squidauth.xml&amp;id=0</url>
 		</tab>
 		
 		<tab>
 			<text>Users</text>
-			<url>/pkg_edit.php?xml=squid_users.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=squidusers.xml&amp;id=0</url>
 		</tab>
 		-->		
 	</tabs>
@@ -122,4 +118,12 @@
 		</field>
 			
 	</fields>
+	
+	<custom_add_php_command_late>	
+		require_once("/usr/local/pkg/squid_ng.inc");
+
+		global_write_squid_config();
+		mwexec("/usr/local/sbin/squid -k reconfigure");
+	</custom_add_php_command_late>
+	
 </packagegui>

@@ -2,26 +2,32 @@
 
 <packagegui>
 	<name>squidng</name>
+	<title>Services: Squid Advanced Proxy</title>
 	<category>Security</category>
 	<version>2.5.10_4</version>
-	<title>Services: Squid Advanced Proxy</title>
+	<configpath>installedpackages->package->squidng->configuration->settings</configpath>
 	
 	<!-- This defines the location where the config is stored within pfSense's
 	     xml based global store -->
-	<configpath>['installedpackages']['package']['squidng']['configuration']['settings']</configpath>
 	<aftersaveredirect>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</aftersaveredirect>
 	
+	<menu>
+		<name>Squid Advanced Proxy</name>
+		<tooltiptext>Modify settings for Squid Advanced Proxy</tooltiptext>
+		<section>Services</section>
+	</menu>
+		
 	<!-- TODO: Add xml to parse proxy logs into readable format
 	<menu>
 		<name>Proxy Log</name>
 		<section>Status</section>
 		<configfile>squid_log.xml</configfile>
 	</menu> -->
-	
+			
 	<files>
 		<file>
 			<type>package</type>
-			<location>ftp://ftp.freebsd.org/pub/FreeBSD/ports/packages/www/squid-2.5.10_4.tbz</location>
+			<location>http://www.pfsense.org/packages/All/squid-2.5.STABLE10.tbz</location>
 		</file>
 		<file>
 			<type>package</type>
@@ -29,6 +35,12 @@
 		</file>
 		
 		<!-- retrieves the configuration file for upstream proxy settings -->
+		
+		<file>
+			<type>configfile</type>
+			<location>http://www.pfsense.com/packages/config/squid_ng.inc</location>
+		</file>
+		
 		<file>
 			<type>configfile</type>
 			<location>http://www.pfsense.com/packages/config/squid_upstream.xml</location>
@@ -67,14 +79,6 @@
 		-->
 		
 	</files>
-	
-	<menus>	
-		<menu>
-			<name>Squid Advanced Proxy</name>
-			<tooltiptext>Modify settings for Squid Advanced Proxy</tooltiptext>
-			<section>Services</section>
-		</menu>
-	</menus>
 	
 	<tabs>
 		<tab>
@@ -198,41 +202,40 @@
 			<description>Select the language in which the Proxy Server shall display error messages to users.</description>
 			<type>select</type>
 			<options>
-				<option><name>Bulgarian</name><value>bulgarian</value></option>
-				<option><name>Catalan</name><value>catalan</value></option>
-				<option><name>Czech</name><value>czech</value></option>
-				<option><name>Danish</name><value>danish</value></option>
-				<option><name>Dutch</name><value>dutch</value></option>
-				<option><name>English</name><value>english</value></option>
-				<option><name>Estonian</name><value>estonian</value></option>
-				<option><name>Finnish</name><value>finnish</value></option>
-				<option><name>French</name><value>french</value></option>
-				<option><name>German</name><value>german</value></option>
-				<option><name>Hebrew</name><value>hebrew</value></option>
-				<option><name>Hungarian</name><value>hungarian</value></option>
-				<option><name>Italian</name><value>italian</value></option>
-				<option><name>Japanese</name><value>japanese</value></option>
-				<option><name>Korean</name><value>korean</value></option>
-				<option><name>Lithuanian</name><value>lithuanian</value></option>
-				<option><name>Polish</name><value>polish</value></option>
-				<option><name>Portuguese</name><value>portuguese</value></option>
-				<option><name>Romanian</name><value>romanian</value></option>
-				<option><name>Russian-1251</name><value>russian_1251</value></option>
-				<option><name>Russian-koi8-r</name><value>russian_koi8</value></option>
-				<option><name>Serbian</name><value>serbian</value></option>
-				<option><name>Simplified Chinese</name><value>simplified_chinese</value></option>
-				<option><name>Slovak</name><value>slovak</value></option>
-				<option><name>Spanish</name><value>spanish</value></option>
-				<option><name>Swedish</name><value>swedish</value></option>
-				<option><name>Traditional Chinese</name><value>traditional_chinese</value></option>
-				<option><name>Turkish</name><value>turkish</value></option>
+				<option><name>Bulgarian</name><value>Bulgarian</value></option>
+				<option><name>Catalan</name><value>Catalan</value></option>
+				<option><name>Czech</name><value>Czech</value></option>
+				<option><name>Danish</name><value>Danish</value></option>
+				<option><name>Dutch</name><value>Dutch</value></option>
+				<option><name>English</name><value>English</value></option>
+				<option><name>Estonian</name><value>Estonian</value></option>
+				<option><name>Finnish</name><value>Finnish</value></option>
+				<option><name>French</name><value>French</value></option>
+				<option><name>German</name><value>German</value></option>
+				<option><name>Hebrew</name><value>Hebrew</value></option>
+				<option><name>Hungarian</name><value>Hungarian</value></option>
+				<option><name>Italian</name><value>Italian</value></option>
+				<option><name>Japanese</name><value>Japanese</value></option>
+				<option><name>Korean</name><value>Korean</value></option>
+				<option><name>Lithuanian</name><value>Lithuanian</value></option>
+				<option><name>Polish</name><value>Polish</value></option>
+				<option><name>Portuguese</name><value>Portuguese</value></option>
+				<option><name>Romanian</name><value>Romanian</value></option>
+				<option><name>Russian-1251</name><value>Russian-1251</value></option>
+				<option><name>Russian-koi8-r</name><value>Russian-koi8-r</value></option>
+				<option><name>Serbian</name><value>Serbian</value></option>
+				<option><name>Simplify Chinese</name><value>Simplify Chinese</value></option>
+				<option><name>Slovak</name><value>Slovak</value></option>
+				<option><name>Spanish</name><value>Spanish</value></option>
+				<option><name>Swedish</name><value>Swedish</value></option>
+				<option><name>Traditional Chinese</name><value>Traditional Chinese</value></option>
+				<option><name>Turkish</name><value>Turkish</value></option>
 			</options>
 		</field>
 				
 	</fields>
-		
-	<!-- The below writes the configuration as defined by the GUI options -->
 	
+	<!-- The below writes the configuration as defined by the GUI options -->
 	<custom_php_global_functions>
 		function write_static_squid_config() {
         	global $config;
@@ -242,7 +245,7 @@
             $lansa = gen_subnet($lancfg['ipaddr'], $lancfg['subnet']);
             $lansn = $lancfg['subnet'];
             
-            $fout = fopen("/usr/local/etc/squid/squid.conf.new","w");
+            $fout = fopen("/usr/local/etc/squid/squid.conf","w");
             fwrite($fout, "#\n");
             fwrite($fout, "# This file was automatically generated by the pfSense package manager\n");
             fwrite($fout, "# This default policy enables transparent proxy with no local disk logging\n");
@@ -256,28 +259,20 @@
 			
 			fwrite($fout, "acl QUERY urlpath_regex cgi-bin \?\n");
 			fwrite($fout, "no_cache deny QUERY\n");
-			if ($domain != "") {
-				$aclout = fopen("/usr/local/etc/squid/dst_nocache.acl","w");
-				$each_domain = explode(" ", $domain);
-				foreach ($each_domain as $line) {
-					fwrite($aclout, $line . "\n");
-				}
-				fclose($aclout);
-			}
 			fwrite($fout, "\n");
 			           
 			fwrite($fout, "pid_filename /var/run/squid.pid\n");
 			fwrite($fout, "\n");
 			
 			fwrite($fout, "cache_mem 8 MB\n");
-			fwrite($fout, "cache_dir aufs /usr/local/squid/cache 500 16 256\n");
+			fwrite($fout, "cache_dir ufs /var/squid/cache 500 16 256\n");
 			fwrite($fout, "\n");
 			
-			fwrite($fout, "error_directory /usr/local/squid/etc/errors/English\n");
+			fwrite($fout, "error_directory /usr/local/etc/squid/errors/English\n");
 			fwrite($fout, "\n");
 			
 			fwrite($fout, "memory_replacement_policy heap LRU\n");
-			fwrite($fout, "cache_replacement_policy heap GSDF\n");
+			fwrite($fout, "cache_replacement_policy heap GDSF\n");
 			fwrite($fout, "\n");
 			
 			fwrite($fout, "cache_access_log /dev/null\n");
@@ -296,7 +291,6 @@
 			fwrite($fout, "acl all src " . $lansa . "/" . $lansn . "\n");
 			fwrite($fout, "acl localnet src " . $lansa . "/" . $lansn . "\n");
 			fwrite($fout, "acl localhost src 127.0.0.1/255.255.255.255\n");
-			fwrite($fout, "acl SSL_ports port 443 563\n");
 			fwrite($fout, "acl Safe_ports port 80 # http\n");
 			fwrite($fout, "acl Safe_ports port 21 # ftp\n");
 			fwrite($fout, "acl Safe_ports port 443 563 # https, snews\n");
@@ -336,7 +330,7 @@
             
             fwrite($fout, "#Strip HTTP Header\n");
             fwrite($fout, "header_access X-Forwarded-For deny all\n");
-            fwrite($fout, "header_access deny all\n");
+            fwrite($fout, "header_access Via deny all\n");
             fwrite($fout, "\n");
             
             fwrite($fout, "maximum_object_size 4096 KB\n");
@@ -349,279 +343,40 @@
             
             fclose($fout);	
 		} <!-- end function write_static_squid_config() -->
-		
-		function global_write_squid_config() {
-			global $config;
-			
-            <!-- define squid configuration file in variable for replace function -->
-            $squidconfig = "/usr/local/etc/squid/squid.conf.new";
-            
-            <!-- squid_ng.xml values -->
-            $active_interface = $config['installedpackages']['squidng']['config'][0]['active_interface'];
-            $transparent_proxy = $config['installedpackages']['squidng']['config'][0]['transparent_proxy'];
-            $log_enabled = $config['installedpackages']['squidng']['config'][0]['log_enabled'];
-            $urlfilter_enable = $config['installedpackages']['squidng']['config'][0]['urlfilter_enable'];
-            $log_query_terms = $config['installedpackages']['squidng']['config'][0]['log_query_terms'];
-            $log_user_agents = $config['installedpackages']['squidng']['config'][0]['log_user_agents'];
-            $proxy_port = $config['installedpackages']['squidng']['config'][0]['proxy_port'];
-            $visible_hostname = $config['installedpackages']['squidng']['config'][0]['visible_hostname'];
-            $cache_admin_email = $config['installedpackages']['squidng']['config'][0]['cache_admin_email'];
-            $error_language = $config['installedpackages']['squidng']['config'][0]['error_language'];
-            
-            <!-- squid_upstream.xml values -->
-            $proxy_forwarding = $config['installedpackages']['squidupstream']['config'][0]['proxy_forwarding'];
-            $client_ip_forwarding = $config['installedpackages']['squidupstream']['config'][0]['client_ip_forwarding'];
-            $user_forwarding = $config['installedpackages']['squidupstream']['config'][0]['user_forwarding'];
-            $upstream_proxy = $config['installedpackages']['squidupstream']['config'][0]['upstream_proxy'];
-            $upstream_proxy_port = $config['installedpackages']['squidupstream']['config'][0]['upstream_proxy_port'];
-            $upstream_username = $config['installedpackages']['squidupstream']['config'][0]['upstream_username'];
-            $upstream_password = $config['installedpackages']['squidupstream']['config'][0]['upstream_psasword'];
-            
-            <!-- squid_cache.xml values -->
-            $memory_cache_size = $config['installedpackages']['squidcache']['config'][0]['memory_cache_size'];
-            $harddisk_cache_size = $config['installedpackages']['squidcache']['config'][0]['harddisk_cache_size'];
-            $minimum_object_size = $config['installedpackages']['squidcache']['config'][0]['minimum_object_size'];
-            $maximum_object_size = $config['installedpackages']['squidcache']['config'][0]['maximum_object_size'];
-            $level_subdirs = $config['installedpackages']['squidcache']['config'][0]['level_subdirs'];
-            $memory_replacement = $config['installedpackages']['squidcache']['config'][0]['memory_replacement'];
-            $cache_replacement = $config['installedpackages']['squidcache']['config'][0]['cache_replacement'];
-            <!-- $domain <rowhelper> -->
-            $enable_offline = $config['installedpackages']['squidcache']['config'][0]['enable_offline'];
-            
-            <!-- squid_nac.xml values -->
-            $allowed_subnets = $config['installedpackages']['squidnac']['config'][0]['allowed_subnets'];
-            <!-- allowed_network_address <rowhelper -->
-            <!-- allowed_subnet_mask <rowhelper -->
-            $unrestricted_ip_address = $config['installedpackages']['squidnac']['config'][0]['unrestricted_ip_address'];
-            
-            <!-- squid_traffic.xml values -->
-            $max_download_size = $config['installedpackages']['squidtraffic']['config'][0]['max_download_size'];
-            $max_upload_size = $config['installedpackages']['squidtraffic']['config'][0]['max_upload_size'];
-            $dl_overall = $config['installedpackages']['squidtraffic']['config'][0]['dl_overall'];
-            $dl_per_host = $config['installedpackages']['squidtraffic']['config'][0]['dl_per_host'];
-            $throttle_binary_files = $config['installedpackages']['squidtraffic']['config'][0]['throttle_binary_files'];
-            $throttle_cd_image = $config['installedpackages']['squidtraffic']['config'][0]['throttle_cd_image'];
-            $throttle_multimedia = $config['installedpackages']['squidtraffic']['config'][0]['throttle_multimedia'];
-                             
-            $fout = fopen($squidconfig,"w");
-            
-            <!-- option: shutdown_lifetime -->
-            fwrite($fout, "shutdown_lifetime 5 seconds\n");
-            fwrite($fout, "\n");
-
-			<!-- option: icp_port -->	
-			if($icp_port == "") $icp_port="3130"; 
-			fwrite($fout, "icp_port " . $icp_port . "\n");
-			
-			<!-- option: http_port -->
-			if($http_port == "") $http_port="3128";
-			$int = convert_friendly_interface_to_real_interface_name($config['installedpackages']['squidng']['config'][0]['active_interface']);
-			$listen_ip = find_interface_ip($int);
-			fwrite($fout, "http_port " . $listen_ip . ":" . $http_port . "\n");
-			fwrite($fout, "\n");
-			
-			fwrite($fout, "acl QUERY urlpath_regex cgi-bin \?\n");
-			fwrite($fout, "non_cache deny QUERY\n");
-			
-			
-			fwrite($fout, "\n");
-			
-			fwrite($fout, "cache_effective_user squid\n");
-			fwrite($fout, "cache_effective_group squid\n");
-			fwrite($fout, "\n");
-			
-			fwrite($fout, "pid_filename /var/run/squid.pid\n");
-			fwrite($fout, "\n");
-			
-			if ($memory_cache_size == "") $memory_cache_size="8";
-			fwrite($fout, "cache_mem " . $memory_cache_size . " MB\n");
-			if ($harddisk_cache_size == "") $harddisk_cache_size="500";
-			if ($level_subdirs == "") $level_subdirs="16";
-			fwrite($fout, "cache_dirs aufs /usr/local/squid/cache " . $harddisk_cache_size . " " . $level_subdirs . " 256\n");
-			fwrite($fout, "\n");
-			
-			if ($error_language == "") $error_language="English";
-			fwrite($fout, "error_directory /usr/local/squid/etc/errors/" . $error_language . "\n");
-			fwrite($fout, "\n");
-			
-			if ($offline_mode == "on") {
-				fwrite($fout, "offline_mode on\n");
-				fwrite($fout, "\n");
-			}
-			
-			if ($memory_replacement == "") $memory_replacement="heap GSDF";
-			fwrite($fout, "memory_replacement_policy " . $memory_replacement . "\n");
-			if ($cache_replacement == "") $cache_replacement="heap GSDF";
-			fwrite($fout, "cache_replacement_policy " . $cache_replacement . "\n");
-			fwrite($fout, "\n");
-			
-			if ($log_enabled == "on" ) {
-				fwrite($fout, "cache_access_log /var/log/squid/access.log\n");
-				fwrite($fout, "cache_log /var/log/squid/cache.log\n");
-				fwrite($fout, "cache_store_log none\n");
-			} else {
-				fwrite($fout, "cache_access_log /dev/null\n");
-				fwrite($fout, "cache_log /dev/null\n");
-				fwrite($fout, "cache_store_log none\n");
-			}
-
-			if ($log_query_terms == "on") {
-				fwrite($fout, "strip_query_terms off\n");
-			} else {
-				fwrite($fout, "strip_query_terms on\n");
-			}
-				
-			if ($log_user_agents == "on") {
-				fwrite($fout, "useragent_log /var/log/squid/useragent.log\n");
-			} 
-			fwrite($fout, "\n");
-			
-			fwrite($fout, "log_mime_hdrs off\n");
-			fwrite($fout, "emulate_httpd_log on\n");
-			if ($client_ip_forwarding !== "on") { 
-				fwrite($fout, "forwarded_for off\n");
-			} elseif ($user_forwarding !== "on") {
-				fwrite($fout, "forwarded_for off\n");
-			} else {
-				fwrite($fout, "forwarded_for on\n");
-			} 
-			fwrite($fout, "\n");
-			
-			fwrite($fout, "acl within_timeframe time MTWHFAS 00:00-24:00\n");
-			fwrite($fout, "\n");
-			
-            <!-- obtain interface subnet and address for Squid rules -->
-            $lactive_interface = strtolower($active_interface);
-            
-            $lancfg = $config['interfaces'][$lactive_interface];
-            $lanif = $lancfg['if'];
-            $lanip = $lancfg['ipaddr'];
-            $lansa = gen_subnet($lancfg['ipaddr'], $lancfg['subnet']);
-            $lansn = $lancfg['subnet'];			
-
-			fwrite($fout, "acl all src " . $lansa . "/" . $lansn . "\n");
-			fwrite($fout, "acl localnet src " . $lansa . "/" . $lansn . "\n");
-			fwrite($fout, "acl localhost src 127.0.0.1/255.255.255.255\n");
-			fwrite($fout, "acl SSL_ports port 443 563\n");
-			fwrite($fout, "acl Safe_ports port 80 # http\n");
-			fwrite($fout, "acl Safe_ports port 21 # ftp\n");
-			fwrite($fout, "acl Safe_ports port 443 563 # https, snews\n");
-			fwrite($fout, "acl Safe_ports port 70 # gopher\n");
-			fwrite($fout, "acl Safe_ports port 210 # wais\n");
-			fwrite($fout, "acl Safe_ports port 1025-65535 # unregistered ports\n");
-			fwrite($fout, "acl Safe_ports port 280 # http-mgmt\n");
-			fwrite($fout, "acl Safe_ports port 488 # gss-http\n");
-			fwrite($fout, "acl Safe_ports port 591 # filemaker\n");
-			fwrite($fout, "acl Safe_ports port 777 # multiling http\n");
-			fwrite($fout, "acl Safe_ports port 800 # Squids port (for icons)\n");
-			fwrite($fout, "\n");
-			
-            fwrite($fout, "acl CONNECT method CONNECT\n");
-            fwrite($fout, "\n");
-            
-            fwrite($fout, "#access to squid; local machine; no restrictions\n");
-            fwrite($fout, "http_access allow localnet\n");
-            fwrite($fout, "http_access allow localhost\n");
-       		fwrite($fout, "\n");
-       		
-       		fwrite($fout, "#Deny non web services\n");
-            fwrite($fout, "http_access deny !Safe_ports\n");
-            fwrite($fout, "http_access deny CONNECT\n");
-            fwrite($fout, "\n");
-            
-            fwrite($fout, "#Set custom configured ACLs\n");
-            fwrite($fout, "http_access deny all\n");
-            fwrite($fout, "\n");
-
-            fwrite($fout, "cache_effective_user squid\n");
-            fwrite($fout, "cache_effective_group squid\n");
-            fwrite($fout, "\n");
-            
-            fwrite($fout, "#Strip HTTP Header\n");
-            fwrite($fout, "header_access X-Forwarded-For deny all\n");
-            fwrite($fout, "header_access deny all\n");
-            fwrite($fout, "\n");
-
-			if ($urlfilter_enable == "on") {
-				fwrite($fout, "redirect_program /usr/sbin/squidGuard");
-				fwrite($fout, "redirect_children 5");
-			}	
-			
-			if ($visible_hostname !== "") {
-				fwrite($fout, "visible_hostname " . $visible_hostname . "\n");
-			} 
-			
-			if ($cache_admin_email !== "") {
-				fwrite($fout, "cache_mgr " . $cache_admin_email . "\n");
-			}
-			
-			if ($maximum_object_size == "") $maximum_object_size="4096";
-			if ($minimum_object_size == "") $minimum_object_size="0";
-			fwrite($fout, "maximum_object_size " . $maximum_object_size . " KB\n");
-			fwrite($fout, "minimum_object_size " . $minimum_object_size . " KB\n");
-			fwrite($fout, "\n");
-			
-			if ($proxy_forwarding == "on") {
-				fwrite($fout, "cache_peer " . $upstream_proxy . "parent " . $upstream_proxy_port . "3130 login=" . upstream_username . ":" . upstream_password . " default no-query\n");
-				fwrite($fout, "never_direct allow all\n");
-			}	
-			
-			if ($transparent_proxy == "on") {
-            	fwrite($fout, "httpd_accel_host virtual\n");
-            	fwrite($fout, "httpd_accel_port 80\n");
-            	fwrite($fout, "httpd_accel_with_proxy on\n");
-            	fwrite($fout, "httpd_accel_uses_host_header on\n");	
-            	fwrite($fout, "\n");			
-            }
-			
-			fclose($fout);
-		} <!-- end function write_squid_config -->
-		
 	</custom_php_global_functions>
 	
-	<custom_add_php_command>
-		function sync_package_squid () {
-			mwexec("/usr/local/sbin/squid -k reconfigure");
-			conf_mount_ro();	<!-- mounts filesystems in read only mode -->
-			config_unlock();	<!-- unlock the config file -->
-		} <!-- end function sync_package_squid -->
-		
+	<custom_add_php_command_late>	
+		require_once("/usr/local/pkg/squid_ng.inc");
+
 		global_write_squid_config();
-		<!-- sync_package_squid(); -->
-	</custom_add_php_command>
-	
-	<custom_php_resync_command>
-		function sync_package_squid() {
-			mwexec("/usr/local/sbin/squid -k reconfigure");
-			conf_mount_ro();	<!-- mounts filesystems in read only mode -->
-			config_unlock();	<!-- unlock the config file -->
-		}
-		
-		global_write_squid_config();
-		sync_package_squid();
-	</custom_php_resync_command>
+		mwexec("/usr/local/sbin/squid -k reconfigure");
+	</custom_add_php_command_late>
 	
 	<custom_php_install_command>
 		write_static_squid_config();	<!-- write initial config to work -->
 		
+		update_output_window("Creating initialization scripts...");
 		$fout = fopen("/usr/local/etc/rc.d/squid.sh","w");
 		fwrite($fout, "#!/bin/sh\n");
-			fwrite($fout, "# PACKAGE: Squid\n);
-			fwrite($fout, "# EXECUTABLE: squid\n\n");
-		fwrite($fout "# Alert system that we need the / mount rw\n");
-		fwrite($fout, "touch /tmp/rw_root_mount\n\n");
+		fwrite($fout, "$pfSense: /usr/local/sbin/rc.d/squid.sh; created " . date(DATE_RFC822) . " mcapp\n");
+		fwrite($fout, "\n");
+		fwrite($fout, "touch /tmp/ro_root_mount\n\n");
 		fwrite($fout, "/usr/local/sbin/squid -D\n\n");
-			fwrite($fout, "touch /tmp/filter_dirty\n\n");
+		fwrite($fout, "touch /tmp/filter_dirty\n\n");
 		fclose($fout);
 		
 		chmod("/usr/local/etc/rc.d/squid.sh", 755);
-		update_output_window("Configuring Squid... This may take a moment...");
-		mwexec("/usr/local/sbin/squid -z");
-		update_output_window("Starting Squid...");
+		
+		if (!file_exists("/var/squid/cache")) {
+			update_output_window("Initializing Cache... This may take a moment...");
+			mwexec("/usr/local/sbin/squid -z");
+		}
+		
+		update_output_window("Starting Squid Advanced Proxy...");
 		mwexec_bg("/usr/local/etc/rc.d/squid.sh");
 		filter_configure();	
 	</custom_php_install_command>
-	
+
 	<custom_php_deinstall_command>
 		rmdir_recursive("/usr/local/squid");
 		unlink_if_exists("/var/mail/squid");
@@ -629,12 +384,13 @@
 		unlink_if_exists("/usr/local/etc/squid/squid.conf");
 		unlink_if_exists("/usr/local/etc/squid");
 		unlink_if_exists("/usr/local/libexec/squid");
+		rmdir_recursive("/usr/local/etc/squid");	
 		filter_configure();
 	</custom_php_deinstall_command>
 	
-	<!-- <start_command>/usr/local/etc/rc.d/squid.sh</start_command> -->
+	<start_command>/usr/local/etc/rc.d/squid.sh</start_command>
 	
-	<process_kill_command>squid</process_kill_command>
+	<process_kill_command>/usr/local/sbin/squid -k shutdown</process_kill_command>
 	
 </packagegui>
 			

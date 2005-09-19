@@ -1,17 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <packagegui>
-	<info>
-		<name>squidupstream</name>
-	</info>
+	<name>squidupstream</name>
+	<title>Services: Squid Advanced Proxy</title>		
+	<configpath>installedpackages->package->squidupstream->configuration->settings</configpath>
 	
-	<files></files>
-	<menus></menus>
-	
-	<configpath>['installedpackages']['package']['squidupstream']['configuration']['settings']</configpath>
 	<aftersaveredirect>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</aftersaveredirect>
 
-	
 	<tabs>
 		<tab>
 			<text>General Settings</text>
@@ -41,14 +36,13 @@
 			
 		<!-- <tab>
 			<text>Authentication Settings</text>
-			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=squidauth.xml&amp;id=0</url>
 		</tab>
 		
 		<tab>
 			<text>Users</text>
-			<url>/pkg_edit.php?xml=squid_users.xml&amp;id=0</url>
-		</tab>
-		-->
+			<url>/pkg_edit.php?xml=squidusers.xml&amp;id=0</url>
+		</tab> -->
 	</tabs>
 	
 	<fields>
@@ -105,7 +99,11 @@
 		</field>
 	</fields>
 	
-	<custom_php_global_functions>
-	</custom_php_global_functions>
-	
+	<custom_add_php_command_late>	
+		require_once("/usr/local/pkg/squid_ng.inc");
+
+		global_write_squid_config();
+		mwexec("/usr/local/sbin/squid -k reconfigure");
+	</custom_add_php_command_late>
+			
 </packagegui>	
