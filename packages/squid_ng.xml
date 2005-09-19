@@ -15,6 +15,7 @@
 		<name>Squid Advanced Proxy</name>
 		<tooltiptext>Modify settings for Squid Advanced Proxy</tooltiptext>
 		<section>Services</section>
+		<url>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</url>
 	</menu>
 		
 	<!-- TODO: Add xml to parse proxy logs into readable format
