@@ -105,7 +105,7 @@
 			<type>textarea</type>
 		</field>
 	</fields>
-	<custom_php_command_before_form>
+	<custom_php_global_functions>
 	    function sync_package_spamd() {
 		conf_mount_rw();
 		config_lock();
@@ -144,13 +144,10 @@
 		config_unlock();
 		restart_service("spamd");
 	    }
-	</custom_php_command_before_form>
+	</custom_php_global_functions>
 	<custom_php_resync_config_command>
 	    sync_package_spamd();
 	</custom_php_resync_config_command>
-	<custom_delete_php_command>
-	    sync_package_spamd();
-	</custom_delete_php_command>
 	<custom_php_install_command>
 	    system("touch /var/mail/whitelist.txt 2>/dev/null");
 	    system("/usr/libexec/spamd-setup 2>/dev/null &amp;");
