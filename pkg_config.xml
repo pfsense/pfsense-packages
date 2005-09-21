@@ -228,7 +228,7 @@ test server or link availability and modify translation or routing rules. This p
 	<configurationfile>mtr-nox11.xml</configurationfile>
     </package>
     <package>
-	<name>squid_ng</name>
+	<name>squid</name>
 	<descr>High performance Web proxy cache</descr>
 	<website>http://www.squid-cache.org/</website>
 	<category>Network Management</category>
