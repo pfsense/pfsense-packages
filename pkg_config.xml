@@ -235,7 +235,7 @@ test server or link availability and modify translation or routing rules. This p
 	<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
 	<depends_on_package>squid-2.5.STABLE10.tgz</depends_on_package>
 	<version>2.5.10_4</version>
-	<status>ALPHA ALPHA *WORK IN PROGRESS, USE OTHER SQUID PACKAGE!*</status>
+	<status>ALPHA</status>
 	<config_file>http://www.pfsense.com/packages/config/squid_ng.xml</config_file>
 	<configurationfile>squid.xml</configurationfile>
     </package>
