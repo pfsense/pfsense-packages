@@ -116,12 +116,12 @@ function global_write_squid_config() {
 		
 	/* option: http_port */
 	if($http_port == "") $http_port="3128";
-	$int = convert_friendly_interface_to_real_interface_name($config['installedpackages']['squidng']['config'][0]['active_interface']);
-	if($int == "LAN") {
+	if($config['installedpackages']['squidng']['config'][0]['active_interface'] == "LAN") {
 		$listen_ip = find_interface_ip($config['interfaces']['lan']['if']);
 	} elseif($int == "WAN") {
 		$listen_ip = find_interface_ip($config['interfaces']['wan']['if']);
 	} else {
+		$int = convert_friendly_interface_to_real_interface_name($config['installedpackages']['squidng']['config'][0]['active_interface']);
 		$listen_ip = find_interface_ip($int);
 	}
 	fwrite($fout, "http_port " . $listen_ip . ":" . $http_port . "\n");
