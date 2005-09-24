@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <packagegui>
-	<name>squidng</name>
+	<name>squid</name>
 	<title>Services: Squid Advanced Proxy</title>
 	<category>Security</category>
 	<version>2.5.10_4</version>
@@ -30,14 +30,15 @@
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	    <item>http://www.pfsense.com/packages/config/squid_traffic.xml</item>
-	</additional_files_needed>    	<additional_files_needed>
+	</additional_files_needed>
+        <additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	    <item>http://www.pfsense.com/packages/config/squid_upstream.xml</item>
 	</additional_files_needed>
 	
 	<menu>
-		<name>Squid Advanced Proxy</name>
+		<name>Squid</name>
 		<tooltiptext>Modify settings for Squid Advanced Proxy</tooltiptext>
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</url>
