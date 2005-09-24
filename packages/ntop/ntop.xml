@@ -69,14 +69,18 @@
 	    $ifaces_final = "";
 	    if($ntop_config['password'] and $ntop_config['passwordagain']) {
 		    if($ntop_config['password'] == $ntop_config['passwordagain']) {
+			    $first = 0;
 			    foreach($_POST['interface_array'] as $iface) {
 				$if = convert_friendly_interface_to_real_interface_name($iface);
 				if($if) {
-				    $ifaces_final .= " -i " . $if;
+				    $ifaces_final .= " " . $if;
+				    if($first == 1)
+					$ifaces_final .= ",";
+				    $first = 1;
 				}
 			    }
 			    exec("/usr/local/bin/ntop --set-admin-password=" . $_POST['password'] . " &amp;", $ntopout);
-			    $start = "/usr/local/bin/ntop " . $ifaces_final . " -u root -d --ipv4 -M -x 8102 -X 8192 &amp;";
+			    $start = "/usr/local/bin/ntop -i " . $ifaces_final . " -u root -d --ipv4 -M -x 8102 -X 8192 &amp;";
 			    write_rcfile(array(
 						    "file" => "ntop.sh",
 						    "start" => $start,  
