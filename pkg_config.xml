@@ -3,6 +3,16 @@
 <pfsensepkgs>
   <packages>
     <package>
+	<name>zebra</name>
+	<website>http://www.zebra.org/</website>
+	<descr>*NO GUI*</descr>
+	<category>Network Management</category>
+	<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+	<depends_on_package>zebra-9.5.tbz</depends_on_package>
+	<status>ALPHA</status>
+	<version>9.5</version>
+    </package>
+    <package>
 	<name>pfstat</name>
 	<website>http://www.benzedrine.cx/pfstat.html</website>
 	<descr>pfstat is a small utility that collects packet filter statistics and produces graphs. THIS PACKAGE HAS NOT BEEN UPDATED TO USE THE LATEST VERSION OF PF.</descr>
