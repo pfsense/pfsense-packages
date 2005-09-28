@@ -67,6 +67,8 @@
 	    $ntop_config =&amp; $_POST;
 	    $if_final = "";
 	    $ifaces_final = "";
+	    system("mkdir -p /var/db/ntopchown nobody:nobody /var/db/ntop");
+	    system("chown nobody:nobody /var/db/ntop");
 	    if($ntop_config['password'] and $ntop_config['passwordagain']) {
 		    if($ntop_config['password'] == $ntop_config['passwordagain']) {
 			    $first = 0;
