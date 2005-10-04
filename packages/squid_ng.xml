@@ -22,6 +22,12 @@
 		<section>Status</section>
 		<configfile>squid_log.xml</configfile>
 	</menu> -->
+
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/squid.xml</item>
+	</additional_files_needed>
 			
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -29,13 +35,13 @@
 		<item>http://www.pfsense.com/packages/config/squid_cache.xml</item>
 	</additional_files_needed>
 	
-    <additional_files_needed>
+	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	    <item>http://www.pfsense.com/packages/config/squid_nac.xml</item>
 	</additional_files_needed>
     	
-    <additional_files_needed>
+	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	    <item>http://www.pfsense.com/packages/config/squid_ng.inc</item>
@@ -57,6 +63,12 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/squid_auth.xml</item>
+	</additional_files_needed>
+
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/squid_auth.inc</item>
 	</additional_files_needed>
 	
 	<additional_files_needed>
