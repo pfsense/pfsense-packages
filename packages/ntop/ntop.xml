@@ -75,9 +75,9 @@
 			    foreach($_POST['interface_array'] as $iface) {
 				$if = convert_friendly_interface_to_real_interface_name($iface);
 				if($if) {
-				    $ifaces_final .= " " . $if;
 				    if($first == 1)
 					$ifaces_final .= ",";
+				    $ifaces_final .= $if;
 				    $first = 1;
 				}
 			    }
