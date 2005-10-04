@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<packagegui>
+	<name>squidauth</name>
+	<title>Services: Proxy Server -> Authentication Settings</title>
+	<category>Security</category>
+	<version>2.5.10_4</version>
+	<configpath>installedpackages->package->squidauth->configuration->settings</configpath>
+
+	<files></files>
+	<menu></menu>
+	
+	<aftersaveredirect>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</aftersaveredirect>
+	
+	<tabs>
+		<tab>
+			<text>General Settings</text>
+			<url>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</url>
+		</tab>
+		
+		<tab>
+			<text>Upstream Proxy</text>
+			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
+		</tab>
+		
+		<tab>
+			<text>Cache Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
+		</tab>
+			
+		<tab>
+			<text>Network Access Control</text>
+			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
+		</tab>
+			
+		<tab>
+			<text>Traffic Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
+		</tab>
+			
+		<tab>
+			<text>Auth Settings</text>
+			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		
+		<tab>
+			<text>Extended Auth Settings</text>
+			<url>/pkg.php?xml=squid_extauth.xml&amp;id=0</url>
+		</tab>		
+	</tabs>
+	
+	<fields>
+		<field>
+			<fielddescr>Authentication Methods</fielddescr>
+			<fieldname>auth_method</fieldname>
+			<description>Select a valid authentication method.  This will allow users to be authenticated by external entities or a minimum, a local password in order to access websites.  The default value is "None".</description>
+			<type>select</type>
+			<options>
+				<option><name>None</name><value>none</value></option>
+				<option><name>Local Authentication</name><value>local_auth</value></option>
+				<option><name>LDAP Authentication</name><value>ldap_bind</value></option>
+				<option><name>NT Domain Authentication</name><value>domain_auth</value></option>
+				<option><name>RADIUS Authentication</name><value>radius_auth</value></option>
+			</options>
+		</field>
+	
+		<field>
+			<fielddescr>Number of Authentication Processes</fielddescr>
+			<fieldname>auth_processes</fieldname>
+			<description>The number of authenticator processes to spawn at one time.  If many authentications are expected within a short timeframe, increase this number accordingly.  The default value is 5.</description>
+			<type>input</type>
+			<size>4</size>
+		</field>
+		
+		<field>
+			<fielddescr>Authentication Cache TTL (in minutes)</fielddescr>
+			<fieldname>auth_cache_ttl</fieldname>
+			<description>This specifies how long Squid assumes an externally validated username and password combination is valid for.  Upon reaching the timeframe set within this value, user(s) will be re-prompted to authenticate.</description>
+			<type>input</type>
+			<size>4</size>
+		</field>
+		
+		<field>
+			<fielddescr>Limit IP Addresses per User</fielddescr>
+			<fieldname>limit_ip_addr</fieldname>
+			<description>A number can be specified to enforce restrictions to prevent potential replay attacks limiting the number of times a user can login from a different source IP address.  The default value is 2.</description>
+			<type>input</type>
+			<size>4</size>
+		</field>
+		
+		<field>
+			<fielddescr>User/IP Cache TTL (in minutes)</fielddescr>
+			<fieldname>user_ip_cache_ttl</fieldname>
+			<description>This value controls how long the proxy will remember the IP address that is associated with a user.  This is used in conjuction with the above option.</description>
+			<type>input</type>
+			<size>4</size>
+		</field>
+		
+		<field>
+			<fielddescr>Require Authentication for Unrestricted Source Addresses</fielddescr>
+			<fieldname>req_unrestricted_auth</fieldname>
+			<description></description>
+			<type>checkbox</type>
+		</field>
+		
+		<field>
+			<fielddescr>Authentication Realm Prompt</fielddescr>
+			<fieldname>auth_realm_prompt</fieldname>
+			<description>This text will be displayed at the top of the authentication request window.</description>
+			<type>input</type>
+			<size>40</size>
+		</field>
+		
+		<field>
+			<fielddescr>Domains Without Authentication</fielddescr>
+			<fieldname>no_domain_auth</fieldname>
+			<description></description>
+			<type>textarea</type>
+			<rows>5</rows>
+			<cols>50</cols>
+		</field>
+
+	</fields>
+	
+	<custom_add_php_command_late>	
+		require_once("/usr/local/pkg/squid_ng.inc");
+		require_once("/usr/local/pkg/squid_auth.inc");
+						
+		global_eval_auth_options();
+		
+		global_write_squid_config();
+		mwexec_bg("/usr/local/sbin/squid -k reconfigure");		
+	</custom_add_php_command_late>
+
+</packagegui>

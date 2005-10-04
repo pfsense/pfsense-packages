@@ -2,7 +2,7 @@
 
 <packagegui>
 	<name>squidtraffic</name>
-	<title>Services: Squid Advanced Proxy</title>		
+	<title>Services: Proxy Server -> Traffic Management</title>		
 	<configpath>installedpackages->package->squidtraffic->configuration->settings</configpath>
 		
 	<aftersaveredirect>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</aftersaveredirect>
@@ -34,16 +34,15 @@
 			<active/>
 		</tab>
 			
-		<!--<tab>
-			<text>Authentication Settings</text>
-			<url>/pkg_edit.php?xml=squidauth.xml&amp;id=0</url>
+		<tab>
+			<text>Auth Settings</text>
+			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
 		</tab>
 		
 		<tab>
-			<text>Users</text>
-			<url>/pkg_edit.php?xml=squidusers.xml&amp;id=0</url>
+			<text>Extended Auth Settings</text>
+			<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>
 		</tab>
-		-->		
 	</tabs>
 	
 	<fields>
