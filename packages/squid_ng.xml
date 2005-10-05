@@ -22,12 +22,6 @@
 		<section>Status</section>
 		<configfile>squid_log.xml</configfile>
 	</menu> -->
-
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/squid.xml</item>
-	</additional_files_needed>
 			
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -35,13 +29,13 @@
 		<item>http://www.pfsense.com/packages/config/squid_cache.xml</item>
 	</additional_files_needed>
 	
-	<additional_files_needed>
+    <additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	    <item>http://www.pfsense.com/packages/config/squid_nac.xml</item>
 	</additional_files_needed>
     	
-	<additional_files_needed>
+    <additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	    <item>http://www.pfsense.com/packages/config/squid_ng.inc</item>
@@ -63,12 +57,6 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/squid_auth.xml</item>
-	</additional_files_needed>
-
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/squid_auth.inc</item>
 	</additional_files_needed>
 	
 	<additional_files_needed>
@@ -361,33 +349,35 @@
 		
 		if (!file_exists("/var/squid/logs")) {
 			mwexec("mkdir -p /var/squid/logs");
-			mwexec("chown squid:squid /var/squid/logs");
 		}
+		mwexec("/usr/sbin/chown squid:squid /var/squid/logs");
+		
 		
 		if (!file_exists("/var/squid/cache")) {
 			mwexec("mkdir -p /var/squid/cache");
-			mwexec("chown squid:squid /var/squid/cache");
 		}
+		mwexec("/usr/sbin/chown squid:squid /var/squid/cache");
+		
 		
 		if (!file_exists("/usr/local/etc/squid/advanced/acls")) {
 			mwexec("mkdir -p /usr/local/etc/squid/advanced/acls");
-			mwexec("chown squid:squid /usr/local/etc/squid/advanced/acls");
 		}
+		mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/acls");
 		
 		if (!file_exists("/usr/local/etc/squid/advanced/ncsa")) {
 			mwexec("mkdir -p /usr/local/etc/squid/advanced/ncsa");
-			mwexec("chown squid:squid /usr/local/etc/squid/advanced/ncsa");
 		}
-		
+		mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/ncsa");
+			
 		if (!file_exists("/usr/local/etc/squid/advanced/ntlm")) {
 			mwexec("mkdir -p /usr/local/etc/squid/advanced/ntlm");
-			mwexec("chown squid:squid /usr/local/etc/squid/advanced/ntlm");
 		}
+		mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/ntlm");		
 		
 		if (!file_exists("/usr/local/etc/squid/advanced/radius")) {
 			mwexec("mkdir -p /usr/local/etc/squid/advanced/radius");
-			mwexec("chown squid:squid /usr/local/etc/squid/advanced/radius");
 		}
+		mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/radius");
 		
 		update_output_window("Initializing Cache... This may take a moment...");
 		mwexec("/usr/local/sbin/squid -z");
@@ -398,10 +388,15 @@
 	</custom_php_install_command>
 
 	<custom_php_deinstall_command>
+		update_output_window("Stopping proxy service...");
+		mwexec("/usr/local/sbin/squid -k shutdown");
+	
+		update_output_window("Recursively removing directories hierarchies...");
 		mwexec("rm -rf /usr/local/squid");
 		mwexec("rm -rf /var/squid/cache");	
 		mwexec("rm -rf /usr/local/etc/squid");
 		
+		update_output_window("Removing configuration files...");
 		unlink_if_exists("/usr/local/etc/rc.d/squid.sh");
 		unlink_if_exists("/usr/local/etc/squid");
 		unlink_if_exists("/usr/local/libexec/squid");

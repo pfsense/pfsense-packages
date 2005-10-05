@@ -88,7 +88,7 @@ function global_write_squid_config() {
     $throttle_cd_images    = $config['installedpackages']['squidtraffic']['config'][0]['throttle_cd_images'];
     $throttle_multimedia   = $config['installedpackages']['squidtraffic']['config'][0]['throttle_multimedia'];
                              
-    /* TODO: squid_auth.xml values (placeholder for now) */
+    /* squid_auth.xml values */
 	$auth_method           = $config['installedpackages']['squidauth']['config'][0]['auth_method'];
 	$auth_processes        = $config['installedpackages']['squidauth']['config'][0]['auth_processes'];
 	$auth_cache_ttl        = $config['installedpackages']['squidauth']['config'][0]['auth_cache_ttl'];
@@ -99,6 +99,14 @@ function global_write_squid_config() {
 	$no_domain_auth        = $config['installedpackages']['squidauth']['config'][0]['no_domain_auth'];
 	$min_pass_length       = $config['installedpackages']['squidauth']['config'][0]['min_pass_length'];
 	$bypass_extended       = $config['installedpackages']['squidauth']['config'][0]['bypass_extended'];
+	
+	/* squid_extauth.xml (ldap) values */
+	$ldap_basedn		   = $config['installedpackages']['squidextldapauth']['config'][0]['ldap_basedn'];
+	$ldap_server		   = $config['installedpackages']['squidextldapauth']['config'][0]['ldap_server'];
+	$ldap_type			   = $config['installedpackages']['squidextldapauth']['config'][0]['ldap_type'];
+	$ldap_port			   = $config['installedpackages']['squidextldapauth']['config'][0]['ldap_port'];
+	$bind_dn_username	   = $config['installedpackages']['squidextldapauth']['config'][0]['bind_dn_username'];
+	$bind_dn_password	   = $config['installedpackages']['squidextldapauth']['config'][0]['bind_dn_password'];
 	
 	/* static variable assignments for directory mapping */
 	$acldir    = "/usr/local/etc/squid/advanced/acls";
@@ -244,7 +252,26 @@ function global_write_squid_config() {
 			break;
 		case "radius_auth";
 			break;
-		case "ldap_auth";
+		case "ldap_bind";
+			/* fwrite($fout, 'auth_param basic program /usr/local/libexec/squid_ldap_auth -b "' . $ldap_basedn . '" -D "' . $bind_dn_username . '" -w "' . $bind_dn_password . '" -f "(&(objectClass=person)(cn=%s))" -u -cn -P "' . $ldap_server . ":" . $ldap_port . "\n"); */
+			fwrite($fout, "auth_param basic program /usr/local/libexec/squid/squid_ldap_auth");
+			fwrite($fout, ' -b "' . $ldap_basedn . '"');
+			fwrite($fout, ' -D "' . $bind_dn_username . '"');
+			fwrite($fout, " -w " . $bind_dn_password);
+			fwrite($fout, ' -f "(&(objectClass=person)(cn=%s))"');
+			fwrite($fout, " -u cn -P " . $ldap_server . ":" . $ldap_port . "\n");
+			
+			if (!isset($auth_processes) or ($auth_processes == "")) $auth_processes = "5";
+			fwrite($fout, "auth_param basic children " . $auth_processes . "\n");
+			
+			if (!isset($auth_realm_prompt) or ($auth_realm_prompt == "")) $auth_realm_prompt = "pfSense Advanced Proxy";
+			fwrite($fout, "auth_param basic realm " . $auth_realm_prompt . "\n");
+			
+			if (!isset($auth_cache_ttl) or ($auth_cache_ttl == "")) $auth_cache_ttl = "60";
+			fwrite($fout, "auth_param basic credentialsttl " . $auth_cache_ttl . " minutes\n");
+			fwrite($fout, "\n");
+			fwrite($fout, "acl for_inetusers proxy_auth REQUIRED\n");
+			fwrite($fout, "\n");			
 			break;
 		case "windows_auth";
 			break;
@@ -339,7 +366,12 @@ function global_write_squid_config() {
 		fclose($aclout);
 				
 		fwrite($fout, 'acl pf_networks src "/usr/local/etc/squid/advanced/acls/src_subnets.acl"' . "\n");
+	} else {
+		$aclout = fopen($acldir . "/src_subnets.acl","w");
+		fwrite($aclout, $lansa . "/" . $lansn . "\n");
+		fclose($aclout);
 	}
+		
 			
 	/* define ip addresses that have 'unrestricted' access */
 	if (isset($unrestricted_ip_addr) && ($unrestricted_ip_addr !== "")) {
@@ -410,9 +442,14 @@ function global_write_squid_config() {
     fwrite($fout, "\n");
             
     fwrite($fout, "#access to squid; local machine; no restrictions\n");
-    fwrite($fout, "http_access allow localnet\n");
+    if (isset($auth_method) && ($auth_method == "none")) fwrite($fout, "http_access allow localnet\n");
+ 
     fwrite($fout, "http_access allow localhost\n");
 	fwrite($fout, "\n");
+	
+	fwrite($fout, "#GUI admin to allow local connections\n");
+	if ($config['system']['webgui']['protocol'] == "http")  fwrite($fout, "http_access allow pf_ips pf_networks pf_admin_port\n");
+	if ($config['system']['webgui']['protocol'] == "https") fwrite($fout, "http_access allow CONNECT pf_ips pf_networks pf_admin_port\n");
        		
 	fwrite($fout, "#Deny non web services\n");
     fwrite($fout, "http_access deny !Safe_ports\n");
@@ -420,7 +457,7 @@ function global_write_squid_config() {
     fwrite($fout, "\n");
             
     fwrite($fout, "#Set custom configured ACLs\n");
-    if (isset($auth_method) and ($auth_method != "no_auth")) {
+    if (isset($auth_method) && ($auth_method != "none")) {
     	fwrite($fout, "http_access allow pf_networks for_inetusers within_timeframe\n");
     }
     
