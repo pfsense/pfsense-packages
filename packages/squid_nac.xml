@@ -90,6 +90,15 @@
 			<rows>5</rows>
 			<cols>50</cols>
 		</field>
+		
+		<field>
+			<fielddescr>Override Host(s)</fielddescr>
+			<fieldname>override_hosts</fieldname>
+			<description>In order to allow override hosts where proxy authentication, if configured, will be bypassed and allowed transparent, please specify each host (IP or FQDN) separated by a semicolon (;).</description>
+			<type>textarea</type>
+			<rows>5</rows>
+			<cols>50</cols>
+		</field>
 	
 	</fields>
 
