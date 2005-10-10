@@ -73,11 +73,12 @@ function global_write_squid_config() {
     $enable_offline 	   = $config['installedpackages']['squidcache']['config'][0]['enable_offline'];
             
     /* squid_nac.xml values */
-    $allowed_subnets       = $config['installedpackages']['squidnac']['config'][0]['allowed_subnets'];
+    $allowed_subnets	   = $config['installedpackages']['squidnac']['config'][0]['allowed_subnets'];
     $unrestricted_ip_addr  = $config['installedpackages']['squidnac']['config'][0]['unrestricted_ip_address'];
     $unrestricted_mac_addr = $config['installedpackages']['squidnac']['config'][0]['unrestricted_mac_addresses'];
-    $banned_ip_addr        = $config['installedpackages']['squidnac']['config'][0]['banned_ip_addresses'];
-    $banned_mac_addr       = $config['installedpackages']['squidnac']['config'][0]['banned_mac_addresses'];
+    $banned_ip_addr		   = $config['installedpackages']['squidnac']['config'][0]['banned_ip_addresses'];
+    $banned_mac_addr 	   = $config['installedpackages']['squidnac']['config'][0]['banned_mac_addresses'];
+    $override_hosts		   = $config['installedpackages']['squidnac']['config'][0]['override_hosts'];
            
     /* squid_traffic.xml values */
     $max_download_size     = $config['installedpackages']['squidtraffic']['config'][0]['max_download_size'];
@@ -331,11 +332,11 @@ function global_write_squid_config() {
 
 	fwrite($fout, "acl all src " . $lansa . "/" . $lansn . "\n");
 	fwrite($fout, "acl localnet src " . $lansa . "/" . $lansn . "\n");
-	fwrite($fout, "acl localhost src 127.0.0.1/255.255.255.255\n");
-	fwrite($fout, "acl SSL_ports port 443 563\n");
+	fwrite($fout, "acl localhost src 127.0.0.1/255.255.255.255\n");					
+	fwrite($fout, "acl SSL_ports port 443 563 873 # https, snews, rsync\n");
 	fwrite($fout, "acl Safe_ports port 80 # http\n");
 	fwrite($fout, "acl Safe_ports port 21 # ftp\n");
-	fwrite($fout, "acl Safe_ports port 443 563 # https, snews\n");
+	fwrite($fout, "acl Safe_ports port 443 563 873 # https, snews, rsync\n");
 	fwrite($fout, "acl Safe_ports port 70 # gopher\n");
 	fwrite($fout, "acl Safe_ports port 210 # wais\n");
 	fwrite($fout, "acl Safe_ports port 1025-65535 # unregistered ports\n");
@@ -347,10 +348,39 @@ function global_write_squid_config() {
 	fwrite($fout, "\n");
 			
 	/* allow access through proxy for custom admin port */
-          $custom_port = $config['system']['webgui']['port'];
-	if ($custom_port !== "") {
+    $custom_port = $config['system']['webgui']['port'];
+	if (isset($custom_port) && ($custom_port !== "")) {
 		fwrite($fout, "acl pf_admin_port port	" . $custom_port . "\n");
+	} else {
+		$admin_protocol = $config['system']['webgui']['protocol'];
+		switch ($admin_protocol) {
+			case "http";
+				fwrite($fout, "acl pf_admin_port port 80\n");
+				break;
+			case "https";
+				fwrite($fout, "acl pf_admin_port port 443\n");
+				break;
+			default;
+				fwrite($fout, "acl pf_admin_port port 80\n");
+				break;
+		}
 	}
+	
+	/* define override hosts as specified in squid_nac.xml */
+	if (isset($override_hosts) && ($override_hosts !== "")) {
+		if (!file_exists($acldir)) mwexec("/bin/mkdir -p " . $acldir);
+		
+		$aclout = fopen($acldir . "/src_override_hosts.acl", "w");
+ 
+		$override_hosts_array = split("; ", $override_hosts);
+		foreach ($override_hosts_array as $ind_override_host) {
+			fwrite($aclout, $ind_override_host . "\n");
+		}
+		
+		fclose($aclout);
+		
+		fwrite($fout, 'acl override_hosts src "/usr/local/etc/squid/advanced/acls/src_override_hosts.acl"' . "\n");
+	}	
 			
 	/* define subnets allowed to utilize proxy service */
 	if (isset($allowed_subnets) && ($allowed_subnets !== "")) {
@@ -376,11 +406,12 @@ function global_write_squid_config() {
 	/* define ip addresses that have 'unrestricted' access */
 	if (isset($unrestricted_ip_addr) && ($unrestricted_ip_addr !== "")) {
 		if (!file_exists($acldir)) mwexec("/bin/mkdir -p " . $acldir);
-			$aclout = fopen($acldir . "/src_unrestricted_ip.acl","w");
 		
-			$unrestricted_ip_array = split(";",$unrestricted_ip_addr);
-			foreach ($unrestricted_ip_array as $ind_unrestricted_ip) {
-				fwrite($aclout, $ind_unrestricted_ip . "\n");
+		$aclout = fopen($acldir . "/src_unrestricted_ip.acl","w");
+		
+		$unrestricted_ip_array = split(";",$unrestricted_ip_addr);
+		foreach ($unrestricted_ip_array as $ind_unrestricted_ip) {
+			fwrite($aclout, $ind_unrestricted_ip . "\n");
 		}
 				
 		fclose($aclout);
@@ -408,14 +439,14 @@ function global_write_squid_config() {
 	if (isset($banned_ip_addr) && ($banned_ip_addr !== "")) {
 		if (!file_exists($acldir)) mwexec("/bin/mkdir -p " . $acldir);
 
-			$aclout = fopen($acldir . "/src_banned_ip.acl","w");
+		$aclout = fopen($acldir . "/src_banned_ip.acl","w");
 			
-			$banned_ip_array = split(";",$banned_ip_addr);
-			foreach ($banned_ip_array as $ind_banned_ip) {
-				fwrite($aclout, $ind_banned_ip . "\n");
+		$banned_ip_array = split(";",$banned_ip_addr);
+		foreach ($banned_ip_array as $ind_banned_ip) {
+			fwrite($aclout, $ind_banned_ip . "\n");
 		}
 				
-			fclose($aclout);
+		fclose($aclout);
 		
 		fwrite($fout, 'acl pf_banned_ip src "/usr/local/etc/squid/advanced/acls/src_banned_ip.acl"' . "\n");
 	}
@@ -443,8 +474,9 @@ function global_write_squid_config() {
             
     fwrite($fout, "#access to squid; local machine; no restrictions\n");
     if (isset($auth_method) && ($auth_method == "none")) fwrite($fout, "http_access allow localnet\n");
- 
     fwrite($fout, "http_access allow localhost\n");
+	
+	if (isset($override_hosts) && ($override_hosts !== "")) fwrite($fout, "http_access allow override_hosts\n");
 	fwrite($fout, "\n");
 	
 	fwrite($fout, "#GUI admin to allow local connections\n");
