@@ -313,7 +313,7 @@ function global_write_squid_config() {
 		$throttle_out = fopen($acldir . "/dst_throttle_multimedia.acl","w");
 		fwrite($throttle_out, $multimedia_out);
 		fclose($throttle_out);
-		fwrite($fout, 'acl for_throttled_multimedia url_regex -i "' . $acldir . 'dst_throttle_multimedia.acl"' . "\n");
+		fwrite($fout, 'acl for_throttled_multimedia url_regex -i "' . $acldir . '/dst_throttle_multimedia.acl"' . "\n");
 	} else {
 		if (file_exists($acldir . "/dst_throttle_multimedia.acl")) unlink($acldir . "/dst_throttle_multimedia.acl");			
 	}	
