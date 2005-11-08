@@ -3,8 +3,8 @@
 <pfsensepkgs>
   <packages>
     <package>
-	<name>zebra</name>
-	<website>http://www.zebra.org/</website>
+	<name>quagga</name>
+	<website>http://www.quagga.net/</website>
 	<descr>*NO GUI*</descr>
 	<category>Network Management</category>
 	<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
@@ -12,6 +12,16 @@
 	<status>ALPHA</status>
 	<version>9.5</version>
     </package>
+    <package>
+	<name>zebra</name>
+	<website>http://www.zebra.org/</website>
+	<descr>*NO GUI*</descr>
+	<category>Network Management</category>
+	<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+	<depends_on_package>quagga-0.98.5_1.tbz</depends_on_package>
+	<status>ALPHA</status>
+	<version>9.5</version>
+    </package>    
     <package>
 	<name>pfstat</name>
 	<website>http://www.benzedrine.cx/pfstat.html</website>
