@@ -8,7 +8,7 @@
 	<descr>*NO GUI*</descr>
 	<category>Network Management</category>
 	<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-	<depends_on_package>zebra-9.5.tbz</depends_on_package>
+	<depends_on_package>quagga-0.98.5_1.tbz</depends_on_package>
 	<status>ALPHA</status>
 	<version>9.5</version>
     </package>
@@ -18,7 +18,7 @@
 	<descr>*NO GUI*</descr>
 	<category>Network Management</category>
 	<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-	<depends_on_package>quagga-0.98.5_1.tbz</depends_on_package>
+	<depends_on_package>zebra-9.5.tbz</depends_on_package>
 	<status>ALPHA</status>
 	<version>9.5</version>
     </package>    
