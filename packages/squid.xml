@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8" ?>
 
 <packagegui>
-	<name>squidng</name>
-	<title>Services: Squid Advanced Proxy</title>
+	<name>squid</name>
+	<title>Services: Proxy Server</title>
 	<category>Security</category>
 	<version>2.5.10_4</version>
 	<configpath>installedpackages->package->squidng->configuration->settings</configpath>
 	
-	<aftersaveredirect>/pkg_edit.php?xml=squid.xml&amp;id=0</aftersaveredirect>
+	<aftersaveredirect>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</aftersaveredirect>
 	
 	<menu>
-		<name>Squid Advanced Proxy</name>
-		<tooltiptext>Modify settings for Squid Advanced Proxy</tooltiptext>
+		<name>Squid</name>
+		<tooltiptext>Modify settings for Proxy Server</tooltiptext>
 		<section>Services</section>
-		<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
+		<url>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</url>
 	</menu>
 		
 	<!-- TODO: Add xml to parse proxy logs into readable format
@@ -23,62 +23,47 @@
 		<configfile>squid_log.xml</configfile>
 	</menu> -->
 			
-	<files>
-		<file>
-			<type>package</type>
-			<location>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-current/Latest/squid.tbz</location>
-		</file>
-		<file>
-			<type>package</type>
-			<location>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-current/Latest/squidGuard.tbz</location>
-		</file>
-		
-		<!-- retrieves the configuration file for upstream proxy settings -->
-		
-		<file>
-			<type>configfile</type>
-			<location>http://www.pfsense.com/packages/config/squid_ng.inc</location>
-		</file>
-		
-		<file>
-			<type>configfile</type>
-			<location>http://www.pfsense.com/packages/config/squid_auth.inc</location>
-		</file>
-		
-		<file>
-			<type>configfile</type>
-			<location>http://www.pfsense.com/packages/config/squid_upstream.xml</location>
-		</file>
-		
-		<!-- retrieves the configuration file for cache management -->
-		<file>
-			<type>configfile</type>
-			<location>http://www.pfsense.com/packages/config/squid_cache.xml</location>
-		</file>
-		
-		<!-- retrieves the configuration file for network access control -->
-		<file>
-			<type>configfile</type>
-			<location>http://www.pfsense.com/packages/config/squid_nac.xml</location>
-		</file>
-		
-		<!-- retrieves the configuration file for traffic management -->
-		<file>
-			<type>configfile</type>
-			<location>http://www.pfsense.com/packages/config/squid_traffic.xml</location>
-		</file>
-		
-		<file>
-			<type>configfile</type>
-			<location>http://www.pfsense.com/packages/config/squid_auth.xml</location>
-		</file>
-		
-		<file>
-			<type>configfile</type>
-			<location>http://www.pfsense.com/packages/config/squid_extauth.xml</location>
-		</file>
-		
-	</files>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/squid_cache.xml</item>
+	</additional_files_needed>
+	
+    <additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://www.pfsense.com/packages/config/squid_nac.xml</item>
+	</additional_files_needed>
+    	
+    <additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://www.pfsense.com/packages/config/squid_ng.inc</item>
+	</additional_files_needed>
+    
+   	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://www.pfsense.com/packages/config/squid_traffic.xml</item>
+	</additional_files_needed>
+	
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://www.pfsense.com/packages/config/squid_upstream.xml</item>
+	</additional_files_needed>
+
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/squid_auth.xml</item>
+	</additional_files_needed>
+	
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/squid_extauth.xml</item>
+	</additional_files_needed>
 	
 	<tabs>
 		<tab>
@@ -251,10 +236,7 @@
 			fwrite($fout, "shutdown_lifetime 5 seconds\n");            
             fwrite($fout, "icp_port 0\n");
             fwrite($fout, "\n");
-            
-            fwrite($fout, "http_port 3128\n");
-			fwrite($fout, "\n");
-			
+            		
 			fwrite($fout, "acl QUERY urlpath_regex cgi-bin \?\n");
 			fwrite($fout, "no_cache deny QUERY\n");
 			fwrite($fout, "\n");
@@ -289,9 +271,10 @@
 			fwrite($fout, "acl all src " . $lansa . "/" . $lansn . "\n");
 			fwrite($fout, "acl localnet src " . $lansa . "/" . $lansn . "\n");
 			fwrite($fout, "acl localhost src 127.0.0.1/255.255.255.255\n");
+			fwrite($fout, "acl SSL_ports port 443 563 873 # https, snews, rsync\n");
 			fwrite($fout, "acl Safe_ports port 80 # http\n");
 			fwrite($fout, "acl Safe_ports port 21 # ftp\n");
-			fwrite($fout, "acl Safe_ports port 443 563 # https, snews\n");
+			fwrite($fout, "acl Safe_ports port 443 563 873 # https, snews, rsync\n");
 			fwrite($fout, "acl Safe_ports port 70 # gopher\n");
 			fwrite($fout, "acl Safe_ports port 210 # wais\n");
 			fwrite($fout, "acl Safe_ports port 1025-65535 # unregistered ports\n");
@@ -312,7 +295,7 @@
        		
        		fwrite($fout, "#Deny non web services\n");
             fwrite($fout, "http_access deny !Safe_ports\n");
-            fwrite($fout, "http_access deny CONNECT\n");
+            fwrite($fout, "http_access deny CONNECT !SSL_ports\n");
             fwrite($fout, "\n");
             
             fwrite($fout, "#Set custom configured ACLs\n");
@@ -345,46 +328,98 @@
 		require_once("/usr/local/pkg/squid_ng.inc");
 
 		global_write_squid_config();
-		mwexec_bg("/usr/local/sbin/squid -k reconfigure");
+		mwexec("/usr/local/sbin/squid -k reconfigure");
 	</custom_add_php_command_late>
 	
 	<custom_php_install_command>
 		write_static_squid_config();	<!-- write initial static config for transparent proxy -->
 		
-		update_output_window("Creating Squid Advanced Proxy initialization scripts...");
+		touch("/tmp/custom_php_install_command">		
+
+		update_output_window("Creating Proxy Server initialization scripts...");
 		$fout = fopen("/usr/local/etc/rc.d/squid.sh","w");
 		fwrite($fout, "#!/bin/sh\n");
-		fwrite($fout, "#$pfSense: /usr/local/sbin/rc.d/squid.sh\n\n");
+		fwrite($fout, "#: /usr/local/etc/rc.d/squid.sh\n\n");
 		fwrite($fout, "touch /tmp/ro_root_mount\n");
 		fwrite($fout, "/usr/local/sbin/squid -D\n");
 		fwrite($fout, "touch /tmp/filter_dirty\n");
 		fclose($fout);
 		
-		chmod("/usr/local/etc/rc.d/squid.sh", 755);
+		mwexec("chmod 755 /usr/local/etc/rc.d/squid.sh");
 			
 		<!-- create log directory hierarchies if they don't exist -->
 		update_output_window("Creating required directory hierarchies...");
 		
-		if (!file_exists("/var/squid/logs")) mwexec("mkdir -p /var/squid/logs");
-		if (!file_exists("/var/squid/cache")) mwexec("mkdir -p /var/squid/cache");
-		if (!file_exists("/usr/local/etc/squid/advanced/acls")) mwexec("mkdir -p /usr/local/etc/squid/advanced/acls");
-		if (!file_exists("/usr/local/etc/squid/advanced/ncsa")) mwexec("mkdir -p /usr/local/etc/squid/advanced/ncsa");
-		if (!file_exists("/usr/local/etc/squid/advanced/ntlm")) mwexec("mkdir -p /usr/local/etc/squid/advanced/ntlm");
-		if (!file_exists("/usr/local/etc/squid/advanced/radius")) mwexec("mkdir -p /usr/local/etc/squid/advanced/radius");
+		if (!file_exists("/var/squid/logs")) {
+			mwexec("mkdir -p /var/squid/logs");
+		}
+		mwexec("/usr/sbin/chown squid:squid /var/squid/logs");
+		
+		
+		if (!file_exists("/var/squid/cache")) {
+			mwexec("mkdir -p /var/squid/cache");
+		}
+		mwexec("/usr/sbin/chown squid:squid /var/squid/cache");
+		
+		if (!file_exists("/usr/local/etc/squid/advanced/acls")) {
+			mwexec("mkdir -p /usr/local/etc/squid/advanced/acls");
+		}
+		mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/acls");
+		
+		if (!file_exists("/usr/local/etc/squid/advanced/ncsa")) {
+			mwexec("mkdir -p /usr/local/etc/squid/advanced/ncsa");
+		}
+		mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/ncsa");
+			
+		if (!file_exists("/usr/local/etc/squid/advanced/ntlm")) {
+			mwexec("mkdir -p /usr/local/etc/squid/advanced/ntlm");
+		}
+		mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/ntlm");		
+		
+		if (!file_exists("/usr/local/etc/squid/advanced/radius")) {
+			mwexec("mkdir -p /usr/local/etc/squid/advanced/radius");
+		}
+		mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/radius");
+		
+		<-- EmanuelG: update pf group ownership settings to enhance squid performance and correct issue relating -->
+		<--           to error message: parseHttpRequest: PF open failed: (13) Permission denied                 -->
+		mwexec("chgrp squid /dev/pf");
+		mwexec("chmod g+rw /dev/pf");
+		
+		$devfs_file = fopen("/etc/devfs.conf", "a");
+		fwrite($devfs_file, "\n# Allow squid to query the packet filter bymaking is group-accessable. 
+		fwrite($devfs_file, "own pf root:squid");
+		fwrite($devfs_file, "perm pf 0640"); 
+		fclose($devfs_file);
 		
 		update_output_window("Initializing Cache... This may take a moment...");
-		exec("/usr/local/sbin/squid -z");
+		mwexec("/usr/local/sbin/squid -z");
 		
-		update_output_window("Starting Squid Advanced Proxy...");
-		mwexec_bg("/usr/local/etc/rc.d/squid.sh");
+		update_output_window("Starting Proxy Server...");
+		mwexec("/usr/local/etc/rc.d/squid.sh");
 		filter_configure();	
 	</custom_php_install_command>
 
 	<custom_php_deinstall_command>
+		update_output_window("Stopping proxy service...");
+		
+		do while ((file_exists("/var/run/squid.pid") or ($i == 30)) {
+			mwexec("/usr/local/sbin/squid -k shutdown");
+			$i++;
+		}
+		
+		if ($i == 30) {
+			$pid = shell_exec('nohup squid > /dev/null & echo $!');
+			shell_exec('kill -9 ' . $pid . '/dev/null');
+		}
+	
+		update_output_window("Recursively removing directories hierarchies...");
+		update_output_window("If existant, log files in /var/squid/logs will remain...");
 		mwexec("rm -rf /usr/local/squid");
 		mwexec("rm -rf /var/squid/cache");	
 		mwexec("rm -rf /usr/local/etc/squid");
 		
+		update_output_window("Removing configuration files...");
 		unlink_if_exists("/usr/local/etc/rc.d/squid.sh");
 		unlink_if_exists("/usr/local/etc/squid");
 		unlink_if_exists("/usr/local/libexec/squid");
