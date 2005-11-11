@@ -334,7 +334,7 @@
 	<custom_php_install_command>
 		write_static_squid_config();	<!-- write initial static config for transparent proxy -->
 		
-		touch("/tmp/custom_php_install_command">		
+		touch("/tmp/custom_php_install_command");
 
 		update_output_window("Creating Proxy Server initialization scripts...");
 		$fout = fopen("/usr/local/etc/rc.d/squid.sh","w");
