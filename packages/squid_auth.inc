@@ -31,21 +31,21 @@
 
 */
 
-function global_eval_auth_options(){
+function global_eval_auth_options() 
+{
+	global $config;
 	conf_mount_rw();
 	config_lock();
 	
-	global $config;
-	
-	$auth_method = $config['installedpackages']['squidauth']['config'][0]['auth_method'];
-	
-	switch ($auth_method) {
+	switch ($config['installedpackages']['squidauth']['config'][0]['auth_method']) {
 		case "none":
 			dynamic_auth_content("pkg_edit");
 			dynamic_no_auth();
 			break;
 		case "local_auth":
 			dynamic_auth_content("pkg");
+			/* create empty passwd file to prevent stat error with squid reload */
+			touch ("/usr/local/etc/squid/advanced/ncsa/passwd");
 			dynamic_local_auth();
 			break;
 		case "ldap_bind":
@@ -54,62 +54,31 @@ function global_eval_auth_options(){
 			break;
 		case "domain_auth":
 			$filecontents = file('/usr/local/pkg/squid_auth.xml');
-			
-			$fout = fopen("/usr/local/pkg/squid_auth.xml","w");
-			foreach($filecontents as $line) {
-				if (stristr($line, "<url>/pkg.php?xml=squid_extauth.xml&amp;id=0</url>")) {
-					fwrite($fout, "			<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>\n");
-				} else {
-					fwrite($fout, $line);
-				}
-			}
-					
+			dynamic_auth_content("pkg_edit");
 			dynamic_domain_auth();
 			break;
 		case "radius_auth":
 			$filecontents = file('/usr/local/pkg/squid_auth.xml');
-			
-			$fout = fopen("/usr/local/pkg/squid_auth.xml","w");
-			foreach($filecontents as $line) {
-				if (stristr($line, "<url>/pkg.php?xml=squid_extauth.xml&amp;id=0</url>")) {
-					fwrite($fout, "			<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>\n");
-				} else {
-					fwrite($fout, $line);
-				}
-			}
-					
+			dynamic_auth_content("pkg_edit");					
 			dynamic_radius_auth();
 			break;
 		default:
 			$filecontents = file('/usr/local/pkg/squid_auth.xml');
-			
-			$fout = fopen("/usr/local/pkg/squid_auth.xml","w");
-			foreach($filecontents as $line) {
-				if (stristr($line, "<url>/pkg.php?xml=squid_extauth.xml&amp;id=0</url>")) {
-					fwrite($fout, "			<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>\n");
-				} else {
-					fwrite($fout, $line);
-				}
-			}
-					
+			dynamic_auth_content("pkg_edit");					
 			dynamic_no_auth();
 			break;
 	}
 	
-	conf_mount_ro();
 	config_unlock();
+	conf_mount_ro();
 	
 } /* end function global_eval_auth_options */
 	
 function dynamic_no_auth() {
-	conf_mount_rw();
-	config_lock();
-	
 	global $config;
-	
-	$pkgfile = "/usr/local/pkg/squid_extauth.xml";
-	
-	$fout = fopen($pkgfile, "w");
+	conf_mount_rw();
+
+	$fout = fopen("/usr/local/pkg/squid_extauth.xml", "w");
 	
 	fwrite($fout, '<?xml version="1.0" encoding="utf-8" ?>' . "\n");
 	fwrite($fout, "<packagegui>\n");
@@ -175,23 +144,22 @@ function dynamic_no_auth() {
 	fwrite($fout, "</packagegui>\n");
 
 	fclose($fout);
+	
+	/* mount filesystem read-only */
+	conf_mount_ro();
 }		
 
 function dynamic_local_auth() {
-	conf_mount_rw();
-	config_lock();
-	
 	global $config;
+	conf_mount_rw();
 
-	$pkgfile = "/usr/local/pkg/squid_extauth.xml";
-	
-	$fout = fopen($pkgfile, "w");
+	$fout = fopen("/usr/local/pkg/squid_extauth.xml", "w");
 	
 	fwrite($fout, '<?xml version="1.0" encoding="utf-8" ?>' . "\n");
 	fwrite($fout, "\n");
 	fwrite($fout, "<packagegui>\n");
 	fwrite($fout, "	<name>squidextlocalauth</name>\n");
-	fwrite($fout, "	<title>Services: Proxy Server -> Extended Authentication Settings</title>\n");
+	fwrite($fout, "	<title>Services: Proxy Server -> Extended Auth Settings</title>\n");
 	fwrite($fout, "	<version>2.5.10_4</version>\n");
 	fwrite($fout, "	<configpath>installedpackages->package->squidextlocalauth->configuration->settings</configpath>\n");
 	fwrite($fout, "\n");
@@ -293,9 +261,7 @@ function dynamic_local_auth() {
 	fwrite($fout, "	<custom_add_php_command_late>\n");
 	fwrite($fout, '		require_once("/usr/local/pkg/squid_ng.inc");' . "\n");
 	fwrite($fout, "\n");
-	fwrite($fout, '		if ($password == $confirm_password) { ' . "\n");
-	fwrite($fout, "			mod_htpasswd();\n");
-	fwrite($fout, "		}\n");
+	fwrite($fout, "		mod_htpasswd();\n");
 	fwrite($fout, "		global_write_squid_config();\n");
 	fwrite($fout, '		mwexec("/usr/local/sbin/squid -k reconfigure");' . "\n");
 	fwrite($fout, "	</custom_add_php_command_late>\n");
@@ -304,19 +270,15 @@ function dynamic_local_auth() {
 		
 	fclose($fout);
 	
+	/* mount filesystem read-only */
 	conf_mount_ro();
-	config_unlock();
-} /* end function dynamic_local_auth */
+}
 
 function dynamic_ldap_auth() {
-	conf_mount_rw();
-	config_lock();
-	
 	global $config;
+	conf_mount_rw();	
 
-	$pkgfile = "/usr/local/pkg/squid_extauth.xml";
-	
-	$fout = fopen($pkgfile, "w");
+	$fout = fopen("/usr/local/pkg/squid_extauth.xml", "w");
 	
 	fwrite($fout, '<?xml version="1.0" encoding="utf-8" ?>' . "\n");
 	fwrite($fout, "\n");
@@ -374,7 +336,7 @@ function dynamic_ldap_auth() {
 	fwrite($fout, "		<field>\n");
 	fwrite($fout, "			<fielddescr>Base DN</fielddescr>\n");
 	fwrite($fout, "			<fieldname>ldap_basedn</fieldname>\n");
-	fwrite($fout, "			<description>This is the base where the LDAP search starts.  All subsequent organizational units (OUs)will be included.  Example: "ou=users,o=company" will search for users in and under the specified company.</description>\n");
+	fwrite($fout, '			<description>This is the base where the LDAP search starts.  All subsequent organizational units (OUs)will be included.  Example: "ou=users,o=company" will search for users in and under the specified company.</description>' . "\n");
 	fwrite($fout, "			<type>input</type>\n");
 	fwrite($fout, "			<size>50</size>\n");
 	fwrite($fout, "		</field>\n");
@@ -428,57 +390,59 @@ function dynamic_ldap_auth() {
 	fwrite($fout, "	<custom_add_php_command_late>\n");
 	fwrite($fout, '		require_once("/usr/local/pkg/squid_ng.inc");' . "\n");
 	fwrite($fout, "\n");
-	fwrite($fout, "		if ($password == $confirm_password) {\n");
-	fwrite($fout, '			mwexec("/usr/bin/htpasswd -b /usr/local/etc/squid/advanced/ncsa/passwd "' . $username . " " . $password . "\n");
-	fwrite($fout, "		}\n");
+	fwrite($fout, "		mod_htpasswd();\n");
 	fwrite($fout, "\n");
 	fwrite($fout, "		global_write_squid_config();\n");
 	fwrite($fout, '		mwexec("/usr/local/sbin/squid -k reconfigure");' . "\n");
 	fwrite($fout, "	</custom_add_php_command_late>\n");
 	fwrite($fout, "\n");
 	fwrite($fout, "</packagegui>\n");
+	
+	fclose($fout);
+	
+	/* mount filesystem read-only */
+	conf_mount_ro();
 }
 
 /* dynamically re-writes all squid xml files to handle adddeletecolumnitems properly */
 function dynamic_auth_content($pkgvar) {
-
-	if ($pkgvar == "pkg") {
-		if ($handle = opendir('/usr/local/pkg')) {
-			while (($file = readdir($handle)) != false) {
-				if (stristr($file, "squid_") && stristr($file, ".xml")) {
-				
-					$filecontents = file("/usr/local/pkg/" . $file);
-			
-					$fout = fopen("/usr/local/pkg/" . $file,"w");
-					foreach($filecontents as $line) {
-						if (stristr($line, "<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>")) {
-							fwrite($fout, "			<url>/pkg.php?xml=squid_extauth.xml&amp;id=0</url>\n");
-						} else {
-							fwrite($fout, $line);
-						}
-					}
-				}
-			}
-		}
-	} else {
+	
+	switch ($pkgvar) {
+		case "pkg":
 			if ($handle = opendir('/usr/local/pkg')) {
-			while (($file = readdir($handle)) != false) {
-				if (stristr($file, "squid_") && stristr($file, ".xml")) {
-				
-					$filecontents = file("/usr/local/pkg/" . $file);
-			
-					$fout = fopen("/usr/local/pkg/" . $file,"w");
-					foreach($filecontents as $line) {
-						if (stristr($line, "<url>/pkg.php?xml=squid_extauth.xml&amp;id=0</url>")) {
-							fwrite($fout, "			<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>\n");
-						} else {
-							fwrite($fout, $line);
+				while (($file = readdir($handle)) != false) {
+					if (stristr($file, "squid_") && stristr($file, ".xml")) {
+						$filecontents = file("/usr/local/pkg/" . $file);
+						$fout = fopen("/usr/local/pkg/" . $file, "w");
+						foreach($filecontents as $line) {
+							if (stristr($line, "<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>")) {
+								fwrite($fout, "			<url>/pkg.php?xml=squid_extauth.xml&amp;id=0</url>\n");
+							} else {
+								fwrite($fout, $line);
+							}
+						}
+					}
+				}
+			}		
+			break;
+		
+		case "pkg_edit":
+			if ($handle = opendir('/usr/local/pkg')) {
+				while (($file = readdir($handle)) != false) {
+					if (stristr($file, "squid_") && stristr($file, ".xml")) {
+						$filecontents = file("/usr/local/pkg/" . $file);
+						$fout = fopen("/usr/local/pkg/" . $file,"w");
+						foreach($filecontents as $line) {
+							if (stristr($line, "<url>/pkg.php?xml=squid_extauth.xml&amp;id=0</url>")) {
+								fwrite($fout, "			<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>\n");
+							} else {
+								fwrite($fout, $line);
+							}
 						}
 					}
 				}
 			}
-		}
+			break;
 	}
+			
 } /* end function dynamic_auth_content */
-
-?>

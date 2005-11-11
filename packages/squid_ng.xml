@@ -271,9 +271,10 @@
 			fwrite($fout, "acl all src " . $lansa . "/" . $lansn . "\n");
 			fwrite($fout, "acl localnet src " . $lansa . "/" . $lansn . "\n");
 			fwrite($fout, "acl localhost src 127.0.0.1/255.255.255.255\n");
+			fwrite($fout, "acl SSL_ports port 443 563 873 # https, snews, rsync\n");
 			fwrite($fout, "acl Safe_ports port 80 # http\n");
 			fwrite($fout, "acl Safe_ports port 21 # ftp\n");
-			fwrite($fout, "acl Safe_ports port 443 563 # https, snews\n");
+			fwrite($fout, "acl Safe_ports port 443 563 873 # https, snews, rsync\n");
 			fwrite($fout, "acl Safe_ports port 70 # gopher\n");
 			fwrite($fout, "acl Safe_ports port 210 # wais\n");
 			fwrite($fout, "acl Safe_ports port 1025-65535 # unregistered ports\n");
@@ -294,7 +295,7 @@
        		
        		fwrite($fout, "#Deny non web services\n");
             fwrite($fout, "http_access deny !Safe_ports\n");
-            fwrite($fout, "http_access deny CONNECT\n");
+            fwrite($fout, "http_access deny CONNECT !SSL_ports\n");
             fwrite($fout, "\n");
             
             fwrite($fout, "#Set custom configured ACLs\n");
@@ -333,10 +334,12 @@
 	<custom_php_install_command>
 		write_static_squid_config();	<!-- write initial static config for transparent proxy -->
 		
+		touch("/tmp/custom_php_install_command">		
+
 		update_output_window("Creating Proxy Server initialization scripts...");
 		$fout = fopen("/usr/local/etc/rc.d/squid.sh","w");
 		fwrite($fout, "#!/bin/sh\n");
-		fwrite($fout, "#$pfSense: /usr/local/sbin/rc.d/squid.sh\n\n");
+		fwrite($fout, "#: /usr/local/etc/rc.d/squid.sh\n\n");
 		fwrite($fout, "touch /tmp/ro_root_mount\n");
 		fwrite($fout, "/usr/local/sbin/squid -D\n");
 		fwrite($fout, "touch /tmp/filter_dirty\n");
@@ -358,7 +361,6 @@
 		}
 		mwexec("/usr/sbin/chown squid:squid /var/squid/cache");
 		
-		
 		if (!file_exists("/usr/local/etc/squid/advanced/acls")) {
 			mwexec("mkdir -p /usr/local/etc/squid/advanced/acls");
 		}
@@ -379,6 +381,17 @@
 		}
 		mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/radius");
 		
+		<-- EmanuelG: update pf group ownership settings to enhance squid performance and correct issue relating -->
+		<--           to error message: parseHttpRequest: PF open failed: (13) Permission denied                 -->
+		mwexec("chgrp squid /dev/pf");
+		mwexec("chmod g+rw /dev/pf");
+		
+		$devfs_file = fopen("/etc/devfs.conf", "a");
+		fwrite($devfs_file, "\n# Allow squid to query the packet filter bymaking is group-accessable. 
+		fwrite($devfs_file, "own pf root:squid");
+		fwrite($devfs_file, "perm pf 0640"); 
+		fclose($devfs_file);
+		
 		update_output_window("Initializing Cache... This may take a moment...");
 		mwexec("/usr/local/sbin/squid -z");
 		
@@ -389,9 +402,19 @@
 
 	<custom_php_deinstall_command>
 		update_output_window("Stopping proxy service...");
-		mwexec("/usr/local/sbin/squid -k shutdown");
+		
+		do while ((file_exists("/var/run/squid.pid") or ($i == 30)) {
+			mwexec("/usr/local/sbin/squid -k shutdown");
+			$i++;
+		}
+		
+		if ($i == 30) {
+			$pid = shell_exec('nohup squid > /dev/null & echo $!');
+			shell_exec('kill -9 ' . $pid . '/dev/null');
+		}
 	
 		update_output_window("Recursively removing directories hierarchies...");
+		update_output_window("If existant, log files in /var/squid/logs will remain...");
 		mwexec("rm -rf /usr/local/squid");
 		mwexec("rm -rf /var/squid/cache");	
 		mwexec("rm -rf /usr/local/etc/squid");
