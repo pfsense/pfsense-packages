@@ -68,7 +68,9 @@
 	    $if_final = "";
 	    $ifaces_final = "";
 	    system("mkdir -p /var/db/ntop");
+	    system("mkdir -p /var/db/ntop/rrd/graphics");
 	    system("chown nobody:nobody /var/db/ntop");
+	    system("chown nobody:nobody /var/db/ntop/rrd/graphics");
 	    if($ntop_config['password'] and $ntop_config['passwordagain']) {
 		    if($ntop_config['password'] == $ntop_config['passwordagain']) {
 			    $first = 0;
