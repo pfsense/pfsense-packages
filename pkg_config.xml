@@ -253,9 +253,9 @@ test server or link availability and modify translation or routing rules. This p
 	<website>http://www.squid-cache.org/</website>
 	<category>Network Management</category>
 	<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-	<depends_on_package>squid-2.5.11_3.tbz</depends_on_package>
-	<version>2.5.11_3</version>
-	<status>*NOT WORKING*</status>
+	<depends_on_package>squid-2.5.12.tbz</depends_on_package>
+	<version>2.5.12</version>
+	<status>*NEEDS TESTING, STATUS UNKNOWN*</status>
 	<config_file>http://www.pfsense.com/packages/config/squid_ng.xml</config_file>
 	<configurationfile>squid_ng.xml</configurationfile>
     </package>
