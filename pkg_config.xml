@@ -305,7 +305,7 @@ test server or link availability and modify translation or routing rules. This p
           <descr>Doorman is a port knocking implementation which allows a server to run silently, invisibly, with all TCP ports closed except to those who know the secret knock.</descr>
           <category>Security</category>
           <config_file>http://www.pfsense.com/packages/config/doorman.xml</config_file>
-          <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+          <depends_on_package_base_url>http://ftp-mirror.internap.com/pub/FreeBSD/ports/i386/packages-6.0-release/All/</depends_on_package_base_url>
           <depends_on_package>doorman-0.8_1.tbz</depends_on_package>
           <version>0.8_1</version>
           <status>ALPHA</status>
