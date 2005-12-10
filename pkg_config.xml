@@ -90,7 +90,7 @@
       <name>nmap</name>
       <descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
       <category>Security</category>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
       <depends_on_package>nmap-3.93.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/nmap.xml</config_file>
       <version>3.93</version>
