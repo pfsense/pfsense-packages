@@ -1,0 +1,77 @@
+<packagegui>
+	<name>upclient</name>
+	<title>upclient: Settings</title>
+	<version>5.0.b8_2</version>
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<aftersaveredirect>pkg_edit.php?xml=upclient.xml&amp;id=0</aftersaveredirect>
+	<menu>
+                <name>upclient</name>
+                <tooltiptext>Modify upclient settings.</tooltiptext>
+                <section>Services</section>
+                <configfile>upclient.xml</configfile>
+                <url>/pkg_edit.php?xml=upclient.xml&amp;id=0</url>
+        </menu>
+	<service>
+                <name>upclient</name>
+                <rcfile>upclient.sh</rcfile>
+                <executable>upclient</executable>
+        </service>
+	<fields>
+		<field>
+			<fielddescr>Authorization Key</fielddescr>
+			<fieldname>authkey</fieldname>
+			<description>This system's uptime authorization key.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Update Interval</fielddescr>
+			<fieldname>interval</fieldname>
+			<description>The interval between updates, in seconds (default 550).</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Uptime Server</fielddescr>
+			<fieldname>server</fieldname>
+			<description>The server this system should send uptime reports to.</description>
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_php_global_functions>
+	function sync_package_upclient() {
+		global $config;
+                conf_mount_rw();
+                config_lock();
+		$upclient_conf = $config['installedpackages']['upclient']['config'][0];
+		$fout = fopen("/usr/local/etc/upclient.conf", "w");
+		if($upclient_conf['authkey'] && $upclient_conf['server']) {
+			fwrite($fout, "AuthKey = {$upclient_conf['authkey']}\n");
+			$interval = $upclient_conf['interval'] ? $upclient_conf['interval'] : "550";
+			fwrite($fout, "Interval = {$interval}\n");
+			fwrite($fout, "UptimeServer = {$upclient_conf['server']}\n");
+			fwrite($fout, <<<EOD
+SendIdle      = 1       # Send CPU idle percent
+SendUsage     = 1       # Send CPU load percent
+SendOSName    = 1       # Send name of your Operating System
+SendOSVersion = 1       # Send version of your OS
+SendCPU       = 1       # Send CPU name of your machine
+SendCPUDetail = 1       # (BSD, Linux & Solaris only)
+SendLoadAvg   = 1       # Send 15-minute Load-average (unix only)
+EOD;);
+			fclose($fout);
+		}
+		$start = "/usr/local/sbin/upclient &amp;";
+		write_rcfile(array(
+			"file" => "upclient.sh",
+			"start" => $start,
+			)
+		);
+		restart_service("upclient");
+                conf_mount_ro();
+                config_unlock();
+        }
+	</custom_php_global_functions>
+	<custom_add_php_command>
+		sync_package_upclient();
+	</custom_add_php_command>
+</packagegui>
+
