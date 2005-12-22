@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>upclient</name>
 	<title>upclient: Settings</title>
@@ -43,26 +44,29 @@
                 config_lock();
 		$upclient_conf = $config['installedpackages']['upclient']['config'][0];
 		$fout = fopen("/usr/local/etc/upclient.conf", "w");
-		if($upclient_conf['authkey'] && $upclient_conf['server']) {
+		if($upclient_conf['authkey'] and $upclient_conf['server']) {
+			fwrite($fout, "PidFile = /var/run/upclient.pid # Location of pid file\n");
 			fwrite($fout, "AuthKey = {$upclient_conf['authkey']}\n");
 			$interval = $upclient_conf['interval'] ? $upclient_conf['interval'] : "550";
 			fwrite($fout, "Interval = {$interval}\n");
 			fwrite($fout, "UptimeServer = {$upclient_conf['server']}\n");
-			fwrite($fout, <<<EOD
+			$static = &lt;&lt;&lt;EOD
 SendIdle      = 1       # Send CPU idle percent
 SendUsage     = 1       # Send CPU load percent
 SendOSName    = 1       # Send name of your Operating System
 SendOSVersion = 1       # Send version of your OS
 SendCPU       = 1       # Send CPU name of your machine
-SendCPUDetail = 1       # (BSD, Linux & Solaris only)
+SendCPUDetail = 1       # (BSD, Linux &amp; Solaris only)
 SendLoadAvg   = 1       # Send 15-minute Load-average (unix only)
-EOD;);
+
+EOD;
+			fwrite($fout, $static);
 			fclose($fout);
 		}
 		$start = "/usr/local/sbin/upclient &amp;";
 		write_rcfile(array(
 			"file" => "upclient.sh",
-			"start" => $start,
+			"start" => $start
 			)
 		);
 		restart_service("upclient");
