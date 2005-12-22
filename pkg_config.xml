@@ -182,6 +182,18 @@
 	  <status>ALPHA</status>
           <configurationfile>netio.xml</configurationfile>
     </package>
+    <package>
+          <name>upclient</name>
+          <website>http://uptimes.hostingwired.com</website>              
+          <descr>upclient sends system uptime and status information to a server (typically uptimes.hostingwired.com) that tracks and compares uptime statistics.</descr>
+          <category>Miscellaneous</category>
+          <config_file>http://www.pfsense.com/packages/config/upclient.xml</config_file>
+          <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/misc</depends_on_package_base_url>
+          <depends_on_package>upclient-5.0.b8_2.tbz</depends_on_package>
+          <version>5.0.b8_2</version>
+          <status>ALPHA</status>
+          <configurationfile>upclient.xml</configurationfile>
+    </package>
 <!--
     <package>
         <name>ifstated</name>
