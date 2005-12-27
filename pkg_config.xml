@@ -37,7 +37,7 @@
     <package>
 	<name>pfstat</name>
 	<website>http://www.benzedrine.cx/pfstat.html</website>
-	<descr>pfstat is a small utility that collects packet filter statistics and produces graphs. THIS PACKAGE HAS NOT BEEN UPDATED TO USE THE LATEST VERSION OF PF.</descr>
+	<descr>pfstat is a small utility that collects packet filter statistics and produces graphs.</descr>
 	<category>Network Management</category>
 	<config_file>http://www.pfsense.com/packages/config/pfstat.xml</config_file>
 	<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
