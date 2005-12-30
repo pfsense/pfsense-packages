@@ -3,6 +3,15 @@
 <pfsensepkgs>
   <packages>
     <package>
+	<name>PerUserBW</name>
+	<descr>Adds a per user bandwidth distribution option.  Requires 0.79.4 or newer.</descr>
+	<category>NET</category>
+	<config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
+	<version>0.1</version>
+	<status>ALPHA</status>
+	<configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
+    </package>
+    <package>
 	  <name>pfflowd</name>
 	  <website>http://www.mindrot.org/pfflowd.html</website>
 	  <descr>pfflowd converts OpenBSD PF status messages (sent via the pfsync interface) to Cisco NetFlow datagrams. These datagrams may be sent (via UDP) to a host of one's choice. Utilising the OpenBSD stateful packet filter infrastructure means that flow tracking is very fast and accurate.</descr>
@@ -297,15 +306,6 @@ test server or link availability and modify translation or routing rules. This p
 	<status>*TESTED. NEEDS MORE TESTING!*</status>
 	<config_file>http://www.pfsense.com/packages/config/upnpd.xml</config_file>
 	<configurationfile>upnpd.xml</configurationfile>
-    </package>
-    <package>
-	<name>PerUserBW</name>
-	<descr>Adds a per user bandwidth distribution option.  Requires 0.79.4 or newer.</descr>
-	<category>NET</category>
-	<config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
-	<version>0.1</version>
-	<status>ALPHA</status>
-	<configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
     </package>
     <package>
         <name>squidGuard</name>
