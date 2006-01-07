@@ -321,7 +321,7 @@
             fwrite($fout, "httpd_accel_uses_host_header on\n");            
             
             fclose($fout);	
-		} <!-- end function write_static_squid_config() -->
+		} /* end function write_static_squid_config() */
 	</custom_php_global_functions>
 	
 	<custom_add_php_command_late>	
@@ -332,7 +332,8 @@
 	</custom_add_php_command_late>
 	
 	<custom_php_install_command>
-		write_static_squid_config();	<!-- write initial static config for transparent proxy -->
+		/* write initial static config for transparent proxy */
+		write_static_squid_config();	
 		
 		touch("/tmp/custom_php_install_command");
 
@@ -366,7 +367,7 @@
 		
 		mwexec("chmod 755 /usr/local/etc/rc.d/squid.sh");
 			
-		<!-- create log directory hierarchies if they don't exist -->
+		/* create log directory hierarchies if they don't exist */
 		update_output_window("Creating required directory hierarchies...");
 		
 		if (!file_exists("/var/squid/logs")) {
