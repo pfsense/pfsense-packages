@@ -336,6 +336,25 @@
 		
 		touch("/tmp/custom_php_install_command");
 
+		/*    make sure this all exists, see:
+		 *    http://forum.pfsense.org/index.php?topic=23.msg2391#msg2391
+		 */
+		update_output_window("Setting up Squid environment...");
+		mwexec("mkdir -p /var/squid");
+		mwexec("chown squid:squid /var/squid");
+		mwexec("mkdir -p /var/squid/logs");
+		mwexec("chown squid:squid /var/squid/logs");
+		mwexec("mkdir -p /var/squid/cache");
+		mwexec("chown squid:squid /var/squid/cache");
+		mwexec("mkdir -p /usr/local/etc/squid/advanced");
+		mwexec("chown squid:squid /usr/local/etc/squid/advanced");
+		mwexec("mkdir -p /usr/local/etc/squid/advanced/acls");
+		mwexec("chown squid:squid /usr/local/etc/squid/advanced/acls");
+		mwexec("touch /usr/local/etc/squid/advanced/acls/src_subnets.acl");
+		mwexec("chown squid:squid /usr/local/etc/squid/advanced/acls/src_subnets.acl");
+		mwexec("touch /usr/local/etc/squid/advanced/acls/src_unrestricted_ip.acl");
+		mwexec("chown squid:squid /usr/local/etc/squid/advanced/acls/src_unrestricted_ip.acl");
+
 		update_output_window("Creating Proxy Server initialization scripts...");
 		$fout = fopen("/usr/local/etc/rc.d/squid.sh","w");
 		fwrite($fout, "#!/bin/sh\n");
@@ -381,8 +400,8 @@
 		}
 		mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/radius");
 		
-		<-- EmanuelG: update pf group ownership settings to enhance squid performance and correct issue relating -->
-		<--           to error message: parseHttpRequest: PF open failed: (13) Permission denied                 -->
+		/* EmanuelG: update pf group ownership settings to enhance squid performance and correct issue relating */
+		/*           to error message: parseHttpRequest: PF open failed: (13) Permission denied               */
 		mwexec("chgrp squid /dev/pf");
 		mwexec("chmod g+rw /dev/pf");
 		
@@ -408,10 +427,8 @@
 			$i++;
 		}
 		
-		if ($i == 30) {
-			$pid = shell_exec('nohup squid > /dev/null & echo $!');
-			shell_exec('kill -9 ' . $pid . '/dev/null');
-		}
+		/* brute force any remaining squid processes out */
+		mwxec("/usr/bin/killall squid");
 	
 		update_output_window("Recursively removing directories hierarchies...");
 		update_output_window("If existant, log files in /var/squid/logs will remain...");
@@ -432,4 +449,3 @@
 	<process_kill_command>/usr/local/sbin/squid -k shutdown</process_kill_command>
 	
 </packagegui>
-			
