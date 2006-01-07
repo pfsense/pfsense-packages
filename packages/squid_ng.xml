@@ -221,6 +221,7 @@
 	<!-- The below writes the configuration as defined by the GUI options -->
 	<custom_php_global_functions>
 		function write_static_squid_config() {
+			touch("/tmp/write_static_squid_config");
 			global $config;
 			$lancfg = $config['interfaces']['lan'];
 			$lanif = $lancfg['if'];
@@ -236,11 +237,11 @@
 			fwrite($fout, "shutdown_lifetime 5 seconds\n");            
 			fwrite($fout, "icp_port 0\n");
 			fwrite($fout, "\n");
-            		
+			
 			fwrite($fout, "acl QUERY urlpath_regex cgi-bin \?\n");
 			fwrite($fout, "no_cache deny QUERY\n");
 			fwrite($fout, "\n");
-			           
+				   
 			fwrite($fout, "pid_filename /var/run/squid.pid\n");
 			fwrite($fout, "\n");
 			
@@ -267,7 +268,7 @@
 			
 			fwrite($fout, "acl within_timeframe time MTWHFAS 00:00-24:00\n");
 			fwrite($fout, "\n");
-
+			
 			fwrite($fout, "acl all src " . $lansa . "/" . $lansn . "\n");
 			fwrite($fout, "acl localnet src " . $lansa . "/" . $lansn . "\n");
 			fwrite($fout, "acl localhost src 127.0.0.1/255.255.255.255\n");
@@ -285,52 +286,49 @@
 			fwrite($fout, "acl Safe_ports port 800 # Squids port (for icons)\n");
 			fwrite($fout, "\n");
 			
-            fwrite($fout, "acl CONNECT method CONNECT\n");
-            fwrite($fout, "\n");
-            
-            fwrite($fout, "#access to squid; local machine; no restrictions\n");
-            fwrite($fout, "http_access allow localnet\n");
-            fwrite($fout, "http_access allow localhost\n");
-       		fwrite($fout, "\n");
-       		
-       		fwrite($fout, "#Deny non web services\n");
-            fwrite($fout, "http_access deny !Safe_ports\n");
-            fwrite($fout, "http_access deny CONNECT !SSL_ports\n");
-            fwrite($fout, "\n");
-            
-            fwrite($fout, "#Set custom configured ACLs\n");
-            fwrite($fout, "http_access deny all\n");
-            fwrite($fout, "visible_hostname pfSense\n");
+			fwrite($fout, "acl CONNECT method CONNECT\n");
 			fwrite($fout, "\n");
 			
-            fwrite($fout, "cache_effective_user squid\n");
-            fwrite($fout, "cache_effective_group squid\n");
-            fwrite($fout, "\n");
-            
-            fwrite($fout, "maximum_object_size 4096 KB\n");
-            fwrite($fout, "minimum_object_size 0 KB\n");
-            fwrite($fout, "\n");
-            
-            fwrite($fout, "request_body_max_size 0 KB\n");
-            fwrite($fout, "reply_body_max_size 0 allow all\n");
-            fwrite($fout, "\n");
-            
-            fwrite($fout, "httpd_accel_host virtual\n");
-            fwrite($fout, "httpd_accel_port 80\n");
-            fwrite($fout, "httpd_accel_with_proxy on\n");
-            fwrite($fout, "httpd_accel_uses_host_header on\n");            
-            
-            fclose($fout);	
-		} /* end function write_static_squid_config() */
+			fwrite($fout, "#access to squid; local machine; no restrictions\n");
+			fwrite($fout, "http_access allow localnet\n");
+			fwrite($fout, "http_access allow localhost\n");
+			fwrite($fout, "\n");
+			
+			fwrite($fout, "#Deny non web services\n");
+			fwrite($fout, "http_access deny !Safe_ports\n");
+			fwrite($fout, "http_access deny CONNECT !SSL_ports\n");
+			fwrite($fout, "\n");
+			
+			fwrite($fout, "#Set custom configured ACLs\n");
+			fwrite($fout, "http_access deny all\n");
+			fwrite($fout, "visible_hostname pfSense\n");
+			fwrite($fout, "\n");
+			
+			fwrite($fout, "cache_effective_user squid\n");
+			fwrite($fout, "cache_effective_group squid\n");
+			fwrite($fout, "\n");
+			
+			fwrite($fout, "maximum_object_size 4096 KB\n");
+			fwrite($fout, "minimum_object_size 0 KB\n");
+			fwrite($fout, "\n");
+			
+			fwrite($fout, "request_body_max_size 0 KB\n");
+			fwrite($fout, "reply_body_max_size 0 allow all\n");
+			fwrite($fout, "\n");
+			
+			fwrite($fout, "httpd_accel_host virtual\n");
+			fwrite($fout, "httpd_accel_port 80\n");
+			fwrite($fout, "httpd_accel_with_proxy on\n");
+			fwrite($fout, "httpd_accel_uses_host_header on\n");            
+			
+			fclose($fout);	
+		} 
 	</custom_php_global_functions>
-	
 	<custom_add_php_command_late>	
 		require_once("/usr/local/pkg/squid_ng.inc");
-
 		global_write_squid_config();
 		mwexec("/usr/local/sbin/squid -k reconfigure");
 	</custom_add_php_command_late>
-	
 	<custom_php_install_command>
 		/* write initial static config for transparent proxy */
 		write_static_squid_config();	
@@ -417,7 +415,7 @@
 		
 		update_output_window("Starting Proxy Server...");
 		mwexec("/usr/local/etc/rc.d/squid.sh");
-		filter_configure();	
+		filter_configure();
 	</custom_php_install_command>
 
 	<custom_php_deinstall_command>
