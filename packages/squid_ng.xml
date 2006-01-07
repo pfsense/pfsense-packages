@@ -1,108 +1,83 @@
 <?xml version="1.0" encoding="utf-8" ?>
-
 <packagegui>
 	<name>squid</name>
 	<title>Services: Proxy Server</title>
 	<category>Security</category>
 	<version>2.5.10_4</version>
 	<configpath>installedpackages->package->squidng->configuration->settings</configpath>
-	
 	<aftersaveredirect>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</aftersaveredirect>
-	
 	<menu>
 		<name>Squid</name>
 		<tooltiptext>Modify settings for Proxy Server</tooltiptext>
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</url>
-	</menu>
-		
-	<!-- TODO: Add xml to parse proxy logs into readable format
-	<menu>
-		<name>Proxy Log</name>
-		<section>Status</section>
-		<configfile>squid_log.xml</configfile>
-	</menu> -->
-			
+	</menu>	
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/squid_cache.xml</item>
 	</additional_files_needed>
-	
-    <additional_files_needed>
+	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	    <item>http://www.pfsense.com/packages/config/squid_nac.xml</item>
 	</additional_files_needed>
-    	
-    <additional_files_needed>
+	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	    <item>http://www.pfsense.com/packages/config/squid_ng.inc</item>
 	</additional_files_needed>
-    
    	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	    <item>http://www.pfsense.com/packages/config/squid_traffic.xml</item>
 	</additional_files_needed>
-	
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	    <item>http://www.pfsense.com/packages/config/squid_upstream.xml</item>
 	</additional_files_needed>
-
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/squid_auth.xml</item>
 	</additional_files_needed>
-	
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/squid_extauth.xml</item>
 	</additional_files_needed>
-	
 	<tabs>
 		<tab>
 			<text>General Settings</text>
 			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
 			<active/>
 		</tab>
-		
 		<tab>
 			<text>Upstream Proxy</text>
 			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
 		</tab>
-		
 		<tab>
 			<text>Cache Mgmt</text>
 			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
 		</tab>
-			
 		<tab>
 			<text>Network Access Control</text>
 			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
 		</tab>
-			
 		<tab>
 			<text>Traffic Mgmt</text>
 			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
 		</tab>
-			
 		<tab>
 			<text>Auth Settings</text>
 			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
 		</tab>
-		
 		<tab>
 			<text>Extended Auth Settings</text>
 			<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>
 		</tab>
 	</tabs>
-	
 	<fields>	
 		<field>
 			<fielddescr>Proxy Listening Interface</fielddescr>
@@ -110,42 +85,36 @@
 			<description>This defines the active listening interface to which the proxy server will listen for its requests.</description>
 			<type>interfaces_selection</type>
 		</field>
-		
 		<field>
 			<fielddescr>Transparent Proxy</fielddescr>
 			<fieldname>transparent_proxy</fieldname>
 			<description>If transparent mode is enabled; all requests for destination port 80 will be forwarded to the proxy server without any additional configuration necessary.</description>
 			<type>checkbox</type>
 		</field>
-		
 		<field>
 			<fielddescr>Log Enabled</fielddescr>
 			<fieldname>log_enabled</fieldname>
 			<description>This enables the Web Proxy logging feature.  All clients requests will be written to a log file viewable under Services -> Proxy Log.</description>
 			<type>checkbox</type>
 		</field>
-		
 		<field>
 			<fielddescr>URL Filtering Enabled</fielddescr>
 			<fieldname>urlfilter_enable</fieldname>
 			<description>This enables the advanced functionality in conjunction with squidGuard to provide an array of URL filtering options.  This squidGuard functionality can be additionally configured from Services -> Advanced Proxy Filtering</description>
 			<type>checkbox</type>
 		</field>
-		
 		<field>
 			<fielddescr>Log Query Terms</fielddescr>
 			<fieldname>log_query_terms</fieldname>
 			<description>This will log the complete URL rather than the part of the URL containing dynamic queries.</description>
 			<type>checkbox</type>
 		</field>
-		
 		<field>
 			<fielddescr>Log User Agents</fielddescr>
 			<fieldname>log_user_agents</fieldname>
 			<description>This will enable the useragent string to be written to a separate log.  The results are not shown in the GUI and should only be used for debugging purposes.</description>
 			<type>checkbox</type>
 		</field>
-		
 		<field>
 			<combinefieldsend>true</combinefieldsend>
 			<fielddescr>Proxy Port</fielddescr>
@@ -154,7 +123,6 @@
 			<size>4</size>
 			<type>input</type>
 		</field>
-		
 		<field>
 			<fielddescr>ICP Port</fielddescr>
 			<fieldname>icp_port</fieldname>
@@ -162,7 +130,6 @@
 			<size>4</size>
 			<type>input</type>
 		</field>
-		
 		<field>
 			<fielddescr>Visible Hostname</fielddescr>
 			<fieldname>visible_hostname</fieldname>
@@ -170,7 +137,6 @@
 			<size>35</size>
 			<type>input</type>
 		</field>
-		
 		<field>
 			<fielddescr>Cache Administrator E-Mail</fielddescr>
 			<fieldname>cache_admin_email</fieldname>
@@ -178,7 +144,6 @@
 			<size>35</size>
 			<type>input</type>
 		</field>
-		
 		<field>
 			<fielddescr>Error Messages Language</fielddescr>
 			<fieldname>error_language</fieldname>
@@ -217,8 +182,6 @@
 		</field>
 				
 	</fields>
-	
-	<!-- The below writes the configuration as defined by the GUI options -->
 	<custom_php_global_functions>
 		function write_static_squid_config() {
 			touch("/tmp/write_static_squid_config");
@@ -417,7 +380,6 @@
 		mwexec("/usr/local/etc/rc.d/squid.sh");
 		filter_configure();
 	</custom_php_install_command>
-
 	<custom_php_deinstall_command>
 		update_output_window("Stopping proxy service...");
 		
@@ -442,9 +404,6 @@
 		
 		filter_configure();
 	</custom_php_deinstall_command>
-	
 	<start_command>/usr/local/etc/rc.d/squid.sh</start_command>
-	
 	<process_kill_command>/usr/local/sbin/squid -k shutdown</process_kill_command>
-	
 </packagegui>
