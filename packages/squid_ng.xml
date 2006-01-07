@@ -382,26 +382,20 @@
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		update_output_window("Stopping proxy service...");
-		
-		do while ((file_exists("/var/run/squid.pid") or ($i == 30)) {
-			mwexec("/usr/local/sbin/squid -k shutdown");
-			$i++;
-		}
-		
+		$i=0;
+		mwexec("/usr/local/sbin/squid -k shutdown");
+		sleep(1);
 		/* brute force any remaining squid processes out */
-		mwxec("/usr/bin/killall squid");
-	
+		mwexec("/usr/bin/killall squid");
 		update_output_window("Recursively removing directories hierarchies...");
 		update_output_window("If existant, log files in /var/squid/logs will remain...");
 		mwexec("rm -rf /usr/local/squid");
 		mwexec("rm -rf /var/squid/cache");	
 		mwexec("rm -rf /usr/local/etc/squid");
-		
 		update_output_window("Removing configuration files...");
 		unlink_if_exists("/usr/local/etc/rc.d/squid.sh");
 		unlink_if_exists("/usr/local/etc/squid");
 		unlink_if_exists("/usr/local/libexec/squid");
-		
 		filter_configure();
 	</custom_php_deinstall_command>
 	<start_command>/usr/local/etc/rc.d/squid.sh</start_command>
