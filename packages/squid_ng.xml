@@ -45,6 +45,11 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/squid_auth.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/squid_extauth.xml</item>
 	</additional_files_needed>
 	<tabs>
