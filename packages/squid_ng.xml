@@ -12,6 +12,10 @@
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</url>
 	</menu>	
+	<service>
+		<name>squid</name>
+		<rcfile>squid.sh</rcfile>
+	</service>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
@@ -324,14 +328,19 @@
 		mwexec("cp /usr/local/etc/squid/mime.conf.default /usr/local/etc/squid/mime.conf");
 		
 		update_output_window("Creating Proxy Server initialization scripts...");
-		$fout = fopen("/usr/local/etc/rc.d/squid.sh","w");
-		fwrite($fout, "#!/bin/sh\n");
-		fwrite($fout, "#: /usr/local/etc/rc.d/squid.sh\n\n");
-		fwrite($fout, "touch /tmp/ro_root_mount\n");
-		fwrite($fout, "/usr/local/sbin/squid -D\n");
-		fwrite($fout, "touch /tmp/filter_dirty\n");
-		fclose($fout);
-		
+		$start = &lt;&lt;&lt;EOD
+touch /tmp/ro_root_mount
+/usr/local/sbin/squid -D
+touch /tmp/filter_dirty
+EOD;
+		$stop = "/usr/local/sbin/squid -k shutdown";
+		write_rcfile(array(
+					"file" => "squid.sh",
+					"start" => $start,
+					"stop" => $stop
+				)
+		);
+	
 		mwexec("chmod 755 /usr/local/etc/rc.d/squid.sh");
 			
 		/* create log directory hierarchies if they don't exist */
@@ -383,13 +392,11 @@
 		mwexec("/usr/local/sbin/squid -z");
 		
 		update_output_window("Starting Proxy Server...");
-		mwexec("/usr/local/etc/rc.d/squid.sh");
-		filter_configure();
+		start_service("squid");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		update_output_window("Stopping proxy service...");
-		$i=0;
-		mwexec("/usr/local/sbin/squid -k shutdown");
+		stop_service("squid");
 		sleep(1);
 		/* brute force any remaining squid processes out */
 		mwexec("/usr/bin/killall squid");
@@ -404,6 +411,4 @@
 		unlink_if_exists("/usr/local/libexec/squid");
 		filter_configure();
 	</custom_php_deinstall_command>
-	<start_command>/usr/local/etc/rc.d/squid.sh</start_command>
-	<process_kill_command>/usr/local/sbin/squid -k shutdown</process_kill_command>
 </packagegui>
