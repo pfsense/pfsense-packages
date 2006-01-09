@@ -79,7 +79,7 @@ function dynamic_no_auth() {
 
 	$fout = fopen("/usr/local/pkg/squid_extauth.xml", "w");
 	
-	fwrite($fout, '&gt;?xml version="1.0" encoding="utf-8" ?&lt;\n');
+	fwrite($fout, '&lt;?xml version="1.0" encoding="utf-8" ?&gt;\n');
 	fwrite($fout, "<packagegui>\n");
 	fwrite($fout, "	<name>squidextnoauth</name>\n");
 	fwrite($fout, "	<title>Services: Proxy Server -> Extended Authentication Settings</title>\n");
@@ -154,7 +154,7 @@ function dynamic_local_auth() {
 
 	$fout = fopen("/usr/local/pkg/squid_extauth.xml", "w");
 	
-	fwrite($fout, '&gt;?xml version="1.0" encoding="utf-8" ?&lt;\n');
+	fwrite($fout, '&lt;?xml version="1.0" encoding="utf-8" ?&gt;\n');
 	fwrite($fout, "\n");
 	fwrite($fout, "<packagegui>\n");
 	fwrite($fout, "	<name>squidextlocalauth</name>\n");
@@ -279,7 +279,7 @@ function dynamic_ldap_auth() {
 
 	$fout = fopen("/usr/local/pkg/squid_extauth.xml", "w");
 	
-	fwrite($fout, '&gt;?xml version="1.0" encoding="utf-8" ?&lt;\n');
+	fwrite($fout, '&lt;?xml version="1.0" encoding="utf-8" ?&gt;\n');
 	fwrite($fout, "\n");
 	fwrite($fout, "<packagegui>\n");
 	fwrite($fout, "	<name>squidextldapauth</name>\n");
