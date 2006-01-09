@@ -321,7 +321,8 @@
 		mwexec("chown squid:squid /usr/local/etc/squid/advanced/acls/src_subnets.acl");
 		mwexec("touch /usr/local/etc/squid/advanced/acls/src_unrestricted_ip.acl");
 		mwexec("chown squid:squid /usr/local/etc/squid/advanced/acls/src_unrestricted_ip.acl");
-
+		mwexec("cp /usr/local/etc/squid/mime.conf.default /usr/local/etc/squid/mime.conf");
+		
 		update_output_window("Creating Proxy Server initialization scripts...");
 		$fout = fopen("/usr/local/etc/rc.d/squid.sh","w");
 		fwrite($fout, "#!/bin/sh\n");
