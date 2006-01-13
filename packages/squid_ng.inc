@@ -471,6 +471,7 @@ function global_write_squid_config()
 	if (isset($allowed_subnets) && ($allowed_subnets !== "")) {
 		if (!file_exists($acldir)) {
 			mwexec("/bin/mkdir -p " . $acldir);
+			mwexec("touch {$acldir}/src_subnets.acl");
 		}
 	
 		$aclout = fopen($acldir . "/src_subnets.acl","w");
