@@ -3,6 +3,18 @@
 <pfsensepkgs>
   <packages>
     <package>
+	<name>ntop</name>
+	<website>http://www.ntop.org/</website>
+	<descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
+	<category>Network Management</category>
+	<depends_on_package_base_url>http://www.pfsense.org/packages/All/</depends_on_package_base_url>
+	<depends_on_package>ntop-3.2_1.tbz</depends_on_package>
+	<version>3.2_1</version>
+	<status>BETA</status>
+	<config_file>http://www.pfsense.com/packages/config/ntop.xml</config_file>
+	<configurationfile>ntop.xml</configurationfile>
+    </package>    
+    <package>
 	  <name>pfflowd</name>
 	  <website>http://www.mindrot.org/pfflowd.html</website>
 	  <descr>pfflowd converts OpenBSD PF status messages (sent via the pfsync interface) to Cisco NetFlow datagrams. These datagrams may be sent (via UDP) to a host of one's choice. Utilising the OpenBSD stateful packet filter infrastructure means that flow tracking is very fast and accurate.</descr>
@@ -340,17 +352,5 @@ test server or link availability and modify translation or routing rules. This p
           <version>0.8_1</version>
           <status>ALPHA</status>
           <configurationfile>doorman.xml</configurationfile>
-    </package>
-    <package>
-	<name>ntop</name>
-	<website>http://www.ntop.org/</website>
-	<descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
-	<category>Network Management</category>
-	<depends_on_package_base_url>http://www.pfsense.org/packages/All/</depends_on_package_base_url>
-	<depends_on_package>ntop-3.2_1.tbz</depends_on_package>
-	<version>3.2_1</version>
-	<status>BETA</status>
-	<config_file>http://www.pfsense.com/packages/config/ntop.xml</config_file>
-	<configurationfile>ntop.xml</configurationfile>
     </package>
 </pfsensepkgs>
