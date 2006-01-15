@@ -81,6 +81,7 @@
 	<category>Network Management</category>
 	<depends_on_package_base_url>http://www.pfsense.org/packages/All/</depends_on_package_base_url>
 	<depends_on_package>ntop-3.2_1.tbz</depends_on_package>
+	<depends_on_package>libxml2-2.6.23.tbz</depends_on_package>
 	<version>3.2_1</version>
 	<status>BETA</status>
 	<config_file>http://www.pfsense.com/packages/config/ntop.xml</config_file>
