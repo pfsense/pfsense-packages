@@ -400,6 +400,7 @@ EOD;
 		sleep(1);
 		/* brute force any remaining squid processes out */
 		mwexec("/usr/bin/killall squid");
+		mwexec("/usr/bin/killall pinger");
 		update_output_window("Recursively removing directories hierarchies...");
 		update_output_window("If existant, log files in /var/squid/logs will remain...");
 		mwexec("rm -rf /usr/local/squid");
