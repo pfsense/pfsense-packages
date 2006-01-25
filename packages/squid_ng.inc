@@ -893,9 +893,7 @@ function custom_php_deinstall_command() {
 	mwexec("/usr/bin/killall pinger");
 	update_output_window("Recursively removing directories hierarchies...");
 	update_output_window("If existant, log files in /var/squid/logs will remain...");
-	mwexec("rm -rf /usr/local/squid");
-	mwexec("rm -rf /var/squid/cache");	
-	mwexec("rm -rf /usr/local/etc/squid");
+	mwexec("rm -rf /var/squid/cache");
 	update_output_window("Removing configuration files...");
 	unlink_if_exists("/usr/local/etc/rc.d/squid.sh");
 	unlink_if_exists("/usr/local/etc/squid");
