@@ -44,7 +44,7 @@ function global_write_squid_config()
     $active_interface      = $config['installedpackages']['squid']['config'][0]['active_interface'];
     $transparent_proxy     = $config['installedpackages']['squid']['config'][0]['transparent_proxy'];
     $log_enabled           = $config['installedpackages']['squid']['config'][0]['log_enabled'];
-    $urlfilter_enable      = $config['installedpackages']['squid']['config'][0]['urlfilter_enable'];
+    $urlfier_enable      = $config['installedpackages']['squid']['config'][0]['urlfilter_enable'];
     $log_query_terms       = $config['installedpackages']['squid']['config'][0]['log_query_terms'];
     $log_user_agents       = $config['installedpackages']['squid']['config'][0]['log_user_agents'];
     $proxy_port            = $config['installedpackages']['squid']['config'][0]['proxy_port'];
@@ -890,13 +890,11 @@ function custom_php_deinstall_command() {
 	sleep(1);
 	/* brute force any remaining squid processes out */
 	mwexec("/usr/bin/killall squid");
-	mwexec("/usr/bin/killall pinger");
-	update_output_window("Recursively removing directories hierarchies...");
-	update_output_window("If existant, log files in /var/squid/logs will remain...");
+	mwexec("/usr/bin/killall pinger");	  
+	update_output_window("Recursively removing directories hierarchies.  If existant, log files in /var/squid/logs will remain...");
 	mwexec("rm -rf /var/squid/cache");
 	update_output_window("Removing configuration files...");
 	unlink_if_exists("/usr/local/etc/rc.d/squid.sh");
-	unlink_if_exists("/usr/local/etc/squid");
 	unlink_if_exists("/usr/local/libexec/squid");
 	filter_configure();
 }
@@ -1043,4 +1041,3 @@ function generate_htpasswd($username, $password) {
     return $crypt;
 }
 
-		
