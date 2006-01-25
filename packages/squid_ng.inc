@@ -1041,3 +1041,4 @@ function generate_htpasswd($username, $password) {
     return $crypt;
 }
 
+?>
