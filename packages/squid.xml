@@ -394,6 +394,8 @@
 		update_output_window("Initializing Cache... This may take a moment...");
 		mwexec("/usr/local/sbin/squid -z");
 		
+		write_static_squid_config();
+		
 		update_output_window("Starting Proxy Server...");
 		mwexec("/usr/local/etc/rc.d/squid.sh");
 		filter_configure();	
