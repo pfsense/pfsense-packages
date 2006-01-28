@@ -29,7 +29,7 @@ function sync_package_spamd() {
 		}
 	}
 	fclose($fd);
-	$fd = fopen("/var/mail/whitelist.txt","w");
+	$fd = fopen("/var/db/whitelist.txt","w");
 	if($config['installedpackages']['spamdwhitelist']['config'] != "")
 	    foreach($config['installedpackages']['spamdwhitelist']['config'] as $spamd) {
 		fwrite($fd, $spamd['ip'] . "\n");
@@ -42,18 +42,18 @@ function sync_package_spamd() {
 
 function custom_php_install_command() {
 	global $config, $g;
-	system("touch /var/mail/whitelist.txt");
+	system("touch /var/db/whitelist.txt");
 	system("/usr/local/libexec/spamd -G 25:4:864");
-	system("/usr/libexec/spamlogd 2>/dev/null &amp;");
-	$start = "/usr/local/sbin/spamd-setup &amp;\n" .
-		 "/sbin/pflogd" .
-		 "/sbin/mount_fdescfs fdescfs /dev/fd" .
-		 "/usr/local/libexec/spamlogd &amp;";
+	system("/usr/libexec/spamlogd 2>/dev/null &");
+	$start = "/usr/local/sbin/spamd-setup &\n" .
+		 "/sbin/pflogd\n" .
+		 "/sbin/mount_fdescfs fdescfs /dev/fd\n" .
+		 "/usr/local/libexec/spamlogd\n";
 		 "/usr/local/libexec/spamd -G 5:4:864 -g -d -b 127.0.0.1\n" .
 	$stop  = "/usr/bin/killall spamd-setup\n" .
 		 "/usr/bin/killall spamd\n" .
-		 "/usr/bin/killall mount_fdescfs" .
-		 "/usr/bin/killall spamlogd";
+		 "/usr/bin/killall mount_fdescfs\n" .
+		 "/usr/bin/killall spamlogd\n";
 	write_rcfile(array(
 				"file" => "spamd.sh",
 				"start" => $start,

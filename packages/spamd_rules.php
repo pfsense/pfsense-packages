@@ -26,8 +26,9 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
+$wanif = get_real_wan_interface();
 $anchor = "natearly";
-$rule = "rdr pass inet proto tcp from <spamd> to any port smtp -> 127.0.0.1 port 8025";
+$natrules .= "rdr pass on {$wanif} proto tcp from <spamd> to port smtp -> 127.0.0.1 port spamd\n";
+$natrules .= "rdr pass on {$wanif} proto tcp from !<spamd-white> to port smtp -> 127.0.0.1 port spamd\n";
 $label = "spamd";
 add_rule_to_anchor($anchor, $rule, $label);
