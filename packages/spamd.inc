@@ -20,12 +20,14 @@ function sync_package_spamd() {
 	fwrite($fd, "\n# begin of user created entries\n");
 	if($config['installedpackages']['spamd']['config'] != "") {
 		foreach($config['installedpackages']['spamd']['config'] as $spamd) {
-			fwrite($fd, rtrim($spamd['providername']) . ":\\\n");
-			fwrite($fd, "\t:" . rtrim($spamd['providertype']) . ":\\\n");
-			fwrite($fd, "\t:msg=\"" . rtrim($spamd['rejectmessage']) . "\":\\\n");
-			fwrite($fd, "\t:method=" . rtrim($spamd['providermethod']) . ":\\\n");
-			fwrite($fd, "\t:" . rtrim($spamd['providermethod']) . ":\\\n");
-			fwrite($fd, "\t:file=" . rtrim($spamd['providerurl']) . ":\n\n");
+			if(rtrim($spamd['providername'])) {
+				fwrite($fd, rtrim($spamd['providername']) . ":\\\n");
+				fwrite($fd, "\t:" . rtrim($spamd['providertype']) . ":\\\n");
+				fwrite($fd, "\t:msg=\"" . rtrim($spamd['rejectmessage']) . "\":\\\n");
+				fwrite($fd, "\t:method=" . rtrim($spamd['providermethod']) . ":\\\n");
+				fwrite($fd, "\t:" . rtrim($spamd['providermethod']) . ":\\\n");
+				fwrite($fd, "\t:file=" . rtrim($spamd['providerurl']) . ":\n\n");
+			}
 		}
 	}
 	fclose($fd);

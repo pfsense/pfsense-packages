@@ -6,7 +6,7 @@
 	<title></title>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
-		<name>spamd</name>
+		<name>SpamD</name>
 		<section>Services</section>
 		<configfile>spamd.xml</configfile>
 	</menu>
@@ -17,12 +17,12 @@
         </service>
 	<tabs>
 		<tab>
-			<text>spamd Settings</text>
+			<text>SpamD Settings</text>
 			<url>/pkg.php?xml=spamd.xml</url>
 			<active/>
 		</tab>
 		<tab>
-			<text>spamd Whitelist</text>
+			<text>SpamD Whitelist</text>
 			<url>/pkg.php?xml=spamd_whitelist.xml</url>
 		</tab>
 	</tabs>
