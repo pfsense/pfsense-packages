@@ -54,7 +54,7 @@ function custom_php_install_command() {
 		 "/usr/bin/killall mount_fdescfs\n" .
 		 "/usr/bin/killall spamlogd\n";
 	write_rcfile(array(
-				"file" => "spamd.sh",
+				"rcfile" => "spamd.sh",
 				"start" => $start,
 				"stop" =>  $stop
 			    )
