@@ -44,8 +44,8 @@ function sync_package_spamd() {
 function custom_php_install_command() {
 	global $config, $g;
 	system("touch /var/db/whitelist.txt");
-	system("/usr/local/libexec/spamd -G 25:4:864");
-	system("/usr/libexec/spamlogd 2>/dev/null &");
+	system("/usr/local/libexec/spamd -G 25:4:864 &");
+	system("/usr/libexec/spamlogd &");
 	$start = "/usr/local/sbin/spamd-setup &\n" .
 		 "/sbin/pflogd &\n" .
 		 "/sbin/mount_fdescfs fdescfs /dev/fd\n" .
