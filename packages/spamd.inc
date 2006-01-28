@@ -56,12 +56,10 @@ function sync_package_spamd() {
 		$maxblack = " -B " . $pkg_i['maxblack'];
 	if($pkg_i['maxcon'] <> "")
 		$maxcon = " -c " . $pkg_i['maxcon'];
-
 	if($pkg_i['stuttersecs'] <> "")
 		$stuttersecs = " -S " . $pkg_i['stuttersecs'];
 	if($pkg_i['delaysecs'] <> "")
 		$delaysecs = " -s " . $pkg_i['delaysecs'];
-
 	$start = "/usr/local/sbin/spamd-setup &\n" .
 		 "/sbin/pflogd &\n" .
 		 "/sbin/mount_fdescfs fdescfs /dev/fd\n" .

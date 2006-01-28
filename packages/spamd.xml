@@ -45,6 +45,11 @@
 	    <chmod>0755</chmod>
 	    <item>http://www.pfsense.com/packages/config/spamd.inc</item>
 	</additional_files_needed>
+    	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://www.pfsense.com/packages/config/spamd_settings.xml</item>
+	</additional_files_needed>	
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->
 	<configpath>['installedpackages']['spamd']['config']</configpath>
