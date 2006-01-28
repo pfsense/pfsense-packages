@@ -37,9 +37,6 @@ function sync_package_spamd() {
 		fwrite($fd, $spamd['ip'] . "\n");
 	}
 	fclose($fd);
-	conf_mount_ro();
-	config_unlock();
-	
 	$passtime = "5:4:864";
 	$identifier = "";
 	$greylisting = " -g";
@@ -80,6 +77,8 @@ function sync_package_spamd() {
 				"stop" =>  $stop
 			    )
 	);
+	conf_mount_ro();
+	config_unlock();
 	restart_service("spamd");
 }
 
