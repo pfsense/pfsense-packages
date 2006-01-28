@@ -18,8 +18,8 @@ function sync_package_spamd() {
 	fwrite($fd, "\t:file=/var/mail/whitelist.txt\n");
 	/* loop through each item and write out its configuration */
 	fwrite($fd, "\n# begin of user created entries\n");
-	if($config['installedpackages']['spamd']['config'] != "") {
-		foreach($config['installedpackages']['spamd']['config'] as $spamd) {
+	if($config['installedpackages']['spamdsources']['config'] != "") {
+		foreach($config['installedpackages']['spamdsources']['config'] as $spamd) {
 			if(rtrim($spamd['providername'])) {
 				fwrite($fd, rtrim($spamd['providername']) . ":\\\n");
 				fwrite($fd, "\t:" . rtrim($spamd['providertype']) . ":\\\n");
