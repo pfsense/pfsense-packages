@@ -68,7 +68,8 @@ function sync_package_spamd() {
 	$stop  = "/usr/bin/killall spamd-setup\n" .
 		 "/usr/bin/killall spamd\n" .
 		 "/usr/bin/killall mount_fdescfs\n" .
-		 "/usr/bin/killall spamlogd\n";
+		 "/usr/bin/killall spamlogd\n" .
+		 "sleep 1";
 	write_rcfile(array(
 				"file" => "spamd.sh",
 				"start" => $start,
