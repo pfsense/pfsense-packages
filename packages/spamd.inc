@@ -64,9 +64,9 @@ function custom_php_install_command() {
 
 function custom_php_deinstall_command() {
 	global $config, $g;
-	unlink_if_exists("/usr/local/pkg/spamd.sh");
 	unlink_if_exists("/usr/local/pkg/pf/spamd_rules.php");
 	unlink_if_exists("/usr/local/www/spamd_rules.php");
+	unlink_if_exists("/usr/local/etc/rc.d/spamd.sh");
 }
 
 ?>
