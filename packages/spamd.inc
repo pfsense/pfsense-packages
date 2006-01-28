@@ -63,8 +63,8 @@ function sync_package_spamd() {
 	$start = "/usr/local/sbin/spamd-setup &\n" .
 		 "/sbin/pflogd &\n" .
 		 "/sbin/mount_fdescfs fdescfs /dev/fd\n" .
-		 "/usr/local/libexec/spamd -G {$passtime}{$identifier}{$greylisting}{$maxcon}{$maxblack} -b 127.0.0.1 &\n";
-		 "/usr/local/libexec/spamlogd &\n" .
+		 "/usr/local/libexec/spamd -G {$passtime}{$identifier}{$greylisting}{$maxcon}{$maxblack} -b 127.0.0.1 &\n" .
+		 "/usr/local/libexec/spamlogd &\n";
 	$stop  = "/usr/bin/killall spamd-setup\n" .
 		 "/usr/bin/killall spamd\n" .
 		 "/usr/bin/killall mount_fdescfs\n" .
