@@ -22,7 +22,7 @@
 		</tab>
 		<tab>
 			<text>SpamD Settings</text>
-			<url>/pkg.php?xml=spamd_whitelist.xml</url>
+			<url>/pkg.php?xml=spamd_settings.xml</url>
 		</tab>			
 	</tabs>
 	<!-- configpath gets expanded out automatically and config items will be

@@ -27,7 +27,7 @@
 		</tab>
 		<tab>
 			<text>SpamD Settings</text>
-			<url>/pkg.php?xml=spamd_whitelist.xml</url>
+			<url>/pkg.php?xml=spamd_settings.xml</url>
 		</tab>		
 	</tabs>
     	<additional_files_needed>
