@@ -60,10 +60,6 @@ function custom_php_install_command() {
 			    )
 	);
 	sync_package_spamd();
-	if($fd_log)
-		fwrite($fd_log, "Starting SpamD...\n");
-	update_output_window("Starting SpamD...");
-	start_service("spamd");
 }
 
 function custom_php_deinstall_command() {
