@@ -59,6 +59,7 @@ function custom_php_install_command() {
 				"stop" =>  $stop
 			    )
 	);
+	sync_package_spamd();
 	if($fd_log)
 		fwrite($fd_log, "Starting SpamD...\n");
 	update_output_window("Starting SpamD...");
