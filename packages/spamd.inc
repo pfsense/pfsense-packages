@@ -37,6 +37,7 @@ function sync_package_spamd() {
 	fclose($fd);
 	conf_mount_ro();
 	config_unlock();
+	update_output_window("Restarting SpamD...");
 	restart_service("spamd");
 }
 
@@ -60,6 +61,7 @@ function custom_php_install_command() {
 				"stop" =>  $stop
 			    )
 	);
+	update_output_window("Starting SpamD...");
 	start_service("spamd");
 }
 
