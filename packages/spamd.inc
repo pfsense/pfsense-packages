@@ -37,7 +37,6 @@ function sync_package_spamd() {
 	fclose($fd);
 	conf_mount_ro();
 	config_unlock();
-	update_output_window("Restarting SpamD...");
 	restart_service("spamd");
 }
 
