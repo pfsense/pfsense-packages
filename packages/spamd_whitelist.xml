@@ -59,7 +59,7 @@
 		global $config;
 		conf_mount_rw();
 		config_lock();
-		$fd = fopen("/var/mail/whitelist.txt","w");
+		$fd = fopen("/var/db/whitelist.txt","w");
 		if($config['installedpackages']['spamdwhitelist']['config'] != "")
 		    foreach($config['installedpackages']['spamdwhitelist']['config'] as $spamd) {
 			fwrite($fd, $spamd['ip'] . "\n");

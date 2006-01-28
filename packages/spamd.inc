@@ -15,7 +15,7 @@ function sync_package_spamd() {
 	fwrite($fd, ":\n\n# begin of whitelist\n");
 	fwrite($fd, "whitelist:\\\n");
 	fwrite($fd, "\t:white:\\\n");
-	fwrite($fd, "\t:file=/var/mail/whitelist.txt\n");
+	fwrite($fd, "\t:file=/var/db/whitelist.txt\n");
 	/* loop through each item and write out its configuration */
 	fwrite($fd, "\n# begin of user created entries\n");
 	if($config['installedpackages']['spamdsources']['config'] != "") {
