@@ -4,7 +4,7 @@
 	<version>0.1.0</version>
 	<include_file>/usr/local/pkg/spamd.inc</include_file>
 	<title>SpamD Settings</title>
-	<aftersaveredirect>pkg_edit.php?xml=ntop.xml&amp;id=0</aftersaveredirect>
+	<aftersaveredirect>pkg_edit.php?xml=spamd_settings.xml&amp;id=0</aftersaveredirect>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>SpamD</name>
@@ -27,7 +27,7 @@
 		</tab>
 		<tab>
 			<text>SpamD Settings</text>
-			<url>/pkg.php?xml=spamd_settings.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=spamd_settings.xml&amp;id=0</url>
 			<active/>
 		</tab>			
 	</tabs>
