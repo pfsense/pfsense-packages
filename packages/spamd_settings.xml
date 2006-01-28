@@ -38,8 +38,8 @@
          will be parsed and rendered for the user as a gui with input, and selectboxes. -->
 	<fields>
 		<field>
-			<fielddescr>Identifer</fielddescr>
-			<fieldname>identifer</fieldname>
+			<fielddescr>Identifier</fielddescr>
+			<fieldname>identifier</fieldname>
 			<description>The SMTP version banner that is reported upon initial connection.</description>
 			<type>input</type>
 		</field>		
