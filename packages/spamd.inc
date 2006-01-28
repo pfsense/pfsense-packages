@@ -50,7 +50,7 @@ function custom_php_install_command() {
 		 "/sbin/pflogd &\n" .
 		 "/sbin/mount_fdescfs fdescfs /dev/fd\n" .
 		 "/usr/local/libexec/spamlogd &\n";
-		 "/usr/local/libexec/spamd -G 5:4:864 -g -d -b 127.0.0.1 &\n" .
+		 "/usr/local/libexec/spamd -G 5:4:864 -g -b 127.0.0.1 &\n" .
 	$stop  = "/usr/bin/killall spamd-setup &\n" .
 		 "/usr/bin/killall spamd\n" .
 		 "/usr/bin/killall mount_fdescfs\n" .
