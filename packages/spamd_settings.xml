@@ -39,7 +39,7 @@
 	<fields>
 		<field>
 			<fielddescr>Identifer</fielddescr>
-			<fieldname>intentifer</fieldname>
+			<fieldname>identifer</fieldname>
 			<description>The SMTP version banner that is reported upon initial connection.</description>
 			<type>input</type>
 		</field>		
