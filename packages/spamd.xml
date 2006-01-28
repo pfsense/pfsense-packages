@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-	<name>spamd</name>
+	<name>spamdsources</name>
 	<version>0.1.0</version>
 	<include_file>/usr/local/pkg/spamd.inc</include_file>
 	<title></title>
@@ -17,7 +17,7 @@
         </service>
 	<tabs>
 		<tab>
-			<text>SpamD Settings</text>
+			<text>SpamD Sources</text>
 			<url>/pkg.php?xml=spamd.xml</url>
 			<active/>
 		</tab>
@@ -25,6 +25,10 @@
 			<text>SpamD Whitelist</text>
 			<url>/pkg.php?xml=spamd_whitelist.xml</url>
 		</tab>
+		<tab>
+			<text>SpamD Settings</text>
+			<url>/pkg.php?xml=spamd_whitelist.xml</url>
+		</tab>		
 	</tabs>
     	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>

@@ -12,7 +12,7 @@
 	</menu>
 	<tabs>
 		<tab>
-			<text>SpamD Settings</text>
+			<text>SpamD Sources</text>
 			<url>/pkg.php?xml=spamd.xml</url>
 		</tab>
 		<tab>
@@ -20,6 +20,10 @@
 			<url>/pkg.php?xml=spamd_whitelist.xml</url>
 			<active/>
 		</tab>
+		<tab>
+			<text>SpamD Settings</text>
+			<url>/pkg.php?xml=spamd_whitelist.xml</url>
+		</tab>			
 	</tabs>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->

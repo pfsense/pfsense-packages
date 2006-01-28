@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>spamdsettings</name>
+	<version>0.1.0</version>
+	<include_file>/usr/local/pkg/spamd.inc</include_file>
+	<title></title>
+	<!-- Menu is where this packages menu will appear -->
+	<menu>
+		<name>SpamD</name>
+		<section>Services</section>
+		<configfile>spamd.xml</configfile>
+	</menu>
+	<service>
+                <name>spamd</name>
+                <rcfile>spamd.sh</rcfile>
+		<executable>spamlogd</executable>
+        </service>
+	<tabs>
+		<tab>
+			<text>SpamD Sources</text>
+			<url>/pkg.php?xml=spamd.xml</url>
+		</tab>
+		<tab>
+			<text>SpamD Whitelist</text>
+			<url>/pkg.php?xml=spamd_whitelist.xml</url>
+		</tab>
+		<tab>
+			<text>SpamD Settings</text>
+			<url>/pkg.php?xml=spamd_whitelist.xml</url>
+			<active/>
+		</tab>			
+	</tabs>
+	<!-- configpath gets expanded out automatically and config items will be
+         stored in that location -->
+	<configpath>['installedpackages']['spamd']['config']</configpath>
+	<!-- fields gets invoked when the user adds or edits a item.   the following items
+         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
+	<fields>
+		<field>
+			<fielddescr>Identifer</fielddescr>
+			<fieldname>intentifer</fieldname>
+			<description>The SMTP version banner that is reported upon initial connection.</description>
+			<type>input</type>
+		</field>		
+		<field>
+			<fielddescr>MaxBlack</fielddescr>
+			<fieldname>maxblack</fieldname>
+			<description>The maximum number of concurrent blacklisted connections to allow in greylisting mode.  This value may not be greater than maxcon (see below).  The default is maxcon - 100.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>MaxCon</fielddescr>
+			<fieldname>maxcon</fieldname>
+			<description>The maximum number of concurrent connections to allow.  The default is 800.</description>
+			<type>input</type>
+			<value>800</value>
+		</field>
+		<field>
+			<fielddescr>Greylisting</fielddescr>
+			<fieldname>greylisting</fieldname>
+			<description>Connections from addresses not blacklisted on the black lists tab will be considered for greylisting.  Such connections will not be stuttered at (though see the stutter secs option) or delayed, and will receive the pleasantly innocuous temporary failure.  After passtime if the host returns it will be added to the white list.</description>
+			<type>checkox</type>
+			<value>yes</value>
+		</field>
+		<field>
+			<fielddescr>passtime:greyexp:whiteexp</fielddescr>
+			<fieldname>greylistingparms</fieldname>
+			<description>Adjust the three time parameters for greylisting; see GREYLISTING.  passtime defaults to 25 (minutes), greyexp to 4 (hours), and whiteexp to 864 (hours, approximately 36 days).</description>
+			<type>input</type>
+			<size>30</size>
+			<value>25:4:864</value>
+		</field>
+		<field>
+			<fielddescr>StutterSecs</fielddescr>
+			<fieldname>stuttersecs</fieldname>
+			<description>Stutter at greylisted connections for the specified amount of seconds, after which the connection is not stuttered at.  Defaults to 10.</description>
+			<type>input</type>
+			<value>10</value>
+		</field>
+		<field>
+			<fielddescr>DelaySecs</fielddescr>
+			<fieldname>delaysecs</fieldname>
+			<description>Delay each character sent to the client by the specified amount of seconds.  Defaults to 1.</description>
+			<type>input</type>
+			<value>1</value>
+		</field>
+	</fields>
+	<custom_php_resync_config_command>
+		sync_package_spamd();
+	</custom_php_resync_config_command>
+</packagegui>

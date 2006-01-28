@@ -39,16 +39,36 @@ function sync_package_spamd() {
 	fclose($fd);
 	conf_mount_ro();
 	config_unlock();
-	restart_service("spamd");
-}
+	
+	$passtime = "5:4:864";
+	$identifier = "";
+	$greylisting = " -g";
+	$maxcon = "";
+	$maxblack = "";
+	$stuttersecs = "";
+	$delaysecs = "";
+	$pkg = get_pkg_id("spamd");
+	$pkg_i = $config['installedpackages']['spamdsettings']['config'];
+	if($pkg_i['passtime'] <> "")
+		$passtime = $pkg_i['passtime'];
+	if($pkg_i['identifier'] <> "")
+		$identifier = " -n \"" . $pkg_i['identifier'] . "\"";
+	if(isset($pkg_i['greylisting']) <> "")
+		$greylisting = $pkg_i['greylisting'];		
+	if($pkg_i['maxblack'] <> "")
+		$maxblack = " -B " . $pkg_i['maxblack'];
+	if($pkg_i['maxcon'] <> "")
+		$maxcon = " -c " . $pkg_i['maxcon'];
 
-function custom_php_install_command() {
-	global $config, $g;
-	system("touch /var/db/whitelist.txt");
+	if($pkg_i['stuttersecs'] <> "")
+		$stuttersecs = " -S " . $pkg_i['stuttersecs'];
+	if($pkg_i['delaysecs'] <> "")
+		$delaysecs = " -s " . $pkg_i['delaysecs'];
+
 	$start = "/usr/local/sbin/spamd-setup &\n" .
 		 "/sbin/pflogd &\n" .
 		 "/sbin/mount_fdescfs fdescfs /dev/fd\n" .
-		 "/usr/local/libexec/spamd -G 5:4:864 -g -b 127.0.0.1 &\n";
+		 "/usr/local/libexec/spamd -G {$passtime}{$identifier}{$greylisting}{$maxcon}{$maxblack} -b 127.0.0.1 &\n";
 		 "/usr/local/libexec/spamlogd &\n" .
 	$stop  = "/usr/bin/killall spamd-setup\n" .
 		 "/usr/bin/killall spamd\n" .
@@ -60,6 +80,13 @@ function custom_php_install_command() {
 				"stop" =>  $stop
 			    )
 	);
+	restart_service("spamd");
+}
+
+function custom_php_install_command() {
+	global $config, $g;
+	system("touch /var/db/whitelist.txt");
+
 	sync_package_spamd();
 }
 
