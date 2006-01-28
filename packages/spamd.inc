@@ -44,8 +44,6 @@ function sync_package_spamd() {
 	$maxblack = "";
 	$stuttersecs = "";
 	$delaysecs = "";
-	$pkg = get_pkg_id("spamd");
-	
 	if($config['installedpackages']['spamdsettings']['config']) {
 		foreach($config['installedpackages']['spamdsettings']['config'] as $ss) {
 			if($ss['nextmta'] <> "")
@@ -64,20 +62,20 @@ function sync_package_spamd() {
 				$stuttersecs = " -S " . $ss['stuttersecs'];
 			if($ss['delaysecs'] <> "")
 				$delaysecs = " -s " . $ss['delaysecs'];
+			if($ss['window'] <> "")
+				$window = " -w " . $ss['window'];				
 		}
 	}
 	$start = "/usr/local/sbin/spamd-setup &\n" .
 		 "/sbin/pflogd &\n" .
 		 "/sbin/mount_fdescfs fdescfs /dev/fd\n" .
 		 "/usr/local/libexec/spamlogd &\n" .
-		 "/usr/local/libexec/spamd {$passtime}{$identifier}{$greylisting}{$maxcon}{$maxblack} -b 127.0.0.1 &\n" .
-		 "/usr/local/libexec/spamlogd &\n" .
-		 "sleep 1\n";
+		 "/usr/local/libexec/spamd {$passtime}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window} -b 127.0.0.1 &\n" .
+		 "/usr/local/libexec/spamlogd\n";
 	$stop  = "/usr/bin/killall spamd-setup\n" .
-		 "/usr/bin/killall spamd\n" .
-		 "/usr/bin/killall /sbin/pflogd\n" .
-		 "/usr/bin/killall mount_fdescfs\n" .
 		 "/usr/bin/killall spamlogd\n" .
+		 "/usr/bin/killall spamd\n" .
+		 "/usr/bin/killall /sbin/pflogd\n" .		 
 		 "sleep 2";
 	write_rcfile(array(
 				"file" => "spamd.sh",
@@ -87,13 +85,14 @@ function sync_package_spamd() {
 	);
 	conf_mount_ro();
 	config_unlock();
-	restart_service("spamd");
+	stop_service("spamd");
+	sleep(3);
+	start_service("spamd");
 }
 
 function custom_php_install_command() {
 	global $config, $g;
 	system("touch /var/db/whitelist.txt");
-
 	sync_package_spamd();
 }
 

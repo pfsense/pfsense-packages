@@ -44,27 +44,27 @@
 			<type>input</type>
 		</field>		
 		<field>
-			<fielddescr>MaxBlack</fielddescr>
+			<fielddescr>Maximum blacklisted connections</fielddescr>
 			<fieldname>maxblack</fieldname>
 			<description>The maximum number of concurrent blacklisted connections to allow in greylisting mode.  This value may not be greater than maxcon (see below).  The default is maxcon - 100.</description>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>MaxCon</fielddescr>
+			<fielddescr>Max concurrent connections</fielddescr>
 			<fieldname>maxcon</fieldname>
 			<description>The maximum number of concurrent connections to allow.  The default is 800.</description>
 			<type>input</type>
 			<value>800</value>
 		</field>
 		<field>
-			<fielddescr>Greylisting</fielddescr>
+			<fielddescr>Grey listing</fielddescr>
 			<fieldname>greylisting</fieldname>
 			<description>Connections from addresses not blacklisted on the black lists tab will be considered for greylisting.  Such connections will not be stuttered at (though see the stutter secs option) or delayed, and will receive the pleasantly innocuous temporary failure.  After passtime if the host returns it will be added to the white list.</description>
 			<type>checkbox</type>
 			<value>yes</value>
 		</field>
 		<field>
-			<fielddescr>passtime:greyexp:whiteexp</fielddescr>
+			<fielddescr>Passtime:GreyExp:WhiteExp</fielddescr>
 			<fieldname>greylistingparms</fieldname>
 			<description>Adjust the three time parameters for greylisting; see GREYLISTING.  passtime defaults to 25 (minutes), greyexp to 4 (hours), and whiteexp to 864 (hours, approximately 36 days).</description>
 			<type>input</type>
@@ -72,19 +72,26 @@
 			<value>25:4:864</value>
 		</field>
 		<field>
-			<fielddescr>StutterSecs</fielddescr>
+			<fielddescr>Stutter Secs</fielddescr>
 			<fieldname>stuttersecs</fieldname>
 			<description>Stutter at greylisted connections for the specified amount of seconds, after which the connection is not stuttered at.  Defaults to 10.</description>
 			<type>input</type>
 			<value>10</value>
 		</field>
 		<field>
-			<fielddescr>DelaySecs</fielddescr>
+			<fielddescr>Delay Secs</fielddescr>
 			<fieldname>delaysecs</fieldname>
 			<description>Delay each character sent to the client by the specified amount of seconds.  Defaults to 1.</description>
 			<type>input</type>
 			<value>1</value>
 		</field>
+		<field>
+			<fielddescr>Window Size</fielddescr>
+			<fieldname>window</fieldname>
+			<description>Set the socket receive buffer to this many bytes, adjusting the window size.</description>
+			<type>input</type>
+			<value></value>
+		</field>			
 		<field>
 			<fielddescr>NextMTA</fielddescr>
 			<fieldname>nextmta</fieldname>
