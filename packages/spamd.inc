@@ -45,21 +45,27 @@ function sync_package_spamd() {
 	$stuttersecs = "";
 	$delaysecs = "";
 	$pkg = get_pkg_id("spamd");
-	$pkg_i = $config['installedpackages']['spamdsettings']['config'];
-	if($pkg_i['passtime'] <> "")
-		$passtime = $pkg_i['passtime'];
-	if($pkg_i['identifier'] <> "")
-		$identifier = " -n \"" . $pkg_i['identifier'] . "\"";
-	if(isset($pkg_i['greylisting']) <> "")
-		$greylisting = $pkg_i['greylisting'];		
-	if($pkg_i['maxblack'] <> "")
-		$maxblack = " -B " . $pkg_i['maxblack'];
-	if($pkg_i['maxcon'] <> "")
-		$maxcon = " -c " . $pkg_i['maxcon'];
-	if($pkg_i['stuttersecs'] <> "")
-		$stuttersecs = " -S " . $pkg_i['stuttersecs'];
-	if($pkg_i['delaysecs'] <> "")
-		$delaysecs = " -s " . $pkg_i['delaysecs'];
+	
+	if($config['installedpackages']['spamdsettings']['config']) {
+		foreach($config['installedpackages']['spamdsettings']['config'] as $ss) {
+			if($ss['nextmta'] <> "")
+				$nextmta = $ss['nextmta'];
+			if($ss['passtime'] <> "")
+				$passtime = $ss['passtime'];
+			if($ss['identifier'] <> "")
+				$identifier = " -n \"" . $ss['identifier'] . "\"";
+			if(isset($ss['greylisting']) <> "")
+				$greylisting = $ss['greylisting'];		
+			if($ss['maxblack'] <> "")
+				$maxblack = " -B " . $ss['maxblack'];
+			if($ss['maxcon'] <> "")
+				$maxcon = " -c " . $ss['maxcon'];
+			if($ss['stuttersecs'] <> "")
+				$stuttersecs = " -S " . $ss['stuttersecs'];
+			if($ss['delaysecs'] <> "")
+				$delaysecs = " -s " . $ss['delaysecs'];
+		}
+	}
 	$start = "/usr/local/sbin/spamd-setup &\n" .
 		 "/sbin/pflogd &\n" .
 		 "/sbin/mount_fdescfs fdescfs /dev/fd\n" .
