@@ -60,7 +60,7 @@
 			<fielddescr>Greylisting</fielddescr>
 			<fieldname>greylisting</fieldname>
 			<description>Connections from addresses not blacklisted on the black lists tab will be considered for greylisting.  Such connections will not be stuttered at (though see the stutter secs option) or delayed, and will receive the pleasantly innocuous temporary failure.  After passtime if the host returns it will be added to the white list.</description>
-			<type>checkox</type>
+			<type>checkbox</type>
 			<value>yes</value>
 		</field>
 		<field>
