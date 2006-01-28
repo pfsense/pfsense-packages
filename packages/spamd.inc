@@ -46,11 +46,11 @@ function custom_php_install_command() {
 	system("/usr/local/libexec/spamd -G 25:4:864");
 	system("/usr/libexec/spamlogd 2>/dev/null &");
 	$start = "/usr/local/sbin/spamd-setup &\n" .
-		 "/sbin/pflogd\n" .
+		 "/sbin/pflogd &\n" .
 		 "/sbin/mount_fdescfs fdescfs /dev/fd\n" .
-		 "/usr/local/libexec/spamlogd\n";
-		 "/usr/local/libexec/spamd -G 5:4:864 -g -d -b 127.0.0.1\n" .
-	$stop  = "/usr/bin/killall spamd-setup\n" .
+		 "/usr/local/libexec/spamlogd &\n";
+		 "/usr/local/libexec/spamd -G 5:4:864 -g -d -b 127.0.0.1 &\n" .
+	$stop  = "/usr/bin/killall spamd-setup &\n" .
 		 "/usr/bin/killall spamd\n" .
 		 "/usr/bin/killall mount_fdescfs\n" .
 		 "/usr/bin/killall spamlogd\n";
