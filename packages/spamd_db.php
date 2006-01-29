@@ -121,8 +121,8 @@ if (typeof getURL == 'undefined') {
 <?php if (file_exists($d_natconfdirty_path)): ?><p>
 <?php endif; ?>
 <table>
-<tr><td align="right">Filter:</td><td><input name="filter" value="<?=$filter?>"></input></td><td><input type="submit" value="Filter"></td></tr>
-<tr><td align="right">Add spam trap E-mail:</td><td><input name="spamtrapemail" value="<?=$spamtrapemail?>"></input></td><td><input type="submit" value="Add"></td></tr>
+<tr><td align="right">Filter by test:</td><td><input name="filter" value="<?=$filter?>"></input></td><td><input type="submit" value="Filter"></td></tr>
+<tr><td align="right">Add spam trap E-mail address:</td><td><input name="spamtrapemail" value="<?=$spamtrapemail?>"></input></td><td><input type="submit" value="Add"></td></tr>
 </table><br>
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
