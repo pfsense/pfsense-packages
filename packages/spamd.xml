@@ -98,8 +98,10 @@
 			<fielddescr>Provider Description</fielddescr>
 			<fieldname>providerdescription</fieldname>
 			<description>Enter the description for this item</description>
-			<type>input</type>
+			<type>textarea</type>
 			<size>30</size>
+			<rows>3</rows>
+			<cols>40</cols>			
 		</field>
 		<field>
 			<fielddescr>Reject message</fielddescr>
