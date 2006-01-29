@@ -45,7 +45,7 @@ if($_GET['action'] or $_POST['action']) {
 	if($action == "whitelist") {
 		mwexec("/usr/local/sbin/spamdb -a {$srcip}");
 	} else if($action == "spamtrap") {
-		mwexec("/usr/local/sbin/spamdb -a {$srcip} -t");
+		mwexec("/usr/local/sbin/spamdb -a {$srcip} -T");
 	} else if($action == "trapped") {
 		mwexec("/usr/local/sbin/spamdb -a {$srcip} -t");
 	}
