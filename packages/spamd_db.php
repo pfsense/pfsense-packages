@@ -32,6 +32,7 @@ require("guiconfig.inc");
 if($_POST['filter'])
 	$filter = $_POST['filter'];
 
+/* handle AJAX operations */
 if($_GET['action'] or $_POST['action']) {
 	if($_GET['action'])
 		$action = $_GET['action'];
@@ -44,6 +45,8 @@ if($_GET['action'] or $_POST['action']) {
 	$pkgdb = split("\n", `/usr/local/sbin/spamdb`);
 	if($action == "whitelist") {
 		mwexec("/usr/local/sbin/spamdb -a {$srcip}");
+	} else if($action == "delete") {
+		mwexec("/usr/local/sbin/spamdb -d {$srcip}");
 	} else if($action == "spamtrap") {
 		mwexec("/usr/local/sbin/spamdb -a {$srcip} -T");
 	} else if($action == "trapped") {
@@ -51,6 +54,12 @@ if($_GET['action'] or $_POST['action']) {
 	}
 	mwexec("killall -HUP spamlogd");
 	exit;
+}
+
+/* spam trap e-mail address */
+if($_POST['spamtrapemail'] <> "") {
+	mwexec("spamdb -T -a \"<{$_POST['spamtrapemail']}>\"");
+	$savemsg = $_POST['spamtrapemail'] . " added to spam trap database.";
 }
 
 $pgtitle = "SpamD: Database";
@@ -109,7 +118,10 @@ if (typeof getURL == 'undefined') {
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_natconfdirty_path)): ?><p>
 <?php endif; ?>
-Filter: <input name="filter" value="<?=$filter?>"></input> <input type="submit" value="Filter"><p>
+<table>
+<tr><td align="right">Filter:</td><td><input name="filter" value="<?=$filter?>"></input></td><td><input type="submit" value="Filter"></td></tr>
+<tr><td align="right">Add spam trap E-mail:</td><td><input name="spamtrapemail" value="<?=$spamtrapemail?>"></input></td><td><input type="submit" value="Add"></td></tr>
+</table><br>
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
 <?php
@@ -126,12 +138,12 @@ Filter: <input name="filter" value="<?=$filter?>"></input> <input type="submit" 
 	<div id="mainarea">
 	<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr id="frheader">
-		  <td class="listhdrr">Action</td>
 		  <td class="listhdrr">Type</td>
                   <td class="listhdrr">IP</td>
                   <td class="listhdrr">From</td>
                   <td class="listhdrr">To</td>
                   <td class="listhdr">Attempts</td>
+		  <td class="listhdrr">Action</td>
 		</tr>
 <?php
 	$pkgdb = split("\n", `/usr/local/sbin/spamdb`);
@@ -144,25 +156,42 @@ Filter: <input name="filter" value="<?=$filter?>"></input> <input type="submit" 
 		$rowtext .= "<span class=\"{$rows}\"></span>";
 		$rowtext .= "<tr id=\"{$rows}\">";
 		$pkgdb_split = split("\|", $pkgdb_row);
-		$rowtext .= "<td class=\"listr\">";
-		$srcip = $pkgdb_split[1];
-		$rowtext .= "<a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=whitelist\", outputrule);' href='#{$rows}'>Whitelist</a> ";
-		$rowtext .= " | <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=trapped\", outputrule);' href='#{$rows}'>Trapped</a> ";
-		$rowtext .= " | <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=spamtrap\", outputrule);' href='#{$rows}'>Blacklist</a> ";
-		$rowtext .= "</td>";
 		$column = 0;
 		foreach($pkgdb_split as $col) {
+			if($column == 2) {
+				if(strstr($pkgdb_row, "TRAPPED")) {
+					$column++;
+					continue;
+				}
+			}
+			/* dont display these columns */
 			if($column == 4 || $column == 5  || $column == 6 || $column == 8) {
 				$column++;
 				continue;
 			}
-			if($col == "")
-				$dontdisplay = true;
+			/* don't display if column blank */
 			$col = str_replace("<","",$col);
 			$col = str_replace(">","",$col);
 			$rowtext .= "<td class=\"listr\">{$col}</td>";
 			$column++;
 		}
+		if(strstr($pkgdb_row, "TRAPPED")) {
+			for($x=0; $x<3; $x++) {
+				$rowtext .= "<td class=\"listr\"></td>";
+			}
+		}
+		if(strstr($pkgdb_row, "SPAMTRAP")) {
+			for($x=0; $x<3; $x++) {
+				$rowtext .= "<td class=\"listr\"></td>";
+			}
+		}		
+		$rowtext .= "<td class=\"listr\">";
+		$srcip = $pkgdb_split[1];
+		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=whitelist\", outputrule);' href='#{$rows}'><img title=\"Add\" border=\"0\" alt=\"Add\" src=\"/themes/{$g['theme']}/images/icons/icon_plus.gif\"></a> ";
+		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=trapped\", outputrule);' href='#{$rows}'><img title=\"Trapped\" border=\"0\" alt=\"Trapped\" src=\"/themes/{$g['theme']}/images/icons/icon_trapped.gif\"></a> ";
+		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=delete\", outputrule);' href='#{$rows}'><img title=\"Delete\" border=\"0\" alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a>";
+		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=spamtrap\", outputrule);' href='#{$rows}'><img title=\"Spamtrap\" border=\"0\" alt=\"Spamtrap\" src=\"./themes/{$g['theme']}/images/icons/icon_plus_bl.gif\"></a> ";
+		$rowtext .= "</td>";		
 		$rowtext .= "</tr>";
 		if($srcip == "")
 			$dontdisplay = true;
