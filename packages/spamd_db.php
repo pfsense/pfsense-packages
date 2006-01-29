@@ -29,6 +29,9 @@
 
 require("guiconfig.inc");
 
+if($_POST['filter'])
+	$filter = $_POST['filter'];
+
 if($_GET['action'] or $_POST['action']) {
 	if($_GET['action'])
 		$action = $_GET['action'];
@@ -106,6 +109,7 @@ if (typeof getURL == 'undefined') {
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_natconfdirty_path)): ?><p>
 <?php endif; ?>
+Filter: <input name="filter" value="<?=$filter?>"></input> <input type="submit" value="Filter"><p>
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
 <?php
@@ -161,8 +165,14 @@ if (typeof getURL == 'undefined') {
 		$rowtext .= "</tr>";
 		if($srcip == "")
 			$dontdisplay = true;
-		if($lastseenip == $srcip)
+		if($lastseenip == $srcip and $filter == "")
 			$dontdisplay = true;
+		if($filter <> "") {
+			if(stristr($rowtext, $filter) == true)
+				$dontdisplay = false;
+			else
+				$dontdisplay = true;
+		}
 		if($dontdisplay == false) {
 			echo $rowtext;
 			$lastseenip = $srcip;
