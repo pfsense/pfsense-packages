@@ -112,14 +112,15 @@
     </package>
     <package>
 	<name>spamd</name>
-	<website>http://www.openbsd.org/</website>
+	<website>http://www.openbsd.org/spamd/</website>
 	<descr>Tarpits like spamd are fake SMTP servers, which accept connections but don't deliver mail. Instead, they keep the connections open and reply very slowly. If the peer is patient enough to actually complete the SMTP dialogue (which will take ten minutes or more), the tarpit returns a 'temporary error' code (4xx), which indicates that the mail could not be delivered successfully and that the sender should keep the mail in their queue and retry again later.</descr>
 	<category>Services</category>
 	<config_file>http://www.pfsense.com/packages/config/spamd.xml</config_file>
 	<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
 	<depends_on_package>spamd-3.7.tbz</depends_on_package>
-	<version>3.7</version>
-	<status>ALPHA</status>
+	<version>4.0</version>
+	<status>BETA</status>
+	<maintainer>geekgod@geekgod.com</maintainer>
 	<configurationfile>spamd.xml</configurationfile>
     </package>
     <package>
