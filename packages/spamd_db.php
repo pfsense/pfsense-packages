@@ -99,10 +99,19 @@ function toggle_on(button, image) {
 }
 /* turn off button by stripping _p out */
 function toggle_off(button) {
+	/* no text back?  thats bad. */
+	if(button == '')
+		return;
 	var item = document.getElementById(button);
 	var currentbutton = item.src;
 	currentbutton = currentbutton.replace("_p.", ".");
 	item.src = currentbutton;
+}
+/* delete a row */
+function delete_row_db(row) {
+	row++;
+	var el = document.getElementById('maintable');
+	el.deleteRow(row);
 }
 /* standard issue AJAX handler */
 if (typeof getURL == 'undefined') {
@@ -163,7 +172,7 @@ if (typeof getURL == 'undefined') {
   <tr>
     <td>
 	<div id="mainarea">
-	<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+	<table id="maintable" name="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr id="frheader">
 		  <td class="listhdrr">Type</td>
                   <td class="listhdrr">IP</td>
@@ -215,10 +224,10 @@ if (typeof getURL == 'undefined') {
 		$rowtext .= "<td class=\"list\">";
 		$srcip = $pkgdb_split[1];
 		$lastrow = $rows - 1;
-		$rowtext .= " <a onClick='toggle_on(\"w{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_plus_p.gif\"); getURL(\"spamd_db.php?buttonid=w{$rows}&srcip={$srcip}&action=whitelist\", outputrule);' href='#{$lastrow}'><img title=\"Add to whitelist\" name='w{$rows}' id='w{$rows}' border=\"0\" alt=\"Add to whitelist\" src=\"/themes/{$g['theme']}/images/icons/icon_plus.gif\"></a> ";
-		$rowtext .= " <a onClick='toggle_on(\"b{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_trapped_p.gif\");getURL(\"spamd_db.php?buttonid=b{$rows}&srcip={$srcip}&action=trapped\", outputrule);' href='#{$lastrow}'><img title=\"Blacklist\" name='b{$rows}' id='b{$rows}' border=\"0\" alt=\"Blacklist\" src=\"/themes/{$g['theme']}/images/icons/icon_trapped.gif\"></a> ";
-		$rowtext .= " <a onClick='toggle_on(\"d{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_x_p.gif\");getURL(\"spamd_db.php?buttonid=srcip=d{$rows}&srcip={$srcip}&action=delete\", outputrule);' href='#{$lastrow}'><img title=\"Delete\" border=\"0\" name='d{$rows}' id='d{$rows}' alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a>";
-		$rowtext .= " <a onClick='toggle_on(\"s{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_plus_bl_p.gif\");getURL(\"spamd_db.php?buttonid=s{$rows}&srcip={$srcip}&action=spamtrap\", outputrule);' href='#{$lastrow}'><img title=\"Spamtrap\" name='s{$rows}' id='s{$rows}' border=\"0\" alt=\"Spamtrap\" src=\"./themes/{$g['theme']}/images/icons/icon_plus_bl.gif\"></a> ";
+		$rowtext .= " <a href='javascript:toggle_on(\"w{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_plus_p.gif\"); getURL(\"spamd_db.php?buttonid=w{$rows}&srcip={$srcip}&action=whitelist\", outputrule);'><img title=\"Add to whitelist\" name='w{$rows}' id='w{$rows}' border=\"0\" alt=\"Add to whitelist\" src=\"/themes/{$g['theme']}/images/icons/icon_plus.gif\"></a> ";
+		$rowtext .= " <a href='javascript:toggle_on(\"b{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_trapped_p.gif\");getURL(\"spamd_db.php?buttonid=b{$rows}&srcip={$srcip}&action=trapped\", outputrule);'><img title=\"Blacklist\" name='b{$rows}' id='b{$rows}' border=\"0\" alt=\"Blacklist\" src=\"/themes/{$g['theme']}/images/icons/icon_trapped.gif\"></a> ";
+		$rowtext .= " <a href='javascript:toggle_on(\"d{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_x_p.gif\");getURL(\"spamd_db.php?buttonid=d{$rows}&srcip={$srcip}&action=delete\", outputrule);'><img title=\"Delete\" border=\"0\" name='d{$rows}' id='d{$rows}' alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a>";
+		$rowtext .= " <a href='javascript:delete_row_db(\"{$rows}\"); toggle_on(\"s{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_plus_bl_p.gif\");getURL(\"spamd_db.php?buttonid=s{$rows}&srcip={$srcip}&action=spamtrap\", outputrule);'><img title=\"Spamtrap\" name='s{$rows}' id='s{$rows}' border=\"0\" alt=\"Spamtrap\" src=\"./themes/{$g['theme']}/images/icons/icon_plus_bl.gif\"></a> ";
 		$rowtext .= "</td>";		
 		$rowtext .= "</tr>";
 		if($srcip == "")
