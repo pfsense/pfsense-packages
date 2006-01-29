@@ -17,7 +17,7 @@
         </service>
 	<tabs>
 		<tab>
-			<text>SpamD Sources</text>
+			<text>SpamD External Sources</text>
 			<url>/pkg.php?xml=spamd.xml</url>
 			<active/>
 		</tab>

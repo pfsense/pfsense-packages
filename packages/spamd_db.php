@@ -128,7 +128,7 @@ if (typeof getURL == 'undefined') {
   <tr><td>
 <?php
 	$tab_array = array();
-	$tab_array[] = array("SpamD Sources", false, "/pkg.php?xml=spamd.xml");
+	$tab_array[] = array("SpamD External Sources", false, "/pkg.php?xml=spamd.xml");
 	$tab_array[] = array("SpamD Whitelist", false, "/pkg.php?xml=spamd_whitelist.xml");
 	$tab_array[] = array("SpamD Settings", false, "/pkg_edit.php?xml=spamd_settings.xml&id=0");
 	$tab_array[] = array("SpamD Database", true, "/spamd_db.php");

@@ -12,7 +12,7 @@
 	</menu>
 	<tabs>
 		<tab>
-			<text>SpamD Sources</text>
+			<text>SpamD External Sources</text>
 			<url>/pkg.php?xml=spamd.xml</url>
 		</tab>
 		<tab>
