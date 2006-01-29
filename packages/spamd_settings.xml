@@ -66,15 +66,15 @@
 		<field>
 			<fielddescr>Passtime</fielddescr>
 			<fieldname>passtime</fieldname>
-			<description>Adjust the three time parameters for greylisting; see GREYLISTING.  passtime defaults to 25 (minutes).</description>
+			<description>Adjust the three time parameters for greylisting.  Passtime defaults to 25 (minutes).  After passtime minutes if spamd sees a retried attempt to deliver mail for the same tuple, spamd will whitelist the connecting address by adding it as a whitelist entry.</description>
 			<type>input</type>
 			<size>30</size>
 			<value>25:4:864</value>
 		</field>
 		<field>
-			<fielddescr>GreyExp</fielddescr>
+			<fielddescr>Grey Expiration</fielddescr>
 			<fieldname>greyexp</fieldname>
-			<description>greyexp to 4</description>
+			<description>Adjust the three time parameters for greylisting.  Grey expiration defaults to 4.  SpamD removes connection entries from the database if delivery has not been retried within greyexp hours from the initial time a connection is seen.</description>
 			<type>input</type>
 			<size>30</size>
 			<value>25:4:864</value>
@@ -82,13 +82,11 @@
 		<field>
 			<fielddescr>White Exp</fielddescr>
 			<fieldname>whiteexp</fieldname>
-			<description>whiteexp to 864 (hours, approximately 36 days).</description>
+			<description>Adjust the three time parameters for greylisting.  White expiration defaults to 864 (hours, approximately 36 days).  spamd removes whitelist entries from the database if no mail delivery activity has been seen from the whitelisted address within whiteexp hours from the initial time an address is whitelisted.</description>
 			<type>input</type>
 			<size>30</size>
 			<value>25:4:864</value>
-		</field>			
-
-
+		</field>
 		<field>
 			<fielddescr>Stutter Secs</fielddescr>
 			<fieldname>stuttersecs</fieldname>
