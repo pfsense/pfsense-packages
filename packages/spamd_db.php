@@ -219,7 +219,9 @@ if (typeof getURL == 'undefined') {
   </tr>
 </table>
 </form>
+<br>
 <span class="vexpl"><strong><span class="red">Note:</span> Clicking on the action icons will invoke a AJAX query and the page will not refresh.   Click refresh in you're browser if you wish to view the changes in status.</strong></span>
+<br>
 <?php include("fend.inc"); ?>
 </body>
 </html>
