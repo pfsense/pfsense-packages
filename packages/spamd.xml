@@ -13,7 +13,6 @@
 	<service>
                 <name>spamd</name>
                 <rcfile>spamd.sh</rcfile>
-		<executable>spamlogd</executable>
         </service>
 	<tabs>
 		<tab>
