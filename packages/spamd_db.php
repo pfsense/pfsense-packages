@@ -44,13 +44,13 @@ if($_GET['action'] or $_POST['action']) {
 		$srcip = $_POST['srcip'];
 	$pkgdb = split("\n", `/usr/local/sbin/spamdb`);
 	if($action == "whitelist") {
-		mwexec("/usr/local/sbin/spamdb -a {$srcip}");
+		exec("/usr/local/sbin/spamdb -a {$srcip}");
 	} else if($action == "delete") {
-		mwexec("/usr/local/sbin/spamdb -d {$srcip}");
+		exec("/usr/local/sbin/spamdb -d {$srcip}");
 	} else if($action == "spamtrap") {
-		mwexec("/usr/local/sbin/spamdb -a {$srcip} -T");
+		exec("/usr/local/sbin/spamdb -a {$srcip} -T");
 	} else if($action == "trapped") {
-		mwexec("/usr/local/sbin/spamdb -a {$srcip} -t");
+		exec("/usr/local/sbin/spamdb -a {$srcip} -t");
 	}
 	mwexec("killall -HUP spamlogd");
 	exit;
@@ -76,7 +76,9 @@ include("head.inc");
 </script>
 <script language="javascript">
 function outputrule(req) {
-	//alert(req.content);
+	if(req.content <> '') {
+		alert(req.content);
+	}
 }
 if (typeof getURL == 'undefined') {
 	getURL = function(url, callback) {
