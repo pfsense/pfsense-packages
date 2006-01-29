@@ -100,15 +100,17 @@
 			<description>Enter the description for this item</description>
 			<type>textarea</type>
 			<size>30</size>
-			<rows>3</rows>
+			<rows>4</rows>
 			<cols>40</cols>			
 		</field>
 		<field>
 			<fielddescr>Reject message</fielddescr>
 			<fieldname>rejectmessage</fieldname>
 			<description>Enter the message to display to emailing parties that are on this providers list</description>
-			<type>input</type>
+			<type>textarea</type>
 			<size>30</size>
+			<rows>2</rows>
+			<cols>40</cols>
 		</field>
 		<field>
 			<fielddescr>Provider Method</fielddescr>
@@ -126,7 +128,7 @@
 			<fielddescr>Provider URL or Filename</fielddescr>
 			<fieldname>providerurl</fieldname>
 			<description>Enter the URL to the provider.</description>
-			<rows>3</rows>
+			<rows>4</rows>
 			<cols>40</cols>
 			<type>textarea</type>
 		</field>
