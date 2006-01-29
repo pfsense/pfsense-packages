@@ -168,7 +168,7 @@ Filter: <input name="filter" value="<?=$filter?>"></input> <input type="submit" 
 		if($lastseenip == $srcip and $filter == "")
 			$dontdisplay = true;
 		if($filter <> "") {
-			if(stristr($rowtext, $filter) == true)
+			if(strstr($rowtext, $filter) == true)
 				$dontdisplay = false;
 			else
 				$dontdisplay = true;
