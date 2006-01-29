@@ -122,6 +122,10 @@
 	<status>BETA</status>
 	<maintainer>geekgod@geekgod.com</maintainer>
 	<configurationfile>spamd.xml</configurationfile>
+        <logging>
+          <facilityname>spamd</facilityname>
+          <logfilename>spamd.log</logfilename>                                 
+        </logging>                                  	
     </package>
     <package>
 	  <name>assp</name>
@@ -211,6 +215,7 @@ test server or link availability and modify translation or routing rules. This p
 	<status>ALPHA</status>
 	<config_file>http://www.pfsense.com/packages/config/squid_ng.xml</config_file>
 	<configurationfile>squid_ng.xml</configurationfile>
+	<maintainer>michael.capp@gmail.com</maintainer>
     </package>
     <package>                                           
         <name>arpwatch</name>
@@ -223,6 +228,7 @@ test server or link availability and modify translation or routing rules. This p
         <status>ALPHA</status>
         <config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
         <configurationfile>arpwatch.xml</configurationfile>
+	<maintainer>ethethlay@gmail.com</maintainer>
         <logging>
           <facilityname>arpwatch</facilityname>
           <logfilename>arpwatch.log</logfilename>                                 
