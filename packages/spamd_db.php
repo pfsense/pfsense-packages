@@ -147,6 +147,7 @@ Filter: <input name="filter" value="<?=$filter?>"></input> <input type="submit" 
 		$rowtext .= "<td class=\"listr\">";
 		$srcip = $pkgdb_split[1];
 		$rowtext .= "<a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=whitelist\", outputrule);' href='#{$rows}'>Whitelist</a> ";
+		$rowtext .= " | <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=trapped\", outputrule);' href='#{$rows}'>Trapped</a> ";
 		$rowtext .= " | <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=spamtrap\", outputrule);' href='#{$rows}'>Blacklist</a> ";
 		$rowtext .= "</td>";
 		$column = 0;
