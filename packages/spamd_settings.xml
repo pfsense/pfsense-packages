@@ -91,6 +91,19 @@
 			<description>Set the socket receive buffer to this many bytes, adjusting the window size.</description>
 			<type>input</type>
 			<value></value>
+		</field>
+		<field>
+			<fielddescr>Reply SMTP error</fielddescr>
+			<fieldname>replysmtperror</fieldname>
+			<description>The SMTP error to return to the spammer, i.e. 450, 451, 550. This defaults to 450.</description>
+			<type>select</type>
+			<value>450</value>
+			<size>1</size>
+			<options>
+			    <option><value>450</value><name>450</name></option>
+			    <option><value>451</value><name>451</name></option>
+			    <option><value>550</value><name>550</name></option>
+			</options>
 		</field>			
 		<field>
 			<fielddescr>NextMTA</fielddescr>

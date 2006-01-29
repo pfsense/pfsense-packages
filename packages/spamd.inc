@@ -63,14 +63,16 @@ function sync_package_spamd() {
 			if($ss['delaysecs'] <> "")
 				$delaysecs = " -s " . $ss['delaysecs'];
 			if($ss['window'] <> "")
-				$window = " -w " . $ss['window'];				
+				$window = " -w " . $ss['window'];
+			if($ss['replysmtperror'] <> "")
+				$replysmtperror = " -r " . $ss['replysmtperror'];
 		}
 	}
 	$start = "/usr/local/sbin/spamd-setup &\n" .
 		 "/sbin/pflogd &\n" .
 		 "/sbin/mount_fdescfs fdescfs /dev/fd\n" .
 		 "/usr/local/libexec/spamlogd &\n" .
-		 "/usr/local/libexec/spamd {$passtime}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window} -b 127.0.0.1 &\n" .
+		 "/usr/local/libexec/spamd {$passtime}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} -b 127.0.0.1 &\n" .
 		 "/usr/local/libexec/spamlogd\n";
 	$stop  = "/usr/bin/killall spamd-setup\n" .
 		 "/usr/bin/killall spamlogd\n" .
@@ -85,8 +87,6 @@ function sync_package_spamd() {
 	);
 	conf_mount_ro();
 	config_unlock();
-	stop_service("spamd");
-	sleep(3);
 	start_service("spamd");
 }
 
