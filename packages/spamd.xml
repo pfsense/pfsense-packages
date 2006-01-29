@@ -68,6 +68,10 @@
 			<fieldname>providername</fieldname>
 		</columnitem>
 		<columnitem>
+			<fielddescr>Provider Type</fielddescr>
+			<fieldname>providertype</fieldname>
+		</columnitem>
+		<columnitem>
 			<fielddescr>Description</fielddescr>
 			<fieldname>providerdescription</fieldname>
 		</columnitem>
