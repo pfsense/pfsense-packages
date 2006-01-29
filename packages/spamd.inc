@@ -77,7 +77,7 @@ function sync_package_spamd() {
 	$stop  = "/usr/bin/killall spamd-setup\n" .
 		 "/usr/bin/killall spamlogd\n" .
 		 "/usr/bin/killall spamd\n" .
-		 "/usr/bin/killall /sbin/pflogd\n" .		 
+		 "/usr/bin/killall pflogd\n" .		 
 		 "sleep 2";
 	write_rcfile(array(
 				"file" => "spamd.sh",
