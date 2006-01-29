@@ -37,7 +37,9 @@ function sync_package_spamd() {
 		fwrite($fd, $spamd['ip'] . "\n");
 	}
 	fclose($fd);
-	$passtime = "5:4:864";
+	$passtime = "5";
+	$greyexp = "4";
+	$whiteexp = "864";
 	$identifier = "";
 	$greylisting = " -g";
 	$maxcon = "";
@@ -66,12 +68,19 @@ function sync_package_spamd() {
 				$window = " -w " . $ss['window'];
 			if($ss['replysmtperror'] <> "")
 				$replysmtperror = " -r " . $ss['replysmtperror'];
+			if($ss['passtime'] <> "")
+				$passtime = $ss['passtime'];
+			if($ss['greyexp'] <> "")
+				$greyexp = $ss['greyexp'];
+			if($ss['whiteexp'] <> "")
+				$whiteexp = $ss['whiteexp'];			
 		}
 	}
+	$greyparms = " -G {$passtime}:{$greyexp}:{$whiteexp}";
 	$start = "/usr/local/sbin/spamd-setup &\n" .
 		 "/sbin/pflogd &\n" .
 		 "/sbin/mount_fdescfs fdescfs /dev/fd\n" .
-		 "/usr/local/libexec/spamd {$passtime}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} -b 127.0.0.1 &\n" .
+		 "/usr/local/libexec/spamd {$greyparms}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} -b 127.0.0.1 &\n" .
 		 "/usr/local/libexec/spamlogd\n";
 	$stop  = "/usr/bin/killall spamd-setup\n" .
 		 "/usr/bin/killall spamlogd\n" .

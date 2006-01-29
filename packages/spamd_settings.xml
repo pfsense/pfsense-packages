@@ -71,6 +71,33 @@
 			<size>30</size>
 			<value>25:4:864</value>
 		</field>
+
+		<field>
+			<fielddescr>Passtime</fielddescr>
+			<fieldname>passtime</fieldname>
+			<description>Adjust the three time parameters for greylisting; see GREYLISTING.  passtime defaults to 25 (minutes).</description>
+			<type>input</type>
+			<size>30</size>
+			<value>25:4:864</value>
+		</field>
+		<field>
+			<fielddescr>GreyExp</fielddescr>
+			<fieldname>greyexp</fieldname>
+			<description>greyexp to 4</description>
+			<type>input</type>
+			<size>30</size>
+			<value>25:4:864</value>
+		</field>
+		<field>
+			<fielddescr>White Exp</fielddescr>
+			<fieldname>whiteexp</fieldname>
+			<description>whiteexp to 864 (hours, approximately 36 days).</description>
+			<type>input</type>
+			<size>30</size>
+			<value>25:4:864</value>
+		</field>			
+
+
 		<field>
 			<fielddescr>Stutter Secs</fielddescr>
 			<fieldname>stuttersecs</fieldname>
@@ -100,11 +127,12 @@
 			<value>450</value>
 			<size>1</size>
 			<options>
+			    <option><value></value><name></name></option>
 			    <option><value>450</value><name>450</name></option>
 			    <option><value>451</value><name>451</name></option>
 			    <option><value>550</value><name>550</name></option>
 			</options>
-		</field>			
+		</field>
 		<field>
 			<fielddescr>NextMTA</fielddescr>
 			<fieldname>nextmta</fieldname>
