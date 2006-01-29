@@ -76,7 +76,7 @@ include("head.inc");
 </script>
 <script language="javascript">
 function outputrule(req) {
-	if(req.content <> '') {
+	if(req.content != '') {
 		alert(req.content);
 	}
 }
@@ -145,7 +145,7 @@ if (typeof getURL == 'undefined') {
                   <td class="listhdrr">From</td>
                   <td class="listhdrr">To</td>
                   <td class="listhdr">Attempts</td>
-		  <td class="listhdrr">Action</td>
+		  <td class="list"></td>
 		</tr>
 <?php
 	$pkgdb = split("\n", `/usr/local/sbin/spamdb`);
@@ -187,12 +187,13 @@ if (typeof getURL == 'undefined') {
 				$rowtext .= "<td class=\"listr\"></td>";
 			}
 		}		
-		$rowtext .= "<td class=\"listr\">";
+		$rowtext .= "<td class=\"list\">";
 		$srcip = $pkgdb_split[1];
-		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=whitelist\", outputrule);' href='#{$rows}'><img title=\"Add\" border=\"0\" alt=\"Add\" src=\"/themes/{$g['theme']}/images/icons/icon_plus.gif\"></a> ";
-		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=trapped\", outputrule);' href='#{$rows}'><img title=\"Trapped\" border=\"0\" alt=\"Trapped\" src=\"/themes/{$g['theme']}/images/icons/icon_trapped.gif\"></a> ";
-		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=delete\", outputrule);' href='#{$rows}'><img title=\"Delete\" border=\"0\" alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a>";
-		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=spamtrap\", outputrule);' href='#{$rows}'><img title=\"Spamtrap\" border=\"0\" alt=\"Spamtrap\" src=\"./themes/{$g['theme']}/images/icons/icon_plus_bl.gif\"></a> ";
+		$lastrow = $rows - 1;
+		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=whitelist\", outputrule);' href='#{$lastrow}'><img title=\"Add to whitelist\" border=\"0\" alt=\"Add to whitelist\" src=\"/themes/{$g['theme']}/images/icons/icon_plus.gif\"></a> ";
+		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=trapped\", outputrule);' href='#{$lastrow}'><img title=\"Blacklist\" border=\"0\" alt=\"Blacklist\" src=\"/themes/{$g['theme']}/images/icons/icon_trapped.gif\"></a> ";
+		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=delete\", outputrule);' href='#{$lastrow}'><img title=\"Delete\" border=\"0\" alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a>";
+		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=spamtrap\", outputrule);' href='#{$lastrow}'><img title=\"Spamtrap\" border=\"0\" alt=\"Spamtrap\" src=\"./themes/{$g['theme']}/images/icons/icon_plus_bl.gif\"></a> ";
 		$rowtext .= "</td>";		
 		$rowtext .= "</tr>";
 		if($srcip == "")
