@@ -34,6 +34,10 @@ if($_POST['filter'])
 
 /* handle AJAX operations */
 if($_GET['action'] or $_POST['action']) {
+	/*    echo back buttonid so it can be turned
+	 *    back off when request is completed.
+	 */
+	echo $_GET['buttonid'] . "|";
 	if($_GET['action'])
 		$action = $_GET['action'];
 	if($_POST['action'])
@@ -43,6 +47,7 @@ if($_GET['action'] or $_POST['action']) {
 	if($_POST['srcip'])
 		$srcip = $_POST['srcip'];
 	$pkgdb = split("\n", `/usr/local/sbin/spamdb`);
+	/* execute spamdb command */
 	if($action == "whitelist") {
 		exec("/usr/local/sbin/spamdb -a {$srcip}");
 	} else if($action == "delete") {
@@ -52,6 +57,7 @@ if($_GET['action'] or $_POST['action']) {
 	} else if($action == "trapped") {
 		exec("/usr/local/sbin/spamdb -a {$srcip} -t");
 	}
+	/* signal a reload for real time effect. */
 	mwexec("killall -HUP spamlogd");
 	exit;
 }
@@ -77,9 +83,28 @@ include("head.inc");
 <script language="javascript">
 function outputrule(req) {
 	if(req.content != '') {
-		alert(req.content);
+		/* response is split by | */
+		var itemsplit = req.content.split("|");
+		/* turn back off the button */
+		toggle_off(itemsplit[0]);
+		/* uh oh, we've got an error of some sort */
+		if(itemsplit[1] != "")
+			alert('An error was detected.\n\n' + req.content);
 	}
 }
+/* toggle button to be on during AJAX request */
+function toggle_on(button, image) {
+	var item = document.getElementById(button);
+	item.src = image;
+}
+/* turn off button by stripping _p out */
+function toggle_off(button) {
+	var item = document.getElementById(button);
+	var currentbutton = item.src;
+	currentbutton = currentbutton.replace("_p.", ".");
+	item.src = currentbutton;
+}
+/* standard issue AJAX handler */
 if (typeof getURL == 'undefined') {
 	getURL = function(url, callback) {
 		if (!url)
@@ -190,10 +215,10 @@ if (typeof getURL == 'undefined') {
 		$rowtext .= "<td class=\"list\">";
 		$srcip = $pkgdb_split[1];
 		$lastrow = $rows - 1;
-		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=whitelist\", outputrule);' href='#{$lastrow}'><img title=\"Add to whitelist\" border=\"0\" alt=\"Add to whitelist\" src=\"/themes/{$g['theme']}/images/icons/icon_plus.gif\"></a> ";
-		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=trapped\", outputrule);' href='#{$lastrow}'><img title=\"Blacklist\" border=\"0\" alt=\"Blacklist\" src=\"/themes/{$g['theme']}/images/icons/icon_trapped.gif\"></a> ";
-		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=delete\", outputrule);' href='#{$lastrow}'><img title=\"Delete\" border=\"0\" alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a>";
-		$rowtext .= " <a onClick='getURL(\"spamd_db.php?srcip={$srcip}&action=spamtrap\", outputrule);' href='#{$lastrow}'><img title=\"Spamtrap\" border=\"0\" alt=\"Spamtrap\" src=\"./themes/{$g['theme']}/images/icons/icon_plus_bl.gif\"></a> ";
+		$rowtext .= " <a onClick='toggle_on(\"w{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_plus_p.gif\"); getURL(\"spamd_db.php?buttonid=w{$rows}&srcip={$srcip}&action=whitelist\", outputrule);' href='#{$lastrow}'><img title=\"Add to whitelist\" name='w{$rows}' id='w{$rows}' border=\"0\" alt=\"Add to whitelist\" src=\"/themes/{$g['theme']}/images/icons/icon_plus.gif\"></a> ";
+		$rowtext .= " <a onClick='toggle_on(\"b{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_trapped_p.gif\");getURL(\"spamd_db.php?buttonid=b{$rows}&srcip={$srcip}&action=trapped\", outputrule);' href='#{$lastrow}'><img title=\"Blacklist\" name='b{$rows}' id='b{$rows}' border=\"0\" alt=\"Blacklist\" src=\"/themes/{$g['theme']}/images/icons/icon_trapped.gif\"></a> ";
+		$rowtext .= " <a onClick='toggle_on(\"d{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_x_p.gif\");getURL(\"spamd_db.php?buttonid=srcip=d{$rows}&srcip={$srcip}&action=delete\", outputrule);' href='#{$lastrow}'><img title=\"Delete\" border=\"0\" name='d{$rows}' id='d{$rows}' alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a>";
+		$rowtext .= " <a onClick='toggle_on(\"s{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_plus_bl_p.gif\");getURL(\"spamd_db.php?buttonid=s{$rows}&srcip={$srcip}&action=spamtrap\", outputrule);' href='#{$lastrow}'><img title=\"Spamtrap\" name='s{$rows}' id='s{$rows}' border=\"0\" alt=\"Spamtrap\" src=\"./themes/{$g['theme']}/images/icons/icon_plus_bl.gif\"></a> ";
 		$rowtext .= "</td>";		
 		$rowtext .= "</tr>";
 		if($srcip == "")
