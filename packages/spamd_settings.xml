@@ -64,15 +64,6 @@
 			<value>yes</value>
 		</field>
 		<field>
-			<fielddescr>Passtime:GreyExp:WhiteExp</fielddescr>
-			<fieldname>greylistingparms</fieldname>
-			<description>Adjust the three time parameters for greylisting; see GREYLISTING.  passtime defaults to 25 (minutes), greyexp to 4 (hours), and whiteexp to 864 (hours, approximately 36 days).</description>
-			<type>input</type>
-			<size>30</size>
-			<value>25:4:864</value>
-		</field>
-
-		<field>
 			<fielddescr>Passtime</fielddescr>
 			<fieldname>passtime</fieldname>
 			<description>Adjust the three time parameters for greylisting; see GREYLISTING.  passtime defaults to 25 (minutes).</description>
