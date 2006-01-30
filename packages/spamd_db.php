@@ -65,6 +65,7 @@ if($_GET['action'] or $_POST['action']) {
 /* spam trap e-mail address */
 if($_POST['spamtrapemail'] <> "") {
 	mwexec("spamdb -T -a \"<{$_POST['spamtrapemail']}>\"");
+	mwexec("killall -HUP spamlogd");
 	$savemsg = $_POST['spamtrapemail'] . " added to spam trap database.";
 }
 
@@ -208,6 +209,11 @@ if (typeof getURL == 'undefined') {
 			/* don't display if column blank */
 			$col = str_replace("<","",$col);
 			$col = str_replace(">","",$col);
+			/*   if string is really long allow it to be wrapped by
+			 *   replacing @ with space@
+                         */
+			if(strlen($col)>40)
+				$col = str_replace("@"," @",$col);
 			$rowtext .= "<td class=\"listr\">{$col}</td>";
 			$column++;
 		}
