@@ -95,9 +95,8 @@ function sync_package_spamd() {
 	);
 	conf_mount_ro();
 	config_unlock();
-	stop_service("spamd");
-	sleep(1);
-	start_service("spamd");
+	mwexec("/usr/local/etc/rc.d/spamd.sh stop");
+	mwexec("/usr/local/etc/rc.d/spamd.sh start");
 }
 
 function custom_php_install_command() {
