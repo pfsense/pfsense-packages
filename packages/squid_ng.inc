@@ -212,19 +212,13 @@ function global_write_squid_config()
 	$config_array[] = 'cache_replacement_policy ' . $cache_replacement . "\n\n";
 	unset($cache_replacement);
 			
-	if (isset($log_enabled) && ($log_enabled == "on" )) {
-		if (!file_exists("/var/squid/logs")) {
-			mwexec("mkdir -p /var/squid/logs");
-			mwexec("chown squid:squid /var/squid/logs");
-		}
-		$config_array[] = 'cache_access_log /var/squid/logs/access.log' . "\n";
-		$config_array[] = 'cache_log /var/squid/logs/cache.log' . "\n";
-		$config_array[] = 'cache_store_log none' . "\n";
-	} else {
-		$config_array[] = 'cache_access_log /dev/null' . "\n";
-		$config_array[] = 'cache_log /dev/null' . "\n";
-		$config_array[] = 'cache_store_log none' . "\n";
+	if (!file_exists("/var/squid/logs")) {
+		mwexec("mkdir -p /var/squid/logs");
+		mwexec("chown squid:squid /var/squid/logs");
 	}
+	$config_array[] = 'cache_access_log /var/squid/logs/access.log' . "\n";
+	$config_array[] = 'cache_log /var/squid/logs/cache.log' . "\n";
+	$config_array[] = 'cache_store_log none' . "\n";
 	unset($log_enabled);
 
 	if (isset($log_query_terms) && ($log_query_terms == "on")) {
@@ -234,10 +228,7 @@ function global_write_squid_config()
 	}
 	unset($log_query_terms);
 				
-	if (isset($log_user_agents) && ($log_user_agents == "on")) {
-		if (!file_exists("/var/squid/logs")) mwexec("mkdir -p /var/squid/logs");
-		$config_array[] = 'useragent_log /var/squid/logs/useragent.log' . "\n\n";
-	} 
+	$config_array[] = 'useragent_log /var/squid/logs/useragent.log' . "\n\n";
 	unset($log_user_agents);
 			
 	$config_array[] = 'log_mime_hdrs off' . "\n";

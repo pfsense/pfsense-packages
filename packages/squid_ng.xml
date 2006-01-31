@@ -102,12 +102,6 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Log Enabled</fielddescr>
-			<fieldname>log_enabled</fieldname>
-			<description>This enables the Web Proxy logging feature.  All clients requests will be written to a log file viewable under Services -> Proxy Log.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
 			<fielddescr>URL Filtering Enabled</fielddescr>
 			<fieldname>urlfilter_enable</fieldname>
 			<description>This enables the advanced functionality in conjunction with squidGuard to provide an array of URL filtering options.  This squidGuard functionality can be additionally configured from Services -> Advanced Proxy Filtering</description>
