@@ -125,7 +125,7 @@
         <logging>
           <facilityname>spamd</facilityname>
           <logfilename>spamd.log</logfilename>                                 
-        </logging>                                  	
+        </logging>                            	
     </package>
     <package>
 	  <name>assp</name>
@@ -216,6 +216,18 @@ test server or link availability and modify translation or routing rules. This p
 	<config_file>http://www.pfsense.com/packages/config/squid_ng.xml</config_file>
 	<configurationfile>squid_ng.xml</configurationfile>
 	<maintainer>michael.capp@gmail.com</maintainer>
+        <logging>
+          <facilityname>Squid Cache Log</facilityname>
+          <logfilename>cache.log</logfilename>
+        </logging>
+        <logging>
+          <facilityname>Squid Access Log</facilityname>
+          <logfilename>access.log</logfilename>                                 
+        </logging>
+        <logging>
+          <facilityname>Squid User Agent Log</facilityname>
+          <logfilename>useragent.log</logfilename>                                 
+	</logging>
     </package>
     <package>                                           
         <name>arpwatch</name>
