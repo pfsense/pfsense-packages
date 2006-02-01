@@ -136,6 +136,9 @@
 			<type>textarea</type>
 		</field>
 	</fields>
+	<custom_delete_php_command>
+		sync_package_spamd();
+	</custom_delete_php_command>
 	<custom_php_resync_config_command>
 		sync_package_spamd();
 	</custom_php_resync_config_command>

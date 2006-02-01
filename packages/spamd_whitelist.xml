@@ -75,10 +75,13 @@
 		config_unlock();
 	    }
 	</custom_php_command_before_form>
+	<custom_delete_php_command>
+		sync_package_spamd_whitelist();
+	</custom_delete_php_command>	
 	<custom_php_resync_config_command>
-	    sync_package_spamd_whitelist();
+		sync_package_spamd_whitelist();
 	</custom_php_resync_config_command>
 	<custom_delete_php_command>
-	    sync_package_spamd_whitelist();
+		sync_package_spamd_whitelist();
 	</custom_delete_php_command>
 </packagegui>
