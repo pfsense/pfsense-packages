@@ -220,6 +220,7 @@ test server or link availability and modify translation or routing rules. This p
           <facilityname>Squid Cache Log</facilityname>
           <logfilename>cache.log</logfilename>
         </logging>
+        <!--
         <logging>
           <facilityname>Squid Access Log</facilityname>
           <logfilename>access.log</logfilename>                                 
@@ -228,6 +229,7 @@ test server or link availability and modify translation or routing rules. This p
           <facilityname>Squid User Agent Log</facilityname>
           <logfilename>useragent.log</logfilename>                                 
 	</logging>
+        -->
     </package>
     <package>                                           
         <name>arpwatch</name>
