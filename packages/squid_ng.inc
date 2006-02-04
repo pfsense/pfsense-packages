@@ -759,7 +759,7 @@ function global_write_squid_config()
 	foreach ($config_array as $config_item) 
 	{ 
 		fwrite($fout, trim($config_item));
-	
+		
 		if (stristr($config_item, "\n")) 
 		{		
 			for ($i = 1; $i < count(explode("\n", $config_item)); $i++) 
@@ -782,7 +782,7 @@ function custom_php_install_command() {
 		write_static_squid_config();	
 		
 		touch("/tmp/custom_php_install_command");
-
+		
 		/*    make sure this all exists, see:
 		 *    http://forum.pfsense.org/index.php?topic=23.msg2391#msg2391
 		 */
@@ -804,10 +804,25 @@ function custom_php_install_command() {
 		mwexec("cp /usr/local/etc/squid/mime.conf.default /usr/local/etc/squid/mime.conf");
 		
 		/* set a few extra items noted by regan */
-		mwexec("chown squid:wheel /dev/pf");
-		mwexec("chmod ug+rw /dev/pf");
-		touch("/var/log/cache.log");
-		mwexec("chown squid:wheel /var/log/cache.log");
+		update_output_window("Creating logs and setting user information...");
+		$fdsquid = fopen("/usr/local/etc/rc.d/aSquid.sh");
+		fwrite($fdsquid, "#/bin/sh\n");
+		fwrite($fdsquid, "# \n");
+		fwrite($fdsquid, "# This file was created by the pfSense package system\n");
+		fwrite($fdsquid, "# Sets up squid option on each bootup that are not persistent\n");
+		fwrite($fdsquid, "# \n\n");
+		fwrite($fdsquid, "chown squid:wheel /dev/pf\n");
+		fwrite($fdsquid, "chmod ug+rw /dev/pf\n");
+		fwrite($fdsquid, "touch /var/log/useragent.log\n");
+		fwrite($fdsquid, "touch /var/log/access.log\n");
+		fwrite($fdsquid, "touch /var/log/cache.log\n");
+		fwrite($fdsquid, "chown squid:wheel /var/log/cache.log\n");
+		fwrite($fdsquid, "chown squid:wheel /var/log/access.log\n");
+		fwrite($fdsquid, "chown squid:wheel /var/log/useragent.log\n");
+		fwrite($fdsquid, "\n");
+		fclose($fdsquid);
+		mwexec("chmod a+rx /usr/local/etc/rc.d/aSquid.sh");
+		mwexec("/usr/local/etc/rc.d/aSquid.sh");
 		
 		update_output_window("Creating Proxy Server initialization scripts...");
 		$start = <<<EOD
@@ -822,7 +837,7 @@ EOD;
 					"stop" => $stop
 				)
 		);
-	
+		
 		mwexec("chmod 755 /usr/local/etc/rc.d/squid.sh");
 			
 		/* create log directory hierarchies if they don't exist */
@@ -889,6 +904,7 @@ function custom_php_deinstall_command() {
 	update_output_window("Removing configuration files...");
 	unlink_if_exists("/usr/local/etc/rc.d/squid.sh");
 	unlink_if_exists("/usr/local/libexec/squid");
+	unlink_if_exists("/usr/local/etc/rc.d/aSquid.sh");
 	filter_configure();
 }
 
