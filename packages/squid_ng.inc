@@ -805,7 +805,7 @@ function custom_php_install_command() {
 		
 		/* set a few extra items noted by regan */
 		update_output_window("Creating logs and setting user information...");
-		$fdsquid = fopen("/usr/local/etc/rc.d/aSquid.sh");
+		$fdsquid = fopen("/usr/local/etc/rc.d/aSquid.sh", "w");
 		fwrite($fdsquid, "#/bin/sh\n");
 		fwrite($fdsquid, "# \n");
 		fwrite($fdsquid, "# This file was created by the pfSense package system\n");
