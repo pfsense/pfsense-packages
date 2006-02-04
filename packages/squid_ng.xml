@@ -3,7 +3,7 @@
 	<name>squid</name>
 	<title>Services: Proxy Server</title>
 	<category>Security</category>
-	<version>2.5.10_4</version>
+	<version>2.5.12_4</version>
 	<include_file>/usr/local/pkg/squid_ng.inc</include_file>
 	<configpath>installedpackages->package->squidng->configuration->settings</configpath>
 	<aftersaveredirect>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</aftersaveredirect>
