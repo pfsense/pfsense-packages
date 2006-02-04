@@ -188,6 +188,7 @@
 	<custom_add_php_command_late>
 		global_write_squid_config();
 		mwexec("/usr/local/sbin/squid -k reconfigure");
+		start_service("squid");		
 	</custom_add_php_command_late>
 	<custom_php_install_command>
 		custom_php_install_command();
