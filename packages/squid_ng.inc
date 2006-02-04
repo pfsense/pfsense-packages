@@ -874,11 +874,6 @@ EOD;
 		}
 		mwexec("/usr/sbin/chown squid:squid /usr/local/etc/squid/advanced/radius");
 		
-		/* EmanuelG: update pf group ownership settings to enhance squid performance and correct issue relating */
-		/*           to error message: parseHttpRequest: PF open failed: (13) Permission denied               */
-		mwexec("chgrp squid /dev/pf");
-		mwexec("chmod g+rw /dev/pf");
-		
 		$devfs_file = fopen("/etc/devfs.conf", "a");
 		fwrite($devfs_file, "\n# Allow squid to query the packet filter bymaking is group-accessable. ");
 		fwrite($devfs_file, "own pf root:squid");
