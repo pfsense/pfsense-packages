@@ -213,7 +213,7 @@ if (typeof getURL == 'undefined') {
 			/*   if string is really long allow it to be wrapped by
 			 *   replacing @ with space@
                          */
-			if(strlen($col)>40) {
+			if(strlen($col)>25) {
 				$col = str_replace("@"," @",$col);
 				$col = str_replace("-"," -",$col);
 				$col = str_replace("."," .",$col);
