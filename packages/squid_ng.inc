@@ -956,7 +956,7 @@ function write_static_squid_config() {
 	fwrite($fout, "acl within_timeframe time MTWHFAS 00:00-24:00\n");
 	fwrite($fout, "\n");
 	
-	fwrite($fout, "acl all src " . $lansa . "/" . $lansn . "\n");
+	fwrite($fout, "acl all src 0.0.0.0/0.0.0.0\n");	
 	fwrite($fout, "acl localnet src " . $lansa . "/" . $lansn . "\n");
 	fwrite($fout, "acl localhost src 127.0.0.1/255.255.255.255\n");
 	fwrite($fout, "acl SSL_ports port 443 563 873 # https, snews, rsync\n");
