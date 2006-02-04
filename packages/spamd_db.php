@@ -184,7 +184,10 @@ if (typeof getURL == 'undefined') {
 		  <td class="list"></td>
 		</tr>
 <?php
-	$pkgdb = split("\n", `/usr/local/sbin/spamdb`);
+	if($filter) 
+		$pkgdb = split("\n", `/usr/local/sbin/spamdb | grep {$filter}`);
+	else
+		$pkgdb = split("\n", `/usr/local/sbin/spamdb`);
 	$rows = 0;
 	$lastseenip = "";
 	$srcip = "|";
