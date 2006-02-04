@@ -395,7 +395,7 @@ function global_write_squid_config()
     $lansa = gen_subnet($lancfg['ipaddr'], $lancfg['subnet']);
     $lansn = $lancfg['subnet'];			
 
-	$config_array[] = 'acl all src ' . $lansa . '/' . $lansn . "\n";
+	$config_array[] = 'acl all src 0.0.0.0/0.0.0.0' . "\n";
 	$config_array[] = 'acl localnet src ' . $lansa . '/' . $lansn . "\n";
 	$config_array[] = 'acl localhost src 127.0.0.1/255.255.255.255' . "\n";					
 	$config_array[] = 'acl SSL_ports port 443 563 873 # https, snews, rsync' . "\n";
