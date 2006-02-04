@@ -804,8 +804,9 @@ function custom_php_install_command() {
 		mwexec("cp /usr/local/etc/squid/mime.conf.default /usr/local/etc/squid/mime.conf");
 		
 		/* set a few extra items noted by regan */
-		mwexec("chgrp squid /dev/pf");
-		mwexec("chmod g+rw /dev/pf");
+		mwexec("chown squid:wheel /dev/pf");
+		mwexec("chmod ug+rw /dev/pf");
+		touch("/var/log/cache.log");
 		mwexec("chown squid:wheel /var/log/cache.log");
 		
 		update_output_window("Creating Proxy Server initialization scripts...");
