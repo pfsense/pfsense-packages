@@ -803,6 +803,11 @@ function custom_php_install_command() {
 		mwexec("chown squid:squid /usr/local/etc/squid/advanced/acls/src_unrestricted_ip.acl");
 		mwexec("cp /usr/local/etc/squid/mime.conf.default /usr/local/etc/squid/mime.conf");
 		
+		/* set a few extra items noted by regan */
+		mwexec("chgrp squid /dev/pf");
+		mwexec("chmod g+rw /dev/pf");
+		mwexec("chown squid:wheel /var/log/cache.log");
+		
 		update_output_window("Creating Proxy Server initialization scripts...");
 		$start = <<<EOD
 touch /tmp/ro_root_mount
@@ -915,7 +920,7 @@ function write_static_squid_config() {
 	fwrite($fout, "pid_filename /var/run/squid.pid\n");
 	fwrite($fout, "\n");
 	
-	fwrite($fout, "cache_mem 8 MB\n");
+	fwrite($fout, "cache_mem 24 MB\n");
 	fwrite($fout, "cache_dir diskd /var/squid/cache 500 16 256\n");
 	fwrite($fout, "\n");
 	
