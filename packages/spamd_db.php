@@ -46,7 +46,6 @@ if($_GET['action'] or $_POST['action']) {
 		$srcip = $_GET['srcip'];
 	if($_POST['srcip'])
 		$srcip = $_POST['srcip'];
-	$pkgdb = split("\n", `/usr/local/sbin/spamdb`);
 	/* execute spamdb command */
 	if($action == "whitelist") {
 		exec("/usr/local/sbin/spamdb -a {$srcip}");
