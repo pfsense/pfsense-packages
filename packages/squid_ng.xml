@@ -185,10 +185,6 @@
 			</options>
 		</field>
 	</fields>
-	<custom_php_global_functions>
-		require_once("/usr/local/pkg/squid_ng.inc");
-		stop_service("squid");
-	</custom_php_global_functions>
 	<custom_add_php_command_late>
 		global_write_squid_config();
 		mwexec("/usr/local/sbin/squid -k reconfigure");
