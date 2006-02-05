@@ -31,7 +31,9 @@ require("guiconfig.inc");
 
 if($_POST['filter'])
 	$filter = $_POST['filter'];
-
+if($_POST['not'])
+	$not = true;
+	
 /* handle AJAX operations */
 if($_GET['action'] or $_POST['action']) {
 	/*    echo back buttonid so it can be turned
@@ -156,7 +158,7 @@ if (typeof getURL == 'undefined') {
 <?php if (file_exists($d_natconfdirty_path)): ?><p>
 <?php endif; ?>
 <table>
-<tr><td align="right">Filter by test:</td><td><input name="filter" value="<?=$filter?>"></input></td><td><input type="submit" value="Filter"></td></tr>
+<tr><td align="right">Filter by test:</td><td><input name="filter" value="<?=$filter?>"></input></td><td><input type="submit" value="Filter"></td><td>Inverse filter (NOT):</td><td><input type="checkbox" id="not" name="not" <?php if($not) echo " CHECKED"; ?>></td></tr>
 <tr><td align="right">Add spam trap E-mail address:</td><td><input name="spamtrapemail" value="<?=$spamtrapemail?>"></input></td><td><input type="submit" value="Add"></td></tr>
 </table><br>
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
@@ -183,10 +185,20 @@ if (typeof getURL == 'undefined') {
 		  <td class="list"></td>
 		</tr>
 <?php
-	if($filter) 
-		$pkgdb = split("\n", `/usr/local/sbin/spamdb | grep {$filter}`);
-	else
+	if($filter) {
+		if($not) {
+			$fd = fopen("/tmp/spamdb", "w");
+			$cmd = "/usr/local/sbin/spamdb | grep -v \"" . $filter . "\"";
+			fwrite($fd, $cmd);
+			fclose($fd);
+			$pkgdb = split("\n", `$cmd`);
+		} else {
+			$cmd = "/usr/local/sbin/spamdb | grep \"{$filter}\"";
+			$pkgdb = split("\n", `$cmd`);
+		}
+	} else {
 		$pkgdb = split("\n", `/usr/local/sbin/spamdb`);
+	}
 	$rows = 0;
 	$lastseenip = "";
 	$srcip = "|";
@@ -246,12 +258,6 @@ if (typeof getURL == 'undefined') {
 			$dontdisplay = true;
 		if($lastseenip == $srcip and $filter == "")
 			$dontdisplay = true;
-		if($filter <> "") {
-			if(strstr($rowtext, $filter) == true)
-				$dontdisplay = false;
-			else
-				$dontdisplay = true;
-		}
 		if($dontdisplay == false) {
 			echo $rowtext;
 			$lastseenip = $srcip;
