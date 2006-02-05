@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>spamdsources</name>
-	<version>0.2.0</version>
+	<version>4.2</version>
 	<include_file>/usr/local/pkg/spamd.inc</include_file>
 	<title></title>
 	<!-- Menu is where this packages menu will appear -->
