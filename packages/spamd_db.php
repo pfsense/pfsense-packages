@@ -33,6 +33,10 @@ if($_POST['filter'])
 	$filter = $_POST['filter'];
 if($_POST['not'])
 	$not = true;
+if($_POST['limit'])
+	$limit = $_POST['limit'];
+else
+	$limit = "25";
 	
 /* handle AJAX operations */
 if($_GET['action'] or $_POST['action']) {
@@ -160,6 +164,7 @@ if (typeof getURL == 'undefined') {
 <table>
 <tr><td align="right">Filter by test:</td><td><input name="filter" value="<?=$filter?>"></input></td><td><input type="submit" value="Filter"></td><td>Inverse filter (NOT):</td><td><input type="checkbox" id="not" name="not" <?php if($not) echo " CHECKED"; ?>></td></tr>
 <tr><td align="right">Add spam trap E-mail address:</td><td><input name="spamtrapemail" value="<?=$spamtrapemail?>"></input></td><td><input type="submit" value="Add"></td></tr>
+<tr><td align="right">Limit:</td><td><input name="limit" value="<?=$limit?>"></input></td></tr>
 </table><br>
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
@@ -188,21 +193,23 @@ if (typeof getURL == 'undefined') {
 	if($filter) {
 		if($not) {
 			$fd = fopen("/tmp/spamdb", "w");
-			$cmd = "/usr/local/sbin/spamdb | grep -v \"" . $filter . "\"";
+			$cmd = "/usr/local/sbin/spamdb | grep -v \"" . $filter . "\" | tail -n {$limit}";
 			fwrite($fd, $cmd);
 			fclose($fd);
 			$pkgdb = split("\n", `$cmd`);
 		} else {
-			$cmd = "/usr/local/sbin/spamdb | grep \"{$filter}\"";
+			$cmd = "/usr/local/sbin/spamdb | grep \"{$filter}\" | tail -n {$limit}";
 			$pkgdb = split("\n", `$cmd`);
 		}
 	} else {
-		$pkgdb = split("\n", `/usr/local/sbin/spamdb`);
+		$pkgdb = split("\n", `/usr/local/sbin/spamdb | tail -n {$limit}`);
 	}
 	$rows = 0;
 	$lastseenip = "";
 	$srcip = "|";
 	foreach($pkgdb as $pkgdb_row) {
+		if($rows > $limit)
+			break;
 		$dontdisplay = false;
 		$rowtext = "";
 		$rowtext .= "<span class=\"{$rows}\"></span>";
