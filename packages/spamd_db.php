@@ -74,6 +74,29 @@ if($_POST['spamtrapemail'] <> "") {
 	$savemsg = $_POST['spamtrapemail'] . " added to spam trap database.";
 }
 
+/* spam trap e-mail address */
+if($_GET['spamtrapemail'] <> "") {
+	$status = exec("spamdb -T -a \"<{$_GET['spamtrapemail']}>\"");
+	mwexec("killall -HUP spamlogd");
+	if($status)
+		echo $status;
+	else 
+		echo $_POST['spamtrapemail'] . " added to spam trap database.";
+	exit;
+}
+
+/* spam trap e-mail address */
+if($_GET['whitelist'] <> "") {
+	$status = exec("spamdb -a \"<{$_GET['spamtrapemail']}>\"");
+	mwexec("killall -HUP spamlogd");
+	if($status)
+		echo $status;
+	else 
+		echo $_POST['spamtrapemail'] . " added to whitelist database.";
+	exit;
+}
+
+
 $pgtitle = "SpamD: Database";
 include("head.inc");
 
