@@ -57,6 +57,8 @@ if($_GET['action'] or $_POST['action']) {
 		exec("/usr/local/sbin/spamdb -a {$srcip}");
 	} else if($action == "delete") {
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
+		exec("/usr/local/sbin/spamdb -d -T \"<{$srcip}>\"");
+		exec("/usr/local/sbin/spamdb -d -t \"<{$srcip}>\"");
 	} else if($action == "spamtrap") {
 		exec("/usr/local/sbin/spamdb -a {$srcip} -T");
 	} else if($action == "trapped") {
@@ -69,9 +71,25 @@ if($_GET['action'] or $_POST['action']) {
 
 /* spam trap e-mail address */
 if($_POST['spamtrapemail'] <> "") {
-	mwexec("spamdb -T -a \"<{$_POST['spamtrapemail']}>\"");
+	mwexec("/usr/local/sbin/spamdb -T -a \"<{$_POST['spamtrapemail']}>\"");
 	mwexec("killall -HUP spamlogd");
 	$savemsg = $_POST['spamtrapemail'] . " added to spam trap database.";
+}
+
+if($_GET['getstatus'] <> "") {
+	$status = exec("/usr/local/sbin/spamdb | grep \"{$_GET['getstatus']}\"");
+	if(stristr($status, "WHITE") == true) {
+		echo "WHITE";
+	} else if(stristr($status, "TRAPPED") == true) {
+		echo "TRAPPED";
+	} else if(stristr($status, "GREY") == true) {
+		echo "GREY";
+	} else if(stristr($status, "SPAMTRAP") == true) {
+		echo "SPAMTRAP";
+	} else {
+		echo "NOT FOUND";	
+	}	
+	exit;
 }
 
 /* spam trap e-mail address */
