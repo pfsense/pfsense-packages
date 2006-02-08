@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>spamdoutlook</name>
+	<version>0.1.0</version>
+	<title>SpamD Outlook</title>
+	<aftersaveredirect>pkg_edit.php?xml=spamd_outlook.xml&amp;id=0</aftersaveredirect>
+	<tabs>
+		<tab>
+			<text>SpamD External Sources</text>
+			<url>/pkg.php?xml=spamd.xml</url>
+		</tab>
+		<tab>
+			<text>SpamD Whitelist</text>
+			<url>/pkg.php?xml=spamd_whitelist.xml</url>
+		</tab>
+		<tab>
+			<text>SpamD Settings</text>
+			<url>/pkg_edit.php?xml=spamd_settings.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>SpamD Database</text>
+			<url>/spamd_db.php</url>
+		</tab>		
+		<tab>
+			<text>SpamD Outlook</text>
+			<url>/pkg_edit.php?xml=spamd_outlook.xml&amp;id=0</url>
+			<active/>
+		</tab>		
+	</tabs>
+	<!-- configpath gets expanded out automatically and config items will be
+         stored in that location -->
+	<configpath>['installedpackages']['spamd']['config']</configpath>
+	<!-- fields gets invoked when the user adds or edits a item.   the following items
+         will be parsed and rendered for the user as a gui with input, and selectboxes. -->
+	<fields>
+		<field>
+			<fielddescr>Username</fielddescr>
+			<fieldname>username</fieldname>
+			<description>Enter the username the outlook clients will use to connect with.</description>
+			<type>input</type>
+		</field>		
+		<field>
+			<fielddescr>Password</fielddescr>
+			<fieldname>password</fieldname>
+			<description>Enter the password the outlook clients will use to connect with.</description>
+			<type>password</type>
+		</field>
+
+	</fields>
+</packagegui>
