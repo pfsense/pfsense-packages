@@ -54,6 +54,7 @@ if($_GET['action'] or $_POST['action']) {
 		$srcip = $_POST['srcip'];
 	/* execute spamdb command */
 	if($action == "whitelist") {
+		exec("echo spamdb -a {$srcip} > /tmp/tmp");
 		exec("/usr/local/sbin/spamdb -a {$srcip}");
 	} else if($action == "delete") {
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
@@ -205,7 +206,7 @@ if (typeof getURL == 'undefined') {
 <table>
 <tr><td align="right">Filter by test:</td><td><input name="filter" value="<?=$filter?>"></input></td><td><input type="submit" value="Filter"></td><td>Inverse filter (NOT):</td><td><input type="checkbox" id="not" name="not" <?php if($not) echo " CHECKED"; ?>></td></tr>
 <tr><td align="right">Limit:</td><td><input name="limit" value="<?=$limit?>"></input></td></tr>
-<tr><td></td></tr>
+<tr><td>&nbsp;</td></tr>
 <tr><td align="right">Add spam trap E-mail address:</td><td><input name="spamtrapemail" value="<?=$spamtrapemail?>"></input></td><td><input type="submit" value="Add"></td></tr>
 </table><br>
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
