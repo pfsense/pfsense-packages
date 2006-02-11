@@ -20,7 +20,7 @@
 	  <descr>pfflowd converts OpenBSD PF status messages (sent via the pfsync interface) to Cisco NetFlow datagrams. These datagrams may be sent (via UDP) to a host of one's choice. Utilising the OpenBSD stateful packet filter infrastructure means that flow tracking is very fast and accurate.</descr>
 	  <category>Network Management</category>
 	  <config_file>http://www.pfsense.com/packages/config/pfflowd.xml</config_file>
-	  <depends_on_package_base_url>http://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All/</depends_on_package_base_url>
+	  <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
 	  <depends_on_package>pfflowd-0.6.tbz</depends_on_package>
 	  <version>0.6</version>
 	  <status>BETA</status>
