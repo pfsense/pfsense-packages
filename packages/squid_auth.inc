@@ -53,17 +53,17 @@ function global_eval_auth_options()
 			dynamic_ldap_auth();
 			break;
 		case "domain_auth":
-			$filecontents = file('/usr/local/pkg/squid_auth.xml');
+			$filecontents = file("/usr/local/pkg/squid_auth.xml");
 			dynamic_auth_content("pkg_edit");
 			dynamic_domain_auth();
 			break;
 		case "radius_auth":
-			$filecontents = file('/usr/local/pkg/squid_auth.xml');
+			$filecontents = file("/usr/local/pkg/squid_auth.xml");
 			dynamic_auth_content("pkg_edit");					
 			dynamic_radius_auth();
 			break;
 		default:
-			$filecontents = file('/usr/local/pkg/squid_auth.xml');
+			$filecontents = file("/usr/local/pkg/squid_auth.xml");
 			dynamic_auth_content("pkg_edit");					
 			dynamic_no_auth();
 			break;
@@ -77,7 +77,6 @@ function global_eval_auth_options()
 function dynamic_no_auth() {
 	global $config;
 	conf_mount_rw();
-
 	$fout = fopen("/usr/local/pkg/squid_extauth.xml", "w");
 	fwrite($fout, "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n");
 	fwrite($fout, "<packagegui>\n");
@@ -134,14 +133,13 @@ function dynamic_no_auth() {
 	fwrite($fout, "	</fields>\n");
 	fwrite($fout, "\n");
 	fwrite($fout, "	<custom_add_php_command_late>\n");
-	fwrite($fout, '		require_once("/usr/local/pkg/squid_ng.inc");\n');
+	fwrite($fout, "		require_once(\"/usr/local/pkg/squid_ng.inc\");");
 	fwrite($fout, "\n");
 	fwrite($fout, "		global_write_squid_config();\n");
-	fwrite($fout, '		mwexec("/usr/local/sbin/squid -k reconfigure");\n');
+	fwrite($fout, "		mwexec(\"/usr/local/sbin/squid -k reconfigure\");\n");
 	fwrite($fout, "	</custom_add_php_command_late>\n");
 	fwrite($fout, "\n");
 	fwrite($fout, "</packagegui>\n");
-
 	fclose($fout);
 	
 	/* mount filesystem read-only */
@@ -258,11 +256,11 @@ function dynamic_local_auth() {
 	fwrite($fout, "	</fields>\n");
 	fwrite($fout, "\n");
 	fwrite($fout, "	<custom_add_php_command_late>\n");
-	fwrite($fout, '		require_once("/usr/local/pkg/squid_ng.inc");\n');
+	fwrite($fout, "		require_once(\"/usr/local/pkg/squid_ng.inc\");\n");
 	fwrite($fout, "\n");
 	fwrite($fout, "		mod_htpasswd();\n");
 	fwrite($fout, "		global_write_squid_config();\n");
-	fwrite($fout, '		mwexec("/usr/local/sbin/squid -k reconfigure");\n');
+	fwrite($fout, "		mwexec(\"/usr/local/sbin/squid -k reconfigure\");\n");
 	fwrite($fout, "	</custom_add_php_command_late>\n");
 	fwrite($fout, "\n");
 	fwrite($fout, "</packagegui>\n");
@@ -335,7 +333,7 @@ function dynamic_ldap_auth() {
 	fwrite($fout, "		<field>\n");
 	fwrite($fout, "			<fielddescr>Base DN</fielddescr>\n");
 	fwrite($fout, "			<fieldname>ldap_basedn</fieldname>\n");
-	fwrite($fout, '			<description>This is the base where the LDAP search starts.  All subsequent organizational units (OUs)will be included.  Example: "ou=users,o=company" will search for users in and under the specified company.</description>\n');
+	fwrite($fout, "			<description>This is the base where the LDAP search starts.  All subsequent organizational units (OUs)will be included.  Example: \"ou=users,o=company\" will search for users in and under the specified company.</description>\n");
 	fwrite($fout, "			<type>input</type>\n");
 	fwrite($fout, "			<size>50</size>\n");
 	fwrite($fout, "		</field>\n");
@@ -364,7 +362,7 @@ function dynamic_ldap_auth() {
 	fwrite($fout, "		<field>\n");
 	fwrite($fout, "			<fielddescr>LDAP Port</fielddescr>\n");
 	fwrite($fout, "			<fieldname>ldap_port</fieldname>\n");
-	fwrite($fout, '			<description>This is the port that LDAP bind will attempt on.  The default is "389".</description>\n');
+	fwrite($fout, "			<description>This is the port that LDAP bind will attempt on.  The default is \"389\".</description>\n");
 	fwrite($fout, "			<type>input</type>\n");
 	fwrite($fout, "			<size>5</size>\n");
 	fwrite($fout, "		</field>\n");
@@ -372,7 +370,7 @@ function dynamic_ldap_auth() {
 	fwrite($fout, "		<field>\n");
 	fwrite($fout, "			<fielddescr>Bind DN Username</fielddescr>\n");
 	fwrite($fout, "			<fieldname>bind_dn_username</fieldname>\n");
-	fwrite($fout, '			<description>If "anonymous bind" is not supported, please specify the bind username that can access the Base DN hierarchy.</description>\n');
+	fwrite($fout, "			<description>If \"anonymous bind\" is not supported, please specify the bind username that can access the Base DN hierarchy.</description>\n");
 	fwrite($fout, "			<type>input</type>\n");
 	fwrite($fout, "			<size>30</size>\n");
 	fwrite($fout, "		</field>\n");
@@ -387,12 +385,12 @@ function dynamic_ldap_auth() {
 	fwrite($fout, "	</fields>\n");
 	fwrite($fout, "\n");
 	fwrite($fout, "	<custom_add_php_command_late>\n");
-	fwrite($fout, '		require_once("/usr/local/pkg/squid_ng.inc");\n');
+	fwrite($fout, "		require_once(\"/usr/local/pkg/squid_ng.inc\");\n");
 	fwrite($fout, "\n");
 	fwrite($fout, "		mod_htpasswd();\n");
 	fwrite($fout, "\n");
 	fwrite($fout, "		global_write_squid_config();\n");
-	fwrite($fout, '		mwexec("/usr/local/sbin/squid -k reconfigure");\n');
+	fwrite($fout, "		mwexec(\"/usr/local/sbin/squid -k reconfigure\");\n");
 	fwrite($fout, "	</custom_add_php_command_late>\n");
 	fwrite($fout, "\n");
 	fwrite($fout, "</packagegui>\n");
@@ -408,7 +406,7 @@ function dynamic_auth_content($pkgvar) {
 	
 	switch ($pkgvar) {
 		case "pkg":
-			if ($handle = opendir('/usr/local/pkg')) {
+			if ($handle = opendir("/usr/local/pkg")) {
 				while (($file = readdir($handle)) != false) {
 					if (stristr($file, "squid_") && stristr($file, ".xml")) {
 						$filecontents = file("/usr/local/pkg/" . $file);
@@ -426,7 +424,7 @@ function dynamic_auth_content($pkgvar) {
 			break;
 		
 		case "pkg_edit":
-			if ($handle = opendir('/usr/local/pkg')) {
+			if ($handle = opendir("/usr/local/pkg")) {
 				while (($file = readdir($handle)) != false) {
 					if (stristr($file, "squid_") && stristr($file, ".xml")) {
 						$filecontents = file("/usr/local/pkg/" . $file);
