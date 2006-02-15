@@ -25,6 +25,7 @@
 	  <version>0.6</version>
 	  <status>BETA</status>
 	  <configurationfile>pfflowd.xml</configurationfile>
+	  <maintainer>nick@buraglio.com</maintainer>
     </package>
     <package>
 	<name>quagga</name>
