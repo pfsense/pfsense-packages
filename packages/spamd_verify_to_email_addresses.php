@@ -73,8 +73,8 @@ foreach($grey_hosts as $grey) {
     } else {
         /* spammer picked the wrong person to mess with */
         if($server_ip) {
-            echo "/usr/local/sbin/spamdb -T -a $server_ip\n";
-            $result = exec("/usr/local/sbin/spamdb -T -a $server_ip\n");
+            echo "/usr/local/sbin/spamdb -a $server_ip -t\n";
+            $result = mwexec("/usr/local/sbin/spamdb -a $server_ip -t");
         } else {
             if($debug) 
                 echo "Could not locate server ip address.";
@@ -82,6 +82,13 @@ foreach($grey_hosts as $grey) {
         if($debug) 
             echo "Script result code: {$result}\n";
     }
+}
+
+mwexec("killall -HUP spamlogd");
+
+if($debug) {
+    system("spamdb | grep TRAPPED | wc -l");
+    system("spamdb | grep SPAMTRAP | wc -l");
 }
 
 ?>
