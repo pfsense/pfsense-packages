@@ -49,12 +49,13 @@ foreach($config['installedpackages']['spamdoutlook']['config'] as $outlook) {
 	}
 }
 
+exec("echo {$_GET['action']} > /tmp/tmp");
+
 /* handle AJAX operations */
 if($_GET['action'] or $_POST['action']) {
 	/*    echo back buttonid so it can be turned
 	 *    back off when request is completed.
 	 */
-	echo $_GET['buttonid'] . "|";
 	if($_GET['action'])
 		$action = $_GET['action'];
 	if($_POST['action'])
@@ -66,14 +67,26 @@ if($_GET['action'] or $_POST['action']) {
 	/* execute spamdb command */
 	if($action == "whitelist") {
 		exec("/usr/local/sbin/spamdb -a {$srcip}");
+		exit;
 	} else if($action == "delete") {
-		exec("/usr/local/sbin/spamdb -d {$srcip}");
-		exec("/usr/local/sbin/spamdb -d -T \"<{$srcip}>\"");
-		exec("/usr/local/sbin/spamdb -d -t \"<{$srcip}>\"");
+		$fd = fopen("/tmp/execcmds", "w");
+		config_lock();
+		fwrite($fd, "#!/bin/sh\n");
+		fwrite($fd, "/usr/local/sbin/spamdb -d {$srcip}\n");
+		fwrite($fd, "/usr/local/sbin/spamdb -T -d \"<{$srcip}>\"\n");
+		fwrite($fd, "/usr/local/sbin/spamdb -t -d \"<{$srcip}>\"\n");
+		fwrite($fd, "/usr/local/sbin/spamdb | grep {$srcip}\n");
+		fclose($fd);
+		exec("chmod a+rx /tmp/execcmds");
+		system("/bin/sh /tmp/execcmds");
+		config_unlock();
+		exit;
 	} else if($action == "spamtrap") {
 		exec("/usr/local/sbin/spamdb -a {$srcip} -T");
+		exit;
 	} else if($action == "trapped") {
 		exec("/usr/local/sbin/spamdb -a {$srcip} -t");
+		exit;
 	}
 	/* signal a reload for real time effect. */
 	mwexec("killall -HUP spamlogd");
