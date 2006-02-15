@@ -28,26 +28,6 @@
 	  <maintainer>nick@buraglio.com</maintainer>
     </package>
     <package>
-	<name>quagga</name>
-	<website>http://www.quagga.net/</website>
-	<descr>*NO GUI*</descr>
-	<category>Network Management</category>
-	<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-	<depends_on_package>quagga-0.98.5_1.tbz</depends_on_package>
-	<status>ALPHA</status>
-	<version>9.5</version>
-    </package>
-    <package>
-	<name>zebra</name>
-	<website>http://www.zebra.org/</website>
-	<descr>*NO GUI*</descr>
-	<category>Network Management</category>
-	<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-	<depends_on_package>zebra-9.5.tbz</depends_on_package>
-	<status>ALPHA</status>
-	<version>9.5</version>
-    </package>
-    <package>
 	<name>pure-ftpd</name>
 	<website>http://www.pureftpd.org/</website>
 	<descr>*DO NOT RUN THIS ON A FIREWALL. USE A DEDICATED MACHINE!* Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerabilities, is trivial to set up, and is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
@@ -375,4 +355,24 @@ test server or link availability and modify translation or routing rules. This p
           <status>ALPHA</status>
           <configurationfile>doorman.xml</configurationfile>
     </package>
+    <package>
+	<name>quagga</name>
+	<website>http://www.quagga.net/</website>
+	<descr>*NO GUI*</descr>
+	<category>Network Management</category>
+	<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+	<depends_on_package>quagga-0.98.5_1.tbz</depends_on_package>
+	<status>ALPHA</status>
+	<version>9.5</version>
+    </package>
+    <package>
+	<name>zebra</name>
+	<website>http://www.zebra.org/</website>
+	<descr>*NO GUI*</descr>
+	<category>Network Management</category>
+	<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+	<depends_on_package>zebra-9.5.tbz</depends_on_package>
+	<status>ALPHA</status>
+	<version>9.5</version>
+    </package>    
 </pfsensepkgs>
