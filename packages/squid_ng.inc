@@ -727,7 +727,7 @@ function global_write_squid_config()
 	$config_array[] = 'minimum_object_size ' . $minimum_object_size . ' KB' . "\n\n";
 			
 	if (isset($proxy_forwarding) && ($proxy_forwarding == "on")) {
-		$config_array[] = 'cache_peer ' . $upstream_proxy . 'parent ' . $upstream_proxy_port . '3130 login=' . upstream_username . ':' . upstream_password . ' default no-query' . "\n";
+		$config_array[] = 'cache_peer ' . $upstream_proxy . ' parent ' . $upstream_proxy_port . ' 3130 login=' . upstream_username . ':' . upstream_password . ' default no-query' . "\n";
 		$config_array[] = 'never_direct allow all' . "\n";
 	}	
 	unset($proxy_forwarding);
