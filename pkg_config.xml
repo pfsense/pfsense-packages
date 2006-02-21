@@ -3,17 +3,27 @@
 <pfsensepkgs>
   <packages>
     <package>
-	<name>ntop</name>
-	<website>http://www.ntop.org/</website>
-	<descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
-	<category>Network Management</category>
-	<depends_on_package_base_url>http://www.pfsense.org/packages/All/</depends_on_package_base_url>
-	<depends_on_package>ntop-3.2_1.tbz</depends_on_package>
-	<version>3.2_1</version>
-	<status>BETA</status>
-	<config_file>http://www.pfsense.com/packages/config/ntop.xml</config_file>
-	<configurationfile>ntop.xml</configurationfile>
-    </package>    
+      <name>OLSR</name>
+      <website>http://www.olsr.org/</website>
+      <descr>The olsr.org OLSR daemon is an implementation of the Optimized Link State Routing protocol. OLSR is a routing protocol for mobile ad-hoc networks. The protocol is pro-active, table driven and utilizes a technique called multipoint relaying for message flooding. olsrd also implements a popular optional link quality extension.</descr>
+      <category>Network Management</category>
+      <version>0.4.10</version>
+      <status>ALPHA</status>
+      <config_file>http://www.pfsense.com/packages/config/olsrd.xml</config_file>
+      <configurationfile>olsrd.xml</configurationfile>
+    </package>
+    <package>
+      <name>ntop</name>
+      <website>http://www.ntop.org/</website>
+      <descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
+      <category>Network Management</category>
+      <depends_on_package_base_url>http://www.pfsense.org/packages/All/</depends_on_package_base_url>
+      <depends_on_package>ntop-3.2_1.tbz</depends_on_package>
+      <version>3.2_1</version>
+      <status>BETA</status>
+      <config_file>http://www.pfsense.com/packages/config/ntop.xml</config_file>
+      <configurationfile>ntop.xml</configurationfile>
+    </package> 
     <package>
 	  <name>pfflowd</name>
 	  <website>http://www.mindrot.org/pfflowd.html</website>
