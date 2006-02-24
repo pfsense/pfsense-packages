@@ -803,6 +803,9 @@ function custom_php_install_command() {
 		mwexec("chown squid:squid /usr/local/etc/squid/advanced/acls/src_unrestricted_ip.acl");
 		mwexec("cp /usr/local/etc/squid/mime.conf.default /usr/local/etc/squid/mime.conf");
 		
+		mwexec("cp mv /usr/lib/squid/cachemgr.cgi /usr/local/www/cachemgr.cgi");
+		mwexec("chmod a+rx /usr/local/www/cachemgr.cgi");
+		
 		/* set a few extra items noted by regan */
 		update_output_window("Creating logs and setting user information...");
 		$fdsquid = fopen("/usr/local/etc/rc.d/aSquid.sh", "w");

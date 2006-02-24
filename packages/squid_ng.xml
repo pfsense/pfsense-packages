@@ -13,6 +13,12 @@
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</url>
 	</menu>	
+	<menu>
+		<name>Squid stats</name>
+		<tooltiptext>Show Squid statistics</tooltiptext>
+		<section>Services</section>
+		<url>/cachemgr.cgi</url>
+	</menu>	
 	<service>
 		<name>squid</name>
 		<rcfile>squid.sh</rcfile>
