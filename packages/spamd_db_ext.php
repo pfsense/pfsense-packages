@@ -82,9 +82,15 @@ if($_GET['action'] or $_POST['action']) {
 		config_unlock();
 		exit;
 	} else if($action == "spamtrap") {
+		exec("/usr/local/sbin/spamdb -d {$srcip}");
+		exec("/usr/local/sbin/spamdb -d -T \"<{$srcip}>\"");
+		exec("/usr/local/sbin/spamdb -d -t \"<{$srcip}>\"");		
 		exec("/usr/local/sbin/spamdb -a {$srcip} -T");
 		exit;
 	} else if($action == "trapped") {
+		exec("/usr/local/sbin/spamdb -d {$srcip}");
+		exec("/usr/local/sbin/spamdb -d -T \"<{$srcip}>\"");
+		exec("/usr/local/sbin/spamdb -d -t \"<{$srcip}>\"");		
 		exec("/usr/local/sbin/spamdb -a {$srcip} -t");
 		exit;
 	}
@@ -95,6 +101,9 @@ if($_GET['action'] or $_POST['action']) {
 
 /* spam trap e-mail address */
 if($_POST['spamtrapemail'] <> "") {
+	exec("/usr/local/sbin/spamdb -d {$_POST['spamtrapemail']}");
+	exec("/usr/local/sbin/spamdb -d -T \"<{$_POST['spamtrapemail']}>\"");
+	exec("/usr/local/sbin/spamdb -d -t \"<{$_POST['spamtrapemail']}>\"");
 	mwexec("/usr/local/sbin/spamdb -T -a \"<{$_POST['spamtrapemail']}>\"");
 	mwexec("killall -HUP spamlogd");
 	$savemsg = $_POST['spamtrapemail'] . " added to spam trap database.";
