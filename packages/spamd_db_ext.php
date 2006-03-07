@@ -160,7 +160,7 @@ function basic_auth_prompt(){
 
 function add_to_blacklist($srcip) {
 	$fd = fopen("/var/db/blacklist.txt", "a");
-	fwrite($fd, $srcip);
+	fwrite($fd, "{$srcip}\n");
 	fclose($fd);
 }
 
@@ -169,7 +169,7 @@ function delete_from_blacklist($srcip) {
 	$fd = fopen("/var/db/blacklist.txt", "w");
 	foreach($blacklist as $bl) {
 		if($blacklist <> $srcip)
-			fwrite($fd, "{$srcip}\n";
+			fwrite($fd, "{$srcip}\n");
 	}
 	fclose($fd);
 }
