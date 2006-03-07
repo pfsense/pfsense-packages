@@ -53,9 +53,6 @@ exec("echo {$_GET['action']} > /tmp/tmp");
 
 /* handle AJAX operations */
 if($_GET['action'] or $_POST['action']) {
-	/*    echo back buttonid so it can be turned
-	 *    back off when request is completed.
-	 */
 	if($_GET['action'])
 		$action = trim($_GET['action']);
 	if($_POST['action'])
@@ -64,33 +61,38 @@ if($_GET['action'] or $_POST['action']) {
 		$srcip = trim($_GET['srcip']);
 	if($_POST['srcip'])
 		$srcip = trim($_POST['srcip']);
+	if($_POST['email'])
+		$email = trim($_POST['email']);
+	if($_GET['email'])
+		$email = trim($_GET['email']);
 	/* execute spamdb command */
 	if($action == "whitelist") {
 		delete_from_spamd_db($srcip);
 		usleep(100);
 		exec("/usr/local/sbin/spamdb -a {$srcip}");
-		mwexec("/usr/bin/killall -HUP spamlogd");
+		hup_spamd();
 		exit;
 	} else if($action == "delete") {
 		delete_from_spamd_db($srcip);
 		usleep(100);
+		hup_spamd();
 		exit;
 	} else if($action == "spamtrap") {
-		delete_from_spamd_db($srcip);
+		delete_from_spamd_db($email);
 		usleep(100);
-		exec("/usr/local/sbin/spamdb -a \"<{$srcip}>\" -T");
-		mwexec("/usr/bin/killall -HUP spamlogd");
+		exec("/usr/local/sbin/spamdb -a \"<{$email}>\" -T");
+		hup_spamd();
 		exit;
 	} else if($action == "trapped") {
 		delete_from_spamd_db($srcip);
 		usleep(100);
 		exec("/usr/local/sbin/spamdb -a {$srcip} -t");
-		mwexec("/usr/bin/killall -HUP spamlogd");
 		add_to_blacklist($srcip);
+		hup_spamd();
 		exit;
 	}
 	/* signal a reload for real time effect. */
-	mwexec("killall -HUP spamlogd");
+	hup_spamd();
 	exit;
 }
 
@@ -166,12 +168,15 @@ function basic_auth_prompt(){
 }
 
 function add_to_blacklist($srcip) {
+	config_lock();
 	$fd = fopen("/var/db/blacklist.txt", "a");
 	fwrite($fd, "{$srcip}\n");
 	fclose($fd);
+	config_unlock();
 }
 
 function delete_from_blacklist($srcip) {
+	config_lock();
 	$blacklist = split("\n", file_get_contents("/var/db/blacklist.txt"));
 	$fd = fopen("/var/db/blacklist.txt", "w");
 	foreach($blacklist as $bl) {
@@ -179,6 +184,11 @@ function delete_from_blacklist($srcip) {
 			fwrite($fd, "{$srcip}\n");
 	}
 	fclose($fd);
+	config_unlock();
+}
+
+function hup_spamd() {
+	mwexec("killall -HUP spamlogd");	
 }
 
 exit;
