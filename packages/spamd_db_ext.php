@@ -79,6 +79,7 @@ if($_GET['action'] or $_POST['action']) {
 		fclose($fd);
 		exec("chmod a+rx /tmp/execcmds");
 		system("/bin/sh /tmp/execcmds");
+		remove_from_blacklist($srcip);
 		config_unlock();
 		exit;
 	} else if($action == "spamtrap") {
@@ -92,6 +93,9 @@ if($_GET['action'] or $_POST['action']) {
 		exec("/usr/local/sbin/spamdb -d -T \"<{$srcip}>\"");
 		exec("/usr/local/sbin/spamdb -d -t \"<{$srcip}>\"");		
 		exec("/usr/local/sbin/spamdb -a {$srcip} -t");
+		config_lock();
+		add_to_blacklist($srcip);
+		config_unlock();
 		exit;
 	}
 	/* signal a reload for real time effect. */
@@ -152,6 +156,22 @@ function basic_auth_prompt(){
 	header("HTTP/1.0 401 Unauthorized");
 	echo "You must enter valid credentials to access this resource.";
 	exit;
+}
+
+function add_to_blacklist($srcip) {
+	$fd = fopen("/var/db/blacklist.txt", "a");
+	fwrite($fd, $srcip);
+	fclose($fd);
+}
+
+function delete_from_blacklist($srcip) {
+	$blacklist = split("\n", file_get_contents("/var/db/blacklist.txt"));
+	$fd = fopen("/var/db/blacklist.txt", "w");
+	foreach($blacklist as $bl) {
+		if($blacklist <> $srcip)
+			fwrite($fd, "{$srcip}\n";
+	}
+	fclose($fd);
 }
 
 exit;

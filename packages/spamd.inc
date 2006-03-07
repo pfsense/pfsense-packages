@@ -44,6 +44,10 @@ function sync_package_spamd() {
 	fwrite($fd, "whitelist:\\\n");
 	fwrite($fd, "\t:white:\\\n");
 	fwrite($fd, "\t:file=/var/db/whitelist.txt\n");
+	fwrite($fd, ":\n\n# begin of blacklist\n");
+	fwrite($fd, "blacklist:\\\n");
+	fwrite($fd, "\t:black:\\\n");
+	fwrite($fd, "\t:file=/var/db/blacklist.txt\n");	
 	/* loop through each item and write out its configuration */
 	fwrite($fd, "\n# begin of user created entries\n");
 	if($config['installedpackages']['spamdsources']['config'] != "") {
@@ -169,6 +173,7 @@ function sync_spamd_config_to_backup() {
 function custom_php_install_command() {
 	global $config, $g;
 	system("touch /var/db/whitelist.txt");
+	system("touch /var/db/blacklist.txt");
 	sync_package_spamd();
 }
 
