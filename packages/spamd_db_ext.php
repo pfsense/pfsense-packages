@@ -57,45 +57,36 @@ if($_GET['action'] or $_POST['action']) {
 	 *    back off when request is completed.
 	 */
 	if($_GET['action'])
-		$action = $_GET['action'];
+		$action = trim($_GET['action']);
 	if($_POST['action'])
-		$action = $_POST['action'];
+		$action = trim($_POST['action']);
 	if($_GET['srcip'])
-		$srcip = $_GET['srcip'];
+		$srcip = trim($_GET['srcip']);
 	if($_POST['srcip'])
-		$srcip = $_POST['srcip'];
+		$srcip = trim($_POST['srcip']);
 	/* execute spamdb command */
 	if($action == "whitelist") {
+		delete_from_spamd_db($srcip);
+		usleep(100);
 		exec("/usr/local/sbin/spamdb -a {$srcip}");
+		mwexec("/usr/bin/killall -HUP spamlogd");
 		exit;
 	} else if($action == "delete") {
-		$fd = fopen("/tmp/execcmds", "w");
-		config_lock();
-		fwrite($fd, "#!/bin/sh\n");
-		fwrite($fd, "/usr/local/sbin/spamdb -d {$srcip}\n");
-		fwrite($fd, "/usr/local/sbin/spamdb -T -d \"<{$srcip}>\"\n");
-		fwrite($fd, "/usr/local/sbin/spamdb -t -d \"<{$srcip}>\"\n");
-		fwrite($fd, "/usr/local/sbin/spamdb | grep {$srcip}\n");
-		fclose($fd);
-		exec("chmod a+rx /tmp/execcmds");
-		system("/bin/sh /tmp/execcmds");
-		remove_from_blacklist($srcip);
-		config_unlock();
+		delete_from_spamd_db($srcip);
+		usleep(100);
 		exit;
 	} else if($action == "spamtrap") {
-		exec("/usr/local/sbin/spamdb -d {$srcip}");
-		exec("/usr/local/sbin/spamdb -d -T \"<{$srcip}>\"");
-		exec("/usr/local/sbin/spamdb -d -t \"<{$srcip}>\"");		
-		exec("/usr/local/sbin/spamdb -a {$srcip} -T");
+		delete_from_spamd_db($srcip);
+		usleep(100);
+		exec("/usr/local/sbin/spamdb -a \"<{$srcip}>\" -T");
+		mwexec("/usr/bin/killall -HUP spamlogd");
 		exit;
 	} else if($action == "trapped") {
-		exec("/usr/local/sbin/spamdb -d {$srcip}");
-		exec("/usr/local/sbin/spamdb -d -T \"<{$srcip}>\"");
-		exec("/usr/local/sbin/spamdb -d -t \"<{$srcip}>\"");		
+		delete_from_spamd_db($srcip);
+		usleep(100);
 		exec("/usr/local/sbin/spamdb -a {$srcip} -t");
-		config_lock();
+		mwexec("/usr/bin/killall -HUP spamlogd");
 		add_to_blacklist($srcip);
-		config_unlock();
 		exit;
 	}
 	/* signal a reload for real time effect. */
@@ -149,6 +140,22 @@ if($_GET['whitelist'] <> "") {
 	else 
 		echo $_POST['spamtrapemail'] . " added to whitelist database.";
 	exit;
+}
+
+function delete_from_spamd_db($srcip) {
+	config_lock();
+	$fd = fopen("/tmp/execcmds", "w");
+	fwrite($fd, "#!/bin/sh\n");	
+	fwrite($fd, "/usr/local/sbin/spamdb -d {$srcip}\n");
+	fwrite($fd, "/usr/local/sbin/spamdb -d {$srcip} -T\n");
+	fwrite($fd, "/usr/local/sbin/spamdb -d {$srcip} -t\n");
+	fwrite($fd, "/usr/local/sbin/spamdb -d \"<{$srcip}>\" -t\n");
+	fwrite($fd, "/usr/local/sbin/spamdb -d \"<{$srcip}>\" -T\n");	
+	fclose($fd);
+	exec("/bin/chmod a+rx /tmp/execcmds");
+	system("/bin/sh /tmp/execcmds");
+	mwexec("/usr/bin/killall -HUP spamlogd");
+	config_unlock();
 }
 
 function basic_auth_prompt(){
