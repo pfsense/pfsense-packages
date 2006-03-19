@@ -57,6 +57,9 @@ if($_GET['action'] or $_POST['action']) {
 	$srcip = str_replace(" ","",$srcip);
 	/* execute spamdb command */
 	if($action == "whitelist") {
+		exec("/usr/local/sbin/spamdb -d {$srcip}");
+		exec("/usr/local/sbin/spamdb -d \"<{$srcip}>\" -T");
+		exec("/usr/local/sbin/spamdb -d \"<{$srcip}>\" -t");		
 		exec("echo spamdb -a {$srcip} > /tmp/tmp");
 		exec("/usr/local/sbin/spamdb -a {$srcip}");
 	} else if($action == "delete") {
