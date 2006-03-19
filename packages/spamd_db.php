@@ -126,8 +126,8 @@ include("head.inc");
 <form action="spamd_db.php" method="post" name="iform">
 <script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
 <script src="/javascript/scriptaculous/scriptaculous.js" type="text/javascript"></script>
-<script type="text/javascript" language="javascript" src="row_toggle.js">
-</script>
+<script type="text/javascript" language="javascript" src="row_toggle.js"></script>
+<script src="/javascript/sorttable.js"></script>
 <script language="javascript">
 function outputrule(req) {
 	if(req.content != '') {
@@ -223,15 +223,17 @@ if (typeof getURL == 'undefined') {
   <tr>
     <td>
 	<div id="mainarea">
-	<table id="maintable" name="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-                <tr id="frheader">
-		  <td class="listhdrr">Type</td>
-                  <td class="listhdrr">IP</td>
-                  <td class="listhdrr">From</td>
-                  <td class="listhdrr">To</td>
-                  <td class="listhdr">Attempts</td>
-		  <td class="list"></td>
-		</tr>
+		<table id="maintable" name="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tr><td>
+			<table id="sortabletable1" name="sortabletable1" class="sortable" width="100%" border="0" cellpadding="0" cellspacing="0">
+			    <tr id="frheader">
+					<td class="listhdrr">Type</td>
+					<td class="listhdrr">IP</td>
+					<td class="listhdrr">From</td>
+					<td class="listhdrr">To</td>
+					<td class="listhdr">Attempts</td>
+					<td class="list"></td>
+				</tr>
 <?php
 	if($filter) {
 		if($not) {
@@ -314,7 +316,7 @@ if (typeof getURL == 'undefined') {
 		}
 		$rows++;
 	}	
-?>
+?>	</td></tr></table>
 	</table>
 	</div>
 	</td>
