@@ -66,9 +66,12 @@ if($_GET['action'] or $_POST['action']) {
 	} else if($action == "spamtrap") {
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
 		exec("/usr/local/sbin/spamdb -d \"<{$srcip}>\" -T");
-		exec("/usr/local/sbin/spamdb -d \"<{$srcip}>\" -t");		
+		exec("/usr/local/sbin/spamdb -d \"<{$srcip}>\" -t");
 		exec("/usr/local/sbin/spamdb -a {$srcip} -T");
 	} else if($action == "trapped") {
+		exec("/usr/local/sbin/spamdb -d {$srcip}");
+		exec("/usr/local/sbin/spamdb -d \"<{$srcip}>\" -T");
+		exec("/usr/local/sbin/spamdb -d \"<{$srcip}>\" -t");
 		exec("/usr/local/sbin/spamdb -a {$srcip} -t");
 	}
 	/* signal a reload for real time effect. */
