@@ -29,7 +29,7 @@ require("config.inc");
 require("functions.inc");
 
 /* path to script that outputs c/r seperated e-mail addresses */
-$server_to_pull_data_from = "http://10.0.0.11/exchexp.asp";
+$server_to_pull_data_from = "http://10.0.0.11/spamd_exchexp.asp";
 
 /* to enable debugging, change false to true */
 $debug = true;
@@ -39,10 +39,10 @@ if($debug)
 /* fetch down the latest list from server */
 if($debug) {
     /* fetch without quiet mode */
-    exec("fetch -o /tmp/emaillist.txt {$server_to_pull_data_from}");
+    system("fetch -o /tmp/emaillist.txt {$server_to_pull_data_from}");
 } else {
     /* fetch with quiet mode */
-    exec("fetch -q -o /tmp/emaillist.txt {$server_to_pull_data_from}");
+    system("fetch -q -o /tmp/emaillist.txt {$server_to_pull_data_from}");
 }
 
 /* test if file exists, if not, bail. */
