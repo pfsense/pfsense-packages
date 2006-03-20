@@ -66,7 +66,10 @@ if($debug) {
         echo "VALID: ||$valid||\n";
 }
 
+/* suck custom blacklist into array */
 $current_blacklist = split("\n", `cat /var/db/blacklist.txt`);
+/* suck current spamtrap emails into array */
+$current_spamtrap = split("\n", `/usr/local/sbin/spamdb | grep SPAMTRAP | cut -d"|" -f2`);
 
 /* traverse list and find the dictionary attackers, etc */
 foreach($grey_hosts as $grey) {
@@ -84,6 +87,11 @@ foreach($grey_hosts as $grey) {
         if($debug)
                 echo "$server_ip already in blacklist.\n";
         continue;
+    }
+    if(in_array($email_to, $current_spamtrap)) {
+        if($email_to)
+                echo "$email_to already in blacklist.\n";
+        continue;        
     }
     if($debug)
         echo "Testing $email_from | $email_to \n";
@@ -115,10 +123,11 @@ foreach($grey_hosts as $grey) {
 mwexec("killall -HUP spamlogd");
 
 if($debug) {
+    echo "\nSearch completed.\n\n";
     echo "Items trapped:              ";
-    system("spamdb | grep TRAPPED | wc -l");
+    system("/usr/local/sbin/spamdb | grep TRAPPED | wc -l");
     echo "Items spamtrapped:          ";
-    system("spamdb | grep SPAMTRAP | wc -l");
+    system("/usr/local/sbin/spamdb | grep SPAMTRAP | wc -l");
 }
 
 mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
