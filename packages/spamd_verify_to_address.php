@@ -130,14 +130,10 @@ if($debug) {
     system("/usr/local/sbin/spamdb | grep TRAPPED | wc -l");
     echo "Items spamtrapped:          ";
     system("/usr/local/sbin/spamdb | grep SPAMTRAP | wc -l");
-}
-
-mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
-mwexec("/sbin/pfctl -t blacklist -T show | cut -d\" \" -f4 > /var/db/blacklist.txt");
-
-if($debug) {
     echo "Items in blacklist.txt:     ";
     system("/sbin/pfctl -t blacklist -T show | wc -l");
 }
+
+mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
 
 ?>
