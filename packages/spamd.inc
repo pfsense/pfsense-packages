@@ -32,7 +32,7 @@ function sync_package_spamd() {
 	global $config, $g;
 	conf_mount_rw();
 	config_lock();
-	$fd = fopen("/usr/local/etc/spamd.conf","w");
+	$fd = fopen("/etc/spamd.conf","w");
 	/* all header */
 	fwrite($fd, "all:\\\n\t:whitelist:blacklist");
 	foreach($config['installedpackages']['spamdsources']['config'] as $spamd) {
@@ -112,9 +112,9 @@ function sync_package_spamd() {
 		}
 	}
 	$greyparms = " -G {$passtime}:{$greyexp}:{$whiteexp}";
-	$start = "/usr/local/sbin/spamd-setup &\n" .
+	$start = "/sbin/mount_fdescfs fdescfs /dev/fd\n" .
+	     "/usr/local/sbin/spamd-setup -d &\n" .
 		 "/sbin/pflogd &\n" .
-		 "/sbin/mount_fdescfs fdescfs /dev/fd\n" .
 		 "/usr/local/libexec/spamd {$greyparms}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} -b 127.0.0.1 &\n" .
 		 "/usr/local/libexec/spamlogd\n";
 	$stop  = "/usr/bin/killall spamd-setup\n" .
