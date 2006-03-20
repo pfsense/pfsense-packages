@@ -903,6 +903,7 @@ function custom_php_deinstall_command() {
 	unlink_if_exists("/usr/local/etc/rc.d/squid.sh");
 	unlink_if_exists("/usr/local/libexec/squid");
 	unlink_if_exists("/usr/local/etc/rc.d/aSquid.sh");
+	mwexec("rm -f /usr/local/etc/rc.d/squid*");
 	filter_configure();
 }
 
