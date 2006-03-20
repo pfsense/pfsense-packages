@@ -172,6 +172,7 @@ function add_to_blacklist($srcip) {
 	$fd = fopen("/var/db/blacklist.txt", "a");
 	fwrite($fd, "{$srcip}\n");
 	fclose($fd);
+	mwexec("/sbin/pfctl -q -t spamd -T add -f /var/db/blacklist.txt");
 	config_unlock();
 }
 
@@ -184,6 +185,7 @@ function delete_from_blacklist($srcip) {
 			fwrite($fd, "{$srcip}\n");
 	}
 	fclose($fd);
+	mwexec("/sbin/pfctl -q -t spamd -T add -f /var/db/blacklist.txt");
 	config_unlock();
 }
 

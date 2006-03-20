@@ -76,6 +76,7 @@ if($_GET['action'] or $_POST['action']) {
 		exec("/usr/local/sbin/spamdb -d \"<{$srcip}>\" -T");
 		exec("/usr/local/sbin/spamdb -d \"<{$srcip}>\" -t");
 		exec("/usr/local/sbin/spamdb -a {$srcip} -t");
+		mwexec("/sbin/pfctl -q -t spamd -T add -f /var/db/blacklist.txt");
 	}
 	/* signal a reload for real time effect. */
 	mwexec("killall -HUP spamlogd");
