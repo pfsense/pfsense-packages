@@ -70,6 +70,11 @@ if($debug) {
 $current_blacklist = split("\n", `cat /var/db/blacklist.txt`);
 /* suck current spamtrap emails into array */
 $current_spamtrap = split("\n", `/usr/local/sbin/spamdb | grep SPAMTRAP | cut -d"|" -f2`);
+/* eliminate <> from email addresses */
+for($x=0; isset($current_spamtrap[$x]); $x++) {
+    $current_spamtrap[$x] = str_replace("<", "", $current_spamtrap[$x]);
+    $current_spamtrap[$x] = str_replace(">", "", $current_spamtrap[$x]);
+}
 
 /* traverse list and find the dictionary attackers, etc */
 foreach($grey_hosts as $grey) {
