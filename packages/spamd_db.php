@@ -334,6 +334,9 @@ if (typeof getURL == 'undefined') {
 		$rows++;
 	}	
 ?>	</td></tr></table>
+	<tr><td>
+		<?php echo "<font face=\"arial\"><p><b>$rows</b> rows returned."; ?>
+	</td></tr>
 	</table>
 	</div>
 	</td>
