@@ -83,7 +83,7 @@
 	  <config_file>http://www.pfsense.com/packages/config/spamd.xml</config_file>
 	  <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
 	  <depends_on_package>spamd-3.7.tbz</depends_on_package>
-	  <version>4.2</version>
+	  <version>4.3</version>
 	  <status>BETA</status>
 	  <maintainer>geekgod@geekgod.com</maintainer>
 	  <configurationfile>spamd.xml</configurationfile>
