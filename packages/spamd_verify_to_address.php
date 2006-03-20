@@ -1,6 +1,5 @@
 #!/usr/local/bin/php -q
 <?php
-
 /*
  *    pfSense spamd mousetrap
  *    (C)2006 Scott Ullrich
@@ -12,7 +11,15 @@
  *    sending to an invalid e-mail address
  *    then add them to spamtrap.
  *
- *    XXX:
+ *    Directions for usage:
+ *       1.  Download this script to the /root/ directory on your pfSense installation.
+ *       2.  chmod a+rx spamd_verify_to_address.php
+ *       3.  Edit $server_to_pull_data_from to point to a location containing a list of
+ *           all valid email addresses c/r seperated.
+ *       4.  Add spamd_verify_to_address.php to cron or run it by invoking 
+ *          ./spamd_verify_to_address.php manually.
+ *
+ *    XXX/TODO:
  *        * Add flag to blacklist a server after receiving X
  *          attempts at a delivery with invalid to: addresses.
  *
@@ -118,8 +125,8 @@ mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
 mwexec("/sbin/pfctl -t blacklist -T show | cut -d\" \" -f4 > /var/db/blacklist.txt");
 
 if($debug) {
-        echo "Items in blacklist.txt: ";
-        system("/sbin/pfctl -t blacklist -T show | wc -l");
+    echo "Items in blacklist.txt:     ";
+    system("/sbin/pfctl -t blacklist -T show | wc -l");
 }
 
 ?>
