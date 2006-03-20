@@ -335,7 +335,7 @@ if (typeof getURL == 'undefined') {
 	}	
 ?>	</td></tr></table>
 	<tr><td>
-		<?php echo "<font face=\"arial\"><p><b>$rows</b> rows returned."; ?>
+		<?php echo "<font face=\"arial\"><p><b>" . ($rows-1) . "</b> rows returned."; ?>
 	</td></tr>
 	</table>
 	</div>
