@@ -128,10 +128,10 @@ function sync_package_spamd() {
 				"stop" =>  $stop
 			    )
 	);
-	conf_mount_ro();
-	config_unlock();
 	$cronjob = "*/120   *       *       *       *       root            /usr/bin/nice -n20 /usr/local/sbin/spamd-setup";
 	add_text_to_file("/etc/crontab", $cronjob);
+	conf_mount_ro();
+	config_unlock();
 	mwexec("killall -HUP cron");
 	mwexec("ln -s /etc/spamd.conf /usr/local/etc/spamd.conf");
 	mwexec("/usr/local/etc/rc.d/spamd.sh stop");
