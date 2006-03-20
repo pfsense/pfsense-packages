@@ -188,9 +188,11 @@ function custom_php_install_command() {
 
 function custom_php_deinstall_command() {
 	global $config, $g;
+	conf_mount_rw();
 	unlink_if_exists("/usr/local/pkg/pf/spamd_rules.php");
 	unlink_if_exists("/usr/local/www/spamd_rules.php");
 	unlink_if_exists("/usr/local/etc/rc.d/spamd.sh");
+	conf_mount_ro();
 }
 
 ?>
