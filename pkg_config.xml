@@ -180,7 +180,6 @@ test server or link availability and modify translation or routing rules. This p
 	  <status>ALPHA</status>
 	  <config_file>http://www.pfsense.com/packages/config/squid_ng.xml</config_file>
 	  <configurationfile>squid_ng.xml</configurationfile>
-	  <maintainer>michael.capp@gmail.com</maintainer>
 	  <logging>
 		<facilityname>Squid Cache Log</facilityname>
 		<logfilename>cache.log</logfilename>
