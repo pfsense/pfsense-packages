@@ -36,7 +36,7 @@ $open_connections = 0;
 $average_connect_time = 0;
 
 $total_connections = count($connect_times);
-echo "Total connections: $total_connections\n";
+//echo "Total connections: $total_connections\n";
 
 /* loop through, how many connections are open */
 foreach($connections as $c) {
