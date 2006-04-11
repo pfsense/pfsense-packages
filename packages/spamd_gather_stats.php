@@ -28,7 +28,6 @@ foreach($log_array as $la) {
         $connect_time = $matches[2];
         $connections[$ip] = true;
         $connect_times[$ip] = $connect_time;
-        //echo "Connect time: $connect_time\n";
     }
 }
 
@@ -36,7 +35,6 @@ $open_connections = 0;
 $average_connect_time = 0;
 
 $total_connections = count($connect_times);
-//echo "Total connections: $total_connections\n";
 
 /* loop through, how many connections are open */
 foreach($connections as $c) {
@@ -49,6 +47,7 @@ foreach($connect_times as $c) {
     $average_connect_time = $average_connect_time + $c;
 }
 
+echo "N:";
 echo $open_connections;
 echo ":";
 echo round(($average_connect_time / $total_connections));
