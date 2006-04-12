@@ -136,6 +136,13 @@
 			<type>input</type>
 			<value>1</value>
 		</field>
+		<field>
+			<fielddescr>Enable RRD graphing</fielddescr>
+			<fieldname>enablerrd</fieldname>
+			<description>Enables the graphing of SpamD connection and disconnection statistics.</description>
+			<type>checkbox</type>
+			<value></value>
+		</field>		
 	</fields>
 	<custom_php_resync_config_command>
 		sync_package_spamd();
