@@ -3,18 +3,6 @@
 <pfsensepkgs>
   <packages>
     <package>
-	  <name>upnp</name>
-	  <descr>Emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP Internet Gateway Device specification (IGD) and allows UPnP aware clients, such as MSN Messenger to work properly from behind a NAT firewall.</descr>
-	  <website>http://linux-igd.sourceforge.net/</website>
-	  <category>Network Management</category>
-	  <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
-	  <depends_on_package>linuxigd-0.92_2.tbz</depends_on_package>
-	  <version>1.0.5</version>
-	  <status>*ALPHA* *DANGER* *MAY WRECK SECURITY, USE AT OWN RISK*</status>
-	  <config_file>http://www.pfsense.com/packages/config/upnpd.xml</config_file>
-	  <configurationfile>upnpd.xml</configurationfile>
-    </package>
-    <package>
       <name>ntop</name>
       <website>http://www.ntop.org/</website>
       <descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
@@ -348,6 +336,18 @@ test server or link availability and modify translation or routing rules. This p
 	  <status>ALPHA</status>
 	  <version>9.5</version>
     </package>
+    <package>
+	  <name>upnp</name>
+	  <descr>Emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP Internet Gateway Device specification (IGD) and allows UPnP aware clients, such as MSN Messenger to work properly from behind a NAT firewall.</descr>
+	  <website>http://linux-igd.sourceforge.net/</website>
+	  <category>Network Management</category>
+	  <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
+	  <depends_on_package>linuxigd-0.92_2.tbz</depends_on_package>
+	  <version>1.0.5</version>
+	  <status>*ALPHA* *DANGER* *MAY WRECK SECURITY, USE AT OWN RISK*</status>
+	  <config_file>http://www.pfsense.com/packages/config/upnpd.xml</config_file>
+	  <configurationfile>upnpd.xml</configurationfile>
+    </package>	
     <package>
 	  <name>pure-ftpd</name>
 	  <website>http://www.pureftpd.org/</website>
