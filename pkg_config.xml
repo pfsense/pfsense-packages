@@ -10,7 +10,7 @@
 	  <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
 	  <depends_on_package>linuxigd-0.92_2.tbz</depends_on_package>
 	  <version>1.0.5</version>
-	  <status>*ALPHA*</status>
+	  <status>*ALPHA* *DANGER* *MAY WRECK SECURITY, USE AT OWN RISK*</status>
 	  <config_file>http://www.pfsense.com/packages/config/upnpd.xml</config_file>
 	  <configurationfile>upnpd.xml</configurationfile>
     </package>
