@@ -17,6 +17,8 @@
 			fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");
 			fwrite($fout, "# PACKAGE: UPNP\n");
 			fwrite($fout, "# EXECUTABLE: upnpd\n\n");
+			fwrite($fout, "/sbin/route add -net 239.0.0.0 -iface {$lanif}\n\n");
+			fwrite($fout, "# Start package\n");
 			fwrite($fout, "/usr/local/bin/upnpd {$wanif} {$lanif}");
 			fclose($fout);
 			chmod("/usr/local/etc/rc.d/upnpd.sh", 0755);
