@@ -193,7 +193,7 @@
 		<field>
                         <fielddescr>Enable cachemgr</fielddescr>
                         <fieldname>cachemgr_enabled</fieldname>
-  <description>Enable Squid's cachemgr.cgi to provide stats.  Once enabled you can access this from the pfSense menus.  <b>Note:</b> This page is not secured by pfSense, any user with access to the pfSense admin port can view the stats.  The page prompts for a password but it only required for shutting down Squid.</description>
+  <description>Enable Squid's cachemgr.cgi to provide stats.  Once enabled you can access this from the pfSense menus.  &lt;b&gt;Note:&lt;/b&gt; This page is not secured by pfSense, any user with access to the pfSense admin port can view the stats.  The page prompts for a password but it only required for shutting down Squid.</description>
                         <type>checkbox</type>
                 </field>
 
