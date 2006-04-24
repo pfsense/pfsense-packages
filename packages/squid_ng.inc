@@ -51,6 +51,7 @@ function global_write_squid_config()
     $visible_hostname      = $config['installedpackages']['squid']['config'][0]['visible_hostname'];
     $cache_admin_email     = $config['installedpackages']['squid']['config'][0]['cache_admin_email'];
     $error_language 	   = $config['installedpackages']['squid']['config'][0]['error_language'];
+    $cachemgr_enabled	   = $config['installedpackages']['squid']['config'][0]['cachemgr_enabled'];
             
     /* squid_upstream.xml values */
     $proxy_forwarding	   = $config['installedpackages']['squidupstream']['config'][0]['proxy_forwarding'];
@@ -125,6 +126,14 @@ function global_write_squid_config()
         
 	$config_array = array('shutdown_lifetime 5 seconds' . "\n\n");
 
+        if (isset($cachemgr_enabled) && ($cachemgr_enabled == "on")) {
+		mwexec("cp /usr/local/libexec/squid/cachemgr.cgi /usr/local/www/cachemgr.cgi");
+		mwexec("chmod a+rx /usr/local/www/cachemgr.cgi");
+        } else {
+		mwexec("rm -f /usr/local/www/cachemgr.cgi");
+	}
+        unset($cachemgr_enabled);
+
 	if (!isset($icp_port) or ($icp_port == "")) {
 		$icp_port = "3130"; 
 	}
@@ -143,6 +152,7 @@ function global_write_squid_config()
 		$config_array[] = 'acl QUERY urlpath_regex cgi-bin \?' . "\n";
 		$config_array[] = 'no_cache deny QUERY' . "\n\n";		
 	}
+	$config_array[] = 'http_port 127.0.0.1:' . $proxy_port . "\n\n";
 	unset($proxy_port);
 
 	if (isset($domain) && ($domain !== "")) {
@@ -803,8 +813,6 @@ function custom_php_install_command() {
 		mwexec("chown squid:squid /usr/local/etc/squid/advanced/acls/src_unrestricted_ip.acl");
 		mwexec("cp /usr/local/etc/squid/mime.conf.default /usr/local/etc/squid/mime.conf");
 		
-		mwexec("cp mv /usr/lib/squid/cachemgr.cgi /usr/local/www/cachemgr.cgi");
-		mwexec("chmod a+rx /usr/local/www/cachemgr.cgi");
 		
 		/* set a few extra items noted by regan */
 		update_output_window("Creating logs and setting user information...");
@@ -904,6 +912,7 @@ function custom_php_deinstall_command() {
 	unlink_if_exists("/usr/local/libexec/squid");
 	unlink_if_exists("/usr/local/etc/rc.d/aSquid.sh");
 	mwexec("rm -f /usr/local/etc/rc.d/squid*");
+	mwexec("rm -f /usr/local/www/cachemgr.cgi");
 	filter_configure();
 }
 
