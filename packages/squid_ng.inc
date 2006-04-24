@@ -44,7 +44,8 @@ function global_write_squid_config()
     $active_interface      = $config['installedpackages']['squid']['config'][0]['active_interface'];
     $transparent_proxy     = $config['installedpackages']['squid']['config'][0]['transparent_proxy'];
     $log_enabled           = $config['installedpackages']['squid']['config'][0]['log_enabled'];
-    $urlfier_enable      = $config['installedpackages']['squid']['config'][0]['urlfilter_enable'];
+    $urlfier_enable        = $config['installedpackages']['squid']['config'][0]['urlfilter_enable'];
+    $accesslog_disabled    = $config['installedpackages']['squid']['config'][0]['accesslog_disabled'];
     $log_query_terms       = $config['installedpackages']['squid']['config'][0]['log_query_terms'];
     $log_user_agents       = $config['installedpackages']['squid']['config'][0]['log_user_agents'];
     $proxy_port            = $config['installedpackages']['squid']['config'][0]['proxy_port'];
@@ -221,10 +222,15 @@ function global_write_squid_config()
 	}
 	$config_array[] = 'cache_replacement_policy ' . $cache_replacement . "\n\n";
 	unset($cache_replacement);
-			
-	$config_array[] = 'cache_access_log /var/log/access.log' . "\n";
+
+	if (isset($accesslog_disabled) && ($accesslog_disabled == "on")) {
+		$config_array[] = 'cache_access_log none' . "\n";
+	} else {
+		$config_array[] = 'cache_access_log /var/log/access.log' . "\n";
+	}
 	$config_array[] = 'cache_log /var/log/cache.log' . "\n";
 	$config_array[] = 'cache_store_log none' . "\n";
+	unset($accesslog_disabled);
 	unset($log_enabled);
 
 	if (isset($log_query_terms) && ($log_query_terms == "on")) {
@@ -956,8 +962,8 @@ function write_static_squid_config() {
 	fwrite($fout, "cache_replacement_policy heap GDSF\n");
 	fwrite($fout, "\n");
 	
-	fwrite($fout, "cache_access_log /dev/null\n");
-	fwrite($fout, "cache_log /dev/null\n");
+	fwrite($fout, "cache_access_log none\n");
+	fwrite($fout, "cache_log none\n");
 	fwrite($fout, "cache_store_log none\n");
 	fwrite($fout, "\n");
 	

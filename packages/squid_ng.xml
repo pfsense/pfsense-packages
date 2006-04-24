@@ -114,6 +114,12 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fielddescr>Disable Access Log</fielddescr>
+			<fieldname>accesslog_disabled</fieldname>
+			<description>Disable the access log entirely.  By default, Squid keeps a log of all requests it processes in /var/log/access.log.  This can grow to be fairly large.  If you do not require this logging, check this box to disable.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>Log Query Terms</fielddescr>
 			<fieldname>log_query_terms</fieldname>
 			<description>This will log the complete URL rather than the part of the URL containing dynamic queries.</description>
