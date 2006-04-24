@@ -176,7 +176,7 @@ test server or link availability and modify translation or routing rules. This p
 	  <category>Network Management</category>
 	  <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
 	  <depends_on_package>squid-2.5.12_4.tbz</depends_on_package>
-	  <version>2.5.12.1</version>
+	  <version>2.5.12_4</version>
 	  <status>ALPHA</status>
 	  <config_file>http://www.pfsense.com/packages/config/squid_ng.xml</config_file>
 	  <configurationfile>squid_ng.xml</configurationfile>
