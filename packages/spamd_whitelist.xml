@@ -2,7 +2,7 @@
 <packagegui>
 	<name>spamd-whitelist</name>
 	<version>0.1.0</version>
-	<title>SpamD Whitelist - this list overrides all other blacklists.</title>
+	<title>SpamD Whitelist</title>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>SpamD Whitelist</name>
