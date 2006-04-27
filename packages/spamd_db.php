@@ -26,7 +26,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-
+ 
 require("guiconfig.inc");
 
 if($_POST['filter'])
@@ -220,12 +220,6 @@ if (typeof getURL == 'undefined') {
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_natconfdirty_path)): ?><p>
 <?php endif; ?>
-<table>
-<tr><td align="right">Filter by test:</td><td><input name="filter" value="<?=$filter?>"></input></td><td><input type="submit" value="Filter"></td><td>Inverse filter (NOT):</td><td><input type="checkbox" id="not" name="not" <?php if($not) echo " CHECKED"; ?>></td></tr>
-<tr><td align="right">Limit:</td><td><input name="limit" value="<?=$limit?>"></input></td></tr>
-<tr><td>&nbsp;</td></tr>
-<tr><td align="right">Add spam trap E-mail address:</td><td><input name="spamtrapemail" value="<?=$spamtrapemail?>"></input></td><td><input type="submit" value="Add"></td></tr>
-</table><br>
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
 <?php
@@ -243,6 +237,17 @@ if (typeof getURL == 'undefined') {
 	<div id="mainarea">
 		<table id="maintable" name="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr><td>
+		
+
+<table>
+<tr><td align="right">Filter by test:</td><td><input name="filter" value="<?=$filter?>"></input></td><td><input type="submit" value="Filter"></td><td>Inverse filter (NOT):</td><td><input type="checkbox" id="not" name="not" <?php if($not) echo " CHECKED"; ?>></td></tr>
+<tr><td align="right">Limit:</td><td><input name="limit" value="<?=$limit?>"></input></td></tr>
+<tr><td>&nbsp;</td></tr>
+<tr><td align="right">Add spam trap E-mail address:</td><td><input name="spamtrapemail" value="<?=$spamtrapemail?>"></input></td><td><input type="submit" value="Add"></td></tr>
+</table><br>
+		
+		
+		
 			<table id="sortabletable1" name="sortabletable1" class="sortable" width="100%" border="0" cellpadding="0" cellspacing="0">
 			    <tr id="frheader">
 					<td class="listhdrr">Type</td>
