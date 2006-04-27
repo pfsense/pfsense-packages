@@ -71,6 +71,7 @@ if($_GET['action'] or $_POST['action']) {
 		usleep(100);
 		exec("/usr/local/sbin/spamdb -a {$srcip}");
 		mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
+		log_error("spamd: {$srcip} has been whitelisted by {$_SERVER['REMOTE_ADDR']}");
 		hup_spamd();
 		exit;
 	} else if($action == "delete") {
@@ -79,6 +80,7 @@ if($_GET['action'] or $_POST['action']) {
 		hup_spamd();
 		mwexec("/sbin/pfctl -q -t spamd -T delete $srcip");
 		mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
+		log_error("spamd: {$srcip} has been deleted by {$_SERVER['REMOTE_ADDR']}");
 		exit;
 	} else if($action == "spamtrap") {
 		delete_from_spamd_db($email);
@@ -86,12 +88,14 @@ if($_GET['action'] or $_POST['action']) {
 		exec("/usr/local/sbin/spamdb -a \"<{$email}>\" -T");
 		hup_spamd();
 		mwexec("/sbin/pfctl -q -t blacklist -T add -f /var/db/blacklist.txt");
+		log_error("spamd: {$srcip} has been blacklisted by {$_SERVER['REMOTE_ADDR']}");
 		exit;
 	} else if($action == "trapped") {
 		delete_from_spamd_db($srcip);
 		usleep(100);
 		exec("/usr/local/sbin/spamdb -a {$srcip} -t");
 		add_to_blacklist($srcip);
+		log_error("spamd: {$srcip} has been trapped by {$_SERVER['REMOTE_ADDR']}");
 		hup_spamd();
 		exit;
 	}
