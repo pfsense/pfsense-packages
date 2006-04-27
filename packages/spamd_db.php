@@ -240,10 +240,10 @@ if (typeof getURL == 'undefined') {
 		
 
 <table>
-<tr><td align="right">Filter by test:</td><td><input name="filter" value="<?=$filter?>"></input></td><td><input type="submit" value="Filter"></td><td>Inverse filter (NOT):</td><td><input type="checkbox" id="not" name="not" <?php if($not) echo " CHECKED"; ?>></td></tr>
+<tr><td align="right">Filter by test:</td><td><input name="filter" value="<?=$filter?>"></input></td><td><input type="submit" value="Filter"></td><td>&nbsp;&nbsp;Inverse filter (NOT):</td><td><input type="checkbox" id="not" name="not" <?php if($not) echo " CHECKED"; ?>></td></tr>
 <tr><td align="right">Limit:</td><td><input name="limit" value="<?=$limit?>"></input></td></tr>
 <tr><td>&nbsp;</td></tr>
-<tr><td align="right">Add spam trap E-mail address:</td><td><input name="spamtrapemail" value="<?=$spamtrapemail?>"></input></td><td><input type="submit" value="Add"></td></tr>
+<tr><td align="right">* Add spam trap E-mail address:</td><td><input name="spamtrapemail" value="<?=$spamtrapemail?>"></input></td><td><input type="submit" value="Add"></td></tr>
 </table><br>
 		
 		
@@ -342,6 +342,8 @@ if (typeof getURL == 'undefined') {
 ?>	</td></tr></table>
 	<tr><td>
 		<?php echo "<font face=\"arial\"><p><b>" . ($rows-1) . "</b> rows returned."; ?>
+		<p>
+		* NOTE: adding an e-mail address to the spamtrap automatically traps any server trying to send e-mail to this address.
 	</td></tr>
 	</table>
 	</div>
