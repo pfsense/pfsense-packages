@@ -30,7 +30,7 @@
 require("config.inc");
 
 if($_GET['loginname'])
-	$username = $_GET['loginname'];
+	$loginname = " Username: " . $_GET['loginname'];
 if($_GET['username'])
 	$username = $_GET['username'];
 if($_GET['password'])
