@@ -1,0 +1,24 @@
+<packagegui>
+	<name>clamav</name>
+	<version>0.1</version>
+	<title>ClamAV: Settings</title>
+	<include_file>/usr/local/pkg/clamav.inc</include_file>
+
+	<service>
+		<name>clamav</name>
+		<rcfile>/usr/local/etc/rc.d/clamav.sh</rcfile>
+	</service>
+
+    	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://agni.linuxense.com/packages/config/clamav.inc</item>
+	</additional_files_needed>
+
+	<custom_php_install_command> clamav_install_command(); </custom_php_install_command>
+	<custom_php_deinstall_command> clamav_deinstall_command(); </custom_php_deinstall_command>
+	<custom_delete_php_command> sync_package_clamav(); </custom_delete_php_command>
+	<custom_php_resync_config_command> sync_package_clamav(); </custom_php_resync_config_command>
+	<custom_add_php_command> sync_package_clamav(); </custom_add_php_command>
+</packagegui>
+

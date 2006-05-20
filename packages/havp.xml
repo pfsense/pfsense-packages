@@ -1,0 +1,109 @@
+<packagegui>
+	<name>havp</name>
+	<version>0.1</version>
+	<title>Havp: Settings</title>
+	<include_file>/usr/local/pkg/havp.inc</include_file>
+
+	<menu>
+		<name>HAVP</name>
+		<section>Services</section>
+		<tooltiptext>Modify HAVP settings.</tooltiptext>
+		<url>/pkg_edit.php?xml=havp.xml&amp;act=edit&amp;id=0</url>
+		<configfile>havp.xml</configfile>
+	</menu>
+
+	<service>
+		<name>havp</name>
+		<rcfile>/usr/local/etc/rc.d/havp.sh</rcfile>
+	</service>
+
+	<tabs>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=havp.xml&amp;act=edit&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Whitelist</text>
+			<url>/pkg.php?xml=havp_whitelist.xml</url>
+		</tab>
+		<tab>
+			<text>Blacklist</text>
+			<url>/pkg.php?xml=havp_blacklist.xml</url>
+		</tab>
+	</tabs>
+
+    	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://agni.linuxense.com/packages/config/havp.inc</item>
+	</additional_files_needed>
+    	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://agni.linuxense.com/packages/config/havp_whitelist.xml</item>
+	</additional_files_needed>
+    	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://agni.linuxense.com/packages/config/havp_blacklist.xml</item>
+	</additional_files_needed>
+
+	<configpath>['installedpackages']['havp]['config']</configpath>
+
+	<fields>
+		<field>
+			<fielddescr>Server Number</fielddescr>
+			<fieldname>servernumber</fieldname>
+			<description>Specify how many servers (child processes) are simultaneously listening on port PORT for a connection. Minimum value should be the peak requests-per-second expected + 5 for headroom.</description>
+			<type>input</type>
+		</field>		
+		<field>
+			<fielddescr>Max Server Number</fielddescr>
+			<fieldname>maxservers</fieldname>
+			<description>This is the hard limit for concurrent requests processed.</description>
+			<type>input</type>
+		</field>		
+		<field>
+			<fielddescr>Transparent?</fielddescr>
+			<fieldname>transparent</fieldname>
+			<description>Run HAVP as transparent Proxy?</description>
+			<type>checkbox</type>
+			<value>yes</value>
+		</field>		
+		<field>
+			<fielddescr>Port</fielddescr>
+			<fieldname>port</fieldname>
+			<description>Port HAVP is listening on.</description>
+			<type>input</type>
+			<value>8080</value>
+		</field>		
+		<field>
+			<fielddescr>Bind Address</fielddescr>
+			<fieldname>bind_address</fieldname>
+			<description>IP address that HAVP listens on. Leave it empty to bind all addresses.</description>
+			<type>input</type>
+		</field>		
+		<field>
+			<fielddescr>Source Address</fielddescr>
+			<fieldname>source_address</fieldname>
+			<description>IP address used for sending outbound packets. Let it be undefined if you want OS to handle right address.</description>
+			<type>input</type>
+		</field>		
+		<field>
+			<fielddescr>Range Requests</fielddescr>
+			<fieldname>range</fieldname>
+			<description> Allow HTTP Range Requests?</description>
+			<type>checkbox</type>
+			<value>yes</value>
+		</field>		
+	</fields>
+
+	<custom_php_install_command> havp_install_command(); </custom_php_install_command>
+	<custom_php_deinstall_command> havp_deinstall_command(); </custom_php_deinstall_command>
+	<custom_delete_php_command> sync_package_havp(); </custom_delete_php_command>
+	<custom_php_resync_config_command> sync_package_havp(); </custom_php_resync_config_command>
+	<custom_add_php_command> sync_package_havp(); </custom_add_php_command>
+
+</packagegui>
+

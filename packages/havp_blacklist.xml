@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>havp-blacklist</name>
+	<version>0.1.0</version>
+	<title>Havp: Blacklist</title>
+	<include_file>/usr/local/pkg/havp.inc</include_file>
+
+	<menu>
+		<name>HAVP Blacklist</name>
+		<tooltiptext></tooltiptext>
+		<section>Services</section>
+		<configfile>havp.xml</configfile>
+	</menu>
+	<tabs>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=havp.xml&amp;act=edit&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Whitelist</text>
+			<url>/pkg.php?xml=havp_whitelist.xml</url>
+		</tab>
+		<tab>
+			<text>Blacklist</text>
+			<url>/pkg.php?xml=havp_blacklist.xml</url>
+			<active/>
+		</tab>
+	</tabs>
+
+    	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://agni.linuxense.com/packages/config/havp.inc</item>
+	</additional_files_needed>
+
+	<configpath>['installedpackages']['havpblacklist']['config']</configpath>
+
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Blocked URL</fielddescr>
+			<fieldname>url</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+
+	<fields>
+		<field>
+			<fielddescr>Blocked URL</fielddescr>
+			<fieldname>url</fieldname>
+			<description>Enter the URL to blacklist</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter the description for this url</description>
+			<type>input</type>
+		</field>
+	</fields>
+
+	<custom_php_command_before_form>sync_package_havp_blacklist();</custom_php_command_before_form>
+	<custom_delete_php_command>sync_package_havp_blacklist();</custom_delete_php_command>	
+	<custom_php_resync_config_command>sync_package_havp_blacklist();</custom_php_resync_config_command>
+</packagegui>
