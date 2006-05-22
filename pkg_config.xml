@@ -11,7 +11,7 @@
 			<depends_on_package_base_url>http://agni.linuxense.com/packages</depends_on_package_base_url>
 			<depends_on_package>clamav-0.88_1.tbz</depends_on_package>
 			<version>0.4</version>
-			<status>BETA</status>
+			<status>BROKEN</status>
 			<maintainer>raj@linuxense.com</maintainer>
 			<configurationfile>clamav.xml</configurationfile>
 			<logging>
@@ -28,7 +28,7 @@
 			<depends_on_package_base_url>http://agni.linuxense.com/packages</depends_on_package_base_url>
 			<depends_on_package>havp-0.80pre_1.tbz</depends_on_package>
 			<version>0.2</version>
-			<status>BETA</status>
+			<status>BROKEN</status>
 			<maintainer>raj@linuxense.com</maintainer>
 			<configurationfile>havp.xml</configurationfile>
 			<logging>
