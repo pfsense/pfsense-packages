@@ -22,6 +22,7 @@ function clamav_install_command() {
 	mwexec ("mkdir -p /var/db/clamav");
 	mwexec ("chown clamav:clamav /var/db/clamav/");
 	mwexec ("chown clamav:clamav /var/log/clamav/");
+	update_output_window("Updating Virus Signatures...");
 	mwexec ("/usr/local/bin/freshclam");
 	sync_package_clamav();
 }
