@@ -3,12 +3,12 @@
 	<version>0.1</version>
 	<title>Havp: Settings</title>
 	<include_file>/usr/local/pkg/havp.inc</include_file>
-
+        <aftersaveredirect>/pkg_edit.php?xml=havp.xml&amp;id=0</aftersaveredirect>
 	<menu>
 		<name>HAVP</name>
 		<section>Services</section>
 		<tooltiptext>Modify HAVP settings.</tooltiptext>
-		<url>/pkg_edit.php?xml=havp.xml&amp;act=edit&amp;id=0</url>
+		<url>/pkg_edit.php?xml=havp.xml&amp;id=0</url>
 		<configfile>havp.xml</configfile>
 	</menu>
 
@@ -20,7 +20,7 @@
 	<tabs>
 		<tab>
 			<text>Settings</text>
-			<url>/pkg_edit.php?xml=havp.xml&amp;act=edit&amp;id=0</url>
+			<url>/pkg_edit.php?xml=havp.xml&amp;id=0</url>
 			<active/>
 		</tab>
 		<tab>
@@ -48,6 +48,11 @@
 	    <chmod>0755</chmod>
 	    <item>http://agni.linuxense.com/packages/config/havp_blacklist.xml</item>
 	</additional_files_needed>
+    	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://agni.linuxense.com/packages/config/havp.sh</item>
+	</additional_files_needed>
 
 	<configpath>['installedpackages']['havp]['config']</configpath>
 
@@ -67,7 +72,7 @@
 		<field>
 			<fielddescr>Transparent?</fielddescr>
 			<fieldname>transparent</fieldname>
-			<description>Run HAVP as transparent Proxy?</description>
+			<description>Run HAVP as transparent Proxy? [Broken now, sorry]</description>
 			<type>checkbox</type>
 			<value>yes</value>
 		</field>		
@@ -101,9 +106,7 @@
 
 	<custom_php_install_command> havp_install_command(); </custom_php_install_command>
 	<custom_php_deinstall_command> havp_deinstall_command(); </custom_php_deinstall_command>
-	<custom_delete_php_command> sync_package_havp(); </custom_delete_php_command>
 	<custom_php_resync_config_command> sync_package_havp(); </custom_php_resync_config_command>
-	<custom_add_php_command> sync_package_havp(); </custom_add_php_command>
 
 </packagegui>
 

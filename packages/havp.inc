@@ -19,36 +19,30 @@ function sync_package_havp() {
 	fwrite($fd, "ENABLETROPHIE false\n");
 	fwrite($fd, "ENABLENOD32 false\n");
 	fwrite($fd, "ENABLEAVAST false\n");
-        foreach($config['installedpackages']['havp']['config'] as $tmp) {
-		fwrite($fd,"SERVERNUMBER " . $tmp['servernumber'] . "\n");
-		fwrite($fd,"MAXSERVERS " . $tmp['maxservers'] . "\n");
-		fwrite($fd,"PORT " . $tmp['port'] . "\n");
-		if ($tmp['bind_address'] <> "")
-		  fwrite($fd,"BIND_ADDRESS " . $tmp['bind_address'] . " \n");
-		if ($tmp['source_address'] <> "")
-		  fwrite($fd,"SOURCE_ADDRESS " . $tmp['source_address'] . " \n");
-		if ($tmp['transparent'] == "on"){
-		  fwrite($fd,"TRANSPARENT true\n");
-		}
-		else {
-		  fwrite($fd,"TRANSPARENT false\n");
-		}
-		if ($tmp['range'] == "on"){
-		  fwrite($fd,"RANGE true\n");
-		}
-		else {
-		  fwrite($fd,"RANGE false\n");
-		}
+	if($config['installedpackages']['havp']['config'] != "") {
+	     foreach($config['installedpackages']['havp']['config'] as $tmp) {
+		  if ($tmp['servernumber'] != "") fwrite($fd,"SERVERNUMBER " . $tmp['servernumber'] . "\n");
+		  if ($tmp['maxservers'] != "") fwrite($fd,"MAXSERVERS " . $tmp['maxservers'] . "\n");
+		  if ($tmp['port'] != "") fwrite($fd,"PORT " . $tmp['port'] . "\n");
+		  if ($tmp['bind_address'] != "") fwrite($fd,"BIND_ADDRESS " . $tmp['bind_address'] . " \n");
+		  if ($tmp['source_address'] != "") fwrite($fd,"SOURCE_ADDRESS " . $tmp['source_address'] . " \n");
+
+		  if ($tmp['transparent'] == "on"){
+		       fwrite($fd,"TRANSPARENT true\n");
+		  }
+		  else {
+		       fwrite($fd,"TRANSPARENT false\n");
+		  }
+
+		  if ($tmp['range'] == "on"){
+		       fwrite($fd,"RANGE true\n");
+		  }
+		  else {
+		       fwrite($fd,"RANGE false\n");
+		  }
+	     }
 	}
 	fclose($fd);
-	$start = "/usr/local/sbin/havp &\n";
-	$stop  = "/usr/bin/killall havp\n" .   "sleep 2";
-	write_rcfile(array(
-			   "file" => "havp.sh",
-			   "start" => $start,
-			   "stop" =>  $stop
-			   )
-		     );
 	conf_mount_ro();
 	config_unlock();
 	unlink_if_exists("/usr/local/etc/havp/havp.config");
@@ -65,14 +59,18 @@ function havp_install_command() {
 	mwexec ("chown havp:havp /var/log/havp");
 	mwexec ("chown havp:havp /var/tmp/havp");
 	mwexec ("chown havp:havp /var/run/havp");
+	mwexec ("cp /usr/local/pkg/havp.sh /usr/local/etc/rc.d/");
+	mwexec ("chmod +x /usr/local/etc/rc.d/havp.sh");
 	sync_package_havp();
 }
 
 function havp_deinstall_command() {
 	global $config, $g;
+	mwexec("/usr/local/etc/rc.d/havp.sh stop");
 	conf_mount_rw();
 	unlink_if_exists("/usr/local/etc/rc.d/havp.sh");
 	unlink_if_exists("/usr/local/etc/havp/havp.config");
+	unlink_if_exists("/etc/havp.config");
 	conf_mount_ro();
 }
 function sync_package_havp_whitelist() {
