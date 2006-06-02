@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packagegui>
+	<include_file>clamsmtp.inc</include_file>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/clamsmtp.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/All/clamsmtpd</item>
+		<prefix>/usr/local/bin/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<custom_php_install_command>
+		clamsmtp_install_command();
+	</custom_php_install_command>
+	<service>
+		<name>clamsmtp</name>
+		<description>SMTP virus scanner.</description>
+		<rcfile>clamsmtp.sh</rcfile>
+		<executable>clamsmtpd</executable>
+	</service>
+</packagegui>
