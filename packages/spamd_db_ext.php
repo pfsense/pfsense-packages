@@ -73,7 +73,7 @@ if($_GET['action'] or $_POST['action']) {
 		usleep(100);
 		exec("/usr/local/sbin/spamdb -a {$srcip}");
 		mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
-		delete_from_spamd_bl($srcip);
+		delete_from_blacklist($srcip);
 		log_error("spamd: {$srcip} has been whitelisted by {$_SERVER['REMOTE_ADDR']} {$loginname}");
 		hup_spamd();
 		exit;
@@ -83,7 +83,7 @@ if($_GET['action'] or $_POST['action']) {
 		hup_spamd();
 		mwexec("/sbin/pfctl -q -t spamd -T delete $srcip");
 		mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
-		delete_from_spamd_bl($srcip);
+		delete_from_blacklist($srcip);
 		log_error("spamd: {$srcip} has been deleted by {$_SERVER['REMOTE_ADDR']} {$loginname}");
 		exit;
 	} else if($action == "spamtrap") {
@@ -156,27 +156,6 @@ if($_GET['whitelist'] <> "") {
 	exit;
 }
 
-function delete_from_spamd_bl($ip) {
-	config_lock();
-	if(!file_exists("/var/db/blacklist.txt")) 
-		return;
-	$blacklist = file("/var/db/blacklist.txt");
-	$new_blacklist = array();
-	foreach($blacklist as $bl) {
-		if(stristr($bl, $ip)) {
-			/* don't add item */	
-		} else {
-			$new_blacklist[] = $bl;
-		}
-	}
-	$fd = fopen("/var/db/blacklist.txt", "w");
-	foreach($new_blacklist as $bl) 
-		fwrite($fd, $bl . "\n");	
-	flose($fd);
-	mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
-	config_unlock();	
-}
-
 function delete_from_spamd_db($srcip) {
 	config_lock();
 	$fd = fopen("/tmp/execcmds", "w");
@@ -216,8 +195,9 @@ function delete_from_blacklist($srcip) {
 	$blacklist = split("\n", file_get_contents("/var/db/blacklist.txt"));
 	$fd = fopen("/var/db/blacklist.txt", "w");
 	foreach($blacklist as $bl) {
-		if($blacklist <> $srcip)
-			fwrite($fd, "{$srcip}\n");
+		if($bl <> "")
+			if(!stristr($bl, $srcip))
+				fwrite($fd, "{$bl}\n");
 	}
 	fclose($fd);
 	mwexec("/sbin/pfctl -q -t spamd -T delete $srcip");
