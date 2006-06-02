@@ -150,6 +150,21 @@ function delete_from_blacklist($srcip) {
 	config_unlock();
 }
 
+function delete_from_whitelist($srcip) {
+	config_lock();
+	$whitelist = split("\n", file_get_contents("/var/db/whitelist.txt"));
+	$fd = fopen("/var/db/whitelist.txt", "w");
+	foreach($whitelist as $wl) {
+		if($wl <> "")
+			if(!stristr($wl, $srcip))
+				fwrite($fd, "{$wl}\n");
+	}
+	fclose($fd);
+	mwexec("/sbin/pfctl -q -t spamd -T delete $srcip");
+	mwexec("/sbin/pfctl -q -t whitelist -T replace -f /var/db/whitelist.txt");
+	config_unlock();
+}
+
 $pgtitle = "SpamD: Database";
 include("head.inc");
 
