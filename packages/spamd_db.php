@@ -168,6 +168,18 @@ function delete_from_whitelist($srcip) {
 $pgtitle = "SpamD: Database";
 include("head.inc");
 
+if(file_exists("/var/db/whitelist.txt"))
+	$whitelist_items = `cat /var/db/whitelist.txt | wc -l`;
+else 
+	$whitelist_items = "0";
+	
+if(file_exists("/var/db/blacklist.txt"))
+	$blacklist_items = `cat /var/db/blacklist.txt | wc -l`;
+else 
+	$blacklist_items = "0";
+
+$spamdb_items = `/usr/local/sbin/spamdb | wc -l`;
+
 ?>
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php include("fbegin.inc"); ?>
@@ -401,6 +413,12 @@ if (typeof getURL == 'undefined') {
 <br>
 <span class="vexpl"><strong><span class="red">Note:</span> Clicking on the action icons will invoke a AJAX query and the page will not refresh.   Click refresh in you're browser if you wish to view the changes in status.</strong></span>
 <br>
+		<p><font size="-2"><b>Database totals:</b><br><font size="-3">
+		<?php
+			echo "&nbsp;&nbsp;{$whitelist_items} total items in the whitelist.<br>";
+			echo "&nbsp;&nbsp;{$blacklist_items} total items in the blacklist.<br>";
+			echo "&nbsp;&nbsp;{$spamdb_items} total items in the SpamDB.<br>";
+		?>
 <?php include("fend.inc"); ?>
 </body>
 </html>
