@@ -1,128 +1,109 @@
-<?xml version="1.0" encoding="utf-8" ?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <packagegui>
+	<include_file>squid.inc</include_file>
 	<name>squidtraffic</name>
-	<title>Services: Proxy Server -> Traffic Management</title>		
-	<configpath>installedpackages->package->squidtraffic->configuration->settings</configpath>
-		
-	<aftersaveredirect>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</aftersaveredirect>
-
+	<title>Proxy server: Traffic management</title>		
 	<tabs>
 		<tab>
-			<text>General Settings</text>
-			<url>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</url>
+			<text>General settings</text>
+			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
 		</tab>
-		
 		<tab>
-			<text>Upstream Proxy</text>
+			<text>Upstream proxy</text>
 			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
 		</tab>
-		
 		<tab>
-			<text>Cache Mgmt</text>
+			<text>Cache management</text>
 			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
 		</tab>
-			
 		<tab>
-			<text>Network Access Control</text>
+			<text>Access control</text>
 			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
 		</tab>
-			
 		<tab>
-			<text>Traffic Mgmt</text>
+			<text>Traffic management</text>
 			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
 			<active/>
 		</tab>
-			
 		<tab>
-			<text>Auth Settings</text>
+			<text>Auth settings</text>
 			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
 		</tab>
-		
 		<tab>
-			<text>Extended Auth Settings</text>
-			<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>
+			<text>Local users</text>
+			<url>/pkg.php?xml=squid_users.inc</url>
 		</tab>
 	</tabs>
-	
 	<fields>
 		<field>
-			<fielddescr>Maximum Download Size (KB)</fielddescr>
 			<fieldname>max_download_size</fieldname>
-			<description>This value allows limitation to download size (in KB) for each download request.  The default value is 0, which disables the limitation.</description>
+			<fielddescr>Maximum download size</fielddescr>
+			<description>Limit the maximum total download size to the size specified here (in kilobytes). Set to 0 to disable.</description>
+			<default_value>0</default_value>
+			<required/>
 			<type>input</type>
-			<size>4</size>
 		</field>
-		
 		<field>
-			<fielddescr>Maximum Upload Size (KB)</fielddescr>
 			<fieldname>max_upload_size</fieldname>
-			<description>This value allows limitation to upload size (in KB) for each upload request.  The default value is 0, which disables the limitation.</description>
+			<fielddescr>Maximum upload size</fielddescr>
+			<description>Limit the maximum total upload size to the size specified here (in kilobytes). Set to 0 to disable.</description>
+			<default_value>0</default_value>
+			<required/>
 			<type>input</type>
-			<size>4</size>
 		</field>
-		
 		<field>
-			<fielddescr>Download Throttle on Interface</fielddescr>
-			<fieldname>dl_overall</fieldname>
-			<description>This value specifies the bandwidth throttle on the interface if desired.</description>
-			<type>select</type>
-			<options>
-				<option><name>64 kBit/s</name><value>64</value></option>
-				<option><name>128 kBit/s</name><value>128</value></option>
-				<option><name>256 kBit/s</name><value>256</value></option>
-				<option><name>512 kBit/s</name><value>512</value></option>
-				<option><name>1024 kBit/s</name><value>1024</value></option>
-				<option><name>2048 kBit/s</name><value>2048</value></option>
-				<option><name>3072 kBit/s</name><value>3072</value></option>
-				<option><name>5120 kBit/s</name><value>5120</value></option>
-				<option><name>Unlimited</name><value>unlimited</value></option>
-			</options>
+			<fieldname>overall_throttling</fieldname>
+			<fielddescr>Overall bandwidth throttling</fielddescr>
+			<description>This value specifies (in kilobytes per second) the bandwidth throttle for downloads. Users will gradually have their download speed increased according to this value. Set to 0 to disable bandwidth throttling.</description>
+			<default_value>0</default_value>
+			<required/>
+			<type>input</type>
 		</field>
-	
 		<field>
-			<fielddescr>Download Limit Per Host</fielddescr>
-			<fieldname>dl_per_host</fieldname>
-			<description>This value specifies the download limit per host if desired.</description>
-			<type>select</type>
-			<options>
-				<option><name>64 kBit/s</name><value>64</value></option>
-				<option><name>128 kBit/s</name><value>128</value></option>
-				<option><name>256 kBit/s</name><value>256</value></option>
-				<option><name>512 kBit/s</name><value>512</value></option>
-				<option><name>1024 kBit/s</name><value>1024</value></option>
-				<option><name>2048 kBit/s</name><value>2048</value></option>
-				<option><name>3072 kBit/s</name><value>3072</value></option>
-				<option><name>5120 kBit/s</name><value>5120</value></option>
-				<option><name>Unlimited</name><value>unlimited</value></option>
-			</options>
+			<fieldname>perhost_throttling</fieldname>
+			<fielddescr>Per-host throttling</fielddescr>
+			<description>This value specifies the download throttling per host. Set to 0 to disable this.</description>
+			<default_value>0</default_value>
+			<required/>
+			<type>input</type>
 		</field>
-		
 		<field>
-			<fielddescr>Throttle Binary Files</fielddescr>
-			<fieldname>throttle_binary_files</fieldname>
+			<fieldname>throttle_specific</fieldname>
+			<fielddescr>Throttle only specific extensions</fielddescr>
+			<description>Leave this checked to be able to choose the extensions that throttling will be applied to. Otherwise, all files will be throttled.</description>
+			<default_value>on</default_value>
+			<type>checkbox</type>
+			<enablefields>throttle_binaries,throttle_cdimages,throttle_multimedia,throttle_others</enablefields>
+		</field>
+		<field>
+			<fieldname>throttle_binaries</fieldname>
+			<fielddescr>Throttle binary files</fielddescr>
+			<description>Check this to apply bandwidth throttle to binary files. This includes compressed archives and executables.</description>
 			<type>checkbox</type>
 		</field>
-		
 		<field>
-			<fielddescr>Throttle CD Images</fielddescr>
-			<fieldname>throttle_cd_images</fieldname>
+			<fieldname>throttle_cdimages</fieldname>
+			<fielddescr>Throttle CD images</fielddescr>
+			<description>Check this to apply bandwidth throttle to CD image files.</description>
 			<type>checkbox</type>
 		</field>
-		
 		<field>
-			<fielddescr>Throttle Multimedia</fielddescr>
 			<fieldname>throttle_multimedia</fieldname>
+			<fielddescr>Throttle multimedia files</fielddescr>
+			<description>Check this to apply bandwidth throttle to multimedia files, such as movies or songs.</description>
 			<type>checkbox</type>
 		</field>
-			
+		<field>
+			<fieldname>throttle_others</fieldname>
+			<fielddescr>Throttle other extensions</fielddescr>
+			<description>Comma-separated list of extensions to apply bandwidth throttle to.</description>
+			<type>input</type>
+		</field>
 	</fields>
-	
-	<custom_add_php_command_late>	
-		require_once("/usr/local/pkg/squid_ng.inc");
-
-		global_write_squid_config();
-		mwexec("/usr/local/sbin/squid -k reconfigure");
-	</custom_add_php_command_late>
-	
+	<custom_php_validation_command>
+		squid_validate_traffic($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		squid_resync();
+	</custom_php_resync_config_command>
 </packagegui>

@@ -1,136 +1,144 @@
-<?xml version="1.0" encoding="utf-8" ?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <packagegui>
+	<include_file>squid.inc</include_file>
 	<name>squidauth</name>
-	<title>Services: Proxy Server -> Authentication Settings</title>
-	<category>Security</category>
-	<version>2.5.10_4</version>
-	<configpath>installedpackages->package->squidauth->configuration->settings</configpath>
-
-	<files></files>
-	<menu></menu>
-	
-	<aftersaveredirect>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</aftersaveredirect>
-	
+	<title>Proxy server: Authentication</title>
 	<tabs>
 		<tab>
-			<text>General Settings</text>
-			<url>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</url>
+			<text>General settings</text>
+			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
 		</tab>
-		
 		<tab>
-			<text>Upstream Proxy</text>
+			<text>Upstream proxy</text>
 			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
 		</tab>
-		
 		<tab>
-			<text>Cache Mgmt</text>
+			<text>Cache management</text>
 			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
 		</tab>
-			
 		<tab>
-			<text>Network Access Control</text>
+			<text>Access control</text>
 			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
 		</tab>
-			
 		<tab>
-			<text>Traffic Mgmt</text>
+			<text>Traffic management</text>
 			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
 		</tab>
-			
 		<tab>
-			<text>Auth Settings</text>
+			<text>Auth settings</text>
 			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
 			<active/>
 		</tab>
-		
 		<tab>
-			<text>Extended Auth Settings</text>
-			<url>/pkg.php?xml=squid_extauth.xml&amp;id=0</url>
-		</tab>		
+			<text>Local users</text>
+			<url>/pkg.php?xml=squid_users.xml</url>
+		</tab>
 	</tabs>
-	
 	<fields>
 		<field>
-			<fielddescr>Authentication Methods</fielddescr>
+			<fielddescr>Authentication method</fielddescr>
 			<fieldname>auth_method</fieldname>
-			<description>Select a valid authentication method.  This will allow users to be authenticated by external entities or a minimum, a local password in order to access websites.  The default value is "None".</description>
+			<description>Select an authentication method. This will allow users to be authenticated by local or external services.</description>
+			<default_value>none</default_value>
+			<required/>
 			<type>select</type>
 			<options>
 				<option><name>None</name><value>none</value></option>
-				<option><name>Local Authentication</name><value>local_auth</value></option>
-				<option><name>LDAP Authentication</name><value>ldap_bind</value></option>
-				<option><name>NT Domain Authentication</name><value>domain_auth</value></option>
-				<option><name>RADIUS Authentication</name><value>radius_auth</value></option>
+				<option><name>Local</name><value>local</value></option>
+				<option><name>LDAP</name><value>ldap</value></option>
+				<option><name>RADIUS</name><value>radius</value></option>
+				<option><name>NT domain</name><value>msnt</value></option>
 			</options>
+			<onchange>on_auth_method_changed()</onchange>
 		</field>
-	
 		<field>
-			<fielddescr>Number of Authentication Processes</fielddescr>
+			<fieldname>auth_server</fieldname>
+			<fielddescr>Authentication server</fielddescr>
+			<description>Enter here the IP or hostname of the server that will perform the authentication.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>auth_server_port</fieldname>
+			<fielddescr>Authentication server port</fielddescr>
+			<description>Enter here the port to use to connect to the authentication server. Leave this field blank to use the authentication method's default port.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>ldap_user</fieldname>
+			<fielddescr>LDAP server user DN</fielddescr>
+			<description>Enter here the user DN to use to connect to the LDAP server.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>ldap_password</fieldname>
+			<fielddescr>LDAP password</fielddescr>
+			<description>Enter here the password to use to connect to the LDAP server.</description>
+			<type>password</type>
+		</field>
+		<field>
+			<fieldname>ldap_basedomain</fieldname>
+			<fielddescr>LDAP base domain</fielddescr>
+			<description>For LDAP authentication, enter here the base domain in the LDAP server.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>radius_secret</fieldname>
+			<fielddescr>RADIUS secret</fielddescr>
+			<description>The RADIUS secret for RADIUS authentication.</description>
+			<type>password</type>
+		</field>
+		<field>
+			<fieldname>msnt_secondary</fieldname>
+			<fielddescr>Secondary NT servers</fielddescr>
+			<description>Comma-separated list of secondary servers to be used for NT domain authentication.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>auth_prompt</fieldname>
+			<fielddescr>Authentication prompt</fielddescr>
+			<description>This string will be displayed at the top of the authentication request window.</description>
+			<default_value>Please enter your credentials to access the proxy</default_value>
+			<type>input</type>
+		</field>
+		<field>
 			<fieldname>auth_processes</fieldname>
-			<description>The number of authenticator processes to spawn at one time.  If many authentications are expected within a short timeframe, increase this number accordingly.  The default value is 5.</description>
+			<fielddescr>Authentication processes</fielddescr>
+			<description>The number of authenticator processes to spawn. If many authentications are expected within a short timeframe, increase this number accordingly.</description>
+			<default_value>5</default_value>
 			<type>input</type>
-			<size>4</size>
 		</field>
-		
 		<field>
-			<fielddescr>Authentication Cache TTL (in minutes)</fielddescr>
-			<fieldname>auth_cache_ttl</fieldname>
-			<description>This specifies how long Squid assumes an externally validated username and password combination is valid for.  Upon reaching the timeframe set within this value, user(s) will be re-prompted to authenticate.</description>
+			<fieldname>auth_ttl</fieldname>
+			<fielddescr>Authentication TTL</fielddescr>
+			<description>This specifies for how long (in minutes) the proxy server assumes an externally validated username and password combination is valid (Time To Live).  When the TTL expires, the user will be prompted for credentials again.</description>
+			<default_value>60</default_value>
 			<type>input</type>
-			<size>4</size>
 		</field>
-		
 		<field>
-			<fielddescr>Limit IP Addresses per User</fielddescr>
-			<fieldname>limit_ip_addr</fieldname>
-			<description>A number can be specified to enforce restrictions to prevent potential replay attacks limiting the number of times a user can login from a different source IP address.  The default value is 2.</description>
-			<type>input</type>
-			<size>4</size>
-		</field>
-		
-		<field>
-			<fielddescr>User/IP Cache TTL (in minutes)</fielddescr>
-			<fieldname>user_ip_cache_ttl</fieldname>
-			<description>This value controls how long the proxy will remember the IP address that is associated with a user.  This is used in conjuction with the above option.</description>
-			<type>input</type>
-			<size>4</size>
-		</field>
-		
-		<field>
-			<fielddescr>Require Authentication for Unrestricted Source Addresses</fielddescr>
-			<fieldname>req_unrestricted_auth</fieldname>
-			<description></description>
+			<fieldname>unrestricted_auth</fieldname>
+			<fielddescr>Requiere authentication for unrestricted hosts</fielddescr>
+			<description>If this option is enabled, even users tagged as unrestricted through access control are required to authenticate to use the proxy.</description>
 			<type>checkbox</type>
 		</field>
-		
 		<field>
-			<fielddescr>Authentication Realm Prompt</fielddescr>
-			<fieldname>auth_realm_prompt</fieldname>
-			<description>This text will be displayed at the top of the authentication request window.</description>
-			<type>input</type>
-			<size>40</size>
-		</field>
-		
-		<field>
-			<fielddescr>Domains Without Authentication</fielddescr>
-			<fieldname>no_domain_auth</fieldname>
-			<description></description>
+			<fieldname>no_auth_hosts</fieldname>
+			<fielddescr>Subnets that don't need authentication</fielddescr>
+			<description>A comma-separated list of subnets (in CIDR range, e.g.: 10.5.0.0/16, 192.168.1.50/32) whose hosts won't be asked for authentication to access the proxy.</description>
 			<type>textarea</type>
 			<rows>5</rows>
 			<cols>50</cols>
 		</field>
-
 	</fields>
-	
-	<custom_add_php_command_late>	
-		require_once("/usr/local/pkg/squid_ng.inc");
-		require_once("/usr/local/pkg/squid_auth.inc");
-						
-		global_eval_auth_options();
-		
-		global_write_squid_config();
-		mwexec_bg("/usr/local/sbin/squid -k reconfigure");		
-	</custom_add_php_command_late>
-
+	<custom_php_after_head_command>
+		squid_print_javascript_auth();
+	</custom_php_after_head_command>
+	<custom_php_validation_command>
+		squid_validate_auth($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_php_after_form_command>
+		squid_print_javascript_auth2();
+	</custom_php_after_form_command>
+	<custom_php_resync_config_command>
+		squid_resync();
+	</custom_php_resync_config_command>
 </packagegui>
