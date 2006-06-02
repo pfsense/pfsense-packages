@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packagegui>
+	<include_file>sassassin.inc</include_file>
+
+	<!-- Installation -->
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sassassin_wl.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sassassin_bl.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sassassin.inc</item>
+	</additional_files_needed>
+	<custom_php_install_command>
+		sassassin_install_command();
+	</custom_php_install_command>
+	<menu>
+		<name>Antispam</name>
+		<tooltiptext>Configure the Antispam service.</tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=sassassin.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>SpamAssassin</name>
+		<description>The SpamAssassin spam detection software.</description>
+		<rcfile>spamd.sh</rcfile>
+		<executable>spamd</executable>
+	</service>
+
+	<!-- Interface -->
+	<name>spamassassin</name>
+	<title>Antispam: Configuration</title>
+	<tabs>
+		<tab>
+			<text>Configuration</text>
+			<url>/pkg_edit.php?xml=sassassin.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Whitelist</text>
+			<url>/pkg.php?xml=sassassin_wl.xml</url>
+		</tab>
+		<tab>
+			<text>Blacklist</text>
+			<url>/pkg.php?xml=sassassin_bl.xml</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fieldname>enable</fieldname>
+			<fielddescr>Enable antispam</fielddescr>
+			<description>Check to enable the antispam protection.</description>
+			<required/>
+			<type>checkbox</type>
+			<enablefields>bayes,bayes_learn,threshold,subject,send_spam</enablefields>
+		</field>
+		<field>
+			<fieldname>bayes</fieldname>
+			<fielddescr>Bayesian classifier</fielddescr>
+			<description>Check this to enable the Bayesian classifier.</description>
+			<default_value>on</default_value>
+			<required/>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fieldname>bayes_learn</fieldname>
+			<fielddescr>Bayesian auto-learning</fielddescr>
+			<description>Check this to enable the Bayesian auto-learning system.</description>
+			<default_value>on</default_value>
+			<required/>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fieldname>threshold</fieldname>
+			<fielddescr>Spam threshold</fielddescr>
+			<description>Set the threshold at which a message is considered spam.</description>
+			<default_value>5.0</default_value>
+			<required/>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>subject</fieldname>
+			<fielddescr>Rewrite subject</fielddescr>
+			<description>This is the string that will be added to the subject of spam emails.</description>
+			<default_value>*** SPAM ***</default_value>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>send_spam</fieldname>
+			<fielddescr>How to send spam messages</fielddescr>
+			<description>Choose between not sending spam messages, sending them as an RFC-822 MIME attachment (recommended) or as plain text.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<value>donotsave</value>
+					<name>Do not send</name>
+				</option>
+				<option>
+					<value>attachment</value>
+					<name>Send as an attachment (recommended)</name>
+				</option>
+				<option>
+					<value>plaintext</value>
+					<name>Send as plain text</name>
+				</option>
+			</options>
+			<default_value>attachment</default_value>
+		</field>
+	</fields>
+	<custom_php_validation_command>
+		sassassin_validate_input($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		sassassin_resync();
+	</custom_php_resync_config_command>
+</packagegui>
