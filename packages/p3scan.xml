@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packagegui>
+	<include_file>p3scan.inc</include_file>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/p3scan.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/All/p3scan</item>
+		<prefix>/usr/local/bin/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/p3scan.mail</item>
+		<prefix>/usr/local/etc/</prefix>
+	</additional_files_needed>
+	<custom_php_install_command>
+		p3scan_install_command();
+	</custom_php_install_command>
+	<service>
+		<name>p3scan</name>
+		<description>POP3 virus/spam scanner.</description>
+		<rcfile>p3scan.sh</rcfile>
+		<executable>p3scan</executable>
+	</service>
+</packagegui>
