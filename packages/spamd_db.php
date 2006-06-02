@@ -60,6 +60,7 @@ if($_GET['action'] or $_POST['action']) {
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
 		exec("/usr/local/sbin/spamdb -d \"<{$srcip}>\" -T");
 		exec("/usr/local/sbin/spamdb -d \"<{$srcip}>\" -t");
+		delete_from_spamd_bl($srcip);
 		mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
 		exec("echo spamdb -a {$srcip} > /tmp/tmp");
 		exec("/usr/local/sbin/spamdb -a {$srcip}");
@@ -67,6 +68,7 @@ if($_GET['action'] or $_POST['action']) {
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
 		exec("/usr/local/sbin/spamdb -d \"<{$srcip}>\" -T");
 		exec("/usr/local/sbin/spamdb -d \"<{$srcip}>\" -t");
+		delete_from_spamd_bl($srcip);
 		mwexec("/sbin/pfctl -q -t spamd -T delete $srcip");
 		mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");		
 	} else if($action == "spamtrap") {
@@ -108,6 +110,27 @@ if($_GET['getstatus'] <> "") {
 		echo "NOT FOUND";	
 	}	
 	exit;
+}
+
+function delete_from_spamd_bl($ip) {
+	config_lock();
+	if(!file_exists("/var/db/blacklist.txt")) 
+		return;
+	$blacklist = file("/var/db/blacklist.txt");
+	$new_blacklist = array();
+	foreach($blacklist as $bl) {
+		if(stristr($bl, $ip)) {
+			/* don't add item */	
+		} else {
+			$new_blacklist[] = $bl;
+		}
+	}
+	$fd = fopen("/var/db/blacklist.txt", "w");
+	foreach($new_blacklist as $bl) 
+		fwrite($fd, $bl . "\n");	
+	flose($fd);
+	mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
+	config_unlock();	
 }
 
 /* spam trap e-mail address */
