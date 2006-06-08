@@ -1,6 +1,6 @@
 <packagegui>
 	<name>havp</name>
-	<version>0.1</version>
+	<version>0.3</version>
 	<title>Havp: Settings</title>
 	<include_file>/usr/local/pkg/havp.inc</include_file>
         <aftersaveredirect>/pkg_edit.php?xml=havp.xml&amp;id=0</aftersaveredirect>
@@ -15,6 +15,7 @@
 	<service>
 		<name>havp</name>
 		<rcfile>/usr/local/etc/rc.d/havp.sh</rcfile>
+		<description>HTTP Anti Virus Proxy.</description>
 	</service>
 
 	<tabs>
@@ -62,31 +63,32 @@
 			<fieldname>servernumber</fieldname>
 			<description>Specify how many servers (child processes) are simultaneously listening on port PORT for a connection. Minimum value should be the peak requests-per-second expected + 5 for headroom.</description>
 			<type>input</type>
+			<default_value>10</default_value>
 		</field>		
 		<field>
 			<fielddescr>Max Server Number</fielddescr>
 			<fieldname>maxservers</fieldname>
 			<description>This is the hard limit for concurrent requests processed.</description>
 			<type>input</type>
+			<default_value>100</default_value>
 		</field>		
 		<field>
 			<fielddescr>Transparent?</fielddescr>
 			<fieldname>transparent</fieldname>
-			<description>Run HAVP as transparent Proxy? [Broken now, sorry]</description>
+			<description>Run HAVP as transparent Proxy? [In Next Version]</description>
 			<type>checkbox</type>
-			<value>yes</value>
 		</field>		
 		<field>
 			<fielddescr>Port</fielddescr>
 			<fieldname>port</fieldname>
 			<description>Port HAVP is listening on.</description>
 			<type>input</type>
-			<value>8080</value>
+			<default_value>8080</default_value>
 		</field>		
 		<field>
 			<fielddescr>Bind Address</fielddescr>
 			<fieldname>bind_address</fieldname>
-			<description>IP address that HAVP listens on. Leave it empty to bind all addresses.</description>
+			<description>IP address that HAVP listens on. Leave it empty to bind all addresses, defaults to LAN address</description>
 			<type>input</type>
 		</field>		
 		<field>
@@ -100,7 +102,32 @@
 			<fieldname>range</fieldname>
 			<description> Allow HTTP Range Requests?</description>
 			<type>checkbox</type>
-			<value>yes</value>
+			<default_value>on</default_value>
+		</field>		
+		<field>
+			<fielddescr>Log All Requests?</fielddescr>
+			<fieldname>log_oks</fieldname>
+			<description>Log Details: true: Log all Requests, false: log only virus hits</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
+		</field>		
+		<field>
+			<fielddescr>Virus Database Reload Time.</fielddescr>
+			<fieldname>dbreload</fieldname>
+			<description>Specify here the number of minutes to wait for reloading. Default 60 Minutes.</description>
+			<type>input</type>
+		</field>		
+		<field>
+			<fielddescr>Parent Proxy Host</fielddescr>
+			<fieldname>parentproxy</fieldname>
+			<description>Specify the parent proxy hostname or ip</description>
+			<type>input</type>
+		</field>		
+		<field>
+			<fielddescr>Parent Proxy Port</fielddescr>
+			<fieldname>parentport</fieldname>
+			<description>Specify the parent proxy port</description>
+			<type>input</type>
 		</field>		
 	</fields>
 

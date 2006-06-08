@@ -1,4 +1,9 @@
 <?php
+require_once('globals.inc');
+require_once('config.inc');
+require_once('service-utils.inc');
+require_once('pkg-utils.inc');
+require_once('pfsense-utils.inc');
 /*
 	havp.inc
         part of the HAVP package for pfSense
@@ -52,8 +57,15 @@ function sync_package_havp() {
 		  if ($tmp['servernumber'] != "") fwrite($fd,"SERVERNUMBER " . $tmp['servernumber'] . "\n");
 		  if ($tmp['maxservers'] != "") fwrite($fd,"MAXSERVERS " . $tmp['maxservers'] . "\n");
 		  if ($tmp['port'] != "") fwrite($fd,"PORT " . $tmp['port'] . "\n");
-		  if ($tmp['bind_address'] != "") fwrite($fd,"BIND_ADDRESS " . $tmp['bind_address'] . " \n");
+		  if ($tmp['bind_address'] != ""){
+		    fwrite($fd,"BIND_ADDRESS " . $tmp['bind_address'] . " \n");
+		  }else {
+		    fwrite($fd,"BIND_ADDRESS " . $config['interfaces']['lan']['ipaddr'] . " \n");
+		  }
 		  if ($tmp['source_address'] != "") fwrite($fd,"SOURCE_ADDRESS " . $tmp['source_address'] . " \n");
+		  if ($tmp['dbreload'] != "") fwrite($fd,"DBRELOAD" . $tmp['dbreload'] . " \n");
+		  if ($tmp['parentproxy'] != "") fwrite($fd,"PARENTPROXY" . $tmp['parentproxy'] . " \n");
+		  if ($tmp['parentport'] != "") fwrite($fd,"PARENTPORT" . $tmp['parentport'] . " \n");
 
 		  if ($tmp['transparent'] == "on"){
 		       fwrite($fd,"TRANSPARENT true\n");
@@ -67,6 +79,12 @@ function sync_package_havp() {
 		  }
 		  else {
 		       fwrite($fd,"RANGE false\n");
+		  }
+		  if ($tmp['log_oks'] == "on"){
+		       fwrite($fd,"LOG_OKS true\n");
+		  }
+		  else {
+		       fwrite($fd,"LOG_OKS false\n");
 		  }
 	     }
 	}
