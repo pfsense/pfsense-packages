@@ -75,7 +75,7 @@
 		<field>
 			<fielddescr>Transparent?</fielddescr>
 			<fieldname>transparent</fieldname>
-			<description>Run HAVP as transparent Proxy? [In Next Version]</description>
+			<description>Run HAVP as transparent Proxy? [Bind Address will be disregarded in this mode, HAVP will listen on localhost] </description>
 			<type>checkbox</type>
 		</field>		
 		<field>
@@ -89,7 +89,8 @@
 			<fielddescr>Bind Address</fielddescr>
 			<fieldname>bind_address</fieldname>
 			<description>IP address that HAVP listens on. Leave it empty to bind all addresses, defaults to LAN address</description>
-			<type>input</type>
+			<type>interfaces_selection</type>
+			<default_value>lan</default_value>
 		</field>		
 		<field>
 			<fielddescr>Source Address</fielddescr>

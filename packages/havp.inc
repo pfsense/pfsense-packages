@@ -57,21 +57,34 @@ function sync_package_havp() {
 		  if ($tmp['servernumber'] != "") fwrite($fd,"SERVERNUMBER " . $tmp['servernumber'] . "\n");
 		  if ($tmp['maxservers'] != "") fwrite($fd,"MAXSERVERS " . $tmp['maxservers'] . "\n");
 		  if ($tmp['port'] != "") fwrite($fd,"PORT " . $tmp['port'] . "\n");
-		  if ($tmp['bind_address'] != ""){
-		    fwrite($fd,"BIND_ADDRESS " . $tmp['bind_address'] . " \n");
-		  }else {
-		    fwrite($fd,"BIND_ADDRESS " . $config['interfaces']['lan']['ipaddr'] . " \n");
-		  }
 		  if ($tmp['source_address'] != "") fwrite($fd,"SOURCE_ADDRESS " . $tmp['source_address'] . " \n");
 		  if ($tmp['dbreload'] != "") fwrite($fd,"DBRELOAD" . $tmp['dbreload'] . " \n");
 		  if ($tmp['parentproxy'] != "") fwrite($fd,"PARENTPROXY" . $tmp['parentproxy'] . " \n");
 		  if ($tmp['parentport'] != "") fwrite($fd,"PARENTPORT" . $tmp['parentport'] . " \n");
 
+		  /* If Transparent then, don't bother with bind address */
 		  if ($tmp['transparent'] == "on"){
 		       fwrite($fd,"TRANSPARENT true\n");
+		       fwrite($fd,"BIND_ADDRESS 127.0.0.1\n");
+		       $trans_file = fopen("/tmp/havp_pf.rules","w");
+		       fwrite($trans_file, "rdr on " . $config['interfaces']['lan']['if'] .  " inet proto tcp from any to ! " . $config['interfaces']['lan']['ipaddr'] . " port = http -> 127.0.0.1 port 8080 \n");
+		       fclose($trans_file);
+		       $havp_pf_result = mwexec ("pfctl -a rdr-package/havp -f /tmp/havp_pf.rules");
+		       if($havp_pf_result <> 0) {
+			    file_notice("HAVP", "There were error(s) loading the transparency rules", "HAVP", "");
+		       }
 		  }
 		  else {
 		       fwrite($fd,"TRANSPARENT false\n");
+		       if ($tmp['bind_address'] != ""){
+			    fwrite($fd,"BIND_ADDRESS " . $config['interfaces'][strtolower($tmp['bind_address'])]['ipaddr']  . " \n");
+		       }else { /* just to be sure, default is lan */
+			    fwrite($fd,"BIND_ADDRESS " . $config['interfaces']['lan']['ipaddr'] . " \n");
+		       }
+		       $havp_pf_result = mwexec ("pfctl -a rdr-package/havp -F nat");
+		       if($havp_pf_result <> 0) {
+			    file_notice("HAVP", "There were error(s) clearing the transparency rules", "HAVP", "");
+		       }
 		  }
 
 		  if ($tmp['range'] == "on"){
@@ -87,6 +100,14 @@ function sync_package_havp() {
 		       fwrite($fd,"LOG_OKS false\n");
 		  }
 	     }
+	} else {
+	     fwrite($fd,"SERVERNUMBER 10\n");
+	     fwrite($fd,"MAXSERVERS 100\n");
+	     fwrite($fd,"PORT 8080\n");
+	     fwrite($fd,"TRANSPARENT false\n");
+	     fwrite($fd,"RANGE true\n");
+	     fwrite($fd,"LOG_OKS true\n");
+	     fwrite($fd,"BIND_ADDRESS " . $config['interfaces']['lan']['ipaddr'] . " \n");	     
 	}
 	fclose($fd);
 	conf_mount_ro();
