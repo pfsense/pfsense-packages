@@ -74,14 +74,10 @@
 			<config_file>http://agni.linuxense.com/packages/config/havp.xml</config_file>
 			<depends_on_package_base_url>http://agni.linuxense.com/packages</depends_on_package_base_url>
 			<depends_on_package>havp-0.80pre_1.tbz</depends_on_package>
-			<version>0.2</version>
-			<status>BROKEN</status>
+			<version>0.5</version>
+			<status>ALPHA</status>
 			<maintainer>raj@linuxense.com</maintainer>
 			<configurationfile>havp.xml</configurationfile>
-			<logging>
-				<facilityname>HAVP Access Log </facilityname>
-				<logfilename>access.log</logfilename>
-			</logging>
 		</package>
 		<package>
 			<name>ntop</name>
