@@ -9,6 +9,7 @@ require_once('pfsense-utils.inc');
         part of the HAVP package for pfSense
 	Copyright (C) 2006 Rajkumar S <raj@linuxense.com>
 	All rights reserved.
+        $Id$
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -58,21 +59,18 @@ function sync_package_havp() {
 		  if ($tmp['maxservers'] != "") fwrite($fd,"MAXSERVERS " . $tmp['maxservers'] . "\n");
 		  if ($tmp['port'] != "") fwrite($fd,"PORT " . $tmp['port'] . "\n");
 		  if ($tmp['source_address'] != "") fwrite($fd,"SOURCE_ADDRESS " . $tmp['source_address'] . " \n");
-		  if ($tmp['dbreload'] != "") fwrite($fd,"DBRELOAD" . $tmp['dbreload'] . " \n");
-		  if ($tmp['parentproxy'] != "") fwrite($fd,"PARENTPROXY" . $tmp['parentproxy'] . " \n");
-		  if ($tmp['parentport'] != "") fwrite($fd,"PARENTPORT" . $tmp['parentport'] . " \n");
+		  if ($tmp['dbreload'] != "") fwrite($fd,"DBRELOAD " . $tmp['dbreload'] . " \n");
+		  if ($tmp['parentproxy'] != "") fwrite($fd,"PARENTPROXY " . $tmp['parentproxy'] . " \n");
+		  if ($tmp['parentport'] != "") fwrite($fd,"PARENTPORT " . $tmp['parentport'] . " \n");
+		  if ($tmp['maxscansize'] != "") fwrite($fd,"MAXSCANSIZE " . $tmp['maxscansize'] . " \n");
+		  if ($tmp['trickling'] != "") fwrite($fd,"TRICKLING " . $tmp['trickling'] . " \n");
+		  if ($tmp['maxdownloadsize'] != "") fwrite($fd,"MAXDOWNLOADSIZE " . $tmp['maxdownloadsize'] . " \n");
 
 		  /* If Transparent then, don't bother with bind address */
 		  if ($tmp['transparent'] == "on"){
 		       fwrite($fd,"TRANSPARENT true\n");
 		       fwrite($fd,"BIND_ADDRESS 127.0.0.1\n");
-		       $trans_file = fopen("/tmp/havp_pf.rules","w");
-		       fwrite($trans_file, "rdr on " . $config['interfaces']['lan']['if'] .  " inet proto tcp from any to ! " . $config['interfaces']['lan']['ipaddr'] . " port = http -> 127.0.0.1 port 8080 \n");
-		       fclose($trans_file);
-		       $havp_pf_result = mwexec ("pfctl -a rdr-package/havp -f /tmp/havp_pf.rules");
-		       if($havp_pf_result <> 0) {
-			    file_notice("HAVP", "There were error(s) loading the transparency rules", "HAVP", "");
-		       }
+		       setup_transparency();
 		  }
 		  else {
 		       fwrite($fd,"TRANSPARENT false\n");
@@ -82,6 +80,7 @@ function sync_package_havp() {
 			    fwrite($fd,"BIND_ADDRESS " . $config['interfaces']['lan']['ipaddr'] . " \n");
 		       }
 		       $havp_pf_result = mwexec ("pfctl -a rdr-package/havp -F nat");
+		       $havp_pf_result = mwexec ("pfctl -t havp -T kill");
 		       if($havp_pf_result <> 0) {
 			    file_notice("HAVP", "There were error(s) clearing the transparency rules", "HAVP", "");
 		       }
@@ -169,4 +168,50 @@ function sync_package_havp_blacklist() {
 	conf_mount_ro();
 	config_unlock();
 }
+
+function add_trans_table(){
+	global $config;
+	conf_mount_rw();
+	config_lock();
+
+	# Flush all entries first, and then add them.
+	$havp_pf_result = mwexec ('pfctl -a "rdr-package/havp" -t havp -T flush');
+	if($havp_pf_result <> 0) {
+		file_notice("HAVP", "There were error(s) flushing the exclude table", "HAVP", "");
+	}
+	if($config['installedpackages']['havptransexclude']['config'] != ""){
+		foreach($config['installedpackages']['havptransexclude']['config'] as $tmp) {
+			$havp_pf_result = mwexec ('pfctl -a "rdr-package/havp" -t havp -T add ' . $tmp['ip']);
+			if($havp_pf_result <> 0) {
+				file_notice("HAVP", "There were error(s) adding the ip " . $tmp['ip'], "HAVP", "");
+			}
+		}
+	}
+	/* signal a reload of all files */
+	conf_mount_ro();
+	config_unlock();
+}
+
+function setup_transparency(){
+	global $config;
+	$trans_file = fopen("/tmp/havp_pf.rules","w");
+	fwrite($trans_file, "table <havp> persist\n");
+	fwrite($trans_file, "rdr on " . $config['interfaces']['lan']['if'] .  " inet proto tcp from !<havp> to ! " . $config['interfaces']['lan']['ipaddr'] . " port = http -> 127.0.0.1 port 8080 \n");
+	fclose($trans_file);
+	$havp_pf_result = mwexec ('pfctl -a "rdr-package/havp" -f /tmp/havp_pf.rules');
+	if($havp_pf_result <> 0) {
+		file_notice("HAVP", "There were error(s) loading the transparency rules", "HAVP", "");
+	}
+	add_trans_table();
+}
+
+function transparency_init(){
+	global $config;
+	if($config['installedpackages']['havp']['config'] != "") {
+		if($config['installedpackages']['havp']['config'][0]['transparent'] == "on") {
+			setup_transparency();
+		}
+	}
+}
+	
 ?>

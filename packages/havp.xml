@@ -32,6 +32,10 @@
 			<text>Blacklist</text>
 			<url>/pkg.php?xml=havp_blacklist.xml</url>
 		</tab>
+		<tab>
+			<text>Exclude from Transparent Proxy</text>
+			<url>/pkg.php?xml=havp_trans_exclude.xml</url>
+		</tab>
 	</tabs>
 
     	<additional_files_needed>
@@ -48,6 +52,16 @@
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	    <item>http://agni.linuxense.com/packages/config/havp_blacklist.xml</item>
+	</additional_files_needed>
+    	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://agni.linuxense.com/packages/config/havp_startup.inc</item>
+	</additional_files_needed>
+    	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://agni.linuxense.com/packages/config/havp_trans_exclude.xml</item>
 	</additional_files_needed>
     	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
@@ -117,6 +131,7 @@
 			<fieldname>dbreload</fieldname>
 			<description>Specify here the number of minutes to wait for reloading. Default 60 Minutes.</description>
 			<type>input</type>
+			<default_value>60</default_value>
 		</field>		
 		<field>
 			<fielddescr>Parent Proxy Host</fielddescr>
@@ -129,6 +144,27 @@
 			<fieldname>parentport</fieldname>
 			<description>Specify the parent proxy port</description>
 			<type>input</type>
+		</field>		
+		<field>
+			<fielddescr>Max size of temporary files on disk</fielddescr>
+			<fieldname>maxscansize</fieldname>
+			<description>Temporary file will grow only up to this size. This means scanner will scan data until this limit is reached. The value is in BYTES, not kb or mb. 0 is Unlimited.</description>
+			<type>input</type>
+			<default_value>0</default_value>
+		</field>		
+		<field>
+			<fielddescr>Trickling Time</fielddescr>
+			<fieldname>trickling</fieldname>
+			<description>After Trickling Time (seconds), some bytes are sent to browser to keep the connection alive. Trickling is not needed if timeouts are not expected. Default is 5 seconds. </description>
+			<type>input</type>
+			<default_value>5</default_value>
+		</field>		
+		<field>
+			<fielddescr>Absolute Maximum Download Size</fielddescr>
+			<fieldname>maxdownloadsize</fieldname>
+			<description>Downloads larger than this will be blocked, Unless whitelisted. 0 is unlimited.</description>
+			<type>input</type>
+			<default_value>0</default_value>
 		</field>		
 	</fields>
 

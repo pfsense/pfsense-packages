@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-	<name>havp-blacklist</name>
+	<name>havp_trans_exclude</name>
 	<version>0.1.0</version>
-	<title>Havp: Blacklist</title>
+	<title>HAVP: Exclude from Transparent Proxy</title>
 	<include_file>/usr/local/pkg/havp.inc</include_file>
 
 	<menu>
-		<name>HAVP Blacklist</name>
+		<name>Transparency Exclude</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
 		<configfile>havp.xml</configfile>
@@ -23,11 +23,11 @@
 		<tab>
 			<text>Blacklist</text>
 			<url>/pkg.php?xml=havp_blacklist.xml</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>Exclude from Transparent Proxy</text>
 			<url>/pkg.php?xml=havp_trans_exclude.xml</url>
+			<active/>
 		</tab>
 	</tabs>
 
@@ -37,12 +37,12 @@
 	    <item>http://agni.linuxense.com/packages/config/havp.inc</item>
 	</additional_files_needed>
 
-	<configpath>['installedpackages']['havpblacklist']['config']</configpath>
+	<configpath>['installedpackages']['havptransexclude']['config']</configpath>
 
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fielddescr>Blocked URL</fielddescr>
-			<fieldname>url</fieldname>
+			<fielddescr>Exempted IP</fielddescr>
+			<fieldname>ip</fieldname>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Description</fielddescr>
@@ -52,20 +52,20 @@
 
 	<fields>
 		<field>
-			<fielddescr>Blocked URL</fielddescr>
-			<fieldname>url</fieldname>
-			<description>Enter the URL to blacklist</description>
+			<fielddescr>Exempted IP</fielddescr>
+			<fieldname>ip</fieldname>
+			<description>Enter the IP to exempt from transparent proxy</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-			<description>Enter the description for this url</description>
+			<description>Enter the description for this item</description>
 			<type>input</type>
 		</field>
 	</fields>
 
-	<custom_php_command_before_form>sync_package_havp_blacklist();</custom_php_command_before_form>
-	<custom_delete_php_command>sync_package_havp_blacklist();</custom_delete_php_command>	
-	<custom_php_resync_config_command>sync_package_havp_blacklist();</custom_php_resync_config_command>
+	<custom_php_command_before_form>add_trans_table();</custom_php_command_before_form>
+	<custom_delete_php_command>add_trans_table();</custom_delete_php_command>	
+	<custom_php_resync_config_command>add_trans_table();</custom_php_resync_config_command>
 </packagegui>

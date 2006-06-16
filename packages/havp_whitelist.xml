@@ -25,6 +25,10 @@
 			<text>Blacklist</text>
 			<url>/pkg.php?xml=havp_blacklist.xml</url>
 		</tab>
+		<tab>
+			<text>Exclude from Transparent Proxy</text>
+			<url>/pkg.php?xml=havp_trans_exclude.xml</url>
+		</tab>
 	</tabs>
 
     	<additional_files_needed>
