@@ -73,8 +73,8 @@
 			<category>Services</category>
 			<config_file>http://agni.linuxense.com/packages/config/havp.xml</config_file>
 			<depends_on_package_base_url>http://agni.linuxense.com/packages</depends_on_package_base_url>
-			<depends_on_package>havp-0.80pre_1.tbz</depends_on_package>
-			<version>0.5</version>
+			<depends_on_package>havp-0.80_5.tbz</depends_on_package>
+			<version>0.6</version>
 			<status>ALPHA</status>
 			<maintainer>raj@linuxense.com</maintainer>
 			<configurationfile>havp.xml</configurationfile>
