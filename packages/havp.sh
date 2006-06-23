@@ -41,8 +41,8 @@ rc_start()
 	else
 		echo "Starting HAVP Antivirus HTTP Proxy"
 		/usr/local/sbin/havp &
-		sleep 4 
-		/usr/local/pkg/havp_startup.inc
+		sleep 4
+		/usr/local/bin/php -q /usr/local/pkg/havp_startup.inc&
 		if [ -f $pidfile ]
 		then
 			pid=$(sed 's/ //g' $pidfile)
