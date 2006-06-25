@@ -755,14 +755,17 @@ function squid_generate_rules($type) {
 	$ifaces = explode(',', $squid_conf['active_interface']);
 	$ifaces = array_map('convert_friendly_interface_to_real_interface_name', $ifaces);
 
-	if ($type == 'nat') {
+	switch($type) {
+	case 'nat':
 		foreach ($ifaces as $iface)
 			$rules .= "rdr on $iface inet proto tcp to !($iface) port 80 -> ($iface) port $port\n";
-	}
-
-	else {
+		break;
+	case 'filter':
 		foreach ($ifaces as $iface)
 			$rules .= "pass quick on $iface inet proto tcp to !($iface) port 80 flags S/SA keep state\n";
+		break;
+	default:
+		break;
 	}
 
 	return $rules;

@@ -229,14 +229,17 @@ function clamav_generate_rules($type) {
 		$ifaces = explode(',', $clamav_conf['pop3_ifaces']);
 		$ifaces = array_map('convert_friendly_interface_to_real_interface_name', $ifaces);
 
-		if ($type == 'nat') {
+		switch($type) {
+		case 'nat':
 			foreach ($ifaces as $iface)
 				$rules .= "rdr on $iface proto tcp to port pop3 -> 127.0.0.1 port 8110\n";
-		}
-
-		else {
+			break;
+		case 'filter':
 			foreach ($ifaces as $iface)
 				$rules .= "pass quick on $iface proto tcp to port pop3 flags S/SA keep state\n";
+			break;
+		default:
+			break;
 		}
 	}
 
