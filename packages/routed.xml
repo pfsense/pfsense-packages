@@ -34,11 +34,17 @@
 	<version>1.0</version>
 	<title>Services: RIP</title>
 	<include_file>routed.inc</include_file>
+
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/routed.inc</item>
+	</additional_files_needed>
+
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>RIP</name>
 		<section>Services</section>
 		<configfile>routed.xml</configfile>
+		<url>pkg_edit.php?xml=routed.xml&amp;id=0</url>
 	</menu>
 	<tabs>
 		<tab>
@@ -61,7 +67,7 @@
 		</field>
 		<field>
 			<fielddescr>Interfaces</fielddescr>
-			<fieldname>interface_array</fieldname>
+			<fieldname>iface_array</fieldname>
 			<value>lan</value>
 			<multiple>true</multiple>
 			<size>3</size>
@@ -88,6 +94,7 @@
 			<type>input</type>
 		</field>
 	</fields>
+	<aftersaveredirect>pkg_edit.php?xml=routed.xml&amp;id=0</aftersaveredirect>
         <custom_php_command_before_form>
         </custom_php_command_before_form>
 	<custom_delete_php_command>
