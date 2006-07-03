@@ -261,6 +261,17 @@
 				<logfilename>arpwatch.log</logfilename>
 			</logging>
 		</package>
+		<package>
+			<name>routed</name>
+			<descr>RIP v1 and v2 daemon</descr>
+			<website>http://www.pfsense.com/</website>
+			<maintainer>billm@pfsense.org</maintainer>
+			<category>Network Management</category>
+			<version>1.0</version>
+			<status>ALPHA</status>
+			<config_file>http://www.pfsense.com/packages/config/routed.xml</config_file>
+			<configurationfile>routed.xml</configurationfile>
+		</package>
 	  </packages>
 		<package>
 			<name>powerdns</name>
