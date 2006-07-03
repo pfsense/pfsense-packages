@@ -88,7 +88,7 @@
 		<field>
 			<fielddescr>RIPv2 password</fielddescr>
 			<fieldname>passwd</fieldname>
-			<description>Specify a RIPv2 password.  This password will be sent
+			<description>Specify a RIPv2 password.  This password will be sent 
 				in the clear on all RIPv2 responses received and sent.
 			</description>
 			<type>input</type>
