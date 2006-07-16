@@ -57,7 +57,7 @@
 					$first = 1;
 				}
 			}
-			$start = "/usr/local/sbin/darkstat -i " . $ifaces_final . " -p 666 -d";
+			$start = "/usr/local/sbin/darkstat" . $ifaces_final . " -p 666 -d";
 			write_rcfile(array(
 					"file" => "darkstat.sh",
 					"start" => $start,
