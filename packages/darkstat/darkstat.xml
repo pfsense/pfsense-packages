@@ -4,19 +4,67 @@
 	<name>Darkstat</name>
 	<version>3.0</version>
 	<menu>
+		<name>Darkstat Settings</name>
+		<tooltiptext>Setup darkstat specific settings</tooltiptext>
+		<section>Diagnostics</section>
+		<url>/pkg_edit.php?xml=darkstat.xml&amp;id=0</url>
+	</menu>
+	<menu>
 		<name>Darkstat</name>
 		<tooltiptext>Access Darkstat</tooltiptext>
-		<section>Diagnostics</section>
 		<url>http://$myurl:666</url>
+		<section>Diagnostics</section>
+		<depends_on_service>darkstat</depends_on_service>
 	</menu>
-    <additional_files_needed>
-	    <prefix>/usr/local/etc/rc.d/</prefix>
-	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/darkstat/darkstat.sh</item>
-	</additional_files_needed>
+	<service>
+		<name>darkstat</name>
+		<rcfile>darkstat.sh</rcfile>
+		<executable>Darkstat</executable>
+	</service>
+	<tabs>
+		<tab>
+			<text>Darkstat Settings</text>
+			<url>/pkg_edit.php?xml=darkstat.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Access Darkstat</text>
+			<url>http://$myurl:666</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fielddescr>Interface</fielddescr>
+			<fieldname>interface_array</fieldname>
+			<value>lan</value>
+			<multiple>true</multiple>
+			<size>3</size>
+			<type>interfaces_selection</type>
+		</field>
+    </fields>
 	<service>
 		<name>Darkstat</name>
 		<rcfile>darkstat.sh</rcfile>
 		<executable>darkstat</executable>
 	</service>
+	<custom_php_global_functions>
+		$first = 0;
+		foreach($_POST['interface_array'] as $iface) {
+			$if = convert_friendly_interface_to_real_interface_name($iface);
+			if($if) {
+				if($first == 1)
+					$ifaces_final .= ",";
+				$ifaces_final .= $if;
+				$first = 1;
+			}
+		}
+		$start = "/usr/local/sbin/darkstat -i " . $ifaces_final . " -p 666 -d";
+		write_rcfile(array(
+				"file" => "darkstat.sh",
+				"start" => $start,
+				"stop" => "/usr/bin/killall darkstat"
+			)
+		);
+		restart_service("darkstat");
+	</custom_php_global_functions>
 </packagegui>
