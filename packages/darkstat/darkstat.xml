@@ -48,23 +48,31 @@
 		<executable>darkstat</executable>
 	</service>
 	<custom_php_global_functions>
-		$first = 0;
-		foreach($_POST['interface_array'] as $iface) {
-			$if = convert_friendly_interface_to_real_interface_name($iface);
-			if($if) {
-				if($first == 1)
-					$ifaces_final .= ",";
-				$ifaces_final .= $if;
-				$first = 1;
+		function sync_package_darkstat() {
+			$first = 0;
+			foreach($_POST['interface_array'] as $iface) {
+				$if = convert_friendly_interface_to_real_interface_name($iface);
+				if($if) {
+					if($first == 1)
+						$ifaces_final .= ",";
+					$ifaces_final .= $if;
+					$first = 1;
+				}
 			}
+			$start = "/usr/local/sbin/darkstat -i " . $ifaces_final . " -p 666 -d";
+			write_rcfile(array(
+					"file" => "darkstat.sh",
+					"start" => $start,
+					"stop" => "/usr/bin/killall darkstat"
+				)
+			);
+			restart_service("darkstat");
 		}
-		$start = "/usr/local/sbin/darkstat -i " . $ifaces_final . " -p 666 -d";
-		write_rcfile(array(
-				"file" => "darkstat.sh",
-				"start" => $start,
-				"stop" => "/usr/bin/killall darkstat"
-			)
-		);
-		restart_service("darkstat");
 	</custom_php_global_functions>
+		<custom_add_php_command>
+        	sync_package_darkstat();
+	</custom_add_php_command>
+	<custom_php_resync_command>
+		sync_package_darkstat();
+	</custom_php_resync_command>
 </packagegui>
