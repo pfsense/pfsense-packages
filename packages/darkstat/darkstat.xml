@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<title>Diagnostics: Darkstat</title>
+	<name>Darkstat</name>
+	<version>3.0</version>
+	<menu>
+		<name>Darkstat</name>
+		<tooltiptext>Access Darkstat</tooltiptext>
+		<section>Diagnostics</section>
+		<url>http://$myurl:666</url>
+	</menu>
+    <additional_files_needed>
+	    <prefix>/usr/local/etc/rc.d/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://www.pfsense.com/packages/config/darkstat/darkstat.sh</item>
+	</additional_files_needed>
+	<service>
+		<name>Darkstat</name>
+		<rcfile>darkstat.sh</rcfile>
+		<executable>darkstat</executable>
+	</service>
+</packagegui>
