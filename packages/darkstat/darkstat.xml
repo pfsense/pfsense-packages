@@ -53,9 +53,7 @@
 			foreach($_POST['interface_array'] as $iface) {
 				$if = convert_friendly_interface_to_real_interface_name($iface);
 				if($if) {
-					if($first == 1)
-						$ifaces_final .= ",";
-					$ifaces_final .= $if;
+					$ifaces_final .= " -i " . $if;
 					$first = 1;
 				}
 			}
