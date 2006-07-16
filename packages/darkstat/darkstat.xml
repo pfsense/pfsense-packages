@@ -64,7 +64,7 @@
 					"stop" => "/usr/bin/killall darkstat"
 				)
 			);
-			restart_service("darkstat");
+			start_service("darkstat");
 		}
 	</custom_php_global_functions>
 		<custom_add_php_command>
