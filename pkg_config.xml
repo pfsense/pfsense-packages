@@ -88,6 +88,7 @@
 			<depends_on_package>darkstat-3.0.524_1.tbz</depends_on_package>
 			<version>3.0.524_1</version>
 			<status>ALPHA</status>
+			<maintainer>geekgod@geekgod.com</maintainer>
 			<config_file>http://www.pfsense.com/packages/config/darkstat/darkstat.xml</config_file>
 			<configurationfile>darkstat.xml</configurationfile>
 		</package>
