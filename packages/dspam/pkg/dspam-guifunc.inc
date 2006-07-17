@@ -5,32 +5,6 @@ require_once("functions.inc");
 require_once("dspam.inc");
 
 /* ========================================================================== */
-/* = A D M I N   R E L A T E D   F U N C T I O N   C A L L S                = */
-/* ========================================================================== */
-
-  /* Status */
-  else if (basename($_SERVER['SCRIPT_NAME']) == "dspam-admin.php" && $CONFIG['ADMIN']) {
-    $displays_errors =& DisplayStatus();
-    $input_errors = array_merge($input_errors, $displays_errors);
-  }
-
-  /* User Statistics */
-  else if (basename($_SERVER['SCRIPT_NAME']) == "dspam-admin-stats.php" && $CONFIG['ADMIN']) {
-    $displayus_errors =& DisplayUserStatistics();
-    $input_errors = array_merge($input_errors, $displayus_errors);
-  }
-
-  /* Preferences */
-  else if (basename($_SERVER['SCRIPT_NAME']) == "dspam-admin-prefs.php" && $CONFIG['ADMIN']) {
-    $savemsg = "";
-    $displayap_errors =& DisplayAdminPreferences($savemsg);
-    $input_errors = array_merge($input_errors, $displayap_errors);
-  }
-} else {
-  $input_errors[] = "The page you did request can't be processed by <code>dspam.inc</code>.";
-}
-
-/* ========================================================================== */
 /* = A D M I N   S T A T U S   F U N C T I O N S                            = */
 /* ========================================================================== */
 
