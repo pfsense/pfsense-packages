@@ -110,6 +110,7 @@
 			<category>Network Management</category>
 			<depends_on_package_base_url>http://www.pfsense.org/packages/All/</depends_on_package_base_url>
 			<depends_on_package>darkstat-3.0.524_1.tbz</depends_on_package>
+			<depends_on_package>gettext-0.14.5_2.tbz</depends_on_package>
 			<version>3.0.524_1</version>
 			<status>ALPHA</status>
 			<maintainer>geekgod@geekgod.com</maintainer>
