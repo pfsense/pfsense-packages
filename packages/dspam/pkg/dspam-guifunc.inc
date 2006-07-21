@@ -427,34 +427,40 @@ function &DisplayInfos() {
       $validity = "invalide (license files not found)";
     }
 
-    require_once ("knione");
-    $gen_lkey = getNIONEKey(trim($owneru), trim($ownerc));
-    if (trim($lkey) <> $gen_lkey) { $validity = "invalide (wrong license key)"; }
+    if(! extension_loaded( 'bcompiler' )) {
+      if(@dl( 'bcompiler.so' )) {
+        require_once ("knione");
+        $gen_lkey = getNIONEKey(trim($owneru), trim($ownerc));
+        if (trim($lkey) <> $gen_lkey) { $validity = "invalide (wrong license key)"; }
 
-    $cdate = mktime(0, 0, 0, date("m"),
-                             date("d"),
-                             date("Y"));
+        $cdate = mktime(0, 0, 0, date("m"),
+                                 date("d"),
+                                 date("Y"));
 
-    $edate = mktime(0, 0, 0, date("m", $pdate),
-                             date("d", $pdate),
-                             date("Y", $pdate)+1);
+        $edate = mktime(0, 0, 0, date("m", $pdate),
+                                 date("d", $pdate),
+                                 date("Y", $pdate)+1);
 
-    if ($edate < $cdate ||
-        $pdate > $cdate) {
-      $validity = "invalide (license expired)";
-    }
+        if ($edate < $cdate ||
+            $pdate > $cdate) {
+          $validity = "invalide (license expired)";
+        }
 
-    if ($fd = @fopen("{$g['conf_path']}/nione.lic.sha1", "r")) {
-      $chksum = str_replace("SHA1 (nione.lic) = ", "", fgets($fd, 4096));
-      $chksum_new = sha1_file("{$g['conf_path']}/nione.lic");
+        if ($fd = @fopen("{$g['conf_path']}/nione.lic.sha1", "r")) {
+          $chksum = str_replace("SHA1 (nione.lic) = ", "", fgets($fd, 4096));
+          $chksum_new = sha1_file("{$g['conf_path']}/nione.lic");
 
-      if (trim($chksum) !== trim($chksum_new)) {
-        $validity = "invalide (wrong license file checksum)";
+          if (trim($chksum) !== trim($chksum_new)) {
+            $validity = "invalide (wrong license file checksum)";
+          }
+
+          fclose($fd);
+        } else {
+          $validity = "invalide (license files not found)";
+        }
+      } else {
+        $validity = "invalide (extension missing, which is necessary to validate license data.)";
       }
-
-      fclose($fd);
-    } else {
-      $validity = "invalide (license files not found)";
     }
   } else {
     $validity = "invalide (license files not found)";
