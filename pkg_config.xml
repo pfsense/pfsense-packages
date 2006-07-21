@@ -12,18 +12,31 @@
 				SMTP appliance.
 			</descr>
 			<config_file>http://www.pfsense.org/packages/config/dspam.xml</config_file>
-            <configurationfile>dspam.xml</configurationfile>
+      <configurationfile>dspam.xml</configurationfile>
 			<depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
-			<depends_on_package>dspam-devel-3.6.4.20060315.1518.tbz</depends_on_package>
-            <!--
-              TODO: add missing deps.
-            -->
+			<depends_on_package>dspam-3.6.8-sqlite3-noldap.tbz</depends_on_package>
+      <!--
+        Archiver deps are introduced by ClamAV.
+      -->
+      <depends_on_package>unzoo-4.4</depends_on_package>
+      <depends_on_package>unzip-5.52_2</depends_on_package>
+      <depends_on_package>lha-1.14i_6</depends_on_package>
+      <depends_on_package>arc-5.21o</depends_on_package>
+      <depends_on_package>arj-3.10.22</depends_on_package>
+      <depends_on_package>pkg-config-0.20_2</depends_on_package>
+      <depends_on_package>sqlite-3.3.6</depends_on_package>
+      <depends_on_package>libiconv-1.9.2_2</depends_on_package>
+      <depends_on_package>gettext-0.14.5_2</depends_on_package>
+      <depends_on_package>libgmp-4.2.1_1</depends_on_package>
+      <depends_on_package>curl-7.15.4</depends_on_package>
+      <depends_on_package>libidn-0.6.3</depends_on_package>
+      <depends_on_package>clamav-devel-20060703</depends_on_package>
 			<version>3.6.8</version>
 			<status>ALPHA</status>
 			<maintainer>me@daniel.stefan.haischt.name</maintainer>
 			<logging>
 				<facilityname>dspam</facilityname>
-                <logfilename>dspam.log</logfilename>
+        <logfilename>dspam.log</logfilename>
 			</logging>
 		</package>
 		<package>
