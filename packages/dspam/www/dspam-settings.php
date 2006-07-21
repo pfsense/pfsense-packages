@@ -961,11 +961,15 @@ EOD;
 				      <li><a href="#priv" class="redlnk">DSPAM Privileges<?php if ($pconfig['sectionid'] == "priv") echo '<span class="red">&nbsp;&raquo;last modified&laquo;</span>'; ?></a></li>
 				      <li><a href="#dbg" class="redlnk">DSPAM Debugging Options<?php if ($pconfig['sectionid'] == "dbg") echo '<span class="red">&nbsp;&raquo;last modified&laquo;</span>'; ?></a></li>
 				      <li><a href="#eng" class="redlnk">DSPAM Engine Settings<?php if ($pconfig['sectionid'] == "eng") echo '<span class="red">&nbsp;&raquo;last modified&laquo;</span>'; ?></a></li>
+				      <?php if (checkForLDAPSupport()): ?>
 				      <li><a href="#ldap" class="redlnk">LDAP Settings<?php if ($pconfig['sectionid'] == "ldap") echo '<span class="red">&nbsp;&raquo;last modified&laquo;</span>'; ?></a></li>
+				      <?php endif; ?>
 				      <li><a href="#misc" class="redlnk">Miscellaneous Settings<?php if ($pconfig['sectionid'] == "misc") echo '<span class="red">&nbsp;&raquo;last modified&laquo;</span>'; ?></a></li>
 				      <li><a href="#main" class="redlnk">Maintainance Settings<?php if ($pconfig['sectionid'] == "main") echo '<span class="red">&nbsp;&raquo;last modified&laquo;</span>'; ?></a></li>
 				      <li><a href="#sys" class="redlnk">System Settings<?php if ($pconfig['sectionid'] == "sys") echo '<span class="red">&nbsp;&raquo;last modified&laquo;</span>'; ?></a></li>
+				      <?php if (checkForClamAVSupport()): ?>
 				      <li><a href="#clam" class="redlnk">ClamAV Engine Settings<?php if ($pconfig['sectionid'] == "clam") echo '<span class="red">&nbsp;&raquo;last modified&laquo;</span>'; ?></a></li>
+				      <?php endif; ?>
 				      <li><a href="#srv" class="redlnk">DSPAM Daemon Settings (Server)<?php if ($pconfig['sectionid'] == "srv") echo '<span class="red">&nbsp;&raquo;last modified&laquo;</span>'; ?></a></li>
 				      <li><a href="#cli" class="redlnk">DSPAM Daemon Settings (Client)<?php if ($pconfig['sectionid'] == "cli") echo '<span class="red">&nbsp;&raquo;last modified&laquo;</span>'; ?></a></li>
 				    </ul>
@@ -982,10 +986,16 @@ EOD;
                     <td width="22%" valign="top" class="vncell">Storage Driver</td>
                     <td width="78%" class="vtable">
                       <select name="sdriver" onChange="toggleDBSettings();" class="formselect">
+                        <?php if (checkForMySQLSupport()): ?>
                         <option value="mysql" <?php if($pconfig['sdriver'] == "mysql") echo('selected="selected"');?>>mysql</option>
+                        <?php endif; ?>
+                        <?php if (checkForSQLiteSupport()): ?>
                         <option value="sqlite" <?php if($pconfig['sdriver'] == "sqlite") echo('selected="selected"');?>>sqlite</option>
+                        <?php endif; ?>
                         <option value="bdb" <?php if($pconfig['sdriver'] == "bdb") echo('selected="selected"');?>>bdb</option>
+                        <?php if (checkForPgSQLSupport()): ?>
                         <option value="pgsql" <?php if($pconfig['sdriver'] == "pgsql") echo('selected="selected"');?>>pgsql</option>
+                        <?php endif; ?>
                         <option value="oracle" <?php if($pconfig['sdriver'] == "oracle") echo('selected="selected"');?>>oracle</option>
                         <option value="hash" <?php if($pconfig['sdriver'] == "hash") echo('selected="selected"');?>>hash</option>
                       </select>
@@ -999,7 +1009,7 @@ EOD;
                       </p>
                     </td>
                   </tr>
-                  <?php if ($pconfig['sdriver'] == "mysql"): ?>
+                  <?php if ($pconfig['sdriver'] == "mysql" && checkForMySQLSupport()): ?>
                   <tbody id="DBmysql" style="display: table-row-group;">
                   <?php else: ?>
                   <tbody id="DBmysql" style="display: none;">
@@ -1115,7 +1125,7 @@ EOD;
                       </td>
                     </tr>
                   </tbody>
-                  <?php if ($pconfig['sdriver'] == "sqlite"): ?>
+                  <?php if ($pconfig['sdriver'] == "sqlite" && checkForSQLiteSupport()): ?>
                   <tbody id="DBsqlite" style="display: table-row-group;">
                   <?php else: ?>
                   <tbody id="DBsqlite" style="display: none;">
@@ -1149,7 +1159,7 @@ EOD;
                       </td>
                     </tr>
                   </tbody>
-                  <?php if ($pconfig['sdriver'] == "pgsql"): ?>
+                  <?php if ($pconfig['sdriver'] == "pgsql" && checkForPgSQLSupport()): ?>
                   <tbody id="DBpgsql" style="display: table-row-group;">
                   <?php else: ?>
                   <tbody id="DBpgsql" style="display: none;">
@@ -2006,6 +2016,7 @@ markov      Markovian Weighted Technique
                       <input id="submitt" name="Submit" type="submit" class="formbtn" value="<?=gettext("Save");?>" onclick="document.iform.sectionid.value = 'eng';" />
                     </td>
                   </tr>
+                  <?php if (checkForLDAPSupport()): ?>
                   <tr>
                     <td colspan="2" class="list" height="12">&nbsp;</td>
                   </tr>
@@ -2068,6 +2079,7 @@ markov      Markovian Weighted Technique
                       <input id="submitt" name="Submit" type="submit" class="formbtn" value="<?=gettext("Save");?>" onclick="document.iform.sectionid.value = 'ldap';" />
                     </td>
                   </tr>
+                  <?php endif; ?>
                   <tr>
                     <td colspan="2" class="list" height="12">&nbsp;</td>
                   </tr>
@@ -2552,6 +2564,7 @@ markov      Markovian Weighted Technique
                   <tr>
                     <td colspan="2" class="list" height="12">&nbsp;</td>
                   </tr>
+                  <?php if (checkForClamAVSupport()): ?>
                   <tr>
                     <td valign="top" class="listtopic"><a name="clam" style="visibility: hidden;">&nbsp;</a>ClamAV Engine Settings</td>
                     <td align="right" valign="top" class="listtopic">
@@ -2633,6 +2646,7 @@ markov      Markovian Weighted Technique
                   <tr>
                     <td colspan="2" class="list" height="12">&nbsp;</td>
                   </tr>
+                  <?php endif; ?>
                   <tr>
                     <td colspan="2" valign="top" class="listtopic"><a name="srv" style="visibility: hidden;">&nbsp;</a>DSPAM Daemon Settings (Server)</td>
                   </tr>
@@ -2793,7 +2807,7 @@ markov      Markovian Weighted Technique
                     <td width="22%" valign="top" class="vncell">Server Parameters</td>
                     <td width="78%" class="vtable">
                       <p>
-                        <input type="text" size="30" class="formfld" name="serverparam" id="serverparam" value="<?=htmlspecialchars($pconfig['serverparam']);?>" />
+                        <input type="text" size="30" class="formfld unknown" name="serverparam" id="serverparam" value="<?=htmlspecialchars($pconfig['serverparam']);?>" />
                         <strong>
                         Parameters which will be passed to the LMTP server.
                         </strong>

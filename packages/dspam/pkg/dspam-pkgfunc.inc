@@ -490,4 +490,57 @@ function custom_php_deinstall_command() {
   conf_mount_ro();
 }
 
+function checkForLDAPSupport() {
+        $pd = popen("ldd /usr/local/bin/dspam", "r");
+        while (!feof($pd)) {
+          $dspamstr .= fgets($pd, 4096);
+        }
+        pclose($pd);
+
+        if (strpos($dspamstr, "libldap") !== false &&
+            file_exists("/usr/local/lib/libldap.so") &&
+            file_exists("/usr/local/lib/liblber.so")) {
+            return true;
+        }
+
+        return false;
+}
+
+function checkForPgSQLSupport() {
+  if (file_exists("/usr/local/lib/libpgsql_drv.so") &&
+      file_exists("/usr/local/lib/libpq.so")) {
+    return true;
+  }
+
+  return false;
+}
+
+function checkForMySQLSupport() {
+  if (file_exists("/usr/local/lib/libmysql_drv.so") &&
+      file_exists("/usr/local/lib/mysql/libmysqlclient.so")) {
+    return true;
+  }
+
+  return false;
+}
+
+function checkForSQLiteSupport() {
+  if (file_exists("/usr/local/lib/libsqlite3_drv.so") &&
+      file_exists("/usr/local/lib/mysql/libsqlite3.so")) {
+    return true;
+  }
+
+  return false;
+}
+
+function checkForClamAVSupport() {
+  if (file_exists("/usr/local/bin/clamdscan") &&
+      file_exists("/usr/local/bin/clamscan") &&
+      file_exists("/usr/local/sbin/clamd")) {
+    return true;
+  }
+
+  return false;
+}
+
 ?>
