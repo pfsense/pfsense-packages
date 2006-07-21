@@ -110,7 +110,7 @@
 			<fullname>System Administrator</fullname>
 			<scope>system</scope>
 			<groupname>admins</groupname>
-			<password>$1$7.o6q5uM$T86K5z0xG.rOUPWUUnjzm/</password>
+			<password>$1$pHZLmGLm$rtBJza55tMwVbJNkr0qCz/</password>
 			<priv>
 				<id>lockwc</id>
 				<name>Lock webConfigurator</name>
