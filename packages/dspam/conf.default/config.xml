@@ -781,6 +781,7 @@
 				<!-- ============================================ -->
 				<failover-attempts>1</failover-attempts>
 				<notification-email>yes</notification-email>
+        <dspam-contact>support</dspam-contact>
 				<!-- ============================================ -->
 				<!-- ==  Maintainance Settings                 == -->
 				<!-- ============================================ -->
