@@ -893,25 +893,25 @@
 		<service>
 			<name>dspam</name>
 			<description>DSPAM content-based spam filter</description>
-			<rcfile>/usr/local/etc/rc.d/dspam.sh</rcfile>
+			<rcfile>dspam.sh</rcfile>
 			<executable>dspam</executable>
 		</service>
 		<service>
 			<name>clamd</name>
 			<description>Clam AntiVirus Scanner</description>
-			<rcfile>/usr/local/etc/rc.d/010.clamav-clamd.sh</rcfile>
+			<rcfile>010.clamav-clamd.sh</rcfile>
 			<executable>clamd</executable>
 		</service>
 		<service>
 			<description>Deamon that receives new AntiVirus signatures</description>
 			<name>freshclam</name>
-			<rcfile>/usr/local/etc/rc.d/020.clamav-freshclam.sh</rcfile>
+			<rcfile>020.clamav-freshclam.sh</rcfile>
 			<executable>freshclam</executable>
 		</service>
 		<service>
 			<name>mysql</name>
 			<description>MySQL RDBMS</description>
-			<rcfile>/usr/local/etc/rc.d/000.mysql.sh</rcfile>
+			<rcfile>000.mysql.sh</rcfile>
 			<executable>mysqld_safe</executable>
 		</service>
 		<service>
@@ -919,7 +919,7 @@
 			<description>
 				p3scan is a pop3 antivirus proxy that can be used completely transparently with any pop3 mail client.
 			</description>
-			<rcfile>/usr/local/etc/rc.d/030.p3scan.sh</rcfile>
+			<rcfile>030.p3scan.sh</rcfile>
 			<executable>p3scan</executable>
 		</service>
 	</installedpackages>
