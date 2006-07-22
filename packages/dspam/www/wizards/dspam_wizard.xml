@@ -12,6 +12,7 @@
   <javascriptafterformdisplay />
 -->
 <copyright>
+<![CDATA[
 /*
   dspam_wizard.xml
         part of pfSense (http://www.pfsense.org/)
@@ -19,6 +20,7 @@
   Copyright (C) 2006 Daniel S. Haischt
         All rights reserved.
 */
+]]>
 </copyright>
 <totalsteps>15</totalsteps>
 <title>Services: DSPAM: DSPAM Wizard</title>
@@ -116,6 +118,7 @@ do this with Postfix.
     </field>
   </fields>
   <stepsubmitphpaction>
+  <![CDATA[
   if($_POST['dspamprofile'] != "") {
   
     /* set default trusted users */
@@ -224,6 +227,7 @@ do this with Postfix.
     
     write_config();
   }
+  ]]>
   </stepsubmitphpaction>
 </step>
 <step>
@@ -517,6 +521,7 @@ do this with Postfix.
     </field>
   </fields>
   <stepsubmitphpaction>
+  <![CDATA[
     if ($_POST['storagedriver'] == "mysql") {
       /* ============================================================================================= */
       /* == SQLite                                                                                  == */
@@ -697,8 +702,10 @@ do this with Postfix.
       unset($config['installedpackages']['dspam']['config'][0]['dbsettings'][0]['ora-password']);
       unset($config['installedpackages']['dspam']['config'][0]['dbsettings'][0]['ora-schema']);
     }
+  ]]>
   </stepsubmitphpaction>
   <javascriptafterformdisplay>
+  <![CDATA[
     function toggleDBSettings(idx) {
       if (idx)
       	idx = idx;
@@ -1088,6 +1095,7 @@ do this with Postfix.
     }
     
     toggleDBSettings(0);
+  ]]>
   </javascriptafterformdisplay>
 </step>
 <step>
@@ -1137,6 +1145,7 @@ do this with Postfix.
       <name>dspamc</name>
       <description>Use &lt;code&gt;dspamc&lt;/code&gt; instead of &lt;code&gt;dspam&lt;/code&gt; to locally deliver mails from the MTA to the user's mailbox (this pulls in DSPAM client/server settings).</description>
       <type>checkbox</type>
+      <bindstofield>installedpackages->dspam->config->0->thin-client</bindstofield>
     </field>
     <field>
       <donotdisable>true</donotdisable>
@@ -1207,6 +1216,7 @@ do this with Postfix.
     </field>
   </fields>
   <stepsubmitphpaction>
+  <![CDATA[
     if($_POST['dspamc'] != "") {
       /* DSPAM server settings */
       $config['installedpackages']['dspam']['config'][0]['dspam-server-port'] = "24";
@@ -1230,6 +1240,7 @@ do this with Postfix.
       $config['installedpackages']['dspam']['config'][0]['dspam-client-id'] = "secret@Relay1";
       write_config();
     }
+  ]]>
   </stepsubmitphpaction>
 </step>
 <step>
@@ -1819,12 +1830,16 @@ do this with Postfix.
     You can click on the icon above to access the site more quickly.
   </description>
   <javascriptafterformdisplay>
+  <![CDATA[
     window.setTimeout('window.location.href = "/dspam-settings.php"', 120000);
+  ]]>
   </javascriptafterformdisplay>
   <stepafterformdisplay>
+  <![CDATA[
       dspam_configure();
       mwexec("/usr/local/etc/rc.d/spamd.sh stop");
       mwexec("/usr/local/etc/rc.d/spamd.sh start");
+  ]]>
   </stepafterformdisplay>
 </step>
 </pfsensewizard>
