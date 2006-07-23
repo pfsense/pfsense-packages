@@ -1825,12 +1825,15 @@ do this with Postfix.
 	<includefile>dspam.inc</includefile>
   <title>Reload in progress</title>
   <description>
-    A reload is now in progress. Please wait. &lt;p&gt; The system will 
-    automatically try to access DSPAM settings in 120 page seconds. &lt;p&gt; 
+    A reload is now in progress. Please wait.
+    &lt;br /&gt;&#160;&lt;br /&gt;
+    The system will automatically try to access DSPAM settings in 120 page seconds.
+    &lt;br /&gt;&#160;&lt;br /&gt;
     You can click on the icon above to access the site more quickly.
   </description>
   <javascriptafterformdisplay>
   <![CDATA[
+    Effect.Pulsate('wzd_step_title', { duration: 10});
     window.setTimeout('window.location.href = "/dspam-settings.php"', 120000);
   ]]>
   </javascriptafterformdisplay>
