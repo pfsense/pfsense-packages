@@ -9,7 +9,7 @@
 				DSPAM is a scalable and open-source content-based spam filter designed for multi-user enterprise systems.
 				On a properly configured system, many users experience results between 99.5% - 99.95%, or one error for
 				every 200 to 2000 messages. DSPAM supports many different MTAs and can also be deployed as a stand-alone
-				SMTP appliance.
+				SMTP appliance (Note: This package is still in some kind of development and only was tested on HEAD).
 			</descr>
 			<config_file>http://www.pfsense.org/packages/config/dspam.xml</config_file>
       <configurationfile>dspam.xml</configurationfile>
@@ -32,7 +32,7 @@
       <depends_on_package>libidn-0.6.3</depends_on_package>
       <depends_on_package>clamav-devel-20060703</depends_on_package>
 			<version>3.6.8</version>
-			<status>ALPHA</status>
+			<status>PRE-ALPHA</status>
 			<maintainer>me@daniel.stefan.haischt.name</maintainer>
 			<logging>
 				<facilityname>dspam</facilityname>
