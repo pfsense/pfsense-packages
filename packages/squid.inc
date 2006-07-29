@@ -27,20 +27,20 @@ function squid_get_real_interface_address($iface) {
 }
 
 function squid_chown_recursive($dir, $user, $group) {
-	chown($dir, $user); 
-	chgrp($dir, $group); 
-	$handle = opendir($dir) ; 
-	while (($item = readdir($handle)) !== false) { 
-		if (($item != ".") && ($item != "..")) { 
+	chown($dir, $user);
+	chgrp($dir, $group);
+	$handle = opendir($dir) ;
+	while (($item = readdir($handle)) !== false) {
+		if (($item != ".") && ($item != "..")) {
 			$path = "$dir/$item";
 			if (is_dir($path))
-				squid_chown_recursive($path, $user, $group); 
+				squid_chown_recursive($path, $user, $group);
 			else {
-				chown($path, $user); 
-				chgrp($path, $group); 
+				chown($path, $user);
+				chgrp($path, $group);
 			}
-		} 
-	} 
+		}
+	}
 }
 
 function squid_is_valid_acl($acl) {
@@ -82,6 +82,10 @@ EOD;
 
 	if (!file_exists(SQUID_CONFBASE . '/mime.conf') && file_exists(SQUID_CONFBASE . '/mime.conf.default'))
 		copy(SQUID_CONFBASE . '/mime.conf.default', SQUID_CONFBASE . '/mime.conf');
+
+	if(!is_dir("/var/squid/cache/"))
+		exec("squid -z");
+
 }
 
 function squid_deinstall_command() {
@@ -321,6 +325,9 @@ EOD;
 		$conf .= "acl localnet src $src\n";
 		$valid_acls[] = 'localnet';
 	}
+
+	if(!is_dir("/var/squid/cache/"))
+		exec("squid -z");
 
 	return $conf;
 }
