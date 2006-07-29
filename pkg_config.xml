@@ -278,7 +278,7 @@
 			<status>PRE-ALPHA</status>
 			<maintainer>fernando@netfilter.com.br</maintainer>
 			<depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
-			<depends_on_package>squid-2.5.13_1.tbz</depends_on_package>
+			<depends_on_package>squid-2.5.14_2.tbz</depends_on_package>
 			<depends_on_package>squid_radius_auth-1.0.8.tbz</depends_on_package>
 			<config_file>http://www.pfsense.org/packages/config/squid.xml</config_file>
 			<configurationfile>squid.xml</configurationfile>
