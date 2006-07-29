@@ -83,9 +83,6 @@ EOD;
 	if (!file_exists(SQUID_CONFBASE . '/mime.conf') && file_exists(SQUID_CONFBASE . '/mime.conf.default'))
 		copy(SQUID_CONFBASE . '/mime.conf.default', SQUID_CONFBASE . '/mime.conf');
 
-	if(!is_dir("/var/squid/cache/"))
-		exec("squid -z");
-
 }
 
 function squid_deinstall_command() {
@@ -325,9 +322,6 @@ EOD;
 		$conf .= "acl localnet src $src\n";
 		$valid_acls[] = 'localnet';
 	}
-
-	if(!is_dir("/var/squid/cache/"))
-		exec("squid -z");
 
 	return $conf;
 }
@@ -636,6 +630,10 @@ function squid_resync() {
 	squid_resync_users();
 
 	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
+
+	if(!is_dir("/var/squid/cache"))
+		exec("/usr/local/sbin/squid -z");
+
 	restart_service('squid');
 
 	filter_configure();
