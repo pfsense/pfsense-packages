@@ -52,9 +52,9 @@ function squid_is_valid_acl($acl) {
 function squid_install_command() {
 	$rc = array();
 	$rc['file'] = 'squid.sh';
-	$rc['start'] = 'squid -D';
+	$rc['start'] = '/usr/local/sbin/squid -D';
 	$rc['stop'] = <<<EOD
-squid -k shutdown
+/usr/local/sbin/squid -k shutdown
 # Just to be sure...
 killall squid 2>/dev/null
 sleep 1
@@ -63,9 +63,9 @@ killall squid 2>/dev/null
 EOD;
 	$rc['restart'] = <<<EOD
 if [ -z "`pgrep squid`" ]; then
-		squid -D
+		/usr/local/sbin/squid -D
 	else
-		squid -k reconfigure
+		/usr/local/sbin/squid -k reconfigure
 	fi
 
 EOD;
