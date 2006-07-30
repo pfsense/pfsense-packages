@@ -80,6 +80,11 @@ EOD;
 			squid_chown_recursive($dir, 'proxy', 'proxy');
 	}
 
+	/* kill any running proxy alarm scripts */
+	mwexec("ps awux | grep \"proxy_monitor\" | awk '{ print $6 }' | xargs kill");
+	/* restart proxy alarm scripts */
+	mwexec("/usr/local/etc/rc.d/proxy_monitor.sh");
+
 	if (!file_exists(SQUID_CONFBASE . '/mime.conf') && file_exists(SQUID_CONFBASE . '/mime.conf.default'))
 		copy(SQUID_CONFBASE . '/mime.conf.default', SQUID_CONFBASE . '/mime.conf');
 
