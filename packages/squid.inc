@@ -87,6 +87,7 @@ EOD;
 
 function squid_deinstall_command() {
 	mwexec('rm -rf ' . CACHEDIR);
+	mwexec('rm -rf /usr/local/etc/rc.d/proxy_monitor.sh');
 	filter_configure();
 }
 
