@@ -11,6 +11,10 @@ set -e
 
 LOOP_SLEEP=5
 
+if [ -f /var/run/squid_alarm ]; then
+	rm /var/run/squid_alarm
+fi
+
 # Squid monitor 1.0
 while [ /bin/true ]; do
         if [  ! -f /var/run/squid_alarm ]; then
