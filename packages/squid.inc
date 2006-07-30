@@ -83,7 +83,7 @@ EOD;
 	/* kill any running proxy alarm scripts */
 	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | awk '{ print $6 }' | xargs kill");
 	/* restart proxy alarm scripts */
-	mwexec("/usr/local/etc/rc.d/proxy_monitor.sh");
+	mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 
 	if (!file_exists(SQUID_CONFBASE . '/mime.conf') && file_exists(SQUID_CONFBASE . '/mime.conf.default'))
 		copy(SQUID_CONFBASE . '/mime.conf.default', SQUID_CONFBASE . '/mime.conf');
@@ -337,7 +337,7 @@ EOD;
 	/* kill any running proxy alarm scripts */
 	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | awk '{ print $6 }' | xargs kill");
 	/* restart proxy alarm scripts */
-	mwexec("/usr/local/etc/rc.d/proxy_monitor.sh");
+	mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 
 	return $conf;
 }
