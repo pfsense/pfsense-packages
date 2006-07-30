@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <packagegui>
-	<include_file>squid.inc</include_file>
-
+	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<!-- Installation -->
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/squid.inc</item>
