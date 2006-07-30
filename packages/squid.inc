@@ -334,6 +334,11 @@ EOD;
 		$valid_acls[] = 'localnet';
 	}
 
+	/* kill any running proxy alarm scripts */
+	mwexec("ps awux | grep \"proxy_monitor\" | awk '{ print $6 }' | xargs kill");
+	/* restart proxy alarm scripts */
+	mwexec("/usr/local/etc/rc.d/proxy_monitor.sh");
+
 	return $conf;
 }
 
