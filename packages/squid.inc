@@ -92,7 +92,8 @@ EOD;
 
 function squid_deinstall_command() {
 	mwexec('rm -rf ' . CACHEDIR);
-	mwexec('rm -rf /usr/local/etc/rc.d/proxy_monitor.sh');
+	mwexec('rm -f /usr/local/etc/rc.d/proxy_monitor.sh');
+	mwexec("ps awux | grep \"proxy_monitor\" | awk '{ print $6 }' | xargs kill");
 	filter_configure();
 }
 
