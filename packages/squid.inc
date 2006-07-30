@@ -754,20 +754,26 @@ function squid_generate_rules($type) {
 	global $config;
 
 	$squid_conf = $config['installedpackages']['squid']['config'][0];
-	if (!is_service_running('squid') || ($squid_conf['transparent_proxy'] != 'on')) return;
+	if (!is_service_running('squid') || ($squid_conf['transparent_proxy'] != 'on')) {
+		log_error("SQUID is installed but not started.  Not installing redirect rules.");
+		return;
+	}
 
-	$port = $squid_conf['proxy_port'];
+	if($squid_conf['proxy_port'])
+		$port = $squid_conf['proxy_port'];
+	else
+		$port = "3128";
 	$ifaces = explode(',', $squid_conf['active_interface']);
 	$ifaces = array_map('convert_friendly_interface_to_real_interface_name', $ifaces);
 
 	switch($type) {
 	case 'nat':
 		foreach ($ifaces as $iface)
-			$rules .= "rdr on $iface inet proto tcp to !($iface) port 80 -> ($iface) port $port\n";
+			$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> ($iface) port $port\n";
 		break;
 	case 'filter':
 		foreach ($ifaces as $iface)
-			$rules .= "pass quick on $iface inet proto tcp to !($iface) port 80 flags S/SA keep state\n";
+			$rules .= "pass quick on $iface proto tcp from any to !($iface) port 80 flags S/SA keep state\n";
 		break;
 	default:
 		break;
