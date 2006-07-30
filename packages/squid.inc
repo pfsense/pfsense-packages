@@ -81,7 +81,7 @@ EOD;
 	}
 
 	/* kill any running proxy alarm scripts */
-	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | awk '{ print $6 }' | xargs kill");
+	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
 	/* restart proxy alarm scripts */
 	mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 
@@ -93,10 +93,10 @@ EOD;
 function squid_deinstall_command() {
 	mwexec('rm -rf ' . CACHEDIR);
 	mwexec('rm -f /usr/local/etc/rc.d/proxy_monitor.sh');
-	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | awk '{ print $6 }' | xargs kill");
-	mwexec("ps awux | grep \"squid\" | grep -v \"grep\" | awk '{ print $6 }' | xargs kill");
-	mwexec("ps awux | grep \"dnsserver\" | grep -v \"grep\" | awk '{ print $6 }' | xargs kill");
-	mwexec("ps awux | grep \"unlinkd\" | grep -v \"grep\" | awk '{ print $6 }' | xargs kill");
+	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
+	mwexec("ps awux | grep \"squid\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
+	mwexec("ps awux | grep \"dnsserver\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
+	mwexec("ps awux | grep \"unlinkd\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
 	filter_configure();
 }
 
@@ -335,7 +335,7 @@ EOD;
 	}
 
 	/* kill any running proxy alarm scripts */
-	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | awk '{ print $6 }' | xargs kill");
+	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
 	/* restart proxy alarm scripts */
 	mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 
