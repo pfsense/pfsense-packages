@@ -282,7 +282,8 @@ EOD;
 	$real_ifaces = array();
 	foreach (explode(',', $ifaces) as $i => $iface) {
 		$real_ifaces[] = squid_get_real_interface_address($iface);
-		$conf .= "http_port {$real_ifaces[$i][0]}:$port\n";
+		if($real_ifaces[$i][0])
+			$conf .= "http_port {$real_ifaces[$i][0]}:$port\n";
 	}
 
 	$icp_port = ($settings['icp_port'] ? $settings['icp_port'] : 0);
