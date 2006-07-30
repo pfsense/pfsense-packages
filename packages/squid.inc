@@ -93,10 +93,10 @@ EOD;
 function squid_deinstall_command() {
 	mwexec('rm -rf ' . CACHEDIR);
 	mwexec('rm -f /usr/local/etc/rc.d/proxy_monitor.sh');
-	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"proxy_monitor\" | awk '{ print $6 }' | xargs kill");
-	mwexec("ps awux | grep \"squid\" | grep -v \"squid\" | awk '{ print $6 }' | xargs kill");
-	mwexec("ps awux | grep \"dnsserver\" | grep -v \"dnsserver\" | awk '{ print $6 }' | xargs kill");
-	mwexec("ps awux | grep \"unlinkd\" | grep -v \"unlinkd\" | awk '{ print $6 }' | xargs kill");
+	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | awk '{ print $6 }' | xargs kill");
+	mwexec("ps awux | grep \"squid\" | grep -v \"grep\" | awk '{ print $6 }' | xargs kill");
+	mwexec("ps awux | grep \"dnsserver\" | grep -v \"grep\" | awk '{ print $6 }' | xargs kill");
+	mwexec("ps awux | grep \"unlinkd\" | grep -v \"grep\" | awk '{ print $6 }' | xargs kill");
 	filter_configure();
 }
 
