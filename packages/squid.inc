@@ -50,6 +50,8 @@ function squid_is_valid_acl($acl) {
 }
 
 function squid_install_command() {
+	/* create cache */
+	mwexec("/usr/local/sbin/squid -z");
 	$rc = array();
 	$rc['file'] = 'squid.sh';
 	$rc['start'] = '/usr/local/sbin/squid -D';
