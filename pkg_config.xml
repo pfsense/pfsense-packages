@@ -274,8 +274,8 @@
 			<descr>High performance web proxy cache.</descr>
 			<website>http://www.squid-cache.org/</website>
 			<category>Network</category>
-			<version>0.1</version>
-			<status>PRE-ALPHA</status>
+			<version>0.2</version>
+			<status>ALPHA</status>
 			<maintainer>fernando@netfilter.com.br</maintainer>
 			<depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
 			<depends_on_package>squid-2.5.14_2.tbz</depends_on_package>
