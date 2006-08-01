@@ -654,6 +654,11 @@ function squid_resync() {
 		exec("/usr/local/sbin/squid -z");
 	}
 
+	/* kill any running proxy alarm scripts */
+	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
+	/* restart proxy alarm scripts */
+	mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
+
 	restart_service('squid');
 
 	filter_configure();
