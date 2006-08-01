@@ -40,6 +40,25 @@
 			</logging>
 		</package>
 		<package>
+			<name>sshterm</name>
+			<descr>
+        This is a package of the SSHTools SSHTerm Java Applet. SSHTools is a
+        suite of Java SSH applications providing a Java SSH API,
+        SSH Terminal, SSH secured VNC client, SFTP client and SSH Daemon.
+        
+        Compatibility note: Tested on CVS HEAD.
+      </descr>
+			<website>http://sourceforge.net/projects/sshtools/</website>
+			<category>Security</category>
+			<version>0.1</version>
+			<status>ALPHA</status>
+			<mantainer>me@daniel.stefan.haischt.name</mantainer>
+			<depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+			<depends_on_package>sshtools-0.2.2.tbz</depends_on_package>
+			<config_file>http://www.pfsense.org/packages/config/sshterm.xml</config_file>
+			<configurationfile>sshterm.xml</configurationfile>
+		</package>
+		<package>
 			<name>spamassassin</name>
 			<descr>The SpamAssassin spam detection software.</descr>
 			<website>http://spamassassin.apache.org/</website>
