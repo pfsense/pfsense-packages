@@ -31,12 +31,6 @@
 	    <prefix>/usr/local/etc/rc.d/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>
-	<custom_php_install_command>
-		squid_install_command();
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		squid_deinstall_command();
-	</custom_php_deinstall_command>
 	<menu>
 		<name>Proxy server</name>
 		<tooltiptext>Modify the proxy server's settings</tooltiptext>
@@ -163,4 +157,11 @@
 	<custom_php_resync_config_command>
 		squid_resync();
 	</custom_php_resync_config_command>
+	<custom_php_install_command>
+		squid_install_command();
+		squid_resync();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		squid_deinstall_command();
+	</custom_php_deinstall_command>
 </packagegui>
