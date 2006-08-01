@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<copyright>
+  <![CDATA[
+	/* $Id$ */
+	/*
+		part of pfSense (http://www.pfsense.org/)
+
+		Copyright (C) 2006 Daniel S. Haischt - me@daniel.stefan.haischt.name.
+		All rights reserved.
+
+		Redistribution and use in source and binary forms, with or without
+		modification, are permitted provided that the following conditions are met:
+
+		1. Redistributions of source code must retain the above copyright notice,
+		   this list of conditions and the following disclaimer.
+
+		2. Redistributions in binary form must reproduce the above copyright
+		   notice, this list of conditions and the following disclaimer in the
+		   documentation and/or other materials provided with the distribution.
+
+		THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+		INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+		AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+		AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+		OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+		SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+		INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+		CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+		ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+		POSSIBILITY OF SUCH DAMAGE.
+	*/
+  ]]>
+	</copyright>
+	<name>sshterm</name>
+	<version>1.0</version>
+	<title>Diagnostics: Shell</title>
+
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/diag_shell.php</item>
+	</additional_files_needed>
+
+	<!-- Menu is where this packages menu will appear -->
+	<menu>
+		<name>Shell</name>
+		<section>Diagnostics</section>
+		<configfile>sshterm.xml</configfile>
+		<url>/diag_shell.php</url>
+	</menu>
+	<!--
+    configpath gets expanded out automatically and config
+    items will be stored in that location
+  -->
+	<configpath>['installedpackages']['sshterm']['config']</configpath>
+	<!--
+    fields gets invoked when the user adds or edits a item.
+    the following items will be parsed and rendered for the
+    user as a gui with input, and selectboxes.
+  -->
+	<fields />
+	<aftersaveredirect />
+  <custom_php_command_before_form>
+  </custom_php_command_before_form>
+	<custom_delete_php_command>
+	</custom_delete_php_command>
+	<custom_php_resync_config_command>
+	</custom_php_resync_config_command>
+	<custom_php_install_command>
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+	</custom_php_deinstall_command>
+</packagegui>
