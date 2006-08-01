@@ -37,7 +37,14 @@
 	<title>Diagnostics: Shell</title>
 
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/diag_shell.php</item>
+    <prefix>/usr/local/www/</prefix>
+    <chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/sshterm/diag_shell_head.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+    <prefix>/usr/local/www/</prefix>
+    <chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/sshterm/diag_shell_releng.php</item>
 	</additional_files_needed>
 
 	<!-- Menu is where this packages menu will appear -->
@@ -66,6 +73,17 @@
 	<custom_php_resync_config_command>
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
+    $version = readfile("/etc/version");
+    
+    if ($version == "HEAD") {
+      unlink("/usr/local/www/diag_shell_releng.php");
+      rename("/usr/local/www/diag_shell_head.php",
+             "/usr/local/www/diag_shell.php");
+    } else {
+      unlink("/usr/local/www/diag_shell_head.php");
+      rename("/usr/local/www/diag_shell_releng.php",
+             "/usr/local/www/diag_shell.php");
+    }
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 	</custom_php_deinstall_command>

@@ -56,7 +56,7 @@
 			<maintainer>me@daniel.stefan.haischt.name</maintainer>
 			<depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
 			<depends_on_package>sshtools-0.2.2.tbz</depends_on_package>
-			<config_file>http://www.pfsense.org/packages/config/sshterm.xml</config_file>
+			<config_file>http://www.pfsense.org/packages/config/sshterm/sshterm.xml</config_file>
 			<configurationfile>sshterm.xml</configurationfile>
 		</package>
 		<package>
