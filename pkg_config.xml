@@ -4,6 +4,18 @@
 <pfsensepkgs>
 	<packages>
 		<package>
+			<name>openntpd</name>
+			<descr>OpenNTPD NTP time server.</descr>
+			<category>Network</category>
+			<version>0.8.1</version>
+			<status>PRE-ALPHA</status>
+			<maintainer>fernando@netfilter.com.br</maintainer>
+			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
+			<depends_on_package>openntpd-3.7p1,2.tbz</depends_on_package>
+			<config_file>http://www.pfsense.org/packages/config/openntpd.xml</config_file>
+			<configurationfile>openntpd.xml</configurationfile>
+		</package>
+		<package>
 			<name>dspam</name>
 			<website>http://dspam.nuclearelephant.com/</website>
 			<descr>
