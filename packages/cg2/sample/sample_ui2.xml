@@ -1,0 +1,28 @@
+<coregui_interface>
+<version>2.0</version>
+<config>sample2</config>
+
+<element>
+	<type>form</type>
+	<widget>
+		<type>textbox</type>
+		<name>mytextbox</name>
+		<label>My fancy textbox</label>
+		<value>Welcome to the world of coregui 2.0</value>
+		<required/>
+	</widget>
+	<widget>
+		<type>textarea</type>
+		<name>mytextarea</name>
+		<label>My fancy textarea</label>
+		<value>This widget will be encoded to the config</value>
+		<encode/>
+	</widget>
+	<widget>
+		<type>submit</type>
+		<name>mysubmit</name>
+		<caption>Submit this now</caption>
+	</widget>
+</element>
+
+</coregui_interface>

@@ -1,0 +1,130 @@
+<coregui_interface>
+<version>2.0</version>
+<config>sample</config>
+
+<include>sample.inc</include>
+<!--<include>sample2.inc</include>-->
+<include_javascript>sample.js</include_javascript>
+
+<element>
+	<type>form</type>
+	<on_load_event>sample_on_load_event</on_load_event>
+	<on_sync_event>sample_on_sync_event</on_sync_event>
+	<widget>
+		<type>header</type>
+		<label>Headers are useful to separate stuff...</label>
+	</widget>
+	<widget>
+		<type>textbox</type>
+		<name>mytextbox</name>
+		<label>My fancy textbox</label>
+		<description>This is a textbox</description>
+		<value>Welcome to the world of coregui 2.0</value>
+		<required/>
+	</widget>
+	<widget>
+		<type>textarea</type>
+		<name>mytextarea</name>
+		<label>My fancy textarea</label>
+		<description>Just testing descriptions...</description>
+		<value>This widget can not be edited!</value>
+		<read_only/>
+	</widget>
+	<widget>
+		<type>checkbox</type>
+		<name>mycheckbox</name>
+		<label>A sample checkbox</label>
+		<caption>Check this nice checkbox</caption>
+		<description>Now checkboxes can have a caption as well.</description>
+		<on_check_javascript>alert('hey, this is only meant for quick and dirty stuff, do NOT implement anything longer than 2 or 3 commands here! Btw, i was clicked.');</on_check_javascript>
+	</widget>
+	<widget>
+		<type>submit</type>
+		<name>mysubmit</name>
+		<caption>Send something</caption>
+		<on_submit_event>sample_on_submit_event</on_submit_event>
+		<group_start/>
+	</widget>
+	<widget>
+		<type>button</type>
+		<name>mybutton</name>
+		<caption>Cancel something</caption>
+		<description>The description for the last element in a group is the description that matters.</description>
+		<on_click_javascript>alert('Hi, don\'t abuse me, use include_javascript instead!');</on_click_javascript>
+		<group_end/>
+	</widget>
+	<widget>
+		<type>textbox</type>
+		<name>dummydummy</name>
+		<label>Just some dummy text</label>
+		<do_not_display/>
+	</widget>
+	<widget>
+		<type>checkbox</type>
+		<name>anothercheckbox</name>
+		<label>Another checkbox</label>
+		<caption>Enable</caption>
+		<description>Another checkbox, this time after a group, and disabled.</description>
+		<disabled/>
+	</widget>
+</element>
+
+<element>
+	<type>table</type>
+	<buttons>move,edit,delete,add</buttons>
+	<apply>Those stupid rules have been updated. Click this button to apply thechanges.</apply>
+	<on_sync_event>sample_on_sync_event</on_sync_event>
+	<widget>
+		<type>checkbox</type>
+		<name>dummycheckbox</name>
+		<label>Dummy checkbox</label>
+	</widget>
+	<widget>
+		<type>port</type>
+		<name>dummyport</name>
+		<label>Port</label>
+		<description>Enter a port here.</description>
+		<value>3128</value>
+		<required/>
+	</widget>
+	<widget>
+		<type>textbox</type>
+		<name>dummysetting</name>
+		<label>Dummy setting</label>
+		<description>This dummy setting will not show up in the table.</description>
+		<not_in_table/>
+	</widget>
+	<widget>
+		<type>textarea</type>
+		<name>longfield</name>
+		<label>Very long field</label>
+		<description>Very very very very very long field.</description>
+		<highlighted/>
+	</widget>
+</element>
+
+<element>
+	<type>form</type>
+	<widget>
+		<type>header</type>
+		<label>...such as two different forms</label>
+	</widget>
+	<widget>
+		<type>button</type>
+		<name>mybutton</name>
+		<label>A simple button</label>
+		<caption>Another silly button</caption>
+	</widget>
+</element>
+
+<element>
+	<type>table</type>
+	<widget>
+		<label>Silly test</label>
+	</widget>
+	<widget>
+		<label>Another field</label>
+	</widget>
+</element>
+
+</coregui_interface>

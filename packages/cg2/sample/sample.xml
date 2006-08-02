@@ -1,0 +1,17 @@
+<coregui_master>
+<version>2.0</version>
+
+<title>A fancy example</title>
+
+<!--<include>sample.inc</include>-->
+<!--<tabs_callback>sample_generate_tabs</tabscallback>-->
+<tab>
+	<label>My fancy tab</label>
+	<interface>sample_ui.xml</interface>
+</tab>
+<tab>
+	<label>Another fancy tab</label>
+	<interface>sample_ui2.xml</interface>
+</tab>
+
+</coregui_master>
