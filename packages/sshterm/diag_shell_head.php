@@ -74,7 +74,6 @@ echo $pfSenseHead->getHTML();
               <param name="sshapps.ui.disabledActions" value="Open,About">
               
             </applet>
-    </applet>
 				 </td>
 				</tr>			
 			</table>
