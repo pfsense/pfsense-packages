@@ -28,7 +28,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = array("Diagnostics", "Shell");
+$pgtitle = "Diagnostics: Shell";
 require("guiconfig.inc");
 
 if ($_POST) {
@@ -46,14 +46,9 @@ include("head.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 			<form action="diag_ping.php" method="post" name="iform" id="iform">
 			  <table width="100%" border="0" cellpadding="6" cellspacing="0">
-        <tr>
-                <td>
-<?php if ($input_errors) print_input_errors($input_errors); ?>
-			<form action="diag_ping.php" method="post" name="iform" id="iform">
-			  <table width="100%" border="0" cellpadding="6" cellspacing="0">
 				<tr>
 				  <td width="10%" valign="top" class="vncellreq">SSH Terminal:</td>
-				  <td align="left" valign="top" width="90%">
+				  <td width="90%"> 
             <applet width="640"
                     height="480"
                     archive="SSHTermApplet-signed.jar,SSHTermApplet-jdkbug-workaround-signed.jar"
@@ -72,9 +67,8 @@ include("head.inc"); ?>
               <param name="sshapps.ui.disabledActions" value="Open,About">
 
             </applet>
-    </applet>
-				 </td>
-				</tr>		
+				  </td>
+				</tr>
 			</table>
 </form>
 </td></tr></table>
