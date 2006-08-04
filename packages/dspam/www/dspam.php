@@ -67,7 +67,7 @@ echo $pfSenseHead->getHTML();
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<form action="dspam.php" method="post" enctype="multipart/form-data">
+<form action="dspam.php" method="post" name="iform" id="iform" enctype="multipart/form-data">
 <input type="hidden" name="MAX_FILE_SIZE" value="<?= (diskfreespace('/') - (10 * pow(10, 6))); ?>">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
