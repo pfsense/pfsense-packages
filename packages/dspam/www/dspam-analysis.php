@@ -61,7 +61,7 @@ echo $pfSenseHead->getHTML();
     <td>
 <?php
   $tab_array = array();
-  $tab_array[] = array("Info",         false, "/dspam.php?{$CURRENT_USER}");
+  $tab_array[] = array("Info",         false, "/dspam.php?user={$CURRENT_USER}");
   $tab_array[] = array("Performance",  false, "/dspam-perf.php?user={$CURRENT_USER}");
   $tab_array[] = array("Preferences",  false, "/dspam-prefs.php?user={$CURRENT_USER}");
   $tab_array[] = array("Alerts",       false, "/pkg.php?xml=dspam_alerts.xml&user={$CURRENT_USER}");

@@ -67,14 +67,14 @@ echo $pfSenseHead->getHTML();
   $querystr = "?user=?{$CURRENT_USER}&page={$DATA['QPAGE']}&sortby={$DATA['SORTBY']}&qperpage={$CONFIG['QUARANTINE_PER_PAGE']}";
 
   $tab_array = array();
-  $tab_array[] = array("Info",         false, "/dspam.php?{$CURRENT_USER}");
-  $tab_array[] = array("Performance",  false, "/dspam-perf.php?{$CURRENT_USER}");
-  $tab_array[] = array("Preferences",  false, "/dspam-prefs.php?{$CURRENT_USER}");
+  $tab_array[] = array("Info",         false, "/dspam.php?user={$CURRENT_USER}");
+  $tab_array[] = array("Performance",  false, "/dspam-perf.php?user={$CURRENT_USER}");
+  $tab_array[] = array("Preferences",  false, "/dspam-prefs.php?user={$CURRENT_USER}");
   $tab_array[] = array("Alerts",       false, "/pkg.php?xml=dspam_alerts.xml&user={$CURRENT_USER}");
   $tab_array[] = array("Quarantine (View)",   true,  "/dspam-quarantine.php{$querystr}");
-  $tab_array[] = array("Analysis",     false, "/dspam-analysis.php?{$CURRENT_USER}");
-  $tab_array[] = array("History",      false, "/dspam-history.php?{$CURRENT_USER}");
-  $tab_array[] = array("Train Filter", false, "/dspam-train.php?{$CURRENT_USER}");
+  $tab_array[] = array("Analysis",     false, "/dspam-analysis.php?user={$CURRENT_USER}");
+  $tab_array[] = array("History",      false, "/dspam-history.php?user={$CURRENT_USER}");
+  $tab_array[] = array("Train Filter", false, "/dspam-train.php?user={$CURRENT_USER}");
   if (isDSPAMAdmin($HTTP_SERVER_VARS['AUTH_USER'])) {
     $tab_array[] = array("Admin Suite",  false, "/dspam-admin.php");
   }
