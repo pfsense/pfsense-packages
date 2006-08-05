@@ -31,6 +31,10 @@
       <active />
     </tab>
     <tab>
+      <text>Transparent Proxy Exclusion</text>
+      <url>/pkg.php?xml=p3scan-pf-transex.xml</url>
+    </tab>
+    <tab>
       <text>Message Processing</text>
       <url>/pkg_edit.php?xml=p3scan-pf-msg.xml&amp;id=0</url>
     </tab>
@@ -56,6 +60,11 @@
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
     <item>http://www.pfsense.com/packages/config/p3scan-pf/p3scan-pf-msg.xml</item>
+  </additional_files_needed>
+  <additional_files_needed>
+    <prefix>/usr/local/pkg/</prefix>
+    <chmod>0755</chmod>
+    <item>http://www.pfsense.com/packages/config/p3scan-pf/p3scan-pf-transex.xml</item>
   </additional_files_needed>
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>

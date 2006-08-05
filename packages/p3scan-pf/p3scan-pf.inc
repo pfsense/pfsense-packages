@@ -327,9 +327,32 @@ function custom_php_deinstall_command() {
   conf_mount_ro();
 }
 
+function add_trans_table(){
+  global $config;
+  conf_mount_rw();
+  config_lock();
+
+  /* Flush all entries first, and then add them. */
+  $p3scan_pf_result = mwexec ('pfctl -a "rdr-package/p3scan" -t p3scan -T flush');
+  if($p3scan_pf_result <> 0) {
+        file_notice("P3SCAN", "There were error(s) flushing the exclude table", "P3SCAN", "");
+  }
+  if($config['installedpackages']['p3scanpftransex']['config'] != ""){
+    foreach($config['installedpackages']['p3scanpftransex']['config'] as $tmp) {
+      $p3scan_pf_result = mwexec ('pfctl -a "rdr-package/p3scan" -t p3scan -T add ' . $tmp['ip']);
+      if($p3scan_pf_result <> 0) {
+        file_notice("P3SCAN", "There were error(s) adding the ip " . $tmp['ip'], "P3SCAN", "");
+      }
+    }
+  }
+  /* signal a reload of all files */
+  conf_mount_ro();
+  config_unlock();
+}
+
 function remove_transparency() {
   $p3scan_pf_result = mwexec ('pfctl -a "rdr-package/p3scan" -t p3scan -T flush');
-  if($havp_pf_result <> 0) {
+  if($p3scan_pf_result <> 0) {
     file_notice("P3SCAN", "There were error(s) flushing the exclude table", "P3SCAN", "");
   }
 }
@@ -339,7 +362,7 @@ function setup_transparency() {
   $cfg = $config['installedpackages']['p3scanpf']['config'][0];
   $trans_file = fopen("/tmp/p3scan_pf.rules","w");
   fwrite($trans_file, "table <p3scan> persist\n");
-  fwrite($trans_file, "rdr on " . $config['interfaces']['lan']['if'] .  " inet proto tcp from !<p3scan> to ! " . $config['interfaces']['lan']['ipaddr'] . " port = pop3 -> {$cfg['ip']} port {$cfg['port']} \n");
+  fwrite($trans_file, "rdr on " . $config['interfaces']['lan']['if'] .  " inet proto tcp from !<p3scan> to ! " . $config['interfaces']['lan']['ipaddr'] . " port = pop3 -> {$cfg['ipaddr']} port {$cfg['port']} \n");
   fclose($trans_file);
   $p3scan_pf_result = mwexec ('pfctl -a "rdr-package/p3scan" -f /tmp/p3scan_pf.rules');
   if($p3scan_pf_result <> 0) {

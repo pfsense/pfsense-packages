@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+  <!-- change this if configpath works -->
+  <name>p3scanpftransex</name>
+  <version>1.0</version>
+  <title>Services: POP3 Proxy: Exclude from Transparent Proxy</title>
+  <note>
+    Below you will have the opportunity to define specific IP addresses
+    which should be exempt from beeing served via transparent proxying.
+  </note>
+  <include_file>p3scan-pf.inc</include_file>
+  <tabs>
+    <tab>
+      <text>Daemon Settings</text>
+      <url>/pkg_edit.php?xml=p3scan-pf.xml&amp;id=0</url>
+    </tab>
+    <tab>
+      <text>Transparent Proxy Exclusion</text>
+      <url>/pkg.php?xml=p3scan-pf-transex.xml</url>
+      <active />
+    </tab>
+    <tab>
+      <text>Message Processing</text>
+      <url>/pkg_edit.php?xml=p3scan-pf-msg.xml&amp;id=0</url>
+    </tab>
+    <tab>
+      <text>Emergency Contact</text>
+      <url>/pkg.php?xml=p3scan-pf-emer.xml</url>
+    </tab>
+    <tab>
+      <text>Virus Scanner Settings</text>
+      <url>/pkg_edit.php?xml=p3scan-pf-vir.xml&amp;id=0</url>
+    </tab>
+    <tab>
+      <text>SPAM Settings</text>
+      <url>/pkg_edit.php?xml=p3scan-pf-spam.xml&amp;id=0</url>
+    </tab>
+  </tabs>
+  <!-- 
+    configpath gets expanded out automatically and config items
+    will be stored in that location
+  -->
+  <configpath>['installedpackages']['p3scanpf']['config']['virus']</configpath>
+  
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Exempted IP</fielddescr>
+			<fieldname>ip</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+  <!--
+    fields gets invoked when the user adds or edits a item. The following items
+    will be parsed and rendered for the user as a gui with input, and selectboxes.
+  -->
+  <fields>
+		<field>
+			<fielddescr>Exempted IP</fielddescr>
+			<fieldname>ip</fieldname>
+			<description>Enter the IP to exempt from transparent proxy</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+			<description>Enter the description for this item</description>
+			<type>input</type>
+		</field>
+  </fields>
+  <!--
+    Arbitrary PHP Code, that gets executed if a certain event gets triggered.
+  -->
+  <custom_php_resync_config_command>
+    sync_package_p3scan();
+  </custom_php_resync_config_command>
+</packagegui>

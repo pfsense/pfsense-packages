@@ -17,6 +17,10 @@
       <url>/pkg_edit.php?xml=p3scan-pf.xml&amp;id=0</url>
     </tab>
     <tab>
+      <text>Transparent Proxy Exclusion</text>
+      <url>/pkg.php?xml=p3scan-pf-transex.xml</url>
+    </tab>
+    <tab>
       <text>Message Processing</text>
       <url>/pkg_edit.php?xml=p3scan-pf-msg.xml&amp;id=0</url>
     </tab>
