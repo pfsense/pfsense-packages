@@ -115,7 +115,7 @@
       <fielddescr>SMTP Reject</fielddescr>
       <fieldname>smtpreject</fieldname>
       <description>
-        This option can be used to change the default lt;acronym title=&quot;Simple Mail Transfer Protocol&quot;&gt;SMTP&lt;/acronym&gt; Reject message that 
+        This option can be used to change the default &lt;acronym title=&quot;Simple Mail Transfer Protocol&quot;&gt;SMTP&lt;/acronym&gt; Reject message that 
         is sent to the client in the event a message is rejected due to a virus. 
         The error message will have a prefix of &quot;554&quot;.
       </description>
