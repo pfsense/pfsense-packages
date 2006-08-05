@@ -97,6 +97,7 @@
 				<page>p3scan-pf-msg.xml</page>
 				<page>p3scan-pf-spam.xml</page>
 				<page>p3scan-pf-vir.xml</page>
+        <page>p3scan-pf-transex.xml</page>
 				<page>ifstats.php</page>
 				<page>xmlrpc.php</page>
 				<page>preload.php</page>
