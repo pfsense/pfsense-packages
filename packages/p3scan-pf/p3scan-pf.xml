@@ -20,7 +20,7 @@
   </menu>
   <service>
     <name>p3scan-pf</name>
-    <rcfile>/usr/local/etc/rc.d/030.p3scan.sh</rcfile>
+    <rcfile>030.p3scan.sh</rcfile>
     <executable>p3scan</executable>
     <description>POP3 virus/spam scanner.</description>
   </service>
