@@ -83,7 +83,7 @@ function sync_package_p3scan() {
     if ($cfg['targetip'] == "0.0.0.0")
       setup_transparency();
     else
-      remove_transparency()
+      remove_transparency();
     fwrite($fd, "targetip = {$cfg['targetip']}\n");
   } else {
     setup_transparency();
@@ -331,6 +331,7 @@ function remove_transparency() {
   $p3scan_pf_result = mwexec ('pfctl -a "rdr-package/p3scan" -t p3scan -T flush');
   if($havp_pf_result <> 0) {
     file_notice("P3SCAN", "There were error(s) flushing the exclude table", "P3SCAN", "");
+  }
 }
 
 function setup_transparency() {
