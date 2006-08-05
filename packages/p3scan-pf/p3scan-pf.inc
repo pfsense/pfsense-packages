@@ -368,5 +368,6 @@ function setup_transparency() {
   if($p3scan_pf_result <> 0) {
     file_notice("P3SCAN", "There were error(s) loading the transparency rules", "P3SCAN", "");
   }
+  add_trans_table();
 }
 ?>
