@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+  <!-- change this if configpath works -->
+  <name>p3scanpfvir</name>
+  <version>1.0</version>
+  <title>Services: POP3 Proxy: Virus Scanner Settings</title>
+  <note>
+    This &lt;acronym title=&quot;Hypertext Markup Language&quot;&gt;HTML&lt;/acronym&gt; page uses default values, hence even if each field is 
+    set, you are still required to save this page if you are editing this page
+    for the very first time!
+  </note>
+  <include_file>/usr/local/pkg/p3scan-pf.inc</include_file>
+  <aftersaveredirect>pkg_edit.php?xml=p3scan-pf-vir.xml&amp;id=0</aftersaveredirect>
+  <tabs>
+    <tab>
+      <text>Daemon Settings</text>
+      <url>/pkg_edit.php?xml=p3scan-pf.xml&amp;id=0</url>
+    </tab>
+    <tab>
+      <text>Message Processing</text>
+      <url>/pkg_edit.php?xml=p3scan-pf-msg.xml&amp;id=0</url>
+    </tab>
+    <tab>
+      <text>Emergency Contact</text>
+      <url>/pkg.php?xml=p3scan-pf-emer.xml</url>
+    </tab>
+    <tab>
+      <text>Virus Scanner Settings</text>
+      <url>/pkg_edit.php?xml=p3scan-pf-vir.xml&amp;id=0</url>
+      <active />
+    </tab>
+    <tab>
+      <text>SPAM Settings</text>
+      <url>/pkg_edit.php?xml=p3scan-pf-spam.xml&amp;id=0</url>
+    </tab>
+  </tabs>
+  <!-- 
+    configpath gets expanded out automatically and config items
+    will be stored in that location
+  -->
+  <configpath>['installedpackages']['p3scanpf']['config']['virus']</configpath>
+  <!--
+    fields gets invoked when the user adds or edits a item. The following items
+    will be parsed and rendered for the user as a gui with input, and selectboxes.
+  -->
+  <fields>
+    <field>
+      <fielddescr>Scanner Type</fielddescr>
+      <fieldname>scannertype</fieldname>
+      <description>Select here which type of scanner you want to use.</description>
+      <type>select</type>
+      <default_value>clamd</default_value>
+      <size>1</size>
+      <options>
+        <option><value>avpd</value><name>Kaspersky Anti-Virus for Linux</name></option>
+        <option><value>avpd_new</value><name>Kaspersky Anti-Virus for Linux (New)</name></option>
+        <option><value>bash</value><name>Shell Script</name></option>
+        <option><value>basic</value><name>Default Scanner Type</name></option>
+        <option><value>clamd</value><name>Clam Anti-Virus</name></option>
+        <option><value>trophie</value><name>Trophie Daemon</name></option>
+      </options>
+    </field>
+    <field>
+      <fielddescr>Virusscanner</fielddescr>
+      <fieldname>scanner</fieldname>
+      <description>Depends on scannertype.</description>
+      <type>input</type>
+      <default_value>127.0.0.1:3310</default_value>
+      <required />
+    </field>
+    <field>
+      <fielddescr>Scanner Returncode</fielddescr>
+      <fieldname>viruscode</fieldname>
+      <description>
+        Specify the returncode(s) which the scanner returns when 
+        the mail is infected.
+      </description>
+      <type>input</type>
+      <default_value>1</default_value>
+    </field>
+    <field>
+      <fielddescr>Good Scanner return codes</fielddescr>
+      <fieldname>goodcode</fieldname>
+      <description>
+        Some scanners can report more than good or infected. Place valid return 
+        codes here that will enable the message to be delivered without a warning.
+      </description>
+      <type>input</type>
+    </field>
+    <field>
+      <fielddescr>Regular Expression for Virusname</fielddescr>
+      <fieldname>virusregexp</fieldname>
+      <description>
+        Specify here a regular expression which describes where the name of 
+        the virus can be found.
+      </description>
+      <type>input</type>
+      <default_value>.*: (.*) FOUND</default_value>
+    </field>
+    <field>
+      <fielddescr>deMIME Setting</fielddescr>
+      <fieldname>demime</fieldname>
+      <description>
+        Tick this if we should parse all lt;acronym title=&quot;Multipurpose Internet Mail Extensions&quot;&gt;MIME&lt;/acronym&gt;-sections instead of passing the 
+        message as-is to the scanner.
+      </description>
+      <type>checkbox</type>
+      <donotdisable>true</donotdisable>
+    </field>
+  </fields>
+  <!--
+    Arbitrary PHP Code, that gets executed if a certain event gets triggered.
+  -->
+  <custom_php_resync_config_command>
+    sync_package_p3scan();
+  </custom_php_resync_config_command>
+</packagegui>

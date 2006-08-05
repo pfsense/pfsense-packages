@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+    <!-- change this if configpath works -->
+  <name>p3scanpfspam</name>
+  <version>1.0</version>
+  <title>Services: POP3 Proxy: SPAM Settings</title>
+  <note>
+    This &lt;acronym title=&quot;Hypertext Markup Language&quot;&gt;HTML&lt;/acronym&gt; page uses default values, hence even if each field is 
+    set, you are still required to save this page if you are editing this page
+    for the very first time!
+  </note>
+  <include_file>/usr/local/pkg/p3scan-pf.inc</include_file>
+  <aftersaveredirect>pkg_edit.php?xml=p3scan-pf-spam.xml&amp;id=0</aftersaveredirect>
+  <tabs>
+    <tab>
+      <text>Daemon Settings</text>
+      <url>/pkg_edit.php?xml=p3scan-pf.xml&amp;id=0</url>
+    </tab>
+    <tab>
+      <text>Message Processing</text>
+      <url>pkg_edit.php?xml=p3scan-pf-msg.xml&amp;id=0</url>
+    </tab>
+    <tab>
+      <text>Emergency Contact</text>
+      <url>/pkg.php?xml=p3scan-pf-emer.xml</url>
+    </tab>
+    <tab>
+      <text>Virus Scanner Settings</text>
+      <url>/pkg_edit.php?xml=p3scan-pf-vir.xml&amp;id=0</url>
+    </tab>
+    <tab>
+      <text>SPAM Settings</text>
+      <url>/pkg_edit.php?xml=p3scan-pf-spam.xml&amp;id=0</url>
+      <active />
+    </tab>
+  </tabs>
+  <!-- 
+    configpath gets expanded out automatically and config items
+    will be stored in that location
+  -->
+  <configpath>['installedpackages']['p3scanpf']['config']['spam']</configpath>
+  <!--
+    fields gets invoked when the user adds or edits a item. The following items
+    will be parsed and rendered for the user as a gui with input, and selectboxes.
+  -->
+  <fields>
+    <field>
+      <fielddescr>Enable Spam Checking</fielddescr>
+      <fieldname>checkspam</fieldname>
+      <description>
+        If set, will scan for Spam before scanning for a virus.
+      </description>
+      <type>checkbox</type>
+      <donotdisable>true</donotdisable>
+      <enablefields>spamcheck</enablefields>
+    </field>
+    <field>
+      <fielddescr>SPAM Executable Command</fielddescr>
+      <fieldname>spamcheck</fieldname>
+      <description>The command (plus arguments) that should be invoked to check for SPAM messages.</description>
+      <type>input</type>
+      <size>70</size>
+      <!-- the below tag plus its inline text must be on one single line. -->
+      <default_value>/usr/local/bin/dspam --user dspamuser --mode=teft --stdout --deliver=innocent,spam --feature=ch,no,wh</default_value>
+    </field>
+  </fields>
+  <!--
+    Arbitrary PHP Code, that gets executed if a certain event gets triggered.
+  -->
+  <custom_php_resync_config_command>
+    sync_package_p3scan();
+  </custom_php_resync_config_command>
+</packagegui>
