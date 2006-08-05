@@ -840,6 +840,19 @@
 				<facilityname>dspam</facilityname>
 			</logging>
 		</package>
+    <package>
+      <name>p3scan-pf</name>
+      <descr>A transparent POP3-Proxy with virus-scanning- and spam-scanning-capabilities.</descr>
+      <website>http://www.undergroundsecurity.com/p3scan/</website>
+      <category>Security</category>
+      <version>0.1</version>
+      <status>ALPHA</status>
+      <maintainer>fernando@netfilter.com.br</maintainer>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package>p3scan-pf-2.3.2.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/p3scan-pf/p3scan-pf.xml</config_file>
+      <configurationfile>p3scan-pf.xml</configurationfile>
+    </package>
 		<package>
 			<name>mysql</name>
 			<website>http://www.mysql.com/</website>
@@ -872,11 +885,29 @@
 				<facilityname>clamav</facilityname>
 			</logging>
 		</package>
+    <package>
+      <name>sshterm</name>
+      <descr>
+        This is a package of the SSHTools SSHTerm Java Applet. SSHTools is a
+        suite of Java SSH applications providing a Java SSH API,
+        SSH Terminal, SSH secured VNC client, SFTP client and SSH Daemon.
+      </descr>
+      <website>http://sourceforge.net/projects/sshtools/</website>
+      <category>Security</category>
+      <version>0.1</version>
+      <status>ALPHA</status>
+      <maintainer>me@daniel.stefan.haischt.name</maintainer>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package>sshtools-0.2.2.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/sshterm/sshterm.xml</config_file>
+      <configurationfile>sshterm.xml</configurationfile>
+    </package>
 		<menu>
 			<name>POP3 Proxy</name>
 			<section>Services</section>
-			<configfile>p3scan.inc</configfile>
+			<configfile>p3scan-pf.xml</configfile>
 			<url>/pkg_edit.php?xml=p3scan-pf.xml&amp;id=0</url>
+      <tooltiptext>A transparent POP3-Proxy with virus-scanning capabilities</tooltiptext>
 		</menu>
 		<menu>
 			<name>DSPAM</name>
@@ -890,6 +921,12 @@
 			<configfile>dspam.inc</configfile>
 			<url>/wizard.php?xml=dspam_wizard.xml</url>
 		</menu>
+    <menu>
+      <name>Shell</name>
+      <section>Diagnostics</section>
+      <configfile>sshterm.xml</configfile>
+      <url>/diag_shell.php</url>
+    </menu>
 		<service>
 			<name>dspam</name>
 			<description>DSPAM content-based spam filter</description>
@@ -915,7 +952,7 @@
 			<executable>mysqld_safe</executable>
 		</service>
 		<service>
-			<name>p3scan</name>
+			<name>p3scan-pf</name>
 			<description>
 				p3scan is a pop3 antivirus proxy that can be used completely transparently with any pop3 mail client.
 			</description>
