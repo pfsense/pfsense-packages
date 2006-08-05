@@ -242,12 +242,14 @@ EOD;
   $stop = "/usr/bin/killall p3scan\n" .
           "sleep 2";
 
-  write_rcfile(array(
-        "file" => "030.p3scan.sh",
-        "start" => $start,
-        "stop" =>  $stop
-        )
-  );
+  if (! file_exists("/usr/local/etc/rc.d/030.p3scan.sh")) {
+    write_rcfile(array(
+          "file" => "030.p3scan.sh",
+          "start" => $start,
+          "stop" =>  $stop
+          )
+    );
+  }
     
   conf_mount_ro();
   config_unlock();
@@ -329,9 +331,7 @@ function custom_php_deinstall_command() {
 
 function add_trans_table(){
   global $config;
-  conf_mount_rw();
-  config_lock();
-
+  
   /* Flush all entries first, and then add them. */
   $p3scan_pf_result = mwexec ('pfctl -a "rdr-package/p3scan" -t p3scan -T flush');
   if($p3scan_pf_result <> 0) {
@@ -345,9 +345,6 @@ function add_trans_table(){
       }
     }
   }
-  /* signal a reload of all files */
-  conf_mount_ro();
-  config_unlock();
 }
 
 function remove_transparency() {
