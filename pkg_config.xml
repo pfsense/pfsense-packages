@@ -93,7 +93,6 @@
 			<version>0.1</version>
 			<status>ALPHA</status>
 			<maintainer>fernando@netfilter.com.br</maintainer>
-      <maintainer>me@daniel.stefan.haischt.name</maintainer>
 			<depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
 			<depends_on_package>p3scan-pf-2.3.2.tbz</depends_on_package>
 			<config_file>http://www.pfsense.org/packages/config/p3scan-pf/p3scan-pf.xml</config_file>
