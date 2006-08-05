@@ -250,6 +250,9 @@ EOD;
           )
     );
   }
+  
+  /* finally get rid of files that were instaled by the package */
+  removePackageLeftovers();
     
   conf_mount_ro();
   config_unlock();
@@ -326,7 +329,17 @@ function custom_php_deinstall_command() {
   unlink_if_exists("/usr/local/etc/p3scan/p3scan.mail");
   unlink_if_exists("/usr/local/etc/rc.d/030.p3scan.sh");
   rmdir("/usr/local/etc/p3scan");
+  mwexec("rm -rf /var/spool/p3scan");
+  mwexec("rm -rf /var/run/p3scan");
+  mwexec("rm -rf /var/run/p3scan");
   conf_mount_ro();
+}
+
+function removePackageLeftovers() {
+  unlink_if_exists("/usr/local/etc/rc.d/p3scan.sh");
+  unlink_if_exists("/usr/local/etc/p3scan.conf.sample");
+  unlink_if_exists("/usr/local/etc/p3scan.mail.sample");
+  
 }
 
 function add_trans_table(){
