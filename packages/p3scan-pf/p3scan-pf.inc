@@ -357,9 +357,14 @@ function remove_transparency() {
 function setup_transparency() {
   global $config;
   $cfg = $config['installedpackages']['p3scanpf']['config'][0];
+  $ip = $cfg['ipaddr'];
+  $port = $cfg['port'];
+  
+  if ($ip == "" || $port == "") { return; }
+  
   $trans_file = fopen("/tmp/p3scan_pf.rules","w");
   fwrite($trans_file, "table <p3scan> persist\n");
-  fwrite($trans_file, "rdr on " . $config['interfaces']['lan']['if'] .  " inet proto tcp from !<p3scan> to ! " . $config['interfaces']['lan']['ipaddr'] . " port = pop3 -> {$cfg['ipaddr']} port {$cfg['port']} \n");
+  fwrite($trans_file, "rdr on " . $config['interfaces']['lan']['if'] .  " inet proto tcp from !<p3scan> to ! " . $config['interfaces']['lan']['ipaddr'] . " port = pop3 -> {$ip} port {$port} \n");
   fclose($trans_file);
   $p3scan_pf_result = mwexec ('pfctl -a "rdr-package/p3scan" -f /tmp/p3scan_pf.rules');
   if($p3scan_pf_result <> 0) {
