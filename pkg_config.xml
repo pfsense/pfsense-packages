@@ -91,7 +91,7 @@
 			<website>http://www.undergroundsecurity.com/p3scan/</website>
 			<category>Security</category>
 			<version>0.1</version>
-			<status>PRE-ALPHA</status>
+			<status>ALPHA</status>
 			<maintainer>fernando@netfilter.com.br</maintainer>
       <maintainer>me@daniel.stefan.haischt.name</maintainer>
 			<depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
