@@ -83,17 +83,21 @@
 			<configurationfile>sassassin.xml</configurationfile>
 		</package>
 		<package>
-			<name>p3scan</name>
-			<descr>Packet Filter port of a POP3 virus/spam scanner.</descr>
+			<name>p3scan-pf</name>
+			<descr>
+        A transparent POP3-Proxy with virus-scanning- and
+        spam-scanning-capabilities.
+      </descr>
 			<website>http://www.undergroundsecurity.com/p3scan/</website>
 			<category>Security</category>
 			<version>0.1</version>
 			<status>PRE-ALPHA</status>
 			<maintainer>fernando@netfilter.com.br</maintainer>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
-			<depends_on_package>pcre-6.6_1.tbz</depends_on_package>
-			<config_file>http://www.pfsense.org/packages/config/p3scan.xml</config_file>
-			<configurationfile>p3scan.xml</configurationfile>
+      <maintainer>me@daniel.stefan.haischt.name</maintainer>
+			<depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+			<depends_on_package>p3scan-pf-2.3.2.tbz</depends_on_package>
+			<config_file>http://www.pfsense.org/packages/config/p3scan-pf/p3scan-pf.xml</config_file>
+			<configurationfile>p3scan-pf.xml</configurationfile>
 		</package>
 		<package>
 			<name>clamsmtp</name>
