@@ -326,8 +326,10 @@ function custom_php_install_command() {
 function custom_php_deinstall_command() {
   global $config, $g;
   conf_mount_rw();
-  unlink_if_exists("/usr/local/pkg/pf/p3scan_rules.php");
-  unlink_if_exists("/usr/local/www/p3scan_rules.php");
+  
+  if (is_service_running("p3scan-pf"))
+    stop_service("p3scan-pf");
+    
   unlink_if_exists("/usr/local/etc/p3scan/p3scan.conf");
   unlink_if_exists("/usr/local/etc/p3scan/p3scan.mail");
   unlink_if_exists("/usr/local/etc/rc.d/030.p3scan.sh");
@@ -335,6 +337,7 @@ function custom_php_deinstall_command() {
   mwexec("rm -rf /var/spool/p3scan");
   mwexec("rm -rf /var/run/p3scan");
   mwexec("rm -rf /var/run/p3scan");
+  
   conf_mount_ro();
 }
 
