@@ -94,7 +94,7 @@
       <fieldname>ipaddr</fieldname>
       <description>The &lt;acronym title=&quot;Internet Protocol&quot;&gt;IP&lt;/acronym&gt; Address we listen on.</description>
       <type>input</type>
-      <default_value>0.0.0.0</default_value>
+      <default_value>127.0.0.1</default_value>
       <required />
     </field>
     <field>
