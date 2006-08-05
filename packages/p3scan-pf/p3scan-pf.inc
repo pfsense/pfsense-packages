@@ -311,7 +311,8 @@ EOD;
   
   mwexec("/usr/local/etc/rc.d/030.p3scan.sh stop");
   /* test whether a pid file still exists and remove it if necessary */
-  unlink_if_exists("/var/run/p3scan/p3scan.pid");
+  if (! is_service_running("p3scan-pf"))
+    unlink_if_exists("/var/run/p3scan/p3scan.pid");
   mwexec("/usr/local/etc/rc.d/030.p3scan.sh start");
   
   return 0;
