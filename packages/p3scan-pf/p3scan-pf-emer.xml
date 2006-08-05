@@ -4,7 +4,7 @@
   <name>p3scanpfemer</name>
   <version>1.0</version>
   <title>Services: POP3 Proxy: Emergency Contact</title>
-  <include_file>/usr/local/pkg/p3scan-pf.inc</include_file>
+  <include_file>p3scan-pf.inc</include_file>
   <tabs>
     <tab>
       <text>Daemon Settings</text>

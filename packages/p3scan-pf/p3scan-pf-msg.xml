@@ -9,7 +9,7 @@
     set, you are still required to save this page if you are editing this page
     for the very first time!
   </note>
-  <include_file>/usr/local/pkg/p3scan-pf.inc</include_file>
+  <include_file>p3scan-pf.inc</include_file>
   <aftersaveredirect>pkg_edit.php?xml=p3scan-pf-msg.xml&amp;id=0</aftersaveredirect>
   <tabs>
     <tab>
