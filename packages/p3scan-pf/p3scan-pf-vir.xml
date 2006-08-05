@@ -105,7 +105,7 @@
       <fielddescr>deMIME Setting</fielddescr>
       <fieldname>demime</fieldname>
       <description>
-        Tick this if we should parse all lt;acronym title=&quot;Multipurpose Internet Mail Extensions&quot;&gt;MIME&lt;/acronym&gt;-sections instead of passing the 
+        Tick this if we should parse all &lt;acronym title=&quot;Multipurpose Internet Mail Extensions&quot;&gt;MIME&lt;/acronym&gt;-sections instead of passing the 
         message as-is to the scanner.
       </description>
       <type>checkbox</type>
