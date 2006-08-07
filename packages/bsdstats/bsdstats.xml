@@ -7,7 +7,7 @@
 	<menu>
 		<name>BSDStats</name>
 		<tooltiptext>BSDStats</tooltiptext>
-		<url></url>
+		<url>http://bsdstats.hub.org/</url>
 		<section>Diagnostics</section>
 	</menu>
 	<custom_php_install_command>
