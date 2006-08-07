@@ -21,5 +21,7 @@
 		system("cat /etc/periodic.conf | grep -n \"monthly_statistics_report_devices\" >/tmp/periodic.conf");
 		system("cat /tmp/periodic.conf | grep -n \"monthly_statistics_enable\" >/etc/periodic.conf");
 		system("rm /usr/local/etc/periodic/monthly/300.statistics");
+		system("rm /tmp/periodic.conf");
+		system("rm /tmp/getid");
 	</custom_php_deinstall_command>
 </packagegui>
