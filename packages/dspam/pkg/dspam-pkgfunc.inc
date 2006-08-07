@@ -429,9 +429,11 @@ EOD;
     $t_spwds = &$dspamcfg['server-pwd'];
     $i = 1;
 
-    foreach ($t_spwds as $spwd) {
-      $dspamconf .= "ServerPass.Relay{$i}\t\"{$spwd['value']}\"\n";
-      $i++;
+      if (is_array($t_spwds)) {
+      foreach ($t_spwds as $spwd) {
+        $dspamconf .= "ServerPass.Relay{$i}\t\"{$spwd['value']}\"\n";
+        $i++;
+      }
     }
   } else if ($dspamcfg['dspam-server-mode'] == "standard") {
     $dspamconf .= <<<EOD
