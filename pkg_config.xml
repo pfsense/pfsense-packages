@@ -312,7 +312,7 @@
 			<maintainer>geekgod@geekgod.com</maintainer>
 			<depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
 			<depends_on_package>bsdstats-2.0.tbz</depends_on_package>
-			<config_file>http://www.pfsense.org/packages/config/bsdstats.xml</config_file>
+			<config_file>http://www.pfsense.org/packages/config/bsdstats/bsdstats.xml</config_file>
 			<configurationfile>bsdstats.xml</configurationfile>
 		</package>
 		<package>
