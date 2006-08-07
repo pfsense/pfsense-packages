@@ -14,6 +14,8 @@
 		system("echo monthly_statistics_report_devices=yes >> /etc/periodic.conf");
 		system("echo monthly_statistics_enable=yes >> /etc/periodic.conf");
 		system("/usr/local/etc/periodic/monthly/300.statistics");
+		$getid=file_get_contents("/tmp/getid");
+		log_error("Thanks for installing BSDStats.  Your id is {$getid}.");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		system("cat /etc/periodic.conf | grep -n \"monthly_statistics_report_devices\" >/tmp/periodic.conf");
