@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<title>BSDStats</title>
+	<name>bsdstats</name>
+	<version>0.1</version>
+	<!-- Menu is where this packages menu will appear -->
+	<menu>
+		<name>BSDStats</name>
+		<tooltiptext>BSDStats</tooltiptext>
+		<url></url>
+		<section>Diagnostics</section>
+	</menu>
+	<custom_php_install_command>
+		system("echo monthly_statistics_report_devices=yes >> /etc/periodic.conf");
+		system("echo monthly_statistics_enable=yes >> /etc/periodic.conf");
+		system("/usr/local/etc/periodic/monthly/300.statistics");
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		system("cat /etc/periodic.conf | grep -n \"monthly_statistics_report_devices\" >/tmp/periodic.conf");
+		system("cat /tmp/periodic.conf | grep -n \"monthly_statistics_enable\" >/etc/periodic.conf");
+		system("rm /usr/local/etc/periodic/monthly/300.statistics");
+	</custom_php_deinstall_command>
+</packagegui>
