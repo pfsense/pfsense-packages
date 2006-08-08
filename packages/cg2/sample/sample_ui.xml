@@ -72,8 +72,7 @@
 <element>
 	<type>table</type>
 	<buttons>move,edit,delete,add</buttons>
-	<apply>Those stupid rules have been updated. Click this button to apply thechanges.</apply>
-	<on_sync_event>sample_on_sync_event</on_sync_event>
+	<on_apply_event>sample_on_apply_event</on_apply_event>
 	<widget>
 		<type>checkbox</type>
 		<name>dummycheckbox</name>
