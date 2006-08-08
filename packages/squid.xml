@@ -38,7 +38,7 @@
 		<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
 	</menu>
 	<service>
-		<name>Squid</name>
+		<name>squid</name>
 		<description>Web proxy cache.</description>
 		<rcfile>squid.sh</rcfile>
 		<executable>squid</executable>
