@@ -18,9 +18,35 @@
 		<type>textbox</type>
 		<name>mytextbox</name>
 		<label>My fancy textbox</label>
-		<description>This is a textbox</description>
+		<description>This is a textbox.</description>
 		<value>Welcome to the world of coregui 2.0</value>
 		<required/>
+	</widget>
+	<widget>
+		<type>ipsec_select</type>
+		<name>ipsec</name>
+		<label>IPsec selection</label>
+		<description>IPsec selection widget test.</description>
+		<multiple/>
+	</widget>
+	<widget>
+		<type>select</type>
+		<name>sample_sel</name>
+		<label>Sample selection</label>
+		<option>
+			<name>foo</name>
+			<label>Foo</label>
+		</option>
+		<option>
+			<name>bar</name>
+			<label>Bar</label>
+		</option>
+	</widget>
+	<widget>
+		<type>interfaces_select</type>
+		<name>inter_sel</name>
+		<label>Sample interfaces select</label>
+		<multiple/>
 	</widget>
 	<widget>
 		<type>textarea</type>
