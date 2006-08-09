@@ -5,6 +5,7 @@
 	<packages>
 		<package>
 			<name>openntpd</name>
+      <website>http://www.openntpd.org/</website>
 			<descr>OpenNTPD NTP time server.</descr>
 			<category>Network</category>
 			<version>0.8.1</version>
