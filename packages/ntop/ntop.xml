@@ -88,7 +88,7 @@
 			    $start = "/usr/local/bin/ntop -i " . $ifaces_final . " -u root -d --ipv4 -M -x 8102 -X 8192 &amp;";
 			    write_rcfile(array(
 						    "file" => "ntop.sh",
-						    "start" => $start,  
+						    "start" => $start,
 						    "stop" => "/usr/bin/killall ntop"
 					    )
 			    );
@@ -109,4 +109,9 @@
 	<custom_php_resync_command>
 		sync_package_ntop();
 	</custom_php_resync_command>
+	<custom_php_install_command>
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		exec("rm /usr/local/etc/rc.d/ntop*");
+	</custom_php_deinstall_command>
 </packagegui>
