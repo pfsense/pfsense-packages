@@ -26,7 +26,7 @@
         configuration interface.
         &lt;/p&gt;
         &lt;p&gt;
-        Please read the &lt;a href=&quot;http://www.pfsense.com/packages/config/freenas/doc/README.txt&quot;&gt;FreeNAS README&lt;/a&gt; before installing this package.
+        Please read the &lt;a href=&quot;http://www.pfsense.com/packages/config/freenas/doc/README.txt&quot; target=&quot;_blank&quot;&gt;FreeNAS README&lt;/a&gt; before installing this package.
         &lt;/p&gt;
       </descr>
 			<category>Network</category>
