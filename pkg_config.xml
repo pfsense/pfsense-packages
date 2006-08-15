@@ -17,6 +17,38 @@
 			<configurationfile>openntpd.xml</configurationfile>
 		</package>
 		<package>
+			<name>freenas</name>
+      <website>http://www.freenas.org/</website>
+			<descr>
+        FreeNAS is a free NAS (Network-Attached Storage) server, supporting: CIFS (samba), FTP, 
+        NFS, RSYNC protocols, local user authentication, Software RAID (0,1,5) with a Full WEB 
+        configuration interface.
+        &lt;p&gt;
+        Please read http://www.pfsense.com/packages/config/freenas/doc/README.txt before installing this package.
+        &lt;/p&gt;
+      </descr>
+			<category>Network</category>
+			<version>0.68</version>
+			<status>PRE-ALPHA</status>
+      <website>http://www.freenas.org/</website>
+			<maintainer>me@daniel.stefan.haischt.name</maintainer>
+			<depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+			<depends_on_package>ataidle-0.9.tbz</depends_on_package>
+      <depends_on_package>avahi+libdns-0.6.12.tbz</depends_on_package>
+      <depends_on_package>wzdftpd-0.7.2_1.tbz</depends_on_package>
+      <depends_on_package>e2fsprogs-1.39_1.tbz</depends_on_package>
+      <depends_on_package>smartmontools-5.36.tbz</depends_on_package>
+      <depends_on_package>aaccli-1.0.tbz</depends_on_package>
+      <depends_on_package>rsync-2.6.8_2.tbz</depends_on_package>
+      <depends_on_package>scponly-4.6_1.tbz</depends_on_package>
+      <depends_on_package>cracklib-2.7_2.tbz</depends_on_package>
+      <depends_on_package>samba-3.0.23,1.tbz</depends_on_package>
+      <depends_on_package>netatalk-2.0.3_3,1.tbz</depends_on_package>
+      <depends_on_package>pam_ldap-1.8.2.tbz</depends_on_package>
+			<config_file>http://www.pfsense.org/packages/config/freenas/pkg/freenas.xml</config_file>
+			<configurationfile>freenas.xml</configurationfile>
+		</package>
+		<package>
 			<name>dspam</name>
 			<website>http://dspam.nuclearelephant.com/</website>
 			<descr>

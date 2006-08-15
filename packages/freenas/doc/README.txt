@@ -5,10 +5,16 @@ This is a port of the FreeNAS PHP sources to pfSense.
 It is based on FreeNAS 0.68 and was tested on pfSense
 HEAD.
 
-*** NOTE ***
+*** NOTES ***
 
 You should be aware that this package installes a custom
 kernel and some additional kernel modules.
+
+YOU NEED TO REBOOT YOUR pfSense SYSTEM AFTER HAVING INSTALLED
+THIS PACKAGE!!!
+
+Additionally, if you are going to enable the FTP service, you
+need to disable the FTP helper on each interface.
 
 Maintainer:
 -----------
