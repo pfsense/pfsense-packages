@@ -25,10 +25,7 @@
         configuration interface.&lt;/font&gt;
         &lt;p&gt;&#160;&lt;/p&gt;
         &lt;font color=&quot;#FFFFFF&quot;&gt;
-        Please read the 
-        &lt;a href=&quot;http://www.pfsense.com/packages/config/freenas/doc/README.txt&quot;&gt;
-        FreeNAS README
-        &lt;/a&gt; before installing this package.
+        Please read the &lt;a href=&quot;http://www.pfsense.com/packages/config/freenas/doc/README.txt&quot;&gt;FreeNAS README&lt;/a&gt; before installing this package.
       </descr>
 			<category>Network</category>
 			<version>0.68</version>
