@@ -193,6 +193,12 @@ function custom_php_install_command() {
   oninstall_copy_misc_binaries();
   adjust_package_contents();
   oninstall_setup_config();
+  
+  if (! file_exists("/usr/local/etc/rc.d"))
+    mwexec("mkdir -p /usr/local/etc/rc.d");
+    
+  rename("/usr/local/pkg/rc.freenas", "/usr/local/etc/rc.d/rc.freenas");
+  chmod ("/usr/local/etc/rc.d/rc.freenas", 0755);
 }
 
 function custom_php_deinstall_command() {

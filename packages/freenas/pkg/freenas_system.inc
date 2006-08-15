@@ -30,6 +30,8 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+require_once("globals.inc");
+
 $freenas_config =& $config['installedpackages']['freenas']['config'][0];
 
 function system_do_extensions($early = false) {
