@@ -35,47 +35,64 @@ function sync_package_freenas() {
 function oninstall_copy_kernel_binaries($action = "install") {
    $binaries = array();
    $binaries[] = array("source" => "/usr/local/pkg/iscsi_initiator.ko",
-                       "target" => "/boot/kernel/iscsi_initiator.ko");
+                       "target" => "/boot/kernel/iscsi_initiator.ko",
+                       "backup" => false);
    $binaries[] = array("source" => "/usr/local/pkg/ext2fs.ko",
-                       "target" => "/boot/kernel/ext2fs.ko");
+                       "target" => "/boot/kernel/ext2fs.ko",
+                       "backup" => false);
    $binaries[] = array("source" => "/usr/local/pkg/geom_concat.ko",
-                       "target" => "/boot/kernel/geom_concat.ko");
+                       "target" => "/boot/kernel/geom_concat.ko",
+                       "backup" => false);
    $binaries[] = array("source" => "/usr/local/pkg/geom_gpt.ko",
-                       "target" => "/boot/kernel/geom_gpt.ko");
+                       "target" => "/boot/kernel/geom_gpt.ko",
+                       "backup" => false);
    $binaries[] = array("source" => "/usr/local/pkg/geom_mirror.ko",
-                       "target" => "/boot/kernel/geom_mirror.ko");
+                       "target" => "/boot/kernel/geom_mirror.ko",
+                       "backup" => false);
    $binaries[] = array("source" => "/usr/local/pkg/geom_stripe.ko",
-                       "target" => "/boot/kernel/geom_stripe.ko");
+                       "target" => "/boot/kernel/geom_stripe.ko",
+                       "backup" => false);
    $binaries[] = array("source" => "/usr/local/pkg/geom_vinum.ko",
-                       "target" => "/boot/kernel/geom_vinum.ko");
+                       "target" => "/boot/kernel/geom_vinum.ko",
+                       "backup" => false);
    $binaries[] = array("source" => "/usr/local/pkg/ntfs.ko",
-                       "target" => "/boot/kernel/ntfs.ko");
+                       "target" => "/boot/kernel/ntfs.ko",
+                       "backup" => false);
    $binaries[] = array("source" => "/usr/local/pkg/kernel.gz",
-                       "target" => "/boot/kernel/kernel.gz");
+                       "target" => "/boot/kernel/kernel.gz",
+                       "backup" => true);
 
    if ($action == "install") {   
      while (list(, $val) = each($binaries)) {
        $static_output .= "FreeNAS: Moving binary file... ";
        update_output_window($static_output);
+       if ($val['backup'] && file_exists($val['target']))
+         rename($val['target'], "{$val['target']}.org");
        rename($val['source'], $val['target']);
        $static_output .= "done.\n";
        update_output_window($static_output);
      }
    } else if ($action == "deinstall") {
      while (list($source, $target) = each($binaries)) {
+       $static_output .= "FreeNAS: Removing binary file... ";
+       update_output_window($static_output);
        unlink($target);
+       $static_output .= "done.\n";
+       update_output_window($static_output);
      }
    }
 }
 
 function remove_package_contents($pkg = "") {
-  if ($file == "") { return; }
+  if ($pkg == "") { return; }
   
-  $pd = popen("pkg_info -rf {$pkg}");
-  
-  while (!feof($pd)) {
-    $buffer = fgets($handle, 4096);
-    
+  $pd = popen("pkg_info -rf {$pkg}", "r");
+
+  if (! pd) { return; }
+
+  while (! feof($pd)) {
+    $buffer = fgets($pd, 4096);
+
     if (strpos($buffer, "File:") !== false) {
       $file = trim(str_replace("File:", "", $buffer));
       
@@ -151,12 +168,20 @@ function oninstall_copy_misc_binaries($action = "install") {
                        
    if ($action == "install") {
      while (list(, $val) = each($binaries)) {
+       $static_output .= "FreeNAS: Installing binary file... ";
+       update_output_window($static_output);
        mwexec("install -s {$source} ${target}");
+       $static_output .= "done.\n";
+       update_output_window($static_output);
      }
    } else if ($action == "deinstall") {
      while (list($val['source'], $val['target']) = each($binaries)) {
+       $static_output .= "FreeNAS: Removing binary file... ";
+       update_output_window($static_output);
        unlink($target);
-     }   
+       $static_output .= "done.\n";
+       update_output_window($static_output);
+     }
    }
 }
 
