@@ -37,6 +37,7 @@ $pgtitle = array(gettext("System"),
                  gettext("GEOM Vinum"),
                  gettext("Tools"));
 
+require_once("freenas_config.inc");
 require_once("guiconfig.inc");
 require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
@@ -174,7 +175,7 @@ echo $pfSenseHead->getHTML();
       						/* Force object state up */
       						system("/sbin/gvinum setstate -f up " . escapeshellarg($object));
       						break;
-      					case "saveconfig":					
+      					case "saveconfig":
       						/* Save config */
       						system("/sbin/gvinum saveconfig");
       						break;

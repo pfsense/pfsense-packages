@@ -6,18 +6,17 @@
   <include_file>/usr/local/pkg/freenas.inc</include_file>
   <!-- Menu is where this packages menu will appear -->
   <menu>
-    <name>FreeNAS Disks</name>
+    <name>Disks</name>
     <section>System</section>
-    <configfile>freenas.xml</configfile>
-    <url>/disk_manage.php</url>
+    <url>/disks_manage.php</url>
   </menu>
   <menu>
-    <name>FreeNAS RAID</name>
+    <name>RAID</name>
     <section>System</section>
     <url>/disks_raid_gmirror.php</url>
   </menu>
   <menu>
-    <name>FreeNAS Mounts</name>
+    <name>Mounts</name>
     <section>System</section>
     <url>/disks_mount.php</url>
   </menu>
@@ -282,7 +281,8 @@
   <additional_files_needed>
     <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
-    <item>http://www.pfsense.com/packages/config/freenas/pkg/rc.freenas</item>
+    <item>http://www.pfsense.com/packages/config/freenas/pkg/freenas_system.inc</item>
+  </additional_files_needed>
   </additional_files_needed>
   <!-- kernel binaries -->
   <additional_files_needed>

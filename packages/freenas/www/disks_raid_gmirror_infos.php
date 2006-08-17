@@ -92,10 +92,10 @@ echo $pfSenseHead->getHTML();
     <td class="tabnavtbl">
 <?php
 	$tab_array = array();
-	$tab_array[0] = array(gettext("Manage RAID"), false, "disks_raid_gvinum.php");
-	$tab_array[1] = array(gettext("Format RAID"), false, "disks_raid_gvinum_init.php");
-	$tab_array[2] = array(gettext("Tools"),       false, "disks_raid_gvinum_tools.php");
-  $tab_array[3] = array(gettext("Information"), true,  "disks_raid_gvinum_infos.php");
+	$tab_array[0] = array(gettext("Manage RAID"), false, "disks_raid_gmirror.php");
+	$tab_array[1] = array(gettext("Format RAID"), false, "disks_raid_gmirror_init.php");
+	$tab_array[2] = array(gettext("Tools"),       false, "disks_raid_gmirror_tools.php");
+  $tab_array[3] = array(gettext("Information"), true,  "disks_raid_gmirror_infos.php");
 	display_top_tabs($tab_array);
 ?>  
     </td>

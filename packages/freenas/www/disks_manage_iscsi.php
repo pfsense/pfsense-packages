@@ -36,13 +36,14 @@ $pgtitle = array(gettext("System"),
                  gettext("Disks"),
                  gettext("iSCSI Initiator"));
 
+require_once("freenas_config.inc");
 require_once("guiconfig.inc");
 require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
 
 if (! is_array($freenas_config['iscsi']))
 {
-	$freenas_config['iscsi'] = array();	
+	$freenas_config['iscsi'] = array();
 }
 
 $pconfig['enable'] = isset($freenas_config['iscsi']['enable']);

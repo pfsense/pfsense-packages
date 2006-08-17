@@ -18,7 +18,7 @@
 	2. Redistributions in binary form must reproduce the above copyright
 	   notice, this list of conditions and the following disclaimer in the
 	   documentation and/or other materials provided with the distribution.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
 	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
@@ -488,7 +488,7 @@ pasv_high_range={$freenas_config['ftp']['pasv_max_port']}
 EOD;
 		}
                 
-                $ftpconf =. <<<EOD
+                $ftpconf .= <<<EOD
 
 pasv_low_range = 2500
 pasv_high_range  = 3000
@@ -1228,12 +1228,12 @@ function services_avahi_configure() {
 EOD;
 	
 	/* kill any running dbus daemon */
-        sigkillbypid("{$g['varrun_path']}/dbus/dbus.pid"", "TERM");
+        sigkillbypid("{$g['varrun_path']}/dbus/dbus.pid", "TERM");
         
 	/* kill any running avahi daemons */
         mwexec("/usr/local/sbin/avahi-daemon -k");
 
-	
+
 	if (isset($config['system']['zeroconf_disable']))
 		return 0;
 	
@@ -1242,7 +1242,7 @@ EOD;
 	
         if (isset($config['system']['webgui']['port'])) {
                 $webservice = str_replace("@PORT@",
-                                          "{$config['system']['webgui']['port']}",
+                                          $config['system']['webgui']['port'],
                                           $service_template);
                 $webservice = str_replace("@TYPE@",
                                           "_http._tcp",
@@ -1272,15 +1272,15 @@ EOD;
                 file_put_contents("/usr/local/etc/avahi/services/http.service", $webservice);
         }
         
-	
+
 	
 	if (isset($freenas_config['afp']['enable'])) {
                 /* NOP */
 	}
-	
+
 	if (isset($freenas_config['rsyncd']['enable'])) 	{				
                 $rsyncservice = str_replace("@PORT@",
-                                          "{$config['rsyncd']['port']}",
+                                          $config['rsyncd']['port'],
                                           $service_template);
                 $rsyncservice = str_replace("@TYPE@",
                                           "_rsync._tcp",
@@ -1294,7 +1294,7 @@ EOD;
                                           
                 file_put_contents("/usr/local/etc/avahi/services/rsync.service", $rsyncservice);
 	}
-	
+
 	if (isset($config['sshd']['enable'])) 	{				
                 $sshservice = str_replace("@PORT@",
                                           "22",

@@ -196,7 +196,7 @@ function custom_php_install_command() {
   
   if (! file_exists("/usr/local/etc/rc.d"))
     mwexec("mkdir -p /usr/local/etc/rc.d");
-    
+
   rename("/usr/local/pkg/rc.freenas", "/usr/local/etc/rc.d/rc.freenas");
   chmod ("/usr/local/etc/rc.d/rc.freenas", 0755);
 }
@@ -204,6 +204,7 @@ function custom_php_install_command() {
 function custom_php_deinstall_command() {
   oninstall_copy_kernel_binaries("deinstall");
   oninstall_copy_misc_binaries("deinstall");
-}
 
+  if (! file_exists("/usr/local/etc/rc.d"))
+    mwexec("rm -rf /usr/local/etc/rc.d");      }
 ?>

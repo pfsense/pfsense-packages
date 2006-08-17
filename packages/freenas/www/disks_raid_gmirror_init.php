@@ -37,6 +37,7 @@ $pgtitle = array(gettext("System"),
                  gettext("GEOM Mirror"),
                  gettext("Initialize"));
 
+require_once("freenas_config.inc");
 require_once("guiconfig.inc");
 require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");

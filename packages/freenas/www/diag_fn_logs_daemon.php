@@ -35,7 +35,8 @@ $pgtitle = array(gettext("Diagnostics"),
                  gettext("System logs"),
                  gettext("Daemon"));
 
-require("guiconfig.inc");
+require_once("freenas_config.inc");
+require_once("guiconfig.inc");
 require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
 
