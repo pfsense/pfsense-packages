@@ -35,6 +35,31 @@
     <section>Status</section>
     <url>/status_disks.php</url>
   </menu>
+  <menu>
+    <name>AFP</name>
+    <section>Services</section>
+    <url>/services_afp.php</url>
+  </menu>
+  <menu>
+    <name>FTP</name>
+    <section>Services</section>
+    <url>/services_ftp.php</url>
+  </menu>
+  <menu>
+    <name>NFS</name>
+    <section>Services</section>
+    <url>/services_nfs.php</url>
+  </menu>
+  <menu>
+    <name>Rsync</name>
+    <section>Services</section>
+    <url>/services_rsyncd.php</url>
+  </menu>
+  <menu>
+    <name>Samba</name>
+    <section>Services</section>
+    <url>/services_samba.php</url>
+  </menu>
   <service>
     <name>dspam</name>
     <rcfile>/usr/local/etc/rc.d/dspam.sh</rcfile>
