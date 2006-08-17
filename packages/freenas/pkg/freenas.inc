@@ -236,8 +236,8 @@ function custom_php_install_command() {
   if (! file_exists("/usr/local/etc/rc.d"))
     mwexec("mkdir -p /usr/local/etc/rc.d");
 
-  rename("/usr/local/pkg/rc.freenas", "/usr/local/etc/rc.d/rc.freenas");
-  chmod ("/usr/local/etc/rc.d/rc.freenas", 0755);
+  rename("/usr/local/pkg/rc.freenas", "/usr/local/etc/rc.d/freenas.sh");
+  chmod ("/usr/local/etc/rc.d/freenas.sh", 0755);
 
   mwexec("ln -s /usr/local/etc/uams/uams_passwd.so /usr/local/etc/uams/uams_clrtxt.so");
   mwexec("ln -s /usr/local/etc/uams/uams_dhx_passwd.so /usr/local/etc/uams/uams_dhx.so");
@@ -254,6 +254,7 @@ function custom_php_deinstall_command() {
 
   unlink_if_exists("/usr/local/etc/uams/uams_clrtxt.so");
   unlink_if_exists("/usr/local/etc/uams/uams_dhx.so");
+  unlink_if_exists("/usr/local/etc/rc.d/freenas.sh");
 
   unset($config['installedpackages']['freenas']);
   write_config();
