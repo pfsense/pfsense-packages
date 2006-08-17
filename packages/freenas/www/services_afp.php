@@ -102,7 +102,7 @@ if (! empty($_POST))
 			/* nuke the cache file */
 			config_lock();
 			services_afpd_configure();
-			services_mdnsresponder_configure();
+			services_zeroconf_configure();
 			config_unlock();
 		}
     

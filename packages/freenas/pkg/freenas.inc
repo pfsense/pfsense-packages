@@ -211,6 +211,8 @@ function custom_php_install_command() {
 }
 
 function custom_php_deinstall_command() {
+  global $config;
+
   oninstall_copy_kernel_binaries("deinstall");
   oninstall_copy_misc_binaries("deinstall");
 
@@ -219,4 +221,8 @@ function custom_php_deinstall_command() {
 
   unlink_if_exists("/usr/local/etc/uams/uams_clrtxt.so");
   unlink_if_exists("/usr/local/etc/uams/uams_dhx.so");
+
+  unset($config['installedpackages']['freenas']);
+  write_config();
+  conf_mount_ro();
 ?>

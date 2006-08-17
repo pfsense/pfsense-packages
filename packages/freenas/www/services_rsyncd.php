@@ -115,7 +115,7 @@ if (! empty($_POST))
 			/* nuke the cache file */
 			config_lock();
 			services_rsyncd_configure();
-			services_mdnsresponder_configure();
+			services_zeroconf_configure();
 			config_unlock();
 		}
 		$savemsg = get_std_save_message($retval);
