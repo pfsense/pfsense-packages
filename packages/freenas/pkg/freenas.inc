@@ -50,6 +50,8 @@ function oninstall_copy_kernel_binaries($action = "install") {
                        "target" => "/boot/kernel/geom_vinum.ko");
    $binaries[] = array("source" => "/usr/local/pkg/ntfs.ko",
                        "target" => "/boot/kernel/ntfs.ko");
+   $binaries[] = array("source" => "/usr/local/pkg/kernel.gz",
+                       "target" => "/boot/kernel/kernel.gz");
 
    if ($action == "install") {   
      while (list(, $val) = each($binaries)) {
