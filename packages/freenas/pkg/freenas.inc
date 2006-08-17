@@ -134,6 +134,12 @@ function oninstall_copy_misc_binaries($action = "install") {
    $binaries = array();
    $binaries[] = array("source" => "/usr/local/pkg/iscontrol",
                        "target" => "/usr/local/sbin/iscontrol");
+   $binaries[] = array("source" => "/usr/local/pkg/nfsd",
+                       "target" => "/usr/sbin/nfsd");
+   $binaries[] = array("source" => "/usr/local/pkg/nfsd",
+                       "target" => "/usr/sbin/mountd");
+   $binaries[] = array("source" => "/usr/local/pkg/rpcbind",
+                       "target" => "/usr/sbin/rpcbind");
                        
    if ($action == "install") {
      while (list($source, $target) = each($binaries)) {
@@ -199,6 +205,9 @@ function custom_php_install_command() {
 
   rename("/usr/local/pkg/rc.freenas", "/usr/local/etc/rc.d/rc.freenas");
   chmod ("/usr/local/etc/rc.d/rc.freenas", 0755);
+
+  mwexec("ln -s /usr/local/etc/uams/uams_passwd.so /usr/local/etc/uams/uams_clrtxt.so");
+  mwexec("ln -s /usr/local/etc/uams/uams_dhx_passwd.so /usr/local/etc/uams/uams_dhx.so");
 }
 
 function custom_php_deinstall_command() {
@@ -207,4 +216,7 @@ function custom_php_deinstall_command() {
 
   if (! file_exists("/usr/local/etc/rc.d"))
     mwexec("rm -rf /usr/local/etc/rc.d");      }
+
+  unlink_if_exists("/usr/local/etc/uams/uams_clrtxt.so");
+  unlink_if_exists("/usr/local/etc/uams/uams_dhx.so");
 ?>
