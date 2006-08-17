@@ -52,10 +52,10 @@ function oninstall_copy_kernel_binaries($action = "install") {
                        "target" => "/boot/kernel/ntfs.ko");
 
    if ($action == "install") {   
-     while (list($source, $target) = each($binaries)) {
+     while (list(, $val) = each($binaries)) {
        $static_output .= "FreeNAS: Moving binary file... ";
        update_output_window($static_output);
-       rename($source, $target);
+       rename($val['source'], $val['target']);
        $static_output .= "done.\n";
        update_output_window($static_output);
      }
@@ -148,11 +148,11 @@ function oninstall_copy_misc_binaries($action = "install") {
                        "target" => "/usr/sbin/rpcbind");
                        
    if ($action == "install") {
-     while (list($source, $target) = each($binaries)) {
+     while (list(, $val) = each($binaries)) {
        mwexec("install -s {$source} ${target}");
      }
    } else if ($action == "deinstall") {
-     while (list($source, $target) = each($binaries)) {
+     while (list($val['source'], $val['target']) = each($binaries)) {
        unlink($target);
      }   
    }
