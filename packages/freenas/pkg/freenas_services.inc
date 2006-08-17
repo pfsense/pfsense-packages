@@ -497,7 +497,6 @@ xferlog = /var/log/wzdftpd/xferlog
 logdir = /var/log/wzdftpd
 max_threads = 32
 
-backend = /usr/local/share/wzdftpd/backends/libwzdplaintext.so > 124
 backend = /usr/local/share/wzdftpd/backends/libwzdpam.so
 
 max_ul_speed = 0
