@@ -165,7 +165,7 @@ if (! empty($_POST))
 		if (!file_exists($d_sysrebootreqd_path)) {
 			/* nuke the cache file */
 			config_lock();
-			services_ftpd_configure();
+			services_wzdftpd_configure();
 			services_zeroconf_configure();
 			config_unlock();
 		}
@@ -332,7 +332,7 @@ echo $pfSenseHead->getHTML();
       <tr>
         <td width="22%" valign="top">&nbsp;</td>
         <td width="78%">
-          <input id="submit" name="Submit" type="submit" class="formbtn" value="<?=gettext("Save");?>" />
+          <input id="submitt" name="Submitt" type="submit" class="formbtn" value="<?=gettext("Save");?>" />
         </td>
       </tr>
     </table>

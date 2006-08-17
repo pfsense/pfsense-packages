@@ -172,7 +172,7 @@ echo $pfSenseHead->getHTML();
           <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="<?=gettext("edit mount");?>" width="17" height="17" border="0" alt="" />
         </a>
         <a href="disks_mount.php?act=del&id=<?=$i;?>">
-          <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" onclick="return confirm('<? gettext("Do you really want to delete this mount point? All elements that still use it will become invalid (e.g. share)!"); ?>');" title="<?=gettext("delete mount");?>" width="17" height="17" border="0" alt="" />
+          <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" onclick="return confirm('<?= gettext("Do you really want to delete this mount point? All elements that still use it will become invalid (e.g. share)!"); ?>');" title="<?=gettext("delete mount");?>" width="17" height="17" border="0" alt="" />
         </a> 
       </td>
       </tr>

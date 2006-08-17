@@ -195,7 +195,7 @@ EOD;
 				/* Unmount filesystem if not booting mode*/
 				
 				$sambaconf .= <<<EOD
-			
+
 [{$mountent['sharename']}]
 comment = {$mountent['desc']}
 path = /mnt/{$mountent['sharename']}
@@ -269,7 +269,7 @@ function services_rsyncd_configure() {
 	
 		if ($g['booting'])
 			echo "Starting RSYNC daemon... ";
-		
+
 		/* If no share configured, exit */
 		if (!is_array($freenas_config['mounts']['mount']))
 			return 1;
@@ -351,7 +351,7 @@ EOD;
 EOD;
 				
 			fwrite($fd, $motd);
-			fclose($fd);				
+			fclose($fd);
 		}
 
 		/* run rsync Daemon */
@@ -442,36 +442,36 @@ EOD;
 }
 
 function services_ftpd_configure() {
-	global $freenas_config, $g;
-	// services_vsftpd_configure();
-	// services_pureftpd_configure();
-        services_wzdftpd_configure();
+  global $freenas_config, $g;
+  // services_vsftpd_configure();
+  // services_pureftpd_configure();
+  services_wzdftpd_configure();
 }
 
 function services_wzdftpd_configure() {
 	global $freenas_config, $g;
-        
+
 	/* kill any WZDFTPD */
 	killbyname("wzdftpd");
 
 	if (isset($freenas_config['ftp']['enable'])) {
-	
+
 		if ($g['booting'])
 			echo "Starting FTP server... ";
 
                 if (! file_exists("/var/log/wzdftpd"))
                         mkdir("/var/log/wzdftpd");
-                        
-                if (! file_exists("{$g['varetc_path']}/wzdftpd"))
-                        mkdir("{$g['varetc_path']}/wzdftpd");
+
+                if (! file_exists("/usr/local/etc/wzdftpd"))
+                        mkdir("/usr/local/etc/wzdftpd");
 
 		/* generate wzd.cfg */
-		$fd = fopen("{$g['varetc_path']}/wzdftpd/wzd.cfg", "w");
+		$fd = fopen("/usr/local/etc/wzdftpd/wzd.cfg", "w");
 		if (!$fd) {
 			printf("Error: cannot open vsftpd.conf in services_vsftpd_configure().\n");
 			return 1;
 		}
-                
+
                 $ftpconf = <<<EOD
 [GLOBAL]
 config version = 0.7.2
@@ -482,23 +482,23 @@ EOD;
 
 		if ($freenas_config['ftp']['pasv_min_port'] && $freenas_config['ftp']['pasv_max_port']) {
 			$ftpconf .= <<<EOD
-pasv_low_range={$freenas_config['ftp']['pasv_min_port']}
-pasv_high_range={$freenas_config['ftp']['pasv_max_port']}
+pasv_low_range = {$freenas_config['ftp']['pasv_min_port']}
+pasv_high_range = {$freenas_config['ftp']['pasv_max_port']}
 
 EOD;
 		}
                 
                 $ftpconf .= <<<EOD
 
-pasv_low_range = 2500
-pasv_high_range  = 3000
 pasv_ip = {$freenas_config['ftp']['pasv_address']}
 dir_message = .message
 logfile = /var/log/wzdftpd/wzd.log
+xferlog = /var/log/wzdftpd/xferlog
+logdir = /var/log/wzdftpd
 max_threads = 32
 
-backend = ${datarootdir}/wzdftpd/backends/libwzdplaintext.so > 124
-backend = ${datarootdir}/wzdftpd/backends/libwzdpam.so
+backend = /usr/local/share/wzdftpd/backends/libwzdplaintext.so > 124
+backend = /usr/local/share/wzdftpd/backends/libwzdpam.so
 
 max_ul_speed = 0
 max_dl_speed = 0
@@ -581,17 +581,17 @@ site_vfsadd = +O
 site_vfsdel = +O
 
 [modules]
-${datarootdir}/wzdftpd/modules/libwzd_debug.so = deny
-${datarootdir}/wzdftpd/modules/libwzd_test.so = deny
-${datarootdir}/wzdftpd/modules/libwzd_sfv.so = allow
-${datarootdir}/wzdftpd/modules/libwzd_tcl.so = deny
-${datarootdir}/wzdftpd/modules/libwzd_perl.so = deny
+/usr/local/share/wzdftpd/modules/libwzd_debug.so = deny
+/usr/local/share/wzdftpd/modules/libwzd_test.so = deny
+/usr/local/share/wzdftpd/modules/libwzd_sfv.so = allow
+/usr/local/share/wzdftpd/modules/libwzd_tcl.so = deny
+/usr/local/share/wzdftpd/modules/libwzd_perl.so = deny
 
 EOD;
 
                 if (empty($config['system']['zeroconf_disable'])) {
                         $ftpconf .= <<<EOD
-${datarootdir}/wzdftpd/modules/libwzd_zeroconf.so = allow
+/usr/local/share/wzdftpd/modules/libwzd_zeroconf.so = allow
 
 [ZEROCONF]
 zeroconf_port = {$freenas_config['ftp']['port']}
@@ -613,7 +613,7 @@ other_completebar = [WzD] - ( %.0mM %fF - COMPLETE ) - [WzD]
 param = /usr/local/etc/wzdftpd/users
 
 [sections]
-ALL = /* ^([]\[A-Za-z0-9_.'() \t+-])*$
+ALL = /* ^([]\[A-Za-z0-9_.'() \\t+-])*\$
 
 [cron]
 
@@ -643,13 +643,13 @@ EOD;
 		fclose($fd);
 
 		/* run vsftpd */
-		mwexec("/usr/local/sbin/wzdftpd -f {$g['varetc_path']}/wzdftpd/wzd.cfg");
+		mwexec("/usr/local/sbin/wzdftpd -f /usr/local/etc/wzdftpd/wzd.cfg");
 
 
 		if ($g['booting'])
 			echo "done\n";
 	}
-        
+
         return 0;
 }
 
@@ -795,7 +795,7 @@ EOD;
 			
 		if ($freenas_config['ftp']['pasv_address'])
 			$cmd .= "-P {$freenas_config['ftp']['pasv_address']} ";
-			
+
 		if ($freenas_config['ftp']['natmode'])
 			$cmd .= "-N ";
 			
@@ -824,7 +824,7 @@ function services_smart_configure() {
 	killbyname("smartd");
 
 	if (isset($config['system']['smart'])) {
-	
+
 		if ($g['booting'])
 			echo "Starting smartd... ";
 
@@ -935,7 +935,7 @@ EOD;
 	
 	// Erase all variable used previously
 	unset ($cron_min, $cron_hour, $cron_day, $cron_month, $cron_weekday);
-		
+
 	if (isset($freenas_config['shutdown']['enable'])) {
 		
 		if ($g['booting'])
@@ -1091,7 +1091,7 @@ function services_afpd_configure()
 		/* If no share configured, exit */
 		if (!is_array($freenas_config['mounts']['mount']))
 			return 1;
-			
+
 		if ($g['booting'])
 			echo "Starting AFP server... ";
 			
@@ -1106,18 +1106,18 @@ function services_afpd_configure()
 			printf("Error: cannot open afpd.conf in services_afpd_configure().\n");
 			return 1;
 		}
-                
+
 		$afpconf = <<<EOD
 {$afpname} -transall
 EOD;
 
                 if (empty($config['system']['zeroconf_disable'])) {
                         $afpconf .= <<<EOD
- -noslp -fqdn {$config['system']['hostname']} -uamlist
+ -noslp -fqdn {$config['system']['hostname']}.{$config['system']['domain']} -uamlist
 EOD;
                 } else {
                         $afpconf .= <<<EOD
- -uamlist
+ -noslp -nozeroconf -uamlist
 EOD;
                 }
 
@@ -1156,16 +1156,14 @@ EOD;
 /mnt/{$mount['sharename']} "{$mount['sharename']}" 
 
 EOD;
-		
+
 		}
 		
 		fwrite($fd, $AppleVolumes);
 		fclose($fd);
 
-
 		/* run afpdpd */
 		mwexec("/usr/local/sbin/afpd -F {$g['varetc_path']}/afpd.conf");
-
 
 		if ($g['booting'])
 			echo "done\n";
@@ -1193,7 +1191,7 @@ function services_iscsi_configure()
 		mwexec("/sbin/kldload kdload /boot/kernel/iscsi_initiator.ko");
 		mwexec("/sbin/sysctl debug.iscsi=0");
 		mwexec("/usr/local/sbin/iscontrol targetaddress={$freenas_config['iscsi']['targetaddress']} TargetName={$freenas_config['iscsi']['targetname']}");
-		
+
 		if ($g['booting'])
 			echo "done\n";
 	}
@@ -1201,7 +1199,7 @@ function services_iscsi_configure()
 	return 0;
 }
 
-function service_zeroconf_configure() {
+function services_zeroconf_configure() {
         //services_mdnsresponder_configure();
         //services_howl_configure();
         services_avahi_configure();
@@ -1226,12 +1224,14 @@ function services_avahi_configure() {
 </service-group>
 
 EOD;
-	
+
 	/* kill any running dbus daemon */
-        sigkillbypid("{$g['varrun_path']}/dbus/dbus.pid", "TERM");
-        
+  sigkillbypid("{$g['varrun_path']}/dbus/dbus.pid", "TERM");
+
+  unlink_if_exists("{$g['varrun_path']}/dbus/dbus.pid");
+
 	/* kill any running avahi daemons */
-        mwexec("/usr/local/sbin/avahi-daemon -k");
+  mwexec("/usr/local/sbin/avahi-daemon -k");
 
 
 	if (isset($config['system']['zeroconf_disable']))
@@ -1239,7 +1239,7 @@ EOD;
 	
         if (! file_exists("/usr/local/etc/avahi/services"))
                 mwexec("mkdir -p /usr/local/etc/avahi/services");
-	
+
         if (isset($config['system']['webgui']['port'])) {
                 $webservice = str_replace("@PORT@",
                                           $config['system']['webgui']['port'],
@@ -1268,7 +1268,7 @@ EOD;
                 $webservice = str_replace("@TXT_RECORDS@",
                                           "",
                                           $webservice);
-                                          
+
                 file_put_contents("/usr/local/etc/avahi/services/http.service", $webservice);
         }
         
@@ -1295,7 +1295,7 @@ EOD;
                 file_put_contents("/usr/local/etc/avahi/services/rsync.service", $rsyncservice);
 	}
 
-	if (isset($config['sshd']['enable'])) 	{				
+	if (isset($config['system']['enablesshd'])) {
                 $sshservice = str_replace("@PORT@",
                                           "22",
                                           $service_template);
@@ -1316,7 +1316,7 @@ EOD;
                 /* NOP */
 	}
 	
-	if (isset($freenas_config['samba']['enable'])) 	{				
+	if (isset($freenas_config['samba']['enable'])) {
                 $cifsservice = str_replace("@PORT@",
                                           "139",
                                           $service_template);
@@ -1333,14 +1333,14 @@ EOD;
                 file_put_contents("/usr/local/etc/avahi/services/cifs.service", $cifsservice);
 	}
 	
-	if (isset($freenas_config['nfs']['enable'])) {				
+	if (isset($freenas_config['nfs']['enable'])) {
 		
 		/* If no share configured, exit */
 		if (!is_array($freenas_config['mounts']['mount']))
 			break;
 		
 		$a_mount = &$freenas_config['mounts']['mount'];
-		
+
 		foreach ($a_mount as $mount) {
                         $sharename = str_replace(" ", "", $mount['sharename']);
                         $sharename = strtolower($sharename);
@@ -1363,11 +1363,11 @@ EOD;
 	}
 
 
-	/* run dbus */
-	mwexec("/usr/local/bin/dbus-daemon --system");
-        
-        /* run avahi */
-        mwexec("/usr/local/sbin/avahi-daemon -D");
+  /* run dbus */
+  mwexec("/usr/local/bin/dbus-daemon --system");
+
+  /* run avahi */
+  mwexec("/usr/local/sbin/avahi-daemon -D");
 
 	if ($g['booting'])
 		echo "done\n";

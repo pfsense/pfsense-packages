@@ -232,6 +232,8 @@ function oninstall_setup_config() {
 }
 
 function custom_php_install_command() {
+  global $g;
+
   oninstall_copy_kernel_binaries();
   oninstall_copy_misc_binaries();
   adjust_package_contents();
@@ -240,27 +242,43 @@ function custom_php_install_command() {
   if (! file_exists("/usr/local/etc/rc.d"))
     mwexec("mkdir -p /usr/local/etc/rc.d");
 
+  if (! file_exists("{$g['varrun_path']}/dbus"))
+    mkdir("{$g['varrun_path']}/dbus");
+
+  if (! file_exists("{$g['varrun_path']}/avahi-daemon"))
+    mkdir("{$g['varrun_path']}/avahi-daemon");
+
   rename("/usr/local/pkg/rc.freenas", "/usr/local/etc/rc.d/freenas.sh");
   chmod ("/usr/local/etc/rc.d/freenas.sh", 0755);
 
   mwexec("ln -s /usr/local/etc/uams/uams_passwd.so /usr/local/etc/uams/uams_clrtxt.so");
   mwexec("ln -s /usr/local/etc/uams/uams_dhx_passwd.so /usr/local/etc/uams/uams_dhx.so");
+  /* hack cause I linked netatalk against db44 instead of db42 */
+  mwexec("ln -s /usr/local/lib/libdb-4.4.so.0 /usr/local/lib/libdb-4.2.so.2");
 }
 
 function custom_php_deinstall_command() {
-  global $config;
+  global $config, $g;
 
   oninstall_copy_kernel_binaries("deinstall");
   oninstall_copy_misc_binaries("deinstall");
 
   if (! file_exists("/usr/local/etc/rc.d"))
-    mwexec("rm -rf /usr/local/etc/rc.d");      }
+    mwexec("rm -rf /usr/local/etc/rc.d");
+
+  if (! file_exists("{$g['varrun_path']}/dbus"))
+    mwexec("rm -rf {$g['varrun_path']}/dbus");
+
+  if (! file_exists("{$g['varrun_path']}/avahi-daemon"))
+    mwexec("rm -rf {$g['varrun_path']}/avahi-daemon");
 
   unlink_if_exists("/usr/local/etc/uams/uams_clrtxt.so");
   unlink_if_exists("/usr/local/etc/uams/uams_dhx.so");
   unlink_if_exists("/usr/local/etc/rc.d/freenas.sh");
+  unlink_if_exists("/usr/local/lib/libdb-4.2.so.2");
 
   unset($config['installedpackages']['freenas']);
   write_config();
   conf_mount_ro();
+}
 ?>

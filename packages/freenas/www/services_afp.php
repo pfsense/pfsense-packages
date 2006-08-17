@@ -160,7 +160,7 @@ echo $pfSenseHead->getHTML();
       <tr>
         <td width="22%" valign="top" class="vncell"><?=gettext("Server Name");?></td>
         <td width="78%" class="vtable">
-          <input name="afpname" type="text" class="formfld" id="afpname" size="20" value="<?=htmlspecialchars($pconfig['afpname']);?>" /> 
+          <input name="afpname" type="text" class="formfld unknown" id="afpname" size="20" value="<?=htmlspecialchars($pconfig['afpname']);?>" />
         </td>
       </tr>
       <tr>
