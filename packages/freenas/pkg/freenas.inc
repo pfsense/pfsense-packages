@@ -27,6 +27,8 @@
         POSSIBILITY OF SUCH DAMAGE.
 */
 
+require_once("freenas_config.inc");
+
 function sync_package_freenas() {
 }
 
@@ -51,7 +53,11 @@ function oninstall_copy_kernel_binaries($action = "install") {
 
    if ($action == "install") {   
      while (list($source, $target) = each($binaries)) {
+       $static_output .= "FreeNAS: Moving binary file... ";
+       update_output_window($static_output);
        rename($source, $target);
+       $static_output .= "done.\n";
+       update_output_window($static_output);
      }
    } else if ($action == "deinstall") {
      while (list($source, $target) = each($binaries)) {
