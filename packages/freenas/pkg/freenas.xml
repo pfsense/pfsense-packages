@@ -385,6 +385,16 @@
     <chmod>0755</chmod>
     <item>http://www.pfsense.com/packages/config/freenas/bin/rpcbind</item>
   </additional_files_needed>
+  <additional_files_needed>
+    <prefix>/usr/local/pkg/</prefix>
+    <chmod>0755</chmod>
+    <item>http://www.pfsense.com/packages/config/freenas/bin/rpc.lockd</item>
+  </additional_files_needed>
+  <additional_files_needed>
+    <prefix>/usr/local/pkg/</prefix>
+    <chmod>0755</chmod>
+    <item>http://www.pfsense.com/packages/config/freenas/bin/rpc.statd</item>
+  </additional_files_needed>
   <!--
     fields gets invoked when the user adds or edits a item. The following items
     will be parsed and rendered for the user as a gui with input, and selectboxes.

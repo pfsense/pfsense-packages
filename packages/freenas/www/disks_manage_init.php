@@ -174,100 +174,100 @@ echo $pfSenseHead->getHTML();
           <tr>
             <td width="22%" valign="top">&nbsp;</td>
             <td width="78%">
-              <input id="submit" name="Submit" type="submit" class="formbtn" value="<?=gettext("Format disk!");?>" />
+              <input id="submitt" name="Submitt" type="submit" class="formbtn" value="<?=gettext("Format disk!");?>" />
             </td>
           </tr>
   				<tr>
     				<td valign="top" colspan="2">
-    				<? if ($do_format)
-    				{
-    					echo(_DISKSMANAGEINITPHP_INITTEXT);
-    					echo('<pre>');
-    					ob_end_flush();
-    					
-    					/* Erase MBR if not checked*/
-    					
-    					if (!$notinitmbr) {
-    						echo "Erasing MBR\n";
-    						system("dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . " bs=32k count=640");
-    						
-    					}
-    					else
-    						echo "Keeping the MBR\n";
-    					
-    					switch ($type)
-    					{
-    					case "ufs":
-    						/* Initialize disk */
-    						system("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
-    						echo "\"fdisk: Geom not found\"is not an error message!\n";
-    						/* Initialise the partition (optional) */
-    						system("/bin/dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . "s1 bs=32k count=16");
-    						/* Create s1 label */
-    						system("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");			
-    						// Create filesystem	
-    						system("/sbin/newfs -U /dev/" . escapeshellarg($disk) . "s1");
-    						break;
-    					case "ufs_no_su":
-    						/* Initialize disk */
-    						system("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
-    						/* Initialise the partition (optional) */
-    						system("/bin/dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . "s1 bs=32k count=16");
-    						/* Create s1 label */
-    						system("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");			
-    						// Create filesystem	
-    						system("/sbin/newfs -m 0 /dev/" . escapeshellarg($disk) . "s1");
-    						break;
-    					case "ufsgpt":
-    						/* Create GPT partition table */
-    						system("/sbin/gpt destroy " . escapeshellarg($disk));
-    						system("/sbin/gpt create -f " . escapeshellarg($disk));
-    						system("/sbin/gpt add -t ufs " . escapeshellarg($disk));
-    						// Create filesystem
-    						system("/sbin/newfs -U /dev/" . escapeshellarg($disk) . "p1");
-    						break;
-    					case "ufsgpt_no_su":
-    						/* Create GPT partition table */
-    						system("/sbin/gpt destroy " . escapeshellarg($disk));
-    						system("/sbin/gpt create -f " . escapeshellarg($disk));
-    						system("/sbin/gpt add -t ufs " . escapeshellarg($disk));
-    						// Create filesystem
-    						system("/sbin/newfs -m 0 /dev/" . escapeshellarg($disk) . "p1");
-    						break;
-    					case "gmirror":
-    						/* Initialize disk */
-    						system("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
-    						/* Initialise the partition (optional) */
-    						system("/bin/dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . "s1 bs=32k count=16");
-    						/* Create s1 label */
-    						//system("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");
-    						/* Delete old gmirror information */
-    						system("/sbin/gmirror clear /dev/" . escapeshellarg($disk));
-    						break;
-    					case "raid":
-    						/* Initialize disk */
-    						system("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
-    						echo "\"fdisk: Geom not found\"is not an error message!\n";
-    						/* Initialise the partition (optional) */
-    						system("/bin/dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . "s1 bs=32k count=16");
-    						/* Create s1 label */
-    						system("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");
-    						break;
-    					case "msdos":
-    						/* Initialize disk */
-    						system("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
-    						echo "\"fdisk: Geom not found\"is not an error message!\n";
-    						/* Initialise the partition (optional) */
-    						system("/bin/dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . "s1 bs=32k count=16");
-    						/* Create s1 label */
-    						system("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");
-    						// Create filesystem
-    						system("/sbin/newfs_msdos -F 32 /dev/" . escapeshellarg($disk) . "s1");
-    						break;		
-    					}
-    					
-    					echo('</pre>');
-    				}
+    				<?
+              if ($do_format) {
+      					echo "<strong>Disk initialization details:</strong>";
+      					echo('<pre style="font-size: small; border: solid 1px silver; padding: 4px;">');
+      					ob_end_flush();
+
+      					/* Erase MBR if not checked*/
+
+      					if (!$notinitmbr) {
+      						echo "Erasing MBR\n";
+      						system("dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . " bs=32k count=640");
+
+      					}
+      					else
+      						echo "Keeping the MBR\n";
+
+      					switch ($type)
+      					{
+      					case "ufs":
+      						/* Initialize disk */
+      						system("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
+      						echo "\"fdisk: Geom not found\" is not an error message!\n";
+      						/* Initialise the partition (optional) */
+      						system("/bin/dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . "s1 bs=32k count=16");
+      						/* Create s1 label */
+      						system("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");
+      						// Create filesystem
+      						system("/sbin/newfs -U /dev/" . escapeshellarg($disk) . "s1");
+      						break;
+      					case "ufs_no_su":
+      						/* Initialize disk */
+      						system("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
+      						/* Initialise the partition (optional) */
+      						system("/bin/dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . "s1 bs=32k count=16");
+      						/* Create s1 label */
+      						system("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");
+      						// Create filesystem
+      						system("/sbin/newfs -m 0 /dev/" . escapeshellarg($disk) . "s1");
+      						break;
+      					case "ufsgpt":
+      						/* Create GPT partition table */
+      						system("/sbin/gpt destroy " . escapeshellarg($disk));
+      						system("/sbin/gpt create -f " . escapeshellarg($disk));
+      						system("/sbin/gpt add -t ufs " . escapeshellarg($disk));
+      						// Create filesystem
+      						system("/sbin/newfs -U /dev/" . escapeshellarg($disk) . "p1");
+      						break;
+      					case "ufsgpt_no_su":
+      						/* Create GPT partition table */
+      						system("/sbin/gpt destroy " . escapeshellarg($disk));
+      						system("/sbin/gpt create -f " . escapeshellarg($disk));
+      						system("/sbin/gpt add -t ufs " . escapeshellarg($disk));
+      						// Create filesystem
+      						system("/sbin/newfs -m 0 /dev/" . escapeshellarg($disk) . "p1");
+      						break;
+      					case "gmirror":
+      						/* Initialize disk */
+      						system("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
+      						/* Initialise the partition (optional) */
+      						system("/bin/dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . "s1 bs=32k count=16");
+      						/* Create s1 label */
+      						//system("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");
+      						/* Delete old gmirror information */
+      						system("/sbin/gmirror clear /dev/" . escapeshellarg($disk));
+      						break;
+      					case "raid":
+      						/* Initialize disk */
+      						system("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
+      						echo "\"fdisk: Geom not found\"is not an error message!\n";
+      						/* Initialise the partition (optional) */
+      						system("/bin/dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . "s1 bs=32k count=16");
+      						/* Create s1 label */
+      						system("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");
+      						break;
+      					case "msdos":
+      						/* Initialize disk */
+      						system("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
+      						echo "\"fdisk: Geom not found\"is not an error message!\n";
+      						/* Initialise the partition (optional) */
+      						system("/bin/dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . "s1 bs=32k count=16");
+      						/* Create s1 label */
+      						system("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");
+      						// Create filesystem
+      						system("/sbin/newfs_msdos -F 32 /dev/" . escapeshellarg($disk) . "s1");
+      						break;
+      					}
+
+      					echo('</pre>');
+    				  }
     				?>
     				</td>
   				</tr>

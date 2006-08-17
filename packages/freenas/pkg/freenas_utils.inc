@@ -183,7 +183,7 @@ function get_gmirror_disks_list()
     //        [desc] => COMPLETE
     //        [size] => 6149M
     //    )
-    
+
 
 	/* Display all configured gmirror volume*/
 	exec("/sbin/gmirror list",$rawdata);
@@ -220,7 +220,7 @@ function get_gmirror_disks_list()
 			$founddesc=1;
 			continue ;
 		}
-		
+
 		// Third Step: Getting the array Size
 		// look for this output:
 		// Name: mirror/pouet
@@ -368,7 +368,7 @@ function get_scsi_disks_list()
 			preg_match("/.*\<([^>]*)>.*/",$line,$match);
 		
 			$disklist[$diskname]['desc'] = $match[1];
-			
+
 			/* Looking for the disk size */
 			foreach ($rawdmesg as $dmesgline) 	{			
 					/* Separe la ligne par les espace */
@@ -627,7 +627,7 @@ function freenas_install($src,$dst)
 	while(list(,$val) = each($tableau))
 	{
 		// Si la ligne contient le mot "unused"
-		
+
 		if (ereg ("unused",$val))
 		{
 			// On remplace c: par a:
@@ -671,5 +671,10 @@ function freenas_install($src,$dst)
 	passthru("/bin/rm -rf /mnt/src");
 	passthru("/bin/rm -rf /mnt/dst");
 
+}
+
+/* Force kill a process by name */
+function forcekillbyname($procname) {
+	return mwexec("/usr/bin/killall -9 " . escapeshellarg($procname));
 }
 ?>

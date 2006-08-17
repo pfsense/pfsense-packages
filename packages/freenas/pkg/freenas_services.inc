@@ -397,8 +397,8 @@ function services_nfs_configure() {
 		list($network,$subnet) = 
 		explode('/', $freenas_config['nfs']['nfsnetwork']);
 		
-		$subnet=gen_subnet_mask($subnet);
-		
+		$subnet = gen_subnet_mask($subnet);
+
 		$a_mount = &$freenas_config['mounts']['mount'];
 		
 		foreach ($a_mount as $mount)

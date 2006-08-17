@@ -165,6 +165,10 @@ function oninstall_copy_misc_binaries($action = "install") {
                        "target" => "/usr/sbin/mountd");
    $binaries[] = array("source" => "/usr/local/pkg/rpcbind",
                        "target" => "/usr/sbin/rpcbind");
+   $binaries[] = array("source" => "/usr/local/pkg/rpc.lockd",
+                       "target" => "/usr/sbin/rpc.lockd");
+   $binaries[] = array("source" => "/usr/local/pkg/rpc.lockd",
+                       "target" => "/usr/sbin/rpc.lockd");
                        
    if ($action == "install") {
      while (list(, $val) = each($binaries)) {

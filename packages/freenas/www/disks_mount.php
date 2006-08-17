@@ -122,7 +122,7 @@ echo $pfSenseHead->getHTML();
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <form id="iform" name="iform" action="disks_mount.php" method="post">
-<?php if (file_exists($d_diskdirty_path)): ?>
+<?php if (file_exists($d_mountdirty_path)): ?>
 <?php print_info_box_np(gettext("The mount point list has been changed.") . "<br />" .
                         gettext("You must apply the changes in order for them to take effect."));?>
 <?php endif; ?>
@@ -155,18 +155,17 @@ echo $pfSenseHead->getHTML();
           <?=htmlspecialchars($mount['desc']);?>&nbsp;
         </td>
        </td>
-       <td valign="middle" class="listbg">
+       <td valign="middle" class="listbg" style="color: #FFFFFF;">
        <?php
-         if (file_exists($d_mountdirty_path))
-           $stat=_CONFIGURING;
-         else {
-           $stat=disks_mount_status($mount);
+         if (file_exists($d_mountdirty_path)) {
+           $stat = gettext("configuring");
+         } else {
+           $stat = disks_mount_status($mount);
            if ($stat == "ERROR")
-             echo "ERROR - <a href=\"disks_mount.php?act=ret&id=$i\">retry</a>";
-           else
-             echo $stat;
-        }
-      ?>&nbsp;
+             $stat = "ERROR - <a href=\"disks_mount.php?act=ret&id=$i\">retry</a>";
+         }
+         echo $stat;
+      ?>
       </td>
       <td valign="middle" class="list"> 
         <a href="disks_mount_edit.php?id=<?=$i;?>">
@@ -197,7 +196,7 @@ echo $pfSenseHead->getHTML();
             </span>
             <br />
             <span class="vexpl">
-              <a href="disk_manage.php">previously configured disk</a>
+              <a href="disks_manage.php">previously configured disk</a>
             </span>
         </td>
       </tr>
