@@ -48,6 +48,7 @@ if (!is_array($freenas_config['ftp']))
 
 $pconfig['enable'] = isset($freenas_config['ftp']['enable']);
 $pconfig['port'] = $freenas_config['ftp']['port'];
+$pconfig['authbackend'] = $freenas_config['ftp']['authentication_backend'];
 $pconfig['numberclients'] = $freenas_config['ftp']['numberclients'];
 $pconfig['maxconperip'] = $freenas_config['ftp']['maxconperip'];
 $pconfig['timeout'] = $freenas_config['ftp']['timeout'];
@@ -74,7 +75,7 @@ if (! empty($_POST))
 		$reqdfields = array_merge($reqdfields, explode(" ", "numberclients maxconperip timeout port"));
 		$reqdfieldsn = array_merge($reqdfieldsn, explode(",", "Numberclients,Maxconperip,Timeout,Port"));
 	}
-	
+
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 	
 	if ($_POST['enable'] && !is_port($_POST['port']))
@@ -148,6 +149,7 @@ if (! empty($_POST))
 		$freenas_config['ftp']['maxconperip'] = $_POST['maxconperip'];
 		$freenas_config['ftp']['timeout'] = $_POST['timeout'];
 		$freenas_config['ftp']['port'] = $_POST['port'];
+		$freenas_config['ftp']['authentication_backend'] = $_POST['authbackend'];
 		$freenas_config['ftp']['anonymous'] = $_POST['anonymous'] ? true : false;
 		$freenas_config['ftp']['localuser'] = $_POST['localuser'] ? true : false;
 		$freenas_config['ftp']['pasv_max_port'] = $_POST['pasv_max_port'];
@@ -185,7 +187,7 @@ function enable_change(enable_change) {
 	
 	endis = !(document.iform.enable.checked || enable_change);
   endis ? color = '#D4D0C8' : color = '#FFFFFF';
-  
+
 	document.iform.port.disabled = endis;
 	document.iform.timeout.disabled = endis;
 	document.iform.numberclients.disabled = endis;
@@ -244,10 +246,43 @@ echo $pfSenseHead->getHTML();
           <input name="port" type="text" class="formfld unknown" id="port" size="20" value="<?=htmlspecialchars($pconfig['port']);?>" />
         </td>
       </tr>
+      <?php
+        if (file_exists("/usr/local/sbin/wzdftpd")) {
+          $a_backends = array();
+
+          $dh  = opendir("/usr/local/share/wzdftpd/backends");
+          while (false !== ($filename = readdir($dh))) {
+            if (preg_match("/\.so$/", $filename)) {
+              $lastslash = strrpos($filename, "/");
+              $dot = strrpos($filename, ".");
+
+              $backend_name = str_replace("libwzd",
+                                          "",
+                                          substr($filename,
+                                                 $lastslash,
+                                                 $dot - $lastslash));
+              $a_backends[] = $backend_name;
+            }
+          }
+        }
+      ?>
+      <?php if (is_array($a_backends)) : ?>
+      <tr>
+        <td width="22%" valign="top" class="vncellreq"><?=gettext("Authentication Backend");?></td>
+        <td width="78%" class="vtable" align="left" valign="middle">
+          <select name="authbackend" id="authbackend" class="formselect">
+            <?php foreach ($a_backends as $backend) : ?>
+              <option value="<?= $backend ?>"><?= $backend ?></option>
+            <?php endforeach; ?>
+          </select><br />
+        <?= gettext("Choose a particular backend, that will be used to authenticate FTP users."); ?>
+        </td>
+      </tr>
+      <?php endif; ?>
       <tr>
         <td width="22%" valign="top" class="vncellreq"><?=gettext("Number of clients");?></td>
         <td width="78%" class="vtable" align="left" valign="middle">
-          <input name="numberclients" type="text" class="formfld unknown" id="numberclients" size="20" value="<?=htmlspecialchars($pconfig['numberclients']);?>" /> 
+          <input name="numberclients" type="text" class="formfld unknown" id="numberclients" size="20" value="<?=htmlspecialchars($pconfig['numberclients']);?>" />
           <br />
           <?= gettext("Maximum number of simultaneous clients."); ?>
         </td>

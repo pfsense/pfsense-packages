@@ -31,6 +31,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+define (FTP_BACKEND_PAM, "pam");
+define (FTP_BACKEND_PLAINTEXT, "plaintext");
+
 $freenas_config =& $config['installedpackages']['freenas']['config'][0];
 
 function services_samba_configure() {
@@ -449,7 +452,7 @@ function services_ftpd_configure() {
 }
 
 function services_wzdftpd_configure() {
-	global $freenas_config, $g;
+	global $freenas_config, $config, $g;
 
 	/* kill any WZDFTPD */
 	killbyname("wzdftpd");
@@ -466,6 +469,7 @@ function services_wzdftpd_configure() {
                         mkdir("/usr/local/etc/wzdftpd");
 
 		/* generate wzd.cfg */
+    chmod("/usr/local/etc/wzdftpd/wzd.cfg", 0600);
 		$fd = fopen("/usr/local/etc/wzdftpd/wzd.cfg", "w");
 		if (!$fd) {
 			printf("Error: cannot open vsftpd.conf in services_vsftpd_configure().\n");
@@ -487,7 +491,7 @@ pasv_high_range = {$freenas_config['ftp']['pasv_max_port']}
 
 EOD;
 		}
-                
+
                 $ftpconf .= <<<EOD
 
 pasv_ip = {$freenas_config['ftp']['pasv_address']}
@@ -497,7 +501,7 @@ xferlog = /var/log/wzdftpd/xferlog
 logdir = /var/log/wzdftpd
 max_threads = 32
 
-backend = /usr/local/share/wzdftpd/backends/libwzdpam.so
+backend = /usr/local/share/wzdftpd/backends/libwzd{$freenas_config['ftp']['authentication_backend']}.so
 
 max_ul_speed = 0
 max_dl_speed = 0
@@ -544,7 +548,16 @@ site_grpratio = +O
 site_grpren = +O
 site_gsinfo = +O +G
 site_help = *
-site_idle = *
+
+EOD;
+
+if (! empty($freenas_config['ftp']['timeout'])) {
+$ftpconf .= "site_idle ={$freenas_config['ftp']['timeout']}\n";
+} else {
+$ftpconf .= "site_idle = *\n";
+}
+
+                $ftpconf .= <<<EOD
 site_invite = !=guest *
 site_kick = +O
 site_kill = +O
@@ -594,14 +607,16 @@ EOD;
 
 [ZEROCONF]
 zeroconf_port = {$freenas_config['ftp']['port']}
-zeroconf_username = root
+zeroconf_username = wzdftpd
+zeroconf_password = wzdftpd
 zeroconf_path = /
 
 EOD;
 
                 }
-                
+
                 $ftpconf .= <<<EOD
+
 [sfv]
 progressmeter = [WzD] - %3d%% Complete - [WzD]
 del_progressmeter = \[.*] - ...% Complete - \[WzD]
@@ -637,9 +652,84 @@ EOD;
                 if (isset($freenas_config['ftp']['banner'])) 	{
                         $ftpconf .= "200 = {$freenas_config['ftp']['banner']}";
                 }
-                
+
 		fwrite($fd, $ftpconf);
 		fclose($fd);
+    chmod("/usr/local/etc/wzdftpd/wzd.cfg", 0400);
+
+  /* now generate the plaintext userfail (if applicable) */
+  if ($freenas_config['ftp']['authentication_backend'] == "plaintext") {
+    $ftpusers = "[GROUPS]\n";
+    $a_group =& $config['system']['group'];
+    $a_user =& $config['system']['user'];
+
+    for ($i = 0; $i < count($a_group); $i++) {
+      $group = $a_group[$i];
+      $gid = $i + 1;
+
+      $ftpusers .= <<<EOD
+
+privgroup {$group['name']}
+gid={$gid}
+default_home=/
+
+EOD;
+    } // end foreach
+
+    /* anonymous group */
+    if (! empty($freenas_config['ftp']['anonymous'])) {
+      $ftpusers .= <<<EOD
+
+privgroup anonymous
+max_idle_time=10
+gid=3
+default_home=/home
+
+EOD;
+    }
+
+    /* same for users */
+    $ftpusers .= "[USERS]\n";
+    for ($i = 0; $i < count($a_user); $i++) {
+      $user = $a_user[$i];
+      $ftpusers .= <<<EOD
+
+name={$user['name']}
+pass={$user['password']}
+home=/
+uid={$i}
+groups={$user['groupname']}
+rights=0xffffffff
+
+EOD;
+    } // end foreach
+
+    /* anonymous user */
+    if (! empty($freenas_config['ftp']['anonymous'])) {
+      $ftpusers .= <<<EOD
+
+name=guest
+pass=%
+home=/tmp
+uid=200
+groups=anonymous
+rights=0x10003
+ip_allowed=*
+max_dl_speed=20480
+credits=0
+bytes_ul_total=0
+bytes_dl_total=1918812
+num_logins=2
+
+EOD;
+    }
+
+    $ftpusers .= "[HOSTS]\nall = *\n";
+    chmod("/usr/local/etc/wzdftpd/users", 0600);
+    file_put_contents("/usr/local/etc/wzdftpd/users", $ftpusers);
+    chmod("/usr/local/etc/wzdftpd/users", 0400);
+
+  } // end if
 
 		/* run vsftpd */
 		mwexec("/usr/local/sbin/wzdftpd -f /usr/local/etc/wzdftpd/wzd.cfg");
