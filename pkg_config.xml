@@ -12,6 +12,7 @@
 			<depends_on_package>quagga-0.99.4_2.tbz</depends_on_package>
 			<status>PRE-ALPHA</status>
 			<version>0.99</version>
+			<config_file>http://www.pfsense.org/packages/config/quagga/quagga.xml</config_file>
 		</package>
 		<package>
 			<name>openntpd</name>

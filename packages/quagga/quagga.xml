@@ -7,7 +7,7 @@
 		<executable>quagga</executable>
 	</service>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/quagga/quagga.sh</item>
+		<item>http://www.pfsense.org/packages/config/quagga/quagga.sh</item>
 	    <prefix>/usr/local/etc/rc.d</prefix>
 	    <chmod>0777</chmod>
 	</additional_files_needed>
