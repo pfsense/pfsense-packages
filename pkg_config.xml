@@ -4,17 +4,6 @@
 <pfsensepkgs>
 	<packages>
 		<package>
-			<name>quagga</name>
-			<website>http://www.quagga.net/</website>
-			<descr>*NO GUI - Uses Telnet*</descr>
-			<category>Network Management</category>
-			<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-			<depends_on_package>quagga-0.99.4_2.tbz</depends_on_package>
-			<status>PRE-ALPHA</status>
-			<version>0.99</version>
-			<config_file>http://www.pfsense.org/packages/config/quagga/quagga.xml</config_file>
-		</package>
-		<package>
 			<name>openntpd</name>
 			<website>http://www.openntpd.org/</website>
 			<descr>OpenNTPD NTP time server.</descr>
@@ -565,5 +554,16 @@
 			<facilityname>ftp</facilityname>
 			<logfilename>pure-ftpd.log</logfilename>
 			</logging>
+		</package>
+		<package>
+			<name>quagga</name>
+			<website>http://www.quagga.net/</website>
+			<descr>*NO GUI - Uses Telnet*</descr>
+			<category>Network Management</category>
+			<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+			<depends_on_package>quagga-0.99.4_2.tbz</depends_on_package>
+			<status>PRE-ALPHA</status>
+			<version>0.99</version>
+			<config_file>http://www.pfsense.org/packages/config/quagga/quagga.xml</config_file>
 		</package>
 </pfsensepkgs>
