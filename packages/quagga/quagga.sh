@@ -36,7 +36,7 @@ load_rc_config $name
 quagga_enable="YES"
 quagga_flags="-d"
 quagga_daemons="zebra ripd ripngd ospfd ospf6d bgpd isisd"
-{quagga_extralibs_path=""
+quagga_extralibs_path=""
 
 quagga_cmd=$1
 
