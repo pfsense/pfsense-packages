@@ -76,7 +76,7 @@ services_ftpd_configure();
 services_nfs_configure();
 
 /* start SSH service */
-services_sshd_configure();
+/* services_sshd_configure(); */
 
 /* start AFP service */
 services_afpd_configure();
