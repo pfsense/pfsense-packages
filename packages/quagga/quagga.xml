@@ -11,6 +11,9 @@
 	    <prefix>/usr/local/etc/rc.d</prefix>
 	    <chmod>0777</chmod>
 	</additional_files_needed>
+	<custom_php_install_command>
+		mwexec("/usr/local/etc/rc.d/quagga.sh start");
+	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		mwexec("rm /usr/local/etc/rc.d/quagga*");
 		mwexec("rm /usr/local/etc/rc.d/watchquagga");
