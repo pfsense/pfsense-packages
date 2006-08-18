@@ -15,7 +15,7 @@
 		</package>
 		<package>
 			<name>openntpd</name>
-      <website>http://www.openntpd.org/</website>
+			<website>http://www.openntpd.org/</website>
 			<descr>OpenNTPD NTP time server.</descr>
 			<category>Network</category>
 			<version>0.8.1</version>
@@ -28,34 +28,34 @@
 		</package>
 		<package>
 			<name>freenas</name>
-      <website>http://www.freenas.org/</website>
+			<website>http://www.freenas.org/</website>
 			<descr>
-        &lt;p&gt;
-        FreeNAS is a free NAS (Network-Attached Storage) server, supporting: CIFS (samba), FTP,
-        NFS, RSYNC protocols, local user authentication, Software RAID (0,1,5) with a Full WEB
-        configuration interface.
-        &lt;/p&gt;
-        &lt;p&gt;
-        Please read the &lt;a href=&quot;http://www.pfsense.com/packages/config/freenas/doc/README.txt&quot; target=&quot;_blank&quot;&gt;FreeNAS README&lt;/a&gt; before installing this package.
-        &lt;/p&gt;
-      </descr>
+				&lt;p&gt;
+				FreeNAS is a free NAS (Network-Attached Storage) server, supporting: CIFS (samba), FTP,
+				NFS, RSYNC protocols, local user authentication, Software RAID (0,1,5) with a Full WEB
+				configuration interface.
+				&lt;/p&gt;
+				&lt;p&gt;
+				Please read the &lt;a href=&quot;http://www.pfsense.com/packages/config/freenas/doc/README.txt&quot; target=&quot;_blank&quot;&gt;FreeNAS README&lt;/a&gt; before installing this package.
+				&lt;/p&gt;
+			</descr>
 			<category>Network</category>
 			<version>0.68</version>
 			<status>PRE-ALPHA</status>
 			<maintainer>me@daniel.stefan.haischt.name</maintainer>
 			<depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
 			<depends_on_package>ataidle-0.9.tbz</depends_on_package>
-      <depends_on_package>avahi+libdns-0.6.12.tbz</depends_on_package>
-      <depends_on_package>wzdftpd-0.7.2_1.tbz</depends_on_package>
-      <depends_on_package>e2fsprogs-1.39_1.tbz</depends_on_package>
-      <depends_on_package>smartmontools-5.36.tbz</depends_on_package>
-      <depends_on_package>aaccli-1.0.tbz</depends_on_package>
-      <depends_on_package>rsync-2.6.8_2.tbz</depends_on_package>
-      <depends_on_package>scponly-4.6_1.tbz</depends_on_package>
-      <depends_on_package>cracklib-2.7_2.tbz</depends_on_package>
-      <depends_on_package>samba-3.0.23,1.tbz</depends_on_package>
-      <depends_on_package>netatalk-2.0.3_3,1.tbz</depends_on_package>
-      <depends_on_package>pam_ldap-1.8.2.tbz</depends_on_package>
+			<depends_on_package>avahi+libdns-0.6.12.tbz</depends_on_package>
+			<depends_on_package>wzdftpd-0.7.2_1.tbz</depends_on_package>
+			<depends_on_package>e2fsprogs-1.39_1.tbz</depends_on_package>
+			<depends_on_package>smartmontools-5.36.tbz</depends_on_package>
+			<depends_on_package>aaccli-1.0.tbz</depends_on_package>
+			<depends_on_package>rsync-2.6.8_2.tbz</depends_on_package>
+			<depends_on_package>scponly-4.6_1.tbz</depends_on_package>
+			<depends_on_package>cracklib-2.7_2.tbz</depends_on_package>
+			<depends_on_package>samba-3.0.23,1.tbz</depends_on_package>
+			<depends_on_package>netatalk-2.0.3_3,1.tbz</depends_on_package>
+			<depends_on_package>pam_ldap-1.8.2.tbz</depends_on_package>
 			<config_file>http://www.pfsense.org/packages/config/freenas/pkg/freenas.xml</config_file>
 			<configurationfile>freenas.xml</configurationfile>
 		</package>
@@ -69,40 +69,40 @@
 				SMTP appliance (Note: This package is still in some kind of development and only was tested on HEAD).
 			</descr>
 			<config_file>http://www.pfsense.org/packages/config/dspam.xml</config_file>
-      <configurationfile>dspam.xml</configurationfile>
+			<configurationfile>dspam.xml</configurationfile>
 			<depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
 			<depends_on_package>dspam-3.6.8-sqlite3-noldap.tbz</depends_on_package>
-      <!--
-        Archiver deps are introduced by ClamAV.
-      -->
-      <depends_on_package>unzoo-4.4</depends_on_package>
-      <depends_on_package>unzip-5.52_2</depends_on_package>
-      <depends_on_package>lha-1.14i_6</depends_on_package>
-      <depends_on_package>arc-5.21o</depends_on_package>
-      <depends_on_package>arj-3.10.22</depends_on_package>
-      <depends_on_package>pkg-config-0.20_2</depends_on_package>
-      <depends_on_package>sqlite-3.3.6</depends_on_package>
-      <depends_on_package>libiconv-1.9.2_2</depends_on_package>
-      <depends_on_package>gettext-0.14.5_2</depends_on_package>
-      <depends_on_package>libgmp-4.2.1_1</depends_on_package>
-      <depends_on_package>curl-7.15.4</depends_on_package>
-      <depends_on_package>libidn-0.6.3</depends_on_package>
-      <depends_on_package>clamav-devel-20060703</depends_on_package>
+	        <!--
+        	Archiver deps are introduced by ClamAV.
+		    -->
+			<depends_on_package>unzoo-4.4</depends_on_package>
+			<depends_on_package>unzip-5.52_2</depends_on_package>
+			<depends_on_package>lha-1.14i_6</depends_on_package>
+			<depends_on_package>arc-5.21o</depends_on_package>
+			<depends_on_package>arj-3.10.22</depends_on_package>
+			<depends_on_package>pkg-config-0.20_2</depends_on_package>
+			<depends_on_package>sqlite-3.3.6</depends_on_package>
+			<depends_on_package>libiconv-1.9.2_2</depends_on_package>
+			<depends_on_package>gettext-0.14.5_2</depends_on_package>
+			<depends_on_package>libgmp-4.2.1_1</depends_on_package>
+			<depends_on_package>curl-7.15.4</depends_on_package>
+			<depends_on_package>libidn-0.6.3</depends_on_package>
+			<depends_on_package>clamav-devel-20060703</depends_on_package>
 			<version>3.6.8</version>
 			<status>PRE-ALPHA</status>
 			<maintainer>me@daniel.stefan.haischt.name</maintainer>
 			<logging>
 				<facilityname>dspam</facilityname>
-        <logfilename>dspam.log</logfilename>
+				<logfilename>dspam.log</logfilename>
 			</logging>
 		</package>
 		<package>
 			<name>sshterm</name>
 			<descr>
-        This is a package of the SSHTools SSHTerm Java Applet. SSHTools is a
-        suite of Java SSH applications providing a Java SSH API,
-        SSH Terminal, SSH secured VNC client, SFTP client and SSH Daemon.
-      </descr>
+		        This is a package of the SSHTools SSHTerm Java Applet. SSHTools is a
+	    	    suite of Java SSH applications providing a Java SSH API,
+    	    	SSH Terminal, SSH secured VNC client, SFTP client and SSH Daemon.
+			</descr>
 			<website>http://sourceforge.net/projects/sshtools/</website>
 			<category>Security</category>
 			<version>0.1</version>
@@ -129,9 +129,9 @@
 		<package>
 			<name>p3scan-pf</name>
 			<descr>
-        A transparent POP3-Proxy with virus-scanning- and
-        spam-scanning-capabilities.
-      </descr>
+	    	    A transparent POP3-Proxy with virus-scanning- and
+    	    	spam-scanning-capabilities.
+      		</descr>
 			<website>http://www.undergroundsecurity.com/p3scan/</website>
 			<category>Security</category>
 			<version>0.1</version>
