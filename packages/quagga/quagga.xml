@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packagegui>
+	<service>
+		<name>quagga</name>
+		<description></description>
+		<rcfile>quagga.sh</rcfile>
+		<executable>quagga</executable>
+	</service>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/quagga/quagga.sh</item>
+	    <prefix>/usr/local/etc/rc.d</prefix>
+	    <chmod>0777</chmod>
+	</additional_files_needed>
+	<custom_php_deinstall_command>
+		mwexec("rm /usr/local/etc/rc.d/quagga*");
+		mwexec("rm /usr/local/etc/rc.d/watchquagga");
+	</custom_php_deinstall_command>
+</packagegui>

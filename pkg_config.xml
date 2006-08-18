@@ -4,6 +4,16 @@
 <pfsensepkgs>
 	<packages>
 		<package>
+			<name>quagga</name>
+			<website>http://www.quagga.net/</website>
+			<descr>*NO GUI - Uses Telnet*</descr>
+			<category>Network Management</category>
+			<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+			<depends_on_package>quagga-0.99.4_2.tbz</depends_on_package>
+			<status>PRE-ALPHA</status>
+			<version>0.99</version>
+		</package>
+		<package>
 			<name>openntpd</name>
       <website>http://www.openntpd.org/</website>
 			<descr>OpenNTPD NTP time server.</descr>
@@ -21,8 +31,8 @@
       <website>http://www.freenas.org/</website>
 			<descr>
         &lt;p&gt;
-        FreeNAS is a free NAS (Network-Attached Storage) server, supporting: CIFS (samba), FTP, 
-        NFS, RSYNC protocols, local user authentication, Software RAID (0,1,5) with a Full WEB 
+        FreeNAS is a free NAS (Network-Attached Storage) server, supporting: CIFS (samba), FTP,
+        NFS, RSYNC protocols, local user authentication, Software RAID (0,1,5) with a Full WEB
         configuration interface.
         &lt;/p&gt;
         &lt;p&gt;
@@ -503,16 +513,6 @@
 			<version>0.8_1</version>
 			<status>ALPHA</status>
 			<configurationfile>doorman.xml</configurationfile>
-		</package>
-		<package>
-			<name>quagga</name>
-			<website>http://www.quagga.net/</website>
-			<descr>*NO GUI*</descr>
-			<category>Network Management</category>
-			<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-			<depends_on_package>quagga-0.98.5_1.tbz</depends_on_package>
-			<status>ALPHA</status>
-			<version>9.5</version>
 		</package>
 		<package>
 			<name>zebra</name>
