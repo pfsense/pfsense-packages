@@ -4,6 +4,7 @@
 	<name>miniupnpd</name>
 	<version>0.9</version>
 	<savetext>Change</savetext>
+	<include_file>/usr/local/pkg/miniupnpd.inc</include_file>
 	<aftersaveredirect>pkg_edit.php?xml=miniupnpd.xml&amp;id=0</aftersaveredirect>
 	<menu>
 		<name>Miniupnpd</name>
