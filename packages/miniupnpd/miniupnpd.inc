@@ -21,7 +21,7 @@
 				log_error("Could not resolve real interfaec {$iface}");
 			}
 		}
-		$start = "/usr/local/sbin/miniupnpd -p 2869 {$ifaces_final}";
+		$start = "/usr/local/sbin/miniupnpd -p 2869{$ifaces_final}";
 		write_rcfile(array(
 			    "file" => "miniupnpd.sh",
 			    "start" => $start,
