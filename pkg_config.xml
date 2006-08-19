@@ -3,6 +3,16 @@
 <!-- $Id$ -->
 <pfsensepkgs>
   <packages>
+	<package>
+		<name>miniupnpd</name>
+		<descr>Emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP Internet Gateway Device specification (IGD) and allows UPnP aware clients, such as MSN Messenger to work properly from behind a NAT firewall.</descr>
+		<website>http://miniupnp.free.fr</website>
+		<category>Network Management</category>
+		<version>0.99</version>
+		<status>*ALPHA* *DANGER* *MAY WRECK SECURITY, USE AT OWN RISK*</status>
+		<config_file>http://www.pfsense.com/packages/config/miniupnpd/miniupnpd.xml</config_file>
+		<configurationfile>miniupnpd.xml</configurationfile>
+	</package>
     <package>
       <name>openntpd</name>
       <website>http://www.openntpd.org/</website>
@@ -22,8 +32,8 @@
       <website>http://www.freenas.org/</website>
       <descr>
         &lt;p&gt;
-        FreeNAS is a free NAS (Network-Attached Storage) server, supporting: CIFS (samba), FTP, 
-        NFS, RSYNC protocols, local user authentication, Software RAID (0,1,5) with a Full WEB 
+        FreeNAS is a free NAS (Network-Attached Storage) server, supporting: CIFS (samba), FTP,
+        NFS, RSYNC protocols, local user authentication, Software RAID (0,1,5) with a Full WEB
         configuration interface.
         &lt;/p&gt;
         &lt;p&gt;

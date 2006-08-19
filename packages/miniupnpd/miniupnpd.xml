@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<title>Services: Miniupnpd</title>
+	<name>miniupnpd</name>
+	<version>0.9</version>
+	<savetext>Change</savetext>
+	<aftersaveredirect>pkg_edit.php?xml=miniupnpd.xml&amp;id=0</aftersaveredirect>
+	<menu>
+		<name>Miniupnpd</name>
+		<tooltiptext>Set miniupnpd settings such as interfaces to listen on.</tooltiptext>
+		<section>Diagnostics</section>
+		<url>/pkg_edit.php?xml=miniupnpd.xml&amp;id=0</url>
+	</menu>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/All/miniupnpd.inc</item>
+	    <prefix>/usr/local/sbin/</prefix>
+	    <chmod>0777</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/miniupnpd/miniupnpd.inc</item>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0777</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/miniupnpd/status_upnp.php</item>
+	    <prefix>/usr/local/www/</prefix>
+	    <chmod>0777</chmod>
+	</additional_files_needed>
+	<service>
+		<name>miniupnpd</name>
+		<rcfile>miniupnpd.sh</rcfile>
+		<executable>miniupnpd</executable>
+	</service>
+	<tabs>
+		<tab>
+			<text>UPNP Status</text>
+			<url>status_upnp.php</url>
+		</tab>
+		<tab>
+			<text>miniupnpd Settings</text>
+			<url>/pkg_edit.php?xml=miniupnpd.xml&amp;id=0</url>
+			<active/>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fielddescr>Interface</fielddescr>
+			<fieldname>interface_array</fieldname>
+			<value>lan</value>
+			<multiple>true</multiple>
+			<size>3</size>
+			<type>interfaces_selection</type>
+		</field>
+    </fields>
+	<custom_php_global_functions>
+		sync_package_miniupnpd();
+	</custom_php_global_functions>
+	<custom_add_php_command>
+        sync_package_miniupnpd();
+	</custom_add_php_command>
+	<custom_php_resync_command>
+		sync_package_miniupnpd();
+	</custom_php_resync_command>
+	<custom_php_install_command>
+		sync_package_miniupnpd();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		exec("rm /usr/local/etc/rc.d/miniupnpd*");
+	</custom_php_deinstall_command>
+</packagegui>
