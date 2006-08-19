@@ -2,568 +2,594 @@
 <!-- pfSense packages -->
 <!-- $Id$ -->
 <pfsensepkgs>
-	<packages>
-		<package>
-			<name>openntpd</name>
-			<website>http://www.openntpd.org/</website>
-			<descr>OpenNTPD NTP time server.</descr>
-			<category>Network</category>
-			<version>0.8.1</version>
-			<status>PRE-ALPHA</status>
-			<maintainer>fernando@netfilter.com.br</maintainer>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
-			<depends_on_package>openntpd-3.7p1,2.tbz</depends_on_package>
-			<config_file>http://www.pfsense.org/packages/config/openntpd.xml</config_file>
-			<configurationfile>openntpd.xml</configurationfile>
-		</package>
-		<package>
-			<name>freenas</name>
-			<website>http://www.freenas.org/</website>
-			<descr>
-				&lt;p&gt;
-				FreeNAS is a free NAS (Network-Attached Storage) server, supporting: CIFS (samba), FTP,
-				NFS, RSYNC protocols, local user authentication, Software RAID (0,1,5) with a Full WEB
-				configuration interface.
-				&lt;/p&gt;
-				&lt;p&gt;
-				Please read the &lt;a href=&quot;http://www.pfsense.com/packages/config/freenas/doc/README.txt&quot; target=&quot;_blank&quot;&gt;FreeNAS README&lt;/a&gt; before installing this package.
-				&lt;/p&gt;
-			</descr>
-			<category>Network</category>
-			<version>0.68</version>
-			<status>PRE-ALPHA</status>
-			<maintainer>me@daniel.stefan.haischt.name</maintainer>
-			<depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
-			<depends_on_package>ataidle-0.9.tbz</depends_on_package>
-			<depends_on_package>avahi+libdns-0.6.12.tbz</depends_on_package>
-			<depends_on_package>wzdftpd-0.7.2_1.tbz</depends_on_package>
-			<depends_on_package>e2fsprogs-1.39_1.tbz</depends_on_package>
-			<depends_on_package>smartmontools-5.36.tbz</depends_on_package>
-			<depends_on_package>aaccli-1.0.tbz</depends_on_package>
-			<depends_on_package>rsync-2.6.8_2.tbz</depends_on_package>
-			<depends_on_package>scponly-4.6_1.tbz</depends_on_package>
-			<depends_on_package>cracklib-2.7_2.tbz</depends_on_package>
-			<depends_on_package>samba-3.0.23,1.tbz</depends_on_package>
-			<depends_on_package>netatalk-2.0.3_3,1.tbz</depends_on_package>
-			<depends_on_package>pam_ldap-1.8.2.tbz</depends_on_package>
-			<config_file>http://www.pfsense.org/packages/config/freenas/pkg/freenas.xml</config_file>
-			<configurationfile>freenas.xml</configurationfile>
-		</package>
-		<package>
-			<name>dspam</name>
-			<website>http://dspam.nuclearelephant.com/</website>
-			<descr>
-				DSPAM is a scalable and open-source content-based spam filter designed for multi-user enterprise systems.
-				On a properly configured system, many users experience results between 99.5% - 99.95%, or one error for
-				every 200 to 2000 messages. DSPAM supports many different MTAs and can also be deployed as a stand-alone
-				SMTP appliance (Note: This package is still in some kind of development and only was tested on HEAD).
-			</descr>
-			<config_file>http://www.pfsense.org/packages/config/dspam.xml</config_file>
-			<configurationfile>dspam.xml</configurationfile>
-			<depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
-			<depends_on_package>dspam-3.6.8-sqlite3-noldap.tbz</depends_on_package>
-	        <!--
-        	Archiver deps are introduced by ClamAV.
-		    -->
-			<depends_on_package>unzoo-4.4</depends_on_package>
-			<depends_on_package>unzip-5.52_2</depends_on_package>
-			<depends_on_package>lha-1.14i_6</depends_on_package>
-			<depends_on_package>arc-5.21o</depends_on_package>
-			<depends_on_package>arj-3.10.22</depends_on_package>
-			<depends_on_package>pkg-config-0.20_2</depends_on_package>
-			<depends_on_package>sqlite-3.3.6</depends_on_package>
-			<depends_on_package>libiconv-1.9.2_2</depends_on_package>
-			<depends_on_package>gettext-0.14.5_2</depends_on_package>
-			<depends_on_package>libgmp-4.2.1_1</depends_on_package>
-			<depends_on_package>curl-7.15.4</depends_on_package>
-			<depends_on_package>libidn-0.6.3</depends_on_package>
-			<depends_on_package>clamav-devel-20060703</depends_on_package>
-			<version>3.6.8</version>
-			<status>PRE-ALPHA</status>
-			<maintainer>me@daniel.stefan.haischt.name</maintainer>
-			<logging>
-				<facilityname>dspam</facilityname>
-				<logfilename>dspam.log</logfilename>
-			</logging>
-		</package>
-		<package>
-			<name>sshterm</name>
-			<descr>
-		        This is a package of the SSHTools SSHTerm Java Applet. SSHTools is a
-	    	    suite of Java SSH applications providing a Java SSH API,
-    	    	SSH Terminal, SSH secured VNC client, SFTP client and SSH Daemon.
-			</descr>
-			<website>http://sourceforge.net/projects/sshtools/</website>
-			<category>Security</category>
-			<version>0.1</version>
-			<status>ALPHA</status>
-			<maintainer>me@daniel.stefan.haischt.name</maintainer>
-			<depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
-			<depends_on_package>sshtools-0.2.2.tbz</depends_on_package>
-			<config_file>http://www.pfsense.org/packages/config/sshterm/sshterm.xml</config_file>
-			<configurationfile>sshterm.xml</configurationfile>
-		</package>
-		<package>
-			<name>spamassassin</name>
-			<descr>The SpamAssassin spam detection software.</descr>
-			<website>http://spamassassin.apache.org/</website>
-			<category>Security</category>
-			<version>0.1</version>
-			<status>PRE-ALPHA</status>
-			<maintainer>fernando@netfilter.com.br</maintainer>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
-			<depends_on_package>p5-Mail-SpamAssassin-3.1.0_6.tbz</depends_on_package>
-			<config_file>http://www.pfsense.org/packages/config/sassassin.xml</config_file>
-			<configurationfile>sassassin.xml</configurationfile>
-		</package>
-		<package>
-			<name>p3scan-pf</name>
-			<descr>
-	    	    A transparent POP3-Proxy with virus-scanning- and
-    	    	spam-scanning-capabilities.
-      		</descr>
-			<website>http://www.undergroundsecurity.com/p3scan/</website>
-			<category>Security</category>
-			<version>0.1</version>
-			<status>ALPHA</status>
-			<maintainer>fernando@netfilter.com.br</maintainer>
-			<depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
-			<depends_on_package>p3scan-pf-2.3.2.tbz</depends_on_package>
-			<config_file>http://www.pfsense.org/packages/config/p3scan-pf/p3scan-pf.xml</config_file>
-			<configurationfile>p3scan-pf.xml</configurationfile>
-		</package>
-		<package>
-			<name>clamsmtp</name>
-			<descr>SMTP virus scanner.</descr>
-			<website>http://memberwebs.com/nielsen/software/clamsmtp/</website>
-			<category>Security</category>
-			<version>0.1</version>
-			<status>PRE-ALPHA</status>
-			<maintainer>fernando@netfilter.com.br</maintainer>
-			<config_file>http://www.pfsense.org/packages/config/clamsmtp.xml</config_file>
-			<configurationfile>clamsmtp.xml</configurationfile>
-		</package>
-		<package>
-			<name>viralator</name>
-			<descr>HTTP virus scanner.</descr>
-			<website>http://viralator.sourceforge.net/</website>
-			<category>Security</category>
-			<version>0.1</version>
-			<status>PRE-ALPHA</status>
-			<maintainer>fernando@netfilter.com.br</maintainer>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
-			<depends_on_package>perl-5.8.8.tbz</depends_on_package>
-			<depends_on_package>p5-libwww-5.805.tbz</depends_on_package>
-			<depends_on_package>squirm-1.26.tbz</depends_on_package>
-			<config_file>http://www.pfsense.org/packages/config/viralator.xml</config_file>
-			<configurationfile>viralator.xml</configurationfile>
-		</package>
-		<package>
-			<name>clamav</name>
-			<descr>The ClamAV antivirus.</descr>
-			<website>http://www.clamav.net/</website>
-			<category>Security</category>
-			<version>0.1</version>
-			<status>PRE-ALPHA</status>
-			<maintainer>fernando@netfilter.com.br</maintainer>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
-			<config_file>http://www.pfsense.org/packages/config/clamav.xml</config_file>
-			<configurationfile>clamav.xml</configurationfile>
-		</package>
-		<package>
-			<name>havp</name>
-			<website>http://havp.sf.net/</website>
-			<descr>HTTP Antivirus Proxy</descr>
-			<category>Services</category>
-			<config_file>http://agni.linuxense.com/packages/config/havp.xml</config_file>
-			<depends_on_package_base_url>http://agni.linuxense.com/packages</depends_on_package_base_url>
-			<depends_on_package>havp-0.80_5.tbz</depends_on_package>
-			<version>0.6</version>
-			<status>ALPHA</status>
-			<maintainer>raj@linuxense.com</maintainer>
-			<configurationfile>havp.xml</configurationfile>
-		</package>
-		<package>
-			<name>darkstat</name>
-			<website>http://dmr.ath.cx/net/darkstat/</website>
-			<descr>darkstat is a network statistics gatherer. It's a packet sniffer that runs as a background process on a cable/DSL router, gathers all sorts of statistics about network usage, and serves them over HTTP.</descr>
-			<category>Network Management</category>
-			<depends_on_package_base_url>http://www.pfsense.org/packages/All/</depends_on_package_base_url>
-			<depends_on_package>darkstat-3.0.524_1.tbz</depends_on_package>
-			<depends_on_package>gettext-0.14.5_2.tbz</depends_on_package>
-			<version>3.0.524_1</version>
-			<status>ALPHA</status>
-			<maintainer>geekgod@geekgod.com</maintainer>
-			<config_file>http://www.pfsense.com/packages/config/darkstat/darkstat.xml</config_file>
-			<configurationfile>darkstat.xml</configurationfile>
-		</package>
-		<package>
-			<name>ntop</name>
-			<website>http://www.ntop.org/</website>
-			<descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
-			<category>Network Management</category>
-			<depends_on_package_base_url>http://www.pfsense.org/packages/All/</depends_on_package_base_url>
-			<depends_on_package>ntop-3.2_2.tbz</depends_on_package>
-			<version>3.2_2</version>
-			<status>BETA</status>
-			<config_file>http://www.pfsense.com/packages/config/ntop.xml</config_file>
-			<configurationfile>ntop.xml</configurationfile>
-		</package>
-		<package>
-			<name>pfflowd</name>
-			<website>http://www.mindrot.org/pfflowd.html</website>
-			<descr>pfflowd converts OpenBSD PF status messages (sent via the pfsync interface) to Cisco NetFlow datagrams. These datagrams may be sent (via UDP) to a host of one's choice. Utilising the OpenBSD stateful packet filter infrastructure means that flow tracking is very fast and accurate.</descr>
-			<category>Network Management</category>
-			<config_file>http://www.pfsense.com/packages/config/pfflowd.xml</config_file>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
-			<depends_on_package>pfflowd-0.6.tbz</depends_on_package>
-			<version>0.6</version>
-			<status>BETA</status>
-			<configurationfile>pfflowd.xml</configurationfile>
-			<maintainer>nick@buraglio.com</maintainer>
-		</package>
-		<package>
-			<name>widentd</name>
-			<descr>RFC1413 auth/identd daemon with fixed fake reply</descr>
-			<website>http://www.webweaving.org/widentd</website>
-			<category>Services</category>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
-			<depends_on_package>widentd-1.03.tbz</depends_on_package>
-			<version>1.03</version>
-			<status>ALPHA ALPHA</status>
-			<config_file>http://www.pfsense.com/packages/config/widentd.xml</config_file>
-			<configurationfile>widentd.xml</configurationfile>
-		</package>
-		<package>
-			<name>freeradius</name>
-			<website>http://www.freeradius.org/</website>
-			<descr>A free implementation of the RADIUS protocol.</descr>
-			<category>System</category>
-			<version>0.1</version>
-			<status>PRE-ALPHA</status>
-			<maintainer>fernando@netfilter.com.br</maintainer>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
-			<depends_on_package>freeradius-1.0.4.tbz</depends_on_package>
-			<config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
-			<configurationfile>freeradius.xml</configurationfile>
-		</package>
-		<package>
-			<name>stunnel</name>
-			<website>http://www.stunnel.org/</website>
-			<descr>The stunnel program is designed to work as an SSL encryption wrapper between remote client and local (inetd-startable) or remote servers. It can be used to add SSL functionality to commonly used inetd daemons like POP2, POP3, and IMAP servers without any changes in the program's code. It will negotiate an SSL connection using the OpenSSL or SSLeay libraries. It calls the underlying crypto libraries, allowing stunnel to support whatever cryptographic algorithms you compiled into your crypto package.</descr>
-			<category>Network Management</category>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
-			<depends_on_package>stunnel-4.11.tbz</depends_on_package>
-			<version>4.11</version>
-			<status>Stable</status>
-			<config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
-			<configurationfile>stunnel.xml</configurationfile>
-		</package>
-		<package>
-			<name>iperf</name>
-			<website>http://dast.nlanr.net/Projects/Iperf/</website>
-			<descr>Iperf is a tool for measuring maximum TCP and UDP bandwidth, reminiscent of ttcp and nettest. It has been written to overcome the shortcomings of those aging tools. Iperf can also test UDP bandwidth, loss, and jitter.</descr>
-			<category>Network Management</category>
-			<config_file>http://www.pfsense.com/packages/config/iperf.xml</config_file>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
-			<depends_on_package>iperf-2.0.2.tbz</depends_on_package>
-			<version>2.0.2</version>
-			<status>ALPHA</status>
-			<configurationfile>iperf.xml</configurationfile>
-		</package>
-		<package>
-			<name>spamd</name>
-			<website>http://www.openbsd.org/spamd/</website>
-			<descr>Tarpits like spamd are fake SMTP servers, which accept connections but don't deliver mail. Instead, they keep the connections open and reply very slowly. If the peer is patient enough to actually complete the SMTP dialogue (which will take ten minutes or more), the tarpit returns a 'temporary error' code (4xx), which indicates that the mail could not be delivered successfully and that the sender should keep the mail in their queue and retry again later.</descr>
-			<category>Services</category>
-			<config_file>http://www.pfsense.com/packages/config/spamd.xml</config_file>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
-			<depends_on_package>spamd-3.7.tbz</depends_on_package>
-			<version>4.3</version>
-			<status>BETA</status>
-			<maintainer>geekgod@geekgod.com</maintainer>
-			<configurationfile>spamd.xml</configurationfile>
-			<logging>
-				<facilityname>spamd</facilityname>
-				<logfilename>spamd.log</logfilename>
-			</logging>
-		</package>
-		<package>
-			<name>siproxd</name>
-			<website>http://siproxd.sourceforge.net/</website>
-			<descr>Siproxd is a proxy/masquerading daemon for the SIP protocol. It handles registrations of SIP clients on a private IP network and performs rewriting of the SIP message bodies to make SIP connections possible via a masquerading firewall. It allows SIP clients (like kphone, linphone) to work behind an IP masquerading firewall or router.</descr>
-			<category>Services</category>
-			<config_file>http://www.pfsense.com/packages/config/siproxd.xml</config_file>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All/</depends_on_package_base_url>
-			<depends_on_package>siproxd-0.5.11.tbz</depends_on_package>
-			<version>0.5.11</version>
-			<status>ALPHA</status>
-			<configurationfile>siproxd.xml</configurationfile>
-		</package>
-		<package>
-			<name>netio</name>
-			<website>http://freshmeat.net/projects/netio/</website>
-			<descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and DOS only support TCP/IP) using various different packet sizes.</descr>
-			<category>Network Management</category>
-			<config_file>http://www.pfsense.com/packages/config/netio.xml</config_file>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
-			<depends_on_package>netio-1.14.tbz</depends_on_package>
-			<version>1.14</version>
-			<status>ALPHA</status>
-			<configurationfile>netio.xml</configurationfile>
-		</package>
-		<package>
-			<name>ifdepd</name>
-			<descr>The ifdepd daemon implements dependencies between network interfaces in a reliable fashion. If any of the source interfaces fails, ifdepd sets all destination interfaces to state down. If all source interfaces are up, ifdepd sets all destination interfaces to state up.</descr>
-			<website>http://hugo.bmg.gv.at</website>
-			<category>Network Management</category>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
-			<depends_on_package>ifdepd-20050420.tbz</depends_on_package>
-			<version>20050420</version>
-			<status>ALPHA</status>
-			<config_file>http://www.pfsense.com/packages/config/ifdepd.xml</config_file>
-			<configurationfile>ifdepd.xml</configurationfile>
-		</package>
-		<package>
-			<name>mtr-nox11</name>
-			<descr>Enhanced traceroute replacement</descr>
-			<website>http://www.bitwizard.nl/mtr/</website>
-			<category>Network Management</category>
-			<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-			<depends_on_package>mtr-nox11-0.65_2.tbz</depends_on_package>
-			<version>0.65_2</version>
-			<status>ALPHA ALPHA</status>
-			<config_file>http://www.pfsense.com/packages/config/mtr-nox11.xml</config_file>
-			<configurationfile>mtr-nox11.xml</configurationfile>
-		</package>
-		<package>
-			<name>bsdstats</name>
-			<descr>The mission of this site is to try and come up with semi-accurate numbers for both advocacy, and marketing, of the *BSD Operating Systems.</descr>
-			<website>http://bsdstats.hub.org/</website>
-			<category>Network</category>
-			<version>0.1</version>
-			<status>BETA</status>
-			<maintainer>geekgod@geekgod.com</maintainer>
-			<depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
-			<depends_on_package>bsdstats-2.0.tbz</depends_on_package>
-			<config_file>http://www.pfsense.org/packages/config/bsdstats/bsdstats.xml</config_file>
-			<configurationfile>bsdstats.xml</configurationfile>
-		</package>
-		<package>
-			<name>squid</name>
-			<descr>High performance web proxy cache.</descr>
-			<website>http://www.squid-cache.org/</website>
-			<category>Network</category>
-			<version>0.4</version>
-			<status>BETA</status>
-			<maintainer>fernando@netfilter.com.br</maintainer>
-			<depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
-			<depends_on_package>squid-2.5.14_2.tbz</depends_on_package>
-			<depends_on_package>squid_radius_auth-1.0.8.tbz</depends_on_package>
-			<config_file>http://www.pfsense.org/packages/config/squid.xml</config_file>
-			<configurationfile>squid.xml</configurationfile>
-		</package>
-		<package>
-			<name>arpwatch</name>
-			<descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
-			<website>http://www-nrg.ee.lbl.gov/</website>
-			<category>Security</category>
-			<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-			<depends_on_package>arpwatch-2.1.a13.tbz</depends_on_package>
-			<version>2.1.a13</version>
-			<status>ALPHA</status>
-			<config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
-			<configurationfile>arpwatch.xml</configurationfile>
-			<logging>
-				<facilityname>arpwatch</facilityname>
-				<logfilename>arpwatch.log</logfilename>
-			</logging>
-		</package>
-		<package>
-			<name>routed</name>
-			<descr>RIP v1 and v2 daemon</descr>
-			<website>http://www.pfsense.com/</website>
-			<maintainer>billm@pfsense.org</maintainer>
-			<category>Network Management</category>
-			<version>1.0</version>
-			<status>ALPHA</status>
-			<config_file>http://www.pfsense.com/packages/config/routed.xml</config_file>
-			<configurationfile>routed.xml</configurationfile>
-		</package>
-	  </packages>
-		<package>
-			<name>powerdns</name>
-			<descr>PowerDNS (AKA pdns) is an advanced high performance authoritative nameserver with MANY advanced features</descr>
-			<website>http://www.powerdns.com/</website>
-			<category>Network Management</category>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
-			<depends_on_package>powerdns-2.9.16_4.tbz</depends_on_package>
-			<version>2.9.16_4</version>
-			<status>ALPHA (NO GUI)</status>
-			<config_file>http://www.pfsense.com/packages/config/powerdns.xml</config_file>
-			<configurationfile>powerdns.xml</configurationfile>
-		</package>
-		<package>
-			<name>frickin</name>
-			<descr>The Frickin PPTP Proxy allows a Point-to-Point Tunneling Protocol (PPTP) client to connect to a PPTP server through Network Address Translation.</descr>
-			<website>http://www.placid.tv</website>
-			<category>Services</category>
-			<version>1.2</version>
-			<status>ALPHA</status>
-			<config_file>http://www.pfsense.com/packages/config/frickin.xml</config_file>
-			<configurationfile>frickin.xml</configurationfile>
-		</package>
-		<package>
-			<name>postfix</name>
-			<descr>Postfix mail forwarder.	Forwards mail to another mail server.</descr>
-			<website>http://www.postfix.com/</website>
-			<category>Mail</category>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/mail</depends_on_package_base_url>
-			<depends_on_package>postfix-1.1.12_1%2c1.tbz</depends_on_package>
-			<version>1.1.12_1</version>
-			<status>ALPHA</status>
-			<config_file>http://www.pfsense.com/packages/config/postfix.xml</config_file>
-			<configurationfile>postfix.xml</configurationfile>
-		</package>
-		<package>
-			<name>doorman</name>
-			<website>http://doorman.sourceforge.net</website>
-			<descr>Doorman is a port knocking implementation which allows a server to run silently, invisibly, with all TCP ports closed except to those who know the secret knock.</descr>
-			<category>Security</category>
-			<config_file>http://www.pfsense.com/packages/config/doorman.xml</config_file>
-			<depends_on_package_base_url>http://ftp-mirror.internap.com/pub/FreeBSD/ports/i386/packages-6.0-release/All/</depends_on_package_base_url>
-			<depends_on_package>doorman-0.8_1.tbz</depends_on_package>
-			<version>0.8_1</version>
-			<status>ALPHA</status>
-			<configurationfile>doorman.xml</configurationfile>
-		</package>
-		<package>
-			<name>squidGuard</name>
-			<descr>High performance Web proxy Guard</descr>
-			<website>http://www.squidguard.org/</website>
-			<category>Network Management</category>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All/</depends_on_package_base_url>
-			<depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
-			<version>1.2.0_1</version>
-			<status>ALPHA</status>
-			<config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
-			<configurationfile>squidGuard.xml</configurationfile>
-		</package>
-		<package>
-			<name>nmap</name>
-			<descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
-			<category>Security</category>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
-			<depends_on_package>nmap-3.93.tbz</depends_on_package>
-			<config_file>http://www.pfsense.com/packages/config/nmap.xml</config_file>
-			<version>3.93</version>
-			<configurationfile>nmap.xml</configurationfile>
-		</package>
-		<package>
-			<name>pfstat</name>
-			<website>http://www.benzedrine.cx/pfstat.html</website>
-			<descr>pfstat is a small utility that collects packet filter statistics and produces graphs.</descr>
-			<category>Network Management</category>
-			<config_file>http://www.pfsense.com/packages/config/pfstat.xml</config_file>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
-			<depends_on_package>pfstat-1.7.tbz</depends_on_package>
-			<status>Stable</status>
-			<version>1.7</version>
-			<configurationfile>pfstat.xml</configurationfile>
-		</package>
-		<package>
-			<name>upclient</name>
-			<website>http://uptimes.hostingwired.com</website>
-			<descr>upclient sends system uptime and status information to a server (typically uptimes.hostingwired.com) that tracks and compares uptime statistics.</descr>
-			<category>Miscellaneous</category>
-			<config_file>http://www.pfsense.com/packages/config/upclient.xml</config_file>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/misc</depends_on_package_base_url>
-			<depends_on_package>upclient-5.0.b8_2.tbz</depends_on_package>
-			<version>5.0.b8_2</version>
-			<status>ALPHA</status>
-			<configurationfile>upclient.xml</configurationfile>
-		</package>
-		<package>
-			<name>PerUserBW</name>
-			<descr>Adds a per user bandwidth distribution option.  Requires 0.79.4 or newer.</descr>
-			<category>NET</category>
-			<config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
-			<version>0.1</version>
-			<status>ALPHA</status>
-			<configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
-		</package>
-		<package>
-			<name>doorman</name>
-			<website>http://doorman.sourceforge.net</website>
-			<descr>Doorman is a port knocking implementation which allows a server to run silently, invisibly, with all TCP ports closed except to those who know the secret knock.</descr>
-			<category>Security</category>
-			<config_file>http://www.pfsense.com/packages/config/doorman.xml</config_file>
-			<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-			<depends_on_package>doorman-0.8_1.tbz</depends_on_package>
-			<version>0.8_1</version>
-			<status>ALPHA</status>
-			<configurationfile>doorman.xml</configurationfile>
-		</package>
-		<package>
-			<name>zebra</name>
-			<website>http://www.zebra.org/</website>
-			<descr>*NO GUI*</descr>
-			<category>Network Management</category>
-			<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-			<depends_on_package>zebra-9.5.tbz</depends_on_package>
-			<status>ALPHA</status>
-			<version>9.5</version>
-		</package>
-		<package>
-			<name>upnp</name>
-			<descr>Emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP Internet Gateway Device specification (IGD) and allows UPnP aware clients, such as MSN Messenger to work properly from behind a NAT firewall.</descr>
-			<website>http://linux-igd.sourceforge.net/</website>
-			<category>Network Management</category>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
-			<depends_on_package>linuxigd-0.92_2.tbz</depends_on_package>
-			<version>1.0.5</version>
-			<status>*ALPHA* *DANGER* *MAY WRECK SECURITY, USE AT OWN RISK*</status>
-			<config_file>http://www.pfsense.com/packages/config/upnpd.xml</config_file>
-			<configurationfile>upnpd.xml</configurationfile>
-		</package>
-		<package>
-			<name>assp</name>
-			<website>http://assp.sourceforge.net</website>
-			<descr>The Anti-Spam SMTP Proxy (ASSP) Server project is an open source platform-independent SMTP Proxy server which implements whitelists and Bayesian filtering to rid the planet of the blight of unsolicited email (UCE). UCE must be stopped at the SMTP server. Anti-spam tools must be adaptive to new spam and customized for each site's mail patterns. This free, easy-to-use tool works with any mail transport and achieves these goals requiring no operator intervention after the initial setup phase.  Default username: anything, Password: nospam4me</descr>
-			<category>Network Management</category>
-			<config_file>http://www.pfsense.com/packages/config/assp.xml</config_file>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All/</depends_on_package_base_url>
-			<depends_on_package>perl-5.8.7.tbz</depends_on_package>
-			<verifyinstalledpkg>perl</verifyinstalledpkg>
-			<version>0.1</version>
-			<status>ALPHA</status>
-			<configurationfile>assp.xml</configurationfile>
-		</package>
-		<package>
-			<name>pure-ftpd</name>
-			<website>http://www.pureftpd.org/</website>
-			<descr>*DO NOT RUN THIS ON A FIREWALL. USE A DEDICATED MACHINE!* Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerabilities, is trivial to set up, and is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
-			<category>FTP</category>
-			<config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
-			<depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
-			<depends_on_package>pure-ftpd-1.0.20_3.tbz</depends_on_package>
-			<version>1.0.20_3</version>
-			<status>Stable</status>
-			<configurationfile>pure-ftpd.xml</configurationfile>
-			<logging>
-			<facilityname>ftp</facilityname>
-			<logfilename>pure-ftpd.log</logfilename>
-			</logging>
-		</package>
-		<package>
-			<name>quagga</name>
-			<website>http://www.quagga.net/</website>
-			<descr>*NO GUI - Uses Telnet*</descr>
-			<category>Network Management</category>
-			<depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
-			<depends_on_package>quagga-0.99.4_2.tbz</depends_on_package>
-			<status>PRE-ALPHA</status>
-			<version>0.99</version>
-			<config_file>http://www.pfsense.org/packages/config/quagga/quagga.xml</config_file>
-		</package>
+  <packages>
+    <package>
+      <name>openntpd</name>
+      <website>http://www.openntpd.org/</website>
+      <descr>OpenNTPD NTP time server.</descr>
+      <category>Network</category>
+      <version>0.8.1</version>
+      <status>PRE-ALPHA</status>
+      <required_version>RC2</required_version>
+      <maintainer>fernando@netfilter.com.br</maintainer>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
+      <depends_on_package>openntpd-3.7p1,2.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/openntpd.xml</config_file>
+      <configurationfile>openntpd.xml</configurationfile>
+    </package>
+    <package>
+      <name>freenas</name>
+      <website>http://www.freenas.org/</website>
+      <descr>
+        &lt;p&gt;
+        FreeNAS is a free NAS (Network-Attached Storage) server, supporting: CIFS (samba), FTP, 
+        NFS, RSYNC protocols, local user authentication, Software RAID (0,1,5) with a Full WEB 
+        configuration interface.
+        &lt;/p&gt;
+        &lt;p&gt;
+        Please read the &lt;a href=&quot;http://www.pfsense.com/packages/config/freenas/doc/README.txt&quot; target=&quot;_blank&quot;&gt;FreeNAS README&lt;/a&gt; before installing this package.
+        &lt;/p&gt;
+      </descr>
+      <category>Network</category>
+      <version>0.68</version>
+      <status>ALPHA</status>
+      <required_version>HEAD</required_version>
+      <maintainer>me@daniel.stefan.haischt.name</maintainer>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package>ataidle-0.9.tbz</depends_on_package>
+      <depends_on_package>avahi+libdns-0.6.12.tbz</depends_on_package>
+      <depends_on_package>wzdftpd-0.7.2_1.tbz</depends_on_package>
+      <depends_on_package>e2fsprogs-1.39_1.tbz</depends_on_package>
+      <depends_on_package>smartmontools-5.36.tbz</depends_on_package>
+      <depends_on_package>aaccli-1.0.tbz</depends_on_package>
+      <depends_on_package>rsync-2.6.8_2.tbz</depends_on_package>
+      <depends_on_package>scponly-4.6_1.tbz</depends_on_package>
+      <depends_on_package>cracklib-2.7_2.tbz</depends_on_package>
+      <depends_on_package>samba-3.0.23,1.tbz</depends_on_package>
+      <depends_on_package>netatalk-2.0.3_3,1.tbz</depends_on_package>
+      <depends_on_package>pam_ldap-1.8.2.tbz</depends_on_package>
+      <depends_on_package>expat-2.0.0_1.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/freenas/pkg/freenas.xml</config_file>
+      <configurationfile>freenas.xml</configurationfile>
+    </package>
+    <package>
+      <name>dspam</name>
+      <website>http://dspam.nuclearelephant.com/</website>
+      <descr>
+        DSPAM is a scalable and open-source content-based spam filter designed for multi-user enterprise systems.
+        On a properly configured system, many users experience results between 99.5% - 99.95%, or one error for
+        every 200 to 2000 messages. DSPAM supports many different MTAs and can also be deployed as a stand-alone
+        SMTP appliance (Note: This package is still in some kind of development and only was tested on HEAD).
+      </descr>
+      <config_file>http://www.pfsense.org/packages/config/dspam.xml</config_file>
+      <configurationfile>dspam.xml</configurationfile>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package>dspam-3.6.8-sqlite3-noldap.tbz</depends_on_package>
+      <!--
+        Archiver deps are introduced by ClamAV.
+      -->
+      <depends_on_package>unzoo-4.4</depends_on_package>
+      <depends_on_package>unzip-5.52_2</depends_on_package>
+      <depends_on_package>lha-1.14i_6</depends_on_package>
+      <depends_on_package>arc-5.21o</depends_on_package>
+      <depends_on_package>arj-3.10.22</depends_on_package>
+      <depends_on_package>pkg-config-0.20_2</depends_on_package>
+      <depends_on_package>sqlite-3.3.6</depends_on_package>
+      <depends_on_package>libiconv-1.9.2_2</depends_on_package>
+      <depends_on_package>gettext-0.14.5_2</depends_on_package>
+      <depends_on_package>libgmp-4.2.1_1</depends_on_package>
+      <depends_on_package>curl-7.15.4</depends_on_package>
+      <depends_on_package>libidn-0.6.3</depends_on_package>
+      <depends_on_package>clamav-devel-20060703</depends_on_package>
+      <version>3.6.8</version>
+      <status>PRE-ALPHA</status>
+      <required_version>HEAD</required_version>
+      <maintainer>me@daniel.stefan.haischt.name</maintainer>
+      <logging>
+        <facilityname>dspam</facilityname>
+        <logfilename>dspam.log</logfilename>
+      </logging>
+    </package>
+    <package>
+      <name>sshterm</name>
+      <descr>
+        This is a package of the SSHTools SSHTerm Java Applet. SSHTools is a
+        suite of Java SSH applications providing a Java SSH API,
+        SSH Terminal, SSH secured VNC client, SFTP client and SSH Daemon.
+      </descr>
+      <website>http://sourceforge.net/projects/sshtools/</website>
+      <category>Security</category>
+      <version>0.1</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <maintainer>me@daniel.stefan.haischt.name</maintainer>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package>sshtools-0.2.2.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/sshterm/sshterm.xml</config_file>
+      <configurationfile>sshterm.xml</configurationfile>
+    </package>
+    <package>
+      <name>spamassassin</name>
+      <descr>The SpamAssassin spam detection software.</descr>
+      <website>http://spamassassin.apache.org/</website>
+      <category>Security</category>
+      <version>0.1</version>
+      <status>PRE-ALPHA</status>
+      <required_version>RC2</required_version>
+      <maintainer>fernando@netfilter.com.br</maintainer>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
+      <depends_on_package>p5-Mail-SpamAssassin-3.1.0_6.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/sassassin.xml</config_file>
+      <configurationfile>sassassin.xml</configurationfile>
+    </package>
+    <package>
+      <name>p3scan-pf</name>
+      <descr>
+        A transparent POP3-Proxy with virus-scanning- and
+        spam-scanning-capabilities.
+      </descr>
+      <website>http://www.undergroundsecurity.com/p3scan/</website>
+      <category>Security</category>
+      <version>0.1</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <maintainer>fernando@netfilter.com.br</maintainer>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package>p3scan-pf-2.3.2.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/p3scan-pf/p3scan-pf.xml</config_file>
+      <configurationfile>p3scan-pf.xml</configurationfile>
+    </package>
+    <package>
+      <name>clamsmtp</name>
+      <descr>SMTP virus scanner.</descr>
+      <website>http://memberwebs.com/nielsen/software/clamsmtp/</website>
+      <category>Security</category>
+      <version>0.1</version>
+      <status>PRE-ALPHA</status>
+      <required_version>RC2</required_version>
+      <maintainer>fernando@netfilter.com.br</maintainer>
+      <config_file>http://www.pfsense.org/packages/config/clamsmtp.xml</config_file>
+      <configurationfile>clamsmtp.xml</configurationfile>
+    </package>
+    <package>
+      <name>viralator</name>
+      <descr>HTTP virus scanner.</descr>
+      <website>http://viralator.sourceforge.net/</website>
+      <category>Security</category>
+      <version>0.1</version>
+      <status>PRE-ALPHA</status>
+      <required_version>RC2</required_version>
+      <maintainer>fernando@netfilter.com.br</maintainer>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
+      <depends_on_package>perl-5.8.8.tbz</depends_on_package>
+      <depends_on_package>p5-libwww-5.805.tbz</depends_on_package>
+      <depends_on_package>squirm-1.26.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/viralator.xml</config_file>
+      <configurationfile>viralator.xml</configurationfile>
+    </package>
+    <package>
+      <name>clamav</name>
+      <descr>The ClamAV antivirus.</descr>
+      <website>http://www.clamav.net/</website>
+      <category>Security</category>
+      <version>0.1</version>
+      <status>PRE-ALPHA</status>
+      <required_version>RC2</required_version>
+      <maintainer>fernando@netfilter.com.br</maintainer>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
+      <config_file>http://www.pfsense.org/packages/config/clamav.xml</config_file>
+      <configurationfile>clamav.xml</configurationfile>
+    </package>
+    <package>
+      <name>havp</name>
+      <website>http://havp.sf.net/</website>
+      <descr>HTTP Antivirus Proxy</descr>
+      <category>Services</category>
+      <config_file>http://agni.linuxense.com/packages/config/havp.xml</config_file>
+      <depends_on_package_base_url>http://agni.linuxense.com/packages</depends_on_package_base_url>
+      <depends_on_package>havp-0.80_5.tbz</depends_on_package>
+      <version>0.6</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <maintainer>raj@linuxense.com</maintainer>
+      <configurationfile>havp.xml</configurationfile>
+    </package>
+    <package>
+      <name>darkstat</name>
+      <website>http://dmr.ath.cx/net/darkstat/</website>
+      <descr>darkstat is a network statistics gatherer. It's a packet sniffer that runs as a background process on a cable/DSL router, gathers all sorts of statistics about network usage, and serves them over HTTP.</descr>
+      <category>Network Management</category>
+      <depends_on_package_base_url>http://www.pfsense.org/packages/All/</depends_on_package_base_url>
+      <depends_on_package>darkstat-3.0.524_1.tbz</depends_on_package>
+      <depends_on_package>gettext-0.14.5_2.tbz</depends_on_package>
+      <version>3.0.524_1</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <maintainer>geekgod@geekgod.com</maintainer>
+      <config_file>http://www.pfsense.com/packages/config/darkstat/darkstat.xml</config_file>
+      <configurationfile>darkstat.xml</configurationfile>
+    </package>
+    <package>
+      <name>ntop</name>
+      <website>http://www.ntop.org/</website>
+      <descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
+      <category>Network Management</category>
+      <depends_on_package_base_url>http://www.pfsense.org/packages/All/</depends_on_package_base_url>
+      <depends_on_package>ntop-3.2_2.tbz</depends_on_package>
+      <version>3.2_2</version>
+      <status>BETA</status>
+      <required_version>RC2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/ntop.xml</config_file>
+      <configurationfile>ntop.xml</configurationfile>
+    </package>
+    <package>
+      <name>pfflowd</name>
+      <website>http://www.mindrot.org/pfflowd.html</website>
+      <descr>pfflowd converts OpenBSD PF status messages (sent via the pfsync interface) to Cisco NetFlow datagrams. These datagrams may be sent (via UDP) to a host of one's choice. Utilising the OpenBSD stateful packet filter infrastructure means that flow tracking is very fast and accurate.</descr>
+      <category>Network Management</category>
+      <config_file>http://www.pfsense.com/packages/config/pfflowd.xml</config_file>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
+      <depends_on_package>pfflowd-0.6.tbz</depends_on_package>
+      <version>0.6</version>
+      <status>BETA</status>
+      <required_version>RC2</required_version>
+      <configurationfile>pfflowd.xml</configurationfile>
+      <maintainer>nick@buraglio.com</maintainer>
+    </package>
+    <package>
+      <name>widentd</name>
+      <descr>RFC1413 auth/identd daemon with fixed fake reply</descr>
+      <website>http://www.webweaving.org/widentd</website>
+      <category>Services</category>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
+      <depends_on_package>widentd-1.03.tbz</depends_on_package>
+      <version>1.03</version>
+      <status>ALPHA ALPHA</status>
+      <required_version>RC2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/widentd.xml</config_file>
+      <configurationfile>widentd.xml</configurationfile>
+    </package>
+    <package>
+      <name>freeradius</name>
+      <website>http://www.freeradius.org/</website>
+      <descr>A free implementation of the RADIUS protocol.</descr>
+      <category>System</category>
+      <version>0.1</version>
+      <status>PRE-ALPHA</status>
+      <required_version>RC2</required_version>
+      <maintainer>fernando@netfilter.com.br</maintainer>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
+      <depends_on_package>freeradius-1.0.4.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
+      <configurationfile>freeradius.xml</configurationfile>
+    </package>
+    <package>
+      <name>stunnel</name>
+      <website>http://www.stunnel.org/</website>
+      <descr>The stunnel program is designed to work as an SSL encryption wrapper between remote client and local (inetd-startable) or remote servers. It can be used to add SSL functionality to commonly used inetd daemons like POP2, POP3, and IMAP servers without any changes in the program's code. It will negotiate an SSL connection using the OpenSSL or SSLeay libraries. It calls the underlying crypto libraries, allowing stunnel to support whatever cryptographic algorithms you compiled into your crypto package.</descr>
+      <category>Network Management</category>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
+      <depends_on_package>stunnel-4.11.tbz</depends_on_package>
+      <version>4.11</version>
+      <status>Stable</status>
+      <required_version>RC2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
+      <configurationfile>stunnel.xml</configurationfile>
+    </package>
+    <package>
+      <name>iperf</name>
+      <website>http://dast.nlanr.net/Projects/Iperf/</website>
+      <descr>Iperf is a tool for measuring maximum TCP and UDP bandwidth, reminiscent of ttcp and nettest. It has been written to overcome the shortcomings of those aging tools. Iperf can also test UDP bandwidth, loss, and jitter.</descr>
+      <category>Network Management</category>
+      <config_file>http://www.pfsense.com/packages/config/iperf.xml</config_file>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
+      <depends_on_package>iperf-2.0.2.tbz</depends_on_package>
+      <version>2.0.2</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <configurationfile>iperf.xml</configurationfile>
+    </package>
+    <package>
+      <name>spamd</name>
+      <website>http://www.openbsd.org/spamd/</website>
+      <descr>Tarpits like spamd are fake SMTP servers, which accept connections but don't deliver mail. Instead, they keep the connections open and reply very slowly. If the peer is patient enough to actually complete the SMTP dialogue (which will take ten minutes or more), the tarpit returns a 'temporary error' code (4xx), which indicates that the mail could not be delivered successfully and that the sender should keep the mail in their queue and retry again later.</descr>
+      <category>Services</category>
+      <config_file>http://www.pfsense.com/packages/config/spamd.xml</config_file>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
+      <depends_on_package>spamd-3.7.tbz</depends_on_package>
+      <version>4.3</version>
+      <status>BETA</status>
+      <required_version>RC2</required_version>
+      <maintainer>geekgod@geekgod.com</maintainer>
+      <configurationfile>spamd.xml</configurationfile>
+      <logging>
+        <facilityname>spamd</facilityname>
+        <logfilename>spamd.log</logfilename>
+      </logging>
+    </package>
+    <package>
+      <name>siproxd</name>
+      <website>http://siproxd.sourceforge.net/</website>
+      <descr>Siproxd is a proxy/masquerading daemon for the SIP protocol. It handles registrations of SIP clients on a private IP network and performs rewriting of the SIP message bodies to make SIP connections possible via a masquerading firewall. It allows SIP clients (like kphone, linphone) to work behind an IP masquerading firewall or router.</descr>
+      <category>Services</category>
+      <config_file>http://www.pfsense.com/packages/config/siproxd.xml</config_file>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All/</depends_on_package_base_url>
+      <depends_on_package>siproxd-0.5.11.tbz</depends_on_package>
+      <version>0.5.11</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <configurationfile>siproxd.xml</configurationfile>
+    </package>
+    <package>
+      <name>netio</name>
+      <website>http://freshmeat.net/projects/netio/</website>
+      <descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and DOS only support TCP/IP) using various different packet sizes.</descr>
+      <category>Network Management</category>
+      <config_file>http://www.pfsense.com/packages/config/netio.xml</config_file>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
+      <depends_on_package>netio-1.14.tbz</depends_on_package>
+      <version>1.14</version>
+      <status>ALPHA</status>
+      <configurationfile>netio.xml</configurationfile>
+    </package>
+    <package>
+      <name>ifdepd</name>
+      <descr>The ifdepd daemon implements dependencies between network interfaces in a reliable fashion. If any of the source interfaces fails, ifdepd sets all destination interfaces to state down. If all source interfaces are up, ifdepd sets all destination interfaces to state up.</descr>
+      <website>http://hugo.bmg.gv.at</website>
+      <category>Network Management</category>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
+      <depends_on_package>ifdepd-20050420.tbz</depends_on_package>
+      <version>20050420</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/ifdepd.xml</config_file>
+      <configurationfile>ifdepd.xml</configurationfile>
+    </package>
+    <package>
+      <name>mtr-nox11</name>
+      <descr>Enhanced traceroute replacement</descr>
+      <website>http://www.bitwizard.nl/mtr/</website>
+      <category>Network Management</category>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+      <depends_on_package>mtr-nox11-0.65_2.tbz</depends_on_package>
+      <version>0.65_2</version>
+      <status>ALPHA ALPHA</status>
+      <config_file>http://www.pfsense.com/packages/config/mtr-nox11.xml</config_file>
+      <configurationfile>mtr-nox11.xml</configurationfile>
+    </package>
+    <package>
+      <name>bsdstats</name>
+      <descr>The mission of this site is to try and come up with semi-accurate numbers for both advocacy, and marketing, of the *BSD Operating Systems.</descr>
+      <website>http://bsdstats.hub.org/</website>
+      <category>Network</category>
+      <version>0.1</version>
+      <status>BETA</status>
+      <required_version>RC2</required_version>
+      <maintainer>geekgod@geekgod.com</maintainer>
+      <depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
+      <depends_on_package>bsdstats-2.0.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/bsdstats/bsdstats.xml</config_file>
+      <configurationfile>bsdstats.xml</configurationfile>
+    </package>
+    <package>
+      <name>squid</name>
+      <descr>High performance web proxy cache.</descr>
+      <website>http://www.squid-cache.org/</website>
+      <category>Network</category>
+      <version>0.4</version>
+      <status>BETA</status>
+      <required_version>RC2</required_version>
+      <maintainer>fernando@netfilter.com.br</maintainer>
+      <depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
+      <depends_on_package>squid-2.5.14_2.tbz</depends_on_package>
+      <depends_on_package>squid_radius_auth-1.0.8.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/squid.xml</config_file>
+      <configurationfile>squid.xml</configurationfile>
+    </package>
+    <package>
+      <name>arpwatch</name>
+      <descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
+      <website>http://www-nrg.ee.lbl.gov/</website>
+      <category>Security</category>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+      <depends_on_package>arpwatch-2.1.a13.tbz</depends_on_package>
+      <version>2.1.a13</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
+      <configurationfile>arpwatch.xml</configurationfile>
+      <logging>
+        <facilityname>arpwatch</facilityname>
+        <logfilename>arpwatch.log</logfilename>
+      </logging>
+    </package>
+    <package>
+      <name>routed</name>
+      <descr>RIP v1 and v2 daemon</descr>
+      <website>http://www.pfsense.com/</website>
+      <maintainer>billm@pfsense.org</maintainer>
+      <category>Network Management</category>
+      <version>1.0</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/routed.xml</config_file>
+      <configurationfile>routed.xml</configurationfile>
+    </package>
+    </packages>
+    <package>
+      <name>powerdns</name>
+      <descr>PowerDNS (AKA pdns) is an advanced high performance authoritative nameserver with MANY advanced features</descr>
+      <website>http://www.powerdns.com/</website>
+      <category>Network Management</category>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
+      <depends_on_package>powerdns-2.9.16_4.tbz</depends_on_package>
+      <version>2.9.16_4</version>
+      <status>ALPHA (NO GUI)</status>
+      <required_version>RC2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/powerdns.xml</config_file>
+      <configurationfile>powerdns.xml</configurationfile>
+    </package>
+    <package>
+      <name>frickin</name>
+      <descr>The Frickin PPTP Proxy allows a Point-to-Point Tunneling Protocol (PPTP) client to connect to a PPTP server through Network Address Translation.</descr>
+      <website>http://www.placid.tv</website>
+      <category>Services</category>
+      <version>1.2</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/frickin.xml</config_file>
+      <configurationfile>frickin.xml</configurationfile>
+    </package>
+    <package>
+      <name>postfix</name>
+      <descr>Postfix mail forwarder.	Forwards mail to another mail server.</descr>
+      <website>http://www.postfix.com/</website>
+      <category>Mail</category>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/mail</depends_on_package_base_url>
+      <depends_on_package>postfix-1.1.12_1%2c1.tbz</depends_on_package>
+      <version>1.1.12_1</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/postfix.xml</config_file>
+      <configurationfile>postfix.xml</configurationfile>
+    </package>
+    <package>
+      <name>doorman</name>
+      <website>http://doorman.sourceforge.net</website>
+      <descr>Doorman is a port knocking implementation which allows a server to run silently, invisibly, with all TCP ports closed except to those who know the secret knock.</descr>
+      <category>Security</category>
+      <config_file>http://www.pfsense.com/packages/config/doorman.xml</config_file>
+      <depends_on_package_base_url>http://ftp-mirror.internap.com/pub/FreeBSD/ports/i386/packages-6.0-release/All/</depends_on_package_base_url>
+      <depends_on_package>doorman-0.8_1.tbz</depends_on_package>
+      <version>0.8_1</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <configurationfile>doorman.xml</configurationfile>
+    </package>
+    <package>
+      <name>squidGuard</name>
+      <descr>High performance Web proxy Guard</descr>
+      <website>http://www.squidguard.org/</website>
+      <category>Network Management</category>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All/</depends_on_package_base_url>
+      <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
+      <version>1.2.0_1</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
+      <configurationfile>squidGuard.xml</configurationfile>
+    </package>
+    <package>
+      <name>nmap</name>
+      <descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
+      <category>Security</category>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
+      <depends_on_package>nmap-3.93.tbz</depends_on_package>
+      <config_file>http://www.pfsense.com/packages/config/nmap.xml</config_file>
+      <version>3.93</version>
+      <required_version>RC2</required_version>
+      <configurationfile>nmap.xml</configurationfile>
+    </package>
+    <package>
+      <name>pfstat</name>
+      <website>http://www.benzedrine.cx/pfstat.html</website>
+      <descr>pfstat is a small utility that collects packet filter statistics and produces graphs.</descr>
+      <category>Network Management</category>
+      <config_file>http://www.pfsense.com/packages/config/pfstat.xml</config_file>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
+      <depends_on_package>pfstat-1.7.tbz</depends_on_package>
+      <status>Stable</status>
+      <version>1.7</version>
+      <required_version>RC2</required_version>
+      <configurationfile>pfstat.xml</configurationfile>
+    </package>
+    <package>
+      <name>upclient</name>
+      <website>http://uptimes.hostingwired.com</website>
+      <descr>upclient sends system uptime and status information to a server (typically uptimes.hostingwired.com) that tracks and compares uptime statistics.</descr>
+      <category>Miscellaneous</category>
+      <config_file>http://www.pfsense.com/packages/config/upclient.xml</config_file>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/misc</depends_on_package_base_url>
+      <depends_on_package>upclient-5.0.b8_2.tbz</depends_on_package>
+      <version>5.0.b8_2</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <configurationfile>upclient.xml</configurationfile>
+    </package>
+    <package>
+      <name>PerUserBW</name>
+      <descr>Adds a per user bandwidth distribution option.  Requires 0.79.4 or newer.</descr>
+      <category>NET</category>
+      <config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
+      <version>0.1</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
+    </package>
+    <package>
+      <name>quagga</name>
+      <website>http://www.quagga.net/</website>
+      <descr>*NO GUI*</descr>
+      <category>Network Management</category>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+      <depends_on_package>quagga-0.98.5_1.tbz</depends_on_package>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <version>9.5</version>
+    </package>
+    <package>
+      <name>zebra</name>
+      <website>http://www.zebra.org/</website>
+      <descr>*NO GUI*</descr>
+      <category>Network Management</category>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+      <depends_on_package>zebra-9.5.tbz</depends_on_package>
+      <status>ALPHA</status>
+      <version>9.5</version>
+      <required_version>RC2</required_version>
+    </package>
+    <package>
+      <name>upnp</name>
+      <descr>Emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP Internet Gateway Device specification (IGD) and allows UPnP aware clients, such as MSN Messenger to work properly from behind a NAT firewall.</descr>
+      <website>http://linux-igd.sourceforge.net/</website>
+      <category>Network Management</category>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
+      <depends_on_package>linuxigd-0.92_2.tbz</depends_on_package>
+      <version>1.0.5</version>
+      <status>*ALPHA* *DANGER* *MAY WRECK SECURITY, USE AT OWN RISK*</status>
+      <required_version>RC2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/upnpd.xml</config_file>
+      <configurationfile>upnpd.xml</configurationfile>
+    </package>
+    <package>
+      <name>assp</name>
+      <website>http://assp.sourceforge.net</website>
+      <descr>The Anti-Spam SMTP Proxy (ASSP) Server project is an open source platform-independent SMTP Proxy server which implements whitelists and Bayesian filtering to rid the planet of the blight of unsolicited email (UCE). UCE must be stopped at the SMTP server. Anti-spam tools must be adaptive to new spam and customized for each site's mail patterns. This free, easy-to-use tool works with any mail transport and achieves these goals requiring no operator intervention after the initial setup phase.  Default username: anything, Password: nospam4me</descr>
+      <category>Network Management</category>
+      <config_file>http://www.pfsense.com/packages/config/assp.xml</config_file>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All/</depends_on_package_base_url>
+      <depends_on_package>perl-5.8.7.tbz</depends_on_package>
+      <verifyinstalledpkg>perl</verifyinstalledpkg>
+      <version>0.1</version>
+      <status>ALPHA</status>
+      <required_version>RC2</required_version>
+      <configurationfile>assp.xml</configurationfile>
+    </package>
+    <package>
+      <name>pure-ftpd</name>
+      <website>http://www.pureftpd.org/</website>
+      <descr>*DO NOT RUN THIS ON A FIREWALL. USE A DEDICATED MACHINE!* Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerabilities, is trivial to set up, and is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
+      <category>FTP</category>
+      <config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
+      <depends_on_package>pure-ftpd-1.0.20_3.tbz</depends_on_package>
+      <version>1.0.20_3</version>
+      <status>Stable</status>
+      <required_version>RC2</required_version>
+      <configurationfile>pure-ftpd.xml</configurationfile>
+      <logging>
+      <facilityname>ftp</facilityname>
+      <logfilename>pure-ftpd.log</logfilename>
+      </logging>
+    </package>
 </pfsensepkgs>
