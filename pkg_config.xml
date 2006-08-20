@@ -9,7 +9,7 @@
 		<website>http://miniupnp.free.fr</website>
 		<category>Network Management</category>
 		<version>0.99</version>
-		<status>*ALPHA* *DANGER* *MAY WRECK SECURITY, USE AT OWN RISK*</status>
+		<status>*ALPHA* *DANGER* *MAY WRECK SECURITY, USE AT OWN RISK* *DOES NOT WORK WITH CARP*</status>
 		<config_file>http://www.pfsense.com/packages/config/miniupnpd/miniupnpd.xml</config_file>
 		<configurationfile>miniupnpd.xml</configurationfile>
 	</package>
