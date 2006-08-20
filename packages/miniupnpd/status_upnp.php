@@ -37,50 +37,52 @@ exec("/sbin/pfctl -aminiupnpd -sn", $rdr_entries, $pf_ret);
 $now = time();
 $year = date("Y");
 
-$pgtitle = array(gettext("Status"),gettext("UPnP Status"));
+$pgtitle = "Status: UPnP Status";
 include("head.inc");
 /* put your custom HTML head content here        */
 /* using some of the $pfSenseHead function calls */
-$pfSenseHead->addMeta("<meta http-equiv=\"refresh\" content=\"120;url={$_SERVER['SCRIPT_NAME']}\" />");
-echo $pfSenseHead->getHTML();
+//$pfSenseHead->addMeta("<meta http-equiv=\"refresh\" content=\"120;url={$_SERVER['SCRIPT_NAME']}\" />");
+//echo $pfSenseHead->getHTML();
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
+<p class="pgtitle"><?=$pgtitle?></font></p>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td>
 	<div id="mainarea">
-              <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td width="10%" class="listhdrr"><?=gettext("Port")?></td>
-                  <td width="10%" class="listhdrr"><?=gettext("Protocol")?></td>
-                  <td width="20%" class="listhdrr"><?=gettext("Internal IP")?></td>
-                  <td width="60%" class="listhdr"><?=gettext("Description")?></td>
-				</tr>
-				<?php $i = 0; foreach ($rdr_entries as $rdr_entry) {
-					$rdr_label = split("\"", $rdr_entry);
-					$rdr_ip = split(" ", $rdr_label[2]);
-					$rdr_port = split(" ", $rdr_label[2]);
-					$rdr_proto = split(" ", $rdr_label[0]);
-				?>
-                <tr>
-                  <td class="listlr">
-				<?php print $rdr_port[4];?>
-                  </td>
-                  <td class="listlr">
-				<?php print $rdr_proto[5];?>
-                  </td>
-                  <td class="listlr">
-				<?php print $rdr_ip[2];?>
-                  </td>
-                  <td class="listlr">
-				<?php print $rdr_label[1];?>
-                  </td>
-                </tr>
-                <?php $i++; }?>
-              </table>
-	   </div>
+      <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td width="10%" class="listhdrr"><?=gettext("Port")?></td>
+          <td width="10%" class="listhdrr"><?=gettext("Protocol")?></td>
+          <td width="20%" class="listhdrr"><?=gettext("Internal IP")?></td>
+          <td width="60%" class="listhdr"><?=gettext("Description")?></td>
+		</tr>
+		<?php $i = 0; foreach ($rdr_entries as $rdr_entry) {
+			if (preg_match("/rdr on (.*) inet proto (.*) from any to any port = (.*) -> (.*) port (.*)/", $rdr_entry, $matches))
+			$rdr_proto = $matches[2];
+			$rdr_port = $matches[3];
+			$rdr_ip = $matches[4];
+			$rdr_label =$matches[5];
+		?>
+        <tr>
+          <td class="listlr">
+		<?php print $rdr_proto;?>
+          </td>
+          <td class="listlr">
+		<?php print $rdr_port;?>
+          </td>
+          <td class="listlr">
+		<?php print $rdr_ip;?>
+          </td>
+          <td class="listlr">
+		<?php print $rdr_label;?>
+          </td>
+        </tr>
+        <?php $i++; }?>
+      </table>
+	</div>
 	</table>
 
 <?php include("fend.inc"); ?>
