@@ -20,14 +20,22 @@
 				    $ifaces_final .= " -i {$wanif} -a {$addr}";
 				    $first = 1;
 				} else {
-					log_error("Could not resolve real interfaec {$iface}");
+					log_error("Could not resolve real interface {$iface}");
 				}
 			}
-			$start = "/usr/local/sbin/miniupnpd -p 2869{$ifaces_final}";
+			$start = "# Clear existing rules and rdr entries \n";
+			$start .= "/sbin/pfctl -aminiupnpd -Fr 2>&1 >/dev/null\n";
+			$start .= "/sbin/pfctl -aminiupnpd -Fn 2>&1 >/dev/null\n";
+			$start .= "/usr/local/sbin/miniupnpd -p 2869{$ifaces_final}";
+
+			$stop .= "/usr/bin/killall miniupnpd \n";
+			$stop .= "# Clear existing rules and rdr entries \n";
+			$stop .= "/sbin/pfctl -aminiupnpd -Fr 2>&1 >/dev/null\n";
+			$stop .= "/sbin/pfctl -aminiupnpd -Fn 2>&1 >/dev/null\n";
 			write_rcfile(array(
 				    "file" => "miniupnpd.sh",
 				    "start" => $start,
-				    "stop" => "/usr/bin/killall miniupnpd"
+				    "stop" => $stop
 			    )
 			);
 		}
