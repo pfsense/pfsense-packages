@@ -408,7 +408,7 @@
   <custom_php_install_command>
   		$version = `cat /etc/version`;
 		if(stristr($version, "HEAD")) {
-	    	update_output_window("This package is *ONLY compatible with -HEAD.");
+	    	update_output_window("This package is *ONLY* compatible with -HEAD.");
 	    	exit;
 		}
     custom_php_install_command();
