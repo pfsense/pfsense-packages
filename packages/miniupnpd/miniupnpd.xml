@@ -53,13 +53,13 @@
 			<type>interfaces_selection</type>
 		</field>
     </fields>
-	<custom_install_php_command>
+	<custom_php_install_command>
 		$ints = `ifconfig -l`;
 		if(stristr($ints, "carp")) {
 	    	update_output_window("This package is not compatible with CARP.");
 	    	exit;
 		}
-	</custom_install_php_command>
+	</custom_php_install_command>
 	<custom_add_php_command>
         sync_package_miniupnpd();
 	</custom_add_php_command>
