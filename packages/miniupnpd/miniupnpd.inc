@@ -9,13 +9,14 @@
 		$if_final = "";
 		$ifaces_final = "";
 		$first = 0;
+		$wanif = get_real_wan_interface();
 		foreach($_POST['interface_array'] as $iface) {
 			$if = convert_friendly_interface_to_real_interface_name($iface);
 			if($if) {
 			    //if($first == 1)
 				//$ifaces_final .= ",";
 				$addr = find_interface_ip($if);
-			    $ifaces_final .= " -i {$if} -a {$addr}";
+			    $ifaces_final .= " -i {$wanif} -a {$addr}";
 			    $first = 1;
 			} else {
 				log_error("Could not resolve real interfaec {$iface}");
