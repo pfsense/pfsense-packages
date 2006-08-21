@@ -7,7 +7,7 @@
 	All rights reserved.
 
 	Modified for FreeNAS (http://freenas.org) by Olivier Cochard <cochard@gmail.com>
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 	
@@ -88,7 +88,7 @@ function users_sort() {
 		return strcmp($a['login'], $b['login']);
 	}
 
-	usort($config['access']['user'], "userscmp");
+	usort($config['system']['user'], "userscmp");
 }
 
 /* TODO: This needs to be changed */
@@ -99,6 +99,6 @@ function groups_sort() {
 		return strcmp($a['name'], $b['name']);
 	}
 
-	usort($config['access']['group'], "groupscmp");
+	usort($config['system']['group'], "groupscmp");
 }
 ?>

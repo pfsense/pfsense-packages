@@ -10,7 +10,7 @@
 	
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
-	
+
 	1. Redistributions of source code must retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
 	
@@ -148,40 +148,57 @@ function system_users_create()
 function system_user_masterpasswd()
 {
 	/* Create the master.passwd file*/
-	global $config, $g;
+	global $config, $g, $userindex, $groupindex;
+  $root = getUNIXRoot();
 	
 	$masterpasswd = <<<EOD
-root:{$config['system']['password']}:0:0::0:0:Charlie &:/root:/bin/sh
+root:{$root['password']}:0:0::0:0:Charlie &:/root:/bin/sh
 toor:*:0:0::0:0:Bourne-again Superuser:/root:
 daemon:*:1:1::0:0:Owner of many system processes:/root:/usr/sbin/nologin
 operator:*:2:5::0:0:System &:/:/usr/sbin/nologin
 bin:*:3:7::0:0:Binaries Commands and Source:/:/usr/sbin/nologin
 tty:*:4:65533::0:0:Tty Sandbox:/:/usr/sbin/nologin
 kmem:*:5:65533::0:0:KMem Sandbox:/:/usr/sbin/nologin
+smmsp:*:25:25::0:0:Sendmail Submission User:/var/spool/clientmqueue:/usr/sbin/nologin
+mailnull:*:26:26::0:0:Sendmail Default User:/var/spool/mqueue:/usr/sbin/nologin
+proxy:*:62:62::0:0:Packet Filter pseudo-user:/nonexistent:/usr/sbin/nologin
+_pflogd:*:64:64::0:0:pflogd privsep user:/var/empty:/usr/sbin/nologin
 www:*:80:80::0:0:World Wide Web Owner:/nonexistent:/usr/sbin/nologin
 nobody:*:65534:65534::0:0:Unprivileged user:/nonexistent:/usr/sbin/nologin
+dhcpd:*:1002:1002::0:0:DHCP Daemon:/nonexistent:/sbin/nologin
+_dhcp:*:65:65::0:0:dhcp programs:/var/empty:/usr/sbin/nologin
+_isakmpd:*:68:68::0:0:isakmpd privsep:/var/empty:/sbin/nologin
 ftp:*:21:50::0:0:FTP user:/mnt:/sbin/nologin
 sshd:*:22:22::0:0:Secure Shell Daemon:/var/empty:/usr/sbin/nologin
 
 EOD;
 	
-	if (is_array($config['access']['user']))
+	if (is_array($config['system']['user']))
 	{
-		foreach ($config['access']['user'] as $user)
+		foreach ($config['system']['user'] as $user)
 		{
-			$password=crypt($user['password']);
+			$password= $user['password'];
+      $groupname = $user['groupname'];
+      $group =& $config['system']['group'][$groupindex[$groupname]];
+
+      if (empty($user['uid'])) {
+        $newuser = assignUID($user['name']);
+        $newgroup = assignGID($groupname);
+        if (! empty($newuser)) { $user = $newuser; }
+        if (! empty($newgroup)) { $group = $newgroup; }
+      }
 			
-			if (isset($user['fullshell']))
+			if (hasShellAccess($user['name']))
 			{
 				$masterpasswd .= <<<EOD
-{$user['login']}:{$password}:{$user['id']}:{$user['usergroupid']}::0:0:{$user['fullname']}:/mnt:/bin/sh
+{$user['name']}:{$password}:{$user['uid']}:{$group['gid']}::0:0:{$user['fullname']}:/mnt:/etc/rc.initial
 
 EOD;
 			}
 			else
 			{
 				$masterpasswd .= <<<EOD
-{$user['login']}:{$password}:{$user['id']}:{$user['usergroupid']}::0:0:{$user['fullname']}:/mnt:/usr/local/bin/scponly
+{$user['name']}:{$password}:{$user['uid']}:{$group['gid']}::0:0:{$user['fullname']}:/mnt:/usr/local/bin/scponly
 
 EOD;
 			}
@@ -189,7 +206,7 @@ EOD;
 
 	}
 	
-	$fd = fopen("{$g['varetc_path']}/master.passwd", "w");
+	$fd = fopen("/etc/master.passwd", "w");
 	if (!$fd)
 	{
 		printf("Error: cannot open master.passwd in system_user_masterpasswd().\n");
@@ -211,16 +228,16 @@ function system_user_group()
 	$groupfile = <<<EOD
 wheel:*:0:root
 EOD;
-	
+
 	/* If user exist with full shell, put them on the wheel group */
-	if (is_array($config['access']['user']))
+	if (is_array($config['system']['user']))
 		{
-			foreach ($config['access']['user'] as $user)
+			foreach ($config['system']['user'] as $user)
 			{
-				if (isset($user['fullshell']))
+				if (hasShellAccess($user['name']) && isSystemAdmin($user['name']))
 				{
 					$groupfile .= <<<EOD
-,{$user['login']}
+,{$user['name']}
 EOD;
 				}
 			}
@@ -233,33 +250,61 @@ kmem:*:2:
 sys:*:3:
 tty:*:4:
 operator:*:5:root
+mail:*:6:
 bin:*:7:
 staff:*:20:
+EOD;
+
+	/* If user exist without full shell, put them on the staff group */
+	if (is_array($config['system']['user']))
+		{
+			foreach ($config['system']['user'] as $user)
+			{
+				if (hasShellAccess($user['name']))
+				{
+					$groupfile .= <<<EOD
+{$user['name']},
+EOD;
+				}
+			}
+		}
+
+	$groupfile .= <<<EOD
+
 sshd:*:22:
+smmsp:*:25:
+mailnull:*:26:
 guest:*:31:
-ftp:*:50:
+proxy:*:62:
 _pflogd:*:64:
 _dhcp:*:65:
+ftp:*:50:
+authpf:*:63:
 network:*:69:
 www:*:80:
 nogroup:*:65533:
 nobody:*:65534:
-admin:*:1000:
+admin:*:0:
 
 EOD;
-	if (is_array($config['access']['group']))
+	if (is_array($config['system']['group']))
 	{
-		foreach ($config['access']['group'] as $group)
+		foreach ($config['system']['group'] as $group)
 		{
+      if (empty($group['gid'])) {
+        $newgroup = assignGID($group['name']);
+        if (! empty($newgroup)) { $group = $newgroup; }
+      }
+
 			$groupfile .= <<<EOD
-{$group['name']}:*:{$group['id']}:
+{$group['name']}:*:{$group['gid']}:
 
 EOD;
 
 		}
 	}
 
-	$fd = fopen("{$g['varetc_path']}/group", "w");
+	$fd = fopen("/etc/group", "w");
 	if (!$fd)
 	{
 		printf("Error: cannot open group in system_user_group().\n");
@@ -269,7 +314,7 @@ EOD;
 
 	fwrite($fd, $groupfile);
 	fclose($fd);
-	
+
 	return 0;
 
 }
@@ -278,9 +323,9 @@ function system_user_pwdmkdb()
 {
 	/* Generate the db of password */
 	global $config, $g;
-		
-	mwexec("/usr/sbin/pwd_mkdb -p -d {$g['varetc_path']} {$g['varetc_path']}/master.passwd");
-	
+
+	mwexec("/usr/sbin/pwd_mkdb -p -d /etc /etc/master.passwd");
+
 	return 0;
 
 }
@@ -290,13 +335,14 @@ function system_user_samba()
 	/* Generate the db of password */
 	global $config, $g;
 	
-	if (is_array($config['access']['user']))
+	if (is_array($config['system']['user']))
 	{
 		
-		foreach ($config['access']['user'] as $user)
-		{		
+		foreach ($config['system']['user'] as $user)
+		{
+      /* TODO: the password in config.xml is already encrypted */
 			$password = escapeshellcmd($user['password']);
-			$login = escapeshellcmd($user['login']);
+			$login = escapeshellcmd($user['name']);
 			mwexec("(/bin/echo {$password}; /bin/echo {$password}) | /usr/local/bin/smbpasswd -s -a {$login}");
 			//mwexec("(/bin/echo {$password}; /bin/echo {$password}) | /usr/local/bin/pdbedit -tau {$login}");
 		}
@@ -376,10 +422,10 @@ EOD;
 		printf("Error: cannot open /pam.d/system in system_pam_configure().\n");
 		return 1;
 	}
-	
+
 	fwrite($fd, $system);
 	fclose($fd);
-		
+
 	$sshd .= <<<EOD
 # PAM configuration for the "sshd" service
 
@@ -396,7 +442,7 @@ EOD;
 auth sufficient /usr/local/lib/pam_winbind.so	debug try_first_pass
 
 EOD;
-	} 
+	}
 
 	$sshd .= <<<EOD
 auth            required        pam_unix.so             no_warn try_first_pass
@@ -411,7 +457,7 @@ EOD;
 account			sufficient		/usr/local/lib/pam_winbind.so
 
 EOD;
-	} 
+	}
 
 	$sshd .= <<<EOD
 account         required        pam_unix.so
@@ -429,7 +475,7 @@ if (isset($config['ad']['enable']))
 password	sufficient	/usr/local/lib/pam_winbind.so	debug try_first_pass
 
 EOD;
-	} 
+	}
 
 
 $sshd .= <<<EOD

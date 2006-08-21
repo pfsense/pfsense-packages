@@ -42,12 +42,12 @@ require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
 
 /* TODO: use pfSense users/groups. */
-if (!is_array($freenas_config['access']['user']))
-	$freenas_config['access']['user'] = array();
+if (!is_array($freenas_config['system']['user']))
+	$freenas_config['system']['user'] = array();
 	
 users_sort();
 
-$a_user = &$freenas_config['access']['user'];
+$a_user = &$freenas_config['system']['user'];
 
 if (!is_array($freenas_config['rsync']))
 {

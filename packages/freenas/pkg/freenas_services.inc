@@ -51,6 +51,12 @@ function services_samba_configure() {
 		if ($g['booting'])
 			echo "Starting Samba... ";
 
+    /* make sure any of the required dirs exist */
+    if (! file_exists("{$g['varetc_path']}/private"))
+      mkdir("{$g['varetc_path']}/private");
+    if (! file_exists("{$g['varlog_path']}/samba"))
+      mkdir("{$g['varlog_path']}/samba");
+
 		/* generate smb.conf */
 		$fd = fopen("{$g['varetc_path']}/smb.conf", "w");
 		if (!$fd) {
@@ -499,7 +505,7 @@ dir_message = .message
 logfile = /var/log/wzdftpd/wzd.log
 xferlog = /var/log/wzdftpd/xferlog
 logdir = /var/log/wzdftpd
-max_threads = 32
+max_threads = {$freenas_config['ftp']['numberclients']}
 
 backend = /usr/local/share/wzdftpd/backends/libwzd{$freenas_config['ftp']['authentication_backend']}.so
 
@@ -649,16 +655,16 @@ site_who = !/usr/local/etc/wzdftpd/file_who.txt
 
 EOD;
 
-                if (isset($freenas_config['ftp']['banner'])) 	{
+                if (isset($freenas_config['ftp']['banner'])) {
                         $ftpconf .= "200 = {$freenas_config['ftp']['banner']}";
                 }
 
-		fwrite($fd, $ftpconf);
-		fclose($fd);
-    chmod("/usr/local/etc/wzdftpd/wzd.cfg", 0400);
+  fwrite($fd, $ftpconf);
+  fclose($fd);
+  chmod("/usr/local/etc/wzdftpd/wzd.cfg", 0400);
 
-  /* now generate the plaintext userfail (if applicable) */
-  if ($freenas_config['ftp']['authentication_backend'] == "plaintext") {
+  /* now generate the plaintext users file (if applicable) */
+  if ($freenas_config['ftp']['authentication_backend'] == FTP_BACKEND_PLAINTEXT) {
     $ftpusers = "[GROUPS]\n";
     $a_group =& $config['system']['group'];
     $a_user =& $config['system']['user'];
@@ -1645,7 +1651,7 @@ _ftp._tcp local.
 EOD;
 	}
 	
-	if (isset($freenas_config['samba']['enable'])) 	{				
+	if (isset($freenas_config['samba']['enable'])) 	{
 		$mDNSResponder .= <<<EOD
 
 "{$config['system']['hostname']} Samba Server"

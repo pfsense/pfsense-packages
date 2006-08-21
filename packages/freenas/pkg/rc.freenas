@@ -40,7 +40,7 @@ require_once("freenas_functions.inc");
 system_tuning();
 
 /* Generate local user base */
-/* system_users_create(); */
+system_users_create();
 
 /* start iSCSI service */
 services_iscsi_configure();
@@ -88,6 +88,6 @@ services_rsyncclient_configure();
 services_cron_configure();
 
 /* Start mdnsresponder (Zeroconf/Bonjour) */
-service_zeroconf_configure();
+services_zeroconf_configure();
 
 ?>
