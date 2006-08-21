@@ -68,10 +68,10 @@ include("head.inc");
 		?>
         <tr>
           <td class="listlr">
-		<?php print $rdr_proto;?>
+		<?php print $rdr_port;?>
           </td>
           <td class="listlr">
-		<?php print $rdr_port;?>
+		<?php print $rdr_proto;?>
           </td>
           <td class="listlr">
 		<?php print $rdr_ip;?>
