@@ -11,7 +11,7 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
     	<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/diag_new_states.xml</item>
+		<item>http://www.pfsense.org/packages/config/diag_states_pt/diag_new_states.xml</item>
 	</additional_files_needed>
 	<menu>
 		<name>States New</name>
