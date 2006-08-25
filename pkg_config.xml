@@ -12,7 +12,9 @@
       <category>Network Management</category>
       <maintainer>seth.mos@xs4all.nl</maintainer>
       <version>0.99</version>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
+      <supported_versions>
+      </supported_versions>
       <status>*ALPHA* *DANGER* *MAY WRECK SECURITY, USE AT OWN RISK* *DOES NOT WORK WITH CARP*</status>
       <config_file>http://www.pfsense.com/packages/config/miniupnpd/miniupnpd.xml</config_file>
       <configurationfile>miniupnpd.xml</configurationfile>
@@ -35,7 +37,7 @@
       <category>Network</category>
       <version>0.8.1</version>
       <status>PRE-ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
       <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
       <depends_on_package>openntpd-3.7p1,2.tbz</depends_on_package>
@@ -126,7 +128,7 @@
       <category>Security</category>
       <version>0.1</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <maintainer>me@daniel.stefan.haischt.name</maintainer>
       <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
       <depends_on_package>sshtools-0.2.2.tbz</depends_on_package>
@@ -140,7 +142,7 @@
       <category>Security</category>
       <version>0.1</version>
       <status>PRE-ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
       <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
       <depends_on_package>p5-Mail-SpamAssassin-3.1.0_6.tbz</depends_on_package>
@@ -157,7 +159,7 @@
       <category>Security</category>
       <version>0.1</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
       <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
       <depends_on_package>p3scan-pf-2.3.2.tbz</depends_on_package>
@@ -171,7 +173,7 @@
       <category>Security</category>
       <version>0.1</version>
       <status>PRE-ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
       <config_file>http://www.pfsense.org/packages/config/clamsmtp.xml</config_file>
       <configurationfile>clamsmtp.xml</configurationfile>
@@ -183,7 +185,7 @@
       <category>Security</category>
       <version>0.1</version>
       <status>PRE-ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
       <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
       <depends_on_package>perl-5.8.8.tbz</depends_on_package>
@@ -199,7 +201,7 @@
       <category>Security</category>
       <version>0.1</version>
       <status>PRE-ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
       <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
       <config_file>http://www.pfsense.org/packages/config/clamav.xml</config_file>
@@ -215,7 +217,7 @@
       <depends_on_package>havp-0.80_5.tbz</depends_on_package>
       <version>0.6</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <maintainer>raj@linuxense.com</maintainer>
       <configurationfile>havp.xml</configurationfile>
     </package>
@@ -229,7 +231,7 @@
       <depends_on_package>gettext-0.14.5_2.tbz</depends_on_package>
       <version>3.0.524_1</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <maintainer>geekgod@geekgod.com</maintainer>
       <config_file>http://www.pfsense.com/packages/config/darkstat/darkstat.xml</config_file>
       <configurationfile>darkstat.xml</configurationfile>
@@ -243,7 +245,7 @@
       <depends_on_package>ntop-3.2_2.tbz</depends_on_package>
       <version>3.2_2</version>
       <status>BETA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <config_file>http://www.pfsense.com/packages/config/ntop.xml</config_file>
       <configurationfile>ntop.xml</configurationfile>
     </package>
@@ -257,7 +259,7 @@
       <depends_on_package>pfflowd-0.6.tbz</depends_on_package>
       <version>0.6</version>
       <status>BETA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <configurationfile>pfflowd.xml</configurationfile>
       <maintainer>nick@buraglio.com</maintainer>
     </package>
@@ -270,7 +272,7 @@
       <depends_on_package>widentd-1.03.tbz</depends_on_package>
       <version>1.03</version>
       <status>ALPHA ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <config_file>http://www.pfsense.com/packages/config/widentd.xml</config_file>
       <configurationfile>widentd.xml</configurationfile>
     </package>
@@ -281,7 +283,7 @@
       <category>System</category>
       <version>0.1</version>
       <status>PRE-ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
       <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
       <depends_on_package>freeradius-1.0.4.tbz</depends_on_package>
@@ -297,7 +299,7 @@
       <depends_on_package>stunnel-4.11.tbz</depends_on_package>
       <version>4.11</version>
       <status>Stable</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
       <configurationfile>stunnel.xml</configurationfile>
     </package>
@@ -311,7 +313,7 @@
       <depends_on_package>iperf-2.0.2.tbz</depends_on_package>
       <version>2.0.2</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <configurationfile>iperf.xml</configurationfile>
     </package>
     <package>
@@ -324,7 +326,7 @@
       <depends_on_package>spamd-3.7.tbz</depends_on_package>
       <version>4.3</version>
       <status>BETA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <maintainer>geekgod@geekgod.com</maintainer>
       <configurationfile>spamd.xml</configurationfile>
       <logging>
@@ -342,7 +344,7 @@
       <depends_on_package>siproxd-0.5.11.tbz</depends_on_package>
       <version>0.5.11</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <configurationfile>siproxd.xml</configurationfile>
     </package>
     <package>
@@ -366,7 +368,7 @@
       <depends_on_package>ifdepd-20050420.tbz</depends_on_package>
       <version>20050420</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <config_file>http://www.pfsense.com/packages/config/ifdepd.xml</config_file>
       <configurationfile>ifdepd.xml</configurationfile>
     </package>
@@ -389,7 +391,7 @@
       <category>Network</category>
       <version>0.1</version>
       <status>BETA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <maintainer>geekgod@geekgod.com</maintainer>
       <depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
       <depends_on_package>bsdstats-2.0.tbz</depends_on_package>
@@ -403,7 +405,7 @@
       <category>Network</category>
       <version>0.4</version>
       <status>BETA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
       <depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
       <depends_on_package>squid-2.5.14_2.tbz</depends_on_package>
@@ -420,7 +422,7 @@
       <depends_on_package>arpwatch-2.1.a13.tbz</depends_on_package>
       <version>2.1.a13</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
       <configurationfile>arpwatch.xml</configurationfile>
       <logging>
@@ -436,7 +438,7 @@
       <category>Network Management</category>
       <version>1.0</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <config_file>http://www.pfsense.com/packages/config/routed.xml</config_file>
       <configurationfile>routed.xml</configurationfile>
     </package>
@@ -450,7 +452,7 @@
       <depends_on_package>powerdns-2.9.16_4.tbz</depends_on_package>
       <version>2.9.16_4</version>
       <status>ALPHA (NO GUI)</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <config_file>http://www.pfsense.com/packages/config/powerdns.xml</config_file>
       <configurationfile>powerdns.xml</configurationfile>
     </package>
@@ -461,7 +463,7 @@
       <category>Services</category>
       <version>1.2</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <config_file>http://www.pfsense.com/packages/config/frickin.xml</config_file>
       <configurationfile>frickin.xml</configurationfile>
     </package>
@@ -474,7 +476,7 @@
       <depends_on_package>postfix-1.1.12_1%2c1.tbz</depends_on_package>
       <version>1.1.12_1</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <config_file>http://www.pfsense.com/packages/config/postfix.xml</config_file>
       <configurationfile>postfix.xml</configurationfile>
     </package>
@@ -488,7 +490,7 @@
       <depends_on_package>doorman-0.8_1.tbz</depends_on_package>
       <version>0.8_1</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <configurationfile>doorman.xml</configurationfile>
     </package>
     <package>
@@ -500,7 +502,7 @@
       <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
       <version>1.2.0_1</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
       <configurationfile>squidGuard.xml</configurationfile>
     </package>
@@ -512,7 +514,7 @@
       <depends_on_package>nmap-3.93.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/nmap.xml</config_file>
       <version>3.93</version>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <configurationfile>nmap.xml</configurationfile>
     </package>
     <package>
@@ -525,7 +527,7 @@
       <depends_on_package>pfstat-1.7.tbz</depends_on_package>
       <status>Stable</status>
       <version>1.7</version>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <configurationfile>pfstat.xml</configurationfile>
     </package>
     <package>
@@ -538,7 +540,7 @@
       <depends_on_package>upclient-5.0.b8_2.tbz</depends_on_package>
       <version>5.0.b8_2</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <configurationfile>upclient.xml</configurationfile>
     </package>
     <package>
@@ -548,7 +550,7 @@
       <config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
       <version>0.1</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
     </package>
     <package>
@@ -559,7 +561,7 @@
       <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
       <depends_on_package>quagga-0.98.5_1.tbz</depends_on_package>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <version>9.5</version>
     </package>
     <package>
@@ -571,7 +573,7 @@
       <depends_on_package>zebra-9.5.tbz</depends_on_package>
       <status>ALPHA</status>
       <version>9.5</version>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
     </package>
     <package>
       <name>upnp</name>
@@ -582,7 +584,7 @@
       <depends_on_package>linuxigd-0.92_2.tbz</depends_on_package>
       <version>1.0.5</version>
       <status>*ALPHA* *DANGER* *MAY WRECK SECURITY, USE AT OWN RISK*</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <config_file>http://www.pfsense.com/packages/config/upnpd.xml</config_file>
       <configurationfile>upnpd.xml</configurationfile>
     </package>
@@ -597,7 +599,7 @@
       <verifyinstalledpkg>perl</verifyinstalledpkg>
       <version>0.1</version>
       <status>ALPHA</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <configurationfile>assp.xml</configurationfile>
     </package>
     <package>
@@ -610,7 +612,7 @@
       <depends_on_package>pure-ftpd-1.0.20_3.tbz</depends_on_package>
       <version>1.0.20_3</version>
       <status>Stable</status>
-      <required_version>RC2</required_version>
+      <required_version>1.0-RC3</required_version>
       <configurationfile>pure-ftpd.xml</configurationfile>
       <logging>
       <facilityname>ftp</facilityname>
