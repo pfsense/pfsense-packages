@@ -6,7 +6,7 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
     	<chmod>0755</chmod>
-		<url>http://www.pfsense.org/packages/config/diag_states_pt/diag_new_states.php</url>
+		<item>http://www.pfsense.org/packages/config/diag_states_pt/diag_new_states.php</item>
 	</additional_files_needed>
 	<menu>
 		<name>States New</name>
