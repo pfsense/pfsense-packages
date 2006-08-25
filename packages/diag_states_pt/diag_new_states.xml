@@ -1,15 +1,14 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>diag_new_states</name>
-	<version>0.1</version>
-	<title>Diagnostics: States (PT)</title>
+	<version>0.2</version>
+	<title>Diagnostics: States New</title>
 	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
     	<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/diag_new_states.php</item>
 	</additional_files_needed>
 	<menu>
-		<name>States(PT)</name>
+		<name>States New</name>
 		<tooltiptext>States by Paul Taylor</tooltiptext>
 		<url>diag_new_states.php</url>
 		<section>Diagnostics</section>
