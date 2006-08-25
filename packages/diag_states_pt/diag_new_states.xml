@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>diag_new_states</name>
+	<version>0.1</version>
+	<title>Diagnostics: States (PT)</title>
+	<additional_files_needed>
+	    <prefix>/usr/local/www/</prefix>
+    	<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/diag_new_states.php</item>
+	</additional_files_needed>
+	<menu>
+		<name>States(PT)</name>
+		<tooltiptext>States by Paul Taylor</tooltiptext>
+		<url>diag_new_states.php</url>
+		<section>Diagnostics</section>
+	</menu>
+	<custom_php_deinstall_command>
+		mwexec("rm /usr/local/www/diag_new_states.php");
+	</custom_php_deinstall_command>
+</packagegui>
