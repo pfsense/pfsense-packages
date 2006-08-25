@@ -1,7 +1,7 @@
 <?php
 /*
-    diag_dump_states.php
-    Copyright (C) 2006 Paul Taylor
+    diag_new_staes.php
+    Copyright (C) 2002 Paul Taylor
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -153,7 +153,7 @@ if (isset($rawdata)) {
 			$split = preg_split("/\s+/", trim($line));
 
 			$data[$count]['protocol'] = $split[0];
-			$data[$count]['direction'] = $split[1];
+			$data[$count]['dir'] =  strtolower($split[1]);
 			$srcTmp = $split[2];
 			$data[$count]['srcip'] = stripPort($srcTmp);
 			$data[$count]['srcport'] = stripPort($srcTmp,true);
@@ -313,23 +313,23 @@ include("head.inc");
 <p class="pgtitle"><?=$pgtitle?></p>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
-  	<td class="listhdrr" colspan="8">Statistics snapshot control</td>
+  	<td class="listhdrr" colspan="9">Statistics snapshot control</td>
   </tr>
   <tr>
     <?php if (($lastSnapshot!='Never') && (!isset($_GET['view']))) :?>
     <td class="listlr"><a href="?view=1&order=bytes&sort=des<?=$filterPassThru;?>">View delta</a></td>
     <td class="listr"><a href="?new=1<?=$filterPassThru;?>">Start new</a></td>
     <td class="listr"><a href="?clear=1">Clear snapshot</a></td>
-	<td class="listr" colspan="5" align="right">Last statistics snapshot: <?=$lastSnapshot;?></td>
+	<td class="listr" colspan="6" align="right">Last statistics snapshot: <?=$lastSnapshot;?></td>
     <?php endif; ?>
     <?php if (($lastSnapshot!='Never') && (isset($_GET['view']))) :?>
     <td class="listlr"><a href="?new=1<?=$filterPassThru;?>">Start new</a></td>
     <td class="listr"><a href="?clear=1">Clear</a></td>
-	<td class="listr" colspan="6" align="right"><span class="red">Viewing delta of statistics snapshot: <?=$lastSnapshot;?></span></td>
+	<td class="listr" colspan="7" align="right"><span class="red">Viewing delta of statistics snapshot: <?=$lastSnapshot;?></span></td>
     <?php endif; ?>
     <?php if ($lastSnapshot=='Never') :?>
     <td class="listlr"><a href="?new=1<?=$filterPassThru;?>">Start new</a></td>
-    <td class="listr" colspan="7" align="right">Last statistics snapshot: <?=$lastSnapshot;?></td>
+    <td class="listr" colspan="8" align="right">Last statistics snapshot: <?=$lastSnapshot;?></td>
     <?php endif; ?>
   </tr>
   <tr>
@@ -338,6 +338,7 @@ include("head.inc");
   <tr>
     <td class="listhdrr"><a href="?order=srcip<?=sortOrder('srcip');echo $filterPassThru;?>">Source</a></td>
     <td class="listhdrr"><a href="?order=srcport<?=sortOrder('srcport');echo $filterPassThru;?>">Port</a></td>
+    <td class="listhdrr"><a href="?order=dir<?=sortOrder('dir');echo $filterPassThru;?>">Dir</a></td>
     <td class="listhdrr"><a href="?order=dstip<?=sortOrder('dstip');echo $filterPassThru;?>">Destination</a></td>
     <td class="listhdrr"><a href="?order=dstport<?=sortOrder('dstport');echo $filterPassThru;?>">Port</a></td>
     <td class="listhdrr"><a href="?order=protocol<?=sortOrder('protocol');echo $filterPassThru;?>">Protocol</a></td>
@@ -355,6 +356,7 @@ if (is_array($data)): foreach ($data as $entry):
   <tr>
     <td class="listlr"><?=displayIP($entry['srcip'],'srcip');?></td>
     <td class="listr"><?=$entry['srcport'];?></td>
+	<td class="listr"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_<?=$entry['dir'];?>.gif" width="11" height="11" style="margin-top: 2px"></td>
     <td class="listr"><?=displayIP($entry['dstip'],'dstip');?></td>
     <td class="listr"><?=$entry['dstport'];?></td>
     <td class="listr"><?=$entry['protocol'];?></td>
