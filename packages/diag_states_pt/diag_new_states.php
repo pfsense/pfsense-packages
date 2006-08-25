@@ -1,7 +1,7 @@
 <?php
 /*
     diag_dump_states.php
-    Copyright (C) 2005 Scott Ullrich, Colin Smith
+    Copyright (C) 2006 Paul Taylor
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -321,16 +321,16 @@ include("head.inc");
     <td class="listr"><a href="?new=1<?=$filterPassThru;?>">Start new</a></td>
     <td class="listr"><a href="?clear=1">Clear snapshot</a></td>
 	<td class="listr" colspan="5" align="right">Last statistics snapshot: <?=$lastSnapshot;?></td>
-    <?php endif ?>
+    <?php endif; ?>
     <?php if (($lastSnapshot!='Never') && (isset($_GET['view']))) :?>
     <td class="listlr"><a href="?new=1<?=$filterPassThru;?>">Start new</a></td>
     <td class="listr"><a href="?clear=1">Clear</a></td>
 	<td class="listr" colspan="6" align="right"><span class="red">Viewing delta of statistics snapshot: <?=$lastSnapshot;?></span></td>
-    <?php endif ?>
+    <?php endif; ?>
     <?php if ($lastSnapshot=='Never') :?>
     <td class="listlr"><a href="?new=1<?=$filterPassThru;?>">Start new</a></td>
     <td class="listr" colspan="7" align="right">Last statistics snapshot: <?=$lastSnapshot;?></td>
-    <?php endif ?>
+    <?php endif; ?>
   </tr>
   <tr>
   	<td colspan="8">&nbsp;</td>
