@@ -24,6 +24,7 @@
 		<category>Network Management</category>
 		<version>0.1</version>
 		<status>BETA</status>
+		<config_file>http://www.pfsense.org/packages/config/diag_states_pt/diag_new_states.xml</config_file>
 		<configurationfile>http://www.pfsense.com/packages/config/diag_states_pt/diag_new_states.xml</configurationfile>
 	</package>
     <package>
