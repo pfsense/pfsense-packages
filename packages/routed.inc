@@ -32,7 +32,8 @@ function setup_routed() {
 	global $config;
 	$gw = "";
 
-	if ($config['installedpackages']['routed']['config'][0]['enable'] == "on") {
+	if (isset($config['installedpackages']['routed']['config'][0]['enable']) &&
+      $config['installedpackages']['routed']['config'][0]['enable'] == "on") {
 		/* if user selected individual interfaces */
 		if (is_array($config['installedpackages']['routed']['config'][0]['interface_array'])) {
 			$ifarr = $config['installedpackages']['routed']['config'][0]['interface_array'];
@@ -55,7 +56,7 @@ function setup_routed() {
 function setup_etc_gateways($iface="") {
 	global $config;
 
-	if ($iface != "") {
+	if (isset($iface)) {
 		$realif= convert_friendly_interface_to_real_interface_name($iface);
 		$ret = "if={$realif} "; 	
 	}
