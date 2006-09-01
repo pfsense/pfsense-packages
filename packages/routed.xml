@@ -109,8 +109,6 @@
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
 	</custom_php_install_command>
-                sync_package_routed('install');
 	<custom_php_deinstall_command>
-                sync_package_routed('deinstall');
 	</custom_php_deinstall_command>
 </packagegui>
