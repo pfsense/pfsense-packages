@@ -35,11 +35,20 @@ function setup_routed() {
 	if (isset($config['installedpackages']['routed']['config'][0]['enable']) &&
       $config['installedpackages']['routed']['config'][0]['enable'] == "on") {
 		/* if user selected individual interfaces */
+		$ifdescrs = array ("wan", "lan");
+		for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
+			if(isset($config['interfaces']['opt' . $j]['enable']))
+				$ifdescrs['opt' . $j] = "opt" . $j;
+		}
+
 		$ifarr = explode(",", $config['installedpackages']['routed']['config'][0]['iface_array']);
-		if(count($ifarr) != 0) {
-			$gw = "no_rip\n";
-			foreach($ifarr as $iface) {
-				$gw .= setup_etc_gateways($iface);
+                if (count($ifarr) != 0) {
+			foreach($ifdescrs as $ifdescr => $ifname) {
+				if (in_array($ifname, $ifarr)) {
+					$gw .= setup_etc_gateways($ifname, 'enable');
+				} else {
+					$gw .= setup_etc_gateways($ifname, 'disable');
+				}
 			}
 		} else {
 			/* setup for all interfaces */
@@ -57,16 +66,28 @@ function setup_routed() {
 function setup_etc_gateways($iface="") {
 	global $config;
 
-	if (isset($iface)) {
+	if ($iface != "") {
 		$realif=convert_friendly_interface_to_real_interface_name(strtoupper($iface));
-		$ret = "if={$realif} "; 	
+		$ret = "if={$realif} ";
 	}
-	if ($config['installedpackages']['routed']['config'][0]['ripversion'] == "2") {
-		$ret .= "ripv2 ";
-	}
-	$passwd = $config['installedpackages']['routed']['config'][0]['passwd'];
-	if ($passwd != "") {
-		$ret .= "passwd={$passwd} ";
+
+	switch($mode) {
+	case "enable":
+		if ($config['installedpackages']['routed']['config'][0]['ripversion'] == "2") {
+			$ret .= "ripv2 ";
+			$passwd = $config['installedpackages']['routed']['config'][0]['passwd'];
+			if ($passwd != "") {
+				$ret .= "passwd={$passwd} ";
+			}
+		}
+		break;
+	case "disable":
+		$ret .= "no_rip ";
+		break;
+
+	default:
+		break;
+
 	}
 	$ret .= "\n";
 
