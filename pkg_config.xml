@@ -436,7 +436,7 @@
       <website>http://www.pfsense.com/</website>
       <maintainer>billm@pfsense.org</maintainer>
       <category>Network Management</category>
-      <version>1.0</version>
+      <version>1.1</version>
       <status>ALPHA</status>
       <required_version>1.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/routed.xml</config_file>
