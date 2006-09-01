@@ -37,6 +37,7 @@ function setup_routed() {
 		/* if user selected individual interfaces */
 		$ifarr = explode(",", $config['installedpackages']['routed']['config'][0]['iface_array']);
 		if(count($ifarr) != 0) {
+			$gw = "no_rip\n";
 			foreach($ifarr as $iface) {
 				$gw .= setup_etc_gateways($iface);
 			}
