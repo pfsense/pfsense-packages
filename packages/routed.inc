@@ -35,8 +35,8 @@ function setup_routed() {
 	if (isset($config['installedpackages']['routed']['config'][0]['enable']) &&
       $config['installedpackages']['routed']['config'][0]['enable'] == "on") {
 		/* if user selected individual interfaces */
-		if (is_array($config['installedpackages']['routed']['config'][0]['interface_array'])) {
-			$ifarr = $config['installedpackages']['routed']['config'][0]['interface_array'];
+		$ifarr = explode(",", $config['installedpackages']['routed']['config'][0]['iface_array']);
+		if(count($ifarr) != 0) {
 			foreach($ifarr as $iface) {
 				$gw .= setup_etc_gateways($iface);
 			}
@@ -57,7 +57,7 @@ function setup_etc_gateways($iface="") {
 	global $config;
 
 	if (isset($iface)) {
-		$realif= convert_friendly_interface_to_real_interface_name($iface);
+		$realif=convert_friendly_interface_to_real_interface_name(strtoupper($iface));
 		$ret = "if={$realif} "; 	
 	}
 	if ($config['installedpackages']['routed']['config'][0]['ripversion'] == "2") {

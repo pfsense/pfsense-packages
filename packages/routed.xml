@@ -64,11 +64,11 @@
 			<fieldname>enable</fieldname>
 			<description>Enables the Routing Information Protocol daemon</description>
 			<type>checkbox</type>
-      <enablefields>interface_array,ripversion,passwd</enablefields>
+      <enablefields>iface_array,ripversion,passwd</enablefields>
 		</field>
 		<field>
 			<fielddescr>Interfaces</fielddescr>
-			<fieldname>interface_array</fieldname>
+			<fieldname>iface_array</fieldname>
 			<value>lan</value>
 			<multiple>true</multiple>
 			<size>3</size>
@@ -109,6 +109,8 @@
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
 	</custom_php_install_command>
+                sync_package_routed('install');
 	<custom_php_deinstall_command>
+                sync_package_routed('deinstall');
 	</custom_php_deinstall_command>
 </packagegui>
