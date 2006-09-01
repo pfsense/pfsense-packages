@@ -63,7 +63,7 @@ function setup_routed() {
 	}
 }
 
-function setup_etc_gateways($iface="") {
+function setup_etc_gateways($iface="", $mode="") {
 	global $config;
 
 	if ($iface != "") {
