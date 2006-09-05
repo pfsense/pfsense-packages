@@ -649,7 +649,7 @@ function squid_resync() {
 
 	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
 
-	if(!is_dir("/var/squid/cache")) {
+	if(!is_dir("/var/squid/cache/01/01")) {
 		log_error("/var/squid/cache does not exist.  Creating.");
 		exec("/usr/local/sbin/squid -z");
 	}
