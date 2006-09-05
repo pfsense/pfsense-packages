@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packagegui>
+	<include_file>squid.inc</include_file>
+	<name>squidauth</name>
+	<title>Proxy server: Authentication</title>
+	<tabs>
+		<tab>
+			<text>General settings</text>
+			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Upstream proxy</text>
+			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Cache management</text>
+			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Access control</text>
+			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Traffic management</text>
+			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Auth settings</text>
+			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Local users</text>
+			<url>/pkg.php?xml=squid_users.xml</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fielddescr>Authentication method</fielddescr>
+			<fieldname>auth_method</fieldname>
+			<description>Select an authentication method. This will allow users to be authenticated by local or external services.</description>
+			<default_value>none</default_value>
+			<type>select</type>
+			<options>
+				<option><name>None</name><value>none</value></option>
+				<option><name>Local</name><value>local</value></option>
+				<option><name>LDAP</name><value>ldap</value></option>
+				<option><name>RADIUS</name><value>radius</value></option>
+				<option><name>NT domain</name><value>msnt</value></option>
+			</options>
+			<onchange>on_auth_method_changed()</onchange>
+		</field>
+		<field>
+			<fieldname>auth_server</fieldname>
+			<fielddescr>Authentication server</fielddescr>
+			<description>Enter here the IP or hostname of the server that will perform the authentication. For NT domain authentication, this is the Primary Domain Controller (PDC).</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>auth_server_port</fieldname>
+			<fielddescr>Authentication server port</fielddescr>
+			<description>Enter here the port to use to connect to the authentication server. Leave this field blank to use the authentication method's default port.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>ldap_user</fieldname>
+			<fielddescr>LDAP server user DN</fielddescr>
+			<description>Enter here the user distinguished name (DN) to bind to connect to the LDAP server (e.g., "cn=Administrator,cn=Users,dc=foobar,dc=com"). You can leave this field blank if you don't want to use authentication.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>ldap_password</fieldname>
+			<fielddescr>LDAP password</fielddescr>
+			<description>Enter here the password to use to connect to the LDAP server. You may leave this field unfilled.</description>
+			<type>password</type>
+		</field>
+		<field>
+			<fieldname>ldap_basedn</fieldname>
+			<fielddescr>LDAP base DN</fielddescr>
+			<description>For LDAP authentication, enter here the base DN for the search (e.g., "cn=Users,dc=foobar,dc=com").</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>ldap_filter</fieldname>
+			<fielddescr>LDAP filter</fielddescr>
+			<description>Enter the string to be used to filter the results of the search, or leave this blank to get the results unfiltered. This must be in compliance with RFC 2254, and ocurrences of the string "%s" will be set to the username given to the proxy. You generally want something like '(sAMAccountName=%s)' here.</description>
+			<type>input</type>
+			<default_value>(sAMAccountName=%s)</default_value>
+		</field>
+		<field>
+			<fieldname>radius_secret</fieldname>
+			<fielddescr>RADIUS secret</fielddescr>
+			<description>The RADIUS secret for RADIUS authentication.</description>
+			<type>password</type>
+		</field>
+		<field>
+			<fieldname>msnt_bdc</fieldname>
+			<fielddescr>Backup Domain Controller</fielddescr>
+			<description>Enter the address of the Backup Domain Controller (BDC) or leave this field blank if you don't want to use a backup controller.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>msnt_domain</fieldname>
+			<fielddescr>NT domain</fielddescr>
+			<description>Enter the NT domain to be used.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>auth_prompt</fieldname>
+			<fielddescr>Authentication prompt</fielddescr>
+			<description>This string will be displayed at the top of the authentication request window.</description>
+			<default_value>Please enter your credentials to access the proxy</default_value>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>auth_processes</fieldname>
+			<fielddescr>Authentication processes</fielddescr>
+			<description>The number of authenticator processes to spawn. If many authentications are expected within a short timeframe, increase this number accordingly.</description>
+			<default_value>5</default_value>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>auth_ttl</fieldname>
+			<fielddescr>Authentication TTL</fielddescr>
+			<description>This specifies for how long (in minutes) the proxy server assumes an externally validated username and password combination is valid (Time To Live).  When the TTL expires, the user will be prompted for credentials again.</description>
+			<default_value>60</default_value>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>unrestricted_auth</fieldname>
+			<fielddescr>Requiere authentication for unrestricted hosts</fielddescr>
+			<description>If this option is enabled, even users tagged as unrestricted through access control are required to authenticate to use the proxy.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fieldname>no_auth_hosts</fieldname>
+			<fielddescr>Subnets that don't need authentication</fielddescr>
+			<description>A comma-separated list of subnets (in CIDR range, e.g.: 10.5.0.0/16, 192.168.1.50/32) whose hosts won't be asked for authentication to access the proxy.</description>
+			<type>textarea</type>
+			<rows>5</rows>
+			<cols>50</cols>
+		</field>
+	</fields>
+	<custom_php_after_head_command>
+		squid_print_javascript_auth();
+	</custom_php_after_head_command>
+	<custom_php_validation_command>
+		squid_validate_auth($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_php_after_form_command>
+		squid_print_javascript_auth2();
+	</custom_php_after_form_command>
+	<custom_php_resync_config_command>
+		squid_resync();
+	</custom_php_resync_config_command>
+</packagegui>
