@@ -75,7 +75,7 @@
 	<custom_php_install_command>
     $version = readfile("/etc/version");
     
-    if ($version == "HEAD") {
+    if (strpos($version, "HEAD") !== false) {
       unlink("/usr/local/www/diag_shell_releng.php");
       rename("/usr/local/www/diag_shell_head.php",
              "/usr/local/www/diag_shell.php");
