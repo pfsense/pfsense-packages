@@ -63,7 +63,7 @@
 		<label xml:lang="en-US">A sample checkbox</label>
 		<caption xml:lang="en-US">Check this nice checkbox</caption>
 		<description xml:lang="en-US">Now checkboxes can have a caption as well.</description>
-		<on_check_javascript>_("hey, this is only meant for quick and dirty stuff, do NOT implement anything longer than 2 or 3 commands here! Btw, i was clicked.");</on_check_javascript>
+		<on_check_javascript>_('hey, this is only meant for quick and dirty stuff, do NOT implement anything longer than 2 or 3 commands here! Btw, i was clicked.');</on_check_javascript>
 	</widget>
 	<widget>
 		<type>submit</type>
@@ -77,7 +77,7 @@
 		<name>mybutton</name>
 		<caption xml:lang="en-US">Cancel something</caption>
 		<description xml:lang="en-US">The description for the last element in a group is the description that matters.</description>
-		<on_click_javascript>_("Hi, don't abuse me, use include_javascript instead!");</on_click_javascript>
+		<on_click_javascript>_('Hi, don\'t abuse me, use include_javascript instead!');</on_click_javascript>
 		<group_end/>
 	</widget>
 	<widget>
