@@ -5,11 +5,11 @@
 	<version>0.101</version>
 	<savetext>Change</savetext>
 	<include_file>/usr/local/pkg/miniupnpd.inc</include_file>
-	<aftersaveredirect>pkg_edit.php?xml=miniupnpd.xml&amp;id=0</aftersaveredirect>
+	<aftersaveredirect>status_upnp.php</aftersaveredirect>
 	<menu>
 		<name>Miniupnpd</name>
 		<tooltiptext>Set miniupnpd settings such as interfaces to listen on.</tooltiptext>
-		<section>Diagnostics</section>
+		<section>Services</section>
 		<url>/pkg_edit.php?xml=miniupnpd.xml&amp;id=0</url>
 	</menu>
 	<additional_files_needed>
