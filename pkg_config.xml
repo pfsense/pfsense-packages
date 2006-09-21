@@ -11,11 +11,11 @@
       <website>http://miniupnp.free.fr/</website>
       <category>Network Management</category>
       <maintainer>seth.mos@xs4all.nl</maintainer>
-      <version>0.99</version>
+      <version>0.101</version>
       <required_version>1.0-RC3</required_version>
       <supported_versions>
       </supported_versions>
-      <status>*ALPHA* *DANGER* *MAY WRECK SECURITY, USE AT OWN RISK* *DOES NOT WORK WITH CARP*</status>
+      <status>*BETA* *MAY WRECK SECURITY, USE AT OWN RISK* *DOES NOT WORK WITH CARP*</status>
       <config_file>http://www.pfsense.com/packages/config/miniupnpd/miniupnpd.xml</config_file>
       <configurationfile>miniupnpd.xml</configurationfile>
     </package>
