@@ -4,6 +4,17 @@
 <pfsensepkgs>
   <packages>
     <package>
+      <name>nmap</name>
+      <descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
+      <category>Security</category>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package>nmap-4.11.tbz</depends_on_package>
+      <config_file>http://www.pfsense.com/packages/config/nmap.xml</config_file>
+      <version>4.11</version>
+      <required_version>1.0-RC2</required_version>
+      <configurationfile>nmap.xml</configurationfile>
+    </package>
+    <package>
       <name>miniupnpd</name>
       <descr>Emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP Internet
       Gateway Device specification (IGD) and allows UPnP aware clients, such as MSN Messenger to
@@ -491,17 +502,6 @@
       <required_version>1.0-RC3</required_version>
       <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
       <configurationfile>squidGuard.xml</configurationfile>
-    </package>
-    <package>
-      <name>nmap</name>
-      <descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
-      <category>Security</category>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
-      <depends_on_package>nmap-3.93.tbz</depends_on_package>
-      <config_file>http://www.pfsense.com/packages/config/nmap.xml</config_file>
-      <version>3.93</version>
-      <required_version>1.0-RC3</required_version>
-      <configurationfile>nmap.xml</configurationfile>
     </package>
     <package>
       <name>pfstat</name>
