@@ -59,8 +59,8 @@ include("head.inc");
 <?php
 	$tab_array = array();
 	$tab_array[0] = array(gettext("Snort Settings"), false, "pkg.php?xml=snort.xml");
-	$tab_array[1] = array(gettext("Snort Rules Update"), true, "/usr/local/www/snort_download_rules.php");
-	$tab_array[2] = array(gettext("Snort Rulesets"), false, "/usr/local/www/snort_rulesets.php");
+	$tab_array[1] = array(gettext("Snort Rules Update"), true, "/snort_download_rules.php");
+	$tab_array[2] = array(gettext("Snort Rulesets"), false, "/snort_rulesets.php");
 	display_top_tabs($tab_array);
 ?>
     </td>
