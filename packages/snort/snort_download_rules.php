@@ -99,8 +99,9 @@ if(!$oinkid) {
 }
 
 /* setup some variables */
-$dl = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-CURRENT.tar.gz";
-$dl_md5 = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-CURRENT.tar.gz.md5";
+$snort_filename = "snortrules-snapshot-CURRENT.tar.gz";
+$dl = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}";
+$dl_md5 = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}.md5";
 
 /* multi user system, request new filename and create directory */
 $tmpfname = tempnam("/tmp", "snortRules");
@@ -109,14 +110,14 @@ exec("rm -rf {$tmpfname}; mkdir -p {$tmpfname}");
 /* download snort rules */
 $static_output = gettext("Downloading current snort rules... ");
 update_all_status($static_output);
-download_file_with_progress_bar($dl, $tmpfname . "/snortrules-snapshot-CURRENT.tar.gz");
-verify_downloaded_file($tmpfname . "/snortrules-snapshot-CURRENT.tar.gz");
+download_file_with_progress_bar($dl, $tmpfname . "/{$snort_filename}");
+verify_downloaded_file($tmpfname . "/{$snort_filename}");
 
 /* download snort rules md5 file */
 $static_output = gettext("Downloading current snort rules md5... ");
 update_all_status($static_output);
-download_file_with_progress_bar($dl_md5, $tmpfname . "/snortrules-snapshot-CURRENT.tar.gz.md5");
-verify_downloaded_file($tmpfname . "/snortrules-snapshot-CURRENT.tar.gz.md5");
+download_file_with_progress_bar($dl_md5, $tmpfname . "/{$snort_filename}.md5");
+verify_downloaded_file($tmpfname . "/{$snort_filename}.md5");
 
 /* verify downloaded rules signature */
 verify_snort_rules_md5($tmpfname);
@@ -141,6 +142,7 @@ hide_progress_bar_status();
 <?php
 
 function check_for_common_errors($filename) {
+	global $snort_filename;
 	$contents = file_get_contents($filename);
 	if(stristr($contents, "You don't have permission")) {
 		update_all_status("An error occured.  Scroll down to inspect it's contents.");
@@ -157,10 +159,12 @@ function check_for_common_errors($filename) {
 }
 
 function scroll_down_to_bottom_of_page() {
+	global $snort_filename;
 	echo "\n<script type=\"text/javascript\">parent.scrollTo(0,1500);\n</script>";
 }
 
 function verify_downloaded_file($filename) {
+	global $snort_filename;
 	if(filesize($filename)<1500) {
 		update_all_status("Checking {$filename}...");
 		check_for_common_errors($filename);
@@ -175,18 +179,20 @@ function verify_downloaded_file($filename) {
 }
 
 function extract_snort_rules_md5($tmpfname) {
+	global $snort_filename;
 	$static_output = gettext("Extracting snort rules...");
 	update_all_status($static_output);
-	exec("tar xzf {$tmpfname}/snortrules-snapshot-CURRENT.tar.gz -C /usr/local/etc/snort/");
+	exec("tar xzf {$tmpfname}/{$snort_filename} -C /usr/local/etc/snort/");
 	$static_output = gettext("Snort rules extracted.");
 	update_all_status($static_output);
 }
 
 function verify_snort_rules_md5($tmpfname) {
+	global $snort_filename;
 	$static_output = gettext("Verifying md5 signature...");
 	update_all_status($static_output);
-	$md5 = file_get_contents("{$tmpfname}/snortrules-snapshot-CURRENT.tar.gz.md5");
-	$file_md5_ondisk = `md5 {$tmpfname}/snortrules-snapshot-CURRENT.tar.gz | awk '{ print $4 }'`;
+	$md5 = file_get_contents("{$tmpfname}/{$snort_filename}.md5");
+	$file_md5_ondisk = `md5 {$tmpfname}/{$snort_filename} | awk '{ print $4 }'`;
 	if($md5 <> $file_md5_ondisk) {
 		$static_output = gettext("md5 signature of rules mismatch.");
 		update_all_status($static_output);
