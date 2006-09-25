@@ -9,6 +9,11 @@
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=snort.xml&amp;id=0</url>
 	</menu>
+	<additional_files_needed>
+		<prefix>/usr/local/bin/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/bin/snort2c</item>
+	</additional_files_needed>
 	<service>
 		<name>snort</name>
 		<rcfile>snort.sh</rcfile>
@@ -39,6 +44,17 @@
 	<custom_php_global_functions>
 		function sync_package_snort() {
 			$first = 0;
+			/* if list */
+			$iflist = array("lan" => "LAN");
+			for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
+				$iflist['opt' . $i] = "opt{$i}";
+			$whitelist = fopen("/var/db/whitelist","w");
+			if(!$whitelist)
+				die "Cannot open whitelist for /var/db/writing.";
+			foreach($iflist as $if) {
+				/* XXX: write out if subnet */
+			}
+			fclose($whitelist);
 			foreach($_POST['interface_array'] as $iface) {
 				$if = convert_friendly_interface_to_real_interface_name($iface);
 				if($if) {
@@ -46,8 +62,8 @@
 					$first = 1;
 				}
 			}
-			$start = "snort -c /usr/local/etc/snort/rules/snort.conf -l /var/log/snort " . $ifaces_final . " -D";
-			$start.= ";snort2c -s -w /var/db/whitelist -a /var/log/snort/alert";
+			$start  = "snort -c /usr/local/etc/snort/rules/snort.conf -l /var/log/snort " . $ifaces_final . " -D";
+			$start .= ";snort2c -s -w /var/db/whitelist -a /var/log/snort/alert";
 			write_rcfile(array(
 					"file" => "snort.sh",
 					"start" => $start,
