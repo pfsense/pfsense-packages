@@ -91,7 +91,8 @@ include("head.inc");
 <?php
 
 /* define oinkid */
-$oinkid = "";
+if($config['installedpackages']['snort'])
+	$oinkid = $config['installedpackages']['snort']['config'][0]['oinkmastercode'];
 
 if(!$oinkid) {
 	$static_output = gettext("You must obtain an oinkid from snort.com and set its value in the Snort settings tab.");
