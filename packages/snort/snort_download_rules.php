@@ -40,6 +40,8 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
 
+<p class="pgtitle"><?=$pgtitle?></font></p>
+
 <form action="snort_download_rules.php" method="post">
 <div id="inputerrors"></div>
 
