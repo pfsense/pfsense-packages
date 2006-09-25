@@ -107,6 +107,7 @@ if(!$oinkid) {
 	exit;
 }
 
+/* send current buffer */
 ob_flush();
 
 /* setup some variables */
@@ -155,15 +156,16 @@ hide_progress_bar_status();
 
 function check_for_common_errors($filename) {
 	global $snort_filename, $snort_filename_md5;
+	ob_flush();
 	$contents = file_get_contents($filename);
 	if(stristr($contents, "You don't have permission")) {
 		update_all_status("An error occured.  Scroll down to inspect it's contents.");
 		hide_progress_bar_status();
 		echo "<center><div id='error' style='background:white;width:90%'>";
-		echo "&nbsp;<p>";
+		echo "&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>";
 		echo "The following error occured while downloading the snort rules file from snort.org:<p>";
 		echo $contents;
-		echo "&nbsp;<p>";
+		echo "&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>";
 		echo "</div></center>";
 		scroll_down_to_bottom_of_page();
 		exit;
@@ -172,12 +174,14 @@ function check_for_common_errors($filename) {
 
 function scroll_down_to_bottom_of_page() {
 	global $snort_filename;
+	ob_flush();
 	echo "\n<script type=\"text/javascript\">parent.scrollTo(0,1500);\n</script>";
 }
 
 function verify_downloaded_file($filename) {
 	global $snort_filename, $snort_filename_md5;
-	if(filesize($filename)<1500) {
+	ob_flush();
+	if(filesize($filename)<99500) {
 		update_all_status("Checking {$filename}...");
 		check_for_common_errors($filename);
 	}
@@ -192,6 +196,7 @@ function verify_downloaded_file($filename) {
 
 function extract_snort_rules_md5($tmpfname) {
 	global $snort_filename, $snort_filename_md5;
+	ob_flush();
 	$static_output = gettext("Extracting snort rules...");
 	update_all_status($static_output);
 	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C /usr/local/etc/snort/");
@@ -201,6 +206,7 @@ function extract_snort_rules_md5($tmpfname) {
 
 function verify_snort_rules_md5($tmpfname) {
 	global $snort_filename, $snort_filename_md5;
+	ob_flush();
 	$static_output = gettext("Verifying md5 signature...");
 	update_all_status($static_output);
 	$md5 = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
@@ -215,11 +221,13 @@ function verify_snort_rules_md5($tmpfname) {
 
 function hide_progress_bar_status() {
 	global $snort_filename, $snort_filename_md5;
+	ob_flush();
 	echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='hidden';\n</script>";
 }
 
 function update_all_status($status) {
 	global $snort_filename, $snort_filename_md5;
+	ob_flush();
 	update_status($status);
 	update_output_window($status);
 }
