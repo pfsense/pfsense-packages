@@ -2,9 +2,7 @@
 /*
 	snort_download_rules.php
 	part of pfSense (http://www.pfsense.com)
-
-	Copyright (C) 2005 Scott Ullrich and Colin Smith
-
+	Copyright (C) 2005 Scott Ullrich
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -28,8 +26,6 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
-	TODO:
-		* modify pfSense.com XMLRPC server to return md5 hashes of firmware updates.
 */
 
 $pgtitle = array(gettext("Services"),gettext("Snort"),gettext("Update Rules"));
@@ -74,7 +70,7 @@ include("head.inc");
       		      <br />
       		      <!-- status box -->
       		      <textarea cols="60" rows="1" name="status" id="status" wrap="hard">
-      		      <?=gettext("Beginning system autoupdate...");?>
+      		      <?=gettext("Initializing...");?>
       		      </textarea>
       		      <!-- command output box -->
       		      <textarea cols="60" rows="25" name="output" id="output" wrap="hard">
@@ -97,19 +93,25 @@ if($config['installedpackages']['snort'])
 if(!$oinkid) {
 	$static_output = gettext("You must obtain an oinkid from snort.com and set its value in the Snort settings tab.");
 	update_all_status($static_output);
-	echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='hidden';\n</script>";
+	hide_progress_bar_status();
 	exit;
 }
 
+/* setup some variables */
 $dl = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-CURRENT.tar.gz";
 $dl_md5 = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-CURRENT.tar.gz.md5";
-$tmpfname = tempnam("/tmp", "snortRules");
-$static_output = gettext("Downloading current snort rules... ");
 
+/* multi user system, request new filename and create directory */
+$tmpfname = tempnam("/tmp", "snortRules");
+exec("rm -rf {$tmpfname}; mkdir -p {$tmpfname}");
+
+/* download snort rules */
+$static_output = gettext("Downloading current snort rules... ");
 update_all_status($static_output);
 download_file_with_progress_bar($dl, 	 $tmpfname);
-$static_output = gettext("Downloading current snort rules md5... ");
 
+/* download snort rules md5 file */
+$static_output = gettext("Downloading current snort rules md5... ");
 update_all_status($static_output);
 download_file_with_progress_bar($dl_md5, $tmpfname);
 
@@ -122,19 +124,25 @@ extract_snort_rules_md5($tmpfname);
 $static_output = gettext("Your snort rules are now up to date.");
 update_all_status($static_output);
 
-echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='hidden';\n</script>";
+/* cleanup temporary directory */
+exec("rm -rf {$tmpfname};");
+
+/* hide progress bar and lets end this party */
+hide_progress_bar_status();
+
 ?>
+
 </body>
 </html>
 
 <?php
+
 function extract_snort_rules_md5($tmpfname) {
 	$static_output = gettext("Extracting snort rules...");
 	update_all_status($static_output);
 	exec("tar xzf {$tmpfname}/snortrules-snapshot-CURRENT.tar.gz -C /usr/local/etc/snort/");
 	$static_output = gettext("Snort rules extracted.");
-	update_status($static_output);
-	update_output_window($static_output);
+	update_all_status($static_output);
 }
 
 function verify_snort_rules_md5($tmpfname) {
@@ -145,9 +153,13 @@ function verify_snort_rules_md5($tmpfname) {
 	if($md5 <> $file_md5_ondisk) {
 		$static_output = gettext("md5 signature of rules mismatch.");
 		update_all_status($static_output);
-		echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='hidden';\n</script>";
+		hide_progress_bar_status();
 		exit;
 	}
+}
+
+function hide_progress_bar_status() {
+	echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='hidden';\n</script>";
 }
 
 function update_all_status($status) {
