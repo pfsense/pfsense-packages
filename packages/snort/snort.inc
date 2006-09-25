@@ -23,7 +23,7 @@ function sync_package_snort() {
 			$first = 1;
 		}
 	}
-	$start  = "snort -c /usr/local/etc/snort/rules/snort.conf -l /var/log/snort " . $ifaces_final . " -D";
+	$start  = "snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort " . $ifaces_final . " -D";
 	$start .= ";snort2c -s -w /var/db/whitelist -a /var/log/snort/alert";
 	write_rcfile(array(
 			"file" => "snort.sh",
@@ -31,6 +31,7 @@ function sync_package_snort() {
 			"stop" => "/usr/bin/killall snort; killall snort2c"
 		)
 	);
+	exec("cp /usr/local/etc/snort/snort.conf-sample /usr/local/etc/snort.conf");
 	start_service("snort");
 }
 
