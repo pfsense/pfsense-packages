@@ -51,6 +51,7 @@
 			<fieldname>oinkmastercode</fieldname>
 			<value></value>
 			<type>input</type>
+			<size>60</size>
 		</field>
     </fields>
 	<service>
