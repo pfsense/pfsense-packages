@@ -27,35 +27,28 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+$snort_conf = "/usr/local/etc/snort/snort.conf";
+
 function sync_package_snort() {
-	global $config, $g;
-	exec("mkdir -p /usr/local/etc/snort");
-	exec("mkdir -p /var/log/snort");
+	global $config, $g, $snort_conf;
+	exec("/bin/mkdir -p /usr/local/etc/snort");
+	exec("/bin/mkdir -p /var/log/snort");
 	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
-	exec("cp /usr/local/etc/snort/classification.config-sample /usr/local/etc/snort/classification.config");
-	exec("cp /usr/local/etc/snort/gen-msg.map-sample /usr/local/etc/snort/gen-msg.map");
-	exec("cp /usr/local/etc/snort/generators-sample /usr/local/etc/snort/generators");
-	exec("cp /usr/local/etc/snort/reference.config-sample /usr/local/etc/snort/reference.config");
-	exec("cp /usr/local/etc/snort/sid-msg.map-sample /usr/local/etc/snort/sid-msg.map");
-	exec("cp /usr/local/etc/snort/sid-sample /usr/local/etc/snort/sid");
-	exec("cp /usr/local/etc/snort/threshold.conf-sample /usr/local/etc/snort/threshold.conf");
-	exec("cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
-	exec("rm -f /usr/local/etc/rc.d/snort");
+	exec("/bin/cp /usr/local/etc/snort/classification.config-sample /usr/local/etc/snort/classification.config");
+	exec("/bin/cp /usr/local/etc/snort/gen-msg.map-sample /usr/local/etc/snort/gen-msg.map");
+	exec("/bin/cp /usr/local/etc/snort/generators-sample /usr/local/etc/snort/generators");
+	exec("/bin/cp /usr/local/etc/snort/reference.config-sample /usr/local/etc/snort/reference.config");
+	exec("/bin/cp /usr/local/etc/snort/sid-msg.map-sample /usr/local/etc/snort/sid-msg.map");
+	exec("/bin/cp /usr/local/etc/snort/sid-sample /usr/local/etc/snort/sid");
+	exec("/bin/cp /usr/local/etc/snort/threshold.conf-sample /usr/local/etc/snort/threshold.conf");
+	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
+	exec("/bin/rm -f /usr/local/etc/rc.d/snort");
 
 	$first = 0;
-	/* if list */
+	/* generate if list */
 	$iflist = array("lan" => "LAN");
 	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
 		$iflist['opt' . $i] = "opt{$i}";
-	$whitelist = fopen("/var/db/whitelist","w");
-	if(!$whitelist) {
-		log_error("Cannot open whitelist for /var/db/writing.");
-		exit;
-	}
-	foreach($iflist as $if) {
-		/* XXX: write out if subnet */
-	}
-	fclose($whitelist);
 	foreach($_POST['interface_array'] as $iface) {
 		$if = convert_friendly_interface_to_real_interface_name($iface);
 		if($if) {
@@ -63,7 +56,8 @@ function sync_package_snort() {
 			$first = 1;
 		}
 	}
-	$start  = "/bin/mkdir -p /var/log/snort;snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort " . $ifaces_final . " -D";
+	$start  = "/bin/mkdir -p /var/log/snort";
+	$start .= ";snort -c {$snort_conf} -l /var/log/snort " . $ifaces_final . " -D";
 	$start .= ";snort2c -s -w /var/db/whitelist -a /var/log/snort/alert";
 	write_rcfile(array(
 			"file" => "snort.sh",
@@ -72,17 +66,20 @@ function sync_package_snort() {
 		)
 	);
 
+	/* create snort configuration file */
 	create_snort_conf();
 
+	/* start snort service */
 	start_service("snort");
 }
 
 function create_snort_conf() {
+	global $config, $g, $snort_conf;
 	/* write out snort.conf */
 	$snort_conf = generate_snort_conf();
-	$conf = fopen("/usr/local/etc/snort/snort.conf","w");
+	$conf = fopen($snort_conf, "w");
 	if(!$conf) {
-		log_error("Could not open /usr/local/etc/snort/snort.conf for writing.");
+		log_error("Could not open {$snort_conf} for writing.");
 		exit;
 	}
 	fwrite($conf, $snort_conf);
@@ -90,8 +87,7 @@ function create_snort_conf() {
 }
 
 function generate_snort_conf() {
-	global $config, $g, $config;
-
+	global $config, $g, $snort_conf;
 	/* obtain external interface */
 	/* XXX: make multi wan friendly */
 	$snort_ext_int = $config['installedpackages']['snort']['config'][0]['interface_array'][0];
@@ -127,24 +123,30 @@ function generate_snort_conf() {
 		$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
 	}
 
-	/* write out whitelist */
-	fwrite($whitelist, $home_net);
+	/* write out whitelist, convert spaces to carriage returns */
+	$whitelist_home_net = str_replace(" ", "\n", $home_net);
+	fwrite($whitelist, $whitelist_home_net);
 
 	/* close file */
 	fclose($whitelist);
 
-	/* XXX: generate rule section dynamically from config.xml information
-	 */
-	$selected_rules_sections = "";
+	/* generate rule sections to load */
 	$enabled_rulesets = $config['installedpackages']['snort']['config'][0]['rulesets'];
-	if($enabled_rulesets)
+	if($enabled_rulesets) {
+		$selected_rules_sections = "";
 		$enabled_rulesets_array = split("\|\|", $enabled_rulesets);
-
-	foreach($enabled_rulesets_array as $enabled_item)
-		$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
+		foreach($enabled_rulesets_array as $enabled_item)
+			$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
+	}
 
 	/* build snort configuration file */
 	$snort_conf = <<<EOD
+
+#snort configuration file
+#generated by the pfSense
+#package manager system
+#see /usr/local/pkg/snort.inc
+#for more information
 
 var AIM_SERVERS [64.12.24.0/24,64.12.25.0/24,64.12.26.14/24,64.12.28.0/24,64.12.29.0/24,64.12.161.0/24,64.12.163.0/24,205.188.5.0/24,205.188.9.0/24]
 var HTTP_PORTS 80
@@ -160,7 +162,7 @@ var EXTERNAL_NET !\$HOME_NET
 var SSH_PORTS {$ssh_port}
 var RULE_PATH /usr/local/etc/snort/rules
 
-# Use lower memory models
+#Use lower memory models
 config detection: search-method lowmem
 
 #Output plugins
