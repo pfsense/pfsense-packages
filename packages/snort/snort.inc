@@ -98,6 +98,8 @@ config detection: search-method lowmem
 #output database: alert
 output alert_syslog: LOG_AUTH LOG_ALERT LOG_CONS LOG_NDELAY LOG_PERROR LOG_PID
 
+output alert_unified: filename alert
+
 #Flow and stream
 preprocessor flow: stats_interval 0 hash 2
 preprocessor frag2
