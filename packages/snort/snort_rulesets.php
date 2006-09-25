@@ -60,8 +60,8 @@ include("head.inc");
 <form action="snort_rulesets.php" method="post" name="iform">
 <script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
 <script src="/javascript/scriptaculous/scriptaculous.js" type="text/javascript"></script>
-<script type="text/javascript" language="javascript" src="row_toggle.js"></script>
-<script src="/javascript/sorttable.js"></script>
+<script src="row_toggle.js" type="text/javascript"></script>
+<script src="/javascript/sorttable.js" type="text/javascript"></script>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
    <tr>
