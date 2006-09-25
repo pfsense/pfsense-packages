@@ -35,6 +35,12 @@
 			<size>3</size>
 			<type>interfaces_selection</type>
 		</field>
+		<field>
+			<fielddescr>Oinkmaster code</fielddescr>
+			<fieldname>oinkmastercode</fieldname>
+			<value></value>
+			<type>input</type>
+		</field>
     </fields>
 	<service>
 		<name>snort</name>
