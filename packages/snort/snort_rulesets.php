@@ -90,30 +90,23 @@ include("head.inc");
 <?php
 	$dir = "/usr/local/etc/snort/rules/";
 	$dh  = opendir($dir);
-	while (false !== ($filename = readdir($dh))) {
+	while (false !== ($filename = readdir($dh)))
    		$files[] = $filename;
-	}
 	sort($files);
 	foreach($files as $file) {
 		if(!stristr($file, ".rules"))
 			continue;
 		echo "<tr>";
-		echo "<td><center>";
-		if(in_array($file, $enabled_rulesets_array)) {
+		if(in_array($file, $enabled_rulesets_array))
 			$CHECKED = " CHECKED";
-		} else {
+		else
 			$CHECKED = "";
-		}
-		echo "	<input type='checkbox' name='toenable[]' value='$file' {$CHECKED}>";
-		echo "</center></td>";
-		echo "<td>";
-		echo "{$file}";
-		echo "</td>";
+		echo "<td align=\"center\" valign=\"top\"><input type='checkbox' name='toenable[]' value='$file'{$CHECKED}></td>";
+		echo "<td>{$file}</td>";
 		//echo "<td>";
 		//echo "description";
 		//echo "</td>";
 	}
-
 ?>
 						</table>
 		    		</td>
