@@ -4,7 +4,7 @@
 	<name>Snort</name>
 	<version>3.0</version>
 	<menu>
-		<name>Snort Settings</name>
+		<name>Snort</name>
 		<tooltiptext>Setup snort specific settings</tooltiptext>
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=snort.xml&amp;id=0</url>
