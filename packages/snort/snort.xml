@@ -36,6 +36,10 @@
 			<url>/pkg_edit.php?xml=snort.xml&amp;id=0</url>
 			<active/>
 		</tab>
+		<tab>
+			<text>Update Snort Rules</text>
+			<url>/snort_download_rules.php</url>
+		</tab>
 	</tabs>
 	<fields>
 		<field>

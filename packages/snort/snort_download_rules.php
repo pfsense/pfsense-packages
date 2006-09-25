@@ -28,10 +28,10 @@
 
 */
 
-$pgtitle = array(gettext("Services"),gettext("Snort"),gettext("Update Rules"));
-
+require_once("functions.inc");
 require_once("guiconfig.inc");
-require_once("xmlrpc.inc");
+
+$pgtitle = "Services: Snort: Update Rules";
 
 include("head.inc");
 
@@ -39,6 +39,7 @@ include("head.inc");
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
+<p class="pgtitle"><?=$pgtitle?></p>
 
 <form action="snort_download_rules.php" method="post">
 <div id="inputerrors"></div>
@@ -108,12 +109,14 @@ exec("rm -rf {$tmpfname}; mkdir -p {$tmpfname}");
 /* download snort rules */
 $static_output = gettext("Downloading current snort rules... ");
 update_all_status($static_output);
-download_file_with_progress_bar($dl, 	 $tmpfname);
+download_file_with_progress_bar($dl, $tmpfname . "/snortrules-snapshot-CURRENT.tar.gz");
+verify_downloaded_file($tmpfname . "/snortrules-snapshot-CURRENT.tar.gz");
 
 /* download snort rules md5 file */
 $static_output = gettext("Downloading current snort rules md5... ");
 update_all_status($static_output);
-download_file_with_progress_bar($dl_md5, $tmpfname);
+download_file_with_progress_bar($dl_md5, $tmpfname . "/snortrules-snapshot-CURRENT.tar.gz.md5");
+verify_downloaded_file($tmpfname . "/snortrules-snapshot-CURRENT.tar.gz.md5");
 
 /* verify downloaded rules signature */
 verify_snort_rules_md5($tmpfname);
@@ -125,7 +128,7 @@ $static_output = gettext("Your snort rules are now up to date.");
 update_all_status($static_output);
 
 /* cleanup temporary directory */
-exec("rm -rf {$tmpfname};");
+//exec("rm -rf {$tmpfname};");
 
 /* hide progress bar and lets end this party */
 hide_progress_bar_status();
@@ -136,6 +139,38 @@ hide_progress_bar_status();
 </html>
 
 <?php
+
+function check_for_common_errors($filename) {
+	$contents = file_get_contents($filename);
+	if(stristr($contents, "You don't have permission")) {
+		update_all_status("An error occured.  Scroll down to inspect it's contents.");
+		hide_progress_bar_status();
+		echo "<center><div id='error' style='background:white;width:90%'>";
+		echo "&nbsp;<p>";
+		echo "The following error occured while downloading the snort rules file from snort.org:<p>";
+		echo $contents;
+		echo "&nbsp;<p>";
+		echo "</div></center>";
+		scroll_down_to_bottom_of_page();
+		exit;
+	}
+}
+
+function scroll_down_to_bottom_of_page() {
+	echo "\n<script type=\"text/javascript\">parent.scrollTo(0,1500);\n</script>";
+}
+
+function verify_downloaded_file($filename) {
+	update_all_status("Checking {$filename}...");
+	check_for_common_errors($filename);
+	update_all_status("Verifying {$filename}...");
+	if(!file_exists($filename)) {
+		update_all_status("Could not fetch snort rules ({$filename}).  Check oinkid key and dns and try again.");
+		hide_progress_bar_status();
+		exit;
+	}
+	update_all_status("Verifyied {$filename}.");
+}
 
 function extract_snort_rules_md5($tmpfname) {
 	$static_output = gettext("Extracting snort rules...");
