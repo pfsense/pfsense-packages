@@ -43,6 +43,15 @@ include("head.inc");
 
 <form action="snort_download_rules.php" method="post">
 <div id="inputerrors"></div>
+
+<?php
+	if(!$_GET['start'] && !$_POST['start']) {
+		echo "Press <a href='snort_download_rules.php?start=yes'>here</a> to start download.<br>";
+		include("fend.inc");
+		exit;
+	}
+?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td>
@@ -97,6 +106,8 @@ if(!$oinkid) {
 	hide_progress_bar_status();
 	exit;
 }
+
+ob_flush();
 
 /* setup some variables */
 $snort_filename = "snortrules-snapshot-CURRENT.tar.gz";
