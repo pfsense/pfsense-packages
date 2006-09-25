@@ -60,21 +60,51 @@ function generate_snort_conf() {
 	global $config, $g, $config;
 
 	/* obtain external interface */
+	/* XXX: make multi wan friendly */
 	$snort_ext_int = $config['installedpackages']['snort']['config'][0]['interface_array'][0];
 
-	/* calculate lan subnet information */
-	$ifcfg = &$config['interfaces']['lan'];
-	$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
-	$subnetmask = gen_subnet_mask($ifcfg['subnet']);
+	/* open snort2c's whitelist for writing */
+	$whitelist = fopen("/var/db/whitelist", "w");
+	if(!$whitelist) {
+		log_error("Could not open /var/db/whitelist for writing.");
+		exit;
+	}
 
-	/* XXX: set SSH port from config variable */
-	$ssh_port = "22";
-	$home_net = "{$subnet}/{$ifcfg['subnet']}";
-	/* XXX: add home net for all interfaces */
+	/* build an interface array list */
+	$int_array = array('lan');
+	for ($j = 1; isset ($config['interfaces']['opt' . $j]); $j++)
+		if(isset($config['interfaces']['opt' . $j]['enable']))
+			if(!$config['interfaces']['opt' . $j]['gateway'])
+				$int_array[] = "opt{$j}";
 
-	/* XXX: generate rule section */
+	/* if user has defined a custom ssh port, use it */
+	if($config['system']['ssh']['port'])
+		$ssh_port = $config['system']['ssh']['port'];
+	else
+		$ssh_port = "22";
+
+	/* iterate through interface list and write out whitelist items
+	 * and also compile a home_net list for snort.
+	 */
+	foreach($int_array as $int) {
+		/* calculate interface subnet information */
+		$ifcfg = &$config['interfaces'][$int];
+		$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
+		$subnetmask = gen_subnet_mask($ifcfg['subnet']);
+		$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
+	}
+
+	/* write out whitelist */
+	fwrite($whitelist, $home_net);
+
+	/* close file */
+	fclose($whitelist);
+
+	/* XXX: generate rule section dynamically from config.xml information
+	 */
 	$selected_rules_sections = "";
 
+	/* build snort configuration file */
 	$snort_conf = <<<EOD
 
 var AIM_SERVERS [64.12.24.0/24,64.12.25.0/24,64.12.26.14/24,64.12.28.0/24,64.12.29.0/24,64.12.161.0/24,64.12.163.0/24,205.188.5.0/24,205.188.9.0/24]
