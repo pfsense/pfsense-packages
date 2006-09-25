@@ -48,7 +48,9 @@ function sync_package_snort() {
 function generate_snort_conf() {
 	global $config, $g;
 
-	$ssh_port = "";
+	/* XXX: set SSH port from config variable */
+	$ssh_port = "22";
+	/* XXX: generate home net */
 	$home_net = "";
 
 	/* XXX: generate rule section */
