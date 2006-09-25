@@ -44,6 +44,13 @@ function sync_package_snort() {
 			"stop" => "/usr/bin/killall snort; killall snort2c"
 		)
 	);
+
+	create_snort_conf();
+
+	start_service("snort");
+}
+
+function create_snort_conf() {
 	/* write out snort.conf */
 	$snort_conf = generate_snort_conf();
 	$conf = fopen("/usr/local/etc/snort/snort.conf","w");
@@ -53,7 +60,6 @@ function sync_package_snort() {
 	}
 	fwrite($conf, $snort_conf);
 	fclose($conf);
-	start_service("snort");
 }
 
 function generate_snort_conf() {
@@ -103,6 +109,12 @@ function generate_snort_conf() {
 	/* XXX: generate rule section dynamically from config.xml information
 	 */
 	$selected_rules_sections = "";
+	$enabled_rulesets = $config['installedpackages']['snort']['config'][0]['rulesets'];
+	if($enabled_rulesets)
+		$enabled_rulesets_array = split("\|\|", $enabled_rulesets);
+
+	foreach($enabled_rulesets_array as $enabled_item)
+		$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
 
 	/* build snort configuration file */
 	$snort_conf = <<<EOD
@@ -195,111 +207,7 @@ include classification.config
 include reference.config
 
 #Rulesets, all optional
-
 {$selected_rules_sections}
-
-# XXX: axe below, use $selected_rules_sections
-
-#General
-#include \$RULE_PATH/bleeding.rules
-include \$RULE_PATH/ftp.rules
-include \$RULE_PATH/telnet.rules
-include \$RULE_PATH/dns.rules
-include \$RULE_PATH/tftp.rules
-include \$RULE_PATH/x11.rules
-include \$RULE_PATH/misc.rules
-include \$RULE_PATH/nntp.rules
-include \$RULE_PATH/other-ids.rules
-# include $RULE_PATH/shellcode.rules
-#include \$RULE_PATH/community-ftp.rules
-#include \$RULE_PATH/community-misc.rules
-
-#Mostly Spyware
-#include \$RULE_PATH/bleeding-malware.rules
-
-#Network issues
-include \$RULE_PATH/bad-traffic.rules
-include \$RULE_PATH/snmp.rules
-
-#Exploits and direct attacks
-include \$RULE_PATH/exploit.rules
-
-#Scans and recon
-include \$RULE_PATH/scan.rules
-#include \$RULE_PATH/bleeding-scan.rules
-
-#Unusual stuff
-include \$RULE_PATH/finger.rules
-
-#R-services, etc
-include \$RULE_PATH/rpc.rules
-include \$RULE_PATH/rservices.rules
-
-#DOS
-include \$RULE_PATH/dos.rules
-include \$RULE_PATH/ddos.rules
-#include \$RULE_PATH/bleeding-dos.rules
-
-#Web issues
-include \$RULE_PATH/web-cgi.rules
-include \$RULE_PATH/web-coldfusion.rules
-include \$RULE_PATH/web-iis.rules
-include \$RULE_PATH/web-frontpage.rules
-include \$RULE_PATH/web-misc.rules
-include \$RULE_PATH/web-client.rules
-include \$RULE_PATH/web-php.rules
-include \$RULE_PATH/web-attacks.rules
-#include \$RULE_PATH/bleeding-web.rules
-#include \$RULE_PATH/community-web-cgi.rules
-#include \$RULE_PATH/community-web-client.rules
-#include \$RULE_PATH/community-web-dos.rules
-#include \$RULE_PATH/community-web-misc.rules
-
-#SQL and DB sigs
-include \$RULE_PATH/sql.rules
-include \$RULE_PATH/oracle.rules
-include \$RULE_PATH/mysql.rules
-#include \$RULE_PATH/community-sql-injection.rules
-
-#Informational stuff
-#include $RULE_PATH/icmp.rules
-include \$RULE_PATH/info.rules
-# include $RULE_PATH/icmp-info.rules
-
-#Windows stuff
-include \$RULE_PATH/netbios.rules
-
-#Compromise responses
-include \$RULE_PATH/attack-responses.rules
-#include \$RULE_PATH/bleeding-attack_response.rules
-
-#Mail sigs
-include \$RULE_PATH/smtp.rules
-include \$RULE_PATH/imap.rules
-include \$RULE_PATH/pop2.rules
-include \$RULE_PATH/pop3.rules
-#include \$RULE_PATH/community-mail-client.rules
-
-#Trojans, Viruses, and spyware
-include \$RULE_PATH/backdoor.rules
-include \$RULE_PATH/virus.rules
-#include \$RULE_PATH/bleeding-virus.rules
-#include \$RULE_PATH/community-virus.rules
-
-#Policy Sigs
-include \$RULE_PATH/policy.rules
-include \$RULE_PATH/porn.rules
-include \$RULE_PATH/chat.rules
-include \$RULE_PATH/p2p.rules
-include \$RULE_PATH/multimedia.rules
-#include \$RULE_PATH/bleeding-policy.rules
-#include \$RULE_PATH/bleeding-p2p.rules
-#include \$RULE_PATH/bleeding-inappropriate.rules
-#include \$RULE_PATH/community-game.rules
-#include \$RULE_PATH/community-inappropriate.rules
-
-#Experimental
-include \$RULE_PATH/experimental.rules
 
 EOD;
 
