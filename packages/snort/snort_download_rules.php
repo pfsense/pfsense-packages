@@ -49,7 +49,7 @@ include("head.inc");
 <?php
 	$tab_array = array();
 	$tab_array[0] = array(gettext("Snort Settings"), false, "pkg.php?xml=snort.xml");
-	$tab_array[0] = array(gettext("Snort Rules Update"), false, "/usr/local/www/snort_download_rules.php");
+	$tab_array[1] = array(gettext("Snort Rules Update"), true, "/usr/local/www/snort_download_rules.php");
 	display_top_tabs($tab_array);
 ?>
     </td>
@@ -100,12 +100,13 @@ if(!$oinkid) {
 
 /* setup some variables */
 $snort_filename = "snortrules-snapshot-CURRENT.tar.gz";
+$snort_filename_md5 = "snortrules-snapshot-CURRENT.tar.gz.md5";
 $dl = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}";
-$dl_md5 = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}.md5";
+$dl_md5 = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}";
 
 /* multi user system, request new filename and create directory */
 $tmpfname = tempnam("/tmp", "snortRules");
-exec("rm -rf {$tmpfname}; mkdir -p {$tmpfname}");
+exec("/bin/rm -rf {$tmpfname};/bin/mkdir -p {$tmpfname}");
 
 /* download snort rules */
 $static_output = gettext("Downloading current snort rules... ");
@@ -116,8 +117,8 @@ verify_downloaded_file($tmpfname . "/{$snort_filename}");
 /* download snort rules md5 file */
 $static_output = gettext("Downloading current snort rules md5... ");
 update_all_status($static_output);
-download_file_with_progress_bar($dl_md5, $tmpfname . "/{$snort_filename}.md5");
-verify_downloaded_file($tmpfname . "/{$snort_filename}.md5");
+download_file_with_progress_bar($dl_md5, $tmpfname . "/{$snort_filename_md5}");
+verify_downloaded_file($tmpfname . "/{$snort_filename_md5}");
 
 /* verify downloaded rules signature */
 verify_snort_rules_md5($tmpfname);
@@ -129,7 +130,7 @@ $static_output = gettext("Your snort rules are now up to date.");
 update_all_status($static_output);
 
 /* cleanup temporary directory */
-exec("rm -rf {$tmpfname};");
+exec("/bin/rm -rf {$tmpfname};");
 
 /* hide progress bar and lets end this party */
 hide_progress_bar_status();
@@ -142,7 +143,7 @@ hide_progress_bar_status();
 <?php
 
 function check_for_common_errors($filename) {
-	global $snort_filename;
+	global $snort_filename, $snort_filename_md5;
 	$contents = file_get_contents($filename);
 	if(stristr($contents, "You don't have permission")) {
 		update_all_status("An error occured.  Scroll down to inspect it's contents.");
@@ -164,7 +165,7 @@ function scroll_down_to_bottom_of_page() {
 }
 
 function verify_downloaded_file($filename) {
-	global $snort_filename;
+	global $snort_filename, $snort_filename_md5;
 	if(filesize($filename)<1500) {
 		update_all_status("Checking {$filename}...");
 		check_for_common_errors($filename);
@@ -179,20 +180,20 @@ function verify_downloaded_file($filename) {
 }
 
 function extract_snort_rules_md5($tmpfname) {
-	global $snort_filename;
+	global $snort_filename, $snort_filename_md5;
 	$static_output = gettext("Extracting snort rules...");
 	update_all_status($static_output);
-	exec("tar xzf {$tmpfname}/{$snort_filename} -C /usr/local/etc/snort/");
+	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C /usr/local/etc/snort/");
 	$static_output = gettext("Snort rules extracted.");
 	update_all_status($static_output);
 }
 
 function verify_snort_rules_md5($tmpfname) {
-	global $snort_filename;
+	global $snort_filename, $snort_filename_md5;
 	$static_output = gettext("Verifying md5 signature...");
 	update_all_status($static_output);
-	$md5 = file_get_contents("{$tmpfname}/{$snort_filename}.md5");
-	$file_md5_ondisk = `md5 {$tmpfname}/{$snort_filename} | awk '{ print $4 }'`;
+	$md5 = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
+	$file_md5_ondisk = `/sbin/md5 {$tmpfname}/{$snort_filename} | /usr/bin/awk '{ print $4 }'`;
 	if($md5 <> $file_md5_ondisk) {
 		$static_output = gettext("md5 signature of rules mismatch.");
 		update_all_status($static_output);
@@ -202,10 +203,12 @@ function verify_snort_rules_md5($tmpfname) {
 }
 
 function hide_progress_bar_status() {
+	global $snort_filename, $snort_filename_md5;
 	echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='hidden';\n</script>";
 }
 
 function update_all_status($status) {
+	global $snort_filename, $snort_filename_md5;
 	update_status($status);
 	update_output_window($status);
 }
