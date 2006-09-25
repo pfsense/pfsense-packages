@@ -19,6 +19,7 @@
 		<rcfile>snort.sh</rcfile>
 		<executable>snort</executable>
 	</service>
+	<include_file>/usr/local/pkg/snort.xml</include_file>
 	<tabs>
 		<tab>
 			<text>Snort Settings</text>
@@ -47,39 +48,7 @@
 		<rcfile>snort.sh</rcfile>
 		<executable>snort</executable>
 	</service>
-	<custom_php_global_functions>
-		function sync_package_snort() {
-			$first = 0;
-			/* if list */
-			$iflist = array("lan" => "LAN");
-			for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
-				$iflist['opt' . $i] = "opt{$i}";
-			$whitelist = fopen("/var/db/whitelist","w");
-			if(!$whitelist)
-				die "Cannot open whitelist for /var/db/writing.";
-			foreach($iflist as $if) {
-				/* XXX: write out if subnet */
-			}
-			fclose($whitelist);
-			foreach($_POST['interface_array'] as $iface) {
-				$if = convert_friendly_interface_to_real_interface_name($iface);
-				if($if) {
-					$ifaces_final .= " -i " . $if;
-					$first = 1;
-				}
-			}
-			$start  = "snort -c /usr/local/etc/snort/rules/snort.conf -l /var/log/snort " . $ifaces_final . " -D";
-			$start .= ";snort2c -s -w /var/db/whitelist -a /var/log/snort/alert";
-			write_rcfile(array(
-					"file" => "snort.sh",
-					"start" => $start,
-					"stop" => "/usr/bin/killall snort; killall snort2c"
-				)
-			);
-			start_service("snort");
-		}
-	</custom_php_global_functions>
-		<custom_add_php_command>
+	<custom_add_php_command>
         	sync_package_snort();
 	</custom_add_php_command>
 	<custom_php_resync_command>
