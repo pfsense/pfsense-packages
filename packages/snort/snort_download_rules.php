@@ -39,14 +39,13 @@ include("head.inc");
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle"><?=$pgtitle?></p>
 
 <form action="snort_download_rules.php" method="post">
 <div id="inputerrors"></div>
 
 <?php
 	if(!$_GET['start'] && !$_POST['start']) {
-		echo "Press <a href='snort_download_rules.php?start=yes'>here</a> to start download.<br>";
+		echo "Press <a href='snort_download_rules.php?start=yes'>here</a> to start download.<br />";
 		include("fend.inc");
 		exit;
 	}
@@ -162,12 +161,20 @@ function check_for_common_errors($filename) {
 	if(stristr($contents, "You don't have permission")) {
 		update_all_status("An error occured.  Scroll down to inspect it's contents.");
 		hide_progress_bar_status();
-		echo "<center><div id='error' style='background:white;width:90%'>";
-		echo "&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>";
-		echo "The following error occured while downloading the snort rules file from snort.org:<p>";
-		echo $contents;
-		echo "&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>&nbsp;<p>";
-		echo "</div></center>";
+		echo "
+      <center>
+        <div id='error' style='background:white;width:90%'>
+        <!-- TODO: The below paragraphs are kind of stupid. Use CSS instead -->
+        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+        <p>The following error occured while downloading the snort rules file from snort.org:</p>
+		    {$contents}
+        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+		    </div>
+      </center>
+    ";
 		scroll_down_to_bottom_of_page();
 		exit;
 	}

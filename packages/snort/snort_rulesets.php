@@ -56,10 +56,8 @@ include("head.inc");
 
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle"><?=$pgtitle?></font></p>
-<form action="snort_rulesets.php" method="post" name="iform">
-<script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
-<script src="/javascript/scriptaculous/scriptaculous.js" type="text/javascript"></script>
+
+<form action="snort_rulesets.php" method="post" name="iform" id="iform">
 <script src="/row_toggle.js" type="text/javascript"></script>
 <script src="/javascript/sorttable.js" type="text/javascript"></script>
 <?php if ($savemsg) print_info_box($savemsg); ?>
@@ -78,10 +76,10 @@ include("head.inc");
   <tr>
     <td>
 		<div id="mainarea">
-			<table id="maintable" name="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+			<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td>
-						<table id="sortabletable1" name="sortabletable1" class="sortable" width="100%" border="0" cellpadding="0" cellspacing="0">
+						<table id="sortabletable1" class="sortable" width="100%" border="0" cellpadding="0" cellspacing="0">
 						    <tr id="frheader">
 								<td width="5%" class="listhdrr">Enabled</td>
 								<td class="listhdrr">Ruleset</td>
@@ -90,23 +88,30 @@ include("head.inc");
 <?php
 	$dir = "/usr/local/etc/snort/rules/";
 	$dh  = opendir($dir);
-	while (false !== ($filename = readdir($dh)))
+	while (false !== ($filename = readdir($dh))) {
    		$files[] = $filename;
+	}
 	sort($files);
 	foreach($files as $file) {
 		if(!stristr($file, ".rules"))
 			continue;
 		echo "<tr>";
-		if(in_array($file, $enabled_rulesets_array))
-			$CHECKED = " CHECKED";
-		else
+		echo "<td align=\"center\" valign=\"top\">";
+		if(in_array($file, $enabled_rulesets_array)) {
+			$CHECKED = " checked=\"checked\"";
+		} else {
 			$CHECKED = "";
-		echo "<td align=\"center\" valign=\"top\"><input type='checkbox' name='toenable[]' value='$file'{$CHECKED}></td>";
-		echo "<td>{$file}</td>";
+		}
+		echo "	<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />";
+		echo "</td>";
+		echo "<td>";
+		echo "{$file}";
+		echo "</td>";
 		//echo "<td>";
 		//echo "description";
 		//echo "</td>";
 	}
+
 ?>
 						</table>
 		    		</td>
@@ -114,7 +119,7 @@ include("head.inc");
 		  		<tr><td>&nbsp;</td></tr>
 		  		<tr><td>Check the rulesets that you would like Snort to load at startup.</td></tr>
 		  		<tr><td>&nbsp;</td></tr>
-		  		<tr><td><input value="Save" type="submit"></td></tr>
+		  		<tr><td><input value="Save" type="submit" name="save" id="save" /></td></tr>
 			</table>
 		</div>
 	</td>
@@ -122,8 +127,6 @@ include("head.inc");
 </table>
 
 </form>
-
-<br>
 
 <?php include("fend.inc"); ?>
 
