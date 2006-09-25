@@ -1,6 +1,7 @@
 <?php
 
 function sync_package_snort() {
+	exec("mkdir -p /usr/local/etc/snort");
 	$first = 0;
 	/* if list */
 	$iflist = array("lan" => "LAN");
@@ -31,13 +32,6 @@ function sync_package_snort() {
 		)
 	);
 	start_service("snort");
-}
-
-function download_latest_rules() {
-	$oinkid = "";
-	$dl = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-CURRENT.tar.gz";
-	$dl_md5 = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-CURRENT.tar.gz.md5";
-
 }
 
 ?>

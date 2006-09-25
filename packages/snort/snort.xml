@@ -14,6 +14,11 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/bin/snort2c</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/snort_download_rules.php</item>
+	</additional_files_needed>
 	<service>
 		<name>snort</name>
 		<rcfile>snort.sh</rcfile>
