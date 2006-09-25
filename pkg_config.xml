@@ -15,6 +15,17 @@
       <configurationfile>nmap.xml</configurationfile>
     </package>
     <package>
+      <name>snort</name>
+      <descr>Snort is a libpcap-based packet sniffer/logger which can be used as a lightweight network intrusion detection system. It features rules based logging and can perform content searching/matching in addition to being used to detect a variety of other attacks and probes, such as buffer overflows, stealth port scans, CGI attacks, SMB probes, and much more. Snort has a real-time alerting capability, with alerts being sent to syslog, a separate "alert" file, or even to a Windows computer via Samba.</descr>
+      <category>Security</category>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package>snort-2.6.0.2.tbz</depends_on_package>
+      <config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
+      <version>2.6.0.2</version>
+      <required_version>HEAD</required_version>
+      <configurationfile>snort.xml</configurationfile>
+    </package>
+    <package>
       <name>miniupnpd</name>
       <descr>Emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP Internet
       Gateway Device specification (IGD) and allows UPnP aware clients, such as MSN Messenger to
