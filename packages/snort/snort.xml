@@ -24,7 +24,7 @@
 		<rcfile>snort.sh</rcfile>
 		<executable>snort</executable>
 	</service>
-	<include_file>/usr/local/pkg/snort.xml</include_file>
+	<include_file>/usr/local/pkg/snort.inc</include_file>
 	<tabs>
 		<tab>
 			<text>Snort Settings</text>
