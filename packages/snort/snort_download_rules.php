@@ -128,7 +128,7 @@ $static_output = gettext("Your snort rules are now up to date.");
 update_all_status($static_output);
 
 /* cleanup temporary directory */
-//exec("rm -rf {$tmpfname};");
+exec("rm -rf {$tmpfname};");
 
 /* hide progress bar and lets end this party */
 hide_progress_bar_status();
@@ -161,8 +161,10 @@ function scroll_down_to_bottom_of_page() {
 }
 
 function verify_downloaded_file($filename) {
-	update_all_status("Checking {$filename}...");
-	check_for_common_errors($filename);
+	if(filesize($filename)<1500) {
+		update_all_status("Checking {$filename}...");
+		check_for_common_errors($filename);
+	}
 	update_all_status("Verifying {$filename}...");
 	if(!file_exists($filename)) {
 		update_all_status("Could not fetch snort rules ({$filename}).  Check oinkid key and dns and try again.");
