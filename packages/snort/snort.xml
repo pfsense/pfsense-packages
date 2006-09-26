@@ -102,6 +102,12 @@
 			<type>input</type>
 			<size>60</size>
 		</field>
+		<field>
+			<fielddescr>Block offenders</fielddescr>
+			<fieldname>blockoffenders</fieldname>
+			<type>checkbox</type>
+			<size>60</size>
+		</field>
     </fields>
 	<service>
 		<name>snort</name>

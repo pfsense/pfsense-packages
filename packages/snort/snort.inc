@@ -56,9 +56,17 @@ function sync_package_snort() {
 			$first = 1;
 		}
 	}
+
+	/* create log directory */
 	$start  = "/bin/mkdir -p /var/log/snort";
-	$start .= ";snort -c {$snort_conf_file} -l /var/log/snort " . $ifaces_final . " -D";
-	$start .= ";snort2c -s -w /var/db/whitelist -a /var/log/snort/alert";
+
+	/* start snort */
+	$start .= ";snort -c {$snort_conf_file} -l /var/log/snort {$ifaces_final} -D";
+
+	/* if block offenders is checked, start snort2c */
+	if($_POST['blockoffenders'])
+		$start .= ";snort2c -s -w /var/db/whitelist -a /var/log/snort/alert";
+
 	write_rcfile(array(
 			"file" => "snort.sh",
 			"start" => $start,
