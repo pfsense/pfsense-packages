@@ -67,7 +67,7 @@ function sync_package_snort() {
 
 	/* if block offenders is checked, start snort2c */
 	if($_POST['blockoffenders'])
-		$start .= ";snort2c -w /var/db/whitelist -a /var/log/snort/alert";
+		$start .= ";sleep 1;snort2c -w /var/db/whitelist -a /var/log/snort/alert";
 
 	write_rcfile(array(
 			"file" => "snort.sh",

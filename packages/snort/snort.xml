@@ -74,6 +74,10 @@
 			<type>select</type>
 			<options>
 				<option>
+					<value>lowmem</value>
+					<name>lowmem</name>
+				</option>
+				<option>
 					<value>ac-std</value>
 					<name>ac-std</name>
 				</option>
@@ -97,10 +101,6 @@
 				<option>
 					<value>acs</value>
 					<name>acs</name>
-				</option>
-				<option>
-					<value>lowmem</value>
-					<name>lowmem</name>
 				</option>
 			</options>
 		</field>
