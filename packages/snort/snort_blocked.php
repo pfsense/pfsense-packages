@@ -108,6 +108,9 @@ include("head.inc");
 
 </form>
 
+<p>
+
+This page lists hosts that have been blocked by Snort.   Hosts are automatically deleted every 60 minutes.
 <?php include("fend.inc"); ?>
 
 </body>
