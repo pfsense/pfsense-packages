@@ -49,7 +49,7 @@ function sync_package_snort() {
 	$iflist = array("lan" => "LAN");
 	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
 		$iflist['opt' . $i] = "opt{$i}";
-	foreach($_POST['interface_array'] as $iface) {
+	foreach($_POST['iface_array'] as $iface) {
 		$if = convert_friendly_interface_to_real_interface_name($iface);
 		if($if) {
 			$ifaces_final .= " -i " . $if;
@@ -98,7 +98,7 @@ function generate_snort_conf() {
 	global $config, $g, $snort_conf_file;
 	/* obtain external interface */
 	/* XXX: make multi wan friendly */
-	$snort_ext_int = $config['installedpackages']['snort']['config'][0]['interface_array'][0];
+	$snort_ext_int = $config['installedpackages']['snort']['config'][0]['iface_array'][0];
 
 	/* set the snort performance model */
 	if($config['installedpackages']['snort']['config'][0]['performance'])
