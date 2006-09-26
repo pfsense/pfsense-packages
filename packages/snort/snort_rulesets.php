@@ -134,6 +134,8 @@ include("head.inc");
 
 </form>
 
+<p><b>NOTE:</b> You can click on a ruleset name to load the file in the pfSense text editor in a new window/tab.
+
 <?php include("fend.inc"); ?>
 
 </body>
