@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Services: Snort</title>
 	<name>Snort</name>
-	<version>3.0</version>
+	<version>2.6.0.2</version>
 	<menu>
 		<name>Snort</name>
 		<tooltiptext>Setup snort specific settings</tooltiptext>
