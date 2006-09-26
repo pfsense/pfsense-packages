@@ -61,7 +61,7 @@ function sync_package_snort() {
 	$start  = "/bin/mkdir -p /var/log/snort";
 
 	/* start snort */
-	$start .= ";snort -c {$snort_conf_file} -l /var/log/snort {$ifaces_final} -D";
+	$start .= ";snort -c {$snort_conf_file} -l /var/log/snort {$ifaces_final} -A full -D";
 
 	/* if block offenders is checked, start snort2c */
 	if($_POST['blockoffenders'])
