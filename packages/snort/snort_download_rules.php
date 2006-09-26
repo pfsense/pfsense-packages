@@ -45,27 +45,29 @@ include("head.inc");
 <form action="snort_download_rules.php" method="post">
 <div id="inputerrors"></div>
 
-<?php
-	if(!$_GET['start'] && !$_POST['start']) {
-		echo "Press <a href='snort_download_rules.php?start=yes'>here</a> to start download.<br />";
-		include("fend.inc");
-		exit;
-	}
-?>
-
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td>
 <?php
 	$tab_array = array();
-	$tab_array[0] = array(gettext("Snort Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
-	$tab_array[1] = array(gettext("Snort Rules Update"), true, "/snort_download_rules.php");
-	$tab_array[2] = array(gettext("Snort Rulesets"), false, "/snort_rulesets.php");
-	$tab_array[3] = array(gettext("Snort Blocked"), false, "/snort_blocked.php");
+	$tab_array[] = array(gettext("Snort Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
+	$tab_array[] = array(gettext("Snort Rules Update"), true, "/snort_download_rules.php");
+	$tab_array[] = array(gettext("Snort Rulesets"), false, "/snort_rulesets.php");
+	$tab_array[] = array(gettext("Snort Blocked"), false, "/snort_blocked.php");
 	display_top_tabs($tab_array);
 ?>
     </td>
   </tr>
+<?php
+	if(!$_GET['start'] && !$_POST['start']) {
+		echo "<tr><td>&nbsp;</td></tr>";
+		echo "<tr><td colspan='2'>Press <a href='snort_download_rules.php?start=yes'>here</a> to start download.</td></tr>";
+		echo "<tr><td>&nbsp;</td></tr>";
+		echo "</table>";
+		include("fend.inc");
+		exit;
+	}
+?>
 	<tr>
 	  <td>
 	      <div id="mainarea">

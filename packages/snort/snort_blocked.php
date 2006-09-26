@@ -57,10 +57,10 @@ include("head.inc");
    		<td>
 <?php
 	$tab_array = array();
-	$tab_array[0] = array(gettext("Snort Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
-	$tab_array[1] = array(gettext("Snort Rules Update"), false, "/snort_download_rules.php");
-	$tab_array[2] = array(gettext("Snort Rulesets"), false, "/snort_rulesets.php");
-	$tab_array[3] = array(gettext("Snort Blocked"), true, "/snort_blocked.php");
+	$tab_array[] = array(gettext("Snort Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
+	$tab_array[] = array(gettext("Snort Rules Update"), false, "/snort_download_rules.php");
+	$tab_array[] = array(gettext("Snort Rulesets"), false, "/snort_rulesets.php");
+	$tab_array[] = array(gettext("Snort Blocked"), true, "/snort_blocked.php");
 	display_top_tabs($tab_array);
 ?>
   		</td>
