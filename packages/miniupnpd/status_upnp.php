@@ -31,6 +31,17 @@
 
 require("guiconfig.inc");
 
+if ($_POST) {
+	if ($_POST['clear'] == "Clear") {
+		// stop
+		mwexec("/bin/sh /usr/local/etc/rc.d/miniupnpd.sh stop");
+		usleep(300);
+		// start
+		mwexec("/bin/sh /usr/local/etc/rc.d/miniupnpd.sh start");
+		$savemsg = "Rules have been cleared and the daemon restarted";
+	}
+}
+
 $rdr_entries = array();
 exec("/sbin/pfctl -aminiupnpd -sn", $rdr_entries, $pf_ret);
 
@@ -48,12 +59,21 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle"><?=$pgtitle?></font></p>
+<?php if ($savemsg) print_info_box($savemsg); ?>
+
+<div id="mainlevel">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr>
-    <td>
-	<div id="mainarea">
-      <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-        <tr>
+   <tr>
+     <td class="tabcont" >
+      <form action="status_upnp.php" method="post">
+      <b><input type="submit" name="clear" id="clear" value="Clear" /></b>
+    </form>
+    </td>
+   </tr>
+   <tr>
+    <td class="tabcont" >
+      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+	<tr>
           <td width="10%" class="listhdrr"><?=gettext("Port")?></td>
           <td width="10%" class="listhdrr"><?=gettext("Protocol")?></td>
           <td width="20%" class="listhdrr"><?=gettext("Internal IP")?></td>
@@ -82,9 +102,10 @@ include("head.inc");
         </tr>
         <?php $i++; }?>
       </table>
-	</div>
-	</table>
-
+     </td>
+    </tr>
+</table>
+</div>
 <?php include("fend.inc"); ?>
 </body>
 </html>
