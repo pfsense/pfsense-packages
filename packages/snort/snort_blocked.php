@@ -80,15 +80,21 @@ include("head.inc");
 
 	$ips = `/sbin/pfctl -t snort2c -T show`;
 	$ips_array = split("\n", $ips);
+	$counter = 0;
 	foreach($ips_array as $ip) {
 		if(!$ip)
 			continue;
+		$counter++;
 		echo "<tr>";
 		echo "<td align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . urlencode($ip) . "'>'";
 		echo "<img title=\"Delete\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>";
 		echo "<td>{$ip}</td>";
 		echo "</tr>";
 	}
+	if($counter < 1)
+		echo "<tr><td colspan='2' align=\"center\" valign=\"top\">There are currently no items being blocked by snort.</td></tr>";
+	else
+		echo "<tr><td colspan='2' align=\"center\" valign=\"top\">{$counter} items listed.</td></tr>";
 
 ?>
 						</table>
