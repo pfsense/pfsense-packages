@@ -29,6 +29,11 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_rulesets.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/snort_blocked.php</item>
+	</additional_files_needed>
 	<service>
 		<name>snort</name>
 		<rcfile>snort.sh</rcfile>
@@ -48,6 +53,10 @@
 		<tab>
 			<text>Snort Rulesets</text>
 			<url>/snort_rulesets.php</url>
+		</tab>
+		<tab>
+			<text>Snort Blocked</text>
+			<url>/snort_blocked.php</url>
 		</tab>
 	</tabs>
 	<fields>

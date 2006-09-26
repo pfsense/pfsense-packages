@@ -1,7 +1,7 @@
 <?php
 /* $Id$ */
 /*
-	snort_rulesets.php
+	snort_blocked.php
 	Copyright (C) 2006 Scott Ullrich
 	All rights reserved.
 
@@ -30,24 +30,13 @@
 require("guiconfig.inc");
 require("/usr/local/pkg/snort.inc");
 
-if($_POST) {
-	$enabled_items = "";
-	$isfirst = true;
-	foreach($_POST['toenable'] as $toenable) {
-		if(!$isfirst)
-			$enabled_items .= "||";
-		$enabled_items .= "{$toenable}";
-		$isfirst = false;
-	}
-	$config['installedpackages']['snort']['config'][0]['rulesets'] = $enabled_items;
-	write_config();
-	create_snort_conf();
-	$savemsg = "The snort ruleset selections have been saved.";
+if($_POST['todelete'] or $_GET['todelete']) {
+	if($_POST['todelete'])
+		$ip = $_POST['todelete'];
+	if($_GET['todelete'])
+		$ip = $_GET['todelete'];
+	exec("pfctl -t snort2c -T delete {$ip}");
 }
-
-$enabled_rulesets = $config['installedpackages']['snort']['config'][0]['rulesets'];
-if($enabled_rulesets)
-	$enabled_rulesets_array = split("\|\|", $enabled_rulesets);
 
 $pgtitle = "Snort: Snort Rulesets";
 include("head.inc");
@@ -70,8 +59,8 @@ include("head.inc");
 	$tab_array = array();
 	$tab_array[0] = array(gettext("Snort Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
 	$tab_array[1] = array(gettext("Snort Rules Update"), false, "/snort_download_rules.php");
-	$tab_array[2] = array(gettext("Snort Rulesets"), true, "/snort_rulesets.php");
-	$tab_array[2] = array(gettext("Snort Blocked"), false, "/snort_blocked.php");
+	$tab_array[2] = array(gettext("Snort Rulesets"), false, "/snort_rulesets.php");
+	$tab_array[2] = array(gettext("Snort Blocked"), true, "/snort_blocked.php");
 	display_top_tabs($tab_array);
 ?>
   		</td>
@@ -84,48 +73,27 @@ include("head.inc");
 					<td>
 						<table id="sortabletable1" class="sortable" width="100%" border="0" cellpadding="0" cellspacing="0">
 						    <tr id="frheader">
-								<td width="5%" class="listhdrr">Enabled</td>
-								<td class="listhdrr">Ruleset</td>
-								<!-- <td class="listhdrr">Description</td> -->
+								<td width="5%" class="listhdrr">Remove</td>
+								<td class="listhdrr">IP</td>
 							</tr>
 <?php
-	$dir = "/usr/local/etc/snort/rules/";
-	$dh  = opendir($dir);
-	while (false !== ($filename = readdir($dh))) {
-   		$files[] = $filename;
-	}
-	sort($files);
-	foreach($files as $file) {
-		if(!stristr($file, ".rules"))
+
+	$ips = `/sbin/pfctl -t snort2c -T show`;
+	$ips_array = split("\n", $ips);
+	foreach($ips_array as $ip) {
+		if(!$ip)
 			continue;
 		echo "<tr>";
-		echo "<td align=\"center\" valign=\"top\">";
-		if(is_array($enabled_rulesets_array))
-			if(in_array($file, $enabled_rulesets_array)) {
-				$CHECKED = " checked=\"checked\"";
-			} else {
-				$CHECKED = "";
-			}
-		else
-			$CHECKED = "";
-		echo "	<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />";
-		echo "</td>";
-		echo "<td>";
-		echo "{$file}";
-		echo "</td>";
-		//echo "<td>";
-		//echo "description";
-		//echo "</td>";
+		echo "<td align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . urlencode($ip) . "'>'";
+		echo "<img title=\"Delete\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>";
+		echo "<td>{$ip}</td>";
+		echo "</tr>";
 	}
 
 ?>
 						</table>
 		    		</td>
 		  		</tr>
-		  		<tr><td>&nbsp;</td></tr>
-		  		<tr><td>Check the rulesets that you would like Snort to load at startup.</td></tr>
-		  		<tr><td>&nbsp;</td></tr>
-		  		<tr><td><input value="Save" type="submit" name="save" id="save" /></td></tr>
 			</table>
 		</div>
 	</td>
@@ -138,12 +106,3 @@ include("head.inc");
 
 </body>
 </html>
-
-<?php
-
-	function get_snort_rule_file_description($filename) {
-		$filetext = file_get_contents($filename);
-
-	}
-
-?>
