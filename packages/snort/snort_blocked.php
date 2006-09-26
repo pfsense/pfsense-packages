@@ -86,7 +86,7 @@ include("head.inc");
 			continue;
 		$counter++;
 		echo "<tr>";
-		echo "<td align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . urlencode($ip) . "'>";
+		echo "<td align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($ip)) . "'>";
 		echo "<img title=\"Delete\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>";
 		echo "<td>&nbsp;{$ip}</td>";
 		echo "</tr>";
