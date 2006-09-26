@@ -99,11 +99,14 @@ include("head.inc");
 			continue;
 		echo "<tr>";
 		echo "<td align=\"center\" valign=\"top\">";
-		if(in_array($file, $enabled_rulesets_array)) {
-			$CHECKED = " checked=\"checked\"";
-		} else {
+		if(is_array($enabled_rulesets_array))
+			if(in_array($file, $enabled_rulesets_array)) {
+				$CHECKED = " checked=\"checked\"";
+			} else {
+				$CHECKED = "";
+			}
+		else
 			$CHECKED = "";
-		}
 		echo "	<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />";
 		echo "</td>";
 		echo "<td>";
