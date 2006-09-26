@@ -111,7 +111,7 @@ include("head.inc");
 		echo "	<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />";
 		echo "</td>";
 		echo "<td>";
-		echo "<a target='_new' href='edit.php?submit=Load&savetopath=" . urlencode($file) . "'>{$file}</a>";
+		echo "<a target='_new' href='edit.php?submit=Load&savetopath=" . urlencode("/usr/local/etc/snort/rules/") . urlencode($file) . "'>{$file}</a>";
 		echo "</td>";
 		//echo "<td>";
 		//echo "description";

@@ -51,6 +51,8 @@ function sync_package_snort() {
 		$iflist['opt' . $i] = "opt{$i}";
 	foreach($_POST['iface_array'] as $iface) {
 		$if = convert_friendly_interface_to_real_interface_name($iface);
+		if($config['interfaces'][$iface]['ipaddr'] == "pppoe")
+			$if = "ng0";
 		if($if) {
 			$ifaces_final .= " -i " . $if;
 			$first = 1;
@@ -99,6 +101,9 @@ function generate_snort_conf() {
 	/* obtain external interface */
 	/* XXX: make multi wan friendly */
 	$snort_ext_int = $config['installedpackages']['snort']['config'][0]['iface_array'][0];
+
+	if($config['interfaces'][$snort_ext_int]['ipaddr'] == "pppoe")
+		$snort_ext_int = "ng0";
 
 	/* set the snort performance model */
 	if($config['installedpackages']['snort']['config'][0]['performance'])
