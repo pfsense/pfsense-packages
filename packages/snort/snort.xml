@@ -118,11 +118,6 @@
 			<size>60</size>
 		</field>
     </fields>
-	<service>
-		<name>snort</name>
-		<rcfile>snort.sh</rcfile>
-		<executable>snort</executable>
-	</service>
 	<custom_add_php_command>
         	sync_package_snort();
 	</custom_add_php_command>
