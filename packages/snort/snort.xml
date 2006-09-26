@@ -60,6 +60,42 @@
 			<type>interfaces_selection</type>
 		</field>
 		<field>
+			<fielddescr>Performance</fielddescr>
+			<fieldname>performance</fieldname>
+			<type>select</type>
+			<options>
+				<option>
+					<value>ac-std</value>
+					<name>ac-std</name>
+				</option>
+				<option>
+					<value>ac</value>
+					<name>ac</name>
+				</option>
+				<option>
+					<value>ac-banded</value>
+					<name>ac-banded</name>
+				</option>
+				<option>
+					<value>ac-sparsebands</value>
+					<name>ac-sparsebands</name>
+				</option>
+
+				<option>
+					<value>mwm</value>
+					<name>mwm</name>
+				</option>
+				<option>
+					<value>acs</value>
+					<name>acs</name>
+				</option>
+				<option>
+					<value>lowmem</value>
+					<name>lowmem</name>
+				</option>
+			</options>
+		</field>
+		<field>
 			<fielddescr>Oinkmaster code</fielddescr>
 			<fieldname>oinkmastercode</fieldname>
 			<value></value>
