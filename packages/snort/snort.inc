@@ -137,8 +137,23 @@ function generate_snort_conf() {
 		$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
 	}
 
+	/* add all local ips to the whitelist */
+	$wan_if = get_real_wan_interface();
+	$ip = find_interface_ip($wan_if);
+	$home_net .= "{$ip} ";
+
+	/* iterate all interfaces and add to whitelist */
+	foreach($config['interfaces'] as $interface)
+        $home_net .= "{$interface['ipaddr']} ";
+
+	/* iterate all vips and add to whitelist */
+	if($config['virtualip'])
+		foreach($config['virtualip']['vip'] as $vip)
+			$home_net .= $vip['subnet'] . " ";
+
 	/* write out whitelist, convert spaces to carriage returns */
 	$whitelist_home_net = str_replace(" ", "\n", $home_net);
+
 	fwrite($whitelist, $whitelist_home_net);
 
 	/* close file */
