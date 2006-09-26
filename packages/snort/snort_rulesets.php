@@ -39,13 +39,13 @@ if($_POST) {
 		$enabled_items .= "{$toenable}";
 		$isfirst = false;
 	}
-	$config['installedpackages']['snort']['config'][0]['rulesets'] = $enabled_items;
+	$config['installedpackages']['snort']['rulesets'] = $enabled_items;
 	write_config();
 	create_snort_conf();
 	$savemsg = "The snort ruleset selections have been saved.";
 }
 
-$enabled_rulesets = $config['installedpackages']['snort']['config'][0]['rulesets'];
+$enabled_rulesets = $config['installedpackages']['snort']['rulesets'];
 if($enabled_rulesets)
 	$enabled_rulesets_array = split("\|\|", $enabled_rulesets);
 
@@ -111,7 +111,7 @@ include("head.inc");
 		echo "	<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />";
 		echo "</td>";
 		echo "<td>";
-		echo "{$file}";
+		echo "<a target='_new' href='edit.php?submit=Load&savetopath=" . urlencode($file) . "'>{$file}</a>";
 		echo "</td>";
 		//echo "<td>";
 		//echo "description";

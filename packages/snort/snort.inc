@@ -160,7 +160,7 @@ function generate_snort_conf() {
 	fclose($whitelist);
 
 	/* generate rule sections to load */
-	$enabled_rulesets = $config['installedpackages']['snort']['config'][0]['rulesets'];
+	$enabled_rulesets = $config['installedpackages']['snort']['rulesets'];
 	if($enabled_rulesets) {
 		$selected_rules_sections = "";
 		$enabled_rulesets_array = split("\|\|", $enabled_rulesets);
