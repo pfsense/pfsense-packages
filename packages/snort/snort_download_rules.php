@@ -31,6 +31,7 @@
 require_once("config.inc");
 require_once("functions.inc");
 require_once("guiconfig.inc");
+require_once("service-utils.inc");
 
 $pgtitle = "Services: Snort: Update Rules";
 
@@ -176,6 +177,9 @@ update_all_status($static_output);
 
 $config['installedpackages']['snort']['last_ruleset_download'] = date("Y-m-d");
 write_config();
+
+stop_service("snort");
+start_service("snort");
 
 /* cleanup temporary directory */
 exec("/bin/rm -rf {$tmpfname};");

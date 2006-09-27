@@ -28,6 +28,7 @@
 */
 
 require("guiconfig.inc");
+require_once("service-utils.inc");
 require("/usr/local/pkg/snort.inc");
 
 if($_POST) {
@@ -41,7 +42,9 @@ if($_POST) {
 	}
 	$config['installedpackages']['snort']['rulesets'] = $enabled_items;
 	write_config();
+	stop_service("snort");
 	create_snort_conf();
+	start_service("snort");
 	$savemsg = "The snort ruleset selections have been saved.";
 }
 
