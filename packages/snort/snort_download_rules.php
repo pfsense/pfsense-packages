@@ -61,6 +61,12 @@ include("head.inc");
   </tr>
 <?php
 	if(!$_GET['start'] && !$_POST['start']) {
+		echo "<tr>";
+		echo "<td>";
+	    echo "<div id=\"mainarea\">";
+	    echo "<table class=\"tabcont\" width=\"100%\" border=\"0\" cellpadding=\"6\" cellspacing=\"0\">";
+      	echo "<tr>";
+      	echo "<td align=\"center\" valign=\"top\">";
 		$last_ruleset_download = $config['installedpackages']['snort']['last_ruleset_download'];
 		$text = file_get_contents("http://www.snort.org/pub-bin/downloads.cgi");
 		if (preg_match_all("/.*RELEASED\: (.*)\</", $text, $matches))
@@ -82,6 +88,12 @@ include("head.inc");
 		else
 			echo "<tr><td colspan='2'>Your snort rulesets are up to date.</td></tr>";
 		echo "<tr><td>&nbsp;</td></tr>";
+        echo "</td>";
+      	echo "	</tr>";
+	    echo "  </table>";
+	    echo "  </div>";
+	  	echo "</td>";
+		echo "</tr>";
 		echo "</table>";
 		include("fend.inc");
 		exit;
