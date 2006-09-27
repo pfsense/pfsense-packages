@@ -43,6 +43,8 @@ if ($_POST['clear']) {
 	exec("killall syslogd");
 	exec("rm {$snort_logfile}; touch {$snort_logfile}");
 	system_syslogd_start();	
+	exec("/usr/bin/killall -HUP snort");
+	exec("/usr/bin/killall -HUP snort2c");
 }
 
 $pgtitle = "Services: Snort: Snort Alerts";
