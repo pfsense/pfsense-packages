@@ -158,7 +158,7 @@ function generate_snort_conf() {
 
 	if($config['installedpackages']['snortwhitelist'])
 		foreach($config['installedpackages']['snortwhitelist']['config'] as $snort)
-			$home_net .= $snort['ip'];
+			$home_net .= $snort['ip'] . " ";
 
 	/* write out whitelist, convert spaces to carriage returns */
 	$whitelist_home_net = str_replace(" ", "\n", $home_net);
