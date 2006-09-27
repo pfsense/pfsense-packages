@@ -32,6 +32,11 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/snort_whitelist.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_blocked.php</item>
 	</additional_files_needed>
 	<service>
@@ -57,6 +62,10 @@
 		<tab>
 			<text>Snort Blocked</text>
 			<url>/snort_blocked.php</url>
+		</tab>
+		<tab>
+			<text>Snort Whitelist</text>
+			<url>/snort_whitelist.php</url>
 		</tab>
 	</tabs>
 	<fields>
