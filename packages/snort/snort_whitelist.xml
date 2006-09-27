@@ -27,6 +27,10 @@
 			<url>/pkg.php?xml=snort_whitelist.xml</url>
 			<active/>
 		</tab>
+		<tab>
+			<text>Snort Alerts</text>
+			<url>/snort_alerts.php</url>
+		</tab>	
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>

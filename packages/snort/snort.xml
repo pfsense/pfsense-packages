@@ -44,6 +44,11 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_check_for_rule_updates.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/snort_alerts.php</item>
+	</additional_files_needed>
 	<service>
 		<name>snort</name>
 		<rcfile>snort.sh</rcfile>
@@ -72,6 +77,10 @@
 			<text>Snort Whitelist</text>
 			<url>/pkg.php?xml=snort_whitelist.xml</url>
 		</tab>
+		<tab>
+			<text>Snort Alerts</text>
+			<url>/snort_alerts.php</url>
+		</tab>	
 	</tabs>
 	<fields>
 		<field>

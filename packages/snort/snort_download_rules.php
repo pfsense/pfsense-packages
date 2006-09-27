@@ -74,6 +74,7 @@ include("head.inc");
 	$tab_array[] = array(gettext("Snort Rulesets"), false, "/snort_rulesets.php");
 	$tab_array[] = array(gettext("Snort Blocked"), false, "/snort_blocked.php");
 	$tab_array[] = array(gettext("Snort Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
+	$tab_array[] = array(gettext("Snort Alerts"), false, "/snort_alerts.php");
 	display_top_tabs($tab_array);
 ?>
     </td>
