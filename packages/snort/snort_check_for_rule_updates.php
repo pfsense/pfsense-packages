@@ -1,3 +1,4 @@
+#!/usr/local/bin/php -v
 <?php
 
 /* $Id$ */
