@@ -50,6 +50,7 @@ else
 include("head.inc");
 
 ?>
+<script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
@@ -75,43 +76,49 @@ include("head.inc");
   </tr>
 <?php
 	if($start_me_up == false) {
-		echo "<tr>";
-		echo "<td>";
-	    echo "<div id=\"mainarea\">";
-	    echo "<table class=\"tabcont\" width=\"100%\" border=\"0\" cellpadding=\"6\" cellspacing=\"0\">";
-      	echo "<tr>";
-      	echo "<td align=\"center\" valign=\"top\">";
+		echo "<tr>\n";
+		echo "<td>\n";
+	    echo "<div id=\"mainarea\">\n";
+	    echo "<table class=\"tabcont\" width=\"100%\" border=\"0\" cellpadding=\"6\" cellspacing=\"0\">\n";
+      	echo "<tr>\n";
+      	echo "<td>\n";
 		$last_ruleset_download = $config['installedpackages']['snort']['last_ruleset_download'];
+		echo "<div id='loading' name='loading'>\n";
+		echo "<img src=\"/themes/metallic/images/misc/loader.gif\"> Getting release information from snort.org...\n";
+		echo "</div>\n";
 		$text = file_get_contents("http://www.snort.org/pub-bin/downloads.cgi");
+		echo "<script type=\"text/javascript\">\n";
+		echo "$('loading').style.visibility = 'hidden';\n";
+		echo "</script>\n";
 		if (preg_match_all("/.*RELEASED\: (.*)\</", $text, $matches))
 		        $last_update_date = trim($matches[1][0]);
-		echo "<tr><td><table>";
+		echo "<table>\n";
 		if($last_update_date)
-			echo "<tr><td><b>Last snort.org rule update:</b></td><td>{$last_update_date}</td></tr>";
+			echo "<tr><td><b>Last snort.org rule update:</b></td><td>{$last_update_date}</td></tr>\n";
 		if($last_ruleset_download)
-			echo "<tr><td><b>You last updated the ruleset:</b></td><td>{$last_ruleset_download}</td></tr>";
+			echo "<tr><td><b>You last updated the ruleset:</b></td><td>{$last_ruleset_download}</td></tr>\n";
 		else
-			echo "<tr><td><b>You last updated the ruleset:</b></td><td>NEVER</td></tr>";
+			echo "<tr><td><b>You last updated the ruleset:</b></td><td>NEVER</td></tr>\n";
 		echo "</td></tr></table>";
 		if(!$oinkid) {
-			echo "<tr><td colspan='2'>You must obtain an oinkid from snort.com and set its value in the Snort settings tab in order to start the download process.</td></tr>";
+			echo "<tr><td colspan='2'>You must obtain an oinkid from snort.com and set its value in the Snort settings tab in order to start the download process.</td></tr>\n";
 		} else {
 			/* get time stamps for comparison operations */
 			$date1ts = strtotime($last_update_date);
 			$date2ts = strtotime($last_ruleset_download);
 			/* is there a newer ruleset available? */
 			if($date1ts > $date2ts or !$last_ruleset_download)
-				echo "<tr><td colspan='2'>Press <a href='snort_download_rules.php?start=yes'>here</a> to start download.</td></tr>";
+				echo "<tr><td colspan='2'>Press <a href='snort_download_rules.php?start=yes'>here</a> to start download.</td></tr>\n";
 			else
-				echo "<tr><td colspan='2'>Your snort rulesets are <b>up to date</b>.</td></tr>";
+				echo "<tr><td colspan='2'>Your snort rulesets are <b>up to date</b>.</td></tr>\n";
 		}
-        echo "</td>";
-      	echo "	</tr>";
-	    echo "  </table>";
-	    echo "  </div>";
-	  	echo "</td>";
-		echo "</tr>";
-		echo "</table>";
+        echo "</td>\n";
+      	echo "	</tr>\n";
+	    echo "  </table>\n";
+	    echo "  </div>\n";
+	  	echo "</td>\n";
+		echo "</tr>\n";
+		echo "</table>\n";
 		include("fend.inc");
 		exit;
 	}
