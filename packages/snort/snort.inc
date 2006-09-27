@@ -168,7 +168,8 @@ function generate_snort_conf() {
 
 	/* iterate all interfaces and add to whitelist */
 	foreach($config['interfaces'] as $interface)
-        $home_net .= "{$interface['ipaddr']} ";
+        if($interface['ipaddr'] <> "pppoe" and $interface['ipaddr'] <> "dhcp")
+        	$home_net .= "{$interface['ipaddr']} ";
 
 	/* iterate all vips and add to whitelist */
 	if($config['virtualip'])
