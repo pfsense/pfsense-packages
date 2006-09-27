@@ -23,7 +23,7 @@
 		</tab>
 		<tab>
 			<text>Snort Whitelist</text>
-			<url>/pkg.php?xml=snort.xml&amp;id=0snort_whitelist.xml</url>
+			<url>/pkg.php?xml=snort_whitelist.xml</url>
 			<active/>
 		</tab>
 	</tabs>
