@@ -106,10 +106,10 @@ function generate_snort_conf() {
 	/* XXX: make multi wan friendly */
 	$snort_ext_int = $config['installedpackages']['snort']['config'][0]['iface_array'][0];
 
-	$text = "*/60\t* \t 1\t *\t *\t root\t /usr/bin/nice -n20 /usr/local/pkg/snort_check_for_rule_updates.php";
-	$file = "/etc/crontab";
-	add_text_to_file($file, $text);
-	remove_text_from_file($file, $text);
+	$text_ww   = "*/60\t* \t 1\t *\t *\t root\t /usr/bin/nice -n20 /usr/local/pkg/snort_check_for_rule_updates.php";
+	$filenamea = "/etc/crontab";
+	remove_text_from_file($filenamea, $text_ww);
+	add_text_to_file($filenamea, $text_ww);
 	exec("killall -HUP cron");
 
 	/* should we install a automatic update crontab entry? */
