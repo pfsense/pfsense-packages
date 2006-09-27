@@ -3,6 +3,7 @@
 	<name>snort-whitelist</name>
 	<version>0.1.0</version>
 	<title>Snort: Whitelist</title>
+	<include_file>/usr/local/pkg/snort.inc</include_file>
 	<!-- Menu is where this packages menu will appear -->
 	<tabs>
 		<tab>
@@ -41,14 +42,16 @@
 		<field>
 			<fielddescr>Whitelisted IP</fielddescr>
 			<fieldname>ip</fieldname>
-			<description>Enter the IP to whitelist from snort blocking</description>
+			<description>Enter the IP or network to whitelist from snort blocking.  Network items should be expressed in CIDR notation.  Example: 0.0.0.0/24 or 0.0.0.0/32</description>
 			<type>input</type>
+			<size>40</size>
 		</field>
 		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 			<description>Enter the description for this item</description>
 			<type>input</type>
+			<size>60</size>
 		</field>
 	</fields>
 	<custom_php_command_before_form>
@@ -56,5 +59,6 @@
 	<custom_delete_php_command>
 	</custom_delete_php_command>
 	<custom_php_resync_config_command>
+		create_snort_conf();
 	</custom_php_resync_config_command>
 </packagegui>
