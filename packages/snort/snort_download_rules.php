@@ -182,6 +182,7 @@ $config['installedpackages']['snort']['last_ruleset_download'] = date("Y-m-d");
 write_config();
 
 stop_service("snort");
+sleep(2);
 start_service("snort");
 
 /* cleanup temporary directory */

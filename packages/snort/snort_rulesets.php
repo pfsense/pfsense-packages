@@ -44,6 +44,7 @@ if($_POST) {
 	write_config();
 	stop_service("snort");
 	create_snort_conf();
+	sleep(2);
 	start_service("snort");
 	$savemsg = "The snort ruleset selections have been saved.";
 }
