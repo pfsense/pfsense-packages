@@ -78,6 +78,8 @@ include("head.inc");
 			echo "<tr><td><b>Last snort.org rule update:</b></td><td>{$last_update_date}</td></tr>";
 		if($last_ruleset_download)
 			echo "<tr><td><b>You last updated the ruleset:</b></td><td>{$last_ruleset_download}</td></tr>";
+		else
+			echo "<tr><td><b>You last updated the ruleset:</b></td><td>NEVER</td></tr>";
 		echo "</td></tr></table>";
 		/* get time stamps for comparison operations */
 		$date1ts = strtotime($last_ruleset_download);
@@ -192,6 +194,10 @@ hide_progress_bar_status();
 
 </body>
 </html>
+
+<script type="text/javascript">
+	document.location.href='snort_download_rules.php?ran=1';
+</script>
 
 <?php
 
