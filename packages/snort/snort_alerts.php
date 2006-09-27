@@ -30,6 +30,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+require("globals.inc");
 require("guiconfig.inc");
 
 $snort_logfile = "{$g['varlog_path']}/snort/alert";
@@ -73,8 +74,8 @@ include("head.inc");
 			<td colspan="2" class="listtopic">
 			  Last <?=$nentries;?> Snort Alert entries</td>
 		  </tr>
-		  <?php dump_clog($snort_logfile, $nentries); ?>
-			<tr><td><br><form action="diag_logs_slbd.php" method="post">
+		  <?php dump_log_file($snort_logfile, $nentries); ?>
+			<tr><td><br><form action="snort_alerts.php" method="post">
 			<input name="clear" type="submit" class="formbtn" value="Clear log"></td></tr>
 		</table>
 	</div>
@@ -86,3 +87,21 @@ include("head.inc");
 <meta http-equiv="refresh" content="60;url=<?php print $_SERVER['SCRIPT_NAME']; ?>">
 </body>
 </html>
+<!-- <?php echo $snort_logfile; ?> -->
+
+<?php
+
+function dump_log_file($logfile, $tail, $withorig = true, $grepfor = "", $grepinvert = "") {
+	global $g, $config;
+    $logarr = "";
+	exec("cat {$logfile} | /usr/bin/tail -n {$tail}", $logarr);
+    foreach ($logarr as $logent) {
+            if(!logent) 
+            	continue;
+            echo "<tr valign=\"top\">\n";
+            echo "<td colspan=\"2\" class=\"listr\">" . $logent . "&nbsp;</td>\n";
+            echo "</tr>\n";
+    }
+}
+
+?>
