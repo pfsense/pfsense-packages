@@ -35,6 +35,10 @@ require_once("service-utils.inc");
 
 $pgtitle = "Services: Snort: Update Rules";
 
+/* define oinkid */
+if($config['installedpackages']['snort'])
+	$oinkid = $config['installedpackages']['snort']['config'][0]['oinkmastercode'];
+
 include("head.inc");
 
 ?>
@@ -81,14 +85,18 @@ include("head.inc");
 		else
 			echo "<tr><td><b>You last updated the ruleset:</b></td><td>NEVER</td></tr>";
 		echo "</td></tr></table>";
-		/* get time stamps for comparison operations */
-		$date1ts = strtotime($last_ruleset_download);
-		$date2ts = strtotime($last_ruleset_download);
-		/* is there a newer ruleset available? */
-		if($date1ts > $date2ts or !$last_ruleset_download)
-			echo "<tr><td colspan='2'>Press <a href='snort_download_rules.php?start=yes'>here</a> to start download.</td></tr>";
-		else
-			echo "<tr><td colspan='2'>Your snort rulesets are <b>up to date</b>.</td></tr>";
+		if(!$oinkid) {
+			echo "<tr><td colspan='2'>You must obtain an oinkid from snort.com and set its value in the Snort settings tab in order to start the download process.</td></tr>";
+		} else {
+			/* get time stamps for comparison operations */
+			$date1ts = strtotime($last_ruleset_download);
+			$date2ts = strtotime($last_ruleset_download);
+			/* is there a newer ruleset available? */
+			if($date1ts > $date2ts or !$last_ruleset_download)
+				echo "<tr><td colspan='2'>Press <a href='snort_download_rules.php?start=yes'>here</a> to start download.</td></tr>";
+			else
+				echo "<tr><td colspan='2'>Your snort rulesets are <b>up to date</b>.</td></tr>";
+		}
         echo "</td>";
       	echo "	</tr>";
 	    echo "  </table>";
@@ -132,10 +140,6 @@ include("head.inc");
 </form>
 <?php include("fend.inc"); ?>
 <?php
-
-/* define oinkid */
-if($config['installedpackages']['snort'])
-	$oinkid = $config['installedpackages']['snort']['config'][0]['oinkmastercode'];
 
 if(!$oinkid) {
 	$static_output = gettext("You must obtain an oinkid from snort.com and set its value in the Snort settings tab.");
