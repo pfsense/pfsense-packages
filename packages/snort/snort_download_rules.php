@@ -97,7 +97,7 @@ include("head.inc");
 			echo "<tr><td colspan='2'>You must obtain an oinkid from snort.com and set its value in the Snort settings tab in order to start the download process.</td></tr>";
 		} else {
 			/* get time stamps for comparison operations */
-			$date1ts = strtotime($last_ruleset_download);
+			$date1ts = strtotime($last_update_date);
 			$date2ts = strtotime($last_ruleset_download);
 			/* is there a newer ruleset available? */
 			if($date1ts > $date2ts or !$last_ruleset_download)

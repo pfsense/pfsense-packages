@@ -40,7 +40,7 @@ $last_ruleset_download = $config['installedpackages']['snort']['last_ruleset_dow
 $text = file_get_contents("http://www.snort.org/pub-bin/downloads.cgi");
 if (preg_match_all("/.*RELEASED\: (.*)\</", $text, $matches))
         $last_update_date = trim($matches[1][0]);
-$date1ts = strtotime($last_ruleset_download);
+$date1ts = strtotime($last_update_date);
 $date2ts = strtotime($last_ruleset_download);
 /* is there a newer ruleset available? */
 if($date1ts > $date2ts or !$last_ruleset_download) {
