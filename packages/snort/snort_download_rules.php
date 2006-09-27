@@ -28,16 +28,24 @@
 
 */
 
-require_once("config.inc");
-require_once("functions.inc");
-require_once("guiconfig.inc");
-require_once("service-utils.inc");
+/* do not require all of this if we already have. */
+if(!$start_me_up) {
+	require_once("config.inc");
+	require_once("functions.inc");
+	require_once("guiconfig.inc");
+	require_once("service-utils.inc");
+}
 
 $pgtitle = "Services: Snort: Update Rules";
 
 /* define oinkid */
 if($config['installedpackages']['snort'])
 	$oinkid = $config['installedpackages']['snort']['config'][0]['oinkmastercode'];
+
+if($_GET['start'] or $_POST['start'])
+	$start_me_up = true;
+else
+	$start_me_up = false;
 
 include("head.inc");
 
@@ -66,7 +74,7 @@ include("head.inc");
     </td>
   </tr>
 <?php
-	if(!$_GET['start'] && !$_POST['start']) {
+	if($start_me_up == false) {
 		echo "<tr>";
 		echo "<td>";
 	    echo "<div id=\"mainarea\">";
@@ -206,90 +214,6 @@ hide_progress_bar_status();
 
 <?php
 
-function check_for_common_errors($filename) {
-	global $snort_filename, $snort_filename_md5;
-	ob_flush();
-	$contents = file_get_contents($filename);
-	if(stristr($contents, "You don't have permission")) {
-		update_all_status("An error occured.  Scroll down to inspect it's contents.");
-		hide_progress_bar_status();
-		echo "
-      <center>
-        <div id='error' style='background:white;width:90%'>
-        <!-- TODO: The below paragraphs are kind of stupid. Use CSS instead -->
-        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-        <p>The following error occured while downloading the snort rules file from snort.org:</p>
-		    {$contents}
-        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-		    </div>
-      </center>
-    ";
-		scroll_down_to_bottom_of_page();
-		exit;
-	}
-}
 
-function scroll_down_to_bottom_of_page() {
-	global $snort_filename;
-	ob_flush();
-	echo "\n<script type=\"text/javascript\">parent.scrollTo(0,1500);\n</script>";
-}
-
-function verify_downloaded_file($filename) {
-	global $snort_filename, $snort_filename_md5;
-	ob_flush();
-	if(filesize($filename)<99500) {
-		update_all_status("Checking {$filename}...");
-		check_for_common_errors($filename);
-	}
-	update_all_status("Verifying {$filename}...");
-	if(!file_exists($filename)) {
-		update_all_status("Could not fetch snort rules ({$filename}).  Check oinkid key and dns and try again.");
-		hide_progress_bar_status();
-		exit;
-	}
-	update_all_status("Verifyied {$filename}.");
-}
-
-function extract_snort_rules_md5($tmpfname) {
-	global $snort_filename, $snort_filename_md5;
-	ob_flush();
-	$static_output = gettext("Extracting snort rules...");
-	update_all_status($static_output);
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C /usr/local/etc/snort/");
-	$static_output = gettext("Snort rules extracted.");
-	update_all_status($static_output);
-}
-
-function verify_snort_rules_md5($tmpfname) {
-	global $snort_filename, $snort_filename_md5;
-	ob_flush();
-	$static_output = gettext("Verifying md5 signature...");
-	update_all_status($static_output);
-	$md5 = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
-	$file_md5_ondisk = `/sbin/md5 {$tmpfname}/{$snort_filename} | /usr/bin/awk '{ print $4 }'`;
-	if($md5 <> $file_md5_ondisk) {
-		$static_output = gettext("md5 signature of rules mismatch.");
-		update_all_status($static_output);
-		hide_progress_bar_status();
-		exit;
-	}
-}
-
-function hide_progress_bar_status() {
-	global $snort_filename, $snort_filename_md5;
-	ob_flush();
-	echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='hidden';\n</script>";
-}
-
-function update_all_status($status) {
-	global $snort_filename, $snort_filename_md5;
-	ob_flush();
-	update_status($status);
-	update_output_window($status);
-}
 
 ?>

@@ -29,6 +29,10 @@
 
 $snort_conf_file = "/usr/local/etc/snort/snort.conf";
 
+/* define oinkid */
+if($config['installedpackages']['snort'])
+	$oinkid = $config['installedpackages']['snort']['config'][0]['oinkmastercode'];
+
 function sync_package_snort() {
 	global $config, $g, $snort_conf_file;
 	exec("/bin/mkdir -p /usr/local/etc/snort");
@@ -279,6 +283,110 @@ include reference.config
 EOD;
 
 	return $snort_conf_text;
+}
+
+function check_for_common_errors($filename) {
+	global $snort_filename, $snort_filename_md5, $console_mode;
+	ob_flush();
+	$contents = file_get_contents($filename);
+	if(stristr($contents, "You don't have permission")) {
+		if(!$console_mode) {
+			update_all_status("An error occured.  Scroll down to inspect it's contents.");
+			hide_progress_bar_status();
+		}
+		echo "
+      <center>
+        <div id='error' style='background:white;width:90%'>
+        <!-- TODO: The below paragraphs are kind of stupid. Use CSS instead -->
+        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+        <p>The following error occured while downloading the snort rules file from snort.org:</p>
+		    {$contents}
+        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+		    </div>
+      </center>
+    ";
+		scroll_down_to_bottom_of_page();
+		exit;
+	}
+}
+
+function scroll_down_to_bottom_of_page() {
+	global $snort_filename, $console_mode;
+	ob_flush();
+	if(!$console_mode)
+		echo "\n<script type=\"text/javascript\">parent.scrollTo(0,1500);\n</script>";
+}
+
+function verify_downloaded_file($filename) {
+	global $snort_filename, $snort_filename_md5, $console_mode;
+	ob_flush();
+	if(filesize($filename)<99500) {
+		if(!$console_mode) {
+			update_all_status("Checking {$filename}...");
+			check_for_common_errors($filename);
+		}
+	}
+	update_all_status("Verifying {$filename}...");
+	if(!file_exists($filename)) {
+		if(!$console_mode) {
+			update_all_status("Could not fetch snort rules ({$filename}).  Check oinkid key and dns and try again.");
+			hide_progress_bar_status();
+		}
+		exit;
+	}
+	update_all_status("Verifyied {$filename}.");
+}
+
+function extract_snort_rules_md5($tmpfname) {
+	global $snort_filename, $snort_filename_md5, $console_mode;
+	ob_flush();
+	if(!$console_mode) {
+		$static_output = gettext("Extracting snort rules...");
+		update_all_status($static_output);
+	}
+	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C /usr/local/etc/snort/");
+	if(!$console_mode) {
+		$static_output = gettext("Snort rules extracted.");
+		update_all_status($static_output);
+	}
+}
+
+function verify_snort_rules_md5($tmpfname) {
+	global $snort_filename, $snort_filename_md5, $console_mode;
+	ob_flush();
+	if(!$console_mode) {
+		$static_output = gettext("Verifying md5 signature...");
+		update_all_status($static_output);
+	}
+	$md5 = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
+	$file_md5_ondisk = `/sbin/md5 {$tmpfname}/{$snort_filename} | /usr/bin/awk '{ print $4 }'`;
+	if($md5 <> $file_md5_ondisk) {
+		if(!$console_mode) {
+			$static_output = gettext("md5 signature of rules mismatch.");
+			update_all_status($static_output);
+			hide_progress_bar_status();
+		}
+		exit;
+	}
+}
+
+function hide_progress_bar_status() {
+	global $snort_filename, $snort_filename_md5, $console_mode;
+	ob_flush();
+	if(!$console_mode)
+		echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='hidden';\n</script>";
+}
+
+function update_all_status($status) {
+	global $snort_filename, $snort_filename_md5;
+	ob_flush();
+	if(!$console_mode) {
+		update_status($status);
+		update_output_window($status);
+	}
 }
 
 ?>
