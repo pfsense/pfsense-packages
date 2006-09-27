@@ -302,21 +302,30 @@ function check_for_common_errors($filename) {
 		if(!$console_mode) {
 			update_all_status("An error occured.  Scroll down to inspect it's contents.");
 			hide_progress_bar_status();
+		} else {
+			log_error("An error occured.  Scroll down to inspect it's contents.");
+			echo "An error occured.  Scroll down to inspect it's contents.";
 		}
-		echo "
-      <center>
-        <div id='error' style='background:white;width:90%'>
-        <!-- TODO: The below paragraphs are kind of stupid. Use CSS instead -->
-        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-        <p>The following error occured while downloading the snort rules file from snort.org:</p>
-		    {$contents}
-        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-		    </div>
-      </center>
-    ";
+		if(!$console_mode) {
+			echo "
+	      <center>
+	        <div id='error' style='background:white;width:90%'>
+	        <!-- TODO: The below paragraphs are kind of stupid. Use CSS instead -->
+	        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+	        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+	        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+	        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+	        <p>The following error occured while downloading the snort rules file from snort.org:</p>
+			    {$contents}
+	        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+			    </div>
+	      </center>
+	    ";
+		} else {
+			$contents = strip_tags($contents);
+			log_error("Error downloading snort rules: {$contents}");
+			echo "Error downloading snort rules: {$contents}";
+		}
 		scroll_down_to_bottom_of_page();
 		exit;
 	}
@@ -343,6 +352,9 @@ function verify_downloaded_file($filename) {
 		if(!$console_mode) {
 			update_all_status("Could not fetch snort rules ({$filename}).  Check oinkid key and dns and try again.");
 			hide_progress_bar_status();
+		} else {
+			log_error("Could not fetch snort rules ({$filename}).  Check oinkid key and dns and try again.");
+			echo "Could not fetch snort rules ({$filename}).  Check oinkid key and dns and try again.";
 		}
 		exit;
 	}
@@ -360,6 +372,9 @@ function extract_snort_rules_md5($tmpfname) {
 	if(!$console_mode) {
 		$static_output = gettext("Snort rules extracted.");
 		update_all_status($static_output);
+	} else {
+		log_error("Snort rules extracted.");
+		echo "Snort rules extracted.";
 	}
 }
 
@@ -374,9 +389,12 @@ function verify_snort_rules_md5($tmpfname) {
 	$file_md5_ondisk = `/sbin/md5 {$tmpfname}/{$snort_filename} | /usr/bin/awk '{ print $4 }'`;
 	if($md5 <> $file_md5_ondisk) {
 		if(!$console_mode) {
-			$static_output = gettext("md5 signature of rules mismatch.");
+			$static_output = gettext("snort rules: md5 signature of rules mismatch.");
 			update_all_status($static_output);
 			hide_progress_bar_status();
+		} else {
+			log_error("snort rules: md5 signature of rules mismatch.");
+			echo "snort rules: md5 signature of rules mismatch.";
 		}
 		exit;
 	}
@@ -390,7 +408,7 @@ function hide_progress_bar_status() {
 }
 
 function update_all_status($status) {
-	global $snort_filename, $snort_filename_md5;
+	global $snort_filename, $snort_filename_md5, $console_mode;
 	ob_flush();
 	if(!$console_mode) {
 		update_status($status);

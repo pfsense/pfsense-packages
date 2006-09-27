@@ -1,4 +1,4 @@
-#!/usr/local/bin/php -v
+#!/usr/local/bin/php -f
 <?php
 
 /* $Id$ */
@@ -61,12 +61,12 @@ if($date1ts > $date2ts or !$last_ruleset_download) {
 	exec("/bin/rm -rf {$tmpfname};/bin/mkdir -p {$tmpfname}");
 
 	/* download snort rules */
-	exec("fetch -vvv -o {$tmpfname}/{$snort_filename} $dl");
+	exec("fetch -q -o {$tmpfname}/{$snort_filename} $dl");
 	verify_downloaded_file($tmpfname . "/{$snort_filename}");
 
 	/* download snort rules md5 file */
 	$static_output = gettext("Downloading current snort rules md5... ");
-	exec("fetch -vvv -o {$tmpfname}/{$snort_filename_md5} $dl_md5");
+	exec("fetch -q -o {$tmpfname}/{$snort_filename_md5} $dl_md5");
 	verify_downloaded_file($tmpfname . "/{$snort_filename_md5}");
 
 	/* verify downloaded rules signature */
@@ -84,9 +84,9 @@ if($date1ts > $date2ts or !$last_ruleset_download) {
 
 	/* cleanup temporary directory */
 	exec("/bin/rm -rf {$tmpfname};");
-	echo "Rules are now up to date.";
+	echo "Rules are now up to date.\n";
 } else {
-	echo "Rules are up to date.";
+	echo "Rules are up to date.\n";
 }
 
 ?>
