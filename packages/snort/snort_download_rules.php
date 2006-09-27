@@ -71,14 +71,12 @@ include("head.inc");
 		$text = file_get_contents("http://www.snort.org/pub-bin/downloads.cgi");
 		if (preg_match_all("/.*RELEASED\: (.*)\</", $text, $matches))
 		        $last_update_date = trim($matches[1][0]);
-		echo "<tr><td>&nbsp;</td></tr>";
 		echo "<tr><td><table>";
 		if($last_update_date)
 			echo "<tr><td><b>Last snort.org rule update:</b></td><td>{$last_update_date}</td></tr>";
 		if($last_ruleset_download)
 			echo "<tr><td><b>You last updated the ruleset:</b></td><td>{$last_ruleset_download}</td></tr>";
 		echo "</td></tr></table>";
-		echo "<tr><td>&nbsp;</td></tr>";
 		/* get time stamps for comparison operations */
 		$date1ts = strtotime($last_ruleset_download);
 		$date2ts = strtotime($last_ruleset_download);
@@ -87,7 +85,6 @@ include("head.inc");
 			echo "<tr><td colspan='2'>Press <a href='snort_download_rules.php?start=yes'>here</a> to start download.</td></tr>";
 		else
 			echo "<tr><td colspan='2'>Your snort rulesets are <b>up to date</b>.</td></tr>";
-		echo "<tr><td>&nbsp;</td></tr>";
         echo "</td>";
       	echo "	</tr>";
 	    echo "  </table>";
