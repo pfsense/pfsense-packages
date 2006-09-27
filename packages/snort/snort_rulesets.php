@@ -27,6 +27,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+if(!is_dir("/usr/local/etc/snort/rules")) 
+	Header("Location: snort_download_rules.php");
+
 require("guiconfig.inc");
 require_once("service-utils.inc");
 require("/usr/local/pkg/snort.inc");

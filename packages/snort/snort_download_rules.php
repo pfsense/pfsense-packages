@@ -34,6 +34,7 @@ if(!$start_me_up) {
 	require_once("functions.inc");
 	require_once("guiconfig.inc");
 	require_once("service-utils.inc");
+	require("/usr/local/pkg/snort.inc");
 }
 
 $pgtitle = "Services: Snort: Update Rules";
@@ -46,6 +47,9 @@ if($_GET['start'] or $_POST['start'])
 	$start_me_up = true;
 else
 	$start_me_up = false;
+
+if(!is_dir("/usr/local/etc/snort/rules"))
+	$start_me_up = true;
 
 include("head.inc");
 
