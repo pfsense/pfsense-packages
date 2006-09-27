@@ -86,6 +86,8 @@ include("head.inc");
 		echo "<div id='loading' name='loading'>\n";
 		echo "<img src=\"/themes/metallic/images/misc/loader.gif\"> Getting release information from snort.org...\n";
 		echo "</div>\n";
+		ob_flush();
+		sleep(1);
 		$text = file_get_contents("http://www.snort.org/pub-bin/downloads.cgi");
 		echo "<script type=\"text/javascript\">\n";
 		echo "$('loading').style.visibility = 'hidden';\n";
