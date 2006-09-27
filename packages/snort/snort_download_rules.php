@@ -28,6 +28,7 @@
 
 */
 
+require_once("config.inc");
 require_once("functions.inc");
 require_once("guiconfig.inc");
 
@@ -60,8 +61,26 @@ include("head.inc");
   </tr>
 <?php
 	if(!$_GET['start'] && !$_POST['start']) {
+		$last_ruleset_download = $config['installedpackages']['snort']['last_ruleset_download'];
+		$text = file_get_contents("http://www.snort.org/pub-bin/downloads.cgi");
+		if (preg_match_all("/.*RELEASED\: (.*)\</", $text, $matches))
+		        $last_update_date = trim($matches[1][0]);
 		echo "<tr><td>&nbsp;</td></tr>";
-		echo "<tr><td colspan='2'>Press <a href='snort_download_rules.php?start=yes'>here</a> to start download.</td></tr>";
+		echo "<tr><td><table>";
+		if($last_update_date)
+			echo "<tr><td>Last snort.org rule update:</td><td>{$last_update_date}</td></tr>";
+		if($last_ruleset_download)
+			echo "<tr><td>You last updated the ruleset:</td><td>{$last_ruleset_download}</td></tr>";
+		echo "</td></tr></table>";
+		echo "<tr><td>&nbsp;</td></tr>";
+		/* get time stamps for comparison operations */
+		$date1ts = strtotime($last_ruleset_download);
+		$date2ts = strtotime($last_ruleset_download);
+		/* is there a newer ruleset available? */
+		if($date1ts > $date2ts or !$last_ruleset_download)
+			echo "<tr><td colspan='2'>Press <a href='snort_download_rules.php?start=yes'>here</a> to start download.</td></tr>";
+		else
+			echo "<tr><td colspan='2'>Your snort rulesets are up to date.</td></tr>";
 		echo "<tr><td>&nbsp;</td></tr>";
 		echo "</table>";
 		include("fend.inc");
@@ -145,6 +164,9 @@ extract_snort_rules_md5($tmpfname);
 
 $static_output = gettext("Your snort rules are now up to date.");
 update_all_status($static_output);
+
+$config['installedpackages']['snort']['last_ruleset_download'] = date("Y-m-d");
+write_config();
 
 /* cleanup temporary directory */
 exec("/bin/rm -rf {$tmpfname};");
