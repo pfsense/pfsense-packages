@@ -152,7 +152,13 @@ function generate_snort_conf() {
 		$ifcfg = &$config['interfaces'][$int];
 		$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
 		$subnetmask = gen_subnet_mask($ifcfg['subnet']);
-		$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
+		if($subnet == "pppoe" or $subnet = "dhcp") {
+			$subnet = find_interface_ip("ng0");
+			if($subnet)
+				$home_net .= "{$subnet} ";
+		} else {
+			$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
+		}
 	}
 
 	/* add all local ips to the whitelist */
