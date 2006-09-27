@@ -74,9 +74,9 @@ include("head.inc");
 		echo "<tr><td>&nbsp;</td></tr>";
 		echo "<tr><td><table>";
 		if($last_update_date)
-			echo "<tr><td>Last snort.org rule update:</td><td>{$last_update_date}</td></tr>";
+			echo "<tr><td><b>Last snort.org rule update:</b></td><td>{$last_update_date}</td></tr>";
 		if($last_ruleset_download)
-			echo "<tr><td>You last updated the ruleset:</td><td>{$last_ruleset_download}</td></tr>";
+			echo "<tr><td><b>You last updated the ruleset:</b></td><td>{$last_ruleset_download}</td></tr>";
 		echo "</td></tr></table>";
 		echo "<tr><td>&nbsp;</td></tr>";
 		/* get time stamps for comparison operations */
@@ -86,7 +86,7 @@ include("head.inc");
 		if($date1ts > $date2ts or !$last_ruleset_download)
 			echo "<tr><td colspan='2'>Press <a href='snort_download_rules.php?start=yes'>here</a> to start download.</td></tr>";
 		else
-			echo "<tr><td colspan='2'>Your snort rulesets are up to date.</td></tr>";
+			echo "<tr><td colspan='2'>Your snort rulesets are <b>up to date</b>.</td></tr>";
 		echo "<tr><td>&nbsp;</td></tr>";
         echo "</td>";
       	echo "	</tr>";
