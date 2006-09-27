@@ -32,7 +32,7 @@
 
 require("guiconfig.inc");
 
-$snort_logfile = "{$g['varlog_path']}/snort/alerts";
+$snort_logfile = "{$g['varlog_path']}/snort/alert";
 
 $nentries = $config['syslog']['nentries'];
 if (!$nentries)
@@ -40,7 +40,7 @@ if (!$nentries)
 
 if ($_POST['clear']) {
 	exec("killall syslogd");
-	exec("/usr/sbin/clog -i -s 262144 {$snort_logfile}");
+	exec("rm {$snort_logfile}; touch {$snort_logfile}");
 	system_syslogd_start();	
 }
 
