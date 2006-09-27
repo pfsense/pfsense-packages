@@ -126,6 +126,11 @@
 			<type>checkbox</type>
 			<size>60</size>
 		</field>
+		<field>
+			<fielddescr>Update rules automatically</fielddescr>
+			<fieldname>automaticrulesupdate</fieldname>
+			<type>checkbox</type>
+		</field>
     </fields>
 	<custom_add_php_command>
         	sync_package_snort();
