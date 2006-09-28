@@ -393,20 +393,6 @@
       <configurationfile>mtr-nox11.xml</configurationfile>
     </package>
     <package>
-      <name>bsdstats</name>
-      <descr>The mission of this site is to try and come up with semi-accurate numbers for both advocacy, and marketing, of the *BSD Operating Systems.</descr>
-      <website>http://bsdstats.hub.org/</website>
-      <category>Network</category>
-      <version>3.9</version>
-      <status>BETA</status>
-      <required_version>1.0-RC3</required_version>
-      <maintainer>geekgod@geekgod.com</maintainer>
-      <depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
-      <depends_on_package>bsdstats-3.9.tbz</depends_on_package>
-      <config_file>http://www.pfsense.org/packages/config/bsdstats/bsdstats.xml</config_file>
-      <configurationfile>bsdstats.xml</configurationfile>
-    </package>
-    <package>
       <name>squid</name>
       <descr>High performance web proxy cache.</descr>
       <website>http://www.squid-cache.org/</website>
@@ -629,5 +615,19 @@
       <required_version>1.0-RC3</required_version>
       <maintainer>raj@linuxense.com</maintainer>
       <configurationfile>havp.xml</configurationfile>
+    </package>
+    <package>
+      <name>bsdstats</name>
+      <descr>The mission of this site is to try and come up with semi-accurate numbers for both advocacy, and marketing, of the *BSD Operating Systems.</descr>
+      <website>http://bsdstats.hub.org/</website>
+      <category>Network</category>
+      <version>3.9</version>
+      <status>BETA</status>
+      <required_version>1.0-RC3</required_version>
+      <maintainer>geekgod@geekgod.com</maintainer>
+      <depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
+      <depends_on_package>bsdstats-3.9.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/bsdstats/bsdstats.xml</config_file>
+      <configurationfile>bsdstats.xml</configurationfile>
     </package>
 </pfsensepkgs>
