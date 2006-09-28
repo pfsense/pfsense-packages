@@ -51,7 +51,7 @@
 	</tabs>
 	<fields>
 		<field>
-			<fielddescr>Interface</fielddescr>
+			<fielddescr>Interface (generally LAN)</fielddescr>
 			<fieldname>interface_array</fieldname>
 			<value>lan</value>
 			<multiple>true</multiple>
@@ -63,7 +63,6 @@
 			<fieldname>overridewanip</fieldname>
 			<type>input</type>
 		</field>
-
     </fields>
 	<custom_php_install_command>
 	</custom_php_install_command>
