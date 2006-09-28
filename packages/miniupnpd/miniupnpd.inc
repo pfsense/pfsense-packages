@@ -16,17 +16,15 @@
 		else if($config['installedpackages']['miniupnpd']['config'][0]['overridewanip'])
 			$overridewanip = $config['installedpackages']['miniupnpd']['config'][0]['overridewanip'];
 
-		if(is_array($_POST['interface_array']))
+		if($_POST['interface_array'])
 			$interface_array = $_POST['interface_array'];
-		else if($config['installedpackages']['miniupnpd']['config'][0]['interface_array'])
+		else if(is_array($config['installedpackages']['miniupnpd']['config'][0]['interface_array']))
 			$interface_array = $config['installedpackages']['miniupnpd']['config'][0]['interface_array'];
 
 		if($interface_array) {
 			foreach($_POST['interface_array'] as $iface) {
 				$if = convert_friendly_interface_to_real_interface_name($iface);
 				if($if) {
-				    //if($first == 1)
-					//$ifaces_final .= ",";
 					$addr = find_interface_ip($if);
 				    $ifaces_final .= " -i {$wanif} -a {$addr}";
 				    $first = 1;
