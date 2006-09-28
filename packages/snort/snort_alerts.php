@@ -42,9 +42,10 @@ if (!$nentries)
 if ($_POST['clear']) {
 	exec("killall syslogd");
 	exec("rm {$snort_logfile}; touch {$snort_logfile}");
-	system_syslogd_start();	
+	system_syslogd_start();
 	exec("/usr/bin/killall -HUP snort");
-	exec("/usr/bin/killall -HUP snort2c");
+	exec("/usr/bin/killall snort2c");
+	exec("/usr/local/bin/snort2c -w /var/db/whitelist -a /var/log/snort/alert");
 }
 
 $pgtitle = "Services: Snort: Snort Alerts";
@@ -98,7 +99,7 @@ function dump_log_file($logfile, $tail, $withorig = true, $grepfor = "", $grepin
     $logarr = "";
 	exec("cat {$logfile} | /usr/bin/tail -n {$tail}", $logarr);
     foreach ($logarr as $logent) {
-            if(!logent) 
+            if(!logent)
             	continue;
             echo "<tr valign=\"top\">\n";
             echo "<td colspan=\"2\" class=\"listr\">" . $logent . "&nbsp;</td>\n";
