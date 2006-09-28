@@ -63,6 +63,14 @@ include("head.inc");
 
 <div id="mainlevel">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<?php
+	$tab_array = array();
+	$tab_array[] = array(gettext("UPNP Status "), true, "/status_upnp.php");
+	$tab_array[] = array(gettext("miniupnpd Settings "), false, "/pkg_edit.php?xml=miniupnpd.xml&id=0");
+	display_top_tabs($tab_array);
+?>
+</table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>
      <td class="tabcont" >
       <form action="status_upnp.php" method="post">
