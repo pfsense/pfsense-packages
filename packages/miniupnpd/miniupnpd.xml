@@ -10,12 +10,6 @@
 		<name>Miniupnpd</name>
 		<tooltiptext>Set miniupnpd settings such as interfaces to listen on.</tooltiptext>
 		<section>Services</section>
-		<url>/pkg_edit.php?xml=miniupnpd.xml&amp;id=0</url>
-	</menu>
-	<menu>
-		<name>Miniupnpd</name>
-		<tooltiptext>List current upnp mappings.</tooltiptext>
-		<section>Status</section>
 		<url>/status_upnp.php</url>
 	</menu>
 	<additional_files_needed>

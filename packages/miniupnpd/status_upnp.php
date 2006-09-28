@@ -31,6 +31,10 @@
 
 require("guiconfig.inc");
 
+/* Defaults to this page but if no settings are present, redirect to setup page */
+if(!is_array($config['installedpackages']['miniupnpd']['config'][0]['interface_array']))
+	Header("Location: /pkg_edit.php?xml=miniupnpd.xml&amp;id=0");
+
 if ($_POST) {
 	if ($_POST['clear'] == "Clear") {
 		// stop
