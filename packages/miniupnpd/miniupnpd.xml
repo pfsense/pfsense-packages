@@ -58,6 +58,12 @@
 			<size>3</size>
 			<type>interfaces_selection</type>
 		</field>
+		<field>
+			<fielddescr>Override WAN address</fielddescr>
+			<fieldname>overridewanip</fieldname>
+			<type>input</type>
+		</field>
+
     </fields>
 	<custom_php_install_command>
 		$ints = `ifconfig -l`;

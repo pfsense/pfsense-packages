@@ -28,6 +28,10 @@
 			$start .= "/sbin/pfctl -aminiupnpd -Fn 2>&1 >/dev/null\n";
 			$start .= "/usr/local/sbin/miniupnpd -p 2869{$ifaces_final}";
 
+			/* override wan ip address, common for carp, etc */
+			if($_POST['overridewanip'])
+				$start .= " -o {$overridewanip}";
+
 			$stop .= "/usr/bin/killall miniupnpd \n";
 			$stop .= "# Clear existing rules and rdr entries \n";
 			$stop .= "/sbin/pfctl -aminiupnpd -Fr 2>&1 >/dev/null\n";
