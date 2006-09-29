@@ -1,7 +1,7 @@
 <?php
 /* $Id$ */
 /*
-	squid.sh
+	squid.inc
 	Copyright (C) 2006 Scott Ullrich
 	Copyright (C) 2006 Fernando Lemos
 	All rights reserved.
@@ -53,6 +53,11 @@ function squid_get_real_interface_address($iface) {
 	list($dummy, $ip, $dummy2, $netmask) = explode(' ', $line);
 
 	return array($ip, long2ip(hexdec($netmask)));
+}
+
+/* setup cache */
+function squid_dash_z() {
+	mwexec("/usr/local/sbin/squid -z");
 }
 
 function squid_chown_recursive($dir, $user, $group) {

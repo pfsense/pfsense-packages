@@ -2,7 +2,7 @@
 <packagegui>
 	<include_file>squid.inc</include_file>
 	<name>squidcache</name>
-	<title>Proxy server: Cache management</title>		
+	<title>Proxy server: Cache management</title>
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -125,10 +125,17 @@
 			<type>checkbox</type>
 		</field>
 	</fields>
+	<custom_php_command_before_form>
+		if($_POST['harddisk_cache_size'] != $config['installedpackages']['squidcache']['config'][0]['harddisk_cache_size']) {
+			$needs_dash_z = true;
+		}
+	</custom_php_command_before_form>
 	<custom_php_validation_command>
 		squid_validate_cache($_POST, &amp;$input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		squid_resync();
+		if($needs_dash_z)
+			squid_dash_z();
 	</custom_php_resync_config_command>
 </packagegui>
