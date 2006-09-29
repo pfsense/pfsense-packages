@@ -86,14 +86,14 @@
 		<field>
 			<fielddescr>Memory replacement policy</fielddescr>
 			<fieldname>memory_replacement</fieldname>
-			<description>The memory replacement policy determines which objects are purged from memory when space is needed.  The default policy for memory replacement is GSDF.</description>
-			<default_value>heap GSDF</default_value>
+			<description>The memory replacement policy determines which objects are purged from memory when space is needed.  The default policy for memory replacement is GDSF.</description>
+			<default_value>heap GDSF</default_value>
 			<type>select</type>
 			<options>
 				<option><name>LRU</name><value>LRU</value></option>
 				<option><name>Heap LRU</name><value>heap LRU</value></option>
 				<option><name>Heap LFUDA</name><value>heap LFUDA</value></option>
-				<option><name>Heap GDSF</name><value>heap GSDF</value></option>
+				<option><name>Heap GDSF</name><value>heap GDSF</value></option>
 			</options>
 		</field>
 		<field>
@@ -106,7 +106,7 @@
 				<option><name>LRU</name><value>lru</value></option>
 				<option><name>Heap LRU</name><value>heap LRU</value></option>
 				<option><name>Heap LFUDA</name><value>heap LFUDA</value></option>
-				<option><name>Heap GDSF</name><value>heap GSDF</value></option>
+				<option><name>Heap GDSF</name><value>heap GDSF</value></option>
 			</options>
 		</field>
 		<field>
