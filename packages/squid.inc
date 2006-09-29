@@ -280,7 +280,7 @@ function squid_validate_auth($post, $input_errors) {
 				$user = trim($post['ldap_user']);
 				if (empty($user))
 					$input_errors[] = 'The field \'LDAP server user DN\' is required';
-				else if (!is_domain($user))
+				else if (!$user)
 					$input_errors[] = 'The field \'LDAP server user DN\' must be a valid domain name';
 				break;
 			case 'radius':
