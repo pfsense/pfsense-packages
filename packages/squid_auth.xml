@@ -139,11 +139,17 @@
 		</field>
 	</fields>
 	<custom_php_after_head_command>
+		$transparent_proxy = ($config['installedpackages']['squid']['config'][0]['transparent_proxy'] == 'on');
+		if($transparent_proxy)
+			$input_errors[] = "Authentication cannot be enabled while transparent proxy mode is enabled";
 		squid_print_javascript_auth();
 	</custom_php_after_head_command>
 	<custom_php_validation_command>
 		squid_validate_auth($_POST, &amp;$input_errors);
 	</custom_php_validation_command>
+	<custom_php_before_form_command>
+		squid_print_javascript_auth2();
+	</custom_php_before_form_command>
 	<custom_php_after_form_command>
 		squid_print_javascript_auth2();
 	</custom_php_after_form_command>
