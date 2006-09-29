@@ -2,7 +2,7 @@
 <?php
 /* $Id$ */
 /*
-    rc.filter_configure
+    rc.freenas
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2006 Daniel S. Haischt
     All rights reserved.
@@ -56,7 +56,7 @@ disks_raid_start();
 
 /* Mount the disks */
 disks_mount_all();
-	
+
 /* Generate the pam configuration file */
 system_pam_configure();
 
