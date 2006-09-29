@@ -9,13 +9,6 @@
 		<section>Diagnostics</section>
 		<url>/pkg_edit.php?xml=darkstat.xml&amp;id=0</url>
 	</menu>
-	<menu>
-		<name>Darkstat</name>
-		<tooltiptext>Access Darkstat</tooltiptext>
-		<url>http://$myurl:666</url>
-		<section>Diagnostics</section>
-		<depends_on_service>darkstat</depends_on_service>
-	</menu>
 	<service>
 		<name>darkstat</name>
 		<rcfile>darkstat.sh</rcfile>
