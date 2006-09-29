@@ -19,7 +19,7 @@
 	<service>
 		<name>darkstat</name>
 		<rcfile>darkstat.sh</rcfile>
-		<executable>Darkstat</executable>
+		<executable>darkstat</executable>
 	</service>
 	<tabs>
 		<tab>
@@ -42,11 +42,6 @@
 			<type>interfaces_selection</type>
 		</field>
     </fields>
-	<service>
-		<name>Darkstat</name>
-		<rcfile>darkstat.sh</rcfile>
-		<executable>darkstat</executable>
-	</service>
 	<custom_php_global_functions>
 		function sync_package_darkstat() {
 			$first = 0;
