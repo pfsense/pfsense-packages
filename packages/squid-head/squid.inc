@@ -87,6 +87,7 @@ EOD;
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_LOGDIR,
 			SQUID_ACLDIR,
+			SQUID_CACHEDIR,
 	) as $dir) {
 			make_dirs($dir);
 			squid_chown_recursive($dir, 'proxy', 'proxy');
@@ -188,7 +189,7 @@ function squid_validate_nac($post, $input_errors) {
 	$allowed_subnets = explode(',', trim($post['allowed_subnets']));
 	foreach ($allowed_subnets as $subnet) {
 		$subnet = trim($subnet);
-		if (!is_subnet($subnet))
+		if (!empty($subnet) && !is_subnet($subnet))
 			$input_errors[] = "'$subnet' is not a valid CIDR range";
 	}
 
@@ -220,10 +221,14 @@ function squid_validate_nac($post, $input_errors) {
 }
 
 function squid_validate_traffic($post, $input_errors) {
-	$num_fields = array(	'max_download_size' => 'Maximum download size',
-				'max_upload_size' => 'Maximum upload size',
-				'perhost_throttling' => 'Per-host bandwidth throttling',
-				'overall_throttling' => 'Overall bandwidth throttling',
+	$num_fields = array(
+		'max_download_size' => 'Maximum download size',
+		'max_upload_size' => 'Maximum upload size',
+		'perhost_capping' => 'Per-host bandwidth capping',
+		'overall_capping' => 'Overall bandwidth capping',
+		'perhost_throttling' => 'Per-host bandwidth throttling',
+		'overall_throttling' => 'Overall bandwidth throttling',
+		'initial_bucket_level' => 'Initial bucket level',
 	);
 	foreach ($num_fields as $field => $name) {
 		$value = trim($post[$field]);
@@ -492,24 +497,38 @@ function squid_resync_traffic() {
 	$conf .= "request_body_max_size $up_limit KB\n";
 	$conf .= 'reply_body_max_size ' . ($down_limit * 1024) . " allow all\n";
 
-	// Only apply throttling past 10MB
-	// XXX: Should this really be hardcoded?
-	$threshold = 10 * 1024 * 1024;
-	$overall = $settings['overall_throttling'];
-	if (!isset($overall) || ($overall == 0))
-		$overall = -1;
+	foreach (array('perhost', 'overall') as $field) {
+		$capping = $settings["{$field}_capping"];
+		$throttling = $settings["{$field}_throttling"];
+
+		if (!isset($capping) || $capping == 0)
+			$capping = '-1';
+		else
+			$capping *= 1024; // Kbytes
+
+		if (!isset($throttling) || $throttling == 0) {
+			if ($capping == '-1')
+				$throttling = '-1';
+			else
+				$throttling = $capping;
+		} else {
+			$throttling *= 1024; // Kbytes
+		}
+
+		$$field = "$throttling/$capping";
+	}
+
+	$initial_bucket_level = $settings['initial_bucket_level'];
+	if (!isset($initial_bucket_level) || $initial_bucket_level == 0)
+		$initial_bucket_level = '100%';
 	else
-		$overall *= 1024;
-	$perhost = $settings['perhost_throttling'];
-	if (!isset($perhost) || ($perhost == 0))
-		$perhost = -1;
-	else
-		$perhost *= 1024;
+		$initial_bucket_level *= 1024; // Kbytes
+
 	$conf .= <<<EOD
+delay_initial_bucket_level $initial_bucket_level
 delay_pools 1
 delay_class 1 2
-delay_parameters 1 $overall/$threshold $perhost/$threshold
-delay_initial_bucket_level 100%
+delay_parameters 1 $overall $perhost
 
 EOD;
 
@@ -539,9 +558,11 @@ EOD;
 			$contents .= "\.$ext\$\n";
 		file_put_contents(SQUID_ACLDIR . '/throttle_exts.acl', $contents);
 
-		$conf .= 'acl throttle_exts url_regex -i "' . SQUID_ACLDIR . '/throttle_exts.acl"';
-		$conf .= "delay_access 1 allow throttle_exts\n";
-		$conf .= "delay_access 1 deny all\n";
+		if (!empty($contents)) { // avoid crashing Squid
+			$conf .= 'acl throttle_exts url_regex -i "' . SQUID_ACLDIR . "/throttle_exts.acl\"\n";
+			$conf .= "delay_access 1 allow throttle_exts\n";
+			$conf .= "delay_access 1 deny all\n";
+		}
 	}
 	else
 		$conf .= "delay_access 1 allow all\n";
@@ -677,7 +698,7 @@ function squid_resync() {
 
 	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
 
-	if (!is_dir(SQUID_CACHEDIR)) {
+	if (!is_dir(SQUID_CACHEDIR . '/0/0')) {
 		log_error(SQUID_CACHEDIR  . ' does not exist. Creating.');
 		mwexec('/usr/local/sbin/squid -z');
 	}

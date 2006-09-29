@@ -38,7 +38,7 @@
 		<field>
 			<fieldname>max_download_size</fieldname>
 			<fielddescr>Maximum download size</fielddescr>
-			<description>Limit the maximum total download size to the size specified here (in kilobytes). Set to 0 to disable.</description>
+			<description>Limit the maximum total download size to the size specified here (in kilobytes). Downloads bigger than the specified size will be denied. Set to 0 to disable.</description>
 			<default_value>0</default_value>
 			<required/>
 			<type>input</type>
@@ -46,7 +46,23 @@
 		<field>
 			<fieldname>max_upload_size</fieldname>
 			<fielddescr>Maximum upload size</fielddescr>
-			<description>Limit the maximum total upload size to the size specified here (in kilobytes). Set to 0 to disable.</description>
+			<description>Limit the maximum total upload size to the size specified here (in kilobytes). Uploads bigger than the specified size will be denied. Set to 0 to disable.</description>
+			<default_value>0</default_value>
+			<required/>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>overall_capping</fieldname>
+			<fielddescr>Overall capping</fielddescr>
+			<description>Caps the download speeds of the network that connects to the proxy as a whole at the specified size (in kilobytes per second). Set to 0 to disable.</description>
+			<default_value>0</default_value>
+			<required/>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>perhost_capping</fieldname>
+			<fielddescr>Per-host capping</fielddescr>
+			<description>Caps the download speeds of each user that connects to the proxy at the specified size (in kilobytes per second). Set to 0 to disable.</description>
 			<default_value>0</default_value>
 			<required/>
 			<type>input</type>
@@ -63,6 +79,14 @@
 			<fieldname>perhost_throttling</fieldname>
 			<fielddescr>Per-host throttling</fielddescr>
 			<description>This value specifies the download throttling per host. Set to 0 to disable this.</description>
+			<default_value>0</default_value>
+			<required/>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>initial_bucket_level</fieldname>
+			<fielddescr>Initial bucket level</fielddescr>
+			<description>The initial bucket level is used to determine how much is put in each bucket when a connection is established. Set to 0 to set the initial bucket level to 100%.</description>
 			<default_value>0</default_value>
 			<required/>
 			<type>input</type>
