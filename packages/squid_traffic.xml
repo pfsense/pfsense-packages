@@ -2,7 +2,7 @@
 <packagegui>
 	<include_file>squid.inc</include_file>
 	<name>squidtraffic</name>
-	<title>Proxy server: Traffic management</title>		
+	<title>Proxy server: Traffic management</title>
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -98,6 +98,7 @@
 			<fielddescr>Throttle other extensions</fielddescr>
 			<description>Comma-separated list of extensions to apply bandwidth throttle to.</description>
 			<type>input</type>
+			<size>60</size>
 		</field>
 	</fields>
 	<custom_php_validation_command>
