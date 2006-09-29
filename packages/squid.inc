@@ -217,11 +217,7 @@ function squid_validate_nac($post, $input_errors) {
 			$input_errors[] = "'$subnet' is not a valid CIDR range";
 	}
 
-	foreach (array(	'unrestricted_hosts',
-			'banned_hosts',
-			'whitelist',
-			'blacklist',
-	) as $hosts) {
+	foreach (array(	'unrestricted_hosts', 'banned_hosts') as $hosts) {
 		foreach (explode(',', $post[$hosts]) as $host) {
 			$host = trim($host);
 			if (!empty($host) && !is_ipaddr($host))
