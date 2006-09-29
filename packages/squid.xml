@@ -132,6 +132,7 @@
 			<description>This is the URL to be displayed in proxy server error messages.</description>
 			<default_value>localhost</default_value>
 			<type>input</type>
+			<size>60</size>
 		</field>
 		<field>
 			<fieldname>admin_email</fieldname>
@@ -139,6 +140,7 @@
 			<description>This is the email address displayed in error messages to the users.</description>
 			<default_value>admin@localhost</default_value>
 			<type>input</type>
+			<size>60</size>
 		</field>
 		<field>
 			<fielddescr>Language</fielddescr>

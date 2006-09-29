@@ -56,42 +56,49 @@
 			<fielddescr>Authentication server</fielddescr>
 			<description>Enter here the IP or hostname of the server that will perform the authentication.</description>
 			<type>input</type>
+			<size>60</size>
 		</field>
 		<field>
 			<fieldname>auth_server_port</fieldname>
 			<fielddescr>Authentication server port</fielddescr>
 			<description>Enter here the port to use to connect to the authentication server. Leave this field blank to use the authentication method's default port.</description>
 			<type>input</type>
+			<size>60</size>
 		</field>
 		<field>
 			<fieldname>ldap_user</fieldname>
 			<fielddescr>LDAP server user DN</fielddescr>
 			<description>Enter here the user DN to use to connect to the LDAP server.</description>
 			<type>input</type>
+			<size>60</size>
 		</field>
 		<field>
 			<fieldname>ldap_password</fieldname>
 			<fielddescr>LDAP password</fielddescr>
 			<description>Enter here the password to use to connect to the LDAP server.</description>
 			<type>password</type>
+			<size>60</size>
 		</field>
 		<field>
 			<fieldname>ldap_basedomain</fieldname>
 			<fielddescr>LDAP base domain</fielddescr>
 			<description>For LDAP authentication, enter here the base domain in the LDAP server.</description>
 			<type>input</type>
+			<size>60</size>
 		</field>
 		<field>
 			<fieldname>radius_secret</fieldname>
 			<fielddescr>RADIUS secret</fielddescr>
 			<description>The RADIUS secret for RADIUS authentication.</description>
 			<type>password</type>
+			<size>60</size>
 		</field>
 		<field>
 			<fieldname>msnt_secondary</fieldname>
 			<fielddescr>Secondary NT servers</fielddescr>
 			<description>Comma-separated list of secondary servers to be used for NT domain authentication.</description>
 			<type>input</type>
+			<size>60</size>
 		</field>
 		<field>
 			<fieldname>auth_prompt</fieldname>
@@ -106,6 +113,7 @@
 			<description>The number of authenticator processes to spawn. If many authentications are expected within a short timeframe, increase this number accordingly.</description>
 			<default_value>5</default_value>
 			<type>input</type>
+			<size>60</size>
 		</field>
 		<field>
 			<fieldname>auth_ttl</fieldname>
@@ -113,6 +121,7 @@
 			<description>This specifies for how long (in minutes) the proxy server assumes an externally validated username and password combination is valid (Time To Live).  When the TTL expires, the user will be prompted for credentials again.</description>
 			<default_value>60</default_value>
 			<type>input</type>
+			<size>60</size>
 		</field>
 		<field>
 			<fieldname>unrestricted_auth</fieldname>
