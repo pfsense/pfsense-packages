@@ -86,6 +86,8 @@ function squid_is_valid_acl($acl) {
 function squid_install_command() {
 	/* create cache */
 	mwexec("/usr/local/sbin/squid -z");
+	/* make sure pinger is executable */
+	exec("chmod a+x /usr/local/libexec/squid/pinger");
 	$rc = array();
 	$rc['file'] = 'squid.sh';
 	$rc['start'] = '/usr/local/sbin/squid -D';
@@ -680,6 +682,9 @@ function squid_resync() {
 	$conf .= squid_resync_traffic() . "\n";
 	$conf .= squid_resync_auth();
 	squid_resync_users();
+
+	/* make sure pinger is executable */
+	exec("chmod a+x /usr/local/libexec/squid/pinger");
 
 	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
 
