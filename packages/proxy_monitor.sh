@@ -29,7 +29,7 @@
 
 set -e
 
-LOOP_SLEEP=60
+LOOP_SLEEP=300
 
 if [ -f /var/run/squid_alarm ]; then
 	rm /var/run/squid_alarm
