@@ -87,7 +87,8 @@ function squid_install_command() {
 	/* create cache */
 	mwexec("/usr/local/sbin/squid -z");
 	/* make sure pinger is executable */
-	exec("chmod a+x /usr/local/libexec/squid/pinger");
+	exec("/bin/chmod a+x /usr/local/libexec/squid/pinger");
+	exec("/bin/rm /usr/local/etc/rc.d/squid");
 	$rc = array();
 	$rc['file'] = 'squid.sh';
 	$rc['start'] = '/usr/local/sbin/squid -D';
