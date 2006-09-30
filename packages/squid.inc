@@ -99,6 +99,7 @@ ps awux | grep proxy_monitor.sh | grep -v grep | awk '{ print \$2 }' | xargs kil
 killall squid 2>/dev/null
 sleep 1
 killall squid 2>/dev/null
+killall pinger 2>/dev/null
 
 EOD;
 	$rc['restart'] = <<<EOD
