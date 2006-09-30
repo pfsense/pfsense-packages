@@ -44,6 +44,7 @@ $date1ts = strtotime($last_update_date);
 $date2ts = strtotime($last_ruleset_download);
 /* is there a newer ruleset available? */
 if($date1ts > $date2ts or !$last_ruleset_download) {
+	log_error("There is a new set of Snort rules posted.  Downloading...");
 	if(!$oinkid) {
 		log_error("Oinkid is not defined.  We cannot automatically update the ruleset.");
 		echo "Oinkid is not defined.  We cannot automatically update the ruleset.";
@@ -85,8 +86,10 @@ if($date1ts > $date2ts or !$last_ruleset_download) {
 	/* cleanup temporary directory */
 	exec("/bin/rm -rf {$tmpfname};");
 	echo "Rules are now up to date.\n";
+	log_error("Snort rules updated.  New version: {$last_update_date}.");
 } else {
 	echo "Rules are up to date.\n";
+	log_error("Snort rules are up to date.  Not updating.");
 }
 
 ?>
