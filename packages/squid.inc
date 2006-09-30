@@ -93,6 +93,7 @@ function squid_install_command() {
 	$rc['file'] = 'squid.sh';
 	$rc['start'] = '/usr/local/sbin/squid -D';
 	$rc['stop'] = <<<EOD
+ps awux | grep proxy_monitor.sh | grep -v grep | awk '{ print \$2 }' | xargs kill
 /usr/local/sbin/squid -k shutdown
 # Just to be sure...
 killall squid 2>/dev/null
