@@ -133,7 +133,7 @@
 			<default_value>localhost</default_value>
 			<type>input</type>
 			<size>60</size>
-		</field> \
+		</field>
 		<field>
 			<fieldname>admin_email</fieldname>
 			<fielddescr>Administrator email</fielddescr>
@@ -163,6 +163,8 @@
 		squid_resync();
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
+		update_status("Checking Squid cache... One moment please...");
+		update_output_window("This operation may take quite some time, please be patient.");
 		squid_install_command();
 		squid_resync();
 	</custom_php_install_command>
