@@ -39,7 +39,7 @@
 	</menu>
 	<service>
 		<name>squid</name>
-		<description>Web proxy cache.</description>
+		<description>Proxy server Service</description>
 		<rcfile>squid.sh</rcfile>
 		<executable>squid</executable>
 	</service>
