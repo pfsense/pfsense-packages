@@ -386,7 +386,7 @@ function squid_resync_cache() {
 	$disk_cache_size = ($settings['harddisk_cache_size'] ? $settings['harddisk_cache_size'] : 100);
 	$level1 = ($settings['level1_subdirs'] ? $settings['level1_subdirs'] : 16);
 	$memory_cache_size = ($settings['memory_cache_size'] ? $settings['memory_cache_size'] : 8);
-	$max_objsize = ($settings['maximum_object_size'] ? $settings['maximum_object_size'] : 4);
+	$max_objsize = ($settings['maximum_object_size'] ? $settings['maximum_object_size'] : 10);
 	$min_objsize = ($settings['minimum_object_size'] ? $settings['minimum_object_size'] : 0);
 	$cache_policy = ($settings['cache_replacement_policy'] ? $settings['cache_replacement_policy'] : 'heap LFUDA');
 	$memory_policy = ($settings['memory_replacement_policy'] ? $settings['memory_replacement_policy'] : 'heap GDSF');
