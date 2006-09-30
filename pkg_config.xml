@@ -397,7 +397,7 @@
       <descr>High performance web proxy cache.</descr>
       <website>http://www.squid-cache.org/</website>
       <category>Network</category>
-      <version>0.5</version>
+      <version>0.6</version>
       <status>BETA</status>
       <required_version>1.0-RC3</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
