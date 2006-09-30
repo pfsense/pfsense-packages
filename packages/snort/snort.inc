@@ -35,6 +35,7 @@ if($config['installedpackages']['snort'])
 
 function sync_package_snort() {
 	global $config, $g, $snort_conf_file;
+	conf_mount_rw();
 	exec("/bin/mkdir -p /usr/local/etc/snort");
 	exec("/bin/mkdir -p /var/log/snort");
 	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
@@ -84,6 +85,7 @@ function sync_package_snort() {
 	create_snort_conf();
 
 	/* start snort service */
+	conf_mount_ro();
 	start_service("snort");
 }
 
@@ -91,6 +93,7 @@ function create_snort_conf() {
 	global $config, $g, $snort_conf_file;
 	/* write out snort.conf */
 	$snort_conf_text = generate_snort_conf();
+	conf_mount_rw();
 	$conf = fopen($snort_conf_file, "w");
 	if(!$conf) {
 		log_error("Could not open {$snort_conf_file} for writing.");
@@ -98,10 +101,12 @@ function create_snort_conf() {
 	}
 	fwrite($conf, $snort_conf_text);
 	fclose($conf);
+	conf_mount_ro();
 }
 
 function generate_snort_conf() {
 	global $config, $g, $snort_conf_file;
+	conf_mount_rw();
 	/* obtain external interface */
 	/* XXX: make multi wan friendly */
 	$snort_ext_int = $config['installedpackages']['snort']['config'][0]['iface_array'][0];
@@ -196,6 +201,8 @@ function generate_snort_conf() {
 		foreach($enabled_rulesets_array as $enabled_item)
 			$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
 	}
+
+	conf_mount_ro();
 
 	/* build snort configuration file */
 	$snort_conf_text = <<<EOD
