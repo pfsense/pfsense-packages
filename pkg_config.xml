@@ -217,19 +217,6 @@
       <configurationfile>viralator.xml</configurationfile>
     </package>
     <package>
-      <name>clamav</name>
-      <descr>The ClamAV antivirus.</descr>
-      <website>http://www.clamav.net/</website>
-      <category>Security</category>
-      <version>0.1</version>
-      <status>PRE-ALPHA</status>
-      <required_version>1.0-RC3</required_version>
-      <maintainer>fernando@netfilter.com.br</maintainer>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
-      <config_file>http://www.pfsense.org/packages/config/clamav.xml</config_file>
-      <configurationfile>clamav.xml</configurationfile>
-    </package>
-    <package>
       <name>darkstat</name>
       <website>http://dmr.ath.cx/net/darkstat/</website>
       <descr>darkstat is a network statistics gatherer. It's a packet sniffer that runs as a background process on a cable/DSL router, gathers all sorts of statistics about network usage, and serves them over HTTP.</descr>
@@ -629,5 +616,18 @@
       <depends_on_package>bsdstats-3.9.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/bsdstats/bsdstats.xml</config_file>
       <configurationfile>bsdstats.xml</configurationfile>
+    </package>
+    <package>
+      <name>clamav</name>
+      <descr>The ClamAV antivirus.</descr>
+      <website>http://www.clamav.net/</website>
+      <category>Security</category>
+      <version>0.1</version>
+      <status>PRE-ALPHA</status>
+      <required_version>1.0-RC3</required_version>
+      <maintainer>fernando@netfilter.com.br</maintainer>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
+      <config_file>http://www.pfsense.org/packages/config/clamav.xml</config_file>
+      <configurationfile>clamav.xml</configurationfile>
     </package>
 </pfsensepkgs>
