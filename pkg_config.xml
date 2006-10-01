@@ -376,7 +376,7 @@
       <depends_on_package>ifdepd-20050420.tbz</depends_on_package>
       <version>20050420</version>
       <status>ALPHA</status>
-      <required_version>1.0-RC3</required_version>
+      <required_version>2.0</required_version>
       <config_file>http://www.pfsense.com/packages/config/ifdepd.xml</config_file>
       <configurationfile>ifdepd.xml</configurationfile>
     </package>
