@@ -3,6 +3,64 @@
 <!-- $Id$ -->
 <pfsensepkgs>
   <packages>
+      <package>
+      <name>clamav</name>
+      <descr>The ClamAV antivirus.</descr>
+      <website>http://www.clamav.net/</website>
+      <category>Security</category>
+      <version>0.1</version>
+      <status>PRE-ALPHA</status>
+      <required_version>2.0</required_version>
+      <maintainer>fernando@netfilter.com.br</maintainer>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
+      <config_file>http://www.pfsense.org/packages/config/clamav.xml</config_file>
+      <configurationfile>clamav.xml</configurationfile>
+    </package>
+    <package>
+      <name>p3scan-pf</name>
+      <descr>
+        A transparent POP3-Proxy with virus-scanning- and
+        spam-scanning-capabilities.
+      </descr>
+      <website>http://www.undergroundsecurity.com/p3scan/</website>
+      <category>Security</category>
+      <version>0.1</version>
+      <status>ALPHA</status>
+      <required_version>2.0</required_version>
+      <maintainer>fernando@netfilter.com.br</maintainer>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package>p3scan-pf-2.3.2.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/p3scan-pf/p3scan-pf.xml</config_file>
+      <configurationfile>p3scan-pf.xml</configurationfile>
+    </package>
+    <package>
+      <name>clamsmtp</name>
+      <descr>SMTP virus scanner.</descr>
+      <website>http://memberwebs.com/nielsen/software/clamsmtp/</website>
+      <category>Security</category>
+      <version>0.1</version>
+      <status>PRE-ALPHA</status>
+      <required_version>2.0</required_version>
+      <maintainer>fernando@netfilter.com.br</maintainer>
+      <config_file>http://www.pfsense.org/packages/config/clamsmtp.xml</config_file>
+      <configurationfile>clamsmtp.xml</configurationfile>
+    </package>
+    <package>
+      <name>viralator</name>
+      <descr>HTTP virus scanner.</descr>
+      <website>http://viralator.sourceforge.net/</website>
+      <category>Security</category>
+      <version>0.1</version>
+      <status>PRE-ALPHA</status>
+      <required_version>2.0</required_version>
+      <maintainer>fernando@netfilter.com.br</maintainer>
+      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
+      <depends_on_package>perl-5.8.8.tbz</depends_on_package>
+      <depends_on_package>p5-libwww-5.805.tbz</depends_on_package>
+      <depends_on_package>squirm-1.26.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/viralator.xml</config_file>
+      <configurationfile>viralator.xml</configurationfile>
+    </package>
     <package>
       <name>nmap</name>
       <descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
@@ -170,51 +228,6 @@
       <depends_on_package>p5-Mail-SpamAssassin-3.1.0_6.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/sassassin.xml</config_file>
       <configurationfile>sassassin.xml</configurationfile>
-    </package>
-    <package>
-      <name>p3scan-pf</name>
-      <descr>
-        A transparent POP3-Proxy with virus-scanning- and
-        spam-scanning-capabilities.
-      </descr>
-      <website>http://www.undergroundsecurity.com/p3scan/</website>
-      <category>Security</category>
-      <version>0.1</version>
-      <status>ALPHA</status>
-      <required_version>1.0-RC3</required_version>
-      <maintainer>fernando@netfilter.com.br</maintainer>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
-      <depends_on_package>p3scan-pf-2.3.2.tbz</depends_on_package>
-      <config_file>http://www.pfsense.org/packages/config/p3scan-pf/p3scan-pf.xml</config_file>
-      <configurationfile>p3scan-pf.xml</configurationfile>
-    </package>
-    <package>
-      <name>clamsmtp</name>
-      <descr>SMTP virus scanner.</descr>
-      <website>http://memberwebs.com/nielsen/software/clamsmtp/</website>
-      <category>Security</category>
-      <version>0.1</version>
-      <status>PRE-ALPHA</status>
-      <required_version>1.0-RC3</required_version>
-      <maintainer>fernando@netfilter.com.br</maintainer>
-      <config_file>http://www.pfsense.org/packages/config/clamsmtp.xml</config_file>
-      <configurationfile>clamsmtp.xml</configurationfile>
-    </package>
-    <package>
-      <name>viralator</name>
-      <descr>HTTP virus scanner.</descr>
-      <website>http://viralator.sourceforge.net/</website>
-      <category>Security</category>
-      <version>0.1</version>
-      <status>PRE-ALPHA</status>
-      <required_version>1.0-RC3</required_version>
-      <maintainer>fernando@netfilter.com.br</maintainer>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
-      <depends_on_package>perl-5.8.8.tbz</depends_on_package>
-      <depends_on_package>p5-libwww-5.805.tbz</depends_on_package>
-      <depends_on_package>squirm-1.26.tbz</depends_on_package>
-      <config_file>http://www.pfsense.org/packages/config/viralator.xml</config_file>
-      <configurationfile>viralator.xml</configurationfile>
     </package>
     <package>
       <name>darkstat</name>
@@ -616,18 +629,5 @@
       <depends_on_package>bsdstats-3.9.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/bsdstats/bsdstats.xml</config_file>
       <configurationfile>bsdstats.xml</configurationfile>
-    </package>
-    <package>
-      <name>clamav</name>
-      <descr>The ClamAV antivirus.</descr>
-      <website>http://www.clamav.net/</website>
-      <category>Security</category>
-      <version>0.1</version>
-      <status>PRE-ALPHA</status>
-      <required_version>1.0-RC3</required_version>
-      <maintainer>fernando@netfilter.com.br</maintainer>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.0-release/All</depends_on_package_base_url>
-      <config_file>http://www.pfsense.org/packages/config/clamav.xml</config_file>
-      <configurationfile>clamav.xml</configurationfile>
     </package>
 </pfsensepkgs>
