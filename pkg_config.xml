@@ -416,7 +416,7 @@
       <depends_on_package>arpwatch-2.1.a13.tbz</depends_on_package>
       <version>2.1.a13</version>
       <status>ALPHA</status>
-      <required_version>1.0-RC3</required_version>
+      <required_version>2.0</required_version>
       <config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
       <configurationfile>arpwatch.xml</configurationfile>
       <logging>
