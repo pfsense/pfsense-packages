@@ -27,14 +27,12 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$snort_conf_file = "/usr/local/etc/snort/snort.conf";
-
 /* define oinkid */
 if($config['installedpackages']['snort'])
 	$oinkid = $config['installedpackages']['snort']['config'][0]['oinkmastercode'];
 
 function sync_package_snort() {
-	global $config, $g, $snort_conf_file;
+	global $config, $g;
 	conf_mount_rw();
 	exec("/bin/mkdir -p /usr/local/etc/snort");
 	exec("/bin/mkdir -p /var/log/snort");
@@ -68,7 +66,7 @@ function sync_package_snort() {
 	$start  = "/bin/mkdir -p /var/log/snort";
 
 	/* start snort */
-	$start .= ";snort -c {$snort_conf_file} -l /var/log/snort {$ifaces_final} -A full -D";
+	$start .= ";snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort {$ifaces_final} -A full -D";
 
 	/* if block offenders is checked, start snort2c */
 	if($_POST['blockoffenders'])
@@ -90,13 +88,13 @@ function sync_package_snort() {
 }
 
 function create_snort_conf() {
-	global $config, $g, $snort_conf_file;
+	global $config, $g;
 	/* write out snort.conf */
 	$snort_conf_text = generate_snort_conf();
 	conf_mount_rw();
-	$conf = fopen($snort_conf_file, "w");
+	$conf = fopen("/usr/local/etc/snort/snort.conf", "w");
 	if(!$conf) {
-		log_error("Could not open {$snort_conf_file} for writing.");
+		log_error("Could not open /usr/local/etc/snort/snort.conf for writing.");
 		exit;
 	}
 	fwrite($conf, $snort_conf_text);
@@ -105,7 +103,7 @@ function create_snort_conf() {
 }
 
 function generate_snort_conf() {
-	global $config, $g, $snort_conf_file;
+	global $config, $g;
 	conf_mount_rw();
 	/* obtain external interface */
 	/* XXX: make multi wan friendly */
