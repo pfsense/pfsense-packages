@@ -24,12 +24,19 @@
 		system("/usr/local/etc/periodic/monthly/300.statistics");
 		$getid=file_get_contents("/tmp/getid");
 		log_error("Thanks for installing BSDStats.  Your id is {$getid}.");
+		update_status("Thanks for installing BSDStats.  Your id is {$getid}.");
+		update_output_window("Thanks for installing BSDStats.  Your id is {$getid}.");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		system("cat /etc/periodic.conf | grep -n \"monthly_statistics_report_devices\" >/tmp/periodic.conf");
-		system("cat /tmp/periodic.conf | grep -n \"monthly_statistics_enable\" >/etc/periodic.conf");
-		system("rm /usr/local/etc/periodic/monthly/300.statistics");
-		system("rm /tmp/periodic.conf");
-		system("rm /tmp/getid");
+		system("/bin/cat /etc/periodic.conf | grep -n \"monthly_statistics_report_devices\" >/tmp/periodic.conf");
+		system("/bin/cat /tmp/periodic.conf | grep -n \"monthly_statistics_enable\" >/etc/periodic.conf");
+		system("/bin/rm /usr/local/etc/periodic/monthly/300.statistics");
+		system("/bin/rm /tmp/periodic.conf");
+		system("/bin/rm /tmp/getid");
 	</custom_php_deinstall_command>
+	<additional_files_needed>
+		<prefix>/usr/bin/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/bsdstats/bin/dig</item>
+	</additional_files_needed>
 </packagegui>
