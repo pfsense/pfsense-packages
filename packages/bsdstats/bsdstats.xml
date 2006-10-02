@@ -21,11 +21,7 @@
 		}
 		system("echo monthly_statistics_report_devices=yes >> /etc/periodic.conf");
 		system("echo monthly_statistics_enable=yes >> /etc/periodic.conf");
-		system("/usr/local/etc/periodic/monthly/300.statistics");
-		$getid=file_get_contents("/tmp/getid");
-		log_error("Thanks for installing BSDStats.  Your id is {$getid}.");
-		update_status("Thanks for installing BSDStats.  Your id is {$getid}.");
-		update_output_window("Thanks for installing BSDStats.  Your id is {$getid}.");
+		mwexec_bg("/usr/local/etc/periodic/monthly/300.statistics");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		system("/bin/cat /etc/periodic.conf | grep -n \"monthly_statistics_report_devices\" >/tmp/periodic.conf");
