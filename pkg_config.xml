@@ -626,7 +626,6 @@
       <required_version>1.0-RC3</required_version>
       <maintainer>geekgod@geekgod.com</maintainer>
       <depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
-      <depends_on_package>bsdstats-3.9.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/bsdstats/bsdstats.xml</config_file>
       <configurationfile>bsdstats.xml</configurationfile>
     </package>
