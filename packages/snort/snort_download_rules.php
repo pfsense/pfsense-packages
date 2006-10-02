@@ -109,7 +109,7 @@ include("head.inc");
 			echo "<tr><td><b>You last updated the ruleset:</b></td><td>NEVER</td></tr>\n";
 		echo "</td></tr></table>";
 		if(!$oinkid) {
-			echo "<tr><td colspan='2'>You must obtain an oinkid from snort.com and set its value in the Snort settings tab in order to start the download process.</td></tr>\n";
+			echo "<tr><td colspan='2'>You must obtain an oinkid from snort.org and set its value in the Snort settings tab in order to start the download process.</td></tr>\n";
 		} else {
 			/* get time stamps for comparison operations */
 			$date1ts = strtotime($last_update_date);
@@ -165,7 +165,7 @@ include("head.inc");
 <?php
 
 if(!$oinkid) {
-	$static_output = gettext("You must obtain an oinkid from snort.com and set its value in the Snort settings tab.");
+	$static_output = gettext("You must obtain an oinkid from snort.org and set its value in the Snort settings tab.");
 	update_all_status($static_output);
 	hide_progress_bar_status();
 	exit;
