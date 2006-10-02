@@ -67,7 +67,7 @@
       <category>Security</category>
       <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
       <depends_on_package>nmap-4.11.tbz</depends_on_package>
-      <config_file>http://www.pfsense.com/packages/config/nmap.xml</config_file>
+      <config_file>http://www.pfsense.com/packages/config/nmap/nmap.xml</config_file>
       <version>4.11</version>
       <required_version>1.0-RC2</required_version>
       <configurationfile>nmap.xml</configurationfile>
