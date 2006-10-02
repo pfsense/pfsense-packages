@@ -11,6 +11,14 @@
 		<section>Diagnostics</section>
 	</menu>
 	<custom_php_install_command>
+		system("/bin/mkdir -p /usr/local/etc/periodic/monthly/");
+		system("/usr/bin/fetch -q -o /usr/local/etc/periodic/monthly/ http://www.bsdstats.org/downloads/300.statistics");
+		system("/bin/chmod a+rx /usr/local/etc/periodic/monthly/300.statistics");
+		if(!is_file("/usr/local/etc/periodic/monthly/300.statistics") {
+			update_status("Could not fetch 300.statistics from bsdstats.org");
+			update_output_window("Install failed. Please check dns, etc");
+			exit;
+		}
 		system("echo monthly_statistics_report_devices=yes >> /etc/periodic.conf");
 		system("echo monthly_statistics_enable=yes >> /etc/periodic.conf");
 		system("/usr/local/etc/periodic/monthly/300.statistics");
