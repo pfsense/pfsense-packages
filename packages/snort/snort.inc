@@ -188,7 +188,7 @@ function generate_snort_conf() {
 
 	/* foreach through whitelist, writing out to file */
 	$whitelist_split = split("\n", $whitelist_home_net);
-	foreach(whitelist_split as $wl) 
+	foreach($whitelist_split as $wl) 
 		if(trim($wl))
 			fwrite($whitelist, trim($wl) . "\n");	
 
