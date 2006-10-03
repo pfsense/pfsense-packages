@@ -235,7 +235,7 @@
       <category>Security</category>
       <version>0.1</version>
       <status>PRE-ALPHA</status>
-      <required_version>1.0-RC3</required_version>
+      <required_version>2.0</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
       <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
       <depends_on_package>p5-Mail-SpamAssassin-3.1.0_6.tbz</depends_on_package>
