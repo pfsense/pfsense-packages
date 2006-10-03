@@ -131,7 +131,7 @@ function generate_snort_conf() {
 	$whitelist = fopen("/var/db/whitelist", "w");
 	if(!$whitelist) {
 		log_error("Could not open /var/db/whitelist for writing.");
-		exit;
+		return;
 	}
 
 	/* build an interface array list */
