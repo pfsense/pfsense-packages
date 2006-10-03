@@ -186,7 +186,11 @@ function generate_snort_conf() {
 	/* write out whitelist, convert spaces to carriage returns */
 	$whitelist_home_net = str_replace(" ", "\n", $home_net);
 
-	fwrite($whitelist, $whitelist_home_net);
+	/* foreach through whitelist, writing out to file */
+	$whitelist_split = split("\n", $whitelist_home_net);
+	foreach(whitelist_split as $wl) 
+		if(trim($wl))
+			fwrite($whitelist, trim($wl) . "\n");	
 
 	/* close file */
 	fclose($whitelist);
