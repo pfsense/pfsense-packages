@@ -53,7 +53,7 @@
 		<prefix>/usr/local/pkg/pf/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_dynamic_ip_reload.php</item>
-	</additional_files_needed>
+	</additional_files_needed>a
 	<service>
 		<name>snort</name>
 		<rcfile>snort.sh</rcfile>
@@ -151,8 +151,11 @@
 			<type>checkbox</type>
 		</field>
     </fields>
+    <custom_add_php_install>
+		sync_package_snort();
+    </custom_add_php_install>
 	<custom_add_php_command>
-        	sync_package_snort();
+		sync_package_snort();
 	</custom_add_php_command>
 	<custom_php_resync_command>
 		sync_package_snort();
