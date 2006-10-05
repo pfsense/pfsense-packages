@@ -4,6 +4,8 @@ require_once('config.inc');
 require_once('service-utils.inc');
 require_once('pkg-utils.inc');
 require_once('pfsense-utils.inc');
+require_once("notices.inc");
+
 /*
 	havp.inc
         part of the HAVP package for pfSense

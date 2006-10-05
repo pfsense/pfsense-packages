@@ -42,6 +42,7 @@
 
 /* include all configuration functions */
 require_once("functions.inc");
+require_once("notices.inc");
 
 function sync_package_p3scan() {
   global $config, $g;
