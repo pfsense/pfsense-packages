@@ -53,7 +53,7 @@
 		<prefix>/usr/local/pkg/pf/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_dynamic_ip_reload.php</item>
-	</additional_files_needed>a
+	</additional_files_needed>
 	<service>
 		<name>snort</name>
 		<rcfile>snort.sh</rcfile>
