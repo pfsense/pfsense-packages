@@ -152,7 +152,7 @@
 		</field>
     </fields>
     <custom_add_php_install>
-		sync_package_snort();
+		sync_package_snort_reinstall();
     </custom_add_php_install>
 	<custom_add_php_command>
 		sync_package_snort();

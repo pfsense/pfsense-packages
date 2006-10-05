@@ -31,6 +31,16 @@
 if($config['installedpackages']['snort'])
 	$oinkid = $config['installedpackages']['snort']['config'][0]['oinkmastercode'];
 
+function sync_package_snort_reinstall() {
+	global $config;
+	if(!$config['installedpackages']['snort'])
+		return;
+	/* create snort configuration file */
+	create_snort_conf();
+	/* start snort service */
+	start_service("snort");
+}
+
 function sync_package_snort() {
 	global $config, $g;
 	conf_mount_rw();
@@ -188,9 +198,9 @@ function generate_snort_conf() {
 
 	/* foreach through whitelist, writing out to file */
 	$whitelist_split = split("\n", $whitelist_home_net);
-	foreach($whitelist_split as $wl) 
+	foreach($whitelist_split as $wl)
 		if(trim($wl))
-			fwrite($whitelist, trim($wl) . "\n");	
+			fwrite($whitelist, trim($wl) . "\n");
 
 	/* close file */
 	fclose($whitelist);
