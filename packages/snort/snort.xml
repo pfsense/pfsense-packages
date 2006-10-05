@@ -151,9 +151,9 @@
 			<type>checkbox</type>
 		</field>
     </fields>
-    <custom_add_php_install>
+    <custom_php_install_command>
 		sync_package_snort_reinstall();
-    </custom_add_php_install>
+    </custom_php_install_command>
 	<custom_add_php_command>
 		sync_package_snort();
 	</custom_add_php_command>
