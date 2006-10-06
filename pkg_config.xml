@@ -104,7 +104,7 @@
       <website>http://miniupnp.free.fr/</website>
       <category>Network Management</category>
       <maintainer>seth.mos@xs4all.nl</maintainer>
-      <version>20060930</version>
+      <version>20060924</version>
       <required_version>1.0-RC3</required_version>
       <supported_versions>
       </supported_versions>
