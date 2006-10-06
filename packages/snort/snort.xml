@@ -166,7 +166,7 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Sync Snort config to secondary cluster members</fielddescr>
+			<fielddescr>Sync Snort configuration to secondary cluster members</fielddescr>
 			<fieldname>syncxmlrpc</fieldname>
 			<description>Checking this option will automatically sync the snort configuration via XMLRPC to CARP cluster members.</description>
 			<type>checkbox</type>
