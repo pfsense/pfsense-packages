@@ -121,7 +121,7 @@ function snort_deinstall() {
 	/* remove auto rules update helper */
 	remove_text_from_file($filenamea, $text_ww);
 	/* remove custom sysctl */
-	remove_text_from_file("/etc/sysctl.conf", "sysctl net.bpf.bufsize=20480");	
+	remove_text_from_file("/etc/sysctl.conf", "sysctl net.bpf.bufsize=20480");
 	/* decrease bpf buffers back to 4096, from 20480 */
 	exec("/sbin/sysctl net.bpf.bufsize=4096");
 }
@@ -133,6 +133,7 @@ function generate_snort_conf() {
 	/* XXX: make multi wan friendly */
 	$snort_ext_int = $config['installedpackages']['snort']['config'][0]['iface_array'][0];
 
+	/* add auto update scripts to /etc/crontab */
 	$text_ww   = "*/60\t* \t 1\t *\t *\t root\t /usr/bin/nice -n20 /usr/local/pkg/snort_check_for_rule_updates.php";
 	$filenamea = "/etc/crontab";
 	remove_text_from_file($filenamea, $text_ww);
@@ -220,6 +221,18 @@ function generate_snort_conf() {
 	foreach($whitelist_split as $wl)
 		if(trim($wl))
 			fwrite($whitelist, trim($wl) . "\n");
+
+	/* should we whitelist vpns? */
+	$whitelistvpns = $config['installedpackages']['snort']['config'][0]['whitelistvpns'];
+
+	/* grab a list of vpns and whitelist if user desires */
+	if($whitelistvpns) {
+		$vpns_list = get_vpns_list();
+		$whitelist_vpns = split(" ", $vpns_list);
+		foreach($whitelist_split as $wl)
+			if(trim($wl))
+				fwrite($whitelist, trim($wl) . "\n");
+	}
 
 	/* close file */
 	fclose($whitelist);
@@ -341,7 +354,7 @@ EOD;
 }
 
 /*   check downloaded text from snort.org to make sure that an error did not occur
- *   for example, if you are not a premium subscriber you can only download rules 
+ *   for example, if you are not a premium subscriber you can only download rules
  *   so often, etc.
  */
 function check_for_common_errors($filename) {
@@ -393,7 +406,7 @@ function scroll_down_to_bottom_of_page() {
 function verify_downloaded_file($filename) {
 	global $snort_filename, $snort_filename_md5, $console_mode;
 	ob_flush();
-	if(filesize($filename)<99500) {
+	if(filesize($filename)<9500) {
 		if(!$console_mode) {
 			update_all_status("Checking {$filename}...");
 			check_for_common_errors($filename);

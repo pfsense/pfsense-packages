@@ -155,6 +155,12 @@
 			<description>Automatically check for and update rules once a week from snort.org.</description>
 			<type>checkbox</type>
 		</field>
+		<field>
+			<fielddescr>Whitelist VPNS automatically</fielddescr>
+			<fieldname>whitelistvpns</fieldname>
+			<description>Checking this option will install whitelists for all VPNs</description>
+			<type>checkbox</type>
+		</field>
     </fields>
     <custom_php_install_command>
 		sync_package_snort_reinstall();
@@ -167,5 +173,5 @@
 	</custom_php_resync_command>
 	<custom_php_deinstall_command>
 		snort_deinstall();
-	</custom_php_deinstall_command>	
+	</custom_php_deinstall_command>
 </packagegui>
