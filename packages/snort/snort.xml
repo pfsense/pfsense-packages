@@ -160,9 +160,12 @@
 		sync_package_snort_reinstall();
     </custom_php_install_command>
 	<custom_add_php_command>
-		sync_package_snort();
+        sync_package_snort();
 	</custom_add_php_command>
 	<custom_php_resync_command>
 		sync_package_snort();
 	</custom_php_resync_command>
+	<custom_php_deinstall_command>
+		snort_deinstall();
+	</custom_php_deinstall_command>	
 </packagegui>

@@ -112,6 +112,16 @@ function create_snort_conf() {
 	conf_mount_ro();
 }
 
+function snort_deinstall() {
+	$text_ww   = "*/60\t* \t 1\t *\t *\t root\t /usr/bin/nice -n20 /usr/local/pkg/snort_check_for_rule_updates.php";
+	$filenamea = "/etc/crontab";
+	remove_text_from_file($filenamea, $text_ww);
+	/* remove custom sysctl */
+	remove_text_from_file("/etc/sysctl.conf", "sysctl net.bpf.bufsize=20480");	
+	/* decrease bpf buffers back to 4096, from 20480 */
+	exec("/sbin/sysctl net.bpf.bufsize=4096");
+}
+
 function generate_snort_conf() {
 	global $config, $g;
 	conf_mount_rw();
@@ -124,6 +134,10 @@ function generate_snort_conf() {
 	remove_text_from_file($filenamea, $text_ww);
 	add_text_to_file($filenamea, $text_ww);
 	exec("killall -HUP cron");
+
+	/* increase bpf buffers to 20480, 5 times the normal 4096 */
+	add_text_to_file("/etc/sysctl.conf", "net.bpf.bufsize=20480");
+	exec("/sbin/sysctl net.bpf.bufsize=20480");
 
 	/* should we install a automatic update crontab entry? */
 	$automaticrulesupdate = $config['installedpackages']['snort']['config'][0]['automaticrulesupdate'];
