@@ -89,8 +89,9 @@
 	</tabs>
 	<fields>
 		<field>
-			<fielddescr>Interface (generally WAN)</fielddescr>
+			<fielddescr>Interface</fielddescr>
 			<fieldname>iface_array</fieldname>
+			<description>Select all LAN type interfaces</description>
 			<value>lan</value>
 			<multiple>true</multiple>
 			<size>3</size>
@@ -99,6 +100,7 @@
 		<field>
 			<fielddescr>Performance</fielddescr>
 			<fieldname>performance</fieldname>
+			<description>ac method is the fastest startup but consumes more a lot more memory.  acs/ac-banded and ac-sparsebands/mwm/lowmem methods use quite a bit less.</description>
 			<type>select</type>
 			<options>
 				<option>
@@ -135,6 +137,7 @@
 		<field>
 			<fielddescr>Oinkmaster code</fielddescr>
 			<fieldname>oinkmastercode</fieldname>
+			<description>Obtain a snort.org Oinkmaster code and paste here.</description>
 			<value></value>
 			<type>input</type>
 			<size>60</size>
@@ -142,12 +145,14 @@
 		<field>
 			<fielddescr>Block offenders</fielddescr>
 			<fieldname>blockoffenders</fieldname>
+			<description>Automatically block hosts that generate a snort alert.</description>
 			<type>checkbox</type>
 			<size>60</size>
 		</field>
 		<field>
 			<fielddescr>Update rules automatically</fielddescr>
 			<fieldname>automaticrulesupdate</fieldname>
+			<description>Automatically check for and update rules once a week from snort.org.</description>
 			<type>checkbox</type>
 		</field>
     </fields>
