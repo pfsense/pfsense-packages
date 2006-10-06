@@ -91,7 +91,7 @@
 		<field>
 			<fielddescr>Interface</fielddescr>
 			<fieldname>iface_array</fieldname>
-			<description>Select all LAN type interfaces</description>
+			<description>Select all WAN type interfaces</description>
 			<value>lan</value>
 			<multiple>true</multiple>
 			<size>3</size>
