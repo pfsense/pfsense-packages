@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<packagegui>
+<packagegui>a
 	<title>Services: Snort</title>
 	<name>Snort</name>
 	<version>2.6.0.2</version>
