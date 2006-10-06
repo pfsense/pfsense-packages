@@ -54,6 +54,11 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_dynamic_ip_reload.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/pf/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/snort_xmlrpc_sync.php</item>
+	</additional_files_needed>
 	<service>
 		<name>snort</name>
 		<rcfile>snort.sh</rcfile>
@@ -123,7 +128,6 @@
 					<value>ac-sparsebands</value>
 					<name>ac-sparsebands</name>
 				</option>
-
 				<option>
 					<value>mwm</value>
 					<name>mwm</name>
@@ -159,6 +163,12 @@
 			<fielddescr>Whitelist VPNS automatically</fielddescr>
 			<fieldname>whitelistvpns</fieldname>
 			<description>Checking this option will install whitelists for all VPNs</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Sync Snort config to secondary cluster members</fielddescr>
+			<fieldname>syncxmlrpc</fieldname>
+			<description>Checking this option will automatically sync the snort configuration via XMLRPC to CARP cluster members.</description>
 			<type>checkbox</type>
 		</field>
     </fields>
