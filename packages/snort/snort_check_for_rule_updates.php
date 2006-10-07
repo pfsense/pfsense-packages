@@ -36,6 +36,20 @@ require_once("functions.inc");
 require_once("/usr/local/pkg/snort.inc");
 require_once("service-utils.inc");
 
+/* check to see if carp settings exist, and get a handle */
+if($config['installedpackages']['carpsettings']) {
+	$carp = &$config['installedpackages']['carpsettings']['config'][0];
+	$password = $carp['password'];
+}
+
+/*  if we are not a CARP cluster master, sleep for a random
+ *  amount of time allowing for other members to download the configuration
+ */
+if(!$password) {
+	$sleepietime = rand(5,700);
+	sleep($sleepietime);
+}
+
 $last_ruleset_download = $config['installedpackages']['snort']['last_ruleset_download'];
 $text = file_get_contents("http://www.snort.org/pub-bin/downloads.cgi");
 if (preg_match_all("/.*RELEASED\: (.*)\</", $text, $matches))
