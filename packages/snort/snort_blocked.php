@@ -97,6 +97,7 @@ include("head.inc");
 		echo "\n<td>&nbsp;{$alert_description}<!-- |{$ww_ip}| get_snort_alert($ww_ip); --></td>";
 		echo "\n</tr>";
 	}
+	echo "\n<tr><td colspan='3'>&nbsp;</td></tr>";
 	if($counter < 1)
 		echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\">There are currently no items being blocked by snort.</td></tr>";
 	else
