@@ -487,6 +487,7 @@ function update_all_status($status) {
 
 $snort_alert_file_split = split("\n", file_get_contents("/var/log/snort/alert"));
 
+/* obtain alert description for an ip address */
 function get_snort_alert($ip) {
 	global $snort_alert_file_split;
 	if(!$snort_alert_file_split)
@@ -501,25 +502,5 @@ function get_snort_alert($ip) {
 	}
 	return "n/a";
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 ?>
