@@ -98,9 +98,9 @@ include("head.inc");
 		echo "\n</tr>";
 	}
 	if($counter < 1)
-		echo "\n<tr><td colspan='2' align=\"center\" valign=\"top\">There are currently no items being blocked by snort.</td></tr>";
+		echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\">There are currently no items being blocked by snort.</td></tr>";
 	else
-		echo "\n<tr><td colspan='2' align=\"center\" valign=\"top\">{$counter} items listed.</td></tr>";
+		echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\">{$counter} items listed.</td></tr>";
 
 ?>
 
