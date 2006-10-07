@@ -50,6 +50,9 @@ function snort_do_xmlrpc_sync() {
 	$carp = &$config['installedpackages']['carpsettings']['config'][0];
 	$password = $carp['password'];
 
+	if(!$carp['synchronizetoip'])
+		return;
+
 	log_error("[SNORT] snort_xmlrpc_sync.php is starting.");
 	$xmlrpc_sync_neighbor = $carp['synchronizetoip'];
     if($config['system']['webgui']['protocol'] != "") {
