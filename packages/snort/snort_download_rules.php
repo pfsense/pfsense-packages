@@ -33,7 +33,6 @@
 if(!$start_me_up) {
 	require_once("config.inc");
 	require_once("functions.inc");
-	require_once("guiconfig.inc");
 	require_once("service-utils.inc");
 	require("/usr/local/pkg/snort.inc");
 }
