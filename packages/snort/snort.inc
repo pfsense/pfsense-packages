@@ -489,9 +489,9 @@ function get_snort_alert($ip) {
 	$file_split = split("\n", file_get_contents("/var/log/snort/alert"));
 	foreach($file_split as $fileline) {
 		if (preg_match("/\[\*\*\] (\[.*\]) (.*) (\[\*\*\])/", $fileline, $matches))
-			$alert_title = $matches[0];
+			$alert_title = $matches[2];
 		if (preg_match("/(\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b)/", $fileline, $matches))
-			$alert_ip = $matches[2];
+			$alert_ip = $matches[0];
 		if($alert_ip == $ip)
 			return $alert_title;
 	}
