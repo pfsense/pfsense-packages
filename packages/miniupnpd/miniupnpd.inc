@@ -37,7 +37,9 @@
 			$start = "# Clear existing rules and rdr entries \n";
 			$start .= "/sbin/pfctl -aminiupnpd -Fr 2>&1 >/dev/null\n";
 			$start .= "/sbin/pfctl -aminiupnpd -Fn 2>&1 >/dev/null\n";
-			$start .= "killall miniupnpd; sleep 3; /usr/local/sbin/miniupnpd -p 2869{$ifaces_final}";
+			$start .= "/usr/bin/killall miniupnpd\n";
+			$start .= "while [ `ps -A | grep /usr/local/sbin/miniupnpd | grep -v grep | wc -l` != 0 ]; do sleep 1; done\n";
+			$start .= "/usr/local/sbin/miniupnpd -p 2869{$ifaces_final}";
 
 			/* override wan ip address, common for carp, etc */
 			if($overridewanip)
@@ -54,7 +56,13 @@
 			    )
 			);
 		}
+
+		/* if not ONE instance running lets start */
+		/* or if $_POST data as user is changing settings */
+		if((int)exec("ps -A | grep /usr/local/sbin/miniupnpd | grep -v grep | wc -l") != 1 || $_POST['interface_array']) {
 		start_service("miniupnpd");
+		} 
+		
 		config_unlock();
 		conf_mount_ro();
 	}
