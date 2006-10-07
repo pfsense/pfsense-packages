@@ -24,7 +24,7 @@
 			$interface_array = $config['installedpackages']['miniupnpd']['config'][0]['interface_array'];
 
 		if($interface_array) {
-			foreach($_POST['interface_array'] as $iface) {
+			foreach($interface_array as $iface) {
 				$if = convert_friendly_interface_to_real_interface_name($iface);
 				if($if) {
 					$addr = find_interface_ip($if);
