@@ -77,6 +77,7 @@ include("head.inc");
 						    <tr id="frheader">
 								<td width="5%" class="listhdrr">Remove</td>
 								<td class="listhdrr">IP</td>
+								<td class="listhdrr">Description</td>
 							</tr>
 <?php
 
@@ -86,19 +87,23 @@ include("head.inc");
 	foreach($ips_array as $ip) {
 		if(!$ip)
 			continue;
+		$ww_ip = str_replace(" ", "", $ip);
 		$counter++;
-		echo "<tr>";
-		echo "<td align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($ip)) . "'>";
-		echo "<img title=\"Delete\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>";
-		echo "<td>&nbsp;{$ip}</td>";
-		echo "</tr>";
+		$alert_description = get_snort_alert($ww_ip);
+		echo "\n<tr>";
+		echo "\n<td align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($ww_ip)) . "'>";
+		echo "\n<img title=\"Delete\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>";
+		echo "\n<td>&nbsp;{$ww_ip}</td>";
+		echo "\n<td>&nbsp;{$alert_description}<!-- |{$ww_ip}| get_snort_alert($ww_ip); --></td>";
+		echo "\n</tr>";
 	}
 	if($counter < 1)
-		echo "<tr><td colspan='2' align=\"center\" valign=\"top\">There are currently no items being blocked by snort.</td></tr>";
+		echo "\n<tr><td colspan='2' align=\"center\" valign=\"top\">There are currently no items being blocked by snort.</td></tr>";
 	else
-		echo "<tr><td colspan='2' align=\"center\" valign=\"top\">{$counter} items listed.</td></tr>";
+		echo "\n<tr><td colspan='2' align=\"center\" valign=\"top\">{$counter} items listed.</td></tr>";
 
 ?>
+
 						</table>
 		    		</td>
 		  		</tr>
