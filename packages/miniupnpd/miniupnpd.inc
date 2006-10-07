@@ -1,4 +1,6 @@
 <?php
+	require_once("config.inc");
+	require_once("functions.inc");
 	/* Miniupnp */
 	function sync_package_miniupnpd() {
 		global $config;
