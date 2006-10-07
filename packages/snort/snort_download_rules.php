@@ -40,6 +40,20 @@ if(!$start_me_up) {
 
 $pgtitle = "Services: Snort: Update Rules";
 
+/* check to see if carp settings exist, and get a handle */
+if($config['installedpackages']['carpsettings']) {
+	$carp = &$config['installedpackages']['carpsettings']['config'][0];
+	$password = $carp['password'];
+}
+
+/*  if we are not a CARP cluster master, sleep for a random
+ *  amount of time allowing for other members to download the configuration
+ */
+if(!$password) {
+	$sleepietime = rand(5,700);
+	sleep($sleepietime);
+}
+
 /* define oinkid */
 if($config['installedpackages']['snort'])
 	$oinkid = $config['installedpackages']['snort']['config'][0]['oinkmastercode'];
