@@ -77,7 +77,7 @@ include("head.inc");
 						    <tr id="frheader">
 								<td width="5%" class="listhdrr">Remove</td>
 								<td class="listhdrr">IP</td>
-								<td class="listhdrr">Description</td>
+								<td class="listhdrr">Alert Description</td>
 							</tr>
 <?php
 
