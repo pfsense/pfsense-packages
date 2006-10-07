@@ -32,6 +32,7 @@
 
 require("globals.inc");
 require("guiconfig.inc");
+require("/usr/local/pkg/snort.inc");
 
 $snort_logfile = "{$g['varlog_path']}/snort/alert";
 
@@ -101,8 +102,11 @@ function dump_log_file($logfile, $tail, $withorig = true, $grepfor = "", $grepin
     foreach ($logarr as $logent) {
             if(!logent)
             	continue;
+            $ww_logent = $logent;
+			$ww_logent = str_replace("[", " [ ", $ww_logent);
+			$ww_logent = str_replace("]", " ] ", $ww_logent);
             echo "<tr valign=\"top\">\n";
-            echo "<td colspan=\"2\" class=\"listr\">" . $logent . "&nbsp;</td>\n";
+            echo "<td colspan=\"2\" class=\"listr\">" . make_clickable($ww_logent) . "&nbsp;</td>\n";
             echo "</tr>\n";
     }
 }
