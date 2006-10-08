@@ -562,7 +562,7 @@ function write_snort_config_cache($snort_config) {
 
 function snort_advanced() {
 	global $g, $config;
-
+	sync_package_snort();
 }
 
 ?>
