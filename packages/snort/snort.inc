@@ -511,6 +511,7 @@ function get_snort_alert($ip) {
 }
 
 function make_clickable($buffer) {
+    global $config, $g;
     /* if clickable urls is disabled, simply return buffer back to caller */
     $clickablalerteurls = $config['installedpackages']['snort']['config'][0]['oinkmastercode'];
     if(!$clickablalerteurls)

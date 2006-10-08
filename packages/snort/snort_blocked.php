@@ -81,6 +81,7 @@ include("head.inc");
 							</tr>
 <?php
 
+	$associatealertip = $config['installedpackages']['snort']['config'][0]['associatealertip'];
 	$ips = `/sbin/pfctl -t snort2c -T show`;
 	$ips_array = split("\n", $ips);
 	$counter = 0;
@@ -89,7 +90,10 @@ include("head.inc");
 			continue;
 		$ww_ip = str_replace(" ", "", $ip);
 		$counter++;
-		$alert_description = get_snort_alert($ww_ip);
+		if($associatealertip)
+			$alert_description = get_snort_alert($ww_ip);
+		else
+			$alert_description = "";
 		echo "\n<tr>";
 		echo "\n<td align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($ww_ip)) . "'>";
 		echo "\n<img title=\"Delete\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>";
