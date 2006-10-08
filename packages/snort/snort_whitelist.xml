@@ -30,7 +30,11 @@
 		<tab>
 			<text>Snort Alerts</text>
 			<url>/snort_alerts.php</url>
-		</tab>	
+		</tab>
+		<tab>
+			<text>Snort Advanced</text>
+			<url>/pkg_edit.php?xml=snort_advanced.xml&id=0</url>
+		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>

@@ -44,6 +44,12 @@ function sync_package_snort_reinstall() {
 
 function sync_package_snort() {
 	global $config, $g;
+
+	/* snort -> advanced features */
+	$bpfbufsize = $config['installedpackages']['snort']['config'][0]['bpfbufsize'];
+	$bpfmaxbufsize = $config['installedpackages']['snort']['config'][0]['bpfmaxbufsize'];
+	$bpfmaxinsns = $config['installedpackages']['snort']['config'][0]['bpfmaxinsns'];
+
 	conf_mount_rw();
 	/* create a few directories and ensure the sample files are in place */
 	exec("/bin/mkdir -p /usr/local/etc/snort");
@@ -76,6 +82,14 @@ function sync_package_snort() {
 
 	/* create log directory */
 	$start  = "/bin/mkdir -p /var/log/snort";
+
+	/* snort advanced features - bpf tuning */
+	if($bpfbufsize)
+		$start .= ";sysctl net.bpf.bufsize={$bpfbufsize}";
+	if($bpfmaxbufsize)
+		$start .= ";sysctl net.bpf.maxbufsize={$bpfmaxbufsize}";
+	if($bpfmaxinsns)
+		$start .= ";sysctl net.bpf.maxinsns={$bpfmaxinsns}";
 
 	/* start snort */
 	$start .= ";snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort {$ifaces_final} -A full -D";
@@ -139,10 +153,6 @@ function generate_snort_conf() {
 	remove_text_from_file($filenamea, $text_ww);
 	add_text_to_file($filenamea, $text_ww);
 	exec("killall -HUP cron");
-
-	/* increase bpf buffers to 20480, 5 times the normal 4096 */
-	add_text_to_file("/etc/sysctl.conf", "net.bpf.bufsize=20480");
-	exec("/sbin/sysctl net.bpf.bufsize=20480");
 
 	/* should we install a automatic update crontab entry? */
 	$automaticrulesupdate = $config['installedpackages']['snort']['config'][0]['automaticrulesupdate'];
@@ -550,5 +560,9 @@ function write_snort_config_cache($snort_config) {
 	return true;
 }
 
+function snort_advanced() {
+	global $g, $config;
+
+}
 
 ?>

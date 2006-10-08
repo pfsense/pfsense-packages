@@ -27,7 +27,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-if(!is_dir("/usr/local/etc/snort/rules")) 
+if(!is_dir("/usr/local/etc/snort/rules"))
 	Header("Location: snort_download_rules.php");
 
 require("guiconfig.inc");
@@ -81,6 +81,7 @@ include("head.inc");
 	$tab_array[] = array(gettext("Snort Blocked"), false, "/snort_blocked.php");
 	$tab_array[] = array(gettext("Snort Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
 	$tab_array[] = array(gettext("Snort Alerts"), false, "/snort_alerts.php");
+	$tab_array[] = array(gettext("Snort Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
 	display_top_tabs($tab_array);
 ?>
   		</td>

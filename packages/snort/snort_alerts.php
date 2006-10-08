@@ -67,6 +67,7 @@ include("head.inc");
 	$tab_array[] = array(gettext("Snort Blocked"), false, "/snort_blocked.php");
 	$tab_array[] = array(gettext("Snort Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
 	$tab_array[] = array(gettext("Snort Alerts"), true, "/snort_alerts.php");
+	$tab_array[] = array(gettext("Snort Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
 	display_top_tabs($tab_array);
 ?>
   </td></tr>
