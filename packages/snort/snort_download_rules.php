@@ -90,7 +90,7 @@ include("head.inc");
       	echo "<td>\n";
 		$last_ruleset_download = $config['installedpackages']['snort']['last_ruleset_download'];
 		echo "<div id='loading' name='loading'>\n";
-		echo "<img src=\"/themes/metallic/images/misc/loader.gif\"> Getting release information from snort.org...\n";
+		echo "<img src=\"/themes/metallic/images/misc/loader_tab.gif\"> Getting release information from snort.org...\n";
 		echo "</div>\n";
 		ob_flush();
 		sleep(1);
