@@ -39,19 +39,19 @@
 			<fielddescr>BPF Buffer size</fielddescr>
 			<fieldname>bpfbufsize</fieldname>
 			<description>Changing this option adjusts the system BPF buffer size.  Leave blank if you do not know what this does.</description>
-			<type>checkbox</type>
+			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Maximum BPF buffer size</fielddescr>
 			<fieldname>bpfmaxbufsize</fieldname>
 			<description>Changing this option adjusts the system maximum BPF buffer size.  Leave blank if you do not know what this does.</description>
-			<type>checkbox</type>
+			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Maximum BPF inserts</fielddescr>
 			<fieldname>bpfmaxinsns</fieldname>
 			<description>Changing this option adjusts the system maximum BPF insert size.  Leave blank if you do not know what this does.</description>
-			<type>checkbox</type>
+			<type>input</type>
 		</field>
     </fields>
 	<custom_php_deinstall_command>
