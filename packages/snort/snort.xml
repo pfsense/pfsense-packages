@@ -166,7 +166,7 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Convert snort alerts urls to clickable links</fielddescr>
+			<fielddescr>Convert Snort alerts urls to clickable links</fielddescr>
 			<fieldname>clickablalerteurls</fieldname>
 			<description>Checking this option will automatically convert URLs in the Snort alerts tab to clickable links.</description>
 			<type>checkbox</type>
