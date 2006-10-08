@@ -158,14 +158,14 @@
 		<field>
 			<fielddescr>Block offenders</fielddescr>
 			<fieldname>blockoffenders</fieldname>
-			<description>Automatically block hosts that generate a snort alert.</description>
+			<description>Checking this option will automatically block hosts that generate a snort alert.</description>
 			<type>checkbox</type>
 			<size>60</size>
 		</field>
 		<field>
 			<fielddescr>Update rules automatically</fielddescr>
 			<fieldname>automaticrulesupdate</fieldname>
-			<description>Automatically check for and update rules once a week from snort.org.</description>
+			<description>Checking this option will automatically check for and update rules once a week from snort.org.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
