@@ -46,9 +46,9 @@ function sync_package_snort() {
 	global $config, $g;
 
 	/* snort -> advanced features */
-	$bpfbufsize = $config['installedpackages']['snort']['config'][0]['bpfbufsize'];
-	$bpfmaxbufsize = $config['installedpackages']['snort']['config'][0]['bpfmaxbufsize'];
-	$bpfmaxinsns = $config['installedpackages']['snort']['config'][0]['bpfmaxinsns'];
+	$bpfbufsize = $config['installedpackages']['snortadvanced']['config'][0]['bpfbufsize'];
+	$bpfmaxbufsize = $config['installedpackages']['snortadvanced']['config'][0]['bpfmaxbufsize'];
+	$bpfmaxinsns = $config['installedpackages']['snortadvanced']['config'][0]['bpfmaxinsns'];
 
 	conf_mount_rw();
 	/* create a few directories and ensure the sample files are in place */

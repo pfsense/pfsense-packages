@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<title>Services: Snort Advanced</title>
-	<name>Snort</name>
+	<name>SnortAdvanced</name>
 	<include_file>/usr/local/pkg/snort.inc</include_file>
 	<tabs>
 		<tab>
