@@ -38,19 +38,19 @@
 		<field>
 			<fielddescr>BPF Buffer size</fielddescr>
 			<fieldname>bpfbufsize</fieldname>
-			<description>Changing this option adjusts the system BPF buffer size.  Leave blank if you do not know what this does.</description>
+			<description>Changing this option adjusts the system BPF buffer size.  Leave blank if you do not know what this does. Default is 1024.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Maximum BPF buffer size</fielddescr>
 			<fieldname>bpfmaxbufsize</fieldname>
-			<description>Changing this option adjusts the system maximum BPF buffer size.  Leave blank if you do not know what this does.</description>
+			<description>Changing this option adjusts the system maximum BPF buffer size.  Leave blank if you do not know what this does. Default is 512.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Maximum BPF inserts</fielddescr>
 			<fieldname>bpfmaxinsns</fieldname>
-			<description>Changing this option adjusts the system maximum BPF insert size.  Leave blank if you do not know what this does.</description>
+			<description>Changing this option adjusts the system maximum BPF insert size.  Leave blank if you do not know what this does. Default is 524288.</description>
 			<type>input</type>
 		</field>
     </fields>
