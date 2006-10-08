@@ -60,9 +60,9 @@
 		<item>http://www.pfsense.com/packages/config/snort/snort_xmlrpc_sync.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/</prefix>
+		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_advanced.php</item>
+		<item>http://www.pfsense.com/packages/config/snort/snort_advanced.xml</item>
 	</additional_files_needed>
 	<service>
 		<name>snort</name>
