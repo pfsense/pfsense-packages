@@ -30,7 +30,7 @@
 		</tab>
 		<tab>
 			<text>Snort Advanced</text>
-			<url>/pkg_edit.php?xml=snort_advanced.xml&id=0</url>
+			<url>/pkg_edit.php?xml=snort_advanced.xml&amp;id=0</url>
 			<active/>
 		</tab>
 	</tabs>
