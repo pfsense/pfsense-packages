@@ -489,7 +489,11 @@ $snort_alert_file_split = split("\n", file_get_contents("/var/log/snort/alert"))
 
 /* obtain alert description for an ip address */
 function get_snort_alert($ip) {
-	global $snort_alert_file_split;
+	global $snort_alert_file_split, $snort_config;
+	if(!$snort_config)
+		$snort_config = read_snort_config_cache();
+	if($snort_config[$ip])
+		return $snort_config[$ip];
 	if(!$snort_alert_file_split)
 		$snort_alert_file_split = split("\n", file_get_contents("/var/log/snort/alert"));
 	foreach($snort_alert_file_split as $fileline) {
@@ -497,13 +501,20 @@ function get_snort_alert($ip) {
 			$alert_title = $matches[2];
 		if (preg_match("/(\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b)/", $fileline, $matches))
 			$alert_ip = $matches[0];
-		if($alert_ip == $ip)
+		if($alert_ip == $ip) {
+			if(!$snort_config[$ip])
+				$snort_config[$ip] = $alert_title;
 			return $alert_title;
+		}
 	}
 	return "n/a";
 }
 
 function make_clickable($buffer) {
+    /* if clickable urls is disabled, simply return buffer back to caller */
+    $clickablalerteurls = $config['installedpackages']['snort']['config'][0]['oinkmastercode'];
+    if(!$clickablalerteurls)
+    	return $buffer;
     $buffer = eregi_replace("(^|[ \n\r\t])((http(s?)://)(www\.)?([a-z0-9_-]+(\.[a-z0-9_-]+)+)(/[^/ \n\r]*)*)","\\1<a href=\"\\2\" target=\"_blank\">\\2</a>", $buffer);
     $buffer = eregi_replace("(^|[ \n\r\t])((ftp://)(www\.)?([a-z0-9_-]+(\.[a-z0-9_-]+)+)(/[^/ \n\r]*)*)","\\1<a href=\"\\2\" target=\"_blank\">\\2</a>", $buffer);
     $buffer = eregi_replace("([a-z_-][a-z0-9\._-]*@[a-z0-9_-]+(\.[a-z0-9_-]+)+)","<a href=\"mailto:\\1\">\\1</a>", $buffer);
@@ -512,5 +523,31 @@ function make_clickable($buffer) {
 
     return $buffer;
 }
+
+function read_snort_config_cache() {
+	global $g, $config, $snort_config;
+	if($snort_config)
+		return $snort_config;
+	if(file_exists($g['tmp_path'] . '/snort_config.cache')) {
+		$snort_config = unserialize(file_get_contents($g['tmp_path'] . '/snort_config.cache'));
+		return $snort_config;
+	}
+	return;
+}
+
+function write_snort_config_cache($snort_config) {
+	global $g, $config;
+	conf_mount_rw();
+	$configcache = fopen($g['tmp_path'] . '/snort_config.cache', "w");
+	if(!$configcache) {
+		log_error("Could not open {$g['tmp_path']}/snort_config.cache  for writing.");
+		return false;
+	}
+	fwrite($configcache, serialize($snort_config));
+	fclose($configcache);
+	conf_mount_ro();
+	return true;
+}
+
 
 ?>

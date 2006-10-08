@@ -123,3 +123,10 @@ This page lists hosts that have been blocked by Snort.   Hosts are automatically
 
 </body>
 </html>
+
+<?php
+
+/* write out snort cache */
+write_snort_config_cache($snort_config);
+
+?>

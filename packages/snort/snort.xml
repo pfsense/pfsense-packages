@@ -162,7 +162,13 @@
 		<field>
 			<fielddescr>Whitelist VPNs automatically</fielddescr>
 			<fieldname>whitelistvpns</fieldname>
-			<description>Checking this option will install whitelists for all VPNs</description>
+			<description>Checking this option will install whitelists for all VPNs.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Convert snort alerts urls to clickable links</fielddescr>
+			<fieldname>clickablalerteurls</fieldname>
+			<description>Checking this option will automatically convert URLs in the Snort alerts tab to clickable links.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
