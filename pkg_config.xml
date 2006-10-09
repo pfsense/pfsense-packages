@@ -30,6 +30,20 @@
       <configurationfile>clamav.xml</configurationfile>
     </package>
     <package>
+      <name>phpmrss</name>
+      <descr>mRss is a C library for parsing, writing and creating RSS files or streams.</descr>
+      <website>http://www2.autistici.org/bakunin//libmrss/doc/</website>
+      <category>Textproc</category>
+      <version>0.13</version>
+      <status>BETA</status>
+      <required_version>2.0</required_version>
+      <maintainer>me@daniel.stefan.haischt.name</maintainer>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package>libmrss-0.13.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/phpmrss.xml</config_file>
+      <configurationfile>phpmrss.xml</configurationfile>
+    </package>
+    <package>
       <name>p3scan-pf</name>
       <descr>
         A transparent POP3-Proxy with virus-scanning- and

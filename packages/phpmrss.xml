@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>phpmrss</name>
+	<version>0.13</version>
+	<title>mRSS</title>
+	<custom_delete_php_command>
+	</custom_delete_php_command>
+	<custom_php_resync_config_command>
+	</custom_php_resync_config_command>
+	<custom_php_install_command>
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+	</custom_php_deinstall_command>
+</packagegui>
