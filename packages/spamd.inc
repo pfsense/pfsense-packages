@@ -30,6 +30,8 @@
 */
 function sync_package_spamd() {
 	global $config, $g;
+	if(!$config['installedpackages']['spamdsources'])
+		return;
 	conf_mount_rw();
 	config_lock();
 	$fd = fopen("/etc/spamd.conf","w");
@@ -48,7 +50,7 @@ function sync_package_spamd() {
 	fwrite($fd, "\t:black:\\\n");
 	fwrite($fd, "\t:msg=\"Sorry, you spammed us before.\":\\\n");
 	fwrite($fd, "\t:method=file:\\\n");
-	fwrite($fd, "\t:file=/var/db/blacklist.txt:\n\n");	
+	fwrite($fd, "\t:file=/var/db/blacklist.txt:\n\n");
 	/* loop through each item and write out its configuration */
 	if($config['installedpackages']['spamdsources']['config'] != "") {
 		foreach($config['installedpackages']['spamdsources']['config'] as $spamd) {
@@ -90,7 +92,7 @@ function sync_package_spamd() {
 			if($ss['identifier'] <> "")
 				$identifier = " -n \"" . $ss['identifier'] . "\"";
 			if(isset($ss['greylisting']) <> "")
-				$greylisting = " -g";	
+				$greylisting = " -g";
 			if($ss['maxblack'] <> "")
 				$maxblack = " -B " . $ss['maxblack'];
 			if($ss['maxcon'] <> "")
@@ -108,7 +110,7 @@ function sync_package_spamd() {
 			if($ss['greyexp'] <> "")
 				$greyexp = $ss['greyexp'];
 			if($ss['whiteexp'] <> "")
-				$whiteexp = $ss['whiteexp'];			
+				$whiteexp = $ss['whiteexp'];
 		}
 	}
 	$greyparms = " -G {$passtime}:{$greyexp}:{$whiteexp}";
@@ -120,7 +122,7 @@ function sync_package_spamd() {
 	$stop  = "/usr/bin/killall spamd-setup\n" .
 		 "/usr/bin/killall spamlogd\n" .
 		 "/usr/bin/killall spamd\n" .
-		 "/usr/bin/killall pflogd\n" .		 
+		 "/usr/bin/killall pflogd\n" .
 		 "sleep 2";
 	write_rcfile(array(
 				"file" => "spamd.sh",
