@@ -495,11 +495,14 @@ function update_all_status($status) {
 	}
 }
 
-$snort_alert_file_split = split("\n", file_get_contents("/var/log/snort/alert"));
+if(file_exists("/var/log/snort/alert"))
+	$snort_alert_file_split = split("\n", file_get_contents("/var/log/snort/alert"));
 
 /* obtain alert description for an ip address */
 function get_snort_alert($ip) {
 	global $snort_alert_file_split, $snort_config;
+	if(!file_exists("/var/log/snort/alert"))
+		return;
 	if(!$snort_config)
 		$snort_config = read_snort_config_cache();
 	if($snort_config[$ip])
