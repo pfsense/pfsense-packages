@@ -495,9 +495,6 @@ function update_all_status($status) {
 	}
 }
 
-if(file_exists("/var/log/snort/alert"))
-	$snort_alert_file_split = split("\n", file_get_contents("/var/log/snort/alert"));
-
 /* obtain alert description for an ip address */
 function get_snort_alert($ip) {
 	global $snort_alert_file_split, $snort_config;
