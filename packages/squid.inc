@@ -79,7 +79,10 @@ function squid_chown_recursive($dir, $user, $group) {
 
 function squid_is_valid_acl($acl) {
 	global $valid_acls;
-
+	if(!is_array($valid_acls))
+		return;
+	if(!is_array($acl))
+		return;
 	return in_array($acl, $valid_acls);
 }
 
@@ -498,7 +501,8 @@ EOD;
 
 function squid_resync_traffic() {
 	global $config, $valid_acls;
-
+	if(!is_array($valid_acls))
+		return;
 	$settings = $config['installedpackages']['squidtraffic']['config'][0];
 	$conf = '';
 
