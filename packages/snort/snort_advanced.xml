@@ -44,7 +44,7 @@
 		<field>
 			<fielddescr>Maximum BPF buffer size</fielddescr>
 			<fieldname>bpfmaxbufsize</fieldname>
-			<description>Changing this option adjusts the system maximum BPF buffer size.  Leave blank if you do not know what this does. Default is 524288.</description>
+			<description>Changing this option adjusts the system maximum BPF buffer size.  Leave blank if you do not know what this does. Default is 524288. This value should never be set above hardware cache size. The best (optimal size) is 50% - 80% of the hardware cache size.</description>
 			<type>input</type>
 		</field>
 		<field>
