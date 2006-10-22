@@ -46,7 +46,7 @@
 	<fields>
 		<field>
 			<fielddescr>Interface (generally LAN)</fielddescr>
-			<fieldname>interface_array</fieldname>
+			<fieldname>iface_array</fieldname>
 			<value>lan</value>
 			<multiple>true</multiple>
 			<size>3</size>
@@ -57,16 +57,13 @@
 			<fieldname>overridewanip</fieldname>
 			<type>input</type>
 		</field>
-    </fields>
+	</fields>
 	<custom_php_resync_config_command>
-		  sync_package_miniupnpd();
+		sync_package_miniupnpd();
 	</custom_php_resync_config_command>    
 	<custom_php_install_command>
 		sync_package_miniupnpd();
 	</custom_php_install_command>
-	<custom_add_php_command>
-        sync_package_miniupnpd();
-	</custom_add_php_command>
 	<custom_php_deinstall_command>
 		exec("rm -f /usr/local/etc/rc.d/miniupnpd*");
 	</custom_php_deinstall_command>

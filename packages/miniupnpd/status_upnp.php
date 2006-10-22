@@ -32,16 +32,12 @@
 require("guiconfig.inc");
 
 /* Defaults to this page but if no settings are present, redirect to setup page */
-if(!is_array($config['installedpackages']['miniupnpd']['config'][0]['interface_array']))
-	Header("Location: /pkg_edit.php?xml=miniupnpd.xml&amp;id=0");
+if(!$config['installedpackages']['miniupnpd']['config'][0]['iface_array'])
+	Header("Location: /pkg_edit.php?xml=miniupnpd.xml&id=0");
 
 if ($_POST) {
 	if ($_POST['clear'] == "Clear") {
-		// stop
-		mwexec("/bin/sh /usr/local/etc/rc.d/miniupnpd.sh stop");
-		usleep(300);
-		// start
-		mwexec("/bin/sh /usr/local/etc/rc.d/miniupnpd.sh start");
+		mwexec("/bin/sh /usr/local/etc/rc.d/miniupnpd.sh restart");
 		$savemsg = "Rules have been cleared and the daemon restarted";
 	}
 }
