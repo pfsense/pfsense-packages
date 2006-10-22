@@ -1,4 +1,4 @@
-
+<?
 function nmap_custom_add_php_command() {
 	$nmap_options = "";
 	if($_POST['option'] == "-sT: TCP connect() scan.") $nmap_options .= " -sT";
@@ -11,4 +11,4 @@ function nmap_custom_add_php_command() {
 	    system("/usr/local/bin/nmap" . $nmap_options);
 }
 
-
+?>
