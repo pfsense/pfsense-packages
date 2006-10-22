@@ -29,8 +29,8 @@
 				/* above function returns iface if fail */
 				if($if!=$iface) {
 					$addr = find_interface_ip($if);
-					/* non enbaled interfaces are displayed in list on miniupnpd settings page */
-					/* check that the interface has an ip address before adding paramters */
+					/* non enabled interfaces are displayed in list on miniupnpd settings page */
+					/* check that the interface has an ip address before adding parameters */
 					if($addr) {
 						upnp_notice("Active on {$iface} interface");
 			    		$ifaces_final .= " -i {$wanif} -a {$addr}";
