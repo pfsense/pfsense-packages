@@ -81,8 +81,6 @@ function squid_is_valid_acl($acl) {
 	global $valid_acls;
 	if(!is_array($valid_acls))
 		return;
-	if(!is_array($acl))
-		return;
 	return in_array($acl, $valid_acls);
 }
 
