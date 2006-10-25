@@ -580,6 +580,11 @@ function squid_resync_auth() {
 	foreach ($banned as $acl)
 			$conf .= "http_access deny $acl\n";
 
+	// Unrestricted hosts take precendence over blacklist
+	if (squid_is_valid_acl('unrestricted_hosts'))
+		$conf .= "http_access allow unrestricted_hosts\n";
+	if (squid_is_valid_acl('unrestricted_macs'))
+		$conf .= "http_access allow unrestricted_macs\n";
 	// Whitelist and blacklist also take precendence
 	if (squid_is_valid_acl('whitelist'))
 		$conf .= "http_access allow whitelist\n";
@@ -591,7 +596,7 @@ function squid_resync_auth() {
 
 	// Allow the remaining ACLs if no authentication is set
 	if ($auth_method == 'none') {
-		$allowed = array('localnet', 'allowed_subnets', 'unrestricted_hosts', 'unrestricted_macs');
+		$allowed = array('localnet', 'allowed_subnets');
 		$allowed = array_filter($allowed, 'squid_is_valid_acl');
 		foreach ($allowed as $acl)
 			$conf .= "http_access allow $acl\n";
