@@ -217,7 +217,7 @@ function squid_validate_nac($post, $input_errors) {
 	$allowed_subnets = explode(',', trim($post['allowed_subnets']));
 	foreach ($allowed_subnets as $subnet) {
 		$subnet = trim($subnet);
-		if (!is_subnet($subnet))
+		if (!empty($subnet) && !is_subnet($subnet))
 			$input_errors[] = "'$subnet' is not a valid CIDR range";
 	}
 
