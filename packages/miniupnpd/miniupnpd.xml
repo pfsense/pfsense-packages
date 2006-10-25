@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Services: Miniupnpd</title>
 	<name>miniupnpd</name>
-	<version>20060924</version>
+	<version>20061023</version>
 	<savetext>Change</savetext>
 	<include_file>/usr/local/pkg/miniupnpd.inc</include_file>
 	<aftersaveredirect>status_upnp.php</aftersaveredirect>
