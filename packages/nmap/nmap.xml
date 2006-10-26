@@ -1,5 +1,35 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
+	<copyright>
+	/* $Id$ */
+	/*
+		part of pfSense (http://www.pfsense.org/)
+
+		Copyright (C) 2006 Bill Marquette - bill.marquette@gmail.com.
+		All rights reserved.
+
+		Redistribution and use in source and binary forms, with or without
+		modification, are permitted provided that the following conditions are met:
+
+		1. Redistributions of source code must retain the above copyright notice,
+		   this list of conditions and the following disclaimer.
+
+		2. Redistributions in binary form must reproduce the above copyright
+		   notice, this list of conditions and the following disclaimer in the
+		   documentation and/or other materials provided with the distribution.
+
+		THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+		INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+		AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+		AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+		OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+		SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+		INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+		CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+		ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+		POSSIBILITY OF SUCH DAMAGE.
+	*/
+	</copyright>
 	<name>nmap</name>
 	<version>4.11</version>
 	<title>Diagnostics: NMap</title>
@@ -25,26 +55,18 @@
                     <description>Enter the IP address or hostname that you would like to scan.</description>
                     <type>input</type>
 		</field>
-                <field>
-                    <fielddescr>-sT</fielddescr>
-                    <fieldname>option</fieldname>
-                    <description>This is the most basic form of TCP scanning.  The connect() system call provided by your operating system is used to open a connection to every interesting port on the machine.  If the port is listening, connect() will succeed, otherwise the port isn't reachable.</description>
-                    <type>radio</type>
-                    <typehint>TCP connect() scan.</typehint>
-                </field>
-                <field>
-                    <fielddescr>-sP</fielddescr>
-                    <fieldname>option</fieldname>
-                    <description>Ping scanning: Sometimes you only want to know which hosts on a network are up.  Nmap can do this by sending ICMP echo request packets to every IP address on the networks you specify.  Hosts that respond are up.  Unfortunately, some sites such as microsoft.com block echo request packets.</description>
-                    <type>radio</type>
-                    <typehint>Ping scanning</typehint>
-                </field>
-                <field>
-                    <fielddescr>-sU</fielddescr>
-                    <fieldname>option</fieldname>
-                    <description>This method is used to determine which UDP (User Datagram Protocol, RFC 768) ports are open on a host.  The technique is to send 0 byte UDP packets to each port on the target machine.  If we receive an ICMP port unreachable message, then the port is closed.  Otherwise we assume it is open.  Unfortunately, firewalls often block the port unreachable messages, causing the port to appear open.  Sometimes an ISP will block only a few specific dangerous ports such as 31337 (back orifice) and 139 (Windows NetBIOS), making it look like these vulnerable ports are open.  So don't panic immediately.  Unfortunately, it isn't always trivial to differentiate between real open UDP ports and these filtered false-positives.</description>
-                    <type>radio</type>
-                    <typehint>UDP Scanning</typehint>
+		<field>
+			<fielddescr>Scan Method</fielddescr>
+			<fieldname>scanmethod</fieldname>
+                        <type>select</type>
+                        <default_value>syn</default_value>
+                        <options>
+                                <option><name>SYN</name><value>syn</value></option>
+                                <option><name>TCP connect()</name><value>connect</value></option>
+                                <option><name>Ping</name><value>icmp</value></option>
+                                <option><name>UDP</name><value>udp</value></option>
+                        </options>
+			<typehint>Scan method</typehint>
                 </field>
                 <field>
                     <fielddescr>-P0</fielddescr>
