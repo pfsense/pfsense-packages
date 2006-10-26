@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <packagegui>
+	<name>squid</name>
+	<version>2.5.14_2-p7</version>
+
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<!-- Installation -->
 	<additional_files_needed>
@@ -45,7 +48,6 @@
 	</service>
 
 	<!-- Interface -->
-	<name>squid</name>
 	<title>Proxy server: General settings</title>
 	<tabs>
 		<tab>
