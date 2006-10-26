@@ -92,7 +92,7 @@ function sync_package_snort() {
 		$start .= ";sysctl net.bpf.maxinsns={$bpfmaxinsns}";
 
 	/* go ahead and issue bpf changes */
-	if($bpfbufsize) 
+	if($bpfbufsize)
 		mwexec_bg("sysctl net.bpf.bufsize={$bpfbufsize}");
 	if($bpfmaxbufsize)
 		mwexec_bg("sysctl net.bpf.maxbufsize={$bpfmaxbufsize}");
@@ -109,7 +109,7 @@ function sync_package_snort() {
 	/* write out rc.d start/stop file */
 	write_rcfile(array(
 			"file" => "snort.sh",
-			"start" => $start,
+			"start" => "BEFORE_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n{$start}\nsleep 10\nAFTER_MEM=`top | grep Free | grep Wired | awk '{print $10}'`\necho \"Ram usage BEFORE starting Snort: \${BEFORE_MEM} -- Ram usage AFTER starting Snort: \${AFTER_MEM}\"| logger -p daemon.info -i -t SnortMemory",
 			"stop" => "/usr/bin/killall snort; killall snort2c"
 		)
 	);
