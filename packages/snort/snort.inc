@@ -109,7 +109,7 @@ function sync_package_snort() {
 	/* write out rc.d start/stop file */
 	write_rcfile(array(
 			"file" => "snort.sh",
-			"start" => "BEFORE_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n{$start}\nsleep 17\nAFTER_MEM=`top | grep Free | grep Wired | awk '{print $10}'`\necho \"Ram usage BEFORE starting Snort: \${BEFORE_MEM} -- Ram usage AFTER starting Snort: \${AFTER_MEM}\"| logger -p daemon.info -i -t SnortMemory",
+			"start" => "BEFORE_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n{$start}\nsleep 17\nAFTER_MEM=`top | grep Free | grep Wired | awk '{print $10}'`\necho \"Ram usage BEFORE starting Snort: \${BEFORE_MEM} -- Ram usage AFTER starting Snort: \${AFTER_MEM}\"| logger -p daemon.info -i -t SnortStartup",
 			"stop" => "/usr/bin/killall snort; killall snort2c"
 		)
 	);
