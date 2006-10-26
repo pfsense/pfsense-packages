@@ -91,6 +91,14 @@ function sync_package_snort() {
 	if($bpfmaxinsns)
 		$start .= ";sysctl net.bpf.maxinsns={$bpfmaxinsns}";
 
+	/* go ahead and issue bpf changes */
+	if($bpfbufsize) 
+		mwexec_bg("sysctl net.bpf.bufsize={$bpfbufsize}");
+	if($bpfmaxbufsize)
+		mwexec_bg("sysctl net.bpf.maxbufsize={$bpfmaxbufsize}");
+	if($bpfmaxinsns)
+		mwexec_bg("sysctl net.bpf.maxinsns={$bpfmaxinsns}");
+
 	/* start snort */
 	$start .= ";snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort {$ifaces_final} -A full -D";
 
