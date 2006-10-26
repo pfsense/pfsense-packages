@@ -36,7 +36,7 @@
 	<include_file>routed.inc</include_file>
 
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/routed.inc</item>
+		<item>http://www.pfsense.org/packages/config/routed/routed.inc</item>
 	</additional_files_needed>
 
 	<!-- Menu is where this packages menu will appear -->
