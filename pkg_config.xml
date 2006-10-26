@@ -110,6 +110,7 @@
       <config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
       <version>2.6.0.2.3</version>
       <required_version>1.0</required_version>
+      <status>BETA</status>
       <configurationfile>snort.xml</configurationfile>
     </package>
     <package>
@@ -123,8 +124,6 @@
       <maintainer>seth.mos@xs4all.nl</maintainer>
       <version>20061023</version>
       <required_version>1.0</required_version>
-      <supported_versions>
-      </supported_versions>
       <status>BETA</status>
       <config_file>http://www.pfsense.com/packages/config/miniupnpd/miniupnpd.xml</config_file>
       <configurationfile>miniupnpd.xml</configurationfile>
