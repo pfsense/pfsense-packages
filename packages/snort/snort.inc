@@ -50,6 +50,12 @@ function sync_package_snort() {
 	$bpfmaxbufsize = $config['installedpackages']['snortadvanced']['config'][0]['bpfmaxbufsize'];
 	$bpfmaxinsns = $config['installedpackages']['snortadvanced']['config'][0]['bpfmaxinsns'];
 
+	/* set the snort performance model */
+	if($config['installedpackages']['snort']['config'][0]['performance'])
+		$snort_performance = $config['installedpackages']['snort']['config'][0]['performance'];
+	else
+		$snort_performance = "lowmem";
+
 	conf_mount_rw();
 	/* create a few directories and ensure the sample files are in place */
 	exec("/bin/mkdir -p /usr/local/etc/snort");
@@ -109,7 +115,7 @@ function sync_package_snort() {
 	/* write out rc.d start/stop file */
 	write_rcfile(array(
 			"file" => "snort.sh",
-			"start" => "BEFORE_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n{$start}\nsleep 17\nAFTER_MEM=`top | grep Free | grep Wired | awk '{print $10}'`\necho \"Ram usage BEFORE starting Snort: \${BEFORE_MEM} -- Ram usage AFTER starting Snort: \${AFTER_MEM}\"| logger -p daemon.info -i -t SnortStartup",
+			"start" => "BEFORE_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n{$start}\nsleep 17\nAFTER_MEM=`top | grep Free | grep Wired | awk '{print $10}'`\necho \"Ram usage BEFORE starting Snort: \${BEFORE_MEM} -- Ram usage AFTER starting Snort: \${AFTER_MEM}\" -- Mode {$snort_performance} | logger -p daemon.info -i -t SnortStartup",
 			"stop" => "/usr/bin/killall snort; killall snort2c"
 		)
 	);
