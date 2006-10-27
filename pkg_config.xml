@@ -135,7 +135,7 @@
       <category>Network Management</category>
       <version>2.0.4</version>
       <status>ALPHA</status>
-      <required_version>1.0-RC3</required_version>
+      <required_version>1.0</required_version>
       <maintainer>ryan@wgnrs.dynu.com</maintainer>
 	  <config_file>http://www.pfsense.com/packages/config/nut.xml</config_file>
 	  <configurationfile>nut.xml</configurationfile>
