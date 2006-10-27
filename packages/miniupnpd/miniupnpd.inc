@@ -45,21 +45,24 @@
 			if($ifaces_final) {
 				/* valid paramters lets create rc file and start miniupnpd */
 				
-				$start = "/usr/bin/killall miniupnpd\n";
+				$start = "if [ -e /var/run/miniupnpd.pid ]; then\n";
+				$start .= "/usr/bin/killall miniupnpd\n";
 				$start .= "# Clear existing rules and rdr entries \n";
 				$start .= "/sbin/pfctl -aminiupnpd -Fr 2>&1 >/dev/null\n";
 				$start .= "/sbin/pfctl -aminiupnpd -Fn 2>&1 >/dev/null\n";
-				$start .= "while [ `pgrep miniupnpd | wc -l` != 0 ]; do sleep 1; done\n";
+				$start .= "while [ -e /var/run/miniupnpd.pid ]; do sleep 1; done\n";
+				$start .= "fi\n";
 				$start .= "/usr/local/sbin/miniupnpd -p 2869{$ifaces_final}";
 
 				/* override wan ip address, common for carp, etc */
 				if($overridewanip)
 					$start .= " -o {$overridewanip}";
 
-				$stop = "/usr/bin/killall miniupnpd \n";
-				$stop .= "# Clear existing rules and rdr entries \n";
+				$stop = "/usr/bin/killall miniupnpd \n";			
+				$stop .= "# Clear existing rules and rdr entries \n";				
 				$stop .= "/sbin/pfctl -aminiupnpd -Fr 2>&1 >/dev/null\n";
-				$stop .= "/sbin/pfctl -aminiupnpd -Fn 2>&1 >/dev/null";
+				$stop .= "/sbin/pfctl -aminiupnpd -Fn 2>&1 >/dev/null\n";
+				$stop .= "while [ -e /var/run/miniupnpd.pid ]; do sleep 1; done";
 				write_rcfile(array(
 					    "file" => "miniupnpd.sh",
 					    "start" => $start,
