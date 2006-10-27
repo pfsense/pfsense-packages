@@ -128,6 +128,21 @@
       <config_file>http://www.pfsense.com/packages/config/miniupnpd/miniupnpd.xml</config_file>
       <configurationfile>miniupnpd.xml</configurationfile>
     </package>
+    <package>
+      <name>nut</name>
+      <descr>Network UPS Tools</descr>
+      <website>http://www.networkupstools.org/</website>
+      <category>Network Management</category>
+      <version>2.0.2</version>
+      <status>ALPHA</status>
+      <required_version>1.0-RC3</required_version>
+      <maintainer>ryan@wgnrs.dynu.com</maintainer>
+	  <config_file>http://www.pfsense.com/packages/config/nut.xml</config_file>
+	  <configurationfile>nut.xml</configurationfile>
+	  <depends_on_package_base_url>http://ftp-mirror.internap.com/pub/FreeBSD/ports/i386/packages-6.0-release/All/</depends_on_package_base_url>
+      <depends_on_package>nut-2.0.2.tbz</depends_on_package>
+	  <depends_on_package>nut-usb-2.0.2.tbz</depends_on_package>
+	</package>
 	<package>
 		<name>diag_new_states</name>
 		<descr>Paul Taylors version of Diagnostics States which utilizes pftop.</descr>
