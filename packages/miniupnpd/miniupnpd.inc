@@ -45,12 +45,12 @@
 			if($ifaces_final) {
 				/* valid paramters lets create rc file and start miniupnpd */
 				
-				$start = "if [ -e /var/run/miniupnpd.pid ]; then\n";
+				$start = "if [ `pgrep miniupnpd | wc -l` != 0  ]; then\n";
 				$start .= "/usr/bin/killall miniupnpd\n";
 				$start .= "# Clear existing rules and rdr entries \n";
 				$start .= "/sbin/pfctl -aminiupnpd -Fr 2>&1 >/dev/null\n";
 				$start .= "/sbin/pfctl -aminiupnpd -Fn 2>&1 >/dev/null\n";
-				$start .= "while [ -e /var/run/miniupnpd.pid ]; do sleep 1; done\n";
+				$start .= "while [ `pgrep miniupnpd | wc -l` != 0 ]; do sleep 1; done\n";
 				$start .= "fi\n";
 				$start .= "/usr/local/sbin/miniupnpd -p 2869{$ifaces_final}";
 
@@ -62,7 +62,7 @@
 				$stop .= "# Clear existing rules and rdr entries \n";				
 				$stop .= "/sbin/pfctl -aminiupnpd -Fr 2>&1 >/dev/null\n";
 				$stop .= "/sbin/pfctl -aminiupnpd -Fn 2>&1 >/dev/null\n";
-				$stop .= "while [ -e /var/run/miniupnpd.pid ]; do sleep 1; done";
+				$stop .= "while [ `pgrep miniupnpd | wc -l` != 0 ]; do sleep 1; done";
 				write_rcfile(array(
 					    "file" => "miniupnpd.sh",
 					    "start" => $start,
