@@ -76,16 +76,17 @@ function sync_package_snort() {
 	$iflist = array("lan" => "LAN");
 	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
 		$iflist['opt' . $i] = "opt{$i}";
-	foreach($_POST['iface_array'] as $iface) {
-		$if = convert_friendly_interface_to_real_interface_name($iface);
-		if($config['interfaces'][$iface]['ipaddr'] == "pppoe")
-			$if = "ng0";
-		if($if) {
-			$ifaces_final .= " -i " . $if;
-			$first = 1;
+	if($_POST['iface_array']) {
+		foreach($_POST['iface_array'] as $iface) {
+			$if = convert_friendly_interface_to_real_interface_name($iface);
+			if($config['interfaces'][$iface]['ipaddr'] == "pppoe")
+				$if = "ng0";
+			if($if) {
+				$ifaces_final .= " -i " . $if;
+				$first = 1;
+			}
 		}
 	}
-
 	/* create log directory */
 	$start  = "/bin/mkdir -p /var/log/snort";
 
