@@ -115,8 +115,7 @@
     </package>
     <package>
       <name>miniupnpd</name>
-      <descr>*MAY WRECK SECURITY, USE AT OWN RISK* *DOES NOT WORK WITH CARP*
-      Emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP Internet
+      <descr>Emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP Internet
       Gateway Device specification (IGD) and allows UPnP aware clients, such as MSN Messenger to
       work properly from behind a NAT firewall.</descr>
       <website>http://miniupnp.free.fr/</website>
