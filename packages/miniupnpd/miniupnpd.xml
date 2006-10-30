@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Services: Miniupnpd</title>
 	<name>miniupnpd</name>
-	<version>20061028</version>
+	<version>20061029</version>
 	<savetext>Change</savetext>
 	<include_file>/usr/local/pkg/miniupnpd.inc</include_file>
 	<aftersaveredirect>status_upnp.php</aftersaveredirect>
@@ -57,6 +57,11 @@
 			<fieldname>overridewanip</fieldname>
 			<type>input</type>
 		</field>
+		<field>
+			<fielddescr>Log packets handled by miniupnpd rules?</fielddescr>
+			<fieldname>logpackets</fieldname>
+			<type>checkbox</type>
+		</field>	
 	</fields>
 	<custom_php_resync_config_command>
 		sync_package_miniupnpd();

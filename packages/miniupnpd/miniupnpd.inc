@@ -20,6 +20,8 @@
 		/* since config is written before this file invoked we don't need to read post data */
 		if($config['installedpackages']['miniupnpd']['config'][0]['overridewanip'])
 			$overridewanip = $config['installedpackages']['miniupnpd']['config'][0]['overridewanip'];
+		if($config['installedpackages']['miniupnpd']['config'][0]['logpackets'])
+			$logpackets = $config['installedpackages']['miniupnpd']['config'][0]['logpackets'];			
 		if($config['installedpackages']['miniupnpd']['config'][0]['iface_array'])
 			$iface_array = explode(",",$config['installedpackages']['miniupnpd']['config'][0]['iface_array']);
 
@@ -57,6 +59,10 @@
 				/* override wan ip address, common for carp, etc */
 				if($overridewanip)
 					$start .= " -o {$overridewanip}";
+				
+				/* enable logging of packets handled by miniupnpd rules */
+				if($logpackets)
+					$start .= " -L";
 
 				$stop = "/usr/bin/killall miniupnpd \n";			
 				$stop .= "# Clear existing rules and rdr entries \n";				
