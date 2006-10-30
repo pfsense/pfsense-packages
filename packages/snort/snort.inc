@@ -113,10 +113,16 @@ function sync_package_snort() {
 	if($_POST['blockoffenders'])
 		$start .= ";/usr/bin/killall snort2c; snort2c -w /var/db/whitelist -a /var/log/snort/alert";
 
+	$sample_before = "\nBEFORE_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
+	$sample_after = "\nAFTER_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
+	$sleep_before_final = "\necho \"Sleeping before final memory sampling...\"\nsleep 17";
+	$total_free_after = "\nTOTAL_USAGE=`top | grep snort | awk '{ print \$6 }'`\n";
+	$echo_usage = "\necho \"Ram free BEFORE starting Snort: \${BEFORE_MEM} -- Ram free AFTER starting Snort: \${AFTER_MEM}\" -- Mode {$snort_performance} -- Snort memory usage: \$TOTAL_USAGE | logger -p daemon.info -i -t SnortStartup\n";
+
 	/* write out rc.d start/stop file */
 	write_rcfile(array(
 			"file" => "snort.sh",
-			"start" => "BEFORE_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n{$start}\necho \"Sleeping before final memory sampling...\"\nsleep 17\nTOTAL_USAGE=`top | grep snort | awk '{ print \$6 }'`\nAFTER_MEM=`top | grep Free | grep Wired | awk '{print $10}'`\necho \"Ram free BEFORE starting Snort: \${BEFORE_MEM} -- Ram free AFTER starting Snort: \${AFTER_MEM}\" -- Mode {$snort_performance} -- Snort memory usage: \$TOTAL_USAGE | logger -p daemon.info -i -t SnortStartup",
+			"start" => "{$sample_before}{$start}{$sleep_before_final}{$sample_after}{$echo_usage}",
 			"stop" => "/usr/bin/killall snort; killall snort2c"
 		)
 	);
