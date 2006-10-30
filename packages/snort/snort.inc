@@ -116,7 +116,7 @@ function sync_package_snort() {
 	$sample_before = "\nBEFORE_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
 	$sample_after = "\nAFTER_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
 	$sleep_before_final = "\necho \"Sleeping before final memory sampling...\"\nsleep 17";
-	$total_free_after = "\nTOTAL_USAGE=`top | grep snort | awk '{ print \$6 }'`\n";
+	$total_free_after = "\nTOTAL_USAGE=`top | grep snort | grep -v grep | awk '{ print \$6 }'`\n";
 	$echo_usage = "\necho \"Ram free BEFORE starting Snort: \${BEFORE_MEM} -- Ram free AFTER starting Snort: \${AFTER_MEM}\" -- Mode {$snort_performance} -- Snort memory usage: \$TOTAL_USAGE | logger -p daemon.info -i -t SnortStartup\n";
 
 	/* write out rc.d start/stop file */
