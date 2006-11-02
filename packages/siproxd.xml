@@ -1,7 +1,7 @@
 <packagegui>
 	<name>siproxd</name>
 	<title>siproxd: Settings</title>
-	<version>0.5.9</version>
+	<version>0.5.13</version>
 	<menu>
 		<name>siproxd</name>
 		<tooltiptext>Modify siproxd users and settings.</tooltiptext>
