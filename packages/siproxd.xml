@@ -109,7 +109,7 @@
 		</field>
 	</fields>
 	<custom_php_global_functions>
-	function sync_package_sipproxd() {
+	function sync_package_siproxd() {
                 conf_mount_rw();
                 config_lock();
                 global $config;
@@ -166,7 +166,7 @@
                 fclose($fout);
 		write_rcfile(array(
 					"file" => "siproxd.sh",
-					"start" => "/usr/local/sbin/siproxd"
+					"start" => "/usr/local/sbin/siproxd",
 					"stop" => "/usr/bin/killall siproxd"
 				)
 		);
@@ -176,10 +176,10 @@
         }
 	</custom_php_global_functions>
 	<custom_php_resync_config_command>
-	    sync_package_sipproxd();
+	    sync_package_siproxd();
 	</custom_php_resync_config_command>
 	<custom_add_php_command>
-	sync_package_sipproxd();
+	sync_package_siproxd();
 	</custom_add_php_command>
 </packagegui>
 
