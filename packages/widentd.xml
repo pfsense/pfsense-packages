@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>widentd</name>
-	<version>1.03</version>
+	<version>1.03_1</version>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<title>Services: widentd</title>
 	<menu>

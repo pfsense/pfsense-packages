@@ -321,8 +321,8 @@
       <website>http://www.webweaving.org/widentd</website>
       <category>Services</category>
       <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
-      <depends_on_package>widentd-1.03.tbz</depends_on_package>
-      <version>1.03</version>
+      <depends_on_package>widentd-1.03_1.tbz</depends_on_package>
+      <version>1.03_1</version>
       <status>ALPHA</status>
       <required_version>1.0</required_version>
       <config_file>http://www.pfsense.com/packages/config/widentd.xml</config_file>
