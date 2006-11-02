@@ -1,7 +1,7 @@
 <packagegui>
 	<name>siproxd</name>
 	<title>siproxd: Settings</title>
-	<version>0.5.13</version>
+	<version>0.5.13_pfs1</version>
 	<menu>
 		<name>siproxd</name>
 		<tooltiptext>Modify siproxd users and settings.</tooltiptext>
@@ -167,6 +167,7 @@
 		write_rcfile(array(
 					"file" => "siproxd.sh",
 					"start" => "/usr/local/sbin/siproxd"
+					"stop" => "/usr/bin/killall siproxd"
 				)
 		);
                 restart_service("siproxd");
