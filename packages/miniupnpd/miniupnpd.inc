@@ -16,18 +16,12 @@
 	}
 
 	function upnp_validate_ip($ip) {
-		$return = TRUE;
-		$tmp = explode(".", $ip);
-		if(count($tmp) != 4)
-			$return = FALSE;
-		else
-			foreach($tmp AS $sub)
-				if($return != FALSE)
-					if(!eregi("^([0-9])", $sub))
-						$return = FALSE;
-					else
-						$return = TRUE;
-		return $return; 
+		if(!eregi("^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$", $ip))
+			return FALSE;   
+		foreach(explode(".", $ip) as $sub)
+			if($sub<0 || $sub>256) 
+				return FALSE;
+		return TRUE;
 	}
 	
 	function before_form_miniupnpd($pkg) {
@@ -40,11 +34,15 @@
 				if ($field['fieldname'] == 'download' || $field['fieldname'] == 'upload')
 					unset($pkg['fields']['field'][$i]);
 				$i++;
-			}				
+			}
 		}
 	}
 
 	function validate_form_miniupnpd($post, $input_errors) {
+		if($post['iface_array'])
+			foreach($post['iface_array'] as $iface)
+				if($iface == "wan")
+					$input_errors[] = 'It is a security risk to specify WAN in the \'Interface\' field';
 		if($post['overridewanip'] && !upnp_validate_ip($post['overridewanip']))
 			$input_errors[] = 'You must specify a valid ip address in the \'Override WAN address\' field';
 		if(($post['download'] && !$post['upload']) || ($post['upload'] && !$post['download']))
@@ -80,7 +78,7 @@
 					/* check that the interface has an ip address before adding parameters */
 					if($addr) {
 						upnp_notice("Active on {$iface} interface");
-			    		$ifaces_final .= " -i {$wanif} -a {$addr}";
+			    		$ifaces_final .= " -a {$addr}";
 					} else {
 						upnp_warn("Interface {$iface} has no ip address");
 					}
@@ -104,15 +102,20 @@
 				}	
 					
 				/* valid paramters lets create rc file and start miniupnpd */
-				
-				$start = "if [ `pgrep miniupnpd | wc -l` != 0  ]; then\n";
-				$start .= "/usr/bin/killall miniupnpd\n";
-				$start .= "# Clear existing rules and rdr entries \n";
-				$start .= "/sbin/pfctl -aminiupnpd -Fr 2>&1 >/dev/null\n";
-				$start .= "/sbin/pfctl -aminiupnpd -Fn 2>&1 >/dev/null\n";
-				$start .= "while [ `pgrep miniupnpd | wc -l` != 0 ]; do sleep 1; done\n";
-				$start .= "fi\n";
-				$start .= "/usr/local/sbin/miniupnpd -p 2869{$ifaces_final}";
+							
+				$stop = "if [ `pgrep miniupnpd | wc -l` != 0  ]; then\n";
+				$stop .= "\t\t/usr/bin/killall miniupnpd\n";
+				$stop .= "\t\twhile [ `pgrep miniupnpd | wc -l` != 0 ]; do sleep 1; done\n";
+				$stop .= "\tfi\n";			
+				$stop .= "\t# Clear existing rules and rdr entries\n";
+				$stop .= "\tif [ `pfctl -aminiupnpd -sr | wc -l` != 0  ]; then\n";				
+				$stop .= "\t\t/sbin/pfctl -aminiupnpd -Fr 2>&1 >/dev/null\n";
+				$stop .= "\tfi\n";
+				$stop .= "\tif [ `pfctl -aminiupnpd -sn | wc -l` != 0  ]; then\n";
+				$stop .= "\t\t/sbin/pfctl -aminiupnpd -Fn 2>&1 >/dev/null\n";
+				$stop .= "\tfi";
+
+				$start = $stop."\n\t/usr/local/sbin/miniupnpd -p 2869 -i {$wanif}{$ifaces_final}";
 
 				/* define maximum downstream and upstream bitrates */
 				if($download && $upload)
@@ -128,13 +131,8 @@
 
 				/* enable system uptime instead of miniupnpd uptime */
 				if($sysuptime)
-					$start .= " -U";					
-
-				$stop = "/usr/bin/killall miniupnpd \n";			
-				$stop .= "# Clear existing rules and rdr entries \n";				
-				$stop .= "/sbin/pfctl -aminiupnpd -Fr 2>&1 >/dev/null\n";
-				$stop .= "/sbin/pfctl -aminiupnpd -Fn 2>&1 >/dev/null\n";
-				$stop .= "while [ `pgrep miniupnpd | wc -l` != 0 ]; do sleep 1; done";
+					$start .= " -U";				
+				
 				write_rcfile(array(
 					    "file" => "miniupnpd.sh",
 					    "start" => $start,
