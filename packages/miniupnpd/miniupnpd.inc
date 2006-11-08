@@ -2,10 +2,59 @@
 	require_once("config.inc");
 	require_once("functions.inc");
 
+	/* Miniupnp */
+
 	function upnp_notice ($msg) { syslog(LOG_NOTICE, "miniupnpd: $msg"); return; }
 	function upnp_warn ($msg) { syslog(LOG_WARNING, "miniupnpd: $msg"); return; }
+	
+	function upnp_config ($name) {
+		global $config;
+		if($config['installedpackages']['miniupnpd']['config'][0]["{$name}"])
+			return $config['installedpackages']['miniupnpd']['config'][0]["{$name}"];
+		else
+			return NULL;
+	}
 
-	/* Miniupnp */
+	function upnp_validate_ip($ip) {
+		$return = TRUE;
+		$tmp = explode(".", $ip);
+		if(count($tmp) != 4)
+			$return = FALSE;
+		else
+			foreach($tmp AS $sub)
+				if($return != FALSE)
+					if(!eregi("^([0-9])", $sub))
+						$return = FALSE;
+					else
+						$return = TRUE;
+		return $return; 
+	}
+	
+	function before_form_miniupnpd($pkg) {
+		global $config;
+		
+		/* if shaper connection speed defined hide fields */
+		if($config['ezshaper']['step2']['download'] && $config['ezshaper']['step2']['upload']) {
+			$i=0;
+			foreach ($pkg['fields']['field'] as $field) {
+				if ($field['fieldname'] == 'download' || $field['fieldname'] == 'upload')
+					unset($pkg['fields']['field'][$i]);
+				$i++;
+			}				
+		}
+	}
+
+	function validate_form_miniupnpd($post, $input_errors) {
+		if($post['overridewanip'] && !upnp_validate_ip($post['overridewanip']))
+			$input_errors[] = 'You must specify a valid ip address in the \'Override WAN address\' field';
+		if(($post['download'] && !$post['upload']) || ($post['upload'] && !$post['download']))
+			$input_errors[] = 'You must fill in both \'Maximum Download Speed\' and \'Maximum Upload Speed\' fields';
+		if($post['download'] && $post['download']<=0)
+			$input_errors[] = 'You must specify a value greater than 0 in the \'Maximum Download Speed\' field';
+		if($post['upload'] && $post['upload']<=0)
+			$input_errors[] = 'You must specify a value greater than 0 in the \'Maximum Upload Speed\' field';
+	}
+
 	function sync_package_miniupnpd() {
 		global $config;
 		global $input_errors;
@@ -17,15 +66,10 @@
 		conf_mount_rw();
 		config_lock();	
 
-		/* since config is written before this file invoked we don't need to read post data */
-		if($config['installedpackages']['miniupnpd']['config'][0]['overridewanip'])
-			$overridewanip = $config['installedpackages']['miniupnpd']['config'][0]['overridewanip'];
-		if($config['installedpackages']['miniupnpd']['config'][0]['logpackets'])
-			$logpackets = $config['installedpackages']['miniupnpd']['config'][0]['logpackets'];			
-		if($config['installedpackages']['miniupnpd']['config'][0]['iface_array'])
-			$iface_array = explode(",",$config['installedpackages']['miniupnpd']['config'][0]['iface_array']);
+		/* since config is written before this file invoked we don't need to read post data */			
+		$iface_array = explode(",",upnp_config("iface_array"));		
 
-		if($iface_array) {			
+		if($iface_array) {		
 			foreach($iface_array as $iface) {
 				$if = convert_friendly_interface_to_real_interface_name($iface);
 				/* above function returns iface if fail */
@@ -45,6 +89,19 @@
 			}
 
 			if($ifaces_final) {
+				$overridewanip = upnp_config("overridewanip");
+				$logpackets = upnp_config("logpackets");
+				$sysuptime = upnp_config("sysuptime");
+				
+				/* if shaper connection speed defined use those values */
+				if($config['ezshaper']['step2']['download'] && $config['ezshaper']['step2']['upload']) {
+					$download = $config['ezshaper']['step2']['download']*1000;
+					$upload = $config['ezshaper']['step2']['upload']*1000;
+				} else {
+					$download = upnp_config("download")*1000;
+					$upload = upnp_config("upload")*1000;
+				}	
+					
 				/* valid paramters lets create rc file and start miniupnpd */
 				
 				$start = "if [ `pgrep miniupnpd | wc -l` != 0  ]; then\n";
@@ -56,6 +113,10 @@
 				$start .= "fi\n";
 				$start .= "/usr/local/sbin/miniupnpd -p 2869{$ifaces_final}";
 
+				/* define maximum downstream and upstream bitrates */
+				if($download && $upload)
+					$start .= " -B {$download} {$upload}";
+
 				/* override wan ip address, common for carp, etc */
 				if($overridewanip)
 					$start .= " -o {$overridewanip}";
@@ -63,6 +124,10 @@
 				/* enable logging of packets handled by miniupnpd rules */
 				if($logpackets)
 					$start .= " -L";
+
+				/* enable system uptime instead of miniupnpd uptime */
+				if($sysuptime)
+					$start .= " -U";					
 
 				$stop = "/usr/bin/killall miniupnpd \n";			
 				$stop .= "# Clear existing rules and rdr entries \n";				

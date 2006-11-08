@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Services: Miniupnpd</title>
 	<name>miniupnpd</name>
-	<version>20061029</version>
+	<version>20061107</version>
 	<savetext>Change</savetext>
 	<include_file>/usr/local/pkg/miniupnpd.inc</include_file>
 	<aftersaveredirect>status_upnp.php</aftersaveredirect>
@@ -53,6 +53,16 @@
 			<type>interfaces_selection</type>
 		</field>
 		<field>
+			<fielddescr>Maximum Download Speed (Kbits/second)</fielddescr>
+			<fieldname>download</fieldname>
+			<type>input</type>
+		</field>	
+		<field>
+			<fielddescr>Maximum Upload Speed (Kbits/second)</fielddescr>
+			<fieldname>upload</fieldname>
+			<type>input</type>
+		</field>	
+		<field>
 			<fielddescr>Override WAN address</fielddescr>
 			<fieldname>overridewanip</fieldname>
 			<type>input</type>
@@ -62,7 +72,18 @@
 			<fieldname>logpackets</fieldname>
 			<type>checkbox</type>
 		</field>	
+		<field>
+			<fielddescr>Use system uptime instead of miniupnpd uptime?</fielddescr>
+			<fieldname>sysuptime</fieldname>
+			<type>checkbox</type>
+		</field>	
 	</fields>
+	<custom_php_command_before_form>
+		before_form_miniupnpd(&amp;$pkg);
+	</custom_php_command_before_form>
+	<custom_php_validation_command>
+		validate_form_miniupnpd($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		sync_package_miniupnpd();
 	</custom_php_resync_config_command>    
