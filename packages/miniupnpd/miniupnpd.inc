@@ -67,7 +67,8 @@
 		config_lock();	
 
 		/* since config is written before this file invoked we don't need to read post data */			
-		$iface_array = explode(",",upnp_config("iface_array"));		
+		if(upnp_config("iface_array"))
+			$iface_array = explode(",",upnp_config("iface_array"));		
 
 		if($iface_array) {		
 			foreach($iface_array as $iface) {
