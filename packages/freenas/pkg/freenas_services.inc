@@ -1390,7 +1390,7 @@ EOD;
                 file_put_contents("/usr/local/etc/avahi/services/rsync.service", $rsyncservice);
 	}
 
-	if (isset($config['system']['enablesshd'])) {
+	if (isset($config['system']['ssh']['enable'])) {
                 $sshservice = str_replace("@PORT@",
                                           "22",
                                           $service_template);
