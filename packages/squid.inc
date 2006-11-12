@@ -95,11 +95,13 @@ function squid_install_command() {
 	$rc['start'] = '/usr/local/sbin/squid -D';
 	$rc['stop'] = <<<EOD
 ps awux | grep proxy_monitor.sh | grep -v grep | awk '{ print \$2 }' | xargs kill
-/usr/local/sbin/squid -k shutdown
+/usr/local/sbin/squid -k shutdown &
+sleep 15
 # Just to be sure...
 killall squid 2>/dev/null
 sleep 1
 killall squid 2>/dev/null
+killall -9 squid 2>/dev/null
 killall pinger 2>/dev/null
 
 EOD;
