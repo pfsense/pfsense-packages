@@ -446,7 +446,7 @@
       <category>Network</category>
       <version>2.5.14_2-p7.1</version>
       <status>BETA</status>
-      <required_version>1.0</required_version>
+      <required_version>2.0</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
       <depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
       <depends_on_package>squid-2.5.14_2.tbz</depends_on_package>
