@@ -102,19 +102,23 @@
 				}	
 					
 				/* valid paramters lets create rc file and start miniupnpd */
-							
-				$stop = "if [ `pgrep miniupnpd | wc -l` != 0  ]; then\n";
-				$stop .= "\t\t/usr/bin/killall miniupnpd\n";
-				$stop .= "\t\twhile [ `pgrep miniupnpd | wc -l` != 0 ]; do sleep 1; done\n";
-				$stop .= "\tfi\n";			
-				$stop .= "\t# Clear existing rules and rdr entries\n";
-				$stop .= "\tif [ `pfctl -aminiupnpd -sr | wc -l` != 0  ]; then\n";				
-				$stop .= "\t\t/sbin/pfctl -aminiupnpd -Fr 2>&1 >/dev/null\n";
-				$stop .= "\tfi\n";
-				$stop .= "\tif [ `pfctl -aminiupnpd -sn | wc -l` != 0  ]; then\n";
-				$stop .= "\t\t/sbin/pfctl -aminiupnpd -Fn 2>&1 >/dev/null\n";
-				$stop .= "\tfi";
-
+			
+				$stop = <<<EOD
+if [ `pgrep miniupnpd | wc -l` != 0  ]; then
+		/usr/bin/killall miniupnpd
+		while [ `pgrep miniupnpd | wc -l` != 0 ]; do
+			sleep 1
+		done	
+	fi
+	# Clear existing rules and rdr entries
+	if [ `pfctl -aminiupnpd -sr | wc -l` != 0  ]; then
+		/sbin/pfctl -aminiupnpd -Fr 2>&1 >/dev/null
+	fi
+	if [ `pfctl -aminiupnpd -sn | wc -l` != 0  ]; then
+		/sbin/pfctl -aminiupnpd -Fn 2>&1 >/dev/null
+	fi
+EOD;
+			
 				$start = $stop."\n\t/usr/local/sbin/miniupnpd -p 2869 -i {$wanif}{$ifaces_final}";
 
 				/* define maximum downstream and upstream bitrates */
