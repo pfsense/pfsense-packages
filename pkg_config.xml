@@ -126,7 +126,21 @@
       <status>BETA</status>
       <config_file>http://www.pfsense.com/packages/config/miniupnpd/miniupnpd.xml</config_file>
       <configurationfile>miniupnpd.xml</configurationfile>
-    </package>
+	</package>
+    <package>
+      <name>imspector</name>
+	  <descr>** REQUIRES: 1.0.1-SNAPSHOT-11-24-2006 OR LATER ** NOTE: IF MINIUPNPD INSTALLED, YOU NEED TO UPGRADE
+      TO MINIUPNPD 20061123 ** IMSpector is an Instant Messenger transparent proxy with logging capabilities.  
+      Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees.</descr>
+      <website>http://www.imspector.org/</website>
+      <category>Network Management</category>
+	  <maintainer>ryan@wgnrs.dynu.com</maintainer>
+      <version>0.2</version>
+      <required_version>1.0</required_version>
+      <status>ALPHA</status>
+      <config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
+      <configurationfile>imspector.xml</configurationfile>
+    </package>	
     <package>
       <name>nut</name>
       <descr>Network UPS Tools</descr>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<title>Services: IMSpector</title>
+	<name>imspector</name>
+	<version>0.2</version>
+	<savetext>Change</savetext>
+	<include_file>/usr/local/pkg/imspector.inc</include_file>
+	<aftersaveredirect>/pkg_edit.php?xml=imspector.xml&amp;id=0</aftersaveredirect>
+	<menu>
+		<name>IMSpector</name>
+		<tooltiptext>Set IMSpector settings such as protocols to listen on.</tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=imspector.xml&amp;id=0</url>
+	</menu>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/imspector/imspector.inc</item>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/sbin/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/sbin/imspector</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/lib/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/lib/libimspector.so</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/lib/imspector</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/lib/debugloggingplugin.so</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/lib/imspector</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/lib/fileloggingplugin.so</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/lib/imspector</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/lib/icqprotocolplugin.so</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/lib/imspector</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/lib/ircprotocolplugin.so</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/lib/imspector</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/lib/msnprotocolplugin.so</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/lib/imspector</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/lib/yahooprotocolplugin.so</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/lib</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/lib/libstdc++.a</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/lib</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/lib/libstdc++.so</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/lib</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/lib/libstdc++.so.5</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/lib</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/lib/libstdc++_p.a</item>
+	</additional_files_needed>
+	<service>
+		<name>imspector</name>
+		<rcfile>imspector.sh</rcfile>
+		<executable>imspector</executable>
+	</service>
+	<fields>
+		<field>
+			<fielddescr>Interface (generally LAN)</fielddescr>
+			<fieldname>iface_array</fieldname>
+			<value>lan</value>
+			<multiple>true</multiple>
+			<size>3</size>
+			<type>interfaces_selection</type>
+		</field>
+		<field>
+			<fielddescr>Listen on MSN protocol</fielddescr>
+			<fieldname>proto_msn</fieldname>
+			<type>checkbox</type>
+		</field>	
+		<field>
+			<fielddescr>Listen on ICQ/AIM protocol</fielddescr>
+			<fieldname>proto_icqaim</fieldname>
+			<type>checkbox</type>
+		</field>	
+		<field>
+			<fielddescr>Listen on Yahoo protocol</fielddescr>
+			<fieldname>proto_yahoo</fieldname>
+			<type>checkbox</type>
+		</field>	
+		<field>
+			<fielddescr>Listen on IRC protocol</fielddescr>
+			<fieldname>proto_irc</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable file logging</fielddescr>
+			<fieldname>log_file</fieldname>
+			<type>checkbox</type>
+		</field>	
+	</fields>
+	<custom_php_command_before_form>
+		before_form_imspector(&amp;$pkg);
+	</custom_php_command_before_form>
+	<custom_php_validation_command>
+		validate_form_imspector($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		sync_package_imspector();
+	</custom_php_resync_config_command>    
+	<custom_php_install_command>
+		sync_package_imspector();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		exec("rm -f /usr/local/etc/rc.d/imspector*");
+		exec("rm -f /usr/local/etc/imspector.conf");
+	</custom_php_deinstall_command>
+</packagegui>
