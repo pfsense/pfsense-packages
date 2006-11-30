@@ -22,6 +22,9 @@
 	<custom_php_install_command>
 		frickin_custom_php_install_command();
 	</custom_php_install_command>
+	<custom_add_php_command>
+		frickin_custom_php_install_command();
+	</custom_add_php_command>
 	<custom_php_deinstall_command>
 		frickin_custom_php_deinstall_command();
 	</custom_php_deinstall_command>
