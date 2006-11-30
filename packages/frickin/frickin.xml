@@ -4,26 +4,20 @@
 	<version>1.2</version>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/frickin/frickin.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/All/frickin</item>
-        </additional_files_needed>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/frickin/bin/frickin</item>
+	</additional_files_needed>    	      
 	<custom_php_install_command>
-	    $fout = fopen("/usr/local/etc/rc.d/frickin.sh", "w");
-	    fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");
-            fwrite($fout, "# PACKAGE: Frickin Proxy\n");
-            fwrite($fout, "# EXECUTABLE: frickin\n");
-	    fwrite($fout, "/usr/local/bin/frickin");
-	    fwrite($fout, " -s 127.0.0.1");
-	    fwrite($fout, " -c 20");
-	    fwrite($fout, " &amp;\n");
-	    fclose($fout);
-	    mwexec("/usr/bin/killall frickin");
-	    mwexec("chmod a+rx /usr/local/etc/rc.d/frickin.sh");
-	    mwexec("/usr/local/etc/rc.d/frickin.sh");
+		frickin_custom_php_install_command();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-	    unlink_if_exists("/usr/local/etc/rc.d/frickin.sh");
-	    unlink_if_exists("/usr/local/bin/frickin");
+		frickin_custom_php_deinstall_command();
 	</custom_php_deinstall_command>
+	<include_file>/usr/local/pkg/frickin.inc</include_file>
 </packagegui>
