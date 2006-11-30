@@ -35,23 +35,54 @@ function frickin_custom_php_install_command() {
 		fwrite($fout, "# PACKAGE: Frickin Proxy\n");
 		fwrite($fout, "# EXECUTABLE: frickin\n");
 		fwrite($fout, "/usr/local/bin/frickin");
-		fwrite($fout, " -s 127.0.0.1");
-		fwrite($fout, " -c 20");
+		fwrite($fout, " -c /usr/local/etc/frickin.conf");
 		fwrite($fout, " &\n");
 		fclose($fout);
+
+		$fout = fopen("/usr/local/etc/frickin.conf", "w");
+		$frickin_conf = <<<EOD
+
+proxy {
+    user = "nobody";
+    group = "nobody";
+    client {
+	queue = 5;	    # Maximum connection queue size
+	max = 100;	    # Maximum number of concurrent clients
+	multiple = FALSE;   # Allow multiple connections from same ip
+    }
+    session {
+	connect = 15;	# Connect timout (seconds)
+	idle = 60;	# Idle timeout (seconds)
+    }
+}
+
+listeners {
+    default {
+	name = "Frickin PPTP Proxy";
+	vendor = "Placid Development";
+	ip = "127.0.0.1";
+	port = 1723;
+    }
+}
+
+EOD;
+
+		fwrite($fout, "{$frickin_conf}");
+		fclose($fout);
+
 		mwexec("/usr/bin/killall frickin");
 		mwexec("chmod a+rx /usr/local/etc/rc.d/frickin.sh");
-		mwexec("/usr/local/etc/rc.d/frickin.sh");	
+		mwexec("/usr/local/etc/rc.d/frickin.sh");
 }
 
 function custom_php_deinstall_command() {
 	    unlink_if_exists("/usr/local/etc/rc.d/frickin.sh");
-	    unlink_if_exists("/usr/local/bin/frickin");	
+	    unlink_if_exists("/usr/local/bin/frickin");
 }
 
 function frickin_generate_rules($type) {
 	global $config;
-	
+
 	$rules = "";
 
 	$frickin_conf = $config['installedpackages']['frickin']['config'][0];
