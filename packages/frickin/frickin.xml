@@ -3,6 +3,12 @@
 	<name>frickin</name>
 	<version>2.0-BETA1</version>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<menu>
+		<name>Frickin PPTP</name>
+		<tooltiptext>Setup Frickin PPTP Proxy specific settings</tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=frickin.xml&amp;id=0</url>
+	</menu>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
