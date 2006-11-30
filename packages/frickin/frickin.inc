@@ -73,11 +73,15 @@ EOD;
 		mwexec("/usr/bin/killall frickin");
 		mwexec("chmod a+rx /usr/local/etc/rc.d/frickin.sh");
 		mwexec("/usr/local/etc/rc.d/frickin.sh");
+
+		filter_configure();
 }
 
 function custom_php_deinstall_command() {
 	    unlink_if_exists("/usr/local/etc/rc.d/frickin.sh");
 	    unlink_if_exists("/usr/local/bin/frickin");
+	    mwexec("killall frickin");
+	    filter_configure();
 }
 
 function frickin_generate_rules($type) {
