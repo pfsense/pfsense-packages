@@ -4,6 +4,17 @@
 <pfsensepkgs>
   <packages>
     <package>
+      <name>frickin</name>
+      <descr>The Frickin PPTP Proxy allows a Point-to-Point Tunneling Protocol (PPTP) client to connect to a PPTP server through Network Address Translation.</descr>
+      <website>http://www.placid.tv</website>
+      <category>Services</category>
+      <version>2.0-BETA1</version>
+      <status>ALPHA</status>
+      <required_version>1.0.1-SNAPSHOT-11-30-2006</required_version>
+      <config_file>http://www.pfsense.com/packages/config/frickin/frickin.xml</config_file>
+      <configurationfile>frickin.xml</configurationfile>
+    </package>
+    <package>
       <name>bsdstats</name>
       <descr>The mission of this site is to try and come up with semi-accurate numbers for both advocacy, and marketing, of the *BSD Operating Systems.</descr>
       <website>http://bsdstats.hub.org/</website>
@@ -516,17 +527,6 @@
       <required_version>1.0</required_version>
       <config_file>http://www.pfsense.com/packages/config/powerdns.xml</config_file>
       <configurationfile>powerdns.xml</configurationfile>
-    </package>
-    <package>
-      <name>frickin</name>
-      <descr>The Frickin PPTP Proxy allows a Point-to-Point Tunneling Protocol (PPTP) client to connect to a PPTP server through Network Address Translation.</descr>
-      <website>http://www.placid.tv</website>
-      <category>Services</category>
-      <version>1.2</version>
-      <status>ALPHA</status>
-      <required_version>1.0</required_version>
-      <config_file>http://www.pfsense.com/packages/config/frickin.xml</config_file>
-      <configurationfile>frickin.xml</configurationfile>
     </package>
     <package>
       <name>postfix</name>
