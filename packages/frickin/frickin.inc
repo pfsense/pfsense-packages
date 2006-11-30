@@ -8,7 +8,7 @@ function frickin_custom_php_install_command() {
 		fwrite($fout, "/usr/local/bin/frickin");
 		fwrite($fout, " -s 127.0.0.1");
 		fwrite($fout, " -c 20");
-		fwrite($fout, " &amp;\n");
+		fwrite($fout, " &\n");
 		fclose($fout);
 		mwexec("/usr/bin/killall frickin");
 		mwexec("chmod a+rx /usr/local/etc/rc.d/frickin.sh");
