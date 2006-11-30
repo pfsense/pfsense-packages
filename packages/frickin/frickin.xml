@@ -2,7 +2,7 @@
 <packagegui>
 	<name>frickin</name>
 	<version>2.0-BETA1</version>
-	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<configpath>installedpackages->package->frickin->configuration->settings</configpath>
 	<menu>
 		<name>Frickin PPTP</name>
 		<tooltiptext>Setup Frickin PPTP Proxy specific settings</tooltiptext>
@@ -18,7 +18,7 @@
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/frickin/bin/frickin</item>
-	</additional_files_needed>    	      
+	</additional_files_needed>
 	<custom_php_install_command>
 		frickin_custom_php_install_command();
 	</custom_php_install_command>
