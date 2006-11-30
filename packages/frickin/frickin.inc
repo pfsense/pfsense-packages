@@ -90,7 +90,7 @@ function frickin_generate_rules($type) {
 	$rules = "";
 
 	$frickin_conf = $config['installedpackages']['frickin']['config'][0];
-	if (!is_service_running('frickin')) {
+	if (!is_process_running('frickin')) {
 		log_error("Frickin is installed but not started.  Not installing redirect rules.");
 		return;
 	}
