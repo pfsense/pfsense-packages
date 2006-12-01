@@ -150,7 +150,10 @@
       <required_version>1.0</required_version>
       <status>ALPHA</status>
       <config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
-      <configurationfile>imspector.xml</configurationfile>
+	  <configurationfile>imspector.xml</configurationfile>
+	  <depends_on_package_base_url>ftp://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/Latest</depends_on_package_base_url>
+	  <depends_on_package>mysql51-client.tbz</depends_on_package>
+	  <depends_on_package>sqlite3.tbz</depends_on_package>	  
     </package>
     <package>
       <name>nut</name>
