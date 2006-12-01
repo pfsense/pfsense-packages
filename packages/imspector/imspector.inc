@@ -49,12 +49,6 @@
 		}
 	}
 	
-	function imspector_remove_rules() {
-		$anchor = "imspector";
-		exec("/sbin/pfctl -a " . $anchor . " -Fr"); 
-		exec("/sbin/pfctl -a " . $anchor . " -Fn");
-	}	
-
 	function before_form_imspector($pkg) {
 		global $config;
 		
@@ -73,7 +67,9 @@
 
 		imspector_notice("Syncing package");
 
-		imspector_remove_rules();
+		/* remove existing rules */
+		exec("/sbin/pfctl -a imspector -Fr"); 
+		exec("/sbin/pfctl -a imspector -Fn");
 
 		conf_mount_rw();
 		config_lock();			
@@ -114,8 +110,26 @@
 				exec("echo \"{$pf_rules}\" | /sbin/pfctl -a imspector -f -");
 
 				$configtext = "plugin_dir=/usr/local/lib/imspector\n";
-				if(imspector_config("log_file"))
+				
+				if(imspector_config("proto_msn")) $configtext .= "msn_protocol=on\n";
+				if(imspector_config("proto_icqaim")) $configtext .= "icq_protocol=on\n";
+				if(imspector_config("proto_yahoo")) $configtext .= "yahoo_protocol=on\n";
+				if(imspector_config("proto_irc")) $configtext .= "irc_protocol=on\n";
+					
+				if(imspector_config("log_file")) 
 					$configtext .= "file_logging_dir=/var/log/imspector\n";
+					
+				if(imspector_config("filter_badwords")) 
+					$configtext .= "badwords_filename=/usr/local/etc/imspector.badwords\n";
+					
+				if(imspector_config("log_mysql"))
+				{
+					$configtext .= "mysql_server=".imspector_config("mysql_server")."\n";
+					$configtext .= "mysql_database=".imspector_config("mysql_database")."\n";
+					$configtext .= "mysql_username=".imspector_config("mysql_username")."\n";
+					$configtext .= "mysql_password=".imspector_config("mysql_password")."\n";
+				}
+				
 				write_imspector_config($configfile,$configtext);					
 					
 				$stop = <<<EOD

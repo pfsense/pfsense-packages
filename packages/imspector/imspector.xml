@@ -23,6 +23,11 @@
 		<item>http://www.pfsense.com/packages/config/imspector/sbin/imspector</item>
 	</additional_files_needed>
 	<additional_files_needed>
+		<prefix>/usr/local/etc/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/imspector.badwords</item>
+	</additional_files_needed>
+	<additional_files_needed>
 		<prefix>/usr/local/lib/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/imspector/lib/libimspector.so</item>
@@ -56,6 +61,21 @@
 		<prefix>/usr/local/lib/imspector</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/imspector/lib/yahooprotocolplugin.so</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/lib/imspector</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/lib/badwordscontentplugin.so</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/lib/imspector</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/lib/mysqlloggingplugin.so</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/lib/imspector</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/imspector/lib/sqliteloggingplugin.so</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/lib</prefix>
@@ -112,9 +132,39 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fielddescr>Enable filtering of bad words</fielddescr>
+			<fieldname>filter_badwords</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>Enable file logging</fielddescr>
 			<fieldname>log_file</fieldname>
 			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable MySQL logging</fielddescr>
+			<fieldname>log_mysql</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>MySQL Server</fielddescr>
+			<fieldname>mysql_server</fieldname>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>MySQL Database</fielddescr>
+			<fieldname>mysql_database</fieldname>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>MySQL Username</fielddescr>
+			<fieldname>mysql_username</fieldname>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>MySQL Password</fielddescr>
+			<fieldname>mysql_password</fieldname>
+			<type>password</type>
 		</field>	
 	</fields>
 	<custom_php_command_before_form>
