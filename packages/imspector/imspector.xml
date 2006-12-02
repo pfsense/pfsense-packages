@@ -17,21 +17,6 @@
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/imspector/imspector.inc</item>
 	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/sbin/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/imspector/sbin/imspector</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/etc/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/imspector/imspector.badwords</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/lib/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/imspector/lib/libimspector.so</item>
-	</additional_files_needed>
 	<service>
 		<name>imspector</name>
 		<rcfile>imspector.sh</rcfile>
@@ -112,28 +97,9 @@
 		sync_package_imspector();
 	</custom_php_resync_config_command>    
 	<custom_php_install_command>
-		exec("mkdir -p /usr/local/lib/imspector");
-		exec("fetch -o /usr/local/lib/imspector/debugloggingplugin.so \
-			http://www.pfsense.com/packages/config/imspector/lib/debugloggingplugin.so");
-		exec("fetch -o /usr/local/lib/imspector/fileloggingplugin.so \
-			http://www.pfsense.com/packages/config/imspector/lib/fileloggingplugin.so");
-		exec("fetch -o /usr/local/lib/imspector/mysqlloggingplugin.so \
-			http://www.pfsense.com/packages/config/imspector/lib/mysqlloggingplugin.so");
-		exec("fetch -o /usr/local/lib/imspector/icqprotocolplugin.so \
-			http://www.pfsense.com/packages/config/imspector/lib/icqprotocolplugin.so");
-		exec("fetch -o /usr/local/lib/imspector/ircprotocolplugin.so \
-			http://www.pfsense.com/packages/config/imspector/lib/ircprotocolplugin.so");
-		exec("fetch -o /usr/local/lib/imspector/msnprotocolplugin.so \
-			http://www.pfsense.com/packages/config/imspector/lib/msnprotocolplugin.so");
-		exec("fetch -o /usr/local/lib/imspector/yahooprotocolplugin.so \
-			http://www.pfsense.com/packages/config/imspector/lib/yahooprotocolplugin.so");
-		exec("fetch -o /usr/local/lib/imspector/badwordscontentplugin.so \
-			http://www.pfsense.com/packages/config/imspector/lib/badwordscontentplugin.so");		
-		exec("chmod 755 /usr/local/lib/imspector/*");
+		sync_package_imspector();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		exec("rm -f /usr/local/etc/rc.d/imspector*");
-		exec("rm -f /usr/local/etc/imspector.conf");
-		exec("rm -rf /usr/local/lib/imspector");
 	</custom_php_deinstall_command>
 </packagegui>

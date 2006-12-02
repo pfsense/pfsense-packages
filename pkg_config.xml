@@ -151,8 +151,8 @@
       <status>ALPHA</status>
       <config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
 	  <configurationfile>imspector.xml</configurationfile>
-	  <depends_on_package_base_url>ftp://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
-	  <depends_on_package>mysql-client-5.1.6_1.tbz</depends_on_package>
+	  <depends_on_package_base_url>http://pfsense.com/packages/All/</depends_on_package_base_url>
+	  <depends_on_package>imspector-0.2.tbz</depends_on_package>
     </package>
     <package>
       <name>nut</name>

@@ -61,7 +61,7 @@
 	function sync_package_imspector() {
 		global $config;
 		global $input_errors;
-		$configfile = "/usr/local/etc/imspector.conf";
+		$configfile = "/usr/local/etc/imspector/imspector.conf";
 		$proto="";
 		$pf_rules="";
 
@@ -120,7 +120,7 @@
 					$configtext .= "file_logging_dir=/var/log/imspector\n";
 					
 				if(imspector_config("filter_badwords")) 
-					$configtext .= "badwords_filename=/usr/local/etc/imspector.badwords\n";
+					$configtext .= "badwords_filename=/usr/local/etc/imspector/badwords.txt\n";
 					
 				if(imspector_config("log_mysql"))
 				{
@@ -129,7 +129,7 @@
 					$configtext .= "mysql_username=".imspector_config("mysql_username")."\n";
 					$configtext .= "mysql_password=".imspector_config("mysql_password")."\n";
 				}
-				
+
 				write_imspector_config($configfile,$configtext);					
 					
 				$stop = <<<EOD
