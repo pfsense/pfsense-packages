@@ -140,9 +140,9 @@
 	</package>
     <package>
       <name>imspector</name>
-	  <descr>** REQUIRES: 1.0.1-SNAPSHOT-11-24-2006 OR LATER ** NOTE: IF MINIUPNPD INSTALLED, YOU NEED TO UPGRADE
-      TO MINIUPNPD 20061123 ** IMSpector is an Instant Messenger transparent proxy with logging capabilities.
-      Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees.</descr>
+	  <descr>** REQUIRES: 1.0.1-SNAPSHOT-11-24-2006 OR LATER ** IMSpector is an Instant Messenger 
+      transparent proxy with logging capabilities. Currently it supports MSN, AIM, ICQ, Yahoo and 
+      IRC to different degrees.</descr>
       <website>http://www.imspector.org/</website>
       <category>Network Management</category>
 	  <maintainer>ryan@wgnrs.dynu.com</maintainer>
@@ -151,9 +151,8 @@
       <status>ALPHA</status>
       <config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
 	  <configurationfile>imspector.xml</configurationfile>
-	  <depends_on_package_base_url>ftp://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/Latest</depends_on_package_base_url>
-	  <depends_on_package>mysql51-client.tbz</depends_on_package>
-	  <depends_on_package>sqlite3.tbz</depends_on_package>	  
+	  <depends_on_package_base_url>ftp://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
+	  <depends_on_package>mysql-client-5.1.6_1.tbz</depends_on_package>
     </package>
     <package>
       <name>nut</name>
