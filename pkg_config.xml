@@ -379,6 +379,7 @@
       <maintainer>fernando@netfilter.com.br</maintainer>
       <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
       <depends_on_package>freeradius-1.1.3_1.tbz</depends_on_package>
+      <depends_on_package>libltdl-1.5.22.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
       <configurationfile>freeradius.xml</configurationfile>
     </package>
