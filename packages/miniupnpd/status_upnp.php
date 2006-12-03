@@ -88,7 +88,7 @@ include("head.inc");
           <td width="60%" class="listhdr"><?=gettext("Description")?></td>
 		</tr>
 		<?php $i = 0; foreach ($rdr_entries as $rdr_entry) {
-			if (preg_match("/rdr on (.*) inet proto (.*) from any to any port = (.*) label \"(.*)\" -> (.*) port (.*)/", $rdr_entry, $matches))
+			if (preg_match("/on (.*) inet proto (.*) from any to any port = (.*) label \"(.*)\" -> (.*) port (.*)/", $rdr_entry, $matches))
 			$rdr_proto = $matches[2];
 			$rdr_port = $matches[3];
 			$rdr_ip = $matches[5];
