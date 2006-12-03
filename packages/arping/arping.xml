@@ -3,6 +3,11 @@
 	<title>Services: arping</title>
 	<name>arping</name>
 	<version>2.6.0.2</version>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/arping/arping.inc</item>
+	</additional_files_needed>
 	<menu>
 		<name>arping</name>
 		<tooltiptext>Host to arp ping</tooltiptext>
@@ -29,6 +34,7 @@
 			<type>input</type>
 		</field>
     </fields>
+
     <custom_php_install_command>
 		arping_package_reinstall();
     </custom_php_install_command>
