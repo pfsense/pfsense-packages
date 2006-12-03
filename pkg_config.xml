@@ -13,6 +13,8 @@
       <required_version>1.0.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/arping/arping.xml</config_file>
       <configurationfile>arping.xml</configurationfile>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package>arping-2.05.tbz</depends_on_package>
     </package>
     <package>
       <name>frickin</name>
