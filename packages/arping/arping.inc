@@ -43,7 +43,4 @@ function arping_package_php_command() {
 function arping_package_resync() {
 }
 
-function arping_deinstall() {
-}
-
 ?>
