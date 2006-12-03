@@ -4,6 +4,17 @@
 <pfsensepkgs>
   <packages>
     <package>
+      <name>arping</name>
+      <descr>Broadcasts a who-has ARP packet on the network and prints answers. VERY useful when you are trying to pick an unused IP for a net that you don't yet have routing to. Then again, if you have no idea what I'm talking about then you prolly don't need it.</descr>
+      <website>http://www.habets.pp.se/synscan/programs.php?prog=arping</website>
+      <category>Services</category>
+      <version>2.05</version>
+      <status>ALPHA</status>
+      <required_version>1.0.1</required_version>
+      <config_file>http://www.pfsense.com/packages/config/arping/arping.xml</config_file>
+      <configurationfile>arping.xml</configurationfile>
+    </package>
+    <package>
       <name>frickin</name>
       <descr>The Frickin PPTP Proxy allows a Point-to-Point Tunneling Protocol (PPTP) client to connect to a PPTP server through Network Address Translation.</descr>
       <website>http://www.placid.tv</website>
@@ -140,8 +151,8 @@
 	</package>
     <package>
       <name>imspector</name>
-	  <descr>** REQUIRES: 1.0.1-SNAPSHOT-11-24-2006 OR LATER ** IMSpector is an Instant Messenger 
-      transparent proxy with logging capabilities. Currently it supports MSN, AIM, ICQ, Yahoo and 
+	  <descr>** REQUIRES: 1.0.1-SNAPSHOT-11-24-2006 OR LATER ** IMSpector is an Instant Messenger
+      transparent proxy with logging capabilities. Currently it supports MSN, AIM, ICQ, Yahoo and
       IRC to different degrees.</descr>
       <website>http://www.imspector.org/</website>
       <category>Network Management</category>

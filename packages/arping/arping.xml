@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<title>Services: arping</title>
+	<name>arping</name>
+	<version>2.6.0.2</version>
+	<menu>
+		<name>arping</name>
+		<tooltiptext>Host to arp ping</tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=arping.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>arping</name>
+		<executable>arping</executable>
+	</service>
+	<include_file>/usr/local/pkg/arping.inc</include_file>
+	<tabs>
+		<tab>
+			<text>arping Settings</text>
+			<url>/pkg_edit.php?xml=arping.xml&amp;id=0</url>
+			<active/>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fielddescr>Host IP or Mac</fielddescr>
+			<fieldname>hostip</fieldname>
+			<description>Select all WAN type interfaces</description>
+			<type>input</type>
+		</field>
+    </fields>
+    <custom_php_install_command>
+		arping_package_reinstall();
+    </custom_php_install_command>
+	<custom_add_php_command>
+        arping_package_php_command();
+	</custom_add_php_command>
+	<custom_php_resync_command>
+		arping_package_resync();
+	</custom_php_resync_command>
+	<custom_php_deinstall_command>
+		arping_deinstall();
+	</custom_php_deinstall_command>
+</packagegui>
