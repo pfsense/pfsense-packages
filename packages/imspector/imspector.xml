@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Services: IMSpector</title>
 	<name>imspector</name>
-	<version>0.2</version>
+	<version>0.3</version>
 	<savetext>Change</savetext>
 	<include_file>/usr/local/pkg/imspector.inc</include_file>
 	<aftersaveredirect>/pkg_edit.php?xml=imspector.xml&amp;id=0</aftersaveredirect>

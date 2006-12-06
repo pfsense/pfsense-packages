@@ -159,13 +159,13 @@
       <website>http://www.imspector.org/</website>
       <category>Network Management</category>
 	  <maintainer>ryan@wgnrs.dynu.com</maintainer>
-      <version>0.2</version>
+      <version>0.3</version>
       <required_version>1.0</required_version>
-      <status>ALPHA</status>
+      <status>BETA</status>
       <config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
 	  <configurationfile>imspector.xml</configurationfile>
 	  <depends_on_package_base_url>http://pfsense.com/packages/All/</depends_on_package_base_url>
-	  <depends_on_package>imspector-0.2.tbz</depends_on_package>
+	  <depends_on_package>imspector-0.3.tbz</depends_on_package>
     </package>
     <package>
       <name>nut</name>
