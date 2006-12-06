@@ -147,7 +147,7 @@
       <maintainer>seth.mos@xs4all.nl ryan@wgnrs.dynu.com</maintainer>
       <version>20061129</version>
       <required_version>1.0</required_version>
-      <status>BETA</status>
+      <status>Stable</status>
       <config_file>http://www.pfsense.com/packages/config/miniupnpd/miniupnpd.xml</config_file>
       <configurationfile>miniupnpd.xml</configurationfile>
 	</package>
