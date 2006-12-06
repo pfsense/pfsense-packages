@@ -45,6 +45,11 @@ function sync_package_snort_reinstall() {
 function sync_package_snort() {
 	global $config, $g;
 
+	mwexec("mkdir -p /var/log/snort/");
+
+	if(!file_exists("/var/log/snort/alert"))
+		touch("/var/log/snort/alert");
+
 	/* snort -> advanced features */
 	$bpfbufsize = $config['installedpackages']['snortadvanced']['config'][0]['bpfbufsize'];
 	$bpfmaxbufsize = $config['installedpackages']['snortadvanced']['config'][0]['bpfmaxbufsize'];
