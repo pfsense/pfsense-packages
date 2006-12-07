@@ -30,11 +30,40 @@
 */
 
 function tinydns_custom_php_install_command() {
-	
+	global $g, $config;
+	conf_mount_rw();
+	/* setup daemon tools service area */
+	exec("pw useradd Gtinydns");
+	exec("pw useradd Gdnslog");
+	conf_mount_ro();
 }
 
 function tinydns_custom_php_deinstall_command() {
-	
+	global $g, $config;
+	conf_mount_rw();
+	/* destroyh all daemontools items */
+	exec("pw userdelete Gtinydns");
+	exec("pw userdelete Gdnslog");
+	conf_mount_ro();
+}
+
+function tinydns_custom_php_changeip_command() {
+	global $g, $config;
+	conf_mount_rw();
+	$ip = $config['installedpackages']['tinydns']['ip'];
+	exec("tinydns-conf Gtinydns Gdnslog /etc/tinydns {$ip}");
+	exec("ln -s /etc/tinydns /service");
+	sleep(5);
+	exec("svstat /service/tinydns");
+	conf_mount_ro();
+}
+
+function tinydns_create_zone_file() {
+	$fd = fopen("/service/tinydns/root/data", "w");	
+	global $g, $config;
+	conf_mount_rw();
+
+	conf_mount_ro();
 }
 
 ?>
