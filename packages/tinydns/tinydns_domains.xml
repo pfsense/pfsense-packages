@@ -11,10 +11,16 @@
 		<text>TinyDNS</text>
 		<url>/tinydns_filter.php</url>
 		<active/>
-	</tab>	
+	</tab>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Hostname</fielddescr>
+			<fieldname>hostname</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>		
 	<fields>
 		<field>
-			<fieldname>Hostname/Domain</fieldname>
+			<fieldname>hostname</fieldname>
 			<fielddescr>Domain name. Example: www.exampledomain.com</fielddescr>
 			<description>Enter the domain name that you would like to serve dns records for.</description>
 			<required/>
@@ -24,21 +30,21 @@
 			<fielddescr>Record type</fielddescr>
 			<fieldname>recordtype</fieldname>
 			<description>DNS Record type.  MX, A, etc</description>
+			<required/>
 			<type>select</type>
 			<size>1</size>
 			<options>
 			    <option><value></value><name></name></option>
 			    <option><value>MX</value><name>MX</name></option>
 			    <option><value>A</value><name>A</name></option>
-			    <option><value>SOA</value><name>.</name></option>
-			    <option><value>PTR</value><name>=</name></option>
+			    <option><value>SOA</value><name>SOA</name></option>
+			    <option><value>PTR</value><name>PTR</name></option>
 			    <option><value>CNAME</value><name>CNAME</name></option>
 			</options>
 		</field>
 		<field>
 			<fieldname>Failover Threshhold</fieldname>
 			<fielddescr>Time in minutes before DNS switches to backup host</fielddescr>
-			<required/>
 			<type>input</type>
 		</field>
 		<field>
