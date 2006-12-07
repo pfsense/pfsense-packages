@@ -39,7 +39,6 @@ function tinydns_custom_php_install_command() {
 	$fd = fopen("/usr/local/etc/rc.d/svscan.sh", "w");
 
 	$svscan = <<<EOD
-
 #!/bin/sh
 #
 # PROVIDE: svscan
