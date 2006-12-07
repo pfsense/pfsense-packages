@@ -35,15 +35,73 @@ function tinydns_custom_php_install_command() {
 	/* setup daemon tools service area */
 	exec("pw useradd Gtinydns");
 	exec("pw useradd Gdnslog");
+	
+	$fd = fopen("/usr/local/etc/rc.d/svscan.sh", "w");
+
+	$svscan = <<<EOD
+
+#!/bin/sh
+#
+# PROVIDE: svscan
+# REQUIRE: LOGIN
+# KEYWORD: FreeBSD
+
+MINSEGMENT=10240
+MAXSEGMENT=20480
+MAXFILESIZE=10240
+MAXFD=100
+MAXCHILD=40
+
+# ulimits
+ulimit -d \${MINSEGMENT}
+ulimit -f \${MAXFILESIZE}
+ulimit -m \${MAXSEGMENT}
+ulimit -n \${MAXFD}
+ulimit -s \${MINSEGMENT}
+ulimit -u \${MAXCHILD}
+
+. /etc/rc.subr
+
+name="svscan"
+rcvar=`set_rcvar`
+command="/usr/local/bin/svscan"
+svscan_enable=\${svscan_enable-"NO"}
+svscan_servicedir=\${svscan_servicedir-"/var/service"}
+
+start_cmd="svscan_start"
+stop_postcmd="svscan_stop_post"
+
+load_rc_config \$name
+
+required_dirs="\${svscan_servicedir}"
+
+svscan_start () {
+        echo "Starting svscan."
+        /usr/bin/env \
+        PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+        /usr/sbin/daemon -f /bin/sh -c "\$command \$svscan_servicedir 2>&1 | /usr/local/bin/readproctitle service errors: ................................................................................................................................................................................................................................................................................................................................................................................................................ &" > /dev/null
+}
+
+svscan_stop_post () {
+        echo "Stopping svscan."
+        find -L "\$svscan_servicedir" -mindepth 1 -maxdepth 2 -type d \( \! -path "\$svscan_servicedir/*/*" -or -name 'log' \) -print0 | xargs -0 /usr/local/bin/svc -dx
+}
+
+run_rc_command "\$1"
+	
+EOD;
+	
+	fwrite($fd, $svscan);
+	fclose($fd);	
 	conf_mount_ro();
 }
 
 function tinydns_custom_php_deinstall_command() {
 	global $g, $config;
 	conf_mount_rw();
-	/* destroyh all daemontools items */
-	exec("pw userdelete Gtinydns");
-	exec("pw userdelete Gdnslog");
+	/* destroy all daemontools items */
+	exec("/usr/sbin/pw userdelete Gtinydns");
+	exec("/usr/sbin/pw userdelete Gdnslog");
 	conf_mount_ro();
 }
 
@@ -59,10 +117,15 @@ function tinydns_custom_php_changeip_command() {
 }
 
 function tinydns_create_zone_file() {
-	$fd = fopen("/service/tinydns/root/data", "w");	
 	global $g, $config;
 	conf_mount_rw();
-
+	$fd = fopen("/service/tinydns/root/data", "w");	
+	foreach($config['installedpackages']['tinydnsdomains'] as $domain) {
+		fwrite($fd, $domain['recordtype'] . ":" . $domain['hostname'] . "\n");
+	}
+	fclose($fd);
+	/* tell tinydns to reload zone file */
+	exec("cd /service/tinydns/root && /usr/local/bin/tinydns-data");
 	conf_mount_ro();
 }
 
