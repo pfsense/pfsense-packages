@@ -33,12 +33,6 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fieldname>Failover Threshhold</fieldname>
-			<fielddescr>Time in minutes before DNS switches to backup host</fielddescr>
-			<required/>
-			<type>input</type>
-		</field>
-		<field>
 		    <type>rowhelper</type>
 		    <rowhelper>
 				<rowhelperfield>

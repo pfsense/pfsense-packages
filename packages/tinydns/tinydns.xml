@@ -9,6 +9,11 @@
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
 	</menu>
+	<tab>
+		<text>TinyDNS Settings</text>
+		<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
+		<active/>
+	</tab>	
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
