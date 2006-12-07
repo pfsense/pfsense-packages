@@ -40,7 +40,7 @@ function tinydns_custom_php_install_command() {
 
 	$svscan = <<<EOD
 #!/bin/sh
-#
+
 # PROVIDE: svscan
 # REQUIRE: LOGIN
 # KEYWORD: FreeBSD
@@ -99,8 +99,10 @@ function tinydns_custom_php_deinstall_command() {
 	global $g, $config;
 	conf_mount_rw();
 	/* destroy all daemontools items */
-	exec("/usr/sbin/pw userdelete Gtinydns");
-	exec("/usr/sbin/pw userdelete Gdnslog");
+	exec("/usr/sbin/pw groupdel Gtinydns");
+	exec("/usr/sbin/pw groupdel Gdnslog");	
+	exec("/usr/sbin/pw userdel Gtinydns");
+	exec("/usr/sbin/pw userdel Gdnslog");
 	conf_mount_ro();
 }
 
@@ -119,9 +121,8 @@ function tinydns_create_zone_file() {
 	global $g, $config;
 	conf_mount_rw();
 	$fd = fopen("/service/tinydns/root/data", "w");	
-	foreach($config['installedpackages']['tinydnsdomains'] as $domain) {
+	foreach($config['installedpackages']['tinydnsdomains'] as $domain) 
 		fwrite($fd, $domain['recordtype'] . ":" . $domain['hostname'] . "\n");
-	}
 	fclose($fd);
 	/* tell tinydns to reload zone file */
 	exec("cd /service/tinydns/root && /usr/local/bin/tinydns-data");

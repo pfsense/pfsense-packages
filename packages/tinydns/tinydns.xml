@@ -14,10 +14,21 @@
 		<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
 		<active/>
 	</tab>	
+	<aftersaveredirect>/pkg_edit.php?xml=tinydns.xml&amp;id=0</aftersaveredirect>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/tinydns/tinydns.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_domains.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_filter.xml</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		tinydns_custom_php_install_command();
@@ -28,11 +39,10 @@
 	<include_file>/usr/local/pkg/tinydns.inc</include_file>
 	<fields>
 		<field>
-			<fieldname>IP Address</fieldname>
-			<fielddescr>TinyDNS listen IP address</fielddescr>
+			<fieldname>ipaddress</fieldname>
+			<fielddescr>IP Address</fielddescr>
 			<description>The IP address that TinyDNS will bind to.</description>
-			<default_value>ip</default_value>
-			<required/>
+			<type>input</type>
 		</field>
 	</fields>
 </packagegui>
