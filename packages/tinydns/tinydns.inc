@@ -121,27 +121,29 @@ function tinydns_create_zone_file() {
 	conf_mount_rw();
 	$fd = fopen("/service/tinydns/root/data", "w");	
 	if($config['installedpackages']['tinydnsdomains'])
-		foreach($config['installedpackages']['tinydnsdomains'] as $domain) {
-			$record_type = "";
+		foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
+			$record_data = "";
+			$hostname = $domain['hostname'];
+			$ipaddress = $domain['ipaddress'];
 			switch ($domain['recordtype']) {
 				case "SOA":
-					$record_type = ".";
+					$record_data = ".{$hostname}::{$ipaddress}";
 					break;
 				case "MX":
-					$record_type = "@";
+					$record_data = "@{$hostname}:{$ipaddress}";
 					break;
 				case "A":
-					$record_type = "+";
+					$record_data = "+{$hostname}:{$ipaddress}";
 					break;
 				case "PTR":
-					$record_type = "=";
+					$record_data = "={$hostname}:{$ipaddress}";
 					break;
 				case "CNAME":
-					$record_type = "C";
+					$record_data = "C{$hostname}:{$ipaddress}";
 					break;					
 			}
-			if($record_type)
-				fwrite($fd, $record_type . ":" . $domain['hostname'] . "\n");
+			if($record_data)
+				fwrite($fd, $record_data . "\n");
 		}
 	fclose($fd);
 	/* tell tinydns to reload zone file */
