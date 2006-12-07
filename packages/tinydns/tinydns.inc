@@ -31,11 +31,7 @@
 
 function tinydns_custom_php_install_command() {
 	global $g, $config;
-	conf_mount_rw();
-	/* setup daemon tools service area */
-	exec("pw useradd Gtinydns");
-	exec("pw useradd Gdnslog");
-	
+	conf_mount_rw();	
 	$fd = fopen("/usr/local/etc/rc.d/svscan.sh", "w");
 
 	$svscan = <<<EOD
@@ -109,11 +105,14 @@ function tinydns_custom_php_deinstall_command() {
 function tinydns_custom_php_changeip_command() {
 	global $g, $config;
 	conf_mount_rw();
-	$ip = $config['installedpackages']['tinydns']['ip'];
-	exec("tinydns-conf Gtinydns Gdnslog /etc/tinydns {$ip}");
-	exec("ln -s /etc/tinydns /service");
+	$ip = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
+	/* setup daemon tools service area */
+	exec("/usr/sbin/pw useradd Gtinydns");
+	exec("/usr/sbin/pw useradd Gdnslog");
+	exec("/usr/local/bin/tinydns-conf Gtinydns Gdnslog /etc/tinydns {$ip}");
+	exec("/bin/ln -s /etc/tinydns /service");
 	sleep(5);
-	exec("svstat /service/tinydns");
+	exec("/usr/local/bin/svstat /service/tinydns");
 	conf_mount_ro();
 }
 
@@ -121,8 +120,9 @@ function tinydns_create_zone_file() {
 	global $g, $config;
 	conf_mount_rw();
 	$fd = fopen("/service/tinydns/root/data", "w");	
-	foreach($config['installedpackages']['tinydnsdomains'] as $domain) 
-		fwrite($fd, $domain['recordtype'] . ":" . $domain['hostname'] . "\n");
+	if($config['installedpackages']['tinydnsdomains'])
+		foreach($config['installedpackages']['tinydnsdomains'] as $domain) 
+			fwrite($fd, $domain['recordtype'] . ":" . $domain['hostname'] . "\n");
 	fclose($fd);
 	/* tell tinydns to reload zone file */
 	exec("cd /service/tinydns/root && /usr/local/bin/tinydns-data");

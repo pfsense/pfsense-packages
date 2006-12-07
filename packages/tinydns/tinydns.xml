@@ -36,6 +36,12 @@
 	<custom_php_deinstall_command>
 		tinydns_custom_php_deinstall_command();
 	</custom_php_deinstall_command>
+	<custom_php_resync_config_command>
+		tinydns_custom_php_changeip_command();
+		tinydns_custom_php_install_command();
+		tinydns_custom_php_changeip_command();
+		tinydns_create_zone_file();
+	</custom_php_resync_config_command>	
 	<include_file>/usr/local/pkg/tinydns.inc</include_file>
 	<fields>
 		<field>
