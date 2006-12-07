@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>tinydnsdomains</name>
+	<configpath>installedpackages->package->tinydnsdomains->configuration->settings</configpath>
+	<include_file>/usr/local/pkg/tinydns.inc</include_file>
+	<fields>
+		<field>
+			<fieldname>Domain</fieldname>
+			<fielddescr>Domain name. Example: exampledomain.com</fielddescr>
+			<description>Enter the domain name that you would like to serve dns records for.</description>
+			<required/>
+			<type>input</type>
+		</field>
+	</fields>
+</packagegui>

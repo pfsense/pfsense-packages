@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>tinydns</name>
+	<version>1.0</version>
+	<configpath>installedpackages->package->tinydns->configuration->settings</configpath>
+	<menu>
+		<name>tinydns</name>
+		<tooltiptext></tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
+	</menu>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/tinydns/tinydns.inc</item>
+	</additional_files_needed>
+	<custom_php_install_command>
+		tinydns_custom_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		tinydns_custom_php_deinstall_command();
+	</custom_php_deinstall_command>
+	<include_file>/usr/local/pkg/tinydns.inc</include_file>
+	<fields>
+		<field>
+			<fieldname>active_interface</fieldname>
+			<fielddescr>Proxy interface</fielddescr>
+			<description>The interface(s) the proxy server will bind to.</description>
+			<default_value>lan</default_value>
+			<required/>
+			<type>interfaces_selection</type>
+			<multiple/>
+		</field>
+	</fields>
+</packagegui>
