@@ -3,6 +3,21 @@
 <!-- $Id$ -->
 <pfsensepkgs>
   <packages>
+      <package>
+      <name>tinydns</name>
+      <descr>pfSense version of TinyDNS which features failover host support</descr>
+      <website>http://cr.yp.to/djbdns.html</website>
+      <category>Services</category>
+      <version>1.0</version>
+      <status>ALPHA</status>
+      <required_version>2.0</required_version>
+      <config_file>http://www.pfsense.com/packages/config/tinydns/tinydns.xml</config_file>
+      <configurationfile>tinydns.xml</configurationfile>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/All/djbdns/</depends_on_package_base_url>
+      <depends_on_package>daemontools-0.76_9.tbz</depends_on_package>
+      <depends_on_package>ucspi-tcp-0.88_1.tbz</depends_on_package>
+      <depends_on_package>djbdns-1.05_9.tbz</depends_on_package>
+    </package>  
     <package>
       <name>arping</name>
       <descr>Broadcasts a who-has ARP packet on the network and prints answers. VERY useful when you are trying to pick an unused IP for a net that you don't yet have routing to. Then again, if you have no idea what I'm talking about then you prolly don't need it.</descr>

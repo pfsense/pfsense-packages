@@ -1,15 +1,53 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>tinydnsdomains</name>
-	<configpath>installedpackages->package->tinydnsdomains->configuration->settings</configpath>
+	<configpath>installedpackages->package->tinydnsdomains</configpath>
 	<include_file>/usr/local/pkg/tinydns.inc</include_file>
 	<fields>
 		<field>
-			<fieldname>Domain</fieldname>
-			<fielddescr>Domain name. Example: exampledomain.com</fielddescr>
+			<fieldname>Hostname/Domain</fieldname>
+			<fielddescr>Domain name. Example: www.exampledomain.com</fielddescr>
 			<description>Enter the domain name that you would like to serve dns records for.</description>
 			<required/>
 			<type>input</type>
 		</field>
+		<field>
+			<fielddescr>Record type</fielddescr>
+			<fieldname>recordtype</fieldname>
+			<description>DNS Record type.  MX, A, etc</description>
+			<type>select</type>
+			<size>1</size>
+			<options>
+			    <option><value></value><name></name></option>
+			    <option><value>MX</value><name>MX</name></option>
+			    <option><value>A</value><name>A</name></option>
+			    <option><value>SOA</value><name>.</name></option>
+			    <option><value>PTR</value><name>=</name></option>
+			    <option><value>CNAME</value><name>CNAME</name></option>
+			</options>
+		</field>
+		<field>
+			<fieldname>Failover Threshhold</fieldname>
+			<fielddescr>Time in minutes before DNS switches to backup host</fielddescr>
+			<required/>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>Failover Threshhold</fieldname>
+			<fielddescr>Time in minutes before DNS switches to backup host</fielddescr>
+			<required/>
+			<type>input</type>
+		</field>
+		<field>
+		    <type>rowhelper</type>
+		    <rowhelper>
+				<rowhelperfield>
+				    <fielddescr>Failover IP</fielddescr>
+				    <fieldname>failoverip</fieldname>
+				    <description>Failover IP when host is not responding to ICMP/PING traffic</description>
+				    <type>input</type>
+				</rowhelperfield>
+		    </rowhelper>
+		</field>		
 	</fields>
 </packagegui>
