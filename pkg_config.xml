@@ -14,8 +14,8 @@
       <config_file>http://www.pfsense.com/packages/config/tinydns/tinydns.xml</config_file>
       <configurationfile>tinydns.xml</configurationfile>
       <depends_on_package_base_url>http://www.pfsense.com/packages/All/djbdns/</depends_on_package_base_url>
-      <depends_on_package>daemontools-0.76_9.tbz</depends_on_package>
       <depends_on_package>ucspi-tcp-0.88_1.tbz</depends_on_package>
+      <depends_on_package>daemontools-0.76_9.tbz</depends_on_package>
       <depends_on_package>djbdns-1.05_9.tbz</depends_on_package>
     </package>  
     <package>
