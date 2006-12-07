@@ -29,6 +29,10 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+/* for now, redirect to unsorted raw CoreGUI page */
+Header("Location: pkg.php?xml=tinydns_domains.xml");
+exit;
+
 require("/usr/local/pkg/tinydns.inc");
 
 ?>
