@@ -65,7 +65,7 @@ name="svscan"
 rcvar=`set_rcvar`
 command="/usr/local/bin/svscan"
 svscan_enable=\${svscan_enable-"YES"}
-svscan_servicedir=\${svscan_servicedir-"/var/service"}
+svscan_servicedir=\${svscan_servicedir-"/service"}
 
 start_cmd="svscan_start"
 stop_postcmd="svscan_stop_post"
