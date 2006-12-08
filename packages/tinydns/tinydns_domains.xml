@@ -90,6 +90,12 @@
 				    <description>Adds this member to active group when host is alive.</description>
 				    <type>checkbox</type>
 				</rowhelperfield>
+				<rowhelperfield>
+				    <fielddescr>Ping threshold</fielddescr>
+				    <fieldname>pingthreshold</fieldname>
+				    <description>When the MS time is surpassed, item will failover to next host</description>
+				    <type>input</type>
+				</rowhelperfield>
 		    </rowhelper>
 		</field>
 	</fields>

@@ -209,7 +209,11 @@ function tinydns_setup_ping_items() {
 		fwrite($fd, $ip . "|" . $domain['ipaddress'] . "|3|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php\n");
 		if($domain['row']) {
 			foreach($domain['row'] as $row) {
-				fwrite($fd, $ip . "|" . $row['failoverip'] . "|3|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php\n");
+				if($row['pingthreshold'])
+					$pingthreshold = $row['pingthreshold'];
+				else
+					$row['pingthreshold'] = "";
+				fwrite($fd, $ip . "|" . $row['failoverip'] . "|3|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
 			}
 		}
 	}
