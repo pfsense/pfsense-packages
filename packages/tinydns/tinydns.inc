@@ -196,7 +196,7 @@ function tinydns_create_zone_file() {
 			$status = tinydns_get_record_status($ipaddress);
 			if(!$status)
 					$ipaddress = tinydns_get_backup_record($ipaddress);
-			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl);
+			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname);
 			if($record_data)
 				fwrite($fd, $record_data . "\n");
 			/* process load balanced items */
@@ -204,8 +204,8 @@ function tinydns_create_zone_file() {
 				foreach($domain['row'] as $row) {
 					if($row['loadbalance']) {
 						$status = tinydns_get_record_status($row['failoverip']);
-						if(!$status) {
-							$record_data = tinydns_get_rowline_data($row['failoverip'], $domain['recordtype'], $ttl);
+						if($status) {
+							$record_data = tinydns_get_rowline_data($row['failoverip'], $domain['recordtype'], $ttl, $hostname);
 							fwrite($fd, $record_data . "\n");
 						}
 					}
@@ -220,26 +220,26 @@ function tinydns_create_zone_file() {
 }
 
 /* formats data as a tinydns data row item */
-function tinydns_get_rowline_data($recordip, $recordtype, $ttl) {
+function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname) {
 		if($ttl)
 			$ttl_string = "::{$ttl}";
 		else
 			$ttl_string = "";
 		switch ($recordtype) {
 			case "SOA":
-				$record_data = ".{$hostname}::{$ipaddress}";
+				$record_data = ".{$hostname}::{$recordip}";
 				break;
 			case "MX":
-				$record_data = "@{$hostname}:{$ipaddress}{$ttl_string}";
+				$record_data = "@{$hostname}:{$recordip}{$ttl_string}";
 				break;
 			case "A":
-				$record_data = "+{$hostname}:{$ipaddress}{$ttl_string}";
+				$record_data = "+{$hostname}:{$recordip}{$ttl_string}";
 				break;
 			case "PTR":
-				$record_data = "={$hostname}:{$ipaddress}{$ttl_string}";
+				$record_data = "={$hostname}:{$recordip}{$ttl_string}";
 				break;
 			case "CNAME":
-				$record_data = "C{$hostname}:{$ipaddress}{$ttl_string}";
+				$record_data = "C{$hostname}:{$recordip}{$ttl_string}";
 				break;
 		}
 		return $record_data;
