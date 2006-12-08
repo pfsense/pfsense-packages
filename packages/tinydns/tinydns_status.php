@@ -44,7 +44,7 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <?php
 	$tab_array = array();
-	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=tinydns.xml?id=0");
+	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=tinydns.xml&id=0");
 	$tab_array[] = array(gettext("Domains"), false, "/tinydns_filter.php");
 	$tab_array[] = array(gettext("Status"), true, "/tinydns_status.php");
 	display_top_tabs($tab_array);
