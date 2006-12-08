@@ -36,7 +36,7 @@
 			<description>Enter the domain name that you would like to serve dns records for.</description>
 			<required/>
 			<type>input</type>
-			<size>45</size>
+			<size>35</size>
 		</field>
 		<field>
 			<fielddescr>Record type</fielddescr>
@@ -60,19 +60,19 @@
 			<description>Enter the IP Address that this record will point to (primary).  The only exception is for NS type records where we expect a complete hostname to point to a A record.</description>
 			<required/>
 			<type>input</type>
-			<size>45</size>
+			<size>35</size>
 		</field>
 		<field>
 			<fieldname>ttl</fieldname>
 			<fielddescr>DNS record time to live</fielddescr>
 			<type>input</type>
-			<size>45</size>
+			<size>35</size>
 		</field>
 		<field>
 			<fieldname>threshhold</fieldname>
 			<fielddescr>Time in minutes before DNS switches to backup host</fielddescr>
 			<type>input</type>
-			<size>45</size>
+			<size>35</size>
 		</field>
 		<field>
 		    <type>rowhelper</type>
@@ -82,7 +82,7 @@
 				    <fieldname>failoverip</fieldname>
 				    <description>Failover IP when host is not responding to ICMP/PING traffic</description>
 				    <type>input</type>
-				    <size>45</size>
+				    <size>25</size>
 				</rowhelperfield>
 				<rowhelperfield>
 				    <fielddescr>Load balance</fielddescr>
@@ -95,12 +95,14 @@
 				    <fieldname>pingthreshold</fieldname>
 				    <description>When the MS time is surpassed, item will failover to next host</description>
 				    <type>input</type>
+				    <size>7</size>
 				</rowhelperfield>
 				<rowhelperfield>
 				    <fielddescr>Wan ping threshold</fielddescr>
 				    <fieldname>wanpingthreshold</fieldname>
 				    <description>When the WAN MS ping time is surpassed, item will failover to next host</description>
 				    <type>input</type>
+				    <size>7</size>
 				</rowhelperfield>
 		    </rowhelper>
 		</field>
