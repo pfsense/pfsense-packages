@@ -13,6 +13,10 @@
 			<url>/tinydns_filter.php</url>
 			<active/>
 		</tab>
+		<tab>
+			<text>Status</text>
+			<url>/tinydns_status.php</url>
+		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
