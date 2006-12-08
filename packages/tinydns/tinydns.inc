@@ -131,6 +131,7 @@ function tinydns_custom_php_changeip_command() {
 		remove_text_from_file($filenamea, $text_1);
 		add_text_to_file($filenamea, $text_5);
 	}
+	exec("killall -HUP cron");
 	conf_mount_ro();
 }
 
