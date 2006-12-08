@@ -199,7 +199,7 @@ function tinydns_create_zone_file() {
 					$ipaddress = tinydns_get_backup_record($ipaddress);
 			switch ($domain['recordtype']) {
 				case "SOA":
-					$record_data = ".{$hostname}::{$ipaddress}::{$ttl}";
+					$record_data = ".{$hostname}::{$ipaddress}";
 					break;
 				case "MX":
 					$record_data = "@{$hostname}:{$ipaddress}::{$ttl}";
