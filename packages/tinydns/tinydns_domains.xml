@@ -3,15 +3,17 @@
 	<name>tinydnsdomains</name>
 	<configpath>installedpackages->package->tinydnsdomains</configpath>
 	<include_file>/usr/local/pkg/tinydns.inc</include_file>
-	<tab>
-		<text>TinyDNS Settings</text>
-		<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
-	</tab>
-	<tab>
-		<text>TinyDNS</text>
-		<url>/tinydns_filter.php</url>
-		<active/>
-	</tab>
+	<tabs>
+		<tab>
+			<text>TinyDNS Settings</text>
+			<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>TinyDNS</text>
+			<url>/tinydns_filter.php</url>
+			<active/>
+		</tab>
+	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Hostname</fielddescr>

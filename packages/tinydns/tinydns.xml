@@ -9,15 +9,17 @@
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
 	</menu>
-	<tab>
-		<text>TinyDNS Settings</text>
-		<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
-		<active/>
-	</tab>
-	<tab>
-		<text>TinyDNS</text>
-		<url>/tinydns_filter.php</url>
-	</tab>
+	<tabs>
+		<tab>
+			<text>TinyDNS Settings</text>
+			<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>TinyDNS</text>
+			<url>/tinydns_filter.php</url>
+		</tab>
+	</tabs>
 	<aftersaveredirect>/pkg_edit.php?xml=tinydns.xml&amp;id=0</aftersaveredirect>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
