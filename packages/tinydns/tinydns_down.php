@@ -30,7 +30,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("/usr/local/pkg/tinydns.inc");
+require_once("functions.inc");
+require_once("config.inc");
+require_once("/usr/local/pkg/tinydns.inc");
 
 tinydns_create_zone_file();
 tinydns_setup_ping_items();

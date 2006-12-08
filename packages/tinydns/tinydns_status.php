@@ -76,6 +76,9 @@ foreach($pingdir as $ping) {
 	$status = file_get_contents("/var/db/pingstatus/$ping");
 	echo $status;
 	echo "</td>";
+	echo "<td class=\"listlr\">";
+	$msstatus = file_get_contents("/var/db/pingmsstatus/$ping");
+	echo "</td>";
 	echo "</tr>";
 }
 ?>
