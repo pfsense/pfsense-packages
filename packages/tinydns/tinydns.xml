@@ -4,7 +4,7 @@
 	<version>1.0</version>
 	<configpath>installedpackages->package->tinydns</configpath>
 	<menu>
-		<name>tinydns</name>
+		<name>TinyDNS</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
