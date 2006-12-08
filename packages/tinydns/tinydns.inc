@@ -123,7 +123,7 @@ function tinydns_custom_php_changeip_command() {
 function tinydns_get_record_status($record) {
 	global $g, $config;
 	if(file_exists("/var/db/pingstatus/{$record}")) {
-		$status = file_return_contents("/var/db/pingstatus/{$record}");
+		$status = file_get_contents("/var/db/pingstatus/{$record}");
 		if($status == "DOWN")
 			return false;
 	}
