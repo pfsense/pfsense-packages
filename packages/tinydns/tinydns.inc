@@ -191,6 +191,10 @@ function tinydns_create_zone_file() {
 			$hostname = $domain['hostname'];
 			$ipaddress = $domain['ipaddress'];
 			$ttl = $domain['ttl'];
+			if($ttl)
+				$ttl_string = "::{$ttl}";
+			else
+				$ttl_string = "";
 			/*   check record status, if it is down request
 			 *   backup server if defined.
 			 */
@@ -202,16 +206,16 @@ function tinydns_create_zone_file() {
 					$record_data = ".{$hostname}::{$ipaddress}";
 					break;
 				case "MX":
-					$record_data = "@{$hostname}:{$ipaddress}::{$ttl}";
+					$record_data = "@{$hostname}:{$ipaddress}{$ttl_string}";
 					break;
 				case "A":
-					$record_data = "+{$hostname}:{$ipaddress}::{$ttl}";
+					$record_data = "+{$hostname}:{$ipaddress}{$ttl_string}";
 					break;
 				case "PTR":
-					$record_data = "={$hostname}:{$ipaddress}::{$ttl}";
+					$record_data = "={$hostname}:{$ipaddress}{$ttl_string}";
 					break;
 				case "CNAME":
-					$record_data = "C{$hostname}:{$ipaddress}::{$ttl}";
+					$record_data = "C{$hostname}:{$ipaddress}{$ttl_string}";
 					break;
 			}
 			if($record_data)
