@@ -3,6 +3,7 @@
 	<name>tinydnsdomains</name>
 	<configpath>installedpackages->package->tinydnsdomains</configpath>
 	<include_file>/usr/local/pkg/tinydns.inc</include_file>
+	<title>TinyDNS: Domains</title>
 	<tabs>
 		<tab>
 			<text>Settings</text>

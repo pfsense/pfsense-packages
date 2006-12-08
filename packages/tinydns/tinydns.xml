@@ -3,6 +3,7 @@
 	<name>tinydns</name>
 	<version>1.0</version>
 	<configpath>installedpackages->package->tinydns</configpath>
+	<title>TinyDNS: Settings</title>
 	<menu>
 		<name>TinyDNS</name>
 		<tooltiptext></tooltiptext>
