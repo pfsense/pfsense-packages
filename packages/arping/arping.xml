@@ -9,7 +9,7 @@
 		<item>http://www.pfsense.com/packages/config/arping/arping.inc</item>
 	</additional_files_needed>
 	<menu>
-		<name>arping</name>
+		<name>Arping</name>
 		<tooltiptext>Host to arp ping</tooltiptext>
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=arping.xml&amp;id=0</url>
