@@ -122,6 +122,7 @@ function tinydns_custom_php_changeip_command() {
 		$text_1   = "*/1		 *	 	*	 	*	 	*	 	root	 /usr/bin/nice -n20 /etc/ping_hosts.sh";
 		$text_5   = "*/5		 *	 	*	 	*	 	*	 	root	 /usr/bin/nice -n20 /etc/ping_hosts.sh";
 		$filenamea = "/etc/crontab";
+		remove_text_from_file($filenamea, $text_1);
 		remove_text_from_file($filenamea, $text_5);
 		add_text_to_file($filenamea, $text_1);
 	} else {
@@ -129,6 +130,7 @@ function tinydns_custom_php_changeip_command() {
 		$text_5   = "*/5		 *	 	*	 	*	 	*	 	root	 /usr/bin/nice -n20 /etc/ping_hosts.sh";
 		$filenamea = "/etc/crontab";
 		remove_text_from_file($filenamea, $text_1);
+		remove_text_from_file($filenamea, $text_5);
 		add_text_to_file($filenamea, $text_5);
 	}
 	exec("killall -HUP cron");
