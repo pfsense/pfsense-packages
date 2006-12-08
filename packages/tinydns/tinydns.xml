@@ -17,7 +17,7 @@
 	<tab>
 		<text>TinyDNS</text>
 		<url>/tinydns_filter.php</url>
-	</tab>		
+	</tab>
 	<aftersaveredirect>/pkg_edit.php?xml=tinydns.xml&amp;id=0</aftersaveredirect>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -45,7 +45,8 @@
 		tinydns_custom_php_install_command();
 		tinydns_custom_php_changeip_command();
 		tinydns_create_zone_file();
-	</custom_php_resync_config_command>	
+		tinydns_setup_ping_items();
+	</custom_php_resync_config_command>
 	<include_file>/usr/local/pkg/tinydns.inc</include_file>
 	<fields>
 		<field>

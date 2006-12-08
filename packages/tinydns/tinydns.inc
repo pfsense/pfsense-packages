@@ -33,6 +33,10 @@ function tinydns_custom_php_install_command() {
 	global $g, $config;
 	conf_mount_rw();
 	$fd = fopen("/usr/local/etc/rc.d/svscan.sh", "w");
+	if(!$fd) {
+		log_error("Could not open /usr/local/etc/rc.d/svscan.sh for writing.");
+		return;
+	}
 
 	$svscan = <<<EOD
 #!/bin/sh
@@ -135,26 +139,58 @@ function tinydns_get_backup_record($record) {
 				if(!$domain['row'])
 					return $record;
 				foreach($domain['row'] as $row) {
-					/* XXX: expand to two failover hosts, etc */
-					return $row['failoverip'];
+					$status = tinydns_get_record_status($record);
+					if($status)
+						return $row['failoverip'];
 				}
 			}
 		}
 	}
+	return $record;
+}
+
+function tinydns_setup_ping_items() {
+	global $g, $config;
+	if(!$config['installedpackages']['tinydnsdomains'])
+		return;
+	conf_mount_rw();
+	/* XXX: make this work with other packages */
+	$fd = fopen("/var/db/pkgpinghosts", "w");
+	if(!$fd) {
+		log_error("Could not open /var/db/pkgpinghosts for writing.");
+		return;
+	}
+	/*   write out each ip address so ping_hosts.sh can begin monitoring ip
+	 *   status and create a database of the status information that we can use.
+	 */
+	foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
+		fwrite($fd, $domain['ipaddress'] . "\n");
+		if($domain['row']) {
+			foreach($domain['row'] as $row) {
+				fwrite($fd, $row['ipaddress'] . "\n");
+			}
+		}
+	}
+	fclose($fd);
+	conf_mount_ro();
 }
 
 function tinydns_create_zone_file() {
 	global $g, $config;
 	conf_mount_rw();
 	$fd = fopen("/service/tinydns/root/data", "w");
-	if($config['installedpackages']['tinydnsdomains'])
+	if(!$fd) {
+		log_error("Could not open /service/tinydns/root/data for writing.");
+		return;
+	}
+	if($config['installedpackages']['tinydnsdomains']) {
 		foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
 			$record_data = "";
 			$hostname = $domain['hostname'];
 			$ipaddress = $domain['ipaddress'];
 			$ttl = $domain['ttl'];
-			/* check record status, if it is down request
-			 * backup server if defined.
+			/*   check record status, if it is down request
+			 *   backup server if defined.
 			 */
 			$status = tinydns_get_record_status($ipaddress);
 			if(!$status)
@@ -179,6 +215,7 @@ function tinydns_create_zone_file() {
 			if($record_data)
 				fwrite($fd, $record_data . "\n");
 		}
+	}
 	fclose($fd);
 	/* tell tinydns to reload zone file */
 	exec("cd /service/tinydns/root && /usr/local/bin/tinydns-data");

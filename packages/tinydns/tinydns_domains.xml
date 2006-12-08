@@ -74,5 +74,6 @@
 	</fields>
 	<custom_php_resync_config_command>
 		tinydns_create_zone_file();
+		tinydns_setup_ping_items();
 	</custom_php_resync_config_command>
 </packagegui>
