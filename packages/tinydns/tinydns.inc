@@ -38,6 +38,29 @@ function tinydns_custom_php_install_command() {
 		return;
 	}
 
+	$ip = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
+
+	$minsegment = "10240";
+	$maxfilesize = "10240";
+	$maxsegment  = "20480";
+	$maxfd = "100";
+	$maxchild = "40";
+
+	if($config['installedpackages']['tinydns']['config'][0]['minsegment'])
+		$minsegment = $config['installedpackages']['tinydns']['config'][0]['minsegment'];
+
+	if($config['installedpackages']['tinydns']['config'][0]['maxfilesize'])
+		$maxfilesize = $config['installedpackages']['tinydns']['config'][0]['maxfilesize'];
+
+	if($config['installedpackages']['tinydns']['config'][0]['maxsegment'])
+		$maxsegment = $config['installedpackages']['tinydns']['config'][0]['maxsegment'];
+
+	if($config['installedpackages']['tinydns']['config'][0]['maxfd'])
+		$maxfd = $config['installedpackages']['tinydns']['config'][0]['maxfd'];
+
+	if($config['installedpackages']['tinydns']['config'][0]['maxchild'])
+		$maxchild = $config['installedpackages']['tinydns']['config'][0]['maxchild'];
+
 	$svscan = <<<EOD
 #!/bin/sh
 
@@ -52,12 +75,12 @@ MAXFD=100
 MAXCHILD=40
 
 # ulimits
-ulimit -d \${MINSEGMENT}
-ulimit -f \${MAXFILESIZE}
-ulimit -m \${MAXSEGMENT}
-ulimit -n \${MAXFD}
-ulimit -s \${MINSEGMENT}
-ulimit -u \${MAXCHILD}
+ulimit -d \${{$minsegment}}
+ulimit -f \${{$maxfilesize}}
+ulimit -m \${{$maxsegment}}
+ulimit -n \${{$$maxfd}}
+ulimit -s \${{$minsegment}}
+ulimit -u \${{$maxchild}}
 
 . /etc/rc.subr
 
