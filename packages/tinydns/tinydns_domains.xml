@@ -5,11 +5,11 @@
 	<include_file>/usr/local/pkg/tinydns.inc</include_file>
 	<tabs>
 		<tab>
-			<text>TinyDNS Settings</text>
+			<text>Settings</text>
 			<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>TinyDNS</text>
+			<text>Domains</text>
 			<url>/tinydns_filter.php</url>
 			<active/>
 		</tab>

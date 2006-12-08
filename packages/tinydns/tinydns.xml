@@ -11,7 +11,7 @@
 	</menu>
 	<tabs>
 		<tab>
-			<text>TinyDNS Settings</text>
+			<text>Settings</text>
 			<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
 			<active/>
 		</tab>
