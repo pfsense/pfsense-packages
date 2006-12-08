@@ -190,6 +190,7 @@ function tinydns_create_zone_file() {
 			$record_data = "";
 			$hostname = $domain['hostname'];
 			$ipaddress = $domain['ipaddress'];
+			$ttl = $domain['ttl'];
 			/*   check record status, if it is down request
 			 *   backup server if defined.
 			 */
