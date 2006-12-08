@@ -31,7 +31,7 @@
 
 function tinydns_custom_php_install_command() {
 	global $g, $config;
-	conf_mount_rw();	
+	conf_mount_rw();
 	$fd = fopen("/usr/local/etc/rc.d/svscan.sh", "w");
 
 	$svscan = <<<EOD
@@ -83,11 +83,11 @@ svscan_stop_post () {
 }
 
 run_rc_command "\$1"
-	
+
 EOD;
-	
+
 	fwrite($fd, $svscan);
-	fclose($fd);	
+	fclose($fd);
 	conf_mount_ro();
 }
 
@@ -96,7 +96,7 @@ function tinydns_custom_php_deinstall_command() {
 	conf_mount_rw();
 	/* destroy all daemontools items */
 	exec("/usr/sbin/pw groupdel Gtinydns");
-	exec("/usr/sbin/pw groupdel Gdnslog");	
+	exec("/usr/sbin/pw groupdel Gdnslog");
 	exec("/usr/sbin/pw userdel Gtinydns");
 	exec("/usr/sbin/pw userdel Gdnslog");
 	conf_mount_ro();
@@ -116,31 +116,65 @@ function tinydns_custom_php_changeip_command() {
 	conf_mount_ro();
 }
 
+function tinydns_get_record_status($record) {
+	global $g, $config;
+	if(file_exists("/var/db/pingstatus/{$record}")) {
+		$status = file_return_contents("/var/db/pingstatus/{$record}");
+		if($status == "DOWN")
+			return false;
+	}
+	return true;
+}
+
+function tinydns_get_backup_record($record) {
+	global $g, $config;
+	if($config['installedpackages']['tinydnsdomains']) {
+		foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
+			if($domain['ipaddress'] == $record) {
+				/* if no failover host exists, simply return original record */
+				if(!$domain['row'])
+					return $record;
+				foreach($domain['row'] as $row) {
+					/* XXX: expand to two failover hosts, etc */
+					return $row['failoverip'];
+				}
+			}
+		}
+	}
+}
+
 function tinydns_create_zone_file() {
 	global $g, $config;
 	conf_mount_rw();
-	$fd = fopen("/service/tinydns/root/data", "w");	
+	$fd = fopen("/service/tinydns/root/data", "w");
 	if($config['installedpackages']['tinydnsdomains'])
 		foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
 			$record_data = "";
 			$hostname = $domain['hostname'];
 			$ipaddress = $domain['ipaddress'];
+			$ttl = $domain['ttl'];
+			/* check record status, if it is down request
+			 * backup server if defined.
+			 */
+			$status = tinydns_get_record_status($ipaddress);
+			if(!$status)
+					$ipaddress = tinydns_get_backup_record($ipaddress);
 			switch ($domain['recordtype']) {
 				case "SOA":
-					$record_data = ".{$hostname}::{$ipaddress}";
+					$record_data = ".{$hostname}::{$ipaddress}::{$ttl}";
 					break;
 				case "MX":
-					$record_data = "@{$hostname}:{$ipaddress}";
+					$record_data = "@{$hostname}:{$ipaddress}::{$ttl}";
 					break;
 				case "A":
-					$record_data = "+{$hostname}:{$ipaddress}";
+					$record_data = "+{$hostname}:{$ipaddress}::{$ttl}";
 					break;
 				case "PTR":
-					$record_data = "={$hostname}:{$ipaddress}";
+					$record_data = "={$hostname}:{$ipaddress}::{$ttl}";
 					break;
 				case "CNAME":
-					$record_data = "C{$hostname}:{$ipaddress}";
-					break;					
+					$record_data = "C{$hostname}:{$ipaddress}::{$ttl}";
+					break;
 			}
 			if($record_data)
 				fwrite($fd, $record_data . "\n");
