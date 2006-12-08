@@ -110,6 +110,7 @@ function tinydns_custom_php_changeip_command() {
 	global $g, $config;
 	conf_mount_rw();
 	$ip = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
+	$updatecron = $config['installedpackages']['tinydns']['config'][0]['updatecron'];
 	/* setup daemon tools service area */
 	exec("/usr/sbin/pw useradd Gtinydns");
 	exec("/usr/sbin/pw useradd Gdnslog");
@@ -117,6 +118,19 @@ function tinydns_custom_php_changeip_command() {
 	exec("/bin/ln -s /etc/tinydns /service");
 	sleep(5);
 	exec("/usr/local/bin/svstat /service/tinydns");
+	if($updatecron) {
+		$text_1   = "*/1		 *	 	*	 	*	 	*	 	root	 /usr/bin/nice -n20 /etc/ping_hosts.sh";
+		$text_5   = "*/5		 *	 	*	 	*	 	*	 	root	 /usr/bin/nice -n20 /etc/ping_hosts.sh";
+		$filenamea = "/etc/crontab";
+		remove_text_from_file($filenamea, $text_5);
+		add_text_to_file($filenamea, $text_1);
+	} else {
+		$text_1   = "*/1		 *	 	*	 	*	 	*	 	root	 /usr/bin/nice -n20 /etc/ping_hosts.sh";
+		$text_5   = "*/5		 *	 	*	 	*	 	*	 	root	 /usr/bin/nice -n20 /etc/ping_hosts.sh";
+		$filenamea = "/etc/crontab";
+		remove_text_from_file($filenamea, $text_1);
+		add_text_to_file($filenamea, $text_5);
+	}
 	conf_mount_ro();
 }
 

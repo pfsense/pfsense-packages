@@ -68,6 +68,12 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fieldname>updatecron</fieldname>
+			<fielddescr>Update cron</fielddescr>
+			<description>Changes cron to ping hosts every minute from 5.</description>
+			<type>input</type>
+		</field>
+		<field>
 			<fieldname>minsegment</fieldname>
 			<fielddescr>Minimum segment size</fielddescr>
 			<description>Recommended size: 10240 or larger.</description>
