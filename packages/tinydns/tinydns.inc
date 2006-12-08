@@ -153,6 +153,8 @@ function tinydns_setup_ping_items() {
 	global $g, $config;
 	if(!$config['installedpackages']['tinydnsdomains'])
 		return;
+	$wanif = get_real_wan_interface();
+	$ip = find_interface_ip($wanif);
 	conf_mount_rw();
 	/* XXX: make this work with other packages */
 	$fd = fopen("/var/db/pkgpinghosts", "w");
@@ -164,10 +166,10 @@ function tinydns_setup_ping_items() {
 	 *   status and create a database of the status information that we can use.
 	 */
 	foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
-		fwrite($fd, $domain['ipaddress'] . "\n");
+		fwrite($fd, $ip . "|" . $domain['ipaddress'] . "|3|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php\n");
 		if($domain['row']) {
 			foreach($domain['row'] as $row) {
-				fwrite($fd, $row['ipaddress'] . "\n");
+				fwrite($fd, $ip . "|" . $row['ipaddress'] . "|3|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php\n");
 			}
 		}
 	}
