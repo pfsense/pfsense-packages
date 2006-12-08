@@ -160,11 +160,21 @@ function tinydns_custom_php_changeip_command() {
 	conf_mount_ro();
 }
 
-function tinydns_get_record_status($record) {
+function tinydns_get_record_status($record, $pingthreshold, $wanpingthreshold) {
 	global $g, $config;
 	if(file_exists("/var/db/pingstatus/{$record}")) {
 		$status = file_get_contents("/var/db/pingstatus/{$record}");
 		if($status == "DOWN")
+			return false;
+	}
+	if($pingthreshold) {
+		$current_ms = file_get_contents("/var/db/pingmsstatus/$record");
+		if($pingthreshold > $current_ms)
+			return false;
+	}
+	if($wanpingthreshold) {
+		$current_avg = file_get_contents("/var/db/wanaverage");
+		if($wanpingthreshold > $current_avg)
 			return false;
 	}
 	return true;
@@ -248,7 +258,15 @@ function tinydns_create_zone_file() {
 			if($domain['row']) {
 				foreach($domain['row'] as $row) {
 					if($row['loadbalance']) {
-						$status = tinydns_get_record_status($row['failoverip']);
+						if($row['pingthreshold'])
+							$pingthreshold = $row['pingthreshold'];
+						else
+							$pingthreshold = "";
+						if($row['wanpingthreshold'])
+							$wanpingthreshold =	$row['wanpingthreshold'];
+						else
+							$wanpingthreshold = "";
+						$status = tinydns_get_record_status($row['failoverip'], $pingthreshold, $wanpingthreshold);
 						if($status) {
 							$record_data = tinydns_get_rowline_data($row['failoverip'], $domain['recordtype'], $ttl, $hostname);
 							fwrite($fd, $record_data . "\n");

@@ -96,6 +96,12 @@
 				    <description>When the MS time is surpassed, item will failover to next host</description>
 				    <type>input</type>
 				</rowhelperfield>
+				<rowhelperfield>
+				    <fielddescr>Wan ping threshold</fielddescr>
+				    <fieldname>wanpingthreshold</fieldname>
+				    <description>When the WAN MS ping time is surpassed, item will failover to next host</description>
+				    <type>input</type>
+				</rowhelperfield>
 		    </rowhelper>
 		</field>
 	</fields>
