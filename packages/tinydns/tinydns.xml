@@ -72,30 +72,35 @@
 			<fielddescr>Minimum segment size</fielddescr>
 			<description></description>
 			<type>input</type>
+			<default>10240</default>
 		</field>
 		<field>
 			<fieldname>maxfilesize</fieldname>
 			<fielddescr>Maximum file size</fielddescr>
 			<description></description>
 			<type>input</type>
+			<default>10240</default>
 		</field>
 		<field>
 			<fieldname>maxsegment</fieldname>
 			<fielddescr>Max Segment size</fielddescr>
 			<description></description>
 			<type>input</type>
+			<default>20480</default>
 		</field>
 		<field>
 			<fieldname>maxfd</fieldname>
 			<fielddescr>Maximum file descriptors</fielddescr>
 			<description></description>
 			<type>input</type>
+			<default>100</default>
 		</field>
 		<field>
 			<fieldname>maxchild</fieldname>
 			<fielddescr>Maximum children processes</fielddescr>
 			<description></description>
 			<type>input</type>
+			<default>40</default>
 		</field>
 	</fields>
 </packagegui>
