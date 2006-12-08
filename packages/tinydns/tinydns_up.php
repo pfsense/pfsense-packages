@@ -33,5 +33,6 @@
 require("/usr/local/pkg/tinydns.inc");
 
 tinydns_create_zone_file();
+tinydns_setup_ping_items();
 
 ?>
