@@ -19,6 +19,10 @@
 			<fielddescr>Hostname</fielddescr>
 			<fieldname>hostname</fieldname>
 		</columnitem>
+		<columnitem>
+			<fielddescr>Record type</fielddescr>
+			<fieldname>recordtype</fieldname>
+		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
