@@ -53,8 +53,7 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>
      <td class="tabcont" >
-      <form action="status_upnp.php" method="post">
-      <b><input type="submit" name="clear" id="clear" value="Clear" /></b>
+      <form action="tinydns_status.php" method="post">
     </form>
     </td>
    </tr>
@@ -62,7 +61,7 @@ include("head.inc");
     <td class="tabcont" >
       <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
-          <td width="10%" class="listhdrr">IP</td>
+          <td width="90%" class="listhdrr">IP</td>
           <td width="10%" class="listhdrr">Status</td>
 		</tr>
 
