@@ -190,42 +190,59 @@ function tinydns_create_zone_file() {
 			$record_data = "";
 			$hostname = $domain['hostname'];
 			$ipaddress = $domain['ipaddress'];
-			$ttl = $domain['ttl'];
-			if($ttl)
-				$ttl_string = "::{$ttl}";
-			else
-				$ttl_string = "";
 			/*   check record status, if it is down request
 			 *   backup server if defined.
 			 */
 			$status = tinydns_get_record_status($ipaddress);
 			if(!$status)
 					$ipaddress = tinydns_get_backup_record($ipaddress);
-			switch ($domain['recordtype']) {
-				case "SOA":
-					$record_data = ".{$hostname}::{$ipaddress}";
-					break;
-				case "MX":
-					$record_data = "@{$hostname}:{$ipaddress}{$ttl_string}";
-					break;
-				case "A":
-					$record_data = "+{$hostname}:{$ipaddress}{$ttl_string}";
-					break;
-				case "PTR":
-					$record_data = "={$hostname}:{$ipaddress}{$ttl_string}";
-					break;
-				case "CNAME":
-					$record_data = "C{$hostname}:{$ipaddress}{$ttl_string}";
-					break;
-			}
+			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl);
 			if($record_data)
 				fwrite($fd, $record_data . "\n");
+			/* process load balanced items */
+			if($domain['row']) {
+				foreach($domain['row'] as $row) {
+					if($row['loadbalance']) {
+						$status = tinydns_get_record_status($row['failoverip']);
+						if(!$status) {
+							$record_data = tinydns_get_rowline_data($row['failoverip'], $domain['recordtype'], $ttl);
+							fwrite($fd, $record_data . "\n");
+						}
+					}
+				}
+			}
 		}
 	}
 	fclose($fd);
 	/* tell tinydns to reload zone file */
 	exec("cd /service/tinydns/root && /usr/local/bin/tinydns-data");
 	conf_mount_ro();
+}
+
+/* formats data as a tinydns data row item */
+function tinydns_get_rowline_data($recordip, $recordtype, $ttl) {
+		if($ttl)
+			$ttl_string = "::{$ttl}";
+		else
+			$ttl_string = "";
+		switch ($recordtype) {
+			case "SOA":
+				$record_data = ".{$hostname}::{$ipaddress}";
+				break;
+			case "MX":
+				$record_data = "@{$hostname}:{$ipaddress}{$ttl_string}";
+				break;
+			case "A":
+				$record_data = "+{$hostname}:{$ipaddress}{$ttl_string}";
+				break;
+			case "PTR":
+				$record_data = "={$hostname}:{$ipaddress}{$ttl_string}";
+				break;
+			case "CNAME":
+				$record_data = "C{$hostname}:{$ipaddress}{$ttl_string}";
+				break;
+		}
+		return $record_data;
 }
 
 ?>

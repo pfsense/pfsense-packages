@@ -79,6 +79,12 @@
 				    <type>input</type>
 				    <size>45</size>
 				</rowhelperfield>
+				<rowhelperfield>
+				    <fielddescr>Load balance</fielddescr>
+				    <fieldname>loadbalance</fieldname>
+				    <description>Adds this member to active group when host is alive.</description>
+				    <type>checkbox</type>
+				</rowhelperfield>
 		    </rowhelper>
 		</field>
 	</fields>
