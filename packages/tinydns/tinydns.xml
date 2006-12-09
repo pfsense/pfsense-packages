@@ -32,6 +32,11 @@
 		<item>http://www.pfsense.com/packages/config/tinydns/tinydns.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
+		<prefix>/usr/local/pkg/pf</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_xmlrpc_sync.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_domains.xml</item>
