@@ -81,8 +81,12 @@
 			<url>/snort_download_rules.php</url>
 		</tab>
 		<tab>
-			<text>Snort Rulesets</text>
+			<text>Snort Categories</text>
 			<url>/snort_rulesets.php</url>
+		</tab>
+		<tab>
+			<text>Snort Rules</text>
+			<url>/snort_rules.php</url>
 		</tab>
 		<tab>
 			<text>Snort Blocked</text>

@@ -56,7 +56,7 @@ $enabled_rulesets = $config['installedpackages']['snort']['rulesets'];
 if($enabled_rulesets)
 	$enabled_rulesets_array = split("\|\|", $enabled_rulesets);
 
-$pgtitle = "Snort: Snort Rulesets";
+$pgtitle = "Snort: Categories";
 include("head.inc");
 
 ?>
@@ -76,8 +76,9 @@ include("head.inc");
 <?php
 	$tab_array = array();
 	$tab_array[] = array(gettext("Snort Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
-	$tab_array[] = array(gettext("Snort Rules Update"), false, "/snort_download_rules.php");
-	$tab_array[] = array(gettext("Snort Rulesets"), true, "/snort_rulesets.php");
+	$tab_array[] = array(gettext("Update Snort Rules"), false, "/snort_download_rules.php");
+	$tab_array[] = array(gettext("Snort Categories"), true, "/snort_rulesets.php");
+	$tab_array[] = array(gettext("Snort Rules"), false, "/snort_rules.php");
 	$tab_array[] = array(gettext("Snort Blocked"), false, "/snort_blocked.php");
 	$tab_array[] = array(gettext("Snort Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
 	$tab_array[] = array(gettext("Snort Alerts"), false, "/snort_alerts.php");
@@ -121,7 +122,7 @@ include("head.inc");
 		echo "	<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />";
 		echo "</td>";
 		echo "<td>";
-		echo "<a target='_new' href='edit.php?submit=Load&savetopath=" . urlencode("/usr/local/etc/snort/rules/") . urlencode($file) . "'>{$file}</a>";
+		echo "<a href='snort_rules.php?openruleset=/usr/local/etc/snort/rules/" . urlencode($file) . "'>{$file}</a>";
 		echo "</td>";
 		//echo "<td>";
 		//echo "description";
@@ -144,7 +145,7 @@ include("head.inc");
 
 </form>
 
-<p><b>NOTE:</b> You can click on a ruleset name to load the file in the pfSense text editor in a new window/tab.
+<p><b>NOTE:</b> You can click on a ruleset name to edit the ruleset.
 
 <?php include("fend.inc"); ?>
 
