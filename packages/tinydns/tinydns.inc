@@ -126,6 +126,9 @@ function tinydns_custom_php_deinstall_command() {
 	exec("/usr/sbin/pw groupdel Gdnslog");
 	exec("/usr/sbin/pw userdel Gtinydns");
 	exec("/usr/sbin/pw userdel Gdnslog");
+	exec("rm /usr/local/www/*tinydns*");
+	exec("rm /usr/local/pkg/*tinydns*");
+	exec("rm /usr/local/pkg/pf/*tinydns*");
 	conf_mount_ro();
 }
 
