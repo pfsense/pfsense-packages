@@ -57,7 +57,7 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Enable file logging</fielddescr>
+			<fielddescr>Enable file logging (stored in /var/log/imspector)</fielddescr>
 			<fieldname>log_file</fieldname>
 			<type>checkbox</type>
 		</field>

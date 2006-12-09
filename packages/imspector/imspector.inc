@@ -26,12 +26,12 @@
 	}	
 
 	function imspector_pf_rdr($iface, $port) {
-		return "rdr on {$iface} inet proto tcp from any to any port = {$port} -> 127.0.0.1 port 16667\n";
+		return "rdr pass on {$iface} inet proto tcp from any to any port = {$port} -> 127.0.0.1 port 16667\n";
 	}
 
 	function imspector_pf_rule($iface, $port) {
 		return "pass in quick on {$iface} inet proto tcp from any to any port {$port} keep state\n";
-	}	
+	}		
 
 	function imspector_proto_to_port ($proto)
 	{
@@ -86,22 +86,20 @@
 			$iface_array = explode(",",imspector_config("iface_array"));
 
 		if($iface_array && $proto_array) {	
-			for($i=1;$i<=2;$i++) {			
-				foreach($iface_array as $iface) {
-					$if = convert_friendly_interface_to_real_interface_name($iface);
-					/* above function returns iface if fail */
-					if($if!=$iface) {
-						$addr = find_interface_ip($if);
-						/* non enabled interfaces are displayed in list on imspector settings page */
-						/* check that the interface has an ip address before adding parameters */
-						if($addr) {
-							foreach($proto_array as $proto) {
-								if($i==1 && imspector_proto_to_port($proto))
-									$pf_rules .= imspector_pf_rdr($if,imspector_proto_to_port($proto));
-								elseif ($i==2 && imspector_proto_to_port($proto))
-									$pf_rules .= imspector_pf_rule($if,imspector_proto_to_port($proto));
-							}							
-						}
+			foreach($iface_array as $iface) {
+				$if = convert_friendly_interface_to_real_interface_name($iface);
+				/* above function returns iface if fail */
+				if($if!=$iface) {
+					$addr = find_interface_ip($if);
+					/* non enabled interfaces are displayed in list on imspector settings page */
+					/* check that the interface has an ip address before adding parameters */
+					if($addr) {
+						foreach($proto_array as $proto) {
+							if(imspector_proto_to_port($proto))	{
+								/* we can use rdr pass to auto create the filter rule */
+								$pf_rules .= imspector_pf_rdr($if,imspector_proto_to_port($proto));
+							}
+						}							
 					}
 				}
 			}
