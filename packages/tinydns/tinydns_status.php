@@ -87,7 +87,7 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 		$inservice = "<FONT COLOR='BLUE'>NO</FONT>";
 	echo "<tr>";
 	echo "<td class=\"listlr\">";
-	echo "$hostname<br>$ipaddress";
+	echo "$hostname<br>&nbsp;&nbsp;&nbsp;$ipaddress";
 	echo "</td>";
 	echo "<td class=\"listlr\">";
 	if(stristr($status,"DOWN"))
