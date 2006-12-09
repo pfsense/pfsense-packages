@@ -73,7 +73,7 @@ function tinydns_do_xmlrpc_sync() {
 	/* xml will hold the sections to sync */
 	$xml = array();
 	$xml['installedpackages']['tinydns'] = &$config['installedpackages']['tinydns'];
-	$xml['installedpackages']['tinydnswhitelist'] = &$config['installedpackages']['tinydnsdomains'];
+	$xml['installedpackages']['tinydnsdomains'] = &$config['installedpackages']['tinydnsdomains'];
 
 	/* assemble xmlrpc payload */
 	$params = array(
