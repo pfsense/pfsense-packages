@@ -75,7 +75,10 @@ foreach($pingdir as $ping) {
 	echo "</td>";
 	echo "<td class=\"listlr\">";
 	$status = file_get_contents("/var/db/pingstatus/$ping");
-	echo $status;
+	if(stristr($status,"DOWN"))
+		echo "<FONT COLOR='red'>DOWN</FONT>";
+	else
+		echo $status;
 	echo "</td>";
 	echo "<td class=\"listlr\">";
 	if(file_exists("/var/db/pingmsstatus/$ping"))
