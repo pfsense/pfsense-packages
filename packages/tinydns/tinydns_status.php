@@ -81,7 +81,7 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 	$ipaddress = $ping['ipaddress'];
 	$hostname  = $ping['hostname'];
 	$status = file_get_contents("/var/db/pingstatus/$ipaddress");
-	if(stristr($tinydns_data, $ipaddress))
+	if(stristr($tinydns_data, "+{$hostname}:{$ipaddress}"))
 		$inservice = "<FONT COLOR='GREEN'>YES</FONT>";
 	else
 		$inservice = "<FONT COLOR='BLUE'>NO</FONT>";
@@ -117,7 +117,7 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 		echo $ipaddress;
 		if($row['loadbalance'])
 			echo " (LB)";
-		if(stristr($tinydns_data ,$row['failoverip']))
+		if(stristr($tinydns_data, "+{$hostname}:{$row['failoverip']}"))
 			$inservice = "<FONT COLOR='GREEN'>YES</FONT>";
 		else
 			$inservice = "<FONT COLOR='BLUE'>NO</FONT>";
