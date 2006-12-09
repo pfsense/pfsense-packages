@@ -116,6 +116,7 @@ EOD;
 	fwrite($fd, $svscan);
 	fclose($fd);
 	conf_mount_ro();
+	filter_configure();
 }
 
 function tinydns_custom_php_deinstall_command() {
@@ -130,6 +131,7 @@ function tinydns_custom_php_deinstall_command() {
 	exec("rm /usr/local/pkg/*tinydns*");
 	exec("rm /usr/local/pkg/pf/*tinydns*");
 	conf_mount_ro();
+	filter_configure();
 }
 
 function tinydns_custom_php_changeip_command() {
@@ -161,6 +163,7 @@ function tinydns_custom_php_changeip_command() {
 	}
 	exec("killall -HUP cron");
 	conf_mount_ro();
+	filter_configure();
 }
 
 function tinydns_get_record_status($record, $pingthreshold = "", $wanpingthreshold = "") {
