@@ -68,26 +68,56 @@ include("head.inc");
 
 <?php
 $pingdir = return_dir_as_array("/var/db/pingstatus");
-foreach($pingdir as $ping) {
+foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
+	if($ping['recordtype'] == "SOA")
+		continue;
+	if(!$ping['row'])
+		continue;
+	$ipaddress = $ping['ipaddress'];
+	$status = file_get_contents("/var/db/pingstatus/$ipaddress");
 	echo "<tr>";
 	echo "<td class=\"listlr\">";
-	echo $ping;
+	echo $ipaddress;
 	echo "</td>";
 	echo "<td class=\"listlr\">";
-	$status = file_get_contents("/var/db/pingstatus/$ping");
 	if(stristr($status,"DOWN"))
 		echo "<FONT COLOR='red'>DOWN</FONT>";
 	else
 		echo $status;
 	echo "</td>";
 	echo "<td class=\"listlr\">";
-	if(file_exists("/var/db/pingmsstatus/$ping"))
-		$msstatus = file_get_contents("/var/db/pingmsstatus/$ping");
+	if(file_exists("/var/db/pingmsstatus/$ipaddress"))
+		$msstatus = file_get_contents("/var/db/pingmsstatus/$ipaddress");
 	else
 		$msstatus = "N/A";
 	echo $msstatus;
 	echo "</td>";
 	echo "</tr>";
+
+	foreach($ping['row'] as $row) {
+		$ipaddress = $row['failoverip'];
+		$status = file_get_contents("/var/db/pingstatus/$ipaddress");
+		echo "<tr>";
+		echo "<td class=\"listlr\">&nbsp;&nbsp;&nbsp;&nbsp;|->&nbsp;&nbsp;";
+		echo $ipaddress;
+		echo "</td>";
+		echo "<td class=\"listlr\">";
+		if(stristr($status,"DOWN"))
+			echo "<FONT COLOR='red'>DOWN</FONT>";
+		else
+			echo $status;
+		echo "</td>";
+		echo "<td class=\"listlr\">";
+		if(file_exists("/var/db/pingmsstatus/$ipaddress"))
+			$msstatus = file_get_contents("/var/db/pingmsstatus/$ipaddress");
+		else
+			$msstatus = "N/A";
+		echo $msstatus;
+		echo "</td>";
+		echo "</tr>";
+
+	}
+	echo "<tr><td>&nbsp;</td></tr>";
 }
 ?>
       </table>
