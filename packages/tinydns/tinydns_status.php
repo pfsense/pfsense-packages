@@ -61,8 +61,9 @@ include("head.inc");
     <td class="tabcont" >
       <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
-          <td width="90%" class="listhdrr">IP</td>
+          <td width="80%" class="listhdrr">IP</td>
           <td width="10%" class="listhdrr">Status</td>
+          <td width="10%" class="listhdrr">Response time</td>
 		</tr>
 
 <?php
@@ -77,7 +78,11 @@ foreach($pingdir as $ping) {
 	echo $status;
 	echo "</td>";
 	echo "<td class=\"listlr\">";
-	$msstatus = file_get_contents("/var/db/pingmsstatus/$ping");
+	if(file_exists("/var/db/pingmsstatus/$ping"))
+		$msstatus = file_get_contents("/var/db/pingmsstatus/$ping");
+	else
+		$msstatus = "N/A";
+	echo $msstatus;
 	echo "</td>";
 	echo "</tr>";
 }
