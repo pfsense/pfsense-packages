@@ -89,6 +89,12 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fieldname>syncxmlrpc</fieldname>
+			<fielddescr>XMLRPC Sync</fielddescr>
+			<description>Sync TinyDNS configuration to backup firewalls</description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fieldname>minsegment</fieldname>
 			<fielddescr>Minimum segment size</fielddescr>
 			<description>Recommended size: 10240 or larger.</description>
