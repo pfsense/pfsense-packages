@@ -31,6 +31,10 @@
 
 require("guiconfig.inc");
 
+/* Defaults to this page but if no settings are present, redirect to setup page */
+if(!$config['installedpackages']['miniupnpd']['config'][0]['iface_array'])
+	Header("Location: /pkg_edit.php?xml=tinydns.xml&id=0");
+
 $pgtitle = "TinyDNS: Status";
 include("head.inc");
 
@@ -87,7 +91,7 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 		$inservice = "<FONT COLOR='BLUE'>NO</FONT>";
 	echo "<tr>";
 	echo "<td class=\"listlr\">";
-	echo "$hostname<br>&nbsp;&nbsp;&nbsp;$ipaddress";
+	echo "$hostname<br>&nbsp;&nbsp;&nbsp;|->&nbsp;$ipaddress";
 	echo "</td>";
 	echo "<td class=\"listlr\">";
 	if(stristr($status,"DOWN"))
@@ -113,7 +117,7 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 		$ipaddress = $row['failoverip'];
 		$status = file_get_contents("/var/db/pingstatus/$ipaddress");
 		echo "<tr>";
-		echo "<td class=\"listlr\">&nbsp;&nbsp;&nbsp;&nbsp;|->&nbsp;&nbsp;";
+		echo "<td class=\"listlr\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|->&nbsp;&nbsp;";
 		echo $ipaddress;
 		if($row['loadbalance'])
 			echo " (LB)";
