@@ -8,7 +8,7 @@
 		<name>DNS Server</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
-		<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
+		<url>/tinydns_status.php</url>
 	</menu>
 	<tabs>
 		<tab>

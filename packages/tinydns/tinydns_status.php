@@ -32,7 +32,7 @@
 require("guiconfig.inc");
 
 /* Defaults to this page but if no settings are present, redirect to setup page */
-if(!$config['installedpackages']['miniupnpd']['config'][0]['iface_array'])
+if(!$config['installedpackages']['tinydns']['config'][0])
 	Header("Location: /pkg_edit.php?xml=tinydns.xml&id=0");
 
 $pgtitle = "TinyDNS: Status";
