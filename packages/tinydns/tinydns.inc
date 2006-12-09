@@ -164,7 +164,7 @@ function tinydns_get_record_status($record, $pingthreshold = "", $wanpingthresho
 	global $g, $config;
 	if(file_exists("/var/db/pingstatus/{$record}")) {
 		$status = file_get_contents("/var/db/pingstatus/{$record}");
-		if($status == "DOWN")
+		if(stristr($status,"DOWN"))
 			return false;
 	}
 	if($pingthreshold) {
@@ -189,7 +189,7 @@ function tinydns_get_backup_record($record) {
 				if(!$domain['row'])
 					return $record;
 				foreach($domain['row'] as $row) {
-					$status = tinydns_get_record_status($record);
+					$status = tinydns_get_record_status($row['failoverip']);
 					if($status)
 						return $row['failoverip'];
 				}
