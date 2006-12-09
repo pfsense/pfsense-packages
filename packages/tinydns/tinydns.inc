@@ -160,7 +160,7 @@ function tinydns_custom_php_changeip_command() {
 	conf_mount_ro();
 }
 
-function tinydns_get_record_status($record, $pingthreshold, $wanpingthreshold) {
+function tinydns_get_record_status($record, $pingthreshold = "", $wanpingthreshold = "") {
 	global $g, $config;
 	if(file_exists("/var/db/pingstatus/{$record}")) {
 		$status = file_get_contents("/var/db/pingstatus/{$record}");
