@@ -63,21 +63,31 @@ include("head.inc");
 	<tr>
           <td width="80%" class="listhdrr">IP</td>
           <td width="10%" class="listhdrr">Status</td>
+          <td width="10%" class="listhdrr">In Service</td>
           <td width="10%" class="listhdrr">Response time</td>
 		</tr>
 
 <?php
 $pingdir = return_dir_as_array("/var/db/pingstatus");
+if(file_exists("/service/tinydns/root/data"))
+	$tinydns_data = file_get_contents("/service/tinydns/root/data");
+else
+	$tinydns_data = "";
 foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 	if($ping['recordtype'] == "SOA")
 		continue;
 	if(!$ping['row'])
 		continue;
 	$ipaddress = $ping['ipaddress'];
+	$hostname  = $ping['hostname'];
 	$status = file_get_contents("/var/db/pingstatus/$ipaddress");
+	if(stristr($tinydns_data, $ipaddress))
+		$inservice = "<FONT COLOR='GREEN'>YES</FONT>";
+	else
+		$inservice = "<FONT COLOR='BLUE'>NO</FONT>";
 	echo "<tr>";
 	echo "<td class=\"listlr\">";
-	echo $ipaddress;
+	echo "$hostname<br>$ipaddress";
 	echo "</td>";
 	echo "<td class=\"listlr\">";
 	if(stristr($status,"DOWN"))
@@ -85,6 +95,11 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 	else
 		echo $status;
 	echo "</td>";
+
+	echo "<td class=\"listlr\">";
+	echo $inservice;
+	echo "</td>";
+
 	echo "<td class=\"listlr\">";
 	if(file_exists("/var/db/pingmsstatus/$ipaddress"))
 		$msstatus = file_get_contents("/var/db/pingmsstatus/$ipaddress");
@@ -100,6 +115,12 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 		echo "<tr>";
 		echo "<td class=\"listlr\">&nbsp;&nbsp;&nbsp;&nbsp;|->&nbsp;&nbsp;";
 		echo $ipaddress;
+		if($row['loadbalance'])
+			echo " (LB)";
+		if(stristr($tinydns_data ,$row['failoverip']))
+			$inservice = "<FONT COLOR='GREEN'>YES</FONT>";
+		else
+			$inservice = "<FONT COLOR='BLUE'>NO</FONT>";
 		echo "</td>";
 		echo "<td class=\"listlr\">";
 		if(stristr($status,"DOWN"))
@@ -107,6 +128,11 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 		else
 			echo $status;
 		echo "</td>";
+
+		echo "<td class=\"listlr\">";
+		echo $inservice;
+		echo "</td>";
+
 		echo "<td class=\"listlr\">";
 		if(file_exists("/var/db/pingmsstatus/$ipaddress"))
 			$msstatus = file_get_contents("/var/db/pingmsstatus/$ipaddress");
