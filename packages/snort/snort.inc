@@ -164,6 +164,9 @@ function snort_deinstall() {
 	remove_text_from_file("/etc/sysctl.conf", "sysctl net.bpf.bufsize=20480");
 	/* decrease bpf buffers back to 4096, from 20480 */
 	exec("/sbin/sysctl net.bpf.bufsize=4096");
+	exec("/usr/bin/killall snort");
+	sleep(5);
+	exec("/usr/bin/killall -9 snort");
 }
 
 function generate_snort_conf() {
