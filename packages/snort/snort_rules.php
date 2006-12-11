@@ -120,11 +120,14 @@ if ($_POST)
     $post_dest = $_POST['dest'];
     $post_destport = $_POST['destport'];
 
+	//clean up any white spaces insert by accident
+	$post_src = str_replace(" ", "", $post_src);
+	$post_srcport = str_replace(" ", "", $post_srcport);
+	$post_dest = str_replace(" ", "", $post_dest);
+	$post_destport = str_replace(" ", "", $post_destport);
+
     //copy rule contents from array into string
     $tempstring = $splitcontents[$post_lineid];
-
-    //explode rule contents into an array, (delimiter is space)
-    $rule_content = explode(' ', $tempstring);
 
     //search string
     $findme = "# alert"; //find string for disabled alerts
@@ -146,10 +149,7 @@ if ($_POST)
         {
             //rule is staying disabled
             $counter2 = 2;
-
         }
-        //if enabled box was not changed, default
-        $counter2 = 2;
     }
     else
     {
@@ -165,27 +165,25 @@ if ($_POST)
             //rule is staying enabled
             $counter2 = 1;
         }
-        //if enabled box was not changed, default
-        $counter2 = 1;
     }
 
+    //explode rule contents into an array, (delimiter is space)
+    $rule_content = explode(' ', $tempstring);
+
+	//insert new values
     $counter2++;
-    $source = $rule_content[$counter2];//source location
+    $rule_content[$counter2] = $post_src;//source location
     $counter2++;
-    $source_port = $rule_content[$counter2];//source port location
+    $rule_content[$counter2] = $post_srcport;//source port location
     $counter2 = $counter2+2;
-    $destination = $rule_content[$counter2];//destination location
+    $rule_content[$counter2] = $post_dest;//destination location
     $counter2++;
-    $destination_port = $rule_content[$counter2];//destination port location
+    $rule_content[$counter2] = $post_destport;//destination port location
 
-    //insert new values into their respective places
-    $tempstring = str_replace($source, $post_src, $tempstring);
-    $tempstring = str_replace($source_port, $post_srcport, $tempstring);
-    $tempstring = str_replace($destination, $post_dest, $tempstring);
-    $tempstring = str_replace($destination_port, $post_destport, $tempstring);
+	//implode the array back into string
+	$tempstring = implode(' ', $rule_content);
 
-
-    //copy string into array for writing
+	//copy string into file array for writing
     $splitcontents[$post_lineid] = $tempstring;
 
     //write the new .rules file
