@@ -55,7 +55,10 @@
 	}
 
 	function validate_form_imspector($post, $input_errors) {
-
+		if($post['iface_array'])
+			foreach($post['iface_array'] as $iface)
+				if($iface == "wan")
+					$input_errors[] = 'It is a security risk to specify WAN in the \'Interface\' field';
 	}
 
 	function sync_package_imspector() {
@@ -139,7 +142,8 @@ if [ `pgrep imspector | wc -l` != 0  ]; then
 	fi
 EOD;
 					
-				$start = $stop."\n\t/usr/local/sbin/imspector -c \"{$configfile}\"";
+				$start = $stop."\n\tldconfig -m /usr/local/lib/mysql\n";
+				$start .= "\t/usr/local/sbin/imspector -c \"{$configfile}\"";
 
 				write_rcfile(array(
 					    "file" => "imspector.sh",
