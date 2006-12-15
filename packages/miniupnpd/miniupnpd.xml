@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Services: Miniupnpd</title>
 	<name>miniupnpd</name>
-	<version>20061129</version>
+	<version>20061214</version>
 	<savetext>Change</savetext>
 	<include_file>/usr/local/pkg/miniupnpd.inc</include_file>
 	<aftersaveredirect>status_upnp.php</aftersaveredirect>
@@ -45,7 +45,8 @@
 	</tabs>
 	<fields>
 		<field>
-			<fielddescr>Interface (generally LAN)</fielddescr>
+			<fielddescr>Interface (generally LAN)&lt;br&gt;
+				NOTE: If no interfaces are selected miniupnpd is disabled</fielddescr>
 			<fieldname>iface_array</fieldname>
 			<value>lan</value>
 			<multiple>true</multiple>

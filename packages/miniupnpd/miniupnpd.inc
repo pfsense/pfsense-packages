@@ -2,7 +2,7 @@
 	require_once("config.inc");
 	require_once("functions.inc");
 
-	/* Miniupnp */
+	/* Miniupnpd */
 
 	function upnp_notice ($msg) { syslog(LOG_NOTICE, "miniupnpd: $msg"); return; }
 	function upnp_warn ($msg) { syslog(LOG_WARNING, "miniupnpd: $msg"); return; }
@@ -27,6 +27,8 @@
 	function before_form_miniupnpd($pkg) {
 		global $config;
 		
+		config_lock();		
+		
 		/* if shaper connection speed defined hide fields */
 		if($config['ezshaper']['step2']['download'] && $config['ezshaper']['step2']['upload']) {
 			$i=0;
@@ -36,6 +38,8 @@
 				$i++;
 			}
 		}
+
+		config_unlock();
 	}
 
 	function validate_form_miniupnpd($post, $input_errors) {
@@ -56,13 +60,10 @@
 	function sync_package_miniupnpd() {
 		global $config;
 		global $input_errors;
-		$ifaces_final = "";		
+		$ifaces_final = "";
 		$wanif = get_real_wan_interface();
 
-		upnp_notice("Syncing package");
-
-		conf_mount_rw();
-		config_lock();	
+		config_lock();
 
 		/* since config is written before this file invoked we don't need to read post data */			
 		if(upnp_config("iface_array"))
@@ -77,13 +78,16 @@
 					/* non enabled interfaces are displayed in list on miniupnpd settings page */
 					/* check that the interface has an ip address before adding parameters */
 					if($addr) {
-						upnp_notice("Active on {$iface} interface");
 			    		$ifaces_final .= " -a {$addr}";
+						if(!$ifaces_active)
+							$ifaces_active = "{$iface}";
+						else
+							$ifaces_active .= ", {$iface}";
 					} else {
-						upnp_warn("Interface {$iface} has no ip address");
+						upnp_warn("Interface {$iface} has no ip address, ignoring");
 					}
 				} else {
-					upnp_warn("Could not resolve real interface {$iface}");
+					upnp_warn("Could not resolve real interface for {$iface}");
 				}
 			}
 
@@ -136,20 +140,28 @@ EOD;
 				/* enable system uptime instead of miniupnpd uptime */
 				if($sysuptime)
 					$start .= " -U";				
-				
+			
+				conf_mount_rw();
+					
 				write_rcfile(array(
 					    "file" => "miniupnpd.sh",
 					    "start" => $start,
 					    "stop" => $stop
 				    )
 				);
+				
+				conf_mount_ro();
 
-				/* if not ONE instance running lets start */
-				/* or if $_POST data as user is changing settings */
-				if((int)exec("pgrep miniupnpd | wc -l") != 1 || $_POST['iface_array']) {
-					upnp_notice("Starting service");
-					start_service("miniupnpd");
-				} 	
+				/* if miniupnpd not running start it */
+				if(!is_service_running("miniupnpd")) {
+					upnp_notice("Starting service on interface: {$ifaces_active}");
+					start_service("miniupnpd");						
+				}
+				/* or restart miniupnpd if settings were changed */
+				elseif($_POST['iface_array']) {
+					upnp_notice("Restarting service on interface: {$ifaces_active}");
+					restart_service("miniupnpd");
+				}
 			} 
 		}
 
@@ -157,12 +169,16 @@ EOD;
 			/* no parameters user does not want miniupnpd running */
 			/* lets stop the service and remove the rc file */
 		
-			stop_service("miniupnpd");
-			upnp_warn("No interfaces stopping service");
-			exec("rm -f /usr/local/etc/rc.d/miniupnpd*");
+			if(file_exists("/usr/local/etc/rc.d/miniupnpd.sh")) {
+				upnp_notice("Stopping service, no interfaces selected");
+				stop_service("miniupnpd");
+
+				conf_mount_rw();
+				unlink("/usr/local/etc/rc.d/miniupnpd.sh");
+				conf_mount_ro();
+			}
 		}
 		
 		config_unlock();
-		conf_mount_ro();
 	}
 ?>
