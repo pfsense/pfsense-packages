@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-	<title>Services: MiniUPnP</title>
+	<title>Services: MiniUPnPd</title>
 	<name>miniupnpd</name>
 	<version>20061214</version>
 	<savetext>Change</savetext>
 	<include_file>/usr/local/pkg/miniupnpd.inc</include_file>
 	<aftersaveredirect>status_upnp.php</aftersaveredirect>
 	<menu>
-		<name>MiniUPnP</name>
+		<name>MiniUPnPd</name>
 		<tooltiptext>Set miniupnpd settings such as interfaces to listen on.</tooltiptext>
 		<section>Services</section>
 		<url>/status_upnp.php</url>
@@ -38,14 +38,14 @@
 			<url>status_upnp.php</url>
 		</tab>
 		<tab>
-			<text>MiniUPnP Settings</text>
+			<text>MiniUPnPd Settings</text>
 			<url>/pkg_edit.php?xml=miniupnpd.xml&amp;id=0</url>
 			<active/>
 		</tab>
 	</tabs>
 	<fields>
 		<field>
-			<fielddescr>Enable MiniUPnP</fielddescr>
+			<fielddescr>Enable MiniUPnPd</fielddescr>
 			<fieldname>enable</fieldname>
 			<type>checkbox</type>
 		</field>			

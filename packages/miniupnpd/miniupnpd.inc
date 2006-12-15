@@ -2,7 +2,7 @@
 	require_once("config.inc");
 	require_once("functions.inc");
 
-	/* MiniUPnP */
+	/* MiniUPnPd */
 
 	function upnp_notice ($msg) { syslog(LOG_NOTICE, "miniupnpd: $msg"); return; }
 	function upnp_warn ($msg) { syslog(LOG_WARNING, "miniupnpd: $msg"); return; }
