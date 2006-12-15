@@ -2,7 +2,7 @@
 	require_once("config.inc");
 	require_once("functions.inc");
 
-	/* Miniupnpd */
+	/* MiniUPnP */
 
 	function upnp_notice ($msg) { syslog(LOG_NOTICE, "miniupnpd: $msg"); return; }
 	function upnp_warn ($msg) { syslog(LOG_WARNING, "miniupnpd: $msg"); return; }
@@ -65,8 +65,8 @@
 
 		config_lock();
 
-		/* since config is written before this file invoked we don't need to read post data */			
-		if(upnp_config("iface_array"))
+		/* since config is written before this file invoked we don't need to read post data */		
+		if(upnp_config("enable") && upnp_config("iface_array"))
 			$iface_array = explode(",",upnp_config("iface_array"));		
 
 		if($iface_array) {		
@@ -170,7 +170,11 @@ EOD;
 			/* lets stop the service and remove the rc file */
 		
 			if(file_exists("/usr/local/etc/rc.d/miniupnpd.sh")) {
-				upnp_notice("Stopping service, no interfaces selected");
+				if(!upnp_config("enable"))
+					upnp_notice("Stopping service, miniupnpd disabled");
+				else
+					upnp_notice("Stopping service, no interfaces selected");
+					
 				stop_service("miniupnpd");
 
 				conf_mount_rw();

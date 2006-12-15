@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-	<title>Services: Miniupnpd</title>
+	<title>Services: MiniUPnP</title>
 	<name>miniupnpd</name>
 	<version>20061214</version>
 	<savetext>Change</savetext>
 	<include_file>/usr/local/pkg/miniupnpd.inc</include_file>
 	<aftersaveredirect>status_upnp.php</aftersaveredirect>
 	<menu>
-		<name>Miniupnpd</name>
+		<name>MiniUPnP</name>
 		<tooltiptext>Set miniupnpd settings such as interfaces to listen on.</tooltiptext>
 		<section>Services</section>
 		<url>/status_upnp.php</url>
@@ -34,24 +34,29 @@
 	</service>
 	<tabs>
 		<tab>
-			<text>UPNP Status</text>
+			<text>UPnP Status</text>
 			<url>status_upnp.php</url>
 		</tab>
 		<tab>
-			<text>miniupnpd Settings</text>
+			<text>MiniUPnP Settings</text>
 			<url>/pkg_edit.php?xml=miniupnpd.xml&amp;id=0</url>
 			<active/>
 		</tab>
 	</tabs>
 	<fields>
 		<field>
-			<fielddescr>Interface (generally LAN)&lt;br&gt;
-				NOTE: If no interfaces are selected miniupnpd is disabled</fielddescr>
+			<fielddescr>Enable MiniUPnP</fielddescr>
+			<fieldname>enable</fieldname>
+			<type>checkbox</type>
+		</field>			
+		<field>
+			<fielddescr>Interfaces (generally LAN)</fielddescr>
 			<fieldname>iface_array</fieldname>
 			<value>lan</value>
 			<multiple>true</multiple>
 			<size>3</size>
 			<type>interfaces_selection</type>
+			<description>You can use the CTRL or COMMAND key to select multiple interfaces.</description>
 		</field>
 		<field>
 			<fielddescr>Maximum Download Speed (Kbits/second)</fielddescr>
