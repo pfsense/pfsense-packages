@@ -68,27 +68,24 @@
 		$proto="";
 		$pf_rules="";
 
-		imspector_notice("Syncing package");
-
 		/* remove existing rules */
-		exec("/sbin/pfctl -a imspector -Fr"); 
+		exec("/sbin/pfctl -a imspector -Fr");
 		exec("/sbin/pfctl -a imspector -Fn");
 
-		conf_mount_rw();
-		config_lock();			
+		config_lock();
 
 		if(imspector_config("proto_msn")) $proto .= "msn,";
 		if(imspector_config("proto_icqaim")) $proto .= "icqaim,";
 		if(imspector_config("proto_yahoo")) $proto .= "yahoo,";
 		if(imspector_config("proto_irc")) $proto .= "irc,";
 		
-		if($proto != "") 
+		if($proto != "")
 			$proto_array = explode(",",$proto);
 
-		if(imspector_config("iface_array"))
+		if(imspector_config("enable") && imspector_config("iface_array"))
 			$iface_array = explode(",",imspector_config("iface_array"));
 
-		if($iface_array && $proto_array) {	
+		if($iface_array && $proto_array) {
 			foreach($iface_array as $iface) {
 				$if = convert_friendly_interface_to_real_interface_name($iface);
 				/* above function returns iface if fail */
@@ -102,13 +99,23 @@
 								/* we can use rdr pass to auto create the filter rule */
 								$pf_rules .= imspector_pf_rdr($if,imspector_proto_to_port($proto));
 							}
-						}							
+						}
+						if(!$ifaces_active)
+							$ifaces_active = "{$iface}";
+						else
+							$ifaces_active .= ", {$iface}";						
+					} else {
+						imspector_warn("Interface {$iface} has no ip address, ignoring");
 					}
+				} else {
+					imspector_warn("Could not resolve real interface for {$iface}");
 				}
 			}
 
 			if($pf_rules != "") {
 				exec("echo \"{$pf_rules}\" | /sbin/pfctl -a imspector -f -");
+
+				conf_mount_rw();
 
 				$configtext = "plugin_dir=/usr/local/lib/imspector\n";
 				
@@ -116,12 +123,15 @@
 				if(imspector_config("proto_icqaim")) $configtext .= "icq_protocol=on\n";
 				if(imspector_config("proto_yahoo")) $configtext .= "yahoo_protocol=on\n";
 				if(imspector_config("proto_irc")) $configtext .= "irc_protocol=on\n";
+
+				if(imspector_config("filter_badwords")) 
+					$configtext .= "badwords_filename=/usr/local/etc/imspector/badwords.txt\n";				
 					
 				if(imspector_config("log_file")) 
+				{
+					exec("mkdir -p /var/log/imspector");
 					$configtext .= "file_logging_dir=/var/log/imspector\n";
-					
-				if(imspector_config("filter_badwords")) 
-					$configtext .= "badwords_filename=/usr/local/etc/imspector/badwords.txt\n";
+				}
 					
 				if(imspector_config("log_mysql"))
 				{
@@ -142,8 +152,11 @@ if [ `pgrep imspector | wc -l` != 0  ]; then
 	fi
 EOD;
 					
-				$start = $stop."\n\tldconfig -m /usr/local/lib/mysql\n";
-				$start .= "\t/usr/local/sbin/imspector -c \"{$configfile}\"";
+				$start = <<<EOD
+{$stop}
+	ldconfig -m /usr/local/lib/mysql
+	/usr/local/sbin/imspector -c "{$configfile}"
+EOD;
 
 				write_rcfile(array(
 					    "file" => "imspector.sh",
@@ -151,27 +164,41 @@ EOD;
 					    "stop" => $stop
 				    )
 				);
+
+				conf_mount_ro();
+
+				/* if imspector not running start it */
+				if(!is_service_running("imspector")) {
+					imspector_notice("Starting service on interface: {$ifaces_active}");
+					start_service("imspector");						
+				}
+				/* or restart imspector if settings were changed */
+				elseif($_POST['iface_array']) {
+					imspector_notice("Restarting service on interface: {$ifaces_active}");
+					restart_service("imspector");
+				}				
 			}
-		
-			if((int)exec("pgrep imspector | wc -l") == 0 || $_POST['iface_array']) {
-				imspector_notice("Starting service");
-				if(imspector_config("log_file"))
-					exec("mkdir -p /var/log/imspector");
-				start_service("imspector");
-			} 	
 		}
 
 		if(!$iface_array || !$proto_array || $pf_rules = "") {
 			/* no parameters user does not want imspector running */
 			/* lets stop the service and remove the rc file */
-		
-			stop_service("imspector");
-			imspector_warn("No interfaces and/or protocols stopping service");
-			exec("rm -f /usr/local/etc/rc.d/imspector*");
-			exec("rm -f {$configfile}");
+
+			if(file_exists("/usr/local/etc/rc.d/imspector.sh")) {
+				if(!imspector_config("enable"))
+					imspector_notice("Stopping service, imspector disabled");
+				else
+					imspector_notice("Stopping service, no interfaces and/or protocols selected");
+					
+				stop_service("imspector");
+
+				conf_mount_rw();
+				unlink("/usr/local/etc/rc.d/imspector.sh");
+				unlink($configfile);
+				conf_mount_ro();
+			}			
 		}	
 
-		config_unlock();
-		conf_mount_ro();		
+		config_unlock();		
 	}
 ?>
