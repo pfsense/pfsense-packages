@@ -94,13 +94,9 @@ function squid_install_command() {
 	$rc['file'] = 'squid.sh';
 	$rc['start'] = '/usr/local/sbin/squid -D';
 	$rc['stop'] = <<<EOD
-ps awux | grep proxy_monitor.sh | grep -v grep | awk '{ print \$2 }' | xargs kill
-/usr/local/sbin/squid -k shutdown &
-sleep 15
+/usr/local/sbin/squid -k shutdown
 # Just to be sure...
-killall squid 2>/dev/null
-sleep 1
-killall squid 2>/dev/null
+sleep 5
 killall -9 squid 2>/dev/null
 killall pinger 2>/dev/null
 
@@ -166,9 +162,20 @@ function squid_before_form_general($pkg) {
 }
 
 function squid_validate_general($post, $input_errors) {
+	global $config;
 	$icp_port = trim($post['icp_port']);
 	if (!empty($icp_port) && !is_port($icp_port))
 		$input_errors[] = 'You must enter a valid port number in the \'ICP port\' field';
+	if (($post['transparent_proxy'] == 'on')) {
+		$port = 80;
+	} else {
+		$port = trim($post['proxy_port']);
+	}
+	$webgui_port = $config['system']['webgui']['port'];
+
+	if ($port == $webgui_port) {
+		$input_errors[] = "You can not run squid on the same port as the webgui";
+	}
 }
 
 function squid_validate_upstream($post, $input_errors) {
@@ -208,11 +215,14 @@ function squid_validate_cache($post, $input_errors) {
 	if (!is_numeric($value) || ($value < 0))
 		$input_errors[] = 'You must enter a valid value for \'Minimum object size\'';
 
-	foreach (explode(',', $post['donotcache']) as $host) {
-		$host = trim($host);
-		if (!is_ipaddr($host) && !is_domain($host))
-			$input_errors[] = "$host is not a valid IP or host name";
+	if ($post['donotcache'] != "") {
+		foreach (explode(',', $post['donotcache']) as $host) {
+			$host = trim($host);
+			if (!is_ipaddr($host) && !is_domain($host))
+				$input_errors[] = "The host '$host' is not a valid IP or host name";
+		}
 	}
+
 }
 
 function squid_validate_nac($post, $input_errors) {
@@ -220,14 +230,14 @@ function squid_validate_nac($post, $input_errors) {
 	foreach ($allowed_subnets as $subnet) {
 		$subnet = trim($subnet);
 		if (!empty($subnet) && !is_subnet($subnet))
-			$input_errors[] = "'$subnet' is not a valid CIDR range";
+			$input_errors[] = "The subnet '$subnet' is not a valid CIDR range";
 	}
 
 	foreach (array(	'unrestricted_hosts', 'banned_hosts') as $hosts) {
 		foreach (explode(',', $post[$hosts]) as $host) {
 			$host = trim($host);
 			if (!empty($host) && !is_ipaddr($host))
-				$input_errors[] = "'$host' is not a valid IP address";
+				$input_errors[] = "The host '$host' is not a valid IP address";
 		}
 	}
 
@@ -235,14 +245,14 @@ function squid_validate_nac($post, $input_errors) {
 		foreach (explode(',', $post[$macs]) as $mac) {
 			$mac = trim($mac);
 			if (!empty($mac) && !is_macaddr($mac))
-				$input_errors[] = "'$mac' is not a valid MAC address";
+				$input_errors[] = "The mac '$mac' is not a valid MAC address";
 		}
 	}
 
 	foreach (explode(',', $post['timelist']) as $time) {
 		$time = trim($time);
 		if (!empty($time) && !squid_is_timerange($time))
-			$input_errors[] = "'$time' is not a valid time range";
+			$input_errors[] = "The time range '$time' is not a valid time range";
 	}
 }
 
@@ -297,7 +307,7 @@ function squid_validate_auth($post, $input_errors) {
 			case 'msnt':
 				foreach (explode(trim($post['msnt_secondary'])) as $server) {
 					if (!empty($server) && !is_ipaddr($server) && !is_domain($server))
-						$input_errors[] = "'$server' isn't a valid IP address or domain name";
+						$input_errors[] = "The host '$server' is not a valid IP address or domain name";
 				}
 				break;
 		}
@@ -306,7 +316,7 @@ function squid_validate_auth($post, $input_errors) {
 		foreach ($no_auth as $host) {
 			$host = trim($host);
 			if (!empty($host) && !is_subnet($host))
-				$input_errors[] = "'$host' isn't a valid CIDR range";
+				$input_errors[] = "The host '$host' is not a valid CIDR range";
 		}
 	}
 }
@@ -317,23 +327,18 @@ function squid_resync_general() {
 	$settings = $config['installedpackages']['squid']['config'][0];
 	$conf = '';
 
-	if ($settings['transparent_proxy'] == 'on') {
-		$conf .= <<<EOD
-httpd_accel_host virtual
-httpd_accel_port 80
-httpd_accel_with_proxy on
-httpd_accel_uses_host_header on
-
-EOD;
-	}
-
 	$port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
 	$ifaces = ($settings['active_interface'] ? $settings['active_interface'] : 'lan');
 	$real_ifaces = array();
 	foreach (explode(',', $ifaces) as $i => $iface) {
 		$real_ifaces[] = squid_get_real_interface_address($iface);
 		if($real_ifaces[$i][0])
-			$conf .= "http_port {$real_ifaces[$i][0]}:$port\n";
+			$conf .= "http_port {$real_ifaces[$i][0]}";
+                        if (($settings['transparent_proxy'] == 'on')) {
+                           $conf .= ":80 transparent\n";
+                        } else {
+			$conf .= ":$port\n";
+		}
 	}
 
 	$icp_port = ($settings['icp_port'] ? $settings['icp_port'] : 0);
@@ -360,6 +365,7 @@ cache_mgr $email
 cache_access_log $logdir_access
 cache_log $logdir_cache
 cache_store_log none
+shutdown_lifetime 3 seconds
 
 EOD;
 
@@ -372,6 +378,14 @@ EOD;
 		}
 		$conf .= "acl localnet src $src\n";
 		$valid_acls[] = 'localnet';
+		$conf .= <<<EOD
+acl get method GET
+http_access allow get
+acl post method POST
+http_access allow post
+
+EOD;
+
 	}
 
 	/* kill any running proxy alarm scripts */
@@ -528,7 +542,7 @@ function squid_resync_traffic() {
 delay_pools 1
 delay_class 1 2
 delay_parameters 1 $overall/$threshold $perhost/$threshold
-delay_initial_bucket_level 100%
+delay_initial_bucket_level 100
 
 EOD;
 
@@ -598,12 +612,13 @@ function squid_resync_auth() {
 
 	// Allow the remaining ACLs if no authentication is set
 	if ($auth_method == 'none') {
-		$allowed = array('localnet', 'allowed_subnets');
-		$allowed = array_filter($allowed, 'squid_is_valid_acl');
-		foreach ($allowed as $acl)
-			$conf .= "http_access allow $acl\n";
+		if ($settings['allow_interface'] == 'on') {
+			$allowed = array('localnet', 'allowed_subnets');
+			$allowed = array_filter($allowed, 'squid_is_valid_acl');
+			foreach ($allowed as $acl)
+				$conf .= "http_access allow $acl\n";
+		}
 	}
-
 	else {
 		$noauth = implode(' ', array_map('trim', explode(',', $settings['no_auth_hosts'])));
 		if (!empty($noauth)) {
@@ -682,6 +697,7 @@ function squid_resync_users() {
 }
 
 function squid_resync() {
+	global $config;
 	$conf = squid_resync_general() . "\n";
 	$conf .= squid_resync_cache() . "\n";
 	$conf .= squid_resync_redirector() . "\n";
@@ -696,20 +712,40 @@ function squid_resync() {
 
 	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
 
-	if(!is_dir("/var/squid/cache/01/01")) {
-		log_error("/var/squid/cache does not exist.  Creating.");
-		exec("/usr/local/sbin/squid -z");
+	$disk_cache_location = $config['installedpackages']['squidcache']['config'][0]['harddisk_cache_location'].'/';
+	$log_dir = $config['installedpackages']['squid']['config'][0]['log_dir'].'/';
+
+	if(!is_dir($log_dir)) {
+		make_dirs($log_dir);
+		squid_chown_recursive($log_dir, 'proxy', 'proxy');
 	}
 
-	restart_service('squid');
-
-	sleep(1);
+	if(!is_dir($disk_cache_location)) {
+		make_dirs($disk_cache_location);
+		squid_chown_recursive($disk_cache_location, 'proxy', 'proxy');	
+	}
+	if(!is_dir($disk_cache_location.'01/')) {
+		log_error($disk_cache_location." does not exist.  Creating.");
+		exec("/usr/local/sbin/squid -z");
+	}
 
 	/* kill any running proxy alarm scripts */
 	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
 	/* restart proxy alarm scripts */
 	mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 
+	sleep(1);
+
+	restart_service('squid');
+	/*
+	mwexec("/usr/local/sbin/squid -k shutdown");
+	sleep (5);
+	mwexec("killall -9 squid");
+	sleep(1);
+	mwexec_bg("/usr/local/sbin/squid -D");
+	*/
+
+	sleep(1);
 	filter_configure();
 }
 
@@ -828,7 +864,7 @@ function squid_generate_rules($type) {
 	global $config;
 
 	$squid_conf = $config['installedpackages']['squid']['config'][0];
-	if (!is_service_running('squid') || ($squid_conf['transparent_proxy'] != 'on')) {
+	if (!is_service_running('squid')) {
 		log_error("SQUID is installed but not started.  Not installing redirect rules.");
 		return;
 	}
@@ -837,6 +873,11 @@ function squid_generate_rules($type) {
 		$port = $squid_conf['proxy_port'];
 	else
 		$port = "3128";
+
+	if (($squid_conf['transparent_proxy'] != 'on') || ($squid_conf['allow_interface'] != 'on')) {
+		return;
+	}
+
 	$ifaces = explode(',', $squid_conf['active_interface']);
 	$ifaces = array_map('convert_friendly_interface_to_real_interface_name', $ifaces);
 
