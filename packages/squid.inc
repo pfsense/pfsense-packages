@@ -37,8 +37,6 @@ require_once('filter.inc');
 require_once('service-utils.inc');
 
 define('SQUID_CONFBASE', '/usr/local/etc/squid');
-define('SQUID_LOGDIR', '/var/squid/log');
-define('SQUID_CACHEDIR', '/var/squid/cache');
 define('SQUID_ACLDIR', '/var/squid/acl');
 define('SQUID_PASSWD', '/var/etc/squid.passwd');
 
@@ -112,8 +110,6 @@ EOD;
 	write_rcfile($rc);
 
 	foreach (array(	SQUID_CONFBASE,
-			SQUID_LOGDIR,
-			SQUID_CACHEDIR,
 			SQUID_ACLDIR,
 	) as $dir) {
 			make_dirs($dir);
@@ -134,7 +130,11 @@ EOD;
 }
 
 function squid_deinstall_command() {
-	mwexec('rm -rf ' . CACHEDIR);
+	global $config;
+	$settings = $config['installedpackages']['squidcache']['config'][0];
+	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
+
+	mwexec('rm -rf $cachedir');
 	mwexec('rm -f /usr/local/etc/rc.d/proxy_monitor.sh');
 	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
 	mwexec("ps awux | grep \"squid\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
@@ -365,8 +365,10 @@ function squid_resync_general() {
 	$hostname = ($settings['visible_hostname'] ? $settings['visible_hostname'] : 'localhost');
 	$email = ($settings['admin_email'] ? $settings['admin_email'] : 'admin@localhost');
 
-	$logdir_cache = SQUID_LOGDIR . '/cache.log';
-	$logdir_access = ($settings['log_enabled'] == 'on' ? SQUID_LOGDIR . '/access.log' : '/dev/null');
+	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
+	
+	$logdir_cache = $logdir . '/cache.log';
+	$logdir_access = ($settings['log_enabled'] == 'on' ? $logdir . '/access.log' : '/dev/null');
 
 	$conf .= <<<EOD
 icp_port $icp_port
@@ -412,7 +414,7 @@ function squid_resync_cache() {
 
 	$settings = $config['installedpackages']['squidcache']['config'][0];
 
-	$cachedir = SQUID_CACHEDIR;
+	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 	$disk_cache_size = ($settings['harddisk_cache_size'] ? $settings['harddisk_cache_size'] : 100);
 	$level1 = ($settings['level1_subdirs'] ? $settings['level1_subdirs'] : 16);
 	$memory_cache_size = ($settings['memory_cache_size'] ? $settings['memory_cache_size'] : 8);
