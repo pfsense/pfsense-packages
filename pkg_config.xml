@@ -496,6 +496,21 @@
       <configurationfile>mtr-nox11.xml</configurationfile>
     </package>
     <package>
+      <name>squid</name>
+      <descr>High performance web proxy cache.</descr>
+      <website>http://www.squid-cache.org/</website>
+      <category>Network</category>
+      <version>2.6</version>
+      <status>BETA</status>
+      <required_version>2.0</required_version>
+      <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl</maintainer>
+      <depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
+      <depends_on_package>squid-2.6.5.tbz</depends_on_package>
+      <depends_on_package>squid_radius_auth-1.0.8.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/squid.xml</config_file>
+      <configurationfile>squid.xml</configurationfile>
+    </package>
+    <package>
       <name>arpwatch</name>
       <descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
       <website>http://www-nrg.ee.lbl.gov/</website>
@@ -577,7 +592,7 @@
       <category>Network Management</category>
       <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
       <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
-      <version>2.0_1</version>
+      <version>1.2.0_1</version>
       <status>ALPHA</status>
       <required_version>1.0</required_version>
       <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
@@ -698,20 +713,5 @@
       <required_version>1.0</required_version>
       <maintainer>raj@linuxense.com</maintainer>
       <configurationfile>havp.xml</configurationfile>
-    </package>
-    <package>
-      <name>squid</name>
-      <descr>High performance web proxy cache.</descr>
-      <website>http://www.squid-cache.org/</website>
-      <category>Network</category>
-      <version>2.6</version>
-      <status>BETA</status>
-      <required_version>1.0</required_version>
-      <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl</maintainer>
-      <depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
-      <depends_on_package>squid-2.6.5.tbz</depends_on_package>
-      <depends_on_package>squid_radius_auth-1.0.8.tbz</depends_on_package>
-      <config_file>http://www.pfsense.org/packages/config/squid.xml</config_file>
-      <configurationfile>squid.xml</configurationfile>
     </package>
 </pfsensepkgs>
