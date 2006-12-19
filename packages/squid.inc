@@ -121,8 +121,11 @@ EOD;
 	}
 
 	/* kill any running proxy alarm scripts */
+	log_error("Stopping any running proxy monitors");
 	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
+	sleep(1);
 	/* restart proxy alarm scripts */
+	log_error("Starting a proxy monitor script");
 	mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 
 	if (!file_exists(SQUID_CONFBASE . '/mime.conf') && file_exists(SQUID_CONFBASE . '/mime.conf.default'))
@@ -388,10 +391,14 @@ EOD;
 
 	}
 
+	log_error("Reloading squid configuration");
+	mwexec("/usr/local/sbin/squid -k reconfigure");
 	/* kill any running proxy alarm scripts */
-	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
+	// log_error("Stopping proxy monitor script");
+	// mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
 	/* restart proxy alarm scripts */
-	mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
+	// log_error("Starting proxy monitor script");
+	// mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 
 	return $conf;
 }
@@ -729,23 +736,26 @@ function squid_resync() {
 		exec("/usr/local/sbin/squid -z");
 	}
 
+	// log_error("Stopping proxy monitor script");
 	/* kill any running proxy alarm scripts */
-	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
+	// mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
+
+	// restart_service('squid');
+	// log_error("Stopping Squid for configuration sync");
+	// mwexec("/usr/local/sbin/squid -k shutdown");
+	// sleep (5);
+	// mwexec("killall -9 squid");
+
+	log_error("Reloading Squid for configuration sync");
+	mwexec("/usr/local/sbin/squid -k reconfigure");
+
+	// log_error("Starting Squid for configuration sync");
+	// mwexec_bg("/usr/local/sbin/squid -D");
+
+	// log_error("Starting monitor script");
 	/* restart proxy alarm scripts */
-	mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
+	// mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 
-	sleep(1);
-
-	restart_service('squid');
-	/*
-	mwexec("/usr/local/sbin/squid -k shutdown");
-	sleep (5);
-	mwexec("killall -9 squid");
-	sleep(1);
-	mwexec_bg("/usr/local/sbin/squid -D");
-	*/
-
-	sleep(1);
 	filter_configure();
 }
 
@@ -869,11 +879,6 @@ function squid_generate_rules($type) {
 		return;
 	}
 
-	if($squid_conf['proxy_port'])
-		$port = $squid_conf['proxy_port'];
-	else
-		$port = "3128";
-
 	if (($squid_conf['transparent_proxy'] != 'on') || ($squid_conf['allow_interface'] != 'on')) {
 		return;
 	}
@@ -884,11 +889,15 @@ function squid_generate_rules($type) {
 	switch($type) {
 	case 'nat':
 		foreach ($ifaces as $iface)
-			$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> ($iface) port $port\n";
+			$rules .= "# Setup Squid transparent proxy redirect\n";
+			$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> ($iface) port 80\n";
+			$rules .= "\n";
 		break;
 	case 'filter':
 		foreach ($ifaces as $iface)
-			$rules .= "pass quick on $iface proto tcp from any to !($iface) port 80 flags S/SA keep state\n";
+			$rules .= "# Setup squid pass rules for transparent proxy\n";
+			$rules .= "pass in quick on $iface proto tcp from any to !($iface) port 80 flags S/SA keep state\n";
+			$rules .= "\n";
 		break;
 	default:
 		break;
