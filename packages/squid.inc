@@ -740,12 +740,13 @@ function squid_resync() {
 	}
 	if(!is_dir($disk_cache_location.'01/')) {
 		log_error($disk_cache_location." does not exist.  Creating.");
-		exec("/usr/local/sbin/squid -z");
+		mwexec("/usr/local/sbin/squid -z");
 	}
 
 
 	if (!is_service_running('squid')) {
 		log_error("Starting Squid");
+		mwexec("/usr/local/sbin/squid -z");
 		mwexec_bg("/usr/local/sbin/squid -D");
 		mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 	} else {
