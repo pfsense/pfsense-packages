@@ -502,7 +502,7 @@
       <category>Network</category>
       <version>2.6</version>
       <status>BETA</status>
-      <required_version>2.0</required_version>
+      <required_version>1.0</required_version>
       <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl</maintainer>
       <depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
       <depends_on_package>squid-2.6.5.tbz</depends_on_package>
