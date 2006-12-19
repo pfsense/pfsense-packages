@@ -113,6 +113,14 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fieldname>log_dir</fieldname>
+			<fielddescr>Log store directory</fielddescr>
+			<description>The directory where the log will be stored (note: do not end with a / mark)</description>
+			<type>input</type>
+			<size>60</size>
+			<default_value>/var/squid/log</default_value>
+		</field>
+		<field>
 			<fieldname>proxy_port</fieldname>
 			<fielddescr>Proxy port</fielddescr>
 			<description>This is the port the proxy server will listen on.</description>

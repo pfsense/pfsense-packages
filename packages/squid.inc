@@ -183,7 +183,11 @@ function squid_validate_general($post, $input_errors) {
 	} else {
 		$port = trim($post['proxy_port']);
 	}
+
 	$webgui_port = $config['system']['webgui']['port'];
+	if($config['system']['webgui']['port'] == "") {
+		$webgui_port = 80;
+	}
 
 	if ($port == $webgui_port) {
 		$input_errors[] = "You can not run squid on the same port as the webgui";
@@ -738,8 +742,14 @@ function squid_resync() {
 	}
 
 
-	log_error("Reloading Squid for configuration sync");
-	mwexec("/usr/local/sbin/squid -k reconfigure");
+	if (!is_service_running('squid')) {
+		log_error("Starting Squid");
+		mwexec_bg("/usr/local/sbin/squid -D");
+		mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
+	} else {
+		log_error("Reloading Squid for configuration sync");
+		mwexec("/usr/local/sbin/squid -k reconfigure");
+	}
 
 	filter_configure();
 }
