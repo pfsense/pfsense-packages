@@ -169,6 +169,15 @@ function squid_validate_general($post, $input_errors) {
 	$icp_port = trim($post['icp_port']);
 	if (!empty($icp_port) && !is_port($icp_port))
 		$input_errors[] = 'You must enter a valid port number in the \'ICP port\' field';
+
+	if (substr($post['log_dir'], -1, 1) == '/')
+		$input_errors[] = 'You may not end log location with an / mark';
+
+	if ($post['log_dir']{0} != '/')
+		$input_errors[] = 'You must start log location with a / mark';
+	if (strlen($post['log_dir']) <= 3)
+		$input_errors[] = "That is not a valid log location dir";
+
 	if (($post['transparent_proxy'] == 'on')) {
 		$port = 80;
 	} else {
@@ -391,15 +400,6 @@ EOD;
 
 	}
 
-	log_error("Reloading squid configuration");
-	mwexec("/usr/local/sbin/squid -k reconfigure");
-	/* kill any running proxy alarm scripts */
-	// log_error("Stopping proxy monitor script");
-	// mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
-	/* restart proxy alarm scripts */
-	// log_error("Starting proxy monitor script");
-	// mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
-
 	return $conf;
 }
 
@@ -469,12 +469,13 @@ function squid_resync_nac() {
 	global $config, $valid_acls;
 
 	$settings = $config['installedpackages']['squidnac']['config'][0];
+	$webgui_port = $config['system']['webgui']['port'];
 
 	$conf = <<<EOD
 acl all src 0.0.0.0/0
 acl localhost src 127.0.0.1
-acl safeports port 21 70 80 210 280 443 488 563 591 631 777 901 1025-65535
-acl sslports port 443 563
+acl safeports port 21 70 80 210 280 443 488 563 591 631 777 901 $webgui_port 1025-65535
+acl sslports port 443 563 $webgui_port
 acl manager proto cache_object
 acl purge method PURGE
 acl connect method CONNECT
@@ -548,7 +549,7 @@ function squid_resync_traffic() {
 	$conf .= <<<EOD
 delay_pools 1
 delay_class 1 2
-delay_parameters 1 $overall/$threshold $perhost/$threshold
+delay_parameters 1 $overall/$overall $perhost/$perhost
 delay_initial_bucket_level 100
 
 EOD;
@@ -736,25 +737,9 @@ function squid_resync() {
 		exec("/usr/local/sbin/squid -z");
 	}
 
-	// log_error("Stopping proxy monitor script");
-	/* kill any running proxy alarm scripts */
-	// mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
-
-	// restart_service('squid');
-	// log_error("Stopping Squid for configuration sync");
-	// mwexec("/usr/local/sbin/squid -k shutdown");
-	// sleep (5);
-	// mwexec("killall -9 squid");
 
 	log_error("Reloading Squid for configuration sync");
 	mwexec("/usr/local/sbin/squid -k reconfigure");
-
-	// log_error("Starting Squid for configuration sync");
-	// mwexec_bg("/usr/local/sbin/squid -D");
-
-	// log_error("Starting monitor script");
-	/* restart proxy alarm scripts */
-	// mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 
 	filter_configure();
 }
