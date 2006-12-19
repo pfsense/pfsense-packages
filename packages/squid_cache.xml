@@ -43,15 +43,15 @@
 			<default_value>100</default_value>
 			<type>input</type>
 		</field>
-                <field>
-                        <fielddescr>Hard disk cache location</fielddescr>
-                        <fieldname>harddisk_cache_location</fieldname>
-                        <description>This is the directory where the cache will be stored. (note: do not end with a /).  If you change this location, squid needs to make a new cache, this could take a while</description>
-                        <required/>
-                        <default_value>/var/squid/cache</default_value>
+		<field>
+			<fielddescr>Hard disk cache location</fielddescr>
+			<fieldname>harddisk_cache_location</fieldname>
+			<description>This is the directory where the cache will be stored. (note: do not end with a /).  If you change this location, squid needs to make a new cache, this could take a while</description>
+			<required/>
+			<default_value>/var/squid/cache</default_value>
 			<size>60</size>
-                        <type>input</type>
-                </field>
+			<type>input</type>
+		</field>
 		<field>
 			<fielddescr>Memory cache size</fielddescr>
 			<fieldname>memory_cache_size</fieldname>
