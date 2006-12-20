@@ -76,13 +76,13 @@ function squid_dash_z() {
 	$settings = $config['installedpackages']['squidcache']['config'][0];
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 
-	if(!is_dir($cachedir)) {
+	if(!is_dir($cachedir.'/')) {
 		log_error("Creating Squid cache dir $cachedir");
 		make_dirs($cachedir);
 		squid_chown_recursive($cachedir, 'proxy', 'proxy');	
 	}
 
-	if(!is_dir($cachedir.'/00')) {
+	if(!is_dir($cachedir.'/00/')) {
 		log_error("Creating squid cache subdirs in $cachedir");
 		mwexec("/usr/local/sbin/squid -z");
 	}
@@ -753,7 +753,6 @@ function squid_resync() {
 	if (!is_service_running('squid')) {
 		log_error("Starting Squid");
 		mwexec_bg("/usr/local/sbin/squid -D");
-		mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 	} else {
 		log_error("Reloading Squid for configuration sync");
 		mwexec("/usr/local/sbin/squid -k reconfigure");
