@@ -157,7 +157,6 @@ EOD;
 	}
 	
 	filter_configure();
-
 }
 
 function squid_deinstall_command() {
@@ -271,6 +270,8 @@ function squid_validate_cache($post, $input_errors) {
 				$input_errors[] = "The host '$host' is not a valid IP or host name";
 		}
 	}
+
+	squid_dash_z();
 
 }
 
