@@ -97,6 +97,8 @@ function squid_is_valid_acl($acl) {
 }
 
 function squid_install_command() {
+	global $config;
+
 	/* create cache */
 	squid_dash_z();
 	/* make sure pinger is executable */
@@ -141,14 +143,28 @@ EOD;
 	if (!file_exists(SQUID_CONFBASE . '/mime.conf') && file_exists(SQUID_CONFBASE . '/mime.conf.default'))
 		copy(SQUID_CONFBASE . '/mime.conf.default', SQUID_CONFBASE . '/mime.conf');
 
+	squid_dash_z();
+
+	if (!is_service_running('squid')) {
+		log_error("Starting Squid");
+		mwexec_bg("/usr/local/sbin/squid -D");
+	} else {
+		log_error("Reloading Squid for configuration sync");
+		mwexec("/usr/local/sbin/squid -k reconfigure");
+	}
+	
+	filter_configure();
+
 }
 
 function squid_deinstall_command() {
 	global $config;
 	$settings = $config['installedpackages']['squidcache']['config'][0];
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
+	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
 
 	mwexec('rm -rf $cachedir');
+	mwexec('rm -rf $logdir');
 	mwexec('rm -f /usr/local/etc/rc.d/proxy_monitor.sh');
 	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
 	mwexec("ps awux | grep \"squid\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
