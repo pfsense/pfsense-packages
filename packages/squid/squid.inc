@@ -84,6 +84,9 @@ function squid_dash_z() {
 
 	if(!is_dir($cachedir.'/00/')) {
 		log_error("Creating squid cache subdirs in $cachedir");
+		mwexec("/usr/local/sbin/squid -k shutdown");
+		sleep(5);
+		mwexec("/usr/local/sbin/squid -k kill");
 		mwexec("/usr/local/sbin/squid -z");
 	}
 
