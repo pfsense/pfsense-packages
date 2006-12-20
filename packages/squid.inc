@@ -53,24 +53,6 @@ function squid_get_real_interface_address($iface) {
 	return array($ip, long2ip(hexdec($netmask)));
 }
 
-/* setup cache */
-function squid_dash_z() {
-	global $config;
-	$settings = $config['installedpackages']['squidcache']['config'][0];
-	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
-
-	if(!is_dir($cachedir)) {
-		make_dirs($cachedir);
-		squid_chown_recursive($cachedir, 'proxy', 'proxy');	
-	}
-
-	if(!is_dir($cachedir.'01/')) {
-		log_error("Creating squid cache dir in $cachedir");
-		mwexec("/usr/local/sbin/squid -z");
-	}
-
-}
-
 function squid_chown_recursive($dir, $user, $group) {
 	chown($dir, $user);
 	chgrp($dir, $group);
@@ -86,6 +68,25 @@ function squid_chown_recursive($dir, $user, $group) {
 			}
 		}
 	}
+}
+
+/* setup cache */
+function squid_dash_z() {
+	global $config;
+	$settings = $config['installedpackages']['squidcache']['config'][0];
+	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
+
+	if(!is_dir($cachedir)) {
+		log_error("Creating Squid cache dir $cachedir");
+		make_dirs($cachedir);
+		squid_chown_recursive($cachedir, 'proxy', 'proxy');	
+	}
+
+	if(!is_dir($cachedir.'/00')) {
+		log_error("Creating squid cache subdirs in $cachedir");
+		mwexec("/usr/local/sbin/squid -z");
+	}
+
 }
 
 function squid_is_valid_acl($acl) {
@@ -739,10 +740,10 @@ function squid_resync() {
 
 	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
 
-	$disk_cache_location = $config['installedpackages']['squidcache']['config'][0]['harddisk_cache_location'].'/';
 	$log_dir = $config['installedpackages']['squid']['config'][0]['log_dir'].'/';
 
 	if(!is_dir($log_dir)) {
+		log_error("Creating squid log dir $log_dir");
 		make_dirs($log_dir);
 		squid_chown_recursive($log_dir, 'proxy', 'proxy');
 	}
