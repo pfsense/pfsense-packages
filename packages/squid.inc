@@ -55,7 +55,20 @@ function squid_get_real_interface_address($iface) {
 
 /* setup cache */
 function squid_dash_z() {
-	mwexec("/usr/local/sbin/squid -z");
+	global $config;
+	$settings = $config['installedpackages']['squidcache']['config'][0];
+	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
+
+	if(!is_dir($cachedir)) {
+		make_dirs($cachedir);
+		squid_chown_recursive($cachedir, 'proxy', 'proxy');	
+	}
+
+	if(!is_dir($cachedir.'01/')) {
+		log_error("Creating squid cache dir in $cachedir");
+		mwexec("/usr/local/sbin/squid -z");
+	}
+
 }
 
 function squid_chown_recursive($dir, $user, $group) {
@@ -84,7 +97,7 @@ function squid_is_valid_acl($acl) {
 
 function squid_install_command() {
 	/* create cache */
-	mwexec("/usr/local/sbin/squid -z");
+	squid_dash_z();
 	/* make sure pinger is executable */
 	exec("/bin/chmod a+x /usr/local/libexec/squid/pinger");
 	exec("/bin/rm /usr/local/etc/rc.d/squid");
@@ -734,19 +747,10 @@ function squid_resync() {
 		squid_chown_recursive($log_dir, 'proxy', 'proxy');
 	}
 
-	if(!is_dir($disk_cache_location)) {
-		make_dirs($disk_cache_location);
-		squid_chown_recursive($disk_cache_location, 'proxy', 'proxy');	
-	}
-	if(!is_dir($disk_cache_location.'01/')) {
-		log_error($disk_cache_location." does not exist.  Creating.");
-		mwexec("/usr/local/sbin/squid -z");
-	}
-
+	squid_dash_z();
 
 	if (!is_service_running('squid')) {
 		log_error("Starting Squid");
-		mwexec("/usr/local/sbin/squid -z");
 		mwexec_bg("/usr/local/sbin/squid -D");
 		mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 	} else {
