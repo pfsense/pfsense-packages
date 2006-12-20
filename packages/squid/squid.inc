@@ -620,7 +620,7 @@ EOD;
 			$contents .= "\.$ext\$\n";
 		file_put_contents(SQUID_ACLDIR . '/throttle_exts.acl', $contents);
 
-		$conf .= 'acl throttle_exts url_regex -i "' . SQUID_ACLDIR . '/throttle_exts.acl\n"';
+		$conf .= "acl throttle_exts url_regex -i \"" . SQUID_ACLDIR . "/throttle_exts.acl\"\n";
 		$conf .= "delay_access 1 allow throttle_exts\n";
 		$conf .= "delay_access 1 deny all\n";
 	}
