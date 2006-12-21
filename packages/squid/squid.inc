@@ -217,7 +217,7 @@ function squid_validate_general($post, $input_errors) {
 	}
 
 	$webgui_port = $config['system']['webgui']['port'];
-	if($config['system']['webgui']['port'] == "") {
+	if(($config['system']['webgui']['port'] == "") && ($config['system']['webgui']['protocol'] == "http")) {
 		$webgui_port = 80;
 	}
 
