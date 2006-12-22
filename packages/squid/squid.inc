@@ -210,18 +210,12 @@ function squid_validate_general($post, $input_errors) {
 	if (strlen($post['log_dir']) <= 3)
 		$input_errors[] = "That is not a valid log location dir";
 
-	if (($post['transparent_proxy'] == 'on')) {
-		$port = 80;
-	} else {
-		$port = trim($post['proxy_port']);
-	}
-
 	$webgui_port = $config['system']['webgui']['port'];
 	if(($config['system']['webgui']['port'] == "") && ($config['system']['webgui']['protocol'] == "http")) {
 		$webgui_port = 80;
 	}
 
-	if ($port == $webgui_port) {
+	if (($post['transparent_proxy'] != 'on') && ($port == $webgui_port)) {
 		$input_errors[] = "You can not run squid on the same port as the webgui";
 	}
 }
@@ -382,12 +376,12 @@ function squid_resync_general() {
 	$real_ifaces = array();
 	foreach (explode(',', $ifaces) as $i => $iface) {
 		$real_ifaces[] = squid_get_real_interface_address($iface);
-		if($real_ifaces[$i][0])
-			$conf .= "http_port {$real_ifaces[$i][0]}";
+		if($real_ifaces[$i][0]) {
                         if (($settings['transparent_proxy'] == 'on')) {
-                           $conf .= ":80 transparent\n";
+				$conf .= "http_port 127.0.0.1:80 transparent\n";
                         } else {
-			$conf .= ":$port\n";
+				$conf .= "http_port {$real_ifaces[$i][0]}:$port\n";
+			}
 		}
 	}
 
@@ -912,7 +906,7 @@ function squid_generate_rules($type) {
 	case 'nat':
 		foreach ($ifaces as $iface)
 			$rules .= "# Setup Squid transparent proxy redirect\n";
-			$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> ($iface) port 80\n";
+			$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> 127.0.0.1 port 80\n";
 			$rules .= "\n";
 		break;
 	case 'filter':
