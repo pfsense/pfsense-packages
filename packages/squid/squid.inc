@@ -79,7 +79,7 @@ function squid_dash_z() {
 	if(!is_dir($cachedir.'/')) {
 		log_error("Creating Squid cache dir $cachedir");
 		make_dirs($cachedir);
-		squid_chown_recursive($cachedir, 'proxy', 'proxy');	
+		squid_chown_recursive($cachedir, 'proxy', 'proxy');
 	}
 
 	if(!is_dir($cachedir.'/00/')) {
@@ -155,7 +155,7 @@ EOD;
 		log_error("Reloading Squid for configuration sync");
 		mwexec("/usr/local/sbin/squid -k reconfigure");
 	}
-	
+
 	filter_configure();
 }
 
@@ -349,7 +349,7 @@ function squid_validate_auth($post, $input_errors) {
 					$input_errors[] = 'The field \'RADIUS secret\' is required';
 				break;
 			case 'msnt':
-				foreach (explode(trim($post['msnt_secondary'])) as $server) {
+				foreach (explode(',', trim($post['msnt_secondary'])) as $server) {
 					if (!empty($server) && !is_ipaddr($server) && !is_domain($server))
 						$input_errors[] = "The host '$server' is not a valid IP address or domain name";
 				}
@@ -394,7 +394,7 @@ function squid_resync_general() {
 	$email = ($settings['admin_email'] ? $settings['admin_email'] : 'admin@localhost');
 
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
-	
+
 	$logdir_cache = $logdir . '/cache.log';
 	$logdir_access = ($settings['log_enabled'] == 'on' ? $logdir . '/access.log' : '/dev/null');
 
