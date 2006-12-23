@@ -138,6 +138,7 @@ function sync_package_spamd() {
 	mwexec("ln -s /etc/spamd.conf /usr/local/etc/spamd.conf");
 	mwexec("/usr/local/etc/rc.d/spamd.sh stop");
 	mwexec("/usr/local/etc/rc.d/spamd.sh start");
+
 }
 
 function remove_spaces($string) {
@@ -194,10 +195,12 @@ function custom_php_install_command() {
 function custom_php_deinstall_command() {
 	global $config, $g;
 	conf_mount_rw();
+	exec("killall -9 spamd");
 	unlink_if_exists("/usr/local/pkg/pf/spamd_rules.php");
 	unlink_if_exists("/usr/local/www/spamd_rules.php");
 	unlink_if_exists("/usr/local/etc/rc.d/spamd.sh");
 	conf_mount_ro();
+	filter_configure();
 }
 
 ?>
