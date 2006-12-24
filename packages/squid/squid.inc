@@ -249,7 +249,7 @@ function squid_validate_cache($post, $input_errors) {
 	);
 	foreach ($num_fields as $field => $name) {
 		$value = trim($post[$field]);
-		if (!is_numeric($value) || ($value < 1))
+		if (!is_numeric($value) || ($value < 0))
 			$input_errors[] = "You must enter a valid value for '$field'";
 	}
 
