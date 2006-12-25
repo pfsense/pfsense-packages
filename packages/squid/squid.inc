@@ -379,9 +379,8 @@ function squid_resync_general() {
 		if($real_ifaces[$i][0]) {
                         if (($settings['transparent_proxy'] == 'on')) {
 				$conf .= "http_port 127.0.0.1:80 transparent\n";
-                        } else {
-				$conf .= "http_port {$real_ifaces[$i][0]}:$port\n";
-			}
+                        }
+			$conf .= "http_port {$real_ifaces[$i][0]}:$port\n";
 		}
 	}
 
@@ -905,14 +904,15 @@ function squid_generate_rules($type) {
 	switch($type) {
 	case 'nat':
 		foreach ($ifaces as $iface)
-			$rules .= "# Setup Squid transparent proxy redirect\n";
+			$rules .= "# Setup Squid proxy redirect\n";
 			$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> 127.0.0.1 port 80\n";
 			$rules .= "\n";
 		break;
 	case 'filter':
 		foreach ($ifaces as $iface)
-			$rules .= "# Setup squid pass rules for transparent proxy\n";
+			$rules .= "# Setup squid pass rules for proxy\n";
 			$rules .= "pass in quick on $iface proto tcp from any to !($iface) port 80 flags S/SA keep state\n";
+			$rules .= "pass in quick on $iface proto tcp from any to !($iface) port $port flags S/SA keep state\n";
 			$rules .= "\n";
 		break;
 	default:
