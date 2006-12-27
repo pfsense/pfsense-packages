@@ -900,6 +900,7 @@ function squid_generate_rules($type) {
 
 	$ifaces = explode(',', $squid_conf['active_interface']);
 	$ifaces = array_map('convert_friendly_interface_to_real_interface_name', $ifaces);
+	$port = ($squid_conf['proxy_port'] ? $squid_conf['proxy_port'] : 3128);
 
 	switch($type) {
 	case 'nat':
