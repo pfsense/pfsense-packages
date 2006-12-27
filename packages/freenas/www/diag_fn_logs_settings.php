@@ -178,7 +178,7 @@ $pfSenseHead->addScript($jscriptstr);
 echo $pfSenseHead->getHTML();
 
 ?>
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC" onload="<?= $jsevents["body"]["onload"] ?>">
 <?php include("fbegin.inc"); ?>
 <form action="diag_fn_logs_settings.php" method="post" name="iform" id="iform">
 <div id="inputerrors"></div>
