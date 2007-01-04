@@ -231,14 +231,14 @@ echo $pfSenseHead->getHTML();
           <tr>
             <td width="22%" valign="top" class="vncellreq"><?= gettext("TCP port"); ?></td>
             <td width="78%" class="vtable">
-              <input name="port" type="text" class="formfld" id="port" size="20" value="<?=htmlspecialchars($pconfig['port']);?>" /> 
+              <input name="port" type="text" class="formfld unknown" id="port" size="20" value="<?=htmlspecialchars($pconfig['port']);?>" /> 
               <br /><?= gettext("Alternate TCP port."); ?>
             </td>
           </tr>
           <tr>
             <td width="22%" valign="top" class="vncellreq"><?= gettext("Maximum connections"); ?></td>
             <td width="78%" class="vtable">
-              <input name="maxcon" type="text" class="formfld" id="maxcon" size="20" value="<?=htmlspecialchars($pconfig['maxcon']);?>" /> 
+              <input name="maxcon" type="text" class="formfld unknown" id="maxcon" size="20" value="<?=htmlspecialchars($pconfig['maxcon']);?>" /> 
               <br /><?= gettext("Maximum number of simultaneous connections. Default is 0 (unlimited)"); ?>
             </td>
           </tr>

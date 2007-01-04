@@ -83,35 +83,35 @@ function gmirror_sort() {
 }
 
 function gconcat_sort() {
-	global $g, $config;
+	global $g, $freenas_cconfig;
 
 	function gconcatcmp($a, $b) {
 		return strcmp($a['name'], $b['name']);
 	}
 
-	usort($config['gconcat']['vdisk'], "gconcatcmp");
+	usort($freenas_cconfig['gconcat']['vdisk'], "gconcatcmp");
 	
 }
 
 function gstripe_sort() {
-	global $g, $config;
+	global $g, $freenas_cconfig;
 
 	function gstripecmp($a, $b) {
 		return strcmp($a['name'], $b['name']);
 	}
 
-	usort($config['gstripe']['vdisk'], "gstripecmp");
+	usort($freenas_cconfig['gstripe']['vdisk'], "gstripecmp");
 	
 }
 
 function graid5_sort() {
-	global $g, $config;
+	global $g, $freenas_cconfig;
 
 	function graid5cmp($a, $b) {
 		return strcmp($a['name'], $b['name']);
 	}
 
-	usort($config['graid5']['vdisk'], "graid5cmp");
+	usort($freenas_cconfig['graid5']['vdisk'], "graid5cmp");
 	
 }
 

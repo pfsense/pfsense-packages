@@ -127,8 +127,8 @@ echo $pfSenseHead->getHTML();
   <tr><td class="tabnavtbl">
 <?php
   $tab_array = array();
-  $tab_array[0] = array(gettext("Manage"), true,  "disks_mount.php");
-  $tab_array[1] = array(gettext("Tools"),  false, "disks_miunt_tools.php");
+  $tab_array[0] = array(gettext("Manage"), false, "disks_mount.php");
+  $tab_array[1] = array(gettext("Tools"),  true,  "disks_mount_tools.php");
   display_top_tabs($tab_array);
 ?>
   </td></tr>

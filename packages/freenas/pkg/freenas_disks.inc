@@ -130,7 +130,7 @@ function disks_mount($mount) {
     case "ntfs":
       if (mwexec("/sbin/mount_ntfs -u ftp -g ftp -m 777 $devname /mnt/$mountname") == 0) {
         $result = 0;
-      else {
+      } else {
         /* Not OK, remove the directory, prevent writing on RAM disk */
         @rmdir ("/mnt/$mountname");
         $result = 1;

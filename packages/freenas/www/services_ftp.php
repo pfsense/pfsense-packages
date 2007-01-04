@@ -196,6 +196,7 @@ function enable_change(enable_change) {
   endis ? color = '#D4D0C8' : color = '#FFFFFF';
   
   document.iform.port.disabled = endis;
+  document.iform.authbackend.disabled = endis;
   document.iform.timeout.disabled = endis;
   document.iform.numberclients.disabled = endis;
   document.iform.maxconperip.disabled = endis;
@@ -209,6 +210,7 @@ function enable_change(enable_change) {
   document.iform.pasv_min_port.disabled = endis;
   /* color adjustments */
   document.iform.port.style.backgroundColor = color;
+  document.iform.authbackend.backgroundColor = color;
   document.iform.timeout.style.backgroundColor = color;
   document.iform.numberclients.style.backgroundColor = color;
   document.iform.maxconperip.style.backgroundColor = color;
