@@ -1,36 +1,44 @@
 <?php
 /* $Id$ */
+/* ========================================================================== */
 /*
-	disks_manage_edit.php
-	part of FreeNAS (http://www.freenas.org)
-	Copyright (C) 2005-2006 Olivier Cochard-Labbé <olivier@freenas.org>.
-	All rights reserved.
-	
-	Based on m0n0wall (http://m0n0.ch/wall)
-	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-	All rights reserved.
-	
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
-	
-	1. Redistributions of source code must retain the above copyright notice,
-	   this list of conditions and the following disclaimer.
-	
-	2. Redistributions in binary form must reproduce the above copyright
-	   notice, this list of conditions and the following disclaimer in the
-	   documentation and/or other materials provided with the distribution.
-	
-	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
-*/
+    disks_mount_edit.php
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2006 Daniel S. Haischt <me@daniel.stefan.haischt.name>
+    All rights reserved.
+
+    Based on FreeNAS (http://www.freenas.org)
+    Copyright (C) 2005-2006 Olivier Cochard-Labbé <olivier@freenas.org>.
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
 
 $pgtitle = array(gettext("System"),
                  gettext("Disks"),
@@ -42,46 +50,61 @@ require_once("guiconfig.inc");
 require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
 
+$id = $_GET['id'];
+if (isset($_POST['id']))
+  $id = $_POST['id'];
+
 if (!is_array($freenas_config['mounts']['mount']))
-	$freenas_config['mounts']['mount'] = array();
+  $freenas_config['mounts']['mount'] = array();
 
 mount_sort();
 
 if (!is_array($freenas_config['disks']['disk']))
-	$freenas_config['disks']['disk'] = array();
-	
+  $freenas_config['disks']['disk'] = array();
+
 disks_sort();
 
-if (!is_array($freenas_config['raid']['vdisk']))
-	$freenas_config['raid']['vdisk'] = array();
+if (!is_array($freenas_config['gvinum']['vdisk']))
+  $freenas_config['gvinum']['vdisk'] = array();
 
 gvinum_sort();
 
 if (!is_array($freenas_config['gmirror']['vdisk']))
-	$freenas_config['gmirror']['vdisk'] = array();
+  $freenas_config['gmirror']['vdisk'] = array();
 
 gmirror_sort();
 
+if (!is_array($freenas_config['gconcat']['vdisk']))
+  $freenas_config['gconcat']['vdisk'] = array();
+
+gconcat_sort();
+
+if (!is_array($freenas_config['gstripe']['vdisk']))
+  $freenas_config['gstripe']['vdisk'] = array();
+
+gstripe_sort();
+
+if (!is_array($freenas_config['graid5']['vdisk']))
+  $freenas_config['graid5']['vdisk'] = array();
+
+graid5_sort();
+
 $a_mount = &$freenas_config['mounts']['mount'];
 
-$a_disk = array_merge($freenas_config['disks']['disk'],$freenas_config['raid']['vdisk'],$freenas_config['gmirror']['vdisk']);
+$a_disk = array_merge($freenas_config['disks']['disk'],$freenas_config['gvinum']['vdisk'],$freenas_config['gmirror']['vdisk'],$freenas_config['gconcat']['vdisk'],$freenas_config['gstripe']['vdisk'],$freenas_config['graid5']['vdisk']);
 
 /* Load the cfdevice file*/
 $filename=$g['varetc_path']."/cfdevice";
 if (file_exists($filename))
   $cfdevice = trim(file_get_contents("$filename"));
 
-
-$id = $_GET['id'];
-if (isset($_POST['id']))
-	$id = $_POST['id'];
-
 if (isset($id) && $a_mount[$id]) {
-	$pconfig['mdisk'] = $a_mount[$id]['mdisk'];
-	$pconfig['partition'] = $a_mount[$id]['partition'];
-	$pconfig['fstype'] = $a_mount[$id]['fstype'];
-	$pconfig['sharename'] = $a_mount[$id]['sharename'];
-	$pconfig['desc'] = $a_mount[$id]['desc'];
+  $pconfig['mdisk'] = $a_mount[$id]['mdisk'];
+  $pconfig['partition'] = $a_mount[$id]['partition'];
+  $pconfig['fullname'] = $a_mount[$id]['fullname'];
+  $pconfig['fstype'] = $a_mount[$id]['fstype'];
+  $pconfig['sharename'] = $a_mount[$id]['sharename'];
+  $pconfig['desc'] = $a_mount[$id]['desc'];
 }
 
 if (! empty($_POST))
@@ -91,59 +114,57 @@ if (! empty($_POST))
   /* simple error list */
   unset($input_errors);
   $pconfig = $_POST;
-
+  
   /* input validation */
   $reqdfields = split(" ", "partition mdisk fstype");
   $reqdfieldsn = split(",", "Partition,Mdisk,Fstype");
-
+  
   do_input_validation_new($_POST, $reqdfields, $reqdfieldsn, &$error_bucket);
-		
-	if (($_POST['sharename'] && !is_validsharename($_POST['sharename'])))
-	{
+    
+  if (($_POST['sharename'] && !is_validsharename($_POST['sharename'])))
+  {
     $error_bucket[] = array("error" => gettext("The share name may only consist of the characters a-z, A-Z, 0-9, _ , -."),
                             "field" => "sharename");
-	}
-	
-	
-	if (($_POST['desc'] && !is_validdesc($_POST['desc'])))
-	{
+  }
+  
+  
+  if (($_POST['desc'] && !is_validdesc($_POST['desc'])))
+  {
     $error_bucket[] = array("error" => gettext("The description name contain invalid characters."),
                             "field" => "desc");
-
-	}
-	$device=$_POST['mdisk'].$_POST['partition'];
-	
-	if ($device == $cfdevice )
-	{
+  
+  }
+  $device=$_POST['mdisk'].$_POST['partition'];
+  
+  if ($device == $cfdevice )
+  {
     $error_bucket[] = array("error" => gettext("Can't mount the system partition 1, the DATA partition is the 2."),
                             "field" => "mdisk");
-
-	}
-		
-	/* check for name conflicts */
-	foreach ($a_mount as $mount)
-	{
-		if (isset($id) && ($a_mount[$id]) && ($a_mount[$id] === $mount))
-			continue;
-
-		/* Remove the duplicate disk use
-		if ($mount['mdisk'] == $_POST['mdisk'])
-		{
-			$input_errors[] = "This device already exists in the mount point list.";
-			break;
-		}
-		*/
-		
-		if (($_POST['sharename']) && ($mount['sharename'] == $_POST['sharename']))
-		{
+  
+  }
+    
+  /* check for name conflicts */
+  foreach ($a_mount as $mount)
+  {
+    if (isset($id) && ($a_mount[$id]) && ($a_mount[$id] === $mount))
+      continue;
+  
+    /* Check for duplicate mount point */
+    if ($mount['mdisk'] == $_POST['mdisk'])
+    {
+      $error_bucket[] = array("error" => gettext("This disk/partition is allready configured."),
+                              "field" => "mdisk");
+      break;
+    }
+    
+    if (($_POST['sharename']) && ($mount['sharename'] == $_POST['sharename']))
+    {
       $error_bucket[] = array("error" => gettext("Duplicate Share Name."),
                               "field" => "sharename");
-			break;
-		}
-		
-		
-	}
-
+      break;
+    }
+  }
+  
   if (is_array($error_bucket))
     foreach($error_bucket as $elem)
       $input_errors[] =& $elem["error"];
@@ -154,30 +175,34 @@ if (! empty($_POST))
       exit;   
   }
   
-	if (!$input_errors)
-	{
-		$mount = array();
-		$mount['mdisk'] = $_POST['mdisk'];
-		$mount['partition'] = $_POST['partition'];
-		$mount['fstype'] = $_POST['fstype'];
-		$mount['desc'] = $_POST['desc'];
-		/* if not sharename given, create one */
-		if (!$_POST['sharename'])
-			$mount['sharename'] = "disk_{$_POST['mdisk']}_part_{$_POST['partition']}";
-		else
-			$mount['sharename'] = $_POST['sharename'];
-		if (isset($id) && $a_mount[$id])
-			$a_mount[$id] = $mount;
-		else
-			$a_mount[] = $mount;
-		
-		touch($d_mountdirty_path);
-		
-		write_config();
-		
-		pfSenseHeader("disks_mount.php");
-		exit;
-	}
+  if (!$input_errors)
+  {
+    $mount = array();
+    $mount['mdisk'] = $_POST['mdisk'];
+    $mount['partition'] = $_POST['partition'];
+    $mount['fstype'] = $_POST['fstype'];
+    $mount['desc'] = $_POST['desc'];
+    /* if not sharename given, create one */
+    if (!$_POST['sharename'])
+      $mount['sharename'] = "disk_{$_POST['mdisk']}_part_{$_POST['partition']}";
+    else
+      $mount['sharename'] = $_POST['sharename'];
+      
+    // Generate fullname
+    $mount['fullname'] = "{$mount['mdisk']}{$mount['partition']}";
+      
+    if (isset($id) && $a_mount[$id])
+      $a_mount[$id] = $mount;
+    else
+      $a_mount[] = $mount;
+    
+    touch($d_mountdirty_path);
+    
+    write_config();
+    
+    pfSenseHeader("disks_mount.php");
+    exit;
+  }
 }
 
 include("head.inc");
@@ -198,14 +223,15 @@ echo $pfSenseHead->getHTML();
       <tr>
         <td width="22%" valign="top" class="vncellreq"><?=gettext("Disk");?></td>
         <td width="78%" class="vtable">
-      		<select name="mdisk" class="formselect" id="mdisk">
-      		  <?php foreach ($a_disk as $disk): ?>
-      			<?php if ((strcmp($disk['fstype'],"raid")!=0) | (strcmp($disk['fstype'],"gmirror")!=0)): ?> 	  
-      				<option value="<?=$disk['name'];?>" <?php if ($pconfig['mdisk'] == $disk['name']) echo "selected";?>> 
-      				<?php echo htmlspecialchars($disk['name'] . ": " .$disk['size'] . " (" . $disk['desc'] . ")");	?>
-      				</option>
-      			<?php endif; ?>
-      		  <?php endforeach; ?>
+          <select name="mdisk" class="formselect" id="mdisk">
+            <?php foreach ($a_disk as $disk): ?>
+              <?php if (strcmp($disk['fstype'],"softraid")==0): ?> 	  
+              <?php continue; ?>
+              <?php endif; ?>
+              <option value="<?=$disk['fullname'];?>" <?php if ($pconfig['mdisk'] == $disk['name']) echo "selected";?>> 
+              <?php echo htmlspecialchars($disk['name'] . ": " .$disk['size'] . " (" . $disk['desc'] . ")");	?>
+              </option>
+            <?php endforeach; ?>
           </select>
         </td>
       </tr>
@@ -213,13 +239,14 @@ echo $pfSenseHead->getHTML();
         <td width="22%" valign="top" class="vncellreq"><?=gettext("Partition");?></td>
         <td width="78%" class="vtable">
           <select name="partition" class="formselect" id="partition number">
-            <option value="s1" <?php if ($pconfig['partition'] == "s1") echo "selected=\"selected\""; ?>>1</option>
-            <option value="s2" <?php if ($pconfig['partition'] == "s2") echo "selected\"selected\""; ?>>2</option>
-            <option value="s3" <?php if ($pconfig['partition'] == "s3") echo "selected\"selected\""; ?>>3</option>
-            <option value="s4" <?php if ($pconfig['partition'] == "s4") echo "selected\"selected\""; ?>>4</option>
-            <option value="gmirror" <?php if ($pconfig['partition'] == "gmirror") echo "selected\"selected\""; ?>><?=_SOFTRAID ;?> - gmirror</option>
-            <option value="gvinum" <?php if ($pconfig['partition'] == "gvinum") echo "selected\"selected\""; ?>><?=_SOFTRAID ;?> - gvinum</option>
-            <option value="p1" <?php if ($pconfig['partition'] == "gpt") echo "selected\"selected\""; ?>>GPT</option>
+            <option value="s1" <?php if ($pconfig['partition'] == "s1") echo "selected"; ?>>1 (or new software RAID method)</option>
+            <option value="s2" <?php if ($pconfig['partition'] == "s2") echo "selected"; ?>>2</option>
+            <option value="s3" <?php if ($pconfig['partition'] == "s3") echo "selected"; ?>>3</option>
+            <option value="s4" <?php if ($pconfig['partition'] == "s4") echo "selected"; ?>>4</option>
+            <option value="gmirror" <?php if ($pconfig['partition'] == "gmirror") echo "selected"; ?>>previous <?=_SOFTRAID ;?> - gmirror</option>
+            <option value="graid5" <?php if ($pconfig['partition'] == "graid5") echo "selected"; ?>>previous <?=_SOFTRAID ;?> - graid5</option>
+            <option value="gvinum" <?php if ($pconfig['partition'] == "gvinum") echo "selected"; ?>>previous <?=_SOFTRAID ;?> - gvinum</option>
+            <option value="p1" <?php if ($pconfig['partition'] == "gpt") echo "selected"; ?>>GPT (or new software RAID method with GPT)</option>
           </select>
         </td>
       </tr>

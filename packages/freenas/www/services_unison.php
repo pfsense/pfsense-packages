@@ -2,7 +2,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    services_afp.php
+    services_unison.php
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2006 Daniel S. Haischt <me@daniel.stefan.haischt.name>
     All rights reserved.
@@ -40,23 +40,45 @@
                                                                               */
 /* ========================================================================== */
 
+/*
+       *************************
+
+	Unison Installation Notes
+
+	To work, unison requires an environment variable UNISON to point at
+	a writable directory. Unison keeps information there between syncs to
+	speed up the process.
+
+	When a user runs the unison client, it will try to invoke ssh to
+	connect to the this server. Giving the local ssh a UNISON environment
+	variable without compromising ssh turned out to be non-trivial.
+	The solution is to modify the default path found in /etc/login.conf.
+	The path is seeded with "UNISON=/mnt" and this updated by the
+	/etc/inc/services.inc file.
+
+	Todo:
+	* 	Arguably, a full client install could be done too to
+	allow FreeNAS to FreeNAS syncing.
+	
+       *************************
+*/
+
 $pgtitle = array(gettext("Services"),
-                 gettext("AFP"));
+                 gettext("Unison"));
 
 require_once("freenas_config.inc");
 require_once("guiconfig.inc");
 require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
 
-if (!is_array($freenas_config['afp'])) {
-  $freenas_config['afp'] = array();	
+if (!is_array($freenas_config['unison'])) {
+  $freenas_config['unison'] = array();	
 }
 
-
-$pconfig['enable'] = isset($freenas_config['afp']['enable']);
-$pconfig['afpname'] = $freenas_config['afp']['afpname'];
-$pconfig['guest'] = isset($freenas_config['afp']['guest']);
-$pconfig['local'] = isset($freenas_config['afp']['local']);
+$pconfig['enable'] = isset($freenas_config['unison']['enable']);
+$pconfig['share'] = $freenas_config['unison']['share'];
+$pconfig['workdir'] = isset($freenas_config['unison']['workdir']);
+$pconfig['makedir'] = isset($freenas_config['unison']['makedir']);
 
 if (! empty($_POST))
 {
@@ -67,22 +89,16 @@ if (! empty($_POST))
   $pconfig = $_POST;
   
   /* input validation */
-  $reqdfields = split(" ", "afpname");
-  $reqdfieldsn = split(",", "Afpname");
+  $reqdfields = split(" ", "share workdir");
+  $reqdfieldsn = split(",", "Share,Working Directory");
   
   do_input_validation_new($_POST, $reqdfields, $reqdfieldsn, &$error_bucket);
   
-  if ($_POST['enable'] && !$_POST['guest'])
-  {
-    if (!$_POST['local'])
-      $error_bucket[] = array("error" => gettext("You must select at least one authentication method."),
-                              "field" => "local");
-  }
-  if ($_POST['enable'] && !$_POST['local'])
-  {
-    if (!$_POST['guest'])
-      $error_bucket[] = array("error" => gettext("You must select at least one authentication method."),
-                              "field" => "name");
+  $fullpath = "/mnt/{$_POST['share']}/{$_POST['workdir']}";
+  
+  if (!$_POST['makedir'] && ($fullpath) && (!file_exists($fullpath))) {
+    $error_bucket[] = array("error" => gettext("The combination of share and working directory does not exist."),
+                            "field" => "workdir");
   }
   
   if (is_array($error_bucket))
@@ -97,10 +113,10 @@ if (! empty($_POST))
   
   if (!$input_errors)
   {
-    $freenas_config['afp']['enable'] = $_POST['enable'] ? true : false;
-    $freenas_config['afp']['guest'] = $_POST['guest'] ? true : false;
-    $freenas_config['afp']['local'] = $_POST['local'] ? true : false;
-    $freenas_config['afp']['afpname'] = $_POST['afpname'];
+    $freenas_config['unison']['share'] = $_POST['share'];
+    $freenas_config['unison']['workdir'] = $_POST['workdir'];
+    $freenas_config['unison']['enable'] = $_POST['enable'] ? true : false;
+    $freenas_config['unison']['makedir'] = $_POST['makedir'] ? true : false;
     
     write_config();
     
@@ -109,14 +125,22 @@ if (! empty($_POST))
     {
       /* nuke the cache file */
       config_lock();
-      services_afpd_configure();
-      services_zeroconf_configure();
+      services_unison_configure();
+      /* services_zeroconf_configure(); */
       config_unlock();
     }
     
     $savemsg = get_std_save_message($retval);
   }
 }
+
+/* retrieve mounts to build list of share names */
+if (!is_array($freenas_config['mounts']['mount']))
+  $freenas_config['mounts']['mount'] = array();
+
+mount_sort();
+
+$a_mount = &$freenas_config['mounts']['mount'];
 
 include("head.inc");
 /* put your custom HTML head content here        */
@@ -131,13 +155,13 @@ function enable_change(enable_change) {
   endis = !(document.iform.enable.checked || enable_change);
   endis ? color = '#D4D0C8' : color = '#FFFFFF';
   
-  document.iform.guest.disabled = endis;
-  document.iform.local.disabled = endis;
-  document.iform.afpname.disabled = endis;
+  document.iform.share.disabled = endis;
+  document.iform.workdir.disabled = endis;
+  document.iform.makedir.disabled = endis;
   /* color adjustments */
-  document.iform.guest.style.backgroundColor = color;
-  document.iform.local.style.backgroundColor = color;
-  document.iform.afpname.style.backgroundColor = color;
+  document.iform.share.style.backgroundColor = color;
+  document.iform.workdir.style.backgroundColor = color;
+  document.iform.makedir.style.backgroundColor = color;
 }
 //-->
 </script>
@@ -155,7 +179,7 @@ echo $pfSenseHead->getHTML();
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
   <div id="inputerrors"></div>
-  <form id="iform" name="iform" action="services_afp.php" method="post">
+  <form id="iform" name="iform" action="services_unison.php" method="post">
     <table width="100%" border="0" cellpadding="6" cellspacing="0">
       <tr>
         <td width="100%" valign="middle" class="listtopic" colspan="2">
@@ -166,24 +190,46 @@ echo $pfSenseHead->getHTML();
         </td>
       </tr>
       <tr>
-        <td width="22%" valign="top" class="vncell"><?=gettext("Server Name");?></td>
+        <td width="22%" valign="top" class="vncell"><?=gettext("Share");?></td>
         <td width="78%" class="vtable">
-          <input name="afpname" type="text" class="formfld unknown" id="afpname" size="20" value="<?=htmlspecialchars($pconfig['afpname']);?>" />
+          <select name="share" class="formselect" id="share">
+            <?php foreach ($a_mount as $mount): $tmp=$mount['sharename']; ?>
+            <option value="<?=$tmp;?>"
+            <?php if ($tmp == $pconfig['share']) echo "selected=\"selected\"";?>><?=$tmp?></option>
+            <?php endforeach; ?>
+          </select>
+          <br />
+          <?= gettext("You may need enough space to duplicate all files being synced."); ?>.</td>
         </td>
       </tr>
       <tr>
-        <td width="22%" valign="top" class="vncell"><?=gettext("Authentication");?></td>
+        <td width="22%" valign="top" class="vncell"><?=gettext("Working Directory");?></td>
         <td width="78%" class="vtable" align="left" valign="middle">
-          <input name="guest" id="guest" type="checkbox" value="yes" <?php if ($pconfig['guest']) echo "checked=\"checked\""; ?> />
-          <?= gettext("Enable guest access."); ?><br />
-          <input name="local" id="local" type="checkbox" value="yes" <?php if ($pconfig['local']) echo "checked=\"checked\""; ?> />
-          <?= gettext("Enable local user authentication."); ?>
+          <input name="workdir" type="text" class="formfld file" id="workdir" size="20" value="<?=htmlspecialchars($pconfig['workdir']);?>" />
+          <?= gettext("Where the working files will be stored"); ?>
+        </td>
+      </tr>
+      <tr>
+        <td width="22%" valign="top" class="vncell"><?=gettext("Create");?></td>
+        <td width="78%" class="vtable" align="left" valign="middle">
+          <input name="makedir" type="checkbox" id="makedir" value="yes" <?php if ($pconfig['makedir']) echo "checked=\"checked\""; ?> />
+          <?= gettext("Create work directory if it doesn't exist"); ?>
         </td>
       </tr>
       <tr>
         <td width="22%" valign="top">&nbsp;</td>
         <td width="78%">
           <input id="submit" name="Submit" type="submit" class="formbtn" value="<?=gettext("Save");?>" />
+        </td>
+      </tr>
+      <tr>
+        <td width="22%" valign="top">&nbsp;</td>
+        <td width="78%">
+          <span class="red">
+            <strong><?= gettext("Note"); ?>:</strong>
+          </span>
+          <br />
+          <?= gettext("<a href='/services_sshd.php'>SSHD</a> must be enabled for Unison to work, and the <a href='/access_users.php'>user</a> must have Full Shell enabled."); ?>
         </td>
       </tr>
     </table>

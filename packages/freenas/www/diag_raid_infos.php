@@ -1,36 +1,44 @@
 <?php
 /* $Id$ */
+/* ========================================================================== */
 /*
-	disks_manage_edit.php
-	part of FreeNAS (http://www.freenas.org)
-	Copyright (C) 2005-2006 Olivier Cochard-Labbé <olivier@freenas.org>.
-	All rights reserved.
-	
-	Based on m0n0wall (http://m0n0.ch/wall)
-	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-	All rights reserved.
-	
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
-	
-	1. Redistributions of source code must retain the above copyright notice,
-	   this list of conditions and the following disclaimer.
-	
-	2. Redistributions in binary form must reproduce the above copyright
-	   notice, this list of conditions and the following disclaimer in the
-	   documentation and/or other materials provided with the distribution.
-	
-	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
-*/
+    diag_raid_infos.php
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2006 Daniel S. Haischt <me@daniel.stefan.haischt.name>
+    All rights reserved.
+
+    Based on FreeNAS (http://www.freenas.org)
+    Copyright (C) 2005-2006 Olivier Cochard-Labbé <olivier@freenas.org>.
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
 
 $pgtitle = array(gettext("Diagnostics"),
                  gettext("RAID Infos"));
@@ -77,8 +85,8 @@ echo $pfSenseHead->getHTML();
   <tr>
     <td class="tabnavtbl">
 <?php
-	$tab_array = array();
-	$tab_array[0] = array(gettext("Disks"),         false, "diag_disks_infos.php");
+  $tab_array = array();
+  $tab_array[0] = array(gettext("Disks"),         false, "diag_disks_infos.php");
   $tab_array[1] = array(gettext("Partitions"),    false, "diag_part_infos.php");
   $tab_array[2] = array(gettext("SMART"),         false, "diag_smart_infos.php");
   $tab_array[3] = array(gettext("ataidle"),       false, "diag_ataidle_infos.php");
@@ -86,22 +94,22 @@ echo $pfSenseHead->getHTML();
   $tab_array[5] = array(gettext("Mounts"),        false, "diag_mounts_infos.php");
   $tab_array[6] = array(gettext("Software RAID"), true,  "diag_raid_infos.php");
   $tab_array[7] = array(gettext("iSCSI"),         false, "diag_iscsi_infos.php");
-	display_top_tabs($tab_array);
+  display_top_tabs($tab_array);
 ?>  
     </td>
   </tr>
   <tr>
     <td class="tabnavtbl">
 <?php
-	$tab_array = array();
-	$tab_array[0] = array(gettext("Manage RAID"), false, "diag_ad_infos.php");
-	display_top_tabs($tab_array);
+  $tab_array = array();
+  $tab_array[0] = array(gettext("MS Domain"), false, "diag_ad_infos.php");
+  display_top_tabs($tab_array);
 ?>  
     </td>
   </tr>
   <tr> 
     <td>
-	  <div id="mainarea">
+    <div id="mainarea">
     <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
       <tr>
         <td align="left" valign="top">
@@ -114,7 +122,6 @@ echo $pfSenseHead->getHTML();
             }
             unset ($line);
             unset ($rawdata);
-
             echo "<strong>Software RAID - gvinum status:</strong><br />";
             exec("/sbin/gvinum list",$rawdata);
             foreach ($rawdata as $line) 	{
@@ -128,7 +135,7 @@ echo $pfSenseHead->getHTML();
     </table>
   </div>
   </td>
-	</tr>
+  </tr>
 </table>
 </form>
 <?php include("fend.inc"); ?>

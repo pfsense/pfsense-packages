@@ -1,7 +1,6 @@
 <?php
-/* $Id$ */
 /*
-    disks_raid_gmirror_init.php
+    disks_raid_stripe_tools.php
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2006 Daniel S. Haischt <me@daniel.stefan.haischt.name>
     All rights reserved.
@@ -39,14 +38,10 @@
                                                                               */
 /* ========================================================================== */
 
-/* ========================================================================== */
-/* ==   T H I S   F I L E   I S   C U R R E N T L Y   N O T   U S E D      == */
-/* ========================================================================== */
-
 $pgtitle = array(gettext("System"),
                  gettext("Disks"),
-                 gettext("GEOM Mirror"),
-                 gettext("Initialize"));
+                 gettext("GEOM Stripe"),
+                 gettext("Tools"));
 
 require_once("freenas_config.inc");
 require_once("guiconfig.inc");
@@ -59,11 +54,12 @@ if (! empty($_POST))
   unset($error_bucket);
   /* simple error list */
   unset($input_errors);
-
-	$reqdfields = explode(" ", "disk");
-	$reqdfieldsn = explode(",", "Disk");
+  unset($do_action);
   
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+  $reqdfields = explode(" ", "action object");
+  $reqdfieldsn = explode(",", "Action,Object");
+  
+  do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
   
   if (is_array($error_bucket))
     foreach($error_bucket as $elem)
@@ -75,15 +71,16 @@ if (! empty($_POST))
       exit;   
   }
   
-	if (! $input_errors) {
-		$do_format = true;
-		$disk = $_POST['disk'];
-	}
-}
-
-if (! isset($do_format)) {
-	$do_format = false;
-	$disk = '';
+  if (!$input_errors) {
+    $do_action = true;
+    $action = $_POST['action'];
+    $object = $_POST['object'];
+  }
+  }
+  if (!isset($do_action)) {
+  $do_action = false;
+  $action = '';
+  $object = '';
 }
 
 include("head.inc");
@@ -103,76 +100,87 @@ echo $pfSenseHead->getHTML();
   <tr>
     <td class="tabnavtbl">
 <?php
-	$tab_array = array();
-	$tab_array[0] = array(gettext("Geom Mirror"),           true,  "disks_raid_gmirror.php");
-	$tab_array[1] = array(gettext("Geom Vinum (unstable)"), false, "disks_raid_gvinum.php");
-	display_top_tabs($tab_array);
+  $tab_array = array();
+  $tab_array[0] = array(gettext("Geom Mirror"), false, "disks_raid_gmirror.php");
+  $tab_array[1] = array(gettext("Geom Concat"), false, "disks_raid_gconcat.php");
+  $tab_array[2] = array(gettext("Geom Stripe"), true,  "disks_raid_gstripe.php");
+  $tab_array[3] = array(gettext("Geom RAID5"),  false, "disks_raid_graid5.php");
+  $tab_array[4] = array(gettext("Geom Vinum"),  false, "disks_raid_gvinum.php");
+  display_top_tabs($tab_array);
 ?>  
     </td>
   </tr>
   <tr>
     <td class="tabnavtbl">
 <?php
-	$tab_array = array();
-	$tab_array[0] = array(gettext("Manage RAID"), false, "disks_raid_gmirror.php");
-	$tab_array[1] = array(gettext("Format RAID"), true,  "disks_raid_gmirror_init.php");
-	$tab_array[2] = array(gettext("Tools"),       false, "disks_raid_gmirror_tools.php");
-  $tab_array[3] = array(gettext("Information"), false, "disks_raid_gmirror_infos.php");
-	display_top_tabs($tab_array);
-?>  
+  $tab_array = array();
+  $tab_array[0] = array(gettext("Manage RAID"), false, "disks_raid_gstripe.php");
+  /* $tab_array[1] = array(gettext("Format RAID"), false, "disks_raid_gstripe_init.php"); */
+  $tab_array[1] = array(gettext("Tools"),       true,  "disks_raid_gstripe_tools.php");
+  $tab_array[2] = array(gettext("Information"), false, "disks_raid_gstripe_infos.php");
+  display_top_tabs($tab_array);
+?> 
     </td>
   </tr>
   <tr>
     <td>
       <div id="mainarea">
-      <form action="disks_raid_gmirror_init.php" method="post" name="iform" id="iform">
+      <form action="disks_raid_gstripe_tools.php" method="post" name="iform" id="iform">
       <table class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
         <tr>
-          <td width="22%" valign="top" class="vncellreq"><?=gettext("Volume name");?></td>
+          <td width="22%" valign="top" class="vncellreq"><?=gettext("Object name");?></td>
           <td width="78%" class="vtable">
-            <input name="disk" type="text" class="formfld" id="disk" size="20" value="<?=htmlspecialchars($disk);?>" />
+            <input name="object" type="text" class="formfld unknown" id="object" size="20" value="<?=htmlspecialchars($disk);?>" />
+          </td>
+        </tr>
+        <tr>
+          <td width="22%" valign="top" class="vncellreq"><?=gettext("Object name");?></td>
+          <td width="78%" class="vtable">
+            <select name="action" class="formselect" id="action">
+              <option value="list" <?php if ($action == "list") echo "selected"; ?>>list</option>
+              <option value="status" <?php if ($action == "status") echo "selected"; ?>>status</option>
+              <option value="clear" <?php if ($action == "clear") echo "selected"; ?>>clear</option>
+              <option value="stop" <?php if ($action == "stop") echo "selected"; ?>>stop</option>
+             </select>
           </td>
         </tr>
         <tr> 
           <td width="22%" valign="top">&nbsp;</td>
           <td width="78%">
-            <input name="Submit" type="submit" class="formbtn" value="Save" /> 
-            <?php if (isset($id) && $a_raid[$id]): ?>
-            <input name="id" type="hidden" value="<?=$id;?>" /> 
-            <?php endif; ?>
+            <input name="Submit" type="submit" class="formbtn" value="Send Command!" /> 
           </td>
         </tr>
-				<tr>
-  				<td valign="top" colspan="2">
-    				<?
-            if ($do_format) {
-    					echo("<strong>" . gettext("Disk format UFS output:") . "</strong><br />");
-    					echo('<pre>');
-    					ob_end_flush();
-    					
-    					/* Create filesystem */
-    					system("/sbin/newfs -U /dev/mirror/" . escapeshellarg($disk));
-    										
-    					echo('</pre>');
-    				}
-    				?>
-  				</td>
-				</tr>
         <tr>
-          <td align="left" valign="top" colspan="2">            
+          <td valign="top" colspan="2">
+            <?
+              if ($do_action) {
+                echo("<strong>" . gettext("GSTRIPE command output:") . "</strong><br />");
+                echo('<pre>');
+                ob_end_flush();
+              
+                system("/sbin/gstripe $action " . escapeshellarg($object));
+            
+                echo('</pre>');
+              }
+            ?>
+          </td>
+        </tr>
+        <tr>
+          <td align="left" valign="top" colspan="2">
             <span class="red">
               <strong>WARNING:</strong><br />
             </span>
-            <span class="vexpl">
-            <?= gettext("This step will format the RAID volume in Unix FileSystem (UFS)."); ?>
-            </span>
+            <ol>
+              <li><span class="vexpl"><?= gettext("Use these specials actions for debugging only!"); ?></span></li>
+              <li><span class="vexpl"><?= gettext("There is no need of using this menu for start a RAID volume (start automaticaly)."); ?></span></li>
+            </ol>
           </td>
         </tr>
       </table>
       </form>
       </div>
     </td>
-	</tr>
+  </tr>
 </table>
 <?php include("fend.inc"); ?>
 </body>

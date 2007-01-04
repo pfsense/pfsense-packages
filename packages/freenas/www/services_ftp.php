@@ -1,36 +1,44 @@
 <?php
 /* $Id$ */
+/* ========================================================================== */
 /*
-	disks_manage_edit.php
-	part of FreeNAS (http://www.freenas.org)
-	Copyright (C) 2005-2006 Olivier Cochard-Labbé <olivier@freenas.org>.
-	All rights reserved.
-	
-	Based on m0n0wall (http://m0n0.ch/wall)
-	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-	All rights reserved.
-	
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
-	
-	1. Redistributions of source code must retain the above copyright notice,
-	   this list of conditions and the following disclaimer.
-	
-	2. Redistributions in binary form must reproduce the above copyright
-	   notice, this list of conditions and the following disclaimer in the
-	   documentation and/or other materials provided with the distribution.
-	
-	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
-*/
+    services_ftp.php
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2006 Daniel S. Haischt <me@daniel.stefan.haischt.name>
+    All rights reserved.
+
+    Based on FreeNAS (http://www.freenas.org)
+    Copyright (C) 2005-2006 Olivier Cochard-Labbé <olivier@freenas.org>.
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
 
 $pgtitle = array(gettext("Services"),
                  gettext("FTP"));
@@ -42,8 +50,7 @@ require_once("freenas_functions.inc");
 
 if (!is_array($freenas_config['ftp']))
 {
-	$freenas_config['ftp'] = array();
-	
+  $freenas_config['ftp'] = array();
 }
 
 $pconfig['enable'] = isset($freenas_config['ftp']['enable']);
@@ -69,70 +76,70 @@ if (! empty($_POST))
   /* simple error list */
   unset($input_errors);
   $pconfig = $_POST;
-
+  
   /* input validation */
-	if ($_POST['enable']) {
-		$reqdfields = array_merge($reqdfields, explode(" ", "numberclients maxconperip timeout port"));
-		$reqdfieldsn = array_merge($reqdfieldsn, explode(",", "Numberclients,Maxconperip,Timeout,Port"));
-	}
-
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
-	
-	if ($_POST['enable'] && !is_port($_POST['port']))
-	{
+  if ($_POST['enable']) {
+    $reqdfields = array_merge($reqdfields, explode(" ", "numberclients maxconperip timeout port"));
+    $reqdfieldsn = array_merge($reqdfieldsn, explode(",", "Numberclients,Maxconperip,Timeout,Port"));
+  }
+  
+  do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+  
+  if ($_POST['enable'] && !is_port($_POST['port']))
+  {
     $error_bucket[] = array("error" => gettext("The TCP port must be a valid port number."),
                             "field" => "port");
-	}
-	if ($_POST['enable'] && !is_numericint($_POST['numberclients'])) {
+  }
+  if ($_POST['enable'] && !is_numericint($_POST['numberclients'])) {
     $error_bucket[] = array("error" => gettext("The maximum Number of client must be a number."),
                             "field" => "numberclients");
-	}
-	
-	if ($_POST['enable'] && !is_numericint($_POST['maxconperip'])) {
+  }
+  
+  if ($_POST['enable'] && !is_numericint($_POST['maxconperip'])) {
     $error_bucket[] = array("error" => gettext("The max con per ip must be a number."),
                             "field" => "maxconperip");
-	}
-	if ($_POST['enable'] && !is_numericint($_POST['timeout'])) {
+  }
+  if ($_POST['enable'] && !is_numericint($_POST['timeout'])) {
     $error_bucket[] = array("error" => gettext("The maximum idle time be a number."),
                             "field" => "timeout");
-	}
-	
-	if ($_POST['enable'] && ($_POST['pasv_address']))
-	{
-		if (!is_ipaddr($_POST['pasv_address']))
+  }
+  
+  if ($_POST['enable'] && ($_POST['pasv_address']))
+  {
+    if (!is_ipaddr($_POST['pasv_address']))
       $error_bucket[] = array("error" => gettext("The pasv address must be a public IP address."),
                               "field" => "pasv_address");
-
-	}
-	
-	if ($_POST['enable'] && ($_POST['pasv_max_port']))
-	{
-		if (!is_port($_POST['pasv_max_port']))
+  
+  }
+  
+  if ($_POST['enable'] && ($_POST['pasv_max_port']))
+  {
+    if (!is_port($_POST['pasv_max_port']))
       $error_bucket[] = array("error" => gettext("The pasv_max_port port must be a valid port number."),
                               "field" => "pasv_max_port");
-	}
-	
-	if ($_POST['enable'] && ($_POST['pasv_min_port']))
-	{
-		if (!is_port($_POST['pasv_min_port']))
+  }
+  
+  if ($_POST['enable'] && ($_POST['pasv_min_port']))
+  {
+    if (!is_port($_POST['pasv_min_port']))
       $error_bucket[] = array("error" => gettext("The pasv_min_port port must be a valid port number."),
                               "field" => "pasv_min_port");
-
-	}
-	
-	if (($_POST['passiveip'] && !is_ipaddr($_POST['passiveip']))) {
+  
+  }
+  
+  if (($_POST['passiveip'] && !is_ipaddr($_POST['passiveip']))) {
     $error_bucket[] = array("error" => gettext("A valid IP address must be specified."),
                             "field" => "passiveip");
-
-	}
-	
-	if (!($_POST['anonymous']) && !($_POST['localuser'])) {
-		$input_errors[] = _SRVFTP_MSGVALIDAUTH;
+  
+  }
+  
+  if (!($_POST['anonymous']) && !($_POST['localuser'])) {
+    $input_errors[] = _SRVFTP_MSGVALIDAUTH;
     $error_bucket[] = array("error" => gettext("You must select at minium anonymous or/and local user authentication."),
                             "field" => "localuser");
-
-	}
-
+  
+  }
+  
   if (is_array($error_bucket))
     foreach($error_bucket as $elem)
       $input_errors[] =& $elem["error"];
@@ -143,36 +150,36 @@ if (! empty($_POST))
       exit;   
   }
   
-	if (!$input_errors)
-	{
-		$freenas_config['ftp']['numberclients'] = $_POST['numberclients'];	
-		$freenas_config['ftp']['maxconperip'] = $_POST['maxconperip'];
-		$freenas_config['ftp']['timeout'] = $_POST['timeout'];
-		$freenas_config['ftp']['port'] = $_POST['port'];
-		$freenas_config['ftp']['authentication_backend'] = $_POST['authbackend'];
-		$freenas_config['ftp']['anonymous'] = $_POST['anonymous'] ? true : false;
-		$freenas_config['ftp']['localuser'] = $_POST['localuser'] ? true : false;
-		$freenas_config['ftp']['pasv_max_port'] = $_POST['pasv_max_port'];
-		$freenas_config['ftp']['pasv_min_port'] = $_POST['pasv_min_port'];
-		$freenas_config['ftp']['pasv_address'] = $_POST['pasv_address'];
-		$freenas_config['ftp']['banner'] = $_POST['banner'];
-		$freenas_config['ftp']['passiveip'] = $_POST['passiveip'];
-		$freenas_config['ftp']['fxp'] = $_POST['fxp'] ? true : false;
-		$freenas_config['ftp']['natmode'] = $_POST['natmode'] ? true : false;
-		$freenas_config['ftp']['enable'] = $_POST['enable'] ? true : false;
-		
-		write_config();
-		
-		$retval = 0;
-		if (!file_exists($d_sysrebootreqd_path)) {
-			/* nuke the cache file */
-			config_lock();
-			services_wzdftpd_configure();
-			services_zeroconf_configure();
-			config_unlock();
-		}
-		$savemsg = get_std_save_message($retval);
-	}
+  if (!$input_errors)
+  {
+    $freenas_config['ftp']['numberclients'] = $_POST['numberclients'];	
+    $freenas_config['ftp']['maxconperip'] = $_POST['maxconperip'];
+    $freenas_config['ftp']['timeout'] = $_POST['timeout'];
+    $freenas_config['ftp']['port'] = $_POST['port'];
+    $freenas_config['ftp']['authentication_backend'] = $_POST['authbackend'];
+    $freenas_config['ftp']['anonymous'] = $_POST['anonymous'] ? true : false;
+    $freenas_config['ftp']['localuser'] = $_POST['localuser'] ? true : false;
+    $freenas_config['ftp']['pasv_max_port'] = $_POST['pasv_max_port'];
+    $freenas_config['ftp']['pasv_min_port'] = $_POST['pasv_min_port'];
+    $freenas_config['ftp']['pasv_address'] = $_POST['pasv_address'];
+    $freenas_config['ftp']['banner'] = $_POST['banner'];
+    $freenas_config['ftp']['passiveip'] = $_POST['passiveip'];
+    $freenas_config['ftp']['fxp'] = $_POST['fxp'] ? true : false;
+    $freenas_config['ftp']['natmode'] = $_POST['natmode'] ? true : false;
+    $freenas_config['ftp']['enable'] = $_POST['enable'] ? true : false;
+    
+    write_config();
+    
+    $retval = 0;
+    if (!file_exists($d_sysrebootreqd_path)) {
+      /* nuke the cache file */
+      config_lock();
+      services_wzdftpd_configure();
+      services_zeroconf_configure();
+      config_unlock();
+    }
+    $savemsg = get_std_save_message($retval);
+  }
 }
 
 include("head.inc");
@@ -183,36 +190,36 @@ $jscriptstr = <<<EOD
 <script type="text/javascript">
 <!--
 function enable_change(enable_change) {
-	var endis;
-	
-	endis = !(document.iform.enable.checked || enable_change);
+  var endis;
+  
+  endis = !(document.iform.enable.checked || enable_change);
   endis ? color = '#D4D0C8' : color = '#FFFFFF';
-
-	document.iform.port.disabled = endis;
-	document.iform.timeout.disabled = endis;
-	document.iform.numberclients.disabled = endis;
-	document.iform.maxconperip.disabled = endis;
-	document.iform.anonymous.disabled = endis;
-	document.iform.localuser.disabled = endis;
-	document.iform.banner.disabled = endis;
-	document.iform.fxp.disabled = endis;
-	document.iform.natmode.disabled = endis;
-	document.iform.passiveip.disabled = endis;
-	document.iform.pasv_max_port.disabled = endis;
-	document.iform.pasv_min_port.disabled = endis;
+  
+  document.iform.port.disabled = endis;
+  document.iform.timeout.disabled = endis;
+  document.iform.numberclients.disabled = endis;
+  document.iform.maxconperip.disabled = endis;
+  document.iform.anonymous.disabled = endis;
+  document.iform.localuser.disabled = endis;
+  document.iform.banner.disabled = endis;
+  document.iform.fxp.disabled = endis;
+  document.iform.natmode.disabled = endis;
+  document.iform.passiveip.disabled = endis;
+  document.iform.pasv_max_port.disabled = endis;
+  document.iform.pasv_min_port.disabled = endis;
   /* color adjustments */
-	document.iform.port.style.backgroundColor = color;
-	document.iform.timeout.style.backgroundColor = color;
-	document.iform.numberclients.style.backgroundColor = color;
-	document.iform.maxconperip.style.backgroundColor = color;
-	document.iform.anonymous.style.backgroundColor = color;
-	document.iform.localuser.style.backgroundColor = color;
-	document.iform.banner.style.backgroundColor = color;
-	document.iform.fxp.style.backgroundColor = color;
-	document.iform.natmode.style.backgroundColor = color;
-	document.iform.passiveip.style.backgroundColor = color;
-	document.iform.pasv_max_port.style.backgroundColor = color;
-	document.iform.pasv_min_port.style.backgroundColor = color;
+  document.iform.port.style.backgroundColor = color;
+  document.iform.timeout.style.backgroundColor = color;
+  document.iform.numberclients.style.backgroundColor = color;
+  document.iform.maxconperip.style.backgroundColor = color;
+  document.iform.anonymous.style.backgroundColor = color;
+  document.iform.localuser.style.backgroundColor = color;
+  document.iform.banner.style.backgroundColor = color;
+  document.iform.fxp.style.backgroundColor = color;
+  document.iform.natmode.style.backgroundColor = color;
+  document.iform.passiveip.style.backgroundColor = color;
+  document.iform.pasv_max_port.style.backgroundColor = color;
+  document.iform.pasv_min_port.style.backgroundColor = color;
 }
 //-->
 </script>

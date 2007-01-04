@@ -2,7 +2,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    services_rsyncd_client.php
+    services_rsyncd_local.php
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2006 Daniel S. Haischt <me@daniel.stefan.haischt.name>
     All rights reserved.
@@ -42,21 +42,20 @@
 
 $pgtitle = array(gettext("Services"),
                  gettext("RSYNCD"),
-                 gettext("Client"));
+                 gettext("Local"));
 
 require_once("freenas_config.inc");
 require_once("guiconfig.inc");
 require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
 
-if (!is_array($freenas_config['rsyncclient']))
+if (!is_array($freenas_config['rsync_local']))
 {
-  $freenas_config['rsyncclient'] = array();
+  $freenas_config['rsync_local'] = array();
 }
 
 $a_months = array("January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December");
 $a_weekdays = array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday");
-$a_mount = array();
 
 $pconfig['readonly'] = $freenas_config['rsyncd']['readonly'];
 $pconfig['port'] = $freenas_config['rsyncd']['port'];
@@ -74,34 +73,20 @@ if (!is_array($freenas_config['mounts']['mount'])) {
     unset($error_bucket);
     /* simple error list */
     unset($input_errors);
-    unset($do_format);
+
     $pconfig = $_POST;
   
     /* input validation */
     if ($_POST['enable']){
-      $reqdfields = array_merge($reqdfields, explode(" ", "rsyncserverip sharetosync"));
-      $reqdfieldsn = array_merge($reqdfieldsn, explode(",", "Rsyncserverip,Sharetosync"));
+      $reqdfields = array_merge($reqdfields, explode(" ", "source destination"));
+      $reqdfieldsn = array_merge($reqdfieldsn, explode(",", "Source,Destination"));
     }
     
     do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
     
-    if ($_POST['enable']) {
-      if (!is_port($_POST['port']))
-        $error_bucket[] = array("error" => gettext("The TCP port must be a valid port number."),
-                                "field" => "port");
-      else if (!is_numericint($_POST['maxcon']))
-        $error_bucket[] = array("error" => gettext("The value provided by the maximum connections field is not a number"),
-                                "field" => "maxcon");
-    }
-    
-    if (!is_array($freenas_config['mounts']['mount'])) {
-      $error_bucket[] = array("error" => gettext("You must configure mount point first."),
-                              "field" => "none");
-    }
-    
-    if ($_POST['enable'] && !is_ipaddr($_POST['rsyncserverip'])) {
-      $error_bucket[] = array("error" => gettext("A valid IP address must be specified."),
-                              "field" => "rsyncserverip");
+    if ($_POST['enable'] && (strcmp($_POST['source'],$_POST['destination'])==0)) {
+      $error_bucket[] = array("error" => gettext("You can't have the same mount point for source and destination!"),
+                              "field" => "source");
     }
   
     if (is_array($error_bucket))
@@ -116,21 +101,21 @@ if (!is_array($freenas_config['mounts']['mount'])) {
     
     if (!$input_errors)
     {
-      $freenas_config['rsyncclient']['opt_delete'] = $_POST['opt_delete'] ? true : false;;
-      $freenas_config['rsyncclient']['rsyncserverip'] = $_POST['rsyncserverip'];
-      $freenas_config['rsyncclient']['minute'] = $_POST['minutes'];
-      $freenas_config['rsyncclient']['hour'] = $_POST['hours'];
-      $freenas_config['rsyncclient']['day'] = $_POST['days'];
-      $freenas_config['rsyncclient']['month'] = $_POST['months'];
-      $freenas_config['rsyncclient']['weekday'] = $_POST['weekdays'];
-      $freenas_config['rsyncclient']['rsyncshare'] = $_POST['rsyncshare'];
-      $freenas_config['rsyncclient']['enable'] = $_POST['enable'] ? true : false;
-      $freenas_config['rsyncclient']['sharetosync'] = $_POST['sharetosync'];
-      $freenas_config['rsyncclient']['all_mins'] = $_POST['all_mins'];
-      $freenas_config['rsyncclient']['all_hours'] = $_POST['all_hours'];
-      $freenas_config['rsyncclient']['all_days'] = $_POST['all_days'];
-      $freenas_config['rsyncclient']['all_months'] = $_POST['all_months'];
-      $freenas_config['rsyncclient']['all_weekdays'] = $_POST['all_weekdays'];
+      $freenas_config['rsync_local']['opt_delete'] = $_POST['opt_delete'] ? true : false;;
+      $freenas_config['rsync_local']['minute'] = $_POST['minutes'];
+      $freenas_config['rsync_local']['hour'] = $_POST['hours'];
+      $freenas_config['rsync_local']['day'] = $_POST['days'];
+      $freenas_config['rsync_local']['month'] = $_POST['months'];
+      $freenas_config['rsync_local']['weekday'] = $_POST['weekdays'];
+      $freenas_config['rsync_local']['source'] = $_POST['source'];
+      $freenas_config['rsync_local']['destination'] = $_POST['destination'];
+      $freenas_config['rsync_local']['enable'] = $_POST['enable'] ? true : false;
+      $freenas_config['rsync_local']['sharetosync'] = $_POST['sharetosync'];
+      $freenas_config['rsync_local']['all_mins'] = $_POST['all_mins'];
+      $freenas_config['rsync_local']['all_hours'] = $_POST['all_hours'];
+      $freenas_config['rsync_local']['all_days'] = $_POST['all_days'];
+      $freenas_config['rsync_local']['all_months'] = $_POST['all_months'];
+      $freenas_config['rsync_local']['all_weekdays'] = $_POST['all_weekdays'];
       
       write_config();
       
@@ -139,7 +124,7 @@ if (!is_array($freenas_config['mounts']['mount'])) {
       if (!file_exists($d_sysrebootreqd_path)){
         /* nuke the cache file */
         config_lock();
-        services_rsyncclient_configure();
+        services_rsync_local_configure();
         services_cron_configure();
         config_unlock();
       }
@@ -151,21 +136,21 @@ if (!is_array($freenas_config['mounts']['mount'])) {
   mount_sort();
   $a_mount = &$freenas_config['mounts']['mount'];
   
-  $pconfig['opt_delete'] = isset($freenas_config['rsyncclient']['opt_delete']);
-  $pconfig['enable'] = isset($freenas_config['rsyncclient']['enable']);
-  $pconfig['rsyncserverip'] = $freenas_config['rsyncclient']['rsyncserverip'];
-  $pconfig['rsyncshare'] = $freenas_config['rsyncclient']['rsyncshare'];
-  $pconfig['minute'] = $freenas_config['rsyncclient']['minute'];
-  $pconfig['hour'] = $freenas_config['rsyncclient']['hour'];
-  $pconfig['day'] = $freenas_config['rsyncclient']['day'];
-  $pconfig['month'] = $freenas_config['rsyncclient']['month'];
-  $pconfig['weekday'] = $freenas_config['rsyncclient']['weekday'];
-  $pconfig['sharetosync'] = $freenas_config['rsyncclient']['sharetosync'];
-  $pconfig['all_mins'] = $freenas_config['rsyncclient']['all_mins'];
-  $pconfig['all_hours'] = $freenas_config['rsyncclient']['all_hours'];
-  $pconfig['all_days'] = $freenas_config['rsyncclient']['all_days'];
-  $pconfig['all_months'] = $freenas_config['rsyncclient']['all_months'];
-  $pconfig['all_weekdays'] = $freenas_config['rsyncclient']['all_weekdays'];
+  $pconfig['opt_delete'] = isset($freenas_config['rsync_local']['opt_delete']);
+  $pconfig['enable'] = isset($freenas_config['rsync_local']['enable']);
+  $pconfig['source'] = $freenas_config['rsync_local']['source'];
+  $pconfig['destination'] = $freenas_config['rsync_local']['destination'];
+  $pconfig['minute'] = $freenas_config['rsync_local']['minute'];
+  $pconfig['hour'] = $freenas_config['rsync_local']['hour'];
+  $pconfig['day'] = $freenas_config['rsync_local']['day'];
+  $pconfig['month'] = $freenas_config['rsync_local']['month'];
+  $pconfig['weekday'] = $freenas_config['rsync_local']['weekday'];
+  $pconfig['sharetosync'] = $freenas_config['rsync_local']['sharetosync'];
+  $pconfig['all_mins'] = $freenas_config['rsync_local']['all_mins'];
+  $pconfig['all_hours'] = $freenas_config['rsync_local']['all_hours'];
+  $pconfig['all_days'] = $freenas_config['rsync_local']['all_days'];
+  $pconfig['all_months'] = $freenas_config['rsync_local']['all_months'];
+  $pconfig['all_weekdays'] = $freenas_config['rsync_local']['all_weekdays'];
   
   if ($pconfig['all_mins'] == 1){
    $all_mins_all = " checked";
@@ -227,7 +212,8 @@ if (is_array($a_mount)) {
  */
 $jscriptstr .= <<<EOD
 
-  document.iform.rsyncserverip.disabled = endis;
+  document.iform.source.disabled = endis;
+  document.iform.destination.disabled = endis;
   document.iform.minutes1.disabled = endis;
   document.iform.minutes2.disabled = endis;
   document.iform.minutes3.disabled = endis;
@@ -250,7 +236,8 @@ $jscriptstr .= <<<EOD
   document.iform.all_weekdays2.disabled = endis;
   document.iform.opt_delete.disabled = endis;
   /* color adjustments */	
-  document.iform.rsyncserverip.style.backgroundColor = color;
+  document.iform.source.style.backgroundColor = color;
+  document.iform.destination.style.backgroundColor = color;
   document.iform.minutes1.style.backgroundColor = color;
   document.iform.minutes2.style.backgroundColor = color;
   document.iform.minutes3.style.backgroundColor = color;
@@ -295,8 +282,8 @@ echo $pfSenseHead->getHTML();
 <?php
   $tab_array = array();
   $tab_array[0] = array(gettext("Server"), false, "services_rsyncd.php");
-  $tab_array[1] = array(gettext("Client"), true,  "services_rsyncd_client.php");
-  $tab_array[2] = array(gettext("Local"),  false, "services_rsyncd_local.php");
+  $tab_array[1] = array(gettext("Client"), false, "services_rsyncd_client.php");
+  $tab_array[2] = array(gettext("Local"),  true,  "services_rsyncd_local.php");
   display_top_tabs($tab_array);
 ?>
     </td>
@@ -304,7 +291,7 @@ echo $pfSenseHead->getHTML();
   <tr>
     <td>
       <div id="mainarea">
-      <form id="iform" name="iform" action="services_rsyncd_client.php" method="post">
+      <form id="iform" name="iform" action="services_rsyncd_local.php" method="post">
       <table class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
           <tr>
             <td width="100%" valign="middle" class="listtopic" colspan="2">
@@ -315,11 +302,49 @@ echo $pfSenseHead->getHTML();
             </td>
           </tr>
           <tr>
-            <td width="16%" valign="top" class="vncellreq"><?= gettext("Remote RSYNC Server"); ?></td>
+            <td width="16%" valign="top" class="vncellreq"><?= gettext("Source"); ?></td>
             <td width="84%" class="vtable">
-              <input name="rsyncserverip" id="rsyncserverip" type="text" class="formfld unknown" size="20" value="<?=htmlspecialchars($pconfig['rsyncserverip']);?>" /> 
+              <select name="source" class="formfld" id="source">
+                <?php
+                if (is_array($freenas_config['mounts']['mount'])) {
+                  foreach ($a_mount as $mountv) 	{ 
+                    echo "<option value=\"{$mountv['sharename']}\"";
+                      if (strcmp($mountv['sharename'],$pconfig['source']) == 0)
+                        echo " selected";
+                    echo">";
+                    echo htmlspecialchars($mountv['sharename']);
+                    echo "</option>";
+                  }
+                }
+                else
+                  echo gettext("You must configure mount point first.");
+                ?>
+              </select>
               <br />
-              <?= gettext("IP address of remote RSYNC server"); ?>
+              <?= gettext("Source Mount Point."); ?>
+            </td>
+          </tr>
+          <tr>
+            <td width="16%" valign="top" class="vncellreq"><?= gettext("Destination"); ?></td>
+            <td width="84%" class="vtable">
+              <select name="destination" class="formfld" id="destination">
+                <?php
+                if (is_array($freenas_config['mounts']['mount'])) {
+                  foreach ($a_mount as $mountv) { 
+                    echo "<option value=\"{$mountv['sharename']}\"";
+                      if (strcmp($mountv['sharename'],$pconfig['destination']) == 0)
+                        echo " selected";
+                    echo">";
+                    echo htmlspecialchars($mountv['sharename']);
+                    echo "</option>";
+                  }
+                }
+                else
+                  echo gettext("You must configure mount point first.");
+                ?>
+              </select>
+              <br />
+              <?= gettext("Destination Mount Point."); ?>
             </td>
           </tr>
           <tr>
@@ -327,29 +352,6 @@ echo $pfSenseHead->getHTML();
             <td width="84%" class="vtable">
               <input name="opt_delete" id="opt_delete" type="checkbox" value="yes" <?php if ($pconfig['opt_delete']) echo "checked=\"checked\""; ?> />
               <?= gettext("Delete files that don't exist on sender."); ?>
-            </td>
-          </tr>
-          <tr>
-            <td width="16%" valign="top" class="vncellreq"><?= gettext("Shares to be synchronized"); ?></td>
-            <td width="84%" class="vtable">
-              <?php 
-                $i=0;
-                if (is_array($freenas_config['mounts']['mount'])) {
-                  foreach ($a_mount as $mountv) {  
-                    echo "<input name=\"sharetosync[]\" id=\"share_" . $i  . "\" type=\"checkbox\" value=\"" . $mountv['sharename'] . "\"";
-                    
-                    if (in_array($mountv['sharename'], $pconfig['sharetosync']))
-                      echo " checked=\"checked\"";
-                    echo" />";
-                    echo $mountv['sharename'] . " (" . $mountv['desc'] . ")<br />\n";
-                    $i++;
-                  }
-                }
-                else
-                  echo "You must configure mount point before!";
-              ?>
-              <br />
-              <?= gettext("This same local share must be present on the Remote Server."); ?>
             </td>
           </tr>
           <tr>

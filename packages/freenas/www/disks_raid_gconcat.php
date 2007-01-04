@@ -2,7 +2,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    disks_raid_gvinum.php
+    disks_raid_gconcat.php
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2006 Daniel S. Haischt <me@daniel.stefan.haischt.name>
     All rights reserved.
@@ -42,7 +42,7 @@
 
 $pgtitle = array(gettext("System"),
                  gettext("Disks"),
-                 gettext("GEOM Vinum"),
+                 gettext("GEOM Concat"),
                  gettext("RAID"));
 
 require_once("freenas_config.inc");
@@ -50,14 +50,14 @@ require_once("guiconfig.inc");
 require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
 
-if (!is_array($freenas_config['gvinum']['vdisk']))
-  $freenas_config['gvinum']['vdisk'] = array();
+if (!is_array($freenas_config['gconcat']['vdisk']))
+  $freenas_config['gconcat']['vdisk'] = array();
 
-gvinum_sort();
+gconcat_sort();
 
 $raidstatus=get_sraid_disks_list();
 
-$a_raid = &$freenas_config['gvinum']['vdisk'];
+$a_raid = &$freenas_config['gconcat']['vdisk'];
 
 if (! empty($_POST))
 {
@@ -67,7 +67,7 @@ if (! empty($_POST))
   unset($input_errors);
   
   $pconfig = $_POST;
-  
+
   if (is_array($error_bucket))
     foreach($error_bucket as $elem)
       $input_errors[] =& $elem["error"];
@@ -84,7 +84,7 @@ if (! empty($_POST))
     {
       config_lock();
       /* reload all components that create raid device */
-      disks_raid_gvinum_configure();
+      disks_raid_gconcat_configure();
       config_unlock();
       write_config();
     }
@@ -94,16 +94,16 @@ if (! empty($_POST))
         unlink($d_raidconfdirty_path);
     }
   }
-  }
-  
-  if ($_GET['act'] == "del") {
+}
+
+if ($_GET['act'] == "del") {
   if ($a_raid[$_GET['id']]) {
     $raidname=$a_raid[$_GET['id']]['name'];
-    disks_raid_gvinum_delete($raidname);
+    disks_raid_gconcat_delete($raidname);
     unset($a_raid[$_GET['id']]);
     write_config();
     touch($d_raidconfdirty_path);
-    pfSenseHeader("disks_raid_gvinum.php");
+    pfSenseHeader("disks_raid_gconcat.php");
     exit;
   }
 }
@@ -120,7 +120,7 @@ echo $pfSenseHead->getHTML();
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
-<form action="disks_raid_gvinum.php" method="post" name="iform" id="iform">
+<form action="disks_raid_gconcat.php" method="post" name="iform" id="iform">
 <?php if (file_exists($d_diskdirty_path)): ?>
 <?php print_info_box_np(gettext("The Raid configuration has been changed.") . "<br />" .
                         gettext("You must apply the changes in order for them to take effect."));?>
@@ -132,11 +132,11 @@ echo $pfSenseHead->getHTML();
     <td class="tabnavtbl">
 <?php
   $tab_array = array();
-  $tab_array[0] = array(gettext("Geom Mirror"), false, "disks_raid_gmirror.php");
-  $tab_array[1] = array(gettext("Geom Concat"), false, "disks_raid_gconcat.php");
+  $tab_array[0] = array(gettext("Geom Mirror"), false,  "disks_raid_gmirror.php");
+  $tab_array[1] = array(gettext("Geom Concat"), true,  "disks_raid_gconcat.php");
   $tab_array[2] = array(gettext("Geom Stripe"), false, "disks_raid_gstripe.php");
   $tab_array[3] = array(gettext("Geom RAID5"),  false, "disks_raid_graid5.php");
-  $tab_array[4] = array(gettext("Geom Vinum"),  true,  "disks_raid_gvinum.php");
+  $tab_array[4] = array(gettext("Geom Vinum"),  false, "disks_raid_gvinum.php");
   display_top_tabs($tab_array);
 ?>  
     </td>
@@ -145,12 +145,12 @@ echo $pfSenseHead->getHTML();
     <td class="tabnavtbl">
 <?php
   $tab_array = array();
-  $tab_array[0] = array(gettext("Manage RAID"), true,  "disks_raid_gvinum.php");
+  $tab_array[0] = array(gettext("Manage RAID"), true,  "disks_raid_gconcat.php");
   /* $tab_array[1] = array(gettext("Format RAID"), false, "disks_raid_gmirror_init.php"); */
-  $tab_array[1] = array(gettext("Tools"),       false, "disks_raid_gvinum_tools.php");
-  $tab_array[2] = array(gettext("Information"), false, "disks_raid_gvinum_infos.php");
+  $tab_array[1] = array(gettext("Tools"),       false, "disks_raid_gconcat_tools.php");
+  $tab_array[2] = array(gettext("Information"), false, "disks_raid_gconcat_infos.php");
   display_top_tabs($tab_array);
-?>
+?>  
     </td>
   </tr>
   <tr> 
@@ -187,17 +187,17 @@ echo $pfSenseHead->getHTML();
         <td valign="middle" class="listr">
           <?php
             if ($raidconfiguring)
-              echo "_CONFIGURING";
+              echo gettext("configuring");
             else {
               echo "{$raidstatus[$tempo]['desc']}";
             }
           ?>&nbsp;
         </td>
         <td valign="middle" class="list"> 
-          <a href="disks_raid_gvinum_edit.php?id=<?=$i;?>">
+          <a href="disks_raid_gconcat_edit.php?id=<?=$i;?>">
             <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="<?=gettext("edit raid");?>" width="17" height="17" border="0" alt="" />
           </a>
-          <a href="disks_raid_gvinum.php?act=del&id=<?=$i;?>">
+          <a href="disks_raid_gconcat.php?act=del&id=<?=$i;?>">
             <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="<?=gettext("delete raid");?>" width="17" height="17" border="0" alt="" />
           </a> 
         </td>
@@ -206,7 +206,7 @@ echo $pfSenseHead->getHTML();
       <tr>
         <td class="list" colspan="4"></td>
         <td class="list" nowrap>
-          <a href="disks_raid_gvinum_edit.php">
+          <a href="disks_raid_gconcat_edit.php">
             <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("add disk");?>" width="17" height="17" border="0" alt="" />
           </a>
         </td>
@@ -222,12 +222,13 @@ echo $pfSenseHead->getHTML();
             <span class="vexpl"><a href="disks_manage.php"><?= gettext("previsously configured disk."); ?></a></span>
             <br />
             <span class="vexpl"><?= gettext("Wait for the \"up\" status before format it and mount it!."); ?></span>
+          </span>
         </td>
       </tr>
     </table>
   </div>
   </td>
-  </tr>
+	</tr>
 </table>
 </form>
 <?php include("fend.inc"); ?>

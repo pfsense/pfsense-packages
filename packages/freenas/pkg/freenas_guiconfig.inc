@@ -35,6 +35,8 @@ $d_diskdirty_path = $g['varrun_path'] . "/disk.dirty";
 $d_raidconfdirty_path = $g['varrun_path'] . "/raid.conf.dirty";
 $d_userconfdirty_path = $g['varrun_path'] . "/user.conf.dirty";
 $d_groupconfdirty_path = $g['varrun_path'] . "/group.conf.dirty";
+$d_smbshareconfdirty_path = $g['varrun_path'] . "/smbshare.conf.dirty";
+$d_upnpconfdirty_path = $g['varrun_path'] . "/upnp.conf.dirty";
 
 $freenas_config =& $config['installedpackages']['freenas']['config'][0];
 
@@ -77,6 +79,39 @@ function gmirror_sort() {
 	}
 
 	usort($freenas_config['gmirror']['vdisk'], "gmirrorcmp");
+	
+}
+
+function gconcat_sort() {
+	global $g, $config;
+
+	function gconcatcmp($a, $b) {
+		return strcmp($a['name'], $b['name']);
+	}
+
+	usort($config['gconcat']['vdisk'], "gconcatcmp");
+	
+}
+
+function gstripe_sort() {
+	global $g, $config;
+
+	function gstripecmp($a, $b) {
+		return strcmp($a['name'], $b['name']);
+	}
+
+	usort($config['gstripe']['vdisk'], "gstripecmp");
+	
+}
+
+function graid5_sort() {
+	global $g, $config;
+
+	function graid5cmp($a, $b) {
+		return strcmp($a['name'], $b['name']);
+	}
+
+	usort($config['graid5']['vdisk'], "graid5cmp");
 	
 }
 

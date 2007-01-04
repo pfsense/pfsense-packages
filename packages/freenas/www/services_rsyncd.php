@@ -1,36 +1,44 @@
 <?php
 /* $Id$ */
+/* ========================================================================== */
 /*
-	disks_manage_edit.php
-	part of FreeNAS (http://www.freenas.org)
-	Copyright (C) 2005-2006 Olivier Cochard-Labbé <olivier@freenas.org>.
-	All rights reserved.
-	
-	Based on m0n0wall (http://m0n0.ch/wall)
-	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-	All rights reserved.
-	
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
-	
-	1. Redistributions of source code must retain the above copyright notice,
-	   this list of conditions and the following disclaimer.
-	
-	2. Redistributions in binary form must reproduce the above copyright
-	   notice, this list of conditions and the following disclaimer in the
-	   documentation and/or other materials provided with the distribution.
-	
-	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
-*/
+    services_rsyncd.php
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2006 Daniel S. Haischt <me@daniel.stefan.haischt.name>
+    All rights reserved.
+
+    Based on FreeNAS (http://www.freenas.org)
+    Copyright (C) 2005-2006 Olivier Cochard-Labbé <olivier@freenas.org>.
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
 
 $pgtitle = array(gettext("Services"),
                  gettext("RSYNCD"),
@@ -43,15 +51,15 @@ require_once("freenas_functions.inc");
 
 /* TODO: use pfSense users/groups. */
 if (!is_array($freenas_config['system']['user']))
-	$freenas_config['system']['user'] = array();
-	
+  $freenas_config['system']['user'] = array();
+
 users_sort();
 
 $a_user = &$freenas_config['system']['user'];
 
 if (!is_array($freenas_config['rsync']))
 {
-	$freenas_config['rsync'] = array();	
+  $freenas_config['rsync'] = array();	
 }
 
 $pconfig['readonly'] = $freenas_config['rsyncd']['readonly'];
@@ -69,25 +77,25 @@ if (! empty($_POST))
   unset($input_errors);
   unset($do_format);
   $pconfig = $_POST;
-
+  
   /* input validation */
-	if ($_POST['enable'])
-	{
-		$reqdfields = array_merge($reqdfields, explode(" ", "readonly port"));
-		$reqdfieldsn = array_merge($reqdfieldsn, explode(",", "Readonly,Port"));
-	}
-	
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
-	
-	if ($_POST['enable']) {
-		if (!is_port($_POST['port']))
+  if ($_POST['enable'])
+  {
+    $reqdfields = array_merge($reqdfields, explode(" ", "readonly port"));
+    $reqdfieldsn = array_merge($reqdfieldsn, explode(",", "Readonly,Port"));
+  }
+  
+  do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+  
+  if ($_POST['enable']) {
+    if (!is_port($_POST['port']))
       $error_bucket[] = array("error" => gettext("The TCP port must be a valid port number."),
                               "field" => "port");
-		else if (!is_numericint($_POST['maxcon']))
+    else if (!is_numericint($_POST['maxcon']))
       $error_bucket[] = array("error" => gettext("The value provided by the maximum connections field is not a number"),
                               "field" => "maxcon");
-	}
-
+  }
+  
   if (is_array($error_bucket))
     foreach($error_bucket as $elem)
       $input_errors[] =& $elem["error"];
@@ -98,28 +106,28 @@ if (! empty($_POST))
       exit;   
   }
   
-	if (!$input_errors)
-	{
-		$freenas_config['rsyncd']['readonly'] = $_POST['readonly'];	
-		$freenas_config['rsyncd']['port'] = $_POST['port'];
-		$freenas_config['rsyncd']['motd'] = $_POST['motd'];
-		$freenas_config['rsyncd']['maxcon'] = $_POST['maxcon'];
-		$freenas_config['rsyncd']['enable'] = $_POST['enable'] ? true : false;
-		$freenas_config['rsyncd']['rsyncd_user'] = $_POST['rsyncd_user'];
-		
-		write_config();
-		
-		$retval = 0;
-		if (!file_exists($d_sysrebootreqd_path))
-		{
-			/* nuke the cache file */
-			config_lock();
-			services_rsyncd_configure();
-			services_zeroconf_configure();
-			config_unlock();
-		}
-		$savemsg = get_std_save_message($retval);
-	}
+  if (!$input_errors)
+  {
+    $freenas_config['rsyncd']['readonly'] = $_POST['readonly'];	
+    $freenas_config['rsyncd']['port'] = $_POST['port'];
+    $freenas_config['rsyncd']['motd'] = $_POST['motd'];
+    $freenas_config['rsyncd']['maxcon'] = $_POST['maxcon'];
+    $freenas_config['rsyncd']['enable'] = $_POST['enable'] ? true : false;
+    $freenas_config['rsyncd']['rsyncd_user'] = $_POST['rsyncd_user'];
+    
+    write_config();
+    
+    $retval = 0;
+    if (!file_exists($d_sysrebootreqd_path))
+    {
+      /* nuke the cache file */
+      config_lock();
+      services_rsyncd_configure();
+      services_zeroconf_configure();
+      config_unlock();
+    }
+    $savemsg = get_std_save_message($retval);
+  }
 }
 
 include("head.inc");
@@ -130,22 +138,22 @@ $jscriptstr = <<<EOD
 <script type="text/javascript">
 <!--
 function enable_change(enable_change) {
-	var endis;
-	
-	endis = !(document.iform.enable.checked || enable_change);
+  var endis;
+  
+  endis = !(document.iform.enable.checked || enable_change);
   endis ? color = '#D4D0C8' : color = '#FFFFFF';
   
-	document.iform.readonly.disabled = endis;
-	document.iform.port.disabled = endis;
-	document.iform.motd.disabled = endis;
-	document.iform.maxcon.disabled = endis;
-	document.iform.rsyncd_user.disabled = endis;
+  document.iform.readonly.disabled = endis;
+  document.iform.port.disabled = endis;
+  document.iform.motd.disabled = endis;
+  document.iform.maxcon.disabled = endis;
+  document.iform.rsyncd_user.disabled = endis;
   /* adjust colors */
-	document.iform.readonly.style.backgroundColor = color;
-	document.iform.port.style.backgroundColor = color;
-	document.iform.motd.style.backgroundColor = color;
-	document.iform.maxcon.style.backgroundColor = color;
-	document.iform.rsyncd_user.style.backgroundColor = color;
+  document.iform.readonly.style.backgroundColor = color;
+  document.iform.port.style.backgroundColor = color;
+  document.iform.motd.style.backgroundColor = color;
+  document.iform.maxcon.style.backgroundColor = color;
+  document.iform.rsyncd_user.style.backgroundColor = color;
 }
 //-->
 </script>
@@ -166,12 +174,13 @@ echo $pfSenseHead->getHTML();
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
   <tr>
     <td>
-<?php
+  <?php
   $tab_array = array();
-	$tab_array[0] = array(gettext("Server"), true, "services_rsyncd.php");
-	$tab_array[1] = array(gettext("Client"), false, "services_rsyncd_client.php");
+  $tab_array[0] = array(gettext("Server"), true, "services_rsyncd.php");
+  $tab_array[1] = array(gettext("Client"), false, "services_rsyncd_client.php");
+  $tab_array[2] = array(gettext("Local"), false, "services_rsyncd_local.php");
   display_top_tabs($tab_array);
-?>
+  ?>
     </td>
   </tr>
   <tr>
@@ -190,11 +199,11 @@ echo $pfSenseHead->getHTML();
           <tr>
             <td width="22%" valign="top" class="vncellreq"><?= gettext("Read only"); ?></td>
             <td width="78%" class="vtable">
-					    <select name="readonly" class="formselect" id="readonly">
+              <select name="readonly" class="formselect" id="readonly">
                 <?php
                   $types = explode(",", "Yes,No");
-					        $vals = explode(" ", "yes no");                  
-					        $j = 0;
+                  $vals = explode(" ", "yes no");                  
+                  $j = 0;
                   
                   for ($j = 0; $j < count($vals); $j++):
                 ?>
@@ -208,14 +217,14 @@ echo $pfSenseHead->getHTML();
           <tr>
             <td width="22%" valign="top" class="vncellreq"><?= gettext("Map to user"); ?></td>
             <td width="78%" class="vtable">
-		          <select name="rsyncd_user" class="formselect" id="rsyncd_user">
-		            <option value="ftp"<?php if ($pconfig['rsyncd_user'] == "ftp") echo "selected";?>> 
-		            <?php echo htmlspecialchars("guest"); ?>
-		            <?php foreach ($a_user as $user): ?>
-		            <option value="<?=$user['name'];?>"<?php if ($user['name'] == $pconfig['rsyncd_user']) echo "selected";?>> 
-		            <?php echo htmlspecialchars($user['name']); ?>
-		            </option>
-		            <?php endforeach; ?>
+              <select name="rsyncd_user" class="formselect" id="rsyncd_user">
+                <option value="ftp"<?php if ($pconfig['rsyncd_user'] == "ftp") echo "selected";?>> 
+                <?php echo htmlspecialchars("guest"); ?>
+                <?php foreach ($a_user as $user): ?>
+                <option value="<?=$user['name'];?>"<?php if ($user['name'] == $pconfig['rsyncd_user']) echo "selected";?>> 
+                <?php echo htmlspecialchars($user['name']); ?>
+                </option>
+                <?php endforeach; ?>
               </select>
             </td>
           </tr>
@@ -251,7 +260,7 @@ echo $pfSenseHead->getHTML();
         </form>
       </div>
     </td>
-	</tr>
+  </tr>
 </table>
 <?php include("fend.inc"); ?>
 <?= checkForInputErrors(); ?>

@@ -2,7 +2,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    disks_raid_gmirror_edit.php
+    disks_raid_gstripe_edit.php
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2006 Daniel S. Haischt <me@daniel.stefan.haischt.name>
     All rights reserved.
@@ -42,9 +42,9 @@
 
 $pgtitle = array(gettext("System"),
                  gettext("Disks"),
-                 gettext("GEOM Mirror"),
+                 gettext("GEOM Stripe"),
                  gettext("RAID"),
-                 isset($id) ? gettext("Edit") : gettext("Add"));
+                 gettext("Edit"));
 
 require_once("freenas_config.inc");
 require_once("guiconfig.inc");
@@ -55,14 +55,14 @@ $id = $_GET['id'];
 if (isset($_POST['id']))
   $id = $_POST['id'];
 
-if (!is_array($freenas_config['gmirror']['vdisk']))
-  $freenas_config['gmirror']['vdisk'] = array();
+if (!is_array($freenas_config['gstripe']['vdisk']))
+  $freenas_config['gstripe']['vdisk'] = array();
 
-gmirror_sort();
+gstripe_sort();
 disks_sort();
 
-$a_raid = &$freenas_config['gmirror']['vdisk'];
-$all_raid = array_merge((array)$freenas_config['graid5']['vdisk'],(array)$freenas_config['gmirror']['vdisk'],(array)$freenas_config['gvinum']['vdisk'],(array)$freenas_config['gstripe']['vdisk'],(array)$freenas_config['gconcat']['vdisk']);
+$a_raid = &$freenas_config['gstripe']['vdisk'];
+$all_raid = array_merge((array)$freenas_config['gstripe']['vdisk'],(array)$freenas_config['gstripe']['vdisk'],(array)$freenas_config['gvinum']['vdisk'],(array)$freenas_config['gstripe']['vdisk'],(array)$freenas_config['gstripe']['vdisk']);
 $a_disk = get_fstype_disks_list("softraid");
 
 if (!sizeof($a_disk)) {
@@ -71,10 +71,9 @@ if (!sizeof($a_disk)) {
 
 if (isset($id) && $a_raid[$id]) {
   $pconfig['name'] = $a_raid[$id]['name'];
-  $pconfig['fullname'] = $a_raid[$id]['fullname'];
   $pconfig['type'] = $a_raid[$id]['type'];
-  $pconfig['balance'] = $a_raid[$id]['balance'];
   $pconfig['diskr'] = $a_raid[$id]['diskr'];
+  $pconfig['fullname'] = $a_raid[$id]['fullname'];
 }
 
 if (! empty($_POST))
@@ -95,7 +94,6 @@ if (! empty($_POST))
                             "field" => "name");
   }
   
-    
   /* check for name conflicts */
   foreach ($a_raid as $raid)
   {
@@ -112,8 +110,8 @@ if (! empty($_POST))
   
   /* check the number of RAID disk for volume */
   
-  if (count($_POST['diskr']) != 2)
-    $error_bucket[] = array("error" => gettext("There must be 2 disks in a RAID 1 volume."),
+  if (count($_POST['diskr']) < 2)
+    $error_bucket[] = array("error" => gettext("There must be a minimum of 2 disks in a RAID 0 volume."),
                             "field" => "diskr");
   
   if (is_array($error_bucket))
@@ -129,11 +127,10 @@ if (! empty($_POST))
   if (!$input_errors) {
     $raid = array();
     $raid['name'] = $_POST['name'];
-    $raid['balance'] = $_POST['balance'];
-    $raid['type'] = 1;
+    $raid['type'] = "JBOD";
     $raid['diskr'] = $_POST['diskr'];
-    $raid['desc'] = "Software RAID {$_POST['type']}";
-    $raid['fullname'] = "/dev/mirror/{$raid['name']}";
+    $raid['desc'] = "Software gstripe RAID 0";
+    $raid['fullname'] = "/dev/stripe/{$raid['name']}";
     
     if (isset($id) && $a_raid[$id])
       $a_raid[$id] = $raid;
@@ -150,7 +147,7 @@ if (! empty($_POST))
     
     write_config();
     
-    pfSenseHeader("disks_raid_gmirror.php");
+    pfSenseHeader("disks_raid_gstripe.php");
     exit;
   }
 }
@@ -173,9 +170,9 @@ echo $pfSenseHead->getHTML();
     <td class="tabnavtbl">
 <?php
   $tab_array = array();
-  $tab_array[0] = array(gettext("Geom Mirror"), true,  "disks_raid_gmirror.php");
+  $tab_array[0] = array(gettext("Geom Mirror"), false, "disks_raid_gmirror.php");
   $tab_array[1] = array(gettext("Geom Concat"), false, "disks_raid_gconcat.php");
-  $tab_array[2] = array(gettext("Geom Stripe"), false, "disks_raid_gstripe.php");
+  $tab_array[2] = array(gettext("Geom Stripe"), true,  "disks_raid_gstripe.php");
   $tab_array[3] = array(gettext("Geom RAID5"),  false, "disks_raid_graid5.php");
   $tab_array[4] = array(gettext("Geom Vinum"),  false, "disks_raid_gvinum.php");
   display_top_tabs($tab_array);
@@ -186,10 +183,10 @@ echo $pfSenseHead->getHTML();
     <td class="tabnavtbl">
 <?php
   $tab_array = array();
-  $tab_array[0] = array(gettext("Manage RAID"), true,  "disks_raid_gmirror.php");
+  $tab_array[0] = array(gettext("Manage RAID"), true,  "disks_raid_gstripe.php");
   /* $tab_array[1] = array(gettext("Format RAID"), false, "disks_raid_gmirror_init.php"); */
-  $tab_array[1] = array(gettext("Tools"),       false, "disks_raid_gmirror_tools.php");
-  $tab_array[2] = array(gettext("Information"), false, "disks_raid_gmirror_infos.php");
+  $tab_array[1] = array(gettext("Tools"),       false, "disks_raid_gstripe_tools.php");
+  $tab_array[2] = array(gettext("Information"), false, "disks_raid_gstripe_infos.php");
   display_top_tabs($tab_array);
 ?>  
     </td>
@@ -197,7 +194,7 @@ echo $pfSenseHead->getHTML();
   <tr>
     <td>
       <div id="mainarea">
-      <form action="disks_raid_gmirror_edit.php" method="post" name="iform" id="iform">
+      <form action="disks_raid_gstripe_edit.php" method="post" name="iform" id="iform">
       <table class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
       <tr>
         <td width="22%" valign="top" class="vncellreq"><?=gettext("Raid name");?></td>
@@ -208,25 +205,9 @@ echo $pfSenseHead->getHTML();
       <tr> 
         <td valign="top" class="vncellreq"><?= gettext("Type"); ?></td>
         <td class="vtable">
-          RAID 1 (<?= gettext("mirroring"); ?>)
+          RAID 5 (<?= gettext("rotated block-interleaved parity"); ?>)
         </td>
-      </tr>
-      <tr> 
-        <td width="22%" valign="top" class="vncellreq"><?= gettext("Balance algorithm"); ?></td>
-        <td width="78%" class="vtable"> 
-          <select name="balance" class="formselect">
-          <?php $balvals = array(
-                             "split"=>"Split request",
-                             "load"=>"Read from lowest load",
-                             "round-robin"=>"Round-robin read");
-          ?>
-          <?php foreach ($balvals as $balval => $balname): ?>
-          <option value="<?=$balval;?>" <?php if($pconfig['balance'] == $balval) echo 'selected';?>><?=htmlspecialchars($balname);?></option>
-          <?php endforeach; ?>
-          </select>
-          <br />
-          <?= gettext("Select your read balance algorithm."); ?></td>
-        </tr>              
+      </tr>              
         <tr> 
           <td width="22%" valign="top" class="vncellreq"><?= gettext("Members of this volume"); ?></td>
           <td width="78%" class="vtable">
@@ -270,7 +251,7 @@ echo $pfSenseHead->getHTML();
         </form>
       </div>
     </td>
-	</tr>
+  </tr>
 </table>
 <?php include("fend.inc"); ?>
 </body>

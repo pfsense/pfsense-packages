@@ -1,36 +1,44 @@
 <?php
 /* $Id$ */
+/* ========================================================================== */
 /*
-	disks_manage_edit.php
-	part of FreeNAS (http://www.freenas.org)
-	Copyright (C) 2005-2006 Olivier Cochard-Labbé <olivier@freenas.org>.
-	All rights reserved.
-	
-	Based on m0n0wall (http://m0n0.ch/wall)
-	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-	All rights reserved.
-	
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
-	
-	1. Redistributions of source code must retain the above copyright notice,
-	   this list of conditions and the following disclaimer.
-	
-	2. Redistributions in binary form must reproduce the above copyright
-	   notice, this list of conditions and the following disclaimer in the
-	   documentation and/or other materials provided with the distribution.
-	
-	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
-*/
+    disks_raid_gmirror.php
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2006 Daniel S. Haischt <me@daniel.stefan.haischt.name>
+    All rights reserved.
+
+    Based on FreeNAS (http://www.freenas.org)
+    Copyright (C) 2005-2006 Olivier Cochard-Labbé <olivier@freenas.org>.
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
 
 $pgtitle = array(gettext("System"),
                  gettext("Disks"),
@@ -43,7 +51,7 @@ require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
 
 if (!is_array($freenas_config['gmirror']['vdisk']))
-	$freenas_config['gmirror']['vdisk'] = array();
+  $freenas_config['gmirror']['vdisk'] = array();
 
 gmirror_sort();
 
@@ -70,33 +78,34 @@ if (! empty($_POST))
       exit;   
   }
   
-	if ($_POST['apply']) {
-		$retval = 0;
-		if (!file_exists($d_sysrebootreqd_path))
-		{
-			config_lock();
-			/* reload all components that create raid device */
-			disks_raid_gmirror_configure();
-			config_unlock();
-			write_config();
-		}
-		$savemsg = get_std_save_message($retval);
-		if ($retval == 0) {
-			if (file_exists($d_raidconfdirty_path))
-				unlink($d_raidconfdirty_path);
-		}
-	}
+  if ($_POST['apply']) {
+    $retval = 0;
+    if (!file_exists($d_sysrebootreqd_path))
+    {
+      config_lock();
+      /* reload all components that create raid device */
+      disks_raid_gmirror_configure();
+      config_unlock();
+      write_config();
+    }
+    $savemsg = get_std_save_message($retval);
+    if ($retval == 0) {
+      if (file_exists($d_raidconfdirty_path))
+        unlink($d_raidconfdirty_path);
+    }
+  }
 }
 
 if ($_GET['act'] == "del") {
-	if ($a_raid[$_GET['id']]) {
-		$raidname=$a_raid[$_GET['id']]['name'];
-		disks_raid_gmirror_delete($raidname);
-		unset($a_raid[$_GET['id']]);
-		write_config();
-		pfSenseHeader("disks_raid_gmirror.php");
-		exit;
-	}
+  if ($a_raid[$_GET['id']]) {
+    $raidname=$a_raid[$_GET['id']]['name'];
+    disks_raid_gmirror_delete($raidname);
+    unset($a_raid[$_GET['id']]);
+    write_config();
+    touch($d_raidconfdirty_path);
+    pfSenseHeader("disks_raid_gmirror.php");
+    exit;
+  }
 }
 
 include("head.inc");
@@ -122,82 +131,85 @@ echo $pfSenseHead->getHTML();
   <tr>
     <td class="tabnavtbl">
 <?php
-	$tab_array = array();
-	$tab_array[0] = array(gettext("Geom Mirror"),           true,  "disks_raid_gmirror.php");
-	$tab_array[1] = array(gettext("Geom Vinum (unstable)"), false, "disks_raid_gvinum.php");
-	display_top_tabs($tab_array);
+  $tab_array = array();
+  $tab_array[0] = array(gettext("Geom Mirror"), true,  "disks_raid_gmirror.php");
+  $tab_array[1] = array(gettext("Geom Concat"), false, "disks_raid_gconcat.php");
+  $tab_array[2] = array(gettext("Geom Stripe"), false, "disks_raid_gstripe.php");
+  $tab_array[3] = array(gettext("Geom RAID5"),  false, "disks_raid_graid5.php");
+  $tab_array[4] = array(gettext("Geom Vinum"),  false, "disks_raid_gvinum.php");
+  display_top_tabs($tab_array);
 ?>  
     </td>
   </tr>
   <tr>
     <td class="tabnavtbl">
 <?php
-	$tab_array = array();
-	$tab_array[0] = array(gettext("Manage RAID"), true,  "disks_raid_gmirror.php");
-	$tab_array[1] = array(gettext("Format RAID"), false, "disks_raid_gmirror_init.php");
-	$tab_array[2] = array(gettext("Tools"),       false, "disks_raid_gmirror_tools.php");
-  $tab_array[3] = array(gettext("Information"), false, "disks_raid_gmirror_infos.php");
-	display_top_tabs($tab_array);
+  $tab_array = array();
+  $tab_array[0] = array(gettext("Manage RAID"), true,  "disks_raid_gmirror.php");
+  /* $tab_array[1] = array(gettext("Format RAID"), false, "disks_raid_gmirror_init.php"); */
+  $tab_array[1] = array(gettext("Tools"),       false, "disks_raid_gmirror_tools.php");
+  $tab_array[2] = array(gettext("Information"), false, "disks_raid_gmirror_infos.php");
+  display_top_tabs($tab_array);
 ?>  
     </td>
   </tr>
   <tr> 
     <td>
-	  <div id="mainarea">
+    <div id="mainarea">
     <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
       <tr> 
-      	<td class="listhdrr"><?=gettext("Volume name");?></td>
-      	<td class="listhdrr"><?=gettext("Type");?></td>
+        <td class="listhdrr"><?=gettext("Volume name");?></td>
+        <td class="listhdrr"><?=gettext("Type");?></td>
         <td class="listhdrr"><?=gettext("Size");?></td>
         <td class="listhdrr"><?=gettext("Status");?></td>
-      	<td class="list">&nbsp;</td>
+        <td class="list">&nbsp;</td>
       </tr>
       <?php $i = 0; foreach ($a_raid as $raid): ?>
       <tr> 
-    	  <td valign="middle" class="listr">
+        <td valign="middle" class="listr">
           <?=htmlspecialchars($raid['name']);?>
-    		</td>
-    	  <td valign="middle" class="listr">
+        </td>
+        <td valign="middle" class="listr">
           <?=htmlspecialchars($raid['type']);?>
-    		</td>
-    	  <td valign="middle" class="listr">
+        </td>
+        <td valign="middle" class="listr">
           <?php
-		        $raidconfiguring = file_exists($d_raidconfdirty_path) &&
+            $raidconfiguring = file_exists($d_raidconfdirty_path) &&
                                in_array($raid['name']."\n",file($d_raidconfdirty_path));
             if ($raidconfiguring)
-						  echo gettext("configuring");
-					  else {
-						  $tempo=$raid['name'];						
-						  echo "{$raidstatus[$tempo]['size']}";
-						}
+              echo gettext("configuring");
+            else {
+              $tempo=$raid['name'];
+              echo "{$raidstatus[$tempo]['size']}";
+            }
           ?>&nbsp;
-    		</td>
-    	  <td valign="middle" class="listr">
+        </td>
+        <td valign="middle" class="listr">
           <?php
             if ($raidconfiguring)
-					  	echo gettext("configuring");
-					  else {
-						  echo "{$raidstatus[$tempo]['desc']}";
-						}
-				  ?>&nbsp;
-    		</td>
-    		<td valign="middle" class="list"> 
+              echo gettext("configuring");
+            else {
+              echo "{$raidstatus[$tempo]['desc']}";
+            }
+          ?>&nbsp;
+        </td>
+        <td valign="middle" class="list"> 
           <a href="disks_raid_gmirror_edit.php?id=<?=$i;?>">
             <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="<?=gettext("edit raid");?>" width="17" height="17" border="0" alt="" />
           </a>
-    		  <a href="disks_raid_gmirror.php?act=del&id=<?=$i;?>">
+          <a href="disks_raid_gmirror.php?act=del&id=<?=$i;?>">
             <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="<?=gettext("delete raid");?>" width="17" height="17" border="0" alt="" />
           </a> 
-    		</td>
+        </td>
       </tr>
       <?php $i++; endforeach; ?>
       <tr>
-    	  <td class="list" colspan="4"></td>
-    	  <td class="list" nowrap>
-    	    <a href="disks_raid_gmirror_edit.php">
+        <td class="list" colspan="4"></td>
+        <td class="list" nowrap>
+          <a href="disks_raid_gmirror_edit.php">
             <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("add disk");?>" width="17" height="17" border="0" alt="" />
           </a>
-    	  </td>
+        </td>
       </tr>
       <tr>
         <td align="left" valign="top" colspan="5">

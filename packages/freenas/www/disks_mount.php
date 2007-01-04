@@ -1,36 +1,44 @@
 <?php
 /* $Id$ */
+/* ========================================================================== */
 /*
-	disks_manage_edit.php
-	part of FreeNAS (http://www.freenas.org)
-	Copyright (C) 2005-2006 Olivier Cochard-Labbé <olivier@freenas.org>.
-	All rights reserved.
-	
-	Based on m0n0wall (http://m0n0.ch/wall)
-	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-	All rights reserved.
-	
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
-	
-	1. Redistributions of source code must retain the above copyright notice,
-	   this list of conditions and the following disclaimer.
-	
-	2. Redistributions in binary form must reproduce the above copyright
-	   notice, this list of conditions and the following disclaimer in the
-	   documentation and/or other materials provided with the distribution.
-	
-	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
-*/
+    disks_mount.php
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2006 Daniel S. Haischt <me@daniel.stefan.haischt.name>
+    All rights reserved.
+
+    Based on FreeNAS (http://www.freenas.org)
+    Copyright (C) 2005-2006 Olivier Cochard-Labbé <olivier@freenas.org>.
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
 
 $pgtitle = array(gettext("System"),
                  gettext("Disks"),
@@ -42,7 +50,7 @@ require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
 
 if (!is_array($freenas_config['mounts']['mount']))
-	$freenas_config['mounts']['mount'] = array();
+  $freenas_config['mounts']['mount'] = array();
 
 mount_sort();
 
@@ -89,23 +97,23 @@ if (! empty($_POST))
 
 if ($_GET['act'] == "del")
 {
-	if ($a_mount[$_GET['id']]) {
-		disks_umount_adv($a_mount[$_GET['id']]);
-		unset($a_mount[$_GET['id']]);
-		write_config();
-		touch($d_mountdirty_path);
-		pfSenseHeader("disks_mount.php");
-		exit;
-	}
+  if ($a_mount[$_GET['id']]) {
+    disks_umount_adv($a_mount[$_GET['id']]);
+    unset($a_mount[$_GET['id']]);
+    write_config();
+    touch($d_mountdirty_path);
+    pfSenseHeader("disks_mount.php");
+    exit;
+  }
 }
 
 if ($_GET['act'] == "ret")
 {
-	if ($a_mount[$_GET['id']]) {
-		disks_mount($a_mount[$_GET['id']]);
-		pfSenseHeader("disks_mount.php");
-		exit;
-	}
+  if ($a_mount[$_GET['id']]) {
+    disks_mount($a_mount[$_GET['id']]);
+    pfSenseHeader("disks_mount.php");
+    exit;
+  }
 }
 
 include("head.inc");
@@ -126,82 +134,102 @@ echo $pfSenseHead->getHTML();
 <?php print_info_box_np(gettext("The mount point list has been changed.") . "<br />" .
                         gettext("You must apply the changes in order for them to take effect."));?>
 <?php endif; ?>
-  <div id="inputerrors"></div>
-    <table width="100%" border="0" cellpadding="6" cellspacing="0">
-      <tr> 
-      	<td class="listhdrr"><?=gettext("Disk");?></td>
-      	<td class="listhdrr"><?=gettext("Partition");?></td>
-        <td class="listhdrr"><?=gettext("File system");?></td>
-        <td class="listhdrr"><?=gettext("Share name");?></td>
-        <td class="listhdrr"><?=gettext("Description");?></td>
-        <td class="listhdrr"><?=gettext("Status");?></td>
-      	<td class="list">&nbsp;</td>
-      </tr>
-      <?php $i = 0; foreach ($a_mount as $mount): ?>
-      <tr> 
-        <td valign="middle" class="listlr">
-          <?=htmlspecialchars($mount['mdisk']);?> &nbsp;
-        </td>
-        <td valign="middle" class="listr">
-          <?=htmlspecialchars($mount['partition']);?>&nbsp;
-        </td>
-        <td valign="middle" class="listr">
-          <?=htmlspecialchars($mount['fstype']);?>&nbsp;
-        </td>
-         <td valign="middle" class="listr">
-          <?=htmlspecialchars($mount['sharename']);?>&nbsp;
-        </td>
-         <td valign="middle" class="listr">
-          <?=htmlspecialchars($mount['desc']);?>&nbsp;
-        </td>
-       </td>
-       <td valign="middle" class="listbg" style="color: #FFFFFF;">
-       <?php
-         if (file_exists($d_mountdirty_path)) {
-           $stat = gettext("configuring");
-         } else {
-           $stat = disks_mount_status($mount);
-           if ($stat == "ERROR")
-             $stat = "ERROR - <a href=\"disks_mount.php?act=ret&id=$i\">retry</a>";
-         }
-         echo $stat;
-      ?>
-      </td>
-      <td valign="middle" class="list"> 
-        <a href="disks_mount_edit.php?id=<?=$i;?>">
-          <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="<?=gettext("edit mount");?>" width="17" height="17" border="0" alt="" />
-        </a>
-        <a href="disks_mount.php?act=del&id=<?=$i;?>">
-          <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" onclick="return confirm('<?= gettext("Do you really want to delete this mount point? All elements that still use it will become invalid (e.g. share)!"); ?>');" title="<?=gettext("delete mount");?>" width="17" height="17" border="0" alt="" />
-        </a> 
-      </td>
-      </tr>
-      <?php $i++; endforeach; ?>
-      <tr>
-    	  <td class="list" colspan="6"></td>
-    	  <td class="list" nowrap>
-    	    <a href="disks_mount_edit.php">
-            <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("add mount");?>" width="17" height="17" border="0" alt="" />
-          </a>
-    	  </td>
-      </tr>
-      <tr>
-        <td align="left" valign="top" colspan="7">
-            <span class="red">
-              <strong>Note:</strong>
-            </span>
-            <br />
-            <span class="vexpl">
-              <?= gettext("Second configuration step: Declaring the filesystem used by your"); ?>
-            </span>
-            <br />
-            <span class="vexpl">
-              <a href="disks_manage.php">previously configured disk</a>
-            </span>
-        </td>
-      </tr>
-    </table>
-  </form>
+
+<div id="inputerrors"></div>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td class="tabnavtbl">
+<?php
+  $tab_array = array();
+  $tab_array[0] = array(gettext("Manage"), true,  "disks_mount.php");
+  $tab_array[1] = array(gettext("Tools"),  false, "disks_miunt_tools.php");
+  display_top_tabs($tab_array);
+?>
+  </td></tr>
+  <tr> 
+    <td>
+      <div id="mainarea">
+        <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+          <tr> 
+            <td class="listhdrr"><?=gettext("Disk");?></td>
+            <td class="listhdrr"><?=gettext("Partition");?></td>
+            <td class="listhdrr"><?=gettext("File system");?></td>
+            <td class="listhdrr"><?=gettext("Share name");?></td>
+            <td class="listhdrr"><?=gettext("Description");?></td>
+            <td class="listhdrr"><?=gettext("Status");?></td>
+            <td class="list">&nbsp;</td>
+          </tr>
+          <?php $i = 0; foreach ($a_mount as $mount): ?>
+          <tr> 
+            <td valign="middle" class="listlr">
+              <?=htmlspecialchars($mount['mdisk']);?> &nbsp;
+            </td>
+            <td valign="middle" class="listr">
+              <?=htmlspecialchars($mount['partition']);?>&nbsp;
+            </td>
+            <td valign="middle" class="listr">
+              <?=htmlspecialchars($mount['fstype']);?>&nbsp;
+            </td>
+             <td valign="middle" class="listr">
+              <?=htmlspecialchars($mount['sharename']);?>&nbsp;
+            </td>
+             <td valign="middle" class="listr">
+              <?=htmlspecialchars($mount['desc']);?>&nbsp;
+            </td>
+           </td>
+           <td valign="middle" class="listbg" style="color: #FFFFFF;">
+           <?php
+             if (file_exists($d_mountdirty_path)) {
+               $stat = gettext("configuring");
+             } else {
+               $stat = disks_check_mount($mount);
+               if ($stat == 0) {
+                 $stat = "ERROR - <a href=\"disks_mount.php?act=ret&id=$i\">retry</a>";
+               } else {
+                 $stat = gettext("OK");
+               }
+             }
+             echo $stat;
+          ?>
+          </td>
+          <td valign="middle" class="list"> 
+            <a href="disks_mount_edit.php?id=<?=$i;?>">
+              <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="<?=gettext("edit mount");?>" width="17" height="17" border="0" alt="" />
+            </a>
+            <a href="disks_mount.php?act=del&id=<?=$i;?>">
+              <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" onclick="return confirm('<?= gettext("Do you really want to delete this mount point? All elements that still use it will become invalid (e.g. share)!"); ?>');" title="<?=gettext("delete mount");?>" width="17" height="17" border="0" alt="" />
+            </a> 
+          </td>
+          </tr>
+          <?php $i++; endforeach; ?>
+          <tr>
+            <td class="list" colspan="6"></td>
+            <td class="list" nowrap>
+              <a href="disks_mount_edit.php">
+                <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="<?=gettext("add mount");?>" width="17" height="17" border="0" alt="" />
+              </a>
+            </td>
+          </tr>
+          <tr>
+            <td align="left" valign="top" colspan="7">
+                <span class="red">
+                  <strong>Note:</strong>
+                </span>
+                <br />
+                <span class="vexpl">
+                  <?= gettext("Second configuration step: Declaring the filesystem used by your"); ?>
+                </span>
+                <br />
+                <span class="vexpl">
+                  <a href="disks_manage.php">previously configured disk</a>
+                </span>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </td>
+  </tr>
+  </table>
+</form>
 <?php include("fend.inc"); ?>
 <?= checkForInputErrors(); ?>
 </body>

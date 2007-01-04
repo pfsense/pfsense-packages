@@ -2,7 +2,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    diag_part_infos.php
+    disks_raid_graid5_infos.php
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2006 Daniel S. Haischt <me@daniel.stefan.haischt.name>
     All rights reserved.
@@ -40,10 +40,11 @@
                                                                               */
 /* ========================================================================== */
 
-$pgtitle = array(gettext("Diagnostics"),
-                 gettext("Partition Infos"));
+$pgtitle = array(gettext("System"),
+                 gettext("Disks"),
+                 gettext("GEOM RAID5"),
+                 gettext("Information"));
 
-require_once("freenas_config.inc");
 require_once("guiconfig.inc");
 require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
@@ -54,7 +55,7 @@ if (! empty($_POST))
   unset($error_bucket);
   /* simple error list */
   unset($input_errors);
-
+  
   if (is_array($error_bucket))
     foreach($error_bucket as $elem)
       $input_errors[] =& $elem["error"];
@@ -64,6 +65,11 @@ if (! empty($_POST))
       input_errors2Ajax(NULL, $error_bucket);       
       exit;   
   }
+  
+	if (!$input_errors) {
+	}
+}
+if (!isset($do_action)) {
 }
 
 include("head.inc");
@@ -78,22 +84,17 @@ echo $pfSenseHead->getHTML();
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
-<form action="diag_part_infos.php" method="post" name="iform" id="iform">
-
 <div id="inputerrors"></div>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td class="tabnavtbl">
 <?php
   $tab_array = array();
-  $tab_array[0] = array(gettext("Disks"),         false, "diag_disks_infos.php");
-  $tab_array[1] = array(gettext("Partitions"),    true,  "diag_part_infos.php");
-  $tab_array[2] = array(gettext("SMART"),         false, "diag_smart_infos.php");
-  $tab_array[3] = array(gettext("ataidle"),       false, "diag_ataidle_infos.php");
-  $tab_array[4] = array(gettext("Space used"),    false, "diag_space_infos.php");
-  $tab_array[5] = array(gettext("Mounts"),        false, "diag_mounts_infos.php");
-  $tab_array[6] = array(gettext("Software RAID"), false, "diag_raid_infos.php");
-  $tab_array[7] = array(gettext("iSCSI"),         false, "diag_iscsi_infos.php");
+  $tab_array[0] = array(gettext("Geom Mirror"), false, "disks_raid_gmirror.php");
+  $tab_array[1] = array(gettext("Geom Concat"), false, "disks_raid_gconcat.php");
+  $tab_array[2] = array(gettext("Geom Stripe"), false, "disks_raid_gstripe.php");
+  $tab_array[3] = array(gettext("Geom RAID5"),  true,  "disks_raid_graid5.php");
+  $tab_array[4] = array(gettext("Geom Vinum"),  false, "disks_raid_gvinum.php");
   display_top_tabs($tab_array);
 ?>  
     </td>
@@ -102,40 +103,41 @@ echo $pfSenseHead->getHTML();
     <td class="tabnavtbl">
 <?php
   $tab_array = array();
-  $tab_array[0] = array(gettext("Manage RAID"), false, "diag_ad_infos.php");
+  $tab_array[0] = array(gettext("Manage RAID"), false, "disks_raid_graid5.php");
+  /* $tab_array[1] = array(gettext("Format RAID"), false, "disks_raid_gconcat_init.php"); */
+  $tab_array[1] = array(gettext("Tools"),       false, "disks_raid_graid5_tools.php");
+  $tab_array[2] = array(gettext("Information"), true, "disks_raid_graid5_infos.php");
   display_top_tabs($tab_array);
 ?>  
     </td>
   </tr>
-  <tr> 
+  <tr>
     <td>
-    <div id="mainarea">
-    <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-      <tr>
-        <td align="left" valign="top">
-          <?php
-            echo "<pre style=\"font-size: medium;\">";
-            $disklist = get_physical_disks_list();
-            echo "<strong>List of partition on all detected disk:</strong><br />";
-            foreach ($disklist as $disknamek => $disknamev)
-            {
-            	exec("/sbin/fdisk $disknamek",$fdiskrawdata);
-            	foreach ($fdiskrawdata as $line)
-            	{
-                 echo htmlspecialchars($line) . "<br />";
-            	}
-            	unset ($fdiskrawdata);
-            }
-            echo "</pre>";
-          ?>
-        </td>
-      </tr>
-    </table>
-  </div>
-  </td>
+      <div id="mainarea">
+      <form action="disks_raid_graid5_infos.php" method="post" name="iform" id="iform">
+      <table class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
+        <tr>
+          <td width="100%" class="vtable">
+            <?php                
+              echo "<pre>";
+              echo "<strong>" . gettext("Software RAID information and status") . "</strong><br />";
+              
+              exec("/sbin/graid5 list",$rawdata);
+              foreach ($rawdata as $line){
+                echo htmlspecialchars($line) . "<br>";
+              }
+              
+              unset ($line);
+              echo "</pre>";
+            ?>
+          </td>
+        </tr>
+      </table>
+      </form>
+      </div>
+    </td>
   </tr>
 </table>
-</form>
 <?php include("fend.inc"); ?>
 </body>
 </html>

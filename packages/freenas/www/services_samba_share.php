@@ -2,7 +2,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    diag_part_infos.php
+    services_samba_share.php
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2006 Daniel S. Haischt <me@daniel.stefan.haischt.name>
     All rights reserved.
@@ -40,13 +40,21 @@
                                                                               */
 /* ========================================================================== */
 
-$pgtitle = array(gettext("Diagnostics"),
-                 gettext("Partition Infos"));
+$pgtitle = array(gettext("Services"),
+                 gettext("CIFS"),
+                 gettext("Shares"));
 
 require_once("freenas_config.inc");
 require_once("guiconfig.inc");
 require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
+
+if (!is_array($freenas_config['mounts']['mount']))
+  $freenas_config['mounts']['mount'] = array();
+
+mount_sort();
+
+$a_mount = &$freenas_config['mounts']['mount'];
 
 if (! empty($_POST))
 {
@@ -54,7 +62,8 @@ if (! empty($_POST))
   unset($error_bucket);
   /* simple error list */
   unset($input_errors);
-
+  $pconfig = $_POST;
+  
   if (is_array($error_bucket))
     foreach($error_bucket as $elem)
       $input_errors[] =& $elem["error"];
@@ -64,45 +73,60 @@ if (! empty($_POST))
       input_errors2Ajax(NULL, $error_bucket);       
       exit;   
   }
+  
+  if (!$input_errors)
+  {
+    if($_POST['apply']) {
+      $retval = 0;
+      if(!file_exists($d_sysrebootreqd_path)) {
+        config_lock();
+        services_samba_configure();
+        services_zeroconf_configure();
+        config_unlock();
+      }
+  
+      $savemsg = get_std_save_message($retval);
+  
+      if(0 == $retval) {
+        if(file_exists($d_smbshareconfdirty_path))
+          unlink($d_smbshareconfdirty_path);
+      }
+    }
+  }
+}
+
+if($_GET['act'] == "ret") {
+  pfSenseHeader("services_samba_share.php");
+  exit;
 }
 
 include("head.inc");
 /* put your custom HTML head content here        */
 /* using some of the $pfSenseHead function calls */
+
 echo $pfSenseHead->getHTML();
 
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC" onload="<?= $jsevents["body"]["onload"] ?>">
 <?php include("fbegin.inc"); ?>
-<?php if ($input_errors) print_input_errors($input_errors); ?>
+
+<form id="iform" name="iform" action="services_samba_share.php" method="post">
 <?php if ($savemsg) print_info_box($savemsg); ?>
-
-<form action="diag_part_infos.php" method="post" name="iform" id="iform">
-
+<?php if (file_exists($d_smbshareconfdirty_path)): ?>
+<?php print_info_box_np(gettext("The shares has been modified.") . "<br />" .
+                        gettext("You must apply the changes in order for them to take effect."));?>
+<?php endif; ?>
+<?php if ($input_errors) print_input_errors($input_errors); ?>
 <div id="inputerrors"></div>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td class="tabnavtbl">
 <?php
   $tab_array = array();
-  $tab_array[0] = array(gettext("Disks"),         false, "diag_disks_infos.php");
-  $tab_array[1] = array(gettext("Partitions"),    true,  "diag_part_infos.php");
-  $tab_array[2] = array(gettext("SMART"),         false, "diag_smart_infos.php");
-  $tab_array[3] = array(gettext("ataidle"),       false, "diag_ataidle_infos.php");
-  $tab_array[4] = array(gettext("Space used"),    false, "diag_space_infos.php");
-  $tab_array[5] = array(gettext("Mounts"),        false, "diag_mounts_infos.php");
-  $tab_array[6] = array(gettext("Software RAID"), false, "diag_raid_infos.php");
-  $tab_array[7] = array(gettext("iSCSI"),         false, "diag_iscsi_infos.php");
-  display_top_tabs($tab_array);
-?>  
-    </td>
-  </tr>
-  <tr>
-    <td class="tabnavtbl">
-<?php
-  $tab_array = array();
-  $tab_array[0] = array(gettext("Manage RAID"), false, "diag_ad_infos.php");
+  $tab_array[0] = array(gettext("Settings"), false, "services_samba.php");
+  $tab_array[1] = array(gettext("Shares"),   true,  "services_samba_share.php");
   display_top_tabs($tab_array);
 ?>  
     </td>
@@ -112,30 +136,30 @@ echo $pfSenseHead->getHTML();
     <div id="mainarea">
     <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
       <tr>
-        <td align="left" valign="top">
-          <?php
-            echo "<pre style=\"font-size: medium;\">";
-            $disklist = get_physical_disks_list();
-            echo "<strong>List of partition on all detected disk:</strong><br />";
-            foreach ($disklist as $disknamek => $disknamev)
-            {
-            	exec("/sbin/fdisk $disknamek",$fdiskrawdata);
-            	foreach ($fdiskrawdata as $line)
-            	{
-                 echo htmlspecialchars($line) . "<br />";
-            	}
-            	unset ($fdiskrawdata);
-            }
-            echo "</pre>";
+        <td width="20%" class="listhdrr"><?= gettext("Share Name"); ?></td>
+        <td width="25%" class="listhdrr"><?= gettext("Description"); ?></td>
+        <td width="20%" class="listhdrr"><?= gettext("Browseable"); ?></td>
+        <td width="10%" class="list"></td>
+      </tr>
+      <?php $i = 0; foreach($a_mount as $mountv): ?>
+      <tr>
+        <td class="listr"><?=htmlspecialchars($mountv['sharename']);?>&nbsp;</td>
+        <td class="listr"><?=htmlspecialchars($mountv['desc']);?>&nbsp;</td>
+        <td class="listbg"><?=htmlspecialchars((is_array($config['samba']['hidemount']) && in_array($mountv['sharename'],$config['samba']['hidemount']))? gettext("No") : gettext("Yes"));?></td>
+        <td valign="middle" nowrap class="list">
+          <?php if(isset($config['samba']['enable']))
+          echo("<a href='services_samba_share_edit.php?id={$i}'><img src='./themes/" . $g['theme'] . "/images/icons/icon_e.gif' title='" . gettext("Edit Share") . "' width='17' height='17' border='0'></a>");
           ?>
         </td>
       </tr>
+      <?php $i++; endforeach; ?>
     </table>
-  </div>
-  </td>
+    </div>
+    </td>
   </tr>
 </table>
 </form>
 <?php include("fend.inc"); ?>
+<?= checkForInputErrors(); ?>
 </body>
 </html>

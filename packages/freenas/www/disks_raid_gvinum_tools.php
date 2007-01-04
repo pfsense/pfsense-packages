@@ -1,36 +1,44 @@
 <?php
 /* $Id$ */
+/* ========================================================================== */
 /*
-	disks_manage_edit.php
-	part of FreeNAS (http://www.freenas.org)
-	Copyright (C) 2005-2006 Olivier Cochard-Labbé <olivier@freenas.org>.
-	All rights reserved.
-	
-	Based on m0n0wall (http://m0n0.ch/wall)
-	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-	All rights reserved.
-	
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
-	
-	1. Redistributions of source code must retain the above copyright notice,
-	   this list of conditions and the following disclaimer.
-	
-	2. Redistributions in binary form must reproduce the above copyright
-	   notice, this list of conditions and the following disclaimer in the
-	   documentation and/or other materials provided with the distribution.
-	
-	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
-*/
+    disks_raid_gvinum_tools.php
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2006 Daniel S. Haischt <me@daniel.stefan.haischt.name>
+    All rights reserved.
+
+    Based on FreeNAS (http://www.freenas.org)
+    Copyright (C) 2005-2006 Olivier Cochard-Labbé <olivier@freenas.org>.
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
 
 $pgtitle = array(gettext("System"),
                  gettext("Disks"),
@@ -48,11 +56,12 @@ if (! empty($_POST))
   unset($error_bucket);
   /* simple error list */
   unset($input_errors);
-
-	$reqdfields = explode(" ", "action object");
-	$reqdfieldsn = explode(",", "Action,Object");
+  unset($do_action);
   
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+  $reqdfields = explode(" ", "action object");
+  $reqdfieldsn = explode(",", "Action,Object");
+  
+  do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
   
   if (is_array($error_bucket))
     foreach($error_bucket as $elem)
@@ -64,16 +73,16 @@ if (! empty($_POST))
       exit;   
   }
   
-	if (!$input_errors) {
-		$do_action = true;
-		$action = $_POST['action'];
-		$object = $_POST['object'];
-	}
-}
-if (!isset($do_action)) {
-	$do_action = false;
-	$action = '';
-	$object = '';
+  if (!$input_errors) {
+    $do_action = true;
+    $action = $_POST['action'];
+    $object = $_POST['object'];
+  }
+  }
+  if (!isset($do_action)) {
+  $do_action = false;
+  $action = '';
+  $object = '';
 }
 
 include("head.inc");
@@ -93,23 +102,26 @@ echo $pfSenseHead->getHTML();
   <tr>
     <td class="tabnavtbl">
 <?php
-	$tab_array = array();
-	$tab_array[0] = array(gettext("Geom Mirror"),           false, "disks_raid_gmirror.php");
-	$tab_array[1] = array(gettext("Geom Vinum (unstable)"), true,  "disks_raid_gvinum.php");
-	display_top_tabs($tab_array);
+  $tab_array = array();
+  $tab_array[0] = array(gettext("Geom Mirror"), false, "disks_raid_gmirror.php");
+  $tab_array[1] = array(gettext("Geom Concat"), false, "disks_raid_gconcat.php");
+  $tab_array[2] = array(gettext("Geom Stripe"), false, "disks_raid_gstripe.php");
+  $tab_array[3] = array(gettext("Geom RAID5"),  false, "disks_raid_graid5.php");
+  $tab_array[4] = array(gettext("Geom Vinum"),  true,  "disks_raid_gvinum.php");
+  display_top_tabs($tab_array);
 ?>  
     </td>
   </tr>
   <tr>
     <td class="tabnavtbl">
 <?php
-	$tab_array = array();
-	$tab_array[0] = array(gettext("Manage RAID"), false, "disks_raid_gvinum.php");
-	$tab_array[1] = array(gettext("Format RAID"), false, "disks_raid_gvinum_init.php");
-	$tab_array[2] = array(gettext("Tools"),       true,  "disks_raid_gvinum_tools.php");
-  $tab_array[3] = array(gettext("Information"), false, "disks_raid_gvinum_infos.php");
-	display_top_tabs($tab_array);
-?>  
+  $tab_array = array();
+  $tab_array[0] = array(gettext("Manage RAID"), false, "disks_raid_gvinum.php");
+  /* $tab_array[1] = array(gettext("Format RAID"), false, "disks_raid_gmirror_init.php"); */
+  $tab_array[1] = array(gettext("Tools"),       true,  "disks_raid_gvinum_tools.php");
+  $tab_array[2] = array(gettext("Information"), false, "disks_raid_gvinum_infos.php");
+  display_top_tabs($tab_array);
+?>
     </td>
   </tr>
   <tr>
@@ -145,47 +157,47 @@ echo $pfSenseHead->getHTML();
             <?php endif; ?>
           </td>
         </tr>
-				<tr>
-  				<td valign="top" colspan="2">
-    				<?
+        <tr>
+          <td valign="top" colspan="2">
+            <?
               if ($do_action) {
-      					echo("<strong>" . gettext("GVINUM command output:") . "</strong><br />");
-      					echo('<pre>');
-      					ob_end_flush();
-      					
-      					switch ($action)
-      					{
-      					case "remove":					
-      						/* Remove recursivly object */
-      						system("/sbin/gvinum rm -r " . escapeshellarg($object));
-      						break;
-      					case "start":
-      						/* Start object */
-      						system("/sbin/gvinum start " . escapeshellarg($object));
-      						break;
-      					case "rebuild":
-      						/* Rebuild RAID 5 parity */
-      						system("/sbin/gvinum rebuildparity " . escapeshellarg($object));
-      						break;
-      					case "list":
-      						/* Disaply a detailed list of object */
-      						system("/sbin/gvinum list " . escapeshellarg($object));
-      						break;
-      					case "forceup":					
-      						/* Force object state up */
-      						system("/sbin/gvinum setstate -f up " . escapeshellarg($object));
-      						break;
-      					case "saveconfig":
-      						/* Save config */
-      						system("/sbin/gvinum saveconfig");
-      						break;
-      					}
-      					
-      					echo('</pre>');
-      				}
-    				?>
-  				</td>
-				</tr>
+                echo("<strong>" . gettext("GVINUM command output:") . "</strong><br />");
+                echo('<pre>');
+                ob_end_flush();
+                
+                switch ($action)
+                {
+                case "remove":
+                  /* Remove recursivly object */
+                  system("/sbin/gvinum rm -r " . escapeshellarg($object));
+                  break;
+                case "start":
+                  /* Start object */
+                  system("/sbin/gvinum start " . escapeshellarg($object));
+                  break;
+                case "rebuild":
+                  /* Rebuild RAID 5 parity */
+                  system("/sbin/gvinum rebuildparity " . escapeshellarg($object));
+                  break;
+                case "list":
+                  /* Disaply a detailed list of object */
+                  system("/sbin/gvinum list " . escapeshellarg($object));
+                  break;
+                case "forceup":
+                  /* Force object state up */
+                  system("/sbin/gvinum setstate -f up " . escapeshellarg($object));
+                  break;
+                case "saveconfig":
+                  /* Save config */
+                  system("/sbin/gvinum saveconfig");
+                  break;
+                }
+                
+                echo('</pre>');
+              }
+            ?>
+          </td>
+        </tr>
         <tr>
           <td align="left" valign="top" colspan="2">
             <span class="red">
@@ -201,7 +213,7 @@ echo $pfSenseHead->getHTML();
       </form>
       </div>
     </td>
-	</tr>
+  </tr>
 </table>
 <?php include("fend.inc"); ?>
 </body>
