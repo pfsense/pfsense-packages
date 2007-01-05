@@ -40,6 +40,24 @@ $d_upnpconfdirty_path = $g['varrun_path'] . "/upnp.conf.dirty";
 
 $freenas_config =& $config['installedpackages']['freenas']['config'][0];
 
+function print_error_box_np($msg) {
+  global $g;
+
+  echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"4\" width=\"100%\">\n";
+  echo "<tr><td bgcolor=\"#A12A2A\" width=\"36\" align=\"center\" valign=\"top\"><img src=\"/themes/{$g['theme']}/images/icons/icon_error.gif\" width=\"28\" height=\"32\"></td>\n";
+  echo "<td bgcolor=\"#FFD9D1\" style=\"padding-left: 8px; padding-top: 6px\">";
+  echo "<span class=\"errmsg\">";
+  echo $msg;
+  echo "</span>";
+  echo "</td></tr></table>";
+}
+
+function print_error_box($msg) {
+  echo "<p>";
+  print_error_box_np($msg);
+  echo "</p>";
+}
+
 function mount_sort() {
 	global $g, $freenas_config;
 

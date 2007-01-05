@@ -42,6 +42,7 @@
 
 /* include all configuration functions */
 require_once("functions.inc");
+require_once("freenas_functions.inc");
 
 $freenas_config =& $config['installedpackages']['freenas']['config'][0];
 
@@ -295,7 +296,7 @@ function disks_check_mount_fullname($fullname) {
   //print_r($detmount);
   
   foreach ($detmount as $detmountk => $detmountv) {
-    if (strcmp($detmountv['fullname'],$fullname) == 0) {
+    if (strpos($detmountv['fullname'],$fullname) !== false) {
       $status=1;
       break;
     }

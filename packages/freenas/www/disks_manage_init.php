@@ -226,6 +226,7 @@ function disk_change() {
 
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
+<?php if($errormsg) print_error_box($errormsg);?>
 <div id="inputerrors"></div> 
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
   <tr>
@@ -250,7 +251,7 @@ function disk_change() {
             <td width="78%" class="vtable">
               <select name="disk" class="formselect" id="disk" onchange="disk_change();">
                 <?php foreach ($all_disk as $diskv): ?>
-                <option value="<?=$diskv['fullname'];?>"<?php if ($diskv['name'] == $disk) echo "selected";?>>
+                <option value="<?=$diskv['fullname'];?>" <?php if ($diskv['name'] == $disk) echo "selected=\selected\"";?>>
                 <?php echo htmlspecialchars($diskv['name'] . ": " .$diskv['size'] . " (" . $diskv['desc'] . ")");?>
                 <?php endforeach; ?>
                 </option>
@@ -291,7 +292,7 @@ function disk_change() {
                 /* Erase MBR if not checked*/
                 if (!$notinitmbr) {
                   echo "Erasing MBR\n";
-                  system("dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . " bs=32k count=640");
+                  system("dd if=/dev/zero of=" . escapeshellarg($disk) . " bs=32k count=640");
                 }
                 else {
                   echo "Keeping the MBR and all partitions\n";
@@ -305,13 +306,13 @@ function disk_change() {
                   system("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
                   /* Initialise the partition (optional) */
                   echo "Initializing parition:\n";
-                  system("/bin/dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . "s1 bs=32k count=16");
+                  system("/bin/dd if=/dev/zero of=" . escapeshellarg($disk) . "s1 bs=32k count=16");
                   /* Create s1 label */
                   echo "Creating BSD label:\n";
                   system("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");
                   // Create filesystem
                   echo "Creating Filesystem:\n";
-                  system("/sbin/newfs -U /dev/" . escapeshellarg($disk) . "s1");
+                  system("/sbin/newfs -U " . escapeshellarg($disk) . "s1");
                   echo "Done!\n";
                   break;
                 case "ufs_no_su":
@@ -320,13 +321,13 @@ function disk_change() {
                   system("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
                   /* Initialise the partition (optional) */
                   echo "Initializing parition:\n";
-                  system("/bin/dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . "s1 bs=32k count=16");
+                  system("/bin/dd if=/dev/zero of=" . escapeshellarg($disk) . "s1 bs=32k count=16");
                   /* Create s1 label */
                   echo "Creating BSD label:\n";
                   system("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");
                   // Create filesystem
                   echo "Creating Filesystem:\n";
-                  system("/sbin/newfs -m 0 /dev/" . escapeshellarg($disk) . "s1");
+                  system("/sbin/newfs -m 0 " . escapeshellarg($disk) . "s1");
                   echo "Done!\n";
                   break;
                 case "ufsgpt":
@@ -338,7 +339,7 @@ function disk_change() {
                   system("/sbin/gpt add -t ufs " . escapeshellarg($disk));
                   // Create filesystem
                   echo "Creating Filesystem with Soft Updates:\n";
-                  system("/sbin/newfs -U /dev/" . escapeshellarg($disk) . "p1");
+                  system("/sbin/newfs -U " . escapeshellarg($disk) . "p1");
                   echo "Done!\n";
                   break;
                 case "ufsgpt_no_su":
@@ -350,14 +351,14 @@ function disk_change() {
                   system("/sbin/gpt add -t ufs " . escapeshellarg($disk));
                   // Create filesystem
                   echo "Creating Filesystem without Soft Updates:\n";
-                  system("/sbin/newfs -m 0 /dev/" . escapeshellarg($disk) . "p1");
+                  system("/sbin/newfs -m 0 " . escapeshellarg($disk) . "p1");
                   echo "Done!\n";
                   break;
                 case "softraid":
                   /* Initialize disk */
                   system("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
                   /* Initialise the partition (optional) */
-                  system("/bin/dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . "s1 bs=32k count=16");
+                  system("/bin/dd if=/dev/zero of=" . escapeshellarg($disk) . "s1 bs=32k count=16");
                   /* Delete old gmirror information */
                   system("/sbin/gmirror clear " . escapeshellarg($disk));
                   echo "Done!\n";
@@ -366,11 +367,11 @@ function disk_change() {
                   /* Initialize disk */
                   system("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
                   /* Initialise the partition (optional) */
-                  system("/bin/dd if=/dev/zero of=/dev/" . escapeshellarg($disk) . "s1 bs=32k count=16");
+                  system("/bin/dd if=/dev/zero of=" . escapeshellarg($disk) . "s1 bs=32k count=16");
                   /* Create s1 label */
                   system("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");
                   // Create filesystem
-                  system("/sbin/newfs_msdos -F 32 /dev/" . escapeshellarg($disk) . "s1");
+                  system("/sbin/newfs_msdos -F 32 " . escapeshellarg($disk) . "s1");
                   echo "Done!\n";
                   break;
                 }
