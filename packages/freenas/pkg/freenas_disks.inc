@@ -81,7 +81,7 @@ function disks_mount($mount) {
   $mountname=escapeshellcmd($mount['sharename']);
 
   @mkdir ("/mnt/$mountname",0777);
-                
+
   /* mount the filesystems */
   $devname=escapeshellcmd($mount['fullname']);
 

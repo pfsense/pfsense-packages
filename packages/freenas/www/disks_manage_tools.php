@@ -156,53 +156,39 @@ function disk_change() {
         <tr>
           <td width="22%" valign="top" class="vncellreq"><?=gettext("Partition");?></td>
           <td width="78%" class="vtable">
-            <td valign="top" class="vncellreq"><?=_PARTITION;?></td>
-            <td class="vtable"> 
-              <select name="partition" class="formfld" id="partition"></select>
-            </td>
+            <select name="partition" class="formfld" id="partition"></select>
           </td>
         </tr>
         <tr>
           <td width="22%" valign="top" class="vncellreq"><?=gettext("Command");?></td>
           <td width="78%" class="vtable">
-            <td valign="top" class="vncellreq"><?=_PARTITION;?></td>
-            <td class="vtable"> 
-              <select name="action" class="formfld" id="action">
-                <option value="fsck" <?php if ($action == "fsck") echo "selected"; ?>>fsck</option>
-               </select>
-            </td>
+            <select name="action" class="formfld" id="action">
+              <option value="fsck" <?php if ($action == "fsck") echo "selected"; ?>>fsck</option>
+             </select>
           </td>
         </tr>
         <tr>
           <td width="22%" valign="top" class="vncellreq"></td>
           <td width="78%" class="vtable">
-            <td valign="top" class="vncellreq"><?=_PARTITION;?></td>
-            <td class="vtable"> 
-              <input name="umount" type="checkbox" id="umount" value="yes" <?php if ($umount) echo "checked"; ?> />
-              <strong>
-                <?= gettext("Unmount disk/partition"); ?>
-              </strong>
-              <span class="vexpl">
-                <br />
-                <?= gettext("If the selected disk/partition is mounted it will be unmounted temporary to perform selected command, otherwise the commands work in read-only mode."); ?>
-              </span>
-            </td>
+            <input name="umount" type="checkbox" id="umount" value="yes" <?php if ($umount) echo "checked"; ?> />
+            <strong>
+              <?= gettext("Unmount disk/partition"); ?>
+            </strong>
+            <span class="vexpl">
+              <br />
+              <?= gettext("If the selected disk/partition is mounted it will be unmounted temporary to perform selected command, otherwise the commands work in read-only mode."); ?>
+            </span>
           </td>
         </tr>
         <tr>
           <td width="22%" valign="top" class="vncellreq">&nbsp;</td>
           <td width="78%" class="vtable">
-            <td valign="top" class="vncellreq"><?=_PARTITION;?></td>
-            <td class="vtable"> 
-              <input name="Submit" type="submit" class="formbtn" value="<?= gettext("Send Command!"); ?>">
-            </td>
+            <input name="Submit" type="submit" class="formbtn" value="<?= gettext("Send Command!"); ?>">
           </td>
         </tr>
         <tr>
           <td width="22%" valign="top" class="vncellreq">&nbsp;</td>
           <td width="78%" class="vtable">
-            <td valign="top" class="vncellreq"><?=_PARTITION;?></td>
-            <td class="vtable"> 
             <?php
             if($do_action)
             {
@@ -256,7 +242,6 @@ function disk_change() {
               echo('</pre>');
             }
             ?>
-            </td>
           </td>
         </tr>
       </table>

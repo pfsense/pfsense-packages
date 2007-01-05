@@ -120,7 +120,7 @@ echo $pfSenseHead->getHTML();
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
-<form id="iform" name="iform" action="disks_mount.php" method="post">
+<form id="iform" name="iform" action="disks_mount_tools.php" method="post">
 
 <div id="inputerrors"></div>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -181,11 +181,11 @@ echo $pfSenseHead->getHTML();
               switch($action)
               {
                 case "mount":
-                  echo(gettext("Mounting...") . "<br />");
+                  echo(gettext("Mounting '{$fullname}'...") . "<br />");
                   $result = disks_mount_fullname($fullname);
                   break;
                 case "umount":
-                  echo(gettext("Umounting...") . "<br />");
+                  echo(gettext("Umounting '{$fullname}'...") . "<br />");
                   $result = disks_umount_fullname($fullname);
                   break;
               }

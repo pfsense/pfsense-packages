@@ -67,7 +67,7 @@ function gvinum_sort() {
 		return strcmp($a['name'], $b['name']);
 	}
 
-	usort($freenas_config['raid']['vdisk'], "gvinumcmp");
+	usort($freenas_config['gvinum']['vdisk'], "gvinumcmp");
 	
 }
 
@@ -83,35 +83,35 @@ function gmirror_sort() {
 }
 
 function gconcat_sort() {
-	global $g, $freenas_cconfig;
+	global $g, $freenas_config;
 
 	function gconcatcmp($a, $b) {
 		return strcmp($a['name'], $b['name']);
 	}
 
-	usort($freenas_cconfig['gconcat']['vdisk'], "gconcatcmp");
+	usort($freenas_config['gconcat']['vdisk'], "gconcatcmp");
 	
 }
 
 function gstripe_sort() {
-	global $g, $freenas_cconfig;
+	global $g, $freenas_config;
 
 	function gstripecmp($a, $b) {
 		return strcmp($a['name'], $b['name']);
 	}
 
-	usort($freenas_cconfig['gstripe']['vdisk'], "gstripecmp");
+	usort($freenas_config['gstripe']['vdisk'], "gstripecmp");
 	
 }
 
 function graid5_sort() {
-	global $g, $freenas_cconfig;
+	global $g, $freenas_config;
 
 	function graid5cmp($a, $b) {
 		return strcmp($a['name'], $b['name']);
 	}
 
-	usort($freenas_cconfig['graid5']['vdisk'], "graid5cmp");
+	usort($freenas_config['graid5']['vdisk'], "graid5cmp");
 	
 }
 
