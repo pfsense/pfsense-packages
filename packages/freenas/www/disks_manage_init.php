@@ -96,7 +96,7 @@ EOD;
 
   switch ($type) {
     case "ufs":
-      $button = create_toggle_button("Creating one parition", "ufs_fdisk_out");
+      $button = create_toggle_button("Creating one partition", "ufs_fdisk_out");
       /* Initialize disk */
       $a_out = exec_command_and_return_text_array("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
       $diskinit_str = implode("\n", $a_out);
@@ -109,7 +109,7 @@ EOD;
 
 EOD;
 
-      $button = create_toggle_button("Initializing parition", "ufs_dd_out");
+      $button = create_toggle_button("Initializing partition", "ufs_dd_out");
       /* Initialise the partition (optional) */
       $a_out = exec_command_and_return_text_array("/bin/dd if=/dev/zero of=" . escapeshellarg($disk) . "s1 bs=32k count=16");
       $diskinit_str = implode("\n", $a_out);
@@ -151,7 +151,7 @@ EOD;
 
       break; // end case "ufs":
     case "ufs_no_su":
-      $button = create_toggle_button("Creating one parition", "ufsn_fdisk_out");
+      $button = create_toggle_button("Creating one partition", "ufsn_fdisk_out");
       /* Initialize disk */
       $a_out = exec_command_and_return_text_array("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
       $diskinit_str = implode("\n", $a_out);
@@ -163,7 +163,7 @@ EOD;
               </div>
 
 EOD;
-      $button = create_toggle_button("Initializing parition", "ufsn_dd_out");
+      $button = create_toggle_button("Initializing partition", "ufsn_dd_out");
       /* Initialise the partition (optional) */
       $a_out = exec_command_and_return_text_array("/bin/dd if=/dev/zero of=" . escapeshellarg($disk) . "s1 bs=32k count=16");
       $diskinit_str = implode("\n", $a_out);
