@@ -175,30 +175,29 @@ echo $pfSenseHead->getHTML();
              <td valign="middle" class="listr">
               <?=htmlspecialchars($mount['desc']);?>&nbsp;
             </td>
-           </td>
-           <td valign="middle" class="listbg" style="color: #FFFFFF;">
-           <?php
-             if (file_exists($d_mountdirty_path)) {
-               $stat = gettext("configuring");
-             } else {
-               $stat = disks_check_mount($mount);
-               if ($stat == 0) {
-                 $stat = "ERROR - <a href=\"disks_mount.php?act=ret&id=$i\">retry</a>";
-               } else {
-                 $stat = gettext("OK");
-               }
-             }
-             echo $stat;
-          ?>
-          </td>
-          <td valign="middle" class="list"> 
-            <a href="disks_mount_edit.php?id=<?=$i;?>">
-              <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="<?=gettext("edit mount");?>" width="17" height="17" border="0" alt="" />
-            </a>
-            <a href="disks_mount.php?act=del&id=<?=$i;?>">
-              <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" onclick="return confirm('<?= gettext("Do you really want to delete this mount point? All elements that still use it will become invalid (e.g. share)!"); ?>');" title="<?=gettext("delete mount");?>" width="17" height="17" border="0" alt="" />
-            </a> 
-          </td>
+            <td valign="middle" class="listbg" style="color: #FFFFFF;">
+            <?php
+              if (file_exists($d_mountdirty_path)) {
+                $stat = gettext("configuring");
+              } else {
+                $stat = disks_check_mount($mount);
+                if ($stat == false) {
+                  $stat = "ERROR - <a href=\"disks_mount.php?act=ret&amp;id=$i\">retry</a>";
+                } else {
+                  $stat = gettext("OK");
+                }
+              }
+              echo $stat;
+            ?>
+            </td>
+            <td valign="middle" class="list"> 
+              <a href="disks_mount_edit.php?id=<?=$i;?>">
+                <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="<?=gettext("edit mount");?>" width="17" height="17" border="0" alt="" />
+              </a>
+              <a href="disks_mount.php?act=del&id=<?=$i;?>">
+                <img src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" onclick="return confirm('<?= gettext("Do you really want to delete this mount point? All elements that still use it will become invalid (e.g. share)!"); ?>');" title="<?=gettext("delete mount");?>" width="17" height="17" border="0" alt="" />
+              </a> 
+            </td>
           </tr>
           <?php $i++; endforeach; ?>
           <tr>

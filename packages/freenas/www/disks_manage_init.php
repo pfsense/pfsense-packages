@@ -486,7 +486,21 @@ if (! empty($_POST))
     $notinitmbr= $_POST['notinitmbr'];
     
     /* Check if disk is mounted. */ 
-    if(disks_check_mount_fullname($disk)) {
+    if(isAjax() && disks_check_mount_fullname($disk)) {
+      $statustxt = sprintf(gettext("The disk is currently mounted! <a href=%s>Unmount</a> this disk first before proceeding."), "disks_mount_tools.php?disk={$disk}&amp;action=umount");
+
+      $divcontents = "<div style='background:#990000'><table>";
+      $divcontents .= "<tr><td>";
+      $divcontents .= "<img src='/themes/{$g['theme']}/images/icons/icon_error.gif' width='28' height='32'>";
+      $divcontents .= "</td><td><font color='white'><br>&nbsp;&nbsp;The following errors have occured:<p><ul>";
+      $divcontents .= "<font color='white'><li> " . $statustxt . "</li>";
+      $divcontents .= "</ul></td></table></div><br />";
+  
+      header("HTTP/1.0 500 Internal Server Error");
+      header("Status: 500 Internal Server Error. {$statustxt}");
+      echo $divcontents;
+      exit;
+    } else {
       $errormsg = sprintf(gettext("The disk is currently mounted! <a href=%s>Unmount</a> this disk first before proceeding."), "disks_mount_tools.php?disk={$disk}&action=umount");
       $do_format = false;
     }
@@ -630,11 +644,20 @@ function toggle_cmdout(image, totoggle) {
                 "<?=$_SERVER['SCRIPT_NAME'];?>", {
                   method     : "post",
                   parameters : Form.serialize($("iform")),
-                  onSuccess  : execFormatComplete
+                  onSuccess  : execFormatComplete,
+                  onFailure  : execFormatFailure
                 }
               );
             }
           
+            function execFormatFailure(req) {
+              if($('doFormatSubmit')) $('doFormatSubmit').style.visibility = 'visible';
+              if($('loading')) $('loading').style.visibility = 'hidden';
+              if($('inputerrors')) window.scrollTo(0, 0);
+              if($('inputerrors')) new Effect.Shake($('inputerrors'));
+              if($('inputerrors')) $('inputerrors').innerHTML = req.responseText;
+            }
+
             function execFormatComplete(req) {
               $("formatOutputTD").innerHTML = req.responseText;
               $('loading').style.visibility = 'hidden';

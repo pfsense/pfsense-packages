@@ -116,7 +116,7 @@ if (! empty($_POST))
   $pconfig = $_POST;
   
   /* input validation */
-  $reqdfields = split(" ", "partition mdisk fstype");
+  $reqdfields = split(" ", "partitionno mdisk fstype");
   $reqdfieldsn = split(",", "Partition,Mdisk,Fstype");
   
   do_input_validation_new($_POST, $reqdfields, $reqdfieldsn, &$error_bucket);
@@ -134,7 +134,7 @@ if (! empty($_POST))
                             "field" => "desc");
   
   }
-  $device=$_POST['mdisk'].$_POST['partition'];
+  $device=$_POST['mdisk'].$_POST['partitionno'];
   
   if ($device == $cfdevice )
   {
@@ -179,12 +179,12 @@ if (! empty($_POST))
   {
     $mount = array();
     $mount['mdisk'] = $_POST['mdisk'];
-    $mount['partition'] = $_POST['partition'];
+    $mount['partition'] = $_POST['partitionno'];
     $mount['fstype'] = $_POST['fstype'];
     $mount['desc'] = $_POST['desc'];
     /* if not sharename given, create one */
     if (!$_POST['sharename'])
-      $mount['sharename'] = "disk_{$_POST['mdisk']}_part_{$_POST['partition']}";
+      $mount['sharename'] = "disk_{$_POST['mdisk']}_part_{$_POST['partitionno']}";
     else
       $mount['sharename'] = $_POST['sharename'];
       
@@ -238,7 +238,7 @@ echo $pfSenseHead->getHTML();
       <tr>
         <td width="22%" valign="top" class="vncellreq"><?=gettext("Partition");?></td>
         <td width="78%" class="vtable">
-          <select name="partition" class="formselect" id="partition number">
+          <select name="partitionno" class="formselect" id="partition_number">
             <option value="s1" <?php if ($pconfig['partition'] == "s1") echo "selected"; ?>>1 (or new software RAID method)</option>
             <option value="s2" <?php if ($pconfig['partition'] == "s2") echo "selected"; ?>>2</option>
             <option value="s3" <?php if ($pconfig['partition'] == "s3") echo "selected"; ?>>3</option>
@@ -246,7 +246,7 @@ echo $pfSenseHead->getHTML();
             <option value="gmirror" <?php if ($pconfig['partition'] == "gmirror") echo "selected"; ?>>previous <?=_SOFTRAID ;?> - gmirror</option>
             <option value="graid5" <?php if ($pconfig['partition'] == "graid5") echo "selected"; ?>>previous <?=_SOFTRAID ;?> - graid5</option>
             <option value="gvinum" <?php if ($pconfig['partition'] == "gvinum") echo "selected"; ?>>previous <?=_SOFTRAID ;?> - gvinum</option>
-            <option value="p1" <?php if ($pconfig['partition'] == "gpt") echo "selected"; ?>>GPT (or new software RAID method with GPT)</option>
+            <option value="p1" <?php if ($pconfig['partition'] == "gpt") echo "selected"; ?>>GPT (or new software RAID method with GPT)</option> 
           </select>
         </td>
       </tr>
