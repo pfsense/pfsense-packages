@@ -578,7 +578,7 @@ $pfSenseHead->setCloseHead(false);
 echo $pfSenseHead->getHTML();
 
 ?>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
 function disk_change() {
   switch(document.iform.disk.value)
