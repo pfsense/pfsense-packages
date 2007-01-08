@@ -500,11 +500,11 @@ if (! empty($_POST))
       header("Status: 500 Internal Server Error. {$statustxt}");
       echo $divcontents;
       exit;
-    } else {
+    } else if (disks_check_mount_fullname($disk)) {
       $errormsg = sprintf(gettext("The disk is currently mounted! <a href=%s>Unmount</a> this disk first before proceeding."), "disks_mount_tools.php?disk={$disk}&action=umount");
       $do_format = false;
     }
-    
+
     if($do_format) {
       /* Get the id of the disk array entry. */
       $NotFound = 1;
