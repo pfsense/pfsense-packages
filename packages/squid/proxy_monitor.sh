@@ -35,7 +35,10 @@ if [ -f /var/run/squid_alarm ]; then
 	rm /var/run/squid_alarm
 fi
 
-# Squid monitor 1.0
+# Sleep 5 seconds on startup not to mangle with existing boot scripts.
+sleep 5
+
+# Squid monitor 1.1
 while [ /bin/true ]; do
         if [  ! -f /var/run/squid_alarm ]; then
                 NUM_PROCS=`ps awux | grep "squid -D" | grep -v "grep" | wc -l | awk '{ print $1 }'`
