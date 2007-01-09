@@ -144,7 +144,7 @@ EOD;
 
 	squid_dash_z();
 
-	if (!isset(is_service_running('squid'))) {
+	if (!is_service_running('squid')) {
 		log_error("Starting Squid");
 		mwexec_bg("/usr/local/sbin/squid -D");
 	} else {
