@@ -42,7 +42,6 @@ define('SQUID_PASSWD', '/var/etc/squid.passwd');
 
 $valid_acls = array();
 
-
 function squid_get_real_interface_address($iface) {
 	global $config;
 
@@ -139,22 +138,23 @@ EOD;
 	log_error("Stopping any running proxy monitors");
 	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
 	sleep(1);
-	/* restart proxy alarm scripts */
-	log_error("Starting a proxy monitor script");
-	mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 
 	if (!file_exists(SQUID_CONFBASE . '/mime.conf') && file_exists(SQUID_CONFBASE . '/mime.conf.default'))
 		copy(SQUID_CONFBASE . '/mime.conf.default', SQUID_CONFBASE . '/mime.conf');
 
 	squid_dash_z();
 
-	if (!is_service_running('squid')) {
+	if (!isset(is_service_running('squid'))) {
 		log_error("Starting Squid");
 		mwexec_bg("/usr/local/sbin/squid -D");
 	} else {
 		log_error("Reloading Squid for configuration sync");
 		mwexec("/usr/local/sbin/squid -k reconfigure");
 	}
+
+	/* restart proxy alarm scripts */
+	log_error("Starting a proxy monitor script");
+	mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 
 	filter_configure();
 }
