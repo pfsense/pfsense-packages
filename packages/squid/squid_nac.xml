@@ -52,14 +52,6 @@
 			<cols>50</cols>
 		</field>
 		<field>
-			<fieldname>unrestricted_macs</fieldname>
-			<fielddescr>Unrestricted MAC Addresses</fielddescr>
-			<description>The MAC addresses specified here (separated by commas) won't be filtered out by the other access control directives set in this page.</description>
-			<type>textarea</type>
-			<rows>5</rows>
-			<cols>50</cols>
-		</field>
-		<field>
 			<fieldname>banned_hosts</fieldname>
 			<fielddescr>Banned host addresses</fielddescr>
 			<description>The IP addresses specified here (separated by commas) won't be allowed to use the proxy.</description>
@@ -68,17 +60,9 @@
 			<cols>50</cols>
 		</field>	
 		<field>
-			<fieldname>banned_macs</fieldname>
-			<fielddescr>Banned MAC addresses</fielddescr>
-			<description>The MAC addresses specified here (separated by commas) won't be allowed to use the proxy.</description>
-			<type>textarea</type>
-			<rows>5</rows>
-			<cols>50</cols>
-		</field>
-		<field>
 			<fieldname>whitelist</fieldname>
 			<fielddescr>Whitelist</fielddescr>
-			<description>Those are the sites (separated by commas) that will be accessable to the users that are allowed to use the proxy.</description>
+			<description>Those are the destination domains (separated by commas) that will be accessable to the users that are allowed to use the proxy.</description>
 			<type>textarea</type>
 			<rows>5</rows>
 			<cols>50</cols>
@@ -86,7 +70,7 @@
 		<field>
 			<fieldname>blacklist</fieldname>
 			<fielddescr>Blacklist</fielddescr>
-			<description>Those are the sites (separated by commas) that will be blocked to the users that are allowed to use the proxy.</description>
+			<description>Those are the destination domains (separated by commas) that will be blocked to the users that are allowed to use the proxy.</description>
 			<type>textarea</type>
 			<rows>5</rows>
 			<cols>50</cols>
