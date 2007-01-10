@@ -49,6 +49,81 @@ require_once("guiconfig.inc");
 require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
 
+function create_cmd_output(&$action, &$a_disk, &$disk, &$partition, &$umount) {
+  $cmdout = CMDOUT_PARA;
+  
+  ob_end_flush();
+  
+  $retvalue =<<<EOD
+{$cmdout}
+
+EOD;
+
+  switch($action)
+  {
+    case "fsck":
+      /* Get the id of the disk. */
+      $id = array_search_ex($disk, $a_disk, "name");
+      /* Get the filesystem type of the disk. */ 
+      $type = $a_disk[$id]['fstype'];
+      /* Check if disk is mounted. */
+      $ismounted = disks_check_mount_fullname($disk.$partition);
+  
+      /* Umount disk if necessary. */
+      if($umount && $ismounted) {
+        $diskinit_str = "<strong class='red'>" . gettext("Note") . ":</strong> " . gettext("The disk is currently mounted! The mount point will be removed temporary to perform selected command.") . "<br /><br />";
+        $retvalue .=<<<EOD
+              <div id="ismounted_out" style="display: none; font-family: Courier, monospace; font-size: small;">
+              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
+              </div>
+
+EOD;
+
+        disks_umount_fullname($disk.$partition);
+      }
+  
+      switch($type)
+      {
+        case "":
+        case "ufs":
+        case "ufs_no_su":
+        case "ufsgpt":
+        case "ufsgpt_no_su":
+          $button = create_toggle_button("Checking disk", "ufsgn_fsck_out");
+          $cmd = "/sbin/fsck_ufs -y -f /dev/" . escapeshellarg($disk . $partition);
+          $out = create_cmdout_container("ufsgn_fsck_out", $cmd);
+          $retvalue .= assemble_cmdout($button, $out);
+          break;
+        case "gmirror":
+        case "gvinum":
+        case "graid5":
+          $diskinit_str = sprintf(gettext("Use <a href='%s'>RAID tools</a> for this disk!"), "disks_raid_{$type}_tools.php");
+          $retvalue .=<<<EOD
+                <div id="graid5_out" style="display: none; font-family: Courier, monospace; font-size: small;">
+                <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
+                </div>
+                
+EOD;
+          break;
+        case "msdos":
+          $button = create_toggle_button("Checking disk", "dos_fsck_out");
+          $cmd = "/sbin/fsck_msdosfs -y -f /dev/" . escapeshellarg($disk . $partition);
+          $out = create_cmdout_container("dos_fsck_out", $cmd);
+          $retvalue .= assemble_cmdout($button, $out);
+          break;
+      }
+  
+      /* Mount disk if necessary. */
+      if($umount && $ismounted) {
+        disks_mount_fullname($disk.$partition);
+      }
+  
+      break;
+  }
+  
+  return $retvalue;
+}
+
 if (!is_array($freenas_config['disks']['disk']))
   $freenas_config['disks']['disk'] = array();
 
@@ -65,6 +140,12 @@ if ($_POST) {
   $reqdfieldsn = explode(",", "Disk,Action");
   do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
   
+  /* if this is an AJAX caller then handle via JSON */
+  if(isAjax() && is_array($error_bucket)) {
+    input_errors2Ajax(NULL, $error_bucket);       
+    exit;   
+  }
+  
   if (!$input_errors)
   {
     $do_action = true;
@@ -72,6 +153,9 @@ if ($_POST) {
     $action = $_POST['action'];
     $partition = $_POST['partition'];
     $umount = $_POST['umount'];
+    
+    echo create_cmd_output($action, $a_disk, $disk, $partition, $umount);
+    exit; // cause of Ajax
   }
 }
   
@@ -116,6 +200,8 @@ function disk_change() {
     <?php endforeach; ?>
   }
 }
+
+<?= CMDOUT_TOGGLE_FUNC ?>
 // -->
 </script>
 </head>
@@ -140,6 +226,7 @@ function disk_change() {
   <tr> 
     <td>
       <div id="mainarea">
+      <?= CMDOUT_AJAX_SCRIPT ?>
       <table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
         <tr>
           <td width="22%" valign="top" class="vncellreq"><?=gettext("Disk");?></td>
@@ -181,68 +268,14 @@ function disk_change() {
           </td>
         </tr>
         <tr>
-          <td width="22%" valign="top" class="vncellreq">&nbsp;</td>
-          <td width="78%" class="vtable">
-            <input name="Submit" type="submit" class="formbtn" value="<?= gettext("Send Command!"); ?>" />
+          <td width="22%" valign="top">&nbsp;</td>
+          <td width="78%">
+            <input id="doCMDSubmit" name="doCMDSubmit" type="button" class="formbtn" value="<?=gettext("Send Command!");?>" onclick="execCMD();" />
           </td>
         </tr>
         <tr>
-          <td width="22%" valign="top" class="vncellreq">&nbsp;</td>
-          <td width="78%" class="vtable">
-            <?php
-            if($do_action)
-            {
-              echo("<strong>" . gettext("Command output:") . "</strong><br>");
-              echo('<pre>');
-              ob_end_flush();
-  
-              switch($action)
-              {
-                case "fsck":
-                  /* Get the id of the disk. */
-                  $id = array_search_ex($disk, $a_disk, "name");
-                  /* Get the filesystem type of the disk. */ 
-                  $type = $a_disk[$id]['fstype'];
-                  /* Check if disk is mounted. */
-                  $ismounted = disks_check_mount($disk,$partition);
-  
-                  /* Umount disk if necessary. */
-                  if($umount && $ismounted) {
-                    echo("<strong class='red'>" . gettext("Note") . ":</strong> " . gettext("The disk is currently mounted! The mount point will be removed temporary to perform selected command.") . "<br><br>");
-                    disks_umount_ex($disk,$partition);
-                  }
-  
-                  switch($type)
-                  {
-                    case "":
-                    case "ufs":
-                    case "ufs_no_su":
-                    case "ufsgpt":
-                    case "ufsgpt_no_su":
-                      system("/sbin/fsck_ufs -y -f /dev/" . escapeshellarg($disk . $partition));
-                      break;
-                    case "gmirror":
-                    case "gvinum":
-                    case "graid5":
-                      $infomsg = sprintf(gettext("Use <a href='%s'>RAID tools</a> for this disk!"), "disks_raid_{$type}_tools.php");
-                      print_info_box_np($infomsg);
-                      break;
-                    case "msdos":
-                      system("/sbin/fsck_msdosfs -y -f /dev/" . escapeshellarg($disk . $partition));
-                      break;
-                  }
-  
-                  /* Mount disk if necessary. */
-                  if($umount && $ismounted) {
-                    disks_mount_ex($disk,$partition);
-                  }
-  
-                  break;
-              }
-              echo('</pre>');
-            }
-            ?>
-          </td>
+          <!-- Format Output Container - Do Not Delete -->
+          <td id="cmdOutputTD" valign="top" colspan="2" style="visibility: hidden; border: solid 1px silver; vertical-align: middle; width: 100%"></td>
         </tr>
       </table>
       </div>

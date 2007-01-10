@@ -38,7 +38,131 @@ $d_groupconfdirty_path = $g['varrun_path'] . "/group.conf.dirty";
 $d_smbshareconfdirty_path = $g['varrun_path'] . "/smbshare.conf.dirty";
 $d_upnpconfdirty_path = $g['varrun_path'] . "/upnp.conf.dirty";
 
+/* ============================================================================= */
+/* ==    Constants used together with executing a UNIX command line tool      == */
+/* ============================================================================= */
+
+define("DONE_PARAGRAPH", "
+              <p>
+                <span class='red' style='font-family: Courier, monospace; font-size: small;'><strong>Done!</strong></span>
+              </p>
+       ");
+
+define("CMDOUT_PARA", "
+              <p style='font-size: small;'>
+                <strong>Command output:</strong> (use the toggle icon to unveil detailed infos):
+              </p>
+       ");
+
+define("CMDOUT_TOGGLE_FUNC", "
+function toggle_cmdout(image, totoggle) {
+  var plusSrc = \"/themes/{$g['theme']}/images/misc/bullet_toggle_plus.png\";
+  var minusSrc = \"/themes/{$g['theme']}/images/misc/bullet_toggle_minus.png\";
+  var currentSrc = image.src;
+  var newSrc = (currentSrc.indexOf(\"plus\") >= 0) ? minusSrc : plusSrc;
+
+  image.src = newSrc;
+  Effect.toggle(totoggle, 'appear', { duration: 0.75 });
+}
+");
+
+define("CMDOUT_AJAX_SCRIPT", "
+          <script type='text/javascript'>
+            function execCMD() {
+              var to_insert = \"<div style='visibility:hidden' id='loading' name='loading'><img src='/themes/nervecenter/images/misc/loader_tab.gif' \/><\/div>\";
+              new Insertion.Before('doCMDSubmit', to_insert);
+              
+              $('doCMDSubmit').style.visibility = 'hidden';
+              $('loading').style.visibility = 'visible';
+              $('cmdOutputTD').innerHTML = '';
+          
+              new Ajax.Request(
+                \"{$_SERVER['SCRIPT_NAME']}\", {
+                  method     : 'post',
+                  parameters : Form.serialize($('iform')),
+                  onSuccess  : execCMDComplete,
+                  onFailure  : execCMDFailure
+                }
+              );
+            }
+          
+            function execCMDFailure(req) {
+              if($('doCMDSubmit')) $('doCMDSubmit').style.visibility = 'visible';
+              if($('loading')) $('loading').style.visibility = 'hidden';
+              if($('inputerrors')) window.scrollTo(0, 0);
+              if($('inputerrors')) new Effect.Shake($('inputerrors'));
+              if($('inputerrors')) $('inputerrors').innerHTML = req.responseText;
+            }
+
+            function execCMDComplete(req) {
+              $('cmdOutputTD').innerHTML = req.responseText;
+              $('loading').style.visibility = 'hidden';
+              $('doCMDSubmit').style.visibility = 'visible';
+              $('cmdOutputTD').style.visibility = 'visible';
+            }
+          </script>
+");
+
 $freenas_config =& $config['installedpackages']['freenas']['config'][0];
+
+/* ============================================================================= */
+/* ==     Functions used together with executing a UNIX command line tool     == */
+/* ============================================================================= */
+
+function assemble_cmdout($button, $out, $done = false) {
+  $dopara = DONE_PARAGRAPH;
+
+  $retvalue =<<<EOD
+{$button}
+{$out}
+
+EOD;
+
+  if ($done) { $retvalue .= "{$dopara}\n"; }
+  return $retvalue;
+}
+
+function create_cmdout_container($id = "", $cmd = "") {
+  $diskinit_str = "";
+  
+  if (is_array($cmd)) {
+    foreach ($cmd as $cmdline) {
+      $a_out = exec_command_and_return_text_array($cmdline);
+      $diskinit_str .= implode("\n", $a_out);
+    }
+  } else {
+    $a_out = exec_command_and_return_text_array($cmd);
+    $diskinit_str = implode("\n", $a_out);
+  }
+  
+  $returnval =<<<EOD
+              <div id="{$id}" style="display: none; font-family: Courier, monospace; font-size: small;">
+              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
+              </div>
+
+EOD;
+
+  return $returnval;
+}
+
+function create_toggle_button($title, $totoggle) {
+  global $g;
+  
+  $returnval =<<<EOD
+                <table cellpadding="0" cellspacing="0" border="0" style="padding-bottom: 8px;">
+                  <tr>
+                    <td align="left" valign="middle" style="padding-right: 5px;">
+                      <img src='/themes/{$g['theme']}/images/misc/bullet_toggle_plus.png' alt='' border='0' style='border: solid 1px silver; cursor: pointer;' onclick='toggle_cmdout(this, "{$totoggle}");' />
+                    </td>
+                    <td align="left" valign="middle" style='font-family: Courier, monospace; font-size: small;'>
+                      {$title}:
+                    </td>
+                  </tr>
+                </table>
+EOD;
+
+  return $returnval;
+}
 
 function print_error_box_np($msg) {
   global $g;

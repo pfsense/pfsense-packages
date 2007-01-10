@@ -49,11 +49,6 @@ require_once("guiconfig.inc");
 require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
 
-define("DONE_PARAGRAPH", "
-              <p>
-                <span class='red' style='font-family: Courier, monospace; font-size: small;'><strong>Done!</strong></span>
-              </p>
-       ");
 define("DISK_DETAILS_PARA", "
               <p style='font-size: small;'>
                 <strong>Disk initialization details</strong> (use the toggle icon to unveil detailed infos):
@@ -62,7 +57,6 @@ define("DISK_DETAILS_PARA", "
 
 function create_format_output($disk, $type, $notinitmbr) {
   $ddetails = DISK_DETAILS_PARA;
-  $dopara = DONE_PARAGRAPH;
   
   ob_end_flush();
   
@@ -74,20 +68,13 @@ EOD;
   // Erase MBR if not checked
   if (!$notinitmbr) {
     $button = create_toggle_button("Erasing MBR and all paritions", "mbr_out");
-    $a_out = exec_command_and_return_text_array("dd if=/dev/zero of=" . escapeshellarg($disk) . " bs=32k count=640");
-    $diskinit_str = implode("\n", $a_out);
-    $retvalue .=<<<EOD
-                {$button}
-                <div id="mbr_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-                <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-                </div>
-
-EOD;
-
+    $cmd = "dd if=/dev/zero of=" . escapeshellarg($disk) . " bs=32k count=640";
+    $out = create_cmdout_container("mbr_out", $cmd);
+    $retvalue .= assemble_cmdout($button, $out);
   } else {
     $diskinit_str = "Keeping the MBR and all partitions";
     $retvalue .=<<<EOD
-                <div id="mbr_out" style="display: none; font-family: Courier, monospace; font-size: small;">
+                <div id="mbr_out" style="font-family: Courier, monospace; font-size: small;">
                 <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
                 </div>
                 
@@ -98,314 +85,146 @@ EOD;
     case "ufs":
       $button = create_toggle_button("Creating one partition", "ufs_fdisk_out");
       /* Initialize disk */
-      $a_out = exec_command_and_return_text_array("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="ufs_fdisk_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-
-EOD;
+      $cmd = "/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk);
+      $out = create_cmdout_container("ufs_fdisk_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
 
       $button = create_toggle_button("Initializing partition", "ufs_dd_out");
       /* Initialise the partition (optional) */
-      $a_out = exec_command_and_return_text_array("/bin/dd if=/dev/zero of=" . escapeshellarg($disk) . "s1 bs=32k count=16");
-      $diskinit_str = implode("\n", $a_out);
-      
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="ufs_dd_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-
-EOD;
+      $cmd = "/bin/dd if=/dev/zero of=" . escapeshellarg($disk) . "s1 bs=32k count=16";
+      $out = create_cmdout_container("ufs_dd_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
 
       $button = create_toggle_button("Creating BSD label", "ufs_label_out");
       /* Create s1 label */
-      $a_out = exec_command_and_return_text_array("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");
-      $diskinit_str = implode("\n", $a_out);
-      
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="ufs_label_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-
-EOD;
+      $cmd = "/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto";
+      $out = create_cmdout_container("ufs_label_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
 
       $button = create_toggle_button("Creating Filesystem", "ufs_newfs_out");
       /* Create filesystem */
-      $a_out = exec_command_and_return_text_array("/sbin/newfs -U " . escapeshellarg($disk) . "s1");
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="ufs_newfs_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-{$dopara}
-
-EOD;
+      $cmd = "/sbin/newfs -U " . escapeshellarg($disk) . "s1";
+      $out = create_cmdout_container("ufs_newfs_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
 
       break; // end case "ufs":
     case "ufs_no_su":
       $button = create_toggle_button("Creating one partition", "ufsn_fdisk_out");
       /* Initialize disk */
-      $a_out = exec_command_and_return_text_array("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
-      $diskinit_str = implode("\n", $a_out);
+      $cmd = "/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk);
+      $out = create_cmdout_container("ufsn_fdisk_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
       
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="ufsn_fdisk_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-
-EOD;
       $button = create_toggle_button("Initializing partition", "ufsn_dd_out");
       /* Initialise the partition (optional) */
-      $a_out = exec_command_and_return_text_array("/bin/dd if=/dev/zero of=" . escapeshellarg($disk) . "s1 bs=32k count=16");
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="ufsn_dd_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-
-EOD;
+      $cmd = "/bin/dd if=/dev/zero of=" . escapeshellarg($disk) . "s1 bs=32k count=16";
+      $out = create_cmdout_container("ufsn_dd_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
+    
       $button = create_toggle_button("Creating BSD label", "ufsn_label_out");
       /* Create s1 label */
-      $a_out = exec_command_and_return_text_array("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="ufsn_label_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-
-EOD;
+      $cmd = "/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto";
+      $out = create_cmdout_container("ufsn_label_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
+      
       $button = create_toggle_button("Creating Filesystem", "ufsn_newfs_out");
       /* Create filesystem */
-      $a_out = exec_command_and_return_text_array("/sbin/newfs -m 0 " . escapeshellarg($disk) . "s1");
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="ufsn_newfs_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-{$dopara}
-
-EOD;
-
+      $cmd = "/sbin/newfs -m 0 " . escapeshellarg($disk) . "s1";
+      $out = create_cmdout_container("ufsn_newfs_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
+      
       break; // end ufs_no_su
     case "ufsgpt":
       $button = create_toggle_button("Destroying old GTP information", "ufsg_gptd_out");
       /* Destroy GPT partition table */
-      $a_out = exec_command_and_return_text_array("/sbin/gpt destroy " . escapeshellarg($disk));
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="ufsg_gptd_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-
-EOD;
+      $cmd = "/sbin/gpt destroy " . escapeshellarg($disk);
+      $out = create_cmdout_container("ufsg_gptd_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
 
       $button = create_toggle_button("Creating GPT partition", "ufsg_gptc_out");
       /* Create GPT partition table */
-      $a_out = exec_command_and_return_text_array("/sbin/gpt create -f " . escapeshellarg($disk));
-      $diskinit_str = implode("\n", $a_out);
-      $a_out = exec_command_and_return_text_array("/sbin/gpt add -t ufs " . escapeshellarg($disk));
-      $diskinit_str .= implode("\n", $a_out);
-      
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="ufsg_gptc_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-
-EOD;
+      $cmd = array("/sbin/gpt create -f " . escapeshellarg($disk),
+                   "/sbin/gpt add -t ufs " . escapeshellarg($disk));
+      $out = create_cmdout_container("ufsg_gptc_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
 
       $button = create_toggle_button("Creating Filesystem with Soft Updates", "ufsg_newfs_out");
       /* Create filesystem */
-      $a_out = exec_command_and_return_text_array("/sbin/newfs -U " . escapeshellarg($disk) . "p1");
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="ufsg_newfs_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-{$dopara}
-
-EOD;
+      $cmd = "/sbin/newfs -U " . escapeshellarg($disk) . "p1";
+      $out = create_cmdout_container("ufsg_newfs_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
 
       break; // end case "ufsgpt":
     case "ufsgpt_no_su":
       $button = create_toggle_button("Destroying old GTP information", "ufsgn_gpt_out");
       /* Destroy GPT partition table */
-      $a_out = exec_command_and_return_text_array("/sbin/gpt destroy " . escapeshellarg($disk));
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="ufsgn_gpt_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-
-EOD;
+      $cmd = "/sbin/gpt destroy " . escapeshellarg($disk);
+      $out = create_cmdout_container("ufsgn_gpt_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
 
       $button = create_toggle_button("Creating GPT partition", "ufsgn_gptc_out");
       /* Create GPT partition table */
-      $a_out = exec_command_and_return_text_array("/sbin/gpt create -f " . escapeshellarg($disk));
-      $diskinit_str = implode("\n", $a_out);
-      $a_out = exec_command_and_return_text_array("/sbin/gpt add -t ufs " . escapeshellarg($disk));
-      $diskinit_str .= implode("\n", $a_out);
+      $cmd = array("/sbin/gpt create -f " . escapeshellarg($disk),
+                   "/sbin/gpt add -t ufs " . escapeshellarg($disk));
+      $out = create_cmdout_container("ufsgn_gptc_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
 
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="ufsgn_gptc_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-
-EOD;
       $button = create_toggle_button("Creating Filesystem without Soft Updates", "ufsgn_newfs_out");
       /* Create filesystem */
-      $a_out = exec_command_and_return_text_array("/sbin/newfs -m 0 " . escapeshellarg($disk) . "p1");
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="ufsgn_newfs_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-{$dopara}
-
-EOD;
+      $cmd = "/sbin/newfs -m 0 " . escapeshellarg($disk) . "p1";
+      $out = create_cmdout_container("ufsgn_newfs_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
 
       break; // end case "ufsgpt_no_su":
     case "softraid":
       $button = create_toggle_button("Initializing disk", "softr_fdisk_out");
       /* Initialize disk */
-      $a_out = exec_command_and_return_text_array("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="softr_fdisk_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-
-EOD;
+      $cmd = "/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk);
+      $out = create_cmdout_container("softr_fdisk_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
 
       $button = create_toggle_button("Initializing partition", "softr_dd_out");
       /* Initialise the partition (optional) */
-      $a_out = exec_command_and_return_text_array("/bin/dd if=/dev/zero of=" . escapeshellarg($disk) . "s1 bs=32k count=16");
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="softr_dd_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-
-EOD;
+      $cmd = "/bin/dd if=/dev/zero of=" . escapeshellarg($disk) . "s1 bs=32k count=16";
+      $out = create_cmdout_container("softr_dd_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
+      
       $button = create_toggle_button("Delete old gmirror information", "softr_dd_out");
       /* Delete old gmirror information */
-      $a_out = exec_command_and_return_text_array("/sbin/gmirror clear " . escapeshellarg($disk));
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="softr_dd_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-{$dopara}
-
-EOD;
+      $cmd = "/sbin/gmirror clear " . escapeshellarg($disk);
+      $out = create_cmdout_container("softr_dd_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
 
       break; // end case "softraid":
     case "msdos":
       $button = create_toggle_button("Initialize disk", "dos_fdisk_out");
       /* Initialize disk */
-      $a_out = exec_command_and_return_text_array("/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk));
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="dos_fdisk_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-
-EOD;
+      $cmd = "/sbin/fdisk -I -b /boot/mbr " . escapeshellarg($disk);
+      $out = create_cmdout_container("dos_fdisk_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
 
       $button = create_toggle_button("Initialize partion", "dos_dd_out");
       /* Initialise the partition (optional) */
-      $a_out = exec_command_and_return_text_array("/bin/dd if=/dev/zero of=" . escapeshellarg($disk) . "s1 bs=32k count=16");
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="dos_dd_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-
-EOD;
+      $cmd = "/bin/dd if=/dev/zero of=" . escapeshellarg($disk) . "s1 bs=32k count=16";
+      $out = create_cmdout_container("dos_dd_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
 
       $button = create_toggle_button("Creating BSD label", "dos_label_out");
       /* Initialise the partition (optional) */
-      $a_out = exec_command_and_return_text_array("/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto");
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="dos_label_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-
-EOD;
+      $cmd = "/sbin/bsdlabel -w " . escapeshellarg($disk) . "s1 auto";
+      $out = create_cmdout_container("dos_label_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out);
 
       $button = create_toggle_button("Creating Filesystem", "dos_newfs_out");
       /* Initialise the partition (optional) */
-      $a_out = exec_command_and_return_text_array("/sbin/newfs_msdos -F 32 " . escapeshellarg($disk) . "s1");
-      $diskinit_str = implode("\n", $a_out);
-
-      $retvalue .=<<<EOD
-              {$button}
-              <div id="dos_newfs_out" style="display: none; font-family: Courier, monospace; font-size: small;">
-              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
-              </div>
-{$dopara}
-
-EOD;
+      $a_out = "/sbin/newfs_msdos -F 32 " . escapeshellarg($disk) . "s1";
+      $out = create_cmdout_container("dos_newfs_out", $cmd);
+      $retvalue .= assemble_cmdout($button, $out, true);
+      
     break; // end case "msdos":
   } // end switch
   
   return $retvalue;
-}
-
-function create_toggle_button($title, $totoggle) {
-  global $g;
-  
-  $returnval =<<<EOD
-                <table cellpadding="0" cellspacing="0" border="0" style="padding-bottom: 8px;">
-                  <tr>
-                    <td align="left" valign="middle" style="padding-right: 5px;">
-                      <img src='/themes/{$g['theme']}/images/misc/bullet_toggle_plus.png' alt='' border='0' style='border: solid 1px silver; cursor: pointer;' onclick='toggle_cmdout(this, "{$totoggle}");' />
-                    </td>
-                    <td align="left" valign="middle" style='font-family: Courier, monospace; font-size: small;'>
-                      {$title}:
-                    </td>
-                  </tr>
-                </table>
-EOD;
-
-  return $returnval;
 }
 
 if (!is_array($freenas_config['disks']['disk']))
@@ -594,15 +413,7 @@ function disk_change() {
   }
 }
 
-function toggle_cmdout(image, totoggle) {
-  var plusSrc = "/themes/<?= $g['theme'] ?>/images/misc/bullet_toggle_plus.png";
-  var minusSrc = "/themes/<?= $g['theme'] ?>/images/misc/bullet_toggle_minus.png";
-  var currentSrc = image.src;
-  var newSrc = (currentSrc.indexOf("plus") >= 0) ? minusSrc : plusSrc;
-
-  image.src = newSrc;
-  Effect.toggle(totoggle, 'appear', { duration: 0.75 });
-}
+<?= CMDOUT_TOGGLE_FUNC ?>
 // -->
 </script>
 </head>
@@ -613,7 +424,7 @@ function toggle_cmdout(image, totoggle) {
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if($errormsg) print_error_box($errormsg);?>
-<div id="inputerrors"></div> 
+<div id="inputerrors"></div>
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
   <tr>
     <td>
@@ -631,40 +442,8 @@ function toggle_cmdout(image, totoggle) {
     <td>
       <div id="mainarea">
       <form id="iform" name="iform" action="disks_manage_init.php" method="post">
+      <?= CMDOUT_AJAX_SCRIPT ?>
       <table class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
-          <script type="text/javascript">
-            function execFormat() {
-              var to_insert = "<div style='visibility:hidden' id='loading' name='loading'><img src='/themes/nervecenter/images/misc/loader_tab.gif' /></div>";
-              new Insertion.Before('doFormatSubmit', to_insert);
-              
-              $("doFormatSubmit").style.visibility = "hidden";
-              $('loading').style.visibility = 'visible';
-          
-              new Ajax.Request(
-                "<?=$_SERVER['SCRIPT_NAME'];?>", {
-                  method     : "post",
-                  parameters : Form.serialize($("iform")),
-                  onSuccess  : execFormatComplete,
-                  onFailure  : execFormatFailure
-                }
-              );
-            }
-          
-            function execFormatFailure(req) {
-              if($('doFormatSubmit')) $('doFormatSubmit').style.visibility = 'visible';
-              if($('loading')) $('loading').style.visibility = 'hidden';
-              if($('inputerrors')) window.scrollTo(0, 0);
-              if($('inputerrors')) new Effect.Shake($('inputerrors'));
-              if($('inputerrors')) $('inputerrors').innerHTML = req.responseText;
-            }
-
-            function execFormatComplete(req) {
-              $("formatOutputTD").innerHTML = req.responseText;
-              $('loading').style.visibility = 'hidden';
-              $("doFormatSubmit").style.visibility = 'visible';
-              $("formatOutputTD").style.visibility = 'visible';
-            }
-          </script>
           <tr>
             <td width="22%" valign="top" class="vncellreq"><?=gettext("Disk");?></td>
             <td width="78%" class="vtable">
@@ -697,22 +476,21 @@ function toggle_cmdout(image, totoggle) {
           <tr>
             <td width="22%" valign="top">&nbsp;</td>
             <td width="78%">
-              <input id="doFormatSubmit" name="doFormatSubmit" type="button" class="formbtn" value="<?=gettext("Format disk!");?>" onclick="execFormat();" />
+              <input id="doCMDSubmit" name="doCMDSubmit" type="button" class="formbtn" value="<?=gettext("Format disk!");?>" onclick="execCMD();" />
             </td>
           </tr>
           <tr>
             <!-- Format Output Container - Do Not Delete -->
-            <td id="formatOutputTD" valign="top" colspan="2" style="visibility: hidden; border: solid 1px silver; vertical-align: middle; width: 100%"></td>
+            <td id="cmdOutputTD" valign="top" colspan="2" style="visibility: hidden; border: solid 1px silver; vertical-align: middle; width: 100%"></td>
           </tr>
           <tr>
             <td align="left" valign="top" colspan="2">
-                <span class="red">
-                  <strong>WARNING:</strong>
-                </span>
-                <br />
-                <span class="vexpl">
-                  <?= gettext("This step will erase all your partition, create partition number 1 and format the hard drive with the file system specified."); ?>
-                </span>
+              <span class="red">
+                <strong>WARNING:</strong>
+              </span>
+              <br />
+              <span class="vexpl">
+                <?= gettext("This step will erase all your partition, create partition number 1 and format the hard drive with the file system specified."); ?>
               </span>
             </td>
           </tr>

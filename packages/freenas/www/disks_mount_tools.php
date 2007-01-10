@@ -50,6 +50,46 @@ require_once("guiconfig.inc");
 require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
 
+function create_cmd_output(&$action, &$a_mount, &$fullname) {
+  $cmdout = CMDOUT_PARA;
+  
+  ob_end_flush();
+  
+  $retvalue =<<<EOD
+{$cmdout}
+
+EOD;
+
+  /* Get the id of the mount array entry. */
+  $id = array_search_ex($fullname, $a_mount, "fullname");
+  /* Get the mount data. */
+  $mount = $a_mount[$id];
+
+  switch($action)
+  {
+    case "mount":
+      $diskinit_str = gettext("Mounting '{$fullname}'...") . "<br />";
+      $result = disks_mount_fullname($fullname);
+      break;
+    case "umount":
+      $diskinit_str = gettext("Umounting '{$fullname}'...") . "<br />";
+      $result = disks_umount_fullname($fullname);
+      break;
+  }
+  
+  /* Display result */
+  (0 == $result) ? $diskinit_str .= gettext("Successful") : $diskinit_str .= gettext("Failed");
+  
+  $retvalue .=<<<EOD
+              <div id="ismounted_out" style="font-family: Courier, monospace; font-size: small;">
+              <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
+              </div>
+
+EOD;
+
+  return $retvalue;
+}
+
 if (!is_array($freenas_config['mounts']['mount']))
   $freenas_config['mounts']['mount'] = array();
 
@@ -85,6 +125,9 @@ if (! empty($_POST))
     $do_action = true;
     $fullname = $_POST['fullname'];
     $action = $_POST['action'];
+    
+    echo create_cmd_output($action, $a_mount, $fullname);
+    exit; // cause of Ajax
   }
 }
 
@@ -107,13 +150,23 @@ if(isset($_GET['action'])) {
   $action = $_GET['action'];
 }
 
+/* if ajax is calling, give them an update message */
+if(isAjax())
+  print_info_box_np($savemsg);
+
 include("head.inc");
 /* put your custom HTML head content here        */
 /* using some of the $pfSenseHead function calls */
+$pfSenseHead->setCloseHead(false);
 echo $pfSenseHead->getHTML();
 
 ?>
-
+<script type="text/javascript">
+<!--
+<?= CMDOUT_TOGGLE_FUNC ?>
+// -->
+</script>
+</head>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC" onload="<?= $jsevents["body"]["onload"] ?>">
 <?php include("fbegin.inc"); ?>
 
@@ -134,6 +187,7 @@ echo $pfSenseHead->getHTML();
   <tr> 
     <td>
       <div id="mainarea">
+      <?= CMDOUT_AJAX_SCRIPT ?>
       <?php if ($input_errors) print_input_errors($input_errors); ?>
         <table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
           <tr> 
@@ -160,41 +214,12 @@ echo $pfSenseHead->getHTML();
           <tr>
             <td width="22%" valign="top">&nbsp;</td>
             <td width="78%">
-              <input name="Submit" type="submit" class="formbtn" value="<?= gettext("Send Command!"); ?>" />
+              <input id="doCMDSubmit" name="doCMDSubmit" type="button" class="formbtn" value="<?=gettext("Send Command!");?>" onclick="execCMD();" />
             </td>
           </tr>
           <tr>
-            <td valign="top" colspan="2">
-            <?php if($do_action)
-            {
-              echo("<strong>" . gettext("Command output") . ": </strong><br />");
-              echo('<pre>');
-              ob_end_flush();
-  
-              /* Get the id of the mount array entry. */
-              $id = array_search_ex($fullname, $a_mount, "fullname");
-              /* Get the mount data. */
-              $mount = $a_mount[$id];
-  
-              switch($action)
-              {
-                case "mount":
-                  echo(gettext("Mounting '{$fullname}'...") . "<br />");
-                  $result = disks_mount_fullname($fullname);
-                  break;
-                case "umount":
-                  echo(gettext("Umounting '{$fullname}'...") . "<br />");
-                  $result = disks_umount_fullname($fullname);
-                  break;
-              }
-  
-              /* Display result */
-              echo((0 == $result) ? gettext("Successful") : gettext("Failed"));
-  
-              echo('</pre>');
-            }
-            ?>
-            </td>
+            <!-- Format Output Container - Do Not Delete -->
+            <td id="cmdOutputTD" valign="top" colspan="2" style="visibility: hidden; border: solid 1px silver; vertical-align: middle; width: 100%"></td>
           </tr>
         </table>
       </div>
