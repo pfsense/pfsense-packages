@@ -44,7 +44,7 @@ include("head.inc");
 echo $pfSenseHead->getHTML();
 
 ?>
-<body link="#000000" vlink="#000000" alink="#000000">
+<body link="#000000" vlink="#000000" alink="#000000" onload="<?= $jsevents["body"]["onload"] ?>">
 <? include("fbegin.inc"); ?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
