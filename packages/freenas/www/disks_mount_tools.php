@@ -120,8 +120,7 @@ echo $pfSenseHead->getHTML();
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
-<form id="iform" name="iform" action="disks_mount_tools.php" method="post">
-
+<form action="disks_mount_tools.php" method="post" name="iform" id="iform">
 <div id="inputerrors"></div>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
@@ -136,12 +135,11 @@ echo $pfSenseHead->getHTML();
     <td>
       <div id="mainarea">
       <?php if ($input_errors) print_input_errors($input_errors); ?>
-      <form action="disks_mount_tools.php" method="post" name="iform" id="iform">
-        <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+        <table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
           <tr> 
             <td valign="top" class="vncellreq"><?= gettext("Share Name"); ?></td>
             <td class="vtable">
-              <select name="fullname" class="formfld" id="fullname">
+              <select name="fullname" class="formselect" id="fullname">
                 <?php foreach ($a_mount as $mountv): ?>
                 <option value="<?=$mountv['fullname'];?>"<?php if ($mountv['fullname'] == $fullname) echo "selected";?>>
                 <?php echo htmlspecialchars($mountv['sharename'] . " (" . gettext("Disk") . ": " . $mountv['mdisk'] . " " . gettext("Partition") . ": " . $mountv['partition'] . ")");?>
@@ -153,7 +151,7 @@ echo $pfSenseHead->getHTML();
           <tr>
             <td valign="top" class="vncellreq"><?= gettext("Command"); ?></td>
             <td class="vtable"> 
-              <select name="action" class="formfld" id="action">
+              <select name="action" class="formselect" id="action">
                 <option value="mount" <?php if ($action == "mount") echo "selected"; ?>>mount</option>
                 <option value="umount" <?php if ($action == "umount") echo "selected"; ?>>umount</option>
                </select>
@@ -162,7 +160,7 @@ echo $pfSenseHead->getHTML();
           <tr>
             <td width="22%" valign="top">&nbsp;</td>
             <td width="78%">
-              <input name="Submit" type="submit" class="formbtn" value="<?= gettext("Send Command!"); ?>">
+              <input name="Submit" type="submit" class="formbtn" value="<?= gettext("Send Command!"); ?>" />
             </td>
           </tr>
           <tr>
@@ -199,12 +197,11 @@ echo $pfSenseHead->getHTML();
             </td>
           </tr>
         </table>
-      </form>
       </div>
     </td>
   </tr>
   </table>
-</form>
+  </form>
 <?php include("fend.inc"); ?>
 <?= checkForInputErrors(); ?>
 </body>

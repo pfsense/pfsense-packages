@@ -54,7 +54,7 @@ if (!is_array($freenas_config['disks']['disk']))
 
 disks_sort();
 
-$a_disk_conf = &$freenas_config['disks']['disk'];
+$a_disk = &$freenas_config['disks']['disk'];
 
 if ($_POST) {
   unset($input_errors);
@@ -140,11 +140,11 @@ function disk_change() {
   <tr> 
     <td>
       <div id="mainarea">
-      <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+      <table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
         <tr>
           <td width="22%" valign="top" class="vncellreq"><?=gettext("Disk");?></td>
           <td width="78%" class="vtable">
-            <select name="disk" class="formfld" id="disk" onchange="disk_change()">
+            <select name="disk" class="formselect" id="disk" onchange="disk_change()">
               <?php foreach ($a_disk as $diskn): ?>
               <option value="<?=$diskn['name'];?>"<?php if ($diskn['name'] == $disk) echo "selected";?>>
               <?php echo htmlspecialchars($diskn['name'] . ": " .$diskn['size'] . " (" . $diskn['desc'] . ")");?>
@@ -156,13 +156,13 @@ function disk_change() {
         <tr>
           <td width="22%" valign="top" class="vncellreq"><?=gettext("Partition");?></td>
           <td width="78%" class="vtable">
-            <select name="partition" class="formfld" id="partition"></select>
+            <select name="partition" class="formselect" id="partition"></select>
           </td>
         </tr>
         <tr>
           <td width="22%" valign="top" class="vncellreq"><?=gettext("Command");?></td>
           <td width="78%" class="vtable">
-            <select name="action" class="formfld" id="action">
+            <select name="action" class="formselect" id="action">
               <option value="fsck" <?php if ($action == "fsck") echo "selected"; ?>>fsck</option>
              </select>
           </td>
@@ -183,7 +183,7 @@ function disk_change() {
         <tr>
           <td width="22%" valign="top" class="vncellreq">&nbsp;</td>
           <td width="78%" class="vtable">
-            <input name="Submit" type="submit" class="formbtn" value="<?= gettext("Send Command!"); ?>">
+            <input name="Submit" type="submit" class="formbtn" value="<?= gettext("Send Command!"); ?>" />
           </td>
         </tr>
         <tr>

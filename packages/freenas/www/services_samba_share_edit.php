@@ -114,19 +114,19 @@ echo $pfSenseHead->getHTML();
       <tr> 
         <td width="22%" valign="top" class="vncellreq"><?= gettext("Share Name"); ?></td>
         <td width="78%" class="vtable"> 
-          <input type="text" class="formfld" size="30" value="<?=htmlspecialchars($freenas_config['mounts']['mount'][$id]['sharename']);?>" disabled="disabled" />
+          <input type="text" class="formfld file" size="30" value="<?=htmlspecialchars($freenas_config['mounts']['mount'][$id]['sharename']);?>" disabled="disabled" />
         </td>
       </tr>
       <tr> 
         <td width="22%" valign="top" class="vncellreq"><?= gettext("Description"); ?></td>
         <td width="78%" class="vtable"> 
-          <input type="text" class="formfld" size="30" value="<?=htmlspecialchars($freenas_config['mounts']['mount'][$id]['desc']);?>" disabled="disabled">
+          <input type="text" class="formfld unknown" size="30" value="<?=htmlspecialchars($freenas_config['mounts']['mount'][$id]['desc']);?>" disabled="disabled">
         </td>
       </tr>
       <tr>
         <td width="22%" valign="top" class="vncell"><?= gettext("Browseable"); ?></td>
         <td width="78%" class="vtable">
-          <select name="browseable" class="formfld" id="browseable">
+          <select name="browseable" class="formselect" id="browseable">
             <?php
               $text = array(gettext("Yes"),gettext("No"));
               $vals = explode(" ","1 0"); $j = 0;

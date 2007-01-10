@@ -183,8 +183,8 @@ echo $pfSenseHead->getHTML();
     <table width="100%" border="0" cellpadding="6" cellspacing="0">
       <tr>
         <td width="100%" valign="middle" class="listtopic" colspan="2">
-          <span style="vertical-align: middle; position: relative; left: 0px;"><?=gettext("AFP Server");?></span>
-          <span style="vertical-align: middle; position: relative; left: 84%;">
+          <span style="vertical-align: middle; position: relative; left: 0px;"><?=gettext("Unison File Synchronisation");?></span>
+          <span style="vertical-align: middle; position: relative; left: 72%;">
             <input name="enable" type="checkbox" value="yes" <?php if ($pconfig['enable']) echo "checked=\"checked\""; ?> onClick="enable_change(false)" />&nbsp;<?= gettext("Enable"); ?>
           </span>
         </td>
@@ -199,7 +199,7 @@ echo $pfSenseHead->getHTML();
             <?php endforeach; ?>
           </select>
           <br />
-          <?= gettext("You may need enough space to duplicate all files being synced."); ?>.</td>
+          <?= gettext("You may need enough space to duplicate all files being synced."); ?>.
         </td>
       </tr>
       <tr>
@@ -229,7 +229,7 @@ echo $pfSenseHead->getHTML();
             <strong><?= gettext("Note"); ?>:</strong>
           </span>
           <br />
-          <?= gettext("<a href='/services_sshd.php'>SSHD</a> must be enabled for Unison to work, and the <a href='/access_users.php'>user</a> must have Full Shell enabled."); ?>
+          <?= gettext("<a href='/system_advanced.php'>SSHD</a> must be enabled for Unison to work, and the <a href='/system_usermanager.php'>user</a> must have Full Shell enabled."); ?>
         </td>
       </tr>
     </table>

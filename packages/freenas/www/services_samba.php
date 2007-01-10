@@ -212,6 +212,9 @@ echo $pfSenseHead->getHTML();
 <?php include("fbegin.inc"); ?>
 
 <form id="iform" name="iform" action="services_samba.php" method="post">
+<?php if ($input_errors) print_input_errors($input_errors); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
+<div id="inputerrors"></div>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td class="tabnavtbl">
@@ -226,10 +229,9 @@ echo $pfSenseHead->getHTML();
   <tr> 
     <td>
     <div id="mainarea">
-    <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+    <table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
       <?php if ($input_errors) print_input_errors($input_errors); ?>
       <?php if ($savemsg) print_info_box($savemsg); ?>
-      <div id="inputerrors"></div>
       <tr>
         <td width="100%" valign="middle" class="listtopic" colspan="2">
           <span style="vertical-align: middle; position: relative; left: 0px;"><?=gettext("CIFS share");?></span>

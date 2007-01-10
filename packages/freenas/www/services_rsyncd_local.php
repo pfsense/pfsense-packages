@@ -191,21 +191,12 @@ $jscriptstr = <<<EOD
 <script type="text/javascript">
 <!--
 function enable_change(enable_change) {
-	var endis;
-	
-	endis = !(document.iform.enable.checked || enable_change);
+  var endis;
+
+  endis = !(document.iform.enable.checked || enable_change);
   endis ? color = '#D4D0C8' : color = '#FFFFFF';
 
 EOD;
-
-$i = 0;
-
-if (is_array($a_mount)) {
-  foreach ($a_mount as $mountv) {
-    $jscriptstr .= "  document.iform.share_" . $i . ".disabled = endis;\n";
-    $i++;
-  }
-}
 
 /* Note: In contrast to FreeNAS we are only using
  * three minutes and one hours field(s)
@@ -221,7 +212,7 @@ $jscriptstr .= <<<EOD
   /* document.iform.hours2.disabled = endis; */
   document.iform.days1.disabled = endis;
   document.iform.days2.disabled = endis;
-  document.iform.days3.disabled = endis;
+  /* document.iform.days3.disabled = endis; */
   document.iform.months.disabled = endis;
   document.iform.weekdays.disabled = endis;
   document.iform.all_mins1.disabled = endis;
@@ -245,7 +236,7 @@ $jscriptstr .= <<<EOD
   /* document.iform.hours2.style.backgroundColor = color; */
   document.iform.days1.style.backgroundColor = color;
   document.iform.days2.style.backgroundColor = color;
-  document.iform.days3.style.backgroundColor = color;
+  /* document.iform.days3.style.backgroundColor = color; */
   document.iform.months.style.backgroundColor = color;
   document.iform.weekdays.style.backgroundColor = color;
   document.iform.all_mins1.style.backgroundColor = color;
@@ -304,10 +295,10 @@ echo $pfSenseHead->getHTML();
           <tr>
             <td width="16%" valign="top" class="vncellreq"><?= gettext("Source"); ?></td>
             <td width="84%" class="vtable">
-              <select name="source" class="formfld" id="source">
+              <select name="source" class="formselect" id="source">
                 <?php
                 if (is_array($freenas_config['mounts']['mount'])) {
-                  foreach ($a_mount as $mountv) 	{ 
+                  foreach ($a_mount as $mountv) { 
                     echo "<option value=\"{$mountv['sharename']}\"";
                       if (strcmp($mountv['sharename'],$pconfig['source']) == 0)
                         echo " selected";
@@ -327,7 +318,7 @@ echo $pfSenseHead->getHTML();
           <tr>
             <td width="16%" valign="top" class="vncellreq"><?= gettext("Destination"); ?></td>
             <td width="84%" class="vtable">
-              <select name="destination" class="formfld" id="destination">
+              <select name="destination" class="formselect" id="destination">
                 <?php
                 if (is_array($freenas_config['mounts']['mount'])) {
                   foreach ($a_mount as $mountv) { 

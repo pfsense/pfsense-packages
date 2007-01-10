@@ -235,7 +235,7 @@ $jscriptstr .= <<<EOD
   /* document.iform.hours2.disabled = endis; */
   document.iform.days1.disabled = endis;
   document.iform.days2.disabled = endis;
-  document.iform.days3.disabled = endis;
+  /* document.iform.days3.disabled = endis; */
   document.iform.months.disabled = endis;
   document.iform.weekdays.disabled = endis;
   document.iform.all_mins1.disabled = endis;
@@ -258,7 +258,7 @@ $jscriptstr .= <<<EOD
   /* document.iform.hours2.style.backgroundColor = color; */
   document.iform.days1.style.backgroundColor = color;
   document.iform.days2.style.backgroundColor = color;
-  document.iform.days3.style.backgroundColor = color;
+  /* document.iform.days3.style.backgroundColor = color; */
   document.iform.months.style.backgroundColor = color;
   document.iform.weekdays.style.backgroundColor = color;
   document.iform.all_mins1.style.backgroundColor = color;
@@ -333,12 +333,11 @@ echo $pfSenseHead->getHTML();
             <td width="16%" valign="top" class="vncellreq"><?= gettext("Shares to be synchronized"); ?></td>
             <td width="84%" class="vtable">
               <?php 
-                $i=0;
                 if (is_array($freenas_config['mounts']['mount'])) {
+                  $i=0;
                   foreach ($a_mount as $mountv) {  
                     echo "<input name=\"sharetosync[]\" id=\"share_" . $i  . "\" type=\"checkbox\" value=\"" . $mountv['sharename'] . "\"";
-                    
-                    if (in_array($mountv['sharename'], $pconfig['sharetosync']))
+                    if ($mountv['sharename'] == $pconfig['sharetosync'])
                       echo " checked=\"checked\"";
                     echo" />";
                     echo $mountv['sharename'] . " (" . $mountv['desc'] . ")<br />\n";
