@@ -381,10 +381,15 @@ function squid_resync_general() {
                         if (($settings['transparent_proxy'] == 'on')) {
 				$conf .= "http_port 127.0.0.1:80 transparent\n";
                         }
-			$conf .= "http_port {$real_ifaces[$i][0]}:$port\n";
+		} else {
+			foreach (explode(',', $ifaces) as $i => $iface) {
+				$real_ifaces[] = squid_get_real_interface_address($iface);
+				if($real_ifaces[$i][0]) {
+					$conf .= "http_port {$real_ifaces[$i][0]}:$port\n";
+				}
+			}
 		}
 	}
-
 	$icp_port = ($settings['icp_port'] ? $settings['icp_port'] : 0);
 
 	$pidfile = "{$g['varrun_path']}/squid.pid";
@@ -422,7 +427,7 @@ EOD;
 			$ip = long2ip(ip2long($ip) & ip2long($mask));
 			$src .= " $ip/$mask";
 		}
-		$conf .= "Allow local network(s) on interface(s)\n";
+		$conf .= "# Allow local network(s) on interface(s)\n";
 		$conf .= "acl localnet src $src\n";
 		$valid_acls[] = 'localnet';
 	}
