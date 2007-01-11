@@ -50,7 +50,13 @@ define("DONE_PARAGRAPH", "
 
 define("CMDOUT_PARA", "
               <p style='font-size: small;'>
-                <strong>Command output:</strong> (use the toggle icon to unveil detailed infos):
+                <strong>Command output</strong> (use the toggle icon to unveil detailed infos):
+              </p>
+       ");
+
+define("CMDOUT_PARA_WOHINT", "
+              <p style='font-size: small;'>
+                <strong>Command output:</strong>
               </p>
        ");
 

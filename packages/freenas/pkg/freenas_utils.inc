@@ -579,7 +579,11 @@ function get_ata_disks_list() {
           /* Separe la ligne par les espace */
           $dmesgtab = explode(" ", $dmesgline);
           $dmesgtab[0] = rtrim($dmesgtab[0],":");
-          if ($dmesgtab[0]!="" &&(strcasecmp($dmesgtab[0],$diskname) == 0))
+          /* When there is a wrong DMA cable, the first line is:
+           * ad0: DMA limited to UDMA33, controller found non-ATA66 cable
+          */
+          if ($dmesgtab[0]!="" && (strcasecmp($dmesgtab[0],$diskname) == 0) &&
+              strcmp($dmesgtab[1],"DMA") !=0) {
             $disklist[$diskname]['size'] = $dmesgtab[1];
         } // end if
       } // end foreach

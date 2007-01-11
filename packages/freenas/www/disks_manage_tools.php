@@ -73,7 +73,7 @@ EOD;
       if($umount && $ismounted) {
         $diskinit_str = "<strong class='red'>" . gettext("Note") . ":</strong> " . gettext("The disk is currently mounted! The mount point will be removed temporary to perform selected command.") . "<br /><br />";
         $retvalue .=<<<EOD
-              <div id="ismounted_out" style="display: none; font-family: Courier, monospace; font-size: small;">
+              <div id="ismounted_out" style="font-family: Courier, monospace; font-size: small;">
               <pre style="font-family: Courier, monospace; font-size: small; font-style: italic;">{$diskinit_str}</pre>
               </div>
 
@@ -90,7 +90,7 @@ EOD;
         case "ufsgpt":
         case "ufsgpt_no_su":
           $button = create_toggle_button("Checking disk", "ufsgn_fsck_out");
-          $cmd = "/sbin/fsck_ufs -y -f /dev/" . escapeshellarg($disk . $partition);
+          $cmd = "/sbin/fsck_ufs -y -f " . escapeshellarg($disk . $partition);
           $out = create_cmdout_container("ufsgn_fsck_out", $cmd);
           $retvalue .= assemble_cmdout($button, $out);
           break;
@@ -107,7 +107,7 @@ EOD;
           break;
         case "msdos":
           $button = create_toggle_button("Checking disk", "dos_fsck_out");
-          $cmd = "/sbin/fsck_msdosfs -y -f /dev/" . escapeshellarg($disk . $partition);
+          $cmd = "/sbin/fsck_msdosfs -y -f " . escapeshellarg($disk . $partition);
           $out = create_cmdout_container("dos_fsck_out", $cmd);
           $retvalue .= assemble_cmdout($button, $out);
           break;
@@ -129,7 +129,37 @@ if (!is_array($freenas_config['disks']['disk']))
 
 disks_sort();
 
-$a_disk = &$freenas_config['disks']['disk'];
+if (!is_array($freenas_config['gvinum']['vdisk']))
+  $freenas_config['gvinum']['vdisk'] = array();
+
+gvinum_sort();
+
+if (!is_array($freenas_config['gmirror']['vdisk']))
+  $freenas_config['gmirror']['vdisk'] = array();
+
+gmirror_sort();
+
+if (!is_array($freenas_config['gconcat']['vdisk']))
+  $freenas_config['gconcat']['vdisk'] = array();
+
+gconcat_sort();
+
+if (!is_array($freenas_config['gstripe']['vdisk']))
+  $config['gstripe']['vdisk'] = array();
+
+gstripe_sort();
+
+if (!is_array($freenas_config['graid5']['vdisk']))
+  $freenas_config['graid5']['vdisk'] = array();
+
+graid5_sort();
+
+$a_disk = array_merge($freenas_config['disks']['disk'],
+                      $freenas_config['gvinum']['vdisk'],
+                      $freenas_config['gmirror']['vdisk'],
+                      $freenas_config['gconcat']['vdisk'],
+                      $freenas_config['gstripe']['vdisk'],
+                      $freenas_config['graid5']['vdisk']);
 
 if ($_POST) {
   unset($input_errors);
@@ -189,6 +219,9 @@ function disk_change() {
   switch(document.iform.disk.value)
   {
     <?php foreach ($a_disk as $diskv): ?>
+    <?php if (strcmp($diskv['fstype'],"softraid")==0): ?> 	  
+      <?php continue; ?>
+    <?php endif; ?>
     case "<?=$diskv['name'];?>":
       <?php $partinfo = disks_get_partition_info($diskv['name']);?>
       <?php foreach($partinfo as $partinfon => $partinfov): ?>
@@ -233,7 +266,10 @@ function disk_change() {
           <td width="78%" class="vtable">
             <select name="disk" class="formselect" id="disk" onchange="disk_change()">
               <?php foreach ($a_disk as $diskn): ?>
-              <option value="<?=$diskn['name'];?>"<?php if ($diskn['name'] == $disk) echo "selected";?>>
+              <?php if (strcmp($diskn['fstype'],"softraid")==0): ?> 	  
+                <?php continue; ?>
+              <?php endif; ?>
+              <option value="<?=$diskn['fullname'];?>"<?php if ($diskn['fullname'] == $disk) echo "selected=\"selected\"";?>>
               <?php echo htmlspecialchars($diskn['name'] . ": " .$diskn['size'] . " (" . $diskn['desc'] . ")");?>
               <?php endforeach; ?>
               </option>

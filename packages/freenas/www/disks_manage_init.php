@@ -270,7 +270,12 @@ $a_gmirror = &$freenas_config['gmirror']['vdisk'];
 $a_gstripe = &$freenas_config['gstripe']['vdisk'];
 $a_graid5 = &$freenas_config['graid5']['vdisk'];
 $a_gvinum = &$freenas_config['gvinum']['vdisk'];
-$all_disk = array_merge($a_disk,$a_gconcat,$a_gmirror,$a_gstripe,$a_graid5,$a_gvinum);
+	 $a_alldisk = array_merge($a_disk,
+                            $a_gconcat,
+                            $a_gmirror,
+                            $a_gstripe,
+                            $a_graid5,
+                            $a_gvinum);
 
 if (! empty($_POST))
 {
@@ -402,7 +407,7 @@ echo $pfSenseHead->getHTML();
 function disk_change() {
   switch(document.iform.disk.value)
   {
-    <?php foreach ($a_disk as $diskv): ?>
+    <?php foreach ($a_alldisk as $diskv): ?>
     case "<?=$diskv['fullname'];?>":
       <?php $i = 0;?>
       <?php foreach ($a_fst as $fstval => $fstname): ?>
@@ -448,7 +453,7 @@ function disk_change() {
             <td width="22%" valign="top" class="vncellreq"><?=gettext("Disk");?></td>
             <td width="78%" class="vtable">
               <select name="disk" class="formselect" id="disk" onchange="disk_change();">
-                <?php foreach ($all_disk as $diskv): ?>
+                <?php foreach ($a_alldisk as $diskv): ?>
                 <option value="<?=$diskv['fullname'];?>" <?php if ($diskv['name'] == $disk) echo "selected=\selected\"";?>>
                 <?php echo htmlspecialchars($diskv['name'] . ": " .$diskv['size'] . " (" . $diskv['desc'] . ")");?>
                 <?php endforeach; ?>

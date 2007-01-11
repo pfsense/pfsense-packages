@@ -115,19 +115,39 @@ echo $pfSenseHead->getHTML();
         <td align="left" valign="top">
           <?php
             echo "<pre style=\"font-size: medium;\">";
-            echo "<strong>Software RAID - gmirror status:</strong><br />";
+            echo "<strong>" . gettext("Software RAID") . " - " . gettext("Geom Mirror") . ":</strong><br /><br />";
             exec("/sbin/gmirror list",$rawdata);
             foreach ($rawdata as $line) {
               echo htmlspecialchars($line) . "<br />";
             }
             unset ($line);
             unset ($rawdata);
-            echo "<strong>Software RAID - gvinum status:</strong><br />";
+            echo "<strong>" . gettext("Software RAID") . " - " . gettext("Geom Vinum") . ":</strong><br /><br />";
             exec("/sbin/gvinum list",$rawdata);
             foreach ($rawdata as $line) 	{
-              echo htmlspecialchars($line) . "<br>";
+              echo htmlspecialchars($line) . "<br />";
             }
             unset ($line);
+            unset ($rawdata);
+            echo "<strong>" . gettext("Software RAID") . " - " . gettext("Geom Concat") . ":</strong><br /><br />";
+            exec("/sbin/gconcat list",$rawdata);
+            foreach ($rawdata as $line) 	{
+              echo htmlspecialchars($line) . "<br />";
+            }
+             unset ($line);
+            unset ($rawdata);
+            echo "<strong>" . gettext("Software RAID") . " - " . gettext("Geom Stripe") . ":</strong><br /><br />";
+            exec("/sbin/gstripe list",$rawdata);
+            foreach ($rawdata as $line) 	{
+              echo htmlspecialchars($line) . "<br />";
+            }
+            unset ($line);
+            unset ($rawdata);
+            echo "<strong>" . gettext("Software RAID") . " - " . gettext("Geom Raid5") . ":</strong><br /><br />";
+            exec("/sbin/graid5 list",$rawdata);
+            foreach ($rawdata as $line) 	{
+              echo htmlspecialchars($line) . "<br />";
+            }
             echo "</pre>";
           ?>
         </td>

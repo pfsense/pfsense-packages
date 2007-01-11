@@ -51,7 +51,7 @@ require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
 
 function create_cmd_output(&$action, &$a_mount, &$fullname) {
-  $cmdout = CMDOUT_PARA;
+  $cmdout = CMDOUT_PARA_WOHINT;
   
   ob_end_flush();
   

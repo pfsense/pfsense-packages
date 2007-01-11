@@ -1034,6 +1034,9 @@ function disks_raid_graid5_delete($raidname) {
 
   // Stop the volume
   mwexec("/sbin/graid5 stop $raidname");
+  
+  // The volume can disapear a few second after stop
+  sleep(2);
 
   // Clear the graid5 information on the hard drive
   foreach ($freenas_config['graid5']['vdisk'] as $a_raid) {
@@ -1155,6 +1158,7 @@ function disks_bsdlabel($harddrive,$partition,$type) {
     // If the line contain the word "unused"
     if (ereg ("unused",$val)) {
       // Replacing c: by a:
+      // Why ??? Must found the web page where I see this method
       $val = ereg_replace ("c:","a:", $val);
       // Peplacing unused by $type
       $val = ereg_replace ("unused",$type, $val);
@@ -1198,8 +1202,6 @@ function disks_set_ataidle() {
         $apm=$disk['apm'];
         $ac=$disk['acoustic'];
         
-        /* mwexec("/usr/local/sbin/ataidle -A $ac -P $apm -S $time $channel $device"); */
-        
         $cmd = "/usr/local/sbin/ataidle ";
         
         if ($disk['acoustic'] != 0) { $cmd .= "-A $ac  "; }
@@ -1227,9 +1229,11 @@ Result is in the form:
   [type]  => 0xa5
   [flags] => 0x80
 )
+
+Called in disks_manage_tools.php
 */
 function disks_get_partition_info($disk) {  
-  exec("/sbin/fdisk -s /dev/{$disk}", $rawdata);
+  exec("/sbin/fdisk -s {$disk}", $rawdata);
   array_shift($rawdata);
   array_shift($rawdata);
 
