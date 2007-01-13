@@ -142,6 +142,10 @@ mount_sort();
 
 $a_mount = &$freenas_config['mounts']['mount'];
 
+/* if ajax is calling, give them an update message */
+if(isAjax())
+  print_info_box_np($savemsg);
+
 include("head.inc");
 /* put your custom HTML head content here        */
 /* using some of the $pfSenseHead function calls */
