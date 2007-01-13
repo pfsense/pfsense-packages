@@ -145,7 +145,7 @@ if (!is_array($freenas_config['gconcat']['vdisk']))
 gconcat_sort();
 
 if (!is_array($freenas_config['gstripe']['vdisk']))
-  $config['gstripe']['vdisk'] = array();
+  $freenas_config['gstripe']['vdisk'] = array();
 
 gstripe_sort();
 
@@ -181,7 +181,7 @@ if ($_POST) {
     $do_action = true;
     $disk = $_POST['disk'];
     $action = $_POST['action'];
-    $partition = $_POST['partition'];
+    $partition = $_POST['partitionno'];
     $umount = $_POST['umount'];
     
     echo create_cmd_output($action, $a_disk, $disk, $partition, $umount);
@@ -214,20 +214,22 @@ echo $pfSenseHead->getHTML();
 function disk_change() {
   var next = null;
   // Remove all entries from partition combobox.
-  document.iform.partition.length = 0;
+  document.iform.partitionno.length = 0;
   // Insert entries for partition combobox.
+  alert(document.iform.disk.value);
   switch(document.iform.disk.value)
   {
     <?php foreach ($a_disk as $diskv): ?>
     <?php if (strcmp($diskv['fstype'],"softraid")==0): ?> 	  
       <?php continue; ?>
     <?php endif; ?>
-    case "<?=$diskv['name'];?>":
+    case "/dev/<?=$diskv['name'];?>":
       <?php $partinfo = disks_get_partition_info($diskv['name']);?>
       <?php foreach($partinfo as $partinfon => $partinfov): ?>
         if(document.all) // MS IE workaround.
-          next = document.iform.partition.length;
-        document.iform.partition.add(new Option("<?=$partinfon;?>","s<?=$partinfon;?>",false,<?php if("s{$partinfon}"==$partition){echo "true";}else{echo "false";};?>), next);
+          next = document.iform.partitionno.length;
+        alert(document.iform.partitionno);
+        document.iform.partitionno.add(new Option("<?=$partinfon;?>","s<?=$partinfon;?>",false,<?php if("s{$partinfon}"==$partition){echo "true";}else{echo "false";};?>), next);
       <?php endforeach; ?>
       break;
     <?php endforeach; ?>
@@ -264,7 +266,7 @@ function disk_change() {
         <tr>
           <td width="22%" valign="top" class="vncellreq"><?=gettext("Disk");?></td>
           <td width="78%" class="vtable">
-            <select name="disk" class="formselect" id="disk" onchange="disk_change()">
+            <select name="disk" class="formselect" id="disk" onchange="disk_change();">
               <?php foreach ($a_disk as $diskn): ?>
               <?php if (strcmp($diskn['fstype'],"softraid")==0): ?> 	  
                 <?php continue; ?>
@@ -279,7 +281,7 @@ function disk_change() {
         <tr>
           <td width="22%" valign="top" class="vncellreq"><?=gettext("Partition");?></td>
           <td width="78%" class="vtable">
-            <select name="partition" class="formselect" id="partition"></select>
+            <select name="partitionno" class="formselect" id="partitionno"></select>
           </td>
         </tr>
         <tr>

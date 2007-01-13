@@ -193,7 +193,7 @@ function disks_umount($mount) {
   /* The $mount variable is the all config table for the mount point*/
   $mountname=escapeshellcmd($mount['sharename']);
 
-  if (mwexec("/sbin/umount $mountname") == 0) {
+  if (mwexec("/sbin/umount /mnt/$mountname") == 0) {
     if (@rmdir ("/mnt/$mountname")) {
       return 0;
     } else {
