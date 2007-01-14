@@ -417,16 +417,12 @@ function services_nfs_configure() {
     $a_mount = &$freenas_config['mounts']['mount'];
 
     foreach ($a_mount as $mount) {
+      /* -mapall and -maproot mutually exclusive */
+      $mapping = $freenas_config['nfs']['mapall'] == "yes" ? "-mapall=root" : "-maproot=root";
+      
       $nfsconf .= <<<EOD
-/mnt/{$mount['sharename']} -alldirs -maproot=root 
+/mnt/{$mount['sharename']} -alldirs {$mapping} 
 EOD;
-
-      if ($freenas_config['nfs']['mapall'] == "yes") {
-        $nfsconf .= <<<EOD
--mapall=root 
-EOD;
-
-      }
 
       $nfsconf .= <<<EOD
 -network {$network} -mask $subnet
