@@ -1621,6 +1621,24 @@ EOD;
 
     file_put_contents("/usr/local/etc/avahi/services/rsync.service", $rsyncservice);
   } // end if
+  
+  /* add ntp service type */
+  if ($config['ntpd']['mode'] == "server") {
+    $ntpdservice = str_replace("@PORT@",
+                               "123",
+                               $service_template);
+    $ntpdservice = str_replace("@TYPE@",
+                               "_ntp._udp",
+                               $ntpdservice);
+    $ntpdservice = str_replace("@SERVICE_DESC@",
+                               "Network Time Daemon",
+                               $ntpdservice);
+    $ntpdservice = str_replace("@TXT_RECORDS@",
+                               "",
+                               $ntpdservice);
+
+    file_put_contents("/usr/local/etc/avahi/services/ntpd.service", $ntpdservice);
+  } // end if
 
   if (isset($config['system']['ssh']['enable'])) {
     $sshservice = str_replace("@PORT@",
