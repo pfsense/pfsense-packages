@@ -590,9 +590,12 @@ delay_initial_bucket_level 100
 
 EOD;
 
-	foreach (array('unrestricted_hosts') as $item) {
-		if (in_array($item, $valid_acls))
-			$conf .= "delay_access 1 deny $item\n";
+	if(! empty($settings['unrestricted_hosts'])) {
+		foreach (array('unrestricted_hosts') as $item) {
+			if (in_array($item, $valid_acls))
+				$conf .= "# Do not throttle unrestricted hosts\n";
+				$conf .= "delay_access 1 deny $item\n";
+		}
 	}
 
 	if ($settings['throttle_specific'] == 'on') {
@@ -634,29 +637,41 @@ function squid_resync_auth() {
 	$conf = '';
 
 	// Deny the banned guys before allowing the good guys
-	$banned = array(	'banned_hosts',
-	);
+	$banned = array('banned_hosts');
 	$banned = array_filter($banned, 'squid_is_valid_acl');
-	foreach ($banned as $acl)
+	foreach ($banned as $acl) {
+		if(! empty($settings[$banned])) {
 			$conf .= "http_access deny $acl\n";
+		}
+	}
 
 	// Unrestricted hosts take precendence over blacklist
-	if (squid_is_valid_acl('unrestricted_hosts'))
-		$conf .= "# These hosts do not have any ACL\n";
-		$conf .= "http_access allow unrestricted_hosts\n";
+	if(! empty($settings['unrestricted_hosts'])) {
+		if (squid_is_valid_acl('unrestricted_hosts')) {
+			$conf .= "# These hosts do not have any restrictions\n";
+			$conf .= "http_access allow unrestricted_hosts\n";
+		}
+	}
+	if(! empty($settings['unrestricted_macs'])) {
+		if (squid_is_valid_acl('unrestricted_macs')) {
+			$conf .= "# These hosts do not have any restrictions\n";
+			$conf .= "http_access allow unrestricted_macs\n";
+		}
+	}
 
 	// Whitelist and blacklist also take precendence
-	if (squid_is_valid_acl('whitelist'))
-		$conf .= "# Always allow access to whitelist domains\n";
-		$conf .= "http_access allow whitelist\n";
-	if (squid_is_valid_acl('blacklist'))
-		$conf .= "# Block access to blacklist domains\n";
-		$conf .= "http_access deny blacklist\n";
-
-	// Allow locanet if it is enabled and defined
-	if (squid_is_valid_acl('localnet'))
-		$conf .= "# Allow local network(s) on interface(s)\n";
-		$conf .= "http_access allow localnet\n";
+	if(! empty($settings['whitelist'])) {
+		if (squid_is_valid_acl('whitelist')) {
+			$conf .= "# Always allow access to whitelist domains\n";
+			$conf .= "http_access allow whitelist\n";
+		}
+	}
+	if(! empty($settings['blacklist'])) {
+		if (squid_is_valid_acl('blacklist')) {
+			$conf .= "# Block access to blacklist domains\n";
+			$conf .= "http_access deny blacklist\n";
+		}
+	}
 
 	$transparent_proxy = ($config['installedpackages']['squid']['config'][0]['transparent_proxy'] == 'on');
 	$auth_method = (($settings['auth_method'] && !$transparent_proxy) ? $settings['auth_method'] : 'none');
@@ -667,6 +682,7 @@ function squid_resync_auth() {
 			$allowed = array('localnet', 'allowed_subnets');
 			$allowed = array_filter($allowed, 'squid_is_valid_acl');
 			foreach ($allowed as $acl)
+				$conf .= "# Allow local network(s) on interface(s)\n";
 				$conf .= "http_access allow $acl\n";
 		}
 	}
