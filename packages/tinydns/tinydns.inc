@@ -291,7 +291,7 @@ function tinydns_create_zone_file() {
 /* formats data as a tinydns data row item */
 function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname) {
 		if($ttl)
-			$ttl_string = "::{$ttl}";
+			$ttl_string = ":{$ttl}";
 		else
 			$ttl_string = "";
 		switch ($recordtype) {
