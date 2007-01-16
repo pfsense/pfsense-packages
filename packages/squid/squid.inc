@@ -634,6 +634,7 @@ function squid_resync_auth() {
 	global $config, $valid_acls;
 
 	$settings = $config['installedpackages']['squidauth']['config'][0];
+	$settingsconfig = $config['installedpackages']['squid']['config'][0];
 	$conf = '';
 
 	// Deny the banned guys before allowing the good guys
@@ -675,10 +676,9 @@ function squid_resync_auth() {
 
 	$transparent_proxy = ($config['installedpackages']['squid']['config'][0]['transparent_proxy'] == 'on');
 	$auth_method = (($settings['auth_method'] && !$transparent_proxy) ? $settings['auth_method'] : 'none');
-
 	// Allow the remaining ACLs if no authentication is set
 	if ($auth_method == 'none') {
-		if ($settings['allow_interface'] == 'on') {
+		if ($settingsconfig['allow_interface'] == 'on') {
 			$allowed = array('localnet', 'allowed_subnets');
 			$allowed = array_filter($allowed, 'squid_is_valid_acl');
 			foreach ($allowed as $acl)
