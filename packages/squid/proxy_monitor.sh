@@ -38,10 +38,10 @@ fi
 # Sleep 5 seconds on startup not to mangle with existing boot scripts.
 sleep 5
 
-# Squid monitor 1.1
+# Squid monitor 1.2
 while [ /bin/true ]; do
         if [  ! -f /var/run/squid_alarm ]; then
-                NUM_PROCS=`ps auxw | grep "[(]squid) -D"|awk '{print $2}'| wc -l | awk '{ print $1 }'`
+                NUM_PROCS=`ps auxw | grep "[s]quid -D"|awk '{print $2}'| wc -l | awk '{ print $1 }'`
                 if [ $NUM_PROCS -lt 1 ]; then
                         # squid is down
                         echo "Squid has exited.  Reconfiguring filter." | \
@@ -54,7 +54,7 @@ while [ /bin/true ]; do
                         touch /var/run/squid_alarm
                 fi
         fi
-        NUM_PROCS=`ps auxw | grep "[(]squid) -D"|awk '{print $2}'| wc -l | awk '{ print $1 }'`
+        NUM_PROCS=`ps auxw | grep "[s]quid -D"|awk '{print $2}'| wc -l | awk '{ print $1 }'`
         if [ $NUM_PROCS -gt 0 ]; then
                 if [ -f /var/run/squid_alarm ]; then
                         echo "Squid has resumed. Reconfiguring filter." | \

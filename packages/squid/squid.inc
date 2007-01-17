@@ -174,7 +174,7 @@ function squid_install_command() {
 	$rc = array();
 	$rc['file'] = 'squid.sh';
 	$rc['start'] = <<<EOD
-if [ -z "`ps auxw | grep \"[(]squid) -D\"|awk '{print $2}'`" ];then
+if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
 	/usr/local/sbin/squid -D
 fi
 
@@ -188,7 +188,7 @@ killall pinger 2>/dev/null
 
 EOD;
 	$rc['restart'] = <<<EOD
-if [ -z "`ps auxw | grep \"[(]squid) -D\"|awk '{print $2}'`" ];then
+if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
 		/usr/local/sbin/squid -D
 	else
 		/usr/local/sbin/squid -k reconfigure
