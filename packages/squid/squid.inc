@@ -448,17 +448,11 @@ function squid_resync_general() {
 	foreach (explode(",", $ifaces) as $i => $iface) {
 		$real_ifaces[] = squid_get_real_interface_address($iface);
 		if($real_ifaces[$i][0]) {
-                        if (($settings['transparent_proxy'] == 'on')) {
-				$conf .= "http_port 127.0.0.1:80 transparent\n";
-                        }
-		} else {
-			foreach (explode(",", $ifaces) as $i => $iface) {
-				$real_ifaces[] = squid_get_real_interface_address($iface);
-				if($real_ifaces[$i][0]) {
-					$conf .= "http_port {$real_ifaces[$i][0]}:$port\n";
-				}
-			}
+			$conf .= "http_port {$real_ifaces[$i][0]}:$port\n";
 		}
+	}
+	if (($settings['transparent_proxy'] == 'on')) {
+		$conf .= "http_port 127.0.0.1:80 transparent\n";
 	}
 	$icp_port = ($settings['icp_port'] ? $settings['icp_port'] : 0);
 
