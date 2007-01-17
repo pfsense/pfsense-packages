@@ -101,6 +101,10 @@ function frickin_generate_rules($type) {
 	switch($type) {
 		case 'nat':
 			foreach ($ifaces as $iface) {
+				if(!$iface) {
+					log_error("Not installing frickin pptp proxy rule.  Please set it up");
+					continue;
+				}
 				$rules .= "rdr on $iface proto tcp from any to !($iface) port 1723 -> 127.0.0.1\n";
 				$rules .= "rdr on $iface proto gre from any to !($iface) -> 127.0.0.1\n";
 			}
