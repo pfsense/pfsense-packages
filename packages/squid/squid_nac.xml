@@ -38,40 +38,45 @@
 		<field>
 			<fieldname>allowed_subnets</fieldname>
 			<fielddescr>Allowed subnets</fielddescr>
-			<description>Those are the subnets (separated by commas) that are allowed to use the proxy. The subnets must be expressed as CIDR ranges (e.g.: 192.168.1.0/24). Note that the proxy interface subnet is already an allowed subnet. All the other subnets won't be able to use the proxy.</description>
+			<description>Enter each subnet on a new line that is allowed to use the proxy. The subnets must be expressed as CIDR ranges (e.g.: 192.168.1.0/24). Note that the proxy interface subnet is already an allowed subnet. All the other subnets won't be able to use the proxy.</description>
 			<type>textarea</type>
+			<encoding>base64</encoding>
 			<rows>5</rows>
 			<cols>50</cols>
 		</field>
 		<field>
 			<fieldname>unrestricted_hosts</fieldname>
 			<fielddescr>Unrestricted IPs</fielddescr>
-			<description>The IP addresses specified here (separated by commas) won't be filtered out by the other access control directives set in this page.</description>
+			<description>Enter each unrestricted IP address on a new line that is not to be filtered out by the other access control directives set in this page.</description>
 			<type>textarea</type>
+			<encoding>base64</encoding>
 			<rows>5</rows>
 			<cols>50</cols>
 		</field>
 		<field>
 			<fieldname>banned_hosts</fieldname>
 			<fielddescr>Banned host addresses</fielddescr>
-			<description>The IP addresses specified here (separated by commas) won't be allowed to use the proxy.</description>
+			<description>Enter each IP address on a new line that is not to be allowed to use the proxy.</description>
 			<type>textarea</type>
+			<encoding>base64</encoding>
 			<rows>5</rows>
 			<cols>50</cols>
 		</field>	
 		<field>
 			<fieldname>whitelist</fieldname>
 			<fielddescr>Whitelist</fielddescr>
-			<description>Those are the destination domains (separated by commas) that will be accessable to the users that are allowed to use the proxy.</description>
+			<description>Enter each destination domain on a new line that will be accessable to the users that are allowed to use the proxy.</description>
 			<type>textarea</type>
+			<encoding>base64</encoding>
 			<rows>5</rows>
 			<cols>50</cols>
 		</field>
 		<field>
 			<fieldname>blacklist</fieldname>
 			<fielddescr>Blacklist</fielddescr>
-			<description>Those are the destination domains (separated by commas) that will be blocked to the users that are allowed to use the proxy.</description>
+			<description>Enter each destination domain on a new line that will be blocked to the users that are allowed to use the proxy.</description>
 			<type>textarea</type>
+			<encoding>base64</encoding>
 			<rows>5</rows>
 			<cols>50</cols>
 		</field>

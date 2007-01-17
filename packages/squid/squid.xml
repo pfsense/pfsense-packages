@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <packagegui>
 	<name>squid</name>
-	<version>2.6.5_1-p11</version>
+	<version>2.6.5_1-p12</version>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<!-- Installation -->
 	<additional_files_needed>
@@ -115,6 +115,7 @@
 			<fieldname>log_dir</fieldname>
 			<fielddescr>Log store directory</fielddescr>
 			<description>The directory where the log will be stored (note: do not end with a / mark)</description>
+			<required/>
 			<type>input</type>
 			<size>60</size>
 			<default_value>/var/squid/log</default_value>

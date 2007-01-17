@@ -47,7 +47,7 @@ function squid_get_real_interface_address($iface) {
 
 	$iface = convert_friendly_interface_to_real_interface_name($iface);
 	$line = trim(shell_exec("ifconfig $iface | grep inet | grep -v inet6"));
-	list($dummy, $ip, $dummy2, $netmask) = explode(' ', $line);
+	list($dummy, $ip, $dummy2, $netmask) = explode(" ", $line);
 
 	return array($ip, long2ip(hexdec($netmask)));
 }
@@ -182,7 +182,7 @@ function squid_before_form_general($pkg) {
 	array_shift($values);
 	$name = array();
 	foreach ($values as $value)
-		$names[] = implode(' ', explode('_', $value));
+		$names[] = implode(" ", explode("_", $value));
 
 	$i = 0;
 	foreach ($pkg['fields']['field'] as $field) {
@@ -258,7 +258,7 @@ function squid_validate_cache($post, $input_errors) {
 		$input_errors[] = 'You must enter a valid value for \'Minimum object size\'';
 
 	if ($post['donotcache'] != "") {
-		foreach (explode(',', $post['donotcache']) as $host) {
+		foreach (split("\n", $post['donotcache']) as $host) {
 			$host = trim($host);
 			if (!is_ipaddr($host) && !is_domain($host))
 				$input_errors[] = "The host '$host' is not a valid IP or host name";
@@ -270,7 +270,7 @@ function squid_validate_cache($post, $input_errors) {
 }
 
 function squid_validate_nac($post, $input_errors) {
-	$allowed_subnets = explode(',', trim($post['allowed_subnets']));
+	$allowed_subnets = explode("\n", $post['allowed_subnets']);
 	foreach ($allowed_subnets as $subnet) {
 		$subnet = trim($subnet);
 		if (!empty($subnet) && !is_subnet($subnet))
@@ -278,7 +278,7 @@ function squid_validate_nac($post, $input_errors) {
 	}
 
 	foreach (array(	'unrestricted_hosts', 'banned_hosts') as $hosts) {
-		foreach (explode(',', $post[$hosts]) as $host) {
+		foreach (explode("\n", $post[$hosts]) as $host) {
 			$host = trim($host);
 			if (!empty($host) && !is_ipaddr($host))
 				$input_errors[] = "The host '$host' is not a valid IP address";
@@ -286,14 +286,14 @@ function squid_validate_nac($post, $input_errors) {
 	}
 
 	foreach (array('unrestricted_macs', 'banned_macs') as $macs) {
-		foreach (explode(',', $post[$macs]) as $mac) {
+		foreach (explode("\n", $post[$macs]) as $mac) {
 			$mac = trim($mac);
 			if (!empty($mac) && !is_macaddr($mac))
 				$input_errors[] = "The mac '$mac' is not a valid MAC address";
 		}
 	}
 
-	foreach (explode(',', $post['timelist']) as $time) {
+	foreach (explode(",", $post['timelist']) as $time) {
 		$time = trim($time);
 		if (!empty($time) && !squid_is_timerange($time))
 			$input_errors[] = "The time range '$time' is not a valid time range";
@@ -349,14 +349,14 @@ function squid_validate_auth($post, $input_errors) {
 					$input_errors[] = 'The field \'RADIUS secret\' is required';
 				break;
 			case 'msnt':
-				foreach (explode(',', trim($post['msnt_secondary'])) as $server) {
+				foreach (explode(",", trim($post['msnt_secondary'])) as $server) {
 					if (!empty($server) && !is_ipaddr($server) && !is_domain($server))
 						$input_errors[] = "The host '$server' is not a valid IP address or domain name";
 				}
 				break;
 		}
 
-		$no_auth = explode(',', trim($post['no_auth_hosts']));
+		$no_auth = explode("\n", $post['no_auth_hosts']);
 		foreach ($no_auth as $host) {
 			$host = trim($host);
 			if (!empty($host) && !is_subnet($host))
@@ -375,14 +375,14 @@ function squid_resync_general() {
 	$port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
 	$ifaces = ($settings['active_interface'] ? $settings['active_interface'] : 'lan');
 	$real_ifaces = array();
-	foreach (explode(',', $ifaces) as $i => $iface) {
+	foreach (explode(",", $ifaces) as $i => $iface) {
 		$real_ifaces[] = squid_get_real_interface_address($iface);
 		if($real_ifaces[$i][0]) {
                         if (($settings['transparent_proxy'] == 'on')) {
 				$conf .= "http_port 127.0.0.1:80 transparent\n";
                         }
 		} else {
-			foreach (explode(',', $ifaces) as $i => $iface) {
+			foreach (explode(",", $ifaces) as $i => $iface) {
 				$real_ifaces[] = squid_get_real_interface_address($iface);
 				if($real_ifaces[$i][0]) {
 					$conf .= "http_port {$real_ifaces[$i][0]}:$port\n";
@@ -461,7 +461,7 @@ offline_mode $offline_mode
 
 EOD;
 
-	$donotcache = trim(implode("\n", array_map('trim', explode(',', $settings['donotcache']))));
+	$donotcache = base64_decode($settings['donotcache']);
 	if (!empty($donotcache)) {
 		file_put_contents(SQUID_ACLDIR . '/donotcache.acl', $donotcache);
 		$conf .= 'acl donotcache dstdomain "' . SQUID_ACLDIR . "/donotcache.acl\"\n";
@@ -520,7 +520,14 @@ acl dynamic urlpath_regex cgi-bin \?
 
 EOD;
 
-	$allowed = implode(' ', array_map('trim', explode(',', $settings['allowed_subnets'])));
+	$allowed_subnets = explode("\n", base64_decode($settings['allowed_subnets']));
+	$allowed = "";
+	foreach ($allowed_subnets as $subnet) {
+		if(!empty($subnet)) {
+			$subnet = trim($subnet);
+			$allowed .= "$subnet ";
+		}
+	}
 	if (!empty($allowed)) {
 		$conf .= "acl allowed_subnets src $allowed\n";
 		$valid_acls[] = 'allowed_subnets';
@@ -532,7 +539,7 @@ EOD;
 				'blacklist' => 'dstdom_regex -i',
 	);
 	foreach ($options as $option => $directive) {
-		$contents = trim(implode("\n", array_map('trim', explode(',', $settings[$option]))));
+		$contents = base64_decode($settings[$option]);
 		if (!empty($contents)) {
 			file_put_contents(SQUID_ACLDIR . "/$option.acl", $contents);
 			$conf .= "acl $option $directive \"" . SQUID_ACLDIR . "/$option.acl\"\n";
@@ -607,10 +614,10 @@ EOD;
 				'throttle_cdimages' => $cdimages,
 				'throttle_multimedia' => $multimedia) as $field => $set) {
 			if ($settings[$field] == 'on')
-				$exts = array_merge($exts, explode(',', $set));
+				$exts = array_merge($exts, explode(",", $set));
 		}
 
-		foreach (explode(',', $settings['throttle_others']) as $ext) {
+		foreach (explode(",", $settings['throttle_others']) as $ext) {
 			if (!empty($ext)) $exts[] = $ext;
 		}
 
@@ -634,60 +641,66 @@ function squid_resync_auth() {
 	global $config, $valid_acls;
 
 	$settings = $config['installedpackages']['squidauth']['config'][0];
+	$settingsnac = $config['installedpackages']['squidnac']['config'][0];
 	$settingsconfig = $config['installedpackages']['squid']['config'][0];
 	$conf = '';
 
 	// Deny the banned guys before allowing the good guys
-	$banned = array('banned_hosts');
-	$banned = array_filter($banned, 'squid_is_valid_acl');
-	foreach ($banned as $acl) {
-		if(! empty($settings[$banned])) {
-			$conf .= "http_access deny $acl\n";
+	if(! empty($settingsnac['banned_hosts'])) {
+		if (squid_is_valid_acl('banned_hosts')) {
+			$conf .= "# These hosts are banned\n";
+			$conf .= "http_access deny banned_hosts\n";
+		}
+	}
+	if(! empty($settingsnac['banned_macs'])) {
+		if (squid_is_valid_acl('banned_macs')) {
+			$conf .= "# These macs are banned\n";
+			$conf .= "http_access deny banned_macs\n";
 		}
 	}
 
 	// Unrestricted hosts take precendence over blacklist
-	if(! empty($settings['unrestricted_hosts'])) {
+	if(! empty($settingsnac['unrestricted_hosts'])) {
 		if (squid_is_valid_acl('unrestricted_hosts')) {
 			$conf .= "# These hosts do not have any restrictions\n";
 			$conf .= "http_access allow unrestricted_hosts\n";
 		}
 	}
-	if(! empty($settings['unrestricted_macs'])) {
+	if(! empty($settingsnac['unrestricted_macs'])) {
 		if (squid_is_valid_acl('unrestricted_macs')) {
 			$conf .= "# These hosts do not have any restrictions\n";
 			$conf .= "http_access allow unrestricted_macs\n";
 		}
 	}
 
-	// Whitelist and blacklist also take precendence
-	if(! empty($settings['whitelist'])) {
+	// Whitelist and blacklist also take precendence over other allow rules
+	if(! empty($settingsnac['whitelist'])) {
 		if (squid_is_valid_acl('whitelist')) {
 			$conf .= "# Always allow access to whitelist domains\n";
 			$conf .= "http_access allow whitelist\n";
 		}
 	}
-	if(! empty($settings['blacklist'])) {
+	if(! empty($settingsnac['blacklist'])) {
 		if (squid_is_valid_acl('blacklist')) {
 			$conf .= "# Block access to blacklist domains\n";
 			$conf .= "http_access deny blacklist\n";
 		}
 	}
 
-	$transparent_proxy = ($config['installedpackages']['squid']['config'][0]['transparent_proxy'] == 'on');
+	$transparent_proxy = ($settingsconfig['transparent_proxy'] == 'on');
 	$auth_method = (($settings['auth_method'] && !$transparent_proxy) ? $settings['auth_method'] : 'none');
 	// Allow the remaining ACLs if no authentication is set
 	if ($auth_method == 'none') {
 		if ($settingsconfig['allow_interface'] == 'on') {
+			$conf .= "# Allow local network(s) on interface(s)\n";
 			$allowed = array('localnet', 'allowed_subnets');
 			$allowed = array_filter($allowed, 'squid_is_valid_acl');
 			foreach ($allowed as $acl)
-				$conf .= "# Allow local network(s) on interface(s)\n";
 				$conf .= "http_access allow $acl\n";
 		}
 	}
 	else {
-		$noauth = implode(' ', array_map('trim', explode(',', $settings['no_auth_hosts'])));
+		$noauth = implode(' ', explode("\n", base64_decode($settings['no_auth_hosts'])));
 		if (!empty($noauth)) {
 			$conf .= "acl noauth src $noauth\n";
 			$valid_acls[] = 'noauth';
@@ -724,7 +737,7 @@ EOD;
 
 		// Onto the ACLs
 		$password = array('localnet', 'allowed_subnets');
-		$passwordless = array('unrestricted_hosts', 'unrestricted_macs');
+		$passwordless = array('unrestricted_hosts');
 		if ($settings['unrestricted_auth'] == 'on') {
 			// Even the unrestricted hosts should authenticate
 			$password = array_merge($password, $passwordless);
@@ -924,7 +937,7 @@ function squid_generate_rules($type) {
 		return;
 	}
 
-	$ifaces = explode(',', $squid_conf['active_interface']);
+	$ifaces = explode(",", $squid_conf['active_interface']);
 	$ifaces = array_map('convert_friendly_interface_to_real_interface_name', $ifaces);
 	$port = ($squid_conf['proxy_port'] ? $squid_conf['proxy_port'] : 3128);
 

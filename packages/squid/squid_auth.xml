@@ -132,8 +132,9 @@
 		<field>
 			<fieldname>no_auth_hosts</fieldname>
 			<fielddescr>Subnets that don't need authentication</fielddescr>
-			<description>A comma-separated list of subnets (in CIDR range, e.g.: 10.5.0.0/16, 192.168.1.50/32) whose hosts won't be asked for authentication to access the proxy.</description>
+			<description>Enter each subnet or IP address on a new line (in CIDR format, e.g.: 10.5.0.0/16, 192.168.1.50/32) that should not be asked for authentication to access the proxy.</description>
 			<type>textarea</type>
+			<encoding>base64</encoding>
 			<rows>5</rows>
 			<cols>50</cols>
 		</field>

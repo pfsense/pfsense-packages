@@ -121,8 +121,9 @@
 		<field>
 			<fielddescr>Do not cache</fielddescr>
 			<fieldname>donotcache</fieldname>
-			<description>The specified domains or IP addresses (separated by commas) will never be cached.</description>
+			<description>Enter each domain or IP address on a new line that should never be cached.</description>
 			<type>textarea</type>
+			<encoding>base64</encoding>
 			<rows>5</rows>
 			<cols>50</cols>
 		</field>
