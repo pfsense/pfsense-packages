@@ -108,7 +108,7 @@ function squid_install_command() {
 	/* migrate auth settings */
 	if (!empty($settingsauth['no_auth_hosts'])) {
 		if(strstr($settingsauth['no_auth_hosts'], ",")) {
-			$settingsauth['no_auth_hosts'] = base64_encode(implode('\n', explode(",", $settingsauth['no_auth_hosts'])));
+			$settingsauth['no_auth_hosts'] = base64_encode(implode("\n", explode(",", $settingsauth['no_auth_hosts'])));
 			$config['installedpackages']['squidauth']['config'][0]['no_auth_hosts'] = $settingsauth['no_auth_hosts'];
 		}
 	}
@@ -116,7 +116,7 @@ function squid_install_command() {
 	/* migrate cache settings */
 	if (!empty($settingscache['donotcache'])) {
 		if(strstr($settingscache['donotcache'], ",")) {
-			$settingscache['donotcache'] = base64_encode(implode('\n', explode(",", $settingscache['donotcache'])));
+			$settingscache['donotcache'] = base64_encode(implode("\n", explode(",", $settingscache['donotcache'])));
 			$config['installedpackages']['squidcache']['config'][0]['donotcache'] = $settingscache['donotcache'];
 		}
 	}
@@ -124,43 +124,43 @@ function squid_install_command() {
 	/* migrate nac settings */
 	if(! empty($settingsnac['allowed_subnets'])) {
 		if(strstr($settingsnac['allowed_subnets'], ",")) {
-			$settingsnac['allowed_subnets'] = base64_encode(implode('\n', explode(",", $settingsnac['allowed_subnets'])));
+			$settingsnac['allowed_subnets'] = base64_encode(implode("\n", explode(",", $settingsnac['allowed_subnets'])));
 			$config['installedpackages']['squidnac']['config'][0]['allowed_subnets'] = $settingsnac['allowed_subnets'];
 		}
 	}
 	if(! empty($settingsnac['banned_hosts'])) {
 		if(strstr($settingsnac['banned_hosts'], ",")) {
-			$settingsnac['banned_hosts'] = base64_encode(implode('\n', explode(",", $settingsnac['banned_hosts'])));
+			$settingsnac['banned_hosts'] = base64_encode(implode("\n", explode(",", $settingsnac['banned_hosts'])));
 			$config['installedpackages']['squidnac']['config'][0]['banned_hosts'] = $settingsnac['banned_hosts'];
 		}
 	}
 	if(! empty($settingsnac['banned_macs'])) {
 		if(strstr($settingsnac['banned_macs'], ",")) {
-			$settingsnac['banned_macs'] = base64_encode(implode('\n', explode(",", $settingsnac['banned_macs'])));
+			$settingsnac['banned_macs'] = base64_encode(implode("\n", explode(",", $settingsnac['banned_macs'])));
 			$config['installedpackages']['squidnac']['config'][0]['banned_macs'] = $settingsnac['banned_macs'];
 		}
 	}
 	if(! empty($settingsnac['unrestricted_hosts'])) {
 		if(strstr($settingsnac['unrestricted_hosts'], ",")) {
-			$settingsnac['unrestricted_hosts'] = base64_encode(implode('\n', explode(",", $settingsnac['unrestricted_hosts'])));
+			$settingsnac['unrestricted_hosts'] = base64_encode(implode("\n", explode(",", $settingsnac['unrestricted_hosts'])));
 			$config['installedpackages']['squidnac']['config'][0]['unrestricted_hosts'] = $settingsnac['unrestricted_hosts'];
 		}
 	}
 	if(! empty($settingsnac['unrestricted_macs'])) {
 		if(strstr($settingsnac['unrestricted_macs'], ",")) {
-			$settingsnac['unrestricted_macs'] = base64_encode(implode('\n', explode(",", $settingsnac['unrestricted_macs'])));
+			$settingsnac['unrestricted_macs'] = base64_encode(implode("\n", explode(",", $settingsnac['unrestricted_macs'])));
 			$config['installedpackages']['squidnac']['config'][0]['unrestricted_macs'] = $settingsnac['unrestricted_macs'];
 		}
 	}
 	if(! empty($settingsnac['whitelist'])) {
 		if(strstr($settingsnac['whitelist'], ",")) {
-			$settingsnac['whitelist'] = base64_encode(implode('\n', explode(",", $settingsnac['whitelist'])));
+			$settingsnac['whitelist'] = base64_encode(implode("\n", explode(",", $settingsnac['whitelist'])));
 			$config['installedpackages']['squidnac']['config'][0]['whitelist'] = $settingsnac['whitelist'];
 		}
 	}
 	if(! empty($settingsnac['blacklist'])) {
 		if(strstr($settingsnac['blacklist'], ",")) {
-			$settingsnac['blacklist'] = base64_encode(implode('\n', explode(",", $settingsnac['blacklist'])));
+			$settingsnac['blacklist'] = base64_encode(implode("\n", explode(",", $settingsnac['blacklist'])));
 			$config['installedpackages']['squidnac']['config'][0]['blacklist'] = $settingsnac['blacklist'];
 		}
 	}
