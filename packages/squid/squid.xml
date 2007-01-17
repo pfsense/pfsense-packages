@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <packagegui>
 	<name>squid</name>
-	<version>2.6.5_1-p13</version>
+	<version>2.6.5_1-p14</version>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<!-- Installation -->
 	<additional_files_needed>
