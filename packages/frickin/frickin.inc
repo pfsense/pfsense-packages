@@ -77,7 +77,7 @@ EOD;
 		filter_configure();
 }
 
-function custom_php_deinstall_command() {
+function frickin_custom_php_deinstall_command() {
 	    unlink_if_exists("/usr/local/etc/rc.d/frickin.sh");
 	    unlink_if_exists("/usr/local/bin/frickin");
 	    mwexec("killall frickin");
