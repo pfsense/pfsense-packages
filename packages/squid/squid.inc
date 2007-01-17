@@ -164,6 +164,7 @@ function squid_install_command() {
 			$config['installedpackages']['squidnac']['config'][0]['blacklist'] = $settingsnac['blacklist'];
 		}
 	}
+	write_config();
 
 	/* create cache */
 	squid_dash_z();
