@@ -585,6 +585,7 @@ function get_ata_disks_list() {
           if ($dmesgtab[0]!="" && (strcasecmp($dmesgtab[0],$diskname) == 0) &&
               strcmp($dmesgtab[1],"DMA") !=0) {
             $disklist[$diskname]['size'] = $dmesgtab[1];
+          }
         } // end if
       } // end foreach
     } // end if

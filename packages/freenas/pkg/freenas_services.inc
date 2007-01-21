@@ -40,8 +40,9 @@
                                                                               */
 /* ========================================================================== */
 
-define (FTP_BACKEND_PAM, "pam");
-define (FTP_BACKEND_PLAINTEXT, "plaintext");
+define ("FTP_BACKEND_PAM", "pam");
+define ("FTP_BACKEND_PLAINTEXT", "plaintext");
+define ("NFS_SERVICE_PORTS", "111 2049");
 
 $freenas_config =& $config['installedpackages']['freenas']['config'][0];
 
@@ -410,11 +411,25 @@ function services_nfs_configure() {
       return 1;
     }
 
-    list($network,$subnet) = 
-    explode('/', $freenas_config['nfs']['nfsnetwork']);
-
-    $subnet = gen_subnet_mask($subnet);
     $a_mount = &$freenas_config['mounts']['mount'];
+
+    /* TODO: ATM network authorization does not work on a per mount basis */
+    if (is_array($freenas_config['nfs']['nfsnetwork'])) {
+      $a_nfsnetworks = array();
+      $pfnetworks = array();
+      
+      foreach ($freenas_config['nfs']['nfsnetwork'] as $netel) {
+        list($network,$subnet) = 
+        explode('/', $netel);
+    
+        $subnet = gen_subnet_mask($subnet);
+        $a_nfsnetworks[] = "-network {$network} -mask {$subnet}";
+        $pfnetworks[] = $network;
+      }
+      
+      $nfsnetworks_str = implode(' ', $a_nfsnetworks);
+      services_setup_transparency_for("nfs", implode(" ", $pfnetworks));
+    }
 
     foreach ($a_mount as $mount) {
       /* -mapall and -maproot mutually exclusive */
@@ -425,26 +440,81 @@ function services_nfs_configure() {
 EOD;
 
       $nfsconf .= <<<EOD
--network {$network} -mask $subnet
+{$nfsnetworks_str}
 
 EOD;
 
     } // end foreach
+
     
     fwrite($fd, $nfsconf);
     fclose($fd);
 
     /* run rpcbind, nfsd and mountd */
-    mwexec("/usr/sbin/rpcbind");
-    mwexec("/usr/sbin/nfsd -u -t -n 4");
+    mwexec("/usr/sbin/rpcbind -h {$freenas_config['nfs']['bindto']}");
+    mwexec("/usr/sbin/nfsd -h {$freenas_config['nfs']['bindto']} -u -t -n 4");
     mwexec("/usr/sbin/mountd -r {$g['varetc_path']}/exports");
     mwexec("/usr/sbin/rpc.lockd");
     mwexec("/usr/sbin/rpc.statd");
 
     if ($g['booting']) { echo "done\n"; }
-  } // end if
+  } else {
+    services_remove_transparency_for("nfs");
+  }// end if
 
   return 0;
+}
+
+function services_remove_transparency_for($whom) {
+  $service_result = mwexec ("pfctl -a \"passin-package-freenas-{$whom}\" -F rules");
+  if($service_result <> 0) {
+    file_notice("FREENAS", "There were error(s) flushing the exclude table", "FREENAS", "");
+  }
+}
+
+function services_setup_transparency_for($whom, $networks) {
+  global $config, $freenas_config;
+  
+  if ($whom == "" || $networks == "") { return; }
+  
+  $generatedLANSubnet = gen_subnet($config['interfaces']['lan']['ipaddr'],
+                                   $config['interfaces']['lan']['subnet']);
+  $aliases = "";
+  
+  /* stolen from filter.inc */
+  $real_wanif = get_real_wan_interface();
+  $wanip = find_interface_ip($real_wanif);
+  
+  $wan_aliases = " " . link_ip_to_carp_interface($wanip);
+  
+  if (link_int_to_bridge_interface("wan"))
+    $wan_aliases .= " " . link_int_to_bridge_interface("wan");
+  
+  if ($config['interfaces']['wan']['ipaddr'] == "pppoe" or $config['interfaces']['wan']['ipaddr'] == "pptp") {
+    $aliases .= "ng0 = \"{ {$config['interfaces']['wan']['if']} {$real_wanif} }\" \n";
+    $aliases .= "wan = \"{ {$config['interfaces']['wan']['if']} {$wan_aliases} ng0 }\"\n";
+  } else {
+    $aliases .= "wan = \"{ {$real_wanif} {$wan_aliases} }\"\n";
+  }
+  
+  $trans_file = fopen("/tmp/freenas-{$whom}.rules","w");
+  fwrite($trans_file, "{$aliases}\n");
+  
+  switch ($whom) {
+    case "nfs":
+      $nfs_ports = explode(" ", NFS_SERVICE_PORTS);
+      
+      foreach ($nfs_ports as $port) {
+        fwrite($trans_file, "pass in quick on \$wan proto { tcp udp } from { {$networks} } to {$freenas_config['nfs']['bindto']} port = {$port} keep state  label \"FreeNAS related rule for {$whom}-{$port}\"\n");
+      }
+      break;
+  }
+  fclose($trans_file);
+  $service_result = mwexec ("pfctl -a \"passin-package-freenas-{$whom}\" -f /tmp/freenas-{$whom}.rules");
+  if($service_result <> 0) {
+    file_notice("FREENAS", "There were error(s) loading the transparency rules", "FREENAS", "");
+  }
+  //add_trans_table($whom);
 }
 
 function services_ftpd_configure() {
