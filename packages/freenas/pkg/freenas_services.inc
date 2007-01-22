@@ -42,7 +42,7 @@
 
 define ("FTP_BACKEND_PAM", "pam");
 define ("FTP_BACKEND_PLAINTEXT", "plaintext");
-define ("NFS_SERVICE_PORTS", "111 2049");
+define ("NFS_SERVICE_PORTS", "111 2049 4711");
 
 $freenas_config =& $config['installedpackages']['freenas']['config'][0];
 
@@ -415,6 +415,7 @@ function services_nfs_configure() {
     }
 
     $a_mount = &$freenas_config['mounts']['mount'];
+    $pfnetworks = array();
     
     foreach ($a_mount as $mount) {
       /* -mapall and -maproot mutually exclusive */
@@ -424,8 +425,6 @@ function services_nfs_configure() {
       $nfsconf = "/mnt/{$mount['sharename']} -alldirs {$mapping}";
       
       if ($networks <> "") {
-        $pfnetworks = array();
-        
         foreach (explode(",", $networks) as $netel) {
           list($network,$subnet) = 
           explode('/', $netel);
@@ -436,6 +435,7 @@ function services_nfs_configure() {
           $tmp_nfsconf .= "{$nfsconf} -network {$network} -mask {$subnet}\n";
         }
         
+        services_setup_transparency_for("nfs", implode(" ", $pfnetworks));
         $nfsconf = $tmp_nfsconf;
       } else {
         $nfsconf .= "\n";
@@ -453,7 +453,7 @@ function services_nfs_configure() {
     /* run rpcbind, nfsd and mountd */
     mwexec("/usr/sbin/rpcbind{$rpcbbindto}");
     mwexec("/usr/sbin/nfsd{$nfsdbindto}{$serveudp}{$servetcp} -n 4");
-    mwexec("/usr/sbin/mountd -r {$g['varetc_path']}/exports");
+    mwexec("/usr/sbin/mountd -p 4711 -r {$g['varetc_path']}/exports");
     mwexec("/usr/sbin/rpc.lockd");
     mwexec("/usr/sbin/rpc.statd");
 
@@ -466,14 +466,18 @@ function services_nfs_configure() {
 }
 
 function services_remove_transparency_for($whom) {
+  global $g;
+  
   $service_result = mwexec ("pfctl -a \"passin-package-freenas-{$whom}\" -F rules");
   if($service_result <> 0) {
     file_notice("FREENAS", "There were error(s) flushing the exclude table", "FREENAS", "");
   }
+  
+  unlink_if_exists("{$g['pkg_path']}/pf/freenas-{$whom}.sh");
 }
 
 function services_setup_transparency_for($whom, $networks) {
-  global $config, $freenas_config;
+  global $g, $config, $freenas_config;
   
   if ($whom == "" || $networks == "") { return; }
   
@@ -514,7 +518,24 @@ function services_setup_transparency_for($whom, $networks) {
   if($service_result <> 0) {
     file_notice("FREENAS", "There were error(s) loading the transparency rules", "FREENAS", "");
   }
-  //add_trans_table($whom);
+  
+  /* create a shell script to make sure our filter rules
+   * are getting loaded upon each filter realod cycle.
+   */
+  $scriptstr = "#!/bin/sh\n\n";
+  $scriptstr .= "case $1 in\n";
+  $scriptstr .= "  start)\n";
+  $scriptstr .= "  if [ -f /tmp/freenas-nfs.rules ]; then\n";
+  $scriptstr .= "    /sbin/pfctl -a \"passin-package-freenas-{$whom}\" -f /tmp/freenas-{$whom}.rules\n";
+  $scriptstr .= "  fi\n";
+  $scriptstr .= "  ;;\n";
+  $scriptstr .= "  *)\n";
+  $scriptstr .= "  echo \"Usage: $0 (start|stop|restart|status|log)\"\n";
+  $scriptstr .= "  exit 1\n";
+  $scriptstr .= "esac\n";
+
+  file_put_contents("{$g['pkg_path']}/pf/freenas-{$whom}.sh", $scriptstr);
+  chmod("{$g['pkg_path']}/pf/freenas-{$whom}.sh", 0700);
 }
 
 function services_ftpd_configure() {
