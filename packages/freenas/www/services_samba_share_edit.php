@@ -81,7 +81,8 @@ if (! empty($_POST))
   
   if (!$input_errors)
   {
-    if(!$_POST['browseable']) {
+    /* TODO: This logic needs to be tested! */
+    if($_POST['browseable'] == gettext("No")) {
       $freenas_config['samba']['hidemount'] = array_merge($freenas_config['samba']['hidemount'],array($freenas_config['mounts']['mount'][$id]['sharename']));
     } else {
       if(is_array($freenas_config['samba']['hidemount']) && in_array($freenas_config['mounts']['mount'][$id]['sharename'],$freenas_config['samba']['hidemount'])) {
@@ -109,7 +110,7 @@ echo $pfSenseHead->getHTML();
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
   <div id="inputerrors"></div>
-  <form id="iform" name="iform" action="disks_mount_edit.php" method="post">
+  <form id="iform" name="iform" action="services_samba_share_edit.php" method="post">
     <table width="100%" border="0" cellpadding="6" cellspacing="0">
       <tr> 
         <td width="22%" valign="top" class="vncellreq"><?= gettext("Share Name"); ?></td>

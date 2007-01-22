@@ -234,8 +234,6 @@ echo $pfSenseHead->getHTML();
     <td>
     <div id="mainarea">
     <table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
-      <?php if ($input_errors) print_input_errors($input_errors); ?>
-      <?php if ($savemsg) print_info_box($savemsg); ?>
       <tr>
         <td width="100%" valign="middle" class="listtopic" colspan="2">
           <span style="vertical-align: middle; position: relative; left: 0px;"><?=gettext("CIFS share");?></span>

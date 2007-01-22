@@ -36,6 +36,7 @@ $d_raidconfdirty_path = $g['varrun_path'] . "/raid.conf.dirty";
 $d_userconfdirty_path = $g['varrun_path'] . "/user.conf.dirty";
 $d_groupconfdirty_path = $g['varrun_path'] . "/group.conf.dirty";
 $d_smbshareconfdirty_path = $g['varrun_path'] . "/smbshare.conf.dirty";
+$d_nfsexportconfdirty_path = $g['varrun_path'] . "/nfsexport.conf.dirty";
 $d_upnpconfdirty_path = $g['varrun_path'] . "/upnp.conf.dirty";
 
 /* ============================================================================= */

@@ -143,11 +143,11 @@ echo $pfSenseHead->getHTML();
       </tr>
       <?php $i = 0; foreach($a_mount as $mountv): ?>
       <tr>
-        <td class="listr"><?=htmlspecialchars($mountv['sharename']);?>&nbsp;</td>
-        <td class="listr"><?=htmlspecialchars($mountv['desc']);?>&nbsp;</td>
-        <td class="listbg"><?=htmlspecialchars((is_array($config['samba']['hidemount']) && in_array($mountv['sharename'],$config['samba']['hidemount']))? gettext("No") : gettext("Yes"));?></td>
+        <td class="listr"><?=htmlspecialchars($mountv['sharename']);?></td>
+        <td class="listr"><?=htmlspecialchars($mountv['desc']);?></td>
+        <td class="listbg"><?=htmlspecialchars((is_array($freenas_config['samba']['hidemount']) && in_array($mountv['sharename'],$freenas_config['samba']['hidemount']))? gettext("No") : gettext("Yes"));?></td>
         <td valign="middle" nowrap class="list">
-          <?php if(isset($config['samba']['enable']))
+          <?php if(isset($freenas_config['samba']['enable']))
           echo("<a href='services_samba_share_edit.php?id={$i}'><img src='./themes/" . $g['theme'] . "/images/icons/icon_e.gif' title='" . gettext("Edit Share") . "' width='17' height='17' border='0'></a>");
           ?>
         </td>

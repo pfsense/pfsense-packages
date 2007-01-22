@@ -399,6 +399,9 @@ function services_nfs_configure() {
 
   if (isset($freenas_config['nfs']['enable'])) {
     if ($g['booting']) { echo "Starting NFS... "; }
+    
+    $nfsconf = "";
+    $a_nfsconf = array();
 
     /* If no share configured, exit */
     if (!is_array($freenas_config['mounts']['mount'])) { return 1; }
@@ -412,47 +415,44 @@ function services_nfs_configure() {
     }
 
     $a_mount = &$freenas_config['mounts']['mount'];
-
-    /* TODO: ATM network authorization does not work on a per mount basis */
-    if (is_array($freenas_config['nfs']['nfsnetwork'])) {
-      $a_nfsnetworks = array();
-      $pfnetworks = array();
-      
-      foreach ($freenas_config['nfs']['nfsnetwork'] as $netel) {
-        list($network,$subnet) = 
-        explode('/', $netel);
     
-        $subnet = gen_subnet_mask($subnet);
-        $a_nfsnetworks[] = "-network {$network} -mask {$subnet}";
-        $pfnetworks[] = $network;
-      }
-      
-      $nfsnetworks_str = implode(' ', $a_nfsnetworks);
-      services_setup_transparency_for("nfs", implode(" ", $pfnetworks));
-    }
-
     foreach ($a_mount as $mount) {
       /* -mapall and -maproot mutually exclusive */
-      $mapping = $freenas_config['nfs']['mapall'] == "yes" ? "-mapall=root" : "-maproot=root";
+      $mapping = $mount['nfs']['mapall'] == "yes" ? "-mapall=root" : "-maproot=root";
+      $networks = isset($mount['nfs']['networks']) ? $mount['nfs']['networks'] : "";
       
-      $nfsconf .= <<<EOD
-/mnt/{$mount['sharename']} -alldirs {$mapping} 
-EOD;
+      $nfsconf = "/mnt/{$mount['sharename']} -alldirs {$mapping}";
+      
+      if ($networks <> "") {
+        $pfnetworks = array();
+        
+        foreach (explode(",", $networks) as $netel) {
+          list($network,$subnet) = 
+          explode('/', $netel);
+      
+          $subnet = gen_subnet_mask($subnet);
+          $pfnetworks[] = $network;
+          
+          $tmp_nfsconf .= "{$nfsconf} -network {$network} -mask {$subnet}\n";
+        }
+        
+        $nfsconf = $tmp_nfsconf;
+      } else {
+        $nfsconf .= "\n";
+      }
+    }
 
-      $nfsconf .= <<<EOD
-{$nfsnetworks_str}
-
-EOD;
-
-    } // end foreach
-
-    
     fwrite($fd, $nfsconf);
     fclose($fd);
 
+    $nfsdbindto = $freenas_config['nfs']['bindto'] = "(ANY)" ? " -a" : " -h {$freenas_config['nfs']['bindto']}";
+    $rpcbbindto = $freenas_config['nfs']['bindto'] = "(ANY)" ? "" : " -h {$freenas_config['nfs']['bindto']}";
+    $servetcp = isset($freenas_config['nfs']['servetcp']) ? " -t" : "";
+    $serveudp = isset($freenas_config['nfs']['serveudp']) ? " -u" : "";
+
     /* run rpcbind, nfsd and mountd */
-    mwexec("/usr/sbin/rpcbind -h {$freenas_config['nfs']['bindto']}");
-    mwexec("/usr/sbin/nfsd -h {$freenas_config['nfs']['bindto']} -u -t -n 4");
+    mwexec("/usr/sbin/rpcbind{$rpcbbindto}");
+    mwexec("/usr/sbin/nfsd{$nfsdbindto}{$serveudp}{$servetcp} -n 4");
     mwexec("/usr/sbin/mountd -r {$g['varetc_path']}/exports");
     mwexec("/usr/sbin/rpc.lockd");
     mwexec("/usr/sbin/rpc.statd");
