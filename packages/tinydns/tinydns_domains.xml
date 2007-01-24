@@ -69,6 +69,12 @@
 			<size>35</size>
 		</field>
 		<field>
+			<fieldname>monitorip</fieldname>
+			<fielddescr>IP to ping to ensure service is up</fielddescr>
+			<type>input</type>
+			<size>35</size>
+		</field>
+		<field>
 			<fieldname>threshhold</fieldname>
 			<fielddescr>Time in minutes before DNS switches to backup host</fielddescr>
 			<type>input</type>
@@ -103,6 +109,13 @@
 				    <description>When the WAN MS ping time is surpassed, item will failover to next host</description>
 				    <type>input</type>
 				    <size>7</size>
+				</rowhelperfield>
+				<rowhelperfield>
+				    <fielddescr>IP to ping to ensure service is up</fielddescr>
+				    <fieldname>monitorip</fieldname>
+				    <description>When the WAN MS ping time is surpassed, item will failover to next host</description>
+				    <type>input</type>
+				    <size>15</size>
 				</rowhelperfield>
 		    </rowhelper>
 		</field>

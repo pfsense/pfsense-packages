@@ -223,15 +223,22 @@ function tinydns_setup_ping_items() {
 	 */
 	foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
 		fwrite($fd, $ip . "|" . $domain['ipaddress'] . "|3|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php\n");
+		if($domain['monitorip'] <> "")
+			$monitorip = $domain['monitorip'];
 		if($domain['row']) {
 			foreach($domain['row'] as $row) {
 				if($row['pingthreshold'])
 					$pingthreshold = $row['pingthreshold'];
 				else
 					$row['pingthreshold'] = "";
-				fwrite($fd, $ip . "|" . $row['failoverip'] . "|3|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+				if($row['monitorip'])
+					fwrite($fd, $row['monitorip'] . "|" . $row['failoverip'] . "|3|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+				else
+					fwrite($fd, $ip . "|" . $row['failoverip'] . "|3|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
 			}
 		}
+		if($domain['monitorip'])
+			fwrite($fd, $domain['monitorip'] . "|" . $row['failoverip'] . "|3|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
 	}
 	fclose($fd);
 	conf_mount_ro();
@@ -254,9 +261,13 @@ function tinydns_create_zone_file() {
 			/*   check record status, if it is down request
 			 *   backup server if defined.
 			 */
-			$status = tinydns_get_record_status($ipaddress);
-			if(!$status)
-					$ipaddress = tinydns_get_backup_record($ipaddress);
+			if($domain['monitorip'])
+				$monitorip = $domain['monitorip'];
+			if($monitorip) {
+				$status = tinydns_get_record_status($monitorip);
+				if(!$status)
+						$ipaddress = tinydns_get_backup_record($ipaddress);
+			}
 			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname);
 			if($record_data)
 				fwrite($fd, $record_data . "\n");
