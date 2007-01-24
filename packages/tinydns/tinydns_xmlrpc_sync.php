@@ -52,8 +52,10 @@ function tinydns_do_xmlrpc_sync() {
 	if(!$config['installedpackages']['carpsettings']['config'][0]['synchronizetoip'])
 		return;
 
+	$sync_to_ip = $config['installedpackages']['carpsettings']['config'][0]['synchronizetoip'];
+
 	log_error("[tinydns] tinydns_xmlrpc_sync.php is starting.");
-	$xmlrpc_sync_neighbor = $carp['synchronizetoip'];
+	$xmlrpc_sync_neighbor = $sync_to_ip;
     if($config['system']['webgui']['protocol'] != "") {
 		$synchronizetoip = $config['system']['webgui']['protocol'];
 		$synchronizetoip .= "://";
@@ -67,7 +69,7 @@ function tinydns_do_xmlrpc_sync() {
 			$port = "443";
 		}
     }
-	$synchronizetoip .= $carp['synchronizetoip'];
+	$synchronizetoip .= $sync_to_ip;
 
 	/* xml will hold the sections to sync */
 	$xml = array();
