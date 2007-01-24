@@ -68,20 +68,6 @@ function tinydns_custom_php_install_command() {
 # REQUIRE: LOGIN
 # KEYWORD: FreeBSD
 
-MINSEGMENT=10240
-MAXSEGMENT=20480
-MAXFILESIZE=10240
-MAXFD=100
-MAXCHILD=40
-
-# ulimits
-ulimit -d \${{$minsegment}}
-ulimit -f \${{$maxfilesize}}
-ulimit -m \${{$maxsegment}}
-ulimit -n \${{$$maxfd}}
-ulimit -s \${{$minsegment}}
-ulimit -u \${{$maxchild}}
-
 . /etc/rc.subr
 
 name="svscan"
@@ -143,9 +129,8 @@ function tinydns_custom_php_changeip_command() {
 	exec("/usr/sbin/pw useradd Gtinydns");
 	exec("/usr/sbin/pw useradd Gdnslog");
 	exec("/usr/local/bin/tinydns-conf Gtinydns Gdnslog /etc/tinydns {$ip}");
-	exec("/bin/ln -s /etc/tinydns /service");
-	sleep(5);
-	exec("/usr/local/bin/svstat /service/tinydns");
+	exec("/bin/mkdir /service");
+	exec("/bin/ln -s /etc/tinydns /service/");
 	if($updatecron) {
 		$text_1   = "*/1		 *	 	*	 	*	 	*	 	root	 /usr/bin/nice -n20 /etc/ping_hosts.sh";
 		$text_5   = "*/5		 *	 	*	 	*	 	*	 	root	 /usr/bin/nice -n20 /etc/ping_hosts.sh";
