@@ -76,7 +76,7 @@ function tinydns_do_xmlrpc_sync() {
 	$xml['installedpackages']['tinydns'] = $config['installedpackages']['tinydns'];
 	$xml['installedpackages']['tinydnsdomains'] = $config['installedpackages']['tinydnsdomains'];
 
-	print_r($xml);
+	//print_r($xml);
 
 	/* assemble xmlrpc payload */
 	$params = array(
