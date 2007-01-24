@@ -47,10 +47,9 @@ function tinydns_do_xmlrpc_sync() {
 	if(!$syncxmlrpc)
 		return;
 
-	$carp = &$config['installedpackages']['carpsettings']['config'][0];
-	$password = $carp['password'];
+	$password = $config['installedpackages']['carpsettings']['config'][0]['password'];
 
-	if(!$carp['synchronizetoip'])
+	if(!$config['installedpackages']['carpsettings']['config'][0]['synchronizetoip'])
 		return;
 
 	log_error("[tinydns] tinydns_xmlrpc_sync.php is starting.");
