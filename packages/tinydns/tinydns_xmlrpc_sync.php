@@ -73,8 +73,10 @@ function tinydns_do_xmlrpc_sync() {
 
 	/* xml will hold the sections to sync */
 	$xml = array();
-	$xml['installedpackages']['tinydns'] = &$config['installedpackages']['tinydns'];
-	$xml['installedpackages']['tinydnsdomains'] = &$config['installedpackages']['tinydnsdomains'];
+	$xml['installedpackages']['tinydns'] = $config['installedpackages']['tinydns'];
+	$xml['installedpackages']['tinydnsdomains'] = $config['installedpackages']['tinydnsdomains'];
+
+	print_r($xml);
 
 	/* assemble xmlrpc payload */
 	$params = array(
@@ -84,7 +86,7 @@ function tinydns_do_xmlrpc_sync() {
 
 	/* set a few variables needed for sync code borrowed from filter.inc */
 	$url = $synchronizetoip;
-	$method = 'pfsense.restore_config_section';
+	$method = 'pfsense.merge_config_section';
 
 	/* Sync! */
 	log_error("Beginning tinydns XMLRPC sync to {$url}:{$port}.");
