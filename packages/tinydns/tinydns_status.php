@@ -115,7 +115,7 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 		$msstatus = file_get_contents("/var/db/pingmsstatus/$monitorip");
 	else
 		$msstatus = "N/A";
-	echo $msstatus;
+	echo "<!-- " . $monitorip . " -->" . $msstatus;
 	echo "</td>";
 	echo "</tr>";
 
@@ -155,7 +155,7 @@ foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 		else
 			$msstatus = "N/A";
 
-		echo $msstatus;
+		echo "<!-- " . $monitorip . " -->" . $msstatus;
 		echo "</td>";
 		echo "</tr>";
 	}
