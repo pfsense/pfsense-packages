@@ -256,7 +256,7 @@ function generate_snort_conf() {
 	$whitelist_home_net = str_replace(" ", "\n", $home_net);
 
 	/* make $home_net presentable to snort */
-	trim($home_net);
+	$home_net = trim($home_net);
 	$home_net = str_replace(" ", ",", $home_net);
 	$home_net = "[{$home_net}]";
 
