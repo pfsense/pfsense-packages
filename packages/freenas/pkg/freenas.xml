@@ -377,6 +377,16 @@
   <additional_files_needed>
     <prefix>/usr/local/www/</prefix>
     <chmod>0755</chmod>
+    <item>http://www.pfsense.com/packages/config/freenas/www/services_nfs_export.php</item>
+  </additional_files_needed>
+  <additional_files_needed>
+    <prefix>/usr/local/www/</prefix>
+    <chmod>0755</chmod>
+    <item>http://www.pfsense.com/packages/config/freenas/www/services_nfs_export_edit.php</item>
+  </additional_files_needed>
+  <additional_files_needed>
+    <prefix>/usr/local/www/</prefix>
+    <chmod>0755</chmod>
     <item>http://www.pfsense.com/packages/config/freenas/www/services_rsyncd.php</item>
   </additional_files_needed>
   <additional_files_needed>
