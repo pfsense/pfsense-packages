@@ -156,19 +156,19 @@ function tinydns_get_record_status($record, $pingthreshold = "", $wanpingthresho
 	if(file_exists("/var/db/pingstatus/{$record}")) {
 		$status = file_get_contents("/var/db/pingstatus/{$record}");
 		if(stristr($status,"DOWN"))
-			return false;
+			return "DOWN";
 	}
 	if($pingthreshold) {
 		$current_ms = file_get_contents("/var/db/pingmsstatus/$record");
 		if($pingthreshold > $current_ms)
-			return false;
+			return "DOWN";
 	}
 	if($wanpingthreshold) {
 		$current_avg = file_get_contents("/var/db/wanaverage");
 		if($wanpingthreshold > $current_avg)
-			return false;
+			return "DOWN";
 	}
-	return true;
+	return "UP";
 }
 
 function tinydns_get_backup_record($record) {
@@ -181,7 +181,7 @@ function tinydns_get_backup_record($record) {
 					return $record;
 				foreach($domain['row'] as $row) {
 					$status = tinydns_get_record_status($row['failoverip']);
-					if($status)
+					if($status == "DOWN")
 						return $row['failoverip'];
 				}
 			}
@@ -253,7 +253,7 @@ function tinydns_create_zone_file() {
 				$monitorip = $domain['monitorip'];
 			if($monitorip) {
 				$status = tinydns_get_record_status($monitorip);
-				if(!$status)
+				if($status == "DOWN")
 						$ipaddress = tinydns_get_backup_record($ipaddress);
 			}
 			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname);
@@ -272,7 +272,7 @@ function tinydns_create_zone_file() {
 						else
 							$wanpingthreshold = "";
 						$status = tinydns_get_record_status($row['failoverip'], $pingthreshold, $wanpingthreshold);
-						if($status) {
+						if($status == "DOWN") {
 							$record_data = tinydns_get_rowline_data($row['failoverip'], $domain['recordtype'], $ttl, $hostname);
 							fwrite($fd, $record_data . "\n");
 						}
