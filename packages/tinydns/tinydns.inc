@@ -88,7 +88,7 @@ svscan_start () {
         /usr/bin/env \
         PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
         /usr/sbin/daemon -f /bin/sh -c "\$command \$svscan_servicedir 2>&1 | /usr/local/bin/readproctitle service errors: ................................................................................................................................................................................................................................................................................................................................................................................................................ &" > /dev/null
-        minicron 1 /var/run/ping_hosts.pid /etc/ping_hosts.sh
+        minicron 60 /var/run/ping_hosts.pid /etc/ping_hosts.sh
 }
 
 svscan_stop_post () {
