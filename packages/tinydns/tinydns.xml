@@ -84,7 +84,7 @@
 		<field>
 			<fieldname>refreshinterval</fieldname>
 			<fielddescr>Refresh Interval</fielddescr>
-			<description>Controls how often the back monitoring ip adresses are polled</description>
+			<description>Controls how often the monitoring ip adresses are polled</description>
 			<type>input</type>
 		</field>
 		<field>
