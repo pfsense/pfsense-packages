@@ -83,7 +83,7 @@
 		</field>
 		<field>
 			<fieldname>refreshinterval</fieldname>
-			<fielddescr>XMLRPC Sync</fielddescr>
+			<fielddescr>Refresh Interval</fielddescr>
 			<description>Controls how often the back monitoring ip adresses are polled</description>
 			<type>input</type>
 		</field>
