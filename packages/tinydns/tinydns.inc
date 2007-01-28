@@ -133,22 +133,22 @@ function tinydns_custom_php_changeip_command() {
 	exec("/bin/mkdir /service");
 	exec("/bin/ln -s /etc/tinydns /service/");
 	if($updatecron) {
-		$text_1   = "*/1		 *	 	*	 	*	 	*	 	root	 /etc/ping_hosts.sh";
-		$text_5   = "*/5		 *	 	*	 	*	 	*	 	root	 /etc/ping_hosts.sh";
+		$text_1   = "*/1	*	*	*	*	root	/etc/ping_hosts.sh";
+		$text_5   = "*/5	*	*	*	*	root	/etc/ping_hosts.sh";
 		$filenamea = "/etc/crontab";
 		remove_text_from_file($filenamea, $text_1);
 		remove_text_from_file($filenamea, $text_5);
 		add_text_to_file($filenamea, $text_1);
 	} else {
-		$text_1   = "*/1		 *	 	*	 	*	 	*	 	root	 /etc/ping_hosts.sh";
-		$text_5   = "*/5		 *	 	*	 	*	 	*	 	root	 /etc/ping_hosts.sh";
+		$text_1   = "*/1	*	*	*	*	root	/etc/ping_hosts.sh";
+		$text_5   = "*/5	*	*	*	*	root	/etc/ping_hosts.sh";
 		$filenamea = "/etc/crontab";
 		remove_text_from_file($filenamea, $text_1);
 		remove_text_from_file($filenamea, $text_5);
 		add_text_to_file($filenamea, $text_5);
 	}
-	exec("killall cron");
-	exec("cron");
+
+	exec("killall -HUP cron");
 	conf_mount_ro();
 	filter_configure();
 }
@@ -183,7 +183,7 @@ function tinydns_get_backup_record($record) {
 					return $record;
 				foreach($domain['row'] as $row) {
 					$status = tinydns_get_record_status($row['failoverip']);
-					if($status == "DOWN")
+					if($status == "UP")
 						return $row['failoverip'];
 				}
 			}
@@ -276,12 +276,19 @@ function tinydns_create_zone_file() {
 				$monitorip = $domain['monitorip'];
 			if($monitorip) {
 				$status = tinydns_get_record_status($monitorip);
-				if($status == "DOWN")
+				if($status == "DOWN") {
+					if($debug)
+						log_error("$ipaddress monitor ip $monitorip is offline.");
 					$ipaddress = tinydns_get_backup_record($ipaddress);
+					if($debug)
+						log_error("tinydns_get_backup_record returned $ipaddress ");
+				}
 			}
 			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname);
-			if($record_data)
+			if($record_data) {
 				fwrite($fd, $record_data . "\n");
+				continue;
+			}
 			/* process load balanced items */
 			if($domain['row']) {
 				foreach($domain['row'] as $row) {
