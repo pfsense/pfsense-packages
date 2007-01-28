@@ -197,6 +197,7 @@ function tinydns_setup_ping_items() {
 	$wanif = get_real_wan_interface();
 	$ip = find_interface_ip($wanif);
 	conf_mount_rw();
+	$processed = array();
 	/* XXX: make this work with other packages */
 	$fd = fopen("/var/db/pkgpinghosts", "w");
 	if(!$fd) {
@@ -207,7 +208,10 @@ function tinydns_setup_ping_items() {
 	 *   status and create a database of the status information that we can use.
 	 */
 	foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
-		fwrite($fd, $ip . "|" . $domain['ipaddress'] . "|3|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php\n");
+		if(!in_array($domain['ipaddress'], $processed)) {
+			fwrite($fd, $ip . "|" . $domain['ipaddress'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php\n");
+			$processed[] = $domain['ipaddress'];
+		}
 		if($domain['monitorip'] <> "")
 			$monitorip = $domain['monitorip'];
 		if($domain['row']) {
@@ -216,17 +220,30 @@ function tinydns_setup_ping_items() {
 					$pingthreshold = $row['pingthreshold'];
 				else
 					$row['pingthreshold'] = "";
-				if($row['monitorip'])
-					fwrite($fd, $ip . "|" . $row['monitorip'] . "|3|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
-				else
-					fwrite($fd, $ip . "|" . $monitorip . "|3|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+				if($row['monitorip']) {
+					if(!in_array($row['monitorip'], $processed)) {
+						fwrite($fd, $ip . "|" . $row['monitorip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+						$processed[] = $row['monitorip'];
+					}
+				} else {
+					if(!in_array($monitorip, $processed)) {
+						fwrite($fd, $ip . "|" . $monitorip . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+						$processed[] = $monitorip;
+					}
+				}
 			}
 		}
-		if($domain['monitorip'])
-			fwrite($fd, $ip . "|" . $domain['monitorip'] . "|3|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
-		else
-			fwrite($fd, $ip . "|" . $row['failoverip'] . "|3|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
-
+		if($domain['monitorip']) {
+			if(!in_array($domain['monitorip'], $processed)) {
+				fwrite($fd, $ip . "|" . $domain['monitorip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+				$processed[] = $domain['monitorip'];
+			}
+		} else {
+			if(!in_array($row['failoverip'], $processed)) {
+				fwrite($fd, $ip . "|" . $row['failoverip'] . "|1|/usr/local/pkg/tinydns_down.php|/usr/local/pkg/tinydns_up.php|{$pingthreshold}\n");
+				$processed[] = $row['failoverip'];
+			}
+		}
 	}
 	fclose($fd);
 	conf_mount_ro();
