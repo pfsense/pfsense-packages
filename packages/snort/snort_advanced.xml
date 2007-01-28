@@ -57,6 +57,14 @@
 			<description>Changing this option adjusts the system maximum BPF insert size.  Leave blank if you do not know what this does. Default is 512.</description>
 			<type>input</type>
 		</field>
+		<field>
+			<fielddescr>Advanced configuration pass through</fielddescr>
+			<fieldname>configpassthru</fieldname>
+			<description>Add items to here will be automatically inserted into the running snort configuration</description>
+			<type>textarea</type>
+			<rows>5</rows>
+			<cols>40</cols>
+		</field>
     </fields>
 	<custom_php_deinstall_command>
 		snort_advanced();
