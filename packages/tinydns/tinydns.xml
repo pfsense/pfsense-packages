@@ -82,6 +82,12 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fieldname>refreshinterval</fieldname>
+			<fielddescr>XMLRPC Sync</fielddescr>
+			<description>Controls how often the back monitoring ip adresses are polled</description>
+			<type>input</type>
+		</field>
+		<field>
 			<fieldname>syncxmlrpc</fieldname>
 			<fielddescr>XMLRPC Sync</fielddescr>
 			<description>Sync TinyDNS configuration to backup firewalls</description>
