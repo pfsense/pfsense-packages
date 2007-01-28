@@ -38,7 +38,7 @@ if(!$config['installedpackages']['tinydns']['config'][0])
 $pgtitle = "TinyDNS: View Logs";
 include("head.inc");
 
-$tinydnslogs = `tail /etc/tinydns/log/main/current | /usr/local/bin/tai64nlocal | php -f /usr/local/pkg/tinydns_parse_logs.php`;
+$tinydnslogs = `tail /etc/tinydns/log/main/current | /usr/local/bin/tai64nlocal | php -f /usr/local/pkg/tinydns_parse_logs.php | grep -v ":0"`;
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
