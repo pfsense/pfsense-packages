@@ -103,6 +103,7 @@ EOD;
 	fclose($fd);
 	conf_mount_ro();
 	filter_configure();
+
 }
 
 function tinydns_custom_php_deinstall_command() {
@@ -132,21 +133,22 @@ function tinydns_custom_php_changeip_command() {
 	exec("/bin/mkdir /service");
 	exec("/bin/ln -s /etc/tinydns /service/");
 	if($updatecron) {
-		$text_1   = "*/1		 *	 	*	 	*	 	*	 	root	 /usr/bin/nice -n20 /etc/ping_hosts.sh";
-		$text_5   = "*/5		 *	 	*	 	*	 	*	 	root	 /usr/bin/nice -n20 /etc/ping_hosts.sh";
+		$text_1   = "*/1		 *	 	*	 	*	 	*	 	root	 /etc/ping_hosts.sh";
+		$text_5   = "*/5		 *	 	*	 	*	 	*	 	root	 /etc/ping_hosts.sh";
 		$filenamea = "/etc/crontab";
 		remove_text_from_file($filenamea, $text_1);
 		remove_text_from_file($filenamea, $text_5);
 		add_text_to_file($filenamea, $text_1);
 	} else {
-		$text_1   = "*/1		 *	 	*	 	*	 	*	 	root	 /usr/bin/nice -n20 /etc/ping_hosts.sh";
-		$text_5   = "*/5		 *	 	*	 	*	 	*	 	root	 /usr/bin/nice -n20 /etc/ping_hosts.sh";
+		$text_1   = "*/1		 *	 	*	 	*	 	*	 	root	 /etc/ping_hosts.sh";
+		$text_5   = "*/5		 *	 	*	 	*	 	*	 	root	 /etc/ping_hosts.sh";
 		$filenamea = "/etc/crontab";
 		remove_text_from_file($filenamea, $text_1);
 		remove_text_from_file($filenamea, $text_5);
 		add_text_to_file($filenamea, $text_5);
 	}
-	exec("killall -HUP cron");
+	exec("killall cron");
+	exec("cron");
 	conf_mount_ro();
 	filter_configure();
 }
@@ -204,6 +206,7 @@ function tinydns_setup_ping_items() {
 		log_error("Could not open /var/db/pkgpinghosts for writing.");
 		return;
 	}
+	config_lock();
 	/*   write out each ip address so ping_hosts.sh can begin monitoring ip
 	 *   status and create a database of the status information that we can use.
 	 */
@@ -246,12 +249,15 @@ function tinydns_setup_ping_items() {
 		}
 	}
 	fclose($fd);
+	config_unlock();
 	conf_mount_ro();
 }
 
 function tinydns_create_zone_file() {
 	global $g, $config;
 	conf_mount_rw();
+	config_lock();
+	exec("rm -f /service/tinydns/root/data");
 	$fd = fopen("/service/tinydns/root/data", "w");
 	if(!$fd) {
 		log_error("Could not open /service/tinydns/root/data for writing.");
@@ -271,7 +277,7 @@ function tinydns_create_zone_file() {
 			if($monitorip) {
 				$status = tinydns_get_record_status($monitorip);
 				if($status == "DOWN")
-						$ipaddress = tinydns_get_backup_record($ipaddress);
+					$ipaddress = tinydns_get_backup_record($ipaddress);
 			}
 			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname);
 			if($record_data)
@@ -301,6 +307,7 @@ function tinydns_create_zone_file() {
 	fclose($fd);
 	/* tell tinydns to reload zone file */
 	exec("cd /service/tinydns/root && /usr/local/bin/tinydns-data");
+	config_unlock();
 	conf_mount_ro();
 }
 
