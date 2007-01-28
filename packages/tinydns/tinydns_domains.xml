@@ -18,6 +18,10 @@
 			<text>Status</text>
 			<url>/tinydns_status.php</url>
 		</tab>
+		<tab>
+			<text>Logs</text>
+			<url>/tinydns_view_logs.php</url>
+		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
