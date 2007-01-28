@@ -88,11 +88,14 @@ svscan_start () {
         /usr/bin/env \
         PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
         /usr/sbin/daemon -f /bin/sh -c "\$command \$svscan_servicedir 2>&1 | /usr/local/bin/readproctitle service errors: ................................................................................................................................................................................................................................................................................................................................................................................................................ &" > /dev/null
+        minicron 1 /var/run/ping_hosts.pid /etc/ping_hosts.sh
 }
 
 svscan_stop_post () {
         echo "Stopping svscan."
         find -L "\$svscan_servicedir" -mindepth 1 -maxdepth 2 -type d \( \! -path "\$svscan_servicedir/*/*" -or -name 'log' \) -print0 | xargs -0 /usr/local/bin/svc -dx
+        PIDTOKILL=`cat /var/run/ping_hosts.pid`
+        kill $PIDTOKILL
 }
 
 run_rc_command "\$1"
@@ -132,23 +135,6 @@ function tinydns_custom_php_changeip_command() {
 	exec("/usr/local/bin/tinydns-conf Gtinydns Gdnslog /etc/tinydns {$ip}");
 	exec("/bin/mkdir /service");
 	exec("/bin/ln -s /etc/tinydns /service/");
-	if($updatecron) {
-		$text_1   = "*/1	*	*	*	*	root	/etc/ping_hosts.sh";
-		$text_5   = "*/5	*	*	*	*	root	/etc/ping_hosts.sh";
-		$filenamea = "/etc/crontab";
-		remove_text_from_file($filenamea, $text_1);
-		remove_text_from_file($filenamea, $text_5);
-		add_text_to_file($filenamea, $text_1);
-	} else {
-		$text_1   = "*/1	*	*	*	*	root	/etc/ping_hosts.sh";
-		$text_5   = "*/5	*	*	*	*	root	/etc/ping_hosts.sh";
-		$filenamea = "/etc/crontab";
-		remove_text_from_file($filenamea, $text_1);
-		remove_text_from_file($filenamea, $text_5);
-		add_text_to_file($filenamea, $text_5);
-	}
-
-	exec("killall -HUP cron");
 	conf_mount_ro();
 	filter_configure();
 }

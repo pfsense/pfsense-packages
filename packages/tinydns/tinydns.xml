@@ -82,12 +82,6 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fieldname>updatecron</fieldname>
-			<fielddescr>Update cron</fielddescr>
-			<description>Changes cron to ping hosts every minute from 5.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
 			<fieldname>syncxmlrpc</fieldname>
 			<fielddescr>XMLRPC Sync</fielddescr>
 			<description>Sync TinyDNS configuration to backup firewalls</description>
