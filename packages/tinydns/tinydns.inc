@@ -317,7 +317,7 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname) {
 				$record_data = ".{$hostname}::{$recordip}";
 				break;
 			case "MX":
-				$record_data = "@{$hostname}:{$recordip}{$ttl_string}";
+				$record_data = "@{$hostname}:{$recordip}::{$ttl_string}";
 				break;
 			case "A":
 				$record_data = "+{$hostname}:{$recordip}{$ttl_string}";
