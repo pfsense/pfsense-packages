@@ -276,7 +276,6 @@ function tinydns_create_zone_file() {
 			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname);
 			if($record_data) {
 				fwrite($fd, $record_data . "\n");
-				continue;
 			}
 			/* process load balanced items */
 			if($domain['row']) {
