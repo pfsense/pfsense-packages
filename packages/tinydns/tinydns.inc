@@ -29,6 +29,8 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+require_once("filter.inc");
+
 function tinydns_custom_php_install_command() {
 	global $g, $config;
 	conf_mount_rw();
