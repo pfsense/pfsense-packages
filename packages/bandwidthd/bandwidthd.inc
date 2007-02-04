@@ -83,7 +83,6 @@ function bandwidthd_install_config() {
 	}
 
 	$dev = "";
-	/* XXX: $dev "eth0" */
 	foreach($ifdescrs as $ifdescr) {
 		$descr = convert_friendly_interface_to_real_interface_name($ifdescr);
 		$dev .= "dev \"$descr\"\n";
