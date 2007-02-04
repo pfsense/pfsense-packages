@@ -5,7 +5,7 @@
 	<configpath>installedpackages->package->bandwidthd</configpath>
 	<title>Bandwidthd</title>
 	<menu>
-		<name>Bandwidthd</name>
+		<name>BandwidthD</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
 		<url>http://$myurl:3000</url>
@@ -53,13 +53,13 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fieldname>output_cdf</fieldname>
+			<fieldname>outputcdf</fieldname>
 			<fielddescr>output_cdf</fielddescr>
 			<description>Log data to cdf file htdocs/log.cdf</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fieldname>recover_cdf</fieldname>
+			<fieldname>recovercdf</fieldname>
 			<fielddescr>recover_cdf</fielddescr>
 			<description>Read back the cdf file on startup</description>
 			<type>checkbox</type>

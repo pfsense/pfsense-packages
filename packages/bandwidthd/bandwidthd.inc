@@ -30,7 +30,7 @@
 
 function bandwidthd_install_config() {
 
-	$meta_refresh = $config['installedpackages']['bandwidthd']['config'][0]['meta_refresh'];
+	$meta_refresh = $config['installedpackages']['bandwidthd']['config'][0]['metarefresh'];
 	if($meta_refresh)
 		$meta_refresh = "meta_refresh $meta_refresh\n";
 	$graph = $config['installedpackages']['bandwidthd']['config'][0]['graph'];
@@ -39,19 +39,19 @@ function bandwidthd_install_config() {
 	$filter = $config['installedpackages']['bandwidthd']['config'][0]['filter'];
 	if($filter)
 		$filter = "filter $meta_refresh\n";
-	$recover_cdf = $config['installedpackages']['bandwidthd']['config'][0]['recover_cdf'];
+	$recover_cdf = $config['installedpackages']['bandwidthd']['config'][0]['recovercdf'];
 	if($recover_cdf)
 		$recover_cdf = "recover_cdf $meta_refresh\n";
-	$output_cdf = $config['installedpackages']['bandwidthd']['config'][0]['output_cdf'];
+	$output_cdf = $config['installedpackages']['bandwidthd']['config'][0]['outputcdf'];
 	if($output_cdf)
 		$output_cdf = "output_cdf $meta_refresh\n";
 	$promiscuous = $config['installedpackages']['bandwidthd']['config'][0]['promiscuous'];
 	if($promiscuous)
 		$promiscuous = "promiscuous $meta_refresh\n";
-	$graph_cutoff = $config['installedpackages']['bandwidthd']['config'][0]['graph_cutoff'];
+	$graph_cutoff = $config['installedpackages']['bandwidthd']['config'][0]['graphcutoff'];
 	if($graph_cutoff)
 		$graph_cutoff = "graph_cutoff $meta_refresh\n";
-	$skip_intervals = $config['installedpackages']['bandwidthd']['config'][0]['skip_intervals'];
+	$skip_intervals = $config['installedpackages']['bandwidthd']['config'][0]['skipintervals'];
 	if($skip_intervals)
 		$skip_intervals = "skip_intervals $meta_refresh\n";
 
