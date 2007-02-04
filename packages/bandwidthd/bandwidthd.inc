@@ -76,14 +76,15 @@ function bandwidthd_install_config() {
 			if($subnet)
 				$subnets .= "subnet \"{$subnet}\"";
 		} else {
-			$subnets .= "subnet \"{$subnet}/{$ifcfg['subnet']}\\n";
+			$subnets .= "subnet \"{$subnet}/{$ifcfg['subnet']}\"\n";
 		}
 	}
 
 	$dev = "";
 	/* XXX: $dev "eth0" */
 	foreach($ifdescrs as $ifdescr) {
-		$dev .= "dev \"$ifdescr\"\n";
+		$descr = convert_friendly_interface_to_real_interface_n($ifdescr);
+		$dev .= "dev \"$descr\"\n";
 	}
 
 	$config_file = <<<EOF
