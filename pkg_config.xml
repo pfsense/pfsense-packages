@@ -406,7 +406,6 @@
       <version>2.0</version>
       <status>BETA</status>
       <required_version>2.0.1</required_version>
-      <maintainer>geekgod@geekgod.com</maintainer>
       <depends_on_package_base_url>ftp://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6.2-release/All/bandwidthd-2.0.1.tbz</depends_on_package_base_url>
       <depends_on_package>bandwidthd-2.0.1.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
