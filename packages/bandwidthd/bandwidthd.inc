@@ -158,12 +158,11 @@ EOF;
 		)
 	);
 
+	exec("rm /usr/local/www/bandwidthd");
 	exec("/bin/ln -s /usr/local/bandwidthd/htdocs /usr/local/www/bandwidthd");
 
 	exec("echo \"Please start bandwidthd to populate this directory.\" > /usr/local/bandwidthd/htdocs/index.html");
 
 }
-
-
 
 ?>
