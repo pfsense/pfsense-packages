@@ -76,7 +76,7 @@ function bandwidthd_install_config() {
 		if($subnet == "pppoe" or $subnet == "dhcp") {
 			$subnet = find_interface_ip("ng0");
 			if($subnet)
-				$subnets .= "subnet {$subnet}";
+				$subnets .= "subnet {$subnet}/32";
 		} else {
 			$subnets .= "subnet {$subnet}/{$ifcfg['subnet']}\n";
 		}
