@@ -80,7 +80,7 @@ function bandwidthd_install_config() {
 		$dev .= "dev \"$ifdescr\"\n";
 	}
 
-	$config_file = <<EOF
+	$config_file = <<<EOF
 ####################################################
 # Bandwidthd.conf
 #
