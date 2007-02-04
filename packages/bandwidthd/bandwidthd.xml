@@ -25,7 +25,7 @@
 			<name>bandwidthd</name>
 			<rcfile>bandwidthd.sh</rcfile>
 			<executable>bandwidthd</executable>
-        </service>
+    </service>
 	<aftersaveredirect>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</aftersaveredirect>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
