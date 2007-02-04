@@ -403,9 +403,9 @@
       <website>http://bandwidthd.sourceforge.net/</website>
       <descr>BandwidthD tracks usage of TCP/IP network subnets and builds html files with graphs to display utilization. Charts are built by individual IPs, and by default display utilization over 2 day, 8 day, 40 day, and 400 day periods. Furthermore, each ip address's utilization can be logged out at intervals of 3.3 minutes, 10 minutes, 1 hour or 12 hours in cdf format, or to a backend database server. HTTP, TCP, UDP, ICMP, VPN, and P2P traffic are color coded.</descr>
       <category>System</category>
-      <version></version>
+      <version>2.0</version>
       <status>BETA</status>
-      <required_version>2.0</required_version>
+      <required_version>2.0.1</required_version>
       <maintainer></maintainer>
       <depends_on_package_base_url>ftp://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6.2-release/All/bandwidthd-2.0.1.tbz</depends_on_package_base_url>
       <depends_on_package>bandwidthd-2.0.1.tbz</depends_on_package>
