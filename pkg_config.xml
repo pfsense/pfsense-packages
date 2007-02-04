@@ -409,7 +409,7 @@
       <maintainer></maintainer>
       <depends_on_package_base_url>ftp://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6.2-release/All/bandwidthd-2.0.1.tbz</depends_on_package_base_url>
       <depends_on_package>bandwidthd-2.0.1.tbz</depends_on_package>
-      <config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
+      <config_file>http://www.pfsense.org/packages/config/bandwidthd.xml</config_file>
       <configurationfile>bandwidthd.xml</configurationfile>
     </package>
     <package>
