@@ -43,9 +43,9 @@ function bandwidthd_install_config() {
 	$graph = $config['installedpackages']['bandwidthd']['config'][0]['graph'];
 	if($graph)
 		$graph = "graph $meta_refresh\n";
-	$filter = $config['installedpackages']['bandwidthd']['config'][0]['filter'];
-	if($filter)
-		$filter = "filter $meta_refresh\n";
+	$filter_text = $config['installedpackages']['bandwidthd']['config'][0]['filter'];
+	if($filter_text)
+		$filter_text = "filter $meta_refresh\n";
 	$recover_cdf = $config['installedpackages']['bandwidthd']['config'][0]['recovercdf'];
 	if($recover_cdf)
 		$recover_cdf = "recover_cdf $meta_refresh\n";
@@ -75,9 +75,9 @@ function bandwidthd_install_config() {
 		if($subnet == "pppoe" or $subnet == "dhcp") {
 			$subnet = find_interface_ip("ng0");
 			if($subnet)
-				$subnets .= "subnet \"{$subnet}\"";
+				$subnets .= "subnet {$subnet}";
 		} else {
-			$subnets .= "subnet \"{$subnet}/{$ifcfg['subnet']}\"\n";
+			$subnets .= "subnet {$subnet}/{$ifcfg['subnet']}\n";
 		}
 	}
 
