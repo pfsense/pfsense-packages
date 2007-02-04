@@ -35,6 +35,7 @@ function bandwidthd_install_deinstall() {
 }
 
 function bandwidthd_install_config() {
+	global $config, $g;
 
 	$meta_refresh = $config['installedpackages']['bandwidthd']['config'][0]['metarefresh'];
 	if($meta_refresh)
