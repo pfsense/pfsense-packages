@@ -17,6 +17,11 @@
 			<active/>
 		</tab>
 	</tabs>
+	<service>
+			<name>bandwidthd</name>
+			<rcfile>bandwidthd.sh</rcfile>
+			<executable>bandwidthd</executable>
+        </service>
 	<aftersaveredirect>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</aftersaveredirect>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -30,6 +35,7 @@
 		bandwidthd_install_deinstall();
 	</custom_php_deinstall_command>
 	<custom_php_resync_config_command>
+		bandwidthd_install_config();
 	</custom_php_resync_config_command>
 	<include_file>/usr/local/pkg/bandwidthd.inc</include_file>
 	<fields>
