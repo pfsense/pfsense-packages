@@ -8,13 +8,17 @@
 		<name>BandwidthD</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
-		<url>http://$myurl:3000</url>
+		<url>/bandwidthd</url>
 	</menu>
 	<tabs>
 		<tab>
 			<text>BandwidthD</text>
 			<url>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</url>
 			<active/>
+		</tab>
+		<tab>
+			<text>Access BandwidthD</text>
+			<url>/bandwidthd</url>
 		</tab>
 	</tabs>
 	<service>

@@ -32,6 +32,7 @@ function bandwidthd_install_deinstall() {
 	exec("cd /var/db/pkg/ && pkg_delete `ls | grep bandwidthd`");
 	exec("rm /usr/local/etc/rc.d/bandwidthd*");
 	exec("rm -rf /usr/local/bandwidthd*");
+	exec("rm /usr/local/www/bandwidthd");
 }
 
 function bandwidthd_install_config() {
@@ -158,6 +159,10 @@ EOF;
 		)
 	);
 
+	exec("ln -s /usr/local/www/bandwidthd /usr/local/bandwidthd/htdocs");
+
 }
+
+
 
 ?>
