@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>bandwidthd</name>
+	<version>1.0</version>
+	<configpath>installedpackages->package->bandwidthd</configpath>
+	<title>Bandwidthd</title>
+	<menu>
+		<name>Bandwidthd</name>
+		<tooltiptext></tooltiptext>
+		<section>Services</section>
+		<url>http://$myurl:3000</url>
+	</menu>
+	<tabs>
+		<tab>
+			<text>BandwidthD</text>
+			<url>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</url>
+			<active/>
+		</tab>
+	</tabs>
+	<aftersaveredirect>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</aftersaveredirect>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/bandwidthd/bandwidthd.inc</item>
+	</additional_files_needed>
+	<custom_php_install_command>
+		bandwidthd_install_config();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+	</custom_php_deinstall_command>
+	<custom_php_resync_config_command>
+	</custom_php_resync_config_command>
+	<include_file>/usr/local/pkg/bandwidthd.inc</include_file>
+	<fields>
+		<field>
+			<fieldname>skipintervals</fieldname>
+			<fielddescr>Skip intervals</fielddescr>
+			<description></description>
+			<type>input</type>
+			<value>1024</value>
+		</field>
+		<field>
+			<fieldname>graphcutoff</fieldname>
+			<fielddescr>Graph cutoff</fielddescr>
+			<description>Graph cutoff is how many k must be transfered by an ip before we bother to graph it</description>
+			<type>input</type>
+			<value>1024</value>
+		</field>
+		<field>
+			<fieldname>promiscuous</fieldname>
+			<fielddescr>promiscuous</fielddescr>
+			<description>Put interface in promiscuous mode to score to traffic that may not be routing through the host machine.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fieldname>output_cdf</fieldname>
+			<fielddescr>output_cdf</fielddescr>
+			<description>Log data to cdf file htdocs/log.cdf</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fieldname>recover_cdf</fieldname>
+			<fielddescr>recover_cdf</fielddescr>
+			<description>Read back the cdf file on startup</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fieldname>filter</fieldname>
+			<fielddescr>filter</fielddescr>
+			<description>Libpcap format filter string used to control what bandwidthd see's.  Please always include "ip" in the string to avoid strange problems.</description>
+			<type>input</type>
+			<value>ip</value>
+		</field>
+		<field>
+			<fieldname>drawgraphs</fieldname>
+			<fielddescr>Draw Graphs</fielddescr>
+			<description>This default to true to graph the traffic bandwidthd is recording.  Usually set this to false if you only want cdf output or you are using the database output option.  Bandwidthd will use very little ram and cpu if this is set to false.</description>
+			<type>checkbox</type>
+			<value>checked</value>
+		</field>
+		<field>
+			<fieldname>meta_refresh</fieldname>
+			<fielddescr>Meta Refresh</fielddescr>
+			<description>Set META REFRESH seconds (default 150, use 0 to disable).</description>
+			<type>input</type>
+			<value>150</value>
+		</field>
+	</fields>
+</packagegui>

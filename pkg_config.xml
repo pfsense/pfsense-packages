@@ -399,6 +399,20 @@
       <configurationfile>freeradius.xml</configurationfile>
     </package>
     <package>
+      <name>bandwidthd</name>
+      <website>http://bandwidthd.sourceforge.net/</website>
+      <descr></descr>
+      <category>System</category>
+      <version></version>
+      <status>BETA</status>
+      <required_version>2.0</required_version>
+      <maintainer></maintainer>
+      <depends_on_package_base_url>ftp://ftp2.freebsd.org/pub/FreeBSD/ports/i386/packages-6.2-release/All/</depends_on_package_base_url>
+      <depends_on_package>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6.2-release/</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
+      <configurationfile>bandwidthd.xml</configurationfile>
+    </package>
+    <package>
       <name>stunnel</name>
       <website>http://www.stunnel.org/</website>
       <descr>The stunnel program is designed to work as an SSL encryption wrapper between remote client and local (inetd-startable) or remote servers. It can be used to add SSL functionality to commonly used inetd daemons like POP2, POP3, and IMAP servers without any changes in the program's code. It will negotiate an SSL connection using the OpenSSL or SSLeay libraries. It calls the underlying crypto libraries, allowing stunnel to support whatever cryptographic algorithms you compiled into your crypto package.</descr>

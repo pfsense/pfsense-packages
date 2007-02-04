@@ -1,0 +1,155 @@
+<?php
+/* $Id$ */
+/*
+	bandwidthd.inc
+	Copyright (C) 2006 Scott Ullrich
+	part of pfSense
+	All rights reserved.
+
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+
+function bandwidthd_install_config() {
+
+	$meta_refresh = $config['installedpackages']['bandwidthd']['config'][0]['meta_refresh'];
+	if($meta_refresh)
+		$meta_refresh = "meta_refresh $meta_refresh\n";
+	$graph = $config['installedpackages']['bandwidthd']['config'][0]['graph'];
+	if($graph)
+		$graph = "graph $meta_refresh\n";
+	$filter = $config['installedpackages']['bandwidthd']['config'][0]['filter'];
+	if($filter)
+		$filter = "filter $meta_refresh\n";
+	$recover_cdf = $config['installedpackages']['bandwidthd']['config'][0]['recover_cdf'];
+	if($recover_cdf)
+		$recover_cdf = "recover_cdf $meta_refresh\n";
+	$output_cdf = $config['installedpackages']['bandwidthd']['config'][0]['output_cdf'];
+	if($output_cdf)
+		$output_cdf = "output_cdf $meta_refresh\n";
+	$promiscuous = $config['installedpackages']['bandwidthd']['config'][0]['promiscuous'];
+	if($promiscuous)
+		$promiscuous = "promiscuous $meta_refresh\n";
+	$graph_cutoff = $config['installedpackages']['bandwidthd']['config'][0]['graph_cutoff'];
+	if($graph_cutoff)
+		$graph_cutoff = "graph_cutoff $meta_refresh\n";
+	$skip_intervals = $config['installedpackages']['bandwidthd']['config'][0]['skip_intervals'];
+	if($skip_intervals)
+		$skip_intervals = "skip_intervals $meta_refresh\n";
+
+	$subnets = "";
+	$ifdescrs = array("lan", "wan");
+	for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
+		$ifdescrs['opt' . $j] = "opt" . $j;
+	}
+	foreach($ifdescrs as $int) {
+		/* calculate interface subnet information */
+		$ifcfg = &$config['interfaces'][$int];
+		$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
+		$subnetmask = gen_subnet_mask($ifcfg['subnet']);
+		if($subnet == "pppoe" or $subnet == "dhcp") {
+			$subnet = find_interface_ip("ng0");
+			if($subnet)
+				$subnets .= "subnet \"{$subnet}\"";
+		} else {
+			$subnets .= "subnet \"{$subnet}/{$ifcfg['subnet']}\\n";
+		}
+	}
+
+	$dev = "";
+	/* XXX: $dev "eth0" */
+	foreach($ifdescrs as $ifdescr) {
+		$dev .= "dev \"$ifdescr\"\n";
+	}
+
+	$config_file = <<EOF
+####################################################
+# Bandwidthd.conf
+#
+# Commented out options are here to provide
+# documentation and represent defaults
+
+# Subnets to collect statistics on.  Traffic that
+# matches none of these subnets will be ignored.
+# Syntax is either IP Subnet Mask or CIDR
+$subnets
+
+# Device to listen on
+# Bandwidthd listens on the first device it detects
+# by default.  Run "bandwidthd -l" for a list of
+# devices.
+$dev
+
+###################################################
+# Options that don't usually get changed
+
+# An interval is 2.5 minutes, this is how many
+# intervals to skip before doing a graphing run
+$skip_inervals
+
+# Graph cutoff is how many k must be transfered by an
+# ip before we bother to graph it
+$graph_cutoff
+
+#Put interface in promiscuous mode to score to traffic
+#that may not be routing through the host machine.
+$promiscuous
+
+#Log data to cdf file htdocs/log.cdf
+$output_cdf
+
+#Read back the cdf file on startup
+$recover_cdf
+
+#Libpcap format filter string used to control what bandwidthd see's
+#Please always include "ip" in the string to avoid strange problems
+"$filter"
+
+#Draw Graphs - This default to true to graph the traffic bandwidthd is recording
+#Usually set this to false if you only want cdf output or
+#you are using the database output option.  Bandwidthd will use very little
+#ram and cpu if this is set to false.
+$graph
+
+#Set META REFRESH seconds (default 150, use 0 to disable).
+$meta_refresh
+
+EOF;
+
+	$fd = fopen("/usr/local/bandwidthd/etc/bandwidthd.conf","w");
+	if(!$fd) {
+		log_error("could not open /usr/local/bandwidthd/etc/bandwidthd.conf for writing");
+		exit;
+	}
+	fwrite($fd, $config_file);
+	fclose($fd);
+
+	/* write out rc.d start/stop file */
+	write_rcfile(array(
+			"file" => "bandwidthd.sh",
+			"start" => "/usr/local/bandwidthd/bandwidthd /usr/local/bandwidth/etc/bandwidthd.conf",
+			"stop" => "/usr/bin/killall bandwidthd"
+		)
+	);
+
+}
+
+?>
