@@ -28,6 +28,12 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+function bandwidthd_install_deinstall() {
+	exec("cd /var/db/pkg/ && pkg_delete `ls | grep bandwidthd`");
+	exec("rm /usr/local/etc/rc.d/bandwidthd*");
+	exec("rm -rf /usr/local/bandwidthd*");
+}
+
 function bandwidthd_install_config() {
 
 	$meta_refresh = $config['installedpackages']['bandwidthd']['config'][0]['metarefresh'];
