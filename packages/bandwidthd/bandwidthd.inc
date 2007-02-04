@@ -80,7 +80,8 @@ function bandwidthd_install_config() {
 			if($subnet)
 				$subnets .= "subnet {$subnet}/32\n";
 		} else {
-			$subnets .= "subnet {$subnet}/{$ifcfg['subnet']}\n";
+			if($subnet)
+				$subnets .= "subnet {$subnet}/{$ifcfg['subnet']}\n";
 		}
 	}
 
