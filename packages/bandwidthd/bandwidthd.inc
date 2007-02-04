@@ -129,7 +129,7 @@ $recover_cdf
 
 #Libpcap format filter string used to control what bandwidthd see's
 #Please always include "ip" in the string to avoid strange problems
-"$filter"
+$filter_text
 
 #Draw Graphs - This default to true to graph the traffic bandwidthd is recording
 #Usually set this to false if you only want cdf output or
