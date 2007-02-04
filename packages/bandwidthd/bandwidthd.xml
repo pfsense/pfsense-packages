@@ -8,7 +8,7 @@
 		<name>BandwidthD</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
-		<url>/bandwidthd</url>
+		<url>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</url>
 	</menu>
 	<tabs>
 		<tab>
