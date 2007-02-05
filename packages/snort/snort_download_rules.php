@@ -176,7 +176,10 @@ if(!$oinkid) {
 ob_flush();
 
 /* setup some variables */
-$snort_filename = "snortrules-snapshot-CURRENT.tar.gz";
+$premium_subscriber = "";
+if($config['installedpackages']['snortadvanced']['config'][0]['subscriber'])
+	$premium_subscriber = "_s";
+$snort_filename = "snortrules-snapshot-CURRENT{$premium_subscriber}.tar.gz";
 $snort_filename_md5 = "snortrules-snapshot-CURRENT.tar.gz.md5";
 $dl = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}";
 $dl_md5 = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}";

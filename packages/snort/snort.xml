@@ -33,7 +33,7 @@
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_rules_edit.php</item>
-	</additional_files_needed>	
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
@@ -167,6 +167,13 @@
 			<description>Obtain a snort.org Oinkmaster code and paste here.</description>
 			<value></value>
 			<type>input</type>
+			<size>60</size>
+		</field>
+		<field>
+			<fielddescr>Snort.org subscriber</fielddescr>
+			<fieldname>subscriber</fieldname>
+			<description>Check this box if you are a Snort.org subscriber (premium rules).</description>
+			<type>checkbox</type>
 			<size>60</size>
 		</field>
 		<field>
