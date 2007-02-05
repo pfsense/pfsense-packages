@@ -29,14 +29,21 @@
 */
 
 function bandwidthd_install_deinstall() {
+	conf_mount_rw();
+	config_lock();
 	exec("cd /var/db/pkg/ && pkg_delete `ls | grep bandwidthd`");
 	exec("rm /usr/local/etc/rc.d/bandwidthd*");
 	exec("rm -rf /usr/local/bandwidthd*");
 	exec("rm /usr/local/www/bandwidthd");
+	conf_mount_ro();
+	config_unlock();
 }
 
 function bandwidthd_install_config() {
 	global $config, $g;
+
+	conf_mount_rw();
+	config_lock();
 
 	/* user defined values */
 	$meta_refresh = $config['installedpackages']['bandwidthd']['config'][0]['metarefresh'];
@@ -172,6 +179,9 @@ EOF;
 	exec("/bin/ln -s /usr/local/bandwidthd/htdocs /usr/local/www/bandwidthd");
 
 	exec("echo \"Please start bandwidthd to populate this directory.\" > /usr/local/bandwidthd/htdocs/index.html");
+
+	conf_mount_ro();
+	config_unlock();
 
 	start_service("bandwidthd");
 
