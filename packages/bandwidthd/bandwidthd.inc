@@ -50,7 +50,7 @@ function bandwidthd_install_config() {
 		$filter_text = "filter $filter_text\n";
 	$recover_cdf = $config['installedpackages']['bandwidthd']['config'][0]['recovercdf'];
 	if($recover_cdf)
-		$recover_cdf = "recover_cdf $recover_cdf\n";
+		$recover_cdf = "recover_cdf true\n";
 	$output_cdf = $config['installedpackages']['bandwidthd']['config'][0]['outputcdf'];
 	if($output_cdf)
 		$output_cdf = "output_cdf $output_cdf\n";
