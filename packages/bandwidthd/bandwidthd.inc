@@ -170,7 +170,7 @@ EOF;
 	/* write out rc.d start/stop file */
 	write_rcfile(array(
 			"file" => "bandwidthd.sh",
-			"start" => "/usr/local/bandwidthd/bandwidthd /usr/local/bandwidth/etc/bandwidthd.conf",
+			"start" => "/usr/local/bandwidthd/bandwidthd /usr/local/bandwidthd/etc/bandwidthd.conf",
 			"stop" => "/usr/bin/killall bandwidthd"
 		)
 	);
