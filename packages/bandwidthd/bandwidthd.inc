@@ -60,7 +60,7 @@ function bandwidthd_install_config() {
 		$recover_cdf = "recover_cdf true\n";
 	$output_cdf = $config['installedpackages']['bandwidthd']['config'][0]['outputcdf'];
 	if($output_cdf)
-		$output_cdf = "output_cdf $output_cdf\n";
+		$output_cdf = "output_cdf true\n";
 	$promiscuous = $config['installedpackages']['bandwidthd']['config'][0]['promiscuous'];
 	if($promiscuous)
 		$promiscuous = "promiscuous true\n";
