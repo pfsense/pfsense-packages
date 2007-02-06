@@ -248,10 +248,10 @@ function tinydns_setup_ping_items() {
 function tinydns_create_zone_file() {
 	global $g, $config;
 	conf_mount_rw();
-	config_lock();
 	if(file_exists("/tmp/config.cache"))
 		unlink("/tmp/config.cache");
 	parse_config(true);
+	config_lock();
 	exec("rm -f /service/tinydns/root/data");
 	$fd = fopen("/service/tinydns/root/data", "w");
 	if(!$fd) {
