@@ -32,11 +32,19 @@
 			<fielddescr>Record type</fielddescr>
 			<fieldname>recordtype</fieldname>
 		</columnitem>
+		<columnitem>
+			<fielddescr>rDNS</fielddescr>
+			<fieldname>rdns</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>IP Address</fielddescr>
+			<fieldname>ipaddress</fieldname>
+		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
 			<fieldname>hostname</fieldname>
-			<fielddescr>Domain name. Example: www.exampledomain.com</fielddescr>
+			<fielddescr>FQDN or Hostname www.exampledomain.com</fielddescr>
 			<description>Enter the domain name that you would like to serve dns records for.</description>
 			<required/>
 			<type>input</type>
@@ -58,6 +66,12 @@
 			    <option><value>CNAME</value><name>CNAME</name></option>
 			</options>
 		</field>
+		<field>
+		 	<fielddescr>Automatic PTR entry</fielddescr>
+			<fieldname>rdns</fieldname>
+			<description>Create a reverse DNS (PTR) entry for this A record?</description>
+			<type>checkbox</type>
+		</field>		
 		<field>
 			<fieldname>ipaddress</fieldname>
 			<fielddescr>IP Address or hostname that record points to</fielddescr>
@@ -129,3 +143,4 @@
 		tinydns_setup_ping_items();
 	</custom_php_resync_config_command>
 </packagegui>
+

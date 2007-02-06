@@ -279,7 +279,7 @@ function tinydns_create_zone_file() {
 						log_error("tinydns_get_backup_record returned $ipaddress ");
 				}
 			}
-			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname);
+			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname, $domain['rdns']);
 			if($record_data) {
 				fwrite($fd, $record_data . "\n");
 			}
@@ -313,7 +313,8 @@ function tinydns_create_zone_file() {
 }
 
 /* formats data as a tinydns data row item */
-function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname) {
+/* A full description of the data format is available at 'man tinydns-data' */
+function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname,$rdns) {
 		if($ttl)
 			$ttl_string = ":{$ttl}";
 		else
@@ -325,14 +326,24 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname) {
 			case "MX":
 				$record_data = "@{$hostname}:{$recordip}::{$ttl_string}";
 				break;
-			case "A":
-				$record_data = "+{$hostname}:{$recordip}{$ttl_string}";
-				break;
 			case "PTR":
+				/* "^" creates "PTR" record only to allow reverse DNS */
+				$record_data = "^{$hostname}:{$recordip}{$ttl_string}";
+				break;
+			case "A":
+				/* "=" creates both "A" and "PTR" records to allow both forward and reverse DNS */
+				if($rdns)
 				$record_data = "={$hostname}:{$recordip}{$ttl_string}";
+				else
+				/* "+" creates "A" records only to allow forward DNS */
+					$record_data = "+{$hostname}:{$recordip}{$ttl_string}";					
 				break;
 			case "CNAME":
 				$record_data = "C{$hostname}:{$recordip}{$ttl_string}";
+				break;
+			case "TXT":
+				/* "'" creates "TXT" record that can be used for SPF */
+				$record_data = "'{$hostname}:{$recordip}{$ttl_string}";
 				break;
 		}
 		return $record_data;
