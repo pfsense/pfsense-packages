@@ -140,6 +140,7 @@ function tinydns_custom_php_changeip_command() {
 	exec("/usr/local/bin/tinydns-conf Gtinydns Gdnslog /etc/tinydns {$ip}");
 	exec("/bin/mkdir /service");
 	exec("/bin/ln -s /etc/tinydns /service/");
+	exec("echo $ip > /service/tinydns/env/IP");
 	conf_mount_ro();
 	filter_configure();
 }
@@ -248,6 +249,9 @@ function tinydns_create_zone_file() {
 	global $g, $config;
 	conf_mount_rw();
 	config_lock();
+	if(file_exists("/tmp/config.cache"))
+		unlink("/tmp/config.cache");
+	parse_config(true);
 	exec("rm -f /service/tinydns/root/data");
 	$fd = fopen("/service/tinydns/root/data", "w");
 	if(!$fd) {
