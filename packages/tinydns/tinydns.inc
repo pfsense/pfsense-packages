@@ -141,6 +141,7 @@ function tinydns_custom_php_changeip_command() {
 	exec("/bin/mkdir /service");
 	exec("/bin/ln -s /etc/tinydns /service/");
 	exec("echo $ip > /service/tinydns/env/IP");
+	exec("killall -9 tinydns");
 	conf_mount_ro();
 	filter_configure();
 }
@@ -322,6 +323,9 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname,$rdns)
 		switch ($recordtype) {
 			case "SOA":
 				$record_data = ".{$hostname}::{$recordip}{$ttl_string}";
+				break;
+			case "NS":
+				$record_data = "&{$hostname}:{$recordip}{$ttl_string}";
 				break;
 			case "MX":
 				$record_data = "@{$hostname}:{$recordip}::{$ttl_string}";

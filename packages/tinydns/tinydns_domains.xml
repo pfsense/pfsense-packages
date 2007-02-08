@@ -25,7 +25,7 @@
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fielddescr>Hostname</fielddescr>
+			<fielddescr>Fully Qualified Domain Name (Hostname)</fielddescr>
 			<fieldname>hostname</fieldname>
 		</columnitem>
 		<columnitem>
@@ -44,8 +44,8 @@
 	<fields>
 		<field>
 			<fieldname>hostname</fieldname>
-			<fielddescr>FQDN or Hostname www.exampledomain.com</fielddescr>
-			<description>Enter the domain name that you would like to serve dns records for.</description>
+			<fielddescr>Hostname or FQDN www.exampledomain.com</fielddescr>
+			<description>The DNS server will supply Records for the Fully Qualified Domain Name that is entered</description>
 			<required/>
 			<type>input</type>
 			<size>35</size>
@@ -53,32 +53,34 @@
 		<field>
 			<fielddescr>Record type</fielddescr>
 			<fieldname>recordtype</fieldname>
-			<description>DNS Record type.  MX, A, etc</description>
+			<description>DNS Record types. A, PTR, MX, NS, SOA, TXT, CNAME</description>
 			<required/>
 			<type>select</type>
 			<size>1</size>
 			<options>
 			    <option><value></value><name></name></option>
-			    <option><value>MX</value><name>MX</name></option>
 			    <option><value>A</value><name>A</name></option>
+			    <option><value>MX</value><name>MX</name></option>
+			    <option><value>NS</value><name>NS</name></option>
 			    <option><value>SOA</value><name>SOA</name></option>
 			    <option><value>PTR</value><name>PTR</name></option>
 			    <option><value>CNAME</value><name>CNAME</name></option>
+			    <option><value>TXT</value><name>TXT</name></option>
 			</options>
 		</field>
 		<field>
 		 	<fielddescr>Automatic PTR entry</fielddescr>
 			<fieldname>rdns</fieldname>
-			<description>Create a reverse DNS (PTR) entry for this A record?</description>
+			<description>Create a reverse DNS (PTR) entry for this A Record?</description>
 			<type>checkbox</type>
 		</field>		
 		<field>
 			<fieldname>ipaddress</fieldname>
-			<fielddescr>IP Address or hostname that record points to</fielddescr>
-			<description>Enter the IP Address that this record will point to (primary).  The only exception is for NS type records where we expect a complete hostname to point to a A record.</description>
+			<fielddescr> FQDN or IP Address</fielddescr>
+			<description>IP Address for A Records. FQDN or Hostname for SOA, PTR, CNAME Records.  For NS Records an IP:FQDN</description>
 			<required/>
 			<type>input</type>
-			<size>35</size>
+			<size>40</size>
 		</field>
 		<field>
 			<fieldname>ttl</fieldname>
@@ -143,4 +145,3 @@
 		tinydns_setup_ping_items();
 	</custom_php_resync_config_command>
 </packagegui>
-
