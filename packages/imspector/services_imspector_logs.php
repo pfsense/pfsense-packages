@@ -35,15 +35,26 @@ require("guiconfig.inc");
 /* variables */
 $log_dir = '/var/log/imspector';
 
-$protocol_color			= '#06264d';
-$local_color 			= '#1d398b';
-$remote_color 			= '#2149c1';
-$conversation_color		= '#335ebe';
+$border_color			= '#c0c0c0';
+$default_bgcolor		= '#eeeeee';
 
-$local_user_color		= 'blue';
-$local_user_bgcolor		= '#e5e5f3';
-$remote_user_color		= 'green';
-$remote_user_bgcolor	= '#efeffa';
+$list_protocol_color	= '#000000';
+$list_local_color 		= '#000000';
+$list_remote_color 		= '#000000';
+$list_convo_color		= '#000000';
+
+$list_protocol_bgcolor	= '#cccccc';
+$list_local_bgcolor		= '#dddddd';
+$list_remote_bgcolor	= '#eeeeee';
+$list_end_bgcolor		= '#bbbbbb';
+
+$convo_title_color		= 'black';
+$convo_local_color		= 'blue';
+$convo_remote_color		= 'red';
+
+$convo_title_bgcolor	= '#cccccc';
+$convo_local_bgcolor	= '#dddddd';
+$convo_remote_bgcolor	= '#eeeeee';
 
 /* functions */
 function convert_dir_list ($topdir) {
@@ -95,11 +106,14 @@ if ($_POST['mode'] == "render") {
 				$type = $matches[3];
 				$data = $matches[4];
 
-				if($type == '1') $user = "&lt;<span style='color: $remote_user_color;'>$remoteuser</span>&gt;";
-				if($type == '2') $user = "&lt;<span style='color: $local_user_color;'>$localuser</span>&gt;";
-
-				if($type == '1') $bgcolor = $remote_user_bgcolor;
-				if($type == '2') $bgcolor = $local_user_bgcolor;
+				if($type == '1') {
+					$bgcolor = $convo_remote_bgcolor;
+					$user = "&lt;<span style='color: $convo_remote_color;'>$remoteuser</span>&gt;";
+				}
+				if($type == '2') {
+					$bgcolor = $convo_local_bgcolor;	
+					$user = "&lt;<span style='color: $convo_local_color;'>$localuser</span>&gt;";
+				}
 
 				$time = strftime("%H:%M:%S", $timestamp);
 
@@ -182,33 +196,33 @@ function updatepage(str)
 		/* create titling information if needed */
 		if (!document.getElementById(a[1])) {
 			document.getElementById('im_convos').innerHTML += 
-				"<div id='" + a[1] + "_t' style='width: 100%; background-color: #d9d9f3; color: $protocol_color;'>" + a[1] + "</div>" +
-				"<div id='" + a[1] + "' style='width: 100%; background-color: #e5e5f3;'></div>";
+				"<div id='" + a[1] + "_t' style='width: 100%; background-color: $list_protocol_bgcolor; color: $list_protocol_color;'>" + a[1] + "</div>" +
+				"<div id='" + a[1] + "' style='width: 100%; background-color: $list_local_bgcolor;'></div>";
 		}
 		if (!document.getElementById(a[1] + "_" + a[2])) {
 			var imageref = "";
 			if (a[0]) imageref = "<img src='" + a[0] + "' alt='" + a[1] + "'/>";
 			document.getElementById(a[1]).innerHTML += 
-				"<div id='" + a[1] + "_" + a[2] + "_t' style='width: 100%; color: $local_color; padding-left: 5px;'>" + imageref + a[2] + "</div>" + 
-				"<div id='" + a[1] + "_" + a[2] + "' style='width: 100%; background-color: #efeffa; border-bottom: solid 1px #d9d9f3;'></div>";
+				"<div id='" + a[1] + "_" + a[2] + "_t' style='width: 100%; color: $list_local_color; padding-left: 5px;'>" + imageref + a[2] + "</div>" + 
+				"<div id='" + a[1] + "_" + a[2] + "' style='width: 100%; background-color: $list_remote_bgcolor; border-bottom: solid 1px $list_end_bgcolor;'></div>";
 		}
 		if (!document.getElementById(a[1] + "_" + a[2] + "_" + a[3])) {
 			document.getElementById(a[1] + "_" + a[2]).innerHTML += 
-				"<div id='" + a[1] + "_" + a[2] + "_" + a[3] + "_t' style='width: 100%; color: $remote_color; padding-left: 10px;'>" + a[3] + "</div>" + 
+				"<div id='" + a[1] + "_" + a[2] + "_" + a[3] + "_t' style='width: 100%; color: $list_remote_color; padding-left: 10px;'>" + a[3] + "</div>" + 
 				"<div id='" + a[1] + "_" + a[2] + "_" + a[3] + "' style='width: 100%;'></div>";
 		}
 		if (!document.getElementById(a[1] + "_" + a[2] + "_" + a[3] + "_" + a[4])) {
 			document.getElementById(a[1] + "_" + a[2] + "_" + a[3]).innerHTML += 
 				"<div id='" + a[1] + "_" + a[2] + "_" + a[3] + "_" + a[4] + 
-				"' style='width: 100%; color: $conversation_color; cursor: pointer; padding-left: 15px;' onClick=" + 
+				"' style='width: 100%; color: $list_convo_color; cursor: pointer; padding-left: 15px;' onClick=" + 
 				'"' + "setsection('" + a[1] + "|" + a[2] + "|" + a[3] + "|" + a[4] + "');" + '"' + "' + >&raquo;" + a[4] + "</div>";
 		}
 	}
 
 	/* determine the title of this conversation */
 	var details = parts[1].split(",");
-	var title = details[0] + " conversation between <span style='color: $local_user_color;'>" + details[ 1 ] +
-		"</span> and <span style='color: $remote_user_color;'>" + details[2] + "</span>";
+	var title = details[0] + " conversation between <span style='color: $convo_local_color;'>" + details[ 1 ] +
+		"</span> and <span style='color: $convo_remote_color;'>" + details[2] + "</span>";
 	if (!details[1]) title = "&nbsp;";
 	if (!parts[2]) parts[2] = "&nbsp;";
 
@@ -249,11 +263,12 @@ print($zz);
       <div style='width: 100%; text-align: right;'><span id='im_status' style='display: none;'>Updating</span>&nbsp;</div>
       <table width="100%">
         <tr>
-		  <td width="15%" bgcolor="#efeffa" style="overflow: auto; border: solid 1px #c0c0c0;">
+		<td width="15%" bgcolor="<?=$default_bgcolor?>" style="overflow: auto; border: solid 1px <?=$border_color?>;">
       	    <div id="im_convos" style="height: 400px; overflow: auto; overflow-x: hidden;"></div>
       	  </td>
-          <td width="75%" bgcolor="#efeffa" style="border: solid 1px #c0c0c0;">
-      	    <div id="im_content_title" style="height: 20px; overflow: auto; vertical-align: top; background-color: #d9d9f3;"></div>
+          <td width="75%" bgcolor="<?=$default_bgcolor?>" style="border: solid 1px <?=$border_color?>;">
+			<div id="im_content_title" style="height: 20px; overflow: auto; vertical-align: top; 
+              color: <?=$convo_title_color?>; background-color: <?=$convo_title_bgcolor?>;"></div>
             <div id="im_content" style="height: 380px; overflow: auto; vertical-align: bottom; overflow-x: hidden;"></div>
           </td>
         </tr>
