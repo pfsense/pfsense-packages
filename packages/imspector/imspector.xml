@@ -22,6 +22,17 @@
 		<rcfile>imspector.sh</rcfile>
 		<executable>imspector</executable>
 	</service>
+	<tabs>
+		<tab>
+			<text>IMSpector Log Viewer</text>
+			<url>services_imspector_logs.php</url>
+		</tab>
+		<tab>
+			<text>IMSpector Settings</text>
+			<url>/pkg_edit.php?xml=imspector.xml&amp;id=0</url>
+			<active/>
+		</tab>
+	</tabs>
 	<fields>
 		<field>
 			<fielddescr>Enable IMSpector</fielddescr>
@@ -36,31 +47,40 @@
 			<size>3</size>
 			<type>interfaces_selection</type>
 			<description>You can use the CTRL or COMMAND key to select multiple interfaces.</description>
+			<required/>
 		</field>
 		<field>
-			<fielddescr>Listen on MSN protocol</fielddescr>
-			<fieldname>proto_msn</fieldname>
-			<type>checkbox</type>
-		</field>	
-		<field>
-			<fielddescr>Listen on ICQ/AIM protocol</fielddescr>
-			<fieldname>proto_icqaim</fieldname>
-			<type>checkbox</type>
-		</field>	
-		<field>
-			<fielddescr>Listen on Yahoo protocol</fielddescr>
-			<fieldname>proto_yahoo</fieldname>
-			<type>checkbox</type>
-		</field>	
-		<field>
-			<fielddescr>Listen on IRC protocol</fielddescr>
-			<fieldname>proto_irc</fieldname>
-			<type>checkbox</type>
+			<fielddescr>Listen on protocols</fielddescr>
+			<fieldname>proto_array</fieldname>
+			<multiple>true</multiple>
+			<type>select</type>
+			<size>4</size>
+			<description>You can use the CTRL or COMMAND key to select multiple protocols.</description>
+ 			<options>
+ 				<option>
+ 					<name>MSN</name>
+ 					<value>msn</value>
+ 				</option>
+ 				<option>
+					<name>ICQ/AIM</name>
+ 					<value>icq</value>
+				</option>
+ 				<option>
+					<name>Yahoo</name>
+ 					<value>yahoo</value>
+				</option>
+ 				<option>
+					<name>IRC</name>
+ 					<value>irc</value>
+ 				</option>			
+			</options>
+			<required/>
 		</field>
 		<field>
 			<fielddescr>Enable filtering of bad words</fielddescr>
 			<fieldname>filter_badwords</fieldname>
 			<type>checkbox</type>
+			<description>Replaces words specified in /usr/local/etc/imspector/badwords.txt with *</description>
 		</field>
 		<field>
 			<fielddescr>Enable file logging</fielddescr>
@@ -72,6 +92,7 @@
 			<fielddescr>Enable MySQL logging</fielddescr>
 			<fieldname>log_mysql</fieldname>
 			<type>checkbox</type>
+			<description>Make sure to specify your MySQL credentials below</description>
 		</field>
 		<field>
 			<fielddescr>MySQL Server</fielddescr>

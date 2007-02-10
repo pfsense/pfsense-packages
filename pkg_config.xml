@@ -168,7 +168,7 @@
 	</package>
     <package>
       <name>imspector</name>
-	  <descr>** REQUIRES: 1.0.1-SNAPSHOT-11-24-2006 OR LATER ** IMSpector is an Instant Messenger
+	  <descr>** REQUIRES: 1.0.1-SNAPSHOT-01-22-2006 OR LATER ** IMSpector is an Instant Messenger
       transparent proxy with logging capabilities. Currently it supports MSN, AIM, ICQ, Yahoo and
       IRC to different degrees.</descr>
       <website>http://www.imspector.org/</website>
