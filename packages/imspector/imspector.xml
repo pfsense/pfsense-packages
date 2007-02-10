@@ -5,17 +5,22 @@
 	<version>0.3</version>
 	<savetext>Change</savetext>
 	<include_file>/usr/local/pkg/imspector.inc</include_file>
-	<aftersaveredirect>/pkg_edit.php?xml=imspector.xml&amp;id=0</aftersaveredirect>
+	<aftersaveredirect>/services_imspector_logs.php</aftersaveredirect>
 	<menu>
 		<name>IMSpector</name>
 		<tooltiptext>Set IMSpector settings such as protocols to listen on.</tooltiptext>
 		<section>Services</section>
-		<url>/pkg_edit.php?xml=imspector.xml&amp;id=0</url>
+		<url>/services_imspector_logs.php</url>
 	</menu>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/imspector/imspector.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/imspector/services_imspector_logs.php</item>
 	</additional_files_needed>
 	<service>
 		<name>imspector</name>
@@ -25,7 +30,7 @@
 	<tabs>
 		<tab>
 			<text>IMSpector Log Viewer</text>
-			<url>services_imspector_logs.php</url>
+			<url>/services_imspector_logs.php</url>
 		</tab>
 		<tab>
 			<text>IMSpector Settings</text>
