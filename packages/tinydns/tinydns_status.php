@@ -52,6 +52,7 @@ include("head.inc");
 	$tab_array[] = array(gettext("Domains"), false, "/tinydns_filter.php");
 	$tab_array[] = array(gettext("Status"), true, "/tinydns_status.php");
 	$tab_array[] = array(gettext("Logs"), false, "/tinydns_view_logs.php");
+	$tab_array[] = array(gettext("Logs"), false, "/pkg_edit.php?xml=tinydns_sync.xml&id=0");
 	display_top_tabs($tab_array);
 ?>
 </table>
