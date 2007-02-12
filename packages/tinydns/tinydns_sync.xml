@@ -42,7 +42,7 @@
 			<fieldname>password</fieldname>
 			<fielddescr>Password</fielddescr>
 			<description>Admin password on remote firewall to faciliate sync</description>
-			<type>input</type>
+			<type>password</type>
 		</field>
 	</fields>
 </packagegui>
