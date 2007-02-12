@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
-	<name>tinydns</name>
+	<name>tinydnssync</name>
 	<version>1.0</version>
 	<configpath>installedpackages->package->tinydns</configpath>
 	<title>TinyDNS: Manual Sync</title>
