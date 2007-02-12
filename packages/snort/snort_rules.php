@@ -26,6 +26,7 @@
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
 */
+require("guiconfig.inc");
 
 if(!is_dir("/usr/local/etc/snort/rules"))
 	Header("Location: snort_download_rules.php");
@@ -84,6 +85,9 @@ function load_rule_file($incoming_file)
 
 $ruledir = "/usr/local/etc/snort/rules/";
 $dh  = opendir($ruledir);
+
+$message_reload = "The Snort rule configuration has been changed.<br>You must apply the changes in order for them to take effect.";
+
 while (false !== ($filename = readdir($dh)))
 {
     //only populate this array if its a rule file
@@ -109,88 +113,99 @@ else
 //Load the rule file
 $splitcontents = load_rule_file($file);
 
-
 if ($_POST)
 {
-    //retrieve POST data
-    $post_lineid = $_POST['lineid'];
-    $post_enabled = $_POST['enabled'];
-    $post_src = $_POST['src'];
-    $post_srcport = $_POST['srcport'];
-    $post_dest = $_POST['dest'];
-    $post_destport = $_POST['destport'];
-
-	//clean up any white spaces insert by accident
-	$post_src = str_replace(" ", "", $post_src);
-	$post_srcport = str_replace(" ", "", $post_srcport);
-	$post_dest = str_replace(" ", "", $post_dest);
-	$post_destport = str_replace(" ", "", $post_destport);
-
-    //copy rule contents from array into string
-    $tempstring = $splitcontents[$post_lineid];
-
-    //search string
-    $findme = "# alert"; //find string for disabled alerts
-
-    //find if alert is disabled
-    $disabled = strstr($tempstring, $findme);
-
-    //if find alert is false, then rule is disabled
-    if ($disabled !== false)
-    {
-        //has rule been enabled
-        if ($post_enabled == "yes")
-        {
-            //move counter up 1, so we do not retrieve the # in the rule_content array
-            $tempstring = str_replace("# alert", "alert", $tempstring);
-            $counter2 = 1;
-        }
-        else
-        {
-            //rule is staying disabled
-            $counter2 = 2;
-        }
-    }
-    else
-    {
-        //has rule been disabled
-        if ($post_enabled != "yes")
-        {
-            //move counter up 1, so we do not retrieve the # in the rule_content array
-            $tempstring = str_replace("alert", "# alert", $tempstring);
-            $counter2 = 2;
-        }
-        else
-        {
-            //rule is staying enabled
-            $counter2 = 1;
-        }
-    }
-
-    //explode rule contents into an array, (delimiter is space)
-    $rule_content = explode(' ', $tempstring);
-
-	//insert new values
-    $counter2++;
-    $rule_content[$counter2] = $post_src;//source location
-    $counter2++;
-    $rule_content[$counter2] = $post_srcport;//source port location
-    $counter2 = $counter2+2;
-    $rule_content[$counter2] = $post_dest;//destination location
-    $counter2++;
-    $rule_content[$counter2] = $post_destport;//destination port location
-
-	//implode the array back into string
-	$tempstring = implode(' ', $rule_content);
-
-	//copy string into file array for writing
-    $splitcontents[$post_lineid] = $tempstring;
-
-    //write the new .rules file
-    write_rule_file($splitcontents, $file);
-
-    //once file has been written, reload file
-    $splitcontents = load_rule_file($file);
+	if (!$_POST['apply']) {
+	    //retrieve POST data
+	    $post_lineid = $_POST['lineid'];
+	    $post_enabled = $_POST['enabled'];
+	    $post_src = $_POST['src'];
+	    $post_srcport = $_POST['srcport'];
+	    $post_dest = $_POST['dest'];
+	    $post_destport = $_POST['destport'];
+	
+		//clean up any white spaces insert by accident
+		$post_src = str_replace(" ", "", $post_src);
+		$post_srcport = str_replace(" ", "", $post_srcport);
+		$post_dest = str_replace(" ", "", $post_dest);
+		$post_destport = str_replace(" ", "", $post_destport);
+	
+	    //copy rule contents from array into string
+	    $tempstring = $splitcontents[$post_lineid];
+	
+	    //search string
+	    $findme = "# alert"; //find string for disabled alerts
+	
+	    //find if alert is disabled
+	    $disabled = strstr($tempstring, $findme);
+	
+	    //if find alert is false, then rule is disabled
+	    if ($disabled !== false)
+	    {
+	        //has rule been enabled
+	        if ($post_enabled == "yes")
+	        {
+	            //move counter up 1, so we do not retrieve the # in the rule_content array
+	            $tempstring = str_replace("# alert", "alert", $tempstring);
+	            $counter2 = 1;
+	        }
+	        else
+	        {
+	            //rule is staying disabled
+	            $counter2 = 2;
+	        }
+	    }
+	    else
+	    {
+	        //has rule been disabled
+	        if ($post_enabled != "yes")
+	        {
+	            //move counter up 1, so we do not retrieve the # in the rule_content array
+	            $tempstring = str_replace("alert", "# alert", $tempstring);
+	            $counter2 = 2;
+	        }
+	        else
+	        {
+	            //rule is staying enabled
+	            $counter2 = 1;
+	        }
+	    }
+	
+	    //explode rule contents into an array, (delimiter is space)
+	    $rule_content = explode(' ', $tempstring);
+	
+		//insert new values
+	    $counter2++;
+	    $rule_content[$counter2] = $post_src;//source location
+	    $counter2++;
+	    $rule_content[$counter2] = $post_srcport;//source port location
+	    $counter2 = $counter2+2;
+	    $rule_content[$counter2] = $post_dest;//destination location
+	    $counter2++;
+	    $rule_content[$counter2] = $post_destport;//destination port location
+	
+		//implode the array back into string
+		$tempstring = implode(' ', $rule_content);
+	
+		//copy string into file array for writing
+	    $splitcontents[$post_lineid] = $tempstring;
+	
+	    //write the new .rules file
+	    write_rule_file($splitcontents, $file);
+	
+	    //once file has been written, reload file
+	    $splitcontents = load_rule_file($file);
+	    
+	    $stopMsg = true;
+	}
+	
+	if ($_POST['apply']) {
+		stop_service("snort");
+		sleep(2);
+		start_service("snort");
+		$savemsg = "The snort rules selections have been saved. Restarting Snort.";
+		$stopMsg = false;
+	}
 
 }
 else if ($_GET['act'] == "toggle")
@@ -233,9 +248,9 @@ else if ($_GET['act'] == "toggle")
 
     //once file has been written, reload file
     $splitcontents = load_rule_file($file);
-
+    
+    $stopMsg = true;
 }
-
 
 
 $pgtitle = "Snort: Rules";
@@ -246,7 +261,10 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle"><?=$pgtitle?></p>
-
+<form action="snort_rules.php" method="post" name="iform" id="iform">
+<?php if ($savemsg){print_info_box($savemsg);} else if ($stopMsg){print_info_box_np($message_reload);}?>
+<br>
+</form>
 <script type="text/javascript" language="javascript" src="row_toggle.js">
     <script src="/javascript/sorttable.js" type="text/javascript">
 </script>
@@ -255,7 +273,7 @@ include("head.inc");
 <!--
 function go()
 {
-    box = document.forms[0].selectbox;
+    box = document.forms[1].selectbox;
     destination = box.options[box.selectedIndex].value;
     if (destination) location.href = destination;
 }
