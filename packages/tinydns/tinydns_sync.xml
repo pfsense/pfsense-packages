@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>tinydns</name>
+	<version>1.0</version>
+	<configpath>installedpackages->package->tinydns</configpath>
+	<title>TinyDNS: Manual Sync</title>
+	<custom_php_install_command>
+		tinydns_custom_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		tinydns_custom_php_deinstall_command();
+	</custom_php_deinstall_command>
+	<custom_php_resync_config_command>
+		tinydns_do_xmlrpc_sync($ipaddress, $password);
+	</custom_php_resync_config_command>
+	<include_file>/usr/local/pkg/tinydns.inc</include_file>
+	<fields>
+		<field>
+			<fieldname>ipaddress</fieldname>
+			<fielddescr>IP Address</fielddescr>
+			<description>The IP address that TinyDNS will Sync its data to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fieldname>password</fieldname>
+			<fielddescr>Password</fielddescr>
+			<description>Admin password on remote firewall to faciliate sync</description>
+			<type>input</type>
+		</field>
+	</fields>
+</packagegui>

@@ -75,6 +75,11 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_view_logs.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_sync.xml</item>
+	</additional_files_needed>
 	<custom_php_install_command>
 		tinydns_custom_php_install_command();
 	</custom_php_install_command>

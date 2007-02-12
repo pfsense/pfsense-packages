@@ -356,4 +356,67 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname,$rdns)
 		return $record_data;
 }
 
+function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
+	global $config, $g;
+
+	if(!$password)
+		return;
+
+	log_error("[tinydns] tinydns_xmlrpc_sync.php is starting to {$sync_to_ip}.");
+	$xmlrpc_sync_neighbor = $sync_to_ip;
+    if($config['system']['webgui']['protocol'] != "") {
+		$synchronizetoip = $config['system']['webgui']['protocol'];
+		$synchronizetoip .= "://";
+    }
+    $port = $config['system']['webgui']['port'];
+    /* if port is empty lets rely on the protocol selection */
+    if($port == "") {
+		if($config['system']['webgui']['protocol'] == "http") {
+			$port = "80";
+		} else {
+			$port = "443";
+		}
+    }
+	$synchronizetoip .= $sync_to_ip;
+
+	/* xml will hold the sections to sync */
+	$xml = array();
+	$xml['installedpackages']['tinydns'] = $config['installedpackages']['tinydns'];
+	$xml['installedpackages']['tinydnsdomains'] = $config['installedpackages']['tinydnsdomains'];
+
+	//print_r($xml);
+
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($xml)
+	);
+
+	/* set a few variables needed for sync code borrowed from filter.inc */
+	$url = $synchronizetoip;
+	$method = 'pfsense.merge_config_section';
+
+	/* Sync! */
+	log_error("Beginning tinydns XMLRPC sync to {$url}:{$port}.");
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials('admin', $password);
+	if($g['debug'])
+		$cli->setDebug(1);
+	/* send our XMLRPC message and timeout after 240 seconds */
+	$resp = $cli->send($msg, "999");
+	if(!$resp) {
+		$error = "A communications error occured while attempting tinydns XMLRPC sync with {$url}:{$port}.";
+		log_error($error);
+		file_notice("sync_settings", $error, "tinydns Settings Sync", "");
+	} elseif($resp->faultCode()) {
+		$error = "An error code was received while attempting tinydns XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error($error);
+		file_notice("sync_settings", $error, "tinydns Settings Sync", "");
+	} else {
+		log_error("tinydns XMLRPC sync successfully completed with {$url}:{$port}.");
+	}
+	log_error("[tinydns] tinydns_xmlrpc_sync.php is ending.");
+}
+
 ?>
