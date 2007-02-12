@@ -301,7 +301,7 @@ function tinydns_create_zone_file() {
 							$wanpingthreshold = "";
 						$status = tinydns_get_record_status($row['failoverip'], $pingthreshold, $wanpingthreshold);
 						if($status == "DOWN") {
-							$record_data = tinydns_get_rowline_data($row['failoverip'], $domain['recordtype'], $ttl, $hostname);
+							$record_data = tinydns_get_rowline_data($row['failoverip'], $domain['recordtype'], $ttl, $hostname, "");
 							fwrite($fd, $record_data . "\n");
 						}
 					}
