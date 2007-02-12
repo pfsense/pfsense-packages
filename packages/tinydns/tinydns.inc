@@ -255,7 +255,7 @@ function tinydns_create_zone_file() {
 	config_lock();
 	if(file_exists("/service/tinydns/root/data"))
 		exec("rm -f /service/tinydns/root/data");
-	if(!isdir("/service/tinydns/root")) 
+	if(!is_dir("/service/tinydns/root")) 
 		return;
 	$fd = fopen("/service/tinydns/root/data", "w");
 	if(!$fd) {
