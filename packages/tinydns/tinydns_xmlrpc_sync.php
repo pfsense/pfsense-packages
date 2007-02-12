@@ -43,7 +43,7 @@ if(!$config) {
 	if($config['installedpackages']['carpsettings']['config'])
 		$password = $config['installedpackages']['carpsettings']['config'][0]['password'];
 	if($config['installedpackages']['carpsettings']['config'])
-	$syncip = $config['installedpackages']['carpsettings']['config'][0]['synchronizetoip'];
+		$syncip = $config['installedpackages']['carpsettings']['config'][0]['synchronizetoip'];
 	if($config['installedpackages']['carpsettings']['config'])
 		$syncxmlrpc = $config['installedpackages']['tinydns']['config'][0]['syncxmlrpc'];
 	

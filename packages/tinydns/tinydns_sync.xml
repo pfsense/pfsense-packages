@@ -11,7 +11,7 @@
 		tinydns_custom_php_deinstall_command();
 	</custom_php_deinstall_command>
 	<custom_php_resync_config_command>
-		tinydns_do_xmlrpc_sync($ipaddress, $password);
+		tinydns_do_xmlrpc_sync($_POST['ipaddress'], $_POST['password']);
 	</custom_php_resync_config_command>
 	<include_file>/usr/local/pkg/tinydns.inc</include_file>
 	<fields>
