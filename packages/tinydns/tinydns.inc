@@ -149,17 +149,22 @@ function tinydns_custom_php_changeip_command() {
 function tinydns_get_record_status($record, $pingthreshold = "", $wanpingthreshold = "") {
 	global $g, $config;
 	if(file_exists("/var/db/pingstatus/{$record}")) {
+		$status = "";
 		$status = file_get_contents("/var/db/pingstatus/{$record}");
 		if(stristr($status,"DOWN"))
 			return "DOWN";
 	}
 	if($pingthreshold) {
-		$current_ms = file_get_contents("/var/db/pingmsstatus/$record");
+		$current_ms = "";
+		if(file_exists("var/db/pingmsstatus/$record")) 
+			$current_ms = file_get_contents("/var/db/pingmsstatus/$record");
 		if($pingthreshold > $current_ms)
 			return "DOWN";
 	}
 	if($wanpingthreshold) {
-		$current_avg = file_get_contents("/var/db/wanaverage");
+		$current_avg = "";
+		if(file_exists("/var/db/wanaverage")) 
+			$current_avg = file_get_contents("/var/db/wanaverage");
 		if($wanpingthreshold > $current_avg)
 			return "DOWN";
 	}
