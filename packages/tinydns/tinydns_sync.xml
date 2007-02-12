@@ -4,12 +4,6 @@
 	<version>1.0</version>
 	<configpath>installedpackages->package->tinydns</configpath>
 	<title>TinyDNS: Manual Sync</title>
-	<custom_php_install_command>
-		tinydns_custom_php_install_command();
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		tinydns_custom_php_deinstall_command();
-	</custom_php_deinstall_command>
 	<custom_php_resync_config_command>
 		tinydns_do_xmlrpc_sync($_POST['ipaddress'], $_POST['password']);
 	</custom_php_resync_config_command>
