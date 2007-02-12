@@ -253,7 +253,10 @@ function tinydns_create_zone_file() {
 		unlink("/tmp/config.cache");
 	parse_config(true);
 	config_lock();
-	exec("rm -f /service/tinydns/root/data");
+	if(file_exists("/service/tinydns/root/data"))
+		exec("rm -f /service/tinydns/root/data");
+	if(!isdir("/service/tinydns/root")) 
+		return;
 	$fd = fopen("/service/tinydns/root/data", "w");
 	if(!$fd) {
 		log_error("Could not open /service/tinydns/root/data for writing.");
