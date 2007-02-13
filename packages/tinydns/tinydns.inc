@@ -156,14 +156,14 @@ function tinydns_get_record_status($record, $pingthreshold = "", $wanpingthresho
 	}
 	if($pingthreshold) {
 		$current_ms = "";
-		if(file_exists("var/db/pingmsstatus/$record")) 
+		if(file_exists("var/db/pingmsstatus/$record"))
 			$current_ms = file_get_contents("/var/db/pingmsstatus/$record");
 		if($pingthreshold > $current_ms)
 			return "DOWN";
 	}
 	if($wanpingthreshold) {
 		$current_avg = "";
-		if(file_exists("/var/db/wanaverage")) 
+		if(file_exists("/var/db/wanaverage"))
 			$current_avg = file_get_contents("/var/db/wanaverage");
 		if($wanpingthreshold > $current_avg)
 			return "DOWN";
@@ -260,7 +260,7 @@ function tinydns_create_zone_file() {
 	config_lock();
 	if(file_exists("/service/tinydns/root/data"))
 		exec("rm -f /service/tinydns/root/data");
-	if(!is_dir("/service/tinydns/root")) 
+	if(!is_dir("/service/tinydns/root"))
 		return;
 	$fd = fopen("/service/tinydns/root/data", "w");
 	if(!$fd) {
@@ -348,7 +348,7 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname,$rdns)
 				$record_data = "={$hostname}:{$recordip}{$ttl_string}";
 				else
 				/* "+" creates "A" records only to allow forward DNS */
-					$record_data = "+{$hostname}:{$recordip}{$ttl_string}";					
+					$record_data = "+{$hostname}:{$recordip}{$ttl_string}";
 				break;
 			case "CNAME":
 				$record_data = "C{$hostname}:{$recordip}{$ttl_string}";
@@ -365,6 +365,9 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 	global $config, $g;
 
 	if(!$password)
+		return;
+
+	if(!$sync_to_ip)
 		return;
 
 	log_error("[tinydns] tinydns_xmlrpc_sync.php is starting to {$sync_to_ip}.");
