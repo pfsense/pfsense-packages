@@ -141,7 +141,7 @@ function tinydns_custom_php_changeip_command() {
 	exec("/bin/mkdir /service");
 	exec("/bin/ln -s /etc/tinydns /service/");
 	exec("echo $ip > /service/tinydns/env/IP");
-	exec("killall -9 tinydns");
+	exec("/usr/bin/killall -9 tinydns");
 	conf_mount_ro();
 	filter_configure();
 }
@@ -345,9 +345,9 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname,$rdns)
 			case "A":
 				/* "=" creates both "A" and "PTR" records to allow both forward and reverse DNS */
 				if($rdns)
-				$record_data = "={$hostname}:{$recordip}{$ttl_string}";
+					$record_data = "={$hostname}:{$recordip}{$ttl_string}";
 				else
-				/* "+" creates "A" records only to allow forward DNS */
+					/* "+" creates "A" records only to allow forward DNS */
 					$record_data = "+{$hostname}:{$recordip}{$ttl_string}";
 				break;
 			case "CNAME":
@@ -370,7 +370,6 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 	if(!$sync_to_ip)
 		return;
 
-
 	$xmlrpc_sync_neighbor = $sync_to_ip;
     if($config['system']['webgui']['protocol'] != "") {
 		$synchronizetoip = $config['system']['webgui']['protocol'];
@@ -391,8 +390,6 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 	$xml = array();
 	$xml['installedpackages']['tinydns'] = $config['installedpackages']['tinydns'];
 	$xml['installedpackages']['tinydnsdomains'] = $config['installedpackages']['tinydnsdomains'];
-
-	//print_r($xml);
 
 	/* assemble xmlrpc payload */
 	$params = array(
