@@ -370,7 +370,7 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 	if(!$sync_to_ip)
 		return;
 
-	log_error("[tinydns] tinydns_xmlrpc_sync.php is starting to {$sync_to_ip}.");
+
 	$xmlrpc_sync_neighbor = $sync_to_ip;
     if($config['system']['webgui']['protocol'] != "") {
 		$synchronizetoip = $config['system']['webgui']['protocol'];
@@ -405,14 +405,14 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 	$method = 'pfsense.merge_config_section';
 
 	/* Sync! */
-	log_error("Beginning tinydns XMLRPC sync to {$url}:{$port}.");
+	log_error("Beginning TinyDNS XMLRPC sync to {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
 	$cli->setCredentials('admin', $password);
 	if($g['debug'])
 		$cli->setDebug(1);
-	/* send our XMLRPC message and timeout after 240 seconds */
-	$resp = $cli->send($msg, "999");
+	/* send our XMLRPC message and timeout after 250 seconds */
+	$resp = $cli->send($msg, "250");
 	if(!$resp) {
 		$error = "A communications error occured while attempting tinydns XMLRPC sync with {$url}:{$port}.";
 		log_error($error);
