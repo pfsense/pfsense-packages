@@ -10,7 +10,11 @@
 			<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Domains</text>
+			<text>Registered Domains</text>
+			<url>/tinydns_dhcp_filter.php</url>
+		</tab>
+		<tab>
+			<text>Add Domains</text>
 			<url>/tinydns_filter.php</url>
 			<active/>
 		</tab>

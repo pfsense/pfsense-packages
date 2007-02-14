@@ -4,6 +4,7 @@
 /*
 	tinydns.inc
 	Copyright (C) 2006 Scott Ullrich
+	Parts Copyright (C) 2007 Goffredo Andreone
 	part of pfSense
 	All rights reserved.
 
@@ -40,6 +41,9 @@ function tinydns_custom_php_install_command() {
 		return;
 	}
 
+	if($config['installedpackages']['tinydns']['config'][0]['bind2lan'])
+		$ip = $config['interfaces']['lan']['ipaddr'];
+	else
 	$ip = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
 
 	$minsegment = "10240";
@@ -132,6 +136,12 @@ function tinydns_custom_php_deinstall_command() {
 function tinydns_custom_php_changeip_command() {
 	global $g, $config;
 	conf_mount_rw();
+	if($config['installedpackages']['tinydns']['config'][0]['bind2lan'])
+		{
+		$ip = $config['interfaces']['lan']['ipaddr'];
+/* Does not work??		$config['installedpackages']['tinydns']['config'][0]['ipaddress'] = $ip; */
+		}
+	else
 	$ip = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
 	$updatecron = $config['installedpackages']['tinydns']['config'][0]['updatecron'];
 	/* setup daemon tools service area */
@@ -267,6 +277,43 @@ function tinydns_create_zone_file() {
 		log_error("Could not open /service/tinydns/root/data for writing.");
 		return;
 	}
+	
+	/* Bind TinyDNS to LAN IP and register SOA for Forward and Reverse DNS */
+	if($config['installedpackages']['tinydns']['config'][0]['bind2lan']) {
+		if($config['system']['hostname']['domain']) {
+			$dhcpdhostname = $config['system']['hostname'];		
+			if($config['dhcpd']['lan'])$dhcpddomain = $config['system']['domain'];
+			$dhcpdlanip = $config['interfaces']['lan']['ipaddr'];		
+			$dhcpdipmask = $config['interfaces']['lan']['subnet'];		
+			$dhcpdfqdn = "{$dhcpdhostname}.{$dhcpddomain}";
+			tinydns_complete_soa_record($fd, $dhcpdlanip, $dhcpdipmask, $dhcpdhostname, $dhcpddomain);
+		}
+	}
+
+	/* Register Static IPs */
+	if($config['installedpackages']['tinydns']['config'][0]['regdhcpstatic']) {
+		if(is_array($config['dhcpd']['lan']['staticmap'])) {
+			foreach($config['dhcpd']['lan']['staticmap'] as $dhcpdstatic){
+				$dhcpdhostname = $dhcpdstatic['hostname'];
+				$dhcpdfqdn = "{$dhcpdhostname}.{$dhcpddomain}";
+				$dhcpdlanip = $dhcpdstatic['ipaddr'];
+				$dhcpda = "={$dhcpdfqdn}:{$dhcpdlanip}";
+				if($dhcpdhostname)fwrite($fd, $dhcpda . "\n");
+			}
+		}
+	}
+
+	/* Register Dynamic IPs */
+	if($config['installedpackages']['tinydns']['config'][0]['regdhcp']) {
+		$leasesfile = "{$g['dhcpd_chroot_path']}/var/db/dhcpd.leases";
+		$fl = fopen($leasesfile, "r");
+		if(!$fl) {
+			log_error("Could not open {$leasesfile} for reading.");
+			return;
+		}
+		tinydns_add_active_leases($fl,$fd, $dhcpddomain);
+	}
+	
 	if($config['installedpackages']['tinydnsdomains']) {
 		foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
 			$record_data = "";
@@ -319,46 +366,6 @@ function tinydns_create_zone_file() {
 	exec("cd /service/tinydns/root && /usr/local/bin/tinydns-data");
 	config_unlock();
 	conf_mount_ro();
-}
-
-/* formats data as a tinydns data row item */
-/* A full description of the data format is available at 'man tinydns-data' */
-function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname,$rdns) {
-		if($ttl)
-			$ttl_string = ":{$ttl}";
-		else
-			$ttl_string = "";
-		switch ($recordtype) {
-			case "SOA":
-				$record_data = ".{$hostname}::{$recordip}{$ttl_string}";
-				break;
-			case "NS":
-				$record_data = "&{$hostname}:{$recordip}{$ttl_string}";
-				break;
-			case "MX":
-				$record_data = "@{$hostname}:{$recordip}::{$ttl_string}";
-				break;
-			case "PTR":
-				/* "^" creates "PTR" record only to allow reverse DNS */
-				$record_data = "^{$hostname}:{$recordip}{$ttl_string}";
-				break;
-			case "A":
-				/* "=" creates both "A" and "PTR" records to allow both forward and reverse DNS */
-				if($rdns)
-					$record_data = "={$hostname}:{$recordip}{$ttl_string}";
-				else
-					/* "+" creates "A" records only to allow forward DNS */
-					$record_data = "+{$hostname}:{$recordip}{$ttl_string}";
-				break;
-			case "CNAME":
-				$record_data = "C{$hostname}:{$recordip}{$ttl_string}";
-				break;
-			case "TXT":
-				/* "'" creates "TXT" record that can be used for SPF */
-				$record_data = "'{$hostname}:{$recordip}{$ttl_string}";
-				break;
-		}
-		return $record_data;
 }
 
 function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
@@ -423,5 +430,187 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 	}
 	log_error("[tinydns] tinydns_xmlrpc_sync.php is ending.");
 }
+/* formats data as a tinydns data row item */
+/* A full description of the data format is available at 'man tinydns-data' */
+function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns) {
+		if($ttl)
+			$ttl_string = ":{$ttl}";
+		else
+			$ttl_string = "";
+		switch ($recordtype) {
+			case "SOA":
+				$record_data = ".{$hostname}::{$recordip}{$ttl_string}";
+				break;
+			case "NS":
+				$record_data = "&{$hostname}:{$recordip}{$ttl_string}";
+				break;
+			case "MX":
+				$record_data = "@{$hostname}:{$recordip}::{$ttl_string}";
+				break;
+			case "PTR":
+				/* "^" creates "PTR" record only to allow reverse DNS */
+				$record_data = "^{$hostname}:{$recordip}{$ttl_string}";
+				break;
+			case "A":
+				/* "=" creates both "A" and "PTR" records to allow both forward and reverse DNS */
+				if($rdns)
+					$record_data = "={$hostname}:{$recordip}{$ttl_string}";
+				else
+				/* "+" creates "A" records only to allow forward DNS */
+					$record_data = "+{$hostname}:{$recordip}{$ttl_string}";					
+				break;
+			case "CNAME":
+				$record_data = "C{$hostname}:{$recordip}{$ttl_string}";
+				break;
+			case "TXT":
+				/* "'" creates "TXT" record that can be used for SPF */
+				$record_data = "'{$hostname}:{$recordip}{$ttl_string}";
+				break;
+		}
+		return $record_data;
+}
+/* Returns the last IP byte and the Trimmed IP*/
+function tinydns_get_lastip_byte($ipsub){
+	$len= strlen($ipsub); 	
+	$pos = strrpos($ipsub, ".");
+	$last_byte = "";
+	if ($pos === false){ $last_byte = $ipsub; return array ($last_byte,$ipsub); } 
+	$last_byte = substr($ipsub,$pos + 1);
+	$ipsub = substr($ipsub,0,$pos);
+	return array ($last_byte,$ipsub);
+}
 
+/* in-add.arpa IP calculated from D.C.B.A and Mask to A.B.C.D.in-addr.arpa */
+function tinydns_get_arpa_ip($ip, $ipmask){
+	$ipsub = $ip;	
+	$arpaip = "";	
+	$array = tinydns_get_lastip_byte($ipsub);
+	$a = $array[0];
+	$ipsub = $array[1];
+	$array = tinydns_get_lastip_byte($ipsub);
+	$b = $array[0];
+	$ipsub = $array[1];
+	$array = tinydns_get_lastip_byte($ipsub);
+	$c = $array[0];
+	$ipsub = $array[1];
+	$array = tinydns_get_lastip_byte($ipsub);
+	$d = $array[0];
+	$ipsub = $array[1];
+	switch ($ipmask){
+		case ($ipmask <= 32 AND $ipmask > 24):
+			$s = 32 - $ipmask;
+			$a >> $s;
+			$arpaip = "{$a}.{$b}.{$c}.{$d}.in-addr.arpa";
+			break;
+		case ($ipmask <= 24 AND $ipmask > 16):
+			$s = 24 - $ipmask;
+			$b >> $s;
+			$arpaip = "{$b}.{$c}.{$d}.in-addr.arpa";
+			break;
+		case ($ipmask <= 16 AND $ipmask > 8):
+			$s = 16 - $ipmask;
+			$c >> $s;
+			$arpaip = "{$c}.{$d}.in-addr.arpa";
+			break;
+		case ($ipmask <= 8 AND $ipmask > 0):
+			$s = 8 - $ipmask;
+			$d >> $s;
+			$arpaip = "{$d}.in-addr.arpa";
+			break;
+		}
+	return 	$arpaip;
+}
+
+/* Create a Forward and a Reverse DNS (SOA, A, PTR) records for Fully Qualififed Domain Name*/
+function tinydns_complete_soa_record($fd, $ip, $ipmask, $nsname, $domain){
+	$fqdn = "{$nsname}.{$domain}";
+	$rip = tinydns_get_arpa_ip($ip, $ipmask);
+	$soa = ".{$domain}::{$fqdn}";
+	$rsoa = ".{$rip}::{$fqdn}";
+	$a = "={$fqdn}:{$ip}";
+	if($fqdn)fwrite($fd, $soa . "\n");
+	if($rip)fwrite($fd, $rsoa . "\n");
+	if($nsname)fwrite($fd, $a . "\n");
+}
+
+/* Search for active leases in the dhcpd.leases file and add them to tinyDNS */
+function tinydns_add_active_leases($fl,$fd, $leasedomain){
+	$i = 0;
+	$lip = strlen("lease") + 1;
+	$lis = strlen("binding state active");
+	$lic = strlen("client-hostname");
+	while (!feof($fl)) {
+		$leases = fgets($fl, 4096);
+		$discard = ($leases[0] == "#") OR ($leases[0] == "\n"); 
+		if(!$discard){
+			if($leaseip == ""){
+				if ($leaseip = strstr($leases,"lease")){
+					$leaseip = substr($leaseip,$lip,strpos($leases,"{") - $lip - 1);
+				}
+			}
+			elseif($leasestatus == FALSE){
+				if (stristr($leases,"binding state active")){
+					$leasestatus = TRUE;
+				}
+			}
+			elseif($leasestatus == TRUE AND $leasehostname == ""){
+				if($leasehostname = stristr($leases,"client-hostname")){
+					$qstrt = strpos($leasehostname,'"') + 1;
+					$qlen  = strrpos($leasehostname,'"') - $qstrt;
+					$leasehostname = substr($leasehostname,$qstrt,$qlen);
+				}
+			}
+			if($leases[0] == "}"){
+				$leasefqdn = "{$leasehostname}.{$leasedomain}";
+				$leasea = "={$leasefqdn}:{$leaseip}";
+				if($leasehostname AND $leasestatus)fwrite($fd, $leasea . "\n");
+				$leaseip = "";
+				$leasehostname = "";
+				$leasestatus = FALSE;
+			}
+			$i = $i + 1;
+		}
+	}
+	fclose($fl);
+	$leaselines = $i;
+}
+function tinydns_get_dns_record_type($tinydnsrecord){
+	$rtype = ""; $rtyte2 = ""; $rdns = "";
+	switch ($tinydnsrecord) {
+		case($tinydnsrecord[0] == "."):
+			$rtype = "SOA";
+			$rtype2 = "NS";
+			break;
+		case($tinydnsrecord[0] == "="):
+			$rtype = "A";
+			$rtype2 = "PTR";
+			$rdns = "on";
+			break;
+		case($tinydnsrecord[0] == "+"):
+			$rtype = "A";
+			break;
+		case($tinydnsrecord[0] == "@"):
+			$rtype = "MX";
+			break;
+		case($tinydnsrecord[0] == "^"):
+			$rtype = "PTR";
+			$rdns = "on";
+			break;
+		case($tinydnsrecord[0] == "&"):
+			$rtype = "NS";
+			break;
+		case($tinydnsrecord[0] == "'"):
+			$rtype = "TXT";
+			break;
+		case($tinydnsrecord[0] == "C"):
+			$rtype = "CNAME";
+			break;
+		case($tinydnsrecord[0] == "Z"):
+			$rtype = "SOA";
+			break;
+		default:
+			$rtype = "";
+	}
+	return array ($rtype, $rtype2, $rdns);
+}
 ?>

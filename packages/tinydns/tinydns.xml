@@ -17,7 +17,11 @@
 			<active/>
 		</tab>
 		<tab>
-			<text>Domains</text>
+			<text>Registered Domains</text>
+			<url>/tinydns_dhcp_filter.php</url>
+		</tab>
+		<tab>
+			<text>Add Domains</text>
 			<url>/tinydns_filter.php</url>
 		</tab>
 		<tab>
@@ -52,10 +56,20 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
+	<item>http://www.pfsense.com/packages/config/tinydns/tinydns_dhcp_domains.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_status.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_dhcp_filter.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_filter.php</item>
 	</additional_files_needed>
@@ -99,9 +113,27 @@
 	<include_file>/usr/local/pkg/tinydns.inc</include_file>
 	<fields>
 		<field>
+		 	<fielddescr>Bind TinyDNS to LAN</fielddescr>
+			<fieldname>bind2lan</fieldname>
+			<description>Set this option to bind TinyDNS to the LAN IP and sets up the LAN with SOA, NS, A, and PTR Records.</description>
+			<type>checkbox</type>
+		</field>		
+		<field>
+		 	<fielddescr>Register DHCP static mappings with TinyDNS</fielddescr>
+			<fieldname>regdhcpstatic</fieldname>
+			<description>Register DHCP static IPs with TinyDNS using the Fully Qualified Domain Name specified in System: General.</description>
+			<type>checkbox</type>
+		</field>		
+		<field>
+		 	<fielddescr>Register DHCP leases with TinyDNS</fielddescr>
+			<fieldname>regdhcp</fieldname>
+			<description>Register a valid DHCP hostname with TinyDNS using the Fully Qualified Domain Name specified in System: General.</description>
+			<type>checkbox</type>
+		</field>		
+		<field>
 			<fieldname>ipaddress</fieldname>
 			<fielddescr>IP Address</fielddescr>
-			<description>The IP address that TinyDNS will bind to.</description>
+			<description>TinyDNS is bound to this IP address if Bind TinyDNS to LAN is not set.</description>
 			<type>input</type>
 		</field>
 		<field>
