@@ -3,7 +3,7 @@
 	status_nut.php
 	part of pfSense (http://www.pfsense.com/)
 
-	Copyright (C) 2006 Ryan Wagoner <ryan@wgnrs.dynu.com>.
+	Copyright (C) 2007 Ryan Wagoner <ryan@wgnrs.dynu.com>.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -60,11 +60,18 @@ include("head.inc");
 </table>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
-	<td class="tabcont">
+	<td>
+      <table width="100%" class="tabcont" cellspacing="0" cellpadding="6">
 <?php
 	if($nut_config['monitor'] == 'local') {
-		/* grab values from upsc */
+		print("<tr><td class=\"vncellreq\">Monitoring:</td><td class=\"vtable\">Local UPS</td><tr>\n");
 		$handle = popen("upsc {$nut_config['name']}@localhost","r");
+	} elseif($nut_config['monitor'] == 'remote') {
+		print("<tr><td class=\"vncellreq\">Monitoring:</td><td class=\"vtable\">Remote UPS</td><tr>\n");
+		$handle = popen("upsc {$nut_config['remotename']}@{$nut_config['remoteaddr']}","r");
+	}
+
+	if($handle) {
 		$read = fread($handle, 4096);
 		pclose($handle);
 
@@ -73,21 +80,47 @@ include("head.inc");
 		$ups = array();
 		foreach($read as $line) {
 			$line = explode(':', $line);
-			$ups[$line[0]] = $line[1];
+			$ups[$line[0]] = trim($line[1]);
 		}
+	
+		print("<tr><td class=\"vncellreq\">Model:</td><td class=\"vtable\">{$ups['ups.model']}</td><tr>\n");
 
-		print("Status: {$ups['ups.status']}<br />");
-		print("Battery Charge: {$ups['battery.charge']}<br />");
-		print("Battery Voltage: {$ups['battery.voltage']}<br />");
-		print("Input Voltage: {$ups['input.voltage']}<br />");
-		print("Output Voltage: {$ups['output.voltage']}<br />");
-		
-		/*print('<pre>'); print_r($ups); print('</pre>');*/
+		print('<tr><td width="100px" class="vncellreq">Status:</td><td class="vtable">');
+		$status = explode(' ',$ups['ups.status']);
+		foreach($status as $condition) {
+			switch ($condition) {
+				case WAIT:
+					print('Waiting... ');
+					break;
+				case OL:
+					print('On Line ');
+					break;
+				case LB:
+					print('Battery Low ');
+					break;
+			}
+		}
+		print("</td><tr>\n");
+
+		print("<tr><td class=\"vncellreq\">Load:</td><td class=\"vtable\">{$ups['ups.load']}%</td><tr>\n");
+		print("<tr><td class=\"vncellreq\">Battery Charge:</td><td class=\"vtable\">{$ups['battery.charge']}%</td><tr>\n");
+		print("<tr><td class=\"vncellreq\">Battery Voltage:</td><td class=\"vtable\">{$ups['battery.voltage']}</td><tr>\n");
+		print("<tr><td class=\"vncellreq\">Input Voltage:</td><td class=\"vtable\">{$ups['input.voltage']}V</td><tr>\n");
+		print("<tr><td class=\"vncellreq\">Output Voltage:</td><td class=\"vtable\">{$ups['output.voltage']}V</td><tr>\n");
+		print("<tr><td class=\"vncellreq\">Temperature:</td><td class=\"vtable\">{$ups['ups.temperature']}</td><tr>\n");
+	} else {
+		/* display error */
+		print("<tr><td class=\"vncellreq\">ERROR:</td><td class=\"vtable\">Can\'t parse data from upsc!</td><tr>\n");
 	}
 ?>
+	  </table>
     </td>
   </tr>
 </table>
+<?php 
+	/* display upsc array */
+	/*print('<pre>'); print_r($ups); print('</pre>');*/
+?>
 </div>
 <?php include("fend.inc"); ?>
 </body>
