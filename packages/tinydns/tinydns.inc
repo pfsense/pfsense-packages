@@ -422,6 +422,8 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 		log_error($error);
 		file_notice("sync_settings", $error, "tinydns Settings Sync", "");
 	} elseif($resp->faultCode()) {
+		$cli->setDebug(1);
+		$resp = $cli->send($msg, "250");
 		$error = "An error code was received while attempting tinydns XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
 		file_notice("sync_settings", $error, "tinydns Settings Sync", "");
