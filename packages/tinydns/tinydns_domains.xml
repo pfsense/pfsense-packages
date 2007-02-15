@@ -12,10 +12,6 @@
 		<tab>
 			<text>Registered Domains</text>
 			<url>/tinydns_dhcp_filter.php</url>
-		</tab>
-		<tab>
-			<text>Add Domains</text>
-			<url>/tinydns_filter.php</url>
 			<active/>
 		</tab>
 		<tab>

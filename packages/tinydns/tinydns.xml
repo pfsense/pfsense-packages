@@ -21,10 +21,6 @@
 			<url>/tinydns_dhcp_filter.php</url>
 		</tab>
 		<tab>
-			<text>Add Domains</text>
-			<url>/tinydns_filter.php</url>
-		</tab>
-		<tab>
 			<text>Status</text>
 			<url>/tinydns_status.php</url>
 		</tab>
