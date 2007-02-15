@@ -50,6 +50,7 @@ if(!$config) {
 	/* option enabled? */
 	if($syncxmlrpc)
 		if($syncip)
-			tinydns_do_xmlrpc_sync($syncip, $password)
+			if($password)
+				tinydns_do_xmlrpc_sync($syncip, $password)
 
 ?>
