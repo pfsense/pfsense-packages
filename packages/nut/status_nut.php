@@ -64,10 +64,10 @@ include("head.inc");
       <table width="100%" class="tabcont" cellspacing="0" cellpadding="6">
 <?php
 	if($nut_config['monitor'] == 'local') {
-		print("<tr><td class=\"vncellreq\">Monitoring:</td><td class=\"vtable\">Local UPS</td><tr>\n");
+		print("<tr><td width=\"100px\" class=\"vncellreq\">Monitoring:</td><td class=\"vtable\">Local UPS</td><tr>\n");
 		$handle = popen("upsc {$nut_config['name']}@localhost","r");
 	} elseif($nut_config['monitor'] == 'remote') {
-		print("<tr><td class=\"vncellreq\">Monitoring:</td><td class=\"vtable\">Remote UPS</td><tr>\n");
+		print("<tr><td width=\"100px\" class=\"vncellreq\">Monitoring:</td><td class=\"vtable\">Remote UPS</td><tr>\n");
 		$handle = popen("upsc {$nut_config['remotename']}@{$nut_config['remoteaddr']}","r");
 	}
 
@@ -85,7 +85,7 @@ include("head.inc");
 	
 		print("<tr><td class=\"vncellreq\">Model:</td><td class=\"vtable\">{$ups['ups.model']}</td><tr>\n");
 
-		print('<tr><td width="100px" class="vncellreq">Status:</td><td class="vtable">');
+		print('<tr><td class="vncellreq">Status:</td><td class="vtable">');
 		$status = explode(' ',$ups['ups.status']);
 		foreach($status as $condition) {
 			switch ($condition) {
@@ -97,6 +97,9 @@ include("head.inc");
 					break;
 				case LB:
 					print('Battery Low ');
+					break;
+				default:
+					print("{$condition} ");
 					break;
 			}
 		}

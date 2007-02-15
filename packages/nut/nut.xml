@@ -142,7 +142,7 @@
 					<value>bestups03</value>
 				</option>
 				<option>
-						<name>Best Power Patriot (Generic/Cable)</name>
+					<name>Best Power Patriot (Generic/Cable)</name>
 					<value>genericups03</value>
 				</option>	
 				<option>
@@ -188,7 +188,11 @@
 				<option>
 					<name>Cyber Power Systems 1500AVR</name>
 					<value>cyberpower08</value>
-				</option>		
+				</option>	
+				<option>
+					<name>Inform GUARD Line Interactive</name>
+					<value>powercom00</value>
+				</option>
 				<option>
 					<name>Meta System HF Line</name>
 					<value>metasys00</value>
@@ -300,7 +304,23 @@
 				<option>
 					<name>Mustek Powermust USB</name>
 					<value>megatec02</value>
-				</option>					
+				</option>
+				<option>
+					<name>Powercom SMK</name>
+					<value>megatec03</value>
+				</option>
+				<option>
+					<name>Powercom ULT</name>
+					<value>megatec04</value>
+				</option>
+				<option>
+					<name>Powercom Trust</name>
+					<value>powercom01</value>
+				</option>		
+				<option>
+					<name>Powercom Various</name>
+					<value>powercom02</value>
+				</option>			
 				<option>
 					<name>Tripp-Lite SmartUPS</name>
 					<value>tripplite00</value>
@@ -308,6 +328,14 @@
 				<option>
 					<name>Tripp-Lite SmartOnline</name>
 					<value>tripplitesu00</value>
+				</option>
+				<option>
+					<name>Tripp-Lite AVR USB</name>
+					<value>newhidups13</value>
+				</option>			
+				<option>
+					<name>Tripp-Lite OMNI USB</name>
+					<value>newhidups14</value>
 				</option>
 				<option>
 					<name>Tripp-Lite OMNIVUS USB</name>
