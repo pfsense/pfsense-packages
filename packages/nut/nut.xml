@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<title>Services: NUT</title>
+	<name>nut</name>
+	<version>2.0.5</version>
+	<savetext>Change</savetext>
+	<include_file>/usr/local/pkg/nut.inc</include_file>
+	<aftersaveredirect>/status_nut.php</aftersaveredirect>
+	<menu>
+		<name>NUT</name>
+		<tooltiptext>Set Network UPS Tools settings.</tooltiptext>
+		<section>Services</section>
+		<url>/status_nut.php</url>
+	</menu>
+	<additional_files_needed>
+		<item>http://www.pfsense.com/packages/config/nut/nut.inc</item>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.com/packages/config/nut/status_nut.php</item>
+	    <prefix>/usr/local/www/</prefix>
+	    <chmod>0755</chmod>
+	</additional_files_needed>
+	<service>
+		<name>nut</name>
+		<rcfile>nut.sh</rcfile>
+		<executable>upsmon</executable>
+	</service>
+	<tabs>
+		<tab>
+			<text>NUT Status</text>
+			<url>/status_nut.php</url>
+		</tab>
+		<tab>
+			<text>NUT Settings</text>
+			<url>/pkg_edit.php?xml=nut.xml&amp;id=0</url>
+			<active/>
+		</tab>
+	</tabs>
+	<fields>		
+		<field>
+			<fielddescr>UPS Monitoring</fielddescr>
+			<fieldname>monitor</fieldname>
+			<type>select</type>
+			<required/>
+			<options>
+				<option>
+					<name>Disabled</name>
+					<value></value>
+				</option>					
+				<option>
+					<name>Local UPS</name>
+					<value>local</value>
+				</option>	
+				<option>
+					<name>Remote UPS</name>
+					<value>remote</value>
+				</option>
+			</options>
+		</field>			
+		<field>
+			<fielddescr>Local UPS Name</fielddescr>
+			<fieldname>name</fieldname>
+			<type>input</type>
+		</field>			
+		<field>
+			<fielddescr>Local UPS Model</fielddescr>
+			<fieldname>driver</fieldname>
+			<type>select</type>
+			<options>
+				<option>
+					<name>APC Back-UPS (Generic/Cable)</name>
+					<value>genericups00</value>
+				</option>	
+				<option>
+					<name>APC Back-UPS RS (Generic/Cable)</name>
+					<value>genericups02</value>
+				</option>			
+				<option>
+					<name>APC Back-UPS Pro (Cable)</name>
+					<value>apcsmart00</value>
+				</option>					
+				<option>
+					<name>APC Smart-UPS (Cable)</name>
+					<value>apcsmart01</value>
+				</option>
+				<option>
+					<name>APC Matrix-UPS</name>
+					<value>apcsmart02</value>
+				</option>	
+				<option>
+					<name>APC Masterswitch (Generic/Cable)</name>
+					<value>genericups01</value>
+				</option>			
+				<option>
+					<name>APC Back-UPS USB</name>
+					<value>newhidups03</value>
+				</option>
+				<option>
+					<name>APC Back-UPS LS USB</name>
+					<value>newhidups00</value>
+				</option>	
+				<option>
+					<name>APC Back-UPS ES USB</name>
+					<value>newhidups01</value>
+				</option>				
+				<option>
+					<name>APC Back-UPS Pro USB</name>
+					<value>newhidups02</value>
+				</option>
+				<option>
+					<name>APC Smart-UPS USB</name>
+					<value>newhidups03</value>
+				</option>					
+				<option>
+					<name>Belkin Regulator Pro</name>
+					<value>belkin00</value>
+				</option>
+				<option>
+					<name>Belkin Universal UPS</name>
+					<value>belkinunv00</value>
+				</option>
+				<option>
+					<name>Belkin Universal UPS USB</name>
+					<value>newhidups04</value>
+				</option>
+				<option>
+					<name>Best Power Fortress</name>
+					<value>bestups00</value>
+				</option>
+				<option>
+					<name>Best Power Fortress Telecom</name>
+					<value>bestups01</value>
+				</option>
+				<option>
+					<name>Best Power Axxium Rackmount</name>
+					<value>bestups02</value>
+				</option>	
+				<option>
+					<name>Best Power Patriot Pro</name>
+					<value>bestups03</value>
+				</option>
+				<option>
+						<name>Best Power Patriot (Generic/Cable)</name>
+					<value>genericups03</value>
+				</option>	
+				<option>
+					<name>Best Power Micro-Ferrups</name>
+					<value>bestuferrups00</value>
+				</option>
+				<option>
+					<name>Best Power Fortress/Ferrups</name>
+					<value>bestfcom00</value>
+				</option>			
+				<option>
+					<name>Cyber Power Systems 320AVR</name>
+					<value>cyberpower00</value>
+				</option>
+				<option>
+					<name>Cyber Power Systems 500AVR</name>
+					<value>cyberpower01</value>
+				</option>
+				<option>
+					<name>Cyber Power Systems 650AVR</name>
+					<value>cyberpower02</value>
+				</option>			
+				<option>
+					<name>Cyber Power Systems 700AVR</name>
+					<value>cyberpower03</value>
+				</option>
+				<option>
+					<name>Cyber Power Systems 800AVR</name>
+					<value>cyberpower04</value>
+				</option>
+				<option>
+					<name>Cyber Power Systems 850AVR</name>
+					<value>cyberpower05</value>
+				</option>			
+				<option>
+					<name>Cyber Power Systems 900AVR</name>
+					<value>cyberpower06</value>
+				</option>
+				<option>
+					<name>Cyber Power Systems 1250AVR</name>
+					<value>cyberpower07</value>
+				</option>
+				<option>
+					<name>Cyber Power Systems 1500AVR</name>
+					<value>cyberpower08</value>
+				</option>		
+				<option>
+					<name>Meta System HF Line</name>
+					<value>metasys00</value>
+				</option>	
+				<option>
+					<name>Meta System HF Millennium</name>
+					<value>metasys01</value>
+				</option>	
+				<option>
+					<name>Meta System HF TOP Line</name>
+					<value>metasys02</value>
+				</option>	
+				<option>
+					<name>Meta System ECO Network</name>
+					<value>metasys03</value>
+				</option>	
+				<option>
+					<name>Meta System ECO</name>
+					<value>metasys04</value>
+				</option>	
+				<option>
+					<name>Meta System ally HF</name>
+					<value>metasys05</value>
+				</option>
+				<option>
+					<name>Meta System Megaline</name>
+					<value>metasys06</value>
+				</option>	
+				<option>
+					<name>MGE UPS SYSTEMS NOVA AVR</name>
+					<value>mge-shut00</value>
+				</option>
+				<option>
+					<name>MGE UPS SYSTEMS Pulsar Ellipse</name>
+					<value>mge-shut01</value>
+				</option>	
+				<option>
+					<name>MGE UPS SYSTEMS Ellipse Office</name>
+					<value>mge-shut02</value>
+				</option>	
+				<option>
+					<name>MGE UPS SYSTEMS Pulsar EXtreme</name>
+					<value>mge-shut03</value>
+				</option>	
+				<option>
+					<name>MGE UPS SYSTEMS Comet</name>
+					<value>mge-shut04</value>
+				</option>	
+				<option>
+					<name>MGE UPS SYSTEMS Pulsar Esprit</name>
+					<value>mge-shut05</value>
+				</option>	
+				<option>
+					<name>MGE UPS SYSTEMS Evolution</name>
+					<value>mge-shut06</value>
+				</option>	
+				<option>
+					<name>MGE UPS SYSTEMS Comet USB</name>
+					<value>newhidups05</value>
+				</option>	
+				<option>
+					<name>MGE UPS SYSTEMS Protection Center USB</name>
+					<value>newhidups06</value>
+				</option>
+				<option>
+					<name>MGE UPS SYSTEMS NOVA AVR USB</name>
+					<value>newhidups07</value>
+				</option>
+				<option>
+					<name>MGE UPS SYSTEMS Pulsar Ellipse USB</name>
+					<value>newhidups08</value>
+				</option>
+				<option>
+					<name>MGE UPS SYSTEMS Ellipse Office USB</name>
+					<value>newhidups09</value>
+				</option>
+				<option>
+					<name>MGE UPS SYSTEMS Pulsar Evolution USB</name>
+					<value>newhidups10</value>
+				</option>
+				<option>
+					<name>MGE UPS SYSTEMS Evolution USB</name>
+					<value>newhidups11</value>
+				</option>	
+				<option>
+					<name>MGE UPS SYSTEMS Pulsar USB</name>
+					<value>newhidups12</value>
+				</option>			
+				<option>
+					<name>MicroDowell B.Box BP</name>
+					<value>cpsups00</value>
+				</option>
+				<option>
+					<name>Microsol Solis</name>
+					<value>solis00</value>
+				</option>
+				<option>
+					<name>Microsol Rhino</name>
+					<value>rhino00</value>
+				</option>	
+				<option>
+					<name>Mustek Various</name>
+					<value>megatec00</value>
+				</option>
+				<option>
+					<name>Mustek Powermust</name>
+					<value>megatec01</value>
+				</option>	
+				<option>
+					<name>Mustek Powermust USB</name>
+					<value>megatec02</value>
+				</option>					
+				<option>
+					<name>Tripp-Lite SmartUPS</name>
+					<value>tripplite00</value>
+				</option>	
+				<option>
+					<name>Tripp-Lite SmartOnline</name>
+					<value>tripplitesu00</value>
+				</option>
+				<option>
+					<name>Tripp-Lite OMNIVUS USB</name>
+					<value>tripplite_usb00</value>
+				</option>
+				<option>
+					<name>Tripp-Lite SMART USB</name>
+					<value>tripplite_usb01</value>
+				</option>			
+			</options>
+		</field>
+		<field>
+			<fielddescr>Local UPS Port</fielddescr>
+			<fieldname>port</fieldname>
+			<type>select</type>
+			<options>
+				<option>
+					<name>auto (USB only)</name>
+					<value>auto</value>
+				</option>	
+			</options>		
+		</field>	
+		<field>
+			<fielddescr>Local UPS Generic Type (optional)</fielddescr>
+			<fieldname>upstype</fieldname>
+			<type>select</type>
+			<options>
+				<option>
+					<value></value>
+					<name></name>
+				</option>					
+				<option>
+					<value>1 00</value>
+					<name>1 (APC Back-UPS)</name>
+				</option>
+				<option>
+					<value>2 00</value>
+					<name>2 (APC Back-UPS)</name>
+				</option>
+				<option>
+					<value>9 00</value>
+					<name>9 (APC Back-UPS)</name>
+				</option>
+				<option>
+					<value>12 00</value>
+					<name>12 (APC Back-UPS Office)</name>
+				</option>				
+				<option>
+					<value>12 01</value>
+					<name>12 (APC Masterswitch)</name>
+				</option>
+				<option>
+					<value>20 00</value>
+					<name>20 (APC Back-UPS RS)</name>
+				</option>			
+				<option>
+					<value>6 00</value>
+					<name>6 (Best Power Patriot)</name>
+				</option>			
+			</options>
+		</field>	
+		<field>
+			<fielddescr>Local UPS Cable Type (optional)</fielddescr>
+			<fieldname>cable</fieldname>
+			<type>select</type>
+			<options>
+				<option>
+					<value></value>
+					<name></name>
+				</option>	
+				<option>
+					<value>940-0020B 00</value>
+					<name>940-0020B (APC Back-Ups - Simple Signalling - Gray Cable)</name>
+				</option>			
+				<option>
+					<value>940-0020C 00</value>
+					<name>940-0020C (APC Back-Ups - Simple Signalling)</name>
+				</option>					
+				<option>
+					<value>940-0023A 00</value>
+					<name>940-0023A (APC Back-Ups - Simple Signalling)</name>
+				</option>				
+				<option>
+					<value>940-0119A 00</value>
+					<name>940-0119A (APC Back-Ups Office - Simple Signalling - Phone Jack Cable)</name>
+				</option>		
+				<option>
+					<value>940-0095A 00</value>
+					<name>940-0095A (APC Back-Ups Pro - Smart Signalling)</name>
+				</option>			
+				<option>
+					<value>940-0095B 00</value>
+					<name>940-0095B (APC Back-Ups Pro - Smart Signalling - Gray Cable)</name>
+				</option>
+				<option>
+					<value>940-0095C 00</value>
+					<name>940-0095C (APC Back-Ups Pro - Smart Signalling)</name>
+				</option>
+				<option>
+					<value>940-0024B 00</value>
+					<name>940-0024B (APC Smart-Ups - Smart Signalling)</name>
+				</option>			
+				<option>
+					<value>940-0024C 00</value>
+					<name>940-0024C (APC Smart-Ups - Smart Signalling - Black Cable)</name>
+				</option>	
+				<option>
+					<value>940-0024G 00</value>
+					<name>940-0024G (APC Smart-Ups - Smart Signalling)</name>
+				</option>			
+				<option>
+					<value>940-0020 00</value>
+					<name>940-0020 (APC Masterswitch - Simple Signalling - Gray Cable)</name>
+				</option>			
+				<option>
+					<value>INT51 00</value>
+					<name>INT51 (Best Power Patriot)</name>
+				</option>			
+			</options>
+		</field>
+		<field>
+			<fielddescr>Local Remote Access Address &lt;br&gt;(ex: 192.168.1.0/24) (optional)</fielddescr>
+			<fieldname>allowaddr</fieldname>
+			<type>input</type>
+		</field>	
+		<field>
+			<fielddescr>Local Remote Access User (optional)</fielddescr>
+			<fieldname>allowuser</fieldname>
+			<type>input</type>
+		</field>	
+		<field>
+			<fielddescr>Local Remote Acces Password (optional)</fielddescr>
+			<fieldname>allowpass</fieldname>
+			<type>password</type>
+		</field>	
+		<field>
+			<fielddescr>Remote UPS Name</fielddescr>
+			<fieldname>remotename</fieldname>
+			<type>input</type>
+		</field>	
+		<field>
+			<fielddescr>Remote UPS Address &lt;br&gt;(ex: 192.168.1.10)</fielddescr>
+			<fieldname>remoteaddr</fieldname>
+			<type>input</type>
+		</field>	
+		<field>
+			<fielddescr>Remote UPS User</fielddescr>
+			<fieldname>remoteuser</fieldname>
+			<type>input</type>
+		</field>	
+		<field>
+			<fielddescr>Remote UPS Password</fielddescr>
+			<fieldname>remotepass</fieldname>
+			<type>password</type>
+		</field>	
+	</fields>
+	<custom_php_command_before_form>
+		before_form_nut(&amp;$pkg);
+	</custom_php_command_before_form>
+	<custom_php_validation_command>
+		validate_form_nut($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		sync_package_nut();	
+	</custom_php_resync_config_command>
+	<custom_php_deinstall_command>
+		deinstall_package_nut();
+	</custom_php_deinstall_command>
+</packagegui>

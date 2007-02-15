@@ -191,7 +191,7 @@
       <status>ALPHA</status>
       <required_version>1.0</required_version>
       <maintainer>ryan@wgnrs.dynu.com</maintainer>
-	  <config_file>http://www.pfsense.com/packages/config/nut.xml</config_file>
+	  <config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
 	  <configurationfile>nut.xml</configurationfile>
 	  <depends_on_package_base_url>ftp://ftp-mirror.internap.com/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
       <depends_on_package>nut-2.0.5.tbz</depends_on_package>
