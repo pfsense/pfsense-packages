@@ -17,8 +17,12 @@
 			<active/>
 		</tab>
 		<tab>
-			<text>Registered Domains</text>
+			<text>View Domains</text>
 			<url>/tinydns_dhcp_filter.php</url>
+		</tab>
+		<tab>
+			<text>Add Domains</text>
+			<url>/tinydns_filter.php</url>
 		</tab>
 		<tab>
 			<text>Status</text>

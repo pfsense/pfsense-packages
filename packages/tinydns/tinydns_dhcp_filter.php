@@ -46,7 +46,7 @@ include("head.inc");
 <?php
 	$tab_array = array();
 	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=tinydns.xml&id=0");
-	$tab_array[] = array(gettext("Registered Domains"), true, "/tinydns_dhcp_filter.php");
+	$tab_array[] = array(gettext("View Domains"), true, "/tinydns_dhcp_filter.php");
 	$tab_array[] = array(gettext("Add Domains"), false, "/tinydns_filter.php");
 	$tab_array[] = array(gettext("Status"), false, "/tinydns_status.php");
 	$tab_array[] = array(gettext("Logs"), false, "/tinydns_view_logs.php");

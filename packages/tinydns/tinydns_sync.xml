@@ -14,7 +14,7 @@
 			<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Registered Domains</text>
+			<text>View Domains</text>
 			<url>/tinydns_dhcp_filter.php</url>
 		</tab>
 		<tab>
