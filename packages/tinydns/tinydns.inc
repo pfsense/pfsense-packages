@@ -577,7 +577,7 @@ function tinydns_add_active_leases($fl,$fd, $leasedomain){
 	$leaselines = $i;
 }
 function tinydns_get_dns_record_type($tinydnsrecord){
-	$rtype = ""; $rtyte2 = ""; $rdns = "";
+	$rtype = ""; $rtype2 = ""; $rdns = "";
 	switch ($tinydnsrecord) {
 		case($tinydnsrecord[0] == "."):
 			$rtype = "SOA";
