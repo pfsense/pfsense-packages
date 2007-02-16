@@ -32,7 +32,56 @@ require("guiconfig.inc");
 
 $nut_config = $config['installedpackages']['nut']['config'][0];
 
-/* Defaults to this page but if no settings are present, redirect to setup page */
+/* functions */
+
+function tblrow ($name, $value) {
+	print(<<<EOD
+<tr>
+  <td class="vncellreq" width="100px">{$name}</td>
+  <td class="vtable">{$value}</td>
+<tr>
+EOD
+	."\n");
+}
+
+function tblrowbar ($name, $value, $red, $yellow, $green) {
+	$red = explode('-',$red);
+	$yellow = explode('-',$yellow);
+	$green = explode('-',$green);
+
+	sort($red);
+	sort($yellow);
+	sort($green);
+
+	if($value >= $red[0] && $value <= $red[1]) {
+		$color = 'white';
+		$bgcolor = 'red';
+	}
+	if($value >= $yellow[0] && $value <= $yellow[1]) {
+		$color = 'black';
+		$bgcolor = 'yellow';
+	}
+	if($value >= $green[0] && $value <= $green[1]) {
+		$color = 'white';
+		$bgcolor = 'green';
+	}
+
+	print(<<<EOD
+<tr>
+  <td class="vncellreq" width="100px">{$name}</td>
+  <td class="vtable">
+    <div style="width: 125px; height: 12px; border-top: thin solid gray; border-bottom: thin solid gray;">
+      <div style="width: {$value}%; height: 12px; background-color: {$bgcolor};">
+        <div style="text-align: center; color: {$color}">{$value}%</div>
+      </div>
+    </div>
+  </td>
+<tr>
+EOD
+	."\n");
+}
+
+/* defaults to this page but if no settings are present, redirect to setup page */
 if(!$nut_config['monitor'])
 	Header("Location: /pkg_edit.php?xml=nut.xml&id=0");
 
@@ -64,10 +113,10 @@ include("head.inc");
       <table width="100%" class="tabcont" cellspacing="0" cellpadding="6">
 <?php
 	if($nut_config['monitor'] == 'local') {
-		print("<tr><td width=\"100px\" class=\"vncellreq\">Monitoring:</td><td class=\"vtable\">Local UPS</td><tr>\n");
+		tblrow('Monitoring:','Local UPS');
 		$handle = popen("upsc {$nut_config['name']}@localhost","r");
 	} elseif($nut_config['monitor'] == 'remote') {
-		print("<tr><td width=\"100px\" class=\"vncellreq\">Monitoring:</td><td class=\"vtable\">Remote UPS</td><tr>\n");
+		tblrow('Monitoring:','Remote UPS');
 		$handle = popen("upsc {$nut_config['remotename']}@{$nut_config['remoteaddr']}","r");
 	}
 
@@ -82,38 +131,40 @@ include("head.inc");
 			$line = explode(':', $line);
 			$ups[$line[0]] = trim($line[1]);
 		}
-	
-		print("<tr><td class=\"vncellreq\">Model:</td><td class=\"vtable\">{$ups['ups.model']}</td><tr>\n");
 
-		print('<tr><td class="vncellreq">Status:</td><td class="vtable">');
+		tblrow('Model:',$ups['ups.model']);
+
 		$status = explode(' ',$ups['ups.status']);
 		foreach($status as $condition) {
 			switch ($condition) {
 				case WAIT:
-					print('Waiting... ');
+					$disp_status .= 'Waiting... ';
 					break;
 				case OL:
-					print('On Line ');
+					$disp_status .= 'On Line ';
+					break;
+				case OB:
+					$disp_status .= 'On Battery ';
 					break;
 				case LB:
-					print('Battery Low ');
+					$disp_status .= 'Battery Low ';
 					break;
 				default:
-					print("{$condition} ");
+					$disp_status .= $condition.' ';
 					break;
 			}
 		}
-		print("</td><tr>\n");
+		tblrow('Status:',$disp_status);
 
-		print("<tr><td class=\"vncellreq\">Load:</td><td class=\"vtable\">{$ups['ups.load']}%</td><tr>\n");
-		print("<tr><td class=\"vncellreq\">Battery Charge:</td><td class=\"vtable\">{$ups['battery.charge']}%</td><tr>\n");
-		print("<tr><td class=\"vncellreq\">Battery Voltage:</td><td class=\"vtable\">{$ups['battery.voltage']}</td><tr>\n");
-		print("<tr><td class=\"vncellreq\">Input Voltage:</td><td class=\"vtable\">{$ups['input.voltage']}V</td><tr>\n");
-		print("<tr><td class=\"vncellreq\">Output Voltage:</td><td class=\"vtable\">{$ups['output.voltage']}V</td><tr>\n");
-		print("<tr><td class=\"vncellreq\">Temperature:</td><td class=\"vtable\">{$ups['ups.temperature']}</td><tr>\n");
+		tblrowbar('Load:',$ups['ups.load'],'100-80','79-60','59-0');
+		tblrowbar('Battery Charge:',$ups['battery.charge'],'0-29','30-79','80-100');
+		tblrow('Battery Voltage:',$ups['battery.voltage'].'V');
+		tblrow('Input Voltage:',$ups['input.voltage'].'V');
+		tblrow('Output Voltage:',$ups['output.voltage'].'V');
+		tblrow('Temperature:',$ups['ups.temperature'].'&deg;');
 	} else {
 		/* display error */
-		print("<tr><td class=\"vncellreq\">ERROR:</td><td class=\"vtable\">Can\'t parse data from upsc!</td><tr>\n");
+		tblrow('ERROR:','Can\'t parse data from upsc!');
 	}
 ?>
 	  </table>
