@@ -60,12 +60,12 @@
 			</options>
 		</field>			
 		<field>
-			<fielddescr>Local UPS Name</fielddescr>
+			<fielddescr>&lt;strong&gt;Local UPS Name&lt;/strong&gt;</fielddescr>
 			<fieldname>name</fieldname>
 			<type>input</type>
 		</field>			
 		<field>
-			<fielddescr>Local UPS Model</fielddescr>
+			<fielddescr>&lt;strong&gt;Local UPS Model&lt;/strong&gt;</fielddescr>
 			<fieldname>driver</fieldname>
 			<type>select</type>
 			<description>If generic or cable specified in parenthesis you need 
@@ -350,7 +350,7 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>Local UPS Port</fielddescr>
+			<fielddescr>&lt;strong&gt;Local UPS Port&lt;/strong&gt;</fielddescr>
 			<fieldname>port</fieldname>
 			<type>select</type>
 			<options>
@@ -361,7 +361,7 @@
 			</options>		
 		</field>	
 		<field>
-			<fielddescr>Local UPS Generic Type (optional)</fielddescr>
+			<fielddescr>Local UPS Generic Type</fielddescr>
 			<fieldname>upstype</fieldname>
 			<type>select</type>
 			<options>
@@ -400,7 +400,7 @@
 			</options>
 		</field>	
 		<field>
-			<fielddescr>Local UPS Cable Type (optional)</fielddescr>
+			<fielddescr>Local UPS Cable Type</fielddescr>
 			<fieldname>cable</fieldname>
 			<type>select</type>
 			<options>
@@ -419,37 +419,37 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>Local Remote Access Address &lt;br&gt;(ex: 192.168.1.0/24) (optional)</fielddescr>
+			<fielddescr>Local Remote Access Address &lt;br&gt;(ex: 192.168.1.0/24)</fielddescr>
 			<fieldname>allowaddr</fieldname>
 			<type>input</type>
 		</field>	
 		<field>
-			<fielddescr>Local Remote Access User (optional)</fielddescr>
+			<fielddescr>Local Remote Access User</fielddescr>
 			<fieldname>allowuser</fieldname>
 			<type>input</type>
 		</field>	
 		<field>
-			<fielddescr>Local Remote Acces Password (optional)</fielddescr>
+			<fielddescr>Local Remote Acces Password</fielddescr>
 			<fieldname>allowpass</fieldname>
 			<type>password</type>
 		</field>	
 		<field>
-			<fielddescr>Remote UPS Name</fielddescr>
+			<fielddescr>&lt;strong&gt;Remote UPS Name&lt;/strong&gt;</fielddescr>
 			<fieldname>remotename</fieldname>
 			<type>input</type>
 		</field>	
 		<field>
-			<fielddescr>Remote UPS Address &lt;br&gt;(ex: 192.168.1.10)</fielddescr>
+			<fielddescr>&lt;strong&gt;Remote UPS Address&lt;/strong&gt; &lt;br&gt;(ex: 192.168.1.10)</fielddescr>
 			<fieldname>remoteaddr</fieldname>
 			<type>input</type>
 		</field>	
 		<field>
-			<fielddescr>Remote UPS User</fielddescr>
+			<fielddescr>&lt;strong&gt;Remote UPS User&lt;/strong&gt;</fielddescr>
 			<fieldname>remoteuser</fieldname>
 			<type>input</type>
 		</field>	
 		<field>
-			<fielddescr>Remote UPS Password</fielddescr>
+			<fielddescr>&lt;strong&gt;Remote UPS Password&lt;/strong&gt;</fielddescr>
 			<fieldname>remotepass</fieldname>
 			<type>password</type>
 		</field>	

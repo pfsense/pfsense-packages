@@ -38,13 +38,13 @@ function tblrow ($name, $value) {
 	print(<<<EOD
 <tr>
   <td class="vncellreq" width="100px">{$name}</td>
-  <td class="vtable">{$value}</td>
+  <td class="vtable">{$value}{$symbol}</td>
 <tr>
 EOD
 	."\n");
 }
 
-function tblrowbar ($name, $value, $red, $yellow, $green) {
+function tblrowbar ($name, $value, $symbol, $red, $yellow, $green) {
 	$red = explode('-',$red);
 	$yellow = explode('-',$yellow);
 	$green = explode('-',$green);
@@ -71,8 +71,8 @@ function tblrowbar ($name, $value, $red, $yellow, $green) {
   <td class="vncellreq" width="100px">{$name}</td>
   <td class="vtable">
     <div style="width: 125px; height: 12px; border-top: thin solid gray; border-bottom: thin solid gray;">
-      <div style="width: {$value}%; height: 12px; background-color: {$bgcolor};">
-        <div style="text-align: center; color: {$color}">{$value}%</div>
+      <div style="width: {$value}{$symbol}; height: 12px; background-color: {$bgcolor};">
+        <div style="text-align: center; color: {$color}">{$value}{$symbol}</div>
       </div>
     </div>
   </td>
@@ -136,28 +136,44 @@ include("head.inc");
 
 		$status = explode(' ',$ups['ups.status']);
 		foreach($status as $condition) {
+			if($disp_status) $disp_status .= ', ';
 			switch ($condition) {
-				case WAIT:
-					$disp_status .= 'Waiting... ';
+				case 'WAIT':
+					$disp_status .= 'Waiting';
 					break;
-				case OL:
-					$disp_status .= 'On Line ';
+				case 'OL':
+					$disp_status .= 'On Line';
 					break;
-				case OB:
-					$disp_status .= 'On Battery ';
+				case 'OB':
+					$disp_status .= 'On Battery';
 					break;
-				case LB:
-					$disp_status .= 'Battery Low ';
+				case 'TRIM':
+					$disp_status .= 'SmartTrim';
 					break;
+				case 'BOOST':
+					$disp_status .= 'SmartBoost';
+					break;
+				case 'OVER':
+					$disp_status .= 'Overload';
+					break;
+				case 'LB':
+					$disp_status .= 'Battery Low';
+					break;
+				case 'RB':
+					$disp_status .= 'Replace Battery';
+					break;
+				case 'CAL':
+					$disp_status .= 'Calibration';
+					break;					
 				default:
-					$disp_status .= $condition.' ';
+					$disp_status .= $condition;
 					break;
 			}
 		}
 		tblrow('Status:',$disp_status);
 
-		tblrowbar('Load:',$ups['ups.load'],'100-80','79-60','59-0');
-		tblrowbar('Battery Charge:',$ups['battery.charge'],'0-29','30-79','80-100');
+		tblrowbar('Load:',$ups['ups.load'],'%','100-80','79-60','59-0');
+		tblrowbar('Battery Charge:',$ups['battery.charge'],'%','0-29','30-79','80-100');
 		tblrow('Battery Voltage:',$ups['battery.voltage'].'V');
 		tblrow('Input Voltage:',$ups['input.voltage'].'V');
 		tblrow('Output Voltage:',$ups['output.voltage'].'V');
