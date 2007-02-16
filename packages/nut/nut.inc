@@ -70,11 +70,24 @@
 		if($uid) chown($file, $uid);
 	}
 
-	function nut_validate_ip($ip) {
-		if(!eregi("^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$", $ip))
-			return false;   
-		foreach(explode('.', $ip) as $sub)
-			if($sub < 0 || $sub > 256) 
+	function nut_validate_ip($ip,$check_cdir) {
+		/* validate cdir */	
+		if($check_cdir)	{
+			$ip_array = explode("/",$ip);
+			if(count($ip_array) == 2) {
+				if($ip_array[1] < 1 || $ip_array[1] > 32)
+					return false;
+			} else
+				if(count($ip_array) != 1)
+					return false;
+		} else
+			$ip_array[] = $ip;
+
+		/* validate ip */
+		if(!eregi("^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$", $ip_array[0]))
+			return false;
+		foreach(explode(".", $ip_array[0]) as $sub)
+			if($sub < 0 || $sub > 256)
 				return false;
 		return true;
 	}
@@ -117,7 +130,7 @@
 		if($post['monitor'] == 'remote') {
 			if(!$post['remotename'])
 				$input_errors[] = 'You must specify a name in the \'Remote Name\' field';
-			if(!$post['remoteaddr'] || !nut_validate_ip($post['remoteaddr']))
+			if(!$post['remoteaddr'] || !nut_validate_ip($post['remoteaddr'],false))
 				$input_errors[] = 'You must specify a valid address \'Remote Address\' field';
 			if(!$post['remoteuser'])
 				$input_errors[] = 'You must specify a name in the \'Remote User\' field';
@@ -133,6 +146,8 @@
 				$input_errors[] = 'You must select a driver in the \'Driver\' field';
 			if(!$post['port'])
 				$input_errors[] = 'You must select a port in the \'Port\' field';
+			if($post['allowaddr'] && !nut_validate_ip($post['allowaddr'],true))
+				$input_errors[] = 'You must specify a valid address \'Local Remote Access Address\' field';
 		}
 
 		/* this is run before the config file changed */

@@ -68,13 +68,15 @@
 			<fielddescr>Local UPS Model</fielddescr>
 			<fieldname>driver</fieldname>
 			<type>select</type>
+			<description>If generic or cable specified in parenthesis you need 
+				to select the appropriate option below.</description>
 			<options>
 				<option>
-					<name>APC Back-UPS (Generic/Cable)</name>
+					<name>APC Back-UPS (Generic)</name>
 					<value>genericups00</value>
 				</option>	
 				<option>
-					<name>APC Back-UPS RS (Generic/Cable)</name>
+					<name>APC Back-UPS RS (Generic)</name>
 					<value>genericups02</value>
 				</option>			
 				<option>
@@ -90,7 +92,7 @@
 					<value>apcsmart02</value>
 				</option>	
 				<option>
-					<name>APC Masterswitch (Generic/Cable)</name>
+					<name>APC Masterswitch (Generic)</name>
 					<value>genericups01</value>
 				</option>			
 				<option>
@@ -369,23 +371,23 @@
 				</option>					
 				<option>
 					<value>1 00</value>
-					<name>1 (APC Back-UPS)</name>
+					<name>1 (APC Back-UPS using 940-0095A/C cables)</name>
 				</option>
 				<option>
 					<value>2 00</value>
-					<name>2 (APC Back-UPS)</name>
+					<name>2 (APC Back-UPS using 940-0020B/C cables)</name>
 				</option>
 				<option>
 					<value>9 00</value>
-					<name>9 (APC Back-UPS)</name>
+					<name>9 (APC Back-UPS using 940-0023A cable)</name>
 				</option>
 				<option>
 					<value>12 00</value>
-					<name>12 (APC Back-UPS Office)</name>
+					<name>12 (APC Back-UPS Office using 940-0119A cable)</name>
 				</option>				
 				<option>
 					<value>12 01</value>
-					<name>12 (APC Masterswitch)</name>
+					<name>12 (APC Masterswitch using 940-0020 cable)</name>
 				</option>
 				<option>
 					<value>20 00</value>
@@ -393,7 +395,7 @@
 				</option>			
 				<option>
 					<value>6 00</value>
-					<name>6 (Best Power Patriot)</name>
+					<name>6 (Best Power Patriot using INT51 cable)</name>
 				</option>			
 			</options>
 		</field>	
@@ -405,55 +407,15 @@
 				<option>
 					<value></value>
 					<name></name>
-				</option>	
-				<option>
-					<value>940-0020B 00</value>
-					<name>940-0020B (APC Back-Ups - Simple Signalling - Gray Cable)</name>
-				</option>			
-				<option>
-					<value>940-0020C 00</value>
-					<name>940-0020C (APC Back-Ups - Simple Signalling)</name>
-				</option>					
-				<option>
-					<value>940-0023A 00</value>
-					<name>940-0023A (APC Back-Ups - Simple Signalling)</name>
-				</option>				
-				<option>
-					<value>940-0119A 00</value>
-					<name>940-0119A (APC Back-Ups Office - Simple Signalling - Phone Jack Cable)</name>
-				</option>		
-				<option>
-					<value>940-0095A 00</value>
-					<name>940-0095A (APC Back-Ups Pro - Smart Signalling)</name>
-				</option>			
+				</option>
 				<option>
 					<value>940-0095B 00</value>
-					<name>940-0095B (APC Back-Ups Pro - Smart Signalling - Gray Cable)</name>
+					<name>940-0095B (Gray Cable)</name>
 				</option>
-				<option>
-					<value>940-0095C 00</value>
-					<name>940-0095C (APC Back-Ups Pro - Smart Signalling)</name>
-				</option>
-				<option>
-					<value>940-0024B 00</value>
-					<name>940-0024B (APC Smart-Ups - Smart Signalling)</name>
-				</option>			
 				<option>
 					<value>940-0024C 00</value>
-					<name>940-0024C (APC Smart-Ups - Smart Signalling - Black Cable)</name>
-				</option>	
-				<option>
-					<value>940-0024G 00</value>
-					<name>940-0024G (APC Smart-Ups - Smart Signalling)</name>
-				</option>			
-				<option>
-					<value>940-0020 00</value>
-					<name>940-0020 (APC Masterswitch - Simple Signalling - Gray Cable)</name>
-				</option>			
-				<option>
-					<value>INT51 00</value>
-					<name>INT51 (Best Power Patriot)</name>
-				</option>			
+					<name>940-0024C (Black Cable)</name>
+				</option>
 			</options>
 		</field>
 		<field>
