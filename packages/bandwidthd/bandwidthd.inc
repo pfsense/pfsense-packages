@@ -71,7 +71,7 @@ function bandwidthd_install_config() {
 	if($skip_intervals)
 		$skip_intervals = "skip_intervals $skip_intervals\n";
 
-	$ifdescrs = $config['installedpackages']['bandwidthd']['config'][0]['active_interface'];		
+	$ifdescrs = array($config['installedpackages']['bandwidthd']['config'][0]['active_interface']);		
 		
 	/* initialize to "" */
 	$subnets = "";
