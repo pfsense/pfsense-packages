@@ -46,7 +46,7 @@
 		<field>
 			<fieldname>active_interface</fieldname>
 			<fielddescr>interface</fielddescr>
-			<description>The interface(s) that bandwidthd will bind to.</description>
+			<description>The interface that bandwidthd will bind to.</description>
 			<default_value>lan</default_value>
 			<required/>
 			<type>interfaces_selection</type>
