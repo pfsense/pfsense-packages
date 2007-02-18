@@ -129,23 +129,27 @@
 		/* monitor remote validation */
 		if($post['monitor'] == 'remote') {
 			if(!$post['remotename'])
-				$input_errors[] = 'You must specify a name in the \'Remote Name\' field';
+				$input_errors[] = 'You must specify a name in the \'Remote UPS Name\' field';
+			if($post['remotename'] && !eregi('^[a-z0-9_.-]+$', $post['remotename']))
+				$input_errors[] = 'Only [Aa-Zz], [0-9], and [-_] accepted in the \'Remote UPS Name\' field';		
 			if(!$post['remoteaddr'] || !nut_validate_ip($post['remoteaddr'],false))
-				$input_errors[] = 'You must specify a valid address \'Remote Address\' field';
+				$input_errors[] = 'You must specify a valid address \'Remote UPS Address\' field';
 			if(!$post['remoteuser'])
-				$input_errors[] = 'You must specify a name in the \'Remote User\' field';
+				$input_errors[] = 'You must specify a name in the \'Remote UPS User\' field';
 			if(!$post['remotepass'])
-				$input_errors[] = 'You must specify a name in the \'Remote Password\' field';
+				$input_errors[] = 'You must specify a name in the \'Remote UPS Password\' field';
 		}
 
 		/* monitor local validation */
 		elseif($post['monitor'] == 'local') {
 			if(!$post['name'])
-				$input_errors[] = 'You must specify a name in the \'Name\' field';
+				$input_errors[] = 'You must specify a name in the \'Local UPS Name\' field';
+			if($post['name'] && !eregi('^[a-z0-9_.-]+$', $post['name']))
+				$input_errors[] = 'Only [Aa-Zz], [0-9], and [-_] accepted in the \'Local UPS Name\' field';			
 			if(!$post['driver'])
-				$input_errors[] = 'You must select a driver in the \'Driver\' field';
+				$input_errors[] = 'You must select a driver in the \'Local UPS Driver\' field';
 			if(!$post['port'])
-				$input_errors[] = 'You must select a port in the \'Port\' field';
+				$input_errors[] = 'You must select a port in the \'Local UPS Port\' field';
 			if($post['allowaddr'] && !nut_validate_ip($post['allowaddr'],true))
 				$input_errors[] = 'You must specify a valid address \'Local Remote Access Address\' field';
 		}
