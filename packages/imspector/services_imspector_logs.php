@@ -34,6 +34,7 @@ require("guiconfig.inc");
 
 /* variables */
 $log_dir = '/var/log/imspector';
+$imspector_config = $config['installedpackages']['imspector']['config'][0];
 
 $border_color			= '#c0c0c0';
 $default_bgcolor		= '#eeeeee';
@@ -57,6 +58,7 @@ $convo_local_bgcolor	= '#dddddd';
 $convo_remote_bgcolor	= '#eeeeee';
 
 /* functions */
+
 function convert_dir_list ($topdir) {
 	if (!is_dir($topdir)) return;
 	if ($dh = opendir($topdir)) {
@@ -128,8 +130,7 @@ if ($_POST['mode'] == "render") {
 	exit;
 }
 /* defaults to this page but if no settings are present, redirect to setup page */
-if(!$config['installedpackages']['imspector']['config'][0]['iface_array'] ||
-	!$config['installedpackages']['imspector']['config'][0]['enable'])
+if(!$imspector_config["enable"] || !$imspector_config["iface_array"] || !$imspector_config["proto_array"])
 	Header("Location: /pkg_edit.php?xml=imspector.xml&id=0");
 
 $pgtitle = "Services: IMSpector Log Viewer";
@@ -147,7 +148,7 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <?php
 	$tab_array = array();
-	$tab_array[] = array(gettext("IMSpector Log Viwer "), true, "/services_imspector_logs.php");
+	$tab_array[] = array(gettext("IMSpector Log Viewer "), true, "/services_imspector_logs.php");
 	$tab_array[] = array(gettext("IMSpector Settings "), false, "/pkg_edit.php?xml=imspector.xml&id=0");
 	display_top_tabs($tab_array);
 ?>
@@ -259,7 +260,7 @@ print($zz);
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
-	<td class="tabcont">
+    <td class="tabcont">
       <div style='width: 100%; text-align: right;'><span id='im_status' style='display: none;'>Updating</span>&nbsp;</div>
       <table width="100%">
         <tr>
@@ -267,9 +268,9 @@ print($zz);
       	    <div id="im_convos" style="height: 400px; overflow: auto; overflow-x: hidden;"></div>
       	  </td>
           <td width="75%" bgcolor="<?=$default_bgcolor?>" style="border: solid 1px <?=$border_color?>;">
-			<div id="im_content_title" style="height: 20px; overflow: auto; vertical-align: top; 
+            <div id="im_content_title" style="height: 20px; overflow: auto; vertical-align: top; 
               color: <?=$convo_title_color?>; background-color: <?=$convo_title_bgcolor?>;"></div>
-            <div id="im_content" style="height: 380px; overflow: auto; vertical-align: bottom; overflow-x: hidden;"></div>
+			<div id="im_content" style="height: 380px; overflow: auto; vertical-align: bottom; overflow-x: hidden;"></div>
           </td>
         </tr>
       </table>
