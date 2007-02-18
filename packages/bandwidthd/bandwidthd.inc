@@ -71,7 +71,12 @@ function bandwidthd_install_config() {
 	if($skip_intervals)
 		$skip_intervals = "skip_intervals $skip_intervals\n";
 
-	$ifdescrs = array($config['installedpackages']['bandwidthd']['config'][0]['active_interface']);		
+	if($config['installedpackages']['bandwidthd']['config'][0]['active_interface']){
+		$ifdescrs = array($config['installedpackages']['bandwidthd']['config'][0]['active_interface']);
+	} else {
+		log_error("You should specify a interface for bandwidthd to listen on.  exiting.");
+		exit;
+	}
 		
 	/* initialize to "" */
 	$subnets = "";
