@@ -34,7 +34,12 @@ $nut_config = $config['installedpackages']['nut']['config'][0];
 
 /* functions */
 
-function tblrow ($name, $value) {
+function tblrow ($name, $value, $symbol = null) {
+	if(!$value) return;
+
+	if($symbol == '&deg;')
+		$value = sprintf("%.1f", $value);
+
 	print(<<<EOD
 <tr>
   <td class="vncellreq" width="100px">{$name}</td>
@@ -45,15 +50,23 @@ EOD
 }
 
 function tblrowbar ($name, $value, $symbol, $red, $yellow, $green) {
-	$red = explode('-',$red);
-	$yellow = explode('-',$yellow);
-	$green = explode('-',$green);
+	if(!$value) return;
+
+	$value = sprintf("%.1f", $value);
+
+	$red = explode('-', $red);
+	$yellow = explode('-', $yellow);
+	$green = explode('-', $green);
 
 	sort($red);
 	sort($yellow);
 	sort($green);
 
-	if($value >= $red[0] && $value <= $red[1]) {
+	if($value >= $red[0] && $value <= ($red[0]+9)) {
+		$color = 'black';
+		$bgcolor = 'red';
+	}
+	if($value >= ($red[0]+10) && $value <= $red[1]) {
 		$color = 'white';
 		$bgcolor = 'red';
 	}
@@ -61,7 +74,11 @@ function tblrowbar ($name, $value, $symbol, $red, $yellow, $green) {
 		$color = 'black';
 		$bgcolor = 'yellow';
 	}
-	if($value >= $green[0] && $value <= $green[1]) {
+	if($value >= $green[0] && $value <= ($green[0]+9)) {
+		$color = 'black';
+		$bgcolor = 'green';
+	}	
+	if($value >= ($green[0]+10) && $value <= $green[1]) {
 		$color = 'white';
 		$bgcolor = 'green';
 	}
@@ -125,22 +142,25 @@ include("head.inc");
 		pclose($handle);
 
 		/* parse upsc into array */
-		$read = explode("\n",$read);		
+		$read = explode("\n", $read);
 		$ups = array();
 		foreach($read as $line) {
 			$line = explode(':', $line);
 			$ups[$line[0]] = trim($line[1]);
 		}
 
-		tblrow('Model:',$ups['ups.model']);
+		tblrow('Model:', $ups['ups.model']);
 
-		$status = explode(' ',$ups['ups.status']);
+		$status = explode(' ', $ups['ups.status']);
 		foreach($status as $condition) {
 			if($disp_status) $disp_status .= ', ';
 			switch ($condition) {
 				case 'WAIT':
 					$disp_status .= 'Waiting';
 					break;
+				case 'OFF':
+					$disp_status .= 'Off Line';
+					break;					
 				case 'OL':
 					$disp_status .= 'On Line';
 					break;
@@ -170,17 +190,17 @@ include("head.inc");
 					break;
 			}
 		}
-		tblrow('Status:',$disp_status);
+		tblrow('Status:', $disp_status);
 
-		tblrowbar('Load:',$ups['ups.load'],'%','100-80','79-60','59-0');
-		tblrowbar('Battery Charge:',$ups['battery.charge'],'%','0-29','30-79','80-100');
-		tblrow('Battery Voltage:',$ups['battery.voltage'].'V');
-		tblrow('Input Voltage:',$ups['input.voltage'].'V');
-		tblrow('Output Voltage:',$ups['output.voltage'].'V');
-		tblrow('Temperature:',$ups['ups.temperature'].'&deg;');
+		tblrowbar('Load:', $ups['ups.load'], '%', '100-80', '79-60', '59-0');
+		tblrowbar('Battery Charge:', $ups['battery.charge'], '%', '0-29' ,'30-79', '80-100');
+		tblrow('Battery Voltage:', $ups['battery.voltage'], 'V');
+		tblrow('Input Voltage:', $ups['input.voltage'], 'V');
+		tblrow('Output Voltage:', $ups['output.voltage'], 'V');
+		tblrow('Temperature:', $ups['ups.temperature'], '&deg;');
 	} else {
 		/* display error */
-		tblrow('ERROR:','Can\'t parse data from upsc!');
+		tblrow('ERROR:', 'Can\'t parse data from upsc');
 	}
 ?>
 	  </table>
