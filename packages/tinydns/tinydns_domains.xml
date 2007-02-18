@@ -12,11 +12,11 @@
 		<tab>
 			<text>View Domains</text>
 			<url>/tinydns_dhcp_filter.php</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>Add Domains</text>
 			<url>/tinydns_filter.php</url>
+			<active/>
 		</tab>
 		<tab>
 			<text>Status</text>
