@@ -91,7 +91,7 @@
 			<fielddescr>Enable file logging</fielddescr>
 			<fieldname>log_file</fieldname>
 			<type>checkbox</type>
-			<description>Log files stored in /var/log/imspector</description>
+			<description>Log files stored in /var/imspector</description>
 		</field>
 		<field>
 			<fielddescr>Enable MySQL logging</fielddescr>
@@ -120,19 +120,13 @@
 			<type>password</type>
 		</field>	
 	</fields>
-	<custom_php_command_before_form>
-		before_form_imspector(&amp;$pkg);
-	</custom_php_command_before_form>
 	<custom_php_validation_command>
 		validate_form_imspector($_POST, &amp;$input_errors);
 	</custom_php_validation_command>
 	<custom_php_resync_config_command>
 		sync_package_imspector();
 	</custom_php_resync_config_command>    
-	<custom_php_install_command>
-	
-	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		exec("rm -f /usr/local/etc/rc.d/imspector*");
+		deinstall_package_imspector();
 	</custom_php_deinstall_command>
 </packagegui>

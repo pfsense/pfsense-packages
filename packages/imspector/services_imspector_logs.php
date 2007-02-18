@@ -33,7 +33,7 @@
 require("guiconfig.inc");
 
 /* variables */
-$log_dir = '/var/log/imspector';
+$log_dir = '/var/imspector';
 $imspector_config = $config['installedpackages']['imspector']['config'][0];
 
 $border_color			= '#c0c0c0';
