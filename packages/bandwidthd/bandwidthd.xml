@@ -44,6 +44,14 @@
 	<include_file>/usr/local/pkg/bandwidthd.inc</include_file>
 	<fields>
 		<field>
+			<fieldname>active_interface</fieldname>
+			<fielddescr>interface</fielddescr>
+			<description>The interface(s) that bandwidthd will bind to.</description>
+			<default_value>lan</default_value>
+			<required/>
+			<type>interfaces_selection</type>
+		</field>	
+		<field>
 			<fieldname>skipintervals</fieldname>
 			<fielddescr>Skip intervals</fielddescr>
 			<description></description>

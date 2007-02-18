@@ -71,12 +71,14 @@ function bandwidthd_install_config() {
 	if($skip_intervals)
 		$skip_intervals = "skip_intervals $skip_intervals\n";
 
+	$ifdescrs = $config['installedpackages']['bandwidthd']['config'][0]['active_interface'];		
+		
 	/* initialize to "" */
 	$subnets = "";
-	$ifdescrs = array("lan", "wan");
-	for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
-		$ifdescrs['opt' . $j] = "opt" . $j;
-	}
+	//$ifdescrs = array("lan", "wan");
+	//for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
+		//$ifdescrs['opt' . $j] = "opt" . $j;
+	//}
 	foreach($ifdescrs as $int) {
 		/* calculate interface subnet information */
 		$ifcfg = &$config['interfaces'][$int];
