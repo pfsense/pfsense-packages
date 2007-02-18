@@ -185,6 +185,7 @@ EOF;
 	conf_mount_ro();
 	config_unlock();
 
+	stop_service("bandwidthd");
 	start_service("bandwidthd");
 
 }
