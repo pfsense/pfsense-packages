@@ -292,23 +292,43 @@ POWERDOWNFLAG /etc/killpower
 EOD;
 
 		$stop = <<<EOD
-/usr/bin/killall upsmon
+	if [ `pgrep upsmon | wc -l` != 0 ]; then
+		echo stopping upsmon
+		/usr/bin/killall upsmon
+		while [ `pgrep upsmon | wc -l` != 0 ]; do
+			sleep 1
+		done
+	fi
+	if [ `pgrep upsd | wc -l` != 0 ]; then
+		echo stopping upsd
+		/usr/bin/killall upsd
+	fi
+	if [ `pgrep {$driver} | wc -l` != 0 ]; then
+		echo stopping {$driver}
+		/usr/local/libexec/nut/upsdrvctl stop
+	fi
 	sleep 1
-	/usr/bin/killall upsd
-	/usr/local/libexec/nut/upsdrvctl stop
-	while [ `pgrep {$driver} | wc -l` != 0 ]; do
-		sleep 1
-		killall {$driver}
-	done
+	if [ `pgrep {$driver} | wc -l` != 0 ]; then
+		echo forcing {$driver} termination
+		/usr/bin/killall {$driver}
+		while [ `pgrep {$driver} | wc -l` != 0 ]; do
+			sleep 1
+		done
+	fi
 EOD;
 
 		$start = <<<EOD
 if [ `pgrep {$driver} | wc -l` != 0 ]; then
 	{$stop}
 	fi
+	echo starting {$driver}
 	if /usr/local/libexec/nut/upsdrvctl start; then
+		echo starting upsd
 		/usr/local/sbin/upsd
+		echo starting upsmon
 		/usr/local/sbin/upsmon {$name}@localhost
+	else
+		echo {$driver} failed to start
 	fi
 EOD;
 
@@ -337,10 +357,12 @@ EOD;
 
 		nut_action('stop');
 
-		/* create state path, might already exist */
-		@mkdir('/var/db/nut');
-		chmod('/var/db/nut', 0700);
-		chown('/var/db/nut', 'uucp');
+		/* create state path */
+		if(!is_dir('/var/db/nut')) {
+			mkdir('/var/db/nut');
+			chmod('/var/db/nut', 0700);
+			chown('/var/db/nut', 'uucp');
+		}
 
 		if(nut_config('monitor') == 'remote')
 			$return = sync_package_nut_remote();
