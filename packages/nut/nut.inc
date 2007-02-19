@@ -251,8 +251,10 @@ EOD;
 			chown($port, 'uucp');
 
 		/* ups.conf */
-		if($port == 'auto') 
+		if($port == 'auto') {
 			$ups_conf = "user=root\n";
+			$ovr_user = '-u root';
+		}
 		$ups_conf .= "[{$name}]\n";
 		$ups_conf .= "driver={$driver}\n";
 		$ups_conf .= "port={$port}\n";
@@ -324,7 +326,7 @@ if [ `pgrep {$driver} | wc -l` != 0 ]; then
 	echo starting {$driver}
 	if /usr/local/libexec/nut/upsdrvctl start; then
 		echo starting upsd
-		/usr/local/sbin/upsd
+		/usr/local/sbin/upsd {$ovr_user}
 		echo starting upsmon
 		/usr/local/sbin/upsmon {$name}@localhost
 	else
