@@ -91,6 +91,9 @@ while ($startofrecord < $datalen ){
 		$ip = substr($dnsrecord,$col1+2);
 	else
 		$ip = substr($dnsrecord,$col1+1);
+		/* For root-servers get rid of the leading colon */	
+		if($ip[0] == ":")$ip = substr($ip,1);
+	if(!$rtypes[2])$rtypes[2] = "na";
 	echo "<tr>";
 	echo "<td class=\"listlr\">$fqdn</td>";
 	echo "<td class=\"listlr\">$rtypes[0]  $rtypes[1]</td>";

@@ -108,6 +108,12 @@
 	<include_file>/usr/local/pkg/tinydns.inc</include_file>
 	<fields>
 		<field>
+		 	<fielddescr>Enable DNS Forwarders</fielddescr>
+			<fieldname>enableforwarding</fieldname>
+			<description>Enable forwarding of unanswered DNS requests to the external DNS servers.</description>
+			<type>checkbox</type>
+		</field>		
+		<field>
 		 	<fielddescr>Bind TinyDNS to LAN</fielddescr>
 			<fieldname>bind2lan</fieldname>
 			<description>Set this option to bind TinyDNS to the LAN IP and sets up the LAN with SOA, NS, A, and PTR Records.</description>

@@ -277,7 +277,16 @@ function tinydns_create_zone_file() {
 		log_error("Could not open /service/tinydns/root/data for writing.");
 		return;
 	}
-	
+
+	/* Load the root servers if Forwarding is enabled  */
+	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
+		if($config['system']['hostname']['domain']) {
+			$forwardingservers = tinydns_register_forwarding_servers();
+			$forwardingservers .= tinydns_register_root_servers();
+			if($forwardingservers)fwrite($fd, $forwardingservers);
+		}
+	}
+
 	/* Bind TinyDNS to LAN IP and register SOA for Forward and Reverse DNS */
 	if($config['installedpackages']['tinydns']['config'][0]['bind2lan']) {
 		if($config['system']['hostname']['domain']) {
@@ -432,6 +441,7 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 	}
 	log_error("[tinydns] tinydns_xmlrpc_sync.php is ending.");
 }
+
 /* formats data as a tinydns data row item */
 /* A full description of the data format is available at 'man tinydns-data' */
 function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns) {
@@ -615,4 +625,73 @@ function tinydns_get_dns_record_type($tinydnsrecord){
 	}
 	return array ($rtype, $rtype2, $rdns);
 }
+
+/* This function will be replaced by an auto detect DNS cache servers routine */
+/* At the moment ther is no tagging of DNSroute to a WAN port. It needs to be added  */
+function tinydns_register_forwarding_servers() {
+	$fr = fopen("/var/etc/resolv.conf", "r");
+	if (! $fr) {
+		printf("Error: cannot open resolv.conf in tinydns_register_forwarding_servers().\n");
+		return 1;
+	}
+	
+	$lip = strlen("nameserver") + 1;
+	$j = 0;
+	$nsrecords = "";
+	$arecords = "";
+	while (!feof($fr)) {
+		$routers = fgets($fr, 4096);
+		$discard = ($routers[0] == "\n"); 
+		if(!$discard){
+			if ($routerip = strstr($routers,"nameserver")){
+				$routerip = substr($routerip,$lip);
+				if($routerip){
+					$j += 1;
+					$routerfqdn = "DNSroute-{$j}.wan{$j}";
+					$routerns = "&::{$routerfqdn}";
+					$routera = "={$routerfqdn}:{$routerip}";
+					$nsrecords .= $routerns . "\n";
+					$arecords .= $routera;
+				}	
+			}
+		}	
+	}
+	fclose($fr);
+	$dnsroutes ="{$nsrecords}{$arecords}";
+	return $dnsroutes;
+}
+
+function tinydns_register_root_servers() {
+$rootservers =<<<EOD
+&::a.root-servers.net
+&::b.root-servers.net
+&::c.root-servers.net
+&::d.root-servers.net
+&::e.root-servers.net
+&::f.root-servers.net
+&::g.root-servers.net
+&::h.root-servers.net
+&::i.root-servers.net
+&::j.root-servers.net
+&::k.root-servers.net
+&::l.root-servers.net
+&::m.root-servers.net
+=a.root-servers.net:198.41.0.4
+=b.root-servers.net:128.9.0.107
+=c.root-servers.net:192.33.4.12
+=d.root-servers.net:128.8.10.90
+=e.root-servers.net:192.203.230.10
+=f.root-servers.net:192.5.5.241
+=g.root-servers.net:192.112.36.4
+=h.root-servers.net:128.63.2.53
+=i.root-servers.net:192.36.148.17
+=j.root-servers.net:192.58.128.30
+=k.root-servers.net:193.0.14.129
+=l.root-servers.net:198.32.64.12
+=m.root-servers.net:202.12.27.33
+
+EOD;
+return $rootservers;
+}
+
 ?>
