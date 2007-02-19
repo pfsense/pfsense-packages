@@ -239,6 +239,14 @@ EOD;
 		if(!($name && $driver && $port))
 			return false;
 
+		/* some installs are missing the lock dir */
+		if(!is_dir('/var/spool/lock')) {
+			@mkdir('/var/spool');
+			mkdir('/var/spool/lock');
+			chown('/var/spool/lock', 'uucp');
+			chgrp('/var/spool/lock', 'dialer');
+		}
+
 		if($port != 'auto')
 			chown($port, 'uucp');
 
