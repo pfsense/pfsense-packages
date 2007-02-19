@@ -129,12 +129,14 @@ include("head.inc");
 	<td>
       <table width="100%" class="tabcont" cellspacing="0" cellpadding="6">
 <?php
-	if($nut_config['monitor'] == 'local') {
-		tblrow('Monitoring:','Local UPS');
-		$handle = popen("upsc {$nut_config['name']}@localhost","r");
-	} elseif($nut_config['monitor'] == 'remote') {
-		tblrow('Monitoring:','Remote UPS');
-		$handle = popen("upsc {$nut_config['remotename']}@{$nut_config['remoteaddr']}","r");
+	if((int)exec('pgrep upsmon | wc -l') > 0) {
+		if($nut_config['monitor'] == 'local') {
+			tblrow('Monitoring:','Local UPS');
+			$handle = popen("upsc {$nut_config['name']}@localhost","r");
+		} elseif($nut_config['monitor'] == 'remote') {
+			tblrow('Monitoring:','Remote UPS');
+			$handle = popen("upsc {$nut_config['remotename']}@{$nut_config['remoteaddr']}","r");
+		}
 	}
 
 	if($handle) {
