@@ -83,18 +83,20 @@ function bandwidthd_install_config() {
 	//for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
 		//$ifdescrs['opt' . $j] = "opt" . $j;
 	//}
-	foreach($ifdescrs as $int) {
-		/* calculate interface subnet information */
-		$ifcfg = &$config['interfaces'][$int];
-		$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
-		$subnetmask = gen_subnet_mask($ifcfg['subnet']);
-		if($subnet == "pppoe") {
-			$subnet = find_interface_ip("ng0");
-			if($subnet)
-				$subnets .= "subnet {$subnet}/32\n";
-		} else {
-			if($subnet)
-				$subnets .= "subnet {$subnet}/{$ifcfg['subnet']}\n";
+	if(is_array($ifdescrs)) {
+		foreach($ifdescrs as $int) {
+			/* calculate interface subnet information */
+			$ifcfg = &$config['interfaces'][$int];
+			$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
+			$subnetmask = gen_subnet_mask($ifcfg['subnet']);
+			if($subnet == "pppoe") {
+				$subnet = find_interface_ip("ng0");
+				if($subnet)
+					$subnets .= "subnet {$subnet}/32\n";
+			} else {
+				if($subnet)
+					$subnets .= "subnet {$subnet}/{$ifcfg['subnet']}\n";
+			}
 		}
 	}
 
