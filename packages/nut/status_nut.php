@@ -34,11 +34,22 @@ $nut_config = $config['installedpackages']['nut']['config'][0];
 
 /* functions */
 
+function tblopen () {
+	print('<table width="100%" class="tabcont" cellspacing="0" cellpadding="6">'."\n");
+}
+
+function tblclose () {
+	print("</table>\n");
+}
+
 function tblrow ($name, $value, $symbol = null) {
 	if(!$value) return;
 
 	if($symbol == '&deg;')
 		$value = sprintf("%.1f", $value);
+
+	if($symbol == 'Hz')
+		$value = sprintf("%d", $value);
 
 	print(<<<EOD
 <tr>
@@ -127,29 +138,37 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
 	<td>
-      <table width="100%" class="tabcont" cellspacing="0" cellpadding="6">
 <?php
-	if((int)exec('pgrep upsmon | wc -l') > 0) {
-		if($nut_config['monitor'] == 'local') {
-			tblrow('Monitoring:','Local UPS');
-			$handle = popen("upsc {$nut_config['name']}@localhost","r");
-		} elseif($nut_config['monitor'] == 'remote') {
-			tblrow('Monitoring:','Remote UPS');
-			$handle = popen("upsc {$nut_config['remotename']}@{$nut_config['remoteaddr']}","r");
-		}
+	tblopen();
+
+	$running = ((int)exec('pgrep upsmon | wc -l') > 0) ? true : false;
+
+	if($nut_config['monitor'] == 'local') {
+		tblrow('Monitoring:','Local UPS'); 
+		$cmd = "upsc {$nut_config['name']}@localhost";
+	} else {
+		tblrow('Monitoring:','Remote UPS');
+		$cmd = "upsc {$nut_config['remotename']}@{$nut_config['remoteaddr']}";
 	}
 
+	if($running)
+		$handle = popen($cmd, 'r');
+	else
+		tblrow('ERROR:','NUT is enabled, however the service is not running!');
+	
 	if($handle) {
 		$read = fread($handle, 4096);
 		pclose($handle);
 
-		/* parse upsc into array */
-		$read = explode("\n", $read);
+		$lines = explode("\n", $read);
 		$ups = array();
-		foreach($read as $line) {
+		foreach($lines as $line) {
 			$line = explode(':', $line);
 			$ups[$line[0]] = trim($line[1]);
 		}
+
+		if(count($lines) == 1)
+			tblrow('ERROR:', 'Data stale!');
 
 		tblrow('Model:', $ups['ups.model']);
 
@@ -162,7 +181,7 @@ include("head.inc");
 					break;
 				case 'OFF':
 					$disp_status .= 'Off Line';
-					break;					
+					break;
 				case 'OL':
 					$disp_status .= 'On Line';
 					break;
@@ -186,7 +205,7 @@ include("head.inc");
 					break;
 				case 'CAL':
 					$disp_status .= 'Calibration';
-					break;					
+					break;
 				default:
 					$disp_status .= $condition;
 					break;
@@ -196,16 +215,20 @@ include("head.inc");
 
 		tblrowbar('Load:', $ups['ups.load'], '%', '100-80', '79-60', '59-0');
 		tblrowbar('Battery Charge:', $ups['battery.charge'], '%', '0-29' ,'30-79', '80-100');
+
+		tblclose();
+		tblopen();
+
+		tblrow('Runtime Remaining:', $ups['battery.runtime'], ' seconds');
 		tblrow('Battery Voltage:', $ups['battery.voltage'], 'V');
 		tblrow('Input Voltage:', $ups['input.voltage'], 'V');
+		tblrow('Input Frequency:', $ups['input.frequency'], 'Hz');
 		tblrow('Output Voltage:', $ups['output.voltage'], 'V');
 		tblrow('Temperature:', $ups['ups.temperature'], '&deg;');
-	} else {
-		/* display error */
-		tblrow('ERROR:', 'Can\'t parse data from upsc');
 	}
+
+	tblclose();
 ?>
-	  </table>
     </td>
   </tr>
 </table>
