@@ -100,9 +100,11 @@ function bandwidthd_install_config() {
 
 	/* initialize to "" */
 	$dev = "";
-	foreach($ifdescrs as $ifdescr) {
-		$descr = convert_friendly_interface_to_real_interface_name($ifdescr);
-		$dev .= "dev \"$descr\"\n";
+	if(is_array($ifdescrs)) {
+		foreach($ifdescrs as $ifdescr) {
+			$descr = convert_friendly_interface_to_real_interface_name($ifdescr);
+			$dev .= "dev \"$descr\"\n";
+		}
 	}
 
 	$config_file = <<<EOF
