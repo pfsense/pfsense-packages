@@ -163,8 +163,8 @@ function tinydns_custom_php_changeip_command() {
 			exec("/usr/sbin/pw useradd Gdnscache");
 			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog /etc/dnscache {$dnscacheip}");
 			exec("/bin/ln -s /etc/dnscache /service/");
-			exec("/usr/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.original");
-			exec("/usr/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.dnscache");
+			exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.original");
+			exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.dnscache");
 		}
 		exec("echo {$dnscacheip} > /etc/dnscache/env/IP");
 		exec("echo 1 > /etc/dnscache/env/FORWARDONLY");
