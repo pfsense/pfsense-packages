@@ -126,27 +126,27 @@
 			<type>checkbox</type>
 		</field>		
 		<field>
-		 	<fielddescr>Bind TinyDNS to LAN</fielddescr>
+		 	<fielddescr>Bind DNScache to LAN</fielddescr>
 			<fieldname>bind2lan</fieldname>
-			<description>Set this option to bind TinyDNS to the LAN IP and sets up the LAN with SOA, NS, A, and PTR Records.</description>
+			<description>Bind DNScache to the LAN IP and set up TinyDNS server with the LAN's SOA, NS, A, and PTR Records.</description>
 			<type>checkbox</type>
 		</field>		
 		<field>
-		 	<fielddescr>Register DHCP static mappings with TinyDNS</fielddescr>
+		 	<fielddescr>Register DHCP static mappings with server</fielddescr>
 			<fieldname>regdhcpstatic</fieldname>
-			<description>Register DHCP static IPs with TinyDNS using the Fully Qualified Domain Name specified in System: General.</description>
+			<description>Register static DHCP leases with TinyDNS server using the Fully Qualified Domain Name specified in System: General.</description>
 			<type>checkbox</type>
 		</field>		
 		<field>
-		 	<fielddescr>Register DHCP leases with TinyDNS</fielddescr>
+		 	<fielddescr>Register DHCP leases with server</fielddescr>
 			<fieldname>regdhcp</fieldname>
-			<description>Register a valid DHCP hostname with TinyDNS using the Fully Qualified Domain Name specified in System: General.</description>
+			<description>Register active DHCP leases with TinyDNS server using the Fully Qualified Domain Name specified in System: General.</description>
 			<type>checkbox</type>
 		</field>		
 		<field>
 			<fieldname>ipaddress</fieldname>
 			<fielddescr>IP Address</fielddescr>
-			<description>TinyDNS is bound to this IP address if Bind TinyDNS to LAN is not set.</description>
+			<description>Bind TinyDNS to this IP address. Create a Virtual Carp IP on the LAN segment if Bind DNScache to LAN is set.</description>
 			<type>input</type>
 		</field>
 		<field>
