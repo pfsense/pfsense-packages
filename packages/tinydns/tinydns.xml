@@ -111,6 +111,12 @@
 		tinydns_create_zone_file();
 		tinydns_setup_ping_items();
 	</custom_php_resync_config_command>
+	<custom_delete_php_command>
+		tinydns_custom_php_changeip_command();
+		tinydns_custom_php_install_command();
+		tinydns_create_zone_file();
+		tinydns_setup_ping_items();
+	</custom_delete_php_command>
 	<include_file>/usr/local/pkg/tinydns.inc</include_file>
 	<fields>
 		<field>
