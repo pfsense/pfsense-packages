@@ -40,10 +40,6 @@ function tinydns_custom_php_install_command() {
 		log_error("Could not open /usr/local/etc/rc.d/svscan.sh for writing.");
 		return;
 	}
-
-	if($config['installedpackages']['tinydns']['config'][0]['bind2lan'])
-		$ip = $config['interfaces']['lan']['ipaddr'];
-	else
 	$ip = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
 
 	$minsegment = "10240";
@@ -114,6 +110,7 @@ EOD;
 	fwrite($fd, $svscan);
 	fclose($fd);
 	conf_mount_ro();
+	tinydns_custom_php_changeip_command();
 	filter_configure();
 
 }
@@ -123,8 +120,10 @@ function tinydns_custom_php_deinstall_command() {
 	conf_mount_rw();
 	/* destroy all daemontools items */
 	exec("/usr/sbin/pw groupdel Gtinydns");
+	exec("/usr/sbin/pw groupdel Gdnscache");
 	exec("/usr/sbin/pw groupdel Gdnslog");
 	exec("/usr/sbin/pw userdel Gtinydns");
+	exec("/usr/sbin/pw userdel Gdnscache");
 	exec("/usr/sbin/pw userdel Gdnslog");
 	exec("rm /usr/local/www/*tinydns*");
 	exec("rm /usr/local/pkg/*tinydns*");
@@ -136,22 +135,45 @@ function tinydns_custom_php_deinstall_command() {
 function tinydns_custom_php_changeip_command() {
 	global $g, $config;
 	conf_mount_rw();
-	if($config['installedpackages']['tinydns']['config'][0]['bind2lan'])
-		{
-		$ip = $config['interfaces']['lan']['ipaddr'];
-/* Does not work??		$config['installedpackages']['tinydns']['config'][0]['ipaddress'] = $ip; */
-		}
-	else
-	$ip = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
+	if($config['installedpackages']['tinydns']['config'][0]['bind2lan']){
+		if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']){
+			$ip = $config['interfaces']['lan']['ipaddr'];
+			$ipmask = $config['interfaces']['lan']['subnet'];
+			$arr = tinydns_get_ip_subnet_arpa($ip, $ipmask);
+			$dnscacheip = $ip;
+			$dnsuserip = $arr[0];
+		}	
+	}
+	$dnsserverip = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
 	$updatecron = $config['installedpackages']['tinydns']['config'][0]['updatecron'];
+
 	/* setup daemon tools service area */
-	exec("/usr/sbin/pw useradd Gtinydns");
-	exec("/usr/sbin/pw useradd Gdnslog");
-	exec("/usr/local/bin/tinydns-conf Gtinydns Gdnslog /etc/tinydns {$ip}");
-	exec("/bin/mkdir /service");
-	exec("/bin/ln -s /etc/tinydns /service/");
-	exec("echo $ip > /service/tinydns/env/IP");
+	if(!is_dir("/service"))	exec("/bin/mkdir /service");
+	if(!is_dir("/service/tinydns")){
+		exec("/usr/sbin/pw useradd Gtinydns");
+		exec("/usr/sbin/pw useradd Gdnslog");
+		exec("/usr/local/bin/tinydns-conf Gtinydns Gdnslog /etc/tinydns {$dnsserverip}");
+		exec("/bin/ln -s /etc/tinydns /service/");
+	}
+	exec("echo {$dnsserverip} > /etc/tinydns/env/IP");
 	exec("/usr/bin/killall -9 tinydns");
+
+	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']){
+		if(!is_dir("/service/dnscache")){
+			exec("/usr/sbin/pw useradd Gdnscache");
+			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog /etc/dnscache {$dnscacheip}");
+			exec("/bin/ln -s /etc/dnscache /service/");
+			exec("/usr/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.original");
+			exec("/usr/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.dnscache");
+		}
+		exec("echo {$dnscacheip} > /etc/dnscache/env/IP");
+		exec("echo 1 > /etc/dnscache/env/FORWARDONLY");
+		tinydns_dnscache_forwarding_servers();
+		exec("touch /etc/dnscache/root/ip/{$dnsuserip}");
+		exec("echo domain {$config['system']['domain']} > /var/etc/resolv.conf");
+		exec("echo nameserver {$dnscacheip} >> /var/etc/resolv.conf");
+		exec("/usr/bin/killall -9 dnscache");
+	}
 	conf_mount_ro();
 	filter_configure();
 }
@@ -277,13 +299,19 @@ function tinydns_create_zone_file() {
 		log_error("Could not open /service/tinydns/root/data for writing.");
 		return;
 	}
-
+	
 	/* Load the root servers if Forwarding is enabled  */
 	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
-		if($config['system']['hostname']['domain']) {
-			$forwardingservers = tinydns_register_forwarding_servers();
-			$forwardingservers .= tinydns_register_root_servers();
-			if($forwardingservers)fwrite($fd, $forwardingservers);
+		if($config['system']['domain']) {
+			$localdomain = $config['system']['domain'];
+//			$localdomain = "";
+//			$localhostmask = 8;		
+//			$localhostip = "127.0.0.1";		
+//			$localname = "localhost";
+//			tinydns_complete_soa_record($fd, $localhostip, $localhostmask, $localname, $localdomain);
+//			$forwardingservers = tinydns_register_forwarding_servers();
+//			$forwardingservers .= tinydns_register_root_servers();
+//			if($forwardingservers)fwrite($fd, $forwardingservers);
 		}
 	}
 
@@ -481,6 +509,7 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 		}
 		return $record_data;
 }
+
 /* Returns the last IP byte and the Trimmed IP*/
 function tinydns_get_lastip_byte($ipsub){
 	$len= strlen($ipsub); 	
@@ -493,7 +522,8 @@ function tinydns_get_lastip_byte($ipsub){
 }
 
 /* in-add.arpa IP calculated from D.C.B.A and Mask to A.B.C.D.in-addr.arpa */
-function tinydns_get_arpa_ip($ip, $ipmask){
+/* subnet IP calculated from A.B.C.D and Mask */
+function tinydns_get_ip_subnet_arpa($ip, $ipmask){
 	$ipsub = $ip;	
 	$arpaip = "";	
 	$array = tinydns_get_lastip_byte($ipsub);
@@ -513,32 +543,36 @@ function tinydns_get_arpa_ip($ip, $ipmask){
 			$s = 32 - $ipmask;
 			$a >> $s;
 			$arpaip = "{$a}.{$b}.{$c}.{$d}.in-addr.arpa";
+			$subnet = "{$d}.{$c}.{$b}.{$a}";
 			break;
 		case ($ipmask <= 24 AND $ipmask > 16):
 			$s = 24 - $ipmask;
 			$b >> $s;
 			$arpaip = "{$b}.{$c}.{$d}.in-addr.arpa";
+			$subnet = "{$d}.{$c}.{$b}";
 			break;
 		case ($ipmask <= 16 AND $ipmask > 8):
 			$s = 16 - $ipmask;
 			$c >> $s;
 			$arpaip = "{$c}.{$d}.in-addr.arpa";
+			$subnet = "{$d}.{$c}";
 			break;
 		case ($ipmask <= 8 AND $ipmask > 0):
 			$s = 8 - $ipmask;
 			$d >> $s;
 			$arpaip = "{$d}.in-addr.arpa";
+			$subnet = "{$d}";
 			break;
 		}
-	return 	$arpaip;
+	return 	array($subnet,$arpaip);
 }
 
 /* Create a Forward and a Reverse DNS (SOA, A, PTR) records for Fully Qualififed Domain Name*/
 function tinydns_complete_soa_record($fd, $ip, $ipmask, $nsname, $domain){
 	$fqdn = "{$nsname}.{$domain}";
-	$rip = tinydns_get_arpa_ip($ip, $ipmask);
+	$rip = tinydns_get_ip_subnet_arpa($ip, $ipmask);
 	$soa = ".{$domain}::{$fqdn}";
-	$rsoa = ".{$rip}::{$fqdn}";
+	$rsoa = ".{$rip[1]}::{$fqdn}";
 	$a = "={$fqdn}:{$ip}";
 	if($fqdn)fwrite($fd, $soa . "\n");
 	if($rip)fwrite($fd, $rsoa . "\n");
@@ -624,6 +658,42 @@ function tinydns_get_dns_record_type($tinydnsrecord){
 			$rtype = "";
 	}
 	return array ($rtype, $rtype2, $rdns);
+}
+
+/* This function will be replaced by an auto detect DNS cache servers routine */
+/* At the moment ther is no tagging of DNSroute to a WAN port. It needs to be added  */
+function tinydns_dnscache_forwarding_servers() {
+	$fr = fopen("/var/etc/resolv.conf.dnscache", "r");
+	if (! $fr) {
+		printf("Error: cannot open resolv.conf in tinydns_register_forwarding_servers().\n");
+		return 1;
+	}
+	
+	$lip = strlen("nameserver") + 1;
+	$j = 0;
+	$iprecords = "";
+	while (!feof($fr)) {
+		$routers = fgets($fr, 4096);
+		$discard = ($routers[0] == "\n"); 
+		if(!$discard){
+			if ($routerip = strstr($routers,"nameserver")){
+				$routerip = substr($routerip,$lip);
+				if($routerip){
+					$j += 1;
+					$routera = "{$routerip}";
+					$iprecords .= $routera;
+				}	
+			}
+		}	
+	}
+	fclose($fr);
+	$fr = fopen("/etc/dnscache/root/servers/@", "w");
+	if (! $fr) {
+		printf("Error: cannot open resolv.conf in tinydns_dnscahe_forwarding_servers().\n");
+		return 1;
+	}
+	if($iprecords)fwrite($fr, $iprecords);
+	fclose($fr);
 }
 
 /* This function will be replaced by an auto detect DNS cache servers routine */
