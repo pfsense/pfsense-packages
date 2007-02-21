@@ -365,31 +365,14 @@ preprocessor rpc_decode: 111 32771
 preprocessor bo
 preprocessor telnet_decode
 
-#Flow Portscan
-preprocessor flow-portscan: \
-        talker-sliding-scale-factor 0.50 \
-        talker-fixed-threshold 30 \
-        talker-sliding-threshold 30 \
-        talker-sliding-window 20 \
-        talker-fixed-window 30 \
-        scoreboard-rows-talker 30000 \
-        server-watchnet \$HOME_NET \
-        server-ignore-limit 200 \
-        server-rows 65535 \
-        server-learning-time 14400 \
-        server-scanner-limit 4 \
-        scanner-sliding-window 20 \
-        scanner-sliding-scale-factor 0.50 \
-        scanner-fixed-threshold 15 \
-        scanner-sliding-threshold 40 \
-        scanner-fixed-window 15 \
-        scoreboard-rows-scanner 30000 \
-        alert-mode once \
-        output-mode msg \
-		portscan-ignorehosts: \$HOME_NET \
-        tcp-penalties on
-
-
+#sf Portscan
+preprocessor sfportscan: proto { all } \
+						scan_type { all } \
+						sense_level { high } \
+						watch_ip { \$HOME_NET } \
+						ignore_scanners { \$HOME_NET } \
+						ignore_scanned { \$HOME_NET }
+						
 #Required files
 include classification.config
 include reference.config
