@@ -3,9 +3,9 @@
 	<name>tinydns</name>
 	<version>1.0</version>
 	<configpath>installedpackages->package->tinydns</configpath>
-	<title>TinyDNS/DNScache: Settings</title>
+	<title>DNS Cache-Server: Settings</title>
 	<menu>
-		<name>DNS Cache and Server</name>
+		<name>DNS Cache-Server</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
 		<url>/tinydns_status.php</url>
