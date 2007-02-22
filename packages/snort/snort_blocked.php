@@ -38,7 +38,7 @@ if($_POST['todelete'] or $_GET['todelete']) {
 	exec("/sbin/pfctl -t snort2c -T delete {$ip}");
 }
 
-$pgtitle = "Snort: Snort Rulesets";
+$pgtitle = "Snort: Snort Blocked";
 include("head.inc");
 
 ?>
