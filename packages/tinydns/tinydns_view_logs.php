@@ -68,6 +68,11 @@ $tinydnslogs = `cat /etc/tinydns/log/main/current | /usr/local/bin/tai64nlocal |
      </td>
     </tr>
 </table>
+<td align="left" valign="top">
+	<form id="filterform" name="filterform" action="diag_logs.php" method="post" style="margin-top: 14px;">
+	<input id="submit" name="clear" type="submit" class="formbtn" value="<?=gettext("Clear log");?>" />
+	</form>
+</td>
 </div>
 <?php include("fend.inc"); ?>
 <meta http-equiv="refresh" content="60;url=<?php print $_SERVER['SCRIPT_NAME']; ?>">
