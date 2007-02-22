@@ -155,9 +155,8 @@ function tinydns_custom_php_changeip_command() {
 	exec("echo {$dnsserverip} > /etc/tinydns/env/IP");
 	exec("/usr/bin/killall -9 tinydns");
 
-	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding'])
-		{
-			if(!is_dir("/service/dnscache")){
+	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
+			if(!is_dir("/service/dnscache")) {
 				exec("/usr/sbin/pw useradd Gdnscache");
 				exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog /etc/dnscache {$dnscacheip}");
 				exec("/bin/ln -s /etc/dnscache /service/");
@@ -172,12 +171,13 @@ function tinydns_custom_php_changeip_command() {
 			exec("echo domain {$config['system']['domain']} > /var/etc/resolv.conf");
 			exec("echo nameserver {$dnscacheip} >> /var/etc/resolv.conf");
 			exec("/usr/bin/killall -9 dnscache");
-		}
-	else
-		{
-			exec("/bin/cp /var/etc/resolv.conf.original /var/etc/resolv.conf");
-			exec("echo > /etc/dnscache/env/IP");
-			exec("/usr/bin/killall -9 dnscache");
+		} else {
+			if(file_exists("/var/etc/resolv.conf.original"))
+				exec("/bin/cp /var/etc/resolv.conf.original /var/etc/resolv.conf");
+			if(is_dir("/etc/dnscache")) {
+				exec("echo > /etc/dnscache/env/IP");
+				exec("/usr/bin/killall -9 dnscache");
+			}
 		}
 	conf_mount_ro();
 	filter_configure();
