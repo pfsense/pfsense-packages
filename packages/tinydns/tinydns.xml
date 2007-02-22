@@ -140,7 +140,7 @@
 		<field>
 			<fieldname>ipaddress</fieldname>
 			<fielddescr>IP Address</fielddescr>
-			<description>Bind TinyDNS to this IP address. Create a Virtual Carp IP on the LAN segment if Enable DNS Forwarders is set.</description>
+			<description>Bind TinyDNS to this IP address. Create a Virtual Carp IP on the LAN segment when Enable DNS Forwarders is set.</description>
 			<type>input</type>
 		</field>
 		<field>
