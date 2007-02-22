@@ -27,6 +27,7 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
+require_once("pfsense-utils.inc");
 
 /* define oinkid */
 if($config['installedpackages']['snort'])
@@ -238,16 +239,25 @@ function generate_snort_conf() {
 		}
 	}
 
-	/* add all local ips to the whitelist */
+	/* add all WAN ips to the whitelist */
 	$wan_if = get_real_wan_interface();
 	$ip = find_interface_ip($wan_if);
 	$home_net .= "{$ip} ";
-
-	/* iterate all interfaces and add to whitelist */
-	foreach($config['interfaces'] as $interface)
-        if($interface['ipaddr'] <> "pppoe" and $interface['ipaddr'] <> "dhcp")
-        	$home_net .= "{$interface['ipaddr']} ";
-
+	
+	/* Add Gateway on WAN interface to whitelist (For RRD graphs) */
+	$int = convert_friendly_interface_to_real_interface_name("WAN");
+	$gw = get_interface_gateway($int);
+	$home_net .= "{$gw} ";
+	
+	/* Add DNS server for WAN interface to whitelist */
+	$dns_servers = get_dns_servers();
+	foreach($dns_servers as $dns) {
+		$home_net .= "{$dns} ";		
+	}
+		
+	/* Add loopback to whitelist (ftphelper) */
+	$home_net .= "127.0.0.1 "; 	
+	
 	/* iterate all vips and add to whitelist */
 	if($config['virtualip'])
 		foreach($config['virtualip']['vip'] as $vip)
@@ -369,9 +379,8 @@ preprocessor telnet_decode
 preprocessor sfportscan: proto { all } \
 						scan_type { all } \
 						sense_level { high } \
-						watch_ip { \$HOME_NET } \
-						ignore_scanners { \$HOME_NET } \
-						ignore_scanned { \$HOME_NET }
+						ignore_scanners { \$HOME_NET }
+							
 						
 #Required files
 include classification.config
