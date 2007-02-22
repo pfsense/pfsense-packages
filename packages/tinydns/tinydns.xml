@@ -5,7 +5,7 @@
 	<configpath>installedpackages->package->tinydns</configpath>
 	<title>DNS Cache-Server: Settings</title>
 	<menu>
-		<name>DNS Cache-Server</name>
+		<name>DNS Servers</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
 		<url>/tinydns_status.php</url>
