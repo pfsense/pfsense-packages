@@ -142,6 +142,8 @@ function tinydns_custom_php_changeip_command() {
 		$dnsuserip = $arr[0];
 	}
 	$dnsserverip = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
+	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding'])
+		$dnsserverip = "127.0.0.1";
 	$updatecron = $config['installedpackages']['tinydns']['config'][0]['updatecron'];
 
 	/* setup daemon tools service area */
@@ -155,8 +157,9 @@ function tinydns_custom_php_changeip_command() {
 	exec("echo {$dnsserverip} > /etc/tinydns/env/IP");
 	exec("/usr/bin/killall -9 tinydns");
 
-	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
-			if(!is_dir("/service/dnscache")) {
+	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding'])
+		{
+			if(!is_dir("/service/dnscache")){
 				exec("/usr/sbin/pw useradd Gdnscache");
 				exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog /etc/dnscache {$dnscacheip}");
 				exec("/bin/ln -s /etc/dnscache /service/");
@@ -171,13 +174,12 @@ function tinydns_custom_php_changeip_command() {
 			exec("echo domain {$config['system']['domain']} > /var/etc/resolv.conf");
 			exec("echo nameserver {$dnscacheip} >> /var/etc/resolv.conf");
 			exec("/usr/bin/killall -9 dnscache");
-		} else {
-			if(file_exists("/var/etc/resolv.conf.original"))
-				exec("/bin/cp /var/etc/resolv.conf.original /var/etc/resolv.conf");
-			if(is_dir("/etc/dnscache")) {
-				exec("echo > /etc/dnscache/env/IP");
-				exec("/usr/bin/killall -9 dnscache");
-			}
+		}
+	else
+		{
+			exec("/bin/cp /var/etc/resolv.conf.original /var/etc/resolv.conf");
+			exec("echo > /etc/dnscache/env/IP");
+			exec("/usr/bin/killall -9 dnscache");
 		}
 	conf_mount_ro();
 	filter_configure();
@@ -689,7 +691,6 @@ function tinydns_dnscache_forwarding_servers() {
 	fclose($fr);
 }
 
-/* This rouine creates the files required by DNScache to send DNS requests to the Forwarders and TinyDNS Server*/
 function tinydns_create_soa_domain_list($dnsserverip){
 	if(file_exists("/service/tinydns/root/data"))
 		$tinydns_data = file_get_contents("/service/tinydns/root/data");
@@ -719,7 +720,7 @@ function tinydns_create_soa_domain_list($dnsserverip){
 	}	
 }
 
-/* This function will be replaced by an auto detect DNS cache servers routine */
+/* This function is not called */
 /* At the moment ther is no tagging of DNSroute to a WAN port. It needs to be added  */
 function tinydns_register_forwarding_servers() {
 	$fr = fopen("/var/etc/resolv.conf", "r");
