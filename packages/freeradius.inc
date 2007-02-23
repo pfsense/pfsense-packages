@@ -4,6 +4,11 @@ require_once('service-utils.inc');
 
 define('RADDB', '/usr/local/etc/raddb');
 
+function freeradius_deinstall_command() {
+	exec("cd /var/db/pkg && pkg_delete `ls | grep freeradius`");
+	exec("cd /var/db/pkg && pkg_delete `ls | grep libltdl`");
+}
+
 function freeradius_install_command() {
 	global $config;
 
