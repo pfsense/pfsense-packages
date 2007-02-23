@@ -38,7 +38,15 @@ if(!$config['installedpackages']['tinydns']['config'][0])
 $pgtitle = "TinyDNS: View Logs";
 include("head.inc");
 
+/* NEED TO FIX there are 2 logs /etc/tinydns/log/main/current and /etc/dnscache/log/main/current */
+
 $tinydnslogs = `cat /etc/tinydns/log/main/current | /usr/local/bin/tai64nlocal | php -f /usr/local/pkg/tinydns_parse_logs.php | grep -v ":0"`;
+
+/* NEED TO FIX */
+if ($_POST['clear']) {
+//	exec("rm /etc/tinydns/log/main/current");
+//	exec("touch /etc/tinydns/log/main/current");
+}
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
@@ -62,14 +70,14 @@ $tinydnslogs = `cat /etc/tinydns/log/main/current | /usr/local/bin/tai64nlocal |
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>
      <td class="tabcont" >
-      <form action="tinydns_status.php" method="post">
+      <form action="tinydns_view_logs.php" method="post">
 		<br>
 <pre><?=$tinydnslogs?></pre>
      </td>
     </tr>
 </table>
 <td align="left" valign="top">
-	<form id="filterform" name="filterform" action="diag_logs.php" method="post" style="margin-top: 14px;">
+	<form id="filterform" name="filterform" action="tinydns_view_logs.php" method="post" style="margin-top: 14px;">
 	<input id="submit" name="clear" type="submit" class="formbtn" value="<?=gettext("Clear log");?>" />
 	</form>
 </td>
@@ -79,3 +87,4 @@ $tinydnslogs = `cat /etc/tinydns/log/main/current | /usr/local/bin/tai64nlocal |
 </body>
 </html>
 
+?>

@@ -140,7 +140,7 @@
 		<field>
 			<fieldname>ipaddress</fieldname>
 			<fielddescr>IP Address</fielddescr>
-			<description>Bind TinyDNS to this IP address. Enable DNS Forwarders bind it to the LAN IP.</description>
+			<description>Bind TinyDNS to this IP address. Enable DNS Forwarders bind TinyDNS to the LAN IP.</description>
 			<type>input</type>
 		</field>
 		<field>

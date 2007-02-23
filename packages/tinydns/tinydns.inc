@@ -141,8 +141,12 @@ function tinydns_custom_php_changeip_command() {
 		$dnscacheip = $ip;
 		$dnsuserip = $arr[0];
 	}
-	$dnsserverip = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
-	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding'])
+/* For now force $dnsserverip to to 127.0.0.1 when registration of 'local' DNS data is required  */
+	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) 
+		$dnsserverip = "127.0.0.1";
+	if($config['installedpackages']['tinydns']['config'][0]['ipaddress'])
+		$dnsserverip = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
+	if($config['installedpackages']['tinydns']['config'][0]['regdhcpstatic'] OR $config['installedpackages']['tinydns']['config'][0]['regdhcp']) 
 		$dnsserverip = "127.0.0.1";
 	$updatecron = $config['installedpackages']['tinydns']['config'][0]['updatecron'];
 
@@ -157,9 +161,8 @@ function tinydns_custom_php_changeip_command() {
 	exec("echo {$dnsserverip} > /etc/tinydns/env/IP");
 	exec("/usr/bin/killall -9 tinydns");
 
-	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding'])
-		{
-			if(!is_dir("/service/dnscache")){
+	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
+			if(!is_dir("/service/dnscache")) {
 				exec("/usr/sbin/pw useradd Gdnscache");
 				exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog /etc/dnscache {$dnscacheip}");
 				exec("/bin/ln -s /etc/dnscache /service/");
@@ -174,12 +177,13 @@ function tinydns_custom_php_changeip_command() {
 			exec("echo domain {$config['system']['domain']} > /var/etc/resolv.conf");
 			exec("echo nameserver {$dnscacheip} >> /var/etc/resolv.conf");
 			exec("/usr/bin/killall -9 dnscache");
-		}
-	else
-		{
-			exec("/bin/cp /var/etc/resolv.conf.original /var/etc/resolv.conf");
-			exec("echo > /etc/dnscache/env/IP");
-			exec("/usr/bin/killall -9 dnscache");
+		} else {
+			if(file_exists("/var/etc/resolv.conf.original"))
+				exec("/bin/cp /var/etc/resolv.conf.original /var/etc/resolv.conf");
+			if(is_dir("/etc/dnscache")) {
+				exec("echo > /etc/dnscache/env/IP");
+				exec("/usr/bin/killall -9 dnscache");
+			}
 		}
 	conf_mount_ro();
 	filter_configure();
@@ -307,45 +311,48 @@ function tinydns_create_zone_file() {
 		return;
 	}
 	
-	/* Load the root servers if Forwarding is enabled  */
-	/* Register LAN IP and SOA Forward and Reverse DNS recors in TinyDNS Server*/
-	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
-		$forwardingservers = tinydns_register_root_servers();
-		if($forwardingservers)fwrite($fd, $forwardingservers);
-		if($config['system']['hostname']['domain']) {
-			$dhcpdhostname = $config['system']['hostname'];		
-			if($config['dhcpd']['lan'])$dhcpddomain = $config['system']['domain'];
-			$dhcpdlanip = $config['interfaces']['lan']['ipaddr'];		
-			$dhcpdipmask = $config['interfaces']['lan']['subnet'];		
-			$dhcpdfqdn = "{$dhcpdhostname}.{$dhcpddomain}";
-			tinydns_complete_soa_record($fd, $dhcpdlanip, $dhcpdipmask, $dhcpdhostname, $dhcpddomain);
-		}
-	}
-
-	/* Register Static IPs */
-	if($config['installedpackages']['tinydns']['config'][0]['regdhcpstatic']) {
-		if(is_array($config['dhcpd']['lan']['staticmap'])) {
-			foreach($config['dhcpd']['lan']['staticmap'] as $dhcpdstatic){
-				$dhcpdhostname = $dhcpdstatic['hostname'];
+	/* For now do not allow registration of 'local' DNS data if tinyDNS not bound to 127.0.0.1 */
+	if($dnsserverip == "127.0.0.1") {
+		/* Load the root servers if Forwarding is enabled  */
+		/* Register LAN IP and SOA Forward and Reverse DNS recors in TinyDNS Server*/
+		if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
+			$forwardingservers = tinydns_register_root_servers();
+			if($forwardingservers)fwrite($fd, $forwardingservers);
+			if($config['system']['hostname']['domain']) {
+				$dhcpdhostname = $config['system']['hostname'];		
+				if($config['dhcpd']['lan'])$dhcpddomain = $config['system']['domain'];
+				$dhcpdlanip = $config['interfaces']['lan']['ipaddr'];		
+				$dhcpdipmask = $config['interfaces']['lan']['subnet'];		
 				$dhcpdfqdn = "{$dhcpdhostname}.{$dhcpddomain}";
-				$dhcpdlanip = $dhcpdstatic['ipaddr'];
-				$dhcpda = "={$dhcpdfqdn}:{$dhcpdlanip}";
-				if($dhcpdhostname)fwrite($fd, $dhcpda . "\n");
+				tinydns_complete_soa_record($fd, $dhcpdlanip, $dhcpdipmask, $dhcpdhostname, $dhcpddomain);
 			}
 		}
-	}
-
-	/* Register Dynamic IPs */
-	if($config['installedpackages']['tinydns']['config'][0]['regdhcp']) {
-		$leasesfile = "{$g['dhcpd_chroot_path']}/var/db/dhcpd.leases";
-		$fl = fopen($leasesfile, "r");
-		if(!$fl) {
-			log_error("Could not open {$leasesfile} for reading.");
-			return;
-		}
-		tinydns_add_active_leases($fl,$fd, $dhcpddomain);
-	}
 	
+		/* Register Static IPs */
+		if($config['installedpackages']['tinydns']['config'][0]['regdhcpstatic']) {
+			if(is_array($config['dhcpd']['lan']['staticmap'])) {
+				foreach($config['dhcpd']['lan']['staticmap'] as $dhcpdstatic){
+					$dhcpdhostname = $dhcpdstatic['hostname'];
+					$dhcpdfqdn = "{$dhcpdhostname}.{$dhcpddomain}";
+					$dhcpdlanip = $dhcpdstatic['ipaddr'];
+					$dhcpda = "={$dhcpdfqdn}:{$dhcpdlanip}";
+					if($dhcpdhostname)fwrite($fd, $dhcpda . "\n");
+				}
+			}
+		}
+	
+		/* Register Dynamic IPs */
+		if($config['installedpackages']['tinydns']['config'][0]['regdhcp']) {
+			$leasesfile = "{$g['dhcpd_chroot_path']}/var/db/dhcpd.leases";
+			$fl = fopen($leasesfile, "r");
+			if(!$fl) {
+				log_error("Could not open {$leasesfile} for reading.");
+				return;
+			}
+			tinydns_add_active_leases($fl,$fd, $dhcpddomain);
+		}
+	}
+		
 	if($config['installedpackages']['tinydnsdomains']) {
 		foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
 			$record_data = "";
@@ -682,15 +689,19 @@ function tinydns_dnscache_forwarding_servers() {
 		}	
 	}
 	fclose($fr);
+	if(is_dir("/etc/dnscache/root/servers/")) 
+		exec("rm -R /etc/dnscache/root/servers/");
+	exec("mkdir /etc/dnscache/root/servers/");
 	$fr = fopen("/etc/dnscache/root/servers/@", "w");
 	if (! $fr) {
-		printf("Error: cannot open resolv.conf in tinydns_dnscache_forwarding_servers().\n");
+		printf("Error: cannot write to /etc/dnscache/root/servers/@ in tinydns_dnscache_forwarding_servers().\n");
 		return 1;
 	}
 	if($iprecords)fwrite($fr, $iprecords);
 	fclose($fr);
 }
 
+/* This routine adds filenames to /etc/dnscache/root/servers/ with the contents pointing to the tinyDNS server */
 function tinydns_create_soa_domain_list($dnsserverip){
 	if(file_exists("/service/tinydns/root/data"))
 		$tinydns_data = file_get_contents("/service/tinydns/root/data");
