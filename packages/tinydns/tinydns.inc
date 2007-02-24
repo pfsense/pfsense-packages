@@ -148,6 +148,7 @@ function tinydns_custom_php_changeip_command() {
 		$dnsserverip = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
 	if($config['installedpackages']['tinydns']['config'][0]['regdhcpstatic'] OR $config['installedpackages']['tinydns']['config'][0]['regdhcp']) 
 		$dnsserverip = "127.0.0.1";
+	$config['installedpackages']['tinydns']['config'][0]['ipaddress'] = $dnsserverip;
 	$updatecron = $config['installedpackages']['tinydns']['config'][0]['updatecron'];
 
 	/* setup daemon tools service area */
@@ -312,7 +313,7 @@ function tinydns_create_zone_file() {
 	}
 	
 	/* For now do not allow registration of 'local' DNS data if tinyDNS not bound to 127.0.0.1 */
-	if($dnsserverip == "127.0.0.1") {
+	if($config['installedpackages']['tinydns']['config'][0]['ipaddress'] == "127.0.0.1") {
 		/* Load the root servers if Forwarding is enabled  */
 		/* Register LAN IP and SOA Forward and Reverse DNS recors in TinyDNS Server*/
 		if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
