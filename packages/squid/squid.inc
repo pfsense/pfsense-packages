@@ -636,7 +636,7 @@ function squid_resync_traffic() {
 	$conf = '';
 
 	$up_limit = ($settings['max_upload_size'] ? $settings['max_upload_size'] : 0);
-	$down_limit = ($settings['max_download_size'] ? $settings['max_download_suze'] : 0);
+	$down_limit = ($settings['max_download_size'] ? $settings['max_download_size'] : 0);
 	$conf .= "request_body_max_size $up_limit KB\n";
 	$conf .= 'reply_body_max_size ' . ($down_limit * 1024) . " allow all\n";
 
