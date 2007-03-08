@@ -193,7 +193,7 @@
       <maintainer>ryan@wgnrs.dynu.com</maintainer>
 	  <config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
 	  <configurationfile>nut.xml</configurationfile>
-	  <depends_on_package_base_url>ftp://ftp-mirror.internap.com/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
+	  <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
       <depends_on_package>nut-2.0.5.tbz</depends_on_package>
 	  <depends_on_package>nut-usb-2.0.5.tbz</depends_on_package>
 	</package>
