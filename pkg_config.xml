@@ -64,7 +64,7 @@
       <status>PRE-ALPHA</status>
       <required_version>2.0</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
       <config_file>http://www.pfsense.org/packages/config/clamav.xml</config_file>
       <configurationfile>clamav.xml</configurationfile>
     </package>
@@ -120,7 +120,7 @@
       <status>PRE-ALPHA</status>
       <required_version>2.0</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
       <depends_on_package>perl-5.8.8.tbz</depends_on_package>
       <depends_on_package>p5-libwww-5.805.tbz</depends_on_package>
       <depends_on_package>squirm-1.26.tbz</depends_on_package>
@@ -309,7 +309,7 @@
       <status>PRE-ALPHA</status>
       <required_version>2.0</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6.1-release/All</depends_on_package_base_url>
       <depends_on_package>p5-Mail-SpamAssassin-3.1.0_6.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/sassassin.xml</config_file>
       <configurationfile>sassassin.xml</configurationfile>
@@ -348,7 +348,7 @@
       <descr>pfflowd converts OpenBSD PF status messages (sent via the pfsync interface) to Cisco NetFlow datagrams. These datagrams may be sent (via UDP) to a host of one's choice. Utilising the OpenBSD stateful packet filter infrastructure means that flow tracking is very fast and accurate.</descr>
       <category>Network Management</category>
       <config_file>http://www.pfsense.com/packages/config/pfflowd.xml</config_file>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
       <depends_on_package>pfflowd-0.6.tbz</depends_on_package>
       <version>0.6</version>
       <status>Stable</status>
@@ -361,7 +361,7 @@
       <descr>RFC1413 auth/identd daemon with fixed fake reply</descr>
       <website>http://www.webweaving.org/widentd</website>
       <category>Services</category>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
       <depends_on_package>widentd-1.03_1.tbz</depends_on_package>
       <version>1.03_1</version>
       <status>ALPHA</status>
@@ -416,7 +416,7 @@
       <descr>Iperf is a tool for measuring maximum TCP and UDP bandwidth, reminiscent of ttcp and nettest. It has been written to overcome the shortcomings of those aging tools. Iperf can also test UDP bandwidth, loss, and jitter.</descr>
       <category>Network Management</category>
       <config_file>http://www.pfsense.com/packages/config/iperf.xml</config_file>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
       <depends_on_package>iperf-2.0.2_1.tbz</depends_on_package>
       <version>2.0.2_1</version>
       <status>ALPHA</status>
@@ -429,7 +429,7 @@
       <descr>Tarpits like spamd are fake SMTP servers, which accept connections but don't deliver mail. Instead, they keep the connections open and reply very slowly. If the peer is patient enough to actually complete the SMTP dialogue (which will take ten minutes or more), the tarpit returns a 'temporary error' code (4xx), which indicates that the mail could not be delivered successfully and that the sender should keep the mail in their queue and retry again later.</descr>
       <category>Services</category>
       <config_file>http://www.pfsense.com/packages/config/spamd.xml</config_file>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
       <depends_on_package>spamd-3.7_2.tbz</depends_on_package>
       <version>4.3</version>
       <status>Stable</status>
@@ -447,7 +447,7 @@
       <descr>Siproxd is a proxy/masquerading daemon for the SIP protocol. It handles registrations of SIP clients on a private IP network and performs rewriting of the SIP message bodies to make SIP connections possible via a masquerading firewall. It allows SIP clients (like kphone, linphone) to work behind an IP masquerading firewall or router.</descr>
       <category>Services</category>
       <config_file>http://www.pfsense.com/packages/config/siproxd.xml</config_file>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
       <depends_on_package>siproxd-0.5.13.tbz</depends_on_package>
       <version>0.5.13_pfs1</version>
       <status>ALPHA</status>
@@ -460,7 +460,7 @@
       <descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and DOS only support TCP/IP) using various different packet sizes.</descr>
       <category>Network Management</category>
       <config_file>http://www.pfsense.com/packages/config/netio.xml</config_file>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
       <depends_on_package>netio-1.14.tbz</depends_on_package>
       <version>1.14</version>
       <required_version>2.0</required_version>
@@ -472,7 +472,7 @@
       <descr>The ifdepd daemon implements dependencies between network interfaces in a reliable fashion. If any of the source interfaces fails, ifdepd sets all destination interfaces to state down. If all source interfaces are up, ifdepd sets all destination interfaces to state up.</descr>
       <website>http://hugo.bmg.gv.at</website>
       <category>Network Management</category>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
       <depends_on_package>ifdepd-20050420.tbz</depends_on_package>
       <version>20050420</version>
       <status>ALPHA</status>
@@ -550,7 +550,7 @@
       <descr>Emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP Internet Gateway Device specification (IGD) and allows UPnP aware clients, such as MSN Messenger to work properly from behind a NAT firewall.</descr>
       <website>http://linux-igd.sourceforge.net/</website>
       <category>Network Management</category>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
       <depends_on_package>linuxigd-0.92_2.tbz</depends_on_package>
       <version>1.0.5</version>
       <status>*ALPHA* *DANGER* *MAY WRECK SECURITY, USE AT OWN RISK*</status>
@@ -563,7 +563,7 @@
       <descr>PowerDNS (AKA pdns) is an advanced high performance authoritative nameserver with MANY advanced features</descr>
       <website>http://www.powerdns.com/</website>
       <category>Network Management</category>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/All</depends_on_package_base_url>
       <depends_on_package>powerdns-2.9.16_4.tbz</depends_on_package>
       <version>2.9.16_4</version>
       <status>ALPHA (NO GUI)</status>
@@ -576,7 +576,7 @@
       <descr>Postfix mail forwarder.	Forwards mail to another mail server.</descr>
       <website>http://www.postfix.com/</website>
       <category>Mail</category>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/mail</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-5.3-release/mail</depends_on_package_base_url>
       <depends_on_package>postfix-1.1.12_1%2c1.tbz</depends_on_package>
       <version>1.1.12_1</version>
       <status>ALPHA</status>
@@ -602,7 +602,7 @@
       <descr>High performance Web proxy Guard</descr>
       <website>http://www.squidguard.org/</website>
       <category>Network Management</category>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
       <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package>
       <version>1.2.0_1</version>
       <status>ALPHA</status>
@@ -616,7 +616,7 @@
       <descr>pfstat is a small utility that collects packet filter statistics and produces graphs.</descr>
       <category>Network Management</category>
       <config_file>http://www.pfsense.com/packages/config/pfstat.xml</config_file>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
       <depends_on_package>pfstat-1.7.tbz</depends_on_package>
       <status>Stable</status>
       <version>1.7</version>
@@ -629,7 +629,7 @@
       <descr>upclient sends system uptime and status information to a server (typically uptimes.hostingwired.com) that tracks and compares uptime statistics.</descr>
       <category>Miscellaneous</category>
       <config_file>http://www.pfsense.com/packages/config/upclient.xml</config_file>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/misc</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/misc</depends_on_package_base_url>
       <depends_on_package>upclient-5.0.b8_2.tbz</depends_on_package>
       <version>5.0.b8_2</version>
       <status>ALPHA</status>
@@ -674,7 +674,7 @@
       <descr>The Anti-Spam SMTP Proxy (ASSP) Server project is an open source platform-independent SMTP Proxy server which implements whitelists and Bayesian filtering to rid the planet of the blight of unsolicited email (UCE). UCE must be stopped at the SMTP server. Anti-spam tools must be adaptive to new spam and customized for each site's mail patterns. This free, easy-to-use tool works with any mail transport and achieves these goals requiring no operator intervention after the initial setup phase.  Default username: anything, Password: nospam4me</descr>
       <category>Network Management</category>
       <config_file>http://www.pfsense.com/packages/config/assp.xml</config_file>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
       <depends_on_package>perl-5.8.7.tbz</depends_on_package>
       <verifyinstalledpkg>perl</verifyinstalledpkg>
       <version>0.1</version>
@@ -688,7 +688,7 @@
       <descr>*DO NOT RUN THIS ON A FIREWALL. USE A DEDICATED MACHINE!* Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerabilities, is trivial to set up, and is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
       <category>FTP</category>
       <config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
-      <depends_on_package_base_url>http://ftp13.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
       <depends_on_package>pure-ftpd-1.0.20_3.tbz</depends_on_package>
       <version>1.0.20_3</version>
       <status>Stable</status>
