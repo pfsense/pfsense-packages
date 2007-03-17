@@ -235,7 +235,8 @@ function generate_snort_conf() {
 			if($subnet)
 				$home_net .= "{$subnet} ";
 		} else {
-			$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
+			if ($subnet)
+				$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
 		}
 	}
 
