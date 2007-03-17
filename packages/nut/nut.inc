@@ -153,20 +153,6 @@
 			if($post['allowaddr'] && !nut_validate_ip($post['allowaddr'],true))
 				$input_errors[] = 'You must specify a valid address \'Local Remote Access Address\' field';
 		}
-
-		/* this is run before the config file changed */
-		/* so we can unassign the existing port */
-		if(nut_config('monitor') == 'local' && count($input_errors) == 0) {
-			$port = nut_config('port');
-			$driver = nut_config_sub('driver', 2);
-		
-			if($port && $driver) {
-				nut_action('stop');
-
-				if($port != 'auto')
-					chown($port, 'root');
-			}
-		}
 	}
 
 	function deinstall_package_nut() {
@@ -179,9 +165,6 @@
 		@unlink(NUT_DIR.'/upsd.users');
 
 		exec('rm -rf /var/db/nut');
-
-		/*exec("pkg_delete nut-usb-2.0.5");
-		exec("pkg_delete nut-2.0.5");*/
 	}	
 
 	function sync_package_nut_remote() {
@@ -247,10 +230,14 @@ EOD;
 			chgrp('/var/spool/lock', 'dialer');
 		}
 
-		if($port != 'auto')
-			chown($port, 'uucp');
+		/* determine permissions for port */
+		if($port != 'auto') {
+			$port_rel = "chown root {$port}";
+			$port_set = "chown uucp {$port}";
+		}
 
 		/* ups.conf */
+		/* for usb ups run as root */
 		if($port == 'auto') {
 			$ups_conf = "user=root\n";
 			$ovr_user = '-u root';
@@ -317,12 +304,14 @@ EOD;
 			sleep 1
 		done
 	fi
+	{$port_rel}
 EOD;
 
 		$start = <<<EOD
 if [ `pgrep {$driver} | wc -l` != 0 ]; then
 	{$stop}
 	fi
+	{$port_set}
 	echo starting {$driver}
 	if /usr/local/libexec/nut/upsdrvctl start; then
 		echo starting upsd
