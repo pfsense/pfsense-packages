@@ -528,7 +528,7 @@
     </package>
     <package>
       <name>routed</name>
-      <descr>RIP v1 and v2 daemon</descr>
+      <descr>RIP v1 and v2 daemon - NOTE: As of 3/18/2007 this package is no longer necessary, it's included in pfSense base and will be removed when 1.0.1 is no longer the current release.</descr>
       <website>http://www.pfsense.com/</website>
       <maintainer>billm@pfsense.org</maintainer>
       <category>Network Management</category>
