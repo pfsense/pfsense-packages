@@ -3,7 +3,20 @@
 <!-- $Id$ -->
 <pfsensepkgs>
   <packages>
-      <package>
+     <package>
+      <name>phpSysInfo</name>
+      <website>http://phpsysinfo.sourceforge.net/</website>
+      <descr>PHPSysInfo is a customizable PHP Script that parses /proc, and formats information nicely. It will display information about system facts like Uptime, CPU, Memory, PCI devices, SCSI devices, IDE devices, Network adapters, Disk usage, and more.</descr>
+      <category>System</category>
+      <version>2.5.3</version>
+      <status>Beta</status>
+      <required_version>1.0</required_version>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/ALL</depends_on_package_base_url>
+      <depends_on_package>mbmon-205_3.tbz</depends_on_package>
+      <config_file>http://www.pfsense.com/packages/phpsysinfo/phpsysinfo.xml</config_file>
+      <configurationfile>phpsysinfo.xml</configurationfile>
+    </package>
+    <package>
       <name>dns-server</name>
       <descr>pfSense version of TinyDNS which features failover host support</descr>
       <website>http://cr.yp.to/djbdns.html</website>

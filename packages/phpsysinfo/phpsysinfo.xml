@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>phpsysinfo</name>
+	<version>1.0</version>
+	<title>phpsysinfo</title>
+	<menu>
+		<name>phpsysinfo</name>
+		<tooltiptext></tooltiptext>
+		<section>Status</section>
+		<url>/pkg_edit.php?xml=phpsysinfo.xml&amp;id=0</url>
+	</menu>
+	<tabs>
+		<tab>
+			<text>phpsysinfo</text>
+			<url>/pkg_edit.php?xml=phpsysinfo.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Access phpsysinfo</text>
+			<url>/phpSysInfo</url>
+		</tab>
+	</tabs>
+	<aftersaveredirect>/pkg_edit.php?xml=phpsysinfo.xml&amp;id=0</aftersaveredirect>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>http://http://www.pfsense.com/packages/config/phpsysinfo/phpsysinfo.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>http://http://www.pfsense.com/packages/ALL/phpsysinfo.tgz</item>
+	</additional_files_needed>
+	<custom_php_install_command>phpsysinfo_install_config();</custom_php_install_command>
+	<custom_php_deinstall_command>phpsysinfo_install_deinstall();</custom_php_deinstall_command>
+	<custom_php_resync_config_command>phpsysinfo_install_config();</custom_php_resync_config_command>
+	<include_file>/usr/local/pkg/phpsysinfo.inc</include_file>
+	<fields>
+		<field>
+			<fieldname>hidepicklist</fieldname>
+			<fielddescr>Hide picklist</fielddescr>
+			<description>Hide language and template picklist</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fieldname>sensorprogram</fieldname>
+			<fielddescr>Show mbmon</fielddescr>
+			<description>Define the motherboard monitoring program here.   Note that not all motherboards are supported and some only partly.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fieldname>showmountpoint</fieldname>
+			<fielddescr>Show mount point</fielddescr>
+			<description>Show mount point</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fieldname>showinodes</fieldname>
+			<fielddescr>Show inodes</fielddescr>
+			<description>Show inode usage</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fieldname>loadbar</fieldname>
+			<fielddescr>Show loadbar</fielddescr>
+			<description>Show a graph for current cpuload</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fieldname>showerrors</fieldname>
+			<fielddescr>Show errors</fielddescr>
+			<description>Display error messages at the top of the page. Note that vmstat is added in 1.0.1-SNAPSHOT-03-15-2007 and later</description>
+			<type>checkbox</type>
+		</field>
+	</fields>
+</packagegui>
