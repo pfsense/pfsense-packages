@@ -52,6 +52,17 @@
 			<onchange>on_auth_method_changed()</onchange>
 		</field>
 		<field>
+			<fieldname>ldap_version</fieldname>
+			<fielddescr>LDAP version</fielddescr>
+			<description>Enter LDAP protocol version (2 or 3).</description>
+			<default_value>2</default_value>
+			<type>select</type>
+			<options>
+			<option><name>2</name><value>2</value></option>
+			<option><name>3</name><value>3</value></option>
+			</options>
+		</field>
+		<field>
 			<fieldname>auth_server</fieldname>
 			<fielddescr>Authentication server</fielddescr>
 			<description>Enter here the IP or hostname of the server that will perform the authentication.</description>
@@ -73,7 +84,7 @@
 			<size>60</size>
 		</field>
 		<field>
-			<fieldname>ldap_password</fieldname>
+			<fieldname>ldap_pass</fieldname>
 			<fielddescr>LDAP password</fielddescr>
 			<description>Enter here the password to use to connect to the LDAP server.</description>
 			<type>password</type>
@@ -83,6 +94,14 @@
 			<fieldname>ldap_basedomain</fieldname>
 			<fielddescr>LDAP base domain</fielddescr>
 			<description>For LDAP authentication, enter here the base domain in the LDAP server.</description>
+			<type>input</type>
+			<size>60</size>
+		</field>
+		<field>
+			<fieldname>ldap_filter</fieldname>
+			<fielddescr>LDAP search filter</fielddescr>
+			<default_value>(&amp;(objectClass=person)(uid=%s))</default_value>
+			<description>Enter LDAP search filter.</description>
 			<type>input</type>
 			<size>60</size>
 		</field>

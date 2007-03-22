@@ -781,7 +781,7 @@ function squid_resync_auth() {
 			case 'ldap':
 				$port = (isset($settings['auth_port']) ? ":{$settings['auth_port']}" : '');
 				$password = (isset($settings['ldap_pass']) ? "-w {$settings['ldap_pass']}" : '');
-				$conf .= "auth_param basic program /usr/local/libexec/squid/squid_ldap_auth -b {$settings['ldap_basedomain']} -D {$settings['ldap_user']} $password -f \"(&(objectClass=person)(cn=%s))\" -u cn -P {$settings['auth_server']}$port\n";
+				$conf .= "auth_param basic program /usr/local/libexec/squid/squid_ldap_auth -v {$settings['ldap_version']} -b {$settings['ldap_basedomain']} -D {$settings['ldap_user']} $password -f \"{$settings['ldap_filter']}\" -u uid -P {$settings['auth_server']}$port\n";
 				break;
 			case 'radius':
 				$port = (isset($settings['auth_port']) ? "-p {$settings['auth_server_port']}" : '');
@@ -891,6 +891,8 @@ function on_auth_method_changed() {
 	document.iform.auth_server.disabled = 1;
 	document.iform.auth_server_port.disabled = 1;
 	document.iform.ldap_user.disabled = 1;
+	document.iform.ldap_version.disabled = 1;
+	document.iform.ldap_filter.disabled = 1;
 	document.iform.ldap_password.disabled = 1;
 	document.iform.ldap_basedomain.disabled = 1;
 	document.iform.radius_secret.disabled = 1;
@@ -918,6 +920,8 @@ function on_auth_method_changed() {
 		document.iform.auth_server.disabled = 1;
 		document.iform.auth_server_port.disabled = 1;
 		document.iform.ldap_user.disabled = 1;
+		document.iform.ldap_version.disabled = 1;
+		document.iform.ldap_filter.disabled = 1;
 		document.iform.ldap_password.disabled = 1;
 		document.iform.ldap_basedomain.disabled = 1;
 		document.iform.radius_secret.disabled = 1;
@@ -942,6 +946,8 @@ function on_auth_method_changed() {
 			document.iform.auth_server_port.disabled = 1;
 			document.iform.ldap_user.disabled = 1;
 			document.iform.ldap_password.disabled = 1;
+			document.iform.ldap_version.disabled = 1;
+			document.iform.ldap_filter.disabled = 1;
 			document.iform.ldap_basedomain.disabled = 1;
 			document.iform.radius_secret.disabled = 1;
 			document.iform.msnt_secondary.disabled = 1;
@@ -951,6 +957,8 @@ function on_auth_method_changed() {
 			document.iform.auth_server_port.disabled = 0;
 			document.iform.ldap_user.disabled = 0;
 			document.iform.ldap_password.disabled = 0;
+			document.iform.ldap_version.disabled = 0;
+			document.iform.ldap_filter.disabled = 0;
 			document.iform.ldap_basedomain.disabled = 0;
 			document.iform.radius_secret.disabled = 1;
 			document.iform.msnt_secondary.disabled = 1;
@@ -960,6 +968,8 @@ function on_auth_method_changed() {
 			document.iform.auth_server_port.disabled = 0;
 			document.iform.ldap_user.disabled = 1;
 			document.iform.ldap_password.disabled = 1;
+			document.iform.ldap_version.disabled = 1;
+			document.iform.ldap_filter.disabled = 1;
 			document.iform.ldap_basedomain.disabled = 1;
 			document.iform.radius_secret.disabled = 0;
 			document.iform.msnt_secondary.disabled = 1;
@@ -969,6 +979,8 @@ function on_auth_method_changed() {
 			document.iform.auth_server_port.disabled = 1;
 			document.iform.ldap_user.disabled = 1;
 			document.iform.ldap_password.disabled = 1;
+			document.iform.ldap_version.disabled = 1;
+			document.iform.ldap_filter.disabled = 1;
 			document.iform.ldap_basedomain.disabled = 1;
 			document.iform.radius_secret.disabled = 1;
 			document.iform.msnt_secondary.disabled = 0;
