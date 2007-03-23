@@ -17,7 +17,7 @@ global $config, $g;
 	config_lock();
 
 	exec("cd ..");
-	exec("tar -xzvf /usr/local/pkg/phpSysInfo-2.5.3.tgz");
+	exec("tar -xzvf /usr/local/pkg/phpsysinfo-2.5.3.tgz");
 
 
  /* lines need in config.php */

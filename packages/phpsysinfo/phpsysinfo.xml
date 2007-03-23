@@ -24,12 +24,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://http://www.pfsense.com/packages/phpsysinfo/phpsysinfo.inc</item>
+		<item>http://www.pfsense/packages/config/phpsysinfo/phpsysinfo.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://http://www.pfsense.com/packages/All/phpSysInfo-2.5.3.tgz</item>
+		<item>http://www.pfsense.com/packages/All/phpsysinfo-2.5.3.tgz</item>
 	</additional_files_needed>
 	<custom_php_install_command>phpsysinfo_install_config();</custom_php_install_command>
 	<custom_php_deinstall_command>phpsysinfo_install_deinstall();</custom_php_deinstall_command>
