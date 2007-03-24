@@ -13,7 +13,7 @@
       <required_version>1.0</required_version>
       <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
       <depends_on_package>mbmon-205_3.tbz</depends_on_package>
-      <config_file>http://www.pfsense.com/packages/phpsysinfo/phpsysinfo.xml</config_file>
+      <config_file>http://www.pfsense.com/packages/config/phpsysinfo/phpsysinfo.xml</config_file>
       <configurationfile>phpsysinfo.xml</configurationfile>
     </package>
     <package>
