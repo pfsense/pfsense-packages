@@ -1,6 +1,6 @@
 <packagegui>
-	<name>per-user-bandwidth-distribution</name>
-	<version>1.0.1</version>
+	<name>peruserbw</name>
+	<version>1.0.2</version>
 	<title>Services: Per User Bandwidth</title>
 	<aftersaveredirect>pkg_edit.php?xml=per-user-bandwidth-distribution.xml&amp;id=0</aftersaveredirect>
 	<menu>
@@ -13,7 +13,6 @@
 		<name>PerUserBW</name>
 		<rcfile>per_user_bandwidth_distribution.sh</rcfile>
 	</service>
-	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<fields>
 		<field>
 			<fielddescr>Incoming Bandwidth</fielddescr>
@@ -74,10 +73,10 @@
 		fwrite($fd, "/sbin/kldload ipfw\n");
 		fwrite($fd, "/sbin/kldload dummynet\n");
 		fwrite($fd, "/sbin/ipfw delete 10\n");
-		fwrite($fd, "/sbin/ipfw pipe 1 config mask src-ip 0x000000ff bw {$_POST['incoming_bandwidth']}{$_POST['incoming_bandwidthtype']}\n");
-		fwrite($fd, "/sbin/ipfw pipe 2 config mask dst-ip 0x000000ff bw {$_POST['outgoing_bandwidth']}{$_POST['outgoing_bandwidthtype']}\n");
-		fwrite($fd, "/sbin/ipfw add 10 pipe 2 ip from any to any out via {$wanif}\n");
-		fwrite($fd, "/sbin/ipfw add 10 pipe 1 ip from any to any in via {$wanif}\n");
+		fwrite($fd, "/sbin/ipfw pipe 101 config mask src-ip 0x000000ff bw {$_POST['incoming_bandwidth']}{$_POST['incoming_bandwidthtype']}\n");
+		fwrite($fd, "/sbin/ipfw pipe 102 config mask dst-ip 0x000000ff bw {$_POST['outgoing_bandwidth']}{$_POST['outgoing_bandwidthtype']}\n");
+		fwrite($fd, "/sbin/ipfw add 10 pipe 102 ip from any to any out via {$wanif}\n");
+		fwrite($fd, "/sbin/ipfw add 10 pipe 101 ip from any to any in via {$wanif}\n");
 		fwrite($fd, "/sbin/ipfw add 10 allow all from any to any\n");
 		fclose($fd);
 		mwexec("chmod a+rx /usr/local/etc/rc.d/per_user_bandwidth_distribution.sh");
