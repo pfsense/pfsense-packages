@@ -26,16 +26,16 @@
 			<type>select</type>
 			<options>
 			    <option>
-				<value>Byte/s</value>
-				<name>Byte/s</name>
+					<value>Kbit/s</value>
+					<name>Kbit/s</name>
 			    </option>
 			    <option>
-				<value>KByte/s</value>
-				<name>KByte/s</name>
+					<value>Kbyte/s</value>
+					<name>Kbyte/s</name>
 			    </option>
 			    <option>
-				<value>MByte/s</value>
-				<name>MByte/s</name>
+					<value>Mbit/s</value>
+					<name>Mbit/s</name>
 			    </option>
 			</options>			
 		</field>
