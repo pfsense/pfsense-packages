@@ -4,6 +4,16 @@
 <pfsensepkgs>
   <packages>
      <package>
+      <name>PerUserBW</name>
+      <descr>Adds a per user bandwidth distribution option.  Requires 1.2 or newer.</descr>
+      <category>NET</category>
+      <config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
+      <version>0.1</version>
+      <status>ALPHA</status>
+      <required_version>1.2</required_version>
+      <configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
+    </package>
+     <package>
       <name>phpSysInfo</name>
       <website>http://phpsysinfo.sourceforge.net/</website>
       <descr>PHPSysInfo is a customizable PHP Script that parses /proc, and formats information nicely. It will display information about system facts like Uptime, CPU, Memory, PCI devices, SCSI devices, IDE devices, Network adapters, Disk usage, and more.</descr>
@@ -648,16 +658,6 @@
       <status>ALPHA</status>
       <required_version>1.0</required_version>
       <configurationfile>upclient.xml</configurationfile>
-    </package>
-    <package>
-      <name>PerUserBW</name>
-      <descr>Adds a per user bandwidth distribution option.  Requires 0.79.4 or newer.</descr>
-      <category>NET</category>
-      <config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
-      <version>0.1</version>
-      <status>ALPHA</status>
-      <required_version>1.0</required_version>
-      <configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
     </package>
     <package>
       <name>quagga</name>
