@@ -134,21 +134,23 @@ function tinydns_custom_php_deinstall_command() {
 function tinydns_custom_php_changeip_command() {
 	global $g, $config;
 	conf_mount_rw();
-	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']){
-		$ip = $config['interfaces']['lan']['ipaddr'];
-		$ipmask = $config['interfaces']['lan']['subnet'];
-		$arr = tinydns_get_ip_subnet_arpa($ip, $ipmask);
-		$dnscacheip = $ip;
-		$dnsuserip = $arr[0];
-	}
+
+	$ip = $config['interfaces']['lan']['ipaddr'];
+	$ipmask = $config['interfaces']['lan']['subnet'];
+	$arr = tinydns_get_ip_subnet_arpa($ip, $ipmask);
+	$dnscacheip = $ip;
+	$dnsuserip = $arr[0];
+
 /* For now force $dnsserverip to to 127.0.0.1 when registration of 'local' DNS data is required  */
+	$localhost = "127.0.0.1";
 	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) 
-		$dnsserverip = "127.0.0.1";
-	if($config['installedpackages']['tinydns']['config'][0]['ipaddress'])
+		$dnsserverip = $localhost;
+	if($config['installedpackages']['tinydns']['config'][0]['ipaddress'] != $localhost)
 		$dnsserverip = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
 	if($config['installedpackages']['tinydns']['config'][0]['regdhcpstatic'] OR $config['installedpackages']['tinydns']['config'][0]['regdhcp']) 
-		$dnsserverip = "127.0.0.1";
+		$dnsserverip = $localhost;
 	$config['installedpackages']['tinydns']['config'][0]['ipaddress'] = $dnsserverip;
+
 	$updatecron = $config['installedpackages']['tinydns']['config'][0]['updatecron'];
 
 	/* setup daemon tools service area */
@@ -163,29 +165,28 @@ function tinydns_custom_php_changeip_command() {
 	exec("/usr/bin/killall -9 tinydns");
 
 	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
-			if(!is_dir("/service/dnscache")) {
+		if(!is_dir("/service/dnscache")) {
 				exec("/usr/sbin/pw useradd Gdnscache");
 				exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog /etc/dnscache {$dnscacheip}");
 				exec("/bin/ln -s /etc/dnscache /service/");
 				exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.original");
 				exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.dnscache");
-			}
-			exec("echo {$dnscacheip} > /etc/dnscache/env/IP");
-			exec("echo 1 > /etc/dnscache/env/FORWARDONLY");
-			tinydns_dnscache_forwarding_servers();
-			exec("touch /etc/dnscache/root/ip/{$dnsuserip}");
-			tinydns_create_soa_domain_list($dnsserverip);
-			exec("echo domain {$config['system']['domain']} > /var/etc/resolv.conf");
-			exec("echo nameserver {$dnscacheip} >> /var/etc/resolv.conf");
-			exec("/usr/bin/killall -9 dnscache");
-		} else {
-			if(file_exists("/var/etc/resolv.conf.original"))
-				exec("/bin/cp /var/etc/resolv.conf.original /var/etc/resolv.conf");
-			if(is_dir("/etc/dnscache")) {
-				exec("echo > /etc/dnscache/env/IP");
-				exec("/usr/bin/killall -9 dnscache");
-			}
 		}
+		exec("echo {$dnscacheip} > /etc/dnscache/env/IP");
+		tinydns_dnscache_forwarding_servers();
+		exec("touch /etc/dnscache/root/ip/{$dnsuserip}");
+		tinydns_create_soa_domain_list($dnsserverip);
+		exec("echo domain {$config['system']['domain']} > /var/etc/resolv.conf");
+		exec("echo nameserver {$dnscacheip} >> /var/etc/resolv.conf");
+		exec("/usr/bin/killall -9 dnscache");
+	} else {
+		if(file_exists("/var/etc/resolv.conf.original"))
+			exec("/bin/cp /var/etc/resolv.conf.original /var/etc/resolv.conf");
+		if(is_dir("/etc/dnscache")) {
+			dnscache_use_root_servers();
+			exec("/usr/bin/killall -9 dnscache");
+		}
+	}
 	conf_mount_ro();
 	filter_configure();
 }
@@ -583,6 +584,8 @@ function tinydns_complete_soa_record($fd, $ip, $ipmask, $nsname, $domain){
 }
 
 /* Search for active leases in the dhcpd.leases file and add them to tinyDNS */
+/* Currently it will add duplicate leases that are ignored by thee tinyDNS server*/
+/* Should duplicate leases be purged by DCHCP server in a remove stale records operation? */
 function tinydns_add_active_leases($fl,$fd, $leasedomain){
 	$i = 0;
 	$lip = strlen("lease") + 1;
@@ -664,11 +667,11 @@ function tinydns_get_dns_record_type($tinydnsrecord){
 }
 
 /* This function will be replaced by an auto detect DNS cache servers routine */
-/* At the moment ther is no tagging of DNSroute to a WAN port. It needs to be added  */
+/* At the moment there is no tagging of DNSroute to a WAN port. It needs to be added  */
 function tinydns_dnscache_forwarding_servers() {
 	$fr = fopen("/var/etc/resolv.conf.dnscache", "r");
 	if (! $fr) {
-		printf("Error: cannot open resolv.conf in tinydns_register_forwarding_servers().\n");
+		printf("Error: cannot open resolv.conf.dnscache in tinydns_register_forwarding_servers().\n");
 		return 1;
 	}
 	
@@ -690,6 +693,7 @@ function tinydns_dnscache_forwarding_servers() {
 		}	
 	}
 	fclose($fr);
+	exec("echo 1 > /etc/dnscache/env/FORWARDONLY");
 	if(is_dir("/etc/dnscache/root/servers/")) 
 		exec("rm -R /etc/dnscache/root/servers/");
 	exec("mkdir /etc/dnscache/root/servers/");
@@ -718,22 +722,23 @@ function tinydns_create_soa_domain_list($dnsserverip){
 		
 		$col1 = strpos($dnsrecord,":");
 		$fqdn = substr($dnsrecord,1,$col1-1);
-		if(!$fqdn)$fqdn = ".";
-		$rtypes = tinydns_get_dns_record_type($dnsrecord);
-		if($rtypes[0] == "SOA"){
-			$fr = fopen("/etc/dnscache/root/servers/{$fqdn}", "w");
-			if (! $fr) {
-				printf("Error: cannot open /etc/dnscache/root/servers/{$fqdn} in tinydns_create_soa_domain_list().\n");
-				return 1;
+		if($fqdn) {
+			$rtypes = tinydns_get_dns_record_type($dnsrecord);
+			if($rtypes[0] == "SOA"){
+				$fr = fopen("/etc/dnscache/root/servers/{$fqdn}", "w");
+				if (! $fr) {
+					printf("Error: cannot open /etc/dnscache/root/servers/{$fqdn} in tinydns_create_soa_domain_list().\n");
+					return 1;
+				}
+				if($fqdn)fwrite($fr, $dnsserverip);
+				fclose($fr);
 			}
-			if($fqdn)fwrite($fr, $dnsserverip);
-			fclose($fr);
-		}
+		}	
 	}	
 }
 
 /* This function is not called */
-/* At the moment ther is no tagging of DNSroute to a WAN port. It needs to be added  */
+/* At the moment there is no tagging of DNSroute to a WAN port. It needs to be added  */
 function tinydns_register_forwarding_servers() {
 	$fr = fopen("/var/etc/resolv.conf", "r");
 	if (! $fr) {
@@ -798,6 +803,37 @@ $rootservers =<<<EOD
 
 EOD;
 return $rootservers;
+}
+
+function dnscache_use_root_servers() {
+$rootservers =<<<EOD
+198.41.0.4
+128.9.0.107
+192.33.4.12
+128.8.10.90
+192.203.230.10
+192.5.5.241
+192.112.36.4
+128.63.2.53
+192.36.148.17
+192.58.128.30
+193.0.14.129
+198.32.64.12
+202.12.27.33
+
+EOD;
+
+	exec("echo 0 > /etc/dnscache/env/FORWARDONLY");
+	if(is_dir("/etc/dnscache/root/servers/")) 
+		exec("rm -R /etc/dnscache/root/servers/");
+	exec("mkdir /etc/dnscache/root/servers/");
+	$fr = fopen("/etc/dnscache/root/servers/@", "w");
+	if (! $fr) {
+		printf("Error: cannot write to /etc/dnscache/root/servers/@ in dnscache_use_root_servers().\n");
+		return 1;
+	}
+	fwrite($fr, $rootservers);
+	fclose($fr);
 }
 
 ?>
