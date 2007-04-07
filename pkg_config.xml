@@ -3,6 +3,19 @@
 <!-- $Id$ -->
 <pfsensepkgs>
   <packages>
+	 <package>
+	  <name>doorman</name>
+	  <website>http://doorman.sourceforge.net</website>
+	  <descr>Doorman is a port knocking implementation which allows a server to run silently, invisibly, with all TCP ports closed except to those who know the secret knock.</descr>
+	  <category>Security</category>
+	  <config_file>http://www.pfsense.com/packages/config/doorman.xml</config_file>
+	  <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
+	  <depends_on_package>doorman-0.81_1.tbz</depends_on_package>
+	  <version>0.8_1</version>
+	  <status>ALPHA</status>
+	  <required_version>1.2</required_version>
+	  <configurationfile>doorman.xml</configurationfile>
+	 </package>
      <package>
       <name>phpSysInfo</name>
       <website>http://phpsysinfo.sourceforge.net/</website>
@@ -596,19 +609,6 @@
       <required_version>1.0</required_version>
       <config_file>http://www.pfsense.com/packages/config/postfix.xml</config_file>
       <configurationfile>postfix.xml</configurationfile>
-    </package>
-    <package>
-      <name>doorman</name>
-      <website>http://doorman.sourceforge.net</website>
-      <descr>Doorman is a port knocking implementation which allows a server to run silently, invisibly, with all TCP ports closed except to those who know the secret knock.</descr>
-      <category>Security</category>
-      <config_file>http://www.pfsense.com/packages/config/doorman.xml</config_file>
-      <depends_on_package_base_url>http://ftp-mirror.internap.com/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
-      <depends_on_package>doorman-0.8_1.tbz</depends_on_package>
-      <version>0.8_1</version>
-      <status>ALPHA</status>
-      <required_version>1.0</required_version>
-      <configurationfile>doorman.xml</configurationfile>
     </package>
     <package>
       <name>squidGuard</name>
