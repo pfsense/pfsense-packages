@@ -95,6 +95,8 @@
 		if($_POST['initdelay'] != "") fwrite($fout, "connection_delay_1 " . $_POST['initdelay'] . "\n");
 		if($_POST['checkdelay'] != "") fwrite($fout, "connection_delay_2 " . $_POST['checkdelay'] . "\n");
 		fwrite($fout, "pidfile /var/run/doormand.pid\nlogfile /var/log/messages\nloglevel NOTICE\nguestlist /usr/local/etc/doormand/guestlist\nfirewall-add /usr/local/etc/doormand/pfctl_add\nfirewall-del /usr/local/etc/doormand/pfctl_del\ntag-queue-length 100000\ntag-queue /var/doorman_tag_queue\ntag-db /var/doorman_tag_db.db\n");
+		fwrite($fout, "hash-archive-size   50000\n");
+        fwrite($fout, "hash-archive        /tmp/doormand.hash-archive\n");
 		fclose($fout);
 		restart_service("doorman");
 		conf_mount_ro();
