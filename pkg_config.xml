@@ -443,7 +443,7 @@
       <category>Services</category>
       <config_file>http://www.pfsense.com/packages/config/spamd.xml</config_file>
       <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
-      <depends_on_package>spamd-3.7_2.tbz</depends_on_package>
+      <depends_on_package>spamd-3.7_3.tbz</depends_on_package>
       <version>4.3</version>
       <status>Stable</status>
       <required_version>1.0</required_version>
