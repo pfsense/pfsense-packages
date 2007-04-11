@@ -112,4 +112,3 @@ while ($startofrecord < $datalen ){
 <meta http-equiv="refresh" content="60;url=<?php print $_SERVER['SCRIPT_NAME']; ?>">
 </body>
 </html>
-?>
