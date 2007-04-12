@@ -141,11 +141,10 @@ function tinydns_custom_php_changeip_command() {
 	$dnscacheip = $ip;
 	$dnsuserip = $arr[0];
 
-/* For now force $dnsserverip to to 127.0.0.1 when registration of 'local' DNS data is required  */
+/* For now force $dnsserverip to to 127.0.0.1 unless a separate IP is specified */
 	$localhost = "127.0.0.1";
-	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) 
-		$dnsserverip = $localhost;
-	if($config['installedpackages']['tinydns']['config'][0]['ipaddress'] != $localhost)
+	$dnsserverip = $localhost;
+	if($config['installedpackages']['tinydns']['config'][0]['ipaddress'] != $localhost AND $config['installedpackages']['tinydns']['config'][0]['ipaddress'] != "")
 		$dnsserverip = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
 	if($config['installedpackages']['tinydns']['config'][0]['regdhcpstatic'] OR $config['installedpackages']['tinydns']['config'][0]['regdhcp']) 
 		$dnsserverip = $localhost;
@@ -155,7 +154,7 @@ function tinydns_custom_php_changeip_command() {
 
 	/* setup daemon tools service area */
 	if(!is_dir("/service"))	exec("/bin/mkdir /service");
-	if(!is_dir("/service/tinydns")){
+	if(!is_dir("/service/tinydns/root")){
 		exec("/usr/sbin/pw useradd Gtinydns");
 		exec("/usr/sbin/pw useradd Gdnslog");
 		exec("/usr/local/bin/tinydns-conf Gtinydns Gdnslog /etc/tinydns {$dnsserverip}");
