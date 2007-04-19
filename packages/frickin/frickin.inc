@@ -75,7 +75,7 @@ EOD;
 		mwexec("chmod a+rx /usr/local/etc/rc.d/frickin.sh");
 		mwexec("/usr/local/etc/rc.d/frickin.sh");
 
-		file_notice("System -> Advanced -> Scrub", "pfSenses scrub option has been disabled.", "Scrub");
+		file_notice("System -> Advanced -> Scrub", "pfSenses scrub option has been disabled.  See http://www.openbsd.org/faq/pf/scrub.html for more info.", "Scrub");
 		$config['system']['scrubnodf'] = "enabled";
 		write_config();
 
@@ -86,7 +86,7 @@ function frickin_custom_php_deinstall_command() {
 		global $config;
 		
 		unset($config['system']['scrubnodf']);
-		file_notice("System -> Advanced -> Scrub", "pfSenses scrub option has been enabled.", "Scrub");
+		file_notice("System -> Advanced -> Scrub", "pfSenses scrub option has been enabled.  See http://www.openbsd.org/faq/pf/scrub.html for more info.", "Scrub");
 		write_config();
 		
 	    unlink_if_exists("/usr/local/etc/rc.d/frickin.sh");
