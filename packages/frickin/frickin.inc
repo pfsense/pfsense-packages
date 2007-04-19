@@ -30,6 +30,7 @@
 */
 
 function frickin_custom_php_install_command() {
+		global $config;
 		$fout = fopen("/usr/local/etc/rc.d/frickin.sh", "w");
 		fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");
 		fwrite($fout, "# PACKAGE: Frickin Proxy\n");
@@ -74,13 +75,25 @@ EOD;
 		mwexec("chmod a+rx /usr/local/etc/rc.d/frickin.sh");
 		mwexec("/usr/local/etc/rc.d/frickin.sh");
 
+		file_notice("System -> Advanced -> Scrub", "pfSenses scrub option has been disabled.", "Scrub");
+		$config['system']['scrubnodf'] = "enabled";
+		write_config();
+
 		filter_configure();
 }
 
 function frickin_custom_php_deinstall_command() {
+		global $config;
+		
+		unset($config['system']['scrubnodf']);
+		file_notice("System -> Advanced -> Scrub", "pfSenses scrub option has been enabled.", "Scrub");
+		write_config();
+		
 	    unlink_if_exists("/usr/local/etc/rc.d/frickin.sh");
 	    unlink_if_exists("/usr/local/bin/frickin");
+	    
 	    mwexec("killall frickin");
+	    
 	    filter_configure();
 }
 
