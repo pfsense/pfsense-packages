@@ -51,7 +51,7 @@
       <category>Services</category>
       <version>2.0-BETA1</version>
       <status>ALPHA</status>
-      <required_version>1.0.1-SNAPSHOT-11-30-2006</required_version>
+      <required_version>1.2</required_version>
       <config_file>http://www.pfsense.com/packages/config/frickin/frickin.xml</config_file>
       <configurationfile>frickin.xml</configurationfile>
     </package>
