@@ -89,6 +89,8 @@ function squid_dash_z() {
 		mwexec("/usr/local/sbin/squid -z");
 	}
 
+	exec("chmod a+rw /var/squid/cache/swap.state");
+
 }
 
 function squid_is_valid_acl($acl) {
