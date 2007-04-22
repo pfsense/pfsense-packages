@@ -3,6 +3,16 @@
 <!-- $Id$ -->
 <pfsensepkgs>
   <packages>
+      <package>
+      <name>PerUserBW</name>
+      <descr>Adds a per user bandwidth distribution option.  Requires 1.2 or newer.</descr>
+      <category>NET</category>
+      <config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
+      <version>0.1</version>
+      <status>ALPHA</status>
+      <required_version>2.0</required_version>
+      <configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
+    </package>
      <package>
       <name>phpSysInfo</name>
       <website>http://phpsysinfo.sourceforge.net/</website>
@@ -702,16 +712,6 @@
       <required_version>1.0</required_version>
       <maintainer>raj@linuxense.com</maintainer>
       <configurationfile>havp.xml</configurationfile>
-    </package>
-     <package>
-      <name>PerUserBW</name>
-      <descr>Adds a per user bandwidth distribution option.  Requires 1.2 or newer.</descr>
-      <category>NET</category>
-      <config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
-      <version>0.1</version>
-      <status>ALPHA</status>
-      <required_version>1.2</required_version>
-      <configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
     </package>
 	 <package>
 	  <name>doorman</name>
