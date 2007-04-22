@@ -26,18 +26,18 @@
 			<type>select</type>
 			<options>
 			    <option>
-					<value>Kbit/s</value>
-					<name>Kbit/s</name>
+				<value>Byte/s</value>
+				<name>Byte/s</name>
 			    </option>
 			    <option>
-					<value>Kbyte/s</value>
-					<name>Kbyte/s</name>
+				<value>KByte/s</value>
+				<name>KByte/s</name>
 			    </option>
 			    <option>
-					<value>Mbit/s</value>
-					<name>Mbit/s</name>
+				<value>MByte/s</value>
+				<name>MByte/s</name>
 			    </option>
-			</options>			
+			</options>		
 		</field>
 		<field>
 			<fielddescr>Outgoing Bandwidth</fielddescr>
