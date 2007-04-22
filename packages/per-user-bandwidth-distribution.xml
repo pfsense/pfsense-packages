@@ -82,6 +82,8 @@
 		fclose($fd);
 		mwexec("chmod a+rx /usr/local/etc/rc.d/per_user_bandwidth_distribution.sh");
 		mwexec_bg("/usr/local/etc/rc.d/per_user_bandwidth_distribution.sh");
+		$config['system']['dummynetshaper'] = true;
+		write_config();
 		conf_mount_ro();
 	</custom_add_php_command>
 	<custom_php_deinstall_command>
@@ -90,6 +92,8 @@
 		mwexec("/sbin/kldunload ipfw");
 		conf_mount_rw();
 		unlink_if_exists("/usr/local/etc/rc.d/per_user_bandwidth_distribution.sh");
+		unset($config['system']['dummynetshaper']);
+		write_config();
 		conf_mount_ro();
 	</custom_php_deinstall_command>
 </packagegui>
