@@ -590,6 +590,9 @@ function tinydns_add_active_leases($fl,$fd, $leasedomain){
 	$lip = strlen("lease") + 1;
 	$lis = strlen("binding state active");
 	$lic = strlen("client-hostname");
+	$leaseip = "";
+	$leasestatus = "";
+	$leasehostname = "";
 	while (!feof($fl)) {
 		$leases = fgets($fl, 4096);
 		$discard = ($leases[0] == "#") OR ($leases[0] == "\n"); 
@@ -625,6 +628,7 @@ function tinydns_add_active_leases($fl,$fd, $leasedomain){
 	fclose($fl);
 	$leaselines = $i;
 }
+
 function tinydns_get_dns_record_type($tinydnsrecord){
 	$rtype = ""; $rtype2 = ""; $rdns = "";
 	switch ($tinydnsrecord) {
@@ -701,7 +705,8 @@ function tinydns_dnscache_forwarding_servers() {
 		printf("Error: cannot write to /etc/dnscache/root/servers/@ in tinydns_dnscache_forwarding_servers().\n");
 		return 1;
 	}
-	if($iprecords)fwrite($fr, $iprecords);
+	if($iprecords)
+		fwrite($fr, $iprecords);
 	fclose($fr);
 }
 
