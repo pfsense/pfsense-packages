@@ -143,6 +143,7 @@
 			<value>http</value>
 			<size>1</size>
 			<options>
+				<option><value>file</value><name>File</name></option>
 			    <option><value>http</value><name>URL</name></option>
 			    <option><value>exec</value><name>Execute command</name></option>
 			</options>
