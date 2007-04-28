@@ -183,7 +183,7 @@
       <website>http://miniupnp.free.fr/</website>
       <category>Network Management</category>
       <maintainer>seth.mos@xs4all.nl ryan@wgnrs.dynu.com</maintainer>
-      <version>20070208</version>
+      <version>20070412</version>
       <required_version>1.0</required_version>
       <status>Stable</status>
       <config_file>http://www.pfsense.com/packages/config/miniupnpd/miniupnpd.xml</config_file>
