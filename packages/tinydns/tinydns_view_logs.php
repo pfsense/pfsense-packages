@@ -86,5 +86,3 @@ if ($_POST['clear']) {
 <meta http-equiv="refresh" content="60;url=<?php print $_SERVER['SCRIPT_NAME']; ?>">
 </body>
 </html>
-
-?>
