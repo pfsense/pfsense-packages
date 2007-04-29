@@ -33,6 +33,11 @@
 	    <prefix>/usr/local/etc/rc.d/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/squid/squid_cache.xml</item>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	</additional_files_needed>
 	<menu>
 		<name>Proxy server</name>
 		<tooltiptext>Modify the proxy server's settings</tooltiptext>
@@ -45,7 +50,6 @@
 		<rcfile>squid.sh</rcfile>
 		<executable>squid</executable>
 	</service>
-
 	<!-- Interface -->
 	<title>Proxy server: General settings</title>
 	<tabs>
