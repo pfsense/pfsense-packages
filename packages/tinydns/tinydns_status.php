@@ -80,6 +80,7 @@ if(file_exists("/service/tinydns/root/data"))
 	$tinydns_data = file_get_contents("/service/tinydns/root/data");
 else
 	$tinydns_data = "";
+if($config['installedpackages']['tinydnsdomains'])
 foreach($config['installedpackages']['tinydnsdomains']['config'] as $ping) {
 	if($ping['recordtype'] == "SOA")
 		continue;
