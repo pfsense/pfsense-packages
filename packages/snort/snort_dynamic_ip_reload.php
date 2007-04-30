@@ -30,12 +30,11 @@
 
 /* NOTE: this file gets included from the pfSense filter.inc plugin process */
 
-log_error("[SNORT] Snort_dynamic_ip_reload.php is starting.");
-
 require_once("/usr/local/pkg/snort.inc");
 require_once("service-utils.inc");
 require_once("config.inc");
 
+/*
 if($config['interfaces']['wan']['ipaddr'] == "pppoe" or
    $config['interfaces']['wan']['ipaddr'] == "dhcp") {
 		log_error("Dynamic WAN interface present.  Restarting snort due to filter changes.");
@@ -44,5 +43,6 @@ if($config['interfaces']['wan']['ipaddr'] == "pppoe" or
 		mwexec("/sbin/pfctl -t snort2c -T flush");
 		start_service("snort");
 }
+*/
 
 ?>
