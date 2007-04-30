@@ -171,8 +171,10 @@ function squid_install_command() {
 	/* create cache */
 	squid_dash_z();
 	/* make sure pinger is executable */
-	exec("/bin/chmod a+x /usr/local/libexec/squid/pinger");
-	exec("/bin/rm /usr/local/etc/rc.d/squid");
+	if(file_exists("/usr/local/libexec/squid/pinger"))
+		exec("/bin/chmod a+x /usr/local/libexec/squid/pinger");
+	if(file_exists("/usr/local/etc/rc.d/squid"))
+		exec("/bin/rm /usr/local/etc/rc.d/squid");
 	$rc = array();
 	$rc['file'] = 'squid.sh';
 	$rc['start'] = <<<EOD
@@ -854,7 +856,8 @@ function squid_resync() {
 	squid_resync_users();
 
 	/* make sure pinger is executable */
-	exec("chmod a+x /usr/local/libexec/squid/pinger");
+	if(file_exists("/usr/local/libexec/squid/pinger"))
+		exec("chmod a+x /usr/local/libexec/squid/pinger");
 
 	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
 
