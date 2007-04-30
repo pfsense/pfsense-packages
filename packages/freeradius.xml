@@ -6,12 +6,18 @@
 	<!-- Installation -->
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/freeradiusclients.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>		
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/freeradiussettings.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>		
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/freeradius.inc</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>		
 	</additional_files_needed>
 	<custom_php_install_command>
 		freeradius_install_command();
