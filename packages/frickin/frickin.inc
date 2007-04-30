@@ -125,6 +125,7 @@ function frickin_generate_rules($type) {
 		case 'filter':
 			$ext_if = get_real_wan_interface();
 			$rules .= "pass out on $ext_if proto gre from any to any keep state\n";
+			$rules .= "pass in on $ext_if proto gre from any to any keep state\n";
 			break;
 		default:
 			break;
