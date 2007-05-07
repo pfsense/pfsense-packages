@@ -266,13 +266,16 @@ function generate_snort_conf() {
 	/* iterate all vips and add to whitelist */
 	if($config['virtualip'])
 		foreach($config['virtualip']['vip'] as $vip)
-			$home_net .= $vip['subnet'] . " ";
+			if($vip['subnet']) 
+				$home_net .= $vip['subnet'] . " ";
 
 	if($config['installedpackages']['snortwhitelist'])
 		foreach($config['installedpackages']['snortwhitelist']['config'] as $snort)
-			$home_net .= $snort['ip'] . " ";
+			if($snort['ip']) 
+				$home_net .= $snort['ip'] . " ";
 
 	/* write out whitelist, convert spaces to carriage returns */
+	$whitelist_home_net = str_replace("  ", " ", $home_net);
 	$whitelist_home_net = str_replace(" ", "\n", $home_net);
 
 	/* make $home_net presentable to snort */
