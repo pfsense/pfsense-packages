@@ -236,24 +236,28 @@ function generate_snort_conf() {
 				$home_net .= "{$subnet} ";
 		} else {
 			if ($subnet)
-				$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
+				if($ifcfg['subnet']) 
+					$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
 		}
 	}
 
 	/* add all WAN ips to the whitelist */
 	$wan_if = get_real_wan_interface();
 	$ip = find_interface_ip($wan_if);
-	$home_net .= "{$ip} ";
+	if($ip) 
+		$home_net .= "{$ip} ";
 	
 	/* Add Gateway on WAN interface to whitelist (For RRD graphs) */
 	$int = convert_friendly_interface_to_real_interface_name("WAN");
 	$gw = get_interface_gateway($int);
-	$home_net .= "{$gw} ";
+	if($gw) 
+		$home_net .= "{$gw} ";
 	
 	/* Add DNS server for WAN interface to whitelist */
 	$dns_servers = get_dns_servers();
 	foreach($dns_servers as $dns) {
-		$home_net .= "{$dns} ";		
+		if($dns) 
+			$home_net .= "{$dns} ";		
 	}
 		
 	/* Add loopback to whitelist (ftphelper) */
