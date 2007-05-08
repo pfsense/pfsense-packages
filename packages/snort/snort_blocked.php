@@ -57,14 +57,14 @@ include("head.inc");
    		<td>
 <?php
 	$tab_array = array();
-	$tab_array[] = array(gettext("Snort Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
-	$tab_array[] = array(gettext("Update Snort Rules"), false, "/snort_download_rules.php");
-	$tab_array[] = array(gettext("Snort Categories"), false, "/snort_rulesets.php");
-	$tab_array[] = array(gettext("Snort Rules"), false, "/snort_rules.php");
-	$tab_array[] = array(gettext("Snort Blocked"), true, "/snort_blocked.php");
-	$tab_array[] = array(gettext("Snort Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
-	$tab_array[] = array(gettext("Snort Alerts"), false, "/snort_alerts.php");
-	$tab_array[] = array(gettext("Snort Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
+	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
+	$tab_array[] = array(gettext("Update Rules"), false, "/snort_download_rules.php");
+	$tab_array[] = array(gettext("Categories"), false, "/snort_rulesets.php");
+	$tab_array[] = array(gettext("Rules"), false, "/snort_rules.php");
+	$tab_array[] = array(gettext("Blocked"), true, "/snort_blocked.php");
+	$tab_array[] = array(gettext("Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
+	$tab_array[] = array(gettext("Alerts"), false, "/snort_alerts.php");
+	$tab_array[] = array(gettext("Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
 	display_top_tabs($tab_array);
 ?>
   		</td>
