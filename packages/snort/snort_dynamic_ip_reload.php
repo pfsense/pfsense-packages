@@ -41,6 +41,7 @@ if($config['interfaces']['wan']['ipaddr'] == "pppoe" or
 		create_snort_conf();
 		mwexec("/sbin/pfctl -t snort2c -T flush");
 		exec("killall -HUP snort");
+		exec("killall -HUP snort2c");
 }
 
 
