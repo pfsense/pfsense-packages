@@ -34,15 +34,14 @@ require_once("/usr/local/pkg/snort.inc");
 require_once("service-utils.inc");
 require_once("config.inc");
 
-/*
+
 if($config['interfaces']['wan']['ipaddr'] == "pppoe" or
    $config['interfaces']['wan']['ipaddr'] == "dhcp") {
 		log_error("Dynamic WAN interface present.  Restarting snort due to filter changes.");
 		create_snort_conf();
-		stop_service("snort");
 		mwexec("/sbin/pfctl -t snort2c -T flush");
-		start_service("snort");
+		exec("killall -HUP snort");
 }
-*/
+
 
 ?>
