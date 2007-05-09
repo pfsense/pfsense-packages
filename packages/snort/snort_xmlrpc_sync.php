@@ -83,7 +83,7 @@ function snort_do_xmlrpc_sync() {
 
 	/* set a few variables needed for sync code borrowed from filter.inc */
 	$url = $synchronizetoip;
-	$method = 'pfsense.merge_config_section';
+	$method = 'pfsense.restore_config_section';
 
 	/* Sync! */
 	log_error("Beginning Snort XMLRPC sync to {$url}:{$port}.");
