@@ -32,7 +32,7 @@
 		</tab>
 		<tab>
 			<text>Local users</text>
-			<url>/pkg.php?xml=squid_users.inc</url>
+			<url>/pkg.php?xml=squid_users.xml</url>
 			<active/>
 		</tab>
 	</tabs>
