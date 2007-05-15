@@ -34,20 +34,26 @@ require_once("config.inc");
 require_once("/usr/local/pkg/tinydns.inc");
 require_once("service-utils.inc");
 
-if(!$config) {
- 	log_error("\$config is not enabled from tinydns_xmlrpc_sync.php!!");
-} else {
-	if($config['installedpackages']['carpsettings']['config'])
-		$password = $config['installedpackages']['carpsettings']['config'][0]['password'];
-	if($config['installedpackages']['carpsettings']['config'])
-		$syncip = $config['installedpackages']['carpsettings']['config'][0]['synchronizetoip'];
-	if($config['installedpackages']['carpsettings']['config'])
-		$syncxmlrpc = $config['installedpackages']['tinydns']['config'][0]['syncxmlrpc'];
-	/* option enabled? */
-	if($syncxmlrpc)
-		if($syncip)
-			if($password)
-				tinydns_do_xmlrpc_sync($syncip, $password);
+if($notnow) {
+
+	/* disabled until Ticket #1318 can be fixed */
+
+	if(!$config) {
+	 	log_error("\$config is not enabled from tinydns_xmlrpc_sync.php!!");
+	} else {
+		if($config['installedpackages']['carpsettings']['config'])
+			$password = $config['installedpackages']['carpsettings']['config'][0]['password'];
+		if($config['installedpackages']['carpsettings']['config'])
+			$syncip = $config['installedpackages']['carpsettings']['config'][0]['synchronizetoip'];
+		if($config['installedpackages']['carpsettings']['config'])
+			$syncxmlrpc = $config['installedpackages']['tinydns']['config'][0]['syncxmlrpc'];
+		/* option enabled? */
+		if($syncxmlrpc)
+			if($syncip)
+				if($password)
+					tinydns_do_xmlrpc_sync($syncip, $password);
+	}
+
 }
 
 ?>

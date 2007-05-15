@@ -41,6 +41,9 @@ if(!$config) {
 }
 
 function snort_do_xmlrpc_sync() {
+
+	return;  /* need to fix the bug which whipes out carp sync settings, etc */
+
 	global $config, $g;
 	$syncxmlrpc = $config['installedpackages']['snort']['config'][0]['syncxmlrpc'];
 	/* option enabled? */
