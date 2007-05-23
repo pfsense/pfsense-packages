@@ -15,7 +15,7 @@
     </package>
       <package>
       <name>Dashboard</name>
-      <descr>Adds pfSense dashboard that will be included with 1.3.</descr>
+      <descr>Adds pfSense dashboard that will be included with 1.3. This requires 1.2-BETA-1 snapshot as of 5/23/07 or older.</descr>
       <category>System</category>
       <config_file>http://www.pfsense.com/packages/config/dashboard/dashboard.xml</config_file>
       <version>0.1</version>
