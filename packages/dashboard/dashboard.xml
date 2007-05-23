@@ -19,6 +19,7 @@
 	<custom_php_deinstall_command>
 		dashboard_deinstall();
 	</custom_php_deinstall_command>
+	<include_file>dashboard.inc</include_file>
 </packagegui>
 
 	
