@@ -6,7 +6,7 @@ function dashboard_install() {
 		/* backup the pre-dashboard index.php file */
 		mwexec("cp /usr/local/www/index.php /usr/local/www/index.php.before_dashboard");
 	}
-	mwexec("tar xzvpf -C /usr/local/www/ /usr/local/pkg/widgets.tgz");
+	mwexec("tar xzvpf /usr/local/pkg/widgets.tgz -C /usr/local/www/");
 }
 
 function dashboard_deinstall() {
