@@ -16,10 +16,6 @@
     <custom_php_install_command>
 		dashboard_install();
     </custom_php_install_command>
-	<custom_add_php_command>
-	</custom_add_php_command>
-	<custom_php_resync_command>
-	</custom_php_resync_command>
 	<custom_php_deinstall_command>
 		dashboard_deinstall();
 	</custom_php_deinstall_command>
