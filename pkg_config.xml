@@ -20,7 +20,7 @@
       <config_file>http://www.pfsense.com/packages/config/dashboard/dashboard.xml</config_file>
       <version>0.1</version>
       <status>ALPHA</status>
-      <required_version>1.3</required_version>
+      <required_version>1.2-BETA-1-TESTING-SNAPSHOT-05-23-2007</required_version>
       <configurationfile>dashboard.xml</configurationfile>
     </package>
      <package>
