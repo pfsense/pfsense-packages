@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<packagegui>
+        <name>lightsquid</name>
+        <title>Services: Proxy server Report(LightSquid) -> Settings</title>
+        <category>Status</category>
+        <version>1.7.1</version>
+        <include_file>lightsquid.inc</include_file>
+
+        <!-- Installation -->
+        <menu>
+                <name>Proxy server report</name>
+                <tooltiptext>Proxy filter statistic report</tooltiptext>
+                <section>Services</section>
+                <url>/pkg_edit.php?xml=lightsquid.xml&amp;id=0</url>
+        </menu>
+        <additional_files_needed>
+               <item>http://www.pfsense.com/packages/config/lightsquid/lightsquid.inc</item>
+        </additional_files_needed>
+        <tabs>
+                <tab>
+                        <text>Settings</text>
+                        <url>/pkg_edit.php?xml=lightsquid.xml&amp;id=0</url>
+                        <active/>
+                </tab>
+                <tab>
+                        <text>Lightsquid Report</text>
+                        <url>/lightsquid/index.cgi</url>                        
+                </tab>
+        </tabs>
+        <fields>
+                <field>
+                        <fieldname>lightsquid_lang</fieldname>
+                        <fielddescr>Language</fielddescr>
+                        <description>Select report language</description>
+                        <type>select</type>
+                        <value>lang_eng</value>
+                        <options>
+                                 <option><value>bg</value><name>Bulgarian</name></option>
+                                 <option><value>cz</value><name>Czech</name></option>
+                                 <option><value>eng</value><name>English</name></option>
+                                 <option><value>fr</value><name>French</name></option>
+                                 <option><value>hu</value><name>Hungarian</name></option>
+                                 <option><value>it</value><name>Italian</name></option>
+                                 <option><value>pt_br</value><name>Portuguese - Brazil</name></option>
+                                 <option><value>ru</value><name>Russian</name></option>
+                                 <option><value>ru-koi8</value><name>Russian KOI-8</name></option>
+                                 <option><value>sp</value><name>Spanish</name></option>
+                                 <option><value>ua</value><name>Ukrainian</name></option>
+                        </options>
+                </field>
+
+                <field>
+                        <fieldname>lightsquid_barcolor</fieldname>
+                        <fielddescr>Bar color</fielddescr>
+                        <description>Select bar color</description>
+                        <type>select</type>
+                        <value>orange</value>
+                        <options>
+                                <option><value>orange</value><name>Orange</name></option>
+                                <option><value>blue</value><name>Blue</name></option>
+                                <option><value>green</value><name>Green</name></option>
+                                <option><value>yellow</value><name>Yellow</name></option>
+                                <option><value>brown</value><name>Brown</name></option>
+                                <option><value>red</value><name>Red</name></option>
+                        </options>
+                </field>          
+
+                <field>
+                        <fieldname>lightsquid_template</fieldname>
+                        <fielddescr>Report scheme</fielddescr>
+                        <description>Select report scheme</description>
+                        <type>select</type>
+                        <value>base</value>
+                        <options>
+                                <option><value>base</value><name>Base</name></option>
+                                <option><value>text</value><name>Text</name></option>
+                        </options>
+                </field>
+
+                <field>
+                        <fieldname>lightsquid_ip2name</fieldname>
+                        <fielddescr>IP resolve method (future)</fielddescr>
+                        <description>Select IP to Name resolve method</description>
+                        <type>select</type>
+                        <value>dns</value>
+                        <options>
+                                <option><value>dns</value><name>DNS</name></option>                              
+                                <option><value>simple</value><name>Simple</name></option>                              
+                        </options>
+                </field>
+
+                <field>
+                        <fieldname>lightsquid_refreshsheduler_time</fieldname>
+                        <fielddescr>Refresh sheduler</fielddescr>
+                        <description>
+			Select data refresh period. System will execute task every XX time as from 00:00 hours. &lt;br&gt;
+			For example: if selected 2h - system wil start task at 0-2-4-..-24h. &lt;br&gt;
+                               	Note:  (!),(*) - use only for powerful system; (+) - recomended. &lt;br&gt;
+			Press button below for start background refresh (this take some time). &lt;br&gt;
+			&lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Refresh now&quot;&gt;&lt;br&gt;
+			&lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Refresh full&quot;&gt;
+	          </description>
+                        <type>select</type>
+                        <value>lhp_none</value>
+                        <options>
+                                <option><value>lhp_none</value><name>none</name></option>
+                                <option><value>lhp_10m</value><name>10min(!)</name></option>
+                                <option><value>lhp_20m</value><name>20min(*)</name></option>
+                                <option><value>lhp_35m</value><name>30min(+)</name></option>
+                                <option><value>lhp_40m</value><name>40min(+)</name></option>
+                                <option><value>lhp_50m</value><name>50min(+)</name></option>
+                                <option><value>lhp_60m</value><name>60min(+)</name></option>
+                                <option><value>lhp_2h</value><name>2h</name></option>
+                                <option><value>lhp_3h</value><name>3h</name></option>
+                                <option><value>lhp_4h</value><name>4h</name></option>
+                                <option><value>lhp_6h</value><name>6h</name></option>
+                                <option><value>lhp_8h</value><name>8h</name></option>
+                                <option><value>lhp_12h</value><name>12h</name></option>
+                                <option><value>lhp_24h</value><name>24(00)h</name></option>
+                        </options>
+                </field>
+                <field>
+                        <fieldname>lightsquid_squidrotatelog_sheduler_time</fieldname>
+                        <fielddescr>Squid rotate log sheduler</fielddescr>
+                        <description>
+					Select squid log rotate period. System will execute task every XX time as from 00:00 hours. &lt;br&gt;
+					This option will allow the updating of the faster &lt;br&gt;
+					For example: if selected '2 day' - system wil start task every 2 day of month. &lt;br&gt;
+					This option will allow the updating of the faster &lt;br&gt;
+                               	Note:  You must choose from that the rate of filling dialogue access.log squid; &lt;br&gt;
+					The more customers, the more often it should be the job.
+			    </description>
+                        <type>select</type>
+                        <value>lsr_none</value>
+                        <options>
+                                <option><value>lsr_none</value><name>none</name></option>
+                                <option><value>lsr_d1</value><name>every 1 day</name></option>
+                                <option><value>lsr_d2</value><name>every 2 day</name></option>
+                                <option><value>lsr_d3</value><name>every 3 day</name></option>
+                                <option><value>lsr_d4</value><name>every 4 day</name></option>
+                                <option><value>lsr_d5</value><name>every 5 day</name></option>
+                                <option><value>lsr_d6</value><name>every 6 day</name></option>
+                                <option><value>lsr_w1</value><name>weekly at Monday</name></option>
+                                <option><value>lsr_w2</value><name>weekly at Tuesday</name></option>
+                                <option><value>lsr_w3</value><name>weekly at Wednesday</name></option>
+                                <option><value>lsr_w4</value><name>weekly at Thursday</name></option>
+                                <option><value>lsr_w5</value><name>weekly at Friday</name></option>
+                                <option><value>lsr_w6</value><name>weekly at Saturday</name></option>
+                                <option><value>lsr_w7</value><name>weekly at Sunday</name></option>
+                                <option><value>lsr_d10</value><name>every 10 day</name></option>
+                                <option><value>lsr_d15</value><name>every 15 day</name></option>
+                                <option><value>lsr_d20</value><name>every 20 day</name></option>
+                                <option><value>lsr_d25</value><name>every 25 day</name></option>
+                                <option><value>lsr_d30</value><name>every 30 day</name></option>
+                        </options>
+                </field>
+                <field>
+                        <fieldname>lightsquid_skipurl</fieldname>
+                        <fielddescr>Skip url</fielddescr>
+                        <description>
+                                If you want skip some sites from stat, example our local www server
+                                Example, if you want skip LOCAL site, put it here
+                                zdd.com|192.168.1.|cnn.com
+                        </description>
+                        <type>textarea</type>
+                        <cols>60</cols>
+                     <rows>5</rows>
+                </field>
+        </fields>
+        <custom_add_php_command>
+       </custom_add_php_command>
+       <custom_php_resync_config_command>
+	  	lightsquid_resync();
+       </custom_php_resync_config_command>
+       <custom_php_install_command>
+		lightsquid_install();
+            		lightsquid_resync();
+       </custom_php_install_command>
+       <custom_php_deinstall_command>
+		lightsquid_deinstall();
+       </custom_php_deinstall_command>
+</packagegui>
