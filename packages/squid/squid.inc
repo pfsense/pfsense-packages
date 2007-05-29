@@ -288,6 +288,10 @@ function squid_validate_general($post, $input_errors) {
 	if(($config['system']['webgui']['port'] == "") && ($config['system']['webgui']['protocol'] == "http")) {
 		$webgui_port = 80;
 	}
+	if(($config['system']['webgui']['port'] == "") && ($config['system']['webgui']['protocol'] == "https")) {
+		$webgui_port = 443;
+	}
+
 
 	if (($post['transparent_proxy'] != 'on') && ($port == $webgui_port)) {
 		$input_errors[] = "You can not run squid on the same port as the webgui";
