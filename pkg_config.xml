@@ -24,7 +24,7 @@
       <depends_on_package>lightsquid-1.7.1.tbz</depends_on_package>
       <status>Beta1</status>
       <required_version>1.2</required_version>
-      <config_file>http://www.pfsense.com/packages/config/lightsquid.xml</config_file>
+      <config_file>http://www.pfsense.com/packages/config/lightsquid/lightsquid.xml</config_file>
       <configurationfile>lightsquid.xml</configurationfile>
     </package>
 	<package>
