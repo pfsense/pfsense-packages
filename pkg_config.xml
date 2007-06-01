@@ -3,7 +3,7 @@
 <!-- $Id$ -->
 <pfsensepkgs>
   <packages>
-      <package>
+	<package>
       <name>PerUserBW</name>
       <descr>Adds a per user bandwidth distribution option.  Requires 1.2 or newer.</descr>
       <category>NET</category>
@@ -13,7 +13,21 @@
       <required_version>2.0</required_version>
       <configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
     </package>
-      <package>
+   <package>
+      <name>Lightsquid</name>
+      <descr>High perfomance web proxy Report. Required squid.</descr>
+      <website>http://lightsquid.sf.net/</website>
+      <category>Network</category>
+      <version>1.7.1</version>
+      <maintainer>dv_serg@mail.ru</maintainer>      		      
+      <depends_on_package_base_url>http://ftp.lv.freebsd.org/pub/FreeBSD/ports/packages/All/</depends_on_package_base_url>
+      <depends_on_package>lightsquid-1.7.1.tbz</depends_on_package>
+      <status>Beta1</status>
+      <required_version>1.2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/lightsquid.xml</config_file>
+      <configurationfile>lightsquid.xml</configurationfile>
+    </package>
+	<package>
       <name>Dashboard</name>
       <descr>Adds pfSense dashboard that will be included with 1.3. This requires 1.2-BETA-1 snapshot as of 5/23/07 or older.</descr>
       <category>System</category>
