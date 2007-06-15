@@ -9,13 +9,18 @@
 
         <!-- Installation -->
         <menu>
-                <name>Proxy server report</name>
-                <tooltiptext>Proxy filter statistic report</tooltiptext>
-                <section>Services</section>
+                <name>Proxy report</name>
+                <tooltiptext>Proxy server statistic report</tooltiptext>
+                <section>Status</section>
                 <url>/pkg_edit.php?xml=lightsquid.xml&amp;id=0</url>
         </menu>
         <additional_files_needed>
                <item>http://www.pfsense.com/packages/config/lightsquid/lightsquid.inc</item>
+        </additional_files_needed>
+        <additional_files_needed>
+               <item>http://www.pfsense.com/packages/config/lightsquid/lightsquid_tpl.tar.gz</item>
+               <prefix>/var/tmp/</prefix>
+               <chmod>0755</chmod>
         </additional_files_needed>
         <tabs>
                 <tab>
@@ -75,18 +80,34 @@
                         <options>
                                 <option><value>base</value><name>Base</name></option>
                                 <option><value>text</value><name>Text</name></option>
+                                <option><value>novosea</value><name>NovoSea</name></option>
+                                <option><value>novopf</value><name>NovoPf</name></option>
                         </options>
                 </field>
 
                 <field>
                         <fieldname>lightsquid_ip2name</fieldname>
                         <fielddescr>IP resolve method (future)</fielddescr>
-                        <description>Select IP to Name resolve method</description>
+                        <description>
+                        &lt;table cellpadding=1 cellspacing=0 style=&quot;text-align: left;&quot;&gt; &lt;tbody&gt;
+                        &lt;tr&gt;&lt;th colspan=2&gt; Select IP to Name resolve method (take effect only on new data): &lt;/th&gt;&lt;tr&gt;
+                        &lt;tr&gt;&lt;th&gt; IP         &lt;/th&gt;&lt;td&gt; - return IP &lt;/td&gt;&lt;tr&gt;
+                        &lt;tr&gt;&lt;th&gt; Demo       &lt;/th&gt;&lt;td&gt; - return AUTHNAME, else DNSNAME, else IP &lt;/td&gt;&lt;tr&gt;
+                        &lt;tr&gt;&lt;th&gt; DNS        &lt;/th&gt;&lt;td&gt; - return DNSNAME &lt;/td&gt;&lt;tr&gt; 
+                        &lt;tr&gt;&lt;th&gt; Simple     &lt;/th&gt;&lt;td&gt; - return AUTHNAME else IP &lt;/td&gt;&lt;tr&gt;
+                        &lt;tr&gt;&lt;th&gt; SMB        &lt;/th&gt;&lt;td&gt; - return SMB name of pc &lt;/td&gt;&lt;tr&gt;
+                        &lt;tr&gt;&lt;th&gt; Squidauth  &lt;/th&gt;&lt;td&gt; - return AUTHNAME else IP, allow cyrilyc name &lt;/td&gt;&lt;tr&gt;
+                        &lt;/tbody&gt; &lt;/table&gt;
+                        </description>
                         <type>select</type>
                         <value>dns</value>
                         <options>
+                                <option><value>ip</value><name>IP</name></option>                             
+                                <option><value>demo</value><name>Demo</name></option>                              
                                 <option><value>dns</value><name>DNS</name></option>                              
                                 <option><value>simple</value><name>Simple</name></option>                              
+                                <option><value>smb</value><name>SMB</name></option>                              
+                                <option><value>squidauth</value><name>Squidauth</name></option>                              
                         </options>
                 </field>
 
@@ -96,19 +117,22 @@
                         <description>
 			Select data refresh period. System will execute task every XX time as from 00:00 hours. &lt;br&gt;
 			For example: if selected 2h - system wil start task at 0-2-4-..-24h. &lt;br&gt;
-                               	Note:  (!),(*) - use only for powerful system; (+) - recomended. &lt;br&gt;
-			Press button below for start background refresh (this take some time). &lt;br&gt;
+                     Note:  (!),(*) - use only for powerful system; (+) - recomended. &lt;br&gt;&lt;br&gt;
 			&lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Refresh now&quot;&gt;&lt;br&gt;
 			&lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Refresh full&quot;&gt;
+			&lt;br&gt; Press button for start background refresh (this take some time).
+			&lt;br&gt; &lt;span style=&quot;color: rgb(153, 51, 0);&quot;&gt; Note after installation: 
+			&lt;br&gt; On the first - enable log in squid package with &quot;/var/squid/log&quot; path.
+			&lt;br&gt; On the second - press Refresh button for create lightsquid reports, else you will have error diagnostic page.&lt;/span&gt;
 	          </description>
                         <type>select</type>
                         <value>lhp_none</value>
                         <options>
                                 <option><value>lhp_none</value><name>none</name></option>
                                 <option><value>lhp_10m</value><name>10min(!)</name></option>
-                                <option><value>lhp_20m</value><name>20min(*)</name></option>
-                                <option><value>lhp_35m</value><name>30min(+)</name></option>
-                                <option><value>lhp_40m</value><name>40min(+)</name></option>
+                                <option><value>lhp_20m</value><name>20min(!)</name></option>
+                                <option><value>lhp_35m</value><name>30min(*)</name></option>
+                                <option><value>lhp_40m</value><name>40min(*)</name></option>
                                 <option><value>lhp_50m</value><name>50min(+)</name></option>
                                 <option><value>lhp_60m</value><name>60min(+)</name></option>
                                 <option><value>lhp_2h</value><name>2h</name></option>
