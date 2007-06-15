@@ -42,6 +42,7 @@ define('LS_LOG_FILE',  '/tmp/lightsquid_gui.log');
 define('LS_CONFIGPATH',       '/usr/local/etc/lightsquid');
 define('LS_CONFIGFILE',       'lightsquid.cfg');
 define('LS_CONFIGFILE_DIST',  'lightsquid.cfg.dist');
+define('LS_WWWPATH',          '/usr/local/www/lightsquid');
 define('LS_TEMPLATEPATH',     '/usr/local/www/lightsquid/tpl');
 define('LS_LANGPATH',         '/usr/local/share/lightsquid/lang');
 define('LS_REPORTPATH',       '/var/lightsquid/report');
@@ -93,6 +94,13 @@ function lightsquid_install() {
               update_log("lightsquid_install: Create report dir " . LS_REPORTPATH);
               mwexec("mkdir -p " . LS_REPORTPATH);
          }
+
+         // install templates
+         $lstpl_file = "/var/tmp/lightsquid_tpl.tar.gz";
+         if (file_exists($lstpl_file)) {
+              mwexec("tar zxvf $lstpl_file -C " . LS_TEMPLATEPATH);
+              update_log("lightsquid_install: Install templates from $lstpl_file");
+         }
          update_log("lightsquid_install: stopped");
 }
 
@@ -104,6 +112,9 @@ function lightsquid_deinstall() {
          ls_setup_cron("lightsquid_parser", "", "", false);
          // control shoot to head :)
          mwexec("pkg_delete lightsquid-1.7.1");
+         // remove '/usr/local/www/lightsquid' dir - any time can't be removed by templates
+         if (file_exists(LS_WWWPATH))
+             mwexec("rm -rf " . LS_WWWPATH);
 
          update_log("lightsquid_deinstall: stopped");
 }
@@ -140,19 +151,23 @@ function lightsquid_resync() {
                         $tm_squid = $cfg[LS_XML_SQUID_SHEDULERTIME];
 
                         if (isset($cfg[LS_XML_LANG]) and !empty($cfg[LS_XML_LANG]))
-                                $lsconf_var[LS_VAR_LANG] = "\"" . $cfg[LS_XML_LANG] . "\";";
+                            $lsconf_var[LS_VAR_LANG] = "\"" . $cfg[LS_XML_LANG] . "\";";
 
                         if (isset($cfg[LS_XML_SKIPURL]) and !empty($cfg[LS_XML_SKIPURL]))
-                                $lsconf_var[LS_VAR_SKIPURL] = "\"" . $cfg[LS_XML_SKIPURL] . "\";";
+                            $lsconf_var[LS_VAR_SKIPURL] = "\"" . $cfg[LS_XML_SKIPURL] . "\";";
 
                         if (isset($cfg[LS_XML_IP2NAME]) and !empty($cfg[LS_XML_IP2NAME] ))
-                                $lsconf_var[LS_VAR_IP2NAME] = "\"" . $cfg[LS_XML_IP2NAME] . "\";";
+                            $lsconf_var[LS_VAR_IP2NAME] = "\"" . $cfg[LS_XML_IP2NAME] . "\";";
 
-                        if (isset($cfg[LS_XML_TEMPLATE]) and !empty($cfg[LS_XML_TEMPLATE]))
-                                $lsconf_var[LS_VAR_TEMPLATE] = "\"" . $cfg[LS_XML_TEMPLATE] . "\";";
+                        if (isset($cfg[LS_XML_TEMPLATE]) and !empty($cfg[LS_XML_TEMPLATE])) {
+                            $tpl_val = $cfg[LS_XML_TEMPLATE];
+                            // check template path
+                            if (!file_exists(LS_TEMPLATEPATH."/$tpl_val")) $tpl_val = 'base';
+                            $lsconf_var[LS_VAR_TEMPLATE] = "\"" . $tpl_val . "\";";
+                        }
 
                         if (isset($cfg[LS_XML_BARCOLOR]) and !empty($cfg[LS_XML_BARCOLOR]))
-                                $lsconf_var[LS_VAR_BARCOLOR] = "\"" . $cfg[LS_XML_BARCOLOR] . "\";";
+                            $lsconf_var[LS_VAR_BARCOLOR] = "\"" . $cfg[LS_XML_BARCOLOR] . "\";";
                 }
 
              $lsconf = "";
@@ -195,7 +210,7 @@ function lightsquid_resync() {
         // set shedule - refresh data job
         if ($tm) {
             $on = false;
-            $opt = array("*", "*", "*", "*", "*", "root", CRONTAB_LS_TEMPLATE);
+            $opt = array("*", "*", "*", "*", "*", "root", CRONTAB_LS_TEMPLATE . " today");
             switch($tm) {
                   case 'lhp_none': $on = false; break;
                   case 'lhp_10m':  $on = true; $opt[0]= "*/10"; break;
@@ -368,7 +383,7 @@ function update_log($log) {
 }
 
 function refresh_now() {
-        $cmd = CRONTAB_LS_TEMPLATE;
+        $cmd = CRONTAB_LS_TEMPLATE . " today";
         update_log("refresh_now: execute command '$cmd'");
         mwexec_bg($cmd);
 }
@@ -377,6 +392,11 @@ function refresh_full() {
         $cmd = CRONTAB_LS_TEMPLATE;
         $log_name = LS_SQUIDLOG;
         update_log("refresh_full: start");
+
+        // parse access.log
+        update_log("refresh_full: execute command '$cmd'");
+        mwexec_bg("$cmd $lg");
+        // parse access.log.x
         for ($i=0; $i<100; $i++) {
              $lg = LS_SQUIDLOG . ".$i";
              if (file_exists(LS_SQUIDLOGPATH . "/$lg")) {
