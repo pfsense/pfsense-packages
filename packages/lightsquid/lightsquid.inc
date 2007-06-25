@@ -60,7 +60,7 @@ define('CRONTAB_SQUID_JOBKEY',       '/squid -k rotate');
 define('LS_DEF_IP2NAME',        'dns');
 define('LS_DEF_SQUIDLOGTYPE',   '0');
 define('LS_DEF_SKIPURL',        'zzz\.zzz');
-define('LS_DEF_LANG',           'en');
+define('LS_DEF_LANG',           'eng');
 define('LS_DEF_TEMPLATE',       'base');
 define('LS_DEF_BARCOLOR',       'orange');
 

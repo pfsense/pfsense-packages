@@ -39,7 +39,7 @@
                         <fielddescr>Language</fielddescr>
                         <description>Select report language</description>
                         <type>select</type>
-                        <value>lang_eng</value>
+                        <value>eng</value>
                         <options>
                                  <option><value>bg</value><name>Bulgarian</name></option>
                                  <option><value>cz</value><name>Czech</name></option>
