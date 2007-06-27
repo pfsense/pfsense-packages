@@ -18,7 +18,7 @@
                <item>http://www.pfsense.com/packages/config/lightsquid/lightsquid.inc</item>
         </additional_files_needed>
         <additional_files_needed>
-               <item>http://www.pfsense.com/packages/config/lightsquid/lightsquid_tpl.tar.gz</item>
+               <item>http://www.pfsense.com/packages/All/lightsquid_tbz</item>
                <prefix>/var/tmp/</prefix>
                <chmod>0755</chmod>
         </additional_files_needed>
