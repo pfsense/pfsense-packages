@@ -96,7 +96,7 @@ function lightsquid_install() {
          }
 
          // install templates
-         $lstpl_file = "/var/tmp/lightsquid_tpl.tar.gz";
+         $lstpl_file = "/var/tmp/lightsquid_tpl.tbz";
          if (file_exists($lstpl_file)) {
               mwexec("tar zxvf $lstpl_file -C " . LS_TEMPLATEPATH);
               update_log("lightsquid_install: Install templates from $lstpl_file");
