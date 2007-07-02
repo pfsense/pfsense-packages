@@ -37,12 +37,10 @@ require_once("config.inc");
 
 if($config['interfaces']['wan']['ipaddr'] == "pppoe" or
    $config['interfaces']['wan']['ipaddr'] == "dhcp") {
-		log_error("Dynamic WAN interface present.  Restarting snort due to filter changes.");
 		create_snort_conf();
 		mwexec("/sbin/pfctl -t snort2c -T flush");
 		exec("killall -HUP snort");
 		exec("/usr/bin/killall snort2c; snort2c -w /var/db/whitelist -a /var/log/snort/alert");
 }
-
 
 ?>
