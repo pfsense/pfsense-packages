@@ -386,7 +386,7 @@ preprocessor telnet_decode
 #sf Portscan
 preprocessor sfportscan: proto { all } \
 						scan_type { all } \
-						sense_level { high } \
+						sense_level { low } \
 						ignore_scanners { \$HOME_NET }
 							
 						
