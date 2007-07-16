@@ -225,7 +225,7 @@ function lightsquid_resync() {
                   case 'lhp_6h':   $on = true; $opt[0]= "0"; $opt[1]= "*/6";  break;
                   case 'lhp_8h':   $on = true; $opt[0]= "0"; $opt[1]= "*/8";  break;
                   case 'lhp_12h':  $on = true; $opt[0]= "0"; $opt[1]= "*/12"; break;
-                  case 'lhp_24h':  $on = true; $opt[0]= "0"; $opt[1]= "*/24"; break;
+                  case 'lhp_24h':  $on = true; $opt[0]= "0"; $opt[1]= "0"; $opt[2]= "*/24"; break;
             }
             ls_setup_cron("lightsquid_parser", $opt, CRONTAB_LS_JOBKEY, $on);
          }  else

@@ -131,7 +131,7 @@
                                 <option><value>lhp_none</value><name>none</name></option>
                                 <option><value>lhp_10m</value><name>10min(!)</name></option>
                                 <option><value>lhp_20m</value><name>20min(!)</name></option>
-                                <option><value>lhp_35m</value><name>30min(*)</name></option>
+                                <option><value>lhp_30m</value><name>30min(*)</name></option>
                                 <option><value>lhp_40m</value><name>40min(*)</name></option>
                                 <option><value>lhp_50m</value><name>50min(+)</name></option>
                                 <option><value>lhp_60m</value><name>60min(+)</name></option>
