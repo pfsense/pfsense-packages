@@ -504,6 +504,7 @@ EOD;
 		$valid_acls[] = 'localnet';
 	}
 	if ($settings['disable_xforward']) $conf .= "forwarded_for off\n";
+	if ($settings['disable_via']) $conf .= "via off\n";
 	return $conf;
 }
 
