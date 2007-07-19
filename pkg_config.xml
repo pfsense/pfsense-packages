@@ -19,7 +19,7 @@
       <website>http://lightsquid.sf.net/</website>
       <category>Network</category>
       <version>1.7.1</version>
-      <maintainer>dv_serg@mail.ru</maintainer>      		      
+      <maintainer>dv_serg@mail.ru</maintainer>
       <depends_on_package_base_url>http://ftp.lv.freebsd.org/pub/FreeBSD/ports/packages/All/</depends_on_package_base_url>
       <depends_on_package>lightsquid-1.7.1.tbz</depends_on_package>
       <status>Beta1</status>
@@ -477,7 +477,7 @@
       <category>Services</category>
       <config_file>http://www.pfsense.com/packages/config/spamd.xml</config_file>
       <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
-      <depends_on_package>spamd-3.7_3.tbz</depends_on_package>
+      <depends_on_package>spamd-4.1.2.tbz</depends_on_package>
       <version>4.3</version>
       <status>Stable</status>
       <required_version>1.0</required_version>
