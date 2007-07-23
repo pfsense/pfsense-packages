@@ -505,7 +505,8 @@ EOD;
 	}
 	if ($settings['disable_xforward']) $conf .= "forwarded_for off\n";
 	if ($settings['disable_via']) $conf .= "via off\n";
-	return $conf;
+	if (!empty($settings['uri_whitespace'])) $conf .= "uri_whitespace {$settings['uri_whitespace']}\n";
+  return $conf;
 }
 
 function squid_resync_cache() {

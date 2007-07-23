@@ -182,7 +182,7 @@
 		<field>
 			<fielddescr>Disable X-Forward</fielddescr>
 			<fieldname>disable_xforward</fieldname>
-			<description>If not set, Squid will include your system's IP address or name in the HTTP requests it forwards. By default it looks like this: X-Forwarded-For: 192.1.2.3. If you enable this, it will appear as X-Forwarded-For: unknown</description>
+			<description>If not set, Squid will include your system's IP address or name in the HTTP requests it forwards.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
@@ -190,6 +190,35 @@
 			<fieldname>disable_via</fieldname>
 			<description>If not set, Squid will include a Via header in requests and replies.</description>
 			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>What to do with requests that have whitespace characters in the	URI.</fielddescr>
+			<fieldname>uri_whitespace</fieldname>
+      <description>&lt;b&gt; strip:&lt;/b&gt; The whitespace characters are stripped out of the URL. This is the behavior recommended by RFC2396. &lt;p&gt; &lt;b&gt; deny:&lt;/b&gt; The request is denied. The user receives an "Invalid Request" message.&lt;p&gt; &lt;b&gt; allow:&lt;/b&gt; The request is allowed and the URI is not changed. The whitespace characters remain in the URI.&lt;p&gt; &lt;b&gt; encode:&lt;/b&gt; The request is allowed and the whitespace characters are encoded according to RFC1738.&lt;p&gt; &lt;b&gt; chop:&lt;/b&gt;	The request is allowed and the URI is chopped at the first whitespace.</description>
+  		<type>select</type>
+			<options>
+				<option>
+					<value>strip</value>
+					<name>strip</name>
+				</option>
+				<option>
+				<value>deny</value>
+					<name>deny</name>
+				</option>
+				<option>
+					<value>allow</value>
+					<name>allow</name>
+				</option>
+				<option>
+					<value>encode</value>
+					<name>encode</name>
+				</option>
+				<option>
+					<value>chop</value>
+					<name>chop</name>
+				</option>
+			</options>
+			<default_value>strip</default_value>
 		</field>
 	</fields>
 	<custom_add_php_command>
