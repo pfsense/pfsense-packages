@@ -10,6 +10,9 @@ function dashboard_install() {
 	}
 	mwexec("tar xzvpf /usr/local/pkg/widgets.tgz -C /usr/local/www/");
 	mwexec("chmod a-w /usr/local/www/index.php");
+	mwexec("chmod a-w /usr/local/www/fbegin.php");
+	mwexec("chmod a-w /usr/local/www/graph_cpu.php");
+	mwexec("chmod a-w /usr/local/www/stats.php");
 }
 
 function dashboard_deinstall() {
