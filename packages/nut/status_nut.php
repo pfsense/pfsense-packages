@@ -3,7 +3,7 @@
 	status_nut.php
 	part of pfSense (http://www.pfsense.com/)
 
-	Copyright (C) 2007 Ryan Wagoner <ryan@wgnrs.dynu.com>.
+	Copyright (C) 2007 Ryan Wagoner <rswagoner@gmail.com>.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without

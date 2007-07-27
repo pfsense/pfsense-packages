@@ -206,7 +206,7 @@
       work properly from behind a NAT firewall.</descr>
       <website>http://miniupnp.free.fr/</website>
       <category>Network Management</category>
-      <maintainer>seth.mos@xs4all.nl ryan@wgnrs.dynu.com</maintainer>
+      <maintainer>seth.mos@xs4all.nl rswagoner@gmail.com</maintainer>
       <version>20070521</version>
       <required_version>1.0</required_version>
       <status>Stable</status>
@@ -220,7 +220,7 @@
       IRC to different degrees.</descr>
       <website>http://www.imspector.org/</website>
       <category>Network Management</category>
-	  <maintainer>ryan@wgnrs.dynu.com</maintainer>
+	  <maintainer>rswagoner@gmail.com</maintainer>
       <version>0.3</version>
       <required_version>1.0</required_version>
       <status>BETA</status>
@@ -237,7 +237,7 @@
       <version>2.0.5</version>
       <status>BETA</status>
       <required_version>1.0</required_version>
-      <maintainer>ryan@wgnrs.dynu.com</maintainer>
+      <maintainer>rswagoner@gmail.com</maintainer>
 	  <config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
 	  <configurationfile>nut.xml</configurationfile>
 	  <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
