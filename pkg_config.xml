@@ -21,7 +21,7 @@
       <version>1.7.1</version>
       <maintainer>dv_serg@mail.ru</maintainer>
       <depends_on_package_base_url>http://ftp.lv.freebsd.org/pub/FreeBSD/ports/packages/All/</depends_on_package_base_url>
-      <depends_on_package>lightsquid-1.7.1.tbz</depends_on_package>
+      <depends_on_package>lightsquid-1.7.1_1.tbz</depends_on_package>
       <status>Beta1</status>
       <required_version>1.2</required_version>
       <config_file>http://www.pfsense.com/packages/config/lightsquid/lightsquid.xml</config_file>
