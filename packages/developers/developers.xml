@@ -8,6 +8,9 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/~sullrich/extra/developer_pkg.tgz</item>
 	</additional_files_needed>
+    <custom_php_install_command>
+		mwexec_bg("cd / &amp;&amp; tar xzvpfqU /usr/local/pkg/developer_pkg.tgz");
+    </custom_php_install_command>
 </packagegui>
 
 	
