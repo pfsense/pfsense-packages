@@ -39,7 +39,7 @@
     </package>
 	<package>
       <name>Dashboard</name>
-      <descr>Adds pfSense dashboard that will be included with 1.3. This requires 1.2-BETA-2 or newer.</descr>
+      <descr>Adds pfSense dashboard that will be included with 1.3. This requires 1.2-BETA-2 or newer. WARNING!  Cannot be deinstalled.</descr>
       <category>System</category>
       <config_file>http://www.pfsense.com/packages/config/dashboard/dashboard.xml</config_file>
       <version>0.6</version>
