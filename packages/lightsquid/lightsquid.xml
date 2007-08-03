@@ -4,7 +4,7 @@
         <name>lightsquid</name>
         <title>Services: Proxy server Report(LightSquid) -> Settings</title>
         <category>Status</category>
-        <version>1.7.1</version>
+        <version>1.7.1_1</version>
         <include_file>/usr/local/pkg/lightsquid.inc</include_file>
 
         <!-- Installation -->
