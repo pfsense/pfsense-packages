@@ -18,7 +18,7 @@
       <descr>High perfomance web proxy Report. Required squid.</descr>
       <website>http://lightsquid.sf.net/</website>
       <category>Network</category>
-      <version>1.7.1</version>
+      <version>1.7.1_1</version>
       <maintainer>dv_serg@mail.ru</maintainer>
       <depends_on_package_base_url>http://ftp.lv.freebsd.org/pub/FreeBSD/ports/packages/All/</depends_on_package_base_url>
       <depends_on_package>lightsquid-1.7.1_1.tbz</depends_on_package>
