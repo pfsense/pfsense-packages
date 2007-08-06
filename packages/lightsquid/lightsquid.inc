@@ -34,6 +34,8 @@ require_once('pkg-utils.inc');
 require_once('filter.inc');
 require_once('service-utils.inc');
 
+define ('CMD_PKGDELETE', 'pkg_delete lightsquid-1.7.1_1');
+
 // enable GUI debug
 define('LS_GUI_DEBUG', 'on');
 define('LS_LOG_FILE',  '/tmp/lightsquid_gui.log');
@@ -111,7 +113,7 @@ function lightsquid_deinstall() {
          ls_setup_cron("lightsquid_squid_rotate", "", "", false);
          ls_setup_cron("lightsquid_parser", "", "", false);
          // control shoot to head :)
-         mwexec("pkg_delete lightsquid-1.7.1");
+         mwexec(CMD_PKGDELETE);
          // remove '/usr/local/www/lightsquid' dir - any time can't be removed by templates
          if (file_exists(LS_WWWPATH))
              mwexec("rm -rf " . LS_WWWPATH);
