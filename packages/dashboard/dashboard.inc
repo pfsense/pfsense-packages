@@ -2,6 +2,7 @@
 
 function dashboard_install() {
 	global $g, $config;
+	mwexec("chmod ug+rw /usr/local/www/index.php");
 	if(!file_exists("/usr/local/www/index.php.before_dashboard")) {
 		/* backup the pre-dashboard index.php file */
 		mwexec("cp /usr/local/www/index.php /usr/local/www/index.php.before_dashboard");
@@ -17,9 +18,9 @@ function dashboard_install() {
 
 function dashboard_deinstall() {
 	global $g, $config;
+	mwexec("chmod ug+rw /usr/local/www/index.php");
 	if(file_exists("/usr/local/www/index.php.before_dashboard")) {
 		/* restore the files prior to the dashboard package installation */
-		mwexec("chmod ug+rw /usr/local/www/index.php");
 		mwexec("cp /usr/local/www/index.php.before_dashboard /usr/local/www/index.php");
 		mwexec("cp /usr/local/www/fbegin.inc.before_dashboard /usr/local/www/fbegin.inc");
 	}
