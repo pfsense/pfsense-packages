@@ -46,7 +46,8 @@ if ($_POST['clear']) {
 	system_syslogd_start();
 	exec("/usr/bin/killall -HUP snort");
 	exec("/usr/bin/killall snort2c");
-	exec("/usr/local/bin/snort2c -w /var/db/whitelist -a /var/log/snort/alert");
+	if ($config['installedpackages']['snort']['config'][0]['blockoffenders'] == 'on')
+		exec("/usr/local/bin/snort2c -w /var/db/whitelist -a /var/log/snort/alert");
 }
 
 $pgtitle = "Services: Snort: Snort Alerts";
