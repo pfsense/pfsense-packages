@@ -78,67 +78,67 @@
                         element.style.visibility = 'visible';
                         element.style.display = 'block';
                         element.style.top = '0';
-                        element.class = 'highLight';
+                        element.className = 'highLight';
 
                         if (whichItem != 'info-div') {
                             document.getElementById('info-div').style.visibility = 'hidden';
                             document.getElementById('info-div').style.display = 'none';
-                            document.getElementById('info-div').class = '';
+                            document.getElementById('info-div').className = '';
                         }
                         if (whichItem != 'license-div') {
                             document.getElementById('license-div').style.visibility = 'hidden';
                             document.getElementById('license-div').style.display = 'none';
-                            document.getElementById('license-div').class = '';
+                            document.getElementById('license-div').className = '';
                         }
                         if (whichItem != 'desc-div') {
                             document.getElementById('desc-div').style.visibility = 'hidden';
                             document.getElementById('desc-div').style.display = 'none';
-                            document.getElementById('desc-div').class = '';
+                            document.getElementById('desc-div').className = '';
                         }
                         if (whichItem != 'req-div') {
                             document.getElementById('req-div').style.visibility = 'hidden';
                             document.getElementById('req-div').style.display = 'none';
-                            document.getElementById('req-div').class = '';
+                            document.getElementById('req-div').className = '';
                         }
                         if (whichItem != 'faq-div') {
                             document.getElementById('faq-div').style.visibility = 'hidden';
                             document.getElementById('faq-div').style.display = 'none';
-                            document.getElementById('faq-div').class = '';
+                            document.getElementById('faq-div').className = '';
                         }
                         if (whichItem != 'files-div') {
                             document.getElementById('files-div').style.visibility = 'hidden';
                             document.getElementById('files-div').style.display = 'none';
-                            document.getElementById('files-div').class = '';
+                            document.getElementById('files-div').className = '';
                         }
                         if (whichItem != 'menu-div') {
                             document.getElementById('menu-div').style.visibility = 'hidden';
                             document.getElementById('menu-div').style.display = 'none';
-                            document.getElementById('menu-div').class = '';
+                            document.getElementById('menu-div').className = '';
                         }
                         if (whichItem != 'tab-div') {
                             document.getElementById('tab-div').style.visibility = 'hidden';
                             document.getElementById('tab-div').style.display = 'none';
-                            document.getElementById('tab-div').class = '';
+                            document.getElementById('tab-div').className = '';
                         }
                         if (whichItem != 'service-div') {
                             document.getElementById('service-div').style.visibility = 'hidden';
                             document.getElementById('service-div').style.display = 'none';
-                            document.getElementById('service-div').class = '';
+                            document.getElementById('service-div').className = '';
                         }
                         if (whichItem != 'rsync-div') {
                             document.getElementById('rsync-div').style.visibility = 'hidden';
                             document.getElementById('rsync-div').style.display = 'none';
-                            document.getElementById('rsync-div').class = '';
+                            document.getElementById('rsync-div').className = '';
                         }
                         if (whichItem != 'install-div') {
                             document.getElementById('install-div').style.visibility = 'hidden';
                             document.getElementById('install-div').style.display = 'none';
-                            document.getElementById('install-div').class = '';
+                            document.getElementById('install-div').className = '';
                         }
                         if (whichItem != 'deinstall-div') {
                             document.getElementById('deinstall-div').style.visibility = 'hidden';
                             document.getElementById('deinstall-div').style.display = 'none';
-                            document.getElementById('deinstall-div').class = '';
+                            document.getElementById('deinstall-div').className = '';
                         }
                     }
                 ]]>
