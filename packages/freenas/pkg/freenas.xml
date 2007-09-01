@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!--
+<!DOCTYPE packagegui SYSTEM "../../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../../xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
 /* $Id$ */
 /* ========================================================================== */
 /*
-    freenas.xml
+    authng.xml
     part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2006 Daniel S. Haischt <me@daniel.stefan.haischt.name>
-    All rights reserved.
-
-    Based on FreeNAS (http://www.freenas.org)
-    Copyright (C) 2005-2006 Olivier Cochard-Labb&#233; <olivier@freenas.org>.
+    Copyright (C) 2007 Daniel S. Haischt <me@daniel.stefan.haischt.name>
     All rights reserved.
 
     Based on m0n0wall (http://m0n0.ch/wall)
@@ -40,8 +40,11 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
--->
-<packagegui>
+        ]]>
+        </copyright>
+  <description>Describe your package here</description>
+  <requirements>Describe your package requirements here</requirements>
+  <faq>Currently there are no FAQ items provided.</faq>
   <name>freenas</name>
   <version>1.0</version>
   <title>System: Disks: Management</title>

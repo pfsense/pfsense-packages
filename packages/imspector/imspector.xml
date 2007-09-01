@@ -1,27 +1,62 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<title>Services: IMSpector</title>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    authng.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2007 to whom it may belong
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
 	<name>imspector</name>
 	<version>0.3</version>
+	<title>Services: IMSpector</title>
 	<savetext>Change</savetext>
-	<include_file>/usr/local/pkg/imspector.inc</include_file>
 	<aftersaveredirect>/services_imspector_logs.php</aftersaveredirect>
+	<include_file>/usr/local/pkg/imspector.inc</include_file>
 	<menu>
 		<name>IMSpector</name>
 		<tooltiptext>Set IMSpector settings such as protocols to listen on.</tooltiptext>
 		<section>Services</section>
 		<url>/services_imspector_logs.php</url>
 	</menu>
-	<additional_files_needed>
-	    <prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/imspector/imspector.inc</item>
-	</additional_files_needed>
-	<additional_files_needed>
-	    <prefix>/usr/local/www/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/imspector/services_imspector_logs.php</item>
-	</additional_files_needed>
 	<service>
 		<name>imspector</name>
 		<rcfile>imspector.sh</rcfile>
@@ -38,6 +73,16 @@
 			<active/>
 		</tab>
 	</tabs>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/imspector/imspector.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/imspector/services_imspector_logs.php</item>
+	</additional_files_needed>
 	<fields>
 		<field>
 			<fielddescr>Enable IMSpector</fielddescr>
@@ -47,20 +92,21 @@
 		<field>
 			<fielddescr>Interfaces (generally LAN)</fielddescr>
 			<fieldname>iface_array</fieldname>
+			<description>You can use the CTRL or COMMAND key to select multiple interfaces.</description>
+			<type>interfaces_selection</type>
+			<size>3</size>
+			<required/>
 			<value>lan</value>
 			<multiple>true</multiple>
-			<size>3</size>
-			<type>interfaces_selection</type>
-			<description>You can use the CTRL or COMMAND key to select multiple interfaces.</description>
-			<required/>
 		</field>
 		<field>
 			<fielddescr>Listen on protocols</fielddescr>
 			<fieldname>proto_array</fieldname>
-			<multiple>true</multiple>
+			<description>You can use the CTRL or COMMAND key to select multiple protocols.</description>
 			<type>select</type>
 			<size>4</size>
-			<description>You can use the CTRL or COMMAND key to select multiple protocols.</description>
+			<required/>
+			<multiple>true</multiple>
  			<options>
  				<option>
  					<name>MSN</name>
@@ -79,25 +125,24 @@
  					<value>irc</value>
  				</option>			
 			</options>
-			<required/>
 		</field>
 		<field>
 			<fielddescr>Enable filtering of bad words</fielddescr>
 			<fieldname>filter_badwords</fieldname>
-			<type>checkbox</type>
 			<description>Replaces words specified in /usr/local/etc/imspector/badwords.txt with *</description>
+			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Enable file logging</fielddescr>
 			<fieldname>log_file</fieldname>
-			<type>checkbox</type>
 			<description>Log files stored in /var/imspector</description>
+			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>Enable MySQL logging</fielddescr>
 			<fieldname>log_mysql</fieldname>
-			<type>checkbox</type>
 			<description>Make sure to specify your MySQL credentials below</description>
+			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>MySQL Server</fielddescr>

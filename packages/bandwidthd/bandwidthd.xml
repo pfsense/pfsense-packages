@@ -1,15 +1,66 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    authng.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2007 to whom it may belong
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
 	<name>bandwidthd</name>
 	<version>1.0</version>
-	<configpath>installedpackages->package->bandwidthd</configpath>
 	<title>Bandwidthd</title>
+	<aftersaveredirect>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</aftersaveredirect>
+	<include_file>/usr/local/pkg/bandwidthd.inc</include_file>
 	<menu>
 		<name>BandwidthD</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</url>
 	</menu>
+	<service>
+			<name>bandwidthd</name>
+			<rcfile>bandwidthd.sh</rcfile>
+			<executable>bandwidthd</executable>
+    </service>
 	<tabs>
 		<tab>
 			<text>BandwidthD</text>
@@ -21,88 +72,82 @@
 			<url>/bandwidthd</url>
 		</tab>
 	</tabs>
-	<service>
-			<name>bandwidthd</name>
-			<rcfile>bandwidthd.sh</rcfile>
-			<executable>bandwidthd</executable>
-    </service>
-	<aftersaveredirect>/pkg_edit.php?xml=bandwidthd.xml&amp;id=0</aftersaveredirect>
+	<configpath>installedpackages->package->bandwidthd</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/bandwidthd/bandwidthd.inc</item>
 	</additional_files_needed>
+	<fields>
+		<field>
+			<fielddescr>interface</fielddescr>
+			<fieldname>active_interface</fieldname>
+			<description>The interface that bandwidthd will bind to.</description>
+			<type>interfaces_selection</type>
+			<required/>
+			<default_value>lan</default_value>
+		</field>	
+		<field>
+			<fielddescr>Skip intervals</fielddescr>
+			<fieldname>skipintervals</fieldname>
+			<description></description>
+			<type>input</type>
+			<value>1024</value>
+		</field>
+		<field>
+			<fielddescr>Graph cutoff</fielddescr>
+			<fieldname>graphcutoff</fieldname>
+			<description>Graph cutoff is how many k must be transfered by an ip before we bother to graph it</description>
+			<type>input</type>
+			<value>1024</value>
+		</field>
+		<field>
+			<fielddescr>promiscuous</fielddescr>
+			<fieldname>promiscuous</fieldname>
+			<description>Put interface in promiscuous mode to score to traffic that may not be routing through the host machine.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>output_cdf</fielddescr>
+			<fieldname>outputcdf</fieldname>
+			<description>Log data to cdf file htdocs/log.cdf</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>recover_cdf</fielddescr>
+			<fieldname>recovercdf</fieldname>
+			<description>Read back the cdf file on startup</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>filter</fielddescr>
+			<fieldname>filter</fieldname>
+			<description>Libpcap format filter string used to control what bandwidthd see's.  Please always include "ip" in the string to avoid strange problems.</description>
+			<type>input</type>
+			<value>ip</value>
+		</field>
+		<field>
+			<fielddescr>Draw Graphs</fielddescr>
+			<fieldname>drawgraphs</fieldname>
+			<description>This default to true to graph the traffic bandwidthd is recording.  Usually set this to false if you only want cdf output or you are using the database output option.  Bandwidthd will use very little ram and cpu if this is set to false.</description>
+			<type>checkbox</type>
+			<value>checked</value>
+		</field>
+		<field>
+			<fielddescr>Meta Refresh</fielddescr>
+			<fieldname>meta_refresh</fieldname>
+			<description>Set META REFRESH seconds (default 150, use 0 to disable).</description>
+			<type>input</type>
+			<value>150</value>
+		</field>
+	</fields>
+	<custom_php_resync_config_command>
+		bandwidthd_install_config();
+	</custom_php_resync_config_command>
 	<custom_php_install_command>
 		bandwidthd_install_config();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		bandwidthd_install_deinstall();
 	</custom_php_deinstall_command>
-	<custom_php_resync_config_command>
-		bandwidthd_install_config();
-	</custom_php_resync_config_command>
-	<include_file>/usr/local/pkg/bandwidthd.inc</include_file>
-	<fields>
-		<field>
-			<fieldname>active_interface</fieldname>
-			<fielddescr>interface</fielddescr>
-			<description>The interface that bandwidthd will bind to.</description>
-			<default_value>lan</default_value>
-			<required/>
-			<type>interfaces_selection</type>
-		</field>	
-		<field>
-			<fieldname>skipintervals</fieldname>
-			<fielddescr>Skip intervals</fielddescr>
-			<description></description>
-			<type>input</type>
-			<value>1024</value>
-		</field>
-		<field>
-			<fieldname>graphcutoff</fieldname>
-			<fielddescr>Graph cutoff</fielddescr>
-			<description>Graph cutoff is how many k must be transfered by an ip before we bother to graph it</description>
-			<type>input</type>
-			<value>1024</value>
-		</field>
-		<field>
-			<fieldname>promiscuous</fieldname>
-			<fielddescr>promiscuous</fielddescr>
-			<description>Put interface in promiscuous mode to score to traffic that may not be routing through the host machine.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fieldname>outputcdf</fieldname>
-			<fielddescr>output_cdf</fielddescr>
-			<description>Log data to cdf file htdocs/log.cdf</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fieldname>recovercdf</fieldname>
-			<fielddescr>recover_cdf</fielddescr>
-			<description>Read back the cdf file on startup</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fieldname>filter</fieldname>
-			<fielddescr>filter</fielddescr>
-			<description>Libpcap format filter string used to control what bandwidthd see's.  Please always include "ip" in the string to avoid strange problems.</description>
-			<type>input</type>
-			<value>ip</value>
-		</field>
-		<field>
-			<fieldname>drawgraphs</fieldname>
-			<fielddescr>Draw Graphs</fielddescr>
-			<description>This default to true to graph the traffic bandwidthd is recording.  Usually set this to false if you only want cdf output or you are using the database output option.  Bandwidthd will use very little ram and cpu if this is set to false.</description>
-			<type>checkbox</type>
-			<value>checked</value>
-		</field>
-		<field>
-			<fieldname>meta_refresh</fieldname>
-			<fielddescr>Meta Refresh</fielddescr>
-			<description>Set META REFRESH seconds (default 150, use 0 to disable).</description>
-			<type>input</type>
-			<value>150</value>
-		</field>
-	</fields>
 </packagegui>

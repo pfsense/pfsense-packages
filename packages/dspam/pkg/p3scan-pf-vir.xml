@@ -1,5 +1,50 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../../xsl/package.xsl"?>
 <packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    authng.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2007 Daniel S. Haischt <me@daniel.stefan.haischt.name>
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+  <description>Describe your package here</description>
+  <requirements>Describe your package requirements here</requirements>
+  <faq>Currently there are no FAQ items provided.</faq>
   <!-- change this if configpath works -->
   <name>p3scanpfvir</name>
   <version>1.0</version>
@@ -9,8 +54,8 @@
     set, you are still required to save this page if you are editing this page
     for the very first time!
   </note>
-  <include_file>/usr/local/pkg/p3scan.inc</include_file>
   <aftersaveredirect>pkg_edit.php?xml=p3scan-pf-vir.xml&amp;id=0</aftersaveredirect>
+  <include_file>/usr/local/pkg/p3scan.inc</include_file>
   <tabs>
     <tab>
       <text>Daemon Settings</text>
@@ -49,8 +94,8 @@
       <fieldname>scannertype</fieldname>
       <description>Select here which type of scanner you want to use.</description>
       <type>select</type>
-      <default_value>clamd</default_value>
       <size>1</size>
+      <default_value>clamd</default_value>
       <options>
         <option><value>avpd</value><name>Kaspersky Anti-Virus for Linux</name></option>
         <option><value>avpd_new</value><name>Kaspersky Anti-Virus for Linux (New)</name></option>
@@ -65,8 +110,8 @@
       <fieldname>scanner</fieldname>
       <description>Depends on scannertype.</description>
       <type>input</type>
-      <default_value>127.0.0.1:3310</default_value>
       <required />
+      <default_value>127.0.0.1:3310</default_value>
     </field>
     <field>
       <fielddescr>Scanner Returncode</fielddescr>
