@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -44,15 +45,56 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<title>Services: Snort</title>
 	<name>Snort</name>
 	<version>2.6.0.2</version>
+	<title>Services: Snort</title>
+	<include_file>/usr/local/pkg/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
 		<tooltiptext>Setup snort specific settings</tooltiptext>
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=snort.xml&amp;id=0</url>
 	</menu>
+	<service>
+		<name>snort</name>
+		<rcfile>snort.sh</rcfile>
+		<executable>snort</executable>
+	</service>
+	<tabs>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=snort.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Update Rules</text>
+			<url>/snort_download_rules.php</url>
+		</tab>
+		<tab>
+			<text>Categories</text>
+			<url>/snort_rulesets.php</url>
+		</tab>
+		<tab>
+			<text>Rules</text>
+			<url>/snort_rules.php</url>
+		</tab>
+		<tab>
+			<text>Blocked</text>
+			<url>/snort_blocked.php</url>
+		</tab>
+		<tab>
+			<text>Whitelist</text>
+			<url>/pkg.php?xml=snort_whitelist.xml</url>
+		</tab>
+		<tab>
+			<text>Alerts</text>
+			<url>/snort_alerts.php</url>
+		</tab>
+		<tab>
+			<text>Advanced</text>
+			<url>/pkg_edit.php?xml=snort_advanced.xml&amp;id=0</url>
+		</tab>
+	</tabs>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
@@ -118,56 +160,15 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_advanced.xml</item>
 	</additional_files_needed>
-	<service>
-		<name>snort</name>
-		<rcfile>snort.sh</rcfile>
-		<executable>snort</executable>
-	</service>
-	<include_file>/usr/local/pkg/snort.inc</include_file>
-	<tabs>
-		<tab>
-			<text>Settings</text>
-			<url>/pkg_edit.php?xml=snort.xml&amp;id=0</url>
-			<active/>
-		</tab>
-		<tab>
-			<text>Update Rules</text>
-			<url>/snort_download_rules.php</url>
-		</tab>
-		<tab>
-			<text>Categories</text>
-			<url>/snort_rulesets.php</url>
-		</tab>
-		<tab>
-			<text>Rules</text>
-			<url>/snort_rules.php</url>
-		</tab>
-		<tab>
-			<text>Blocked</text>
-			<url>/snort_blocked.php</url>
-		</tab>
-		<tab>
-			<text>Whitelist</text>
-			<url>/pkg.php?xml=snort_whitelist.xml</url>
-		</tab>
-		<tab>
-			<text>Alerts</text>
-			<url>/snort_alerts.php</url>
-		</tab>
-		<tab>
-			<text>Advanced</text>
-			<url>/pkg_edit.php?xml=snort_advanced.xml&amp;id=0</url>
-		</tab>
-	</tabs>
 	<fields>
 		<field>
 			<fielddescr>Interface</fielddescr>
 			<fieldname>iface_array</fieldname>
 			<description>Select all WAN type interfaces</description>
+			<type>interfaces_selection</type>
+			<size>3</size>
 			<value>lan</value>
 			<multiple>true</multiple>
-			<size>3</size>
-			<type>interfaces_selection</type>
 		</field>
 		<field>
 			<fielddescr>Performance</fielddescr>
@@ -176,32 +177,32 @@
 			<type>select</type>
 			<options>
 				<option>
-					<value>lowmem</value>
 					<name>lowmem</name>
+					<value>lowmem</value>
 				</option>
 				<option>
-					<value>ac-std</value>
 					<name>ac-std</name>
+					<value>ac-std</value>
 				</option>
 				<option>
-					<value>ac</value>
 					<name>ac</name>
+					<value>ac</value>
 				</option>
 				<option>
-					<value>ac-banded</value>
 					<name>ac-banded</name>
+					<value>ac-banded</value>
 				</option>
 				<option>
-					<value>ac-sparsebands</value>
 					<name>ac-sparsebands</name>
+					<value>ac-sparsebands</value>
 				</option>
 				<option>
-					<value>mwm</value>
 					<name>mwm</name>
+					<value>mwm</value>
 				</option>
 				<option>
-					<value>acs</value>
 					<name>acs</name>
+					<value>acs</value>
 				</option>
 			</options>
 		</field>
@@ -209,9 +210,9 @@
 			<fielddescr>Oinkmaster code</fielddescr>
 			<fieldname>oinkmastercode</fieldname>
 			<description>Obtain a snort.org Oinkmaster code and paste here.</description>
-			<value></value>
 			<type>input</type>
 			<size>60</size>
+			<value></value>
 		</field>
 		<field>
 			<fielddescr>Snort.org subscriber</fielddescr>
@@ -258,15 +259,15 @@
 			<type>checkbox</type>
 		</field>
     </fields>
-    <custom_php_install_command>
-		sync_package_snort_reinstall();
-    </custom_php_install_command>
 	<custom_add_php_command>
         sync_package_snort();
 	</custom_add_php_command>
-	<custom_php_resync_command>
+	<custom_php_resync_config_command>
 		sync_package_snort();
-	</custom_php_resync_command>
+	</custom_php_resync_config_command>
+    <custom_php_install_command>
+		sync_package_snort_reinstall();
+    </custom_php_install_command>
 	<custom_php_deinstall_command>
 		snort_deinstall();
 	</custom_php_deinstall_command>

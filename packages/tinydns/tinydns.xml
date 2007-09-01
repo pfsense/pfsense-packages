@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -46,8 +47,9 @@
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>tinydns</name>
 	<version>1.0</version>
-	<configpath>installedpackages->package->tinydns</configpath>
 	<title>DNS Cache-Server: Settings</title>
+	<aftersaveredirect>/pkg_edit.php?xml=tinydns.xml&amp;id=0</aftersaveredirect>
+	<include_file>/usr/local/pkg/tinydns.inc</include_file>
 	<menu>
 		<name>DNS Servers</name>
 		<tooltiptext></tooltiptext>
@@ -81,7 +83,7 @@
 			<url>/pkg_edit.php?xml=tinydns_sync.xml&amp;id=0</url>
 		</tab>
 	</tabs>
-	<aftersaveredirect>/pkg_edit.php?xml=tinydns.xml&amp;id=0</aftersaveredirect>
+	<configpath>installedpackages->package->tinydns</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
@@ -137,31 +139,6 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_sync.xml</item>
 	</additional_files_needed>
-	<custom_php_install_command>
-		tinydns_custom_php_install_command();
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		tinydns_custom_php_deinstall_command();
-	</custom_php_deinstall_command>
-	<custom_add_php_command>
-		tinydns_custom_php_changeip_command();
-		tinydns_custom_php_install_command();
-		tinydns_create_zone_file();
-		tinydns_setup_ping_items();
-	</custom_add_php_command>
-	<custom_php_resync_config_command>
-		tinydns_custom_php_changeip_command();
-		tinydns_custom_php_install_command();
-		tinydns_create_zone_file();
-		tinydns_setup_ping_items();
-	</custom_php_resync_config_command>
-	<custom_delete_php_command>
-		tinydns_custom_php_changeip_command();
-		tinydns_custom_php_install_command();
-		tinydns_create_zone_file();
-		tinydns_setup_ping_items();
-	</custom_delete_php_command>
-	<include_file>/usr/local/pkg/tinydns.inc</include_file>
 	<fields>
 		<field>
 		 	<fielddescr>Enable DNS Forwarders</fielddescr>
@@ -182,57 +159,81 @@
 			<type>checkbox</type>
 		</field>		
 		<field>
-			<fieldname>ipaddress</fieldname>
 			<fielddescr>IP Address</fielddescr>
+			<fieldname>ipaddress</fieldname>
 			<description>Bind TinyDNS to this IP address. Enable DNS Forwarders bind TinyDNS to the LAN IP.</description>
 			<type>input</type>
 		</field>
 		<field>
-			<fieldname>refreshinterval</fieldname>
 			<fielddescr>Refresh Interval</fielddescr>
+			<fieldname>refreshinterval</fieldname>
 			<description>Controls how often the monitoring ip adresses are polled</description>
 			<type>input</type>
 		</field>
 		<field>
-			<fieldname>syncxmlrpc</fieldname>
 			<fielddescr>XMLRPC Sync</fielddescr>
+			<fieldname>syncxmlrpc</fieldname>
 			<description>Sync TinyDNS configuration to backup firewalls</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fieldname>minsegment</fieldname>
 			<fielddescr>Minimum segment size</fielddescr>
+			<fieldname>minsegment</fieldname>
 			<description>Recommended size: 10240 or larger.</description>
 			<type>input</type>
 			<value>10240</value>
 		</field>
 		<field>
-			<fieldname>maxfilesize</fieldname>
 			<fielddescr>Maximum file size</fielddescr>
+			<fieldname>maxfilesize</fieldname>
 			<description>Recommended size: 10240 or larger.</description>
 			<type>input</type>
 			<value>10240</value>
 		</field>
 		<field>
-			<fieldname>maxsegment</fieldname>
 			<fielddescr>Max Segment size</fielddescr>
+			<fieldname>maxsegment</fieldname>
 			<description>Recommended size: 20480 or larger.</description>
 			<type>input</type>
 			<value>20480</value>
 		</field>
 		<field>
-			<fieldname>maxfd</fieldname>
 			<fielddescr>Maximum file descriptors</fielddescr>
+			<fieldname>maxfd</fieldname>
 			<description>Recommended size: 100 or larger.</description>
 			<type>input</type>
 			<value>100</value>
 		</field>
 		<field>
-			<fieldname>maxchild</fieldname>
 			<fielddescr>Maximum children processes</fielddescr>
+			<fieldname>maxchild</fieldname>
 			<description>Recommended size: 40 or larger.</description>
 			<type>input</type>
 			<value>40</value>
 		</field>
 	</fields>
+	<custom_delete_php_command>
+		tinydns_custom_php_changeip_command();
+		tinydns_custom_php_install_command();
+		tinydns_create_zone_file();
+		tinydns_setup_ping_items();
+	</custom_delete_php_command>
+	<custom_add_php_command>
+		tinydns_custom_php_changeip_command();
+		tinydns_custom_php_install_command();
+		tinydns_create_zone_file();
+		tinydns_setup_ping_items();
+	</custom_add_php_command>
+	<custom_php_resync_config_command>
+		tinydns_custom_php_changeip_command();
+		tinydns_custom_php_install_command();
+		tinydns_create_zone_file();
+		tinydns_setup_ping_items();
+	</custom_php_resync_config_command>
+	<custom_php_install_command>
+		tinydns_custom_php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		tinydns_custom_php_deinstall_command();
+	</custom_php_deinstall_command>
 </packagegui>

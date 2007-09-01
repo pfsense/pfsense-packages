@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -44,9 +45,10 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<include_file>squid.inc</include_file>
 	<name>squidcache</name>
+	<version>none</version>
 	<title>Proxy server: Cache management</title>
+	<include_file>squid.inc</include_file>
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -83,49 +85,49 @@
 			<fielddescr>Hard disk cache size</fielddescr>
 			<fieldname>harddisk_cache_size</fieldname>
 			<description>This is the amount of disk space (in megabytes) to use for cached objects.</description>
+			<type>input</type>
 			<required/>
 			<default_value>100</default_value>
-			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Hard disk cache location</fielddescr>
 			<fieldname>harddisk_cache_location</fieldname>
 			<description>This is the directory where the cache will be stored. (note: do not end with a /).  If you change this location, squid needs to make a new cache, this could take a while</description>
+			<type>input</type>
+			<size>60</size>
 			<required/>
 			<default_value>/var/squid/cache</default_value>
-			<size>60</size>
-			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Memory cache size</fielddescr>
 			<fieldname>memory_cache_size</fieldname>
 			<description>This is the amount of physical RAM (in megabytes) to be used for negative cache and in-transit objects.  This value should not exceed more than 50% of the installed RAM. The minimum value is 1MB.</description>
+			<type>input</type>
 			<required/>
 			<default_value>8</default_value>
-			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Minimum object size</fielddescr>
 			<fieldname>minimum_object_size</fieldname>
 			<description>Objects smaller than the size specified (in kilobytes) will not be saved on disk. The default value is 0, meaning there is no minimum.</description>
-			<required/>
-			<default_value>0</default_value>
 			<type>input</type>
+			<required />
+			<default_value>0</default_value>
 		</field>
 		<field>
 			<fielddescr>Maximum object size</fielddescr>
 			<fieldname>maximum_object_size</fieldname>
 			<description>Objects larger than the size specified (in kilobytes) will not be saved on disk. If you wish to increase speed more than you want to save bandwidth, this should be set to a low value.</description>
+			<type>input</type>
 			<required/>
 			<default_value>4</default_value>
-			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Level 1 subdirectories</fielddescr>
 			<fieldname>level1_subdirs</fieldname>
 			<description>Each level-1 directory contains 256 subdirectories, so a value of 256 level-1 directories will use a total of 65536 directories for the hard disk cache.  This will significantly slow down the startup process of the proxy service, but can speed up the caching under certain conditions.</description>
-			<default_value>16</default_value>
 			<type>select</type>
+			<default_value>16</default_value>
 			<options>
 				<option><name>4</name><value>4</value></option>
 				<option><name>8</name><value>8</value></option>
@@ -140,8 +142,8 @@
 			<fielddescr>Memory replacement policy</fielddescr>
 			<fieldname>memory_replacement</fieldname>
 			<description>The memory replacement policy determines which objects are purged from memory when space is needed.  The default policy for memory replacement is GDSF.  &lt;p&gt; &lt;b&gt; LRU: Last Recently Used Policy &lt;/b&gt; - The LRU policies keep recently referenced objects.  i.e., it replaces the object that has not been accessed for the longest time. &lt;p&gt; &lt;b&gt; Heap GDSF: Greedy-Dual Size Frequency &lt;/b&gt; - The Heap GDSF policy optimizes object-hit rate by keeping smaller, popular objects in cache.  It achieves a lower byte hit rate than LFUDA though, since it evicts larger (possibly popular) objects.  &lt;p&gt; &lt;b&gt; Heap LFUDA: Least Frequently Used with Dynamic Aging &lt;/b&gt; - The Heap LFUDA policy keeps popular objects in cache regardless of their size and thus optimizes byte hit rate at the expense of hit rate since one large, popular object will prevent many smaller, slightly less popular objects from being cached.  &lt;p&gt; &lt;b&gt; Heap LRU: Last Recently Used &lt;/b&gt; - Works like LRU, but uses a heap instead. &lt;p&gt; Note: If using the LFUDA replacement policy, the value of Maximum Object Size should be increased above its default of 12KB to maximize the potential byte hit rate improvement of LFUDA.</description>
-			<default_value>heap GDSF</default_value>
 			<type>select</type>
+			<default_value>heap GDSF</default_value>
 			<options>
 				<option><name>LRU</name><value>lru</value></option>
 				<option><name>Heap LFUDA</name><value>heap LFUDA</value></option>
@@ -153,8 +155,8 @@
 			<fielddescr>Cache replacement policy</fielddescr>
 			<fieldname>cache_replacement</fieldname>
 			<description>The cache replacement policy decides which objects will remain in cache and which objects are replaced to create space for the new objects.  The default policy for cache replacement is LFUDA.  Please see the type descriptions specified in the memory replacement policy for additional detail.</description>
-			<default_value>heap LFUDA</default_value>
 			<type>select</type>
+			<default_value>heap LFUDA</default_value>
 			<options>
 				<option><name>LRU</name><value>lru</value></option>
 				<option><name>Heap LFUDA</name><value>heap LFUDA</value></option>
@@ -167,16 +169,16 @@
 			<fieldname>donotcache</fieldname>
 			<description>Enter each domain or IP address on a new line that should never be cached.</description>
 			<type>textarea</type>
-			<encoding>base64</encoding>
-			<rows>5</rows>
 			<cols>50</cols>
+			<rows>5</rows>
+			<encoding>base64</encoding>
 		</field>
 		<field>
 			<fielddescr>Enable offline mode</fielddescr>
 			<fieldname>enable_offline</fieldname>
 			<description>Enable this option and the proxy server will never try to validate cached objects. The offline mode gives access to more cached information than the proposed feature would allow (stale cached versions, where the origin server should have been contacted).</description>
-			<required/>
 			<type>checkbox</type>
+			<required/>
 		</field>
 	</fields>
 	<custom_php_command_before_form>

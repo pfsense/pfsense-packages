@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -44,9 +45,10 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<include_file>squid.inc</include_file>
 	<name>squidcache</name>
+	<version>none</version>
 	<title>Proxy server: Cache management</title>		
+	<include_file>squid.inc</include_file>
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -83,40 +85,40 @@
 			<fielddescr>Hard disk cache size</fielddescr>
 			<fieldname>harddisk_cache_size</fieldname>
 			<description>This is the amount of disk space (in megabytes) to use for cached objects.</description>
+			<type>input</type>
 			<required/>
 			<default_value>100</default_value>
-			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Memory cache size</fielddescr>
 			<fieldname>memory_cache_size</fieldname>
 			<description>This is the amount of physical RAM (in megabytes) to be used for negative cache and in-transit objects.  This value should not exceed more than 50% of the installed RAM. The minimum value is 1MB.</description>
+			<type>input</type>
 			<required/>
 			<default_value>8</default_value>
-			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Minimum object size</fielddescr>
 			<fieldname>minimum_object_size</fieldname>
 			<description>Objects smaller than the size specified (in kilobytes) will not be saved on disk. The default value is 0, meaning there is no minimum.</description>
+			<type>input</type>
 			<required/>
 			<default_value>0</default_value>
-			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Maximum object size</fielddescr>
 			<fieldname>maximum_object_size</fieldname>
 			<description>Objects larger than the size specified (in kilobytes) will not be saved on disk. If you wish to increase speed more than you want to save bandwidth, this should be set to a low value.</description>
+			<type>input</type>
 			<required/>
 			<default_value>4</default_value>
-			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Level 1 subdirectories</fielddescr>
 			<fieldname>level1_subdirs</fieldname>
 			<description>Each level 1 (L1) directory contains 256 subdirectories, so a value of 256 L1 directories will use a total of 65536 directories for the hard disk cache.  This will significantly slow down the startup process of the proxy service, but can speed up the caching under certain conditions.</description>
-			<default_value>16</default_value>
 			<type>select</type>
+			<default_value>16</default_value>
 			<options>
 				<option><name>4</name><value>4</value></option>
 				<option><name>8</name><value>8</value></option>
@@ -131,8 +133,8 @@
 			<fielddescr>Memory replacement policy</fielddescr>
 			<fieldname>memory_replacement</fieldname>
 			<description>The memory replacement policy determines which objects are purged from memory when space is needed.  The default policy for memory replacement is GDSF.</description>
-			<default_value>heap GDSF</default_value>
 			<type>select</type>
+			<default_value>heap GDSF</default_value>
 			<options>
 				<option><name>LRU</name><value>LRU</value></option>
 				<option><name>Heap LRU</name><value>heap LRU</value></option>
@@ -144,8 +146,8 @@
 			<fielddescr>Cache replacement policy</fielddescr>
 			<fieldname>cache_replacement</fieldname>
 			<description>The cache replacement policy decides which objects will remain in cache and which objects are replaced to create space for the new objects.  The default policy for cache replacement is LFUDA.</description>
-			<default_value>heap LFUDA</default_value>
 			<type>select</type>
+			<default_value>heap LFUDA</default_value>
 			<options>
 				<option><name>LRU</name><value>lru</value></option>
 				<option><name>Heap LRU</name><value>heap LRU</value></option>
@@ -158,15 +160,15 @@
 			<fieldname>donotcache</fieldname>
 			<description>The specified domains or IP addresses (separated by commas) will never be cached.</description>
 			<type>textarea</type>
-			<rows>5</rows>
 			<cols>50</cols>
+			<rows>5</rows>
 		</field>
 		<field>
 			<fielddescr>Enable offline mode</fielddescr>
 			<fieldname>enable_offline</fieldname>
 			<description>Enable this option and the proxy server will never try to validate cached objects. The offline mode also gives access to more cached information than the proposed feature would allow (stale cached versions, where the origin server should have been contacted).</description>
-			<required/>
 			<type>checkbox</type>
+			<required/>
 		</field>
 	</fields>
 	<custom_php_validation_command>

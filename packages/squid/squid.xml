@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -46,7 +47,51 @@
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>squid</name>
 	<version>2.6.5_1-p15</version>
+	<title>Proxy server: General settings</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
+	<menu>
+		<name>Proxy server</name>
+		<tooltiptext>Modify the proxy server's settings</tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>squid</name>
+		<rcfile>squid.sh</rcfile>
+		<executable>squid</executable>
+		<description>Proxy server Service</description>
+	</service>
+	<tabs>
+		<tab>
+			<text>General settings</text>
+			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Upstream proxy</text>
+			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Cache management</text>
+			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Access control</text>
+			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Traffic management</text>
+			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Auth settings</text>
+			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Local users</text>
+			<url>/pkg.php?xml=squid_users.xml</url>
+		</tab>
+	</tabs>
 	<!-- Installation -->
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
@@ -89,139 +134,94 @@
 		<item>http://www.pfsense.org/packages/config/squid/squid_users.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/squid/proxy_monitor.sh</item>
 	    <prefix>/usr/local/etc/rc.d/</prefix>
 	    <chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/squid/proxy_monitor.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/squid/squid_cache.xml</item>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/squid/squid_cache.xml</item>
 	</additional_files_needed>
-	<menu>
-		<name>Proxy server</name>
-		<tooltiptext>Modify the proxy server's settings</tooltiptext>
-		<section>Services</section>
-		<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
-	</menu>
-	<service>
-		<name>squid</name>
-		<description>Proxy server Service</description>
-		<rcfile>squid.sh</rcfile>
-		<executable>squid</executable>
-	</service>
-	<!-- Interface -->
-	<title>Proxy server: General settings</title>
-	<tabs>
-		<tab>
-			<text>General settings</text>
-			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
-			<active/>
-		</tab>
-		<tab>
-			<text>Upstream proxy</text>
-			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Cache management</text>
-			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Access control</text>
-			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Traffic management</text>
-			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Auth settings</text>
-			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Local users</text>
-			<url>/pkg.php?xml=squid_users.xml</url>
-		</tab>
-	</tabs>
 	<fields>
 		<field>
-			<fieldname>active_interface</fieldname>
 			<fielddescr>Proxy interface</fielddescr>
+			<fieldname>active_interface</fieldname>
 			<description>The interface(s) the proxy server will bind to.</description>
-			<default_value>lan</default_value>
-			<required/>
 			<type>interfaces_selection</type>
+			<required/>
+			<default_value>lan</default_value>
 			<multiple/>
 		</field>
 		<field>
-			<fieldname>allow_interface</fieldname>
 			<fielddescr>Allow users on interface</fielddescr>
+			<fieldname>allow_interface</fieldname>
 			<description>If this field is checked, the users connected to the interface selected in the 'Proxy interface' field will be allowed to use the proxy, i.e., there will be no need to add the interface's subnet to the list of allowed subnets. This is just a shortcut.</description>
+			<type>checkbox</type>
+			<required/>
 			<default_value>on</default_value>
-			<required/>
-			<type>checkbox</type>
 		</field>
 		<field>
-			<fieldname>transparent_proxy</fieldname>
 			<fielddescr>Transparent proxy</fielddescr>
+			<fieldname>transparent_proxy</fieldname>
 			<description>If transparent mode is enabled, all requests for destination port 80 will be forwarded to the proxy server without any additional configuration necessary.</description>
-			<required/>
 			<type>checkbox</type>
+			<required/>
 		</field>
 		<field>
-			<fieldname>log_enabled</fieldname>
 			<fielddescr>Enabled logging</fielddescr>
+			<fieldname>log_enabled</fieldname>
 			<description>This will enable the access log. Don't switch this on if you don't have much disk space left.</description>
-			<enablefields>log_query_terms,log_user_agents</enablefields>
 			<type>checkbox</type>
+			<enablefields>log_query_terms,log_user_agents</enablefields>
 		</field>
 		<field>
-			<fieldname>log_dir</fieldname>
 			<fielddescr>Log store directory</fielddescr>
+			<fieldname>log_dir</fieldname>
 			<description>The directory where the log will be stored (note: do not end with a / mark)</description>
-			<required/>
 			<type>input</type>
 			<size>60</size>
+			<required/>
 			<default_value>/var/squid/log</default_value>
 		</field>
 		<field>
-			<fieldname>proxy_port</fieldname>
 			<fielddescr>Proxy port</fielddescr>
+			<fieldname>proxy_port</fieldname>
 			<description>This is the port the proxy server will listen on.</description>
-			<required/>
 			<type>input</type>
 			<size>5</size>
+			<required/>
 			<default_value>3128</default_value>
 		</field>
 		<field>
-			<fieldname>icp_port</fieldname>
 			<fielddescr>ICP port</fielddescr>
+			<fieldname>icp_port</fieldname>
 			<description>This is the port the Proxy Server will send and receive ICP queries to and from neighbor caches. Leave this blank if you don't want the proxy server to communicate with neighbor caches through ICP.</description>
 			<type>input</type>
 			<size>5</size>
 		</field>
 		<field>
-			<fieldname>visible_hostname</fieldname>
 			<fielddescr>Visible hostname</fielddescr>
+			<fieldname>visible_hostname</fieldname>
 			<description>This is the URL to be displayed in proxy server error messages.</description>
-			<default_value>localhost</default_value>
 			<type>input</type>
 			<size>60</size>
+			<default_value>localhost</default_value>
 		</field>
 		<field>
-			<fieldname>admin_email</fieldname>
 			<fielddescr>Administrator email</fielddescr>
+			<fieldname>admin_email</fieldname>
 			<description>This is the email address displayed in error messages to the users.</description>
-			<default_value>admin@localhost</default_value>
 			<type>input</type>
 			<size>60</size>
+			<default_value>admin@localhost</default_value>
 		</field>
 		<field>
 			<fielddescr>Language</fielddescr>
 			<fieldname>error_language</fieldname>
 			<description>Select the language in which the proxy server will display error messages to users.</description>
-			<default_value>English</default_value>
 			<type>select</type>
+			<default_value>English</default_value>
 		</field>
 		<field>
 			<fielddescr>Disable X-Forward</fielddescr>
@@ -240,37 +240,37 @@
 			<fieldname>uri_whitespace</fieldname>
       <description>&lt;b&gt; strip:&lt;/b&gt; The whitespace characters are stripped out of the URL. This is the behavior recommended by RFC2396. &lt;p&gt; &lt;b&gt; deny:&lt;/b&gt; The request is denied. The user receives an "Invalid Request" message.&lt;p&gt; &lt;b&gt; allow:&lt;/b&gt; The request is allowed and the URI is not changed. The whitespace characters remain in the URI.&lt;p&gt; &lt;b&gt; encode:&lt;/b&gt; The request is allowed and the whitespace characters are encoded according to RFC1738.&lt;p&gt; &lt;b&gt; chop:&lt;/b&gt;	The request is allowed and the URI is chopped at the first whitespace.</description>
   		<type>select</type>
+			<default_value>strip</default_value>
 			<options>
 				<option>
-					<value>strip</value>
 					<name>strip</name>
+					<value>strip</value>
 				</option>
 				<option>
-				<value>deny</value>
 					<name>deny</name>
+				<value>deny</value>
 				</option>
 				<option>
-					<value>allow</value>
 					<name>allow</name>
+					<value>allow</value>
 				</option>
 				<option>
-					<value>encode</value>
 					<name>encode</name>
+					<value>encode</value>
 				</option>
 				<option>
-					<value>chop</value>
 					<name>chop</name>
+					<value>chop</value>
 				</option>
 			</options>
-			<default_value>strip</default_value>
 		</field>
 	</fields>
-	<custom_add_php_command>
-		squid_resync();
-	</custom_add_php_command>
 	<custom_php_command_before_form>
 		squid_before_form_general(&amp;$pkg);
 	</custom_php_command_before_form>
+	<custom_add_php_command>
+		squid_resync();
+	</custom_add_php_command>
 	<custom_php_validation_command>
 		squid_validate_general($_POST, &amp;$input_errors);
 	</custom_php_validation_command>

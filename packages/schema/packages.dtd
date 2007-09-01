@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- ...................................................................... -->
+<!-- pfSense Package DTD V1.0 ............................................. -->
+<!-- File package.dtd ..................................................... -->
 <!--
 /* $Id$ */
 /* ========================================================================== */
@@ -37,60 +40,155 @@
                                                                               */
 /* ========================================================================== */
 -->
+<!--
+  |
+  | May be parsed using http://dtdparse.sourceforge.net/ to generate an
+  | HTML document that describes this DTD.
+  |
+-->
+<!-- Indicates the version of a package -->
 <!ELEMENT version (#PCDATA)>
+<!-- Indicates where to get more informations about this package -->
 <!ELEMENT url (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT tooltiptext (#PCDATA)>
+<!-- The title of a particular package -->
 <!ELEMENT title (#PCDATA)>
+<!-- Categroy of a particular package (e.g. System) -->
+<!ELEMENT category (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT note (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT savetext (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT preoutput (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT donotsave (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT text (#PCDATA)>
+<!-- Container element. Contains several tab elements -->
 <!ELEMENT tabs ((tab*))>
+<!-- A specific tab that is part of a tab pane -->
 <!ELEMENT tab ((text, url, active?))>
-<!ELEMENT service ((name, rcfile, executable?))>
+<!-- A service that may be executed while starting the system -->
+<!ELEMENT service ((name, rcfile?, executable?, description?))>
+<!-- needs to be documented -->
 <!ELEMENT section (#PCDATA)>
+<!-- Indicates what particular kind of components may be required to run this package -->
 <!ELEMENT requirements (#PCDATA)>
+<!-- Shell script that is beeing used to start and stop a service -->
 <!ELEMENT rcfile (#PCDATA)>
+<!-- Executable that represents a service -->
 <!ELEMENT executable (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT prefix (#PCDATA)>
-<!ELEMENT packagegui ((copyright, description, requirements, faq, name, version, title, note?, savetext?, aftersaveredirect?, include_file?, menu*, service?, tabs?, configpath?, adddeleteeditpagefields?, additional_files_needed*, fields?, custom_php_global_functions?, custom_php_command_before_form?, custom_delete_php_command?, custom_add_php_command?, custom_php_resync_config_command?, custom_php_validation_command?, custom_add_php_command_late?, start_command?, restart_command?, custom_php_after_form_command?, custom_php_resync_config_command?, custom_php_install_command?, custom_php_deinstall_command?))>
+<!-- Root node of a package definition. Container element -->
+<!ELEMENT packagegui ((copyright, description, requirements, faq, name, version, title, category?, note?, savetext?, preoutput?, donotsave?, aftersaveredirect?, include_file?, delete_string?, addedit_string?, menu*, service?, tabs?, configpath?, adddeleteeditpagefields?, additional_files_needed*, fields?, custom_php_global_functions?, custom_php_command_before_form?, custom_delete_php_command?, custom_add_php_command?, custom_php_resync_config_command?, custom_php_validation_command?, custom_add_php_command_late?, start_command?, restart_command?, custom_php_after_form_command?, custom_php_resync_config_command?, custom_php_install_command?, custom_php_deinstall_command?, custom_php_before_form_command?, custom_php_after_head_command?))>
+<!-- A particular name -->
 <!ELEMENT name (#PCDATA)>
+<!-- Menu item. Container element -->
 <!ELEMENT menu ((name, tooltiptext?, section?, configfile?, url?))>
+<!-- needs to be documented -->
 <!ELEMENT item (#PCDATA)>
+<!-- A PHP file that needs to be included prior to executing arbitrary PHP code -->
 <!ELEMENT include_file (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT delete_string (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT addedit_string (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT aftersaveredirect (#PCDATA)>
+<!-- FAQ items or an URL that points to certain FAQ items -->
 <!ELEMENT faq (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT rowhelperfield ((fielddescr, fieldname, description, type, size?))>
+<!-- needs to be documented -->
+<!ELEMENT rowhelper ((rowhelperfield+))>
+<!-- needs to be documented -->
 <!ELEMENT size (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT donotdisable (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT enablefields (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT required EMPTY>
+<!-- needs to be documented -->
 <!ELEMENT multiple (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT default_value (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT value (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT type (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT cols (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT rows (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT combinefieldsend (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT onchange (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT encoding (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT typehint (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT options ((option+))>
+<!-- needs to be documented -->
 <!ELEMENT option ((name, value))>
-<!ELEMENT fields ((field+))>
+<!-- needs to be documented -->
+<!ELEMENT fields ((field*))>
+<!-- needs to be documented -->
 <!ELEMENT fieldname (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT fielddescr (#PCDATA)>
-<!ELEMENT field ((fielddescr, fieldname, description?, type, donotdisable?, enablefields?, size?, required?, default_value?, value?, multiple?, options?))>
+<!-- needs to be documented -->
+<!ELEMENT field ((fielddescr, fieldname, description?, type, donotdisable?, enablefields?, size?, required?, default_value?, value?, multiple?, options?, cols?, rows?, typehint?, onchange?, encoding?, combinefieldsend?, rowhelper?))>
+<!-- needs to be documented -->
 <!ELEMENT description (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT custom_php_global_functions (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT custom_php_command_before_form (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT custom_delete_php_command (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT custom_add_php_command (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT custom_php_resync_config_command (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT custom_php_validation_command (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT custom_add_php_command_late (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT start_command (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT restart_command (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT custom_php_after_form_command (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT custom_php_install_command (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT custom_php_deinstall_command (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT custom_php_after_head_command (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT custom_php_before_form_command (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT copyright (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT configpath (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT configfile (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT chmod (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT columnitem ((fielddescr, fieldname))>
+<!-- needs to be documented -->
 <!ELEMENT adddeleteeditpagefields ((columnitem+))>
-<!ELEMENT additional_files_needed ((prefix, chmod, item))>
+<!-- needs to be documented -->
+<!ELEMENT additional_files_needed ((prefix?, chmod?, item))>
+<!-- needs to be documented -->
 <!ELEMENT active EMPTY>
+<!-- End of pfSense package DTD V1.0 ...................................... -->
+<!-- ...................................................................... -->

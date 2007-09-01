@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -44,33 +45,18 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<title>Services: MiniUPnPd</title>
 	<name>miniupnpd</name>
 	<version>20070521</version>
+	<title>Services: MiniUPnPd</title>
 	<savetext>Change</savetext>
-	<include_file>/usr/local/pkg/miniupnpd.inc</include_file>
 	<aftersaveredirect>/status_upnp.php</aftersaveredirect>
+	<include_file>/usr/local/pkg/miniupnpd.inc</include_file>
 	<menu>
 		<name>MiniUPnPd</name>
 		<tooltiptext>Set miniupnpd settings such as interfaces to listen on.</tooltiptext>
 		<section>Services</section>
 		<url>/status_upnp.php</url>
 	</menu>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/miniupnpd/miniupnpd.inc</item>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/miniupnpd/status_upnp.php</item>
-	    <prefix>/usr/local/www/</prefix>
-	    <chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/sbin/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/miniupnpd/sbin/miniupnpd</item>
-	</additional_files_needed>
 	<service>
 		<name>miniupnpd</name>
 		<rcfile>miniupnpd.sh</rcfile>
@@ -87,6 +73,21 @@
 			<active/>
 		</tab>
 	</tabs>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/miniupnpd/miniupnpd.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/www/</prefix>
+	    <chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/miniupnpd/status_upnp.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/sbin/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/miniupnpd/sbin/miniupnpd</item>
+	</additional_files_needed>
 	<fields>
 		<field>
 			<fielddescr>Enable MiniUPnPd</fielddescr>
@@ -96,12 +97,12 @@
 		<field>
 			<fielddescr>Interfaces (generally LAN)</fielddescr>
 			<fieldname>iface_array</fieldname>
+			<description>You can use the CTRL or COMMAND key to select multiple interfaces.</description>
+			<type>interfaces_selection</type>
+			<size>3</size>
+			<required/>
 			<value>lan</value>
 			<multiple>true</multiple>
-			<size>3</size>
-			<type>interfaces_selection</type>
-			<description>You can use the CTRL or COMMAND key to select multiple interfaces.</description>
-			<required/>
 		</field>
 		<field>
 			<fielddescr>Maximum Download Speed (Kbits/second)</fielddescr>

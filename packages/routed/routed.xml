@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -47,12 +48,8 @@
 	<name>routed</name>
 	<version>1.1</version>
 	<title>Services: RIP</title>
+	<aftersaveredirect>pkg_edit.php?xml=routed.xml&amp;id=0</aftersaveredirect>
 	<include_file>routed.inc</include_file>
-
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/routed/routed.inc</item>
-	</additional_files_needed>
-
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>RIP</name>
@@ -70,6 +67,9 @@
 	<!-- configpath gets expanded out automatically and config items will be
 		stored in that location -->
 	<configpath>['installedpackages']['routed']['config']</configpath>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/routed/routed.inc</item>
+	</additional_files_needed>
 	<!-- fields gets invoked when the user adds or edits a item.   the following items
 		will be parsed and rendered for the user as a gui with input, and selectboxes. -->
 	<fields>
@@ -83,24 +83,24 @@
 		<field>
 			<fielddescr>Interfaces</fielddescr>
 			<fieldname>iface_array</fieldname>
+			<description>Select the interfaces that RIP will bind to.  You can use the CTRL or COMMAND key to select multiple interfaces.</description>
+			<type>interfaces_selection</type>
+			<size>3</size>
+			<required />
 			<value>lan</value>
 			<multiple>true</multiple>
-			<size>3</size>
-			<type>interfaces_selection</type>
-			<description>Select the interfaces that RIP will bind to.  You can use the CTRL or COMMAND key to select multiple interfaces.</description>
-      <required />
 		</field>
 		<field>
 			<fielddescr>RIP Version</fielddescr>
 			<fieldname>ripversion</fieldname>
 			<type>select</type>
+			<required />
 			<default_value>2</default_value>
 			<options>
 				<option><name>RIP Version 1</name><value>1</value></option>
 				<option><name>RIP Version 2</name><value>2</value></option>
 			</options>
 			<typehint>Select which RIP version the daemon will listen/advertise using.</typehint>
-      <required />
 		</field>
 		<field>
 			<fielddescr>RIPv2 password</fielddescr>
@@ -111,7 +111,6 @@
 			<type>input</type>
 		</field>
 	</fields>
-	<aftersaveredirect>pkg_edit.php?xml=routed.xml&amp;id=0</aftersaveredirect>
         <custom_php_command_before_form>
         </custom_php_command_before_form>
 	<custom_delete_php_command>

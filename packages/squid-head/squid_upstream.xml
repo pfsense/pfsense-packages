@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -44,9 +45,10 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<include_file>squid.inc</include_file>
 	<name>squidupstream</name>
+	<version>none</version>
 	<title>Proxy server: Upstream proxy settings</title>		
+	<include_file>squid.inc</include_file>
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -83,9 +85,9 @@
 			<fielddescr>Enable forwarding</fielddescr>
 			<fieldname>proxy_forwarding</fieldname>
 			<description>This option enables the proxy server to forward requests to an upstream server.</description>
-			<required/>
 			<type>checkbox</type>
 			<enablefields>proxy_addr,proxy_port,icp_port,username,password</enablefields>
+			<required/>
 		</field>
 		<field>
 			<fielddescr>Hostname</fielddescr>
@@ -97,17 +99,17 @@
 			<fielddescr>TCP port</fielddescr>
 			<fieldname>proxy_port</fieldname>
 			<description>Enter the port to use to connect to the upstream proxy.</description>
-			<default_value>3128</default_value>
 			<type>input</type>
 			<size>5</size>
+			<default_value>3128</default_value>
 		</field>
 		<field>
 			<fielddescr>ICP port</fielddescr>
 			<fieldname>icp_port</fieldname>
 			<description>Enter the port to connect to the upstream proxy for the ICP protocol. Use port number 7 to disable ICP communication between the proxies.</description>
-			<default_value>7</default_value>
 			<type>input</type>
 			<size>5</size>
+			<default_value>7</default_value>
 		</field>
 		<field>
 			<fielddescr>Username</fielddescr>

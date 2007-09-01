@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -44,9 +45,10 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<include_file>squid.inc</include_file>
 	<name>squidauth</name>
+	<version>none</version>
 	<title>Proxy server: Authentication</title>
+	<include_file>squid.inc</include_file>
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -83,9 +85,9 @@
 			<fielddescr>Authentication method</fielddescr>
 			<fieldname>auth_method</fieldname>
 			<description>Select an authentication method. This will allow users to be authenticated by local or external services.</description>
-			<default_value>none</default_value>
-			<required/>
 			<type>select</type>
+			<required/>
+			<default_value>none</default_value>
 			<options>
 				<option><name>None</name><value>none</value></option>
 				<option><name>Local</name><value>local</value></option>
@@ -96,128 +98,128 @@
 			<onchange>on_auth_method_changed()</onchange>
 		</field>
 		<field>
-			<fieldname>ldap_version</fieldname>
 			<fielddescr>LDAP version</fielddescr>
+			<fieldname>ldap_version</fieldname>
 			<description>Enter LDAP protocol version (2 or 3).</description>
-			<default_value>2</default_value>
 			<type>select</type>
+			<default_value>2</default_value>
 			<options>
 			<option><name>2</name><value>2</value></option>
 			<option><name>3</name><value>3</value></option>
 			</options>
 		</field>
 		<field>
-			<fieldname>auth_server</fieldname>
 			<fielddescr>Authentication server</fielddescr>
+			<fieldname>auth_server</fieldname>
 			<description>Enter here the IP or hostname of the server that will perform the authentication.</description>
 			<type>input</type>
 			<size>60</size>
 		</field>
 		<field>
-			<fieldname>auth_server_port</fieldname>
 			<fielddescr>Authentication server port</fielddescr>
+			<fieldname>auth_server_port</fieldname>
 			<description>Enter here the port to use to connect to the authentication server. Leave this field blank to use the authentication method's default port.</description>
 			<type>input</type>
 			<size>60</size>
 		</field>
 		<field>
-			<fieldname>ldap_user</fieldname>
 			<fielddescr>LDAP server user DN</fielddescr>
+			<fieldname>ldap_user</fieldname>
 			<description>Enter here the user DN to use to connect to the LDAP server.</description>
 			<type>input</type>
 			<size>60</size>
 		</field>
 		<field>
-			<fieldname>ldap_pass</fieldname>
 			<fielddescr>LDAP password</fielddescr>
+			<fieldname>ldap_pass</fieldname>
 			<description>Enter here the password to use to connect to the LDAP server.</description>
 			<type>password</type>
 			<size>60</size>
 		</field>
 		<field>
-			<fieldname>ldap_basedomain</fieldname>
 			<fielddescr>LDAP base domain</fielddescr>
+			<fieldname>ldap_basedomain</fieldname>
 			<description>For LDAP authentication, enter here the base domain in the LDAP server.</description>
 			<type>input</type>
 			<size>60</size>
 		</field>
 		<field>
-			<fieldname>ldap_filter</fieldname>
 			<fielddescr>LDAP search filter</fielddescr>
-			<default_value>(&amp;(objectClass=person)(uid=%s))</default_value>
+			<fieldname>ldap_filter</fieldname>
 			<description>Enter LDAP search filter.</description>
 			<type>input</type>
 			<size>60</size>
+			<default_value>(&amp;(objectClass=person)(uid=%s))</default_value>
 		</field>
 		<field>
-			<fieldname>radius_secret</fieldname>
 			<fielddescr>RADIUS secret</fielddescr>
+			<fieldname>radius_secret</fieldname>
 			<description>The RADIUS secret for RADIUS authentication.</description>
 			<type>password</type>
 			<size>60</size>
 		</field>
 		<field>
-			<fieldname>msnt_secondary</fieldname>
 			<fielddescr>Secondary NT servers</fielddescr>
+			<fieldname>msnt_secondary</fieldname>
 			<description>Comma-separated list of secondary servers to be used for NT domain authentication.</description>
 			<type>input</type>
 			<size>60</size>
 		</field>
 		<field>
-			<fieldname>auth_prompt</fieldname>
 			<fielddescr>Authentication prompt</fielddescr>
+			<fieldname>auth_prompt</fieldname>
 			<description>This string will be displayed at the top of the authentication request window.</description>
+			<type>input</type>
 			<default_value>Please enter your credentials to access the proxy</default_value>
-			<type>input</type>
 		</field>
 		<field>
-			<fieldname>auth_processes</fieldname>
 			<fielddescr>Authentication processes</fielddescr>
+			<fieldname>auth_processes</fieldname>
 			<description>The number of authenticator processes to spawn. If many authentications are expected within a short timeframe, increase this number accordingly.</description>
+			<type>input</type>
+			<size>60</size>
 			<default_value>5</default_value>
-			<type>input</type>
-			<size>60</size>
 		</field>
 		<field>
-			<fieldname>auth_ttl</fieldname>
 			<fielddescr>Authentication TTL</fielddescr>
+			<fieldname>auth_ttl</fieldname>
 			<description>This specifies for how long (in minutes) the proxy server assumes an externally validated username and password combination is valid (Time To Live).  When the TTL expires, the user will be prompted for credentials again.</description>
-			<default_value>60</default_value>
 			<type>input</type>
 			<size>60</size>
+			<default_value>60</default_value>
 		</field>
 		<field>
-			<fieldname>unrestricted_auth</fieldname>
 			<fielddescr>Requiere authentication for unrestricted hosts</fielddescr>
+			<fieldname>unrestricted_auth</fieldname>
 			<description>If this option is enabled, even users tagged as unrestricted through access control are required to authenticate to use the proxy.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fieldname>no_auth_hosts</fieldname>
 			<fielddescr>Subnets that don't need authentication</fielddescr>
+			<fieldname>no_auth_hosts</fieldname>
 			<description>Enter each subnet or IP address on a new line (in CIDR format, e.g.: 10.5.0.0/16, 192.168.1.50/32) that should not be asked for authentication to access the proxy.</description>
 			<type>textarea</type>
-			<encoding>base64</encoding>
-			<rows>5</rows>
 			<cols>50</cols>
+			<rows>5</rows>
+			<encoding>base64</encoding>
 		</field>
 	</fields>
-	<custom_php_after_head_command>
-		$transparent_proxy = ($config['installedpackages']['squid']['config'][0]['transparent_proxy'] == 'on');
-		if($transparent_proxy)
-			$input_errors[] = "Authentication cannot be enabled while transparent proxy mode is enabled";
-		squid_print_javascript_auth();
-	</custom_php_after_head_command>
 	<custom_php_validation_command>
 		squid_validate_auth($_POST, &amp;$input_errors);
 	</custom_php_validation_command>
-	<custom_php_before_form_command>
-		squid_print_javascript_auth2();
-	</custom_php_before_form_command>
 	<custom_php_after_form_command>
 		squid_print_javascript_auth2();
 	</custom_php_after_form_command>
 	<custom_php_resync_config_command>
 		squid_resync();
 	</custom_php_resync_config_command>
+	<custom_php_before_form_command>
+		squid_print_javascript_auth2();
+	</custom_php_before_form_command>
+	<custom_php_after_head_command>
+		$transparent_proxy = ($config['installedpackages']['squid']['config'][0]['transparent_proxy'] == 'on');
+		if($transparent_proxy)
+			$input_errors[] = "Authentication cannot be enabled while transparent proxy mode is enabled";
+		squid_print_javascript_auth();
+	</custom_php_after_head_command>
 </packagegui>

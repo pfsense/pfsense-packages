@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -44,28 +45,18 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<title>Services: NUT</title>
 	<name>nut</name>
 	<version>2.0.5</version>
+	<title>Services: NUT</title>
 	<savetext>Change</savetext>
-	<include_file>/usr/local/pkg/nut.inc</include_file>
 	<aftersaveredirect>/status_nut.php</aftersaveredirect>
+	<include_file>/usr/local/pkg/nut.inc</include_file>
 	<menu>
 		<name>NUT</name>
 		<tooltiptext>Set Network UPS Tools settings.</tooltiptext>
 		<section>Services</section>
 		<url>/status_nut.php</url>
 	</menu>
-	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/nut/nut.inc</item>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/nut/status_nut.php</item>
-	    <prefix>/usr/local/www/</prefix>
-	    <chmod>0755</chmod>
-	</additional_files_needed>
 	<service>
 		<name>nut</name>
 		<rcfile>nut.sh</rcfile>
@@ -82,6 +73,16 @@
 			<active/>
 		</tab>
 	</tabs>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/nut/nut.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/www/</prefix>
+	    <chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/nut/status_nut.php</item>
+	</additional_files_needed>
 	<fields>
 		<field>
 			<fielddescr>UPS Monitoring</fielddescr>
@@ -111,9 +112,9 @@
 		<field>
 			<fielddescr>&lt;strong&gt;Local UPS Model&lt;/strong&gt;</fielddescr>
 			<fieldname>driver</fieldname>
-			<type>select</type>
 			<description>If generic or cable specified in parenthesis you need 
 				to select the appropriate option below.</description>
+			<type>select</type>
 			<options>
 				<option>
 					<name>APC Back-UPS (Generic)</name>
@@ -414,36 +415,36 @@
 			<type>select</type>
 			<options>
 				<option>
-					<value></value>
 					<name></name>
+					<value></value>
 				</option>
 				<option>
-					<value>1 00</value>
 					<name>1 (APC Back-UPS using 940-0095A/C cables)</name>
+					<value>1 00</value>
 				</option>
 				<option>
-					<value>2 00</value>
 					<name>2 (APC Back-UPS using 940-0020B/C cables)</name>
+					<value>2 00</value>
 				</option>
 				<option>
-					<value>9 00</value>
 					<name>9 (APC Back-UPS using 940-0023A cable)</name>
+					<value>9 00</value>
 				</option>
 				<option>
-					<value>12 00</value>
 					<name>12 (APC Back-UPS Office using 940-0119A cable)</name>
+					<value>12 00</value>
 				</option>
 				<option>
-					<value>12 01</value>
 					<name>12 (APC Masterswitch using 940-0020 cable)</name>
+					<value>12 01</value>
 				</option>
 				<option>
-					<value>20 00</value>
 					<name>20 (APC Back-UPS RS)</name>
+					<value>20 00</value>
 				</option>
 				<option>
-					<value>6 00</value>
 					<name>6 (Best Power Patriot using INT51 cable)</name>
+					<value>6 00</value>
 				</option>
 			</options>
 		</field>	
@@ -453,16 +454,16 @@
 			<type>select</type>
 			<options>
 				<option>
-					<value></value>
 					<name></name>
+					<value></value>
 				</option>
 				<option>
-					<value>940-0095B 00</value>
 					<name>940-0095B (Gray Cable)</name>
+					<value>940-0095B 00</value>
 				</option>
 				<option>
-					<value>940-0024C 00</value>
 					<name>940-0024C (Black Cable)</name>
+					<value>940-0024C 00</value>
 				</option>
 			</options>
 		</field>

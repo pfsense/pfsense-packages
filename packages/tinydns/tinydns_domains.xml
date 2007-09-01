@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -45,9 +46,9 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>tinydnsdomains</name>
-	<configpath>installedpackages->package->tinydnsdomains</configpath>
-	<include_file>/usr/local/pkg/tinydns.inc</include_file>
+	<version>none</version>
 	<title>TinyDNS: Domains</title>
+	<include_file>/usr/local/pkg/tinydns.inc</include_file>
 	<tabs>
 		<tab>
 			<text>Settings</text>
@@ -75,6 +76,7 @@
 			<url>/pkg_edit.php?xml=tinydns_sync.xml&amp;id=0</url>
 		</tab>		
 	</tabs>
+	<configpath>installedpackages->package->tinydnsdomains</configpath>
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Fully Qualified Domain Name (Hostname)</fielddescr>
@@ -95,29 +97,29 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<fieldname>hostname</fieldname>
 			<fielddescr>Hostname or FQDN www.exampledomain.com</fielddescr>
+			<fieldname>hostname</fieldname>
 			<description>The DNS server will supply Records for the Fully Qualified Domain Name that is entered</description>
-			<required/>
 			<type>input</type>
 			<size>35</size>
+			<required/>
 		</field>
 		<field>
 			<fielddescr>Record type</fielddescr>
 			<fieldname>recordtype</fieldname>
 			<description>DNS Record types. A, PTR, MX, NS, SOA, TXT, CNAME</description>
-			<required/>
 			<type>select</type>
 			<size>1</size>
+			<required/>
 			<options>
-			    <option><value></value><name></name></option>
-			    <option><value>A</value><name>A</name></option>
-			    <option><value>MX</value><name>MX</name></option>
-			    <option><value>NS</value><name>NS</name></option>
-			    <option><value>SOA</value><name>SOA</name></option>
-			    <option><value>PTR</value><name>PTR</name></option>
-			    <option><value>CNAME</value><name>CNAME</name></option>
-			    <option><value>TXT</value><name>TXT</name></option>
+			    <option><name></name><value></value></option>
+			    <option><name>A</name><value>A</value></option>
+			    <option><name>MX</name><value>MX</value></option>
+			    <option><name>NS</name><value>NS</value></option>
+			    <option><name>SOA</name><value>SOA</value></option>
+			    <option><name>PTR</name><value>PTR</value></option>
+			    <option><name>CNAME</name><value>CNAME</value></option>
+			    <option><name>TXT</name><value>TXT</value></option>
 			</options>
 		</field>
 		<field>
@@ -127,32 +129,34 @@
 			<type>checkbox</type>
 		</field>		
 		<field>
-			<fieldname>ipaddress</fieldname>
 			<fielddescr> FQDN or IP Address</fielddescr>
+			<fieldname>ipaddress</fieldname>
 			<description>IP Address for A Records. FQDN or Hostname for SOA, PTR, CNAME Records.  For NS Records an IP:FQDN</description>
-			<required/>
 			<type>input</type>
 			<size>40</size>
+			<required/>
 		</field>
 		<field>
-			<fieldname>ttl</fieldname>
 			<fielddescr>DNS record time to live</fielddescr>
+			<fieldname>ttl</fieldname>
 			<type>input</type>
 			<size>35</size>
 		</field>
 		<field>
-			<fieldname>monitorip</fieldname>
 			<fielddescr>IP to ping to ensure service is up</fielddescr>
+			<fieldname>monitorip</fieldname>
 			<type>input</type>
 			<size>35</size>
 		</field>
 		<field>
-			<fieldname>threshhold</fieldname>
 			<fielddescr>Time in minutes before DNS switches to backup host</fielddescr>
+			<fieldname>threshhold</fieldname>
 			<type>input</type>
 			<size>35</size>
 		</field>
 		<field>
+			<fielddescr>none</fielddescr>
+			<fieldname>none</fieldname>
 		    <type>rowhelper</type>
 		    <rowhelper>
 				<rowhelperfield>
@@ -192,14 +196,14 @@
 		    </rowhelper>
 		</field>
 	</fields>
-	<custom_add_php_command>
-		tinydns_create_zone_file();
-		tinydns_setup_ping_items();
-	</custom_add_php_command>
 	<custom_delete_php_command>
 		tinydns_create_zone_file();
 		tinydns_setup_ping_items();
 	</custom_delete_php_command>
+	<custom_add_php_command>
+		tinydns_create_zone_file();
+		tinydns_setup_ping_items();
+	</custom_add_php_command>
 	<custom_php_resync_config_command>
 		tinydns_create_zone_file();
 		tinydns_setup_ping_items();

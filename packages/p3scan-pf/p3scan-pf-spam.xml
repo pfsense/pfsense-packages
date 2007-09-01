@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -53,8 +54,8 @@
     set, you are still required to save this page if you are editing this page
     for the very first time!
   </note>
-  <include_file>p3scan-pf.inc</include_file>
   <aftersaveredirect>pkg_edit.php?xml=p3scan-pf-spam.xml&amp;id=0</aftersaveredirect>
+  <include_file>p3scan-pf.inc</include_file>
   <tabs>
     <tab>
       <text>Daemon Settings</text>

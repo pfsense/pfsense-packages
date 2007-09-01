@@ -97,12 +97,12 @@
       <size>1</size>
       <default_value>clamd</default_value>
       <options>
-        <option><value>avpd</value><name>Kaspersky Anti-Virus for Linux</name></option>
-        <option><value>avpd_new</value><name>Kaspersky Anti-Virus for Linux (New)</name></option>
-        <option><value>bash</value><name>Shell Script</name></option>
-        <option><value>basic</value><name>Default Scanner Type</name></option>
-        <option><value>clamd</value><name>Clam Anti-Virus</name></option>
-        <option><value>trophie</value><name>Trophie Daemon</name></option>
+        <option><name>Kaspersky Anti-Virus for Linux</name><value>avpd</value></option>
+        <option><name>Kaspersky Anti-Virus for Linux (New)</name><value>avpd_new</value></option>
+        <option><name>Shell Script</name><value>bash</value></option>
+        <option><name>Default Scanner Type</name><value>basic</value></option>
+        <option><name>Clam Anti-Virus</name><value>clamd</value></option>
+        <option><name>Trophie Daemon</name><value>trophie</value></option>
       </options>
     </field>
     <field>

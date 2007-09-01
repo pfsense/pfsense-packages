@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -45,9 +46,9 @@
         <requirements>Describe your package requirements here</requirements>
         <faq>Currently there are no FAQ items provided.</faq>
         <name>lightsquid</name>
+        <version>1.7.1_1</version>
         <title>Services: Proxy server Report(LightSquid) -> Settings</title>
         <category>Status</category>
-        <version>1.7.1_1</version>
         <include_file>/usr/local/pkg/lightsquid.inc</include_file>
 
         <!-- Installation -->
@@ -57,14 +58,6 @@
                 <section>Status</section>
                 <url>/pkg_edit.php?xml=lightsquid.xml&amp;id=0</url>
         </menu>
-        <additional_files_needed>
-               <item>http://www.pfsense.com/packages/config/lightsquid/lightsquid.inc</item>
-        </additional_files_needed>
-        <additional_files_needed>
-               <item>http://www.pfsense.com/packages/All/lightsquid_tpl.tbz</item>
-               <prefix>/var/tmp/</prefix>
-               <chmod>0755</chmod>
-        </additional_files_needed>
         <tabs>
                 <tab>
                         <text>Settings</text>
@@ -76,61 +69,69 @@
                         <url>/lightsquid/index.cgi</url>                        
                 </tab>
         </tabs>
+        <additional_files_needed>
+               <item>http://www.pfsense.com/packages/config/lightsquid/lightsquid.inc</item>
+        </additional_files_needed>
+        <additional_files_needed>
+               <prefix>/var/tmp/</prefix>
+               <chmod>0755</chmod>
+               <item>http://www.pfsense.com/packages/All/lightsquid_tpl.tbz</item>
+        </additional_files_needed>
         <fields>
                 <field>
-                        <fieldname>lightsquid_lang</fieldname>
                         <fielddescr>Language</fielddescr>
+                        <fieldname>lightsquid_lang</fieldname>
                         <description>Select report language</description>
                         <type>select</type>
                         <value>eng</value>
                         <options>
-                                 <option><value>bg</value><name>Bulgarian</name></option>
-                                 <option><value>cz</value><name>Czech</name></option>
-                                 <option><value>eng</value><name>English</name></option>
-                                 <option><value>fr</value><name>French</name></option>
-                                 <option><value>hu</value><name>Hungarian</name></option>
-                                 <option><value>it</value><name>Italian</name></option>
-                                 <option><value>pt_br</value><name>Portuguese - Brazil</name></option>
-                                 <option><value>ru</value><name>Russian</name></option>
-                                 <option><value>ru-koi8</value><name>Russian KOI-8</name></option>
-                                 <option><value>sp</value><name>Spanish</name></option>
-                                 <option><value>ua</value><name>Ukrainian</name></option>
+                                 <option><name>Bulgarian</name><value>bg</value></option>
+                                 <option><name>Czech</name><value>cz</value></option>
+                                 <option><name>English</name><value>eng</value></option>
+                                 <option><name>French</name><value>fr</value></option>
+                                 <option><name>Hungarian</name><value>hu</value></option>
+                                 <option><name>Italian</name><value>it</value></option>
+                                 <option><name>Portuguese - Brazil</name><value>pt_br</value></option>
+                                 <option><name>Russian</name><value>ru</value></option>
+                                 <option><name>Russian KOI-8</name><value>ru-koi8</value></option>
+                                 <option><name>Spanish</name><value>sp</value></option>
+                                 <option><name>Ukrainian</name><value>ua</value></option>
                         </options>
                 </field>
 
                 <field>
-                        <fieldname>lightsquid_barcolor</fieldname>
                         <fielddescr>Bar color</fielddescr>
+                        <fieldname>lightsquid_barcolor</fieldname>
                         <description>Select bar color</description>
                         <type>select</type>
                         <value>orange</value>
                         <options>
-                                <option><value>orange</value><name>Orange</name></option>
-                                <option><value>blue</value><name>Blue</name></option>
-                                <option><value>green</value><name>Green</name></option>
-                                <option><value>yellow</value><name>Yellow</name></option>
-                                <option><value>brown</value><name>Brown</name></option>
-                                <option><value>red</value><name>Red</name></option>
+                                <option><name>Orange</name><value>orange</value></option>
+                                <option><name>Blue</name><value>blue</value></option>
+                                <option><name>Green</name><value>green</value></option>
+                                <option><name>Yellow</name><value>yellow</value></option>
+                                <option><name>Brown</name><value>brown</value></option>
+                                <option><name>Red</name><value>red</value></option>
                         </options>
                 </field>          
 
                 <field>
-                        <fieldname>lightsquid_template</fieldname>
                         <fielddescr>Report scheme</fielddescr>
+                        <fieldname>lightsquid_template</fieldname>
                         <description>Select report scheme</description>
                         <type>select</type>
                         <value>base</value>
                         <options>
-                                <option><value>base</value><name>Base</name></option>
-                                <option><value>text</value><name>Text</name></option>
-                                <option><value>novosea</value><name>NovoSea</name></option>
-                                <option><value>novopf</value><name>NovoPf</name></option>
+                                <option><name>Base</name><value>base</value></option>
+                                <option><name>Text</name><value>text</value></option>
+                                <option><name>NovoSea</name><value>novosea</value></option>
+                                <option><name>NovoPf</name><value>novopf</value></option>
                         </options>
                 </field>
 
                 <field>
-                        <fieldname>lightsquid_ip2name</fieldname>
                         <fielddescr>IP resolve method (future)</fielddescr>
+                        <fieldname>lightsquid_ip2name</fieldname>
                         <description>
                         &lt;table cellpadding=1 cellspacing=0 style=&quot;text-align: left;&quot;&gt; &lt;tbody&gt;
                         &lt;tr&gt;&lt;th colspan=2&gt; Select IP to Name resolve method (take effect only on new data): &lt;/th&gt;&lt;tr&gt;
@@ -145,18 +146,18 @@
                         <type>select</type>
                         <value>dns</value>
                         <options>
-                                <option><value>ip</value><name>IP</name></option>                             
-                                <option><value>demo</value><name>Demo</name></option>                              
-                                <option><value>dns</value><name>DNS</name></option>                              
-                                <option><value>simple</value><name>Simple</name></option>                              
-                                <option><value>smb</value><name>SMB</name></option>                              
-                                <option><value>squidauth</value><name>Squidauth</name></option>                              
+                                <option><name>IP</name><value>ip</value></option>                             
+                                <option><name>Demo</name><value>demo</value></option>                              
+                                <option><name>DNS</name><value>dns</value></option>                              
+                                <option><name>Simple</name><value>simple</value></option>                              
+                                <option><name>SMB</name><value>smb</value></option>                              
+                                <option><name>Squidauth</name><value>squidauth</value></option>                              
                         </options>
                 </field>
 
                 <field>
-                        <fieldname>lightsquid_refreshsheduler_time</fieldname>
                         <fielddescr>Refresh sheduler</fielddescr>
+                        <fieldname>lightsquid_refreshsheduler_time</fieldname>
                         <description>
 			Select data refresh period. System will execute task every XX time as from 00:00 hours. &lt;br&gt;
 			For example: if selected 2h - system wil start task at 0-2-4-..-24h. &lt;br&gt;
@@ -171,25 +172,25 @@
                         <type>select</type>
                         <value>lhp_none</value>
                         <options>
-                                <option><value>lhp_none</value><name>none</name></option>
-                                <option><value>lhp_10m</value><name>10min(!)</name></option>
-                                <option><value>lhp_20m</value><name>20min(!)</name></option>
-                                <option><value>lhp_30m</value><name>30min(*)</name></option>
-                                <option><value>lhp_40m</value><name>40min(*)</name></option>
-                                <option><value>lhp_50m</value><name>50min(+)</name></option>
-                                <option><value>lhp_60m</value><name>60min(+)</name></option>
-                                <option><value>lhp_2h</value><name>2h</name></option>
-                                <option><value>lhp_3h</value><name>3h</name></option>
-                                <option><value>lhp_4h</value><name>4h</name></option>
-                                <option><value>lhp_6h</value><name>6h</name></option>
-                                <option><value>lhp_8h</value><name>8h</name></option>
-                                <option><value>lhp_12h</value><name>12h</name></option>
-                                <option><value>lhp_24h</value><name>24(00)h</name></option>
+                                <option><name>none</name><value>lhp_none</value></option>
+                                <option><name>10min(!)</name><value>lhp_10m</value></option>
+                                <option><name>20min(!)</name><value>lhp_20m</value></option>
+                                <option><name>30min(*)</name><value>lhp_30m</value></option>
+                                <option><name>40min(*)</name><value>lhp_40m</value></option>
+                                <option><name>50min(+)</name><value>lhp_50m</value></option>
+                                <option><name>60min(+)</name><value>lhp_60m</value></option>
+                                <option><name>2h</name><value>lhp_2h</value></option>
+                                <option><name>3h</name><value>lhp_3h</value></option>
+                                <option><name>4h</name><value>lhp_4h</value></option>
+                                <option><name>6h</name><value>lhp_6h</value></option>
+                                <option><name>8h</name><value>lhp_8h</value></option>
+                                <option><name>12h</name><value>lhp_12h</value></option>
+                                <option><name>24(00)h</name><value>lhp_24h</value></option>
                         </options>
                 </field>
                 <field>
-                        <fieldname>lightsquid_squidrotatelog_sheduler_time</fieldname>
                         <fielddescr>Squid rotate log sheduler</fielddescr>
+                        <fieldname>lightsquid_squidrotatelog_sheduler_time</fieldname>
                         <description>
 					Select squid log rotate period. System will execute task every XX time as from 00:00 hours. &lt;br&gt;
 					This option will allow the updating of the faster &lt;br&gt;
@@ -201,30 +202,30 @@
                         <type>select</type>
                         <value>lsr_none</value>
                         <options>
-                                <option><value>lsr_none</value><name>none</name></option>
-                                <option><value>lsr_d1</value><name>every 1 day</name></option>
-                                <option><value>lsr_d2</value><name>every 2 day</name></option>
-                                <option><value>lsr_d3</value><name>every 3 day</name></option>
-                                <option><value>lsr_d4</value><name>every 4 day</name></option>
-                                <option><value>lsr_d5</value><name>every 5 day</name></option>
-                                <option><value>lsr_d6</value><name>every 6 day</name></option>
-                                <option><value>lsr_w1</value><name>weekly at Monday</name></option>
-                                <option><value>lsr_w2</value><name>weekly at Tuesday</name></option>
-                                <option><value>lsr_w3</value><name>weekly at Wednesday</name></option>
-                                <option><value>lsr_w4</value><name>weekly at Thursday</name></option>
-                                <option><value>lsr_w5</value><name>weekly at Friday</name></option>
-                                <option><value>lsr_w6</value><name>weekly at Saturday</name></option>
-                                <option><value>lsr_w7</value><name>weekly at Sunday</name></option>
-                                <option><value>lsr_d10</value><name>every 10 day</name></option>
-                                <option><value>lsr_d15</value><name>every 15 day</name></option>
-                                <option><value>lsr_d20</value><name>every 20 day</name></option>
-                                <option><value>lsr_d25</value><name>every 25 day</name></option>
-                                <option><value>lsr_d30</value><name>every 30 day</name></option>
+                                <option><name>none</name><value>lsr_none</value></option>
+                                <option><name>every 1 day</name><value>lsr_d1</value></option>
+                                <option><name>every 2 day</name><value>lsr_d2</value></option>
+                                <option><name>every 3 day</name><value>lsr_d3</value></option>
+                                <option><name>every 4 day</name><value>lsr_d4</value></option>
+                                <option><name>every 5 day</name><value>lsr_d5</value></option>
+                                <option><name>every 6 day</name><value>lsr_d6</value></option>
+                                <option><name>weekly at Monday</name><value>lsr_w1</value></option>
+                                <option><name>weekly at Tuesday</name><value>lsr_w2</value></option>
+                                <option><name>weekly at Wednesday</name><value>lsr_w3</value></option>
+                                <option><name>weekly at Thursday</name><value>lsr_w4</value></option>
+                                <option><name>weekly at Friday</name><value>lsr_w5</value></option>
+                                <option><name>weekly at Saturday</name><value>lsr_w6</value></option>
+                                <option><name>weekly at Sunday</name><value>lsr_w7</value></option>
+                                <option><name>every 10 day</name><value>lsr_d10</value></option>
+                                <option><name>every 15 day</name><value>lsr_d15</value></option>
+                                <option><name>every 20 day</name><value>lsr_d20</value></option>
+                                <option><name>every 25 day</name><value>lsr_d25</value></option>
+                                <option><name>every 30 day</name><value>lsr_d30</value></option>
                         </options>
                 </field>
                 <field>
-                        <fieldname>lightsquid_skipurl</fieldname>
                         <fielddescr>Skip url</fielddescr>
+                        <fieldname>lightsquid_skipurl</fieldname>
                         <description>
                                 If you want skip some sites from stat, example our local www server
                                 Example, if you want skip LOCAL site, put it here
