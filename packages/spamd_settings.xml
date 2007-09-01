@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -46,9 +47,9 @@
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>spamdsettings</name>
 	<version>0.1.0</version>
-	<include_file>/usr/local/pkg/spamd.inc</include_file>
 	<title>SpamD Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=spamd_settings.xml&amp;id=0</aftersaveredirect>
+	<include_file>/usr/local/pkg/spamd.inc</include_file>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>SpamD</name>
@@ -164,13 +165,13 @@
 			<fieldname>replysmtperror</fieldname>
 			<description>The SMTP error to return to the spammer, i.e. 450, 451, 550. This defaults to 450.</description>
 			<type>select</type>
-			<value>450</value>
 			<size>1</size>
+			<value>450</value>
 			<options>
-			    <option><value></value><name></name></option>
-			    <option><value>450</value><name>450</name></option>
-			    <option><value>451</value><name>451</name></option>
-			    <option><value>550</value><name>550</name></option>
+			    <option><name></name><value></value></option>
+			    <option><name>450</name><value>450</value></option>
+			    <option><name>451</name><value>451</value></option>
+			    <option><name>550</name><value>550</value></option>
 			</options>
 		</field>
 		<field>

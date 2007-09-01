@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -44,31 +45,10 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<include_file>freeradius.inc</include_file>
+	<name>freeradius</name>
 	<version>1.1.2</version>
-
-	<!-- Installation -->
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/freeradiusclients.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>		
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/freeradiussettings.xml</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>		
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/freeradius.inc</item>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>		
-	</additional_files_needed>
-	<custom_php_install_command>
-		freeradius_install_command();
-	</custom_php_install_command>
-	<custom_php_deinstall_command>	
-		freeradius_deinstall_command();
-	</custom_php_deinstall_command>
+	<title>FreeRADIUS: Users</title>
+	<include_file>freeradius.inc</include_file>
 	<menu>
 		<name>FreeRADIUS</name>
 		<tooltiptext>Modify FreeRADIUS users, clients, and settings.</tooltiptext>
@@ -77,14 +57,11 @@
 	</menu>
 	<service>
 		<name>FreeRADIUS</name>
-		<description>The FreeRADIUS daemon.</description>
 		<rcfile>radiusd.sh</rcfile>
 		<executable>radiusd</executable>
+		<description>The FreeRADIUS daemon.</description>
 	</service>
 
-	<!-- Interface -->
-	<name>freeradius</name>
-	<title>FreeRADIUS: Users</title>
 	<tabs>
 		<tab>
 			<text>Users</text>
@@ -100,6 +77,7 @@
 			<url>/pkg_edit.php?xml=freeradiussettings.xml&amp;id=0</url>
 		</tab>
 	</tabs>
+
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Username</fielddescr>
@@ -110,24 +88,39 @@
 			<fieldname>description</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>		
+		<item>http://www.pfsense.org/packages/config/freeradiusclients.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>		
+		<item>http://www.pfsense.org/packages/config/freeradiussettings.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>	
+		<item>http://www.pfsense.org/packages/config/freeradius.inc</item>
+	</additional_files_needed>
 	<fields>
 		<field>
-			<fieldname>username</fieldname>
 			<fielddescr>Username</fielddescr>
+			<fieldname>username</fieldname>
 			<description>Enter the username.</description>
-			<required/>
 			<type>input</type>
-		</field>
-		<field>
-			<fieldname>password</fieldname>
-			<fielddescr>Password</fielddescr>
-			<description>Enter the password for this username.</description>
 			<required/>
-			<type>password</type>
 		</field>
 		<field>
-			<fieldname>description</fieldname>
+			<fielddescr>Password</fielddescr>
+			<fieldname>password</fieldname>
+			<description>Enter the password for this username.</description>
+			<type>password</type>
+			<required/>
+		</field>
+		<field>
 			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
 			<description>You may enter a description here for your reference (not parsed).</description>
 			<type>input</type>
 		</field>
@@ -138,4 +131,10 @@
 	<custom_php_resync_config_command>
 		freeradius_users_resync();
 	</custom_php_resync_config_command>
+	<custom_php_install_command>
+		freeradius_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>	
+		freeradius_deinstall_command();
+	</custom_php_deinstall_command>
 </packagegui>

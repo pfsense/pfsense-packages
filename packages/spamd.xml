@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -46,8 +47,8 @@
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>spamdsources</name>
 	<version>4.2</version>
-	<include_file>/usr/local/pkg/spamd.inc</include_file>
 	<title>SpamD: External Sources</title>
+	<include_file>/usr/local/pkg/spamd.inc</include_file>
 	<backup_file>/var/db/spamd</backup_file>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
@@ -82,6 +83,23 @@
 			<url>/pkg_edit.php?xml=spamd_outlook.xml&amp;id=0</url>
 		</tab>			
 	</tabs>
+	<!-- configpath gets expanded out automatically and config items will be
+         stored in that location -->
+	<configpath>['installedpackages']['spamd']['config']</configpath>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Provider Name</fielddescr>
+			<fieldname>providername</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Provider Type</fielddescr>
+			<fieldname>providertype</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>providerdescription</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
     	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
@@ -122,23 +140,7 @@
 	    <chmod>0755</chmod>
 	    <item>http://www.pfsense.com/packages/config/spamd_gather_stats.php</item>
 	</additional_files_needed>	
-	<!-- configpath gets expanded out automatically and config items will be
-         stored in that location -->
-	<configpath>['installedpackages']['spamd']['config']</configpath>
-	<adddeleteeditpagefields>
-		<columnitem>
-			<fielddescr>Provider Name</fielddescr>
-			<fieldname>providername</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Provider Type</fielddescr>
-			<fieldname>providertype</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Description</fielddescr>
-			<fieldname>providerdescription</fieldname>
-		</columnitem>
-	</adddeleteeditpagefields>
+
 	<!-- fields gets invoked when the user adds or edits a item.   the following items
          will be parsed and rendered for the user as a gui with input, and selectboxes. -->
 	<fields>
@@ -146,19 +148,19 @@
 			<fielddescr>Provider Name</fielddescr>
 			<fieldname>providername</fieldname>
 			<description>Enter the name of the source</description>
-			<size>30</size>
 			<type>input</type>
+			<size>30</size>
 		</field>
 		<field>
 			<fielddescr>Provider Type</fielddescr>
 			<fieldname>providertype</fieldname>
 			<description>Select the Provider Type</description>
 			<type>select</type>
-			<value>black</value>
 			<size>1</size>
+			<value>black</value>
 			<options>
-			    <option><value>black</value><name>Black List</name></option>
-			    <option><value>white</value><name>White List</name></option>
+			    <option><name>Black List</name><value>black</value></option>
+			    <option><name>White List</name><value>white</value></option>
 			</options>
 		</field>
 		<field>
@@ -167,8 +169,8 @@
 			<description>Enter the description for this item</description>
 			<type>textarea</type>
 			<size>30</size>
-			<rows>4</rows>
 			<cols>40</cols>			
+			<rows>4</rows>
 		</field>
 		<field>
 			<fielddescr>Reject message</fielddescr>
@@ -176,29 +178,29 @@
 			<description>Enter the message to display to emailing parties that are on this providers list</description>
 			<type>textarea</type>
 			<size>30</size>
-			<rows>2</rows>
 			<cols>40</cols>
+			<rows>2</rows>
 		</field>
 		<field>
 			<fielddescr>Provider Method</fielddescr>
 			<fieldname>providermethod</fieldname>
 			<description>Select the Provider Method</description>
 			<type>select</type>
-			<value>http</value>
 			<size>1</size>
+			<value>http</value>
 			<options>
-				<option><value>file</value><name>File</name></option>
-			    <option><value>http</value><name>URL</name></option>
-			    <option><value>exec</value><name>Execute command</name></option>
+				<option><name>File</name><value>file</value></option>
+			    <option><name>URL</name><value>http</value></option>
+			    <option><name>Execute command</name><value>exec</value></option>
 			</options>
 		</field>
 		<field>
 			<fielddescr>Provider URL or Filename</fielddescr>
 			<fieldname>providerurl</fieldname>
 			<description>Enter the URL to the provider.</description>
-			<rows>4</rows>
-			<cols>40</cols>
 			<type>textarea</type>
+			<cols>40</cols>
+			<rows>4</rows>
 		</field>
 	</fields>
 	<custom_delete_php_command>

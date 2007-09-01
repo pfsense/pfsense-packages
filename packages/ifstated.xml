@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -47,6 +48,7 @@
     <name>ifstated</name>
     <version>20041117</version>
     <title>ifstated: Settings</title>
+    <aftersaveredirect>pkg_edit.php?xml=ifstated.xml&amp;id=0&amp;savemsg=Updated</aftersaveredirect>
     <menu>
 	<name>ifstated</name>
 	<tooltiptext>Modify ifstated settings.</tooltiptext>
@@ -54,14 +56,13 @@
 	<configfile>ifstated.xml</configfile>
 	<url>/pkg_edit.php?xml=ifstated.xml&amp;id=0</url>
     </menu>
-    <aftersaveredirect>pkg_edit.php?xml=ifstated.xml&amp;id=0&amp;savemsg=Updated</aftersaveredirect>
-    <configpath>installedpackages->package->$packagename->configuration->settings</configpath>
     <modify_system>
-	<item>
+	<modifyitem>
 	    <modifyfilename>/etc/sysctl.conf</modifyfilename>
 	    <textneeded>net.inet.carp.preempt=1</textneeded>
-	</item>
+	</modifyitem>
     </modify_system>
+    <configpath>installedpackages->package->$packagename->configuration->settings</configpath>
     <fields>
 	<field>
 	    <fielddescr>External Test IP</fielddescr>
@@ -104,15 +105,6 @@
 	    </options>
 	</field>
     </fields>
-    <custom_php_install_command>
-	global $config;
-	$fout = fopen("/usr/local/etc/rc.d/ifstated.sh","w");
-	fwrite($fout,"#!/bin/sh\n\n/usr/local/sbin/ifstated\n");
-	fwrite($fout, "# PACKAGE: IFStated\n");
-	fwrite($fout, "# EXECUTABLE: ifstated\n");
-	fclose($fout);
-	chmod("/usr/local/etc/rc.d/ifstated.sh", 0755);
-    </custom_php_install_command>
     <custom_add_php_command>
 	conf_mount_rw();
 	config_lock();
@@ -135,5 +127,14 @@
 	config_unlock();
 	mwexec("/usr/bin/killall -HUP ifstated");
     </custom_add_php_command>
+    <custom_php_install_command>
+	global $config;
+	$fout = fopen("/usr/local/etc/rc.d/ifstated.sh","w");
+	fwrite($fout,"#!/bin/sh\n\n/usr/local/sbin/ifstated\n");
+	fwrite($fout, "# PACKAGE: IFStated\n");
+	fwrite($fout, "# EXECUTABLE: ifstated\n");
+	fclose($fout);
+	chmod("/usr/local/etc/rc.d/ifstated.sh", 0755);
+    </custom_php_install_command>
 </packagegui>
 

@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -89,9 +90,6 @@
 			<type>input</type>
 		</field>
 	</fields>
-	<custom_php_resync_config_command>
-	    sync_package_sipproxd_users();
-	</custom_php_resync_config_command>
 	<custom_add_php_command>
 		function sync_package_sipproxd_users()
 		{
@@ -112,5 +110,8 @@
 		}
 		sync_package_sipproxd_users();
 	</custom_add_php_command>
+	<custom_php_resync_config_command>
+	    sync_package_sipproxd_users();
+	</custom_php_resync_config_command>
 </packagegui>
 

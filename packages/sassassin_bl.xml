@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -45,6 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>sassassinbl</name>
+	<version>none</version>
 	<title>AntiSPAM: Blacklist</title>
         <include_file>sassassin.inc</include_file>
 	<tabs>
@@ -64,25 +66,25 @@
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fieldname>address</fieldname>
 			<fielddescr>Address</fielddescr>
+			<fieldname>address</fieldname>
 		</columnitem>
 		<columnitem>
-			<fieldname>description</fieldname>
 			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<fieldname>address</fieldname>
 			<fielddescr>Address</fielddescr>
+			<fieldname>address</fieldname>
 			<description>This is the email address that will be added to the blacklist (valid wildcards: *, ?).</description>
-			<required/>
 			<type>input</type>
+			<required/>
 		</field>
 		<field>
-			<fieldname>description</fieldname>
 			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
 			<description>You may enter a description here for your reference (not parsed).</description>
 			<type>input</type>
 		</field>

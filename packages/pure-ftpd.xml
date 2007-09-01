@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -60,9 +61,6 @@
 		<section>Services</section>
 		<url>pkg_edit.php?xml=pure-ftpdsettings.xml&amp;id=0</url>
 	</menu>
-	<additional_files_needed>
-		<item>http://www.pfsense.com/packages/config/pure-ftpdsettings.xml</item>
-	</additional_files_needed>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location seperated with -> -->
 	<configpath>installedpackages->package->$packagename->configuration</configpath>
@@ -78,6 +76,11 @@
 			<fieldname>description</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
+	
+	<additional_files_needed>
+		<item>http://www.pfsense.com/packages/config/pure-ftpdsettings.xml</item>
+	</additional_files_needed>
+
 	<!-- fields gets invoked when the user adds or edits a item.   the following items
          will be parsed and rendered for the user as a gui with input, and selectboxes. -->
 	<fields>
@@ -106,21 +109,10 @@
 			<type>input</type>
 		</field>
 	</fields>
-	<custom_php_install_command>
-		$fout = fopen("/usr/local/etc/rc.d/pure-ftpd.sh","w");
-		fwrite($fout, "#!/bin/sh\n\n");
-                fwrite($fout, "# PACKAGE: Pure-FTPD\n");
-                fwrite($fout, "# EXECUTABLE: pure-ftpd\n");
-		fwrite($fout, "/usr/local/sbin/pure-ftpd -A -B /usr/local/etc/pure-ftpd.conf\n");
-		fclose($fout);
-		chmod("/usr/local/etc/rc.d/pure-ftpd.sh", 0755);
-		mwexec("/usr/local/etc/rc.d/pure-ftpd.sh");
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		mwexec("/usr/bin/killall pure-ftpd");
-		rmdir_recursive("/usr/local/etc/pure*");
-		rmdir_recursive("/usr/local/etc/rc.d/pure*");
-	</custom_php_deinstall_command>
+	<custom_delete_php_command>
+		rmdir_recursive("/home/" . $username);
+		system("/usr/sbin/pw userdel " . $username);
+	</custom_delete_php_command>
 	<custom_add_php_command>
 		conf_mount_rw();
 		config_lock();
@@ -139,8 +131,19 @@
 		config_unlock();
 		$savemsg = "User has been added.";
 	</custom_add_php_command>
-	<custom_delete_php_command>
-		rmdir_recursive("/home/" . $username);
-		system("/usr/sbin/pw userdel " . $username);
-	</custom_delete_php_command>
+	<custom_php_install_command>
+		$fout = fopen("/usr/local/etc/rc.d/pure-ftpd.sh","w");
+		fwrite($fout, "#!/bin/sh\n\n");
+                fwrite($fout, "# PACKAGE: Pure-FTPD\n");
+                fwrite($fout, "# EXECUTABLE: pure-ftpd\n");
+		fwrite($fout, "/usr/local/sbin/pure-ftpd -A -B /usr/local/etc/pure-ftpd.conf\n");
+		fclose($fout);
+		chmod("/usr/local/etc/rc.d/pure-ftpd.sh", 0755);
+		mwexec("/usr/local/etc/rc.d/pure-ftpd.sh");
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		mwexec("/usr/bin/killall pure-ftpd");
+		rmdir_recursive("/usr/local/etc/pure*");
+		rmdir_recursive("/usr/local/etc/rc.d/pure*");
+	</custom_php_deinstall_command>
 </packagegui>

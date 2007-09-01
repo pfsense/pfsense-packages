@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -45,9 +46,8 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>upclient</name>
-	<title>upclient: Settings</title>
 	<version>5.0.b8_2</version>
-	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<title>upclient: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=upclient.xml&amp;id=0</aftersaveredirect>
 	<menu>
                 <name>upclient</name>
@@ -61,6 +61,7 @@
                 <rcfile>upclient.sh</rcfile>
                 <executable>upclient</executable>
         </service>
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<fields>
 		<field>
 			<fielddescr>Authorization Key</fielddescr>

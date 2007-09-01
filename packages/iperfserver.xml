@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -47,8 +48,8 @@
 	<name>iperf</name>
 	<version>1.7.0</version>
 	<title>iperf: Server</title>
-	<donotsave>true</donotsave>
 	<preoutput>yes</preoutput>
+	<donotsave>true</donotsave>
 	<menu>
 		<name>iperf</name>
 		<tooltiptext>Run iperf in client or server mode.</tooltiptext>

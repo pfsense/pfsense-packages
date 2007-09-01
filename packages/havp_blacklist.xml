@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -75,12 +76,6 @@
 		</tab>
 	</tabs>
 
-    	<additional_files_needed>
-	    <prefix>/usr/local/pkg/</prefix>
-	    <chmod>0755</chmod>
-	    <item>http://agni.linuxense.com/packages/config/havp.inc</item>
-	</additional_files_needed>
-
 	<configpath>['installedpackages']['havpblacklist']['config']</configpath>
 
 	<adddeleteeditpagefields>
@@ -93,6 +88,12 @@
 			<fieldname>description</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
+
+    	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://agni.linuxense.com/packages/config/havp.inc</item>
+	</additional_files_needed>
 
 	<fields>
 		<field>

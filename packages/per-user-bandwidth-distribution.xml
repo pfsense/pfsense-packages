@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -71,16 +72,16 @@
 			<type>select</type>
 			<options>
 			    <option>
-					<value>Kbit/s</value>
 					<name>Kbit/s</name>
+					<value>Kbit/s</value>
 			    </option>
 			    <option>
-					<value>Kbyte/s</value>
 					<name>Kbyte/s</name>
+					<value>Kbyte/s</value>
 			    </option>
 			    <option>
-					<value>Mbit/s</value>
 					<name>Mbit/s</name>
+					<value>Mbit/s</value>
 			    </option>
 			</options>			
 		</field>
@@ -96,16 +97,16 @@
 			<type>select</type>
 			<options>
 			    <option>
-					<value>Kbit/s</value>
 					<name>Kbit/s</name>
+					<value>Kbit/s</value>
 			    </option>
 			    <option>
-					<value>Kbyte/s</value>
 					<name>Kbyte/s</name>
+					<value>Kbyte/s</value>
 			    </option>
 			    <option>
-					<value>Mbit/s</value>
 					<name>Mbit/s</name>
+					<value>Mbit/s</value>
 			    </option>
 			</options>			
 		</field>

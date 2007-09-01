@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -47,14 +48,14 @@
 	<name>havp</name>
 	<version>0.3</version>
 	<title>Havp: Settings</title>
-	<include_file>/usr/local/pkg/havp.inc</include_file>
         <aftersaveredirect>/pkg_edit.php?xml=havp.xml&amp;id=0</aftersaveredirect>
+	<include_file>/usr/local/pkg/havp.inc</include_file>
 	<menu>
 		<name>HAVP</name>
-		<section>Services</section>
 		<tooltiptext>Modify HAVP settings.</tooltiptext>
-		<url>/pkg_edit.php?xml=havp.xml&amp;id=0</url>
+		<section>Services</section>
 		<configfile>havp.xml</configfile>
+		<url>/pkg_edit.php?xml=havp.xml&amp;id=0</url>
 	</menu>
 
 	<service>
@@ -82,7 +83,7 @@
 			<url>/pkg.php?xml=havp_trans_exclude.xml</url>
 		</tab>
 	</tabs>
-
+	<configpath>['installedpackages']['havp]['config']</configpath>
     	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
@@ -113,8 +114,6 @@
 	    <chmod>0755</chmod>
 	    <item>http://agni.linuxense.com/packages/config/havp.sh</item>
 	</additional_files_needed>
-
-	<configpath>['installedpackages']['havp]['config']</configpath>
 
 	<fields>
 		<field>
@@ -213,9 +212,9 @@
 		</field>		
 	</fields>
 
+	<custom_php_resync_config_command> sync_package_havp(); </custom_php_resync_config_command>
 	<custom_php_install_command> havp_install_command(); </custom_php_install_command>
 	<custom_php_deinstall_command> havp_deinstall_command(); </custom_php_deinstall_command>
-	<custom_php_resync_config_command> sync_package_havp(); </custom_php_resync_config_command>
 
 </packagegui>
 

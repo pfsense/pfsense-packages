@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -47,8 +48,8 @@
 	<name>postfix</name>
 	<version>1.1.12_1</version>
 	<title>Services: Postfix Forwarder</title>
-        <preoutput>yes</preoutput>
         <savetext>Change</savetext>
+        <preoutput>yes</preoutput>
 	<aftersaveredirect>pkg_edit.php?xml=postfix.xml&amp;id=1</aftersaveredirect>
 	<menu>
 		<name>Postfix Forwarder</name>
@@ -70,31 +71,35 @@
                         <type>input</type>
 		</field>
 		<field>
+			<fielddescr>none</fielddescr>
+			<fieldname>none</fieldname>
 		    <type>rowhelper</type>
 		    <rowhelper>
 			<rowhelperfield>
+			    <fielddescr>Domain</fielddescr>
+			    <fieldname>domain</fieldname>
+			    <description>Enter the domain here (ex: example.com)</description>
 			    <type>input</type>
 			    <size>20</size>
-			    <fieldname>domain</fieldname>
-			    <fielddescr>Domain</fielddescr>
-			    <description>Enter the domain here (ex: example.com)</description>
 			</rowhelperfield>
 			<rowhelperfield>
+			    <fielddescr>Mail Server IP</fielddescr>
+			    <fieldname>mailserverip</fieldname>
+			    <description>Enter the mail server IP to forward to here.</description>
 			    <type>input</type>
 			    <size>20</size>
-			    <fieldname>mailserverip</fieldname>
-			    <fielddescr>Mail Server IP</fielddescr>
-			    <description>Enter the mail server IP to forward to here.</description>
 			</rowhelperfield>
 		    </rowhelper>
 		</field>
         </fields>
 	<custom_add_php_command>
 	</custom_add_php_command>
-	<custom_php_deinstall_command>
-	</custom_php_deinstall_command>
+        <start_command>/usr/local/sbin/postfix start</start_command>
+        <restart_command>/usr/local/sbin/postmap /usr/local/etc/postfix/transport ; /usr/local/sbin/postfix reload</restart_command>
 	<custom_php_install_command>
 	</custom_php_install_command>
+	<custom_php_deinstall_command>
+	</custom_php_deinstall_command>
         <templates>
             <template>
                 <filename>/usr/local/etc/postfix/main.cf</filename>
@@ -109,6 +114,4 @@ relay_domains = domain_fieldvalue[ ] \n
                 <templatecontents>domain_fieldvalue smtp:[mailserverip_fieldvalue]\n</templatecontents>
             </template>
         </templates>
-        <start_command>/usr/local/sbin/postfix start</start_command>
-        <restart_command>/usr/local/sbin/postmap /usr/local/etc/postfix/transport ; /usr/local/sbin/postfix reload</restart_command>
 </packagegui>

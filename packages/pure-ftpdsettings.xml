@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -45,6 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>pure-ftpdsettings</name>
+	<version>none</version>
 	<title>Services: PureFTPD Settings</title>
         <aftersaveredirect>pkg_edit.php?xml=pure-ftpdsettings.xml&amp;id=0</aftersaveredirect>
 	<!-- Menu is where this packages menu will appear -->
@@ -126,10 +128,8 @@
             <type>checkbox</type>
         </field>
         </fields>
-	<custom_php_install_command>
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-	</custom_php_deinstall_command>
+	<custom_delete_php_command>
+	</custom_delete_php_command>
 	<custom_add_php_command>
 		conf_mount_rw();
 		config_lock();
@@ -154,7 +154,9 @@
 		mwexec("killall pure-ftpd");
 		mwexec("/usr/local/etc/rc.d/pure-ftpd.sh");
 	</custom_add_php_command>
-	<custom_delete_php_command>
-	</custom_delete_php_command>
+	<custom_php_install_command>
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+	</custom_php_deinstall_command>
 </packagegui>
 

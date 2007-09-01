@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -44,21 +45,10 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
+	<name>spamassassin</name>
+	<version>none</version>
+	<title>Antispam: Configuration</title>
 	<include_file>sassassin.inc</include_file>
-
-	<!-- Installation -->
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sassassin_wl.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sassassin_bl.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/sassassin.inc</item>
-	</additional_files_needed>
-	<custom_php_install_command>
-		sassassin_install_command();
-	</custom_php_install_command>
 	<menu>
 		<name>Antispam</name>
 		<tooltiptext>Configure the Antispam service.</tooltiptext>
@@ -67,14 +57,10 @@
 	</menu>
 	<service>
 		<name>SpamAssassin</name>
-		<description>The SpamAssassin spam detection software.</description>
 		<rcfile>spamd.sh</rcfile>
 		<executable>spamd</executable>
+		<description>The SpamAssassin spam detection software.</description>
 	</service>
-
-	<!-- Interface -->
-	<name>spamassassin</name>
-	<title>Antispam: Configuration</title>
 	<tabs>
 		<tab>
 			<text>Configuration</text>
@@ -90,66 +76,75 @@
 			<url>/pkg.php?xml=sassassin_bl.xml</url>
 		</tab>
 	</tabs>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sassassin_wl.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sassassin_bl.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/sassassin.inc</item>
+	</additional_files_needed>
 	<fields>
 		<field>
-			<fieldname>enable</fieldname>
 			<fielddescr>Enable antispam</fielddescr>
+			<fieldname>enable</fieldname>
 			<description>Check to enable the antispam protection.</description>
-			<required/>
 			<type>checkbox</type>
 			<enablefields>bayes,bayes_learn,threshold,subject,send_spam</enablefields>
+			<required/>
 		</field>
 		<field>
-			<fieldname>bayes</fieldname>
 			<fielddescr>Bayesian classifier</fielddescr>
+			<fieldname>bayes</fieldname>
 			<description>Check this to enable the Bayesian classifier.</description>
-			<default_value>on</default_value>
-			<required/>
 			<type>checkbox</type>
+			<required/>
+			<default_value>on</default_value>
 		</field>
 		<field>
-			<fieldname>bayes_learn</fieldname>
 			<fielddescr>Bayesian auto-learning</fielddescr>
+			<fieldname>bayes_learn</fieldname>
 			<description>Check this to enable the Bayesian auto-learning system.</description>
-			<default_value>on</default_value>
-			<required/>
 			<type>checkbox</type>
-		</field>
-		<field>
-			<fieldname>threshold</fieldname>
-			<fielddescr>Spam threshold</fielddescr>
-			<description>Set the threshold at which a message is considered spam.</description>
-			<default_value>5.0</default_value>
 			<required/>
-			<type>input</type>
+			<default_value>on</default_value>
 		</field>
 		<field>
-			<fieldname>subject</fieldname>
+			<fielddescr>Spam threshold</fielddescr>
+			<fieldname>threshold</fieldname>
+			<description>Set the threshold at which a message is considered spam.</description>
+			<type>input</type>
+			<required/>
+			<default_value>5.0</default_value>
+		</field>
+		<field>
 			<fielddescr>Rewrite subject</fielddescr>
+			<fieldname>subject</fieldname>
 			<description>This is the string that will be added to the subject of spam emails.</description>
-			<default_value>*** SPAM ***</default_value>
 			<type>input</type>
+			<default_value>*** SPAM ***</default_value>
 		</field>
 		<field>
-			<fieldname>send_spam</fieldname>
 			<fielddescr>How to send spam messages</fielddescr>
+			<fieldname>send_spam</fieldname>
 			<description>Choose between not sending spam messages, sending them as an RFC-822 MIME attachment (recommended) or as plain text.</description>
 			<type>select</type>
+			<default_value>attachment</default_value>
 			<options>
 				<option>
-					<value>donotsave</value>
 					<name>Do not send</name>
+					<value>donotsave</value>
 				</option>
 				<option>
-					<value>attachment</value>
 					<name>Send as an attachment (recommended)</name>
+					<value>attachment</value>
 				</option>
 				<option>
-					<value>plaintext</value>
 					<name>Send as plain text</name>
+					<value>plaintext</value>
 				</option>
 			</options>
-			<default_value>attachment</default_value>
 		</field>
 	</fields>
 	<custom_php_validation_command>
@@ -158,4 +153,7 @@
 	<custom_php_resync_config_command>
 		sassassin_resync();
 	</custom_php_resync_config_command>
+	<custom_php_install_command>
+		sassassin_install_command();
+	</custom_php_install_command>
 </packagegui>

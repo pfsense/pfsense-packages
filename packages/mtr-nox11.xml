@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -47,9 +48,9 @@
 	<name>mtr</name>
 	<version>0.65_2</version>
 	<title>Diagnostics: mtr</title>
-	<donotsave>true</donotsave>
-	<preoutput>yes</preoutput>
 	<savetext>mtr</savetext>
+	<preoutput>yes</preoutput>
+	<donotsave>true</donotsave>
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>mtr</name>
@@ -80,8 +81,6 @@
 		    <type>checkbox</type>
                 </field>
         </fields>
-		<custom_php_deinstall_command>
-		</custom_php_deinstall_command>
         <custom_add_php_command>
             $mtr_options = " -r";
             if($_POST['count']) $mtr_options .= " -c " . $_POST['count'];
@@ -89,4 +88,6 @@
             $mtr_options .= " " . $_POST['hostname'];
             system("/usr/local/sbin/mtr" . $mtr_options);
         </custom_add_php_command>
+		<custom_php_deinstall_command>
+		</custom_php_deinstall_command>
 </packagegui>

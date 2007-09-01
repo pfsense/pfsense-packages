@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -45,9 +46,8 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>arpwatch</name>
-	<title>arpwatch: Settings</title>
 	<version>2.1.a13</version>
-	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<title>arpwatch: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=arpwatch.xml&amp;id=0</aftersaveredirect>
 	<menu>
                 <name>arpwatch</name>
@@ -72,6 +72,7 @@
 			<url>/arpwatch_reports.php</url>
 		</tab>
 	</tabs>
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<additional_files_needed>
             <prefix>/usr/local/www/</prefix>
             <chmod>a+rx</chmod>
@@ -85,9 +86,6 @@
 			<type>interfaces_selection</type>
 		</field>
 	</fields>
-	<custom_php_install_command>
-		unlink_if_exists("/usr/local/etc/rc.d/arpwatch.sh");
-        </custom_php_install_command>
 	<custom_php_global_functions>
 	function sync_package_arpwatch() {
 		global $config;
@@ -111,5 +109,8 @@
 	<custom_add_php_command>
 		sync_package_arpwatch();
 	</custom_add_php_command>
+	<custom_php_install_command>
+		unlink_if_exists("/usr/local/etc/rc.d/arpwatch.sh");
+        </custom_php_install_command>
 </packagegui>
 

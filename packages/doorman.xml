@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -45,6 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>doorman</name>
+	<version>none</version>
 	<title>doorman: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=doorman.xml&amp;id=0</aftersaveredirect>
 	<menu>
@@ -61,7 +63,7 @@
         </service>
 	<tabs>
 		<tab> 
-                        <text>Settings</ext>
+                        <text>Settings</text>
                         <url>/pkg_edit.php?xml=doorman.xml&amp;id=0</url>
                         <active/>
                 </tab>
@@ -70,10 +72,10 @@
                         <url>/pkg.php?xml=doormanusers.xml</url>
                 </tab>
         </tabs>
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<additional_files_needed>
 		<item>http://www.pfsense.com/packages/config/doormanusers.xml</item>
 	</additional_files_needed>
-	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<fields>
 		<field>
 			<fielddescr>Initial connection timeout</fielddescr>
@@ -109,20 +111,10 @@
 			<fielddescr>Listening port</fielddescr>
 			<fieldname>port</fieldname>
 			<description>Enter the port that doormand should listen on. (default 1001)</description>	
-			<value>1001</value>
 			<type>input</type>
+			<value>1001</value>
 		</field>
 	</fields>
-	<custom_php_install_command>
-		global $config;
-		$start = "/usr/local/sbin/doormand -D &amp;";
-		write_rcfile(array(
-					"file" => "doorman.sh",
-					"start" => $start,
-					"stop" => "/usr/bin/killall doormand"
-				)
-		);
-	</custom_php_install_command>
 	<custom_php_global_functions>
 	function sync_package_doorman() {
 		conf_mount_rw();
@@ -151,5 +143,15 @@
 	<custom_add_php_command>
 		sync_package_doorman();
 	</custom_add_php_command>
+	<custom_php_install_command>
+		global $config;
+		$start = "/usr/local/sbin/doormand -D &amp;";
+		write_rcfile(array(
+					"file" => "doorman.sh",
+					"start" => $start,
+					"stop" => "/usr/bin/killall doormand"
+				)
+		);
+	</custom_php_install_command>
 </packagegui>
 

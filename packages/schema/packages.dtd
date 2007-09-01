@@ -51,9 +51,13 @@
 <!-- Indicates where to get more informations about this package -->
 <!ELEMENT url (#PCDATA)>
 <!-- needs to be documented -->
+<!ELEMENT depends_on_service (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT tooltiptext (#PCDATA)>
 <!-- The title of a particular package -->
 <!ELEMENT title (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT textneeded (#PCDATA)>
 <!-- Categroy of a particular package (e.g. System) -->
 <!ELEMENT category (#PCDATA)>
 <!-- needs to be documented -->
@@ -83,15 +87,19 @@
 <!-- needs to be documented -->
 <!ELEMENT prefix (#PCDATA)>
 <!-- Root node of a package definition. Container element -->
-<!ELEMENT packagegui ((copyright, description, requirements, faq, name, version, title, category?, note?, savetext?, preoutput?, donotsave?, aftersaveredirect?, include_file?, delete_string?, addedit_string?, menu*, service?, tabs?, configpath?, adddeleteeditpagefields?, additional_files_needed*, fields?, custom_php_global_functions?, custom_php_command_before_form?, custom_delete_php_command?, custom_add_php_command?, custom_php_resync_config_command?, custom_php_validation_command?, custom_add_php_command_late?, start_command?, restart_command?, custom_php_after_form_command?, custom_php_resync_config_command?, custom_php_install_command?, custom_php_deinstall_command?, custom_php_before_form_command?, custom_php_after_head_command?))>
+<!ELEMENT packagegui ((copyright, description, requirements, faq, name, version, title, category?, note?, savetext?, preoutput?, donotsave?, aftersaveredirect?, include_file?, backup_file?, delete_string?, addedit_string?, menu*, service*, modify_system?, tabs?, configpath?, adddeleteeditpagefields?, additional_files_needed*, fields?, custom_php_global_functions?, custom_php_command_before_form?, custom_delete_php_command?, custom_add_php_command?, custom_php_resync_config_command?, custom_php_validation_command?, custom_add_php_command_late?, start_command?, restart_command?, process_kill_command?, custom_php_after_form_command?, custom_php_resync_config_command?, custom_php_install_command?, custom_php_deinstall_command?, custom_php_before_form_command?, custom_php_after_head_command?, templates?))>
 <!-- A particular name -->
 <!ELEMENT name (#PCDATA)>
 <!-- Menu item. Container element -->
-<!ELEMENT menu ((name, tooltiptext?, section?, configfile?, url?))>
+<!ELEMENT menu ((name, tooltiptext?, section?, configfile?, url?, depends_on_service?))>
+<!-- needs to be documented -->
+<!ELEMENT modifyitem ((modifyfilename?, textneeded?))>
 <!-- needs to be documented -->
 <!ELEMENT item (#PCDATA)>
 <!-- A PHP file that needs to be included prior to executing arbitrary PHP code -->
 <!ELEMENT include_file (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT backup_file (#PCDATA)>
 <!-- needs to be documented -->
 <!ELEMENT delete_string (#PCDATA)>
 <!-- needs to be documented -->
@@ -101,7 +109,11 @@
 <!-- FAQ items or an URL that points to certain FAQ items -->
 <!ELEMENT faq (#PCDATA)>
 <!-- needs to be documented -->
-<!ELEMENT rowhelperfield ((fielddescr, fieldname, description, type, size?))>
+<!ELEMENT modifyfilename (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT modify_system ((modifyitem+))>
+<!-- needs to be documented -->
+<!ELEMENT rowhelperfield ((fielddescr, fieldname, description, type, size?, options?))>
 <!-- needs to be documented -->
 <!ELEMENT rowhelper ((rowhelperfield+))>
 <!-- needs to be documented -->
@@ -125,7 +137,13 @@
 <!-- needs to be documented -->
 <!ELEMENT rows (#PCDATA)>
 <!-- needs to be documented -->
+<!ELEMENT combinefieldsbegin (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT combinefieldsend (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT dontdisplayname (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT dontcombinecells (#PCDATA)>
 <!-- needs to be documented -->
 <!ELEMENT onchange (#PCDATA)>
 <!-- needs to be documented -->
@@ -139,11 +157,15 @@
 <!-- needs to be documented -->
 <!ELEMENT fields ((field*))>
 <!-- needs to be documented -->
+<!ELEMENT filename (#PCDATA)>
+<!-- needs to be documented -->
 <!ELEMENT fieldname (#PCDATA)>
 <!-- needs to be documented -->
 <!ELEMENT fielddescr (#PCDATA)>
 <!-- needs to be documented -->
-<!ELEMENT field ((fielddescr, fieldname, description?, type, donotdisable?, enablefields?, size?, required?, default_value?, value?, multiple?, options?, cols?, rows?, typehint?, onchange?, encoding?, combinefieldsend?, rowhelper?))>
+<!ELEMENT validationtype (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT field ((fielddescr, fieldname, description?, type, donotdisable?, enablefields?, size?, required?, default_value?, value?, multiple?, options?, cols?, rows?, typehint?, onchange?, encoding?, combinefieldsend?, combinefieldsbegin?, rowhelper?, dontdisplayname?, dontcombinecells?, validationtype?))>
 <!-- needs to be documented -->
 <!ELEMENT description (#PCDATA)>
 <!-- needs to be documented -->
@@ -160,6 +182,8 @@
 <!ELEMENT custom_php_validation_command (#PCDATA)>
 <!-- needs to be documented -->
 <!ELEMENT custom_add_php_command_late (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT process_kill_command (#PCDATA)>
 <!-- needs to be documented -->
 <!ELEMENT start_command (#PCDATA)>
 <!-- needs to be documented -->
@@ -190,5 +214,11 @@
 <!ELEMENT additional_files_needed ((prefix?, chmod?, item))>
 <!-- needs to be documented -->
 <!ELEMENT active EMPTY>
+<!-- needs to be documented -->
+<!ELEMENT templates ((template+))>
+<!-- needs to be documented -->
+<!ELEMENT templatecontents (#PCDATA)>
+<!-- needs to be documented -->
+<!ELEMENT template ((filename, templatecontents))>
 <!-- End of pfSense package DTD V1.0 ...................................... -->
 <!-- ...................................................................... -->

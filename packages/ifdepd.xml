@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
@@ -80,7 +81,7 @@
 		<description>Enter a colon seperated list of interfaces to disable once one of the source interfaces loses connectivity. You must specify physical interface names.</description>
 		<type>input</type>
 	</field>
-    </fields>
+    </fields>    
     <custom_php_global_functions>
 	function sync_package_ifdepd() {
                 conf_mount_rw();
@@ -110,8 +111,8 @@
     <custom_add_php_command>
 	sync_package_ifdepd();
     </custom_add_php_command>
-    <custom_php_resync_command>
+    <custom_php_resync_config_command>
 	sync_package_ifdepd();
-    </custom_php_resync_command>
+    </custom_php_resync_config_command>
 </packagegui>
 
