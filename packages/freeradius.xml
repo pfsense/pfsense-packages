@@ -48,7 +48,7 @@
 	<name>freeradius</name>
 	<version>1.1.2</version>
 	<title>FreeRADIUS: Users</title>
-	<include_file>freeradius.inc</include_file>
+	<include_file>/usr/local/pkg/freeradius.inc</include_file>
 	<menu>
 		<name>FreeRADIUS</name>
 		<tooltiptext>Modify FreeRADIUS users, clients, and settings.</tooltiptext>
