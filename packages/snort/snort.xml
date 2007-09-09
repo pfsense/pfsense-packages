@@ -173,7 +173,7 @@
 		<field>
 			<fielddescr>Performance</fielddescr>
 			<fieldname>performance</fieldname>
-			<description>ac method is the fastest startup but consumes more a lot more memory.  acs/ac-banded and ac-sparsebands/mwm/lowmem methods use quite a bit less.  ac-sparsebands is recommended.</description>
+			<description>ac method is the fastest startup but consumes a lot more memory.  acs/ac-banded and ac-sparsebands/mwm/lowmem methods use quite a bit less.  ac-sparsebands is recommended.</description>
 			<type>select</type>
 			<options>
 				<option>
