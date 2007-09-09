@@ -1,0 +1,16 @@
+Index: guiconfig.inc
+===================================================================
+RCS file: /cvsroot/pfSense/usr/local/www/guiconfig.inc,v
+retrieving revision 1.90.2.31.2.3
+diff -u -r1.90.2.31.2.3 guiconfig.inc
+--- guiconfig.inc	10 May 2007 20:49:41 -0000	1.90.2.31.2.3
++++ guiconfig.inc	9 Sep 2007 19:43:31 -0000
+@@ -41,7 +41,7 @@
+ 
+ /* Include authentication routines */
+ /* THIS MUST BE ABOVE ALL OTHER CODE */
+-require_once("auth.inc");
++require_once("authng_authgui.inc");
+ 
+ /* parse the configuration and include all configuration functions */
+ require_once("config.inc");
