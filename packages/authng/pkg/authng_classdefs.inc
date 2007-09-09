@@ -2,7 +2,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng_classdefs.xml
+    authng_classdefs.inc
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2007 Daniel S. Haischt <me@daniel.stefan.haischt.name>
     All rights reserved.

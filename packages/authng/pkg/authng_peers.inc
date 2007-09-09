@@ -2,7 +2,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng_peers.xml
+    authng_peers.inc
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2007 Daniel S. Haischt <me@daniel.stefan.haischt.name>
     All rights reserved.
@@ -194,6 +194,21 @@ class AbstractUserPeer {
         function getUserByIndex($index) {
                 return $this->users[$index];
         }
+        
+        function getUserByName($username) {
+                return $this->users[$username];
+        }
+        
+        function isSystemAdmin($username) {
+                $result = false;
+                $user = getUserByName($username);
+             
+                if ($user) {
+                    $result = $user->isSystemAdmin();
+                }
+                
+                return $result;
+        }
 }
 
 /**
@@ -229,6 +244,21 @@ class AbstractGroupPeer {
 
         function getGroupByIndex($index) {
                 return $this->groups[$index];
+        }
+        
+        function getGroupByName($groupname) {
+                return $this->groups[$groupname];
+        }
+        
+        function getGroupHomePage($groupname) {
+                $result = false;
+                $group = getGroupByName($groupname);
+             
+                if ($group) {
+                    $result = $group->getHome();
+                }
+                
+                return $result;
         }
 }
 

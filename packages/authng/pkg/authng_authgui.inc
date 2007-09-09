@@ -2,7 +2,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng_authmethods.inc
+    authng_authgui.inc
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2007 Daniel S. Haischt <me@daniel.stefan.haischt.name>
     All rights reserved.
@@ -46,7 +46,7 @@ if (!$authMethod->authenticate($backend)) { exit; }
 /* scriptname is set in headjs.php if the user did try to access a page other
  * than index.php without beeing logged in.
  */
-if (isset($_POST['scriptname']) && isSystemAdmin($HTTP_SERVER_VARS['AUTH_USER'])) {
+if (isset($_POST['scriptname']) && $userPeer->isSystemAdmin($HTTP_SERVER_VARS['AUTH_USER'])) {
   pfSenseHeader("{$_POST['scriptname']}");
   exit;
 }
@@ -55,7 +55,7 @@ $allowed = array();
 
 // Once here, the user has authenticated with the web server.
 // Now, we give them access only to the appropriate pages for their group.
-if (!(isSystemAdmin($HTTP_SERVER_VARS['AUTH_USER']))) {
+if (!($userPeer->isSystemAdmin($HTTP_SERVER_VARS['AUTH_USER']))) {
   $allowed[] = '';
   if (isset($config['system']['group'][$groupindex[$config['system']['user'][$userindex[$HTTP_SERVER_VARS['AUTH_USER']]]['groupname']]]['pages'][0]['page'])) {
     $useridx = $userindex[$HTTP_SERVER_VARS['AUTH_USER']];
@@ -67,7 +67,7 @@ if (!(isSystemAdmin($HTTP_SERVER_VARS['AUTH_USER']))) {
   /* get the group homepage, to be able to forward
    * the user to this particular PHP page.
    */
-  getGroupHomePage($group) == "" ? $home = "/index.php" : $home = "/" . getGroupHomePage($group);
+  $groupPeer->getGroupHomePage($group) == "" ? $home = "/index.php" : $home = "/" . $groupPeer->getGroupHomePage($group);
 
   /* okay but if the user realy tries to explicitely access a particular
    * page, set $home to that page instead.
@@ -248,8 +248,8 @@ function display_login_form() {
           $('inputerrors').innerHTML='';
       }
       <?php
-        require("headjs.php");
-        echo getHeadJS();
+//        require("headjs.php");
+//        echo getHeadJS();
       ?>
     //-->
     </script>
