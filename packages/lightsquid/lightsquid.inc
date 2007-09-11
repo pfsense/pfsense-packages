@@ -55,7 +55,7 @@ define('LS_IP2NAMEPATH',      '/usr/local/libexec/lightsquid');
 define('CRONTAB_FILE',               '/var/cron/tabs/root');
 define('CRONTAB_LS_TEMPLATE',        '/usr/bin/perl /usr/local/www/lightsquid/lightparser.pl');
 define('CRONTAB_LS_JOBKEY',          '/lightparser.pl');
-define('CRONTAB_SQUID_TEMPLATE',     '/usr/local/etc/squid /usr/local/sbin/squid -k rotate > /dev/null');
+define('CRONTAB_SQUID_TEMPLATE',     '/usr/local/sbin/squid -k rotate > /dev/null');
 define('CRONTAB_SQUID_JOBKEY',       '/squid -k rotate');
 
 // default values
