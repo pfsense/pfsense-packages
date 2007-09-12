@@ -43,7 +43,9 @@ require_once("authng_peers.inc");
 // TODO: Define user- and groupindex array
 
 // get principal store type from config.xml
-$principalStore = $config['system']['webgui']['principal_store'];
+// TODO: needs to be defined in config.xml
+//$principalStore = $config['system']['webgui']['principal_store'];
+$principalStore = "xml";
 // get PeerFactory instance
 $peerFactory =& PeerFactory::getInstance();
 // get the actual UserPeer that holds the user index

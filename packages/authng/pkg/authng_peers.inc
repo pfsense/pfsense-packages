@@ -36,7 +36,7 @@
                                                                               */
 /* ========================================================================== */
 
-require_once("authng_classdefs");
+require_once("authng_classdefs.inc");
 
 class PeerFactory extends SingletonInterface {
         function __construct() {
@@ -54,7 +54,7 @@ class PeerFactory extends SingletonInterface {
             /* Each name links to an entry in config.xml
              * Example: <principal_store>xml</principal_store>
              */
-            switch ($name) {
+            switch ($store) {
                 case "xml":
                     $result = new XMLGroupPeer();
                     break;
@@ -76,7 +76,7 @@ class PeerFactory extends SingletonInterface {
             /* Each name links to an entry in config.xml
              * Example: <principal_store>xml</principal_store>
              */
-            switch ($name) {
+            switch ($store) {
                 case "xml":
                     $result = new XMLUserPeer();
                     break;
@@ -201,7 +201,7 @@ class AbstractUserPeer {
         
         function isSystemAdmin($username) {
                 $result = false;
-                $user = getUserByName($username);
+                $user = $this->getUserByName($username);
              
                 if ($user) {
                     $result = $user->isSystemAdmin();
@@ -252,7 +252,7 @@ class AbstractGroupPeer {
         
         function getGroupHomePage($groupname) {
                 $result = false;
-                $group = getGroupByName($groupname);
+                $group = $this->getGroupByName($groupname);
              
                 if ($group) {
                     $result = $group->getHome();
@@ -355,6 +355,7 @@ class XMLUserPeer extends AbstractUserPeer {
 
                         foreach($config['system']['user'] as $userent) {
                                 $this->user_index[$userent['name']] = $i;
+                                $this->addUserFromEnt($userent);
                                 $i++;
                         }
                 }                                
@@ -369,6 +370,7 @@ class XMLUserPeer extends AbstractUserPeer {
         /* ========================================================================== */
 
         function addUserFromEnt(&$ent) {
+            print "HURTZ";
                 $newUser = new AuthngUser();
                 $newUser->setName($ent['name']);
                 $newUser->setFullname($ent['fullname']);
@@ -387,7 +389,7 @@ class XMLUserPeer extends AbstractUserPeer {
                         }
                 }
 
-                $this->users[] = $newUser;
+                $this->users["${ent['name']}"] = $newUser;
         }
 
         function setUserName($id, $name) {
@@ -465,7 +467,7 @@ class XMLGroupPeer extends AbstractGroupPeer {
                         }
                 }
 
-                $this->groups[] = $newGoup;
+                $this->groups["${ent['name']}"] = $newGoup;
         }
 
         function setGroupName($id, $name) {

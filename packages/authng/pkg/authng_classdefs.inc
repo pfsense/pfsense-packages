@@ -36,6 +36,19 @@
                                                                               */
 /* ========================================================================== */
 
+class Object {
+        function Object() {
+                $args = func_get_args();
+                if (method_exists($this, '__destruct')) {
+                            register_shutdown_function(array(&$this, '__destruct'));
+                }
+                call_user_func_array(array(&$this, '__construct'), $args);
+        }
+
+        function __construct() {
+        }
+}
+
 class SingletonInterface extends Object {
         function __construct() {
                 // Perform object initialization here.
@@ -64,7 +77,7 @@ class AuthMethodFactory extends SingletonInterface {
                 return parent::__getInstanceImp('AuthMethodFactory');
         }
         
-        function &getBackendByName($name) {
+        function &getAuthMethodByName($name) {
             $result = null;
             
             /* Each name links to an entry in config.xml
@@ -103,7 +116,7 @@ class BackendFactory extends SingletonInterface {
                 return parent::__getInstanceImp('BackendFactory');
         }
         
-        function &getAuthMethodByName($name) {
+        function &getBackendByName($name) {
             $result = null;
             
             /* Each name links to an entry in config.xml
