@@ -67,19 +67,19 @@ class SingletonInterface extends Object {
         }
 }
 
-class AuthMethodFactory extends SingletonInterface {
+class BackendFactory extends SingletonInterface {
         function __construct() {
                 // Perform object initialization here.
                 parent::__construct();
         }
 
         function &getInstance() {
-                return parent::__getInstanceImp('AuthMethodFactory');
+                return parent::__getInstanceImp('BackendFactory');
         }
-        
-        function &getAuthMethodByName($name) {
+
+        function &getBackendByName($name) {
             $result = null;
-            
+
             /* Each name links to an entry in config.xml
              * Example: <auth_method>session</auth_method>
              */
@@ -101,24 +101,24 @@ class AuthMethodFactory extends SingletonInterface {
                     break;
                 default:
             }
-            
+
             return $result;
         }
 }
 
-class BackendFactory extends SingletonInterface {
+class AuthMethodFactory extends SingletonInterface {
         function __construct() {
                 // Perform object initialization here.
                 parent::__construct();
         }
 
         function &getInstance() {
-                return parent::__getInstanceImp('BackendFactory');
+                return parent::__getInstanceImp('AuthMethodFactory');
         }
-        
-        function &getBackendByName($name) {
+
+        function &getAuthMethodByName($name) {
             $result = null;
-            
+
             /* Each name links to an entry in config.xml
              * Example: <backing_method>htpasswd</backing_method>
              */
@@ -131,7 +131,7 @@ class BackendFactory extends SingletonInterface {
                     break;
                 default:
             }
-            
+
             return $result;
         }
 }
@@ -154,7 +154,7 @@ class AuthngAuxiliary {
 
           return $adminUsers;
         }  // end function
-        
+
         function assignUID($username = "") {
               global $userindex, $config, $g;
 
@@ -323,19 +323,19 @@ class AuthngUser {
         /* ========================================================================== */
         /* ==                              Accessors                               == */
         /* ========================================================================== */
-        
+
         function isSystemAdmin() {
                 return $this->systemAdmin;
         }
-        
+
         function setIsSystemAdmin($flag = false) {
                 $this->systemAdmin = $flag;
         }
-        
+
         function isUNIXRoot() {
                 return $this->unixRoot;
         }
-        
+
         function setIsUNIXRoot($flag = false) {
                 $this->unixRoot = $flag;
         }

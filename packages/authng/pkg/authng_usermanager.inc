@@ -2,7 +2,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.inc
+    authng_usermanager.inc
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2007 Daniel S. Haischt <me@daniel.stefan.haischt.name>
     All rights reserved.
@@ -36,55 +36,24 @@
                                                                               */
 /* ========================================================================== */
 
-/* PHP classes like factories users, and groups */
-require_once("authng_classdefs.inc");
-/* PHP classes representing specific auth methods */
-require_once("authng_authmethods.inc");
-/* PHP classes representing specific backends */
-require_once("authng_backends.inc");
-/* PHP peer classes that are providing a persistence layer */
-require_once("authng_peers.inc");
-
-// TODO: Define user- and groupindex array
-
-// get principal store type from config.xml
-// TODO: needs to be defined in config.xml
-//$principalStore = $config['system']['webgui']['principal_store'];
-$principalStore = "xml";
-// get PeerFactory instance
-$peerFactory =& PeerFactory::getInstance();
-// get the actual UserPeer that holds the user index
-$userPeer =& $peerFactory->getUserPeerByPrincipalStore($principalStore);
-// get the actual GroupPeer that holds the user index
-$groupPeer =& $peerFactory->getGroupPeerByPrincipalStore($principalStore);
-// get AuthMethodFactory instance
-$authMethodFactory =& AuthMethodFactory::getInstance();
-// get BackendFactory instance
-$backendFactory =& BackendFactory::getInstance();
-// get the actual auth method
-$authMethod =& $authMethodFactory->getAuthMethodByName($config['system']['webgui']['auth_method']);
-// get the actual backend
-$backend =& $backendFactory->getBackendByName($config['system']['webgui']['backing_method']);
-
-function getUsermanagerPagetitle() {
-    global $userPeer;
-
-    $result = "";
-
-    if ($userPeer->isSystemAdmin($HTTP_SERVER_VARS['AUTH_USER'])) {
-        // Page title for admins
-        $result = array(gettext("System"), gettext("User manager"));
-    } else {
-        // Page title for non-admins
-        $result = array(gettext("System"), gettext("User password"));
+function initUserFromGetVars() {
+    if ($_GET['act'] == "edit") {
+        if (isset($id) && $a_user[$id]) {
+            $pconfig['usernamefld'] = $a_user[$id]['name'];
+            $pconfig['fullname'] = $a_user[$id]['fullname'];
+            $pconfig['groupname'] = $a_user[$id]['groupname'];
+            $pconfig['utype'] = $a_user[$id]['scope'];
+            $pconfig['authorizedkeys'] = base64_decode($a_user[$id]['authorizedkeys']);
+        }
+    } else if ($_GET['act'] == "new") {
+      /* set this value cause the text field is read only
+       * and the user should not be able to mess with this
+       * setting.
+       */
+      $pconfig['utype'] = "user";
     }
-
-    return $result;
 }
-
-function processUserManagerPostVars() {
-    global $input_errors, $savemsg, $config;
-
+function processUserManagerPostVarsUser() {
     if (isset($_POST['save'])) {
         unset($input_errors);
 
@@ -112,9 +81,7 @@ function processUserManagerPostVars() {
     }
 }
 
-function processUserManagerAdminPostVars() {
-    global $config;
-
+function processUserManagerPostVarsAdmin() {
     $id = $_GET['id'];
     if (isset($_POST['id']))
         $id = $_POST['id'];
@@ -242,16 +209,13 @@ function processUserManagerAdminPostVars() {
  * @return
  */
 function getWindowJSScriptRefs(){
-    $result = array('<script type="text/javascript" src="/javascript/windows-js/javascript/window.js"></script>',
-                    '<script type="text/javascript" src="/javascript/windows-js/javascript/window_effects.js"></script>',
-                    '<script type="text/javascript" src="/javascript/windows-js/javascript/debug.js"></script>');
+    $result = array('<script type="text/javascript" src="/javascripts/windows-js/javascript/effects.js"></script>',
+                    '<script type="text/javascript" src="/javascripts/windows-js/javascript/window.js"></script>',
+                    '<script type="text/javascript" src="/javascripts/windows-js/javascript/window_effects.js"></script>',
+                    '<script type="text/javascript" src="/javascripts/windows-js/javascript/window_effects.js"></script>',
+                    '<script type="text/javascript" src="/javascripts/windows-js/javascript/debug.js"></script>');
 
     return $result;
-}
-
-function gotNoUsers() {
-    global $config;
-    return empty($config['installedpackages']['authng']['config']);
 }
 
 /**
@@ -261,22 +225,18 @@ function gotNoUsers() {
  * @return
  */
 function openNoUserDefsDialog($effectClass) {
-    if (gotNoUsers()) {
-        $alertMessage = gettext("No users or groups found. You will be forwarded to the AuthNG wizard to be able to define users and groups.");
+    if (empty($config['installedpackages']['authng']['config'])) {
+        $alertMessage = gettext("No users or group found. You will be forwarded to the AuthNG wizard to be able to define users and groups.");
         $dialogScript = "
             <script type='text/javascript'>
-                var anchor = document.getElementById('popupanchor');
-
                 function forwardToWizard() {
                     window.location.href = '/wizard.php?xml=authng_wizard.xml';
                 }
 
                 function openNoUserDefsDialog(html) {
                     var effect = new PopupEffect(html, {className: '${effectClass}'});
-                    Dialog.alert('${alertMessage}',{className:'alphacube', top:150, width:400, height:null, showEffect:effect.show.bind(effect), hideEffect:effect.hide.bind(effect), onOk:forwardToWizard});
+                    Dialog.alert('${alertMessage},{className:'alphacube', width: 400, height:null, showEffect:effect.show.bind(effect), hideEffect:effect.hide.bind(effect), onOk:forwardToWizard});
                 }
-
-                openNoUserDefsDialog(anchor);
             </script>
         ";
 
@@ -284,40 +244,4 @@ function openNoUserDefsDialog($effectClass) {
     }
 }
 
-/**
- * getWindowJSStyleRefs()
- *
- * @return
- */
-function getWindowJSStyleRefs(){
-    $result = array('<link href="/javascript/windows-js/themes/default.css" rel="stylesheet" type="text/css" />',
-                    '<link href="/javascript/windows-js/themes/alert.css" rel="stylesheet" type="text/css" />',
-                    '<link href="/javascript/windows-js/themes/alphacube.css" rel="stylesheet" type="text/css" />');
-
-    return $result;
-}
-
-/**
- * installPackageAuthNG()
- *
- * @return
- */
-function installPackageAuthNG() {
-    mwexec("cd / && /usr/bin/patch < /usr/local/pkg/authng-pfSenseHead.diff");
-    mwexec("cd / && /usr/bin/patch < /usr/local/pkg/authng-fbegin.inc.diff");
-    mwexec("cd / && /usr/bin/patch < /usr/local/pkg/authng-guiconfig.inc.diff");
-    mwexec("cd / && /usr/bin/patch < /usr/local/pkg/authng-globals.inc.diff");
-}
-
-/**
- * deinstallPackageAuthNG()
- *
- * @return
- */
-function deinstallPackageAuthNG() {
-    mwexec("cd / && /usr/bin/patch -R < /usr/local/pkg/authng-pfSenseHead.diff");
-    mwexec("cd / && /usr/bin/patch -R < /usr/local/pkg/authng-fbegin.inc.diff");
-    mwexec("cd / && /usr/bin/patch -R < /usr/local/pkg/authng-guiconfig.inc.diff");
-    mwexec("cd / && /usr/bin/patch -R < /usr/local/pkg/authng-globals.inc.diff");
-}
 ?>

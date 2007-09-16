@@ -2,7 +2,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    system_usermanager.php
+    system_usermanager_user.inc
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2007 Daniel S. Haischt <me@daniel.stefan.haischt.name>
     All rights reserved.
@@ -35,50 +35,32 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
-
-require("guiconfig.inc");
-// The page title for non-admins
-$pgtitle = getUsermanagerPagetitle();
-
-include("head.inc");
-
-$effectStyle = '
-    <style type="text/css">
-        .popup_nousers {
-            background: #000000;
-            opacity: 0.2;
-        }
-    </style>
-';
-foreach(getWindowJSScriptRefs() as $jscript){
-    $pfSenseHead->addScript($jscript);
-}
-foreach(getWindowJSStyleRefs() as $style){
-    $pfSenseHead->addStyle($style);
-}
-$pfSenseHead->addStyle($effectStyle);
-echo $pfSenseHead->getHTML();
+/* ======================= P A G E   F R A G M E N T ======================== */
+/* ========================================================================== */
 ?>
-<body link="#000000" vlink="#000000" alink="#000000">
-<?php include("fbegin.inc");?>
-<p class="pgtitle"><?= gentitle($pgtitle); ?></p>
-<form action="system_usermanager.php" method="post" name="iform" id="iform">
-<?php if ($input_errors) print_input_errors($input_errors);?>
-<?php if ($savemsg) print_info_box($savemsg);?>
-<?php
-    if (! gotNoUsers()) {
-        if ($userPeer->isSystemAdmin($HTTP_SERVER_VARS['AUTH_USER'])) {
-            processUserManagerAdminPostVars();
-            require_once("system_usermanager_admin.inc");
-        } else {
-            processUserManagerPostVars();
-            require_once("system_usermanager_user.inc");
-        }
-    }
-?>
-</form>
-<div id="popupanchor">&#160;</div>
-<?= openNoUserDefsDialog("popup_nousers"); ?>
-<?php include("fend.inc");?>
-</body>
-</html>
+  <div id="inputerrors"></div>
+  <table width="100%" border="0" cellpadding="6" cellspacing="0">
+    <tr>
+      <td colspan="2" valign="top" class="listtopic"><?=$HTTP_SERVER_VARS['AUTH_USER']?>'s Password</td>
+    </tr>
+    <tr>
+      <td width="22%" valign="top" class="vncell" rowspan="2">Password</td>
+      <td width="78%" class="vtable">
+        <input name="passwordfld1" type="password" class="formfld pwd" id="passwordfld1" size="20" />
+      </td>
+    </tr>
+    <tr>
+      <td width="78%" class="vtable">
+        <input name="passwordfld2" type="password" class="formfld pwd" id="passwordfld2" size="20" />
+        &nbsp;<?=gettext("(confirmation)");?>
+        <br />
+        <span class="vexpl"><?=gettext("Select a new password");?></span>
+      </td>
+    </tr>
+    <tr>
+      <td width="22%" valign="top">&nbsp;</td>
+      <td width="78%">
+        <input name="save" type="submit" class="formbtn" value="<?=gettext("Save");?>" />
+      </td>
+    </tr>
+  </table>

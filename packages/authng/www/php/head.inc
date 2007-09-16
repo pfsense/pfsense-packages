@@ -49,15 +49,15 @@ if($config['theme'] <> "") {
 // navigation level separator string
 $navlevelsep = ": ";
 
-//function gentitle($title) {
-//    global $navlevelsep;
-//    
-//    if(!is_array($title)) {
-//        return $title;
-//    }
-//    
-//    return join($navlevelsep, $title);
-//}
+function gentitle($title) {
+    global $navlevelsep;
+
+    if(!is_array($title)) {
+        return $title;
+    }
+
+    return join($navlevelsep, $title);
+}
 
 function genhtmltitle($title) {
     global $config;
@@ -228,7 +228,7 @@ class pfSenseHTMLHead
   var $link = array();
   var $script = array();
   var $style = array();
-  var $html = "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"%LANG%\" lang=\"%LANG%\">\n<head>\n<title>%TITLE%</title>\n%META%\n%STYLE%\n%LINK%\n%SCRIPT%";
+  var $html = "<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\">\n<head>\n<title>%TITLE%</title>\n%META%\n%STYLE%\n%LINK%\n%SCRIPT%";
   var $closehead = true;
   var $returnedHTML = false;
   var $allCSSID = "NOT-SET";
@@ -639,7 +639,7 @@ class pfSenseHTMLHead
       $this->html = str_replace("%STYLE%", $stylestr, $this->html);
       $this->html = str_replace("%LINK%", $linkstr, $this->html);
       $this->html = str_replace("%SCRIPT%", $scriptstr, $this->html);
-      $this->html = str_replace("%LANG%", $language, $this->html);
+      //$this->html = str_replace("%LANG%", $language, $this->html);
       $this->html = $this->xmlHead . $this->docType . $this->html;
 
       $this->returnedHTML = true;

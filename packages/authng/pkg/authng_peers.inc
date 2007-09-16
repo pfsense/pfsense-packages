@@ -36,8 +36,6 @@
                                                                               */
 /* ========================================================================== */
 
-require_once("authng_classdefs.inc");
-
 class PeerFactory extends SingletonInterface {
         function __construct() {
                 // Perform object initialization here.
@@ -47,10 +45,10 @@ class PeerFactory extends SingletonInterface {
         function &getInstance() {
                 return parent::__getInstanceImp('PeerFactory');
         }
-        
+
         function &getGroupPeerByPrincipalStore($store) {
             $result = null;
-            
+
             /* Each name links to an entry in config.xml
              * Example: <principal_store>xml</principal_store>
              */
@@ -66,13 +64,13 @@ class PeerFactory extends SingletonInterface {
                     break;
                 default:
             }
-            
+
             return $result;
         }
-        
+
         function &getUserPeerByPrincipalStore($store) {
             $result = null;
-            
+
             /* Each name links to an entry in config.xml
              * Example: <principal_store>xml</principal_store>
              */
@@ -88,7 +86,7 @@ class PeerFactory extends SingletonInterface {
                     break;
                 default:
             }
-            
+
             return $result;
         }
 }
@@ -116,11 +114,11 @@ class AbstractPrivilegePeer {
         /* ========================================================================== */
         /* ==                              Accessors                               == */
         /* ========================================================================== */
-        
+
         function setUserPeer($peer) {
             $this->userPeer = $peer;
         }
-        
+
         function getUserPeer() {
             return $this->userPeer;
         }
@@ -194,19 +192,19 @@ class AbstractUserPeer {
         function getUserByIndex($index) {
                 return $this->users[$index];
         }
-        
+
         function getUserByName($username) {
                 return $this->users[$username];
         }
-        
+
         function isSystemAdmin($username) {
                 $result = false;
                 $user = $this->getUserByName($username);
-             
+
                 if ($user) {
                     $result = $user->isSystemAdmin();
                 }
-                
+
                 return $result;
         }
 }
@@ -245,19 +243,19 @@ class AbstractGroupPeer {
         function getGroupByIndex($index) {
                 return $this->groups[$index];
         }
-        
+
         function getGroupByName($groupname) {
                 return $this->groups[$groupname];
         }
-        
+
         function getGroupHomePage($groupname) {
                 $result = false;
                 $group = $this->getGroupByName($groupname);
-             
+
                 if ($group) {
                     $result = $group->getHome();
                 }
-                
+
                 return $result;
         }
 }
@@ -276,11 +274,11 @@ class XMLPrivilegePeer extends AbstractPrivilegePeer {
 
         function XMLPrivilegePeer($userPeer) {
                 global $g, $config;
-                
+
                 parent::AbstractPrivilegePeer();
-                
+
                 $this->setUserPeer($peer);
-                
+
                 foreach ($peer->users as $userent) {
                     foreach ($userent->getPrivileges() as $privent) {
                         $this->privileges[$userent->getName()] = $privent;
@@ -311,22 +309,22 @@ class XMLPrivilegePeer extends AbstractPrivilegePeer {
                 $userid = getPrivilegeIndexByName($username);
                 $user = $config['system']['user'][$userid];
         }
-        
+
         function setFullName($id, $name) {
                 $userid = getUserIndexByName($id);
                 $config['system']['user'][$userid]['fullname'] = $name;
         }
-        
+
         function setGroupName($id, $name) {
                 $userid = getUserIndexByName($id);
                 $config['system']['user'][$userid]['groupname'] = $name;
         }
-        
+
         function setPassword($id, $pwd) {
                 $userid = getUserIndexByName($id);
                 $config['system']['user'][$userid]['password'] = $pwd;
         }
-        
+
         function setUid($id, $uid) {
                 $userid = getUserIndexByName($id);
                 $config['system']['user'][$userid]['uid'] = $uid;
@@ -347,7 +345,7 @@ class XMLUserPeer extends AbstractUserPeer {
 
         function XMLUserPeer() {
                 global $g, $config;
-                
+
                 parent::AbstractUserPeer();
 
                 if (isset($config['system']['user'])) {
@@ -358,7 +356,7 @@ class XMLUserPeer extends AbstractUserPeer {
                                 $this->addUserFromEnt($userent);
                                 $i++;
                         }
-                }                                
+                }
         }
 
         /* ========================================================================== */
@@ -384,7 +382,7 @@ class XMLUserPeer extends AbstractUserPeer {
                                 $newPrivilege->setId($privent['id']);
                                 $newPrivilege->setName($privent['name']);
                                 $newPrivilege->setDescription($privent['description']);
-                                
+
                                 $newUser->addPrivilege($newPrivilege);
                         }
                 }
@@ -396,22 +394,22 @@ class XMLUserPeer extends AbstractUserPeer {
                 $userid = getUserIndexByName($id);
                 $config['system']['user'][$userid]['name'] = $name;
         }
-        
+
         function setFullName($id, $name) {
                 $userid = getUserIndexByName($id);
                 $config['system']['user'][$userid]['fullname'] = $name;
         }
-        
+
         function setGroupName($id, $name) {
                 $userid = getUserIndexByName($id);
                 $config['system']['user'][$userid]['groupname'] = $name;
         }
-        
+
         function setPassword($id, $pwd) {
                 $userid = getUserIndexByName($id);
                 $config['system']['user'][$userid]['password'] = $pwd;
         }
-        
+
         function setUid($id, $uid) {
                 $userid = getUserIndexByName($id);
                 $config['system']['user'][$userid]['uid'] = $uid;
@@ -432,7 +430,7 @@ class XMLGroupPeer extends AbstractGroupPeer {
 
         function XMLGroupPeer() {
                 global $g, $config;
-                
+
                 parent::AbstractGroupPeer();
 
                 if (isset($config['system']['group'])) {
