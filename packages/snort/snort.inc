@@ -180,7 +180,7 @@ function generate_snort_conf() {
 	/* XXX: make multi wan friendly */
 	$snort_ext_int = $config['installedpackages']['snort']['config'][0]['iface_array'][0];
 
-	$snort_config_pass_thru = $config['installedpackages']['snort']['config'][0]['configpassthru'];
+	$snort_config_pass_thru = $config['installedpackages']['snortadvanced']['config'][0]['configpassthru'];
 
 	/* add auto update scripts to /etc/crontab */
 	$text_ww   = "*/60\t* \t 1\t *\t *\t root\t /usr/bin/nice -n20 /usr/local/pkg/snort_check_for_rule_updates.php";
