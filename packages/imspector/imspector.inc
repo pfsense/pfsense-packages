@@ -34,10 +34,10 @@
 	/* IMSpector */
 
 	define('IMSPECTOR_RCFILE', '/usr/local/etc/rc.d/imspector.sh');
-	define('IMSPECTOR_CONFIG','/usr/local/etc/imspector/imspector.conf');
+	define('IMSPECTOR_CONFIG', '/usr/local/etc/imspector/imspector.conf');
 
-	function imspector_notice ($msg) { syslog(LOG_NOTICE, "imspector: {$msg}"); return; }
-	function imspector_warn ($msg) { syslog(LOG_WARNING, "imspector: {$msg}"); return; }
+	function imspector_notice ($msg) { syslog(LOG_NOTICE, "imspector: {$msg}"); }
+	function imspector_warn ($msg) { syslog(LOG_WARNING, "imspector: {$msg}"); }
 
 	function imspector_action ($action) {
 		if (file_exists(IMSPECTOR_RCFILE))
@@ -45,20 +45,13 @@
 	}	
 
 	function imspector_running () {
-		if((int)exec("pgrep imspector | wc -l") > 0)
+		if((int)exec('pgrep imspector | wc -l') > 0)
 			return true;
 		return false;
 	}
-	
-	function imspector_config ($name) {
-		global $config;
-		if($config['installedpackages']['imspector']['config'][0]["{$name}"])
-			return $config['installedpackages']['imspector']['config'][0]["{$name}"];
-		return null;
-	}
 
 	function write_imspector_config($file, $text) {
-		$conf = fopen($file, "w");
+		$conf = fopen($file, 'w');
 		if(!$conf) {
 			imspector_warn("Could not open {$file} for writing.");
 			exit;
@@ -78,13 +71,13 @@
 	function imspector_proto_to_port ($proto)
 	{
 		switch ($proto) {
-			case "msn":
+			case 'msn':
 				return 1863;
-			case "icq":
+			case 'icq':
 				return 5190;
-			case "yahoo":
+			case 'yahoo':
 				return 5050;
-			case "irc":
+			case 'irc':
 				return 6667;
 			default:
 				return null;
@@ -94,7 +87,7 @@
 	function validate_form_imspector($post, $input_errors) {
 		if($post['iface_array'])
 			foreach($post['iface_array'] as $iface)
-				if($iface == "wan")
+				if($iface == 'wan')
 					$input_errors[] = 'It is a security risk to specify WAN in the \'Interface\' field';
 	}
 
@@ -104,7 +97,7 @@
 		@unlink(IMSPECTOR_RCFILE);
 		@unlink(IMSPECTOR_CONFIG);
 
-		exec("pkg_delete imspector-0.3");
+		exec('pkg_delete imspector-0.3');
 	}
 
 	function sync_package_imspector() {
@@ -113,15 +106,19 @@
 
 		config_lock();
 
+		$imspector_config = $config['installedpackages']['imspector']['config'][0];
+
 		/* remove existing rules */
-		exec("/sbin/pfctl -a imspector -Fr");
-		exec("/sbin/pfctl -a imspector -Fn");		
+		exec('/sbin/pfctl -a imspector -Fr');
+		exec('/sbin/pfctl -a imspector -Fn');	
 
-		if(imspector_config('enable') && imspector_config('proto_array'))
-			$proto_array = explode(',', imspector_config('proto_array'));
+		$ifaces_active = '';		
 
-		if(imspector_config('enable') && imspector_config('iface_array'))
-			$iface_array = explode(',', imspector_config('iface_array'));
+		if($imspector_config['enable'] && $imspector_config['proto_array'])
+			$proto_array = explode(',', $imspector_config['proto_array']);
+
+		if($imspector_config['enable'] && $imspector_config['iface_array'])
+			$iface_array = explode(',', $imspector_config['iface_array']);
 
 		if($iface_array && $proto_array) {
 			foreach($iface_array as $iface) {
@@ -158,23 +155,22 @@
 				foreach($proto_array as $proto)
 					$configtext .= "{$proto}_protocol=on\n";
 
-				if(imspector_config("filter_badwords")) 
+				if($imspector_config["filter_badwords"]) 
 					$configtext .= "badwords_filename=/usr/local/etc/imspector/badwords.txt\n";		
 					
-				if(imspector_config("log_file")) {
+				if($imspector_config["log_file"]) {
 					@mkdir('/var/imspector');
 					$configtext .= "file_logging_dir=/var/imspector\n";
 				}
 					
-				if(imspector_config("log_mysql")) {
-					$configtext .= "mysql_server=".imspector_config("mysql_server")."\n";
-					$configtext .= "mysql_database=".imspector_config("mysql_database")."\n";
-					$configtext .= "mysql_username=".imspector_config("mysql_username")."\n";
-					$configtext .= "mysql_password=".imspector_config("mysql_password")."\n";
+				if($imspector_config["log_mysql"]) {
+					$configtext .= "mysql_server={$imspector_config["mysql_server"]}\n";
+					$configtext .= "mysql_database={$imspector_config["mysql_database"]}\n";
+					$configtext .= "mysql_username={$imspector_config["mysql_username"]}\n";
+					$configtext .= "mysql_password={$imspector_config["mysql_password"]}\n";
 				}
 
-				/* XXX: for now just enable tracing of errors */
-				if(1) {
+				if(0) {
 					@mkdir('/tmp/trace');
 					$configtext .= "icq_trace_error=on\n";
 				}
@@ -188,7 +184,6 @@ if [ `pgrep imspector | wc -l` != 0  ]; then
 		done	
 	fi
 EOD;
-
 				$start = $stop."\n\tldconfig -m /usr/local/lib/mysql\n";
 				$start .= "\t/usr/local/sbin/imspector -c \"".IMSPECTOR_CONFIG."\"";
 
@@ -221,7 +216,7 @@ EOD;
 			/* lets stop the service and remove the rc file */
 
 			if(file_exists(IMSPECTOR_RCFILE)) {
-				if(!imspector_config('enable'))
+				if(!$imspector_config['enable'])
 					imspector_notice('Stopping service: imspector disabled');
 				else
 					imspector_notice('Stopping service: no interfaces and/or protocols selected');
