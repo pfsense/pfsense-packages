@@ -46,7 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>miniupnpd</name>
-	<version>20070521</version>
+	<version>20070927</version>
 	<title>Services: MiniUPnPd</title>
 	<savetext>Change</savetext>
 	<aftersaveredirect>/status_upnp.php</aftersaveredirect>
