@@ -231,7 +231,7 @@
       <website>http://www.imspector.org/</website>
       <category>Network Management</category>
 	  <maintainer>rswagoner@gmail.com</maintainer>
-      <version>0.3</version>
+      <version>0.3.1</version>
       <required_version>1.0</required_version>
       <status>BETA</status>
       <config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
