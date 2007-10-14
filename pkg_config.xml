@@ -3,6 +3,39 @@
 <!-- $Id$ -->
 <pfsensepkgs>
   <packages>
+    <!--
+    <package>
+        <name>AuthNG</name>
+        <descr>Adds a per user- and groupmanager to the system.</descr>
+        <category>System</category>
+        <config_file>http://www.pfsense.com/packages/config/authng/pkg/authng.xml</config_file>
+        <version>1.0</version>
+        <status>ALPHA</status>
+        <maintainer>me@daniel.stefan.haischt.name</maintainer>
+        <required_version>1.2</required_version>
+        <configurationfile>authng.xml</configurationfile>
+        <depends_on_package>scriptaculous-js-1.7.1_1.tbz</depends_on_package>
+        <depends_on_package>windows_js-1.3_1.tbz</depends_on_package>
+    </package>
+    -->
+    <package>
+        <name>Dyntables</name>
+        <descr>Dynamically reloads table data using Ajax instead of wrong meta refresh tag..</descr>
+        <category>System</category>
+        <config_file>http://www.pfsense.com/packages/config/dyntables/pkg/dyntables.xml</config_file>
+        <version>1.0</version>
+        <status>ALPHA</status>
+        <maintainer>me@daniel.stefan.haischt.name</maintainer>
+        <required_version>1.2</required_version>
+        <configurationfile>dyntables.xml</configurationfile>
+        <!--
+          |
+          | Dependencies
+          |
+        -->
+        <depends_on_package>scriptaculous-js-1.7.1_1.tbz</depends_on_package>
+        <depends_on_package>windows_js-1.3_1.tbz</depends_on_package>
+    </package>
 	<package>
       <name>PerUserBW</name>
       <descr>Adds a per user bandwidth distribution option.  Requires 1.2 or newer.</descr>
@@ -225,8 +258,8 @@
 	</package>
     <package>
       <name>imspector</name>
-      <descr>IMSpector is an Instant Messenger transparent proxy with logging capabilities. 
-      Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees. 
+      <descr>IMSpector is an Instant Messenger transparent proxy with logging capabilities.
+      Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees.
       REQUIRES: 1.0.1-SNAPSHOT-01-22-2006 or later</descr>
       <website>http://www.imspector.org/</website>
       <category>Network Management</category>
