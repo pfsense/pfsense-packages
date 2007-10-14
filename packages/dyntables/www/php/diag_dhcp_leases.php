@@ -264,13 +264,15 @@ $ajaxRequest = "
             '{$_SERVER['SCRIPT_NAME']}',
             {
                 method: 'get',
-                parameters: 'refresh=true',
+                parameters: { refresh: 'true' },
+                onLoading: openInfoDialog,
                 onSuccess: function(transport) {
                     var json = transport.responseText.evalJSON();
                     var table = document.getElementById('sortabletable');
 
                     emtyDhcpLeaseTable(table);
                     dhcpLeaseTableToHTML(table, json, '{$g['theme']}');
+                    Dialog.closeInfo();
                 }
             });
     }

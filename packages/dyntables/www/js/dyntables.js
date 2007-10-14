@@ -35,6 +35,11 @@
                                                                               */
 /* ========================================================================== */
 
+function openInfoDialog() {
+  Dialog.info("Reloading table data ...",
+               {className:"alphacube", width:200, height:75, showProgress: true});
+}
+
 /**
  *
  * @access public
