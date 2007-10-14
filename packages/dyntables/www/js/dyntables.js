@@ -37,7 +37,7 @@
 
 function openInfoDialog() {
   Dialog.info("Reloading table data ...",
-               {className:"alphacube", width:200, height:75, showProgress: true});
+               {className:"alphacube", width:200, height:75, top:100, showProgress: true});
 }
 
 /**
