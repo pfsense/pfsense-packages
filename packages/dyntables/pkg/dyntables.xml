@@ -81,7 +81,7 @@
     |
   -->
   <additional_files_needed>
-    <prefix>/usr/local/www/</prefix>
+    <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
     <item>http://www.pfsense.com/packages/config/dyntables/www/php/diag_dhcp_leases.php</item>
   </additional_files_needed>
@@ -91,7 +91,7 @@
     |
   -->
   <additional_files_needed>
-    <prefix>/usr/local/www/javascript</prefix>
+    <prefix>/usr/local/pkg/</prefix>
     <chmod>0755</chmod>
     <item>http://www.pfsense.com/packages/config/dyntables/www/js/dyntables.js</item>
   </additional_files_needed>

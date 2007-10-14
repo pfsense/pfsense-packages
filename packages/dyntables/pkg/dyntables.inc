@@ -43,11 +43,17 @@ function syncPackageDyntables() {
 }
 
 function installPackageDyntables() {
-
+    /* move temp files */
+    @rename('/usr/local/www/diag_dhcp_leases.php', '/usr/local/pkg/diag_dhcp_leases.php.org');
+    @rename('/usr/local/pkg/dyntables.js', '/usr/local/www/javascript/dyntables.js');
+    @rename('/usr/local/pkg/diag_dhcp_leases.php', '/usr/local/www/diag_dhcp_leases.php');
 }
 
 function deinstallPackageDyntables() {
-
+    /* move backup files */
+    @unlink('/usr/local/www/diag_dhcp_leases.php');
+    @unlink('/usr/local/www/javascript/dyntables.js');
+    @rename('/usr/local/pkg/diag_dhcp_leases.php.org', '/usr/local/www/diag_dhcp_leases.php');
 }
 
 function checkForExtension($alertClass) {
