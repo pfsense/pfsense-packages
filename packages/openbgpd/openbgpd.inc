@@ -85,7 +85,8 @@ function openbgpd_install_conf() {
 	}	
 	
 	// OpenBGPD filters
-	$conffile .= "deny all\n";
+	$conffile .= "deny from any\n";
+	$conffile .= "deny to any\n";
 	foreach($openbgpd_neighbors as $neighbor) {
 		$conffile .= "allow from {$neighbor['neighbor']}\n";
 		$conffile .= "allow to {$neighbor['neighbor']}\n";	
