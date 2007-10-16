@@ -109,16 +109,16 @@
 				<rowhelperfield>
 				    <fielddescr>Paramaters</fielddescr>
 				    <fieldname>paramaters</fieldname>
-				    <description>Neighbor settings</description>
+				    <description>Neighbor settings.  Items ending with a X require a value.  Leave the items without a trailing X's value blank.</description>
 				    <type>select</type>
 					<options>
 						<option><name>Announce all</name><value>announce all</value></option>
 						<option><name>Announce none</name><value>announce none</value></option>
 						<option><name>Announce self</name><value>announce self</value></option>
 						<option><name>Announce default-route</name><value>announce default-route</value></option>
-						<option><name>Metric</name><value>set metric</value></option>
-						<option><name>Multihop</name><value>multihop</value></option>
-						<option><name>Localpref</name><value>set localpref</value></option>
+						<option><name>Metric X</name><value>set metric</value></option>
+						<option><name>Multihop X</name><value>multihop</value></option>
+						<option><name>Localpref X</name><value>set localpref</value></option>
 						<option><name>Softreconfig in yes</name><value>softreconfig in yes</value></option>
 						<option><name>Softreconfig in no</name><value>softreconfig in no</value></option>
 						<option><name>Softreconfig out yes</name><value>softreconfig out yes</value></option>
