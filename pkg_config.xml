@@ -38,14 +38,16 @@
         <depends_on_package>windows_js-1.3_1.tbz</depends_on_package>
     </package>
 	<package>
-      <name>PerUserBW</name>
-      <descr>Adds a per user bandwidth distribution option.  Requires 1.2 or newer.</descr>
+      <name>OpenBGPD</name>
+      <descr></descr>
       <category>NET</category>
-      <config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
+      <config_file>http://www.pfsense.com/packages/config/openbgpd/openbgpd.xml</config_file>
       <version>0.1</version>
       <status>ALPHA</status>
       <required_version>2.0</required_version>
-      <configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
+      <configurationfile>openbgpd.xml</configurationfile>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6.2-release/All</depends_on_package_base_url>
+      <depends_on_package>openbgpd-3.9.tbz</depends_on_package>
     </package>
    <package>
       <name>Lightsquid</name>
@@ -776,6 +778,16 @@
 	  <required_version>1.2</required_version>
 	  <configurationfile>doorman.xml</configurationfile>
 	 </package>
+	<package>
+      <name>PerUserBW</name>
+      <descr>Adds a per user bandwidth distribution option.  Requires 1.2 or newer.</descr>
+      <category>NET</category>
+      <config_file>http://www.pfsense.com/packages/config/per-user-bandwidth-distribution.xml</config_file>
+      <version>0.1</version>
+      <status>ALPHA</status>
+      <required_version>2.0</required_version>
+      <configurationfile>per-user-bandwidth-distribution.xml</configurationfile>
+    </package>
     <package>
       <name>spamd</name>
       <website>http://www.openbsd.org/spamd/</website>
