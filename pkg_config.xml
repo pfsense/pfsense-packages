@@ -3,6 +3,18 @@
 <!-- $Id$ -->
 <pfsensepkgs>
   <packages>
+ 	<package>
+      <name>OpenBGPD</name>
+      <descr>OpenBGPD is a FREE implementation of the Border Gateway Protocol, Version 4. It allows ordinary machines to be used as routers exchanging routes with other systems speaking the BGP protocol.</descr>
+      <category>NET</category>
+      <config_file>http://www.pfsense.com/packages/config/openbgpd/openbgpd.xml</config_file>
+      <version>0.1</version>
+      <status>ALPHA</status>
+      <required_version>1.2</required_version>
+      <configurationfile>openbgpd.xml</configurationfile>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6.2-release/All</depends_on_package_base_url>
+      <depends_on_package>openbgpd-3.9.tbz</depends_on_package>
+    </package>
     <!--
     <package>
         <name>AuthNG</name>
@@ -36,18 +48,6 @@
         <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
         <depends_on_package>scriptaculous-js-1.7.1_1.tbz</depends_on_package>
         <depends_on_package>windows_js-1.3_1.tbz</depends_on_package>
-    </package>
-	<package>
-      <name>OpenBGPD</name>
-      <descr></descr>
-      <category>NET</category>
-      <config_file>http://www.pfsense.com/packages/config/openbgpd/openbgpd.xml</config_file>
-      <version>0.1</version>
-      <status>ALPHA</status>
-      <required_version>2.0</required_version>
-      <configurationfile>openbgpd.xml</configurationfile>
-      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6.2-release/All</depends_on_package_base_url>
-      <depends_on_package>openbgpd-3.9.tbz</depends_on_package>
     </package>
    <package>
       <name>Lightsquid</name>
