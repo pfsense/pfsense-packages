@@ -65,6 +65,12 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/openbgpd/openbgpd_neighbors.xml</item>
 	</additional_files_needed>
+	<menu>
+		<name>OpenBGPD</name>
+		<tooltiptext></tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=openbgpd.xml&amp;id=0</url>
+	</menu>
 	<tabs>
 		<tab>
 			<text>Settings</text>
