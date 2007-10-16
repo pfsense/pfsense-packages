@@ -117,7 +117,12 @@
 						<option><name>Announce self</name><value>announce self</value></option>
 						<option><name>Announce default-route</name><value>announce default-route</value></option>
 						<option><name>Metric</name><value>set metric</value></option>
+						<option><name>Multihop</name><value>multihop</value></option>
+						<option><name>Localpref</name><value>set localpref</value></option>
 						<option><name>Softreconfig in yes</name><value>softreconfig in yes</value></option>
+						<option><name>Softreconfig in no</name><value>softreconfig in no</value></option>
+						<option><name>Softreconfig out yes</name><value>softreconfig out yes</value></option>
+						<option><name>Softreconfig out no</name><value>softreconfig out no</value></option>
 					</options>
 				</rowhelperfield>
 				<rowhelperfield>
@@ -129,7 +134,6 @@
 				</rowhelperfield>
 		    </rowhelper>
 		</field>
-		
 	</fields>
 	<custom_php_command_before_form>
 		$newoptions = array();
