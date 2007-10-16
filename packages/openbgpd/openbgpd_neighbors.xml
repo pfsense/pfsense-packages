@@ -123,6 +123,11 @@
 						<option><name>Softreconfig in no</name><value>softreconfig in no</value></option>
 						<option><name>Softreconfig out yes</name><value>softreconfig out yes</value></option>
 						<option><name>Softreconfig out no</name><value>softreconfig out no</value></option>
+						<option><name>Tcp md5sig password X</name><value>tcp md5sig password</value></option>
+						<option><name>Local address X</name><value>local-address</value></option>
+						
+						local-address 
+												
 					</options>
 				</rowhelperfield>
 				<rowhelperfield>

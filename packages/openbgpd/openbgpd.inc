@@ -84,6 +84,20 @@ function openbgpd_install_conf() {
 		}
 	}	
 	
+	
+	// Handle neighbors that do not have a group assigned to them	
+	foreach($openbgpd_neighbors as $neighbor) {
+		if($neighbor['groupname'] == "") {
+			$conffile .= "	neighbor {$neighbor['neighbor']} {\n";
+			$conffile .= "		descr \"{$neighbor['descr']}\"\n";
+			foreach($neighbor['row'] as $row) {
+				$conffile .= "		{$row['paramaters']} {$row['parmvalue']} \n";
+			}		
+			$conffile .= "	}\n";
+		}
+	}
+	$conffile .= "}\n";
+	
 	// OpenBGPD filters
 	$conffile .= "deny from any\n";
 	$conffile .= "deny to any\n";
