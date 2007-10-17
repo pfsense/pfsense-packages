@@ -87,13 +87,16 @@ function openbgpd_install_conf() {
 	
 	// Handle neighbors that do not have a group assigned to them	
 	foreach($openbgpd_neighbors as $neighbor) {
+		$used_this_item = false;
 		if($neighbor['groupname'] == "") {
 			$conffile .= "	neighbor {$neighbor['neighbor']} {\n";
 			$conffile .= "		descr \"{$neighbor['descr']}\"\n";
+			$used_this_item = true;
 			foreach($neighbor['row'] as $row) {
 				$conffile .= "		{$row['paramaters']} {$row['parmvalue']} \n";
-			}		
-			$conffile .= "	}\n";
+			}
+			if($used_this_item)		
+				$conffile .= "	}\n";
 		}
 	}
 	$conffile .= "}\n";
