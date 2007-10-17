@@ -110,6 +110,7 @@ function openbgpd_install_conf() {
 	}
 	
 	// Write out the configuration file
+	fwrite($fd, "# This file was created by the pfSense package manager.  Do not edit!\n\n");	
 	fwrite($fd, $conffile);
 	
 	// Close file handle
