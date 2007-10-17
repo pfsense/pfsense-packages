@@ -150,16 +150,15 @@ function grey_out_value_boxes() {
 							\$('parmvalue' + x).value = '';
 							\$('parmvalue' + x).disabled = true;
 						} else {
-							$('paramaters' + x).options[$('paramaters' + x).selectedIndex].text = without_last_two;
 							\$('parmvalue' + x).disabled = false;
 						}
 					}
 				}
 			}
-		}
-								
-
-		var timerID  = setTimeout("grey_out_value_boxes()", 1000);
+			var timerID  = setTimeout("grey_out_value_boxes()", 1200);
+			
+		}	
+		grey_out_value_boxes();
 	</script>	
 
 	

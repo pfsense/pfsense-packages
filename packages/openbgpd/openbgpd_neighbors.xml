@@ -130,9 +130,8 @@
 				<rowhelperfield>
 				    <fielddescr>Value</fielddescr>
 				    <fieldname>parmvalue</fieldname>
-				    <description>When the WAN MS ping time is surpassed, item will failover to next host</description>
 				    <type>input</type>
-				    <size>15</size>
+				    <size>25</size>
 				</rowhelperfield>
 		    </rowhelper>
 		</field>
