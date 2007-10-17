@@ -130,7 +130,8 @@ function openbgpd_install_conf() {
 }
 
 function deinstall_openbgpd() {
-	exec("rm /usr/local/etc/rc.d/bgpd.sh");	
+	exec("rm /usr/local/etc/rc.d/bgpd.sh");
+	exec("killall bgpd");
 }
 
 function grey_out_value_boxes() {
