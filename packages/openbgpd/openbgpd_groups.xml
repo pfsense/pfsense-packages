@@ -109,6 +109,6 @@
 	<custom_php_validation_command>
 		$status = check_group_usage($_POST['groupname']);
 		if($status != "") 
-			$input_errors[] = "Sorry this group is in use by {$staus} and cannot be deleted.";
+			$input_errors[] = "Sorry this group is in use by {$status} and cannot be deleted.";
 	</custom_php_validation_command>
 </packagegui>
