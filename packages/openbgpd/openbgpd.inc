@@ -83,8 +83,7 @@ function openbgpd_install_conf() {
 			$conffile .= "}\n";
 		}
 	}	
-	
-	
+
 	// Handle neighbors that do not have a group assigned to them	
 	foreach($openbgpd_neighbors as $neighbor) {
 		$used_this_item = false;
@@ -117,7 +116,8 @@ function openbgpd_install_conf() {
 	
 	// Create rc.d file
 	$fd = fopen("/usr/local/etc/rc.d/bgpd.sh","w");
-	fwrite($fd, "#!/bin/sh\n");
+	fwrite($fd, "#!/bin/sh\n\n");
+	fwrite($fd, "# This file was created by the pfSense package manager.  Do not edit!\n\n");	
 	fwrite($fd, "bgpd\n");
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/bgpd.sh");
