@@ -123,6 +123,8 @@ function openbgpd_install_conf() {
 	fwrite($fd, "bgpd\n");
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/bgpd.sh");
+	exec("chmod a-rw /usr/local/etc/bgpd.conf");
+	exec("chmod a+rw /usr/local/etc/bgpd.conf");
 	
 	// bgpd process running?  if so reload, elsewise start.
 	if(is_openbgpd_running() == true) {
