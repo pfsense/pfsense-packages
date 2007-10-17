@@ -109,7 +109,7 @@
 				<rowhelperfield>
 				    <fielddescr>Paramaters</fielddescr>
 				    <fieldname>paramaters</fieldname>
-				    <description>Neighbor settings.  Items ending with a X require a value.  Leave the items without a trailing X's value blank.</description>
+				    <description>Neighbor settings.</description>
 				    <type>select</type>
 					<options>
 						<option><name>Announce all</name><value>announce all</value></option>

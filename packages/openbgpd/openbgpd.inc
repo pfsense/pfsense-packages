@@ -144,11 +144,13 @@ function grey_out_value_boxes() {
 					var length = fieldvalue.length;
 					length = length -2;
 					var last_two = fieldvalue.substring(length);
+					var without_last_two = fieldvalue.substring(0,length);
 					if( \$('parmvalue' + x) ) {
 						if(last_two != ' X') {			
 							\$('parmvalue' + x).value = '';
 							\$('parmvalue' + x).disabled = true;
 						} else {
+							$('paramaters' + x).options[$('paramaters' + x).selectedIndex].text = without_last_two;
 							\$('parmvalue' + x).disabled = false;
 						}
 					}
