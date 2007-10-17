@@ -119,6 +119,7 @@
 						<option><name>Metric X</name><value>set metric</value></option>
 						<option><name>Multihop X</name><value>multihop</value></option>
 						<option><name>Localpref X</name><value>set localpref</value></option>
+						<option><name>Remote AS X</name><value>remote-as</value></option>
 						<option><name>Softreconfig in yes</name><value>softreconfig in yes</value></option>
 						<option><name>Softreconfig in no</name><value>softreconfig in no</value></option>
 						<option><name>Softreconfig out yes</name><value>softreconfig out yes</value></option>
