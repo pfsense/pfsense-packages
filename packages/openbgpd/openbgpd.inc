@@ -131,6 +131,7 @@ function openbgpd_install_conf() {
 
 function deinstall_openbgpd() {
 	exec("rm /usr/local/etc/rc.d/bgpd.sh");
+	exec("rm /usr/local/www/openbgpd_status.php");
 	exec("killall bgpd");
 }
 
@@ -144,11 +145,11 @@ function check_group_usage($groupname) {
 		foreach($openbgpd_groups as $group) {
 			foreach($openbgpd_neighbors as $neighbor) {
 				if($neighbor['groupname'] == $group['name']) 
-					return true;
+					return $neighbor['groupname'];
 			}
 		}
 	}
-	return false;
+	return "";
 }
 
 function grey_out_value_boxes() {
