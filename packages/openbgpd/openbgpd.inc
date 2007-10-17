@@ -134,6 +134,23 @@ function deinstall_openbgpd() {
 	exec("killall bgpd");
 }
 
+function check_group_usage($groupname) {
+	global $config, $g;
+	$openbgpd_conf = &$config['installedpackages']['openbgpd']['config'][0];
+	$openbgpd_rows = &$config['installedpackages']['openbgpd']['config'][0]['row'];
+	$openbgpd_groups = &$config['installedpackages']['openbgpdgroups']['config'];
+	$openbgpd_neighbors = &$config['installedpackages']['openbgpdneighbors']['config'];
+	if(is_array($openbgpd_groups)) {	
+		foreach($openbgpd_groups as $group) {
+			foreach($openbgpd_neighbors as $neighbor) {
+				if($neighbor['groupname'] == $group['name']) 
+					return true;
+			}
+		}
+	}
+	return false;
+}
+
 function grey_out_value_boxes() {
 	echo <<<EOF
 	<script language="javascript">
