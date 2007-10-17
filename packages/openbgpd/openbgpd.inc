@@ -98,7 +98,8 @@ function openbgpd_install_conf() {
 				$conffile .= "	}\n";
 		}
 	}
-	$conffile .= "}\n";
+	if($used_this_item)
+		$conffile .= "}\n";
 	
 	// OpenBGPD filters
 	$conffile .= "deny from any\n";
