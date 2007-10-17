@@ -102,6 +102,7 @@
 		</field>
 	</fields>
 	<custom_php_deinstall_command>
+		deinstall_openbgpd();
 	</custom_php_deinstall_command>
 	<custom_php_resync_config_command>
 		openbgpd_install_conf();
