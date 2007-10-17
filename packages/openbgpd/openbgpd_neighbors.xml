@@ -159,11 +159,13 @@
 			}
 			$counter++;
 		}
-
 	</custom_php_command_before_form>
 	<custom_php_deinstall_command>
 	</custom_php_deinstall_command>
 	<custom_php_resync_config_command>
 		openbgpd_install_conf();
 	</custom_php_resync_config_command>
+	<custom_php_after_form_command>
+		grey_out_value_boxes();
+	</custom_php_after_form_command>
 </packagegui>

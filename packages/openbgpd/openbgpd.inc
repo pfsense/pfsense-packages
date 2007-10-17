@@ -133,6 +133,38 @@ function deinstall_openbgpd() {
 	exec("rm /usr/local/etc/rc.d/bgpd.sh");	
 }
 
+function grey_out_value_boxes() {
+	echo <<<EOF
+	<script language="javascript">
+		function grey_out_value_boxes() {
+			var x = 0;
+			for(x=0; x<99; x++) {
+				if( \$('paramaters' + x) ) {
+					var fieldvalue = $('paramaters' + x).options[$('paramaters' + x).selectedIndex].text;
+					var length = fieldvalue.length;
+					length = length -2;
+					var last_two = fieldvalue.substring(length);
+					if( \$('parmvalue' + x) ) {
+						if(last_two != ' X') {			
+							\$('parmvalue' + x).value = '';
+							\$('parmvalue' + x).disabled = true;
+						} else {
+							\$('parmvalue' + x).disabled = false;
+						}
+					}
+				}
+			}
+		}
+								
+
+		var timerID  = setTimeout("grey_out_value_boxes()", 1000);
+	</script>	
+
+	
+EOF;
+		
+}
+
 function is_openbgpd_running() {
 	$status = `ps awux | grep bgpd | grep "parent" | wc -l | awk '{ print \$1 }'`;
 	if(intval($status) > 0) 
