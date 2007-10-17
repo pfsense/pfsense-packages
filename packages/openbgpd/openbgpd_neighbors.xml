@@ -70,6 +70,10 @@
 			<fieldname>descr</fieldname>
 		</columnitem>
 		<columnitem>
+			<fielddescr>Group</fielddescr>
+			<fieldname>groupname</fieldname>
+		</columnitem>		
+		<columnitem>
 			<fielddescr>Neighbor</fielddescr>
 			<fieldname>neighbor</fieldname>
 		</columnitem>
@@ -116,6 +120,7 @@
 						<option><name>Announce none</name><value>announce none</value></option>
 						<option><name>Announce self</name><value>announce self</value></option>
 						<option><name>Announce default-route</name><value>announce default-route</value></option>
+						<option><name>Holdtime X</name><value>holdtime</value></option>
 						<option><name>Metric X</name><value>set metric</value></option>
 						<option><name>Multihop X</name><value>multihop</value></option>
 						<option><name>Localpref X</name><value>set localpref</value></option>
