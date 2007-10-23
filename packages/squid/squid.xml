@@ -264,6 +264,14 @@
 				</option>
 			</options>
 		</field>
+		<field>
+			<fielddescr>Custom Options</fielddescr>
+			<fieldname>custom_options</fieldname>
+			<description>You can put your own custom options here, separated by semi-colons (;). They'll be added to the configuration. They need to be squid.conf native options, otherwise squid will NOT work.</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>5</rows>
+		</field>
 	</fields>
 	<custom_php_command_before_form>
 		squid_before_form_general(&amp;$pkg);

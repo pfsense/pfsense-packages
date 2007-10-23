@@ -830,6 +830,15 @@ EOD;
 			$conf .= "http_access allow password $acl\n";
 	}
 
+	$settings = $config['installedpackages']['squid']['config'][0];	
+  if(!empty($settings['custom_options'])) {
+	 $custopts = explode(";", ($settings['custom_options']));
+	 $conf .= "# Custom options\n";
+	 foreach ($custopts as $custopt) {
+			$conf .= $custopt."\n";
+	 }
+	}
+
 	$conf .= "# Default block all to be sure\n";
 	$conf .= "http_access deny all\n";
 
