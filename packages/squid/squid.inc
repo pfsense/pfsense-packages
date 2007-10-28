@@ -506,6 +506,7 @@ EOD;
 	if ($settings['disable_xforward']) $conf .= "forwarded_for off\n";
 	if ($settings['disable_via']) $conf .= "via off\n";
 	if (!empty($settings['uri_whitespace'])) $conf .= "uri_whitespace {$settings['uri_whitespace']}\n";
+	
   return $conf;
 }
 
@@ -830,9 +831,8 @@ EOD;
 			$conf .= "http_access allow password $acl\n";
 	}
 
-	$settings = $config['installedpackages']['squid']['config'][0];	
-  if(!empty($settings['custom_options'])) {
-	 $custopts = explode(";", ($settings['custom_options']));
+  if(!empty($config['installedpackages']['squid']['config'][0]['custom_options'])) {
+	 $custopts = explode(";", ($config['installedpackages']['squid']['config'][0]['custom_options']));
 	 $conf .= "# Custom options\n";
 	 foreach ($custopts as $custopt) {
 			$conf .= $custopt."\n";
