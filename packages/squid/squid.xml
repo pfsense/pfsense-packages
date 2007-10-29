@@ -169,6 +169,12 @@
 			<required/>
 		</field>
 		<field>
+			<fieldname>private_subnet_proxy</fieldname>
+			<fielddescr>Do NOT proxy private subnets</fielddescr>
+			<description>Do not forward traffic to private subnets to the proxy server.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>Enabled logging</fielddescr>
 			<fieldname>log_enabled</fieldname>
 			<description>This will enable the access log. Don't switch this on if you don't have much disk space left.</description>

@@ -292,10 +292,14 @@ function squid_validate_general($post, $input_errors) {
 		$webgui_port = 443;
 	}
 
-
 	if (($post['transparent_proxy'] != 'on') && ($port == $webgui_port)) {
 		$input_errors[] = "You can not run squid on the same port as the webgui";
 	}
+
+	if (($post['transparent_proxy'] != 'on') && ($post['private_subnet_proxy'] == 'on')) {
+		$input_errors[] = "You can not disable forwarding traffic to private subnets to the proxy server without using the transparent proxy.";
+	}
+
 }
 
 function squid_validate_upstream($post, $input_errors) {
@@ -1039,11 +1043,18 @@ function squid_generate_rules($type) {
 
 	switch($type) {
 	case 'nat':
+		$rules .= "\n# Setup Squid proxy redirect\n";
+    if ($squid_conf['private_subnet_proxy'] == 'on') {
+      foreach ($ifaces as $iface){
+       $rules .= "no rdr on $iface proto tcp from any to 10.0.0.0/8 port 80\n";
+       $rules .= "no rdr on $iface proto tcp from any to 172.16.0.0/12 port 80\n";
+       $rules .= "no rdr on $iface proto tcp from any to 192.168.0.0/16 port 80\n";              
+      }
+     }
 		foreach ($ifaces as $iface){
-			$rules .= "# Setup Squid proxy redirect\n";
 			$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> 127.0.0.1 port 80\n";
-			$rules .= "\n";
 			};
+		$rules .= "\n";
 		break;
 	case 'filter':
 		foreach ($ifaces as $iface){
