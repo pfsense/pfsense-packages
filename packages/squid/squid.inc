@@ -1046,9 +1046,7 @@ function squid_generate_rules($type) {
 		$rules .= "\n# Setup Squid proxy redirect\n";
     if ($squid_conf['private_subnet_proxy'] == 'on') {
       foreach ($ifaces as $iface){
-       $rules .= "no rdr on $iface proto tcp from any to 10.0.0.0/8 port 80\n";
-       $rules .= "no rdr on $iface proto tcp from any to 172.16.0.0/12 port 80\n";
-       $rules .= "no rdr on $iface proto tcp from any to 192.168.0.0/16 port 80\n";              
+       $rules .= "no rdr on $iface proto tcp from any to { 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8 } port 80\n";         
       }
      }
 		foreach ($ifaces as $iface){
