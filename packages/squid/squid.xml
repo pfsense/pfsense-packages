@@ -170,8 +170,8 @@
 		</field>
 		<field>
 			<fieldname>private_subnet_proxy</fieldname>
-			<fielddescr>Do NOT proxy private subnets</fielddescr>
-			<description>Do not forward traffic to private subnets to the proxy server.</description>
+			<fielddescr>Do NOT proxy Private Address Space (RFC 1918)</fielddescr>
+			<description>Do not forward traffic to Private Address Space (RFC 1918) to the proxy server.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
