@@ -273,7 +273,7 @@ include("head.inc");
 <!--
 function go()
 {
-    box = document.forms[1].selectbox;
+    box = document.forms.selectbox;
     destination = box.options[box.selectedIndex].value;
     if (destination) location.href = destination;
 }
