@@ -93,6 +93,12 @@ function sync_package_snort() {
 			}
 		}
 	}
+	
+	if(!$ifaces_final) {
+		log_error("Snort will not start.  You must select an interface for it to listen on.");
+		return;
+	}
+	
 	/* create log directory */
 	$start  = "/bin/mkdir -p /var/log/snort";
 
