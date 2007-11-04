@@ -806,4 +806,18 @@
         <logfilename>spamd.log</logfilename>
       </logging>
     </package>
+	<package>
+		<name>Zabbix Agent</name>
+		<description>Monitoring agent.</description>
+		<category>NET</category>
+		<config_file>http://www.pfsense.com/packages/config/zabbix-agent.xml</config_file>
+		<version>0.1</version>
+		<status>ALPHA</status>
+		<required_version>1.2</required_version>
+		<configurationfile>zabbix-agent.xml</configurationfile>
+		<maintainer>Remco Verhoef</maintainer>
+		<dependencies baseUrl="ftp://ftp.freebsd.org/pub/FreeBSD/ports/packages/All/">
+			<dependency>zabbix-agent-1.4.2,1.tbz</dependency>
+		</dependencies>
+	</package>
 </pfsensepkgs>
