@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packagegui>
+	<title>Proxy server filter SquidGuard: General settings</title>
+	<name>squidguardgeneral</name>
+	<version>1.2.0_1</version>
+	<include_file>squidguard.inc</include_file>
+
+	<!-- Installation -->
+	<menu>
+		<name>Proxy server filter</name>
+		<tooltiptext>Modify the proxy server's filter settings</tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
+	</menu>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_cls.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/upload.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_acl.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_default.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_dest.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_rewr.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_src.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_time.xml</item>
+	</additional_files_needed>
+	<service>
+		<name>squidGuard</name>
+		<description>Proxy server filter Service</description>
+		<executable>squidGuard</executable>
+	</service>
+
+	<tabs>
+		<tab>
+			<text>General settings</text>
+			<url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Default</text>
+			<url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>ACL</text>
+			<url>/pkg.php?xml=squidguard_acl.xml</url>
+		</tab>
+		<tab>
+			<text>Sources</text>
+			<url>/pkg.php?xml=squidguard_src.xml</url>
+		</tab>
+		<tab>
+			<text>Destinations</text>
+			<url>/pkg.php?xml=squidguard_dest.xml</url>			
+		</tab>
+		<tab>
+			<text>Times</text>
+			<url>/pkg.php?xml=squidguard_time.xml</url>
+		</tab>
+		<tab>
+			<text>Rewrites</text>
+			<url>/pkg.php?xml=squidguard_rewr.xml</url>
+		</tab>
+		<tab>
+			<text>Log</text>
+			<url>/pkg_edit.php?xml=squidguard_log.xml</url>
+		</tab>
+	</tabs>
+	<fields>		
+		<field>
+			<fieldname>squidguard_enable</fieldname>
+			<fielddescr>Enable</fielddescr>
+			<type>checkbox</type>
+			<description>Check this for enable squidGuard</description>
+		</field>
+		<field>
+			<fieldname>blacklist</fieldname>
+			<fielddescr>Blacklist</fielddescr>
+			<description>Check this for enable blacklist</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fieldname>admin_email</fieldname>
+			<fielddescr>Administrator email</fielddescr>
+			<description>This is the email address displayed in error messages to the users.</description>
+			<default_value>admin@localhost</default_value>
+			<type>input</type>
+			<size>100</size>
+		</field>
+		<field>
+			<fieldname>view_gui_log</fieldname>
+			<fielddescr>View GUI log</fielddescr>
+			<description>Check this for view GUI log</description>
+			<type>checkbox</type>
+		</field>
+	</fields>
+       <custom_php_install_command></custom_php_install_command>
+	<custom_add_php_command></custom_add_php_command>
+	<custom_php_command_before_form>
+		squidguard_before_form(&amp;$pkg);
+	</custom_php_command_before_form>
+	<custom_php_after_form_command> 
+               squidGuard_print_javascript();
+	</custom_php_after_form_command>
+	<custom_php_resync_config_command>
+		squidguard_resync();
+	</custom_php_resync_config_command>
+	<custom_php_deinstall_command>
+#              squidguard_deinstall();
+	</custom_php_deinstall_command>
+</packagegui>
