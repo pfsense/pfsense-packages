@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packagegui>
+	<include_file>squidguard.inc</include_file>
+	<name>squidguardlog</name>
+	<title>Proxy server filter SquidGuard: Log</title>
+	<delete_string>A proxy server user has been deleted.</delete_string>
+	<addedit_string>A proxy server user has been created/modified.</addedit_string>
+	<tabs>
+		<tab>
+			<text>General settings</text>
+			<url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Default</text>
+			<url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>ACL</text>
+			<url>/pkg.php?xml=squidguard_acl.xml</url>
+		</tab>
+		<tab>
+			<text>Sources</text>
+			<url>/pkg.php?xml=squidguard_src.xml</url>
+		</tab>
+		<tab>
+			<text>Destinations</text>
+			<url>/pkg.php?xml=squidguard_dest.xml</url>			
+		</tab>
+		<tab>
+			<text>Times</text>
+			<url>/pkg.php?xml=squidguard_time.xml</url>
+		</tab>
+		<tab>
+			<text>Rewrites</text>
+			<url>/pkg.php?xml=squidguard_rewr.xml</url>
+		</tab>
+		<tab>
+			<text>Log</text>
+			<url>/pkg_edit.php?xml=squidguard_log.xml</url>
+			<active/>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fieldname>logtype</fieldname>
+			<fielddescr>Log type</fielddescr>
+			<description>LOG</description>
+			<type>select</type>
+			<value>access_log</value>
+			<options>
+				<option><value>access_log</value><name>User access log</name></option>
+			    	<option><value>webgui_log</value><name>WebGUI log</name></option>
+			    	<option><value>squidguard_log</value><name>squidGuard log</name></option>
+			</options> 
+		</field>
+
+	</fields>
+	<custom_php_command_before_form>
+		squidguard_before_form_log(&amp;$pkg);
+	</custom_php_command_before_form>
+	<custom_php_after_form_command> 
+               squidGuard_print_javascript();
+	</custom_php_after_form_command>
+	<custom_php_validation_command>
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+	</custom_php_resync_config_command>
+</packagegui>

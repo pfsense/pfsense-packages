@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packagegui>
+	<include_file>squidguard.inc</include_file>
+	<name>squidguardsrc</name>
+	<title>Proxy server filter SquidGuard: Sources</title>
+	<delete_string>A proxy server user has been deleted.</delete_string>
+	<addedit_string>A proxy server user has been created/modified.</addedit_string>
+	<tabs>
+		<tab>
+			<text>General settings</text>
+			<url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Default</text>
+			<url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>ACL</text>
+			<url>/pkg.php?xml=squidguard_acl.xml</url>
+		</tab>
+		<tab>
+			<text>Sources</text>
+			<url>/pkg.php?xml=squidguard_src.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Destinations</text>
+			<url>/pkg.php?xml=squidguard_dest.xml</url>			
+		</tab>
+		<tab>
+			<text>Times</text>
+			<url>/pkg.php?xml=squidguard_time.xml</url>
+		</tab>
+		<tab>
+			<text>Rewrites</text>
+			<url>/pkg.php?xml=squidguard_rewr.xml</url>
+		</tab>
+		<tab>
+			<text>Log</text>
+			<url>/pkg_edit.php?xml=squidguard_log.xml</url>
+		</tab>
+	</tabs>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fieldname>name</fieldname>
+			<fielddescr>Source name</fielddescr>
+		</columnitem>
+		<columnitem>
+			<fieldname>iplist</fieldname>
+			<fielddescr>IP list</fielddescr>
+		</columnitem>
+		<columnitem>
+			<fieldname>description</fieldname>
+			<fielddescr>Description</fielddescr>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<fieldname>name</fieldname>
+			<fielddescr>Source name</fielddescr>
+			<description>
+				You can enter name here. Name consist minimum 2 symbols, first from which letter. &lt;br&gt;
+				All other symbols is [a-Z_0-9]. Source name must be &lt;b&gt;unique&lt;/b&gt; .
+			</description>
+			<type>input</type>
+			<required/>
+			<size>80</size>
+		</field>
+		<field>
+			<fieldname>iplist</fieldname>
+			<fielddescr>IP addresses</fielddescr>
+			<description>
+				Enter IP addresses here with space(' ') divider. &lt;br&gt; 
+				IP addresses must be in format:&lt;br&gt; 
+				ip xxx.xxx.xxx.xxx [...] or ip xxx.xxx.xxx.xxx/nn [...] or &lt;br&gt; 
+				ip xxx.xxx.xxx.xxx/mmm.mmm.mmm.mmm [...] or ip xxx.xxx.xxx.xxx-yyy.yyy.yyy.yyy [...] &lt;br&gt; 
+				where: &lt;br&gt; 
+				xxx.xxx.xxx.xxx is an IP address (host or net, i.e. 10.11.12.13 or 10.11.12.0), /nn a net prefix (i.e. /23), &lt;br&gt; 
+				mmm.mmm.mmm.mmm is a netmask (i.e. 255.255.254.0) and	yyy.yyy.yyy.yyy is a host address &lt;br&gt; 
+				(must be >= xxx.xxx.xxx.xxx)	
+			</description>
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>10</rows>
+		</field>
+		<field>
+			<fieldname>enablelog</fieldname>
+			<fielddescr>Enable log</fielddescr>
+			<type>checkbox</type>
+			<description>Check this for enable log.</description>
+		</field>
+		<field>
+			<fieldname>description</fieldname>
+			<fielddescr>Description</fielddescr>
+			<description></description>
+			<type>input</type>
+			<size>80</size>
+		</field>
+	</fields>
+	<custom_php_after_form_command> 
+               squidGuard_print_javascript();
+	</custom_php_after_form_command>
+	<custom_php_validation_command>
+		squidguard_validate_source($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+//		squidguard_resync_time();
+	</custom_php_resync_config_command>
+</packagegui>
