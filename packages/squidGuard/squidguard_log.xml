@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<include_file>squidguard.inc</include_file>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+
 	<name>squidguardlog</name>
+	<version>none</version>
 	<title>Proxy server filter SquidGuard: Log</title>
+	<include_file>squidguard.inc</include_file>
+
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
+
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -42,18 +51,17 @@
 	</tabs>
 	<fields>
 		<field>
-			<fieldname>logtype</fieldname>
 			<fielddescr>Log type</fielddescr>
+			<fieldname>logtype</fieldname>
 			<description>LOG</description>
 			<type>select</type>
 			<value>access_log</value>
 			<options>
-				<option><value>access_log</value><name>User access log</name></option>
-			    	<option><value>webgui_log</value><name>WebGUI log</name></option>
-			    	<option><value>squidguard_log</value><name>squidGuard log</name></option>
+				<option><name>User access log</name><value>access_log</value></option>
+			    <option><name>WebGUI log</name><value>webgui_log</value></option>
+			    <option><name>squidGuard log</name><value>squidguard_log</value></option>
 			</options> 
 		</field>
-
 	</fields>
 	<custom_php_command_before_form>
 		squidguard_before_form_log(&amp;$pkg);

@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<include_file>squidguard.inc</include_file>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+
 	<name>squidguarddefault</name>
+	<version>none</version>
 	<title>Proxy server filter SquidGuard: Default</title>
+	<include_file>squidguard.inc</include_file>
+	
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -40,51 +48,51 @@
 	</tabs>
 	<fields>		
 		<field>
-			<fieldname>time</fieldname>
 			<fielddescr>Default Time</fielddescr>
+			<fieldname>time</fieldname>
 			<type>select</type>
 			<description>Enter time name in current which this rule permitted.</description>
 		</field>
 		<field>
-			<fieldname>dest</fieldname>
 			<fielddescr>Default destination</fielddescr>
+			<fieldname>dest</fieldname>
 			<description></description>
 			<type>input</type>
 			<size>115</size>
 		</field>
 		<field>
-			<fieldname>redirect</fieldname>
 			<fielddescr>Default Redirect</fielddescr>
+			<fieldname>redirect</fieldname>
 			<description>Enter redirection URL or Error page message for this rule, or leave blank.</description>
 			<type>textarea</type>
 			<cols>70</cols>
-                     <rows>5</rows>
+            <rows>5</rows>
 		</field>
 		<field>
-			<fieldname>overredirect</fieldname>
 			<fielddescr>Default overtime redirect</fielddescr>
+			<fieldname>overredirect</fieldname>
 			<description>Enter redirection URL or Error page message for this rule, or leave blank.</description>
 			<type>textarea</type>
 			<cols>70</cols>
-                     <rows>5</rows>
+            <rows>5</rows>
 		</field>
 		<field>
-			<fieldname>rewrite</fieldname>
 			<fielddescr>Default Rewrite</fielddescr>
-			<type>select</type>
+			<fieldname>rewrite</fieldname>
 			<description>Enter rewrite condition name for this rule, or leave blank.</description>
+			<type>select</type>
 		</field>
 		<field>
-			<fieldname>overrewrite</fieldname>
 			<fielddescr>Default overtime rewrite</fielddescr>
-			<type>select</type>
+			<fieldname>overrewrite</fieldname>
 			<description>Enter rewrite condition name for this rule, or leave blank.</description>
+			<type>select</type>
 		</field>
 		<field>
-			<fieldname>enablelog</fieldname>
 			<fielddescr>Enable log</fielddescr>
-			<type>checkbox</type>
+			<fieldname>enablelog</fieldname>
 			<description>Check this for enable log.</description>
+			<type>checkbox</type>
 		</field>
 	</fields>
 	<custom_php_validation_command>

@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<title>Proxy server filter SquidGuard: General settings</title>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+
 	<name>squidguardgeneral</name>
 	<version>1.2.0_1</version>
+	<title>Proxy server filter SquidGuard: General settings</title>
 	<include_file>squidguard.inc</include_file>
 
 	<!-- Installation -->
@@ -12,39 +18,13 @@
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
 	</menu>
-	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard.inc</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_cls.inc</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/upload.inc</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_acl.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_default.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_dest.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_rewr.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_src.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_time.xml</item>
-	</additional_files_needed>
+
 	<service>
 		<name>squidGuard</name>
-		<description>Proxy server filter Service</description>
 		<executable>squidGuard</executable>
+		<description>Proxy server filter Service</description>
 	</service>
-
+	
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -80,35 +60,65 @@
 			<url>/pkg_edit.php?xml=squidguard_log.xml</url>
 		</tab>
 	</tabs>
+	
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_cls.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/upload.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_acl.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_default.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_dest.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_rewr.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_src.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_time.xml</item>
+	</additional_files_needed>
+
 	<fields>		
 		<field>
-			<fieldname>squidguard_enable</fieldname>
 			<fielddescr>Enable</fielddescr>
-			<type>checkbox</type>
+			<fieldname>squidguard_enable</fieldname>
 			<description>Check this for enable squidGuard</description>
+			<type>checkbox</type>
 		</field>
 		<field>
-			<fieldname>blacklist</fieldname>
 			<fielddescr>Blacklist</fielddescr>
+			<fieldname>blacklist</fieldname>
 			<description>Check this for enable blacklist</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fieldname>admin_email</fieldname>
 			<fielddescr>Administrator email</fielddescr>
+			<fieldname>admin_email</fieldname>
 			<description>This is the email address displayed in error messages to the users.</description>
-			<default_value>admin@localhost</default_value>
 			<type>input</type>
 			<size>100</size>
+			<default_value>admin@localhost</default_value>
 		</field>
 		<field>
-			<fieldname>view_gui_log</fieldname>
 			<fielddescr>View GUI log</fielddescr>
+			<fieldname>view_gui_log</fieldname>
 			<description>Check this for view GUI log</description>
 			<type>checkbox</type>
 		</field>
 	</fields>
-       <custom_php_install_command></custom_php_install_command>
+	
+    <custom_php_install_command></custom_php_install_command>
 	<custom_add_php_command></custom_add_php_command>
 	<custom_php_command_before_form>
 		squidguard_before_form(&amp;$pkg);

@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<include_file>squidguard.inc</include_file>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+
 	<name>squidguardtime</name>
+	<version>none</version>
 	<title>Proxy server filter SquidGuard: Times</title>
+	<include_file>squidguard.inc</include_file>
+
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
+
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -42,22 +51,22 @@
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fieldname>name</fieldname>
 			<fielddescr>Timename</fielddescr>
+			<fieldname>name</fieldname>
 		</columnitem>
 		<columnitem>
-			<fieldname>description</fieldname>
 			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<fieldname>name</fieldname>
 			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
 			<description>Enter the time name here.</description>
 			<type>input</type>
-			<required/>
 			<size>80</size>
+			<required/>
 		</field>
 		<field>
   			<type>rowhelper</type> 
@@ -70,8 +79,8 @@
 					<type>select</type>
 					<value>weekly</value>
 					<options>
-			    			<option><value>weekly</value><name>Weekly</name></option>
-			    			<option><value>date</value><name>Date</name></option>
+			    			<option><name>Weekly</name><value>weekly</value></option>
+			    			<option><name>Date</name><value>date</value></option>
 					</options> 
   				</rowhelperfield>
  				<rowhelperfield>
@@ -81,35 +90,35 @@
 					<type>select</type>
 					<value>*</value>
 					<options>
-			    			<option><value>*</value><name>all</name></option>
-			    			<option><value>mon</value><name>mon</name></option>
-			    			<option><value>tue</value><name>tue</name></option>
-			    			<option><value>wed</value><name>wed</name></option>
-			    			<option><value>thu</value><name>thu</name></option>
-			    			<option><value>fri</value><name>fri</name></option>
-			    			<option><value>sat</value><name>sat</name></option>
-			    			<option><value>sun</value><name>sun</name></option>
+			    			<option><name>all</name><value>*</value></option>
+			    			<option><name>mon</name><value>mon</value></option>
+			    			<option><name>tue</name><value>tue</value></option>
+			    			<option><name>wed</name><value>wed</value></option>
+			    			<option><name>thu</name><value>thu</value></option>
+			    			<option><name>fri</name><value>fri</value></option>
+			    			<option><name>sat</name><value>sat</value></option>
+			    			<option><name>sun</name><value>sun</value></option>
 					</options> 
   				</rowhelperfield>
  				<rowhelperfield>
+  					<fielddescr>Date or Date range</fielddescr> 
+  					<fieldname>daterange</fieldname> 
+  					<description>00:00-08:00 15:00-21:00 Format: *.01.01</description> 
   					<type>input</type> 
 					<size>40</size>
-  					<fieldname>daterange</fieldname> 
-  					<fielddescr>Date or Date range</fielddescr> 
-  					<description>00:00-08:00 15:00-21:00 Format: *.01.01</description> 
   				</rowhelperfield>
  				<rowhelperfield>
+  					<fielddescr>Time range</fielddescr> 
+  					<fieldname>timerange</fieldname> 
+  					<description>00:00-08:00</description> 
   					<type>input</type> 
 					<size>20</size>
-  					<fieldname>timerange</fieldname> 
-  					<fielddescr>Time range</fielddescr> 
-  					<description>00:00-08:00</description> 
   				</rowhelperfield>
   			</rowhelper>
 		</field>
 		<field>
-			<fieldname>description</fieldname>
 			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
 			<description>You may enter a description here for your reference (not parsed).</description>
 			<type>input</type>
 			<size>80</size>

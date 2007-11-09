@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<include_file>squidguard.inc</include_file>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+
 	<name>squidguardrewrite</name>
+	<version>none</version>
 	<title>Proxy server filter SquidGuard: Rewrites</title>
+	<include_file>squidguard.inc</include_file>
+
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -40,18 +48,18 @@
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fieldname>name</fieldname>
 			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
 		</columnitem>
 		<columnitem>
-			<fieldname>description</fieldname>
 			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>		
 		<field>
-			<fieldname>name</fieldname>
 			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
 			<description>
 				You may enter name here. Name must consist of minimum 2 symbols, first from which letter. &lt;br&gt;
 				All other symbols must be [a-Z_0-9].				
@@ -61,14 +69,14 @@
 			<size>100</size>
 		</field>
 		<field>
-			<fieldname>enablelog</fieldname>
 			<fielddescr>Enable log</fielddescr>
+			<fieldname>enablelog</fieldname>
 			<type>checkbox</type>
 			<description>Check this for enable log.</description>
 		</field>
 		<field>
-			<fieldname>description</fieldname>
 			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
 			<description>You may enter a description here for your reference (not parsed).</description>
 			<type>input</type>
 			<size>100</size>
@@ -109,8 +117,8 @@
 			</rowhelper>
 		</field>
 		<field>
-			<fieldname>note</fieldname>
 			<fielddescr>Note</fielddescr>
+			<fieldname>note</fieldname>
 			<type>checkbox</type>
 			<description>
 				&lt;b&gt;Rewrite rule&lt;/b&gt;-define how url will are replaced.&lt;br&gt;

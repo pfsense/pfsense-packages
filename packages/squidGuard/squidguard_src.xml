@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<include_file>squidguard.inc</include_file>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+
 	<name>squidguardsrc</name>
+	<version>none</version>
 	<title>Proxy server filter SquidGuard: Sources</title>
+	<include_file>squidguard.inc</include_file>
+
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
+
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -42,33 +51,33 @@
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fieldname>name</fieldname>
 			<fielddescr>Source name</fielddescr>
+			<fieldname>name</fieldname>
 		</columnitem>
 		<columnitem>
-			<fieldname>iplist</fieldname>
 			<fielddescr>IP list</fielddescr>
+			<fieldname>iplist</fieldname>
 		</columnitem>
 		<columnitem>
-			<fieldname>description</fieldname>
 			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<fieldname>name</fieldname>
 			<fielddescr>Source name</fielddescr>
+			<fieldname>name</fieldname>
 			<description>
 				You can enter name here. Name consist minimum 2 symbols, first from which letter. &lt;br&gt;
 				All other symbols is [a-Z_0-9]. Source name must be &lt;b&gt;unique&lt;/b&gt; .
 			</description>
 			<type>input</type>
-			<required/>
 			<size>80</size>
+			<required/>
 		</field>
 		<field>
-			<fieldname>iplist</fieldname>
 			<fielddescr>IP addresses</fielddescr>
+			<fieldname>iplist</fieldname>
 			<description>
 				Enter IP addresses here with space(' ') divider. &lt;br&gt; 
 				IP addresses must be in format:&lt;br&gt; 
@@ -84,14 +93,14 @@
 			<rows>10</rows>
 		</field>
 		<field>
-			<fieldname>enablelog</fieldname>
 			<fielddescr>Enable log</fielddescr>
-			<type>checkbox</type>
+			<fieldname>enablelog</fieldname>
 			<description>Check this for enable log.</description>
+			<type>checkbox</type>
 		</field>
 		<field>
-			<fieldname>description</fieldname>
 			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
 			<description></description>
 			<type>input</type>
 			<size>80</size>

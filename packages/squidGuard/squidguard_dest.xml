@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<include_file>squidguard.inc</include_file>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+
 	<name>squidguarddest</name>
+	<version>none</version>
 	<title>Proxy server filter SquidGuard: Destinations</title>
+	<include_file>squidguard.inc</include_file>
+
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
+
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -42,34 +51,34 @@
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fieldname>name</fieldname>
 			<fielddescr>Destination name</fielddescr>
+			<fieldname>name</fieldname>
 		</columnitem>
 		<columnitem>
-			<fieldname>domains</fieldname>
 			<fielddescr>Domain list</fielddescr>
+			<fieldname>domains</fieldname>
 		</columnitem>
 		<columnitem>
-			<fieldname>urls</fieldname>
 			<fielddescr>URL list</fielddescr>
+			<fieldname>urls</fieldname>
 		</columnitem>
 		<columnitem>
-			<fieldname>expressions</fieldname>
 			<fielddescr>Expressions</fielddescr>
+			<fieldname>expressions</fieldname>
 		</columnitem>
 		<columnitem>
-			<fieldname>redir</fieldname>
 			<fielddescr>Redirect</fielddescr>
+			<fieldname>redir</fieldname>
 		</columnitem>
 		<columnitem>
-			<fieldname>description</fieldname>
 			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<fieldname>name</fieldname>
 			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
 			<description>				
 				You may enter name here. Name must consist of minimum 2 symbols, first from which letter. &lt;br&gt;
 				All other symbols must be [a-Z_0-9].
@@ -79,8 +88,8 @@
 			<required/>
 		</field>
 		<field>
-			<fieldname>domains</fieldname>
 			<fielddescr>Domains list</fielddescr>
+			<fieldname>domains</fieldname>
 			<description>
 				Enter destination domains here. For separate domains names use ' '(space). 
 				&lt;p&gt; &lt;b&gt;Example:&lt;/b&gt; 'mail.ru e-mail.ru yahoo.com' .
@@ -102,8 +111,8 @@
 			<rows>10</rows>
 		</field>
 		<field>
-			<fieldname>urls</fieldname>
 			<fielddescr>URLs list</fielddescr>
+			<fieldname>urls</fieldname>
 			<description>
 				Enter url's here. 
 				For separate urls's use ' '(space). 
@@ -114,22 +123,22 @@
 			<rows>10</rows>
 		</field>
 		<field>
-			<fieldname>redir</fieldname>
 			<fielddescr>Redirect</fielddescr>
+			<fieldname>redir</fieldname>
 			<description>Enter redirection URL or Error page message for this rule, or leave blank.</description>
 			<type>textarea</type>
 			<cols>60</cols>
                      <rows>5</rows>
 		</field>
 		<field>
-			<fieldname>enablelog</fieldname>
 			<fielddescr>Enable log</fielddescr>
-			<type>checkbox</type>
+			<fieldname>enablelog</fieldname>
 			<description>Check this for enable log.</description>
+			<type>checkbox</type>
 		</field>
 		<field>
-			<fieldname>description</fieldname>
 			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
 			<description>You may enter a description here for your reference (not parsed).</description>
 			<type>input</type>
 			<size>90</size>
