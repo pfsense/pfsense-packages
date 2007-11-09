@@ -2,29 +2,23 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
 
 	<name>squidguardgeneral</name>
 	<version>1.2.0_1</version>
-	<title>Proxy server filter SquidGuard: General settings</title>
-	<include_file>squidguard.inc</include_file>
+	<title>Proxy Content filter SquidGuard: General settings</title>
+	<include_file>/usr/local/pkg/squidguard.inc</include_file>
 
 	<!-- Installation -->
 	<menu>
-		<name>Proxy server filter</name>
+		<name>Proxy Content filter</name>
 		<tooltiptext>Modify the proxy server's filter settings</tooltiptext>
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
 	</menu>
 
-	<service>
-		<name>squidGuard</name>
-		<executable>squidGuard</executable>
-		<description>Proxy server filter Service</description>
-	</service>
-	
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -61,32 +55,46 @@
 		</tab>
 	</tabs>
 	
+	<service>
+		<name>squidGuard</name>
+		<description>Proxy server filter Service</description>
+		<executable>squidGuard</executable>
+	</service>
+
 	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard.inc</item>
+		<item>http://www.pfsense.org/packages/config/squidGuard/squidguard.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_cls.inc</item>
+		<item>http://www.pfsense.org/packages/config/squidGuard/squidguard_configurator.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/upload.inc</item>
+		<item>http://www.pfsense.org/packages/config/squidGuard/upload.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_acl.xml</item>
+		<item>http://www.pfsense.org/packages/config/squidGuard/squidguard_acl.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_default.xml</item>
+		<item>http://www.pfsense.org/packages/config/squidGuard/squidguard_default.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_dest.xml</item>
+		<item>http://www.pfsense.org/packages/config/squidGuard/squidguard_dest.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_rewr.xml</item>
+		<item>http://www.pfsense.org/packages/config/squidGuard/squidguard_rewr.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_src.xml</item>
+		<item>http://www.pfsense.org/packages/config/squidGuard/squidguard_src.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://diskatel.narod.ru/pfSense/packages/squidguard_time.xml</item>
+		<item>http://www.pfsense.org/packages/config/squidGuard/squidguard_time.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/squidGuard/squidguard_log.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+        <prefix>/usr/local/www/</prefix>
+        <chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/squidGuard/sgerror.php</item>
 	</additional_files_needed>
 
 	<fields>		
@@ -103,33 +111,27 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Administrator email</fielddescr>
-			<fieldname>admin_email</fieldname>
-			<description>This is the email address displayed in error messages to the users.</description>
-			<type>input</type>
-			<size>100</size>
-			<default_value>admin@localhost</default_value>
-		</field>
-		<field>
 			<fielddescr>View GUI log</fielddescr>
 			<fieldname>view_gui_log</fieldname>
 			<description>Check this for view GUI log</description>
 			<type>checkbox</type>
 		</field>
 	</fields>
-	
-    <custom_php_install_command></custom_php_install_command>
-	<custom_add_php_command></custom_add_php_command>
+	<custom_add_php_command/>
 	<custom_php_command_before_form>
 		squidguard_before_form(&amp;$pkg);
 	</custom_php_command_before_form>
 	<custom_php_after_form_command> 
-               squidGuard_print_javascript();
+        squidGuard_print_javascript();
 	</custom_php_after_form_command>
 	<custom_php_resync_config_command>
 		squidguard_resync();
 	</custom_php_resync_config_command>
+	<custom_php_install_command>
+		squidguard_install_command();
+		squidguard_resync();
+	</custom_php_install_command>
 	<custom_php_deinstall_command>
-#              squidguard_deinstall();
+		squidguard_deinstall_command();
 	</custom_php_deinstall_command>
 </packagegui>

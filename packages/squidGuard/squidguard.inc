@@ -1,8 +1,8 @@
 <?php
 
-# ---------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # squidguard.inc
-# (C)2006 Serg Dvoriancev
+# (C)2006, 2007 Serg Dvoriancev
 /*        Redistribution and use in source and binary forms, with or without
         modification, are permitted provided that the following conditions are met:
 
@@ -24,11 +24,7 @@
         ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
         POSSIBILITY OF SUCH DAMAGE.
 */
-# ---------------------------------------------------------------------------------------------------------------------
-
-if ($_SERVER['SCRIPT_FILENAME'] == '/usr/local/www/packages/config/squidguard.inc') {
-        exit;
-}
+# ------------------------------------------------------------------------------
 
 require_once('globals.inc');
 require_once('config.inc');
@@ -37,18 +33,20 @@ require_once('pfsense-utils.inc');
 require_once('pkg-utils.inc');
 require_once('filter.inc');
 require_once('service-utils.inc');
-require_once('squidguard_cls.inc');
-# ---------------------------------------------------------------------------------------------------------------------
-define('SQUIDGUARD_CONFBASE', '/usr/local/etc/squid');
-define('SQUIDGUARD_CONFFILE', '/squidguard.conf.test');
-define('SQUIDGUARD_BINPATH',  '/usr/local/bin');
-define('SQUIDGUARD_WORKDIR',  '/usr/local/etc/squidGuard');
-define('SQUIDGUARD_DBHOME',   '/var/db/squidGuard');
+require_once('squidguard_configurator.inc');
+# ------------------------------------------------------------------------------
+define('SQUIDGUARD_CONFBASE',  '/usr/local/etc/squid');
+define('SQUIDGUARD_CONFFILE',  '/squidguard.conf');
+define('SQUIDGUARD_CONFXML',   '/squidguard_conf.xml');
+define('SQUIDGUARD_BINPATH',   '/usr/local/bin');
+define('SQUIDGUARD_WORKDIR',   '/usr/local/etc/squidGuard');
+define('SQUIDGUARD_LOGDIR',    '/var/squidGuard/log');
+define('SQUIDGUARD_DBHOME',    '/var/db/squidGuard');
 
 define('SQUIDGUARD_WEBGUI_LOG',         '/squidguard_gui.log');
 define('SQUIDGUARD_WEBGUI_HISTORY_LOG', '/squidguard_gui_history.log');
 
-# ---------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 define('FLD_NAME',        'name');
 define('FLD_DEST',        'dest');
@@ -65,7 +63,7 @@ define('FLD_REPLACETO',       'replaceto');
 define('FLD_TIMETYPE',        'timetype');
 define('FLD_TIMEDAYS',        'timedays');
 define('FLD_DATERANGE',       'daterange');
-define('FLD_TIMERANGE',       'timerange');
+define('FLD_TIMERANGE',       'sg_timerange');
 define('FLD_IPLIST',          'iplist');
 define('FLD_DESCRIPTION',     'description');
 define('FLD_EXPRESSIONS',     'expressions');
@@ -73,6 +71,8 @@ define('FLD_DOMAINS',         'domains');
 define('FLD_URLS',            'urls');
 define('FLD_DISABLED',        'disabled');
 define('FLD_ENABLELOG',       'enablelog');
+define('FLD_SQUIDGUARDENABLE','squidguard_enable');
+define('FLD_BLACKLIST',       'blacklist');
 
 define('PREFLD_UPTIME',        'uptime_');
 define('PREFLD_UPTIME_DENY',   'uptimedeny_');
@@ -88,9 +88,9 @@ define('MODULE_SOURCE',          'squidguardsrc');
 define('MODULE_TIME',            'squidguardtime');
 define('MODULE_LOG',             'squidguardlog');
 
-define('BLACKLIST_DEFAULT_URL', 'http://ftp.teledanmark.no/pub/www/proxy/squidGuard/contrib/blacklists.tar.gz'); // 360Kb
-//define('BLACKLIST_DEFAULT_URL', 'http://squidguard.mesd.k12.or.us/blacklists.tgz'); // 3.5Mb
-// define('BLACKLIST_DEFAULT_URL', 'http://blacklist.dansguardian.org/cgi-bin/download.pl?type=download&file=bigblacklist');
+define('BLACKLIST_DEFAULT_URL',  'http://ftp.teledanmark.no/pub/www/proxy/squidGuard/contrib/blacklists.tar.gz'); // 360Kb
+define('BLACKLIST_DEFAULT_URL1', 'http://squidguard.mesd.k12.or.us/blacklists.tgz'); // 3.5Mb
+define('BLACKLIST_DEFAULT_URL2', 'http://blacklist.dansguardian.org/cgi-bin/download.pl?type=download&file=bigblacklist');
 define('BLACKLIST_TMP_FILE',    '/var/tmp/blacklists.tar.gz');
 define('BLACKLIST_BTN_STD',     'Upload Std');
 define('BLACKLIST_BTN_URL',     'Upload Url');
@@ -103,216 +103,25 @@ define('WEBGUI_HISTORY_LOG', 'on');
 
 define('TEST_LOG', '/var/tmp/sqtest.test');
 
-# ---------------------------------------------------------------------------------------------------------------------
-# squidguard_object
-# ---------------------------------------------------------------------------------------------------------------------
-$squidguard_object = create_squidguard_object();
+# ==============================================================================
+# Initialization
+# ==============================================================================
+sg_init(convert_pfxml_to_sgxml());
 
+# ==============================================================================
+# Validations
+# ==============================================================================
 
-# ---------------------------------------------------------------------------------------------------------------------
-# functions
-# ---------------------------------------------------------------------------------------------------------------------
-
-function create_squidguard_object() {
-        $sg_object = new SquidGuardConfigClass();
-        $sg_object->debug_history .= "->create_squidguard_object";
-        $sg_object->set_options(SQUIDGUARD_BINPATH, SQUIDGUARD_WORKDIR, SQUIDGUARD_DBHOME);
-
-        squidguard_ini_object(&$sg_object);
-        return $sg_object;
-}
-
-function squidguard_ini_object($sg_object) {
-        global $config;
-
-        $sg_object->debug_history .= "->squidguard_ini_object";
-        $sg_object->init();
-        if ($config['installedpackages'][MODULE_GENERAL]['config'][0]['squidguard_enable'] != '')
-             $sg_object->enabled = true;
-        else $sg_object->enabled = false;
-
-        if ($config['installedpackages'][MODULE_GENERAL]['config'][0]['blacklist'] != '')
-             $sg_object->blacklist_enabled = true;
-        else $sg_object->blacklist_enabled = false;
-
-        // rewrite's
-        $rewrite = $config['installedpackages'][MODULE_REWRITE]; // ['config'];
-        if (is_array($rewrite)) {
-                foreach($rewrite['config'] as $rew) {
-                        // rewrite object
-                        $sg_rew =& $sg_object->add_rewrite($rew[FLD_NAME], $rew[FLD_DESCRIPTION], $rew[FLD_ENABLELOG]);
-                        if (is_array($rew) and count($rew['row'])) {
-                            foreach($rew['row'] as $row) {
-                                // rewrite items
-                                $sg_rew->add_item($row[FLD_TARGETURL], $row[FLD_REPLACETO]);
-                            }
-                        }
-                }
-        }
-
-        // time's
-        $time = $config['installedpackages'][MODULE_TIME]['config'];
-        if (is_array($time)) {
-                foreach($time as $tm) {
-                        // time object
-                        $sg_time =& $sg_object->add_time($tm[FLD_NAME], $tm[FLD_DESCRIPTION]);
-                        foreach($tm['row'] as $row) {
-                                // time items
-                                if ($row[FLD_TIMETYPE] == 'date') // 0 - "date"$FLD_TIMETYPE
-                                     $sg_time->add_date   ($row[FLD_DATERANGE], $row[FLD_TIMERANGE]);
-                                else $sg_time->add_weekly ($row[FLD_TIMEDAYS], /* $row[FLD_DATERANGE], */$row[FLD_TIMERANGE]);
-                        }
-                }
-        }
-
-        // source's
-        $source = $config['installedpackages'][MODULE_SOURCE]['config'];
-        if (is_array($source)) {
-                foreach($source as $src) {
-                        // source object
-                        $sg_src =& $sg_object->add_src($src[FLD_NAME], $src[FLD_IPLIST],
-                                   $src[FLD_DESCRIPTION], $src[FLD_ENABLELOG]);
-                }
-        }
-
-        // destination's
-        $destination = $config['installedpackages'][MODULE_DESTINATION]['config'];
-        if (is_array($destination)) {
-                foreach($destination as $dest) {
-                        // destination object
-                        $sg_ds =& $sg_object->add_dest($dest[FLD_NAME], $dest[FLD_DOMAINS], $dest[FLD_URLS],
-                                  $dest[FLD_EXPRESSIONS], $dest[FLD_REDIRECT], $dest[FLD_DESCRIPTION],
-                                  $dest[FLD_ENABLELOG]);
-                }
-        }
-
-        // acl's
-        $acl = $config['installedpackages'][MODULE_ACL]['config'];
-        if (is_array($acl)) {
-                foreach($acl as $ac) {
-                        $passes = str_replace("]", "", trim($ac[FLD_DESTINATION]));
-                        $passes = explode("[", $passes);
-                        $pass     = "";
-                        $overpass = "";
-                        if (is_array($passes)) {
-                                $pass = $passes[0];
-                                $overpass = $passes[1];
-                        }
-                        // acl object; log defined only for default acl
-                        $sg_acl =& $sg_object->add_acl(
-                                $ac[FLD_SOURCE], $ac[FLD_TIME], $ac[FLD_DESCRIPTION],
-                                array('pass' => $pass,     'rewrite'=>$ac[FLD_REWRITE], 'redirect'=>$ac[FLD_REDIRECT], 'log'=>''),
-                                array('pass' => $overpass, 'rewrite'=>$ac[FLD_REWRITE], 'redirect'=>$ac[FLD_REDIRECT], 'log'=>''),
-                                $ac[FLD_DISABLED]
-                        );
-                }
-        }
-
-        // default acl; log defined only for default acl
-        $acdef = $config['installedpackages'][MODULE_DEFAULT]['config'][0];
-        if (is_array($acdef)) {
-            $passes = str_replace("]", "", trim($acdef[FLD_DESTINATION]));
-            $passes = explode("[", $passes);
-            $pass     = "";
-            $overpass = "";
-            if (is_array($passes)) {
-                $pass = $passes[0];
-                $overpass = $passes[1];
-            }
-            // default acl object
-            $sg_object->set_default_acl(
-                $acdef[FLD_TIME], $acdef[FLD_DESCRIPTION],
-                array('pass' => $pass,     'rewrite'=>$acdef[FLD_REWRITE], 'redirect'=>$acdef[FLD_REDIRECT], 'log'=>$acdef[FLD_ENABLELOG]),
-                array('pass' => $overpass, 'rewrite'=>$acdef[FLD_REWRITE], 'redirect'=>$acdef[FLD_REDIRECT], 'log'=>$acdef[FLD_ENABLELOG]),
-                $acdef[FLD_DISABLED]
-            );
-        }
-
-        // update squidguard object
-        $sg_object->update();
-}
-
-
-# ---------------------------------------------------------------------------------------------------------------------
-# install/deinstall
-# ---------------------------------------------------------------------------------------------------------------------
-function squidguard_deinstall() {
-
-}
-
-# ---------------------------------------------------------------------------------------------------------------------
-# Upload file to /var/tmp directory
-# ---------------------------------------------------------------------------------------------------------------------
-function upload_file($file) {
-        global $squidguard_object;
-
-        $res = '';
-        $cat = '/var/tmp/';
-
-$squidguard_object->add_log("FILES: " . count($_FILES));
-
-        if (isset($_FILES[$file])) {        // if file exists
-                if (move_uploaded_file($_FILES[$file]['tmp_name'], $cat . $_FILES[$file]['name'])) {
-                        $res = true;
-                } // else  blacklist_add_log('Нифига нет Files=' . count($_FILES));
-        }
-        return $res;
-}
-
-
-# ---------------------------------------------------------------------------------------------------------------------
-# default squidguard blacklist
-# http://ftp.teledanmark.no/pub/www/proxy/squidGuard/contrib/blacklists.tar.gz
-# ---------------------------------------------------------------------------------------------------------------------
-// upload file and put them to temp catalog
-function upload_file_from_url($url_file, $destination_file, $proxy) {
-        global $squidguard_object;
-
-        // open destination file
-        $upload_tmp = '/var/tmp/blacklists.tar.gz';
-        $result = '';
-        $squidguard_object->add_log("Begin upload from URL $url_file");
-
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL,BLACKLIST_DEFAULT_URL);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-        if ($proxy != '') {
-            $ip    = '';
-            $login = '';
-            $s     = trim($proxy);
-            if (strpos($s, ' ')) {
-                       $ip    = substr($s, 0, strpos($s, ' '));
-                       $login = substr($s, strpos($s, ' ') + 1);
-            } else     $ip    = $s;
-
-            if($ip != '') {
-               $s_log = "Host[$ip] ";
-               curl_setopt($ch, CURLOPT_PROXY, $ip);
-               if($login != '') {
-                  $s_log .= "Login[$login]";
-                  curl_setopt($ch, CURLOPT_PROXYUSERPWD, $login);
-               }
-               $squidguard_object->add_log("Proxy settings: $s_log");
-            }
-        } else $squidguard_object->add_log("Proxy: not defined");
-        $result=curl_exec ($ch);
-        curl_close ($ch);
-
-        // TODO: check uploaded content for '.gz' file format
-
-        if (file_put_contents($upload_tmp, $result) > 0) {
-               $squidguard_object->add_log("Uploaded success.");
-        } else $squidguard_object->add_log("Upload error.");
-        return $upload_tmp;
-}
-
-# ---------------------------------------------------------------------------------------------------------------------
-# Validates
-# ---------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# validate default
+# ------------------------------------------------------------------------------
 function squidguard_validate_default($post, $input_errors) {
         squidguard_validate_acl($post, &$input_errors);
 }
 
+# ------------------------------------------------------------------------------
+# validate acl
+# ------------------------------------------------------------------------------
 function squidguard_validate_acl($post, $input_errors) {
         global $config;
         $pass_up = array();
@@ -322,7 +131,7 @@ function squidguard_validate_acl($post, $input_errors) {
         $deny_over = array();
         $pass_over_val = '';
 
-        // ===== store destinations to 'dest' value =====
+        // store destinations to 'dest' value
         foreach ($post as $key => $val) {
                 if (substr_count($key, PREFLD_UPTIME) != 0) {
                         $name = str_replace(PREFLD_UPTIME, '', $key);
@@ -358,7 +167,9 @@ function squidguard_validate_acl($post, $input_errors) {
                 else $pass_over_val .= " $key";
         }
 
-        // if not exists key 'all', then add '!all' - default 'deny all' (equiqalence 'none')
+        // !ATTENTION! on pfSense XML config must be must(shall) be '!all' instead of 'none' - it is a must for correct work GUI
+
+        // if not exists key 'all', then add 'none' - default 'deny all'
         if ((substr_count($pass_up_val, 'all') == 0)) {
              $pass_up_val .= ' !all';
         }
@@ -372,6 +183,12 @@ function squidguard_validate_acl($post, $input_errors) {
         else $post[FLD_DEST] = "$pass_up_val [$pass_over_val]";
 }
 
+# ------------------------------------------------------------------------------
+# validate times
+# Format:
+#    date:   <date(or range)><time (or range)> -- days not parsed (reset to *)
+#    weekly: <day or *><time or range>         -- dates not parsed (reset to '')
+# ------------------------------------------------------------------------------
 function squidguard_validate_times($post, $input_errors) {
 
          // check name
@@ -382,45 +199,40 @@ function squidguard_validate_times($post, $input_errors) {
                   $input_errors[] = $err;
          }
 
-          // check unique name
-          if (!check_unique_name(MODULE_TIME, $name))
+         // check unique name
+         if (!check_unique_name(MODULE_TIME, $name))
                 $input_errors[] = "Name '$name' already exists";
 
-         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-         # Format:
-         #    date:   <date(or range)><time (or range)> -- days not parsed (reset to *)
-         #    weekly: <day or *><time or range>         -- dates not parsed (reset to '')
-         # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+         // check format
          $err = '';
          for ($i=0; $post[FLD_TIMETYPE . "$i"] != ''; $i++) {
-              $timetype = strtolower($post[FLD_TIMETYPE . "$i"]);
-              if ($timetype == 'date') {
-                  // set timedays to '*'
-                  $post[FLD_TIMEDAYS . "$i"] = '*';
+               $timetype = strtolower($post[FLD_TIMETYPE . "$i"]);
+               if ($timetype == 'date') {
+                   // set timedays to '*'
+                   $post[FLD_TIMEDAYS . "$i"] = '*';
 
-                  // check date and time
-                  $date = trim($post[FLD_DATERANGE."$i"]);
-                  $time = trim($post[FLD_TIMERANGE."$i"]);
-                  $err  = check_date($date);
-                  if (!empty($err)) $input_errors[] = $err;
-                  $err  = check_time($time);
-                  if (!empty($err)) $input_errors[] = $err;
-              } else {
-                  // set daterange to ''
-                  $post[FLD_DATERANGE . "$i"] = '';
+                   // check date and time
+                   $date = trim($post[FLD_DATERANGE."$i"]);
+                   $time = trim($post[FLD_TIMERANGE."$i"]);
+                   $err  = check_date($date);
+                   if (!empty($err)) $input_errors[] = $err;
+                   $err  = check_time($time);
+                   if (!empty($err)) $input_errors[] = $err;
+               } else {
+                   // set daterange to ''
+                   $post[FLD_DATERANGE . "$i"] = '';
 
-                  // check time
-                  $time = trim($post[FLD_TIMERANGE."$i"]);
-                  $err  = check_time($time);
-                  if (!empty($err)) $input_errors[] = $err;
-              }
-        }
-
-        if (!empty($err))
-            $input_errors .= $err;
+                   // check time
+                   $time = trim($post[FLD_TIMERANGE."$i"]);
+                   $err  = check_time($time);
+                   if (!empty($err)) $input_errors[] = $err;
+               }
+         }
 }
 
+# ------------------------------------------------------------------------------
+# validate sources
+# ------------------------------------------------------------------------------
 function squidguard_validate_source($post, $input_errors) {
          // check name
          $name = trim($post[FLD_NAME]);
@@ -435,6 +247,9 @@ function squidguard_validate_source($post, $input_errors) {
          }
 }
 
+# ------------------------------------------------------------------------------
+# validate destinations
+# ------------------------------------------------------------------------------
 function squidguard_validate_destination($post, $input_errors) {
          // check name
          $name = trim($post[FLD_NAME]);
@@ -447,8 +262,21 @@ function squidguard_validate_destination($post, $input_errors) {
                   if (!check_unique_name(MODULE_DESTINATION, $name))
                         $input_errors[] = "Name '$name' already exists";
          }
+         // check redirect
+         $redirect = trim($post[FLD_REDIRECT]);
+         if(!empty($redirect)) {
+            // cut first redirect url, if entered more that one
+            $redirect = explode("\n", $redirect);
+            $redirect = $redirect[0];
+            $post[FLD_REDIRECT] = $redirect;
+            if (is_url($redirect) === false)
+                 $input_errors[] = "Redirect must contains valid url. Example: 'http://www.my.com', 'https://my.com', 'ftp://my.com'";
+         }
 }
 
+# ------------------------------------------------------------------------------
+# validate rewrites
+# ------------------------------------------------------------------------------
 function squidguard_validate_rewrite($post, $input_errors) {
          // check name
          $name = trim($post[FLD_NAME]);
@@ -464,70 +292,81 @@ function squidguard_validate_rewrite($post, $input_errors) {
          }
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-// Resync & Make
-// ---------------------------------------------------------------------------------------------------------------------
-
+// -----------------------------------------------------------------------------
+// squidguard_resync
+// -----------------------------------------------------------------------------
 function squidguard_resync() {
-        global $squidguard_object;
-        $sg_object;
-        if (is_null($squidguard_object)) {
-            $squidguard_object = create_squidguard_object();
-        }
-        $sg_object = $squidguard_object;
-        $sg_object->debug_history .= "->squidguard_resync";
-        squidguard_ini_object(&$sg_object);
-
         $conf = '';
         $upload_file = '';
 
-        if ($_POST['submit'] == BLACKLIST_BTN_STD) {
-            // upload from std url
-            $proxy = $_POST['blacklist_proxy'];
-            $upload_file = upload_file_from_url(BLACKLIST_DEFAULT_URL, BLACKLIST_TMP_FILE, $proxy);
-            $sg_object->update_blacklist($upload_file);
-        } else
-
+        // blacklist upload
         if ($_POST['submit'] == BLACKLIST_BTN_URL) {
             // upload from another url
             $url = $_POST['blacklist_url'];
             $proxy = $_POST['blacklist_proxy'];
             if ($url)
-                $upload_file = upload_file_from_url($url, BLACKLIST_TMP_FILE, $proxy);
-            $sg_object->update_blacklist($upload_file);
-        } else
-
-        if ($_POST['submit'] == BLACKLIST_BTN_FILE) {
-       /*     $upload_file = $_POST['blacklist_file'];
-             blacklist_add_log('Begin upload from file ' . $upload_file . '.\r');
-             if (upload_file(''))
-                   blacklist_add_log('Success.\r');
-             else {
-                   blacklist_add_log('Error.\r');
-                   $upload_file = '';
-             }
-             $sg_object->update_blacklist($upload_file); */
- //            $sg_object->update_blacklist('/var/tmp/blacklists.tar');
-upload_file('');
-        } else
-
-        // apply changes
-        if ($_POST['submit'] == APPLY_BTN) {
-                // reconfigure service
-                $sg_object->reconfigure();
-        } else
-
-        // start test squidGuard
-        /*if ($_POST['test_squidguard'] != '')*/ {
-                  $result = '';
-                  $src_urls = $_POST['test_squidguard_urls'];
-                  $result = $sg_object->test_work($src_urls);
-                  file_put_contents(TEST_LOG, $result);
+                sg_reconfigure_blacklist($url, $proxy);
         }
-
+        // apply changes
+        if ($_POST['submit'] == APPLY_BTN) sg_reconfigure();
 }
+
 // -----------------------------------------------------------------------------
+// squidguard_resync_src
+// -----------------------------------------------------------------------------
+function squidguard_resync_src() {
+       global $config;
+       $conf = $config['installedpackages'][MODULE_SOURCE]['config'];
+       $id = $_GET['id'];
+       if (!$id)
+           $id = $_POST['id'];
+
+       // move current id by order
+       if (($id != '') and is_array($conf) and ($id !== intval($conf[$id]['order']))) {
+           // copy current item to temp and remove it's from list
+           $src_new = array();
+           $src_cur = $conf[$id];
+           unset ($conf[$id]);
+
+           // rebuild list and insert current item by order
+           $i=0;
+           foreach($conf as $src) {
+                   if (intval($src_cur['order']) === $i) {
+                       $src_new[] = $src_cur;
+                       unset($src_cur);
+                       $i++;
+                   }
+                   $src_new[] = $src;
+                   $i++;
+           }
+           // if current item not inserted - insert him to the end
+           if (isset($src_cur)) {
+               $src_new[] = $src_cur;
+               unset($src_cur);
+           }
+
+           // renew order values
+           foreach($src_new as $key => $src) {
+                   $src_new[$key]['order'] = $key;
+           }
+
+           unset ($config['installedpackages'][MODULE_SOURCE]['config']);
+           $config['installedpackages'][MODULE_SOURCE]['config'] = $src_new;
+           write_config('Update squidguardsrc config');
+       } else if (($_GET['act'] === 'del') or ($_POST['act'] === 'del')) {
+           // update order on delete item
+           foreach($config['installedpackages'][MODULE_SOURCE]['config'] as $key => $src)
+                   $config['installedpackages'][MODULE_SOURCE]['config'][$key]['order'] = $key;
+           write_config('Update squidguardsrc config');
+       }
+}
+
+// =============================================================================
 // common functions
+// =============================================================================
+
+// -----------------------------------------------------------------------------
+// get_pkg_items_list
 // -----------------------------------------------------------------------------
 function get_pkg_items_list($pkg_gui_name, $fieldname) {
        $res = '';
@@ -538,101 +377,33 @@ function get_pkg_items_list($pkg_gui_name, $fieldname) {
         return $res;
 }
 
-// -----------------------------------------------------------------------------
-// Resync
-// -----------------------------------------------------------------------------
-
-function squidguard_resync_rewrite() {    // rewrite
-    $conf = "";
-    // ----- nothing for do -----
-    return $conf;
-}
-
-function squidguard_resync_time() {       // resync time
-    global $config;
-
-    $conf = '';
-    $times = $config['installedpackages']['squidguardtime']['config'];
-
-    if (is_array($times)) {
-        foreach($times as $tm) {
-            $timevalue = '';
-            $conf .= "\n time " . $tm['timename'] . " {";
-            foreach($tm['row'] as $rw) {
-                if ($rw['timetype'] == 'date') {
-                    $timevalue .= $rw['timetype'] . ' ' . $rw['timelist'];
-                    $conf .= "\n        date" . $rw['timelist'];
-                } else {
-                    $timevalue .= $rw['timetype'] . ' ' . $rw['timedays'] . ' ' . $rw['timelist'];
-                    $conf .= "\n        weekly " . $rw['timedays'] . ' ' . $rw['timelist'];
-                }
-            }
-            $conf .= "\n    } \n";
-            $config['installedpackages']['squidguardtime']['config']['timevalue'] = "1110";//$timevalue;
-        }
-    }
-
-//    file_put_contents("/var/tmp/squidguard.test", $conf);
-
-    return $conf;
-}
-
-function squidguard_resync_src() {        // source
-    $conf = "";
-    // ----- nothing for do -----
-    return $conf;
-}
-
-function squidguard_resync_std_dest() {    // standart destinations
-    global $config;
-    $settings = $config['installedpackages']['squidguard']['config'][0];
-    $conf = "";
-
-    // ads
-    $conf .= make_dest(FLT_ADS, "ads/domains", "ads/urls", "", "");
-    // aggressive
-    $conf .= make_dest(FLT_AGGRESSIVE, "aggressive/domains", "aggressive/urls", "", "");
-    // audio & video
-    $conf .= make_dest(FLT_AUDIOVIDEO, "audio-video/domains", "audio-video/urls", "", "");
-    // Druggs
-    $conf .= make_dest(FLT_DRUGGS, "drugs/domains", "drugs/urls", "", "");
-    // Gambling
-    $conf .= make_dest(FLT_GAMBLING, "gambling/domains", "gambling/urls", "", "");
-    // Hacking
-    $conf .= make_dest(FLT_HACKING, "hacking/domains", "hacking/urls", "", "");
-    // Mail
-    $conf .= make_dest(FLT_MAIL, "mail/domains", "mail/urls", "", "");
-    // Porn
-    $conf .= make_dest(FLT_PORN, "porn/domains", "porn/urls", "", "");
-    // proxy
-    $conf .= make_dest(FLT_PROXY, "proxy/domains", "proxy/urls", "", "");
-    // Violence
-    $conf .= make_dest(FLT_VIOLENCE, "violence/domains", "violence/urls", "", "");
-    // Warez
-    $conf .= make_dest(FLT_WAREZ, "warez/domains", "warez/urls", "", "");
-
-    return $conf;
-}
-
-function squidguard_resync_user_dst() {    // user destinations
-}
-
-function squidguard_resync_dest() {       // destination
-    $conf = "";
-    // ----- nothing for do -----
-    return $conf;
-}
-
-function squidguard_resync_acl() {        // acl
-    $conf = "";
-    // ----- nothing for do -----
-    return $conf;
-}
+# ==============================================================================
+# Before form
+# ==============================================================================
 
 // -----------------------------------------------------------------------------
-// Before form
+// squidguard_before_form_src
 // -----------------------------------------------------------------------------
-
+function squidguard_before_form_src($pkg) {
+         global $config;
+         global $g;
+         $i=0;
+         foreach($pkg['fields']['field'] as $field) {
+                 if ($field['fieldname'] == 'order') {
+                         $fld = &$pkg['fields']['field'][$i];
+                         $img_up   = "<img src='./themes/{$g['theme']}/images/icons/icon_up.gif'
+                                      title='move up' width='17' height='17' border='0' onclick='on_moveup()'>";
+                         $img_down = "<img src='./themes/{$g['theme']}/images/icons/icon_down.gif'
+                                      title='move down' width='17' height='17' border='0' onclick='on_movedown()'>";
+                         $s = "<b>Move to:</b> $img_up $img_down <br>" . $fld['description'];
+                         $fld['description'] = $s;
+                  }
+                  $i++;
+         }
+}
+// -----------------------------------------------------------------------------
+// squidguard_before_form_dest
+// -----------------------------------------------------------------------------
 function squidguard_before_form_dest($pkg) {
          global $config;
          $expr_names = '';
@@ -659,10 +430,11 @@ function squidguard_before_form_dest($pkg) {
         }
 }
 
+// -----------------------------------------------------------------------------
+// squidguard_before_form
+// -----------------------------------------------------------------------------
 function squidguard_before_form($pkg) {
         $i=0;
-
-// <encType>multipart/form-data</encType>;
 
         foreach($pkg['fields']['field'] as $field) {
                 // blacklist controls
@@ -685,9 +457,11 @@ function squidguard_before_form($pkg) {
 }
 
 
+// -----------------------------------------------------------------------------
+// squidguard_before_form_acl
+// -----------------------------------------------------------------------------
 function squidguard_before_form_acl($pkg) {
         global $config;
-        global $squidguard_object;
         $current_id = '';
 
         $sources      = '';
@@ -710,9 +484,8 @@ function squidguard_before_form_acl($pkg) {
         // sources
         $sources = $config['installedpackages']['squidguardsrc']['config'];
         if (is_array($sources)) {
-                foreach($sources as $src) {
+                foreach($sources as $src)
                         $source_items[] = $src['name'];
-                }
         }
 
         // generate sources list TODO: exclude used names from list, source name used in ACL unique
@@ -720,7 +493,8 @@ function squidguard_before_form_acl($pkg) {
         foreach($pkg['fields']['field'] as $field) {
                 if ($field['fieldname'] == 'source') {
                         $fld = &$pkg['fields']['field'][$i];
-                        foreach($source_items as $nm) {
+                        if (is_array($source_items)) {
+                            foreach($source_items as $nm)
                                 $fld['options']['option'][] = array('name'=>$nm, 'value'=>$nm);
                         }
                 }
@@ -756,22 +530,28 @@ function squidguard_before_form_acl($pkg) {
                 }
          }
 
-        # --------------------------------------------------------------------------------------------------------------
-        # destinations
-        # --------------------------------------------------------------------------------------------------------------
-        if ($squidguard_object->blacklist_enabled) {
-            foreach($squidguard_object->blacklist as $dst)
-                $dest_items[] = array ('name'=>$dst->name, 'upt_value'=>$acls_up[$dst->name],
-                                'ovt_value'=>$acls_over[$dst->name], 'description'=>$dst->desc);
+        // --- Destinations ---
+        $general_cfg = $config['installedpackages'][MODULE_GENERAL]['config'][0];
+        $dest_cfg =  $config['installedpackages'][MODULE_DESTINATION]['config'];
+
+        // Blacklist
+        if ($general_cfg['blacklist'] == 'on') {
+            $blk_entries = sg_entries_blacklist();
+            if (!empty($blk_entries)) {
+                foreach($blk_entries as $dst)
+                        $dest_items[] = array ('name'=>$dst, 'upt_value'=>$acls_up[$dst],
+                                               'ovt_value'=>$acls_over[$dst], 'description'=>'');
+            }
         }
 
-        if ($squidguard_object->dests) {
-            foreach($squidguard_object->dests as $dst)
-                $dest_items[] = array ('name'=>$dst->name, 'upt_value'=>$acls_up[$dst->name],
-                                 'ovt_value'=>$acls_over[$dst->name], 'description'=>$dst->desc);
+        // User destinations
+        if ($dest_cfg) {
+            foreach($dest_cfg as $dst)
+                    $dest_items[] = array ('name'=>$dst[FLD_NAME], 'upt_value'=>$acls_up[$dst[FLD_NAME]],
+                                           'ovt_value'=>$acls_over[$dst[FLD_NAME]], 'description'=>$dst[FLD_DESCRIPTION]);
         }
 
-        // default all
+        // Default all
         $dest_items[] = array('name'=>FLT_DEFAULT_ALL, 'upt_value'=>$acls_up[FLT_DEFAULT_ALL],
                         'ovt_value'=>$acls_over[FLT_DEFAULT_ALL], 'description'=>'Default access');
 
@@ -828,10 +608,15 @@ function squidguard_before_form_acl($pkg) {
         }
 }
 
+// -----------------------------------------------------------------------------
+// squidguard_before_form_log
+// -----------------------------------------------------------------------------
 function squidguard_before_form_log($pkg) {
         global $config;
-        global $squidguard_object;
         $i=0;
+        $move_pos = 0;
+        $move_step = 50;
+
         foreach($pkg['fields']['field'] as $field) {
                 if ($field['fieldname'] == 'logtype') {
                         $slog = '';
@@ -839,15 +624,19 @@ function squidguard_before_form_log($pkg) {
 
                         $filename = '';
                         $fld = &$pkg['fields']['field'][$i];
-                        if ($mlog['logtype'] == 'access_log') {
-                            $filename = $squidguard_object->log_dir . "/" . SQUIDGUARD_ACCESSBLOCK_FILE;
+                        if (empty($move_pos)) $move_pos = 0;
+                        if ($mlog['logtype'] == 'block_log') {
+                            $filename = SQUIDGUARD_LOGDIR . "/" . SQUIDGUARD_ACCESSBLOCK_FILE;
                             if (file_exists($filename)) {
                                 $s = file_get_contents($filename);
                                 $s = explode("\n", $s);
+                                $move_pos = count ($s) - $move_step;
+                                if ($move_pos < 0) $move_pos = 0;
+                                $s = array_slice($s, $move_pos, $move_step);
 
-                                $slog .= "<table cellSpacing=1 cellPadding=1 width='100%'>";
-                                $slog .= "<tr><th>DateTime</th><th>IP</th><th>URL</th><th>Filter</th><th>ID</th><th>Method</th></tr>";
-                                foreach($s as $vs) {
+                                $slog .= "<tr><th>Num</th><th>DateTime</th><th>IP</th><th>URL</th><th>Filter</th><th>ID</th><th>Mtd</th></tr>";
+                                foreach($s as $key => $vs) {
+                                    $nkey = $move_pos + intval($key);
                                     $slog .= "<tr>";
                                     $sx = $vs;
                                     $sx = str_replace("/- -", "", $sx);
@@ -861,6 +650,7 @@ function squidguard_before_form_log($pkg) {
                                     $sx = explode(" ", $sx);
                                     if (!empty($vs))
                                         $slog .= "<tr>
+                                              <td style='vertical-align: top; white-space: nowrap;'>" . strval($nkey) . "</td>
                                               <td style='vertical-align: top; white-space: nowrap;'>$sx[0] $sx[1]</td>
                                               <td style='vertical-align: top;'>$sx[5]</td>
                                               <td style='vertical-align: top;'>$sx[4]</td>
@@ -868,11 +658,12 @@ function squidguard_before_form_log($pkg) {
                                               <td style='vertical-align: top;'>$sx[2]</td>
                                               <td style='vertical-align: top;'>$sx[6]</td></tr>";
                                 }
-                                $slog .= "</table>";
+#                                $slog .= "</table>";
                             }
                         } else
-                        if ($mlog['logtype'] == 'webgui_log') {
-                            $filename = $squidguard_object->log_dir . SQUIDGUARD_LOG_FILE;
+                        if ($mlog['logtype'] == 'configurator_log') {
+                            $filename = SQUIDGUARD_LOGDIR . SQUIDGUARDCONF_LOGFILE;
+                            $slog .= "<b>$filename</b><br>";
                             if (file_exists($filename)) {
                                 $slog .= file_get_contents($filename);
                                 $slog = str_replace("\n", "<br>", $slog);
@@ -880,36 +671,64 @@ function squidguard_before_form_log($pkg) {
                             }
                         } else
                         if ($mlog['logtype'] == 'squidguard_log') {
-                            $filename = $squidguard_object->log_dir . "/squidGuard.log";
+                            $filename = SQUIDGUARD_LOGDIR . '/squidGuard.log';
+                            $slog .= "<b>$filename</b><br>";
+                            if (file_exists($filename)) {
+                                $slog .= file_get_contents($filename);
+                                $slog = explode("\n", $slog);
+                                while (count($slog) > 500)  array_shift($slog);
+                                $slog = implode("\n", $slog);
+                                $slog = str_replace("\n", "<br>", $slog);
+                                $slog = "<tr><td>$slog</td></tr>";
+                            }
+                        } else
+                        if ($mlog['logtype'] == 'squid_config') {
+                            $filename = SQUID_CONFIGFILE;
+                            $slog .= "<b>$filename</b><br>";
                             if (file_exists($filename)) {
                                 $slog .= file_get_contents($filename);
                                 $slog = str_replace("\n", "<br>", $slog);
+                                $slog = str_replace("\t", " ", $slog);
+                                $slog = "<tr><td>$slog</td></tr>";
+                            }
+                        } else
+                        if ($mlog['logtype'] == 'squidguard_config') {
+                            $filename = SQUIDGUARD_WORKDIR . "/squidGuard.conf";
+                            $slog .= "<b>$filename</b><br>";
+                            if (file_exists($filename)) {
+                                $slog .= file_get_contents($filename);
+                                $slog = str_replace("\n", "<br>", $slog);
+                                $slog = str_replace("\t", " ", $slog);
                                 $slog = "<tr><td>$slog</td></tr>";
                             }
                         }
 
-// $slog .= $filename . "\n"; // debug
-
                         $fld['description'] .=
-                            "</tr><tr><td><br></td>
-                             <td><table width='100%' class=tabcont cellSpacing=0 cellPadding=1 border=1>$slog</table>";
-//                            "<table class=tabcont cellSpacing=0 cellPadding=0 border=1 width='100%'>$slog</table></td>";
+                            "<INPUT class=formbtn type=submit value='Get log' name=Submit>
+                            </tr><tr>
+                             <td colspan='2'><table width='100%' class=tabcont cellSpacing=0 cellPadding=1 border=1>$slog</table>";
+                            "<table class=tabcont cellSpacing=0 cellPadding=0 border=1 width='100%'>$slog</table></td></tr>";
+
                 }
                 $i++;
         }
 }
 
+// -----------------------------------------------------------------------------
+// squidguard_update_acl_dest
+// -----------------------------------------------------------------------------
 function squidguard_update_acl_dest($acl_name, $post) {
         global $config;
         $post['dest'] = 'fig vam';
-        #s='TST';
         foreach($post as $k => $p)
                 $s .= $k . '=' . $p;
 }
 
+// -----------------------------------------------------------------------------
+// make_grid_general_items
+// -----------------------------------------------------------------------------
 function make_grid_general_items($id = '')
 {
-        global $squidguard_object;
         global $config;
 
         $res = '';
@@ -917,17 +736,21 @@ function make_grid_general_items($id = '')
 
         if ($id == '') {
             // Apply
-            $res .= "<tr><td>After changing configuration Squid or squidGuard you must
-                     <b>apply all changes</b></td><td><input name='submit'
-                     type='submit' value='Apply'></td></tr>";
+            $res .= "<tr bgcolor='#dddddd'><td><big>For saving configuration YOU need click button 'Save' on bottom of page</big></td></tr>
+                     <tr><td><big>After changing configuration Squid or squidGuard you must <b><span style='color: #800000;'>apply all changes</span></b></big></td></tr>
+                     <tr><td><input name='submit' type='submit' value='Apply'></td></tr>";
+
+            // service state
+            $sgstate = "<span style='color: #800000;'>STOPPED</span>";
+            if (is_service_running("squidGuard")) $sgstate = "<span style='color: #008000;'>STARTED</span>";
+            $res .= "<tr bgcolor='#dddddd'><td><big>SquidGuard service state: <b>$sgstate</b></big></td></tr>";
         } else
         if ($id == 'gui_log') {
             if ($config['installedpackages']['squidguardgeneral']['config'][0]['view_gui_log'] == 'on') {
-                $log_content = $squidguard_object->get_log();
-                $res .= "<tr><td><br></td></tr>";
-                $res .= "<tr><td>Web GUI log</td></tr>";
-                $res .= "<tr><td vAlign=top width='100%'>
-                         <textarea name='Name' rows=7 cols=65 wrap='on' readonly='on'>$log_content</textarea></td></tr>";
+                $log_content = sg_getlog(50);
+                $log_content = str_replace("\n","<br>", $log_content);
+                $res .= "<tr bgcolor='#dddddd'><td><font size='-1'><b>Web GUI log (Last 50)</b></font></td></tr>";
+                $res .= "<tr bgcolor='#dddddd'><td vAlign=top width='100%'><font size='-2'>$log_content</font></td></tr>";
             }
         }
 
@@ -935,31 +758,47 @@ function make_grid_general_items($id = '')
         return $res;
 }
 
+// -----------------------------------------------------------------------------
+// make_grid_blacklist
+// -----------------------------------------------------------------------------
 function make_grid_blacklist() {
-        global $squidguard_object;
 
-        $style1 = 'class=vtable'; // 'class=vncell' ;// 'style="background-color: #FFF0E2;"';
+        $style1 = ''; // 'style="background-color: ##CCCCC2;"';
         $style2 = 'class=vtable';
         $style2 = '';
-        $e_size = '80';
+        $e_size = '90';
 
         $res = '';
         $res .= "<table width='100%'>";
-        $res .= "<tr><td><b>Proxy</b> settings</b></td> <td>Blacklist upload proxy - enter here, or leave blank.<br>
-                Format: host:[port login:pass] . Default proxy port 1080. Example: '192.168.0.1:8080 user:pass'</td><td>&nbsp;</td></tr>";
-        $res .= "<tr><td $style1>&nbsp;</td><td $style1><input name='blacklist_proxy' id='blacklist_proxy' type='text' size='$e_size'></td><td $style1><br></td></tr>";
-        $res .= "<tr><td $style3>Load from <b>Default</b></td> <td $style3><b>" . /*BLACKLIST_DEFAULT_URL .*/ "</b></td> <td $style3><input name='submit' value='" .
-                BLACKLIST_BTN_STD . "' type='submit'></td></tr>";
-        $res .= "<tr><td $style3>Load from <b>Url </b></td> <td $style3><input name='blacklist_url'  id='blacklist_url'
-                type='text' size='$e_size'></td> <td $style3><input name='submit' value='" . BLACKLIST_BTN_URL  . "' type='submit'>
-                </td></tr>";
-//        $res .= "<tr><td $style1>Load from <b>File</b></td> <td $style1><input name='blacklist_file' id='blacklist_file'
-//                type='file' size='$e_size'></td> <td $style1><input name='submit' value='" . BLACKLIST_BTN_FILE .
-//                "' type='submit'></td></tr>";
+        $res .= "<tr $style1><td><b>Proxy</b> settings</b></td>";
+        $res .= "<td $style1><input name='blacklist_proxy' id='blacklist_proxy' type='text' size='$e_size'></td></tr>";
+        $res .= "<tr><td $style1>&nbsp;</td>
+                 <td>Blacklist upload proxy - enter here, or leave blank.<br>
+                 Format: host:[port login:pass] . Default proxy port 1080. <br>
+                 Example: '192.168.0.1:8080 user:pass'
+                 </td></tr>";
+        $res .= "<tr><td $style3>Load from <b>Url </b></td> <td $style3><input name='blacklist_url' id='blacklist_url'
+                type='text' size='$e_size' value='http://squidguard.mesd.k12.or.us/blacklists.tgz'></td></tr>";
+        $res .= "<tr><td $style1>&nbsp;</td>
+                 <td>FTP, HTTP or LOCAL (pfSense) path to blacklist archive enter here, or leave blank.<br></td></tr>";
+        // button
+        $res .= "<tr><td $style3>&nbsp;</td>
+                 <td $style3><input name='submit' value='" . BLACKLIST_BTN_URL  . "' type='submit'></td></tr>";
+
+#        $res .= "<tr><td $style3>Load from <b>Default</b></td> <td $style3><b>" . /*BLACKLIST_DEFAULT_URL .*/ "</b></td> <td $style3><input name='submit' value='" .
+#                BLACKLIST_BTN_STD . "' type='submit'></td></tr>";
+
+#        $res .= "<tr><td $style1>Load from <b>File</b></td> <td $style1><input name='blacklist_file' id='blacklist_file'
+#                type='file' size='$e_size'></td> <td $style1><input name='submit' value='" . BLACKLIST_BTN_FILE .
+#                "' type='submit'></td></tr>";
+
         $res .= "</table>";
         return $res;
 }
 
+// -----------------------------------------------------------------------------
+// make_grid_controls
+// -----------------------------------------------------------------------------
 function make_grid_controls($type, $items) {
         $res = '';
         $tbl = '';
@@ -969,12 +808,12 @@ function make_grid_controls($type, $items) {
 
         foreach($items as $item) {
                 if ($x == 0) {
-                        $color = 'style="background-color: #FFF0E2;"';
+                        $color = 'style="background-color: #dddddd;"';
                         $color2 = '';
                         $x = 1;
                 } else {
                         $color = '';
-                        $color2 = 'style="background-color: #FFF0E2;"';
+                        $color2 = 'style="background-color: #dddddd;"';
                         $x = 0;
                 }
 
@@ -1012,31 +851,17 @@ function make_grid_controls($type, $items) {
                              <td/><td>Select destination for overtime rule.<br>If time not defined, this part must be ignored</td><td/><td/></tr>"
                         . $tbl;
 
-                $res .= "<table>" . $tbl . "</table>";
+                $res .= "<table cellspacing='0'>" . $tbl . "</table>";
         }
         return $res;
 }
 
 // -----------------------------------------------------------------------------
-
-function check_name ($name) {
-        $err = '';
-        $val = trim($name);
-
-        if ((strlen($val) < 2) || (strlen($val) > 16))
-            $err .= " Size of name must be between [2..16].";
-
-        // All symbols must be [a-zA-Z_0-9\-] First symbol = letter.
-        if (!eregi("^([a-zA-Z]{1})([a-zA-Z_0-9\-]+)$", $val))
-            $err .= " Invalid name $name. Valid name symbols: ['a-Z', '_', '0-9', '-']. First symbol must be a letter.";
-
-        return $err;
-}
-
-// --- Check unique name ---
+// check unique name
+// -----------------------------------------------------------------------------
 function check_unique_name($module_id, $name, $log='') {
         $res = true;
-       $count_names = 0;
+        $count_names = 0;
         $is_self ='notself';
 
         $id = $_GET['id'];
@@ -1074,51 +899,85 @@ function check_unique_name($module_id, $name, $log='') {
         return $res;
 }
 
+// -----------------------------------------------------------------------------
+// check date
+// -----------------------------------------------------------------------------
 function check_date($date) {
         $err = '';
         $val = trim($date);
         // date or date range format: 'yyyy-mm-dd', 'yyyy-m-d', 'yyyy.mm.dd'  'yyyy.mm.dd-yyyy.mm.dd'
-        if (!eregi("^([0-9*]{4})\.([0-9*]{1,2})\.([0-9*]{1,2})$", $val) &&
-            !eregi("^([0-9*]{4})\.([0-9*]{1,2})\.([0-9*]{1,2})-([0-9*]{4})\.([0-9*]{1,2})\.([0-9*]{1,2})$", $val))
-            $err .= " Invalid date " . $date .
-                    " You mast use date or date range format: 'yyyy.mm.dd' and 'yyyy.mm.dd-yyyy.mm.dd' .
-                      Any symbol in date can be set to *(any number). Example: '*-10-01', '199*-*1-*1' ." . $val ;
+        if (!eregi("^(([0-9]{4})|[*])\.(([0-9]{2})|[*])\.(([0-9]{2})|[*])$", $val) &&
+            !eregi("^(([0-9]{4})|[*])\.(([0-9]{2})|[*])\.(([0-9]{2})|[*])-(([0-9]{4})|[*])\.(([0-9]{2})|[*])\.(([0-9]{2})|[*])$", $val))
+            $err .= " Invalid date '$date'.
+                         You mast use date or date range format: 'yyyy.mm.dd' and 'yyyy.mm.dd-yyyy.mm.dd'.
+                      Any symbol in date can be set as * (any). Example: '*-10-01', '199*-*1-*1'.";
         return $err;
 }
 
+// -----------------------------------------------------------------------------
+// check time
+// -----------------------------------------------------------------------------
 function check_time($time) {
         $err = '';
         $val = trim($time);
+
+        if (empty($val)) return '';
+
         // time range format: 'HH:MM-HH:MM'
         if (!eregi("^([0-9]{2})\:([0-9]{2})-([0-9]{2})\:([0-9]{2})$", $val))
-            $err = '';//" Invalid time range time . You must use 'HH:MM-HH:MM' time range format. ";
+            $err = "Invalid time range '$time'. You must use 'HH:MM-HH:MM' time range format. ";
+        else {
+            $tms = $time;
+            $tms = str_replace("-", "\n", $tms);
+            $tmsv = $tms;
+            $tms = str_replace(":", "", $tms);
+            $tms = explode("\n", $tms);
+            $tmsv = explode("\n", $tmsv);
+            if ($tms[0] >= 2400)
+                 $err .= "Invalid time range var1='$tmsv[0]' must be < '24:00'. ";
+            if ($tms[1] > 2400)
+                 $err .= "Invalid time range var2='$tmsv[1]'  must be <= '24:00'. ";
+            if ($tms[0] >= $tms[1])
+                 $err .= "Invalid time range var1='$tmsv[0]'  must be < var2='$tmsv[1]'. ";
+        }
+
         return $err;
 }
 
-function check_ip($ip) {
-
-}
-
-
-function squidguard_print_javascript_main() {
-}
-
-# ---------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Install & deinstall
-# ---------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 function squidguard_install_command() {
-        global $squidguard_object;
+        if (!is_service_running("squidGuard")) {
+              sg_init(convert_pfxml_to_sgxml());
+              sg_check_system();
+
+              // generate squidGuard blacklist entries file (check with squidGuard PORT)
+              $entries = array("ads", "aggressive", "audio-video", "drugs", "gambling", "hacking",
+                               "mail", "porn", "proxy", "violence", "warez");
+              file_put_contents(SQUIDGUARD_WORKDIR . SQUIDGUARD_BLK_ENTRIES, implode("\n", $entries));
+              set_file_access(SQUIDGUARD_WORKDIR, OWNER_NAME, 0755);
+
+              sg_reconfigure();
+        }
 }
 
 function squidguard_deinstall_command() {
-        mwexec('rm -rf ' . SQUIDGUARD_WORKDIR);
-        mwexec('rm -rf ' . SQUIDGUARD_DBHOME);
+         // remove entries from squid config
+         squid_reconfigure('remove redirector options');
+
+         // remove package and his depends
+         mwexec("pkg_delete squidGuard-1.2.0_1");
+         mwexec("rm -rf " . SQUIDGUARD_WORKDIR);
+         // i known't, really need delete blacklist base?
+         mwexec("rm -rf " . SQUIDGUARD_DBHOME);
+         mwexec("/bin/rm -f " . SQUIDGUARD_CONFBASE . "/squidGuard*");
 }
 
-# ---------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # SquidGuard print JavaSrcript
-# ---------------------------------------------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 function squidGuard_print_javascript() {
         $javascript = '';
@@ -1171,7 +1030,265 @@ function squidGuard_print_javascript() {
             $javascript .= "\n</script>";
         }
 
+        if ($xml == "squidguard_src.xml") {
+            $javascript .= "\n<script language='JavaScript'>";
+            $javascript .= "\n<!--";
+            $javascript .= "\n    function on_updatecontrols() {";
+            $javascript .= "\n        document.iform.elements['order'].disabled = 0;";
+            $javascript .= "\n        document.iform.elements['order'].onfocus = on_orderfocus;";
+            $javascript .= "\n    }";
+            $javascript .= "\n    function on_orderfocus() {";
+            $javascript .= "\n        document.iform.elements['order'].blur();";
+            $javascript .= "\n    }";
+            $javascript .= "\n    function on_moveup() {";
+            $javascript .= "\n        var order = parseInt(document.iform.elements['order'].value)";
+            $javascript .= "\n        if (order > 0)";
+            $javascript .= "\n             order = order - 1;";
+            $javascript .= "\n        else order = 0;";
+            $javascript .= "\n        document.iform.elements['order'].value = order;";
+            $javascript .= "\n    }";
+            $javascript .= "\n    function on_movedown() {";
+            $javascript .= "\n        var order = parseInt(document.iform.elements['order'].value)";
+            $javascript .= "\n        if (order >= 0)";
+            $javascript .= "\n             order = order + 1;";
+            $javascript .= "\n        else order = 0;";
+            $javascript .= "\n        document.iform.elements['order'].value = order;";
+            $javascript .= "\n    }";
+            $javascript .= "\n    on_updatecontrols();";
+            $javascript .= "\n    ";
+            $javascript .= "\n//-->";
+            $javascript .= "\n</script>";
+        }
+
          print($javascript);
+}
+
+# ==============================================================================
+# SquidGuard 2
+# ==============================================================================
+
+// -----------------------------------------------------------------
+// convert_pfxml_to_sgxml
+// -----------------------------------------------------------------
+function convert_pfxml_to_sgxml() {
+    global $config;
+    $sgxml = array();
+    $pfxml = $config['installedpackages'][MODULE_GENERAL]['config'][0];
+
+    $sgxml[FLD_LOGDIR]           = SQUIDGUARD_LOGDIR;
+    $sgxml[FLD_DBHOME]           = SQUIDGUARD_DBHOME;
+    $sgxml[FLD_BINPATH]          = SQUIDGUARD_BINPATH;
+    $sgxml[FLD_WORKDIR]          = SQUIDGUARD_WORKDIR;
+    $sgxml[FLD_SGCONF_XML]       = SQUIDGUARD_WORKDIR . SQUIDGUARD_CONFXML;
+    $sgxml[FLD_ENABLED]          = $pfxml[FLD_SQUIDGUARDENABLE];
+    $sgxml[FLD_BLACKLISTENABLED] = $pfxml[FLD_BLACKLIST];
+    $sgxml[FLD_SOURCES]          = convert_pfxml_to_sgxml_source($config);
+    $sgxml[FLD_DESTINATIONS]     = convert_pfxml_to_sgxml_destination($config);
+    $sgxml[FLD_REWRITES]         = convert_pfxml_to_sgxml_rewrite($config);
+    $sgxml[FLD_TIMES]            = convert_pfxml_to_sgxml_time($config);
+    $sgxml[FLD_ACLS]             = convert_pfxml_to_sgxml_acl($config);
+    $sgxml[FLD_DEFAULT]          = convert_pfxml_to_sgxml_default($config);
+
+    // transparent
+    $squidxml = $config['installedpackages']['squid']['config'][0];
+    if(isset($squidxml['transparent_proxy'])) {
+             $lanip = $config['interfaces']['lan']['ipaddr'];
+             $sgxml[FLD_SQUID_TRANSPARENT_MODE] = 'on';
+             $sgxml[FLD_CURRENT_LAN_IP] = $lanip;
+    } else {
+             unset($sgxml[FLD_SQUID_TRANSPARENT_MODE]);
+             unset($sgxml[FLD_CURRENT_LAN_IP]);
+    }
+
+    // store cfg cache
+    $cfg_xml = dump_xml_config($sgxml, FLD_SQUIDGUARD);
+    file_put_contents($sgxml[FLD_SGCONF_XML], $cfg_xml);
+
+    return $sgxml;
+}
+
+// -----------------------------------------------------------------
+// convert_pfxml_to_sgxml_source
+// sgxml_source: [name][ip][desc][log]
+// -----------------------------------------------------------------
+function convert_pfxml_to_sgxml_source($pfconfig) {
+        $sgxml = array();
+
+        $pfxml = $pfconfig['installedpackages']['squidguardsrc']['config'];
+        if (is_array($pfxml)) {
+            foreach($pfxml as $pfx) {
+                $sgx = array();
+                $sgx[FLD_NAME]                 = $pfx['name'];
+                $sgx[FLD_IP]                   = $pfx['iplist'];
+                $sgx[FLD_DOMAINS]              = $pfx[FLD_DOMAINS];
+                $sgx[FLD_LOG]                  = $pfx['enablelog'];
+                $sgx[FLD_DESCRIPTION]          = $pfx['description'];
+                $sgxml[FLD_ITEM][] = $sgx;
+            }
+        }
+        return $sgxml;
+}
+
+// -----------------------------------------------------------------
+// convert_pfxml_to_sgxml_destination
+// sgxml_destination: [name][domains][expr][urls][redir][desc][log]
+// -----------------------------------------------------------------
+function convert_pfxml_to_sgxml_destination($pfconfig) {
+        $sgxml = array();
+
+        $pfxml = $pfconfig['installedpackages']['squidguarddest']['config'];
+        if (is_array($pfxml)) {
+            foreach($pfxml as $pfx) {
+                $sgx = array();
+                $sgx[FLD_NAME]                = $pfx['name'];
+                $sgx[FLD_URLS]                = $pfx['urls'];
+                $sgx[FLD_DOMAINS]             = $pfx[FLD_DOMAINS];
+                $sgx[FLD_EXPRESSIONS]         = $pfx['expressions'];
+                $sgx[FLD_REDIRECT]            = $pfx[FLD_REDIRECT];
+                $sgx[FLD_DESCRIPTION]         = $pfx['description'];
+                $sgx[FLD_LOG]                 = $pfx['enablelog'];
+                $sgxml[FLD_ITEM][] = $sgx;
+            }
+        }
+        return $sgxml;
+}
+
+// -----------------------------------------------------------------
+// convert_pfxml_to_sgxml_rewrite
+// sgxml_rewrite: [name][desc][log][items(array): [targeturl][replaceto]]
+// -----------------------------------------------------------------
+function convert_pfxml_to_sgxml_rewrite($pfconfig) {
+        $sgxml = array();
+
+        $pfxml = $pfconfig['installedpackages']['squidguardrewrite']['config'];
+        if (is_array($pfxml)) {
+            foreach($pfxml as $pfx) {
+                $sgx = array();
+                $sgx[FLD_NAME]                 = $pfx['name'];
+                $sgx[FLD_DESCRIPTION]         = $pfx['description'];
+                $sgx[FLD_LOG]                  = $pfx['enablelog'];
+
+                foreach($pfx['row'] as $pfx_row) {
+                        $sgx_row = array();
+                        $sgx_row[FLD_TARGETURL] = $pfx_row['targeturl'];
+                        $sgx_row[FLD_REPLACETO] = $pfx_row['replaceto'];
+                        $sgx[FLD_ITEM][] = $sgx_row;
+                }
+
+                $sgxml[FLD_ITEM][] = $sgx;
+            }
+        }
+        return $sgxml;
+}
+
+// -----------------------------------------------------------------
+// convert_pfxml_to_sgxml_time
+// sgxml_time: [name][desc][items(array): [timetype][timedays][daterange][timerange]]
+// -----------------------------------------------------------------
+function convert_pfxml_to_sgxml_time($pfconfig) {
+        $sgxml = array();
+
+        $pfxml = $pfconfig['installedpackages']['squidguardtime']['config'];
+        if (is_array($pfxml)) {
+            foreach($pfxml as $pfx) {
+                $sgx = array();
+                $sgx[FLD_NAME]                = $pfx[FLD_NAME];
+                $sgx[FLD_DESCRIPTION]        = $pfx[FLD_DESCRIPTION];
+
+                foreach($pfx['row'] as $pfx_row) {
+                        $sgx_row = array();
+                        $sgx_row[FLD_TIMETYPE]  = $pfx_row[FLD_TIMETYPE];
+                        $sgx_row[FLD_TIMEDAYS]  = $pfx_row[FLD_TIMEDAYS];
+                        $sgx_row[FLD_DATERANGE] = $pfx_row[FLD_DATERANGE];
+                        $sgx_row[FLD_TIMERANGE] = $pfx_row[FLD_TIMERANGE];
+                        $sgx[FLD_ITEM][] = $sgx_row;
+                }
+
+                $sgxml[FLD_ITEM][] = $sgx;
+            }
+        }
+
+        return $sgxml;
+}
+
+// -----------------------------------------------------------------
+// convert_pfxml_to_sgxml_acl
+// sgxml_acl: [name][desc][disabled][timename][destname][redirect][rewritename][over_redirect][over_rewritename]
+// -----------------------------------------------------------------
+function convert_pfxml_to_sgxml_acl($pfconfig) {
+        $sgxml = array();
+
+        $pfxml = $pfconfig['installedpackages']['squidguardacl']['config'];
+        if (is_array($pfxml)) {
+            foreach($pfxml as $pfx) {
+                $sgx = array();
+                $sgx[FLD_NAME]               = $pfx[FLD_SOURCE];
+                $sgx[FLD_DESCRIPTION]        = $pfx[FLD_DESCRIPTION];
+                $sgx[FLD_DISABLED]           = $pfx[FLD_DISABLED];
+                $sgx[FLD_TIMENAME]           = $pfx[FLD_TIME];
+                $sgx[FLD_REDIRECT]           = $pfx[FLD_REDIRECT];
+                $sgx[FLD_REWRITENAME]        = $pfx[FLD_REWRITE];
+
+                // for overtime
+                $sgx[FLD_OVERREDIRECT]       = $pfx[FLD_OVERREDIRECT];
+                $sgx[FLD_OVERREWRITENAME]    = $pfx[FLD_OVERREWRITE];
+
+                // destinations
+                if (strpos($pfx['dest'], '[') === false) {
+                    $sgx[FLD_DESTINATIONNAME]     = trim($pfx['dest']);
+                    $sgx[FLD_OVERDESTINATIONNAME] = '';
+                } else {
+                    $sgx[FLD_DESTINATIONNAME]     = trim( substr($pfx['dest'], 0, strpos($pfx['dest'], '[')) );
+                    $sgx[FLD_OVERDESTINATIONNAME] = trim( strstr($pfx['dest'], '[') );
+                    $sgx[FLD_OVERDESTINATIONNAME] = trim( str_replace(']', '', $sgx[FLD_OVERDESTINATIONNAME]) );
+                    $sgx[FLD_OVERDESTINATIONNAME] = trim( str_replace('[', '', $sgx[FLD_OVERDESTINATIONNAME]) );
+                }
+
+                // !ATTENTION! '!all' must be convert to 'none'
+                $sgx[FLD_DESTINATIONNAME]     = str_replace("!all", "none", $sgx[FLD_DESTINATIONNAME]);
+                $sgx[FLD_OVERDESTINATIONNAME] = str_replace("!all", "none", $sgx[FLD_OVERDESTINATIONNAME]);
+
+                $sgxml[FLD_ITEM][] = $sgx;
+            }
+        }
+        return $sgxml;
+}
+
+// -----------------------------------------------------------------
+// convert_pfxml_to_sgxml_default
+// sgxml_acl: [name][desc][disabled][timename][destname][redirect][rewritename][over_redirect][over_rewritename]
+// -----------------------------------------------------------------
+function convert_pfxml_to_sgxml_default($pfconfig) {
+        $pfxml = $pfconfig['installedpackages']['squidguarddefault']['config'];
+
+        $pfx = $pfxml[0];
+        $sgx = array();
+        $sgx[FLD_NAME]                = 'default';
+        $sgx[FLD_DESCRIPTION]         = '';
+        $sgx[FLD_DISABLED]            = '';
+        $sgx[FLD_TIMENAME]            = $pfx[FLD_TIME];
+        $sgx[FLD_REDIRECT]            = $pfx[FLD_REDIRECT];
+        $sgx[FLD_REWRITENAME]         = $pfx[FLD_REWRITE];
+        // for overtime
+        $sgx[FLD_OVERREDIRECT]        = $pfx[FLD_OVERREDIRECT];
+        $sgx[FLD_OVERREWRITENAME]     = $pfx[FLD_OVERREWRITE];
+
+        // destinations
+        if (strpos($pfx['dest'], '[') === false) {
+            $sgx[FLD_DESTINATIONNAME]     = trim($pfx['dest']);
+            $sgx[FLD_OVERDESTINATIONNAME] = '';
+        } else {
+            $sgx[FLD_DESTINATIONNAME]     = trim( substr($pfx['dest'], 0, strpos($pfx['dest'], '[')) );
+            $sgx[FLD_OVERDESTINATIONNAME] = trim( strstr($pfx['dest'], '[') );
+            $sgx[FLD_OVERDESTINATIONNAME] = trim( str_replace(']', '', $sgx[FLD_OVERDESTINATIONNAME]) );
+            $sgx[FLD_OVERDESTINATIONNAME] = trim( str_replace('[', '', $sgx[FLD_OVERDESTINATIONNAME]) );
+        }
+
+        // !ATTENTION! '!all' must be convert to 'none'
+        $sgx[FLD_DESTINATIONNAME]     = str_replace("!all", "none", $sgx[FLD_DESTINATIONNAME]);
+        $sgx[FLD_OVERDESTINATIONNAME] = str_replace("!all", "none", $sgx[FLD_OVERDESTINATIONNAME]);
+
+        return $sgx;
 }
 
 ?>

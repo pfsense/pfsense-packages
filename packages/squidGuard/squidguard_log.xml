@@ -2,14 +2,14 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
 
 	<name>squidguardlog</name>
 	<version>none</version>
-	<title>Proxy server filter SquidGuard: Log</title>
-	<include_file>squidguard.inc</include_file>
+	<title>Proxy Content filter SquidGuard: Log</title>
+	<include_file>/usr/local/pkg/squidguard.inc</include_file>
 
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
@@ -45,29 +45,33 @@
 		</tab>
 		<tab>
 			<text>Log</text>
-			<url>/pkg_edit.php?xml=squidguard_log.xml</url>
+			<url>/pkg_edit.php?xml=squidguard_log.xml&amp;id=0</url>
 			<active/>
 		</tab>
 	</tabs>
+	
 	<fields>
 		<field>
 			<fielddescr>Log type</fielddescr>
 			<fieldname>logtype</fieldname>
-			<description>LOG</description>
+			<description></description>
 			<type>select</type>
 			<value>access_log</value>
 			<options>
-				<option><name>User access log</name><value>access_log</value></option>
-			    <option><name>WebGUI log</name><value>webgui_log</value></option>
-			    <option><name>squidGuard log</name><value>squidguard_log</value></option>
+				    <option><name>Blocked URL's log</name><value>block_log</value></option>
+			    	<option><name>Configurator log</name><value>configurator_log</value></option>
+			    	<option><name>squidGuard log</name><value>squidguard_log</value></option>
+			    	<option><name>squid config</name><value>squid_config</value></option>
+			    	<option><name>squidGuard config</name><value>squidguard_config</value></option>
 			</options> 
 		</field>
 	</fields>
+
 	<custom_php_command_before_form>
 		squidguard_before_form_log(&amp;$pkg);
 	</custom_php_command_before_form>
 	<custom_php_after_form_command> 
-               squidGuard_print_javascript();
+        squidGuard_print_javascript();
 	</custom_php_after_form_command>
 	<custom_php_validation_command>
 	</custom_php_validation_command>

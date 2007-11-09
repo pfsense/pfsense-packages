@@ -2,14 +2,14 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
 
 	<name>squidguardtime</name>
 	<version>none</version>
-	<title>Proxy server filter SquidGuard: Times</title>
-	<include_file>squidguard.inc</include_file>
+	<title>Proxy Content filter SquidGuard: Times</title>
+	<include_file>/usr/local/pkg/squidguard.inc</include_file>
 
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
@@ -49,6 +49,7 @@
 			<url>/pkg_edit.php?xml=squidguard_log.xml</url>
 		</tab>
 	</tabs>
+	
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Timename</fielddescr>
@@ -65,12 +66,12 @@
 			<fieldname>name</fieldname>
 			<description>Enter the time name here.</description>
 			<type>input</type>
-			<size>80</size>
 			<required/>
+			<size>80</size>
 		</field>
 		<field>
-  			<type>rowhelper</type> 
 			<fielddescr>Values</fielddescr>
+  			<type>rowhelper</type> 
  			<rowhelper>
  				<rowhelperfield>
 					<fielddescr>Time type</fielddescr>
@@ -103,13 +104,12 @@
  				<rowhelperfield>
   					<fielddescr>Date or Date range</fielddescr> 
   					<fieldname>daterange</fieldname> 
-  					<description>00:00-08:00 15:00-21:00 Format: *.01.01</description> 
   					<type>input</type> 
 					<size>40</size>
   				</rowhelperfield>
  				<rowhelperfield>
   					<fielddescr>Time range</fielddescr> 
-  					<fieldname>timerange</fieldname> 
+  					<fieldname>sg_timerange</fieldname> 
   					<description>00:00-08:00</description> 
   					<type>input</type> 
 					<size>20</size>
@@ -119,13 +119,19 @@
 		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-			<description>You may enter a description here for your reference (not parsed).</description>
+			<description>You may enter a description here for your reference (not parsed). &lt;br&gt;
+                &lt;b&gt; Note: &lt;/b&gt; &lt;br&gt; 
+				Field &lt;b&gt;'Date or date range'&lt;/b&gt; have format 'yyyy.mm.dd'; 'yyyy.mm.dd-yyyy.mm.dd'; or use '*' in format. &lt;br&gt;
+				Example: '2007.05.01'; '2007.04.14-2007.04.17'; '*.12.24'; '2007.*.01'; &lt;br&gt;
+				Field &lt;b&gt;'Time range'&lt;/b&gt; have format 'hh:mm-hh:mm'. Example: '08:00-18:00';
+			</description>
 			<type>input</type>
 			<size>80</size>
 		</field>
 	</fields>
+	
 	<custom_php_after_form_command> 
-               squidGuard_print_javascript();
+              squidGuard_print_javascript();
 	</custom_php_after_form_command>
 	<custom_php_validation_command>
 		squidguard_validate_times(&amp;$_POST, &amp;$input_errors);

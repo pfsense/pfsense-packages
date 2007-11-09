@@ -2,14 +2,14 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
 
 	<name>squidguarddest</name>
 	<version>none</version>
-	<title>Proxy server filter SquidGuard: Destinations</title>
-	<include_file>squidguard.inc</include_file>
+	<title>Proxy Content filter SquidGuard: Destinations</title>
+	<include_file>/usr/local/pkg/squidguard.inc</include_file>
 
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
@@ -49,6 +49,7 @@
 			<url>/pkg_edit.php?xml=squidguard_log.xml</url>
 		</tab>
 	</tabs>
+	
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Destination name</fielddescr>
@@ -68,13 +69,14 @@
 		</columnitem>
 		<columnitem>
 			<fielddescr>Redirect</fielddescr>
-			<fieldname>redir</fieldname>
+			<fieldname>redirect</fieldname>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
+
 	<fields>
 		<field>
 			<fielddescr>Name</fielddescr>
@@ -124,8 +126,11 @@
 		</field>
 		<field>
 			<fielddescr>Redirect</fielddescr>
-			<fieldname>redir</fieldname>
-			<description>Enter redirection URL or Error page message for this rule, or leave blank.</description>
+			<fieldname>redirect</fieldname>
+			<description>
+                         Enter redirection URL or Error page code for this rule, or leave blank. 
+                         Supported error page codes: 403, 404, 410.
+                     </description>
 			<type>textarea</type>
 			<cols>60</cols>
                      <rows>5</rows>
@@ -133,8 +138,8 @@
 		<field>
 			<fielddescr>Enable log</fielddescr>
 			<fieldname>enablelog</fieldname>
-			<description>Check this for enable log.</description>
 			<type>checkbox</type>
+			<description>Check this for enable log.</description>
 		</field>
 		<field>
 			<fielddescr>Description</fielddescr>
@@ -144,6 +149,8 @@
 			<size>90</size>
 		</field>
 	</fields>
+
+	<custom_delete_php_command/>
 	<custom_php_validation_command>
 		squidguard_validate_destination($_POST, &amp;$input_errors);
 	</custom_php_validation_command>

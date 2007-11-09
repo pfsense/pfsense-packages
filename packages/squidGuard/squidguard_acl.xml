@@ -2,14 +2,14 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
 
 	<name>squidguardacl</name>
 	<version>none</version>
-	<title>Proxy server filter SquidGuard: Access Control List (ACL)</title>
-	<include_file>squidguard.inc</include_file>
+	<title>Proxy Content filter SquidGuard: Access Control List (ACL)</title>
+	<include_file>/usr/local/pkg/squidguard.inc</include_file>
 
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
@@ -49,7 +49,12 @@
 			<url>/pkg_edit.php?xml=squidguard_log.xml</url>
 		</tab>
 	</tabs>
+	
 	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Disable</fielddescr>
+			<fieldname>disabled</fieldname>
+		</columnitem>
 		<columnitem>
 			<fielddescr>Source</fielddescr>
 			<fieldname>source</fieldname>
@@ -75,6 +80,7 @@
 			<fieldname>description</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
+
 	<fields>
 		<field>
 			<fielddescr>Disabled</fielddescr>
@@ -86,8 +92,8 @@
 			<fielddescr>Source name</fielddescr>
 			<fieldname>source</fieldname>
 			<description>Select source name here (required). Any ACL must have unique source name.</description>
-			<type>select</type>
 			<required/>
+			<type>select</type>
 		</field>
 		<field>
 			<fielddescr>Time</fielddescr>
@@ -105,15 +111,21 @@
 		<field>
 			<fielddescr>Redirect</fielddescr>
 			<fieldname>redirect</fieldname>
-			<description>Enter redirection URL or Error page message for this rule, or leave blank.</description>
+			<description>
+                         Enter redirection URL or Error page code for this rule, or leave blank. 
+                         Supported error page codes: 403, 404, 410.
+                     </description>
 			<type>textarea</type>
 			<cols>70</cols>
-            <rows>5</rows>
+                     <rows>5</rows>
 		</field>
 		<field>
 			<fielddescr>Overtime redirect</fielddescr>
 			<fieldname>overredirect</fieldname>
-			<description>Enter redirection URL or Error page message for this rule, or leave blank.</description>
+			<description>
+                         Enter redirection URL or Error page code for this rule, or leave blank. 
+                         Supported error page codes: 403, 404, 410.
+                     </description>
 			<type>textarea</type>
 			<cols>70</cols>
             <rows>5</rows>
@@ -132,12 +144,13 @@
 		</field>
 		<field>
 			<fielddescr>Description</fielddescr>
-			<description>You may enter a description here for your reference (not parsed).</description>
 			<fieldname>description</fieldname>
+			<description>You may enter a description here for your reference (not parsed).</description>
 			<type>input</type>
 			<size>114</size>
 		</field>
 	</fields>
+
 	<custom_php_validation_command>
 		squidguard_validate_acl(&amp;$_POST, &amp;$input_errors);
 	</custom_php_validation_command>
