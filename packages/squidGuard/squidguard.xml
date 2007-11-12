@@ -97,7 +97,7 @@
 	<additional_files_needed>
         <prefix>/usr/local/www/</prefix>
         <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squidGuard/sgerror.inc</item>
+		<item>http://www.pfsense.org/packages/config/squidGuard/sgerror.php</item>
 	</additional_files_needed>
 
 	<fields>		
