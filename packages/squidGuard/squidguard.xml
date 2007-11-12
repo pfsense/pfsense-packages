@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<!--DOCTYPE packagegui SYSTEM "../schema/packages.dtd"-->
+<!--?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?-->
 <packagegui>
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
