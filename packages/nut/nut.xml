@@ -46,7 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>nut</name>
-	<version>2.0.5</version>
+	<version>2.2.0</version>
 	<title>Services: NUT</title>
 	<savetext>Change</savetext>
 	<aftersaveredirect>/status_nut.php</aftersaveredirect>
@@ -142,27 +142,27 @@
 				</option>
 				<option>
 					<name>APC Back-UPS USB</name>
-					<value>newhidups00</value>
+					<value>usbhid-ups00</value>
 				</option>
 				<option>
 					<name>APC Back-UPS LS USB</name>
-					<value>newhidups01</value>
+					<value>usbhid-ups01</value>
 				</option>
 				<option>
 					<name>APC Back-UPS ES USB</name>
-					<value>newhidups02</value>
+					<value>usbhid-ups02</value>
 				</option>
 				<option>
 					<name>APC Back-UPS RS USB</name>
-					<value>newhidups03</value>
+					<value>usbhid-ups03</value>
 				</option>
 				<option>
 					<name>APC Back-UPS Pro USB</name>
-					<value>newhidups04</value>
+					<value>usbhid-ups04</value>
 				</option>
 				<option>
 					<name>APC Smart-UPS USB</name>
-					<value>newhidups05</value>
+					<value>usbhid-ups05</value>
 				</option>
 				<option>
 					<name>Belkin Regulator Pro</name>
@@ -174,7 +174,7 @@
 				</option>
 				<option>
 					<name>Belkin Universal UPS USB</name>
-					<value>newhidups06</value>
+					<value>usbhid-ups06</value>
 				</option>
 				<option>
 					<name>Best Power Fortress</name>
@@ -302,35 +302,35 @@
 				</option>
 				<option>
 					<name>MGE UPS SYSTEMS Comet USB</name>
-					<value>newhidups07</value>
+					<value>usbhid-ups07</value>
 				</option>
 				<option>
 					<name>MGE UPS SYSTEMS Protection Center USB</name>
-					<value>newhidups08</value>
+					<value>usbhid-ups08</value>
 				</option>
 				<option>
 					<name>MGE UPS SYSTEMS NOVA AVR USB</name>
-					<value>newhidups09</value>
+					<value>usbhid-ups09</value>
 				</option>
 				<option>
 					<name>MGE UPS SYSTEMS Pulsar Ellipse USB</name>
-					<value>newhidups10</value>
+					<value>usbhid-ups10</value>
 				</option>
 				<option>
 					<name>MGE UPS SYSTEMS Ellipse Office USB</name>
-					<value>newhidups11</value>
+					<value>usbhid-ups11</value>
 				</option>
 				<option>
 					<name>MGE UPS SYSTEMS Pulsar Evolution USB</name>
-					<value>newhidups12</value>
+					<value>usbhid-ups12</value>
 				</option>
 				<option>
 					<name>MGE UPS SYSTEMS Evolution USB</name>
-					<value>newhidups13</value>
+					<value>usbhid-ups13</value>
 				</option>
 				<option>
 					<name>MGE UPS SYSTEMS Pulsar USB</name>
-					<value>newhidups14</value>
+					<value>usbhid-ups14</value>
 				</option>
 				<option>
 					<name>MicroDowell B.Box BP</name>
@@ -382,11 +382,11 @@
 				</option>
 				<option>
 					<name>Tripp-Lite AVR USB</name>
-					<value>newhidups15</value>
+					<value>usbhid-ups15</value>
 				</option>
 				<option>
 					<name>Tripp-Lite OMNI USB</name>
-					<value>newhidups16</value>
+					<value>usbhid-ups16</value>
 				</option>
 				<option>
 					<name>Tripp-Lite OMNIVUS USB</name>
