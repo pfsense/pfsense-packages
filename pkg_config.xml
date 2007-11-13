@@ -613,6 +613,23 @@
       <config_file>http://www.pfsense.com/packages/config/routed/routed.xml</config_file>
       <configurationfile>routed.xml</configurationfile>
     </package>
+    <package>
+  	  <name>squidGuard</name> 
+  	  <descr>
+          High perfomance web proxy filter. 
+          Required proxy squid-2.6.5 (or hi). 
+	  </descr> 
+  	  <website>http://www.squidGuard.com/</website> 
+  	  <maintainer>dv_serg@mail.ru</maintainer> 
+  	  <category>Network Management</category> 
+  	  <version>1.2.0_1</version> 
+  	  <status>Beta</status> 
+  	  <required_version>1.1</required_version> 
+  	  <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url> 
+  	  <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package> 
+  	  <config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file> 
+  	  <configurationfile>squidguard.xml</configurationfile> 
+    </package>
   </packages>
 <ENDOFPACKAGES>
 </ENDOFPACKAGES>
@@ -660,6 +677,7 @@
       <configurationfile>postfix.xml</configurationfile>
     </package>
     <package>
+    <!-- 
       <name>squidGuard</name>
       <descr>High performance Web proxy Guard</descr>
       <website>http://www.squidguard.org/</website>
@@ -672,6 +690,7 @@
       <config_file>http://www.pfsense.com/packages/config/squidGuard.xml</config_file>
       <configurationfile>squidGuard.xml</configurationfile>
     </package>
+    --> 
     <package>
       <name>pfstat</name>
       <website>http://www.benzedrine.cx/pfstat.html</website>
