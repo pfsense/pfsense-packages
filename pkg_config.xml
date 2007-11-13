@@ -676,8 +676,8 @@
       <config_file>http://www.pfsense.com/packages/config/postfix.xml</config_file>
       <configurationfile>postfix.xml</configurationfile>
     </package>
+    <!--
     <package>
-    <!-- 
       <name>squidGuard</name>
       <descr>High performance Web proxy Guard</descr>
       <website>http://www.squidguard.org/</website>
