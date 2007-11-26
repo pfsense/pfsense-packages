@@ -61,7 +61,7 @@
 		</field>
 		<field>
 			<fieldname>driver</fieldname>
-			<fielddescr>Driver</fieldescr>
+			<fielddescr>Driver</fielddescr>
 			<description>Set the LCD driver LCDproc should use.</description>
 			<type>select</type>
 			<options>
