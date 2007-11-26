@@ -1,7 +1,7 @@
 <?php
 
 /*
-        squid.inc
+        lcdproc.inc
         Copyright (C) 2007 Seth Mos <seth.mos@xs4all.nl>
         All rights reserved.
 
