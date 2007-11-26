@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<title>Services: LCDproc</title>
+	<namelcdproc</name>
+	<version>0.5.2_1-p1</version>
+	<savetext>Save</savetext>
+	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
+	<menu>
+		<name>LCDproc</name>
+		<tooltiptext>Set LCDproc settings such as display driver and com port</tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=lcdproc.xml&amp;id=0</url>
+	</menu>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/lcdproc/lcdproc.inc</item>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	</additional_files_needed>
+	<service>
+		<name>lcdproc</name>
+		<rcfile>lcdproc.sh</rcfile>
+		<executable>lcdproc</executable>
+	</service>
+	<tabs>
+		<tab>
+			<text>LCDproc Settings</text>
+			<url>/pkg_edit.php?xml=lcdproc.xml&amp;id=0</url>
+			<active/>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fielddescr>Enable LCDproc</fielddescr>
+			<fieldname>enable</fieldname>
+			<type>checkbox</type>
+		</field>			
+		<field>
+			<fieldname>comport</fieldname>
+			<fielddescr>Com Port</fieldescr>
+			<description>Set the com port LCDproc should use.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<value>none</value>
+					<name>none</name>
+				</option>
+			</options>
+			<options>
+				<option>
+					<value>com2</value>
+					<name>Serial Com port 2</name>
+				</option>
+			</options>
+			<options>
+				<option>
+					<value>ucom1</value>
+					<name>USB Com port 1</name>
+				</option>
+			</options>
+			<options>
+				<option>
+					<value>ucom2</value>
+					<name>USB Com port 2</name>
+				</option>
+			</options>
+			<default_value>0</default_value>
+		</field>
+	</fields>
+	<custom_php_command_before_form>
+		before_form_lcdproc(&amp;$pkg);
+	</custom_php_command_before_form>
+	<custom_php_validation_command>
+		validate_form_lcdproc($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		sync_package_lcdproc();
+	</custom_php_resync_config_command>
+</packagegui>
