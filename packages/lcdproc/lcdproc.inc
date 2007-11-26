@@ -1,11 +1,46 @@
 <?php
+
+/*
+        squid.inc
+        Copyright (C) 2007 Seth Mos <seth.mos@xs4all.nl>
+        All rights reserved.
+
+        Redistribution and use in source and binary forms, with or without
+        modification, are permitted provided that the following conditions are met:
+
+        1. Redistributions of source code must retain the above copyright notice,
+           this list of conditions and the following disclaimer.
+
+        2. Redistributions in binary form must reproduce the above copyright
+           notice, this list of conditions and the following disclaimer in the
+           documentation and/or other materials provided with the distribution.
+
+        THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+        INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+        AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+        AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+        OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+        SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+        INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+        CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+        ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+        POSSIBILITY OF SUCH DAMAGE.
+*/
+
 	require_once("config.inc");
 	require_once("functions.inc");
 
 	/* LCDproc */
+	define('LCDPROC_RCFILE', '/usr/local/etc/rc.d/lcdproc.sh');
+	define('LCDPROC_CONFIG','/usr/local/etc/LCDd.conf');
 
 	function lcdproc_notice ($msg) { syslog(LOG_NOTICE, "lcdproc: {$msg}"); }
 	function lcdproc_warn ($msg) { syslog(LOG_WARNING, "lcdproc: {$msg}"); }
+
+	function lcdproc_action ($action) {
+		if (file_exists(LCDPROC_RCFILE))
+			mwexec(LCDPROC_RCFILE.' '.$action);
+	}
 
 	function lcdproc_running () {
 		if((int)exec('pgrep lcdproc | wc -l') > 0)
@@ -60,13 +95,76 @@
 		config_lock();
 
 		$lcdproc_config = $config['installedpackages']['lcdproc']['config'][0];
-		$config_file = '/var/etc/lcdd.conf';
-
 
 		/* since config is written before this file invoked we don't need to read post data */
 		if($lcdproc_config['enable'] && ($lcdproc_config['comport'] != "none")) {
+			switch($lcdproc_config['comport']) {
+				case "com2":
+					$realport = "/dev/cua1";
+					break;
+				case "ucom1":
+					$realport = "/dev/cuaU0";
+					break;
+				case "ucom2":
+					$realport = "/dev/cuaU1";
+					break;
+				default:
+					lcdproc_warn("The selected com port is not valid!");
+					return;
+			}
+
 			$config_text = "[server]\n";
 			$config_text .= "Driver={$lcdproc_config[driver]}\n";
+			$config_text .= "Bind=127.0.0.1\n";
+			$config_text .= "Port=13666\n";
+			$config_text .= "ReportLevel=3\n";
+			$config_text .= "ReportToSyslog=yes\n";
+			$config_text .= "WaitTime=5\n";
+			$config_text .= "User=nobody\n";
+			$config_text .= "ServerScreen=0\n";
+			$config_text .= "Foreground=no\n";
+			$config_text .= "DriverPath=/usr/local/lib/lcdproc/\n";
+			$config_text .= "GoodBye=\"Thanks for using\"\n";
+			$config_text .= "GoodBye=\"    {$g['product']}     \"\n";
+			/* FIXME: Specific to the pyramid project */
+			$config_text .= "ToggleRotateKey=Enter\n";
+			$config_text .= "PrevScreenKey=Left\n";
+			$config_text .= "NextScreenKey=Right\n";
+			$config_text .= "ScrollUpKey=Up\n";
+			$config_text .= "ScrollDownKey=Down\n";
+			/* FIXME: pyramid test menu */
+			$config_text .= "[menu]\n";
+			$config_text .= "MenuKey=Escape\n";
+			$config_text .= "EnterKey=Enter\n";
+			$config_text .= "UpKey=Up\n";
+			$config_text .= "DownKey=Down\n";
+
+			/* lcdproc default driver definitions */
+			$config_text .= "[pyramid]\n";
+			$config_text .= "Device={$realport}\n";
+
+			/* generate rc file start and stop */
+			$stop = <<<EOD
+
+if [ `pgrep LCDd | wc -l` != 0  ]; then
+	/usr/bin/killall LCDd
+	while [ `pgrep LCDd | wc -l` != 0 ]; do
+		sleep 1
+	done
+fi
+
+EOD;
+			$start = $stop."\n\t/usr/local/sbin/LCDd -c ".LCDPROC_CONFIG;
+
+			/* write out the configuration */
+			conf_mount_rw();
+			lcdproc_write_config(LCDPROC_CONFIG, $config_text);
+			write_rcfile(array(
+					'file' => 'lcdproc.sh',
+					'start' => $start,
+					'stop' => $stop
+					));
+			conf_mount_ro();
 
 			/* if lcdproc not running start it */
 			if(!lcdproc_running()) {
@@ -80,20 +178,24 @@
 			}
 		}
 
-		if((! $lcdproc_config['comport']) || ($lcdproc_config['comport'] == "none")) {
+		if((! $lcdproc_config['driver']) || ($lcdproc_config['comport'] == "none")) {
 			/* no parameters user does not want lcdproc running */
 			/* lets stop the service and remove the rc file */
 
-			if(file_exists($config_file)) {
+			if(file_exists(LCDPROC_RCFILE)) {
 				if(!$lcdproc_config['enable']) {
 					lcdproc_notice('Stopping service: lcdproc disabled');
 				} else {
 					lcdproc_notice('Stopping service: no com port selected');
 				}
 				lcdproc_action('stop');
-				unlink($config_file);
+				conf_mount_rw();
+				unlink(LCDPROC_RCFILE);
+				unlink(LCDPROC_CONFIG);
+				conf_mount_ro();
 			}
 		}
 		config_unlock();
 	}
+
 ?>
