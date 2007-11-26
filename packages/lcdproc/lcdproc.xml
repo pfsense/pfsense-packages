@@ -44,20 +44,14 @@
 					<value>none</value>
 					<name>none</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>com2</value>
 					<name>Serial Com port 2</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>ucom1</value>
 					<name>USB Com port 1</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>ucom2</value>
 					<name>USB Com port 2</name>
@@ -75,236 +69,158 @@
 					<value>bayrad</value>
 					<name>bayrad</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>CFontz</value>
 					<name>CrystalFontz</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>CFontz633</value>
 					<name>CrystalFontz 633</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>CFontzPacket</value>
 					<name>CrystalFontz Packet</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>curses</value>
 					<name>curses</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>CwLnx</value>
 					<name>CwLnx</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>ea65</value>
 					<name>ea65</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>EyeBoxOne</value>
 					<name>EyeBoxOne</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>gl5</value>
 					<name>gl5</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>glcdlib</value>
 					<name>glcdlib</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>glk</value>
 					<name>glk</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>hd44780</value>
 					<name>hd44780</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>icp_a106</value>
 					<name>icp_a106</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>imon</value>
 					<name>imon</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>IOWarrior</value>
 					<name>IOWarrior</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>irman</value>
 					<name>irman</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>joy</value>
 					<name>joy</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>lb216</value>
 					<name>lb216</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>lcdm001</value>
 					<name>lcdm001</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>lcterm</value>
 					<name>lcterm</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>lirc</value>
 					<name>lirc</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>MD8800</value>
 					<name>MD8800</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>ms6931</value>
 					<name>ms6931</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>mtc_s16209x</value>
 					<name>mtc_s16209x</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>MtxOrb</value>
 					<name>MtxOrb</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>NoritakeVFD</value>
 					<name>NoritakeVFD</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>picolcd</value>
 					<name>picolcd</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>pyramid</value>
 					<name>pyramid</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>Sed1330</value>
 					<name>Sed1330</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>sed1520</value>
 					<name>sed1520</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>serialpos</value>
 					<name>serialpos</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>serialVFD</value>
 					<name>serialVFD</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>sli</value>
 					<name>sli</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>stv5730</value>
 					<name>stv5730</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>svga</value>
 					<name>svga</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>t6963</value>
 					<name>t6963</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>text</value>
 					<name>text</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>tyan</value>
 					<name>tyan</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>ula200</value>
 					<name>ula200</name>
 				</option>
-			</options>
-			<options>
 				<option>
 					<value>xosd</value>
 					<name>xosd</name>
