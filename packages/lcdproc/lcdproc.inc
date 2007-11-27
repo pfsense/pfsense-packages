@@ -140,8 +140,54 @@
 			$config_text .= "DownKey=Down\n";
 
 			/* lcdproc default driver definitions */
-			$config_text .= "[pyramid]\n";
-			$config_text .= "Device={$realport}\n";
+			switch($lcdproc_config[driver]) {
+				case "bayrad":
+					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Speed=9600\n";
+					break;
+				case "CFontz":
+					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Size=20x4\n";
+					$config_text .= "Contrast=350\n";
+					$config_text .= "Brightness=1000\n";
+					$config_text .= "OffBrightness=0\n";
+					$config_text .= "Speed=9600\n";
+					$config_text .= "NewFirmware=no\n";
+					$config_text .= "Reboot=no\n";
+					break;
+				case "CFontz633":
+					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Size=16x2\n";
+					$config_text .= "Contrast=350\n";
+					$config_text .= "Brightness=1000\n";
+					$config_text .= "OffBrightness=50\n";
+					$config_text .= "Speed=19200\n";
+					$config_text .= "NewFirmware=yes\n";
+					$config_text .= "Reboot=yes\n";
+					break;
+				case "CFontzPacket":
+					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Model=635\n";
+					$config_text .= "Size=20x4\n";
+					$config_text .= "Contrast=350\n";
+					$config_text .= "Brightness=1000\n";
+					$config_text .= "OffBrightness=50\n";
+					$config_text .= "Speed=115200\n";
+					$config_text .= "NewFirmware=yes\n";
+					$config_text .= "Reboot=yes\n";
+					break;
+				case "pyramid":
+					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "Device={$realport}\n";
+					break;
+				default:
+					lcdproc_warn("The chosen lcdproc driver is not a valid choice");
+					unset($lcdproc_config[driver]);
+			}
 
 			/* generate rc file start and stop */
 			$stop = <<<EOD
