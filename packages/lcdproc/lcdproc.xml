@@ -46,15 +46,15 @@
 				</option>
 				<option>
 					<value>com2</value>
-					<name>Serial Com port 2</name>
+					<name>Serial Com port 2 (/dev/cua1)</name>
 				</option>
 				<option>
 					<value>ucom1</value>
-					<name>USB Com port 1</name>
+					<name>USB Com port 1 (/dev/cuaU0)</name>
 				</option>
 				<option>
 					<value>ucom2</value>
-					<name>USB Com port 2</name>
+					<name>USB Com port 2 (/dev/cuaU1)</name>
 				</option>
 			</options>
 			<default_value>0</default_value>

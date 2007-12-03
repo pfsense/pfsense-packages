@@ -180,9 +180,33 @@
 					$config_text .= "NewFirmware=yes\n";
 					$config_text .= "Reboot=yes\n";
 					break;
+				case "curses":
+					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "Foreground=blue\n";
+					$config_text .= "Background=cyan\n";
+					$config_text .= "Backlight=red\n";
+					$config_text .= "Size=16x4\n";
+					$config_text .= "TopLeftX=7\n";
+					$config_text .= "TopLeftY=7\n";
+					$config_text .= "UseACS=no\n";
+					break;
+				case "CwLynx":
+					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "Model=12232\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Size=20x4\n";
+					$config_text .= "Speed=19200\n";
+					$config_text .= "Reboot=no\n";
+					break;
 				case "pyramid":
 					$config_text .= "[{$lcdproc_config[driver]}]\n";
 					$config_text .= "Device={$realport}\n";
+					break;
+				case "ea65":
+					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "OffBrightness=0\n";
+					$config_text .= "Brightness=500\n";
 					break;
 				default:
 					lcdproc_warn("The chosen lcdproc driver is not a valid choice");
