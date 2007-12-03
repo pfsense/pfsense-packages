@@ -250,10 +250,10 @@
       <name>snort</name>
       <descr>Snort is a libpcap-based packet sniffer/logger which can be used as a lightweight network intrusion detection system. It features rules based logging and can perform content searching/matching in addition to being used to detect a variety of other attacks and probes, such as buffer overflows, stealth port scans, CGI attacks, SMB probes, and much more.</descr>
       <category>Security</category>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
-      <depends_on_package>snort-2.6.1.3_2.tbz</depends_on_package>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/packages/All/</depends_on_package_base_url>
+      <depends_on_package>snort-2.7.0.1_1.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
-      <version>2.6.1.3_2</version>
+      <version>2.7.0.1_1</version>
       <required_version>1.0</required_version>
       <status>STABLE</status>
       <configurationfile>snort.xml</configurationfile>
