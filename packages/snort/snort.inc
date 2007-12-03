@@ -92,11 +92,10 @@ function sync_package_snort() {
 				$first = 1;
 			}
 		}
-	}
-	
-	if(!$ifaces_final) {
-		log_error("Snort will not start.  You must select an interface for it to listen on.");
-		return;
+		if(!$ifaces_final) {
+			log_error("Snort will not start.  You must select an interface for it to listen on.");
+			return;
+		}		
 	}
 	
 	/* create log directory */
