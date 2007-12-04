@@ -33,6 +33,8 @@
 	/* LCDproc */
 	define('LCDPROC_RCFILE', '/usr/local/etc/rc.d/lcdproc.sh');
 	define('LCDPROC_CONFIG','/usr/local/etc/LCDd.conf');
+	define('LCDPROC_PORT','localhost');
+	define('LCDPROC_PORT','13666');
 
 	function lcdproc_notice ($msg) { syslog(LOG_NOTICE, "lcdproc: {$msg}"); }
 	function lcdproc_warn ($msg) { syslog(LOG_WARNING, "lcdproc: {$msg}"); }
@@ -267,5 +269,30 @@ EOD;
 		}
 		config_unlock();
 	}
+
+	/* Connect to the LCDd port and interface with the LCD */
+	function send_lcd_commands($lcd_cmds) {
+		if(!is_array($lcd_cmds) || (empty($lcd_cmds))) {
+			lcdproc_warn("Failed to interpret lcd commands");
+			return;
+		}
+		$lcd = fsockopen(LCDPROC_HOST, LCDPROC_PORT, $errno, $errstr, 30);
+		if (!$lcd) {
+			lcdproc_warn("Failed to connect to LCDd process $errstr ($errno)");
+		} else {
+			foreach($lcd_cmds as $lcd_cmd) {
+				$cmd_output = "";
+				fwrite($lcd, $lcd_cmd);
+				while (!feof($lcd)) {
+					$cmd_output .= fgets($lcd, 128);
+				}
+				lcdproc_notice("LCDd output for cmd $lcd_cmd is: $cmd_output");
+				usleep(100);
+			}
+		}
+		fclose($lcd);
+	}
+
+
 
 ?>
