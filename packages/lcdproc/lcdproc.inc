@@ -276,7 +276,7 @@ EOD;
 			lcdproc_warn("Failed to interpret lcd commands");
 			return;
 		}
-		$lcd = fsockopen(LCDPROC_HOST, LCDPROC_PORT, $errno, $errstr, 30);
+		$lcd = fsockopen($LCDPROC_HOST, $LCDPROC_PORT, $errno, $errstr, 30);
 		if (!$lcd) {
 			lcdproc_warn("Failed to connect to LCDd process $errstr ($errno)");
 		} else {
@@ -289,8 +289,8 @@ EOD;
 				lcdproc_notice("LCDd output for cmd $lcd_cmd is: $cmd_output");
 				usleep(100);
 			}
+			fclose($lcd);
 		}
-		fclose($lcd);
 	}
 
 
