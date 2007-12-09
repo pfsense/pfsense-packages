@@ -643,6 +643,19 @@
   	  <config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file> 
   	  <configurationfile>squidguard.xml</configurationfile> 
     </package>
+	<package>
+		<name>Zabbix Agent</name>
+		<descr>Monitoring agent.</descr>
+		<category>Services</category>
+		<config_file>http://www.pfsense.com/packages/config/zabbix-agent.xml</config_file>
+		<version>0.1</version>
+		<status>Beta</status>
+		<required_version>1.2</required_version>
+		<configurationfile>zabbix-agent.xml</configurationfile>
+		<maintainer>Remco Verhoef</maintainer>
+		<depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
+		<depends_on_package>zabbix-agent-1.4.2,1.tbz</depends_on_package>
+	</package>
   </packages>
 <ENDOFPACKAGES>
 </ENDOFPACKAGES>
@@ -838,17 +851,4 @@
         <logfilename>spamd.log</logfilename>
       </logging>
     </package>
-	<package>
-		<name>Zabbix Agent</name>
-		<descr>Monitoring agent.</descr>
-		<category>Services</category>
-		<config_file>http://www.pfsense.com/packages/config/zabbix-agent.xml</config_file>
-		<version>0.1</version>
-		<status>Beta</status>
-		<required_version>1.2</required_version>
-		<configurationfile>zabbix-agent.xml</configurationfile>
-		<maintainer>Remco Verhoef</maintainer>
-        <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
-        <depends_on_package>zabbix-agent-1.4.2,1.tbz</depends_on_package>
-	</package>
 </pfsensepkgs>
