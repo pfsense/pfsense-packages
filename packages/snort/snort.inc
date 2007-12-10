@@ -354,10 +354,20 @@ output alert_unified: filename alert
 
 #Flow and stream
 preprocessor flow: stats_interval 0 hash 2
-preprocessor frag2
-preprocessor stream4: disable_evasion_alerts,detect_scans
 
-preprocessor stream4_reassemble: both, ports all
+preprocessor frag3_global: max_frags 8192
+preprocessor frag3_engine
+preprocessor frag3_engine: policy last detect_anomalies
+#preprocessor frag2
+#preprocessor frag2
+#preprocessor stream4: disable_evasion_alerts,detect_scans
+preprocessor stream5_global: max_tcp 8192, track_tcp yes, \
+track_udp yes, track_icmp yes
+preprocessor stream5_tcp: policy BSD, ports both all, use_static_footprint_sizes
+preprocessor stream5_udp
+preprocessor stream5_icmp
+
+#preprocessor stream4_reassemble: both, ports all
 
 #XLink2State mini proc
 #preprocessor xlink2state: ports { 25 691 }
@@ -386,7 +396,52 @@ preprocessor http_inspect_server: server default \
 #Other preprocs
 preprocessor rpc_decode: 111 32771
 preprocessor bo
-preprocessor telnet_decode
+
+
+
+dynamicpreprocessor directory /usr/local/lib/snort/dynamicpreprocessor/
+dynamicpreprocessor file /usr/local/lib/snort/dynamicpreprocessor/libsf_ftptelnet_preproc.so
+
+preprocessor ftp_telnet: global \
+inspection_type stateless
+preprocessor ftp_telnet_protocol: ftp server default \
+  ports { 21 } \
+  def_max_param_len 100 \
+  ftp_cmds { USER PASS ACCT CWD CDUP SMNT \
+    QUIT REIN PORT PASV TYPE STRU MODE RETR STOR STOU APPE ALLO REST \
+    RNFR RNTO ABOR DELE RMD MKD PWD LIST NLST SITE SYST STAT HELP NOOP } \
+  ftp_cmds { AUTH ADAT PROT PBSZ CONF ENC } \
+  ftp_cmds { FEAT OPTS } \
+  ftp_cmds { MDTM REST SIZE MLST MLSD } \
+  alt_max_param_len 0 { CDUP QUIT REIN PASV STOU ABOR PWD SYST NOOP } \
+  cmd_validity MODE < char SBC > \
+  cmd_validity STRU < char FRP > \
+  cmd_validity ALLO < int [ char R int ] > \
+  cmd_validity TYPE < { char AE [ char NTC ] | char I | char L [ number ] } > \
+  cmd_validity PORT < host_port > 
+
+preprocessor ftp_telnet_protocol: ftp client default \
+   max_resp_len 100
+
+#preprocessor telnet_decode
+
+
+dynamicpreprocessor file /usr/local/lib/snort/dynamicpreprocessor/libsf_smtp_preproc.so 
+
+
+preprocessor smtp: \
+  ports { 25 } \
+  inspection_type stateful \
+  normalize cmds \
+  normalize_cmds { EXPN VRFY RCPT } \
+  alt_max_command_line_len 260 { MAIL } \
+  alt_max_command_line_len 300 { RCPT } \
+  alt_max_command_line_len 500 { HELP HELO ETRN } \
+  alt_max_command_line_len 255 { EXPN VRFY }
+
+
+
+
 
 #sf Portscan
 preprocessor sfportscan: proto { all } \
