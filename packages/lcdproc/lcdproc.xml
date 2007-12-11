@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Services: LCDproc</title>
 	<name>lcdproc</name>
-	<version>0.5.2_1-p1</version>
+	<version>0.5.2_1-p2</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<menu>
@@ -13,6 +13,11 @@
 	</menu>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/lcdproc/lcdproc.inc</item>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/lcdproc/lcdproc_client.php</item>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>

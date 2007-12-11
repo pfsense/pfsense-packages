@@ -1,5 +1,5 @@
 <?php
-
+/* $Id$ */
 /*
         lcdproc.inc
         Copyright (C) 2007 Seth Mos <seth.mos@xs4all.nl>
@@ -32,8 +32,9 @@
 
 	/* LCDproc */
 	define('LCDPROC_RCFILE', '/usr/local/etc/rc.d/lcdproc.sh');
+	define('LCDPROC_CLIENT', '/tmp/lcdprocc.sh');
 	define('LCDPROC_CONFIG','/usr/local/etc/LCDd.conf');
-	define('LCDPROC_PORT','localhost');
+	define('LCDPROC_HOST','localhost');
 	define('LCDPROC_PORT','13666');
 
 	function lcdproc_notice ($msg) { syslog(LOG_NOTICE, "lcdproc: {$msg}"); }
@@ -45,7 +46,7 @@
 	}
 
 	function lcdproc_running () {
-		if((int)exec('pgrep lcdproc | wc -l') > 0)
+		if((int)exec('pgrep LCDd | wc -l') > 0)
 			return true;
 		return false;
 	}	
@@ -216,20 +217,39 @@
 			}
 
 			/* generate rc file start and stop */
+			$client_script = <<<EOD
+#!/bin/sh
+
+counter=1
+while [ "$counter" -ne 0 ]
+do
+	/usr/local/bin/php -f /usr/local/pkg/lcdproc_client.php
+	sleep 10
+done
+
+EOD;
+
+			/* generate rc file start and stop */
 			$stop = <<<EOD
 
 if [ `pgrep LCDd | wc -l` != 0  ]; then
 	/usr/bin/killall LCDd
+	/usr/bin/killall lcdprocc.sh
 	while [ `pgrep LCDd | wc -l` != 0 ]; do
+		sleep 1
+	done
+	while [ `pgrep lcdprocc.sh | wc -l` != 0 ]; do
 		sleep 1
 	done
 fi
 
 EOD;
-			$start = $stop."\n\t/usr/local/sbin/LCDd -c ".LCDPROC_CONFIG;
+			$start = $stop ."\n";
+			$start .= "\t/usr/local/sbin/LCDd -c ". LCDPROC_CONFIG ."\n";
 
 			/* write out the configuration */
 			conf_mount_rw();
+			lcdproc_write_config(LCDPROC_CLIENT, $client_script);
 			lcdproc_write_config(LCDPROC_CONFIG, $config_text);
 			write_rcfile(array(
 					'file' => 'lcdproc.sh',
@@ -263,36 +283,12 @@ EOD;
 				lcdproc_action('stop');
 				conf_mount_rw();
 				unlink(LCDPROC_RCFILE);
+				unlink(LCDPROC_CLIENT);
 				unlink(LCDPROC_CONFIG);
 				conf_mount_ro();
 			}
 		}
 		config_unlock();
 	}
-
-	/* Connect to the LCDd port and interface with the LCD */
-	function send_lcd_commands($lcd_cmds) {
-		if(!is_array($lcd_cmds) || (empty($lcd_cmds))) {
-			lcdproc_warn("Failed to interpret lcd commands");
-			return;
-		}
-		$lcd = fsockopen($LCDPROC_HOST, $LCDPROC_PORT, $errno, $errstr, 30);
-		if (!$lcd) {
-			lcdproc_warn("Failed to connect to LCDd process $errstr ($errno)");
-		} else {
-			foreach($lcd_cmds as $lcd_cmd) {
-				$cmd_output = "";
-				fwrite($lcd, $lcd_cmd);
-				while (!feof($lcd)) {
-					$cmd_output .= fgets($lcd, 128);
-				}
-				lcdproc_notice("LCDd output for cmd $lcd_cmd is: $cmd_output");
-				usleep(100);
-			}
-			fclose($lcd);
-		}
-	}
-
-
 
 ?>
