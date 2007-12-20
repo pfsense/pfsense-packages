@@ -1,8 +1,8 @@
 <?php
 # ------------------------------------------------------------------------------
-# squidguard_configurator.inc
-# (C) 2006, 2007 Serg Dvoriancev
-/*      Redistribution and use in source and binary forms, with or without
+/*        squidguard_configurator.inc
+        (C)2006 Serg Dvoriancev
+        Redistribution and use in source and binary forms, with or without
         modification, are permitted provided that the following conditions are met:
 
         1. Redistributions of source code must retain the above copyright notice,
@@ -221,6 +221,7 @@ define('SQUIDGUARD_WORKDIR_DEF',       '/usr/local/etc/squidGuard');
 define('SQUIDGUARD_BINPATH_DEF',       '/usr/local/bin');
 define('SQUIDGUARD_DBHOME_DEF',        '/var/db/squidGuard');
 define('BLK_LOCALFILE',                '/tmp/sg_blacklists.tar');
+define('DB_REBUILD_SH',                '/tmp/squidGuard_db_rebuild.sh');
 
 # ------------------------------------------------------------------------------
 // debug options
@@ -598,9 +599,12 @@ function sg_reconfigure_user_db() {
              set_file_access($dbhome, OWNER_NAME, 0755);
 
              // 5. rebuild user db
-             //$dst_names
+             // $dst_names; create array of names
+             $db_names = Array();
              foreach($dst_names as $dname)
-                     sg_full_rebuild_db($dname);
+                     $db_names[] = $dname;
+#                     sg_full_rebuild_db($dname);
+             sg_full_rebuild_db($db_names);
 
          } else
              sg_addlog("sg_reconfigure_user_db: stopped - destinations list empty");
@@ -670,21 +674,40 @@ function sg_full_rebuild_db($dblist='') {
 
          // rebuild squidGuard DB (without waite)
          if (file_exists($sg_cfgfile)) {
+
+             // rebuild via sh script
+             $sh_scr = Array();
+             $sh_scr[] = "#!/bin/sh";
+             $sh_scr[] = "cd /var/db/squidGuard";
+
              if (empty($dblist)) {
                  // full rebuild
                  $cmd = $squidguard_config[FLD_BINPATH] . '/squidGuard -c $sg_cfgfile -C all';
-                 mwexec_bg($cmd);
+#                 mwexec_bg($cmd); // by sh script
+                 $sh_scr[] = $cmd;
                  sg_addlog("sg_rebuild_db: start full rebuild db");
              } else {
                  // partually rebuild
-                 $cmd_domains = $squidguard_config[FLD_BINPATH] . "/squidGuard -c $sg_cfgfile -C $dblist/domains";
-                 $cmd_urls = $squidguard_config[FLD_BINPATH] . "/squidGuard -c $sg_cfgfile -C $dblist/urls";
-                 mwexec_bg($cmd_domains);
-                 mwexec_bg($cmd_urls);
-                 sg_addlog("sg_rebuild_db: start rebuild DB '$dblist'");
+                 if (is_array($dblist))
+                     foreach($dblist as $dbl) {
+                             $sh_scr[] = $squidguard_config[FLD_BINPATH] . "/squidGuard -c $sg_cfgfile -C $dbl/domains";
+                             $sh_scr[] = $squidguard_config[FLD_BINPATH] . "/squidGuard -c $sg_cfgfile -C $dbl/urls";
+                             sg_addlog("sg_rebuild_db: start rebuild DB '$dbl'");
+                     }
              }
              // update .diff files
-#            mwexec_bg($squidguard_config[FLD_BINPATH] . '/squidGuard -c $sg_cfgfile -u')*/)
+#            mwexec_bg($squidguard_config[FLD_BINPATH] . '/squidGuard -c $sg_cfgfile -u')*/) // by sh script
+
+             // change db owner's after rebuild
+             $sh_scr[] = "chown -R -v " . OWNER_NAME . " " . $squidguard_config[FLD_DBHOME];
+
+             // restart squid for take effects
+             $sh_scr[] = "/usr/local/sbin/squid -k reconfigure";
+
+             // store & exec ssh
+             $sh_scr = implode("\n", $sh_scr);
+             file_put_contents(DB_REBUILD_SH, $sh_scr);
+             mwexec_bg(DB_REBUILD_SH);
          } else {
              sg_addlog("sg_rebuild_db: error, config file '$sg_cfgfile' not found");
          }
