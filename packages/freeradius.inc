@@ -251,6 +251,36 @@ modules {
 		allowed-servicetype = Framed-User
 		cache-size = 5000
 	}
+	
+	counter weekly {
+		filename = \${raddbdir}/db.weekly
+		key = User-Name
+		count-attribute = Acct-Session-Time
+		reset = weekly
+		counter-name = Weekly-Session-Time
+		check-name = Max-Weekly-Session
+		cache-size = 5000
+	}
+	
+  counter monthly {
+		filename = \${raddbdir}/db.monthly
+		key = User-Name
+		count-attribute = Acct-Session-Time
+		reset = monthly
+		counter-name = Monthly-Session-Time
+		check-name = Max-Monthly-Session
+		cache-size = 5000
+	}
+
+	counter forever {
+		filename = \${raddbdir}/db.forever
+		key = User-Name
+		count-attribute = Acct-Session-Time
+		reset = never
+		counter-name = Forever-Session-Time
+		check-name = Max-Forever-Session
+		cache-size = 5000
+	}
  
 	always fail {
 		rcode = fail
@@ -298,7 +328,10 @@ modules {
 instantiate {
 	exec
 	expr
-	#daily
+	daily
+  weekly
+  monthly
+  forever
 }
  
 authorize {
@@ -316,7 +349,10 @@ authorize {
 	#sql
 	#etc_smbpasswd
 	#ldap
-	#daily
+	daily
+	weekly
+	monthly
+	forever
 	#checkval
 }
  
@@ -350,7 +386,10 @@ preacct {
  
 accounting {
 	detail
-	#daily
+	daily
+	weekly
+	monthly
+	forever
 	unix
 	radutmp
 	#sradutmp
@@ -398,8 +437,43 @@ function freeradius_users_resync() {
 	$conf = '';
 	$users = $config['installedpackages']['freeradius']['config'];
 	if (is_array($users)) {
-		foreach ($users as $user)
-			$conf .= "{$user['username']}\tUser-Password == \"{$user['password']}\"\n";
+		foreach ($users as $user) {
+			$username = $user['username'];
+			$password = $user['password'];
+      $multiconnet = $user['multiconnet'];
+			$ip = $user['ip'];
+                  $x=$user['expiration'];
+                  $sessiontime=$user['sessiontime'];
+                  $onlinetime=$user['onlinetime'];
+                  $atrib=''; 
+                  $head="$username User-Password == ".'"'.$password.'" ';
+                        if ($multiconnect <> '')
+                        {
+                        $head .=", Simultaneous-Use += $multiconnet";
+                        }
+                        if ($x <> '')
+                        {
+                        $head .=", Expiration := ".'"'.$x.'"';
+                        }
+                        if ($ip <> '') 
+                        {
+                        $atrib .="\r\n\tFramed-IP-Address = $ip,";
+                        }
+                        if ($sessiontime <> '')
+                        {
+                        $atrib .="\r\n\tSession-Timeout := $sessiontime,";
+                        }
+                        if ($onlinetime <> '')
+                        {
+                        $head .=", Login-Time := ". '"' . $onlinetime .'"';
+                        }
+                        
+                        $conf .= <<<EOD
+$head 
+	$atrib
+
+EOD;
+		}
 	}
 	$filename = RADDB . '/users';
 	file_put_contents($filename, $conf);
