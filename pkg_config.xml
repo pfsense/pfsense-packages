@@ -260,7 +260,7 @@
     </package>
     <package>
       <name>miniupnpd</name>
-      <descr>Emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP Internet
+      <descr>WARNING! Do not install on 1.2, it's already included. Emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP Internet
       Gateway Device specification (IGD) and allows UPnP aware clients, such as MSN Messenger to
       work properly from behind a NAT firewall. WARNING! Do not install on 1.2, it's already included.</descr>
       <website>http://miniupnp.free.fr/</website>
