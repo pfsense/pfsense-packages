@@ -14,51 +14,49 @@
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
 
-	<tabs>
-		<tab>
-			<text>General settings</text>
-			<url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Default</text>
-			<url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>ACL</text>
-			<url>/pkg.php?xml=squidguard_acl.xml</url>
-			<active/>
-		</tab>
-		<tab>
-			<text>Sources</text>
-			<url>/pkg.php?xml=squidguard_src.xml</url>
-		</tab>
-		<tab>
-			<text>Destinations</text>
-			<url>/pkg.php?xml=squidguard_dest.xml</url>			
-		</tab>
-		<tab>
-			<text>Times</text>
-			<url>/pkg.php?xml=squidguard_time.xml</url>
-		</tab>
-		<tab>
-			<text>Rewrites</text>
-			<url>/pkg.php?xml=squidguard_rewr.xml</url>
-		</tab>
-		<tab>
-			<text>Log</text>
-			<url>/pkg_edit.php?xml=squidguard_log.xml</url>
-		</tab>
-	</tabs>
+        <tabs>
+                <tab>
+                        <text>General settings</text>
+                        <url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
+                </tab>
+                <tab>
+                        <text>Default</text>
+                        <url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
+                </tab>
+                <tab>
+                        <text>ACL</text>
+                        <url>/pkg.php?xml=squidguard_acl.xml</url>
+                        <active/>
+                </tab>
+                <tab>
+                        <text>Destinations</text>
+                        <url>/pkg.php?xml=squidguard_dest.xml</url>
+                </tab>
+                <tab>
+                        <text>Times</text>
+                        <url>/pkg.php?xml=squidguard_time.xml</url>
+                </tab>
+                <tab>
+                        <text>Rewrites</text>
+                        <url>/pkg.php?xml=squidguard_rewr.xml</url>
+                </tab>
+                <tab>
+                        <text>Log</text>
+                        <url>/pkg_edit.php?xml=squidguard_log.xml</url>
+                </tab>
+        </tabs>
 	
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Disable</fielddescr>
 			<fieldname>disabled</fieldname>
 		</columnitem>
+<!--
 		<columnitem>
 			<fielddescr>Source</fielddescr>
 			<fieldname>source</fieldname>
 		</columnitem>
+-->
 		<columnitem>
 			<fielddescr>Destinations</fielddescr>
 			<fieldname>dest</fieldname>
@@ -88,12 +86,66 @@
 			<description>Check this for disable this ACL rule.</description>
 			<type>checkbox</type>
 		</field>
+<!--		
 		<field>
 			<fielddescr>Source name</fielddescr>
 			<fieldname>source</fieldname>
 			<description>Select source name here (required). Any ACL must have unique source name.</description>
 			<required/>
 			<type>select</type>
+		</field>
+-->
+		<field>
+			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
+			<description>
+				You can enter name here. Name consist minimum 2 symbols, first from which letter. &lt;br&gt;
+				All other symbols is [a-Z_0-9]. Source name must be &lt;b&gt;unique&lt;/b&gt; .
+			</description>
+			<type>input</type>
+			<required/>
+			<size>100</size>
+		</field>
+		<field>
+			<fielddescr>Order</fielddescr>
+			<fieldname>order</fieldname>
+			<description>
+				Order source in list. &lt;br&gt;
+				&lt;b&gt;Note:&lt;/b&gt; &lt;br&gt;
+				Sources order have very high importance. Sources are evaluated on a first-match basis. &lt;br&gt;
+				If your sources have an overlaying ranges, then act will be first in list. &lt;br&gt;
+				&lt;b&gt;For example:&lt;/b&gt; &lt;br&gt;
+				Wrong order:
+				First source entry is the range 10.0.0.0/24 and second entry is 10.0.0.15 (or 10.0.0.15/32 ) &lt;br&gt;
+				Right order:
+				First source entry is the single ip 10.0.0.15 (or 10.0.0.15/32 ) then the overlaying range 10.0.0.0/24 &lt;br&gt;
+			</description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
+			<fielddescr>Source IP addresses</fielddescr>
+			<fieldname>iplist</fieldname>
+			<description>
+				Enter source IP addresses here with space(' ') divider.
+				IP addresses must have format:&lt;br&gt;
+				single example: '192.168.0.1' &lt;br&gt;
+				range examples: '192.168.0.0/24', '192.168.1.0/255.255.255.0', '192.168.1.1-192.168.1.10'
+			</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>3</rows>
+		</field>
+		<field>
+			<fielddescr>Source Domains</fielddescr>
+			<fieldname>domains</fieldname>
+			<description>
+				Enter source domains names here with space(' ') divider.
+				Example: &lt;b&gt;'foo.bar'&lt;/b&gt; match &lt;b&gt;'foo.bar'&lt;/b&gt; or &lt;b&gt;'*.foo.bar'&lt;/b&gt;.
+			</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>3</rows>
 		</field>
 		<field>
 			<fielddescr>Time</fielddescr>
@@ -106,29 +158,33 @@
 			<fieldname>dest</fieldname>
 			<description></description>
 			<type>input</type>
-			<size>114</size>
+			<size>100</size>
 		</field>
 		<field>
 			<fielddescr>Redirect</fielddescr>
 			<fieldname>redirect</fieldname>
 			<description>
-                         Enter redirection URL or Error page code for this rule, or leave blank. 
-                         Supported error page codes: 403, 404, 410.
-                     </description>
+				Enter redirection URL, Tag or Error page code for this rule, or leave blank. &lt;br&gt;
+				Supported URL's: 'http://myurl', 'https://myurl'. &lt;br&gt;
+				Supported tags: 'blank', 'blank_img'. &lt;br&gt;
+				Supported error page codes: 3xx, 4xx, 5xx. Format: 'code' or 'code[space]reason message'.
+			</description>
 			<type>textarea</type>
-			<cols>70</cols>
-                     <rows>5</rows>
+			<cols>65</cols>
+			<rows>2</rows>
 		</field>
 		<field>
 			<fielddescr>Overtime redirect</fielddescr>
 			<fieldname>overredirect</fieldname>
 			<description>
-                         Enter redirection URL or Error page code for this rule, or leave blank. 
-                         Supported error page codes: 403, 404, 410.
-                     </description>
+				Enter redirection URL, Tag or Error page code for this rule, or leave blank. &lt;br&gt;
+				Supported URL's: 'http://myurl', 'https://myurl'. &lt;br&gt;
+				Supported tags: 'blank', 'blank_img'. &lt;br&gt;
+				Supported error page codes: 3xx, 4xx, 5xx. Format: 'code' or 'code[space]reason message'.
+			</description>
 			<type>textarea</type>
-			<cols>70</cols>
-            <rows>5</rows>
+			<cols>65</cols>
+            <rows>2</rows>
 		</field>
 		<field>
 			<fielddescr>Rewrite</fielddescr>
@@ -147,7 +203,7 @@
 			<fieldname>description</fieldname>
 			<description>You may enter a description here for your reference (not parsed).</description>
 			<type>input</type>
-			<size>114</size>
+			<size>100</size>
 		</field>
 	</fields>
 
@@ -158,11 +214,14 @@
 		squidguard_before_form_acl(&amp;$pkg);
 	</custom_php_command_before_form>
 	<custom_php_after_form_command> 
-               squidGuard_print_javascript();
+		squidGuard_print_javascript();
 	</custom_php_after_form_command>
 	<custom_php_resync_config_command>
-//		squidguard_resync_time();
+		squidguard_resync_acl();
 	</custom_php_resync_config_command>
+	<custom_delete_php_command>
+		squidguard_resync_acl();
+	</custom_delete_php_command>
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_add_php_command_late>

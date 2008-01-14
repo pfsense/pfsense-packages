@@ -28,10 +28,6 @@
 			<url>/pkg.php?xml=squidguard_acl.xml</url>
 		</tab>
 		<tab>
-			<text>Sources</text>
-			<url>/pkg.php?xml=squidguard_src.xml</url>
-		</tab>
-		<tab>
 			<text>Destinations</text>
 			<url>/pkg.php?xml=squidguard_dest.xml</url>			
 		</tab>
@@ -131,7 +127,7 @@
 	</fields>
 	
 	<custom_php_after_form_command> 
-              squidGuard_print_javascript();
+		squidGuard_print_javascript();
 	</custom_php_after_form_command>
 	<custom_php_validation_command>
 		squidguard_validate_times(&amp;$_POST, &amp;$input_errors);

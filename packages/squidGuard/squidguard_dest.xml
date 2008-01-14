@@ -28,10 +28,6 @@
 			<url>/pkg.php?xml=squidguard_acl.xml</url>
 		</tab>
 		<tab>
-			<text>Sources</text>
-			<url>/pkg.php?xml=squidguard_src.xml</url>
-		</tab>
-		<tab>
 			<text>Destinations</text>
 			<url>/pkg.php?xml=squidguard_dest.xml</url>			
 			<active/>
@@ -128,12 +124,14 @@
 			<fielddescr>Redirect</fielddescr>
 			<fieldname>redirect</fieldname>
 			<description>
-                         Enter redirection URL or Error page code for this rule, or leave blank. 
-                         Supported error page codes: 403, 404, 410.
-                     </description>
+				Enter redirection URL, Tag or Error page code for this rule, or leave blank. &lt;br&gt;
+				Supported URL's: 'http://myurl', 'https://myurl'. &lt;br&gt;
+				Supported tags: 'blank', 'blank_img'. &lt;br&gt;
+				Supported error page codes: 3xx, 4xx, 5xx. Format: 'code' or 'code[space]reason message'.
+			</description>
 			<type>textarea</type>
 			<cols>60</cols>
-                     <rows>5</rows>
+			<rows>2</rows>
 		</field>
 		<field>
 			<fielddescr>Enable log</fielddescr>
@@ -158,6 +156,6 @@
 //		squidguard_resync_time();
 	</custom_php_resync_config_command>
 	<custom_php_after_form_command> 
-               squidGuard_print_javascript();
+		squidGuard_print_javascript();
 	</custom_php_after_form_command>
 </packagegui>

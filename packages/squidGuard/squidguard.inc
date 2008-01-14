@@ -1,4 +1,5 @@
 <?php
+
 # ------------------------------------------------------------------------------
 # squidguard.inc
 # (C)2006, 2007 Serg Dvoriancev
@@ -130,6 +131,18 @@ function squidguard_validate_acl($post, $input_errors) {
         $deny_over = array();
         $pass_over_val = '';
 
+        // check name ('source')
+        $name = trim($post[FLD_NAME]);
+        if(!empty($name)) {
+            $err = check_name($name);        // validate name content
+            if (!empty($err))
+                $input_errors[] = $err;
+
+            // check unique name
+            if (!check_unique_name(MODULE_ACL, $name))
+                $input_errors[] = "Name '$name' already exists";
+        }
+
         // store destinations to 'dest' value
         foreach ($post as $key => $val) {
                 if (substr_count($key, PREFLD_UPTIME) != 0) {
@@ -166,7 +179,7 @@ function squidguard_validate_acl($post, $input_errors) {
                 else $pass_over_val .= " $key";
         }
 
-        // !ATTENTION! on pfSense XML config must be must(shall) be '!all' instead of 'none' - it is a must for correct work GUI
+        // !ATTENTION! on pfSense XML config must be must(shell) be '!all' instead of 'none' - it is a must for correct work GUI
 
         // if not exists key 'all', then add 'none' - default 'deny all'
         if ((substr_count($pass_up_val, 'all') == 0)) {
@@ -311,6 +324,57 @@ function squidguard_resync() {
 }
 
 // -----------------------------------------------------------------------------
+// squidguard_resync_acl
+// -----------------------------------------------------------------------------
+function squidguard_resync_acl() {
+       global $config;
+       $conf = $config['installedpackages'][MODULE_ACL]['config'];
+       $id = $_GET['id'];
+       if (!$id)
+           $id = $_POST['id'];
+
+       // --- sources ---
+       // move current id by order
+       if (($id != '') and is_array($conf) and ($id !== intval($conf[$id]['order']))) {
+           // copy current item to temp and remove it's from list
+           $src_new = array();
+           $src_cur = $conf[$id];
+           unset ($conf[$id]);
+
+           // rebuild list and insert current item by order
+           $i=0;
+           foreach($conf as $src) {
+                   if (intval($src_cur['order']) === $i) {
+                       $src_new[] = $src_cur;
+                       unset($src_cur);
+                       $i++;
+                   }
+                   $src_new[] = $src;
+                   $i++;
+           }
+           // if current item not inserted - insert him to the end
+           if (isset($src_cur)) {
+               $src_new[] = $src_cur;
+               unset($src_cur);
+           }
+
+           // renew order values
+           foreach($src_new as $key => $src) {
+                   $src_new[$key]['order'] = $key;
+           }
+
+           unset ($config['installedpackages'][MODULE_ACL]['config']);
+           $config['installedpackages'][MODULE_ACL]['config'] = $src_new;
+           write_config('Update squidguardacl config');
+       } else if (($_GET['act'] === 'del') or ($_POST['act'] === 'del')) {
+           // update order on delete item
+           foreach($config['installedpackages'][MODULE_ACL]['config'] as $key => $src)
+                   $config['installedpackages'][MODULE_ACL]['config'][$key]['order'] = $key;
+           write_config('Update squidguardsrc config');
+       }
+}
+
+// -----------------------------------------------------------------------------
 // squidguard_resync_src
 // -----------------------------------------------------------------------------
 function squidguard_resync_src() {
@@ -381,7 +445,7 @@ function get_pkg_items_list($pkg_gui_name, $fieldname) {
 # ==============================================================================
 
 // -----------------------------------------------------------------------------
-// squidguard_before_form_src
+// squidguard_before_form_src -- ### will deleted ###
 // -----------------------------------------------------------------------------
 function squidguard_before_form_src($pkg) {
          global $config;
@@ -394,7 +458,7 @@ function squidguard_before_form_src($pkg) {
                                       title='move up' width='17' height='17' border='0' onclick='on_moveup()'>";
                          $img_down = "<img src='./themes/{$g['theme']}/images/icons/icon_down.gif'
                                       title='move down' width='17' height='17' border='0' onclick='on_movedown()'>";
-                         $s = "<b>Move to:</b> $img_up $img_down <br>" . $fld['description'];
+                         $s = "$img_up $img_down <br> <b>Move to:</b> " . $fld['description'];
                          $fld['description'] = $s;
                   }
                   $i++;
@@ -461,6 +525,7 @@ function squidguard_before_form($pkg) {
 // -----------------------------------------------------------------------------
 function squidguard_before_form_acl($pkg) {
         global $config;
+        global $g;
         $current_id = '';
 
         $sources      = '';
@@ -479,6 +544,22 @@ function squidguard_before_form_acl($pkg) {
             $current_id = $_POST['id'];
         if ($current_id == '')
             $current_id = 0;
+
+        // 'source' part of 'acl' page
+        $i=0;
+        foreach($pkg['fields']['field'] as $field) {
+                if ($field['fieldname'] == 'order') {
+                        $fld = &$pkg['fields']['field'][$i];
+                        $img_up   = "<img src='./themes/{$g['theme']}/images/icons/icon_up.gif'
+                                     title='move up' width='17' height='17' border='0' onclick='on_moveup()'>";
+                        $img_down = "<img src='./themes/{$g['theme']}/images/icons/icon_down.gif'
+                                     title='move down' width='17' height='17' border='0' onclick='on_movedown()'>";
+                        $s = "<b>Move to:</b> $img_up $img_down <br>" . $fld['description'];
+                        $fld['description'] = $s;
+                 }
+                 $i++;
+        }
+        unset ($i);
 
         // sources
         $sources = $config['installedpackages']['squidguardsrc']['config'];
@@ -615,7 +696,7 @@ function squidguard_before_form_log($pkg) {
         $i=0;
         $move_pos = 0;
         $move_step = 50;
-
+return;
         foreach($pkg['fields']['field'] as $field) {
                 if ($field['fieldname'] == 'logtype') {
                         $slog = '';
@@ -748,7 +829,7 @@ function make_grid_general_items($id = '')
             if ($config['installedpackages']['squidguardgeneral']['config'][0]['view_gui_log'] == 'on') {
                 $log_content = sg_getlog(50);
                 $log_content = str_replace("\n","<br>", $log_content);
-                $res .= "<tr bgcolor='#dddddd'><td><font size='-1'><b>Web GUI log (Last 50)</b></font></td></tr>";
+                $res .= "<tr bgcolor='#dddddd'><td><font size='-1'><b>Web GUI log (Latest 50)</b></font></td></tr>";
                 $res .= "<tr bgcolor='#dddddd'><td vAlign=top width='100%'><font size='-2'>$log_content</font></td></tr>";
             }
         }
@@ -999,6 +1080,31 @@ function squidGuard_print_javascript() {
             $javascript .= "\n<script language='JavaScript'>";
             $javascript .= "\n<!--";
             $javascript .= "\n    document.iform.dest.disabled=1;";
+            // source JS part
+            $javascript .= "\n    function on_updatecontrols() {";
+            $javascript .= "\n        document.iform.elements['order'].disabled = 0;";
+            $javascript .= "\n        document.iform.elements['order'].onfocus = on_orderfocus;";
+            $javascript .= "\n    }";
+            $javascript .= "\n    function on_orderfocus() {";
+            $javascript .= "\n        document.iform.elements['order'].blur();";
+            $javascript .= "\n    }";
+            $javascript .= "\n    function on_moveup() {";
+            $javascript .= "\n        var order = parseInt(document.iform.elements['order'].value)";
+            $javascript .= "\n        if (order > 0)";
+            $javascript .= "\n             order = order - 1;";
+            $javascript .= "\n        else order = 0;";
+            $javascript .= "\n        document.iform.elements['order'].value = order;";
+            $javascript .= "\n    }";
+            $javascript .= "\n    function on_movedown() {";
+            $javascript .= "\n        var order = parseInt(document.iform.elements['order'].value)";
+            $javascript .= "\n        if (order >= 0)";
+            $javascript .= "\n             order = order + 1;";
+            $javascript .= "\n        else order = 0;";
+            $javascript .= "\n        document.iform.elements['order'].value = order;";
+            $javascript .= "\n    }";
+            $javascript .= "\n    on_updatecontrols();";
+            $javascript .= "\n    ";
+            // end source JS part
             $javascript .= "\n//-->";
             $javascript .= "\n</script>";
 
@@ -1029,7 +1135,7 @@ function squidGuard_print_javascript() {
             $javascript .= "\n</script>";
         }
 
-        if ($xml == "squidguard_src.xml") {
+        if ($xml == "squidguard_src.xml") { ### will deleted ###
             $javascript .= "\n<script language='JavaScript'>";
             $javascript .= "\n<!--";
             $javascript .= "\n    function on_updatecontrols() {";
@@ -1059,7 +1165,7 @@ function squidGuard_print_javascript() {
             $javascript .= "\n</script>";
         }
 
-         print($javascript);
+        print($javascript);
 }
 
 # ==============================================================================
@@ -1092,11 +1198,18 @@ function convert_pfxml_to_sgxml() {
     $squidxml = $config['installedpackages']['squid']['config'][0];
     if(isset($squidxml['transparent_proxy'])) {
              $lanip = $config['interfaces']['lan']['ipaddr'];
+             $guiport = $config['system']['webgui']['port'];
+             $guiprotocol = $config['system']['webgui']['protocol'];
+
              $sgxml[FLD_SQUID_TRANSPARENT_MODE] = 'on';
              $sgxml[FLD_CURRENT_LAN_IP] = $lanip;
+             $sgxml[FLD_CURRENT_GUI_PORT] = $guiport;
+             $sgxml[FLD_CURRENT_GUI_PROTO] = $guiprotocol;
     } else {
              unset($sgxml[FLD_SQUID_TRANSPARENT_MODE]);
              unset($sgxml[FLD_CURRENT_LAN_IP]);
+             unset($sgxml[FLD_CURRENT_GUI_PORT]);
+             unset($sgxml[FLD_CURRENT_GUI_PROTO]);
     }
 
     // store cfg cache
@@ -1110,10 +1223,28 @@ function convert_pfxml_to_sgxml() {
 // convert_pfxml_to_sgxml_source
 // sgxml_source: [name][ip][desc][log]
 // -----------------------------------------------------------------
+# Changes 04-01-2008 :
+# Source fields moved to ACL page. Source page - will remove
+# But in XML internal config nothing to change
+#
 function convert_pfxml_to_sgxml_source($pfconfig) {
         $sgxml = array();
-
+/*
+# --- previous ver ---
         $pfxml = $pfconfig['installedpackages']['squidguardsrc']['config'];
+        if (is_array($pfxml)) {
+            foreach($pfxml as $pfx) {
+                $sgx = array();
+                $sgx[FLD_NAME]                 = $pfx['name'];
+                $sgx[FLD_IP]                   = $pfx['iplist'];
+                $sgx[FLD_DOMAINS]              = $pfx[FLD_DOMAINS];
+                $sgx[FLD_LOG]                  = $pfx['enablelog'];
+                $sgx[FLD_DESCRIPTION]          = $pfx['description'];
+                $sgxml[FLD_ITEM][] = $sgx;
+            }
+        }
+*/
+        $pfxml = $pfconfig['installedpackages']['squidguardacl']['config'];
         if (is_array($pfxml)) {
             foreach($pfxml as $pfx) {
                 $sgx = array();
@@ -1221,7 +1352,8 @@ function convert_pfxml_to_sgxml_acl($pfconfig) {
         if (is_array($pfxml)) {
             foreach($pfxml as $pfx) {
                 $sgx = array();
-                $sgx[FLD_NAME]               = $pfx[FLD_SOURCE];
+#                $sgx[FLD_NAME]               = $pfx[FLD_SOURCE]; // [04-01-2008] previous ver - this field will removed
+                $sgx[FLD_NAME]               = $pfx[FLD_NAME];    // [04-01-2008] new ver
                 $sgx[FLD_DESCRIPTION]        = $pfx[FLD_DESCRIPTION];
                 $sgx[FLD_DISABLED]           = $pfx[FLD_DISABLED];
                 $sgx[FLD_TIMENAME]           = $pfx[FLD_TIME];

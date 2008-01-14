@@ -34,10 +34,6 @@
 			<url>/pkg.php?xml=squidguard_acl.xml</url>
 		</tab>
 		<tab>
-			<text>Sources</text>
-			<url>/pkg.php?xml=squidguard_src.xml</url>
-		</tab>
-		<tab>
 			<text>Destinations</text>
 			<url>/pkg.php?xml=squidguard_dest.xml</url>			
 		</tab>
@@ -67,12 +63,6 @@
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/squidGuard/squidguard_configurator.inc</item>
 	</additional_files_needed>
-	
-<!-- Now commented, may be deleted later.
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/squidGuard/upload.inc</item>
-	</additional_files_needed>
--->
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/squidGuard/squidguard_acl.xml</item>
 	</additional_files_needed>
@@ -85,9 +75,11 @@
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/squidGuard/squidguard_rewr.xml</item>
 	</additional_files_needed>
+<!--
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/squidGuard/squidguard_src.xml</item>
 	</additional_files_needed>
+-->
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/squidGuard/squidguard_time.xml</item>
 	</additional_files_needed>

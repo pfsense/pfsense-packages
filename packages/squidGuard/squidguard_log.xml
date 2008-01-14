@@ -28,10 +28,6 @@
 			<url>/pkg.php?xml=squidguard_acl.xml</url>
 		</tab>
 		<tab>
-			<text>Sources</text>
-			<url>/pkg.php?xml=squidguard_src.xml</url>
-		</tab>
-		<tab>
 			<text>Destinations</text>
 			<url>/pkg.php?xml=squidguard_dest.xml</url>			
 		</tab>
@@ -58,7 +54,7 @@
 			<type>select</type>
 			<value>access_log</value>
 			<options>
-				    <option><name>Blocked URL's log</name><value>block_log</value></option>
+			    	<option><name>Blocked URL's log</name><value>block_log</value></option>
 			    	<option><name>Configurator log</name><value>configurator_log</value></option>
 			    	<option><name>squidGuard log</name><value>squidguard_log</value></option>
 			    	<option><name>squid config</name><value>squid_config</value></option>

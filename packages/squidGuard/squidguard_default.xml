@@ -26,10 +26,6 @@
 			<url>/pkg.php?xml=squidguard_acl.xml</url>
 		</tab>
 		<tab>
-			<text>Sources</text>
-			<url>/pkg.php?xml=squidguard_src.xml</url>
-		</tab>
-		<tab>
 			<text>Destinations</text>
 			<url>/pkg.php?xml=squidguard_dest.xml</url>			
 		</tab>
@@ -59,29 +55,32 @@
 			<fieldname>dest</fieldname>
 			<description></description>
 			<type>input</type>
-			<size>115</size>
+			<size>100</size>
 		</field>
 		<field>
 			<fielddescr>Default Redirect</fielddescr>
 			<fieldname>redirect</fieldname>
 			<description>
-                         Enter redirection URL or Error page code for this rule, or leave blank. 
-                         Supported error page codes: 403, 404, 410.
-                     </description>
+				Enter redirection URL, Tag or Error page code for this rule, or leave blank. &lt;br&gt;
+				Supported URL's: 'http://myurl', 'https://myurl'. &lt;br&gt;
+				Supported tags: 'blank', 'blank_img'. &lt;br&gt;
+				Supported error page codes: 3xx, 4xx, 5xx. Format: 'code' or 'code[space]reason message'.
 			<type>textarea</type>
-			<cols>70</cols>
-            <rows>5</rows>
+			<cols>65</cols>
+            <rows>2</rows>
 		</field>
 		<field>
 			<fielddescr>Default overtime redirect</fielddescr>
 			<fieldname>overredirect</fieldname>
 			<description>
-                         Enter redirection URL or Error page code for this rule, or leave blank. 
-                         Supported error page codes: 403, 404, 410.
-                     </description>
+				Enter redirection URL, Tag or Error page code for this rule, or leave blank. &lt;br&gt;
+				Supported URL's: 'http://myurl', 'https://myurl'. &lt;br&gt;
+				Supported tags: 'blank', 'blank_img'. &lt;br&gt;
+				Supported error page codes: 3xx, 4xx, 5xx. Format: 'code' or 'code[space]reason message'.
+			</description>
 			<type>textarea</type>
-			<cols>70</cols>
-            <rows>5</rows>
+			<cols>65</cols>
+            <rows>2</rows>
 		</field>
 		<field>
 			<fielddescr>Default Rewrite</fielddescr>

@@ -196,10 +196,9 @@ define('REDIRECTOR_PROCESS_COUNT', '3');
 # define default redirection url (redirector get this url for all blocked url's)
 # * !ATTENTION! this url must be exists; IF url not exist, redirector will't block
 #               (returned to squid some url, what blocked)
-#               this may use '301:' or '302:' value (only)
-#define('REDIRECT_BASE_URL', '302:');
-define('REDIRECT_BASE_URL', 'http://127.0.0.1/sgerror.php');
-define('REDIRECT_TRANSPARENT_BASE_URL', '/sgerror.php');
+# ------------------------------------------------------------------------------
+define('REDIRECT_BASE_URL', '/sgerror.php');
+define('REDIRECT_URL_ARGS', '&a=%a&n=%n&i=%i&s=%s&t=%t&u=%u');
 
 # ------------------------------------------------------------------------------
 # squidguard system defines
@@ -338,6 +337,8 @@ define('FLD_TIMERANGE',           'sg_timerange');
 // transparent mode
 define('FLD_SQUID_TRANSPARENT_MODE',   'squid_transparent_mode');
 define('FLD_CURRENT_LAN_IP',           'current_lan_ip');
+define('FLD_CURRENT_GUI_PORT',         'current_gui_port');
+define('FLD_CURRENT_GUI_PROTO',        'current_gui_protocol');
 
 # ------------------------------------------------------------------------------
 # sg_init
@@ -553,12 +554,13 @@ function sg_reconfigure_user_db() {
                      $path = "$dbhome/" . $dst[FLD_NAME];
                      $dst_names[] = $path;
 
-                     // 1. check destination catalog
+                     // 1. check destination catalog and create them, if need
                      if (!file_exists($path)) {
                           if (!mkdir ($path, 0755)) {
                                  sg_addlog("sg_reconfigure_user_db: error create dir $path");
                                  return;
-                          } else sg_addlog("Create dir $path");
+                          }
+                          else sg_addlog("Create dir $path");
                      }
 
                      // 2. build domains file
@@ -780,9 +782,7 @@ function sg_getlog($last_entries_count) {
 function sg_build_default_config() {
          global $squidguard_config;
          $sgconf = array();
-         $redirect_base_url = REDIRECT_BASE_URL;
-
-// TODO: need fix for transparentproxy
+#         $redirect_base_url = sg_redirector_base_url();
 
          // header
          $sgconf[] = CONFIG_SG_HEADER;
@@ -795,7 +795,7 @@ function sg_build_default_config() {
          $sgconf[] = "acl {";
          $sgconf[] = "\t default {";
          $sgconf[] = "\t\t pass none";
-         $sgconf[] = "\t\t redirect " . $redirect_base_url;
+         $sgconf[] = "\t\t redirect " . sg_redirector_base_url('404 Check proxy filter settings on errors.'); # $redirect_base_url
          $sgconf[] = "\t }";
          $sgconf[] = "}";
 
@@ -804,12 +804,42 @@ function sg_build_default_config() {
 }
 
 // ------------------------------------------------------------
+// sg_redirector_base_url
+// ------------------------------------------------------------
+function sg_redirector_base_url($url) {
+         global $squidguard_config;
+         $rdr_path = REDIRECT_BASE_URL;
+
+         // check GUI port settings
+         if (isset($squidguard_config[FLD_CURRENT_GUI_PORT]) and !empty($squidguard_config[FLD_CURRENT_GUI_PORT])) {
+                $rdr_path = ":" . $squidguard_config[FLD_CURRENT_GUI_PORT] . $rdr_path;
+         }
+
+         // check Lan IP port settings
+         $rdr_path = $squidguard_config[FLD_CURRENT_LAN_IP] . $rdr_path;
+
+         // check GUI protocol settings
+         if ($squidguard_config[FLD_CURRENT_GUI_PROTO] === "https")
+              $rdr_path = "https://" . $rdr_path;
+         else $rdr_path = "http://"  . $rdr_path;
+
+         // arguments
+         // Attention: 
+         // 	order arg's must be: first-URL, last-SG variables
+         //		SG have bug, what broke data after his var's
+         $rdr_path = $rdr_path . "?url=" . rawurlencode($url) . REDIRECT_URL_ARGS;
+
+         sg_addlog("sg_redirector_base_url: select redirector base url ($rdr_path)");
+         return $rdr_path;
+}
+
+// ------------------------------------------------------------
 // sg_build_config
 // ------------------------------------------------------------
 function sg_build_config() {
          global $squidguard_config;
          $sgconf = array();
-         $redirect_base_url = REDIRECT_BASE_URL;
+#         $redirect_base_url = REDIRECT_BASE_URL;
 
          sg_addlog("sg_build_config: create squidGuard config");
          if(!is_array($squidguard_config)) {
@@ -830,13 +860,8 @@ function sg_build_config() {
          // --- Header ---
          $sgconf[] = CONFIG_SG_HEADER;
 
-         // Transparent redirector base url
-         if (isset($squidguard_config[FLD_SQUID_TRANSPARENT_MODE]) and
-             isset($squidguard_config[FLD_CURRENT_LAN_IP])) {
-             $redirect_base_url = "http://" . $squidguard_config[FLD_CURRENT_LAN_IP] . REDIRECT_TRANSPARENT_BASE_URL;
-             sg_addlog("sg_build_config: select LAN redirector base url ($redirect_base_url)");
-         } else
-             sg_addlog("sg_build_config: select localhost redirector base url ($redirect_base_url)");
+         // redirector base url
+#         $redirect_base_url = sg_redirector_base_url();
 
          // init
          $sgconf[] = "logdir " . $squidguard_config[FLD_LOGDIR];
@@ -955,7 +980,7 @@ function sg_build_config() {
                  if ($dst[FLD_URLS])
                      $sgconf[] = "\t urllist $dstname/urls";
                  if ($dst[FLD_REDIRECT] && is_url($dst[FLD_REDIRECT]))
-                     $sgconf[] = "\t redirect " . $redirect_base_url . "?url={$dst[FLD_REDIRECT]}";
+                     $sgconf[] = "\t redirect " . sg_redirector_base_url($dst[FLD_REDIRECT]);  # $redirect_base_url . rawurlencode($dst[FLD_REDIRECT]);
                  if ($dst[FLD_LOG])
                      $sgconf[] = "\t log " . SQUIDGUARD_ACCESSBLOCK_FILE;
                  $sgconf[] = "}";
@@ -969,7 +994,7 @@ function sg_build_config() {
                  $sgconf[] = "";
                  $sgconf[] = "rew " . $rew[FLD_NAME] . " {";
                  foreach ($rew[FLD_ITEM] as $rw)
-                          $sgconf[] = "\t s@." . $rw[FLD_TARGETURL] . "@" . $rw[FLD_REPLACETO]."@";
+                          $sgconf[] = "\t s@." . $rw[FLD_TARGETURL] . "@" . $rw[FLD_REPLACETO]."@r";
                  if ($rew[FLD_LOG])
                      $sgconf[] = "\t log " . SQUIDGUARD_ACCESSBLOCK_FILE;
                  $sgconf[] = "}";
@@ -1017,7 +1042,7 @@ function sg_build_config() {
                           $sgconf[] = "\t\t pass " . $acl[FLD_DESTINATIONNAME];
                           if ($acl[FLD_REDIRECT]) {
                               if (is_url($acl[FLD_REDIRECT]))
-                                   $sgconf[] = "\t\t redirect " . $redirect_user_url . "?url={$acl[FLD_REDIRECT]}";
+                                   $sgconf[] = "\t\t redirect " . $redirect_user_url . rawurlencode($acl[FLD_REDIRECT]);
                               else $sgconf[] = "\t\t redirect " . $redirect_user_url . "?msg=" . htmlspecialchars($acl[FLD_REDIRECT]);
                           }
                           if ($acl[FLD_REWRITENAME])
@@ -1027,7 +1052,7 @@ function sg_build_config() {
                           $sgconf[] = "\t } else {";
                           $sgconf[] = "\t\t pass " . $acl[FLD_OVERDESTINATIONNAME];
                           if ($acl[FLD_OVERREDIRECT] && is_url($acl[FLD_OVERREDIRECT]))
-                                   $sgconf[] = "\t\t redirect " . $redirect_base_url . "?url={$acl[FLD_OVERREDIRECT]}";
+                                   $sgconf[] = "\t\t redirect " . sg_redirector_base_url($acl[FLD_OVERREDIRECT]); # $redirect_base_url . rawurlencode($acl[FLD_OVERREDIRECT]);
                           if ($acl[FLD_OVERREWRITENAME])
                               $sgconf[] = "\t\t rewrite " . $acl[FLD_OVERREWRITENAME];
 
@@ -1038,7 +1063,7 @@ function sg_build_config() {
                           $sgconf[] = "\t\t pass " . $acl[FLD_DESTINATIONNAME];
 
                           if ($acl[FLD_REDIRECT] && is_url($acl[FLD_REDIRECT]))
-                              $sgconf[] = "\t\t redirect " . $redirect_base_url . "?url={$acl[FLD_REDIRECT]}";
+                              $sgconf[] = "\t\t redirect " . sg_redirector_base_url($acl[FLD_REDIRECT]); # $redirect_base_url . rawurlencode($acl[FLD_REDIRECT]);
                           if ($acl[FLD_REWRITENAME])
                               $sgconf[] = "\t\t rewrite " . $acl[FLD_REWRITENAME];
 
@@ -1079,24 +1104,24 @@ function sg_build_config() {
                  $sgconf[] = "\t default within " . $def[FLD_TIMENAME] . " { ";
                  $sgconf[] = "\t\t pass " . $def[FLD_DESTINATIONNAME];
                  if ($def[FLD_REDIRECT] && is_url($def[FLD_REDIRECT]))
-                      $sgconf[] = "\t\t redirect " . $redirect_base_url . "?url={$def[FLD_REDIRECT]}";
-                 else $sgconf[] = "\t\t redirect " . $redirect_base_url;
+                      $sgconf[] = "\t\t redirect " . sg_redirector_base_url($def[FLD_REDIRECT]); # $redirect_base_url . rawurlencode($def[FLD_REDIRECT]);
+                 else $sgconf[] = "\t\t redirect " . sg_redirector_base_url(''); # $redirect_base_url;
                  // overtime
                  $sgconf[] = "\t } else {";
                  $sgconf[] = "\t\t pass " . $def[FLD_OVERDESTINATIONNAME];
                  if ($def[FLD_OVERREDIRECT] && is_url($def[FLD_OVERREDIRECT])) {
-                     $sgconf[] = "\t\t redirect " . $redirect_base_url . "?url={$def[FLD_OVERREDIRECT]}";
+                     $sgconf[] = "\t\t redirect " . sg_redirector_base_url($def[FLD_OVERREDIRECT]); # $redirect_base_url . rawurlencode($def[FLD_OVERREDIRECT]);
                  }
-                 else $sgconf[] = "\t\t redirect " . $redirect_base_url;
+                 else $sgconf[] = "\t\t redirect " .  sg_redirector_base_url(''); # $redirect_base_url;
                  $sgconf[] = "\t }";
              } else {
                  // without time
                  $sgconf[] = "\t default { ";
                  $sgconf[] = "\t\t pass " . $def[FLD_DESTINATIONNAME];
                  if ($def[FLD_REDIRECT] && is_url($def[FLD_REDIRECT])) {
-                      $sgconf[] = "\t\t redirect " . $redirect_base_url . "?url={$def[FLD_REDIRECT]}";
+                      $sgconf[] = "\t\t redirect " .  sg_redirector_base_url($def[FLD_REDIRECT]); # $redirect_base_url . rawurlencode($def[FLD_REDIRECT]);
                  }
-                 else $sgconf[] = "\t\t redirect " . $redirect_base_url;
+                 else $sgconf[] = "\t\t redirect " . sg_redirector_base_url(''); # $redirect_base_url;
                  $sgconf[] = "\t }";
              }
          } // if def
@@ -1104,7 +1129,7 @@ function sg_build_config() {
                sg_addlog("sg_build_config: error - ACL 'default' is empty, use as default 'block all'.");
                $sgconf[] = "\t default { ";
                $sgconf[] = "\t\t pass none";
-               $sgconf[] = "\t\t redirect " . $redirect_base_url;
+               $sgconf[] = "\t\t redirect " . sg_redirector_base_url(''); # $redirect_base_url;
                $sgconf[] = "\t }";
          }
 
@@ -1561,10 +1586,12 @@ function scan_dir($dir) {
 # is_url - build files listing for $dir
 # ------------------------------------------------------------------------------
 function is_url($url) {
-    if (empty($url))              return false;
-    if (eregi("^http://", $url))  return true;
-    if (eregi("^https://", $url)) return true;
-    if (eregi("^([0-9]{3})", $url)) return true; // http error code 403, 404, 410, 500,
+    if (empty($url))                return false;
+    if (eregi("^http://", $url))    return true;
+    if (eregi("^https://", $url))   return true;
+    if (strstr("blank", $url))      return true;
+    if (strstr("blank_img", $url))  return true;
+    if (eregi("^([0-9]{3})", $url)) return true; // http error code 403, 404, 410, etc.
     return false;
 }
 # ------------------------------------------------------------------------------
