@@ -111,7 +111,7 @@ EOD;
 	fclose($fd);
 	conf_mount_ro();
 	filter_configure();
-
+	exec("/usr/local/etc/rc.d/svscan.sh start");
 }
 
 function tinydns_custom_php_deinstall_command() {
