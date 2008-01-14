@@ -65,9 +65,10 @@
 				Supported URL's: 'http://myurl', 'https://myurl'. &lt;br&gt;
 				Supported tags: 'blank', 'blank_img'. &lt;br&gt;
 				Supported error page codes: 3xx, 4xx, 5xx. Format: 'code' or 'code[space]reason message'.
+			</description>
 			<type>textarea</type>
 			<cols>65</cols>
-            <rows>2</rows>
+			<rows>2</rows>
 		</field>
 		<field>
 			<fielddescr>Default overtime redirect</fielddescr>
@@ -80,7 +81,7 @@
 			</description>
 			<type>textarea</type>
 			<cols>65</cols>
-            <rows>2</rows>
+			<rows>2</rows>
 		</field>
 		<field>
 			<fielddescr>Default Rewrite</fielddescr>
