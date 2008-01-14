@@ -164,6 +164,5 @@
 		sync_package_siproxd();
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
-		sync_package_siproxd();
 	</custom_php_resync_config_command>
 </packagegui>
