@@ -70,8 +70,15 @@
         </tabs>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>		
 		<item>http://www.pfsense.com/packages/config/siproxdusers.xml</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/sipproxd.inc</item>
+	</additional_files_needed>	
 	<fields>
 		<field>
 			<fielddescr>Inbound interface</fielddescr>
