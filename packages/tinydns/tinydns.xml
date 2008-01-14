@@ -56,6 +56,12 @@
 		<section>Services</section>
 		<url>/tinydns_status.php</url>
 	</menu>
+	<service>
+		<name>DNS Server</name>
+		<rcfile>svscan.sh</rcfile>
+		<executable>tinydns</executable>
+		<description>TinyDNS DNS Server</description>
+	</service>	
 	<tabs>
 		<tab>
 			<text>Settings</text>
