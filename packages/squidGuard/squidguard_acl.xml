@@ -51,27 +51,21 @@
 			<fielddescr>Disable</fielddescr>
 			<fieldname>disabled</fieldname>
 		</columnitem>
-<!--
 		<columnitem>
-			<fielddescr>Source</fielddescr>
-			<fieldname>source</fieldname>
+			<fielddescr>Order</fielddescr>
+			<fieldname>order</fieldname>
 		</columnitem>
--->
+		<columnitem>
+			<fielddescr>Name</fielddescr>
+			<fieldname>name</fieldname>
+		</columnitem>
 		<columnitem>
 			<fielddescr>Destinations</fielddescr>
 			<fieldname>dest</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Uptime</fielddescr>
+			<fielddescr>Time</fielddescr>
 			<fieldname>time</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Redirect</fielddescr>
-			<fieldname>redirect</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Rewrite</fielddescr>
-			<fieldname>rewrite</fieldname>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Description</fielddescr>
