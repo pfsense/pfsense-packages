@@ -44,7 +44,7 @@
 	<name>siproxd</name>
 	<version>0.5.13_pfs2</version>
 	<title>siproxd: Settings</title>
-	<include_file>/usr/local/pkg/sipproxd.inc</include_file>	
+	<include_file>/usr/local/pkg/siproxd.inc</include_file>	
 	<aftersaveredirect>pkg_edit.php?xml=siproxd.xml&amp;id=0</aftersaveredirect>
 	<menu>
 		<name>siproxd</name>
@@ -78,7 +78,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/sipproxd.inc</item>
+		<item>http://www.pfsense.com/packages/config/siproxd.inc</item>
 	</additional_files_needed>	
 	<fields>
 		<field>
