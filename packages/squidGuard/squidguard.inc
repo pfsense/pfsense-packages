@@ -103,6 +103,8 @@ define('WEBGUI_HISTORY_LOG', 'on');
 
 define('TEST_LOG', '/var/tmp/sqtest.test');
 
+define('ERRVALIDATE_REDIRECT', "Redirect must contains valid data. Example: 'http://www.my.com', 'https://my.com', Error_Code<space>Reason, blank, blank_img");
+
 # ==============================================================================
 # Initialization
 # ==============================================================================
@@ -193,6 +195,28 @@ function squidguard_validate_acl($post, $input_errors) {
         if (empty($pass_over_val))
              $post[FLD_DEST] = "$pass_up_val";
         else $post[FLD_DEST] = "$pass_up_val [$pass_over_val]";
+
+         // check redirect
+         $redirect = trim($post[FLD_REDIRECT]);
+         if(!empty($redirect)) {
+            // cut first redirect url, if entered more that one
+            $redirect = explode("\n", $redirect);
+            $redirect = $redirect[0];
+            $post[FLD_REDIRECT] = $redirect;
+            if (is_url($redirect) === false)
+                 $input_errors[] = "Redirect '$redirect' error. " . ERRVALIDATE_REDIRECT;
+         }
+
+         // check overredirect
+         $redirect = trim($post[FLD_OVERREDIRECT]);
+         if(!empty($redirect)) {
+            // cut first redirect url, if entered more that one
+            $redirect = explode("\n", $redirect);
+            $redirect = $redirect[0];
+            $post[FLD_OVERREDIRECT] = $redirect;
+            if (is_url($redirect) === false)
+                 $input_errors[] = "Overtime redirect '$redirect' error. " . ERRVALIDATE_REDIRECT;
+         }
 }
 
 # ------------------------------------------------------------------------------
@@ -282,7 +306,7 @@ function squidguard_validate_destination($post, $input_errors) {
             $redirect = $redirect[0];
             $post[FLD_REDIRECT] = $redirect;
             if (is_url($redirect) === false)
-                 $input_errors[] = "Redirect must contains valid url. Example: 'http://www.my.com', 'https://my.com', 'ftp://my.com'";
+                 $input_errors[] = "Redirect '$redirect' error. " . ERRVALIDATE_REDIRECT;
          }
 }
 

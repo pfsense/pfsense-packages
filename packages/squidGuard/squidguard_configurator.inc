@@ -827,7 +827,12 @@ function sg_redirector_base_url($url) {
          // Attention: 
          // 	order arg's must be: first-URL, last-SG variables
          //		SG have bug, what broke data after his var's
-         $rdr_path = $rdr_path . "?url=" . rawurlencode($url) . REDIRECT_URL_ARGS;
+         $tmp_url = ltrim($url);
+         // not need encoded url string. only err_code line
+         if (eregi("^https{0,1}://", $tmp_url) === false)
+                $tmp_url = rawurlencode($tmp_url);
+         $rdr_path = $rdr_path . "?url=" . $tmp_url . REDIRECT_URL_ARGS; // rawurlencode($tmp_url) . REDIRECT_URL_ARGS;
+         unset($tmp_url);
 
          sg_addlog("sg_redirector_base_url: select redirector base url ($rdr_path)");
          return $rdr_path;
@@ -1583,7 +1588,7 @@ function scan_dir($dir) {
     return $files;
 }
 # ------------------------------------------------------------------------------
-# is_url - build files listing for $dir
+# is_url - check url an err_codes
 # ------------------------------------------------------------------------------
 function is_url($url) {
     if (empty($url))                return false;
@@ -1591,7 +1596,7 @@ function is_url($url) {
     if (eregi("^https://", $url))   return true;
     if (strstr("blank", $url))      return true;
     if (strstr("blank_img", $url))  return true;
-    if (eregi("^([0-9]{3})", $url)) return true; // http error code 403, 404, 410, etc.
+    if (eregi("^((30[1235]{1})|(40[0-9]{1})|(41[0-7]{1})|(50[0-5]{1}))", $url)) return true; // http error code 30x, 4xx, 50x.
     return false;
 }
 # ------------------------------------------------------------------------------
