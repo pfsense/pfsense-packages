@@ -696,7 +696,7 @@ function squidguard_before_form_log($pkg) {
         $i=0;
         $move_pos = 0;
         $move_step = 50;
-return;
+
         foreach($pkg['fields']['field'] as $field) {
                 if ($field['fieldname'] == 'logtype') {
                         $slog = '';
@@ -705,11 +705,15 @@ return;
                         $filename = '';
                         $fld = &$pkg['fields']['field'][$i];
                         if (empty($move_pos)) $move_pos = 0;
+
                         if ($mlog['logtype'] == 'block_log') {
+				$slog .= 'block_log report disabled';
+/*
                             $filename = SQUIDGUARD_LOGDIR . "/" . SQUIDGUARD_ACCESSBLOCK_FILE;
                             if (file_exists($filename)) {
                                 $s = file_get_contents($filename);
                                 $s = explode("\n", $s);
+#                               while (count($s) > 500)  array_shift($s);
                                 $move_pos = count ($s) - $move_step;
                                 if ($move_pos < 0) $move_pos = 0;
                                 $s = array_slice($s, $move_pos, $move_step);
@@ -740,7 +744,9 @@ return;
                                 }
 #                                $slog .= "</table>";
                             }
+*/
                         } else
+
                         if ($mlog['logtype'] == 'configurator_log') {
                             $filename = SQUIDGUARD_LOGDIR . SQUIDGUARDCONF_LOGFILE;
                             $slog .= "<b>$filename</b><br>";
@@ -750,7 +756,10 @@ return;
                                 $slog = "<tr><td>$slog</td></tr>";
                             }
                         } else
+
                         if ($mlog['logtype'] == 'squidguard_log') {
+$slog .= 'squidguard_log report disabled';
+/*
                             $filename = SQUIDGUARD_LOGDIR . '/squidGuard.log';
                             $slog .= "<b>$filename</b><br>";
                             if (file_exists($filename)) {
@@ -761,7 +770,9 @@ return;
                                 $slog = str_replace("\n", "<br>", $slog);
                                 $slog = "<tr><td>$slog</td></tr>";
                             }
+*/
                         } else
+
                         if ($mlog['logtype'] == 'squid_config') {
                             $filename = SQUID_CONFIGFILE;
                             $slog .= "<b>$filename</b><br>";
