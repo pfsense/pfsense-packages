@@ -332,20 +332,30 @@ function squidguard_validate_rewrite($post, $input_errors) {
 // squidguard_resync
 // -----------------------------------------------------------------------------
 function squidguard_resync() {
-        $conf = '';
-        $upload_file = '';
+	global $config;
+       $conf = $config['installedpackages'][MODULE_GENERAL]['config'][0];
+       $upload_file = '';
+       $submit = '';
 
-        // blacklist upload
-        if ($_POST['submit'] == BLACKLIST_BTN_URL) {
-            // upload from another url
-            $url = $_POST['blacklist_url'];
-            $proxy = $_POST['blacklist_proxy'];
-            if ($url)
-                sg_reconfigure_blacklist($url, $proxy);
-        }
-        // apply changes
-        if ($_POST['submit'] == APPLY_BTN) sg_reconfigure();
+       if (isset($_POST['submit']))
+       	$submit = $_POST['submit'];
+       else
+       if (isset($_GET['submit']))
+       	$submit = $_GET['submit'];
+
+       // blacklist upload
+       if ($submit == BLACKLIST_BTN_URL) {
+#           $url = $_POST['blacklist_url'];
+#           $proxy = $_POST['blacklist_proxy'];
+           $url = $conf['blacklist_url'];
+           $proxy = $conf['blacklist_proxy'];
+           if ($url)
+               sg_reconfigure_blacklist($url, $proxy);
+       }
+       // apply changes
+       if ($submit == APPLY_BTN) sg_reconfigure();
 }
+
 
 // -----------------------------------------------------------------------------
 // squidguard_resync_acl
