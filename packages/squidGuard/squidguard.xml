@@ -106,6 +106,35 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fielddescr>Blacklist proxy</fielddescr>
+			<fieldname>blacklist_proxy</fieldname>
+			<description>
+				Blacklist upload proxy - enter here, or leave blank. 
+				Format: host:[port login:pass] . Default proxy port 1080. 
+				Example: '192.168.0.1:8080 user:pass' 
+			</description>
+			<type>input</type>
+			<size>100</size>
+		</field>
+		<field>
+			<fielddescr>Blacklist URL</fielddescr>
+			<fieldname>blacklist_url</fieldname>
+			<description>Enter FTP, HTTP or LOCAL (pfSense) URL blacklist archive, or leave blank.</description>
+			<type>input</type>
+			<size>100</size>
+		</field>
+		<field>
+			<fielddescr>Emulate error HTTP header</fielddescr>
+			<fieldname>emu_err_http_hdr</fieldname>
+			<description>
+				Check this for enable emulation error code HTTP header, 
+				when proxy-filter deny access to URL with specified HTTP error code 
+				in 'Redirect' field's. This may change behaviour client's IE brouser 
+				and affiliated proxy.
+			</description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>View GUI log</fielddescr>
 			<fieldname>view_gui_log</fieldname>
 			<description>Check this for view GUI log</description>
