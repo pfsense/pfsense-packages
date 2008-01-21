@@ -168,7 +168,7 @@ function sync_package_siproxd() {
 				)
 			);
 			log_error("16");			
-            stop_service("siproxd");
+	    exec("killall siproxd");
             start_service("siproxd");
 			log_error("17");
 			conf_mount_ro();
