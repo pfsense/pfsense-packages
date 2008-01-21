@@ -45,12 +45,11 @@
 	<version>0.5.13_pfs2</version>
 	<title>siproxd: Settings</title>
 	<include_file>/usr/local/pkg/siproxd.inc</include_file>	
-	<aftersaveredirect>pkg_edit.php?xml=siproxd.xml&amp;id=0</aftersaveredirect>
+	<aftersaveredirect>/pkg_edit.php?xml=siproxd.xml&amp;id=0</aftersaveredirect>
 	<menu>
 		<name>siproxd</name>
 		<tooltiptext>Modify siproxd users and settings.</tooltiptext>
 		<section>Services</section>
-		<configfile>siproxd.xml</configfile>
 		<url>/pkg_edit.php?xml=siproxd.xml&amp;id=0</url>
 	</menu>
 	<service>
