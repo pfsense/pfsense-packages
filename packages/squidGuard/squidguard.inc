@@ -887,18 +887,8 @@ function make_grid_general_items($id = '')
 // make_grid_blacklist
 // -----------------------------------------------------------------------------
 function make_grid_blacklist() {
-
-        $style1 = '';
-        $style2 = 'class=vtable';
-        $style2 = '';
-        $e_size = '90';
-
-        $res = '';
-        $res .= "<table width='100%'>";
-        // button
-        $res .= "<tr><td $style3>&nbsp;</td>
-                 <td $style3><input name='submit' value='" . BLACKLIST_BTN_URL  . "' type='submit'></td></tr>";
-        $res .= "</table>";
+        // button 'Upload URL'
+        $res = "<br><input name='submit' value='" . BLACKLIST_BTN_URL  . "' type='submit'>";
         return $res;
 }
 
