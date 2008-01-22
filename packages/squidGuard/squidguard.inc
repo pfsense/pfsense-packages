@@ -888,35 +888,16 @@ function make_grid_general_items($id = '')
 // -----------------------------------------------------------------------------
 function make_grid_blacklist() {
 
-        $style1 = ''; // 'style="background-color: ##CCCCC2;"';
+        $style1 = '';
         $style2 = 'class=vtable';
         $style2 = '';
         $e_size = '90';
 
         $res = '';
         $res .= "<table width='100%'>";
-        $res .= "<tr $style1><td><b>Proxy</b> settings</b></td>";
-        $res .= "<td $style1><input name='blacklist_proxy' id='blacklist_proxy' type='text' size='$e_size'></td></tr>";
-        $res .= "<tr><td $style1>&nbsp;</td>
-                 <td>Blacklist upload proxy - enter here, or leave blank.<br>
-                 Format: host:[port login:pass] . Default proxy port 1080. <br>
-                 Example: '192.168.0.1:8080 user:pass'
-                 </td></tr>";
-        $res .= "<tr><td $style3>Load from <b>Url </b></td> <td $style3><input name='blacklist_url' id='blacklist_url'
-                type='text' size='$e_size' value='http://squidguard.mesd.k12.or.us/blacklists.tgz'></td></tr>";
-        $res .= "<tr><td $style1>&nbsp;</td>
-                 <td>FTP, HTTP or LOCAL (pfSense) path to blacklist archive enter here, or leave blank.<br></td></tr>";
         // button
         $res .= "<tr><td $style3>&nbsp;</td>
                  <td $style3><input name='submit' value='" . BLACKLIST_BTN_URL  . "' type='submit'></td></tr>";
-
-#        $res .= "<tr><td $style3>Load from <b>Default</b></td> <td $style3><b>" . /*BLACKLIST_DEFAULT_URL .*/ "</b></td> <td $style3><input name='submit' value='" .
-#                BLACKLIST_BTN_STD . "' type='submit'></td></tr>";
-
-#        $res .= "<tr><td $style1>Load from <b>File</b></td> <td $style1><input name='blacklist_file' id='blacklist_file'
-#                type='file' size='$e_size'></td> <td $style1><input name='submit' value='" . BLACKLIST_BTN_FILE .
-#                "' type='submit'></td></tr>";
-
         $res .= "</table>";
         return $res;
 }
