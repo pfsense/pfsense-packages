@@ -293,14 +293,14 @@
       <descr>Network UPS Tools</descr>
       <website>http://www.networkupstools.org/</website>
       <category>Network Management</category>
-      <version>2.2.0</version>
+      <version>2.0.4</version>
       <status>BETA</status>
       <required_version>1.0</required_version>
       <maintainer>rswagoner@gmail.com</maintainer>
 	  <config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
 	  <configurationfile>nut.xml</configurationfile>
-	  <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
-      <depends_on_package>nut-2.2.0.tbz</depends_on_package>
+	  <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6.2-release/All/</depends_on_package_base_url>
+      <depends_on_package>nut-2.0.4.tbz</depends_on_package>
 	</package>
 	<package>
 		<name>diag_new_states</name>
