@@ -588,9 +588,9 @@
       <descr>LCD display driver</descr>
       <website>http://www.lcdproc.org/</website>
       <category>Utility</category>
-      <version>lcdproc-0.5.2_1-p1</version>
-      <status>ALPHA</status>
-      <required_version>1.3</required_version>
+      <version>lcdproc-0.5.2_1-p3</version>
+      <status>BETA</status>
+      <required_version>1.2</required_version>
       <maintainer>seth.mos@xs4all.nl</maintainer>
       <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
       <depends_on_package>lcdproc-0.5.2_1.tbz</depends_on_package>
