@@ -2,9 +2,20 @@
 <packagegui>
 	<title>Services: LCDproc</title>
 	<name>lcdproc</name>
-	<version>0.5.2_1-p2</version>
+	<version>0.5.2_1-p3</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
+	<tabs>
+		<tab>
+			<text>Server</text>
+			<url>/pkg_edit.php?xml=lcdproc.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Screens</text>
+			<url>/pkg_edit.php?xml=lcdproc_screens.xml&amp;id=0</url>
+		</tab>
+	</tabs>
 	<menu>
 		<name>LCDproc</name>
 		<tooltiptext>Set LCDproc settings such as display driver and com port</tooltiptext>
@@ -26,13 +37,6 @@
 		<rcfile>lcdproc.sh</rcfile>
 		<executable>lcdproc</executable>
 	</service>
-	<tabs>
-		<tab>
-			<text>LCDproc Settings</text>
-			<url>/pkg_edit.php?xml=lcdproc.xml&amp;id=0</url>
-			<active/>
-		</tab>
-	</tabs>
 	<fields>
 		<field>
 			<fielddescr>Enable LCDproc</fielddescr>

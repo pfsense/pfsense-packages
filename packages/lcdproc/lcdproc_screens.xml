@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<title>Services: LCDproc: Screens</title>
+	<name>lcdproc_screens</name>
+	<version>0.5.2_1-p3</version>
+	<savetext>Save</savetext>
+	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
+	<tabs>
+		<tab>
+			<text>Server</text>
+			<url>/pkg_edit.php?xml=lcdproc.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Screens</text>
+			<url>/pkg_edit.php?xml=lcdproc_screens.xml&amp;id=0</url>
+			<active/>
+		</tab>
+	</tabs>
+	<menu>
+		<name>LCDproc</name>
+		<tooltiptext>Set LCDproc settings such as display driver and com port</tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=lcdproc.xml&amp;id=0</url>
+	</menu>
+	<fields>
+		<field>
+			<fielddescr>Enable CPU</fielddescr>
+			<fieldname>scr_cpu</fieldname>
+			<type>checkbox</type>
+		</field>			
+		<field>
+			<fielddescr>Enable Load</fielddescr>
+			<fieldname>scr_load</fieldname>
+			<type>checkbox</type>
+		</field>			
+		<field>
+			<fielddescr>Enable Time</fielddescr>
+			<fieldname>scr_time</fieldname>
+			<type>checkbox</type>
+		</field>			
+		<field>
+			<fielddescr>Enable Uptime</fielddescr>
+			<fieldname>scr_uptime</fieldname>
+			<type>checkbox</type>
+		</field>			
+	</fields>
+	<custom_php_command_before_form>
+		before_form_lcdproc_screens(&amp;$pkg);
+	</custom_php_command_before_form>
+	<custom_php_validation_command>
+		validate_form_lcdproc_screens($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		sync_package_lcdproc_screens();
+	</custom_php_resync_config_command>
+</packagegui>

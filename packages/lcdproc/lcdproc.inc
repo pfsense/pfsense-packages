@@ -32,7 +32,7 @@
 
 	/* LCDproc */
 	define('LCDPROC_RCFILE', '/usr/local/etc/rc.d/lcdproc.sh');
-	define('LCDPROC_CLIENT', '/tmp/lcdprocc.sh');
+	define('LCDPROC_CLIENT', '/tmp/lcdclient.sh');
 	define('LCDPROC_CONFIG','/usr/local/etc/LCDd.conf');
 	define('LCDPROC_HOST','localhost');
 	define('LCDPROC_PORT','13666');
@@ -61,7 +61,26 @@
 		fclose($handle);
 	}
 
+	function lcdproc_write_script($file, $text) {
+		$handle = fopen($file, 'wx');
+		if(!$handle) {
+			lcdproc_warn("Could not open {$file} for writing.");
+			exit;
+		}
+		fwrite($handle, $text);
+		fclose($handle);
+		chmod($file, 0755);
+	}
+
 	function before_form_lcdproc($pkg) {
+		global $config;
+
+		config_lock();		
+		
+		config_unlock();
+	}
+
+	function before_form_lcdproc_screens($pkg) {
 		global $config;
 
 		config_lock();		
@@ -90,14 +109,22 @@
 			}
 		}
 	}
+	function validate_form_lcdproc_screens($post, $input_errors) {
+		// No validation required ?!
+	}
 
+	function sync_package_lcdproc_screens() {
+		sync_package_lcdproc();
+	}
 	function sync_package_lcdproc() {
+		global $g;
 		global $config;
 		global $input_errors;
 
 		config_lock();
 
 		$lcdproc_config = $config['installedpackages']['lcdproc']['config'][0];
+		$lcdproc_screens_config = $config['installedpackages']['lcdprocscreens']['config'][0];
 
 		/* since config is written before this file invoked we don't need to read post data */
 		if($lcdproc_config['enable'] && ($lcdproc_config['comport'] != "none")) {
@@ -124,11 +151,11 @@
 			$config_text .= "ReportToSyslog=yes\n";
 			$config_text .= "WaitTime=5\n";
 			$config_text .= "User=nobody\n";
-			$config_text .= "ServerScreen=0\n";
+			$config_text .= "ServerScreen=no\n";
 			$config_text .= "Foreground=no\n";
 			$config_text .= "DriverPath=/usr/local/lib/lcdproc/\n";
 			$config_text .= "GoodBye=\"Thanks for using\"\n";
-			$config_text .= "GoodBye=\"    {$g['product']}     \"\n";
+			$config_text .= "GoodBye=\"    {$g['product_name']}     \"\n";
 			/* FIXME: Specific to the pyramid project */
 			$config_text .= "ToggleRotateKey=Enter\n";
 			$config_text .= "PrevScreenKey=Left\n";
@@ -217,13 +244,35 @@
 			}
 
 			/* generate rc file start and stop */
+			$options = "";
+			foreach($lcdproc_screens_config as $name => $screen) {
+				if($screen == "on") {
+					switch($name) {
+						case "scr_cpu":
+							$options .= "P ";
+							break;
+						case "scr_time":
+							$options .= "O ";
+							break;
+						case "scr_load":
+							$options .= "L ";
+							break;
+						case "scr_uptime":
+							$options .= "U ";
+							break;
+					}
+				}
+			}
 			$client_script = <<<EOD
 #!/bin/sh
 
+# script starts a lcd client and always keeps it active.
 counter=1
-while [ "$counter" -ne 0 ]
+while [ "\$counter" -ne 0 ]
 do
-	/usr/local/bin/php -f /usr/local/pkg/lcdproc_client.php
+	# start the lcd client, lcdproc client for now until PHP client is finished
+	/usr/local/bin/lcdproc -f O P L U
+	#/usr/local/bin/php -f /usr/local/pkg/lcdproc_client.php
 	sleep 10
 done
 
@@ -234,11 +283,11 @@ EOD;
 
 if [ `pgrep LCDd | wc -l` != 0  ]; then
 	/usr/bin/killall LCDd
-	/usr/bin/killall lcdprocc.sh
+	/usr/bin/killall lcdclient.sh
 	while [ `pgrep LCDd | wc -l` != 0 ]; do
 		sleep 1
 	done
-	while [ `pgrep lcdprocc.sh | wc -l` != 0 ]; do
+	while [ `pgrep lcdclient.sh | wc -l` != 0 ]; do
 		sleep 1
 	done
 fi
@@ -246,10 +295,11 @@ fi
 EOD;
 			$start = $stop ."\n";
 			$start .= "\t/usr/local/sbin/LCDd -c ". LCDPROC_CONFIG ."\n";
+			$start .= "\t". LCDPROC_CLIENT ." &\n";
 
 			/* write out the configuration */
 			conf_mount_rw();
-			lcdproc_write_config(LCDPROC_CLIENT, $client_script);
+			lcdproc_write_script(LCDPROC_CLIENT, $client_script);
 			lcdproc_write_config(LCDPROC_CONFIG, $config_text);
 			write_rcfile(array(
 					'file' => 'lcdproc.sh',

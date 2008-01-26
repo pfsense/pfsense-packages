@@ -27,8 +27,8 @@
         POSSIBILITY OF SUCH DAMAGE.
 */
 
-	require_once("config.inc");
-	require_once("functions.inc");
+	// require_once("config.inc");
+	// require_once("functions.inc");
 	require_once("/usr/local/pkg/lcdproc.inc");
 
 	/* Define functions */
@@ -39,34 +39,46 @@
 		}
 		foreach($lcd_cmds as $lcd_cmd) {
 			$cmd_output = "";
-			fwrite($lcd, $lcd_cmd);
-			$cmd_output .= fgets($lcd, 128);
-			lcdproc_notice("LCDd output for cmd $lcd_cmd is: $cmd_output");
-			sleep(1);
+			if(! fwrite($lcd, "$lcd_cmd\n")) {
+				lcdproc_warn("Connection to LCDd process lost $errstr ($errno)");
+				die();
+			}
+			$cmd_output = fgets($lcd, 4096);
+			if(preg_match("/^huh?/", $cmd_output)) {
+				lcdproc_notice("LCDd output: \"$cmd_output\". Executed \"$lcd_cmd\"");
+			}
+			// sleep(1);
 		}
 	}
 
 	function loop_status($lcd) {
+		global $g;
+		global $config;
 		/* keep a counter to see how many times we can loop */
-		$i = 0;
-		while(1) {
-			$time = time();
+		$i = 1;
+		while($i) {
+			$time = date ("l dS of F Y h:i:s A");
 			$lcd_cmds = array();
-			$lcd_cmds[] = "client_set -name \"Parenttest\"\n";
-			$lcd_cmds[] = "screen_add status\n";
-			$lcd_cmds[] = "screen_set status -heartbeat off\n";
-			$lcd_cmds[] = "widget_add status title title\n";
-			$lcd_cmds[] = "widget_add status date scroller\n";
-			$lcd_cmds[] = "widget_set status title $i\n";
-			$lcd_cmds[] = "widget_set status date left right h 1 $time\n";
+			$lcd_cmds[] = "widget_set welcome_scr title_wdgt \"$i test \"";
+			// $lcd_cmds[] = "widget_set welcome_scr text_wdgt 1 1 \"$time test\"";
+			$lcd_cmds[] = "widget_set welcome_scr text_wdgt 1 2 20 2 h 4 \"$i $time test\"";
+			// $lcd_cmds[] = "output on 1 \"";
 			send_lcd_commands($lcd, $lcd_cmds);
+			sleep(10);
 			$i++;
 		}
 	}
 
-	function send_hello($lcd) {
+	function build_interface($lcd) {
 		$lcd_cmds = array();
-		$lcd_cmds[] = "hello\n";
+		$lcd_cmds[] = "hello";
+		$lcd_cmds[] = "client_set name pfSense";
+		$lcd_cmds[] = "screen_add welcome_scr";
+		$lcd_cmds[] = "screen_set welcome_scr heartbeat off";
+		// $lcd_cmds[] = "screen_set welcome_scr duration 32";
+		$lcd_cmds[] = "screen_set welcome_scr name welcome";
+		$lcd_cmds[] = "widget_add welcome_scr title_wdgt title";
+		$lcd_cmds[] = "widget_add welcome_scr text_wdgt scroller";
 		send_lcd_commands($lcd, $lcd_cmds);
 	}
 
@@ -75,10 +87,10 @@
 	if (!$lcd) {
 		lcdproc_warn("Failed to connect to LCDd process $errstr ($errno)");
 	} else {
-		send_hello($lcd);
+		build_interface($lcd);
 		loop_status($lcd);
 		/* loop exited? Close fd and wait for the script to kick in again */
-		sleep(1);
+		// sleep(1);
+		fclose($lcd);
 	}
-	fclose($lcd);
 ?>
