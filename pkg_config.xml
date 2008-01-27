@@ -301,6 +301,7 @@
 	  <configurationfile>nut.xml</configurationfile>
 	  <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6.2-release/All/</depends_on_package_base_url>
       <depends_on_package>nut-2.0.4.tbz</depends_on_package>
+      <depends_on_package>nut-usb-2.0.4.tbz</depends_on_package>
 	</package>
 	<package>
 		<name>diag_new_states</name>
