@@ -271,7 +271,7 @@ counter=1
 while [ "\$counter" -ne 0 ]
 do
 	# start the lcd client, lcdproc client for now until PHP client is finished
-	/usr/local/bin/lcdproc -f O P L U
+	/usr/local/bin/lcdproc -f $options
 	#/usr/local/bin/php -f /usr/local/pkg/lcdproc_client.php
 	sleep 10
 done
