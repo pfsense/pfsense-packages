@@ -124,6 +124,22 @@
 			<size>100</size>
 		</field>
 		<field>
+			<fielddescr>Redirect mode</fielddescr>
+			<fieldname>redirect_mode</fieldname>
+			<description>
+				Select redirect mode here. If you selected 'Internal', then will use internal 'sgerror.php' page. 
+				Else - all redirect url's will added 'as it is'. In this situation you can't use 'HTTP error codes',
+				'BLANK' and 'BLANK_IMG' extensions, only you self error page URL.				
+			</description>
+			<type>select</type>
+			<value>rmod_int</value>
+			<options>
+				<option><name>Internal</name><value>rmod_int</value></option>
+				<option><name>External as Moved (http '301' code)</name><value>rmod_301</value></option>
+				<option><name>External as Found (http '302' code)</name><value>rmod_302</value></option>
+			</options>
+		</field>
+		<field>
 			<fielddescr>Emulate error HTTP header</fielddescr>
 			<fieldname>emu_err_http_hdr</fieldname>
 			<description>

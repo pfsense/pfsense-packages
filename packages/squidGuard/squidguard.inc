@@ -336,24 +336,33 @@ function squidguard_resync() {
        $conf = $config['installedpackages'][MODULE_GENERAL]['config'][0];
        $upload_file = '';
        $submit = '';
+       $url    = '';
+       $proxy  = '';
 
-       if (isset($_POST['submit']))
-       	$submit = $_POST['submit'];
+       if (isset($_POST['submit'])) {
+           $submit = $_POST['submit'];
+           $url    = $_POST['blacklist_url'];
+           $proxy  = $_POST['blacklist_proxy'];
+       } 
        else
-       if (isset($_GET['submit']))
-       	$submit = $_GET['submit'];
+       if (isset($_GET['submit'])) {
+           $submit = $_GET['submit'];
+           $url    = $_GET['blacklist_url'];
+           $proxy  = $_GET['blacklist_proxy'];
+       }
 
        // blacklist upload
        if ($submit == BLACKLIST_BTN_URL) {
-#           $url = $_POST['blacklist_url'];
-#           $proxy = $_POST['blacklist_proxy'];
-           $url = $conf['blacklist_url'];
-           $proxy = $conf['blacklist_proxy'];
+#           $url = $conf['blacklist_url'];
+#           $proxy = $conf['blacklist_proxy'];
            if ($url)
                sg_reconfigure_blacklist($url, $proxy);
        }
        // apply changes
        if ($submit == APPLY_BTN) sg_reconfigure();
+
+       // if nothing on GET or POST - then system resync on start or other
+       // ... write here ...
 }
 
 
@@ -1203,6 +1212,7 @@ function convert_pfxml_to_sgxml() {
     $sgxml[FLD_SGCONF_XML]       = SQUIDGUARD_WORKDIR . SQUIDGUARD_CONFXML;
     $sgxml[FLD_ENABLED]          = $pfxml[FLD_SQUIDGUARDENABLE];
     $sgxml[FLD_BLACKLISTENABLED] = $pfxml[FLD_BLACKLIST];
+    $sgxml[FLD_REDIRECTMODE]     = $pfxml[FLD_REDIRECTMODE];
     $sgxml[FLD_SOURCES]          = convert_pfxml_to_sgxml_source($config);
     $sgxml[FLD_DESTINATIONS]     = convert_pfxml_to_sgxml_destination($config);
     $sgxml[FLD_REWRITES]         = convert_pfxml_to_sgxml_rewrite($config);
