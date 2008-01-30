@@ -3,7 +3,7 @@
 /* $Id$ */
 /*
 	tinydns.inc
-	Copyright (C) 2006 Scott Ullrich
+	Copyright (C) 2006, 2007, 2008 Scott Ullrich
 	Parts Copyright (C) 2007 Goffredo Andreone
 	part of pfSense
 	All rights reserved.
@@ -825,7 +825,7 @@ EOD;
 }
 
 function dnscache_use_root_servers() {
-$rootservers =<<<EOD
+	$rootservers =<<<EOD
 198.41.0.4
 128.9.0.107
 192.33.4.12
