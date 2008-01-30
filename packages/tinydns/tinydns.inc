@@ -111,6 +111,9 @@ EOD;
 	fclose($fd);
 	conf_mount_ro();
 	filter_configure();
+
+	tinydns_custom_php_changeip_command();
+	
 	exec("/usr/local/etc/rc.d/svscan.sh start");
 }
 
@@ -141,7 +144,7 @@ function tinydns_custom_php_changeip_command() {
 	$dnscacheip = $ip;
 	$dnsuserip = $arr[0];
 
-/* For now force $dnsserverip to to 127.0.0.1 unless a separate IP is specified */
+	/* For now force $dnsserverip to to 127.0.0.1 unless a separate IP is specified */
 	$localhost = "127.0.0.1";
 	$dnsserverip = $localhost;
 	if($config['installedpackages']['tinydns']['config'][0]['ipaddress'] != $localhost AND $config['installedpackages']['tinydns']['config'][0]['ipaddress'] != "")
@@ -153,13 +156,15 @@ function tinydns_custom_php_changeip_command() {
 	$updatecron = $config['installedpackages']['tinydns']['config'][0]['updatecron'];
 
 	/* setup daemon tools service area */
-	if(!is_dir("/service"))	exec("/bin/mkdir /service");
-	if(!is_dir("/service/tinydns/root")){
-		exec("/usr/sbin/pw useradd Gtinydns");
-		exec("/usr/sbin/pw useradd Gdnslog");
-		exec("/usr/local/bin/tinydns-conf Gtinydns Gdnslog /etc/tinydns {$dnsserverip}");
-		exec("/bin/ln -s /etc/tinydns /service/");
-	}
+	if(!is_dir("/service"))	
+		exec("/bin/mkdir /service");
+
+	exec("/usr/sbin/pw useradd Gtinydns");
+	exec("/usr/sbin/pw useradd Gdnslog");
+
+	exec("/usr/local/bin/tinydns-conf Gtinydns Gdnslog /etc/tinydns {$dnsserverip}");
+	exec("/bin/ln -s /etc/tinydns /service/");
+
 	exec("echo {$dnsserverip} > /etc/tinydns/env/IP");
 	exec("/usr/bin/killall -9 tinydns");
 
