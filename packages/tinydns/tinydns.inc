@@ -324,10 +324,12 @@ function tinydns_create_zone_file() {
 		/* Register LAN IP and SOA Forward and Reverse DNS recors in TinyDNS Server*/
 		if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
 			$forwardingservers = tinydns_register_root_servers();
-			if($forwardingservers)fwrite($fd, $forwardingservers);
+			if($forwardingservers) 
+				fwrite($fd, $forwardingservers);
 			if($config['system']['hostname']['domain']) {
 				$dhcpdhostname = $config['system']['hostname'];		
-				if($config['dhcpd']['lan'])$dhcpddomain = $config['system']['domain'];
+				if($config['dhcpd']['lan'])
+					$dhcpddomain = $config['system']['domain'];
 				$dhcpdlanip = $config['interfaces']['lan']['ipaddr'];		
 				$dhcpdipmask = $config['interfaces']['lan']['subnet'];		
 				$dhcpdfqdn = "{$dhcpdhostname}.{$dhcpddomain}";
@@ -338,12 +340,13 @@ function tinydns_create_zone_file() {
 		/* Register Static IPs */
 		if($config['installedpackages']['tinydns']['config'][0]['regdhcpstatic']) {
 			if(is_array($config['dhcpd']['lan']['staticmap'])) {
-				foreach($config['dhcpd']['lan']['staticmap'] as $dhcpdstatic){
+				foreach($config['dhcpd']['lan']['staticmap'] as $dhcpdstatic) {
 					$dhcpdhostname = $dhcpdstatic['hostname'];
 					$dhcpdfqdn = "{$dhcpdhostname}.{$dhcpddomain}";
 					$dhcpdlanip = $dhcpdstatic['ipaddr'];
 					$dhcpda = "={$dhcpdfqdn}:{$dhcpdlanip}";
-					if($dhcpdhostname)fwrite($fd, $dhcpda . "\n");
+					if($dhcpdhostname)
+						fwrite($fd, $dhcpda . "\n");
 				}
 			}
 		}
@@ -382,9 +385,8 @@ function tinydns_create_zone_file() {
 				}
 			}
 			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname, $domain['rdns']);
-			if($record_data) {
+			if($record_data) 
 				fwrite($fd, $record_data . "\n");
-			}
 			/* process load balanced items */
 			if($domain['row']) {
 				foreach($domain['row'] as $row) {
@@ -431,11 +433,10 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
     $port = $config['system']['webgui']['port'];
     /* if port is empty lets rely on the protocol selection */
     if($port == "") {
-		if($config['system']['webgui']['protocol'] == "http") {
+		if($config['system']['webgui']['protocol'] == "http") 
 			$port = "80";
-		} else {
+		else 
 			$port = "443";
-		}
     }
 	$synchronizetoip .= $sync_to_ip;
 
@@ -520,11 +521,14 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 }
 
 /* Returns the last IP byte and the Trimmed IP*/
-function tinydns_get_lastip_byte($ipsub){
+function tinydns_get_lastip_byte($ipsub) {
 	$len= strlen($ipsub); 	
 	$pos = strrpos($ipsub, ".");
 	$last_byte = "";
-	if ($pos === false){ $last_byte = $ipsub; return array ($last_byte,$ipsub); } 
+	if ($pos === false) { 
+			$last_byte = $ipsub; 
+			return array ($last_byte,$ipsub); 
+	} 
 	$last_byte = substr($ipsub,$pos + 1);
 	$ipsub = substr($ipsub,0,$pos);
 	return array ($last_byte,$ipsub);
@@ -532,7 +536,7 @@ function tinydns_get_lastip_byte($ipsub){
 
 /* in-add.arpa IP calculated from D.C.B.A and Mask to A.B.C.D.in-addr.arpa */
 /* subnet IP calculated from A.B.C.D and Mask */
-function tinydns_get_ip_subnet_arpa($ip, $ipmask){
+function tinydns_get_ip_subnet_arpa($ip, $ipmask) {
 	$ipsub = $ip;	
 	$arpaip = "";	
 	$array = tinydns_get_lastip_byte($ipsub);
@@ -547,7 +551,7 @@ function tinydns_get_ip_subnet_arpa($ip, $ipmask){
 	$array = tinydns_get_lastip_byte($ipsub);
 	$d = $array[0];
 	$ipsub = $array[1];
-	switch ($ipmask){
+	switch ($ipmask) {
 		case ($ipmask <= 32 AND $ipmask > 24):
 			$s = 32 - $ipmask;
 			$a >> $s;
@@ -577,21 +581,24 @@ function tinydns_get_ip_subnet_arpa($ip, $ipmask){
 }
 
 /* Create a Forward and a Reverse DNS (SOA, A, PTR) records for Fully Qualififed Domain Name*/
-function tinydns_complete_soa_record($fd, $ip, $ipmask, $nsname, $domain){
+function tinydns_complete_soa_record($fd, $ip, $ipmask, $nsname, $domain) {
 	$fqdn = "{$nsname}.{$domain}";
 	$rip = tinydns_get_ip_subnet_arpa($ip, $ipmask);
 	$soa = ".{$domain}::{$fqdn}";
 	$rsoa = ".{$rip[1]}::{$fqdn}";
 	$a = "={$fqdn}:{$ip}";
-	if($fqdn)fwrite($fd, $soa . "\n");
-	if($rip)fwrite($fd, $rsoa . "\n");
-	if($nsname)fwrite($fd, $a . "\n");
+	if($fqdn)
+		fwrite($fd, $soa . "\n");
+	if($rip) 
+		fwrite($fd, $rsoa . "\n");
+	if($nsname) 
+		fwrite($fd, $a . "\n");
 }
 
 /* Search for active leases in the dhcpd.leases file and add them to tinyDNS */
 /* Currently it will add duplicate leases that are ignored by thee tinyDNS server*/
 /* Should duplicate leases be purged by DCHCP server in a remove stale records operation? */
-function tinydns_add_active_leases($fl,$fd, $leasedomain){
+function tinydns_add_active_leases($fl,$fd, $leasedomain) {
 	$i = 0;
 	$lip = strlen("lease") + 1;
 	$lis = strlen("binding state active");
@@ -602,25 +609,25 @@ function tinydns_add_active_leases($fl,$fd, $leasedomain){
 	while (!feof($fl)) {
 		$leases = fgets($fl, 4096);
 		$discard = ($leases[0] == "#") OR ($leases[0] == "\n"); 
-		if(!$discard){
-			if($leaseip == ""){
-				if ($leaseip = strstr($leases,"lease")){
+		if(!$discard) {
+			if($leaseip == "") {
+				if ($leaseip = strstr($leases,"lease")) {
 					$leaseip = substr($leaseip,$lip,strpos($leases,"{") - $lip - 1);
 				}
 			}
-			elseif($leasestatus == FALSE){
-				if (stristr($leases,"binding state active")){
+			elseif($leasestatus == FALSE) {
+				if (stristr($leases,"binding state active")) {
 					$leasestatus = TRUE;
 				}
 			}
-			elseif($leasestatus == TRUE AND $leasehostname == ""){
-				if($leasehostname = stristr($leases,"client-hostname")){
+			elseif($leasestatus == TRUE AND $leasehostname == "") {
+				if($leasehostname = stristr($leases,"client-hostname")) {
 					$qstrt = strpos($leasehostname,'"') + 1;
 					$qlen  = strrpos($leasehostname,'"') - $qstrt;
 					$leasehostname = substr($leasehostname,$qstrt,$qlen);
 				}
 			}
-			if($leases[0] == "}"){
+			if($leases[0] == "}") {
 				$leasefqdn = "{$leasehostname}.{$leasedomain}";
 				$leasea = "={$leasefqdn}:{$leaseip}";
 				if($leasehostname AND $leasestatus)fwrite($fd, $leasea . "\n");
@@ -635,8 +642,10 @@ function tinydns_add_active_leases($fl,$fd, $leasedomain){
 	$leaselines = $i;
 }
 
-function tinydns_get_dns_record_type($tinydnsrecord){
-	$rtype = ""; $rtype2 = ""; $rdns = "";
+function tinydns_get_dns_record_type($tinydnsrecord) {
+	$rtype = "";
+	$rtype2 = "";
+	$rdns = "";
 	switch ($tinydnsrecord) {
 		case($tinydnsrecord[0] == "."):
 			$rtype = "SOA";
@@ -690,10 +699,10 @@ function tinydns_dnscache_forwarding_servers() {
 	while (!feof($fr)) {
 		$routers = fgets($fr, 4096);
 		$discard = ($routers[0] == "\n"); 
-		if(!$discard){
-			if ($routerip = strstr($routers,"nameserver")){
+		if(!$discard) {
+			if ($routerip = strstr($routers,"nameserver")) {
 				$routerip = substr($routerip,$lip);
-				if($routerip){
+				if($routerip) {
 					$j += 1;
 					$routera = "{$routerip}";
 					$iprecords .= $routera;
@@ -717,7 +726,7 @@ function tinydns_dnscache_forwarding_servers() {
 }
 
 /* This routine adds filenames to /etc/dnscache/root/servers/ with the contents pointing to the tinyDNS server */
-function tinydns_create_soa_domain_list($dnsserverip){
+function tinydns_create_soa_domain_list($dnsserverip) {
 	if(file_exists("/service/tinydns/root/data"))
 		$tinydns_data = file_get_contents("/service/tinydns/root/data");
 	else
@@ -725,7 +734,7 @@ function tinydns_create_soa_domain_list($dnsserverip){
 	
 	$datalen = strlen($tinydns_data);
 	$startofrecord = 0;
-	while ($startofrecord < $datalen ){	
+	while ($startofrecord < $datalen ) {	
 		$endofrecord = strpos($tinydns_data,"\n",$startofrecord);
 		$dnsrecord = substr($tinydns_data,$startofrecord,$endofrecord-$startofrecord);
 		$startofrecord = $endofrecord + 1;
@@ -734,7 +743,7 @@ function tinydns_create_soa_domain_list($dnsserverip){
 		$fqdn = substr($dnsrecord,1,$col1-1);
 		if($fqdn) {
 			$rtypes = tinydns_get_dns_record_type($dnsrecord);
-			if($rtypes[0] == "SOA"){
+			if($rtypes[0] == "SOA") {
 				$fr = fopen("/etc/dnscache/root/servers/{$fqdn}", "w");
 				if (! $fr) {
 					printf("Error: cannot open /etc/dnscache/root/servers/{$fqdn} in tinydns_create_soa_domain_list().\n");
@@ -763,10 +772,10 @@ function tinydns_register_forwarding_servers() {
 	while (!feof($fr)) {
 		$routers = fgets($fr, 4096);
 		$discard = ($routers[0] == "\n"); 
-		if(!$discard){
-			if ($routerip = strstr($routers,"nameserver")){
+		if(!$discard) {
+			if ($routerip = strstr($routers,"nameserver")) {
 				$routerip = substr($routerip,$lip);
-				if($routerip){
+				if($routerip) {
 					$j += 1;
 					$routerfqdn = "DNSroute-{$j}.wan{$j}";
 					$routerns = "&::{$routerfqdn}";
@@ -783,7 +792,7 @@ function tinydns_register_forwarding_servers() {
 }
 
 function tinydns_register_root_servers() {
-$rootservers =<<<EOD
+	$rootservers =<<<EOD
 &::a.root-servers.net
 &::b.root-servers.net
 &::c.root-servers.net
@@ -812,7 +821,7 @@ $rootservers =<<<EOD
 =m.root-servers.net:202.12.27.33
 
 EOD;
-return $rootservers;
+	return $rootservers;
 }
 
 function dnscache_use_root_servers() {
