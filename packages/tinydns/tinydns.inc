@@ -161,6 +161,7 @@ function tinydns_custom_php_changeip_command() {
 
 	exec("/usr/sbin/pw useradd Gtinydns");
 	exec("/usr/sbin/pw useradd Gdnslog");
+	exec("/usr/sbin/pw useradd Gdnscache");
 
 	exec("/usr/local/bin/tinydns-conf Gtinydns Gdnslog /etc/tinydns {$dnsserverip}");
 	exec("/bin/ln -s /etc/tinydns /service/");
