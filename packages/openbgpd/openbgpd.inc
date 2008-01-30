@@ -85,30 +85,34 @@ function openbgpd_install_conf() {
 	}	
 
 	// Handle neighbors that do not have a group assigned to them	
-	foreach($openbgpd_neighbors as $neighbor) {
-		$used_this_item = false;
-		if($neighbor['groupname'] == "") {
-			$conffile .= "	neighbor {$neighbor['neighbor']} {\n";
-			$conffile .= "		descr \"{$neighbor['descr']}\"\n";
-			$used_this_item = true;
-			foreach($neighbor['row'] as $row) {
-				$conffile .= "		{$row['paramaters']} {$row['parmvalue']} \n";
+	if(is_array($openbgpd_neighbors)) {
+		foreach($openbgpd_neighbors as $neighbor) {
+			$used_this_item = false;
+			if($neighbor['groupname'] == "") {
+				$conffile .= "	neighbor {$neighbor['neighbor']} {\n";
+				$conffile .= "		descr \"{$neighbor['descr']}\"\n";
+				$used_this_item = true;
+				foreach($neighbor['row'] as $row) {
+					$conffile .= "		{$row['paramaters']} {$row['parmvalue']} \n";
+				}
+				if($used_this_item)		
+					$conffile .= "	}\n";
 			}
-			if($used_this_item)		
-				$conffile .= "	}\n";
 		}
-	}
-	if($used_this_item)
-		$conffile .= "}\n";
+		if($used_this_item)
+			$conffile .= "}\n";
+	}	
 	
 	// OpenBGPD filters
 	$conffile .= "deny from any\n";
 	$conffile .= "deny to any\n";
-	foreach($openbgpd_neighbors as $neighbor) {
-		$conffile .= "allow from {$neighbor['neighbor']}\n";
-		$conffile .= "allow to {$neighbor['neighbor']}\n";	
+	if(is_array($openbgpd_neighbors)) {
+		foreach($openbgpd_neighbors as $neighbor) {
+			$conffile .= "allow from {$neighbor['neighbor']}\n";
+			$conffile .= "allow to {$neighbor['neighbor']}\n";	
+		}
 	}
-	
+
 	// Write out the configuration file
 	fwrite($fd, "# This file was created by the pfSense package manager.  Do not edit!\n\n");	
 	fwrite($fd, $conffile);
