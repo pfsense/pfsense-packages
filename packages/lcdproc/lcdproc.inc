@@ -245,21 +245,23 @@
 
 			/* generate rc file start and stop */
 			$options = "";
-			foreach($lcdproc_screens_config as $name => $screen) {
-				if($screen == "on") {
-					switch($name) {
-						case "scr_cpu":
-							$options .= "P ";
-							break;
-						case "scr_time":
-							$options .= "O ";
-							break;
-						case "scr_load":
-							$options .= "L ";
-							break;
-						case "scr_uptime":
-							$options .= "U ";
-							break;
+			if(is_array($lcdproc_screens_config)) {
+				foreach($lcdproc_screens_config as $name => $screen) {
+					if($screen == "on") {
+						switch($name) {
+							case "scr_cpu":
+								$options .= "P ";
+								break;
+							case "scr_time":
+								$options .= "O ";
+								break;
+							case "scr_load":
+								$options .= "L ";
+								break;
+							case "scr_uptime":
+								$options .= "U ";
+								break;
+						}
 					}
 				}
 			}
