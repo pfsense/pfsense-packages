@@ -1,4 +1,10 @@
 <?php
+
+/*   package is now in base, check to see 
+ *   if we are already being included 
+ */
+if(!function_exists("upnp_action")) {
+		
 	require_once("config.inc");
 	require_once("functions.inc");
 
@@ -278,4 +284,7 @@ EOD;
 
 		config_unlock();
 	}
+
+}
+
 ?>
