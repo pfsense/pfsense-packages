@@ -146,24 +146,26 @@
 	<custom_php_command_before_form>
 		$newoptions = array();
 		$new_groups = array();
-		foreach($config['installedpackages']['openbgpdgroups']['config'] as $item) 
-    		    $new_groups[] = $item['name'];  
-		$counter = 0;  		    
-		foreach($new_groups as $group) {
-			$newoptions['option'][$counter]['name'] = $group;
-			$newoptions['option'][$counter]['value'] = $group;
-			$counter++;
-		}	
-		$newoptions['option'][$counter]['name'] = "";
-		$newoptions['option'][$counter]['value'] = "";		
-		$pkg['fields']['field'][2]['options'] = $newoptions; 
-		$counter = 0;
-		foreach($pkg['fields']['field'] as $field) {
-			if($field['name'] == "group") {
-				$foundgroupid = $counter;
-				echo "found it: $counter";
+		if($config['installedpackages']['openbgpdgroups']['config']) {
+			foreach($config['installedpackages']['openbgpdgroups']['config'] as $item) 
+	    		    $new_groups[] = $item['name'];  
+			$counter = 0;  		    
+			foreach($new_groups as $group) {
+				$newoptions['option'][$counter]['name'] = $group;
+				$newoptions['option'][$counter]['value'] = $group;
+				$counter++;
+			}	
+			$newoptions['option'][$counter]['name'] = "";
+			$newoptions['option'][$counter]['value'] = "";		
+			$pkg['fields']['field'][2]['options'] = $newoptions; 
+			$counter = 0;
+			foreach($pkg['fields']['field'] as $field) {
+				if($field['name'] == "group") {
+					$foundgroupid = $counter;
+					echo "found it: $counter";
+				}
+				$counter++;
 			}
-			$counter++;
 		}
 	</custom_php_command_before_form>
 	<custom_php_deinstall_command>

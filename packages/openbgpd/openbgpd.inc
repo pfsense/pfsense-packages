@@ -34,11 +34,13 @@ function openbgpd_install_conf() {
 	
 	conf_mount_rw();
 	
-	$openbgpd_conf = &$config['installedpackages']['openbgpd']['config'][0];
-	$openbgpd_rows = &$config['installedpackages']['openbgpd']['config'][0]['row'];
-	$openbgpd_groups = &$config['installedpackages']['openbgpdgroups']['config'];
-	$openbgpd_neighbors = &$config['installedpackages']['openbgpdneighbors']['config'];
-
+	if($config['installedpackages']['openbgpd']['config']) {
+		$openbgpd_conf = &$config['installedpackages']['openbgpd']['config'][0];
+		$openbgpd_rows = &$config['installedpackages']['openbgpd']['config'][0]['row'];
+		$openbgpd_groups = &$config['installedpackages']['openbgpdgroups']['config'];
+		$openbgpd_neighbors = &$config['installedpackages']['openbgpdneighbors']['config'];
+	}
+	
 	$fd = fopen("/usr/local/etc/bgpd.conf", "w");
 	
 	$conffile = "";
@@ -70,14 +72,16 @@ function openbgpd_install_conf() {
 		foreach($openbgpd_groups as $group) {
 			$conffile .= "group \"{$group['name']}\" {\n";
 			$conffile .= "	remote-as {$group['remoteas']}\n";
-			foreach($openbgpd_neighbors as $neighbor) {
-				if($neighbor['groupname'] == $group['name']) {
-					$conffile .= "	neighbor {$neighbor['neighbor']} {\n";
-					$conffile .= "		descr \"{$neighbor['descr']}\"\n";
-					foreach($neighbor['row'] as $row) {
-						$conffile .= "		{$row['paramaters']} {$row['parmvalue']} \n";
-					}		
-					$conffile .= "	}\n";
+			if(is_array($openbgpd_neighbors)) {
+				foreach($openbgpd_neighbors as $neighbor) {
+					if($neighbor['groupname'] == $group['name']) {
+						$conffile .= "	neighbor {$neighbor['neighbor']} {\n";
+						$conffile .= "		descr \"{$neighbor['descr']}\"\n";
+						foreach($neighbor['row'] as $row) {
+							$conffile .= "		{$row['paramaters']} {$row['parmvalue']} \n";
+						}		
+						$conffile .= "	}\n";
+					}
 				}
 			}
 			$conffile .= "}\n";
@@ -148,10 +152,12 @@ function deinstall_openbgpd() {
 
 function check_group_usage($groupname) {
 	global $config, $g;
-	$openbgpd_conf = &$config['installedpackages']['openbgpd']['config'][0];
-	$openbgpd_rows = &$config['installedpackages']['openbgpd']['config'][0]['row'];
-	$openbgpd_groups = &$config['installedpackages']['openbgpdgroups']['config'];
-	$openbgpd_neighbors = &$config['installedpackages']['openbgpdneighbors']['config'];
+	if($config['installedpackages']['openbgpd']['config']) {
+		$openbgpd_conf = &$config['installedpackages']['openbgpd']['config'][0];
+		$openbgpd_rows = &$config['installedpackages']['openbgpd']['config'][0]['row'];
+		$openbgpd_groups = &$config['installedpackages']['openbgpdgroups']['config'];
+		$openbgpd_neighbors = &$config['installedpackages']['openbgpdneighbors']['config'];
+	}
 	if(is_array($openbgpd_groups)) {	
 		foreach($openbgpd_groups as $group) {
 			foreach($openbgpd_neighbors as $neighbor) {
