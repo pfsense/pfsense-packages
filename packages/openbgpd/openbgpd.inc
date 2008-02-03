@@ -34,12 +34,14 @@ function openbgpd_install_conf() {
 	
 	conf_mount_rw();
 	
-	if($config['installedpackages']['openbgpd']['config']) {
+	if($config['installedpackages']['openbgpd']['config']) 
 		$openbgpd_conf = &$config['installedpackages']['openbgpd']['config'][0];
-		$openbgpd_rows = &$config['installedpackages']['openbgpd']['config'][0]['row'];
+	if($config['installedpackages']['openbgpd']['config'][0]['row'])
+		$openbgpd_rows = &$config['installedpackages']['openbgpd']['config'][0]['row'];	
+	if($config['installedpackages']['openbgpdgroups']['config'])
 		$openbgpd_groups = &$config['installedpackages']['openbgpdgroups']['config'];
+	if($config['installedpackages']['openbgpdneighbors']['config'])
 		$openbgpd_neighbors = &$config['installedpackages']['openbgpdneighbors']['config'];
-	}
 	
 	$fd = fopen("/usr/local/etc/bgpd.conf", "w");
 	
@@ -152,12 +154,16 @@ function deinstall_openbgpd() {
 
 function check_group_usage($groupname) {
 	global $config, $g;
-	if($config['installedpackages']['openbgpd']['config']) {
+
+	if($config['installedpackages']['openbgpd']['config']) 
 		$openbgpd_conf = &$config['installedpackages']['openbgpd']['config'][0];
-		$openbgpd_rows = &$config['installedpackages']['openbgpd']['config'][0]['row'];
+	if($config['installedpackages']['openbgpd']['config'][0]['row'])
+		$openbgpd_rows = &$config['installedpackages']['openbgpd']['config'][0]['row'];	
+	if($config['installedpackages']['openbgpdgroups']['config'])
 		$openbgpd_groups = &$config['installedpackages']['openbgpdgroups']['config'];
+	if($config['installedpackages']['openbgpdneighbors']['config'])
 		$openbgpd_neighbors = &$config['installedpackages']['openbgpdneighbors']['config'];
-	}
+
 	if(is_array($openbgpd_groups)) {	
 		foreach($openbgpd_groups as $group) {
 			foreach($openbgpd_neighbors as $neighbor) {
