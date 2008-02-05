@@ -32,8 +32,8 @@
 # squidGuard -c <configfile>        - create squidGuard with specified config file
 # ------------------------------------------------------------------------------
 # Notes:
-#   -- for work squidGuard need present ALL destinations; 
-#      if dest not present in config - then this item will ignored in operations 
+#   -- for work squidGuard need present ALL destinations;
+#      if dest not present in config - then this item will ignored in operations
 #      (in rebuild DB for example)
 # ------------------------------------------------------------------------------
 # Directories:
@@ -51,107 +51,7 @@
 #                   '' or 'local'   - update from local file (example: '/tmp/blacklist.tar')
 #                   'url'           - update from url
 # ------------------------------------------------------------------------------
-# Config XML structure:
-# ------------------------------------------------------------------------------
-/*
-<?xml version="1.0"?>
-<squidGuard>
-        <logdir/>
-        <dbhome/>
-        <workdir/>
-        <enabled/>
-        <blacklist_enabled>
-        <sources>
-                <item>
-                        <name/>
-                        <ip/>
-                        <log>on</log>
-                        <description/>
-                </item>
-                <item>
-                      ...
-                </item>
-        </sources>
-        <destinations>
-                <item>
-                        <name/>
-                        <urls/>
-                        <domains/>
-                        <expressions/>
-                        <redirect/>
-                        <description/>
-                        <log>on</log>
-                </item>
-                <item>
-                      ...
-                </item>
-        </destinations>
-        <rewrites>
-                <item>
-                        <name/>
-                        <description/>
-                        <log>on</log>
-                        <item>
-                                <targeturl/>
-                                <replaceto/>
-                        </item>
-                        <item>
-                              ...
-                        </item>
-                </item>
-                <item>
-                      ...
-                </item>
-        </rewrites>
-        <times>
-                <item>
-                        <name/>
-                        <description/>
-                        <item>
-                                <timetype/>
-                                <timedays/>
-                                <daterange/>
-                                <sg_timerange/>
-                        </item>
-                        <item>
-                              ...
-                        </item>
-                </item>
-                <item>
-                      ...
-                </item>
-        </times>
-        <acls>
-                <item>
-                        <name/>
-                        <description/>
-                        <disabled/>
-                        <timename/>
-                        <redirect/>
-                        <rewritename/>
-                        <overredirect/>
-                        <overrewritename/>
-                        <destname/>
-                        <overdestname/>
-                </item>
-                <item>
-                      ...
-                </item>
-        </acls>
-        <default>
-                <name/>
-                <description/>
-                <disabled/>
-                <timename/>
-                <redirect/>
-                <rewritename/>
-                <overredirect/>
-                <overrewritename/>
-                <destname/>
-                <overdestname/>
-        </default>
-</squidGuard>
-*/
+
 require_once('globals.inc');
 require_once('config.inc');
 require_once('util.inc');
@@ -161,7 +61,8 @@ require_once('filter.inc');
 require_once('service-utils.inc');
 
 # ------------------------------------------------------------------------------
-
+# files header
+# ------------------------------------------------------------------------------
 define('FILES_DB_HEADER', '
 # ------------------------------------------------------------------------------
 #        File created by squidGuard package GUI
@@ -216,16 +117,26 @@ define('TMP_DIR',                      '/var/tmp');
 define('SQUIDGUARD_CONFIGFILE',        '/squidGuard.conf');
 define('SQUIDGUARDCONF_LOGFILE',       '/sg_configurator.log');
 define('SQUIDGUARD_ACCESSBLOCK_FILE',  'block.log');
-define('SQUIDGUARD_BLK_ENTRIES',       '/blacklist.files');
-define('BLACKLIST_ARCHIVE',            '/blacklists.tar');
-# ? may be not used ?
 define('SQUIDGUARD_CONFBASE_DEF',      '/usr/local/etc/squid');
 define('SQUIDGUARD_LOGDIR_DEF',        '/tmp');
 define('SQUIDGUARD_WORKDIR_DEF',       '/usr/local/etc/squidGuard');
 define('SQUIDGUARD_BINPATH_DEF',       '/usr/local/bin');
+define('SQUIDGUARD_TMP',               '/var/tmp/squidGuard');
+
+# DB home catalog contains 'Blacklist' and 'User' sub-catalogs
 define('SQUIDGUARD_DBHOME_DEF',        '/var/db/squidGuard');
+define('SQUIDGUARD_DB_BLACKLIST',      '/bl');
+define('SQUIDGUARD_DB_USER',           '/usr');
+define('SQUIDGUARD_BL_UNPACK',         '/unpack');
+define('SQUIDGUARD_BL_DB',             '/db');
+
+# DB/Blacklist defines
+define('SQUIDGUARD_BLK_ENTRIES',       '/blacklist.files');
+define('BLACKLIST_ARCHIVE',            '/blacklists.tar');
 define('BLK_LOCALFILE',                '/tmp/sg_blacklists.tar');
 define('DB_REBUILD_SH',                '/tmp/squidGuard_db_rebuild.sh');
+define('DB_REBUILD_CONF',              '/tmp/squidGuard_db_rebuild.conf');
+define('BLK_TEMP',                     '/tmp/sg_blk');
 
 # ------------------------------------------------------------------------------
 // debug options
@@ -536,58 +447,65 @@ function sg_check_system() {
          }
          unset($db_dir);
 }
-// ------------------------------------------------------------
-// sg_reconfigure_user_db
-//  - reconfigure(update) db user entries
-// ------------------------------------------------------------
+# ==============================================================================
+# squidGuard DB
+# ==============================================================================
+# sg_reconfigure_user_db
+#  - reconfigure(update) db user entries
+# ------------------------------------------------------------------------------
 function sg_reconfigure_user_db() {
          global $squidguard_config;
          $dbhome = $squidguard_config[FLD_DBHOME];
 
-         sg_addlog("sg_reconfigure_user_db: begin");
+         sg_addlog("sg_reconfigure_user_db: begin at '$dbhome'");
 
+         // create user DB catalog, if not extsts
          if (!file_exists($dbhome)) {
-             sg_addlog("sg_reconfigure_user_db: error - path not found $dbhome");
-             return;
+             if (!mkdir($dbhome, 0755)) {
+                  sg_addlog("sg}_reconfigure_user_db: ERROR create user DB directory $dbhome");
+                  return;
+             }
+             set_file_access($dbhome, OWNER_NAME, 0755);
+             sg_addlog("sg_reconfigure_user_db:Create user DB directory $dbhome");
          }
 
          // update destinations to db
          $dests = $squidguard_config[FLD_DESTINATIONS];
          if(!empty($dests)){
-             $dst_names = array();
+             $dst_names = Array();
+             $dst_list  = Array();   // destinations list
 
              foreach($dests[FLD_ITEM] as $dst) {
                      $path = "$dbhome/" . $dst[FLD_NAME];
-                     $dst_names[] = $path;
+                     $dst_names[]   = $path;
+                     $dst_list["usr_{$dst[FLD_NAME]}"] = $dst[FLD_NAME];
 
                      // 1. check destination catalog and create them, if need
                      if (!file_exists($path)) {
                           if (!mkdir ($path, 0755)) {
-                                 sg_addlog("sg_reconfigure_user_db: error create dir $path");
-                                 return;
+                               sg_addlog("sg_reconfigure_user_db: ERROR create dir $path");
+                               return;
                           }
-                          else sg_addlog("Create dir $path");
+                          sg_addlog("sg_reconfigure_user_db: Create dir $path");
                      }
 
                      // 2. build domains file
                      $domains = $dst[FLD_DOMAINS];
                      if (!empty($domains)) {
-                          $content = '';
                           $content = str_replace(" ", "\n", $domains);
                           $content = trim($content);
                           file_put_contents($path . '/domains', $content);
-                          sg_addlog("sg_reconfigure_user_db: add domains '$domains'");
+                          sg_addlog("sg_reconfigure_user_db: -- add domains '$domains'");
                      }
                      unset($domains);
 
                      // 3. build urls file
                      $urls = $dst[FLD_URLS];
                      if (!empty($urls)) {
-                          $content = '';
                           $content = str_replace(" ", "\n", $urls);
                           $content = trim($content);
                           file_put_contents($path . '/urls', $content);
-                          sg_addlog("sg_reconfigure_user_db: add urls '$content'");
+                          sg_addlog("sg_reconfigure_user_db: -- add urls '$content'");
                      }
                      unset($urls);
 
@@ -598,7 +516,7 @@ function sg_reconfigure_user_db() {
                           $content = trim($content); // delete first and last unnecessary '|' symbols
                           $content = str_replace(" ", "|", $content);
                           file_put_contents($path . '/expressions', $content);
-                          sg_addlog("sg_reconfigure_user_db: add expressions '$content'");
+                          sg_addlog("sg_reconfigure_user_db: -- add expressions '$content'");
                      }
                      unset($expr);
              }
@@ -606,18 +524,14 @@ function sg_reconfigure_user_db() {
              // 4. recursive set files access
              set_file_access($dbhome, OWNER_NAME, 0755);
 
-             // 5. rebuild user db
-             // $dst_names; create array of names
-             $db_names = Array();
-             foreach($dst_names as $dname)
-                     $db_names[] = $dname;
-             sg_full_rebuild_db($db_names);
+             // 5. rebuild user db ('/var/db/squidGuard')
+             sg_rebuild_db("_usrdb", $dbhome, $dst_list);
 
          } else
-             sg_addlog("sg_reconfigure_user_db: stopped - destinations list empty");
+             sg_addlog("sg_reconfigure_user_db: STOPPED; User destinations list empty");
 
          // 6. remove unused db entries
-         sg_remove_unused_db_entries();
+#         sg_remove_unused_db_entries();
 
          sg_addlog("sg_reconfigure_user_db: end");
 }
@@ -660,109 +574,120 @@ function sg_remove_unused_db_entries() {
          }
          sg_addlog("sg_remove_unused_db_entries: end");
 }
+# ------------------------------------------------------------------------------
+# sg_rebuild_db  Rebuild squidGuard DB from list items
+# ------------------------------------------------------------------------------
+# $shtag         - rebuild SH script TAG
+# $rdb_dbhome    - DB directory  (default: '/var/db/squidGuard')
+# $rdb_itemslist - items list as ['dest_key']='dest_DB_path'
+#                  dest_DB_path - path without '$rdb_dbhome'
+#                  example: ['ads_ban']='ads/banners' -> '/var/db/squidGuard/ads/banners'
+# ------------------------------------------------------------------------------
 
-// ------------------------------------------------------------
-// sg_full_rebuild_db
-// squidguard inline options: -C - create db files; -u - update '.diff' files to db
-// ------------------------------------------------------------
-// squidGuard behaviour:
-//   -- sg load all destinations, what defined in config file
-// Problem:
-//   -- if db very big and not rebuilded - then starting squidGuard very long
-//      if i want rebuild some destination items with '-C itemname' option,
-//      then with worked config i take very-slowly-proccess
-// Decision:
-//   -- for rebuild DB all i use worked config
-//   -- for partually rebuild DB i create temp config with rebuilded destinations,
-//      and call '-C all' options with temp config
-// ------------------------------------------------------------
-// Algorithm:
-//    if need full DB rebuild
-// ------------------------------------------------------------
-function sg_full_rebuild_db($dblist='') {
+function sg_rebuild_db($shtag, $rdb_dbhome, $rdb_itemslist) {
          global $squidguard_config;
-         $sg_cfgfile = '';
+         $conf   = '';
+         $conf_path = '';
+         $logdir = $squidguard_config[FLD_LOGDIR];
+         $dbhome = $squidguard_config[FLD_DBHOME];
 
-         sg_addlog("sg_rebuild_db: begin");
+         // current dbhome dir
+         if (!empty($rdb_dbhome)) $dbhome = $rdb_dbhome;
+         sg_addlog("sg_rebuild_db: Begin with path '$dbhome'.");
 
-         if ($squidguard_config[FLD_WORKDIR])
-              $sg_cfgfile = $squidguard_config[FLD_WORKDIR];
-         else $sg_cfgfile = SQUIDGUARD_WORKDIR_DEF;
-         $sg_cfgfile .= SQUIDGUARD_CONFIGFILE;
+         // define - where config will placed
+         $conf_path = "/tmp/squidGuard_rebuild.conf" . $shtag;
 
-         // set files access
-         set_file_access($squidguard_config[FLD_DBHOME], OWNER_NAME, 0755);
+         // make rebuild config; include all found dest items
+         $conf = sg_create_rebuild_config($dbhome, $rdb_itemslist);
+         file_put_contents($conf_path, $conf);
+         set_file_access($conf_path, OWNER_NAME, 0750);
+         sg_addlog("sg_rebuild_db: Create temporary config '$conf_path'.");
 
-         // rebuild squidGuard DB (without waite)
-         if (file_exists($sg_cfgfile)) {
-             // sh script
-             $sh_scr = array();
-             $sh_scr[] = "#!/bin/sh";
-             $sh_scr[] = "cd " . $squidguard_config[FLD_DBHOME];
+         // *** SH script ***
+         $sh_scr = Array();
+         $sh_scr[] = "#!/bin/sh";
+         $sh_scr[] = "cd $dbhome";
+         $cmd = $squidguard_config[FLD_BINPATH] . "/squidGuard -c $conf_path -C all";
+         $sh_scr[] = $cmd;
 
-             // full rebuild DB
-             if (empty($dblist)) {
-                 // full rebuild via sh script
-                 $cmd = $squidguard_config[FLD_BINPATH] . "/squidGuard -c $sg_cfgfile -C all";
-                 $sh_scr[] = $cmd;
-#                mwexec_bg($cmd);
-                 sg_addlog("sg_rebuild_db: start full rebuild db: '$cmd'");
-             } else {
-                 // partually rebuild
-                 if (is_array($dblist)) {
-                     // create temp config
-                     $t_cfg = "/tmp/squidGuard_tmp.cfg";
-                     $tmp_cfg = array();
-                     $tmp_cfg[] = FILES_DB_HEADER;
-                     $tmp_cfg[] = "logdir " . $squidguard_config[FLD_LOGDIR];
-                     $tmp_cfg[] = "dbhome " . $squidguard_config[FLD_DBHOME];
-                     $tmp_cfg[] = "";
+         // set DB owner and right access
+         $sh_scr[] = "chown -R -v " . OWNER_NAME . " $dbhome";
 
-                     foreach($dblist as $dbl) {
-                           $path = $squidguard_config[FLD_DBHOME]."/$dbl";
-                     	$tmp_cfg[] = "dest $dbl {";
-                           if (file_exists("$path/domains"))     $tmp_cfg[] = "\t domainlist $dbl/domains";
-                           if (file_exists("$path/urls"))        $tmp_cfg[] = "\t urllist $dbl/urls";
-                           if (file_exists("$path/expressions")) $tmp_cfg[] = "\t expressionlist $dbl/expressions";                               
-                     	$tmp_cfg[] = "}";
-                           sg_addlog("sg_rebuild_db: rebuild DB '$dbl'");
-                     }
-                     $tmp_cfg[] = "acl {";
-                     $tmp_cfg[] = "\t default {";
-                     $tmp_cfg[] = "\t\t pass none";
-                     $tmp_cfg[] = "\t\t redirect http://127.0.0.1";
-                     $tmp_cfg[] = "\t }";
-                     $tmp_cfg[] = "}";
-                     file_put_contents($t_cfg, implode("\n", $tmp_cfg));
-                     chmod($t_cfg, 0750);
+         // restart squid for changes to take effects
+         $sh_scr[] = "/usr/local/sbin/squid -k reconfigure";
 
-                     // rebuild all, what contains in temporary config file
-                     $cmd = $squidguard_config[FLD_BINPATH] . "/squidGuard -c $t_cfg -C all";
-                     $sh_scr[] = $cmd;
-#                    mwexec_bg($cmd);
-                     sg_addlog("sg_rebuild_db: start rebuild db '$cmd'");
-                 } else {
-                     sg_addlog("sg_rebuild_db: ERROR parameter '$dblist'");
-                 }
+         // store & exec sh
+         $sh_scr = implode("\n", $sh_scr);
+         $shfile =  DB_REBUILD_SH . $shtag;
+         file_put_contents($shfile, $sh_scr);
+         set_file_access($shfile, OWNER_NAME, 0750);
+         mwexec_bg($shfile);
+         sg_addlog("sg_rebuild_db: Started SH script '$shfile'.");
+         sg_addlog("sg_rebuild_db: End.");
+}
+
+# ------------------------------------------------------------------------------
+# sg_create_rebuild_config
+#     Create config for DB rebuilding
+#     Default rule - block all
+#     Variables:
+#         $blk_dbhome   - temporary DB home dir, may be different with DBHOME
+#         $blk_destlist - is array as [dst_name] = 'path',
+#                         where path - catalog without dbhome path
+#                         For example: dbhome is '/var/db/squidGuard/',
+#                         path can be 'usr/ads' or 'bl/poxy'
+# ------------------------------------------------------------------------------
+function sg_create_rebuild_config($blk_dbhome, $blk_destlist) {
+         global $squidguard_config;
+         $sgconf = array();
+         $logdir = $squidguard_config[FLD_LOGDIR];
+         $dbhome = $squidguard_config[FLD_DBHOME];
+
+         // current dbhome dir
+         if (!empty($blk_dbhome)) $dbhome = $blk_dbhome;
+         sg_addlog("sg_create_rebuild_config: Begin with dbhome='$dbhome'.");
+
+         // header
+         $sgconf[] = CONFIG_SG_HEADER;
+
+         // init section
+         $sgconf[] = "logdir $logdir";
+         $sgconf[] = "dbhome $dbhome";
+         $sgconf[] = "";
+
+         // destination section
+         if (is_array($blk_destlist)) {
+             foreach($blk_destlist as $dst => $dpath) {
+                 $tmp_s = array();
+                 // check item elements
+                 if (file_exists("$dbhome/$dpath/domains"))     $tmp_s[] = "\t domainlist $dpath/domains";
+                 if (file_exists("$dbhome/$dpath/urls"))        $tmp_s[] = "\t urllist $dpath/urls";
+                 if (file_exists("$dbhome/$dpath/expressions")) $tmp_s[] = "\t expressionlist $dpath/expressions";
+                 // create only valid items
+                 if (!empty($tmp_s)) {
+                     $sgconf[] = "dest $dst {";
+                     $sgconf[] = implode("\n", $tmp_s);
+                     $sgconf[] = "}";
+                     $sgconf[] = "";
+                     sg_addlog("sg_create_rebuild_config: Added item '$dst' = '$dbhome/$dpath'.");
+                 } else
+                     sg_addlog("sg_create_rebuild_config: Ignored item '$dst' = '$dbhome/$dpath'.");
              }
-             // *** SH script ***
-             // change db owner's after rebuild
-             $sh_scr[] = "chown -R -v " . OWNER_NAME . " " . $squidguard_config[FLD_DBHOME];
-
-             // restart squid for take effects
-             $sh_scr[] = "/usr/local/sbin/squid -k reconfigure";
-
-             // store & exec sh
-             $sh_scr = implode("\n", $sh_scr);
-             file_put_contents(DB_REBUILD_SH, $sh_scr);
-             chmod(DB_REBUILD_SH, 0750);
-             mwexec_bg(DB_REBUILD_SH);
-         } else {
-             sg_addlog("sg_rebuild_db: error, config file '$sg_cfgfile' not found");
          }
 
-         sg_addlog("sg_rebuild_db: end");
+         // acl section
+         $sgconf[] = "acl {";
+         $sgconf[] = "\t default {";
+         $sgconf[] = "\t\t pass none";
+         $sgconf[] = "\t\t redirect " . sg_redirector_base_url('404');
+         $sgconf[] = "\t }";
+         $sgconf[] = "}";
+
+         sg_addlog("sg_create_rebuild_config: ATTENTION! Created default configuration. All content will blocked.");
+         return implode("\n", $sgconf);
 }
+
 // ============================================================
 // Log
 // ============================================================
@@ -825,11 +750,12 @@ function sg_getlog($last_entries_count) {
 # -------------------------------------------------------------
 # sg_build_default_config
 # default rule - block all
+#   $dest_list - is array as [dst_name] = path, where path - without dbhome
+#   For example: dbhome is '/var/db/squidGuard', path can be 'usr/ads' or 'bl/poxy'
 # -------------------------------------------------------------
 function sg_build_default_config() {
          global $squidguard_config;
          $sgconf = array();
-#         $redirect_base_url = sg_redirector_base_url();
 
          // header
          $sgconf[] = CONFIG_SG_HEADER;
@@ -837,7 +763,6 @@ function sg_build_default_config() {
          $sgconf[] = "logdir {$squidguard_config[FLD_LOGDIR]}";
          $sgconf[] = "dbhome {$squidguard_config[FLD_DBHOME]}";
          $sgconf[] = "";
-
          // acl section
          $sgconf[] = "acl {";
          $sgconf[] = "\t default {";
@@ -846,8 +771,8 @@ function sg_build_default_config() {
          $sgconf[] = "\t }";
          $sgconf[] = "}";
 
-         sg_addlog("sg_build_default_config: Created default configuration. All content will blocked.");
-         return $sgconf;
+         sg_addlog("sg_build_default_config: ATTENTION! Created default configuration. All content will blocked.");
+         return implode("\n", $sgconf);
 }
 
 // ------------------------------------------------------------
@@ -884,16 +809,16 @@ function sg_redirector_base_url($url) {
              else $rdr_path = "http://"  . $rdr_path;
 
              // arguments
-             // Attention: 
-             // 	order arg's must be: first-URL, last-SG variables
-             //		SG have bug, what broke data after his var's
+             // Attention:
+             //         order arg's must be: first-URL, last-SG variables
+             //                SG have bug, what broke data after his var's
              $tmp_url = ltrim($url);
              // not need encoded url string. only err_code line
              if (eregi("^https{0,1}://", $tmp_url) === false)
                  $tmp_url = rawurlencode($tmp_url);
              $rdr_path = $rdr_path . "?url=" . $tmp_url . REDIRECT_URL_ARGS; // rawurlencode($tmp_url) . REDIRECT_URL_ARGS;
              unset($tmp_url);
-         } 
+         }
 
          sg_addlog("sg_redirector_base_url: select redirector base url ($rdr_path)");
          return $rdr_path;
@@ -1450,7 +1375,7 @@ function sg_check_config_data () {
 }
 
 // =============================================================================
-// blacklist
+// Blacklist
 // =============================================================================
 // sg_reconfigure_blacklist($source_filename, $opt)
 //       $source_filename - file name or url
@@ -1493,100 +1418,129 @@ function sg_reconfigure_blacklist($source_filename, $opt = '') {
          sg_update_blacklist(BLK_LOCALFILE);
 
          // 4. rebuild db
-         sg_full_rebuild_db();
+#         sg_full_rebuild_db();
 
          sg_addlog("sg_reconfigure_blacklist: end");
 }
 
-// -----------------------------------------------------------------------------
-// sg_update_blacklist - update blacklist from file
-// -----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# sg_update_blacklist - update blacklist from file
+# How it's work:
+#     - unpack tar archive to temp dir
+#     - copy subdir tree to one-level temp DB
+#     - copy unrebuilded temp db to work db (for user can configure with new Blacklist)
+#     - create Blacklist files listing and copy to work dir and tem DB dir
+#     - background rebuild temp DB via sh script (loonger proccess) and copy them to work DB
+# ------------------------------------------------------------------------------
 
 function sg_update_blacklist($from_file) {
          global $squidguard_config;
-         $dbhome = SQUIDGUARD_DBHOME_DEF;
+         $tmp_unpack_dir = SQUIDGUARD_TMP . SQUIDGUARD_BL_UNPACK;
+         $tmp_db_dir     = SQUIDGUARD_TMP . SQUIDGUARD_BL_DB;
+         $dbhome  = SQUIDGUARD_DBHOME_DEF;
          $workdir = SQUIDGUARD_WORKDIR_DEF;
 
-         if (file_exists($squidguard_config[FLD_DBHOME])) $dbhome = $squidguard_config[FLD_DBHOME];
+         sg_addlog("sg_update_blacklist: Begin.");
+
+         // check work and DB dir's
+         if (file_exists($squidguard_config[FLD_DBHOME]))  $dbhome = $squidguard_config[FLD_DBHOME];
          if (file_exists($squidguard_config[FLD_WORKDIR])) $workdir = $squidguard_config[FLD_WORKDIR];
-         sg_addlog("sg_update_blacklist: begin '$dbhome'");
+         // delete old tmp dir's
+         if (file_exists($tmp_unpack_dir)) mwexec("rm -R  . $tmp_unpack_dir");
+         if (file_exists($tmp_db_dir))     mwexec("rm -R  . $tmp_db_dir");
+         // create new tmp dir's
+         mwexec("mkdir -p -m 0750 $tmp_unpack_dir");
+         mwexec("mkdir -p -m 0750 $tmp_db_dir");
 
          if (file_exists($from_file)) {
-             $bl_temp = '/var/tmp/blacklists';
 
-             // remove all db items
-             $blk_items = scan_dir($dbhome);
-             foreach ($blk_items as $itm) {
-                      $itm_path = "$dbhome/$itm";
-                      mwexec("rm -R $itm_path");
-                      sg_addlog("sg_update_blacklist: remove DB entry $itm_path");
-             }
-             unset($blk_items);
-
-             // remove old temp catalog '/var/tmp/blacklists', make new and unpack archive
-             if (file_exists($bl_temp))
-                 mwexec("rm -R $bl_temp");
-             mkdir($bl_temp, 0750);
-             mwexec("tar zxvf $from_file -C $bl_temp");
-             sg_addlog("sg_update_blacklist: unpack uploaded file $from_file -> $bl_temp");
+             // unpack archive
+             mwexec("tar zxvf $from_file -C $tmp_unpack_dir");
+             sg_addlog("sg_update_blacklist: Unpack uploaded file '$from_file' -> '$tmp_unpack_dir'.");
+             set_file_access($tmp_unpack_dir, OWNER_NAME, 0750);
 
              // 2. copy blacklist to squidGuard base & create entries list
-             if (file_exists($bl_temp)) {
+             if (file_exists($tmp_unpack_dir)) {
                  $blk_items = array();
+                 $blk_list  = array();
 
                  // scan blacklist items
-                 scan_blacklist_cat($bl_temp, "blk", & $blk_items);
+                 scan_blacklist_cat($tmp_unpack_dir, "blk", & $blk_items);
 
-                 // copy blacklist items
-                 foreach($blk_items as $key => $val) {
-                     $current_dbpath = "$dbhome/$key";
-                     if (count($val)) {
-                         // make item db dir, if need
-                         if (!file_exists($current_dbpath))
-                             mkdir($current_dbpath, 0750);
+                 // modify blacklist catalog structure to 'one level'
+                 foreach ($blk_items as $key => $val) {
+                          $current_dbpath = "$tmp_db_dir/$key";
+                          if (count($val)) {
+                              // make blk_list for config file
+                              $blk_list[$key] = $key;
 
-                         // copy urls
-                         if (isset($val['urls'])) {                             
-                             $path = $val['urls'];
-                             $db_path = "$current_dbpath/urls";
-                             if (copy($path, $db_path)) 
-                                  sg_addlog("sg_update_blacklist: copy '$path' to '$db_path'");
-                             else sg_addlog("sg_update_blacklist: ERROR copy '$path' to '$db_path'");
-                         }
-
-                         // copy domains
-                         if (isset($val['domains'])) {                             
-                             $path = $val['domains'];
-                             $db_path = "$current_dbpath/domains";
-                             if (copy($path, $db_path)) 
-                                  sg_addlog("sg_update_blacklist: copy '$path' to '$db_path'");
-                             else sg_addlog("sg_update_blacklist: ERROR copy '$path' to '$db_path'");
-                         }
-
-                         // copy expressions
-                         if (isset($val['expressions'])) {                             
-                             $path = $val['expressions'];
-                             $db_path = "$current_dbpath/expressions";
-                             if (copy($path, $db_path)) 
-                                  sg_addlog("sg_update_blacklist: copy '$path' to '$db_path'");
-                             else sg_addlog("sg_update_blacklist: ERROR copy '$path' to '$db_path'");
-                         }
-                         
-                     }
+                              // delete '$current_dbpath' for correct moving
+                              // need moving $val['path'] to $current_dbpath
+                              // if $current_dbpath exists,
+                              // then $val['path'] will created as subdir - !it's worng!
+                              if (file_exists($current_dbpath))
+                                  mwexec("rm -R $current_dbpath");
+                              mwexec("mv -f {$val['path']}/ $current_dbpath");
+                              sg_addlog("sg_update_blacklist: Move {$val['path']}/ -> $current_dbpath.");
+                          }
                  }
+                 // copy unrebuilded blacklist to work DB
+                 mwexec("cp -R $tmp_db_dir/ $dbhome");
 
                  // create entries list
                  if (count($blk_items)) {
-                     file_put_contents($workdir . SQUIDGUARD_BLK_ENTRIES, implode("\n", array_keys($blk_items)));
-                     set_file_access($workdir . SQUIDGUARD_BLK_ENTRIES, OWNER_NAME, 0755);
-                     sg_addlog("sg_update_blacklist: create entries "  . $workdir . SQUIDGUARD_BLK_ENTRIES);
+                      $blklist_file = SQUIDGUARD_TMP . SQUIDGUARD_BLK_ENTRIES;
+                      // save to temp DB
+                      file_put_contents($blklist_file, implode("\n", array_keys($blk_items)));
+                      set_file_access  ($blklist_file, OWNER_NAME, 0750);
+                      // save to config dir
+                      $blklist_file = "{$squidguard_config[FLD_WORKDIR]}/" . SQUIDGUARD_BLK_ENTRIES;
+                      file_put_contents($blklist_file, implode("\n", array_keys($blk_items)));
+                      set_file_access  ($blklist_file, OWNER_NAME, 0750);
+                      sg_addlog("sg_update_blacklist: create entries "  . $blklist_file);
                  }
+                 set_file_access($tmp_db_dir, OWNER_NAME, 0750);
+
+                 // make rebuild config; include all found dest items
+                 $conf_path = "/tmp/squidGuard_rebuild_blk.conf";
+                 $conf = sg_create_rebuild_config($tmp_db_dir, $blk_list);
+                 // copy to temp DB
+                 file_put_contents($conf_path, $conf);
+                 set_file_access($conf_path, OWNER_NAME, 0750);
+                 sg_addlog("sg_rebuild_db: Create temporary config '$conf_path'.");
+
+                 // *** SH script ***
+                 $sh_scr = Array();
+                 $sh_scr[] = "#!/bin/sh";
+                 $sh_scr[] = "cd $tmp_db_dir";
+                 $cmd = $squidguard_config[FLD_BINPATH] . "/squidGuard -c $conf_path -C all";
+                 $sh_scr[] = $cmd;
+
+                 // copy temp db to '/var/db/squidGuard (-R - recursive; -p - copy access rights)
+                 // '$bl_temp_dbhome/' - slash in end of path - copy only dir content (not self dir)
+                 $sh_scr[] = "cp -R $tmp_db_dir/ $dbhome";
+
+                 // set DB owner and right access
+#                 $sh_scr[] = "chown -R -v " . OWNER_NAME . " $dbhome";
+
+                 // restart squid for changes to take effects
+#                 $sh_scr[] = "/usr/local/sbin/squid -k reconfigure";
+
+                 // store & exec sh
+                 $sh_scr = implode("\n", $sh_scr);
+                 $shfile =  DB_REBUILD_SH . "_blk";
+                 file_put_contents($shfile, $sh_scr);
+                 set_file_access($shfile, OWNER_NAME, 0750);
+                 mwexec_bg($shfile);
+                 sg_addlog("sg_rebuild_db: Started SH script '$shfile'.");
+                 sg_addlog("sg_rebuild_db: End.");
+
                  sg_remove_unused_db_entries();
 
                  // clearing temp
-# пока отключить                 mwexec("rm -R $bl_temp");
+#                 mwexec("rm -R $bl_temp");
              }
-             set_file_access($squidguard_config[FLD_DBHOME], OWNER_NAME, 0755);
+#             set_file_access($squidguard_config[FLD_DBHOME], OWNER_NAME, 0755);
 #             sg_full_rebuild_db();
          }
          sg_addlog("sg_update_blacklist: end");
@@ -1594,7 +1548,7 @@ function sg_update_blacklist($from_file) {
 
 
 // -----------------------------------------------------------------------------
-// sg_entries_blacklist - update blacklist from file
+// sg_blacklist_rebuild_DB  - update blacklist from file
 // -----------------------------------------------------------------------------
 function sg_entries_blacklist() {
          global $squidguard_config;
@@ -1609,8 +1563,36 @@ function sg_entries_blacklist() {
          }
          return $contents;
 }
+// -----------------------------------------------------------------------------
+// sg_blacklist_rebuild_db - rebuild current Blacklist DB (default: '/var/db/squidGuard')
+// -----------------------------------------------------------------------------
+function sg_blacklist_rebuild_db() { // $shtag, $rdb_dbhome, $rdb_workdir) {
+         global $squidguard_config;
+         $dst_list = array();
+         $dbhome  = $squidguard_config[FLD_DBHOME];
+         $workdir = $squidguard_config[FLD_WORKDIR];
 
-# -------------------------- UTILS ---------------------------------------------
+         // current dbhome and work dir's
+# disabled in current ver
+#         if (!empty($rdb_dbhome))  $dbhome  = $rdb_dbhome;
+#         if (!empty($rdb_workdir)) $workdir = $rdb_workdir;
+         sg_addlog("sg_blacklist_rebuild_db: Begin with path '$dbhome'.");
+
+         // make dest list
+         $blklist_file = "$workdir/" . SQUIDGUARD_BLK_ENTRIES;
+         if (file_exists($blklist_file)) {
+             $blklist = explode("\n", file_get_contents($blklist_file));
+             if (is_array($blklist))
+                 foreach($blklist as $bl)
+                         $dst_list[$bl] = $bl;
+         }
+
+         // rebuild user db ('/var/db/squidGuard')
+         sg_rebuild_db("_blkdb", $dbhome, $dst_list);
+         sg_addlog("sg_blacklist_rebuild_db: End.");
+}
+
+# ========================== UTILS =============================================
 # sg_uploadfile_from_url
 # upload file and put them to $destination_file
 # return = upload content
@@ -1652,9 +1634,11 @@ function sg_uploadfile_from_url($url_file, $destination_file, $proxy = '') {
          return $result;
 }
 
-// -----------------------------------------------------------------------------
-// Set file access
-// -----------------------------------------------------------------------------
+# ==============================================================================
+# self utils
+# ==============================================================================
+# Set file access
+# ------------------------------------------------------------------------------
 function set_file_access($dir, $owner, $mod) {
 
         if (!file_exists($dir)) return;
@@ -1663,6 +1647,7 @@ function set_file_access($dir, $owner, $mod) {
         chgrp($dir, $owner);
         chmod($dir, $mod);
 
+        // if $dir - directory - set subitem's access
         if (is_dir($dir)) {
                $hd = opendir($dir);
                while (($item = readdir($hd)) !== false) {
@@ -1679,28 +1664,28 @@ function set_file_access($dir, $owner, $mod) {
                }
         }
 }
-# ==============================================================================
-# self utils
-# ==============================================================================
+# ------------------------------------------------------------------------------
 # scan_dir - build files listing for $dir
 # ------------------------------------------------------------------------------
 function scan_dir($dir) {
     $files = array();
     if (file_exists($dir)) {
         $dh = opendir($dir);
-        while (false !== ($filename = readdir($dh)))
-            $files[] = $filename;
+        while (false !== ($filename = readdir($dh))) {
+               // skip '.' and '..' names
+               if (($filename !== '.') and ($filename !== '..')) $files[] = $filename;
+        }
         sort($files);
     }
     return $files;
 }
 
 # ------------------------------------------------------------------------------
-# scan_blacklist_cat - scan all dirs and subdirs tree and make blk enrties list 
+# scan_blacklist_cat - scan all dirs and subdirs tree and make blk enrties list
 #     $cur_dir - start directory
 #     $key_name - current key name
 # ------------------------------------------------------------------------------
-# blk entry[key]: 
+# blk entry[key]:
 #    ["domains"]     domains file path
 #    ["urls"]        urls file path
 #    ["expressions"] expressions file path
@@ -1716,24 +1701,28 @@ function scan_blacklist_cat($curdir, $key_name, $cat_array) {
 
             if (($fls != ".") and ($fls != "..")) {
                 if (is_file($fls_file)) {
+
                      // add files path
                      switch(strtolower($fls)) {
                          case "domains":
                              $blk_entry["domains"] = $fls_file;
+                             $blk_entry["path"]    = $curdir;
                              break;
                          case "urls":
                              $blk_entry["urls"] = $fls_file;
+                             $blk_entry["path"]    = $curdir;
                              break;
-                         case "expressions": 
+                         case "expressions":
                              $blk_entry["expressions"] = $fls_file;
+                             $blk_entry["path"]    = $curdir;
                              break;
                      }
                  }
                  elseif (is_dir($fls_file)) {
                      $fls_key = $key_name . "_" . $fls;
 
-                     // рекурсивно вызываем эту-же функцию
-                     scan_blacklist_cat($fls_file, $fls_key, & $cat_array); 
+                     // recursive call
+                     scan_blacklist_cat($fls_file, $fls_key, & $cat_array);
                  }
             }
         }
