@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Services: LCDproc</title>
 	<name>lcdproc</name>
-	<version>0.5.2_1-p3</version>
+	<version>0.5.2_1-p4</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
@@ -69,6 +69,10 @@
 				<option>
 					<value>ucom2</value>
 					<name>USB Com port 2 (/dev/cuaU1)</name>
+				</option>
+				<option>
+					<value>lpt1</value>
+					<name>Parallel port 1 (/dev/lpt0)</name>
 				</option>
 			</options>
 			<default_value>0</default_value>

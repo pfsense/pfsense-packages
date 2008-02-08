@@ -103,6 +103,9 @@
 				case "ucom2":
 					continue;
 					break;
+				case "lpt1":
+					continue;
+					break;
 				default:
 					$input_errors[] = "The chosen com port is not valid";
 					break;
@@ -137,6 +140,9 @@
 					break;
 				case "ucom2":
 					$realport = "/dev/cuaU1";
+					break;
+				case "lpt1":
+					$realport = "/dev/lpt0";
 					break;
 				default:
 					lcdproc_warn("The selected com port is not valid!");
