@@ -332,7 +332,7 @@ function squidguard_validate_rewrite($post, $input_errors) {
 // squidguard_resync
 // -----------------------------------------------------------------------------
 function squidguard_resync() {
-	global $config;
+        global $config;
        $conf = $config['installedpackages'][MODULE_GENERAL]['config'][0];
        $upload_file = '';
        $submit = '';
@@ -343,7 +343,7 @@ function squidguard_resync() {
            $submit = $_POST['submit'];
            $url    = $_POST['blacklist_url'];
            $proxy  = $_POST['blacklist_proxy'];
-       } 
+       }
        else
        if (isset($_GET['submit'])) {
            $submit = $_GET['submit'];
@@ -359,10 +359,10 @@ function squidguard_resync() {
                sg_reconfigure_blacklist($url, $proxy);
        }
        // apply changes
-       if ($submit == APPLY_BTN) sg_reconfigure();
-
-       // if nothing on GET or POST - then system resync on start or other
-       // ... write here ...
+       if ($submit == APPLY_BTN) {
+#           write_config('Update squidGuard options.'); // store, if not 'Save' button
+           sg_reconfigure();
+       }
 }
 
 
@@ -750,7 +750,7 @@ function squidguard_before_form_log($pkg) {
                         if (empty($move_pos)) $move_pos = 0;
 
                         if ($mlog['logtype'] == 'block_log') {
-				$slog .= 'block_log report disabled';
+                                $slog .= 'block_log report disabled';
 /*
                             $filename = SQUIDGUARD_LOGDIR . "/" . SQUIDGUARD_ACCESSBLOCK_FILE;
                             if (file_exists($filename)) {

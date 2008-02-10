@@ -40,17 +40,6 @@
 # work path       - $workdir
 # log path        - $workdir + $logdir
 # ------------------------------------------------------------------------------
-# Functions:
-#           sg_init($init_xml)
-#           sg_load_configxml($filename)
-#           sg_save_configxml($filename)
-#           sg_reconfigure()
-#           sg_reconfigure_blacklist($source_filename, $opt)
-#               $source_filename - file name or url
-#               $opt - option:
-#                   '' or 'local'   - update from local file (example: '/tmp/blacklist.tar')
-#                   'url'           - update from url
-# ------------------------------------------------------------------------------
 
 require_once('globals.inc');
 require_once('config.inc');
@@ -59,6 +48,7 @@ require_once('pfsense-utils.inc');
 require_once('pkg-utils.inc');
 require_once('filter.inc');
 require_once('service-utils.inc');
+require_once('squid.inc');
 
 # ------------------------------------------------------------------------------
 # files header
@@ -349,59 +339,49 @@ function sg_reconfigure() {
 //         redirect_program /usr/local/squidGuard/bin/squidGuard -c /path_to_config_file
 //         redirect_children 1
 // ------------------------------------------------------------
+
 function squid_reconfigure($remove_only = '') {
+         global $config;
          global $squidguard_config;
+         $conf = '';
+         $cust_opt = $config['installedpackages']['squid']['config'][0]['custom_options'];
 
          sg_addlog("squid_reconfigure: begin");
 
-         // 1. update squid config
-         $opt = '';
-         $squid_conf_file = SQUID_CONFIGFILE;
-         $redirector_path = $squidguard_config[FLD_BINPATH] . '/squidGuard';
-         $redirector_conf = $squidguard_config[FLD_WORKDIR] . SQUIDGUARD_CONFIGFILE;
+         // remove old options
+         if (!empty($cust_opt)) {
+              $conf = explode(";", $cust_opt);
+              foreach ($conf as $key => $c_opt) {
+                       $t_opt = ltrim($c_opt);
+                       if ((strpos($t_opt, REDIRECTOR_PROGRAM_OPT) === 0) or
+                           (strpos($t_opt, REDIRECT_BYPASS_OPT)    === 0) or
+                           (strpos($t_opt, REDIRECT_CHILDREN_OPT)  === 0))
+                          unset($conf[$key]);
+              }
+              sg_addlog("squid_reconfigure: remove old redirector options from Squid config.");
+         }
 
-         // update squid.conf file
-         if (file_exists($squid_conf_file)) {
-             sg_addlog("squid_reconfigure: config file '$squid_conf_file'");
-             $conf = file_get_contents($squid_conf_file);
+         // add new options - if squidGuard enabled
+         if (empty($remove_only) && ($squidguard_config[FLD_ENABLED] === 'on')) {
 
-             // remove old redirector options from 'squid.conf'
-             sg_addlog("squid_reconfigure: remove old redirector options from 'squid.conf'");
-             $conf = explode("\n", $conf);
-             for($i=0; $i<count($conf); $i++) {
-                 $s = trim($conf[$i]);
-                 if (strpos($s, REDIRECTOR_OPTIONS_REM) === 0) $conf[$i] = '';
-                 if (strpos($s, REDIRECTOR_PROGRAM_OPT) === 0) $conf[$i] = '';
-                 if (strpos($s, REDIRECT_BYPASS_OPT)    === 0) $conf[$i] = '';
-                 if (strpos($s, REDIRECT_CHILDREN_OPT)  === 0) $conf[$i] = '';
-             }
-             $conf = implode("\n", $conf);
-             $conf = rtrim($conf);
+             $redirector_path = $squidguard_config[FLD_BINPATH] . '/squidGuard';
+             $redirector_conf = $squidguard_config[FLD_WORKDIR] . SQUIDGUARD_CONFIGFILE;
 
-             // if squidGuard enabled - add new options to squid config
-             if (empty($remove_only) && ($squidguard_config[FLD_ENABLED] === 'on')) {
-                 sg_addlog("squid_reconfigure: add new redirector options to 'squid.conf'");
-                 // add redirector options to 'squid.conf'
-                 $conf .= "\n";
-                 $conf .= "\n" . REDIRECTOR_OPTIONS_REM;
-                 $conf .= "\n" . REDIRECTOR_PROGRAM_OPT . " $redirector_path -c $redirector_conf";
-                 $conf .= "\n" . REDIRECT_BYPASS_OPT    . ' on';
-                 $conf .= "\n" . REDIRECT_CHILDREN_OPT  . " " . REDIRECTOR_PROCESS_COUNT;
-             }
-             $conf .= "\n";
-             file_put_contents($squid_conf_file, $conf);
-         } else
-             sg_addlog("squid_reconfigure: error config file '$squid_conf_file' not found.");
+             $conf[] = REDIRECTOR_PROGRAM_OPT . " $redirector_path -c $redirector_conf";
+             $conf[] = REDIRECT_BYPASS_OPT    . " on";
+             $conf[] = REDIRECT_CHILDREN_OPT  . " " . REDIRECTOR_PROCESS_COUNT;
 
+             sg_addlog("squid_reconfigure: add new redirector options to Squid config.");
+         }
 
-         // 2. restart squid - squid automaticly restart redirector too
-         if (is_service_running('squid'))
-             mwexec("/usr/local/sbin/squid -k reconfigure");
+         // update config
+         $conf = implode(";", $conf);
+         $config['installedpackages']['squid']['config'][0]['custom_options'] = $conf;
+         write_config('Update squidGuard option to squid config.');
 
-#        // 2.1. another method
-#        if (is_service_running('squid'))
-#            mwexec('killall -HUP squid');
+         squid_resync();
 }
+
 // ------------------------------------------------------------
 // sg_check_system
 // - check squidguard catalog's and access right's
@@ -531,7 +511,7 @@ function sg_reconfigure_user_db() {
              sg_addlog("sg_reconfigure_user_db: STOPPED; User destinations list empty");
 
          // 6. remove unused db entries
-#         sg_remove_unused_db_entries();
+         sg_remove_unused_db_entries();
 
          sg_addlog("sg_reconfigure_user_db: end");
 }
@@ -545,13 +525,14 @@ function sg_remove_unused_db_entries() {
          $db_entries = array();
          $file_list = '';
          $dbhome = $squidguard_config[FLD_DBHOME];
+         $workdir = $squidguard_config[FLD_WORKDIR];
 
          sg_addlog("sg_remove_unused_db_entries: begin");
 
          // black list entries
          // * worked only with 'blacklist entries list file - else may be deleted black list entry
-         if (file_exists($dbhome .  SQUIDGUARD_BLK_ENTRIES)) {
-             $db_entries = explode("\n", file_get_contents($dbhome . SQUIDGUARD_BLK_ENTRIES));
+         if (file_exists($workdir .  SQUIDGUARD_BLK_ENTRIES)) {
+             $db_entries = explode("\n", file_get_contents($workdir . SQUIDGUARD_BLK_ENTRIES));
              // user entries
              $dests = $squidguard_config[FLD_DESTINATIONS];
              foreach($dests[FLD_ITEM] as $dst) {
@@ -701,12 +682,15 @@ function sg_addlog($log) {
          $logfile = SQUIDGUARD_LOGDIR_DEF . SQUIDGUARDCONF_LOGFILE;
          $log_content = array();
 
+         setlocale(LC_TIME, '');
+         $dt = date("d.m.Y H:i:s");
+
          if (!empty($squidguard_config)) {
                 // define logfile
                 if (file_exists($squidguard_config[FLD_LOGDIR]))
                      $logfile = $squidguard_config[FLD_LOGDIR] . SQUIDGUARDCONF_LOGFILE;
          } else {
-                $log_content[] = date("d.m.Y H:i:s") . ": " . "sg_addlog: Error, squidguard_config is empty";
+                $log_content[] = "$dt : " . "sg_addlog: Error, squidguard_config is empty";
          }
 
          $tmplog = '';
@@ -715,7 +699,7 @@ function sg_addlog($log) {
          $log_content = explode("\n", $tmplog);
          unset($tmplog);
 
-         $log_content[] = date("d.m.Y H:i:s") . ": $log";
+         $log_content[] = "$dt : $log";
          while (count($log_content) > SQUIDGUARD_LOG_MAXCOUNT) array_shift($log_content);
 
          $tlog = implode("\n", $log_content);
