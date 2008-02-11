@@ -364,7 +364,8 @@ function tinydns_create_zone_file() {
 	}
 		
 	if($config['installedpackages']['tinydnsdomains']) {
-		foreach($config['installedpackages']['tinydnsdomains']['config'] as $domain) {
+		for($x=0; $x< count($config['installedpackages']['tinydnsdomains']['config']); $x++) {
+			$domain = $config['installedpackages']['tinydnsdomains']['config'][$x];
 			$record_data = "";
 			$hostname = $domain['hostname'];
 			$ipaddress = $domain['ipaddress'];
