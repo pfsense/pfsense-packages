@@ -655,7 +655,7 @@
 		<configurationfile>zabbix-agent.xml</configurationfile>
 		<maintainer>Remco Verhoef</maintainer>
 		<depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
-		<depends_on_package>zabbix-agent-1.4.2,1.tbz</depends_on_package>
+		<depends_on_package>zabbix-1.4.4,1.tbz</depends_on_package>
 	</package>
   </packages>
 <ENDOFPACKAGES>
