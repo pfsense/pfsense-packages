@@ -442,11 +442,11 @@ function sg_reconfigure_user_db() {
          // create user DB catalog, if not extsts
          if (!file_exists($dbhome)) {
              if (!mkdir($dbhome, 0755)) {
-                  sg_addlog("sg}_reconfigure_user_db: ERROR create user DB directory $dbhome");
+                  sg_addlog("sg_reconfigure_user_db: ERROR create user DB directory $dbhome");
                   return;
              }
              set_file_access($dbhome, OWNER_NAME, 0755);
-             sg_addlog("sg_reconfigure_user_db:Create user DB directory $dbhome");
+             sg_addlog("sg_reconfigure_user_db: Create user DB directory $dbhome");
          }
 
          // update destinations to db
@@ -455,6 +455,7 @@ function sg_reconfigure_user_db() {
              $dst_names = Array();
              $dst_list  = Array();   // destinations list
 
+             sg_addlog("sg_reconfigure_user_db: add user entries");
              foreach($dests[FLD_ITEM] as $dst) {
                      $path = "$dbhome/" . $dst[FLD_NAME];
                      $dst_names[]   = $path;
@@ -475,7 +476,7 @@ function sg_reconfigure_user_db() {
                           $content = str_replace(" ", "\n", $domains);
                           $content = trim($content);
                           file_put_contents($path . '/domains', $content);
-                          sg_addlog("sg_reconfigure_user_db: -- add domains '$domains'");
+                          sg_addlog("sg_reconfigure_user_db: -- add {$dst[FLD_NAME]} domains '$domains'");
                      }
                      unset($domains);
 
@@ -485,7 +486,7 @@ function sg_reconfigure_user_db() {
                           $content = str_replace(" ", "\n", $urls);
                           $content = trim($content);
                           file_put_contents($path . '/urls', $content);
-                          sg_addlog("sg_reconfigure_user_db: -- add urls '$content'");
+                          sg_addlog("sg_reconfigure_user_db: -- add {$dst[FLD_NAME]} urls '$content'");
                      }
                      unset($urls);
 
@@ -496,7 +497,7 @@ function sg_reconfigure_user_db() {
                           $content = trim($content); // delete first and last unnecessary '|' symbols
                           $content = str_replace(" ", "|", $content);
                           file_put_contents($path . '/expressions', $content);
-                          sg_addlog("sg_reconfigure_user_db: -- add expressions '$content'");
+                          sg_addlog("sg_reconfigure_user_db: -- add {$dst[FLD_NAME]} expressions '$content'");
                      }
                      unset($expr);
              }
@@ -513,7 +514,7 @@ function sg_reconfigure_user_db() {
          // 6. remove unused db entries
          sg_remove_unused_db_entries();
 
-         sg_addlog("sg_reconfigure_user_db: end");
+         sg_addlog("sg_reconfigure_user_db: end.");
 }
 
 // ------------------------------------------------------------
@@ -533,23 +534,26 @@ function sg_remove_unused_db_entries() {
          // * worked only with 'blacklist entries list file - else may be deleted black list entry
          if (file_exists($workdir .  SQUIDGUARD_BLK_ENTRIES)) {
              $db_entries = explode("\n", file_get_contents($workdir . SQUIDGUARD_BLK_ENTRIES));
-             // user entries
-             $dests = $squidguard_config[FLD_DESTINATIONS];
+
+             // $db_entries + user entries
+             $dests = $squidguard_config[FLD_DESTINATIONS];             
              foreach($dests[FLD_ITEM] as $dst) {
                      $db_entries[] = $dst[FLD_NAME];
+             }
 
-                     $file_list = scan_dir($dbhome);
-                     $file_for_del = array_diff($file_list, $db_entries);
+             // diff between file list and entries list
+             $file_list = scan_dir($dbhome);
+             $file_for_del = array_diff($file_list, $db_entries);
 
-                     foreach($file_for_del as $fd) {
-                             $file_fd = "$dbhome/$fd";
-                             if (($fd != "") && ($fd != ".") && ($fd != "..")) {
-                                  if (file_exists($file_fd)) {
-                                      if (!mwexec("rm -R  . $file_fd"))
-                                           sg_addlog("sg_remove_unused_db_entries: Delete $file_fd");
-                                      else sg_addlog("sg_remove_unused_db_entries: Error delete $file_fd");
-                                  } else   sg_addlog("sg_remove_unused_db_entries: File $file_fd not found");
-                             }
+             // delete
+             foreach($file_for_del as $fd) {
+                     $file_fd = "$dbhome/$fd";
+                     if (($fd != "") && ($fd != ".") && ($fd != "..")) {
+                          if (file_exists($file_fd)) {
+                              mwexec("rm -R  . $file_fd");
+                              sg_addlog("sg_remove_unused_db_entries: Removed file '$file_fd'");
+                          } else   
+                              sg_addlog("sg_remove_unused_db_entries: File $file_fd not found");
                      }
              }
          }
@@ -651,21 +655,21 @@ function sg_create_rebuild_config($blk_dbhome, $blk_destlist) {
                      $sgconf[] = implode("\n", $tmp_s);
                      $sgconf[] = "}";
                      $sgconf[] = "";
-                     sg_addlog("sg_create_rebuild_config: Added item '$dst' = '$dbhome/$dpath'.");
+                     sg_addlog("sg_create_rebuild_config: -- added item '$dst' = '$dbhome/$dpath'.");
                  } else
-                     sg_addlog("sg_create_rebuild_config: Ignored item '$dst' = '$dbhome/$dpath'.");
+                     sg_addlog("sg_create_rebuild_config: -- ignored empty item '$dst' = '$dbhome/$dpath'.");
              }
          }
 
          // acl section
          $sgconf[] = "acl {";
          $sgconf[] = "\t default {";
-         $sgconf[] = "\t\t pass none";
-         $sgconf[] = "\t\t redirect " . sg_redirector_base_url('404');
+         $sgconf[] = "\t\t pass all"; // yes, now this 'pass all' - this is only temp config
+         $sgconf[] = "\t\t redirect " . sg_redirector_base_url('404', true); // use sgerror only!
          $sgconf[] = "\t }";
          $sgconf[] = "}";
 
-         sg_addlog("sg_create_rebuild_config: ATTENTION! Created default configuration. All content will blocked.");
+         sg_addlog("sg_create_rebuild_config: End.");
          return implode("\n", $sgconf);
 }
 
@@ -704,7 +708,6 @@ function sg_addlog($log) {
 
          $tlog = implode("\n", $log_content);
          file_put_contents($logfile, $tlog);
-#         file_put_contents("/tmp/_sg.log", $tmp_log);
 }
 // ------------------------------------------------------------
 // sg_getlog
@@ -751,28 +754,31 @@ function sg_build_default_config() {
          $sgconf[] = "acl {";
          $sgconf[] = "\t default {";
          $sgconf[] = "\t\t pass none";
-         $sgconf[] = "\t\t redirect " . sg_redirector_base_url('404 Check proxy filter settings on errors.'); # $redirect_base_url
+         $sgconf[] = "\t\t redirect " . sg_redirector_base_url('404 Check proxy filter settings on errors.', true); # use only sgerror.php
          $sgconf[] = "\t }";
          $sgconf[] = "}";
 
          sg_addlog("sg_build_default_config: ATTENTION! Created default configuration. All content will blocked.");
+         sg_addlog("sg_build_default_config: End.");
          return implode("\n", $sgconf);
 }
 
-// ------------------------------------------------------------
+// ------------------------------------------------------------------------------------------------
 // sg_redirector_base_url
-// ------------------------------------------------------------
-function sg_redirector_base_url($url) {
+//   $url - url where redirect to
+//   $use_internal - ignore 'Redirect mode' option, use internal (for rebuild config, for example)
+// ------------------------------------------------------------------------------------------------
+function sg_redirector_base_url($url, $use_internal = false) {
          global $squidguard_config;
          $rdr_path = '';
 
          // Redirect option must have any valid URL
          // 301:redirect_url
-         if (!empty($url) and ($squidguard_config[FLD_REDIRECTMODE] === 'rmod_301')) {
+         if (!$use_internal and !empty($url) and ($squidguard_config[FLD_REDIRECTMODE] === 'rmod_301')) {
              $rdr_path = "301:$url";
          }
          // 302:redirect_url
-         elseif (!empty($url) and ($squidguard_config[FLD_REDIRECTMODE] === 'rmod_302')) {
+         elseif (!$use_internal and !empty($url) and ($squidguard_config[FLD_REDIRECTMODE] === 'rmod_302')) {
              $rdr_path = "302:$url";
          }
          // sgerror.php
@@ -805,6 +811,7 @@ function sg_redirector_base_url($url) {
          }
 
          sg_addlog("sg_redirector_base_url: select redirector base url ($rdr_path)");
+         sg_addlog("sg_redirector_base_url: End.");
          return $rdr_path;
 }
 
@@ -816,14 +823,14 @@ function sg_build_config() {
          $sgconf = array();
 #         $redirect_base_url = REDIRECT_BASE_URL;
 
-         sg_addlog("sg_build_config: create squidGuard config");
+         sg_addlog("sg_build_config: create squidGuard config.");
          if(!is_array($squidguard_config)) {
-            sg_addlog("sg_build_config: error configuration in squidguard_config");
+            sg_addlog("sg_build_config: error configuration in squidguard_config.");
             return sg_build_default_config();
          }
 
          // check configuration data
-         sg_addlog("sg_build_config: check configuration data");
+         sg_addlog("sg_build_config: checking configuration data.");
          $s = sg_check_config_data();
          if ($s) {
             sg_addlog("sg_build_config: error configuration data. It's all errors: \n$s");
@@ -892,10 +899,12 @@ function sg_build_config() {
 
          // --- Blacklist ---
          #
-         # Note! Blacklist must be added to config constantly. It's need for rebuild DB
+         # Note! Blacklist must be added to config permanently. It's need for rebuild DB
          #
          $db_entries = sg_entries_blacklist();
          if (($squidguard_config[FLD_BLACKLISTENABLED] === 'on') and $db_entries) {
+             $log_entr_added = '';
+             $log_entr_ignored = '';
              sg_addlog("sg_build_config: add blacklist entries");
              foreach($db_entries as $key => $ent) {
                      $ent_state = array();
@@ -927,12 +936,20 @@ function sg_build_config() {
                          if ($ent_state[FLD_URLS])        $sgconf[] = "\t urllist $ent/urls";
                          $sgconf[] = "\t log " . SQUIDGUARD_ACCESSBLOCK_FILE;
                          $sgconf[] = "}";
-                         sg_addlog("sg_build_config: -- add '$ent' entry");
+                         $log_entr_added .= " $ent;"; 
                      } else {
                          $sgconf[] = "\t# Config ERROR: Destination '$ent' not found in DB";
-                         sg_addlog("sg_build_config: uncompleted or error '$ent' entry - disabled");
+                         $log_entr_ignored .= " $ent;";
                      }
              }
+
+             // log 'added'
+             if (!empty($log_entr_added))
+                 sg_addlog("sg_build_config: added: \n $log_entr_added \n");
+
+             // log 'ignored'
+             if (!empty($log_entr_ignored))
+                 sg_addlog("sg_build_config: ignored: \n $log_entr_ignored \n");
          }
 
          // --- Destinations ---
@@ -942,6 +959,7 @@ function sg_build_config() {
 #             $sgconf[] = "dest localhost { # fix localhost access problem on transparent proxy ";
 #             $sgconf[] = "\t ip 127.0.0.1";
 #             $sgconf[] = "}";
+             $log_entr_added = '';
              foreach($squidguard_config[FLD_DESTINATIONS][FLD_ITEM] as $dst) {
                  $dstname = $dst[FLD_NAME];
                  $sgconf[] = "";
@@ -955,16 +973,22 @@ function sg_build_config() {
                  if ($dst[FLD_URLS])
                      $sgconf[] = "\t urllist $dstname/urls";
                  if ($dst[FLD_REDIRECT] && is_url($dst[FLD_REDIRECT]))
-                     $sgconf[] = "\t redirect " . sg_redirector_base_url($dst[FLD_REDIRECT]);  # $redirect_base_url . rawurlencode($dst[FLD_REDIRECT]);
+                     $sgconf[] = "\t redirect " . sg_redirector_base_url($dst[FLD_REDIRECT]);
                  if ($dst[FLD_LOG])
                      $sgconf[] = "\t log " . SQUIDGUARD_ACCESSBLOCK_FILE;
                  $sgconf[] = "}";
+                 $log_entr_added .= " $dstname;";
              }
+             // log
+             if (!empty($log_entr_added))
+                  sg_addlog("sg_build_config: added: \n $log_entr_added \n");
+             else sg_addlog("sg_build_config: added: Nothing.");
          }
 
          // --- Rewrites ---
          if ($squidguard_config[FLD_REWRITES]) {
-             sg_addlog("sg_build_config: add rewrites");
+             sg_addlog("sg_build_config: add rewrites.");
+             $log_entr_added = '';
              foreach($squidguard_config[FLD_REWRITES][FLD_ITEM] as $rew) {
                  $sgconf[] = "";
                  $sgconf[] = "rew " . $rew[FLD_NAME] . " {";
@@ -973,7 +997,12 @@ function sg_build_config() {
                  if ($rew[FLD_LOG])
                      $sgconf[] = "\t log " . SQUIDGUARD_ACCESSBLOCK_FILE;
                  $sgconf[] = "}";
+                 $log_entr_added .= " {$rew[FLD_NAME]};";
              }
+             // log
+             if (!empty($log_entr_added))
+                  sg_addlog("sg_build_config: added: \n $log_entr_added \n");
+             else sg_addlog("sg_build_config: added: Nothing.");
          }
 
          # ----------------------------------------
@@ -984,6 +1013,7 @@ function sg_build_config() {
          $sgconf[] = "acl {";
          if ($squidguard_config[FLD_ACLS]) {
              sg_addlog("sg_build_config: add ACL");
+             $log_entr_added = '';
              foreach($squidguard_config[FLD_ACLS][FLD_ITEM] as $acl) {
 
                  // delete blacklist entries from 'pass' if blacklist disabled
@@ -1046,7 +1076,12 @@ function sg_build_config() {
                       }
                       $sgconf[] = "";
                  }
+                 $log_entr_added .= " {$acl[FLD_NAME]};";
              }
+             // log
+             if (!empty($log_entr_added))
+                  sg_addlog("sg_build_config: added: \n $log_entr_added \n");
+             else sg_addlog("sg_build_config: added: Nothing.");
          }
 
          // --- Default ---
