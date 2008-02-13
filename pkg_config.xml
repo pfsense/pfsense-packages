@@ -633,7 +633,7 @@
           High perfomance web proxy filter. 
           Required proxy squid-2.6.5 (or hi). 
 	  </descr> 
-  	  <website>http://www.squidGuard.com/</website> 
+  	  <website>http://www.squidGuard.org/</website> 
   	  <maintainer>dv_serg@mail.ru</maintainer> 
   	  <category>Network Management</category> 
   	  <version>1.2.0_1</version> 
