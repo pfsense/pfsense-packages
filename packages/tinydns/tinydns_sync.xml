@@ -97,7 +97,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Password</fielddescr>
+			<fielddescr>Password 2</fielddescr>
 			<fieldname>password2</fieldname>
 			<description>Admin password on remote firewall to faciliate sync</description>
 			<type>password</type>
