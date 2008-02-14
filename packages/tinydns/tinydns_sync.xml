@@ -104,7 +104,7 @@
 		</field>		
 		<field>
 			<fielddescr>IP Address 3</fielddescr>
-			<fieldname>ipaddress</fieldname>
+			<fieldname>ipaddress3</fieldname>
 			<description>OPTIONAL. The IP address that TinyDNS will Sync its data to.</description>
 			<type>input</type>
 		</field>
