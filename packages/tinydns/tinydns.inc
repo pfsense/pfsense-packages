@@ -443,7 +443,7 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 
 	/* xml will hold the sections to sync */
 	$xml = array();
-	$xml['installedpackages']['tinydnsdomains'] = $config['installedpackages']['tinydnsdomains'];
+	$xml['tinydnsdomains'] = $config['installedpackages']['tinydnsdomains'];
 
 	/* assemble xmlrpc payload */
 	$params = array(
