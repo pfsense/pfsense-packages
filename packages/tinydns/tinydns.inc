@@ -453,7 +453,7 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 
 	/* set a few variables needed for sync code borrowed from filter.inc */
 	$url = $synchronizetoip;
-	$method = 'pfsense.restore_config_section';
+	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 
 	/* Sync! */
 	log_error("Beginning TinyDNS XMLRPC sync to {$url}:{$port}.");

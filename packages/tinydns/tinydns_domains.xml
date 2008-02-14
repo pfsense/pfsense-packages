@@ -197,11 +197,17 @@
 		tinydns_setup_ping_items();
 	</custom_delete_php_command>
 	<custom_add_php_command>
+		log_error("Begin tinydns add");
 		tinydns_create_zone_file();
+		log_error("Zone file done.");
 		tinydns_setup_ping_items();
+		log_error("Ping items done.");
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
+		log_error("Begin tinydns resync");
 		tinydns_create_zone_file();
+		log_error("Zone file done.");
 		tinydns_setup_ping_items();
+		log_error("Ping items done.");
 	</custom_php_resync_config_command>
 </packagegui>
