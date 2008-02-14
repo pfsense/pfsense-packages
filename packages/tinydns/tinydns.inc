@@ -477,6 +477,38 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 	} else {
 		log_error("tinydns XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
+	
+	/* tell tinydns to reload our settings on the destionation sync host. */
+	
+	$method = 'pfsense.exec_php';	
+	
+	$execcmd  = "require('/usr/local/pkg/tinydns.inc');\n";
+	$execcmd .= "tinydns_custom_php_changeip_command();\n";
+	$execcmd .= "tinydns_custom_php_install_command();\n";
+	$execcmd .= "tinydns_create_zone_file();\n";
+	$execcmd .= "tinydns_setup_ping_items();\n";
+	
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($execcmd)
+	);
+
+	$resp = $cli->send($msg, "250");
+	if(!$resp) {
+		$error = "A communications error occured while attempting tinydns XMLRPC sync with {$url}:{$port}.";
+		log_error($error);
+		file_notice("sync_settings", $error, "tinydns Settings Sync", "");
+	} elseif($resp->faultCode()) {
+		$cli->setDebug(1);
+		$resp = $cli->send($msg, "250");
+		$error = "An error code was received while attempting tinydns XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error($error);
+		file_notice("sync_settings", $error, "tinydns Settings Sync", "");
+	} else {
+		log_error("tinydns XMLRPC sync successfully completed with {$url}:{$port}.");
+	}
+	
 	log_error("[tinydns] tinydns_xmlrpc_sync.php is ending.");
 }
 

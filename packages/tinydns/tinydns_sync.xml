@@ -90,8 +90,36 @@
 			<description>Admin password on remote firewall to faciliate sync</description>
 			<type>password</type>
 		</field>
+		<field>
+			<fielddescr>IP Address 2</fielddescr>
+			<fieldname>ipaddress2</fieldname>
+			<description>OPTIONAL.  The IP address that TinyDNS will Sync its data to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Password</fielddescr>
+			<fieldname>password2</fieldname>
+			<description>Admin password on remote firewall to faciliate sync</description>
+			<type>password</type>
+		</field>		
+		<field>
+			<fielddescr>IP Address 3</fielddescr>
+			<fieldname>ipaddress</fieldname>
+			<description>OPTIONAL. The IP address that TinyDNS will Sync its data to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Password 3</fielddescr>
+			<fieldname>password3</fieldname>
+			<description>Admin password on remote firewall to faciliate sync</description>
+			<type>password</type>
+		</field>
 	</fields>
 	<custom_php_resync_config_command>
 		tinydns_do_xmlrpc_sync($_POST['ipaddress'], $_POST['password']);
+		if($_POST['ipaddress2])
+			tinydns_do_xmlrpc_sync($_POST['ipaddress2'], $_POST['password2']);
+		if($_POST['ipaddress3])
+			tinydns_do_xmlrpc_sync($_POST['ipaddress3'], $_POST['password3']);
 	</custom_php_resync_config_command>
 </packagegui>
