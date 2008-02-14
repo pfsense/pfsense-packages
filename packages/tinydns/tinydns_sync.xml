@@ -117,9 +117,9 @@
 	</fields>
 	<custom_php_resync_config_command>
 		tinydns_do_xmlrpc_sync($_POST['ipaddress'], $_POST['password']);
-		if($_POST['ipaddress2])
+		if($_POST['ipaddress2'])
 			tinydns_do_xmlrpc_sync($_POST['ipaddress2'], $_POST['password2']);
-		if($_POST['ipaddress3])
+		if($_POST['ipaddress3'])
 			tinydns_do_xmlrpc_sync($_POST['ipaddress3'], $_POST['password3']);
 	</custom_php_resync_config_command>
 </packagegui>
