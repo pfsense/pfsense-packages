@@ -46,7 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>imspector</name>
-	<version>0.3.1</version>
+	<version>0.4</version>
 	<title>Services: IMSpector</title>
 	<savetext>Change</savetext>
 	<aftersaveredirect>/services_imspector_logs.php</aftersaveredirect>
@@ -127,43 +127,91 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>Enable filtering of bad words</fielddescr>
-			<fieldname>filter_badwords</fieldname>
-			<description>Replaces words specified in /usr/local/etc/imspector/badwords.txt with *</description>
-			<type>checkbox</type>
-		</field>
-		<field>
 			<fielddescr>Enable file logging</fielddescr>
 			<fieldname>log_file</fieldname>
-			<description>Log files stored in /var/imspector</description>
+			<description>Log files stored in /var/imspector.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Enable MySQL logging</fielddescr>
+			<fielddescr>Enable mySQL logging</fielddescr>
 			<fieldname>log_mysql</fieldname>
-			<description>Make sure to specify your MySQL credentials below</description>
+			<description>Make sure to specify your MySQL credentials below.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>MySQL Server</fielddescr>
+			<fielddescr>mySQL server</fielddescr>
 			<fieldname>mysql_server</fieldname>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>MySQL Database</fielddescr>
+			<fielddescr>mySQL database</fielddescr>
 			<fieldname>mysql_database</fieldname>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>MySQL Username</fielddescr>
+			<fielddescr>mySQL username</fielddescr>
 			<fieldname>mysql_username</fieldname>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>MySQL Password</fielddescr>
+			<fielddescr>mySQL password</fielddescr>
 			<fieldname>mysql_password</fieldname>
 			<type>password</type>
-		</field>	
+		</field>
+		<field>
+			<fielddescr>Enable bad word filtering</fielddescr>
+			<fieldname>filter_badwords</fieldname>
+			<description>Replace characters of matched bad word with *.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Bad words list</fielddescr>
+			<fieldname>badwords_list</fieldname>
+			<description>
+				Place one word or phrase to match per line.&lt;br /&gt;
+				If left blank the default list in /usr/local/etc/imspector/badwords.txt will be used.
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>5</rows>
+			<cols>40</cols>
+		</field>
+		<field>
+			<fielddescr>Block file transfers</fielddescr>
+			<fieldname>block_files</fieldname>
+			<description>Block file transfers on supported protocols.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Block non ACL defined</fielddescr>
+			<fieldname>block_unlisted</fieldname>
+			<description>Overide the default of allowing user's not defined the whitelist or blacklist ACLs.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>ACL whitelist</fielddescr>
+			<fieldname>acl_whitelist</fieldname>
+			<description>
+				Example (allow specifc access): localuser: remoteuser1 remoteuser2&lt;br /&gt;
+				Example (allow full access): localuser:
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>5</rows>
+			<cols>40</cols>
+		</field>
+		<field>
+			<fielddescr>ACL blacklist</fielddescr>
+			<fieldname>acl_blacklist</fieldname>
+			<description>
+				Example (block specifc access): localuser: remoteuser1 remoteuser2&lt;br /&gt;
+				Example (block all access): localuser:
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>5</rows>
+			<cols>40</cols>
+		</field>
 	</fields>
 	<custom_php_validation_command>
 		validate_form_imspector($_POST, &amp;$input_errors);

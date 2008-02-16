@@ -34,7 +34,8 @@
 	/* IMSpector */
 
 	define('IMSPECTOR_RCFILE', '/usr/local/etc/rc.d/imspector.sh');
-	define('IMSPECTOR_CONFIG', '/usr/local/etc/imspector/imspector.conf');
+	define('IMSPECTOR_ETC', '/usr/local/etc/imspector');
+	define('IMSPECTOR_CONFIG', IMSPECTOR_ETC . '/imspector.conf');
 
 	function imspector_notice ($msg) { syslog(LOG_NOTICE, "imspector: {$msg}"); }
 	function imspector_warn ($msg) { syslog(LOG_WARNING, "imspector: {$msg}"); }
@@ -96,8 +97,11 @@
 
 		@unlink(IMSPECTOR_RCFILE);
 		@unlink(IMSPECTOR_CONFIG);
+		@unlink(IMSPECTOR_ETC . '/badwords_custom.txt');
+		@unlink(IMSPECTOR_ETC . '/acl_blacklist.txt');
+		@unlink(IMSPECTOR_ETC . '/acl_whitelist.txt');
 
-		exec('pkg_delete imspector-0.3');
+		//exec('pkg_delete imspector-0.4');
 	}
 
 	function sync_package_imspector() {
@@ -150,30 +154,58 @@
 			if($pf_rules) {
 				exec("echo \"{$pf_rules}\" | /sbin/pfctl -a imspector -f -");
 
-				$configtext = "plugin_dir=/usr/local/lib/imspector\n";
+				conf_mount_rw();
+
+				/* generate configuration files */
+
+				$conf['plugin_dir'] = '/usr/local/lib/imspector';
 
 				foreach($proto_array as $proto)
-					$configtext .= "{$proto}_protocol=on\n";
-
-				if($imspector_config["filter_badwords"]) 
-					$configtext .= "badwords_filename=/usr/local/etc/imspector/badwords.txt\n";		
+					$conf[$proto . '_protocol'] = 'on';
 					
-				if($imspector_config["log_file"]) {
+				if($imspector_config['log_file']) {
 					@mkdir('/var/imspector');
-					$configtext .= "file_logging_dir=/var/imspector\n";
+					$conf['file_logging_dir'] = '/var/imspector';
 				}
 					
-				if($imspector_config["log_mysql"]) {
-					$configtext .= "mysql_server={$imspector_config["mysql_server"]}\n";
-					$configtext .= "mysql_database={$imspector_config["mysql_database"]}\n";
-					$configtext .= "mysql_username={$imspector_config["mysql_username"]}\n";
-					$configtext .= "mysql_password={$imspector_config["mysql_password"]}\n";
+				if($imspector_config['log_mysql']) {
+					$conf['mysql_server'] = $imspector_config['mysql_server'];
+					$conf['mysql_database'] = $imspector_config['mysql_database'];
+					$conf['mysql_username'] = $imspector_config['mysql_username'];
+					$conf['mysql_password'] = $imspector_config['mysql_password'];
 				}
 
-				if(0) {
-					@mkdir('/tmp/trace');
-					$configtext .= "icq_trace_error=on\n";
+				if($imspector_config['filter_badwords']) {
+					if(!empty($imspector_config["badwords_list"])) {
+						$conf['badwords_filename'] = IMSPECTOR_ETC . '/badwords_custom.txt';
+						write_imspector_config(IMSPECTOR_ETC . '/badwords_custom.txt', 
+							str_replace("\r", '', base64_decode($imspector_config["badwords_list"])));
+					} else
+						$conf['badwords_filename'] = IMSPECTOR_ETC . '/badwords.txt'; 
 				}
+
+				if($imspector_config['block_files'])
+					$conf['block_files'] = 'on';
+
+				if($imspector_config['block_unlisted'])
+					$conf['block_unlisted'] = 'on';
+
+				if(!empty($imspector_config['acl_whitelist'])) {
+					$conf['whitelist_filename'] = IMSPECTOR_ETC . '/acl_whitelist.txt';
+					write_imspector_config(IMSPECTOR_ETC . '/acl_whitelist.txt', 
+						str_replace("\r", '', base64_decode($imspector_config["acl_whitelist"])));
+				}
+
+				if(!empty($imspector_config['acl_blacklist'])) {
+					$conf['blacklist_filename'] = IMSPECTOR_ETC . '/acl_blacklist.txt';
+					write_imspector_config(IMSPECTOR_ETC . '/acl_blacklist.txt', 
+						str_replace("\r", '', base64_decode($imspector_config["acl_blacklist"])));
+				}
+
+				$conftext = '';
+				foreach($conf as $var => $key)
+					$conftext .= "{$var}={$key}\n";
+				write_imspector_config(IMSPECTOR_CONFIG, $conftext);
 
 				/* generate rc file start and stop */
 				$stop = <<<EOD
@@ -187,15 +219,13 @@ EOD;
 				$start = $stop."\n\tldconfig -m /usr/local/lib/mysql\n";
 				$start .= "\t/usr/local/sbin/imspector -c \"".IMSPECTOR_CONFIG."\"";
 
-				/* write out the configuration */
-				conf_mount_rw();
-				write_imspector_config(IMSPECTOR_CONFIG, $configtext);
 				write_rcfile(array(
 					    'file' => 'imspector.sh',
 					    'start' => $start,
 					    'stop' => $stop
 				    )
 				);
+
 				conf_mount_ro();
 
 				/* if imspector not running start it */
@@ -226,6 +256,9 @@ EOD;
 				conf_mount_rw();
 				unlink(IMSPECTOR_RCFILE);
 				unlink(IMSPECTOR_CONFIG);
+				@unlink(IMSPECTOR_ETC . '/badwords_custom.txt');
+				@unlink(IMSPECTOR_ETC . '/acl_blacklist.txt');
+				@unlink(IMSPECTOR_ETC . '/acl_whitelist.txt');
 				conf_mount_ro();
 			}			
 		}	

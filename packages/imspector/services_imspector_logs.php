@@ -102,17 +102,19 @@ if ($_POST['mode'] == "render") {
 				$line = fgets($fd);
 				if(feof($fd)) continue;
 
-				preg_match('/([^,]*),([^,]*),([^,]*),(.*)/', $line, $matches);
+				preg_match('/([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),(.*)/', $line, $matches);
 				$address = $matches[1];
 				$timestamp = $matches[2];
-				$type = $matches[3];
-				$data = $matches[4];
+				$direction = $matches[3];
+				$type = $matches[4];
+				$filtered = $matches[5];
+				$data = $matches[6];
 
-				if($type == '1') {
+				if($direction == '0') {
 					$bgcolor = $convo_remote_bgcolor;
 					$user = "&lt;<span style='color: $convo_remote_color;'>$remoteuser</span>&gt;";
 				}
-				if($type == '2') {
+				if($direction == '1') {
 					$bgcolor = $convo_local_bgcolor;	
 					$user = "&lt;<span style='color: $convo_local_color;'>$localuser</span>&gt;";
 				}
