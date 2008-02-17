@@ -166,9 +166,13 @@ function squid_install_command() {
 			$config['installedpackages']['squidnac']['config'][0]['blacklist'] = $settingsnac['blacklist'];
 		}
 	}
+	
+	update_status("Writing configuration... One moment please...");
+	
 	write_config();
 
 	/* create cache */
+	update_status("Creating squid cache pools... One moment please...");
 	squid_dash_z();
 	/* make sure pinger is executable */
 	if(file_exists("/usr/local/libexec/squid/pinger"))
@@ -199,6 +203,7 @@ if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
 	fi
 
 EOD;
+	update_status("Writing rc files... One moment please...");
 	write_rcfile($rc);
 
 	foreach (array(	SQUID_CONFBASE,
@@ -209,6 +214,7 @@ EOD;
 	}
 
 	/* kill any running proxy alarm scripts */
+	update_status("Checking for running processes... One moment please...");
 	log_error("Stopping any running proxy monitors");
 	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
 	sleep(1);
@@ -216,12 +222,15 @@ EOD;
 	if (!file_exists(SQUID_CONFBASE . '/mime.conf') && file_exists(SQUID_CONFBASE . '/mime.conf.default'))
 		copy(SQUID_CONFBASE . '/mime.conf.default', SQUID_CONFBASE . '/mime.conf');
 
+	update_status("Checking cache... One moment please...");
 	squid_dash_z();
 
 	if (!is_service_running('squid')) {
+		update_status("Starting... One moment please...");
 		log_error("Starting Squid");
 		mwexec_bg("/usr/local/sbin/squid -D");
 	} else {
+		update_status("Reloading Squid for configuration sync... One moment please...");
 		log_error("Reloading Squid for configuration sync");
 		mwexec("/usr/local/sbin/squid -k reconfigure");
 	}
@@ -230,6 +239,7 @@ EOD;
 	log_error("Starting a proxy monitor script");
 	mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 
+	update_status("Reconfiguring filter... One moment please...");
 	filter_configure();
 }
 
