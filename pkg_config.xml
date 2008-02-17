@@ -566,6 +566,7 @@
       <depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
       <depends_on_package>squid-2.6.18.tbz</depends_on_package>
       <depends_on_package>squid_radius_auth-1.0.8.tbz</depends_on_package>
+	  <depends_on_package>openldap-client-2.3.40.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
       <configurationfile>squid.xml</configurationfile>
     </package>
