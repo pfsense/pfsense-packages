@@ -801,7 +801,8 @@ function squidguard_before_form_log($pkg) {
                         } else
 
                         if ($mlog['logtype'] == 'squidguard_log') {
-$slog .= 'squidguard_log report disabled';
+
+                        $slog .= 'squidguard_log report disabled';
 /*
                             $filename = SQUIDGUARD_LOGDIR . '/squidGuard.log';
                             $slog .= "<b>$filename</b><br>";
@@ -898,6 +899,10 @@ function make_grid_general_items($id = '')
 function make_grid_blacklist() {
         // button 'Upload URL'
         $res = "<br><input name='submit' value='" . BLACKLIST_BTN_URL  . "' type='submit'>";
+        if (file_exists(SG_INFO_FILE))
+            $res .= "<br><b>Rebuild status:</b><span style='color: #800000;'>" .
+                    str_replace("\n", "<br>", file_get_contents(SG_INFO_FILE) .
+                    "</span>");
         return $res;
 }
 
