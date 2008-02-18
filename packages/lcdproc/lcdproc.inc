@@ -279,8 +279,8 @@ counter=1
 while [ "\$counter" -ne 0 ]
 do
 	# start the lcd client, lcdproc client for now until PHP client is finished
-	/usr/local/bin/lcdproc -f $options
-	#/usr/local/bin/php -f /usr/local/pkg/lcdproc_client.php
+	#/usr/local/bin/lcdproc -f $options
+	/usr/local/bin/php -f /usr/local/pkg/lcdproc_client.php
 	sleep 10
 done
 
@@ -289,15 +289,13 @@ EOD;
 			/* generate rc file start and stop */
 			$stop = <<<EOD
 
-if [ `pgrep LCDd | wc -l` != 0  ]; then
-	/usr/bin/killall LCDd
-	/usr/bin/killall lcdclient.sh
-	while [ `pgrep LCDd | wc -l` != 0 ]; do
-		sleep 1
-	done
-	while [ `pgrep lcdclient.sh | wc -l` != 0 ]; do
-		sleep 1
-	done
+if [ `ps auxw |awk '/LCD[d]/ {print $2}'| wc -l` != 0  ]; then
+	ps auxw |awk '/LCD[d]/ {print $2}'|xargs kill 
+	sleep 1	
+fi
+if [ `ps auxw |awk '/lcdclient.s[h]/ {print $2}'| wc -l` != 0  ]; then
+	ps auxw |awk '/lcdclient.s[h]/ {print $2}'|xargs kill
+	sleep 1	
 fi
 
 EOD;
