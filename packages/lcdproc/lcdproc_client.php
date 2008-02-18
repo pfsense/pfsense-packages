@@ -30,7 +30,6 @@
 	// require_once("config.inc");
 	// require_once("functions.inc");
 	require_once("/usr/local/pkg/lcdproc.inc");
-	$lcdproc_screens_config = $config['installedpackages']['lcdprocscreens']['config'][0];
 
 	/* Define functions */
 	function send_lcd_commands($lcd, $lcd_cmds) {
@@ -55,6 +54,7 @@
 	function loop_status($lcd) {
 		global $g;
 		global $config;
+		$lcdproc_screens_config = $config['installedpackages']['lcdprocscreens']['config'][0];
 		/* keep a counter to see how many times we can loop */
 		$i = 1;
 		while($i) {
@@ -104,6 +104,9 @@
 	}
 
 	function build_interface($lcd) {
+		global $g;
+		global $config;
+		$lcdproc_screens_config = $config['installedpackages']['lcdprocscreens']['config'][0];
 		$lcd_cmds = array();
 		$lcd_cmds[] = "hello";
 		$lcd_cmds[] = "client_set name pfSense";
