@@ -30,6 +30,7 @@
 	// require_once("config.inc");
 	// require_once("functions.inc");
 	require_once("/usr/local/pkg/lcdproc.inc");
+	$lcdproc_screens_config = $config['installedpackages']['lcdprocscreens']['config'][0];
 
 	/* Define functions */
 	function send_lcd_commands($lcd, $lcd_cmds) {
@@ -57,12 +58,45 @@
 		/* keep a counter to see how many times we can loop */
 		$i = 1;
 		while($i) {
-			$time = date ("l dS of F Y h:i:s A");
 			$lcd_cmds = array();
-			$lcd_cmds[] = "widget_set welcome_scr title_wdgt \"$i test \"";
-			// $lcd_cmds[] = "widget_set welcome_scr text_wdgt 1 1 \"$time test\"";
-			$lcd_cmds[] = "widget_set welcome_scr text_wdgt 1 2 20 2 h 4 \"$i $time test\"";
-			// $lcd_cmds[] = "output on 1 \"";
+			$lcd_cmds[] = "widget_set welcome_scr title_wdgt \"Welcome\"";
+			$lcd_cmds[] = "widget_set welcome_scr text_wdgt 1 2 20 2 h 4 \"to {$g['product_name']}\"";
+
+			/* process screens to display */
+			if(is_array($lcdproc_screens_config)) {
+				foreach($lcdproc_screens_config as $name => $screen) {
+					if($screen == "on") {
+						switch($name) {
+							case "scr_cpu":
+								$processor = "";
+								$lcd_cmds[] = "widget_set $name title_wdgt \"Processor\"";
+								$lcd_cmds[] = "widget_set $name text_wdgt 1 2 20 2 h 4 \"$processor\"";
+								break;
+							case "scr_time":
+								$time = date ("F Y h:i:s");
+								$lcd_cmds[] = "widget_set $name title_wdgt \"Time\"";
+								$lcd_cmds[] = "widget_set $name text_wdgt 1 2 20 2 h 4 \"$time\"";
+								break;
+							case "scr_load":
+								exec("/usr/bin/uptime", $output, $ret);
+								$temp = explode($output, " ");
+								$loadavg = "$temp[9] $temp[10] $temp[11] $temp[12] $temp[13]";
+								$lcd_cmds[] = "widget_set $name title_wdgt \"Load average\"";
+								$lcd_cmds[] = "widget_set $name text_wdgt 1 2 20 2 h 4 \"$loadavg\"";
+								break;
+							case "scr_uptime":
+								exec("/usr/bin/uptime", $output, $ret);
+								$temp = explode($output, " ");
+								$uptime = "$temp[2] $temp[3] $temp[4] $temp[5] $temp[6] $temp[7] $temp[8]";
+								$lcd_cmds[] = "widget_set $name title_wdgt \"Uptime\"";
+								$lcd_cmds[] = "widget_set $name text_wdgt 1 2 20 2 h 4 \"$uptime\"";
+	
+								break;
+						}
+					}
+				}
+			}
+
 			send_lcd_commands($lcd, $lcd_cmds);
 			sleep(10);
 			$i++;
@@ -79,6 +113,37 @@
 		$lcd_cmds[] = "screen_set welcome_scr name welcome";
 		$lcd_cmds[] = "widget_add welcome_scr title_wdgt title";
 		$lcd_cmds[] = "widget_add welcome_scr text_wdgt scroller";
+
+		/* process screens to display */
+		if(is_array($lcdproc_screens_config)) {
+			foreach($lcdproc_screens_config as $name => $screen) {
+				if($screen == "on") {
+					switch($name) {
+						case "scr_cpu":
+							$lcd_cmds[] = "screen_set $name name welcome";
+							$lcd_cmds[] = "widget_add $name title_wdgt title";
+							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							break;
+						case "scr_time":
+							$lcd_cmds[] = "screen_set $name name welcome";
+							$lcd_cmds[] = "widget_add $name title_wdgt title";
+							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							break;
+						case "scr_load":
+							$lcd_cmds[] = "screen_set $name name welcome";
+							$lcd_cmds[] = "widget_add $name title_wdgt title";
+							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							break;
+						case "scr_uptime":
+							$lcd_cmds[] = "screen_set $name name welcome";
+							$lcd_cmds[] = "widget_add $name title_wdgt title";
+							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+
+							break;
+					}
+				}
+			}
+		}
 		send_lcd_commands($lcd, $lcd_cmds);
 	}
 
