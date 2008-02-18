@@ -369,102 +369,59 @@ function squidguard_resync() {
 // -----------------------------------------------------------------------------
 // squidguard_resync_acl
 // -----------------------------------------------------------------------------
+
 function squidguard_resync_acl() {
        global $config;
        $conf = $config['installedpackages'][MODULE_ACL]['config'];
        $id = $_GET['id'];
+
        if (!$id)
            $id = $_POST['id'];
 
-       // --- sources ---
+       // --- sources part ---
        // move current id by order
-       if (($id != '') and is_array($conf) and ($id !== intval($conf[$id]['order']))) {
-           // copy current item to temp and remove it's from list
+       if (($id !== '') and is_array($conf) /*and ($id !== intval($conf[$id]['order']))*/) {
+
            $src_new = array();
-           $src_cur = $conf[$id];
-           unset ($conf[$id]);
+           foreach ($conf as $key => $src) {
+                    $order = $src['order'];
+                    $n_key = '';    // n_key: [order]_x[key]; x: =0[up]; = 5[nothing]; =9[down];
 
-           // rebuild list and insert current item by order
-           $i=0;
-           foreach($conf as $src) {
-                   if (intval($src_cur['order']) === $i) {
-                       $src_new[] = $src_cur;
-                       unset($src_cur);
-                       $i++;
-                   }
-                   $src_new[] = $src;
-                   $i++;
+                    $k1    = sprintf("%04d", $order);
+                    $k3    = sprintf("%04d", $key);
+
+                    // new: move to last
+                    if (!isset($src['order']) or ($src['order'] === ''))
+                             $n_key = "99995{$k3}";
+                    // current: moveup; movedown; nothing;
+                    elseif (intval($key) === intval($id)) {
+                         if (intval($order) < intval($key))
+                             $n_key = "{$k1}0{$k3}";
+                         elseif (intval($order) > intval($key))
+                             $n_key = "{$k1}9{$k3}";
+                         else
+                             $n_key = "{$k1}5{$k3}";
+                    // other: nothing
+                    } else
+                             $n_key = "{$k1}5{$k3}";
+                    // update with key
+                    $src_new[$n_key] = $src;
            }
-           // if current item not inserted - insert him to the end
-           if (isset($src_cur)) {
-               $src_new[] = $src_cur;
-               unset($src_cur);
+           // sort by key
+           ksort($src_new);
+           reset($src_new);
+
+           // make keys '0, 1, 2, ...', and update order
+           $src_new = array_values($src_new);
+           foreach ($src_new as $key => $src) {
+                    $src_new[$key]['order'] = $key;
            }
 
-           // renew order values
-           foreach($src_new as $key => $src) {
-                   $src_new[$key]['order'] = $key;
-           }
-
+           // renew config
            unset ($config['installedpackages'][MODULE_ACL]['config']);
            $config['installedpackages'][MODULE_ACL]['config'] = $src_new;
            write_config('Update squidguardacl config');
-       } else if (($_GET['act'] === 'del') or ($_POST['act'] === 'del')) {
-           // update order on delete item
-           foreach($config['installedpackages'][MODULE_ACL]['config'] as $key => $src)
-                   $config['installedpackages'][MODULE_ACL]['config'][$key]['order'] = $key;
-           write_config('Update squidguardsrc config');
-       }
-}
-
-// -----------------------------------------------------------------------------
-// squidguard_resync_src
-// -----------------------------------------------------------------------------
-function squidguard_resync_src() {
-       global $config;
-       $conf = $config['installedpackages'][MODULE_SOURCE]['config'];
-       $id = $_GET['id'];
-       if (!$id)
-           $id = $_POST['id'];
-
-       // move current id by order
-       if (($id != '') and is_array($conf) and ($id !== intval($conf[$id]['order']))) {
-           // copy current item to temp and remove it's from list
-           $src_new = array();
-           $src_cur = $conf[$id];
-           unset ($conf[$id]);
-
-           // rebuild list and insert current item by order
-           $i=0;
-           foreach($conf as $src) {
-                   if (intval($src_cur['order']) === $i) {
-                       $src_new[] = $src_cur;
-                       unset($src_cur);
-                       $i++;
-                   }
-                   $src_new[] = $src;
-                   $i++;
-           }
-           // if current item not inserted - insert him to the end
-           if (isset($src_cur)) {
-               $src_new[] = $src_cur;
-               unset($src_cur);
-           }
-
-           // renew order values
-           foreach($src_new as $key => $src) {
-                   $src_new[$key]['order'] = $key;
-           }
-
-           unset ($config['installedpackages'][MODULE_SOURCE]['config']);
-           $config['installedpackages'][MODULE_SOURCE]['config'] = $src_new;
-           write_config('Update squidguardsrc config');
-       } else if (($_GET['act'] === 'del') or ($_POST['act'] === 'del')) {
-           // update order on delete item
-           foreach($config['installedpackages'][MODULE_SOURCE]['config'] as $key => $src)
-                   $config['installedpackages'][MODULE_SOURCE]['config'][$key]['order'] = $key;
-           write_config('Update squidguardsrc config');
-       }
+      }
 }
 
 // =============================================================================

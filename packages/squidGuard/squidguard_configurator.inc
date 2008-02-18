@@ -364,7 +364,8 @@ function squid_reconfigure($remove_only = '') {
          }
 
          // update config
-         $conf = implode(";", $conf);
+         if (is_array($conf))
+             $conf = implode(";", $conf);
          $config['installedpackages']['squid']['config'][0]['custom_options'] = $conf;
          write_config('Update squidGuard option to squid config.');
 
@@ -522,6 +523,7 @@ function sg_remove_unused_db_entries() {
          // black list entries
          // * worked only with 'blacklist entries list file - else may be deleted black list entry
          if (file_exists($workdir .  SQUIDGUARD_BLK_ENTRIES)) {
+             $file_for_del = array();
 
              // load blk entries
              $db_entries = explode("\n", file_get_contents($workdir . SQUIDGUARD_BLK_ENTRIES));
@@ -536,10 +538,11 @@ function sg_remove_unused_db_entries() {
 
              // diff between file list and entries list
              $file_list = scan_dir($dbhome);
-             $file_for_del = array_diff($file_list, $db_entries);
+             if (is_array($file_list) and is_array($db_entries))
+                 $file_for_del = array_diff($file_list, $db_entries);
 
              // delete
-             if (!empty($file_for_del)) {
+             if (is_array($file_for_del) and !empty($file_for_del)) {
                   foreach($file_for_del as $fd) {
                           $file_fd = "$dbhome/$fd";
                           if (($fd != "") && ($fd != ".") && ($fd != "..")) {
