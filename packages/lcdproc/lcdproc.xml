@@ -47,7 +47,7 @@
 			<fielddescr>Enable LCDproc</fielddescr>
 			<fieldname>enable</fieldname>
 			<type>checkbox</type>
-		</field>			
+		</field>
 		<field>
 			<fieldname>comport</fieldname>
 			<fielddescr>Com Port</fielddescr>
@@ -75,7 +75,52 @@
 					<name>Parallel port 1 (/dev/lpt0)</name>
 				</option>
 			</options>
-			<default_value>0</default_value>
+			<default_value>ucom1</default_value>
+		</field>
+		<field>
+			<fieldname>size</fieldname>
+			<fielddescr>Display Size</fielddescr>
+			<description>Set the display size lcdproc should use.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<value>12x1</value>
+					<name>1 rows 12 colums</name>
+				</option>
+				<option>
+					<value>12x2</value>
+					<name>2 rows 12 colums</name>
+				</option>
+				<option>
+					<value>12x4</value>
+					<name>4 rows 12 colums</name>
+				</option>
+				<option>
+					<value>16x1</value>
+					<name>1 row 16 colums</name>
+				</option>
+				<option>
+					<value>16x2</value>
+					<name>2 rows 16 colums</name>
+				</option>
+				<option>
+					<value>16x4</value>
+					<name>4 rows 16 colums</name>
+				</option>
+				<option>
+					<value>20x1</value>
+					<name>1 row 20 colums</name>
+				</option>
+				<option>
+					<value>20x2</value>
+					<name>2 rows 20 colums</name>
+				</option>
+				<option>
+					<value>20x4</value>
+					<name>4 rows 20 colums</name>
+				</option>
+			</options>
+			<default_value>16x2</default_value>
 		</field>
 		<field>
 			<fieldname>driver</fieldname>

@@ -24,8 +24,23 @@
 	</menu>
 	<fields>
 		<field>
+			<fielddescr>Enable Time</fielddescr>
+			<fieldname>scr_time</fieldname>
+			<type>checkbox</type>
+		</field>			
+		<field>
+			<fielddescr>Enable Uptime</fielddescr>
+			<fieldname>scr_uptime</fieldname>
+			<type>checkbox</type>
+		</field>			
+		<field>
 			<fielddescr>Enable CPU</fielddescr>
 			<fieldname>scr_cpu</fieldname>
+			<type>checkbox</type>
+		</field>			
+		<field>
+			<fielddescr>Enable Memory</fielddescr>
+			<fieldname>scr_memory</fieldname>
 			<type>checkbox</type>
 		</field>			
 		<field>
@@ -34,13 +49,8 @@
 			<type>checkbox</type>
 		</field>			
 		<field>
-			<fielddescr>Enable Time</fielddescr>
-			<fieldname>scr_time</fieldname>
-			<type>checkbox</type>
-		</field>			
-		<field>
-			<fielddescr>Enable Uptime</fielddescr>
-			<fieldname>scr_uptime</fieldname>
+			<fielddescr>Enable States</fielddescr>
+			<fieldname>scr_states</fieldname>
 			<type>checkbox</type>
 		</field>			
 	</fields>

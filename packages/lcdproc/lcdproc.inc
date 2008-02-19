@@ -111,6 +111,40 @@
 					break;
 			}
 		}
+		if($post['size']) {
+			switch($post['size']) {
+				case "12x1":
+					continue;
+					break;
+				case "12x2":
+					continue;
+					break;
+				case "12x4":
+					continue;
+					break;
+				case "16x1":
+					continue;
+					break;
+				case "16x2":
+					continue;
+					break;
+				case "16x4":
+					continue;
+					break;
+				case "20x1":
+					continue;
+					break;
+				case "20x2":
+					continue;
+					break;
+				case "20x4":
+					continue;
+					break;
+				default:
+					$input_errors[] = "The chosen display size is not valid";
+					break;
+			}
+		}
 	}
 	function validate_form_lcdproc_screens($post, $input_errors) {
 		// No validation required ?!
@@ -178,25 +212,25 @@
 			/* lcdproc default driver definitions */
 			switch($lcdproc_config[driver]) {
 				case "bayrad":
-					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "Device={$realport}\n";
 					$config_text .= "Speed=9600\n";
 					break;
 				case "CFontz":
-					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "Device={$realport}\n";
-					$config_text .= "Size=20x4\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
 					$config_text .= "Contrast=350\n";
 					$config_text .= "Brightness=1000\n";
-					$config_text .= "OffBrightness=0\n";
+					$config_text .= "OffBrightness=50\n";
 					$config_text .= "Speed=9600\n";
 					$config_text .= "NewFirmware=no\n";
 					$config_text .= "Reboot=no\n";
 					break;
 				case "CFontz633":
-					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "Device={$realport}\n";
-					$config_text .= "Size=16x2\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
 					$config_text .= "Contrast=350\n";
 					$config_text .= "Brightness=1000\n";
 					$config_text .= "OffBrightness=50\n";
@@ -205,10 +239,10 @@
 					$config_text .= "Reboot=yes\n";
 					break;
 				case "CFontzPacket":
-					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "Device={$realport}\n";
 					$config_text .= "Model=635\n";
-					$config_text .= "Size=20x4\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
 					$config_text .= "Contrast=350\n";
 					$config_text .= "Brightness=1000\n";
 					$config_text .= "OffBrightness=50\n";
@@ -217,29 +251,30 @@
 					$config_text .= "Reboot=yes\n";
 					break;
 				case "curses":
-					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "Foreground=blue\n";
 					$config_text .= "Background=cyan\n";
 					$config_text .= "Backlight=red\n";
-					$config_text .= "Size=16x4\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
 					$config_text .= "TopLeftX=7\n";
 					$config_text .= "TopLeftY=7\n";
 					$config_text .= "UseACS=no\n";
 					break;
 				case "CwLynx":
-					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "Model=12232\n";
 					$config_text .= "Device={$realport}\n";
-					$config_text .= "Size=20x4\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
 					$config_text .= "Speed=19200\n";
 					$config_text .= "Reboot=no\n";
 					break;
 				case "pyramid":
-					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "Device={$realport}\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
 					break;
 				case "ea65":
-					$config_text .= "[{$lcdproc_config[driver]}]\n";
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "Device={$realport}\n";
 					$config_text .= "OffBrightness=0\n";
 					$config_text .= "Brightness=500\n";
@@ -250,27 +285,6 @@
 			}
 
 			/* generate rc file start and stop */
-			$options = "";
-			if(is_array($lcdproc_screens_config)) {
-				foreach($lcdproc_screens_config as $name => $screen) {
-					if($screen == "on") {
-						switch($name) {
-							case "scr_cpu":
-								$options .= "P ";
-								break;
-							case "scr_time":
-								$options .= "O ";
-								break;
-							case "scr_load":
-								$options .= "L ";
-								break;
-							case "scr_uptime":
-								$options .= "U ";
-								break;
-						}
-					}
-				}
-			}
 			$client_script = <<<EOD
 #!/bin/sh
 
@@ -278,10 +292,9 @@
 counter=1
 while [ "\$counter" -ne 0 ]
 do
-	# start the lcd client, lcdproc client for now until PHP client is finished
-	#/usr/local/bin/lcdproc -f $options
+	# loop the client to drive the display
 	/usr/local/bin/php -f /usr/local/pkg/lcdproc_client.php
-	sleep 10
+	sleep 1
 done
 
 EOD;
