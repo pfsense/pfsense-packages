@@ -27,32 +27,57 @@
 			<fielddescr>Enable Time</fielddescr>
 			<fieldname>scr_time</fieldname>
 			<type>checkbox</type>
-		</field>			
+		</field>
 		<field>
 			<fielddescr>Enable Uptime</fielddescr>
 			<fieldname>scr_uptime</fieldname>
 			<type>checkbox</type>
-		</field>			
+		</field>
 		<field>
-			<fielddescr>Enable CPU</fielddescr>
-			<fieldname>scr_cpu</fieldname>
+			<fielddescr>Enable System</fielddescr>
+			<fieldname>scr_system</fieldname>
 			<type>checkbox</type>
-		</field>			
+		</field>
 		<field>
-			<fielddescr>Enable Memory</fielddescr>
-			<fieldname>scr_memory</fieldname>
+			<fielddescr>Enable Disk</fielddescr>
+			<fieldname>scr_disk</fieldname>
 			<type>checkbox</type>
-		</field>			
+		</field>
 		<field>
 			<fielddescr>Enable Load</fielddescr>
 			<fieldname>scr_load</fieldname>
 			<type>checkbox</type>
-		</field>			
+		</field>
 		<field>
 			<fielddescr>Enable States</fielddescr>
 			<fieldname>scr_states</fieldname>
 			<type>checkbox</type>
-		</field>			
+		</field>
+		<field>
+			<fielddescr>Enable Carp</fielddescr>
+			<fieldname>scr_carp</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable IPsec</fielddescr>
+			<fieldname>scr_ipsec</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable DHCP</fielddescr>
+			<fieldname>scr_dhcp</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable Load Balancer</fielddescr>
+			<fieldname>scr_slbd</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable Interfaces</fielddescr>
+			<fieldname>scr_interfaces</fieldname>
+			<type>checkbox</type>
+		</field>
 	</fields>
 	<custom_php_command_before_form>
 		before_form_lcdproc_screens(&amp;$pkg);
