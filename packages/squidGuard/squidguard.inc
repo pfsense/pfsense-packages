@@ -523,7 +523,7 @@ function squidguard_before_form($pkg) {
 // -----------------------------------------------------------------------------
 // squidguard_before_form_acl
 // -----------------------------------------------------------------------------
-function squidguard_before_form_acl($pkg) {
+function squidguard_before_form_acl($pkg, $is_acl=true) {
         global $config;
         global $g;
         $current_id = '';
@@ -639,7 +639,7 @@ function squidguard_before_form_acl($pkg) {
         foreach($pkg['fields']['field'] as $field) {
                 if (($field['fieldname'] == 'dest')/* || ($field['fieldname'] == 'overdest')*/) {
                         $fld = &$pkg['fields']['field'][$i];
-                        $fld['description'] .= make_grid_controls('checkbox', $dest_items);        // insert to description custom controls
+                        $fld['description'] .= make_grid_controls('checkbox', $dest_items, $is_acl);        // insert to description custom controls
                 }
                 $i++;
         }
@@ -866,7 +866,7 @@ function make_grid_blacklist() {
 // -----------------------------------------------------------------------------
 // make_grid_controls
 // -----------------------------------------------------------------------------
-function make_grid_controls($type, $items) {
+function make_grid_controls($type, $items, $enable_overtime = true) {
         $res = '';
         $tbl = '';
         $color = '';
@@ -900,25 +900,42 @@ function make_grid_controls($type, $items) {
                 if ($ovt_val == 'deny') $ovt_deny = 'CHECKED';
 
                 $tbl .= "<tr>";
+                // uptime table
                 $tbl .= "<td $color><input type=\"$type\" name=\"" . PREFLD_UPTIME . "$name\" $upt_on></td>";
-                $tbl .= "<td width=\"35%\" $color >$description [$name]</td>";
+                $tbl .= "<td $color>$description [$name]</td>";
                 $tbl .= "<td $color><input type=\"$type\" name=\"" . PREFLD_UPTIME_DENY . "$name\" $upt_deny></td>";
                 $tbl .= "<td $color>deny access</td>";
+                // overtime table
+                if ($enable_overtime) {
+                    $tbl .= "<td $color><input type=\"$type\" name=\"" . PREFLD_OVERTIME . "$name\" $ovt_on></td>";
+                    $tbl .= "<td $color>$description [$name]</td>";
+                    $tbl .= "<td $color><input type='$type' name=\"" . PREFLD_OVERTIME_DENY . "$name\" $ovt_deny></td>";
+                    $tbl .= "<td $color>deny access</td>";
+                } else {
 
-                $tbl .= "<td $color><input type=\"$type\" name=\"" . PREFLD_OVERTIME . "$name\" $ovt_on></td>";
-                $tbl .= "<td $color width=\"35%\" >$description [$name]</td>";
-                $tbl .= "<td $color><input type=\"$type\" name=\"" . PREFLD_OVERTIME_DENY . "$name\" $ovt_deny></td>";
-                $tbl .= "<td $color>deny access</td>";
+                }
                 $tbl .= "</tr>";
         }
 
         if (!empty($tbl)) {
-                $tbl = "<th/><th>Destinations in uptime</th><th/><th/><th/><th>Destinations in overtime</th><th/><th/>" .
-                        "<tr><td/><td>Select destinations for uptime rule</td><td/><td/>
-                             <td/><td>Select destination for overtime rule.<br>If time not defined, this part must be ignored</td><td/><td/></tr>"
-                        . $tbl;
+                $thdr = '';
+                if ($enable_overtime) {
+                    $thdr = "<tr>" .
+                            "<th colspan='4' align=middle>Destinations in uptime</th>" .
+                            "<th colspan='4' align=middle>Destinations in overtime</th></tr><tr>" .
+                            "<td colspan='4' align=middle>Select destinations for uptime rule</td>" .
+                            "<td colspan='4' align=middle>Select destination for overtime rule.<br>" .
+                            "If time not defined, this part must be ignored</td></tr>";
+                    // formatting
+                    $thdr .= "<tr><td/><td width='35%'/><td/><td/><td/><td width='35%'/><td/><td/></tr>";
+                } else {
+                    $thdr = "<tr><th colspan='4' align=middle>Destinations in uptime</th></tr>" .
+                            "<tr><td colspan='4' align=middle>Select destinations for uptime rule</td></tr>";
+                    // formatting
+                    $thdr .= "<tr><td width='5%'/><td/><td width='5%'/><td width='10%'/></tr>";
+                }
 
-                $res .= "<table cellspacing='0'>" . $tbl . "</table>";
+                $res .= "<table cellspacing='0' width='100%'> $thdr $tbl </table>";
         }
         return $res;
 }
@@ -1239,7 +1256,7 @@ function convert_pfxml_to_sgxml_source($pfconfig) {
                 $sgx[FLD_NAME]                 = $pfx['name'];
                 $sgx[FLD_IP]                   = $pfx['iplist'];
                 $sgx[FLD_DOMAINS]              = $pfx[FLD_DOMAINS];
-                $sgx[FLD_LOG]                  = $pfx['enablelog'];
+                $sgx[FLD_LOG]                  = $pfx[FLD_ENABLELOG];
                 $sgx[FLD_DESCRIPTION]          = $pfx['description'];
                 $sgxml[FLD_ITEM][] = $sgx;
             }
@@ -1264,7 +1281,7 @@ function convert_pfxml_to_sgxml_destination($pfconfig) {
                 $sgx[FLD_EXPRESSIONS]         = $pfx['expressions'];
                 $sgx[FLD_REDIRECT]            = $pfx[FLD_REDIRECT];
                 $sgx[FLD_DESCRIPTION]         = $pfx['description'];
-                $sgx[FLD_LOG]                 = $pfx['enablelog'];
+                $sgx[FLD_LOG]                 = $pfx[FLD_ENABLELOG];
                 $sgxml[FLD_ITEM][] = $sgx;
             }
         }
@@ -1282,9 +1299,9 @@ function convert_pfxml_to_sgxml_rewrite($pfconfig) {
         if (is_array($pfxml)) {
             foreach($pfxml as $pfx) {
                 $sgx = array();
-                $sgx[FLD_NAME]                 = $pfx['name'];
+                $sgx[FLD_NAME]                = $pfx['name'];
                 $sgx[FLD_DESCRIPTION]         = $pfx['description'];
-                $sgx[FLD_LOG]                  = $pfx['enablelog'];
+                $sgx[FLD_LOG]                 = $pfx[FLD_ENABLELOG];
 
                 foreach($pfx['row'] as $pfx_row) {
                         $sgx_row = array();
@@ -1340,13 +1357,14 @@ function convert_pfxml_to_sgxml_acl($pfconfig) {
         if (is_array($pfxml)) {
             foreach($pfxml as $pfx) {
                 $sgx = array();
-#                $sgx[FLD_NAME]               = $pfx[FLD_SOURCE]; // [04-01-2008] previous ver - this field will removed
                 $sgx[FLD_NAME]               = $pfx[FLD_NAME];    // [04-01-2008] new ver
                 $sgx[FLD_DESCRIPTION]        = $pfx[FLD_DESCRIPTION];
                 $sgx[FLD_DISABLED]           = $pfx[FLD_DISABLED];
                 $sgx[FLD_TIMENAME]           = $pfx[FLD_TIME];
                 $sgx[FLD_REDIRECT]           = $pfx[FLD_REDIRECT];
                 $sgx[FLD_REWRITENAME]        = $pfx[FLD_REWRITE];
+                $sgx[FLD_LOG]                = $pfx[FLD_ENABLELOG];
+                $sgx[FLD_NOTALLOWINGIP]      = $pfx[FLD_NOTALLOWINGIP];
 
                 // for overtime
                 $sgx[FLD_OVERREDIRECT]       = $pfx[FLD_OVERREDIRECT];
@@ -1388,24 +1406,16 @@ function convert_pfxml_to_sgxml_default($pfconfig) {
         $sgx[FLD_TIMENAME]            = $pfx[FLD_TIME];
         $sgx[FLD_REDIRECT]            = $pfx[FLD_REDIRECT];
         $sgx[FLD_REWRITENAME]         = $pfx[FLD_REWRITE];
-        // for overtime
-        $sgx[FLD_OVERREDIRECT]        = $pfx[FLD_OVERREDIRECT];
-        $sgx[FLD_OVERREWRITENAME]     = $pfx[FLD_OVERREWRITE];
+        $sgx[FLD_LOG]                 = $pfx[FLD_ENABLELOG];
+        $sgx[FLD_NOTALLOWINGIP]       = $pfx[FLD_NOTALLOWINGIP];
 
         // destinations
-        if (strpos($pfx['dest'], '[') === false) {
-            $sgx[FLD_DESTINATIONNAME]     = trim($pfx['dest']);
-            $sgx[FLD_OVERDESTINATIONNAME] = '';
-        } else {
-            $sgx[FLD_DESTINATIONNAME]     = trim( substr($pfx['dest'], 0, strpos($pfx['dest'], '[')) );
-            $sgx[FLD_OVERDESTINATIONNAME] = trim( strstr($pfx['dest'], '[') );
-            $sgx[FLD_OVERDESTINATIONNAME] = trim( str_replace(']', '', $sgx[FLD_OVERDESTINATIONNAME]) );
-            $sgx[FLD_OVERDESTINATIONNAME] = trim( str_replace('[', '', $sgx[FLD_OVERDESTINATIONNAME]) );
-        }
+        if (strpos($pfx['dest'], '[') === false)
+             $sgx[FLD_DESTINATIONNAME]     = trim($pfx['dest']);
+        else $sgx[FLD_DESTINATIONNAME]     = trim( substr($pfx['dest'], 0, strpos($pfx['dest'], '[')) );
 
         // !ATTENTION! '!all' must be convert to 'none'
         $sgx[FLD_DESTINATIONNAME]     = str_replace("!all", "none", $sgx[FLD_DESTINATIONNAME]);
-        $sgx[FLD_OVERDESTINATIONNAME] = str_replace("!all", "none", $sgx[FLD_OVERDESTINATIONNAME]);
 
         return $sgx;
 }

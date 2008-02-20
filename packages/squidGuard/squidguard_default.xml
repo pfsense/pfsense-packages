@@ -45,12 +45,6 @@
 	
 	<fields>		
 		<field>
-			<fielddescr>Default Time</fielddescr>
-			<fieldname>time</fieldname>
-			<description>Enter time name in current which this rule permitted.</description>
-			<type>select</type>
-		</field>
-		<field>
 			<fielddescr>Default destination</fielddescr>
 			<fieldname>dest</fieldname>
 			<description></description>
@@ -58,21 +52,17 @@
 			<size>100</size>
 		</field>
 		<field>
-			<fielddescr>Default Redirect</fielddescr>
-			<fieldname>redirect</fieldname>
+			<fielddescr>Not to allow IP addresses in URL</fielddescr>
+			<fieldname>notallowingip</fieldname>
 			<description>
-				Enter redirection URL, Tag or Error page code for this rule, or leave blank. &lt;br&gt;
-				Supported URL's: 'http://myurl', 'https://myurl'. &lt;br&gt;
-				Supported tags: 'blank', 'blank_img'. &lt;br&gt;
-				Supported error page codes: 3xx, 4xx, 5xx. Format: 'code' or 'code[space]reason message'.
+				To make sure that people don't bypass the URL filter 
+				by simply using the IP addresses instead of the fully qualified domain names, you can check this option.   
 			</description>
-			<type>textarea</type>
-			<cols>65</cols>
-			<rows>2</rows>
+			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Default overtime redirect</fielddescr>
-			<fieldname>overredirect</fieldname>
+			<fielddescr>Default Redirect</fielddescr>
+			<fieldname>redirect</fieldname>
 			<description>
 				Enter redirection URL, Tag or Error page code for this rule, or leave blank. &lt;br&gt;
 				Supported URL's: 'http://myurl', 'https://myurl'. &lt;br&gt;
@@ -90,12 +80,6 @@
 			<type>select</type>
 		</field>
 		<field>
-			<fielddescr>Default overtime rewrite</fielddescr>
-			<fieldname>overrewrite</fieldname>
-			<description>Enter rewrite condition name for this rule, or leave blank.</description>
-			<type>select</type>
-		</field>
-		<field>
 			<fielddescr>Enable log</fielddescr>
 			<fieldname>enablelog</fieldname>
 			<description>Check this for enable log.</description>
@@ -107,7 +91,7 @@
 		squidguard_validate_acl(&amp;$_POST, &amp;$input_errors);
 	</custom_php_validation_command>
 	<custom_php_command_before_form>
-		squidguard_before_form_acl(&amp;$pkg);
+		squidguard_before_form_acl(&amp;$pkg, false);
 	</custom_php_command_before_form>
 	<custom_php_after_form_command> 
         squidGuard_print_javascript();

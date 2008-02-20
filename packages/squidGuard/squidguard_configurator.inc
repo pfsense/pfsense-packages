@@ -60,7 +60,7 @@ define('FILES_DB_HEADER', '
 # ------------------------------------------------------------------------------
 ');
 
-define('CONFIG_SG_HEADER', '
+define('CONFIG_SG_HEADER', "
 # ============================================================
 # SquidGuard configuration file
 #
@@ -69,7 +69,7 @@ define('CONFIG_SG_HEADER', '
 # (C)2006 Serg Dvoriancev
 # email: dv_serg@mail.ru
 # ============================================================
-');
+");
 
 define('ACL_WARNING_ABSENSE_PASS', "!WARNING! Absence PASS 'all' or 'none' added as 'none'");
 
@@ -148,6 +148,8 @@ define('SQUIDGUARD_LOG_LEVEL',           0);
 # ------------------------------------------------------------------------------
 #
 define('FLT_DEFAULT_ALL', 'all');
+define('FLT_NOTALLOWIP',  '!in-addr');
+
 # ------------------------------------------------------------------------------
 # owner user name (squid system user - need for define rights access)
 # ------------------------------------------------------------------------------
@@ -229,6 +231,7 @@ define('FLD_TIMEDAYS',            'timedays');
 define('FLD_DATRANGE',            'daterange');
 define('FLD_TIMERANGE',           'sg_timerange');
 define('FLD_REDIRECTMODE',        'redirect_mode');                             // [redirect_mode] = rmod_int <base- use sgerror.php>; rmod_301; rmod_302;
+define('FLD_NOTALLOWINGIP',       'notallowingip');                             // not allowing ip in URL
 
 // transparent mode
 define('FLD_SQUID_TRANSPARENT_MODE',   'squid_transparent_mode');
@@ -842,9 +845,6 @@ function sg_build_config() {
          // --- Header ---
          $sgconf[] = CONFIG_SG_HEADER;
 
-         // redirector base url
-#         $redirect_base_url = sg_redirector_base_url();
-
          // init
          $sgconf[] = "logdir " . $squidguard_config[FLD_LOGDIR];
          $sgconf[] = "dbhome " . $squidguard_config[FLD_DBHOME];
@@ -956,9 +956,6 @@ function sg_build_config() {
          if ($squidguard_config[FLD_DESTINATIONS]) {
              sg_addlog("sg_build_config: add destinations");
              $sgconf[] = "";
-#             $sgconf[] = "dest localhost { # fix localhost access problem on transparent proxy ";
-#             $sgconf[] = "\t ip 127.0.0.1";
-#             $sgconf[] = "}";
              $log_entr_added = '';
              foreach($squidguard_config[FLD_DESTINATIONS][FLD_ITEM] as $dst) {
                  $dstname = $dst[FLD_NAME];
@@ -1016,10 +1013,11 @@ function sg_build_config() {
              $log_entr_added = '';
              foreach($squidguard_config[FLD_ACLS][FLD_ITEM] as $acl) {
 
-                 // delete blacklist entries from 'pass' if blacklist disabled
-                 if ($squidguard_config[FLD_BLACKLISTENABLED] !== 'on') {
+                if ($squidguard_config[FLD_BLACKLISTENABLED] !== 'on') {
                      $tarray = explode(" ", $acl[FLD_DESTINATIONNAME]);
                      $varray = explode(" ", $acl[FLD_OVERDESTINATIONNAME]);
+
+                     // delete blacklist entries from 'pass' if blacklist disabled
                      foreach($entry_blacklist as $entry) {
                          $tk = array_search($entry, $tarray);
                          if ($tk !== false) unset ($tarray[$tk]);
@@ -1033,11 +1031,22 @@ function sg_build_config() {
                          $tk = array_search("!$entry", $varray);
                          if ($tk !== false) unset ($varray[$tk]);
                      }
+
                      $acl[FLD_DESTINATIONNAME]     = implode (" ", $tarray);
                      $acl[FLD_OVERDESTINATIONNAME] = implode (" ", $varray);
                  }
 
                  if (!$acl[FLD_DISABLED]) {
+                      // not allowing IP in URL
+                      if ($acl[FLD_NOTALLOWINGIP]) {
+                          $acl[FLD_DESTINATIONNAME]     = "!in-addr " . $acl[FLD_DESTINATIONNAME];
+                          $acl[FLD_OVERDESTINATIONNAME] = "!in-addr " . $acl[FLD_OVERDESTINATIONNAME];
+                      }
+
+                      // re-order acl pass (<allow><deny<all|none>)
+                      $acl[FLD_DESTINATIONNAME]     = sg_aclpass_reorder($acl[FLD_DESTINATIONNAME]);
+                      $acl[FLD_OVERDESTINATIONNAME] = sg_aclpass_reorder($acl[FLD_OVERDESTINATIONNAME]);
+
                       if ($acl[FLD_DESCRIPTION])
                           $sgconf[] = "\t # " . $acl[FLD_DESCRIPTION];
 
@@ -1047,11 +1056,13 @@ function sg_build_config() {
                           $sgconf[] = "\t\t pass " . $acl[FLD_DESTINATIONNAME];
                           if ($acl[FLD_REDIRECT]) {
                               if (is_url($acl[FLD_REDIRECT]))
-                                   $sgconf[] = "\t\t redirect " . $redirect_user_url . rawurlencode($acl[FLD_REDIRECT]);
-                              else $sgconf[] = "\t\t redirect " . $redirect_user_url . "?msg=" . htmlspecialchars($acl[FLD_REDIRECT]);
+                                   $sgconf[] = "\t\t redirect " . sg_redirector_base_url($acl[FLD_REDIRECT]); # $redirect_user_url . rawurlencode($acl[FLD_REDIRECT]);
+                              else $sgconf[] = "\t\t redirect " . sg_redirector_base_url(''); # $redirect_user_url . "?msg=" . htmlspecialchars($acl[FLD_REDIRECT]);
                           }
                           if ($acl[FLD_REWRITENAME])
                               $sgconf[] = "\t\t rewrite " . $acl[FLD_REWRITENAME];
+                          if ($acl[FLD_LOG])
+                              $sgconf[] = "\t\t log " . SQUIDGUARD_ACCESSBLOCK_FILE;
 
                           // overtime
                           $sgconf[] = "\t } else {";
@@ -1060,6 +1071,8 @@ function sg_build_config() {
                                    $sgconf[] = "\t\t redirect " . sg_redirector_base_url($acl[FLD_OVERREDIRECT]); # $redirect_base_url . rawurlencode($acl[FLD_OVERREDIRECT]);
                           if ($acl[FLD_OVERREWRITENAME])
                               $sgconf[] = "\t\t rewrite " . $acl[FLD_OVERREWRITENAME];
+                          if ($acl[FLD_LOG])
+                              $sgconf[] = "\t\t log " . SQUIDGUARD_ACCESSBLOCK_FILE;
 
                           $sgconf[] = "\t }";
                       } else {
@@ -1071,6 +1084,8 @@ function sg_build_config() {
                               $sgconf[] = "\t\t redirect " . sg_redirector_base_url($acl[FLD_REDIRECT]); # $redirect_base_url . rawurlencode($acl[FLD_REDIRECT]);
                           if ($acl[FLD_REWRITENAME])
                               $sgconf[] = "\t\t rewrite " . $acl[FLD_REWRITENAME];
+                          if ($acl[FLD_LOG])
+                              $sgconf[] = "\t\t log " . SQUIDGUARD_ACCESSBLOCK_FILE;
 
                           $sgconf[] = "\t }";
                       }
@@ -1091,7 +1106,6 @@ function sg_build_config() {
              // delete blacklist entries from 'pass' if blacklist disabled
              if ($squidguard_config[FLD_BLACKLISTENABLED] !== 'on') {
                  $tarray = explode(" ", $def[FLD_DESTINATIONNAME]);
-                 $varray = explode(" ", $def[FLD_OVERDESTINATIONNAME]);
                  foreach($entry_blacklist as $entry) {
                          $tk = array_search($entry , $tarray);
                          if ($tk !== false) unset ($tarray[$tk]);
@@ -1099,41 +1113,28 @@ function sg_build_config() {
                          $tk = array_search("!$entry" , $tarray);
                          if ($tk !== false) unset ($tarray[$tk]);
 
-                         $tk = array_search($entry , $varray);
-                         if ($tk !== false) unset ($varray[$tk]);
-
-                         $tk = array_search("!$entry" , $varray);
-                         if ($tk !== false) unset ($varray[$tk]);
                  }
                  $def[FLD_DESTINATIONNAME]     = implode (" ", $tarray);
-                 $def[FLD_OVERDESTINATIONNAME] = implode (" ", $varray);
              }
 
-             if ($def[FLD_TIMENAME]) {
-                 // ontime
-                 $sgconf[] = "\t default within " . $def[FLD_TIMENAME] . " { ";
-                 $sgconf[] = "\t\t pass " . $def[FLD_DESTINATIONNAME];
-                 if ($def[FLD_REDIRECT] && is_url($def[FLD_REDIRECT]))
-                      $sgconf[] = "\t\t redirect " . sg_redirector_base_url($def[FLD_REDIRECT]); # $redirect_base_url . rawurlencode($def[FLD_REDIRECT]);
-                 else $sgconf[] = "\t\t redirect " . sg_redirector_base_url(''); # $redirect_base_url;
-                 // overtime
-                 $sgconf[] = "\t } else {";
-                 $sgconf[] = "\t\t pass " . $def[FLD_OVERDESTINATIONNAME];
-                 if ($def[FLD_OVERREDIRECT] && is_url($def[FLD_OVERREDIRECT])) {
-                     $sgconf[] = "\t\t redirect " . sg_redirector_base_url($def[FLD_OVERREDIRECT]); # $redirect_base_url . rawurlencode($def[FLD_OVERREDIRECT]);
-                 }
-                 else $sgconf[] = "\t\t redirect " .  sg_redirector_base_url(''); # $redirect_base_url;
-                 $sgconf[] = "\t }";
-             } else {
-                 // without time
-                 $sgconf[] = "\t default { ";
-                 $sgconf[] = "\t\t pass " . $def[FLD_DESTINATIONNAME];
-                 if ($def[FLD_REDIRECT] && is_url($def[FLD_REDIRECT])) {
+             // not allowing IP in URL
+             if ($def[FLD_NOTALLOWINGIP])
+                 $def[FLD_DESTINATIONNAME] = "!in-addr " . $def[FLD_DESTINATIONNAME];
+
+             // re-order acl pass (<allow><deny<all|none>)
+             $def[FLD_DESTINATIONNAME]     = sg_aclpass_reorder($def[FLD_DESTINATIONNAME]);
+
+             // 'Default' used without time
+             $sgconf[] = "\t default { ";
+             $sgconf[] = "\t\t pass " . $def[FLD_DESTINATIONNAME];
+             if ($def[FLD_REDIRECT] && is_url($def[FLD_REDIRECT])) {
                       $sgconf[] = "\t\t redirect " .  sg_redirector_base_url($def[FLD_REDIRECT]); # $redirect_base_url . rawurlencode($def[FLD_REDIRECT]);
-                 }
-                 else $sgconf[] = "\t\t redirect " . sg_redirector_base_url(''); # $redirect_base_url;
-                 $sgconf[] = "\t }";
              }
+             else $sgconf[] = "\t\t redirect " . sg_redirector_base_url(''); # $redirect_base_url;
+             if ($def[FLD_LOG])
+                 $sgconf[] = "\t\t log " . SQUIDGUARD_ACCESSBLOCK_FILE;
+             $sgconf[] = "\t }";
+
          } // if def
          else {
                sg_addlog("sg_build_config: error - ACL 'default' is empty, use as default 'block all'.");
@@ -1147,6 +1148,30 @@ function sg_build_config() {
          $sgconf[] = "}";
 
          return $sgconf;
+}
+// ------------------------------------------------------------
+//
+// ------------------------------------------------------------
+function sg_aclpass_reorder($pass) {
+    $ar_pass = explode(" ", $pass);
+
+    // 'pass' order: <allow> <deny> <all|none>
+    if (is_array($ar_pass)) {
+        $pass_end = '';
+        $pass_fst = array();
+        $pass_lst = array();
+        foreach ($ar_pass as $val) {
+            $tk = trim($val);
+            if ($tk === 'all' or $tk === 'none')
+                 $pass_end   = $val;
+            elseif (strpos($tk, "!") !== false)
+                 $pass_lst[] = $val;
+            else $pass_fst[] = $val;
+        }
+        $ar_pass = array_merge($pass_fst, $pass_lst);
+        $ar_pass[] = $pass_end;
+    }
+    return implode(" ", $ar_pass);
 }
 
 // ------------------------------------------------------------
@@ -1354,25 +1379,6 @@ function sg_check_config_data () {
                  }
              } else {
                      $check_log[] = "ACL 'default' error: ontime pass list is empty.";
-             }
-
-             // check overtime destinations
-             if ($time) {
-                 if ($def[FLD_OVERDESTINATIONNAME]) {
-                     $defoverdest = str_replace("!", "", $def[FLD_OVERDESTINATIONNAME]);
-                     $defoverdest = explode(" ", $defoverdest);
-                     $key_defoverdest = array_count_values($defoverdest);
-                     foreach($defoverdest as $adest) {
-                         // check duplicates destinations in acl
-                         if ($key_defoverdest[$adest] > 1)
-                             $check_log[] = "ACL 'default' error: duplicate overtime destination name '$adest'. Any destination must included once.";
-                         // check destinations for exists
-                         if ($adest and ($adest != 'all') and ($adest != 'none') and !$key_destinations[$adest])
-                             $check_log[] = "ACL 'default' error: overtime destination name '$adest' not found";
-                     }
-                 } else {
-                     $check_log[] = "ACL 'default' error: overtime pass list is empty.";
-                 }
              }
 
              // check rewrite
