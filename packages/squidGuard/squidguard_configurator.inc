@@ -1147,7 +1147,8 @@ function sg_build_config() {
          // --- ACL end ---
          $sgconf[] = "}";
 
-         return $sgconf;
+         return implode("\n", $sgconf);
+#         return $sgconf;
 }
 // ------------------------------------------------------------
 //
