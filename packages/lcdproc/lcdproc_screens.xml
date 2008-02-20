@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Services: LCDproc: Screens</title>
 	<name>lcdproc_screens</name>
-	<version>0.5.2_1-p3</version>
+	<version>0.5.2_1-p8</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
@@ -31,6 +31,11 @@
 		<field>
 			<fielddescr>Enable Uptime</fielddescr>
 			<fieldname>scr_uptime</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable Hostname</fielddescr>
+			<fieldname>scr_hostname</fieldname>
 			<type>checkbox</type>
 		</field>
 		<field>
