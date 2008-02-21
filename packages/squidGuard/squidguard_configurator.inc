@@ -309,7 +309,7 @@ function sg_reconfigure() {
          $conf_file = SQUIDGUARD_LOGDIR_DEF . SQUIDGUARD_CONFIGFILE;
          $conf = sg_build_config();
          if ($conf) {
-             $conf = implode("\n", $conf);
+#             $conf = implode("\n", $conf);
              if ($squidguard_config[FLD_WORKDIR])
                  $conf_file = $squidguard_config[FLD_WORKDIR] . SQUIDGUARD_CONFIGFILE;
              file_put_contents($conf_file, $conf);
