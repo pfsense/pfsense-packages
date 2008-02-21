@@ -36,7 +36,7 @@
 		exec("/usr/bin/uptime", $output, $ret);
 		if(stristr($output[0], "day")) {
 			$temp = explode(" ", $output[0]);
-			$status = "$temp[2] $temp[3] $temp[4] $temp[5] $temp[6] $temp[7] $temp[8] ". substr($temp[9], 0, -1);
+			$status = "$temp[2] $temp[3] $temp[4] $temp[5] $temp[6] $temp[7] ". substr($temp[8], 0, -1);
 		} else {
 			$temp = explode(" ", $output[0]);
 			$status = "$temp[2] $temp[3] $temp[4] $temp[5] $temp[6] ". substr($temp[7], 0, -1);
@@ -48,7 +48,7 @@
 		exec("/usr/bin/uptime", $output, $ret);
 		if(stristr($output[0], "day")) {
 			$temp = explode(" ", $output[0]);
-			$status = "$temp[12] $temp[13] $temp[14]";
+			$status = "$temp[11] $temp[12] $temp[13]";
 		} else {
 			$temp = explode(" ", $output[0]);
 			$status = "$temp[10] $temp[11] $temp[12]";
