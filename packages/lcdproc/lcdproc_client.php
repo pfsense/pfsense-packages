@@ -104,6 +104,7 @@
 		$pstatus = "";
 		$i = 0;
 		foreach ($a_pool as $vipent) {
+			$pstatus[] = "{$vipent['name']}";
 			if ($vipent['type'] == "gateway") {
 				$poolfile = "{$g['tmp_path']}/{$vipent['name']}.pool";
 				if(file_exists("$poolfile")) {
@@ -129,7 +130,7 @@
 					} else {
 						$online = "Offline";
 					}
-					$pstatus[] = "{$vipent['name']} {$svr[0]} {$online}";
+					$pstatus[] = "[{$svr[0]}] {$online}";
 				}
 			} else {
 				$pstatus[] = "{$vipent['monitor']}";
@@ -174,7 +175,7 @@
 						break;
 				}
 			}
-			$status = "MASTER/BACKUP/INIT {$mastercount}/{$backupcount}/{$initcount}";
+			$status = "M/B/I {$mastercount}/{$backupcount}/{$initcount}";
 		} else {
 			$status = "CARP Disabled";
 		}
@@ -195,7 +196,7 @@
 				if ($line[0] != "\t") {
 					if (is_array($cursa))
 						$sad[] = $cursa;
-					$cursa = array();
+						$cursa = array();
 					list($cursa['src'],$cursa['dst']) = explode(" ", $line);
 					$i = 0;
 				} else {
@@ -204,13 +205,13 @@
 						$cursa['proto'] = $linea[0];
 						$cursa['spi'] = substr($linea[2], strpos($linea[2], "x")+1, -1);
 					} else if ($i == 2) {
-						$cursa['ealgo'] = $linea[1];
+							$cursa['ealgo'] = $linea[1];
 					} else if ($i == 3) {
 						$cursa['aalgo'] = $linea[1];
 					}
 				}
-				$i++;
-			}
+			$i++;
+				}
 			if (is_array($cursa) && count($cursa))
 				$sad[] = $cursa;
 			pclose($fd);
@@ -257,28 +258,27 @@
 		}
 	}
 
-	function get_ipsec_stats () {
-		global $g;
-		global $config;
-
+	function get_ipsec_status() {
+		global $g, $config, $sad;
 		$sad = array();
 		$sad = get_ipsec_tunnel_sad();
 
 		$activecounter = 0;
 		$inactivecounter = 0;
 	
+		$ipsec_detail_array = array();
 		foreach ($config['ipsec']['tunnel'] as $tunnel){ 
 			$ipsecstatus = false;
-		
+
 			$tun_disabled = "false";
 			$foundsrc = false;
 			$founddst = false; 
-
+	
 			if (isset($tunnel['disabled'])) {
 				$tun_disabled = "true";
 				continue;
 			}		
-		
+			
 			if(output_ipsec_tunnel_status($tunnel)) {
 				/* tunnel is up */
 				$iconfn = "true";
@@ -288,10 +288,23 @@
 				$iconfn = "false";
 				$inactivecounter++;
 			}
+			
+			$ipsec_detail_array[] = array('src' => $tunnel['interface'],
+						'dest' => $tunnel['remote-gateway'],
+						'remote-subnet' => $tunnel['remote-subnet'],
+						'descr' => $tunnel['descr'],
+						'status' => $iconfn,
+						'disabled' => $tun_disabled);
 		}
-		$status = "Up/Down {$activecounter}/{$inactivecounter}";
+
+		if (is_array($config['ipsec']['tunnel'])) {
+			$status = "Up/Down $activecounter/$inactivecounter";
+		} else {
+			$status = "IPSEC Disabled";
+		}
 		return($status);
 	}
+
 	
 	/* Define functions */
 	function send_lcd_commands($lcd, $lcd_cmds) {
@@ -446,7 +459,7 @@
 					case "scr_uptime":
 						$uptime = get_uptime_stats();
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Uptime\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 1 \"$uptime\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"$uptime\"";
 						break;
 					case "scr_hostname":
 						exec("/bin/hostname", $output, $ret);
@@ -488,12 +501,12 @@
 					case "scr_slbd":
 						$slbd = get_slbd_stats();
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Load Balancer\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 1 \"$slbd\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"$slbd\"";
 						break;
 					case "scr_interfaces":
 						$interfaces = get_interfaces_stats();
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Interfaces\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 1 \"$interfaces\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"$interfaces\"";
 						break;
 				}
 			}
