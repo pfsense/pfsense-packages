@@ -77,7 +77,6 @@
 			} else {
 				$ip = "-";
 			}
-			// $ifstatus[] = htmlspecialchars($ifname) ." $online [{$ip}]";
 			$ifstatus[] = htmlspecialchars($ifname) ." $online";
 		}
 		$status = " ". implode(", ", $ifstatus);
@@ -116,15 +115,6 @@
 					$lastchange = "";
                                         $svr = split("\|", $server);
 					$monitorip = $svr[1];
-					/*
-					$logstates = return_clog($slbd_logfile, $nentries, array("$monitorip", "marking"), true);
-					$logstates = $logstates[0];
-
-					if(stristr($logstates, $monitorip)) {
-						$date = preg_split("/[ ]+/" , $logstates);
-						$lastchange = "$date[0] $date[1] $year $date[2]";
-					}
-					*/
 					if(stristr($poolstatus, $monitorip)) {
 						$online = "Online";
 					} else {
@@ -258,7 +248,7 @@
 		}
 	}
 
-	function get_ipsec_status() {
+	function get_ipsec_stats() {
 		global $g, $config, $sad;
 		$sad = array();
 		$sad = get_ipsec_tunnel_sad();
@@ -323,7 +313,6 @@
 			if(preg_match("/^huh?/", $cmd_output)) {
 				lcdproc_notice("LCDd output: \"$cmd_output\". Executed \"$lcd_cmd\"");
 			}
-			// sleep(1);
 		}
 	}
 
@@ -486,7 +475,7 @@
 					case "scr_states":
 						$states = get_pfstate();
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Traffic States\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"$states States\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"Curr/Max $states\"";
 						break;
 					case "scr_carp":
 						$carp = get_carp_stats();
