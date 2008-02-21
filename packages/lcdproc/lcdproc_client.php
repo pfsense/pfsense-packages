@@ -256,7 +256,6 @@
 		$activecounter = 0;
 		$inactivecounter = 0;
 	
-		$ipsec_detail_array = array();
 		foreach ($config['ipsec']['tunnel'] as $tunnel){ 
 			$ipsecstatus = false;
 
@@ -279,12 +278,6 @@
 				$inactivecounter++;
 			}
 			
-			$ipsec_detail_array[] = array('src' => $tunnel['interface'],
-						'dest' => $tunnel['remote-gateway'],
-						'remote-subnet' => $tunnel['remote-subnet'],
-						'descr' => $tunnel['descr'],
-						'status' => $iconfn,
-						'disabled' => $tun_disabled);
 		}
 
 		if (is_array($config['ipsec']['tunnel'])) {
@@ -443,18 +436,18 @@
 					case "scr_time":
 						$time = date ("n/j/Y H:i");
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Time\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"$time\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"{$time}\"";
 						break;
 					case "scr_uptime":
 						$uptime = get_uptime_stats();
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Uptime\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"$uptime\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"{$uptime}\"";
 						break;
 					case "scr_hostname":
 						exec("/bin/hostname", $output, $ret);
 						$hostname = $output[0];
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Name\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"$hostname\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"{$hostname}\"";
 						break;
 					case "scr_system":
 						$processor = cpu_usage();
@@ -470,32 +463,32 @@
 					case "scr_load":
 						$loadavg = get_loadavg_stats();
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Load Averages\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"$loadavg\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"{$loadavg}\"";
 						break;
 					case "scr_states":
 						$states = get_pfstate();
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Traffic States\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"Curr/Max $states\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"Curr/Max {$states}\"";
 						break;
 					case "scr_carp":
 						$carp = get_carp_stats();
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ CARP State\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"$carp\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"{$carp}\"";
 						break;
 					case "scr_ipsec":
 						$ipsec = get_ipsec_stats();
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ IPsec Tunnels\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"$ipsec\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"{$ipsec}\"";
 						break;
 					case "scr_slbd":
 						$slbd = get_slbd_stats();
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Load Balancer\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"$slbd\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"{$slbd}\"";
 						break;
 					case "scr_interfaces":
 						$interfaces = get_interfaces_stats();
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Interfaces\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"$interfaces\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"{$interfaces}\"";
 						break;
 				}
 			}
