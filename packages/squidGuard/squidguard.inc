@@ -1299,15 +1299,17 @@ function convert_pfxml_to_sgxml_rewrite($pfconfig) {
         if (is_array($pfxml)) {
             foreach($pfxml as $pfx) {
                 $sgx = array();
-                $sgx[FLD_NAME]                = $pfx['name'];
-                $sgx[FLD_DESCRIPTION]         = $pfx['description'];
-                $sgx[FLD_LOG]                 = $pfx[FLD_ENABLELOG];
+                $sgx[FLD_NAME]        = $pfx['name'];
+                $sgx[FLD_DESCRIPTION] = $pfx['description'];
+                $sgx[FLD_LOG]         = $pfx[FLD_ENABLELOG];
 
-                foreach($pfx['row'] as $pfx_row) {
+                if (is_array($pfx['row'])) {
+                     foreach($pfx['row'] as $pfx_row) {
                         $sgx_row = array();
                         $sgx_row[FLD_TARGETURL] = $pfx_row['targeturl'];
                         $sgx_row[FLD_REPLACETO] = $pfx_row['replaceto'];
                         $sgx[FLD_ITEM][] = $sgx_row;
+                     }
                 }
 
                 $sgxml[FLD_ITEM][] = $sgx;
@@ -1330,13 +1332,15 @@ function convert_pfxml_to_sgxml_time($pfconfig) {
                 $sgx[FLD_NAME]                = $pfx[FLD_NAME];
                 $sgx[FLD_DESCRIPTION]        = $pfx[FLD_DESCRIPTION];
 
-                foreach($pfx['row'] as $pfx_row) {
+                if (is_array($pfx['row'])) {
+                     foreach($pfx['row'] as $pfx_row) {
                         $sgx_row = array();
                         $sgx_row[FLD_TIMETYPE]  = $pfx_row[FLD_TIMETYPE];
                         $sgx_row[FLD_TIMEDAYS]  = $pfx_row[FLD_TIMEDAYS];
                         $sgx_row[FLD_DATERANGE] = $pfx_row[FLD_DATERANGE];
                         $sgx_row[FLD_TIMERANGE] = $pfx_row[FLD_TIMERANGE];
                         $sgx[FLD_ITEM][] = $sgx_row;
+                     }
                 }
 
                 $sgxml[FLD_ITEM][] = $sgx;
