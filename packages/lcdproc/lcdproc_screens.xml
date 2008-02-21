@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Services: LCDproc: Screens</title>
 	<name>lcdproc_screens</name>
-	<version>0.5.2_1-p8</version>
+	<version>0.5.2_1-p9</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
@@ -66,11 +66,6 @@
 		<field>
 			<fielddescr>Enable IPsec</fielddescr>
 			<fieldname>scr_ipsec</fieldname>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>Enable DHCP</fielddescr>
-			<fieldname>scr_dhcp</fieldname>
 			<type>checkbox</type>
 		</field>
 		<field>

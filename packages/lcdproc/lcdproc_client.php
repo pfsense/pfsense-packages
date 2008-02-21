@@ -34,7 +34,7 @@
 
 	function get_uptime_stats() {
 		exec("/usr/bin/uptime", $output, $ret);
-		if(stristr($output[0], "days")) {
+		if(stristr($output[0], "day")) {
 			$temp = explode(" ", $output[0]);
 			$status = "$temp[2] $temp[3] $temp[4] $temp[5] $temp[6] $temp[7] $temp[8] ". substr($temp[9], 0, -1);
 		} else {
@@ -46,7 +46,7 @@
 
 	function get_loadavg_stats() {
 		exec("/usr/bin/uptime", $output, $ret);
-		if(stristr($output[0], "days")) {
+		if(stristr($output[0], "day")) {
 			$temp = explode(" ", $output[0]);
 			$status = "$temp[12] $temp[13] $temp[14]";
 		} else {
@@ -59,15 +59,87 @@
 	function get_interfaces_stats() {
 		global $g;
 		global $config;
+		$ifstatus = array();
+		$i = 0;
+		$ifdescrs = array('wan' => 'WAN', 'lan' => 'LAN');
+		for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
+			$ifdescrs['opt' . $j] = $config['interfaces']['opt' . $j]['descr'];
+		}
+		foreach ($ifdescrs as $ifdescr => $ifname){
+			$ifinfo = get_interface_info($ifdescr);
+			if($ifinfo['status'] == "up") {
+				$online = "Up";
+			} else {
+				$online = "Down";
+			}
+			if(!empty($ifinfo['ipaddr'])) {
+				$ip = htmlspecialchars($ifinfo['ipaddr']);
+			} else {
+				$ip = "-";
+			}
+			// $ifstatus[] = htmlspecialchars($ifname) ." $online [{$ip}]";
+			$ifstatus[] = htmlspecialchars($ifname) ." $online";
+		}
+		$status = " ". implode(", ", $ifstatus);
 		return($status);
-
 	}
 
 	function get_slbd_stats() {
 		global $g;
 		global $config;
-		return($status);
 
+		if (!is_array($config['load_balancer']['lbpool'])) {
+			$config['load_balancer']['lbpool'] = array();
+		}
+		$a_pool = &$config['load_balancer']['lbpool'];
+
+		$slbd_logfile = "{$g['varlog_path']}/slbd.log";
+
+		$nentries = $config['syslog']['nentries'];
+		if (!$nentries)
+		        $nentries = 50;
+
+		$now = time();
+		$year = date("Y");
+		$pstatus = "";
+		$i = 0;
+		foreach ($a_pool as $vipent) {
+			if ($vipent['type'] == "gateway") {
+				$poolfile = "{$g['tmp_path']}/{$vipent['name']}.pool";
+				if(file_exists("$poolfile")) {
+					$poolstatus = file_get_contents("$poolfile");
+				} else {
+					continue;
+				}
+				foreach ((array) $vipent['servers'] as $server) {
+					$lastchange = "";
+                                        $svr = split("\|", $server);
+					$monitorip = $svr[1];
+					/*
+					$logstates = return_clog($slbd_logfile, $nentries, array("$monitorip", "marking"), true);
+					$logstates = $logstates[0];
+
+					if(stristr($logstates, $monitorip)) {
+						$date = preg_split("/[ ]+/" , $logstates);
+						$lastchange = "$date[0] $date[1] $year $date[2]";
+					}
+					*/
+					if(stristr($poolstatus, $monitorip)) {
+						$online = "Online";
+					} else {
+						$online = "Offline";
+					}
+					$pstatus[] = "{$vipent['name']} {$svr[0]} {$online}";
+				}
+			} else {
+				$pstatus[] = "{$vipent['monitor']}";
+			}
+		}
+		if(count($a_pool) == 0) {
+			$pstatus[] = "Disabled";
+		}
+		$status = implode(", ", $pstatus);
+		return($status);
 	}
 
 	function get_carp_stats () {
@@ -104,7 +176,7 @@
 			}
 			$status = "MASTER/BACKUP/INIT {$mastercount}/{$backupcount}/{$initcount}";
 		} else {
-			$status = "CARP not enabled";
+			$status = "CARP Disabled";
 		}
 		return($status);
 	}
@@ -217,7 +289,7 @@
 				$inactivecounter++;
 			}
 		}
-		$status = "Active/Inactive {$activecounter}/{$inactivecounter}";
+		$status = "Up/Down {$activecounter}/{$inactivecounter}";
 		return($status);
 	}
 	
@@ -289,6 +361,13 @@
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
 							break;
+						case "scr_disk":
+							$lcd_cmds[] = "screen_add $name";
+							$lcd_cmds[] = "screen_set $name heartbeat off";
+							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "widget_add $name title_wdgt string";
+							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
+							break;
 						case "scr_load":
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
@@ -351,7 +430,7 @@
 		while($i) {
 			$lcd_cmds = array();
 			$lcd_cmds[] = "widget_set welcome_scr title_wdgt \"Welcome to\"";
-			$lcd_cmds[] = "widget_set welcome_scr text_wdgt 1 2 16 2 h 4 \"{$g['product_name']} $version\"";
+			$lcd_cmds[] = "widget_set welcome_scr text_wdgt 1 2 16 2 h 2 \"{$g['product_name']} $version\"";
 
 			/* process screens to display */
 			foreach((array) $lcdproc_screens_config as $name => $screen) {
@@ -367,7 +446,7 @@
 					case "scr_uptime":
 						$uptime = get_uptime_stats();
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Uptime\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"$uptime\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 1 \"$uptime\"";
 						break;
 					case "scr_hostname":
 						exec("/bin/hostname", $output, $ret);
@@ -379,12 +458,12 @@
 						$processor = cpu_usage();
 						$memory = mem_usage();
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ System Stats\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 4 \"CPU $processor %, Mem $memory %\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"CPU {$processor}%, Mem {$memory}%\"";
 						break;
 					case "scr_disk":
 						$disk = disk_usage();
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Disk USe\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 4 \"Disk $disk %\"";
+						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Disk Use\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"Disk {$disk}%\"";
 						break;
 					case "scr_load":
 						$loadavg = get_loadavg_stats();
@@ -398,7 +477,7 @@
 						break;
 					case "scr_carp":
 						$carp = get_carp_stats();
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Carp State\"";
+						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ CARP State\"";
 						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"$carp\"";
 						break;
 					case "scr_ipsec":
@@ -409,12 +488,12 @@
 					case "scr_slbd":
 						$slbd = get_slbd_stats();
 						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Load Balancer\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 2 \"$slbd\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 1 \"$slbd\"";
 						break;
 					case "scr_interfaces":
 						$interfaces = get_interfaces_stats();
-						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Interfaces State\"";
-						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 v 2 \"$interfaces\"";
+						$lcd_cmds[] = "widget_set $name title_wdgt 1 1 \"+ Interfaces\"";
+						$lcd_cmds[] = "widget_set $name text_wdgt 1 2 16 2 h 1 \"$interfaces\"";
 						break;
 				}
 			}

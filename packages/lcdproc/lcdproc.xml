@@ -2,7 +2,7 @@
 <packagegui>
 	<title>Services: LCDproc</title>
 	<name>lcdproc</name>
-	<version>0.5.2_1-p8</version>
+	<version>0.5.2_1-p9</version>
 	<savetext>Save</savetext>
 	<include_file>/usr/local/pkg/lcdproc.inc</include_file>
 	<tabs>
