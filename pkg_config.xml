@@ -575,7 +575,7 @@
       <descr>LCD display driver</descr>
       <website>http://www.lcdproc.org/</website>
       <category>Utility</category>
-      <version>lcdproc-0.5.2_1-p10</version>
+      <version>lcdproc-0.5.2_1-p11</version>
       <status>BETA</status>
       <required_version>1.2</required_version>
       <maintainer>seth.mos@xs4all.nl</maintainer>

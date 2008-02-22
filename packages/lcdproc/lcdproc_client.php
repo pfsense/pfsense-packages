@@ -77,7 +77,7 @@
 			} else {
 				$ip = "-";
 			}
-			$ifstatus[] = htmlspecialchars($ifname) ." $online";
+			$ifstatus[] = htmlspecialchars($ifname) ." [$online]";
 		}
 		$status = " ". implode(", ", $ifstatus);
 		return($status);
@@ -116,11 +116,11 @@
                                         $svr = split("\|", $server);
 					$monitorip = $svr[1];
 					if(stristr($poolstatus, $monitorip)) {
-						$online = "Online";
+						$online = "Up";
 					} else {
-						$online = "Offline";
+						$online = "Down";
 					}
-					$pstatus[] = "[{$svr[0]}] {$online}";
+					$pstatus[] = strtoupper($svr[0]) ." [{$online}]";
 				}
 			} else {
 				$pstatus[] = "{$vipent['monitor']}";
@@ -301,7 +301,7 @@
 				lcdproc_warn("Connection to LCDd process lost $errstr ($errno)");
 				die();
 			}
-			$cmd_output = fgets($lcd, 4096);
+			$cmd_output = fgets($lcd, 256);
 			// FIXME: add support for interpreting menu commands here.
 			if(preg_match("/^huh?/", $cmd_output)) {
 				lcdproc_notice("LCDd output: \"$cmd_output\". Executed \"$lcd_cmd\"");
@@ -420,12 +420,13 @@
 			$g['product_name'] = "pfSense";
 		}
 		$version = @file_get_contents("/etc/version");
+		$version = trim($version);
 		/* keep a counter to see how many times we can loop */
 		$i = 1;
 		while($i) {
 			$lcd_cmds = array();
 			$lcd_cmds[] = "widget_set welcome_scr title_wdgt \"Welcome to\"";
-			$lcd_cmds[] = "widget_set welcome_scr text_wdgt 1 2 16 2 h 2 \"{$g['product_name']} $version\"";
+			$lcd_cmds[] = "widget_set welcome_scr text_wdgt 1 2 16 2 h 2 \"{$g['product_name']} {$version}\"";
 
 			/* process screens to display */
 			foreach((array) $lcdproc_screens_config as $name => $screen) {
