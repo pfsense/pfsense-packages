@@ -986,19 +986,23 @@ function sg_build_config() {
          if ($squidguard_config[FLD_REWRITES]) {
              sg_addlog("sg_build_config: add rewrites.");
              $log_entr_added = '';
+             $log_entr_err = '';
              foreach($squidguard_config[FLD_REWRITES][FLD_ITEM] as $rew) {
-                 $sgconf[] = "";
-                 $sgconf[] = "rew " . $rew[FLD_NAME] . " {";
-                 foreach ($rew[FLD_ITEM] as $rw)
+                 if (is_array($rew[FLD_ITEM])) {
+                     $sgconf[] = "";
+                     $sgconf[] = "rew " . $rew[FLD_NAME] . " {";
+                     foreach ($rew[FLD_ITEM] as $rw)
                           $sgconf[] = "\t s@." . $rw[FLD_TARGETURL] . "@" . $rw[FLD_REPLACETO]."@r";
-                 if ($rew[FLD_LOG])
-                     $sgconf[] = "\t log " . SQUIDGUARD_ACCESSBLOCK_FILE;
-                 $sgconf[] = "}";
-                 $log_entr_added .= " {$rew[FLD_NAME]};";
+                     if ($rew[FLD_LOG])
+                         $sgconf[] = "\t log " . SQUIDGUARD_ACCESSBLOCK_FILE;
+                     $sgconf[] = "}";
+                     $log_entr_added .= " {$rew[FLD_NAME]};";
+                 } else
+                     $log_entr_err .= " {$rew[FLD_NAME]};";
              }
              // log
              if (!empty($log_entr_added))
-                  sg_addlog("sg_build_config: added: \n $log_entr_added \n");
+                  sg_addlog("sg_build_config: added: \n $log_entr_added \n error: \n $log_entr_err ");
              else sg_addlog("sg_build_config: added: Nothing.");
          }
 
