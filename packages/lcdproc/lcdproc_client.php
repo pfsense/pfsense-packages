@@ -320,6 +320,7 @@
 		$lcd_cmds[] = "screen_add welcome_scr";
 		$lcd_cmds[] = "screen_set welcome_scr heartbeat off";
 		$lcd_cmds[] = "screen_set welcome_scr name welcome";
+		$lcd_cmds[] = "screen_set $name duration 80";
 		$lcd_cmds[] = "widget_add welcome_scr title_wdgt title";
 		$lcd_cmds[] = "widget_add welcome_scr text_wdgt scroller";
 
@@ -332,6 +333,7 @@
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
 							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "screen_set $name duration 40";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
 							break;
@@ -339,6 +341,7 @@
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
 							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "screen_set $name duration 80";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
 							break;
@@ -346,6 +349,7 @@
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
 							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "screen_set $name duration 80";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
 							break;
@@ -353,6 +357,7 @@
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
 							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "screen_set $name duration 80";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
 							break;
@@ -360,6 +365,7 @@
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
 							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "screen_set $name duration 80";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
 							break;
@@ -367,6 +373,7 @@
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
 							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "screen_set $name duration 80";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
 							break;
@@ -374,6 +381,7 @@
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
 							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "screen_set $name duration 80";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
 							break;
@@ -381,6 +389,7 @@
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
 							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "screen_set $name duration 80";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
 							break;
@@ -388,6 +397,7 @@
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
 							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "screen_set $name duration 80";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
 							break;
@@ -395,6 +405,7 @@
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
 							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "screen_set $name duration 80";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
 							break;
@@ -402,6 +413,7 @@
 							$lcd_cmds[] = "screen_add $name";
 							$lcd_cmds[] = "screen_set $name heartbeat off";
 							$lcd_cmds[] = "screen_set $name name $name";
+							$lcd_cmds[] = "screen_set $name duration 80";
 							$lcd_cmds[] = "widget_add $name title_wdgt string";
 							$lcd_cmds[] = "widget_add $name text_wdgt scroller";
 							break;
