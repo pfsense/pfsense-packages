@@ -1002,7 +1002,9 @@ function sg_build_config() {
              }
              // log
              if (!empty($log_entr_added))
-                  sg_addlog("sg_build_config: added: \n $log_entr_added \n error: \n $log_entr_err ");
+                  sg_addlog("sg_build_config: added: \n $log_entr_added");
+             if (!empty($log_entr_err))
+                  sg_addlog("sg_build_config: ERROR: \n $log_entr_err ");
              else sg_addlog("sg_build_config: added: Nothing.");
          }
 
@@ -1268,7 +1270,7 @@ function sg_check_config_data () {
              foreach($squidguard_config[FLD_REWRITES][FLD_ITEM] as $rw) {
                  // check check name as unique and name format
                  $rw_name = $rw[FLD_NAME];
-                 $s = check_name($dst_name);
+                 $s = check_name($rw_name);
                  if ($s)
                      $check_log[] = "REWRITE '$rw_name' error: $s";
 
@@ -1790,7 +1792,7 @@ function check_name ($name) {
         $val = trim($name);
 
         if ((strlen($val) < 2) || (strlen($val) > 16))
-            $err .= " Size of name must be between [2..16].";
+            $err .= " Size of name '$val' must be between [2..16].";
 
         // All symbols must be [a-zA-Z_0-9\-] First symbol = letter.
         if (!eregi("^([a-zA-Z]{1})([a-zA-Z_0-9\-]+)$", $val))
