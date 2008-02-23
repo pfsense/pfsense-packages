@@ -691,6 +691,8 @@ function squidguard_before_form_acl($pkg, $is_acl=true) {
 // -----------------------------------------------------------------------------
 // squidguard_before_form_log
 // -----------------------------------------------------------------------------
+define('LOGSHOW_BUFSIZE', 16384);
+
 function squidguard_before_form_log($pkg) {
         global $config;
         $i=0;
@@ -707,33 +709,50 @@ function squidguard_before_form_log($pkg) {
                         if (empty($move_pos)) $move_pos = 0;
 
                         if ($mlog['logtype'] == 'block_log') {
-                                $slog .= 'block_log report disabled';
-/*
                             $filename = SQUIDGUARD_LOGDIR . "/" . SQUIDGUARD_ACCESSBLOCK_FILE;
-                            if (file_exists($filename)) {
-                                $s = file_get_contents($filename);
-                                $s = explode("\n", $s);
-#                               while (count($s) > 500)  array_shift($s);
-                                $move_pos = count ($s) - $move_step;
-                                if ($move_pos < 0) $move_pos = 0;
-                                $s = array_slice($s, $move_pos, $move_step);
+                            $fh = '';
+                            if (file_exists($filename))  {
+                                $fh = fopen($filename, "r");
+                                if ($fh) {
+                                    $fsize = filesize($filename);
+                                    // take LOGSHOW_BUFSIZE bytes from end
+                                    if ($fsize > LOGSHOW_BUFSIZE)
+                                        fseek($fh, -LOGSHOW_BUFSIZE, SEEK_END);
+                                    $s = fread($fh, LOGSHOW_BUFSIZE);
+                                    fclose($fh);
 
-                                $slog .= "<tr><th>Num</th><th>DateTime</th><th>IP</th><th>URL</th><th>Filter</th><th>ID</th><th>Mtd</th></tr>";
-                                foreach($s as $key => $vs) {
-                                    $nkey = $move_pos + intval($key);
-                                    $slog .= "<tr>";
-                                    $sx = $vs;
-                                    $sx = str_replace("/- -", "", $sx);
-                                    $sx = str_replace("/-", "", $sx);
-                                    $sx = str_replace("Request", "", $sx);
-                                    $sx = str_replace("request", "", $sx);
-                                    $sx = str_replace("(", "", $sx);
-                                    $sx = str_replace(")", "", $sx);
-                                    $sx = str_replace("[", "", $sx);
-                                    $sx = str_replace("]", "", $sx);
-                                    $sx = explode(" ", $sx);
-                                    if (!empty($vs))
-                                        $slog .= "<tr>
+                                    $slog .= "<tr><td colspan='7'>Block log '$filename'. Last 100:<td><tr>";
+
+                                    $s = explode("\n", $s);
+                                    unset($s[0]); // unset us'nt complete string
+
+                                    $slog .= "<tr><th>Num</th><th>DateTime</th><th>IP</th><th>URL</th><th>Filter</th><th>ID</th><th>Mtd</th></tr>";
+                                    foreach($s as $key => $vs) {
+                                        $nkey = $move_pos + intval($key);
+                                        $slog .= "<tr>";
+                                        $sx = $vs;
+                                        $sx = str_replace("/- -", "", $sx);
+                                        $sx = str_replace("/-", "", $sx);
+                                        $sx = str_replace("Request", "", $sx);
+                                        $sx = str_replace("request", "", $sx);
+                                        $sx = str_replace("(", "", $sx);
+                                        $sx = str_replace(")", "", $sx);
+                                        $sx = str_replace("[", "", $sx);
+                                        $sx = str_replace("]", "", $sx);
+                                        $sx = explode(" ", $sx);
+
+                                        // formatting url
+                                        $spos =0;
+                                        $stmp = '';
+                                        while($spos + 81 < strlen($sx[4])) {
+                                            $stmp .= substr($sx[4], $spos, 81) . "<br>";
+                                            $spos += 81;
+                                        }
+                                        $stmp .= substr($sx[4], $spos, strlen($sx[4]) - $spos);
+                                        $sx[4] = $stmp;
+
+                                        if (!empty($vs))
+                                            $slog .= "<tr>
                                               <td style='vertical-align: top; white-space: nowrap;'>" . strval($nkey) . "</td>
                                               <td style='vertical-align: top; white-space: nowrap;'>$sx[0] $sx[1]</td>
                                               <td style='vertical-align: top;'>$sx[5]</td>
@@ -741,10 +760,10 @@ function squidguard_before_form_log($pkg) {
                                               <td style='vertical-align: top;'>$sx[3]</td>
                                               <td style='vertical-align: top;'>$sx[2]</td>
                                               <td style='vertical-align: top;'>$sx[6]</td></tr>";
+                                    }
                                 }
-#                                $slog .= "</table>";
                             }
-*/
+
                         } else
 
                         if ($mlog['logtype'] == 'configurator_log') {
