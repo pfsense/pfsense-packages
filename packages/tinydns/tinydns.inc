@@ -338,18 +338,30 @@ function tinydns_create_zone_file() {
 		}
 	
 		/* Register Static IPs */
-		if($config['installedpackages']['tinydns']['config'][0]['regdhcpstatic']) {
-			if(is_array($config['dhcpd']['lan']['staticmap'])) {
-				foreach($config['dhcpd']['lan']['staticmap'] as $dhcpdstatic) {
-					$dhcpdhostname = $dhcpdstatic['hostname'];
-					$dhcpdfqdn = "{$dhcpdhostname}.{$dhcpddomain}";
-					$dhcpdlanip = $dhcpdstatic['ipaddr'];
-					$dhcpda = "={$dhcpdfqdn}:{$dhcpdlanip}";
-					if($dhcpdhostname)
-						fwrite($fd, $dhcpda . "\n");
-				}
-			}
-		}
+        if($config['installedpackages']['tinydns']['config'][0]['regdhcpstatic']) {
+                foreach($config['dhcpd'] as $zone_key => $zone ) {
+                        $dhcpdhostname = $config['system']['hostname'];
+                        if ($zone['ddnsdomain']) 
+                                $dhcpddomain = $zone['ddnsdomain'];
+                        else
+                                $dhcpddomain = $config['system']['domain'];
+                        $dhcpdlanip = $config['interfaces'][$zone_key]['ipaddr'];
+                        $dhcpdipmask = $config['interfaces'][$zone_key]['subnet'];
+                        $dhcpdfqdn = "{$dhcpdhostname}.{$dhcpddomain}";
+                        tinydns_complete_soa_record($fd, $dhcpdlanip, $dhcpdipmask, $dhcpdhostname, $dhcpddomain);
+       
+                        if(is_array($zone['staticmap'])) {
+                                foreach($zone['staticmap'] as $dhcpdstatic) {
+                                        $dhcpdhostname = $dhcpdstatic['hostname'];
+                                        $dhcpdfqdn = "{$dhcpdhostname}.{$dhcpddomain}";
+                                        $dhcpdlanip = $dhcpdstatic['ipaddr'];
+                                        $dhcpda = "={$dhcpdfqdn}:{$dhcpdlanip}";
+                                        if($dhcpdhostname)
+                                                fwrite($fd, $dhcpda . "\n");
+                                }
+                        }
+                }
+        }
 	
 		/* Register Dynamic IPs */
 		if($config['installedpackages']['tinydns']['config'][0]['regdhcp']) {
