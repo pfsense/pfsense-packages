@@ -206,6 +206,8 @@ EOD;
 	update_status("Writing rc files... One moment please...");
 	write_rcfile($rc);
 
+	exec("chmod a+rx /usr/local/libexec/squid/dnsserver");
+
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
 	) as $dir) {
