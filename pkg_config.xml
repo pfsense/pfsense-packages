@@ -35,7 +35,7 @@
       <category>Network</category>
       <version>1.7.1_1</version>
       <maintainer>dv_serg@mail.ru</maintainer>
-      <depends_on_package_base_url>ftp://ftp.lv.freebsd.org/pub/FreeBSD/ports/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://ftp.tu-clausthal.de/ftp/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
       <depends_on_package>lightsquid-1.7.1_1.tbz</depends_on_package>
       <status>Beta1</status>
       <required_version>1.2</required_version>
