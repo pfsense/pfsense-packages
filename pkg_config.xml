@@ -9,7 +9,7 @@
       <descr>Siproxd is a proxy/masquerading daemon for the SIP protocol. It handles registrations of SIP clients on a private IP network and performs rewriting of the SIP message bodies to make SIP connections possible via a masquerading firewall. It allows SIP clients (like kphone, linphone) to work behind an IP masquerading firewall or router.</descr>
       <category>Services</category>
       <config_file>http://www.pfsense.com/packages/config/siproxd.xml</config_file>
-      <depends_on_package_base_url>http://www.pfsense.com/mirrors/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
       <depends_on_package>siproxd-0.6.0.tbz</depends_on_package>
       <version>0.6.0</version>
       <status>ALPHA</status>
@@ -90,20 +90,10 @@
       <required_version>1.0.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/arping/arping.xml</config_file>
       <configurationfile>arping.xml</configurationfile>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
       <depends_on_package>arping-2.05.tbz</depends_on_package>
     </package>
-    <package>
-      <name>frickin</name>
-      <descr>The Frickin PPTP Proxy allows a Point-to-Point Tunneling Protocol (PPTP) client to connect to a PPTP server through Network Address Translation.</descr>
-      <website>http://www.placid.tv</website>
-      <category>Services</category>
-      <version>2.0-BETA2</version>
-      <status>ALPHA</status>
-      <required_version>1.2</required_version>
-      <config_file>http://www.pfsense.com/packages/config/frickin/frickin.xml</config_file>
-      <configurationfile>frickin.xml</configurationfile>
-    </package>
+
     <package>
       <name>bsdstats</name>
       <descr>The mission of this site is to try and come up with semi-accurate numbers for both advocacy, and marketing, of the *BSD Operating Systems.</descr>
@@ -113,7 +103,7 @@
       <status>BETA</status>
       <required_version>2.0</required_version>
       <maintainer>geekgod@geekgod.com</maintainer>
-      <depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All</depends_on_package_base_url>
       <config_file>http://www.pfsense.org/packages/config/bsdstats/bsdstats.xml</config_file>
       <configurationfile>bsdstats.xml</configurationfile>
     </package>
@@ -139,7 +129,7 @@
       <status>BETA</status>
       <required_version>2.0</required_version>
       <maintainer>me@daniel.stefan.haischt.name</maintainer>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
       <depends_on_package>libmrss-0.13.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/phpmrss.xml</config_file>
       <configurationfile>phpmrss.xml</configurationfile>
@@ -156,7 +146,7 @@
       <status>ALPHA</status>
       <required_version>2.0</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
       <depends_on_package>p3scan-pf-2.3.2.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/p3scan-pf/p3scan-pf.xml</config_file>
       <configurationfile>p3scan-pf.xml</configurationfile>
@@ -215,20 +205,6 @@
       <configurationfile>snort.xml</configurationfile>
     </package>
     <package>
-      <name>miniupnpd</name>
-      <descr>WARNING! Do not install on 1.2, it's already included. Emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP Internet
-      Gateway Device specification (IGD) and allows UPnP aware clients, such as MSN Messenger to
-      work properly from behind a NAT firewall. WARNING! Do not install on 1.2, it's already included.</descr>
-      <website>http://miniupnp.free.fr/</website>
-      <category>Network Management</category>
-      <maintainer>seth.mos@xs4all.nl rswagoner@gmail.com</maintainer>
-      <version>20080130</version>
-      <required_version>1.0</required_version>
-      <status>Stable</status>
-      <config_file>http://www.pfsense.com/packages/config/miniupnpd/miniupnpd.xml</config_file>
-      <configurationfile>miniupnpd.xml</configurationfile>
-	</package>
-    <package>
       <name>imspector</name>
       <descr>IMSpector is an Instant Messenger transparent proxy with logging capabilities.
       Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees.
@@ -241,7 +217,7 @@
       <status>BETA</status>
       <config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
 	  <configurationfile>imspector.xml</configurationfile>
-	  <depends_on_package_base_url>http://pfsense.com/packages/All/</depends_on_package_base_url>
+	  <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
 	  <depends_on_package>imspector-0.4.tbz</depends_on_package>
     </package>
     <package>
@@ -255,7 +231,7 @@
       <maintainer>rswagoner@gmail.com</maintainer>
 	  <config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
 	  <configurationfile>nut.xml</configurationfile>
-	  <depends_on_package_base_url>http://pfsense.com/packages/All/</depends_on_package_base_url>
+	  <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
       <depends_on_package>nut-2.0.4.tbz</depends_on_package>
       <depends_on_package>nut-usb-2.0.4.tbz</depends_on_package>
 	</package>
@@ -517,7 +493,7 @@
       <descr>Enhanced traceroute replacement</descr>
       <website>http://www.bitwizard.nl/mtr/</website>
       <category>Network Management</category>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All</depends_on_package_base_url>
       <depends_on_package>mtr-nox11-0.65_2.tbz</depends_on_package>
       <version>0.65_2</version>
       <status>ALPHA</status>
@@ -571,18 +547,6 @@
         <facilityname>arpwatch</facilityname>
         <logfilename>arpwatch.log</logfilename>
       </logging>
-    </package>
-    <package>
-      <name>routed</name>
-      <descr>RIP v1 and v2 daemon - NOTE: As of 3/18/2007 this package is no longer necessary, it's included in pfSense base and will be removed when 1.0.1 is no longer the current release.</descr>
-      <website>http://www.pfsense.com/</website>
-      <maintainer>billm@pfsense.org</maintainer>
-      <category>Network Management</category>
-      <version>1.1</version>
-      <status>Stable</status>
-      <required_version>1.0</required_version>
-      <config_file>http://www.pfsense.com/packages/config/routed/routed.xml</config_file>
-      <configurationfile>routed.xml</configurationfile>
     </package>
     <package>
   	  <name>squidGuard</name> 
@@ -808,5 +772,42 @@
         <facilityname>spamd</facilityname>
         <logfilename>spamd.log</logfilename>
       </logging>
+    </package>
+    <package>
+      <name>frickin</name>
+      <descr>The Frickin PPTP Proxy allows a Point-to-Point Tunneling Protocol (PPTP) client to connect to a PPTP server through Network Address Translation.</descr>
+      <website>http://www.placid.tv</website>
+      <category>Services</category>
+      <version>2.0-BETA2</version>
+      <status>ALPHA</status>
+      <required_version>1.2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/frickin/frickin.xml</config_file>
+      <configurationfile>frickin.xml</configurationfile>
+    </package>
+    <package>
+      <name>routed</name>
+      <descr>RIP v1 and v2 daemon - NOTE: As of 3/18/2007 this package is no longer necessary, it's included in pfSense base and will be removed when 1.0.1 is no longer the current release.</descr>
+      <website>http://www.pfsense.com/</website>
+      <maintainer>billm@pfsense.org</maintainer>
+      <category>Network Management</category>
+      <version>1.1</version>
+      <status>Stable</status>
+      <required_version>1.0</required_version>
+      <config_file>http://www.pfsense.com/packages/config/routed/routed.xml</config_file>
+      <configurationfile>routed.xml</configurationfile>
+    </package>
+    <package>
+      <name>miniupnpd</name>
+      <descr>WARNING! Do not install on 1.2, it's already included. Emulates Microsoft's Internet Connection Service (ICS). It implements the UPnP Internet
+      Gateway Device specification (IGD) and allows UPnP aware clients, such as MSN Messenger to
+      work properly from behind a NAT firewall. WARNING! Do not install on 1.2, it's already included.</descr>
+      <website>http://miniupnp.free.fr/</website>
+      <category>Network Management</category>
+      <maintainer>seth.mos@xs4all.nl rswagoner@gmail.com</maintainer>
+      <version>20080130</version>
+      <required_version>1.0</required_version>
+      <status>Stable</status>
+      <config_file>http://www.pfsense.com/packages/config/miniupnpd/miniupnpd.xml</config_file>
+      <configurationfile>miniupnpd.xml</configurationfile>
     </package>
 </pfsensepkgs>
