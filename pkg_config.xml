@@ -184,7 +184,7 @@
       <maintainer>billm@pfsense.org</maintainer>
       <descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
       <category>Security</category>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
       <depends_on_package>nmap-4.20_1.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/nmap/nmap.xml</config_file>
       <version>4.20_1</version>
@@ -196,7 +196,7 @@
       <name>snort</name>
       <descr>Snort is a libpcap-based packet sniffer/logger which can be used as a lightweight network intrusion detection system. It features rules based logging and can perform content searching/matching in addition to being used to detect a variety of other attacks and probes, such as buffer overflows, stealth port scans, CGI attacks, SMB probes, and much more.</descr>
       <category>Security</category>
-      <depends_on_package_base_url>http://www.pfsense.com/mirrors/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
       <depends_on_package>snort-2.7.0.1_1.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
       <version>2.7.0.1_3</version>
@@ -207,8 +207,7 @@
     <package>
       <name>imspector</name>
       <descr>IMSpector is an Instant Messenger transparent proxy with logging capabilities.
-      Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees.
-      REQUIRES: 1.0.1-SNAPSHOT-01-22-2006 or later</descr>
+      Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees.</descr>
       <website>http://www.imspector.org/</website>
       <category>Network Management</category>
 	  <maintainer>rswagoner@gmail.com</maintainer>
