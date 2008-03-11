@@ -35,7 +35,7 @@
       <category>Network</category>
       <version>1.7.1_1</version>
       <maintainer>dv_serg@mail.ru</maintainer>
-      <depends_on_package_base_url>http://ftp.tu-clausthal.de/ftp/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/</depends_on_package_base_url>
       <depends_on_package>lightsquid-1.7.1_1.tbz</depends_on_package>
       <status>Beta1</status>
       <required_version>1.2</required_version>
@@ -60,7 +60,7 @@
       <version>2.5.3</version>
       <status>Beta</status>
       <required_version>1.0</required_version>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/mirrors/packages/All</depends_on_package_base_url>
       <depends_on_package>mbmon-205_3.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/phpsysinfo/phpsysinfo.xml</config_file>
       <configurationfile>phpsysinfo.xml</configurationfile>
@@ -75,7 +75,7 @@
       <required_version>1.2</required_version>
       <config_file>http://www.pfsense.com/packages/config/tinydns/tinydns.xml</config_file>
       <configurationfile>tinydns.xml</configurationfile>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All/djbdns/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/mirrors/packages/All/djbdns/</depends_on_package_base_url>
       <depends_on_package>ucspi-tcp-0.88_1.tbz</depends_on_package>
       <depends_on_package>daemontools-0.76_9.tbz</depends_on_package>
       <depends_on_package>djbdns-1.05_9.tbz</depends_on_package>
@@ -464,7 +464,7 @@
       <website>http://www.stunnel.org/</website>
       <descr>The stunnel program is designed to work as an SSL encryption wrapper between remote client and local (inetd-startable) or remote servers. It can be used to add SSL functionality to commonly used inetd daemons like POP2, POP3, and IMAP servers without any changes in the program's code. It will negotiate an SSL connection using the OpenSSL or SSLeay libraries. It calls the underlying crypto libraries, allowing stunnel to support whatever cryptographic algorithms you compiled into your crypto package.</descr>
       <category>Network Management</category>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All</depends_on_package_base_url>
       <depends_on_package>stunnel-4.19.tbz</depends_on_package>
       <version>4.18</version>
       <status>Stable</status>
@@ -478,7 +478,7 @@
       <descr>Iperf is a tool for measuring maximum TCP and UDP bandwidth, reminiscent of ttcp and nettest. It has been written to overcome the shortcomings of those aging tools. Iperf can also test UDP bandwidth, loss, and jitter.</descr>
       <category>Network Management</category>
       <config_file>http://www.pfsense.com/packages/config/iperf.xml</config_file>
-      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/</depends_on_package_base_url>
       <depends_on_package>iperf-2.0.2_1.tbz</depends_on_package>
       <version>2.0.2_1</version>
       <status>ALPHA</status>
@@ -534,7 +534,7 @@
       <status>BETA</status>
       <required_version>1.0</required_version>
       <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl</maintainer>
-      <depends_on_package_base_url>http://www.pfsense.org/packages/All</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All</depends_on_package_base_url>
       <depends_on_package>squid-2.6.18.tbz</depends_on_package>
       <depends_on_package>squid_radius_auth-1.0.8.tbz</depends_on_package>
 	  <depends_on_package>openldap-client-2.3.40.tbz</depends_on_package>
@@ -560,7 +560,7 @@
       <descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
       <website>http://www-nrg.ee.lbl.gov/</website>
       <category>Security</category>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All</depends_on_package_base_url>
       <depends_on_package>arpwatch-2.1.a13.tbz</depends_on_package>
       <version>2.1.a13</version>
       <status>ALPHA</status>
