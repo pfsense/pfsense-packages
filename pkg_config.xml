@@ -25,7 +25,7 @@
       <status>ALPHA</status>
       <required_version>1.3</required_version>
       <configurationfile>openbgpd.xml</configurationfile>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>openbgpd-4.0.tbz</depends_on_package>
     </package>
    <package>
@@ -35,7 +35,7 @@
       <category>Network</category>
       <version>1.7.1_1</version>
       <maintainer>dv_serg@mail.ru</maintainer>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>lightsquid-1.7.1_1.tbz</depends_on_package>
       <status>Beta1</status>
       <required_version>1.2</required_version>
@@ -453,7 +453,7 @@
       <descr>Iperf is a tool for measuring maximum TCP and UDP bandwidth, reminiscent of ttcp and nettest. It has been written to overcome the shortcomings of those aging tools. Iperf can also test UDP bandwidth, loss, and jitter.</descr>
       <category>Network Management</category>
       <config_file>http://www.pfsense.com/packages/config/iperf.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>iperf-2.0.2_1.tbz</depends_on_package>
       <version>2.0.2_1</version>
       <status>ALPHA</status>
@@ -525,7 +525,7 @@
       <status>BETA</status>
       <required_version>1.2</required_version>
       <maintainer>seth.mos@xs4all.nl</maintainer>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>lcdproc-0.5.2_2.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
       <configurationfile>lcdproc.xml</configurationfile>
