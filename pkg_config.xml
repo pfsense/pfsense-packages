@@ -9,7 +9,7 @@
       <descr>Siproxd is a proxy/masquerading daemon for the SIP protocol. It handles registrations of SIP clients on a private IP network and performs rewriting of the SIP message bodies to make SIP connections possible via a masquerading firewall. It allows SIP clients (like kphone, linphone) to work behind an IP masquerading firewall or router.</descr>
       <category>Services</category>
       <config_file>http://www.pfsense.com/packages/config/siproxd.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>siproxd-0.6.0.tbz</depends_on_package>
       <version>0.6.0</version>
       <status>ALPHA</status>
@@ -90,7 +90,7 @@
       <required_version>1.0.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/arping/arping.xml</config_file>
       <configurationfile>arping.xml</configurationfile>
-      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>arping-2.05.tbz</depends_on_package>
     </package>
 
@@ -129,7 +129,7 @@
       <status>BETA</status>
       <required_version>2.0</required_version>
       <maintainer>me@daniel.stefan.haischt.name</maintainer>
-      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>libmrss-0.13.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/phpmrss.xml</config_file>
       <configurationfile>phpmrss.xml</configurationfile>
@@ -146,7 +146,7 @@
       <status>ALPHA</status>
       <required_version>2.0</required_version>
       <maintainer>fernando@netfilter.com.br</maintainer>
-      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>p3scan-pf-2.3.2.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/p3scan-pf/p3scan-pf.xml</config_file>
       <configurationfile>p3scan-pf.xml</configurationfile>
@@ -184,7 +184,7 @@
       <maintainer>billm@pfsense.org</maintainer>
       <descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
       <category>Security</category>
-      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>nmap-4.20_1.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/nmap/nmap.xml</config_file>
       <version>4.20_1</version>
@@ -196,7 +196,7 @@
       <name>snort</name>
       <descr>Snort is a libpcap-based packet sniffer/logger which can be used as a lightweight network intrusion detection system. It features rules based logging and can perform content searching/matching in addition to being used to detect a variety of other attacks and probes, such as buffer overflows, stealth port scans, CGI attacks, SMB probes, and much more.</descr>
       <category>Security</category>
-      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>snort-2.7.0.1_1.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
       <version>2.7.0.1_3</version>
@@ -216,7 +216,7 @@
       <status>BETA</status>
       <config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
 	  <configurationfile>imspector.xml</configurationfile>
-	  <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
+	  <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
 	  <depends_on_package>imspector-0.4.tbz</depends_on_package>
     </package>
     <package>
@@ -230,7 +230,7 @@
       <maintainer>rswagoner@gmail.com</maintainer>
 	  <config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
 	  <configurationfile>nut.xml</configurationfile>
-	  <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All/</depends_on_package_base_url>
+	  <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>nut-2.0.4.tbz</depends_on_package>
       <depends_on_package>nut-usb-2.0.4.tbz</depends_on_package>
 	</package>
