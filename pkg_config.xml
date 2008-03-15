@@ -264,7 +264,7 @@
       <status>ALPHA</status>
       <required_version>HEAD</required_version>
       <maintainer>me@daniel.stefan.haischt.name</maintainer>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.com/packages/All/</depends_on_package_base_url>
       <depends_on_package>ataidle-0.9.tbz</depends_on_package>
       <depends_on_package>avahi+libdns-0.6.12.tbz</depends_on_package>
       <depends_on_package>wzdftpd-0.7.2_1.tbz</depends_on_package>
@@ -292,7 +292,7 @@
       </descr>
       <config_file>http://www.pfsense.org/packages/config/dspam.xml</config_file>
       <configurationfile>dspam.xml</configurationfile>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.com/packages/All/</depends_on_package_base_url>
       <depends_on_package>dspam-3.6.8-sqlite3-noldap.tbz</depends_on_package>
       <!--
         Archiver deps are introduced by ClamAV.
@@ -332,7 +332,7 @@
       <status>Stable</status>
       <required_version>1.0</required_version>
       <maintainer>me@daniel.stefan.haischt.name</maintainer>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.com/packages/All/</depends_on_package_base_url>
       <depends_on_package>sshtools-0.2.2.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/sshterm/sshterm.xml</config_file>
       <configurationfile>sshterm.xml</configurationfile>
