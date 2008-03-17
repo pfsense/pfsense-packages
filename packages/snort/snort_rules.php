@@ -273,11 +273,16 @@ include("head.inc");
 <!--
 function go()
 {
-    box = document.forms.selectbox;
+    var agt=navigator.userAgent.toLowerCase();
+    if (agt.indexOf("msie") != -1) {
+        box = document.forms.selectbox;
+    } else {
+        box = document.forms[1].selectbox;
+	}
     destination = box.options[box.selectedIndex].value;
-    if (destination) location.href = destination;
+    if (destination) 
+		location.href = destination;
 }
-
 // -->
 </script>
 
