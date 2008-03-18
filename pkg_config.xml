@@ -398,7 +398,7 @@
       <descr>RFC1413 auth/identd daemon with fixed fake reply</descr>
       <website>http://www.webweaving.org/widentd</website>
       <category>Services</category>
-      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6.2-release/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>widentd-1.03_1.tbz</depends_on_package>
       <version>1.03_1</version>
       <status>ALPHA</status>
