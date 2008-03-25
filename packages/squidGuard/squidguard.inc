@@ -1061,6 +1061,7 @@ function squidguard_install_command() {
                                "mail", "porn", "proxy", "violence", "warez");
               file_put_contents(SQUIDGUARD_WORKDIR . SQUIDGUARD_BLK_ENTRIES, implode("\n", $entries));
               set_file_access(SQUIDGUARD_WORKDIR, OWNER_NAME, 0755);
+              set_file_access(SQUIDGUARD_DBHOME, OWNER_NAME, 0755);
 
               sg_reconfigure();
         }
