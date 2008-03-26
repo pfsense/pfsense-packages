@@ -414,9 +414,9 @@ function sg_check_system() {
             if (!file_exists($db_dir)) {
                  mwexec("mkdir -p $db_dir");
                  $sg_addlog("Create db dir $db_dir");
-                 // set access right
-                 set_file_access($db_dir, OWNER_NAME, 0755);
             }
+            // set access right
+            set_file_access($db_dir, OWNER_NAME, 0755);
          }
          unset($db_dir);
 }
