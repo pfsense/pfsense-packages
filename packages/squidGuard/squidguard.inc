@@ -1409,6 +1409,10 @@ function convert_pfxml_to_sgxml_acl($pfconfig) {
                 $sgx[FLD_DESTINATIONNAME]     = str_replace("!all", "none", $sgx[FLD_DESTINATIONNAME]);
                 $sgx[FLD_OVERDESTINATIONNAME] = str_replace("!all", "none", $sgx[FLD_OVERDESTINATIONNAME]);
 
+                // if empty - adding 'none'
+                if (!$sgx[FLD_DESTINATIONNAME])     $sgx[FLD_DESTINATIONNAME] = "none";
+                if (!$sgx[FLD_OVERDESTINATIONNAME]) $sgx[FLD_OVERDESTINATIONNAME] = "none";
+
                 $sgxml[FLD_ITEM][] = $sgx;
             }
         }
@@ -1440,6 +1444,9 @@ function convert_pfxml_to_sgxml_default($pfconfig) {
 
         // !ATTENTION! '!all' must be convert to 'none'
         $sgx[FLD_DESTINATIONNAME]     = str_replace("!all", "none", $sgx[FLD_DESTINATIONNAME]);
+
+        // if empty - adding 'none'
+        if (!$sgx[FLD_DESTINATIONNAME]) $sgx[FLD_DESTINATIONNAME] = "none";
 
         return $sgx;
 }
