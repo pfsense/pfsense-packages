@@ -1,0 +1,115 @@
+<packagegui>
+	<name>pfflowd</name>
+	<version>0.6</version>
+	<title>pfflowd: Settings</title>
+	<aftersaveredirect>pkg_edit.php?xml=pfflowd.xml&amp;id=0</aftersaveredirect>
+	<menu>
+		<name>pfflowd</name>
+		<tooltiptext>Modify pfflowd settings.</tooltiptext>
+		<section>Services</section>
+		<configfile>pfflowd.xml</configfile>
+		<url>/pkg_edit.php?xml=pfflowd.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>pfflowd</name>
+		<rcfile>pfflowd.sh</rcfile>
+		<executable>pfflowd</executable>
+	</service>
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<fields>
+		<field>
+			<fielddescr>Host</fielddescr>
+			<fieldname>host</fieldname>
+			<description>Specify the host that datagrams are to be sent to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Port</fielddescr>
+			<fieldname>port</fieldname>
+			<description>Enter the port that datagrams are to be sent to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>pf rule direction restriction</fielddescr>
+			<fieldname>direction</fieldname>
+			<description>Restrict creation of flow records to states matching a certain direction (in, out, or any).</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>Any</name>
+					<value>any</value>
+				</option>
+				<option>
+					<name>In</name>
+					<value>in</value>
+				</option>
+				<option>
+					<name>Out</name>
+					<value>out</value>
+				</option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Netflow version</fielddescr>
+			<fieldname>version</fieldname>
+			<description>Select which version of the NetFlow protocol to use.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>5</name>
+					<value>5</value>
+				</option>
+				<option>
+					<name>4</name>
+					<value>4</value>
+				</option>
+				<option>
+					<name>3</name>
+					<value>3</value>
+				</option>
+				<option>
+					<name>2</name>
+					<value>2</value>
+				</option>
+				<option>
+					<name>1</name>
+					<value>1</value>
+				</option>
+			</options>
+		</field>
+	</fields>
+	<custom_php_global_functions>
+		function sync_package_pfflowd() {
+			conf_mount_rw();
+            		config_lock();
+            		global $config;
+            		foreach($config['installedpackages']['pfflowd']['config'] as $cf) {
+				if($cf['host'] != "") {
+					$start = "\n/sbin/ifconfig pfsync0 up\n";
+					$start .= "/usr/local/sbin/pfflowd ";
+					$start .= " -n {$cf['host']}";
+					if($cf['port'] != "") 
+						$start .= ":{$cf['port']}";
+					if($cf['direction'] != "") 
+						$start .= " -S {$cf['direction']}";
+					if($cf['version'] != "") 
+						$start .= " -v {$cf['version']}";
+					write_rcfile(array(
+							"file" => "pfflowd.sh",
+							"start" => $start,
+							"stop" => "/usr/bin/killall pfflowd"
+						)
+					);
+					restart_service("pfflowd");
+					break;
+				}
+			}
+			conf_mount_ro();
+			config_unlock();
+		}
+	</custom_php_global_functions>
+	<custom_add_php_command>
+		sync_package_pfflowd();
+	</custom_add_php_command>
+</packagegui>
+
