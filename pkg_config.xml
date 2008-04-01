@@ -30,13 +30,13 @@
     </package>
    <package>
       <name>Lightsquid</name>
-      <descr>High perfomance web proxy Report. Required squid.</descr>
+      <descr>High perfomance web proxy Report. Required squid. (For pfSense 1.2/FreeBSD 6.x)</descr>
       <website>http://lightsquid.sf.net/</website>
       <category>Network</category>
-      <version>1.7.1_1</version>
+      <version>1.7.1</version>
       <maintainer>dv_serg@mail.ru</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
-      <depends_on_package>lightsquid-1.7.1_1.tbz</depends_on_package>
+      <depends_on_package>lightsquid-1.7.1.tbz</depends_on_package>
       <status>Beta1</status>
       <required_version>1.2</required_version>
       <config_file>http://www.pfsense.com/packages/config/lightsquid/lightsquid.xml</config_file>
