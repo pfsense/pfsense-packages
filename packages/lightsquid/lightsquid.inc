@@ -33,6 +33,7 @@ require_once('pfsense-utils.inc');
 require_once('pkg-utils.inc');
 require_once('filter.inc');
 require_once('service-utils.inc');
+require_once('squid.inc');
 
 define ('CMD_PKGDELETE', 'pkg_delete lightsquid-1.7.1');
 
@@ -210,7 +211,7 @@ function lightsquid_resync() {
              }
 
         // set shedule - refresh data job
-        if ($tm) {
+		if ($tm) {
             $on = false;
             $opt = array("*", "*", "*", "*", "*", "root", CRONTAB_LS_TEMPLATE . " today");
             switch($tm) {
@@ -230,11 +231,11 @@ function lightsquid_resync() {
                   case 'lhp_24h':  $on = true; $opt[0]= "0"; $opt[1]= "0"; $opt[2]= "*/24"; break;
             }
             ls_setup_cron("lightsquid_parser", $opt, CRONTAB_LS_JOBKEY, $on);
-         }  else
+		}  else
             ls_setup_cron("lightsquid_parser", "", "", false);
 
         // set shedule - squid rotate
-        if ($tm_squid) {
+		if ($tm_squid) {
             $on = false;
             $opt = array("0", "0", "*", "*", "*", "root", CRONTAB_SQUID_TEMPLATE);
             switch($tm_squid) {
@@ -261,8 +262,16 @@ function lightsquid_resync() {
                     case 'lsr_w7': $on = true; $opt[4]= "*/1"; break;
             }
             ls_setup_cron("lightsquid_squid_rotate", $opt, CRONTAB_SQUID_JOBKEY, $on);
-         }  else
+		}  else
             ls_setup_cron("lightsquid_squid_rotate", "", "", false);
+            
+         // update squid conf
+		if (isset($config['installedpackages']['squid']['config'][0])) {
+			$config['installedpackages']['squid']['config'][0]['log_enabled'] = 'on';
+			$config['installedpackages']['squid']['config'][0]['log_dir'] = LS_SQUIDLOGPATH;
+			write_config();
+			squid_resync();
+		}
     }
 
     if ($_POST['Submit'] === 'Refresh now')  refresh_now();
