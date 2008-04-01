@@ -46,7 +46,7 @@
         <requirements>Describe your package requirements here</requirements>
         <faq>Currently there are no FAQ items provided.</faq>
         <name>lightsquid</name>
-        <version>1.7.1_1</version>
+        <version>1.7.1</version>
         <title>Services: Proxy server Report(LightSquid) -> Settings</title>
         <category>Status</category>
         <include_file>/usr/local/pkg/lightsquid.inc</include_file>
@@ -247,7 +247,8 @@
 		lightsquid_install();
             		lightsquid_resync();
        </custom_php_install_command>
-       <custom_php_deinstall_command>
-		lightsquid_deinstall();
+       <custom_php_deinstall_command>                
+            		mwexec("pkg_delete lightsquid-1.7.1");       
+            		lightsquid_deinstall();
        </custom_php_deinstall_command>
 </packagegui>
