@@ -78,8 +78,60 @@
 			<fieldname>port</fieldname>
 			<description>Enter the port the RADIUS server will listen on. Leave blank to default to the system default, i.e., 1892.</description>
 			<type>input</type>
+      <default_value>1892</default_value>
 		</field>
-	</fields>
+    <field>
+      <fielddescr>Radius Logging</fielddescr>
+      <fieldname>radiuslogging</fieldname>
+      <description>Enable radius logging to /var/log/radius.log?</description>
+      <type>select</type>
+      <default_value>no</default_value>
+      <options>
+        <option>
+          <name>no</name>
+          <value>no</value>
+        </option>
+        <option>
+          <name>yes</name>
+          <value>yes</value>
+        </option>
+      </options>
+    </field>
+    <field>
+      <fielddescr>Log bad authentication attempts?</fielddescr>
+      <fieldname>radiuslogbadpass</fieldname>
+      <description>Specifies whether to log bad authentication attempts to the radius.log file. Radius Logging must be enabled for this to work.</description>
+      <type>select</type>
+      <default_value>no</default_value>
+      <options>
+        <option>
+          <name>no</name>
+          <value>no</value>
+        </option>
+        <option>
+          <name>yes</name>
+          <value>yes</value>
+        </option>
+      </options>
+    </field>
+    <field>
+      <fielddescr>Log good authentication attempts?</fielddescr>
+      <fieldname>radiusloggoodpass</fieldname>
+      <description>Specifies whether to log good authentication attempts to the radius.log file. Radius Logging must be enabled for this to work.</description>
+      <type>select</type>
+      <default_value>no</default_value>
+      <options>
+        <option>
+          <name>no</name>
+          <value>no</value>
+        </option>
+        <option>
+          <name>yes</name>
+          <value>yes</value>
+        </option>
+      </options>
+    </field>
+  </fields>
 	<custom_delete_php_command>
 		freeradius_settings_resync();
 	</custom_delete_php_command>

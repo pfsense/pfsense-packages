@@ -41,6 +41,9 @@ function freeradius_settings_resync() {
 	$iface = convert_friendly_interface_to_real_interface_name($iface);
 	$iface_ip = find_interface_ip($iface);
 	$port = ($settings['port'] != '' ? $settings['port'] : 0);
+  $radiuslogging = $settings['radiuslogging'];
+  $radiuslogbadpass = $settings['radiuslogbadpass'];
+  $radiusloggoodpass = $settings['radiusloggoodpass'];
 
 	// FreeRADIUS's configuration is huge
 	// This is the standard default config file, trimmed down a bit. Somebody might want to implement more options. It should be as simple as editing this, then also providing the settings in each file that was included here (or maybe just put the config inlined here).
@@ -71,9 +74,9 @@ allow_core_dumps = no
 regular_expressions	= yes
 extended_expressions	= yes
 log_stripped_names = no
-log_auth = no
-log_auth_badpass = no
-log_auth_goodpass = no
+log_auth = $radiuslogging
+log_auth_badpass = $radiuslogbadpass
+log_auth_goodpass = $radiusloggoodpass
 usercollide = no
 lower_user = no
 lower_pass = no
@@ -442,33 +445,40 @@ function freeradius_users_resync() {
 			$password = $user['password'];
       $multiconnet = $user['multiconnet'];
 			$ip = $user['ip'];
-                  $x=$user['expiration'];
-                  $sessiontime=$user['sessiontime'];
-                  $onlinetime=$user['onlinetime'];
-                  $atrib=''; 
-                  $head="$username User-Password == ".'"'.$password.'" ';
-                        if ($multiconnect <> '')
-                        {
-                        $head .=", Simultaneous-Use += $multiconnet";
-                        }
-                        if ($x <> '')
-                        {
-                        $head .=", Expiration := ".'"'.$x.'"';
-                        }
-                        if ($ip <> '') 
-                        {
-                        $atrib .="\r\n\tFramed-IP-Address = $ip,";
-                        }
-                        if ($sessiontime <> '')
-                        {
-                        $atrib .="\r\n\tSession-Timeout := $sessiontime,";
-                        }
-                        if ($onlinetime <> '')
-                        {
-                        $head .=", Login-Time := ". '"' . $onlinetime .'"';
-                        }
-                        
-                        $conf .= <<<EOD
+      $userexpiration=$user['expiration'];
+      $sessiontime=$user['sessiontime'];
+      $onlinetime=$user['onlinetime'];
+      $vlanid=$user['vlanid'];
+      $additionaloptions=$user['additionaloptions'];
+      $atrib=''; 
+      $head="$username User-Password == ".'"'.$password.'"';
+      if ($multiconnect <> '') {
+        $head .=", Simultaneous-Use += $multiconnet";
+       }
+      if ($x <> '') {
+        $head .=", Expiration := ".'"'.$userexpiration.'"';
+       }
+      if ($onlinetime <> '') {
+        $head .=", Login-Time := ". '"' . $onlinetime .'"';
+       }
+      if ($ip <> '') {
+        if ($atrib <> '') { $atrib .=","; }
+        $atrib .="\r\n\tFramed-IP-Address = $ip";
+       }
+      if ($sessiontime <> '') {
+        if ($atrib <> '') { $atrib .=","; }
+        $atrib .="\r\n\tSession-Timeout := $sessiontime";
+       }
+      if ($vlanid <> '') {
+        if ($atrib <> '') { $atrib .=","; }
+        $atrib .="\r\n\tTunnel-Type = VLAN,\r\n\tTunnel-Medium-Type = IEEE-802,\r\n\tTunnel-Private-Group-ID = \"$vlanid\"";
+       }
+      if ($additionaloptions <> '') {
+        if ($atrib <> '') { $atrib .=","; }
+        $atrib .="\r\n\t$additionaloptions";
+       }
+       
+      $conf .= <<<EOD
 $head 
 	$atrib
 
