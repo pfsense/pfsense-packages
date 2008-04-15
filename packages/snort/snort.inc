@@ -33,17 +33,21 @@ require_once("pfsense-utils.inc");
 if($config['installedpackages']['snort'])
 	$oinkid = $config['installedpackages']['snort']['config'][0]['oinkmastercode'];
 
-function sync_package_snort_reinstall() {
+function sync_package_snort_reinstall() 
+{
 	global $config;
 	if(!$config['installedpackages']['snort'])
 		return;
+    
 	/* create snort configuration file */
 	create_snort_conf();
+  
 	/* start snort service */
 	start_service("snort");
 }
 
-function sync_package_snort() {
+function sync_package_snort() 
+{
 	global $config, $g;
 
 	mwexec("mkdir -p /var/log/snort/");
@@ -78,24 +82,37 @@ function sync_package_snort() {
 	exec("/bin/rm -f /usr/local/etc/rc.d/snort");
 
 	$first = 0;
+  $snortInterfaces = array(); /* -gtm  */
+  
 	/* generate if list */
 	$iflist = array("lan" => "LAN");
+  
 	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
 		$iflist['opt' . $i] = "opt{$i}";
-	if($_POST['iface_array']) {
-		foreach($_POST['iface_array'] as $iface) {
+    
+	if($_POST['iface_array']) 
+  {
+		foreach($_POST['iface_array'] as $iface) 
+    {
 			$if = convert_friendly_interface_to_real_interface_name($iface);
+
 			if($config['interfaces'][$iface]['ipaddr'] == "pppoe")
 				$if = "ng0";
-			if($if) {
-				$ifaces_final .= " -i " . $if;
-				$first = 1;
-			}
-		}
-		if(!$ifaces_final) {
-			log_error("Snort will not start.  You must select an interface for it to listen on.");
-			return;
-		}		
+      
+      /* build a list of user specified interfaces -gtm */      
+      if($if)
+      {      
+        array_push($snortInterfaces, $if);
+        $first = 1;
+      }
+		}	
+    
+    if (count($snortInterfaces) < 1) 
+    {
+      log_error("Snort will not start.  You must select an interface for it to listen on.");
+		  return;
+    }
+
 	}
 	
 	/* create log directory */
@@ -117,13 +134,20 @@ function sync_package_snort() {
 	if($bpfmaxinsns)
 		mwexec_bg("sysctl net.bpf.maxinsns={$bpfmaxinsns}");
 
-	/* start snort */
-	$start .= ";snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort {$ifaces_final} -A full -D";
+	/* always stop snort2c before starting snort -gtm */
+  $start .= ";/usr/bin/killall snort2c";
 
+  /* start a snort process for each interface -gtm */
+  /* Note the sleep delay.  Seems to help getting mult interfaces to start -gtm */
+  foreach($snortInterfaces as $snortIf)
+  {
+  	$start .= ";sleep 8;snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -i {$snortIf} -A full -D";
+  }    
+    
 	/* if block offenders is checked, start snort2c */
 	if($_POST['blockoffenders'])
-		$start .= ";/usr/bin/killall snort2c; snort2c -w /var/db/whitelist -a /var/log/snort/alert";
-
+		$start .= ";sleep 8;snort2c -w /var/db/whitelist -a /var/log/snort/alert";
+    
 	$sample_before = "\nBEFORE_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
 	$sample_after = "\nAFTER_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
 	$sleep_before_final = "\necho \"Sleeping before final memory sampling...\"\nsleep 17";
