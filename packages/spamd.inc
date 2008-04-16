@@ -2,8 +2,8 @@
 /* $Id$ */
 /*
 	spamd.inc
-        part of the SpamD package for pfSense
-	Copyright (C) 2006 Scott Ullrich
+	part of the SpamD package for pfSense
+	Copyright (C) 2008 Scott Ullrich
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,7 @@
 */
 function sync_package_spamd() {
 	global $config, $g;
-	if(!$config['installedpackages']['spamdsources'])
-		return;
+	
 	conf_mount_rw();
 	config_lock();
 	$fd = fopen("/etc/spamd.conf","w");

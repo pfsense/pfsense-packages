@@ -7,13 +7,9 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
+    spamd_settings.xml
     part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2007 to whom it may belong
-    All rights reserved.
-
-    Based on m0n0wall (http://m0n0.ch/wall)
-    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    Copyright (C) 2008 Scott Ullrich
     All rights reserved.
                                                                               */
 /* ========================================================================== */
