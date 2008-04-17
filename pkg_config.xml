@@ -11,7 +11,7 @@
       <config_file>http://www.pfsense.com/packages/config/spamd.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>spamd-4.1.2.tbz</depends_on_package>
-      <version>4.3.1</version>
+      <version>4.3.2</version>
       <status>Stable</status>
       <required_version>1.2</required_version>
       <maintainer>geekgod@geekgod.com</maintainer>
@@ -21,7 +21,6 @@
         <logfilename>spamd.log</logfilename>
       </logging>
     </package>
-
     <package>
       <name>siproxd</name>
       <website>http://siproxd.sourceforge.net/</website>
