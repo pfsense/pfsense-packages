@@ -104,8 +104,8 @@ function sync_package_spamd() {
 				$delaysecs = " -s " . $ss['delaysecs'];
 			if($ss['window'] <> "")
 				$window = " -w " . $ss['window'];
-			if($ss['replysmtperror'] <> "")
-				$replysmtperror = " -r " . $ss['replysmtperror'];
+//			if($ss['replysmtperror'] <> "")
+//				$replysmtperror = " -r " . $ss['replysmtperror'];
 			if($ss['passtime'] <> "")
 				$passtime = $ss['passtime'];
 			if($ss['greyexp'] <> "")
