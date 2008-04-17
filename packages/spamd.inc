@@ -79,7 +79,6 @@ function sync_package_spamd() {
 	$greyexp = "4";
 	$whiteexp = "864";
 	$identifier = "";
-//	$greylisting = " -g";
 	$maxcon = "";
 	$maxblack = "";
 	$stuttersecs = "";
@@ -92,8 +91,9 @@ function sync_package_spamd() {
 				$passtime = " -G " . $ss['greylistingparms'];
 			if($ss['identifier'] <> "")
 				$identifier = " -n \"" . $ss['identifier'] . "\"";
-//			if(isset($ss['greylisting']) <> "")
-//				$greylisting = " -g";
+			// Default is greylisting, turn on blacklisting if not checked.
+			if(!isset($ss['greylisting']) <> "")
+				$greylisting = " -b";
 			if($ss['maxblack'] <> "")
 				$maxblack = " -B " . $ss['maxblack'];
 			if($ss['maxcon'] <> "")
