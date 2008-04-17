@@ -115,7 +115,8 @@ function sync_package_spamd() {
 		}
 	}
 	$greyparms = " -G {$passtime}:{$greyexp}:{$whiteexp}";
-	$start = "/sbin/mount_fdescfs fdescfs /dev/fd\n" .
+	$start = "mkdir -p /var/db/spamd\n";
+		 "/sbin/mount_fdescfs fdescfs /dev/fd\n" .
 	     "/usr/local/sbin/spamd-setup -d &\n" .
 		 "/sbin/pflogd &\n" .
 		 "/usr/local/libexec/spamd {$greyparms}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} -b 127.0.0.1 &\n" .
