@@ -36,8 +36,10 @@ function sync_package_spamd() {
 	$fd = fopen("/etc/spamd.conf","w");
 	/* all header */
 	fwrite($fd, "all:\\\n\t:whitelist:blacklist");
-	foreach($config['installedpackages']['spamdsources']['config'] as $spamd) {
-		fwrite($fd, ":" . remove_spaces($spamd['providername']));
+	if($config['installedpackages']['spamdsources']['config']) {
+		foreach($config['installedpackages']['spamdsources']['config'] as $spamd) {
+			fwrite($fd, ":" . remove_spaces($spamd['providername']));
+		}
 	}
 	fwrite($fd, ":\n\n");
 	fwrite($fd, "whitelist:\\\n");
