@@ -92,8 +92,8 @@ function sync_package_spamd() {
 				$passtime = " -G " . $ss['greylistingparms'];
 			if($ss['identifier'] <> "")
 				$identifier = " -n \"" . $ss['identifier'] . "\"";
-			if(isset($ss['greylisting']) <> "")
-				$greylisting = " -g";
+//			if(isset($ss['greylisting']) <> "")
+//				$greylisting = " -g";
 			if($ss['maxblack'] <> "")
 				$maxblack = " -B " . $ss['maxblack'];
 			if($ss['maxcon'] <> "")
