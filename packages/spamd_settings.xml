@@ -152,6 +152,7 @@
 			<type>input</type>
 			<value></value>
 		</field>
+		<!--
 		<field>
 			<fielddescr>Reply SMTP error</fielddescr>
 			<fieldname>replysmtperror</fieldname>
@@ -166,6 +167,7 @@
 			    <option><name>550</name><value>550</value></option>
 			</options>
 		</field>
+		-->
 		<field>
 			<fielddescr>NextMTA</fielddescr>
 			<fieldname>nextmta</fieldname>
