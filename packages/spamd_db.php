@@ -45,13 +45,13 @@ if($_GET['action'] or $_POST['action']) {
 	 */
 	echo $_GET['buttonid'] . "|";
 	if($_GET['action'])
-		$action = $_GET['action'];
+		$action = escapeshellarg($_GET['action']);
 	if($_POST['action'])
-		$action = $_POST['action'];
+		$action = escapeshellarg($_POST['action']);
 	if($_GET['srcip'])
-		$srcip = $_GET['srcip'];
+		$srcip = escapeshellarg($_GET['srcip']);
 	if($_POST['srcip'])
-		$srcip = $_POST['srcip'];
+		$srcip = escapeshellarg($_POST['srcip']);
 	$srcip = str_replace("<","",$srcip);
 	$srcip = str_replace(">","",$srcip);
 	$srcip = str_replace(" ","",$srcip);
@@ -91,9 +91,13 @@ if($_GET['action'] or $_POST['action']) {
 
 /* spam trap e-mail address */
 if($_POST['spamtrapemail'] <> "") {
-	mwexec("/usr/local/sbin/spamdb -T -a \"{$_POST['spamtrapemail']}\"");
+	$spamtrapemail = escapeshellarg($_POST['spamtrapemail']);
+	exec("/usr/local/sbin/spamdb -d {$spamtrapemail}");
+	exec("/usr/local/sbin/spamdb -d -T \"{$spamtrapemail}\"");
+	exec("/usr/local/sbin/spamdb -d -t \"{$spamtrapemail}\"");
+	mwexec("/usr/local/sbin/spamdb -T -a \"{$spamtrapemail}\"");
 	mwexec("killall -HUP spamlogd");
-	$savemsg = $_POST['spamtrapemail'] . " added to spam trap database.";
+	$savemsg = htmlentities($_POST['spamtrapemail']) . " added to spam trap database.";
 }
 
 if($_GET['getstatus'] <> "") {
@@ -114,26 +118,27 @@ if($_GET['getstatus'] <> "") {
 
 /* spam trap e-mail address */
 if($_GET['spamtrapemail'] <> "") {
-	$status = exec("spamdb -T -a \"{$_GET['spamtrapemail']}\"");
+	$spamtrapemail = escapeshellarg($_GET['spamtrapemail']);
+	$status = exec("spamdb -T -a \"{$spamtrapemail}\"");
 	mwexec("killall -HUP spamlogd");
 	if($status)
 		echo $status;
 	else 
-		echo $_POST['spamtrapemail'] . " added to spam trap database.";
+		echo htmlentities($_POST['spamtrapemail']) . " added to spam trap database.";
 	exit;
 }
 
 /* spam trap e-mail address */
 if($_GET['whitelist'] <> "") {
-	$status = exec("spamdb -a \"{$_GET['spamtrapemail']}\"");
+	$spamtrapemail = escapeshellarg($_GET['spamtrapemail']);
+	$status = exec("spamdb -a \"{$spamtrapemail}\"");
 	mwexec("killall -HUP spamlogd");
 	if($status)
 		echo $status;
 	else 
-		echo $_POST['spamtrapemail'] . " added to whitelist database.";
+		echo htmlentities($_POST['spamtrapemail']) . " added to whitelist database.";
 	exit;
 }
-
 
 function delete_from_blacklist($srcip) {
 	config_lock();

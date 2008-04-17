@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
 	spamd_db_ext.php
-	Copyright (C) 2006 Scott Ullrich
+	Copyright (C) 2008 Scott Ullrich
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("config.inc");
+require("guiconfig.inc");
 
 if($_GET['loginname'])
 	$loginname = " Username: " . $_GET['loginname'];
@@ -56,17 +56,17 @@ exec("echo {$_GET['action']} > /tmp/tmp");
 /* handle AJAX operations */
 if($_GET['action'] or $_POST['action']) {
 	if($_GET['action'])
-		$action = trim($_GET['action']);
+		$action = escapeshellarg(trim($_GET['action']));
 	if($_POST['action'])
-		$action = trim($_POST['action']);
+		$action = escapeshellarg(trim($_POST['action']));
 	if($_GET['srcip'])
-		$srcip = trim($_GET['srcip']);
+		$srcip = escapeshellarg(trim($_GET['srcip']));
 	if($_POST['srcip'])
-		$srcip = trim($_POST['srcip']);
+		$srcip = escapeshellarg(trim($_POST['srcip']));
 	if($_POST['email'])
-		$email = trim($_POST['email']);
+		$email = escapeshellarg(trim($_POST['email']));
 	if($_GET['email'])
-		$email = trim($_GET['email']);
+		$email = escapeshellarg(trim($_GET['email']));
 	/* execute spamdb command */
 	if($action == "whitelist") {
 		delete_from_spamd_db($srcip);
@@ -113,16 +113,18 @@ if($_GET['action'] or $_POST['action']) {
 
 /* spam trap e-mail address */
 if($_POST['spamtrapemail'] <> "") {
-	exec("/usr/local/sbin/spamdb -d {$_POST['spamtrapemail']}");
-	exec("/usr/local/sbin/spamdb -d -T \"{$_POST['spamtrapemail']}\"");
-	exec("/usr/local/sbin/spamdb -d -t \"{$_POST['spamtrapemail']}\"");
-	mwexec("/usr/local/sbin/spamdb -T -a \"{$_POST['spamtrapemail']}\"");
+	$spamtrapemail = escapeshellarg($_POST['spamtrapemail']);
+	exec("/usr/local/sbin/spamdb -d {$spamtrapemail}");
+	exec("/usr/local/sbin/spamdb -d -T \"{$spamtrapemail}\"");
+	exec("/usr/local/sbin/spamdb -d -t \"{$spamtrapemail}\"");
+	mwexec("/usr/local/sbin/spamdb -T -a \"{$spamtrapemail}\"");
 	mwexec("killall -HUP spamlogd");
-	$savemsg = $_POST['spamtrapemail'] . " added to spam trap database.";
+	$savemsg = htmlentities($_POST['spamtrapemail']) . " added to spam trap database.";
 }
 
 if($_GET['getstatus'] <> "") {
-	$status = exec("/usr/local/sbin/spamdb | grep \"{$_GET['getstatus']}\"");
+	$getstatus = escapeshellarg($_GET['getstatus']);
+	$status = exec("/usr/local/sbin/spamdb | grep \"{$getstatus}\"");
 	if(stristr($status, "WHITE") == true) {
 		echo "WHITE";
 	} else if(stristr($status, "TRAPPED") == true) {
@@ -139,23 +141,25 @@ if($_GET['getstatus'] <> "") {
 
 /* spam trap e-mail address */
 if($_GET['spamtrapemail'] <> "") {
-	$status = exec("spamdb -T -a \"{$_GET['spamtrapemail']}\"");
+	$spamtrapemail = escapeshellarg($_GET['spamtrapemail']);
+	$status = exec("spamdb -T -a \"{$spamtrapemail}\"");
 	mwexec("killall -HUP spamlogd");
 	if($status)
 		echo $status;
 	else 
-		echo $_POST['spamtrapemail'] . " added to spam trap database.";
+		echo htmlentities($_POST['spamtrapemail']) . " added to spam trap database.";
 	exit;
 }
 
 /* spam trap e-mail address */
 if($_GET['whitelist'] <> "") {
-	$status = exec("spamdb -a \"{$_GET['spamtrapemail']}\"");
+	$spamtrapemail = escapeshellarg($_GET['spamtrapemail']);
+	$status = exec("spamdb -a \"{$spamtrapemail}\"");
 	mwexec("killall -HUP spamlogd");
 	if($status)
 		echo $status;
 	else 
-		echo $_POST['spamtrapemail'] . " added to whitelist database.";
+		echo htmlentities($_POST['spamtrapemail']) . " added to whitelist database.";
 	exit;
 }
 
