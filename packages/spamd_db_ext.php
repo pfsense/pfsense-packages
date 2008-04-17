@@ -29,6 +29,9 @@
 
 require("guiconfig.inc");
 
+/* this script is no longer supported */
+exit;
+
 if($_GET['loginname'])
 	$loginname = " Username: " . $_GET['loginname'];
 if($_GET['username'])
