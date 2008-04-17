@@ -104,8 +104,6 @@ function sync_package_spamd() {
 				$delaysecs = " -s " . $ss['delaysecs'];
 			if($ss['window'] <> "")
 				$window = " -w " . $ss['window'];
-//			if($ss['replysmtperror'] <> "")
-//				$replysmtperror = " -r " . $ss['replysmtperror'];
 			if($ss['passtime'] <> "")
 				$passtime = $ss['passtime'];
 			if($ss['greyexp'] <> "")
@@ -243,6 +241,26 @@ function spamd_install_cron($should_install) {
 				configure_cron();
 			}
 		break;
+	}
+}
+
+function spamd_validate_input($post, $input_errors) {
+	global $config, $g;
+	$nextmta = $post['nextmta'];
+	if(stristr($nextmta, "{")) {
+		/* item is an alias, make sure the name exists */
+		$nextmta = str_replace("{", "", $nextmta);
+		$nextmta = str_replace("}", "", $nextmta);
+		$found = false;
+		if($config['aliases']['alias']) {
+			foreach($config['aliases']['alias'] as $alias) {
+				if($alias['name'] == $nextmta) {
+					$found = true;
+				}
+			}
+		}
+		if($found == false)
+			$intput_errors = "Could not locate alias named " . htmlentities($nextmta);
 	}
 }
 

@@ -183,6 +183,9 @@
 			<value></value>
 		</field>		
 	</fields>
+	<custom_php_validation_command>
+		spamd_validate_input($_POST, &amp;$input_errors);
+	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
 		sync_package_spamd();
 	</custom_php_resync_config_command>
