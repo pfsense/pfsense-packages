@@ -166,8 +166,8 @@ function delete_from_spamd_db($srcip) {
 	fwrite($fd, "/usr/local/sbin/spamdb -d {$srcip}\n");
 	fwrite($fd, "/usr/local/sbin/spamdb -d {$srcip} -T\n");
 	fwrite($fd, "/usr/local/sbin/spamdb -d {$srcip} -t\n");
-	fwrite($fd, "/usr/local/sbin/spamdb -d \"<{$srcip}>\" -t\n");
-	fwrite($fd, "/usr/local/sbin/spamdb -d \"<{$srcip}>\" -T\n");	
+	fwrite($fd, "/usr/local/sbin/spamdb -d \"{$srcip}\" -t\n");
+	fwrite($fd, "/usr/local/sbin/spamdb -d \"{$srcip}\" -T\n");	
 	fclose($fd);
 	exec("/bin/chmod a+rx /tmp/execcmds");
 	system("/bin/sh /tmp/execcmds");
