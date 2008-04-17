@@ -1,4 +1,4 @@
-c<?php
+<?php
 /* $Id$ */
 /*
 	spamd.inc
