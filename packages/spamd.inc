@@ -79,7 +79,7 @@ function sync_package_spamd() {
 	$greyexp = "4";
 	$whiteexp = "864";
 	$identifier = "";
-	$greylisting = " -g";
+//	$greylisting = " -g";
 	$maxcon = "";
 	$maxblack = "";
 	$stuttersecs = "";
