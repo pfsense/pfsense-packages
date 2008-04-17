@@ -139,7 +139,7 @@ function sync_package_spamd() {
 	mwexec("/usr/local/etc/rc.d/spamd.sh stop");
 	sleep(1);
 	mwexec("/usr/local/etc/rc.d/spamd.sh start");
-
+	filter_configure();
 }
 
 function remove_spaces($string) {
