@@ -131,8 +131,7 @@ function sync_package_spamd() {
 				"stop" =>  $stop
 			    )
 	);
-	$cronjob = "*/120   *       *       *       *       root            /usr/bin/nice -n20 /usr/local/sbin/spamd-setup";
-	add_text_to_file("/etc/crontab", $cronjob);
+	spamd_install_cron(true);
 	conf_mount_ro();
 	config_unlock();
 	mwexec("killall -HUP cron");
@@ -200,8 +199,50 @@ function custom_php_deinstall_command() {
 	unlink_if_exists("/usr/local/pkg/pf/spamd_rules.php");
 	unlink_if_exists("/usr/local/www/spamd_rules.php");
 	unlink_if_exists("/usr/local/etc/rc.d/spamd.sh");
+	spamd_install_cron(false);
 	conf_mount_ro();
 	filter_configure();
+}
+
+function spamd_install_cron($should_install) {
+	global $config, $g;
+	$is_installed = false;
+	if(!$config['cron']['item'])
+		return;
+	$x=0;
+	foreach($config['cron']['item'] as $item) {
+		if(strstr($item['command'], "spamd-setup")) {
+			$is_installed = true;
+			break;
+		}
+		$x++;
+	}
+	switch($should_install) {
+		case true:
+			if(!$is_installed) {
+				$cron_item = array();
+				$cron_item['minute'] = "*/120";
+				$cron_item['hour'] = "*";
+				$cron_item['mday'] = "*";
+				$cron_item['month'] = "*";
+				$cron_item['wday'] = "*";
+				$cron_item['who'] = "root";
+				$cron_item['command'] = "/usr/bin/nice -n20 /usr/local/sbin/spamd-setup";		
+				$config['cron']['item'][] = $cron_item;
+				write_config("Installed SPAMD crontab entries.");
+				configure_cron();
+			}
+		break;
+		case false:
+			if($is_installed == true) {
+				if($x > 0) {
+					unset($config['cron']['item'][$x]);
+					write_config();
+				}
+				configure_cron();
+			}
+		break;
+	}
 }
 
 ?>
