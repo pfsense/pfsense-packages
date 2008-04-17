@@ -152,7 +152,10 @@ function sync_spamd_config_to_backup() {
 			if($carp['synchronizetoip'] != "" ) {
 				$synctoip = $carp['synchronizetoip'];
 				$password = $carp['password'];
-				$username = "admin";
+				if($config['system']['username'])
+					$username = $config['system']['username'];
+				else 
+					$username = "admin";
 			}
 		}
 	}
