@@ -78,10 +78,6 @@
 			<text>SpamD Database</text>
 			<url>/spamd_db.php</url>
 		</tab>
-		<tab>
-			<text>SpamD Outlook</text>
-			<url>/pkg_edit.php?xml=spamd_outlook.xml&amp;id=0</url>
-		</tab>			
 	</tabs>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->

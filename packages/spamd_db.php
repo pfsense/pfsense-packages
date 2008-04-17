@@ -272,7 +272,6 @@ if (typeof getURL == 'undefined') {
 	$tab_array[] = array("SpamD Whitelist", false, "/pkg.php?xml=spamd_whitelist.xml");
 	$tab_array[] = array("SpamD Settings", false, "/pkg_edit.php?xml=spamd_settings.xml&id=0");
 	$tab_array[] = array("SpamD Database", true, "/spamd_db.php");
-	$tab_array[] = array("SpamD Outlook", false, "/pkg_edit.php?xml=spamd_outlook.xml&amp;id=0");
 	display_top_tabs($tab_array);
 ?>
  </td></tr>
