@@ -91,7 +91,7 @@ if($_GET['action'] or $_POST['action']) {
 		delete_from_spamd_db($email);
 		delete_from_whitelist($srcip);
 		usleep(100);
-		exec("/usr/local/sbin/spamdb -a \"<{$email}>\" -T");
+		exec("/usr/local/sbin/spamdb -a \"{$email}\" -T");
 		hup_spamd();
 		mwexec("/sbin/pfctl -q -t blacklist -T add -f /var/db/blacklist.txt");
 		log_error("spamd: {$srcip} has been blacklisted by {$_SERVER['REMOTE_ADDR']} {$loginname}");
@@ -114,9 +114,9 @@ if($_GET['action'] or $_POST['action']) {
 /* spam trap e-mail address */
 if($_POST['spamtrapemail'] <> "") {
 	exec("/usr/local/sbin/spamdb -d {$_POST['spamtrapemail']}");
-	exec("/usr/local/sbin/spamdb -d -T \"<{$_POST['spamtrapemail']}>\"");
-	exec("/usr/local/sbin/spamdb -d -t \"<{$_POST['spamtrapemail']}>\"");
-	mwexec("/usr/local/sbin/spamdb -T -a \"<{$_POST['spamtrapemail']}>\"");
+	exec("/usr/local/sbin/spamdb -d -T \"{$_POST['spamtrapemail']}\"");
+	exec("/usr/local/sbin/spamdb -d -t \"{$_POST['spamtrapemail']}\"");
+	mwexec("/usr/local/sbin/spamdb -T -a \"{$_POST['spamtrapemail']}\"");
 	mwexec("killall -HUP spamlogd");
 	$savemsg = $_POST['spamtrapemail'] . " added to spam trap database.";
 }
@@ -139,7 +139,7 @@ if($_GET['getstatus'] <> "") {
 
 /* spam trap e-mail address */
 if($_GET['spamtrapemail'] <> "") {
-	$status = exec("spamdb -T -a \"<{$_GET['spamtrapemail']}>\"");
+	$status = exec("spamdb -T -a \"{$_GET['spamtrapemail']}\"");
 	mwexec("killall -HUP spamlogd");
 	if($status)
 		echo $status;
@@ -150,7 +150,7 @@ if($_GET['spamtrapemail'] <> "") {
 
 /* spam trap e-mail address */
 if($_GET['whitelist'] <> "") {
-	$status = exec("spamdb -a \"<{$_GET['spamtrapemail']}>\"");
+	$status = exec("spamdb -a \"{$_GET['spamtrapemail']}\"");
 	mwexec("killall -HUP spamlogd");
 	if($status)
 		echo $status;

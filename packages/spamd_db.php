@@ -91,7 +91,7 @@ if($_GET['action'] or $_POST['action']) {
 
 /* spam trap e-mail address */
 if($_POST['spamtrapemail'] <> "") {
-	mwexec("/usr/local/sbin/spamdb -T -a \"<{$_POST['spamtrapemail']}>\"");
+	mwexec("/usr/local/sbin/spamdb -T -a \"{$_POST['spamtrapemail']}\"");
 	mwexec("killall -HUP spamlogd");
 	$savemsg = $_POST['spamtrapemail'] . " added to spam trap database.";
 }
@@ -114,7 +114,7 @@ if($_GET['getstatus'] <> "") {
 
 /* spam trap e-mail address */
 if($_GET['spamtrapemail'] <> "") {
-	$status = exec("spamdb -T -a \"<{$_GET['spamtrapemail']}>\"");
+	$status = exec("spamdb -T -a \"{$_GET['spamtrapemail']}\"");
 	mwexec("killall -HUP spamlogd");
 	if($status)
 		echo $status;
@@ -125,7 +125,7 @@ if($_GET['spamtrapemail'] <> "") {
 
 /* spam trap e-mail address */
 if($_GET['whitelist'] <> "") {
-	$status = exec("spamdb -a \"<{$_GET['spamtrapemail']}>\"");
+	$status = exec("spamdb -a \"{$_GET['spamtrapemail']}\"");
 	mwexec("killall -HUP spamlogd");
 	if($status)
 		echo $status;
