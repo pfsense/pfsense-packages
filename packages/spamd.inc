@@ -139,7 +139,7 @@ function sync_package_spamd() {
 	conf_mount_ro();
 	config_unlock();
 	mwexec("killall -HUP cron");
-	mwexec("ln -s /etc/spamd.conf /usr/local/etc/spamd.conf");
+	mwexec("ln -s /etc/spamd.conf /usr/local/etc/spamd/spamd.conf");
 	mwexec("/usr/local/etc/rc.d/spamd.sh stop");
 	sleep(1);
 	mwexec("/usr/local/etc/rc.d/spamd.sh start");
