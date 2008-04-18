@@ -98,7 +98,7 @@ function sync_package_spamd() {
 			if($ss['identifier'] <> "")
 				$identifier = " -n \"" . $ss['identifier'] . "\"";
 			// Default is greylisting, turn on blacklisting if not checked.
-			if(!isset($ss['greylisting']) <> "")
+			if($ss['greylisting'] <> "on")
 				$greylisting = " -b";
 			if($ss['maxblack'] <> "")
 				$maxblack = " -B " . $ss['maxblack'];
@@ -122,7 +122,7 @@ function sync_package_spamd() {
 	$start = "/sbin/mount_fdescfs fdescfs /dev/fd\n" .
 	     "/usr/local/sbin/spamd-setup -d &\n" .
 		 "/sbin/pflogd &\n" .
-		 "/usr/local/libexec/spamd {$greyparms}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} -b 127.0.0.1 &\n" .
+		 "/usr/local/libexec/spamd {$greyparms}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} 127.0.0.1 &\n" .
 		 "/usr/local/libexec/spamlogd\n";
 	$stop  = "/usr/bin/killall spamd-setup\n" .
 		 "/usr/bin/killall spamlogd\n" .
