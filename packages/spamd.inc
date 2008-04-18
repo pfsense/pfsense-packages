@@ -38,7 +38,9 @@ function sync_package_spamd() {
 	fwrite($fd, "all:\\\n\t:whitelist:blacklist");
 	if($config['installedpackages']['spamdsources']['config']) {
 		foreach($config['installedpackages']['spamdsources']['config'] as $spamd) {
-			fwrite($fd, ":" . remove_spaces($spamd['providername']));
+			if($spamd['providername']) {
+				fwrite($fd, ":" . remove_spaces($spamd['providername']));
+			}
 		}
 	}
 	fwrite($fd, ":\n\n");
@@ -56,23 +58,27 @@ function sync_package_spamd() {
 	if($config['installedpackages']['spamdsources']['config'] != "") {
 		foreach($config['installedpackages']['spamdsources']['config'] as $spamd) {
 			if(remove_spaces($spamd['providername'])) {
-				fwrite($fd, remove_spaces($spamd['providername']) . ":\\\n");
-				fwrite($fd, "\t:" . remove_spaces($spamd['providertype']) . ":\\\n");
-				fwrite($fd, "\t:msg=\"" . rtrim($spamd['rejectmessage']) . "\":\\\n");
-				fwrite($fd, "\t:method=" . remove_spaces($spamd['providermethod']) . ":\\\n");
-				fwrite($fd, "\t:" . remove_spaces($spamd['providermethod']) . ":\\\n");
-				$providerurl = $spamd['providerurl'];
-				$providerurl = str_replace("http://", "", $providerurl);
-				$providerurl = str_replace("https://", "", $providerurl);
-				fwrite($fd, "\t:file=" . remove_spaces($providerurl) . ":\n\n");
+				if($spamd['providername']) {
+					fwrite($fd, remove_spaces($spamd['providername']) . ":\\\n");
+					fwrite($fd, "\t:" . remove_spaces($spamd['providertype']) . ":\\\n");
+					fwrite($fd, "\t:msg=\"" . rtrim($spamd['rejectmessage']) . "\":\\\n");
+					fwrite($fd, "\t:method=" . remove_spaces($spamd['providermethod']) . ":\\\n");
+					fwrite($fd, "\t:" . remove_spaces($spamd['providermethod']) . ":\\\n");
+					$providerurl = $spamd['providerurl'];
+					$providerurl = str_replace("http://", "", $providerurl);
+					$providerurl = str_replace("https://", "", $providerurl);
+					fwrite($fd, "\t:file=" . remove_spaces($providerurl) . ":\n\n");
+				}
 			}
 		}
 	}
 	fclose($fd);
 	$fd = fopen("/var/db/whitelist.txt","w");
-	if($config['installedpackages']['spamdwhitelist']['config'] != "")
+	if($config['installedpackages']['spamdwhitelist']['config'] != "") {
 	    foreach($config['installedpackages']['spamdwhitelist']['config'] as $spamd) {
-		fwrite($fd, $spamd['ip'] . "\n");
+			if($spamd['ip'])
+				fwrite($fd, $spamd['ip'] . "\n");
+		}
 	}
 	fclose($fd);
 	$passtime = "5";
@@ -249,11 +255,10 @@ function spamd_install_cron($should_install) {
 
 function spamd_validate_input($post, $input_errors) {
 	global $config, $g;
-	$nextmta = $post['nextmta'];
+	$nextmta = str_replace("$", "", $post['nextmta']);
 	if(stristr($nextmta, "{")) {
 		/* item is an alias, make sure the name exists */
-		$nextmta = str_replace("{", "", $nextmta);
-		$nextmta = str_replace("}", "", $nextmta);
+		$nextmta = str_replace("$", "", $nextmta);
 		$found = false;
 		if($config['aliases']['alias']) {
 			foreach($config['aliases']['alias'] as $alias) {

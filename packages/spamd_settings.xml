@@ -171,7 +171,7 @@
 		<field>
 			<fielddescr>NextMTA</fielddescr>
 			<fieldname>nextmta</fieldname>
-			<description>Automatically sends messages after being processed by SpamD to IP Address.  You may enter an alias if you like, simply surround it with {}.  Note, if you have postfix package installed enter 127.0.0.1 here.</description>
+			<description>Automatically sends messages after being processed by SpamD to IP Address.  You may enter an alias if you like, simply prepend $ to the alias name. example: $mailservers.  Note, if you have postfix package installed enter 127.0.0.1 here.</description>
 			<type>input</type>
 			<value>1</value>
 		</field>
