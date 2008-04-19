@@ -63,7 +63,6 @@ function sync_package_spamd() {
 					fwrite($fd, "\t:" . remove_spaces($spamd['providertype']) . ":\\\n");
 					fwrite($fd, "\t:msg=\"" . rtrim($spamd['rejectmessage']) . "\":\\\n");
 					fwrite($fd, "\t:method=" . remove_spaces($spamd['providermethod']) . ":\\\n");
-					fwrite($fd, "\t:" . remove_spaces($spamd['providermethod']) . ":\\\n");
 					$providerurl = $spamd['providerurl'];
 					$providerurl = str_replace("http://", "", $providerurl);
 					$providerurl = str_replace("https://", "", $providerurl);
