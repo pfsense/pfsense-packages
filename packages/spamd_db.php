@@ -342,64 +342,69 @@ if (typeof getURL == 'undefined') {
 		if($rows > $limit)
 			break;
 		$dontdisplay = false;
-		$rowtext = "";
-		$rowtext .= "<span class=\"{$rows}\"></span>";
-		$rowtext .= "<tr id=\"{$rows}\">";
 		$pkgdb_split = split("\|", $pkgdb_row);
-		$column = 0;
-		foreach($pkgdb_split as $col) {
-			if($column == 2) {
-				if(strstr($pkgdb_row, "TRAPPED")) {
-					$column++;
-					continue;
-				}
-			}
-			/* dont display these columns */
-			if($column == 4 || $column == 5  || $column == 6 || $column == 8) {
-				$column++;
-				continue;
-			}
-			/* don't display if column blank */
-			$col = str_replace("<","",$col);
-			$col = str_replace(">","",$col);
-			/*   if string is really long allow it to be wrapped by
-			 *   replacing @ with space@
-                         */
-			if(strlen($col)>25) {
-				$col = str_replace("@"," @",$col);
-				$col = str_replace("-"," -",$col);
-				$col = str_replace("."," .",$col);
-			}
-			$rowtext .= "<td class=\"listr\">&nbsp;{$col}&nbsp;</td>";
-			$column++;
+
+		/*
+
+  			For TRAPPED entries the format is:
+
+        	type|ip|expire
+
+  				where type will be TRAPPED, IP will be the IP address blacklisted due to
+  				hitting a spamtrap, and expire will be when the IP is due to be removed
+  				from the blacklist.
+
+  			For GREY entries, the format is:
+
+        	type|source IP|helo|from|to|first|pass|expire|block|pass
+
+  			For WHITE entries, the format is:
+
+        	type|source IP|||first|pass|expire|block|pass
+
+		*/
+		switch($pkgdb_split[0]) {
+			case "TRAPPED":
+				$recordtype = htmlentities($pkgdb_split[0]);
+				$srcip = htmlentities($pkgdb_split[1]);
+				$fromaddress = "";
+				$toaddress = "";
+				$attempts = "";
+				break;
+			case "GREY":
+				$recordtype = htmlentities($pkgdb_split[0]);
+				$srcip = htmlentities($pkgdb_split[1]);
+				$fromaddress = htmlentities($pkgdb_split[3]);
+				$toaddress = htmlentities($pkgdb_split[4]);
+				$attempts = htmlentities($pkgdb_split[8]);			
+				break;
+			case "WHITE":
+				$recordtype = htmlentities($pkgdb_split[0]);
+				$srcip = htmlentities($pkgdb_split[1]);
+				$fromaddress = "";
+				$toaddress = "";
+				$attempts = htmlentities($pkgdb_split[8]);			
+				break;
 		}
-		if(strstr($pkgdb_row, "TRAPPED")) {
-			for($x=0; $x<3; $x++) {
-				$rowtext .= "<td class=\"listr\"></td>";
-			}
+
+		if($fromaddress == "") {
+			$rows++;
+			continue;
 		}
-		if(strstr($pkgdb_row, "SPAMTRAP")) {
-			for($x=0; $x<3; $x++) {
-				$rowtext .= "<td class=\"listr\"></td>";
-			}
-		}		
-		$rowtext .= "<td class=\"list\">&nbsp;";
-		$srcip = $pkgdb_split[1];
-		$lastrow = $rows - 1;
-		$rowtext .= "<NOBR><a href='javascript:toggle_on(\"w{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_plus_p.gif\"); getURL(\"spamd_db.php?buttonid=w{$rows}&srcip={$srcip}&action=whitelist\", outputrule);'><img title=\"Add to whitelist\" name='w{$rows}' id='w{$rows}' border=\"0\" alt=\"Add to whitelist\" src=\"/themes/{$g['theme']}/images/icons/icon_plus.gif\"></a> ";
+		echo "<tr id=\"{$rows}\">";
+		echo "<td class=\"listr\">{$recordtype}</td>";		
+		echo "<td class=\"listr\">{$srcip}</td>";
+		echo "<td class=\"listr\">{$fromaddress}</td>";		
+		echo "<td class=\"listr\">{$toaddress}</td>";
+		echo "<td class=\"listr\">{$attempts}</td>";
+		echo "<td>";
+		$rowtext = "<NOBR><a href='javascript:toggle_on(\"w{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_plus_p.gif\"); getURL(\"spamd_db.php?buttonid=w{$rows}&srcip={$srcip}&action=whitelist\", outputrule);'><img title=\"Add to whitelist\" name='w{$rows}' id='w{$rows}' border=\"0\" alt=\"Add to whitelist\" src=\"/themes/{$g['theme']}/images/icons/icon_plus.gif\"></a> ";
 		$rowtext .= "<a href='javascript:toggle_on(\"b{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_trapped_p.gif\");getURL(\"spamd_db.php?buttonid=b{$rows}&srcip={$srcip}&action=trapped\", outputrule);'><img title=\"Blacklist\" name='b{$rows}' id='b{$rows}' border=\"0\" alt=\"Blacklist\" src=\"/themes/{$g['theme']}/images/icons/icon_trapped.gif\"></a> ";
 		$rowtext .= "<a href='javascript:toggle_on(\"d{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_x_p.gif\");getURL(\"spamd_db.php?buttonid=d{$rows}&srcip={$srcip}&action=delete\", outputrule);'><img title=\"Delete\" border=\"0\" name='d{$rows}' id='d{$rows}' alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a>";
 		$rowtext .= "<a href='javascript:delete_row_db(\"{$rows}\"); toggle_on(\"s{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_plus_bl_p.gif\");getURL(\"spamd_db.php?buttonid=s{$rows}&srcip={$srcip}&action=spamtrap\", outputrule);'><img title=\"Spamtrap\" name='s{$rows}' id='s{$rows}' border=\"0\" alt=\"Spamtrap\" src=\"./themes/{$g['theme']}/images/icons/icon_plus_bl.gif\"></a> ";
-		$rowtext .= "</NOBR>&nbsp;</td>";		
-		$rowtext .= "</tr>";
-		if($srcip == "")
-			$dontdisplay = true;
-		if($lastseenip == $srcip and $filter == "")
-			$dontdisplay = true;
-		if($dontdisplay == false) {
-			echo $rowtext;
-			$lastseenip = $srcip;
-		}
+		echo $rowtext;
+		echo "</td></tr>";
+
 		$rows++;
 	}	
 ?>	</td></tr></table>
