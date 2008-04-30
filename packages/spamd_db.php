@@ -51,12 +51,12 @@ if($_GET['action'] or $_POST['action']) {
 	if($_GET['srcip'])
 		$srcip = escapeshellarg($_GET['srcip']);
 	if($_POST['srcip'])
-		$srcip = escapeshellarg($_POST['srcip']);
+		$srcip = escapeshellarg($_POST['srcip']);		
 	$srcip = str_replace("<","",$srcip);
 	$srcip = str_replace(">","",$srcip);
 	$srcip = str_replace(" ","",$srcip);
 	/* execute spamdb command */
-	if($action == "whitelist") {
+	if($action == "'whitelist'") {
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
 		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -T");
 		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -t");
@@ -64,19 +64,19 @@ if($_GET['action'] or $_POST['action']) {
 		mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
 		exec("echo spamdb -a {$srcip} > /tmp/tmp");
 		exec("/usr/local/sbin/spamdb -a {$srcip}");
-	} else if($action == "delete") {
+	} else if($action == "'delete'") {
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
 		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -T");
 		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -t");
 		delete_from_blacklist($srcip);
 		mwexec("/sbin/pfctl -q -t spamd -T delete $srcip");
 		mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");		
-	} else if($action == "spamtrap") {
+	} else if($action == "'spamtrap'") {
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
 		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -T");
 		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -t");
 		exec("/usr/local/sbin/spamdb -a {$srcip} -T");
-	} else if($action == "trapped") {
+	} else if($action == "'trapped'") {
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
 		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -T");
 		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -t");
