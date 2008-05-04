@@ -1024,18 +1024,20 @@ function sg_build_config() {
                      $varray = explode(" ", $acl[FLD_OVERDESTINATIONNAME]);
 
                      // delete blacklist entries from 'pass' if blacklist disabled
-                     foreach($entry_blacklist as $entry) {
-                         $tk = array_search($entry, $tarray);
-                         if ($tk !== false) unset ($tarray[$tk]);
+                     if (is_array($entry_blacklist) and !empty($entry_blacklist)) {
+                     	foreach($entry_blacklist as $entry) {
+                         	$tk = array_search($entry, $tarray);
+                         	if ($tk !== false) unset ($tarray[$tk]);
 
-                         $tk = array_search("!$entry", $tarray);
-                         if ($tk !== false) unset($tarray[$tk]);
+                         	$tk = array_search("!$entry", $tarray);
+                         	if ($tk !== false) unset($tarray[$tk]);
 
-                         $tk = array_search($entry, $varray);
-                         if ($tk !== false) unset ($varray[$tk]);
+                         	$tk = array_search($entry, $varray);
+                         	if ($tk !== false) unset ($varray[$tk]);
 
-                         $tk = array_search("!$entry", $varray);
-                         if ($tk !== false) unset ($varray[$tk]);
+                         	$tk = array_search("!$entry", $varray);
+                         	if ($tk !== false) unset ($varray[$tk]);
+                     	}
                      }
 
                      $acl[FLD_DESTINATIONNAME]     = implode (" ", $tarray);
