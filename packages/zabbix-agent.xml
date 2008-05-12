@@ -79,37 +79,30 @@
 
 		exec("/bin/rm -f /usr/local/etc/rc.d/zabbix_agentd");
 
-		$start  = "/bin/mkdir -p /var/log/zabbix;";
-		$start  .= "/usr/sbin/chown -R zabbix:zabbix /var/log/zabbix;";
+		$start  = "/bin/mkdir -p /var/log/zabbix\n";
+		$start  .= "/usr/sbin/chown -R zabbix:zabbix /var/log/zabbix\n";
 
-		$start  .= "/bin/mkdir -p /var/run/zabbix;";
-		$start  .= "/usr/sbin/chown -R zabbix:zabbix /var/run/zabbix;";
+		$start  .= "/bin/mkdir -p /var/run/zabbix\n";
+		$start  .= "/usr/sbin/chown -R zabbix:zabbix /var/run/zabbix\n";
 
-		/* start snort */
-		$start .= "/usr/local/bin/zabbix_agentd;";
+        $start  .= "echo \"Starting Zabbix Agent\"...\n";
+
+		/* start zabbix agent */
+		$start .= "/usr/local/bin/zabbix_agentd\n";
+
+        $stop = "echo \"Stopping Zabbix Agent\"\n";
+        $stop .= "/usr/bin/killall zabbix_agentd\n"
 
 		/* write out rc.d start/stop file */
 		write_rcfile(array(
 						"file" => "zabbix_agentd.sh",
 						"start" => "{$start}",
-						"restart" => "/usr/bin/killall zabbix_agentd; {$start};",
-						"stop" => "/usr/bin/killall zabbix_agentd;"
+						"restart" => "$stop\nsleep 5\n{$start}",
+						"stop" => "$stop"
 				)
 		);
 
-		$conf = "Server=127.0.0.1\n";
-        $conf .= "StartAgents=5\n";
-        $conf .= "DebugLevel=3\n";
-        $conf .= "PidFile=/var/run/zabbix/zabbix_agentd.pid\n";
-        $conf .= "LogFile=/var/log/zabbix/zabbix_agentd.log\n";
-        $conf .= "LogFileSize=1\n";
-        $conf .= "Timeout=3\n";
-
-        file_put_contents("/usr/local/etc/zabbix/zabbix_agentd.conf", $conf);
-
 		conf_mount_ro();
-
-		start_service("zabbix_agentd");
 	]]>
 	</custom_php_install_command>
 	<custom_php_command_before_form></custom_php_command_before_form>
@@ -144,8 +137,8 @@
         $conf = "Server=$Server\n";
         $conf .= "ServerPort=$ServerPort\n";
         $conf .= "Hostname=$Hostname\n";
+        $conf .= "ListenIP=0.0.0.0\n"; 
         $conf .= "ListenPort=$ListenPort\n";
-        $conf .= "Hostname=$Hostname\n";
         $conf .= "StartAgents=5\n";
         $conf .= "DebugLevel=3\n";
         $conf .= "PidFile=/var/run/zabbix/zabbix_agentd.pid\n";
