@@ -591,9 +591,9 @@
 		<status>FINAL</status>
 		<required_version>1.2</required_version>
 		<configurationfile>zabbix-agent.xml</configurationfile>
-		<maintainer>Remco Verhoef</maintainer>
-		<depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
-		<depends_on_package>zabbix-agent-1.4.4,1.tbz</depends_on_package>
+		<maintainer>Remco Verhoef (remco.verhoef@redfive.biz)</maintainer>
+		<depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
+		<depends_on_package>zabbix-agent-1.4.5,1.tbz</depends_on_package>
 	</package>
   </packages>
 <ENDOFPACKAGES>
