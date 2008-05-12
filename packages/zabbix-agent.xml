@@ -91,7 +91,7 @@
 		$start .= "/usr/local/bin/zabbix_agentd\n";
 
         $stop = "echo \"Stopping Zabbix Agent\"\n";
-        $stop .= "/usr/bin/killall zabbix_agentd\n"
+        $stop .= "/usr/bin/killall zabbix_agentd\n";
 
 		/* write out rc.d start/stop file */
 		write_rcfile(array(
