@@ -92,9 +92,9 @@ define('BLACKLIST_DEFAULT_URL',  'http://ftp.teledanmark.no/pub/www/proxy/squidG
 define('BLACKLIST_DEFAULT_URL1', 'http://squidguard.mesd.k12.or.us/blacklists.tgz'); // 3.5Mb
 define('BLACKLIST_DEFAULT_URL2', 'http://blacklist.dansguardian.org/cgi-bin/download.pl?type=download&file=bigblacklist');
 define('BLACKLIST_TMP_FILE',    '/var/tmp/blacklists.tar.gz');
-define('BLACKLIST_BTN_STD',     'Upload Std');
 define('BLACKLIST_BTN_URL',     'Upload Url');
-define('BLACKLIST_BTN_FILE',    'Upload File');
+define('BLACKLIST_BTN_LAST',    'Restore last');
+
 define('BLACKLIST_LOGFILE',     'blacklist.log');
 
 define('APPLY_BTN', 'Apply');
@@ -142,43 +142,31 @@ function squidguard_validate_acl($post, $input_errors) {
 
             // check unique name
             if (!check_unique_name(MODULE_ACL, $name))
-                $input_errors[] = "Name '$name' already exists";
+                $input_errors[] = "Name '$name' already exists.";
         }
 
         // store destinations to 'dest' value
         foreach ($post as $key => $val) {
                 if (substr_count($key, PREFLD_UPTIME) != 0) {
                         $name = str_replace(PREFLD_UPTIME, '', $key);
-                        if ($name)
-                            $pass_up[$name] = 'on';
-                }
-                elseif (substr_count($key, PREFLD_UPTIME_DENY) != 0) {
-                        $name = str_replace(PREFLD_UPTIME_DENY, '', $key);
-                        if ($name)
-                            $deny_up[$name] = 'on';
+                        if ($name) {
+                            switch($val) {
+                               case "allow": $pass_up_val .= " $name";  break;
+                               case "white": $pass_up_val .= " ^$name"; break;
+                               case "deny" : $pass_up_val .= " !$name"; break;
+                            }
+                        }
                 }
                 elseif (substr_count($key, PREFLD_OVERTIME) != 0) {
                         $name = str_replace(PREFLD_OVERTIME, '', $key);
-                        if ($name)
-                            $pass_over[$name] = 'on';
+                        if ($name) {
+                            switch($val) {
+                               case "allow": $pass_over_val .= " $name";  break;
+                               case "white": $pass_over_val .= " ^$name"; break;
+                               case "deny" : $pass_over_val .= " !$name"; break;
+                            }
+                        }
                 }
-                elseif (substr_count($key, PREFLD_OVERTIME_DENY) != 0) {
-                        $name = str_replace(PREFLD_OVERTIME_DENY, '', $key);
-                        if ($name)
-                            $deny_over[$name] = 'on';
-                }
-        }
-
-        foreach ($pass_up as $key => $val) {
-                if ($deny_up[$key])
-                     $pass_up_val .= " !$key";
-                else $pass_up_val .= " $key";
-        }
-
-        foreach ($pass_over as $key => $val) {
-                if ($deny_over[$key])
-                     $pass_over_val .= " !$key";
-                else $pass_over_val .= " $key";
         }
 
         // !ATTENTION! on pfSense XML config must be must(shell) be '!all' instead of 'none' - it is a must for correct work GUI
@@ -358,6 +346,12 @@ function squidguard_resync() {
            if ($url)
                sg_reconfigure_blacklist($url, $proxy);
        }
+
+       // blacklist restore last (if exists)
+       if ($submit == BLACKLIST_BTN_LAST) {
+           restore_arc_blacklist();
+       }
+
        // apply changes
        if ($submit == APPLY_BTN) {
 #           write_config('Update squidGuard options.'); // store, if not 'Save' button
@@ -443,30 +437,8 @@ function get_pkg_items_list($pkg_gui_name, $fieldname) {
 # ==============================================================================
 # Before form
 # ==============================================================================
-
-// -----------------------------------------------------------------------------
-// squidguard_before_form_src -- ### will deleted ###
-// -----------------------------------------------------------------------------
-function squidguard_before_form_src($pkg) {
-         global $config;
-         global $g;
-         $i=0;
-         foreach($pkg['fields']['field'] as $field) {
-                 if ($field['fieldname'] == 'order') {
-                         $fld = &$pkg['fields']['field'][$i];
-                         $img_up   = "<img src='./themes/{$g['theme']}/images/icons/icon_up.gif'
-                                      title='move up' width='17' height='17' border='0' onclick='on_moveup()'>";
-                         $img_down = "<img src='./themes/{$g['theme']}/images/icons/icon_down.gif'
-                                      title='move down' width='17' height='17' border='0' onclick='on_movedown()'>";
-                         $s = "$img_up $img_down <br> <b>Move to:</b> " . $fld['description'];
-                         $fld['description'] = $s;
-                  }
-                  $i++;
-         }
-}
-// -----------------------------------------------------------------------------
-// squidguard_before_form_dest
-// -----------------------------------------------------------------------------
+# squidguard_before_form_dest
+# ------------------------------------------------------------------------------
 function squidguard_before_form_dest($pkg) {
          global $config;
          $expr_names = '';
@@ -493,15 +465,15 @@ function squidguard_before_form_dest($pkg) {
         }
 }
 
-// -----------------------------------------------------------------------------
-// squidguard_before_form
-// -----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# squidguard_before_form
+# ------------------------------------------------------------------------------
 function squidguard_before_form($pkg) {
         $i=0;
 
         foreach($pkg['fields']['field'] as $field) {
                 // blacklist controls
-                if ($field['fieldname'] == 'blacklist') {
+                if ($field['fieldname'] == 'blacklist_url') {
                         $fld = &$pkg['fields']['field'][$i];
                         $fld['description'] .= make_grid_blacklist();        // insert to description custom controls
                 }
@@ -595,51 +567,67 @@ function squidguard_before_form_acl($pkg, $is_acl=true) {
                 $pss = str_replace(']', '', $acl_dest);
                 $pss = explode(' ', $pss);
                 foreach($pss as $val) {
-                        $name = str_replace('!', '', $val);
+                        $name = $val;
+                        $name = str_replace('!', '', $name);
+                        $name = str_replace('^', '', $name);
                         if ($val == '[')     { $overtime = 'yes'; continue; }
                         elseif ($val == ']') { break; }
                         if (empty($overtime)) {
-                                if($val[0] != '!')
-                                     $acls_up[$name] = 'pass';
-                                else $acls_up[$name] = 'deny';
+                            if (!empty($val)) {
+                                 switch($val[0]) {
+                                   case '!': $acls_up[$name] = 'deny';  break;
+                                   case '^': $acls_up[$name] = 'white'; break;
+                                   default : $acls_up[$name] = 'allow'; break;
+                                 }
+                            }
                         } else {
-                                if($val[0] != '!')
-                                     $acls_over[$name] = 'pass';
-                                else $acls_over[$name] = 'deny';
+                            if (!empty($val)) {
+                                 switch($val[0]) {
+                                   case '!': $acls_over[$name] = 'deny';  break;
+                                   case '^': $acls_over[$name] = 'white'; break;
+                                   default : $acls_over[$name] = 'allow'; break;
+                                 }
+                            }
                         }
                 }
          }
 
         // --- Destinations ---
         $general_cfg = $config['installedpackages'][MODULE_GENERAL]['config'][0];
-        $dest_cfg =  $config['installedpackages'][MODULE_DESTINATION]['config'];
+        $dest_cfg = $config['installedpackages'][MODULE_DESTINATION]['config'];
 
         // Blacklist
         if ($general_cfg['blacklist'] == 'on') {
             $blk_entries = sg_entries_blacklist();
             if (!empty($blk_entries)) {
                 foreach($blk_entries as $dst)
-                        $dest_items[] = array ('name'=>$dst, 'upt_value'=>$acls_up[$dst],
-                                               'ovt_value'=>$acls_over[$dst], 'description'=>'');
+                        $dest_items[] = array ('name'=>$dst,
+                                               'upt_value'=>$acls_up[$dst],
+                                               'ovt_value'=>$acls_over[$dst],
+                                               'description'=>'');
             }
         }
 
         // User destinations
         if ($dest_cfg) {
             foreach($dest_cfg as $dst)
-                    $dest_items[] = array ('name'=>$dst[FLD_NAME], 'upt_value'=>$acls_up[$dst[FLD_NAME]],
-                                           'ovt_value'=>$acls_over[$dst[FLD_NAME]], 'description'=>$dst[FLD_DESCRIPTION]);
+                    $dest_items[] = array ('name'=>$dst[FLD_NAME],
+                                           'upt_value'=>$acls_up[$dst[FLD_NAME]],
+                                           'ovt_value'=>$acls_over[$dst[FLD_NAME]],
+                                           'description'=>$dst[FLD_DESCRIPTION]);
         }
 
         // Default all
-        $dest_items[] = array('name'=>FLT_DEFAULT_ALL, 'upt_value'=>$acls_up[FLT_DEFAULT_ALL],
-                        'ovt_value'=>$acls_over[FLT_DEFAULT_ALL], 'description'=>'Default access');
+        $dest_items[] = array('name'=>FLT_DEFAULT_ALL,
+                              'upt_value'=>$acls_up[FLT_DEFAULT_ALL],
+                              'ovt_value'=>$acls_over[FLT_DEFAULT_ALL],
+                              'description'=>'Default access');
 
         $i=0;
         foreach($pkg['fields']['field'] as $field) {
                 if (($field['fieldname'] == 'dest')/* || ($field['fieldname'] == 'overdest')*/) {
                         $fld = &$pkg['fields']['field'][$i];
-                        $fld['description'] .= make_grid_controls('checkbox', $dest_items, $is_acl);        // insert to description custom controls
+                        $fld['description'] .= make_grid_controls('', $dest_items, $is_acl);        // insert to description custom controls
                 }
                 $i++;
         }
@@ -842,26 +830,32 @@ function make_grid_general_items($id = '')
 {
         global $config;
 
+		$bg_color = "bgcolor='#dddddd'";
         $res = '';
         $res .= "<table width='100%'>";
 
         if ($id == '') {
             // Apply
-            $res .= "<tr bgcolor='#dddddd'><td><big>For saving configuration YOU need click button 'Save' on bottom of page</big></td></tr>
-                     <tr><td><big>After changing configuration Squid or squidGuard you must <b><span style='color: #800000;'>apply all changes</span></b></big></td></tr>
+            $res .= "<tr $bg_color><td><big>For saving configuration YOU need click button 'Save' on bottom of page</big></td></tr>
+                     <tr><td><big>After changing configuration squidGuard you must <b><span style='color: #800000;'>apply all changes</span></b></big></td></tr>
                      <tr><td><input name='submit' type='submit' value='Apply'></td></tr>";
 
             // service state
             $sgstate = "<span style='color: #800000;'>STOPPED</span>";
-            if (is_service_running("squidGuard")) $sgstate = "<span style='color: #008000;'>STARTED</span>";
-            $res .= "<tr bgcolor='#dddddd'><td><big>SquidGuard service state: <b>$sgstate</b></big></td></tr>";
+            if (is_service_running("squidGuard"))
+            	$sgstate = "<span style='color: #008000;'>STARTED</span>";
+
+            if (is_blacklist_update_started()) {
+            	$sgstate .= "<br><span style='color: #800000;'>Wait: began updating the blacklist.<br>New data will be available after some time.<br>After the upgrade, it is necessary to check the configuration.</span>";
+			}
+            $res .= "<tr $bg_color><td><big>SquidGuard service state: <b>$sgstate</b></big></td></tr>";
         } else
         if ($id == 'gui_log') {
             if ($config['installedpackages']['squidguardgeneral']['config'][0]['view_gui_log'] == 'on') {
                 $log_content = sg_getlog(50);
                 $log_content = str_replace("\n","<br>", $log_content);
-                $res .= "<tr bgcolor='#dddddd'><td><font size='-1'><b>Web GUI log (Latest 50)</b></font></td></tr>";
-                $res .= "<tr bgcolor='#dddddd'><td vAlign=top width='100%'><font size='-2'>$log_content</font></td></tr>";
+                $res .= "<tr $bg_color><td><font size='-1'><b>Web GUI log (Latest 50)</b></font></td></tr>";
+                $res .= "<tr $bg_color><td vAlign=top width='100%'><font size='-2'>$log_content</font></td></tr>";
             }
         }
 
@@ -873,13 +867,14 @@ function make_grid_general_items($id = '')
 // make_grid_blacklist
 // -----------------------------------------------------------------------------
 function make_grid_blacklist() {
-        // button 'Upload URL'
-        $res = "<br><input name='submit' value='" . BLACKLIST_BTN_URL  . "' type='submit'>";
-        if (file_exists(SG_INFO_FILE))
-            $res .= "<br><b>Rebuild status:</b><span style='color: #800000;'>" .
-                    str_replace("\n", "<br>", file_get_contents(SG_INFO_FILE) .
-                    "</span>");
-        return $res;
+         $res = '';
+
+         // button 'Upload URL'
+         $res = "<br><input name='submit' value='" . BLACKLIST_BTN_URL  . "' type='submit'>";
+         // button 'Restore last blacklist'
+         $res .= "&nbsp;<input name='submit' value='" . BLACKLIST_BTN_LAST  . "' type='submit'>";
+
+         return $res;
 }
 
 // -----------------------------------------------------------------------------
@@ -907,49 +902,83 @@ function make_grid_controls($type, $items, $enable_overtime = true) {
                 $upt_val = $item['upt_value'];
                 $ovt_val = $item['ovt_value'];
                 $description = $item['description'];
-                $upt_on   = '';
-                $upt_deny = '';
-                $ovt_on   = '';
-                $ovt_deny = '';
 
-                if ($upt_val) $upt_on = 'CHECKED';
-                if ($upt_val == 'deny') $upt_deny = 'CHECKED';
+                $sel = "selected=\"selected\"";
+                $upt_A = $upt_B = $upt_C = $upt_D = '';
+                switch($upt_val) {
+                       case "allow": $upt_B = $sel; break;
+                       case "white": $upt_C = $sel; break;
+                       case "deny" : $upt_D = $sel; break;
+                       default:      $upt_A = $sel; break;
+                }
 
-                if ($ovt_val) $ovt_on = 'CHECKED';
-                if ($ovt_val == 'deny') $ovt_deny = 'CHECKED';
+                $ovt_A = $ovt_B = $ovt_C= $ovt_D = '';
+                switch($ovt_val) {
+                       case "allow": $ovt_B = $sel; break;
+                       case "white": $ovt_C = $sel; break;
+                       case "deny" : $ovt_D = $sel; break;
+                       default:      $ovt_A = $sel; break;
+                }
+                unset($sel);
 
                 $tbl .= "<tr>";
                 // uptime table
-                $tbl .= "<td $color><input type=\"$type\" name=\"" . PREFLD_UPTIME . "$name\" $upt_on></td>";
+                $tnm  = PREFLD_UPTIME . $name;
+                $tbl .= "<td $color></td>";
                 $tbl .= "<td $color>$description [$name]</td>";
-                $tbl .= "<td $color><input type=\"$type\" name=\"" . PREFLD_UPTIME_DENY . "$name\" $upt_deny></td>";
-                $tbl .= "<td $color>deny access</td>";
+                $tbl .= "<td $color>access</td>";
+                $tbl .= "<td $color><select id=$tnm name=\"$tnm\">";
+                if (substr_count($name, "all") === 0) {
+                       $tbl .= "<option value=none  name=\"----\"  $upt_A>----</option>";
+                       $tbl .= "<option value=allow name=\"allow\" $upt_B>allow</option>";
+                       $tbl .= "<option value=white name=\"white\" $upt_C>white</option>";
+                       $tbl .= "<option value=deny  name=\"deny\"  $upt_D>deny </option>";
+                } else {
+                       $tbl .= "<option value=allow name=\"allow\" $upt_B>allow</option>";
+                       $tbl .= "<option value=deny  name=\"deny\"  $upt_D>deny </option>";
+                }
+                $tbl .= "</td>";
+
                 // overtime table
                 if ($enable_overtime) {
-                    $tbl .= "<td $color><input type=\"$type\" name=\"" . PREFLD_OVERTIME . "$name\" $ovt_on></td>";
+                    $tnm  = PREFLD_OVERTIME . $name;
+                    $tbl .= "<td $color></td>";
                     $tbl .= "<td $color>$description [$name]</td>";
-                    $tbl .= "<td $color><input type='$type' name=\"" . PREFLD_OVERTIME_DENY . "$name\" $ovt_deny></td>";
-                    $tbl .= "<td $color>deny access</td>";
-                } else {
-
+                    $tbl .= "<td $color>access</td>";
+                    $tbl .= "<td $color><select id=$tnm name=\"$tnm\">";
+                    if (substr_count($name, "all") === 0) {
+                           $tbl .= "<option value=none  name=\"----\"  $ovt_A>----</option>";
+                           $tbl .= "<option value=allow name=\"allow\" $ovt_B>allow</option>";
+                           $tbl .= "<option value=white name=\"white\" $ovt_C>white</option>";
+                           $tbl .= "<option value=deny  name=\"deny\"  $ovt_D>deny </option>";
+                    } else {
+                           $tbl .= "<option value=allow name=\"allow\" $ovt_B>allow</option>";
+                           $tbl .= "<option value=deny  name=\"deny\"  $ovt_D>deny </option>";
+                    }
+                    $tbl .= "</td>";
                 }
                 $tbl .= "</tr>";
         }
 
+        # header
         if (!empty($tbl)) {
                 $thdr = '';
+                $hdr1up = "Destinations in uptime";
+                $hdr1ov = "Destinations in overtime";
+                $hdr2up = "Select destinations for uptime rule.";
+                $hdr2ov = "Select destination for overtime rule.";
+                $hds3   = "Access option priority: 1-'white'(whitelist), 2-'deny'(blacklist), 3-'allow', 4-all rule('allow' ro 'deny').";
                 if ($enable_overtime) {
-                    $thdr = "<tr>" .
-                            "<th colspan='4' align=middle>Destinations in uptime</th>" .
-                            "<th colspan='4' align=middle>Destinations in overtime</th></tr><tr>" .
-                            "<td colspan='4' align=middle>Select destinations for uptime rule</td>" .
-                            "<td colspan='4' align=middle>Select destination for overtime rule.<br>" .
-                            "If time not defined, this part must be ignored</td></tr>";
+                    $thdr =
+                            "<tr><th colspan='4' align=middle>$hdr1up</th><th colspan='4' align=middle>$hdr1ov</th></tr>" .
+                            "<tr><td colspan='4' align=middle>$hdr2up</td><td colspan='4' align=middle>$hdr2ov<br>If <b>'Time'</b> not defined, this part must be ignored</td></tr>" .
+                            "<tr><td colspan='8' align=left><hr><b>$hds3</b><hr></td></tr>";
                     // formatting
                     $thdr .= "<tr><td/><td width='35%'/><td/><td/><td/><td width='35%'/><td/><td/></tr>";
                 } else {
-                    $thdr = "<tr><th colspan='4' align=middle>Destinations in uptime</th></tr>" .
-                            "<tr><td colspan='4' align=middle>Select destinations for uptime rule</td></tr>";
+                    $thdr = "<tr><th colspan='4' align=middle>$hdr1up</th></tr>" .
+                            "<tr><td colspan='4' align=middle>$hdr2up</td></tr>" .
+                            "<tr><td colspan='4' align=middle><hr><b>$hds3</b><hr></tr>";
                     // formatting
                     $thdr .= "<tr><td width='5%'/><td/><td width='5%'/><td width='10%'/></tr>";
                 }
@@ -1254,21 +1283,6 @@ function convert_pfxml_to_sgxml() {
 #
 function convert_pfxml_to_sgxml_source($pfconfig) {
         $sgxml = array();
-/*
-# --- previous ver ---
-        $pfxml = $pfconfig['installedpackages']['squidguardsrc']['config'];
-        if (is_array($pfxml)) {
-            foreach($pfxml as $pfx) {
-                $sgx = array();
-                $sgx[FLD_NAME]                 = $pfx['name'];
-                $sgx[FLD_IP]                   = $pfx['iplist'];
-                $sgx[FLD_DOMAINS]              = $pfx[FLD_DOMAINS];
-                $sgx[FLD_LOG]                  = $pfx['enablelog'];
-                $sgx[FLD_DESCRIPTION]          = $pfx['description'];
-                $sgxml[FLD_ITEM][] = $sgx;
-            }
-        }
-*/
         $pfxml = $pfconfig['installedpackages']['squidguardacl']['config'];
         if (is_array($pfxml)) {
             foreach($pfxml as $pfx) {
@@ -1290,7 +1304,6 @@ function convert_pfxml_to_sgxml_source($pfconfig) {
 // -----------------------------------------------------------------
 function convert_pfxml_to_sgxml_destination($pfconfig) {
         $sgxml = array();
-
         $pfxml = $pfconfig['installedpackages']['squidguarddest']['config'];
         if (is_array($pfxml)) {
             foreach($pfxml as $pfx) {
