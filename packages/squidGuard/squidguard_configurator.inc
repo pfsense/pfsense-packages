@@ -319,7 +319,7 @@ function sg_reconfigure() {
                  $conf_file = $squidguard_config[FLD_WORKDIR] . SQUIDGUARD_CONFIGFILE;
              file_put_contents($conf_file, $conf);
              file_put_contents('/usr/local/etc/squid' . SQUIDGUARD_CONFIGFILE, $conf); // << squidGuard want config '/usr/local/etc/squid' by default
-             set_file_access($squidguard_config[FLD_WORKDIR], OWNER_NAME, 0664);
+             set_file_access($squidguard_config[FLD_WORKDIR], OWNER_NAME, 0755);
              sg_addlog("sg_reconfigure: Generate squidGuard config and save to '$conf_file'.", 1);
          }
 
@@ -391,7 +391,7 @@ function sg_check_system() {
              // check dir's
              if (!file_exists($work_dir)) {
                   mwexec("mkdir -p $work_dir");
-                  set_file_access($work_dir, OWNER_NAME, 0664);
+                  set_file_access($work_dir, OWNER_NAME, 0755);
                   sg_addlog("sg_check_system: Create work dir '$work_dir'.", 1);
              }
          }
@@ -406,7 +406,7 @@ function sg_check_system() {
             }
             // set access right - need start any time;
             // (SG possible start from console and log file will have only root access)
-            set_file_access($log_dir, OWNER_NAME, 0664);
+            set_file_access($log_dir, OWNER_NAME, 0755);
          }
          unset($log_dir);
 
@@ -418,7 +418,7 @@ function sg_check_system() {
                  sg_addlog("sg_check_system: Create db dir '$db_dir'.", 1);
             }
             // set access right
-            set_file_access($db_dir, OWNER_NAME, 0664);
+            set_file_access($db_dir, OWNER_NAME, 0755);
          }
          unset($db_dir);
 }
@@ -436,11 +436,11 @@ function sg_reconfigure_user_db() {
 
          // create user DB catalog, if not extsts
          if (!file_exists($dbhome)) {
-             if (!mkdir($dbhome, 0664)) {
+             if (!mkdir($dbhome, 0755)) {
                   sg_addlog("sg_reconfigure_user_db: Error create user DB directory '$dbhome'.", 2);
                   return;
              }
-             set_file_access($dbhome, OWNER_NAME, 0664);
+             set_file_access($dbhome, OWNER_NAME, 0755);
              sg_addlog("sg_reconfigure_user_db: Create user DB directory '$dbhome'.", 1);
          }
 
@@ -458,7 +458,7 @@ function sg_reconfigure_user_db() {
 
                      // 1. check destination catalog and create them, if need
                      if (!file_exists($path)) {
-                          if (!mkdir ($path, 0664)) {
+                          if (!mkdir ($path, 0755)) {
                                sg_addlog("sg_reconfigure_user_db: Error create dir '$path'.", 2);
                                return;
                           }
@@ -495,7 +495,7 @@ function sg_reconfigure_user_db() {
              }
 
              // 5. recursive set files access
-             set_file_access($dbhome, OWNER_NAME, 0664);
+             set_file_access($dbhome, OWNER_NAME, 0755);
 
              // 6. rebuild user db ('/var/db/squidGuard')
              sg_rebuild_db("_usrdb", $dbhome, $dst_list);
@@ -1014,6 +1014,8 @@ function sg_create_config() {
          // --- ACL end ---
          $sgconf[] = "}";
 
+         # delete "\n" chars before each string - SG bug (first string of config must be not empty)
+         foreach ($sgconf as $key => $val) $sgconf[$key] = ltrim($sgconf[$key], "\n");
          return implode("\n", $sgconf);
 }
 # ------------------------------------------------------------------------------
@@ -1071,7 +1073,9 @@ function sg_create_simple_config($blk_dbhome, $blk_destlist, $redirect_to = "404
          $sgconf[] = "\t\t redirect " . sg_redirector_base_url($redirect_to, true); // use sgerror only!
          $sgconf[] = "\t } \n}";
 
-         sg_addlog("sg_create_simple_config: End.");
+         # delete "\n" chars before each string - SG bug (first string of config must be not empty)
+         foreach ($sgconf as $key => $val) $sgconf[$key] = ltrim($sgconf[$key], "\n");
+
          return implode("\n", $sgconf);
 }
 
@@ -1467,12 +1471,12 @@ function sg_update_blacklist($from_file) {
              if (file_exists($tmp_unpack_dir)) mwexec("rm -R  . $tmp_unpack_dir");
              if (file_exists($arc_db_dir))     mwexec("rm -R  . $arc_db_dir");
              # create new tmp/arc dir's
-             mwexec("mkdir -p -m 0664 $tmp_unpack_dir");
-             mwexec("mkdir -p -m 0664 $arc_db_dir");
+             mwexec("mkdir -p -m 0755 $tmp_unpack_dir");
+             mwexec("mkdir -p -m 0755 $arc_db_dir");
 
              # 1. unpack archive
              mwexec("tar zxvf $from_file -C $tmp_unpack_dir");
-             set_file_access($tmp_unpack_dir, OWNER_NAME, 0664);
+             set_file_access($tmp_unpack_dir, OWNER_NAME, 0755);
              sg_addlog("sg_update_blacklist: Unpack uploaded file '$from_file' -> '$tmp_unpack_dir'.", 1);
 
              # 2. copy blacklist to squidGuard base & create entries list
@@ -1500,30 +1504,30 @@ function sg_update_blacklist($from_file) {
                               sg_addlog("sg_update_blacklist: Move {$val['path']}/ -> $current_dbpath.", 1);
                           }
                  }
-                 set_file_access($arc_db_dir, OWNER_NAME, 0664);
+                 set_file_access($arc_db_dir, OWNER_NAME, 0755);
 
                  # -- DISABLED -- copy unrebuilded blacklist from arch_DB_to work DB & set access rights
 #                 mwexec("cp -R $arc_db_dir/ $dbhome");
-#                 set_file_access($dbhome, OWNER_NAME, 0664);
+#                 set_file_access($dbhome, OWNER_NAME, 0755);
 
                  # create entries list
                  if (count($blk_items)) {
                       # save to temp DB
                       $blklist_file = SQUIDGUARD_VAR . SQUIDGUARD_BLK_ENTRIES;
                       file_put_contents($blklist_file, implode("\n", array_keys($blk_items)));
-                      set_file_access  ($blklist_file, OWNER_NAME, 0664);
+                      set_file_access  ($blklist_file, OWNER_NAME, 0755);
 
                       # -- DISABLED -- save copy to squidGuard config dir
 #                      $blklist_file = "{$squidguard_config[FLD_WORKDIR]}/" . SQUIDGUARD_BLK_ENTRIES;
 #                      file_put_contents($blklist_file, implode("\n", array_keys($blk_items)));
-#                      set_file_access  ($blklist_file, OWNER_NAME, 0664);
+#                      set_file_access  ($blklist_file, OWNER_NAME, 0755);
                       sg_addlog("sg_update_blacklist: Create DB entries list '$blklist_file'.", 1);
                  }
 
                  # make rebuild config (included all found dest items) & save to work dir
                  $conf_path = SQUIDGUARD_VAR . DB_REBUILD_BLK_CONF;   # "/tmp/squidGuard_rebuild_blk.conf";
                  file_put_contents($conf_path, sg_create_simple_config($arc_db_dir, $blk_list));
-                 set_file_access($conf_path, OWNER_NAME, 0664);
+                 set_file_access($conf_path, OWNER_NAME, 0755);
                  sg_addlog("sg_update_blacklist: Create rebuild config '$conf_path'.", 1);
 
                  # *** SH script ***********************************************
@@ -1533,7 +1537,7 @@ function sg_update_blacklist($from_file) {
                  $sh_scr[] = $squidguard_config[FLD_BINPATH] . "/squidGuard -c $conf_path -C all";
                  $sh_scr[] = "wait"; # wait while SG rebuild DB
                  $sh_scr[] = "chown -R -v " . OWNER_NAME . " $arc_db_dir";
-                 $sh_scr[] = "chmod -R -v 0664 $arc_db_dir";
+                 $sh_scr[] = "chmod -R -v 0755 $arc_db_dir";
 
                  # copy temp db to '/var/db/squidGuard (-R - recursive; -p - copy access rights)
                  # '$bl_temp_dbhome/' - slash in end of path - copy only dir content (not self dir)
@@ -1541,7 +1545,7 @@ function sg_update_blacklist($from_file) {
                  $sh_scr[] = "cp -f -p $blklist_file " . SQUIDGUARD_WORKDIR_DEF;
                  # set DB owner and right access
                  $sh_scr[] = "chown -R -v " . OWNER_NAME . " $dbhome";
-                 $sh_scr[] = "chmod -R -v 0664 $dbhome";
+                 $sh_scr[] = "chmod -R -v 0755 $dbhome";
 
                  # if new blacklist some as already installed, then restart squid for changes to take effects
                  $blk_items_old = '';
@@ -1695,12 +1699,12 @@ function restore_arc_blacklist() {
 
              // copy arc blacklist to work DB with permissions
              mwexec("cp -R -p $arc_db_dir/ $dbhome");
-             set_file_access($dbhome, OWNER_NAME, 0664);
+             set_file_access($dbhome, OWNER_NAME, 0755);
              sg_addlog("restore_arc_blacklist: Restore blacklist archive from '$arc_db_dir'.", 1);
 
              // copy black list file
              copy($arc_blklist_file, $blklist_file);
-             set_file_access($blklist_file, OWNER_NAME, 0664);
+             set_file_access($blklist_file, OWNER_NAME, 0755);
              sg_addlog("restore_arc_blacklist: Restore black list file from '$arc_blklist_file' to '$blklist_file'.", 1);
          } else {
              sg_addlog("restore_arc_blacklist: Error, file '$arc_db_dir' or '$blklist_file' not found.", 2);
