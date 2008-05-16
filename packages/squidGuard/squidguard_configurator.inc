@@ -1565,7 +1565,7 @@ function sg_update_blacklist($from_file) {
                  file_put_contents($shfile, $sh_scr);
                  set_file_access($shfile, OWNER_NAME, 0755); # 0755 - script will execute
                  # kill exists rebuild processes
-                 mwexec("kill `ps auxw | grep \"$shfile\" | grep -v \"grep\" | awk '{print $2}'`");                # sh script
+#                 mwexec("kill `ps auxw | grep \"$shfile\" | grep -v \"grep\" | awk '{print $2}'`");                # sh script
                  mwexec("kill `ps auxw | grep \"squidGuard_blk_rebuild\" | grep -v \"grep\" | awk '{print $2}'`"); # squidGuard process
                  mwexec_bg("nice -n 5 $shfile");
                  sg_addlog("sg_update_blacklist: Started sh script '$shfile'.", 1);
