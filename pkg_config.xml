@@ -146,7 +146,6 @@
       <version>0.13</version>
       <status>BETA</status>
       <required_version>2.0</required_version>
-      <maintainer>me@daniel.stefan.haischt.name</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>libmrss-0.13.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/phpmrss.xml</config_file>
@@ -281,7 +280,6 @@
       <version>0.68</version>
       <status>ALPHA</status>
       <required_version>HEAD</required_version>
-      <maintainer>me@daniel.stefan.haischt.name</maintainer>
       <depends_on_package_base_url>http://files.pfsense.com/packages/All/</depends_on_package_base_url>
       <depends_on_package>ataidle-0.9.tbz</depends_on_package>
       <depends_on_package>avahi+libdns-0.6.12.tbz</depends_on_package>
@@ -331,7 +329,6 @@
       <version>3.6.8</version>
       <status>PRE-ALPHA</status>
       <required_version>2.0</required_version>
-      <maintainer>me@daniel.stefan.haischt.name</maintainer>
       <logging>
         <facilityname>dspam</facilityname>
         <logfilename>dspam.log</logfilename>
@@ -349,7 +346,6 @@
       <version>0.1</version>
       <status>Stable</status>
       <required_version>1.0</required_version>
-      <maintainer>me@daniel.stefan.haischt.name</maintainer>
       <depends_on_package_base_url>http://files.pfsense.com/packages/All/</depends_on_package_base_url>
       <depends_on_package>sshtools-0.2.2.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/sshterm/sshterm.xml</config_file>
