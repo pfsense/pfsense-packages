@@ -428,7 +428,7 @@
       <version>1.1.2_1</version>
       <status>BETA</status>
       <required_version>1.0</required_version>
-      <maintainer>fernando@netfilter.com.br</maintainer>
+      <maintainer>none</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>freeradius-1.1.2_1.tbz</depends_on_package>
       <depends_on_package>libltdl-1.5.22.tbz</depends_on_package>
