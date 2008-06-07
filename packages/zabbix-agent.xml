@@ -16,7 +16,7 @@
   <service>
     <name>zabbix-agent</name>
     <rcfile>zabbix-agentd.sh</rcfile>
-    <executable>zabbix-agentd</executable>
+    <executable>zabbix_agentd</executable>
   </service>
   <tabs>
     <tab>
