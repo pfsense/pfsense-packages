@@ -59,5 +59,6 @@
 		exec("rm /usr/local/etc/rc.d/vmware-guestd.sh");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
+		exec("rm -f /usr/local/etc/rc.d/vmware*");
 	</custom_php_deinstall_command>
 </packagegui>
