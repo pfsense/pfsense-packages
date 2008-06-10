@@ -55,6 +55,8 @@
 		<item>http://www.pfsense.com/packages/config/open-vm-tools/vmware-kmod.sh</item>
 	</additional_files_needed>
 	<custom_php_install_command>
+		exec("rm /usr/local/etc/rc.d/vmware-kmod");
+		exec("rm /usr/local/etc/rc.d/vmware-guestd.sh");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 	</custom_php_deinstall_command>
