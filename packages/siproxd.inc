@@ -38,6 +38,7 @@ function siproxd_generate_rules($type) {
 	
 	/* proxy is turned off in package settings */
 	if($siproxd_conf['rtpenable'] == "0") {
+		log_error("WARNING: siproxd RTP proxy has not been enabled.  Not installing rules.");
 		return "\n";
 	}
 
@@ -62,6 +63,7 @@ function siproxd_generate_rules($type) {
 		}
 		break;
 	default:
+		log_error("Siproxd.inc -- error -- should not hit default case statement.");
 		break;
 	}
 
@@ -159,6 +161,12 @@ function sync_package_siproxd() {
 			);
 
 	    	exec("killall siproxd");
+	
+			sleep(1);
+			
+			start_service("siproxd");
+			
+			filter_configure();
     }
 
 ?>
