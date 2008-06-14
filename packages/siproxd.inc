@@ -30,7 +30,7 @@
 function siproxd_generate_rules($type) {
 	global $config;
 
-	$siproxd_conf = &$config['installedpackages']['siproxd']['config'][0];
+	$siproxd_conf = &$config['installedpackages']['siproxdsettings']['config'][0];
 	if (!is_service_running('siproxd')) {
 		log_error("Sipproxd is installed but not started.  Not installing redirect rules.");
 		return;
