@@ -46,7 +46,7 @@
       <config_file>http://www.pfsense.com/packages/config/siproxd.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>siproxd-0.7.0.tbz</depends_on_package>
-      <version>0.7.0</version>
+      <version>0.7.1</version>
       <status>ALPHA</status>
       <required_version>1.2</required_version>
       <configurationfile>siproxd.xml</configurationfile>
