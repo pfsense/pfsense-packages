@@ -605,7 +605,7 @@
 		<required_version>1.2</required_version>
 		<configurationfile>zabbix-agent.xml</configurationfile>
 		<maintainer>remco.verhoef@redfive.biz</maintainer>
-		<depends_on_package_base_url>ftp://ftp1.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/net-mgmt/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://ftp.nl.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All/</depends_on_package_base_url>
 		<depends_on_package>zabbix-agent-1.4.5,1.tbz</depends_on_package>
 	</package>
   </packages>
