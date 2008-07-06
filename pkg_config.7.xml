@@ -300,7 +300,6 @@
       <status>ALPHA</status>
       <configurationfile>netio.xml</configurationfile>
     </package>
-
     <package>
       <name>mtr-nox11</name>
       <maintainer>billm@pfsense.org</maintainer>
@@ -308,14 +307,13 @@
       <website>http://www.bitwizard.nl/mtr/</website>
       <category>Network Management</category>
       <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All</depends_on_package_base_url>
-      <depends_on_package>mtr-nox11-0.65_2.tbz</depends_on_package>
+      <depends_on_package>mtr-nox11-0.73_1.tbz</depends_on_package>
       <version>0.65_2</version>
       <status>ALPHA</status>
       <required_version>2.0</required_version>
       <config_file>http://www.pfsense.com/packages/config/mtr-nox11.xml</config_file>
       <configurationfile>mtr-nox11.xml</configurationfile>
     </package>
-
     <package>
       <name>squid</name>
       <descr>High performance web proxy cache.</descr>
@@ -327,12 +325,11 @@
       <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All</depends_on_package_base_url>
       <depends_on_package>squid-2.6.20_3.tbz</depends_on_package>
-      <depends_on_package>squid_radius_auth-1.0.8.tbz</depends_on_package>
-	  <depends_on_package>openldap-client-2.3.40.tbz</depends_on_package>
+      <depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
+	  <depends_on_package>openldap-client-2.3.42.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
       <configurationfile>squid.xml</configurationfile>
     </package>
-
     <package>
       <name>LCDproc</name>
       <descr>LCD display driver</descr>
