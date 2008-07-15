@@ -2,7 +2,8 @@
 /* $Id$ */
 /*
 	spamd_db.php
-	Copyright (C) 2006 Scott Ullrich
+	part of the pfSense project
+	Copyright (C) 2006, 2007, 2008 Scott Ullrich
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -59,6 +60,10 @@ if($_GET['action'] or $_POST['action']) {
 	$srcip = str_replace(" ","",$srcip);
 	/* execute spamdb command */
 	if($action == "'whitelist'") {
+		if(!is_ipaddr($srcip)) {
+			echo "Invalid IP address entered. Please correct the entry and try again.";
+			return;
+		}
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
 		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -T");
 		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -t");
