@@ -427,7 +427,7 @@ if (typeof getURL == 'undefined') {
 	}	
 ?>	</td></tr></table>
 	<tr><td>
-		<?php echo "<font face=\"arial\"><p><b>" . ($rows-1) . "</b> rows returned."; ?>
+		<?php echo "<font face=\"arial\"><p><b>" . $rows . "</b> rows returned."; ?>
 		<p>
 		* NOTE: adding an e-mail address to the spamtrap automatically traps any server trying to send e-mail to this address.
 	</td></tr>
