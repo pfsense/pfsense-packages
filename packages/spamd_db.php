@@ -100,7 +100,6 @@ if($_POST['spamtrapemail'] <> "") {
 	exec("/usr/local/sbin/spamdb -d {$spamtrapemail}");
 	exec("/usr/local/sbin/spamdb -d -T \"{$spamtrapemail}\"");
 	exec("/usr/local/sbin/spamdb -d -t \"{$spamtrapemail}\"");
-	mwexec("/usr/local/sbin/spamdb -T -a \"{$spamtrapemail}\"");
 	exec("/usr/local/sbin/spamdb -T -a '{$toaddress}'");	
 
 	mwexec("killall -HUP spamlogd");
@@ -338,7 +337,9 @@ if (typeof getURL == 'undefined') {
 				}				
 			}			
 		} else {
+			
 			$cmd = "/usr/local/sbin/spamdb | grep \"{$filter}\" | tail -n {$limit}";
+
 			$pkgdb = split("\n", `$cmd`);
 			if(file_exists("/var/db/blacklist.txt")) {
 				$cmd = "cat /var/db/blacklist.txt | grep \"{$filter}\" ";
@@ -356,6 +357,7 @@ if (typeof getURL == 'undefined') {
 	$lastseenip = "";
 	$srcip = "|";
 	foreach($pkgdb as $pkgdb_row) {
+
 		if($rows > $limit)
 			break;
 		$dontdisplay = false;
@@ -383,6 +385,13 @@ if (typeof getURL == 'undefined') {
 
 		*/
 		switch($pkgdb_split[0]) {
+			case "SPAMTRAP":
+				$recordtype = htmlentities($pkgdb_split[0]);
+				$srcip = htmlentities($pkgdb_split[1]);
+				$fromaddress = htmlentities($pkgdb_split[3]);
+				$toaddress = htmlentities($pkgdb_split[4]);
+				$attempts = htmlentities($pkgdb_split[8]);			
+				break;			
 			case "TRAPPED":
 				$recordtype = htmlentities($pkgdb_split[0]);
 				$srcip = htmlentities($pkgdb_split[1]);
@@ -440,7 +449,7 @@ if (typeof getURL == 'undefined') {
 <br>
 <span class="vexpl"><strong><span class="red">Note:</span> Clicking on the action icons will invoke a AJAX query and the page will not refresh.   Click refresh in you're browser if you wish to view the changes in status.</strong></span>
 <br>
-		<p><font size="-2"><b>Database totals:</b><br><font size="-3">
+		<p><font size="-2"><b>Database totals:</b><br><font size="-3"><br>
 		<?php
 			echo "&nbsp;&nbsp;{$whitelist_items} total items in the whitelist.<br>";
 			echo "&nbsp;&nbsp;{$blacklist_items} total items in the blacklist.<br>";
