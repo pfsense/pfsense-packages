@@ -418,6 +418,9 @@ if (typeof getURL == 'undefined') {
 		$rowtext .= "<a href='javascript:toggle_on(\"b{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_trapped_p.gif\");getURL(\"spamd_db.php?buttonid=b{$rows}&srcip={$srcip}&action=trapped\", outputrule);'><img title=\"Blacklist\" name='b{$rows}' id='b{$rows}' border=\"0\" alt=\"Blacklist\" src=\"/themes/{$g['theme']}/images/icons/icon_trapped.gif\"></a> ";
 		$rowtext .= "<a href='javascript:toggle_on(\"d{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_x_p.gif\");getURL(\"spamd_db.php?buttonid=d{$rows}&srcip={$srcip}&action=delete\", outputrule);'><img title=\"Delete\" border=\"0\" name='d{$rows}' id='d{$rows}' alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a>";
 		$rowtext .= "<a href='javascript:delete_row_db(\"{$rows}\"); toggle_on(\"s{$rows}\", \"/themes/{$g['theme']}/images/icons/icon_plus_bl_p.gif\");getURL(\"spamd_db.php?buttonid=s{$rows}&spamtrapemail={$toaddress}&action=spamtrap\", outputrule);'><img title=\"Spamtrap\" name='s{$rows}' id='s{$rows}' border=\"0\" alt=\"Spamtrap\" src=\"./themes/{$g['theme']}/images/icons/icon_plus_bl.gif\"></a> ";
+
+		echo $rowtext;
+		
 		echo "</td></tr>";
 
 		$rows++;
