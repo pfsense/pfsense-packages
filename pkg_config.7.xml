@@ -11,10 +11,10 @@
       <config_file>http://www.pfsense.com/packages/config/spamd.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>spamd-4.1.2.tbz</depends_on_package>
-      <version>4.3.6</version>
+      <version>4.3.7</version>
       <status>Stable</status>
       <required_version>1.2</required_version>
-      <maintainer>geekgod@geekgod.com</maintainer>
+      <maintainer>sullrich+pfsp@gmail.com</maintainer>
       <configurationfile>spamd.xml</configurationfile>
       <logging>
         <facilityname>spamd</facilityname>
@@ -129,7 +129,6 @@
 	  <depends_on_package>imspector-0.5.tbz</depends_on_package>
     </package>
 
-
     <package>
       <name>nut</name>
       <descr>Network UPS Tools</descr>
@@ -145,8 +144,7 @@
       <depends_on_package>nut-2.0.4.tbz</depends_on_package>
       <depends_on_package>nut-usb-2.0.4.tbz</depends_on_package>
 	</package>
-	
-	
+
 	<package>
 		<name>diag_new_states</name>
 		<descr>Paul Taylors version of Diagnostics States which utilizes pftop.</descr>
@@ -159,7 +157,6 @@
 		<config_file>http://www.pfsense.org/packages/config/diag_states_pt/diag_new_states.xml</config_file>
 		<configurationfile>http://www.pfsense.com/packages/config/diag_states_pt/diag_new_states.xml</configurationfile>
 	</package>
-
     <package>
       <name>sshterm</name>
       <descr>
@@ -177,7 +174,6 @@
       <config_file>http://www.pfsense.org/packages/config/sshterm/sshterm.xml</config_file>
       <configurationfile>sshterm.xml</configurationfile>
     </package>
-
     <package>
       <name>darkstat</name>
       <website>http://dmr.ath.cx/net/darkstat/</website>
@@ -189,7 +185,7 @@
       <version>3.0.619</version>
       <status>Stable</status>
       <required_version>1.0</required_version>
-      <maintainer>geekgod@geekgod.com</maintainer>
+      <maintainer>sullrich+pfsp@gmail.com</maintainer>
       <config_file>http://www.pfsense.com/packages/config/darkstat/darkstat.xml</config_file>
       <configurationfile>darkstat.xml</configurationfile>
     </package>
