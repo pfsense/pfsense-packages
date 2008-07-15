@@ -63,26 +63,26 @@ if($_GET['action'] or $_POST['action']) {
 	/* execute spamdb command */
 	if($action == "'whitelist'") {
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
-		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -T");
-		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -t");
+		exec("/usr/local/sbin/spamdb -d {$srcip} -T");
+		exec("/usr/local/sbin/spamdb -d {$srcip} -t");
 		delete_from_blacklist($srcip);
 		mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
 		exec("echo spamdb -a {$srcip} > /tmp/tmp");
 		exec("/usr/local/sbin/spamdb -a {$srcip}");
 	} else if($action == "'delete'") {
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
-		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -T");
-		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -t");
+		exec("/usr/local/sbin/spamdb -d {$srcip} -T");
+		exec("/usr/local/sbin/spamdb -d {$srcip} -t");
 		delete_from_blacklist($srcip);
 		mwexec("/sbin/pfctl -q -t spamd -T delete $srcip");
 		mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");		
 	} else if($action == "'spamtrap'") {
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
-		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -T");
-		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -t");
+		exec("/usr/local/sbin/spamdb -d {$srcip} -T");
+		exec("/usr/local/sbin/spamdb -d {$srcip} -t");
 		exec("/usr/local/sbin/spamdb -a {$srcip} -T");
 	} else if($action == "'trapped'") {
-		exec("/usr/local/sbin/spamdb -T -d \"{$toaddress}\"");
+		exec("/usr/local/sbin/spamdb -T -d {$toaddress}");
 		exec("/usr/local/sbin/spamdb -T -a '{$toaddress}'");	
 	}
 	/* signal a reload for real time effect. */
@@ -94,8 +94,8 @@ if($_GET['action'] or $_POST['action']) {
 if($_POST['spamtrapemail'] <> "") {
 	$spamtrapemail = escapeshellarg($_POST['spamtrapemail']);
 	exec("/usr/local/sbin/spamdb -d {$spamtrapemail}");
-	exec("/usr/local/sbin/spamdb -d -T \"{$spamtrapemail}\"");
-	exec("/usr/local/sbin/spamdb -d -t \"{$spamtrapemail}\"");
+	exec("/usr/local/sbin/spamdb -d -T {$spamtrapemail}");
+	exec("/usr/local/sbin/spamdb -d -t {$spamtrapemail}");
 	exec("/usr/local/sbin/spamdb -T -a '{$toaddress}'");	
 
 	mwexec("killall -HUP spamlogd");
@@ -121,7 +121,7 @@ if($_GET['getstatus'] <> "") {
 /* spam trap e-mail address */
 if($_GET['spamtrapemail'] <> "") {
 	$spamtrapemail = escapeshellarg($_GET['spamtrapemail']);
-	$status = exec("spamdb -T -a \"{$spamtrapemail}\"");
+	$status = exec("spamdb -T -a {$spamtrapemail}");
 	mwexec("killall -HUP spamlogd");
 	if($status)
 		echo $status;
@@ -133,7 +133,7 @@ if($_GET['spamtrapemail'] <> "") {
 /* whitelist e-mail address */
 if($_GET['whitelist'] <> "") {
 	$spamtrapemail = escapeshellarg($_GET['spamtrapemail']);
-	$status = exec("spamdb -a \"{$spamtrapemail}\"");
+	$status = exec("spamdb -a {$spamtrapemail}");
 	mwexec("killall -HUP spamlogd");
 	if($status)
 		echo $status;
@@ -152,7 +152,7 @@ function delete_from_blacklist($srcip) {
 				fwrite($fd, "{$bl}\n");
 	}
 	fclose($fd);
-	mwexec("/sbin/pfctl -q -t spamd -T delete $srcip");
+	mwexec("/sbin/pfctl -q -t spamd -T delete {$srcip}");
 	mwexec("/sbin/pfctl -q -t blacklist -T replace -f /var/db/blacklist.txt");
 	config_unlock();
 }
