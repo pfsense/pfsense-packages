@@ -50,14 +50,16 @@ if($_GET['action'] or $_POST['action']) {
 	if($_POST['action'])
 		$action = escapeshellarg($_POST['action']);
 	if($_GET['srcip'])
-		$srcip = escapeshellarg($_GET['srcip']);
+		$srcip = $_GET['srcip'];
 	if($_POST['srcip'])
-		$srcip = escapeshellarg($_POST['srcip']);
+		$srcip = $_POST['srcip'];
 	if($_POST['toaddress']) 
 		$toaddress = escapeshellarg($_POST['toaddress']);
 	$srcip = str_replace("<","",$srcip);
 	$srcip = str_replace(">","",$srcip);
 	$srcip = str_replace(" ","",$srcip);
+	// Make input safe
+	$srcip = escapeshellarg($srcip);
 	/* execute spamdb command */
 	if($action == "'whitelist'") {
 		if(!is_ipaddr($srcip)) {
