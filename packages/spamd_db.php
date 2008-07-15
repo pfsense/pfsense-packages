@@ -62,10 +62,6 @@ if($_GET['action'] or $_POST['action']) {
 	$srcip = escapeshellarg($srcip);
 	/* execute spamdb command */
 	if($action == "'whitelist'") {
-		if(!is_ipaddr($srcip)) {
-			echo "Invalid IP address entered. Please correct the entry and try again.";
-			return;
-		}
 		exec("/usr/local/sbin/spamdb -d {$srcip}");
 		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -T");
 		exec("/usr/local/sbin/spamdb -d \"{$srcip}\" -t");
