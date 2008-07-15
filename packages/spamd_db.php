@@ -447,10 +447,10 @@ if (typeof getURL == 'undefined') {
 <br>
 		<p><font size="-2"><b>Database totals:</b><br><font size="-3"><br>
 		<?php
-			echo "&nbsp;&nbsp;{$whitelist_items} total items in the whitelist.<br>";
-			echo "&nbsp;&nbsp;{$blacklist_items} total items in the blacklist.<br>";
-			echo "&nbsp;&nbsp;{$spamdb_grey} total items in the greylist.<br>";			
-			echo "&nbsp;&nbsp;{$spamdb_items} total items in the SpamDB.<br>";
+			echo "{$whitelist_items} total items in the whitelist.<br>";
+			echo "{$blacklist_items} total items in the blacklist.<br>";
+			echo "{$spamdb_grey} total items in the greylist.<br>";			
+			echo "{$spamdb_items} total items in the SpamDB.<br>";
 		?>
 <?php include("fend.inc"); ?>
 </body>
