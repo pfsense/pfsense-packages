@@ -181,12 +181,12 @@ include("head.inc");
 if(file_exists("/var/db/whitelist.txt"))
 	$whitelist_items = `cat /var/db/whitelist.txt | wc -l`;
 else 
-	$whitelist_items = "0";
+	$whitelist_items = 0;
 	
 if(file_exists("/var/db/blacklist.txt"))
 	$blacklist_items = `cat /var/db/blacklist.txt | wc -l`;
 else 
-	$blacklist_items = "0";
+	$blacklist_items = 0;
 
 // Get an overall count of the database
 $spamdb_items = `/usr/local/sbin/spamdb | wc -l`;
@@ -194,10 +194,11 @@ $spamdb_items = `/usr/local/sbin/spamdb | wc -l`;
 // Get blacklist and whitelist count from database
 $spamdb_white = `/usr/local/sbin/spamdb | grep WHITE | wc -l`;
 $spamdb_black = `/usr/local/sbin/spamdb | grep BLACK | wc -l`;
+$spamdb_grey = `/usr/local/sbin/spamdb | grep GREY | wc -l`;
 
 // Now count the user contributed whitelist and blacklist count
+$whitelist_items = $whitelist_items + $spamdb_white;
 $blacklist_items = $blacklist_items + $spamdb_black;
-$whiteList_items = $whiteList_items + $spamdb_white;
 
 ?>
 <body link="#000000" vlink="#000000" alink="#000000">
@@ -436,6 +437,7 @@ if (typeof getURL == 'undefined') {
 		<?php
 			echo "&nbsp;&nbsp;{$whitelist_items} total items in the whitelist.<br>";
 			echo "&nbsp;&nbsp;{$blacklist_items} total items in the blacklist.<br>";
+			echo "&nbsp;&nbsp;{$spamdb_grey} total items in the greylist.<br>";			
 			echo "&nbsp;&nbsp;{$spamdb_items} total items in the SpamDB.<br>";
 		?>
 <?php include("fend.inc"); ?>
