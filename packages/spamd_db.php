@@ -183,7 +183,16 @@ if(file_exists("/var/db/blacklist.txt"))
 else 
 	$blacklist_items = "0";
 
+// Get an overall count of the database
 $spamdb_items = `/usr/local/sbin/spamdb | wc -l`;
+
+// Get blacklist and whitelist count from database
+$spamdb_white = `/usr/local/sbin/spamdb | grep WHITE | wc -l`;
+$spamdb_black = `/usr/local/sbin/spamdb | grep BLACK | wc -l`;
+
+// Now count the user contributed whitelist and blacklist count
+$blacklist_items = $blacklist_items + $spamdb_black;
+$whiteList_items = $whiteList_items + $spamdb_white;
 
 ?>
 <body link="#000000" vlink="#000000" alink="#000000">
