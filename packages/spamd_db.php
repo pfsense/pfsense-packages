@@ -405,6 +405,8 @@ if (typeof getURL == 'undefined') {
 				$attempts = htmlentities($pkgdb_split[8]);			
 				break;
 		}
+		if($srcip == "" and $fromaddress == "" and $toaddress == "") 
+			continue;
 		echo "<tr id=\"{$rows}\">";
 		echo "<td class=\"listr\">{$recordtype}</td>";		
 		echo "<td class=\"listr\">{$srcip}</td>";
