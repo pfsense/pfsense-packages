@@ -35,7 +35,7 @@ if($_POST['filter'])
 if($_POST['not'])
 	$not = true;
 if($_POST['limit'])
-	$limit = $_POST['limit'];
+	$limit = intval($_POST['limit']);
 else
 	$limit = "25";
 	
@@ -321,12 +321,12 @@ if (typeof getURL == 'undefined') {
 	if($filter) {
 		if($not) {
 			$fd = fopen("/tmp/spamdb", "w");
-			$cmd = "/usr/local/sbin/spamdb | grep -v \"" . $filter . "\" | tail -n {$limit}";
+			$cmd = "/usr/local/sbin/spamdb | grep -v \"" . escapeshellarg($filter) . "\" | tail -n {$limit}";
 			fwrite($fd, $cmd);
 			fclose($fd);
 			$pkgdb = split("\n", `$cmd`);
 			if(file_exists("/var/db/blacklist.txt")) {
-				$cmd = "cat /var/db/blacklist.txt | grep -v \"" . $filter . "\" ";
+				$cmd = "cat /var/db/blacklist.txt | grep -v \"" . escapeshellarg($filter) . "\" ";
 				$pkgdba = split("\n", `$cmd`);
 				foreach($pkgdba as $pkg) {
 					$pkgdb[] = "TRAPPED|{$pkg}|1149324397";	
@@ -334,11 +334,11 @@ if (typeof getURL == 'undefined') {
 			}			
 		} else {
 			
-			$cmd = "/usr/local/sbin/spamdb | grep \"{$filter}\" | tail -n {$limit}";
+			$cmd = "/usr/local/sbin/spamdb | grep " . escapeshellarg($filter) . " | tail -n {$limit}";
 
 			$pkgdb = split("\n", `$cmd`);
 			if(file_exists("/var/db/blacklist.txt")) {
-				$cmd = "cat /var/db/blacklist.txt | grep \"{$filter}\" ";
+				$cmd = "cat /var/db/blacklist.txt | grep " . escapeshellarg($filter);
 				$pkgdba = split("\n", `$cmd`);
 				foreach($pkgdba as $pkg) {
 					$pkgdb[] = "TRAPPED|{$pkg}|1149324397";
