@@ -400,8 +400,8 @@
       <category>Network Management</category>
       <config_file>http://www.pfsense.com/packages/config/pfflowd.xml</config_file>
       <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/All</depends_on_package_base_url>
-      <depends_on_package>pfflowd-0.6.tbz</depends_on_package>
-      <version>0.6</version>
+      <depends_on_package>pfflowd-0.7.tbz</depends_on_package>
+      <version>0.7</version>
       <status>Stable</status>
       <required_version>1.0</required_version>
       <configurationfile>pfflowd.xml</configurationfile>
