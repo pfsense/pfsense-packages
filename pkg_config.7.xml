@@ -13,7 +13,7 @@
       <depends_on_package>spamd-4.1.2.tbz</depends_on_package>
       <version>4.3.7</version>
       <status>Stable</status>
-      <required_version>1.2</required_version>
+      <required_version>1.2.1</required_version>
       <maintainer>sullrich+pfsp@gmail.com</maintainer>
       <configurationfile>spamd.xml</configurationfile>
       <logging>
@@ -31,7 +31,7 @@
       <depends_on_package>siproxd-0.7.0_1.tbz</depends_on_package>
       <version>0.7.1</version>
       <status>ALPHA</status>
-      <required_version>1.2</required_version>
+      <required_version>1.2.1</required_version>
       <configurationfile>siproxd.xml</configurationfile>
     </package>
  	<package>
@@ -56,7 +56,7 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>lightsquid-1.7.1_1.tbz</depends_on_package>
       <status>Beta1</status>
-      <required_version>1.2</required_version>
+      <required_version>1.2.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/lightsquid/lightsquid.xml</config_file>
       <configurationfile>lightsquid.xml</configurationfile>
     </package>
@@ -67,7 +67,7 @@
       <category>Services</category>
       <version>1.0.3</version>
       <status>ALPHA</status>
-      <required_version>1.2</required_version>
+      <required_version>1.2.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/tinydns/tinydns.xml</config_file>
       <configurationfile>tinydns.xml</configurationfile>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/djbdns/</depends_on_package_base_url>
@@ -98,7 +98,7 @@
       <config_file>http://www.pfsense.com/packages/config/nmap/nmap.xml</config_file>
       <version>4.20_1</version>
       <status>Stable</status>
-      <required_version>1.0</required_version>
+      <required_version>1.2.1</required_version>
       <configurationfile>nmap.xml</configurationfile>
     </package>
     <package>
@@ -124,12 +124,12 @@
       <category>Network Management</category>
       <version>2.0.4</version>
       <status>BETA</status>
-      <required_version>1.0</required_version>
+      <required_version>1.2.1</required_version>
       <maintainer>rswagoner@gmail.com</maintainer>
 	  <config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
 	  <configurationfile>nut.xml</configurationfile>
 	  <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <depends_on_package>nut-2.0.4.tbz</depends_on_package>
+      <depends_on_package>nut-2.2.2.tbz</depends_on_package>
       <depends_on_package>nut-usb-2.0.4.tbz</depends_on_package>
 	</package>
 
@@ -140,7 +140,7 @@
 		<category>Network Management</category>
 		<version>0.2</version>
 		<maintainer>ptaylor@addressplus.net</maintainer>
-		<required_version>1.0</required_version>
+		<required_version>1.2.1</required_version>
 		<status>BETA</status>
 		<config_file>http://www.pfsense.org/packages/config/diag_states_pt/diag_new_states.xml</config_file>
 		<configurationfile>http://www.pfsense.com/packages/config/diag_states_pt/diag_new_states.xml</configurationfile>
@@ -156,7 +156,7 @@
       <category>Security</category>
       <version>0.1</version>
       <status>Stable</status>
-      <required_version>1.0</required_version>
+      <required_version>1.2.1</required_version>
       <depends_on_package_base_url>http://files.pfsense.com/packages/All/</depends_on_package_base_url>
       <depends_on_package>sshtools-0.2.2.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/sshterm/sshterm.xml</config_file>
@@ -172,7 +172,7 @@
 	  <depends_on_package>gettext-0.17_1.tbz</depends_on_package>
       <version>3.0.619</version>
       <status>Stable</status>
-      <required_version>1.0</required_version>
+      <required_version>1.2.1</required_version>
       <maintainer>sullrich+pfsp@gmail.com</maintainer>
       <config_file>http://www.pfsense.com/packages/config/darkstat/darkstat.xml</config_file>
       <configurationfile>darkstat.xml</configurationfile>
@@ -184,9 +184,9 @@
       <category>Network Management</category>
       <depends_on_package_base_url>http://www.pfsense.org/mirrors/packages/All/</depends_on_package_base_url>
       <depends_on_package>	ntop-3.3_4.tbz</depends_on_package>
-      <version>3.2_2</version>
+      <version>3.3_4</version>
       <status>BETA</status>
-      <required_version>1.0</required_version>
+      <required_version>1.2.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/ntop.xml</config_file>
       <configurationfile>ntop.xml</configurationfile>
     </package>
@@ -200,7 +200,7 @@
       <depends_on_package>pfflowd-0.7.tbz</depends_on_package>
       <version>0.7</version>
       <status>Stable</status>
-      <required_version>1.0</required_version>
+      <required_version>1.2.1</required_version>
       <configurationfile>pfflowd.xml</configurationfile>
       <maintainer>nick@buraglio.com</maintainer>
     </package>
@@ -213,7 +213,7 @@
       <depends_on_package>widentd-1.03_1.tbz</depends_on_package>
       <version>1.03_1</version>
       <status>ALPHA</status>
-      <required_version>1.0</required_version>
+      <required_version>1.2.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/widentd.xml</config_file>
       <configurationfile>widentd.xml</configurationfile>
     </package>
@@ -224,7 +224,7 @@
       <category>System</category>
       <version>1.1.2_1</version>
       <status>BETA</status>
-      <required_version>1.0</required_version>
+      <required_version>1.2.1</required_version>
       <maintainer>none</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>freeradius-1.1.7_3.tbz</depends_on_package>
@@ -239,7 +239,7 @@
       <category>System</category>
       <version>2.0.1.1</version>
       <status>BETA</status>
-      <required_version>1.0</required_version>
+      <required_version>1.2.1</required_version>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>bandwidthd-2.0.1_1.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
@@ -252,9 +252,9 @@
       <category>Network Management</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/All</depends_on_package_base_url>
       <depends_on_package>stunnel-4.25.tbz</depends_on_package>
-      <version>4.18</version>
+      <version>4.25</version>
       <status>Stable</status>
-      <required_version>1.0</required_version>
+      <required_version>1.2.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
       <configurationfile>stunnel.xml</configurationfile>
     </package>
@@ -268,7 +268,7 @@
       <depends_on_package>iperf-2.0.4.tbz</depends_on_package>
       <version>2.0.2_1</version>
       <status>ALPHA</status>
-      <required_version>1.0</required_version>
+      <required_version>1.2.1</required_version>
       <configurationfile>iperf.xml</configurationfile>
     </package>
     <package>
@@ -303,14 +303,14 @@
       <descr>High performance web proxy cache.</descr>
       <website>http://www.squid-cache.org/</website>
       <category>Network</category>
-      <version>2.6.18.1</version>
+      <version>2.6.21</version>
       <status>BETA</status>
-      <required_version>1.0</required_version>
+      <required_version>1.2.1</required_version>
       <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All</depends_on_package_base_url>
-      <depends_on_package>squid-2.6.20_3.tbz</depends_on_package>
+      <depends_on_package>squid-2.6.21.tbz</depends_on_package>
       <depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
-	  <depends_on_package>openldap-client-2.3.42.tbz</depends_on_package>
+	  <depends_on_package>openldap-client-2.4.10.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
       <configurationfile>squid.xml</configurationfile>
     </package>
@@ -321,7 +321,7 @@
       <category>Utility</category>
       <version>lcdproc-0.5.2_2</version>
       <status>BETA</status>
-      <required_version>1.2</required_version>
+      <required_version>1.2.1</required_version>
       <maintainer>seth.mos@xs4all.nl</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>lcdproc-0.5.2_2.tbz</depends_on_package>
@@ -369,7 +369,7 @@
 		<config_file>http://www.pfsense.com/packages/config/zabbix-agent.xml</config_file>
 		<version>0.22</version>
 		<status>FINAL</status>
-		<required_version>1.2</required_version>
+		<required_version>1.2.1</required_version>
 		<configurationfile>zabbix-agent.xml</configurationfile>
 		<maintainer>remco.verhoef@redfive.biz</maintainer>
 		<depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/net-mgmt/</depends_on_package_base_url>
