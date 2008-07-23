@@ -70,7 +70,7 @@
       <required_version>1.2.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/tinydns/tinydns.xml</config_file>
       <configurationfile>tinydns.xml</configurationfile>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/djbdns/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>ucspi-tcp-0.88_2.tbz</depends_on_package>
       <depends_on_package>daemontools-0.76_12.tbz</depends_on_package>
       <depends_on_package>djbdns-1.05_12.tbz</depends_on_package>
@@ -182,8 +182,8 @@
       <website>http://www.ntop.org/</website>
       <descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
       <category>Network Management</category>
-      <depends_on_package_base_url>http://www.pfsense.org/mirrors/packages/All/</depends_on_package_base_url>
-      <depends_on_package>	ntop-3.3_4.tbz</depends_on_package>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package>ntop-3.3_4.tbz</depends_on_package>
       <version>3.3_4</version>
       <status>BETA</status>
       <required_version>1.2.1</required_version>
@@ -290,7 +290,7 @@
       <descr>Enhanced traceroute replacement</descr>
       <website>http://www.bitwizard.nl/mtr/</website>
       <category>Network Management</category>
-      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>mtr-nox11-0.73_1.tbz</depends_on_package>
       <version>0.65_2</version>
       <status>ALPHA</status>
@@ -307,7 +307,7 @@
       <status>BETA</status>
       <required_version>1.2.1</required_version>
       <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl</maintainer>
-      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>squid-2.6.21.tbz</depends_on_package>
       <depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
 	  <depends_on_package>openldap-client-2.4.10.tbz</depends_on_package>
@@ -333,7 +333,7 @@
       <descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
       <website>http://www-nrg.ee.lbl.gov/</website>
       <category>Security</category>
-      <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>arpwatch-2.1.a15_4.tbz</depends_on_package>
       <version>2.1.a13</version>
       <status>ALPHA</status>
@@ -357,7 +357,7 @@
   	  <version>1.2.0_1</version> 
   	  <status>Beta</status> 
   	  <required_version>1.1</required_version> 
-  	  <depends_on_package_base_url>http://www.pfsense.org/mirrors/packages/All/</depends_on_package_base_url> 
+  	  <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url> 
   	  <depends_on_package>squidGuard-1.2.0_1.tbz</depends_on_package> 
   	  <config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file> 
   	  <configurationfile>squidguard.xml</configurationfile> 
