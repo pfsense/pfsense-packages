@@ -48,7 +48,7 @@
     </package>
    <package>
       <name>Lightsquid</name>
-      <descr>High perfomance web proxy Report. Required squid. (For pfSense 1.2/FreeBSD 6.x)</descr>
+      <descr>High perfomance web proxy report. Requires squid.</descr>
       <website>http://lightsquid.sf.net/</website>
       <category>Network</category>
       <version>1.7.1</version>
