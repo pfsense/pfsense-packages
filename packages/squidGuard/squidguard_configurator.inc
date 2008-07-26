@@ -50,6 +50,10 @@ require_once('filter.inc');
 require_once('service-utils.inc');
 require_once('squid.inc');
 
+/* Allow additional execution time 0 = no limit. */
+ini_set('max_execution_time', '3600');
+ini_set('max_input_time', '3600');
+
 # ------------------------------------------------------------------------------
 # files header
 # ------------------------------------------------------------------------------
