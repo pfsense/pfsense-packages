@@ -51,6 +51,7 @@ if(!$password) {
 }
 
 $last_ruleset_download = $config['installedpackages']['snort']['last_ruleset_download'];
+ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
 $text = file_get_contents("http://www.snort.org/pub-bin/downloads.cgi");
 if (preg_match_all("/.*RELEASED\: (.*)\</", $text, $matches))
         $last_update_date = trim($matches[1][0]);
@@ -68,6 +69,7 @@ if($date1ts > $date2ts or !$last_ruleset_download) {
 	/* setup some variables */
 	$snort_filename = "snortrules-snapshot-CURRENT.tar.gz";
 	$snort_filename_md5 = "snortrules-snapshot-CURRENT.tar.gz.md5";
+	ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
 	$dl = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}";
 	$dl_md5 = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}";
 

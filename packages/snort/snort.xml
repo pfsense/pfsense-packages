@@ -8,7 +8,7 @@
 /* ========================================================================== */
 /*
     authng.xml
-    part of pfSense (http://www.pfSense.com)
+    part of pfSense (http://www.pfsense.com)
     Copyright (C) 2007 to whom it may belong
     All rights reserved.
 
@@ -106,6 +106,11 @@
 		<item>http://www.pfsense.com/packages/config/snort/bin/snort2c</item>
 	</additional_files_needed>
 	<additional_files_needed>
+		<prefix>/usr/local/bin/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/bin/mons2c</item>
+	</additional_files_needed>
+	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_download_rules.php</item>
@@ -146,14 +151,9 @@
 		<item>http://www.pfsense.com/packages/config/snort/snort_alerts.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/pf/</prefix>
+		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_dynamic_ip_reload.php</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/pf/</prefix>
-		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_xmlrpc_sync.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -177,6 +177,10 @@
 			<type>select</type>
 			<options>
 				<option>
+					<name>ac-bnfa</name>
+					<value>ac-bnfa</value>
+				</option>
+				<option>
 					<name>lowmem</name>
 					<value>lowmem</value>
 				</option>
@@ -195,10 +199,6 @@
 				<option>
 					<name>ac-sparsebands</name>
 					<value>ac-sparsebands</value>
-				</option>
-				<option>
-					<name>mwm</name>
-					<value>mwm</value>
 				</option>
 				<option>
 					<name>acs</name>
