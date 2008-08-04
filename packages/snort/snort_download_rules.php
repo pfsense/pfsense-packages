@@ -95,6 +95,7 @@ include("head.inc");
 		echo "</div>\n";
 		ob_flush();
 		sleep(1);
+		ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');		
 		$text = file_get_contents("http://www.snort.org/pub-bin/downloads.cgi");
 		echo "<script type=\"text/javascript\">\n";
 		echo "$('loading').style.visibility = 'hidden';\n";
@@ -191,12 +192,14 @@ exec("/bin/rm -rf {$tmpfname};/bin/mkdir -p {$tmpfname}");
 /* download snort rules */
 $static_output = gettext("Downloading current snort rules... ");
 update_all_status($static_output);
+ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
 download_file_with_progress_bar($dl, $tmpfname . "/{$snort_filename}");
 verify_downloaded_file($tmpfname . "/{$snort_filename}");
 
 /* download snort rules md5 file */
 $static_output = gettext("Downloading current snort rules md5... ");
 update_all_status($static_output);
+ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
 download_file_with_progress_bar($dl_md5, $tmpfname . "/{$snort_filename_md5}");
 verify_downloaded_file($tmpfname . "/{$snort_filename_md5}");
 
