@@ -64,7 +64,7 @@ function sync_package_snort()
 	if($config['installedpackages']['snort']['config'][0]['performance'])
 		$snort_performance = $config['installedpackages']['snort']['config'][0]['performance'];
 	else
-		$snort_performance = "lowmem";
+		$snort_performance = "ac-bnfa";
 
 	conf_mount_rw();
 	/* create a few directories and ensure the sample files are in place */
@@ -141,7 +141,7 @@ function sync_package_snort()
   /* Note the sleep delay.  Seems to help getting mult interfaces to start -gtm */
   foreach($snortInterfaces as $snortIf)
   {
-  	$start .= ";sleep 8;snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -i {$snortIf} -A full -D";
+  	$start .= ";sleep 8;snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -i {$snortIf} -A fast -D";
   }    
     
 	/* if block offenders is checked, start snort2c */
@@ -229,7 +229,7 @@ function generate_snort_conf() {
 	if($config['installedpackages']['snort']['config'][0]['performance'])
 		$snort_performance = $config['installedpackages']['snort']['config'][0]['performance'];
 	else
-		$snort_performance = "lowmem";
+		$snort_performance = "ac-bnfa";
 
 	/* open snort2c's whitelist for writing */
 	$whitelist = fopen("/var/db/whitelist", "w");
@@ -353,48 +353,84 @@ function generate_snort_conf() {
 # see /usr/local/pkg/snort.inc
 # for more information
 
-var AIM_SERVERS [64.12.24.0/24,64.12.25.0/24,64.12.26.14/24,64.12.28.0/24,64.12.29.0/24,64.12.161.0/24,64.12.163.0/24,205.188.5.0/24,205.188.9.0/24]
-var HTTP_PORTS 80
-var SHELLCODE_PORTS !\$HTTP_PORTS
-var ORACLE_PORTS 1521
 var HOME_NET {$home_net}
-var TELNET_SERVERS \$HOME_NET
-var SQL_SERVERS \$HOME_NET
-var HTTP_SERVERS \$HOME_NET
-var SMTP_SERVERS \$HOME_NET
-var DNS_SERVERS \$HOME_NET
 var EXTERNAL_NET !\$HOME_NET
-var SSH_PORTS {$ssh_port}
+
+var DNS_SERVERS \$HOME_NET
+var SMTP_SERVERS \$HOME_NET
+var HTTP_SERVERS \$HOME_NET
+var SQL_SERVERS \$HOME_NET
+var TELNET_SERVERS \$HOME_NET
+var SNMP_SERVERS \$HOME_NET
+var FTP_SERVERS \$HOME_NET
+var SSH_SERVERS \$HOME_NET
+var POP_SERVERS \$HOME_NET
+var IMAP_SERVERS \$HOME_NET
+var RPC_SERVERS \$HOME_NET
+var WWW_SERVERS \$HOME_NET
+var AIM_SERVERS \
+[64.12.24.0/23,64.12.28.0/23,64.12.161.0/24,64.12.163.0/24,64.12.200.0/24,205.188.3.0/24,205.188.5.0/24,205.188.7.0/24,205.188.9.0/24,205.188.153.0/24,205.188.179.0/24,205.188.248.0/24]
+
+portvar HTTP_PORTS 80
+portvar SHELLCODE_PORTS !80
+portvar ORACLE_PORTS 1521
+portvar AUTH_PORTS 113
+portvar DNS_PORTS 53
+portvar FINGER_PORTS 79
+portvar FTP_PORTS 21
+portvar IMAP_PORTS 143
+portvar IRC_PORTS [6665,6666,6667,6668,6669,7000]
+portvar MSSQL_PORTS 1433
+portvar NNTP_PORTS 119
+portvar POP2_PORTS 109
+portvar POP3_PORTS 110
+portvar SUNRPC_PORTS [111,32770,32771,32772,32773,32774,32775,32776,32777,32778,32779]
+portvar RLOGIN_PORTS 513
+portvar RSH_PORTS 514
+portvar SMB_PORTS [139,445]
+portvar SMTP_PORTS 25
+portvar SNMP_PORTS 161
+portvar SSH_PORTS {$ssh_port}
+portvar TELNET_PORTS 23
+portvar MAIL_PORTS [25,143,465,691]
+portvar SSL_PORTS [25,443,465,636,993,995]
+
 var RULE_PATH /usr/local/etc/snort/rules
 
+# Configure the snort decoder
+config checksum_mode: all
+config disable_decode_alerts
+config disable_tcpopt_experimental_alerts
+config disable_tcpopt_obsolete_alerts
+config disable_ttcp_alerts
+config disable_tcpopt_alerts
+config disable_ipopt_alerts
+config disable_decode_drops
+
+#Configure the detection engine
 #Use lower memory models
 config detection: search-method {$snort_performance}
+config detection: max_queue_events 5
+config event_queue: max_queue 8 log 3 order_events content_length
 
-#Output plugins
-#output database: alert
-output alert_syslog: LOG_AUTH LOG_ALERT LOG_CONS LOG_NDELAY LOG_PERROR LOG_PID
+#Configure dynamic loaded libraries
+dynamicpreprocessor file /usr/local/lib/snort/dynamicpreprocessor/libsf_dcerpc_preproc.so
+dynamicpreprocessor file /usr/local/lib/snort/dynamicpreprocessor/libsf_dns_preproc.so
+dynamicpreprocessor file /usr/local/lib/snort/dynamicpreprocessor/libsf_ftptelnet_preproc.so
+dynamicpreprocessor file /usr/local/lib/snort/dynamicpreprocessor/libsf_smtp_preproc.so
+dynamicpreprocessor file /usr/local/lib/snort/dynamicpreprocessor/libsf_ssh_preproc.so
 
-output alert_unified: filename alert
+dynamicengine /usr/local/lib/snort/dynamicengine/libsf_engine.so
 
 #Flow and stream
-preprocessor flow: stats_interval 0 hash 2
 
 preprocessor frag3_global: max_frags 8192
-preprocessor frag3_engine
 preprocessor frag3_engine: policy last detect_anomalies
-#preprocessor frag2
-#preprocessor frag2
-#preprocessor stream4: disable_evasion_alerts,detect_scans
 preprocessor stream5_global: max_tcp 8192, track_tcp yes, \
 track_udp yes, track_icmp yes
 preprocessor stream5_tcp: policy BSD, ports both all, use_static_footprint_sizes
 preprocessor stream5_udp
 preprocessor stream5_icmp
-
-#preprocessor stream4_reassemble: both, ports all
-
-#XLink2State mini proc
-#preprocessor xlink2state: ports { 25 691 }
 
 #HTTP Inspect
 preprocessor http_inspect: global iis_unicode_map unicode.map 1252
@@ -403,7 +439,7 @@ preprocessor http_inspect_server: server default \
                         ports  { 80 8080 3128 }  \
                         no_alerts \
                         non_strict \
-                        non_rfc_char  { 0x00 }  \
+                        non_rfc_char  { 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 }  \
                         flow_depth 0  \
                         apache_whitespace yes \
                         directory no \
@@ -418,51 +454,62 @@ preprocessor http_inspect_server: server default \
                         multi_slash no
 
 #Other preprocs
-preprocessor rpc_decode: 111 32771
+preprocessor rpc_decode: 111 32770 32771 32772 32773 32774 32775 32776 32777 32778 32779
 preprocessor bo
-
-
-
-dynamicpreprocessor directory /usr/local/lib/snort/dynamicpreprocessor/
-dynamicpreprocessor file /usr/local/lib/snort/dynamicpreprocessor/libsf_ftptelnet_preproc.so
 
 preprocessor ftp_telnet: global \
 inspection_type stateless
-preprocessor ftp_telnet_protocol: ftp server default \
-  ports { 21 } \
-  def_max_param_len 100 \
-  ftp_cmds { USER PASS ACCT CWD CDUP SMNT \
-    QUIT REIN PORT PASV TYPE STRU MODE RETR STOR STOU APPE ALLO REST \
-    RNFR RNTO ABOR DELE RMD MKD PWD LIST NLST SITE SYST STAT HELP NOOP } \
-  ftp_cmds { AUTH ADAT PROT PBSZ CONF ENC } \
-  ftp_cmds { FEAT OPTS } \
-  ftp_cmds { MDTM REST SIZE MLST MLSD } \
-  alt_max_param_len 0 { CDUP QUIT REIN PASV STOU ABOR PWD SYST NOOP } \
-  cmd_validity MODE < char SBC > \
-  cmd_validity STRU < char FRP > \
-  cmd_validity ALLO < int [ char R int ] > \
-  cmd_validity TYPE < { char AE [ char NTC ] | char I | char L [ number ] } > \
-  cmd_validity PORT < host_port > 
-
+preprocessor ftp_telnet_protocol: \
+    ftp server default \
+    def_max_param_len 100 \
+    ports { 21 } \
+    ftp_cmds { USER PASS ACCT CWD SDUP SMNT QUIT REIN PORT PASV TYPE STRU MODE } \
+    ftp_cmds { RETR STOR STOU APPE ALLO REST RNFR RNTO ABOR DELE RMD MKD PWD } \
+    ftp_cmds { LIST NLST SITE SYST STAT HELP NOOP } \
+    ftp_cmds { AUTH ADAT PROT PBSZ CONF ENC } \
+    ftp_cmds { FEAT OPTS CEL CMD MACB } \
+    ftp_cmds { MDTM REST SIZE MLST MLSD } \
+    ftp_cmds { XPWD XCWD XCUP XMKD XRMD TEST CLNT } \
+    alt_max_param_len 0 { CDUP QUIT REIN PASV STOU ABOR PWD SYST NOOP } \
+    alt_max_param_len 100 { MDTM CEL XCWD SITE USER PASS REST DELE RMD SYST TEST STAT MACB EPSV CLNT LPRT } \
+    alt_max_param_len 200 { XMKD NLST ALLO STOU APPE RETR STOR CMD RNFR HELP } \
+    alt_max_param_len 256 { RNTO CWD } \ 
+    alt_max_param_len 400 { PORT } \
+    alt_max_param_len 512 { SIZE } \
+    chk_str_fmt { USER PASS ACCT CWD SDUP SMNT PORT TYPE STRU MODE } \
+    chk_str_fmt { RETR STOR STOU APPE ALLO REST RNFR RNTO DELE RMD MKD } \
+    chk_str_fmt { LIST NLST SITE SYST STAT HELP } \
+    chk_str_fmt { AUTH ADAT PROT PBSZ CONF ENC } \
+    chk_str_fmt { FEAT OPTS CEL CMD } \
+    chk_str_fmt { MDTM REST SIZE MLST MLSD } \
+    chk_str_fmt { XPWD XCWD XCUP XMKD XRMD TEST CLNT } \
+    cmd_validity MODE < char ASBCZ > \
+    cmd_validity STRU < char FRP > \
+    cmd_validity ALLO < int [ char R int ] > \
+    cmd_validity TYPE < { char AE [ char NTC ] | char I | char L [ number ] } > \
+    cmd_validity MDTM < [ date nnnnnnnnnnnnnn[.n[n[n]]] ] string > \
+    cmd_validity PORT < host_port >
 preprocessor ftp_telnet_protocol: ftp client default \
    max_resp_len 100
 
-#preprocessor telnet_decode
-
-
-dynamicpreprocessor file /usr/local/lib/snort/dynamicpreprocessor/libsf_smtp_preproc.so 
-
-
-preprocessor smtp: \
-  ports { 25 } \
-  inspection_type stateful \
-  normalize cmds \
-  normalize_cmds { EXPN VRFY RCPT } \
-  alt_max_command_line_len 260 { MAIL } \
-  alt_max_command_line_len 300 { RCPT } \
-  alt_max_command_line_len 500 { HELP HELO ETRN } \
-  alt_max_command_line_len 255 { EXPN VRFY }
-
+preprocessor SMTP: \
+    ports { 25 465 691 } \
+    inspection_type stateful \
+    normalize cmds \
+    valid_cmds { MAIL RCPT HELP HELO ETRN EHLO EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT NOOP RSET SEND SAML SOML AUTH TURN ETRN PIPELINING \
+CHUNKING DATA DSN RSET QUIT ONEX QUEU STARTTLS TICK TIME TURNME VERB X-EXPS X-LINK2STATE XADR XAUTH XCIR XEXCH50 XGEN XLICENSE XQUEU XSTA XTRN XUSR } \
+    normalize_cmds { MAIL RCPT HELP HELO ETRN EHLO EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT NOOP RSET SEND SAML SOML AUTH TURN ETRN \
+PIPELINING CHUNKING DATA DSN RSET QUIT ONEX QUEU STARTTLS TICK TIME TURNME VERB X-EXPS X-LINK2STATE XADR XAUTH XCIR XEXCH50 XGEN XLICENSE XQUEU XSTA XTRN XUSR } \
+    max_header_line_len 1000 \ 
+    max_response_line_len 512 \
+    alt_max_command_line_len 260 { MAIL } \
+    alt_max_command_line_len 300 { RCPT } \
+    alt_max_command_line_len 500 { HELP HELO ETRN EHLO } \
+    alt_max_command_line_len 255 { EXPN VRFY ATRN SIZE BDAT DEBUG EMAL ESAM ESND ESOM EVFY IDENT NOOP RSET } \
+    alt_max_command_line_len 246 { SEND SAML SOML AUTH TURN ETRN PIPELINING CHUNKING DATA DSN RSET QUIT ONEX } \
+    alt_max_command_line_len 246 { QUEU STARTTLS TICK TIME TURNME VERB X-EXPS X-LINK2STATE XADR } \
+    alt_max_command_line_len 246 { XAUTH XCIR XEXCH50 XGEN XLICENSE XQUEU XSTA XTRN XUSR } \
+    xlink2state { enable }
 
 
 
@@ -472,11 +519,26 @@ preprocessor sfportscan: proto { all } \
 						scan_type { all } \
 						sense_level { low } \
 						ignore_scanners { \$HOME_NET }
-							
+
+preprocessor dcerpc: \
+    autodetect \
+    max_frag_size 3000 \
+    memcap 100000
+
+preprocessor dns: ports { 53 } enable_rdata_overflow
+
+#Output plugins
+#output database: alert
+output alert_syslog: LOG_AUTH LOG_ALERT LOG_CONS LOG_NDELAY LOG_PERROR LOG_PID
+
+output alert_unified: filename alert							
 						
 #Required files
-include classification.config
-include reference.config
+include /usr/local/etc/snort/classification.config
+include /usr/local/etc/snort/reference.config
+
+# Include any thresholding or suppression commands. See threshold.conf in the
+# include threshold.conf
 
 # Snort user pass through configuration
 {$snort_config_pass_thru}
