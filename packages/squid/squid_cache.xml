@@ -165,6 +165,20 @@
 			</options>
 		</field>
 		<field>
+			<fielddescr>Low-water-mark in %</fielddescr>
+			<fieldname>cache_swap_low</fieldname>
+			<description>Cache replacement begins when the swap usage is above the low-low-water mark and attempts to maintain utilisation near the low-water-mark.</description>
+			<type>input</type>
+			<default_value>90</default_value>
+		</field>
+		<field>
+			<fielddescr>High-water-mark in %</fielddescr>
+			<fieldname>cache_swap_high</fieldname>
+			<description>As swap utilisation gets close to the high-water-mark object eviction becomes more aggressive.</description>
+			<type>input</type>
+			<default_value>95</default_value>
+		</field>    		
+    <field>
 			<fielddescr>Do not cache</fielddescr>
 			<fieldname>donotcache</fieldname>
 			<description>Enter each domain or IP address on a new line that should never be cached.</description>
