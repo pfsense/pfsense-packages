@@ -600,8 +600,8 @@ function squid_resync_nac() {
 	$conf = <<<EOD
 
 # Setup some default acls
-acl all src 0.0.0.0/0
-acl localhost src 127.0.0.1
+acl all src 0.0.0.0/0.0.0.0
+acl localhost src 127.0.0.1/255.255.255.255
 acl safeports port 21 70 80 210 280 443 488 563 591 631 777 901 $webgui_port 1025-65535
 acl sslports port 443 563 $webgui_port
 acl manager proto cache_object
