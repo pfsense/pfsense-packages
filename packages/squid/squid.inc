@@ -500,7 +500,6 @@ cache_effective_group proxy
 error_directory $errordir
 visible_hostname $hostname
 cache_mgr $email
-
 access_log $logdir_access
 cache_log $logdir_cache
 cache_store_log none
@@ -521,10 +520,11 @@ EOD;
 	}
 	if ($settings['disable_xforward']) $conf .= "forwarded_for off\n";
 	if ($settings['disable_via']) $conf .= "via off\n";
-	if (!empty($settings['uri_whitespace'])) $conf .= "uri_whitespace {$settings['uri_whitespace']}\n";
-	
+	$conf .= "uri_whitespace {$settings['uri_whitespace']}\n";
+	if (!empty($settings['dns_nameservers'])) $conf .= "dns_nameservers {$settings['dns_nameservers']}\n";
   return $conf;
 }
+
 
 function squid_resync_cache() {
 	global $config;
