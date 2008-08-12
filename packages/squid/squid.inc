@@ -312,6 +312,15 @@ function squid_validate_general($post, $input_errors) {
 		$input_errors[] = "You can not enable forwarding traffic to private subnets to the proxy server without using the transparent proxy.";
 	}
 
+  if(!empty($post['dns_nameservers'])) {
+	 $altdns = explode(";", ($post['dns_nameservers']));
+//  $conf .= "# Custom options\n";
+	 foreach ($altdns as $dnssrv) {
+//	$conf .= $custopt."\n";
+    if (!is_ipaddr($dnssrv))
+      $input_errors[] = 'You must enter a valid IP address in the \'Alternate DNS servers\' field';
+	 }}
+
 }
 
 function squid_validate_upstream($post, $input_errors) {
@@ -533,7 +542,16 @@ EOD;
 	if ($settings['disable_xforward']) $conf .= "forwarded_for off\n";
 	if ($settings['disable_via']) $conf .= "via off\n";
 	$conf .= "uri_whitespace {$settings['uri_whitespace']}\n";
-	if (!empty($settings['dns_nameservers'])) $conf .= "dns_nameservers {$settings['dns_nameservers']}\n";
+	
+	if(!empty($settings['dns_nameservers'])) {
+	  $altdns = explode(";", ($settings['dns_nameservers']));
+    $conf .= "dns_nameservers ";
+	 foreach ($altdns as $dnssrv) {
+    $conf .= $dnssrv." ";
+	 }
+//  $conf .= "\n";
+   }
+	
   return $conf;
 }
 

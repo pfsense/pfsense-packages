@@ -271,9 +271,9 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>Use different DNS-servers for the proxy-server</fielddescr>
+			<fielddescr>Use alternate DNS-servers for the proxy-server</fielddescr>
 			<fieldname>dns_nameservers</fieldname>
-			<description>If you want to use other DNS-servers than the DNS-forwarder, enter the IPs here separated by spaces.</description>
+			<description>If you want to use other DNS-servers than the DNS-forwarder, enter the IPs here, separated by semi-colons (;).</description>
 			<type>input</type>
 			<size>60</size>
 		</field>
