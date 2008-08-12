@@ -426,6 +426,25 @@ function squid_validate_traffic($post, $input_errors) {
 		if (!is_numeric($value) || ($value < 0))
 			$input_errors[] = "The field '$name' must contain a positive number";
 	}
+
+  if (!empty($post['quick_abort_min'])) {		
+	 $value = trim($post['quick_abort_min']);
+     if (!is_numeric($value))
+	   $input_errors[] = "The field 'Finish when remaining KB' must contain a positive number";	
+  }	
+  
+  if (!empty($post['quick_abort_max'])) {		
+	 $value = trim($post['quick_abort_max']);
+     if (!is_numeric($value))
+	   $input_errors[] = "The field 'Abort when remaining KB' must contain a positive number";	
+  }	
+		
+  if (!empty($post['quick_abort_pct'])) {		
+	 $value = trim($post['quick_abort_pct']);
+     if (!is_numeric($value) || ($value > 100))
+	   $input_errors[] = "The field 'Finish when remaining %' must contain a percentaged value";	
+  }	
+
 }
 
 function squid_validate_auth($post, $input_errors) {
@@ -700,6 +719,10 @@ function squid_resync_traffic() {
 	$conf .= "request_body_max_size $up_limit KB\n";
 	$conf .= 'reply_body_max_size ' . ($down_limit * 1024) . " allow all\n";
 
+  if (!empty($settings['quick_abort_min'])) $conf .= "quick_abort_min {$settings['quick_abort_min']} KB\n";
+  if (!empty($settings['quick_abort_max'])) $conf .= "quick_abort_max {$settings['quick_abort_max']} KB\n";
+  if (!empty($settings['quick_abort_pct'])) $conf .= "quick_abort_pct {$settings['quick_abort_pct']}\n";	
+  
 	// Only apply throttling past 10MB
 	// XXX: Should this really be hardcoded?
 	$threshold = 10 * 1024 * 1024;

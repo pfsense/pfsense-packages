@@ -146,6 +146,27 @@
 			<type>input</type>
 			<size>60</size>
 		</field>
+		<field>
+			<fielddescr>Finish transfer if less than x KB remaining</fielddescr>
+			<fieldname>quick_abort_min</fieldname>
+			<description>If the transfer has less than x KB remaining, it will finish the retrieval. Set to 0 to abort the transfer immediately.</description>
+			<type>input</type>
+			<default_value>0</default_value>
+		</field>
+		<field>
+			<fielddescr>Abort transfer if more than x KB remaining</fielddescr>
+			<fieldname>quick_abort_max</fieldname>
+			<description>If the transfer has more than x KB remaining, it will abort the retrieval. Set to 0 to abort the transfer immediately.</description>
+			<type>input</type>
+			<default_value>0</default_value>
+		</field>
+		<field>
+			<fielddescr>Finish transfer if more than x % finished</fielddescr>
+			<fieldname>quick_abort_pct</fieldname>
+			<description>If more than x % of the transfer has completed, it will finish the retrieval.</description>
+			<type>input</type>
+			<default_value>0</default_value>
+		</field>        		
 	</fields>
 	<custom_php_validation_command>
 		squid_validate_traffic($_POST, &amp;$input_errors);
