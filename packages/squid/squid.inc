@@ -714,15 +714,15 @@ function squid_resync_traffic() {
 	$settings = $config['installedpackages']['squidtraffic']['config'][0];
 	$conf = '';
 
+  if (!empty($settings['quick_abort_min']) || ($settings['quick_abort_min'])== 0) $conf .= "quick_abort_min {$settings['quick_abort_min']} KB\n";
+  if (!empty($settings['quick_abort_max']) || ($settings['quick_abort_max'])== 0) $conf .= "quick_abort_max {$settings['quick_abort_max']} KB\n";
+  if (!empty($settings['quick_abort_pct'])) $conf .= "quick_abort_pct {$settings['quick_abort_pct']}\n";	
+
 	$up_limit = ($settings['max_upload_size'] ? $settings['max_upload_size'] : 0);
 	$down_limit = ($settings['max_download_size'] ? $settings['max_download_size'] : 0);
 	$conf .= "request_body_max_size $up_limit KB\n";
 	$conf .= 'reply_body_max_size ' . ($down_limit * 1024) . " allow all\n";
 
-  if (!empty($settings['quick_abort_min'])) $conf .= "quick_abort_min {$settings['quick_abort_min']} KB\n";
-  if (!empty($settings['quick_abort_max'])) $conf .= "quick_abort_max {$settings['quick_abort_max']} KB\n";
-  if (!empty($settings['quick_abort_pct'])) $conf .= "quick_abort_pct {$settings['quick_abort_pct']}\n";	
-  
 	// Only apply throttling past 10MB
 	// XXX: Should this really be hardcoded?
 	$threshold = 10 * 1024 * 1024;
