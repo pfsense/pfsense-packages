@@ -351,6 +351,18 @@ function squid_validate_cache($post, $input_errors) {
 	if (!is_numeric($value) || ($value < 0))
 		$input_errors[] = 'You must enter a valid value for \'Minimum object size\'';
 
+  if (!empty($post['cache_swap_low'])) {
+    $value = trim($post['cache_swap_low']);
+	  if (!is_numeric($value) || ($value > 100))
+	  $input_errors[] = 'You must enter a valid value for \'Low-water-mark\'';
+	}
+
+  if (!empty($post['cache_swap_high'])) {		
+	 $value = trim($post['cache_swap_high']);
+	 if (!is_numeric($value) || ($value > 100))
+		$input_errors[] = 'You must enter a valid value for \'High-water-mark\'';		
+  }
+
 	if ($post['donotcache'] != "") {
 		foreach (split("\n", $post['donotcache']) as $host) {
 			$host = trim($host);
@@ -539,8 +551,6 @@ function squid_resync_cache() {
 	$min_objsize = ($settings['minimum_object_size'] ? $settings['minimum_object_size'] : 0);
 	$cache_policy = ($settings['cache_replacement_policy'] ? $settings['cache_replacement_policy'] : 'heap LFUDA');
 	$memory_policy = ($settings['memory_replacement_policy'] ? $settings['memory_replacement_policy'] : 'heap GDSF');
-	$cache_swap_low = ($settings['cache_swap_low'] ? $settings['cache_swap_low'] : '90');
-	$cache_swap_high = ($settings['cache_swap_high'] ? $settings['cache_swap_high'] : '95');
 	$offline_mode = ($settings['enable_offline'] == 'on' ? 'on' : 'off');
 
 	$conf = <<<EOD
@@ -550,11 +560,12 @@ maximum_object_size $max_objsize KB
 minimum_object_size $min_objsize KB
 cache_replacement_policy $cache_policy
 memory_replacement_policy $memory_policy
-cache_swap_low $cache_swap_low
-cache_swap_high $cache_swap_high
 offline_mode $offline_mode
 
 EOD;
+
+	if (!empty($settings['cache_swap_low'])) $conf .= "cache_swap_low {$settings['cache_swap_low']}\n";
+	if (!empty($settings['cache_swap_high'])) $conf .= "cache_swap_high {$settings['cache_swap_high']}\n";
 
 	$donotcache = base64_decode($settings['donotcache']);
 	if (!empty($donotcache)) {
