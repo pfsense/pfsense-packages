@@ -309,7 +309,7 @@ function squid_validate_general($post, $input_errors) {
 	}
 
 	if (($post['transparent_proxy'] != 'on') && ($post['private_subnet_proxy_off'] == 'on')) {
-		$input_errors[] = "You can not disable forwarding traffic to private subnets to the proxy server without using the transparent proxy.";
+		$input_errors[] = "You can not enable forwarding traffic to private subnets to the proxy server without using the transparent proxy.";
 	}
 
 }
