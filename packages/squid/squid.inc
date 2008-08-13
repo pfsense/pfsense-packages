@@ -714,8 +714,8 @@ function squid_resync_traffic() {
 	$settings = $config['installedpackages']['squidtraffic']['config'][0];
 	$conf = '';
 
-  if (!empty($settings['quick_abort_min']) || ($settings['quick_abort_min'])== 0) $conf .= "quick_abort_min {$settings['quick_abort_min']} KB\n";
-  if (!empty($settings['quick_abort_max']) || ($settings['quick_abort_max'])== 0) $conf .= "quick_abort_max {$settings['quick_abort_max']} KB\n";
+  if (!empty($settings['quick_abort_min']) || ($settings['quick_abort_min']) == "0") $conf .= "quick_abort_min {$settings['quick_abort_min']} KB\n";
+  if (!empty($settings['quick_abort_max']) || ($settings['quick_abort_max']) == "0") $conf .= "quick_abort_max {$settings['quick_abort_max']} KB\n";
   if (!empty($settings['quick_abort_pct'])) $conf .= "quick_abort_pct {$settings['quick_abort_pct']}\n";	
 
 	$up_limit = ($settings['max_upload_size'] ? $settings['max_upload_size'] : 0);
