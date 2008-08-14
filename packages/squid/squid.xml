@@ -238,7 +238,7 @@
 		<field>
 			<fielddescr>Disable VIA</fielddescr>
 			<fieldname>disable_via</fieldname>
-			<description>If not set, Squid will include a Via header in requests and replies.</description>
+			<description>If not set, Squid will include a Via header in requests and replies as required by RFC2616.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
