@@ -608,7 +608,7 @@ EOD;
 	if (!empty($donotcache)) {
 		file_put_contents(SQUID_ACLDIR . '/donotcache.acl', $donotcache);
 		$conf .= 'acl donotcache dstdomain "' . SQUID_ACLDIR . "/donotcache.acl\"\n";
-		$conf .= 'no_cache deny donotcache';
+		$conf .= 'cache deny donotcache';
 	}
 
 	return $conf;
