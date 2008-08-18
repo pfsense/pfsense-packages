@@ -314,7 +314,7 @@
     </package>
     <package>
       <name>squid3</name>
-      <descr>High performance web proxy cache.</descr>
+      <descr>EXPERIMANTAL! Notall directives are ported yet ! High performance web proxy cache.</descr>
       <website>http://www.squid-cache.org/</website>
       <category>Network</category>
       <version>3.0.8</version>
