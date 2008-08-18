@@ -313,6 +313,22 @@
       <configurationfile>squid.xml</configurationfile>
     </package>
     <package>
+      <name>squid3</name>
+      <descr>High performance web proxy cache.</descr>
+      <website>http://www.squid-cache.org/</website>
+      <category>Network</category>
+      <version>3.0.8</version>
+      <status>BETA</status>
+      <required_version>1.2.1</required_version>
+      <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl</maintainer>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package>squid-2.6.21.tbz</depends_on_package>
+      <depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
+	  <depends_on_package>openldap-client-2.4.10.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
+      <configurationfile>squid.xml</configurationfile>
+    </package>    
+    <package>
       <name>LCDproc</name>
       <descr>LCD display driver</descr>
       <website>http://www.lcdproc.org/</website>
