@@ -309,8 +309,17 @@ function squid_validate_general($post, $input_errors) {
 	}
 
 	if (($post['transparent_proxy'] != 'on') && ($post['private_subnet_proxy_off'] == 'on')) {
-		$input_errors[] = "You can not disable forwarding traffic to private subnets to the proxy server without using the transparent proxy.";
+		$input_errors[] = "You can not enable forwarding traffic to private subnets to the proxy server without using the transparent proxy.";
 	}
+
+  if(!empty($post['dns_nameservers'])) {
+	 $altdns = explode(";", ($post['dns_nameservers']));
+//  $conf .= "# Custom options\n";
+	 foreach ($altdns as $dnssrv) {
+//	$conf .= $custopt."\n";
+    if (!is_ipaddr($dnssrv))
+      $input_errors[] = 'You must enter a valid IP address in the \'Alternate DNS servers\' field';
+	 }}
 
 }
 
@@ -350,6 +359,18 @@ function squid_validate_cache($post, $input_errors) {
 	$value = trim($post['minimum_object_size']);
 	if (!is_numeric($value) || ($value < 0))
 		$input_errors[] = 'You must enter a valid value for \'Minimum object size\'';
+
+  if (!empty($post['cache_swap_low'])) {
+    $value = trim($post['cache_swap_low']);
+	  if (!is_numeric($value) || ($value > 100))
+	  $input_errors[] = 'You must enter a valid value for \'Low-water-mark\'';
+	}
+
+  if (!empty($post['cache_swap_high'])) {		
+	 $value = trim($post['cache_swap_high']);
+	 if (!is_numeric($value) || ($value > 100))
+		$input_errors[] = 'You must enter a valid value for \'High-water-mark\'';		
+  }
 
 	if ($post['donotcache'] != "") {
 		foreach (split("\n", $post['donotcache']) as $host) {
@@ -405,6 +426,25 @@ function squid_validate_traffic($post, $input_errors) {
 		if (!is_numeric($value) || ($value < 0))
 			$input_errors[] = "The field '$name' must contain a positive number";
 	}
+
+  if (!empty($post['quick_abort_min'])) {		
+	 $value = trim($post['quick_abort_min']);
+     if (!is_numeric($value))
+	   $input_errors[] = "The field 'Finish when remaining KB' must contain a positive number";	
+  }	
+  
+  if (!empty($post['quick_abort_max'])) {		
+	 $value = trim($post['quick_abort_max']);
+     if (!is_numeric($value))
+	   $input_errors[] = "The field 'Abort when remaining KB' must contain a positive number";	
+  }	
+		
+  if (!empty($post['quick_abort_pct'])) {		
+	 $value = trim($post['quick_abort_pct']);
+     if (!is_numeric($value) || ($value > 100))
+	   $input_errors[] = "The field 'Finish when remaining %' must contain a percentaged value";	
+  }	
+
 }
 
 function squid_validate_auth($post, $input_errors) {
@@ -500,7 +540,6 @@ cache_effective_group proxy
 error_directory $errordir
 visible_hostname $hostname
 cache_mgr $email
-
 access_log $logdir_access
 cache_log $logdir_cache
 cache_store_log none
@@ -521,10 +560,20 @@ EOD;
 	}
 	if ($settings['disable_xforward']) $conf .= "forwarded_for off\n";
 	if ($settings['disable_via']) $conf .= "via off\n";
-	if (!empty($settings['uri_whitespace'])) $conf .= "uri_whitespace {$settings['uri_whitespace']}\n";
+	$conf .= "uri_whitespace {$settings['uri_whitespace']}\n";
+	
+	if(!empty($settings['dns_nameservers'])) {
+	  $altdns = explode(";", ($settings['dns_nameservers']));
+    $conf .= "dns_nameservers ";
+	 foreach ($altdns as $dnssrv) {
+    $conf .= $dnssrv." ";
+	 }
+//  $conf .= "\n";
+   }
 	
   return $conf;
 }
+
 
 function squid_resync_cache() {
 	global $config;
@@ -552,11 +601,14 @@ offline_mode $offline_mode
 
 EOD;
 
+	if (!empty($settings['cache_swap_low'])) $conf .= "cache_swap_low {$settings['cache_swap_low']}\n";
+	if (!empty($settings['cache_swap_high'])) $conf .= "cache_swap_high {$settings['cache_swap_high']}\n";
+
 	$donotcache = base64_decode($settings['donotcache']);
 	if (!empty($donotcache)) {
 		file_put_contents(SQUID_ACLDIR . '/donotcache.acl', $donotcache);
 		$conf .= 'acl donotcache dstdomain "' . SQUID_ACLDIR . "/donotcache.acl\"\n";
-		$conf .= 'no_cache deny donotcache';
+		$conf .= 'cache deny donotcache';
 	}
 
 	return $conf;
@@ -600,8 +652,8 @@ function squid_resync_nac() {
 	$conf = <<<EOD
 
 # Setup some default acls
-acl all src 0.0.0.0/0
-acl localhost src 127.0.0.1
+acl all src 0.0.0.0/0.0.0.0
+acl localhost src 127.0.0.1/255.255.255.255
 acl safeports port 21 70 80 210 280 443 488 563 591 631 777 901 $webgui_port 1025-65535
 acl sslports port 443 563 $webgui_port
 acl manager proto cache_object
@@ -661,6 +713,10 @@ function squid_resync_traffic() {
 		return;
 	$settings = $config['installedpackages']['squidtraffic']['config'][0];
 	$conf = '';
+
+  if (!empty($settings['quick_abort_min']) || ($settings['quick_abort_min']) == "0") $conf .= "quick_abort_min {$settings['quick_abort_min']} KB\n";
+  if (!empty($settings['quick_abort_max']) || ($settings['quick_abort_max']) == "0") $conf .= "quick_abort_max {$settings['quick_abort_max']} KB\n";
+  if (!empty($settings['quick_abort_pct'])) $conf .= "quick_abort_pct {$settings['quick_abort_pct']}\n";	
 
 	$up_limit = ($settings['max_upload_size'] ? $settings['max_upload_size'] : 0);
 	$down_limit = ($settings['max_download_size'] ? $settings['max_download_size'] : 0);

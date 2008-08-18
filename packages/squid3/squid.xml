@@ -238,11 +238,11 @@
 		<field>
 			<fielddescr>Disable VIA</fielddescr>
 			<fieldname>disable_via</fieldname>
-			<description>If not set, Squid will include a Via header in requests and replies.</description>
+			<description>If not set, Squid will include a Via header in requests and replies as required by RFC2616.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>What to do with requests that have whitespace characters in the	URI.</fielddescr>
+			<fielddescr>What to do with requests that have whitespace characters in the	URI</fielddescr>
 			<fieldname>uri_whitespace</fieldname>
       <description>&lt;b&gt; strip:&lt;/b&gt; The whitespace characters are stripped out of the URL. This is the behavior recommended by RFC2396. &lt;p&gt; &lt;b&gt; deny:&lt;/b&gt; The request is denied. The user receives an "Invalid Request" message.&lt;p&gt; &lt;b&gt; allow:&lt;/b&gt; The request is allowed and the URI is not changed. The whitespace characters remain in the URI.&lt;p&gt; &lt;b&gt; encode:&lt;/b&gt; The request is allowed and the whitespace characters are encoded according to RFC1738.&lt;p&gt; &lt;b&gt; chop:&lt;/b&gt;	The request is allowed and the URI is chopped at the first whitespace.</description>
   		<type>select</type>
@@ -269,6 +269,13 @@
 					<value>chop</value>
 				</option>
 			</options>
+		</field>
+		<field>
+			<fielddescr>Use alternate DNS-servers for the proxy-server</fielddescr>
+			<fieldname>dns_nameservers</fieldname>
+			<description>If you want to use other DNS-servers than the DNS-forwarder, enter the IPs here, separated by semi-colons (;).</description>
+			<type>input</type>
+			<size>60</size>
 		</field>
 		<field>
 			<fielddescr>Custom Options</fielddescr>
