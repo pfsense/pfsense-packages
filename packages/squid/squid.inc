@@ -560,6 +560,7 @@ EOD;
 	}
 	if ($settings['disable_xforward']) $conf .= "forwarded_for off\n";
 	if ($settings['disable_via']) $conf .= "via off\n";
+	if ($settings['disable_squidversion']) $conf .= "httpd_suppress_version_string on\n";
 	$conf .= "uri_whitespace {$settings['uri_whitespace']}\n";
 	
 	if(!empty($settings['dns_nameservers'])) {
