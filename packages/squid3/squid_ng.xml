@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    authng.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2007 to whom it may belong
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>squid</name>
+	<version>2.5.12_4</version>
+	<title>Services: Proxy Server</title>
+	<category>Security</category>
+	<aftersaveredirect>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</aftersaveredirect>
+	<include_file>/usr/local/pkg/squid_ng.inc</include_file>
+	<menu>
+		<name>Squid</name>
+		<tooltiptext>Modify settings for Proxy Server</tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</url>
+	</menu>	
+	<menu>
+		<name>Squid stats</name>
+		<tooltiptext>Show Squid statistics</tooltiptext>
+		<section>Services</section>
+		<url>/cachemgr.cgi</url>
+	</menu>	
+	<service>
+		<name>squid</name>
+		<rcfile>squid.sh</rcfile>
+	</service>
+	<tabs>
+		<tab>
+			<text>General Settings</text>
+			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Upstream Proxy</text>
+			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Cache Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Network Access Control</text>
+			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Traffic Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Auth Settings</text>
+			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Extended Auth Settings</text>
+			<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>
+		</tab>
+	</tabs>
+	<configpath>installedpackages->package->squidng->configuration->settings</configpath>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/squid/squid_cache.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://www.pfsense.com/packages/config/squid/squid_nac.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://www.pfsense.com/packages/config/squid/squid_ng.inc</item>
+	</additional_files_needed>
+   	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://www.pfsense.com/packages/config/squid/squid_traffic.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://www.pfsense.com/packages/config/squid/squid_upstream.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/squid/squid_auth.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/squid/squid_auth.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/squid/squid_extauth.xml</item>
+	</additional_files_needed>
+	<fields>	
+		<field>
+			<fielddescr>Proxy Listening Interface</fielddescr>
+			<fieldname>active_interface</fieldname>
+			<description>This defines the active listening interface to which the proxy server will listen for its requests.</description>
+			<type>interfaces_selection</type>
+		</field>
+		<field>
+			<fielddescr>Transparent Proxy</fielddescr>
+			<fieldname>transparent_proxy</fieldname>
+			<description>If transparent mode is enabled; all requests for destination port 80 will be forwarded to the proxy server without any additional configuration necessary.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>URL Filtering Enabled</fielddescr>
+			<fieldname>urlfilter_enable</fieldname>
+			<description>This enables the advanced functionality in conjunction with squidGuard to provide an array of URL filtering options.  This squidGuard functionality can be additionally configured from Services -> Advanced Proxy Filtering</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Disable Access Log</fielddescr>
+			<fieldname>accesslog_disabled</fieldname>
+			<description>Disable the access log entirely.  By default, Squid keeps a log of all requests it processes in /var/log/access.log.  This can grow to be fairly large.  If you do not require this logging, check this box to disable.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Log Query Terms</fielddescr>
+			<fieldname>log_query_terms</fieldname>
+			<description>This will log the complete URL rather than the part of the URL containing dynamic queries.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Log User Agents</fielddescr>
+			<fieldname>log_user_agents</fieldname>
+			<description>This will enable the useragent string to be written to a separate log.  The results are not shown in the GUI and should only be used for debugging purposes.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Proxy Port</fielddescr>
+			<fieldname>proxy_port</fieldname>
+			<description>This is the port the Proxy Server will listen for client requests on.  The default is 3128.</description>
+			<type>input</type>
+			<size>4</size>
+			<combinefieldsend>true</combinefieldsend>
+		</field>
+		<field>
+			<fielddescr>ICP Port</fielddescr>
+			<fieldname>icp_port</fieldname>
+			<description>This is the port the Proxy Server will send and receive ICP queries to and from neighbor caches.  The default value is 0, which means this function is disabled.</description>
+			<type>input</type>
+			<size>4</size>
+		</field>
+		<field>
+			<fielddescr>Visible Hostname</fielddescr>
+			<fieldname>visible_hostname</fieldname>
+			<description>This URL is displayed on the Proxy Server error messages.</description>
+			<type>input</type>
+			<size>35</size>
+		</field>
+		<field>
+			<fielddescr>Cache Administrator E-Mail</fielddescr>
+			<fieldname>cache_admin_email</fieldname>
+			<description>This E-Mail address is displayed on the Proxy Server error messages.</description>
+			<type>input</type>
+			<size>35</size>
+		</field>
+		<field>
+			<fielddescr>Error Messages Language</fielddescr>
+			<fieldname>error_language</fieldname>
+			<description>Select the language in which the Proxy Server shall display error messages to users.</description>
+			<type>select</type>
+			<options>
+				<option><name>Bulgarian</name><value>Bulgarian</value></option>
+				<option><name>Catalan</name><value>Catalan</value></option>
+				<option><name>Czech</name><value>Czech</value></option>
+				<option><name>Danish</name><value>Danish</value></option>
+				<option><name>Dutch</name><value>Dutch</value></option>
+				<option><name>English</name><value>English</value></option>
+				<option><name>Estonian</name><value>Estonian</value></option>
+				<option><name>Finnish</name><value>Finnish</value></option>
+				<option><name>French</name><value>French</value></option>
+				<option><name>German</name><value>German</value></option>
+				<option><name>Hebrew</name><value>Hebrew</value></option>
+				<option><name>Hungarian</name><value>Hungarian</value></option>
+				<option><name>Italian</name><value>Italian</value></option>
+				<option><name>Japanese</name><value>Japanese</value></option>
+				<option><name>Korean</name><value>Korean</value></option>
+				<option><name>Lithuanian</name><value>Lithuanian</value></option>
+				<option><name>Polish</name><value>Polish</value></option>
+				<option><name>Portuguese</name><value>Portuguese</value></option>
+				<option><name>Romanian</name><value>Romanian</value></option>
+				<option><name>Russian-1251</name><value>Russian-1251</value></option>
+				<option><name>Russian-koi8-r</name><value>Russian-koi8-r</value></option>
+				<option><name>Serbian</name><value>Serbian</value></option>
+				<option><name>Simplify Chinese</name><value>Simplify Chinese</value></option>
+				<option><name>Slovak</name><value>Slovak</value></option>
+				<option><name>Spanish</name><value>Spanish</value></option>
+				<option><name>Swedish</name><value>Swedish</value></option>
+				<option><name>Traditional Chinese</name><value>Traditional Chinese</value></option>
+				<option><name>Turkish</name><value>Turkish</value></option>
+			</options>
+		</field>
+		<field>
+                        <fielddescr>Enable cachemgr</fielddescr>
+                        <fieldname>cachemgr_enabled</fieldname>
+  <description>Enable Squid's cachemgr.cgi to provide stats.  Once enabled you can access this from the pfSense menus.  &lt;b&gt;Note:&lt;/b&gt; This page is not secured by pfSense, any user with access to the pfSense admin port can view the stats.  The page prompts for a password but it only required for shutting down Squid.</description>
+                        <type>checkbox</type>
+                </field>
+
+	</fields>
+	<custom_add_php_command_late>
+		global_write_squid_config();
+		mwexec("/usr/local/sbin/squid -k reconfigure");
+		start_service("squid");		
+	</custom_add_php_command_late>
+	<custom_php_install_command>
+		custom_php_install_command();
+		write_static_squid_config();
+		mwexec("/usr/local/sbin/squid -k reconfigure");
+		start_service("squid");
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		custom_php_deinstall_command();
+		stop_service("squid");
+	</custom_php_deinstall_command>
+</packagegui>
