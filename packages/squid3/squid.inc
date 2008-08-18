@@ -4,7 +4,7 @@
 	squid.inc
 	Copyright (C) 2006 Scott Ullrich
 	Copyright (C) 2006 Fernando Lemos
-	Copyright (C) 2008 Martin Fuchs	
+	Copyright (C) 2008 Martin Fuchs
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -653,7 +653,6 @@ function squid_resync_nac() {
 	$conf = <<<EOD
 
 # Setup some default acls
-acl all src 0.0.0.0/0.0.0.0
 acl localhost src 127.0.0.1/255.255.255.255
 acl safeports port 21 70 80 210 280 443 488 563 591 631 777 901 $webgui_port 1025-65535
 acl sslports port 443 563 $webgui_port
@@ -722,7 +721,7 @@ function squid_resync_traffic() {
 	$up_limit = ($settings['max_upload_size'] ? $settings['max_upload_size'] : 0);
 	$down_limit = ($settings['max_download_size'] ? $settings['max_download_size'] : 0);
 	$conf .= "request_body_max_size $up_limit KB\n";
-	$conf .= 'reply_body_max_size ' . ($down_limit * 1024) . " allow all\n";
+	$conf .= 'reply_body_max_size ' . ($down_limit * 1024) . "\n";
 
 	// Only apply throttling past 10MB
 	// XXX: Should this really be hardcoded?
