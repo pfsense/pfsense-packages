@@ -115,8 +115,7 @@
     </package>
     <package>
       <name>imspector</name>
-      <descr>IMSpector is an Instant Messenger transparent proxy with logging capabilities.
-      Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees.</descr>
+      <descr>IMSpector is an Instant Messenger transparent proxy with logging capabilities. Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees.</descr>
       <website>http://www.imspector.org/</website>
       <category>Network Management</category>
 	  <maintainer>rswagoner@gmail.com</maintainer>
@@ -314,7 +313,7 @@
     </package>
     <package>
       <name>squid3</name>
-      <descr>EXPERIMANTAL! Notall directives are ported yet ! High performance web proxy cache.</descr>
+      <descr>EXPERIMANTAL! Not all directives are ported yet! High performance web proxy cache.</descr>
       <website>http://www.squid-cache.org/</website>
       <category>Network</category>
       <version>3.0.8</version>
