@@ -127,7 +127,6 @@
 	  <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
 	  <depends_on_package>imspector-0.5.tbz</depends_on_package>
     </package>
-
     <package>
       <name>nut</name>
       <descr>Network UPS Tools</descr>
@@ -142,7 +141,6 @@
 	  <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>nut-2.2.2.tbz</depends_on_package>
 	</package>
-
 	<package>
 		<name>diag_new_states</name>
 		<descr>Paul Taylors version of Diagnostics States which utilizes pftop.</descr>
@@ -155,23 +153,6 @@
 		<config_file>http://www.pfsense.org/packages/config/diag_states_pt/diag_new_states.xml</config_file>
 		<configurationfile>http://www.pfsense.com/packages/config/diag_states_pt/diag_new_states.xml</configurationfile>
 	</package>
-    <package>
-      <name>sshterm</name>
-      <descr>
-        This is a package of the SSHTools SSHTerm Java Applet. SSHTools is a
-        suite of Java SSH applications providing a Java SSH API,
-        SSH Terminal, SSH secured VNC client, SFTP client and SSH Daemon.
-      </descr>
-      <website>http://sourceforge.net/projects/sshtools/</website>
-      <category>Security</category>
-      <version>0.1</version>
-      <status>Stable</status>
-      <required_version>1.2.1</required_version>
-      <depends_on_package_base_url>http://files.pfsense.com/packages/All/</depends_on_package_base_url>
-      <depends_on_package>sshtools-0.2.2.tbz</depends_on_package>
-      <config_file>http://www.pfsense.org/packages/config/sshterm/sshterm.xml</config_file>
-      <configurationfile>sshterm.xml</configurationfile>
-    </package>
     <package>
       <name>darkstat</name>
       <website>http://dmr.ath.cx/net/darkstat/</website>
