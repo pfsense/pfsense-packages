@@ -6,156 +6,185 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 
-	<name>squidguarddest</name>
-	<version>none</version>
-	<title>Proxy Content filter SquidGuard: Destinations</title>
-	<include_file>/usr/local/pkg/squidguard.inc</include_file>
+        <name>squidguarddest</name>
+        <version>none</version>
+        <title>Proxy Content filter SquidGuard: Destinations</title>
+        <include_file>/usr/local/pkg/squidguard.inc</include_file>
 
-	<delete_string>A proxy server user has been deleted.</delete_string>
-	<addedit_string>A proxy server user has been created/modified.</addedit_string>
+        <delete_string>A proxy server user has been deleted.</delete_string>
+        <addedit_string>A proxy server user has been created/modified.</addedit_string>
 
-	<tabs>
-		<tab>
-			<text>General settings</text>
-			<url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Default</text>
-			<url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>ACL</text>
-			<url>/pkg.php?xml=squidguard_acl.xml</url>
-		</tab>
-		<tab>
-			<text>Destinations</text>
-			<url>/pkg.php?xml=squidguard_dest.xml</url>			
-			<active/>
-		</tab>
-		<tab>
-			<text>Times</text>
-			<url>/pkg.php?xml=squidguard_time.xml</url>
-		</tab>
-		<tab>
-			<text>Rewrites</text>
-			<url>/pkg.php?xml=squidguard_rewr.xml</url>
-		</tab>
-		<tab>
-			<text>Log</text>
-			<url>/pkg_edit.php?xml=squidguard_log.xml</url>
-		</tab>
-	</tabs>
-	
-	<adddeleteeditpagefields>
-		<columnitem>
-			<fielddescr>Destination name</fielddescr>
-			<fieldname>name</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Domain list</fielddescr>
-			<fieldname>domains</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>URL list</fielddescr>
-			<fieldname>urls</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Expressions</fielddescr>
-			<fieldname>expressions</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Redirect</fielddescr>
-			<fieldname>redirect</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Description</fielddescr>
-			<fieldname>description</fieldname>
-		</columnitem>
-	</adddeleteeditpagefields>
+        <tabs>
+                <tab>
+                        <text>General settings</text>
+                        <url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
+                </tab>
+                <tab>
+                        <text>Default</text>
+                        <url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
+                </tab>
+                <tab>
+                        <text>ACL</text>
+                        <url>/pkg.php?xml=squidguard_acl.xml</url>
+                </tab>
+                <tab>
+                        <text>Destinations</text>
+                        <url>/pkg.php?xml=squidguard_dest.xml</url>
+                        <active/>
+                </tab>
+                <tab>
+                        <text>Times</text>
+                        <url>/pkg.php?xml=squidguard_time.xml</url>
+                </tab>
+                <tab>
+                        <text>Rewrites</text>
+                        <url>/pkg.php?xml=squidguard_rewr.xml</url>
+                </tab>
+                <tab>
+                        <text>Log</text>
+                        <url>/pkg_edit.php?xml=squidguard_log.xml</url>
+                </tab>
+        </tabs>
 
-	<fields>
-		<field>
-			<fielddescr>Name</fielddescr>
-			<fieldname>name</fieldname>
-			<description>				
-				You may enter name here. Name must consist of minimum 2 symbols, first from which letter. &lt;br&gt;
-				All other symbols must be [a-Z_0-9].
-			</description>
-			<type>input</type>
-			<size>90</size>
-			<required/>
-		</field>
-		<field>
-			<fielddescr>Domains list</fielddescr>
-			<fieldname>domains</fieldname>
-			<description>
-				Enter destination domains here. For separate domains names use ' '(space). 
-				&lt;p&gt; &lt;b&gt;Example:&lt;/b&gt; 'mail.ru e-mail.ru yahoo.com' .
-			</description>
-			<type>textarea</type>
-			<cols>60</cols>
-			<rows>10</rows>
-		</field>
-		<field>
-			<fielddescr>Expressions</fielddescr>
-			<fieldname>expressions</fieldname>
-			<description>
-				Enter word fragments, what may be contains in destinations URL path. 
-				For separate expression words use '|'. 
-				&lt;p&gt; &lt;b&gt;Example:&lt;/b&gt; 'mail|casino|game' .
-			</description>
-			<type>textarea</type>
-			<cols>60</cols>
-			<rows>10</rows>
-		</field>
-		<field>
-			<fielddescr>URLs list</fielddescr>
-			<fieldname>urls</fieldname>
-			<description>
-				Enter url's here. 
-				For separate urls's use ' '(space). 
-				&lt;p&gt; &lt;b&gt;Example:&lt;/b&gt; 'host.com/xxx 12.10.220.125/alisa' .
-			</description>
-			<type>textarea</type>
-			<cols>60</cols>
-			<rows>10</rows>
-		</field>
-		<field>
-			<fielddescr>Redirect</fielddescr>
-			<fieldname>redirect</fieldname>
-			<description>
-				Enter redirection URL, Tag or Error page code for this rule, or leave blank. &lt;br&gt;
-				Supported URL's: 'http://myurl', 'https://myurl'. &lt;br&gt;
-				Supported tags: 'blank', 'blank_img'. &lt;br&gt;
-				Supported error page codes: 3xx, 4xx, 5xx. Format: 'code' or 'code[space]reason message'.
-			</description>
-			<type>textarea</type>
-			<cols>60</cols>
-			<rows>2</rows>
-		</field>
-		<field>
-			<fielddescr>Enable log</fielddescr>
-			<fieldname>enablelog</fieldname>
-			<type>checkbox</type>
-			<description>Check this for enable log.</description>
-		</field>
-		<field>
-			<fielddescr>Description</fielddescr>
-			<fieldname>description</fieldname>
-			<description>You may enter a description here for your reference (not parsed).</description>
-			<type>input</type>
-			<size>90</size>
-		</field>
-	</fields>
+        <adddeleteeditpagefields>
+                <columnitem>
+                        <fielddescr>Destination name</fielddescr>
+                        <fieldname>name</fieldname>
+                </columnitem>
+                <columnitem>
+                        <fielddescr>Domain list</fielddescr>
+                        <fieldname>domains</fieldname>
+                </columnitem>
+                <columnitem>
+                        <fielddescr>URL list</fielddescr>
+                        <fieldname>urls</fieldname>
+                </columnitem>
+                <columnitem>
+                        <fielddescr>Expressions</fielddescr>
+                        <fieldname>expressions</fieldname>
+                </columnitem>
+                <columnitem>
+                        <fielddescr>Redirect</fielddescr>
+                        <fieldname>redirect</fieldname>
+                </columnitem>
+                <columnitem>
+                        <fielddescr>Description</fielddescr>
+                        <fieldname>description</fieldname>
+                </columnitem>
+        </adddeleteeditpagefields>
 
-	<custom_delete_php_command/>
-	<custom_php_validation_command>
-		squidguard_validate_destination($_POST, &amp;$input_errors);
-	</custom_php_validation_command>
-	<custom_php_resync_config_command>
-//		squidguard_resync_time();
-	</custom_php_resync_config_command>
-	<custom_php_after_form_command> 
-		squidGuard_print_javascript();
-	</custom_php_after_form_command>
+        <fields>
+                <field>
+                        <fielddescr>Name</fielddescr>
+                        <fieldname>name</fieldname>
+                        <description>
+                                Enter the unique name here.
+                                Name must consist of minimum 2 symbols, first from which letter. &lt;br&gt;
+                                All other symbols must be [a-Z_0-9].
+                        </description>
+                        <type>input</type>
+                        <size>100</size>
+                        <required/>
+                </field>
+                <field>
+                        <fielddescr>Domains list</fielddescr>
+                        <fieldname>domains</fieldname>
+                        <description>
+                                Enter destination domains here. For separate domains names use ' '(space).
+                                &lt;p&gt; &lt;b&gt;Example:&lt;/b&gt; 'mail.ru e-mail.ru yahoo.com' .
+                        </description>
+                        <type>textarea</type>
+                        <cols>60</cols>
+                        <rows>10</rows>
+                </field>
+                <field>
+                        <fielddescr>Expressions</fielddescr>
+                        <fieldname>expressions</fieldname>
+                        <description>
+                                Enter word fragments, what may be contains in destinations URL path.
+                                For separate expression words use '|'.
+                                &lt;p&gt; &lt;b&gt;Example:&lt;/b&gt; 'mail|casino|game' .
+                        </description>
+                        <type>textarea</type>
+                        <cols>60</cols>
+                        <rows>10</rows>
+                </field>
+                <field>
+                        <fielddescr>URLs list</fielddescr>
+                        <fieldname>urls</fieldname>
+                        <description>
+                                Enter url's here.
+                                For separate urls's use ' '(space).
+                                &lt;p&gt; &lt;b&gt;Example:&lt;/b&gt; 'host.com/xxx 12.10.220.125/alisa' .
+                        </description>
+                        <type>textarea</type>
+                        <cols>60</cols>
+                        <rows>10</rows>
+                </field>
+                <field>
+                        <fielddescr>Redirect mode</fielddescr>
+                        <fieldname>redirect_mode</fieldname>
+                        <description>
+                                Select redirect mode here.
+                                &lt;br&gt; Note: if you use 'transparent proxy', then 'int' redirect mode will not accessible.
+<!--                                &lt;br&gt;&lt;b&gt; int size limit  :&lt;/b&gt;    if content size 0 or > 'size limit', then client moved to 'blank image' page; -->
+                                &lt;br&gt; Options:
+                                &lt;A title="To 'url' will added special client information;" &gt;
+                                &lt;span style="background-color: #dddddd;" &gt;ext url err page&lt;/span&gt;&lt;/A&gt; ,
+                                &lt;A title="Client view 'url' content without any notification about;" &gt;
+                                &lt;span style="background-color: #dddddd;" &gt; ext url redirect&lt;/span&gt;&lt;/A&gt; ,
+                                &lt;A title="Client will moved to specified url with displaying url in addres bar;" &gt;
+                                &lt;span style="background-color: #dddddd;" &gt; ext url as 'move'&lt;/span&gt;&lt;/A&gt; ,
+                                &lt;A title="Client will moved to specified url with showing progress(only!) in status bar;" &gt;
+                                &lt;span style="background-color: #dddddd;" &gt; ext url as 'found'.&lt;/span&gt;&lt;/A&gt;
+                                &lt;/u&gt;
+                        </description>
+                        <type>select</type>
+                        <value>rmod_none</value>
+                        <options>
+                                <option><name>none</name>                                                <value>rmod_none</value></option>
+                                <option><name>int error page (enter error message)</name>                <value>rmod_int</value></option>
+                                <option><name>int blank page </name>                                        <value>rmod_int_bpg</value></option>
+                                <option><name>int blank image</name>                                        <value>rmod_int_bim</value></option>
+<!--                                <option><name>int size limit (enter size in bytes)</name>        <value>rmod_int_szl</value></option> -->
+                                <option><name>ext url err page (enter URL)</name>                   <value>rmod_ext_err</value></option>
+                                <option><name>ext url redirect (enter URL)</name>                   <value>rmod_ext_rdr</value></option>
+                                <option><name>ext url move  (enter URL)</name>                         <value>rmod_ext_mov</value></option>
+                                <option><name>ext url found (enter URL)</name>                         <value>rmod_ext_fnd</value></option>
+                        </options>
+                </field>
+                <field>
+                        <fielddescr>Redirect</fielddescr>
+                        <fieldname>redirect</fieldname>
+                        <description>
+                                Enter external redirection URL, error message or size (bytes) here.
+                        </description>
+                        <type>textarea</type>
+                        <cols>60</cols>
+                        <rows>2</rows>
+                </field>
+                <field>
+                        <fielddescr>Enable log</fielddescr>
+                        <fieldname>enablelog</fieldname>
+                        <type>checkbox</type>
+                        <description>Check this for enable log.</description>
+                </field>
+                <field>
+                        <fielddescr>Description</fielddescr>
+                        <fieldname>description</fieldname>
+                        <description>You may enter a description here for your reference (not parsed).</description>
+                        <type>input</type>
+                        <size>90</size>
+                </field>
+        </fields>
+
+        <custom_delete_php_command/>
+        <custom_php_validation_command>
+                squidguard_validate_destination($_POST, &amp;$input_errors);
+        </custom_php_validation_command>
+        <custom_php_resync_config_command>
+        </custom_php_resync_config_command>
+        <custom_php_after_form_command>
+                squidGuard_print_javascript();
+        </custom_php_after_form_command>
 </packagegui>

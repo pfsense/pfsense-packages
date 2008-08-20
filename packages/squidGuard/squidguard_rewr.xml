@@ -26,7 +26,7 @@
 		</tab>
 		<tab>
 			<text>Destinations</text>
-			<url>/pkg.php?xml=squidguard_dest.xml</url>			
+			<url>/pkg.php?xml=squidguard_dest.xml</url>
 		</tab>
 		<tab>
 			<text>Times</text>
@@ -42,7 +42,7 @@
 			<url>/pkg_edit.php?xml=squidguard_log.xml</url>
 		</tab>
 	</tabs>
-	
+
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Name</fielddescr>
@@ -54,13 +54,14 @@
 		</columnitem>
 	</adddeleteeditpagefields>
 
-	<fields>		
+	<fields>
 		<field>
 			<fielddescr>Name</fielddescr>
 			<fieldname>name</fieldname>
 			<description>
-				You may enter name here. Name must consist of minimum 2 symbols, first from which letter. &lt;br&gt;
-				All other symbols must be [a-Z_0-9].				
+                   Enter the unique name here.
+                   Name must consist of minimum 2 symbols, first from which letter. &lt;br&gt;
+                   All other symbols must be [a-Z_0-9].
 			</description>
 			<type>input</type>
 			<required/>
@@ -84,7 +85,7 @@
 					<type>input</type>
 					<size>69</size>
 				</rowhelperfield>
-				
+
 <!--				<rowhelperfield>
 					<fielddescr>Case ins.</fielddescr>
 					<fieldname>caseins</fieldname>
@@ -116,14 +117,14 @@
 				&lt;b&gt; Note: &lt;/b&gt; &lt;br&gt;
 				&lt;b&gt;Rewrite rule&lt;/b&gt; - define how url will are replaced.&lt;br&gt;
 				&lt;b&gt;Target URL or regular expression&lt;/b&gt; - contains destination url or regular expression. Regular expression example: */cc32e46.exe &lt;br&gt;
-				&lt;b&gt;Replace to&lt;/b&gt; - contains replacing url.		
+				&lt;b&gt;Replace to&lt;/b&gt; - contains replacing url.
 			</description>
 			<type>input</type>
 			<size>100</size>
 		</field>
 	</fields>
 
-	<custom_php_after_form_command> 
+	<custom_php_after_form_command>
 		squidGuard_print_javascript();
 	</custom_php_after_form_command>
 	<custom_php_validation_command>

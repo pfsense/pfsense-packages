@@ -6,98 +6,127 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 
-	<name>squidguarddefault</name>
-	<version>none</version>
-	<title>Proxy Content filter SquidGuard: Default</title>
-	<include_file>/usr/local/pkg/squidguard.inc</include_file>
+        <name>squidguarddefault</name>
+        <version>none</version>
+        <title>Proxy Content filter SquidGuard: Default</title>
+        <include_file>/usr/local/pkg/squidguard.inc</include_file>
 
-	<tabs>
-		<tab>
-			<text>General settings</text>
-			<url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
-		</tab>
-		<tab>
-			<text>Default</text>
-			<url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
-			<active/>
-		</tab>
-		<tab>
-			<text>ACL</text>
-			<url>/pkg.php?xml=squidguard_acl.xml</url>
-		</tab>
-		<tab>
-			<text>Destinations</text>
-			<url>/pkg.php?xml=squidguard_dest.xml</url>			
-		</tab>
-		<tab>
-			<text>Times</text>
-			<url>/pkg.php?xml=squidguard_time.xml</url>
-		</tab>
-		<tab>
-			<text>Rewrites</text>
-			<url>/pkg.php?xml=squidguard_rewr.xml</url>
-		</tab>
-		<tab>
-			<text>Log</text>
-			<url>/pkg_edit.php?xml=squidguard_log.xml</url>
-		</tab>
-	</tabs>
-	
-	<fields>		
-		<field>
-			<fielddescr>Default destination</fielddescr>
-			<fieldname>dest</fieldname>
-			<description></description>
-			<type>input</type>
-			<size>100</size>
-		</field>
-		<field>
-			<fielddescr>Not to allow IP addresses in URL</fielddescr>
-			<fieldname>notallowingip</fieldname>
-			<description>
-				To make sure that people don't bypass the URL filter 
-				by simply using the IP addresses instead of the fully qualified domain names, you can check this option.   
-			</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>Default Redirect</fielddescr>
-			<fieldname>redirect</fieldname>
-			<description>
-				Enter redirection URL, Tag or Error page code for this rule, or leave blank. &lt;br&gt;
-				Supported URL's: 'http://myurl', 'https://myurl'. &lt;br&gt;
-				Supported tags: 'blank', 'blank_img'. &lt;br&gt;
-				Supported error page codes: 3xx, 4xx, 5xx. Format: 'code' or 'code[space]reason message'.
-			</description>
-			<type>textarea</type>
-			<cols>65</cols>
-			<rows>2</rows>
-		</field>
-		<field>
-			<fielddescr>Default Rewrite</fielddescr>
-			<fieldname>rewrite</fieldname>
-			<description>Enter rewrite condition name for this rule, or leave blank.</description>
-			<type>select</type>
-		</field>
-		<field>
-			<fielddescr>Enable log</fielddescr>
-			<fieldname>enablelog</fieldname>
-			<description>Check this for enable log.</description>
-			<type>checkbox</type>
-		</field>
-	</fields>
+        <tabs>
+                <tab>
+                        <text>General settings</text>
+                        <url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
+                </tab>
+                <tab>
+                        <text>Default</text>
+                        <url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
+                        <active/>
+                </tab>
+                <tab>
+                        <text>ACL</text>
+                        <url>/pkg.php?xml=squidguard_acl.xml</url>
+                </tab>
+                <tab>
+                        <text>Destinations</text>
+                        <url>/pkg.php?xml=squidguard_dest.xml</url>
+                </tab>
+                <tab>
+                        <text>Times</text>
+                        <url>/pkg.php?xml=squidguard_time.xml</url>
+                </tab>
+                <tab>
+                        <text>Rewrites</text>
+                        <url>/pkg.php?xml=squidguard_rewr.xml</url>
+                </tab>
+                <tab>
+                        <text>Log</text>
+                        <url>/pkg_edit.php?xml=squidguard_log.xml</url>
+                </tab>
+        </tabs>
 
-	<custom_php_validation_command>
-		squidguard_validate_acl(&amp;$_POST, &amp;$input_errors);
-	</custom_php_validation_command>
-	<custom_php_command_before_form>
-		squidguard_before_form_acl(&amp;$pkg, false);
-	</custom_php_command_before_form>
-	<custom_php_after_form_command> 
+        <fields>
+                <field>
+                        <fielddescr>Default destination</fielddescr>
+                        <fieldname>dest</fieldname>
+                        <description></description>
+                        <type>input</type>
+                        <size>100</size>
+                </field>
+                <field>
+                        <fielddescr>Not to allow IP addresses in URL</fielddescr>
+                        <fieldname>notallowingip</fieldname>
+                        <description>
+                                To make sure that people don't bypass the URL filter
+                                by simply using the IP addresses instead of the fully qualified domain names, you can check this option.
+                        </description>
+                        <type>checkbox</type>
+                </field>
+              <field>
+                        <fielddescr>Redirect mode</fielddescr>
+                        <fieldname>redirect_mode</fieldname>
+                        <description>
+                                Select redirect mode here.
+                                &lt;br&gt; Note: if you use 'transparent proxy', then 'int' redirect mode will not accessible.
+<!--                                &lt;br&gt;&lt;b&gt; int size limit  :&lt;/b&gt;    if content size 0 or > 'size limit', then client moved to 'blank image' page; -->
+                                &lt;br&gt; Options:
+                                &lt;A title="To 'url' will added special client information;" &gt;
+                                &lt;span style="background-color: #dddddd;" &gt;ext url err page&lt;/span&gt;&lt;/A&gt; ,
+                                &lt;A title="Client view 'url' content without any notification about;" &gt;
+                                &lt;span style="background-color: #dddddd;" &gt; ext url redirect&lt;/span&gt;&lt;/A&gt; ,
+                                &lt;A title="Client will moved to specified url with displaying url in addres bar;" &gt;
+                                &lt;span style="background-color: #dddddd;" &gt; ext url as 'move'&lt;/span&gt;&lt;/A&gt; ,
+                                &lt;A title="Client will moved to specified url with showing progress(only!) in status bar;" &gt;
+                                &lt;span style="background-color: #dddddd;" &gt; ext url as 'found'.&lt;/span&gt;&lt;/A&gt;
+                                &lt;/u&gt;
+                        </description>
+                        <type>select</type>
+                        <value>rmod_none</value>
+                        <options>
+                                <!--option><name>none</name>                                                <value>rmod_none</value></option-->
+                                <option><name>int error page (enter error message)</name>                <value>rmod_int</value></option>
+                                <option><name>int blank page </name>                                        <value>rmod_int_bpg</value></option>
+                                <!--option><name>int blank image</name>                                        <value>rmod_int_bim</value></option-->
+                                <!--option><name>int size limit (enter size in bytes)</name>        <value>rmod_int_szl</value></option-->
+                                <option><name>ext url err page (enter URL)</name>                   <value>rmod_ext_err</value></option>
+                                <option><name>ext url redirect (enter URL)</name>                   <value>rmod_ext_rdr</value></option>
+                                <option><name>ext url move  (enter URL)</name>                         <value>rmod_ext_mov</value></option>
+                                <option><name>ext url found (enter URL)</name>                         <value>rmod_ext_fnd</value></option>
+                        </options>
+              </field>
+                <field>
+                        <fielddescr>Redirect info</fielddescr>
+                        <fieldname>redirect</fieldname>
+                        <description>
+                                Enter external redirection URL, error message or size (bytes) here.
+                        </description>
+                        <type>textarea</type>
+                        <cols>65</cols>
+                        <rows>2</rows>
+                </field>
+                <field>
+                        <fielddescr>Rewrite</fielddescr>
+                        <fieldname>rewrite</fieldname>
+                        <description>Enter rewrite condition name for this rule, or leave blank.</description>
+                        <type>select</type>
+                </field>
+                <field>
+                        <fielddescr>Enable log</fielddescr>
+                        <fieldname>enablelog</fieldname>
+                        <description>Check this for enable log.</description>
+                        <type>checkbox</type>
+                </field>
+        </fields>
+
+        <custom_php_validation_command>
+                squidguard_validate_acl(&amp;$_POST, &amp;$input_errors);
+        </custom_php_validation_command>
+        <custom_php_command_before_form>
+                squidguard_before_form_acl(&amp;$pkg, false);
+        </custom_php_command_before_form>
+        <custom_php_after_form_command>
         squidGuard_print_javascript();
-	</custom_php_after_form_command>
-	<custom_add_php_command/>
-	<custom_php_resync_config_command>
-//		squidguard_resync();
-	</custom_php_resync_config_command>
+        </custom_php_after_form_command>
+        <custom_add_php_command/>
+        <custom_php_resync_config_command>
+//                squidguard_resync();
+        </custom_php_resync_config_command>
 </packagegui>
