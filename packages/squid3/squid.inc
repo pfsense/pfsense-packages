@@ -523,6 +523,7 @@ function squid_resync_general() {
 	$pidfile = "{$g['varrun_path']}/squid.pid";
 	$language = ($settings['error_language'] ? $settings['error_language'] : 'English');
 	$errordir = SQUID_CONFBASE . '/errors/' . $language;
+	$icondir = SQUID_CONFBASE . '/icons/';
 	$hostname = ($settings['visible_hostname'] ? $settings['visible_hostname'] : 'localhost');
 	$email = ($settings['admin_email'] ? $settings['admin_email'] : 'admin@localhost');
 
@@ -538,6 +539,7 @@ pid_filename $pidfile
 cache_effective_user proxy
 cache_effective_group proxy
 error_directory $errordir
+icon_directory $icondir
 visible_hostname $hostname
 cache_mgr $email
 access_log $logdir_access
