@@ -561,9 +561,9 @@ EOD;
 	if ($settings['disable_xforward']) $conf .= "forwarded_for off\n";
 	if ($settings['disable_via']) $conf .= "via off\n";
 	if ($settings['disable_squidversion']) $conf .= "httpd_suppress_version_string on\n";
-	if (empty($settings['uri_whitespace'])) $conf .= "uri_whitespace strip\n";
-  else $conf .= "uri_whitespace {$settings['uri_whitespace']}\n";
-	
+	if (!empty($settings['uri_whitespace'])) $conf .= "uri_whitespace {$settings['uri_whitespace']}\n";
+  else $conf .= "uri_whitespace strip\n"; //only used for first run
+
 	if(!empty($settings['dns_nameservers'])) {
 	  $altdns = explode(";", ($settings['dns_nameservers']));
     $conf .= "dns_nameservers ";
