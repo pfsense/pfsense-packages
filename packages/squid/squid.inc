@@ -648,7 +648,8 @@ function squid_resync_redirector() {
 function squid_resync_nac() {
 	global $config, $valid_acls;
 
-	$settings = $config['installedpackages']['squidnac']['config'][0];
+  $port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);	
+  $settings = $config['installedpackages']['squidnac']['config'][0];
 	$webgui_port = $config['system']['webgui']['port'];
 
 	$conf = <<<EOD
@@ -656,7 +657,7 @@ function squid_resync_nac() {
 # Setup some default acls
 acl all src 0.0.0.0/0.0.0.0
 acl localhost src 127.0.0.1/255.255.255.255
-acl safeports port 21 70 80 210 280 443 488 563 591 631 777 901 $webgui_port 1025-65535
+acl safeports port 21 70 80 210 280 443 488 563 591 631 777 901 $port $webgui_port 1025-65535
 acl sslports port 443 563 $webgui_port
 acl manager proto cache_object
 acl purge method PURGE
