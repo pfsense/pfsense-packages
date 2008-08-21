@@ -4,6 +4,7 @@
 	squid.inc
 	Copyright (C) 2006 Scott Ullrich
 	Copyright (C) 2006 Fernando Lemos
+	Copyright (C) 2008 Martin Fuchs	
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without

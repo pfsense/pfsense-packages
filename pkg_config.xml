@@ -510,7 +510,7 @@
       <version>2.6.18.1_03</version>
       <status>BETA</status>
       <required_version>1.0</required_version>
-      <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl</maintainer>
+      <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All</depends_on_package_base_url>
       <depends_on_package>squid-2.6.18.tbz</depends_on_package>
       <depends_on_package>squid_radius_auth-1.0.8.tbz</depends_on_package>
