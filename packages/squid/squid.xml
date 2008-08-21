@@ -282,8 +282,8 @@
 			<fieldname>disable_squidversion</fieldname>
 			<description>If set, suppress Squid version string info in HTTP headers and HTML error pages.</description>
 			<type>checkbox</type>
-		</field>		
-		<field>
+		</field>
+    <field>
 			<fielddescr>Custom Options</fielddescr>
 			<fieldname>custom_options</fieldname>
 			<description>You can put your own custom options here, separated by semi-colons (;). They'll be added to the configuration. They need to be squid.conf native options, otherwise squid will NOT work.</description>

@@ -314,13 +314,10 @@ function squid_validate_general($post, $input_errors) {
 
   if(!empty($post['dns_nameservers'])) {
 	 $altdns = explode(";", ($post['dns_nameservers']));
-//  $conf .= "# Custom options\n";
 	 foreach ($altdns as $dnssrv) {
-//	$conf .= $custopt."\n";
     if (!is_ipaddr($dnssrv))
       $input_errors[] = 'You must enter a valid IP address in the \'Alternate DNS servers\' field';
 	 }}
-
 }
 
 function squid_validate_upstream($post, $input_errors) {
@@ -413,6 +410,13 @@ function squid_validate_nac($post, $input_errors) {
 		if (!empty($time) && !squid_is_timerange($time))
 			$input_errors[] = "The time range '$time' is not a valid time range";
 	}
+
+  if(!empty($post['ext_cachemanager'])) {
+	 $extmgr = explode(";", ($post['ext_cachemanager']));
+	 foreach ($extmgr as $mgr) {
+    if (!is_ipaddr($mgr))
+      $input_errors[] = 'You must enter a valid IP address in the \'External Cache Manager\' field';
+	 }}
 }
 
 function squid_validate_traffic($post, $input_errors) {
@@ -572,7 +576,7 @@ EOD;
 	 foreach ($altdns as $dnssrv) {
     $conf .= $dnssrv." ";
 	 }
-//  $conf .= "\n";
+  $conf .= "\n";
    }
 	
   return $conf;
@@ -696,8 +700,27 @@ EOD;
 	}
 
 	$conf .= <<<EOD
+	
 cache deny dynamic
 http_access allow manager localhost
+
+EOD;
+
+	if(!empty($settings['ext_cachemanager'])) {
+	  $extmgr = explode(";", ($settings['ext_cachemanager']));
+    $count = 1;
+    $conf .= "\n# Allow external cache managers\n";
+//    $conf .= "acl ext_manager src ".$settings['ext_cachemanager']."\n";
+	 foreach ($extmgr as $mgr) {
+    $conf .= "acl ext_manager_".$count." src ";
+    $conf .= $mgr." ";
+    $conf .= "\n";
+    $conf .= "http_access allow manager ext_manager_".$count."\n";
+    $count += 1;
+	 }}
+	
+  $conf .= <<<EOD
+  
 http_access deny manager
 http_access allow purge localhost
 http_access deny purge
