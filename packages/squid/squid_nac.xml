@@ -127,12 +127,12 @@
 			<encoding>base64</encoding>
 		</field>
 		<field>
-			<fielddescr>Allow an external host as a cachemanager</fielddescr>
+			<fielddescr>External Cache-Managers</fielddescr>
 			<fieldname>ext_cachemanager</fieldname>
-			<description>Enter the IPs for the external Cache Managers here, separated by semi-colons (;).</description>
+			<description>Enter the IPs for the external Cache Managers to be allowed here, separated by semi-colons (;).</description>
 			<type>input</type>
 			<size>60</size>
-		</field>		
+		</field>	
 	</fields>
 	<custom_php_validation_command>
 		squid_validate_nac($_POST, &amp;$input_errors);
