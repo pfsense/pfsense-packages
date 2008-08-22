@@ -508,7 +508,7 @@
       <website>http://www.squid-cache.org/</website>
       <category>Network</category>
       <version>2.6.18.1_03</version>
-      <status>STABLE</status>
+      <status>Stable</status>
       <required_version>1.0</required_version>
       <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/mirror/packages/All</depends_on_package_base_url>
