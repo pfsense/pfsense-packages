@@ -220,6 +220,7 @@
       <required_version>1.2.1</required_version>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>bandwidthd-2.0.1_1.tbz</depends_on_package>
+	  <depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
       <configurationfile>bandwidthd.xml</configurationfile>
     </package>
