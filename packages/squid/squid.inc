@@ -4,7 +4,6 @@
 	squid.inc
 	Copyright (C) 2006 Scott Ullrich
 	Copyright (C) 2006 Fernando Lemos
-	Copyright (C) 2008 Martin Fuchs
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -529,7 +528,7 @@ function squid_resync_general() {
 	$language = ($settings['error_language'] ? $settings['error_language'] : 'English');
 	$errordir = SQUID_CONFBASE . '/errors/' . $language;
 	$icondir = SQUID_CONFBASE . '/icons';
-  $hostname = ($settings['visible_hostname'] ? $settings['visible_hostname'] : 'localhost');
+	$hostname = ($settings['visible_hostname'] ? $settings['visible_hostname'] : 'localhost');
 	$email = ($settings['admin_email'] ? $settings['admin_email'] : 'admin@localhost');
 
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
@@ -619,7 +618,10 @@ EOD;
 		$conf .= 'acl donotcache dstdomain "' . SQUID_ACLDIR . "/donotcache.acl\"\n";
 		$conf .= 'cache deny donotcache';
 	}
-
+	elseif (file_exists(SQUID_ACLDIR . '/donotcache.acl')) {
+     unlink(SQUID_ACLDIR . '/donotcache.acl');
+    }
+  
 	return $conf;
 }
 
@@ -655,7 +657,7 @@ function squid_resync_redirector() {
 function squid_resync_nac() {
 	global $config, $valid_acls;
 
-  $port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);	
+  $port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
   $settings = $config['installedpackages']['squidnac']['config'][0];
 	$webgui_port = $config['system']['webgui']['port'];
 
@@ -698,10 +700,12 @@ EOD;
 			$conf .= "acl $option $directive \"" . SQUID_ACLDIR . "/$option.acl\"\n";
 			$valid_acls[] = $option;
 		}
+		elseif (file_exists(SQUID_ACLDIR . "/$option.acl")) {
+      unlink(SQUID_ACLDIR . "/$option.acl");
+    }
 	}
 
 	$conf .= <<<EOD
-	
 cache deny dynamic
 http_access allow manager localhost
 

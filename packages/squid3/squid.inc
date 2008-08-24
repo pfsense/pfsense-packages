@@ -619,7 +619,10 @@ EOD;
 		$conf .= 'acl donotcache dstdomain "' . SQUID_ACLDIR . "/donotcache.acl\"\n";
 		$conf .= 'cache deny donotcache';
 	}
-
+	elseif (file_exists(SQUID_ACLDIR . '/donotcache.acl')) {
+     unlink(SQUID_ACLDIR . '/donotcache.acl');
+    }
+  
 	return $conf;
 }
 
@@ -655,7 +658,7 @@ function squid_resync_redirector() {
 function squid_resync_nac() {
 	global $config, $valid_acls;
 
-	$port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
+  $port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
   $settings = $config['installedpackages']['squidnac']['config'][0];
 	$webgui_port = $config['system']['webgui']['port'];
 
@@ -697,6 +700,9 @@ EOD;
 			$conf .= "acl $option $directive \"" . SQUID_ACLDIR . "/$option.acl\"\n";
 			$valid_acls[] = $option;
 		}
+		elseif (file_exists(SQUID_ACLDIR . "/$option.acl")) {
+      unlink(SQUID_ACLDIR . "/$option.acl");
+    }
 	}
 
 	$conf .= <<<EOD
