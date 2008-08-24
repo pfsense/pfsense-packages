@@ -248,6 +248,7 @@ EOD;
 
 function squid_deinstall_command() {
 	global $config;
+  squid_install_cron(false);
 	$settings = $config['installedpackages']['squidcache']['config'][0];
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
@@ -296,6 +297,10 @@ function squid_validate_general($post, $input_errors) {
 		$input_errors[] = 'You must start log location with a / mark';
 	if (strlen($post['log_dir']) <= 3)
 		$input_errors[] = "That is not a valid log location dir";
+
+	$log_rotate = trim($post['log_rotate']);
+	if (!empty($log_rotate) && !is_numeric($log_rotate))
+		$input_errors[] = 'You must enter a valid number of days \'Log rotate\' field';
 
 	$webgui_port = $config['system']['webgui']['port'];
 	if(($config['system']['webgui']['port'] == "") && ($config['system']['webgui']['protocol'] == "http")) {
@@ -504,6 +509,51 @@ function squid_validate_auth($post, $input_errors) {
 	}
 }
 
+function squid_install_cron($should_install) {
+	global $config, $g;
+	if($g['booting']==true) 
+		return;
+	$is_installed = false;
+	if(!$config['cron']['item'])
+		return;
+	$x=0;
+	foreach($config['cron']['item'] as $item) {
+		if(strstr($item['command'], "/usr/local/sbin/squid")) {
+			$is_installed = true;
+			break;
+		}
+		$x++;
+	}
+	switch($should_install) {
+		case true:
+			if(!$is_installed) {
+				$cron_item = array();
+				$cron_item['minute'] = "0";
+				$cron_item['hour'] = "0";
+				$cron_item['mday'] = "*";
+				$cron_item['month'] = "*";
+				$cron_item['wday'] = "*";
+				$cron_item['who'] = "root";
+				$cron_item['command'] = "/usr/local/sbin/squid -k rotate";		
+				$config['cron']['item'][] = $cron_item;
+				parse_config(true);
+				write_config("Squid Log Rotation");
+				configure_cron();
+			}
+		break;
+		case false:
+			if($is_installed == true) {
+				if($x > 0) {
+					unset($config['cron']['item'][$x]);
+					parse_config(true);
+					write_config();
+				}
+				configure_cron();
+			}
+		break;
+	}
+}
+
 function squid_resync_general() {
 	global $g, $config, $valid_acls;
 
@@ -550,6 +600,18 @@ cache_mgr $email
 access_log $logdir_access
 cache_log $logdir_cache
 cache_store_log none
+
+EOD;
+
+  if (!empty($settings['log_rotate'])) {
+    $conf .= "logfile_rotate {$settings['log_rotate']}\n";
+    squid_install_cron(true);
+    }
+  else {
+    squid_install_cron(false);
+    }
+
+	$conf .= <<<EOD
 shutdown_lifetime 3 seconds
 
 EOD;
@@ -577,7 +639,7 @@ EOD;
 	 foreach ($altdns as $dnssrv) {
     $conf .= $dnssrv." ";
 	 }
-  $conf .= "\n";
+//  $conf .= "\n";  //Kill blank line after DNS-Servers
    }
 	
   return $conf;

@@ -191,6 +191,13 @@
 			<default_value>/var/squid/log</default_value>
 		</field>
 		<field>
+			<fielddescr>Log rotate</fielddescr>
+			<fieldname>log_rotate</fieldname>
+			<description>Defines how many days of logfiles will be kept. Rotation is disabled if left empty.</description>
+			<type>input</type>
+			<size>5</size>
+		</field>
+		<field>
 			<fielddescr>Proxy port</fielddescr>
 			<fieldname>proxy_port</fieldname>
 			<description>This is the port the proxy server will listen on.</description>
