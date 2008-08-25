@@ -298,7 +298,7 @@ function squid_validate_general($post, $input_errors) {
 		$input_errors[] = "That is not a valid log location dir";
 
 	$log_rotate = trim($post['log_rotate']);
-	if (!empty($log_rotate) && !is_numeric($log_rotate))
+	if (!empty($log_rotate) && !is_numeric($log_rotate) or ($log_rotate < 1))
 		$input_errors[] = 'You must enter a valid number of days \'Log rotate\' field';
 
 	$webgui_port = $config['system']['webgui']['port'];
