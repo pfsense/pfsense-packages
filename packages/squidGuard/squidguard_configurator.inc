@@ -53,6 +53,7 @@ require_once('squid.inc');
 /* Allow additional execution time 0 = no limit. */
 ini_set('max_execution_time', '3600');
 ini_set('max_input_time', '3600');
+ini_set('memory_limit', '32M');
 
 # ------------------------------------------------------------------------------
 # files header
@@ -148,11 +149,6 @@ define('RMOD_EXT_ERR',       'rmod_ext_err');
 define('RMOD_EXT_RDR',       'rmod_ext_rdr');
 define('RMOD_EXT_MOVED',     'rmod_ext_mov');
 define('RMOD_EXT_FOUND',     'rmod_ext_fnd');
-
-# debug options
-define('DEBUG_UPDATE_SQUID_CONF',        'true');
-define('DEBUG_UPDATE_SQUIDGUARD_DB',     'true');
-define('DEBUG_MAKE_SQUIDGUARD_CONFIG',   'true');
 
 # GUI options
 define('SQUIDGUARD_LOG_MAXCOUNT',        500);                                 # max log lines
@@ -741,13 +737,13 @@ function sg_create_config()
             # separate IP, domains, usernames
             $tsrc = explode(" ", trim($src[FLD_SOURCE]));
             foreach($tsrc as $sr) {
-            	$sr = trim($sr);
-            	if     (empty($sr))           continue;
-            	if     (is_ipaddr_valid($sr)) $sg_tag->items[] = "ip     $sr";
-            	elseif (is_domain_valid($sr)) $sg_tag->items[] = "domain $sr";
-            	elseif (is_username($sr))     $sg_tag->items[] = "user   " . str_replace("'", "", $sr);
+                    $sr = trim($sr);
+                    if     (empty($sr))           continue;
+                    if     (is_ipaddr_valid($sr)) $sg_tag->items[] = "ip     $sr";
+                    elseif (is_domain_valid($sr)) $sg_tag->items[] = "domain $sr";
+                    elseif (is_username($sr))     $sg_tag->items[] = "user   " . str_replace("'", "", $sr);
             }
-            if ($src[FLD_LOG])      $sg_tag->items[] = "log {SQUIDGUARD_ACCESSBLOCK_FILE}";
+            if ($src[FLD_LOG])      $sg_tag->items[] = "log " . SQUIDGUARD_ACCESSBLOCK_FILE;
 
             $sgconf[] = "";
             $sgconf[] = $sg_tag->tag_text();
@@ -831,7 +827,7 @@ function sg_create_config()
             if ($dst[FLD_RMOD] != RMOD_NONE)
                 $sg_tag->items[] = "redirect " . sg_redirector_base_url($dst[FLD_REDIRECT], $dst[FLD_RMOD]);
             if ($dst[FLD_LOG])
-                $sg_tag->items[] = "log {SQUIDGUARD_ACCESSBLOCK_FILE}";
+                $sg_tag->items[] = "log " . SQUIDGUARD_ACCESSBLOCK_FILE;
 
             $sgconf[] = "";
             $sgconf[] = $sg_tag->tag_text();
@@ -858,7 +854,7 @@ function sg_create_config()
                     $sg_tag->items[] = "s@.{$rw[FLD_TARGETURL]}@{$rw[FLD_REPLACETO]}@r";
 
                 if ($rew[FLD_LOG])
-                    $sg_tag->items[] = "log {SQUIDGUARD_ACCESSBLOCK_FILE}";
+                    $sg_tag->items[] = "log " . SQUIDGUARD_ACCESSBLOCK_FILE;
 
                 $sgconf[] = "";
                 $sgconf[] = $sg_tag->tag_text();
@@ -914,7 +910,7 @@ function sg_create_config()
                 if ($acl[FLD_REWRITENAME])
                     $sg_acltag->items[] = "rewrite {$acl[FLD_REWRITENAME]}";
                 if ($acl[FLD_LOG])
-                    $sg_acltag->items[] = "log {SQUIDGUARD_ACCESSBLOCK_FILE}";
+                    $sg_acltag->items[] = "log " . SQUIDGUARD_ACCESSBLOCK_FILE;
 
                 # overtime
                 if ($acl[FLD_TIMENAME]) {
@@ -960,7 +956,7 @@ function sg_create_config()
         if ($def[FLD_RMOD] !== RMOD_NONE)
             $sg_tag_def->items[] = "redirect " .  sg_redirector_base_url($def[FLD_REDIRECT], $def[FLD_RMOD]);
         if ($def[FLD_LOG])
-            $sg_tag_def->items[] = "log {SQUIDGUARD_ACCESSBLOCK_FILE}";
+            $sg_tag_def->items[] = "log " . SQUIDGUARD_ACCESSBLOCK_FILE;
 
     } # <- if def
     else {
@@ -1342,7 +1338,7 @@ function sg_check_config_data ($input_errors)
 
     # update log
     if (!empty($elog)) {
-    	$input_errors = (is_array($input_errors)) ? array_merge($input_errors, $elog) : implode("\n", $elog);
+            $input_errors = (is_array($input_errors)) ? array_merge($input_errors, $elog) : implode("\n", $elog);
     }
 
     return empty($elog);
@@ -1821,7 +1817,7 @@ function check_name_format ($name, $input_errors)
 
     # update log
     if (!empty($elog)) {
-    	$input_errors = (is_array($input_errors)) ? array_merge($input_errors, $elog) : implode("\n", $elog);
+            $input_errors = (is_array($input_errors)) ? array_merge($input_errors, $elog) : implode("\n", $elog);
     }
 
     return empty($elog);
@@ -1903,8 +1899,8 @@ function sg_check_dest($sgx, $input_errors)
     if (!empty($elog)) {
         $elog = "DEST '{$sgx[FLD_NAME]}': " . implode(" ", $elog);
         if (is_array($input_errors))
-    	     $input_errors[] = $elog;
-    	else $input_errors   = $elog;
+                 $input_errors[] = $elog;
+            else $input_errors   = $elog;
     }
     return empty($elog);
 }
@@ -1928,7 +1924,7 @@ function sg_check_src($sgx, $input_errors)
 
     # update log
     if (!empty($elog)) {
-    	$input_errors = (is_array($input_errors)) ? array_merge($input_errors, $elog) : implode("\n", $elog);
+            $input_errors = (is_array($input_errors)) ? array_merge($input_errors, $elog) : implode("\n", $elog);
     }
 
     return empty($elog);
