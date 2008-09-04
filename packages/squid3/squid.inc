@@ -571,7 +571,8 @@ function squid_resync_general() {
 		}
 	}
 	if (($settings['transparent_proxy'] == 'on')) {
-		$conf .= "http_port 127.0.0.1:80 transparent\n";
+		$conf .= "http_port 127.0.0.1:80 transparent\n"; // for squid < v.3.1 (for pf)	
+//	$conf .= "http_port 127.0.0.1:80 intercept\n"; // new from squid >= 3.1 (for pf)	
 	}
 	$icp_port = ($settings['icp_port'] ? $settings['icp_port'] : 0);
 
