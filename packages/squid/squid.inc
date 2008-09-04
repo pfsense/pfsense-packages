@@ -850,9 +850,9 @@ EOD;
 
 	if ($settings['throttle_specific'] == 'on') {
 		$exts = array();
-		$binaries = 'bin,cab,sea,ar,arj,tar,tgz,gz,tbz,bz2,zip,exe,com';
+		$binaries = 'bin,cab,sea,ar,arj,tar,tgz,gz,tbz,bz2,zip,7z,exe,com';
 		$cdimages = 'iso,bin,mds,nrg,gho,bwt,b5t,pqi';
-		$multimedia = 'aiff?,asf,avi,divx,mov,mp3,mp4,mpe?g,qt,ra?m';
+		$multimedia = 'aiff?,asf,avi,divx,mov,mp3,mp4,wmv,mpe?g,qt,ra?m';
 		foreach (array(	'throttle_binaries' => $binaries,
 				'throttle_cdimages' => $cdimages,
 				'throttle_multimedia' => $multimedia) as $field => $set) {
