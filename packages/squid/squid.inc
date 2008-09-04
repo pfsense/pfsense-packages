@@ -710,7 +710,7 @@ function squid_resync_redirector() {
 
 	$httpav_enabled = ($config['installedpackages']['clamav']['config'][0]['scan_http'] == 'on');
 	if ($httpav_enabled) {
-		$conf = "redirect_program /usr/local/bin/squirm\n";
+		$conf = "url_rewrite_program /usr/local/bin/squirm\n";
 	} else {
 		$conf = "# No redirector configured\n";
 	}
