@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+	<name>OpenVPN Client Export</name>
+	<version>0.0.1</version>
+	<title>OpenVPN Client Export</title>
+	<include_file>/usr/local/pkg/openvpn-client-export.inc</include_file>
+	<backup_file></backup_file>
+	<aftersaveredirect></aftersaveredirect>
+	<configpath></configpath>
+	<tabs>
+		<tab>
+			<name>Client Export</name>
+			<tabgroup>OpenVPN</tabgroup>
+			<url>/vpn_openvpn_export.php</url>
+		</tab>
+	</tabs>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://hole.shrew.net/~mgrooms/temp/openvpn-client-export.inc</item>
+        </additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>077</chmod>
+		<item>http://hole.shrew.net/~mgrooms/temp/openvpn-client-export.tgz</item>
+	</additional_files_needed>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr></fielddescr>
+			<fieldname></fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<fielddescr></fielddescr>
+			<fieldname></fieldname>
+			<description></description>
+			<size></size>
+			<type></type>
+		</field>
+	</fields>
+	<custom_php_install_command>
+		openvpn_client_export_install();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		openvpn_client_export_deinstall();
+	</custom_php_deinstall_command>
+</packagegui>
