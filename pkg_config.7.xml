@@ -292,7 +292,7 @@
       <descr>High performance web proxy cache.</descr>
       <website>http://www.squid-cache.org/</website>
       <category>Network</category>
-      <version>2.6.21_05</version>
+      <version>2.6.21_06</version>
       <status>Stable</status>
       <required_version>1.2.1</required_version>
       <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
@@ -308,7 +308,7 @@
       <descr>EXPERIMANTAL! Not all directives are ported yet! High performance web proxy cache.</descr>
       <website>http://www.squid-cache.org/</website>
       <category>Network</category>
-      <version>3.0.8_04</version>
+      <version>3.0.8_05</version>
       <status>ALPHA</status>
       <required_version>1.2.1</required_version>
       <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>

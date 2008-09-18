@@ -175,6 +175,13 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fielddescr>Do NOT proxy these IPs</fielddescr>
+			<fieldname>defined_ip_proxy_off</fieldname>
+			<description>Do not forward traffic from these &lt;b&gt;source&lt;/b&gt; IPs through the proxy server. Separate by semi-colons (;).</description>
+			<type>input</type>
+  		<size>80</size>
+		</field>		
+		<field>
 			<fielddescr>Enabled logging</fielddescr>
 			<fieldname>log_enabled</fieldname>
 			<description>This will enable the access log. Don't switch this on if you don't have much disk space left.</description>

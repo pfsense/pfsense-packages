@@ -316,6 +316,18 @@ function squid_validate_general($post, $input_errors) {
 	if (($post['transparent_proxy'] != 'on') && ($post['private_subnet_proxy_off'] == 'on')) {
 		$input_errors[] = "You can not bypass traffic to private subnets  without using the transparent proxy.";
 	}
+	
+	if (($post['transparent_proxy'] != 'on') && !empty($post['defined_ip_proxy_off'])) {
+		$input_errors[] = "You can not bypass traffic from specific IPs without using the transparent proxy.";
+	}	
+
+	foreach (array('defined_ip_proxy_off') as $hosts) {
+		foreach (explode(";", $post[$hosts]) as $host) {
+			$host = trim($host);
+			if (!empty($host) && !is_ipaddr($host))
+				$input_errors[] = "The entry '$host' is not a valid IP address";
+		}
+	}
 
   if(!empty($post['dns_nameservers'])) {
 	 $altdns = explode(";", ($post['dns_nameservers']));
@@ -1213,6 +1225,22 @@ function squid_generate_rules($type) {
        $rules .= "no rdr on $iface proto tcp from any to { 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8 } port 80\n";         
       }
      }
+    
+    if (!empty($squid_conf['defined_ip_proxy_off'])) {
+      $defined_ip_proxy_off = explode(";", $config['installedpackages']['squid']['config'][0]['defined_ip_proxy_off']);
+      $exempt_ip = "";
+        foreach ($defined_ip_proxy_off as $ip_proxy_off) {
+          if(!empty($ip_proxy_off)) {
+            $ip_proxy_off = trim($ip_proxy_off);
+            $exempt_ip .= ", $ip_proxy_off";
+          }
+        }
+        $exempt_ip = substr($exempt_ip,2);
+        foreach ($ifaces as $iface){
+          $rules .= "no rdr on $iface proto tcp from { $exempt_ip } to any port 80\n";         
+        }          
+    }
+     
 		foreach ($ifaces as $iface){
 			$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> 127.0.0.1 port 80\n";
 			};
