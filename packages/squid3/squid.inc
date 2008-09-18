@@ -1228,7 +1228,7 @@ function squid_generate_rules($type) {
      }
     
     if (!empty($squid_conf['defined_ip_proxy_off'])) {
-      $defined_ip_proxy_off = explode(";", $config['installedpackages']['squid']['config'][0]['defined_ip_proxy_off']);
+      $defined_ip_proxy_off = explode(";", $squid_conf['defined_ip_proxy_off']);
       $exempt_ip = "";
         foreach ($defined_ip_proxy_off as $ip_proxy_off) {
           if(!empty($ip_proxy_off)) {
