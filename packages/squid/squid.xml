@@ -169,9 +169,9 @@
 			<required/>
 		</field>
 		<field>
-			<fieldname>private_subnet_proxy_off</fieldname>
 			<fielddescr>Do NOT proxy Private Address Space (RFC 1918)</fielddescr>
-			<description>Do not forward traffic to Private Address Space (RFC 1918) to the proxy server.</description>
+			<fieldname>private_subnet_proxy_off</fieldname>
+			<description>Do not forward traffic to Private Address Space (RFC 1918) &lt;b&gt;destination&lt;/b&gt; through the proxy server.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
