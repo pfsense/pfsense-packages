@@ -1787,7 +1787,7 @@ function is_ipaddr_valid($val)
 # ------------------------------------------------------------------------------
 function is_domain_valid($domain)
 {
-    $dm_fmt = "([a-z][a-z0-9\-]{0,})";
+    $dm_fmt = "([a-z0-9\-]{1,})";
     $dm_fmt = "^(($dm_fmt{1,}\.){1,}$dm_fmt{2,})+$"; # example: (my.)(super.)(domain.)com
     return is_string($domain) && eregi($dm_fmt, trim($domain));
 }
