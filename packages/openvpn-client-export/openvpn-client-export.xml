@@ -17,12 +17,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://hole.shrew.net/~mgrooms/temp/openvpn-client-export.inc</item>
+		<item>http:///www.pfsense.com/packages/config/openvpn-client-export/openvpn-client-export.inc</item>
         </additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>077</chmod>
-		<item>http://hole.shrew.net/~mgrooms/temp/openvpn-client-export.tgz</item>
+		<item>http:///www.pfsense.com/packages/config/openvpn-client-export/openvpn-client-export.tgz</item>
 	</additional_files_needed>
 	<adddeleteeditpagefields>
 		<columnitem>
