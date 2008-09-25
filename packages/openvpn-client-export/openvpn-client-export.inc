@@ -37,7 +37,7 @@ function openvpn_client_export_install() {
 	$ovpndir = "/usr/local/share/openvpn";
 	$workdir = "{$ovpndir}/client-export";
 
-	if(is_dir("/usr/local/share/openvpn"))
+	if(!is_dir("/usr/local/share/openvpn"))
 		mkdir("/usr/local/share/openvpn");
 
 	exec("/usr/bin/tar zxf {$tarpath} -C {$ovpndir}");
