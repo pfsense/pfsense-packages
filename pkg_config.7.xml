@@ -385,7 +385,7 @@
 		<descr>Allows a pre-configured OpenVPN Windows Client to be exported directly from pfSense.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-7-stable/All</depends_on_package_base_url>
-		<depends_on_package>p7zip-4.57.tbz</depends_on_package>
+		<depends_on_package>p7zip-4.58.tbz</depends_on_package>
 		<version>0.1</version>
 		<status>BETA</status>
 		<required_version>1.3</required_version>
