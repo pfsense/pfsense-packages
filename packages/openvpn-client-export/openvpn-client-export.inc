@@ -188,16 +188,21 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	if (!$cert)
 		return false;
 
-	// create temp config directory
+	// create template directory
 	$tempdir = $g['tmp_path']."/openvpn-export-".uniqid();
 	mkdir($tempdir, 0700, true);
+
+	// create config directory
+	$confdir = "{$tempdir}/config";
+	if (!is_dir($conf_dir))
+		mkdir($confdir, 0700, true);
 
 	// copy the template directory
 	exec("cp -r {$workdir}/template/* {$tempdir}");
 
 	// write cofiguration file
 	$prefix = openvpn_client_export_prefix($srvid);
-	$cfgfile = "{$tempdir}/config/{$prefix}-config.ovpn";
+	$cfgfile = "{$confdir}/{$prefix}-config.ovpn";
 	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken);
 	if (!$conf)
 		return false;
