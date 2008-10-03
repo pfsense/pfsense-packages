@@ -216,7 +216,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	$keyfile = "{$tempdir}/config/{$prefix}-{$user['name']}.key";
 	file_put_contents($keyfile, base64_decode($cert['prv']));
 	if ($settings['tls']) {
-		$tlsfile = "{$tempdir}/config/{$prefix}-tls.key\n";
+		$tlsfile = "{$tempdir}/config/{$prefix}-tls.key";
 		file_put_contents($tlsfile, base64_decode($settings['tls']));
 	}
 
