@@ -552,12 +552,12 @@
   	  <name>squidGuard</name> 
   	  <descr>
           High perfomance web proxy filter. 
-          Required proxy squid-2.6.5 (or hi). 
+          Required proxy squid. 
 	  </descr> 
   	  <website>http://www.squidGuard.org/</website> 
   	  <maintainer>dv_serg@mail.ru</maintainer> 
   	  <category>Network Management</category> 
-  	  <version>1.2.0_1</version> 
+  	  <version>1.2.0_1-1</version> 
   	  <status>Beta</status> 
   	  <required_version>1.1</required_version> 
   	  <depends_on_package_base_url>http://www.pfsense.org/mirrors/packages/All/</depends_on_package_base_url> 
