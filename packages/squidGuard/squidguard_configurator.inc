@@ -1069,8 +1069,8 @@ function sg_redirector_base_url($rdr_info, $redirect_mode)
         case RMOD_EXT_RDR:         $rdr_path = "$rdr_info"; break;
         case RMOD_EXT_MOVED:       $rdr_path = "301:$rdr_info"; break;
         case RMOD_EXT_FOUND:       $rdr_path = "302:$rdr_info"; break;
-        case RMOD_INT_BLANKPAGE:   $rdr_path .= "?url=blank"; break;
-        case RMOD_INT_BLANKIMG:    $rdr_path .= "?url=blank_img"; break;
+        case RMOD_INT_BLANKPAGE:   $rdr_path .= "?url=blank&msg=" . rawurlencode($rdr_info) . REDIRECT_URL_ARGS; break;
+        case RMOD_INT_BLANKIMG:    $rdr_path .= "?url=blank_img&msg=" . rawurlencode($rdr_info) . REDIRECT_URL_ARGS; break;
         case RMOD_INT_SIZELIMIT:   $rdr_path .= "?url=maxlen_$rdr_info" . REDIRECT_URL_ARGS; break;
         case RMOD_INT_ERRORPAGE:
         default:                   $rdr_path .= "?url=" . rawurlencode("403 $rdr_info") . REDIRECT_URL_ARGS; break;
@@ -1746,6 +1746,16 @@ function is_url($url)
     if (eregi("^((30[1235]{1})|(40[0-9]{1})|(41[0-7]{1})|(50[0-5]{1}))", $url)) return true; # http error code 30x, 4xx, 50x.
     return false;
 }
+
+# url as 'domain/path': 'mydomain.com/index.php'
+function is_dest_url($url)
+{
+    $fmt  = "[a-zA-Z0-9_-]";
+
+    if (empty($url)) return false;
+    if (eregi("^(($fmt){1,}\.){1,}($fmt){2,}(/(.[^\*][^ ])*)", $url)) return true;
+    return false;
+}
 # ------------------------------------------------------------------------------
 # is_masksubnet - check ip/mask
 # ------------------------------------------------------------------------------
@@ -1890,7 +1900,7 @@ function sg_check_dest($sgx, $input_errors)
 
     # url
     foreach ($ur as $u_it)
-        if ($u_it && !is_url($u_it)) $elog[] = "Item '$u_it' is not a url";
+        if ($u_it && !is_dest_url($u_it)) $elog[] = "Item '$u_it' is not a url.";
 
     # check redirect
     sg_check_redirect($sgx[FLD_RMOD], $sgx[FLD_REDIRECT], &$elog);

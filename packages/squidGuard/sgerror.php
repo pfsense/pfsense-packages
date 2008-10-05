@@ -140,16 +140,24 @@ if ($url) {
     }
 
     # blank page
-    if ($url === 'blank') {
+    if ($url === TAG_BLANK) {
             echo get_page('');
     }
     # blank image
     elseif ($url === TAG_BLANK_IMG) {
-            # --------------------------------------------------------------
-            # return blank image
-            # --------------------------------------------------------------
-            header("Content-Type: image/gif;"); //  charset=windows-1251");
-            echo GIF_BODY;
+           $msg = trim($msg);
+           if(strpos($msg, "maxlen_") !== false) {
+              $maxlen = intval(trim(str_replace("maxlen_", "", $url)));
+              filter_by_image_size($cl['u'], $maxlen);
+              exit();
+           }
+           else {
+              # --------------------------------------------------------------
+              # return blank image
+              # --------------------------------------------------------------
+              header("Content-Type: image/gif;"); //  charset=windows-1251");
+              echo GIF_BODY;
+           }
     }
     # error code
     elseif ($err_id !== 0) {
@@ -236,5 +244,41 @@ function get_about() {
         $str[] = '</table>';
 
         return implode("\n", $str);
+}
+
+function filter_by_image_size($url, $val_size) {
+
+          # load url header
+          $ch = curl_init();
+          curl_setopt($ch, CURLOPT_URL, $url);
+          curl_setopt($ch, CURLOPT_HEADER, 1);
+          curl_setopt($ch, CURLOPT_NOBODY, 1);
+          curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+          $hd = curl_exec($ch);
+          curl_close($ch);
+
+         $size = 0;
+         $SKEY = "content-length:";
+         $s_tmp = strtolower($hd);
+         $s_tmp = str_replace("\n", " ", $s_tmp); # replace all "\n"
+         if (strpos($s_tmp, $SKEY) !== false) {
+             $s_tmp = trim(substr($s_tmp, strpos($s_tmp, $SKEY) + strlen($SKEY)));
+             $s_tmp = trim(substr($s_tmp, 0, strpos($s_tmp, " ")));
+             if (is_numeric($s_tmp))
+                  $size = intval($s_tmp);
+             else $size = 0;
+         }
+
+         # === check url type and content size ===
+         # redirect to specified url
+         if (($size !== 0) && ($size < $val_size)) {
+              header("HTTP/1.0");
+              header("Location: $url", '', 302);
+         }
+         # return blank image
+         else {
+              header("Content-Type: image/gif;");
+              echo GIF_BODY;
+         }
 }
 ?>
