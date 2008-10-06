@@ -39,10 +39,11 @@
 	<name>autoconfigbackup</name>
 	<version>1.0</version>
 	<title>Diagnostics: Auto Configuration Backup</title>
-        <savetext>Change</savetext>
+	<savetext>Change</savetext>
+	<includefile>/usr/local/pkg/autoconfigbackup.inc</includefile>
 	<aftersaveredirect>pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0</aftersaveredirect>
 	<menu>
-		<name>autoconfigbackup Settings</name>
+		<name>AutoConfigBackup</name>
 		<tooltiptext>Set autoconfigbackup settings such as password and port.</tooltiptext>
 		<section>Diagnostics</section>
 		<url>/pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0</url>
@@ -57,9 +58,14 @@
 	    <chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/autoconfigbackup/autoconfigbackup.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/autoconfigbackup/autoconfigbackup.inc</item>
+	</additional_files_needed>
 	<tabs>
 		<tab>
-			<text>autoconfigbackup Settings</text>
+			<text>Settings</text>
 			<url>/pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0</url>
 			<active/>
 		</tab>
@@ -70,28 +76,31 @@
 	</tabs>
 	<fields>
 		<field>
-			<fielddescr>autoconfigbackup Subscription Username</fielddescr>
-			<fieldname>input</fieldname>
-			<description>Enter the username for the Automatic Configuration Backup Web GUI.  Minimum 5 characters.</description>
-			<type>password</type>
+			<fielddescr>Subscription Username</fielddescr>
+			<fieldname>username</fieldname>
+			<description>Enter the username for the Automatic Configuration Backup Web GUI.  Minimum 6 characters.</description>
+			<type>intput</type>
 		</field>
 		<field>
-			<fielddescr>autoconfigbackup Subscription Password</fielddescr>
+			<fielddescr>Subscription Password</fielddescr>
 			<fieldname>password</fieldname>
-			<description>Enter the password for the Automatic Configuration Backup Web GUI.  Minimum 5 characters.</description>
+			<description>Enter the password for the Automatic Configuration Backup Web GUI.  Minimum 6 characters.</description>
 			<type>password</type>
 		</field>
 		<field>
-			<fielddescr>autoconfigbackup Password AGAIN</fielddescr>
+			<fielddescr>Enter Password again</fielddescr>
 			<fieldname>passwordagain</fieldname>
 			<type>password</type>
 		</field>
 		<field>
-			<fielddescr>Encryption password</fielddescr>
+			<fielddescr>Encryption Password</fielddescr>
 			<fieldname>crypto_password</fieldname>
 			<type>password</type>
 		</field>
     </fields>
+	<custom_php_validation_command>
+		custom_php_validation_command($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
 	<custom_php_global_functions>
 	</custom_php_global_functions>
 	<custom_add_php_command>

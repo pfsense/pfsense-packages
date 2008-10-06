@@ -10,7 +10,6 @@
  *
  */
 
-
 $last_backup_date 	= $config['system']['lastpfSbackup'];
 $last_config_change = $config['revision']['time'];
 
