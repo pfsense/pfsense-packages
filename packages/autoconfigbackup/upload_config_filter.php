@@ -54,6 +54,7 @@ if($last_backup_date <> $last_config_change) {
 		curl_setopt($curl_session, CURLOPT_URL, $upload_url);  
 		curl_setopt($curl_session, CURLOPT_POST, count($post_fields));  
 		curl_setopt($curl_session, CURLOPT_POSTFIELDS, $fields_string);
+		curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);		
 		curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
 		$data = curl_exec($curl_session);
 		if (curl_errno($curl_session)) {
@@ -71,7 +72,12 @@ if($last_backup_date <> $last_config_change) {
 		fwrite($fd, $config['revision']['time']);
 		fclose($fd);
 
-		log_error("End of portal.pfsense.org configuration backup.");
+		if(!strstr($data, "500")) {
+			log_error("An error occured while uploading your pfSense configuration to portal.pfsense.org ($data)");
+			file_notice("autoconfigurationbackup", "An error occured while uploading your pfSense configuration to portal.pfsense.org", $data, "");			
+		} else {
+			log_error("End of portal.pfsense.org configuration backup (success).");
+		}
 
 		// Unlock config
 		config_unlock();
