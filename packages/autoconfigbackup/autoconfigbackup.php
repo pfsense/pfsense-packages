@@ -36,64 +36,83 @@ require("guiconfig.inc");
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 
 // Seperator used during client / server communications
-$oper_sep = "\|\|";
+$oper_sep			= "\|\|";
 
 // Encryption password 
-$decrypt_password = $config['installedpackages']['autoconfigbackup']['config'][0]['decrypt_password'];
+$decrypt_password 	= $config['installedpackages']['autoconfigbackup']['config'][0]['decrypt_password'];
 
 // Defined username
-$username = $config['installedpackages']['autoconfigbackup']['config'][0]['username'];
+$username			= $config['installedpackages']['autoconfigbackup']['config'][0]['username'];
 
 // Defined password
-$password = $config['installedpackages']['autoconfigbackup']['config'][0]['password'];
+$password			= $config['installedpackages']['autoconfigbackup']['config'][0]['password'];
 
 // URL to restore.php
-$get_url = "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/restore.php?";
+$get_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/restore.php";
+
+// Set hostname
+$hostname			= $config['system']['hostname'];
 
 if(!$username) {
 	Header("Location: /pkg_edit.php?xml=autoconfigbackup.xml&id=0");
 	exit;
 }
 	
-if($_GET['newver'] != "") {
+if($_REQUEST['newver'] != "") {
 	// Phone home and obtain backups
-	$curl_Session = curl_init($get_url);
-	curl_setopt($curl_Session, CURLOPT_POST, 1);
-	curl_setopt($curl_Session, CURLOPT_POSTFIELDS, "action=restore&revision={$_GET['newver']}");
-	curl_setopt($curl_Session, CURLOPT_FOLLOWLOCATION, 1);
+	$curl_session = curl_init();
+	curl_setopt($curl_session, CURLOPT_URL, $get_url);  
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
-	$data = curl_exec($curl_Session);	
+	curl_setopt($curl_session, CURLOPT_POST, 1);
+	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=restore&revision={$_REQUEST['newver']}");
+
+	$data = curl_exec($curl_session);	
 	if (!tagfile_deformat($data, $data, "config.xml")) 
 		$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
 	$data = decrypt_data($data, $decrypt_password);
 	$fd = fopen("/tmp/config_restore.xml", "w");
 	fwrite($fd, $data);
 	fclose($fd);
-	curl_close($curl_Session);	
+	if (curl_errno($curl_session)) {
+		$fd = fopen("/tmp/backupdebug.txt", "w");
+		fwrite($fd, $get_url . "" . "action=restore&revision={$_REQUEST['newver']}" . "\n\n");
+		fwrite($fd, $data);
+		fwrite($fd, curl_error($curl_session));
+		fclose($fd);
+	} else {
+	    curl_close($curl_session);
+	}
 	unlink("/tmp/config_restore.xml");
 	if(config_restore("/tmp/config_restore.xml") == 0) {
-		$savemsg = "Successfully reverted to timestamp " . date("n/j/y H:i:s", $_GET['newver']) . ".";
+		$savemsg = "Successfully reverted to timestamp " . date("n/j/y H:i:s", $_REQUEST['newver']) . ".";
 	} else {
 		$savemsg = "Unable to revert to the selected configuration.";
 	}
 } else {
-	// Grab username and password from config.xml
-	$username = $config['installedpackages']['autoconfigbackup']['config'][0]['username'];
-	$password = $config['installedpackages']['autoconfigbackup']['config'][0]['password'];
-	// Phone home and obtain backups
-	$curl_Session = curl_init($get_url);
-	curl_setopt($curl_Session, CURLOPT_POST, 1);
-	curl_setopt($curl_Session, CURLOPT_POSTFIELDS, "action=showbackups");
-	curl_setopt($curl_Session, CURLOPT_FOLLOWLOCATION, 1);
+	$curl_session = curl_init();
+	curl_setopt($curl_session, CURLOPT_URL, $get_url);  
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
-	$data = curl_exec($curl_Session);
-	curl_close($curl_Session);	
+	curl_setopt($curl_session, CURLOPT_POST, 1);
+	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showbackups&hostname={$hostname}");
+	$data = curl_exec($curl_session);
+	if (curl_errno($curl_session)) {
+		$fd = fopen("/tmp/backupdebug.txt", "w");
+		fwrite($fd, $get_url . "" . "action=showbackups" . "\n\n");
+		fwrite($fd, $data);
+		fwrite($fd, curl_error($curl_session));
+		fclose($fd);
+	} else {
+	    curl_close($curl_session);
+	}
 }
 
-if($_GET['rmver'] != "") {
-	//unlink_if_exists($g['conf_path'] . '/backup/config-' . $_GET['rmver'] . '.xml');
-	//$savemsg = "Deleted backup with timestamp " . date("n/j/y H:i:s", $_GET['rmver']) . " and description \"" . $confvers[$_GET['rmver']]['description'] . "\".";
+if($_REQUEST['rmver'] != "") {
+	//unlink_if_exists($g['conf_path'] . '/backup/config-' . $_REQUEST['rmver'] . '.xml');
+	//$savemsg = "Deleted backup with timestamp " . date("n/j/y H:i:s", $_REQUEST['rmver']) . " and description \"" . $confvers[$_REQUEST['rmver']]['description'] . "\".";
 }
+
+echo "<!-- $data -->";
 
 // Loop through and create new confvers
 $data_split = split("\n", $data);
