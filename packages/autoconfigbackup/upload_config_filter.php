@@ -38,13 +38,32 @@ if($last_backup_date <> $last_config_change) {
 		$configxml = encrypt_data($data, $encryptpw);
 		tagfile_reformat($data, $data, "config.xml");
 
+		$post_fields = array(
+		                         'reason'=>urlencode($reason),  
+		                         'hostname'=>urlencode($hostname),  
+		                         'configxml'=>urlencode($configxml)
+		                    );
+		
+		//url-ify the data for the POST  
+		foreach($post_fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }  
+		rtrim($fields_string,'&');
+		
 		// Check configuration into the BSDP repo
-		$curl_Session = curl_init($upload_url);
-		curl_setopt($curl_Session, CURLOPT_POST, 1);
-		curl_setopt($curl_Session, CURLOPT_POSTFIELDS, "reason={$reason}&configxml={$configxml}&hostname={$hostname}");
-		curl_setopt($curl_Session, CURLOPT_FOLLOWLOCATION, 1);
-		$data = curl_exec($curl_Session);
-		curl_close($curl_Session);
+		$curl_session = curl_init();
+		curl_setopt($curl_session, CURLOPT_URL, $upload_url);  
+		curl_setopt($curl_session, CURLOPT_POST, count($post_fields));  
+		curl_setopt($curl_session, CURLOPT_POSTFIELDS, $fields_string);
+		curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+		$data = curl_exec($curl_session);
+		if (curl_errno($curl_session)) {
+			$fd = fopen("/tmp/backupdebug.txt", "w");
+			fwrite($fd, $upload_url . "" . $fields_string . "\n\n");
+			fwrite($fd, $data);
+			fwrite($fd, curl_error($curl_session));
+			fclose($fd);
+		} else {
+		    curl_close($curl_session);
+		}
 		
 		// Update last pfS backup time
 		$fd = fopen("/cf/conf/lastpfSbackup.txt", "w");
@@ -59,6 +78,8 @@ if($last_backup_date <> $last_config_change) {
 		conf_mount_ro();
 
 	}
+} else {
+	log_error("No portal.pfsense.org backup required.");
 }
 
 ?>

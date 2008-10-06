@@ -38,9 +38,6 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 // Seperator used during client / server communications
 $oper_sep = "\|\|";
 
-// URL to restore.php
-$get_url = "https://portal.pfsense.org/pfSconfigbackups/restore.php";
-
 // Encryption password 
 $decrypt_password = $config['installedpackages']['autoconfigbackup']['config'][0]['decrypt_password'];
 
@@ -49,6 +46,9 @@ $username = $config['installedpackages']['autoconfigbackup']['config'][0]['usern
 
 // Defined password
 $password = $config['installedpackages']['autoconfigbackup']['config'][0]['password'];
+
+// URL to restore.php
+$get_url = "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/restore.php?";
 
 if(!$username) {
 	Header("Location: /pkg_edit.php?xml=autoconfigbackup.xml&id=0");
@@ -59,7 +59,7 @@ if($_GET['newver'] != "") {
 	// Phone home and obtain backups
 	$curl_Session = curl_init($get_url);
 	curl_setopt($curl_Session, CURLOPT_POST, 1);
-	curl_setopt($curl_Session, CURLOPT_POSTFIELDS, "action=restore&username={$username}&password={$password}&revision={$_GET['newver']}");
+	curl_setopt($curl_Session, CURLOPT_POSTFIELDS, "action=restore&revision={$_GET['newver']}");
 	curl_setopt($curl_Session, CURLOPT_FOLLOWLOCATION, 1);
 	$data = curl_exec($curl_Session);	
 	if (!tagfile_deformat($data, $data, "config.xml")) 
@@ -82,7 +82,7 @@ if($_GET['newver'] != "") {
 	// Phone home and obtain backups
 	$curl_Session = curl_init($get_url);
 	curl_setopt($curl_Session, CURLOPT_POST, 1);
-	curl_setopt($curl_Session, CURLOPT_POSTFIELDS, "action=showbackups&username={$username}&password={$password}");
+	curl_setopt($curl_Session, CURLOPT_POSTFIELDS, "action=showbackups");
 	curl_setopt($curl_Session, CURLOPT_FOLLOWLOCATION, 1);
 	$data = curl_exec($curl_Session);
 	curl_close($curl_Session);	
