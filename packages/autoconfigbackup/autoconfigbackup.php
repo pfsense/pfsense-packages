@@ -42,13 +42,13 @@ $oper_sep = "\|\|";
 $get_url = "https://portal.pfsense.org/pfSconfigbackups/restore.php";
 
 // Encryption password 
-$decrypt_password = $config['installedpackages']['autoconfigbackup']['config']['decrypt_password'];
+$decrypt_password = $config['installedpackages']['autoconfigbackup']['config'][0]['decrypt_password'];
 
 // Defined username
-$username = $config['installedpackages']['autoconfigbackup']['config']['username'];
+$username = $config['installedpackages']['autoconfigbackup']['config'][0]['username'];
 
 // Defined password
-$password = $config['installedpackages']['autoconfigbackup']['config']['password'];
+$password = $config['installedpackages']['autoconfigbackup']['config'][0]['password'];
 
 if(!$username) {
 	Header("Location: /pkg_edit.php?xml=autoconfigbackup.xml&id=0");
@@ -77,8 +77,8 @@ if($_GET['newver'] != "") {
 	}
 } else {
 	// Grab username and password from config.xml
-	$username = $config['installedpackages']['autoconfigbackup']['config']['username'];
-	$password = $config['installedpackages']['autoconfigbackup']['config']['password'];
+	$username = $config['installedpackages']['autoconfigbackup']['config'][0]['username'];
+	$password = $config['installedpackages']['autoconfigbackup']['config'][0]['password'];
 	// Phone home and obtain backups
 	$curl_Session = curl_init($get_url);
 	curl_setopt($curl_Session, CURLOPT_POST, 1);

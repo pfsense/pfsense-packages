@@ -12,34 +12,40 @@
 
 $last_backup_date 	= $config['system']['lastpfSbackup'];
 $last_config_change = $config['revision']['time'];
+$hostname  			= $config['system']['hostname'];
+$username 			= $config['installedpackages']['autoconfigbackup']['config'][0]['username'];
+$password  			= $config['installedpackages']['autoconfigbackup']['config'][0]['password'];
+$encryptpw 			= $config['installedpackages']['autoconfigbackup']['config'][0]['crypto_password'];
+$reason	   			= $config['revision']['description'];
 
 /* If configuration has changed, upload to pfS */
 if($last_backup_date <> $last_config_change) {
 
-	$hostname  = $config['system']['hostname'];
-	$username  = $config['installedpackages']['pfSautoconfigbackup']['config']['username'];
-	$password  = $config['installedpackages']['pfSautoconfigbackup']['config']['password'];
-	$encryptpw = $config['installedpackages']['pfSautoconfigbackup']['config']['crypto_password'];
-	$reason	   = $config['revision']['description'];
+	if($username && $password && $encryptpw) {
 
-	$upload_url = "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/backup.php";
+		log_error("Beginning portal.pfsense.org configuration backup.");
 
-	// Encrypt config.xml
-	$data = file_get_contents("/cf/conf/config.xml");
-	$configxml = encrypt_data($data, $encryptpw);
-	tagfile_reformat($data, $data, "config.xml");
+		$upload_url = "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/backup.php";
 
-	// Check configuration into the BSDP repo
-	$curl_Session = curl_init($upload_url);
-	curl_setopt($curl_Session, CURLOPT_POST, 1);
-	curl_setopt($curl_Session, CURLOPT_POSTFIELDS, "reason={$reason}&configxml={$configxml}&hostname={$hostname}");
-	curl_setopt($curl_Session, CURLOPT_FOLLOWLOCATION, 1);
-	$data = curl_exec($curl_Session);
-	curl_close($curl_Session);
+		// Encrypt config.xml
+		$data = file_get_contents("/cf/conf/config.xml");
+		$configxml = encrypt_data($data, $encryptpw);
+		tagfile_reformat($data, $data, "config.xml");
 
-	$config['system']['lastpfSbackup'] = $last_config_change;
-	write_config("Updating last portal.pfsense.org last backup date/time.");
+		// Check configuration into the BSDP repo
+		$curl_Session = curl_init($upload_url);
+		curl_setopt($curl_Session, CURLOPT_POST, 1);
+		curl_setopt($curl_Session, CURLOPT_POSTFIELDS, "reason={$reason}&configxml={$configxml}&hostname={$hostname}");
+		curl_setopt($curl_Session, CURLOPT_FOLLOWLOCATION, 1);
+		$data = curl_exec($curl_Session);
+		curl_close($curl_Session);
 
+		$config['system']['lastpfSbackup'] = $last_config_change;
+		write_config("Updating last portal.pfsense.org last backup date/time.");
+
+		log_error("End of portal.pfsense.org configuration backup.");
+
+	}
 }
 
 ?>
