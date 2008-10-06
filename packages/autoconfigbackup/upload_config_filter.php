@@ -41,7 +41,7 @@ if($last_backup_date <> $last_config_change) {
 		$post_fields = array(
 		                         'reason'		=> urlencode($reason),  
 		                         'hostname'		=> urlencode($hostname),  
-		                         'configxml'	=> urlencode($configxml)
+		                         'configxml'	=> urlencode($data)
 		                    );
 		
 		//url-ify the data for the POST  

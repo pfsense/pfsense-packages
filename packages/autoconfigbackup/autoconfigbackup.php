@@ -65,8 +65,8 @@ if($_REQUEST['newver'] != "") {
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
 	$data = curl_exec($curl_session);
-	//if (!tagfile_deformat($data, $data, "config.xml")) 
-		//$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
+	if (!tagfile_deformat($data, $data, "config.xml")) 
+		$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
 	$data = decrypt_data($data, $decrypt_password);
 	$fd = fopen("/tmp/config_restore.xml", "w");
 	fwrite($fd, $data);
