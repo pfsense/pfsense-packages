@@ -36,7 +36,7 @@
 	</copyright>
     <description>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from http://portal.pfsense.org</description>
     <requirements>pfSense Premium Support Portal</requirements>
-	<name>autoconfigbackup</name>
+	<name>AutoConfigBackup</name>
 	<version>1.0</version>
 	<title>Diagnostics: Auto Configuration Backup</title>
 	<savetext>Change</savetext>
