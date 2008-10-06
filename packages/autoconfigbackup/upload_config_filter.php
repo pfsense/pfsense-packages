@@ -10,7 +10,8 @@
  *
  */
 
-$last_backup_date 	= $config['system']['lastpfSbackup'];
+// Define some needed variables
+$last_backup_date 	= str_replace("\n", "", file_get_contents("/cf/conf/lastpfSbackup.txt"));
 $last_config_change = $config['revision']['time'];
 $hostname  			= $config['system']['hostname'];
 $username 			= $config['installedpackages']['autoconfigbackup']['config'][0]['username'];
@@ -18,14 +19,19 @@ $password  			= $config['installedpackages']['autoconfigbackup']['config'][0]['p
 $encryptpw 			= $config['installedpackages']['autoconfigbackup']['config'][0]['crypto_password'];
 $reason	   			= $config['revision']['description'];
 
+// Define upload_url, must be present after other variable definitions due to username, password
+$upload_url = "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/backup.php";
+
 /* If configuration has changed, upload to pfS */
 if($last_backup_date <> $last_config_change) {
-
 	if($username && $password && $encryptpw) {
 
+		// Mount RW (if needed)
+		conf_mount_rw();
+		// Lock config
+		config_lock();
+		
 		log_error("Beginning portal.pfsense.org configuration backup.");
-
-		$upload_url = "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/backup.php";
 
 		// Encrypt config.xml
 		$data = file_get_contents("/cf/conf/config.xml");
@@ -39,11 +45,18 @@ if($last_backup_date <> $last_config_change) {
 		curl_setopt($curl_Session, CURLOPT_FOLLOWLOCATION, 1);
 		$data = curl_exec($curl_Session);
 		curl_close($curl_Session);
-
-		$config['system']['lastpfSbackup'] = $last_config_change;
-		write_config("Updating last portal.pfsense.org last backup date/time.");
+		
+		// Update last pfS backup time
+		$fd = fopen("/cf/conf/lastpfSbackup.txt", "w");
+		fwrite($fd, $config['revision']['time']);
+		fclose($fd);
 
 		log_error("End of portal.pfsense.org configuration backup.");
+
+		// Unlock config
+		config_unlock();
+		// Mount image RO (if needed)
+		conf_mount_ro();
 
 	}
 }
