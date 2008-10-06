@@ -46,7 +46,7 @@ $username = $config['installedpackages']['autoconfigbackup']['config']['username
 $password = $config['installedpackages']['autoconfigbackup']['config']['password'];
 
 if(!$username) {
-	Header("Location: /pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0");
+	Header("Location: /pkg_edit.php?xml=autoconfigbackup.xml&id=0");
 	exit;
 }
 	
