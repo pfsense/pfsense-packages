@@ -39,7 +39,7 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 $oper_sep			= "\|\|";
 
 // Encryption password 
-$decrypt_password 	= $config['installedpackages']['autoconfigbackup']['config'][0]['decrypt_password'];
+$decrypt_password 	= $config['installedpackages']['autoconfigbackup']['config'][0]['crypto_password'];
 
 // Defined username
 $username			= $config['installedpackages']['autoconfigbackup']['config'][0]['username'];
@@ -61,58 +61,56 @@ if(!$username) {
 if($_REQUEST['newver'] != "") {
 	// Phone home and obtain backups
 	$curl_session = curl_init();
-	curl_setopt($curl_session, CURLOPT_URL, $get_url);  
+	curl_setopt($curl_session, CURLOPT_URL, $get_url . "?action=restore&revision=" . urlencode($_REQUEST['newver']));  
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
-	curl_setopt($curl_session, CURLOPT_POST, 1);
-	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=restore&revision={$_REQUEST['newver']}");
-
-	$data = curl_exec($curl_session);	
-	if (!tagfile_deformat($data, $data, "config.xml")) 
-		$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
+	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
+	$data = curl_exec($curl_session);
+	//if (!tagfile_deformat($data, $data, "config.xml")) 
+		//$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
 	$data = decrypt_data($data, $decrypt_password);
 	$fd = fopen("/tmp/config_restore.xml", "w");
 	fwrite($fd, $data);
 	fclose($fd);
 	if (curl_errno($curl_session)) {
 		$fd = fopen("/tmp/backupdebug.txt", "w");
-		fwrite($fd, $get_url . "" . "action=restore&revision={$_REQUEST['newver']}" . "\n\n");
+		fwrite($fd, $get_url . "" . "action=restore&revision=" . urlencode($_REQUEST['newver']) . "\n\n");
 		fwrite($fd, $data);
 		fwrite($fd, curl_error($curl_session));
 		fclose($fd);
 	} else {
 	    curl_close($curl_session);
 	}
-	unlink("/tmp/config_restore.xml");
-	if(config_restore("/tmp/config_restore.xml") == 0) {
+	if(!$input_errors && config_restore("/tmp/config_restore.xml") == 0) {
 		$savemsg = "Successfully reverted to timestamp " . date("n/j/y H:i:s", $_REQUEST['newver']) . ".";
 	} else {
 		$savemsg = "Unable to revert to the selected configuration.";
 	}
+	unlink("/tmp/config_restore.xml");
+} 
+
+// Populate available backups
+$curl_session = curl_init();
+curl_setopt($curl_session, CURLOPT_URL, $get_url);  
+curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
+curl_setopt($curl_session, CURLOPT_POST, 1);
+curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
+curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showbackups&hostname={$hostname}");
+$data = curl_exec($curl_session);
+if (curl_errno($curl_session)) {
+	$fd = fopen("/tmp/backupdebug.txt", "w");
+	fwrite($fd, $get_url . "" . "action=showbackups" . "\n\n");
+	fwrite($fd, $data);
+	fwrite($fd, curl_error($curl_session));
+	fclose($fd);
 } else {
-	$curl_session = curl_init();
-	curl_setopt($curl_session, CURLOPT_URL, $get_url);  
-	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
-	curl_setopt($curl_session, CURLOPT_POST, 1);
-	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showbackups&hostname={$hostname}");
-	$data = curl_exec($curl_session);
-	if (curl_errno($curl_session)) {
-		$fd = fopen("/tmp/backupdebug.txt", "w");
-		fwrite($fd, $get_url . "" . "action=showbackups" . "\n\n");
-		fwrite($fd, $data);
-		fwrite($fd, curl_error($curl_session));
-		fclose($fd);
-	} else {
-	    curl_close($curl_session);
-	}
+    curl_close($curl_session);
 }
+
 
 if($_REQUEST['rmver'] != "") {
 	//unlink_if_exists($g['conf_path'] . '/backup/config-' . $_REQUEST['rmver'] . '.xml');
 	//$savemsg = "Deleted backup with timestamp " . date("n/j/y H:i:s", $_REQUEST['rmver']) . " and description \"" . $confvers[$_REQUEST['rmver']]['description'] . "\".";
 }
-
-echo "<!-- $data -->";
 
 // Loop through and create new confvers
 $data_split = split("\n", $data);
@@ -162,24 +160,11 @@ include("head.inc");
 	foreach($confvers as $cv): 
 ?>
 		<tr valign="top">
-			<td class="listlr"> <?= date("n/j/y H:i:s", $cv[2]); ?></td>
-			<td class="listlr"> <?= $cv[1]; ?></td>
+		  <td class="listlr"> <?= $cv['time']; ?></td>
+			<td class="listlr"> <?= $cv['reason']; ?></td>
 			<td colspan="2" valign="middle" class="list" nowrap>
-					<b></b>
-			</td>
-		</tr>
-
-		<tr valign="top">
-			<td class="listlr"> <?= $date ?></td>
-			<td class="listlr"> <?= $desc ?></td>
-			<td valign="middle" class="list" nowrap>
-			<a href="autoconfigbackup.php?newver=<?=$version['time'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
-		</td>
-		<td valign="middle" class="list" nowrap>
-			<!-- 
-			<a href="diag_confbak.php?rmver=<?=$version['time'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a>
-			-->
-		</td>
+			<a href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
+		  </td>
 		</tr>
 <?php
 	$counter++; 

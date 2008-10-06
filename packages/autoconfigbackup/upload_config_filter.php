@@ -39,13 +39,14 @@ if($last_backup_date <> $last_config_change) {
 		tagfile_reformat($data, $data, "config.xml");
 
 		$post_fields = array(
-		                         'reason'=>urlencode($reason),  
-		                         'hostname'=>urlencode($hostname),  
-		                         'configxml'=>urlencode($configxml)
+		                         'reason'		=> urlencode($reason),  
+		                         'hostname'		=> urlencode($hostname),  
+		                         'configxml'	=> urlencode($configxml)
 		                    );
 		
 		//url-ify the data for the POST  
-		foreach($post_fields as $key=>$value) { $fields_string .= $key.'='.$value.'&'; }  
+		foreach($post_fields as $key=>$value) 
+			$fields_string .= $key.'='.$value.'&'; 
 		rtrim($fields_string,'&');
 		
 		// Check configuration into the BSDP repo
