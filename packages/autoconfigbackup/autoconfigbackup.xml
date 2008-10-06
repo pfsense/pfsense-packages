@@ -40,7 +40,7 @@
 	<version>1.0</version>
 	<title>Diagnostics: Auto Configuration Backup</title>
 	<savetext>Change</savetext>
-	<includefile>/usr/local/pkg/autoconfigbackup.inc</includefile>
+	<include_file>/usr/local/pkg/autoconfigbackup.inc</include_file>
 	<aftersaveredirect>pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0</aftersaveredirect>
 	<menu>
 		<name>AutoConfigBackup</name>
