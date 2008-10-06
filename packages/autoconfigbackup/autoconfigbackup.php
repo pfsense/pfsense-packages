@@ -81,11 +81,11 @@ if($_GET['rmver'] != "") {
 }
 
 // Loop through and create new confvers
-$data_split = split($data, "\n");
+$data_split = split("\n", $data);
 $confvers = array();
 $tmp_array = array();
 foreach($data_split as $ds) {
-	$ds_split = split($ds, $oper_sep);
+	$ds_split = split($oper_sep, $ds);
 	$tmp_array['username'] = $ds_split[0];
 	$tmp_array['reason'] = $ds_split[1];
 	$tmp_array['time'] = $ds_split[2];
