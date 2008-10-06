@@ -47,6 +47,11 @@
 		<section>Diagnostics</section>
 		<url>/pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0</url>
 	</menu>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/pf/</prefix>
+	    <chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/autoconfigbackup/upload_config_filter.php</item>
+	</additional_files_needed>
 	<tabs>
 		<tab>
 			<text>autoconfigbackup Settings</text>
@@ -65,7 +70,6 @@
 			<description>Enter the username for the Automatic Configuration Backup Web GUI.  Minimum 5 characters.</description>
 			<type>password</type>
 		</field>
-
 		<field>
 			<fielddescr>autoconfigbackup Subscription Password</fielddescr>
 			<fieldname>password</fieldname>
