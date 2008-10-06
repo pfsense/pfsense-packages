@@ -98,7 +98,7 @@
       <depends_on_package>djbdns-1.05_12.tbz</depends_on_package>
     </package>
     <package>
-      <name>autoconfigurationbackup</name>
+      <name>AutoConfigBackup</name>
       <descr>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from http://portal.pfsense.org</descr>
       <website>http://portal.pfsense.org</website>
       <category>Services</category>
