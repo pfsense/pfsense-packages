@@ -31,8 +31,10 @@
 
 require("guiconfig.inc");
 
+$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
+
 // Seperator used during client / server communications
-$oper_sep = "||";
+$oper_sep = "\|\|";
 
 // URL to restore.php
 $get_url = "https://portal.pfsense.org/pfSconfigbackups/restore.php";
@@ -54,7 +56,7 @@ if($_GET['newver'] != "") {
 	fwrite($fd, $data);
 	fclose($fd);
 	curl_close($curl_Session);	
-	$confvers = unserialize(file_get_contents($g['cf_conf_path'] . '/backup/backup.cache'));
+	//$confvers = unserialize(file_get_contents($g['cf_conf_path'] . '/backup/backup.cache'));
 	unlink("/tmp/config_restore.xml");
 	if(config_restore("/tmp/config_restore.xml") == 0) {
 		$savemsg = "Successfully reverted to timestamp " . date("n/j/y H:i:s", $_GET['newver']) . " with description \"" . $confvers[$_GET['newver']]['description'] . "\".";
@@ -75,7 +77,7 @@ if($_GET['newver'] != "") {
 }
 
 if($_GET['rmver'] != "") {
-	$confvers = unserialize(file_get_contents($g['cf_conf_path'] . '/backup/backup.cache'));
+	//$confvers = unserialize(file_get_contents($g['cf_conf_path'] . '/backup/backup.cache'));
 	unlink_if_exists($g['conf_path'] . '/backup/config-' . $_GET['rmver'] . '.xml');
 	$savemsg = "Deleted backup with timestamp " . date("n/j/y H:i:s", $_GET['rmver']) . " and description \"" . $confvers[$_GET['rmver']]['description'] . "\".";
 }
@@ -83,25 +85,31 @@ if($_GET['rmver'] != "") {
 // Loop through and create new confvers
 $data_split = split("\n", $data);
 $confvers = array();
-$tmp_array = array();
 foreach($data_split as $ds) {
 	$ds_split = split($oper_sep, $ds);
+	$tmp_array = array();
 	$tmp_array['username'] = $ds_split[0];
 	$tmp_array['reason'] = $ds_split[1];
 	$tmp_array['time'] = $ds_split[2];
-	$confvers[] = $tmp_array();
+	if($ds_split[2] && $ds_split[1] && $ds_split[0])
+		$confvers[] = $tmp_array;
 }
 
 $pgtitle = "Diagnostics: Auto Backup";
 include("head.inc");
 
 ?>
-
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle"><?=$pgtitle?></p>
-<?php if($savemsg) print_info_box($savemsg); ?>
-<?php if ($input_errors) print_input_errors($input_errors); ?>
+<?php
+	include("fbegin.inc"); 
+	if(strstr("1.2", $pfSversion)) {
+		echo "<p class=\"pgtitle\">{$pgtitle}</p>";
+	}
+	if($savemsg) 
+		print_info_box($savemsg);	
+	if ($input_errors)
+		print_input_errors($input_errors);
+?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">  <tr><td>
 <?php
 	$tab_array = array();
@@ -113,47 +121,33 @@ include("head.inc");
   <tr>
     <td>
 	<div id="mainarea">
-              <table class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
-<?php
-if(is_array($confvers)) { 
-		?>
-                <tr>
-                  <td width="30%" class="listhdrr">Date</td>
-		  		  <td width="70%" class="listhdrr">Configuration Change</td>
-                </tr>
-                <tr valign="top">
-		  			<td class="listlr"> <?= date("n/j/y H:i:s", $config['revision']['time']) ?></td>
-                  	<td class="listlr"> <?= $config['revision']['description'] ?></td>
-		  			<td colspan="2" valign="middle" class="list" nowrap><b>Current</b></td>
-				</tr>
-		<?php
-		  foreach($confvers as $version) {
-			if($version['time'] != 0) {
-				$date = date("n/j/y H:i:s", $version['time']);
-			} else {
-				$date = "Unknown";
-			}
-			$desc = $version['description'];
-               ?>
-				<tr valign="top">
-					<td class="listlr"> <?= $date ?></td>
-					<td class="listlr"> <?= $desc ?></td>
-					<td valign="middle" class="list" nowrap>
-						<a href="diag_confbak.php?newver=<?=$version['time'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
-					</td>
-					<td valign="middle" class="list" nowrap>
-				<!-- 
-					<a href="diag_confbak.php?rmver=<?=$version['time'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a>
-				-->
-			    </tr>
-               <?php
-                  } ?>
-<?php } else { ?>
-		<tr><td>
-		<?php print_info_box("No backups found at http://portal.pfsense.org for username {$username}"); ?>
-		</td></tr>
-<?php      }
-?>
+	<table class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
+		<tr>
+			<td width="30%" class="listhdrr">Date</td>
+			<td width="70%" class="listhdrr">Configuration Change</td>
+		</tr>
+<?php foreach($confvers as $cv): ?>
+		<tr valign="top">
+			<td class="listlr"> <?= date("n/j/y H:i:s", $cv[2]); ?></td>
+			<td class="listlr"> <?= $cv[1]; ?></td>
+			<td colspan="2" valign="middle" class="list" nowrap>
+					<b></b>
+			</td>
+		</tr>
+
+		<tr valign="top">
+			<td class="listlr"> <?= $date ?></td>
+			<td class="listlr"> <?= $desc ?></td>
+			<td valign="middle" class="list" nowrap>
+			<a href="autoconfigbackup.php?newver=<?=$version['time'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
+		</td>
+		<td valign="middle" class="list" nowrap>
+			<!-- 
+			<a href="diag_confbak.php?rmver=<?=$version['time'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a>
+			-->
+		</td>
+		</tr>
+<?php endforeach; ?>
 	</table>
 	</div>
     </td>
