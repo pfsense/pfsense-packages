@@ -32,6 +32,7 @@ if($last_backup_date <> $last_config_change) {
 		config_lock();
 		
 		log_error("Beginning portal.pfsense.org configuration backup.");
+		update_filter_reload_status("Beginning portal.pfsense.org configuration backup.");		
 
 		// Encrypt config.xml
 		$data = file_get_contents("/cf/conf/config.xml");
@@ -75,8 +76,10 @@ if($last_backup_date <> $last_config_change) {
 		if(!strstr($data, "500")) {
 			log_error("An error occured while uploading your pfSense configuration to portal.pfsense.org ($data)");
 			file_notice("autoconfigurationbackup", "An error occured while uploading your pfSense configuration to portal.pfsense.org", $data, "");			
+			update_filter_reload_status("An error occured while uploading your pfSense configuration to portal.pfsense.org - $data");	
 		} else {
 			log_error("End of portal.pfsense.org configuration backup (success).");
+			update_filter_reload_status("End of portal.pfsense.org configuration backup (success).");					
 		}
 
 		// Unlock config
