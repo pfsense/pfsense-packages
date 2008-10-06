@@ -175,6 +175,16 @@ include("head.inc");
 	</table>
 	</div>
     </td>
+  <tr><td>
+	  <p>
+	  <strong>
+			&nbsp;&nbsp;<span class="red">Hint:&nbsp;
+	  		</span>
+	  </strong>
+	  Click the + sign next to the revision you would like to restore.
+	</p>	
+  </td></tr>
+
   </tr>
 </table>
 </form>
