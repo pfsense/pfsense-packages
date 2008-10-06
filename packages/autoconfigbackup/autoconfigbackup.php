@@ -2,8 +2,10 @@
 /* $Id$ */
 /*
     autoconfigbackup.php
-    Copyright (C) 2005 Colin Smith
-	Originally based on diag_confbak.php
+    Copyright (C) 2008 Scott Ullrich
+    All rights reserved.
+
+	Originally based on diag_confbak.php written and
     Copyright (C) 2005 Colin Smith
     All rights reserved.
 
@@ -42,7 +44,10 @@ $get_url = "https://portal.pfsense.org/pfSconfigbackups/restore.php";
 // Encryption password 
 $decrypt_password = $config['installedpackages']['autoconfigbackup']['config']['decrypt_password'];
 
+// Defined username
 $username = $config['installedpackages']['autoconfigbackup']['config']['username'];
+
+// Defined password
 $password = $config['installedpackages']['autoconfigbackup']['config']['password'];
 
 if(!$username) {
@@ -64,10 +69,9 @@ if($_GET['newver'] != "") {
 	fwrite($fd, $data);
 	fclose($fd);
 	curl_close($curl_Session);	
-	//$confvers = unserialize(file_get_contents($g['cf_conf_path'] . '/backup/backup.cache'));
 	unlink("/tmp/config_restore.xml");
 	if(config_restore("/tmp/config_restore.xml") == 0) {
-		$savemsg = "Successfully reverted to timestamp " . date("n/j/y H:i:s", $_GET['newver']) . " with description \"" . $confvers[$_GET['newver']]['description'] . "\".";
+		$savemsg = "Successfully reverted to timestamp " . date("n/j/y H:i:s", $_GET['newver']) . ".";
 	} else {
 		$savemsg = "Unable to revert to the selected configuration.";
 	}
@@ -85,9 +89,8 @@ if($_GET['newver'] != "") {
 }
 
 if($_GET['rmver'] != "") {
-	//$confvers = unserialize(file_get_contents($g['cf_conf_path'] . '/backup/backup.cache'));
-	unlink_if_exists($g['conf_path'] . '/backup/config-' . $_GET['rmver'] . '.xml');
-	$savemsg = "Deleted backup with timestamp " . date("n/j/y H:i:s", $_GET['rmver']) . " and description \"" . $confvers[$_GET['rmver']]['description'] . "\".";
+	//unlink_if_exists($g['conf_path'] . '/backup/config-' . $_GET['rmver'] . '.xml');
+	//$savemsg = "Deleted backup with timestamp " . date("n/j/y H:i:s", $_GET['rmver']) . " and description \"" . $confvers[$_GET['rmver']]['description'] . "\".";
 }
 
 // Loop through and create new confvers
@@ -110,9 +113,8 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php
 	include("fbegin.inc"); 
-	if(strstr("1.2", $pfSversion)) {
+	if(strstr("1.2", $pfSversion)) 
 		echo "<p class=\"pgtitle\">{$pgtitle}</p>";
-	}
 	if($savemsg) 
 		print_info_box($savemsg);	
 	if ($input_errors)
