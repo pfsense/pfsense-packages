@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+        <![CDATA[
+		/* $Id$ */
+		/*
+		   autoconfigbackup.xml 
+		   part of pfSense (http://www.pfSense.com)
+		   Copyright (C) 2008 BSD Perimeter
+		   All rights reserved.
+		                                                                             */
+		   Redistribution and use in source and binary forms, with or without
+		   modification, are permitted provided that the following conditions are met:
+
+		    1. Redistributions of source code must retain the above copyright notice,
+		       this list of conditions and the following disclaimer.
+
+		    2. Redistributions in binary form must reproduce the above copyright
+		       notice, this list of conditions and the following disclaimer in the
+		       documentation and/or other materials provided with the distribution.
+
+		   THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+		   INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+		   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+		   AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+		   OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+		   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+		   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+		   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+		   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+		   POSSIBILITY OF SUCH DAMAGE.
+		*/
+        ]]>
+	</copyright>
+    <description>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from http://portal.pfsense.org</description>
+    <requirements>pfSense Premium Support Portal</requirements>
+	<name>autoconfigbackup</name>
+	<version>1.0</version>
+	<title>Diagnostics: Auto Configuration Backup</title>
+        <savetext>Change</savetext>
+	<aftersaveredirect>pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0</aftersaveredirect>
+	<menu>
+		<name>autoconfigbackup Settings</name>
+		<tooltiptext>Set autoconfigbackup settings such as password and port.</tooltiptext>
+		<section>Diagnostics</section>
+		<url>/pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0</url>
+	</menu>
+	<tabs>
+		<tab>
+			<text>autoconfigbackup Settings</text>
+			<url>/pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Restore</text>
+			<url>/autoconfigbackup.php</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fielddescr>autoconfigbackup Subscription Username</fielddescr>
+			<fieldname>input</fieldname>
+			<description>Enter the username for the Automatic Configuration Backup Web GUI.  Minimum 5 characters.</description>
+			<type>password</type>
+		</field>
+
+		<field>
+			<fielddescr>autoconfigbackup Subscription Password</fielddescr>
+			<fieldname>password</fieldname>
+			<description>Enter the password for the Automatic Configuration Backup Web GUI.  Minimum 5 characters.</description>
+			<type>password</type>
+		</field>
+		<field>
+			<fielddescr>autoconfigbackup Password AGAIN</fielddescr>
+			<fieldname>passwordagain</fieldname>
+			<type>password</type>
+		</field>
+    </fields>
+	<custom_php_global_functions>
+	</custom_php_global_functions>
+	<custom_add_php_command>
+	</custom_add_php_command>
+	<custom_php_resync_config_command>
+	</custom_php_resync_config_command>
+	<custom_php_install_command>
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+	</custom_php_deinstall_command>
+</packagegui>
