@@ -46,7 +46,7 @@
 		<name>AutoConfigBackup</name>
 		<tooltiptext>Set autoconfigbackup settings such as password and port.</tooltiptext>
 		<section>Diagnostics</section>
-		<url>/pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0</url>
+		<url>/autoconfigbackup.php</url>
 	</menu>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/pf/</prefix>
