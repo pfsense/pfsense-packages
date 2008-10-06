@@ -37,6 +37,9 @@ if($last_backup_date <> $last_config_change) {
 	$data = curl_exec($curl_Session);
 	curl_close($curl_Session);
 
+	$config['system']['lastpfSbackup'] = $last_config_change;
+	write_config("Updating last portal.pfsense.org last backup date/time.");
+
 }
 
 ?>
