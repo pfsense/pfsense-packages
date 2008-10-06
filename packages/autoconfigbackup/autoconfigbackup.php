@@ -85,6 +85,7 @@ if($_GET['newver'] != "") {
 	curl_setopt($curl_Session, CURLOPT_POST, 1);
 	curl_setopt($curl_Session, CURLOPT_POSTFIELDS, "action=showbackups");
 	curl_setopt($curl_Session, CURLOPT_FOLLOWLOCATION, 1);
+	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
 	$data = curl_exec($curl_Session);
 	curl_close($curl_Session);	
 }
