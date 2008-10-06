@@ -78,13 +78,13 @@
 		<field>
 			<fielddescr>Subscription Username</fielddescr>
 			<fieldname>username</fieldname>
-			<description>Enter the username for the Automatic Configuration Backup Web GUI.  Minimum 6 characters.</description>
-			<type>intput</type>
+			<description>Enter the subscription username for portal.pfsense.org</description>
+			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Subscription Password</fielddescr>
 			<fieldname>password</fieldname>
-			<description>Enter the password for the Automatic Configuration Backup Web GUI.  Minimum 6 characters.</description>
+			<description>Enter the password for portal.pfsense.org</description>
 			<type>password</type>
 		</field>
 		<field>
@@ -94,6 +94,7 @@
 		</field>
 		<field>
 			<fielddescr>Encryption Password</fielddescr>
+			<description>This password will be used to encrypt config.xml before sending to portal.pfsense.org.  Do not share the password and keep it safe!</description>
 			<fieldname>crypto_password</fieldname>
 			<type>password</type>
 		</field>

@@ -126,7 +126,10 @@ include("head.inc");
 			<td width="30%" class="listhdrr">Date</td>
 			<td width="70%" class="listhdrr">Configuration Change</td>
 		</tr>
-<?php foreach($confvers as $cv): ?>
+<?php 
+	$counter = 0;
+	foreach($confvers as $cv): 
+?>
 		<tr valign="top">
 			<td class="listlr"> <?= date("n/j/y H:i:s", $cv[2]); ?></td>
 			<td class="listlr"> <?= $cv[1]; ?></td>
@@ -147,7 +150,12 @@ include("head.inc");
 			-->
 		</td>
 		</tr>
-<?php endforeach; ?>
+<?php
+	$counter++; 
+	endforeach;
+	if($counter == 0)
+		echo "<tr><td colspan='3'><center>Sorry, we could not locate any backups at portal.pfsense.org for this hostname.</td></tr>";
+?>
 	</table>
 	</div>
     </td>
