@@ -1,5 +1,9 @@
 <?php
 
+$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
+if(strstr("1.2", $pfSversion)) 
+	require("crypt_acb.php");
+
 /*
  *   pfSense upload config to pfSense.org script
  *   This file plugs into filter.inc (/usr/local/pkg/pf)
@@ -14,18 +18,21 @@
 $last_backup_date 	= str_replace("\n", "", file_get_contents("/cf/conf/lastpfSbackup.txt"));
 $last_config_change = $config['revision']['time'];
 $hostname  			= $config['system']['hostname'];
+$reason	   			= $config['revision']['description'];
 $username 			= $config['installedpackages']['autoconfigbackup']['config'][0]['username'];
 $password  			= $config['installedpackages']['autoconfigbackup']['config'][0]['password'];
 $encryptpw 			= $config['installedpackages']['autoconfigbackup']['config'][0]['crypto_password'];
-$reason	   			= $config['revision']['description'];
 
 // Define upload_url, must be present after other variable definitions due to username, password
 $upload_url = "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/backup.php";
 
 if(!$username or !$password or !$encryptpw) {
-	$notice_text = "Either the username, password or encryption password is not set for Automatic Configuration Backup.  Please correct this in Diagnostics -> AutoConfigBackup -> Settings.";
+
+	$notice_text =  "Either the username, password or encryption password is not set for Automatic Configuration Backup.  ";
+	$notice_text .= "Please correct this in Diagnostics -> AutoConfigBackup -> Settings.";
 	log_error($notice_text);
-	file_notice("autoconfigurationbackup", $notice_text, $notice_text, "");
+	file_notice("AutoConfigBackup", $notice_text, $notice_text, "");
+
 } else {
 	/* If configuration has changed, upload to pfS */
 	if($last_backup_date <> $last_config_change) {
@@ -34,9 +41,10 @@ if(!$username or !$password or !$encryptpw) {
 			conf_mount_rw();
 			// Lock config
 			config_lock();
-		
-			log_error("Beginning portal.pfsense.org configuration backup.");
-			update_filter_reload_status("Beginning portal.pfsense.org configuration backup.");		
+
+			$notice_text = "Beginning http://portal.pfsense.org configuration backup.";
+			log_error($notice_text);
+			update_filter_reload_status($notice_text);
 
 			// Encrypt config.xml
 			$data = file_get_contents("/cf/conf/config.xml");
@@ -78,12 +86,14 @@ if(!$username or !$password or !$encryptpw) {
 			fclose($fd);
 
 			if(!strstr($data, "500")) {
-				log_error("An error occured while uploading your pfSense configuration to portal.pfsense.org ($data)");
-				file_notice("autoconfigurationbackup", "An error occured while uploading your pfSense configuration to portal.pfsense.org", $data, "");			
-				update_filter_reload_status("An error occured while uploading your pfSense configuration to portal.pfsense.org - $data");	
+				$notice_text = "An error occured while uploading your pfSense configuration to portal.pfsense.org";
+				log_error($notice_text . " - " . $data);
+				file_notice("autoconfigurationbackup", $notice_text, $data, "");			
+				update_filter_reload_status($notice_text . " - " . $data);	
 			} else {
-				log_error("End of portal.pfsense.org configuration backup (success).");
-				update_filter_reload_status("End of portal.pfsense.org configuration backup (success).");					
+				$notice_text = "End of portal.pfsense.org configuration backup (success).";
+				log_error($notice_text);
+				update_filter_reload_status($notice_text);	
 			}
 
 			// Unlock config
@@ -92,8 +102,9 @@ if(!$username or !$password or !$encryptpw) {
 			conf_mount_ro();
 
 	} else {
-		log_error("No portal.pfsense.org backup required.");
+		log_error("No http://portal.pfsense.org backup required.");
 	}
+
 }
 
 ?>

@@ -34,6 +34,8 @@
 require("guiconfig.inc");
 
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
+if(strstr("1.2", $pfSversion)) 
+	require("crypt_acb.php");
 
 // Seperator used during client / server communications
 $oper_sep			= "\|\|";
