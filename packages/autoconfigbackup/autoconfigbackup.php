@@ -123,7 +123,7 @@ foreach($data_split as $ds) {
 	$tmp_array['username'] = $ds_split[0];
 	$tmp_array['reason'] = $ds_split[1];
 	$tmp_array['time'] = $ds_split[2];
-	if($ds_split[2] && $ds_split[1] && $ds_split[0])
+	if($ds_split[2] && $ds_split[0])
 		$confvers[] = $tmp_array;
 }
 
