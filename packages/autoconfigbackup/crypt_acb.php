@@ -43,7 +43,10 @@
 		fwrite($pipes[0], $data);
 		fclose($pipes[0]);
 
-		$rslt = stream_get_contents($pipes[1]);
+		while (!feof($pipes[1])) {
+		  $rslt .= fread($pipes[1], 8192);
+		}
+
 		fclose($pipes[1]);
 
 		proc_close($fp);
