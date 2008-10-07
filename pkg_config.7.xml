@@ -14,6 +14,19 @@
       <configurationfile>dashboard.xml</configurationfile>
     </package>
     <package>
+      <name>FreeSWITCH</name>
+      <website>http://www.freeswitch.org/</website>
+      <descr>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow. </descr>
+      <category>Services</category>
+      <config_file>http://www.pfsense.com/packages/config/freeswitch/freeswitch.xml</config_file>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <version>0.1</version>
+      <status>Beta</status>
+      <required_version>1.2.1</required_version>
+      <maintainer>markjcrane@gmail.com</maintainer>
+      <configurationfile>freeswitch.xml</configurationfile>
+    </package>
+    <package>
       <name>snort</name>
       <descr>Snort is a libpcap-based packet sniffer/logger which can be used as a lightweight network intrusion detection system. It features rules based logging and can perform content searching/matching in addition to being used to detect a variety of other attacks and probes, such as buffer overflows, stealth port scans, CGI attacks, SMB probes, and much more.</descr>
       <category>Security</category>
