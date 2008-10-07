@@ -22,74 +22,78 @@ $reason	   			= $config['revision']['description'];
 // Define upload_url, must be present after other variable definitions due to username, password
 $upload_url = "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/backup.php";
 
-/* If configuration has changed, upload to pfS */
-if($last_backup_date <> $last_config_change) {
-	if($username && $password && $encryptpw) {
-
-		// Mount RW (if needed)
-		conf_mount_rw();
-		// Lock config
-		config_lock();
-		
-		log_error("Beginning portal.pfsense.org configuration backup.");
-		update_filter_reload_status("Beginning portal.pfsense.org configuration backup.");		
-
-		// Encrypt config.xml
-		$data = file_get_contents("/cf/conf/config.xml");
-		$data = encrypt_data($data, $encryptpw);
-		tagfile_reformat($data, $data, "config.xml");
-
-		$post_fields = array(
-		                         'reason'		=> urlencode($reason),  
-		                         'hostname'		=> urlencode($hostname),  
-		                         'configxml'	=> urlencode($data)
-		                    );
-		
-		//url-ify the data for the POST  
-		foreach($post_fields as $key=>$value) 
-			$fields_string .= $key.'='.$value.'&'; 
-		rtrim($fields_string,'&');
-		
-		// Check configuration into the BSDP repo
-		$curl_session = curl_init();
-		curl_setopt($curl_session, CURLOPT_URL, $upload_url);  
-		curl_setopt($curl_session, CURLOPT_POST, count($post_fields));  
-		curl_setopt($curl_session, CURLOPT_POSTFIELDS, $fields_string);
-		curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);		
-		curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
-		$data = curl_exec($curl_session);
-		if (curl_errno($curl_session)) {
-			$fd = fopen("/tmp/backupdebug.txt", "w");
-			fwrite($fd, $upload_url . "" . $fields_string . "\n\n");
-			fwrite($fd, $data);
-			fwrite($fd, curl_error($curl_session));
-			fclose($fd);
-		} else {
-		    curl_close($curl_session);
-		}
-		
-		// Update last pfS backup time
-		$fd = fopen("/cf/conf/lastpfSbackup.txt", "w");
-		fwrite($fd, $config['revision']['time']);
-		fclose($fd);
-
-		if(!strstr($data, "500")) {
-			log_error("An error occured while uploading your pfSense configuration to portal.pfsense.org ($data)");
-			file_notice("autoconfigurationbackup", "An error occured while uploading your pfSense configuration to portal.pfsense.org", $data, "");			
-			update_filter_reload_status("An error occured while uploading your pfSense configuration to portal.pfsense.org - $data");	
-		} else {
-			log_error("End of portal.pfsense.org configuration backup (success).");
-			update_filter_reload_status("End of portal.pfsense.org configuration backup (success).");					
-		}
-
-		// Unlock config
-		config_unlock();
-		// Mount image RO (if needed)
-		conf_mount_ro();
-
-	}
+if(!$username or !$password or !$encryptpw) {
+	$notice_text = "Either the username, password or encryption password is not set for Automatic Configuration Backup.  Please correct this in Diagnostics -> AutoConfigBackup -> Settings.";
+	log_error($notice_text);
+	file_notice("autoconfigurationbackup", $notice_text, $notice_text, "");
 } else {
-	log_error("No portal.pfsense.org backup required.");
+	/* If configuration has changed, upload to pfS */
+	if($last_backup_date <> $last_config_change) {
+
+			// Mount RW (if needed)
+			conf_mount_rw();
+			// Lock config
+			config_lock();
+		
+			log_error("Beginning portal.pfsense.org configuration backup.");
+			update_filter_reload_status("Beginning portal.pfsense.org configuration backup.");		
+
+			// Encrypt config.xml
+			$data = file_get_contents("/cf/conf/config.xml");
+			$data = encrypt_data($data, $encryptpw);
+			tagfile_reformat($data, $data, "config.xml");
+
+			$post_fields = array(
+			                         'reason'		=> urlencode($reason),  
+			                         'hostname'		=> urlencode($hostname),  
+			                         'configxml'	=> urlencode($data)
+			                    );
+		
+			//url-ify the data for the POST  
+			foreach($post_fields as $key=>$value) 
+				$fields_string .= $key.'='.$value.'&'; 
+			rtrim($fields_string,'&');
+		
+			// Check configuration into the BSDP repo
+			$curl_session = curl_init();
+			curl_setopt($curl_session, CURLOPT_URL, $upload_url);  
+			curl_setopt($curl_session, CURLOPT_POST, count($post_fields));  
+			curl_setopt($curl_session, CURLOPT_POSTFIELDS, $fields_string);
+			curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);		
+			curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+			$data = curl_exec($curl_session);
+			if (curl_errno($curl_session)) {
+				$fd = fopen("/tmp/backupdebug.txt", "w");
+				fwrite($fd, $upload_url . "" . $fields_string . "\n\n");
+				fwrite($fd, $data);
+				fwrite($fd, curl_error($curl_session));
+				fclose($fd);
+			} else {
+			    curl_close($curl_session);
+			}
+		
+			// Update last pfS backup time
+			$fd = fopen("/cf/conf/lastpfSbackup.txt", "w");
+			fwrite($fd, $config['revision']['time']);
+			fclose($fd);
+
+			if(!strstr($data, "500")) {
+				log_error("An error occured while uploading your pfSense configuration to portal.pfsense.org ($data)");
+				file_notice("autoconfigurationbackup", "An error occured while uploading your pfSense configuration to portal.pfsense.org", $data, "");			
+				update_filter_reload_status("An error occured while uploading your pfSense configuration to portal.pfsense.org - $data");	
+			} else {
+				log_error("End of portal.pfsense.org configuration backup (success).");
+				update_filter_reload_status("End of portal.pfsense.org configuration backup (success).");					
+			}
+
+			// Unlock config
+			config_unlock();
+			// Mount image RO (if needed)
+			conf_mount_ro();
+
+	} else {
+		log_error("No portal.pfsense.org backup required.");
+	}
 }
 
 ?>
