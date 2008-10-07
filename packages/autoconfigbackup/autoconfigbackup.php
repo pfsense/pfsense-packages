@@ -133,7 +133,7 @@ include("head.inc");
 <?php
 	include("fbegin.inc"); 
 	if(strstr("1.2", $pfSversion)) 
-		echo "<p class=\"pgtitle\">{$pgtitle}</p>";
+		echo "<p class=\"pgtitle\">{$pgtitle}</p><br/>";
 	if($savemsg) 
 		print_info_box($savemsg);	
 	if ($input_errors)
