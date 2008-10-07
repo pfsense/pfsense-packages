@@ -99,6 +99,17 @@
       <depends_on_package>djbdns-1.05_9.tbz</depends_on_package>
     </package>
     <package>
+      <name>AutoConfigBackup</name>
+      <descr>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from http://portal.pfsense.org</descr>
+      <website>http://portal.pfsense.org</website>
+      <category>Services</category>
+      <version>1.01</version>
+      <status>ALPHA</status>
+      <required_version>1.2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/autoconfigbackup/autoconfigbackup.xml</config_file>
+      <configurationfile>autoconfigbackup.xml</configurationfile>
+    </package>
+    <package>
       <name>arping</name>
       <descr>Broadcasts a who-has ARP packet on the network and prints answers. VERY useful when you are trying to pick an unused IP for a net that you don't yet have routing to. Then again, if you have no idea what I'm talking about then you prolly don't need it.</descr>
       <website>http://www.habets.pp.se/synscan/programs.php?prog=arping</website>
