@@ -68,6 +68,16 @@
 	    <chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/autoconfigbackup/crypt_acb.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/share/curl/</prefix>
+	    <chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/autoconfigbackup/certs/gd-class2-root.crt</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/share/curl/</prefix>
+	    <chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/autoconfigbackup/certs/gd_intermediate.crt</item>
+	</additional_files_needed>
 	<tabs>
 		<tab>
 			<text>Settings</text>
