@@ -36,7 +36,7 @@ if($last_backup_date <> $last_config_change) {
 
 		// Encrypt config.xml
 		$data = file_get_contents("/cf/conf/config.xml");
-		$configxml = encrypt_data($data, $encryptpw);
+		$data = encrypt_data($data, $encryptpw);
 		tagfile_reformat($data, $data, "config.xml");
 
 		$post_fields = array(
