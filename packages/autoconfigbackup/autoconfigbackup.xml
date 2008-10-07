@@ -64,7 +64,7 @@
 		<item>http://www.pfsense.com/packages/config/autoconfigbackup/autoconfigbackup.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-	    <prefix>/etc/inc</prefix>
+	    <prefix>/etc/inc/</prefix>
 	    <chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/autoconfigbackup/crypt_acb.php</item>
 	</additional_files_needed>
