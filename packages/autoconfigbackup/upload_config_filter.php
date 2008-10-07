@@ -85,11 +85,6 @@ if(!$username or !$password or !$encryptpw) {
 			} else {
 			    curl_close($curl_session);
 			}
-		
-			// Update last pfS backup time
-			$fd = fopen("/cf/conf/lastpfSbackup.txt", "w");
-			fwrite($fd, $config['revision']['time']);
-			fclose($fd);
 
 			if(!strstr($data, "500")) {
 				$notice_text = "An error occured while uploading your pfSense configuration to portal.pfsense.org";
@@ -97,6 +92,10 @@ if(!$username or !$password or !$encryptpw) {
 				file_notice("autoconfigurationbackup", $notice_text, $data, "");			
 				update_filter_reload_status($notice_text . " - " . $data);	
 			} else {
+				// Update last pfS backup time
+				$fd = fopen("/cf/conf/lastpfSbackup.txt", "w");
+				fwrite($fd, $config['revision']['time']);
+				fclose($fd);				
 				$notice_text = "End of portal.pfsense.org configuration backup (success).";
 				log_error($notice_text);
 				update_filter_reload_status($notice_text);	
