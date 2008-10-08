@@ -30,8 +30,10 @@
 */
 
 	function crypt_data($val, $pass, $opt) {
-		$file = tempnam('','php-encrypt-');
-		exec("echo -E '$val' > $file.dec");
+		$file = tempnam("/tmp", "php-encrypt");
+		$fd = fopen("$file.dec", "w");
+		fwrite($fd, $val);
+		fclose($fd);
 		exec("/usr/bin/openssl enc {$opt} -aes-256-cbc -in $file.dec -out $file.enc -k {$pass}");
 		$myfile = file("$file.enc");
 		exec("rm $file");
