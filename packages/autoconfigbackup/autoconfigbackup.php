@@ -84,7 +84,7 @@ if($_REQUEST['newver'] != "") {
 	} else {
 	    curl_close($curl_session);
 	}
-	if(!$input_errors && config_restore("/tmp/config_restore.xml") == 0) {
+	if(!$input_errors && $data && config_restore("/tmp/config_restore.xml") == 0) {
 		$savemsg = "Successfully reverted the pfSense configuration to timestamp " . date("n/j/y H:i:s", $_REQUEST['newver']) . ".";
 	} else {
 		$savemsg = "Unable to revert to the selected configuration.";
@@ -110,10 +110,8 @@ if (curl_errno($curl_session)) {
     curl_close($curl_session);
 }
 
-
 if($_REQUEST['rmver'] != "") {
-	//unlink_if_exists($g['conf_path'] . '/backup/config-' . $_REQUEST['rmver'] . '.xml');
-	//$savemsg = "Deleted backup with timestamp " . date("n/j/y H:i:s", $_REQUEST['rmver']) . " and description \"" . $confvers[$_REQUEST['rmver']]['description'] . "\".";
+	// XXX: delete revision, or all backups from server.
 }
 
 // Loop through and create new confvers
@@ -167,7 +165,9 @@ include("head.inc");
 		  <td class="listlr"> <?= $cv['time']; ?></td>
 			<td class="listlr"> <?= $cv['reason']; ?></td>
 			<td colspan="2" valign="middle" class="list" nowrap>
-			<a href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
+			  <a href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>&hostname=<?=urlencode($hostname);?>">
+				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0">
+			  </a>
 		  </td>
 		</tr>
 <?php
@@ -179,7 +179,7 @@ include("head.inc");
 	</table>
 	</div>
     </td>
-  <tr><td>
+	<tr><td>
 	  <p>
 	  <strong>
 			&nbsp;&nbsp;<span class="red">Hint:&nbsp;
@@ -188,7 +188,6 @@ include("head.inc");
 	  Click the + sign next to the revision you would like to restore.
 	</p>	
   </td></tr>
-
   </tr>
 </table>
 </form>
