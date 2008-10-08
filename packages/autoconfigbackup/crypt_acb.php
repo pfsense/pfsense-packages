@@ -30,7 +30,6 @@
 */
 
 	function crypt_data($val, $pass) {
-		$val = str_replace("'", "#%$", $val);
 		$file = tempnam('','php-encrypt-');
 		exec("echo -E '$val' > $file.dec");
 		exec("/usr/bin/openssl enc {$opt} -aes-256-cbc -in $file.dec -out $file.enc -k {$pass}");
