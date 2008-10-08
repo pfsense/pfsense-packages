@@ -41,8 +41,6 @@
 		while (list($line_num, $line) = each($myfile)) {
 			$result .= $line;
 		}
-		$result = base64_encode($result);
-		$result = urlencode($result);
 		return $result;
 	}
 
