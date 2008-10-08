@@ -1,11 +1,13 @@
 <?php
 /* $Id$ */
 /*
-	tinydns_view_logs.php
-	part of pfSense (http://www.pfsense.com/)
-
-	Copyright (C) 2006 Scott Ullrich <sullrich@gmail.com>
+	freeswitch_status.php
+	Copyright (C) 2008 Mark J Crane
 	All rights reserved.
+  
+	FreeSWITCH (TM)
+	http://www.freeswitch.org/
+
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -31,10 +33,6 @@
 
 require("guiconfig.inc");
 
-/* Defaults to this page but if no settings are present, redirect to setup page */
-//if(!$config['installedpackages']['tinydns']['config'][0]) {
-//	Header("Location: /pkg_edit.php?xml=tinydns.xml&id=0");
-//}
 
 function event_socket_create($host, $port, $password) {
    $fp = fsockopen($host, $port, $errno, $errdesc) 
@@ -107,9 +105,9 @@ function event_socket_request($fp, $cmd) {
 $pgtitle = "FreeSWITCH: Status";
 include("head.inc");
 
-$password = "ClueCon";
-$port = "8021";
-$host = "192.168.1.1";
+$password = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_password'];
+$port = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_port'];
+$host = $config['interfaces']['lan']['ipaddr'];
 
 
 ?>
@@ -127,7 +125,7 @@ $host = "192.168.1.1";
 	$tab_array[] = array(gettext("Dialplan"), false, "/pkg_edit.php?xml=freeswitch_dialplan.xml&amp;id=0");
 	$tab_array[] = array(gettext("Extensions"), false, "/pkg.php?xml=freeswitch_extensions.xml");
 	$tab_array[] = array(gettext("External"), false, "/pkg_edit.php?xml=freeswitch_external.xml&amp;id=0");	
-  $tab_array[] = array(gettext("Gateways"), false, "/pkg.php?xml=freeswitch_gateways.xml");
+	$tab_array[] = array(gettext("Gateways"), false, "/pkg.php?xml=freeswitch_gateways.xml");
 	$tab_array[] = array(gettext("Internal"), false, "/pkg_edit.php?xml=freeswitch_internal.xml&amp;id=0");
 	$tab_array[] = array(gettext("Modules"), false, "/pkg_edit.php?xml=freeswitch_modules.xml&amp;id=0");
 	$tab_array[] = array(gettext("Public"), false, "/pkg_edit.php?xml=freeswitch_public.xml&amp;id=0");

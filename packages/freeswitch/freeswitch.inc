@@ -593,7 +593,7 @@ function freeswitch_php_install_command()
   pclose($handle);
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 9759.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.1";       
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.1.1";       
   conf_mount_ro();
 	config_unlock();
   
