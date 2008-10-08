@@ -64,8 +64,8 @@ if($_REQUEST['newver'] != "") {
 	// Phone home and obtain backups
 	$curl_session = curl_init();
 	curl_setopt($curl_session, CURLOPT_URL, $get_url . "?action=restore" . 
-				"&hostname=" . urlencode($_REQUEST['newver']) . 
-				" &revision=" . urlencode($_REQUEST['newver']));  
+				"&hostname=" . urlencode($hostname) . 
+				"&revision=" . urlencode($_REQUEST['newver']));  
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
 	$data = curl_exec($curl_session);
@@ -165,7 +165,7 @@ include("head.inc");
 		  <td class="listlr"> <?= $cv['time']; ?></td>
 			<td class="listlr"> <?= $cv['reason']; ?></td>
 			<td colspan="2" valign="middle" class="list" nowrap>
-			  <a href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>&hostname=<?=urlencode($hostname);?>">
+			  <a href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>">
 				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0">
 			  </a>
 		  </td>
