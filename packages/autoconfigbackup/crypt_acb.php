@@ -35,13 +35,10 @@
 		fwrite($fd, $val);
 		fclose($fd);
 		exec("/usr/bin/openssl enc {$opt} -aes-256-cbc -in $file.dec -out $file.enc -k {$pass}");
-		$myfile = file("$file.enc");
+		$result = file_get_contents("$file.enc");
 		exec("rm $file");
 		exec("rm $file.dec");
 		exec("rm $file.enc");
-		while (list($line_num, $line) = each($myfile)) {
-			$result .= $line;
-		}
 		return $result;
 	}
 
