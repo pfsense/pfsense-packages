@@ -29,24 +29,46 @@
     DISABLE_PHP_LINT_CHECKING
 */
 
-	function crypt_data(& $data, $pass, $opt) {
+	function crypt_data($val, $pass) {
+		$val = str_replace("'", "#%$", $val);
+		$file = tempnam('','php-encrypt-');
+		exec("echo -E '$val' > $file.dec");
+		exec("/usr/bin/openssl enc {$opt} -aes-256-cbc -in $file.dec -out $file.enc -k {$pass}");
+		$myfile = file("$file.enc");
+		exec("rm $file");
+		exec("rm $file.dec");
+		exec("rm $file.enc");
+		while (list($line_num, $line) = each($myfile)) {
+			$result .= $line;
+		}
+		$result = base64_encode($result);
+		$result = urlencode($result);
+		return $result;
+	}
 
+	function crypt_dataA(& $data, $pass, $opt) {
+		log_error("entering crypt_data()");
 		$pspec = "/usr/bin/openssl enc {$opt} -aes-256-cbc -k {$pass}";
 		$dspec = array( 0 => array("pipe", "r"),
 				1 => array("pipe", "w"),
 				2 => array("pipe", "e"));
-
+		log_error("proc_open");
 		$fp = proc_open($pspec, $dspec, $pipes);
 		if (!$fp)
 			return false;
-
+		log_error("writing to pipe[0]");
 		fwrite($pipes[0], $data);
+		log_error("closing pipe[0]");
 		fclose($pipes[0]);
-
+		
+		log_error("enter while()");
+		
 		while (!feof($pipes[1])) {
 		  $rslt .= fread($pipes[1], 8192);
 		}
-
+		
+		log_error("exit while()");
+		
 		fclose($pipes[1]);
 
 		proc_close($fp);
