@@ -63,11 +63,13 @@ if(!$username) {
 if($_REQUEST['newver'] != "") {
 	// Phone home and obtain backups
 	$curl_session = curl_init();
-	curl_setopt($curl_session, CURLOPT_URL, $get_url . "?action=restore" . 
-				"&hostname=" . urlencode($hostname) . 
-				"&revision=" . urlencode($_REQUEST['newver']));  
+	curl_setopt($curl_session, CURLOPT_URL, $get_url);
+	curl_setopt($curl_session, CURLOPT_POST, 3);				
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
+	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=restore" . 
+				"&hostname=" . urlencode($hostname) . 
+				"&revision=" . urlencode($_REQUEST['newver']));
 	$data = curl_exec($curl_session);
 	if (!tagfile_deformat($data, $data, "config.xml")) 
 		$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
@@ -84,10 +86,12 @@ if($_REQUEST['newver'] != "") {
 	} else {
 	    curl_close($curl_session);
 	}
-	if(!$input_errors && $data && config_restore("/tmp/config_restore.xml") == 0) {
-		$savemsg = "Successfully reverted the pfSense configuration to timestamp " . date("n/j/y H:i:s", $_REQUEST['newver']) . ".";
-	} else {
-		$savemsg = "Unable to revert to the selected configuration.";
+	if(!$input_errors && $data) {
+		if(config_restore("/tmp/config_restore.xml") == 0) {
+			$savemsg = "Successfully reverted the pfSense configuration to timestamp " . date("n/j/y H:i:s", $_REQUEST['newver']) . ".";
+		} else {
+			$savemsg = "Unable to revert to the selected configuration.";
+		}
 	}
 	unlink("/tmp/config_restore.xml");
 } 
