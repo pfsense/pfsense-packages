@@ -63,7 +63,9 @@ if(!$username) {
 if($_REQUEST['newver'] != "") {
 	// Phone home and obtain backups
 	$curl_session = curl_init();
-	curl_setopt($curl_session, CURLOPT_URL, $get_url . "?action=restore&revision=" . urlencode($_REQUEST['newver']));  
+	curl_setopt($curl_session, CURLOPT_URL, $get_url . "?action=restore" . 
+				"&hostname=" . urlencode($_REQUEST['newver']) . 
+				" &revision=" . urlencode($_REQUEST['newver']));  
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
 	$data = curl_exec($curl_session);
@@ -75,7 +77,7 @@ if($_REQUEST['newver'] != "") {
 	fclose($fd);
 	if (curl_errno($curl_session)) {
 		$fd = fopen("/tmp/backupdebug.txt", "w");
-		fwrite($fd, $get_url . "" . "action=restore&revision=" . urlencode($_REQUEST['newver']) . "\n\n");
+		fwrite($fd, $get_url . "" . "action=restore&hostname={$hostname}&revision=" . urlencode($_REQUEST['newver']) . "\n\n");
 		fwrite($fd, $data);
 		fwrite($fd, curl_error($curl_session));
 		fclose($fd);
