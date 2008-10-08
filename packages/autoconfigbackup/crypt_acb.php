@@ -29,7 +29,7 @@
     DISABLE_PHP_LINT_CHECKING
 */
 
-	function crypt_data($val, $pass) {
+	function crypt_data($val, $pass, $opt) {
 		$file = tempnam('','php-encrypt-');
 		exec("echo -E '$val' > $file.dec");
 		exec("/usr/bin/openssl enc {$opt} -aes-256-cbc -in $file.dec -out $file.enc -k {$pass}");
