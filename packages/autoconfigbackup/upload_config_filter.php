@@ -48,7 +48,7 @@ if(!$username or !$password or !$encryptpw) {
 			// Lock config
 			config_lock();
 
-			$notice_text = "Beginning http://portal.pfsense.org configuration backup.";
+			$notice_text = "Beginning https://portal.pfsense.org configuration backup.";
 			log_error($notice_text);
 			update_filter_reload_status($notice_text);
 
@@ -107,7 +107,7 @@ if(!$username or !$password or !$encryptpw) {
 			conf_mount_ro();
 
 	} else {
-		log_error("No http://portal.pfsense.org backup required.");
+		log_error("No https://portal.pfsense.org backup required.");
 	}
 
 }

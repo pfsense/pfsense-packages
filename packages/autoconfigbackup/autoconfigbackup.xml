@@ -34,7 +34,7 @@
 		*/
         ]]>
 	</copyright>
-    <description>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from http://portal.pfsense.org</description>
+    <description>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from https://portal.pfsense.org</description>
     <requirements>pfSense Premium Support Portal</requirements>
 	<name>AutoConfigBackup</name>
 	<version>1.0</version>
