@@ -201,7 +201,7 @@ include("head.inc");
   </td></tr>
   <tr><td>
 	<form method="post" action="autoconfigbackup.php">
-		<input type="post" name="Backup now" value="backup">
+		<input type="submit" name="Backup now" value="backup">
 	</form>
   </td></tr>
   </tr>
