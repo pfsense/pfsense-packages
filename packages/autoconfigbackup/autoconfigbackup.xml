@@ -109,6 +109,12 @@
 			<fieldname>crypto_password2</fieldname>
 			<type>password</type>
 		</field>
+		<field>
+			<fielddescr>Test connection</fielddescr>
+			<description>Check this box to test the connection to portal.pfsense.org.</description>
+			<fieldname>testconnection</fieldname>
+			<type>checkbox</type>
+		</field>
     </fields>
 	<custom_php_validation_command>
 		custom_php_validation_command($_POST, &amp;$input_errors);

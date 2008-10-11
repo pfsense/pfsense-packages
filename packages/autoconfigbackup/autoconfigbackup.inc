@@ -28,13 +28,62 @@
 
 /* ensures patches match */
 function custom_php_validation_command($post, $input_errors) {
-	global $_POST;
+	global $_POST, $savemsg, $config;
+
 	if($post['password'] <> $post['passwordagain']) 
 		$input_errors[] = "Sorry, the entered passwords do not match.";
 
 	if($post['crypto_password'] <> $post['crypto_password2']) 
 		$input_errors[] = "Sorry, the entered encryption passwords do not match.";
 
+	if($post['testconnection']) {
+		$status = test_connection($post);
+		if(!$status) 
+			$savemsg = "Connection to portal.pfsense.org was tested with no errors.";
+		else 
+			$savemsg = "There was a problem connecting to portal.pfsense.org.";
+	}
+	
+	// We do not need to store this value.
+	unset($_POST['testconnection']);
+}
+
+function test_connection($post) {
+	global $savemsg, $config;
+
+	// Seperator used during client / server communications
+	$oper_sep			= "\|\|";
+
+	// Encryption password
+	$decrypt_password 	= $post['crypto_password'];
+
+	// Defined username
+	$username			= $post['username'];
+
+	// Defined password
+	$password			= $post['password'];
+
+	// Set hostname
+	$hostname			= $config['system']['hostname'];
+
+	// URL to restore.php
+	$get_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/restore.php";
+
+	// Populate available backups
+	$curl_session = curl_init();
+	curl_setopt($curl_session, CURLOPT_URL, $get_url);
+	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+	curl_setopt($curl_session, CURLOPT_POST, 1);
+	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showbackups&hostname={$hostname}");
+	$data = curl_exec($curl_session);
+
+	if (curl_errno($curl_session)) 
+		return("An error occurred " . curl_error($curl_session));
+	else 
+		curl_close($curl_session);
+
+	return;
 }
 
 ?>
