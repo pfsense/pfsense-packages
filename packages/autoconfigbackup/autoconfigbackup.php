@@ -59,7 +59,12 @@ if(!$username) {
 	Header("Location: /pkg_edit.php?xml=autoconfigbackup.xml&id=0");
 	exit;
 }
-	
+
+if($_POST['Backup now']) {
+	write_config("Backup Now invoked via Auto Config Backup.");
+	$savemsg = "A configuration backup has been queued.";
+}
+
 if($_REQUEST['newver'] != "") {
 	// Phone home and obtain backups
 	$curl_session = curl_init();
@@ -191,6 +196,11 @@ include("head.inc");
 	  </strong>
 	  Click the + sign next to the revision you would like to restore.
 	</p>	
+  </td></tr>
+  <tr><td>
+	<form method="post" action="autoconfigbackup.php">
+		<input type="post" name="Backup now" value="backup">
+	</form>
   </td></tr>
   </tr>
 </table>
