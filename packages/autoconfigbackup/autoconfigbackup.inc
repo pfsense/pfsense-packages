@@ -31,6 +31,10 @@ function custom_php_validation_command($post, $input_errors) {
 	global $_POST;
 	if($post['password'] <> $post['passwordagain']) 
 		$input_errors[] = "Sorry, the entered passwords do not match.";
+
+	if($post['crypto_password'] <> $post['crypto_password2']) 
+		$input_errors[] = "Sorry, the entered encryption passwords do not match.";
+
 }
 
 ?>

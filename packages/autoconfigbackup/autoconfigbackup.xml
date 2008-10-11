@@ -103,6 +103,12 @@
 			<fieldname>crypto_password</fieldname>
 			<type>password</type>
 		</field>
+		<field>
+			<fielddescr>Encryption Password again</fielddescr>
+			<description>Enter the encryption password again.</description>
+			<fieldname>crypto_password2</fieldname>
+			<type>password</type>
+		</field>
     </fields>
 	<custom_php_validation_command>
 		custom_php_validation_command($_POST, &amp;$input_errors);
