@@ -124,7 +124,11 @@
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
+		exec("echo > /cf/conf/lastpfSbackup.txt");
 		filter_configure();
+		if($savemsg) 
+			$savemsg .= "<br/>";
+		$savemsg .= "A configuration backup has been queued.";
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
 	</custom_php_install_command>

@@ -63,6 +63,8 @@ if(!$username) {
 if($_POST['Backup now']) {
 	write_config("Backup Now invoked via Auto Config Backup.");
 	$savemsg = "A configuration backup has been queued.";
+	exec("echo > /cf/conf/lastpfSbackup.txt");
+	filter_configure();
 }
 
 if($_REQUEST['newver'] != "") {
