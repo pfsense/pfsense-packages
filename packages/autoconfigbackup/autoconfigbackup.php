@@ -60,7 +60,7 @@ if(!$username) {
 	exit;
 }
 
-if($_POST['Backup now']) {
+if($_POST['backup']) {
 	write_config("Backup Now invoked via Auto Config Backup.");
 	$savemsg = "A configuration backup has been queued.";
 	exec("echo > /cf/conf/lastpfSbackup.txt");
@@ -201,7 +201,7 @@ include("head.inc");
   </td></tr>
   <tr><td>
 	<form method="post" action="autoconfigbackup.php">
-		<input type="submit" name="Backup now" value="backup">
+		<input type="submit" name="backup" value="Backup">
 	</form>
   </td></tr>
   </tr>
