@@ -38,10 +38,8 @@ function custom_php_validation_command($post, $input_errors) {
 
 	if($post['testconnection']) {
 		$status = test_connection($post);
-		if(!$status) 
+		if($status) 
 			$savemsg = "Connection to portal.pfsense.org was tested with no errors.";
-		else 
-			$savemsg = "There was a problem connecting to portal.pfsense.org.";
 	}
 	
 	// We do not need to store this value.
