@@ -138,7 +138,7 @@ foreach($data_split as $ds) {
 		$confvers[] = $tmp_array;
 }
 
-$pgtitle = "Diagnostics: Auto Backup";
+$pgtitle = "Diagnostics: Auto Configuration Backup";
 include("head.inc");
 
 ?>
