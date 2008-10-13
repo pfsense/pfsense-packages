@@ -174,7 +174,7 @@ include("head.inc");
 ?>
 		<tr valign="top">
 		  <td class="listlr"> <?= $cv['time']; ?></td>
-			<td class="listlr"> <?= $cv['reason']; ?></td>
+			<td class="listbg"> <?= $cv['reason']; ?></td>
 			<td colspan="2" valign="middle" class="list" nowrap>
 			  <a href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>">
 				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0">
