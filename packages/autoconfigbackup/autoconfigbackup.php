@@ -95,7 +95,7 @@ if($_REQUEST['newver'] != "") {
 	}
 	if(!$input_errors && $data) {
 		if(config_restore("/tmp/config_restore.xml") == 0) {
-			$savemsg = "Successfully reverted the pfSense configuration to timestamp " . date("n/j/y H:i:s", $_REQUEST['newver']) . ".";
+			$savemsg = "Successfully reverted the pfSense configuration to timestamp " . urldecode($_REQUEST['newver']) . ".";
 		} else {
 			$savemsg = "Unable to revert to the selected configuration.";
 		}
