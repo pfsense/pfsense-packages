@@ -68,7 +68,12 @@ if($_POST['backup']) {
 	$savemsg = "Backup completed successfully.";
 	exec("echo > /cf/conf/lastpfSbackup.txt");
 	filter_configure_sync();
+	print_info_box($savemsg);	
+	$donotshowheader=true;
 }
+
+if($_REQUEST['savemsg']) 
+	$savemsg = htmlentities($_REQUEST['savemsg']);
 
 if($_REQUEST['newver'] != "") {
 	// Phone home and obtain backups
@@ -151,12 +156,14 @@ foreach($data_split as $ds) {
 }
 
 $pgtitle = "Diagnostics: Auto Configuration Backup";
+
 include("head.inc");
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <script type="text/javascript">
 	function backupnow() {
+		scroll(0,0);
 		var reason = prompt ("Enter the reason for the backup","");
 		var url = "/autoconfigbackup.php";
 		var pars = 'backup=yes&reason=' + reason;
@@ -167,24 +174,31 @@ include("head.inc");
 				parameters: pars,
 				onComplete: backupcomplete
 			});
+			$('savemsg').innerHTML = '';
+			$('feedbackdiv').innerHTML = "<img src='themes/metallic/images/misc/loader.gif'> One moment please, saving backup to portal.pfsense.org...<p/>";	
 	}
 	function backupcomplete(transport) {
-		$('feedbackdiv').innerHTML = '<p/>' + transport.responseText + '<p/>';
+		document.location.href = 'autoconfigbackup.php?savemsg=Backup+completed+successfully';
 	}
 </script>
-
-<div id='feedbackdiv'></div>
+<div id='maincontent'>
 <script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
 <?php
 	include("fbegin.inc"); 
 	if(strstr($pfSversion, "1.2")) 
 		echo "<p class=\"pgtitle\">{$pgtitle}</p>";
-	if($savemsg) 
-		print_info_box($savemsg);	
+	if($savemsg) {
+		echo "<div id='savemsg'>";
+		print_info_box($savemsg);
+		echo "</div>";	
+	}
 	if ($input_errors)
 		print_input_errors($input_errors);
+
 ?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">  <tr><td>
+<div id='feedbackdiv'></div>
 <?php
 	$tab_array = array();
 	$tab_array[0] = array("Settings", false, "/pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0");
@@ -194,8 +208,7 @@ include("head.inc");
   </td></tr>
   <tr>
     <td>
-	<div id="mainarea">
-	<table class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
+	<table id="backuptable" class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
 			<td width="30%" class="listhdrr">Date</td>
 			<td width="70%" class="listhdrr">Configuration Change</td>
