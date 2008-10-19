@@ -96,6 +96,15 @@ if($_REQUEST['newver'] != "") {
 	if(!$input_errors && $data) {
 		if(config_restore("/tmp/config_restore.xml") == 0) {
 			$savemsg = "Successfully reverted the pfSense configuration to timestamp " . urldecode($_REQUEST['newver']) . ".";
+			$savemsg .= <<<EOF
+			<p/>
+		  <form action="reboot.php" method="post">
+			Would you like to reboot? 
+		  <input name="Submit" type="submit" class="formbtn" value=" Yes ">
+		  <input name="Submit" type="submit" class="formbtn" value=" No ">
+		</form>
+EOF;
+	    	
 		} else {
 			$savemsg = "Unable to revert to the selected configuration.";
 		}
