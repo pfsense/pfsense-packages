@@ -167,7 +167,6 @@ include("head.inc");
 				parameters: pars,
 				onComplete: backupcomplete
 			});
-			event.preventDefault();
 	}
 	function backupcomplete(transport) {
 		$('feedbackdiv').innerHTML = '<p/>' + transport.responseText + '<p/>';
