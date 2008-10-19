@@ -66,7 +66,7 @@ function test_connection($post) {
 	$password			= $post['password'];
 
 	// Set hostname
-	$hostname			= $config['system']['hostname'];
+	$hostname			= $config['system']['hostname'] . "." . $config['system']['domain'];
 
 	// URL to restore.php
 	$get_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/restore.php";
@@ -110,7 +110,7 @@ function upload_config() {
 
 	$last_backup_date 	= str_replace("\n", "", file_get_contents("/cf/conf/lastpfSbackup.txt"));
 	$last_config_change = $config['revision']['time'];
-	$hostname  			= $config['system']['hostname'];
+	$hostname  			= $config['system']['hostname'] . "." . $config['system']['domain'];
 	$reason	   			= $config['revision']['description'];
 	$username 			= $config['installedpackages']['autoconfigbackup']['config'][0]['username'];
 	$password  			= $config['installedpackages']['autoconfigbackup']['config'][0]['password'];

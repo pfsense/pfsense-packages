@@ -53,7 +53,7 @@ $password			= $config['installedpackages']['autoconfigbackup']['config'][0]['pas
 $get_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/restore.php";
 
 // Set hostname
-$hostname			= $config['system']['hostname'];
+$hostname			= $config['system']['hostname'] . "." . $config['system']['domain'];
 
 if(!$username) {
 	Header("Location: /pkg_edit.php?xml=autoconfigbackup.xml&id=0");
