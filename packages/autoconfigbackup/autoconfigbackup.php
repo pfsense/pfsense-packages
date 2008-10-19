@@ -61,7 +61,10 @@ if(!$username) {
 }
 
 if($_POST['backup']) {
-	write_config("Backup invoked via Auto Config Backup.");
+	if($_REQUEST['reason']) 
+		write_config($_REQUEST['reason']);
+	else 
+		write_config("Backup invoked via Auto Config Backup.");
 	$savemsg = "Backup completed successfully.";
 	exec("echo > /cf/conf/lastpfSbackup.txt");
 	filter_configure_sync();
@@ -152,6 +155,27 @@ include("head.inc");
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<script type="text/javascript">
+	function backupnow() {
+		var reason = prompt ("Enter the reason for the backup","");
+		var url = "/autoconfigbackup.php";
+		var pars = 'backup=yes&reason=' + reason;
+		var myAjax = new Ajax.Request(
+			url,
+			{
+				method: 'post',
+				parameters: pars,
+				onComplete: backupcomplete
+			});
+			event.preventDefault();
+	}
+	function backupcomplete(transport) {
+		$('feedbackdiv').innerHTML = '<p/>' + transport.responseText + '<p/>';
+	}
+</script>
+
+<div id='feedbackdiv'></div>
+<script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
 <?php
 	include("fbegin.inc"); 
 	if(strstr($pfSversion, "1.2")) 
@@ -210,7 +234,7 @@ include("head.inc");
   </td></tr>
   <tr><td>
 	<form method="post" action="autoconfigbackup.php">
-		<input type="submit" name="backup" value="Backup Now">
+		<input type="button" onClick='backupnow()' name="backup" value="Backup Now">
 	</form>
   </td></tr>
   </tr>
