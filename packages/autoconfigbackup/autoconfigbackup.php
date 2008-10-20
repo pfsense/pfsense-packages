@@ -75,6 +75,26 @@ if($_POST['backup']) {
 if($_REQUEST['savemsg']) 
 	$savemsg = htmlentities($_REQUEST['savemsg']);
 
+if($_REQUEST['download']) {
+	// Phone home and obtain backups
+	$curl_session = curl_init();
+	curl_setopt($curl_session, CURLOPT_URL, $get_url);
+	curl_setopt($curl_session, CURLOPT_POST, 3);				
+	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
+	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
+	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=restore" . 
+				"&hostname=" . urlencode($hostname) . 
+				"&revision=" . urlencode($_REQUEST['download']));
+	$data = curl_exec($curl_session);
+	if (!tagfile_deformat($data, $data1, "config.xml")) 
+		$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
+	if ($input_errors)
+		print_input_errors($input_errors);
+	else 
+		echo $data;
+	exit;	
+}
+
 if($_REQUEST['newver'] != "") {
 	// Phone home and obtain backups
 	$curl_session = curl_init();
@@ -223,6 +243,9 @@ include("head.inc");
 			<td colspan="2" valign="middle" class="list" nowrap>
 			  <a href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>">
 				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0">
+			  </a>
+			  <a href="autoconfigbackup.php?download=<?=urlencode($cv['time']);?>">
+				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0">
 			  </a>
 		  </td>
 		</tr>
