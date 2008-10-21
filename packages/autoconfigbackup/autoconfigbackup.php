@@ -91,7 +91,7 @@ if($_REQUEST['download']) {
 	if ($input_errors)
 		print_input_errors($input_errors);
 	else 
-		echo $data;
+		echo "<pre>{$data}</pre>";
 	exit;	
 }
 
