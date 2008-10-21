@@ -242,10 +242,10 @@ include("head.inc");
 			<td class="listbg"> <?= $cv['reason']; ?></td>
 			<td colspan="2" valign="middle" class="list" nowrap>
 			  <a href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>">
-				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0">Restore
+				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0">
 			  </a>
 			  <a href="autoconfigbackup.php?download=<?=urlencode($cv['time']);?>">
-				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0">Download
+				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_down.gif" width="17" height="17" border="0">
 			  </a>
 		  </td>
 		</tr>
