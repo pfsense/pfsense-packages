@@ -429,6 +429,20 @@ function tinydns_create_zone_file() {
 	conf_mount_ro();
 }
 
+function tinydns_sync_on_changes() {
+	global $g, $config;
+	$synconchanges = $config['installedpackages']['tinydns']['config'][0]['synconchanges'];	
+	if(!$synconchanges) 
+		return;
+	$sync_hosts = $config['installedpackages']['tinydnssync']['config'];
+	foreach($sync_hosts as $sh) {
+		$sync_to_ip = $sh['ipaddress'];
+		$password   = $sh['password'];
+		if($password and $sync_to_ip) 
+			tinydns_do_xmlrpc_sync($sync_to_ip, $password);
+	}	
+}
+
 function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 	global $config, $g;
 

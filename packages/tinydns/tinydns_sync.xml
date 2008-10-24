@@ -79,6 +79,12 @@
 	<configpath>installedpackages->package->tinydns</configpath>
 	<fields>
 		<field>
+			<fielddescr>Automatically sync on changes</fielddescr>
+			<fieldname>synconchanges</fieldname>
+			<description>pfSense will automatically sync changes to hosts defined in the Sync tab.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>IP Address</fielddescr>
 			<fieldname>ipaddress</fieldname>
 			<description>The IP address that TinyDNS will Sync its data to.</description>
@@ -118,7 +124,7 @@
 	<custom_php_resync_config_command>
 		tinydns_do_xmlrpc_sync($_POST['ipaddress'], $_POST['password']);
 		if($_POST['ipaddress2'])
-			tinydns_do_xmlrpc_sync($_POST['ipaddress2'], $_POST['password2']);
+			tinydns_do_xmlrpc_syncc_sync($_POST['ipaddress2'], $_POST['password2']);
 		if($_POST['ipaddress3'])
 			tinydns_do_xmlrpc_sync($_POST['ipaddress3'], $_POST['password3']);
 	</custom_php_resync_config_command>

@@ -195,6 +195,7 @@
 	<custom_delete_php_command>
 		tinydns_create_zone_file();
 		tinydns_setup_ping_items();
+		tinydns_sync_on_changes();
 	</custom_delete_php_command>
 	<custom_add_php_command>
 		log_error("Begin tinydns add");
@@ -202,6 +203,7 @@
 		log_error("Zone file done.");
 		tinydns_setup_ping_items();
 		log_error("Ping items done.");
+		tinydns_sync_on_changes();
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
 		log_error("Begin tinydns resync");
@@ -209,5 +211,6 @@
 		log_error("Zone file done.");
 		tinydns_setup_ping_items();
 		log_error("Ping items done.");
+		tinydns_sync_on_changes();		
 	</custom_php_resync_config_command>
 </packagegui>
