@@ -120,7 +120,7 @@
 	
 		$changed = false; 
 		
-		if($_POST['domainname']) {
+		if($_POST['domainname'] and $_POST['primarynameserver']) {
 			$tmp = array();
 			$tmp['hostname'] = $_POST['domainname'];
 			$tmp['recordtype'] = "SOA";		
