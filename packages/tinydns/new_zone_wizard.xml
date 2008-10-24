@@ -47,7 +47,7 @@
 </step>
 <step>
 	<id>2</id>
-	<title>DNS Start of authorities</title>
+	<title>Domain Name</title>
 	<description>On this screen you will define the SOA records for this zone</description>
 	<fields>
 		<field>
