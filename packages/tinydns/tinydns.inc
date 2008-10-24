@@ -431,7 +431,7 @@ function tinydns_create_zone_file() {
 
 function tinydns_sync_on_changes() {
 	global $g, $config;
-	$synconchanges = $config['installedpackages']['tinydns']['config'][0]['synconchanges'];	
+	$synconchanges = $config['installedpackages']['tinydnssync']['config'][0]['synconchanges'];	
 	if(!$synconchanges) 
 		return;
 	$sync_hosts = $config['installedpackages']['tinydnssync']['config'];
