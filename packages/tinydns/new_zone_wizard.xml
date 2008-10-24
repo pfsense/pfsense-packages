@@ -151,6 +151,10 @@
 		unset($tmp);
 		
 		write_config("new_zone_wizard.xml is creating a new zone {$_POST['domainname']}");
+	
+		tinydns_create_zone_file();
+		tinydns_setup_ping_items();
+		tinydns_sync_on_changes();		
 	]]>	
 	</stepsubmitbeforesave>	
 </step>
