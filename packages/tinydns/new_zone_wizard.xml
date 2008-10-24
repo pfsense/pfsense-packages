@@ -150,7 +150,9 @@
 	
 		tinydns_create_zone_file();
 		tinydns_setup_ping_items();
-		tinydns_sync_on_changes();		
+		tinydns_sync_on_changes();
+		
+		Header("Location: /tinydns_status.php");
 	]]>	
 	</stepsubmitbeforesave>	
 </step>
