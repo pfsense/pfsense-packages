@@ -83,7 +83,7 @@
 	<configpath>installedpackages->package->tinydns</configpath>
 	<fields>
 		<field>
-			<fielddescr>Automatically sync on changes</fielddescr>
+			<fielddescr>Automatically sync on DNS Server changes</fielddescr>
 			<fieldname>synconchanges</fieldname>
 			<description>pfSense will automatically sync changes to hosts defined in the Sync tab.</description>
 			<type>checkbox</type>
