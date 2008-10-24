@@ -118,40 +118,55 @@
 	<stepsubmitbeforesave>
 	<![CDATA[
 	
-		$tmp = array();
-		$tmp['hostname'] = $_POST['domainname'];
-		$tmp['recordtype'] = "SOA";		
-		$tmp['ipaddress'] = $_POST['primarynameserver'];
-		$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
-		unset($tmp);
-
-		$tmp = array();	
-		$tmp['hostname'] = $_POST['domainname'];
-		$tmp['recordtype'] = "SOA";
-		$tmp['ipaddress'] = $_POST['secondarynameserver'];
-		$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
-		unset($tmp);
-
-		$tmp = array();
-		$tmp['hostname'] = $_POST['firstarecordhostname'];
-		$tmp['recordtype'] = "A";
-		$tmp['ipaddress'] = $_POST['firstarecordipaddress'];
-		$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
-		unset($tmp);
+		$changed = false; 
 		
-		$tmp = array();
-		$tmp['hostname'] = $_POST['secondarecordiphostname'];
-		$tmp['recordtype'] = "A";
-		$tmp['ipaddress'] = $_POST['secondarecordipaddress'];		
-		$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
-		unset($tmp);
-		
-		write_config("new_zone_wizard.xml is creating a new zone {$_POST['domainname']}");
+		if($_POST['domainname']) {
+			$tmp = array();
+			$tmp['hostname'] = $_POST['domainname'];
+			$tmp['recordtype'] = "SOA";		
+			$tmp['ipaddress'] = $_POST['primarynameserver'];
+			$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
+			unset($tmp);
+			$changed = true; 
+		}
 
-		require_once("/usr/local/pkg/tinydns.inc");
-		tinydns_create_zone_file();
-		tinydns_setup_ping_items();
-		tinydns_sync_on_changes();
+		if($_POST['domainname']) {
+			$tmp = array();	
+			$tmp['hostname'] = $_POST['domainname'];
+			$tmp['recordtype'] = "SOA";
+			$tmp['ipaddress'] = $_POST['secondarynameserver'];
+			$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
+			unset($tmp);
+			$changed = true; 
+		}
+
+		if($_POST['firstarecordhostname']) {
+			$tmp = array();
+			$tmp['hostname'] = $_POST['firstarecordhostname'];
+			$tmp['recordtype'] = "A";
+			$tmp['ipaddress'] = $_POST['firstarecordipaddress'];
+			$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
+			unset($tmp);
+			$changed = true; 
+		}
+		
+		if($_POST['secondarecordiphostname']) {
+			$tmp = array();
+			$tmp['hostname'] = $_POST['secondarecordiphostname'];
+			$tmp['recordtype'] = "A";
+			$tmp['ipaddress'] = $_POST['secondarecordipaddress'];		
+			$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
+			unset($tmp);
+			$changed = true; 
+		}
+		
+		if($changed) {
+			write_config("new_zone_wizard.xml is creating a new zone {$_POST['domainname']}");
+			require_once("/usr/local/pkg/tinydns.inc");
+			tinydns_create_zone_file();
+			tinydns_setup_ping_items();
+			tinydns_sync_on_changes();
+		}
 		
 		Header("Location: /tinydns_status.php");
 	]]>	
