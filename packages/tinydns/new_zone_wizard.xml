@@ -130,7 +130,7 @@
 			$changed = true; 
 		}
 
-		if($_POST['domainname']) {
+		if($_POST['domainname'] and $_POST['secondarynameserver']) {
 			$tmp = array();	
 			$tmp['hostname'] = $_POST['domainname'];
 			$tmp['recordtype'] = "SOA";
@@ -140,7 +140,7 @@
 			$changed = true; 
 		}
 
-		if($_POST['firstarecordhostname']) {
+		if($_POST['firstarecordhostname'] and $_POST['firstarecordipaddress']) {
 			$tmp = array();
 			$tmp['hostname'] = $_POST['firstarecordhostname'];
 			$tmp['recordtype'] = "A";
@@ -150,7 +150,7 @@
 			$changed = true; 
 		}
 		
-		if($_POST['secondarecordiphostname']) {
+		if($_POST['secondarecordiphostname'] and $_POST['secondarecordipaddress']) {
 			$tmp = array();
 			$tmp['hostname'] = $_POST['secondarecordiphostname'];
 			$tmp['recordtype'] = "A";
