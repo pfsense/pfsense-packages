@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<pfsensewizard>
+<copyright>
+/* $Id$ */
+/*
+		new_zone_wizard.xml
+		part of pfSense (http://www.pfsense.org/)
+		Copyright (C) 2008 Scott Ullrich
+		All rights reserved.
+
+        Redistribution and use in source and binary forms, with or without
+        modification, are permitted provided that the following conditions are met:
+
+        1. Redistributions of source code must retain the above copyright notice,
+           this list of conditions and the following disclaimer.
+
+        2. Redistributions in binary form must reproduce the above copyright
+           notice, this list of conditions and the following disclaimer in the
+           documentation and/or other materials provided with the distribution.
+
+        THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+        INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+        AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+        AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+        OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+        SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+        INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+        CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+        ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+        POSSIBILITY OF SUCH DAMAGE.
+*/
+</copyright>
+<totalsteps>2</totalsteps>
+<step>
+	<id>1</id>
+	<title>pfSense New Zone Wizard</title>
+	<disableheader>true</disableheader>
+	<description>This wizard will guide you through the adding a new DNS zone to TinyDNS.</description>
+	<fields>
+		<field>
+			<name>Next</name>
+			<type>submit</type>
+		</field>
+	</fields>
+	<stepbeforeformdisplay>
+	</stepbeforeformdisplay>
+</step>
+<step>
+	<id>2</id>
+	<title>DNS Start of authorities</title>
+	<description>On this screen you will define the SOA records for this zone</description>
+	<fields>
+		<field>
+			<name>Domain information</name>
+			<type>listtopic</type>
+		</field>		
+		<field>
+			<name>Domain Name</name>
+			<type>input</type>
+			<unsetfield>yes</unsetfield>
+			<arraynum>0</arraynum>
+			<description>Enter the domain name for this zone (example: pfsense.org)</description>
+		</field>
+		<field>
+			<name>Primary Nameserver</name>
+			<type>listtopic</type>
+		</field>		
+		<field>
+			<name>Primary Nameserver</name>
+			<type>input</type>
+			<unsetfield>yes</unsetfield>
+			<arraynum>0</arraynum>
+			<description>Enter the primary nameserver for this domain (example: ns.pfsense.org)</description>			
+		</field>
+		<field>
+			<name>Secondary Nameserver</name>
+			<type>listtopic</type>
+		</field>		
+		<field>
+			<name>Secondary Nameserver</name>
+			<type>input</type>
+			<arraynum>1</arraynum>
+			<description>Enter the secondary nameserver for this domain (example: ns2.pfsense.org)</description>
+		</field>
+		<field>
+			<name>First A record</name>
+			<type>listtopic</type>
+		</field>		
+		<field>
+			<name>First A record hostname</name>
+			<type>input</type>
+			<arraynum>1</arraynum>
+			<description>Enter the first A records hostname (example: www.pfsense.org)</description>						
+		</field>
+		<field>
+			<name>First A record IP address</name>
+			<type>input</type>
+			<arraynum>1</arraynum>
+			<description>Enter the first A records IP address (example: 1.2.3.4)</description>									
+		</field>
+		<field>
+			<name>Secondary A record</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<name>Second A record IP hostname</name>
+			<type>input</type>
+			<arraynum>1</arraynum>
+			<description>Enter the second A records hostname (example: pfsense.org)</description>												
+		</field>
+		<field>
+			<name>Second A record IP address</name>
+			<type>input</type>
+			<arraynum>1</arraynum>
+			<description>Enter the second A records IP address (example: 5.6.7.8)</description>									
+		</field>
+		<field>
+			<name>Next</name>
+			<type>submit</type>
+		</field>
+	</fields>
+	<stepsubmitbeforesave>
+	<![CDATA[
+	
+		$tmp = array();
+		$tmp['hostname'] = $_POST['domainname'];
+		$tmp['recordtype'] = "SOA";		
+		$tmp['ipaddress'] = $_POST['primarynameserver'];
+		$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
+		unset($tmp);
+
+		$tmp = array();	
+		$tmp['hostname'] = $_POST['domainname'];
+		$tmp['recordtype'] = "SOA";
+		$tmp['ipaddress'] = $_POST['secondarynameserver'];
+		$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
+		unset($tmp);
+
+		$tmp = array();
+		$tmp['hostname'] = $_POST['firstarecordhostname'];
+		$tmp['recordtype'] = "A";
+		$tmp['ipaddress'] = $_POST['firstarecordipaddress'];
+		$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
+		unset($tmp);
+		
+		$tmp = array();
+		$tmp['hostname'] = $_POST['secondarecordiphostname'];
+		$tmp['recordtype'] = "A";
+		$tmp['ipaddress'] = $_POST['secondarecordipaddress'];		
+		$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
+		unset($tmp);
+		
+		write_config("new_zone_wizard.xml is creating a new zone {$_POST['domainname']}");
+	]]>	
+	</stepsubmitbeforesave>	
+</step>
+</pfsensewizard>

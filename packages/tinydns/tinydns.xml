@@ -145,6 +145,11 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/tinydns/tinydns_sync.xml</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/wizards/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/tinydns/new_zone_wizard.xml</item>
+	</additional_files_needed>
 	<fields>
 		<field>
 		 	<fielddescr>Enable DNS Forwarders</fielddescr>
