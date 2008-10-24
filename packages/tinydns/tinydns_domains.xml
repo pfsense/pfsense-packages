@@ -70,7 +70,11 @@
 		<tab>
 			<text>Sync</text>
 			<url>/pkg_edit.php?xml=tinydns_sync.xml&amp;id=0</url>
-		</tab>		
+		</tab>
+		<tab>
+			<text>New domain wizard</text>
+			<url>/wizard.php?xml=new_zone_wizard.xml</url>
+		</tab>			
 	</tabs>
 	<configpath>installedpackages->package->tinydnsdomains</configpath>
 	<adddeleteeditpagefields>

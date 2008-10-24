@@ -64,6 +64,7 @@ if ($_POST['clear']) {
 	$tab_array[] = array(gettext("Status"), false, "/tinydns_status.php");
 	$tab_array[] = array(gettext("Logs"), true, "/tinydns_view_logs.php");
 	$tab_array[] = array(gettext("Sync"), false, "/pkg_edit.php?xml=tinydns_sync.xml&id=0");
+	$tab_array[] = array(gettext("New domain wizard"), false, "/wizard.php?xml=new_zone_wizard.xml");		
 	display_top_tabs($tab_array);
 ?>
 </table>

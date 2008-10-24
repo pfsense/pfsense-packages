@@ -51,6 +51,7 @@ include("head.inc");
 	$tab_array[] = array(gettext("Status"), false, "/tinydns_status.php");
 	$tab_array[] = array(gettext("Logs"), false, "/tinydns_view_logs.php");
 	$tab_array[] = array(gettext("Sync"), false, "/tinydns_xmlrpc_sync.php");
+	$tab_array[] = array(gettext("New domain wizard"), false, "/wizard.php?xml=new_zone_wizard.xml");	
 	display_top_tabs($tab_array);
 ?>
 </table>
