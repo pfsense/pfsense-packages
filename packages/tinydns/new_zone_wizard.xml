@@ -51,10 +51,6 @@
 	<description>On this screen you will define the SOA records for this zone</description>
 	<fields>
 		<field>
-			<name>Domain information</name>
-			<type>listtopic</type>
-		</field>		
-		<field>
 			<name>Domain Name</name>
 			<type>input</type>
 			<unsetfield>yes</unsetfield>
