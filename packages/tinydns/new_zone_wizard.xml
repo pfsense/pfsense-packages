@@ -79,7 +79,23 @@
 			<description>Enter the secondary nameserver for this domain (example: ns2.pfsense.org)</description>
 		</field>
 		<field>
-			<name>First A record</name>
+			<name>Mail Exchanger (optional)</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<name>Mail exchanger record hostname</name>
+			<type>input</type>
+			<arraynum>1</arraynum>
+			<description>Enter the hostname of your Mail exchanger (MX) - (example: exchange.pfsense.org)</description>									
+		</field>
+		<field>
+			<name>Mail exchanger record IP address</name>
+			<type>input</type>
+			<arraynum>1</arraynum>
+			<description>Enter the IP address of your Mail exchanger (MX) - (example: 9.10.11.12)</description>									
+		</field>
+		<field>
+			<name>First A record (optional)</name>
 			<type>listtopic</type>
 		</field>		
 		<field>
@@ -95,7 +111,7 @@
 			<description>Enter the first A records IP address (example: 1.2.3.4)</description>									
 		</field>
 		<field>
-			<name>Secondary A record</name>
+			<name>Secondary A record (optional)</name>
 			<type>listtopic</type>
 		</field>
 		<field>
@@ -109,6 +125,22 @@
 			<type>input</type>
 			<arraynum>1</arraynum>
 			<description>Enter the second A records IP address (example: 5.6.7.8)</description>									
+		</field>
+		<field>
+			<name>Third A record (optional)</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<name>Third A record IP hostname</name>
+			<type>input</type>
+			<arraynum>1</arraynum>
+			<description>Enter the third A records hostname (example: www2.pfsense.org)</description>												
+		</field>
+		<field>
+			<name>Third A record IP address</name>
+			<type>input</type>
+			<arraynum>1</arraynum>
+			<description>Enter the third A records IP address (example: 9.10.11.12)</description>									
 		</field>
 		<field>
 			<name>Next</name>
@@ -154,10 +186,29 @@
 			$tmp = array();
 			$tmp['hostname'] = $_POST['secondarecordiphostname'];
 			$tmp['recordtype'] = "A";
-			$tmp['ipaddress'] = $_POST['secondarecordipaddress'];		
+			$tmp['ipaddress'] = $_POST['secondarecordipaddress'];
 			$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
 			unset($tmp);
 			$changed = true; 
+		}
+
+		if($_POST['thirdarecordiphostname'] and $_POST['thirdarecordipaddress']) {
+			$tmp = array();
+			$tmp['hostname'] = $_POST['thirdarecordiphostname'];
+			$tmp['recordtype'] = "A";
+			$tmp['ipaddress'] = $_POST['thirdarecordipaddress'];
+			$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
+			unset($tmp);
+			$changed = true; 
+		}
+
+		if($_POST['mailexchangerrecordipaddress'] and $_POST['mailexchangerrecordhostname']) {
+			$tmp = array();
+			$tmp['hostname'] = $_POST['mailexchangerrecordhostname'];
+			$tmp['recordtype'] = "MX";
+			$tmp['ipaddress'] = $_POST['secondarecordipaddress'];		
+			unset($tmp);
+			$changed = true;
 		}
 		
 		if($changed) {
