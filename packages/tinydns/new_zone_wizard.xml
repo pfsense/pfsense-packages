@@ -48,7 +48,7 @@
 <step>
 	<id>2</id>
 	<title>Domain Name</title>
-	<description>On this screen you will define the SOA records for this zone</description>
+	<description>On this screen you will define various options for your new DNS Zone</description>
 	<fields>
 		<field>
 			<name>Domain Name</name>
