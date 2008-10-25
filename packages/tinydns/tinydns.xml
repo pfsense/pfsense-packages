@@ -154,6 +154,7 @@
 		<field>
 			<type>listtopic</type>
 			<name>Binding IP Address</name>
+			<fieldname>temp</fieldname>			
 		</field>		
 		<field>
 			<fielddescr>IP Address</fielddescr>
@@ -164,6 +165,7 @@
 		<field>
 			<type>listtopic</type>
 			<name>DNS-Cache server</name>
+			<fieldname>temp</fieldname>						
 		</field>		
 		<field>
 		 	<fielddescr>Enable DNS Forwarders</fielddescr>
@@ -186,6 +188,7 @@
 		<field>
 			<type>listtopic</type>
 			<name>Monitoring address refresh interval</name>
+			<fieldname>temp</fieldname>						
 		</field>
 		<field>
 			<fielddescr>Refresh Interval</fielddescr>
@@ -196,6 +199,7 @@
 		<field>
 			<type>listtopic</type>
 			<name>Sync TinyDNS settings via XMLRPC</name>
+			<fieldname>temp</fieldname>						
 		</field>
 		<field>
 			<fielddescr>XMLRPC Sync</fielddescr>
@@ -206,6 +210,7 @@
 		<field>
 			<type>listtopic</type>
 			<name>Advanced tunables (OPTIONAL)</name>
+			<fieldname>temp</fieldname>						
 		</field>		
 		<field>
 			<fielddescr>Minimum segment size</fielddescr>
@@ -272,4 +277,7 @@
 		tinydns_custom_php_deinstall_command();
 		tinydns_sync_on_changes();		
 	</custom_php_deinstall_command>
+	<custom_php_command_before_form>	
+		unset($_POST['temp']);		
+	</custom_php_command_before_form>
 </packagegui>

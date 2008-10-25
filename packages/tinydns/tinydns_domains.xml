@@ -95,6 +95,7 @@
 		<field>
 			<type>listtopic</type>
 			<name>General</name>
+			<fieldname>temp</fieldname>			
 		</field>		
 		<field>
 			<fielddescr>Hostname or FQDN www.exampledomain.com</fielddescr>
@@ -139,6 +140,7 @@
 		<field>
 			<type>listtopic</type>
 			<name>Reverse lookup</name>
+			<fieldname>temp</fieldname>						
 		</field>
 		<field>
 		 	<fielddescr>Automatic PTR entry</fielddescr>
@@ -149,6 +151,7 @@
 		<field>
 			<type>listtopic</type>
 			<name>Failover</name>
+			<fieldname>temp</fieldname>						
 		</field>
 		<field>
 			<fielddescr>IP to ping to ensure service is up</fielddescr>
@@ -225,4 +228,7 @@
 		log_error("Ping items done.");
 		tinydns_sync_on_changes();		
 	</custom_php_resync_config_command>
+	<custom_php_command_before_form>	
+		unset($_POST['temp']);
+	</custom_php_command_before_form>
 </packagegui>
