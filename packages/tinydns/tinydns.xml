@@ -85,7 +85,7 @@
 			<url>/tinydns_view_logs.php</url>
 		</tab>
 		<tab>
-			<text>Sync</text>
+			<text>Zone Sync</text>
 			<url>/pkg_edit.php?xml=tinydns_sync.xml&amp;id=0</url>
 		</tab>
 		<tab>
