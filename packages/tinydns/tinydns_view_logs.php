@@ -86,6 +86,7 @@ if ($_POST['clear']) {
 </table>
 <td align="left" valign="top">
 	<form id="filterform" name="filterform" action="tinydns_view_logs.php" method="post" style="margin-top: 14px;">
+	<p/>
 	<input id="submit" name="clear" type="submit" class="formbtn" value="<?=gettext("Clear log");?>" />
 	</form>
 </td>
