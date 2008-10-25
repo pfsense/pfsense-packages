@@ -79,10 +79,10 @@ if(strstr($pfSversion, "1.2"))
     <td class="tabcont" >
       <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
-          <td width="80%" class="listhdrr">IP</td>
-          <td width="10%" class="listhdrr">Status</td>
-          <td width="10%" class="listhdrr">In Service</td>
-          <td width="10%" class="listhdrr">Response time</td>
+          <td width="55%" class="listhdrr">IP</td>
+          <td width="15%" class="listhdrr">Status</td>
+          <td width="15%" class="listhdrr">In Service</td>
+          <td width="25%" class="listhdrr">Response time</td>
 		</tr>
 
 <?php
