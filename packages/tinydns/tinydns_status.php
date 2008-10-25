@@ -32,7 +32,7 @@
 require("guiconfig.inc");
 
 /* Defaults to this page but if no settings are present, redirect to setup page */
-if(!$config['installedpackages']['tinydns']['config'][0])
+if(!$config['installedpackages']['tinydnsdomains']['config'])
 	Header("Location: /wizard.php?xml=new_zone_wizard.xml");
 
 if(!$config['installedpackages']['tinydns']['config'][0]['ipaddress']) 
