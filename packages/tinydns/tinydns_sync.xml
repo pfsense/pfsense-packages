@@ -7,13 +7,9 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
+    tinydns_sync.xml
     part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2007 to whom it may belong
-    All rights reserved.
-
-    Based on m0n0wall (http://m0n0.ch/wall)
-    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    Copyright (C) 2008 Scott Ullrich
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -126,10 +122,6 @@
 		</field>
 	</fields>
 	<custom_php_resync_config_command>
-		tinydns_do_xmlrpc_sync($_POST['ipaddress'], $_POST['password']);
-		if($_POST['ipaddress2'])
-			tinydns_do_xmlrpc_sync($_POST['ipaddress2'], $_POST['password2']);
-		if($_POST['ipaddress3'])
-			tinydns_do_xmlrpc_sync($_POST['ipaddress3'], $_POST['password3']);
+		tinydns_sync_on_changes();
 	</custom_php_resync_config_command>
 </packagegui>
