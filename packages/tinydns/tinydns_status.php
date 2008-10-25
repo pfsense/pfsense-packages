@@ -36,7 +36,7 @@ if(!$config['installedpackages']['tinydns']['config'][0])
 	Header("Location: /wizard.php?xml=new_zone_wizard.xml");
 
 if(!$config['installedpackages']['tinydns']['config'][0]['ipaddress']) 
-	Header("Location: /pkg_edit.php?xml=tinydns.xml&id=0");
+	Header("Location: /pkg_edit.php?xml=tinydns.xml&id=0&savemsg=Please+set+the+binding+ip+address+for+server+operation");
 
 $pgtitle = "TinyDNS: Status";
 include("head.inc");
