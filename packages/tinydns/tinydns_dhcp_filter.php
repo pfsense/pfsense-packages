@@ -35,10 +35,18 @@ require("guiconfig.inc");
 $pgtitle = "TinyDNS: DHCP Domains";
 include("head.inc");
 
+$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
+if(strstr($pfSversion, "1.2"))
+	$one_two = true;
+
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
+
+<?php if($one_two): ?>
 <p class="pgtitle"><?=$pgtitle?></font></p>
+<?php endif; ?>
+
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <div id="mainlevel">
