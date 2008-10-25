@@ -35,6 +35,10 @@ require("guiconfig.inc");
 if(!$config['installedpackages']['tinydns']['config'][0])
 	Header("Location: /pkg_edit.php?xml=tinydns.xml&id=0");
 
+$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
+if(strstr($pfSversion, "1.2"))
+	$one_two = true;
+
 $pgtitle = "TinyDNS: View Logs";
 include("head.inc");
 
@@ -51,7 +55,11 @@ if ($_POST['clear']) {
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
+
+<?php if($one_two): ?>
 <p class="pgtitle"><?=$pgtitle?></font></p>
+<?php endif; ?>
+
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <div id="mainlevel">
