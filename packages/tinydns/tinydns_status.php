@@ -35,6 +35,9 @@ require("guiconfig.inc");
 if(!$config['installedpackages']['tinydns']['config'][0])
 	Header("Location: /wizard.php?xml=new_zone_wizard.xml");
 
+if(!$config['installedpackages']['tinydns']['config'][0]['ipaddress']) 
+	Header("Location: /pkg_edit.php?xml=tinydns.xml&id=0");
+
 $pgtitle = "TinyDNS: Status";
 include("head.inc");
 
