@@ -73,7 +73,7 @@
 			<url>/tinydns_dhcp_filter.php</url>
 		</tab>
 		<tab>
-			<text>Add Record</text>
+			<text>Add/Edit Record</text>
 			<url>/tinydns_filter.php</url>
 		</tab>
 		<tab>
