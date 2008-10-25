@@ -69,11 +69,11 @@
 			<active/>
 		</tab>
 		<tab>
-			<text>View Domains</text>
+			<text>View Records</text>
 			<url>/tinydns_dhcp_filter.php</url>
 		</tab>
 		<tab>
-			<text>Add Domains</text>
+			<text>Add Record</text>
 			<url>/tinydns_filter.php</url>
 		</tab>
 		<tab>

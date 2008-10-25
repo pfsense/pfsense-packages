@@ -51,11 +51,11 @@
 			<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>View Domains</text>
+			<text>View Records</text>
 			<url>/tinydns_dhcp_filter.php</url>
 		</tab>
 		<tab>
-			<text>Add Domains</text>
+			<text>Add Record</text>
 			<url>/tinydns_filter.php</url>
 		</tab>
 		<tab>

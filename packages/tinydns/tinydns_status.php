@@ -57,8 +57,8 @@ if(strstr($pfSversion, "1.2"))
 <?php
 	$tab_array = array();
 	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=tinydns.xml&id=0");
-	$tab_array[] = array(gettext("View Domains"), false, "/tinydns_dhcp_filter.php");
-	$tab_array[] = array(gettext("Add Domains"), false, "/tinydns_filter.php");
+	$tab_array[] = array(gettext("View Records"), false, "/tinydns_dhcp_filter.php");
+	$tab_array[] = array(gettext("Add Record"), false, "/tinydns_filter.php");
 	$tab_array[] = array(gettext("Status"), true, "/tinydns_status.php");
 	$tab_array[] = array(gettext("Logs"), false, "/tinydns_view_logs.php");
 	$tab_array[] = array(gettext("Zone Sync"), false, "/pkg_edit.php?xml=tinydns_sync.xml&id=0");
