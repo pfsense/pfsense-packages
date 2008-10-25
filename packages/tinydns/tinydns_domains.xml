@@ -97,6 +97,10 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
+			<type>listtopic</type>
+			<name>General</name>
+		</field>		
+		<field>
 			<fielddescr>Hostname or FQDN www.exampledomain.com</fielddescr>
 			<fieldname>hostname</fieldname>
 			<description>The DNS server will supply Records for the Fully Qualified Domain Name that is entered</description>
@@ -123,24 +127,33 @@
 			</options>
 		</field>
 		<field>
-		 	<fielddescr>Automatic PTR entry</fielddescr>
-			<fieldname>rdns</fieldname>
-			<description>Create a reverse DNS (PTR) entry for this A Record?</description>
-			<type>checkbox</type>
-		</field>		
-		<field>
 			<fielddescr> FQDN or IP Address</fielddescr>
 			<fieldname>ipaddress</fieldname>
 			<description>IP Address for A Records. FQDN or Hostname for SOA, PTR, CNAME Records.  For NS Records an IP:FQDN</description>
 			<type>input</type>
 			<size>40</size>
 			<required/>
+		</field>		
+		<field>
+			<type>listtopic</type>
+			<name>Reverse lookup</name>
+		</field>
+		<field>
+		 	<fielddescr>Automatic PTR entry</fielddescr>
+			<fieldname>rdns</fieldname>
+			<description>Create a reverse DNS (PTR) entry for this A Record?</description>
+			<type>checkbox</type>
 		</field>
 		<field>
 			<fielddescr>DNS record time to live</fielddescr>
 			<fieldname>ttl</fieldname>
 			<type>input</type>
 			<size>35</size>
+		</field>
+		
+		<field>
+			<type>listtopic</type>
+			<name>Failover</name>
 		</field>
 		<field>
 			<fielddescr>IP to ping to ensure service is up</fielddescr>
