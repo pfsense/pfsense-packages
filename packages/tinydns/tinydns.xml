@@ -156,11 +156,15 @@
 	</additional_files_needed>
 	<fields>
 		<field>
+			<type>listtopic</type>
+			<name>DNS-Cache server</name>
+		</field>		
+		<field>
 		 	<fielddescr>Enable DNS Forwarders</fielddescr>
 			<fieldname>enableforwarding</fieldname>
 			<description>Enable DNScache forwarder on LAN IP and register LAN's SOA, NS, A, and PTR Records with  TinyDNS Server.</description>
 			<type>checkbox</type>
-		</field>		
+		</field>
 		<field>
 		 	<fielddescr>Register DHCP static mappings with server</fielddescr>
 			<fieldname>regdhcpstatic</fieldname>
@@ -172,6 +176,10 @@
 			<fieldname>regdhcp</fieldname>
 			<description>Register active DHCP leases with TinyDNS server using the Fully Qualified Domain Name specified in System: General.</description>
 			<type>checkbox</type>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>Binding IP Address</name>
 		</field>		
 		<field>
 			<fielddescr>IP Address</fielddescr>
@@ -180,10 +188,18 @@
 			<type>input</type>
 		</field>
 		<field>
+			<type>listtopic</type>
+			<name>Monitoring address refresh interval</name>
+		</field>
+		<field>
 			<fielddescr>Refresh Interval</fielddescr>
 			<fieldname>refreshinterval</fieldname>
 			<description>Controls how often the monitoring ip adresses are polled</description>
 			<type>input</type>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>Sync TinyDNS settings via XMLRPC</name>
 		</field>
 		<field>
 			<fielddescr>XMLRPC Sync</fielddescr>
@@ -191,6 +207,10 @@
 			<description>Sync TinyDNS configuration to backup firewalls</description>
 			<type>checkbox</type>
 		</field>
+		<field>
+			<type>listtopic</type>
+			<name>Advanced tunables (OPTIONAL)</name>
+		</field>		
 		<field>
 			<fielddescr>Minimum segment size</fielddescr>
 			<fieldname>minsegment</fieldname>
