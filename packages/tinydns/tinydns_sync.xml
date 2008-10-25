@@ -79,11 +79,19 @@
 	<configpath>installedpackages->package->tinydns</configpath>
 	<fields>
 		<field>
+			<type>listtopic</type>
+			<name>Enbable DNS zone sync</name>
+		</field>		
+		<field>
 			<fielddescr>Automatically sync DNS zone changes</fielddescr>
 			<fieldname>synconchanges</fieldname>
 			<description>pfSense will automatically sync changes to the hosts defined below.</description>
 			<type>checkbox</type>
 		</field>
+		<field>
+			<type>listtopic</type>
+			<name>Sync host #1</name>
+		</field>		
 		<field>
 			<fielddescr>IP Address</fielddescr>
 			<fieldname>ipaddress</fieldname>
@@ -97,6 +105,10 @@
 			<type>password</type>
 		</field>
 		<field>
+			<type>listtopic</type>
+			<name>Sync host #2</name>
+		</field>		
+		<field>
 			<fielddescr>IP Address 2</fielddescr>
 			<fieldname>ipaddress2</fieldname>
 			<description>OPTIONAL.  The IP address of the second host that TinyDNS will Sync its DNS zone data to.</description>
@@ -107,7 +119,11 @@
 			<fieldname>password2</fieldname>
 			<description>Admin password of the second host that TinyDNS will Sync its DNS zone data to.</description>
 			<type>password</type>
-		</field>		
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>Sync host #3</name>
+		</field>				
 		<field>
 			<fielddescr>IP Address 3</fielddescr>
 			<fieldname>ipaddress3</fieldname>
