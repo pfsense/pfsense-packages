@@ -51,10 +51,6 @@
 			<url>/pkg_edit.php?xml=tinydns.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>View Records</text>
-			<url>/tinydns_dhcp_filter.php</url>
-		</tab>
-		<tab>
 			<text>Add/Edit Record</text>
 			<url>/tinydns_filter.php</url>
 			<active/>
