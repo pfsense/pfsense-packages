@@ -157,6 +157,16 @@
 	<fields>
 		<field>
 			<type>listtopic</type>
+			<name>Binding IP Address</name>
+		</field>		
+		<field>
+			<fielddescr>IP Address</fielddescr>
+			<fieldname>ipaddress</fieldname>
+			<description>Bind TinyDNS to this IP address. Enable DNS Forwarders bind TinyDNS to the LAN IP.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<type>listtopic</type>
 			<name>DNS-Cache server</name>
 		</field>		
 		<field>
@@ -176,16 +186,6 @@
 			<fieldname>regdhcp</fieldname>
 			<description>Register active DHCP leases with TinyDNS server using the Fully Qualified Domain Name specified in System: General.</description>
 			<type>checkbox</type>
-		</field>
-		<field>
-			<type>listtopic</type>
-			<name>Binding IP Address</name>
-		</field>		
-		<field>
-			<fielddescr>IP Address</fielddescr>
-			<fieldname>ipaddress</fieldname>
-			<description>Bind TinyDNS to this IP address. Enable DNS Forwarders bind TinyDNS to the LAN IP.</description>
-			<type>input</type>
 		</field>
 		<field>
 			<type>listtopic</type>
