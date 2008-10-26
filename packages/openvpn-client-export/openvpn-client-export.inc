@@ -50,7 +50,7 @@ function openvpn_client_export_deinstall() {
 	$ovpndir = "/usr/local/share/openvpn";
 	$workdir = "{$ovpndir}/client-export";
 
-	unlink("/usr/local/www/{$phpfile}");
+	unlink_if_exists("/usr/local/www/{$phpfile}");
 	exec("/bin/rm -r {$workdir}");
 }
 
