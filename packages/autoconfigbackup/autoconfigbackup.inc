@@ -120,12 +120,13 @@ function upload_config() {
 	$upload_url = "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/backup.php";
 
 	if(!$username or !$password or !$encryptpw) {
-
-		$notice_text =  "Either the username, password or encryption password is not set for Automatic Configuration Backup.  ";
-		$notice_text .= "Please correct this in Diagnostics -> AutoConfigBackup -> Settings.";
-		log_error($notice_text);
-		file_notice("AutoConfigBackup", $notice_text, $notice_text, "");
-
+		if(!file_exists("/cf/conf/autoconfigback.notice")) {
+			$notice_text =  "Either the username, password or encryption password is not set for Automatic Configuration Backup.  ";
+			$notice_text .= "Please correct this in Diagnostics -> AutoConfigBackup -> Settings.";
+			log_error($notice_text);
+			file_notice("AutoConfigBackup", $notice_text, $notice_text, "");
+			touch("/cf/conf/autoconfigback.notice");
+		}
 	} else {
 		/* If configuration has changed, upload to pfS */
 		if($last_backup_date <> $last_config_change) {
