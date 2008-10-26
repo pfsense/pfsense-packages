@@ -33,6 +33,7 @@ require("guiconfig.inc");
 
 if($_REQUEST['getactivity']) {
 	$tinydnslogs = `cat /etc/tinydns/log/main/current | /usr/local/bin/tai64nlocal | php -f /usr/local/pkg/tinydns_parse_logs.php | grep -v ":0"`;
+	echo "TinyDNS Server logs as of " . date("D M j G:i:s T Y")  . "\n\n";
 	echo $tinydnslogs;
 	exit;
 }
@@ -73,7 +74,7 @@ if ($_POST['clear']) {
 				});
 		}
 		function activitycallback(transport) {
-			$('tinydnslogs').innerHTML = '<font face="Courier"><font size="1"><pre>' + transport.responseText  + '</pre></font>';
+			$('tinydnslogs').innerHTML = '<font face="Courier"><pre>' + transport.responseText  + '</pre></font>';
 			setTimeout('getlogactivity()', 2500);		
 		}
 		setTimeout('getlogactivity()', 1000);	
