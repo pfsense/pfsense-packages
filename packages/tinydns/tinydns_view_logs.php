@@ -73,7 +73,7 @@ if ($_POST['clear']) {
 				});
 		}
 		function activitycallback(transport) {
-			$('tinydnslogs').innerHTML = '<font face="Courier"><font size="1"><b><pre>' + transport.responseText  + '</pre></font>';
+			$('tinydnslogs').innerHTML = '<font face="Courier"><font size="1"><pre>' + transport.responseText  + '</pre></font>';
 			setTimeout('getlogactivity()', 2500);		
 		}
 		setTimeout('getlogactivity()', 1000);	
