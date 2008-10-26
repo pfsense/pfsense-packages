@@ -31,6 +31,12 @@
 
 require("guiconfig.inc");
 
+if($_REQUEST['getactivity']) {
+	$tinydnslogs = `cat /etc/tinydns/log/main/current | /usr/local/bin/tai64nlocal | php -f /usr/local/pkg/tinydns_parse_logs.php | grep -v ":0"`;
+	echo $tinydnslogs;
+	exit;
+}
+
 /* Defaults to this page but if no settings are present, redirect to setup page */
 if(!$config['installedpackages']['tinydns']['config'][0])
 	Header("Location: /pkg_edit.php?xml=tinydns.xml&id=0");
@@ -44,8 +50,6 @@ include("head.inc");
 
 /* NEED TO FIX there are 2 logs /etc/tinydns/log/main/current and /etc/dnscache/log/main/current */
 
-$tinydnslogs = `cat /etc/tinydns/log/main/current | /usr/local/bin/tai64nlocal | php -f /usr/local/pkg/tinydns_parse_logs.php | grep -v ":0"`;
-
 /* NEED TO FIX */
 if ($_POST['clear']) {
 //	exec("rm /etc/tinydns/log/main/current");
@@ -54,6 +58,26 @@ if ($_POST['clear']) {
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		function getlogactivity() {
+			scroll(0,0);
+			var url = "/tinydns_view_logs.php";
+			var pars = 'getactivity=yes';
+			var myAjax = new Ajax.Request(
+				url,
+				{
+					method: 'post',
+					parameters: pars,
+					onComplete: activitycallback
+				});
+		}
+		function activitycallback(transport) {
+			$('tinydnslogs').innerHTML = '<font face="Courier"><font size="1"><b><pre>' + transport.responseText  + '</pre></font>';
+			setTimeout('getlogactivity()', 2500);		
+		}
+		setTimeout('getlogactivity()', 1000);	
+	</script>
 <?php include("fbegin.inc"); ?>
 
 <?php if($one_two): ?>
@@ -80,7 +104,9 @@ if ($_POST['clear']) {
      <td class="tabcont" >
       <form action="tinydns_view_logs.php" method="post">
 		<br>
-<pre><?=$tinydnslogs?></pre>
+			<div id="tinydnslogs">
+				<pre>One moment please, loading TinyDNS logs...</pre>
+			</div>
      </td>
     </tr>
 </table>
