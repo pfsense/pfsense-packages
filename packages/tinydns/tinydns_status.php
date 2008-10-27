@@ -61,7 +61,7 @@ if(strstr($pfSversion, "1.2"))
 	$tab_array = array();
 	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=tinydns.xml&id=0");
 	$tab_array[] = array(gettext("Add/Edit Record"), false, "/tinydns_filter.php");
-	$tab_array[] = array(gettext("Status"), true, "/tinydns_status.php");
+	$tab_array[] = array(gettext("Failover Status"), true, "/tinydns_status.php");
 	$tab_array[] = array(gettext("Logs"), false, "/tinydns_view_logs.php");
 	$tab_array[] = array(gettext("Zone Sync"), false, "/pkg_edit.php?xml=tinydns_sync.xml&id=0");
 	$tab_array[] = array(gettext("New domain wizard"), false, "/wizard.php?xml=new_zone_wizard.xml");	

@@ -56,7 +56,7 @@
 			<active/>
 		</tab>
 		<tab>
-			<text>Status</text>
+			<text>Failover Status</text>
 			<url>/tinydns_status.php</url>
 		</tab>
 		<tab>
