@@ -26,7 +26,6 @@
       <version>4.3.7</version>
       <status>Stable</status>
       <required_version>1.2</required_version>
-      <maintainer>geekgod@geekgod.com</maintainer>
       <configurationfile>spamd.xml</configurationfile>
       <logging>
         <facilityname>spamd</facilityname>

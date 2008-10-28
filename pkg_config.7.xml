@@ -49,7 +49,6 @@
       <version>4.3.7</version>
       <status>Stable</status>
       <required_version>1.2.1</required_version>
-      <maintainer>sullrich+pfsp@gmail.com</maintainer>
       <configurationfile>spamd.xml</configurationfile>
       <logging>
         <facilityname>spamd</facilityname>
