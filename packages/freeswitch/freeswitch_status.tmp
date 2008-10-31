@@ -102,7 +102,7 @@ function event_socket_request($fp, $cmd) {
 }
 
 
-$pgtitle = "FreeSWITCH: Status";
+
 include("head.inc");
 
 $password = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_password'];
@@ -113,11 +113,12 @@ $host = $config['interfaces']['lan']['ipaddr'];
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle"><?=$pgtitle?></font></p>
+<p class="pgtitle">FreeSWITCH: Status</font></p>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <div id="mainlevel">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr><td class="tabnavtbl">
 <?php
 			
 	$tab_array = array();
@@ -134,6 +135,7 @@ $host = $config['interfaces']['lan']['ipaddr'];
  	display_top_tabs($tab_array);
  	
 ?>
+</td></tr>
 </table>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>

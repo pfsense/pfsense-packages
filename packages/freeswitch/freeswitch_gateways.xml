@@ -47,12 +47,12 @@
                                                                               */
 /* ========================================================================== */
         ]]>
-        </copyright>
+         </copyright>
     <description>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow.</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>freeswitchgateways</name>
-	<version>0.1</version>
+	<version>0.2</version>
 	<title>FreeSWITCH: Gateways</title>
 	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
 	<tabs>
@@ -134,7 +134,14 @@
 			<description>Enter the password here.</description>
 			<type>input</type>
 			<value></value>			
-		</field>		
+		</field>
+		<field>
+			<fielddescr>Realm</fielddescr>
+			<fieldname>realm</fieldname>
+			<description>Enter the realm here.</description>
+			<type>input</type>
+			<value></value>			
+		</field>				
 		<field>
 			<fielddescr>From-user</fielddescr>
 			<fieldname>from-user</fieldname>
@@ -180,8 +187,28 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>Retry_seconds</fielddescr>
-			<fieldname>retry_seconds</fieldname>
+			<fielddescr>Register-transport</fielddescr>
+			<fieldname>register-transport</fieldname>
+			<description>Choose whether to register-transport.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name></name>
+					<value></value>
+				</option>			
+				<option>
+					<name>udp</name>
+					<value>udp</value>
+				</option>
+				<option>
+					<name>tcp</name>
+					<value>tcp</value>
+				</option>
+			</options>
+		</field>		  
+		<field>
+			<fielddescr>Retry-seconds</fielddescr>
+			<fieldname>retry-seconds</fieldname>
 			<description>Enter the retry_seconds here. Example: 30</description>
 			<type>input</type>
 			<value>30</value>
@@ -200,6 +227,46 @@
 			<type>input</type>
 			<value>public</value>
 		</field>
+    <field>
+			<fielddescr>Caller-id-in-from</fielddescr>
+			<fieldname>caller-id-in-from</fieldname>
+			<description>Choose caller-id-in-from.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name></name>
+					<value></value>
+				</option>
+				<option>
+					<name>True</name>
+					<value>true</value>
+				</option>
+				<option>
+					<name>False</name>
+					<value>false</value>
+				</option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Supress-cng</fielddescr>
+			<fieldname>supress-cng</fieldname>
+			<description>Choose whether to supress-cng.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name></name>
+					<value></value>
+				</option>
+				<option>
+					<name>True</name>
+					<value>true</value>
+				</option>
+				<option>
+					<name>False</name>
+					<value>false</value>
+				</option>
+			</options>
+		</field> 		
 		<field>
 			<fielddescr>Gateway Description</fielddescr>
 			<fieldname>description</fieldname>
@@ -219,4 +286,3 @@
 	<custom_php_deinstall_command>
 	</custom_php_deinstall_command>	
 </packagegui>
-
