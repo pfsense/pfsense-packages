@@ -21,7 +21,7 @@
       <category>Services</category>
       <config_file>http://www.pfsense.com/packages/config/freeswitch/freeswitch.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <version>0.1.1</version>
+      <version>0.2</version>
       <status>Beta</status>
       <required_version>1.2.1</required_version>
       <maintainer>markjcrane@gmail.com</maintainer>
