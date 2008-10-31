@@ -225,21 +225,14 @@
 			<type>input</type>
 		</field>	
 	</fields>	
-	<custom_php_command_before_form>
-	</custom_php_command_before_form>
-	<custom_php_after_head_command>
-	</custom_php_after_head_command>
-	<custom_php_after_form_command>
-	</custom_php_after_form_command>
 	<custom_add_php_command>
-		sync_package_freeswitch();
 	</custom_add_php_command>
-	<custom_delete_php_command>
-		sync_package_freeswitch();
-	</custom_delete_php_command>
 	<custom_php_resync_config_command>
-		sync_package_freeswitch();
+	    sync_package_freeswitch_settings();
 	</custom_php_resync_config_command>
+	<custom_delete_php_command>    
+      sync_package_freeswitch_settings();
+	</custom_delete_php_command>
 	<custom_php_install_command>
 		freeswitch_php_install_command();
 	</custom_php_install_command>
