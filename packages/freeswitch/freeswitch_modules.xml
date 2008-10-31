@@ -179,7 +179,10 @@
 	<fields>
     <field>
 			<fielddescr>&lt;b&gt;Loggers&lt;/b&gt;</fielddescr>
-		</field>
+			<fieldname>loggers</fieldname>
+			<description></description>
+			<type>listtopic</type>
+	</field>
     <field>
 			<fielddescr>mod_console</fielddescr>
 			<fieldname>mod_console</fieldname>
@@ -195,7 +198,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>		
+	</field>		
     <field>
 			<fielddescr>mod_logfile</fielddescr>
 			<fieldname>mod_logfile</fieldname>
@@ -211,7 +214,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_syslog</fielddescr>
 			<fieldname>mod_syslog</fieldname>
@@ -227,9 +230,12 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>&lt;b&gt;Multi-Faceted&lt;/b&gt;</fielddescr>
+			<fieldname>multi-faceted</fieldname>
+			<description></description>
+			<type>listtopic</type>
 		</field>
     <field>
 			<fielddescr>mod_enum</fielddescr>
@@ -246,10 +252,13 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>&lt;b&gt;XML Interfaces&lt;/b&gt;</fielddescr>
-		</field>
+			<fieldname>xml_interfaces</fieldname>
+			<description></description>
+			<type>listtopic</type>			
+	</field>
     <field>
 			<fielddescr>mod_xml_rpc</fielddescr>
 			<fieldname>mod_xml_rpc</fieldname>
@@ -265,7 +274,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_xml_curl</fielddescr>
 			<fieldname>mod_xml_curl</fieldname>
@@ -281,7 +290,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>		
+	</field>		
     <field>
 			<fielddescr>mod_xml_cdr</fielddescr>
 			<fieldname>mod_xml_cdr</fieldname>
@@ -297,10 +306,13 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>&lt;b&gt;Event Handlers&lt;/b&gt;</fielddescr>
-		</field>		
+			<fieldname>event_handlers</fieldname>
+			<description></description>
+			<type>listtopic</type>
+	</field>		
     <field>
 			<fielddescr>mod_cdr_csv</fielddescr>
 			<fieldname>mod_cdr_csv</fieldname>
@@ -316,7 +328,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>		
+	</field>		
     <field>
 			<fielddescr>mod_event_multicast</fielddescr>
 			<fieldname>mod_event_multicast</fieldname>
@@ -332,7 +344,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_event_socket</fielddescr>
 			<fieldname>mod_event_socket</fieldname>
@@ -348,7 +360,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>		
+	</field>		
     <field>
 			<fielddescr>mod_zeroconf</fielddescr>
 			<fieldname>mod_zeroconf</fieldname>
@@ -364,10 +376,13 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>&lt;b&gt;Directory Interfaces&lt;/b&gt;</fielddescr>
-		</field>
+			<fieldname>directory_interfaces</fieldname>
+			<description></description>
+			<type>listtopic</type>
+	</field>
     <field>
 			<fielddescr>mod_ldap</fielddescr>
 			<fieldname>mod_ldap</fieldname>
@@ -383,10 +398,13 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>&lt;b&gt;Endpoints&lt;/b&gt;</fielddescr>
-		</field>		
+			<fieldname>endpoints</fieldname>
+			<description></description>
+			<type>listtopic</type>
+	</field>		
     <field>
 			<fielddescr>mod_dingaling</fielddescr>
 			<fieldname>mod_dingaling</fieldname>
@@ -402,7 +420,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_iax</fielddescr>
 			<fieldname>mod_iax</fieldname>
@@ -418,7 +436,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>		
+	</field>		
     <field>
 			<fielddescr>mod_portaudio</fielddescr>
 			<fieldname>mod_portaudio</fieldname>
@@ -434,7 +452,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_alsa</fielddescr>
 			<fieldname>mod_alsa</fieldname>
@@ -450,7 +468,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>		
+	</field>		
     <field>
 			<fielddescr>mod_sofia</fielddescr>
 			<fieldname>mod_sofia</fieldname>
@@ -466,7 +484,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_loopback</fielddescr>
 			<fieldname>mod_loopback</fieldname>
@@ -482,7 +500,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_wanpipe</fielddescr>
 			<fieldname>mod_wanpipe</fieldname>
@@ -498,7 +516,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_woomera</fielddescr>
 			<fieldname>mod_woomera</fieldname>
@@ -514,7 +532,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_openzap</fielddescr>
 			<fieldname>mod_openzap</fieldname>
@@ -530,10 +548,13 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>&lt;b&gt;Applications&lt;/b&gt;</fielddescr>
-		</field>		
+			<fieldname>applications</fieldname>
+			<description></description>
+			<type>listtopic</type>
+	</field>		
     <field>
 			<fielddescr>mod_commands</fielddescr>
 			<fieldname>mod_commands</fieldname>
@@ -549,7 +570,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_conference</fielddescr>
 			<fieldname>mod_conference</fieldname>
@@ -565,7 +586,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_dptools</fielddescr>
 			<fieldname>mod_dptools</fieldname>
@@ -581,7 +602,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_expr</fielddescr>
 			<fieldname>mod_expr</fieldname>
@@ -597,7 +618,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_fifo</fielddescr>
 			<fieldname>mod_fifo</fieldname>
@@ -613,7 +634,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_voicemail</fielddescr>
 			<fieldname>mod_voicemail</fieldname>
@@ -629,7 +650,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_limit</fielddescr>
 			<fieldname>mod_limit</fieldname>
@@ -645,7 +666,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_esf</fielddescr>
 			<fieldname>mod_esf</fieldname>
@@ -661,7 +682,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_fsv</fielddescr>
 			<fieldname>mod_fsv</fieldname>
@@ -677,10 +698,13 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>&lt;b&gt;SNOM Module&lt;/b&gt;</fielddescr>
-		</field>		
+			<fieldname>snom_module</fieldname>
+			<description></description>
+			<type>listtopic</type>
+	</field>		
     <field>
 			<fielddescr>mod_snom</fielddescr>
 			<fieldname>mod_snom</fieldname>
@@ -696,10 +720,13 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>&lt;b&gt;Dialplan Interfaces&lt;/b&gt;</fielddescr>
-		</field>		
+			<fieldname>dialplan_interfaces</fieldname>
+			<description></description>
+			<type>listtopic</type>
+	</field>		
     <field>
 			<fielddescr>mod_dialplan_directory</fielddescr>
 			<fieldname>mod_dialplan_directory</fieldname>
@@ -715,7 +742,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_dialplan_xml</fielddescr>
 			<fieldname>mod_dialplan_xml</fieldname>
@@ -731,7 +758,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_dialplan_asterisk</fielddescr>
 			<fieldname>mod_dialplan_asterisk</fieldname>
@@ -747,7 +774,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_yaml</fielddescr>
 			<fieldname>mod_yaml</fieldname>
@@ -763,9 +790,12 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>&lt;b&gt;Codec Interfaces&lt;/b&gt;</fielddescr>
+			<fieldname>codec_interfaces</fieldname>
+			<description></description>
+			<type>listtopic</type>
 		</field>		
     <field>
 			<fielddescr>mod_voipcodecs</fielddescr>
@@ -782,7 +812,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_g723_1</fielddescr>
 			<fieldname>mod_g723_1</fieldname>
@@ -798,7 +828,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_g729</fielddescr>
 			<fieldname>mod_g729</fieldname>
@@ -814,7 +844,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_amr</fielddescr>
 			<fieldname>mod_amr</fieldname>
@@ -830,7 +860,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_ilbc</fielddescr>
 			<fieldname>mod_ilbc</fieldname>
@@ -846,7 +876,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_speex</fielddescr>
 			<fieldname>mod_speex</fieldname>
@@ -862,7 +892,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_h26x</fielddescr>
 			<fieldname>mod_h26x</fieldname>
@@ -878,10 +908,13 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>&lt;b&gt;File Format Interfaces&lt;/b&gt;</fielddescr>
-		</field>		
+			<fieldname>file_format_interfaces</fieldname>
+			<description></description>
+			<type>listtopic</type>
+	</field>		
     <field>
 			<fielddescr>mod_sndfile</fielddescr>
 			<fieldname>mod_sndfile</fieldname>
@@ -897,7 +930,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_native_file</fielddescr>
 			<fieldname>mod_native_file</fieldname>
@@ -913,10 +946,13 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>&lt;b&gt;Streams/Files&lt;/b&gt;</fielddescr>
-		</field>
+			<fieldname>streams_files</fieldname>
+			<description></description>
+			<type>listtopic</type>
+	</field>
     <field>
 			<fielddescr>mod_shout</fielddescr>
 			<fieldname>mod_shout</fieldname>
@@ -932,7 +968,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_local_stream</fielddescr>
 			<fieldname>mod_local_stream</fieldname>
@@ -948,7 +984,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_tone_stream</fielddescr>
 			<fieldname>mod_tone_stream</fieldname>
@@ -964,9 +1000,12 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>&lt;b&gt;Languages&lt;/b&gt;</fielddescr>
+			<fieldname>languages</fieldname>
+			<description></description>
+			<type>listtopic</type>
 		</field>
     <field>
 			<fielddescr>mod_spidermonkey</fielddescr>
@@ -983,7 +1022,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_perl</fielddescr>
 			<fieldname>mod_perl</fieldname>
@@ -999,7 +1038,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_python</fielddescr>
 			<fieldname>mod_python</fieldname>
@@ -1015,7 +1054,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_java</fielddescr>
 			<fieldname>mod_java</fieldname>
@@ -1031,7 +1070,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_lua</fielddescr>
 			<fieldname>mod_lua</fieldname>
@@ -1047,10 +1086,13 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>&lt;b&gt;ASR /TTS&lt;/b&gt;</fielddescr>
-		</field>
+			<fieldname>asr_tts</fieldname>
+			<description></description>
+			<type>listtopic</type>
+	</field>
     <field>
 			<fielddescr>mod_flite</fielddescr>
 			<fieldname>mod_flite</fieldname>
@@ -1066,7 +1108,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_pocketsphinx</fielddescr>
 			<fieldname>mod_pocketsphinx</fieldname>
@@ -1082,7 +1124,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_cepstral</fielddescr>
 			<fieldname>mod_cepstral</fieldname>
@@ -1098,7 +1140,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_openmrcp</fielddescr>
 			<fieldname>mod_openmrcp</fieldname>
@@ -1114,7 +1156,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_rss</fielddescr>
 			<fieldname>mod_rss</fieldname>
@@ -1130,10 +1172,13 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>&lt;b&gt;Say&lt;/b&gt;</fielddescr>
-		</field>		
+			<fieldname>say</fieldname>
+			<description></description>
+			<type>listtopic</type>
+	</field>		
     <field>
 			<fielddescr>mod_say_en</fielddescr>
 			<fieldname>mod_say_en</fieldname>
@@ -1149,7 +1194,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>
+	</field>
     <field>
 			<fielddescr>mod_say_zh</fielddescr>
 			<fieldname>mod_say_zh</fieldname>
@@ -1165,7 +1210,7 @@
 					<value>disable</value>
 				</option>
 			</options>
-		</field>		
+	</field>		
 	</fields>	
 	<custom_php_command_before_form>
 	</custom_php_command_before_form>
