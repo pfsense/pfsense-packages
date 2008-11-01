@@ -320,59 +320,63 @@ function sync_package_freeswitch_gateways()
     	unlink_if_exists("/usr/local/freeswitch/conf/sip_profiles/external/*.xml");
     	
       foreach($config['installedpackages']['freeswitchgateways']['config'] as $rowhelper) {
-      		$fout = fopen("/usr/local/freeswitch/conf/sip_profiles/external/".$rowhelper['gateway'].".xml","w");
 
-          $tmpxml .= "<include>\n";
-          $tmpxml .= "    <gateway name=\"" . $rowhelper['gateway'] . "\">\n";
-          if (strlen($rowhelper['username']) > 0) {
-            $tmpxml .= "      <param name=\"username\" value=\"" . $rowhelper['username'] . "\"/>\n";
-          }
-          if (strlen($rowhelper['password']) > 0) {
-            $tmpxml .= "      <param name=\"password\" value=\"" . $rowhelper['password'] . "\"/>\n";
-          }                    
-          if (strlen($rowhelper['realm']) > 0) {
-            $tmpxml .= "      <param name=\"realm\" value=\"" . $rowhelper['realm'] . "\"/>\n";
-          }
-          if (strlen($rowhelper['from-user']) > 0) {
-            $tmpxml .= "      <param name=\"from-user\" value=\"" . $rowhelper['from-user'] . "\"/>\n";
-          }
-          if (strlen($rowhelper['from-domain']) > 0) {
-            $tmpxml .= "      <param name=\"from-domain\" value=\"" . $rowhelper['from-domain'] . "\"/>\n";
-          }
-          if (strlen($rowhelper['proxy']) > 0) {
-            $tmpxml .= "      <param name=\"proxy\" value=\"" . $rowhelper['proxy'] . "\"/>\n";
-          }
-          if (strlen($rowhelper['expire-seconds']) > 0) {
-            $tmpxml .= "      <param name=\"expire-seconds\" value=\"" . $rowhelper['expire-seconds'] . "\"/>\n";
-          }
-          if (strlen($rowhelper['register']) > 0) {
-            $tmpxml .= "      <param name=\"register\" value=\"" . $rowhelper['register'] . "\"/>\n";
-          }
-          if (strlen($rowhelper['register-transport']) > 0) {
-            $tmpxml .= "      <param name=\"register-transport\" value=\"" . $rowhelper['register-transport'] . "\"/>\n";
-          }                    
-          if (strlen($rowhelper['retry-seconds']) > 0) {
-            $tmpxml .= "      <param name=\"retry-seconds\" value=\"" . $rowhelper['retry-seconds'] . "\"/>\n";
-          }
-          if (strlen($rowhelper['extension']) > 0) {
-            $tmpxml .= "      <param name=\"extension\" value=\"" . $rowhelper['extension'] . "\"/>\n";
-          }
-          if (strlen($rowhelper['context']) > 0) {
-            $tmpxml .= "      <param name=\"context\" value=\"" . $rowhelper['context'] . "\"/>\n";
-          }
-          if (strlen($rowhelper['caller-id-in-from']) > 0) {
-            $tmpxml .= "      <param name=\"context\" value=\"" . $rowhelper['context'] . "\"/>\n";
-          }
-          if (strlen($rowhelper['supress-cng']) > 0) {
-            $tmpxml .= "      <param name=\"context\" value=\"" . $rowhelper['context'] . "\"/>\n";
-          }                    
-
-          $tmpxml .= "    </gateway>\n";
-          $tmpxml .= "</include>";
-          
-          fwrite($fout, $tmpxml);
-          unset($tmpxml);
-          fclose($fout);
+          if ($rowhelper['disabled'] != "on") {
+		          $fout = fopen("/usr/local/freeswitch/conf/sip_profiles/external/".$rowhelper['gateway'].".xml","w");
+		
+		          $tmpxml .= "<include>\n";
+		          $tmpxml .= "    <gateway name=\"" . $rowhelper['gateway'] . "\">\n";
+		          if (strlen($rowhelper['username']) > 0) {
+		            $tmpxml .= "      <param name=\"username\" value=\"" . $rowhelper['username'] . "\"/>\n";
+		          }
+		          if (strlen($rowhelper['password']) > 0) {
+		            $tmpxml .= "      <param name=\"password\" value=\"" . $rowhelper['password'] . "\"/>\n";
+		          }                    
+		          if (strlen($rowhelper['realm']) > 0) {
+		            $tmpxml .= "      <param name=\"realm\" value=\"" . $rowhelper['realm'] . "\"/>\n";
+		          }
+		          if (strlen($rowhelper['from-user']) > 0) {
+		            $tmpxml .= "      <param name=\"from-user\" value=\"" . $rowhelper['from-user'] . "\"/>\n";
+		          }
+		          if (strlen($rowhelper['from-domain']) > 0) {
+		            $tmpxml .= "      <param name=\"from-domain\" value=\"" . $rowhelper['from-domain'] . "\"/>\n";
+		          }
+		          if (strlen($rowhelper['proxy']) > 0) {
+		            $tmpxml .= "      <param name=\"proxy\" value=\"" . $rowhelper['proxy'] . "\"/>\n";
+		          }
+		          if (strlen($rowhelper['expire-seconds']) > 0) {
+		            $tmpxml .= "      <param name=\"expire-seconds\" value=\"" . $rowhelper['expire-seconds'] . "\"/>\n";
+		          }
+		          if (strlen($rowhelper['register']) > 0) {
+		            $tmpxml .= "      <param name=\"register\" value=\"" . $rowhelper['register'] . "\"/>\n";
+		          }
+		          if (strlen($rowhelper['register-transport']) > 0) {
+		            $tmpxml .= "      <param name=\"register-transport\" value=\"" . $rowhelper['register-transport'] . "\"/>\n";
+		          }                    
+		          if (strlen($rowhelper['retry-seconds']) > 0) {
+		            $tmpxml .= "      <param name=\"retry-seconds\" value=\"" . $rowhelper['retry-seconds'] . "\"/>\n";
+		          }
+		          if (strlen($rowhelper['extension']) > 0) {
+		            $tmpxml .= "      <param name=\"extension\" value=\"" . $rowhelper['extension'] . "\"/>\n";
+		          }
+		          if (strlen($rowhelper['context']) > 0) {
+		            $tmpxml .= "      <param name=\"context\" value=\"" . $rowhelper['context'] . "\"/>\n";
+		          }
+		          if (strlen($rowhelper['caller-id-in-from']) > 0) {
+		            $tmpxml .= "      <param name=\"context\" value=\"" . $rowhelper['context'] . "\"/>\n";
+		          }
+		          if (strlen($rowhelper['supress-cng']) > 0) {
+		            $tmpxml .= "      <param name=\"context\" value=\"" . $rowhelper['context'] . "\"/>\n";
+		          }                    
+		
+		          $tmpxml .= "    </gateway>\n";
+		          $tmpxml .= "</include>";
+		          
+		          fwrite($fout, $tmpxml);
+		          unset($tmpxml);
+		          fclose($fout);
+          }		        
+      
       }
       
       conf_mount_ro();

@@ -52,7 +52,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>freeswitchgateways</name>
-	<version>0.2</version>
+	<version>0.2.1</version>
 	<title>FreeSWITCH: Gateways</title>
 	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
 	<tabs>
@@ -266,7 +266,14 @@
 					<value>false</value>
 				</option>
 			</options>
-		</field> 		
+		</field>
+    	<field>
+			<fielddescr>Disabled</fielddescr>
+			<fieldname>disabled</fieldname>
+			<description>Set this option to disable this gateway without removing it from the list.</description>
+			<type>checkbox</type>
+			<value>tmp</value>
+		</field>		 		
 		<field>
 			<fielddescr>Gateway Description</fielddescr>
 			<fieldname>description</fieldname>
