@@ -59,7 +59,6 @@
 		<tab>
 			<text>Settings</text>
 			<url>/pkg_edit.php?xml=freeswitch.xml&amp;id=0</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>Dialplan</text>

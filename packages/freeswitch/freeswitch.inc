@@ -277,7 +277,7 @@ function sync_package_freeswitch_extensions()
           /* 	<description>Optional: Enter the email address to send voicemail to.</description> */
           /* 	<type>input</type> */
           /* </field> */		
-          $tmpxml .= "    </params>>\n";
+          $tmpxml .= "    </params>\n";
           $tmpxml .= "    <variables>\n";
           $tmpxml .= "      <variable name=\"toll_allow\" value=\"domestic,international,local\"/>\n";
           $tmpxml .= "      <variable name=\"accountcode\" value=\"" . $rowhelper['accountcode'] . "\"/>\n";
@@ -667,6 +667,9 @@ function freeswitch_php_install_command()
 	exec("cp /tmp/freeswitch_status.tmp /usr/local/www/freeswitch/freeswitch_status.php");
 	unlink_if_exists("/tmp/freeswitch_status.tmp");
 	
+	exec("cp /tmp/freeswitch_cmd.tmp /usr/local/www/freeswitch/freeswitch_cmd.php");
+	unlink_if_exists("/tmp/freeswitch_cmd.tmp");
+	
 	exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
 	unlink_if_exists("/tmp/freeswitch.tgz");
 	
@@ -931,7 +934,8 @@ function freeswitch_deinstall_command()
 	unlink_if_exists("/usr/local/pkg/freeswitch_modules.xml");	
 	unlink_if_exists("/usr/local/pkg/freeswitch_public.xml");
 	unlink_if_exists("/usr/local/pkg/freeswitch_vars.xml");	
-	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_status.xml");	
+	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_status.xml");
+	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_cmd.xml");	
 	exec("rm -R /usr/local/freeswitch/");
 	exec("rm -R /usr/local/www/freeswitch/");
 	unlink_if_exists("/usr/local/etc/rc.d/freeswitch.sh");
