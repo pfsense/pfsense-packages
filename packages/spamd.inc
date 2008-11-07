@@ -54,6 +54,7 @@ function sync_package_spamd() {
 	fwrite($fd, "\t:msg=\"Sorry, you spammed us before.\":\\\n");
 	fwrite($fd, "\t:method=file:\\\n");
 	fwrite($fd, "\t:file=/var/db/blacklist.txt:\n\n");
+	log_error("Looping through each item and write out its configuration");
 	/* loop through each item and write out its configuration */
 	if($config['installedpackages']['spamdsources']['config'] != "") {
 		foreach($config['installedpackages']['spamdsources']['config'] as $spamd) {
@@ -72,6 +73,7 @@ function sync_package_spamd() {
 		}
 	}
 	fclose($fd);
+		log_error("Creating /var/db/whitelist.txt");
 	$fd = fopen("/var/db/whitelist.txt","w");
 	if($config['installedpackages']['spamdwhitelist']['config'] != "") {
 	    foreach($config['installedpackages']['spamdwhitelist']['config'] as $spamd) {
@@ -88,6 +90,7 @@ function sync_package_spamd() {
 	$maxblack = "";
 	$stuttersecs = "";
 	$delaysecs = "";
+	log_error("Looping through spamdsettings");
 	if($config['installedpackages']['spamdsettings']['config']) {
 		foreach($config['installedpackages']['spamdsettings']['config'] as $ss) {
 			if($ss['nextmta'] <> "")
@@ -128,21 +131,31 @@ function sync_package_spamd() {
 		 "/usr/bin/killall spamd\n" .
 		 "/usr/bin/killall pflogd\n" .
 		 "sleep 2";
+	log_error("Writing rc_file");		
 	write_rcfile(array(
 				"file" => "spamd.sh",
 				"start" => $start,
 				"stop" =>  $stop
 			    )
 	);
+	log_error("Installing CRON");	
 	spamd_install_cron(true);
+	log_error("Mounting RO");	
 	conf_mount_ro();
+	log_error("Unlocking config");	
 	config_unlock();
+	log_error("Restart cron");	
 	mwexec("killall -HUP cron");
+	log_error("Setting up spamd.conf symlink");	
 	mwexec("ln -s /etc/spamd.conf /usr/local/etc/spamd/spamd.conf");
+	log_error("Stopping spamd");
 	mwexec("/usr/local/etc/rc.d/spamd.sh stop");
 	sleep(1);
+	log_error("Starting spamd");
 	mwexec("/usr/local/etc/rc.d/spamd.sh start");
+	log_error("Reconfiguring filter");
 	filter_configure();
+	log_error("SpamD setup completed");	
 }
 
 function remove_spaces($string) {
