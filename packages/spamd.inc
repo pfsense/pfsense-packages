@@ -121,7 +121,7 @@ function sync_package_spamd() {
 		}
 	}
 	$greyparms = " -G {$passtime}:{$greyexp}:{$whiteexp}";
-	$start = "if [ `mount | grep -v grep | grep mount | wc -l` -lt 1 ]; then \h" .
+	$start = "if [ `mount | grep -v grep | grep mount | wc -l` -lt 1 ]; then \n" .
 		 "/sbin/mount -t fdescfs fdescfs /dev/fd\n" .
 		 "fi\n" .
 	     "/usr/local/sbin/spamd-setup -d &\n" .
