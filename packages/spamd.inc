@@ -152,7 +152,7 @@ function sync_package_spamd() {
 	mwexec("/usr/local/etc/rc.d/spamd.sh stop");
 	sleep(1);
 	log_error("Starting spamd");
-	mwexec("/usr/local/etc/rc.d/spamd.sh start");
+	mwexec_bg("/usr/local/etc/rc.d/spamd.sh start");
 	log_error("Reconfiguring filter");
 	filter_configure();
 	log_error("SpamD setup completed");	
