@@ -121,7 +121,9 @@ function sync_package_spamd() {
 		}
 	}
 	$greyparms = " -G {$passtime}:{$greyexp}:{$whiteexp}";
-	$start = "/sbin/mount -t fdescfs fdescfs /dev/fd\n" .
+	$start = "if [ `mount | grep -v grep | grep mount | wc -l` -lt 1 ]; then \h" .
+		 "/sbin/mount -t fdescfs fdescfs /dev/fd\n" .
+		 "fi\n" .
 	     "/usr/local/sbin/spamd-setup -d &\n" .
 		 "/sbin/pflogd &\n" .
 		 "/usr/local/libexec/spamd {$greyparms}{$identifier}{$greylisting}{$maxcon}{$maxblack}{$window}{$replysmtperror} 127.0.0.1 &\n" .
