@@ -62,7 +62,6 @@ if ($_POST['clear']) {
 <script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
 	<script type="text/javascript">
 		function getlogactivity() {
-			scroll(0,0);
 			var url = "/tinydns_view_logs.php";
 			var pars = 'getactivity=yes';
 			var myAjax = new Ajax.Request(
