@@ -46,7 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>nmap</name>
-	<version>4.11</version>
+	<version>4.76</version>
 	<title>Diagnostics: NMap</title>
 	<savetext>Scan</savetext>
 	<preoutput>yes</preoutput>
@@ -62,7 +62,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/nmap/nmap.inc</item>
+		<item>http://files.pfsense.org/packages/config/nmap/nmap.inc</item>
 	</additional_files_needed>
 	<fields>
 		<field>
