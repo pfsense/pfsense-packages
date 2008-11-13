@@ -122,6 +122,7 @@
 	  <executable>stunnel</executable>
 	</service>	
 	<custom_add_php_command_late>
+	<![CDATA[	
 	  conf_mount_rw();
 	  config_lock();
 	  $fout = fopen("/usr/local/etc/stunnel/stunnel.conf","w");
@@ -158,9 +159,12 @@
 	    fwrite($fout, "/usr/local/sbin/stunnel /usr/local/etc/stunnel/stunnel.conf\n\n");
 	    fclose($fout);
 	    chmod("/usr/local/etc/rc.d/stunnel.sh", 0555);
+	]]>	
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
+	<![CDATA[		
 	    rmdir_recursive("/var/tmp/stunnel");
 	    rmdir_recursive("/usr/local/etc/stunnel*");
+	]]>
 	</custom_php_deinstall_command>
 </packagegui>
