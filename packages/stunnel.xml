@@ -116,6 +116,11 @@
 			<type>input</type>
 		</field>
 	</fields>
+	<service>
+	  <name>stunnel</name>
+	  <rcfile>/usr/local/etc/rc.d/stunnel.sh</rcfile>
+	  <executable>stunnel</executable>
+	</service>	
 	<custom_add_php_command_late>
 	  conf_mount_rw();
 	  config_lock();
