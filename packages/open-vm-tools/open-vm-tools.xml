@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
-<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
         <copyright>
         <![CDATA[
@@ -8,8 +8,12 @@
 /* ========================================================================== */
 /*
     open-vm-tools.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2008 Scott Ullrich
+    part of pfSense (http://www.pfSense.org)
+    Copyright (C) 2008 BSD Perimeter LLC
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2008 Manuel Kasper <mk@neon1.net>.
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -42,23 +46,19 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>open-vm-tools</name>
-	<version>0.1</version>
-	<title>open-vm-tools</title>
-	<additional_files_needed>
-		<prefix>/usr/local/etc/rc.d/</prefix>
-		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/open-vm-tools/vmware-guestd.sh</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/etc/rc.d/</prefix>
-		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/open-vm-tools/vmware-kmod.sh</item>
-	</additional_files_needed>
-	<custom_php_install_command>
-		exec("rm /usr/local/etc/rc.d/vmware-kmod");
-		exec("rm /usr/local/etc/rc.d/vmware-guestd.sh");
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		exec("rm -f /usr/local/etc/rc.d/vmware*");
-	</custom_php_deinstall_command>
+	<version>102166_7</version>
+	<title>Open VM Tools</title>
+    <custom_add_php_command>
+    </custom_add_php_command>
+    <custom_php_install_command>
+	conf_mount_rw();
+	config_lock();
+	exec("pkg_add -r ");
+	conf_mount_ro();
+	config_unlock();
+        /usr/local/etc/rc.d/vmware-guestd.sh start
+        /usr/local/etc/rc.d/vmware-kmod.sh start
+    </custom_php_install_command>
+    <custom_php_deinstall_command>
+    </custom_php_deinstall_command>
 </packagegui>
