@@ -4,6 +4,16 @@
 <pfsensepkgs>
   <packages>
     <package>
+      <name>Pubkey</name>
+      <descr>pfSense release key</descr>
+      <website>http:/pfsense.org</website>
+      <category>System</category>
+      <version>1</version>
+      <status>RELEASE</status>
+      <config_file>http://www.pfsense.org/packages/config/pubkey.xml</config_file>
+      <configurationfile>pubkey.xml</configurationfile>
+    </package>
+    <package>
       <name>AutoConfigBackup</name>
 	  <maintainer>portal@bsdperimeter.com</maintainer>
       <descr>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from http://portal.pfsense.org</descr>

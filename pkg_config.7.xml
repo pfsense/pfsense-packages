@@ -4,6 +4,16 @@
 <pfsensepkgs>
   <packages>
     <package>
+      <name>Pubkey</name>
+      <descr>pfSense release key</descr>
+      <website>http:/pfsense.org</website>
+      <category>System</category>
+      <version>1</version>
+      <status>RELEASE</status>
+      <config_file>http://www.pfsense.org/packages/config/pubkey.xml</config_file>
+      <configurationfile>pubkey.xml</configurationfile>
+    </package>
+    <package>
       <name>Dashboard</name>
       <descr>Adds pfSense dashboard that will be included with 1.3. This requires 1.2 or newer. WARNING!  Cannot be deinstalled.</descr>
       <category>System</category>
