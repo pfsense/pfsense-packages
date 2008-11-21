@@ -69,13 +69,14 @@
     <package>
       <name>siproxd</name>
       <website>http://siproxd.sourceforge.net/</website>
-      <descr>Siproxd is a proxy/masquerading daemon for the SIP protocol. It handles registrations of SIP clients on a private IP network and performs rewriting of the SIP message bodies to make SIP connections possible via a masquerading firewall. It allows SIP clients (like kphone, linphone) to work behind an IP masquerading firewall or router.</descr>
+      <descr>Proxy for handling NAT of multiple SIP devices to a single public IP.</descr>
       <category>Services</category>
       <config_file>http://www.pfsense.com/packages/config/siproxd.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>siproxd-0.7.0_1.tbz</depends_on_package>
+      <pkginfolink>http://doc.pfsense.org/index.php/Siproxd_package</pkginfolink>
       <version>0.7.1</version>
-      <status>ALPHA</status>
+      <status>Beta</status>
       <required_version>1.2.1</required_version>
       <configurationfile>siproxd.xml</configurationfile>
     </package>
@@ -156,11 +157,12 @@
     </package>
     <package>
       <name>arping</name>
-      <descr>Broadcasts a who-has ARP packet on the network and prints answers. VERY useful when you are trying to pick an unused IP for a net that you don't yet have routing to. Then again, if you have no idea what I'm talking about then you prolly don't need it.</descr>
+      <descr>Broadcasts a who-has ARP packet on the network and prints answers. </descr>
       <website>http://www.habets.pp.se/synscan/programs.php?prog=arping</website>
       <category>Services</category>
       <version>2.05</version>
-      <status>ALPHA</status>
+      <status>Beta</status>
+      <pkginfolink>http://doc.pfsense.org/index.php/Arping_package</pkginfolink>
       <required_version>1.0.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/arping/arping.xml</config_file>
       <configurationfile>arping.xml</configurationfile>
@@ -258,7 +260,8 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>widentd-1.03_1.tbz</depends_on_package>
       <version>1.03_1</version>
-      <status>ALPHA</status>
+      <status>Stable</status>
+      <pkginfolink>http://doc.pfsense.org/index.php/Widentd_package</pkginfolink>
       <required_version>1.2.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/widentd.xml</config_file>
       <configurationfile>widentd.xml</configurationfile>
