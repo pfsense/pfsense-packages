@@ -6,9 +6,10 @@
     <package>
       <name>Pubkey</name>
       <descr>pfSense release key</descr>
-      <website>http:/pfsense.org</website>
+      <website>http://pfsense.org</website>
       <category>System</category>
-      <version>1</version>
+      <version>1.0</version>
+      <required_version>1.0</required_version>
       <status>RELEASE</status>
       <config_file>http://www.pfsense.org/packages/config/pubkey.xml</config_file>
       <configurationfile>pubkey.xml</configurationfile>
