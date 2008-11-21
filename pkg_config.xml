@@ -17,8 +17,8 @@
     <package>
       <name>AutoConfigBackup</name>
 	  <maintainer>portal@bsdperimeter.com</maintainer>
-      <descr>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from http://portal.pfsense.org</descr>
-      <website>http://portal.pfsense.org</website>
+      <descr>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from https://portal.pfsense.org</descr>
+      <website>https://portal.pfsense.org</website>
       <category>Services</category>
       <version>1.06</version>
       <status>ALPHA</status>
@@ -84,7 +84,7 @@
     </package>
     <package>
       <name>Dashboard</name>
-      <descr>Adds pfSense dashboard that will be included with 1.3. This requires 1.2 or newer. WARNING!  Cannot be deinstalled.</descr>
+      <descr>Adds pfSense dashboard that will be included with 2.0. This requires 1.2 or newer. WARNING!  Cannot be deinstalled.</descr>
       <category>System</category>
       <config_file>http://www.pfsense.com/packages/config/dashboard/dashboard.xml</config_file>
       <version>0.6.2</version>
