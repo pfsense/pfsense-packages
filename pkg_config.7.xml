@@ -111,7 +111,8 @@
       <website>http://cr.yp.to/djbdns.html</website>
       <category>Services</category>
       <version>1.0.6</version>
-      <status>ALPHA</status>
+      <status>Beta</status>
+      <pkginfolink>http://doc.pfsense.org/index.php/Tinydns_package</pkginfolink>
       <required_version>1.2</required_version>
       <config_file>http://www.pfsense.com/packages/config/tinydns/tinydns.xml</config_file>
       <configurationfile>tinydns.xml</configurationfile>
@@ -207,19 +208,19 @@
 	  <configurationfile>nut.xml</configurationfile>
 	  <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>nut-2.2.2.tbz</depends_on_package>
-	</package>
-	<package>
-		<name>diag_new_states</name>
-		<descr>Paul Taylors version of Diagnostics States which utilizes pftop.</descr>
-		<website>http://www.addressplus.net</website>
-		<category>Network Management</category>
-		<version>0.2</version>
-		<maintainer>ptaylor@addressplus.net</maintainer>
-		<required_version>1.2.1</required_version>
-		<status>BETA</status>
-		<config_file>http://www.pfsense.org/packages/config/diag_states_pt/diag_new_states.xml</config_file>
-		<configurationfile>http://www.pfsense.com/packages/config/diag_states_pt/diag_new_states.xml</configurationfile>
-	</package>
+    </package>
+    <package>
+	<name>diag_new_states</name>
+	<descr>Paul Taylors version of Diagnostics States which utilizes pftop.</descr>
+	<website>http://www.addressplus.net</website>
+	<category>Network Management</category>
+	<version>0.2</version>
+	<maintainer>ptaylor@addressplus.net</maintainer>
+	<required_version>1.2.1</required_version>
+	<status>BETA</status>
+	<config_file>http://www.pfsense.org/packages/config/diag_states_pt/diag_new_states.xml</config_file>
+        <configurationfile>http://www.pfsense.com/packages/config/diag_states_pt/diag_new_states.xml</configurationfile>
+    </package>
     <package>
       <name>darkstat</name>
       <website>http://dmr.ath.cx/net/darkstat/</website>
@@ -294,12 +295,13 @@
     <package>
       <name>stunnel</name>
       <website>http://www.stunnel.org/</website>
-      <descr>The stunnel program is designed to work as an SSL encryption wrapper between remote client and local (inetd-startable) or remote servers. It can be used to add SSL functionality to commonly used inetd daemons like POP2, POP3, and IMAP servers without any changes in the program's code. It will negotiate an SSL connection using the OpenSSL or SSLeay libraries. It calls the underlying crypto libraries, allowing stunnel to support whatever cryptographic algorithms you compiled into your crypto package.</descr>
+      <descr>An SSL encryption wrapper between remote client and local or remote servers. </descr>
       <category>Network Management</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>stunnel-4.25.tbz</depends_on_package>
       <version>4.25.1</version>
       <status>Stable</status>
+      <pkginfolink>http://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
       <required_version>1.2.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
       <configurationfile>stunnel.xml</configurationfile>
@@ -307,13 +309,14 @@
     <package>
       <name>iperf</name>
       <website>http://dast.nlanr.net/Projects/Iperf/</website>
-      <descr>Iperf is a tool for measuring maximum TCP and UDP bandwidth, reminiscent of ttcp and nettest. It has been written to overcome the shortcomings of those aging tools. Iperf can also test UDP bandwidth, loss, and jitter.</descr>
+      <descr>Iperf is a tool for testing network throughput, loss, and jitter.</descr>
       <category>Network Management</category>
       <config_file>http://www.pfsense.com/packages/config/iperf.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>iperf-2.0.4.tbz</depends_on_package>
       <version>2.0.2_1</version>
-      <status>ALPHA</status>
+      <status>Beta</status>
+      <pkginfolink>http://doc.pfsense.org/index.php/Iperf_package</pkginfolink>
       <required_version>1.2.1</required_version>
       <configurationfile>iperf.xml</configurationfile>
     </package>
