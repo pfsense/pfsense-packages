@@ -46,7 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
-	<version>2.6.0.2</version>
+	<version>2.8.2.1</version>
 	<title>Services: Snort</title>
 	<include_file>/usr/local/pkg/snort.inc</include_file>
 	<menu>
@@ -164,7 +164,7 @@
 		<field>
 			<fielddescr>Interface</fielddescr>
 			<fieldname>iface_array</fieldname>
-			<description>Select all WAN type interfaces</description>
+			<description>Select the interface(s) Snort will listen on.</description>
 			<type>interfaces_selection</type>
 			<size>3</size>
 			<value>lan</value>

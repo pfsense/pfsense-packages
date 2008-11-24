@@ -480,7 +480,7 @@ preprocessor ftp_telnet_protocol: \
     chk_str_fmt { RETR STOR STOU APPE ALLO REST RNFR RNTO DELE RMD MKD } \
     chk_str_fmt { LIST NLST SITE SYST STAT HELP } \
     chk_str_fmt { AUTH ADAT PROT PBSZ CONF ENC } \
-    chk_str_fmt { FEAT OPTS CEL CMD } \
+    chk_str_fmt { FEAT CEL CMD } \
     chk_str_fmt { MDTM REST SIZE MLST MLSD } \
     chk_str_fmt { XPWD XCWD XCUP XMKD XRMD TEST CLNT } \
     cmd_validity MODE < char ASBCZ > \
