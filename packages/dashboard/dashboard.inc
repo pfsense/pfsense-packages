@@ -9,7 +9,7 @@ function dashboard_install() {
 		/* backup the pre-dashboard fbegin.inc file */
 		mwexec("cp /usr/local/www/fbegin.inc /usr/local/www/fbegin.inc.before_dashboard");
 	}
-	mwexec("tar xzvpf /usr/local/pkg/widgets.tgz -C /usr/local/www/");
+	mwexec("tar xzvpf /usr/local/pkg/widgets.tgz -C /");
 	assign_privs();
 }
 
