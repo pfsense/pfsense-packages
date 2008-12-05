@@ -25,6 +25,10 @@ function dashboard_deinstall() {
 }
 
 function assign_privs() {
+	mwexec("chown root:wheel /usr/local/www/index.php");
+	mwexec("chown root:wheel /usr/local/www/fbegin.php");
+	mwexec("chown root:wheel /usr/local/www/graph_cpu.php");
+	mwexec("chown root:wheel /usr/local/www/stats.php");
 	mwexec("chmod a+rw /usr/local/www/index.php");
 	mwexec("chmod a+rw /usr/local/www/fbegin.php");
 	mwexec("chmod a+rw /usr/local/www/graph_cpu.php");
