@@ -114,7 +114,7 @@ if($_REQUEST['newver'] != "") {
 	$fd = fopen("/tmp/config_restore.xml", "w");
 	fwrite($fd, $data);
 	fclose($fd);
-	$ondisksha256 = trim(`/sbin/sha256 /tmp/backupdebug.txt | awk '{ print $4 }'`);
+	$ondisksha256 = trim(`/sbin/sha256 /tmp/config_restore.xml | awk '{ print $4 }'`);
 	if($sha256)  // we might not have a sha256 on file for older backups
 		if($ondisksha256 <> $sha256)
 			$input_errors[] = "SHA256 does not match, cannot restore. $sha256 $ondisksha256";
