@@ -649,7 +649,7 @@ function sync_package_freeswitch_public()
 
 	conf_mount_ro();
   //$cmd = "api reloadxml";
-  event_socket_request_cmd($cmd);
+  //event_socket_request_cmd($cmd);
   unset($cmd);
 
 }
@@ -1775,9 +1775,15 @@ function freeswitch_php_install_command()
 	sync_package_freeswitch();
 	$handle = popen("/usr/local/etc/rc.d/freeswitch.sh start", "r");
 	pclose($handle);
+	
+	$cmd = "api reloadxml";
+	event_socket_request_cmd($cmd);
+	unset($cmd);
 
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 9759.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.3";       
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.3";
+	
+	       
 	conf_mount_ro();
 	config_unlock();
   
