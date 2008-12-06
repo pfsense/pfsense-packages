@@ -250,7 +250,11 @@ if ($config_change == 1) {
       </td>
 		</tr>
 
-		<?php $i = 0; foreach ($a_recordings as $recordingent): ?>
+      <?php 
+      $i = 0;
+      if (count($a_recordings) > 0) { 
+      	foreach ($a_recordings as $recordingent) {
+      ?>
       <tr>
       <td class="listlr" ondblclick="document.location='freeswitch_recordings_edit.php?id=<?=$i;?>'">
           <a href="freeswitch_recordings.php?a=download&t=bin&filename=<?=$recordingent['filename'];?>">
@@ -273,10 +277,15 @@ if ($config_change == 1) {
           </tr>
        </table>
       </td>
-    </tr>
-		<?php $i++; endforeach; ?>
-		<!--
-    <tr>
+      </tr>
+      <?php 
+      	$i++;
+      	} //end for each 
+      } //end count
+      ?>
+      
+      <!--
+      <tr>
       <td class="list" colspan="3"></td>
       <td class="list">
         <table border="0" cellspacing="0" cellpadding="1">
