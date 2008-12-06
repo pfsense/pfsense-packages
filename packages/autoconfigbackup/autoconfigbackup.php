@@ -190,9 +190,18 @@ $pgtitle = "Diagnostics: Auto Configuration Backup";
 include("head.inc");
 
 ?>
+<script type="text/javascript">
+<script>
+	function confirmRestore(delUrl) {
+		if (confirm("Are you sure you want to restore?")) {
+			document.location = delUrl;
+		}
+	}
+</script>
+</script>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <script type="text/javascript">
-	function backupnow() {
+	function restore_item() {
 		scroll(0,0);
 		var reason = prompt ("Enter the reason for the backup","");
 		var url = "/autoconfigbackup.php";
@@ -251,7 +260,7 @@ include("head.inc");
 		  <td class="listlr"> <?= $cv['time']; ?></td>
 			<td class="listbg"> <?= $cv['reason']; ?></td>
 			<td colspan="2" valign="middle" class="list" nowrap>
-			  <a href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>">
+			  <a onClick="return confirm('Are you sure you want to restore <?= $cv['time']; ?>?')" href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>">
 				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0">
 			  </a>
 			  <a href="autoconfigbackup.php?download=<?=urlencode($cv['time']);?>">
