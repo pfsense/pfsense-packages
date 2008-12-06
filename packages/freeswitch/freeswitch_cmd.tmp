@@ -1,7 +1,7 @@
 <?php
 /* $Id$ */
 /*
-	freeswitch_status.php
+	freeswitch_cmd.php
 	Copyright (C) 2008 Mark J Crane
 	All rights reserved.
   
