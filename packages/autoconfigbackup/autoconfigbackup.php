@@ -118,7 +118,7 @@ if($_REQUEST['newver'] != "") {
 	if(strlen($data) < 50) 
 		$input_errors[] = "The decrypted config.xml is under 50 characters, something went wrong.  Aborting.";
 	$ondisksha256 = trim(`/sbin/sha256 /tmp/config_restore.xml | awk '{ print $4 }'`);
-	if($sha256 != "0" || $sha256 != "")  // we might not have a sha256 on file for older backups
+	if($sha256 != "0" && $sha256 != "")  // we might not have a sha256 on file for older backups
 		if($ondisksha256 <> $sha256)
 			$input_errors[] = "SHA256 does not match, cannot restore. ({$sha256}) - ({$ondisksha256})";
 	if (curl_errno($curl_session)) {
