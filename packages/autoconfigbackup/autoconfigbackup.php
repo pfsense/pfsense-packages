@@ -103,18 +103,19 @@ if($_REQUEST['newver'] != "") {
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=restore" . 
-		"&hostname=" . urlencode($hostname) . 
+		"&hostname=" . urlencode($hostname) . 	
 		"&revision=" . urlencode($_REQUEST['newver']));
 	$data = curl_exec($curl_session);
+	$data_split = split("\+\+\+\+", $data);
+	$sha256 = $data_split[0];	// sha256
+	$data = $data_split[1];
 	if (!tagfile_deformat($data, $data, "config.xml")) 
 		$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
-	$data_split = split("\+\+\+\+", $data);	
-	$sha256 = $data_split[0];	// sha256
-	$data = decrypt_data($data_split[1], $decrypt_password);
+	$data = decrypt_data($data, $decrypt_password);
 	$fd = fopen("/tmp/config_restore.xml", "w");
 	fwrite($fd, $data);
 	fclose($fd);
-	if(count($data) < 50) 
+	if(strlen($data) < 50) 
 		$input_errors[] = "The decrypted config.xml is under 50 characters, something went wrong.  Aborting.";
 	$ondisksha256 = trim(`/sbin/sha256 /tmp/config_restore.xml | awk '{ print $4 }'`);
 	if($sha256 != "0" || $sha256 != "")  // we might not have a sha256 on file for older backups
@@ -146,7 +147,7 @@ EOF;
 			$savemsg = "Unable to revert to the selected configuration.";
 		}
 	}
-	unlink("/tmp/config_restore.xml");
+	//unlink("/tmp/config_restore.xml");
 } 
 
 // Populate available backups
