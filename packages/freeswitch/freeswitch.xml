@@ -68,7 +68,7 @@
 		</tab>
 		<tab>
 			<text>Dialplan</text>
-			<url>/pkg_edit.php?xml=freeswitch_dialplan.xml&amp;id=0</url>
+			<url>/freeswitch/freeswitch_dialplan_includes.php</url>
 		</tab>
 		<tab>
 			<text>Extensions</text>
@@ -80,19 +80,27 @@
 		</tab>		
 		<tab>
 			<text>Gateways</text>
-			<url>/pkg.php?xml=freeswitch_gateways.xml</url>
+			<url>/freeswitch/freeswitch_gateways.php</url>
 		</tab>
 		<tab>
 			<text>Internal</text>
 			<url>/pkg_edit.php?xml=freeswitch_internal.xml&amp;id=0</url>
-		</tab>		
+		</tab>
+		<tab>
+			<text>IVR</text>
+			<url>/freeswitch/freeswitch_ivr.php</url>
+		</tab>    		
 		<tab>
 			<text>Modules</text>
 			<url>/pkg_edit.php?xml=freeswitch_modules.xml&amp;id=0</url>
 		</tab>		
 		<tab>
 			<text>Public</text>
-			<url>/pkg_edit.php?xml=freeswitch_public.xml&amp;id=0</url>
+			<url>/freeswitch/freeswitch_public_includes.php</url>
+		</tab>
+		<tab>
+			<text>Rec</text>
+			<url>/freeswitch/freeswitch_recordings.php</url>
 		</tab>
 		<tab>
 			<text>Status</text>
@@ -118,7 +126,72 @@
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_cmd.tmp</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_recordings_edit.tmp</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes_details.tmp</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_recordings_play.tmp</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_time_conditions_edit.tmp</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr.tmp</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_time_conditions.tmp</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes_edit.tmp</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_recordings.tmp</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes.tmp</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr_edit.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr_options_edit.tmp</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr_options.tmp</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes_details_edit.tmp</item>
+	</additional_files_needed>	
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>		
@@ -133,11 +206,6 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_external.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_gateways.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -173,7 +241,22 @@
 		<prefix>/usr/local/lib/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/libncurses.so.5.6</item>
-	</additional_files_needed>		  
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/please_enter_your_pin_number.wav</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/begin_recording.wav</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/your_pin_number_is_incorect_goodbye.wav</item>
+	</additional_files_needed>
 	<fields>
 		<field>
 			<fielddescr>Numbering Plan</fielddescr>
@@ -228,7 +311,13 @@
 			<fieldname>xml_rpc_auth_pass</fieldname>
 			<description>Enter the XML RPC Auth Password here. default: works</description>
 			<type>input</type>
-		</field>	
+		</field>
+		<field>
+			<fielddescr>Admin PIN Number</fielddescr>
+			<fieldname>admin_pin</fieldname>
+			<description>Enter a admin pin number. Used to authenticate the admin from the phone.</description>
+			<type>input</type>
+		</field>    	
 	</fields>	
 	<custom_add_php_command>
 	</custom_add_php_command>

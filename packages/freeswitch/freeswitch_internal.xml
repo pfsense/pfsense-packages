@@ -63,7 +63,7 @@
 		</tab>
 		<tab>
 			<text>Dialplan</text>
-			<url>/pkg_edit.php?xml=freeswitch_dialplan.xml&amp;id=0</url>
+			<url>/freeswitch/freeswitch_dialplan_includes.php</url>
 		</tab>
 		<tab>
 			<text>Extensions</text>
@@ -75,20 +75,28 @@
 		</tab>		
 		<tab>
 			<text>Gateways</text>
-			<url>/pkg.php?xml=freeswitch_gateways.xml</url>
+			<url>/freeswitch/freeswitch_gateways.php</url>
 		</tab>
 		<tab>
 			<text>Internal</text>
 			<url>/pkg_edit.php?xml=freeswitch_internal.xml&amp;id=0</url>
 			<active/>
-		</tab>		
+		</tab>
+		<tab>
+			<text>IVR</text>
+			<url>/freeswitch/freeswitch_ivr.php</url>
+		</tab>
 		<tab>
 			<text>Modules</text>
 			<url>/pkg_edit.php?xml=freeswitch_modules.xml&amp;id=0</url>
 		</tab>		
 		<tab>
 			<text>Public</text>
-			<url>/pkg_edit.php?xml=freeswitch_public.xml&amp;id=0</url>
+			<url>/freeswitch/freeswitch_public_includes.php</url>
+		</tab>
+		<tab>
+			<text>Rec</text>
+			<url>/freeswitch/freeswitch_recordings.php</url>
 		</tab>
 		<tab>
 			<text>Status</text>
@@ -126,4 +134,3 @@
 	    sync_package_freeswitch_internal();
 	</custom_php_resync_config_command>
 </packagegui>
-

@@ -1,0 +1,272 @@
+<?php
+/* $Id$ */
+/*
+	freeswitch_public_includes.php
+  Copyright (C) 2008 Mark J Crane
+  All rights reserved.
+  
+  FreeSWITCH (TM)
+  http://www.freeswitch.org/
+
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
+
+require("guiconfig.inc");
+require("/usr/local/pkg/freeswitch.inc");
+
+
+//freeswitchpublicincludes
+  //publicincludeid
+  //extensionname
+  //context
+      //default
+  //enabled
+  //descr
+  
+//freeswitchpublicincludedetails
+
+  //publicincludeid
+  //tag
+      //condition
+      //action
+      //antiaction
+      //param
+  //tagorder
+      //1-20
+  //fieldtype
+      
+  //fielddata
+
+
+$a_public_includes = &$config['installedpackages']['freeswitchpublicincludes']['config'];
+$a_public_includes_details = &$config['installedpackages']['freeswitchpublicincludedetails']['config'];
+
+
+if ($_GET['act'] == "del") {
+    if ($_GET['type'] == 'publicincludes') {
+        
+        if ($a_public_includes[$_GET['id']]) {
+
+            $publicincludeid = $a_public_includes[$_GET['id']][publicincludeid];
+
+            $extensionname = $a_public_includes[$_GET['id']][extensionname];
+            $order = $a_public_includes[$_GET['id']][order];
+            $publicincludefilename = $order."_".$extensionname.".xml";
+            
+            //delete the public include details. aka. child data
+            $i=0;
+            foreach($a_public_includes_details as $row) {
+              if ($row["publicincludeid"] == $publicincludeid) {
+                  //echo "child id: ".$i."<br />\n";
+                  unset($a_public_includes_details[$i]);
+              }
+              $i++;            
+            }
+            
+            //if the public include xml file exists then delete it
+            if (file_exists("/usr/local/freeswitch/conf/public/default/".$publicincludefilename)) {
+              unlink("/usr/local/freeswitch/conf/public/default/".$publicincludefilename);
+            }
+            
+            unset($publicincludefilename);           
+            unset($a_public_includes[$_GET['id']]);
+            write_config();
+            sync_package_freeswitch_public_includes();
+            header("Location: freeswitch_public_includes.php");
+            exit;
+        }
+    }
+}
+
+$pgtitle = "FreeSWITCH: Public";
+include("head.inc");
+
+?>
+
+
+
+
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<?php include("fbegin.inc"); ?>
+<p class="pgtitle"><?=$pgtitle?></p>
+
+<div id="mainlevel">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr><td class="tabnavtbl">
+<?php
+			
+	$tab_array = array();
+	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=freeswitch.xml&amp;id=0");
+	$tab_array[] = array(gettext("Dialplan"), false, "/freeswitch/freeswitch_dialplan_includes.php");
+	$tab_array[] = array(gettext("Extensions"), false, "/pkg.php?xml=freeswitch_extensions.xml");
+	$tab_array[] = array(gettext("External"), false, "/pkg_edit.php?xml=freeswitch_external.xml&amp;id=0");	
+	$tab_array[] = array(gettext("Gateways"), false, "/freeswitch/freeswitch_gateways.php");
+	$tab_array[] = array(gettext("Internal"), false, "/pkg_edit.php?xml=freeswitch_internal.xml&amp;id=0");
+	$tab_array[] = array(gettext("IVR"), false, "/freeswitch/freeswitch_ivr.php");
+	$tab_array[] = array(gettext("Modules"), false, "/pkg_edit.php?xml=freeswitch_modules.xml&amp;id=0");
+	$tab_array[] = array(gettext("Public"), true, "/freeswitch/freeswitch_public_includes.php");
+	$tab_array[] = array(gettext("Rec"), false, "/freeswitch/freeswitch_recordings.php");	
+	$tab_array[] = array(gettext("Status"), false, "/freeswitch/freeswitch_status.php");
+	$tab_array[] = array(gettext("Vars"), false, "/pkg_edit.php?xml=freeswitch_vars.xml&amp;id=0");
+ 	display_top_tabs($tab_array);
+ 	
+?>
+</td></tr>
+</table>
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+   <tr>
+     <td class="tabcont" >
+
+<form action="freeswitch_public_includes.php" method="post" name="iform" id="iform">
+<?php 
+
+
+//echo "<pre>";
+//print_r ($a_public_includes);
+//echo "</pre>";
+
+
+//if ($config_change == 1) {
+//    write_config();
+//    $config_change = 0;  
+//}
+
+//if ($savemsg) print_info_box($savemsg); 
+//if (file_exists($d_hostsdirty_path)): echo"<p>";
+//print_info_box_np("The FreeSWITCH recordings have been changed.<br>You must apply the changes in order for them to take effect.");
+//echo"<br />";
+//endif; 
+
+?>
+
+    <br />
+    <br />
+
+  	<table width="100%" border="0" cellpadding="0" cellspacing="0">              
+      <tr>
+        <td><span class="vexpl"><span class="red"><strong>Public
+            </strong></span></span>
+        </td>
+        <td align='right'>
+          <input type='button' value='deprecated xml' alt='deprecated' onclick="document.location.href='/pkg_edit.php?xml=freeswitch_public.xml&id=0';">
+        </td>         
+      </tr>
+      <tr>
+        <td colspan='2'>
+          <span class="vexpl">
+              The public dialplan is used to route incoming calls to destinations based on conditions and context. It can send incoming calls to IVRs, extensions, external numbers, and scripts.
+          </span>
+        </td>
+       
+      </tr>
+    </table>
+
+    <br />
+    <br />
+    <br />    
+        
+    <table width="100%" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+      <td width="20%" class="listhdrr">Extension Name</td>
+      <td width="25%" class="listhdrr">Order</td>
+      <td width="25%" class="listhdrr">Enabled</td>
+      <td width="50%" class="listhdr">Description</td>
+      <td width="10%" class="list">
+        <table border="0" cellspacing="0" cellpadding="1">
+          <tr>
+            <td width="17"></td>
+            <td valign="middle"><a href="freeswitch_public_includes_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+          </tr>
+        </table>
+      </td>
+		</tr>
+
+		<?php 
+      $i = 0;
+      if (count($a_public_includes) > 0) { 
+        foreach ($a_public_includes as $ent) {
+    ?>
+    <tr>
+      <td class="listlr" ondblclick="document.location='freeswitch_public_includes_edit.php?id=<?=$i;?>'">
+        <?=$ent['extensionname']?>
+      </td>
+      <td class="listlr" ondblclick="document.location='freeswitch_public_includes_edit.php?id=<?=$i;?>'">
+        <?=$ent['order']?>
+      </td>
+      <td class="listr" ondblclick="document.location='freeswitch_public_includes_edit.php?id=<?=$i;?>';">
+        <?=$ent['enabled'];?>&nbsp;
+      </td>
+      <td class="listbg" ondblclick="document.location='freeswitch_public_includes_edit.php?id=<?=$i;?>';">
+        <font color="#FFFFFF"><?=htmlspecialchars($ent['descr']);?>&nbsp;
+      </td>
+      <td valign="middle" nowrap class="list">
+        <table border="0" cellspacing="0" cellpadding="1">
+          <tr>
+            <td valign="middle"><a href="freeswitch_public_includes_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+            <td><a href="freeswitch_public_includes.php?type=publicincludes&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this recording?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+          </tr>
+       </table>
+      </td>
+    </tr>
+		<?php 
+          $i++; 
+        }
+      }
+    ?>
+    <tr>
+      <td class="list" colspan="4"></td>
+      <td class="list">
+        <table border="0" cellspacing="0" cellpadding="1">
+          <tr>
+            <td width="17"></td>
+            <td valign="middle"><a href="freeswitch_public_includes_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+          </tr>
+        </table>
+		  </td>
+     </tr>
+
+     <tr>
+       <td class="list" colspan="4"></td>
+       <td class="list"></td>
+     </tr>
+     </table>
+     
+</form>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+
+</td>
+</tr>
+</table>
+
+</div>
+
+
+<?php include("fend.inc"); ?>
+</body>
+</html>
