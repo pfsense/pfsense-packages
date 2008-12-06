@@ -96,11 +96,11 @@ if ($_POST) {
 		$ivroptionent['optiondescr'] = $_POST['optiondescr'];
 
 		if (isset($id) && $a_ivr_options[$id]) {
-		  //update
-      $a_ivr_options[$id] = $ivroptionent;
+			//update
+      		$a_ivr_options[$id] = $ivroptionent;
 		}
 		else {
-		  //add  
+			//add  
 			$a_ivr_options[] = $ivroptionent;
 		}
 		

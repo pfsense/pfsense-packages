@@ -99,11 +99,11 @@ if ($_POST) {
 
 
 		if (isset($id) && $a_public_includes_details[$id]) {
-		  //update
-      $a_public_includes_details[$id] = $ent;
+			//update
+      		$a_public_includes_details[$id] = $ent;
 		}
 		else {
-		  //add  
+			//add  
 			$a_public_includes_details[] = $ent;
 		}
 		

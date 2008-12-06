@@ -74,12 +74,14 @@ if ($_GET['act'] == "del") {
             
             //delete the public include details. aka. child data
             $i=0;
-            foreach($a_public_includes_details as $row) {
-              if ($row["publicincludeid"] == $publicincludeid) {
-                  //echo "child id: ".$i."<br />\n";
-                  unset($a_public_includes_details[$i]);
-              }
-              $i++;            
+            if (count($a_public_includes_details) > 0) {
+	            foreach($a_public_includes_details as $row) {
+	              if ($row["publicincludeid"] == $publicincludeid) {
+	                  //echo "child id: ".$i."<br />\n";
+	                  unset($a_public_includes_details[$i]);
+	              }
+	              $i++;            
+	            }
             }
             
             //if the public include xml file exists then delete it

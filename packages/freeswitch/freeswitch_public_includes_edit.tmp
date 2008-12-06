@@ -62,13 +62,13 @@ $parentid = $id;
 if (isset($id) && $a_public_includes[$id]) {
 	$pconfig['publicincludeid'] = $a_public_includes[$id]['publicincludeid'];	
 	$publicincludeid = $a_public_includes[$id]['publicincludeid'];	
-  $pconfig['extensionname'] = $a_public_includes[$id]['extensionname'];
-  $pconfig['order'] = $a_public_includes[$id]['order'];
+	$pconfig['extensionname'] = $a_public_includes[$id]['extensionname'];
+	$pconfig['order'] = $a_public_includes[$id]['order'];
 	$pconfig['context'] = $a_public_includes[$id]['context'];
 	$pconfig['enabled'] = $a_public_includes[$id]['enabled'];    	
 	$pconfig['descr'] = $a_public_includes[$id]['descr'];	
-  $pconfig['opt1name'] = $a_public_includes[$id]['opt1name'];
-  $pconfig['opt1value'] = $a_public_includes[$id]['opt1value'];
+	$pconfig['opt1name'] = $a_public_includes[$id]['opt1name'];
+	$pconfig['opt1value'] = $a_public_includes[$id]['opt1value'];
 }
 
 if ($_POST) {
@@ -94,64 +94,66 @@ if ($_POST) {
 		$ent = array();
 		if (strlen($_POST['publicincludeid']) > 0) {
 		    //update
-  		  $ent['publicincludeid'] = $_POST['publicincludeid'];    		  
+  			$ent['publicincludeid'] = $_POST['publicincludeid'];    		  
 		}
 		else {
-		  //add
-      $ent['publicincludeid'] = guid();
-    }
+			//add
+      		$ent['publicincludeid'] = guid();
+    	}
 		$ent['extensionname'] = $_POST['extensionname'];
 		$ent['order'] = $_POST['order'];
 		//$ent['context'] = $_POST['context'];
 		$ent['context'] = 'default';
 		$ent['enabled'] = $_POST['enabled'];			
 		$ent['descr'] = $_POST['descr'];		
-    $ent['opt1name'] = $_POST['opt1name'];
+    	$ent['opt1name'] = $_POST['opt1name'];
 		$ent['opt1value'] = $_POST['opt1value'];
 		
  
 
 		if (isset($id) && $a_public_includes[$id]) {
-        
-        foreach($config['installedpackages']['freeswitchpublicincludes']['config'] as $rowhelper) {
-    
-          //$rowhelper['publicincludeid'];
-          //$rowhelper['extensionname'];
-          //$rowhelper['context'];
-          //$rowhelper['enabled'];
-          
-          $filenamechanged = false;
-          if ($rowhelper['publicincludeid'] == $_POST['publicincludeid']) {
-              
-              if ($rowhelper['extensionname'] != $_POST['extensionname']) {
-                  //if the extension name has changed then remove the current public xml file
-                    //to prepare for the new file
-                  $filenamechanged = true; 
-              }
-              if ($rowhelper['order'] != $_POST['order']) {
-                  //if the order has changed then remove the current public xml file
-                    //to prepare for the new file
-                  $filenamechanged = true;                    
-              }              
-              if ($_POST['enabled'] == "false") {
-                  //if the extension name is disabled then remove the public xml file
-                  $filenamechanged = true;
-              }
-              if ($filenamechanged){        
-                $publicincludefilename = $rowhelper['order']."_".$rowhelper['extensionname'].".xml";
-                if (file_exists("/usr/local/freeswitch/conf/dialplan/public/".$publicincludefilename)) {
-                  unlink("/usr/local/freeswitch/conf/dialplan/public/".$publicincludefilename);
-                }
-                unset($publicincludefilename);
-              }
-                        
-          }
-          unset($filenamechanged); 
-          
-        } //end foreach
-        
-  		  //update the config
-        $a_public_includes[$id] = $ent;
+        	$a_public_includes = $config['installedpackages']['freeswitchpublicincludes']['config'];
+		    if (count($a_public_includes) > 0) {
+		        foreach($a_public_includes as $rowhelper) {
+		    
+		          //$rowhelper['publicincludeid'];
+		          //$rowhelper['extensionname'];
+		          //$rowhelper['context'];
+		          //$rowhelper['enabled'];
+		          
+		          $filenamechanged = false;
+		          if ($rowhelper['publicincludeid'] == $_POST['publicincludeid']) {
+		              
+		              if ($rowhelper['extensionname'] != $_POST['extensionname']) {
+		                  //if the extension name has changed then remove the current public xml file
+		                    //to prepare for the new file
+		                  $filenamechanged = true; 
+		              }
+		              if ($rowhelper['order'] != $_POST['order']) {
+		                  //if the order has changed then remove the current public xml file
+		                    //to prepare for the new file
+		                  $filenamechanged = true;                    
+		              }              
+		              if ($_POST['enabled'] == "false") {
+		                  //if the extension name is disabled then remove the public xml file
+		                  $filenamechanged = true;
+		              }
+		              if ($filenamechanged){        
+		                $publicincludefilename = $rowhelper['order']."_".$rowhelper['extensionname'].".xml";
+		                if (file_exists("/usr/local/freeswitch/conf/dialplan/public/".$publicincludefilename)) {
+		                  unlink("/usr/local/freeswitch/conf/dialplan/public/".$publicincludefilename);
+		                }
+		                unset($publicincludefilename);
+		              }
+		                        
+		          }
+		          unset($filenamechanged); 
+		          
+		        } //end foreach
+	        } //end if count
+	        
+	  		  //update the config
+	        $a_public_includes[$id] = $ent;
 		}
 		else {
   		  //add to the config

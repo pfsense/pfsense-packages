@@ -127,7 +127,7 @@ $parentid = $id;
 if (isset($id) && $a_ivr[$id]) {
 	$pconfig['ivrid'] = $a_ivr[$id]['ivrid'];
 	$ivrid = $a_ivr[$id]['ivrid'];
-  $pconfig['ivrextension'] = $a_ivr[$id]['ivrextension'];
+	$pconfig['ivrextension'] = $a_ivr[$id]['ivrextension'];
 	$pconfig['ivrname'] = $a_ivr[$id]['ivrname'];
 	$pconfig['recordingidaction'] = $a_ivr[$id]['recordingidaction'];    	
 	$pconfig['recordingidantiaction'] = $a_ivr[$id]['recordingidantiaction'];	
@@ -161,26 +161,26 @@ if ($_POST) {
   	
 		$ivrent = array();
 		if (strlen($_POST['ivrid']) > 0) {
-		  $ivrent['ivrid'] = $_POST['ivrid'];
+			$ivrent['ivrid'] = $_POST['ivrid'];
 		}
 		else {
-      $ivrent['ivrid'] = guid();
-    }
+      		$ivrent['ivrid'] = guid();
+    	}
 		$ivrent['ivrextension'] = $_POST['ivrextension'];
 		$ivrent['ivrname'] = $_POST['ivrname'];
 		$ivrent['recordingidaction'] = $_POST['recordingidaction'];			
 		$ivrent['recordingidantiaction'] = $_POST['recordingidantiaction'];
 		$ivrent['ivrtimeout'] = $_POST['ivrtimeout'];
 		$ivrent['ivrcontext'] = $_POST['ivrcontext'];    
-    $ivrent['ivrconditionjs'] = base64_encode($_POST['ivrconditionjs']);		
+		$ivrent['ivrconditionjs'] = base64_encode($_POST['ivrconditionjs']);		
 		$ivrent['ivrdescr'] = $_POST['ivrdescr'];
 
 		if (isset($id) && $a_ivr[$id]) {
-		  //update
-      $a_ivr[$id] = $ivrent;
+		  	//update
+      		$a_ivr[$id] = $ivrent;
 		}
 		else {
-		  //add
+		  	//add
 			$a_ivr[] = $ivrent;
 		}
 		

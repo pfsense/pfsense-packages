@@ -64,26 +64,25 @@ if ($_POST) {
 
 
 		if (isset($id) && $a_recordings[$id]) {
-		  //update
-  		
-  		if (strlen($_POST['recordingid']) > 0) {
-  		  $recordingent['recordingid'] = $_POST['recordingid'];
-  		}
-  		else {
-        $recordingent['recordingid'] = guid();
-      }  		
+		  	//update  		
+	  		if (strlen($_POST['recordingid']) > 0) {
+	  		  	$recordingent['recordingid'] = $_POST['recordingid'];
+	  		}
+	  		else {
+	        	$recordingent['recordingid'] = guid();
+	      	}  		
 
-  		$recordingent['filename'] = $_POST['filename'];
+  			$recordingent['filename'] = $_POST['filename'];
         		
-  		//if file name is not the same then rename the file
-  		if ($_POST['filename'] != $_POST['filename_orig']) {
-          rename('/usr/local/freeswitch/recordings/'.$_POST['filename_orig'], '/usr/local/freeswitch/recordings/'.$_POST['filename']);	  
+  			//if file name is not the same then rename the file
+  			if ($_POST['filename'] != $_POST['filename_orig']) {
+          	rename('/usr/local/freeswitch/recordings/'.$_POST['filename_orig'], '/usr/local/freeswitch/recordings/'.$_POST['filename']);	  
 			}
-      $a_recordings[$id] = $recordingent;
+      		$a_recordings[$id] = $recordingent;
 		}
 		else {
-		  //add
-  		$recordingent['filename'] = $_POST['filename'];	  
+		  	//add
+  			$recordingent['filename'] = $_POST['filename'];	  
 			$a_recordings[] = $recordingent;
 		}
 				

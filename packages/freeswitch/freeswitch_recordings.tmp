@@ -50,9 +50,9 @@ if (($_GET['a'] == "download") && file_exists($recording_dir.$_GET['filename']))
   }     
   header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
   header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past	
-	header("Content-Length: " . filesize($recording_dir.$_GET['filename']));
-	fpassthru($fd);
-	exit;
+  header("Content-Length: " . filesize($recording_dir.$_GET['filename']));
+  fpassthru($fd);
+  exit;
 }
 else {
   //echo $recording_dir.$_GET['filename'];
@@ -175,33 +175,34 @@ if (is_dir($recording_dir)) {
  
 
 
-$i = 0; 
-foreach ($a_recordings as $recordingent) {
-
-  if (!is_file($recording_dir.$recordingent['filename'])) {
-      //echo "not found: ".$recordingent['filename']."<br />";
-      
-      //recording not found restore the file from the config.xml
-          $file_content = $recordingent['filecontent'];       
-          $handle = fopen($recording_dir.$recordingent['filename'],'w');
-          fwrite ($handle, base64_decode($file_content)); 
-          unset($file_content);
-          fclose($handle);
-          $recordingent['filecontent'] = base64_encode($file_content);     
-      
-      // loop through recordings in the config.xml 
-      //  if the file does not exist remove it from the file system.
-      //unset($a_recordings[$i]);
-      
-      $config_change = 1; 
-  }
-  else {
-      //echo "found: ".$recordingent['filename']."<br />";  
-  }
-
-$i++; 
+$i = 0;
+if (count($a_recordings) > 0) { 
+	foreach ($a_recordings as $recordingent) {
+	
+	  if (!is_file($recording_dir.$recordingent['filename'])) {
+	      //echo "not found: ".$recordingent['filename']."<br />";
+	      
+	      //recording not found restore the file from the config.xml
+	          $file_content = $recordingent['filecontent'];       
+	          $handle = fopen($recording_dir.$recordingent['filename'],'w');
+	          fwrite ($handle, base64_decode($file_content)); 
+	          unset($file_content);
+	          fclose($handle);
+	          $recordingent['filecontent'] = base64_encode($file_content);     
+	      
+	      // loop through recordings in the config.xml 
+	      //  if the file does not exist remove it from the file system.
+	      //unset($a_recordings[$i]);
+	      
+	      $config_change = 1; 
+	  }
+	  else {
+	      //echo "found: ".$recordingent['filename']."<br />";  
+	  }
+	
+	$i++; 
+	}
 }
-
 
 if ($config_change == 1) {
     write_config();
@@ -250,7 +251,7 @@ if ($config_change == 1) {
 		</tr>
 
 		<?php $i = 0; foreach ($a_recordings as $recordingent): ?>
-    <tr>
+      <tr>
       <td class="listlr" ondblclick="document.location='freeswitch_recordings_edit.php?id=<?=$i;?>'">
           <a href="freeswitch_recordings.php?a=download&t=bin&filename=<?=$recordingent['filename'];?>">
             <?=$recordingent['filename']?>

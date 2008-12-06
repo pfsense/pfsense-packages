@@ -99,11 +99,11 @@ if ($_POST) {
 		
 
 		if (isset($id) && $a_gateways[$id]) {
-		  //update
-      $a_gateways[$id] = $ent;
+		  	//update
+      		$a_gateways[$id] = $ent;
 		}
 		else {
-		  //add	  
+		  	//add	  
 			$a_gateways[] = $ent;
 		}
 		
@@ -115,94 +115,94 @@ if ($_POST) {
 		    $gateway = $_POST['gateway'];
 		    $context = $_POST['context'];
         
-        $default_area_code = $config['installedpackages']['freeswitchsettings']['config'][0]['default_area_code'];
-        $a_dialplan_includes          = &$config['installedpackages']['freeswitchdialplanincludes']['config'];
-        $a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config']; 
+	        $default_area_code 				= &$config['installedpackages']['freeswitchsettings']['config'][0]['default_area_code'];
+	        $a_dialplan_includes          	= &$config['installedpackages']['freeswitchdialplanincludes']['config'];
+	        $a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config']; 
   		
     
     		$tmp_array = split("\\\n", $_POST['dialplan_expression']);
 
 		    foreach($tmp_array as $dialplan_expression) {
 		    
-            $dialplan_expression = trim($dialplan_expression);
-            if (strlen($dialplan_expression)>0) {
-                        
-                switch ($dialplan_expression) {          
-                case "^(\d{7})$":
-                    $action_data = "sofia/gateway/".$gateway."/1".$default_area_code."\$1";
-                    $label = "7 digits";
-                    $abbrv = "7d";                
-                    break;            
-                case "^(\d{10})$":
-                    $action_data = "sofia/gateway/".$gateway."/1\$1";
-                    $label = "10 digits";
-                    $abbrv = "10d";                
-                    break;
-                case "^(\d{11})$":
-                    $action_data = "sofia/gateway/".$gateway."/\$1";
-                    $label = "11 digits";
-                    $abbrv = "11d";
-                    break;
-                case "^311$":
-                    $action_data = "sofia/gateway/".$gateway."/\$1";
-                    $label = "311";
-                    $abbrv = "311";
-                    break;
-                case "^411$":
-                    $action_data = "sofia/gateway/".$gateway."/\$1";
-                    $label = "411";                    
-                    $abbrv = "411";
-                    break;                
-                case "^911$":
-                    $action_data = "sofia/gateway/".$gateway."/\$1";
-                    $label = "911";
-                    $abbrv = "911";
-                    break;
-                case "^1?(8(00|55|66|77|88)[2-9]\d{6})$":
-                    $action_data = "sofia/gateway/".$gateway."/\$1";
-                    $label = "toll free";
-                    $abbrv = "tollfree";
-                    break;
-                default:
-                    $action_data = "sofia/gateway/".$gateway."/\$1";
-                    $label = $dialplan_expression;
-                    $abbrv = $dialplan_expression;
-                }
-                
-                $dialplanincludeid = guid();
-                $ent['dialplanincludeid'] = $dialplanincludeid;
-            		$ent['extensionname'] = $gateway.".".$abbrv;
-            		$ent['order'] = '9002'; //if update use the existing order number and extension name and desc
-            		$ent['context'] = $context;
-            		$ent['enabled'] = 'true';			
-            		$ent['descr'] = $label.' '.$gateway;
-            		$ent['opt1name'] = 'gatewayid';
-            		$ent['opt1value'] = $gatewayid;
-            		$a_dialplan_includes[] = $ent;
-            		unset($ent);
-            		
-                $ent = array();
-                $ent['dialplanincludeid'] = $dialplanincludeid;
-                $ent['tag'] = 'condition'; //condition, action, antiaction
-                $ent['fieldtype'] = 'destination_number';
-                $ent['fielddata'] = $dialplan_expression;
-            		$a_dialplan_include_details[] = $ent;
-            		unset($ent);
-            		
-                $ent = array();
-                $ent['dialplanincludeid'] = $dialplanincludeid;
-                $ent['tag'] = 'action'; //condition, action, antiaction
-                $ent['fieldtype'] = 'bridge';
-                $ent['fielddata'] = $action_data;
-            		$a_dialplan_include_details[] = $ent;
-            		unset($ent);
-            		
-            		unset($label);
-            		unset($abbrv);
-            		unset($dialplan_expression);
-            		unset($action_data);
-            } //if strlen
-        } //end for each		
+	            $dialplan_expression = trim($dialplan_expression);
+	            if (strlen($dialplan_expression)>0) {
+	                        
+	                switch ($dialplan_expression) {          
+	                case "^(\d{7})$":
+	                    $action_data = "sofia/gateway/".$gateway."/1".$default_area_code."\$1";
+	                    $label = "7 digits";
+	                    $abbrv = "7d";                
+	                    break;            
+	                case "^(\d{10})$":
+	                    $action_data = "sofia/gateway/".$gateway."/1\$1";
+	                    $label = "10 digits";
+	                    $abbrv = "10d";                
+	                    break;
+	                case "^(\d{11})$":
+	                    $action_data = "sofia/gateway/".$gateway."/\$1";
+	                    $label = "11 digits";
+	                    $abbrv = "11d";
+	                    break;
+	                case "^311$":
+	                    $action_data = "sofia/gateway/".$gateway."/\$1";
+	                    $label = "311";
+	                    $abbrv = "311";
+	                    break;
+	                case "^411$":
+	                    $action_data = "sofia/gateway/".$gateway."/\$1";
+	                    $label = "411";                    
+	                    $abbrv = "411";
+	                    break;                
+	                case "^911$":
+	                    $action_data = "sofia/gateway/".$gateway."/\$1";
+	                    $label = "911";
+	                    $abbrv = "911";
+	                    break;
+	                case "^1?(8(00|55|66|77|88)[2-9]\d{6})$":
+	                    $action_data = "sofia/gateway/".$gateway."/\$1";
+	                    $label = "toll free";
+	                    $abbrv = "tollfree";
+	                    break;
+	                default:
+	                    $action_data = "sofia/gateway/".$gateway."/\$1";
+	                    $label = $dialplan_expression;
+	                    $abbrv = $dialplan_expression;
+	                }
+	                
+	                $dialplanincludeid = guid();
+	                $ent['dialplanincludeid'] = $dialplanincludeid;
+	            		$ent['extensionname'] = $gateway.".".$abbrv;
+	            		$ent['order'] = '9002'; //if update use the existing order number and extension name and desc
+	            		$ent['context'] = $context;
+	            		$ent['enabled'] = 'true';			
+	            		$ent['descr'] = $label.' '.$gateway;
+	            		$ent['opt1name'] = 'gatewayid';
+	            		$ent['opt1value'] = $gatewayid;
+	            		$a_dialplan_includes[] = $ent;
+	            		unset($ent);
+	            		
+	                $ent = array();
+	                $ent['dialplanincludeid'] = $dialplanincludeid;
+	                $ent['tag'] = 'condition'; //condition, action, antiaction
+	                $ent['fieldtype'] = 'destination_number';
+	                $ent['fielddata'] = $dialplan_expression;
+	            		$a_dialplan_include_details[] = $ent;
+	            		unset($ent);
+	            		
+	                $ent = array();
+	                $ent['dialplanincludeid'] = $dialplanincludeid;
+	                $ent['tag'] = 'action'; //condition, action, antiaction
+	                $ent['fieldtype'] = 'bridge';
+	                $ent['fielddata'] = $action_data;
+	            		$a_dialplan_include_details[] = $ent;
+	            		unset($ent);
+	            		
+	            		unset($label);
+	            		unset($abbrv);
+	            		unset($dialplan_expression);
+	            		unset($action_data);
+	            } //if strlen
+        	} //end for each		
 		}
 	
 		write_config();
