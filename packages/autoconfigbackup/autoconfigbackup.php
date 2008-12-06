@@ -103,8 +103,8 @@ if($_REQUEST['newver'] != "") {
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=restore" . 
-				"&hostname=" . urlencode($hostname) . 
-				"&revision=" . urlencode($_REQUEST['newver']));
+		"&hostname=" . urlencode($hostname) . 
+		"&revision=" . urlencode($_REQUEST['newver']));
 	$data = curl_exec($curl_session);
 	if (!tagfile_deformat($data, $data, "config.xml")) 
 		$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
@@ -115,9 +115,9 @@ if($_REQUEST['newver'] != "") {
 	fwrite($fd, $data);
 	fclose($fd);
 	$ondisksha256 = trim(`/sbin/sha256 /tmp/config_restore.xml | awk '{ print $4 }'`);
-	if($sha256 <> "0" || $sha256 <> "")  // we might not have a sha256 on file for older backups
+	if($sha256 != "0" || $sha256 != "")  // we might not have a sha256 on file for older backups
 		if($ondisksha256 <> $sha256)
-			$input_errors[] = "SHA256 does not match, cannot restore. $sha256 $ondisksha256";
+			$input_errors[] = "SHA256 does not match, cannot restore. ({$sha256}) - ({$ondisksha256})";
 	if (curl_errno($curl_session)) {
 		/* If an error occured, log the error in /tmp/ */
 		$fd = fopen("/tmp/backupdebug.txt", "w");
