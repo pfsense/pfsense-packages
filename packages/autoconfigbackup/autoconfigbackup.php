@@ -114,6 +114,8 @@ if($_REQUEST['newver'] != "") {
 	$fd = fopen("/tmp/config_restore.xml", "w");
 	fwrite($fd, $data);
 	fclose($fd);
+	if(count($data) < 50) 
+		$input_errors[] = "The decrypted config.xml is under 50 characters, something went wrong.  Aborting.";
 	$ondisksha256 = trim(`/sbin/sha256 /tmp/config_restore.xml | awk '{ print $4 }'`);
 	if($sha256 != "0" || $sha256 != "")  // we might not have a sha256 on file for older backups
 		if($ondisksha256 <> $sha256)
