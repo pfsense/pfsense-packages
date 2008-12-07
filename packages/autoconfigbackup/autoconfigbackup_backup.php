@@ -64,10 +64,13 @@ if(!$username) {
 if($_POST) {	
 	if($_REQUEST['nooverwrite'])
 		touch("/tmp/acb_nooverwrite");
+	if($_REQUEST['reason']) 
+		write_config($_REQUEST['reason']);
+	else 
+		write_config("Backup invoked via Auto Config Backup.");
 	upload_config();
 	$savemsg = "Backup completed successfully.";
 	exec("echo > /cf/conf/lastpfSbackup.txt");
-	filter_configure_sync();
 	$donotshowheader=true;
 }
 
