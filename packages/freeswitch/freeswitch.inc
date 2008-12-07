@@ -1482,8 +1482,6 @@ function freeswitch_php_install_command()
 	exec("cp /tmp/freeswitch_public_includes_details_edit.tmp /usr/local/www/freeswitch/freeswitch_public_includes_details_edit.php");
 	unlink_if_exists("/tmp/freeswitch_public_includes_details_edit.tmp");
 
-
-
 	exec("cp /tmp/freeswitch_recordings.tmp /usr/local/www/freeswitch/freeswitch_recordings.php");
 	unlink_if_exists("/tmp/freeswitch_recordings.tmp");
 	
