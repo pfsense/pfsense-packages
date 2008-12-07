@@ -129,7 +129,7 @@ include("head.inc");
 							</td>
 						</tr>
 						<tr>
-							<td colspan="2" align="center">
+							<td align="right">
 								<input type="submit" name="Backup" value="Backup">
 							</td>
 						</tr>
