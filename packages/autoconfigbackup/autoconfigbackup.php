@@ -197,7 +197,7 @@ include("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <script type="text/javascript">
-	function restore_item() {
+	function backupnow() {
 		scroll(0,0);
 		var reason = prompt ("Enter the reason for the backup","");
 		var url = "/autoconfigbackup.php";
@@ -209,7 +209,8 @@ include("head.inc");
 				parameters: pars,
 				onComplete: backupcomplete
 			});
-			$('savemsg').innerHTML = '';
+			if($('savemsg'))
+				$('savemsg').innerHTML = '';
 			$('feedbackdiv').innerHTML = "<img src='themes/metallic/images/misc/loader.gif'> One moment please, saving backup to portal.pfsense.org...<p/>";	
 	}
 	function backupcomplete(transport) {
