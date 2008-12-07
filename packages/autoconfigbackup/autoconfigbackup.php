@@ -287,13 +287,13 @@ include("head.inc");
 	  <td class="listlr"> <?= $cv['time']; ?></td>
 		<td class="listbg"> <?= $cv['reason']; ?></td>
 		<td colspan="2" valign="middle" class="list" nowrap>
-		  <a onClick="return confirm('Are you sure you want to restore <?= $cv['time']; ?>?')" href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>">
+		  <a title="Restore this revision" onClick="return confirm('Are you sure you want to restore <?= $cv['time']; ?>?')" href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>">
 			<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0">
 		  </a>
-		  <a href="autoconfigbackup.php?download=<?=urlencode($cv['time']);?>">
+		  <a title="Show info" href="autoconfigbackup.php?download=<?=urlencode($cv['time']);?>">
 			<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_down.gif" width="17" height="17" border="0">
 		  </a>
-		  <a onClick="return confirm('Are you sure you want to delete <?= $cv['time']; ?>?')"href="autoconfigbackup.php?rmver=<?=urlencode($cv['time']);?>">
+		  <a title="Delete" onClick="return confirm('Are you sure you want to delete <?= $cv['time']; ?>?')"href="autoconfigbackup.php?rmver=<?=urlencode($cv['time']);?>">
 			<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_del.gif" width="17" height="17" border="0">
 		  </a>
 	  </td>
@@ -302,25 +302,31 @@ include("head.inc");
 	$counter++; 
 	endforeach;
 	if($counter == 0)
-		echo "<tr><td colspan='3'><center>Sorry, we could not locate any backups at portal.pfsense.org for this hostname.</td></tr>";
+		echo "<tr><td colspan='3'><center>Sorry, we could not locate any backups at portal.pfsense.org for this hostname ({$hostname}).</td></tr>";
 ?>
 	</table>
 	</div>
     </td>
-	<tr><td>
-	  <p>
-	  <strong>
-			&nbsp;&nbsp;<span class="red">Hint:&nbsp;
-	  		</span>
-	  </strong>
-	  Click the + sign next to the revision you would like to restore.
-	</p>	
-  </td></tr>
-  <tr><td>
-	<form method="post" action="autoconfigbackup.php">
-		<input type="button" onClick='backupnow()' name="backup" value="Backup Now">
-	</form>
-  </td></tr>
+	<tr>
+		<td>
+	  		<p>
+	  			<strong>
+					&nbsp;&nbsp;
+					<span class="red">
+						Hint:&nbsp;
+	  				</span>
+	  			</strong>
+	  			Click the + sign next to the revision you would like to restore.
+			</p>	
+		</td>
+	</tr>
+ 	<tr>
+		<td>
+			<form method="post" action="autoconfigbackup.php">
+				<input type="button" onClick='backupnow()' name="backup" value="Backup Now">
+			</form>
+		</td>
+	</tr>
   </tr>
 </table>
 </form>
