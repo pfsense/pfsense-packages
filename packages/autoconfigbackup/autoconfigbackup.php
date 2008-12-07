@@ -222,7 +222,7 @@ include("head.inc");
 	$tab_array[1] = array("Restore", $active, "/autoconfigbackup.php");
 	if($_REQUEST['download'])
 		$tab_array[] = array("Revision", true, "/autoconfigbackup.php?download={$_REQUEST['download']}");
-	$tab_array[] = array("Backup now", true, "/autoconfigbackup_backup.php");
+	$tab_array[] = array("Backup now", false, "/autoconfigbackup_backup.php");
 	display_top_tabs($tab_array);
 ?>			
   </td></tr>

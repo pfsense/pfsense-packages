@@ -105,37 +105,37 @@ include("head.inc");
   </td></tr>
   <tr>
     <td>
-	<table id="backuptable" class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
-	<tr>
-		<td colspan="2" align="left">
-			<table>
-				<tr>
-					<td align="right">
-						Enter the backup reason:
-					</td>
-					<td>
-						<input name="reason" id="reason">
-					</td>
-				</tr>
-				<tr>
-					<td align="right">
-						Do not overwrite previous backups for this hostname:
-					</td>
-					<td>
-						<input type="nooverwrite" type="checkbox">
-					</td>
-				</tr>
-				<tr>
-					<td colspan="2" align="middle">
-						<input type="button" name="Backup" value="Backup">
-					</td>
-				</tr>
-			</table>
-		</td>
-	</tr>
-	</table>
+		<table id="backuptable" class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
+			<tr>
+				<td colspan="2" align="left">
+					<table>
+						<tr>
+							<td align="right">
+								Enter the backup reason:
+							</td>
+							<td>
+								<input name="reason" id="reason">
+							</td>
+						</tr>
+						<tr>
+							<td align="right">
+								Do not overwrite previous backups for this hostname:
+							</td>
+							<td>
+								<input type="nooverwrite" type="checkbox">
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2" align="middle">
+								<input type="button" name="Backup" value="Backup">
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
 	</div>
-    </td>
+	</td>
   </tr>
 </table>
 </form>
