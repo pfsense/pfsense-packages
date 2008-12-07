@@ -1111,64 +1111,66 @@ function sync_package_freeswitch_ivr() {
 	    $tmp .= "         if ( dtmf.digits.length > \"0\" ) {\n";
 	    
 	    $x = 0;
-	    foreach($config['installedpackages']['freeswitchivroptions']['config'] as $row) {
-	      
-	      /*
-	      $row['ivrid']
-	      $row['optionnumber']
-	      $row['optiontype']
-	      $row['optionaction']
-	      $row['optiondest']
-	      $row['optiondescr']    
-	      */
-	      //$tmpantiactiondefault = "";
-	  
-	      //find the correct IVR options with the correct action
-	    	if ($row['ivrid'] == $rowhelper['ivrid']) {
-	      
-	          if ($row['optionaction'] == "anti-action") {
-	        	    
-	        	    switch ($row['optionnumber']) {
-	              case "t":
-	                  
-	                  if ($row['optiontype'] == "extension") {
-	                      $tmpantiactiondefault .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
-	                  }
-	                  if ($row['optiontype'] == "voicemail") {
-	                      //$tmpantiactiondefault .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
-	                      $tmpantiactiondefault .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-	                  }              
-	                                
-	                  break;
-	              default:
-	                  //$tmpantiaction .= "             //console_log( \"info\", \"IVR Detected 1 digit \\n\" );\n";
-	
-	                  if ($x == 0) {
-	                    $tmpantiaction .= "             if ( dtmf.digits == \"".$row['optionnumber']."\" ) { //".$row['optiondescr']."\n";                  
-	                  }
-	                  else {
-	                    $tmpantiaction .= "             else if ( dtmf.digits == \"".$row['optionnumber']."\" ) { //".$row['optiondescr']."\n";
-	                  }
-	
-	                  if ($row['optiontype'] == "extension") {
-	                      $tmpantiaction .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\");\n";
-	                  }
-	                  if ($row['optiontype'] == "voicemail") {
-	                      //$tmpantiaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
-	                      $tmpantiaction .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-	                  } 
-	                  $tmpantiaction .= "             }\n";
-	
-	                  
-	              } //end switch
-	              
-	              $x++;              
-	        	} //end anti-action
-	
-	    	} //end ivrid
-	    	
-	
-	    } //end for each
+	    if (count($a_ivr_options) > 0) {
+		    foreach(a_ivr_options as $row) {
+		      
+		      /*
+		      $row['ivrid']
+		      $row['optionnumber']
+		      $row['optiontype']
+		      $row['optionaction']
+		      $row['optiondest']
+		      $row['optiondescr']    
+		      */
+		      //$tmpantiactiondefault = "";
+		  
+		      //find the correct IVR options with the correct action
+		    	if ($row['ivrid'] == $rowhelper['ivrid']) {
+		      
+		          if ($row['optionaction'] == "anti-action") {
+		        	    
+		        	    switch ($row['optionnumber']) {
+		              case "t":
+		                  
+		                  if ($row['optiontype'] == "extension") {
+		                      $tmpantiactiondefault .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
+		                  }
+		                  if ($row['optiontype'] == "voicemail") {
+		                      //$tmpantiactiondefault .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
+		                      $tmpantiactiondefault .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
+		                  }              
+		                                
+		                  break;
+		              default:
+		                  //$tmpantiaction .= "             //console_log( \"info\", \"IVR Detected 1 digit \\n\" );\n";
+		
+		                  if ($x == 0) {
+		                    $tmpantiaction .= "             if ( dtmf.digits == \"".$row['optionnumber']."\" ) { //".$row['optiondescr']."\n";                  
+		                  }
+		                  else {
+		                    $tmpantiaction .= "             else if ( dtmf.digits == \"".$row['optionnumber']."\" ) { //".$row['optiondescr']."\n";
+		                  }
+		
+		                  if ($row['optiontype'] == "extension") {
+		                      $tmpantiaction .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\");\n";
+		                  }
+		                  if ($row['optiontype'] == "voicemail") {
+		                      //$tmpantiaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
+		                      $tmpantiaction .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
+		                  } 
+		                  $tmpantiaction .= "             }\n";
+		
+		                  
+		              } //end switch
+		              
+		              $x++;              
+		        	} //end anti-action
+		
+		    	} //end ivrid
+		    	
+		
+		    } //end for each
+	    } //if count
 	    
 	    $tmp .= $tmpantiaction;
 	    $tmp .= "             else {\n";

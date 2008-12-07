@@ -153,6 +153,7 @@ include("head.inc");
       $i = 0;
       if (count($a_ivr) > 0) { 
         foreach ($a_ivr as $ent) {
+        	if (strlen($ent['ivrid']) > 0) {
     ?>
     <tr>
       <td class="listlr" ondblclick="document.location='freeswitch_ivr_edit.php?id=<?=$i;?>'">
@@ -173,8 +174,9 @@ include("head.inc");
        </table>
       </td>
     </tr>
-		<?php 
-          $i++; 
+		<?php
+          	} 
+        	$i++; 
         }
       }
     ?>
