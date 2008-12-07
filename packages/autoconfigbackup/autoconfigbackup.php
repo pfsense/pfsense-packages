@@ -5,10 +5,6 @@
     Copyright (C) 2008 Scott Ullrich
     All rights reserved.
 
-	Originally based on diag_confbak.php written and
-    Copyright (C) 2005 Colin Smith
-    All rights reserved.
-
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
 
@@ -61,18 +57,6 @@ $hostname			= $config['system']['hostname'] . "." . $config['system']['domain'];
 if(!$username) {
 	Header("Location: /pkg_edit.php?xml=autoconfigbackup.xml&id=0");
 	exit;
-}
-
-if($_POST['backup']) {
-	if($_REQUEST['reason']) 
-		write_config($_REQUEST['reason']);
-	else 
-		write_config("Backup invoked via Auto Config Backup.");
-	$savemsg = "Backup completed successfully.";
-	exec("echo > /cf/conf/lastpfSbackup.txt");
-	filter_configure_sync();
-	print_info_box($savemsg);	
-	$donotshowheader=true;
 }
 
 if($_REQUEST['savemsg']) 
