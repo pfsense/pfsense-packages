@@ -59,7 +59,7 @@ if(!$username) {
 	exit;
 }
 
-if($_POST) {
+if($_POST) {	
 	touch("/tmp/acb_nooverwrite");
 	if($_REQUEST['reason']) 
 		write_config($_REQUEST['reason']);
