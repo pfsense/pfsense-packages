@@ -158,6 +158,22 @@ EOF;
 	//unlink("/tmp/config_restore.xml");
 } 
 
+if($_REQUEST['rmver'] != "") {
+	$curl_session = curl_init();
+	curl_setopt($curl_session, CURLOPT_URL, $del_url);
+	curl_setopt($curl_session, CURLOPT_POST, 3);				
+	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
+	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
+	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=delete" . 
+		"&hostname=" . urlencode($hostname) . 
+		"&revision=" . urlencode($_REQUEST['rmver']));
+	$data = curl_exec($curl_session);
+	if (curl_errno($curl_session)) {
+	} else {
+	    curl_close($curl_session);
+	}
+}
+
 // Populate available backups
 $curl_session = curl_init();
 curl_setopt($curl_session, CURLOPT_URL, $get_url);  
@@ -174,22 +190,6 @@ if (curl_errno($curl_session)) {
 	fclose($fd);
 } else {
     curl_close($curl_session);
-}
-
-if($_REQUEST['rmver'] != "") {
-	$curl_session = curl_init();
-	curl_setopt($curl_session, CURLOPT_URL, $del_url);
-	curl_setopt($curl_session, CURLOPT_POST, 3);				
-	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
-	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
-	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=delete" . 
-		"&hostname=" . urlencode($hostname) . 
-		"&revision=" . urlencode($_REQUEST['rmver']));
-	$data = curl_exec($curl_session);
-	if (curl_errno($curl_session)) {
-	} else {
-	    curl_close($curl_session);
-	}
 }
 
 // Loop through and create new confvers
