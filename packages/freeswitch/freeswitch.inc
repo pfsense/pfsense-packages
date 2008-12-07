@@ -1425,6 +1425,17 @@ function freeswitch_php_install_command()
 	   exec("mkdir /usr/local/www/freeswitch/");
 	}
 
+	exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
+	unlink_if_exists("/tmp/freeswitch.tgz");
+
+	exec("cp /tmp/please_enter_your_pin_number.wav /usr/local/www/freeswitch/please_enter_your_pin_number.wav");
+	unlink_if_exists("/tmp/please_enter_your_pin_number.wav");
+
+	exec("cp /tmp/begin_recording.wav /usr/local/www/freeswitch/begin_recording.wav");
+	unlink_if_exists("/tmp/begin_recording.wav");
+  
+	exec("cp /tmp/your_pin_number_is_incorect_goodbye.wav /usr/local/www/freeswitch/your_pin_number_is_incorect_goodbye.wav");
+	unlink_if_exists("/tmp/your_pin_number_is_incorect_goodbye.wav");
 		
 	exec("cp /tmp/freeswitch_cmd.tmp /usr/local/www/freeswitch/freeswitch_cmd.php");
 	unlink_if_exists("/tmp/freeswitch_cmd.tmp");
@@ -1441,6 +1452,12 @@ function freeswitch_php_install_command()
 	exec("cp /tmp/freeswitch_dialplan_includes_edit.tmp /usr/local/www/freeswitch/freeswitch_dialplan_includes_edit.php");
 	unlink_if_exists("/tmp/freeswitch_dialplan_includes_edit.tmp");
 
+	exec("cp /tmp/freeswitch_gateways.tmp /usr/local/www/freeswitch/freeswitch_gateways.php");
+	unlink_if_exists("/tmp/freeswitch_gateways.tmp");
+	
+	exec("cp /tmp/freeswitch_gateways_edit.tmp /usr/local/www/freeswitch/freeswitch_gateways_edit.php");
+	unlink_if_exists("/tmp/freeswitch_gateways_edit.tmp");
+		
 	exec("cp /tmp/freeswitch_ivr.tmp /usr/local/www/freeswitch/freeswitch_ivr.php");
 	unlink_if_exists("/tmp/freeswitch_ivr.tmp");
   
@@ -1452,6 +1469,12 @@ function freeswitch_php_install_command()
 
 	exec("cp /tmp/freeswitch_ivr_options_edit.tmp /usr/local/www/freeswitch/freeswitch_ivr_options_edit.php");
 	unlink_if_exists("/tmp/freeswitch_ivr_options_edit.tmp");
+	
+	exec("cp /tmp/freeswitch_public_includes.tmp /usr/local/www/freeswitch/freeswitch_public_includes.php");
+	unlink_if_exists("/tmp/freeswitch_public_includes.tmp");
+    	
+	exec("cp /tmp/freeswitch_public_includes_edit.tmp /usr/local/www/freeswitch/freeswitch_public_includes_edit.php");
+	unlink_if_exists("/tmp/freeswitch_public_includes_edit.tmp");
 
 	exec("cp /tmp/freeswitch_public_includes_details.tmp /usr/local/www/freeswitch/freeswitch_public_includes_details.php");
 	unlink_if_exists("/tmp/freeswitch_public_includes_details.tmp");
@@ -1459,41 +1482,25 @@ function freeswitch_php_install_command()
 	exec("cp /tmp/freeswitch_public_includes_details_edit.tmp /usr/local/www/freeswitch/freeswitch_public_includes_details_edit.php");
 	unlink_if_exists("/tmp/freeswitch_public_includes_details_edit.tmp");
 
-	exec("cp /tmp/freeswitch_public_includes.tmp /usr/local/www/freeswitch/freeswitch_public_includes.php");
-	unlink_if_exists("/tmp/freeswitch_public_includes.tmp");
-    	
-	exec("cp /tmp/freeswitch_public_includes_edit.tmp /usr/local/www/freeswitch/freeswitch_public_includes_edit.php");
-	unlink_if_exists("/tmp/freeswitch_public_includes_edit.tmp");
 
+
+	exec("cp /tmp/freeswitch_recordings.tmp /usr/local/www/freeswitch/freeswitch_recordings.php");
+	unlink_if_exists("/tmp/freeswitch_recordings.tmp");
+	
 	exec("cp /tmp/freeswitch_recordings_edit.tmp /usr/local/www/freeswitch/freeswitch_recordings_edit.php");
 	unlink_if_exists("/tmp/freeswitch_recordings_edit.tmp");
 
 	exec("cp /tmp/freeswitch_recordings_play.tmp /usr/local/www/freeswitch/freeswitch_recordings_play.php");
 	unlink_if_exists("/tmp/freeswitch_recordings_play.tmp");
   
-	exec("cp /tmp/freeswitch_recordings.tmp /usr/local/www/freeswitch/freeswitch_recordings.php");
-	unlink_if_exists("/tmp/freeswitch_recordings.tmp");
+	exec("cp /tmp/freeswitch_status.tmp /usr/local/www/freeswitch/freeswitch_status.php");
+	unlink_if_exists("/tmp/freeswitch_status.tmp");
   	
 	exec("cp /tmp/freeswitch_time_conditions.tmp /usr/local/www/freeswitch/freeswitch_time_conditions.php");
 	unlink_if_exists("/tmp/freeswitch_time_conditions.tmp");
 	
 	exec("cp /tmp/freeswitch_time_conditions_edit.tmp /usr/local/www/freeswitch/freeswitch_time_conditions_edit.php");
 	unlink_if_exists("/tmp/freeswitch_time_conditions_edit.tmp");
-
-	exec("cp /tmp/freeswitch_status.tmp /usr/local/www/freeswitch/freeswitch_status.php");
-	unlink_if_exists("/tmp/freeswitch_status.tmp");
-                	
-	exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
-	unlink_if_exists("/tmp/freeswitch.tgz");
-
-	exec("cp /tmp/please_enter_your_pin_number.wav /usr/local/www/freeswitch/please_enter_your_pin_number.wav");
-	unlink_if_exists("/tmp/please_enter_your_pin_number.wav");
-
-	exec("cp /tmp/begin_recording.wav /usr/local/www/freeswitch/begin_recording.wav");
-	unlink_if_exists("/tmp/begin_recording.wav");
-  
-	exec("cp /tmp/your_pin_number_is_incorect_goodbye.wav /usr/local/www/freeswitch/your_pin_number_is_incorect_goodbye.wav");
-	unlink_if_exists("/tmp/your_pin_number_is_incorect_goodbye.wav");
 
 
   /* freeswitch settings defaults */
@@ -1776,9 +1783,6 @@ function freeswitch_php_install_command()
 	$handle = popen("/usr/local/etc/rc.d/freeswitch.sh start", "r");
 	pclose($handle);
 	
-	$cmd = "api reloadxml";
-	event_socket_request_cmd($cmd);
-	unset($cmd);
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.3";
