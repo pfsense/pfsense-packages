@@ -52,6 +52,9 @@ $password			= $config['installedpackages']['autoconfigbackup']['config'][0]['pas
 // URL to restore.php
 $get_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/restore.php";
 
+// URL to delete.php
+$del_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/delete.php";
+
 // Set hostname
 $hostname			= $config['system']['hostname'] . "." . $config['system']['domain'];
 
@@ -174,7 +177,19 @@ if (curl_errno($curl_session)) {
 }
 
 if($_REQUEST['rmver'] != "") {
-	// XXX: delete revision, or all backups from server.
+	$curl_session = curl_init();
+	curl_setopt($curl_session, CURLOPT_URL, $del_url);
+	curl_setopt($curl_session, CURLOPT_POST, 3);				
+	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
+	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
+	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=delete" . 
+		"&hostname=" . urlencode($hostname) . 
+		"&revision=" . urlencode($_REQUEST['rmver']));
+	$data = curl_exec($curl_session);
+	if (curl_errno($curl_session)) {
+	} else {
+	    curl_close($curl_session);
+	}
 }
 
 // Loop through and create new confvers
@@ -245,26 +260,36 @@ include("head.inc");
   <tr>
     <td>
 	<table id="backuptable" class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
-		<tr>
-			<td width="30%" class="listhdrr">Date</td>
-			<td width="70%" class="listhdrr">Configuration Change</td>
-		</tr>
+	<tr>
+		<td colspan="2" align="left">
+			<form method="post" action="autoconfigbackup.php">
+				<input type="button" onClick='backupnow()' name="backup" value="Backup Now">
+			</form>
+		</td>
+	</tr>
+	<tr>
+		<td width="30%" class="listhdrr">Date</td>
+		<td width="70%" class="listhdrr">Configuration Change</td>
+	</tr>
 <?php 
 	$counter = 0;
 	foreach($confvers as $cv): 
 ?>
-		<tr valign="top">
-		  <td class="listlr"> <?= $cv['time']; ?></td>
-			<td class="listbg"> <?= $cv['reason']; ?></td>
-			<td colspan="2" valign="middle" class="list" nowrap>
-			  <a onClick="return confirm('Are you sure you want to restore <?= $cv['time']; ?>?')" href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>">
-				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0">
-			  </a>
-			  <a href="autoconfigbackup.php?download=<?=urlencode($cv['time']);?>">
-				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_down.gif" width="17" height="17" border="0">
-			  </a>
-		  </td>
-		</tr>
+	<tr valign="top">
+	  <td class="listlr"> <?= $cv['time']; ?></td>
+		<td class="listbg"> <?= $cv['reason']; ?></td>
+		<td colspan="2" valign="middle" class="list" nowrap>
+		  <a onClick="return confirm('Are you sure you want to restore <?= $cv['time']; ?>?')" href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>">
+			<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0">
+		  </a>
+		  <a href="autoconfigbackup.php?download=<?=urlencode($cv['time']);?>">
+			<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_down.gif" width="17" height="17" border="0">
+		  </a>
+		  <a onClick="return confirm('Are you sure you want to delete <?= $cv['time']; ?>?')"href="autoconfigbackup.php?rmver=<?=urlencode($cv['time']);?>">
+			<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_del.gif" width="17" height="17" border="0">
+		  </a>
+	  </td>
+	</tr>
 <?php
 	$counter++; 
 	endforeach;
