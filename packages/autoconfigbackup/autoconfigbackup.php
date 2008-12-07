@@ -226,6 +226,8 @@ include("head.inc");
 						$ds = split("\+\+\+\+", $data);
 						$revision = $_REQUEST['download'];
 						$sha256sum = $ds[0];
+						if($sha256sum == "0")
+							$sha256sum = "None on file.";
 						$data = $ds[1];
 						$configtype = "Encrypted";
 						if (!tagfile_deformat($data, $data, "config.xml")) 
