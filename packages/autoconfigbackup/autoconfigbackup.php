@@ -88,10 +88,15 @@ if($_REQUEST['download']) {
 	$data = curl_exec($curl_session);
 	if (!tagfile_deformat($data, $data1, "config.xml")) 
 		$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
-	if ($input_errors)
+	if ($input_errors) {
 		print_input_errors($input_errors);
-	else 
-		echo "<pre>{$data}</pre>";
+	} else {
+		$ds = split("\+\+\+\+", $data);
+		echo "<h1>SHA256 summary</h1>";
+		echo "<textarea rows='1' cols='70'>{$ds[0]}</textarea>";
+		echo "<h1>Encrypted config.xml</h1>";
+		echo "<textarea rows='40' cols='70'>{$ds[1]}</textarea>";
+	}
 	exit;	
 }
 
