@@ -89,19 +89,19 @@ include("head.inc");
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">  <tr><td>
 <div id='feedbackdiv'></div>
-<?php
-	$tab_array = array();
-	$tab_array[0] = array("Settings", false, "/pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0");
-	if($_REQUEST['download']) 
-		$active = false;
-	else 
-		$active = true;
-	$tab_array[1] = array("Restore", $active, "/autoconfigbackup.php");
-	if($_REQUEST['download'])
-		$tab_array[] = array("Revision", true, "/autoconfigbackup.php?download={$_REQUEST['download']}");
-	$tab_array[] = array("Backup now", false, "/autoconfigbackup_backup.php");
-	display_top_tabs($tab_array);
-?>			
+	<?php
+		$tab_array = array();
+		$tab_array[0] = array("Settings", false, "/pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0");
+		if($_REQUEST['download']) 
+			$active = false;
+		else 
+			$active = true;
+		$tab_array[1] = array("Restore", $active, "/autoconfigbackup.php");
+		if($_REQUEST['download'])
+			$tab_array[] = array("Revision", true, "/autoconfigbackup.php?download={$_REQUEST['download']}");
+		$tab_array[] = array("Backup now", false, "/autoconfigbackup_backup.php");
+		display_top_tabs($tab_array);
+	?>			
   </td></tr>
   <tr>
     <td>
@@ -239,7 +239,6 @@ EOF;
 					require("fend.inc");
 					exit;	
 				}
-
 				// Populate available backups
 				$curl_session = curl_init();
 				curl_setopt($curl_session, CURLOPT_URL, $get_url);  
@@ -257,7 +256,6 @@ EOF;
 				} else {
 				    curl_close($curl_session);
 				}
-
 				// Loop through and create new confvers
 				$data_split = split("\n", $data);
 				$confvers = array();
@@ -269,8 +267,8 @@ EOF;
 					$tmp_array['time'] = $ds_split[2];
 					if($ds_split[2] && $ds_split[0])
 						$confvers[] = $tmp_array;
-				}				
-			?>		
+				}
+			?>
 		</td>
 	</tr>
 	<tr>
@@ -284,26 +282,28 @@ EOF;
 	echo "</script>";	
 	foreach($confvers as $cv): 
 ?>
-	<tr valign="top">
-	  <td class="listlr"> <?= $cv['time']; ?></td>
-		<td class="listbg"> <?= $cv['reason']; ?></td>
-		<td colspan="2" valign="middle" class="list" nowrap>
-		  <a title="Restore this revision" onClick="return confirm('Are you sure you want to restore <?= $cv['time']; ?>?')" href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>">
-			<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0">
-		  </a>
-		  <a title="Show info" href="autoconfigbackup.php?download=<?=urlencode($cv['time']);?>&reason=<?php echo urlencode($cv['reason']);?>">
-			<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_down.gif" width="17" height="17" border="0">
-		  </a>
-		  <a title="Delete" onClick="return confirm('Are you sure you want to delete <?= $cv['time']; ?>?')"href="autoconfigbackup.php?rmver=<?=urlencode($cv['time']);?>">
-			<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0">
-		  </a>
-	  </td>
-	</tr>
+		<tr valign="top">
+		  <td class="listlr"> <?= $cv['time']; ?></td>
+			<td class="listbg"> <?= $cv['reason']; ?></td>
+			<td colspan="2" valign="middle" class="list" nowrap>
+			  <a title="Restore this revision" onClick="return confirm('Are you sure you want to restore <?= $cv['time']; ?>?')" href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>">
+				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0">
+			  </a>
+			  <a title="Show info" href="autoconfigbackup.php?download=<?=urlencode($cv['time']);?>&reason=<?php echo urlencode($cv['reason']);?>">
+				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_down.gif" width="17" height="17" border="0">
+			  </a>
+			  <a title="Delete" onClick="return confirm('Are you sure you want to delete <?= $cv['time']; ?>?')"href="autoconfigbackup.php?rmver=<?=urlencode($cv['time']);?>">
+				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0">
+			  </a>
+		  </td>
+		</tr>
 <?php
-	$counter++; 
+		$counter++; 
 	endforeach;
 	if($counter == 0)
 		echo "<tr><td colspan='3'><center>Sorry, we could not locate any backups at portal.pfsense.org for this hostname ({$hostname}).</td></tr>";
+	else 
+		echo "<tr><td colspan='3'><center><br/>Backups hosted currently for this hostname on portalpfsense.org: {$counter}.</td></tr>";	
 ?>
 	</table>
 	</div>

@@ -93,14 +93,15 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">  
 	<tr>
 		<td>
-			<div id='feedbackdiv'></div>
-<?php
-	$tab_array = array();
-	$tab_array[] = array("Settings", false, "/pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0");
-	$tab_array[] = array("Restore", false, "/autoconfigbackup.php");
-	$tab_array[] = array("Backup now", true, "/autoconfigbackup_backup.php");
-	display_top_tabs($tab_array);
-?>			
+			<div id='feedbackdiv'>
+			</div>
+			<?php
+				$tab_array = array();
+				$tab_array[] = array("Settings", false, "/pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0");
+				$tab_array[] = array("Restore", false, "/autoconfigbackup.php");
+				$tab_array[] = array("Backup now", true, "/autoconfigbackup_backup.php");
+				display_top_tabs($tab_array);
+			?>			
   		</td>
 	</tr>
   	<tr>
