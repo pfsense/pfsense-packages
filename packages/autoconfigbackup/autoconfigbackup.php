@@ -157,37 +157,6 @@ if($_REQUEST['rmver'] != "") {
 	}
 }
 
-// Populate available backups
-$curl_session = curl_init();
-curl_setopt($curl_session, CURLOPT_URL, $get_url);  
-curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
-curl_setopt($curl_session, CURLOPT_POST, 1);
-curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
-curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showbackups&hostname={$hostname}");
-$data = curl_exec($curl_session);
-if (curl_errno($curl_session)) {
-	$fd = fopen("/tmp/acb_backupdebug.txt", "w");
-	fwrite($fd, $get_url . "" . "action=showbackups" . "\n\n");
-	fwrite($fd, $data);
-	fwrite($fd, curl_error($curl_session));
-	fclose($fd);
-} else {
-    curl_close($curl_session);
-}
-
-// Loop through and create new confvers
-$data_split = split("\n", $data);
-$confvers = array();
-foreach($data_split as $ds) {
-	$ds_split = split($oper_sep, $ds);
-	$tmp_array = array();
-	$tmp_array['username'] = $ds_split[0];
-	$tmp_array['reason'] = $ds_split[1];
-	$tmp_array['time'] = $ds_split[2];
-	if($ds_split[2] && $ds_split[0])
-		$confvers[] = $tmp_array;
-}
-
 if($_REQUEST['download']) 
 	$pgtitle = "Diagnostics: Auto Configuration Backup revision information";
 else
@@ -283,6 +252,37 @@ include("head.inc");
 					require("fend.inc");
 					exit;	
 				}
+
+				// Populate available backups
+				$curl_session = curl_init();
+				curl_setopt($curl_session, CURLOPT_URL, $get_url);  
+				curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
+				curl_setopt($curl_session, CURLOPT_POST, 1);
+				curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showbackups&hostname={$hostname}");
+				$data = curl_exec($curl_session);
+				if (curl_errno($curl_session)) {
+					$fd = fopen("/tmp/acb_backupdebug.txt", "w");
+					fwrite($fd, $get_url . "" . "action=showbackups" . "\n\n");
+					fwrite($fd, $data);
+					fwrite($fd, curl_error($curl_session));
+					fclose($fd);
+				} else {
+				    curl_close($curl_session);
+				}
+
+				// Loop through and create new confvers
+				$data_split = split("\n", $data);
+				$confvers = array();
+				foreach($data_split as $ds) {
+					$ds_split = split($oper_sep, $ds);
+					$tmp_array = array();
+					$tmp_array['username'] = $ds_split[0];
+					$tmp_array['reason'] = $ds_split[1];
+					$tmp_array['time'] = $ds_split[2];
+					if($ds_split[2] && $ds_split[0])
+						$confvers[] = $tmp_array;
+				}				
 			?>		
 		</td>
 	</tr>
