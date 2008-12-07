@@ -195,15 +195,6 @@ $pgtitle = "Diagnostics: Auto Configuration Backup";
 include("head.inc");
 
 ?>
-<script type="text/javascript">
-<script>
-	function confirmRestore(delUrl) {
-		if (confirm("Are you sure you want to restore?")) {
-			document.location = delUrl;
-		}
-	}
-</script>
-</script>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <script type="text/javascript">
 	function restore_item() {
