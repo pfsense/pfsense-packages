@@ -130,7 +130,7 @@ EOF;
 			$savemsg = "Unable to revert to the selected configuration.";
 		}
 	}
-	//unlink("/tmp/config_restore.xml");
+	unlink("/tmp/config_restore.xml");
 } 
 
 if($_REQUEST['rmver'] != "") {
