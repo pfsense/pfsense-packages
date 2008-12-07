@@ -112,7 +112,7 @@ include("head.inc");
 								Enter the backup reason:
 							</td>
 							<td>
-								<input name="reason" id="reason">
+								<input name="reason" id="reason" size="80">
 							</td>
 						</tr>
 						<tr>
