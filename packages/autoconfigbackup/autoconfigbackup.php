@@ -249,13 +249,13 @@ include("head.inc");
 						print_input_errors($input_errors);
 					} else {
 						$ds = split("\+\+\+\+", $data);
-						echo "<h1>Hostname</h1>";						
+						echo "<h2>Hostname</h2>";						
 						echo "<textarea rows='1' cols='70'>{$hostname}</textarea>";
-						echo "<h1>Revision date/time</h1>";
+						echo "<h2>Revision date/time</h2>";
 						echo "<textarea rows='1' cols='70'>{$_REQUEST['download']}</textarea>";
-						echo "<h1>SHA256 summary</h1>";
+						echo "<h2>SHA256 summary</h2>";
 						echo "<textarea rows='1' cols='70'>{$ds[0]}</textarea>";
-						echo "<h1>Encrypted config.xml</h1>";
+						echo "<h2>Encrypted config.xml</h2>";
 						echo "<textarea rows='40' cols='70'>{$ds[1]}</textarea>";
 					}
 					echo "</td></tr></table></div></td></td></tr></tr></table></form>";
