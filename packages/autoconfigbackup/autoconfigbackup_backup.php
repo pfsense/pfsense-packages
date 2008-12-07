@@ -97,8 +97,8 @@ include("head.inc");
 <div id='feedbackdiv'></div>
 <?php
 	$tab_array = array();
-	$tab_array[0] = array("Settings", false, "/pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0");
-	$tab_array[1] = array("Restore", false, "/autoconfigbackup.php");
+	$tab_array[] = array("Settings", false, "/pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0");
+	$tab_array[] = array("Restore", false, "/autoconfigbackup.php");
 	$tab_array[] = array("Backup now", true, "/autoconfigbackup_backup.php");
 	display_top_tabs($tab_array);
 ?>			
@@ -110,7 +110,7 @@ include("head.inc");
 		<td colspan="2" align="left">
 			<table>
 				<tr>
-					<td>
+					<td align="right">
 						Enter the backup reason:
 					</td>
 					<td>
@@ -118,7 +118,7 @@ include("head.inc");
 					</td>
 				</tr>
 				<tr>
-					<td>
+					<td align="right">
 						Do not overwrite previous backups for this hostname:
 					</td>
 					<td>
@@ -126,7 +126,7 @@ include("head.inc");
 					</td>
 				</tr>
 				<tr>
-					<td colspan="2">
+					<td colspan="2" align="middle">
 						<input type="button" name="Backup" value="Backup">
 					</td>
 				</tr>
