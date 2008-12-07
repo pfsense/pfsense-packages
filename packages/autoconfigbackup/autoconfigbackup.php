@@ -191,7 +191,7 @@ include("head.inc");
 					}
 					if(!$input_errors && $data) {
 						if(config_restore("/tmp/config_restore.xml") == 0) {
-							$savemsg = "Successfully reverted the pfSense configuration to timestamp " . urldecode($_REQUEST['newver']) . ".";
+							$savemsg = "Successfully reverted the pfSense configuration to revision " . urldecode($_REQUEST['newver']) . ".";
 							$savemsg .= <<<EOF
 							<p/>
 						  <form action="reboot.php" method="post">
