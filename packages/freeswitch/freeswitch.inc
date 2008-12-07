@@ -148,8 +148,7 @@ function event_socket_request_cmd($cmd)
   $port = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_port'];  
   $host = $config['interfaces']['lan']['ipaddr'];
 
-  if (pkg_is_service_running('freeswitch')) 
-  {
+  if (pkg_is_service_running('freeswitch')) {
     $fp = event_socket_create($host, $port, $password);
     $response = event_socket_request($fp, $cmd);
     fclose($fp);
@@ -766,9 +765,9 @@ function get_recording_filename($id) {
 
 function sync_package_freeswitch_ivr() {
 
-	global $config;
-	conf_mount_rw();
-	config_lock();
+  global $config;
+  conf_mount_rw();
+  config_lock();
 
   $a_ivr = &$config['installedpackages']['freeswitchivr']['config'];
   if (count($a_ivr) > 0) {  
@@ -895,10 +894,12 @@ function sync_package_freeswitch_ivr() {
 	    $password = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_password'];
 	    $port = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_port'];
 	    $host = $config['interfaces']['lan']['ipaddr'];
-	
-	    $fp = event_socket_create($host, $port, $password);
-	    $cmd = "api global_getvar domain";
-	    $domain = trim(event_socket_request($fp, $cmd));
+		
+		if (pkg_is_service_running('freeswitch')) {
+		    $fp = event_socket_create($host, $port, $password);
+		    $cmd = "api global_getvar domain";
+		    $domain = trim(event_socket_request($fp, $cmd));
+	    }
 	      
 	    $tmp .= "\n";
 	    $tmp .= " var condition = true;\n";
@@ -1409,7 +1410,9 @@ function sync_package_freeswitch()
   sync_package_freeswitch_internal();
   sync_package_freeswitch_external();
   //sync_package_freeswitch_recordings();
-  sync_package_freeswitch_ivr();
+  if (pkg_is_service_running('freeswitch')) {  
+      sync_package_freeswitch_ivr();
+  }
   sync_package_freeswitch_dialplan_includes();  
 }
     
