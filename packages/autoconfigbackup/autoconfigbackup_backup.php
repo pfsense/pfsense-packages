@@ -27,7 +27,9 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
+require("globals.inc");
 require("guiconfig.inc");
+require("/usr/local/pkg/autoconfigbackup.inc");
 
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2")) 
@@ -60,11 +62,9 @@ if(!$username) {
 }
 
 if($_POST) {	
-	touch("/tmp/acb_nooverwrite");
-	if($_REQUEST['reason']) 
-		write_config($_REQUEST['reason']);
-	else 
-		write_config("Backup invoked via Auto Config Backup.");
+	if($_REQUEST['nooverwrite'])
+		touch("/tmp/acb_nooverwrite");
+	upload_config();
 	$savemsg = "Backup completed successfully.";
 	exec("echo > /cf/conf/lastpfSbackup.txt");
 	filter_configure_sync();

@@ -84,9 +84,7 @@ include("head.inc");
 	}	
 	if ($input_errors)
 		print_input_errors($input_errors);
-
 ?>
-
 <table width="100%" border="0" cellpadding="0" cellspacing="0">  <tr><td>
 <div id='feedbackdiv'></div>
 	<?php
@@ -108,8 +106,8 @@ include("head.inc");
 	<table id="backuptable" class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
 		<td colspan="2" align="left">
-			<div id='loading'>
-				<img src='themes/metallic/images/misc/loader.gif'> Loading, please wait...
+			<div id="loading">
+				<img src="themes/metallic/images/misc/loader.gif"> Loading, please wait...
 			</div>
 			<?php
 				if($_REQUEST['rmver'] != "") {
@@ -184,7 +182,6 @@ include("head.inc");
 						  <input name="Submit" type="submit" class="formbtn" value=" No ">
 						</form>
 EOF;
-	    	
 						} else {
 							$savemsg = "Unable to revert to the selected configuration.";
 						}
