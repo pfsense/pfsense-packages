@@ -188,12 +188,12 @@
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_external.xml</item>
 	</additional_files_needed>	
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_gateways.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_gateways_edit.tmp</item>
 	</additional_files_needed>	
@@ -233,22 +233,22 @@
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_public.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes.tmp</item>
 	</additional_files_needed>	
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes_edit.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes_details.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes_details_edit.tmp</item>
 	</additional_files_needed>			
