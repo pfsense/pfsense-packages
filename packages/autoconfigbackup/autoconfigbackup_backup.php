@@ -68,7 +68,6 @@ if($_POST) {
 	$savemsg = "Backup completed successfully.";
 	exec("echo > /cf/conf/lastpfSbackup.txt");
 	filter_configure_sync();
-	print_info_box($savemsg);	
 	$donotshowheader=true;
 }
 
@@ -84,16 +83,15 @@ include("head.inc");
 	if(strstr($pfSversion, "1.2")) 
 		echo "<p class=\"pgtitle\">{$pgtitle}</p>";
 	if($savemsg) {
-		echo "<div id='savemsg'>";
 		print_info_box($savemsg);
-		echo "</div>";	
 	}	
 	if ($input_errors)
 		print_input_errors($input_errors);
 
 ?>
 <form method="post" action="autoconfigbackup_backup.php">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">  <tr><td>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">  
+	<tr><td>
 <div id='feedbackdiv'></div>
 <?php
 	$tab_array = array();
@@ -126,8 +124,13 @@ include("head.inc");
 							</td>
 						</tr>
 						<tr>
-							<td colspan="2" align="middle">
-								<input type="button" name="Backup" value="Backup">
+							<td>
+								&nbsp;
+							</td>
+						</tr>
+						<tr>
+							<td colspan="2" align="center">
+								<input type="submit" name="Backup" value="Backup">
 							</td>
 						</tr>
 					</table>
