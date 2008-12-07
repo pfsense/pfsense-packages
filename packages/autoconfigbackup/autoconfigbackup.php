@@ -251,34 +251,34 @@ include("head.inc");
 	<table id="backuptable" class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
 		<td colspan="2" align="left">
-<?php
-	if($_REQUEST['download']) {
-		// Phone home and obtain backups
-		$curl_session = curl_init();
-		curl_setopt($curl_session, CURLOPT_URL, $get_url);
-		curl_setopt($curl_session, CURLOPT_POST, 3);				
-		curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
-		curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
-		curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=restore" . 
-					"&hostname=" . urlencode($hostname) . 
-					"&revision=" . urlencode($_REQUEST['download']));
-		$data = curl_exec($curl_session);
-		if (!tagfile_deformat($data, $data1, "config.xml")) 
-			$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
-		if ($input_errors) {
-			print_input_errors($input_errors);
-		} else {
-			$ds = split("\+\+\+\+", $data);
-			echo "<h1>SHA256 summary</h1>";
-			echo "<textarea rows='1' cols='70'>{$ds[0]}</textarea>";
-			echo "<h1>Encrypted config.xml</h1>";
-			echo "<textarea rows='40' cols='70'>{$ds[1]}</textarea>";
-		}
-		echo "</td></tr></table></div></td></td></tr></tr></table></form>";
-		require("fend.inc");
-		exit;	
-	}
-?>		
+			<?php
+				if($_REQUEST['download']) {
+					// Phone home and obtain backups
+					$curl_session = curl_init();
+					curl_setopt($curl_session, CURLOPT_URL, $get_url);
+					curl_setopt($curl_session, CURLOPT_POST, 3);				
+					curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
+					curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
+					curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=restore" . 
+						"&hostname=" . urlencode($hostname) . 
+						"&revision=" . urlencode($_REQUEST['download']));
+					$data = curl_exec($curl_session);
+					if (!tagfile_deformat($data, $data1, "config.xml")) 
+						$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
+					if ($input_errors) {
+						print_input_errors($input_errors);
+					} else {
+						$ds = split("\+\+\+\+", $data);
+						echo "<h1>SHA256 summary</h1>";
+						echo "<textarea rows='1' cols='70'>{$ds[0]}</textarea>";
+						echo "<h1>Encrypted config.xml</h1>";
+						echo "<textarea rows='40' cols='70'>{$ds[1]}</textarea>";
+					}
+					echo "</td></tr></table></div></td></td></tr></tr></table></form>";
+					require("fend.inc");
+					exit;	
+				}
+			?>		
 			<form method="post" action="autoconfigbackup.php">
 				<input type="button" onClick='backupnow()' name="backup" value="Backup Now">
 			</form>
@@ -303,7 +303,7 @@ include("head.inc");
 			<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_down.gif" width="17" height="17" border="0">
 		  </a>
 		  <a title="Delete" onClick="return confirm('Are you sure you want to delete <?= $cv['time']; ?>?')"href="autoconfigbackup.php?rmver=<?=urlencode($cv['time']);?>">
-			<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_del.gif" width="17" height="17" border="0">
+			<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0">
 		  </a>
 	  </td>
 	</tr>
