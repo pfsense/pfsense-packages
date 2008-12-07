@@ -249,14 +249,24 @@ include("head.inc");
 						print_input_errors($input_errors);
 					} else {
 						$ds = split("\+\+\+\+", $data);
+						$revision = $_REQUEST['download'];
+						$sha256sum = $ds[0];
+						$data = $ds[1];
+						$configtype = "Encrypted";
+						if (!tagfile_deformat($data, $data, "config.xml")) 
+							$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
+						$data = decrypt_data($data, $decrypt_password);						
+						
 						echo "<h2>Hostname</h2>";						
 						echo "<textarea rows='1' cols='70'>{$hostname}</textarea>";
 						echo "<h2>Revision date/time</h2>";
-						echo "<textarea rows='1' cols='70'>{$_REQUEST['download']}</textarea>";
+						echo "<textarea name='download' rows='1' cols='70'>{$_REQUEST['download']}</textarea>";
 						echo "<h2>SHA256 summary</h2>";
-						echo "<textarea rows='1' cols='70'>{$ds[0]}</textarea>";
+						echo "<textarea name='shasum' rows='1' cols='70'>{$sha256sum}</textarea>";
 						echo "<h2>Encrypted config.xml</h2>";
-						echo "<textarea rows='40' cols='70'>{$ds[1]}</textarea>";
+						echo "<textarea name='config_xml' rows='40' cols='70'>{$ds[1]}</textarea>";
+						echo "<h2>Decrypted config.xml</h2>";
+						echo "<textarea name='dec_config_xml' rows='40' cols='70'>{$data}</textarea>";
 					}
 					echo "</td></tr></table></div></td></td></tr></tr></table></form>";
 					require("fend.inc");
