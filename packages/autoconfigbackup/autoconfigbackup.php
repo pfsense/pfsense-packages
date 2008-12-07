@@ -292,6 +292,9 @@ include("head.inc");
 	</tr>
 <?php 
 	$counter = 0;
+	echo "<script type=\"text/javascript\">";
+	echo "$('loading').innerHTML = '';";
+	echo "</script>";	
 	foreach($confvers as $cv): 
 ?>
 	<tr valign="top">
