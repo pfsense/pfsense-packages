@@ -188,7 +188,10 @@ foreach($data_split as $ds) {
 		$confvers[] = $tmp_array;
 }
 
-$pgtitle = "Diagnostics: Auto Configuration Backup";
+if($_REQUEST['download']) 
+	$pgtitle = "Diagnostics: Auto Configuration Backup revision information";
+else
+	$pgtitle = "Diagnostics: Auto Configuration Backup";
 
 include("head.inc");
 
