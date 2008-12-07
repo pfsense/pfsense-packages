@@ -162,7 +162,7 @@ include("head.inc");
 					$ondisksha256 = trim(`/sbin/sha256 /tmp/config_restore.xml | awk '{ print $4 }'`);
 					if($sha256 != "0" && $sha256 != "")  // we might not have a sha256 on file for older backups
 						if($ondisksha256 <> $sha256)
-							$input_errors[] = "SHA256 does not match, cannot restore. ({$sha256}) - ({$ondisksha256})";
+							$input_errors[] = "SHA256 values does not match, cannot restore.";
 					if (curl_errno($curl_session)) {
 						/* If an error occured, log the error in /tmp/ */
 						$fd = fopen("/tmp/acb_restoredebug.txt", "w");
