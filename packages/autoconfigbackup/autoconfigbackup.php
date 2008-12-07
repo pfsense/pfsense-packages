@@ -249,6 +249,10 @@ include("head.inc");
 						print_input_errors($input_errors);
 					} else {
 						$ds = split("\+\+\+\+", $data);
+						echo "<h1>Hostname</h1>";						
+						echo "<textarea rows='1' cols='70'>{$hostname}</textarea>";
+						echo "<h1>Revision date/time</h1>";
+						echo "<textarea rows='1' cols='70'>{$_REQUEST['download']}</textarea>";
 						echo "<h1>SHA256 summary</h1>";
 						echo "<textarea rows='1' cols='70'>{$ds[0]}</textarea>";
 						echo "<h1>Encrypted config.xml</h1>";
