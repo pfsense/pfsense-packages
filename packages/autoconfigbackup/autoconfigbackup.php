@@ -78,85 +78,6 @@ if($_POST['backup']) {
 if($_REQUEST['savemsg']) 
 	$savemsg = htmlentities($_REQUEST['savemsg']);
 
-if($_REQUEST['newver'] != "") {
-	// Phone home and obtain backups
-	$curl_session = curl_init();
-	curl_setopt($curl_session, CURLOPT_URL, $get_url);
-	curl_setopt($curl_session, CURLOPT_POST, 3);				
-	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
-	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
-	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=restore" . 
-		"&hostname=" . urlencode($hostname) . 	
-		"&revision=" . urlencode($_REQUEST['newver']));
-	$data = curl_exec($curl_session);
-	$data_split = split("\+\+\+\+", $data);
-	$sha256 = $data_split[0];	// sha256
-	$data = $data_split[1];
-	if (!tagfile_deformat($data, $data, "config.xml")) 
-		$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
-	$data = decrypt_data($data, $decrypt_password);
-	$fd = fopen("/tmp/config_restore.xml", "w");
-	fwrite($fd, $data);
-	fclose($fd);
-	if(strlen($data) < 50) 
-		$input_errors[] = "The decrypted config.xml is under 50 characters, something went wrong.  Aborting.";
-	$ondisksha256 = trim(`/sbin/sha256 /tmp/config_restore.xml | awk '{ print $4 }'`);
-	if($sha256 != "0" && $sha256 != "")  // we might not have a sha256 on file for older backups
-		if($ondisksha256 <> $sha256)
-			$input_errors[] = "SHA256 does not match, cannot restore. ({$sha256}) - ({$ondisksha256})";
-	if (curl_errno($curl_session)) {
-		/* If an error occured, log the error in /tmp/ */
-		$fd = fopen("/tmp/acb_restoredebug.txt", "w");
-		fwrite($fd, $get_url . "" . "action=restore&hostname={$hostname}&revision=" . urlencode($_REQUEST['newver']) . "\n\n");
-		fwrite($fd, $data);
-		fwrite($fd, curl_error($curl_session));
-		fclose($fd);
-	} else {
-	    curl_close($curl_session);
-	}
-	if(!$input_errors && $data) {
-		if(config_restore("/tmp/config_restore.xml") == 0) {
-			$savemsg = "Successfully reverted the pfSense configuration to timestamp " . urldecode($_REQUEST['newver']) . ".";
-			$savemsg .= <<<EOF
-			<p/>
-		  <form action="reboot.php" method="post">
-			Would you like to reboot? 
-		  <input name="Submit" type="submit" class="formbtn" value=" Yes ">
-		  <input name="Submit" type="submit" class="formbtn" value=" No ">
-		</form>
-EOF;
-	    	
-		} else {
-			$savemsg = "Unable to revert to the selected configuration.";
-		}
-	}
-	unlink("/tmp/config_restore.xml");
-} 
-
-if($_REQUEST['rmver'] != "") {
-	$curl_session = curl_init();
-	curl_setopt($curl_session, CURLOPT_URL, $del_url);
-	curl_setopt($curl_session, CURLOPT_POST, 3);				
-	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
-	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
-	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=delete" . 
-		"&hostname=" . urlencode($hostname) . 
-		"&revision=" . urlencode($_REQUEST['rmver']));
-	$data = curl_exec($curl_session);
-	if (curl_errno($curl_session)) {
-		$fd = fopen("/tmp/acb_deletedebug.txt", "w");
-		fwrite($fd, $get_url . "" . "action=delete&hostname=" . 
-			urlencode($hostname) . "&revision=" . 
-			urlencode($_REQUEST['rmver']) . "\n\n");
-		fwrite($fd, $data);
-		fwrite($fd, curl_error($curl_session));
-		fclose($fd);
-	} else {
-	    curl_close($curl_session);
-		$savemsg = "Backup revision {$_REQUEST['rmver']} has been removed.";
-	}
-}
-
 if($_REQUEST['download']) 
 	$pgtitle = "Diagnostics: Auto Configuration Backup revision information";
 else
@@ -207,6 +128,86 @@ include("head.inc");
 				<img src='themes/metallic/images/misc/loader.gif'> Loading, please wait...
 			</div>
 			<?php
+				if($_REQUEST['rmver'] != "") {
+					$curl_session = curl_init();
+					curl_setopt($curl_session, CURLOPT_URL, $del_url);
+					curl_setopt($curl_session, CURLOPT_POST, 3);				
+					curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
+					curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
+					curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=delete" . 
+						"&hostname=" . urlencode($hostname) . 
+						"&revision=" . urlencode($_REQUEST['rmver']));
+					$data = curl_exec($curl_session);
+					if (curl_errno($curl_session)) {
+						$fd = fopen("/tmp/acb_deletedebug.txt", "w");
+						fwrite($fd, $get_url . "" . "action=delete&hostname=" . 
+							urlencode($hostname) . "&revision=" . 
+							urlencode($_REQUEST['rmver']) . "\n\n");
+						fwrite($fd, $data);
+						fwrite($fd, curl_error($curl_session));
+						fclose($fd);
+						$savemsg = "An error occurred while trying to remove the item from portal.pfsense.org.";
+					} else {
+					    curl_close($curl_session);
+						$savemsg = "Backup revision {$_REQUEST['rmver']} has been removed.";
+					}
+					print_info_box($savemsg);
+				}			
+				if($_REQUEST['newver'] != "") {
+					// Phone home and obtain backups
+					$curl_session = curl_init();
+					curl_setopt($curl_session, CURLOPT_URL, $get_url);
+					curl_setopt($curl_session, CURLOPT_POST, 3);				
+					curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
+					curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
+					curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=restore" . 
+						"&hostname=" . urlencode($hostname) . 	
+						"&revision=" . urlencode($_REQUEST['newver']));
+					$data = curl_exec($curl_session);
+					$data_split = split("\+\+\+\+", $data);
+					$sha256 = $data_split[0];	// sha256
+					$data = $data_split[1];
+					if (!tagfile_deformat($data, $data, "config.xml")) 
+						$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
+					$data = decrypt_data($data, $decrypt_password);
+					$fd = fopen("/tmp/config_restore.xml", "w");
+					fwrite($fd, $data);
+					fclose($fd);
+					if(strlen($data) < 50) 
+						$input_errors[] = "The decrypted config.xml is under 50 characters, something went wrong.  Aborting.";
+					$ondisksha256 = trim(`/sbin/sha256 /tmp/config_restore.xml | awk '{ print $4 }'`);
+					if($sha256 != "0" && $sha256 != "")  // we might not have a sha256 on file for older backups
+						if($ondisksha256 <> $sha256)
+							$input_errors[] = "SHA256 does not match, cannot restore. ({$sha256}) - ({$ondisksha256})";
+					if (curl_errno($curl_session)) {
+						/* If an error occured, log the error in /tmp/ */
+						$fd = fopen("/tmp/acb_restoredebug.txt", "w");
+						fwrite($fd, $get_url . "" . "action=restore&hostname={$hostname}&revision=" . urlencode($_REQUEST['newver']) . "\n\n");
+						fwrite($fd, $data);
+						fwrite($fd, curl_error($curl_session));
+						fclose($fd);
+					} else {
+					    curl_close($curl_session);
+					}
+					if(!$input_errors && $data) {
+						if(config_restore("/tmp/config_restore.xml") == 0) {
+							$savemsg = "Successfully reverted the pfSense configuration to timestamp " . urldecode($_REQUEST['newver']) . ".";
+							$savemsg .= <<<EOF
+							<p/>
+						  <form action="reboot.php" method="post">
+							Would you like to reboot? 
+						  <input name="Submit" type="submit" class="formbtn" value=" Yes ">
+						  <input name="Submit" type="submit" class="formbtn" value=" No ">
+						</form>
+EOF;
+	    	
+						} else {
+							$savemsg = "Unable to revert to the selected configuration.";
+						}
+						print_info_box($savemsg);
+					}
+					unlink("/tmp/config_restore.xml");
+				} 			
 				if($_REQUEST['download']) {
 					// Phone home and obtain backups
 					$curl_session = curl_init();
