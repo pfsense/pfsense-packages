@@ -255,12 +255,13 @@ include("head.inc");
 						$configtype = "Encrypted";
 						if (!tagfile_deformat($data, $data, "config.xml")) 
 							$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
-						$data = decrypt_data($data, $decrypt_password);						
-						
+						$data = decrypt_data($data, $decrypt_password);
 						echo "<h2>Hostname</h2>";						
 						echo "<textarea rows='1' cols='70'>{$hostname}</textarea>";
 						echo "<h2>Revision date/time</h2>";
 						echo "<textarea name='download' rows='1' cols='70'>{$_REQUEST['download']}</textarea>";
+						echo "<h2>Revision reason</h2>";
+						echo "<textarea name='download' rows='1' cols='70'>{$_REQUEST['reason']}</textarea>";
 						echo "<h2>SHA256 summary</h2>";
 						echo "<textarea name='shasum' rows='1' cols='70'>{$sha256sum}</textarea>";
 						echo "<h2>Encrypted config.xml</h2>";
@@ -291,7 +292,7 @@ include("head.inc");
 		  <a title="Restore this revision" onClick="return confirm('Are you sure you want to restore <?= $cv['time']; ?>?')" href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>">
 			<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0">
 		  </a>
-		  <a title="Show info" href="autoconfigbackup.php?download=<?=urlencode($cv['time']);?>">
+		  <a title="Show info" href="autoconfigbackup.php?download=<?=urlencode($cv['time']);?>&reason=<?php echo urlencode($cv['reason']);?>">
 			<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_down.gif" width="17" height="17" border="0">
 		  </a>
 		  <a title="Delete" onClick="return confirm('Are you sure you want to delete <?= $cv['time']; ?>?')"href="autoconfigbackup.php?rmver=<?=urlencode($cv['time']);?>">
