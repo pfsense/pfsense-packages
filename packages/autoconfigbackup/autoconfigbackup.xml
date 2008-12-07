@@ -73,6 +73,11 @@
 	    <chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/autoconfigbackup/crypt_acb.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/www/</prefix>
+	    <chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/autoconfigbackup/autoconfigbackup_backup.php</item>
+	</additional_files_needed>
 	<tabs>
 		<tab>
 			<text>Settings</text>
@@ -82,6 +87,10 @@
 		<tab>
 			<text>Restore</text>
 			<url>/autoconfigbackup.php</url>
+		</tab>
+		<tab>
+			<text>Backup now</text>
+			<url>/autoconfigbackup_backup.php</url>
 		</tab>
 	</tabs>
 	<fields>

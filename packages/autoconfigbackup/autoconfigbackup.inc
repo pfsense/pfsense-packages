@@ -100,6 +100,13 @@ function upload_config() {
 	 *   (C) 2008 BSD Perimeter LLC 
 	 *
 	 */
+	
+	if(file_exists("/tmp/acb_nooverwrite")) {
+		unlink("/tmp/acb_nooverwrite");
+		$nooverwrite = "true";
+	} else {
+		$nooverwrite = "false";
+	}
 
 	// Define some needed variables
 	if(!file_exists("/cf/conf/lastpfSbackup.txt")) {
@@ -152,6 +159,7 @@ function upload_config() {
 					'reason'					=> urlencode($reason),  
 					'hostname'					=> urlencode($hostname),  
 					'configxml'					=> urlencode($data),
+					'nooverwrite'				=> urlencode($nooverwrite),
 					'raw_config_sha256_hash' 	=> urlencode($raw_config_sha256_hash)
 				);
 

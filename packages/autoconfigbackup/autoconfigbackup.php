@@ -194,27 +194,6 @@ include("head.inc");
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<script type="text/javascript">
-	function backupnow() {
-		scroll(0,0);
-		var reason = prompt ("Enter the reason for the backup","");
-		var url = "/autoconfigbackup.php";
-		var pars = 'backup=yes&reason=' + reason;
-		var myAjax = new Ajax.Request(
-			url,
-			{
-				method: 'post',
-				parameters: pars,
-				onComplete: backupcomplete
-			});
-			if($('savemsg'))
-				$('savemsg').innerHTML = '';
-			$('feedbackdiv').innerHTML = "<img src='themes/metallic/images/misc/loader.gif'> One moment please, saving backup to portal.pfsense.org...<p/>";	
-	}
-	function backupcomplete(transport) {
-		document.location.href = 'autoconfigbackup.php?savemsg=Backup+completed+successfully';
-	}
-</script>
 <div id='maincontent'>
 <script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
 <?php
@@ -243,6 +222,7 @@ include("head.inc");
 	$tab_array[1] = array("Restore", $active, "/autoconfigbackup.php");
 	if($_REQUEST['download'])
 		$tab_array[] = array("Revision", true, "/autoconfigbackup.php?download={$_REQUEST['download']}");
+	$tab_array[] = array("Backup now", true, "/autoconfigbackup_backup.php");
 	display_top_tabs($tab_array);
 ?>			
   </td></tr>
@@ -279,9 +259,6 @@ include("head.inc");
 					exit;	
 				}
 			?>		
-			<form method="post" action="autoconfigbackup.php">
-				<input type="button" onClick='backupnow()' name="backup" value="Backup Now">
-			</form>
 		</td>
 	</tr>
 	<tr>
@@ -327,13 +304,6 @@ include("head.inc");
 	  			</strong>
 	  			Click the + sign next to the revision you would like to restore.
 			</p>	
-		</td>
-	</tr>
- 	<tr>
-		<td>
-			<form method="post" action="autoconfigbackup.php">
-				<input type="button" onClick='backupnow()' name="backup" value="Backup Now">
-			</form>
 		</td>
 	</tr>
   </tr>
