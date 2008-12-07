@@ -91,8 +91,9 @@ include("head.inc");
 ?>
 <form method="post" action="autoconfigbackup_backup.php">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">  
-	<tr><td>
-<div id='feedbackdiv'></div>
+	<tr>
+		<td>
+			<div id='feedbackdiv'></div>
 <?php
 	$tab_array = array();
 	$tab_array[] = array("Settings", false, "/pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0");
@@ -100,43 +101,46 @@ include("head.inc");
 	$tab_array[] = array("Backup now", true, "/autoconfigbackup_backup.php");
 	display_top_tabs($tab_array);
 ?>			
-  </td></tr>
-  <tr>
-    <td>
-		<table id="backuptable" class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
-			<tr>
-				<td colspan="2" align="left">
-					<table>
-						<tr>
-							<td align="right">
-								Enter the backup reason:
-							</td>
-							<td>
-								<input name="reason" id="reason" size="80">
-							</td>
-						</tr>
-						<tr>
-							<td align="right">
-								Do not overwrite previous backups for this hostname:
-							</td>
-							<td>
-								<input type="checkbox" name="nooverwrite">
-							</td>
-						</tr>
-						<tr>
-							<td>
-								&nbsp;
-							</td>
-						</tr>
-						<tr>
-							<td align="right">
-								<input type="submit" name="Backup" value="Backup">
-							</td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-		</table>
+  		</td>
+	</tr>
+  	<tr>
+    	<td>
+			<table id="backuptable" class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
+				<tr>
+					<td colspan="2" align="left">
+						<table>
+							<tr>
+								<td align="right">
+									Enter the backup reason:
+								</td>
+								<td>
+									<input name="reason" id="reason" size="80">
+								</td>
+							</tr>
+							<tr>
+								<td align="right">
+									Do not overwrite previous backups for this hostname:
+								</td>
+								<td>
+									<input type="checkbox" name="nooverwrite">
+								</td>
+							</tr>
+							<tr>
+								<td>
+									&nbsp;
+								</td>
+							</tr>
+							<tr>
+								<td align="right">
+									<input type="submit" name="Backup" value="Backup">
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
 	</div>
 	</td>
   </tr>
