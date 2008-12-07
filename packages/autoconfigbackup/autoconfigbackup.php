@@ -231,6 +231,9 @@ include("head.inc");
 	<table id="backuptable" class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
 		<td colspan="2" align="left">
+			<div id='loading'>
+				<img src='themes/metallic/images/misc/loader.gif'> Loading, please wait...
+			</div>
 			<?php
 				if($_REQUEST['download']) {
 					// Phone home and obtain backups
@@ -270,6 +273,9 @@ include("head.inc");
 						echo "<textarea name='dec_config_xml' rows='40' cols='70'>{$data}</textarea>";
 					}
 					echo "<p/><input type=\"button\" value=\"Install this revision\" onClick=\"document.location='autoconfigbackup.php?newver=" . urlencode($_REQUEST['download']) . "';\">";
+					echo "<script type=\"text/javascript\">";
+					echo "$('loading').innerHTML = '';";
+					echo "</script>";
 					echo "</td></tr></table></div></td></td></tr></tr></table></form>";
 					require("fend.inc");
 					exit;	
