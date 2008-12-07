@@ -131,7 +131,7 @@ if($_REQUEST['newver'] != "") {
 			$input_errors[] = "SHA256 does not match, cannot restore. ({$sha256}) - ({$ondisksha256})";
 	if (curl_errno($curl_session)) {
 		/* If an error occured, log the error in /tmp/ */
-		$fd = fopen("/tmp/backupdebug.txt", "w");
+		$fd = fopen("/tmp/acb_restoredebug.txt", "w");
 		fwrite($fd, $get_url . "" . "action=restore&hostname={$hostname}&revision=" . urlencode($_REQUEST['newver']) . "\n\n");
 		fwrite($fd, $data);
 		fwrite($fd, curl_error($curl_session));
@@ -169,8 +169,16 @@ if($_REQUEST['rmver'] != "") {
 		"&revision=" . urlencode($_REQUEST['rmver']));
 	$data = curl_exec($curl_session);
 	if (curl_errno($curl_session)) {
+		$fd = fopen("/tmp/acb_deletedebug.txt", "w");
+		fwrite($fd, $get_url . "" . "action=delete&hostname=" . 
+			urlencode($hostname) . "&revision=" . 
+			urlencode($_REQUEST['rmver']) . "\n\n");
+		fwrite($fd, $data);
+		fwrite($fd, curl_error($curl_session));
+		fclose($fd);
 	} else {
 	    curl_close($curl_session);
+		$savemsg = "Backup revision {$_REQUEST['rmver']} has been removed.";
 	}
 }
 
@@ -183,7 +191,7 @@ curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
 curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showbackups&hostname={$hostname}");
 $data = curl_exec($curl_session);
 if (curl_errno($curl_session)) {
-	$fd = fopen("/tmp/backupdebug.txt", "w");
+	$fd = fopen("/tmp/acb_backupdebug.txt", "w");
 	fwrite($fd, $get_url . "" . "action=showbackups" . "\n\n");
 	fwrite($fd, $data);
 	fwrite($fd, curl_error($curl_session));
@@ -242,7 +250,7 @@ include("head.inc");
 		echo "<div id='savemsg'>";
 		print_info_box($savemsg);
 		echo "</div>";	
-	}
+	}	
 	if ($input_errors)
 		print_input_errors($input_errors);
 
