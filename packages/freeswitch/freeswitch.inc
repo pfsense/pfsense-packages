@@ -1433,13 +1433,13 @@ function freeswitch_php_install_command()
 	exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
 	unlink_if_exists("/tmp/freeswitch.tgz");
 
-	exec("cp /tmp/please_enter_your_pin_number.wav /usr/local/www/freeswitch/please_enter_your_pin_number.wav");
+	exec("cp /tmp/please_enter_your_pin_number.wav /usr/local/freeswitch/recordings/please_enter_your_pin_number.wav");
 	unlink_if_exists("/tmp/please_enter_your_pin_number.wav");
 
-	exec("cp /tmp/begin_recording.wav /usr/local/www/freeswitch/begin_recording.wav");
+	exec("cp /tmp/begin_recording.wav /usr/local/freeswitch/recordings/begin_recording.wav");
 	unlink_if_exists("/tmp/begin_recording.wav");
   
-	exec("cp /tmp/your_pin_number_is_incorect_goodbye.wav /usr/local/www/freeswitch/your_pin_number_is_incorect_goodbye.wav");
+	exec("cp /tmp/your_pin_number_is_incorect_goodbye.wav /usr/local/freeswitch/recordings/your_pin_number_is_incorect_goodbye.wav");
 	unlink_if_exists("/tmp/your_pin_number_is_incorect_goodbye.wav");
 		
 	exec("cp /tmp/freeswitch_cmd.tmp /usr/local/www/freeswitch/freeswitch_cmd.php");
