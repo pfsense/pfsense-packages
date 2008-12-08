@@ -166,7 +166,8 @@ include("head.inc");
 	$counter = 0;
 	echo "<script type=\"text/javascript\">";
 	echo "$('loading').innerHTML = '';";
-	echo "</script>";	
+	echo "</script>";
+	$total_backups = 0;
 	foreach($statvers as $cv): 
 ?>
 		<tr valign="top">
@@ -186,13 +187,20 @@ include("head.inc");
 			</td>
 		</tr>
 <?php
+		$total_backups = $total_backups + $cv['hostnamecount'];
 		$counter++; 
 	endforeach;
 	if($counter == 0)
 		echo "<tr><td colspan='3'><center>Sorry, we could not load the status information for the account ($username).</td></tr>";
 ?>
-
-	</div>
+	<tr>
+		<td align="right">
+			Total
+		</td>
+		<td>
+			<?=$total_backups?>
+		</td>
+	</tr>
 	</td>
   </tr>
 </table>
