@@ -88,7 +88,7 @@ function test_connection($post) {
 	return;
 }
 
-function upload_config() {
+function upload_config($reasonm = "") {
 	global $config, $g, $input_errors;
 
 	/*
@@ -118,7 +118,10 @@ function upload_config() {
 	$last_backup_date 	= str_replace("\n", "", file_get_contents("/cf/conf/lastpfSbackup.txt"));
 	$last_config_change = $config['revision']['time'];
 	$hostname  			= $config['system']['hostname'] . "." . $config['system']['domain'];
-	$reason	   			= $config['revision']['description'];
+	if($reasonm)
+		$reason = $reasonm;
+	else 
+		$reason	   			= $config['revision']['description'];
 	$username 			= $config['installedpackages']['autoconfigbackup']['config'][0]['username'];
 	$password  			= $config['installedpackages']['autoconfigbackup']['config'][0]['password'];
 	$encryptpw 			= $config['installedpackages']['autoconfigbackup']['config'][0]['crypto_password'];
