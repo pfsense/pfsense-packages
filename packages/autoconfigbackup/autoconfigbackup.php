@@ -271,7 +271,8 @@ EOF;
 						echo "<h2>Decrypted config.xml</h2>";
 						echo "<textarea name='dec_config_xml' rows='40' cols='70'>{$data}</textarea>";
 					}
-					echo "<p/><input type=\"button\" value=\"Install this revision\" onClick=\"document.location='autoconfigbackup.php?newver=" . urlencode($_REQUEST['download']) . "';\">";
+					if(!$input_errors)
+						echo "<p/><input type=\"button\" value=\"Install this revision\" onClick=\"document.location='autoconfigbackup.php?newver=" . urlencode($_REQUEST['download']) . "';\">";
 					echo "<script type=\"text/javascript\">";
 					echo "$('loading').innerHTML = '';";
 					echo "</script>";
