@@ -50,11 +50,11 @@ $password			= $config['installedpackages']['autoconfigbackup']['config'][0]['pas
 // URL to restore.php
 $get_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/restore.php";
 
-// URL to stats.php
-$stats_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/showstats.php";
-
 // URL to delete.php
 $del_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/delete.php";
+
+// URL to stats.php
+$stats_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/showstats.php";
 
 // Set hostname
 $hostname			= $config['system']['hostname'] . "." . $config['system']['domain'];
@@ -62,6 +62,28 @@ $hostname			= $config['system']['hostname'] . "." . $config['system']['domain'];
 if(!$username) {
 	Header("Location: /pkg_edit.php?xml=autoconfigbackup.xml&id=0");
 	exit;
+}
+
+if($_REQUEST['delhostname']) {
+	$curl_session = curl_init();
+	curl_setopt($curl_session, CURLOPT_URL, $del_url);
+	curl_setopt($curl_session, CURLOPT_POST, 2);				
+	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
+	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);	
+	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=deletehostname&delhostname=" . urlencode($_REQUEST['delhostname']));
+	$data = curl_exec($curl_session);
+	if (curl_errno($curl_session)) {
+		$fd = fopen("/tmp/acb_deletedebug.txt", "w");
+		fwrite($fd, $get_url . "" . "action=deletehostname&hostname=" . 
+			urlencode($_REQUEST['delhostname']) . "\n\n");
+		fwrite($fd, $data);
+		fwrite($fd, curl_error($curl_session));
+		fclose($fd);
+		$savemsg = "An error occurred while trying to remove the item from portal.pfsense.org.";
+	} else {
+	    curl_close($curl_session);
+		$savemsg = "ALL backup revisions for {$_REQUEST['delhostname']} have been removed.";
+	}
 }
 
 $pgtitle = "Diagnostics: Auto Configuration Stats";
@@ -153,6 +175,14 @@ include("head.inc");
 			</td>
 			<td class="listbg"> 
 				<?= $cv['hostnamecount']; ?>
+			</td>
+			<td>
+
+			  <a title="Delete all backups for this host" onClick="return confirm('Are you sure you want to delete *ALL BACKUPS FOR THIS HOSTNAME* <?= $cv['hostname']; ?>?')"href="autoconfigbackup_stats.php?delhostname=<?=urlencode($cv['hostname'])?>">
+				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0">
+			  </a>
+
+			
 			</td>
 		</tr>
 <?php
