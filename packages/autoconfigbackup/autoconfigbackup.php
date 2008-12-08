@@ -343,7 +343,7 @@ EOF;
 			  <a title="Restore this revision" onClick="return confirm('Are you sure you want to restore <?= $cv['time']; ?>?')" href="autoconfigbackup.php?hostname=<?=urlencode($hostname)?>&newver=<?=urlencode($cv['time']);?>">
 				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0">
 			  </a>
-			  <a title="Show info" href="autoconfigbackup.php?download=<?=urlencode($cv['time']);?>&reason=<?php echo urlencode($cv['reason']);?>">
+			  <a title="Show info" href="autoconfigbackup.php?download=<?=urlencode($cv['time']);?>&hostname=<?=urlencode($hostname)?>&reason=<?php echo urlencode($cv['reason']);?>">
 				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_down.gif" width="17" height="17" border="0">
 			  </a>
 			  <a title="Delete" onClick="return confirm('Are you sure you want to delete <?= $cv['time']; ?>?')"href="autoconfigbackup.php?hostname=<?=urlencode($hostname)?>&rmver=<?=urlencode($cv['time']);?>">
