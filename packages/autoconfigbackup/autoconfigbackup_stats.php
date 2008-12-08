@@ -1,7 +1,7 @@
 <?php
 /* $Id$ */
 /*
-    autoconfigbackup_backup.php
+    autoconfigbackup_stats.php
     Copyright (C) 2008 Scott Ullrich
     All rights reserved.
 
@@ -50,6 +50,9 @@ $password			= $config['installedpackages']['autoconfigbackup']['config'][0]['pas
 // URL to restore.php
 $get_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/restore.php";
 
+// URL to stats.php
+$stats_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/showstats.php";
+
 // URL to delete.php
 $del_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/delete.php";
 
@@ -61,25 +64,13 @@ if(!$username) {
 	exit;
 }
 
-if($_POST) {	
-	if($_REQUEST['nooverwrite'])
-		touch("/tmp/acb_nooverwrite");
-	if($_REQUEST['reason']) 
-		write_config($_REQUEST['reason']);
-	else 
-		write_config("Backup invoked via Auto Config Backup.");
-	upload_config();
-	$savemsg = "Backup completed successfully.";
-	exec("echo > /cf/conf/lastpfSbackup.txt");
-	$donotshowheader=true;
-}
-
-$pgtitle = "Diagnostics: Auto Configuration Backup Now";
+$pgtitle = "Diagnostics: Auto Configuration Stats";
 
 include("head.inc");
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
 <div id='maincontent'>
 <?php
 	include("fbegin.inc"); 
@@ -92,7 +83,7 @@ include("head.inc");
 		print_input_errors($input_errors);
 
 ?>
-<form method="post" action="autoconfigbackup_backup.php">
+<form method="post" action="autoconfigbackup_stats.php">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">  
 	<tr>
 		<td>
@@ -102,53 +93,80 @@ include("head.inc");
 				$tab_array = array();
 				$tab_array[] = array("Settings", false, "/pkg_edit.php?xml=autoconfigbackup.xml&amp;id=0");
 				$tab_array[] = array("Restore", false, "/autoconfigbackup.php");
-				$tab_array[] = array("Backup now", true, "/autoconfigbackup_backup.php");
-				$tab_array[] = array("Stats", false, "/autoconfigbackup_stats.php");
+				$tab_array[] = array("Backup now", false, "/autoconfigbackup_backup.php");
+				$tab_array[] = array("Stats", true, "/autoconfigbackup_stats.php");
 				display_top_tabs($tab_array);
 			?>			
   		</td>
 	</tr>
-  	<tr>
-    	<td>
-			<table id="backuptable" class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
-				<tr>
-					<td colspan="2" align="left">
-						<table>
-							<tr>
-								<td align="right">
-									Enter the backup reason:
-								</td>
-								<td>
-									<input name="reason" id="reason" size="80">
-								</td>
-							</tr>
-							<tr>
-								<td align="right">
-									Do not overwrite previous backups for this hostname:
-								</td>
-								<td>
-									<input type="checkbox" name="nooverwrite">
-								</td>
-							</tr>
-							<tr>
-								<td>
-									&nbsp;
-								</td>
-							</tr>
-							<tr>
-								<td align="right">
-									<input type="submit" name="Backup" value="Backup">
-								</td>
-							</tr>
-						</table>
-					</td>
-				</tr>
-			</table>
-		</td>
+  <tr>
+    <td>
+	<table id="backuptable" class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
+	<tr>
+		<td colspan="2" align="left">
+			<div id="loading">
+				<img src="themes/metallic/images/misc/loader.gif"> Loading, please wait...
+			</div>
 	</tr>
+	<tr>
+		<td width="30%" class="listhdrr">Hostname</td>
+		<td width="70%" class="listhdrr">Backup count</td>
+	</tr>			
+<?php 
+	// Populate available backups
+	$curl_session = curl_init();
+	curl_setopt($curl_session, CURLOPT_URL, $stats_url);  
+	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
+	curl_setopt($curl_session, CURLOPT_POST, 1);
+	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showstats");
+	$data = curl_exec($curl_session);
+	if (curl_errno($curl_session)) {
+		$fd = fopen("/tmp/acb_statsdebug.txt", "w");
+		fwrite($fd, $get_url . "" . "action=showstats" . "\n\n");
+		fwrite($fd, $data);
+		fwrite($fd, curl_error($curl_session));
+		fclose($fd);
+	} else {
+	    curl_close($curl_session);
+	}
+	// Loop through and create new confvers
+	$data_split = split("\n", $data);
+	$statvers = array();
+	foreach($data_split as $ds) {
+		$ds_split = split($oper_sep, $ds);
+		$tmp_array = array();
+		$tmp_array['hostname'] = $ds_split[0];
+		$tmp_array['hostnamecount'] = $ds_split[1];
+		if($ds_split[0] && $ds_split[1])
+			$statvers[] = $tmp_array;
+	}
+	$counter = 0;
+	echo "<script type=\"text/javascript\">";
+	echo "$('loading').innerHTML = '';";
+	echo "</script>";	
+	foreach($statvers as $cv): 
+?>
+		<tr valign="top">
+			<td class="listlr">
+				<?= $cv['hostname']; ?>
+			</td>
+			<td class="listbg"> 
+				<?= $cv['hostnamecount']; ?>
+			</td>
+		</tr>
+<?php
+		$counter++; 
+	endforeach;
+	if($counter == 0)
+		echo "<tr><td colspan='3'><center>Sorry, we could not load the status information for the account ($username).</td></tr>";
+?>
+
 	</div>
 	</td>
   </tr>
+</table>
+</td></tr>
 </table>
 </form>
 <?php include("fend.inc"); ?>

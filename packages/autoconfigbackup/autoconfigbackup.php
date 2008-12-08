@@ -98,6 +98,7 @@ include("head.inc");
 		if($_REQUEST['download'])
 			$tab_array[] = array("Revision", true, "/autoconfigbackup.php?download={$_REQUEST['download']}");
 		$tab_array[] = array("Backup now", false, "/autoconfigbackup_backup.php");
+		$tab_array[] = array("Stats", false, "/autoconfigbackup_stats.php");
 		display_top_tabs($tab_array);
 	?>			
   </td></tr>
