@@ -179,7 +179,11 @@ include("head.inc");
 			</td>
 			<td>
 
-			  <a title="Delete all backups for this host" onClick="return confirm('Are you sure you want to delete *ALL BACKUPS FOR THIS HOSTNAME* <?= $cv['hostname']; ?>?')"href="autoconfigbackup_stats.php?delhostname=<?=urlencode($cv['hostname'])?>">
+			  <a title="View all backups for this host" href="autoconfigbackup.php?hostname=<?=urlencode($cv['hostname'])?>">
+				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0">
+			  </a>
+
+			  <a title="Delete all backups for this host" onClick="return confirm('Are you sure you want to delete *ALL BACKUPS FOR THIS HOSTNAME* <?= $cv['hostname']; ?>?')" href="autoconfigbackup_stats.php?delhostname=<?=urlencode($cv['hostname'])?>">
 				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0">
 			  </a>
 
