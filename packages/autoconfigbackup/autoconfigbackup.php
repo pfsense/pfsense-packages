@@ -258,6 +258,10 @@ EOF;
 						if (!tagfile_deformat($data, $data, "config.xml")) 
 							$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
 						$data = decrypt_data($data, $decrypt_password);
+						if(!strstr($data, "pfsense")) {
+							$data = "Could not decrypt.  Different encryption key?";
+							$input_errors[] = "Could not decrypt config.xml";
+						}
 						echo "<h2>Hostname</h2>";						
 						echo "<textarea rows='1' cols='70'>{$hostname}</textarea>";
 						echo "<h2>Revision date/time</h2>";
