@@ -48,11 +48,20 @@ $password			= $config['installedpackages']['autoconfigbackup']['config'][0]['pas
 // URL to restore.php
 $get_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/restore.php";
 
+// URL to stats
+$stats_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/showstats.php";
+
 // URL to delete.php
 $del_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackups/delete.php";
 
 // Set hostname
-$hostname			= $config['system']['hostname'] . "." . $config['system']['domain'];
+if($_REQUEST['hostname'])
+	$hostname		= $_REQUEST['hostname'];
+else
+	$hostname		= $config['system']['hostname'] . "." . $config['system']['domain'];
+
+// Hostname of local machine
+$myhostname		= $config['system']['hostname'] . "." . $config['system']['domain'];
 
 if(!$username) {
 	Header("Location: /pkg_edit.php?xml=autoconfigbackup.xml&id=0");
@@ -69,6 +78,36 @@ else
 
 include("head.inc");
 
+function get_hostnames() {
+	global $stats_url, $username, $oper_sep;
+	// Populate available backups
+	$curl_session = curl_init();
+	curl_setopt($curl_session, CURLOPT_URL, $stats_url);  
+	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);	
+	curl_setopt($curl_session, CURLOPT_POST, 1);
+	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showstats");
+	$data = curl_exec($curl_session);
+	if (curl_errno($curl_session)) {
+		$fd = fopen("/tmp/acb_statsdebug.txt", "w");
+		fwrite($fd, $stats_url . "" . "action=showstats" . "\n\n");
+		fwrite($fd, $data);
+		fwrite($fd, curl_error($curl_session));
+		fclose($fd);
+	} else {
+	    curl_close($curl_session);
+	}
+	// Loop through and create new confvers
+	$data_split = split("\n", $data);
+	$statvers = array();
+	foreach($data_split as $ds) {
+		$ds_split = split($oper_sep, $ds);
+		if($ds_split[0])
+			$statvers[] = $ds_split[0];;
+	}
+	return $statvers;
+}
+
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <div id='maincontent'>
@@ -84,6 +123,8 @@ include("head.inc");
 	}	
 	if ($input_errors)
 		print_input_errors($input_errors);
+	if($hostname <> $myhostname) 
+			print_info_box("Warning! You are currently viewing an alternate hosts backup history ($hostname)");
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">  <tr><td>
 <div id='feedbackdiv'></div>
@@ -100,6 +141,7 @@ include("head.inc");
 		$tab_array[] = array("Backup now", false, "/autoconfigbackup_backup.php");
 		$tab_array[] = array("Stats", false, "/autoconfigbackup_stats.php");
 		display_top_tabs($tab_array);
+		$hostnames = get_hostnames();
 	?>			
   </td></tr>
   <tr>
@@ -269,6 +311,19 @@ EOF;
 			?>
 		</td>
 	</tr>
+			<tr>
+				<td colspan="2">
+					<center>
+					<b>Hostname:</b>
+					<select id="hostname" name="hostname" onChange="document.location='autoconfigbackup.php?hostname=' + this.value;">
+						<?foreach($hostnames as $hn):?>
+						<option value='<?=$hn?>'><?=$hn?></option>
+						<?endforeach?>
+						<option value='<?=$hostname?>' SELECTED><?=$hostname?></option>
+					</select>
+				</td>
+			</tr>
+	
 	<tr>
 		<td width="30%" class="listhdrr">Date</td>
 		<td width="70%" class="listhdrr">Configuration Change</td>
@@ -284,13 +339,13 @@ EOF;
 		  <td class="listlr"> <?= $cv['time']; ?></td>
 			<td class="listbg"> <?= $cv['reason']; ?></td>
 			<td colspan="2" valign="middle" class="list" nowrap>
-			  <a title="Restore this revision" onClick="return confirm('Are you sure you want to restore <?= $cv['time']; ?>?')" href="autoconfigbackup.php?newver=<?=urlencode($cv['time']);?>">
+			  <a title="Restore this revision" onClick="return confirm('Are you sure you want to restore <?= $cv['time']; ?>?')" href="autoconfigbackup.php?hostname=<?=urlencode($hostname)?>&newver=<?=urlencode($cv['time']);?>">
 				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0">
 			  </a>
 			  <a title="Show info" href="autoconfigbackup.php?download=<?=urlencode($cv['time']);?>&reason=<?php echo urlencode($cv['reason']);?>">
 				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_down.gif" width="17" height="17" border="0">
 			  </a>
-			  <a title="Delete" onClick="return confirm('Are you sure you want to delete <?= $cv['time']; ?>?')"href="autoconfigbackup.php?rmver=<?=urlencode($cv['time']);?>">
+			  <a title="Delete" onClick="return confirm('Are you sure you want to delete <?= $cv['time']; ?>?')"href="autoconfigbackup.php?hostname=<?=urlencode($hostname)?>&rmver=<?=urlencode($cv['time']);?>">
 				<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0">
 			  </a>
 		  </td>
