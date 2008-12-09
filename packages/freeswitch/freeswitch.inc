@@ -160,8 +160,10 @@ function event_socket_request_cmd($cmd)
 
 function  recording_js() {
     
+    $admin_pin = $config['installedpackages']['freeswitchsettings']['config'][0]['admin_pin'];
+    
     $fout = fopen("/usr/local/freeswitch/scripts/recordings.js","w");
-    $tmp = "  var pin = \"".$rowhelper['admin_pin']."\";\n";
+    $tmp = "  var pin = \"".$admin_pin."\";\n";
     $tmp .= "  //var pin = \"\"; //don't require a pin\n";
     $tmp .= "    //if you choose not to require a pin then then you may want to add a dialplan condition for a specific caller id\n";
     $tmp .= "\n";
@@ -212,17 +214,17 @@ function  recording_js() {
     $tmp .= "  dtmf.digits = \"\";\n";
     $tmp .= "\n";
     $tmp .= "  if ( session.ready( ) ) {\n";
-    $tmp .= "  session.answer( );\n";
+    $tmp .= "      session.answer( );\n";
     $tmp .= "\n";
-    //$tmp .= "  session.execute(\"set\", \"tts_engine=flite\");\n";
-    //$tmp .= "  session.execute(\"set\", \"tts_voice=kal\");\n";
-    //$tmp .= "  session.execute(\"speak\", \"Please enter your pin number now.\");\n";
-    $tmp .= "  digitmaxlength = 6;\n";    
-    $tmp .= "  session.execute(\"set\", \"playback_terminators=#\");\n";
-    $tmp .= "  session.streamFile( \"/usr/local/freeswitch/recordings/please_enter_your_pin_number.wav\", mycb, \"dtmf\");\n";    
+
     $tmp .= "\n";
     $tmp .= "  if (pin.length > 0) {\n";
-    //$tmp .= "      session.streamFile( \"custom/pin.wav\", mycb, \"dtmf\");\n";
+    //$tmp .= "      session.execute(\"set\", \"tts_engine=flite\");\n";
+    //$tmp .= "      session.execute(\"set\", \"tts_voice=kal\");\n";
+    //$tmp .= "      session.execute(\"speak\", \"Please enter your pin number now.\");\n";
+    $tmp .= "      digitmaxlength = 6;\n";    
+    $tmp .= "      session.execute(\"set\", \"playback_terminators=#\");\n";
+    $tmp .= "      session.streamFile( \"/usr/local/freeswitch/recordings/please_enter_your_pin_number.wav\", mycb, \"dtmf\");\n";    
     $tmp .= "      session.collectInput( mycb, dtmf, timeoutpin );\n";
     $tmp .= "  }\n";
     $tmp .= "\n";
