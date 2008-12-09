@@ -851,14 +851,18 @@ function sync_package_freeswitch_ivr() {
 	          $ent['fielddata'] = '^'.$rowhelper['ivrextension'].'$';
 	      		$a_dialplan_include_details[] = $ent;
 	      		unset($ent);
-	      		
+	      	  
+	      	  $ivrid = str_replace(array("{", "}"), "", $rowhelper['ivrid']);
+	      	  	
 	          $ent = array();
 	          $ent['dialplanincludeid'] = $dialplanincludeid;
 	          $ent['tag'] = 'action'; //condition, action, antiaction
 	          $ent['fieldtype'] = 'javascript';
-	          $ent['fielddata'] = 'ivr_'.$rowhelper['ivrid'].'.js';
+	          $ent['fielddata'] = 'ivr_'.$ivrid.'.js';
 	      		$a_dialplan_include_details[] = $ent;
 	      		unset($ent);
+	      		
+	      	  unset($ivrid);
 	      		 		
 	  		}
 	      if ($action == 'update') {
@@ -1117,7 +1121,7 @@ function sync_package_freeswitch_ivr() {
 	    
 	    $x = 0;
 	    if (count($a_ivr_options) > 0) {
-		    foreach(a_ivr_options as $row) {
+		    foreach($a_ivr_options as $row) {
 		      
 		      /*
 		      $row['ivrid']
@@ -1796,7 +1800,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.3.1";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.3.6";
 	
 	       
 	conf_mount_ro();
