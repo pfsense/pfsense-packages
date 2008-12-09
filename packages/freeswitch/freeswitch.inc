@@ -217,11 +217,12 @@ function  recording_js() {
     //$tmp .= "  session.execute(\"set\", \"tts_engine=flite\");\n";
     //$tmp .= "  session.execute(\"set\", \"tts_voice=kal\");\n";
     //$tmp .= "  session.execute(\"speak\", \"Please enter your pin number now.\");\n";
-    //$tmp .= "  session.execute(\"set\", \"playback_terminators=#\");\n";
+    $tmp .= "  digitmaxlength = 6;\n";    
+    $tmp .= "  session.execute(\"set\", \"playback_terminators=#\");\n";
+    $tmp .= "  session.streamFile( \"/usr/local/freeswitch/recordings/please_enter_your_pin_number.wav\", mycb, \"dtmf\");\n";    
     $tmp .= "\n";
     $tmp .= "  if (pin.length > 0) {\n";
-    $tmp .= "      digitmaxlength = 6;\n";
-    $tmp .= "      session.streamFile( \"custom/pin.wav\", mycb, \"dtmf\");\n";
+    //$tmp .= "      session.streamFile( \"custom/pin.wav\", mycb, \"dtmf\");\n";
     $tmp .= "      session.collectInput( mycb, dtmf, timeoutpin );\n";
     $tmp .= "  }\n";
     $tmp .= "\n";
@@ -229,7 +230,8 @@ function  recording_js() {
     //$tmp .= "      //console_log( \"info\", \"Recordings pin is correct\\n\" );\n";
     //$tmp .= "      session.execute(\"set\", \"tts_engine=flite\");\n";
     //$tmp .= "      session.execute(\"set\", \"tts_voice=kal\");\n";
-    //$tmp .= "      session.execute(\"speak\", \"Begin your recording now.\");\n";
+    //$tmp .= "      session.execute(\"speak\", \"Begin recording.\");\n";
+    $tmp .= "      session.streamFile( \"/usr/local/freeswitch/recordings/begin_recording.wav\", mycb, \"dtmf\");\n";    
     $tmp .= "      session.execute(\"set\", \"playback_terminators=#\");\n";
     $tmp .= "      session.execute(\"record\", \"/usr/local/freeswitch/recordings/temp\"+Year+Month+Day+Hours+Mins+Seconds+\".wav 180 200\");\n";
     $tmp .= "  }\n";
@@ -238,6 +240,7 @@ function  recording_js() {
     //$tmp .= "      session.execute(\"set\", \"tts_engine=flite\");\n";
     //$tmp .= "      session.execute(\"set\", \"tts_voice=kal\");\n";
     //$tmp .= "      session.execute(\"speak\", \"Your pin number is incorect, goodbye.\");\n";
+    $tmp .= "      session.streamFile( \"/usr/local/freeswitch/recordings/your_pin_number_is_incorect_goodbye.wav\", mycb, \"dtmf\");\n";
     $tmp .= "  }\n";
     $tmp .= "  session.hangup();\n";
     $tmp .= "\n";
