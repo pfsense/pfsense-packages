@@ -35,7 +35,8 @@
 */
 
 
-function guid(){
+function guid()
+{
     if (function_exists('com_create_guid')){
         return com_create_guid();
     }else{
@@ -157,7 +158,8 @@ function event_socket_request_cmd($cmd)
 }
 
 
-function  recording_js() {
+function  recording_js()
+{
 
     global $config;    
     $admin_pin = $config['installedpackages']['freeswitchsettings']['config'][0]['admin_pin'];
@@ -256,8 +258,8 @@ function  recording_js() {
  
 function sync_package_freeswitch_settings()
 {
-	global $config;
-  
+
+  global $config; 
   if($config['installedpackages']['freeswitchsettings']['config'] != "") {
   
       conf_mount_rw();
@@ -265,7 +267,7 @@ function sync_package_freeswitch_settings()
 	
       foreach($config['installedpackages']['freeswitchsettings']['config'] as $rowhelper) {
 
-      		$fout = fopen("/usr/local/freeswitch/conf/directory/default/default.xml","w");		
+          $fout = fopen("/usr/local/freeswitch/conf/directory/default/default.xml","w");		
           $tmpxml = "<include>\n";
           $tmpxml .= "  <user id=\"default\"> <!--if id is numeric mailbox param is not necessary-->\n";
           $tmpxml .= "    <variables>\n";
@@ -282,14 +284,14 @@ function sync_package_freeswitch_settings()
           fclose($fout);
           
           $fout = fopen("/usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml","w");
-        	$tmpxml = "<configuration name=\"event_socket.conf\" description=\"Socket Client\">\n";
-        	$tmpxml .= "  <settings>\n";
-        	$tmpxml .= "    <param name=\"listen-ip\" value=\"". $config['interfaces']['lan']['ipaddr'] ."\"/>\n";
-        	$tmpxml .= "    <param name=\"listen-port\" value=\"" . $rowhelper['event_socket_port'] . "\"/>\n"; 
-        	$tmpxml .= "    <param name=\"password\" value=\"" . $rowhelper['event_socket_password'] . "\"/>\n";
-        	$tmpxml .= "    <!--<param name=\"apply-inbound-acl\" value=\"lan\"/>-->\n";
-        	$tmpxml .= "  </settings>\n";
-        	$tmpxml .= "</configuration>";
+          $tmpxml = "<configuration name=\"event_socket.conf\" description=\"Socket Client\">\n";
+          $tmpxml .= "  <settings>\n";
+          $tmpxml .= "    <param name=\"listen-ip\" value=\"". $config['interfaces']['lan']['ipaddr'] ."\"/>\n";
+          $tmpxml .= "    <param name=\"listen-port\" value=\"" . $rowhelper['event_socket_port'] . "\"/>\n"; 
+          $tmpxml .= "    <param name=\"password\" value=\"" . $rowhelper['event_socket_password'] . "\"/>\n";
+          $tmpxml .= "    <!--<param name=\"apply-inbound-acl\" value=\"lan\"/>-->\n";
+          $tmpxml .= "  </settings>\n";
+          $tmpxml .= "</configuration>";
           fwrite($fout, $tmpxml);
           unset($tmpxml, $event_socket_password);
           fclose($fout);
@@ -323,9 +325,10 @@ function sync_package_freeswitch_settings()
 
 function sync_package_freeswitch_dialplan()
 {
-	global $config;
-	conf_mount_rw();
-	config_unlock();
+
+  global $config;
+  conf_mount_rw();
+  config_unlock();
         
   if(strlen($config['installedpackages']['freeswitchdialplan']['config'][0]['dialplan_default_xml']) == 0) {
       /* dialplan not found in the pfsense config.xml get the default dialplan and save to config.xml. */
@@ -355,8 +358,8 @@ function sync_package_freeswitch_dialplan()
 
 function sync_package_freeswitch_extensions()
 {
-	global $config;
-    
+
+  global $config;    
   if($config['installedpackages']['freeswitchextensions']['config'] != "") {
 
     	conf_mount_rw();
@@ -426,15 +429,15 @@ function sync_package_freeswitch_extensions()
 
 function sync_package_freeswitch_gateways()
 {
-	global $config;
-  
+
+  global $config;  
   if($config['installedpackages']['freeswitchgateways']['config'] != "") {
   
       conf_mount_rw();
-    	config_unlock();
+      config_unlock();
     	
-    	/* delete all old gateways to prepare for new ones */ 
-    	unlink_if_exists("/usr/local/freeswitch/conf/sip_profiles/external/*.xml");
+      /* delete all old gateways to prepare for new ones */ 
+      unlink_if_exists("/usr/local/freeswitch/conf/sip_profiles/external/*.xml");
     	
       foreach($config['installedpackages']['freeswitchgateways']['config'] as $rowhelper) {
 
@@ -508,9 +511,10 @@ function sync_package_freeswitch_gateways()
 
 function sync_package_freeswitch_modules()
 {
-	global $config;
-	conf_mount_rw();
-	config_unlock();
+  
+  global $config;
+  conf_mount_rw();
+  config_unlock();
 
   foreach($config['installedpackages']['freeswitchmodules']['config'] as $rowhelper) {
   		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/modules.conf.xml","w");
@@ -619,7 +623,7 @@ function sync_package_freeswitch_modules()
       fclose($fout);
   }
 
-	conf_mount_ro();
+  conf_mount_ro();
   $cmd = "api reloadxml";
   //event_socket_request_cmd($cmd);
   unset($cmd);
@@ -629,13 +633,14 @@ function sync_package_freeswitch_modules()
 
 function sync_package_freeswitch_public()
 {
-	global $config;
-	conf_mount_rw();
-	config_unlock();
+
+  global $config;
+  conf_mount_rw();
+  config_unlock();
         
   if(strlen($config['installedpackages']['freeswitchpublic']['config'][0]['public_xml']) == 0) {
       /* dialplan_public_xml not found in the pfsense config.xml get the default public.xml and save to config.xml. */
-    	$filename = "/usr/local/freeswitch/conf/dialplan/public/00_inbound_did.xml";
+      $filename = "/usr/local/freeswitch/conf/dialplan/public/00_inbound_did.xml";
       $fout = fopen($filename,"r");
       $tmpxml = fread($fout, filesize($filename));  
       $config['installedpackages']['freeswitchpublic']['config'][0]['public_xml'] = base64_encode($tmpxml);
@@ -644,14 +649,14 @@ function sync_package_freeswitch_public()
   }
   else {
       /* found dialplan_public_xml in the pfsense config.xml save it to public.xml. */
-    	$fout = fopen("/usr/local/freeswitch/conf/dialplan/public/00_inbound_did.xml","w");
+      $fout = fopen("/usr/local/freeswitch/conf/dialplan/public/00_inbound_did.xml","w");
       $tmpxml = $config['installedpackages']['freeswitchpublic']['config'][0]['public_xml'];
       fwrite($fout, base64_decode($tmpxml));
       fclose($fout);
       unset($tmpxml);
   }
 
-	conf_mount_ro();
+  conf_mount_ro();
   //$cmd = "api reloadxml";
   //event_socket_request_cmd($cmd);
   unset($cmd);
@@ -661,9 +666,10 @@ function sync_package_freeswitch_public()
 
 function sync_package_freeswitch_vars()
 {
-	global $config;
-	conf_mount_rw();
-	config_unlock();
+
+  global $config;
+  conf_mount_rw();
+  config_unlock();
         
   if(strlen($config['installedpackages']['freeswitchvars']['config'][0]['vars_xml']) == 0) {
       /* dialplan not found in the pfsense config.xml get the default dialplan and save to config.xml. */
@@ -683,7 +689,7 @@ function sync_package_freeswitch_vars()
       unset($tmpxml);
   }
 
-	conf_mount_ro();
+  conf_mount_ro();
   $cmd = "api reloadxml";
   //event_socket_request_cmd($cmd);
   unset($cmd);
@@ -715,7 +721,7 @@ function sync_package_freeswitch_internal()
       unset($tmpxml);
   }
 
-	conf_mount_ro();
+  conf_mount_ro();
   $cmd = "api reloadxml";
   //event_socket_request_cmd($cmd);
   unset($cmd);
@@ -725,13 +731,13 @@ function sync_package_freeswitch_internal()
 
 function sync_package_freeswitch_external()
 {
-	global $config;
-	conf_mount_rw();
-	config_unlock();
+  global $config;
+  conf_mount_rw();
+  config_unlock();
         
   if(strlen($config['installedpackages']['freeswitchexternal']['config'][0]['external_xml']) == 0) {
       /* external_xml not found in the pfsense config.xml get the external.xml and save to config.xml. */
-    	$filename = "/usr/local/freeswitch/conf/sip_profiles/external.xml";
+      $filename = "/usr/local/freeswitch/conf/sip_profiles/external.xml";
       $fout = fopen($filename,"r");
       $tmpxml = fread($fout, filesize($filename));  
       $config['installedpackages']['freeswitchexternal']['config'][0]['external_xml'] = base64_encode($tmpxml);
@@ -740,14 +746,14 @@ function sync_package_freeswitch_external()
   }
   else {
       /* found the external_xml in the pfsense config.xml save it to external.xml. */
-    	$fout = fopen("/usr/local/freeswitch/conf/sip_profiles/external.xml","w");
+      $fout = fopen("/usr/local/freeswitch/conf/sip_profiles/external.xml","w");
       $tmpxml = $config['installedpackages']['freeswitchexternal']['config'][0]['external_xml'];
       fwrite($fout, base64_decode($tmpxml));
       fclose($fout);
       unset($tmpxml);
   }
 
-	conf_mount_ro();
+  conf_mount_ro();
   $cmd = "api reloadxml";
   //event_socket_request_cmd($cmd);
   unset($cmd);
@@ -755,7 +761,9 @@ function sync_package_freeswitch_external()
 }
 
 
-function get_recording_filename($id) {
+function get_recording_filename($id)
+{
+  global $config;
   $a_recordings = &$config['installedpackages']['freeswitchrecordings']['config'];
     if (count($a_recordings) > 0) {
       global $config;
@@ -768,7 +776,8 @@ function get_recording_filename($id) {
 }
   
 
-function sync_package_freeswitch_ivr() {
+function sync_package_freeswitch_ivr()
+{
 
   global $config;
   conf_mount_rw();
@@ -879,8 +888,7 @@ function sync_package_freeswitch_ivr() {
 	          //update the config
 	          $a_dialplan_includes[$id] = $ent;
 	
-	      		unset($ent);
-	      		
+	      		unset($ent);	      		
 	      		unset($extensionname);
 	      		unset($order);
 	      		unset($context);
@@ -888,7 +896,7 @@ function sync_package_freeswitch_ivr() {
 	      		unset($descr);
 	      		unset($opt1name);
 	      		unset($opt1value);
-	          unset($id);                    		
+	      		unset($id);                    		
 	  		}
 	  		write_config();
 	   		  		
@@ -1219,10 +1227,12 @@ function sync_package_freeswitch_ivr() {
 } //end function
 
 
-function sync_package_freeswitch_dialplan_includes() {
-	global $config;
-	conf_mount_rw();
-	config_lock();
+function sync_package_freeswitch_dialplan_includes()
+{
+
+  global $config;
+  conf_mount_rw();
+  config_lock();
 
   $a_dialplan_includes          = &$config['installedpackages']['freeswitchdialplanincludes']['config'];
   $a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];
@@ -1309,15 +1319,17 @@ function sync_package_freeswitch_dialplan_includes() {
   } //if array count 
       
   conf_mount_ro();
-	config_unlock();
+  config_unlock();
   
 }
 
 
-function sync_package_freeswitch_public_includes() {
-	global $config;
-	conf_mount_rw();
-	config_lock();
+function sync_package_freeswitch_public_includes() 
+{
+
+  global $config;
+  conf_mount_rw();
+  config_lock();
 
   $a_public_includes          	= &$config['installedpackages']['freeswitchpublicincludes']['config'];
   $a_public_include_details 	= &$config['installedpackages']['freeswitchpublicincludedetails']['config'];
@@ -1410,6 +1422,7 @@ function sync_package_freeswitch_public_includes() {
 
 function sync_package_freeswitch() 
 {
+  
   global $config;   
   sync_package_freeswitch_settings();
   sync_package_freeswitch_dialplan();
@@ -1424,7 +1437,8 @@ function sync_package_freeswitch()
   if (pkg_is_service_running('freeswitch')) {  
       sync_package_freeswitch_ivr();
   }
-  sync_package_freeswitch_dialplan_includes();  
+  sync_package_freeswitch_dialplan_includes();
+    
 }
     
 
@@ -1560,33 +1574,33 @@ function freeswitch_php_install_command()
     
     $ent = array();
     $ent['dialplanincludeid'] = $dialplanincludeid;
-		$ent['extensionname'] = 'Recordings';
-		$ent['order'] = '9000';
-		$ent['context'] = 'default';
-		$ent['enabled'] = 'true';			
-		$ent['descr'] = 'Default system recordings tool';
-		$a_dialplan_includes[] = $ent;
-		unset($dialplanincludeid);
+    $ent['extensionname'] = 'Recordings';
+    $ent['order'] = '9000';
+    $ent['context'] = 'default';
+    $ent['enabled'] = 'true';			
+    $ent['descr'] = 'Default system recordings tool';
+    $a_dialplan_includes[] = $ent;
+    unset($dialplanincludeid);
  		
     $ent = array();
     $ent['dialplanincludeid'] = $dialplanincludeid;
     $ent['tag'] = 'condition'; //condition, action, antiaction
     $ent['fieldtype'] = 'destination_number';
     $ent['fielddata'] = '^732673$';
-		$a_dialplan_include_details[] = $ent;
-		unset($ent);
+    $a_dialplan_include_details[] = $ent;
+    unset($ent);
 		
     $ent = array();
     $ent['dialplanincludeid'] = $dialplanincludeid;
     $ent['tag'] = 'action'; //condition, action, antiaction
     $ent['fieldtype'] = 'javascript';
     $ent['fielddata'] = 'recordings.js';
-		$a_dialplan_include_details[] = $ent;
-		unset($ent);
+    $a_dialplan_include_details[] = $ent;
+    unset($ent);
 
-		write_config();		
+    write_config();		
     sync_package_freeswitch_dialplan_includes();		
-		unset($dialplanincludeid);
+    unset($dialplanincludeid);
 		
 
 	$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml","w");
@@ -1598,9 +1612,9 @@ function freeswitch_php_install_command()
 	$tmpxml .= "    <!--<param name=\"apply-inbound-acl\" value=\"lan\"/>-->\n";
 	$tmpxml .= "  </settings>\n";
 	$tmpxml .= "</configuration>";
-  fwrite($fout, $tmpxml);
-  unset($tmpxml);
-  fclose($fout);
+	fwrite($fout, $tmpxml);
+	unset($tmpxml);
+	fclose($fout);
   
   /* freeswitch modules defaults */
    
@@ -1800,7 +1814,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.3.6";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.3.7";
 	
 	       
 	conf_mount_ro();
@@ -1809,7 +1823,8 @@ function freeswitch_php_install_command()
 }
 
 
-function freeswitch_deinstall_command() {
+function freeswitch_deinstall_command() 
+{
 
 	conf_mount_rw();
 	config_lock();
@@ -1845,7 +1860,6 @@ function freeswitch_deinstall_command() {
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_time_conditions.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_time_conditions_edit.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_status.php");
-
 	
 	exec("rm -R /usr/local/freeswitch/");
 	exec("rm -R /usr/local/www/freeswitch/");
