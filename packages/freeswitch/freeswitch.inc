@@ -142,8 +142,7 @@ function event_socket_request($fp, $cmd)
 
 function event_socket_request_cmd($cmd)
 {
-	global $config;
-
+  global $config;
   $password = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_password'];
   $port = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_port'];  
   $host = $config['interfaces']['lan']['ipaddr'];
@@ -159,7 +158,8 @@ function event_socket_request_cmd($cmd)
 
 
 function  recording_js() {
-    
+
+    global $config;    
     $admin_pin = $config['installedpackages']['freeswitchsettings']['config'][0]['admin_pin'];
     
     $fout = fopen("/usr/local/freeswitch/scripts/recordings.js","w");
