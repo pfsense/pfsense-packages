@@ -868,8 +868,8 @@ function sync_package_freeswitch_ivr()
 	          $ent['tag'] = 'action'; //condition, action, antiaction
 	          $ent['fieldtype'] = 'javascript';
 	          $ent['fielddata'] = 'ivr_'.$ivrid.'.js';
-	      		$a_dialplan_include_details[] = $ent;
-	      		unset($ent);
+	          $a_dialplan_include_details[] = $ent;
+	          unset($ent);
 	      		
 	      	  unset($ivrid);
 	      		 		
@@ -1071,7 +1071,8 @@ function sync_package_freeswitch_ivr()
 	
 	    $tmp .= $tmpaction;
 	    $tmp .= "             else {\n";
-	    $tmp .= $tmpactiondefault;
+	    $tmp .= "	                  session.execute(\"transfer\", dtmf.digits+\" XML default\");\n";
+	    //$tmp .= $tmpactiondefault;
 	    $tmp .= "             }\n";
 	    $tmp .= "\n";
 	    unset($tmpaction);  
@@ -1106,7 +1107,7 @@ function sync_package_freeswitch_ivr()
 	    $tmp .= "         //pickup the remaining digits\n";
 	    $tmp .= "         //http://wiki.freeswitch.org/wiki/Session_getDigits\n";
 	    $tmp .= "         //getDigits(length, terminators, timeout, digit_timeout, abs_timeout)\n";
-	    $tmp .= "         dtmf.digits +=  session.getDigits(2, \"#\", 3000);\n";
+	    $tmp .= "         dtmf.digits +=  session.getDigits(3, \"#\", 3000);\n";
 	    $tmp .= "\n";
 	    $tmp .= "         console_log( \"info\", \"IVR Digit Pressed: \" + dtmf.digits + \"\\n\" );\n";
 	    $tmp .= "\n";
@@ -1191,7 +1192,8 @@ function sync_package_freeswitch_ivr()
 	    
 	    $tmp .= $tmpantiaction;
 	    $tmp .= "             else {\n";
-	    $tmp .= $tmpantiactiondefault;
+	    $tmp .= "	                  session.execute(\"transfer\", dtmf.digits+\" XML default\");\n";	    
+	    //$tmp .= $tmpantiactiondefault;
 	    $tmp .= "             }\n";
 	    $tmp .= "\n";
 	    unset($tmpantiaction);
@@ -1814,7 +1816,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.3.7";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.3.8";
 	
 	       
 	conf_mount_ro();
