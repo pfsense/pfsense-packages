@@ -50,6 +50,11 @@
 	<title>Diagnostics: ntop Settings</title>
         <savetext>Change</savetext>
 	<aftersaveredirect>pkg_edit.php?xml=ntop.xml&amp;id=0</aftersaveredirect>
+	<additional_files_needed>
+	    <prefix>/usr/local/lib/</prefix>
+	    <chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/ntop/bin/librrd_th.so.2</item>
+	</additional_files_needed>	
 	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>ntop Settings</name>
@@ -65,10 +70,10 @@
 		<depends_on_service>ntop</depends_on_service>
 	</menu>
 	<service>
-                        <name>ntop</name>
-                        <rcfile>ntop.sh</rcfile>
-                        <executable>ntop</executable>
-        </service>
+		<name>ntop</name>
+		<rcfile>ntop.sh</rcfile>
+		<executable>ntop</executable>
+	</service>
 	<tabs>
 		<tab>
 			<text>ntop Settings</text>
