@@ -10,7 +10,6 @@
       <category>Network Management</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>ntop-3.3.8.tbz</depends_on_package>
-	  <depends_on_package>rrdtool-1.2.26_1.tbz</depends_on_package>
 	  <depends_on_package>gdbm-1.8.3_3.tbz</depends_on_package>
 	  <depends_on_package>perl-5.8.8_1.tbz</depends_on_package>
       <version>3.3.8</version>
