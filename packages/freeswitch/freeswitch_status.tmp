@@ -43,7 +43,12 @@ if ($_GET['a'] == "download") {
   if ($_GET['t'] == "cdrcsv") {
     $tmp = '/usr/local/freeswitch/log/cdr-csv/';
     $filename = 'Master.csv';
-  }  
+  }
+  if ($_GET['t'] == "backup") {
+    $tmp = '/tmp/';
+    $filename = 'freeswitch.bak.tgz';
+    system('cd /usr/local/;tar cvzf /tmp/freeswitch.bak.tgz freeswitch');
+  }
 	session_cache_limiter('public');
 	$fd = fopen($tmp.$filename, "rb");
 	header("Content-Type: binary/octet-stream");
@@ -53,6 +58,37 @@ if ($_GET['a'] == "download") {
 	exit;
 }
 
+if ($_GET['a'] == "other") {
+  if ($_GET['t'] == "restore") {
+    $tmp = '/tmp/';
+    $filename = 'freeswitch.bak.tgz';
+   
+    //extract a specific directory to /usr/local/freeswitch
+    if (file_exists('/tmp/'.$filename)) {
+      //echo "The file $filename exists";
+
+      //Recommended
+        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/db/');
+        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/log/');
+        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/recordings/');
+        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/scripts/');
+        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/storage/');
+        
+      //Optional  
+        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/conf/');
+        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/grammar/');  
+        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/htdocs/'); 
+        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/sounds/'); 
+    
+        header( 'Location: freeswitch_status.php?savemsg=Backup+has+been+restored.' ) ;
+    }
+    else {
+        header( 'Location: freeswitch_status.php?savemsg=Restore+failed.+Backup+file+not+found.' ) ;
+    }       
+  
+	exit;
+  }
+}
 
 include("head.inc");
 
@@ -214,6 +250,26 @@ else {
 }
 fclose($fp);  
 echo "<br /><br />\n\n";
+echo "<br /><br />\n\n";
+
+
+echo "<table width='690' cellpadding='0' cellspacing='0' border='0'>\n";
+echo "<tr>\n";
+echo "<td width='80%'>\n";
+echo "<b>Backup / Restore</b><br />\n";
+echo "The 'backup' button will tar gzip /usr/local/freeswitch/ to /tmp/freeswitch.bak.tgz it then presents a file to download. \n";
+echo "If the backup file does not exist in /tmp/freeswitch.bak.tgz then the 'restore' button will be hidden. \n";
+echo "Use Diagnostics->Command->File to upload: to browse to the file and then click on upload it now ready to be restored. \n";
+echo "<br /><br />\n";
+echo "</td>\n";
+echo "<td width='20%' valign='middle' align='right'>\n";
+echo "  <input type='button' value='backup' onclick=\"document.location.href='/freeswitch/freeswitch_status.php?a=download&t=backup';\" />\n";
+if (file_exists('/tmp/freeswitch.bak.tgz')) {
+  echo "  <input type='button' value='restore' onclick=\"document.location.href='/freeswitch/freeswitch_status.php?a=other&t=restore';\" />\n";
+}
+echo "</td>\n";
+echo "</tr>\n";
+echo "</table>\n";
 echo "<br /><br />\n\n";
 
 

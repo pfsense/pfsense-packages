@@ -990,7 +990,7 @@ function sync_package_freeswitch_ivr()
 	    $tmp .= "           session.streamFile( \"/usr/local/freeswitch/recordings/".$recording_action_filename."\", mycb, \"dtmf ".$rowhelper['ivrtimeout']."\" );\n";
 	    $tmp .= "           if (session.ready()) {\n";
 	    $tmp .= "           	if (dtmf.digits == 0) {\n";
-	    $tmp .= "           		dtmf.digits +=  session.getDigits(1, "#", ".($rowhelper['ivrtimeout']*1000)."); // ".$rowhelper['ivrtimeout']." seconds\n";
+	    $tmp .= "           		dtmf.digits +=  session.getDigits(1, \"#\", ".($rowhelper['ivrtimeout']*1000)."); // ".$rowhelper['ivrtimeout']." seconds\n";
 	    $tmp .= "           		if (dtmf.digits == 0) {\n";
 	    //$tmp .= "           			console_log( "info", "time out option: " + dtmf.digits + "\n" );\n";
 
@@ -1138,7 +1138,7 @@ function sync_package_freeswitch_ivr()
 	    $tmp .= "           session.streamFile( \"/usr/local/freeswitch/recordings/".$recording_antiaction_filename."\", mycb, \"dtmf ".$rowhelper['ivrtimeout']."\" );\n";
 	    $tmp .= "           if (session.ready()) {\n";
 	    $tmp .= "           	if (dtmf.digits == 0) {\n";
-	    $tmp .= "           		dtmf.digits +=  session.getDigits(1, "#", ".($rowhelper['ivrtimeout']*1000)."); // ".$rowhelper['ivrtimeout']." seconds\n";
+	    $tmp .= "           		dtmf.digits +=  session.getDigits(1, \"#\", ".($rowhelper['ivrtimeout']*1000)."); // ".$rowhelper['ivrtimeout']." seconds\n";
 	    $tmp .= "           		if (dtmf.digits == 0) {\n";
 	    //$tmp .= "           			console_log( "info", "time out option: " + dtmf.digits + "\n" );\n";
 
@@ -1889,7 +1889,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.3.9";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.0";
 	
 	       
 	conf_mount_ro();
