@@ -858,8 +858,8 @@ function sync_package_freeswitch_ivr()
 	          $ent['tag'] = 'condition'; //condition, action, antiaction
 	          $ent['fieldtype'] = 'destination_number';
 	          $ent['fielddata'] = '^'.$rowhelper['ivrextension'].'$';
-	      		$a_dialplan_include_details[] = $ent;
-	      		unset($ent);
+	          $a_dialplan_include_details[] = $ent;
+	          unset($ent);
 	      	  
 	      	  $ivrid = str_replace(array("{", "}"), "", $rowhelper['ivrid']);
 	      	  	
@@ -921,7 +921,6 @@ function sync_package_freeswitch_ivr()
 	    $tmp .= "\n";
 	    $tmp .= " var condition = true;\n";
 	    $tmp .= "\n";
-	    $tmp .= " var dtmftimeout = 3;\n";
 	    $tmp .= " var domain = \"".$domain."\"; //by default this is the ipv4 address of FreeSWITCH used for transfer to voicemail\n";
 	    $tmp .= " var digitmaxlength = 0;\n";
 	    $tmp .= " var objdate = new Date();\n";
@@ -989,7 +988,43 @@ function sync_package_freeswitch_ivr()
 	    $tmp .= "         while (session.ready() && ! exit ) {\n";
 	    $tmp .= "           //session.streamFile( \"C:/Program Files/FreeSWITCH/sounds/".$recording_action_filename."\", mycb, \"dtmf ".$rowhelper['ivrtimeout']."\" );\n";
 	    $tmp .= "           session.streamFile( \"/usr/local/freeswitch/recordings/".$recording_action_filename."\", mycb, \"dtmf ".$rowhelper['ivrtimeout']."\" );\n";
-	    $tmp .= "           //session.collectInput( mycb, dtmf, dtmftimeout );\n";
+	    $tmp .= "           if (session.ready()) {\n";
+	    $tmp .= "           	if (dtmf.digits == 0) {\n";
+	    $tmp .= "           		dtmf.digits +=  session.getDigits(1, "#", ".($rowhelper['ivrtimeout']*1000)."); // ".$rowhelper['ivrtimeout']." seconds\n";
+	    $tmp .= "           		if (dtmf.digits == 0) {\n";
+	    //$tmp .= "           			console_log( "info", "time out option: " + dtmf.digits + "\n" );\n";
+
+
+		//find the timeout IVR options with the correct action
+		    if (count($a_ivr_options) > 0) {
+			    foreach($a_ivr_options as $row) {		      
+	
+			    	if ($row['ivrid'] == $rowhelper['ivrid']) {
+			      
+			          if ($row['optionaction'] == "action") {
+			        	    		                  
+			                  if ($row['optiontype'] == "extension") {
+			                      $tmp .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
+			                  }
+			                  if ($row['optiontype'] == "voicemail") {
+			                      //$tmp .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
+			                      $tmp .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
+			                  }              
+			                                           
+			        	} //end anti-action
+			
+			    	} //end ivrid
+			
+			    } //end for each
+		    } //if count
+		    
+
+	    $tmp .= "           		}\n";
+	    $tmp .= "           		else {\n";
+	    $tmp .= "           			break; //dtmf found end the while loop\n";
+	    $tmp .= "           		}\n";                        	    
+	    $tmp .= "           	}\n";	    
+	    $tmp .= "           }\n";	    
 	    $tmp .= "         }\n";
 	    $tmp .= "\n";
 	    $tmp .= "         //pickup the remaining digits\n";
@@ -1101,7 +1136,45 @@ function sync_package_freeswitch_ivr()
 	    $tmp .= "         digitmaxlength = 1;\n";
 	    $tmp .= "         while (session.ready() && ! exit ) {\n";
 	    $tmp .= "           session.streamFile( \"/usr/local/freeswitch/recordings/".$recording_antiaction_filename."\", mycb, \"dtmf ".$rowhelper['ivrtimeout']."\" );\n";
-	    $tmp .= "           //session.collectInput( mycb, dtmf, dtmftimeout );\n";
+	    $tmp .= "           if (session.ready()) {\n";
+	    $tmp .= "           	if (dtmf.digits == 0) {\n";
+	    $tmp .= "           		dtmf.digits +=  session.getDigits(1, "#", ".($rowhelper['ivrtimeout']*1000)."); // ".$rowhelper['ivrtimeout']." seconds\n";
+	    $tmp .= "           		if (dtmf.digits == 0) {\n";
+	    //$tmp .= "           			console_log( "info", "time out option: " + dtmf.digits + "\n" );\n";
+
+
+		//find the timeout IVR options with the correct action
+		    if (count($a_ivr_options) > 0) {
+			    foreach($a_ivr_options as $row) {
+			      
+	
+			    	if ($row['ivrid'] == $rowhelper['ivrid']) {
+			      
+			          if ($row['optionaction'] == "anti-action") {
+			        	    		                  
+			                  if ($row['optiontype'] == "extension") {
+			                      $tmp .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
+			                  }
+			                  if ($row['optiontype'] == "voicemail") {
+			                      //$tmp .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
+			                      $tmp .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
+			                  }              
+			                                           
+			        	} //end anti-action
+			
+			    	} //end ivrid
+			    	
+			
+			    } //end for each
+		    } //if count
+
+
+	    $tmp .= "           		}\n";
+	    $tmp .= "           		else {\n";
+	    $tmp .= "           			break; //dtmf found end the while loop\n";
+	    $tmp .= "           		}\n";                        	    
+	    $tmp .= "           	}\n";	    
+	    $tmp .= "           }\n";
 	    $tmp .= "         }\n";
 	    $tmp .= "\n";
 	    $tmp .= "         //pickup the remaining digits\n";
@@ -1147,7 +1220,7 @@ function sync_package_freeswitch_ivr()
 		      
 		          if ($row['optionaction'] == "anti-action") {
 		        	    
-		        	    switch ($row['optionnumber']) {
+		        	  switch ($row['optionnumber']) {
 		              case "t":
 		                  
 		                  if ($row['optiontype'] == "extension") {
@@ -1816,7 +1889,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.3.8";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.3.9";
 	
 	       
 	conf_mount_ro();

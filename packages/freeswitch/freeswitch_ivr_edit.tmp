@@ -297,15 +297,21 @@ include("head.inc");
                 ?>          
               </td>
             </tr>
-            <!-- reserved for future use -->
-            <!--                      
+            <?php
+            if (strlen($pconfig['ivrtimeout']) == 0) {
+                $pconfig['ivrtimeout'] = 10; //set a default timeout
+            }           
+            ?>                   
             <tr>
               <td width="22%" valign="top" class="vncellreq">Timeout</td>
               <td width="78%" class="vtable"> 
                 <input name="ivrtimeout" type="text" class="formfld" id="ivrtimeout" size="40" value="<?=htmlspecialchars($pconfig['ivrtimeout']);?>">
+                <br><span class="vexpl">After the recording concludes the 
+                timeout sets the time in seconds to continue to wait for DTMF.  
+                If the DTMF is <br />not detected during that time the 't' 
+                timeout option is executed.</span>
               </td>
             </tr>
-            -->
             <tr>
               <td width="22%" valign="top" class="vncell">Context</td>
               <td width="78%" class="vtable"> 
