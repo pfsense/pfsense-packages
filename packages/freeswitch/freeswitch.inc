@@ -994,7 +994,7 @@ function sync_package_freeswitch_ivr()
 	    $tmp .= "           		if (dtmf.digits == 0) {\n";
 	    //$tmp .= "           			console_log( "info", "time out option: " + dtmf.digits + "\n" );\n";
 
-
+	    $a_ivr_options = &$config['installedpackages']['freeswitchivroptions']['config'];	    
 		//find the timeout IVR options with the correct action
 		    if (count($a_ivr_options) > 0) {
 			    foreach($a_ivr_options as $row) {		      
@@ -1002,7 +1002,7 @@ function sync_package_freeswitch_ivr()
 			    	if ($row['ivrid'] == $rowhelper['ivrid']) {
 			      
 			          if ($row['optionaction'] == "action") {
-			        	    		                  
+		        	     if ($row['optionnumber'] == "t") {			          
 			                  if ($row['optiontype'] == "extension") {
 			                      $tmp .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
 			                  }
@@ -1010,8 +1010,8 @@ function sync_package_freeswitch_ivr()
 			                      //$tmp .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
 			                      $tmp .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
 			                  }              
-			                                           
-			        	} //end anti-action
+		        	     }
+			          } //end anti-action
 			
 			    	} //end ivrid
 			
@@ -1064,17 +1064,17 @@ function sync_package_freeswitch_ivr()
 		        	    //$tmpaction .= "\n";
 		        	    
 		        	    switch ($row['optionnumber']) {
-		              case "t":
+		              //case "t":
 		    
-		                  if ($row['optiontype'] == "extension") {
-		                      $tmpactiondefault .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
-		                  }
-		                  if ($row['optiontype'] == "voicemail") {
-		                      //$tmpactiondefault .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
-		                      $tmpactiondefault .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-		                  }              
+		                  //if ($row['optiontype'] == "extension") {
+		                  //    $tmpactiondefault .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
+		                  //}
+		                  //if ($row['optiontype'] == "voicemail") {
+		                  //    //$tmpactiondefault .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
+		                  //    $tmpactiondefault .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
+		                  //}              
 		                                
-		                  break;
+		                  //break;
 		              default:
 		                  //$tmpaction .= "             //console_log( \"info\", \"IVR Detected 1 digit \\n\" );\n";
 		                  if ($x == 0) {
@@ -1146,11 +1146,11 @@ function sync_package_freeswitch_ivr()
 		//find the timeout IVR options with the correct action
 		    if (count($a_ivr_options) > 0) {
 			    foreach($a_ivr_options as $row) {
-			      
 	
 			    	if ($row['ivrid'] == $rowhelper['ivrid']) {
 			      
 			          if ($row['optionaction'] == "anti-action") {
+		        	     if ($row['optionnumber'] == "t") {			          
 			        	    		                  
 			                  if ($row['optiontype'] == "extension") {
 			                      $tmp .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
@@ -1159,11 +1159,10 @@ function sync_package_freeswitch_ivr()
 			                      //$tmp .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
 			                      $tmp .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
 			                  }              
-			                                           
-			        	} //end anti-action
+		        	     }
+			          } //end anti-action
 			
 			    	} //end ivrid
-			    	
 			
 			    } //end for each
 		    } //if count
@@ -1221,17 +1220,17 @@ function sync_package_freeswitch_ivr()
 		          if ($row['optionaction'] == "anti-action") {
 		        	    
 		        	  switch ($row['optionnumber']) {
-		              case "t":
+		              //case "t":
 		                  
-		                  if ($row['optiontype'] == "extension") {
-		                      $tmpantiactiondefault .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
-		                  }
-		                  if ($row['optiontype'] == "voicemail") {
-		                      //$tmpantiactiondefault .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
-		                      $tmpantiactiondefault .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-		                  }              
+		                  //if ($row['optiontype'] == "extension") {
+		                  //    $tmpantiactiondefault .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
+		                  //}
+		                  //if ($row['optiontype'] == "voicemail") {
+		                  //    //$tmpantiactiondefault .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
+		                  //    $tmpantiactiondefault .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
+		                  //}              
 		                                
-		                  break;
+		                  //break;
 		              default:
 		                  //$tmpantiaction .= "             //console_log( \"info\", \"IVR Detected 1 digit \\n\" );\n";
 		
@@ -1871,6 +1870,29 @@ function freeswitch_php_install_command()
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_zh'] = "disable";
   	}
   	
+	// if backup file exists restore it
+	    $filename = 'freeswitch.bak.tgz';
+	    	   
+	    //extract a specific directory to /usr/local/freeswitch
+	    if (file_exists('/tmp/'.$filename)) {
+	      //echo "The file $filename exists";
+	
+	      //Recommended
+	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/db/');
+	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/log/');
+	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/recordings/');
+	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/scripts/');
+	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/storage/');
+	        
+	      //Optional  
+	        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/conf/');
+	        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/grammar/');  
+	        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/htdocs/'); 
+	        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/sounds/'); 
+	    
+			unset($filename);
+	    }
+  	
 	write_rcfile(array(
 		"file" => "freeswitch.sh",
 		"start" => "/usr/local/freeswitch/bin/./freeswitch -nc",
@@ -1889,7 +1911,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.0";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.1";
 	
 	       
 	conf_mount_ro();
