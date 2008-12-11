@@ -174,35 +174,36 @@ if (is_dir($recording_dir)) {
 
  
 
-
-$i = 0;
-if (count($a_recordings) > 0) { 
-	foreach ($a_recordings as $recordingent) {
+//saved for future use if and when config.xml scales well 
+	//enough to save the files inside it
+//$i = 0;
+//if (count($a_recordings) > 0) { 
+//	foreach ($a_recordings as $recordingent) {
 	
-	  if (!is_file($recording_dir.$recordingent['filename'])) {
+//	  if (!is_file($recording_dir.$recordingent['filename'])) {
 	      //echo "not found: ".$recordingent['filename']."<br />";
 	      
 	      //recording not found restore the file from the config.xml
-	          $file_content = $recordingent['filecontent'];       
-	          $handle = fopen($recording_dir.$recordingent['filename'],'w');
-	          fwrite ($handle, base64_decode($file_content)); 
-	          unset($file_content);
-	          fclose($handle);
-	          $recordingent['filecontent'] = base64_encode($file_content);     
+	          //$file_content = $recordingent['filecontent'];       
+	          //$handle = fopen($recording_dir.$recordingent['filename'],'w');
+	          //fwrite ($handle, base64_decode($file_content)); 
+	          //unset($file_content);
+	          //fclose($handle);
+	          //$recordingent['filecontent'] = base64_encode($file_content);     
 	      
 	      // loop through recordings in the config.xml 
 	      //  if the file does not exist remove it from the file system.
 	      //unset($a_recordings[$i]);
 	      
-	      $config_change = 1; 
-	  }
-	  else {
+//	      $config_change = 1; 
+//	  }
+//	  else {
 	      //echo "found: ".$recordingent['filename']."<br />";  
-	  }
+//	  }
 	
-	$i++; 
-	}
-}
+//	$i++; 
+//	}
+//}
 
 if ($config_change == 1) {
     write_config();

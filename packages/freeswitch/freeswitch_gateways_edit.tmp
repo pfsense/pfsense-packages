@@ -206,7 +206,8 @@ if ($_POST) {
 		}
 	
 		write_config();
-		sync_package_freeswitch_gateways();
+		sync_package_freeswitch_gateways();	
+		sync_package_freeswitch_dialplan_includes();		
 		
 		header("Location: freeswitch_gateways.php");
 		exit;
