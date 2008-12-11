@@ -2,7 +2,7 @@
 <!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
-        <copyright>
+	<copyright>
         <![CDATA[
 /* $Id$ */
 /* ========================================================================== */
@@ -41,21 +41,20 @@
                                                                               */
 /* ========================================================================== */
         ]]>
-        </copyright>
+	</copyright>
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>ntop</name>
 	<version>3.0</version>
 	<title>Diagnostics: ntop Settings</title>
-        <savetext>Change</savetext>
+	<savetext>Change</savetext>
 	<aftersaveredirect>pkg_edit.php?xml=ntop.xml&amp;id=0</aftersaveredirect>
 	<additional_files_needed>
 	    <prefix>/usr/local/lib/</prefix>
 	    <chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/ntop/bin/librrd_th.so.2</item>
 	</additional_files_needed>	
-	<!-- Menu is where this packages menu will appear -->
 	<menu>
 		<name>ntop Settings</name>
 		<tooltiptext>Set ntop settings such as password and port.</tooltiptext>
@@ -85,8 +84,6 @@
 			<url>http://$myurl:3000</url>
 		</tab>
 	</tabs>
-        <!-- Do not save invokes a simple input menu and will not update
-             the configuration database. -->
 	<fields>
 		<field>
 			<fielddescr>ntop Admin Password</fielddescr>
@@ -109,6 +106,7 @@
 		</field>
     </fields>
 	<custom_php_global_functions>
+	<![CDATA[
 	function sync_package_ntop() {
 	    conf_mount_rw();
 	    config_lock();
@@ -152,9 +150,10 @@
 	    conf_mount_ro();
 	    config_unlock();
 	}
+	]]>
 	</custom_php_global_functions>
 	<custom_add_php_command>
-        	sync_package_ntop();
+		sync_package_ntop();
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
 		sync_package_ntop();
