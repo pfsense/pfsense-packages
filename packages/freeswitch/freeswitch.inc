@@ -1342,24 +1342,40 @@ function sync_package_freeswitch_dialplan_includes()
           //$rowhelper['enabled'];
          
         $tmp = "<extension name=\"".$rowhelper['extensionname']."\">\n";
-    
-        if (count($a_dialplan_include_details) > 0) {     
-          $conditioncount = 0;
-          $i = 0;
-          foreach ($a_dialplan_include_details as $ent) {
-            if ($ent['tag'] == "condition" && $rowhelper['dialplanincludeid'] == $ent['dialplanincludeid']) {
-                if ($i == 0) {
-                    $tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\">\n";
-                }
-                else {
-                    $tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\"/>\n";
-                }
-                $conditioncount++;
-                $i++;
-            }     
-     
-          }
-        }
+        
+        if (count($a_dialplan_include_details) > 0) {    
+		  
+			$conditioncount = 0;
+			$i = 0;
+          	foreach ($a_dialplan_include_details as $ent) {
+			  if ($ent['tag'] == "condition" && $rowhelper['dialplanincludeid'] == $ent['dialplanincludeid']) {
+			      $conditioncount++;
+			      $i++;
+			  }      
+			}
+			  
+			$i = 1;
+          	foreach ($a_dialplan_include_details as $ent) {
+			  if ($ent['tag'] == "condition" && $rowhelper['dialplanincludeid'] == $ent['dialplanincludeid']) {
+				    if ($conditioncount == 1) { //single condition                  
+				    	//start tag
+				    	$tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\">\n";              
+				    }
+				    else { //more than one condition                  
+						if ($i < $conditioncount) {                      
+				              //all tags should be self-closing except the last one
+				              $tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\"/>\n";
+						}
+						else {
+				            //for the last tag use the start tag                  
+				              $tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\">\n";
+						}
+				    }
+				    $i++;
+			  }
+			} //end for each
+		             
+		} //end if count
         
         if (count($a_dialplan_include_details) > 0) {
           $i = 0;
@@ -1396,6 +1412,7 @@ function sync_package_freeswitch_dialplan_includes()
         if ($conditioncount > 0) {
             $tmp .= "   </condition>\n";
         }
+        unset ($conditioncount);        
         $tmp .= "</extension>\n";
      
         
@@ -1440,23 +1457,40 @@ function sync_package_freeswitch_public_includes()
 	     
 	    $tmp = "<extension name=\"".$rowhelper['extensionname']."\">\n";
 	
-	    if (count($a_public_include_details) > 0) {     
-	      $conditioncount = 0;
-	      $i = 0;
-	      foreach ($a_public_include_details as $ent) {
-	        if ($ent['tag'] == "condition" && $rowhelper['publicincludeid'] == $ent['publicincludeid']) {
-	            if ($i == 0) {
-	                $tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\">\n";
-	            }
-	            else {
-	                $tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\"/>\n";
-	            }
-	            $conditioncount++;
-	            $i++;
-	        }     
-	 
-	      }
-	    }
+		if (count($a_public_include_details) > 0) {     
+		  
+			$conditioncount = 0;
+			$i = 0;
+			foreach ($a_public_include_details as $ent) {
+			  if ($ent['tag'] == "condition" && $rowhelper['publicincludeid'] == $ent['publicincludeid']) {
+			      $conditioncount++;
+			      $i++;
+			  }      
+			}
+			  
+			$i = 1;
+			foreach ($a_public_include_details as $ent) {
+			  if ($ent['tag'] == "condition" && $rowhelper['publicincludeid'] == $ent['publicincludeid']) {
+				    if ($conditioncount == 1) { //single condition                  
+				    	//start tag
+				    	$tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\">\n";              
+				    }
+				    else { //more than one condition                  
+						if ($i < $conditioncount) {                      
+				              //all tags should be self-closing except the last one
+				              $tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\"/>\n";
+						}
+						else {
+				            //for the last tag use the start tag                  
+				              $tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\">\n";
+						}
+				    }
+				    $i++;
+			  }
+			} //end for each
+		             
+		} //end if count
+
 	    
 	    if (count($a_public_include_details) > 0) {
 	      $i = 0;
@@ -1493,6 +1527,7 @@ function sync_package_freeswitch_public_includes()
 	    if ($conditioncount > 0) {
 	        $tmp .= "   </condition>\n";
 	    }
+	    unset ($conditioncount);
 	    $tmp .= "</extension>\n";
 	 
 	    
@@ -1932,7 +1967,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.4";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.5";
 	
 	       
 	conf_mount_ro();
