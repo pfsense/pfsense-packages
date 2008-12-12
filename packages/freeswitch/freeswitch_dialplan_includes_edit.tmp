@@ -110,7 +110,6 @@ if ($_POST) {
  
 		if (isset($id) && $a_dialplan_includes[$id]) {
 	        
-	        $a_dialplan_includes = $config['freeswitchdialplanincludes']['config'];
 	        if (count($a_dialplan_includes)>0) {
 		        foreach($a_dialplan_includes as $rowhelper) {
 		    
