@@ -98,7 +98,6 @@
 		</field>
     </fields>
 	<custom_php_global_functions>
-	<![CDATA[
 	function sync_package_ntop() {
 	    conf_mount_rw();
 	    config_lock();
@@ -142,7 +141,6 @@
 	    conf_mount_ro();
 	    config_unlock();
 	}
-	]]>
 	</custom_php_global_functions>
 	<custom_add_php_command>
 		sync_package_ntop();
