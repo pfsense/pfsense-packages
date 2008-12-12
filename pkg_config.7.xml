@@ -4,6 +4,23 @@
 <pfsensepkgs>
   <packages>
     <package>
+		<name>pure-ftpd</name>
+		<website>http://www.pureftpd.org/</website>
+		<descr>*DO NOT RUN THIS ON A FIREWALL. USE A DEDICATED MACHINE!* Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerabilities, is trivial to set up, and is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
+		<category>FTP</category>
+		<config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+		<depends_on_package>pure-ftpd-1.0.20_3.tbz</depends_on_package>
+		<version>1.0.21</version>
+		<status>Stable</status>
+		<configurationfile>pure-ftpd.xml</configurationfile>
+		<required_version>2.0</required_version>
+		<logging>
+			<facilityname>ftp</facilityname>
+			<logfilename>pure-ftpd.log</logfilename>
+		</logging>
+    </package>	
+    <package>
       <name>ntop</name>
       <website>http://www.ntop.org/</website>
       <descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
