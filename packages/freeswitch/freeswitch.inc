@@ -74,25 +74,45 @@ function pkg_is_service_running($servicename)
 
 function event_socket_create($host, $port, $password) 
 {
-   $fp = fsockopen($host, $port, $errno, $errdesc) 
-     or die("Connection to $host failed");
-   socket_set_blocking($fp,false);
-   
-   if ($fp) {
-       while (!feof($fp)) {
-          $buffer = fgets($fp, 1024);
-          usleep(100); //allow time for reponse
-          if (trim($buffer) == "Content-Type: auth/request") {
-             fputs($fp, "auth $password\n\n");
-             break;
-          }
-       }
-       return $fp;
-   }
-   else {
-       return false;
-   }           
-}
+    //$host has been deprecated
+    
+    //build the interface list
+    $i = 0; $ifdescrs = array('wan' => 'WAN', 'lan' => 'LAN');
+		for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
+			$ifdescrs['opt' . $j] = $config['interfaces']['opt' . $j]['descr'];
+		}
+		
+		//get the interface ip addresses and try to connect to them
+		foreach ($ifdescrs as $ifdescr => $ifname){
+        $ifinfo = get_interface_info($ifdescr);
+        $interface_ip_address = $ifinfo['ipaddr'];
+        
+        if (strlen($interface_ip_address) > 0) {
+
+           $fp = fsockopen($interface_ip_address, $port, $errno, $errdesc, 1);
+           socket_set_blocking($fp,false);
+           
+           if (!$fp) {
+               //connection failed continue through the loop testing other addresses 
+               //invalid handle     
+           }
+           else {
+               //connected to the socket return the handle
+
+               while (!feof($fp)) {
+                  $buffer = fgets($fp, 1024);
+                  usleep(100); //allow time for reponse
+                  if (trim($buffer) == "Content-Type: auth/request") {
+                     fputs($fp, "auth $password\n\n");
+                     break;
+                  }
+               }
+               return $fp;        
+           } 
+             
+        } //end if interface_ip_address
+		} //end foreach                     
+} //end function
 
 
 function event_socket_request($fp, $cmd) 
@@ -286,7 +306,7 @@ function sync_package_freeswitch_settings()
           $fout = fopen("/usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml","w");
           $tmpxml = "<configuration name=\"event_socket.conf\" description=\"Socket Client\">\n";
           $tmpxml .= "  <settings>\n";
-          $tmpxml .= "    <param name=\"listen-ip\" value=\"". $config['interfaces']['lan']['ipaddr'] ."\"/>\n";
+          $tmpxml .= "    <param name=\"listen-ip\" value=\"0.0.0.0\"/>\n";
           $tmpxml .= "    <param name=\"listen-port\" value=\"" . $rowhelper['event_socket_port'] . "\"/>\n"; 
           $tmpxml .= "    <param name=\"password\" value=\"" . $rowhelper['event_socket_password'] . "\"/>\n";
           $tmpxml .= "    <!--<param name=\"apply-inbound-acl\" value=\"lan\"/>-->\n";
@@ -378,7 +398,7 @@ function sync_package_freeswitch_extensions()
   	
       foreach($config['installedpackages']['freeswitchextensions']['config'] as $rowhelper) {
 
-      		$fout = fopen("/usr/local/freeswitch/conf/directory/default/".$rowhelper['extension'].".xml","w");
+          $fout = fopen("/usr/local/freeswitch/conf/directory/default/".$rowhelper['extension'].".xml","w");
 
           $tmpxml = "<include>\n";
           $tmpxml .= "  <user id=\"" . $rowhelper['extension'] . "\" mailbox=\"" . $rowhelper['mailbox'] . "\">\n";
@@ -1911,7 +1931,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.2";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.3";
 	
 	       
 	conf_mount_ro();
