@@ -1520,10 +1520,12 @@ function sync_package_freeswitch()
   global $config;   
   sync_package_freeswitch_settings();
   sync_package_freeswitch_dialplan();
+  sync_package_freeswitch_dialplan_includes();  
   sync_package_freeswitch_extensions();
   sync_package_freeswitch_gateways();
   sync_package_freeswitch_modules();
   sync_package_freeswitch_public();
+  sync_package_freeswitch_public_includes();  
   sync_package_freeswitch_vars();  
   sync_package_freeswitch_internal();
   sync_package_freeswitch_external();
@@ -1531,8 +1533,7 @@ function sync_package_freeswitch()
   if (pkg_is_service_running('freeswitch')) {  
       sync_package_freeswitch_ivr();
   }
-  sync_package_freeswitch_dialplan_includes();
-    
+
 }
     
 
@@ -1931,7 +1932,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.3";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.4";
 	
 	       
 	conf_mount_ro();
