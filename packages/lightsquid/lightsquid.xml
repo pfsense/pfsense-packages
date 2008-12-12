@@ -248,7 +248,7 @@
             		lightsquid_resync();
        </custom_php_install_command>
        <custom_php_deinstall_command>                
-            		mwexec("pkg_delete lightsquid-1.7.1");       
+#            		mwexec("pkg_delete lightsquid-1.7.1");       
             		lightsquid_deinstall();
        </custom_php_deinstall_command>
 </packagegui>

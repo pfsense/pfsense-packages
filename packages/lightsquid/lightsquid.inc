@@ -103,7 +103,12 @@ function lightsquid_install() {
          if (file_exists($lstpl_file)) {
               mwexec("tar zxvf $lstpl_file -C " . LS_TEMPLATEPATH);
               update_log("lightsquid_install: Install templates from $lstpl_file");
-         }
+         }         
+         
+         # check perl
+         if (!file_exists("/usr/bin/perl")) 
+              mwexec("ln -s /usr/local/bin/perl /usr/bin/perl");
+         
          update_log("lightsquid_install: stopped");
 }
 
@@ -116,8 +121,8 @@ function lightsquid_deinstall() {
          // control shoot to head :)
 #         mwexec(CMD_PKGDELETE);
          // remove '/usr/local/www/lightsquid' dir - any time can't be removed by templates
-         if (file_exists(LS_WWWPATH))
-             mwexec("rm -rf " . LS_WWWPATH);
+#         if (file_exists(LS_WWWPATH))
+#             mwexec("rm -rf " . LS_WWWPATH);
 
          update_log("lightsquid_deinstall: stopped");
 }
@@ -126,6 +131,10 @@ function lightsquid_resync() {
         global $config;
         $tm = '';
         $tm_squid = '';
+
+        # check perl
+        if (!file_exists("/usr/bin/perl")) 
+            mwexec("ln -s /usr/local/bin/perl /usr/bin/perl");
 
         // debug
         $light_test = array();
