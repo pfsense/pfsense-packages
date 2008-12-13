@@ -100,7 +100,9 @@ $savemsg = $_GET["savemsg"];
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
+
 <p class="pgtitle">FreeSWITCH: Status</font></p>
+
 <?php 
 if ($savemsg) {
   print_info_box($savemsg);

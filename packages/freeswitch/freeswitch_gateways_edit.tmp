@@ -214,7 +214,6 @@ if ($_POST) {
 	}
 }
 
-$pgtitle = "FreeSWITCH: Gateways: Edit";
 include("head.inc");
 
 ?>
@@ -240,7 +239,7 @@ function show_advanced_config() {
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle"><?=$pgtitle?></p>
+<p class="pgtitle">FreeSWITCH: Gateways: Edit</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 
 

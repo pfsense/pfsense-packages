@@ -63,9 +63,10 @@
       <website>http://www.freeswitch.org/</website>
       <descr>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow. </descr>
       <category>Services</category>
+      <pkginfolink>http://forum.pfsense.org/index.php/topic,11930.0.html</pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/freeswitch/freeswitch.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <version>0.4.5</version>
+      <version>0.4.6</version>
       <status>Beta</status>
       <required_version>1.2.1</required_version>
       <maintainer>markjcrane@gmail.com</maintainer>
