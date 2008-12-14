@@ -170,12 +170,12 @@ function tinydns_custom_php_changeip_command() {
 
 	/* TinyDNS Server */
 	exec("/usr/local/bin/tinydns-conf Gtinydns Gdnslog /etc/tinydns {$dnsserverip}");
+	exec("/bin/ln -s /etc/tinydns /service/");
 
 	/* AXFRDNS - Zone transfers */
 	if(is_array($ztipaddress)) 
 		exec("/usr/local/bin/axfrdns-conf Gaxfrdns Gdnslog /etc/axfrdns /etc/tinydns {$dnsserverip}");
-
-	exec("/bin/ln -s /etc/tinydns /service/");
+	exec("/bin/ln -s /etc/axfrdns /service/");
 
 	exec("echo {$dnsserverip} > /etc/tinydns/env/IP");
 	exec("/usr/bin/killall -9 tinydns");
