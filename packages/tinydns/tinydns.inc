@@ -127,6 +127,7 @@ function tinydns_custom_php_deinstall_command() {
 	exec("/usr/sbin/pw userdel Gtinydns");
 	exec("/usr/sbin/pw userdel Gdnscache");
 	exec("/usr/sbin/pw userdel Gdnslog");
+	exec("/usr/sbin/pw groupdel Gaxfrdns");
 	exec("rm /usr/local/www/*tinydns*");
 	exec("rm /usr/local/pkg/*tinydns*");
 	exec("rm /usr/local/pkg/pf/*tinydns*");
@@ -155,6 +156,9 @@ function tinydns_custom_php_changeip_command() {
 
 	$updatecron = $config['installedpackages']['tinydns']['config'][0]['updatecron'];
 
+	/* Populate Zone Transfer array */
+	$ztipaddress = populate_zt_array();
+
 	/* setup daemon tools service area */
 	if(!is_dir("/service"))	
 		exec("/bin/mkdir /service");
@@ -162,8 +166,15 @@ function tinydns_custom_php_changeip_command() {
 	exec("/usr/sbin/pw useradd Gtinydns");
 	exec("/usr/sbin/pw useradd Gdnslog");
 	exec("/usr/sbin/pw useradd Gdnscache");
+	exec("/usr/sbin/pw useradd Gaxfrdns");
 
+	/* TinyDNS Server */
 	exec("/usr/local/bin/tinydns-conf Gtinydns Gdnslog /etc/tinydns {$dnsserverip}");
+
+	/* AXFRDNS - Zone transfers */
+	if(is_array($ztipaddress)) 
+		exec("axfrdns-conf Gaxfrdns Gdnslog /etc/axfrdns /etc/tinydns {$dnsserverip}");
+
 	exec("/bin/ln -s /etc/tinydns /service/");
 
 	exec("echo {$dnsserverip} > /etc/tinydns/env/IP");
@@ -171,11 +182,11 @@ function tinydns_custom_php_changeip_command() {
 
 	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
 		if(!is_dir("/service/dnscache")) {
-				exec("/usr/sbin/pw useradd Gdnscache");
-				exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog /etc/dnscache {$dnscacheip}");
-				exec("/bin/ln -s /etc/dnscache /service/");
-				exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.original");
-				exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.dnscache");
+			exec("/usr/sbin/pw useradd Gdnscache");
+			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog /etc/dnscache {$dnscacheip}");
+			exec("/bin/ln -s /etc/dnscache /service/");
+			exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.original");
+			exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.dnscache");
 		}
 		exec("echo {$dnscacheip} > /etc/dnscache/env/IP");
 		tinydns_dnscache_forwarding_servers();
@@ -194,6 +205,44 @@ function tinydns_custom_php_changeip_command() {
 	}
 	conf_mount_ro();
 	filter_configure();
+}
+
+function populate_zt_array() {
+	global $g, $config;	
+	/* Populate Zone Transfer array */
+	if($config['installedpackages']['tinydns']['config'][0]['row']) {
+		$ztipaddress = array();
+		foreach($config['installedpackages']['tinydns']['config'][0]['row'] as $zt) {
+			$tmp = array();
+			$tmp['ztipaddress'] = $zt['ztipaddress'];
+			$tmp['dnszone'] = $zt['dnszone'];
+			$ztipaddress[] = $tmp;
+		}
+	}
+	return $ztipaddress;
+}
+
+function tinydns_setup_axfrdns() {
+	global $g, $config;
+	/* Populate Zone Transfer array */
+	$ztipaddress = populate_zt_array();
+	if(!is_array($ztipaddress)) 
+		return;
+	$fd = fopen("/etc/axfrdns/tcp","w");
+	if(!$fd) {
+		log_error("Could not open /etc/axfrdns/tcp for writing");
+		return;
+	}
+	foreach($ztipaddress as $zt) {
+		if($zt['ztipaddress'] && $zt['dnszone'])
+			$zonet = "{$zt['ztipaddress']}:allow";
+			if($zt['dnszone'] <> "*")
+				$zonet .= ",AXFR=\"{$zt['dnszone']}\"";
+			fwrite($fd, $zone . "\n");
+	}
+	fclose($fd);
+	// Recompile database
+	exec("cd /service/axfrdns && /usr/local/bin/tinydns-data");
 }
 
 function tinydns_get_record_status($record, $pingthreshold = "", $wanpingthreshold = "") {

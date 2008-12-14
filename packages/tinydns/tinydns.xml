@@ -209,6 +209,32 @@
 		</field>
 		<field>
 			<type>listtopic</type>
+			<name>Zone transfers</name>
+			<fieldname>temp</fieldname>
+		</field>
+		<field>
+			<fielddescr>Hosts allowed to perform DNS Zone Transfers</fielddescr>
+			<fieldname>none</fieldname>
+		    <type>rowhelper</type>
+		    <rowhelper>
+			<rowhelperfield>
+			    <fielddescr>IP Address</fielddescr>
+			    <fieldname>ztipaddress</fieldname>
+			    <description>Enter the IP Address that is allowed to transfer zone records (ex: 4.2.2.1)</description>
+			    <type>input</type>
+			    <size>20</size>
+			</rowhelperfield>
+			<rowhelperfield>
+			    <fielddescr>DNS Zone</fielddescr>
+			    <fieldname>dnszone</fieldname>
+			    <description>Enter the DNS zone that this IP address is allowed to transfer (ex: domain.com)</description>
+			    <type>input</type>
+			    <size>20</size>
+			</rowhelperfield>			
+		    </rowhelper>
+		</field>
+		<field>
+			<type>listtopic</type>
 			<name>Advanced tunables (OPTIONAL)</name>
 			<fieldname>temp</fieldname>						
 		</field>		
