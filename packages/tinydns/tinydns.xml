@@ -213,7 +213,7 @@
 			<fieldname>temp</fieldname>
 		</field>
 		<field>
-			<fielddescr>Hosts allowed to perform DNS Zone Transfers</fielddescr>
+			<fielddescr>Hosts allowed to perform DNS Zone Transfers - Note: this requires TCP port 25 firewall permit rule!</fielddescr>
 			<fieldname>none</fieldname>
 		    <type>rowhelper</type>
 		    <rowhelper>
@@ -225,7 +225,7 @@
 			    <size>20</size>
 			</rowhelperfield>
 			<rowhelperfield>
-			    <fielddescr>DNS Zone</fielddescr>
+			    <fielddescr>DNS Zone - Use * for all Zones</fielddescr>
 			    <fieldname>dnszone</fieldname>
 			    <description>Enter the DNS zone that this IP address is allowed to transfer (ex: domain.com)</description>
 			    <type>input</type>
