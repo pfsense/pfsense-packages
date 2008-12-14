@@ -213,7 +213,7 @@
 			<fieldname>temp</fieldname>
 		</field>
 		<field>
-			<fielddescr>Hosts allowed to perform DNS Zone Transfers - Note: this requires TCP port 25 firewall permit rule!</fielddescr>
+			<fielddescr>Hosts allowed to perform DNS Zone Transfers - Note: this requires TCP port 53 firewall permit rule!</fielddescr>
 			<fieldname>none</fieldname>
 		    <type>rowhelper</type>
 		    <rowhelper>
