@@ -173,7 +173,7 @@ function tinydns_custom_php_changeip_command() {
 
 	/* AXFRDNS - Zone transfers */
 	if(is_array($ztipaddress)) 
-		exec("axfrdns-conf Gaxfrdns Gdnslog /etc/axfrdns /etc/tinydns {$dnsserverip}");
+		exec("/usr/local/bin/axfrdns-conf Gaxfrdns Gdnslog /etc/axfrdns /etc/tinydns {$dnsserverip}");
 
 	exec("/bin/ln -s /etc/tinydns /service/");
 
