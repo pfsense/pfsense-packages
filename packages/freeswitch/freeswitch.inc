@@ -89,7 +89,7 @@ function event_socket_create($host, $port, $password)
         
         if (strlen($interface_ip_address) > 0) {
 
-           $fp = fsockopen($interface_ip_address, $port, $errno, $errdesc, 1);
+           $fp = fsockopen($interface_ip_address, $port, $errno, $errdesc, 3);
            socket_set_blocking($fp,false);
            
            if (!$fp) {
@@ -1728,10 +1728,8 @@ function freeswitch_php_install_command()
     $a_dialplan_include_details[] = $ent;
     unset($ent);
 
-    write_config();		
-    sync_package_freeswitch_dialplan_includes();		
-    unset($dialplanincludeid);
-		
+    write_config();
+    		
 
 	$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml","w");
 	$tmpxml = "<configuration name=\"event_socket.conf\" description=\"Socket Client\">\n";
@@ -1957,7 +1955,17 @@ function freeswitch_php_install_command()
 	);
 	
 	exec("rm -R /freeswitch");
-	  	       
+	exec("cp /usr/local/freeswitch/conf/directory/default/brian.xml /usr/local/freeswitch/conf/directory/default/brian.xml.noload");
+	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/brian.xml");
+	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/example.com.xml");
+	  	
+	write_rcfile(array(
+		"file" => "freeswitch.sh",
+		"start" => "/usr/local/freeswitch/bin/./freeswitch -nc",
+		"stop" => "/usr/local/freeswitch/bin/./freeswitch -stop"
+		)
+	);
+		  	       
 	sync_package_freeswitch();
 	$handle = popen("/usr/local/etc/rc.d/freeswitch.sh start", "r");
 	pclose($handle);
@@ -1967,7 +1975,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.6";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.7";
 	
 	       
 	conf_mount_ro();
