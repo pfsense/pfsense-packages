@@ -408,7 +408,7 @@ function sync_package_freeswitch_extensions()
           if (strlen($rowhelper['vm-mailto']) > 0) {
               $tmpxml .= "      <param name=\"vm-email-all-messages\" value=\"true\"/>\n";
               
-              switch ($vm-attach-file) {
+              switch ($rowhelper['vm-attach-file']) {
               case "true":
               		$tmpxml .= "      <param name=\"vm-attach-file\" value=\"true\"/>\n";
               		break;
@@ -1770,16 +1770,18 @@ function freeswitch_php_install_command()
     write_config();
     		
 	//prepare switch.conf.xml for voicemail to email
-		$handle = fopen("/usr/local/freeswitch/conf/autoload_configs/switch.conf.xml","rb");
+		$filename = "/usr/local/freeswitch/conf/autoload_configs/switch.conf.xml";
+		$handle = fopen($filename,"rb");
 		$contents = fread($handle, filesize($filename));	
 		fclose($handle);
 		
-		$handle = fopen("/usr/local/freeswitch/conf/autoload_configs/switch.conf.xml","w");
+		$handle = fopen($filename,"w");
 		$contents = str_replace("<param name=\"mailer-app\" value=\"sendmail\"/>", "<param name=\"mailer-app\" value=\"/usr/local/bin/php\"/>", $contents);
 		$contents = str_replace("<param name=\"mailer-app-args\" value=\"-t\"/>", "<param name=\"mailer-app-args\" value=\"/usr/local/www/freeswitch/freeswitch_mailto.php\"/>", $contents);
 		fwrite($handle, $contents);		
 		unset($contents); 	
 		fclose($fout);
+		unset($filename);
 	
 	
 	$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml","w");
@@ -2026,7 +2028,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.8.2";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.8.3";
 	
 	       
 	conf_mount_ro();

@@ -33,8 +33,7 @@
 require("guiconfig.inc");
 require("/usr/local/pkg/freeswitch.inc");
 
-
-$a_settings = &$config['installedpackages']['freeswitchsettings']['config'];
+global $config; 
 
 $smtphost   = $config['installedpackages']['freeswitchmodules']['config'][0]['smtphost'];
 $smtpsecure = $config['installedpackages']['freeswitchmodules']['config'][0]['smtpsecure'];  //options "", "TLS", "SSL"
