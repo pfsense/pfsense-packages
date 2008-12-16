@@ -175,7 +175,30 @@
 			<fieldname>outbound_caller_id_number</fieldname>
 			<description>Enter the outbound caller id number here.</description>
 			<type>input</type>
-		</field>		
+		</field>
+        <field>
+           	<fielddescr>Voicemail Mail To</fielddescr>
+			<fieldname>vm-mailto</fieldname>
+			<description>Optional: Enter the email address to send voicemail to.</description>
+			<type>input</type>
+        </field>
+        <field>
+           	<fielddescr>Voicemail Attach File</fielddescr>
+			<fieldname>vm-attach-file</fieldname>
+			<description>Choose whether to attach the file to the email.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>true</name>
+					<value>true</value>
+				</option>
+				<option>
+					<name>false</name>
+					<value>false</value>
+				</option>
+			</options>
+        </field>        
+        
 		<field>
 			<fielddescr>User Context</fielddescr>
 			<fieldname>user_context</fieldname>

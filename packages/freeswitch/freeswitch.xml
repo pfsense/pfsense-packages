@@ -44,7 +44,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>FreeSWITCH Settings</name>
-	<version>0.4.7</version>
+	<version>0.4.8</version>
 	<title>FreeSWITCH: Settings</title>
 	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
 	<menu>
@@ -150,6 +150,16 @@
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/class.smtp.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/class.phpmailer.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_cmd.tmp</item>
 	</additional_files_needed>	
 	<additional_files_needed>
@@ -221,7 +231,12 @@
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr_options.tmp</item>
-	</additional_files_needed>	
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_mailto.tmp</item>
+	</additional_files_needed>		
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>		
@@ -347,7 +362,61 @@
 			<fieldname>admin_pin</fieldname>
 			<description>Enter a admin pin number. Used to authenticate the admin from the phone.</description>
 			<type>input</type>
-		</field>    	
+		</field>
+		<field>
+			<fielddescr>SMTP Host</fielddescr>
+			<fieldname>smtphost</fieldname>
+			<description>Enter the SMTP host address. If you using a different port append it on the end with a semi-colon. e.g. mail.example.com:2525</description>
+			<type>input</type>
+		</field>		
+		<field>
+			<fielddescr>SMTP Secure</fielddescr>
+			<fieldname>smtpsecure</fieldname>
+			<description>Select the SMTP security. None, TLS, SSL</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>none</name>
+					<value></value>
+				</option>
+				<option>
+					<name>TLS</name>
+					<value>TLS</value>
+				</option>
+				<option>
+					<name>SSL</name>
+					<value>SSL</value>
+				</option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>SMTP Auth</fielddescr>
+			<fieldname>smtpauth</fieldname>
+			<description>Use SMTP Authentication true or false.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>true</name>
+					<value>true</value>
+				</option>
+				<option>
+					<name>false</name>
+					<value>false</value>
+				</option>
+			</options>
+		</field>		
+		<field>
+			<fielddescr>SMTP Username</fielddescr>
+			<fieldname>smtpusername</fieldname>
+			<description>Enter the SMTP authentication username.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>SMTP Password</fielddescr>
+			<fieldname>smtppassword</fieldname>
+			<description>Enter the SMTP authentication password.</description>
+			<type>input</type>
+		</field>
 	</fields>	
 	<custom_add_php_command>
 	</custom_add_php_command>

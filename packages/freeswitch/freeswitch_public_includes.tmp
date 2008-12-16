@@ -203,6 +203,7 @@ include("head.inc");
       $i = 0;
       if (count($a_public_includes) > 0) { 
         foreach ($a_public_includes as $ent) {
+          if (strlen($ent['extensionname'].$ent['enabled']) > 0) {
     ?>
     <tr>
       <td class="listlr" ondblclick="document.location='freeswitch_public_includes_edit.php?id=<?=$i;?>'">
@@ -227,9 +228,10 @@ include("head.inc");
       </td>
     </tr>
 		<?php 
-          $i++; 
-        }
-      }
+          } //end if strlen
+          $i++;
+        } //end for each
+      } //end if count
     ?>
     <tr>
       <td class="list" colspan="4"></td>

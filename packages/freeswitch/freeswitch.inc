@@ -405,18 +405,22 @@ function sync_package_freeswitch_extensions()
           $tmpxml .= "    <params>\n";
           $tmpxml .= "      <param name=\"password\" value=\"" . $rowhelper['password'] . "\"/>\n";
           $tmpxml .= "      <param name=\"vm-password\" value=\"" . $rowhelper['vm-password'] . "\"/>\n";
-          /* Disabled until further testing */
-          /* if (strlen($rowhelper['vm-mailto']) > 0) { */
-              /* $tmpxml .= "      <param name=\"vm-email-all-messages\" value=\"true\"/>\n"; */
-              /* $tmpxml .= "      <param name=\"vm-attach-file\" value=\"true\"/>\n"; */
-              /* $tmpxml .= "      <param name=\"vm-mailto\" value=\"" . $rowhelper['vm-mailto'] . "\"/>\n"; */
-          /* } */
-          /* <field> */
-          /* 	<fielddescr>Voicemail Mail To</fielddescr> */
-          /* 	<fieldname>vm-mailto</fieldname> */
-          /* 	<description>Optional: Enter the email address to send voicemail to.</description> */
-          /* 	<type>input</type> */
-          /* </field> */		
+          if (strlen($rowhelper['vm-mailto']) > 0) { */
+              $tmpxml .= "      <param name=\"vm-email-all-messages\" value=\"true\"/>\n"; */
+              
+              switch ($vm-attach-file) {
+              case "true":
+              		$tmpxml .= "      <param name=\"vm-attach-file\" value=\"true\"/>\n"; */
+              		break;
+              case "false":
+              		$tmpxml .= "      <param name=\"vm-attach-file\" value=\"false\"/>\n"; */
+              		break;
+              default:
+              		$tmpxml .= "      <param name=\"vm-attach-file\" value=\"true\"/>\n"; */
+              }
+
+              $tmpxml .= "      <param name=\"vm-mailto\" value=\"" . $rowhelper['vm-mailto'] . "\"/>\n"; */
+          }	
           $tmpxml .= "    </params>\n";
           $tmpxml .= "    <variables>\n";
           $tmpxml .= "      <variable name=\"toll_allow\" value=\"domestic,international,local\"/>\n";
@@ -1594,7 +1598,13 @@ function freeswitch_php_install_command()
   
 	exec("cp /tmp/your_pin_number_is_incorect_goodbye.wav /usr/local/freeswitch/recordings/your_pin_number_is_incorect_goodbye.wav");
 	unlink_if_exists("/tmp/your_pin_number_is_incorect_goodbye.wav");
-		
+
+	exec("cp /tmp/class.smtp.tmp /usr/local/www/freeswitch/class.smtp.php");
+	unlink_if_exists("/tmp/class.smtp.tmp");
+	
+	exec("cp /tmp/class.phpmailer.tmp /usr/local/www/freeswitch/class.phpmailer.php");
+	unlink_if_exists("/tmp/class.phpmailer.tmp");
+			
 	exec("cp /tmp/freeswitch_cmd.tmp /usr/local/www/freeswitch/freeswitch_cmd.php");
 	unlink_if_exists("/tmp/freeswitch_cmd.tmp");
 	
@@ -1640,6 +1650,9 @@ function freeswitch_php_install_command()
 	exec("cp /tmp/freeswitch_public_includes_details_edit.tmp /usr/local/www/freeswitch/freeswitch_public_includes_details_edit.php");
 	unlink_if_exists("/tmp/freeswitch_public_includes_details_edit.tmp");
 
+	exec("cp /tmp/freeswitch_mailto.tmp /usr/local/www/freeswitch/freeswitch_mailto.php");
+	unlink_if_exists("/tmp/freeswitch_mailto.tmp");
+	
 	exec("cp /tmp/freeswitch_recordings.tmp /usr/local/www/freeswitch/freeswitch_recordings.php");
 	unlink_if_exists("/tmp/freeswitch_recordings.tmp");
 	
@@ -1698,8 +1711,34 @@ function freeswitch_php_install_command()
     recording_js();
   
   //add recording.js to the dialplan
-    $a_dialplan_includes          = &$config['installedpackages']['freeswitchdialplanincludes']['config'];
+    $a_dialplan_includes          	= &$config['installedpackages']['freeswitchdialplanincludes']['config'];
     $a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];     
+
+	//delete dialplan recording from the previous install
+	    if (count($a_dialplan_includes) > 0) {
+	    	$i = 0;
+	    	foreach ($a_dialplan_includes as $ent) {
+	        	if ($ent['extensionname'] == "Recordings") {
+	            	unset($a_dialplan_includes[$i]);
+	        	}     
+	        	$i++; 
+	    	}
+	    }
+
+	//delete the recording dialplan details		    
+	    if (count($a_dialplan_include_details) > 0) {
+	    	$i = 0;
+	    	foreach ($a_dialplan_include_details as $ent) {
+	        	if ($ent['fielddata'] == "^732673$") {
+	            	unset($a_dialplan_include_details[$i]);
+	        	}
+	        	if ($ent['fielddata'] == "recordings.js") {
+	            	unset($a_dialplan_include_details[$i]);	            	
+	        	}             
+	        	$i++; 
+	      	}
+	    }
+    
     $dialplanincludeid = guid();
     
     $ent = array();
@@ -1975,7 +2014,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.7";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.8";
 	
 	       
 	conf_mount_ro();
@@ -2000,6 +2039,8 @@ function freeswitch_deinstall_command()
 	unlink_if_exists("/usr/local/pkg/freeswitch_public.xml");
 	unlink_if_exists("/usr/local/pkg/freeswitch_vars.xml");	
 
+	unlink_if_exists("/usr/local/www/freeswitch/class.smtp.php");
+	unlink_if_exists("/usr/local/www/freeswitch/class.phpmailer.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_cmd.php");	
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_dialplan_includes_details.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_dialplan_includes_edit.php");
@@ -2010,7 +2051,8 @@ function freeswitch_deinstall_command()
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_ivr_options_edit.php");  
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_ivr_options.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_gateways.php");
-	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_gateways_edit.php");	
+	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_gateways_edit.php");
+	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_mailto.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_public_includes_details.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_public_includes_edit.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_public_includes.php");	
@@ -2021,6 +2063,7 @@ function freeswitch_deinstall_command()
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_time_conditions.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_time_conditions_edit.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_status.php");
+
 	
 	exec("rm -R /usr/local/freeswitch/");
 	exec("rm -R /usr/local/www/freeswitch/");
