@@ -405,21 +405,21 @@ function sync_package_freeswitch_extensions()
           $tmpxml .= "    <params>\n";
           $tmpxml .= "      <param name=\"password\" value=\"" . $rowhelper['password'] . "\"/>\n";
           $tmpxml .= "      <param name=\"vm-password\" value=\"" . $rowhelper['vm-password'] . "\"/>\n";
-          if (strlen($rowhelper['vm-mailto']) > 0) { */
-              $tmpxml .= "      <param name=\"vm-email-all-messages\" value=\"true\"/>\n"; */
+          if (strlen($rowhelper['vm-mailto']) > 0) {
+              $tmpxml .= "      <param name=\"vm-email-all-messages\" value=\"true\"/>\n";
               
               switch ($vm-attach-file) {
               case "true":
-              		$tmpxml .= "      <param name=\"vm-attach-file\" value=\"true\"/>\n"; */
+              		$tmpxml .= "      <param name=\"vm-attach-file\" value=\"true\"/>\n";
               		break;
               case "false":
-              		$tmpxml .= "      <param name=\"vm-attach-file\" value=\"false\"/>\n"; */
+              		$tmpxml .= "      <param name=\"vm-attach-file\" value=\"false\"/>\n";
               		break;
               default:
-              		$tmpxml .= "      <param name=\"vm-attach-file\" value=\"true\"/>\n"; */
+              		$tmpxml .= "      <param name=\"vm-attach-file\" value=\"true\"/>\n";
               }
 
-              $tmpxml .= "      <param name=\"vm-mailto\" value=\"" . $rowhelper['vm-mailto'] . "\"/>\n"; */
+              $tmpxml .= "      <param name=\"vm-mailto\" value=\"" . $rowhelper['vm-mailto'] . "\"/>\n";
           }	
           $tmpxml .= "    </params>\n";
           $tmpxml .= "    <variables>\n";
@@ -2026,7 +2026,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.8.1";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.8.2";
 	
 	       
 	conf_mount_ro();
