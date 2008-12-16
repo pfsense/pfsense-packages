@@ -224,7 +224,6 @@ $content = ob_get_contents(); //get the output from the buffer
 ob_end_clean(); //clean the buffer
 
 fwrite($fp, $content);
-
 fclose($fp);
 
 ?>

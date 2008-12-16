@@ -1769,7 +1769,19 @@ function freeswitch_php_install_command()
 
     write_config();
     		
-
+	//prepare switch.conf.xml for voicemail to email
+		$handle = fopen("/usr/local/freeswitch/conf/autoload_configs/switch.conf.xml","rb");
+		$contents = fread($handle, filesize($filename));	
+		fclose($handle);
+		
+		$handle = fopen("/usr/local/freeswitch/conf/autoload_configs/switch.conf.xml","w");
+		$contents = str_replace("<param name=\"mailer-app\" value=\"sendmail\"/>", "<param name=\"mailer-app\" value=\"/usr/local/bin/php\"/>", $contents);
+		$contents = str_replace("<param name=\"mailer-app-args\" value=\"-t\"/>", "<param name=\"mailer-app-args\" value=\"/usr/local/www/freeswitch/freeswitch_mailto.php\"/>", $contents);
+		fwrite($handle, $contents);		
+		unset($contents); 	
+		fclose($fout);
+	
+	
 	$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml","w");
 	$tmpxml = "<configuration name=\"event_socket.conf\" description=\"Socket Client\">\n";
 	$tmpxml .= "  <settings>\n";
@@ -2014,7 +2026,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.8";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.8.1";
 	
 	       
 	conf_mount_ro();
