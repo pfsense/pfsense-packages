@@ -73,13 +73,15 @@ if ($_GET['act'] == "del") {
             $dialplanincludefilename = $order."_".$extensionname.".xml";
             
             //delete the dialplan include details. aka. child data
-            $i=0;
-            foreach($a_dialplan_includes_details as $row) {
-              if ($row["dialplanincludeid"] == $dialplanincludeid) {
-                  //echo "child id: ".$i."<br />\n";
-                  unset($a_dialplan_includes_details[$i]);
-              }
-              $i++;            
+            if (count($a_dialplan_includes_details) > 0) {
+	            $i=0;
+	            foreach($a_dialplan_includes_details as $row) {
+	              if ($row["dialplanincludeid"] == $dialplanincludeid) {
+	                  //echo "child id: ".$i."<br />\n";
+	                  unset($a_dialplan_includes_details[$i]);
+	              }
+	              $i++;            
+	            }
             }
             
             //if the dialplan include xml file exists then delete it
