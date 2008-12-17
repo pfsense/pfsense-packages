@@ -44,7 +44,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>FreeSWITCH Settings</name>
-	<version>0.4.9</version>
+	<version>0.5.0</version>
 	<title>FreeSWITCH: Settings</title>
 	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
 	<menu>
@@ -366,7 +366,7 @@
 		<field>
 			<fielddescr>SMTP Host</fielddescr>
 			<fieldname>smtphost</fieldname>
-			<description>Enter the SMTP host address. If you using a different port append it on the end with a semi-colon. e.g. mail.example.com:2525</description>
+			<description>Enter the SMTP host address. If you using a different port append it on the end with a semi-colon. e.g. smtp.gmail.com:465</description>
 			<type>input</type>
 		</field>		
 		<field>
@@ -380,12 +380,12 @@
 					<value></value>
 				</option>
 				<option>
-					<name>TLS</name>
-					<value>TLS</value>
+					<name>tls</name>
+					<value>tls</value>
 				</option>
 				<option>
-					<name>SSL</name>
-					<value>SSL</value>
+					<name>ssl</name>
+					<value>ssl</value>
 				</option>
 			</options>
 		</field>
@@ -417,6 +417,12 @@
 			<description>Enter the SMTP authentication password.</description>
 			<type>input</type>
 		</field>
+		<field>
+			<fielddescr>SMTP From</fielddescr>
+			<fieldname>smtpfrom</fieldname>
+			<description>Enter the SMTP From email address.</description>
+			<type>input</type>
+		</field>			
 	</fields>	
 	<custom_add_php_command>
 	</custom_add_php_command>
