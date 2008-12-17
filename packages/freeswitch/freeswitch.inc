@@ -1726,18 +1726,18 @@ function freeswitch_php_install_command()
 	    }
 
 	//delete the recording dialplan details		    
-	    if (count($a_dialplan_include_details) > 0) {
-	    	$i = 0;
-	    	foreach ($a_dialplan_include_details as $ent) {
-	        	if ($ent['fielddata'] == "^732673$") {
-	            	unset($a_dialplan_include_details[$i]);
-	        	}
-	        	if ($ent['fielddata'] == "recordings.js") {
-	            	unset($a_dialplan_include_details[$i]);	            	
-	        	}             
-	        	$i++; 
-	      	}
-	    }
+	    //if (count($a_dialplan_include_details) > 0) {
+	    //	$i = 0;
+	    //	foreach ($a_dialplan_include_details as $ent) {
+	    //    	if ($ent['fielddata'] == "^732673$") {
+	    //        	unset($a_dialplan_include_details[$i]);
+	    //    	}
+	    //    	if ($ent['fielddata'] == "recordings.js") {
+	    //        	unset($a_dialplan_include_details[$i]);	            	
+	    //    	}             
+	    //    	$i++; 
+	    //  	}
+	    //}
     
     $dialplanincludeid = guid();
     
@@ -2028,7 +2028,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.8.4";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.4.8.5";
 	
 	       
 	conf_mount_ro();
