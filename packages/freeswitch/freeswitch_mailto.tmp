@@ -41,7 +41,7 @@ $tmp_smtpauth = $config['installedpackages']['freeswitchsettings']['config'][0][
 $tmp_smtpusername = $config['installedpackages']['freeswitchsettings']['config'][0]['smtpusername'];
 $tmp_smtppassword = $config['installedpackages']['freeswitchsettings']['config'][0]['smtppassword'];
 $tmp_smtpfrom = $config['installedpackages']['freeswitchsettings']['config'][0]['smtpfrom'];
-
+$tmp_smtpfromname = $config['installedpackages']['freeswitchsettings']['config'][0]['smtpfromname'];
 
       
 ini_set(max_execution_time,900); //15 minutes
@@ -201,7 +201,7 @@ ob_start();
 
            
       $mail->From       = $tmp_smtpfrom;
-      $mail->FromName   = $var['From'];
+      $mail->FromName   = $tmp_smtpfromname;
       $mail->Subject    = $var['Subject'];
       $mail->AltBody    = $textplain;   // optional, comment out and test
       $mail->MsgHTML($texthtml);

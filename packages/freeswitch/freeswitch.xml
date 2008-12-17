@@ -44,7 +44,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>FreeSWITCH Settings</name>
-	<version>0.5.0</version>
+	<version>0.5.1</version>
 	<title>FreeSWITCH: Settings</title>
 	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
 	<menu>
@@ -422,7 +422,13 @@
 			<fieldname>smtpfrom</fieldname>
 			<description>Enter the SMTP From email address.</description>
 			<type>input</type>
-		</field>			
+		</field>
+		<field>
+			<fielddescr>SMTP From Name</fielddescr>
+			<fieldname>smtpfromname</fieldname>
+			<description>Enter the SMTP From Name.</description>
+			<type>input</type>
+		</field>
 	</fields>	
 	<custom_add_php_command>
 	</custom_add_php_command>
