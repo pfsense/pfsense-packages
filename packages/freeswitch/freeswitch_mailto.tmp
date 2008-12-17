@@ -30,16 +30,15 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
-require("/usr/local/pkg/freeswitch.inc");
-
+require_once("config.inc");
+require_once("/usr/local/pkg/freeswitch.inc");
 global $config; 
 
-$smtphost   = $config['installedpackages']['freeswitchmodules']['config'][0]['smtphost'];
-$smtpsecure = $config['installedpackages']['freeswitchmodules']['config'][0]['smtpsecure'];  //options "", "TLS", "SSL"
-$smtpauth = $config['installedpackages']['freeswitchmodules']['config'][0]['smtpauth'];     // SMTP authentication: true or false
-$smtpusername = $config['installedpackages']['freeswitchmodules']['config'][0]['smtpusername'];
-$smtppassword = $config['installedpackages']['freeswitchmodules']['config'][0]['smtppassword'];
+$tmp_smtphost   = $config['installedpackages']['freeswitchsettings']['config'][0]['smtphost'];
+$tmp_smtpsecure = $config['installedpackages']['freeswitchsettings']['config'][0]['smtpsecure'];  //options "", "TLS", "SSL"
+$tmp_smtpauth = $config['installedpackages']['freeswitchsettings']['config'][0]['smtpauth'];     // SMTP authentication: true or false
+$tmp_smtpusername = $config['installedpackages']['freeswitchsettings']['config'][0]['smtpusername'];
+$tmp_smtppassword = $config['installedpackages']['freeswitchsettings']['config'][0]['smtppassword'];
 
       
 ini_set(max_execution_time,900); //15 minutes
@@ -187,14 +186,14 @@ ob_start();
       $mail = new PHPMailer();
      
       $mail->IsSMTP();                  // set mailer to use SMTP
-      $mail->SMTPAuth = $smtpauth;      // turn on/off SMTP authentication
-      $mail->Host   = $smtphost;
-      if (strlen($smtpsecure)>0) {
-          $mail->SMTPSecure = $smtpsecure;
+      $mail->SMTPAuth = $tmp_smtpauth;      // turn on/off SMTP authentication
+      $mail->Host   = $tmp_smtphost;
+      if (strlen($tmp_smtpsecure)>0) {
+          $mail->SMTPSecure = $tmp_smtpsecure;
       }
-      if ($smtpauth) {   
-          $mail->Username = $smtpusername;
-          $mail->Password = $smtppassword;
+      if ($tmp_smtpauth) {   
+          $mail->Username = $tmp_smtpusername;
+          $mail->Password = $tmp_smtppassword;
       }     
       $mail->From       = $var['From'];
       $mail->FromName   = $var['From'];
