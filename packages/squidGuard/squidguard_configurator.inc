@@ -851,7 +851,7 @@ function sg_create_config()
 
             if (is_array($rew[FLD_ITEM])) {
                 foreach ($rew[FLD_ITEM] as $rw)
-                    $sg_tag->items[] = "s@.{$rw[FLD_TARGETURL]}@{$rw[FLD_REPLACETO]}@r";
+                    $sg_tag->items[] = "s@{$rw[FLD_TARGETURL]}@{$rw[FLD_REPLACETO]}@r";
 
                 if ($rew[FLD_LOG])
                     $sg_tag->items[] = "log " . SQUIDGUARD_ACCESSBLOCK_FILE;
@@ -955,6 +955,8 @@ function sg_create_config()
         $sg_tag_def->items[] = "pass {$def[FLD_DESTINATIONNAME]}";
         if ($def[FLD_RMOD] !== RMOD_NONE)
             $sg_tag_def->items[] = "redirect " .  sg_redirector_base_url($def[FLD_REDIRECT], $def[FLD_RMOD]);
+        if ($def[FLD_REWRITENAME])
+            $sg_tag_def->items[] = "rewrite {$def[FLD_REWRITENAME]}";
         if ($def[FLD_LOG])
             $sg_tag_def->items[] = "log " . SQUIDGUARD_ACCESSBLOCK_FILE;
 
