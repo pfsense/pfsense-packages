@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
 
-	freeswitch_recordings_edit.php
+  freeswitch_ivr_edit.php
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
   
@@ -409,7 +409,7 @@ include("head.inc");
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
-            <td valign="middle"><a href="freeswitch_ivr_options_edit.php?id=<?=$id;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=action"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+            <td valign="middle"><a href="freeswitch_ivr_options_edit.php?parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=action"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
           </tr>
         </table>
       </td>
@@ -455,7 +455,7 @@ include("head.inc");
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
-            <td valign="middle"><a href="freeswitch_ivr_options_edit.php?id=<?=$id;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=action"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+            <td valign="middle"><a href="freeswitch_ivr_options_edit.php?parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=action"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
           </tr>
         </table>
 		  </td>
@@ -507,7 +507,7 @@ include("head.inc");
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
-            <td valign="middle"><a href="freeswitch_ivr_options_edit.php?id=<?=$id;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=antiaction"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+            <td valign="middle"><a href="freeswitch_ivr_options_edit.php?parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=antiaction"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
           </tr>
         </table>
       </td>
@@ -553,7 +553,7 @@ include("head.inc");
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
-            <td valign="middle"><a href="freeswitch_ivr_options_edit.php?id=<?=$id;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=antiaction"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+            <td valign="middle"><a href="freeswitch_ivr_options_edit.php?parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=antiaction"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
           </tr>
         </table>
 		  </td>
