@@ -66,7 +66,7 @@ include("head.inc");
 	$tab_array = array();
 	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=freeswitch.xml&amp;id=0");
 	$tab_array[] = array(gettext("Dialplan"), false, "/freeswitch/freeswitch_dialplan_includes.php");
-	$tab_array[] = array(gettext("Extensions"), false, "/pkg.php?xml=freeswitch_extensions.xml");
+	$tab_array[] = array(gettext("Extensions"), false, "/freeswitch/freeswitch_extensions.php");
 	$tab_array[] = array(gettext("External"), false, "/pkg_edit.php?xml=freeswitch_external.xml&amp;id=0");	
 	$tab_array[] = array(gettext("Gateways"), false, "/freeswitch/freeswitch_gateways.php");
 	$tab_array[] = array(gettext("Internal"), false, "/pkg_edit.php?xml=freeswitch_internal.xml&amp;id=0");

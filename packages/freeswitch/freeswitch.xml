@@ -44,7 +44,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>FreeSWITCH Settings</name>
-	<version>0.5.2</version>
+	<version>0.5.3</version>
 	<title>FreeSWITCH: Settings</title>
 	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
 	<menu>
@@ -72,7 +72,7 @@
 		</tab>
 		<tab>
 			<text>Extensions</text>
-			<url>/pkg.php?xml=freeswitch_extensions.xml</url>
+			<url>/freeswitch/freeswitch_extensions.php</url>
 		</tab>
 		<tab>
 			<text>External</text>
@@ -188,10 +188,15 @@
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes_details_edit.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_extensions.xml</item>
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_extensions.tmp</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>		
+		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_extensions_edit.tmp</item>
+	</additional_files_needed>	
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>		

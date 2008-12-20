@@ -664,16 +664,17 @@ function sync_package_freeswitch_public()
         
   if(strlen($config['installedpackages']['freeswitchpublic']['config'][0]['public_xml']) == 0) {
       /* dialplan_public_xml not found in the pfsense config.xml get the default public.xml and save to config.xml. */
-      $filename = "/usr/local/freeswitch/conf/dialplan/public/00_inbound_did.xml";
+      $filename = "/usr/local/freeswitch/conf/dialplan/public.xml";
       $fout = fopen($filename,"r");
       $tmpxml = fread($fout, filesize($filename));  
+      $tmpxml = str_replace("<anti-action application=\"export\" data=\"domain_name=\${sip_req_host}\"/>", "<!--<anti-action application=\"export\" data=\"domain_name=\${sip_req_host}\"/>-->", $tmpxml);
       $config['installedpackages']['freeswitchpublic']['config'][0]['public_xml'] = base64_encode($tmpxml);
       unset($filename, $tmpxml);
       fclose($fout);
   }
   else {
       /* found dialplan_public_xml in the pfsense config.xml save it to public.xml. */
-      $fout = fopen("/usr/local/freeswitch/conf/dialplan/public/00_inbound_did.xml","w");
+      $fout = fopen("/usr/local/freeswitch/conf/dialplan/public.xml","w");
       $tmpxml = $config['installedpackages']['freeswitchpublic']['config'][0]['public_xml'];
       fwrite($fout, base64_decode($tmpxml));
       fclose($fout);
@@ -1589,7 +1590,12 @@ function freeswitch_php_install_command()
 
 	exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
 	unlink_if_exists("/tmp/freeswitch.tgz");
+	
+	//remove some default config files that are not needed
+	unlink_if_exists("/usr/local/freeswitch/conf/dialplan/default/01_example.com.xml");
+	unlink_if_exists("/usr/local/freeswitch/conf/dialplan/public/00_inbound_did.xml");
 
+	//copy audio files
 	exec("cp /tmp/please_enter_your_pin_number.wav /usr/local/freeswitch/recordings/please_enter_your_pin_number.wav");
 	unlink_if_exists("/tmp/please_enter_your_pin_number.wav");
 
@@ -1598,7 +1604,8 @@ function freeswitch_php_install_command()
   
 	exec("cp /tmp/your_pin_number_is_incorect_goodbye.wav /usr/local/freeswitch/recordings/your_pin_number_is_incorect_goodbye.wav");
 	unlink_if_exists("/tmp/your_pin_number_is_incorect_goodbye.wav");
-
+	
+	//rename PHP files from .tmp to .php
 	exec("cp /tmp/class.smtp.tmp /usr/local/www/freeswitch/class.smtp.php");
 	unlink_if_exists("/tmp/class.smtp.tmp");
 	
@@ -1619,6 +1626,12 @@ function freeswitch_php_install_command()
     	
 	exec("cp /tmp/freeswitch_dialplan_includes_edit.tmp /usr/local/www/freeswitch/freeswitch_dialplan_includes_edit.php");
 	unlink_if_exists("/tmp/freeswitch_dialplan_includes_edit.tmp");
+	
+	exec("cp /tmp/freeswitch_extensions.tmp /usr/local/www/freeswitch/freeswitch_extensions.php");
+	unlink_if_exists("/tmp/freeswitch_extensions.tmp");
+	
+	exec("cp /tmp/freeswitch_extensions_edit.tmp /usr/local/www/freeswitch/freeswitch_extensions_edit.php");
+	unlink_if_exists("/tmp/freeswitch_extensions_edit.tmp");
 
 	exec("cp /tmp/freeswitch_gateways.tmp /usr/local/www/freeswitch/freeswitch_gateways.php");
 	unlink_if_exists("/tmp/freeswitch_gateways.tmp");
@@ -2028,7 +2041,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.5.2";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.5.3";
 	
 	       
 	conf_mount_ro();
@@ -2060,6 +2073,8 @@ function freeswitch_deinstall_command()
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_dialplan_includes_edit.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_dialplan_includes.php");	
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_dialplan_includes_details_edit.php");
+	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_extensions.php");
+	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_extensions_edit.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_ivr.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_ivr_edit.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_ivr_options_edit.php");  

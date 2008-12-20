@@ -78,7 +78,7 @@
 		</tab>
 		<tab>
 			<text>Extensions</text>
-			<url>/pkg.php?xml=freeswitch_extensions.xml</url>
+			<url>/freeswitch/freeswitch_extensions.php</url>
 		</tab>
 		<tab>
 			<text>External</text>
@@ -118,72 +118,7 @@
 			<url>/pkg_edit.php?xml=freeswitch_vars.xml&amp;id=0</url>
 		</tab>
 	</tabs>
-	<configpath>installedpackages->package->$packagename->configuration->freeswitchmodules</configpath>
-	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch.tgz</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_status.tmp</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_extensions.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_external.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_gateways.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_internal.xml</item>
-	</additional_files_needed>	
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_modules.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_public.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
-		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_vars.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch.inc</item>
-	</additional_files_needed>	
-	<additional_files_needed>
-		<prefix>/usr/local/lib/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/freeswitch/libtinfo.so.5.6</item>
-	</additional_files_needed>	
-	<additional_files_needed>
-		<prefix>/usr/local/lib/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/freeswitch/libncurses.so.5.6</item>
-	</additional_files_needed>		  
+	<configpath>installedpackages->package->$packagename->configuration->freeswitchmodules</configpath> 
 	<fields>
     <field>
 			<fielddescr>&lt;b&gt;Loggers&lt;/b&gt;</fielddescr>

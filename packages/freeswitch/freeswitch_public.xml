@@ -66,7 +66,7 @@
 		</tab>
 		<tab>
 			<text>Extensions</text>
-			<url>/pkg.php?xml=freeswitch_extensions.xml</url>
+			<url>/freeswitch/freeswitch_extensions.php</url>
 		</tab>
 		<tab>
 			<text>External</text>
@@ -111,7 +111,7 @@
 		<field>
 			<fielddescr>&lt;b&gt;Public&lt;/b&gt; &lt;br /&gt; &lt;br /&gt;Directs inbound calls to extensions, IVRs, external numbers, and scripts. </fielddescr>
 			<fieldname>public_xml</fieldname>
-			<description>&lt;br /&gt;Path: /usr/local/freeswitch/conf/dialplan/public/00_inbound_did.xml &lt;br /&gt;&lt;br /&gt;</description>
+			<description>&lt;br /&gt;Path: /usr/local/freeswitch/conf/dialplan/public.xml &lt;br /&gt;&lt;br /&gt;</description>
 			<type>textarea</type>
 			<encoding>base64</encoding>
 			<wrap>off</wrap>

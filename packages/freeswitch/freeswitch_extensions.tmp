@@ -1,7 +1,7 @@
 <?php
 /* $Id$ */
 /*
-	freeswitch_ivr.php
+	freeswitch_extensions.php
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
   
@@ -33,17 +33,15 @@
 require("guiconfig.inc");
 require("/usr/local/pkg/freeswitch.inc");
 
-
-$a_ivr = &$config['installedpackages']['freeswitchivr']['config'];
+$a_extensions 	   = &$config['installedpackages']['freeswitchextensions']['config'];
 
 
 if ($_GET['act'] == "del") {
-    if ($_GET['type'] == 'ivr') {
-        if ($a_ivr[$_GET['id']]) {
-            unset($a_ivr[$_GET['id']]);
+    if ($_GET['type'] == 'extensions') {
+        if ($a_extensions[$_GET['id']]) {
+            unset($a_extensions[$_GET['id']]);
             write_config();
-            sync_package_freeswitch_ivr();
-            header("Location: freeswitch_ivr.php");
+            header("Location: freeswitch_extensions.php");
             exit;
         }
     }
@@ -53,9 +51,10 @@ include("head.inc");
 
 ?>
 
+
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">FreeSWITCH: IVR</p>
+<p class="pgtitle">FreeSWITCH: Extensions</p>
 
 <div id="mainlevel">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -65,11 +64,11 @@ include("head.inc");
 	$tab_array = array();
 	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=freeswitch.xml&amp;id=0");
 	$tab_array[] = array(gettext("Dialplan"), false, "/freeswitch/freeswitch_dialplan_includes.php");
-	$tab_array[] = array(gettext("Extensions"), false, "/freeswitch/freeswitch_extensions.php");
+	$tab_array[] = array(gettext("Extensions"), true, "/freeswitch/freeswitch_extensions.php");
 	$tab_array[] = array(gettext("External"), false, "/pkg_edit.php?xml=freeswitch_external.xml&amp;id=0");	
 	$tab_array[] = array(gettext("Gateways"), false, "/freeswitch/freeswitch_gateways.php");
 	$tab_array[] = array(gettext("Internal"), false, "/pkg_edit.php?xml=freeswitch_internal.xml&amp;id=0");
-	$tab_array[] = array(gettext("IVR"), true, "/freeswitch/freeswitch_ivr.php");
+	$tab_array[] = array(gettext("IVR"), false, "/freeswitch/freeswitch_ivr.php");
 	$tab_array[] = array(gettext("Modules"), false, "/pkg_edit.php?xml=freeswitch_modules.xml&amp;id=0");
 	$tab_array[] = array(gettext("Public"), false, "/freeswitch/freeswitch_public_includes.php");
 	$tab_array[] = array(gettext("Rec"), false, "/freeswitch/freeswitch_recordings.php");	
@@ -85,117 +84,112 @@ include("head.inc");
    <tr>
      <td class="tabcont" >
 
-<form action="freeswitch_ivr.php" method="post" name="iform" id="iform">
+<form action="freeswitch_extensions.php" method="post" name="iform" id="iform">
 <?php 
 
-
-//echo "<pre>";
-//print_r ($a_ivr);
-//echo "</pre>";
-
-//build a list of recordings from the config.xml
-//$config_recording_list = '';
-//$i = 0; 
-//if (count($a_ivr) > 0) {
-//  foreach ($a_ivr as $ivrent) {
-//    $config_recording_list .= $ivrent['filename']."|";
-//    $i++; 
-//  }
-//}
-//echo "config recording list: ".$config_recording_list."<br />\n";
-
-
-//if ($config_change == 1) {
-//    write_config();
-//    $config_change = 0;  
-//}
+if ($config_change == 1) {
+    write_config();
+    $config_change = 0;  
+}
 
 //if ($savemsg) print_info_box($savemsg); 
 //if (file_exists($d_hostsdirty_path)): echo"<p>";
-//print_info_box_np("The FreeSWITCH recordings have been changed.<br>You must apply the changes in order for them to take effect.");
+//print_info_box_np("The FreeSWITCH extensions have been changed.<br>You must apply the changes in order for them to take effect.");
 //echo"<br />";
 //endif; 
 
 ?>
   	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
       <tr>
-        <td><p><span class="vexpl"><span class="red"><strong>IVR<br />
+        <td><p><span class="vexpl"><span class="red"><strong>Extensions<br>
             </strong></span>
-              An interactive voice response (IVR) often refered to as an Auto Attendant. 
-              It associates a recording to multiple options that can be used to direct calls 
-              to extensions, voicemail, queues, other IVR applications, and external 
-              phone numbers.
-            </span></p></td>
+            Use this to configure your SIP extensions.
+            </p></td>
       </tr>
     </table>
     <br />
-        
+		
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
       <td width="20%" class="listhdrr">Extension</td>
-      <td width="25%" class="listhdrr">Name</td>
-      <td width="50%" class="listhdr">Description</td>
+      <td width="25%" class="listhdrr">Mail To</td>
+      <td width="25%" class="listhdrr">Context</td>
+      <td width="25%" class="listhdr">Description</td>
       <td width="10%" class="list">
+
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
-            <td valign="middle"><a href="freeswitch_ivr_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+            <td valign="middle"><a href="freeswitch_extensions_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
           </tr>
         </table>
+
       </td>
 		</tr>
 
+
 		<?php 
-      $i = 0;
-      if (count($a_ivr) > 0) { 
-        foreach ($a_ivr as $ent) {
-        	if (strlen($ent['ivrid']) > 0) {
+    
+    $i = 0;
+    if (count($a_extensions) > 0) {
+
+      foreach ($a_extensions as $ent) {
+    
     ?>
-    <tr>
-      <td class="listlr" ondblclick="document.location='freeswitch_ivr_edit.php?id=<?=$i;?>'">
-        <?=$ent['ivrextension']?>
-      </td>
-      <td class="listr" ondblclick="document.location='freeswitch_ivr_edit.php?id=<?=$i;?>';">
-        <?=$ent['ivrname'];?>&nbsp;
-      </td>
-      <td class="listbg" ondblclick="document.location='freeswitch_ivr_edit.php?id=<?=$i;?>';">
-        <font color="#FFFFFF"><?=htmlspecialchars($ent['ivrdescr']);?>&nbsp;
-      </td>
-      <td valign="middle" nowrap class="list">
-        <table border="0" cellspacing="0" cellpadding="1">
           <tr>
-            <td valign="middle"><a href="freeswitch_ivr_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-            <td><a href="freeswitch_ivr.php?type=ivr&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this recording?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+            <td class="listr" ondblclick="document.location='freeswitch_extensions_edit.php?id=<?=$i;?>';">
+              <?=$ent['extension'];?>&nbsp;
+            </td>      
+            <td class="listr" ondblclick="document.location='freeswitch_extensions_edit.php?id=<?=$i;?>';">
+              <?=$ent['vm-mailto'];?>&nbsp;
+            </td>
+            <td class="listr" ondblclick="document.location='freeswitch_extensions_edit.php?id=<?=$i;?>';">
+              <?=$ent['user_context'];?>&nbsp;
+            </td>      
+            <td class="listbg" ondblclick="document.location='freeswitch_extensions_edit.php?id=<?=$i;?>';">
+              <font color="#FFFFFF"><?=htmlspecialchars($ent['description']);?>&nbsp;
+            </td>
+            <td valign="middle" nowrap class="list">
+              <table border="0" cellspacing="0" cellpadding="1">
+                <tr>
+                  <td valign="middle"><a href="freeswitch_extensions_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                  <td><a href="freeswitch_extensions.php?type=extensions&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this recording?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                </tr>
+             </table>
+            </td>
           </tr>
-       </table>
-      </td>
-    </tr>
-		<?php
-          	} 
-        	$i++; 
+		<?php 
+
+          $i++; 
         }
       }
     ?>
+
     <tr>
-      <td class="list" colspan="3"></td>
-      <td class="list">
+      <td class="list" colspan="4"></td>
+      <td class="list">          
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
-            <td valign="middle"><a href="freeswitch_ivr_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+            <td valign="middle"><a href="freeswitch_extensions_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
           </tr>
         </table>
 		  </td>
      </tr>
 
+
      <tr>
-       <td class="list" colspan="3"></td>
+       <td class="list" colspan="4"></td>
        <td class="list"></td>
      </tr>
      </table>
      
 </form>
 
+
+/usr/local/freeswitch/conf/directory/default/
+<br>
+<br>
 <br>
 <br>
 <br>
