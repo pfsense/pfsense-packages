@@ -837,6 +837,38 @@
 			</options>
 	</field>
     <field>
+			<fielddescr>mod_siren</fielddescr>
+			<fieldname>mod_siren</fieldname>
+			<description>Siren codec.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>enable</name>
+					<value>enable</value>
+				</option>
+				<option>
+					<name>disable</name>
+					<value>disable</value>
+				</option>
+			</options>
+	</field>	
+    <field>
+			<fielddescr>mod_celt</fielddescr>
+			<fieldname>mod_celt</fieldname>
+			<description>Celt codec.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>enable</name>
+					<value>enable</value>
+				</option>
+				<option>
+					<name>disable</name>
+					<value>disable</value>
+				</option>
+			</options>
+	</field>
+    <field>
 			<fielddescr>mod_h26x</fielddescr>
 			<fieldname>mod_h26x</fieldname>
 			<description>H26X signed linear codec. Video Pass-thru.</description>

@@ -609,6 +609,8 @@ function sync_package_freeswitch_modules()
       if ($rowhelper['mod_amr'] == "enable"){       $tmpxml .= "    <load module=\"mod_amr\"/>\n"; }
       if ($rowhelper['mod_ilbc'] == "enable"){      $tmpxml .= "    <load module=\"mod_ilbc\"/>\n"; }
       if ($rowhelper['mod_speex'] == "enable"){     $tmpxml .= "    <load module=\"mod_speex\"/>\n"; }
+      if ($rowhelper['mod_siren'] == "enable"){     $tmpxml .= "    <load module=\"mod_siren\"/>\n"; }
+      if ($rowhelper['mod_celt'] == "enable"){     $tmpxml .= "    <load module=\"mod_celt\"/>\n"; }
       if ($rowhelper['mod_h26x'] == "enable"){      $tmpxml .= "    <load module=\"mod_h26x\"/>\n"; }
       $tmpxml .= "\n";
       $tmpxml .= "    <!-- File Format Interfaces -->\n";
@@ -1796,6 +1798,19 @@ function freeswitch_php_install_command()
 		fclose($fout);
 		unset($filename);
 	
+	//prepare shout.conf.xml for mod_shout	
+		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/shout.conf.xml","w");
+		$tmpxml = "<configuration name=\"shout.conf\" description=\"mod shout config\">\n";
+		$tmpxml .= "  <settings>\n";
+		$tmpxml .= "    <!-- Don't change these unless you are insane -->\n";
+		$tmpxml .= "    <param name=\"decoder\" value=\"i586\"/>\n";
+		$tmpxml .= "    <!--<param name=\"volume\" value=\".1\"/>-->\n";
+		$tmpxml .= "    <!--<param name=\"outscale\" value=\"8192\"/>-->\n";
+		$tmpxml .= "  </settings>\n";
+		$tmpxml .= "</configuration>";
+		fwrite($fout, $tmpxml);
+		unset($tmpxml);
+		fclose($fout);
 	
 	$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml","w");
 	$tmpxml = "<configuration name=\"event_socket.conf\" description=\"Socket Client\">\n";
@@ -1935,6 +1950,12 @@ function freeswitch_php_install_command()
   	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_speex']) == 0) {
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_speex'] = "enable";
   	}
+  	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_siren']) == 0) {
+  	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_siren'] = "enable";
+  	}
+  	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_celt']) == 0) {
+  	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_celt'] = "enable";
+  	}
   	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_h26x']) == 0) {
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_h26x'] = "enable";
   	}
@@ -2041,7 +2062,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.5.3";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.5.4";
 	
 	       
 	conf_mount_ro();
