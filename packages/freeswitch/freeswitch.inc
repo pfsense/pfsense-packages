@@ -830,7 +830,7 @@ function sync_package_freeswitch_ivr()
 
 	    
 	    //add the IVR to the dialplan
-
+	    if (strlen($rowhelper['ivrid']) > 0) {
 	      $action = 'add'; //set default action to add
 	      $i = 0;
 	      if (count($a_dialplan_includes) > 0) {
@@ -928,8 +928,9 @@ function sync_package_freeswitch_ivr()
 	  		write_config();
 	   		  		
 	      sync_package_freeswitch_dialplan_includes();		
-	  		unset($dialplanincludeid);
+	      unset($dialplanincludeid);
 	  		
+	    } //end if strlen ivrid; add the IVR to the dialplan
 	    
 	    // Build the IVR javascript
 	    $recording_action_filename = get_recording_filename($rowhelper['recordingidaction']);
@@ -944,7 +945,9 @@ function sync_package_freeswitch_ivr()
 		    $cmd = "api global_getvar domain";
 		    $domain = trim(event_socket_request($fp, $cmd));
 	    }
-	      
+	    
+	    
+	    $tmp = ""; //make sure the variable starts with no value
 	    $tmp .= "\n";
 	    $tmp .= " var condition = true;\n";
 	    $tmp .= "\n";
@@ -1313,12 +1316,13 @@ function sync_package_freeswitch_ivr()
 	    unset($tmpactiondefault);
 	    unset($tmpantiactiondefault);    
 	    
-	    $ivrfilename = "ivr_".str_replace(array("{", "}"), "", $rowhelper['ivrid']).".js";   
-	  	$fout = fopen("/usr/local/freeswitch/scripts/".$ivrfilename,"w");
-	    fwrite($fout, $tmp);
-	    unset($ivrfilename);
-	    unset($tmpxml);
-	    fclose($fout);
+	    if (strlen($rowhelper['ivrid']) > 0) {
+		    $ivrfilename = "ivr_".str_replace(array("{", "}"), "", $rowhelper['ivrid']).".js";   
+		  	$fout = fopen("/usr/local/freeswitch/scripts/".$ivrfilename,"w");
+		    fwrite($fout, $tmp);
+		    unset($ivrfilename);
+		    fclose($fout);
+	    }
 	  
 	  } //end foreach 
   } //end if count    
@@ -2062,7 +2066,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.5.6";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.5.7";
 	
 	       
 	conf_mount_ro();
