@@ -68,7 +68,7 @@ function pkg_is_service_running($servicename)
     }
 }
 
-function sync_package() 
+function php_sync_package() 
 {
   
   //global $config;   

@@ -41,7 +41,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>tftp Settings</name>
-	<version>0.3</version>
+	<version>0.4</version>
 	<title>TFTP: Settings</title>
 	<include_file>/usr/local/pkg/tftp.inc</include_file>
 	<menu>
@@ -122,10 +122,10 @@
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
-		sync_package();
+		php_sync_package();
 	</custom_php_resync_config_command>
 	<custom_delete_php_command>    
-		sync_package();
+		php_sync_package();
 	</custom_delete_php_command>
 	<custom_php_install_command>
 		php_install_command();
