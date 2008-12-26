@@ -41,9 +41,9 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>tftp Settings</name>
-	<version>0.1</version>
+	<version>0.2</version>
 	<title>TFTP: Settings</title>
-	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
+	<include_file>/usr/local/pkg/tftp_inc.php</include_file>
 	<menu>
 		<name>TFTP</name>
 		<tooltiptext>Add or Remove files for TFTP.</tooltiptext>
@@ -122,10 +122,10 @@
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
-	  sync_package();
+		sync_package();
 	</custom_php_resync_config_command>
 	<custom_delete_php_command>    
-    sync_package();
+		sync_package();
 	</custom_delete_php_command>
 	<custom_php_install_command>
 		php_install_command();
