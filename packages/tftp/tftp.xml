@@ -41,7 +41,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>tftp Settings</name>
-	<version>0.7.2</version>
+	<version>0.7.3</version>
 	<title>TFTP: Settings</title>
 	<include_file>/usr/local/pkg/tftp.inc</include_file>
 	<menu>
@@ -49,7 +49,7 @@
 		<tooltiptext>Add or Remove files for TFTP.</tooltiptext>
 		<section>Services</section>
 		<configfile>tftp.xml</configfile>
-		<url>/pkg_edit.php?xml=tftp.xml&amp;id=0</url>
+		<url>/tftp/tftp_files.php</url>
 	</menu>
 	<service>
 		<name>tftp</name>
@@ -58,11 +58,6 @@
 		<description>Trivial File Transport Protocol is a very simple file transfer protocol. Often used with routers, voip phones and more.</description>    
 	</service>
 	<tabs>
-		<tab>
-			<text>Description</text>
-			<url>/pkg_edit.php?xml=tftp.xml&amp;id=0</url>
-			<active/>
-		</tab>
 		<tab>
 			<text>Files</text>
 			<url>/tftp/tftp_files.php</url>
@@ -78,14 +73,7 @@
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/tftp/tftp_files.tmp</item>
-	</additional_files_needed>
-	<fields>
-		<field>
-			<fielddescr>TFTP</fielddescr>
-			<fieldname>tftp</fieldname>
-			<description>Trivial File Transport Protocol is a very simple file transfer protocol. Often used with routers, voip phones and more.</description>
-		</field>
-	</fields>	
+	</additional_files_needed>	
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>

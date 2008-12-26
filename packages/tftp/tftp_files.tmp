@@ -77,7 +77,6 @@ include("head.inc");
 <?php
 			
 	$tab_array = array();
-	$tab_array[] = array(gettext("Description"), false, "/pkg_edit.php?xml=tftp.xml&amp;id=0");
 	$tab_array[] = array(gettext("Files"), false, "/tftp/tftp_files.php");
  	display_top_tabs($tab_array);
  	
@@ -132,9 +131,9 @@ include("head.inc");
         
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
-      <td width="25%" class="listhdrr">Name</td>
-      <!--<td width="50%" class="listhdr">&nbsp;</td>-->
-		</tr>
+      <td width="25%" class="listhdrr">File Name</td>
+      <td width="50%" class="listhdr">Last Modified</td>
+	</tr>
 		
     <?php		
     if ($handle = opendir('/tftpboot')) {
@@ -147,9 +146,9 @@ include("head.inc");
                 echo "    	$file";
                 echo "	  </a>";
                 echo "  </td>\n";
-                //echo "  <td class=\"listlr\" ondblclick=\"\">\n";
-                //echo "    ";
-                //echo "  </td>\n";                
+                echo "  <td class=\"listlr\" ondblclick=\"\">\n";
+                echo 		date ("F d Y H:i:s.", filemtime('/tftpboot/'.$file));
+                echo "  </td>\n";                
                 echo "  <td valign=\"middle\" nowrap class=\"list\">\n";
                 echo "    <table border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
                 echo "      <tr>\n";
