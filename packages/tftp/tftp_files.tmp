@@ -31,7 +31,7 @@
 */
 
 require("guiconfig.inc");
-require("/usr/local/pkg/tftp_inc.php");
+require("/usr/local/pkg/tftp.inc");
 
 
 //$a_ivr = &$config['installedpackages']['freeswitchivr']['config'];

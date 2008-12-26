@@ -41,9 +41,9 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>tftp Settings</name>
-	<version>0.2</version>
+	<version>0.3</version>
 	<title>TFTP: Settings</title>
-	<include_file>/usr/local/pkg/tftp_inc.php</include_file>
+	<include_file>/usr/local/pkg/tftp.inc</include_file>
 	<menu>
 		<name>TFTP</name>
 		<tooltiptext>Add or Remove files for TFTP.</tooltiptext>
@@ -72,7 +72,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/tftp/tftp_inc.tmp</item>
+		<item>http://www.pfsense.com/packages/config/tftp/tftp.inc</item>
 	</additional_files_needed>	
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
