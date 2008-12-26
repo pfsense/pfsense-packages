@@ -41,7 +41,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>tftp Settings</name>
-	<version>0.5</version>
+	<version>0.5.1</version>
 	<title>TFTP: Settings</title>
 	<include_file>/usr/local/pkg/tftp.inc</include_file>
 	<menu>
@@ -75,48 +75,15 @@
 		<item>http://www.pfsense.com/packages/config/tftp/tftp.inc</item>
 	</additional_files_needed>	
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/tftp/tftp_files.tmp</item>
 	</additional_files_needed>
 	<fields>
 		<field>
-			<fielddescr>Numbering Plan</fielddescr>
-			<fieldname>numbering_plan</fieldname>
-			<description>Enter the numbering plan here. example: US</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Default Gateway</fielddescr>
-			<fieldname>default_gateway</fieldname>
-			<description>Enter the default gateway name here. example: asterlink.com</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Default Area Code</fielddescr>
-			<fieldname>default_area_code</fieldname>
-			<description>Enter the area code here. example: 918</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>SMTP Secure</fielddescr>
-			<fieldname>smtpsecure</fieldname>
-			<description>Select the SMTP security. None, TLS, SSL</description>
-			<type>select</type>
-			<options>
-				<option>
-					<name>none</name>
-					<value></value>
-				</option>
-				<option>
-					<name>tls</name>
-					<value>tls</value>
-				</option>
-				<option>
-					<name>ssl</name>
-					<value>ssl</value>
-				</option>
-			</options>
+			<fielddescr>TFTP</fielddescr>
+			<fieldname>tftp</fieldname>
+			<description>Trivial File Transport Protocol is a very simple file transfer protocol. Often used with routers, voip phones and more.</description>
 		</field>
 	</fields>	
 	<custom_add_php_command>

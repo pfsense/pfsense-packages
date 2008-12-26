@@ -121,7 +121,7 @@ function php_install_command()
 		$contents = str_replace("#tftp    dgram   udp     wait    root    /usr/libexec/tftpd", "tftp    dgram   udp     wait    root    /usr/libexec/tftpd", $contents);
 		fwrite($handle, $contents);		
 		unset($contents); 	
-		fclose($fout);
+		fclose($handle);
 		unset($filename);
 	
   	
