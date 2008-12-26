@@ -43,7 +43,7 @@ if (($_GET['a'] == "download") && file_exists("/tftpboot/".$_GET['filename'])) {
 	header('Content-Disposition: attachment; filename="'.$_GET['filename'].'"');      
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past	
-	header("Content-Length: " . filesize($recording_dir.$_GET['filename']));
+	header("Content-Length: " . filesize("/tftpboot/".$_GET['filename']));
 	fpassthru($fd);
 	exit;
 }
@@ -56,14 +56,10 @@ if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_na
 
 
 if ($_GET['act'] == "del") {
-    if ($_GET['type'] == 'ivr') {
-        if ($a_ivr[$_GET['id']]) {
-            //unset($a_ivr[$_GET['id']]);
-            //write_config();
-            sync_package_freeswitch_ivr();
-            header("Location: tftp_files.php");
-            exit;
-        }
+    if ($_GET['type'] == 'tftp') {
+		unlink_if_exists("/tftpboot/".$_GET['filename']);
+        header("Location: tftp_files.php");
+        exit;
     }
 }
 
@@ -157,8 +153,8 @@ include("head.inc");
                 echo "  <td valign=\"middle\" nowrap class=\"list\">\n";
                 echo "    <table border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
                 echo "      <tr>\n";
-                echo "        <td valign=\"middle\"><a href=\"tftp_files_edit.php?id=$i\"><img src=\"/themes/".$g['theme']."/images/icons/icon_e.gif\" width=\"17\" height=\"17\" border=\"0\"></a></td>\n";
-                echo "        <td><a href=\"tftp_files_edit.php?type=tftp&act=del&id=$i\" onclick=\"return confirm('Do you really want to delete this file?')\"><img src=\"/themes/". $g['theme']."/images/icons/icon_x.gif\" width=\"17\" height=\"17\" border=\"0\"></a></td>\n";
+                //echo "        <td valign=\"middle\"><a href=\"tftp_files_edit.php?id=$i\"><img src=\"/themes/".$g['theme']."/images/icons/icon_e.gif\" width=\"17\" height=\"17\" border=\"0\"></a></td>\n";
+                echo "        <td><a href=\"tftp_files.php?type=tftp&act=del&filename=".$file."\" onclick=\"return confirm('Do you really want to delete this file?')\"><img src=\"/themes/". $g['theme']."/images/icons/icon_x.gif\" width=\"17\" height=\"17\" border=\"0\"></a></td>\n";
                 echo "      </tr>\n";
                 echo "   </table>\n";
                 echo "  </td>\n";
