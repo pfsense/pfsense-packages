@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    tftp.xml
+    Copyright (C) 2008 Mark J Crane
+    All rights reserved.
+                                                                                  */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow.</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>tftp Settings</name>
+	<version>0.1</version>
+	<title>TFTP: Settings</title>
+	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
+	<menu>
+		<name>FreeSWITCH</name>
+		<tooltiptext>Modify FreeSWITCH settings.</tooltiptext>
+		<section>Services</section>
+		<configfile>freeswitch.xml</configfile>
+		<url>/pkg_edit.php?xml=freeswitch.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>tftp</name>
+    <rcfile>tftp.sh</rcfile>
+    <executable>tftp</executable>
+		<description>Trivial File Transport Protocol is a very simple file transfer protocol. Often used with routers, voip phones and more.</description>    
+	</service>
+	<tabs>
+		<tab>
+			<text>Description</text>
+			<url>/pkg_edit.php?xml=tftp.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Files</text>
+			<url>/tftp/tftp_files.php</url>
+		</tab>
+	</tabs>
+	<configpath>installedpackages->package->$packagename->configuration->tftp</configpath>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/tftp/tftp_inc.tmp</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/tftp/tftp_files.tmp</item>
+	</additional_files_needed>
+	<fields>
+		<field>
+			<fielddescr>Numbering Plan</fielddescr>
+			<fieldname>numbering_plan</fieldname>
+			<description>Enter the numbering plan here. example: US</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Default Gateway</fielddescr>
+			<fieldname>default_gateway</fieldname>
+			<description>Enter the default gateway name here. example: asterlink.com</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Default Area Code</fielddescr>
+			<fieldname>default_area_code</fieldname>
+			<description>Enter the area code here. example: 918</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>SMTP Secure</fielddescr>
+			<fieldname>smtpsecure</fieldname>
+			<description>Select the SMTP security. None, TLS, SSL</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>none</name>
+					<value></value>
+				</option>
+				<option>
+					<name>tls</name>
+					<value>tls</value>
+				</option>
+				<option>
+					<name>ssl</name>
+					<value>ssl</value>
+				</option>
+			</options>
+		</field>
+	</fields>	
+	<custom_add_php_command>
+	</custom_add_php_command>
+	<custom_php_resync_config_command>
+	  sync_package();
+	</custom_php_resync_config_command>
+	<custom_delete_php_command>    
+    sync_package();
+	</custom_delete_php_command>
+	<custom_php_install_command>
+		php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		php_deinstall_command();
+	</custom_php_deinstall_command>
+</packagegui>
