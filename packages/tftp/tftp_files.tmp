@@ -48,6 +48,12 @@ if (($_GET['a'] == "download") && file_exists("/tftpboot/".$_GET['filename'])) {
 	exit;
 }
 
+if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_name'])) {
+	move_uploaded_file($_FILES['ulfile']['tmp_name'], "/tftpboot/" . $_FILES['ulfile']['name']);
+	$ulmsg = "Uploaded file to /tftpboot/" . htmlentities($_FILES['ulfile']['name']);
+	unset($_POST['txtCommand']);
+}
+
 
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'ivr') {
@@ -87,8 +93,6 @@ include("head.inc");
    <tr>
      <td class="tabcont" >
 
-<form action="tftp_files.php" method="post" name="iform" id="iform">
-
   	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>TFTP files<br />
@@ -99,6 +103,32 @@ include("head.inc");
       </tr>
     </table>
     <br />
+    
+
+	<div id="niftyOutter">
+	<form action="tftp_files.php" method="POST" enctype="multipart/form-data" name="frmUpload" onSubmit="">
+	  <table>
+	
+		<tr>
+		  <td colspan="2" valign="top" class="vnsepcell">Upload</td>
+		</tr>    
+	    <tr>
+	      <td align="right">File to upload:</td>
+	      <td valign="top" class="label">
+		<input name="ulfile" type="file" class="button" id="ulfile">
+		</td></tr>
+	    <tr>
+	      <td valign="top">&nbsp;&nbsp;&nbsp;</td>
+	      <td valign="top" class="label">	
+	        <input name="submit" type="submit"  class="button" id="upload" value="Upload"></td>
+	    </tr>
+	   
+	  </table>
+	</div>
+	</form>
+	
+	
+	<form action="tftp_files.php" method="post" name="iform" id="iform">
         
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
@@ -145,7 +175,7 @@ include("head.inc");
     ?>
 
     <tr>
-      <td class="list" colspan="3"></td>
+      <td class="list" colspan="2"></td>
       <td class="list">
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
@@ -178,7 +208,6 @@ include("head.inc");
 </table>
 
 </div>
-
 
 <?php include("fend.inc"); ?>
 </body>

@@ -118,7 +118,7 @@ function php_install_command()
 		fclose($handle);
 		
 		$handle = fopen($filename,"w");
-		$contents = str_replace("#tftp    dgram   udp     wait    root    /usr/libexec/tftpd", "tftp    dgram   udp     wait    root    /usr/libexec/tftpd", $contents);
+		$contents = str_replace("\#tftp    dgram   udp     wait    root    /usr/libexec/tftpd", "tftp    dgram   udp     wait    root    /usr/libexec/tftpd", $contents);
 		fwrite($handle, $contents);		
 		unset($contents); 	
 		fclose($handle);
@@ -140,7 +140,7 @@ function php_install_command()
   	
 	write_rcfile(array(
 		"file" => "tftp.sh",
-		"start" => "/usr/sbin/inetd",
+		"start" => "/usr/sbin/./inetd",
 		"stop" => "killall -9 /usr/sbin/inetd"
 		)
 	);
@@ -170,7 +170,7 @@ function php_deinstall_command()
 		fclose($handle);
 		
 		$handle = fopen($filename,"w");
-		$contents = str_replace("tftp    dgram   udp     wait    root    /usr/libexec/tftpd", "#tftp    dgram   udp     wait    root    /usr/libexec/tftpd", $contents);
+		$contents = str_replace("tftp    dgram   udp     wait    root    /usr/libexec/tftpd", "\#tftp    dgram   udp     wait    root    /usr/libexec/tftpd", $contents);
 		fwrite($handle, $contents);		
 		unset($contents); 	
 		fclose($fout);
