@@ -130,9 +130,7 @@ function php_install_command()
 	    	   
 	    //extract a specific directory to /usr/local/freeswitch
 	    if (file_exists('/tmp/'.$filename)) {
-	      //echo "The file $filename exists";
-	
-	      //Recommended
+	    	//echo "The file $filename exists";
 	        system('cd /tftpboot; tar xvpfz /tmp/'.$filename.' tftpboot/');
 			
 			unset($filename);

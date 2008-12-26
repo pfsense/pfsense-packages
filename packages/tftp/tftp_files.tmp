@@ -34,6 +34,12 @@ require("guiconfig.inc");
 require("/usr/local/pkg/tftp.inc");
 
 if (($_GET['a'] == "download") && file_exists("/tftpboot/".$_GET['filename'])) {
+	if ($_GET['t'] == "backup") {
+	  $tmp = '/tmp/';
+	  $filename = 'freeswitch.bak.tgz';
+	  system('cd /usr/local/;tar cvzf /tmp/freeswitch.bak.tgz freeswitch');
+	}
+  
 	session_cache_limiter('public');
 	$fd = fopen("/tftpboot/".$_GET['filename'], "rb");
 	header("Content-Type: application/force-download");
@@ -47,6 +53,27 @@ if (($_GET['a'] == "download") && file_exists("/tftpboot/".$_GET['filename'])) {
 	fpassthru($fd);
 	exit;
 }
+
+if ($_GET['a'] == "other") {
+  if ($_GET['t'] == "restore") {
+    $tmp = '/tmp/';
+    $filename = 'tftp.bak.tgz';
+   
+    //extract a specific directory to /usr/local/freeswitch
+    if (file_exists('/tmp/'.$filename)) {
+        //echo "The file $filename exists";
+        system('cd /tftpboot; tar xvpfz /tmp/'.$filename.' tftpboot/');
+           
+        header( 'Location: tftp_files.php?savemsg=Backup+has+been+restored.' ) ;
+    }
+    else {
+        header( 'Location: tftp_files.php?savemsg=Restore+failed.+Backup+file+not+found.' ) ;
+    }       
+  
+	exit;
+  }
+}
+
 
 if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_name'])) {
 	move_uploaded_file($_FILES['ulfile']['tmp_name'], "/tftpboot/" . $_FILES['ulfile']['name']);
@@ -71,6 +98,12 @@ include("head.inc");
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">TFTP: Files</p>
 
+<?php 
+if ($savemsg) {
+  print_info_box($savemsg);
+}
+?>
+
 <div id="mainlevel">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr><td class="tabnavtbl">
@@ -93,7 +126,8 @@ include("head.inc");
         <td><p><span class="vexpl"><span class="red"><strong>TFTP files<br />
             </strong></span>
               Trivial File Transport Protocol is a very simple file transfer 
-              protocol. Often used with routers, voip phones and more.
+              protocol. Use the file upload to add files to the /tftpboot directory. 
+              Click on the file to download it. 
             </span></p></td>
       </tr>
     </table>
@@ -147,7 +181,7 @@ include("head.inc");
                 echo "	  </a>";
                 echo "  </td>\n";
                 echo "  <td class=\"listlr\" ondblclick=\"\">\n";
-                echo 		date ("F d Y H:i:s.", filemtime('/tftpboot/'.$file));
+                echo 		date ("F d Y H:i:s", filemtime('/tftpboot/'.$file));
                 echo "  </td>\n";                
                 echo "  <td valign=\"middle\" nowrap class=\"list\">\n";
                 echo "    <table border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
@@ -175,6 +209,28 @@ include("head.inc");
 
 <br>
 <br>
+
+<?php
+echo "<table width='690' cellpadding='0' cellspacing='0' border='0'>\n";
+echo "<tr>\n";
+echo "<td width='80%'>\n";
+echo "<b>Backup / Restore</b><br />\n";
+echo "The 'backup' button will tar gzip /tftpboot/ to /tmp/tftp.bak.tgz it then presents a file to download. \n";
+echo "If the backup file does not exist in /tmp/tftp.bak.tgz then the 'restore' button will be hidden. \n";
+echo "Use Diagnostics->Command->File to upload: to browse to the file and then click on upload it now ready to be restored. \n";
+echo "<br /><br />\n";
+echo "</td>\n";
+echo "<td width='20%' valign='middle' align='right'>\n";
+echo "  <input type='button' value='backup' onclick=\"document.location.href='/tftp/tftp_files.php?a=download&t=backup';\" />\n";
+if (file_exists('/tmp/tftp.bak.tgz')) {
+  echo "  <input type='button' value='restore' onclick=\"document.location.href='/tftp/tftp_files.php?a=other&t=restore';\" />\n";
+}
+echo "</td>\n";
+echo "</tr>\n";
+echo "</table>\n";
+echo "<br /><br />\n\n";
+?>
+
 <br>
 <br>
 <br>
