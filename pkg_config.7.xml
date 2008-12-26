@@ -73,6 +73,20 @@
       <configurationfile>freeswitch.xml</configurationfile>
     </package>
     <package>
+      <name>TFTP</name>
+      <website></website>
+      <descr>Trivial File Transport Protocol is a very simple file transfer protocol. Often used with routers, voip phones and more.</descr>
+      <category>Services</category>
+      <pkginfolink></pkginfolink>
+      <config_file>http://www.pfsense.com/packages/config/tftp/tftp.xml</config_file>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <version>0.1</version>
+      <status>Alpha</status>
+      <required_version>1.2.1</required_version>
+      <maintainer>markjcrane@gmail.com</maintainer>
+      <configurationfile>tftp.xml</configurationfile>
+    </package>    
+    <package>
       <name>snort</name>
       <descr>Snort is a libpcap-based packet sniffer/logger which can be used as a lightweight network intrusion detection system. It features rules based logging and can perform content searching/matching in addition to being used to detect a variety of other attacks and probes, such as buffer overflows, stealth port scans, CGI attacks, SMB probes, and much more.</descr>
       <category>Security</category>

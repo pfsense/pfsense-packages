@@ -37,7 +37,7 @@
 /* ========================================================================== */
         ]]>
         </copyright>
-    <description>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow.</description>
+    <description></description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>tftp Settings</name>
@@ -45,16 +45,16 @@
 	<title>TFTP: Settings</title>
 	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
 	<menu>
-		<name>FreeSWITCH</name>
-		<tooltiptext>Modify FreeSWITCH settings.</tooltiptext>
+		<name>TFTP</name>
+		<tooltiptext>Add or Remove files for TFTP.</tooltiptext>
 		<section>Services</section>
-		<configfile>freeswitch.xml</configfile>
-		<url>/pkg_edit.php?xml=freeswitch.xml&amp;id=0</url>
+		<configfile>tftp.xml</configfile>
+		<url>/pkg_edit.php?xml=tftp.xml&amp;id=0</url>
 	</menu>
 	<service>
 		<name>tftp</name>
-    <rcfile>tftp.sh</rcfile>
-    <executable>tftp</executable>
+		<rcfile>tftp.sh</rcfile>
+		<executable>tftp</executable>
 		<description>Trivial File Transport Protocol is a very simple file transfer protocol. Often used with routers, voip phones and more.</description>    
 	</service>
 	<tabs>
