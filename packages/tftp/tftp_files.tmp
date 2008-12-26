@@ -109,9 +109,11 @@ include("head.inc");
 	<form action="tftp_files.php" method="POST" enctype="multipart/form-data" name="frmUpload" onSubmit="">
 	  <table>
 	
+		<!--
 		<tr>
 		  <td colspan="2" valign="top" class="vnsepcell">Upload</td>
-		</tr>    
+		</tr>
+		-->    
 	    <tr>
 	      <td align="right">File to upload:</td>
 	      <td valign="top" class="label">
@@ -126,22 +128,16 @@ include("head.inc");
 	  </table>
 	</div>
 	</form>
-	
+
+    <br />
+    <br />
 	
 	<form action="tftp_files.php" method="post" name="iform" id="iform">
         
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
       <td width="25%" class="listhdrr">Name</td>
-      <td width="50%" class="listhdr">&nbsp;</td>
-      <td width="10%" class="list">
-        <table border="0" cellspacing="0" cellpadding="1">
-          <tr>
-            <td width="17"></td>
-            <td valign="middle"><a href="tftp_files_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
-          </tr>
-        </table>
-      </td>
+      <!--<td width="50%" class="listhdr">&nbsp;</td>-->
 		</tr>
 		
     <?php		
@@ -152,12 +148,12 @@ include("head.inc");
                 echo "<tr>\n";
                 echo "  <td class=\"listlr\" ondblclick=\"\">\n";
                 echo "	  <a href=\"tftp_files.php?a=download&filename=".$file."\">\n";
-                echo "    $file";
+                echo "    	$file";
                 echo "	  </a>";
                 echo "  </td>\n";
-                echo "  <td class=\"listlr\" ondblclick=\"\">\n";
-                echo "    ";
-                echo "  </td>\n";                
+                //echo "  <td class=\"listlr\" ondblclick=\"\">\n";
+                //echo "    ";
+                //echo "  </td>\n";                
                 echo "  <td valign=\"middle\" nowrap class=\"list\">\n";
                 echo "    <table border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
                 echo "      <tr>\n";
@@ -173,20 +169,6 @@ include("head.inc");
         closedir($handle);
     }
     ?>
-
-    <tr>
-      <td class="list" colspan="2"></td>
-      <td class="list">
-        <table border="0" cellspacing="0" cellpadding="1">
-          <tr>
-            <td width="17"></td>
-            <td valign="middle">
-              <a href="tftp_files_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
-            </td>
-          </tr>
-        </table>
-		  </td>
-     </tr>
 
      <tr>
        <td class="list" colspan="3"></td>
