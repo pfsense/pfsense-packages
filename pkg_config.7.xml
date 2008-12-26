@@ -80,7 +80,7 @@
       <pkginfolink></pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/tftp/tftp.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <version>0.5.1</version>
+      <version>0.6</version>
       <status>Alpha</status>
       <required_version>1.2.1</required_version>
       <maintainer>markjcrane@gmail.com</maintainer>

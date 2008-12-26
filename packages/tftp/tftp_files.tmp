@@ -1,7 +1,7 @@
 <?php
 /* $Id$ */
 /*
-	freeswitch_ivr.php
+  tftp_files.php
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
   
@@ -33,8 +33,20 @@
 require("guiconfig.inc");
 require("/usr/local/pkg/tftp.inc");
 
-
-//$a_ivr = &$config['installedpackages']['freeswitchivr']['config'];
+if (($_GET['a'] == "download") && file_exists("/tftpboot/".$_GET['filename'])) {
+	session_cache_limiter('public');
+	$fd = fopen("/tftpboot/".$_GET['filename'], "rb");
+	header("Content-Type: application/force-download");
+	header("Content-Type: application/octet-stream");
+	header("Content-Type: application/download");
+	header("Content-Description: File Transfer");
+	header('Content-Disposition: attachment; filename="'.$_GET['filename'].'"');      
+	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past	
+	header("Content-Length: " . filesize($recording_dir.$_GET['filename']));
+	fpassthru($fd);
+	exit;
+}
 
 
 if ($_GET['act'] == "del") {
@@ -79,7 +91,7 @@ include("head.inc");
 
   	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
       <tr>
-        <td><p><span class="vexpl"><span class="red"><strong>IVR<br />
+        <td><p><span class="vexpl"><span class="red"><strong>TFTP files<br />
             </strong></span>
               Trivial File Transport Protocol is a very simple file transfer 
               protocol. Often used with routers, voip phones and more.
@@ -91,7 +103,7 @@ include("head.inc");
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
       <td width="25%" class="listhdrr">Name</td>
-      <td width="50%" class="listhdr">Description</td>
+      <td width="50%" class="listhdr">&nbsp;</td>
       <td width="10%" class="list">
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
@@ -103,14 +115,19 @@ include("head.inc");
 		</tr>
 		
     <?php		
-    if ($handle = opendir('.')) {
+    if ($handle = opendir('/tftpboot')) {
         while (false !== ($file = readdir($handle))) {
             if ($file != "." && $file != "..") {
                 
                 echo "<tr>\n";
                 echo "  <td class=\"listlr\" ondblclick=\"\">\n";
+                echo "	  <a href=\"tftp_files.php?a=download&filename=".$file."\">\n";
                 echo "    $file";
+                echo "	  </a>";
                 echo "  </td>\n";
+                echo "  <td class=\"listlr\" ondblclick=\"\">\n";
+                echo "    ";
+                echo "  </td>\n";                
                 echo "  <td valign=\"middle\" nowrap class=\"list\">\n";
                 echo "    <table border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
                 echo "      <tr>\n";
@@ -127,11 +144,6 @@ include("head.inc");
     }
     ?>
 
-
-
-
-
-
     <tr>
       <td class="list" colspan="3"></td>
       <td class="list">
@@ -139,7 +151,7 @@ include("head.inc");
           <tr>
             <td width="17"></td>
             <td valign="middle">
-              a href="tftp_files_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
+              <a href="tftp_files_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
             </td>
           </tr>
         </table>
