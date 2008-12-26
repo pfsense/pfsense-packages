@@ -107,8 +107,6 @@ function php_install_command()
 	
 	
 	//rename PHP files from .tmp to .php
-	//exec("cp /tmp/tftp_inc.tmp /usr/local/www/tftp/tftp_inc.php");
-	//unlink_if_exists("/tmp/tftp_inc.tmp");
 	
 	exec("cp /tmp/tftp_files.tmp /usr/local/www/tftp/tftp_files.php");
 	unlink_if_exists("/tmp/tftp_files.tmp");
