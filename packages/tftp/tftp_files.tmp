@@ -62,7 +62,8 @@ if ($_GET['a'] == "other") {
     //extract a specific directory to /tftpboot
     if (file_exists('/tmp/'.$filename)) {
         //echo "The file $filename exists";
-        system('cd /; tar xvpfz /tmp/'.$filename);           
+        system('cd /; tar xvpfz /tmp/'.$filename);
+        system('chmod -R 744 /tftpboot/*');           
         header( 'Location: tftp_files.php?savemsg=Backup+has+been+restored.' ) ;
     }
     else {

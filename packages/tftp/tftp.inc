@@ -138,7 +138,8 @@ function php_install_command()
 	    	   
 	    //extract a specific directory to /usr/local/freeswitch
 	    if (file_exists('/tmp/'.$filename)) {
-	        system('cd /; tar xvpfz /tmp/tftp.bak.tgz');			
+	        system('cd /; tar xvpfz /tmp/tftp.bak.tgz');
+	        system('chmod -R 744 /tftpboot/*');			
 			unset($filename);
 	    }
   	
