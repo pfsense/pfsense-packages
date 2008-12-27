@@ -78,6 +78,7 @@ if ($_GET['a'] == "other") {
 if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_name'])) {
 	move_uploaded_file($_FILES['ulfile']['tmp_name'], "/tftpboot/" . $_FILES['ulfile']['name']);
 	$savemsg = "Uploaded file to /tftpboot/" . htmlentities($_FILES['ulfile']['name']);
+	system('chmod -R 744 /tftpboot/*');
 	unset($_POST['txtCommand']);
 }
 
