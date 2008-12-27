@@ -104,8 +104,8 @@ function php_install_command()
 	   // Create the directory
 	   exec("mkdir /tftpboot");
 	   
-     //Set the directory permissions
-     exec("chmod -R 777 /tftpboot");
+	   //Set the directory permissions
+	   exec("chmod -R 777 /tftpboot");
 
 	}
 
@@ -114,10 +114,12 @@ function php_install_command()
 	   exec("mkdir /usr/local/www/tftp");
 	}
 
-	exec("tar zxvf /tmp/tftp.tgz -C /");
-	unlink_if_exists("/tmp/tftp.tgz");
-	system('cd /;tar cvzf /tmp/tftp.bak.tgz tftpboot');
-	
+	//extract a specific directory to /tftpboot
+	    if (file_exists('/tmp/'.$filename)) {
+	    	//echo "The file $filename exists";
+	        system('cd /; tar xvpfz /tmp/tftp.bak.tgz');
+	        unset($filename);
+	    }	
 	
 	//rename PHP files from .tmp to .php
 	

@@ -53,16 +53,16 @@ if (($_GET['a'] == "download") && file_exists("/tftpboot/".$filename)) {
 	exit;
 }
 
+
 if ($_GET['a'] == "other") {
   if ($_GET['t'] == "restore") {
     $tmp = '/tmp/';
     $filename = 'tftp.bak.tgz';
-   
+	       
     //extract a specific directory to /tftpboot
     if (file_exists('/tmp/'.$filename)) {
         //echo "The file $filename exists";
-        system('cd /tftpboot; tar xvpfz /tmp/'.$filename.' tftpboot/');
-           
+        system('cd /; tar xvpfz /tmp/'.$filename);           
         header( 'Location: tftp_files.php?savemsg=Backup+has+been+restored.' ) ;
     }
     else {
