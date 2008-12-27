@@ -68,6 +68,18 @@ function pkg_is_service_running($servicename)
     }
 }
 
+function byte_convert( $bytes ) {
+   
+    if ($bytes<=0)
+        return '0 Byte';
+   
+    $convention=1000; //[1000->10^x|1024->2^x]
+    $s=array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB');
+    $e=floor(log($bytes,$convention));
+    return round($bytes/pow($convention,$e),2).' '.$s[$e];
+}
+
+
 function php_sync_package() 
 {
   
@@ -104,6 +116,7 @@ function php_install_command()
 
 	exec("tar zxvf /tmp/tftp.tgz -C /");
 	unlink_if_exists("/tmp/tftp.tgz");
+	system('cd /;tar cvzf /tmp/tftp.bak.tgz tftpboot');
 	
 	
 	//rename PHP files from .tmp to .php
