@@ -5,8 +5,6 @@
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
   
-  FreeSWITCH (TM)
-  http://www.freeswitch.org/
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -34,22 +32,24 @@ require("guiconfig.inc");
 require("/usr/local/pkg/tftp.inc");
 
 if (($_GET['a'] == "download") && file_exists("/tftpboot/".$_GET['filename'])) {
+
+	$filename = $_GET['filename'];
 	if ($_GET['t'] == "backup") {
 	  $tmp = '/tmp/';
-	  $filename = 'freeswitch.bak.tgz';
-	  system('cd /usr/local/;tar cvzf /tmp/freeswitch.bak.tgz freeswitch');
+	  $filename = 'tftp.bak.tgz';
+	  system('cd /;tar cvzf /tmp/tftp.bak.tgz tftpboot');
 	}
   
 	session_cache_limiter('public');
-	$fd = fopen("/tftpboot/".$_GET['filename'], "rb");
+	$fd = fopen("/tftpboot/".$filename, "rb");
 	header("Content-Type: application/force-download");
 	header("Content-Type: application/octet-stream");
 	header("Content-Type: application/download");
 	header("Content-Description: File Transfer");
-	header('Content-Disposition: attachment; filename="'.$_GET['filename'].'"');      
+	header('Content-Disposition: attachment; filename="'.$filename.'"');      
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past	
-	header("Content-Length: " . filesize("/tftpboot/".$_GET['filename']));
+	header("Content-Length: " . filesize("/tftpboot/".$filename));
 	fpassthru($fd);
 	exit;
 }
@@ -59,7 +59,7 @@ if ($_GET['a'] == "other") {
     $tmp = '/tmp/';
     $filename = 'tftp.bak.tgz';
    
-    //extract a specific directory to /usr/local/freeswitch
+    //extract a specific directory to /tftpboot
     if (file_exists('/tmp/'.$filename)) {
         //echo "The file $filename exists";
         system('cd /tftpboot; tar xvpfz /tmp/'.$filename.' tftpboot/');
@@ -127,27 +127,45 @@ if ($savemsg) {
             </strong></span>
               Trivial File Transport Protocol is a very simple file transfer 
               protocol. Use the file upload to add files to the /tftpboot directory. 
-              Click on the file to download it. 
+               
             </span></p></td>
       </tr>
     </table>
     <br />
-    
+<?php
+echo "<table width='690' cellpadding='0' cellspacing='0' border='0'>\n";
+echo "<tr>\n";
+echo "<td width='80%'>\n";
+echo "<b>Backup / Restore</b><br />\n";
+echo "The 'backup' button will tar gzip /tftpboot/ to /tmp/tftp.bak.tgz it then presents a file to download. \n";
+echo "If the backup file does not exist in /tmp/tftp.bak.tgz then the 'restore' button will be hidden. \n";
+echo "Use Diagnostics->Command->File to upload: to browse to the file and then click on upload it now ready to be restored. \n";
+echo "<br /><br />\n";
+echo "</td>\n";
+echo "<td width='20%' valign='middle' align='right'>\n";
+echo "  <input type='button' value='backup' onclick=\"document.location.href='/tftp/tftp_files.php?a=download&t=backup';\" />\n";
+if (file_exists('/tmp/tftp.bak.tgz')) {
+  echo "  <input type='button' value='restore' onclick=\"document.location.href='/tftp/tftp_files.php?a=other&t=restore';\" />\n";
+}
+echo "</td>\n";
+echo "</tr>\n";
+echo "</table>\n";
+echo "<br /><br />\n\n";
+?>
 
 	<div id="niftyOutter">
 	<form action="tftp_files.php" method="POST" enctype="multipart/form-data" name="frmUpload" onSubmit="">
 	  <table>
 	
-		<!--
 		<tr>
-		  <td colspan="2" valign="top" class="vnsepcell">Upload</td>
+		  <td colspan="2" valign="top" class="">Click on the file to download it.</td>
 		</tr>
-		-->    
 	    <tr>
 	      <td align="right">File to upload:</td>
 	      <td valign="top" class="label">
-		<input name="ulfile" type="file" class="button" id="ulfile">
-		</td></tr>
+			<input name="ulfile" type="file" class="button" id="ulfile">
+	      </td>
+	    </tr>
 	    <tr>
 	      <td valign="top">&nbsp;&nbsp;&nbsp;</td>
 	      <td valign="top" class="label">	
@@ -209,28 +227,6 @@ if ($savemsg) {
 
 <br>
 <br>
-
-<?php
-echo "<table width='690' cellpadding='0' cellspacing='0' border='0'>\n";
-echo "<tr>\n";
-echo "<td width='80%'>\n";
-echo "<b>Backup / Restore</b><br />\n";
-echo "The 'backup' button will tar gzip /tftpboot/ to /tmp/tftp.bak.tgz it then presents a file to download. \n";
-echo "If the backup file does not exist in /tmp/tftp.bak.tgz then the 'restore' button will be hidden. \n";
-echo "Use Diagnostics->Command->File to upload: to browse to the file and then click on upload it now ready to be restored. \n";
-echo "<br /><br />\n";
-echo "</td>\n";
-echo "<td width='20%' valign='middle' align='right'>\n";
-echo "  <input type='button' value='backup' onclick=\"document.location.href='/tftp/tftp_files.php?a=download&t=backup';\" />\n";
-if (file_exists('/tmp/tftp.bak.tgz')) {
-  echo "  <input type='button' value='restore' onclick=\"document.location.href='/tftp/tftp_files.php?a=other&t=restore';\" />\n";
-}
-echo "</td>\n";
-echo "</tr>\n";
-echo "</table>\n";
-echo "<br /><br />\n\n";
-?>
-
 <br>
 <br>
 <br>

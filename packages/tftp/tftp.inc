@@ -144,12 +144,12 @@ function php_install_command()
 	);
 	
 		  	       
-	//sync_package_freeswitch();
+	//php_sync_package();
 	$handle = popen("/usr/sbin/inetd", "r");
 	pclose($handle);
 	
-	//if (pkg_is_service_running('freeswitch')) {  
-  //    sync_package_freeswitch_ivr();
+	//if (pkg_is_service_running('inetd')) {  
+	//    temp_sync_package();
 	//}
       
 	//conf_mount_ro();
