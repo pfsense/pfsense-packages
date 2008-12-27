@@ -114,15 +114,8 @@ function php_install_command()
 	   exec("mkdir /usr/local/www/tftp");
 	}
 
-	//extract a specific directory to /tftpboot
-	    if (file_exists('/tmp/'.$filename)) {
-	    	//echo "The file $filename exists";
-	        system('cd /; tar xvpfz /tmp/tftp.bak.tgz');
-	        unset($filename);
-	    }	
 	
-	//rename PHP files from .tmp to .php
-	
+	//rename PHP files from .tmp to .php	
 	exec("cp /tmp/tftp_files.tmp /usr/local/www/tftp/tftp_files.php");
 	unlink_if_exists("/tmp/tftp_files.tmp");
     		
@@ -145,9 +138,7 @@ function php_install_command()
 	    	   
 	    //extract a specific directory to /usr/local/freeswitch
 	    if (file_exists('/tmp/'.$filename)) {
-	    	//echo "The file $filename exists";
-	        system('cd /tftpboot; tar xvpfz /tmp/'.$filename.' tftpboot/');
-			
+	        system('cd /; tar xvpfz /tmp/tftp.bak.tgz');			
 			unset($filename);
 	    }
   	
