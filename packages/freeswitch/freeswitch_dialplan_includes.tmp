@@ -151,7 +151,7 @@ include("head.inc");
 
 //if ($savemsg) print_info_box($savemsg); 
 //if (file_exists($d_hostsdirty_path)): echo"<p>";
-//print_info_box_np("The FreeSWITCH recordings have been changed.<br>You must apply the changes in order for them to take effect.");
+//print_info_box_np("This has been changed.<br>You must apply the changes in order for them to take effect.");
 //echo"<br />";
 //endif; 
 
@@ -221,7 +221,7 @@ include("head.inc");
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td valign="middle"><a href="freeswitch_dialplan_includes_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-            <td><a href="freeswitch_dialplan_includes.php?type=dialplanincludes&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this recording?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+            <td><a href="freeswitch_dialplan_includes.php?type=dialplanincludes&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
           </tr>
        </table>
       </td>

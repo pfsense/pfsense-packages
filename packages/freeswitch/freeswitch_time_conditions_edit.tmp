@@ -75,17 +75,6 @@ if ($_POST) {
 	unset($input_errors);
 	$pconfig = $_POST;
 
-	/* check for overlaps */
-	//foreach ($a_recordings as $recordingent) {
-	//	if (isset($id) && ($a_recordings[$id]) && ($a_recordings[$id] === $recordingent))
-	//		continue;
-
-	//	if (($recordingent['filename'] == $_POST['filename']) && ($recordingent['recordingname'] == $_POST['recordingname'])) {
-	//		$input_errors[] = "This filename and recording name already exists.";
-	//		break;
-	//	}
-	//}
-
 	if (!$input_errors) {
 	
 		$ivroptionent = array();		

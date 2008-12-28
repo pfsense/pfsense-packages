@@ -224,7 +224,7 @@ include("head.inc");
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td valign="middle"><a href="freeswitch_public_includes_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-            <td><a href="freeswitch_public_includes.php?type=publicincludes&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this recording?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+            <td><a href="freeswitch_public_includes.php?type=publicincludes&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
           </tr>
        </table>
       </td>
