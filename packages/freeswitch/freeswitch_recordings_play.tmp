@@ -32,9 +32,12 @@
 */
 
 $filename = $_GET['filename'];
+$type = $_GET['type']; //moh //rec
 
 ?>
 <html>
+<head>
+</head>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -45,7 +48,21 @@ $filename = $_GET['filename'];
    </tr>  
    <tr>
      <td align='center'>
-        <embed src="freeswitch_recordings.php?a=download&filename=<?=$filename;?>" autostart=true width=200 height=40 name="sound<?=$$filename;?>" enablejavascript="true">
+     <?php
+          
+      $file_ext = substr($_GET['filename'], -3);
+      if ($file_ext == "wav") {
+        echo "<embed src=\"freeswitch_recordings.php?a=download&type=".$type."&filename=".$filename."\" autostart=true width=200 height=40 name=\"sound".$$filename."\" enablejavascript=\"true\">\n";
+      }
+      if ($file_ext == "mp3") {
+        echo "<object type=\"application/x-shockwave-flash\" width=\"400\" height=\"17\" data=\"slim.swf?song_url=".urlencode("/freeswitch/freeswitch_recordings.php?a=download&type=".$type."&filename=".$filename)."\">\n";
+        echo "<param name=\"movie\" value=\"slim.swf?song_url=".urlencode("/freeswitch/freeswitch_recordings.php?a=download&type=".$type."&filename=".$filename)."\" />\n";
+        echo "<param name=\"quality\" value=\"high\"/>\n";
+        echo "<param name=\"bgcolor\" value=\"#E6E6E6\"/>\n";
+        echo "</object>\n";
+      } 
+
+     ?>
      </td>
    </tr>
 </table>

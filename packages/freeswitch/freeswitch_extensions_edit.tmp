@@ -57,6 +57,9 @@ if (isset($id) && $a_extensions[$id]) {
 	$pconfig['vm-mailto'] = $a_extensions[$id]['vm-mailto'];
 	$pconfig['vm-attach-file'] = $a_extensions[$id]['vm-attach-file'];
 	$pconfig['user_context'] = $a_extensions[$id]['user_context'];
+	$pconfig['callgroup'] = $a_extensions[$id]['callgroup'];
+	$pconfig['auth-acl'] = $a_extensions[$id]['auth-acl'];
+	$pconfig['cidr'] = $a_extensions[$id]['cidr'];
 	$pconfig['description'] = $a_extensions[$id]['description'];
 	
 }
@@ -82,6 +85,10 @@ if ($_POST) {
 		$ent['vm-mailto'] = $_POST['vm-mailto'];
 		$ent['vm-attach-file'] = $_POST['vm-attach-file'];
 		$ent['user_context'] = $_POST['user_context'];
+		$ent['callgroup'] = $_POST['callgroup'];		
+		$ent['auth-acl'] = $_POST['auth-acl'];
+		$ent['cidr'] = $_POST['cidr'];		
+		
 		$ent['description'] = $_POST['description'];
 
 		if (isset($id) && $a_extensions[$id]) {
@@ -105,6 +112,15 @@ include("head.inc");
 
 ?>
 
+<script type="text/javascript" language="JavaScript">
+
+function show_advanced_config() {
+	document.getElementById("showadvancedbox").innerHTML='';
+	aodiv = document.getElementById('showadvanced');
+	aodiv.style.display = "block";
+}
+
+</script>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
@@ -248,14 +264,52 @@ include("head.inc");
                 Choose whether to attach the file to the email.
               </td>
             </tr>		
-				    <tr>
+            <tr>
               <td width="22%" valign="top" class="vncellreq">User Context</td>
               <td width="78%" class="vtable"> 
                 <input name="user_context" type="text" class="formfld" id="user_context" size="40" value="<?=htmlspecialchars($pconfig['user_context']);?>">
                 <br><span class="vexpl">Enter the user context here. Example: default<br></span>
               </td>
-            </tr>	
-				    <tr>
+            </tr>
+            <tr>
+              <td width="22%" valign="top" class="vncellreq">Call Group</td>
+              <td width="78%" class="vtable"> 
+                <input name="callgroup" type="text" class="formfld" id="callgroup" size="40" value="<?=htmlspecialchars($pconfig['callgroup']);?>">
+                <br><span class="vexpl">Enter the user call group here. Example: sales<br></span>
+              </td>
+            </tr>
+            
+  			<div id="showadvancedbox">
+  			      <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <tr>
+                <td width="22%" valign="top" class="vncell">Show Advanced</td>
+                <td width="78%" class="vtable"> 
+                  <input type="button" onClick="show_advanced_config()" value="Advanced"></input></a>
+                </td>
+              </tr>
+              </table>				
+  			</div>
+  			<div id="showadvanced" style="display:none">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+              <tr>
+                <td width="22%" valign="top" class="vncell">Auth-ACL</td>
+                <td width="78%" class="vtable"> 
+                  <input name="auth-acl" type="text" class="formfld" id="auth-acl" size="40" value="<?=htmlspecialchars($pconfig['auth-acl']);?>">
+                  <br> <span class="vexpl">Enter the auth acl here.<br></span>
+                </td>
+              </tr>
+              <tr>
+                <td width="22%" valign="top" class="vncell">CIDR</td>
+                <td width="78%" class="vtable"> 
+                  <input name="cidr" type="text" class="formfld" id="cidr" size="40" value="<?=htmlspecialchars($pconfig['cidr']);?>">
+                  <br> <span class="vexpl">Enter the cidr here.<br></span>
+                </td>
+              </tr>              
+              
+              </table>      
+  			</div>
+  			
+            <tr>
               <td width="22%" valign="top" class="vncellreq">Extension Description</td>
               <td width="78%" class="vtable"> 
                 <input name="description" type="text" class="formfld" id="description" size="40" value="<?=htmlspecialchars($pconfig['description']);?>">

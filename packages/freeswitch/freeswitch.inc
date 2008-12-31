@@ -177,6 +177,16 @@ function event_socket_request_cmd($cmd)
   	
 }
 
+function byte_convert( $bytes ) {
+
+    if ($bytes<=0)
+        return '0 Byte';
+
+    $convention=1000; //[1000->10^x|1024->2^x]
+    $s=array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB');
+    $e=floor(log($bytes,$convention));
+    return round($bytes/pow($convention,$e),2).' '.$s[$e];
+}
 
 function  recording_js()
 {
@@ -401,7 +411,12 @@ function sync_package_freeswitch_extensions()
           $fout = fopen("/usr/local/freeswitch/conf/directory/default/".$rowhelper['extension'].".xml","w");
 
           $tmpxml = "<include>\n";
-          $tmpxml .= "  <user id=\"" . $rowhelper['extension'] . "\" mailbox=\"" . $rowhelper['mailbox'] . "\">\n";
+          if (strlen($rowhelper['cidr']) == 0) {          
+          	$tmpxml .= "  <user id=\"" . $rowhelper['extension'] . "\" mailbox=\"" . $rowhelper['mailbox'] . "\">\n";
+          }
+          else {
+          	$tmpxml .= "  <user id=\"" . $rowhelper['extension'] . "\" mailbox=\"" . $rowhelper['mailbox'] . "\" cidr=\"" . $rowhelper['cidr'] . "\">\n";
+          }
           $tmpxml .= "    <params>\n";
           $tmpxml .= "      <param name=\"password\" value=\"" . $rowhelper['password'] . "\"/>\n";
           $tmpxml .= "      <param name=\"vm-password\" value=\"" . $rowhelper['vm-password'] . "\"/>\n";
@@ -420,7 +435,10 @@ function sync_package_freeswitch_extensions()
               }
 
               $tmpxml .= "      <param name=\"vm-mailto\" value=\"" . $rowhelper['vm-mailto'] . "\"/>\n";
-          }	
+          }
+          if (strlen($rowhelper['auth-acl']) > 0) {          
+          	$tmpxml .= "      <param name=\"auth-acl\" value=\"" . $rowhelper['auth-acl'] . "\"/>\n";          
+          }          	
           $tmpxml .= "    </params>\n";
           $tmpxml .= "    <variables>\n";
           $tmpxml .= "      <variable name=\"toll_allow\" value=\"domestic,international,local\"/>\n";
@@ -2066,7 +2084,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.5.7.1";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.5.8";
 	
 	       
 	conf_mount_ro();
