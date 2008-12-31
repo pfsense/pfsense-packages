@@ -258,7 +258,7 @@ function show_advanced_config() {
 	$tab_array[] = array(gettext("IVR"), false, "/freeswitch/freeswitch_ivr.php");
 	$tab_array[] = array(gettext("Modules"), false, "/pkg_edit.php?xml=freeswitch_modules.xml&amp;id=0");
 	$tab_array[] = array(gettext("Public"), false, "/freeswitch/freeswitch_public_includes.php");
-	$tab_array[] = array(gettext("Rec"), false, "/freeswitch/freeswitch_gateways.php");
+	$tab_array[] = array(gettext("Rec"), false, "/freeswitch/freeswitch_recordings.php");
 	$tab_array[] = array(gettext("Status"), false, "/freeswitch/freeswitch_status.php");
 	$tab_array[] = array(gettext("Vars"), false, "/pkg_edit.php?xml=freeswitch_vars.xml&amp;id=0");
  	display_top_tabs($tab_array);
@@ -301,7 +301,7 @@ function show_advanced_config() {
             <tr>
               <td width="22%" valign="top" class="vncellreq">Password</td>
               <td width="78%" class="vtable"> 
-                <input name="password" type="text" class="formfld" id="password" size="40" value="<?=htmlspecialchars($pconfig['password']);?>">
+                <input name="password" type="password" class="formfld" id="password" size="40" value="<?=htmlspecialchars($pconfig['password']);?>">
                 <br><span class="vexpl">Enter the password here.<br></span>
               </td>
             </tr>

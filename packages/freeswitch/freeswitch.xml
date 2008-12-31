@@ -44,7 +44,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>FreeSWITCH Settings</name>
-	<version>0.5.8.1</version>
+	<version>0.5.8.2</version>
 	<title>FreeSWITCH: Settings</title>
 	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
 	<menu>
@@ -346,7 +346,7 @@
 			<fielddescr>Event Socket Password</fielddescr>
 			<fieldname>event_socket_password</fieldname>
 			<description>Enter the event socket password here. default: ClueCon</description>
-			<type>input</type>
+			<type>password</type>
 		</field>	
 		<field>
 			<fielddescr>XML RPC HTTP Port</fielddescr>
@@ -370,13 +370,13 @@
 			<fielddescr>XML RPC Auth Password</fielddescr>
 			<fieldname>xml_rpc_auth_pass</fieldname>
 			<description>Enter the XML RPC Auth Password here. default: works</description>
-			<type>input</type>
+			<type>password</type>
 		</field>
 		<field>
 			<fielddescr>Admin PIN Number</fielddescr>
 			<fieldname>admin_pin</fieldname>
 			<description>Enter a admin pin number. Used to authenticate the admin from the phone.</description>
-			<type>input</type>
+			<type>password</type>
 		</field>
 		<field>
 			<fielddescr>SMTP Host</fielddescr>
@@ -430,7 +430,7 @@
 			<fielddescr>SMTP Password</fielddescr>
 			<fieldname>smtppassword</fieldname>
 			<description>Enter the SMTP authentication password.</description>
-			<type>input</type>
+			<type>password</type>
 		</field>
 		<field>
 			<fielddescr>SMTP From</fielddescr>

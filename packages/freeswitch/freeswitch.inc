@@ -1708,6 +1708,7 @@ function freeswitch_php_install_command()
 	exec("cp /tmp/freeswitch_time_conditions_edit.tmp /usr/local/www/freeswitch/freeswitch_time_conditions_edit.php");
 	unlink_if_exists("/tmp/freeswitch_time_conditions_edit.tmp");
 
+	exec("cp /usr/local/freeswitch/htdocs/slim.swf /usr/local/www/freeswitch/slim.swf");
 
   /* freeswitch settings defaults */
   	if (strlen($config['installedpackages']['freeswitchsettings']['config'][0]['numbering_plan']) == 0) {
@@ -2084,8 +2085,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.5.8.1";
-	
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.5.8.2";
 	       
 	conf_mount_ro();
 	config_unlock();
@@ -2134,8 +2134,8 @@ function freeswitch_deinstall_command()
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_recordings_play.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_time_conditions.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_time_conditions_edit.php");
-	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_status.php");
-
+	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_status.php");	
+	unlink_if_exists("/usr/local/www/freeswitch/slim.swf");
 	
 	exec("rm -R /usr/local/freeswitch/");
 	exec("rm -R /usr/local/www/freeswitch/");
