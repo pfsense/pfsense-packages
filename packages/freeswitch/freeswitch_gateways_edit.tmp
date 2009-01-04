@@ -49,6 +49,7 @@ if (isset($id) && $a_gateways[$id]) {
 	$pconfig['gateway'] = $a_gateways[$id]['gateway'];
 	$pconfig['username'] = $a_gateways[$id]['username'];
 	$pconfig['password'] = $a_gateways[$id]['password'];
+	$pconfig['realm'] = $a_gateways[$id]['realm'];	
 	$pconfig['from-user'] = $a_gateways[$id]['from-user'];
 	$pconfig['from-domain'] = $a_gateways[$id]['from-domain'];	
 	$pconfig['proxy'] = $a_gateways[$id]['proxy'];
@@ -512,7 +513,7 @@ function show_advanced_config() {
               ?>
                 <br>
                 <select name='dialplan_expression_select' id='dialplan_expression_select' onchange="document.getElementById('dialplan_expression').value += document.getElementById('dialplan_expression_select').value + '\n';" class='formfld'>
-                <option></option>
+                <option></option>                
                 <option value='^(\d{7})$'>7 digits local</option>
                 <option value='^(\d{10})$'>10 digits long distance</option>
                 <option value='^(\d{11})$'>11 digits long distance</option>
@@ -520,7 +521,10 @@ function show_advanced_config() {
                 <option value='^411$'>411 information</option>
                 <option value='^911$'>911 emergency</option>
                 <option value='^1?(8(00|55|66|77|88)[2-9]\d{6})$'>toll free</option>
-                
+                <option value='^9(\d{3})$'>Dial 9 then 3 digits</option>
+                <option value='^9(\d{4})$'>Dial 9 then 4 digits</option>
+                <option value='^9(\d{10})$'>Dial 9 then 10 digits</option>
+                <option value='^9(\d{11})$'>Dial 9 then 11 digits</option>                
                 </select>
                 <span class="vexpl">
                 <br />
