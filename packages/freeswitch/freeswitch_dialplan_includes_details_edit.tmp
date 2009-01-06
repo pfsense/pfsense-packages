@@ -198,7 +198,7 @@ include("head.inc");
                     echo "                <option>anti-action</option>\n";
                     //echo "                <option>param</option>\n";
                     break;
-                case "antiaction":
+                case "anti-action":
                     echo "                <option>condition</option>\n";
                     echo "                <option>action</option>\n";
                     echo "                <option selected='yes'>anti-action</option>\n";
