@@ -82,38 +82,33 @@ function sync_package_snort()
 	exec("/bin/rm -f /usr/local/etc/rc.d/snort");
 
 	$first = 0;
-  $snortInterfaces = array(); /* -gtm  */
-  
-	/* generate if list */
-	$iflist = array("lan" => "LAN");
-  
-	for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++)
-		$iflist['opt' . $i] = "opt{$i}";
-    
-	if($_POST['iface_array']) 
-  {
-		foreach($_POST['iface_array'] as $iface) 
-    {
+	$snortInterfaces = array(); /* -gtm  */
+	
+	$if_list = $config['installedpackages']['snort']['config'][0]['iface_array'];
+	$if_array = split(',', $if_list);
+	//print_r($if_array);
+	if($if_array) {
+		foreach($if_array as $iface) {
 			$if = convert_friendly_interface_to_real_interface_name($iface);
-
-			if($config['interfaces'][$iface]['ipaddr'] == "pppoe")
+			
+			if($config['interfaces'][$iface]['ipaddr'] == "pppoe") {
 				$if = "ng0";
-      
-      /* build a list of user specified interfaces -gtm */      
-      if($if)
-      {      
-        array_push($snortInterfaces, $if);
-        $first = 1;
-      }
+			}
+	      
+			/* build a list of user specified interfaces -gtm */      
+			if($if){      
+			  array_push($snortInterfaces, $if);
+			  $first = 1;
+			}
 		}	
-    
-    if (count($snortInterfaces) < 1) 
-    {
-      log_error("Snort will not start.  You must select an interface for it to listen on.");
-		  return;
-    }
-
+	    
+		if (count($snortInterfaces) < 1) {
+			//log_error("Snort will not start.  You must select an interface for it to listen on.");
+			echo "Snort will not start.  You must select an interface for it to listen on.";
+			return;
+		}
 	}
+	//print_r($snortInterfaces);
 	
 	/* create log directory */
 	$start  = "/bin/mkdir -p /var/log/snort";
