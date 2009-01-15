@@ -2151,8 +2151,8 @@ function freeswitch_php_install_command()
       sync_package_freeswitch_ivr();
 	}
 
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.1 revision 10638.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.5.8.7";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.2 revision 11220.";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.5.8.8";
 	       
 	conf_mount_ro();
 	config_unlock();
