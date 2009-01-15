@@ -246,7 +246,7 @@ include("head.inc");
               <td width="22%" valign="top" class="vncellreq">Extension</td>
               <td width="78%" class="vtable"> 
                 <input name="ivrextension" type="text" class="formfld" id="ivrextension" size="40" value="<?=htmlspecialchars($pconfig['ivrextension']);?>">
-                <br> <span class="vexpl">e.g. <em>5001</em></span></td>
+                <br> <span class="vexpl">e.g. <em>5002</em></span></td>
             </tr>
             <tr>
               <td width="22%" valign="top" class="vncellreq">IVR Name</td>

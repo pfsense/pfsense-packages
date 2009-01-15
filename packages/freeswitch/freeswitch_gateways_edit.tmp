@@ -517,6 +517,7 @@ function show_advanced_config() {
                 <option value='^(\d{7})$'>7 digits local</option>
                 <option value='^(\d{10})$'>10 digits long distance</option>
                 <option value='^(\d{11})$'>11 digits long distance</option>
+                <option value='^011(.*)$'>011 International</option>
                 <option value='^311$'>311 information</option>
                 <option value='^411$'>411 information</option>
                 <option value='^911$'>911 emergency</option>
@@ -524,7 +525,7 @@ function show_advanced_config() {
                 <option value='^9(\d{3})$'>Dial 9 then 3 digits</option>
                 <option value='^9(\d{4})$'>Dial 9 then 4 digits</option>
                 <option value='^9(\d{10})$'>Dial 9 then 10 digits</option>
-                <option value='^9(\d{11})$'>Dial 9 then 11 digits</option>                
+                <option value='^9(\d{11})$'>Dial 9 then 11 digits</option>                                
                 </select>
                 <span class="vexpl">
                 <br />

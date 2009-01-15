@@ -218,6 +218,7 @@ function show_advanced_config() {
                 <br><span class="vexpl">Enter the effective caller id number here.<br></span>
               </td>
             </tr>
+            <--
 		        <tr>
               <td width="25%" valign="top" class="vncellreq" nowrap>Outbound Caller ID Name</td>
               <td width="75%" class="vtable"> 
@@ -232,6 +233,7 @@ function show_advanced_config() {
                 <br><span class="vexpl">Enter the outbound caller id number here.<br></span>
               </td>
             </tr>
+            -->
 				    <tr>
               <td width="25%" valign="top" class="vncellreq" nowrap>Voicemail Mail To</td>
               <td width="75%" class="vtable"> 
@@ -275,7 +277,7 @@ function show_advanced_config() {
               <td width="25%" valign="top" class="vncellreq">Call Group</td>
               <td width="75%" class="vtable"> 
                 <input name="callgroup" type="text" class="formfld" id="callgroup" size="40" value="<?=htmlspecialchars($pconfig['callgroup']);?>">
-                <br><span class="vexpl">Enter the user call group here. Example: sales<br></span>
+                <br><span class="vexpl">Enter the user call group here. Example: sales, support<br></span>
               </td>
             </tr>            
             </table>
@@ -320,6 +322,8 @@ function show_advanced_config() {
             <tr>
               <td valign="top">&nbsp;</td>
               <td>
+                <input name="outbound_caller_id_name" type="hidden" class="formfld" id="outbound_caller_id_name" size="40" value="<?=htmlspecialchars($pconfig['outbound_caller_id_name']);?>">
+                <input name="outbound_caller_id_number" type="hidden" class="formfld" id="outbound_caller_id_number" size="40" value="<?=htmlspecialchars($pconfig['outbound_caller_id_number']);?>">
                 <input name="Submit" type="submit" class="formbtn" value="Save"> <input class="formbtn" type="button" value="Cancel" onclick="history.back()">
                 <?php if (isset($id) && $a_extensions[$id]): ?>
                   <input name="id" type="hidden" value="<?=$id;?>">
