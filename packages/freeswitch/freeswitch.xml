@@ -44,7 +44,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>FreeSWITCH Settings</name>
-	<version>0.5.8.8</version>
+	<version>0.6</version>
 	<title>FreeSWITCH: Settings</title>
 	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
 	<menu>
@@ -142,6 +142,21 @@
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/libvorbis.so.4</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/freeswitch/mod_shout.so.1</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/freeswitch/mod_fax.so.1</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/lib/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/freeswitch/libspandsp.so.1</item>
+	</additional_files_needed>		
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>		

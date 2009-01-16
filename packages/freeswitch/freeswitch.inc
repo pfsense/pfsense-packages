@@ -606,6 +606,7 @@ function sync_package_freeswitch_modules()
       if ($rowhelper['mod_conference'] == "enable"){ $tmpxml .= "    <load module=\"mod_conference\"/>\n"; }
       if ($rowhelper['mod_dptools'] == "enable"){   $tmpxml .= "    <load module=\"mod_dptools\"/>\n"; }
       if ($rowhelper['mod_expr'] == "enable"){      $tmpxml .= "    <load module=\"mod_expr\"/>\n"; }
+      if ($rowhelper['mod_fax'] == "enable"){      $tmpxml .= "    <load module=\"mod_fax\"/>\n"; }
       if ($rowhelper['mod_fifo'] == "enable"){      $tmpxml .= "    <load module=\"mod_fifo\"/>\n"; }
       if ($rowhelper['mod_voicemail'] == "enable"){ $tmpxml .= "    <load module=\"mod_voicemail\"/>\n"; }
       if ($rowhelper['mod_limit'] == "enable"){     $tmpxml .= "    <load module=\"mod_limit\"/>\n"; }
@@ -1674,6 +1675,9 @@ function freeswitch_php_install_command()
 	global $config;
 	conf_mount_rw();
 	config_lock();
+	
+	//needed for mod_fax support
+	system('pkg_add -r spandsp');
 
 	if (!is_dir('/usr/local/www/freeswitch/')) {
 	   exec("mkdir /usr/local/www/freeswitch/");
@@ -1695,6 +1699,15 @@ function freeswitch_php_install_command()
   
 	exec("cp /tmp/your_pin_number_is_incorect_goodbye.wav /usr/local/freeswitch/recordings/your_pin_number_is_incorect_goodbye.wav");
 	unlink_if_exists("/tmp/your_pin_number_is_incorect_goodbye.wav");
+
+	
+	//rename .so files from .1 to .so
+	exec("cp /tmp/mod_shout.so.1 /usr/local/freeswitch/mod/mod_shout.so");
+	unlink_if_exists("/tmp/mod_shout.so.tmp");
+
+	exec("cp /tmp/mod_fax.so.1 /usr/local/freeswitch/mod/mod_fax.so");
+	unlink_if_exists("/tmp/mod_shout.so.tmp");
+	
 	
 	//rename PHP files from .tmp to .php
 	exec("cp /tmp/class.smtp.tmp /usr/local/www/freeswitch/class.smtp.php");
@@ -1995,6 +2008,9 @@ function freeswitch_php_install_command()
   	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_expr']) == 0) {
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_expr'] = "enable";
   	}
+  	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_fax']) == 0) {
+  	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_fax'] = "enable";
+  	}
   	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_fifo']) == 0) {
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_fifo'] = "enable";
   	}
@@ -2151,8 +2167,8 @@ function freeswitch_php_install_command()
       sync_package_freeswitch_ivr();
 	}
 
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.2 revision 11220.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.5.8.8";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.2 revision 11245.";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.6";
 	       
 	conf_mount_ro();
 	config_unlock();

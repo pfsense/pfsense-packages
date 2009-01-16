@@ -563,6 +563,22 @@
 			</options>
 	</field>
     <field>
+			<fielddescr>mod_fax</fielddescr>
+			<fieldname>mod_fax</fieldname>
+			<description>FAX provides fax send and receive.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>enable</name>
+					<value>enable</value>
+				</option>
+				<option>
+					<name>disable</name>
+					<value>disable</value>
+				</option>
+			</options>
+	</field>
+    <field>
 			<fielddescr>mod_fifo</fielddescr>
 			<fieldname>mod_fifo</fieldname>
 			<description>FIFO provides custom call queues including call park.</description>
