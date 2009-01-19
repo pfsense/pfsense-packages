@@ -2130,12 +2130,13 @@ function freeswitch_php_install_command()
 	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/recordings/');
 	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/scripts/');
 	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/storage/');
-	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/sounds/music/8000/'); 
-	        
-	      //Optional  
-	        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/conf/');
+	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/sounds/music/8000/');
+	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/conf/ssl');
+
+	      //Optional
+	      	//system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/conf/');  
 	        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/grammar/');  
-	        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/htdocs/');  
+	        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/htdocs/');
 			
 			unset($filename);
 	    }
@@ -2168,7 +2169,7 @@ function freeswitch_php_install_command()
 	}
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.2 revision 11245.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.6";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.6.1";
 	       
 	conf_mount_ro();
 	config_unlock();
