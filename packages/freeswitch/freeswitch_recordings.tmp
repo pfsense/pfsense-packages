@@ -214,6 +214,7 @@ if (is_dir($dir_recordings)) {
                     $recordingent = array();
                     $recordingent['filename'] = $file;
                     $recordingent['recordingname'] = $a_file[0];
+                    $recordingent['recordingid'] = guid();
                     //$recordingent['filecontent'] = base64_encode($file_content);
                     $recordingent['descr'] = 'Auto';
                     
