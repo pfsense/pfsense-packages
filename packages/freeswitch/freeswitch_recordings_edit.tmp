@@ -46,6 +46,7 @@ if (isset($_POST['id'])) {
 if (isset($id) && $a_recordings[$id]) {
 	$pconfig['filename'] = $a_recordings[$id]['filename'];
 	$pconfig['recordingname'] = $a_recordings[$id]['recordingname'];
+	$pconfig['recordingid'] = $a_recordings[$id]['recordingid'];
 	$pconfig['descr'] = $a_recordings[$id]['descr'];
 }
 
