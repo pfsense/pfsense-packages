@@ -211,22 +211,22 @@ function show_advanced_config() {
                 <br><span class="vexpl">Enter the effective caller id name here.<br></span>
               </td>
             </tr>		
-		        <tr>
+		    <tr>
               <td width="25%" valign="top" class="vncellreq" nowrap>Effective Caller ID Number</td>
               <td width="75%" class="vtable"> 
                 <input name="effective_caller_id_number" type="text" class="formfld" id="effective_caller_id_number" size="40" value="<?=htmlspecialchars($pconfig['effective_caller_id_number']);?>">
                 <br><span class="vexpl">Enter the effective caller id number here.<br></span>
               </td>
             </tr>
-            <--
-		        <tr>
+            <!--
+		    <tr>
               <td width="25%" valign="top" class="vncellreq" nowrap>Outbound Caller ID Name</td>
               <td width="75%" class="vtable"> 
                 <input name="outbound_caller_id_name" type="text" class="formfld" id="outbound_caller_id_name" size="40" value="<?=htmlspecialchars($pconfig['outbound_caller_id_name']);?>">
                 <br><span class="vexpl">Enter the outbound caller id name here.<br></span>
               </td>
             </tr>
-		        <tr>
+		    <tr>
               <td width="25%" valign="top" class="vncellreq" nowrap>Outbound Caller ID Number</td>
               <td width="75%" class="vtable"> 
                 <input name="outbound_caller_id_number" type="text" class="formfld" id="outbound_caller_id_number" size="40" value="<?=htmlspecialchars($pconfig['outbound_caller_id_number']);?>">
@@ -234,7 +234,7 @@ function show_advanced_config() {
               </td>
             </tr>
             -->
-				    <tr>
+			<tr>
               <td width="25%" valign="top" class="vncellreq" nowrap>Voicemail Mail To</td>
               <td width="75%" class="vtable"> 
                 <input name="vm-mailto" type="text" class="formfld" id="vm-mailto" size="40" value="<?=htmlspecialchars($pconfig['vm-mailto']);?>">
