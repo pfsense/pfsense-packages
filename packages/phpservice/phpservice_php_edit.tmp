@@ -100,7 +100,7 @@ function show_advanced_config() {
 <?php
 			
 	$tab_array = array();
-	$tab_array[] = array(gettext("PHP"), false, "/phpservice_php.php");
+	$tab_array[] = array(gettext("PHP"), false, "/packages/phpservice_php.php");
 	display_top_tabs($tab_array);
  	
 ?>

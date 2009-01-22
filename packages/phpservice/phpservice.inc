@@ -153,12 +153,12 @@ function sync_package_phpservice()
 function sync_package() 
 {
   
-  global $config;   
-  sync_package_phpservice();
+	global $config;   
+	sync_package_phpservice();
 
-  //if (!is_dir('/usr/local/www/phpservice/')) {
-    //exec("mkdir /usr/local/www/phpservice/");
-  //}
+	if (!is_dir('/usr/local/www/packages/phpservice/')) {
+	   exec("mkdir /usr/local/www/packages/phpservice/");
+	}
 
 }
     
@@ -170,17 +170,17 @@ function php_install_command()
 	conf_mount_rw();
 	config_lock();
 
-	//if (!is_dir('/usr/local/www/phpservice/')) {
-	   //exec("mkdir /usr/local/www/phpservice/");
-	//}
+	if (!is_dir('/usr/local/www/packages/phpservice/')) {
+	   exec("mkdir /usr/local/www/packages/phpservice/");
+	}
 
 	
 	//rename PHP files from .tmp to .php
-	exec("cp /tmp/phpservice_php.tmp /usr/local/www/phpservice_php.php");
+	exec("cp /tmp/phpservice_php.tmp /usr/local/www/packages/phpservice/phpservice_php.php");
 	unlink_if_exists("/tmp/phpservice_php.tmp");
 	
-	exec("cp /tmp/phpservice.tmp /usr/local/pkg/phpservice.php");
-	unlink_if_exists("/tmp/phpservice.tmp");
+	exec("cp /tmp/phpservice_php_edit.tmp /usr/local/www/packages/phpservice/phpservice_php_edit.php");
+	unlink_if_exists("/tmp/phpservice_php_edit.tmp");
 		
 
     //write_config();

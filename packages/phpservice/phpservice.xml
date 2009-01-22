@@ -41,7 +41,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>PHP Service Settings</name>
-	<version>0.1</version>
+	<version>0.2</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/phpservice.inc</include_file>
 	<menu>
@@ -49,12 +49,12 @@
 		<tooltiptext>PHP Service settings.</tooltiptext>
 		<section>Services</section>
 		<configfile>phpservice.xml</configfile>
-		<url>/phpservice.php</url>
+		<url>/packages/phpservice_php.php</url>
 	</menu>
 	<service>
 		<name>PHPService</name>
-    <rcfile>phpservice.sh</rcfile>
-    <executable>phpservice</executable>
+		<rcfile>phpservice.sh</rcfile>
+		<executable>phpservice</executable>
 		<description>PHP Service</description>    
 	</service>
 	<tabs>
@@ -65,7 +65,7 @@
 		</tab>
 		<tab>
 			<text>Settings</text>
-			<url>/phpservice_php.php</url>
+			<url>/packages/phpservice_php.php</url>
 			<active/>
 		</tab>		
 	</tabs>
@@ -81,7 +81,7 @@
 		<item>http://www.pfsense.com/packages/config/phpservice/phpservice.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/</prefix>
+		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/phpservice/phpservice_php.tmp</item>
 	</additional_files_needed>
@@ -107,10 +107,10 @@
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
-	    sync_package_phpservice_settings();
+		sync_package();
 	</custom_php_resync_config_command>
 	<custom_delete_php_command>    
-      sync_package_phpservice_settings();
+		sync_package();
 	</custom_delete_php_command>
 	<custom_php_install_command>
 		php_install_command();
