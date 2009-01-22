@@ -150,7 +150,7 @@ function sync_package_phpservice()
 }
 
 
-function sync_package() 
+function php_sync_package() 
 {
   
 	global $config;   
@@ -193,7 +193,7 @@ function php_install_command()
 		)
 	);
 		  	       
-	sync_package();
+	php_sync_package();
 	$handle = popen("/usr/local/etc/rc.d/phpservice.sh start", "r");
 	pclose($handle);
 	
