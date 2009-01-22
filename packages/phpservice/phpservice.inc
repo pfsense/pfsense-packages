@@ -58,7 +58,7 @@ function byte_convert( $bytes ) {
 }
 
  
-function sync_package_phpservice()
+function phpservice_sync_package_php()
 {
 
   global $config; 
@@ -150,11 +150,11 @@ function sync_package_phpservice()
 }
 
 
-function php_sync_package() 
+function phpservice_sync_package() 
 {
   
 	global $config;   
-	sync_package_phpservice();
+	phpservice_sync_package_php();
 
 	if (!is_dir('/usr/local/www/packages/phpservice/')) {
 	   exec("mkdir /usr/local/www/packages/phpservice/");
@@ -193,7 +193,7 @@ function php_install_command()
 		)
 	);
 		  	       
-	php_sync_package();
+	phpservice_sync_package();
 	$handle = popen("/usr/local/etc/rc.d/phpservice.sh start", "r");
 	pclose($handle);
 	
