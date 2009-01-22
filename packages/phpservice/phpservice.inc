@@ -156,10 +156,6 @@ function phpservice_sync_package()
 	global $config;   
 	phpservice_sync_package_php();
 
-	if (!is_dir('/usr/local/www/packages/phpservice/')) {
-	   exec("mkdir /usr/local/www/packages/phpservice/");
-	}
-
 }
     
 
@@ -170,6 +166,10 @@ function php_install_command()
 	conf_mount_rw();
 	config_lock();
 
+	if (!is_dir('/usr/local/www/packages/')) {
+	   exec("mkdir /usr/local/www/packages/");
+	}
+	
 	if (!is_dir('/usr/local/www/packages/phpservice/')) {
 	   exec("mkdir /usr/local/www/packages/phpservice/");
 	}

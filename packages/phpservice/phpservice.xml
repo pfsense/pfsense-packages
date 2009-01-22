@@ -49,7 +49,7 @@
 		<tooltiptext>PHP Service settings.</tooltiptext>
 		<section>Services</section>
 		<configfile>phpservice.xml</configfile>
-		<url>/packages/phpservice_php.php</url>
+		<url>/packages/phpservice/phpservice_php.php</url>
 	</menu>
 	<service>
 		<name>PHPService</name>
