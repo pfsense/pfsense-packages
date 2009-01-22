@@ -194,8 +194,8 @@ function php_install_command()
 	);
 		  	       
 	phpservice_sync_package();
-	$handle = popen("/usr/local/etc/rc.d/phpservice.sh start", "r");
-	pclose($handle);
+	//$handle = popen("/usr/local/etc/rc.d/phpservice.sh start", "r");
+	//pclose($handle);
 	
 	//if (pkg_is_service_running('phpservice')) {  
 		//documentation purposes
