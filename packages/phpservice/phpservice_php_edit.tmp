@@ -69,7 +69,7 @@ if ($_POST) {
 		}
 		
 		write_config();
-		sync_package_phpservice();
+		php_sync_package();
 		
 		header("Location: phpservice_php.php");
 		exit;
@@ -110,7 +110,7 @@ function show_advanced_config() {
    <tr>
      <td class="tabcont" >
 
-
+	<!--
   	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>PHP<br>
@@ -118,6 +118,7 @@ function show_advanced_config() {
             </p></td>
       </tr>
     </table>
+    -->
     <br />
     
         <form action="phpservice_php_edit.php" method="post" name="iform" id="iform">
@@ -134,7 +135,7 @@ function show_advanced_config() {
               <td width="22%" valign="top" class="vncell">PHP</td>
               <td width="78%" class="vtable">
               <?php
-                echo "<textarea name=\"php\" id=\"php\" cols=\"30\" rows=\"4\" wrap=\"off\"></textarea>\n";
+                echo "<textarea name=\"php\" id=\"php\" cols=\"70\" rows=\"7\" wrap=\"off\">".htmlspecialchars($pconfig['php'])."</textarea>\n";
               ?>
                 <!--
                 <br>

@@ -118,15 +118,15 @@ function phpservice_sync_package_php()
 		$tmp .= "  }\n";
 		$tmp .= "\n";
 		$tmp .= "\n";
-
-		$tmp .= "//------------------------------------------\n";
+		$tmp .= "\n";
 		      
 		foreach($config['installedpackages']['phpservice']['config'] as $rowhelper) {
-				      
-		      $tmp .= base64_decode($rowhelper['php']);
-		      $tmp .= "\n";
-		      $tmp .= "//------------------------------------------\n";
-		                
+
+			$tmp .= "// name: ".$rowhelper['name']." \n";
+			$tmp .= "// description: ".$rowhelper['description']." \n\n";				      
+			$tmp .= base64_decode($rowhelper['php']);
+			$tmp .= "\n";
+
 		}
       		
 		$tmp .= "\n";
@@ -150,7 +150,7 @@ function phpservice_sync_package_php()
 }
 
 
-function phpservice_sync_package() 
+function php_sync_package() 
 {
   
 	global $config;   
@@ -193,7 +193,7 @@ function php_install_command()
 		)
 	);
 		  	       
-	phpservice_sync_package();
+	php_sync_package();
 	//$handle = popen("/usr/local/etc/rc.d/phpservice.sh start", "r");
 	//pclose($handle);
 	
