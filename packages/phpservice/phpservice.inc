@@ -121,11 +121,15 @@ function phpservice_sync_package_php()
 		$tmp .= "\n";
 		      
 		foreach($config['installedpackages']['phpservice']['config'] as $rowhelper) {
-
-			$tmp .= "// name: ".$rowhelper['name']." \n";
-			$tmp .= "// description: ".$rowhelper['description']." \n\n";				      
-			$tmp .= base64_decode($rowhelper['php']);
-			$tmp .= "\n";
+			if ($rowhelper['enabled'] != "false") {
+				$tmp_php = base64_decode($rowhelper['php'];
+				if (strlen($tmp_php) > 0) {
+					$tmp .= "// name: ".$rowhelper['name']." \n";
+					$tmp .= "// description: ".$rowhelper['description']." \n\n";				      
+					$tmp .= base64_decode($rowhelper['php']);
+					$tmp .= "\n";
+				}
+			}
 
 		}
       		

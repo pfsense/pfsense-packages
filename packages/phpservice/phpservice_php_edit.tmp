@@ -43,6 +43,7 @@ if (isset($id) && $a_phpservice[$id]) {
 
 	$pconfig['name'] = $a_phpservice[$id]['name'];
 	$pconfig['php'] = base64_decode($a_phpservice[$id]['php']);
+	$pconfig['enabled'] = $a_phpservice[$id]['enabled'];
 	$pconfig['description'] = $a_phpservice[$id]['description'];
 	
 }
@@ -56,7 +57,8 @@ if ($_POST) {
 	
 		$ent = array();
 		$ent['name'] = $_POST['name'];
-		$ent['php'] = base64_encode($_POST['php']);		
+		$ent['php'] = base64_encode($_POST['php']);
+		$ent['enabled'] = $_POST['enabled'];		
 		$ent['description'] = $_POST['description'];
 
 		if (isset($id) && $a_phpservice[$id]) {
@@ -100,7 +102,7 @@ function show_advanced_config() {
 <?php
 			
 	$tab_array = array();
-	$tab_array[] = array(gettext("PHP"), false, "/packages/phpservice_php.php");
+	$tab_array[] = array(gettext("Settings"), false, "/packages/phpservice/phpservice_php.php");
 	display_top_tabs($tab_array);
  	
 ?>
@@ -135,7 +137,7 @@ function show_advanced_config() {
               <td width="22%" valign="top" class="vncell">PHP</td>
               <td width="78%" class="vtable">
               <?php
-                echo "<textarea name=\"php\" id=\"php\" cols=\"70\" rows=\"7\" wrap=\"off\">".htmlspecialchars($pconfig['php'])."</textarea>\n";
+                echo "<textarea name=\"php\" id=\"php\" cols=\"70\" rows=\"15\" wrap=\"off\">".htmlspecialchars($pconfig['php'])."</textarea>\n";
               ?>
                 <!--
                 <br>
@@ -149,7 +151,30 @@ function show_advanced_config() {
                	-->               	   
                 </td>
             </tr>
-            
+            <tr>
+              <td width="22%" valign="top" class="vncellreq">Enabled</td>
+              <td width="78%" class="vtable"> 
+                <?php                
+                echo "              <select name='enabled' class='formfld'>\n";
+                echo "                <option></option>\n";
+                switch (htmlspecialchars($pconfig['enabled'])) {
+                case "true":
+                    echo "              <option value='true' selected='yes'>true</option>\n";
+                    echo "              <option value='false'>false</option>\n";
+                    break;
+                case "false":
+                    echo "              <option value='true'>true</option>\n";
+                    echo "              <option value='false' selected='yes'>false</option>\n";
+
+                    break;
+                default:
+                    echo "              <option value='true' selected='yes'>true</option>\n";
+                    echo "              <option value='false'>false</option>\n";
+                }
+                echo "              </select>\n";
+                ?>          
+              </td>
+            </tr>
             <tr>
               <td width="25%" valign="top" class="vncellreq">Description</td>
               <td width="75%" class="vtable"> 

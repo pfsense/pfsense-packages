@@ -59,7 +59,7 @@ include("head.inc");
 <?php
 			
 	$tab_array = array();
-	$tab_array[] = array(gettext("PHP"), false, "/packages/phpservice_php.php");
+	$tab_array[] = array(gettext("Settings"), false, "/packages/phpservice/phpservice_php.php");
  	display_top_tabs($tab_array);
  	
 ?>
@@ -87,9 +87,11 @@ if ($config_change == 1) {
 ?>
   	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
       <tr>
-        <td><p><span class="vexpl"><span class="red"><strong>PHP Service<br>
-            </strong></span>
-            PHP Service is an easy way to monitor Memory, CPU, and files and send events to the system log.
+        <td><p><!--<span class="vexpl"><span class="red"><strong>PHP Service<br></strong></span>-->
+            Is command line PHP designed to run PHP as a Service. The custom PHP code that is defined below is run over and over again inside a continuous loop. There are many possible uses such as monitoring CPU, Memory, File System Space, interacting with Snort, and many others uses that are yet to be discovered. 
+            It can send events to the sylog that will can be viewed from the system log or remote syslog server. example: exec("logger This is a test");
+            <br /><br />
+            For more information see: <a href='http://doc.pfsense.org/index.php/PHPService'>http://doc.pfsense.org/index.php/PHPService</a>            
             </p></td>
       </tr>
     </table>
@@ -97,8 +99,9 @@ if ($config_change == 1) {
 		
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
-      <td width="20%" class="listhdrr">Name</td>
-      <td width="25%" class="listhdr">Description</td>
+      <td width="30%" class="listhdrr">Name</td>
+      <td width="20%" class="listhdrr">Enabled</td>
+      <td width="40%" class="listhdr">Description</td>
       <td width="10%" class="list">
 
         <table border="0" cellspacing="0" cellpadding="1">
@@ -109,7 +112,7 @@ if ($config_change == 1) {
         </table>
 
       </td>
-		</tr>
+	</tr>
 
 
 		<?php 
@@ -123,6 +126,9 @@ if ($config_change == 1) {
           <tr>
             <td class="listr" ondblclick="document.location='phpservice_php_edit.php?id=<?=$i;?>';">
               <?=$ent['name'];?>&nbsp;
+            </td>
+            <td class="listr" ondblclick="document.location='phpservice_php_edit.php?id=<?=$i;?>';">
+              <?=$ent['enabled'];?>&nbsp;
             </td>
             <td class="listbg" ondblclick="document.location='phpservice_php_edit.php?id=<?=$i;?>';">
               <font color="#FFFFFF"><?=htmlspecialchars($ent['description']);?>&nbsp;
@@ -144,7 +150,7 @@ if ($config_change == 1) {
     ?>
 
     <tr>
-      <td class="list" colspan="2"></td>
+      <td class="list" colspan="3"></td>
       <td class="list">          
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
@@ -157,7 +163,7 @@ if ($config_change == 1) {
 
 
      <tr>
-       <td class="list" colspan="2"></td>
+       <td class="list" colspan="3"></td>
        <td class="list"></td>
      </tr>
      </table>

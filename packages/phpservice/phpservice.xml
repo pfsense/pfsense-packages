@@ -52,7 +52,7 @@
 		<url>/packages/phpservice/phpservice_php.php</url>
 	</menu>
 	<service>
-		<name>PHPService</name>
+		<name>PHP Service</name>
 		<rcfile>phpservice.sh</rcfile>
 		<executable>phpservice</executable>
 		<description>PHP Service</description>    
