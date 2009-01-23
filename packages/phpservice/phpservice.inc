@@ -122,7 +122,7 @@ function phpservice_sync_package_php()
 		      
 		foreach($config['installedpackages']['phpservice']['config'] as $rowhelper) {
 			if ($rowhelper['enabled'] != "false") {
-				$tmp_php = base64_decode($rowhelper['php'];
+				$tmp_php = base64_decode($rowhelper['php']);
 				if (strlen($tmp_php) > 0) {
 					$tmp .= "// name: ".$rowhelper['name']." \n";
 					$tmp .= "// description: ".$rowhelper['description']." \n\n";				      
