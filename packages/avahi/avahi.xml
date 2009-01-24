@@ -59,7 +59,7 @@
 		<field>
 			<fielddescr>Enable</fielddescr>
 			<fieldname>enable</fieldname>
-			<description>Enable AVAHI Bonjour proxy.</description>
+			<description>Enable Avahi Bonjour/Zeroconf proxy.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
