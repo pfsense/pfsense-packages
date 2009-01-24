@@ -73,6 +73,20 @@
       <configurationfile>freeswitch.xml</configurationfile>
     </package>
     <package>
+      <name>Notes</name>
+      <website></website>
+      <descr>Customizable PHP service that can monitor memory, CPU, files and send alerts to the syslog.</descr>
+      <category>Status</category>
+      <pkginfolink></pkginfolink>
+      <config_file>http://www.pfsense.com/packages/config/notes/notes.xml</config_file>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <version>0.1</version>
+      <status>Alpha</status>
+      <required_version>1.2.1</required_version>
+      <maintainer>markjcrane@gmail.com</maintainer>
+      <configurationfile>notes.xml</configurationfile>
+    </package>    
+    <package>
       <name>TFTP</name>
       <website></website>
       <descr>Trivial File Transport Protocol is a very simple file transfer protocol. Often used with routers, voip phones and more.</descr>
@@ -89,13 +103,13 @@
     <package>
       <name>PHPService</name>
       <website></website>
-      <descr>Customizable PHP service that can monitor memory, CPU, files and send alerts to the syslog.</descr>
+      <descr>PHP run as a service it can do anything PHP can do including but not limited to monitoring files, CPU, RAM, and send alerts to the syslog.</descr>
       <category>Services</category>
       <pkginfolink>http://doc.pfsense.org/index.php/PHPService</pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/phpservice/phpservice.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <version>0.2.9</version>
-      <status>Alpha</status>
+      <status>Beta</status>
       <required_version>1.2.1</required_version>
       <maintainer>markjcrane@gmail.com</maintainer>
       <configurationfile>phpservice.xml</configurationfile>
