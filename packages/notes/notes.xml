@@ -41,7 +41,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>Notes</name>
-	<version>0.1</version>
+	<version>0.2</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/notes.inc</include_file>
 	<menu>
@@ -63,18 +63,28 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/notes/notes.inc</item>
-	</additional_files_needed>			
+	</additional_files_needed>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Title</fielddescr>
+			<fieldname>title</fieldname>
+		</columnitem>		
+		<columnitem>
+			<fielddescr>Category</fielddescr>
+			<fieldname>category</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>				
 	<fields>
 		<field>
 			<fielddescr>Title</fielddescr>
 			<fieldname>title</fieldname>
-			<description>Enter the title of your notes.</description>
+			<description>Enter the title.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Category</fielddescr>
 			<fieldname>category</fieldname>
-			<description>Enter a category for your notes.</description>
+			<description>Enter a category.</description>
 			<type>input</type>
 		</field>		
 		<field>
