@@ -55,6 +55,7 @@ function setup_avahi() {
 	$domain = $config['system']['domain'];
 	$enable = $config['installedpackages']['avahi']['config'][0]['enable'];
 	$browsedomains = $config['installedpackages']['avahi']['config'][0]['browsedomains'];
+	$denyif = $config['installedpackages']['avahi']['config'][0]['denyinterfaces'];
 
 	// Is package disabled?
 	if(!$enable) {
@@ -70,6 +71,19 @@ function setup_avahi() {
 	if(!$browsedomains)
 		$browsedomains = "local, 0pointer.de, zeroconf.org";
 
+	// Never pass along WAN.  Bad.
+	$denyinterfaces = $config['interfaces']['wan']['if'];
+
+	// Process interfaces defined by user to deny.
+	if($denyif) {
+		$if = split(",", $denyif);
+		foreach($if as $i) {
+			$ifreal = convert_friendly_interface_to_real_interface_name($i);
+			if($ifreal)
+				$denyinterfaces .= ", " . $ifreal;
+		}
+	}
+
 	// Construct the avahi configuration
 	$avahiconfig   = <<<EOF
 
@@ -81,6 +95,7 @@ function setup_avahi() {
 host-name={$hostname}
 domain-name={$domain}
 browse-domains={$browsedomains}
+deny-interfaces={$denyinterfaces}
 use-ipv4=yes
 use-ipv6=no
 enable-dbus=no

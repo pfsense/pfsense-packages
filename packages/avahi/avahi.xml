@@ -68,6 +68,13 @@
 			<description>Enter the domains that you would like proxied. (example: local, pfsense.org, mydomain.com)</description>
 			<type>input</type>
 		</field>
+		<field>
+			<fielddescr>Deny interfaces</fielddescr>
+			<fieldname>denyinterfaces</fieldname>
+			<description>Interfaces that you do NOT want Avahi to listen on.  NOTE: WAN is disabled by default.</description>
+			<type>interfaces_selection</type>
+			<multiple>true</multiple>
+		</field>
 	</fields>
 	<custom_add_php_command>
 		setup_avahi();
