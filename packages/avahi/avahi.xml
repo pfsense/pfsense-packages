@@ -35,13 +35,13 @@
 	<version>1.0</version>
 	<title>Services: Avahi</title>
 	<menu>
-		<name>avahi</name>
+		<name>Avahi</name>
 		<tooltiptext>Modify avahi settings.</tooltiptext>
 		<section>Services</section>
 		<url>pkg_edit.php?xml=avahi.xml&amp;id=0</url>
 	</menu>
 	<service>
-		<name>Avahi</name>
+		<name>avahi</name>
 		<rcfile>avahi.sh</rcfile>
 		<executable>avahi</executable>
 	</service>
