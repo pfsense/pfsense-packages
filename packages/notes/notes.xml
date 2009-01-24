@@ -49,7 +49,7 @@
 		<tooltiptext>Notes.</tooltiptext>
 		<section>Status</section>
 		<configfile>notes.xml</configfile>
-		<url>pkg.php?xml=notes.xml</url>
+		<url>/pkg.php?xml=notes.xml</url>
 	</menu>
 	<tabs>
 		<tab>
