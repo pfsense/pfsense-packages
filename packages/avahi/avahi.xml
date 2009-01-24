@@ -48,12 +48,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/avahi/avahi.inc</item>
+		<item>http://www.pfsense.org/packages/config/avahi/avahi.inc</item>
 	</additional_files_needed>	
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/avahi/binaries/avahi.tgz</item>
+		<item>http://www.pfsense.org/packages/config/avahi/binaries/avahi.tgz</item>
 	</additional_files_needed>
 	<fields>
 		<field>
@@ -75,6 +75,5 @@
 	<custom_php_deinstall_command>
 		delete_avahi();
 	</custom_php_deinstall_command>
-
 	<include_file>avahi.inc</include_file>
 </packagegui>
