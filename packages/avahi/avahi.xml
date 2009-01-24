@@ -41,7 +41,7 @@
 		<url>pkg_edit.php?xml=avahi.xml&amp;id=0</url>
 	</menu>
 	<service>
-		<name>avahi</name>
+		<name>Avahi</name>
 		<rcfile>avahi.sh</rcfile>
 		<executable>avahi</executable>
 	</service>
@@ -66,7 +66,7 @@
 			<fielddescr>Browse domains (comma separated)</fielddescr>
 			<fieldname>browsedomains</fieldname>
 			<description>Enter the domains that you would like proxied. (example: local, pfsense.org, mydomain.com)</description>
-			<type>checkbox</type>
+			<type>input</type>
 		</field>
 	</fields>
 	<custom_php_install_command>
