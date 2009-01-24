@@ -62,6 +62,10 @@ function setup_avahi() {
 		return;
 	}
 
+	// Add needed users and groups
+	exec("/usr/sbin/pw useradd  avahi");
+	exec("/usr/sbin/pw groupadd avahi");	
+
 	// No supplied domains?  Use the defaults.
 	if(!$browsedomains)
 		$browsedomains = "local, 0pointer.de, zeroconf.org";
@@ -124,7 +128,7 @@ EOF;
 	fwrite($fd, $avahiconfig);
 	fclose($fd);
 	/* Write out rc.d startup file */
-	$start = "/usr/local/sbin/avahi-daemon";
+	$start = "/usr/local/sbin/avahi-daemon -D";
 	$stop = "/usr/bin/killall avahi-daemon";
 	write_rcfile(array(
 		"file" => "avahi-daemon.sh",
