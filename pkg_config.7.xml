@@ -74,13 +74,13 @@
     </package>
     <package>
       <name>Notes</name>
-      <website></website>
-      <descr>Customizable PHP service that can monitor memory, CPU, files and send alerts to the syslog.</descr>
+      <website>Track things you want to note for this system.</website>
+      <descr></descr>
       <category>Status</category>
       <pkginfolink></pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/notes/notes.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <version>0.2</version>
+      <version>0.2.1</version>
       <status>Alpha</status>
       <required_version>1.2.1</required_version>
       <maintainer>markjcrane@gmail.com</maintainer>
