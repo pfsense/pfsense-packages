@@ -159,6 +159,31 @@ if ($_POST) {
 	                    $label = "911";
 	                    $abbrv = "911";
 	                    break;
+	                case "^9(\d{3})$":
+	                    $action_data = "sofia/gateway/".$gateway."/1".$default_area_code."\$1";
+	                    $label = "dial 9, 3 digits";
+	                    $abbrv = "9.3d"; 
+	                    break;
+	                case "^9(\d{4})$":
+	                    $action_data = "sofia/gateway/".$gateway."/1".$default_area_code."\$1";
+	                    $label = "dial 9, 4 digits";
+	                    $abbrv = "9.4d"; 
+	                    break;	                    
+	                case "^9(\d{7})$":
+	                    $action_data = "sofia/gateway/".$gateway."/1".$default_area_code."\$1";
+	                    $label = "dial 9, 7 digits";
+	                    $abbrv = "9.7d"; 
+	                    break;
+	                case "^9(\d{10})$":
+	                    $action_data = "sofia/gateway/".$gateway."/\$1";
+	                    $label = "dial 9, 10 digits";
+	                    $abbrv = "9.10d";
+	                    break;
+	                case "^9(\d{11})$":
+	                    $action_data = "sofia/gateway/".$gateway."/\$1";
+	                    $label = "dial 9, 11 digits";
+	                    $abbrv = "9.11d";
+	                    break;
 	                case "^1?(8(00|55|66|77|88)[2-9]\d{6})$":
 	                    $action_data = "sofia/gateway/".$gateway."/\$1";
 	                    $label = "toll free";
@@ -524,6 +549,7 @@ function show_advanced_config() {
                 <option value='^1?(8(00|55|66|77|88)[2-9]\d{6})$'>toll free</option>
                 <option value='^9(\d{3})$'>Dial 9 then 3 digits</option>
                 <option value='^9(\d{4})$'>Dial 9 then 4 digits</option>
+                <option value='^9(\d{7})$'>Dial 9 then 7 digits</option>
                 <option value='^9(\d{10})$'>Dial 9 then 10 digits</option>
                 <option value='^9(\d{11})$'>Dial 9 then 11 digits</option>                                
                 </select>
