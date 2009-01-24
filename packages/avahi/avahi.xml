@@ -46,9 +46,9 @@
 		<executable>avahi</executable>
 	</service>
 	<additional_files_needed>
-		<prefix>/usr/local/sbin/</prefix>
+		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/avahi/binaries/avahi</item>
+		<item>http://www.pfsense.com/packages/avahi/binaries/avahi.tgz</item>
 	</additional_files_needed>
 	<fields>
 		<field>
@@ -64,12 +64,12 @@
 			<type>checkbox</type>
 		</field>
 	</fields>
-	<custom_php_global_functions>
-	</custom_php_global_functions>
-	<custom_add_php_command>
-	</custom_add_php_command>
 	<custom_php_install_command>
 		setup_avahi();
 	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		delete_avahi();
+	</custom_php_deinstall_command>
+
 	<include_file>avahi.inc</include_file>
 </packagegui>
