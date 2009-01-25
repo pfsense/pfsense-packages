@@ -143,11 +143,13 @@ EOF;
 	fwrite($fd, $avahiconfig);
 	fclose($fd);
 	/* Write out rc.d startup file */
-	$start = "if [ ! -d /proc/0 ]; then\n";
+	$start = "/etc/rc.conf_mount_rw\n";
+	$start .= "if [ ! -d /proc/0 ]; then\n";
 	$start .= "	mkdir -p /proc\n";
 	$start .= "	mount -t procfs procfs /proc\n";
 	$start .= "fi\n";
 	$start .= "/usr/local/sbin/avahi-daemon -D\n";
+	$start .= "/etc/rc.conf_mount_ro\n";	
 	$stop = "/usr/bin/killall avahi-daemon";
 	write_rcfile(array(
 		"file" => "avahi-daemon.sh",
