@@ -144,6 +144,7 @@ EOF;
 	fclose($fd);
 	/* Write out rc.d startup file */
 	$start = "if [ ! -d /proc/0 ]; then\n";
+	$start .= "	mkdir -t /proc\n";
 	$start .= "	mount -t procfs procfs /proc\n";
 	$start .= "fi\n";
 	$start .= "/usr/local/sbin/avahi-daemon -D\n";
