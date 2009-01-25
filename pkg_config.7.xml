@@ -28,7 +28,7 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <version>0.6.24</version>
       <status>ALPHA</status>
-      <required_version>1.2.1</required_version>
+      <required_version>1.2.3</required_version>
       <config_file>http://www.pfsense.com/packages/config/avahi/avahi.xml</config_file>
       <configurationfile>avahi.xml</configurationfile>
     </package>
