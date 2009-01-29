@@ -97,6 +97,12 @@ $port = $config['installedpackages']['freeswitchsettings']['config'][0]['event_s
 $host = $config['interfaces']['lan']['ipaddr'];
 
 $savemsg = $_GET["savemsg"];
+
+//if freeswitch is not running then start it
+if (!pkg_is_service_running('freeswitch')) {
+	$handle = popen("/usr/local/etc/rc.d/freeswitch.sh start", "r");
+	pclose($handle);
+}
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
