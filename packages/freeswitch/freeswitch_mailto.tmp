@@ -206,7 +206,15 @@ ob_start();
       $mail->AltBody    = $textplain;   // optional, comment out and test
       $mail->MsgHTML($texthtml);
   
-      $mail->AddAddress($var['To']);
+      
+      $tmp_to = $var['To'];
+      $tmp_to = str_replace(";", ",", $tmp_to);
+      $tmp_to_array = split(",", $tmp_to);
+      foreach($tmp_to_array as $tmp_to_row) {
+        if (strlen($tmp_to_row) > 0) {
+            $mail->AddAddress($tmp_to_row);
+        }
+      }
 
       if (strlen($strwav) > 0) {
       		//$mail->AddAttachment("/usr/local/freeswitch/data/domain/example.wav");  // attachment
