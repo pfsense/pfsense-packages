@@ -131,7 +131,90 @@ function php_install_command()
 		unset($contents); 	
 		fclose($handle);
 		unset($filename);
-	
+
+
+	// add a TFTP DHCP Option to the DHCP Server
+		$filename = "/usr/local/www/services_dhcp.php";
+		$fout = fopen($filename,"r");		
+		$tmp = fread($fout, filesize($filename));
+		fclose($fout);
+		
+		//tftp was not found in the string
+		if (strpos($tmp, "tftp") === false) { 
+		    $tmpsearch = "\$pconfig['netmask'] = \$config['dhcpd'][\$if]['netmask'];";
+		    $tmpreplace = "\$pconfig['netmask'] = \$config['dhcpd'][\$if]['netmask'];\n";
+		    $tmpreplace .= "\$pconfig['tftp'] = \$config['dhcpd'][\$if]['options']['tftp-server-name'];";
+		    $tmp = str_replace($tmpsearch, $tmpreplace, $tmp);
+		    unset($tmpsearch, $tmpreplace);
+		    
+		    $tmpsearch = "\$config['dhcpd'][\$if]['filename'] = \$_POST['filename'];";
+		    $tmpreplace = "\$config['dhcpd'][\$if]['filename'] = \$_POST['filename'];\n";
+		    $tmpreplace .= "		\$config['dhcpd'][\$if]['options']['tftp-server-name'] = \$_POST['tftp'];";
+		    $tmp = str_replace($tmpsearch, $tmpreplace, $tmp);
+		    unset($tmpsearch, $tmpreplace);
+		    
+		    $tmpsearch = "function show_netboot_config() {";
+		    $tmpreplace = "function show_tftp_config() {\n";
+		    $tmpreplace .= "	document.getElementById(\"showtftpbox\").innerHTML=''\n";
+		    $tmpreplace .= "	aodiv = document.getElementById('showtftp');\n";
+		    $tmpreplace .= "	aodiv.style.display = \"block\";\n";
+		    $tmpreplace .= "}\n";
+		    $tmpreplace .= "\n";
+		    $tmpreplace .= "function show_netboot_config() {";
+		    $tmp = str_replace($tmpsearch, $tmpreplace, $tmp);
+		    unset($tmpsearch, $tmpreplace);
+		    
+		    $tmpsearch = "<td width=\"22%\" valign=\"top\" class=\"vncell\">Enable Network booting</td>";
+		    $tmpreplace .= "";
+		    //$tmpreplace = "		  <tr>\n";
+		    $tmpreplace .= "<td width=\"22%\" valign=\"top\" class=\"vncell\">TFTP server</td>\n";
+		    $tmpreplace .= "			<td width=\"78%\" class=\"vtable\">\n";
+		    $tmpreplace .= "				<div id=\"showtftpbox\">\n";
+		    $tmpreplace .= "					<input type=\"button\" onClick=\"show_tftp_config()\" value=\"Advanced\"></input> - Show TFTP configuration</a>\n";
+		    $tmpreplace .= "				</div>\n";
+		    $tmpreplace .= "				<div id=\"showtftp\" style=\"display:none\">\n";
+		    $tmpreplace .= "					<input name=\"tftp\" type=\"text\" class=\"formfld\" id=\"tftp\" size=\"20\" value=\"<"."?=htmlspecialchars(\$pconfig['tftp']);?".">\"><br>\n";
+		    $tmpreplace .= "				</div>\n";	      
+		    $tmpreplace .= "			</td>\n";
+		    $tmpreplace .= "			</tr>\n";
+		    $tmpreplace .= "\n";
+		    $tmpreplace .= "			<tr>\n";
+		    $tmpreplace .= "			<td width=\"22%\" valign=\"top\" class=\"vncell\">Enable Network booting</td>";
+		    $tmpreplace .= "\n";
+		    $tmp = str_replace($tmpsearch, $tmpreplace, $tmp);
+		    unset($tmpsearch, $tmpreplace);
+		    
+		    $fout = fopen($filename,"w");	
+		    fwrite($fout, $tmp);
+		    unset($tmp);
+		    fclose($fout);
+		} 
+		unset($tmp, $filename);
+				
+				
+				
+		$filename = "/etc/inc/services.inc";
+		$fout = fopen($filename,"r");		
+		$tmp = fread($fout, filesize($filename));
+		fclose($fout);
+		
+		//tftp was not found in the string
+		if (strpos($tmp, "tftp") === false) {
+		    $tmpsearch = "if (is_array(\$dhcpifconf['ntpserver']) && \$dhcpifconf['ntpserver'][0])";
+		    $tmpreplace = "if (isset(\$dhcpifconf['options']['tftp-server-name'])) {\n";
+		    $tmpreplace .= "		  	\$dhcpdconf .= \"	option tftp-server-name \\\"\".\$dhcpifconf['options']['tftp-server-name'].\"\\\";\".\"\\n\";\n";
+		    $tmpreplace .= "		}\n";
+		    $tmpreplace .= "		\n";
+		    $tmpreplace .= "		if (is_array(\$dhcpifconf['ntpserver']) && \$dhcpifconf['ntpserver'][0])";
+		    $tmp = str_replace($tmpsearch, $tmpreplace, $tmp);
+		    unset($tmpsearch, $tmpreplace);
+		    
+		    $fout = fopen($filename,"w");	
+		    fwrite($fout, $tmp);  
+		    fclose($fout);
+		} 
+		unset($tmp, $filename);
+			
   	
 	// if backup file exists restore it
 	    $filename = 'tftp.bak.tgz';
