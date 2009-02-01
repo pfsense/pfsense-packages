@@ -29,6 +29,14 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+function start_avahi() {
+	exec("sh /usr/local/etc/rc.d/avahi-daemon.sh start");
+}
+
+function stop_avahi() {
+	exec("sh /usr/local/etc/rc.d/avahi-daemon.sh stop");
+}
+
 function delete_avahi() {
 	global $g, $config;
 	unlink_if_exists("/usr/local/etc/rc.d/avahi-daemon.sh");
@@ -159,7 +167,7 @@ EOF;
 	);
 	// Make image RO
 	conf_mount_ro();
-
+	start_avahi();
 }
 
 ?>
