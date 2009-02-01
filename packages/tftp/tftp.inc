@@ -126,7 +126,7 @@ function php_install_command()
 		fclose($handle);
 		
 		$handle = fopen($filename,"w");
-		$contents = str_replace("#tftp	dgram", "tftp	dgram", $contents);
+		$contents = str_replace("#tftp", "tftp", $contents);
 		fwrite($handle, $contents);		
 		unset($contents); 	
 		fclose($handle);
