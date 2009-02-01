@@ -126,7 +126,7 @@ function php_install_command()
 		fclose($handle);
 		
 		$handle = fopen($filename,"w");
-		$contents = str_replace("#tftp	dgram	udp	wait	root	/usr/libexec/tftpd", "tftp	dgram	udp	wait	root	/usr/libexec/tftpd", $contents);
+		$contents = str_replace("#tftp	dgram", "tftp	dgram", $contents);
 		fwrite($handle, $contents);		
 		unset($contents); 	
 		fclose($handle);
@@ -155,7 +155,7 @@ function php_install_command()
 		    
 		    $tmpsearch = "function show_netboot_config() {";
 		    $tmpreplace = "function show_tftp_config() {\n";
-		    $tmpreplace .= "	document.getElementById(\"showtftpbox\").innerHTML=''\n";
+		    $tmpreplace .= "	document.getElementById(\"showtftpbox\").innerHTML='';\n";
 		    $tmpreplace .= "	aodiv = document.getElementById('showtftp');\n";
 		    $tmpreplace .= "	aodiv.style.display = \"block\";\n";
 		    $tmpreplace .= "}\n";
@@ -258,7 +258,7 @@ function php_deinstall_command()
 		fclose($handle);
 		
 		$handle = fopen($filename,"w");
-		$contents = str_replace("tftp	dgram	udp	wait	root	/usr/libexec/tftpd", "#tftp	dgram	udp	wait	root	/usr/libexec/tftpd", $contents);
+		$contents = str_replace("tftp	dgram", "#tftp	dgram", $contents);
 		fwrite($handle, $contents);		
 		unset($contents); 	
 		fclose($fout);
