@@ -30,11 +30,11 @@
 */
 
 function start_avahi() {
-	exec("sh /usr/local/etc/rc.d/avahi-daemon.sh start");
+	 mwexec_bg("sh /usr/local/etc/rc.d/avahi-daemon.sh start");
 }
 
 function stop_avahi() {
-	exec("sh /usr/local/etc/rc.d/avahi-daemon.sh stop");
+	 mwexec_bg("sh /usr/local/etc/rc.d/avahi-daemon.sh stop");
 }
 
 function delete_avahi() {
