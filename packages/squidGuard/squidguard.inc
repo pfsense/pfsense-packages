@@ -518,7 +518,7 @@ function squidguard_before_form_acl($pkg, $is_acl=true) {
 
     # User destinations
     if ($squidguard_config[F_DESTINATIONS]) {
-        foreach($squidguard_config[F_DESTINATIONS] as $dst)
+        foreach($squidguard_config[F_DESTINATIONS]['item'] as $dst)
             $dest_items[] = array ('name'=>$dst[F_NAME],
                                    'upt_value'=>$acls_up[$dst[F_NAME]],
                                    'ovt_value'=>$acls_over[$dst[F_NAME]],
