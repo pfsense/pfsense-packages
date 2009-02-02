@@ -48,12 +48,8 @@
 
         <adddeleteeditpagefields>
                 <columnitem>
-                        <fielddescr>Disable</fielddescr>
+                        <fielddescr>Disabled</fielddescr>
                         <fieldname>disabled</fieldname>
-                </columnitem>
-                <columnitem>
-                        <fielddescr>Order</fielddescr>
-                        <fieldname>order</fieldname>
                 </columnitem>
                 <columnitem>
                         <fielddescr>Name</fielddescr>
@@ -100,15 +96,13 @@
                         <fielddescr>Order</fielddescr>
                         <fieldname>order</fieldname>
                         <description>
-                                The order defines a place in the list of ACL. &lt;br&gt;
+                                Select the new position for ACL item. ACL are evaluated on a first-match source basis.&lt;br&gt;
                                 &lt;b&gt;Note:&lt;/b&gt; &lt;br&gt;
                                 Search for a suitable ACL by field 'source' will occur before the first match. If you want to define an exception for some sources (IP) from the IP range, put them on first of the list. &lt;br&gt;
                                 &lt;b&gt;For example:&lt;/b&gt; &lt;br&gt;
-                                Right order:
-                                ACL0 with source ip 10.0.0.15, then ACL1 with ip-range 10.0.0.0/24 &lt;br&gt;
+                                ACL with single (or short range) source ip 10.0.0.15, must be placed before ACL with more large ip range 10.0.0.0/24 &lt;br&gt;
                         </description>
-                        <type>input</type>
-                        <size>5</size>
+                        <type>select</type>
                 </field>
                 <field>
                         <fielddescr>Source IP adresses and domains</fielddescr>
@@ -166,12 +160,12 @@
                         <fielddescr>Not to allow IP addresses in URL</fielddescr>
                         <fieldname>notallowingip</fieldname>
                         <description>
-                                To make sure that people don't bypass the URL filter
+                                To make sure that people don't bypass the URL filter.
                                 by simply using the IP addresses instead of the fully qualified domain names, you can check this option.
                         </description>
                         <type>checkbox</type>
                 </field>
-              <field>
+                <field>
                         <fielddescr>Redirect mode</fielddescr>
                         <fieldname>redirect_mode</fieldname>
                         <description>
@@ -225,6 +219,16 @@
                         <rows>2</rows>
                 </field>
 -->
+                <field>
+                        <fielddescr>Spec: Use safe search engine</fielddescr>
+                        <fieldname>safesearch</fieldname>
+                        <description>
+                                To protect your children from adult content, you can use the protected mode of search engines. 
+                                Now it is supported by Google, Yandex, Yahoo, MSN, Live Search. Make sure that the search engines can, and others, it is recommended to prohibit.
+                                &lt;br&gt;Note: ! This option overrides 'Rewrite' setting. !
+                        </description>
+                        <type>checkbox</type>
+                </field>
                 <field>
                         <fielddescr>Rewrite</fielddescr>
                         <fieldname>rewrite</fieldname>

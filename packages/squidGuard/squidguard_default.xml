@@ -103,6 +103,16 @@
                         <rows>2</rows>
                 </field>
                 <field>
+                        <fielddescr>Spec: Use safe search engine</fielddescr>
+                        <fieldname>safesearch</fieldname>
+                        <description>
+                                To protect your children from adult content, you can use the protected mode of search engines. 
+                                Now it is supported by Google, Yandex, Yahoo, MSN, Live Search. Make sure that the search engines can, and others, it is recommended to prohibit.
+                                &lt;br&gt;Note: ! This option overrides 'Rewrite' setting. !
+                        </description>
+                        <type>checkbox</type>
+                </field>
+                <field>
                         <fielddescr>Rewrite</fielddescr>
                         <fieldname>rewrite</fieldname>
                         <description>Enter rewrite condition name for this rule, or leave blank.</description>

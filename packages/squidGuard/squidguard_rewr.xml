@@ -77,21 +77,27 @@
 					<fielddescr>Target URL or regular expression</fielddescr>
 					<fieldname>targeturl</fieldname>
 					<type>input</type>
-					<size>50</size>
+					<size>45</size>
 				</rowhelperfield>
 				<rowhelperfield>
 					<fielddescr>Replace to URL</fielddescr>
 					<fieldname>replaceto</fieldname>
 					<type>input</type>
-					<size>69</size>
-				</rowhelperfield>
-
-<!--				<rowhelperfield>
-					<fielddescr>Case ins.</fielddescr>
-					<fieldname>caseins</fieldname>
-					<type>checkbox</type>
+					<size>45</size>
 				</rowhelperfield>
 				<rowhelperfield>
+					<fielddescr>Opt.</fielddescr>
+					<fieldname>mode</fieldname>
+					<type>select</type>
+                                  <value>no</value>
+                                  <options>
+                                      <option> <name>---------</name> <value>no</value> </option>
+                                      <option> <name>no case  </name> <value>nocase</value> </option>
+                                      <option> <name>redirect </name> <value>redirect</value> </option>
+                                      <option> <name>no case + redirect</name> <value>nocase_redirect</value> </option>
+                                  </options>
+				</rowhelperfield>
+<!--				<rowhelperfield>
 					<fielddescr>Http 301</fielddescr>
 					<fieldname>http301</fieldname>
 					<type>checkbox</type>
