@@ -77,16 +77,14 @@
 		</field>
 	</fields>
 	<custom_add_php_command>
-		require_once("avahi.inc");
 		setup_avahi();
 	</custom_add_php_command>
 	<custom_php_install_command>
-		require_once("avahi.inc");
 		setup_avahi();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		require_once("avahi.inc");
-		delete_avahi();
+		unlink_if_exists("/usr/local/etc/rc.d/avahi-daemon.sh");
+		exec("killall avahi-daemon");
 	</custom_php_deinstall_command>
 	<include_file>/usr/local/pkg/avahi.inc</include_file>
 </packagegui>
