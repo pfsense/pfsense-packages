@@ -454,7 +454,7 @@ function squidguard_before_form_acl($pkg, $is_acl=true) {
                     $fld['options']['option'][] = array('name'=>$nm, 'value'=>$nm);
             }
         }
-        # test
+        # order
         if (is_array($source_items) && $field['fieldname'] == 'order') {
             $fld = &$pkg['fields']['field'][$i];
             foreach($source_items as $nmkey => $nm)
@@ -468,36 +468,50 @@ function squidguard_before_form_acl($pkg, $is_acl=true) {
     # destinations
     # acls pass ---> prepare data for destinations; dest format 'uptime_dests_list [overtime_dests_list]'
     $acl_dest = '';
+    $acl_overdest = '';
 
     # acl & default
-    if ($pkg['name'] !== MODULE_DEFAULT)
-         $acl_dest = $squidguard_config[F_ACLS]['item'][$current_id][F_DESTINATIONNAME];
+    if ($pkg['name'] !== MODULE_DEFAULT) {
+         $acl_dest     = $squidguard_config[F_ACLS]['item'][$current_id][F_DESTINATIONNAME];
+         $acl_overdest = $squidguard_config[F_ACLS]['item'][$current_id][F_OVERDESTINATIONNAME];
+    }
     else $acl_dest = $squidguard_config[F_DEFAULT][F_DESTINATIONNAME];
 
+    # acl dest ontime
     if ($acl_dest) {
-        $overtime = '';
-        $pss = explode(' ', str_replace(']', '', $acl_dest));
+        # 'none' > to '!all'
+        $acl_dest = str_replace('none', '!all', $acl_dest);
+
+        $pss = explode(' ', $acl_dest);
         foreach($pss as $val) {
             $name = $val;
             $name = str_replace('!', '', $name);
             $name = str_replace('^', '', $name);
-            if ($val === '[')     { $overtime = 'yes'; continue; }
-            elseif ($val === ']') { break; }
-            if (empty($overtime)) {
-                if (!empty($val)) {
-                    switch($val[0]) {
-                        case '!': $acls_up[$name] = 'deny';  break;
-                        case '^': $acls_up[$name] = 'white'; break;
-                        default : $acls_up[$name] = 'allow'; break;
-                    }
+            if (!empty($val)) {
+                switch($val[0]) {
+                    case '!': $acls_up[$name] = 'deny';  break;
+                    case '^': $acls_up[$name] = 'white'; break;
+                    default : $acls_up[$name] = 'allow'; break;
                 }
-            } else {
-                if (!empty($val)) {
-                    switch($val[0]) {
-                        case '!': $acls_over[$name] = 'deny';  break;
-                        case '^': $acls_over[$name] = 'white'; break;
-                        default : $acls_over[$name] = 'allow'; break;
-                    }
+            }
+        }
+    }
+
+    # acl dest overtime
+    if ($acl_overdest) {
+        # 'none' > to '!all'
+        $acl_overdest = str_replace('none', '!all', $acl_overdest);
+
+        $pss = explode(' ', $acl_overdest);
+        foreach($pss as $val) {
+            $name = $val;
+            $name = str_replace('!', '', $name);
+            $name = str_replace('^', '', $name);
+            if (!empty($val)) {
+                switch($val[0]) {
+                    case '!': $acls_over[$name] = 'deny';  break;
+                    case '^': $acls_over[$name] = 'white'; break;
+                    default : $acls_over[$name] = 'allow'; break;
                 }
             }
         }
