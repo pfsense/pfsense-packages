@@ -37,12 +37,6 @@ function stop_avahi() {
 	 mwexec_bg("sh /usr/local/etc/rc.d/avahi-daemon.sh stop");
 }
 
-function delete_avahi() {
-	global $g, $config;
-	unlink_if_exists("/usr/local/etc/rc.d/avahi-daemon.sh");
-	exec("killall avahi-daemon");
-}
-
 function setup_avahi() {
 	global $g, $config;
 
