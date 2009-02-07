@@ -1,24 +1,24 @@
-<?xml version="1.0" encoding="utf-8"?> 
+<?xml version="1.0" encoding="utf-8"?>
 <!-- pfSense packages -->
 <!-- $Id$ -->
 <pfsensepkgs>
   <packages>
     <package>
-		<name>pure-ftpd</name>
-		<website>http://www.pureftpd.org/</website>
-		<descr>*DO NOT RUN THIS ON A FIREWALL. USE A DEDICATED MACHINE!* Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerabilities, is trivial to set up, and is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
-		<category>FTP</category>
-		<config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-		<depends_on_package>pure-ftpd-1.0.20_3.tbz</depends_on_package>
-		<version>1.0.21</version>
-		<status>Stable</status>
-		<configurationfile>pure-ftpd.xml</configurationfile>
-		<required_version>2.0</required_version>
-		<logging>
-			<facilityname>ftp</facilityname>
-			<logfilename>pure-ftpd.log</logfilename>
-		</logging>
+      <name>pure-ftpd</name>
+      <website>http://www.pureftpd.org/</website>
+      <descr>*DO NOT RUN THIS ON A FIREWALL. USE A DEDICATED MACHINE!* Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerabilities, is trivial to set up, and is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
+      <category>FTP</category>
+      <config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package>pure-ftpd-1.0.20_3.tbz</depends_on_package>
+      <version>1.0.21</version>
+      <status>Stable</status>
+      <configurationfile>pure-ftpd.xml</configurationfile>
+      <required_version>2.0</required_version>
+      <logging>
+        <facilityname>ftp</facilityname>
+        <logfilename>pure-ftpd.log</logfilename>
+      </logging>
     </package>
     <package>
       <name>Avahi</name>
@@ -39,14 +39,14 @@
       <category>Network Management</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>ntop-3.3.8.tbz</depends_on_package>
-	  <depends_on_package>gdbm-1.8.3_3.tbz</depends_on_package>
-	  <depends_on_package>perl-5.8.8_1.tbz</depends_on_package>
+      <depends_on_package>gdbm-1.8.3_3.tbz</depends_on_package>
+      <depends_on_package>perl-5.8.8_1.tbz</depends_on_package>
       <version>3.3.8</version>
       <status>BETA</status>
       <required_version>1.2.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/ntop/ntop.xml</config_file>
       <configurationfile>ntop.xml</configurationfile>
-    </package>	
+    </package>
     <package>
       <name>Pubkey</name>
       <descr>pfSense release key</descr>
@@ -67,7 +67,7 @@
       <version>0.6.2</version>
       <status>BETA</status>
       <required_version>1.2</required_version>
-	  <maximum_version>1.9</maximum_version>
+      <maximum_version>1.9</maximum_version>
       <configurationfile>dashboard.xml</configurationfile>
     </package>
     <package>
@@ -86,10 +86,10 @@
     </package>
     <package>
       <name>Notes</name>
-      <website></website>
+      <website/>
       <descr>Track things you want to note for this system.</descr>
       <category>Status</category>
-      <pkginfolink></pkginfolink>
+      <pkginfolink/>
       <config_file>http://www.pfsense.com/packages/config/notes/notes.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <version>0.2.4</version>
@@ -97,13 +97,13 @@
       <required_version>1.2.1</required_version>
       <maintainer>markjcrane@gmail.com</maintainer>
       <configurationfile>notes.xml</configurationfile>
-    </package>    
+    </package>
     <package>
       <name>TFTP</name>
-      <website></website>
+      <website/>
       <descr>Trivial File Transport Protocol is a very simple file transfer protocol. Often used with routers, voip phones and more.</descr>
       <category>Services</category>
-      <pkginfolink></pkginfolink>
+      <pkginfolink/>
       <config_file>http://www.pfsense.com/packages/config/tftp/tftp.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <version>1.0.2</version>
@@ -111,10 +111,10 @@
       <required_version>1.2.1</required_version>
       <maintainer>markjcrane@gmail.com</maintainer>
       <configurationfile>tftp.xml</configurationfile>
-    </package>    
+    </package>
     <package>
       <name>PHPService</name>
-      <website></website>
+      <website/>
       <descr>PHP run as a service it can do anything PHP can do including but not limited to monitoring files, CPU, RAM, and send alerts to the syslog.</descr>
       <category>Services</category>
       <pkginfolink>http://doc.pfsense.org/index.php/PHPService</pkginfolink>
@@ -169,7 +169,7 @@
       <required_version>1.2.1</required_version>
       <configurationfile>siproxd.xml</configurationfile>
     </package>
- 	<package>
+    <package>
       <name>OpenBGPD</name>
       <descr>OpenBGPD is a FREE implementation of the Border Gateway Protocol, Version 4. It allows ordinary machines to be used as routers exchanging routes with other systems speaking the BGP protocol.</descr>
       <category>NET</category>
@@ -181,7 +181,7 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>openbgpd-4.0.tbz</depends_on_package>
     </package>
-   <package>
+    <package>
       <name>Lightsquid</name>
       <descr>High perfomance web proxy report. Requires squid.</descr>
       <website>http://lightsquid.sf.net/</website>
@@ -246,7 +246,7 @@
     </package>
     <package>
       <name>AutoConfigBackup</name>
-	  <maintainer>portal@bsdperimeter.com</maintainer>
+      <maintainer>portal@bsdperimeter.com</maintainer>
       <descr>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from https://portal.pfsense.org</descr>
       <website>https://portal.pfsense.org</website>
       <category>Services</category>
@@ -290,7 +290,7 @@
       <descr>IMSpector is an Instant Messenger transparent proxy with logging capabilities. Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees.</descr>
       <website>http://www.imspector.org/</website>
       <category>Network Management</category>
-	  <maintainer>rswagoner@gmail.com</maintainer>
+      <maintainer>rswagoner@gmail.com</maintainer>
       <version>0.4</version>
       <required_version>1.0.1</required_version>
       <status>BETA</status>
@@ -308,31 +308,31 @@
       <status>BETA</status>
       <required_version>1.2.1</required_version>
       <maintainer>rswagoner@gmail.com</maintainer>
-	  <config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
-	  <configurationfile>nut.xml</configurationfile>
-	  <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
+      <configurationfile>nut.xml</configurationfile>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>nut-2.2.2.tbz</depends_on_package>
     </package>
     <package>
-	<name>diag_new_states</name>
-	<descr>Paul Taylors version of Diagnostics States which utilizes pftop.</descr>
-	<website>http://www.addressplus.net</website>
-	<category>Network Management</category>
-	<version>0.2</version>
-	<maintainer>ptaylor@addressplus.net</maintainer>
-	<required_version>1.2.1</required_version>
-	<status>BETA</status>
-	<config_file>http://www.pfsense.org/packages/config/diag_states_pt/diag_new_states.xml</config_file>
-        <configurationfile>http://www.pfsense.com/packages/config/diag_states_pt/diag_new_states.xml</configurationfile>
+      <name>diag_new_states</name>
+      <descr>Paul Taylors version of Diagnostics States which utilizes pftop.</descr>
+      <website>http://www.addressplus.net</website>
+      <category>Network Management</category>
+      <version>0.2</version>
+      <maintainer>ptaylor@addressplus.net</maintainer>
+      <required_version>1.2.1</required_version>
+      <status>BETA</status>
+      <config_file>http://www.pfsense.org/packages/config/diag_states_pt/diag_new_states.xml</config_file>
+      <configurationfile>http://www.pfsense.com/packages/config/diag_states_pt/diag_new_states.xml</configurationfile>
     </package>
     <package>
       <name>darkstat</name>
       <website>http://dmr.ath.cx/net/darkstat/</website>
       <descr>darkstat is a network statistics gatherer. It's a packet sniffer that runs as a background process on a cable/DSL router, gathers all sorts of statistics about network usage, and serves them over HTTP.</descr>
       <category>Network Management</category>
-	  <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-	  <depends_on_package>darkstat-3.0.708.tbz</depends_on_package>
-	  <depends_on_package>gettext-0.17_1.tbz</depends_on_package>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package>darkstat-3.0.708.tbz</depends_on_package>
+      <depends_on_package>gettext-0.17_1.tbz</depends_on_package>
       <version>3.0.619</version>
       <status>Stable</status>
       <required_version>1.2.1</required_version>
@@ -393,7 +393,7 @@
       <required_version>1.2.1</required_version>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>bandwidthd-2.0.1_1.tbz</depends_on_package>
-	  <depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
+      <depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
       <configurationfile>bandwidthd.xml</configurationfile>
     </package>
@@ -464,7 +464,7 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>squid-2.6.21.tbz</depends_on_package>
       <depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
-	  <depends_on_package>openldap-client-2.4.10.tbz</depends_on_package>
+      <depends_on_package>openldap-client-2.4.10.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
       <configurationfile>squid.xml</configurationfile>
     </package>
@@ -480,10 +480,10 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>squid-3.0.8.tbz</depends_on_package>
       <depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
-	  <depends_on_package>openldap-client-2.4.10.tbz</depends_on_package>
+      <depends_on_package>openldap-client-2.4.10.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/squid3/squid.xml</config_file>
       <configurationfile>squid.xml</configurationfile>
-    </package>    
+    </package>
     <package>
       <name>LCDproc</name>
       <descr>LCD display driver</descr>
@@ -516,46 +516,46 @@
       </logging>
     </package>
     <package>
-  	  <name>squidGuard</name> 
-  	  <descr>
+      <name>squidGuard</name>
+      <descr>
           High perfomance web proxy filter. 
           Required proxy Squid package. 
-	  </descr> 
-  	  <website>http://www.squidGuard.org/</website> 
-  	  <maintainer>dv_serg@mail.ru</maintainer> 
-  	  <category>Network Management</category> 
-  	  <version>1.3-2</version> 
-  	  <status>Beta</status> 
-  	  <required_version>1.1</required_version> 
-  	  <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url> 
-  	  <depends_on_package>squidGuard-1.3_1.tbz</depends_on_package> 
-  	  <config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file> 
-  	  <configurationfile>squidguard.xml</configurationfile> 
+	  </descr>
+      <website>http://www.squidGuard.org/</website>
+      <maintainer>dv_serg@mail.ru</maintainer>
+      <category>Network Management</category>
+      <version>1.3-2</version>
+      <status>Beta</status>
+      <required_version>1.1</required_version>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package>squidGuard-1.3_1.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
+      <configurationfile>squidguard.xml</configurationfile>
     </package>
-	<package>
-		<name>Zabbix Agent</name>
-		<descr>Monitoring agent.</descr>
-		<category>Services</category>
-		<config_file>http://www.pfsense.com/packages/config/zabbix-agent.xml</config_file>
-		<version>0.22</version>
-		<status>FINAL</status>
-		<required_version>1.2.1</required_version>
-		<configurationfile>zabbix-agent.xml</configurationfile>
-		<maintainer>remco.verhoef@redfive.biz</maintainer>
-		<depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/net-mgmt/</depends_on_package_base_url>
-		<depends_on_package>zabbix-agent-1.4.5,2.tbz</depends_on_package>
-	</package>
-	<package>
-		<name>OpenVPN Client Export Utility</name>
-		<descr>Allows a pre-configured OpenVPN Windows Client to be exported directly from pfSense.</descr>
-		<category>Security</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-		<depends_on_package>p7zip-4.58.tbz</depends_on_package>
-		<version>0.1</version>
-		<status>BETA</status>
-		<required_version>2.0</required_version>
-		<config_file>http://www.pfsense.com/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
-		<configurationfile>openvpn-client-export.xml</configurationfile>
-	</package>
+    <package>
+      <name>Zabbix Agent</name>
+      <descr>Monitoring agent.</descr>
+      <category>Services</category>
+      <config_file>http://www.pfsense.com/packages/config/zabbix-agent.xml</config_file>
+      <version>0.22</version>
+      <status>FINAL</status>
+      <required_version>1.2.1</required_version>
+      <configurationfile>zabbix-agent.xml</configurationfile>
+      <maintainer>remco.verhoef@redfive.biz</maintainer>
+      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/net-mgmt/</depends_on_package_base_url>
+      <depends_on_package>zabbix-agent-1.4.5,2.tbz</depends_on_package>
+    </package>
+    <package>
+      <name>OpenVPN Client Export Utility</name>
+      <descr>Allows a pre-configured OpenVPN Windows Client to be exported directly from pfSense.</descr>
+      <category>Security</category>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package>p7zip-4.58.tbz</depends_on_package>
+      <version>0.1</version>
+      <status>BETA</status>
+      <required_version>2.0</required_version>
+      <config_file>http://www.pfsense.com/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
+      <configurationfile>openvpn-client-export.xml</configurationfile>
+    </package>
   </packages>
 </pfsensepkgs>
