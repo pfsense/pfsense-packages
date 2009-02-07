@@ -31,6 +31,10 @@
 
 function frickin_custom_php_install_command() {
 		global $config;
+		if(file_exists("/tmp/frickin.tgz")) {
+			exec("tar xzPf /tmp/frickin.tgz -C /");
+			unlink("/tmp/frickin.tgz");
+		}
 		$fout = fopen("/usr/local/etc/rc.d/frickin.sh", "w");
 		fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");
 		fwrite($fout, "# PACKAGE: Frickin Proxy\n");
