@@ -39,7 +39,7 @@ function frickin_custom_php_install_command() {
 		fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");
 		fwrite($fout, "# PACKAGE: Frickin Proxy\n");
 		fwrite($fout, "# EXECUTABLE: frickin\n");
-		fwrite($fout, "/usr/local/bin/frickin");
+		fwrite($fout, "/usr/local/bin/frickin2");
 		fwrite($fout, " -c /usr/local/etc/frickin.conf");
 		fwrite($fout, " &\n");
 		fclose($fout);
