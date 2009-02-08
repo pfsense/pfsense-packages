@@ -216,7 +216,7 @@
       <status>Beta</status>
       <required_version>1.2.3</required_version>
       <maintainer>crazypark2@yahoo.dk</maintainer>
-      <config_file>http://files.pfsense.org/packages/config/vnstat/vnstat.xml</config_file>
+      <config_file>http://www.pfsense.com/packages/config/vnstat/vnstat.xml</config_file>
       <configurationfile>vnstat.xml</configurationfile>
     </package>
     <package>
