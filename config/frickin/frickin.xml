@@ -47,7 +47,7 @@
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>frickin</name>
 	<version>2.0-BETA1</version>
-	<title>none</title>
+	<title>Frickin PPTP Proxy</title>
 	<include_file>/usr/local/pkg/frickin.inc</include_file>
 	<menu>
 		<name>Frickin PPTP</name>
