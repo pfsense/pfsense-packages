@@ -77,7 +77,7 @@ EOD;
 
 		mwexec("/usr/bin/killall frickin");
 		mwexec("chmod a+rx /usr/local/etc/rc.d/frickin.sh");
-		mwexec("/usr/local/etc/rc.d/frickin.sh");
+		mwexec_bg("/usr/local/etc/rc.d/frickin.sh");
 
 //		file_notice("System -> Advanced -> Scrub", "pfSenses scrub option has been disabled.  See http://www.openbsd.org/faq/pf/scrub.html for more info.", "Scrub");
 //		$config['system']['scrubnodf'] = "enabled";
