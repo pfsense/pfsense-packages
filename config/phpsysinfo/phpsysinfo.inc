@@ -14,7 +14,7 @@ global $config, $g;
 	config_lock();
 	exec("cd ..");
 	exec("tar -zxovf /usr/local/pkg/phpsysinfo-2.5.4.tar.gz");
-	exec("mv /usr/local/pkg/phpsysinfo /usr/local/www/phpsysinfo");
+	exec("mv phpsysinfo /usr/local/www/phpsysinfo");
 
 //  link shared libraries
   if ((!file_exists("/lib/libm.so.4")) AND (file_exists("/lib/libm.so.5"))) {
