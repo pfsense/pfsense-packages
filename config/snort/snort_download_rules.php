@@ -178,13 +178,30 @@ ob_flush();
 
 /* setup some variables */
 $premium_subscriber = "";
-if($config['installedpackages']['snortadvanced']['config'][0]['subscriber'])
+
+/* Snort version */
+$snort_version = "2.8";
+
+/* Are we using the premium subscriber subscription? */
+if($config['installedpackages']['snortadvanced']['config'][0]['subscriber']) {
+	// http://www.snort.org/pub-bin/downloads.cgi/Download/sub_rules/snortrules-snapshot-CURRENT_s.tar.gz.md5
 	$premium_subscriber = "_s";
-$snort_filename = "snortrules-snapshot-CURRENT{$premium_subscriber}.tar.gz";
-$snort_filename_md5 = "snortrules-snapshot-CURRENT.tar.gz.md5";
+	$snort_download_prefix = "http://www.snort.org/pub-bin/oinkmaster.cgi";
+} else {
+	// http://www.snort.org/pub-bin/downloads.cgi/Download/vrt_os/snortrules-snapshot-CURRENT.tar.gz.md5
+	$snort_download_prefix = "http://www.snort.org/pub-bin/oinkmaster.cgi";
+}
+
+/* Set snort rules download filename */
+$snort_filename = "snortrules-snapshot-{$snort_version}{$premium_subscriber}.tar.gz";
+$snort_filename_md5 = "snortrules-snapshot-{$snort_version}{$premium_subscriber}.tar.gz.md5";
+
+/* Set user agent to Mozilla */
 ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-$dl = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}";
-$dl_md5 = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}";
+
+/* Set download URL */
+$dl = "{$snort_download_prefix}/{$oinkid}/{$snort_filename}";
+$dl_md5 = "{$snort_download_prefix}/{$oinkid}/{$snort_filename_md5}";
 
 /* multi user system, request new filename and create directory */
 $tmpfname = tempnam("/tmp", "snortRules");
