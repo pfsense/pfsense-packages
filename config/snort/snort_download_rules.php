@@ -212,15 +212,21 @@ $tmpfname = tempnam("/tmp", "snortRules");
 exec("/bin/rm -rf {$tmpfname};/bin/mkdir -p {$tmpfname}");
 
 /* download snort rules */
-$static_output = gettext("Downloading current snort rules... {$dl}");
+$static_output = gettext("Downloading current snort rules... ");
+
+/* Set URL we are downloading in bottom textarea and 
+ * download snort rules
+ */
 update_all_status($static_output);
-download_file_with_progress_bar($dl, $tmpfname . "/{$snort_filename}");
+update_output_window("{$dl}");
+download_file_with_progress_bar($dl, $tmpfname . "/{$snort_filename}", "read_body_snort");
 verify_downloaded_file($tmpfname . "/{$snort_filename}");
 
 /* download snort rules md5 file */
-$static_output = gettext("Downloading current snort rules md5... {$dl_md5}");
+$static_output = gettext("Downloading current snort rules md5... ");
 update_all_status($static_output);
-download_file_with_progress_bar($dl_md5, $tmpfname . "/{$snort_filename_md5}");
+update_output_window("{$dl_md5}");
+download_file_with_progress_bar($dl_md5, $tmpfname . "/{$snort_filename_md5}", "read_body_snort"););
 verify_downloaded_file($tmpfname . "/{$snort_filename_md5}");
 
 /* verify downloaded rules signature */
@@ -256,6 +262,29 @@ hide_progress_bar_status();
 
 <?php
 
-
+function read_body_snort($ch, $string) {
+	global $fout, $file_size, $downloaded, $counter, $version, $latest_version, $current_installed_pfsense_version;
+	$length = strlen($string);
+	$downloaded += intval($length);
+	$downloadProgress = round(100 * (1 - $downloaded / $file_size), 0);
+	$downloadProgress = 100 - $downloadProgress;
+	$a = $file_size;
+	$b = $downloaded;
+	$c = $downloadProgress;
+	$text  = "  Snort download in progress\\n";
+	$text .= "----------------------------------------------------\\n";
+	$text .= "  File size       : {$a}\\n";
+	$text .= "  Downloaded      : {$b}\\n";
+	$text .= "  Percent         : {$c}%\\n";
+	$text .= "----------------------------------------------------\\n";
+	$counter++;
+	if($counter > 150) {
+		update_output_window($text);
+		update_progress_bar($downloadProgress);
+		$counter = 0;
+	}
+	fwrite($fout, $string);
+	return $length;
+}
 
 ?>
