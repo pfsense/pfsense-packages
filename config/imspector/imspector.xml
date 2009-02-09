@@ -9,11 +9,7 @@
 /*
     authng.xml
     part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2007 to whom it may belong
-    All rights reserved.
-
-    Based on m0n0wall (http://m0n0.ch/wall)
-    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    Copyright (C) 2007 Ryan Wagoner <rswagoner@gmail.com>.
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -46,7 +42,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>imspector</name>
-	<version>0.4</version>
+	<version>0.5</version>
 	<title>Services: IMSpector</title>
 	<savetext>Change</savetext>
 	<aftersaveredirect>/services_imspector_logs.php</aftersaveredirect>
