@@ -64,7 +64,10 @@ include("head.inc");
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php include("fbegin.inc"); ?>
 
-<p class="pgtitle"><?=$pgtitle?></font></p>
+<?php
+if(!$pgtitle_output)
+	echo "<p class=\"pgtitle\"><?=$pgtitle?></p>";
+?>
 
 <form action="snort_rulesets.php" method="post" name="iform" id="iform">
 <script src="/row_toggle.js" type="text/javascript"></script>

@@ -260,7 +260,10 @@ include("head.inc");
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle"><?=$pgtitle?></p>
+<?php
+if(!$pgtitle_output)
+	echo "<p class=\"pgtitle\"><?=$pgtitle?></p>";
+?>
 <form action="snort_rules.php" method="post" name="iform" id="iform">
 <?php if ($savemsg){print_info_box($savemsg);} else if ($stopMsg){print_info_box_np($message_reload);}?>
 <br>
