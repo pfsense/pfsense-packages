@@ -67,9 +67,9 @@ if($showerrors)
   $showerrors = "true";
   else
   $showerrors = "false";
-  $hf = fopen("/usr/local/www/phpSysInfo/config.php","w");
+  $hf = fopen("/usr/local/www/phpsysinfo/config.php","w");
 if(!$hf) {
-  log_error("could not open /usr/local/www/phpSysInfo/config.php for writing");
+  log_error("could not open /usr/local/www/phpsysinfo/config.php for writing");
 exit;
 }
 
