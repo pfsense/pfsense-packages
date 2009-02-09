@@ -102,13 +102,14 @@ if ($_POST['mode'] == "render") {
 				$line = fgets($fd);
 				if(feof($fd)) continue;
 
-				preg_match('/([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),(.*)/', $line, $matches);
+				preg_match('/([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),(|.*),(.*)/', $line, $matches);
 				$address = $matches[1];
 				$timestamp = $matches[2];
 				$direction = $matches[3];
 				$type = $matches[4];
 				$filtered = $matches[5];
-				$data = $matches[6];
+				$category = $matches[6];
+				$data = $matches[7];
 
 				if($direction == '0') {
 					$bgcolor = $convo_remote_bgcolor;
@@ -123,6 +124,7 @@ if ($_POST['mode'] == "render") {
 
 				print("<tr bgcolor='$bgcolor'><td style='width: 30px; vertical-align: top;'>[$time]</td>\n
 						<td style=' width: 60px; vertical-align: top;'>$user</td>\n
+						<td style=' width: 60px; vertical-align: top;'>$category</td>\n
 						<td style='vertical-align: top;'>$data</td></tr>\n");
 			}
 			print("</table>\n");
