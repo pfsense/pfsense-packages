@@ -224,11 +224,11 @@
       <website>http://phpsysinfo.sourceforge.net/</website>
       <descr>PHPSysInfo is a customizable PHP Script that parses /proc, and formats information nicely. It will display information about system facts like Uptime, CPU, Memory, PCI devices, SCSI devices, IDE devices, Network adapters, Disk usage, and more.</descr>
       <category>System</category>
-      <version>2.5.3</version>
+      <version>2.5.4</version>
       <status>Beta</status>
       <required_version>1.0</required_version>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/All</depends_on_package_base_url>
-      <depends_on_package>mbmon-205_3.tbz</depends_on_package>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/config/phpsysinfo/bin/</depends_on_package_base_url>
+      <depends_on_package>mbmon-205_4.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/phpsysinfo/phpsysinfo.xml</config_file>
       <configurationfile>phpsysinfo.xml</configurationfile>
     </package>
