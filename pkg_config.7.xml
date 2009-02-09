@@ -210,7 +210,7 @@
       <website>http://humdi.net/vnstat/</website>
       <descr>A console-based network traffic monitor</descr>
       <category>Network Management</category>
-	  <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+	  <depends_on_package_base_url>http://www.pfsense.com/packages/config/vnstat/bin/</depends_on_package_base_url>
 	  <depends_on_package>vnstat-1.6_3.tbz</depends_on_package>
       <version>1.6.3</version>
       <status>Beta</status>
