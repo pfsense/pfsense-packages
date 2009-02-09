@@ -314,14 +314,14 @@
       <descr>IMSpector is an Instant Messenger transparent proxy with logging capabilities. Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees.</descr>
       <website>http://www.imspector.org/</website>
       <category>Network Management</category>
-      <maintainer>rswagoner@gmail.com</maintainer>
-      <version>0.5</version>
-      <required_version>1.0.1</required_version>
+      <maintainer>bill.marquette@gmail.com</maintainer>
+      <version>0.8</version>
+      <required_version>1.2.1</required_version>
       <status>BETA</status>
       <config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
       <configurationfile>imspector.xml</configurationfile>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <depends_on_package>imspector-0.5.tbz</depends_on_package>
+      <depends_on_package>imspector-0.8.tbz</depends_on_package>
     </package>
     <package>
       <name>nut</name>

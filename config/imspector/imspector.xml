@@ -42,7 +42,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>imspector</name>
-	<version>0.5</version>
+	<version>0.8</version>
 	<title>Services: IMSpector</title>
 	<savetext>Change</savetext>
 	<aftersaveredirect>/services_imspector_logs.php</aftersaveredirect>
