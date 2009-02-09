@@ -189,6 +189,7 @@ if($config['installedpackages']['snortadvanced']['config'][0]['subscriber']) {
 	$snort_download_prefix = "http://www.snort.org/pub-bin/oinkmaster.cgi";
 } else {
 	// http://www.snort.org/pub-bin/downloads.cgi/Download/vrt_os/snortrules-snapshot-CURRENT.tar.gz.md5
+	$premium_subscriber = "";
 	$snort_download_prefix = "http://www.snort.org/pub-bin/oinkmaster.cgi";
 }
 
