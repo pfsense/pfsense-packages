@@ -556,7 +556,7 @@ function check_for_common_errors($filename) {
 	$contents = file_get_contents($filename);
 	if(stristr($contents, "You don't have permission")) {
 		if(!$console_mode) {
-			update_all_status("An error occured.  Scroll down to inspect it's contents.");
+			update_all_status("An error occured while downloading {$filename}.  Scroll down to inspect it's contents.");
 			hide_progress_bar_status();
 		} else {
 			log_error("An error occured.  Scroll down to inspect it's contents.");
