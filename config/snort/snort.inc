@@ -635,7 +635,7 @@ function extract_snort_rules_md5($tmpfname) {
 	/* extract item and show status during extraction */
 	$handle = popen('$cmd 2>&1', 'r');
 	while(!feof($handle)) {
-		$read .= fread($handle, 2096);		
+		$read .= fread($handle, 100);		
 		update_output_window($read);
 	}
 	pclose($handle);
