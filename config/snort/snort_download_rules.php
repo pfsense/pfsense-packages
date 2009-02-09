@@ -208,13 +208,13 @@ $tmpfname = tempnam("/tmp", "snortRules");
 exec("/bin/rm -rf {$tmpfname};/bin/mkdir -p {$tmpfname}");
 
 /* download snort rules */
-$static_output = gettext("Downloading current snort rules... {$snort_filename}");
+$static_output = gettext("Downloading current snort rules... {$dl}");
 update_all_status($static_output);
 download_file_with_progress_bar($dl, $tmpfname . "/{$snort_filename}");
 verify_downloaded_file($tmpfname . "/{$snort_filename}");
 
 /* download snort rules md5 file */
-$static_output = gettext("Downloading current snort rules md5... ");
+$static_output = gettext("Downloading current snort rules md5... {$dl_md5}");
 update_all_status($static_output);
 download_file_with_progress_bar($dl_md5, $tmpfname . "/{$snort_filename_md5}");
 verify_downloaded_file($tmpfname . "/{$snort_filename_md5}");
