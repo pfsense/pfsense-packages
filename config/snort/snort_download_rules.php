@@ -208,7 +208,7 @@ $tmpfname = tempnam("/tmp", "snortRules");
 exec("/bin/rm -rf {$tmpfname};/bin/mkdir -p {$tmpfname}");
 
 /* download snort rules */
-$static_output = gettext("Downloading current snort rules... ");
+$static_output = gettext("Downloading current snort rules... {$snort_filename}");
 update_all_status($static_output);
 download_file_with_progress_bar($dl, $tmpfname . "/{$snort_filename}");
 verify_downloaded_file($tmpfname . "/{$snort_filename}");
