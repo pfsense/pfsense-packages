@@ -637,6 +637,7 @@ function extract_snort_rules_md5($tmpfname) {
 	while(!feof($handle)) {
 		$read .= fread($handle, 100);		
 		update_output_window($read);
+		flush();
 	}
 	pclose($handle);
 	if(!$console_mode) {
