@@ -29,6 +29,10 @@
 */
 require_once("pfsense-utils.inc");
 
+/* Allow additional execution time 0 = no limit. */
+ini_set('max_execution_time', '9999');
+ini_set('max_input_time', '9999');
+
 /* define oinkid */
 if($config['installedpackages']['snort'])
 	$oinkid = $config['installedpackages']['snort']['config'][0]['oinkmastercode'];
@@ -627,7 +631,14 @@ function extract_snort_rules_md5($tmpfname) {
 		$static_output = gettext("Extracting snort rules...");
 		update_all_status($static_output);
 	}
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C /usr/local/etc/snort/");
+	$cmd = "/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C /usr/local/etc/snort/";
+	/* extract item and show status during extraction */
+	$handle = popen('$cmd 2>&1', 'r');
+	while(!feof($handle)) {
+		$read = fread($handle, 2096);		
+		update_output_window($read);
+	}
+	pclose($handle);
 	if(!$console_mode) {
 		$static_output = gettext("Snort rules extracted.");
 		update_all_status($static_output);
