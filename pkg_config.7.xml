@@ -206,6 +206,20 @@
       <configurationfile>lightsquid.xml</configurationfile>
     </package>
     <package>
+      <name>vnstat</name>
+      <website>http://humdi.net/vnstat/</website>
+      <descr>A console-based network traffic monitor</descr>
+      <category>Network Management</category>
+	  <depends_on_package_base_url>http://www.pfsense.com/packages/config/vnstat/bin/</depends_on_package_base_url>
+	  <depends_on_package>vnstat-1.6_3.tbz</depends_on_package>
+      <version>1.6.3</version>
+      <status>Beta</status>
+      <required_version>1.2.3</required_version>
+      <maintainer>crazypark2@yahoo.dk</maintainer>
+      <config_file>http://www.pfsense.com/packages/config/vnstat/vnstat.xml</config_file>
+      <configurationfile>vnstat.xml</configurationfile>
+    </package>
+    <package>
       <name>phpSysInfo</name>
       <website>http://phpsysinfo.sourceforge.net/</website>
       <descr>PHPSysInfo is a customizable PHP Script that parses /proc, and formats information nicely. It will display information about system facts like Uptime, CPU, Memory, PCI devices, SCSI devices, IDE devices, Network adapters, Disk usage, and more.</descr>
