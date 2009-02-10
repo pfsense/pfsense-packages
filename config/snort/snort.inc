@@ -560,27 +560,14 @@ function check_for_common_errors($filename) {
 	$contents = file_get_contents($filename);
 	if(stristr($contents, "You don't have permission")) {
 		if(!$console_mode) {
-			update_all_status("An error occured while downloading {$filename}.  Scroll down to inspect it's contents.");
+			update_all_status("An error occured while downloading {$filename}.");
 			hide_progress_bar_status();
 		} else {
 			log_error("An error occured.  Scroll down to inspect it's contents.");
 			echo "An error occured.  Scroll down to inspect it's contents.";
 		}
 		if(!$console_mode) {
-			echo "
-	      <center>
-	        <div id='error' style='background:white;width:90%'>
-	        <!-- TODO: The below paragraphs are kind of stupid. Use CSS instead -->
-	        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-	        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-	        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-	        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-	        <p>The following error occured while downloading the snort rules file from snort.org:</p>
-			    {$contents}
-	        <p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
-			    </div>
-	      </center>
-	    ";
+			update_output_window(strip_tags("$contents"));
 		} else {
 			$contents = strip_tags($contents);
 			log_error("Error downloading snort rules: {$contents}");
