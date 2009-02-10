@@ -199,6 +199,8 @@ function snort_deinstall() {
 	exec("rm -f /usr/local/etc/rc.d/snort*");
 	exec("rm -rf /usr/local/etc/snort*");
 	exec("cd /var/db/pkg && pkg_delete `ls | grep snort`");
+	exec("/usr/bin/killall -9 snort");
+	exec("/usr/bin/killall snort");
 }
 
 function generate_snort_conf() {
