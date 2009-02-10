@@ -12,6 +12,7 @@
 		<required_version>1.2.2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/frickin/frickin.xml</config_file>
 		<configurationfile>frickin.xml</configurationfile>
+		<after_install_info>Please visit the Frickin PPTP settings tab and press save after setting the service up to start.</after_install_info>
 	</package>
     <package>
       <name>pure-ftpd</name>
@@ -69,6 +70,7 @@
       <pkginfolink>http://doc.pfsense.org/index.php/Pubkey_package</pkginfolink>
       <config_file>http://www.pfsense.org/packages/config/pubkey.xml</config_file>
       <configurationfile>pubkey.xml</configurationfile>
+	<after_install_info>The pfSense release key has been updated.</after_install_info>
     </package>
     <package>
       <name>Dashboard</name>
