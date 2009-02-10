@@ -97,7 +97,6 @@ if(!$pgtitle_output)
 		echo "<img src=\"/themes/metallic/images/misc/loader_tab.gif\"> Getting release information from snort.org...\n";
 		echo "</div>\n";
 		ob_flush();
-		sleep(1);
 		ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
 		$text = file_get_contents("http://www.snort.org/pub-bin/downloads.cgi");
 		echo "<script type=\"text/javascript\">\n";
@@ -219,20 +218,22 @@ $static_output = gettext("Downloading current snort rules... ");
  */
 update_all_status($static_output);
 update_output_window("{$dl}");
-download_file_with_progress_bar($dl, $tmpfname . "/{$snort_filename}", "read_body_snort");
+download_file_with_progress_bar($dl, $tmpfname . "/{$snort_filename}", "read_body_firmware");
 verify_downloaded_file($tmpfname . "/{$snort_filename}");
 
 /* download snort rules md5 file */
 $static_output = gettext("Downloading current snort rules md5... ");
 update_all_status($static_output);
 update_output_window("{$dl_md5}");
-download_file_with_progress_bar($dl_md5, $tmpfname . "/{$snort_filename_md5}", "read_body_snort"););
+download_file_with_progress_bar($dl_md5, $tmpfname . "/{$snort_filename_md5}", "read_body_firmware");
 verify_downloaded_file($tmpfname . "/{$snort_filename_md5}");
 
 /* verify downloaded rules signature */
+update_status(gettext("Verifying MD5 Signature..."));
 verify_snort_rules_md5($tmpfname);
 
 /* extract rules */
+update_status(gettext("Extracting rules..."));
 extract_snort_rules_md5($tmpfname);
 
 $static_output = gettext("Your snort rules are now up to date.");
@@ -241,11 +242,16 @@ update_all_status($static_output);
 $config['installedpackages']['snort']['last_ruleset_download'] = date("Y-m-d");
 write_config();
 
+update_status(gettext("Stopping Snort..."));
+update_output_window(gettext("One moment please..."));
 stop_service("snort");
-sleep(2);
+update_status(gettext("Starting Snort..."));
+update_output_window(gettext("One moment please..."));
 start_service("snort");
 
 /* cleanup temporary directory */
+update_status(gettext("Cleaning up..."));
+update_output_window(gettext("One moment please..."));
 exec("/bin/rm -rf {$tmpfname};");
 
 /* hide progress bar and lets end this party */
@@ -262,7 +268,7 @@ hide_progress_bar_status();
 
 <?php
 
-function read_body_snort($ch, $string) {
+function read_body_firmware($ch, $string) {
 	global $fout, $file_size, $downloaded, $counter, $version, $latest_version, $current_installed_pfsense_version;
 	$length = strlen($string);
 	$downloaded += intval($length);
@@ -281,6 +287,7 @@ function read_body_snort($ch, $string) {
 	if($counter > 150) {
 		update_output_window($text);
 		update_progress_bar($downloadProgress);
+		flush();
 		$counter = 0;
 	}
 	fwrite($fout, $string);
