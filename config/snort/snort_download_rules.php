@@ -279,9 +279,7 @@ function read_body_firmware($ch, $string) {
 	$c = $downloadProgress;
 	$text  = "  Snort download in progress\\n";
 	$text .= "----------------------------------------------------\\n";
-	$text .= "  File size       : {$a}\\n";
 	$text .= "  Downloaded      : {$b}\\n";
-	$text .= "  Percent         : {$c}%\\n";
 	$text .= "----------------------------------------------------\\n";
 	$counter++;
 	if($counter > 150) {
