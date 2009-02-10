@@ -41,6 +41,7 @@
       <required_version>1.2.3</required_version>
       <config_file>http://www.pfsense.com/packages/config/avahi/avahi.xml</config_file>
       <configurationfile>avahi.xml</configurationfile>
+	  <after_install_info>Please visit the Avahi settings tab and select which interfaces you do not wish Avahi to listen on and click save to start the service.</after_install_info>
     </package>
     <package>
       <name>ntop</name>
@@ -147,6 +148,7 @@
       <required_version>1.2</required_version>
       <status>Stable</status>
       <configurationfile>snort.xml</configurationfile>
+	  <after_install_info>Please visit the Snort settings tab and enter your oinkid code.   Afterwards visit the update rules tab to download the snort rules.</after_install_info>
     </package>
     <package>
       <name>spamd</name>
