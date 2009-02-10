@@ -19,7 +19,7 @@ global $config, $g;
 //  link shared libraries
 //  if ((!file_exists("/lib/libm.so.4")) AND (file_exists("/lib/libm.so.5"))) {
 //      exec("ln -s /lib/libm.so.5 /lib/libm.so.4");
-    }
+//    }
 
  /* lines need in config.php */
 $default_lng = en;
