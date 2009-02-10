@@ -636,7 +636,7 @@ function extract_snort_rules_md5($tmpfname) {
 	$handle = popen("{$cmd} 2>&1", 'r');
 	while(!feof($handle)) {
     	$buffer = fgets($handle);
-    	echo "$buffer\n";
+	 update_output_window($buffer);
     	ob_flush();
     	flush();
 	}
