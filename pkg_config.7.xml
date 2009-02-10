@@ -286,7 +286,7 @@
       <descr>Broadcasts a who-has ARP packet on the network and prints answers. </descr>
       <website>http://www.habets.pp.se/synscan/programs.php?prog=arping</website>
       <category>Services</category>
-      <version>2.05</version>
+      <version>2.06</version>
       <status>Beta</status>
       <pkginfolink>http://doc.pfsense.org/index.php/Arping_package</pkginfolink>
       <required_version>1.0.1</required_version>
