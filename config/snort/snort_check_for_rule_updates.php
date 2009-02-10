@@ -66,12 +66,26 @@ if($date1ts > $date2ts or !$last_ruleset_download) {
 		exit;
 	}
 	echo "Downloading snort rule updates...";
-	/* setup some variables */
-	$snort_filename = "snortrules-snapshot-CURRENT.tar.gz";
-	$snort_filename_md5 = "snortrules-snapshot-CURRENT.tar.gz.md5";
-	ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-	$dl = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}";
-	$dl_md5 = "http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}";
+    /* setup some variables */
+    $premium_subscriber = "";
+
+    /* Snort version */
+    $snort_version = "2.8";
+
+    /* Are we using the premium subscriber subscription? */
+    if($config['installedpackages']['snortadvanced']['config'][0]['subscriber']) {
+    	// http://www.snort.org/pub-bin/downloads.cgi/Download/sub_rules/snortrules-snapshot-CURRENT_s.tar.gz.md5
+    	$premium_subscriber = "_s";
+    	$snort_download_prefix = "http://www.snort.org/pub-bin/oinkmaster.cgi";
+    } else {
+    	// http://www.snort.org/pub-bin/downloads.cgi/Download/vrt_os/snortrules-snapshot-CURRENT.tar.gz.md5
+    	$premium_subscriber = "";
+    	$snort_download_prefix = "http://www.snort.org/pub-bin/oinkmaster.cgi";
+    }
+
+    /* Set snort rules download filename */
+    $snort_filename = "snortrules-snapshot-{$snort_version}{$premium_subscriber}.tar.gz";
+    $snort_filename_md5 = "snortrules-snapshot-{$snort_version}{$premium_subscriber}.tar.gz.md5";
 
 	/* multi user system, request new filename and create directory */
 	$tmpfname = tempnam("/tmp", "snortRules");
