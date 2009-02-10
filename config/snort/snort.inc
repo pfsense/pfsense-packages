@@ -632,13 +632,11 @@ function extract_snort_rules_md5($tmpfname) {
 		update_all_status($static_output);
 	}
 	mkdir("/usr/local/etc/snort/rules/");
-	$cmd = "/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C /usr/local/etc/snort/";
+	$cmd = "/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C /usr/local/etc/snort/ rules/";
 	$handle = popen("{$cmd} 2>&1", 'r');
 	while(!feof($handle)) {
-    	$buffer = fgets($handle);
-	 update_output_window($buffer);
-    	ob_flush();
-    	flush();
+		$buffer = fgets($handle);
+		update_output_window($buffer);
 	}
 	pclose($handle);	
 
