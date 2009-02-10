@@ -55,10 +55,6 @@
 		<section>Services</section>
 		<url>/pkg_edit.php?xml=arping.xml&amp;id=0</url>
 	</menu>
-	<service>
-		<name>arping</name>
-		<executable>arping</executable>
-	</service>
 	<tabs>
 		<tab>
 			<text>arping Settings</text>
