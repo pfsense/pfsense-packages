@@ -37,6 +37,10 @@ if(!$start_me_up) {
 	require("/usr/local/pkg/snort.inc");
 }
 
+/* Allow additional execution time 0 = no limit. */
+ini_set('max_execution_time', '9999');
+ini_set('max_input_time', '9999');
+
 $pgtitle = "Services: Snort: Update Rules";
 
 /* define oinkid */
