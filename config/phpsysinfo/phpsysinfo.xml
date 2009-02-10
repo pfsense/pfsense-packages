@@ -64,7 +64,7 @@
 		</tab>
 		<tab>
 			<text>Access phpsysinfo</text>
-			<url>/phpSysInfo</url>
+			<url>/phpsysinfo</url>
 		</tab>
 	</tabs>
 	<additional_files_needed>

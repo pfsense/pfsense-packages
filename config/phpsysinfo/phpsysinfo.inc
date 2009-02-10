@@ -3,7 +3,7 @@ function phpsysinfo_install_deinstall() {
 	conf_mount_rw();
 	config_lock();
 	exec("cd /var/db/pkg/ && pkg_delete `ls | grep mbmon`");
-	exec("rm -d -R /usr/local/www/phpSysInfo");
+	exec("rm -d -R /usr/local/www/phpsysinfo");
 	conf_mount_ro();
 	config_unlock();
 }
@@ -17,8 +17,8 @@ global $config, $g;
 	exec("mv phpsysinfo /usr/local/www/phpsysinfo");
 
 //  link shared libraries
-  if ((!file_exists("/lib/libm.so.4")) AND (file_exists("/lib/libm.so.5"))) {
-      exec("ln -s /lib/libm.so.5 /lib/libm.so.4");
+//  if ((!file_exists("/lib/libm.so.4")) AND (file_exists("/lib/libm.so.5"))) {
+//      exec("ln -s /lib/libm.so.5 /lib/libm.so.4");
     }
 
  /* lines need in config.php */
