@@ -329,8 +329,8 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>imspector-0.8.tbz</depends_on_package>
       <depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
-      <depends_on_package>mysql-client-5.1.11.tbz</depends_on_package>
-      <depends_on_package>sqlite-3.3.7.tbz</depends_on_package>
+      <!-- <depends_on_package>mysql-client-5.1.11.tbz</depends_on_package> -->
+      <!-- <depends_on_package>sqlite-3.3.7.tbz</depends_on_package> -->
     </package>
     <package>
       <name>nut</name>
