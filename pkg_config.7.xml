@@ -330,7 +330,7 @@
       <depends_on_package>imspector-0.8.tbz</depends_on_package>
       <depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
       <depends_on_package>mysql-client-5.1.30.tbz</depends_on_package>
-      <depends_on_package>sqlite-3.5.6.tbz</depends_on_package>
+      <depends_on_package>sqlite3-3.5.6.tbz</depends_on_package>
     </package>
     <package>
       <name>nut</name>
