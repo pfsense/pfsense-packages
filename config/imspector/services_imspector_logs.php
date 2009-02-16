@@ -101,8 +101,8 @@ if ($_POST['mode'] == "render") {
 			while (!feof($fd)) {
 				$line = fgets($fd);
 				if(feof($fd)) continue;
-				$new_format = '([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)';
-				$old_format = '([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*)';
+				$new_format = '([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),(.*)';
+				$old_format = '([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),(.*)';
 				preg_match("/${new_format}|${old_format}/", $line, $matches);
 				$address = $matches[1];
 				$timestamp = $matches[2];
