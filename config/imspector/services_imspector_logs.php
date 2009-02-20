@@ -101,15 +101,21 @@ if ($_POST['mode'] == "render") {
 			while (!feof($fd)) {
 				$line = fgets($fd);
 				if(feof($fd)) continue;
-
-				preg_match('/([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),(|.*),(.*)/', $line, $matches);
+				$new_format = '([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),(.*)';
+				$old_format = '([^,]*),([^,]*),([^,]*),([^,]*),([^,]*),(.*)';
+				preg_match("/${new_format}|${old_format}/", $line, $matches);
 				$address = $matches[1];
 				$timestamp = $matches[2];
 				$direction = $matches[3];
 				$type = $matches[4];
 				$filtered = $matches[5];
-				$category = $matches[6];
-				$data = $matches[7];
+				if(count($matches) == 8) {
+					$category = $matches[6];
+					$data = $matches[7];
+				} else {
+					$category = "";
+					$data = $matches[6];
+				}
 
 				if($direction == '0') {
 					$bgcolor = $convo_remote_bgcolor;

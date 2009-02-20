@@ -320,7 +320,7 @@
       <website>http://www.imspector.org/</website>
       <category>Network Management</category>
       <maintainer>billm@pfsense.org</maintainer>
-      <version>0.8-0</version>
+      <version>0.8-5</version>
       <required_version>1.2.1</required_version>
       <status>BETA</status>
       <pkginfolink>http://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
@@ -329,6 +329,8 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>imspector-0.8.tbz</depends_on_package>
       <depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
+      <depends_on_package>mysql-client-5.1.30.tbz</depends_on_package>
+      <depends_on_package>sqlite3-3.5.6.tbz</depends_on_package>
     </package>
     <package>
       <name>nut</name>
@@ -567,13 +569,13 @@
       <name>Zabbix Agent</name>
       <descr>Monitoring agent.</descr>
       <category>Services</category>
-      <config_file>http://www.pfsense.com/packages/config/zabbix-agent.xml</config_file>
+      <config_file>http://www.pfsense.com/packages/config/zabbix-agent/zabbix-agent.xml</config_file>
       <version>0.22</version>
       <status>FINAL</status>
-      <required_version>1.2.1</required_version>
+      <required_version>1.2.3</required_version>
       <configurationfile>zabbix-agent.xml</configurationfile>
       <maintainer>remco.verhoef@redfive.biz</maintainer>
-      <depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-6-stable/net-mgmt/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://www.pfsense.com/packages/config/zabbix-agent/bin/</depends_on_package_base_url>
       <depends_on_package>zabbix-agent-1.4.5,2.tbz</depends_on_package>
     </package>
     <package>
