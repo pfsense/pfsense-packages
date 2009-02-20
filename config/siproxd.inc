@@ -73,6 +73,8 @@ function siproxd_generate_rules($type) {
 function sync_package_siproxd() {
     		global $config;
 
+			conf_mount_rw();
+			
 			unlink_if_exists("/usr/local/etc/rc.d/siproxd");
 
 			$conf = &$config['installedpackages']['siproxd']['config'][0];
@@ -167,6 +169,8 @@ function sync_package_siproxd() {
 			start_service("siproxd");
 			
 			filter_configure();
+
+			conf_mount_ro();
     }
 
 ?>
