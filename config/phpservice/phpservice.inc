@@ -63,10 +63,9 @@ function phpservice_sync_package_php()
 
   global $config; 
   if($config['installedpackages']['phpservice']['config'] != "") {
-  
-      conf_mount_rw();
-      config_unlock();
 
+    conf_mount_rw();
+    config_unlock();
 		
 		$tmp = "<?php\n";
 		$tmp .= "\n";
@@ -186,13 +185,11 @@ function php_install_command()
 	exec("cp /tmp/phpservice_php_edit.tmp /usr/local/www/packages/phpservice/phpservice_php_edit.php");
 	unlink_if_exists("/tmp/phpservice_php_edit.tmp");
 		
-
-    //write_config();
-
+  //write_config();
 	  	
 	write_rcfile(array(
 		"file" => "phpservice.sh",
-		"start" => "/usr/local/bin/php /usr/local/pkg/phpservice.php",
+		"start" => "/usr/local/bin/php /usr/local/pkg/phpservice.php >> /var/log/phpservice.log &",
 		"stop" => "rm /tmp/phpmonitor.pid"
 		)
 	);

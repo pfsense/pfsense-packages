@@ -48,11 +48,24 @@ if (isset($id) && $a_phpservice[$id]) {
 	
 }
 
+
 if ($_POST) {
 
 	unset($input_errors);
 	$pconfig = $_POST;
 
+	if ($_GET['act'] == "del") {
+    if ($_GET['type'] == 'php') {
+        if ($a_phpservice[$_GET['id']]) {
+            unset($a_phpservice[$_GET['id']]);
+            write_config();
+            php_sync_package();
+            header("Location: phpservice_php.php");
+            exit;
+        }
+    }
+  }
+  
 	if (!$input_errors) {
 	
 		$ent = array();
