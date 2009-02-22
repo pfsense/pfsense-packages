@@ -61,7 +61,7 @@ function setup_avahi() {
 
 	// Is package disabled?
 	if(!$enable) {
-		delete_avahi();
+		stop_avahi();
 		return;
 	}
 
