@@ -35,6 +35,11 @@
 */
 
 
+$freeswitch_build_version = "1.0.3";
+$freeswitch_build_revision = "12228";
+$freeswitch_package_version = "0.8";
+  
+
 function guid()
 {
     if (function_exists('com_create_guid')){
@@ -1685,6 +1690,9 @@ function freeswitch_php_install_command()
 
 	exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
 	unlink_if_exists("/tmp/freeswitch.tgz");
+
+	//make a backup copy of the default config
+	exec("cp -R /usr/local/freeswitch/conf /usr/local/freeswitch/conf.rev".$freeswitch_build_revision.".orig");
 	
 	//remove some default config files that are not needed
 	unlink_if_exists("/usr/local/freeswitch/conf/dialplan/default/01_example.com.xml");
@@ -1898,7 +1906,7 @@ function freeswitch_php_install_command()
 		$contents = str_replace("<param name=\"mailer-app-args\" value=\"-t\"/>", "<param name=\"mailer-app-args\" value=\"/usr/local/www/freeswitch/freeswitch_mailto.php\"/>", $contents);
 		fwrite($handle, $contents);		
 		unset($contents); 	
-		fclose($fout);
+		fclose($handle);
 		unset($filename);
 	
 	//prepare shout.conf.xml for mod_shout	
@@ -2167,9 +2175,10 @@ function freeswitch_php_install_command()
 	if (pkg_is_service_running('freeswitch')) {  
       sync_package_freeswitch_ivr();
 	}
+	
 
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = "1.0.2 revision 11245.";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = "0.7";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = $freeswitch_build_version." revision ".$freeswitch_build_revision.".";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = $freeswitch_package_version;
 	       
 	conf_mount_ro();
 	config_unlock();
