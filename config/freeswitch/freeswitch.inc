@@ -37,7 +37,7 @@
 
 $freeswitch_build_version = "1.0.3";
 $freeswitch_build_revision = "12228";
-$freeswitch_package_version = "0.8";
+$freeswitch_package_version = "0.8.1";
   
 
 function guid()
@@ -1676,8 +1676,11 @@ function sync_package_freeswitch()
 
 function freeswitch_php_install_command() 
 {
-
 	global $config;
+  global $freeswitch_build_version;
+  global $freeswitch_build_revision;
+  global $freeswitch_package_version;
+  
 	conf_mount_rw();
 	config_lock();
 	
