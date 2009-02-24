@@ -35,11 +35,6 @@
 */
 
 
-$freeswitch_build_version = "1.0.3";
-$freeswitch_build_revision = "12228";
-$freeswitch_package_version = "0.8.1";
-  
-
 function guid()
 {
     if (function_exists('com_create_guid')){
@@ -1677,10 +1672,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command() 
 {
 	global $config;
-  global $freeswitch_build_version;
-  global $freeswitch_build_revision;
-  global $freeswitch_package_version;
-  
+	$freeswitch_package_version = "0.8.2"; 
 	conf_mount_rw();
 	config_lock();
 	
@@ -1691,8 +1683,28 @@ function freeswitch_php_install_command()
 	   exec("mkdir /usr/local/www/freeswitch/");
 	}
 
-	exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
-	unlink_if_exists("/tmp/freeswitch.tgz");
+  	$struname = exec('uname -v');
+  	if (stristr($struname, 'FreeBSD 7.0')) {
+    		$freebsd_version = "7.0";
+    		exec("cd /tmp; fetch 
+http://www.portableusbapps.com/packages/config/freeswitch/freeswitch.1.jun.2009.tgz");
+	  	exec("tar zxvf /tmp/freeswitch.1.jun.2009.tgz -C 
+/usr/local/");
+  		unlink_if_exists("/tmp/freeswitch.1.jun.2009.tgz");
+  	
+  		$freeswitch_build_version = "1.0.2";
+    		$freeswitch_build_revision = "";
+  	}
+  	else {
+    		exec("cd /tmp; fetch 
+http://www.portableusbapps.com/packages/config/freeswitch/freeswitch.tgz");
+  		exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
+  		unlink_if_exists("/tmp/freeswitch.tgz");
+  	
+  		$freeswitch_build_version = "1.0.3";
+    		$freeswitch_build_revision = "12228";
+  	}	
+
 
 	//make a backup copy of the default config
 	exec("cp -R /usr/local/freeswitch/conf /usr/local/freeswitch/conf.rev".$freeswitch_build_revision.".orig");
