@@ -681,6 +681,7 @@ minimum_object_size $min_objsize KB
 cache_replacement_policy $cache_policy
 memory_replacement_policy $memory_policy
 offline_mode $offline_mode
+dns_children 32
 
 EOD;
 
