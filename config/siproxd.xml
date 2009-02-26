@@ -155,6 +155,13 @@
 			<description>Enter the port of the outbound proxy to send all traffic to. This is only useful if you have multiple masquerading firewalls to cross.</description>
 			<type>input</type>
 		</field>
+		<field>
+			<fielddescr>Expedited Forwarding</fielddescr>
+			<fieldname>expeditedforwarding</fieldname>
+			<description>This service is designed to allow ISPs to offer a service with attributes similar to a "leased line". This service offers the ULTIMATE IN LOW LOSS, LOW LATENCY AND LOW JITTER by ensuring that there is always sufficient room in output queues for the contracted expedited forwarding traffic.
+			</description>
+			<type>checkbox</type>
+		</field>		
 	</fields>
 	<custom_php_global_functions>
 	</custom_php_global_functions>

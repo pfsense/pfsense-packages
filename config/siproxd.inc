@@ -153,6 +153,9 @@ function sync_package_siproxd() {
 				}
 			}
 
+			if($_POST['expeditedforwarding'] != "") 
+				fwrite($fout, "rtp_dscp = 46\n");
+
 			fclose($fout);
 
 			write_rcfile(array(
