@@ -590,5 +590,16 @@
       <config_file>http://www.pfsense.com/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
       <configurationfile>openvpn-client-export.xml</configurationfile>
     </package>
+    <package>
+      <name>onatproto</name>
+      <descr>Patch to add Protocol options to Manual Outbound NAT. WARNING! Cannot be uninstalled.</descr>
+      <category>System</category>
+      <config_file>http://www.pfsense.com/packages/config/onatproto/onatproto.xml</config_file>
+      <version>0.1</version>
+      <status>BETA</status>
+      <required_version>1.2.1</required_version>
+      <maximum_version>1.2.3</maximum_version>
+      <configurationfile>dashboard.xml</configurationfile>
+    </package>
   </packages>
 </pfsensepkgs>
