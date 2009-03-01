@@ -140,12 +140,12 @@ function sync_package_snort()
   /* Note the sleep delay.  Seems to help getting mult interfaces to start -gtm */
   foreach($snortInterfaces as $snortIf)
   {
-  	$start .= "\nsleep 8;snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -D -i {$snortIf} -A fast &";
+  	$start .= ";sleep 8;snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -D -i {$snortIf} -A fast -q";
   }    
     
 	/* if block offenders is checked, start snort2c */
 	if($_POST['blockoffenders'])
-		$start .= ";sleep 8;snort2c -w /var/db/whitelist -a /var/log/snort/alert";
+		$start .= "\nsleep 8;snort2c -w /var/db/whitelist -a /var/log/snort/alert";
     
 	$sample_before = "\nBEFORE_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
 	$sample_after = "\nAFTER_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
