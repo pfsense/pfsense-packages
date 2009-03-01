@@ -49,11 +49,6 @@
 		<url>/autoconfigbackup.php</url>
 	</menu>
 	<additional_files_needed>
-	    <prefix>/usr/local/pkg/pf/</prefix>
-	    <chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/autoconfigbackup/upload_config_filter.php</item>
-	</additional_files_needed>
-	<additional_files_needed>
 	    <prefix>/usr/local/pkg/parse_config/</prefix>
 	    <chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/autoconfigbackup/parse_config_upload.php</item>
