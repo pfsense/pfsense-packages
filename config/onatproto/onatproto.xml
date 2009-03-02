@@ -7,7 +7,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
+    onatproto.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2007 to whom it may belong
     All rights reserved.
@@ -42,30 +42,24 @@
 /* ========================================================================== */
         ]]>
         </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
-	<name>dashboard</name>
-	<version>0.7.1</version>
-	<title>Dashboard</title>
-	<include_file>/usr/local/pkg/dashboard.inc</include_file>
+    <description>Patch to add Protocol options to Manual Outbound NAT</description>
+    <requirements>pfSense 1.2.x</requirements>
+    <faq>Only needed if you want to NAT outbound based on protocol as well as port.</faq>
+	<name>onatproto</name>
+	<version>0.1</version>
+	<title>onatproto</title>
+	<include_file>/usr/local/pkg/onatproto.inc</include_file>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/dashboard/dashboard.inc</item>
+		<item>http://www.pfsense.com/packages/config/onatproto/onatproto.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/dashboard/binaries/widgets.tgz</item>
+		<item>http://www.pfsense.com/packages/config/onatproto/onatproto.patch</item>
 	</additional_files_needed>
-    <custom_php_install_command>
-		dashboard_install();
-    </custom_php_install_command>
-	<custom_php_deinstall_command>
-		dashboard_deinstall();
-	</custom_php_deinstall_command>
+	<custom_php_install_command>
+		onatproto_install();
+	</custom_php_install_command>
 </packagegui>
-
-	
-	
