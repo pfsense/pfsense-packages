@@ -169,15 +169,15 @@
 			<required/>
 		</field>
 		<field>
-			<fielddescr>Do NOT proxy Private Address Space (RFC 1918)</fielddescr>
+			<fielddescr>Bypass proxy for Private Address Space (RFC 1918) destination</fielddescr>
 			<fieldname>private_subnet_proxy_off</fieldname>
-			<description>Do not forward traffic to Private Address Space (RFC 1918) &lt;b&gt;destination&lt;/b&gt; through the proxy server.</description>
+			<description>Do not forward traffic to Private Address Space (RFC 1918) &lt;b&gt;destination&lt;/b&gt; through the proxy server but directly through the firewall.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Do NOT proxy these IPs</fielddescr>
+			<fielddescr>Bypass proxy for these source IPs</fielddescr>
 			<fieldname>defined_ip_proxy_off</fieldname>
-			<description>Do not forward traffic from these &lt;b&gt;source&lt;/b&gt; IPs through the proxy server. Separate by semi-colons (;).</description>
+			<description>Do not forward traffic from these &lt;b&gt;source&lt;/b&gt; IPs through the proxy server but directly through the firewall. Separate by semi-colons (;).</description>
 			<type>input</type>
   		<size>80</size>
 		</field>		
