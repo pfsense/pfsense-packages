@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+        <name>havp</name>
+        <title>Services: Antivirus proxy server (havp + clamav) -> Settings</title>
+        <category>Status</category>
+        <version>1.7.1</version>
+        <include_file>havp.inc</include_file>
+
+        <!-- Installation -->
+        <menu>
+                <name>HTTP Antivirus</name>
+                <tooltiptext>Proxy server antivirus</tooltiptext>
+                <section>Services</section>
+                <url>/pkg_edit.php?xml=havp.xml&amp;id=0</url>
+        </menu>
+
+        <additional_files_needed>
+               <item>http://www.pfsense.com/packages/config/havp/havp.inc</item>
+        </additional_files_needed>
+
+        <tabs>
+                <tab>
+                        <text>Settings</text>
+                        <url>/pkg_edit.php?xml=havp.xml&amp;id=0</url>
+                        <active/>
+                </tab>
+        </tabs>
+        <fields>
+                <field>
+                        <fielddescr>Enable</fielddescr>
+                        <fieldname>enable</fieldname>
+                        <description>Check this for enable proxy.</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Use external interface</fielddescr>
+                        <fieldname>listenextinterface</fieldname>
+                        <description>Select this for use external interface, otherwise the proxy will use the internal interface '127.0.0.1'. Cascade you other proxy to the HAVP as 'parent proxy' via '127.0.0.1' ip.</description>
+                        <type>checkbox</type>
+                        <enablefields>proxyiface</enablefields>
+                </field>
+                <field>
+                        <fielddescr>Proxy interface</fielddescr>
+                        <fieldname>proxyiface</fieldname>
+                        <description>The interface(s) the proxy server will bind to.</description>
+                        <type>interfaces_selection</type>
+                        <required/>
+                        <default_value>lan</default_value>
+                </field>
+                <field>
+                        <fielddescr>Proxy port</fielddescr>
+                        <fieldname>proxyport</fieldname>
+                        <description>This is the port the proxy server will listen on.</description>
+                        <type>input</type>
+                        <size>10</size>
+                        <required/>
+                        <default_value>3128</default_value>
+                </field>
+                <field>
+                        <fielddescr>Parent proxy</fielddescr>
+                        <fieldname>parentproxy</fieldname>
+                        <description>
+                                Enter the parent proxy as PROXY:PORT format or leave empty.
+                        </description>
+                        <type>input</type>
+                        <size>90</size>
+                </field>
+                <field>
+                        <fielddescr>Language</fielddescr>
+                        <fieldname>lang</fieldname>
+                        <description>Select the language in which the proxy server will display error messages to users.</description>
+                        <type>select</type>
+                        <value>en</value>
+                        <options>
+                                 <option><value>br</value><name>Brazil</name></option>
+                                 <option><value>de</value><name>Germany</name></option>
+                                 <option><value>en</value><name>English</name></option>
+                                 <option><value>es</value><name>Spain</name></option>
+                                 <option><value>fr</value><name>French</name></option>
+                                 <option><value>it</value><name>Italian</name></option>
+                                 <option><value>nf</value><name>Norfolk Island</name></option>
+                                 <option><value>pl</value><name>Poland</name></option>
+                                 <option><value>ru</value><name>Russian</name></option>
+                        </options>
+                </field>
+                <field>
+                        <fielddescr>Max download size</fielddescr>
+                        <fieldname>maxdownloadsize</fieldname>
+                        <description>Enter value or leave empty. Value in bytes. Downloads larger than 'Max download size' will be blocked. Only if not Whitelisted!</description>
+                        <type>input</type>
+                        <size>10</size>
+                        <default_value></default_value>
+                </field>
+                <field>
+                        <fielddescr>Disable X-Forward</fielddescr>
+                        <fieldname>xforwardedfor</fieldname>
+                        <description>If not set, proxy will include your system's IP address or name in the HTTP requests it forwards.</description>
+                        <type>checkbox</type>
+                </field>
+
+                <field>
+                        <fielddescr>Whitelist</fielddescr>
+                        <fieldname>whitelist</fieldname>
+                        <description>
+                            Enter each destination url on a new line that will be accessable to the users without scanning.
+                            Use '*' symbol for mask. Example: *.pfsense.com/*, *sourceforge.net/*clamav-*, */*.xml, */*.inc
+                        </description>
+                        <type>textarea</type>
+                        <cols>60</cols>
+                        <rows>5</rows>
+                        <encoding>base64</encoding>
+                </field>
+
+                <field>
+                        <fielddescr>Blacklist</fielddescr>
+                        <fieldname>blacklist</fieldname>
+                        <description>Enter each destination domain on a new line that will be accessable to the users that are allowed to use the proxy.</description>
+                        <type>textarea</type>
+                        <cols>60</cols>
+                        <rows>5</rows>
+                        <encoding>base64</encoding>
+                </field>
+<!-- Scanner -->
+                <field>
+                        <fielddescr>Block file if error scanning</fielddescr>
+                        <fieldname>failscanerror</fieldname>
+                        <description>If set, the proxy will block the files on which an error scanning.</description>
+                        <type>checkbox</type>
+                </field>
+
+                <field>
+                        <fielddescr>Scan max file size</fielddescr>
+                        <fieldname>scanmaxsize</fieldname>
+                        <description>
+                                Enter here value in bytes (5, 10, 15, 20) or leave empty.
+                                Files larger than this limit won't be scanned.
+                                Empty or 0 also disables the limit.
+                                NOTE: Setting limit is a security risk, because some archives like
+                                ZIP need all the data to be scanned properly! Use this only if you
+                                can't afford temporary space for big files. Also scanner settings
+                                will affect how many files will be scanned inside an archive etc.
+                        </description>
+                        <type>input</type>
+                        <size>10</size>
+                </field>
+
+                <field>
+                        <fielddescr>Scan images</fielddescr>
+                        <fieldname>scanimg</fieldname>
+                        <description>Check this for scan image files.</description>
+                        <type>checkbox</type>
+                </field>
+
+                <field>
+                        <fielddescr>Scan archives</fielddescr>
+                        <fieldname>scanarc</fieldname>
+                        <description>Check this for scan within archives and compressed files.</description>
+                        <type>checkbox</type>
+                </field>
+
+                <field>
+                        <fielddescr>Scan archive max file size</fielddescr>
+                        <fieldname>scanarcmaxsize</fieldname>
+                        <value>10M</value>
+                        <description>
+                                Enter here value in megabytes (15M) or leave empty.
+                                Files in archives larger than this limit won't be scanned.
+                                Value of 0 also disables the limit.
+                        </description>
+                        <type>input</type>
+                        <size>10</size>
+                </field>
+
+                <field>
+                        <fielddescr>AV bases update</fielddescr>
+                        <fieldname>havpavupdate</fieldname>
+                        <description>
+                                &lt;input name='submit' type='submit' value='Update_AV'&gt;
+                                Press button for update AV database now.
+                        </description>
+                        <type>select</type>
+                        <value>hv_none</value>
+                        <options>
+                                <option><name>none</name><value>hv_none</value></option>
+                                <option><name>every 1  hours</name><value>hv_01h</value></option>
+                                <option><name>every 2  hours</name><value>hv_02h</value></option>
+                                <option><name>every 3  hours</name><value>hv_03h</value></option>
+                                <option><name>every 4  hours</name><value>hv_04h</value></option>
+                                <option><name>every 6  hours</name><value>hv_06h</value></option>
+                                <option><name>every 8  hours</name><value>hv_08h</value></option>
+                                <option><name>every 12 hours</name><value>hv_12h</value></option>
+                                <option><name>every 24 hours</name><value>hv_24h</value></option>
+                        </options>
+                </field>
+                <field>
+                        <fielddescr>Regional AV database update mirror</fielddescr>
+                        <fieldname>dbregion</fieldname>
+                        <description>Select regional database mirror.</description>
+                        <type>select</type>
+                        <value></value>
+                        <options>
+                                 <option><value></value><name>-----</name></option>
+                                 <option><value>au</value><name>Australia</name></option>
+                                 <option><value>eu</value><name>Europe</name></option>
+                                 <option><value>ca</value><name>Canada</name></option>
+                                 <option><value>cn</value><name>China</name></option>
+                                 <option><value>id</value><name>Indonesia</name></option>
+                                 <option><value>jp</value><name>Japan</name></option>
+                                 <option><value>kr</value><name>Korea</name></option>
+                                 <option><value>ml</value><name>Malaysia</name></option>
+                                 <option><value>ru</value><name>Russian</name></option>
+                                 <option><value>sa</value><name>South africa</name></option>
+                                 <option><value>tw</value><name>Taiwan</name></option>
+                                 <option><value>uk</value><name>United Kingdom</name></option>
+                                 <option><value>us</value><name>United States</name></option>
+                        </options>
+                </field>
+                <field>
+                        <fielddescr>Optional AV database update servers</fielddescr>
+                        <fieldname>avupdateserver</fieldname>
+                        <description>Enter here space separated AV update servers, or leave empty.</description>
+                        <type>textarea</type>
+                        <cols>60</cols>
+                        <rows>5</rows>
+                </field>
+
+                <field>
+                        <fielddescr>Syslog</fielddescr>
+                        <fieldname>syslog</fieldname>
+                        <description>Check this for enable Syslog.</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Log</fielddescr>
+                        <fieldname>log</fieldname>
+                        <description>Check this for enable log.</description>
+                        <type>checkbox</type>
+                </field>
+        </fields>
+        <custom_php_validation_command>
+                havp_validate_settings($_POST, &amp;$input_errors);
+        </custom_php_validation_command>
+        <custom_php_resync_config_command>
+                havp_resync();
+        </custom_php_resync_config_command>
+        <custom_php_install_command>
+        </custom_php_install_command>
+        <custom_php_deinstall_command>
+        </custom_php_deinstall_command>
+</packagegui>
