@@ -75,12 +75,12 @@
     </package>
     <package>
       <name>Dashboard</name>
-      <descr>Adds pfSense dashboard that will be included with 2.0. This requires 1.2.1 or newer. WARNING!  Cannot be deinstalled.</descr>
+      <descr>Adds pfSense dashboard that will be included with 2.0. This requires 1.2 or newer. WARNING!  Cannot be deinstalled.</descr>
       <category>System</category>
       <config_file>http://www.pfsense.com/packages/config/dashboard/dashboard.xml</config_file>
-      <version>0.7.1</version>
+      <version>0.6.2</version>
       <status>BETA</status>
-      <required_version>1.2.1</required_version>
+      <required_version>1.2</required_version>
       <maximum_version>1.9</maximum_version>
       <configurationfile>dashboard.xml</configurationfile>
     </package>
@@ -179,7 +179,7 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>siproxd-0.7.0_1.tbz</depends_on_package>
       <pkginfolink>http://doc.pfsense.org/index.php/Siproxd_package</pkginfolink>
-      <version>0.7.3</version>
+      <version>0.7.2</version>
       <status>Beta</status>
       <required_version>1.2.1</required_version>
       <configurationfile>siproxd.xml</configurationfile>
@@ -490,7 +490,7 @@
       <descr>High performance web proxy cache.</descr>
       <website>http://www.squid-cache.org/</website>
       <category>Network</category>
-      <version>2.6.21_08</version>
+      <version>2.6.21_07</version>
       <status>Stable</status>
       <required_version>1.2.1</required_version>
       <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
@@ -506,7 +506,7 @@
       <descr>EXPERIMENTAL! Not all directives are ported yet! High performance web proxy cache.</descr>
       <website>http://www.squid-cache.org/</website>
       <category>Network</category>
-      <version>3.0.8_07</version>
+      <version>3.0.8_06</version>
       <status>ALPHA</status>
       <required_version>1.2.1</required_version>
       <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
@@ -591,15 +591,20 @@
       <configurationfile>openvpn-client-export.xml</configurationfile>
     </package>
     <package>
-      <name>onatproto</name>
-      <descr>Patch to add Protocol options to Manual Outbound NAT. WARNING! Cannot be uninstalled.</descr>
-      <category>System</category>
-      <config_file>http://www.pfsense.com/packages/config/onatproto/onatproto.xml</config_file>
-      <version>0.1</version>
-      <status>BETA</status>
-      <required_version>1.2.1</required_version>
-      <maximum_version>1.2.3</maximum_version>
-      <configurationfile>dashboard.xml</configurationfile>
+      <name>HAVP</name> 
+      <pkginfolink></pkginfolink> 
+      <website>http://www.server-side.de/</website> 
+      <descr>HAVP (HTTP Antivirus Proxy) is a proxy with a ClamAV anti-virus scanner. The main aims are continuous, non-blocking downloads and smooth scanning of dynamic and password protected HTTP traffic. Havp antivirus proxy has a parent and transparent proxy mode. It can be used with squid or standalone.</descr> 
+      <category>Network Management</category> 
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url> 
+      <depends_on_package>havp-0.88.tbz</depends_on_package>
+      <version>0.88</version> 
+      <status>ALPHA</status> 
+      <required_version>1.2.2</required_version> 
+      <config_file>http://www.pfsense.com/packages/config/havp/havp.xml</config_file> 
+      <configurationfile>havp.xml</configurationfile> 
+      <maintainer>dv_serg@mail.ru</maintainer>
+      <after_install_info>Please check the HAVP settings.</after_install_info> 
     </package>
   </packages>
 </pfsensepkgs>
