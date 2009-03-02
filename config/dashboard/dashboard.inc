@@ -28,6 +28,7 @@ function dashboard_deinstall() {
 }
 
 function assign_privs() {
+	/* Fix permissions on replaced files */
 	mwexec("chown root:wheel /usr/local/www/index.php");
 	mwexec("chown root:wheel /usr/local/www/fbegin.php");
 	mwexec("chown root:wheel /usr/local/www/graph_cpu.php");
