@@ -46,7 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>dashboard</name>
-	<version>0.7.1</version>
+	<version>0.7.2</version>
 	<title>Dashboard</title>
 	<include_file>/usr/local/pkg/dashboard.inc</include_file>
 	<additional_files_needed>
