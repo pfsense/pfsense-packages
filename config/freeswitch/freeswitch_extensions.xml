@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <packagegui>
-        <copyright>
-        <![CDATA[
+				<copyright>
+				<![CDATA[
 /* $Id$ */
 /* ========================================================================== */
 /*
 
-    freeswitch_extensions.xml
-    Copyright (C) 2008 Mark J Crane
-    All rights reserved.
-    
-    FreeSWITCH (TM)
-    http://www.freeswitch.org/
-    
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2007 to whom it may belong
-    All rights reserved.
+		freeswitch_extensions.xml
+		Copyright (C) 2008 Mark J Crane
+		All rights reserved.
 
-    Based on m0n0wall (http://m0n0.ch/wall)
-    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
-    All rights reserved.
-                                                                              */
+		FreeSWITCH (TM)
+		http://www.freeswitch.org/
+
+		part of pfSense (http://www.pfSense.com)
+		Copyright (C) 2007 to whom it may belong
+		All rights reserved.
+
+		Based on m0n0wall (http://m0n0.ch/wall)
+		Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+		All rights reserved.
+																																							*/
 /* ========================================================================== */
 /*
     Redistribution and use in source and binary forms, with or without
@@ -44,13 +44,13 @@
     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
+																																							*/
 /* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow.</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+				]]>
+				</copyright>
+		<description>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow.</description>
+		<requirements>Describe your package requirements here</requirements>
+		<faq>Currently there are no FAQ items provided.</faq>
 	<name>freeswitchextensions</name>
 	<version>0.1</version>
 	<title>FreeSWITCH: Extensions</title>
@@ -72,7 +72,7 @@
 		<tab>
 			<text>External</text>
 			<url>/pkg_edit.php?xml=freeswitch_external.xml&amp;id=0</url>
-		</tab>		
+		</tab>
 		<tab>
 			<text>Gateways</text>
 			<url>/freeswitch/freeswitch_gateways.php</url>
@@ -80,7 +80,7 @@
 		<tab>
 			<text>Internal</text>
 			<url>/pkg_edit.php?xml=freeswitch_internal.xml&amp;id=0</url>
-		</tab>		
+		</tab>
 		<tab>
 			<text>IVR</text>
 			<url>/freeswitch/freeswitch_ivr.php</url>
@@ -88,7 +88,7 @@
 		<tab>
 			<text>Modules</text>
 			<url>/pkg_edit.php?xml=freeswitch_modules.xml&amp;id=0</url>
-		</tab>		
+		</tab>
 		<tab>
 			<text>Public</text>
 			<url>/freeswitch/freeswitch_public_includes.php</url>
@@ -100,7 +100,7 @@
 		<tab>
 			<text>Status</text>
 			<url>/freeswitch/freeswitch_status.php</url>
-		</tab>    		
+		</tab>
 		<tab>
 			<text>Vars</text>
 			<url>/pkg_edit.php?xml=freeswitch_vars.xml&amp;id=0</url>
@@ -111,7 +111,7 @@
 		<columnitem>
 			<fielddescr>Extension</fielddescr>
 			<fieldname>extension</fieldname>
-		</columnitem>		
+		</columnitem>
 		<columnitem>
 			<fielddescr>Mailbox</fielddescr>
 			<fieldname>mailbox</fieldname>
@@ -120,7 +120,7 @@
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>
-	</adddeleteeditpagefields>	
+	</adddeleteeditpagefields>
 	<fields>
 		<field>
 			<fielddescr>Extension</fielddescr>
@@ -176,14 +176,14 @@
 			<description>Enter the outbound caller id number here.</description>
 			<type>input</type>
 		</field>
-        <field>
-           	<fielddescr>Voicemail Mail To</fielddescr>
+		<field>
+				<fielddescr>Voicemail Mail To</fielddescr>
 			<fieldname>vm-mailto</fieldname>
 			<description>Optional: Enter the email address to send voicemail to.</description>
 			<type>input</type>
-        </field>
-        <field>
-           	<fielddescr>Voicemail Attach File</fielddescr>
+		</field>
+		<field>
+			<fielddescr>Voicemail Attach File</fielddescr>
 			<fieldname>vm-attach-file</fieldname>
 			<description>Choose whether to attach the file to the email.</description>
 			<type>select</type>
@@ -197,8 +197,8 @@
 					<value>false</value>
 				</option>
 			</options>
-        </field>        
-        
+			</field>
+
 		<field>
 			<fielddescr>User Context</fielddescr>
 			<fieldname>user_context</fieldname>
@@ -215,10 +215,10 @@
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
-	   sync_package_freeswitch_extensions();
+		sync_package_freeswitch_extensions();
 	</custom_php_resync_config_command>
-	<custom_delete_php_command>    
-	   sync_package_freeswitch_extensions();
+	<custom_delete_php_command>
+		sync_package_freeswitch_extensions();
 	</custom_delete_php_command>
 	<custom_php_deinstall_command>
 	</custom_php_deinstall_command>
