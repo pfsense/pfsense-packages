@@ -30,19 +30,21 @@ function Fit123_install_config() {
 //Greate directories and downloading files to them
 	//Date
 	exec("mkdir /usr/local/pkg/Fit123/date");
-	exec("fetch -o /usr/local/pkg/Fit123/date/index.php http://pfsense.comuf.com/packages/config/Fit123/bin/date/index.abc");
+	exec("fetch -o /usr/local/pkg/Fit123/date/index.php http://www.pfsense.com/packages/config/Fit123/bin/date/index.abc");
 	//Code-Red Nervecenter Theme
 	exec("mkdir /usr/local/pkg/Fit123/code-red");
-	exec("fetch -o /usr/local/pkg/Fit123/code-red/ http://pfsense.comuf.com/packages/config/Fit123/bin/code-red/all.css");
-	exec("fetch -o /usr/local/pkg/Fit123/code-red/ http://pfsense.comuf.com/packages/config/Fit123/bin/code-red/background.gif");
-	exec("fetch -o /usr/local/pkg/Fit123/code-red/ http://pfsense.comuf.com/packages/config/Fit123/bin/code-red/footer.png");
-	exec("fetch -o /usr/local/pkg/Fit123/code-red/ http://pfsense.comuf.com/packages/config/Fit123/bin/code-red/header.png");
+	exec("fetch -o /usr/local/pkg/Fit123/code-red/ http://www.pfsense.com/packages/config/Fit123/bin/code-red/all.css");
+	exec("fetch -o /usr/local/pkg/Fit123/code-red/ http://www.pfsense.com/packages/config/Fit123/bin/code-red/background.gif");
+	exec("fetch -o /usr/local/pkg/Fit123/code-red/ http://www.pfsense.com/packages/config/Fit123/bin/code-red/footer.png");
+	exec("fetch -o /usr/local/pkg/Fit123/code-red/ http://www.pfsense.com/packages/config/Fit123/bin/code-red/header.png");
 	//LTSP 3th network boot Option
 	exec("mkdir /usr/local/pkg/Fit123/LTSP");
-	exec("fetch -o /usr/local/pkg/Fit123/LTSP/ http://pfsense.comuf.com/packages/config/Fit123/bin/ltsp/services.inc");
-	exec("fetch -o /usr/local/pkg/Fit123/LTSP/services_dhcp.php http://pfsense.comuf.com/packages/config/Fit123/bin/ltsp/services_dhcp.abc");
+	exec("fetch -o /usr/local/pkg/Fit123/LTSP/ http://www.pfsense.com/packages/config/Fit123/bin/ltsp/services.inc");
+	exec("fetch -o /usr/local/pkg/Fit123/LTSP/services_dhcp.php http://www.pfsense.com/packages/config/Fit123/bin/ltsp/services_dhcp.abc");
 	//AFC Reset's states after filter change
-	exec("fetch -o /usr/local/bin/reset_states.sh http://pfsense.comuf.com/packages/config/Fit123/bin/afc/reset_states.sh");
+	exec("mkdir /usr/local/pkg/Fit123/afc");
+	exec("fetch -o /usr/local/pkg/Fit123/afc/reset_states.sh http://www.pfsense.com/packages/config/Fit123/bin/afc/reset_states.sh");
+	exec("chmod 744 /usr/local/pkg/Fit123/afc/reset_states.sh");
 	//DDNS 
 	exec("mkdir /usr/local/pkg/Fit123/ddns");
 	conf_mount_ro();
@@ -266,6 +268,8 @@ global $config;
 	fwrite($hfd, "\n");
 	fwrite($hfd, '                echo $current_ip > $dns_file');
 	fwrite($hfd, "\n");
+	fwrite($hfd, '                echo "Your DDNS records have been updated" | logger');
+	fwrite($hfd, "\n");
 	fwrite($hfd, '        fi');
 	fwrite($hfd, "\n");
 	fwrite($hfd, '}');
@@ -277,5 +281,7 @@ global $config;
 	fwrite($hfd, 'exit $EXIT_SUCCESS');
 	fwrite($hfd, "\n");
 	fclose($hfd);
+
+	exec("chmod 744 /usr/local/pkg/Fit123/ddns/DDNS.sh");
 }
 ?>

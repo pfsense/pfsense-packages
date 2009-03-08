@@ -30,12 +30,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://pfsense.comuf.com/packages/config/Fit123/fit123.inc</item>
+		<item>http://www.pfsense.com/packages/config/Fit123/fit123.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://pfsense.comuf.com/packages/config/Fit123/ddns.xml</item>
+		<item>http://www.pfsense.com/packages/config/Fit123/ddns.xml</item>
 	</additional_files_needed>
 	<fields>
 		<field>
