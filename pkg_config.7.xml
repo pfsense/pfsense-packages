@@ -332,7 +332,7 @@
       <website>http://www.imspector.org/</website>
       <category>Network Management</category>
       <maintainer>billm@pfsense.org</maintainer>
-      <version>0.8-5</version>
+      <version>0.8-6</version>
       <required_version>1.2.1</required_version>
       <status>BETA</status>
       <pkginfolink>http://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
