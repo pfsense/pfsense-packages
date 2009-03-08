@@ -451,7 +451,7 @@
       <category>Network Management</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/All</depends_on_package_base_url>
       <depends_on_package>stunnel-4.19.tbz</depends_on_package>
-      <version>4.18.1</version>
+      <version>4.18.2</version>
       <status>Stable</status>
       <required_version>1.0</required_version>
       <config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
