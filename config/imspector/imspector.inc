@@ -101,7 +101,7 @@
 		@unlink(IMSPECTOR_ETC . '/acl_blacklist.txt');
 		@unlink(IMSPECTOR_ETC . '/acl_whitelist.txt');
 
-		exec('pkg_delete imspector-0.8');
+		//exec('pkg_delete imspector-0.4');
 	}
 
 	function sync_package_imspector() {
