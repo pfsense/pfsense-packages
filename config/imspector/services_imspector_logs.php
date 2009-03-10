@@ -151,6 +151,8 @@ include("head.inc");
 //echo $pfSenseHead->getHTML();
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<script type="text/javascript" language="javascript" src="/javascript/scriptaculous/prototype.js"></script>
+<script type="text/javascript" language="javascript" src="/javascript/scriptaculous/scriptaculous.js"></script>
 <?php include("fbegin.inc"); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <div id="mainlevel">
@@ -188,7 +190,7 @@ function xmlhttpPost()
 			updatepage(self.xmlHttpReq.responseText);
 	}
 
-	document.getElementById('im_status').style.display = "inline";
+	$('im_status').style.display = "inline";
 	self.xmlHttpReq.send("mode=render&section=" + section);
 }
 
@@ -204,25 +206,25 @@ function updatepage(str)
 		if (!a[1] || !a[2] || !a[3]) continue;
 
 		/* create titling information if needed */
-		if (!document.getElementById(a[1])) {
-			document.getElementById('im_convos').innerHTML += 
+		if (!$(a[1])) {
+			$('im_convos').innerHTML += 
 				"<div id='" + a[1] + "_t' style='width: 100%; background-color: $list_protocol_bgcolor; color: $list_protocol_color;'>" + a[1] + "</div>" +
 				"<div id='" + a[1] + "' style='width: 100%; background-color: $list_local_bgcolor;'></div>";
 		}
-		if (!document.getElementById(a[1] + "_" + a[2])) {
+		if (!$(a[1] + "_" + a[2])) {
 			var imageref = "";
 			if (a[0]) imageref = "<img src='" + a[0] + "' alt='" + a[1] + "'/>";
-			document.getElementById(a[1]).innerHTML += 
+			$(a[1]).innerHTML += 
 				"<div id='" + a[1] + "_" + a[2] + "_t' style='width: 100%; color: $list_local_color; padding-left: 5px;'>" + imageref + a[2] + "</div>" + 
 				"<div id='" + a[1] + "_" + a[2] + "' style='width: 100%; background-color: $list_remote_bgcolor; border-bottom: solid 1px $list_end_bgcolor;'></div>";
 		}
-		if (!document.getElementById(a[1] + "_" + a[2] + "_" + a[3])) {
-			document.getElementById(a[1] + "_" + a[2]).innerHTML += 
+		if (!$(a[1] + "_" + a[2] + "_" + a[3])) {
+			$(a[1] + "_" + a[2]).innerHTML += 
 				"<div id='" + a[1] + "_" + a[2] + "_" + a[3] + "_t' style='width: 100%; color: $list_remote_color; padding-left: 10px;'>" + a[3] + "</div>" + 
 				"<div id='" + a[1] + "_" + a[2] + "_" + a[3] + "' style='width: 100%;'></div>";
 		}
-		if (!document.getElementById(a[1] + "_" + a[2] + "_" + a[3] + "_" + a[4])) {
-			document.getElementById(a[1] + "_" + a[2] + "_" + a[3]).innerHTML += 
+		if (!$(a[1] + "_" + a[2] + "_" + a[3] + "_" + a[4])) {
+			$(a[1] + "_" + a[2] + "_" + a[3]).innerHTML += 
 				"<div id='" + a[1] + "_" + a[2] + "_" + a[3] + "_" + a[4] + 
 				"' style='width: 100%; color: $list_convo_color; cursor: pointer; padding-left: 15px;' onClick=" + 
 				'"' + "setsection('" + a[1] + "|" + a[2] + "|" + a[3] + "|" + a[4] + "');" + '"' + "' + >&raquo;" + a[4] + "</div>";
@@ -236,21 +238,21 @@ function updatepage(str)
 	if (!details[1]) title = "&nbsp;";
 	if (!parts[2]) parts[2] = "&nbsp;";
 
-	document.getElementById('im_status').style.display = "none";
-	var bottom  = parseInt(document.getElementById('im_content').scrollTop);
-	var bottom2 = parseInt(document.getElementById('im_content').style.height);
+	$('im_status').style.display = "none";
+	var bottom  = parseInt($('im_content').scrollTop);
+	var bottom2 = parseInt($('im_content').style.height);
 	var absheight = parseInt( bottom + bottom2 );
-	if (absheight == document.getElementById('im_content').scrollHeight) {
+	if (absheight == $('im_content').scrollHeight) {
 		moveit = 1;
 	} else {
 		moveit = 0;
 	}
-	document.getElementById('im_content').innerHTML = parts[2];
+	$('im_content').innerHTML = parts[2];
 	if (moveit == 1) {
-		document.getElementById('im_content').scrollTop = 0;
-		document.getElementById('im_content').scrollTop = document.getElementById('im_content').scrollHeight;
+		$('im_content').scrollTop = 0;
+		$('im_content').scrollTop = $('im_content').scrollHeight;
 	}
-	document.getElementById('im_content_title').innerHTML = title;
+	$('im_content_title').update = title;
 	the_timeout = setTimeout( "xmlhttpPost();", 5000 );
 }
 
