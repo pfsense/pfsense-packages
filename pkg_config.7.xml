@@ -449,7 +449,7 @@
       <category>Network Management</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>stunnel-4.25.tbz</depends_on_package>
-      <version>4.25.2</version>
+      <version>4.30.0</version>
       <status>Stable</status>
       <pkginfolink>http://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
       <required_version>1.2.1</required_version>

@@ -38,73 +38,48 @@
 /* ========================================================================== */
         ]]>
         </copyright>
-    <description>Describe your package here</description>
+    <description>Stunnel certificates</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<name>stunnel</name>
+	<name>stunnelcerts</name>
 	<version>4.18</version>
-	<title>Services: Secure Tunnel</title>
-	<!-- Menu is where this packages menu will appear -->
-	<menu>
-		<name>STunnel</name>
-		<tooltiptext>The stunnel program is designed to work as an SSL encryption wrapper between remote client and local (inetd-startable) or remote server. It can be used to add SSL functionality to commonly used inetd daemons like POP2, POP3, and IMAP servers without any changes in the programs' code. It will negotiate an SSL connection using the OpenSSL or SSLeay libraries. It calls the underlying crypto libraries, so stunnel supports whatever cryptographic algorithms you compiled into your crypto package.</tooltiptext>
-		<section>Services</section>
-		<configfile>stunnel.xml</configfile>
-	</menu>
-	
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/stunnel/stunnel.inc</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/stunnel/stunnel_certs.xml</item>
-	</additional_files_needed>
+	<title>Services: Secure Tunnel - Certificates</title>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->
 	<configpath>['installedpackages']['package']['$packagename']['configuration']</configpath>
-         
+
 	<tabs>
 		<tab>
 			<text>Tunnels</text>
 			<url>/pkg.php?xml=stunnel.xml</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>Certificates</text>
 			<url>/pkg.php?xml=stunnel_certs.xml</url>
+			<active/>
 		</tab>
 	</tabs>
 
 	<!-- adddeleteeditpagefields items will appear on the first page where you can add / delete or edit
-         items.  An example of this would be the nat page where you add new nat redirects -->         
+         items.  An example of this would be the nat page where you add new nat redirects -->
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Listen on IP</fielddescr>
-			<fieldname>localip</fieldname>
+			<fielddescr>Subject</fielddescr>
+			<fieldname>subject</fieldname>
 		</columnitem>
+<!--		<columnitem>
+			<fielddescr>Valid until</fielddescr>
+			<fieldname>expiry</fieldname>
+		</columnitem> -->
 		<columnitem>
-			<fielddescr>Listen on Port</fielddescr>
-			<fieldname>localport</fieldname>
+			<fielddescr>Status</fielddescr>
+			<fieldname>status</fieldname>
 		</columnitem>
-		<columnitem>
-			<fielddescr>Certificate</fielddescr>
-			<fieldname>certificatelink</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Redirects to IP</fielddescr>
-			<fieldname>redirectip</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Redirects to Port</fielddescr>
-			<fieldname>redirectport</fieldname>
-		</columnitem>
+
 	</adddeleteeditpagefields>
 	<!-- fields gets invoked when the user adds or edits a item.   the following items
          will be parsed and rendered for the user as a gui with input, and selectboxes. -->
@@ -112,70 +87,61 @@
 		<field>
 			<fielddescr>Description</fielddescr>
 			<fieldname>description</fieldname>
-			<description>Enter a description for this redirection.</description>
+			<description>Enter a (short) description for this certificate</description>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Listen on IP</fielddescr>
-			<fieldname>localip</fieldname>
-			<description>Enter the local IP address to bind this redirection to.</description>
+			<fielddescr>Certificate filename</fielddescr>
+			<fieldname>filename</fieldname>
+			<description>File name of certificate (read-only; updated on save). Extensions (.pem, .chain, .key) are added automatically.</description>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Listen on port</fielddescr>
-			<fieldname>localport</fieldname>
-			<description>Enter the local port to bind this redirection to.</description>
+			<fielddescr>Certificate subject</fielddescr>
+			<fieldname>subject</fieldname>
+			<description>Certificate subject (read-only; updated on save)</description>
+			<type>input</type>
+			<size>50</size>
+		</field>
+		<field>
+			<fielddescr>Certificate valid until</fielddescr>
+			<fieldname>expiry</fieldname>
+			<description>The certificate will expire on this date, and will no longer work.</description>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Certificate</fielddescr>
-			<fieldname>certificate</fieldname>
-			<description>Select server certificate to use for this tunnel. Certificates are defined on the 'Certificates' page.</description>
-			<type>select</type>
-			<options>
-				<option><name> --- default --- </name><value></value></option>
-			</options>
-			<default_value></default_value>
+			<fielddescr>RSA private key</fielddescr>
+			<fieldname>cert_key</fieldname>
+			<description>RSA private key used for certificate. Do not change for existing certificates!&lt;br&gt;
+							&lt;b&gt;Leave blank to automatically create key and certificate signing request on save.&lt;/b&gt;</description>
+			<type>textarea</type>
+			<rows>7</rows>
+			<cols>65</cols>
 		</field>
 		<field>
-			<fielddescr>Redirects to IP</fielddescr>
-			<fieldname>redirectip</fieldname>
-			<description>Enter the IP address to redirect this to.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Redirects to Port</fielddescr>
-			<fieldname>redirectport</fieldname>
-			<description>Enter the port to redirect to.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Outgoing source IP</fielddescr>
-			<fieldname>sourceip</fieldname>
-			<description>Enter the source IP address for outgoing connections.</description>
-			<type>input</type>
+			<fielddescr>Certificate chain</fielddescr>
+			<fieldname>cert_chain</fieldname>
+			<description>Full certificate chain; root certificate on top, then any intermediates, server certificate at the end.&lt;br&gt;
+							&lt;b&gt;Full chain required for private or EV certificates!&lt;/b&gt;</description>
+			<type>textarea</type>
+			<rows>7</rows>
+			<cols>65</cols>
 		</field>
 	</fields>
-
-	<service>
-	  <name>stunnel</name>
-	  <rcfile>/usr/local/etc/rc.d/stunnel.sh</rcfile>
-	  <executable>stunnel</executable>
-	</service>	
-
+	
 	<include_file>/usr/local/pkg/stunnel.inc</include_file>
-
-	<custom_add_php_command_late>
+	<custom_add_php_command>
+		stunnel_save_cert($config);
 		stunnel_save($config);
-	</custom_add_php_command_late>
-	<custom_php_install_command>
-		stunnel_install();
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-		stunnel_deinstall();
-	</custom_php_deinstall_command>
+	</custom_add_php_command>
+	<custom_php_command_before_form>
+		stunnel_printcsr();
+	</custom_php_command_before_form>
 	<custom_php_after_form_command>
-		stunnel_addcerts($config);
+		stunnel_disablefields();
 	</custom_php_after_form_command>
+	<custom_delete_php_command>
+		stunnel_delete($config);
+	</custom_delete_php_command>
 
 </packagegui>
