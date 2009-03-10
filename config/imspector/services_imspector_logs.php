@@ -172,26 +172,23 @@ var section = 'none';
 var moveit = 1;
 var the_timeout;
 
-function xmlhttpPost()
-{
-	var xmlHttpReq = false;
-	var self = this;
-
-	if (window.XMLHttpRequest)
-		self.xmlHttpReq = new XMLHttpRequest();
-	else if (window.ActiveXObject)
-		self.xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
-
-	self.xmlHttpReq.open('POST', 'services_imspector_logs.php', true);
-	self.xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-	self.xmlHttpReq.onreadystatechange = function() {
-		if (self.xmlHttpReq && self.xmlHttpReq.readyState == 4)
-			updatepage(self.xmlHttpReq.responseText);
-	}
-
-	$('im_status').style.display = "inline";
-	self.xmlHttpReq.send("mode=render&section=" + section);
+function xmlhttpPost(){
+	var url = "/services_imspector_logs.php"
+	new Ajax.Request(url, {
+		method: 'post',
+		parameters: {
+			mode: 'render',
+			section: section
+		},
+		onSuccess: function(transport){
+			var response = transport.responseText || "";
+			updatepage(response);
+			$('im_status').style.display = "none";
+		},
+		onLoading: function(){
+			$('im_status').style.display = "inline";
+		}
+	});
 }
 
 function updatepage(str)
@@ -233,12 +230,11 @@ function updatepage(str)
 
 	/* determine the title of this conversation */
 	var details = parts[1].split(",");
-	var title = details[0] + " conversation between <span style='color: $convo_local_color;'>" + details[ 1 ] +
+	var title = details[0] + " conversation between <span style='color: $convo_local_color;'>" + details[1] +
 		"</span> and <span style='color: $convo_remote_color;'>" + details[2] + "</span>";
 	if (!details[1]) title = "&nbsp;";
 	if (!parts[2]) parts[2] = "&nbsp;";
 
-	$('im_status').style.display = "none";
 	var bottom  = parseInt($('im_content').scrollTop);
 	var bottom2 = parseInt($('im_content').style.height);
 	var absheight = parseInt( bottom + bottom2 );
@@ -247,12 +243,12 @@ function updatepage(str)
 	} else {
 		moveit = 0;
 	}
-	$('im_content').innerHTML = parts[2];
+	$('im_content').update(parts[2]);
 	if (moveit == 1) {
 		$('im_content').scrollTop = 0;
 		$('im_content').scrollTop = $('im_content').scrollHeight;
 	}
-	$('im_content_title').update = title;
+	$('im_content_title').update(title);
 	the_timeout = setTimeout( "xmlhttpPost();", 5000 );
 }
 
