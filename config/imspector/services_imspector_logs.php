@@ -202,29 +202,37 @@ function updatepage(str)
 
 		if (!a[1] || !a[2] || !a[3]) continue;
 
+		var image = a[0];
+		var protocol = a[1];
+		var login = a[2];
+		var destination = a[3];
+		var date = a[4];
+		
+
 		/* create titling information if needed */
-		if (!$(a[1])) {
+		if (!$(protocol)) {
 			$('im_convos').innerHTML += 
-				"<div id='" + a[1] + "_t' style='width: 100%; background-color: $list_protocol_bgcolor; color: $list_protocol_color;'>" + a[1] + "</div>" +
-				"<div id='" + a[1] + "' style='width: 100%; background-color: $list_local_bgcolor;'></div>";
+				"<div id='" + protocol + "_t' style='width: 100%; background-color: $list_protocol_bgcolor; color: $list_protocol_color;'>" + protocol + "</div>" +
+				"<div id='" + protocol + "' style='width: 100%; background-color: $list_local_bgcolor;'></div>";
 		}
-		if (!$(a[1] + "_" + a[2])) {
+		if (!$(protocol + "_" + login)) {
 			var imageref = "";
-			if (a[0]) imageref = "<img src='" + a[0] + "' alt='" + a[1] + "'/>";
-			$(a[1]).innerHTML += 
-				"<div id='" + a[1] + "_" + a[2] + "_t' style='width: 100%; color: $list_local_color; padding-left: 5px;'>" + imageref + a[2] + "</div>" + 
-				"<div id='" + a[1] + "_" + a[2] + "' style='width: 100%; background-color: $list_remote_bgcolor; border-bottom: solid 1px $list_end_bgcolor;'></div>";
+			if (image) imageref = "<img src='" + image + "' alt='" + protocol + "'/>";
+			$(protocol).innerHTML += 
+				"<div id='" + protocol + "_" + login + "_t' style='width: 100%; color: $list_local_color; padding-left: 5px;'>" + imageref + login + "</div>" + 
+				"<div id='" + protocol + "_" + login + "' style='width: 100%; background-color: $list_remote_bgcolor; border-bottom: solid 1px $list_end_bgcolor;'></div>";
 		}
-		if (!$(a[1] + "_" + a[2] + "_" + a[3])) {
-			$(a[1] + "_" + a[2]).innerHTML += 
-				"<div id='" + a[1] + "_" + a[2] + "_" + a[3] + "_t' style='width: 100%; color: $list_remote_color; padding-left: 10px;'>" + a[3] + "</div>" + 
-				"<div id='" + a[1] + "_" + a[2] + "_" + a[3] + "' style='width: 100%;'></div>";
+		if (!$(protocol + "_" + login + "_" + destination)) {
+			$(protocol + "_" + login).innerHTML += 
+				"<div id='" + protocol + "_" + login + "_" + destination + "_t' style='width: 100%; color: $list_remote_color; padding-left: 10px;'>" + destination + "</div>" + 
+				"<div id='" + protocol + "_" + login + "_" + destination + "' style='width: 100%;'></div>";
 		}
-		if (!$(a[1] + "_" + a[2] + "_" + a[3] + "_" + a[4])) {
-			$(a[1] + "_" + a[2] + "_" + a[3]).innerHTML += 
-				"<div id='" + a[1] + "_" + a[2] + "_" + a[3] + "_" + a[4] + 
+		if (!$(protocol + "_" + login + "_" + destination + "_" + date)) {
+			/* XXX: use observer instead of onclick */
+			$(protocol + "_" + login + "_" + destination).innerHTML += 
+				"<div id='" + protocol + "_" + login + "_" + destination + "_" + date + 
 				"' style='width: 100%; color: $list_convo_color; cursor: pointer; padding-left: 15px;' onClick=" + 
-				'"' + "setsection('" + a[1] + "|" + a[2] + "|" + a[3] + "|" + a[4] + "');" + '"' + "' + >&raquo;" + a[4] + "</div>";
+				'"' + "setsection('" + protocol + "|" + login + "|" + destination + "|" + date + "');" + '"' + "' + >&raquo;" + date + "</div>";
 		}
 	}
 
