@@ -151,6 +151,8 @@ include("head.inc");
 //echo $pfSenseHead->getHTML();
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<script type="text/javascript" language="javascript" src="/javascript/scriptaculous/prototype.js"></script>
+<script type="text/javascript" language="javascript" src="/javascript/scriptaculous/scriptaculous.js"></script>
 <?php include("fbegin.inc"); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <div id="mainlevel">
@@ -170,26 +172,23 @@ var section = 'none';
 var moveit = 1;
 var the_timeout;
 
-function xmlhttpPost()
-{
-	var xmlHttpReq = false;
-	var self = this;
-
-	if (window.XMLHttpRequest)
-		self.xmlHttpReq = new XMLHttpRequest();
-	else if (window.ActiveXObject)
-		self.xmlHttpReq = new ActiveXObject("Microsoft.XMLHTTP");
-
-	self.xmlHttpReq.open('POST', 'services_imspector_logs.php', true);
-	self.xmlHttpReq.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-
-	self.xmlHttpReq.onreadystatechange = function() {
-		if (self.xmlHttpReq && self.xmlHttpReq.readyState == 4)
-			updatepage(self.xmlHttpReq.responseText);
-	}
-
-	document.getElementById('im_status').style.display = "inline";
-	self.xmlHttpReq.send("mode=render&section=" + section);
+function xmlhttpPost(){
+	var url = "/services_imspector_logs.php"
+	new Ajax.Request(url, {
+		method: 'post',
+		parameters: {
+			mode: 'render',
+			section: section
+		},
+		onSuccess: function(transport){
+			var response = transport.responseText || "";
+			updatepage(response);
+			$('im_status').style.display = "none";
+		},
+		onLoading: function(){
+			$('im_status').style.display = "inline";
+		}
+	});
 }
 
 function updatepage(str)
@@ -203,54 +202,61 @@ function updatepage(str)
 
 		if (!a[1] || !a[2] || !a[3]) continue;
 
+		var image = a[0];
+		var protocol = a[1];
+		var login = a[2];
+		var destination = a[3];
+		var date = a[4];
+		
+
 		/* create titling information if needed */
-		if (!document.getElementById(a[1])) {
-			document.getElementById('im_convos').innerHTML += 
-				"<div id='" + a[1] + "_t' style='width: 100%; background-color: $list_protocol_bgcolor; color: $list_protocol_color;'>" + a[1] + "</div>" +
-				"<div id='" + a[1] + "' style='width: 100%; background-color: $list_local_bgcolor;'></div>";
+		if (!$(protocol)) {
+			$('im_convos').innerHTML += 
+				"<div id='" + protocol + "_t' style='width: 100%; background-color: $list_protocol_bgcolor; color: $list_protocol_color;'>" + protocol + "</div>" +
+				"<div id='" + protocol + "' style='width: 100%; background-color: $list_local_bgcolor;'></div>";
 		}
-		if (!document.getElementById(a[1] + "_" + a[2])) {
+		if (!$(protocol + "_" + login)) {
 			var imageref = "";
-			if (a[0]) imageref = "<img src='" + a[0] + "' alt='" + a[1] + "'/>";
-			document.getElementById(a[1]).innerHTML += 
-				"<div id='" + a[1] + "_" + a[2] + "_t' style='width: 100%; color: $list_local_color; padding-left: 5px;'>" + imageref + a[2] + "</div>" + 
-				"<div id='" + a[1] + "_" + a[2] + "' style='width: 100%; background-color: $list_remote_bgcolor; border-bottom: solid 1px $list_end_bgcolor;'></div>";
+			if (image) imageref = "<img src='" + image + "' alt='" + protocol + "'/>";
+			$(protocol).innerHTML += 
+				"<div id='" + protocol + "_" + login + "_t' style='width: 100%; color: $list_local_color; padding-left: 5px;'>" + imageref + login + "</div>" + 
+				"<div id='" + protocol + "_" + login + "' style='width: 100%; background-color: $list_remote_bgcolor; border-bottom: solid 1px $list_end_bgcolor;'></div>";
 		}
-		if (!document.getElementById(a[1] + "_" + a[2] + "_" + a[3])) {
-			document.getElementById(a[1] + "_" + a[2]).innerHTML += 
-				"<div id='" + a[1] + "_" + a[2] + "_" + a[3] + "_t' style='width: 100%; color: $list_remote_color; padding-left: 10px;'>" + a[3] + "</div>" + 
-				"<div id='" + a[1] + "_" + a[2] + "_" + a[3] + "' style='width: 100%;'></div>";
+		if (!$(protocol + "_" + login + "_" + destination)) {
+			$(protocol + "_" + login).innerHTML += 
+				"<div id='" + protocol + "_" + login + "_" + destination + "_t' style='width: 100%; color: $list_remote_color; padding-left: 10px;'>" + destination + "</div>" + 
+				"<div id='" + protocol + "_" + login + "_" + destination + "' style='width: 100%;'></div>";
 		}
-		if (!document.getElementById(a[1] + "_" + a[2] + "_" + a[3] + "_" + a[4])) {
-			document.getElementById(a[1] + "_" + a[2] + "_" + a[3]).innerHTML += 
-				"<div id='" + a[1] + "_" + a[2] + "_" + a[3] + "_" + a[4] + 
+		if (!$(protocol + "_" + login + "_" + destination + "_" + date)) {
+			/* XXX: use observer instead of onclick */
+			$(protocol + "_" + login + "_" + destination).innerHTML += 
+				"<div id='" + protocol + "_" + login + "_" + destination + "_" + date + 
 				"' style='width: 100%; color: $list_convo_color; cursor: pointer; padding-left: 15px;' onClick=" + 
-				'"' + "setsection('" + a[1] + "|" + a[2] + "|" + a[3] + "|" + a[4] + "');" + '"' + "' + >&raquo;" + a[4] + "</div>";
+				'"' + "setsection('" + protocol + "|" + login + "|" + destination + "|" + date + "');" + '"' + "' + >&raquo;" + date + "</div>";
 		}
 	}
 
 	/* determine the title of this conversation */
 	var details = parts[1].split(",");
-	var title = details[0] + " conversation between <span style='color: $convo_local_color;'>" + details[ 1 ] +
+	var title = details[0] + " conversation between <span style='color: $convo_local_color;'>" + details[1] +
 		"</span> and <span style='color: $convo_remote_color;'>" + details[2] + "</span>";
 	if (!details[1]) title = "&nbsp;";
 	if (!parts[2]) parts[2] = "&nbsp;";
 
-	document.getElementById('im_status').style.display = "none";
-	var bottom  = parseInt(document.getElementById('im_content').scrollTop);
-	var bottom2 = parseInt(document.getElementById('im_content').style.height);
+	var bottom  = parseInt($('im_content').scrollTop);
+	var bottom2 = parseInt($('im_content').style.height);
 	var absheight = parseInt( bottom + bottom2 );
-	if (absheight == document.getElementById('im_content').scrollHeight) {
+	if (absheight == $('im_content').scrollHeight) {
 		moveit = 1;
 	} else {
 		moveit = 0;
 	}
-	document.getElementById('im_content').innerHTML = parts[2];
+	$('im_content').update(parts[2]);
 	if (moveit == 1) {
-		document.getElementById('im_content').scrollTop = 0;
-		document.getElementById('im_content').scrollTop = document.getElementById('im_content').scrollHeight;
+		$('im_content').scrollTop = 0;
+		$('im_content').scrollTop = $('im_content').scrollHeight;
 	}
-	document.getElementById('im_content_title').innerHTML = title;
+	$('im_content_title').update(title);
 	the_timeout = setTimeout( "xmlhttpPost();", 5000 );
 }
 
@@ -259,9 +265,14 @@ function setsection(value)
 	section = value;
 	clearTimeout(the_timeout);
 	xmlhttpPost();
-	document.getElementById('im_content').scrollTop = 0;
-	document.getElementById('im_content').scrollTop = document.getElementById('im_content').scrollHeight;
+	$('im_content').scrollTop = 0;
+	$('im_content').scrollTop = $('im_content').scrollHeight;
 }
+
+document.observe('dom:loaded', function() {
+	xmlhttpPost();
+});
+
 </script>
 EOD;
 print($zz);
@@ -273,22 +284,19 @@ print($zz);
       <div style='width: 100%; text-align: right;'><span id='im_status' style='display: none;'>Updating</span>&nbsp;</div>
       <table width="100%">
         <tr>
-		<td width="15%" bgcolor="<?=$default_bgcolor?>" style="overflow: auto; border: solid 1px <?=$border_color?>;">
-      	    <div id="im_convos" style="height: 400px; overflow: auto; overflow-x: hidden;"></div>
-      	  </td>
+          <td width="15%" bgcolor="<?=$default_bgcolor?>" style="overflow: auto; border: solid 1px <?=$border_color?>;">
+            <div id="im_convos" style="height: 400px; overflow: auto; overflow-x: hidden;"></div>
+          </td>
           <td width="75%" bgcolor="<?=$default_bgcolor?>" style="border: solid 1px <?=$border_color?>;">
             <div id="im_content_title" style="height: 20px; overflow: auto; vertical-align: top; 
               color: <?=$convo_title_color?>; background-color: <?=$convo_title_bgcolor?>;"></div>
-			<div id="im_content" style="height: 380px; overflow: auto; vertical-align: bottom; overflow-x: hidden;"></div>
+            <div id="im_content" style="height: 380px; overflow: auto; vertical-align: bottom; overflow-x: hidden;"></div>
           </td>
         </tr>
       </table>
     </td>
   </tr>
 </table>
-
-<script type="text/javascript">xmlhttpPost();</script>
-
 </div>
 <?php include("fend.inc"); ?>
 </body>
