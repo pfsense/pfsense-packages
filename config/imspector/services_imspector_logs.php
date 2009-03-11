@@ -257,14 +257,9 @@ function setsection(value)
 	section = value;
 	clearTimeout(the_timeout);
 	xmlhttpPost();
-	$('im_content').scrollTop = 0;
-	$('im_content').scrollTop = $('im_content').scrollHeight;
+	document.getElementById('im_content').scrollTop = 0;
+	document.getElementById('im_content').scrollTop = document.getElementById('im_content').scrollHeight;
 }
-
-document.observe('dom:loaded', function() {
-	xmlhttpPost();
-});
-
 </script>
 EOD;
 print($zz);
@@ -276,19 +271,22 @@ print($zz);
       <div style='width: 100%; text-align: right;'><span id='im_status' style='display: none;'>Updating</span>&nbsp;</div>
       <table width="100%">
         <tr>
-          <td width="15%" bgcolor="<?=$default_bgcolor?>" style="overflow: auto; border: solid 1px <?=$border_color?>;">
-            <div id="im_convos" style="height: 400px; overflow: auto; overflow-x: hidden;"></div>
-          </td>
+		<td width="15%" bgcolor="<?=$default_bgcolor?>" style="overflow: auto; border: solid 1px <?=$border_color?>;">
+      	    <div id="im_convos" style="height: 400px; overflow: auto; overflow-x: hidden;"></div>
+      	  </td>
           <td width="75%" bgcolor="<?=$default_bgcolor?>" style="border: solid 1px <?=$border_color?>;">
             <div id="im_content_title" style="height: 20px; overflow: auto; vertical-align: top; 
               color: <?=$convo_title_color?>; background-color: <?=$convo_title_bgcolor?>;"></div>
-            <div id="im_content" style="height: 380px; overflow: auto; vertical-align: bottom; overflow-x: hidden;"></div>
+			<div id="im_content" style="height: 380px; overflow: auto; vertical-align: bottom; overflow-x: hidden;"></div>
           </td>
         </tr>
       </table>
     </td>
   </tr>
 </table>
+
+<script type="text/javascript">xmlhttpPost();</script>
+
 </div>
 <?php include("fend.inc"); ?>
 </body>
