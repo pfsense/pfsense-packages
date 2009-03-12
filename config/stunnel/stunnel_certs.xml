@@ -113,7 +113,6 @@
 			<fielddescr>RSA private key</fielddescr>
 			<fieldname>cert_key</fieldname>
 			<description>RSA private key used for certificate. Do not change for existing certificates!&lt;br&gt;
-							&lt;b&gt;Leave blank to automatically create key and certificate signing request on save.&lt;/b&gt;</description>
 			<type>textarea</type>
 			<rows>7</rows>
 			<cols>65</cols>
