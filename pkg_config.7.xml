@@ -628,5 +628,31 @@
       <required_version>1.2.1</required_version>
       <maximum_version>1.2.3</maximum_version>
     </package>
+  <package>
+   <name>pfJailctl</name>
+   <descr>pfSense wrapper for jailctl - a jail management tool. Allows you to run jails on pfSense.</descr>
+   <website>http://anduin.net/jailctl/</website>
+   <category>System</category>
+   <version>0.5</version>
+   <required_version>1.2.3</required_version>
+   <status>BETA</status>
+   <pkginfolink>http://doc.pfsense.org/index.php/PfJailctl_package</pkginfolink>
+   <config_file>http://www.pfsense.com/packages/config/jailctl.xml</config_file>
+   <configurationfile>jailctl.xml</configurationfile>
+   <maintainer>ltning-jailctl@anduin.net</maintainer>
+  </package>
+  <package>
+   <name>jail_template</name>
+   <descr>Basic template for jails, probably requires pfJailctl to be useful. Includes 'base' and 'manpages' dists.</descr>
+   <website>http://anduin.net/jailctl/</website>
+   <category>System</category>
+   <version>0.2</version>
+   <required_version>1.2.3</required_version>
+   <status>BETA</status>
+   <pkginfolink>http://doc.pfsense.org/index.php/PfJailctl_package</pkginfolink>
+   <config_file>http://www.pfsense.com/packages/config/jail_template.xml</config_file>
+   <configurationfile>jail_template.xml</configurationfile>
+   <maintainer>ltning-jailctl@anduin.net</maintainer>
+  </package>
   </packages>
 </pfsensepkgs>
