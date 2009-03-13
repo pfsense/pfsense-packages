@@ -57,7 +57,7 @@ $del_url			= "https://{$username}:{$password}@portal.pfsense.org/pfSconfigbackup
 $hostname			= $config['system']['hostname'] . "." . $config['system']['domain'];
 
 if(!$username) {
-	Header("Location: /pkg_edit.php?xml=autoconfigbackup.xml&id=0");
+	Header("Location: /pkg_edit.php?xml=autoconfigbackup.xml&id=0&savemsg=Please+setup+Auto+Config+Backup");
 	exit;
 }
 
