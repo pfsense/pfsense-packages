@@ -242,8 +242,8 @@
       <website>http://pfsense.comuf.com</website>
       <descr>A list of small custom things that can be added to pfSense 1.2.3 :	Date,Code-red,LTSP,AFC and DDNS</descr>
       <category>System</category>
-      <version>0.0.0.1</version>
-      <status>DoNotUseIt</status>
+      <version>0.0.1</version>
+      <status>ALPHA</status>
       <required_version>1.2.3</required_version>
       <maintainer>crazypark2@yahoo.dk</maintainer>
       <config_file>http://www.pfsense.com/packages/config/Fit123/fit123.xml</config_file>
