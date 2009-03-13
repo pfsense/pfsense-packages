@@ -27,7 +27,6 @@
 			<description>
 			A more customize way to update dynamic dns and mainly for IP's that doesn't change very often.&lt;br&gt;
 			Will check for ip change every 5 min via local shell script and will only contact provider on change.&lt;br&gt;
-			(needs a reboot, hopefully it can be changed )
 			</description>
 			<type>checkbox</type>
 		</field>
