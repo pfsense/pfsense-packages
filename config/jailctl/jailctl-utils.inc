@@ -25,7 +25,7 @@ function jailctl_initialize_jail($jail, $jstatus, $jconfig) {
 	$cmd.="echo '".$jail['jip']."    ".$jail['jname']." ".$jstatus['jhostname'][0]."' >> ".$jstatus['jpath']."/etc/hosts \n";
 	$cmd.="echo 'hostname=\"".$jail['jname']."\"' > ".$jstatus['jpath']."/etc/rc.conf \n";
 
-	if(is_array($jconfig['row']) {
+	if(is_array($jconfig['row'])) {
 		foreach($jconfig['row'] as $_row) {
 			$cmd.="echo '".$_row['rcconfline']."' >> ".$jstatus['jpath']."/etc/rc.conf \n";
 			#$cmd.="echo '".str_replace(' ', "\n", $jconfig['jrcconf'])."' >> ".$jstatus['jpath']."/etc/rc.conf \n";
