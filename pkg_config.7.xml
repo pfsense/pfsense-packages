@@ -633,7 +633,7 @@
    <descr>pfSense wrapper for jailctl - a jail management tool. Allows you to run jails on pfSense.</descr>
    <website>http://anduin.net/jailctl/</website>
    <category>System</category>
-   <version>0.5</version>
+   <version>0.51</version>
    <required_version>1.2.3</required_version>
    <status>BETA</status>
    <pkginfolink>http://doc.pfsense.org/index.php/PfJailctl_package</pkginfolink>
