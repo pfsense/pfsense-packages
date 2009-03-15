@@ -1672,7 +1672,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command() 
 {
 	global $config;
-	$freeswitch_package_version = "0.8.3.4";
+	$freeswitch_package_version = "0.8.3.5";
 	$freeswitch_build_version = "1.0.3";
 	$freeswitch_build_revision = "12545";
 

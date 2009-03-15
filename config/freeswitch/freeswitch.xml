@@ -44,7 +44,7 @@
 		<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>FreeSWITCH Settings</name>
-	<version>0.8.3.4</version>
+	<version>0.8.3.5</version>
 	<title>FreeSWITCH: Settings</title>
 	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
 	<menu>
@@ -411,7 +411,7 @@
 		<field>
 			<fielddescr>SMTP Host</fielddescr>
 			<fieldname>smtphost</fieldname>
-			<description>Enter the SMTP host address. If you using a different port append it on the end with a semi-colon. e.g. smtp.gmail.com:465</description>
+			<description>Enter the SMTP host address. If you using a different port append it on the end with a colon. e.g. smtp.gmail.com:465</description>
 			<type>input</type>
 		</field>
 		<field>
