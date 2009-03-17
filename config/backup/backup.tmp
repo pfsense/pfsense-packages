@@ -144,7 +144,7 @@ if ($_GET["savemsg"]) {
 			are recommended for backup.
 			
 			<table>
-			<tr><td><strong>pfSense Config</strong></td><td>/conf</td></tr>
+			<tr><td><strong>pfSense Config</strong></td><td>/cf/conf</td></tr>
 			<tr><td><strong>RRD Graph Data Files</strong></td><td>/var/db/rrd</td></tr>
 			</table>
     </p>
