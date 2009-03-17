@@ -61,29 +61,29 @@
 			<text>Settings</text>
 			<url>/packages/backup.php</url>
 			<active/>
-		</tab>		
+		</tab>
 	</tabs>
-	<configpath>installedpackages->package->$packagename->configuration->backup</configpath>	
+	<configpath>installedpackages->package->$packagename->configuration->backup</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
-		<item>http://portableusbapps.com/packages/config/backup/backup.xml</item>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/backup/backup.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
-		<item>http://portableusbapps.com/packages/config/backup/backup.inc</item>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/backup/backup.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
-		<item>http://portableusbapps.com/packages/config/backup/backup.tmp</item>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/backup/backup.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
-		<item>http://portableusbapps.com/packages/config/backup/backup_edit.tmp</item>
-	</additional_files_needed>			
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/backup/backup_edit.tmp</item>
+	</additional_files_needed>
 	<fields>
 		<field>
 			<fielddescr>Example Variable One</fielddescr>
@@ -97,13 +97,13 @@
 			<description>Enter the variable one here.</description>
 			<type>input</type>
 		</field>
-	</fields>	
+	</fields>
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
 		php_sync_package();
 	</custom_php_resync_config_command>
-	<custom_delete_php_command>    
+	<custom_delete_php_command>
 		php_sync_package();
 	</custom_delete_php_command>
 	<custom_php_install_command>
