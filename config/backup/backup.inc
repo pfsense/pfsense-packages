@@ -79,7 +79,7 @@ function php_sync_package()
 	backup_sync_package_php();
 
 }
-    
+
 
 function php_install_command() 
 {
@@ -96,7 +96,6 @@ function php_install_command()
 	   exec("mkdir /usr/local/www/packages/backup/");
 	}
 
-	
 	//rename PHP files from .tmp to .php
 	exec("cp /tmp/backup.tmp /usr/local/www/packages/backup/backup.php");
 	unlink_if_exists("/tmp/backup.tmp");
@@ -104,10 +103,6 @@ function php_install_command()
 	exec("cp /tmp/backup_edit.tmp /usr/local/www/packages/backup/backup_edit.php");
 	unlink_if_exists("/tmp/backup_edit.tmp");
 		
-  //write_config();
-	  	
-
-		  	       
 	php_sync_package();
 
 	conf_mount_ro();
