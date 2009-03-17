@@ -146,7 +146,7 @@
       <descr>Tool to Backup and Restore files and directories.</descr>
       <category>System</category>
       <pkginfolink></pkginfolink>
-      <config_file>http://www.pfsense.com/packages/config/phpservice/backup.xml</config_file>
+      <config_file>http://www.pfsense.com/packages/config/backup/backup.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <version>0.1.3</version>
       <status>Beta</status>
