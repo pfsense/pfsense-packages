@@ -27,6 +27,8 @@ function Fit123_install_config() {
 	//LTSP network boot Option
 	exec("cp /etc/inc/services.inc /usr/local/pkg/Fit123/backup/");
 	exec("cp /usr/local/www/services_dhcp.php /usr/local/pkg/Fit123/backup/");
+	//DNS Server adds option for a 3th and 4th DNS Server
+	exec("cp /usr/local/www/system.php /usr/local/pkg/Fit123/backup/");
 //Greate directories and downloading files to them
 	//Date
 	exec("mkdir /usr/local/pkg/Fit123/date");
@@ -47,6 +49,9 @@ function Fit123_install_config() {
 	exec("chmod 744 /usr/local/pkg/Fit123/afc/reset_states.sh");
 	//DDNS 
 	exec("mkdir /usr/local/pkg/Fit123/ddns");
+	//DNS Server adds option for a 3th and 4th DNS Server
+	exec("mkdir /usr/local/pkg/Fit123/dnssrv");
+	exec("fetch -o /usr/local/pkg/Fit123/dnssrv/system.php http://www.pfsense.com/packages/config/Fit123/bin/dnssrv/system.abc");
 	conf_mount_ro();
 	config_unlock();
 }
@@ -91,6 +96,12 @@ global $config;
 	$config['system']['afterfilterchangeshellcmd'] = "/usr/local/bin/reset_states.sh";
 	else
 	$config['system']['afterfilterchangeshellcmd'] = "";
+
+	$dnssrv = $config['installedpackages']['fit123']['config'][0]['dnssrv'];
+	if($dnssrv)
+	exec("cp /usr/local/pkg/Fit123/dnssrv/system.php /usr/local/www/system.php");
+	else
+	exec("cp /usr/local/pkg/Fit123/backup/system.php /usr/local/www/system.php");
 }
 
 function ddns_config(){
