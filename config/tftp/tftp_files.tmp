@@ -37,18 +37,18 @@ if (($_GET['a'] == "download") && $_GET['t'] == "backup") {
   $filename = 'tftp.bak.tgz';
   system('cd /;tar cvzf /tmp/tftp.bak.tgz tftpboot');
 }
-if (($_GET['a'] == "download") && file_exists("/tftpboot/".$filename)) {
-  
+if (($_GET['a'] == "download") && file_exists("/tmp/".$filename)) {
+
 	session_cache_limiter('public');
-	$fd = fopen("/tftpboot/".$filename, "rb");
+	$fd = fopen("/tmp/".$filename, "rb");
 	header("Content-Type: application/force-download");
 	header("Content-Type: application/octet-stream");
 	header("Content-Type: application/download");
 	header("Content-Description: File Transfer");
-	header('Content-Disposition: attachment; filename="'.$filename.'"');      
+	header('Content-Disposition: attachment; filename="'.$filename.'"');
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
-	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past	
-	header("Content-Length: " . filesize("/tftpboot/".$filename));
+	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+	header("Content-Length: " . filesize("/tmp/".$filename));
 	fpassthru($fd);
 	exit;
 }
@@ -58,18 +58,18 @@ if ($_GET['a'] == "other") {
   if ($_GET['t'] == "restore") {
     $tmp = '/tmp/';
     $filename = 'tftp.bak.tgz';
-	       
+
     //extract a specific directory to /tftpboot
     if (file_exists('/tmp/'.$filename)) {
         //echo "The file $filename exists";
         system('cd /; tar xvpfz /tmp/'.$filename);
-        system('chmod -R 744 /tftpboot/*');           
+        system('chmod -R 744 /tftpboot/*');
         header( 'Location: tftp_files.php?savemsg=Backup+has+been+restored.' ) ;
     }
     else {
         header( 'Location: tftp_files.php?savemsg=Restore+failed.+Backup+file+not+found.' ) ;
-    }       
-  
+    }
+
 	exit;
   }
 }
@@ -99,7 +99,8 @@ include("head.inc");
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">TFTP: Files</p>
 
-<?php 
+<?php
+$savemsg = $_GET["savemsg"];
 if ($savemsg) {
   print_info_box($savemsg);
 }
@@ -111,7 +112,7 @@ if ($savemsg) {
 <?php
 			
 	$tab_array = array();
-	$tab_array[] = array(gettext("Files"), false, "/tftp/tftp_files.php");
+	$tab_array[] = array(gettext("Files"), false, "/packages/tftp/tftp_files.php");
  	display_top_tabs($tab_array);
  	
 ?>
@@ -169,9 +170,9 @@ if ($savemsg) {
 	echo "<br /><br />\n";
 	echo "</td>\n";
 	echo "<td width='20%' valign='middle' align='right'>\n";
-	echo "  <input type='button' value='backup' onclick=\"document.location.href='/tftp/tftp_files.php?a=download&t=backup';\" />\n";
+	echo "  <input type='button' value='backup' onclick=\"document.location.href='/packages/tftp/tftp_files.php?a=download&t=backup';\" />\n";
 	if (file_exists('/tmp/tftp.bak.tgz')) {
-	  echo "  <input type='button' value='restore' onclick=\"document.location.href='/tftp/tftp_files.php?a=other&t=restore';\" />\n";
+	  echo "  <input type='button' value='restore' onclick=\"document.location.href='/packages/tftp/tftp_files.php?a=other&t=restore';\" />\n";
 	}
 	echo "</td>\n";
 	echo "</tr>\n";

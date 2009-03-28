@@ -274,8 +274,9 @@ function php_deinstall_command()
 	unlink_if_exists("/usr/local/pkg/tftp.xml");
 	unlink_if_exists("/usr/local/pkg/tftp.inc");
 	unlink_if_exists("/usr/local/www/packages/tftp/tftp_files.php");
+	exec("rm -R /usr/local/www/packages/tftp/");
 	
-	exec("rm -R /tftpboot");
+	//exec("rm -R /tftpboot");
 	unlink_if_exists("/usr/local/etc/rc.d/tftp.sh");
 	unlink_if_exists("/tmp/pkg_mgr_tftp.log");	
 	
