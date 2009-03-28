@@ -109,8 +109,13 @@ function php_install_command()
 
 	}
 
+	if (!is_dir('/usr/local/www/packages/')) {
+	   // Create the packages directory
+	   exec("mkdir /usr/local/www/packages/");
+	}
+	
 	if (!is_dir('/usr/local/www/packages/tftp')) {
-	   // Create the directory
+	   // Create the tftp directory
 	   exec("mkdir /usr/local/www/packages/tftp");
 	}
 
