@@ -233,7 +233,7 @@ function php_install_command()
   	
 	write_rcfile(array(
 		"file" => "tftp.sh",
-		"start" => "/usr/sbin/inetd",
+		"start" => "/usr/sbin/inetd -l",
 		"stop" => "killall -9 inetd"
 		)
 	);
