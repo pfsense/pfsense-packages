@@ -469,7 +469,7 @@ preprocessor ftp_telnet_protocol: \
     ftp_cmds { LIST NLST SITE SYST STAT HELP NOOP } \
     ftp_cmds { AUTH ADAT PROT PBSZ CONF ENC } \
     ftp_cmds { FEAT OPTS CEL CMD MACB } \
-    ftp_cmds { MDTM REST SIZE MLST MLSD } \
+    ftp_cmds { MDTM REST SIZE MLST MLSD EPSV } \
     ftp_cmds { XPWD XCWD XCUP XMKD XRMD TEST CLNT } \
     alt_max_param_len 0 { CDUP QUIT REIN PASV STOU ABOR PWD SYST NOOP } \
     alt_max_param_len 100 { MDTM CEL XCWD SITE USER PASS REST DELE RMD SYST TEST STAT MACB EPSV CLNT LPRT } \
