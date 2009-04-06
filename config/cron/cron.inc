@@ -48,25 +48,14 @@ function pkg_is_service_running($servicename)
     }
 }
 
-function byte_convert( $bytes ) {
-
-    if ($bytes<=0)
-        return '0 Byte';
-
-    $convention=1000; //[1000->10^x|1024->2^x]
-    $s=array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB');
-    $e=floor(log($bytes,$convention));
-    return round($bytes/pow($convention,$e),2).' '.$s[$e];
-}
-
- 
-
 function php_sync_package() 
 {
 
 	global $config;   
 	//synch cron tab
 	configure_cron();
+	$handle = popen("/usr/local/etc/rc.d/cron.sh start", "r");
+	pclose($handle);
 
 }
     
@@ -96,17 +85,15 @@ function php_install_command()
 		
   //write_config();
 	  	
-	//write_rcfile(array(
-	//	"file" => "cron.sh",
-	//	"start" => "/usr/local/bin/php /usr/local/pkg/cron.php >> /var/log/cron.log &",
-	//	"stop" => "rm /tmp/cron.pid"
-	//	)
-	//);
+	write_rcfile(array(
+		"file" => "cron.sh",
+		"start" => "/usr/sbin/cron -s &",
+		"stop" => "kill -9 `cat /var/run/cron.pid`"
+		)
+	);
 		  	       
 	php_sync_package();
-	//$handle = popen("/usr/local/etc/rc.d/cron.sh start", "r");
-	//pclose($handle);
-	
+
 	//if (pkg_is_service_running('cron')) {
 		//documentation purposes
 	//}

@@ -90,7 +90,7 @@ if ($config_change == 1) {
         <td><p><!--<span class="vexpl"><span class="red"><strong>Cron<br></strong></span>-->
             Cron controls the scheduling of commands.
             <br /><br />
-            For more information see: <a href='http://www.freebsd.org/doc/en/books/handbook/configtuning-cron.html'>http://www.freebsd.org/doc/en/books/handbook/configtuning-cron.html</a>
+            For more information see: <a href='http://www.freebsd.org/doc/en/books/handbook/configtuning-cron.html' target='_blank'>http://www.freebsd.org/doc/en/books/handbook/configtuning-cron.html</a>
             </p></td>
       </tr>
     </table>
