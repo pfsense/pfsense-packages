@@ -54,6 +54,8 @@ function php_sync_package()
 	global $config;   
 	//synch cron tab
 	configure_cron();
+	$handle = popen("/usr/local/etc/rc.d/cron.sh stop", "r");
+	pclose($handle);
 	$handle = popen("/usr/local/etc/rc.d/cron.sh start", "r");
 	pclose($handle);
 
