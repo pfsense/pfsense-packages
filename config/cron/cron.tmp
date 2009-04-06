@@ -95,13 +95,16 @@ if ($config_change == 1) {
       </tr>
     </table>
     <br />
-		
+    
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
-      <td width="30%" class="listhdrr">Minute</td>
-      <td width="20%" class="listhdrr">Hour</td>
-      <td width="20%" class="listhdrr">Who</td>
-      <td width="40%" class="listhdr">Command</td>
+      <td width="5%" class="listhdrr">minute</td>
+      <td width="5%" class="listhdrr">hour</td>
+      <td width="5%" class="listhdrr">mday</td>
+      <td width="5%" class="listhdrr">month</td>
+      <td width="5%" class="listhdrr">wday</td>
+      <td width="5%" class="listhdrr">who</td>
+      <td width="60%" class="listhdr">command</td>
       <td width="10%" class="list">
 
         <table border="0" cellspacing="0" cellpadding="1">
@@ -123,12 +126,22 @@ if ($config_change == 1) {
       foreach ($a_cron as $ent) {
     
     ?>
+
           <tr>
             <td class="listr" ondblclick="document.location='cron_edit.php?id=<?=$i;?>';">
               <?=$ent['minute'];?>&nbsp;
             </td>
             <td class="listr" ondblclick="document.location='cron_edit.php?id=<?=$i;?>';">
               <?=$ent['hour'];?>&nbsp;
+            </td>
+            <td class="listr" ondblclick="document.location='cron_edit.php?id=<?=$i;?>';">
+              <?=$ent['mday'];?>&nbsp;
+            </td>
+            <td class="listr" ondblclick="document.location='cron_edit.php?id=<?=$i;?>';">
+              <?=$ent['month'];?>&nbsp;
+            </td>
+            <td class="listr" ondblclick="document.location='cron_edit.php?id=<?=$i;?>';">
+              <?=$ent['wday'];?>&nbsp;
             </td>
             <td class="listr" ondblclick="document.location='cron_edit.php?id=<?=$i;?>';">
               <?=$ent['who'];?>&nbsp;
@@ -139,7 +152,7 @@ if ($config_change == 1) {
             <td valign="middle" nowrap class="list">
               <table border="0" cellspacing="0" cellpadding="1">
                 <tr>
-                  <td valign="middle"><a href="cronf_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                  <td valign="middle"><a href="cron_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
                   <td><a href="cron_edit.php?type=php&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                 </tr>
              </table>
@@ -153,7 +166,7 @@ if ($config_change == 1) {
     ?>
 
     <tr>
-      <td class="list" colspan="3"></td>
+      <td class="list" colspan="8"></td>
       <td class="list">          
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
@@ -166,7 +179,7 @@ if ($config_change == 1) {
 
 
      <tr>
-       <td class="list" colspan="3"></td>
+       <td class="list" colspan="8"></td>
        <td class="list"></td>
      </tr>
      </table>
