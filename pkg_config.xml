@@ -86,7 +86,7 @@
       <descr>Adds pfSense dashboard that will be included with 2.0. This requires 1.2 or newer. WARNING!  Cannot be deinstalled.</descr>
       <category>System</category>
       <config_file>http://www.pfsense.com/packages/config/dashboard/dashboard.xml</config_file>
-      <version>0.6.2</version>
+      <version>1.7.5.3</version>
       <status>BETA</status>
       <required_version>1.2</required_version>
       <maximum_version>1.9</maximum_version>
@@ -451,7 +451,7 @@
       <category>Network Management</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/All</depends_on_package_base_url>
       <depends_on_package>stunnel-4.19.tbz</depends_on_package>
-      <version>4.18.1</version>
+      <version>4.18.2</version>
       <status>Stable</status>
       <required_version>1.0</required_version>
       <config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>

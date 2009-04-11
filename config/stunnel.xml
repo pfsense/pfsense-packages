@@ -51,11 +51,35 @@
 		<section>Services</section>
 		<configfile>stunnel.xml</configfile>
 	</menu>
+	
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>http://www.pfsense.com/packages/config/stunnel/stunnel.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>http://www.pfsense.com/packages/config/stunnel/stunnel_certs.xml</item>
+	</additional_files_needed>
 	<!-- configpath gets expanded out automatically and config items will be
          stored in that location -->
 	<configpath>['installedpackages']['package']['$packagename']['configuration']</configpath>
+         
+	<tabs>
+		<tab>
+			<text>Tunnels</text>
+			<url>/pkg.php?xml=stunnel.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Certificates</text>
+			<url>/pkg.php?xml=stunnel_certs.xml</url>
+		</tab>
+	</tabs>
+
 	<!-- adddeleteeditpagefields items will appear on the first page where you can add / delete or edit
-         items.  An example of this would be the nat page where you add new nat redirects -->
+         items.  An example of this would be the nat page where you add new nat redirects -->         
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Description</fielddescr>
@@ -68,6 +92,10 @@
 		<columnitem>
 			<fielddescr>Listen on Port</fielddescr>
 			<fieldname>localport</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Certificate</fielddescr>
+			<fieldname>certificatelink</fieldname>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Redirects to IP</fielddescr>
@@ -100,6 +128,16 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>Certificate</fielddescr>
+			<fieldname>certificate</fieldname>
+			<description>Select server certificate to use for this tunnel. Certificates are defined on the 'Certificates' page.</description>
+			<type>select</type>
+			<options>
+				<option><name> --- default --- </name><value></value></option>
+			</options>
+			<default_value></default_value>
+		</field>
+		<field>
 			<fielddescr>Redirects to IP</fielddescr>
 			<fieldname>redirectip</fieldname>
 			<description>Enter the IP address to redirect this to.</description>
@@ -111,58 +149,33 @@
 			<description>Enter the port to redirect to.</description>
 			<type>input</type>
 		</field>
+		<field>
+			<fielddescr>Outgoing source IP</fielddescr>
+			<fieldname>sourceip</fieldname>
+			<description>Enter the source IP address for outgoing connections.</description>
+			<type>input</type>
+		</field>
 	</fields>
+
 	<service>
 	  <name>stunnel</name>
 	  <rcfile>/usr/local/etc/rc.d/stunnel.sh</rcfile>
 	  <executable>stunnel</executable>
 	</service>	
+
+	<include_file>/usr/local/pkg/stunnel.inc</include_file>
+
 	<custom_add_php_command_late>
-	<![CDATA[	
-	  conf_mount_rw();
-	  config_lock();
-	  $fout = fopen("/usr/local/etc/stunnel/stunnel.conf","w");
-	  fwrite($fout, "cert = /usr/local/etc/stunnel/stunnel.pem \n");
-	  fwrite($fout, "chroot = /var/tmp/stunnel \n");
-	  fwrite($fout, "setuid = stunnel \n");
-	  fwrite($fout, "setgid = stunnel \n");
-	  foreach($config['installedpackages']['stunnel']['config'] as $pkgconfig) {
-	    fwrite($fout, "\n[" . $pkgconfig['description'] . "]\n");
-	    fwrite($fout, "accept = " . $pkgconfig['localip'] . ":" . $pkgconfig['localport'] . "\n");
-	    fwrite($fout, "connect = " . $pkgconfig['redirectip'] . ":" . $pkgconfig['redirectport'] . "\n");
-	    fwrite($fout, "TIMEOUTclose = 0\n\n");
-	  }
-	  fclose($fout);
-	  conf_mount_ro();
-	  config_unlock();
-	  system("/usr/bin/killall stunnel 2>/dev/null");
-	  system("/usr/local/etc/rc.d/stunnel.sh start 2>/dev/null");
-	]]>		
+		stunnel_save($config);
 	</custom_add_php_command_late>
 	<custom_php_install_command>
-	<![CDATA[
-	    safe_mkdir("/usr/local/etc/stunnel");
-	    system("/usr/bin/openssl req -new -x509 -days 365 -nodes -out /usr/local/etc/stunnel/stunnel.pem -keyout /usr/local/etc/stunnel/stunnel.pem 2>/dev/null");
-	    chmod("/usr/local/etc/stunnel/stunnel.pem", 600);
-            system("/bin/mkdir /var/tmp/stunnel");
-	    system("/bin/mkdir /var/tmp/stunnel/var");
-	    system("/bin/mkdir /var/tmp/stunnel/var/tmp");
-	    system("/usr/sbin/chown -R stunnel:stunnel /var/tmp/stunnel");
-	    chmod("/var/tmp/stunnel/var/tmp/", 1777);
-	    $fout = fopen("/usr/local/etc/rc.d/stunnel.sh","w");
-	    system("/usr/sbin/chown -R stunnel:stunnel /var/tmp/stunnel/var/stunnel");
-	    fwrite($fout, "#!/bin/sh\n");
-	    fwrite($fout, "# PACKAGE: STunnel\n");
-	    fwrite($fout, "# EXECUTABLE: stunnel\n");
-	    fwrite($fout, "/usr/local/sbin/stunnel /usr/local/etc/stunnel/stunnel.conf\n\n");
-	    fclose($fout);
-	    chmod("/usr/local/etc/rc.d/stunnel.sh", 0555);
-	]]>	
+		stunnel_install();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-	<![CDATA[		
-	    rmdir_recursive("/var/tmp/stunnel");
-	    rmdir_recursive("/usr/local/etc/stunnel*");
-	]]>
+		stunnel_deinstall();
 	</custom_php_deinstall_command>
+	<custom_php_after_form_command>
+		stunnel_addcerts($config);
+	</custom_php_after_form_command>
+
 </packagegui>

@@ -2,18 +2,18 @@
 <!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+				<copyright>
+				<![CDATA[
 /* $Id$ */
 /* ========================================================================== */
 /*
-    freeswitch.xml
-    Copyright (C) 2008 Mark J Crane
-    All rights reserved.
-    
-    FreeSWITCH (TM)
-    http://www.freeswitch.org/
-                                                                              */
+		freeswitch.xml
+		Copyright (C) 2008 Mark J Crane
+		All rights reserved
+
+		FreeSWITCH (TM)
+		http://www.freeswitch.org/
+																																							*/
 /* ========================================================================== */
 /*
     Redistribution and use in source and binary forms, with or without
@@ -38,13 +38,13 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow.</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+				]]>
+				</copyright>
+		<description>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow.</description>
+		<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
 	<name>FreeSWITCH Settings</name>
-	<version>0.8.3.1</version>
+	<version>0.8.3.5</version>
 	<title>FreeSWITCH: Settings</title>
 	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
 	<menu>
@@ -56,8 +56,8 @@
 	</menu>
 	<service>
 		<name>freeswitch</name>
-    <rcfile>freeswitch.sh</rcfile>
-    <executable>freeswitch</executable>
+		<rcfile>freeswitch.sh</rcfile>
+		<executable>freeswitch</executable>
 		<description>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow. </description>    
 	</service>
 	<tabs>
@@ -77,7 +77,7 @@
 		<tab>
 			<text>External</text>
 			<url>/pkg_edit.php?xml=freeswitch_external.xml&amp;id=0</url>
-		</tab>		
+		</tab>
 		<tab>
 			<text>Gateways</text>
 			<url>/freeswitch/freeswitch_gateways.php</url>
@@ -89,11 +89,11 @@
 		<tab>
 			<text>IVR</text>
 			<url>/freeswitch/freeswitch_ivr.php</url>
-		</tab>    		
+		</tab>
 		<tab>
 			<text>Modules</text>
 			<url>/pkg_edit.php?xml=freeswitch_modules.xml&amp;id=0</url>
-		</tab>		
+		</tab>
 		<tab>
 			<text>Public</text>
 			<url>/freeswitch/freeswitch_public_includes.php</url>
@@ -105,28 +105,28 @@
 		<tab>
 			<text>Status</text>
 			<url>/freeswitch/freeswitch_status.php</url>
-		</tab>    		
+		</tab>
 		<tab>
 			<text>Vars</text>
 			<url>/pkg_edit.php?xml=freeswitch_vars.xml&amp;id=0</url>
 		</tab>
 	</tabs>
 	<configpath>installedpackages->package->$packagename->configuration->freeswitchsettings</configpath>
-        <additional_files_needed>
-                <prefix>/tmp/</prefix>
-                <chmod>0755</chmod>
-                <item>http://portableusbapps.com/packages/config/freeswitch/freeswitch.tgz</item>
-        </additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://portableusbapps.com/packages/config/freeswitch/freeswitch.tgz</item>
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch.inc</item>
-	</additional_files_needed>	
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/lib/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/libtinfo.so.5.6</item>
-	</additional_files_needed>	
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/lib/</prefix>
 		<chmod>0755</chmod>
@@ -146,12 +146,12 @@
 		<prefix>/usr/local/lib/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/libcurl.so.5</item>
-	</additional_files_needed>	
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/mod_shout.so.1</item>
-	</additional_files_needed>	
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
@@ -166,185 +166,185 @@
 		<prefix>/usr/local/lib/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/libodbc.so.1</item>
-	</additional_files_needed>  		
-        <additional_files_needed>
-                <prefix>/usr/local/lib/</prefix>
-                <chmod>0755</chmod>
-                <item>http://www.pfsense.com/packages/config/freeswitch/libiconv.so.3</item>
-        </additional_files_needed>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/lib/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/freeswitch/libiconv.so.3</item>
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/please_enter_your_pin_number.wav</item>
-	</additional_files_needed>	
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/begin_recording.wav</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/your_pin_number_is_incorect_goodbye.wav</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/class.smtp.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/class.phpmailer.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_cmd.tmp</item>
-	</additional_files_needed>	
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes_edit.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes_details.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes_details_edit.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_extensions.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_extensions_edit.tmp</item>
-	</additional_files_needed>	
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_external.xml</item>
-	</additional_files_needed>	
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_gateways.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_gateways_edit.tmp</item>
-	</additional_files_needed>	
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_internal.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr.tmp</item>
-	</additional_files_needed>		
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr_edit.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr_options_edit.tmp</item>
-	</additional_files_needed>	
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr_options.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_mailto.tmp</item>
-	</additional_files_needed>		
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_modules.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_public.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes.tmp</item>
-	</additional_files_needed>	
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes_edit.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes_details.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes_details_edit.tmp</item>
-	</additional_files_needed>			
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_recordings.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_recordings_edit.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_recordings_play.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_status.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_time_conditions.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_time_conditions_edit.tmp</item>
-	</additional_files_needed>	
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>		
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch_vars.xml</item>
 	</additional_files_needed>
 	<fields>
@@ -371,31 +371,31 @@
 			<fieldname>event_socket_port</fieldname>
 			<description>Enter the event socket port here. default: 8021</description>
 			<type>input</type>
-		</field>			
+		</field>
 		<field>
 			<fielddescr>Event Socket Password</fielddescr>
 			<fieldname>event_socket_password</fieldname>
 			<description>Enter the event socket password here. default: ClueCon</description>
 			<type>password</type>
-		</field>	
+		</field>
 		<field>
 			<fielddescr>XML RPC HTTP Port</fielddescr>
 			<fieldname>xml_rpc_http_port</fieldname>
 			<description>Enter the XML RPC HTTP Port here. default: 8787</description>
 			<type>input</type>
-		</field>	
+		</field>
 		<field>
 			<fielddescr>XML RPC Auth Realm</fielddescr>
 			<fieldname>xml_rpc_auth_realm</fieldname>
 			<description>Enter the XML RPC Auth Realm here. default: freeswitch</description>
 			<type>input</type>
-		</field>	
+		</field>
 		<field>
 			<fielddescr>XML RPC Auth User</fielddescr>
 			<fieldname>xml_rpc_auth_user</fieldname>
 			<description>Enter the XML RPC Auth User here. default: freeswitch</description>
 			<type>input</type>
-		</field>	
+		</field>
 		<field>
 			<fielddescr>XML RPC Auth Password</fielddescr>
 			<fieldname>xml_rpc_auth_pass</fieldname>
@@ -411,9 +411,9 @@
 		<field>
 			<fielddescr>SMTP Host</fielddescr>
 			<fieldname>smtphost</fieldname>
-			<description>Enter the SMTP host address. If you using a different port append it on the end with a semi-colon. e.g. smtp.gmail.com:465</description>
+			<description>Enter the SMTP host address. If you using a different port append it on the end with a colon. e.g. smtp.gmail.com:465</description>
 			<type>input</type>
-		</field>		
+		</field>
 		<field>
 			<fielddescr>SMTP Secure</fielddescr>
 			<fieldname>smtpsecure</fieldname>
@@ -449,7 +449,7 @@
 					<value>false</value>
 				</option>
 			</options>
-		</field>		
+		</field>
 		<field>
 			<fielddescr>SMTP Username</fielddescr>
 			<fieldname>smtpusername</fieldname>
@@ -474,14 +474,14 @@
 			<description>Enter the SMTP From Name.</description>
 			<type>input</type>
 		</field>
-	</fields>	
+	</fields>
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
-	    sync_package_freeswitch_settings();
+		sync_package_freeswitch_settings();
 	</custom_php_resync_config_command>
-	<custom_delete_php_command>    
-      sync_package_freeswitch_settings();
+	<custom_delete_php_command>
+		sync_package_freeswitch_settings();
 	</custom_delete_php_command>
 	<custom_php_install_command>
 		freeswitch_php_install_command();

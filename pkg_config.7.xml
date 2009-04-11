@@ -75,10 +75,10 @@
     </package>
     <package>
       <name>Dashboard</name>
-      <descr>Adds pfSense dashboard that will be included with 2.0. This requires 1.2 or newer. WARNING!  Cannot be deinstalled.</descr>
+      <descr>Adds pfSense dashboard that will be included with 2.0. WARNING!  Cannot be deinstalled.</descr>
       <category>System</category>
       <config_file>http://www.pfsense.com/packages/config/dashboard/dashboard.xml</config_file>
-      <version>0.6.2</version>
+      <version>0.7.5.3</version>
       <status>BETA</status>
       <required_version>1.2</required_version>
       <maximum_version>1.9</maximum_version>
@@ -92,7 +92,7 @@
       <pkginfolink>http://doc.pfsense.org/index.php/FreeSWITCH</pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/freeswitch/freeswitch.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <version>0.8.3.1</version>
+      <version>0.8.3.5</version>
       <status>Beta</status>
       <required_version>1.2.1</required_version>
       <maintainer>markjcrane@gmail.com</maintainer>
@@ -120,7 +120,7 @@
       <pkginfolink/>
       <config_file>http://www.pfsense.com/packages/config/tftp/tftp.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <version>1.0.2</version>
+      <version>1.0.5</version>
       <status>Stable</status>
       <required_version>1.2.1</required_version>
       <maintainer>markjcrane@gmail.com</maintainer>
@@ -141,13 +141,41 @@
       <configurationfile>phpservice.xml</configurationfile>
     </package>
     <package>
+      <name>Backup</name>
+      <website/>
+      <descr>Tool to Backup and Restore files and directories.</descr>
+      <category>System</category>
+      <pkginfolink></pkginfolink>
+      <config_file>http://www.pfsense.com/packages/config/backup/backup.xml</config_file>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <version>0.1.5</version>
+      <status>Beta</status>
+      <required_version>1.2</required_version>
+      <maintainer>markjcrane@gmail.com</maintainer>
+      <configurationfile>backup.xml</configurationfile>
+    </package>
+    <package>
+      <name>Cron</name>
+      <website/>
+      <descr>The cron utility is used to manage commands on a schedule.</descr>
+      <category>Services</category>
+      <pkginfolink></pkginfolink>
+      <config_file>http://www.pfsense.com/packages/config/cron/cron.xml</config_file>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <version>0.1.5</version>
+      <status>Beta</status>
+      <required_version>1.2</required_version>
+      <maintainer>markjcrane@gmail.com</maintainer>
+      <configurationfile>cron.xml</configurationfile>
+    </package>
+    <package>
       <name>snort</name>
       <descr>Snort is a libpcap-based packet sniffer/logger which can be used as a lightweight network intrusion detection system. It features rules based logging and can perform content searching/matching in addition to being used to detect a variety of other attacks and probes, such as buffer overflows, stealth port scans, CGI attacks, SMB probes, and much more.</descr>
       <category>Security</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>snort-2.8.2.1.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
-      <version>2.8.2.6</version>
+      <version>2.8.2.6_2</version>
       <required_version>1.2</required_version>
       <status>Stable</status>
       <configurationfile>snort.xml</configurationfile>
@@ -179,7 +207,7 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>siproxd-0.7.0_1.tbz</depends_on_package>
       <pkginfolink>http://doc.pfsense.org/index.php/Siproxd_package</pkginfolink>
-      <version>0.7.3</version>
+      <version>0.7.2</version>
       <status>Beta</status>
       <required_version>1.2.1</required_version>
       <configurationfile>siproxd.xml</configurationfile>
@@ -238,11 +266,23 @@
       <configurationfile>phpsysinfo.xml</configurationfile>
     </package>
     <package>
+      <name>Fit123</name>
+      <website>http://pfsense.comuf.com</website>
+      <descr>A list of small custom things that can be added to pfSense 1.2.3 :	Date,Code-red,LTSP,AFC and DDNS</descr>
+      <category>System</category>
+      <version>0.0.1</version>
+      <status>ALPHA</status>
+      <required_version>1.2.3</required_version>
+      <maintainer>crazypark2@yahoo.dk</maintainer>
+      <config_file>http://www.pfsense.com/packages/config/Fit123/fit123.xml</config_file>
+      <configurationfile>fit123.xml</configurationfile>
+    </package>
+    <package>
       <name>dns-server</name>
       <descr>pfSense version of TinyDNS which features failover host support</descr>
       <website>http://cr.yp.to/djbdns.html</website>
       <category>Services</category>
-      <version>1.0.6</version>
+      <version>1.0.6.1</version>
       <status>Beta</status>
       <pkginfolink>http://doc.pfsense.org/index.php/Tinydns_package</pkginfolink>
       <required_version>1.2</required_version>
@@ -320,7 +360,7 @@
       <website>http://www.imspector.org/</website>
       <category>Network Management</category>
       <maintainer>billm@pfsense.org</maintainer>
-      <version>0.8-5</version>
+      <version>0.8-9</version>
       <required_version>1.2.1</required_version>
       <status>BETA</status>
       <pkginfolink>http://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
@@ -329,8 +369,8 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>imspector-0.8.tbz</depends_on_package>
       <depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
-      <depends_on_package>mysql-client-5.1.30.tbz</depends_on_package>
-      <depends_on_package>sqlite3-3.5.6.tbz</depends_on_package>
+      <depends_on_package>mysql-client-5.0.77.tbz</depends_on_package>
+      <depends_on_package>sqlite3-3.6.10.tbz</depends_on_package>
     </package>
     <package>
       <name>nut</name>
@@ -437,7 +477,7 @@
       <category>Network Management</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>stunnel-4.25.tbz</depends_on_package>
-      <version>4.25.1</version>
+      <version>4.30.1</version>
       <status>Stable</status>
       <pkginfolink>http://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
       <required_version>1.2.1</required_version>
@@ -506,7 +546,7 @@
       <descr>EXPERIMENTAL! Not all directives are ported yet! High performance web proxy cache.</descr>
       <website>http://www.squid-cache.org/</website>
       <category>Network</category>
-      <version>3.0.8_07</version>
+      <version>3.0.8_08</version>
       <status>ALPHA</status>
       <required_version>1.2.1</required_version>
       <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
@@ -590,5 +630,57 @@
       <config_file>http://www.pfsense.com/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
       <configurationfile>openvpn-client-export.xml</configurationfile>
     </package>
+    <package>
+      <name>HAVP</name> 
+      <pkginfolink></pkginfolink> 
+      <website>http://www.server-side.de/</website> 
+      <descr>HAVP (HTTP Antivirus Proxy) is a proxy with a ClamAV anti-virus scanner. The main aims are continuous, non-blocking downloads and smooth scanning of dynamic and password protected HTTP traffic. Havp antivirus proxy has a parent and transparent proxy mode. It can be used with squid or standalone.</descr> 
+      <category>Network Management</category> 
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url> 
+      <depends_on_package>havp-0.88.tbz</depends_on_package>
+      <version>0.88</version> 
+      <status>ALPHA</status> 
+      <required_version>1.2.2</required_version> 
+      <config_file>http://www.pfsense.com/packages/config/havp/havp.xml</config_file> 
+      <configurationfile>havp.xml</configurationfile> 
+      <maintainer>dv_serg@mail.ru</maintainer>
+      <after_install_info>Please check the HAVP settings.</after_install_info> 
+    </package>
+    <package>
+      <name>onatproto</name>
+      <descr>Patch to add Protocol options to Manual Outbound NAT. WARNING! Cannot be uninstalled.</descr>
+      <category>System</category>
+      <config_file>http://www.pfsense.com/packages/config/onatproto/onatproto.xml</config_file>
+      <version>0.1</version>
+      <status>BETA</status>
+      <required_version>1.2.1</required_version>
+      <maximum_version>1.2.3</maximum_version>
+    </package>
+  <package>
+   <name>pfJailctl</name>
+   <descr>pfSense wrapper for jailctl - a jail management tool. Allows you to run jails on pfSense.</descr>
+   <website>http://anduin.net/jailctl/</website>
+   <category>System</category>
+   <version>0.51</version>
+   <required_version>1.2.3</required_version>
+   <status>BETA</status>
+   <pkginfolink>http://doc.pfsense.org/index.php/PfJailctl_package</pkginfolink>
+   <config_file>http://www.pfsense.com/packages/config/jailctl.xml</config_file>
+   <configurationfile>jailctl.xml</configurationfile>
+   <maintainer>ltning-jailctl@anduin.net</maintainer>
+  </package>
+  <package>
+   <name>jail_template</name>
+   <descr>Basic template for jails, probably requires pfJailctl to be useful. Includes 'base' and 'manpages' dists.</descr>
+   <website>http://anduin.net/jailctl/</website>
+   <category>System</category>
+   <version>0.2</version>
+   <required_version>1.2.3</required_version>
+   <status>BETA</status>
+   <pkginfolink>http://doc.pfsense.org/index.php/PfJailctl_package</pkginfolink>
+   <config_file>http://www.pfsense.com/packages/config/jail_template.xml</config_file>
+   <configurationfile>jail_template.xml</configurationfile>
+   <maintainer>ltning-jailctl@anduin.net</maintainer>
+  </package>
   </packages>
 </pfsensepkgs>

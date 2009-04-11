@@ -41,7 +41,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>tftp Settings</name>
-	<version>1.0.2</version>
+	<version>1.0.5</version>
 	<title>TFTP: Settings</title>
 	<include_file>/usr/local/pkg/tftp.inc</include_file>
 	<menu>
@@ -49,7 +49,7 @@
 		<tooltiptext>Add or Remove files for TFTP.</tooltiptext>
 		<section>Services</section>
 		<configfile>tftp.xml</configfile>
-		<url>/tftp/tftp_files.php</url>
+		<url>/packages/tftp/tftp_files.php</url>
 	</menu>
 	<service>
 		<name>tftp</name>
@@ -60,7 +60,7 @@
 	<tabs>
 		<tab>
 			<text>Files</text>
-			<url>/tftp/tftp_files.php</url>
+			<url>/packages/tftp/tftp_files.php</url>
 		</tab>
 	</tabs>
 	<configpath>installedpackages->package->$packagename->configuration->tftp</configpath>

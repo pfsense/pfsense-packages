@@ -42,11 +42,11 @@
 /* ========================================================================== */
         ]]>
         </copyright>
-    <description>Describe your package here</description>
+    <description>Dashboard package</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>dashboard</name>
-	<version>0.2</version>
+	<version>0.7.5.3</version>
 	<title>Dashboard</title>
 	<include_file>/usr/local/pkg/dashboard.inc</include_file>
 	<additional_files_needed>
@@ -59,13 +59,10 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/dashboard/binaries/widgets.tgz</item>
 	</additional_files_needed>
-    <custom_php_install_command>
+	<custom_php_install_command>
 		dashboard_install();
-    </custom_php_install_command>
+	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		dashboard_deinstall();
 	</custom_php_deinstall_command>
 </packagegui>
-
-	
-	

@@ -109,14 +109,19 @@ function php_install_command()
 
 	}
 
-	if (!is_dir('/usr/local/www/tftp')) {
-	   // Create the directory
-	   exec("mkdir /usr/local/www/tftp");
+	if (!is_dir('/usr/local/www/packages/')) {
+	   // Create the packages directory
+	   exec("mkdir /usr/local/www/packages/");
+	}
+	
+	if (!is_dir('/usr/local/www/packages/tftp')) {
+	   // Create the tftp directory
+	   exec("mkdir /usr/local/www/packages/tftp");
 	}
 
 	
 	//rename PHP files from .tmp to .php	
-	exec("cp /tmp/tftp_files.tmp /usr/local/www/tftp/tftp_files.php");
+	exec("cp /tmp/tftp_files.tmp /usr/local/www/packages/tftp/tftp_files.php");
 	unlink_if_exists("/tmp/tftp_files.tmp");
     		
 	//prepare inetd.conf for tftp
@@ -228,7 +233,7 @@ function php_install_command()
   	
 	write_rcfile(array(
 		"file" => "tftp.sh",
-		"start" => "/usr/sbin/inetd",
+		"start" => "/usr/sbin/inetd -l",
 		"stop" => "killall -9 inetd"
 		)
 	);
@@ -268,9 +273,10 @@ function php_deinstall_command()
 	
 	unlink_if_exists("/usr/local/pkg/tftp.xml");
 	unlink_if_exists("/usr/local/pkg/tftp.inc");
-	unlink_if_exists("/usr/local/www/tftp/tftp_files.php");
+	unlink_if_exists("/usr/local/www/packages/tftp/tftp_files.php");
+	exec("rm -R /usr/local/www/packages/tftp/");
 	
-	exec("rm -R /tftpboot");
+	//exec("rm -R /tftpboot");
 	unlink_if_exists("/usr/local/etc/rc.d/tftp.sh");
 	unlink_if_exists("/tmp/pkg_mgr_tftp.log");	
 	

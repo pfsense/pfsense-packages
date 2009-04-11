@@ -133,8 +133,8 @@ function upload_config($reasonm = "") {
 		if(!file_exists("/cf/conf/autoconfigback.notice")) {
 			$notice_text =  "Either the username, password or encryption password is not set for Automatic Configuration Backup.  ";
 			$notice_text .= "Please correct this in Diagnostics -> AutoConfigBackup -> Settings.";
-			log_error($notice_text);
-			file_notice("AutoConfigBackup", $notice_text, $notice_text, "");
+			//log_error($notice_text);
+			//file_notice("AutoConfigBackup", $notice_text, $notice_text, "");
 			conf_mount_rw();
 			touch("/cf/conf/autoconfigback.notice");
 			conf_mount_ro();

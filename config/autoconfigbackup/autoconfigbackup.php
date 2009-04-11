@@ -64,7 +64,7 @@ else
 $myhostname		= $config['system']['hostname'] . "." . $config['system']['domain'];
 
 if(!$username) {
-	Header("Location: /pkg_edit.php?xml=autoconfigbackup.xml&id=0");
+	Header("Location: /pkg_edit.php?xml=autoconfigbackup.xml&id=0&savemsg=Please+setup+Auto+Config+Backup");
 	exit;
 }
 
@@ -127,6 +127,10 @@ function get_hostnames() {
 			print_info_box("Warning! You are currently viewing an alternate hosts backup history ($hostname)");
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">  <tr><td>
+<div id="loading">
+	<img src="/themes/metallic/images/misc/loader.gif"> Loading, please wait...
+	<p/>&nbsp;
+</div>
 <div id='feedbackdiv'></div>
 	<?php
 		$tab_array = array();
@@ -149,9 +153,6 @@ function get_hostnames() {
 	<table id="backuptable" class="tabcont" align="center" width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
 		<td colspan="2" align="left">
-			<div id="loading">
-				<img src="themes/metallic/images/misc/loader.gif"> Loading, please wait...
-			</div>
 			<?php
 				if($_REQUEST['rmver'] != "") {
 					$curl_session = curl_init();
