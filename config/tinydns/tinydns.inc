@@ -431,6 +431,7 @@ function tinydns_create_zone_file() {
 			$hostname = $domain['hostname'];
 			$ipaddress = $domain['ipaddress'];
 			$ttl = $domain['ttl'];
+			$dist = $domain['dist'];
 			/*   check record status, if it is down request
 			 *   backup server if defined.
 			 */
@@ -446,7 +447,7 @@ function tinydns_create_zone_file() {
 						log_error("tinydns_get_backup_record returned $ipaddress ");
 				}
 			}
-			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname, $domain['rdns']);
+			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname, $domain['rdns'], $dist);
 			if($record_data) 
 				fwrite($fd, $record_data . "\n");
 			/* process load balanced items */
@@ -588,12 +589,15 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 
 /* formats data as a tinydns data row item */
 /* A full description of the data format is available at 'man tinydns-data' */
-function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns) {
+function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns, $dist) {
 		if($ttl)
 			$ttl_string = ":{$ttl}";
 		else
 			$ttl_string = "";
+
 		switch ($recordtype) {
+
+			/* Note that some of these are simplistic versions of TinyDNS record handling.  Uber-users can always do "raw" entries...  */
 			case "SOA":
 				$record_data = ".{$hostname}::{$recordip}{$ttl_string}";
 				break;
@@ -601,7 +605,7 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 				$record_data = "&{$hostname}:{$recordip}{$ttl_string}";
 				break;
 			case "MX":
-				$record_data = "@{$hostname}:{$recordip}::{$ttl_string}";
+				$record_data = "@{$hostname}::{$recordip}:{$dist}{$ttl_string}";
 				break;
 			case "PTR":
 				/* "^" creates "PTR" record only to allow reverse DNS */
@@ -619,9 +623,36 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 				$record_data = "C{$hostname}:{$recordip}{$ttl_string}";
 				break;
 			case "TXT":
-				/* "'" creates "TXT" record that can be used for SPF */
-				$record_data = "'{$hostname}:{$recordip}{$ttl_string}";
+				/* "'" creates "TXT" record                                                             */
+				/* ":" creates a generic record entry, (and record code 16 below makes it a TXT record) */
+				/* Q: Why bother with generic?                                                          */
+				/* A: TinyDNS TXT records get split up every 127 chars and some clients have trouble re-assembling them.                               */
+				/* TinyDNS generic records allow up to the maximum DNS record size of 255 chars but it is a hard limit, no splitting of larger strings */
+				/* ...so try to always create the best record for the need                                                                             */
+
+				/* Initial cleanup required for TXT records in TinyDNS where we substitute Octal escape codes for certain chars*/
+				$saferecordip = str_replace(":", "\\072", $recordip);
+				$saferecordip = str_replace(" ", "\\040", $saferecordip);
+				$saferecordip = str_replace("\r", "\\015", $saferecordip);
+				$saferecordip = str_replace("\n", "\\012", $saferecordip);
+				
+				/* Logically this should be comparing against 127 and 255 but PHP has a boundary error?                 */
+				/* Boundary errors or not, 128 and 256 at least evaluate properly!!!                                    */
+				/* Also note that reclen checks against the original string and not the "safe" one we generated above.  */
+				$reclen = mb_strlen($recordip, '8bit');
+				if($reclen > 128 && $reclen <= 256) {	
+					/* TinyDNS generic records require an escaped Octal string length padded to three chars before the actual string!    */
+					/* The logic here shouldn't ever require padding but including it anyway in case somebody changes code down the road */
+					$reclen = str_pad(decoct($reclen),3,"0",STR_PAD_LEFT);
+					$record_data = ":{$hostname}:16:\\{$reclen}{$saferecordip}{$ttl_string}";
+				} else {
+					$record_data = "'{$hostname}:{$saferecordip}{$ttl_string}";
+				}	
 				break;
+			case "raw":
+				/* We don't know or care what is in a raw entry, just pass it along as-is */
+				$record_data = "{$recordip}";
+				break;				
 		}
 		return $record_data;
 }
@@ -961,4 +992,22 @@ EOD;
 	fclose($fr);
 }
 
+function tinydns_cleanup_addedit_form_record() {
+	/* Clean some things up and simplify per limited subset of TinyDNS record syntax before saving.  */
+	if((($_POST['recordtype'] == "SOA") || ($_POST['recordtype'] == "NS") || ($_POST['recordtype'] == "MX")) && substr($_POST['ipaddress'],-1) != ".")
+		$_POST['ipaddress'] = $_POST['ipaddress'] . ".";
+
+	if($_POST['recordtype'] == "TXT") {
+		/* TinyDNS provides surrounding quotes for TXT records automatically so we check & remove them here */
+		if(substr($_POST['ipaddress'],-1) == "\"")
+			$_POST['ipaddress'] = substr($_POST['ipaddress'],0,-1);		
+		if(substr($_POST['ipaddress'],0,1) == "\"")
+			$_POST['ipaddress'] = substr($_POST['ipaddress'],1);
+		if(substr($_POST['ipaddress'],0,5) == "v=spf") {
+			/* more cleanup specific to SPF records - strip newlines and carriage returns) */
+			$_POST['ipaddress'] = str_replace("\r", "", $_POST['ipaddress']);
+			$_POST['ipaddress'] = str_replace("\n", "", $_POST['ipaddress']);		
+		}
+	}
+}
 ?>
