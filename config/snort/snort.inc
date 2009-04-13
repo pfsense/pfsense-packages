@@ -412,7 +412,7 @@ portvar RSH_PORTS 514
 portvar SMB_PORTS [139,445]
 portvar SMTP_PORTS 25
 portvar SNMP_PORTS 161
-portvar SSH_PORTS {$ssh_port}
+portvar SSH_PORTS {\$ssh_port}
 portvar TELNET_PORTS 23
 portvar MAIL_PORTS [25,143,465,691]
 portvar SSL_PORTS [25,443,465,636,993,995]
@@ -477,6 +477,15 @@ preprocessor stream5_tcp: bind_to any, policy macos
 preprocessor stream5_tcp: policy BSD, ports both all, use_static_footprint_sizes
 preprocessor stream5_udp
 preprocessor stream5_icmp
+
+##########################
+                         #
+# NEW                    #
+# Performance Statistics #
+                         #
+##########################
+
+preprocessor perfmonitor: time 300 file /var/log/snort/snort.stats pktcnt 10000
 
 #################
                 #
@@ -597,7 +606,7 @@ preprocessor sfportscan: scan_type { all } \
                          proto  { all } \
                          memcap { 10000000 } \
                          sense_level { medium } \
-                         ignore_scanners { $HOME_NET }
+                         ignore_scanners { \$HOME_NET }
 
 ############################
                            #
