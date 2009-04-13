@@ -412,7 +412,7 @@ portvar RSH_PORTS 514
 portvar SMB_PORTS [139,445]
 portvar SMTP_PORTS 25
 portvar SNMP_PORTS 161
-portvar SSH_PORTS {\$ssh_port}
+portvar SSH_PORTS {$ssh_port}
 portvar TELNET_PORTS 23
 portvar MAIL_PORTS [25,143,465,691]
 portvar SSL_PORTS [25,443,465,636,993,995]
