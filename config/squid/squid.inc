@@ -1244,7 +1244,7 @@ function squid_generate_rules($type) {
 			$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> 127.0.0.1 port 80\n";
 		}
 		/* Handle PPPOE case */
-		if($config['pppoe']['mode'] == "server") {
+		if($config['pppoe']['mode'] == "off") {
 			$rules .= "rdr on \$pppoe proto tcp from any to !(\$pppoe) port 80 -> 127.0.0.1 port 80\n";
 		}
 		/* Handle PPTP case */
@@ -1260,7 +1260,7 @@ function squid_generate_rules($type) {
 			$rules .= "pass in quick on $iface proto tcp from any to !($iface) port $port flags S/SA keep state\n";
 			$rules .= "\n";
 		};
-		if($config['pppoe']['mode'] == "server") {
+		if($config['pppoe']['mode'] == "off") {
 			$rules .= "pass in quick on \$pppoe proto tcp from any to !(\$pppoe) port $port flags S/SA keep state\n";			
 		}			
 		if($config['pptpd']['mode'] != "off") {
