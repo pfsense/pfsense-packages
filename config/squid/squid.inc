@@ -1248,7 +1248,9 @@ function squid_generate_rules($type) {
 			$rules .= "rdr on \$pppoe proto tcp from any to !(\$pppoe) port 80 -> 127.0.0.1 port 80\n";
 		}
 		/* Handle PPTP case */
-		if($config['pptpd']['mode'] != "off") {
+//		if($config['pptpd']['mode'] != "off") {
+//    mode is not present after disabling "redir"
+      if($config['pptpd']['mode'] == "server") {
 			$rules .= "rdr on \$pptp proto tcp from any to !(\$pptp) port 80 -> 127.0.0.1 port 80\n";
 		}		
 		$rules .= "\n";
