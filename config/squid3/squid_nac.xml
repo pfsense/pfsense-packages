@@ -111,7 +111,7 @@
 		<field>
 			<fielddescr>Whitelist</fielddescr>
 			<fieldname>whitelist</fieldname>
-			<description>Enter each destination domain on a new line that will be accessable to the users that are allowed to use the proxy.</description>
+			<description>Enter each destination domain on a new line that will be accessable to the users that are allowed to use the proxy. You also can use regular expressions.</description>
 			<type>textarea</type>
 			<cols>50</cols>
 			<rows>5</rows>
@@ -120,7 +120,7 @@
 		<field>
 			<fielddescr>Blacklist</fielddescr>
 			<fieldname>blacklist</fieldname>
-			<description>Enter each destination domain on a new line that will be blocked to the users that are allowed to use the proxy.</description>
+			<description>Enter each destination domain on a new line that will be blocked to the users that are allowed to use the proxy. You also can use regular expressions.</description>
 			<type>textarea</type>
 			<cols>50</cols>
 			<rows>5</rows>

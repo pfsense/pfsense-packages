@@ -1221,30 +1221,36 @@ function squid_generate_rules($type) {
 	switch($type) {
 	case 'nat':
 		$rules .= "\n# Setup Squid proxy redirect\n";
-    if ($squid_conf['private_subnet_proxy_off'] == 'on') {
-      foreach ($ifaces as $iface){
-       $rules .= "no rdr on $iface proto tcp from any to { 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8 } port 80\n";         
-      }
-     }
-    
-    if (!empty($squid_conf['defined_ip_proxy_off'])) {
-      $defined_ip_proxy_off = explode(";", $squid_conf['defined_ip_proxy_off']);
-      $exempt_ip = "";
-        foreach ($defined_ip_proxy_off as $ip_proxy_off) {
-          if(!empty($ip_proxy_off)) {
-            $ip_proxy_off = trim($ip_proxy_off);
-            $exempt_ip .= ", $ip_proxy_off";
-          }
-        }
-        $exempt_ip = substr($exempt_ip,2);
-        foreach ($ifaces as $iface){
-          $rules .= "no rdr on $iface proto tcp from { $exempt_ip } to any port 80\n";         
-        }          
-    }
-     
-		foreach ($ifaces as $iface){
+		if ($squid_conf['private_subnet_proxy_off'] == 'on') {
+			foreach ($ifaces as $iface){
+				$rules .= "no rdr on $iface proto tcp from any to { 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8 } port 80\n";         
+			}
+		}
+		if (!empty($squid_conf['defined_ip_proxy_off'])) {
+			$defined_ip_proxy_off = explode(";", $squid_conf['defined_ip_proxy_off']);
+			$exempt_ip = "";
+			foreach ($defined_ip_proxy_off as $ip_proxy_off) {
+				if(!empty($ip_proxy_off)) {
+					$ip_proxy_off = trim($ip_proxy_off);
+					$exempt_ip .= ", $ip_proxy_off";
+				}
+			}
+			$exempt_ip = substr($exempt_ip,2);
+			foreach ($ifaces as $iface) {
+				$rules .= "no rdr on $iface proto tcp from { $exempt_ip } to any port 80\n";         
+			}          
+		}     
+		foreach ($ifaces as $iface) {
 			$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> 127.0.0.1 port 80\n";
-			};
+		}
+		/* Handle PPPOE case */
+		if($config['pppoe']['mode'] == "off") {
+			$rules .= "rdr on \$pppoe proto tcp from any to !(\$pppoe) port 80 -> 127.0.0.1 port 80\n";
+		}
+		/* Handle PPTP case */
+		if($config['pptpd']['mode'] != "off") {
+			$rules .= "rdr on \$pptp proto tcp from any to !(\$pptp) port 80 -> 127.0.0.1 port 80\n";
+		}		
 		$rules .= "\n";
 		break;
 	case 'filter':
@@ -1253,7 +1259,13 @@ function squid_generate_rules($type) {
 			$rules .= "pass in quick on $iface proto tcp from any to !($iface) port 80 flags S/SA keep state\n";
 			$rules .= "pass in quick on $iface proto tcp from any to !($iface) port $port flags S/SA keep state\n";
 			$rules .= "\n";
-			};
+		};
+		if($config['pppoe']['mode'] == "off") {
+			$rules .= "pass in quick on \$pppoe proto tcp from any to !(\$pppoe) port $port flags S/SA keep state\n";			
+		}			
+		if($config['pptpd']['mode'] != "off") {
+			$rules .= "pass in quick on \$pptp proto tcp from any to !(\$pptp) port $port flags S/SA keep state\n";
+		}			
 		break;
 	default:
 		break;

@@ -37,7 +37,7 @@
                                                                               */
 /* ========================================================================== */
         ]]>
-        </copyright>
+	</copyright>
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
@@ -75,11 +75,11 @@
 	<configpath>installedpackages->package->tinydnsdomains</configpath>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fielddescr>Fully Qualified Domain Name (Hostname)</fielddescr>
+			<fielddescr>Record Name</fielddescr>
 			<fieldname>hostname</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Record type</fielddescr>
+			<fielddescr>Record Type</fielddescr>
 			<fieldname>recordtype</fieldname>
 		</columnitem>
 		<columnitem>
@@ -87,8 +87,12 @@
 			<fieldname>rdns</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>IP Address</fielddescr>
+			<fielddescr>Record Data</fielddescr>
 			<fieldname>ipaddress</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>TTL</fielddescr>
+			<fieldname>ttl</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
@@ -98,7 +102,7 @@
 			<fieldname>temp</fieldname>			
 		</field>		
 		<field>
-			<fielddescr>Hostname or FQDN www.exampledomain.com</fielddescr>
+			<fielddescr>Record Name (Hostname or FQDN.  E.g. www.exampledomain.com)</fielddescr>
 			<fieldname>hostname</fieldname>
 			<description>The DNS server will supply Records for the Fully Qualified Domain Name that is entered</description>
 			<type>input</type>
@@ -106,9 +110,9 @@
 			<required/>
 		</field>
 		<field>
-			<fielddescr>Record type</fielddescr>
+			<fielddescr>Record Type</fielddescr>
 			<fieldname>recordtype</fieldname>
-			<description>DNS Record types. A, PTR, MX, NS, SOA, TXT, CNAME</description>
+			<description>Supported Record types: A, PTR, MX, NS, SOA, TXT, CNAME, raw  ("raw" allows direct entry of a complete TinyDNS record in the FQDN field below)</description>
 			<type>select</type>
 			<size>1</size>
 			<required/>
@@ -121,18 +125,25 @@
 			    <option><name>PTR</name><value>PTR</value></option>
 			    <option><name>CNAME</name><value>CNAME</value></option>
 			    <option><name>TXT</name><value>TXT</value></option>
+			    <option><name>raw</name><value>raw</value></option>
 			</options>
 		</field>
 		<field>
-			<fielddescr> FQDN or IP Address</fielddescr>
+			<fielddescr>Record Data (FQDN, IP Address, or "raw" TinyDNS record)</fielddescr>
 			<fieldname>ipaddress</fieldname>
-			<description>IP Address for A Records. FQDN or Hostname for SOA, PTR, CNAME Records.  For NS Records an IP:FQDN</description>
+			<description>Use IP Address for A Records - FQDN or Hostname for SOA, PTR, CNAME Records - NS Records use colon-separated IP and FQDN, e.g. 1.2.3.4:mydomain.com</description>
 			<type>input</type>
-			<size>40</size>
+			<size>80</size>
 			<required/>
 		</field>
 		<field>
-			<fielddescr>DNS record time to live</fielddescr>
+			<fielddescr>MX priority (only used for MX records)</fielddescr>
+			<fieldname>dist</fieldname>
+			<type>input</type>
+			<size>4</size>
+		</field>				
+		<field>
+			<fielddescr>DNS record time to live (in seconds)</fielddescr>
 			<fieldname>ttl</fieldname>
 			<type>input</type>
 			<size>35</size>
@@ -212,8 +223,11 @@
 		tinydns_setup_ping_items();
 		tinydns_sync_on_changes();
 	</custom_delete_php_command>
+	<custom_php_validation_command>
+		tinydns_cleanup_addedit_form_record();
+	</custom_php_validation_command>
 	<custom_add_php_command>
-		log_error("Begin tinydns add");
+		log_error("Begin tinydns add");		
 		tinydns_create_zone_file();
 		log_error("Zone file done.");
 		tinydns_setup_ping_items();
