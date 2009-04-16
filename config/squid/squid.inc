@@ -1248,7 +1248,9 @@ function squid_generate_rules($type) {
 			$rules .= "rdr on \$pppoe proto tcp from any to !(\$pppoe) port 80 -> 127.0.0.1 port 80\n";
 		}
 		/* Handle PPTP case */
-		if($config['pptpd']['mode'] != "off") {
+//		if($config['pptpd']['mode'] != "off") {
+//    <mode> is not present in config.xml after disabling "redir"
+      if($config['pptpd']['mode'] == "server") {
 			$rules .= "rdr on \$pptp proto tcp from any to !(\$pptp) port 80 -> 127.0.0.1 port 80\n";
 		}		
 		$rules .= "\n";
@@ -1263,7 +1265,9 @@ function squid_generate_rules($type) {
 		if($config['pppoe']['mode'] == "off") {
 			$rules .= "pass in quick on \$pppoe proto tcp from any to !(\$pppoe) port $port flags S/SA keep state\n";			
 		}			
-		if($config['pptpd']['mode'] != "off") {
+//		if($config['pptpd']['mode'] != "off") {
+//    <mode> is not present in config.xml after disabling "redir"
+		if($config['pptpd']['mode'] == "server") {
 			$rules .= "pass in quick on \$pptp proto tcp from any to !(\$pptp) port $port flags S/SA keep state\n";
 		}			
 		break;
