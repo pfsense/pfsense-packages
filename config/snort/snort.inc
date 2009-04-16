@@ -142,7 +142,7 @@ function sync_package_snort()
   /* TODO; get snort to start under nologin shell */
   foreach($snortInterfaces as $snortIf)
   {
-  	$start .= ";sleep 8;snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -D -i {$snortIf} -o -A fast -q";
+  	$start .= ";sleep 8;snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -D -i {$snortIf} -A fast -q";
   }    
     
 	/* if block offenders is checked, start snort2c */
