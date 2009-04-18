@@ -1218,6 +1218,16 @@ function squid_generate_rules($type) {
 	$ifaces = array_map('convert_friendly_interface_to_real_interface_name', $ifaces);
 	$port = ($squid_conf['proxy_port'] ? $squid_conf['proxy_port'] : 3128);
 
+	$fw_aliases = filter_generate_aliases();
+	if(strstr($fw_aliases, "pptp ="))
+		$PPTP_ALIAS = "\$pptp";
+	else 
+		$PPTP_ALIAS = "\$PPTP";
+	if(strstr($fw_aliases, "PPPoE ="))
+		$PPPOE_ALIAS = "\$PPPoE";
+	else 
+		$PPPOE_ALIAS = "\$pppoe";
+		
 	switch($type) {
 		case 'nat':
 			$rules .= "\n# Setup Squid proxy redirect\n";
@@ -1245,11 +1255,11 @@ function squid_generate_rules($type) {
 			}
 			/* Handle PPPOE case */
 			if($config['pppoe']['mode'] == "server" && $config['pppoe']['localip']) {
-				$rules .= "rdr on \$pppoe proto tcp from any to !(\$pppoe) port 80 -> 127.0.0.1 port 80\n";
+				$rules .= "rdr on $PPPOE_ALIAS proto tcp from any to !127.0.0.1 port 80 -> 127.0.0.1 port 80\n";
 			}
 			/* Handle PPTP case */
 			if($config['pptpd']['mode'] == "server" && $config['pptpd']['localip']) {
-				$rules .= "rdr on \$pptp proto tcp from any to !(\$pptp) port 80 -> 127.0.0.1 port 80\n";
+				$rules .= "rdr on $PPTP_ALIAS proto tcp from any to !127.0.0.1 port 80 -> 127.0.0.1 port 80\n";
 			}
 			$rules .= "\n";
 			break;
@@ -1261,10 +1271,10 @@ function squid_generate_rules($type) {
 				$rules .= "\n";
 			};
 			if($config['pppoe']['mode'] == "server" && $config['pppoe']['localip']) {
-				$rules .= "pass in quick on \$pppoe proto tcp from any to !(\$pppoe) port $port flags S/SA keep state\n";			
+				$rules .= "pass in quick on $PPPOE_ALIAS proto tcp from any to !127.0.0.1 port $port flags S/SA keep state\n";			
 			}			
 			if($config['pptpd']['mode'] == "server" && $config['pptpd']['localip']) {
-				$rules .= "pass in quick on \$pptp proto tcp from any to !(\$pptp) port $port flags S/SA keep state\n";
+				$rules .= "pass in quick on $PPTP_ALIAS proto tcp from any to !127.0.0.1 port $port flags S/SA keep state\n";
 			}
 			break;
 		default:
