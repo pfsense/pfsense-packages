@@ -93,7 +93,7 @@ global $config;
 
 	$afc = $config['installedpackages']['fit123']['config'][0]['afc'];
 	if($afc)
-	$config['system']['afterfilterchangeshellcmd'] = "/usr/local/bin/reset_states.sh";
+	$config['system']['afterfilterchangeshellcmd'] = "/usr/local/pkg/Fit123/afc/reset_states.sh";
 	else
 	$config['system']['afterfilterchangeshellcmd'] = "";
 
