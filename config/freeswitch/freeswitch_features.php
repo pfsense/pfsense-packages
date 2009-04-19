@@ -4,7 +4,7 @@
 	freeswitch_extensions.php
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
-  
+
   FreeSWITCH (TM)
   http://www.freeswitch.org/
 
@@ -82,7 +82,7 @@ include("head.inc");
    <tr>
      <td class="tabcont" >
 
-  	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
+  	<table width="100%" border="0" cellpadding="6" cellspacing="0">
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>Features<br>
             </strong></span>
@@ -98,11 +98,11 @@ include("head.inc");
 	</tr>
     <tr>
 		<td width='10%' class="vncell"><a href='/freeswitch/freeswitch_ivr.php'>Open</a></td>
-		<td class="vtable">          
-			An interactive voice response (IVR) often refered to as an Auto Attendant. 
-			It associates a recording to multiple options that can be used to direct 
-			calls to extensions, voicemail, queues, other IVR applications, and external 
-			phone numbers. 
+		<td class="vtable">
+			An interactive voice response (IVR) often refered to as an Auto Attendant.
+			It associates a recording to multiple options that can be used to direct
+			calls to extensions, voicemail, queues, other IVR applications, and external
+			phone numbers.
 		</td>
      </tr>
      </table>
@@ -116,12 +116,12 @@ include("head.inc");
 	</tr>
     <tr>
 		<td width='10%' class="vncell"><a href='/pkg_edit.php?xml=freeswitch_modules.xml&amp;id=0'>Open</a></td>
-		<td class="vtable">          
+		<td class="vtable">
 			Modules add additional features and can be enabled or disabled to provide the desired features.
 		</td>
      </tr>
      </table>
-	 
+	
     <br />
     <br />
 	
@@ -131,13 +131,13 @@ include("head.inc");
 	</tr>
     <tr>
 		<td width='10%' class="vncell"><a href='/freeswitch/freeswitch_recordings.php'>Open</a></td>
-		<td class="vtable">          
-			Music on hold can be in WAV or MP3 format. To play MP3 you must have mod_shout enabled 
-			on the 'Modules' tab. For best performance upload 16bit 8khz/16khz Mono WAV files. 
+		<td class="vtable">
+			Music on hold can be in WAV or MP3 format. To play MP3 you must have mod_shout enabled
+			on the 'Modules' tab. For best performance upload 16bit 8khz/16khz Mono WAV files.
 		</td>
      </tr>
      </table>
-	 
+	
     <br />
     <br />
 	
@@ -147,14 +147,14 @@ include("head.inc");
 	</tr>
 	<tr>
 		<td width='10%' class="vncell"><a href='/freeswitch/freeswitch_recordings.php'>Open</a></td>
-		<td class="vtable">          
-			To make a recording dial extension 732673 (record) or you can make a 16bit 8khz/16khz 
-			Mono WAV file then copy it to the following directory then refresh the page to play 
-			it back. Click on the 'Filename' to download it or the 'Recording Name' to play the audio. 
+		<td class="vtable">
+			To make a recording dial extension 732673 (record) or you can make a 16bit 8khz/16khz
+			Mono WAV file then copy it to the following directory then refresh the page to play
+			it back. Click on the 'Filename' to download it or the 'Recording Name' to play the audio.
 		</td>
 	 </tr>
-	 </table>	 
-	 
+	 </table>	
+	
     <br />
     <br />
 

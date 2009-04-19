@@ -1,10 +1,10 @@
 <?php
 /* $Id$ */
 /*
-	freeswitch_dialplan_includes.php
+  freeswitch_dialplan_includes.php
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
-  
+
   FreeSWITCH (TM)
   http://www.freeswitch.org/
 
@@ -41,7 +41,7 @@ require("/usr/local/pkg/freeswitch.inc");
       //default
   //enabled
   //descr
-  
+
 //freeswitchdialplanincludedetails
 
   //dialplanincludeid
@@ -53,7 +53,7 @@ require("/usr/local/pkg/freeswitch.inc");
   //tagorder
       //1-20
   //fieldtype
-      
+
   //fielddata
 
 
@@ -63,7 +63,7 @@ $a_dialplan_includes_details = &$config['installedpackages']['freeswitchdialplan
 
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'dialplanincludes') {
-        
+
         if ($a_dialplan_includes[$_GET['id']]) {
 
             $dialplanincludeid = $a_dialplan_includes[$_GET['id']][dialplanincludeid];
@@ -71,7 +71,7 @@ if ($_GET['act'] == "del") {
             $extensionname = $a_dialplan_includes[$_GET['id']][extensionname];
             $order = $a_dialplan_includes[$_GET['id']][order];
             $dialplanincludefilename = $order."_".$extensionname.".xml";
-            
+
             //delete the dialplan include details. aka. child data
             if (count($a_dialplan_includes_details) > 0) {
 	            $i=0;
@@ -80,16 +80,16 @@ if ($_GET['act'] == "del") {
 	                  //echo "child id: ".$i."<br />\n";
 	                  unset($a_dialplan_includes_details[$i]);
 	              }
-	              $i++;            
+	              $i++;
 	            }
             }
-            
+
             //if the dialplan include xml file exists then delete it
             if (file_exists("/usr/local/freeswitch/conf/dialplan/default/".$dialplanincludefilename)) {
               unlink("/usr/local/freeswitch/conf/dialplan/default/".$dialplanincludefilename);
             }
-            
-            unset($dialplanincludefilename);           
+
+            unset($dialplanincludefilename);
             unset($a_dialplan_includes[$_GET['id']]);
             write_config();
             sync_package_freeswitch_dialplan_includes();
@@ -134,7 +134,7 @@ include("head.inc");
      <td class="tabcont" >
 
 <form action="freeswitch_dialplan_includes.php" method="post" name="iform" id="iform">
-<?php 
+<?php
 
 
 //echo "<pre>";
@@ -144,28 +144,28 @@ include("head.inc");
 
 //if ($config_change == 1) {
 //    write_config();
-//    $config_change = 0;  
+//    $config_change = 0;
 //}
 
-//if ($savemsg) print_info_box($savemsg); 
+//if ($savemsg) print_info_box($savemsg);
 //if (file_exists($d_hostsdirty_path)): echo"<p>";
 //print_info_box_np("This has been changed.<br>You must apply the changes in order for them to take effect.");
 //echo"<br />";
-//endif; 
+//endif;
 
 ?>
 
     <br />
     <br />
 
-  	<table width="100%" border="0" cellpadding="0" cellspacing="0">              
+  	<table width="100%" border="0" cellpadding="0" cellspacing="0">
       <tr>
         <td><span class="vexpl"><span class="red"><strong>Dialplan
             </strong></span></span>
         </td>
         <td align='right'>
           <input type='button' value='default.xml' onclick="document.location.href='/pkg_edit.php?xml=freeswitch_dialplan.xml&id=0';">
-        </td>         
+        </td>
       </tr>
       <tr>
         <td colspan='2'>
@@ -173,14 +173,14 @@ include("head.inc");
               The dialplan is used to setup call destinations based on conditions and context. You can use the dialplan to send calls to gateways, IVRs, external numbers, to scripts, or any destination.
           </span>
         </td>
-       
+
       </tr>
     </table>
 
     <br />
     <br />
-    <br />    
-        
+    <br />
+
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
       <td width="20%" class="listhdrr">Extension Name</td>
@@ -197,9 +197,9 @@ include("head.inc");
       </td>
 		</tr>
 
-		<?php 
+		<?php
       $i = 0;
-      if (count($a_dialplan_includes) > 0) { 
+      if (count($a_dialplan_includes) > 0) {
         foreach ($a_dialplan_includes as $ent) {
     ?>
     <tr>
@@ -224,8 +224,8 @@ include("head.inc");
        </table>
       </td>
     </tr>
-		<?php 
-          $i++; 
+		<?php
+          $i++;
         }
       }
     ?>
@@ -246,7 +246,7 @@ include("head.inc");
        <td class="list"></td>
      </tr>
      </table>
-     
+
 </form>
 
 /usr/local/freeswitch/conf/dialplan/default/

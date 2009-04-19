@@ -1,11 +1,11 @@
-<?php 
+<?php
 /* $Id$ */
 /*
 
 	freeswitch_time_conditions_edit.php
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
-  
+
   FreeSWITCH (TM)
   http://www.freeswitch.org/
 	
@@ -89,7 +89,7 @@ if ($_POST) {
       		$a_ivr_options[$id] = $ivroptionent;
 		}
 		else {
-			//add  
+			//add
 			$a_ivr_options[] = $ivroptionent;
 		}
 		
@@ -135,19 +135,19 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>
      <td class="tabcont" >
-    
+
         <form action="freeswitch_ivr_options_edit.php" method="post" name="iform" id="iform">
             <table width="100%" border="0" cellpadding="6" cellspacing="0">
             <tr>
               <td width="22%" valign="top" class="vncellreq">Option Number</td>
-              <td width="78%" class="vtable"> 
+              <td width="78%" class="vtable">
                 <input name="optionnumber" type="text" class="formfld" id="optionnumber" size="40" value="<?=htmlspecialchars($pconfig['optionnumber']);?>">
                 <br> <span class="vexpl">Option Number<br>
                 e.g. <em>1</em></span></td>
             </tr>
             <tr>
               <td width="22%" valign="top" class="vncellreq">Type</td>
-              <td width="78%" class="vtable"> 
+              <td width="78%" class="vtable">
                 <?php
                 echo "                <select name='optiontype' class='formfld'>\n";
                 echo "                <option></option>\n";
@@ -169,14 +169,14 @@ include("head.inc");
             </tr>
             <tr>
               <td width="22%" valign="top" class="vncellreq">Destination</td>
-              <td width="78%" class="vtable"> 
+              <td width="78%" class="vtable">
                 <input name="optiondest" type="text" class="formfld" id="optiondest" size="40" value="<?=htmlspecialchars($pconfig['optiondest']);?>">
                 <br> <span class="vexpl">Destination<br>
                 e.g. <em>1001</em></span></td>
-            </tr>            
+            </tr>
             <tr>
               <td width="22%" valign="top" class="vncell">Description</td>
-              <td width="78%" class="vtable"> 
+              <td width="78%" class="vtable">
                 <input name="optiondescr" type="text" class="formfld" id="optiondescr" size="40" value="<?=htmlspecialchars($pconfig['optiondescr']);?>">
                 <br> <span class="vexpl">You may enter a description here
                 for your reference (not parsed).</span></td>
@@ -187,21 +187,21 @@ include("head.inc");
                 <input name="ivrid" type="hidden" value="<?=$ivrid;?>">
                 <input name="parentid" type="hidden" value="<?=$parentid;?>">
                 <?php if (isset($id) && $a_ivr_options[$id]): ?>
-                  <input name="id" type="hidden" value="<?=$id;?>">                 
+                  <input name="id" type="hidden" value="<?=$id;?>">
                 <?php endif; ?>
                 <input name="Submit" type="submit" class="formbtn" value="Save"> <input class="formbtn" type="button" value="Cancel" onclick="history.back()">
               </td>
             </tr>
             </table>
         </form>
-        
+
       <br>
       <br>
       <br>
       <br>
       <br>
       <br>
-      
+
      </td>
    </tr>
 </table>

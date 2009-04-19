@@ -4,7 +4,7 @@
 	freeswitch_status.php
 	Copyright (C) 2008 Mark J Crane
 	All rights reserved.
-  
+
 	FreeSWITCH (TM)
 	http://www.freeswitch.org/
 
@@ -62,7 +62,7 @@ if ($_GET['a'] == "other") {
   if ($_GET['t'] == "restore") {
     $tmp = '/tmp/';
     $filename = 'freeswitch.bak.tgz';
-   
+
     //extract a specific directory to /usr/local/freeswitch
     if (file_exists('/tmp/'.$filename)) {
       //echo "The file $filename exists";
@@ -73,19 +73,19 @@ if ($_GET['a'] == "other") {
         system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/recordings/');
         system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/scripts/');
         system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/storage/');
-        
-      //Optional  
+
+      //Optional
         //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/conf/');
-        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/grammar/');  
-        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/htdocs/'); 
-        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/sounds/'); 
-    
+        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/grammar/');
+        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/htdocs/');
+        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/sounds/');
+
         header( 'Location: freeswitch_status.php?savemsg=Backup+has+been+restored.' ) ;
     }
     else {
         header( 'Location: freeswitch_status.php?savemsg=Restore+failed.+Backup+file+not+found.' ) ;
-    }       
-  
+    }
+
 	exit;
   }
 }
@@ -109,7 +109,7 @@ if (!pkg_is_service_running('freeswitch')) {
 
 <p class="pgtitle">FreeSWITCH: Status</font></p>
 
-<?php 
+<?php
 if ($savemsg) {
   print_info_box($savemsg);
 }
@@ -159,9 +159,9 @@ echo "</td>\n";
 echo "</tr>\n";
 echo "</table>\n";
 echo "<pre style=\"font-size: 9pt;\">\n";
-echo $response; 
+echo $response;
 echo "</pre>\n";
-fclose($fp);  
+fclose($fp);
 echo "<br /><br />\n\n";
 
 
@@ -181,9 +181,9 @@ echo "</td>\n";
 echo "</tr>\n";
 echo "</table>\n";
 echo "<pre style=\"font-size: 9pt;\">\n";
-echo $response; 
+echo $response;
 echo "</pre>\n";
-fclose($fp);  
+fclose($fp);
 echo "<br /><br />\n\n";
 
 
@@ -204,9 +204,9 @@ echo "</td>\n";
 echo "</tr>\n";
 echo "</table>\n";
 echo "<pre style=\"font-size: 9pt;\">\n";
-echo $response; 
+echo $response;
 echo "</pre>\n";
-fclose($fp);  
+fclose($fp);
 echo "<br /><br />\n\n";
 
 
@@ -215,10 +215,10 @@ $cmd = "api status";
 $response = event_socket_request($fp, $cmd);
 echo "<b>status</b><br />\n";
 echo "<pre style=\"font-size: 9pt;\">\n";
-echo $response; 
+echo $response;
 echo "</pre>\n";
-fclose($fp);  
-echo "<br /><br />\n\n"; 
+fclose($fp);
+echo "<br /><br />\n\n";
 
 
 $fp = event_socket_create($host, $port, $password);
@@ -235,7 +235,7 @@ else {
   echo $response;
   echo "</pre>\n";
 }
-fclose($fp);  
+fclose($fp);
 echo "<br /><br />\n\n";
 echo "<br /><br />\n\n";
 
@@ -254,7 +254,7 @@ else {
   echo $response;
   echo "</pre>\n";
 }
-fclose($fp);  
+fclose($fp);
 echo "<br /><br />\n\n";
 echo "<br /><br />\n\n";
 
@@ -307,7 +307,7 @@ echo "<br /><br />\n\n";
 
 echo "<b>tail -n 100 /usr/local/freeswitch/log/freeswitch.log</b><br />\n";
 echo "<textarea cols='85' rows='30' wrap='off'>\n";
-echo system("tail -n 100 /usr/local/freeswitch/log/freeswitch.log"); 
+echo system("tail -n 100 /usr/local/freeswitch/log/freeswitch.log");
 echo "</textarea>\n";
 echo "<br /><br />\n\n";
 
@@ -317,9 +317,9 @@ echo "<br /><br />\n\n";
 //$response = event_socket_request($fp, $cmd);
 //echo "<b>api sofia</b><br />\n";
 //echo "<pre style=\"font-size: 9pt;\">\n";
-//echo $response; 
+//echo $response;
 //echo "</pre>\n";
-//fclose($fp);  
+//fclose($fp);
 //echo "<br /><br />\n\n";
 
 ?>

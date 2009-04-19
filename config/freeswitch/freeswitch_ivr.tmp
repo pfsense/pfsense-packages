@@ -4,7 +4,7 @@
 	freeswitch_ivr.php
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
-  
+
   FreeSWITCH (TM)
   http://www.freeswitch.org/
 
@@ -84,7 +84,7 @@ include("head.inc");
      <td class="tabcont" >
 
 <form action="freeswitch_ivr.php" method="post" name="iform" id="iform">
-<?php 
+<?php
 
 
 //echo "<pre>";
@@ -93,11 +93,11 @@ include("head.inc");
 
 //build a list of recordings from the config.xml
 //$config_recording_list = '';
-//$i = 0; 
+//$i = 0;
 //if (count($a_ivr) > 0) {
 //  foreach ($a_ivr as $ivrent) {
 //    $config_recording_list .= $ivrent['filename']."|";
-//    $i++; 
+//    $i++;
 //  }
 //}
 //echo "config recording list: ".$config_recording_list."<br />\n";
@@ -105,29 +105,29 @@ include("head.inc");
 
 //if ($config_change == 1) {
 //    write_config();
-//    $config_change = 0;  
+//    $config_change = 0;
 //}
 
-//if ($savemsg) print_info_box($savemsg); 
+//if ($savemsg) print_info_box($savemsg);
 //if (file_exists($d_hostsdirty_path)): echo"<p>";
 //print_info_box_np("The FreeSWITCH recordings have been changed.<br>You must apply the changes in order for them to take effect.");
 //echo"<br />";
-//endif; 
+//endif;
 
 ?>
-  	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
+  	<table width="100%" border="0" cellpadding="6" cellspacing="0">
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>IVR<br />
             </strong></span>
-              An interactive voice response (IVR) often refered to as an Auto Attendant. 
-              It associates a recording to multiple options that can be used to direct calls 
-              to extensions, voicemail, queues, other IVR applications, and external 
+              An interactive voice response (IVR) often refered to as an Auto Attendant.
+              It associates a recording to multiple options that can be used to direct calls
+              to extensions, voicemail, queues, other IVR applications, and external
               phone numbers.
             </span></p></td>
       </tr>
     </table>
     <br />
-        
+
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
       <td width="20%" class="listhdrr">Extension</td>
@@ -143,9 +143,9 @@ include("head.inc");
       </td>
 		</tr>
 
-		<?php 
+		<?php
       $i = 0;
-      if (count($a_ivr) > 0) { 
+      if (count($a_ivr) > 0) {
         foreach ($a_ivr as $ent) {
         	if (strlen($ent['ivrid']) > 0) {
     ?>
@@ -169,8 +169,8 @@ include("head.inc");
       </td>
     </tr>
 		<?php
-          	} 
-        	$i++; 
+          	}
+        	$i++;
         }
       }
     ?>
@@ -191,7 +191,7 @@ include("head.inc");
        <td class="list"></td>
      </tr>
      </table>
-     
+
 </form>
 
 <br>

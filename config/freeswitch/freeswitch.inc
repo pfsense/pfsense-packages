@@ -6,7 +6,7 @@
     freeswitch.inc
     Copyright (C) 2008 Mark J Crane
     All rights reserved.
-    
+
     FreeSWITCH (TM)
     http://www.freeswitch.org/
                                                                               */
@@ -56,7 +56,7 @@ function guid()
 //echo guid();
 
 
-function pkg_is_service_running($servicename) 
+function pkg_is_service_running($servicename)
 {
     exec("/bin/ps ax | awk '{ print $5 }'", $psout);
     array_shift($psout);
@@ -72,10 +72,10 @@ function pkg_is_service_running($servicename)
 }
 
 
-function event_socket_create($host, $port, $password) 
+function event_socket_create($host, $port, $password)
 {
     //$host has been deprecated
-    
+
     //build the interface list
     $i = 0; $ifdescrs = array('wan' => 'WAN', 'lan' => 'LAN');
 		for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
@@ -86,15 +86,15 @@ function event_socket_create($host, $port, $password)
 		foreach ($ifdescrs as $ifdescr => $ifname){
         $ifinfo = get_interface_info($ifdescr);
         $interface_ip_address = $ifinfo['ipaddr'];
-        
+
         if (strlen($interface_ip_address) > 0) {
 
            $fp = fsockopen($interface_ip_address, $port, $errno, $errdesc, 3);
            socket_set_blocking($fp,false);
-           
+
            if (!$fp) {
-               //connection failed continue through the loop testing other addresses 
-               //invalid handle     
+               //connection failed continue through the loop testing other addresses
+               //invalid handle
            }
            else {
                //connected to the socket return the handle
@@ -107,20 +107,20 @@ function event_socket_create($host, $port, $password)
                      break;
                   }
                }
-               return $fp;        
-           } 
-             
+               return $fp;
+           }
+
         } //end if interface_ip_address
-		} //end foreach                     
+		} //end foreach
 } //end function
 
 
-function event_socket_request($fp, $cmd) 
+function event_socket_request($fp, $cmd)
 {
-   if ($fp) {    
-       fputs($fp, $cmd."\n\n");    
+   if ($fp) {
+       fputs($fp, $cmd."\n\n");
        usleep(100); //allow time for reponse
-       
+
        $response = "";
        $i = 0;
        $contentlength = 0;
@@ -129,7 +129,7 @@ function event_socket_request($fp, $cmd)
           if ($contentlength > 0) {
              $response .= $buffer;
           }
-          
+
           if ($contentlength == 0) { //if contentlenght is already don't process again
               if (strlen(trim($buffer)) > 0) { //run only if buffer has content
                   $temparray = split(":", trim($buffer));
@@ -138,21 +138,21 @@ function event_socket_request($fp, $cmd)
                   }
               }
           }
-          
+
           usleep(100); //allow time for reponse
-          
+
           //optional because of script timeout //don't let while loop become endless
-          if ($i > 10000) { break; } 
-          
+          if ($i > 10000) { break; }
+
           if ($contentlength > 0) { //is contentlength set
               //stop reading if all content has been read.
-              if (strlen($response) >= $contentlength) {  
+              if (strlen($response) >= $contentlength) {
                  break;
               }
           }
           $i++;
        }
-       
+
        return $response;
    }
    else {
@@ -165,7 +165,7 @@ function event_socket_request_cmd($cmd)
 {
   global $config;
   $password = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_password'];
-  $port = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_port'];  
+  $port = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_port'];
   $host = $config['interfaces']['lan']['ipaddr'];
 
   if (pkg_is_service_running('freeswitch')) {
@@ -191,9 +191,9 @@ function byte_convert( $bytes ) {
 function  recording_js()
 {
 
-    global $config;    
+    global $config;
     $admin_pin = $config['installedpackages']['freeswitchsettings']['config'][0]['admin_pin'];
-    
+
     $fout = fopen("/usr/local/freeswitch/scripts/recordings.js","w");
     $tmp = "  var pin = \"".$admin_pin."\";\n";
     $tmp .= "  //var pin = \"\"; //don't require a pin\n";
@@ -254,9 +254,9 @@ function  recording_js()
     //$tmp .= "      session.execute(\"set\", \"tts_engine=flite\");\n";
     //$tmp .= "      session.execute(\"set\", \"tts_voice=kal\");\n";
     //$tmp .= "      session.execute(\"speak\", \"Please enter your pin number now.\");\n";
-    $tmp .= "      digitmaxlength = 6;\n";    
+    $tmp .= "      digitmaxlength = 6;\n";
     $tmp .= "      session.execute(\"set\", \"playback_terminators=#\");\n";
-    $tmp .= "      session.streamFile( \"/usr/local/freeswitch/recordings/please_enter_your_pin_number.wav\", mycb, \"dtmf\");\n";    
+    $tmp .= "      session.streamFile( \"/usr/local/freeswitch/recordings/please_enter_your_pin_number.wav\", mycb, \"dtmf\");\n";
     $tmp .= "      session.collectInput( mycb, dtmf, timeoutpin );\n";
     $tmp .= "  }\n";
     $tmp .= "\n";
@@ -265,7 +265,7 @@ function  recording_js()
     //$tmp .= "      session.execute(\"set\", \"tts_engine=flite\");\n";
     //$tmp .= "      session.execute(\"set\", \"tts_voice=kal\");\n";
     //$tmp .= "      session.execute(\"speak\", \"Begin recording.\");\n";
-    $tmp .= "      session.streamFile( \"/usr/local/freeswitch/recordings/begin_recording.wav\", mycb, \"dtmf\");\n";    
+    $tmp .= "      session.streamFile( \"/usr/local/freeswitch/recordings/begin_recording.wav\", mycb, \"dtmf\");\n";
     $tmp .= "      session.execute(\"set\", \"playback_terminators=#\");\n";
     $tmp .= "      session.execute(\"record\", \"/usr/local/freeswitch/recordings/temp\"+Year+Month+Day+Hours+Mins+Seconds+\".wav 180 200\");\n";
     $tmp .= "  }\n";
@@ -285,13 +285,13 @@ function  recording_js()
 
 }
 
- 
+
 function sync_package_freeswitch_settings()
 {
 
-  global $config; 
+  global $config;
   if($config['installedpackages']['freeswitchsettings']['config'] != "") {
-  
+
       conf_mount_rw();
       config_unlock();
 	
@@ -312,12 +312,12 @@ function sync_package_freeswitch_settings()
           fwrite($fout, $tmpxml);
           unset($tmpxml);
           fclose($fout);
-          
+
           $fout = fopen("/usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml","w");
           $tmpxml = "<configuration name=\"event_socket.conf\" description=\"Socket Client\">\n";
           $tmpxml .= "  <settings>\n";
           $tmpxml .= "    <param name=\"listen-ip\" value=\"0.0.0.0\"/>\n";
-          $tmpxml .= "    <param name=\"listen-port\" value=\"" . $rowhelper['event_socket_port'] . "\"/>\n"; 
+          $tmpxml .= "    <param name=\"listen-port\" value=\"" . $rowhelper['event_socket_port'] . "\"/>\n";
           $tmpxml .= "    <param name=\"password\" value=\"" . $rowhelper['event_socket_password'] . "\"/>\n";
           $tmpxml .= "    <!--<param name=\"apply-inbound-acl\" value=\"lan\"/>-->\n";
           $tmpxml .= "  </settings>\n";
@@ -325,8 +325,8 @@ function sync_package_freeswitch_settings()
           fwrite($fout, $tmpxml);
           unset($tmpxml, $event_socket_password);
           fclose($fout);
-          
-          $fout = fopen("/usr/local/freeswitch/conf/autoload_configs/xml_rpc.conf","w");          
+
+          $fout = fopen("/usr/local/freeswitch/conf/autoload_configs/xml_rpc.conf","w");
           $tmpxml = "<configuration name=\"xml_rpc.conf\" description=\"XML RPC\">\n";
           $tmpxml .= "  <settings>\n";
           $tmpxml .= "    <!-- The port where you want to run the http service (default 8080) -->\n";
@@ -340,11 +340,11 @@ function sync_package_freeswitch_settings()
           fwrite($fout, $tmpxml);
           unset($tmpxml, $event_socket_password);
           fclose($fout);
-          
+
           recording_js();
-                    
+
       }
-      
+
       conf_mount_ro();
       $cmd = "api reloadxml";
       //event_socket_request_cmd($cmd);
@@ -359,12 +359,12 @@ function sync_package_freeswitch_dialplan()
   global $config;
   conf_mount_rw();
   config_unlock();
-        
+
   if(strlen($config['installedpackages']['freeswitchdialplan']['config'][0]['dialplan_default_xml']) == 0) {
       /* dialplan not found in the pfsense config.xml get the default dialplan and save to config.xml. */
     	$filename = "/usr/local/freeswitch/conf/dialplan/default.xml";
       $fout = fopen($filename,"r");
-      $tmpxml = fread($fout, filesize($filename));  
+      $tmpxml = fread($fout, filesize($filename));
       $config['installedpackages']['freeswitchdialplan']['config'][0]['dialplan_default_xml'] = base64_encode($tmpxml);
       unset($filename, $dialplan);
       fclose($fout);
@@ -389,13 +389,13 @@ function sync_package_freeswitch_dialplan()
 function sync_package_freeswitch_extensions()
 {
 
-  global $config;    
+  global $config;
   if($config['installedpackages']['freeswitchextensions']['config'] != "") {
 
     	conf_mount_rw();
     	config_unlock();
 	
-      /* delete all old extensions to prepare for new ones */ 
+      /* delete all old extensions to prepare for new ones */
     	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/1*.xml");
     	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/2*.xml");
     	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/3*.xml");
@@ -411,7 +411,7 @@ function sync_package_freeswitch_extensions()
           $fout = fopen("/usr/local/freeswitch/conf/directory/default/".$rowhelper['extension'].".xml","w");
 
           $tmpxml = "<include>\n";
-          if (strlen($rowhelper['cidr']) == 0) {          
+          if (strlen($rowhelper['cidr']) == 0) {
           	$tmpxml .= "  <user id=\"" . $rowhelper['extension'] . "\" mailbox=\"" . $rowhelper['mailbox'] . "\">\n";
           }
           else {
@@ -422,7 +422,7 @@ function sync_package_freeswitch_extensions()
           $tmpxml .= "      <param name=\"vm-password\" value=\"" . $rowhelper['vm-password'] . "\"/>\n";
           if (strlen($rowhelper['vm-mailto']) > 0) {
               $tmpxml .= "      <param name=\"vm-email-all-messages\" value=\"true\"/>\n";
-              
+
               switch ($rowhelper['vm-attach-file']) {
               case "true":
               		$tmpxml .= "      <param name=\"vm-attach-file\" value=\"true\"/>\n";
@@ -436,8 +436,8 @@ function sync_package_freeswitch_extensions()
 
               $tmpxml .= "      <param name=\"vm-mailto\" value=\"" . $rowhelper['vm-mailto'] . "\"/>\n";
           }
-          if (strlen($rowhelper['auth-acl']) > 0) {          
-          	$tmpxml .= "      <param name=\"auth-acl\" value=\"" . $rowhelper['auth-acl'] . "\"/>\n";          
+          if (strlen($rowhelper['auth-acl']) > 0) {
+          	$tmpxml .= "      <param name=\"auth-acl\" value=\"" . $rowhelper['auth-acl'] . "\"/>\n";
           }          	
           $tmpxml .= "    </params>\n";
           $tmpxml .= "    <variables>\n";
@@ -459,26 +459,26 @@ function sync_package_freeswitch_extensions()
           unset($tmpxml);
           fclose($fout);
       }
-      
+
       conf_mount_ro();
       $cmd = "api reloadxml";
       //event_socket_request_cmd($cmd);
       unset($cmd);
 
-  }  
+  }
 }
 
 
 function sync_package_freeswitch_gateways()
 {
 
-  global $config;  
+  global $config;
   if($config['installedpackages']['freeswitchgateways']['config'] != "") {
-  
+
       conf_mount_rw();
       config_unlock();
     	
-      /* delete all old gateways to prepare for new ones */ 
+      /* delete all old gateways to prepare for new ones */
       unlink_if_exists("/usr/local/freeswitch/conf/sip_profiles/external/*.xml");
     	
       foreach($config['installedpackages']['freeswitchgateways']['config'] as $rowhelper) {
@@ -493,7 +493,7 @@ function sync_package_freeswitch_gateways()
 		          }
 		          if (strlen($rowhelper['password']) > 0) {
 		            $tmpxml .= "      <param name=\"password\" value=\"" . $rowhelper['password'] . "\"/>\n";
-		          }                    
+		          }
 		          if (strlen($rowhelper['realm']) > 0) {
 		            $tmpxml .= "      <param name=\"realm\" value=\"" . $rowhelper['realm'] . "\"/>\n";
 		          }
@@ -514,7 +514,7 @@ function sync_package_freeswitch_gateways()
 		          }
 		          if (strlen($rowhelper['register-transport']) > 0) {
 		            $tmpxml .= "      <param name=\"register-transport\" value=\"" . $rowhelper['register-transport'] . "\"/>\n";
-		          }                    
+		          }
 		          if (strlen($rowhelper['retry-seconds']) > 0) {
 		            $tmpxml .= "      <param name=\"retry-seconds\" value=\"" . $rowhelper['retry-seconds'] . "\"/>\n";
 		          }
@@ -529,38 +529,38 @@ function sync_package_freeswitch_gateways()
 		          }
 		          if (strlen($rowhelper['supress-cng']) > 0) {
 		            $tmpxml .= "      <param name=\"context\" value=\"" . $rowhelper['context'] . "\"/>\n";
-		          }                    
+		          }
 		
 		          $tmpxml .= "    </gateway>\n";
 		          $tmpxml .= "</include>";
-		          
+		
 		          fwrite($fout, $tmpxml);
 		          unset($tmpxml);
 		          fclose($fout);
-          }		        
-      
+          }		
+
       }
-      
+
       conf_mount_ro();
       $cmd = "api sofia profile external restart reloadxml";
       //event_socket_request_cmd($cmd);
       unset($cmd);
-      
+
   }
-  
+
 }
 
 
 function sync_package_freeswitch_modules()
 {
-  
+
   global $config;
   conf_mount_rw();
   config_unlock();
 
   foreach($config['installedpackages']['freeswitchmodules']['config'] as $rowhelper) {
   		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/modules.conf.xml","w");
-          
+
       $tmpxml ="";
       $tmpxml .= "<configuration name=\"modules.conf\" description=\"Modules\">\n";
       $tmpxml .= "  <modules>\n";
@@ -682,12 +682,12 @@ function sync_package_freeswitch_public()
   global $config;
   conf_mount_rw();
   config_unlock();
-        
+
   if(strlen($config['installedpackages']['freeswitchpublic']['config'][0]['public_xml']) == 0) {
       /* dialplan_public_xml not found in the pfsense config.xml get the default public.xml and save to config.xml. */
       $filename = "/usr/local/freeswitch/conf/dialplan/public.xml";
       $fout = fopen($filename,"r");
-      $tmpxml = fread($fout, filesize($filename));  
+      $tmpxml = fread($fout, filesize($filename));
       $tmpxml = str_replace("<anti-action application=\"export\" data=\"domain_name=\${sip_req_host}\"/>", "<!--<anti-action application=\"export\" data=\"domain_name=\${sip_req_host}\"/>-->", $tmpxml);
       $config['installedpackages']['freeswitchpublic']['config'][0]['public_xml'] = base64_encode($tmpxml);
       unset($filename, $tmpxml);
@@ -716,12 +716,12 @@ function sync_package_freeswitch_vars()
   global $config;
   conf_mount_rw();
   config_unlock();
-        
+
   if(strlen($config['installedpackages']['freeswitchvars']['config'][0]['vars_xml']) == 0) {
       /* dialplan not found in the pfsense config.xml get the default dialplan and save to config.xml. */
     	$filename = "/usr/local/freeswitch/conf/vars.xml";
       $fout = fopen($filename,"r");
-      $tmpxml = fread($fout, filesize($filename));  
+      $tmpxml = fread($fout, filesize($filename));
       $config['installedpackages']['freeswitchvars']['config'][0]['vars_xml'] = base64_encode($tmpxml);
       unset($filename, $dialplan);
       fclose($fout);
@@ -748,12 +748,12 @@ function sync_package_freeswitch_internal()
 	global $config;
 	conf_mount_rw();
 	config_unlock();
-        
+
   if(strlen($config['installedpackages']['freeswitchinternal']['config'][0]['internal_xml']) == 0) {
       /* internal_xml not found in the pfsense config.xml get the internal.xml and save to config.xml. */
     	$filename = "/usr/local/freeswitch/conf/sip_profiles/internal.xml";
       $fout = fopen($filename,"r");
-      $tmpxml = fread($fout, filesize($filename));  
+      $tmpxml = fread($fout, filesize($filename));
       $config['installedpackages']['freeswitchinternal']['config'][0]['internal_xml'] = base64_encode($tmpxml);
       unset($filename, $dialplan);
       fclose($fout);
@@ -780,12 +780,12 @@ function sync_package_freeswitch_external()
   global $config;
   conf_mount_rw();
   config_unlock();
-        
+
   if(strlen($config['installedpackages']['freeswitchexternal']['config'][0]['external_xml']) == 0) {
       /* external_xml not found in the pfsense config.xml get the external.xml and save to config.xml. */
       $filename = "/usr/local/freeswitch/conf/sip_profiles/external.xml";
       $fout = fopen($filename,"r");
-      $tmpxml = fread($fout, filesize($filename));  
+      $tmpxml = fread($fout, filesize($filename));
       $config['installedpackages']['freeswitchexternal']['config'][0]['external_xml'] = base64_encode($tmpxml);
       unset($filename, $dialplan);
       fclose($fout);
@@ -818,9 +818,9 @@ function get_recording_filename($id)
             return $rowhelper['filename'];
         }
     }
-  } 
+  }
 }
-  
+
 
 function sync_package_freeswitch_ivr()
 {
@@ -830,37 +830,37 @@ function sync_package_freeswitch_ivr()
   config_lock();
 
   $a_ivr = &$config['installedpackages']['freeswitchivr']['config'];
-  if (count($a_ivr) > 0) {  
+  if (count($a_ivr) > 0) {
 	  foreach($a_ivr as $rowhelper) {
 	  	
 	  	/*
 	    $rowhelper['ivrid']
 	    $rowhelper['ivrextension']
 	    $rowhelper['ivrname']
-	    $rowhelper['recordingid']  
+	    $rowhelper['recordingid']
 	    $rowhelper['ivrtimeout']
 	    $rowhelper['ivrcontext']
 	    $rowhelper['ivrconditionjs']
-	    $rowhelper['ivrdescr']    
+	    $rowhelper['ivrdescr']
 	    */
-	    
+	
 	    $a_dialplan_includes          	= &$config['installedpackages']['freeswitchdialplanincludes']['config'];
-	    $a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];     
+	    $a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];
 
-	    
+	
 	    //add the IVR to the dialplan
 	    if (strlen($rowhelper['ivrid']) > 0) {
 	      $action = 'add'; //set default action to add
 	      $i = 0;
 	      if (count($a_dialplan_includes) > 0) {
 		      foreach($a_dialplan_includes as $row) {
-		  
+		
 		          //$row['dialplanincludeid'];
 		          //$row['extensionname'];
 		          //$row['context'];
 		          //$row['enabled'];
 		          //echo "if (".$row['opt1name']." == \"ivrid\" && ".$row['opt1value']." == ".$rowhelper['ivrid'].") {\n";
-		          
+		
 		          if ($row['opt1name'] == "ivrid" && $row['opt1value'] == $rowhelper['ivrid']) {
 		              //update
 		              $action = 'update';
@@ -873,18 +873,18 @@ function sync_package_freeswitch_ivr()
 		              $opt1name = $row['opt1name'];
 		              $opt1value = $row['opt1value'];
 		              $id = $i;
-		              //echo "update".$i."<br />\n";        
+		              //echo "update".$i."<br />\n";
 		
 		          }
 		          $i++;
-		        
+		
 		      }
 	      }
-	      
-	      
+	
+	
 	      $ent = array();
 	      if ($action == 'add') {
-	          
+	
 	          $dialplanincludeid = guid();
 	          $ent['dialplanincludeid'] = $dialplanincludeid;
 	      		$ent['extensionname'] = $rowhelper['ivrextension'];
@@ -894,7 +894,7 @@ function sync_package_freeswitch_ivr()
 	      		$ent['descr'] = 'IVR';
 	      		$ent['opt1name'] = 'ivrid';
 	      		$ent['opt1value'] = $rowhelper['ivrid'];
-	          
+	
 	          //add to the config  		
 	      		$a_dialplan_includes[] = $ent;
 	      		unset($ent);      		
@@ -906,7 +906,7 @@ function sync_package_freeswitch_ivr()
 	          $ent['fielddata'] = '^'.$rowhelper['ivrextension'].'$';
 	          $a_dialplan_include_details[] = $ent;
 	          unset($ent);
-	      	  
+	      	
 	      	  $ivrid = str_replace(array("{", "}"), "", $rowhelper['ivrid']);
 	      	  	
 	          $ent = array();
@@ -921,7 +921,7 @@ function sync_package_freeswitch_ivr()
 	      		 		
 	  		}
 	      if ($action == 'update') {
-	          
+	
 	          $ent['dialplanincludeid'] = $dialplanincludeid;
 	      		$ent['extensionname'] = $rowhelper['ivrextension'];
 	      		$ent['order'] = $order;
@@ -950,7 +950,7 @@ function sync_package_freeswitch_ivr()
 	      unset($dialplanincludeid);
 	  		
 	    } //end if strlen ivrid; add the IVR to the dialplan
-	    
+	
 	    // Build the IVR javascript
 	    $recording_action_filename = get_recording_filename($rowhelper['recordingidaction']);
 	    $recording_antiaction_filename = get_recording_filename($rowhelper['recordingidantiaction']);
@@ -964,8 +964,8 @@ function sync_package_freeswitch_ivr()
 		    $cmd = "api global_getvar domain";
 		    $domain = trim(event_socket_request($fp, $cmd));
 	    }
-	    
-	    
+	
+	
 	    $tmp = ""; //make sure the variable starts with no value
 	    $tmp .= "\n";
 	    $tmp .= " var condition = true;\n";
@@ -1017,17 +1017,17 @@ function sync_package_freeswitch_ivr()
 	    $tmp .= "    }\n";
 	    $tmp .= "    return( true );\n";
 	    $tmp .= " } //end function mycb\n";
-	        
+	
 	    $tmp .= "\n";
 	    $tmp .= base64_decode($rowhelper['ivrconditionjs']);
 	    $tmp .= "\n";
 	    $tmp .= "\n";
-	    
+	
 	    //$tmp .= " //condition = true; //debugging\n";
 
 	    $actiondirect = false;
 	    $actioncount = 0;
-	    foreach($config['installedpackages']['freeswitchivroptions']['config'] as $row) {  
+	    foreach($config['installedpackages']['freeswitchivroptions']['config'] as $row) {
 	        //find the correct IVR options with the correct action
 	      	if ($row['ivrid'] == $rowhelper['ivrid']) {
 	      	   if ($row['optionaction'] == "action") {
@@ -1076,23 +1076,23 @@ function sync_package_freeswitch_ivr()
       	    $tmp .= "           		dtmf.digits +=  session.getDigits(1, \"#\", ".($rowhelper['ivrtimeout']*1000)."); // ".$rowhelper['ivrtimeout']." seconds\n";
       	    $tmp .= "           		if (dtmf.digits == 0) {\n";
       	    //$tmp .= "           			console_log( "info", "time out option: " + dtmf.digits + "\n" );\n";
-      
-      	    $a_ivr_options = &$config['installedpackages']['freeswitchivroptions']['config'];	    
+
+      	    $a_ivr_options = &$config['installedpackages']['freeswitchivroptions']['config'];	
       		//find the timeout IVR options with the correct action
       		    if (count($a_ivr_options) > 0) {
-      			    foreach($a_ivr_options as $row) {		      
+      			    foreach($a_ivr_options as $row) {		
       	
       			    	if ($row['ivrid'] == $rowhelper['ivrid']) {
-      			      
+      			
       			          if ($row['optionaction'] == "action") {
-      		        	     if (strtolower($row['optionnumber']) == "t") {			          
+      		        	     if (strtolower($row['optionnumber']) == "t") {			
       			                  if ($row['optiontype'] == "extension") {
       			                      $tmp .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
       			                  }
       			                  if ($row['optiontype'] == "voicemail") {
       			                      //$tmp .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
       			                      $tmp .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-      			                  }              
+      			                  }
       		        	     }
       			          } //end anti-action
       			
@@ -1100,14 +1100,14 @@ function sync_package_freeswitch_ivr()
       			
       			    } //end for each
       		    } //if count
-      		    
-      
+      		
+
       	    $tmp .= "           		}\n";
       	    $tmp .= "           		else {\n";
       	    $tmp .= "           			break; //dtmf found end the while loop\n";
-      	    $tmp .= "           		}\n";                        	    
-      	    $tmp .= "           	}\n";	    
-      	    $tmp .= "           }\n";	    
+      	    $tmp .= "           		}\n";                        	
+      	    $tmp .= "           	}\n";	
+      	    $tmp .= "           }\n";	
       	    $tmp .= "         }\n";
       	    $tmp .= "\n";
       	    $tmp .= "         //pickup the remaining digits\n";
@@ -1128,35 +1128,35 @@ function sync_package_freeswitch_ivr()
       	    $a_ivr_options = &$config['installedpackages']['freeswitchivroptions']['config'];
       	    if (count($a_ivr_options) > 0) {
       		    foreach($a_ivr_options as $row) {
-      		      
+      		
       		      /*
       		      $row['ivrid']
       		      $row['optionnumber']
       		      $row['optiontype']
       		      $row['optionaction']
       		      $row['optiondest']
-      		      $row['optiondescr']    
+      		      $row['optiondescr']
       		      */
-      		      
-      		      $tmpactiondefault = ""; 
-      		  
+      		
+      		      $tmpactiondefault = "";
+      		
       		      //find the correct IVR options with the correct action
       		    	if ($row['ivrid'] == $rowhelper['ivrid']){
-      		      
+      		
       		          if ($row['optionaction'] == "action") {
       		        	    //$tmpaction .= "\n";
-      		        	    
+      		        	
       		        	    switch ($row['optionnumber']) {
       		              //case "t":
-      		    
+      		
       		                  //if ($row['optiontype'] == "extension") {
       		                  //    $tmpactiondefault .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
       		                  //}
       		                  //if ($row['optiontype'] == "voicemail") {
       		                  //    //$tmpactiondefault .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
       		                  //    $tmpactiondefault .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-      		                  //}              
-      		                                
+      		                  //}
+      		
       		                  //break;
       		              default:
       		                  //$tmpaction .= "             //console_log( \"info\", \"IVR Detected 1 digit \\n\" );\n";
@@ -1172,17 +1172,17 @@ function sync_package_freeswitch_ivr()
       		                  if ($row['optiontype'] == "voicemail") {
       		                      //$tmpaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
       		                      $tmpaction .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-      		                  } 
+      		                  }
       		                  $tmpaction .= "             }\n";
       		
-      		                  
+      		
       		              }
-      		              
+      		
       		              $x++;
-      		          } //end if action       
+      		          } //end if action
       		
       		    	} //end ivrid
-      		      
+      		
       		
       		    } //end foreach
       	    } //end if count
@@ -1193,9 +1193,9 @@ function sync_package_freeswitch_ivr()
       	    //$tmp .= $tmpactiondefault;
       	    $tmp .= "             }\n";
       	    $tmp .= "\n";
-      	    unset($tmpaction);  
+      	    unset($tmpaction);
       	
-      	              
+      	
       	    $tmp .= "          } \n";
       	    //$tmp .= "          else if ( dtmf.digits.length == \"3\" ) {\n";
       	    //$tmp .= "	                  //Transfer to the extension the caller chose\n";
@@ -1207,13 +1207,13 @@ function sync_package_freeswitch_ivr()
       	    $tmp .= "     } //end if session.ready\n";
       	    $tmp .= "\n";
       	    $tmp .= " }\n"; //end if condition
-      	    
+      	
   	       }	//if ($actiondirect) {
 	    } //actioncount
-	    
+	
 	    $antiactiondirect = false;
 	    $antiactioncount = 0;
-	    foreach($config['installedpackages']['freeswitchivroptions']['config'] as $row) {  
+	    foreach($config['installedpackages']['freeswitchivroptions']['config'] as $row) {
 	        //find the correct IVR options with the correct action
 	      	if ($row['ivrid'] == $rowhelper['ivrid']) {
 	      	   if ($row['optionaction'] == "anti-action") {
@@ -1228,7 +1228,7 @@ function sync_package_freeswitch_ivr()
 	    }
 	    //$tmp .= "anti-action count: ".$antiactioncount."<br />\n";
 
-	    
+	
 	    if ($antiactioncount > 0) {
 	      if ($antiactiondirect) {
       	    $tmp .= " else {\n";
@@ -1261,40 +1261,40 @@ function sync_package_freeswitch_ivr()
       	    $tmp .= "           		dtmf.digits +=  session.getDigits(1, \"#\", ".($rowhelper['ivrtimeout']*1000)."); // ".$rowhelper['ivrtimeout']." seconds\n";
       	    $tmp .= "           		if (dtmf.digits == 0) {\n";
       	    //$tmp .= "           			console_log( "info", "time out option: " + dtmf.digits + "\n" );\n";
-      
-      
+
+
       		//find the timeout IVR options with the correct action
       		    if (count($a_ivr_options) > 0) {
       			    foreach($a_ivr_options as $row) {
       	
       			    	if ($row['ivrid'] == $rowhelper['ivrid']) {
-      			      
+      			
       			          if ($row['optionaction'] == "anti-action") {
-      		        	     if (strtolower($row['optionnumber']) == "t") {			          
-      			        	    		                  
+      		        	     if (strtolower($row['optionnumber']) == "t") {			
+      			        	    		
       			                  if ($row['optiontype'] == "extension") {
       			                      $tmp .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
       			                  }
       			                  if ($row['optiontype'] == "voicemail") {
       			                      //$tmp .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
       			                      $tmp .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-      			                  }              
+      			                  }
       		        	     }
-      
+
       			          } //end anti-action
       			
       			    	} //end ivrid
       			
       			    } //end for each
       		    } //if count
-      
-      
+
+
       	    $tmp .= "           		}\n";
        	    $tmp .= "           		else {\n";
        	    $tmp .= "           			break; //dtmf found end the while loop\n";
        	    $tmp .= "           		}\n";
-                            	    
-      	    $tmp .= "           	}\n";	    
+                            	
+      	    $tmp .= "           	}\n";	
       	    $tmp .= "           }\n";
       	    $tmp .= "         }\n";
       	    $tmp .= "\n";
@@ -1307,48 +1307,48 @@ function sync_package_freeswitch_ivr()
       	    $tmp .= "\n";
       	
       	
-      
+
       	
       	
       	    $tmpantiaction = "";
       	    $tmp .= "         if ( dtmf.digits.length > \"0\" ) {\n";
-      	    
+      	
       	    $x = 0;
       	    if (count($a_ivr_options) > 0) {
       		    foreach($a_ivr_options as $row) {
-      		      
+      		
       		      /*
       		      $row['ivrid']
       		      $row['optionnumber']
       		      $row['optiontype']
       		      $row['optionaction']
       		      $row['optiondest']
-      		      $row['optiondescr']    
+      		      $row['optiondescr']
       		      */
       		      //$tmpantiactiondefault = "";
-      		  
+      		
       		      //find the correct IVR options with the correct action
       		    	if ($row['ivrid'] == $rowhelper['ivrid']) {
-      		      
+      		
       		          if ($row['optionaction'] == "anti-action") {
-      		        	    
+      		        	
       		        	  switch ($row['optionnumber']) {
       		              //case "t":
-      		                  
+      		
       		                  //if ($row['optiontype'] == "extension") {
       		                  //    $tmpantiactiondefault .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
       		                  //}
       		                  //if ($row['optiontype'] == "voicemail") {
       		                  //    //$tmpantiactiondefault .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
       		                  //    $tmpantiactiondefault .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-      		                  //}              
-      		                                
+      		                  //}
+      		
       		                  //break;
       		              default:
       		                  //$tmpantiaction .= "             //console_log( \"info\", \"IVR Detected 1 digit \\n\" );\n";
       		
       		                  if ($x == 0) {
-      		                    $tmpantiaction .= "             if ( dtmf.digits == \"".$row['optionnumber']."\" ) { //".$row['optiondescr']."\n";                  
+      		                    $tmpantiaction .= "             if ( dtmf.digits == \"".$row['optionnumber']."\" ) { //".$row['optiondescr']."\n";
       		                  }
       		                  else {
       		                    $tmpantiaction .= "             else if ( dtmf.digits == \"".$row['optionnumber']."\" ) { //".$row['optiondescr']."\n";
@@ -1360,13 +1360,13 @@ function sync_package_freeswitch_ivr()
       		                  if ($row['optiontype'] == "voicemail") {
       		                      //$tmpantiaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
       		                      $tmpantiaction .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-      		                  } 
+      		                  }
       		                  $tmpantiaction .= "             }\n";
       		
-      		                  
+      		
       		              } //end switch
-      		              
-      		              $x++;              
+      		
+      		              $x++;
       		        	} //end anti-action
       		
       		    	} //end ivrid
@@ -1374,15 +1374,15 @@ function sync_package_freeswitch_ivr()
       		
       		    } //end for each
       	    } //if count
-      	    
+      	
       	    $tmp .= $tmpantiaction;
       	    $tmp .= "             else {\n";
-      	    $tmp .= "	                  session.execute(\"transfer\", dtmf.digits+\" XML default\");\n";	    
+      	    $tmp .= "	                  session.execute(\"transfer\", dtmf.digits+\" XML default\");\n";	
       	    //$tmp .= $tmpantiactiondefault;
       	    $tmp .= "             }\n";
       	    $tmp .= "\n";
       	    unset($tmpantiaction);
-      	       
+      	
       	    $tmp .= "          } \n";
       	    //$tmp .= "          else if ( dtmf.digits.length == \"3\" ) {\n";
       	    //$tmp .= "                //Transfer to the extension the caller chose\n";
@@ -1395,22 +1395,22 @@ function sync_package_freeswitch_ivr()
       	    $tmp .= "     } //end if session.ready\n";
       	    $tmp .= "\n";
       	    $tmp .=  " } //end if condition";
-      	    
+      	
 	       }	//if ($antiactiondirect) {
 	    } //antiactioncount
 	    unset($tmpactiondefault);
-	    unset($tmpantiactiondefault);    
-	    
+	    unset($tmpantiactiondefault);
+	
 	    if (strlen($rowhelper['ivrid']) > 0) {
-		    $ivrfilename = "ivr_".str_replace(array("{", "}"), "", $rowhelper['ivrid']).".js";   
+		    $ivrfilename = "ivr_".str_replace(array("{", "}"), "", $rowhelper['ivrid']).".js";
 		  	$fout = fopen("/usr/local/freeswitch/scripts/".$ivrfilename,"w");
 		    fwrite($fout, $tmp);
 		    unset($ivrfilename);
 		    fclose($fout);
 	    }
-	  
-	  } //end foreach 
-  } //end if count    
+	
+	  } //end foreach
+  } //end if count
   conf_mount_ro();
   config_unlock();
 
@@ -1427,73 +1427,73 @@ function sync_package_freeswitch_dialplan_includes()
 
   $a_dialplan_includes          = &$config['installedpackages']['freeswitchdialplanincludes']['config'];
   $a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];
- 
+
   if (count($a_dialplan_includes) > 0) {
       foreach($config['installedpackages']['freeswitchdialplanincludes']['config'] as $rowhelper) {
           $tmp = "";
           $tmp .= "\n";
-          
+
           //$rowhelper['dialplanincludeid'];
           //$rowhelper['extensionname'];
           //$rowhelper['context'];
           //$rowhelper['enabled'];
-         
+
         $tmp = "<extension name=\"".$rowhelper['extensionname']."\">\n";
-        
-        if (count($a_dialplan_include_details) > 0) {    
-		  
+
+        if (count($a_dialplan_include_details) > 0) {
+		
 			$conditioncount = 0;
 			$i = 0;
           	foreach ($a_dialplan_include_details as $ent) {
 			  if ($ent['tag'] == "condition" && $rowhelper['dialplanincludeid'] == $ent['dialplanincludeid']) {
 			      $conditioncount++;
 			      $i++;
-			  }      
+			  }
 			}
-			  
+			
 			$i = 1;
           	foreach ($a_dialplan_include_details as $ent) {
 			  if ($ent['tag'] == "condition" && $rowhelper['dialplanincludeid'] == $ent['dialplanincludeid']) {
-				    if ($conditioncount == 1) { //single condition                  
+				    if ($conditioncount == 1) { //single condition
 				    	//start tag
-				    	$tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\">\n";              
+				    	$tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\">\n";
 				    }
-				    else { //more than one condition                  
-						if ($i < $conditioncount) {                      
+				    else { //more than one condition
+						if ($i < $conditioncount) {
 				              //all tags should be self-closing except the last one
 				              $tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\"/>\n";
 						}
 						else {
-				            //for the last tag use the start tag                  
+				            //for the last tag use the start tag
 				              $tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\">\n";
 						}
 				    }
 				    $i++;
 			  }
 			} //end for each
-		             
+		
 		} //end if count
-        
+
         if (count($a_dialplan_include_details) > 0) {
           $i = 0;
           foreach ($a_dialplan_include_details as $ent) {
             if ($ent['tag'] == "action" && $rowhelper['dialplanincludeid'] == $ent['dialplanincludeid']) {
-                $tmp .= "       <action application=\"".$ent['fieldtype']."\" data=\"".$ent['fielddata']."\"/>\n";            
-            }     
-            $i++; 
+                $tmp .= "       <action application=\"".$ent['fieldtype']."\" data=\"".$ent['fielddata']."\"/>\n";
+            }
+            $i++;
           }
         }
-        
+
         if (count($a_dialplan_include_details) > 0) {
             $i = 0;
           foreach ($a_dialplan_include_details as $ent) {
             if ($ent['tag'] == "anti-action" && $rowhelper['dialplanincludeid'] == $ent['dialplanincludeid']) {
                 $tmp .= "       <anti-action application=\"".$ent['fieldtype']."\" data=\"".$ent['fielddata']."\"/>\n";
-            }     
-            $i++; 
+            }
+            $i++;
           }
         }
-        
+
         //if (count($a_dialplan_include_details) > 0) {
         //foreach ($a_dialplan_include_details as $ent) {
         //    $i = 0;
@@ -1501,38 +1501,38 @@ function sync_package_freeswitch_dialplan_includes()
                 //$ent['tag']
                 //$ent['fieldtype']
                 //$ent['fielddata']
-        //    }     
-        //    $i++; 
+        //    }
+        //    $i++;
         //  }
         //}
-        
+
         if ($conditioncount > 0) {
             $tmp .= "   </condition>\n";
         }
-        unset ($conditioncount);        
+        unset ($conditioncount);
         $tmp .= "</extension>\n";
-     
-        
+
+
         if ($rowhelper['enabled'] == "true") {
-            $dialplanincludefilename = $rowhelper['order']."_".$rowhelper['extensionname'].".xml";   
+            $dialplanincludefilename = $rowhelper['order']."_".$rowhelper['extensionname'].".xml";
           	$fout = fopen("/usr/local/freeswitch/conf/dialplan/default/".$dialplanincludefilename,"w");
             fwrite($fout, $tmp);
-            fclose($fout);        
+            fclose($fout);
         }
         unset($dialplanincludefilename);
         unset($tmp);
-    
-      
+
+
       } //end foreach
-  } //if array count 
-      
+  } //if array count
+
   conf_mount_ro();
   config_unlock();
-  
+
 }
 
 
-function sync_package_freeswitch_public_includes() 
+function sync_package_freeswitch_public_includes()
 {
 
   global $config;
@@ -1542,73 +1542,73 @@ function sync_package_freeswitch_public_includes()
   $a_public_includes          	= &$config['installedpackages']['freeswitchpublicincludes']['config'];
   $a_public_include_details 	= &$config['installedpackages']['freeswitchpublicincludedetails']['config'];
 
-  if (count($a_public_includes) > 0) { 
+  if (count($a_public_includes) > 0) {
 	  foreach($a_public_includes as $rowhelper) {
 	      $tmp = "";
 	      $tmp .= "\n";
-	      
+	
 	      //$rowhelper['publicincludeid'];
 	      //$rowhelper['extensionname'];
 	      //$rowhelper['context'];
 	      //$rowhelper['enabled'];
-	     
+	
 	    $tmp = "<extension name=\"".$rowhelper['extensionname']."\">\n";
 	
-		if (count($a_public_include_details) > 0) {     
-		  
+		if (count($a_public_include_details) > 0) {
+		
 			$conditioncount = 0;
 			$i = 0;
 			foreach ($a_public_include_details as $ent) {
 			  if ($ent['tag'] == "condition" && $rowhelper['publicincludeid'] == $ent['publicincludeid']) {
 			      $conditioncount++;
 			      $i++;
-			  }      
+			  }
 			}
-			  
+			
 			$i = 1;
 			foreach ($a_public_include_details as $ent) {
 			  if ($ent['tag'] == "condition" && $rowhelper['publicincludeid'] == $ent['publicincludeid']) {
-				    if ($conditioncount == 1) { //single condition                  
+				    if ($conditioncount == 1) { //single condition
 				    	//start tag
-				    	$tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\">\n";              
+				    	$tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\">\n";
 				    }
-				    else { //more than one condition                  
-						if ($i < $conditioncount) {                      
+				    else { //more than one condition
+						if ($i < $conditioncount) {
 				              //all tags should be self-closing except the last one
 				              $tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\"/>\n";
 						}
 						else {
-				            //for the last tag use the start tag                  
+				            //for the last tag use the start tag
 				              $tmp .= "   <condition field=\"".$ent['fieldtype']."\" expression=\"".$ent['fielddata']."\">\n";
 						}
 				    }
 				    $i++;
 			  }
 			} //end for each
-		             
+		
 		} //end if count
 
-	    
+	
 	    if (count($a_public_include_details) > 0) {
 	      $i = 0;
 	      foreach ($a_public_include_details as $ent) {
 	        if ($ent['tag'] == "action" && $rowhelper['publicincludeid'] == $ent['publicincludeid']) {
-	            $tmp .= "       <action application=\"".$ent['fieldtype']."\" data=\"".$ent['fielddata']."\"/>\n";            
-	        }     
-	        $i++; 
+	            $tmp .= "       <action application=\"".$ent['fieldtype']."\" data=\"".$ent['fielddata']."\"/>\n";
+	        }
+	        $i++;
 	      }
 	    }
-	    
+	
 	    if (count($a_public_include_details) > 0) {
 	        $i = 0;
 	      foreach ($a_public_include_details as $ent) {
 	        if ($ent['tag'] == "anti-action" && $rowhelper['publicincludeid'] == $ent['publicincludeid']) {
 	            $tmp .= "       <anti-action application=\"".$ent['fieldtype']."\" data=\"".$ent['fielddata']."\"/>\n";
-	        }     
-	        $i++; 
+	        }
+	        $i++;
 	      }
 	    }
-	    
+	
 	    //if (count($a_public_include_details) > 0) {
 	    //foreach ($a_public_include_details as $ent) {
 	    //    $i = 0;
@@ -1616,60 +1616,60 @@ function sync_package_freeswitch_public_includes()
 	            //$ent['tag']
 	            //$ent['fieldtype']
 	            //$ent['fielddata']
-	    //    }     
-	    //    $i++; 
+	    //    }
+	    //    $i++;
 	    //  }
 	    //}
-	    
+	
 	    if ($conditioncount > 0) {
 	        $tmp .= "   </condition>\n";
 	    }
 	    unset ($conditioncount);
 	    $tmp .= "</extension>\n";
-	 
-	    
+	
+	
 	    if ($rowhelper['enabled'] == "true") {
-	        $publicincludefilename = $rowhelper['order']."_".$rowhelper['extensionname'].".xml";   
+	        $publicincludefilename = $rowhelper['order']."_".$rowhelper['extensionname'].".xml";
 	      	$fout = fopen("/usr/local/freeswitch/conf/dialplan/public/".$publicincludefilename,"w");
 	        fwrite($fout, $tmp);
-	        fclose($fout);        
+	        fclose($fout);
 	    }
 	    unset($publicincludefilename);
 	    unset($tmp);
 	
-	  
-	  } //end foreach 
-  } //end if count    
+	
+	  } //end foreach
+  } //end if count
   conf_mount_ro();
   config_unlock();
-  
+
 }
 
 
-function sync_package_freeswitch() 
+function sync_package_freeswitch()
 {
-  
-  global $config;   
+
+  global $config;
   sync_package_freeswitch_settings();
   sync_package_freeswitch_dialplan();
-  sync_package_freeswitch_dialplan_includes();  
+  sync_package_freeswitch_dialplan_includes();
   sync_package_freeswitch_extensions();
   sync_package_freeswitch_gateways();
   sync_package_freeswitch_modules();
   sync_package_freeswitch_public();
-  sync_package_freeswitch_public_includes();  
-  sync_package_freeswitch_vars();  
+  sync_package_freeswitch_public_includes();
+  sync_package_freeswitch_vars();
   sync_package_freeswitch_internal();
   sync_package_freeswitch_external();
   //sync_package_freeswitch_recordings();
-  if (pkg_is_service_running('freeswitch')) {  
+  if (pkg_is_service_running('freeswitch')) {
       sync_package_freeswitch_ivr();
   }
 
 }
-    
 
-function freeswitch_php_install_command() 
+
+function freeswitch_php_install_command()
 {
 	global $config;
 	$freeswitch_package_version = "0.8.4";
@@ -1709,7 +1709,7 @@ function freeswitch_php_install_command()
 
 	exec("cp /tmp/begin_recording.wav /usr/local/freeswitch/recordings/begin_recording.wav");
 	unlink_if_exists("/tmp/begin_recording.wav");
-  
+
 	exec("cp /tmp/your_pin_number_is_incorect_goodbye.wav /usr/local/freeswitch/recordings/your_pin_number_is_incorect_goodbye.wav");
 	unlink_if_exists("/tmp/your_pin_number_is_incorect_goodbye.wav");
 
@@ -1758,7 +1758,7 @@ function freeswitch_php_install_command()
 		
 	exec("cp /tmp/freeswitch_ivr.tmp /usr/local/www/freeswitch/freeswitch_ivr.php");
 	unlink_if_exists("/tmp/freeswitch_ivr.tmp");
-  
+
 	exec("cp /tmp/freeswitch_ivr_edit.tmp /usr/local/www/freeswitch/freeswitch_ivr_edit.php");
 	unlink_if_exists("/tmp/freeswitch_ivr_edit.tmp");
 	
@@ -1791,7 +1791,7 @@ function freeswitch_php_install_command()
 
 	exec("cp /tmp/freeswitch_recordings_play.tmp /usr/local/www/freeswitch/freeswitch_recordings_play.php");
 	unlink_if_exists("/tmp/freeswitch_recordings_play.tmp");
-  
+
 	exec("cp /tmp/freeswitch_status.tmp /usr/local/www/freeswitch/freeswitch_status.php");
 	unlink_if_exists("/tmp/freeswitch_status.tmp");
   	
@@ -1840,10 +1840,10 @@ function freeswitch_php_install_command()
 	
   //write the recording.js script
     recording_js();
-  
+
   //add recording.js to the dialplan
     $a_dialplan_includes          	= &$config['installedpackages']['freeswitchdialplanincludes']['config'];
-    $a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];     
+    $a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];
 
 	//delete dialplan recording from the previous install
 	    if (count($a_dialplan_includes) > 0) {
@@ -1851,12 +1851,12 @@ function freeswitch_php_install_command()
 	    	foreach ($a_dialplan_includes as $ent) {
 	        	if ($ent['extensionname'] == "Recordings") {
 	            	unset($a_dialplan_includes[$i]);
-	        	}     
-	        	$i++; 
+	        	}
+	        	$i++;
 	    	}
 	    }
 
-	//delete the recording dialplan details		    
+	//delete the recording dialplan details		
 	    if (count($a_dialplan_include_details) > 0) {
 	    	$i = 0;
 	    	foreach ($a_dialplan_include_details as $ent) {
@@ -1865,13 +1865,13 @@ function freeswitch_php_install_command()
 	        	}
 	        	if ($ent['fielddata'] == "recordings.js") {
 	            	unset($a_dialplan_include_details[$i]);	            	
-	        	}             
-	        	$i++; 
+	        	}
+	        	$i++;
 	      	}
 	    }
-    
+
     $dialplanincludeid = guid();
-    
+
     $ent = array();
     $ent['dialplanincludeid'] = $dialplanincludeid;
     $ent['extensionname'] = 'Recordings';
@@ -1940,9 +1940,9 @@ function freeswitch_php_install_command()
 	fwrite($fout, $tmpxml);
 	unset($tmpxml);
 	fclose($fout);
-  
+
   /* freeswitch modules defaults */
-   
+
   	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_console']) == 0) {
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_console'] = "enable";
   	}
@@ -1963,7 +1963,7 @@ function freeswitch_php_install_command()
   	}
     if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_xml_curl']) == 0) {
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_xml_curl'] = "disable";
-  	}        
+  	}
   	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_xml_cdr']) == 0) {
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_xml_cdr'] = "disable";
   	}
@@ -2062,7 +2062,7 @@ function freeswitch_php_install_command()
   	}
     if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_amr']) == 0) {
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_amr'] = "enable";
-  	}        
+  	}
   	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_ilbc']) == 0) {
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_ilbc'] = "enable";
   	}
@@ -2132,7 +2132,7 @@ function freeswitch_php_install_command()
   	
 	// if backup file exists restore it
 	    $filename = 'freeswitch.bak.tgz';
-	    	   
+	    	
 	    //extract a specific directory to /usr/local/freeswitch
 	    if (file_exists('/tmp/'.$filename)) {
 	      //echo "The file $filename exists";
@@ -2147,8 +2147,8 @@ function freeswitch_php_install_command()
 	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/conf/ssl');
 
 	      //Optional
-	      	//system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/conf/');  
-	        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/grammar/');  
+	      	//system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/conf/');
+	        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/grammar/');
 	        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/htdocs/');
 			
 			unset($filename);
@@ -2172,26 +2172,26 @@ function freeswitch_php_install_command()
 		"stop" => "/usr/local/freeswitch/bin/./freeswitch -stop"
 		)
 	);
-		  	       
+		  	
 	sync_package_freeswitch();
 	$handle = popen("/usr/local/etc/rc.d/freeswitch.sh start", "r");
 	pclose($handle);
 	
-	if (pkg_is_service_running('freeswitch')) {  
+	if (pkg_is_service_running('freeswitch')) {
       sync_package_freeswitch_ivr();
 	}
 	
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = $freeswitch_build_version." revision ".$freeswitch_build_revision.".";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = $freeswitch_package_version;
-	       
+	
 	conf_mount_ro();
 	config_unlock();
-  
+
 }
 
 
-function freeswitch_deinstall_command() 
+function freeswitch_deinstall_command()
 {
 
 	conf_mount_rw();
@@ -2218,7 +2218,7 @@ function freeswitch_deinstall_command()
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_extensions_edit.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_ivr.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_ivr_edit.php");
-	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_ivr_options_edit.php");  
+	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_ivr_options_edit.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_ivr_options.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_gateways.php");
 	unlink_if_exists("/usr/local/www/freeswitch/freeswitch_gateways_edit.php");

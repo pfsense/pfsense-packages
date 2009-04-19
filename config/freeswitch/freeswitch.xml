@@ -58,7 +58,7 @@
 		<name>freeswitch</name>
 		<rcfile>freeswitch.sh</rcfile>
 		<executable>freeswitch</executable>
-		<description>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow. </description>    
+		<description>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow. </description>
 	</service>
 	<tabs>
 		<tab>

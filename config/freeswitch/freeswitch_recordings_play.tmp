@@ -1,11 +1,11 @@
-<?php 
+<?php
 /* $Id$ */
 /*
 
 	freeswitch_recordings_play.php
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
-  
+
   FreeSWITCH (TM)
   http://www.freeswitch.org/
 	
@@ -45,11 +45,11 @@ $type = $_GET['type']; //moh //rec
      <td align='center'>
       <b>file: <?=$filename?></b>
      </td>
-   </tr>  
+   </tr>
    <tr>
      <td align='center'>
      <?php
-          
+
       $file_ext = substr($_GET['filename'], -3);
       if ($file_ext == "wav") {
         echo "<embed src=\"freeswitch_recordings.php?a=download&type=".$type."&filename=".$filename."\" autostart=true width=200 height=40 name=\"sound".$$filename."\" enablejavascript=\"true\">\n";
@@ -60,7 +60,7 @@ $type = $_GET['type']; //moh //rec
         echo "<param name=\"quality\" value=\"high\"/>\n";
         echo "<param name=\"bgcolor\" value=\"#E6E6E6\"/>\n";
         echo "</object>\n";
-      } 
+      }
 
      ?>
      </td>

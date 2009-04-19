@@ -1,11 +1,11 @@
-<?php 
+<?php
 /* $Id$ */
 /*
 
 	freeswitch_dialplan_includes_edit.php
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
-  
+
   FreeSWITCH (TM)
   http://www.freeswitch.org/
 	
@@ -42,7 +42,7 @@ require("/usr/local/pkg/freeswitch.inc");
       //default
   //enabled
   //descr
-  
+
 //
 
 
@@ -88,11 +88,11 @@ if ($_POST) {
 
 
 	if (!$input_errors) {
-    
+
 		$ent = array();
 		if (strlen($_POST['dialplanincludeid']) > 0) {
 		    //update
-  		  $ent['dialplanincludeid'] = $_POST['dialplanincludeid'];    		  
+  		  $ent['dialplanincludeid'] = $_POST['dialplanincludeid'];    		
 		}
 		else {
 		  //add
@@ -107,48 +107,48 @@ if ($_POST) {
 		$ent['opt1name'] = $_POST['opt1name'];
 		$ent['opt1value'] = $_POST['opt1value'];
 		
- 
+
 		if (isset($id) && $a_dialplan_includes[$id]) {
-	        
+	
 	        if (count($a_dialplan_includes)>0) {
 		        foreach($a_dialplan_includes as $rowhelper) {
-		    
+		
 		          //$rowhelper['dialplanincludeid'];
 		          //$rowhelper['extensionname'];
 		          //$rowhelper['context'];
 		          //$rowhelper['enabled'];
-		          
+		
 		          $filenamechanged = false;
 		          if ($rowhelper['dialplanincludeid'] == $_POST['dialplanincludeid']) {
-		              
+		
 		              if ($rowhelper['extensionname'] != $_POST['extensionname']) {
 		                  //if the extension name has changed then remove the current dialplan xml file
 		                    //to prepare for the new file
-		                  $filenamechanged = true; 
+		                  $filenamechanged = true;
 		              }
 		              if ($rowhelper['order'] != $_POST['order']) {
 		                  //if the order has changed then remove the current dialplan xml file
 		                    //to prepare for the new file
-		                  $filenamechanged = true;                    
-		              }              
+		                  $filenamechanged = true;
+		              }
 		              if ($_POST['enabled'] == "false") {
 		                  //if the extension name is disabled then remove the dialplan xml file
 		                  $filenamechanged = true;
 		              }
-		              if ($filenamechanged){        
+		              if ($filenamechanged){
 		                $dialplanincludefilename = $rowhelper['order']."_".$rowhelper['extensionname'].".xml";
 		                if (file_exists("/usr/local/freeswitch/conf/dialplan/default/".$dialplanincludefilename)) {
 		                  unlink("/usr/local/freeswitch/conf/dialplan/default/".$dialplanincludefilename);
 		                }
 		                unset($dialplanincludefilename);
 		              }
-		                        
+		
 		          }
-		          unset($filenamechanged); 
-		          
+		          unset($filenamechanged);
+		
 		        } //end foreach
 	        } //end count
-	        
+	
 	  		//update the config
 	        $a_dialplan_includes[$id] = $ent;
 		}
@@ -201,8 +201,8 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>
      <td class="tabcont" >
-     
-      	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
+
+      	<table width="100%" border="0" cellpadding="6" cellspacing="0">
           <tr>
             <td><p><span class="vexpl"><span class="red"><strong>Dialplan:<br>
                 </strong></span>
@@ -216,27 +216,27 @@ include("head.inc");
             <table width="100%" border="0" cellpadding="6" cellspacing="0">
             <tr>
               <td width="22%" valign="top" class="vncellreq">Extension Name</td>
-              <td width="78%" class="vtable"> 
+              <td width="78%" class="vtable">
                 <input name="extensionname" type="text" class="formfld" id="extensionname" size="40" value="<?=htmlspecialchars($pconfig['extensionname']);?>">
                 <br />
-                Supported characters are 'a-z', 'A-Z', '0-9', underscore '_', and period '.'. 
+                Supported characters are 'a-z', 'A-Z', '0-9', underscore '_', and period '.'.
               </td>
             </tr>
             <!--
             <tr>
               <td width="22%" valign="top" class="vncellreq">Context</td>
-              <td width="78%" class="vtable"> 
+              <td width="78%" class="vtable">
                 <input name="context" type="text" class="formfld" id="context" size="40" value="<?=htmlspecialchars($pconfig['context']);?>">
                 <br />
                 e.g. default
               </td>
             </tr>
             -->
-            
+
             <tr>
               <td width="22%" valign="top" class="vncellreq">Enabled</td>
-              <td width="78%" class="vtable"> 
-                <?php                
+              <td width="78%" class="vtable">
+                <?php
                 echo "              <select name='enabled' class='formfld'>\n";
                 echo "                <option></option>\n";
                 switch (htmlspecialchars($pconfig['enabled'])) {
@@ -254,30 +254,30 @@ include("head.inc");
                     echo "              <option value='false'>false</option>\n";
                 }
                 echo "              </select>\n";
-                ?>          
+                ?>
               </td>
             </tr>
-            
+
             <tr>
               <td width="22%" valign="top" class="vncellreq">Order</td>
-              <td width="78%" class="vtable"> 
+              <td width="78%" class="vtable">
                 <?php
-               
+
                 echo "              <select name='order' class='formfld'>\n";
                 echo "              <option></option>\n";
                 if (strlen(htmlspecialchars($pconfig['order']))> 0) {
-                    echo "              <option selected='yes' value='".htmlspecialchars($pconfig['order'])."'>".htmlspecialchars($pconfig['order'])."</option>\n";                
+                    echo "              <option selected='yes' value='".htmlspecialchars($pconfig['order'])."'>".htmlspecialchars($pconfig['order'])."</option>\n";
                 }
                 $i=0;
                 while($i<=999) {
-                  if (strlen($i) == 1) {                  
+                  if (strlen($i) == 1) {
                     echo "              <option value='00$i'>00$i</option>\n";
                   }
                   if (strlen($i) == 2) {
                     echo "              <option value='0$i'>0$i</option>\n";
                   }
                   if (strlen($i) == 3) {
-                    echo "              <option value='$i'>$i</option>\n";                                      
+                    echo "              <option value='$i'>$i</option>\n";
                   }
 
                   $i++;
@@ -285,24 +285,24 @@ include("head.inc");
                 echo "              </select>\n";
                 ?>
                 <br />
-                Processing of each dialplan include is determined by this order.          
+                Processing of each dialplan include is determined by this order.
               </td>
             </tr>
-                        
+
             <tr>
               <td width="22%" valign="top" class="vncell">Description</td>
-              <td width="78%" class="vtable"> 
+              <td width="78%" class="vtable">
                 <input name="descr" type="text" class="formfld" id="descr" size="40" value="<?=htmlspecialchars($pconfig['descr']);?>">
                 <br> <span class="vexpl">You may enter a description here
                 for your reference (not parsed).</span></td>
-            </tr>           
+            </tr>
             <tr>
               <td width="22%" valign="top">&nbsp;</td>
               <td width="78%">
                 <input name="dialplanincludeid" type="hidden" value="<?=htmlspecialchars($pconfig['dialplanincludeid']);?>">
-                <?php 
+                <?php
                 if (strlen($id) > 0 && $a_dialplan_includes[$id]) {
-                    echo "\n"; 
+                    echo "\n";
                     echo "                <input name=\"id\" type=\"hidden\" value=\"$id\">\n";
                     echo "                <input name=\"opt1name\" type=\"hidden\" value=\"".htmlspecialchars($pconfig['opt1name'])."\">\n";
                     echo "                <input name=\"opt1value\" type=\"hidden\" value=\"".htmlspecialchars($pconfig['opt1value'])."\">\n";
@@ -313,36 +313,36 @@ include("head.inc");
             </tr>
             </table>
         </form>
-        
+
       <br>
       <br>
 
       <form action="freeswitch_dialplan_includes_edit.php" method="post" name="iform2" id="iform2">
-      <?php 
-      
+      <?php
+
       //echo "<pre>";
       //print_r ($a_dialplan_includes);
       //echo "</pre>";
-      
-      //if ($savemsg) print_info_box($savemsg); 
+
+      //if ($savemsg) print_info_box($savemsg);
       //if (file_exists($d_hostsdirty_path)): echo"<p>";
       //print_info_box_np("The FreeSWITCH recordings have been changed.<br>You must apply the changes in order for them to take effect.");
       //echo"<br />";
-      //endif; 
-      
+      //endif;
+
       ?>
-         
-    
-  	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
+
+
+  	<table width="100%" border="0" cellpadding="6" cellspacing="0">
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>Conditions and Actions<br />
             </strong></span>
-            The following conditions, actions and anti-actions are used in the dialplan to direct call flow. Each is processed in order until you reach the action tag which tells FreeSWITCH what action to perform. You are not limited to only one condition or action tag for a given extension. 
+            The following conditions, actions and anti-actions are used in the dialplan to direct call flow. Each is processed in order until you reach the action tag which tells FreeSWITCH what action to perform. You are not limited to only one condition or action tag for a given extension.
             </span></p></td>
       </tr>
     </table>
     <br />
-        
+
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
       <td width="20%" class="listhdrr">Tag</td>
@@ -356,13 +356,13 @@ include("head.inc");
           </tr>
         </table>
       </td>
-		</tr> 
-  
-		<?php 
-  
+		</tr>
+
+		<?php
+
       $i = 0;
       if (count($a_dialplan_include_details) > 0) {
- 
+
         foreach ($a_dialplan_include_details as $ent) {
           if ($ent['tag'] == "condition" && $dialplanincludeid == $ent['dialplanincludeid']) {
     ?>
@@ -375,7 +375,7 @@ include("head.inc");
               </td>
               <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
                 <?=$ent['fielddata'];?>&nbsp;
-              </td>      
+              </td>
               <td valign="middle" nowrap class="list">
                 <table border="0" cellspacing="0" cellpadding="1">
                   <tr>
@@ -385,15 +385,15 @@ include("head.inc");
                </table>
               </td>
             </tr>
-		<?php 
+		<?php
 		      }
-          $i++; 
+          $i++;
         }
       }
-      
+
       $i = 0;
       if (count($a_dialplan_include_details) > 0) {
- 
+
         foreach ($a_dialplan_include_details as $ent) {
           if ($ent['tag'] == "action" && $dialplanincludeid == $ent['dialplanincludeid']) {
     ?>
@@ -406,7 +406,7 @@ include("head.inc");
               </td>
               <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
                 <?=$ent['fielddata'];?>&nbsp;
-              </td>      
+              </td>
               <td valign="middle" nowrap class="list">
                 <table border="0" cellspacing="0" cellpadding="1">
                   <tr>
@@ -416,15 +416,15 @@ include("head.inc");
                </table>
               </td>
             </tr>
-		<?php 
+		<?php
 		      }
-          $i++; 
+          $i++;
         }
       }
-      
+
       $i = 0;
       if (count($a_dialplan_include_details) > 0) {
- 
+
         foreach ($a_dialplan_include_details as $ent) {
           if ($ent['tag'] == "anti-action" && $dialplanincludeid == $ent['dialplanincludeid']) {
     ?>
@@ -437,7 +437,7 @@ include("head.inc");
               </td>
               <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
                 <?=$ent['fielddata'];?>&nbsp;
-              </td>      
+              </td>
               <td valign="middle" nowrap class="list">
                 <table border="0" cellspacing="0" cellpadding="1">
                   <tr>
@@ -447,15 +447,15 @@ include("head.inc");
                </table>
               </td>
             </tr>
-		<?php 
+		<?php
 		      }
-          $i++; 
+          $i++;
         }
       }
-      
+
       $i = 0;
       if (count($a_dialplan_include_details) > 0) {
- 
+
         foreach ($a_dialplan_include_details as $ent) {
           if ($ent['tag'] == "param" && $dialplanincludeid == $ent['dialplanincludeid']) {
     ?>
@@ -468,7 +468,7 @@ include("head.inc");
               </td>
               <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
                 <?=$ent['fielddata'];?>&nbsp;
-              </td>      
+              </td>
               <td valign="middle" nowrap class="list">
                 <table border="0" cellspacing="0" cellpadding="1">
                   <tr>
@@ -478,11 +478,11 @@ include("head.inc");
                </table>
               </td>
             </tr>
-		<?php 
+		<?php
 		      }
-          $i++; 
+          $i++;
         }
-      }      
+      }
     ?>
     <tr>
       <td class="list" colspan="3"></td>
@@ -502,14 +502,14 @@ include("head.inc");
        <td class="list"></td>
      </tr>
      </table>
-     
+
       </form>
-      
 
 
-   
+
+
       <br>
-      <br>     
+      <br>
 
      </td>
    </tr>

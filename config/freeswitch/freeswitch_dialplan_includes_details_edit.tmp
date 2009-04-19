@@ -1,11 +1,11 @@
-<?php 
+<?php
 /* $Id$ */
 /*
 
 	freeswitch_dialplan_includes_details_edit.php
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
-  
+
   FreeSWITCH (TM)
   http://www.freeswitch.org/
 	
@@ -62,9 +62,9 @@ if (isset($_POST['dialplanincludeid'])) {
   //tagorder
       //1-20
   //fieldtype
-      
+
   //fielddata
-  
+
 
 if (isset($id) && $a_dialplan_includes_details[$id]) {
 	$pconfig['dialplanincludeid'] = $a_dialplan_includes_details[$id]['dialplanincludeid'];
@@ -89,7 +89,7 @@ if ($_POST) {
 
 
 	if (!$input_errors) {
-  
+
 		$ent = array();		
 		$ent['dialplanincludeid'] = $_POST['dialplanincludeid'];
 		$ent['tag'] = $_POST['tag'];
@@ -103,7 +103,7 @@ if ($_POST) {
       $a_dialplan_includes_details[$id] = $ent;
 		}
 		else {
-		  //add  
+		  //add
 			$a_dialplan_includes_details[] = $ent;
 		}
 				
@@ -142,14 +142,14 @@ include("head.inc");
 	$tab_array[] = array(gettext("Status"), false, "/freeswitch/freeswitch_status.php");
 	$tab_array[] = array(gettext("Vars"), false, "/pkg_edit.php?xml=freeswitch_vars.xml&amp;id=0");
  	display_top_tabs($tab_array);
-  
+
 ?>
 </td></tr>
 </table>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>
      <td class="tabcont" >
-    
+
         <form action="freeswitch_dialplan_includes_details_edit.php" method="post" name="iform" id="iform">
             <table width="100%" border="0" cellpadding="6" cellspacing="0">
             <tr>
@@ -177,9 +177,9 @@ include("head.inc");
                       if (tag == "") {
                         document.getElementById("label_fieldtype").innerHTML = "Type";
                         document.getElementById("label_fielddata").innerHTML = "Data";
-                      }                   
+                      }
                   }
-              </script> 
+              </script>
                 <?php
                 echo "                <select name='tag' class='formfld' id='form_tag' onchange='dialplan_include_details_tag_onchange();'>\n";
                 echo "                <option></option>\n";
@@ -207,7 +207,7 @@ include("head.inc");
                     echo "                <option>action</option>\n";
                     echo "                <option>anti-action</option>\n";
                     //echo "                <option selected='yes'>param</option>\n";
-                    break;                    
+                    break;
                 default:
                     echo "                <option>condition</option>\n";
                     echo "                <option>action</option>\n";
@@ -215,31 +215,31 @@ include("head.inc");
                     //echo "                <option>param</option>\n";
                 }
                 echo "                </select>\n";
-                
+
                 //condition
                     //field expression
                 //action
-                    //application 
+                    //application
                     //data
                 //antiaction
-                    //application 
+                    //application
                     //data
                 //param
                     //name
                     //value
-                
+
                 ?>
               </td>
-            </tr>          
+            </tr>
             <tr>
               <td width="22%" valign="top" class="vncellreq" id="label_fieldtype">Type</td>
-              <td width="78%" class="vtable"> 
-                <input name="fieldtype" type="text" class="formfld" id="fieldtype" size="40" value="<?=htmlspecialchars($pconfig['fieldtype']);?>">             
+              <td width="78%" class="vtable">
+                <input name="fieldtype" type="text" class="formfld" id="fieldtype" size="40" value="<?=htmlspecialchars($pconfig['fieldtype']);?>">
               </td>
-            </tr>            
+            </tr>
             <tr>
               <td width="22%" valign="top" class="vncellreq" id="label_fielddata">Data</td>
-              <td width="78%" class="vtable"> 
+              <td width="78%" class="vtable">
                 <input name="fielddata" type="text" class="formfld" id="fielddata" size="40" value="<?=htmlspecialchars($pconfig['fielddata']);?>">
                 <br> <span class="vexpl"></span></td>
             </tr>
@@ -247,16 +247,16 @@ include("head.inc");
               <td width="22%" valign="top">&nbsp;</td>
               <td width="78%">
                 <input name="dialplanincludeid" type="hidden" value="<?=$dialplanincludeid;?>">
-                <input name="parentid" type="hidden" value="<?=$parentid;?>">                
+                <input name="parentid" type="hidden" value="<?=$parentid;?>">
                 <?php if (isset($id) && $a_dialplan_includes_details[$id]): ?>
-                  <input name="id" type="hidden" value="<?=$id;?>">                 
+                  <input name="id" type="hidden" value="<?=$id;?>">
                 <?php endif; ?>
                 <input name="Submit" type="submit" class="formbtn" value="Save"> <input class="formbtn" type="button" value="Cancel" onclick="history.back()">
               </td>
             </tr>
             </table>
         </form>
-      
+
       <br />
       <br />
       <b>Additional Information</b>
@@ -268,7 +268,7 @@ include("head.inc");
       <br />
       <br />
       <br />
-      
+
       <b>Conditions</b>
       <br />
       <br />
@@ -285,49 +285,49 @@ include("head.inc");
           <li><b>uuid</b> Unique identifier of the current call? (looks like a GUID)</li>
           <li><b>source</b> Name of the FreeSwitch module that received the call (e.g. PortAudio)</li>
           <li><b>chan_name</b> Name of the current channel (Example: PortAudio/1234). Give us examples when this one can be used.</li>
-          <li><b>network_addr</b> IP address of the signalling source for a VoIP call.</li> 
+          <li><b>network_addr</b> IP address of the signalling source for a VoIP call.</li>
       </ul>
       In addition to the above you can also do variables using the syntax ${variable} or api functions using the syntax %{api} {args}
       <br />
       <br />
-      Variables may be used in either the field or the expression, as follows 
+      Variables may be used in either the field or the expression, as follows
 
       <br />
       <br />
       <br />
       <br />
-      
+
       <b>Action and Anti-Actions</b>
       <br />
       <br />
       Actions are executed when the <b>condition matches</b>. Anti-Actions are executed when the <b>condition does NOT match</b>.
       Additional information on applications for Actions and Anti-Actions.<br />
-      <a href='http://wiki.freeswitch.org/wiki/Modules#Applications' target='_blank'>http://wiki.freeswitch.org/wiki/Modules#Applications</a>      
+      <a href='http://wiki.freeswitch.org/wiki/Modules#Applications' target='_blank'>http://wiki.freeswitch.org/wiki/Modules#Applications</a>
       <br />
       <a href='http://wiki.freeswitch.org/wiki/Dialplan_Functions' target='_blank'>http://wiki.freeswitch.org/wiki/Dialplan_Functions</a>
       <br />
       <br />
       <br />
-      The following is a partial list of <b>applications</b>. 
+      The following is a partial list of <b>applications</b>.
       <ul>
       <li><b>answer</b> answer the call</li>
       <li><b>bridge</b> bridge the call<li>
       <li><b>cond</b></li>
-      <li><b>db</b> is a a runtime database either sqlite by default or odbc</li>      
+      <li><b>db</b> is a a runtime database either sqlite by default or odbc</li>
       <li><b>global_set</b> allows setting of global vars similar to the ones found in vars.xml</li>
       <li><b>group</b> allows grouping of several extensions for things like ring groups</li>
       <li><b>expr</b></li>
-      <li><b>hangup</b> hangs up the call</li>      
+      <li><b>hangup</b> hangs up the call</li>
       <li><b>info</b> sends call info to the console</li>
       <li><b>javascript</b> run javascript .js files</li>
       <li><b>playback</b></li>
       <li><b>reject</b> reject the call</li>
-      <li><b>respond</b></li>      
-      <li><b>ring_ready</b></li>      
+      <li><b>respond</b></li>
+      <li><b>ring_ready</b></li>
       <li><b>set</b> set a variable</li>
       <li><b>set_user</b></li>
       <li><b>sleep</b></li>
-      <li><b>sofia_contact</b></li>      
+      <li><b>sofia_contact</b></li>
       <li><b>transfer</b> transfer the call to another extension or number<li>
       <li><b>voicemail</b> send the call to voicemail</li>
       </ul>
@@ -340,13 +340,13 @@ include("head.inc");
       <b>Param</b>
       Example parameters by name and value
       <br />
-      <a href='http://wiki.freeswitch.org/wiki/Special:Search?search=param&go=Go' target='_blank'>http://wiki.freeswitch.org/wiki/Special:Search?search=param&go=Go</a>      
+      <a href='http://wiki.freeswitch.org/wiki/Special:Search?search=param&go=Go' target='_blank'>http://wiki.freeswitch.org/wiki/Special:Search?search=param&go=Go</a>
       <ul>
-      <li><b>codec-ms</b> 20</li>      
+      <li><b>codec-ms</b> 20</li>
       <li><b>codec-prefs</b> PCMU@20i</li>
       <li><b>debug</b> 1</li>
       <li><b>dialplan</b> XML</li>
-      <li><b>dtmf-duration</b> 100</li>            
+      <li><b>dtmf-duration</b> 100</li>
       <li><b>rfc2833-pt</b>" 101</li>
       <li><b>sip-port</b> 5060</li>
       <li><b>use-rtp-timer</b> true</li>
@@ -355,13 +355,13 @@ include("head.inc");
       <br />
       -->
 
-      
+
       <br />
       <br />
       <br />
       <br />
       <br />
-      
+
      </td>
    </tr>
 </table>

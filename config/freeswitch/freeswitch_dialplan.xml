@@ -77,7 +77,7 @@
 		<tab>
 			<text>Features</text>
 			<url>/freeswitch/freeswitch_features.php</url>
-		</tab>		
+		</tab>
 		<tab>
 			<text>Gateways</text>
 			<url>/freeswitch/freeswitch_gateways.php</url>

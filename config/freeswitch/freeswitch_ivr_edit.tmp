@@ -1,11 +1,11 @@
-<?php 
+<?php
 /* $Id$ */
 /*
 
   freeswitch_ivr_edit.php
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
-  
+
   FreeSWITCH (TM)
   http://www.freeswitch.org/
 	
@@ -122,8 +122,8 @@ $parentid = $id;
   $ivrconditionjs .= "    condition = false;\n";
   $ivrconditionjs .= "}\n";
   $ivrconditionjs .= "\n";
-    
-    
+
+
 if (isset($id) && $a_ivr[$id]) {
 	$pconfig['ivrid'] = $a_ivr[$id]['ivrid'];
 	$ivrid = $a_ivr[$id]['ivrid'];
@@ -171,7 +171,7 @@ if ($_POST) {
 		$ivrent['recordingidaction'] = $_POST['recordingidaction'];			
 		$ivrent['recordingidantiaction'] = $_POST['recordingidantiaction'];
 		$ivrent['ivrtimeout'] = $_POST['ivrtimeout'];
-		$ivrent['ivrcontext'] = $_POST['ivrcontext'];    
+		$ivrent['ivrcontext'] = $_POST['ivrcontext'];
 		$ivrent['ivrconditionjs'] = base64_encode($_POST['ivrconditionjs']);		
 		$ivrent['ivrdescr'] = $_POST['ivrdescr'];
 
@@ -227,8 +227,8 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>
      <td class="tabcont" >
-     
-      	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
+
+      	<table width="100%" border="0" cellpadding="6" cellspacing="0">
           <tr>
             <td><p><span class="vexpl"><span class="red"><strong>General Settings:<br>
                 </strong></span>
@@ -242,20 +242,20 @@ include("head.inc");
             <table width="100%" border="0" cellpadding="6" cellspacing="0">
             <tr>
               <td width="22%" valign="top" class="vncellreq">Extension</td>
-              <td width="78%" class="vtable"> 
+              <td width="78%" class="vtable">
                 <input name="ivrextension" type="text" class="formfld" id="ivrextension" size="40" value="<?=htmlspecialchars($pconfig['ivrextension']);?>">
                 <br> <span class="vexpl">e.g. <em>5002</em></span></td>
             </tr>
             <tr>
               <td width="22%" valign="top" class="vncellreq">IVR Name</td>
-              <td width="78%" class="vtable"> 
+              <td width="78%" class="vtable">
                 <input name="ivrname" type="text" class="formfld" id="ivrname" size="40" value="<?=htmlspecialchars($pconfig['ivrname']);?>">
               </td>
             </tr>
             <tr>
               <td width="22%" valign="top" class="vncellreq">Recording Action</td>
-              <td width="78%" class="vtable"> 
-                <?php                
+              <td width="78%" class="vtable">
+                <?php
                 $a_recordings = &$config['installedpackages']['freeswitchrecordings']['config'];
                 echo "              <select name='recordingidaction' class='formfld'>\n";
                 echo "                <option></option>\n";
@@ -270,13 +270,13 @@ include("head.inc");
                   }
                 }
                 echo "              </select>\n";
-                ?>          
+                ?>
               </td>
             </tr>
             <tr>
               <td width="22%" valign="top" class="vncellreq">Recording Anti-Action</td>
-              <td width="78%" class="vtable"> 
-                <?php                
+              <td width="78%" class="vtable">
+                <?php
                 //$a_recordings = &$config['installedpackages']['freeswitchrecordings']['config'];
                 echo "              <select name='recordingidantiaction' class='formfld'>\n";
                 echo "                <option></option>\n";
@@ -291,33 +291,33 @@ include("head.inc");
                   }
                 }
                 echo "              </select>\n";
-                ?>          
+                ?>
               </td>
             </tr>
             <?php
             if (strlen($pconfig['ivrtimeout']) == 0) {
                 $pconfig['ivrtimeout'] = 10; //set a default timeout
-            }           
-            ?>                   
+            }
+            ?>
             <tr>
               <td width="22%" valign="top" class="vncellreq">Timeout</td>
-              <td width="78%" class="vtable"> 
+              <td width="78%" class="vtable">
                 <input name="ivrtimeout" type="text" class="formfld" id="ivrtimeout" size="40" value="<?=htmlspecialchars($pconfig['ivrtimeout']);?>">
-                <br><span class="vexpl">After the recording concludes the 
-                timeout sets the time in seconds to continue to wait for DTMF.  
-                If the DTMF is <br />not detected during that time the 't' 
+                <br><span class="vexpl">After the recording concludes the
+                timeout sets the time in seconds to continue to wait for DTMF.
+                If the DTMF is <br />not detected during that time the 't'
                 timeout option is executed.</span>
               </td>
             </tr>
             <tr>
               <td width="22%" valign="top" class="vncell">Context</td>
-              <td width="78%" class="vtable"> 
+              <td width="78%" class="vtable">
                 <input name="ivrcontext" type="text" class="formfld" id="ivrextension" size="40" value="<?=htmlspecialchars($pconfig['ivrcontext']);?>">
                 <br> <span class="vexpl">e.g. <em>default</em></span></td>
-            </tr>                        
+            </tr>
             <tr>
               <td width="22%" valign="top" class="vncell">Description</td>
-              <td width="78%" class="vtable"> 
+              <td width="78%" class="vtable">
                 <input name="ivrdescr" type="text" class="formfld" id="descr" size="40" value="<?=htmlspecialchars($pconfig['ivrdescr']);?>">
                 <br> <span class="vexpl">You may enter a description here
                 for your reference (not parsed).</span></td>
@@ -335,14 +335,14 @@ include("head.inc");
                 echo "<textarea name=\"ivrconditionjs\" cols=\"50\" rows=\"7\" wrap=\"off\">".htmlspecialchars(base64_decode($pconfig['ivrconditionjs']))."</textarea>\n";
               }
               ?>
-                <br> <span class="vexpl">A simple valid condition is: 
-                condition=true; To re-populate the default simply empty the 
-                textarea and click on save. The following javascript variables 
-                have been defined: Hours, Mins, Seconds, Month, Date, Year, 
+                <br> <span class="vexpl">A simple valid condition is:
+                condition=true; To re-populate the default simply empty the
+                textarea and click on save. The following javascript variables
+                have been defined: Hours, Mins, Seconds, Month, Date, Year,
                 and Day.</span></td>
-            </tr>        
-            
-            
+            </tr>
+
+
             <tr>
               <td width="22%" valign="top">&nbsp;</td>
               <td width="78%">
@@ -355,39 +355,39 @@ include("head.inc");
             </tr>
             </table>
         </form>
-        
+
       <br>
       <br>
 
       <form action="freeswitch_ivr_edit.php" method="post" name="iform2" id="iform2">
-      <?php 
-      
-      
+      <?php
+
+
       //echo "<pre>";
       //print_r ($a_ivr);
       //echo "</pre>";
-      
-      //if ($savemsg) print_info_box($savemsg); 
+
+      //if ($savemsg) print_info_box($savemsg);
       //if (file_exists($d_hostsdirty_path)): echo"<p>";
       //print_info_box_np("The FreeSWITCH recordings have been changed.<br>You must apply the changes in order for them to take effect.");
       //echo"<br />";
-      //endif; 
-      
+      //endif;
+
       ?>
-      
-    <table width="100%" border="0" cellpadding="6" cellspacing="0">              
+
+    <table width="100%" border="0" cellpadding="6" cellspacing="0">
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong><br>
             </strong></span>
-            Options are the choices that are available to the caller when they 
-            are calling the auto attendant. If the caller presses 2 then the call 
+            Options are the choices that are available to the caller when they
+            are calling the auto attendant. If the caller presses 2 then the call
             is directed to the corresponding destination.
             </span></p></td>
       </tr>
     </table>
-    
-    
-  	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
+
+
+  	<table width="100%" border="0" cellpadding="6" cellspacing="0">
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>Action<br />
             </strong></span>
@@ -396,7 +396,7 @@ include("head.inc");
       </tr>
     </table>
     <br />
-        
+
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
       <td width="20%" class="listhdrr">Option</td>
@@ -413,9 +413,9 @@ include("head.inc");
       </td>
 		</tr>
 
-		<?php 
+		<?php
       $i = 0;
-      if (count($a_ivr_options) > 0) { 
+      if (count($a_ivr_options) > 0) {
         foreach ($a_ivr_options as $ent) {
           if ($ent['optionaction'] == "action" && $ivrid == $ent['ivrid']) {
     ?>
@@ -428,7 +428,7 @@ include("head.inc");
               </td>
               <td class="listr" ondblclick="document.location='freeswitch_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
                 <?=$ent['optiondest'];?>&nbsp;
-              </td>      
+              </td>
               <td class="listbg" ondblclick="document.location='freeswitch_ivr_options_edit.php?id=<?=$id;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
                 <font color="#FFFFFF"><?=htmlspecialchars($ent['optiondescr']);?>&nbsp;
               </td>
@@ -441,9 +441,9 @@ include("head.inc");
                </table>
               </td>
             </tr>
-		<?php 
+		<?php
 		      }
-          $i++; 
+          $i++;
         }
       }
     ?>
@@ -465,36 +465,36 @@ include("head.inc");
        <td class="list"></td>
      </tr>
      </table>
-     
+
       </form>
-      
+
 
 
       <form action="freeswitch_ivr_edit.php" method="post" name="iform2" id="iform2">
-      <?php 
-      
-      
+      <?php
+
+
       //echo "<pre>";
       //print_r ($a_ivr);
       //echo "</pre>";
-      
-      //if ($savemsg) print_info_box($savemsg); 
+
+      //if ($savemsg) print_info_box($savemsg);
       //if (file_exists($d_hostsdirty_path)): echo"<p>";
       //print_info_box_np("The FreeSWITCH recordings have been changed.<br>You must apply the changes in order for them to take effect.");
       //echo"<br />";
-      //endif; 
-      
+      //endif;
+
       ?>
-  	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
+  	<table width="100%" border="0" cellpadding="6" cellspacing="0">
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>Anti-Action<br />
             </strong></span>
-              The options that are executed when the <b>condition does NOT match.</b> 
+              The options that are executed when the <b>condition does NOT match.</b>
             </span></p></td>
       </tr>
     </table>
     <br />
-        
+
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
       <td width="20%" class="listhdrr">Option</td>
@@ -511,9 +511,9 @@ include("head.inc");
       </td>
 		</tr>
 
-		<?php 
+		<?php
       $i = 0;
-      if (count($a_ivr_options) > 0) { 
+      if (count($a_ivr_options) > 0) {
         foreach ($a_ivr_options as $ent) {
           if ($ent['optionaction'] == "anti-action" && $ivrid == $ent['ivrid']) {
     ?>
@@ -526,7 +526,7 @@ include("head.inc");
               </td>
               <td class="listr" ondblclick="document.location='freeswitch_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
                 <?=$ent['optiondest'];?>&nbsp;
-              </td>      
+              </td>
               <td class="listbg" ondblclick="document.location='freeswitch_ivr_options_edit.php?id=<?=$id;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
                 <font color="#FFFFFF"><?=htmlspecialchars($ent['optiondescr']);?>&nbsp;
               </td>
@@ -539,9 +539,9 @@ include("head.inc");
                </table>
               </td>
             </tr>
-		<?php 
+		<?php
 		      }
-          $i++; 
+          $i++;
         }
       }
     ?>
@@ -563,11 +563,11 @@ include("head.inc");
        <td class="list"></td>
      </tr>
      </table>
-     
+
       </form>
-      
+
       <br>
-      <br>     
+      <br>
 
      </td>
    </tr>

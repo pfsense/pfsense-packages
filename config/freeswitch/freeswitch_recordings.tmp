@@ -4,7 +4,7 @@
 	freeswitch_recordings.php
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
-  
+
   FreeSWITCH (TM)
   http://www.freeswitch.org/
 
@@ -49,7 +49,7 @@ if ($_GET['a'] == "download") {
             header("Content-Type: application/octet-stream");
             header("Content-Type: application/download");
             header("Content-Description: File Transfer");
-            header('Content-Disposition: attachment; filename="'.$_GET['filename'].'"');      
+            header('Content-Disposition: attachment; filename="'.$_GET['filename'].'"');
       	}
         else {
       	    $file_ext = substr($_GET['filename'], -3);
@@ -58,7 +58,7 @@ if ($_GET['a'] == "download") {
             }
       	    if ($file_ext == "mp3") {
               header("Content-Type: audio/mp3");
-            }                  
+            }
         }
         header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
         header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past	
@@ -66,7 +66,7 @@ if ($_GET['a'] == "download") {
         fpassthru($fd);
     }
   }
-  
+
   if ($_GET['type'] = "moh") {
     if  (file_exists($dir_music_on_hold_8000.$_GET['filename'])) {
       	$fd = fopen($dir_music_on_hold_8000.$_GET['filename'], "rb");
@@ -75,7 +75,7 @@ if ($_GET['a'] == "download") {
             header("Content-Type: application/octet-stream");
             header("Content-Type: application/download");
             header("Content-Description: File Transfer");
-            header('Content-Disposition: attachment; filename="'.$_GET['filename'].'"');      
+            header('Content-Disposition: attachment; filename="'.$_GET['filename'].'"');
       	}
         else {
       	    $file_ext = substr($_GET['filename'], -3);
@@ -84,7 +84,7 @@ if ($_GET['a'] == "download") {
             }
       	    if ($file_ext == "mp3") {
               header("Content-Type: audio/mp3");
-            }                 
+            }
         }
         header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
         header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past	
@@ -180,29 +180,29 @@ function EvalSound(soundobj) {
    <tr>
      <td class="tabcont" >
 
-<?php 
+<?php
 
 
 //build a list of recordings from the config.xml
 $config_recording_list = '';
-$i = 0; 
+$i = 0;
 if (count($a_recordings) > 0) {
   foreach ($a_recordings as $recordingent) {
     $config_recording_list .= $recordingent['filename']."|";
-    $i++; 
+    $i++;
   }
 }
 
 
-                
+
 $config_change = 0; 	
 if (is_dir($dir_recordings)) {
     if ($dh = opendir($dir_recordings)) {
         while (($file = readdir($dh)) !== false) {
-            if (filetype($dir_recordings . $file) == "file") {                
-          
+            if (filetype($dir_recordings . $file) == "file") {
+
                 if (strpos($config_recording_list, $file) === false) {
-                    
+
                     //$handle = fopen($dir_recordings.$file,'rb');
                     //$file_content = fread($handle,filesize($dir_recordings.$file));
                     //fclose($handle);
@@ -215,83 +215,83 @@ if (is_dir($dir_recordings)) {
                     $recordingent['recordingid'] = guid();
                     //$recordingent['filecontent'] = base64_encode($file_content);
                     $recordingent['descr'] = 'Auto';
-                    
+
                     $a_recordings[] = $recordingent;
                     write_config();
-                    
+
                     unset($file_content);
-                  
+
                 }
                 else {
                     //echo "The file was found.<br/>";
                 }
-                
+
             }
         }
         closedir($dh);
     }
 }
 
- 
 
-//saved for future use if and when config.xml scales well 
+
+//saved for future use if and when config.xml scales well
 	//enough to save the files inside it
 //$i = 0;
-//if (count($a_recordings) > 0) { 
+//if (count($a_recordings) > 0) {
 //	foreach ($a_recordings as $recordingent) {
 	
 //	  if (!is_file($dir_recordings.$recordingent['filename'])) {
 	      //echo "not found: ".$recordingent['filename']."<br />";
-	      
+	
 	      //recording not found restore the file from the config.xml
-	          //$file_content = $recordingent['filecontent'];       
+	          //$file_content = $recordingent['filecontent'];
 	          //$handle = fopen($dir_recordings.$recordingent['filename'],'w');
-	          //fwrite ($handle, base64_decode($file_content)); 
+	          //fwrite ($handle, base64_decode($file_content));
 	          //unset($file_content);
 	          //fclose($handle);
-	          //$recordingent['filecontent'] = base64_encode($file_content);     
-	      
-	      // loop through recordings in the config.xml 
+	          //$recordingent['filecontent'] = base64_encode($file_content);
+	
+	      // loop through recordings in the config.xml
 	      //  if the file does not exist remove it from the file system.
 	      //unset($a_recordings[$i]);
-	      
-//	      $config_change = 1; 
+	
+//	      $config_change = 1;
 //	  }
 //	  else {
-	      //echo "found: ".$recordingent['filename']."<br />";  
+	      //echo "found: ".$recordingent['filename']."<br />";
 //	  }
 	
-//	$i++; 
+//	$i++;
 //	}
 //}
 
 if ($config_change == 1) {
     write_config();
-    $config_change = 0;  
+    $config_change = 0;
 }
 
-//if ($savemsg) print_info_box($savemsg); 
+//if ($savemsg) print_info_box($savemsg);
 //if (file_exists($d_hostsdirty_path)): echo"<p>";
 //print_info_box_np("The FreeSWITCH recordings have been changed.<br>You must apply the changes in order for them to take effect.");
 //echo"<br />";
-//endif; 
+//endif;
 
 ?>
-	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
+	<table width="100%" border="0" cellpadding="6" cellspacing="0">
     <tr>
       <td><p><span class="vexpl"><span class="red"><strong>Recordings:<br>
           </strong></span>
           To make a recording dial extension 732673 (record) or you can make a
-          16bit 8khz/16khz Mono WAV file then copy it to the 
-          following directory then refresh the page to play it back. 
-          Click on the 'Filename' to download it or the 'Recording Name' to 
+          16bit 8khz/16khz Mono WAV file then copy it to the
+          following directory then refresh the page to play it back.
+          Click on the 'Filename' to download it or the 'Recording Name' to
           play the audio.
           </span></p></td>
     </tr>
   </table>
-  
+
   <br />
-  
+
 	<div id="niftyOutter">
 	<form action="" method="POST" enctype="multipart/form-data" name="frmUpload" onSubmit="">
 	  <table border='0'>
@@ -305,11 +305,11 @@ if ($config_change == 1) {
 			     <input name="ulfile" type="file" class="button" id="ulfile">
 			     <input name="submit" type="submit"  class="button" id="upload" value="Upload">
 	      </td>
-	    </tr>	   
+	    </tr>	
 	  </table>
 	</div>
 	</form>
-        
+
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
       <td width="30%" class="listhdrr">Filename (download)</td>
@@ -327,9 +327,9 @@ if ($config_change == 1) {
       </td>
 		</tr>
 
-      <?php 
+      <?php
       $i = 0;
-      if (count($a_recordings) > 0) { 
+      if (count($a_recordings) > 0) {
       	foreach ($a_recordings as $recordingent) {
       ?>
       <tr>
@@ -341,7 +341,7 @@ if ($config_change == 1) {
       <td class="listr" ondblclick="document.location='freeswitch_recordings_edit.php?id=<?=$i;?>';">
           <a href="javascript:void(0);" onclick="window.open('freeswitch_recordings_play.php?a=download&type=rec&filename=<?=$recordingent['filename'];?>', 'play',' width=420,height=40,menubar=no,status=no,toolbar=no')">
             <?=$recordingent['recordingname'];?>&nbsp;
-          </a>        
+          </a>
       </td>
       <td class="listbg" ondblclick="document.location='freeswitch_recordings_edit.php?id=<?=$i;?>';">
         <font color="#FFFFFF"><?=htmlspecialchars($recordingent['descr']);?>&nbsp;
@@ -355,12 +355,12 @@ if ($config_change == 1) {
        </table>
       </td>
       </tr>
-      <?php 
+      <?php
       	$i++;
-      	} //end for each 
+      	} //end for each
       } //end count
       ?>
-      
+
       <!--
       <tr>
       <td class="list" colspan="3"></td>
@@ -380,28 +380,28 @@ if ($config_change == 1) {
        <td class="list"></td>
      </tr>
      </table>
-     
 
 
+
     <br />
     <br />
     <br />
-    
-  	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
+
+  	<table width="100%" border="0" cellpadding="6" cellspacing="0">
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>Music on Hold:<br>
             </strong></span>
-            Music on hold can be in WAV or MP3 format. To play MP3 you must have 
-            mod_shout enabled on the 'Modules' tab.  For best performance 
-            upload 16bit 8khz/16khz Mono WAV files. 
-            <!--Click on the 'Filename' to download it or the 'Recording Name' to 
+            Music on hold can be in WAV or MP3 format. To play MP3 you must have
+            mod_shout enabled on the 'Modules' tab.  For best performance
+            upload 16bit 8khz/16khz Mono WAV files.
+            <!--Click on the 'Filename' to download it or the 'Recording Name' to
             play the audio.-->
             </span></p></td>
       </tr>
     </table>
-    
+
     <br />
-    
+
   	<div id="niftyOutter">
   	<form action="" method="POST" enctype="multipart/form-data" name="frmUpload" onSubmit="">
   	  <table border='0'>
@@ -414,8 +414,8 @@ if ($config_change == 1) {
   	      <td valign="top" class="label">
   			     <input name="ulfile" type="file" class="button" id="ulfile">
   			     <input name="submit" type="submit"  class="button" id="upload" value="Upload">
-  	      </td>  
-  	    </tr>	   
+  	      </td>
+  	    </tr>	
   	  </table>
   	</div>
   	</form>
@@ -434,7 +434,7 @@ if ($config_change == 1) {
     if ($handle = opendir($dir_music_on_hold_8000)) {
         while (false !== ($file = readdir($handle))) {
             if ($file != "." && $file != ".." && is_file($dir_music_on_hold_8000.$file)) {
-                
+
                 $tmp_filesize = filesize($dir_music_on_hold_8000.$file);
                 $tmp_filesize = byte_convert($tmp_filesize);
 
@@ -442,18 +442,18 @@ if ($config_change == 1) {
                 echo "  <td class=\"listlr\" ondblclick=\"\">\n";
                 echo "	  <a href=\"freeswitch_recordings.php?a=download&type=moh&t=bin&filename=".$file."\">\n";
                 echo "    	$file";
-                echo "	  </a>";                
+                echo "	  </a>";
                 echo "  </td>\n";
                 echo "  <td class=\"listlr\" ondblclick=\"\">\n";
                 echo "	  <a href=\"javascript:void(0);\" onclick=\"window.open('freeswitch_recordings_play.php?a=download&type=moh&filename=".$file."', 'play',' width=420,height=40,menubar=no,status=no,toolbar=no')\">\n";
                 $tmp_file_array = split("\.",$file);
                 echo "    	".$tmp_file_array[0];
-                echo "	  </a>";                
-                echo "  </td>\n";                
+                echo "	  </a>";
+                echo "  </td>\n";
                 echo "  <td class=\"listlr\" ondblclick=\"\">\n";
                 echo 		date ("F d Y H:i:s", filemtime($dir_music_on_hold_8000.$file));
                 echo "  </td>\n";
-                echo "  <td class=\"listlr\" ondblclick=\"\">\n";                
+                echo "  <td class=\"listlr\" ondblclick=\"\">\n";
                 echo "	".$tmp_filesize;
                 echo "  </td>\n";
                 echo "  <td valign=\"middle\" nowrap class=\"list\">\n";
@@ -465,7 +465,7 @@ if ($config_change == 1) {
                 echo "   </table>\n";
                 echo "  </td>\n";
                 echo "</tr>\n";
-        
+
             }
         }
         closedir($handle);

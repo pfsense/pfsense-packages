@@ -4,7 +4,7 @@
 	freeswitch_gateways.php
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
-  
+
   FreeSWITCH (TM)
   http://www.freeswitch.org/
 
@@ -83,21 +83,21 @@ include("head.inc");
      <td class="tabcont" >
 
 <form action="freeswitch_gateways.php" method="post" name="iform" id="iform">
-<?php 
+<?php
 
 if ($config_change == 1) {
     write_config();
-    $config_change = 0;  
+    $config_change = 0;
 }
 
-//if ($savemsg) print_info_box($savemsg); 
+//if ($savemsg) print_info_box($savemsg);
 //if (file_exists($d_hostsdirty_path)): echo"<p>";
 //print_info_box_np("The FreeSWITCH gateways have been changed.<br>You must apply the changes in order for them to take effect.");
 //echo"<br />";
-//endif; 
+//endif;
 
 ?>
-  	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
+  	<table width="100%" border="0" cellpadding="6" cellspacing="0">
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>Gateways<br>
             </strong></span>
@@ -106,7 +106,7 @@ if ($config_change == 1) {
       </tr>
     </table>
     <br />
-        
+
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
       <td width="20%" class="listhdrr">Gateway</td>
@@ -126,24 +126,24 @@ if ($config_change == 1) {
 		</tr>
 
 
-		<?php 
-    
+		<?php
+
     $i = 0;
     if (count($a_gateways) > 0) {
 
       foreach ($a_gateways as $ent) {
-    
+
     ?>
           <tr>
             <td class="listr" ondblclick="document.location='freeswitch_gateways_edit.php?id=<?=$i;?>';">
               <?=$ent['gateway'];?>&nbsp;
-            </td>      
+            </td>
             <td class="listr" ondblclick="document.location='freeswitch_gateways_edit.php?id=<?=$i;?>';">
               <?=$ent['context'];?>&nbsp;
             </td>
             <td class="listr" ondblclick="document.location='freeswitch_gateways_edit.php?id=<?=$i;?>';">
               <?=$ent['enabled'];?>&nbsp;
-            </td>      
+            </td>
             <td class="listbg" ondblclick="document.location='freeswitch_gateways_edit.php?id=<?=$i;?>';">
               <font color="#FFFFFF"><?=htmlspecialchars($ent['description']);?>&nbsp;
             </td>
@@ -156,16 +156,16 @@ if ($config_change == 1) {
              </table>
             </td>
           </tr>
-		<?php 
+		<?php
 
-          $i++; 
+          $i++;
         }
       }
     ?>
 
     <tr>
       <td class="list" colspan="4"></td>
-      <td class="list">          
+      <td class="list">
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
@@ -181,7 +181,7 @@ if ($config_change == 1) {
        <td class="list"></td>
      </tr>
      </table>
-     
+
 </form>
 
 
