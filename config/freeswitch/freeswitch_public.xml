@@ -73,6 +73,10 @@
 			<url>/pkg_edit.php?xml=freeswitch_external.xml&amp;id=0</url>
 		</tab>
 		<tab>
+			<text>Features</text>
+			<url>/freeswitch/freeswitch_features.php</url>
+		</tab>
+		<tab>
 			<text>Gateways</text>
 			<url>/freeswitch/freeswitch_gateways.php</url>
 		</tab>
@@ -81,21 +85,9 @@
 			<url>/pkg_edit.php?xml=freeswitch_internal.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>IVR</text>
-			<url>/freeswitch/freeswitch_ivr.php</url>
-		</tab>
-		<tab>
-			<text>Modules</text>
-			<url>/pkg_edit.php?xml=freeswitch_modules.xml&amp;id=0</url>
-		</tab>
-		<tab>
 			<text>Public</text>
 			<url>/freeswitch/freeswitch_public_includes.php</url>
 			<active/>
-		</tab>
-		<tab>
-			<text>Rec</text>
-			<url>/freeswitch/freeswitch_recordings.php</url>
 		</tab>
 		<tab>
 			<text>Status</text>
