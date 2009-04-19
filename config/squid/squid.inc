@@ -285,6 +285,10 @@ function squid_before_form_general($pkg) {
 
 function squid_validate_general($post, $input_errors) {
 	global $config;
+	$settings = $config['installedpackages']['squid']['config'][0];
+	$port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
+	$port = $post['proxy_port'] ? $post['proxy_port'] : $port;
+
 	$icp_port = trim($post['icp_port']);
 	if (!empty($icp_port) && !is_port($icp_port))
 		$input_errors[] = 'You must enter a valid port number in the \'ICP port\' field';
