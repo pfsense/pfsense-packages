@@ -468,6 +468,11 @@
 			</options>
 		</field>
 		<field>
+			<fielddescr>Power Down Instead of Halt</fielddescr>
+			<fieldname>powerdown</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>Local Remote Access Address &lt;br&gt;(ex: 192.168.1.0/24)</fielddescr>
 			<fieldname>allowaddr</fieldname>
 			<type>input</type>

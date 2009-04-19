@@ -172,6 +172,7 @@
 		$remoteaddr = nut_config('remoteaddr');
 		$remoteuser = nut_config('remoteuser');
 		$remotepass = nut_config('remotepass');
+		$shutdownflag  = (nut_config('powerdown') == 'on') ? '-p' : '-h';
 
 		if(!($remotename && $remoteaddr && $remoteuser && $remotepass))
 			return false;
@@ -180,7 +181,7 @@
 		$upsmon_conf = <<<EOD
 MONITOR {$remotename}@{$remoteaddr} 1 {$remoteuser} {$remotepass} slave
 MINSUPPLIES 1
-SHUTDOWNCMD "/sbin/shutdown -h +0"
+SHUTDOWNCMD "/sbin/shutdown {$shutdownflag} +0"
 POWERDOWNFLAG /etc/killpower
 EOD;
 	
@@ -218,6 +219,8 @@ EOD;
 		$allowaddr = nut_config('allowaddr');
 		$allowuser = nut_config('allowuser');
 		$allowpass = nut_config('allowpass');
+		$shutdownflag  = (nut_config('powerdown') == 'on') ? '-p' : '-h';
+
 
 		if(!($name && $driver && $port))
 			return false;
@@ -276,7 +279,7 @@ EOD;
 		$upsmon_conf = <<<EOD
 MONITOR {$name}@localhost 1 monuser mypass master
 MINSUPPLIES 1
-SHUTDOWNCMD "/sbin/shutdown -h +0"
+SHUTDOWNCMD "/sbin/shutdown {$shutdownflag} +0"
 POWERDOWNFLAG /etc/killpower
 EOD;
 
