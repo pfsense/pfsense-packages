@@ -1672,7 +1672,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.8.4";
+	$freeswitch_package_version = "0.8.4.1";
 	$freeswitch_build_version = "1.0.3";
 	$freeswitch_build_revision = "12545";
 
@@ -1750,6 +1750,9 @@ function freeswitch_php_install_command()
 	exec("cp /tmp/freeswitch_extensions_edit.tmp /usr/local/www/freeswitch/freeswitch_extensions_edit.php");
 	unlink_if_exists("/tmp/freeswitch_extensions_edit.tmp");
 
+	exec("cp /tmp/freeswitch_features.tmp /usr/local/www/freeswitch/freeswitch_features.php");
+	unlink_if_exists("/tmp/freeswitch_features.tmp");	
+	
 	exec("cp /tmp/freeswitch_gateways.tmp /usr/local/www/freeswitch/freeswitch_gateways.php");
 	unlink_if_exists("/tmp/freeswitch_gateways.tmp");
 	
