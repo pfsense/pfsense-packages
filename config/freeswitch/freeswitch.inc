@@ -256,7 +256,7 @@ function  recording_js()
     //$tmp .= "      session.execute(\"speak\", \"Please enter your pin number now.\");\n";
     $tmp .= "      digitmaxlength = 6;\n";
     $tmp .= "      session.execute(\"set\", \"playback_terminators=#\");\n";
-    $tmp .= "      session.streamFile( \"/usr/local/freeswitch/sounds/custom/8000/please_enter_your_pin_number.wav\", mycb, \"dtmf\");\n";
+    $tmp .= "      session.streamFile( \"/usr/local/freeswitch/sounds/custom/8000/please_enter_the_pin_number.wav\", mycb, \"dtmf\");\n";
     $tmp .= "      session.collectInput( mycb, dtmf, timeoutpin );\n";
     $tmp .= "  }\n";
     $tmp .= "\n";
