@@ -144,17 +144,17 @@ if ($_POST) {
 	                    $label = "11 digits";
 	                    $abbrv = "11d";
 	                    break;
-	                case "^311$":
+	                case "^(311)$":
 	                    $action_data = "sofia/gateway/".$gateway."/\$1";
 	                    $label = "311";
 	                    $abbrv = "311";
 	                    break;
-	                case "^411$":
+	                case "^(411)$":
 	                    $action_data = "sofia/gateway/".$gateway."/\$1";
 	                    $label = "411";
 	                    $abbrv = "411";
 	                    break;
-	                case "^911$":
+	                case "^(911)$":
 	                    $action_data = "sofia/gateway/".$gateway."/\$1";
 	                    $label = "911";
 	                    $abbrv = "911";
