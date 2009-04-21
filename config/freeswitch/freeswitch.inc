@@ -256,7 +256,7 @@ function  recording_js()
     //$tmp .= "      session.execute(\"speak\", \"Please enter your pin number now.\");\n";
     $tmp .= "      digitmaxlength = 6;\n";
     $tmp .= "      session.execute(\"set\", \"playback_terminators=#\");\n";
-    $tmp .= "      session.streamFile( \"/usr/local/freeswitch/recordings/please_enter_your_pin_number.wav\", mycb, \"dtmf\");\n";
+    $tmp .= "      session.streamFile( \"/usr/local/www/freeswitch/sounds/custom/8000/please_enter_your_pin_number.wav\", mycb, \"dtmf\");\n";
     $tmp .= "      session.collectInput( mycb, dtmf, timeoutpin );\n";
     $tmp .= "  }\n";
     $tmp .= "\n";
@@ -265,7 +265,7 @@ function  recording_js()
     //$tmp .= "      session.execute(\"set\", \"tts_engine=flite\");\n";
     //$tmp .= "      session.execute(\"set\", \"tts_voice=kal\");\n";
     //$tmp .= "      session.execute(\"speak\", \"Begin recording.\");\n";
-    $tmp .= "      session.streamFile( \"/usr/local/freeswitch/recordings/begin_recording.wav\", mycb, \"dtmf\");\n";
+    $tmp .= "      session.streamFile( \"/usr/local/www/freeswitch/sounds/custom/8000/begin_recording.wav\", mycb, \"dtmf\");\n";
     $tmp .= "      session.execute(\"set\", \"playback_terminators=#\");\n";
     $tmp .= "      session.execute(\"record\", \"/usr/local/freeswitch/recordings/temp\"+Year+Month+Day+Hours+Mins+Seconds+\".wav 180 200\");\n";
     $tmp .= "  }\n";
@@ -274,7 +274,7 @@ function  recording_js()
     //$tmp .= "      session.execute(\"set\", \"tts_engine=flite\");\n";
     //$tmp .= "      session.execute(\"set\", \"tts_voice=kal\");\n";
     //$tmp .= "      session.execute(\"speak\", \"Your pin number is incorect, goodbye.\");\n";
-    $tmp .= "      session.streamFile( \"/usr/local/freeswitch/recordings/your_pin_number_is_incorect_goodbye.wav\", mycb, \"dtmf\");\n";
+    $tmp .= "      session.streamFile( \"/usr/local/www/freeswitch/sounds/custom/8000/your_pin_number_is_incorect_goodbye.wav\", mycb, \"dtmf\");\n";
     $tmp .= "  }\n";
     $tmp .= "  session.hangup();\n";
     $tmp .= "\n";
@@ -297,51 +297,60 @@ function sync_package_freeswitch_settings()
 	
       foreach($config['installedpackages']['freeswitchsettings']['config'] as $rowhelper) {
 
-          $fout = fopen("/usr/local/freeswitch/conf/directory/default/default.xml","w");		
-          $tmpxml = "<include>\n";
-          $tmpxml .= "  <user id=\"default\"> <!--if id is numeric mailbox param is not necessary-->\n";
-          $tmpxml .= "    <variables>\n";
-          $tmpxml .= "      <!--all variables here will be set on all inbound calls that originate from this user -->\n";
-          $tmpxml .= "      <!-- set these to take advantage of a dialplan localized to this user -->\n";
-          $tmpxml .= "      <variable name=\"numbering_plan\" value=\"" . $rowhelper['numbering_plan'] . "\"/>\n";
-          $tmpxml .= "      <variable name=\"default_gateway\" value=\"" . $rowhelper['default_gateway'] . "\"/>\n";
-          $tmpxml .= "      <variable name=\"default_area_code\" value=\"" . $rowhelper['default_area_code'] . "\"/>\n";
-          $tmpxml .= "    </variables>\n";
-          $tmpxml .= "  </user>\n";
-          $tmpxml .= "</include>\n";
-          fwrite($fout, $tmpxml);
-          unset($tmpxml);
-          fclose($fout);
+		$fout = fopen("/usr/local/freeswitch/conf/directory/default/default.xml","w");		
+		$tmpxml = "<include>\n";
+		$tmpxml .= "  <user id=\"default\"> <!--if id is numeric mailbox param is not necessary-->\n";
+		$tmpxml .= "    <variables>\n";
+		$tmpxml .= "      <!--all variables here will be set on all inbound calls that originate from this user -->\n";
+		$tmpxml .= "      <!-- set these to take advantage of a dialplan localized to this user -->\n";
+		$tmpxml .= "      <variable name=\"numbering_plan\" value=\"" . $rowhelper['numbering_plan'] . "\"/>\n";
+		$tmpxml .= "      <variable name=\"default_gateway\" value=\"" . $rowhelper['default_gateway'] . "\"/>\n";
+		$tmpxml .= "      <variable name=\"default_area_code\" value=\"" . $rowhelper['default_area_code'] . "\"/>\n";
+		$tmpxml .= "    </variables>\n";
+		$tmpxml .= "  </user>\n";
+		$tmpxml .= "</include>\n";
+		fwrite($fout, $tmpxml);
+		unset($tmpxml);
+		fclose($fout);
 
-          $fout = fopen("/usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml","w");
-          $tmpxml = "<configuration name=\"event_socket.conf\" description=\"Socket Client\">\n";
-          $tmpxml .= "  <settings>\n";
-          $tmpxml .= "    <param name=\"listen-ip\" value=\"0.0.0.0\"/>\n";
-          $tmpxml .= "    <param name=\"listen-port\" value=\"" . $rowhelper['event_socket_port'] . "\"/>\n";
-          $tmpxml .= "    <param name=\"password\" value=\"" . $rowhelper['event_socket_password'] . "\"/>\n";
-          $tmpxml .= "    <!--<param name=\"apply-inbound-acl\" value=\"lan\"/>-->\n";
-          $tmpxml .= "  </settings>\n";
-          $tmpxml .= "</configuration>";
-          fwrite($fout, $tmpxml);
-          unset($tmpxml, $event_socket_password);
-          fclose($fout);
+		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml","w");
+		$tmpxml = "<configuration name=\"event_socket.conf\" description=\"Socket Client\">\n";
+		$tmpxml .= "  <settings>\n";
+		$tmpxml .= "    <param name=\"listen-ip\" value=\"0.0.0.0\"/>\n";
+		$tmpxml .= "    <param name=\"listen-port\" value=\"" . $rowhelper['event_socket_port'] . "\"/>\n";
+		$tmpxml .= "    <param name=\"password\" value=\"" . $rowhelper['event_socket_password'] . "\"/>\n";
+		$tmpxml .= "    <!--<param name=\"apply-inbound-acl\" value=\"lan\"/>-->\n";
+		$tmpxml .= "  </settings>\n";
+		$tmpxml .= "</configuration>";
+		fwrite($fout, $tmpxml);
+		unset($tmpxml, $event_socket_password);
+		fclose($fout);
 
-          $fout = fopen("/usr/local/freeswitch/conf/autoload_configs/xml_rpc.conf","w");
-          $tmpxml = "<configuration name=\"xml_rpc.conf\" description=\"XML RPC\">\n";
-          $tmpxml .= "  <settings>\n";
-          $tmpxml .= "    <!-- The port where you want to run the http service (default 8080) -->\n";
-          $tmpxml .= "    <param name=\"http-port\" value=\"" . $rowhelper['xml_rpc_http_port'] . "\"/>\n";
-          $tmpxml .= "    <!-- if all 3 of the following params exist all http traffic will require auth -->\n";
-          $tmpxml .= "    <param name=\"auth-realm\" value=\"" . $rowhelper['xml_rpc_auth_realm'] . "\"/>\n";
-          $tmpxml .= "    <param name=\"auth-user\" value=\"" . $rowhelper['xml_rpc_auth_user'] . "\"/>\n";
-          $tmpxml .= "    <param name=\"auth-pass\" value=\"" . $rowhelper['xml_rpc_auth_pass'] . "\"/>\n";
-          $tmpxml .= "  </settings>\n";
-          $tmpxml .= "</configuration>\n";
-          fwrite($fout, $tmpxml);
-          unset($tmpxml, $event_socket_password);
-          fclose($fout);
+		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/xml_rpc.conf","w");
+		$tmpxml = "<configuration name=\"xml_rpc.conf\" description=\"XML RPC\">\n";
+		$tmpxml .= "  <settings>\n";
+		$tmpxml .= "    <!-- The port where you want to run the http service (default 8080) -->\n";
+		$tmpxml .= "    <param name=\"http-port\" value=\"" . $rowhelper['xml_rpc_http_port'] . "\"/>\n";
+		$tmpxml .= "    <!-- if all 3 of the following params exist all http traffic will require auth -->\n";
+		$tmpxml .= "    <param name=\"auth-realm\" value=\"" . $rowhelper['xml_rpc_auth_realm'] . "\"/>\n";
+		$tmpxml .= "    <param name=\"auth-user\" value=\"" . $rowhelper['xml_rpc_auth_user'] . "\"/>\n";
+		$tmpxml .= "    <param name=\"auth-pass\" value=\"" . $rowhelper['xml_rpc_auth_pass'] . "\"/>\n";
+		$tmpxml .= "  </settings>\n";
+		$tmpxml .= "</configuration>\n";
+		fwrite($fout, $tmpxml);
+		unset($tmpxml, $event_socket_password);
+		fclose($fout);
 
-          recording_js();
+		recording_js();
+		
+		//config.js
+		$admin_pin = $config['installedpackages']['freeswitchsettings']['config'][0]['admin_pin'];
+		$fout = fopen("/usr/local/freeswitch/scripts/config.js","w");
+		$tmp = "//javascript include\n\n";
+		$tmp .= "var admin_pin = \"" . $admin_pin . "\";\n";
+		fwrite($fout, $tmp);
+		unset($tmp);
+		fclose($fout);
 
       }
 
@@ -1701,17 +1710,25 @@ function freeswitch_php_install_command()
 	
 	//remove some default config files that are not needed
 	unlink_if_exists("/usr/local/freeswitch/conf/dialplan/default/01_example.com.xml");
-	unlink_if_exists("/usr/local/freeswitch/conf/dialplan/public/00_inbound_did.xml");
+	unlink_if_exists("/usr/local/freeswitch/conf/dialplan/public/00_inbound_did.xml");	
+
+	if (!is_dir('/usr/local/www/freeswitch/sounds/custom/')) {
+	   exec("mkdir /usr/local/www/freeswitch/sounds/custom/");
+	}
+
+	if (!is_dir('/usr/local/www/freeswitch/sounds/custom/8000/')) {
+	   exec("mkdir /usr/local/www/freeswitch/sounds/custom/8000/");
+	}
 
 	//copy audio files
-	exec("cp /tmp/please_enter_your_pin_number.wav /usr/local/freeswitch/recordings/please_enter_your_pin_number.wav");
-	unlink_if_exists("/tmp/please_enter_your_pin_number.wav");
-
-	exec("cp /tmp/begin_recording.wav /usr/local/freeswitch/recordings/begin_recording.wav");
-	unlink_if_exists("/tmp/begin_recording.wav");
-
-	exec("cp /tmp/your_pin_number_is_incorect_goodbye.wav /usr/local/freeswitch/recordings/your_pin_number_is_incorect_goodbye.wav");
-	unlink_if_exists("/tmp/your_pin_number_is_incorect_goodbye.wav");
+	exec("cd /usr/local/www/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_your_pin_number.wav");
+	exec("cd /usr/local/www/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_pin_number.wav");	
+	exec("cd /usr/local/www/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_extension_number.wav");
+	exec("cd /usr/local/www/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_phone_number.wav");
+	exec("cd /usr/local/www/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/call_forward_has_been_set.wav");
+	exec("cd /usr/local/www/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/call_forward_has_been_deleted.wav");	
+	exec("cd /usr/local/www/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/begin_recording.wav");
+	exec("cd /usr/local/www/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/your_pin_number_is_incorect_goodbye.wav");
 
 	
 	//rename .so files from .1 to .so
@@ -1803,6 +1820,9 @@ function freeswitch_php_install_command()
 	
 	exec("cp /tmp/freeswitch_time_conditions_edit.tmp /usr/local/www/freeswitch/freeswitch_time_conditions_edit.php");
 	unlink_if_exists("/tmp/freeswitch_time_conditions_edit.tmp");
+	
+	exec("cp /tmp/disa.js /usr/local/www/freeswitch/scripts/disa.js");
+	unlink_if_exists("/tmp/disa.js");
 
 	exec("cp /usr/local/freeswitch/htdocs/slim.swf /usr/local/www/freeswitch/slim.swf");
 
@@ -1872,36 +1892,82 @@ function freeswitch_php_install_command()
 	        	$i++;
 	      	}
 	    }
+	
+	//add recording to the dialplan
+		$dialplanincludeid = guid();
 
-    $dialplanincludeid = guid();
-
-    $ent = array();
-    $ent['dialplanincludeid'] = $dialplanincludeid;
-    $ent['extensionname'] = 'Recordings';
-    $ent['order'] = '9000';
-    $ent['context'] = 'default';
-    $ent['enabled'] = 'true';			
-    $ent['descr'] = 'Default system recordings tool';
-    $a_dialplan_includes[] = $ent;
-    unset($ent);
- 		
-    $ent = array();
-    $ent['dialplanincludeid'] = $dialplanincludeid;
-    $ent['tag'] = 'condition'; //condition, action, antiaction
-    $ent['fieldtype'] = 'destination_number';
-    $ent['fielddata'] = '^732673$';
-    $a_dialplan_include_details[] = $ent;
-    unset($ent);
-		
-    $ent = array();
-    $ent['dialplanincludeid'] = $dialplanincludeid;
-    $ent['tag'] = 'action'; //condition, action, antiaction
-    $ent['fieldtype'] = 'javascript';
-    $ent['fielddata'] = 'recordings.js';
-    $a_dialplan_include_details[] = $ent;
-    unset($ent);
+		$ent = array();
+		$ent['dialplanincludeid'] = $dialplanincludeid;
+		$ent['extensionname'] = 'Recordings';
+		$ent['order'] = '9000';
+		$ent['context'] = 'default';
+		$ent['enabled'] = 'true';			
+		$ent['descr'] = '*732673 Default system recordings tool';
+		$a_dialplan_includes[] = $ent;
+		unset($ent);
+			
+		$ent = array();
+		$ent['dialplanincludeid'] = $dialplanincludeid;
+		$ent['tag'] = 'condition'; //condition, action, antiaction
+		$ent['fieldtype'] = 'destination_number';
+		$ent['fielddata'] = '^\*(732673)$';
+		$a_dialplan_include_details[] = $ent;
+		unset($ent);
+			
+		$ent = array();
+		$ent['dialplanincludeid'] = $dialplanincludeid;
+		$ent['tag'] = 'action'; //condition, action, antiaction
+		$ent['fieldtype'] = 'javascript';
+		$ent['fielddata'] = 'recordings.js';
+		$a_dialplan_include_details[] = $ent;
+		unset($ent);
 
     write_config();
+
+	//delete dialplan DISA from the previous install
+		$disa_enabled = 'false';
+	    if (count($a_dialplan_includes) > 0) {
+	    	$i = 0;
+	    	foreach ($a_dialplan_includes as $ent) {
+	        	if ($ent['extensionname'] == "DISA") {
+					$disa_enabled = $ent['enabled'];
+					unset($a_dialplan_includes[$i]);
+	        	}
+	        	$i++;
+	    	}
+	    }
+		if (strlen(
+		
+	//add the DISA to the dialplan
+		$dialplanincludeid = guid();
+
+		$ent = array();
+		$ent['dialplanincludeid'] = $dialplanincludeid;
+		$ent['extensionname'] = 'DISA';
+		$ent['order'] = '000';
+		$ent['context'] = 'default';
+		$ent['enabled'] = disa_enabled;
+		$ent['descr'] = '*3472 Direct Inward System Access';
+		$a_dialplan_includes[] = $ent;
+		unset($ent);
+			
+		$ent = array();
+		$ent['dialplanincludeid'] = $dialplanincludeid;
+		$ent['tag'] = 'condition'; //condition, action, antiaction, set
+		$ent['fieldtype'] = 'destination_number';
+		$ent['fielddata'] = '^\*(3472)$';
+		$a_dialplan_include_details[] = $ent;
+		unset($ent);
+			
+		$ent = array();
+		$ent['dialplanincludeid'] = $dialplanincludeid;
+		$ent['tag'] = 'action'; //condition, action, antiaction, set
+		$ent['fieldtype'] = 'javascript';
+		$ent['fielddata'] = 'disa.js';
+		$a_dialplan_include_details[] = $ent;
+		unset($ent);
+
+	write_config();	
     		
 	//prepare switch.conf.xml for voicemail to email
 		$filename = "/usr/local/freeswitch/conf/autoload_configs/switch.conf.xml";
@@ -2168,6 +2234,7 @@ function freeswitch_php_install_command()
 	exec("cp /usr/local/freeswitch/conf/directory/default/brian.xml /usr/local/freeswitch/conf/directory/default/brian.xml.noload");
 	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/brian.xml");
 	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/example.com.xml");
+	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/99999_enum.xml");	
 	  	
 	write_rcfile(array(
 		"file" => "freeswitch.sh",

@@ -167,21 +167,6 @@
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/freeswitch/please_enter_your_pin_number.wav</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/freeswitch/begin_recording.wav</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/freeswitch/your_pin_number_is_incorect_goodbye.wav</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/class.smtp.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>

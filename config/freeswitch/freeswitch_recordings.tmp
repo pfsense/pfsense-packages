@@ -281,7 +281,7 @@ if ($config_change == 1) {
     <tr>
       <td><p><span class="vexpl"><span class="red"><strong>Recordings:<br>
           </strong></span>
-          To make a recording dial extension 732673 (record) or you can make a
+          To make a recording dial *732673 (record) or you can make a
           16bit 8khz/16khz Mono WAV file then copy it to the
           following directory then refresh the page to play it back.
           Click on the 'Filename' to download it or the 'Recording Name' to
@@ -391,9 +391,10 @@ if ($config_change == 1) {
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>Music on Hold:<br>
             </strong></span>
-            Music on hold can be in WAV or MP3 format. To play MP3 you must have
-            mod_shout enabled on the 'Modules' tab.  For best performance
-            upload 16bit 8khz/16khz Mono WAV files.
+            <!-- Music on hold can be in WAV or MP3 format. To play MP3 you must have
+            mod_shout enabled on the 'Modules' tab.  -->
+			Music on hold can be in WAV or MP3 format. 
+			For best performance upload 16bit 8khz/16khz Mono WAV files.
             <!--Click on the 'Filename' to download it or the 'Recording Name' to
             play the audio.-->
             </span></p></td>

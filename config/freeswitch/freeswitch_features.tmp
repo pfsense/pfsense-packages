@@ -104,11 +104,30 @@ include("head.inc");
 			calls to extensions, voicemail, queues, other IVR applications, and external
 			phone numbers.
 		</td>
-     </tr>
-     </table>
-
+	</tr>
+	</table>
+	
     <br />
     <br />
+	
+    <table width="100%" border="0" cellpadding="6" cellspacing="0">
+    <tr>
+      <td class="listtopic" colspan='2'>Direct Inward System Access (DISA)</td>
+	</tr>
+    <tr>
+		<td width='10%' class="vncell"></td>
+		<td class="vtable">
+			DISA allows inbound callers to make internal or external calls. For security reasons it is disabled by default.  
+			To enable it first set a secure pin number from the Settings->Admin PIN Number.
+			Then go to Dialplan tab and find the DISA entry and edit it to set 'Enabled' to 'true'. 
+			To use DISA dial *3427 (disa) enter the admin pin code and the extension or phone number you wish to call.
+		</td>
+	</tr>
+	</table>
+	
+    <br />
+    <br />
+	
 
     <table width="100%" border="0" cellpadding="6" cellspacing="0">
     <tr>
@@ -132,11 +151,11 @@ include("head.inc");
     <tr>
 		<td width='10%' class="vncell"><a href='/freeswitch/freeswitch_recordings.php'>Open</a></td>
 		<td class="vtable">
-			Music on hold can be in WAV or MP3 format. To play MP3 you must have mod_shout enabled
-			on the 'Modules' tab. For best performance upload 16bit 8khz/16khz Mono WAV files.
+			<!--Music on hold can be in WAV or MP3 format. To play MP3 you must have mod_shout enabled on the 'Modules' tab.-->
+			Music on hold can be in WAV format. For best performance upload 16bit 8khz/16khz Mono WAV files.
 		</td>
-     </tr>
-     </table>
+	</tr>
+	</table>
 	
     <br />
     <br />
@@ -148,24 +167,21 @@ include("head.inc");
 	<tr>
 		<td width='10%' class="vncell"><a href='/freeswitch/freeswitch_recordings.php'>Open</a></td>
 		<td class="vtable">
-			To make a recording dial extension 732673 (record) or you can make a 16bit 8khz/16khz
+			To make a recording dial *732673 (record) or you can make a 16bit 8khz/16khz
 			Mono WAV file then copy it to the following directory then refresh the page to play
 			it back. Click on the 'Filename' to download it or the 'Recording Name' to play the audio.
 		</td>
-	 </tr>
-	 </table>	
+	</tr>
+	</table>	
 	
-    <br />
-    <br />
-
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
 
 </td>
 </tr>
