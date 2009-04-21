@@ -393,7 +393,7 @@ if ($config_change == 1) {
             </strong></span>
             <!-- Music on hold can be in WAV or MP3 format. To play MP3 you must have
             mod_shout enabled on the 'Modules' tab.  -->
-			Music on hold can be in WAV or MP3 format. 
+			Music on hold is in WAV format. 
 			For best performance upload 16bit 8khz/16khz Mono WAV files.
             <!--Click on the 'Filename' to download it or the 'Recording Name' to
             play the audio.-->
