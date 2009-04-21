@@ -1936,7 +1936,6 @@ function freeswitch_php_install_command()
 	        	$i++;
 	    	}
 	    }
-		if (strlen(
 		
 	//add the DISA to the dialplan
 		$dialplanincludeid = guid();
