@@ -1732,8 +1732,8 @@ function freeswitch_php_install_command()
 
 	
 	//rename .so files from .1 to .so
-	exec("cp /tmp/mod_shout.so.1 /usr/local/freeswitch/mod/mod_shout.so");
-	unlink_if_exists("/tmp/mod_shout.so.tmp");
+	//exec("cp /tmp/mod_shout.so.1 /usr/local/freeswitch/mod/mod_shout.so");
+	//unlink_if_exists("/tmp/mod_shout.so.tmp");
 
 	exec("cp /tmp/mod_fax.so.1 /usr/local/freeswitch/mod/mod_fax.so");
 	unlink_if_exists("/tmp/mod_shout.so.tmp");
@@ -2212,7 +2212,7 @@ function freeswitch_php_install_command()
 	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/recordings/');
 	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/scripts/');
 	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/storage/');
-	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/sounds/music/8000/');
+	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/sounds/custom/8000/');
 	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/conf/ssl');
 
 	      //Optional
