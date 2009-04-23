@@ -35,7 +35,7 @@
 	<id>1</id>
 	<title>pfSense New Zone Wizard</title>
 	<disableheader>true</disableheader>
-	<description>This wizard will guide you through the adding a new domain name service zone to TinyDNS.</description>
+	<description>This wizard will guide you through adding your first domain to TinyDNS.</description>
 	<fields>
 		<field>
 			<name>Next</name>
