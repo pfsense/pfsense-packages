@@ -199,30 +199,51 @@ include("head.inc");
       </td>
 		</tr>
 
-		<?php
+	<?php
+	//create a temporary id for the array
+	$i = 0;
+	if (count($a_public_includes) > 0) {
+		foreach ($a_public_includes as $ent) {
+			$a_public_includes[$i]['id'] = $i;
+			$i++;
+		}
+	}
+
+	//order the array
+	//order the array
+	function cmp_number($a, $b) {
+		if ($a["order"] > $b["order"]) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+	usort($a_public_includes, "cmp_number");
+	
       $i = 0;
       if (count($a_public_includes) > 0) {
         foreach ($a_public_includes as $ent) {
           if (strlen($ent['extensionname'].$ent['enabled']) > 0) {
     ?>
     <tr>
-      <td class="listlr" ondblclick="document.location='freeswitch_public_includes_edit.php?id=<?=$i;?>'">
+      <td class="listlr" ondblclick="document.location='freeswitch_public_includes_edit.php?id=<?=$ent['id'];?>'">
         <?=$ent['extensionname']?>
       </td>
-      <td class="listlr" ondblclick="document.location='freeswitch_public_includes_edit.php?id=<?=$i;?>'">
+      <td class="listlr" ondblclick="document.location='freeswitch_public_includes_edit.php?id=<?=$ent['id'];?>'">
         <?=$ent['order']?>
       </td>
-      <td class="listr" ondblclick="document.location='freeswitch_public_includes_edit.php?id=<?=$i;?>';">
+      <td class="listr" ondblclick="document.location='freeswitch_public_includes_edit.php?id=<?=$ent['id'];?>';">
         <?=$ent['enabled'];?>&nbsp;
       </td>
-      <td class="listbg" ondblclick="document.location='freeswitch_public_includes_edit.php?id=<?=$i;?>';">
+      <td class="listbg" ondblclick="document.location='freeswitch_public_includes_edit.php?id=<?=$ent['id'];?>';">
         <font color="#FFFFFF"><?=htmlspecialchars($ent['descr']);?>&nbsp;
       </td>
       <td valign="middle" nowrap class="list">
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
-            <td valign="middle"><a href="freeswitch_public_includes_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-            <td><a href="freeswitch_public_includes.php?type=publicincludes&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+            <td valign="middle"><a href="freeswitch_public_includes_edit.php?id=<?=$ent['id'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+            <td><a href="freeswitch_public_includes.php?type=publicincludes&act=del&id=<?=$ent['id'];?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
           </tr>
        </table>
       </td>

@@ -126,8 +126,28 @@ if ($config_change == 1) {
 		</tr>
 
 
-		<?php
+	<?php
+		
+	//create a temporary id for the array
+	$i = 0;
+	if (count($a_extensions) > 0) {
+		foreach ($a_extensions as $ent) {
+			$a_extensions[$i]['id'] = $i;
+			$i++;
+		}
+	}		
 
+	//order the array
+	function cmp_number($a, $b) {
+		if ($a["extension"] > $b["extension"]) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+	usort($a_extensions, "cmp_number");
+	
     $i = 0;
     if (count($a_extensions) > 0) {
 
@@ -135,23 +155,23 @@ if ($config_change == 1) {
 
     ?>
           <tr>
-            <td class="listr" ondblclick="document.location='freeswitch_extensions_edit.php?id=<?=$i;?>';">
+            <td class="listr" ondblclick="document.location='freeswitch_extensions_edit.php?id=<?=$ent['id'];?>';">
               <?=$ent['extension'];?>&nbsp;
             </td>
-            <td class="listr" ondblclick="document.location='freeswitch_extensions_edit.php?id=<?=$i;?>';">
+            <td class="listr" ondblclick="document.location='freeswitch_extensions_edit.php?id=<?=$ent['id'];?>';">
               <?=$ent['vm-mailto'];?>&nbsp;
             </td>
-            <td class="listr" ondblclick="document.location='freeswitch_extensions_edit.php?id=<?=$i;?>';">
+            <td class="listr" ondblclick="document.location='freeswitch_extensions_edit.php?id=<?=$ent['id'];?>';">
               <?=$ent['callgroup'];?>&nbsp;
             </td>
-            <td class="listbg" ondblclick="document.location='freeswitch_extensions_edit.php?id=<?=$i;?>';">
+            <td class="listbg" ondblclick="document.location='freeswitch_extensions_edit.php?id=<?=$ent['id'];?>';">
               <font color="#FFFFFF"><?=htmlspecialchars($ent['description']);?>&nbsp;
             </td>
             <td valign="middle" nowrap class="list">
               <table border="0" cellspacing="0" cellpadding="1">
                 <tr>
-                  <td valign="middle"><a href="freeswitch_extensions_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                  <td><a href="freeswitch_extensions.php?type=extensions&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                  <td valign="middle"><a href="freeswitch_extensions_edit.php?id=<?=$ent['id'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                  <td><a href="freeswitch_extensions.php?type=extensions&act=del&id=<?=$ent['id'];?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                 </tr>
              </table>
             </td>
