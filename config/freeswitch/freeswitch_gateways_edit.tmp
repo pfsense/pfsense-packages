@@ -3,22 +3,22 @@
 /*
 
 	freeswitch_gateways_edit.php
-  Copyright (C) 2008 Mark J Crane
-  All rights reserved.
+	Copyright (C) 2008 Mark J Crane
+	All rights reserved.
 
-  FreeSWITCH (TM)
-  http://www.freeswitch.org/
-	
+	FreeSWITCH (TM)
+	http://www.freeswitch.org/
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
-	
+
 	1. Redistributions of source code must retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
-	
+
 	2. Redistributions in binary form must reproduce the above copyright
 	   notice, this list of conditions and the following disclaimer in the
 	   documentation and/or other materials provided with the distribution.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
 	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
@@ -276,14 +276,14 @@ function show_advanced_config() {
 			
 	$tab_array = array();
 	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=freeswitch.xml&amp;id=0");
-	$tab_array[] = array(gettext("Dialplan"), false, "/freeswitch/freeswitch_dialplan_includes.php");
-	$tab_array[] = array(gettext("Extensions"), false, "/freeswitch/freeswitch_extensions.php");
+	$tab_array[] = array(gettext("Dialplan"), false, "/packages/freeswitch/freeswitch_dialplan_includes.php");
+	$tab_array[] = array(gettext("Extensions"), false, "/packages/freeswitch/freeswitch_extensions.php");
 	$tab_array[] = array(gettext("External"), false, "/pkg_edit.php?xml=freeswitch_external.xml&amp;id=0");
-	$tab_array[] = array(gettext("Features"), false, "/freeswitch/freeswitch_features.php");	
-	$tab_array[] = array(gettext("Gateways"), true, "/freeswitch/freeswitch_gateways.php");
+	$tab_array[] = array(gettext("Features"), false, "/packages/freeswitch/freeswitch_features.php");	
+	$tab_array[] = array(gettext("Gateways"), true, "/packages/freeswitch/freeswitch_gateways.php");
 	$tab_array[] = array(gettext("Internal"), false, "/pkg_edit.php?xml=freeswitch_internal.xml&amp;id=0");
-	$tab_array[] = array(gettext("Public"), false, "/freeswitch/freeswitch_public_includes.php");
-	$tab_array[] = array(gettext("Status"), false, "/freeswitch/freeswitch_status.php");
+	$tab_array[] = array(gettext("Public"), false, "/packages/freeswitch/freeswitch_public_includes.php");
+	$tab_array[] = array(gettext("Status"), false, "/packages/freeswitch/freeswitch_status.php");
 	$tab_array[] = array(gettext("Vars"), false, "/pkg_edit.php?xml=freeswitch_vars.xml&amp;id=0");
  	display_top_tabs($tab_array);
  	

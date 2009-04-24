@@ -44,7 +44,7 @@
     CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
-																																							*/
+*/
 /* ========================================================================== */
 				]]>
 				</copyright>
@@ -63,11 +63,11 @@
 		</tab>
 		<tab>
 			<text>Dialplan</text>
-			<url>/freeswitch/freeswitch_dialplan_includes.php</url>
+			<url>/packages/freeswitch/freeswitch_dialplan_includes.php</url>
 		</tab>
 		<tab>
 			<text>Extensions</text>
-			<url>/freeswitch/freeswitch_extensions.php</url>
+			<url>/packages/freeswitch/freeswitch_extensions.php</url>
 		</tab>
 		<tab>
 			<text>External</text>
@@ -75,11 +75,11 @@
 		</tab>
 		<tab>
 			<text>Features</text>
-			<url>/freeswitch/freeswitch_features.php</url>
+			<url>/packages/freeswitch/freeswitch_features.php</url>
 		</tab>		
 		<tab>
 			<text>Gateways</text>
-			<url>/freeswitch/freeswitch_gateways.php</url>
+			<url>/packages/freeswitch/freeswitch_gateways.php</url>
 		</tab>
 		<tab>
 			<text>Internal</text>
@@ -87,11 +87,11 @@
 		</tab>
 		<tab>
 			<text>Public</text>
-			<url>/freeswitch/freeswitch_public_includes.php</url>
+			<url>/packages/freeswitch/freeswitch_public_includes.php</url>
 		</tab>
 		<tab>
 			<text>Status</text>
-			<url>/freeswitch/freeswitch_status.php</url>
+			<url>/packages/freeswitch/freeswitch_status.php</url>
 		</tab>
 		<tab>
 			<text>Vars</text>
