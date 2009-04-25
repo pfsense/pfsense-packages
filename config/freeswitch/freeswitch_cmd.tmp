@@ -44,6 +44,6 @@ $fp = event_socket_create($host, $port, $password);
 $response = event_socket_request($fp, $cmd);
 fclose($fp);
 
-header("Location: /freeswitch/freeswitch_status.php?savemsg=".urlencode($response));
+header("Location: /packages/freeswitch/freeswitch_status.php?savemsg=".urlencode($response));
 
 ?>
