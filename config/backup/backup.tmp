@@ -125,7 +125,7 @@ if ($_GET["savemsg"]) {
 <?php
 			
 	$tab_array = array();
-	$tab_array[] = array(gettext("Settings"), false, "/packages/backup/backup.php");
+	$tab_array[] = array(gettext("Settings"), true, "/packages/backup/backup.php");
  	display_top_tabs($tab_array);
  	
 ?>
