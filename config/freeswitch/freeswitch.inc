@@ -338,7 +338,7 @@ function sync_package_freeswitch_settings()
 		$tmpxml .= "  </settings>\n";
 		$tmpxml .= "</configuration>\n";
 		fwrite($fout, $tmpxml);
-		unset($tmpxml, $event_socket_password);
+		unset($tmpxml);
 		fclose($fout);
 
 		recording_js();
@@ -353,6 +353,9 @@ function sync_package_freeswitch_settings()
 		$tmpxml .= "    <!--<param name=\"outscale\" value=\"8192\"/>-->\n";
 		$tmpxml .= "  </settings>\n";
 		$tmpxml .= "</configuration>";
+		fwrite($fout, $tmpxml);
+		unset($tmpxml);
+		fclose($fout);
 		
 		//config.js
 		$admin_pin = $config['installedpackages']['freeswitchsettings']['config'][0]['admin_pin'];
