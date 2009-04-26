@@ -154,8 +154,8 @@ include("head.inc");
     <tr>
 		<td width='10%' class="vncell"><a href='freeswitch_recordings.php'>Open</a></td>
 		<td class="vtable">
-			<!--Music on hold can be in WAV or MP3 format. To play MP3 you must have mod_shout enabled on the 'Modules' tab.-->
-			Music on hold can be in WAV format. For best performance upload 16bit 8khz/16khz Mono WAV files.
+			Music on hold can be in WAV or MP3 format. To play an MP3 files you must have mod_shout enabled on the 'Modules' tab. 
+			For best performance upload 16bit 8khz/16khz Mono WAV files.
 		</td>
 	</tr>
 	</table>

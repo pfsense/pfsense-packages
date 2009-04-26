@@ -456,6 +456,18 @@
 			<description>Enter the SMTP From Name.</description>
 			<type>input</type>
 		</field>
+		<field>
+			<fielddescr>Mod Shout Decoder</fielddescr>
+			<fieldname>mod_shout_decoder</fieldname>
+			<description>Enter the Decoder. default: i386</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Mod Shout Volume</fielddescr>
+			<fieldname>mod_shout_volume</fieldname>
+			<description>Enter the Volume. default: 0.3</description>
+			<type>input</type>
+		</field>		
 	</fields>
 	<custom_add_php_command>
 	</custom_add_php_command>

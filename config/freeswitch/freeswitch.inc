@@ -342,6 +342,17 @@ function sync_package_freeswitch_settings()
 		fclose($fout);
 
 		recording_js();
+
+		//shout.conf.xml
+		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/shout.conf.xml","w");
+		$tmpxml = "<configuration name=\"shout.conf\" description=\"mod shout config\">\n";
+		$tmpxml .= "  <settings>\n";
+		$tmpxml .= "    <!-- Don't change these unless you are insane -->\n";
+		$tmpxml .= "    <param name=\"decoder\" value=\"" . $rowhelper['mod_shout_decoder'] . "\"/>\n";
+		$tmpxml .= "    <param name=\"volume\" value=\"" . $rowhelper['mod_shout_volume'] . "\"/>\n";
+		$tmpxml .= "    <!--<param name=\"outscale\" value=\"8192\"/>-->\n";
+		$tmpxml .= "  </settings>\n";
+		$tmpxml .= "</configuration>";
 		
 		//config.js
 		$admin_pin = $config['installedpackages']['freeswitchsettings']['config'][0]['admin_pin'];
@@ -1681,7 +1692,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.8.4.4";
+	$freeswitch_package_version = "0.8.4.5";
 	$freeswitch_build_version = "1.0.3";
 	$freeswitch_build_revision = "12545";
 
@@ -1739,7 +1750,7 @@ function freeswitch_php_install_command()
 	//unlink_if_exists("/tmp/mod_shout.so.tmp");
 
 	exec("cp /tmp/mod_fax.so.1 /usr/local/freeswitch/mod/mod_fax.so");
-	unlink_if_exists("/tmp/mod_shout.so.tmp");
+	unlink_if_exists("/tmp/mod_fax.so.tmp");
 	
 	
 	//rename PHP files from .tmp to .php
@@ -1853,7 +1864,13 @@ function freeswitch_php_install_command()
   	}
   	if (strlen($config['installedpackages']['freeswitchsettings']['config'][0]['admin_pin']) == 0) {
   	   $config['installedpackages']['freeswitchsettings']['config'][0]['admin_pin'] = "7575";
-  	}
+  	}	
+	if (strlen($config['installedpackages']['freeswitchsettings']['config'][0]['mod_shout_decoder']) == 0) {
+		$config['installedpackages']['freeswitchsettings']['config'][0]['mod_shout_decoder'] = "i386";
+	}	
+	if (strlen($config['installedpackages']['freeswitchsettings']['config'][0]['mod_shout_volume']) == 0) {
+		$config['installedpackages']['freeswitchsettings']['config'][0]['mod_shout_volume'] = "0.3";
+	}
     		
 	$numbering_plan = $config['installedpackages']['freeswitchsettings']['config'][0]['numbering_plan'];
 	$event_socket_password = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_password'];
