@@ -682,5 +682,15 @@
    <configurationfile>jail_template.xml</configurationfile>
    <maintainer>ltning-jailctl@anduin.net</maintainer>
   </package>
+  <package>
+	<name>IGMPproxy</name>
+	<descr>An IGMP proxy for multicast traffic.</descr>
+	<category>Network</category.
+	<status>BETA</status>
+	<pkginfolink>http://doc.pfsense.org/index.php/IGMPproxy</pkginfolink>
+	<config_file>http://www.pfsense.com/packages/config/igmpproxy/igmpproxy.xml</config_file>
+	<configurationfile>igmpproxy.xml</configurationfile>
+	<maintainer>eri@pfsense.org</maintainer>
+  </package>
   </packages>
 </pfsensepkgs>
