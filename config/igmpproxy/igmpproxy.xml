@@ -53,6 +53,11 @@
             <chmod>0755</chmod>
         </additional_files_needed>
 	<additional_files_needed>
+            <item>http://files.pfsense.org/packages/igmpproxy</item>
+            <prefix>/usr/local/sbin/</prefix>
+            <chmod>0755</chmod>
+        </additional_files_needed>
+	<additional_files_needed>
             <item>http://www.pfsense.org/packages/config/igmpproxy/firewall_rules_edit.tmp</item>
             <prefix>/tmp/</prefix>
             <chmod>0755</chmod>
