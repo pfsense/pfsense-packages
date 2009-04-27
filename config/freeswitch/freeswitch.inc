@@ -2279,6 +2279,7 @@ function freeswitch_php_install_command()
 	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/scripts/');
 	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/storage/');
 	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/sounds/custom/8000/');
+			system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/sounds/music/8000/');
 	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/conf/ssl');
 
 	      //Optional
