@@ -44,7 +44,7 @@
 		<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>FreeSWITCH Settings</name>
-	<version>0.8.4.6</version>
+	<version>0.8.4.7</version>
 	<title>FreeSWITCH: Settings</title>
 	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
 	<menu>
@@ -103,6 +103,8 @@
 			<url>/pkg_edit.php?xml=freeswitch_vars.xml&amp;id=0</url>
 		</tab>
 	</tabs>
+	<configpath>installedpackages->package->$packagename->configuration->freeswitchsettings</configpath>
+	<fields>
 		<field>
 			<fielddescr>Numbering Plan</fielddescr>
 			<fieldname>numbering_plan</fieldname>
@@ -245,13 +247,13 @@
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
-		exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.inc");
 		sync_package_freeswitch_settings();
 	</custom_php_resync_config_command>
 	<custom_delete_php_command>
 		sync_package_freeswitch_settings();
 	</custom_delete_php_command>
 	<custom_php_install_command>
+		exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.inc");	
 		freeswitch_php_install_command();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
