@@ -1695,7 +1695,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.8.4.9";
+	$freeswitch_package_version = "0.8.5";
 	$freeswitch_build_version = "1.0.3";
 	$freeswitch_build_revision = "12545";
 
@@ -2012,7 +2012,7 @@ function freeswitch_php_install_command()
 		$ent['extensionname'] = 'DISA';
 		$ent['order'] = '000';
 		$ent['context'] = 'default';
-		$ent['enabled'] = disa_enabled;
+		$ent['enabled'] = $disa_enabled;
 		$ent['descr'] = '*3472 Direct Inward System Access';
 		$a_dialplan_includes[] = $ent;
 		unset($ent);
