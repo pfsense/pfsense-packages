@@ -44,7 +44,7 @@
 		<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>FreeSWITCH Settings</name>
-	<version>0.8.4.8</version>
+	<version>0.8.4.9</version>
 	<title>FreeSWITCH: Settings</title>
 	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
 	<menu>
@@ -108,6 +108,11 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/freeswitch/freeswitch.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://portableusbapps.com/packages/config/freeswitch/freeswitch.tgz</item>
 	</additional_files_needed>
 	<fields>
 		<field>
