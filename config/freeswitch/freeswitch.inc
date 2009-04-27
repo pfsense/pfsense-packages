@@ -1695,7 +1695,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.8.5";
+	$freeswitch_package_version = "0.8.5.1";
 	$freeswitch_build_version = "1.0.3";
 	$freeswitch_build_revision = "12545";
 
@@ -1885,7 +1885,7 @@ function freeswitch_php_install_command()
 	exec("cp /tmp/freeswitch_time_conditions_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_time_conditions_edit.php");
 	unlink_if_exists("/tmp/freeswitch_time_conditions_edit.tmp");
 	
-	exec("cd /usr/local/www/packages/freeswitch/scripts/;fetch http://www.pfsense.com/packages/config/freeswitch/disa.js");
+	exec("cd /usr/local/freeswitch/scripts/;fetch http://www.pfsense.com/packages/config/freeswitch/disa.js");
 	exec("cp /usr/local/freeswitch/htdocs/slim.swf /usr/local/www/packages/freeswitch/slim.swf");
 
   /* freeswitch settings defaults */
