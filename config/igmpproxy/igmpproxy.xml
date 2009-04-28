@@ -41,6 +41,12 @@
 	<name>igmpproxy</name>
 	<title>Services: IGMP proxy</title>
 	<include_file>/usr/local/pkg/igmpproxy.inc</include_file>
+	<menu>
+                <name>IGMP proxy</name>
+                <tooltiptext>Multicast proxy.</tooltiptext>
+                <section>Services</section>
+                <configfile>igmpproxy.xml</configfile>
+        </menu>
         <service>
                 <name>igmpproxy</name>
                 <rcfile>igmpproxy.sh</rcfile>
