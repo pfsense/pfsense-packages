@@ -50,6 +50,9 @@ quickleave
 
 EOD;
 
+	if (!is_array($config['installedpackages']['igmpproxy']['config']))
+		return 0;
+
 	$igmpcfg =& $config['installedpackages']['igmpproxy']['config'];
         foreach ($igmpcfg as $igmpcf) {
                 $realif = convert_friendly_interface_to_real_interface_name($igmpcf['igmpname']);
