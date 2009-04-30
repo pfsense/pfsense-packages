@@ -2271,25 +2271,28 @@ function freeswitch_php_install_command()
   	
 	// if backup file exists restore it
 	    $filename = 'freeswitch.bak.tgz';
-	    	
+	    if (!is_dir('/root/backup/')) {
+		   exec("mkdir /root/backup/");
+		}
+	
 	    //extract a specific directory to /usr/local/freeswitch
-	    if (file_exists('/tmp/'.$filename)) {
+	    if (file_exists('/root/backup/'.$filename)) {
 	      //echo "The file $filename exists";
 	
 	      //Recommended
-	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/db/');
-	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/log/');
-	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/recordings/');
-	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/scripts/');
-	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/storage/');
-	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/sounds/custom/8000/');
-			system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/sounds/music/8000/');
-	        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/conf/ssl');
+	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/db/');
+	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/log/');
+	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/recordings/');
+	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/scripts/');
+	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/storage/');
+	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/sounds/custom/8000/');
+			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/sounds/music/8000/');
+	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/ssl');
 
 	      //Optional
-	      	//system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/conf/');
-	        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/grammar/');
-	        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/htdocs/');
+	      	//system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/');
+	        //system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/grammar/');
+	        //system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/htdocs/');
 			
 			unset($filename);
 	    }
