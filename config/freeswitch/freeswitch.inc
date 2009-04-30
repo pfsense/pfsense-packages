@@ -2379,7 +2379,7 @@ function freeswitch_deinstall_command()
 	unlink_if_exists("/tmp/pkg_mgr_FreeSWITCH.log");	
 	conf_mount_ro();
 	config_unlock();
-	
+
 }
 
 ?>
