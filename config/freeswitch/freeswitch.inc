@@ -1695,15 +1695,19 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.8.5.1";
+	$freeswitch_package_version = "0.8.5.3";
 	$freeswitch_build_version = "1.0.3";
 	$freeswitch_build_revision = "12545";
+	
+	//set script execution time limit to 24 hours
+	set_time_limit (86400);
+	ini_set(max_execution_time,86400);
+	
+	//hide errors
+	ini_set('display_errors', '0'); 
 
 	conf_mount_rw();
 	config_lock();
-	
-	//needed for mod_fax support
-	system('pkg_add -r spandsp');
 
 	if (!is_dir('/usr/local/www/packages/')) {
 	   exec("mkdir /usr/local/www/packages/");
@@ -2289,36 +2293,36 @@ function freeswitch_php_install_command()
 			
 			unset($filename);
 	    }
-  	
+
 	write_rcfile(array(
 		"file" => "freeswitch.sh",
 		"start" => "/usr/local/freeswitch/bin/./freeswitch -nc",
 		"stop" => "/usr/local/freeswitch/bin/./freeswitch -stop"
 		)
 	);
-	
+
 	exec("rm -R /freeswitch");
 	exec("cp /usr/local/freeswitch/conf/directory/default/brian.xml /usr/local/freeswitch/conf/directory/default/brian.xml.noload");
 	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/brian.xml");
 	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/example.com.xml");
-	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/99999_enum.xml");	
-	  	
+	unlink_if_exists("/usr/local/freeswitch/conf/dialplan/default/99999_enum.xml");
+
 	write_rcfile(array(
 		"file" => "freeswitch.sh",
 		"start" => "/usr/local/freeswitch/bin/./freeswitch -nc",
 		"stop" => "/usr/local/freeswitch/bin/./freeswitch -stop"
 		)
 	);
-		  	
+
 	sync_package_freeswitch();
 	$handle = popen("/usr/local/etc/rc.d/freeswitch.sh start", "r");
 	pclose($handle);
-	
+
 	if (pkg_is_service_running('freeswitch')) {
       sync_package_freeswitch_ivr();
 	}
-	
 
+	
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = $freeswitch_build_version." revision ".$freeswitch_build_revision.".";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = $freeswitch_package_version;
 	

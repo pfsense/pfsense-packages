@@ -140,7 +140,7 @@ if ($config_change == 1) {
 	function cmp_string($a, $b) { 
 		return strcmp($a["gateway"], $b["gateway"]); 
 	}
-	usort($a_gateways, "cmp_string");	
+	if (count($a_gateways) > 0) { usort($a_gateways, "cmp_string");	}
 	
     $i = 0;
     if (count($a_gateways) > 0) {

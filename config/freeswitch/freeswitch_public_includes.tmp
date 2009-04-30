@@ -210,7 +210,6 @@ include("head.inc");
 	}
 
 	//order the array
-	//order the array
 	function cmp_number($a, $b) {
 		if ($a["order"] > $b["order"]) {
 			return 1;
@@ -219,7 +218,7 @@ include("head.inc");
 			return 0;
 		}
 	}
-	usort($a_public_includes, "cmp_number");
+	if (count($a_public_includes) > 0) { usort($a_public_includes, "cmp_number"); }
 	
       $i = 0;
       if (count($a_public_includes) > 0) {

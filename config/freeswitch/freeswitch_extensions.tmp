@@ -146,7 +146,7 @@ if ($config_change == 1) {
 			return 0;
 		}
 	}
-	usort($a_extensions, "cmp_number");
+	if (count($a_extensions) > 0) { usort($a_extensions, "cmp_number"); }
 	
     $i = 0;
     if (count($a_extensions) > 0) {

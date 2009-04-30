@@ -216,7 +216,7 @@ include("head.inc");
 			return 0;
 		}
 	}
-	usort($a_dialplan_includes, "cmp_number");
+	if (count($a_public_includes) > 0) { usort($a_dialplan_includes, "cmp_number"); }
 		
 	$i = 0;
 	if (count($a_dialplan_includes) > 0) {
