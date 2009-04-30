@@ -102,6 +102,8 @@ $savemsg = $_GET["savemsg"];
 if (!pkg_is_service_running('freeswitch')) {
 	$handle = popen("/usr/local/etc/rc.d/freeswitch.sh start", "r");
 	pclose($handle);
+	//give freeswitch time to load before processing the rest of the page.
+	sleep(7);
 }
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
