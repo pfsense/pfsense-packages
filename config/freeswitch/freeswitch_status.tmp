@@ -45,9 +45,12 @@ if ($_GET['a'] == "download") {
     $filename = 'Master.csv';
   }
   if ($_GET['t'] == "backup") {
-    $tmp = '/tmp/';
+    $tmp = '/root/backup/';
     $filename = 'freeswitch.bak.tgz';
-    system('cd /usr/local/;tar cvzf /tmp/freeswitch.bak.tgz freeswitch');
+	if (!is_dir('/root/backup/')) {
+	   exec("mkdir /root/backup/");
+	}
+    system('cd /usr/local/;tar cvzf /root/backup/freeswitch.bak.tgz freeswitch');
   }
 	session_cache_limiter('public');
 	$fd = fopen($tmp.$filename, "rb");
@@ -60,25 +63,25 @@ if ($_GET['a'] == "download") {
 
 if ($_GET['a'] == "other") {
   if ($_GET['t'] == "restore") {
-    $tmp = '/tmp/';
+    $tmp = '/root/backup/';
     $filename = 'freeswitch.bak.tgz';
 
     //extract a specific directory to /usr/local/freeswitch
-    if (file_exists('/tmp/'.$filename)) {
+    if (file_exists('/root/backup/'.$filename)) {
       //echo "The file $filename exists";
 
       //Recommended
-        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/db/');
-        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/log/');
-        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/recordings/');
-        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/scripts/');
-        system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/storage/');
+        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/db/');
+        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/log/');
+        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/recordings/');
+        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/scripts/');
+        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/storage/');
 
       //Optional
-        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/conf/');
-        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/grammar/');
-        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/htdocs/');
-        //system('cd /usr/local; tar xvpfz /tmp/'.$filename.' freeswitch/sounds/');
+        //system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/');
+        //system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/grammar/');
+        //system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/htdocs/');
+        //system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/sounds/');
 
         header( 'Location: freeswitch_status.php?savemsg=Backup+has+been+restored.' ) ;
     }
@@ -102,7 +105,7 @@ $savemsg = $_GET["savemsg"];
 if (!pkg_is_service_running('freeswitch')) {
 	$handle = popen("/usr/local/etc/rc.d/freeswitch.sh start", "r");
 	pclose($handle);
-	//give freeswitch time to load before processing the rest of the page.
+	//give freeswitch time to load
 	sleep(7);
 }
 ?>
@@ -265,14 +268,14 @@ echo "<table width='690' cellpadding='0' cellspacing='0' border='0'>\n";
 echo "<tr>\n";
 echo "<td width='80%'>\n";
 echo "<b>Backup / Restore</b><br />\n";
-echo "The 'backup' button will tar gzip /usr/local/freeswitch/ to /tmp/freeswitch.bak.tgz it then presents a file to download. \n";
-echo "If the backup file does not exist in /tmp/freeswitch.bak.tgz then the 'restore' button will be hidden. \n";
+echo "The 'backup' button will tar gzip /usr/local/freeswitch/ to /root/backup/freeswitch.bak.tgz it then presents a file to download. \n";
+echo "If the backup file does not exist in /root/backup/freeswitch.bak.tgz then the 'restore' button will be hidden. \n";
 echo "Use Diagnostics->Command->File to upload: to browse to the file and then click on upload it now ready to be restored. \n";
 echo "<br /><br />\n";
 echo "</td>\n";
 echo "<td width='20%' valign='middle' align='right'>\n";
 echo "  <input type='button' value='backup' onclick=\"document.location.href='/packages/freeswitch/freeswitch_status.php?a=download&t=backup';\" />\n";
-if (file_exists('/tmp/freeswitch.bak.tgz')) {
+if (file_exists('/root/backup/freeswitch.bak.tgz')) {
   echo "  <input type='button' value='restore' onclick=\"document.location.href='/packages/freeswitch/freeswitch_status.php?a=other&t=restore';\" />\n";
 }
 echo "</td>\n";
