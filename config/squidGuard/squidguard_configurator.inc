@@ -52,8 +52,8 @@ require_once('squid.inc');
 
 /* Allow additional execution time 0 = no limit. */
 ini_set('max_execution_time', '3600');
-ini_set('max_input_time', '3600');
-ini_set('memory_limit', '32M');
+ini_set('max_input_time',     '3600');
+ini_set('memory_limit',       '100M');
 
 # ------------------------------------------------------------------------------
 # files header
@@ -872,7 +872,8 @@ function sg_create_config()
         }
 
         # log
-        sg_addlog("sg_create_config: add rewrites: \n success $log_entr_added \n error $log_entr_err", 1);
+        if (!empty($log_entr_added)) sg_addlog("sg_create_config: add rewrites: success $log_entr_added", 1);
+        if (!empty($log_entr_err))   sg_addlog("sg_create_config: add rewrites: error $log_entr_err", 1);
     }
 
     # ----------------------------------------

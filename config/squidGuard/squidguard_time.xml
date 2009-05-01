@@ -8,7 +8,7 @@
 
 	<name>squidguardtime</name>
 	<version>none</version>
-	<title>Proxy Content filter SquidGuard: Times</title>
+	<title>Proxy filter SquidGuard: Times</title>
 	<include_file>/usr/local/pkg/squidguard.inc</include_file>
 
 	<delete_string>A proxy server user has been deleted.</delete_string>

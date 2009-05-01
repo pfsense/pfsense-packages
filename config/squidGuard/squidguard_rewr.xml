@@ -8,7 +8,7 @@
 
 	<name>squidguardrewrite</name>
 	<version>none</version>
-	<title>Proxy Content filter SquidGuard: Rewrites</title>
+	<title>Proxy filter SquidGuard: Rewrites</title>
 	<include_file>/usr/local/pkg/squidguard.inc</include_file>
 
 	<tabs>

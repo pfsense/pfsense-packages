@@ -7,13 +7,13 @@
     <faq>Currently there are no FAQ items provided.</faq>
 
         <name>squidguardgeneral</name>
-        <version>1.2.0_1</version>
-        <title>Proxy Content filter SquidGuard: General settings</title>
+        <version>1.2.0_2</version>
+        <title>Proxy filter SquidGuard: General settings</title>
         <include_file>/usr/local/pkg/squidguard.inc</include_file>
 
         <!-- Installation -->
         <menu>
-                <name>Proxy Content filter</name>
+                <name>Proxy filter</name>
                 <tooltiptext>Modify the proxy server's filter settings</tooltiptext>
                 <section>Services</section>
                 <url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
