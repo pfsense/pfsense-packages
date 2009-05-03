@@ -591,7 +591,7 @@
     <package>
       <name>squidGuard</name>
       <descr>
-          High perfomance web proxy filter. 
+          High perfomance web proxy URL filter.
           Required proxy Squid package. 
 	  </descr>
       <website>http://www.squidGuard.org/</website>
@@ -631,14 +631,14 @@
       <configurationfile>openvpn-client-export.xml</configurationfile>
     </package>
     <package>
-      <name>HAVP</name> 
+      <name>HAVP antivirus</name> 
       <pkginfolink></pkginfolink> 
       <website>http://www.server-side.de/</website> 
-      <descr>HAVP (HTTP Antivirus Proxy) is a proxy with a ClamAV anti-virus scanner. The main aims are continuous, non-blocking downloads and smooth scanning of dynamic and password protected HTTP traffic. Havp antivirus proxy has a parent and transparent proxy mode. It can be used with squid or standalone.</descr> 
+      <descr>Antivirus:  HAVP (HTTP Antivirus Proxy) is a proxy with a ClamAV anti-virus scanner. The main aims are continuous, non-blocking downloads and smooth scanning of dynamic and password protected HTTP traffic. Havp antivirus proxy has a parent and transparent proxy mode. It can be used with squid or standalone. And File Scanner for local files.</descr> 
       <category>Network Management</category> 
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url> 
       <depends_on_package>havp-0.88.tbz</depends_on_package>
-      <version>0.88</version> 
+      <version>0.88_03</version> 
       <status>ALPHA</status> 
       <required_version>1.2.2</required_version> 
       <config_file>http://www.pfsense.com/packages/config/havp/havp.xml</config_file> 
