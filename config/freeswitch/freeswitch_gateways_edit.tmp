@@ -428,15 +428,21 @@ function show_advanced_config() {
                       case "udp":
                           echo "              <option value='udp' selected='yes'>udp</option>\n";
                           echo "              <option value='tcp'>tcp</option>\n";
+						  echo "              <option value='tls'>tls</option>\n";						  
                           break;
                       case "tcp":
                           echo "              <option value='udp'>udp</option>\n";
                           echo "              <option value='tcp' selected='yes'>tcp</option>\n";
-
+						  echo "              <option value='tls'>tls</option>\n";						  
+                      case "tls":
+                          echo "              <option value='udp'>udp</option>\n";
+                          echo "              <option value='tcp'>tcp</option>\n";
+						  echo "              <option value='tls' selected='yes'>tls</option>\n";
                           break;
                       default:
                           echo "              <option value='udp'>udp</option>\n";
                           echo "              <option value='tcp'>tcp</option>\n";
+						  echo "              <option value='tls'>tls</option>\n";
                       }
                       echo "              </select>\n";
                       ?>
