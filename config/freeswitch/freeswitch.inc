@@ -535,9 +535,24 @@ function sync_package_freeswitch_gateways()
 		          if (strlen($rowhelper['register']) > 0) {
 		            $tmpxml .= "      <param name=\"register\" value=\"" . $rowhelper['register'] . "\"/>\n";
 		          }
+				  
 		          if (strlen($rowhelper['register-transport']) > 0) {
-		            $tmpxml .= "      <param name=\"register-transport\" value=\"" . $rowhelper['register-transport'] . "\"/>\n";
-		          }
+					switch ($rowhelper['register-transport']) {
+					case "udp":
+						$tmpxml .= "      <param name=\"register-transport\" value=\"udp\"/>\n";
+						break;
+					case "tcp":
+						$tmpxml .= "      <param name=\"register-transport\" value=\"tcp\"/>\n";
+						break;
+					case "tls":
+						$tmpxml .= "      <param name=\"register-transport\" value=\"tls\"/>\n";
+						$tmpxml .= "      <param name=\"contact-params\" value=\"transport=tls\"/>\n";
+						break;
+					default:
+						$tmpxml .= "      <param name=\"register-transport\" value=\"" . $rowhelper['register-transport'] . "\"/>\n";
+					}
+				  }
+
 		          if (strlen($rowhelper['retry-seconds']) > 0) {
 		            $tmpxml .= "      <param name=\"retry-seconds\" value=\"" . $rowhelper['retry-seconds'] . "\"/>\n";
 		          }
@@ -1695,9 +1710,9 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.8.5.3";
-	$freeswitch_build_version = "1.0.3";
-	$freeswitch_build_revision = "12545";
+	$freeswitch_package_version = "0.8.5.4";
+	$freeswitch_build_version = "1.0.4 pre 6";
+	$freeswitch_build_revision = "13238";
 	
 	//set script execution time limit to 24 hours
 	set_time_limit (86400);
@@ -1734,23 +1749,23 @@ function freeswitch_php_install_command()
 	unlink_if_exists("/usr/local/freeswitch/conf/dialplan/default/01_example.com.xml");
 	unlink_if_exists("/usr/local/freeswitch/conf/dialplan/public/00_inbound_did.xml");	
 
-	if (!is_dir('/usr/local/www/packages/freeswitch/sounds/custom/')) {
-	   exec("mkdir /usr/local/www/packages/freeswitch/sounds/custom/");
+	if (!is_dir('/usr/local/freeswitch/sounds/custom/')) {
+	   exec("mkdir /usr/local/freeswitch/sounds/custom/");
 	}
 
-	if (!is_dir('/usr/local/www/packages/freeswitch/sounds/custom/8000/')) {
-	   exec("mkdir /usr/local/www/packages/freeswitch/sounds/custom/8000/");
+	if (!is_dir('/usr/local/freeswitch/sounds/custom/8000/')) {
+	   exec("mkdir /usr/local/freeswitch/sounds/custom/8000/");
 	}
 
 	//copy audio files
-	exec("cd /usr/local/www/packages/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_your_pin_number.wav");
-	exec("cd /usr/local/www/packages/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_pin_number.wav");	
-	exec("cd /usr/local/www/packages/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_extension_number.wav");
-	exec("cd /usr/local/www/packages/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_phone_number.wav");
-	exec("cd /usr/local/www/packages/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/call_forward_has_been_set.wav");
-	exec("cd /usr/local/www/packages/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/call_forward_has_been_deleted.wav");	
-	exec("cd /usr/local/www/packages/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/begin_recording.wav");
-	exec("cd /usr/local/www/packages/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/your_pin_number_is_incorect_goodbye.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_your_pin_number.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_pin_number.wav");	
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_extension_number.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_phone_number.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/call_forward_has_been_set.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/call_forward_has_been_deleted.wav");	
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/begin_recording.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/your_pin_number_is_incorect_goodbye.wav");
 
 	
 	//download lib files
@@ -1763,12 +1778,6 @@ function freeswitch_php_install_command()
 	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libodbc.so.1");
 	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libiconv.so.3");
 	
-	//rename .so files from .1 to .so
-	//exec("cp /tmp/mod_shout.so.1 /usr/local/freeswitch/mod/mod_shout.so");
-	//unlink_if_exists("/tmp/mod_shout.so.tmp");
-
-	//exec("cp /tmp/mod_fax.so.1 /usr/local/freeswitch/mod/mod_fax.so");
-	//unlink_if_exists("/tmp/mod_fax.so.tmp");
 	
 	//download xml package files
 	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.inc");
@@ -1779,6 +1788,7 @@ function freeswitch_php_install_command()
 	exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_modules.xml");
 	exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_public.xml");
 	exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_vars.xml");
+	
 	
 	//rename PHP files from .tmp to .php
 	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/class.smtp.tmp");
