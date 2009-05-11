@@ -256,7 +256,16 @@
                 <field>
                         <fielddescr>Scan images</fielddescr>
                         <fieldname>scanimg</fieldname>
-                        <description>Check this for scan image files.</description>
+                        <description>
+                            Check this for scan image files. 
+                            This option allows you to increase reliability, but also slows down the scanning process.
+                        </description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Scan media stream</fielddescr>
+                        <fieldname>scanstream</fieldname>
+                        <description>Check this for scan media (audio/video) stream. Use this for additional scan exploits for players.</description>
                         <type>checkbox</type>
                 </field>
                 <field>
@@ -283,7 +292,9 @@
             havp_resync();
         </custom_php_resync_config_command>
         <custom_php_install_command>
+		havp_install();
         </custom_php_install_command>
         <custom_php_deinstall_command>
+		havp_deinstall();
         </custom_php_deinstall_command>
 </packagegui>
