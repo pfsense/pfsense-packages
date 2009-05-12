@@ -1710,7 +1710,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.8.6";
+	$freeswitch_package_version = "0.8.6.1";
 	$freeswitch_build_version = "1.0.4 pre 6";
 	$freeswitch_build_revision = "13238";
 	
@@ -1862,7 +1862,7 @@ function freeswitch_php_install_command()
 	exec("cp /tmp/freeswitch_ivr_options_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_ivr_options_edit.php");
 	unlink_if_exists("/tmp/freeswitch_ivr_options_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_profiles.php.tmp");
+	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_profiles.tmp");
 	exec("cp /tmp/freeswitch_profiles.tmp /usr/local/www/packages/freeswitch/freeswitch_profiles.php");
 	unlink_if_exists("/tmp/freeswitch_profiles.tmp");
 
