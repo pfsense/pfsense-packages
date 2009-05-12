@@ -69,10 +69,6 @@
 			<url>/packages/freeswitch/freeswitch_extensions.php</url>
 		</tab>
 		<tab>
-			<text>External</text>
-			<url>/pkg_edit.php?xml=freeswitch_external.xml&amp;id=0</url>
-		</tab>
-		<tab>
 			<text>Features</text>
 			<url>/packages/freeswitch/freeswitch_features.php</url>
 		</tab>
@@ -81,8 +77,8 @@
 			<url>/packages/freeswitch/freeswitch_gateways.php</url>
 		</tab>
 		<tab>
-			<text>Internal</text>
-			<url>/pkg_edit.php?xml=freeswitch_internal.xml&amp;id=0</url>
+			<text>Profiles</text>
+			<url>/packages/freeswitch/freeswitch_profiles.php</url>
 		</tab>
 		<tab>
 			<text>Public</text>
