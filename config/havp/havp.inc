@@ -184,13 +184,15 @@ function havp_install()
 function havp_deinstall()
 {
     havp_setup_cron(HVDEF_CLAM_UPD_CRONNAME,"", "");
+    mwexec("killall -9 havp");
     mwexec("rm -rf " . HVDEF_HAVP_STARTUP_SCRIPT);
-    mwexec("rm -rf " . HVDEF_CLAM_STARTUP_SCRIPT);
-    mwexec("rm -rf " . HVDEF_AVUPD_SCRIPT);
     mwexec("rm -rf " . HVDEF_FILTER_RESYNC_SCRIPT);
     mwexec("rm -rf " . HVDEF_PID_FILE);
-    mwexec("rm -rf " . HVDEF_CLAM_PID);
-    mwexec("rm -rf " . HVDEF_CLAM_SOCKET);
+#    mwexec("rm -rf " . HVDEF_CLAM_STARTUP_SCRIPT);
+#    mwexec("rm -rf " . HVDEF_AVUPD_SCRIPT);
+#    mwexec("rm -rf " . HVDEF_CLAM_PID);
+#    mwexec("rm -rf " . HVDEF_CLAM_SOCKET);
+    umountRAMDisk();
 }
 # ==============================================================================
 # Events
@@ -1282,17 +1284,12 @@ function mountRAMdisk($free_and_mount = true)
     # =-= Temp RAMDisk =-=
     # note: use 1/4 of system memory capacity
     $ramdisk_capacity = get_memory();
-    $ramdisk_capacity = intval($ramdisk_capacity[0]) / 4; # [Mb]
+    $ramdisk_capacity = intval(intval($ramdisk_capacity[0]) / 4); # [Mb]
 
-    # check RAMDisk for exists and capacity
-	if (file_exists($mnt_flag_file)) {
-		$old_ramdisk_size = trim(file_get_contents($mnt_flag_file));
-		# RAMDisk exists - not need create new
-		if (intval($ramdisk_size) === intval($old_ramdisk_size)) return;
-    }
-
+    # RAMDisk already exists?
+    if (file_exists("/dev/md10")) return;
     # umount old RAMDisk
-    umountRAMDisk();
+#    umountRAMDisk();
 
     # create and mount a swap backed file system on /var/tmp/havp by /dev/md10:
 # SWAP
@@ -1300,11 +1297,11 @@ function mountRAMdisk($free_and_mount = true)
 #    mwexec("newfs -U /dev/md10");
 #    mwexec("mount /dev/md10 $mnt_point");
 # RAM - more quickly, used physical RAM
-    mwexec("/sbin/mdmfs -s {$ramdisk_capacity}M md10 $mnt_point");
-    mwexec("chmod 1777 $mnt_point");
+    mwexec("/sbin/mdmfs -s {$ramdisk_capacity}M md10 {$mnt_point}");
+    mwexec("chmod 1777 {$mnt_point}");
 
     # create flag file
-    file_put_contents($mnt_flag_file, "$ramdisk_capacity");
+    file_put_contents($mnt_flag_file, "{$ramdisk_capacity}");
     # syslog
     if (HV_DEBUG === 'true')
         log_error("havp: Create RAMDisk {$ramdisk_capacity}Mb.");
@@ -1433,7 +1430,7 @@ function havp_fix()
     if (isset($config['installedpackages']['menu'])) {
         foreach($config['installedpackages']['menu'] as $mkey => $mval) {
         	if ($mval['name'] === 'HTTP Antivirus') {
-        		unset($config['installedpackages']['menu'][$key]);
+        		unset($config['installedpackages']['menu'][$mkey]);
                 write_config('Fix HAVP menu.');
                 break;
         	}

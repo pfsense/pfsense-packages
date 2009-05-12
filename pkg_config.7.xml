@@ -638,7 +638,7 @@
       <category>Network Management</category> 
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url> 
       <depends_on_package>havp-0.88.tbz</depends_on_package>
-      <version>0.88_04</version> 
+      <version>0.88_05</version> 
       <status>ALPHA</status> 
       <required_version>1.2.2</required_version> 
       <config_file>http://www.pfsense.com/packages/config/havp/havp.xml</config_file> 
