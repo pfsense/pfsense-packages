@@ -1710,7 +1710,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.8.5.4";
+	$freeswitch_package_version = "0.8.6";
 	$freeswitch_build_version = "1.0.4 pre 6";
 	$freeswitch_build_revision = "13238";
 	
@@ -1743,7 +1743,7 @@ function freeswitch_php_install_command()
 
 
 	//make a backup copy of the default config
-	exec("cp -R /usr/local/freeswitch/conf /usr/local/freeswitch/conf.rev".$freeswitch_build_revision.".orig");
+	exec("cp -R /usr/local/freeswitch/conf /usr/local/freeswitch/conf.orig");
 	
 	//remove some default config files that are not needed
 	unlink_if_exists("/usr/local/freeswitch/conf/dialplan/default/01_example.com.xml");
@@ -1783,12 +1783,19 @@ function freeswitch_php_install_command()
 	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.inc");
 	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.xml");
 	exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan.xml");
-	exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_external.xml");
-	exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_internal.xml");
+	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_external.xml");
+	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_internal.xml");
 	exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_modules.xml");
 	exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_public.xml");
 	exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_vars.xml");
 	
+	//misc files
+	if (!is_dir('/usr/local/www/edit_area/')) {
+	   exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/edit_area.tgz");
+	   system('cd /usr/local/www; tar xvpfz /tmp/edit_area.tgz edit_area');
+	   unlink_if_exists("/tmp/edit_area.tgz");
+	}
+
 	
 	//rename PHP files from .tmp to .php
 	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/class.smtp.tmp");
@@ -1854,7 +1861,15 @@ function freeswitch_php_install_command()
 	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr_options_edit.tmp");
 	exec("cp /tmp/freeswitch_ivr_options_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_ivr_options_edit.php");
 	unlink_if_exists("/tmp/freeswitch_ivr_options_edit.tmp");
-	
+
+	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_profiles.php.tmp");
+	exec("cp /tmp/freeswitch_profiles.tmp /usr/local/www/packages/freeswitch/freeswitch_profiles.php");
+	unlink_if_exists("/tmp/freeswitch_profiles.tmp");
+
+	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_profile_edit.tmp");
+	exec("cp /tmp/freeswitch_profile_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_profile_edit.php");
+	unlink_if_exists("/tmp/freeswitch_profile_edit.tmp");
+
 	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes.tmp");
 	exec("cp /tmp/freeswitch_public_includes.tmp /usr/local/www/packages/freeswitch/freeswitch_public_includes.php");
 	unlink_if_exists("/tmp/freeswitch_public_includes.tmp");
@@ -2282,7 +2297,9 @@ function freeswitch_php_install_command()
 	// if backup file exists restore it
 	    $filename = 'freeswitch.bak.tgz';
 	    if (!is_dir('/root/backup/')) {
-		   exec("mkdir /root/backup/");
+			exec("rm -R /usr/local/freeswitch/conf/sip_profiles/");
+			exec("rm -R /usr/local/freeswitch/sounds/music/");
+			exec("mkdir /root/backup/");
 		}
 	
 	    //extract a specific directory to /usr/local/freeswitch
@@ -2297,7 +2314,9 @@ function freeswitch_php_install_command()
 	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/storage/');
 	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/sounds/custom/8000/');
 			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/sounds/music/8000/');
-	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/ssl');
+	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/ssl/');
+			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/sip_profiles/');
+			
 
 	      //Optional
 	      	//system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/');
@@ -2332,7 +2351,7 @@ function freeswitch_php_install_command()
 	pclose($handle);
 
 	if (pkg_is_service_running('freeswitch')) {
-      sync_package_freeswitch_ivr();
+		sync_package_freeswitch_ivr();
 	}
 
 	
