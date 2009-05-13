@@ -130,7 +130,7 @@ function openbgpd_install_conf() {
 	$fd = fopen("/usr/local/etc/rc.d/bgpd.sh","w");
 	fwrite($fd, "#!/bin/sh\n\n");
 	fwrite($fd, "# This file was created by the pfSense package manager.  Do not edit!\n\n");	
-	fwrite($fd, "bgpd\n");
+	fwrite($fd, "bgpd -f /usr/local/etc/bgpd.conf\n");
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/bgpd.sh");
 	exec("chmod a-rw /usr/local/etc/bgpd.conf");
