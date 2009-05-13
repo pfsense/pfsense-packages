@@ -1,12 +1,12 @@
 <?php
 /* $Id$ */
 /*
-  freeswitch_profiles.php
-  Copyright (C) 2008 Mark J Crane
-  All rights reserved.
+	freeswitch_profiles.php
+	Copyright (C) 2008 Mark J Crane
+	All rights reserved.
 
-  FreeSWITCH (TM)
-  http://www.freeswitch.org/
+	FreeSWITCH (TM)
+	http://www.freeswitch.org/
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -59,6 +59,13 @@ function ListFiles($dir) {
     }
 }
 
+
+if ($_GET['a'] == "default") {
+	conf_mount_rw();
+	exec("cp /usr/local/freeswitch/conf.orig/sip_profiles/".$_GET['f']." /usr/local/freeswitch/conf/sip_profiles/".$_GET['f']);
+	$savemsg = $_POST['f'].": Set as Default";
+	conf_mount_ro();
+}
 
 if ($_POST['a'] == "save") {
 	conf_mount_rw();

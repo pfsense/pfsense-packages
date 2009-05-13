@@ -102,7 +102,7 @@
 		</tab>
 		<tab>
 			<text>Vars</text>
-			<url>/pkg_edit.php?xml=freeswitch_vars.xml&amp;id=0</url>
+			<url>/packages/freeswitch/freeswitch_vars.php</url>
 		</tab>
 	</tabs>
 	<configpath>installedpackages->package->$packagename->configuration->freeswitchmodules</configpath>
