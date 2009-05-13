@@ -11,12 +11,7 @@ function dashboard_install() {
 	mwexec("cp /usr/local/www/diag_logs_filter.php /usr/local/www/diag_logs_filter.php.before_dashboard");
 	mwexec("cp /usr/local/www/diag_logs_filter_dynamic.php /usr/local/www/diag_logs_filter_dynamic.php.before_dashboard");
 
-	mwexec("rm /usr/local/www/index.php");
-	mwexec("rm /usr/local/www/fbegin.inc");
-	mwexec("rm /usr/local/www/diag_logs_filter.php");
-	mwexec("rm /usr/local/www/diag_logs_filter_dynamic.php");
-
-	mwexec("tar xzvpf /usr/local/pkg/widgets.tgz -C /");
+	mwexec("tar xzvpUf /usr/local/pkg/widgets.tgz -C /");
 	assign_privs();
 }
 

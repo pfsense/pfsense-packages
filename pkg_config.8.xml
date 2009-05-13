@@ -74,17 +74,6 @@
 	<after_install_info>The pfSense release key has been updated.</after_install_info>
     </package>
     <package>
-      <name>Dashboard</name>
-      <descr>Adds pfSense dashboard that will be included with 2.0. WARNING!  Cannot be deinstalled.</descr>
-      <category>System</category>
-      <config_file>http://www.pfsense.com/packages/config/dashboard/dashboard.xml</config_file>
-      <version>0.7.5.3</version>
-      <status>BETA</status>
-      <required_version>1.2</required_version>
-      <maximum_version>1.9</maximum_version>
-      <configurationfile>dashboard.xml</configurationfile>
-    </package>
-    <package>
       <name>FreeSWITCH</name>
       <website>http://www.freeswitch.org/</website>
       <descr>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow. </descr>
