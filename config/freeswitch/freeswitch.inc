@@ -2419,6 +2419,9 @@ function freeswitch_php_install_command()
 			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/sounds/music/8000/');
 	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/ssl/');
 			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/sip_profiles/');
+			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/vars.xml');
+			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/dialplan/default.xml');
+			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/dialplan/public.xml');
 
 	      //Optional
 	      	//system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/');
