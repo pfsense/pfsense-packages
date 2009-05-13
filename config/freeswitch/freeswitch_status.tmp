@@ -115,6 +115,23 @@ if (!pkg_is_service_running('freeswitch')) {
 	sleep(7);
 }
 ?>
+
+<script language="Javascript" type="text/javascript" src="/edit_area/edit_area_full.js"></script>
+<script language="Javascript" type="text/javascript">
+	// initialisation
+	editAreaLoader.init({
+		id: "log"	// id of the textarea to transform		
+		,start_highlight: false
+		,allow_toggle: true
+		,display: "later"
+		,language: "en"
+		,syntax: "html"	
+		,toolbar: "search, go_to_line,|, fullscreen, |, undo, redo, |, select_font, |, syntax_selection, |, change_smooth_selection, highlight, reset_highlight, |, help"
+		,syntax_selection_allow: "css,html,js,php,xml,c,cpp,sql"
+		,show_line_colors: true
+	});	
+</script>
+
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
 
@@ -305,9 +322,9 @@ echo "</table>\n";
 echo "<br /><br />\n\n";
 
 
-echo "<b>tail -n 100 /usr/local/freeswitch/log/freeswitch.log</b><br />\n";
-echo "<textarea cols='85' rows='30' wrap='off'>\n";
-echo system("tail -n 100 /usr/local/freeswitch/log/freeswitch.log");
+echo "<b>tail -n 500 /usr/local/freeswitch/log/freeswitch.log</b><br />\n";
+echo "<textarea id='log' name='log' cols='93' rows='30' wrap='off'>\n";
+echo system("tail -n 500 /usr/local/freeswitch/log/freeswitch.log");
 echo "</textarea>\n";
 echo "<br /><br />\n\n";
 

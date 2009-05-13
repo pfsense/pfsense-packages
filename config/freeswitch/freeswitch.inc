@@ -1778,30 +1778,33 @@ function create_lan_sip_profile()
 	//create the LAN profile if it doesn't exist
 	if (!file_exists('/usr/local/freeswitch/conf/sip_profiles/lan.xml')) {
 		$lan_ip = $config['interfaces']['lan']['ipaddr'];
-		
-		$filename = "/usr/local/freeswitch/conf/sip_profiles/lan.xml";
-		$handle = fopen($filename,"rb");
-		$contents = fread($handle, filesize($filename));	
-		fclose($handle);
+		if (strlen($lan_ip) > 0) {
+			exec("cp /usr/local/freeswitch/conf/sip_profiles/internal.xml /usr/local/freeswitch/conf/sip_profiles/lan.xml");
+			
+			$filename = "/usr/local/freeswitch/conf/sip_profiles/lan.xml";
+			$handle = fopen($filename,"rb");
+			$contents = fread($handle, filesize($filename));	
+			fclose($handle);
 
-		$handle = fopen($filename,"w");
-		$contents = str_replace("<profile name=\"internal\">", "<profile name=\"lan\">", $contents);
-		$contents = str_replace("<alias name=\"default\"/>", "", $contents);
-		$contents = str_replace("<X-PRE-PROCESS cmd=\"include\" data=\"internal/*.xml\"/>", "<X-PRE-PROCESS cmd=\"include\" data=\"lan/*.xml\"/>", $contents);
-		$contents = str_replace("<param name=\"rtp-ip\" value=\"$${local_ip_v4}\"/>", "<param name=\"rtp-ip\" value=\"".$lan_ip."\"/>", $contents);
-		$contents = str_replace("<param name=\"sip-ip\" value=\"$${local_ip_v4}\"/>", "<param name=\"sip-ip\" value=\"".$lan_ip."\"/>", $contents);
-		fwrite($handle, $contents);		
-		unset($contents); 	
-		fclose($handle);
-		unset($filename);
+			$handle = fopen($filename,"w");
+			$contents = str_replace("<profile name=\"internal\">", "<profile name=\"lan\">", $contents);
+			$contents = str_replace("<alias name=\"default\"/>", "", $contents);
+			$contents = str_replace("<X-PRE-PROCESS cmd=\"include\" data=\"internal/*.xml\"/>", "<X-PRE-PROCESS cmd=\"include\" data=\"lan/*.xml\"/>", $contents);
+			$contents = str_replace("<param name=\"rtp-ip\" value=\"$${local_ip_v4}\"/>", "<param name=\"rtp-ip\" value=\"".$lan_ip."\"/>", $contents);
+			$contents = str_replace("<param name=\"sip-ip\" value=\"$${local_ip_v4}\"/>", "<param name=\"sip-ip\" value=\"".$lan_ip."\"/>", $contents);
+			fwrite($handle, $contents);		
+			unset($contents); 	
+			fclose($handle);
+			unset($filename);
+		}
 	}
-
+	
 }
 
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.8.7";
+	$freeswitch_package_version = "0.8.7.1";
 	$freeswitch_build_version = "1.0.4 pre 6";
 	$freeswitch_build_revision = "13238";
 	
