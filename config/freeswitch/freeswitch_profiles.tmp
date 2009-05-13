@@ -63,7 +63,7 @@ function ListFiles($dir) {
 if ($_GET['a'] == "default") {
 	conf_mount_rw();
 	exec("cp /usr/local/freeswitch/conf.orig/sip_profiles/".$_GET['f']." /usr/local/freeswitch/conf/sip_profiles/".$_GET['f']);
-	$savemsg = $_POST['f'].": Set as Default";
+	$savemsg = "Restore Default";
 	conf_mount_ro();
 }
 
@@ -73,7 +73,7 @@ if ($_POST['a'] == "save") {
 	$fd = fopen("/usr/local/freeswitch/conf/sip_profiles/".$_POST['f'], "w");
 	fwrite($fd, $content);
 	fclose($fd);
-	$savemsg = "Saved text to " . $_POST['f'];
+	$savemsg = "Saved";
 	conf_mount_ro();
 }
 

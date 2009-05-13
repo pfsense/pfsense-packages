@@ -110,7 +110,7 @@ display_top_tabs(build_menu());
 		<td align='right'>
 			<input type="hidden" name="a" value="save" />
 			<?php
-			echo "<input type='button' value='Set as Default' onclick=\"document.location.href='/packages/freeswitch/freeswitch_profiles.php?a=default&f=".$_GET['f']."';\" />";
+			echo "<input type='button' value='Restore Default' onclick=\"document.location.href='/packages/freeswitch/freeswitch_profiles.php?a=default&f=".$_GET['f']."';\" />";
 			?>
 		</td>
       </tr>

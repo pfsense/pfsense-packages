@@ -253,6 +253,35 @@ function byte_convert( $bytes ) {
     return round($bytes/pow($convention,$e),2).' '.$s[$e];
 }
 
+function lan_sip_profile()
+{
+	global $config;
+	//create the LAN profile if it doesn't exist
+	if (!file_exists('/usr/local/freeswitch/conf/sip_profiles/lan.xml')) {
+		$lan_ip = $config['interfaces']['lan']['ipaddr'];
+		if (strlen($lan_ip) > 0) {
+			exec("cp /usr/local/freeswitch/conf/sip_profiles/internal.xml /usr/local/freeswitch/conf/sip_profiles/lan.xml");
+			
+			$filename = "/usr/local/freeswitch/conf/sip_profiles/lan.xml";
+			$handle = fopen($filename,"rb");
+			$contents = fread($handle, filesize($filename));	
+			fclose($handle);
+
+			$handle = fopen($filename,"w");
+			$contents = str_replace("<profile name=\"internal\">", "<profile name=\"lan\">", $contents);
+			$contents = str_replace("<alias name=\"default\"/>", "", $contents);
+			$contents = str_replace("<X-PRE-PROCESS cmd=\"include\" data=\"internal/*.xml\"/>", "<X-PRE-PROCESS cmd=\"include\" data=\"lan/*.xml\"/>", $contents);
+			$contents = str_replace("<param name=\"rtp-ip\" value=\"\$\${local_ip_v4}\"/>", "<param name=\"rtp-ip\" value=\"".$lan_ip."\"/>", $contents);
+			$contents = str_replace("<param name=\"sip-ip\" value=\"\$\${local_ip_v4}\"/>", "<param name=\"sip-ip\" value=\"".$lan_ip."\"/>", $contents);
+			fwrite($handle, $contents);		
+			unset($contents); 	
+			fclose($handle);
+			unset($filename);
+		}
+	}
+	
+}
+
 function  recording_js()
 {
 
@@ -1772,39 +1801,10 @@ function sync_package_freeswitch()
 }
 
 
-function create_lan_sip_profile()
-{
-	global $config;
-	//create the LAN profile if it doesn't exist
-	if (!file_exists('/usr/local/freeswitch/conf/sip_profiles/lan.xml')) {
-		$lan_ip = $config['interfaces']['lan']['ipaddr'];
-		if (strlen($lan_ip) > 0) {
-			exec("cp /usr/local/freeswitch/conf/sip_profiles/internal.xml /usr/local/freeswitch/conf/sip_profiles/lan.xml");
-			
-			$filename = "/usr/local/freeswitch/conf/sip_profiles/lan.xml";
-			$handle = fopen($filename,"rb");
-			$contents = fread($handle, filesize($filename));	
-			fclose($handle);
-
-			$handle = fopen($filename,"w");
-			$contents = str_replace("<profile name=\"internal\">", "<profile name=\"lan\">", $contents);
-			$contents = str_replace("<alias name=\"default\"/>", "", $contents);
-			$contents = str_replace("<X-PRE-PROCESS cmd=\"include\" data=\"internal/*.xml\"/>", "<X-PRE-PROCESS cmd=\"include\" data=\"lan/*.xml\"/>", $contents);
-			$contents = str_replace("<param name=\"rtp-ip\" value=\"$${local_ip_v4}\"/>", "<param name=\"rtp-ip\" value=\"".$lan_ip."\"/>", $contents);
-			$contents = str_replace("<param name=\"sip-ip\" value=\"$${local_ip_v4}\"/>", "<param name=\"sip-ip\" value=\"".$lan_ip."\"/>", $contents);
-			fwrite($handle, $contents);		
-			unset($contents); 	
-			fclose($handle);
-			unset($filename);
-		}
-	}
-	
-}
-
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.8.7.1";
+	$freeswitch_package_version = "0.8.7.2";
 	$freeswitch_build_version = "1.0.4 pre 6";
 	$freeswitch_build_revision = "13238";
 	
@@ -2401,41 +2401,40 @@ function freeswitch_php_install_command()
   	}
   	
 	// if backup file exists restore it
-	    $filename = 'freeswitch.bak.tgz';
-	    if (!is_dir('/root/backup/')) {
+		$filename = 'freeswitch.bak.tgz';
+		if (!is_dir('/root/backup/')) {
 			exec("rm -R /usr/local/freeswitch/conf/sip_profiles/");
 			exec("rm -R /usr/local/freeswitch/sounds/music/");
 			exec("mkdir /root/backup/");
 		}
 	
-	    //extract a specific directory to /usr/local/freeswitch
-	    if (file_exists('/root/backup/'.$filename)) {
-	      //echo "The file $filename exists";
+	//extract a specific directory to /usr/local/freeswitch
+		if (file_exists('/root/backup/'.$filename)) {
+			//echo "The file $filename exists";
 	
-	      //Recommended
-	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/db/');
-	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/log/');
-	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/recordings/');
-	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/scripts/');
-	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/storage/');
-	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/sounds/custom/8000/');
+			//Recommended
+			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/db/');
+			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/log/');
+			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/recordings/');
+			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/scripts/');
+			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/storage/');
+			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/sounds/custom/8000/');
 			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/sounds/music/8000/');
-	        system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/ssl/');
+			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/ssl/');
 			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/sip_profiles/');
 			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/vars.xml');
 			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/dialplan/default.xml');
 			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/dialplan/public.xml');
 
-	      //Optional
-	      	//system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/');
-	        //system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/grammar/');
-	        //system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/htdocs/');
+			//Optional
+			//system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/');
+			//system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/grammar/');
+			//system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/htdocs/');
 
 			unset($filename);
-	    }
-	
-	//Create the LAN SIP Profile
-	create_lan_sip_profile();
+		}
+
+
 
 	write_rcfile(array(
 		"file" => "freeswitch.sh",
@@ -2449,13 +2448,15 @@ function freeswitch_php_install_command()
 	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/brian.xml");
 	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/example.com.xml");
 	unlink_if_exists("/usr/local/freeswitch/conf/dialplan/default/99999_enum.xml");
-
+		
 	write_rcfile(array(
 		"file" => "freeswitch.sh",
 		"start" => "/usr/local/freeswitch/bin/./freeswitch -nc",
 		"stop" => "/usr/local/freeswitch/bin/./freeswitch -stop"
 		)
 	);
+	
+	lan_sip_profile();
 
 	sync_package_freeswitch();
 	$handle = popen("/usr/local/etc/rc.d/freeswitch.sh start", "r");
@@ -2465,7 +2466,6 @@ function freeswitch_php_install_command()
 		sync_package_freeswitch_ivr();
 	}
 
-	
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = $freeswitch_build_version." revision ".$freeswitch_build_revision.".";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = $freeswitch_package_version;
 	
@@ -2518,7 +2518,7 @@ function freeswitch_deinstall_command()
 	unlink_if_exists("/usr/local/www/packages/freeswitch/freeswitch_time_conditions_edit.php");
 	unlink_if_exists("/usr/local/www/packages/freeswitch/freeswitch_status.php");	
 	unlink_if_exists("/usr/local/www/packages/freeswitch/slim.swf");
-	
+
 	exec("rm -R /usr/local/freeswitch/");
 	exec("rm -R /usr/local/www/packages/freeswitch/");
 	unlink_if_exists("/usr/local/etc/rc.d/freeswitch.sh");

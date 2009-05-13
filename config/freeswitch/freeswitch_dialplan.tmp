@@ -38,7 +38,7 @@ require("/usr/local/pkg/freeswitch.inc");
 if ($_GET['a'] == "default") {
 	conf_mount_rw();
 	exec("cp /usr/local/freeswitch/conf.orig/dialplan/default.xml /usr/local/freeswitch/conf/dialplan/default.xml");
-	$savemsg = "Dialplan default.xml: Set as Default";
+	$savemsg = "Default Restored";
 	conf_mount_ro();
 }
 
@@ -48,7 +48,7 @@ if ($_POST['a'] == "save") {
 	$fd = fopen("/usr/local/freeswitch/conf/dialplan/default.xml", "w");
 	fwrite($fd, $content);
 	fclose($fd);
-	$savemsg = "Saved text to the dialplan default.xml";
+	$savemsg = "Saved";
 	conf_mount_ro();
 }
 
@@ -130,7 +130,7 @@ display_top_tabs(build_menu());
 			<input type="hidden" name="f" value="<?php echo $_GET['f']; ?>" />
 			<input type="hidden" name="a" value="save" />
 			<?php
-			echo "<input type='button' value='Set as Default' onclick=\"document.location.href='/packages/freeswitch/freeswitch_dialplan.php?a=default&f=default.xml';\" />";
+			echo "<input type='button' value='Restore Default' onclick=\"document.location.href='/packages/freeswitch/freeswitch_dialplan.php?a=default&f=default.xml';\" />";
 			?>
 		</td>
       </tr>
