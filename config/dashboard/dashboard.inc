@@ -3,33 +3,20 @@
 function dashboard_install() {
 	global $g, $config;
 	assign_privs();
-	if(!file_exists("/usr/local/www/index.php.before_dashboard")) {
-		/* backup the pre-dashboard files */
-		mwexec("mv /usr/local/www/index.php /usr/local/www/index.php.before_dashboard");
-		mwexec("mv /usr/local/www/fbegin.inc /usr/local/www/fbegin.inc.before_dashboard");
-		mwexec("mv /usr/local/www/diag_logs_filter.php /usr/local/www/diag_logs_filter.php.before_dashboard");
-		mwexec("mv /usr/local/www/diag_logs_filter_dynamic.php /usr/local/www/diag_logs_filter_dynamic.php.before_dashboard");
-	} else {
-		/* Move the files, since we do not know what version they are, don't try to keep them. */
-		mwexec("mv /usr/local/www/index.php /usr/local/www/index.php.tmp");
-		mwexec("mv /usr/local/www/fbegin.inc /usr/local/www/fbegin.inc.tmp");
-		mwexec("mv /usr/local/www/diag_logs_filter.php /usr/local/www/diag_logs_filter.php.tmp");
-		mwexec("mv /usr/local/www/diag_logs_filter_dynamic.php /usr/local/www/diag_logs_filter_dynamic.php.tmp");
-	}
-	mwexec("tar xzvpf /usr/local/pkg/widgets.tgz -C /");
-	assign_privs();
-}
+	
+	/* Copy, then rm the files for backup. For some odd reason, mv alone does
+	 *  not always result in the proper file being used. */
+	mwexec("cp /usr/local/www/index.php /usr/local/www/index.php.before_dashboard");
+	mwexec("cp /usr/local/www/fbegin.inc /usr/local/www/fbegin.inc.before_dashboard");
+	mwexec("cp /usr/local/www/diag_logs_filter.php /usr/local/www/diag_logs_filter.php.before_dashboard");
+	mwexec("cp /usr/local/www/diag_logs_filter_dynamic.php /usr/local/www/diag_logs_filter_dynamic.php.before_dashboard");
 
-function dashboard_deinstall() {
-	global $g, $config;
-	assign_privs();
-	if(file_exists("/usr/local/www/index.php.before_dashboard")) {
-		/* restore the files prior to the dashboard package installation */
-		mwexec("mv /usr/local/www/index.php.before_dashboard /usr/local/www/index.php");
-		mwexec("mv /usr/local/www/fbegin.inc.before_dashboard /usr/local/www/fbegin.inc");
-		mwexec("mv /usr/local/www/diag_logs_filter.php.before_dashboard /usr/local/www/diag_logs_filter.php");
-		mwexec("mv /usr/local/www/diag_logs_filter_dynamic.php.before_dashboard /usr/local/www/diag_logs_filter_dynamic.php");
-	}
+	mwexec("rm /usr/local/www/index.php");
+	mwexec("rm /usr/local/www/fbegin.inc");
+	mwexec("rm /usr/local/www/diag_logs_filter.php");
+	mwexec("rm /usr/local/www/diag_logs_filter_dynamic.php");
+
+	mwexec("tar xzvpf /usr/local/pkg/widgets.tgz -C /");
 	assign_privs();
 }
 
