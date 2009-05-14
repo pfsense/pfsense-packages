@@ -47,58 +47,116 @@ if (isset($_POST['t'])) {
 }
 
 if ($_GET['act'] == "del") {
-  if ($_GET['type'] == 'cmd') {
-      if ($a_shellcmd[$_GET['id']]) {
-          unset($a_shellcmd[$_GET['id']]);
-          write_config();
-          php_sync_package();
-          header("Location: shellcmd.php");
-          exit;
-      }
-  }
+	if ($_GET['type'] == 'cmd') {
+
+		switch (htmlspecialchars($type)) {
+		case "earlyshellcmd":
+			//if ($a_earlyshellcmd[$_GET['id']]) {
+				unset($a_earlyshellcmd[$_GET['id']]);
+				write_config();
+				php_sync_package();
+				header("Location: shellcmd.php");
+				exit;
+			//}
+			break;
+		case "shellcmd":
+			//if ($a_shellcmd[$_GET['id']]) {
+				unset($a_shellcmd[$_GET['id']]);
+				write_config();
+				php_sync_package();
+				header("Location: shellcmd.php");
+				exit;
+			//}
+			break;
+		case "afterfilterchangeshellcmd":
+			//if ($a_afterfilterchangeshellcmd[$_GET['id']]) {
+			//	unset($a_afterfilterchangeshellcmd[$_GET['id']]);
+			//	write_config();
+			//	php_sync_package();
+			//	header("Location: shellcmd.php");
+			//	exit;
+			//}
+			break;					
+		default:
+			break;	
+		}
+
+	}
 }
 
+//get value for the form edit value
 if (isset($id) && $a_shellcmd[$id]) {
 
-	$pconfig['command'] = $a_shellcmd[$id]['command'];
+	switch (htmlspecialchars($type)) {
+	case "earlyshellcmd":
+		if ($a_earlyshellcmd[$id]) {
+			$pconfig['command'] = $a_earlyshellcmd[$id]['command'];
+		}
+		break;
+	case "shellcmd":
+		if ($a_shellcmd[$id]) {
+			$pconfig['command'] = $a_shellcmd[$id]['command'];
+		}
+		break;
+	case "afterfilterchangeshellcmd":
+		//if ($a_afterfilterchangeshellcmd[$id]) {
+		//	$pconfig['command'] = $a_afterfilterchangeshellcmd[$id]['command'];
+		//}
+		break;					
+	default:
+		break;	
+	}
 
-	
 }
 
 if ($_POST) {
 
 	unset($input_errors);
-	$pconfig = $_POST;
   
 	if (!$input_errors) {
+		if (strlen($_POST['command']) > 0) {
+			$ent = array();
+			$ent['command'] = $_POST['command'];
 
-		$ent = array();
-		$ent['command'] = $_POST['command'];
-
-		if (isset($id) && $a_shellcmd[$id]) {
-		  	//update
-      		$a_shellcmd[$id] = $ent;
-		}
-		else {
-		  	//add			
-			switch (htmlspecialchars($type)) {
-			case "earlyshellcmd":
-				$a_earlyshellcmd[] = $ent;
-				break;
-			case "shellcmd":
-				$a_shellcmd[] = $ent;
-				break;
-			case "afterfilterchangeshellcmd":
-				$a_afterfilterchangeshellcmd[] = $ent;
-				break;					
-			default:
-				break;	
-			}
+			if (isset($id)) { //if ($a_shellcmd[$id]) {
+				//update
 				
+				switch (htmlspecialchars($type)) {
+				case "earlyshellcmd":
+					$a_earlyshellcmd[$id] = $ent;
+					break;
+				case "shellcmd":
+					$a_shellcmd[$id] = $ent;
+					break;
+				case "afterfilterchangeshellcmd":
+				//	$a_afterfilterchangeshellcmd[$id] = $ent;
+					break;					
+				default:
+					break;	
+				}
+					
+			}			
+			else {
+				//add			
+				switch (htmlspecialchars($type)) {
+				case "earlyshellcmd":
+					$a_earlyshellcmd[] = $ent;
+					break;
+				case "shellcmd":
+					$a_shellcmd[] = $ent;
+					break;
+				case "afterfilterchangeshellcmd":
+					//$a_afterfilterchangeshellcmd[] = $ent;
+					break;					
+				default:
+					break;	
+				}
+					
+			}
+			
+			write_config();
+			php_sync_package();
 		}
-		
-		write_config();
-		php_sync_package();
 		
 		header("Location: shellcmd.php");
 		exit;
@@ -119,7 +177,7 @@ function show_advanced_config() {
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">shellcmd: Edit</p>
+<p class="pgtitle">Shellcmd: Edit</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 
 
@@ -152,9 +210,16 @@ function show_advanced_config() {
 
 
         <form action="shellcmd_edit.php" method="post" name="iform" id="iform">
-            <table width="100%" border="0" cellpadding="6" cellspacing="0">		
+            <table width="100%" border="0" cellpadding="6" cellspacing="0">		         
             <tr>
-              <td width="25%" valign="top" class="vncellreq">type</td>
+              <td width="25%" valign="top" class="vncellreq">Command</td>
+              <td width="75%" class="vtable">
+                <input name="command" type="text" class="formfld" id="command" size="40" value="<?=htmlspecialchars($pconfig['command']);?>">
+              </td>
+            </tr>
+
+			<tr>
+              <td width="25%" valign="top" class="vncellreq">Type</td>
               <td width="75%" class="vtable">
 				<?php                
 				echo "              <select name='t' class='formfld'>\n";
@@ -163,38 +228,30 @@ function show_advanced_config() {
 				case "earlyshellcmd":
 					echo "              <option value='earlyshellcmd' selected='yes'>earlyshellcmd</option>\n";
 					echo "              <option value='shellcmd'>shellcmd</option>\n";
-					echo "              <option value='afterfilterchangeshellcmd'>afterfilterchangeshellcmd</option>\n";
+					//echo "              <option value='afterfilterchangeshellcmd'>afterfilterchangeshellcmd</option>\n";
 					break;
 				case "shellcmd":
 					echo "              <option value='earlyshellcmd'>earlyshellcmd</option>\n";
 					echo "              <option value='shellcmd' selected='yes'>shellcmd</option>\n";
-					echo "              <option value='afterfilterchangeshellcmd'>afterfilterchangeshellcmd</option>\n";
+					//echo "              <option value='afterfilterchangeshellcmd'>afterfilterchangeshellcmd</option>\n";
 					break;
 				case "afterfilterchangeshellcmd":
-					echo "              <option value='earlyshellcmd'>earlyshellcmd</option>\n";
-					echo "              <option value='shellcmd'>shellcmd</option>\n";
-					echo "              <option value='afterfilterchangeshellcmd' selected='yes'>afterfilterchangeshellcmd</option>\n";
+					//echo "              <option value='earlyshellcmd'>earlyshellcmd</option>\n";
+					//echo "              <option value='shellcmd'>shellcmd</option>\n";
+					//echo "              <option value='afterfilterchangeshellcmd' selected='yes'>afterfilterchangeshellcmd</option>\n";
 					break;					
 				default:
 					echo "              <option value=''></option>\n";				
 					echo "              <option value='earlyshellcmd'>earlyshellcmd</option>\n";
 					echo "              <option value='shellcmd'>shellcmd</option>\n";
-					echo "              <option value='afterfilterchangeshellcmd'>afterfilterchangeshellcmd</option>\n";
+					//echo "              <option value='afterfilterchangeshellcmd'>afterfilterchangeshellcmd</option>\n";
 					break;	
 				}
 				echo "              </select>\n";
 				?>
-                <input name="type" type="text" class="formfld" id="minute" size="40" value="<?=htmlspecialchars($pconfig['type']);?>">
-              </td>
-            </tr> 
-          
-            <tr>
-              <td width="25%" valign="top" class="vncellreq">command</td>
-              <td width="75%" class="vtable">
-                <input name="command" type="text" class="formfld" id="command" size="40" value="<?=htmlspecialchars($pconfig['command']);?>">
               </td>
             </tr>
-
+			
 
             <!--
             <tr>
@@ -209,10 +266,10 @@ function show_advanced_config() {
             <tr>
               <td valign="top">&nbsp;</td>
               <td>
-                <input name="Submit" type="submit" class="formbtn" value="Save"> <input class="formbtn" type="button" value="Cancel" onclick="history.back()">
-                <?php if (isset($id) && $a_shellcmd[$id]): ?>
+                <?php if (isset($id)) { ?>
                   <input name="id" type="hidden" value="<?=$id;?>">
-                <?php endif; ?>
+                <?php }; ?>			  
+                <input name="Submit" type="submit" class="formbtn" value="Save"> <input class="formbtn" type="button" value="Cancel" onclick="history.back()">
               </td>
             </tr>
             </table>
