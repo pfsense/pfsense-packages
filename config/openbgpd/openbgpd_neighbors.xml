@@ -106,6 +106,18 @@
 			</options>
 		</field>
 		<field>
+			<fielddescr>MD5 Signature Password</fielddescr>
+			<fieldname>md5sigpass</fieldname>
+			<description></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>MD5 Signature Key</fielddescr>
+			<fieldname>md5sigkey</fieldname>
+			<description></description>
+			<type>input</type>
+		</field>
+		<field>
 			<fielddescr>none</fielddescr>
 			<fieldname>none</fieldname>
 		    <type>rowhelper</type>
