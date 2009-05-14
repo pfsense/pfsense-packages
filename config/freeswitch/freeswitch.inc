@@ -282,6 +282,30 @@ function lan_sip_profile()
 	
 }
 
+function ListFiles($dir) {
+
+    if($dh = opendir($dir)) {
+
+        $files = Array();
+        $inner_files = Array();
+
+        while($file = readdir($dh)) {
+            if($file != "." && $file != ".." && $file[0] != '.') {
+                if(is_dir($dir . "/" . $file)) {
+                    //$inner_files = ListFiles($dir . "/" . $file); //recursive
+                    if(is_array($inner_files)) $files = array_merge($files, $inner_files); 
+                } else {
+                    array_push($files, $file);
+					//array_push($files, $dir . "/" . $file);
+                }
+            }
+        }
+
+        closedir($dh);
+        return $files;
+    }
+}
+
 function  recording_js()
 {
 
@@ -1804,7 +1828,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.8.7.2";
+	$freeswitch_package_version = "0.8.7.3";
 	$freeswitch_build_version = "1.0.4 pre 6";
 	$freeswitch_build_revision = "13238";
 	
@@ -2400,18 +2424,19 @@ function freeswitch_php_install_command()
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_zh'] = "disable";
   	}
   	
-	// if backup file exists restore it
-		$filename = 'freeswitch.bak.tgz';
+	// if backup file exists restore it		
 		if (!is_dir('/root/backup/')) {
-			exec("rm -R /usr/local/freeswitch/conf/sip_profiles/");
-			exec("rm -R /usr/local/freeswitch/sounds/music/");
 			exec("mkdir /root/backup/");
 		}
 	
 	//extract a specific directory to /usr/local/freeswitch
+		$filename = 'freeswitch.bak.tgz';
 		if (file_exists('/root/backup/'.$filename)) {
 			//echo "The file $filename exists";
 	
+			exec("rm -R /usr/local/freeswitch/conf/sip_profiles/");
+			exec("rm -R /usr/local/freeswitch/sounds/music/");
+			
 			//Recommended
 			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/db/');
 			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/log/');
@@ -2434,14 +2459,6 @@ function freeswitch_php_install_command()
 			unset($filename);
 		}
 
-
-
-	write_rcfile(array(
-		"file" => "freeswitch.sh",
-		"start" => "/usr/local/freeswitch/bin/./freeswitch -nc",
-		"stop" => "/usr/local/freeswitch/bin/./freeswitch -stop"
-		)
-	);
 
 	exec("rm -R /freeswitch");
 	exec("cp /usr/local/freeswitch/conf/directory/default/brian.xml /usr/local/freeswitch/conf/directory/default/brian.xml.noload");

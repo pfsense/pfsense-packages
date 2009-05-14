@@ -148,8 +148,6 @@ include("head.inc");
 
 
 	<?php
-		
-
 
 	foreach (ListFiles('/usr/local/freeswitch/conf/sip_profiles') as $key=>$file){
     ?>

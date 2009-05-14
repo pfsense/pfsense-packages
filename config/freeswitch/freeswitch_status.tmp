@@ -181,50 +181,31 @@ echo "</pre>\n";
 fclose($fp);
 echo "<br /><br />\n\n";
 
+foreach (ListFiles('/usr/local/freeswitch/conf/sip_profiles') as $key=>$sip_profile_file){
+	
+	$sip_profile_name = str_replace(".xml", "", $sip_profile_file);
+	$fp = event_socket_create($host, $port, $password);
+	$cmd = "api sofia status profile ".$sip_profile_name;
+	$response = event_socket_request($fp, $cmd);
+	echo "<table width='690' cellpadding='0' cellspacing='0' border='0'>\n";
+	echo "<tr>\n";
+	echo "<td width='50%'>\n";
+	echo "  <b>sofia status profile $sip_profile_name</b> \n";
+	echo "</td>\n";
+	echo "<td width='50%' align='right'>\n";
+	echo "  <input type='button' value='start' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+".$sip_profile_name."+start';\" />\n";
+	echo "  <input type='button' value='stop' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+".$sip_profile_name."+stop';\" />\n";
+	echo "  <input type='button' value='flush_inbound_reg' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+".$sip_profile_name."+flush_inbound_reg';\" />\n";
+	echo "</td>\n";
+	echo "</tr>\n";
+	echo "</table>\n";
+	echo "<pre style=\"font-size: 9pt;\">\n";
+	echo $response;
+	echo "</pre>\n";
+	fclose($fp);
+	echo "<br /><br />\n\n";
 
-$fp = event_socket_create($host, $port, $password);
-$cmd = "api sofia status profile internal";
-$response = event_socket_request($fp, $cmd);
-echo "<table width='690' cellpadding='0' cellspacing='0' border='0'>\n";
-echo "<tr>\n";
-echo "<td width='50%'>\n";
-echo "  <b>sofia status profile internal</b> \n";
-echo "</td>\n";
-echo "<td width='50%' align='right'>\n";
-echo "  <input type='button' value='start' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+internal+start';\" />\n";
-echo "  <input type='button' value='stop' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+internal+stop';\" />\n";
-echo "  <input type='button' value='flush_inbound_reg' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+internal+flush_inbound_reg';\" />\n";
-echo "</td>\n";
-echo "</tr>\n";
-echo "</table>\n";
-echo "<pre style=\"font-size: 9pt;\">\n";
-echo $response;
-echo "</pre>\n";
-fclose($fp);
-echo "<br /><br />\n\n";
-
-
-$fp = event_socket_create($host, $port, $password);
-$cmd = "api sofia status profile external";
-$response = event_socket_request($fp, $cmd);
-echo "<table width='690' cellpadding='0' cellspacing='0' border='0'>\n";
-echo "<tr>\n";
-echo "<td width='50%'>\n";
-echo "  <b>sofia status profile external</b> \n";
-echo "</td>\n";
-echo "<td width='50%' align='right'>\n";
-echo "  <input type='button' value='start' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+external+start+reloadxml';\" />\n";
-echo "  <input type='button' value='stop' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+external+stop';\" />\n";
-echo "  <input type='button' value='restart' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+external+restart+reloadxml';\" />\n";
-echo "  <input type='button' value='rescan' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+external+rescan+reloadxml';\" />\n";
-echo "</td>\n";
-echo "</tr>\n";
-echo "</table>\n";
-echo "<pre style=\"font-size: 9pt;\">\n";
-echo $response;
-echo "</pre>\n";
-fclose($fp);
-echo "<br /><br />\n\n";
+}
 
 
 $fp = event_socket_create($host, $port, $password);
