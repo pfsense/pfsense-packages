@@ -45,6 +45,11 @@
 	<version>1</version>
 	<title>Services: OpenBGPD</title>
 	<include_file>/usr/local/pkg/openbgpd.inc</include_file>
+  <service>
+    <name>bgpd</name>
+    <rcfile>bgpd.sh</rcfile>
+    <executable>bgpd</executable>
+  </service>	
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
