@@ -222,7 +222,7 @@ echo "<br /><br />\n\n";
 $fp = event_socket_create($host, $port, $password);
 $cmd = "api show channels";
 $response = event_socket_request($fp, $cmd);
-echo "<b>show channels</b>\n";
+echo "<b>show channels</b><br />\n";
 if (strlen($response) > 40) {
   echo "<textarea cols='85' rows='10' wrap='off'>\n";
   echo $response;
@@ -241,7 +241,7 @@ echo "<br /><br />\n\n";
 $fp = event_socket_create($host, $port, $password);
 $cmd = "api show calls";
 $response = event_socket_request($fp, $cmd);
-echo "<b>show calls</b>\n";
+echo "<b>show calls</b><br />\n";
 if (strlen($response) > 40) {
   echo "<textarea cols='85' rows='10' wrap='off'>\n";
   echo $response;
