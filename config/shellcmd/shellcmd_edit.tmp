@@ -32,17 +32,13 @@ require("guiconfig.inc");
 require("/usr/local/pkg/shellcmd.inc");
 
 
-$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
-$a_shellcmd = &$config['system']['shellcmd'];
-$a_afterfilterchangeshellcmd = &$config['system']['afterfilterchangeshellcmd'];
-
 $id = $_GET['id'];
-if (isset($_POST['id'])) {
+if (strlen($_POST['id'])>0) {
 	$id = $_POST['id'];
 }
 
 $type = $_GET['t'];
-if (isset($_POST['t'])) {
+if (strlen($_POST['t'])>0) {
 	$type = $_POST['t'];
 }
 
@@ -51,31 +47,28 @@ if ($_GET['act'] == "del") {
 
 		switch (htmlspecialchars($type)) {
 		case "earlyshellcmd":
-			//if ($a_earlyshellcmd[$_GET['id']]) {
-				unset($a_earlyshellcmd[$_GET['id']]);
-				write_config();
-				php_sync_package();
-				header("Location: shellcmd.php");
-				exit;
-			//}
+			$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
+			unset($a_earlyshellcmd[$_GET['id']]);
+			write_config();
+			php_sync_package();
+			header("Location: shellcmd.php");
+			exit;
 			break;
 		case "shellcmd":
-			//if ($a_shellcmd[$_GET['id']]) {
-				unset($a_shellcmd[$_GET['id']]);
-				write_config();
-				php_sync_package();
-				header("Location: shellcmd.php");
-				exit;
-			//}
+			$a_shellcmd = &$config['system']['shellcmd'];
+			unset($a_shellcmd[$_GET['id']]);
+			write_config();
+			php_sync_package();
+			header("Location: shellcmd.php");
+			exit;
 			break;
 		case "afterfilterchangeshellcmd":
-			//if ($a_afterfilterchangeshellcmd[$_GET['id']]) {
+			//  $a_afterfilterchangeshellcmd = &$config['system']['afterfilterchangeshellcmd'];
 			//	unset($a_afterfilterchangeshellcmd[$_GET['id']]);
 			//	write_config();
 			//	php_sync_package();
 			//	header("Location: shellcmd.php");
 			//	exit;
-			//}
 			break;					
 		default:
 			break;	
@@ -85,20 +78,23 @@ if ($_GET['act'] == "del") {
 }
 
 //get value for the form edit value
-if (isset($id) && $a_shellcmd[$id]) {
+if (strlen($id) > 0) {
 
 	switch (htmlspecialchars($type)) {
 	case "earlyshellcmd":
+		$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
 		if ($a_earlyshellcmd[$id]) {
 			$pconfig['command'] = $a_earlyshellcmd[$id]['command'];
 		}
 		break;
 	case "shellcmd":
+		$a_shellcmd = &$config['system']['shellcmd'];
 		if ($a_shellcmd[$id]) {
 			$pconfig['command'] = $a_shellcmd[$id]['command'];
 		}
 		break;
 	case "afterfilterchangeshellcmd":
+		//$a_afterfilterchangeshellcmd = &$config['system']['afterfilterchangeshellcmd'];
 		//if ($a_afterfilterchangeshellcmd[$id]) {
 		//	$pconfig['command'] = $a_afterfilterchangeshellcmd[$id]['command'];
 		//}
@@ -118,18 +114,27 @@ if ($_POST) {
 			$ent = array();
 			$ent['command'] = $_POST['command'];
 
-			if (isset($id)) { //if ($a_shellcmd[$id]) {
+			if (strlen($id)>0) {
 				//update
 				
 				switch (htmlspecialchars($type)) {
 				case "earlyshellcmd":
-					$a_earlyshellcmd[$id] = $ent;
+					$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
+					if ($a_earlyshellcmd[$id]) {
+						$a_earlyshellcmd[$id] = $ent;
+					}
 					break;
 				case "shellcmd":
-					$a_shellcmd[$id] = $ent;
+					$a_shellcmd = &$config['system']['shellcmd'];
+					if ($a_shellcmd[$id]) {
+						$a_shellcmd[$id] = $ent;
+					}
 					break;
 				case "afterfilterchangeshellcmd":
-				//	$a_afterfilterchangeshellcmd[$id] = $ent;
+					//$a_afterfilterchangeshellcmd = &$config['system']['afterfilterchangeshellcmd'];
+					//if ($a_afterfilterchangeshellcmd[$id]) {
+					//	$a_afterfilterchangeshellcmd[$id] = $ent;
+					//}
 					break;					
 				default:
 					break;	
@@ -140,24 +145,27 @@ if ($_POST) {
 				//add			
 				switch (htmlspecialchars($type)) {
 				case "earlyshellcmd":
+					$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
 					$a_earlyshellcmd[] = $ent;
 					break;
 				case "shellcmd":
+					$a_shellcmd = &$config['system']['shellcmd'];
 					$a_shellcmd[] = $ent;
 					break;
 				case "afterfilterchangeshellcmd":
+					//$a_afterfilterchangeshellcmd = &$config['system']['afterfilterchangeshellcmd'];
 					//$a_afterfilterchangeshellcmd[] = $ent;
 					break;					
 				default:
 					break;	
 				}
-					
+
 			}
-			
+
 			write_config();
 			php_sync_package();
 		}
-		
+
 		header("Location: shellcmd.php");
 		exit;
 	}
@@ -266,7 +274,7 @@ function show_advanced_config() {
             <tr>
               <td valign="top">&nbsp;</td>
               <td>
-                <?php if (isset($id)) { ?>
+                <?php if (strlen($id)>0) { ?>
                   <input name="id" type="hidden" value="<?=$id;?>">
                 <?php }; ?>			  
                 <input name="Submit" type="submit" class="formbtn" value="Save"> <input class="formbtn" type="button" value="Cancel" onclick="history.back()">
