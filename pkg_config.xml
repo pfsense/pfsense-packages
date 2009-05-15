@@ -86,7 +86,7 @@
       <descr>Adds pfSense dashboard that will be included with 2.0. This requires 1.2 or newer. WARNING!  Cannot be deinstalled.</descr>
       <category>System</category>
       <config_file>http://www.pfsense.com/packages/config/dashboard/dashboard.xml</config_file>
-      <version>1.7.6.1</version>
+      <version>1.7.6.2</version>
       <status>BETA</status>
       <required_version>1.2</required_version>
       <maximum_version>1.9</maximum_version>

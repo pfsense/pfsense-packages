@@ -7,7 +7,6 @@ function dashboard_install() {
 	/* Copy, then rm the files for backup. For some odd reason, mv alone does
 	 *  not always result in the proper file being used. */
 	mwexec("cp /usr/local/www/index.php /usr/local/www/index.php.before_dashboard");
-	mwexec("cp /usr/local/www/fbegin.inc /usr/local/www/fbegin.inc.before_dashboard");
 	mwexec("cp /usr/local/www/diag_logs_filter.php /usr/local/www/diag_logs_filter.php.before_dashboard");
 	mwexec("cp /usr/local/www/diag_logs_filter_dynamic.php /usr/local/www/diag_logs_filter_dynamic.php.before_dashboard");
 
@@ -18,13 +17,11 @@ function dashboard_install() {
 function assign_privs() {
 	/* Fix permissions on replaced files */
 	mwexec("chown root:wheel /usr/local/www/index.php");
-	mwexec("chown root:wheel /usr/local/www/fbegin.php");
 	mwexec("chown root:wheel /usr/local/www/graph_cpu.php");
 	mwexec("chown root:wheel /usr/local/www/stats.php");
 	mwexec("chown root:wheel /usr/local/www/diag_logs_filter.php");
 	mwexec("chown root:wheel /usr/local/www/diag_logs_filter_dynamic.php");
 	mwexec("chmod ug+rw,o-w /usr/local/www/index.php");
-	mwexec("chmod ug+rw,o-w /usr/local/www/fbegin.php");
 	mwexec("chmod ug+rw,o-w /usr/local/www/graph_cpu.php");
 	mwexec("chmod ug+rw,o-w /usr/local/www/stats.php");
 	mwexec("chmod ug+rw,o-w /usr/local/www/diag_logs_filter.php");
