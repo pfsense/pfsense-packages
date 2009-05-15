@@ -481,16 +481,29 @@ function tinydns_create_zone_file() {
 
 function tinydns_sync_on_changes() {
 	global $g, $config;
+	log_error("[tinydns] tinydns_xmlrpc_sync.php is starting.");
 	$synconchanges = $config['installedpackages']['tinydnssync']['config'][0]['synconchanges'];	
 	if(!$synconchanges) 
 		return;
 	$sync_hosts = $config['installedpackages']['tinydnssync']['config'];
-	foreach($sync_hosts as $sh) {
-		$sync_to_ip = $sh['ipaddress'];
-		$password   = $sh['password'];
-		if($password and $sync_to_ip) 
+	$previous_ip = "";
+	$x=0;
+	$sh = $config['installedpackages']['tinydnssync']['config'][0];
+	for($x=1; $x<5; $x++) {
+		if($x > 1) 
+			$counter = $x;
+		else 
+			$counter = "";
+		$sync_to_ip = "";
+		$password = "";
+		if($sh['ipaddress' . $counter]) {
+			$sync_to_ip = $sh['ipaddress' . $counter];
+			$password   = $sh['password'  . $counter];
+		}
+		if($password && $sync_to_ip)
 			tinydns_do_xmlrpc_sync($sync_to_ip, $password);
-	}	
+	}
+	log_error("[tinydns] tinydns_xmlrpc_sync.php is ending.");
 }
 
 function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
@@ -554,9 +567,9 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 	
 	/* tell tinydns to reload our settings on the destionation sync host. */
 	$method = 'pfsense.exec_php';
-	$execcmd  = "require('/usr/local/pkg/tinydns.inc');\n";
+	$execcmd  = "require_once('/usr/local/pkg/tinydns.inc');\n";
 	$execcmd .= "tinydns_custom_php_changeip_command();\n";
-	$execcmd .= "tinydns_custom_php_install_command();\n";
+	//$execcmd .= "tinydns_custom_php_install_command();\n";
 	$execcmd .= "tinydns_create_zone_file();\n";
 	$execcmd .= "tinydns_setup_ping_items();\n";
 	
@@ -566,6 +579,7 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 		XML_RPC_encode($execcmd)
 	);
 
+	log_error("tinydns XMLRPC reload data {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
 	$cli->setCredentials('admin', $password);
@@ -581,10 +595,9 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 		log_error($error);
 		file_notice("sync_settings", $error, "tinydns Settings Sync", "");
 	} else {
-		log_error("tinydns XMLRPC sync successfully completed with {$url}:{$port} (pfsense.exec_php).");
+		log_error("tinydns XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
 	}
-	
-	log_error("[tinydns] tinydns_xmlrpc_sync.php is ending.");
+
 }
 
 /* formats data as a tinydns data row item */

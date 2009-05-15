@@ -219,28 +219,38 @@
 		</field>
 	</fields>
 	<custom_delete_php_command>
+		$dnssync = true;		
 		tinydns_create_zone_file();
 		tinydns_setup_ping_items();
 		tinydns_sync_on_changes();
 	</custom_delete_php_command>
 	<custom_php_validation_command>
-		tinydns_cleanup_addedit_form_record();
+		if(function_exists("tinydns_cleanup_addedit_form_record"))
+			tinydns_cleanup_addedit_form_record();
+		else {
+			require_once("/usr/local/pkg/tinydns.inc");
+		}
 	</custom_php_validation_command>
 	<custom_add_php_command>
+		$dnssync = true;
 		log_error("Begin tinydns add");		
 		tinydns_create_zone_file();
 		log_error("Zone file done.");
 		tinydns_setup_ping_items();
 		log_error("Ping items done.");
 		tinydns_sync_on_changes();
+		log_error("Sync items done.");
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
-		log_error("Begin tinydns resync");
-		tinydns_create_zone_file();
-		log_error("Zone file done.");
-		tinydns_setup_ping_items();
-		log_error("Ping items done.");
-		tinydns_sync_on_changes();		
+		if(!$dnssync) {
+			log_error("Begin tinydns resync");
+			tinydns_create_zone_file();
+			log_error("Zone file done.");
+			tinydns_setup_ping_items();
+			log_error("Ping items done.");
+			tinydns_sync_on_changes();
+			log_error("Sync items done.");
+		}
 	</custom_php_resync_config_command>
 	<custom_php_command_before_form>	
 		unset($_POST['temp']);
