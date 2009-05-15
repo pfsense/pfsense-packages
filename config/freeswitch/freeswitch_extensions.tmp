@@ -38,7 +38,8 @@ $a_extensions 	   = &$config['installedpackages']['freeswitchextensions']['confi
 
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'extensions') {
-        if ($a_extensions[$_GET['id']]) {
+        if ($a_extensions[$_GET['id']]) {		
+			unlink("/usr/local/freeswitch/conf/directory/default/".$_GET['extension'].".xml");
             unset($a_extensions[$_GET['id']]);
             write_config();
             header("Location: freeswitch_extensions.php");
@@ -160,7 +161,7 @@ if ($config_change == 1) {
               <table border="0" cellspacing="0" cellpadding="1">
                 <tr>
                   <td valign="middle"><a href="freeswitch_extensions_edit.php?id=<?=$ent['id'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                  <td><a href="freeswitch_extensions.php?type=extensions&act=del&id=<?=$ent['id'];?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                  <td><a href="freeswitch_extensions.php?type=extensions&act=del&id=<?=$ent['id'];?>&extension=<?=$ent['extension'];?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                 </tr>
              </table>
             </td>

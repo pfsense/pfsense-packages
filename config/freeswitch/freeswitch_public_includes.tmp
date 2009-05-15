@@ -87,8 +87,8 @@ if ($_GET['act'] == "del") {
             }
 
             //if the public include xml file exists then delete it
-            if (file_exists("/usr/local/freeswitch/conf/public/default/".$publicincludefilename)) {
-              unlink("/usr/local/freeswitch/conf/public/default/".$publicincludefilename);
+            if (file_exists("/usr/local/freeswitch/conf/dialplan/public/".$publicincludefilename)) {
+				unlink("/usr/local/freeswitch/conf/dialplan/public/".$publicincludefilename);
             }
 
             unset($publicincludefilename);

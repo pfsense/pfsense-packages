@@ -40,6 +40,7 @@ $a_ivr = &$config['installedpackages']['freeswitchivr']['config'];
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'ivr') {
         if ($a_ivr[$_GET['id']]) {
+		unlink("/usr/local/freeswitch/scripts/ivr_".$_GET['ivrid'].".js");		
             unset($a_ivr[$_GET['id']]);
             write_config();
             sync_package_freeswitch_ivr();
@@ -73,37 +74,7 @@ display_top_tabs(build_menu());
      <td class="tabcont" >
 
 <form action="freeswitch_ivr.php" method="post" name="iform" id="iform">
-<?php
 
-
-//echo "<pre>";
-//print_r ($a_ivr);
-//echo "</pre>";
-
-//build a list of recordings from the config.xml
-//$config_recording_list = '';
-//$i = 0;
-//if (count($a_ivr) > 0) {
-//  foreach ($a_ivr as $ivrent) {
-//    $config_recording_list .= $ivrent['filename']."|";
-//    $i++;
-//  }
-//}
-//echo "config recording list: ".$config_recording_list."<br />\n";
-
-
-//if ($config_change == 1) {
-//    write_config();
-//    $config_change = 0;
-//}
-
-//if ($savemsg) print_info_box($savemsg);
-//if (file_exists($d_hostsdirty_path)): echo"<p>";
-//print_info_box_np("The FreeSWITCH recordings have been changed.<br>You must apply the changes in order for them to take effect.");
-//echo"<br />";
-//endif;
-
-?>
   	<table width="100%" border="0" cellpadding="6" cellspacing="0">
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>IVR<br />
@@ -130,20 +101,23 @@ display_top_tabs(build_menu());
           </tr>
         </table>
       </td>
-		</tr>
+	</tr>
 
-		<?php
+	<?php
       $i = 0;
       if (count($a_ivr) > 0) {
         foreach ($a_ivr as $ent) {
         	if (strlen($ent['ivrid']) > 0) {
+
+				$ivrid = str_replace(array("{", "}"), "", $ent['ivrid']);
+
     ?>
     <tr>
       <td class="listlr" ondblclick="document.location='freeswitch_ivr_edit.php?id=<?=$i;?>'">
         <?=$ent['ivrextension']?>
       </td>
       <td class="listr" ondblclick="document.location='freeswitch_ivr_edit.php?id=<?=$i;?>';">
-        <?=$ent['ivrname'];?>&nbsp;
+        <?=$ent['ivrname'];?>&nbsp;<?=$ent['ivrid'];?>&nbsp;
       </td>
       <td class="listbg" ondblclick="document.location='freeswitch_ivr_edit.php?id=<?=$i;?>';">
         <font color="#FFFFFF"><?=htmlspecialchars($ent['ivrdescr']);?>&nbsp;
@@ -152,7 +126,7 @@ display_top_tabs(build_menu());
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td valign="middle"><a href="freeswitch_ivr_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-            <td><a href="freeswitch_ivr.php?type=ivr&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+            <td><a href="freeswitch_ivr.php?type=ivr&act=del&id=<?=$i;?>&ivrid=<?php echo $ivrid; ?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
           </tr>
        </table>
       </td>

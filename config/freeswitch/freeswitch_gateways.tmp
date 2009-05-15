@@ -38,7 +38,8 @@ $a_gateways 	   = &$config['installedpackages']['freeswitchgateways']['config'];
 
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'gateways') {
-        if ($a_gateways[$_GET['id']]) {
+        if ($a_gateways[$_GET['id']]) {		
+			unlink("/usr/local/freeswitch/conf/sip_profiles/external/".$_GET['gateway'].".xml");
             unset($a_gateways[$_GET['id']]);
             write_config();
             header("Location: freeswitch_gateways.php");
@@ -154,7 +155,7 @@ if ($config_change == 1) {
               <table border="0" cellspacing="0" cellpadding="1">
                 <tr>
                   <td valign="middle"><a href="freeswitch_gateways_edit.php?id=<?=$ent['id'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                  <td><a href="freeswitch_gateways.php?type=gateways&act=del&id=<?=$ent['id'];?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                  <td><a href="freeswitch_gateways.php?type=gateways&act=del&id=<?=$ent['id'];?>&gateway=<?=$ent['gateway'];?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                 </tr>
              </table>
             </td>

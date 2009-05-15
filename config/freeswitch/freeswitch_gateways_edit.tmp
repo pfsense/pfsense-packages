@@ -197,36 +197,36 @@ if ($_POST) {
 	
 	                $dialplanincludeid = guid();
 	                $ent['dialplanincludeid'] = $dialplanincludeid;
-	            		$ent['extensionname'] = $gateway.".".$abbrv;
-	            		$ent['order'] = '9002'; //if update use the existing order number and extension name and desc
-	            		$ent['context'] = $context;
-	            		$ent['enabled'] = 'true';			
-	            		$ent['descr'] = $label.' '.$gateway;
-	            		$ent['opt1name'] = 'gatewayid';
-	            		$ent['opt1value'] = $gatewayid;
-	            		$a_dialplan_includes[] = $ent;
-	            		unset($ent);
+					$ent['extensionname'] = $gateway.".".$abbrv;
+					$ent['order'] = '9002'; //if update use the existing order number and extension name and desc
+					$ent['context'] = $context;
+					$ent['enabled'] = 'true';			
+					$ent['descr'] = $label.' '.$gateway;
+					$ent['opt1name'] = 'gatewayid';
+					$ent['opt1value'] = $gatewayid;
+					$a_dialplan_includes[] = $ent;
+					unset($ent);
 	            		
 	                $ent = array();
 	                $ent['dialplanincludeid'] = $dialplanincludeid;
 	                $ent['tag'] = 'condition'; //condition, action, antiaction
 	                $ent['fieldtype'] = 'destination_number';
 	                $ent['fielddata'] = $dialplan_expression;
-	            		$a_dialplan_include_details[] = $ent;
-	            		unset($ent);
+					$a_dialplan_include_details[] = $ent;
+					unset($ent);
 	            		
 	                $ent = array();
 	                $ent['dialplanincludeid'] = $dialplanincludeid;
 	                $ent['tag'] = 'action'; //condition, action, antiaction
 	                $ent['fieldtype'] = 'bridge';
 	                $ent['fielddata'] = $action_data;
-	            		$a_dialplan_include_details[] = $ent;
-	            		unset($ent);
-	            		
-	            		unset($label);
-	            		unset($abbrv);
-	            		unset($dialplan_expression);
-	            		unset($action_data);
+					$a_dialplan_include_details[] = $ent;
+					unset($ent);
+					
+					unset($label);
+					unset($abbrv);
+					unset($dialplan_expression);
+					unset($action_data);
 	            } //if strlen
         	} //end for each		
 		}

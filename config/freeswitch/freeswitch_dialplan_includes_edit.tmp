@@ -252,7 +252,7 @@ display_top_tabs(build_menu());
                 <?php
 
                 echo "              <select name='order' class='formfld'>\n";
-                echo "              <option></option>\n";
+                //echo "              <option></option>\n";
                 if (strlen(htmlspecialchars($pconfig['order']))> 0) {
                     echo "              <option selected='yes' value='".htmlspecialchars($pconfig['order'])."'>".htmlspecialchars($pconfig['order'])."</option>\n";
                 }
