@@ -821,6 +821,7 @@
       <version>0.1</version>
       <status>BETA</status>
       <required_version>1.2</required_version>
+      <maximum_version>1.2.9</maximum_version>      
       <config_file>http://www.pfsense.com/packages/config/ovpnenhance/ovpnenhance.xml</config_file>
       <configurationfile>ovpnenhance.xml</configurationfile>
     </package>
