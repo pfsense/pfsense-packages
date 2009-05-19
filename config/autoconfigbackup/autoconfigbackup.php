@@ -124,7 +124,7 @@ function get_hostnames() {
 	if ($input_errors)
 		print_input_errors($input_errors);
 	if($hostname <> $myhostname) 
-			print_info_box("Warning! You are currently viewing an alternate hosts backup history ($hostname)");
+			print_info_box("Warning! You are currently viewing an alternate host's backup history ($hostname)");
 ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">  <tr><td>
 <div id="loading">
@@ -204,7 +204,7 @@ function get_hostnames() {
 					$ondisksha256 = trim(`/sbin/sha256 /tmp/config_restore.xml | awk '{ print $4 }'`);
 					if($sha256 != "0" && $sha256 != "")  // we might not have a sha256 on file for older backups
 						if($ondisksha256 <> $sha256)
-							$input_errors[] = "SHA256 values does not match, cannot restore.";
+							$input_errors[] = "SHA256 values do not match, cannot restore.";
 					if (curl_errno($curl_session)) {
 						/* If an error occured, log the error in /tmp/ */
 						$fd = fopen("/tmp/acb_restoredebug.txt", "w");
@@ -362,7 +362,7 @@ EOF;
 	if($counter == 0)
 		echo "<tr><td colspan='3'><center>Sorry, we could not locate any backups at portal.pfsense.org for this hostname ({$hostname}).</td></tr>";
 	else 
-		echo "<tr><td colspan='3'><center><br/>Backups hosted currently for this hostname on portalpfsense.org: {$counter}.</td></tr>";	
+		echo "<tr><td colspan='3'><center><br/>Backups hosted currently for this hostname on portal.pfsense.org: {$counter}.</td></tr>";	
 ?>
 	</table>
 	</div>
