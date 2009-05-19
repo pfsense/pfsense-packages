@@ -144,7 +144,7 @@ function nrpe2_custom_php_write_config()
 	
 	foreach ($config['installedpackages']['nrpe2']['config'][0]['row'] as $cmd)
 	{
-		$cmds[] = "command[{$cmd['command']}]=/usr/local/libexec/nagios/{$cmd['command']} -w {$cmd['warning']} -c {$cmd['critical']} {$cmd['extra']}\n";
+		$cmds[] = "command[{$cmd['name']}]=/usr/local/libexec/nagios/{$cmd['command']} -w {$cmd['warning']} -c {$cmd['critical']} {$cmd['extra']}\n";
 	}
 	$commands = implode($cmds);
 	
