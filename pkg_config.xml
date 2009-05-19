@@ -812,4 +812,15 @@
     <config_file>http://www.pfsense.com/packages/config/open-vm-tools/open-vm-tools.xml</config_file>
     <configurationfile>open-vm-tools.xml</configurationfile>
   </package>
+    <package>
+      <name>OpenVPN-Enhancements</name>
+      <maintainer>mfuchs77@googlemail.com</maintainer>
+      <descr>AEnhance OpenVPN with TLS-auth and client/server-options</descr>
+      <category>Services</category>
+      <version>0.1</version>
+      <status>BETA</status>
+      <required_version>1.2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/ovpnenhance/ovpnenhance.xml</config_file>
+      <configurationfile>ovpnenhance.xml</configurationfile>
+    </package>
 </pfsensepkgs>
