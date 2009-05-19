@@ -4,7 +4,7 @@
 <packagegui>
     <description>Enhance OpenVPN with TLS-auth and client/server-options</description>
     <requirements>pfSense 1.2.x</requirements>
-    <faq>Enhances OpenVPN with TLS-auth and client/server-options.</faq>
+    <faq>Enhances OpenVPN with TLS-auth and client/server-options. Cannot be uninstalled.</faq>
 	<name>ovpnenhance</name>
 	<version>0.1</version>
 	<title>ovpnenhance</title>
