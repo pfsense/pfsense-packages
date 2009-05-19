@@ -816,7 +816,7 @@
       <name>OpenVPN-Enhancements</name>
       <maintainer>mfuchs77@googlemail.com</maintainer>
       <website>http://pfsense.trendchiller.com</website>
-      <descr>Enhance OpenVPN with TLS-auth and client/server-options</descr>
+      <descr>Enhance OpenVPN with TLS-auth and client/server-options. WARNING! Cannot be uninstalled.</descr>
       <category>Security</category>
       <version>0.1</version>
       <status>BETA</status>
