@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<packagegui>
+    <description>Nagios NRPEv2</description>
+    <requirements>Describe your package requirements here</requirements>
+	<name>nrpe2</name>
+	<version>2.11</version>
+	<title>NRPEv2</title>
+	<aftersaveredirect>/pkg_edit.php?xml=nrpe2.xml&amp;id=0</aftersaveredirect>
+	<include_file>/usr/local/pkg/nrpe2.inc</include_file>
+	<menu>
+		<name>NRPEv2</name>
+		<tooltiptext></tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=nrpe2.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>NRPEv2</name>
+		<rcfile>nrpe2</rcfile>
+		<executable>nrpe2</executable>
+		<description>Nagios NRPE Daemon</description>
+	</service>	
+	<configpath>installedpackages->package->nrpe2</configpath>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/nrpe2/nrpe2.inc</item>
+	</additional_files_needed>
+	<fields>
+		<field>
+			<type>listtopic</type>
+			<name>NRPE Options</name>
+			<fieldname>temp</fieldname>
+		</field>
+		<field>
+			<fielddescr>Enabled</fielddescr>
+			<fieldname>enabled</fieldname>
+			<description>Check this to enable NRPE daemon</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>Configuration Options</name>
+			<fieldname>temp</fieldname>			
+		</field>		
+		<field>
+			<fielddescr>Port Number</fielddescr>
+			<fieldname>server_port</fieldname>
+			<description>Port number we should wait for connections on. (Default: 5666)</description>
+			<type>input</type>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Bind IP Address</fielddescr>
+			<fieldname>server_address</fieldname>
+			<description>Set this to the IP address of the interface you want the daemon to listen on.</description>
+			<type>input</type>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Nagios Server(s)</fielddescr>
+			<fieldname>allowed_hosts</fieldname>
+			<description>IP Address of Nagios server, usualy a single IP, but if multiple delimit by comma</description>
+			<type>input</type>
+			<required/>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>Commands</name>
+			<fieldname>temp</fieldname>						
+		</field>
+		<field>
+			<fielddescr>Command Definitions that the Nagios server can call via the NRPE daemon.</fielddescr>
+			<fieldname>none</fieldname>
+		    <type>rowhelper</type>
+		    <rowhelper>
+				<rowhelperfield>
+					<fielddescr>Name (Allowed Characters: a-zA-Z_)</fielddescr>
+					<fieldname>name</fieldname>
+					<type>input</type>
+					<size>20</size>
+					<required/>
+				</rowhelperfield>
+				<rowhelperfield>
+			    	<fielddescr>Command</fielddescr>
+			    	<fieldname>command</fieldname>
+			    	<type>select</type>
+					<options>
+						<option><name></name><value></value></option>
+						<option><name>check_dhcp</name><value>check_dhcp</value></option>
+						<option><name>check_dig</name><value>check_dig</value></option>
+						<option><name>check_disk</name><value>check_disk</value></option>
+						<option><name>check_dns</name><value>check_dns</value></option>
+						<option><name>check_file_age</name><value>check_file_age</value></option>
+						<option><name>check_http</name><value>check_http</value></option>
+						<option><name>check_icmp</name><value>check_icmp</value></option>
+						<option><name>check_ifoperstatus</name><value>check_ifoperstatus</value></option>
+						<option><name>check_ifstatus</name><value>check_ifstatus</value></option>
+						<option><name>check_load</name><value>check_load</value></option>
+						<option><name>check_log</name><value>check_log</value></option>
+						<option><name>check_nntp</name><value>check_nntp</value></option>
+						<option><name>check_nntps</name><value>check_nntps</value></option>
+						<option><name>check_ntp</name><value>check_ntp</value></option>
+						<option><name>check_ntp_peer</name><value>check_ntp_peer</value></option>
+						<option><name>check_ntp_time</name><value>check_ntp_time</value></option>
+						<option><name>check_oracle</name><value>check_oracle</value></option>
+						<option><name>check_ping</name><value>check_ping</value></option>
+						<option><name>check_procs</name><value>check_procs</value></option>
+						<option><name>check_rpc</name><value>check_rpc</value></option>
+						<option><name>check_ssh</name><value>check_ssh</value></option>
+						<option><name>check_swap</name><value>check_swap</value></option>
+						<option><name>check_tcp</name><value>check_tcp</value></option>
+						<option><name>check_time</name><value>check_time</value></option>
+						<option><name>check_udp</name><value>check_udp</value></option>
+						<option><name>check_ups</name><value>check_ups</value></option>
+						<option><name>check_users</name><value>check_users</value></option>
+					</options>
+				</rowhelperfield>
+				<rowhelperfield>
+			    	<fielddescr>Warning Level</fielddescr>
+			    	<fieldname>warning</fieldname>
+			    	<description>At which level do you want a warning to be alerted on?</description>
+			    	<type>input</type>
+			    	<size>15</size>
+					<required/>
+				</rowhelperfield>
+				<rowhelperfield>
+			    	<fielddescr>Critical Level</fielddescr>
+			    	<fieldname>critical</fieldname>
+			    	<description>At which level do you want a warning to be alerted on?</description>
+			    	<type>input</type>
+			    	<size>15</size>
+					<required/>
+				</rowhelperfield>
+				<rowhelperfield>
+			    	<fielddescr>Extra Options</fielddescr>
+			    	<fieldname>extra</fieldname>
+			    	<description>Warning! Use at your own risk, incorrect settings here may prevent NRPE from starting!</description>
+			    	<type>input</type>
+			    	<size>25</size>
+				</rowhelperfield>
+		    </rowhelper>
+		</field>
+	</fields>
+	<custom_delete_php_command>
+		nrpe2_custom_php_write_config();
+		nrpe2_custom_php_service();
+	</custom_delete_php_command>
+	<custom_add_php_command>
+		nrpe2_custom_php_write_config();
+		nrpe2_custom_php_service();
+	</custom_add_php_command>
+	<custom_php_install_command>
+		nrpe2_custom_php_install_command();
+		nrpe2_custom_php_write_config();
+		nrpe2_custom_php_service();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		nrpe2_custom_php_deinstall_command();
+		nrpe2_custom_php_write_config();
+	</custom_php_deinstall_command>
+	<custom_php_resync_config_command>
+	</custom_php_resync_config_command>
+	<custom_php_command_before_form>
+		unset($_POST['temp']);	
+	</custom_php_command_before_form>
+</packagegui>
