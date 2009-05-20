@@ -13,17 +13,20 @@ function Fit123_install_config() {
 	conf_mount_rw();
 	config_lock();
 	exec("cd ..");
+//Adding new themes
+	exec("tar -zxovf /usr/local/pkg/code-red.tar.gz");
+	exec("mv code-red /usr/local/www/themes/code-red");
+	exec("tar -zxovf /usr/local/pkg/pfsense_ng.tar.gz");
+	exec("mv pfsense\ ng /usr/local/www/themes/pfsense\ ng");
 //Creating backup directory
 	exec("mkdir /usr/local/pkg/Fit123");
 	exec("mkdir /usr/local/pkg/Fit123/backup");
 //Copy orignal files to backup dir
 	//Date
 	exec("cp /usr/local/www/index.php /usr/local/pkg/Fit123/backup/");
-	//Code-Red Nervecenter Theme	
-	exec("cp /usr/local/www/themes/nervecenter/all.css /usr/local/pkg/Fit123/backup/");
-	exec("cp /usr/local/www/themes/nervecenter/images/background.gif /usr/local/pkg/Fit123/backup/");
-	exec("cp /usr/local/www/themes/nervecenter/images/footer.png /usr/local/pkg/Fit123/backup/");
-	exec("cp /usr/local/www/themes/nervecenter/images/header.png /usr/local/pkg/Fit123/backup/");
+	//Captive Portal Add-On
+	exec("cp /etc/inc/filter.inc /usr/local/pkg/Fit123/backup/");
+	exec("cp /usr/local/www/services_captiveportal.php /usr/local/pkg/Fit123/backup/");
 	//LTSP network boot Option
 	exec("cp /etc/inc/services.inc /usr/local/pkg/Fit123/backup/");
 	exec("cp /usr/local/www/services_dhcp.php /usr/local/pkg/Fit123/backup/");
@@ -33,12 +36,10 @@ function Fit123_install_config() {
 	//Date
 	exec("mkdir /usr/local/pkg/Fit123/date");
 	exec("fetch -o /usr/local/pkg/Fit123/date/index.php http://www.pfsense.com/packages/config/Fit123/bin/date/index.abc");
-	//Code-Red Nervecenter Theme
-	exec("mkdir /usr/local/pkg/Fit123/code-red");
-	exec("fetch -o /usr/local/pkg/Fit123/code-red/ http://www.pfsense.com/packages/config/Fit123/bin/code-red/all.css");
-	exec("fetch -o /usr/local/pkg/Fit123/code-red/ http://www.pfsense.com/packages/config/Fit123/bin/code-red/background.gif");
-	exec("fetch -o /usr/local/pkg/Fit123/code-red/ http://www.pfsense.com/packages/config/Fit123/bin/code-red/footer.png");
-	exec("fetch -o /usr/local/pkg/Fit123/code-red/ http://www.pfsense.com/packages/config/Fit123/bin/code-red/header.png");
+	//Captive Portal Add-On
+	exec("mkdir /usr/local/pkg/Fit123/cpaddon");
+	exec("fetch -o /usr/local/pkg/Fit123/cpaddon/filter.inc http://www.pfsense.com/packages/config/Fit123/bin/cpaddon/filter.inc");
+	exec("fetch -o /usr/local/pkg/Fit123/cpaddon/services_captiveportal.php http://www.pfsense.com/packages/config/Fit123/bin/cpaddon/services_captiveportal.abc");
 	//LTSP 3th network boot Option
 	exec("mkdir /usr/local/pkg/Fit123/LTSP");
 	exec("fetch -o /usr/local/pkg/Fit123/LTSP/ http://www.pfsense.com/packages/config/Fit123/bin/ltsp/services.inc");
@@ -65,19 +66,15 @@ global $config;
 	else
 	exec("cp /usr/local/pkg/Fit123/backup/index.php /usr/local/www/index.php");
 
-	$codered = $config['installedpackages']['fit123']['config'][0]['codered'];
-	if($codered){
-	exec("cp /usr/local/pkg/Fit123/code-red/all.css /usr/local/www/themes/nervecenter/all.css");
-	exec("cp /usr/local/pkg/Fit123/code-red/background.gif /usr/local/www/themes/nervecenter/images/background.gif");
-	exec("cp /usr/local/pkg/Fit123/code-red/footer.png /usr/local/www/themes/nervecenter/images/footer.png");
-	exec("cp /usr/local/pkg/Fit123/code-red/header.png /usr/local/www/themes/nervecenter/images/header.png");
+	$cpaddon = $config['installedpackages']['fit123']['config'][0]['cpaddon'];
+	if($cpaddon){
+	exec("cp /usr/local/pkg/Fit123/cpaddon/filter.inc /etc/inc/filter.inc");
+	exec("cp /usr/local/pkg/Fit123/cpaddon/services_captiveportal.php /usr/local/www/services_captiveportal.php");
 	}
 	else
 	{
-	exec("cp /usr/local/pkg/Fit123/backup/all.css /usr/local/www/themes/nervecenter/all.css");
-	exec("cp /usr/local/pkg/Fit123/backup/background.gif /usr/local/www/themes/nervecenter/images/background.gif");
-	exec("cp /usr/local/pkg/Fit123/backup/footer.png /usr/local/www/themes/nervecenter/images/footer.png");
-	exec("cp /usr/local/pkg/Fit123/backup/header.png /usr/local/www/themes/nervecenter/images/header.png");
+	exec("cp /usr/local/pkg/Fit123/backup/filter.inc /etc/inc/filter.inc");
+	exec("cp /usr/local/pkg/Fit123/backup/services_captiveportal.php /usr/local/www/services_captiveportal.php");
 	}
 
 	$ltsp = $config['installedpackages']['fit123']['config'][0]['ltsp'];
