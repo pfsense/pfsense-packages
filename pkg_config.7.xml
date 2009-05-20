@@ -255,12 +255,12 @@
     <package>
       <name>vnstat</name>
       <website>http://humdi.net/vnstat/</website>
-      <descr>A console-based network traffic monitor</descr>
+      <descr>A console-based network traffic monitor + vnstat PHP frontend</descr>
       <category>Network Management</category>
 	  <depends_on_package_base_url>http://www.pfsense.com/packages/config/vnstat/bin/</depends_on_package_base_url>
 	  <depends_on_package>vnstat-1.6_3.tbz</depends_on_package>
       <version>1.6.3</version>
-      <status>Beta</status>
+      <status>Stable</status>
       <required_version>1.2.3</required_version>
       <maintainer>crazypark2@yahoo.dk</maintainer>
       <config_file>http://www.pfsense.com/packages/config/vnstat/vnstat.xml</config_file>
@@ -282,9 +282,9 @@
     <package>
       <name>Fit123</name>
       <website>http://pfsense.comuf.com</website>
-      <descr>A list of small custom things that can be added to pfSense 1.2.3 :	Date,Code-red,LTSP,AFC and DDNS</descr>
+      <descr>With Fit123 a small set of features can be added to pfSense 1.2.3 (Date)Adds current date to front page (LTSP)Adds 3th network boot option (After Filter Change) Clear states after filter reload (DNS Servers)Adds option for a 3th and 4th DNS Server (DDNS)A more customize way to update dynamic dns (Themes)On install Code-red and the pfsense ng theme are added to the list of avalible themes.</descr>
       <category>System</category>
-      <version>0.0.1</version>
+      <version>0.0.5</version>
       <status>ALPHA</status>
       <required_version>1.2.3</required_version>
       <maintainer>crazypark2@yahoo.dk</maintainer>
