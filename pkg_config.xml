@@ -818,8 +818,8 @@
       <website>http://pfsense.trendchiller.com</website>
       <descr>Enhance OpenVPN with TLS-auth and client/server-options. WARNING! Cannot be uninstalled.</descr>
       <category>Security</category>
-      <version>0.1</version>
-      <status>BETA</status>
+      <version>1.0</version>
+      <status>STABLE</status>
       <required_version>1.2</required_version>
       <maximum_version>1.2.9</maximum_version>      
       <config_file>http://www.pfsense.com/packages/config/ovpnenhance/ovpnenhance.xml</config_file>
