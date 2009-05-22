@@ -107,8 +107,7 @@ function sync_package_snort()
 		}	
 	    
 		if (count($snortInterfaces) < 1) {
-			//log_error("Snort will not start.  You must select an interface for it to listen on.");
-			echo "Snort will not start.  You must select an interface for it to listen on.";
+			log_error("Snort will not start.  You must select an interface for it to listen on.");
 			return;
 		}
 	}
