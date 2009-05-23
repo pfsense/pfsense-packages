@@ -624,8 +624,8 @@ preprocessor sfportscan: scan_type { all } \
               #
 ###############
 
-preprocessor dcerpc2
-preprocessor dcerpc2_server: default
+#preprocessor dcerpc2
+#preprocessor dcerpc2_server: default
 
 ####################
                    #
