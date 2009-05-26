@@ -202,7 +202,6 @@ function snort_deinstall() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep snort`");
 	exec("cd /var/db/pkg && pkg_delete `ls | grep mysql-client`");
 	exec("cd /var/db/pkg && pkg_delete `ls | grep libdnet`");
-	exec("cd /var/db/pkg && pkg_delete `ls | grep pcre`");
 	exec("/usr/bin/killall -9 snort");
 	exec("/usr/bin/killall snort");
 }
