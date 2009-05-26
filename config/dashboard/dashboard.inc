@@ -4,10 +4,7 @@ function dashboard_install() {
 	global $g, $config;
 	assign_privs();
 
-	if (file_exists("/usr/local/www/fbegin.inc.before_dashboard"))
-		mwexec("mv /usr/local/www/fbegin.inc.before_dashboard /usr/local/www/fbegin.inc");
-	
-	/* Copy, then rm the files for backup. For some odd reason, mv alone does
+	/* Copy files for backup. For some odd reason, mv alone does
 	 *  not always result in the proper file being used. */
 	mwexec("cp /usr/local/www/index.php /usr/local/www/index.php.before_dashboard");
 	mwexec("cp /usr/local/www/diag_logs_filter.php /usr/local/www/diag_logs_filter.php.before_dashboard");
