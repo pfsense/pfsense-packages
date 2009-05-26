@@ -183,7 +183,7 @@ function havp_install()
 # ------------------------------------------------------------------------------
 function havp_deinstall()
 {
-    havp_setup_cron(HVDEF_CLAM_UPD_CRONNAME,"", "");
+    havp_setup_cron(HVDEF_AVUPD_SCRIPT,"", "");
     mwexec("killall -9 havp");
     mwexec("rm -rf " . HVDEF_HAVP_STARTUP_SCRIPT);
     mwexec("rm -rf " . HVDEF_FILTER_RESYNC_SCRIPT);
@@ -251,19 +251,21 @@ function havp_validate_settings($post, $input_errors)
             $input_errors[] = 'You must enter a valid numeric value in \'Scan max file size\' field.';
 
         # whitelist validate
-        $lst = explode("\n", str_replace(" ", "\n", $post[F_WHITELIST]));
+        $lst = str_replace(array(" ", ";"), "\n", $post[F_WHITELIST]);
+        $lst = explode("\n", $lst);
         foreach ($lst as $dm) {
             $dm = trim($dm);
             if ($dm && check_bw_domain($dm) === false)
-                $input_errors[] = "Invalid whitelist element '$dm'.";
+                $input_errors[] = "Invalid whitelist element '$dm'. Example: '*domain.com, domain.com/*path*'.";
         }
 
         # blacklist validate
-        $lst = explode("\n", str_replace(" ", "\n", $post[F_BLACKLIST]));
+        $lst = str_replace(array(" ", ";"), "\n", $post[F_BLACKLIST]);
+        $lst = explode("\n", $lst);
         foreach ($lst as $dm) {
             $dm = trim($dm);
             if ($dm && check_bw_domain($dm) === false)
-                $input_errors[] = "Invalid blacklist element '$dm'.";
+                $input_errors[] = "Invalid blacklist element '$dm'. Example: '*domain.com, domain.com/*path*'.";
         }
     }
 
@@ -282,8 +284,8 @@ function havp_resync()
     # whitelist and blacklist
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # also white-listed by default:
-    $whitelist = havp_whitelist_def() . "\n" . str_replace(" ", "\n", base64_decode($havp_config[F_WHITELIST]));
-    $blacklist = str_replace(" ", "\n", base64_decode($havp_config[F_BLACKLIST]));
+    $whitelist = havp_whitelist_def() . "\n" . str_replace(";", "\n", $havp_config[F_WHITELIST]);
+    $blacklist = str_replace(";", "\n", $havp_config[F_BLACKLIST]);
     # fix: stupid havp parser - error on 0x0D:
     $whitelist = str_replace("\r", "", $whitelist);
     $blacklist = str_replace("\r", "", $blacklist);
@@ -420,7 +422,7 @@ function havp_reconfigure_cron()
     $opt[1] = $optval[$havp_config[F_HAVPUPDATE]];
     $on     = ($opt[1] !== "");
 
-    havp_setup_cron(HVDEF_CLAM_UPD_CRONNAME, $opt, $on);
+    havp_setup_cron(HVDEF_AVUPD_SCRIPT, $opt, $on);
 }
 # ------------------------------------------------------------------------------
 # Convert conf to XML
@@ -433,14 +435,12 @@ function havp_convert_pfxml_xml()
 
     # === GUI Fields ===
     $havp_config[F_ENABLE]          = ( $pfconf[F_ENABLE] === 'on' ? 'true' : 'false' );
-
     # proxy
     $havp_config[F_PROXYMODE]       = ( !empty($pfconf[F_PROXYMODE]) ? $pfconf[F_PROXYMODE] : 'standard' );
 # ToDo: add check squid transparent
     $havp_config[F_PROXYINTERFACE]  = $pfconf[F_PROXYINTERFACE];
     $havp_config[F_PROXYPORT]       = ( !empty($pfconf[F_PROXYPORT]) ? $pfconf[F_PROXYPORT] : HVDEF_PROXYPORT );
 # ToDo: add check squid proxy port
-
     # parent proxy
     # [F_PARENTPROXY] = "proxy_ip:port"
     $pfconf[F_PARENTPROXY]          = trim($pfconf[F_PARENTPROXY]);
@@ -449,16 +449,22 @@ function havp_convert_pfxml_xml()
     	$havp_config[F_PARENTPROXY] = array( 'ip' => $parent[0], 'port' => $parent[1] );
 	}
 	else $havp_config[F_PARENTPROXY] = '';
-
     # language
     $havp_config[F_LANGUAGE]            = trim($pfconf[F_LANGUAGE]);
-
     # proxy settings
     $havp_config[F_ENABLEFORWARDEDIP]   = ( $pfconf[F_ENABLEFORWARDEDIP]   === 'on' ? 'true' : 'false' );
     $havp_config[F_ENABLEXFORWARDEDFOR] = ( $pfconf[F_ENABLEXFORWARDEDFOR] === 'on' ? 'true' : 'false' );
     $havp_config[F_MAXDOWNLOADSIZE]     = ( is_numeric($pfconf[F_MAXDOWNLOADSIZE]) ? $pfconf[F_MAXDOWNLOADSIZE] : 0 );
     $havp_config[F_RANGE]               = ( $pfconf[F_RANGE]               === 'on' ? 'true' : 'false' );
     $havp_config[F_ENABLERAMDISK]       = ( $pfconf[F_ENABLERAMDISK]       === 'on' ? 'true' : 'false' );
+    # whitelist
+    $havp_config[F_WHITELIST]           = base64_decode($pfconf[F_WHITELIST]);
+    $havp_config[F_WHITELIST]           = str_replace(";", "\n", $havp_config[F_WHITELIST]);
+    $havp_config[F_WHITELIST]           = str_replace(";", " ",  $havp_config[F_WHITELIST]);
+    # blacklist
+    $havp_config[F_BLACKLIST]           = base64_decode($pfconf[F_BLACKLIST]);
+    $havp_config[F_BLACKLIST]           = str_replace(";", "\n", $havp_config[F_BLACKLIST]);
+    $havp_config[F_BLACKLIST]           = str_replace(";", " ",  $havp_config[F_BLACKLIST]);
 
     # =-= Temp RAMDisk =-=
     # use RAMDisk if only capacity > calculated [MAXSCANSIZE * 50 connections]
@@ -961,8 +967,10 @@ function check_bw_domain($_dm)
 {
     $domain = "";
     $path = "";
-    $pos = strpos($_dm, "/");
 
+    if (!is_string($_dm)) return false;
+
+    $pos = strpos($_dm, "/");
     if ($pos === false) {
         $domain = $_dm;
         $path = "";
@@ -972,20 +980,31 @@ function check_bw_domain($_dm)
         $path   = substr($_dm, $pos+1);
     }
 
-    $fmt  = "[a-zA-Z0-9_-]";
-    # Domains can have a wildcard at begin '*xxx.xxx' - *my.domain.com
-    if (!eregi("^(\*)|((\*){0,1}($fmt\.){0,}$fmt{1,})$", $domain)) return false;
-    # Path can have a wildcard at begin and end '*xxx*'
-    if ($path && !eregi("^(\*){0,1}(.[^\*][^=]){0,}(\*){0,1}$", $path)) return false;
+    # Domains can have a wildcard at begin '*domain.xx' - *my.domain.com
+    # Path can have a wildcard(*) at begin and end '*xxx*'
+    # Regex:  * - {0,}; + - {1,}; ? = {0,1}
+    $df     = "[a-zA-Z0-9\-]";
+    $dm_fmt = "^((\*)|(\*\.))?($df+\.)+$df{2,}$";        # d.com *d.com *.d.com
+    $ph_fmt = "^((\*)|((\*)?([^\*]+)(\*)?))$";           # *path*
 
-    return true;
+    if (empty($path)) {
+    	# d.com *d.com *.d.com
+        return eregi($dm_fmt, $domain);
+    }
+    else {
+        if (!empty($domain)) {
+            return (($domain === '*') || eregi($dm_fmt, $domain)) && eregi($ph_fmt, $path);
+        }
+    }
+
+    return false;
 }
 # ------------------------------------------------------------------------------
 # cron
 # ------------------------------------------------------------------------------
 # $options: [0]='minute', [1]='hour', [2]='mday', [3]='month', [4]='wday', [5]='who', [6]='command'
 #
-function havp_setup_cron($task_name, $options, $on_off)
+function havp_setup_cron($task_key, $options, $on_off)
 {
     global $config;
 	$cron_item = array();
@@ -993,7 +1012,6 @@ function havp_setup_cron($task_name, $options, $on_off)
     # $on_off = TRUE/FALSE - install/deinstall cron task:
     # prepare new cron item
 	if (is_array($options)) {
-        $cron_item['task_name'] = $task_name;
 		$cron_item['minute']  =  $options[0];
         $cron_item['hour']    =  $options[1];
         $cron_item['mday']    =  $options[2];
@@ -1003,12 +1021,12 @@ function havp_setup_cron($task_name, $options, $on_off)
         $cron_item['command'] =  $options[6];
     }
 
-    # unset old cron task with $task_name
-    if (!empty($task_name)) {
+    # unset old cron task with $task_key
+    if (!empty($task_key)) {
         $flag_cron_upd = false;
         # delete old cron task if exists
         foreach($config['cron']['item'] as $key => $val) {
-            if ($config['cron']['item'][$key]['task_name'] === $task_name) {
+            if (strpos($config['cron']['item'][$key]['command'], $task_key) !== false) {
                 unset($config['cron']['item'][$key]);
                 $flag_cron_upd = true;
                 break;
@@ -1023,7 +1041,7 @@ function havp_setup_cron($task_name, $options, $on_off)
 
         # write config and configure cron only if cron task modified
         if ($flag_cron_upd === true) {
-            write_config("Installed cron task '$task_name' for 'havp' package");
+            write_config("Installed cron task '$task_key' for 'havp' package");
             configure_cron();
         }
     }
@@ -1425,6 +1443,7 @@ EOD;
 # Fix
 function havp_fix()
 {
+/*
 	global $config;
 	# unset old menu item
     if (isset($config['installedpackages']['menu'])) {
@@ -1436,5 +1455,6 @@ function havp_fix()
         	}
         }
     }
+*/
 }
 ?>
