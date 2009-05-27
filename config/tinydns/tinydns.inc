@@ -3,7 +3,7 @@
 /* $Id$ */
 /*
 	tinydns.inc
-	Copyright (C) 2006, 2007, 2008 Scott Ullrich
+	Copyright (C) 2006, 2007, 2008, 2009 Scott Ullrich
 	Parts Copyright (C) 2007 Goffredo Andreone
 	part of pfSense
 	All rights reserved.
@@ -569,7 +569,6 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('/usr/local/pkg/tinydns.inc');\n";
 	$execcmd .= "tinydns_custom_php_changeip_command();\n";
-	//$execcmd .= "tinydns_custom_php_install_command();\n";
 	$execcmd .= "tinydns_create_zone_file();\n";
 	$execcmd .= "tinydns_setup_ping_items();\n";
 	
@@ -851,7 +850,6 @@ function tinydns_dnscache_forwarding_servers() {
 		printf("Error: cannot open resolv.conf.dnscache in tinydns_register_forwarding_servers().\n");
 		return 1;
 	}
-	
 	$lip = strlen("nameserver") + 1;
 	$j = 0;
 	$iprecords = "";
@@ -890,7 +888,6 @@ function tinydns_create_soa_domain_list($dnsserverip) {
 		$tinydns_data = file_get_contents("/service/tinydns/root/data");
 	else
 		$tinydns_data = "";
-	
 	$datalen = strlen($tinydns_data);
 	$startofrecord = 0;
 	while ($startofrecord < $datalen ) {	
@@ -923,7 +920,6 @@ function tinydns_register_forwarding_servers() {
 		printf("Error: cannot open resolv.conf in tinydns_register_forwarding_servers().\n");
 		return 1;
 	}
-	
 	$lip = strlen("nameserver") + 1;
 	$j = 0;
 	$nsrecords = "";
@@ -966,7 +962,7 @@ function tinydns_register_root_servers() {
 &::l.root-servers.net
 &::m.root-servers.net
 =a.root-servers.net:198.41.0.4
-=b.root-servers.net:128.9.0.107
+=b.root-servers.net:192.228.79.201
 =c.root-servers.net:192.33.4.12
 =d.root-servers.net:128.8.10.90
 =e.root-servers.net:192.203.230.10
@@ -1016,9 +1012,6 @@ EOD;
 
 function tinydns_cleanup_addedit_form_record() {
 	/* Clean some things up and simplify per limited subset of TinyDNS record syntax before saving.  */
-	//if((($_POST['recordtype'] == "SOA") || ($_POST['recordtype'] == "NS") || ($_POST['recordtype'] == "MX")) && substr($_POST['ipaddress'],-1) != ".")
-	//	$_POST['ipaddress'] = $_POST['ipaddress'] . ".";
-
 	if($_POST['recordtype'] == "TXT") {
 		/* TinyDNS provides surrounding quotes for TXT records automatically so we check & remove them here */
 		if(substr($_POST['ipaddress'],-1) == "\"")
