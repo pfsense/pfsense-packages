@@ -986,7 +986,7 @@ EOD;
 function dnscache_use_root_servers() {
 	$rootservers =<<<EOD
 198.41.0.4
-128.9.0.107
+192.228.79.201
 192.33.4.12
 128.8.10.90
 192.203.230.10
