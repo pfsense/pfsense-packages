@@ -620,6 +620,8 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 				break;
 			case "MX":
 				//      @fqdn:ip:x:dist:ttl:timestamp:lo
+				if(!$dist)
+					$dist = "10"; // default to 10 if no preference has been defined.  0 is ugly.
 				$record_data = "@{$hostname}:{$recordip}::{$dist}{$ttl_string}";
 				break;
 			case "PTR":
