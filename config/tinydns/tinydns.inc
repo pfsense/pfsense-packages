@@ -611,28 +611,33 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 		switch ($recordtype) {
 
 			/* Note that some of these are simplistic versions of TinyDNS record handling.  Uber-users can always do "raw" entries...  */
-			case "SOA":
+			case "SOA":	
 				$record_data = ".{$hostname}::{$recordip}{$ttl_string}";
 				break;
 			case "NS":
+				//      &serious.panic.mil:1.8.248.6:a
 				$record_data = "&{$hostname}:{$recordip}{$ttl_string}";
 				break;
 			case "MX":
-				$record_data = "@{$hostname}:{$recordip}:{$dist}{$ttl_string}";
+				//      @fqdn:ip:x:dist:ttl:timestamp:lo
+				$record_data = "@{$hostname}:{$recordip}::{$dist}{$ttl_string}";
 				break;
 			case "PTR":
 				/* "^" creates "PTR" record only to allow reverse DNS */
+				// =fqdn:ip:ttl:timestamp:lo
 				$record_data = "^{$hostname}:{$recordip}{$ttl_string}";
 				break;
 			case "A":
 				/* "=" creates both "A" and "PTR" records to allow both forward and reverse DNS */
+     			//		=fqdn:ip:ttl:timestamp:lo
 				if($rdns)
 					$record_data = "={$hostname}:{$recordip}{$ttl_string}";
 				else
-				/* "+" creates "A" records only to allow forward DNS */
+					/* "+" creates "A" records only to allow forward DNS */
 					$record_data = "+{$hostname}:{$recordip}{$ttl_string}";					
 				break;
 			case "CNAME":
+				//     Cfqdn:p:ttl:timestamp:lo
 				$record_data = "C{$hostname}:{$recordip}{$ttl_string}";
 				break;
 			case "TXT":
