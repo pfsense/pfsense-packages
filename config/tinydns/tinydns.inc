@@ -618,7 +618,7 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 				$record_data = "&{$hostname}:{$recordip}{$ttl_string}";
 				break;
 			case "MX":
-				$record_data = "@{$hostname}::{$recordip}:{$dist}{$ttl_string}";
+				$record_data = "@{$hostname}:{$recordip}:{$dist}{$ttl_string}";
 				break;
 			case "PTR":
 				/* "^" creates "PTR" record only to allow reverse DNS */
