@@ -1016,8 +1016,8 @@ EOD;
 
 function tinydns_cleanup_addedit_form_record() {
 	/* Clean some things up and simplify per limited subset of TinyDNS record syntax before saving.  */
-	if((($_POST['recordtype'] == "SOA") || ($_POST['recordtype'] == "NS") || ($_POST['recordtype'] == "MX")) && substr($_POST['ipaddress'],-1) != ".")
-		$_POST['ipaddress'] = $_POST['ipaddress'] . ".";
+	//if((($_POST['recordtype'] == "SOA") || ($_POST['recordtype'] == "NS") || ($_POST['recordtype'] == "MX")) && substr($_POST['ipaddress'],-1) != ".")
+	//	$_POST['ipaddress'] = $_POST['ipaddress'] . ".";
 
 	if($_POST['recordtype'] == "TXT") {
 		/* TinyDNS provides surrounding quotes for TXT records automatically so we check & remove them here */
@@ -1032,4 +1032,5 @@ function tinydns_cleanup_addedit_form_record() {
 		}
 	}
 }
+
 ?>
