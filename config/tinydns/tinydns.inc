@@ -601,7 +601,6 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 }
 
 /* formats data as a tinydns data row item */
-/* A full description of the data format is available at 'man tinydns-data' */
 function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns, $dist) {
 		if($ttl)
 			$ttl_string = ":{$ttl}";
@@ -612,6 +611,7 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 
 			/* Note that some of these are simplistic versions of TinyDNS record handling.  Uber-users can always do "raw" entries...  */
 			case "SOA":	
+				//     .fqdn:ip:x:ttl:timestamp:lo
 				$record_data = ".{$hostname}::{$recordip}{$ttl_string}";
 				break;
 			case "NS":
@@ -626,7 +626,7 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 				break;
 			case "PTR":
 				/* "^" creates "PTR" record only to allow reverse DNS */
-				// =fqdn:ip:ttl:timestamp:lo
+				//		^fqdn:p:ttl:timestamp:lo
 				$record_data = "^{$hostname}:{$recordip}{$ttl_string}";
 				break;
 			case "A":
@@ -649,13 +649,11 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 				/* A: TinyDNS TXT records get split up every 127 chars and some clients have trouble re-assembling them.                               */
 				/* TinyDNS generic records allow up to the maximum DNS record size of 255 chars but it is a hard limit, no splitting of larger strings */
 				/* ...so try to always create the best record for the need                                                                             */
-
 				/* Initial cleanup required for TXT records in TinyDNS where we substitute Octal escape codes for certain chars*/
 				$saferecordip = str_replace(":", "\\072", $recordip);
 				$saferecordip = str_replace(" ", "\\040", $saferecordip);
 				$saferecordip = str_replace("\r", "\\015", $saferecordip);
 				$saferecordip = str_replace("\n", "\\012", $saferecordip);
-				
 				/* Logically this should be comparing against 127 and 255 but PHP has a boundary error?                 */
 				/* Boundary errors or not, 128 and 256 at least evaluate properly!!!                                    */
 				/* Also note that reclen checks against the original string and not the "safe" one we generated above.  */
@@ -664,8 +662,10 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 					/* TinyDNS generic records require an escaped Octal string length padded to three chars before the actual string!    */
 					/* The logic here shouldn't ever require padding but including it anyway in case somebody changes code down the road */
 					$reclen = str_pad(decoct($reclen),3,"0",STR_PAD_LEFT);
+					//		:fqdn:n:rdata:ttl:timestamp:lo
 					$record_data = ":{$hostname}:16:\\{$reclen}{$saferecordip}{$ttl_string}";
 				} else {
+					//		'fqdn:s:ttl:timestamp:lo
 					$record_data = "'{$hostname}:{$saferecordip}{$ttl_string}";
 				}	
 				break;
