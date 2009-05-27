@@ -631,12 +631,14 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 				break;
 			case "A":
 				/* "=" creates both "A" and "PTR" records to allow both forward and reverse DNS */
-     			//		=fqdn:ip:ttl:timestamp:lo
-				if($rdns)
+				if($rdns) {
+					//		=fqdn:ip:ttl:timestamp:lo
 					$record_data = "={$hostname}:{$recordip}{$ttl_string}";
-				else
+				} else {
 					/* "+" creates "A" records only to allow forward DNS */
-					$record_data = "+{$hostname}:{$recordip}{$ttl_string}";					
+					//		+fqdn:ip:ttl:timestamp:lo
+					$record_data = "+{$hostname}:{$recordip}{$ttl_string}";
+				}
 				break;
 			case "CNAME":
 				//     Cfqdn:p:ttl:timestamp:lo
