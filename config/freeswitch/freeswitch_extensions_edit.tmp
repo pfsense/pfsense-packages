@@ -204,22 +204,6 @@ display_top_tabs(build_menu());
                 <br><span class="vexpl">Enter the effective caller id number here.<br></span>
               </td>
             </tr>
-            <!--
-		    <tr>
-              <td width="25%" valign="top" class="vncellreq" nowrap>Outbound Caller ID Name</td>
-              <td width="75%" class="vtable">
-                <input name="outbound_caller_id_name" type="text" class="formfld unknown" id="outbound_caller_id_name" size="40" value="<?=htmlspecialchars($pconfig['outbound_caller_id_name']);?>">
-                <br><span class="vexpl">Enter the outbound caller id name here.<br></span>
-              </td>
-            </tr>
-		    <tr>
-              <td width="25%" valign="top" class="vncellreq" nowrap>Outbound Caller ID Number</td>
-              <td width="75%" class="vtable">
-                <input name="outbound_caller_id_number" type="text" class="formfld unknown" id="outbound_caller_id_number" size="40" value="<?=htmlspecialchars($pconfig['outbound_caller_id_number']);?>">
-                <br><span class="vexpl">Enter the outbound caller id number here.<br></span>
-              </td>
-            </tr>
-            -->
 			<tr>
               <td width="25%" valign="top" class="vncellreq" nowrap>Voicemail Mail To</td>
               <td width="75%" class="vtable">
@@ -269,32 +253,46 @@ display_top_tabs(build_menu());
             </table>
 
   			<div id="showadvancedbox">
-  			  <table width="100%" border="0" cellpadding="6" cellspacing="0">
-              <tr>
-                <td width="25%" valign="top" class="vncell">Show Advanced</td>
-                <td width="75%" class="vtable">
-                  <input type="button" onClick="show_advanced_config()" value="Advanced"></input></a>
-                </td>
-              </tr>
-              </table>				
+				<table width="100%" border="0" cellpadding="6" cellspacing="0">
+				<tr>
+					<td width="25%" valign="top" class="vncell">Show Advanced</td>
+					<td width="75%" class="vtable">
+						<input type="button" onClick="show_advanced_config()" value="Advanced"></input></a>
+					</td>
+				</tr>
+				</table>				
   			</div>
   			<div id="showadvanced" style="display:none">
-              <table width="100%" border="0" cellpadding="6" cellspacing="0">
-              <tr>
-                <td width="25%" valign="top" class="vncell">Auth-ACL</td>
-                <td width="75%" class="vtable">
-                  <input name="auth-acl" type="text" class="formfld unknown" id="auth-acl" size="40" value="<?=htmlspecialchars($pconfig['auth-acl']);?>">
-                  <br> <span class="vexpl">Enter the auth acl here.<br></span>
-                </td>
-              </tr>
-              <tr>
+				<table width="100%" border="0" cellpadding="6" cellspacing="0">
+				<tr>
+					<td width="25%" valign="top" class="vncell">Auth-ACL</td>
+					<td width="75%" class="vtable">
+						<input name="auth-acl" type="text" class="formfld unknown" id="auth-acl" size="40" value="<?=htmlspecialchars($pconfig['auth-acl']);?>">
+						<br> <span class="vexpl">Enter the auth acl here.<br></span>
+					</td>
+				</tr>
+				<tr>
                 <td valign="top" class="vncell">CIDR</td>
-                <td class="vtable">
-                  <input name="cidr" type="text" class="formfld unknown" id="cidr" size="40" value="<?=htmlspecialchars($pconfig['cidr']);?>">
-                  <br> <span class="vexpl">Enter the cidr here.<br></span>
-                </td>
-              </tr>
-              </table>
+					<td class="vtable">
+						<input name="cidr" type="text" class="formfld unknown" id="cidr" size="40" value="<?=htmlspecialchars($pconfig['cidr']);?>">
+						<br> <span class="vexpl">Enter the cidr here.<br></span>
+					</td>
+				</tr>
+				<tr>
+					<td width="25%" valign="top" class="vncell" nowrap>Outbound Caller ID Name</td>
+					<td width="75%" class="vtable">
+						<input name="outbound_caller_id_name" type="text" class="formfld unknown" id="outbound_caller_id_name" size="40" value="<?=htmlspecialchars($pconfig['outbound_caller_id_name']);?>">
+						<br><span class="vexpl">Enter the outbound caller id name here.<br></span>
+					</td>
+				</tr>
+				<tr>
+					<td width="25%" valign="top" class="vncell" nowrap>Outbound Caller ID Number</td>
+					<td width="75%" class="vtable">
+						<input name="outbound_caller_id_number" type="text" class="formfld unknown" id="outbound_caller_id_number" size="40" value="<?=htmlspecialchars($pconfig['outbound_caller_id_number']);?>">
+						<br><span class="vexpl">Enter the outbound caller id number here.<br></span>
+					</td>
+				</tr>
+				</table>
   			</div>
             			
             <table width="100%" border="0" cellpadding="6" cellspacing="0">  			
@@ -308,9 +306,7 @@ display_top_tabs(build_menu());
             <tr>
               <td valign="top">&nbsp;</td>
               <td>
-                <input name="outbound_caller_id_name" type="hidden" class="formfld" id="outbound_caller_id_name" size="40" value="<?=htmlspecialchars($pconfig['outbound_caller_id_name']);?>">
-                <input name="outbound_caller_id_number" type="hidden" class="formfld unknown" id="outbound_caller_id_number" size="40" value="<?=htmlspecialchars($pconfig['outbound_caller_id_number']);?>">
-                <input name="Submit" type="submit" class="formbtn" value="Save"> <input class="formbtn" type="button" value="Cancel" onclick="history.back()">
+                 <input name="Submit" type="submit" class="formbtn" value="Save"> <input class="formbtn" type="button" value="Cancel" onclick="history.back()">
                 <?php if (isset($id) && $a_extensions[$id]): ?>
                   <input name="id" type="hidden" value="<?=$id;?>">
                 <?php endif; ?>

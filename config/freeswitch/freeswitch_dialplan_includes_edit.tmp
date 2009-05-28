@@ -346,13 +346,13 @@ display_top_tabs(build_menu());
       </td>
 		</tr>
 
-		<?php
+	<?php
 
       $i = 0;
       if (count($a_dialplan_include_details) > 0) {
 
         foreach ($a_dialplan_include_details as $ent) {
-          if ($ent['tag'] == "condition" && $dialplanincludeid == $ent['dialplanincludeid']) {
+			if ($ent['tag'] == "condition" && $dialplanincludeid == $ent['dialplanincludeid']) {
     ?>
             <tr>
               <td class="listlr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>'">
@@ -373,9 +373,9 @@ display_top_tabs(build_menu());
                </table>
               </td>
             </tr>
-		<?php
-		      }
-          $i++;
+	<?php
+		    }
+			$i++;
         }
       }
 
@@ -404,7 +404,7 @@ display_top_tabs(build_menu());
                </table>
               </td>
             </tr>
-		<?php
+	<?php
 		      }
           $i++;
         }
@@ -435,7 +435,7 @@ display_top_tabs(build_menu());
                </table>
               </td>
             </tr>
-		<?php
+	<?php
 		      }
           $i++;
         }
@@ -466,7 +466,7 @@ display_top_tabs(build_menu());
                </table>
               </td>
             </tr>
-		<?php
+	<?php
 		      }
           $i++;
         }

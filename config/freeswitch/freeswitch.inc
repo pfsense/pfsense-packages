@@ -65,6 +65,10 @@ function build_menu() {
 	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_ivr_options_edit.php") { $menu_selected = true; }
 	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_recordings.php") { $menu_selected = true; }
 	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_recordings_edit.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_hunt_group.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_hunt_group_edit.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_hunt_group_destinations.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_hunt_group_destinations_edit.php") { $menu_selected = true; }
 	$tab_array[] = array(gettext("Features"), $menu_selected, "/packages/freeswitch/freeswitch_features.php");
 	unset($menu_selected);
 
@@ -963,6 +967,339 @@ function sync_package_freeswitch_external()
 }
 
 
+function sync_package_freeswitch_hunt_group()
+{
+
+	//Hunt Group Javascript Notes:
+		//get the domain
+		//loop through all Hunt Groups
+			//get the Hunt Group information such as the name and description
+			//add each Hunt Group to the dialplan
+			//get the list of destinations then build the Hunt Group javascript
+
+			
+	global $config;
+	conf_mount_rw();
+	config_lock();
+	
+	
+	//get the domain
+		$password = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_password'];
+		$host = $config['interfaces']['lan']['ipaddr'];
+		$port = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_port'];
+
+		if (pkg_is_service_running('freeswitch')) {
+			$fp = event_socket_create($host, $port, $password);
+			$cmd = "api global_getvar domain";
+			$domain = trim(event_socket_request($fp, $cmd));
+		}
+
+		$tmp = "";
+		$tmp .= "\n";
+		$tmp .= " var domain = \"".$domain."\"; //by default this is the ipv4 address of FreeSWITCH used for transfer to voicemail\n";
+		//$tmp .= " var exit = false;\n";
+		$tmp .= "\n";
+		$tmp .= "\n";
+
+	//loop through all Hunt Groups
+		$a_hunt_group = &$config['installedpackages']['freeswitchhuntgroup']['config'];
+		if (count($a_hunt_group) > 0) {
+			foreach($a_hunt_group as $rowhelper) {
+		
+				//get the Hunt Group information such as the name and description				
+					//$rowhelper['huntgroupid']
+					//$rowhelper['huntgroupextension']
+					//$rowhelper['huntgroupname']
+					//$rowhelper['huntgrouptype']
+					//$rowhelper['huntgrouptimeout']
+					//$rowhelper['huntgroupcontext']
+					//$rowhelper['huntgroupdescr']
+
+				//add each Hunt Group to the dialplan
+					$a_dialplan_includes          	= &$config['installedpackages']['freeswitchdialplanincludes']['config'];
+					$a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];
+
+
+					if (strlen($rowhelper['huntgroupid']) > 0) {
+						$action = 'add'; //set default action to add
+						$i = 0;
+						if (count($a_dialplan_includes) > 0) {
+					  
+							foreach($a_dialplan_includes as $row) {
+
+								//$row['dialplanincludeid'];
+								//$row['extensionname'];
+								//$row['context'];
+								//$row['enabled'];
+
+								if ($row['opt1name'] == "huntgroupid" && $row['opt1value'] == $rowhelper['huntgroupid']) {
+									//update
+									$action = 'update';
+									$dialplanincludeid = $row['dialplanincludeid'];
+									$extensionname = $row['extensionname'];
+									$order = $row['order'];
+									$context = $row['context'];
+									$enabled = $row['enabled'];
+									$descr = $row['descr'];
+									$opt1name = $row['opt1name'];
+									$opt1value = $row['opt1value'];
+									$id = $i;
+									//echo "update".$i."<br />\n";
+
+								}
+								$i++;
+
+							}
+						}
+
+
+						$ent = array();
+						if ($action == 'add') {
+
+							$dialplanincludeid = guid();
+							$ent['dialplanincludeid'] = $dialplanincludeid;
+							$ent['extensionname'] = $rowhelper['ivrextension'];
+							$ent['order'] = '9001'; //if update use the existing order number and extension name and desc
+							$ent['context'] = $rowhelper['huntgroupcontext'];
+							$ent['enabled'] = 'true';
+							$ent['descr'] = 'huntgroup';
+							$ent['opt1name'] = 'huntgroupid';
+							$ent['opt1value'] = $rowhelper['huntgroupid'];
+
+							//add to the config
+								$a_dialplan_includes[] = $ent;
+								unset($ent);
+							
+							$ent = array();
+							$ent['dialplanincludeid'] = $dialplanincludeid;
+							$ent['tag'] = 'condition'; //condition, action, antiaction
+							$ent['fieldtype'] = 'destination_number';
+							$ent['fielddata'] = '^'.$rowhelper['huntgroupextension'].'$';
+							$a_dialplan_include_details[] = $ent;
+							unset($ent);
+
+							$huntgroupid = str_replace(array("{", "}"), "", $rowhelper['huntgroupid']);
+
+							$ent = array();
+							$ent['dialplanincludeid'] = $dialplanincludeid;
+							$ent['tag'] = 'action'; //condition, action, antiaction
+							$ent['fieldtype'] = 'javascript';
+							$ent['fielddata'] = 'huntgroup_'.$huntgroupid.'.js';
+							$a_dialplan_include_details[] = $ent;
+							unset($ent);
+
+							unset($huntgroupid);
+									
+						}
+						if ($action == 'update') {
+
+							$ent['dialplanincludeid'] = $dialplanincludeid;
+							$ent['extensionname'] = $rowhelper['huntgroupextension'];
+							$ent['order'] = $order;
+							$ent['context'] = $context;
+							$ent['enabled'] = $enabled;		
+							$ent['descr'] = $descr;
+							$ent['opt1name'] = $opt1name;
+							$ent['opt1value'] = $opt1value;
+
+							//update the config
+							$a_dialplan_includes[$id] = $ent;
+
+							unset($ent);	      		
+							unset($extensionname);
+							unset($order);
+							unset($context);
+							unset($enabled);
+							unset($descr);
+							unset($opt1name);
+							unset($opt1value);
+							unset($id);                    		
+						}
+						write_config();
+								
+						sync_package_freeswitch_dialplan_includes();		
+						unset($dialplanincludeid);
+						
+					} //end if strlen huntgroupid; add the Hunt Group to the dialplan
+	
+				//Get the list of destinations then build the Hunt Group javascript
+					$tmp = "";					
+					$tmp .= "	function get_sofia_contact(extension,domain_name){\n";
+					$tmp .= "		session.execute(\"set\", \"sofia_contact_\"+extension+\"=\${sofia_contact(internal/\"+extension+\"@\"+domain_name+\")}\");\n";
+					$tmp .= "		sofia_contact = session.getVariable(\"sofia_contact_\"+extension);\n";
+					$tmp .= "		//console_log( \"info\", \"sofia_contact: \"+sofia_contact+\".\\n\" );\n";
+					$tmp .= "		return sofia_contact;\n";
+					$tmp .= "	}\n";
+					$tmp .= "\n";
+					$tmp .= "	dialed_extension = session.getVariable(\"dialed_extension\");\n";
+					$tmp .= "	domain_name = session.getVariable(\"domain_name\");\n";
+					$tmp .= "	domain = session.getVariable(\"domain\");\n";
+					$tmp .= "	us_ring = session.getVariable(\"us-ring\");\n";
+					$tmp .= "	caller_id_name = session.getVariable(\"caller_id_name\");\n";
+					$tmp .= "	caller_id_number = session.getVariable(\"caller_id_number\");\n";
+					$tmp .= "\n";
+					$tmp .= "	session.execute(\"set\", \"ringback=\"+us_ring);          //set to ringtone\n";
+					$tmp .= "	session.execute(\"set\", \"transfer_ringback=\"+us_ring); //set to ringtone\n";
+					if ($rowhelper['huntgrouptimeout'] > 0) {
+						$tmp .= "	session.execute(\"set\", \"call_timeout=".$rowhelper['huntgrouptimeout']."\");\n";
+						$tmp .= "	session.execute(\"set\", \"continue_on_fail=true\");\n";
+					}
+					$tmp .= "	session.execute(\"set\", \"hangup_after_bridge=true\");\n";
+					$tmp .= "\n";
+					$tmp .= "	//console_log( \"info\", \"dialed extension:\"+dialed_extension+\".\\n\" );\n";
+					$tmp .= "	//console_log( \"info\", \"domain: \"+domain+\".\\n\" );\n";
+					$tmp .= "	//console_log( \"info\", \"us_ring: \"+us_ring+\".\\n\" );\n";
+					$tmp .= "	//console_log( \"info\", \"domain: \"+domain+\".\\n\" );\n";
+					$tmp .= "	//console_log( \"info\", \"domain_name: \"+domain_name+\".\\n\" );\n";
+					$tmp .= "\n";
+					
+					$tmp .= "	//console_log( \"info\", \"action call now don't wait for dtmf\\n\" );\n";
+					$tmp .= "	if ( session.ready() ) {\n";
+					$tmp .= "		session.answer();\n";
+					$tmp .= "\n";
+
+					$a_hunt_group          = &$config['installedpackages']['freeswitchhuntgroup']['config'];
+					if (isset($id) && $a_hunt_group[0]) {
+						$huntgrouptimeout = $a_hunt_group[$id]['huntgrouptimeout'];
+						$huntgrouptimeoutdestination = $a_hunt_group[$id]['huntgrouptimeoutdestination'];
+					}
+					
+					//order the array
+					function cmp_hunt_group_order($a, $b) {
+						if ($a["destinationorder"] > $b["destinationorder"]) {
+							return 1;
+						}
+						else {
+							return 0;
+						}
+					}
+					
+	
+					$a_hunt_group_destinations = &$config['installedpackages']['freeswitchhuntgroupdestinations']['config'];
+					if (count($a_hunt_group_destinations) > 0) { usort($a_hunt_group_destinations, "cmp_hunt_group_order"); }
+						if (count($a_hunt_group_destinations) > 0) {
+							$x = 0;
+							foreach($a_hunt_group_destinations as $row) {
+							
+								/*
+								$row['huntgroupid']
+								$row['destinationnumber']
+								$row['destinationtype']
+								$row['destinationorder']
+								$row['destinationdescr']
+								*/
+								
+								if ($row['huntgroupid'] == $rowhelper['huntgroupid']) {						
+									
+									if ($row['destinationtype'] == "extension") {
+										//$tmp .= "		session.execute(\"transfer\", \"".$row['destinationnumber']." XML default\"); //".$row['destinationdescr']."\n";
+										$tmp .= "		sofia_contact_".$row['destinationnumber']." = get_sofia_contact(\"".$row['destinationnumber']."\",domain_name);\n";									
+										$tmp_sub_array["application"] = "bridge";
+										$tmp_sub_array["data"] = "sofia_contact_".$row['destinationnumber'];
+										$tmp_array[$x] = $tmp_sub_array;
+										unset($tmp_sub_array);									
+									}
+									if ($row['destinationtype'] == "voicemail") {							
+										//$tmp .= "		session.execute(\"voicemail\", \"".$row['destinationnumber']." XML default\");\n";
+										$tmp .= "		session.execute(\"voicemail\", \"default \"+domain+\" ".$row['destinationnumber']."\");\n";
+										$tmp_sub_array["application"] = "voicemail";
+										$tmp_sub_array["data"] = "default \"+domain+\" ".$row['destinationnumber'];
+										$tmp_array[$x] = $tmp_sub_array;
+										unset($tmp_sub_array);
+									}
+									if ($row['destinationtype'] == "sip uri") {						
+										//$tmp .= "		session.execute(\"transfer\", \"".$row['destinationnumber']." XML default\"); //".$row['destinationdescr']."\n";
+										//tmp .= "		sofia_contact_".$row['destinationnumber']." = get_sofia_contact(\"".$row['destinationnumber']."\",domain_name);\n";									
+										$tmp_sub_array["application"] = "bridge";
+										$tmp_sub_array["data"] = "\"".$row['destinationnumber']."\"";
+										$tmp_array[$x] = $tmp_sub_array;
+										unset($tmp_sub_array);
+									}
+									$x++;
+						
+								} //end huntgroupid
+						
+							} //end for each
+							unset($x);
+						} //if count
+						
+						
+					
+					switch ($rowhelper['huntgrouptype']) {
+					case "simultaneous":
+						//print_r($tmp_array);
+						$x = 0;
+						foreach ($tmp_array as $row) {
+							if ($x < 1) {
+								$tmp_buffer = $row["data"];
+							}
+							else {
+								$tmp_buffer .= "+\",\"+".$row["data"];
+							}
+							$x++;						
+						}
+						
+						$delimiter = ",";
+						
+						$tmp_application = $tmp_array[0]["application"];
+						$tmp .= "\n";
+						$tmp .= "		session.execute(\"".$tmp_application."\", $tmp_buffer);\n";
+						//$tmp .= "		session.execute(\"bridge\", sofia_contact_100+\",\"+sofia_contact_101+\",\"+sofia_contact_102+\",\"+sofia_contact_103+\",\"+sofia_contact_104);\n";
+						//$tmp .= "		//session.execute(\"bridge\", \"sofia/gateway/flowroute.com/12081231234,\"+sofia_contact_101);\n";
+
+						break;
+					case "sequentially":
+					
+						$tmp .= "\n";
+						//print_r($tmp_array);
+						$x = 0;
+						foreach ($tmp_array as $row) {
+							$tmp .= "		session.execute(\"".$row["application"]."\", ".$row["data"].");\n";					
+						}
+						
+						break;
+					}
+
+
+					//set the timeout destination
+					$huntgrouptimeoutdestination = $a_hunt_group[0]['huntgrouptimeoutdestination'];
+					$huntgrouptimeouttype = $a_hunt_group[0]['huntgrouptimeouttype'];
+					if ($row['huntgrouptimeouttype'] == "extension") { $huntgrouptimeouttype = "bridge"; }
+					if ($row['huntgrouptimeouttype'] == "voicemail") { $huntgrouptimeouttype = "voicemail"; }
+					if ($row['huntgrouptimeouttype'] == "sip uri") { $huntgrouptimeouttype = "bridge"; }
+					$tmp .= "\n";
+					$tmp .= "		//timeout\n";
+					$tmp .= "		session.execute(\"".$huntgrouptimeouttype."\", \"default \"+domain+\" ".$huntgrouptimeoutdestination."\" );\n";
+					
+					
+					$tmp .= "\n";
+					$tmp .= "		//clear variables\n";
+					$tmp .= "		dialed_extension = \"\";\n";
+					$tmp .= "		new_extension = \"\";\n";
+					$tmp .= "		domain_name = \"\";\n";
+					$tmp .= "		domain = \"\";";
+					
+					$tmp .= "\n";
+					$tmp .= "	} //end if session.ready\n";
+					$tmp .= "\n";
+
+					if (strlen($rowhelper['huntgroupid']) > 0) {
+						$huntgroupfilename = "huntgroup_".str_replace(array("{", "}"), "", $rowhelper['huntgroupid']).".js";
+						$fout = fopen("/usr/local/freeswitch/scripts/".$huntgroupfilename,"w");
+						fwrite($fout, $tmp);
+						unset($huntgroupfilename);
+						fclose($fout);
+					}
+
+
+			} //end foreach
+		} //end if count
+		conf_mount_ro();
+		config_unlock();
+
+} //end function
+
+
 function get_recording_filename($id)
 {
   global $config;
@@ -1189,9 +1526,9 @@ function sync_package_freeswitch_ivr()
 	      	   if ($row['optionaction'] == "action") {
 	      	        $actioncount++;
 	      	        if (strtolower($row['optionnumber']) == "n") { //direct the call now don't wait for dtmf
-	      	          $actiondirect = true;
-                    $actiondirecttype = $row['optiontype'];
-	      	          $actiondirectdest = $row['optiondest'];
+						$actiondirect = true;
+						$actiondirecttype = $row['optiontype'];
+						$actiondirectdest = $row['optiondest'];
 	      	        }
 	      	   }
 	        }   	
@@ -1828,7 +2165,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.8.7.5";
+	$freeswitch_package_version = "0.8.8";
 	$freeswitch_build_version = "1.0.4 pre 6";
 	$freeswitch_build_revision = "13238";
 	
@@ -1967,6 +2304,22 @@ function freeswitch_php_install_command()
 	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_gateways_edit.tmp");
 	exec("cp /tmp/freeswitch_gateways_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_gateways_edit.php");
 	unlink_if_exists("/tmp/freeswitch_gateways_edit.tmp");
+	
+	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_hunt_group.tmp");
+	exec("cp /tmp/freeswitch_hunt_group.tmp /usr/local/www/packages/freeswitch/freeswitch_hunt_group.php");
+	unlink_if_exists("/tmp/freeswitch_hunt_group.tmp");
+
+	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_hunt_group_edit.tmp");
+	exec("cp /tmp/freeswitch_hunt_group_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_hunt_group_edit.php");
+	unlink_if_exists("/tmp/freeswitch_hunt_group_edit.tmp");
+
+	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_hunt_group_destinations.tmp");
+	exec("cp /tmp/freeswitch_hunt_group_destinations.tmp /usr/local/www/packages/freeswitch/freeswitch_hunt_group_destinations.php");
+	unlink_if_exists("/tmp/freeswitch_hunt_group_destinations.tmp");
+
+	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_hunt_group_destinations_edit.tmp");
+	exec("cp /tmp/freeswitch_hunt_group_destinations_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_hunt_group_destinations_edit.php");
+	unlink_if_exists("/tmp/freeswitch_hunt_group_destinations_edit.tmp");
 
 	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr.tmp");	
 	exec("cp /tmp/freeswitch_ivr.tmp /usr/local/www/packages/freeswitch/freeswitch_ivr.php");

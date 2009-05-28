@@ -120,6 +120,20 @@ display_top_tabs(build_menu());
     <br />
     <br />
 	
+    <table width="100%" border="0" cellpadding="6" cellspacing="0">
+    <tr>
+      <td class="listtopic" colspan='2'>Hunt Group</td>
+	</tr>
+    <tr>
+		<td width='10%' class="vncell"><a href='freeswitch_hunt_group.php'>Open</a></td>
+		<td class="vtable">
+			Hunt Group is a group of destinations to call at once or in succession.
+		</td>
+	</tr>
+	</table>
+	
+    <br />
+    <br />	
 
     <table width="100%" border="0" cellpadding="6" cellspacing="0">
     <tr>
