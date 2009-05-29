@@ -117,7 +117,7 @@ display_top_tabs(build_menu());
         <?=$ent['ivrextension']?>
       </td>
       <td class="listr" ondblclick="document.location='freeswitch_ivr_edit.php?id=<?=$i;?>';">
-        <?=$ent['ivrname'];?>&nbsp;<?=$ent['ivrid'];?>&nbsp;
+        <?=$ent['ivrname'];?>&nbsp;
       </td>
       <td class="listbg" ondblclick="document.location='freeswitch_ivr_edit.php?id=<?=$i;?>';">
         <font color="#FFFFFF"><?=htmlspecialchars($ent['ivrdescr']);?>&nbsp;

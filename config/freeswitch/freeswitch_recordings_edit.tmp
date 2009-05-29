@@ -116,7 +116,7 @@ display_top_tabs(build_menu());
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>
      <td class="tabcont" >
-
+		<br />
         <form action="freeswitch_recordings_edit.php" method="post" name="iform" id="iform">
             <table width="100%" border="0" cellpadding="6" cellspacing="0">
             <tr>

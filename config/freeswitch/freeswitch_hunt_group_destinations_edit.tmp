@@ -57,6 +57,7 @@ if (isset($_POST['huntgroupid'])) {
 if (isset($id) && $a_hunt_group_destinations[$id]) {
 	$pconfig['destinationnumber'] = $a_hunt_group_destinations[$id]['destinationnumber'];
 	$pconfig['destinationtype'] = $a_hunt_group_destinations[$id]['destinationtype'];
+	$pconfig['destinationprofile'] = $a_hunt_group_destinations[$id]['destinationprofile'];	
 	$pconfig['destinationorder'] = $a_hunt_group_destinations[$id]['destinationorder'];
 	$pconfig['destinationdescr'] = $a_hunt_group_destinations[$id]['destinationdescr'];	
 }
@@ -80,6 +81,7 @@ if ($_POST) {
 		$huntgroupdestinationent['huntgroupid'] = $_POST['huntgroupid'];
 		$huntgroupdestinationent['destinationnumber'] = $_POST['destinationnumber'];
 		$huntgroupdestinationent['destinationtype'] = $_POST['destinationtype'];
+		$huntgroupdestinationent['destinationprofile'] = $_POST['destinationprofile'];		
 		$huntgroupdestinationent['destinationorder'] = $_POST['destinationorder'];		
 		$huntgroupdestinationent['destinationdescr'] = $_POST['destinationdescr'];
 
@@ -160,7 +162,32 @@ display_top_tabs(build_menu());
                 echo "                </select>\n";
                 ?>
               </td>
-            </tr>			
+            </tr>
+			
+            <tr>
+              <td width="22%" valign="top" class="vncellreq">Profile</td>
+              <td width="78%" class="vtable">
+                <?php
+                echo "                <select name='destinationprofile' class='formfld'>\n";
+                echo "                <option></option>\n";
+				
+				foreach (ListFiles('/usr/local/freeswitch/conf/sip_profiles') as $key=>$sip_profile_file){	
+					$sip_profile_name = str_replace(".xml", "", $sip_profile_file);
+
+					if (htmlspecialchars($pconfig['destinationprofile']) == $sip_profile_name) {
+						echo "                <option selected='yes'>$sip_profile_name</option>\n";
+					}
+					else {
+						echo "                <option>$sip_profile_name</option>\n";
+					}
+				}
+                echo "                </select>\n";
+				
+				
+                ?>
+              </td>
+            </tr>		
+			
 			<tr>
               <td width="22%" valign="top" class="vncell">Order</td>
               <td width="78%" class="vtable">

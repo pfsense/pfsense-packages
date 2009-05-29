@@ -294,11 +294,12 @@ display_top_tabs(build_menu());
 
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
-      <td width="20%" class="listhdrr">Destination</td>
-      <td width="25%" class="listhdrr">Type</td>
-	  <td width="25%" class="listhdrr">Order</td>
+      <td width="40%" class="listhdrr">Destination</td>
+      <td width="40" class="listhdrr">Type</td>
+	  <td width="40" class="listhdrr">Profile</td>
+	  <td width="40" class="listhdrr">Order</td>
       <td width="45%" class="listhdr">Description</td>
-      <td width="10%" class="list">
+      <td width="30" class="list">
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
@@ -342,6 +343,9 @@ display_top_tabs(build_menu());
 					<?=$ent['destinationtype'];?>&nbsp;
 				  </td>
 				  <td class="listr" ondblclick="document.location='freeswitch_hunt_group_destinations_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&huntgroupid=<?=$huntgroupid;?>';">
+					<?=$ent['destinationprofile'];?>&nbsp;
+				  </td>
+				  <td class="listr" ondblclick="document.location='freeswitch_hunt_group_destinations_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&huntgroupid=<?=$huntgroupid;?>';">
 					<?=$ent['destinationorder'];?>&nbsp;
 				  </td>				  
 				  <td class="listbg" ondblclick="document.location='freeswitch_hunt_group_destinations_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&huntgroupid=<?=$huntgroupid;?>';">
@@ -363,7 +367,7 @@ display_top_tabs(build_menu());
     }
     ?>
     <tr>
-      <td class="list" colspan="4"></td>
+      <td class="list" colspan="5"></td>
       <td class="list">
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
@@ -376,7 +380,7 @@ display_top_tabs(build_menu());
 
 
      <tr>
-       <td class="list" colspan="4"></td>
+       <td class="list" colspan="5"></td>
        <td class="list"></td>
      </tr>
      </table>
@@ -391,7 +395,7 @@ display_top_tabs(build_menu());
 
 
      <tr>
-       <td class="list" colspan="3"></td>
+       <td class="list" colspan="4"></td>
        <td class="list"></td>
      </tr>
      </table>

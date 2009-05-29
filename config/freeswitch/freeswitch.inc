@@ -1124,8 +1124,8 @@ function sync_package_freeswitch_hunt_group()
 	
 				//Get the list of destinations then build the Hunt Group javascript
 					$tmp = "";					
-					$tmp .= "	function get_sofia_contact(extension,domain_name){\n";
-					$tmp .= "		session.execute(\"set\", \"sofia_contact_\"+extension+\"=\${sofia_contact(internal/\"+extension+\"@\"+domain_name+\")}\");\n";
+					$tmp .= "	function get_sofia_contact(extension,domain_name, profile){\n";
+					$tmp .= "		session.execute(\"set\", \"sofia_contact_\"+extension+\"=\${sofia_contact(\"+profile+\"/\"+extension+\"@\"+domain_name+\")}\");\n";
 					$tmp .= "		sofia_contact = session.getVariable(\"sofia_contact_\"+extension);\n";
 					$tmp .= "		//console_log( \"info\", \"sofia_contact: \"+sofia_contact+\".\\n\" );\n";
 					$tmp .= "		return sofia_contact;\n";
@@ -1185,15 +1185,18 @@ function sync_package_freeswitch_hunt_group()
 								$row['huntgroupid']
 								$row['destinationnumber']
 								$row['destinationtype']
+								$row['destinationprofile']
 								$row['destinationorder']
 								$row['destinationdescr']
 								*/
 								
-								if ($row['huntgroupid'] == $rowhelper['huntgroupid']) {						
+								if ($row['huntgroupid'] == $rowhelper['huntgroupid']) {
+								
+									//set the default profile
+									if (strlen($row['destinationnumber']) == 0) { $row['destinationnumber'] = "internal"; }
 									
 									if ($row['destinationtype'] == "extension") {
-										//$tmp .= "		session.execute(\"transfer\", \"".$row['destinationnumber']." XML default\"); //".$row['destinationdescr']."\n";
-										$tmp .= "		sofia_contact_".$row['destinationnumber']." = get_sofia_contact(\"".$row['destinationnumber']."\",domain_name);\n";									
+										$tmp .= "		sofia_contact_".$row['destinationnumber']." = get_sofia_contact(\"".$row['destinationnumber']."\",domain_name, \"".$row['destinationprofile']."\");\n";									
 										$tmp_sub_array["application"] = "bridge";
 										$tmp_sub_array["data"] = "sofia_contact_".$row['destinationnumber'];
 										$tmp_array[$x] = $tmp_sub_array;
@@ -1207,9 +1210,7 @@ function sync_package_freeswitch_hunt_group()
 										$tmp_array[$x] = $tmp_sub_array;
 										unset($tmp_sub_array);
 									}
-									if ($row['destinationtype'] == "sip uri") {						
-										//$tmp .= "		session.execute(\"transfer\", \"".$row['destinationnumber']." XML default\"); //".$row['destinationdescr']."\n";
-										//tmp .= "		sofia_contact_".$row['destinationnumber']." = get_sofia_contact(\"".$row['destinationnumber']."\",domain_name);\n";									
+									if ($row['destinationtype'] == "sip uri") {												
 										$tmp_sub_array["application"] = "bridge";
 										$tmp_sub_array["data"] = "\"".$row['destinationnumber']."\"";
 										$tmp_array[$x] = $tmp_sub_array;
@@ -1607,7 +1608,7 @@ function sync_package_freeswitch_ivr()
       	    //$tmp .= "         //http://wiki.freeswitch.org/wiki/Session_getDigits\n";
       	    //$tmp .= "         //getDigits(length, terminators, timeout, digit_timeout, abs_timeout)\n";
       	    //$tmp .= "       //dtmf.digits +=  session.getDigits(2, \"#\", 3000); //allow up to 3 digits\n";
-      	    $tmp .= "         dtmf.digits +=  session.getDigits(3, \"#\", 3000); //allow up to 4 digits\n";
+      	    $tmp .= "         dtmf.digits +=  session.getDigits(4, \"#\", 3000); //allow up to 5 digits\n";
       	    $tmp .= "\n";
       	    $tmp .= "\n";
       	    //$tmp .= "         console_log( \"info\", \"IVR Digit Pressed: \" + dtmf.digits + \"\\n\" );\n";
@@ -2165,7 +2166,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.8.8";
+	$freeswitch_package_version = "0.8.8.1";
 	$freeswitch_build_version = "1.0.4 pre 6";
 	$freeswitch_build_revision = "13238";
 	
