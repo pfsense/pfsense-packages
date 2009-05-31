@@ -1,11 +1,8 @@
 <?php
 /* $Id$ */
 /*
-	snort_alerts.php
-	part of pfSense
-
-	Copyright (C) 2005 Bill Marquette <bill.marquette@gmail.com>.
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	snort_rulesets.php
+	Copyright (C) 2006 Scott Ullrich
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -118,9 +115,23 @@ if(!$pgtitle_output)
 ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
 ini_set("memory_limit","125M");
 
+/* define oinkid */
+if($config['installedpackages']['snort'])
+        $oinkid = $config['installedpackages']['snort']['config'][0]['oinkmastercode'];
 
-/* hide progress bar and lets end this party */
+/* if missing oinkid exit */
+if(!$oinkid) {
+        $static_output = gettext("You must obtain an oinkid from snort.org and set its value in the Snort settings tab.");
+        update_all_status($static_output);
+        hide_progress_bar_status();
+        exit;
+}
+
+/* hide progress bar */
 hide_progress_bar_status();
+
+/* send current buffer */
+ob_flush();
 
 /*  remove old $tmpfname files */
 if (file_exists("{$tmpfname}")) {
@@ -151,7 +162,7 @@ if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
     /* echo "downloading md5\n"; */
     update_status(gettext("Downloading md5 file..."));
 ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-$image = file_get_contents('http://dl.snort.org/reg-rules/snortrules-snapshot-2.8.tar.gz.md5?oink_code=658d6fe74f30ac3efd01e7ff551f63d91a926430');
+$image = file_get_contents("http://dl.snort.org/reg-rules/snortrules-snapshot-2.8.tar.gz.md5?oink_code={$oinkid}");
 $f = fopen("{$tmpfname}/snortrules-snapshot-2.8.tar.gz.md5", 'w');
 fwrite($f, $image);
 fclose($f);
@@ -190,7 +201,7 @@ if (file_exists("{$tmpfname}/{$snort_filename}")) {
     update_output_window(gettext("May take 4 to 10 min..."));
 
 update_output_window("{$snort_filename}");
-download_file_with_progress_bar("http://dl.snort.org/reg-rules/snortrules-snapshot-2.8.tar.gz?oink_code=658d6fe74f30ac3efd01e7ff551f63d91a926430", $tmpfname . "/{$snort_filename}", "read_body_firmware");
+download_file_with_progress_bar("http://dl.snort.org/reg-rules/snortrules-snapshot-2.8.tar.gz?oink_code={$oinkid}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
 update_all_status($static_output);
     /* echo "done\n"; */
     update_status(gettext("Done."));
