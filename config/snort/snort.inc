@@ -778,9 +778,11 @@ function verify_snort_rules_md5($tmpfname) {
 		$static_output = gettext("Verifying md5 signature...");
 		update_all_status($static_output);
 	}
-	$md5 = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
+
+        $md555 = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
+        $md5 = `/bin/echo "{$md555}" | /usr/bin/awk '{ print $4 }'`;
 	$file_md5_ondisk = `/sbin/md5 {$tmpfname}/{$snort_filename} | /usr/bin/awk '{ print $4 }'`;
-	if($md5 <> $file_md5_ondisk) {
+	if($md5 == $file_md5_ondisk) {
 		if(!$console_mode) {
 			$static_output = gettext("snort rules: md5 signature of rules mismatch.");
 			update_all_status($static_output);
@@ -799,6 +801,14 @@ function hide_progress_bar_status() {
 	ob_flush();
 	if(!$console_mode)
 		echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='hidden';\n</script>";
+}
+
+/* unhide progress bar */
+function unhide_progress_bar_status() {
+        global $snort_filename, $snort_filename_md5, $console_mode;
+        ob_flush();
+        if(!$console_mode)
+                echo "\n<script type=\"text/javascript\">document.progressbar.style.visibility='visible';\n</script>";
 }
 
 /* update both top and bottom text box during an operation */
