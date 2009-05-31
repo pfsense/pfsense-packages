@@ -310,16 +310,36 @@ display_top_tabs(build_menu());
       <form action="freeswitch_public_includes_edit.php" method="post" name="iform2" id="iform2">
       <?php
 
-      //echo "<pre>";
-      //print_r ($a_public_includes);
-      //echo "</pre>";
+		//echo "<pre>";
+		//print_r ($a_public_includes);
+		//echo "</pre>";
 
-      //if ($savemsg) print_info_box($savemsg);
-      //if (file_exists($d_hostsdirty_path)): echo"<p>";
-      //print_info_box_np("The FreeSWITCH recordings have been changed.<br>You must apply the changes in order for them to take effect.");
-      //echo"<br />";
-      //endif;
+		//if ($savemsg) print_info_box($savemsg);
+		//if (file_exists($d_hostsdirty_path)): echo"<p>";
+		//print_info_box_np("The FreeSWITCH recordings have been changed.<br>You must apply the changes in order for them to take effect.");
+		//echo"<br />";
+		//endif;
 
+		//create a temporary id for the array
+		$i = 0;
+		if (count($a_public_include_details) > 0) {
+			foreach ($a_public_include_details as $ent) {
+				$a_public_include_details[$i]['id'] = $i;
+				$i++;
+			}
+		}
+
+		//order the array
+		function cmp_number_public_details($a, $b) {
+			if ($a["fieldorder"] > $b["fieldorder"]) {
+				return 1;
+			}
+			else {
+				return 0;
+			}
+		}
+		if (count($a_public_include_details) > 0) { usort($a_public_include_details, "cmp_number_public_details"); }
+	
       ?>
 
 
@@ -335,10 +355,11 @@ display_top_tabs(build_menu());
 
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
-      <td width="20%" class="listhdrr">Tag</td>
-      <td width="20%" class="listhdrr">Type</td>
+      <td width="40" class="listhdrr">Tag</td>
+      <td width="40" class="listhdrr">Type</td>
       <td width="50%" class="listhdrr">Data</td>
-      <td width="10%" class="list">
+	  <td width="40" class="listhdrr">Order</td>
+      <td width="40" class="list">
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
@@ -348,7 +369,7 @@ display_top_tabs(build_menu());
       </td>
 		</tr>
 
-		<?php
+	<?php
 
       $i = 0;
       if (count($a_public_include_details) > 0) {
@@ -357,20 +378,23 @@ display_top_tabs(build_menu());
           if ($ent['tag'] == "condition" && $publicincludeid == $ent['publicincludeid']) {
     ?>
             <tr>
-              <td class="listlr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>'">
+              <td class="listlr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>'">
                 <?=$ent['tag']?>
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
                 <?=$ent['fieldtype'];?>&nbsp;
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
                 <?=$ent['fielddata'];?>&nbsp;
+              </td>
+              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
+                <?=$ent['fieldorder'];?>&nbsp;
               </td>
               <td valign="middle" nowrap class="list">
                 <table border="0" cellspacing="0" cellpadding="1">
                   <tr>
-                    <td valign="middle"><a href="freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                    <td><a href="freeswitch_public_includes_details.php?type=publicincludedetails&act=del&id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                    <td valign="middle"><a href="freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                    <td><a href="freeswitch_public_includes_details.php?type=publicincludedetails&act=del&id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                   </tr>
                </table>
               </td>
@@ -388,20 +412,23 @@ display_top_tabs(build_menu());
           if ($ent['tag'] == "action" && $publicincludeid == $ent['publicincludeid']) {
     ?>
             <tr>
-              <td class="listlr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>'">
+              <td class="listlr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>'">
                 <?=$ent['tag']?>
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
                 <?=$ent['fieldtype'];?>&nbsp;
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
                 <?=$ent['fielddata'];?>&nbsp;
+              </td>
+              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
+                <?=$ent['fieldorder'];?>&nbsp;
               </td>
               <td valign="middle" nowrap class="list">
                 <table border="0" cellspacing="0" cellpadding="1">
                   <tr>
-                    <td valign="middle"><a href="freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                    <td><a href="freeswitch_public_includes_details.php?type=publicincludedetails&act=del&id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                    <td valign="middle"><a href="freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                    <td><a href="freeswitch_public_includes_details.php?type=publicincludedetails&act=del&id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                   </tr>
                </table>
               </td>
@@ -419,20 +446,23 @@ display_top_tabs(build_menu());
           if ($ent['tag'] == "anti-action" && $publicincludeid == $ent['publicincludeid']) {
     ?>
             <tr>
-              <td class="listlr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>'">
+              <td class="listlr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>'">
                 <?=$ent['tag']?>
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
                 <?=$ent['fieldtype'];?>&nbsp;
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
                 <?=$ent['fielddata'];?>&nbsp;
+              </td>
+              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
+                <?=$ent['fieldorder'];?>&nbsp;
               </td>
               <td valign="middle" nowrap class="list">
                 <table border="0" cellspacing="0" cellpadding="1">
                   <tr>
-                    <td valign="middle"><a href="freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                    <td><a href="freeswitch_public_includes_details.php?type=publicincludedetails&act=del&id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                    <td valign="middle"><a href="freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                    <td><a href="freeswitch_public_includes_details.php?type=publicincludedetails&act=del&id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                   </tr>
                </table>
               </td>
@@ -450,20 +480,23 @@ display_top_tabs(build_menu());
           if ($ent['tag'] == "param" && $publicincludeid == $ent['publicincludeid']) {
     ?>
             <tr>
-              <td class="listlr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>'">
+              <td class="listlr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>'">
                 <?=$ent['tag']?>
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
                 <?=$ent['fieldtype'];?>&nbsp;
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
                 <?=$ent['fielddata'];?>&nbsp;
+              </td>
+              <td class="listr" ondblclick="document.location='freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>';">
+                <?=$ent['fieldorder'];?>&nbsp;
               </td>
               <td valign="middle" nowrap class="list">
                 <table border="0" cellspacing="0" cellpadding="1">
                   <tr>
-                    <td valign="middle"><a href="freeswitch_public_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                    <td><a href="freeswitch_public_includes_details.php?type=publicincludedetails&act=del&id=<?=$i;?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                    <td valign="middle"><a href="freeswitch_public_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                    <td><a href="freeswitch_public_includes_details.php?type=publicincludedetails&act=del&id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&publicincludeid=<?=$publicincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                   </tr>
                </table>
               </td>
@@ -475,7 +508,7 @@ display_top_tabs(build_menu());
       }
     ?>
     <tr>
-      <td class="list" colspan="3"></td>
+      <td class="list" colspan="4"></td>
       <td class="list">
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
@@ -488,7 +521,7 @@ display_top_tabs(build_menu());
 
 
      <tr>
-       <td class="list" colspan="3"></td>
+       <td class="list" colspan="4"></td>
        <td class="list"></td>
      </tr>
      </table>

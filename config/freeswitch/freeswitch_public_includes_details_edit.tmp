@@ -58,19 +58,17 @@ if (isset($_POST['publicincludeid'])) {
       //action
       //antiaction
       //param
-  //tagorder
-      //1-20
   //fieldtype
-
   //fielddata
-
+  //fieldorder
+      //000-999
 
 if (isset($id) && $a_public_includes_details[$id]) {
 	$pconfig['publicincludeid'] = $a_public_includes_details[$id]['publicincludeid'];
 	$pconfig['tag'] = $a_public_includes_details[$id]['tag'];
-	//$pconfig['tagorder'] = $a_public_includes_details[$id]['tagorder'];
 	$pconfig['fieldtype'] = $a_public_includes_details[$id]['fieldtype'];
-	$pconfig['fielddata'] = $a_public_includes_details[$id]['fielddata'];	
+	$pconfig['fielddata'] = $a_public_includes_details[$id]['fielddata'];
+	$pconfig['fieldorder'] = $a_public_includes_details[$id]['fieldorder'];	
 }
 //else {
 //  if (isset($_GET['a'])) {
@@ -86,16 +84,14 @@ if ($_POST) {
 	unset($input_errors);
 	$pconfig = $_POST;
 
-
 	if (!$input_errors) {
 
 		$ent = array();		
 		$ent['publicincludeid'] = $_POST['publicincludeid'];
 		$ent['tag'] = $_POST['tag'];
-		//$ent['tagorder'] = $_POST['tagorder'];
 		$ent['fieldtype'] = $_POST['fieldtype'];		
 		$ent['fielddata'] = $_POST['fielddata'];
-
+		$ent['fieldorder'] = $_POST['fieldorder'];
 
 		if (isset($id) && $a_public_includes_details[$id]) {
 			//update
@@ -138,7 +134,7 @@ display_top_tabs(build_menu());
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>
      <td class="tabcont" >
-
+		<br />
         <form action="freeswitch_public_includes_details_edit.php" method="post" name="iform" id="iform">
             <table width="100%" border="0" cellpadding="6" cellspacing="0">
             <tr>
@@ -232,6 +228,33 @@ display_top_tabs(build_menu());
                 <input name="fielddata" type="text" class="formfld" id="fielddata" size="40" value="<?=htmlspecialchars($pconfig['fielddata']);?>">
                 <br> <span class="vexpl"></span></td>
             </tr>
+            <tr>
+              <td width="22%" valign="top" class="vncellreq" id="label_fieldtype">Order</td>
+              <td width="78%" class="vtable">
+	            <?php
+                echo "              <select name='fieldorder' class='formfld'>\n";
+                //echo "              <option></option>\n";
+                if (strlen(htmlspecialchars($pconfig['fieldorder']))> 0) {
+                    echo "              <option selected='yes' value='".htmlspecialchars($pconfig['fieldorder'])."'>".htmlspecialchars($pconfig['fieldorder'])."</option>\n";
+                }
+                $i=0;
+                while($i<=999) {
+                  if (strlen($i) == 1) {
+                    echo "              <option value='00$i'>00$i</option>\n";
+                  }
+                  if (strlen($i) == 2) {
+                    echo "              <option value='0$i'>0$i</option>\n";
+                  }
+                  if (strlen($i) == 3) {
+                    echo "              <option value='$i'>$i</option>\n";
+                  }
+
+                  $i++;
+                }
+                echo "              </select>\n";
+                ?>
+				</td>
+            </tr>			
             <tr>
               <td width="22%" valign="top">&nbsp;</td>
               <td width="78%">

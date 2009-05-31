@@ -318,6 +318,26 @@ display_top_tabs(build_menu());
       //echo"<br />";
       //endif;
 
+	  	//create a temporary id for the array
+		$i = 0;
+		if (count($a_dialplan_include_details) > 0) {
+			foreach ($a_dialplan_include_details as $ent) {
+				$a_dialplan_include_details[$i]['id'] = $i;
+				$i++;
+			}
+		}
+		
+		//order the array
+		function cmp_number($a, $b) {
+			if ($a["fieldorder"] > $b["fieldorder"]) {
+				return 1;
+			}
+			else {
+				return 0;
+			}
+		}
+		if (count($a_dialplan_include_details) > 0) { usort($a_dialplan_include_details, "cmp_number"); }
+	
       ?>
 
 
@@ -333,10 +353,11 @@ display_top_tabs(build_menu());
 
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
-      <td width="20%" class="listhdrr">Tag</td>
-      <td width="20%" class="listhdrr">Type</td>
+      <td width="40" class="listhdrr">Tag</td>
+      <td width="40" class="listhdrr">Type</td>
       <td width="50%" class="listhdrr">Data</td>
-      <td width="10%" class="list">
+	  <td width="40" class="listhdrr">Order</td>
+      <td width="40" class="list">
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
@@ -355,20 +376,23 @@ display_top_tabs(build_menu());
 			if ($ent['tag'] == "condition" && $dialplanincludeid == $ent['dialplanincludeid']) {
     ?>
             <tr>
-              <td class="listlr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>'">
+              <td class="listlr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>'">
                 <?=$ent['tag']?>
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
                 <?=$ent['fieldtype'];?>&nbsp;
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
                 <?=$ent['fielddata'];?>&nbsp;
               </td>
+              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
+                <?=$ent['fieldorder'];?>&nbsp;
+              </td>			  
               <td valign="middle" nowrap class="list">
                 <table border="0" cellspacing="0" cellpadding="1">
                   <tr>
-                    <td valign="middle"><a href="freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                    <td><a href="freeswitch_dialplan_includes_details.php?type=dialplanincludedetails&act=del&id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                    <td valign="middle"><a href="freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                    <td><a href="freeswitch_dialplan_includes_details.php?type=dialplanincludedetails&act=del&id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                   </tr>
                </table>
               </td>
@@ -386,20 +410,23 @@ display_top_tabs(build_menu());
           if ($ent['tag'] == "action" && $dialplanincludeid == $ent['dialplanincludeid']) {
     ?>
             <tr>
-              <td class="listlr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>'">
+              <td class="listlr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>'">
                 <?=$ent['tag']?>
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
                 <?=$ent['fieldtype'];?>&nbsp;
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
                 <?=$ent['fielddata'];?>&nbsp;
               </td>
+              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
+                <?=$ent['fieldorder'];?>&nbsp;
+              </td>			  
               <td valign="middle" nowrap class="list">
                 <table border="0" cellspacing="0" cellpadding="1">
                   <tr>
-                    <td valign="middle"><a href="freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                    <td><a href="freeswitch_dialplan_includes_details.php?type=dialplanincludedetails&act=del&id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                    <td valign="middle"><a href="freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                    <td><a href="freeswitch_dialplan_includes_details.php?type=dialplanincludedetails&act=del&id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                   </tr>
                </table>
               </td>
@@ -417,20 +444,23 @@ display_top_tabs(build_menu());
           if ($ent['tag'] == "anti-action" && $dialplanincludeid == $ent['dialplanincludeid']) {
     ?>
             <tr>
-              <td class="listlr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>'">
+              <td class="listlr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>'">
                 <?=$ent['tag']?>
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
                 <?=$ent['fieldtype'];?>&nbsp;
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
                 <?=$ent['fielddata'];?>&nbsp;
               </td>
+              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
+                <?=$ent['fieldorder'];?>&nbsp;
+              </td>			  
               <td valign="middle" nowrap class="list">
                 <table border="0" cellspacing="0" cellpadding="1">
                   <tr>
-                    <td valign="middle"><a href="freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                    <td><a href="freeswitch_dialplan_includes_details.php?type=dialplanincludedetails&act=del&id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                    <td valign="middle"><a href="freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                    <td><a href="freeswitch_dialplan_includes_details.php?type=dialplanincludedetails&act=del&id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                   </tr>
                </table>
               </td>
@@ -448,20 +478,23 @@ display_top_tabs(build_menu());
           if ($ent['tag'] == "param" && $dialplanincludeid == $ent['dialplanincludeid']) {
     ?>
             <tr>
-              <td class="listlr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>'">
+              <td class="listlr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>'">
                 <?=$ent['tag']?>
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
                 <?=$ent['fieldtype'];?>&nbsp;
               </td>
-              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
+              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
                 <?=$ent['fielddata'];?>&nbsp;
               </td>
+              <td class="listr" ondblclick="document.location='freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>';">
+                <?=$ent['fieldorder'];?>&nbsp;
+              </td>	
               <td valign="middle" nowrap class="list">
                 <table border="0" cellspacing="0" cellpadding="1">
                   <tr>
-                    <td valign="middle"><a href="freeswitch_dialplan_includes_details_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                    <td><a href="freeswitch_dialplan_includes_details.php?type=dialplanincludedetails&act=del&id=<?=$i;?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                    <td valign="middle"><a href="freeswitch_dialplan_includes_details_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                    <td><a href="freeswitch_dialplan_includes_details.php?type=dialplanincludedetails&act=del&id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&dialplanincludeid=<?=$dialplanincludeid;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                   </tr>
                </table>
               </td>
@@ -473,7 +506,7 @@ display_top_tabs(build_menu());
       }
     ?>
     <tr>
-      <td class="list" colspan="3"></td>
+      <td class="list" colspan="4"></td>
       <td class="list">
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
@@ -486,7 +519,7 @@ display_top_tabs(build_menu());
 
 
      <tr>
-       <td class="list" colspan="3"></td>
+       <td class="list" colspan="4"></td>
        <td class="list"></td>
      </tr>
      </table>

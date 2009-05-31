@@ -212,6 +212,7 @@ if ($_POST) {
 	                $ent['tag'] = 'condition'; //condition, action, antiaction
 	                $ent['fieldtype'] = 'destination_number';
 	                $ent['fielddata'] = $dialplan_expression;
+					$ent['fieldorder'] = '000';
 					$a_dialplan_include_details[] = $ent;
 					unset($ent);
 	            		
@@ -220,6 +221,7 @@ if ($_POST) {
 	                $ent['tag'] = 'action'; //condition, action, antiaction
 	                $ent['fieldtype'] = 'bridge';
 	                $ent['fielddata'] = $action_data;
+					$ent['fieldorder'] = '001';
 					$a_dialplan_include_details[] = $ent;
 					unset($ent);
 					

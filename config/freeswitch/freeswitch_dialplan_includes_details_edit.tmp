@@ -59,7 +59,7 @@ if (isset($_POST['dialplanincludeid'])) {
       //action
       //antiaction
       //param
-  //tagorder
+  //fieldorder
       //1-20
   //fieldtype
 
@@ -69,7 +69,7 @@ if (isset($_POST['dialplanincludeid'])) {
 if (isset($id) && $a_dialplan_includes_details[$id]) {
 	$pconfig['dialplanincludeid'] = $a_dialplan_includes_details[$id]['dialplanincludeid'];
 	$pconfig['tag'] = $a_dialplan_includes_details[$id]['tag'];
-	//$pconfig['tagorder'] = $a_dialplan_includes_details[$id]['tagorder'];
+	$pconfig['fieldorder'] = $a_dialplan_includes_details[$id]['fieldorder'];
 	$pconfig['fieldtype'] = $a_dialplan_includes_details[$id]['fieldtype'];
 	$pconfig['fielddata'] = $a_dialplan_includes_details[$id]['fielddata'];	
 }
@@ -93,7 +93,7 @@ if ($_POST) {
 		$ent = array();		
 		$ent['dialplanincludeid'] = $_POST['dialplanincludeid'];
 		$ent['tag'] = $_POST['tag'];
-		//$ent['tagorder'] = $_POST['tagorder'];
+		$ent['fieldorder'] = $_POST['fieldorder'];
 		$ent['fieldtype'] = $_POST['fieldtype'];		
 		$ent['fielddata'] = $_POST['fielddata'];
 
@@ -138,7 +138,7 @@ display_top_tabs(build_menu());
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>
      <td class="tabcont" >
-
+		<br />
         <form action="freeswitch_dialplan_includes_details_edit.php" method="post" name="iform" id="iform">
             <table width="100%" border="0" cellpadding="6" cellspacing="0">
             <tr>
@@ -232,6 +232,33 @@ display_top_tabs(build_menu());
                 <input name="fielddata" type="text" class="formfld" id="fielddata" size="40" value="<?=htmlspecialchars($pconfig['fielddata']);?>">
                 <br> <span class="vexpl"></span></td>
             </tr>
+            <tr>
+              <td width="22%" valign="top" class="vncellreq" id="label_fieldtype">Order</td>
+              <td width="78%" class="vtable">
+	            <?php
+                echo "              <select name='fieldorder' class='formfld'>\n";
+                //echo "              <option></option>\n";
+                if (strlen(htmlspecialchars($pconfig['fieldorder']))> 0) {
+                    echo "              <option selected='yes' value='".htmlspecialchars($pconfig['fieldorder'])."'>".htmlspecialchars($pconfig['fieldorder'])."</option>\n";
+                }
+                $i=0;
+                while($i<=999) {
+                  if (strlen($i) == 1) {
+                    echo "              <option value='00$i'>00$i</option>\n";
+                  }
+                  if (strlen($i) == 2) {
+                    echo "              <option value='0$i'>0$i</option>\n";
+                  }
+                  if (strlen($i) == 3) {
+                    echo "              <option value='$i'>$i</option>\n";
+                  }
+
+                  $i++;
+                }
+                echo "              </select>\n";
+                ?>
+				</td>
+            </tr>			
             <tr>
               <td width="22%" valign="top">&nbsp;</td>
               <td width="78%">

@@ -85,8 +85,10 @@ function build_menu() {
 	unset($menu_selected);
 
 	$menu_selected = false;
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_public.php") { $menu_selected = true; }	
 	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_public_includes.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_public.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_public_includes_edit.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_public_includes_details_edit.php") { $menu_selected = true; }	
 	$tab_array[] = array(gettext("Public"), $menu_selected, "/packages/freeswitch/freeswitch_public_includes.php");
 	unset($menu_selected);
 
@@ -1486,8 +1488,25 @@ function sync_package_freeswitch_ivr()
 	    $tmp .= " var Year = objdate2.getYear()\n";
 	    $tmp .= " var Day = objdate2.getDay()+1;\n";
 	    $tmp .= " var exit = false;\n";
-	    $tmp .= "\n";
-	    $tmp .= "//console_log( \"info\", \"IVR Server Time is: \"+Hours+\":\"+Mins+\" \\n\" );\n";
+		$tmp .= "\n";
+		$tmp .= " dialed_extension = session.getVariable(\"dialed_extension\");\n";
+		$tmp .= " domain_name = session.getVariable(\"domain_name\");\n";
+		$tmp .= " domain = session.getVariable(\"domain\");\n";
+		$tmp .= " us_ring = session.getVariable(\"us-ring\");\n";
+		$tmp .= " caller_id_name = session.getVariable(\"caller_id_name\");\n";
+		$tmp .= " caller_id_number = session.getVariable(\"caller_id_number\");\n";
+		$tmp .= "\n";
+		$tmp .= " session.execute(\"set\", \"ringback=\"+us_ring);          //set to ringtone\n";
+		$tmp .= " session.execute(\"set\", \"transfer_ringback=\"+us_ring); //set to ringtone\n";
+		$tmp .= "\n";
+		$tmp .= "//console_log( \"info\", \"IVR Server Time is: \"+Hours+\":\"+Mins+\" \\n\" );\n";
+		$tmp .= "\n";
+		$tmp .= " function get_sofia_contact(extension,domain_name, profile){\n";
+		$tmp .= "		session.execute(\"set\", \"sofia_contact_\"+extension+\"=\${sofia_contact(\"+profile+\"/\"+extension+\"@\"+domain_name+\")}\");\n";
+		$tmp .= "		sofia_contact = session.getVariable(\"sofia_contact_\"+extension);\n";
+		$tmp .= "		//console_log( \"info\", \"sofia_contact: \"+sofia_contact+\".\\n\" );\n";
+		$tmp .= "		return sofia_contact;\n";
+		$tmp .= " }\n";				
 	    $tmp .= "\n";
 	    $tmp .= " function mycb( session, type, obj, arg ) {\n";
 	    $tmp .= "    try {\n";
@@ -1529,6 +1548,7 @@ function sync_package_freeswitch_ivr()
 	      	        if (strtolower($row['optionnumber']) == "n") { //direct the call now don't wait for dtmf
 						$actiondirect = true;
 						$actiondirecttype = $row['optiontype'];
+						$actiondirectprofile = $row['optionprofile'];
 						$actiondirectdest = $row['optiondest'];
 	      	        }
 	      	   }
@@ -1542,12 +1562,18 @@ function sync_package_freeswitch_ivr()
       	    $tmp .= "    //direct\n";
       	    $tmp .= "    //console_log( \"info\", \"action direct\\n\" );\n";
             if ($actiondirecttype == "extension") {
-                $tmp .= "    session.execute(\"transfer\", \"".$actiondirectdest." XML default\"); //".$actiondirectdest."\n";
-            }
+				$tmp .= "    sofia_contact_".$actiondirectdest." = get_sofia_contact(\"".$actiondirectdest."\",domain_name, \"".$actiondirectprofile."\");\n";									
+                $tmp .= "    session.execute(\"bridge\", sofia_contact_".$actiondirectdest."); //".$actiondirectdest."\n";
+                //$tmp .= "    session.execute(\"transfer\", \"".$actiondirectdest." XML default\"); //".$actiondirectdest."\n";
+			}
             if ($actiondirecttype == "voicemail") {
                 //$tmp .= "    session.execute(\"voicemail\", \"".$actiondirectdest." XML default\");\n";
                 $tmp .= "    session.execute(\"voicemail\", \"default \"+domain+\" ".$actiondirectdest."\");\n";
             }
+            if ($actiondirecttype == "sip uri") {
+                $tmp .= "    session.execute(\"bridge\", \"".$actiondirectdest."\"); //".$actiondirectdest."\n";
+			}
+			
       	    $tmp .= "}\n";
 
   	    }
@@ -1580,13 +1606,18 @@ function sync_package_freeswitch_ivr()
       			
       			          if ($row['optionaction'] == "action") {
       		        	     if (strtolower($row['optionnumber']) == "t") {			
-      			                  if ($row['optiontype'] == "extension") {
-      			                      $tmp .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
-      			                  }
-      			                  if ($row['optiontype'] == "voicemail") {
-      			                      //$tmp .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
-      			                      $tmp .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-      			                  }
+      			                if ($row['optiontype'] == "extension") {
+									$tmp .= "                 	sofia_contact_".$row['optiondest']." = get_sofia_contact(\"".$row['optiondest']."\",domain_name, \"".$row['optionprofile']."\");\n";									
+									$tmp .= "                 	session.execute(\"bridge\", sofia_contact_".$row['optiondest']."); //".$row['optiondescr']."\n";
+      			                }
+      			                if ($row['optiontype'] == "voicemail") {
+									//$tmp .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
+									$tmp .= "                 	session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+      			                }
+      			                if ($row['optiontype'] == "sip uri") {
+      			                    //$tmp .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
+									$tmp .= "                 	session.execute(\"bridge\", \"".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+      			                }
       		        	     }
       			          } //end anti-action
       			
@@ -1594,7 +1625,6 @@ function sync_package_freeswitch_ivr()
       			
       			    } //end for each
       		    } //if count
-      		
 
       	    $tmp .= "           		}\n";
       	    $tmp .= "           		else {\n";
@@ -1640,37 +1670,33 @@ function sync_package_freeswitch_ivr()
       		          if ($row['optionaction'] == "action") {
       		        	    //$tmpaction .= "\n";
       		        	
-      		        	    switch ($row['optionnumber']) {
-      		              //case "t":
+						switch ($row['optionnumber']) {
+						case "t":      		
+								break;
+						default:
+								//$tmpaction .= "             //console_log( \"info\", \"IVR Detected 1 digit \\n\" );\n";
+								if ($x == 0) {
+									$tmpaction .= "             if ( dtmf.digits == \"".$row['optionnumber']."\" ) { //".$row['optiondescr']."\n";
+								}
+								else {
+									$tmpaction .= "             else if ( dtmf.digits == \"".$row['optionnumber']."\" ) { //".$row['optiondescr']."\n";
+								}
+								if ($row['optiontype'] == "extension") {
+									$tmpaction .= "                 sofia_contact_".$row['optiondest']." = get_sofia_contact(\"".$row['optiondest']."\",domain_name, \"".$row['optionprofile']."\");\n";									
+									$tmpaction .= "                 session.execute(\"bridge\", sofia_contact_".$row['optiondest']."); //".$row['optiondescr']."\n";
+								}
+								if ($row['optiontype'] == "voicemail") {
+									//$tmpaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
+									$tmpaction .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+								}
+								if ($row['optiontype'] == "sip uri") {
+									//$tmpaction .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
+									$tmpaction .= "                 session.execute(\"bridge\", \"".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+								}
+
+								$tmpaction .= "             }\n";
       		
-      		                  //if ($row['optiontype'] == "extension") {
-      		                  //    $tmpactiondefault .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
-      		                  //}
-      		                  //if ($row['optiontype'] == "voicemail") {
-      		                  //    //$tmpactiondefault .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
-      		                  //    $tmpactiondefault .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-      		                  //}
-      		
-      		                  //break;
-      		              default:
-      		                  //$tmpaction .= "             //console_log( \"info\", \"IVR Detected 1 digit \\n\" );\n";
-      		                  if ($x == 0) {
-      		                    $tmpaction .= "             if ( dtmf.digits == \"".$row['optionnumber']."\" ) { //".$row['optiondescr']."\n";
-      		                  }
-      		                  else {
-      		                    $tmpaction .= "             else if ( dtmf.digits == \"".$row['optionnumber']."\" ) { //".$row['optiondescr']."\n";
-      		                  }
-      		                  if ($row['optiontype'] == "extension") {
-      		                      $tmpaction .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\");\n";
-      		                  }
-      		                  if ($row['optiontype'] == "voicemail") {
-      		                      //$tmpaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
-      		                      $tmpaction .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-      		                  }
-      		                  $tmpaction .= "             }\n";
-      		
-      		
-      		              }
+      		            }
       		
       		              $x++;
       		          } //end if action
@@ -1691,7 +1717,7 @@ function sync_package_freeswitch_ivr()
       	
       	
       	    $tmp .= "          } \n";
-      	    //$tmp .= "          else if ( dtmf.digits.length == \"3\" ) {\n";
+      	    //$tmp .= "          else if ( dtmf.digits.length == \"4\" ) {\n";
       	    //$tmp .= "	                  //Transfer to the extension the caller chose\n";
       	    //$tmp .= "	                  session.execute(\"transfer\", dtmf.digits+\" XML default\");\n";
       	    //$tmp .= "          } else {\n";
@@ -1728,13 +1754,19 @@ function sync_package_freeswitch_ivr()
       	    $tmp .= " else {\n";
       	    $tmp .= "     //anti-action direct\n";
       	    $tmp .= "     //console_log( \"info\", \"anti-action call now don't wait for dtmf\\n\" );\n";
-            if ($antiactiondirecttype == "extension") {
-                $tmp .= "    session.execute(\"transfer\", \"".$antiactiondirectdest." XML default\"); //".$antiactiondirectdest."\n";
+            
+            if ($actiondirecttype == "extension") {
+				$tmp .= "    sofia_contact_".$actiondirectdest." = get_sofia_contact(\"".$actiondirectdest."\",domain_name, \"".$actiondirectprofile."\");\n";									
+                $tmp .= "    session.execute(\"bridge\", sofia_contact_".$actiondirectdest."); //".$actiondirectdest."\n";
+                //$tmp .= "    session.execute(\"transfer\", \"".$actiondirectdest." XML default\"); //".$actiondirectdest."\n";
+			}
+            if ($actiondirecttype == "voicemail") {
+                //$tmp .= "    session.execute(\"voicemail\", \"".$actiondirectdest." XML default\");\n";
+                $tmp .= "    session.execute(\"voicemail\", \"default \"+domain+\" ".$actiondirectdest."\");\n";
             }
-            if ($antiactiondirecttype == "voicemail") {
-                //$tmp .= "    session.execute(\"voicemail\", \"".$antiactiondirectdest." XML default\");\n";
-                $tmp .= "    session.execute(\"voicemail\", \"default \"+domain+\" ".$antiactiondirectdest."\");\n";
-            }
+            if ($actiondirecttype == "sip uri") {
+                $tmp .= "    session.execute(\"bridge\", \"".$actiondirectdest."\"); //".$actiondirectdest."\n";
+			}
       	    $tmp .= "}\n";
 	      }
 	      else {
@@ -1765,14 +1797,18 @@ function sync_package_freeswitch_ivr()
       			
       			          if ($row['optionaction'] == "anti-action") {
       		        	     if (strtolower($row['optionnumber']) == "t") {			
-      			        	    		
-      			                  if ($row['optiontype'] == "extension") {
-      			                      $tmp .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
-      			                  }
-      			                  if ($row['optiontype'] == "voicemail") {
-      			                      //$tmp .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
-      			                      $tmp .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-      			                  }
+      			                if ($row['optiontype'] == "extension") {
+									$tmp .= "                 	sofia_contact_".$row['optiondest']." = get_sofia_contact(\"".$row['optiondest']."\",domain_name, \"".$row['optionprofile']."\");\n";									
+									$tmp .= "                 	session.execute(\"bridge\", sofia_contact_".$row['optiondest']."); //".$row['optiondescr']."\n";
+								}
+      			                if ($row['optiontype'] == "voicemail") {
+									//$tmp .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
+									$tmp .= "                 	session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+      			                }
+      			                if ($row['optiontype'] == "sip uri") {
+      			                    //$tmp .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
+									$tmp .= "                 	session.execute(\"bridge\", \"".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+								}
       		        	     }
 
       			          } //end anti-action
@@ -1799,11 +1835,8 @@ function sync_package_freeswitch_ivr()
       	    $tmp .= "\n";
       	    $tmp .= "         console_log( \"info\", \"IVR Digit Pressed: \" + dtmf.digits + \"\\n\" );\n";
       	    $tmp .= "\n";
-      	
-      	
 
-      	
-      	
+
       	    $tmpantiaction = "";
       	    $tmp .= "         if ( dtmf.digits.length > \"0\" ) {\n";
       	
@@ -1824,41 +1857,36 @@ function sync_package_freeswitch_ivr()
       		      //find the correct IVR options with the correct action
       		    	if ($row['ivrid'] == $rowhelper['ivrid']) {
       		
-      		          if ($row['optionaction'] == "anti-action") {
+      		        if ($row['optionaction'] == "anti-action") {
       		        	
-      		        	  switch ($row['optionnumber']) {
-      		              //case "t":
-      		
-      		                  //if ($row['optiontype'] == "extension") {
-      		                  //    $tmpantiactiondefault .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
-      		                  //}
-      		                  //if ($row['optiontype'] == "voicemail") {
-      		                  //    //$tmpantiactiondefault .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
-      		                  //    $tmpantiactiondefault .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-      		                  //}
-      		
+      		        	switch ($row['optionnumber']) {
+      		            case "t":
       		                  //break;
-      		              default:
-      		                  //$tmpantiaction .= "             //console_log( \"info\", \"IVR Detected 1 digit \\n\" );\n";
+      		            default:
+								//$tmpantiaction .= "             //console_log( \"info\", \"IVR Detected 1 digit \\n\" );\n";
+
+								if ($x == 0) {
+									$tmpantiaction .= "             if ( dtmf.digits == \"".$row['optionnumber']."\" ) { //".$row['optiondescr']."\n";
+								}
+								else {
+									$tmpantiaction .= "             else if ( dtmf.digits == \"".$row['optionnumber']."\" ) { //".$row['optiondescr']."\n";
+								}
+
+      			                if ($row['optiontype'] == "extension") {
+									$tmpantiaction .= "                 sofia_contact_".$row['optiondest']." = get_sofia_contact(\"".$row['optiondest']."\",domain_name, \"".$row['optionprofile']."\");\n";									
+									$tmpantiaction .= "                 session.execute(\"bridge\", sofia_contact_".$row['optiondest']."); //".$row['optiondescr']."\n";
+								}
+      			                if ($row['optiontype'] == "voicemail") {
+									//$tmpantiaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
+									$tmpantiaction .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+      			                }
+      			                if ($row['optiontype'] == "sip uri") {
+      			                    //$tmpantiaction .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
+									$tmpantiaction .= "                 session.execute(\"bridge\", \"".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+								}
+								$tmpantiaction .= "             }\n";      		
       		
-      		                  if ($x == 0) {
-      		                    $tmpantiaction .= "             if ( dtmf.digits == \"".$row['optionnumber']."\" ) { //".$row['optiondescr']."\n";
-      		                  }
-      		                  else {
-      		                    $tmpantiaction .= "             else if ( dtmf.digits == \"".$row['optionnumber']."\" ) { //".$row['optiondescr']."\n";
-      		                  }
-      		
-      		                  if ($row['optiontype'] == "extension") {
-      		                      $tmpantiaction .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\");\n";
-      		                  }
-      		                  if ($row['optiontype'] == "voicemail") {
-      		                      //$tmpantiaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
-      		                      $tmpantiaction .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\");\n";
-      		                  }
-      		                  $tmpantiaction .= "             }\n";
-      		
-      		
-      		              } //end switch
+      		            } //end switch
       		
       		              $x++;
       		        	} //end anti-action
@@ -1915,13 +1943,25 @@ function sync_package_freeswitch_ivr()
 function sync_package_freeswitch_dialplan_includes()
 {
 
-  global $config;
-  conf_mount_rw();
-  config_lock();
+	global $config;
+	conf_mount_rw();
+	config_lock();
 
-  $a_dialplan_includes          = &$config['installedpackages']['freeswitchdialplanincludes']['config'];
-  $a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];
+	$a_dialplan_includes          = &$config['installedpackages']['freeswitchdialplanincludes']['config'];
+	$a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];
 
+	//order the array
+	if (!function_exists('cmp_number_dialplan_details')) {
+		function cmp_number_dialplan_details($a, $b) {
+			if ($a["fieldorder"] > $b["fieldorder"]) {
+				return 1;
+			}
+			else {
+				return 0;
+			}
+		}
+	}
+			
   if (count($a_dialplan_includes) > 0) {
       foreach($config['installedpackages']['freeswitchdialplanincludes']['config'] as $rowhelper) {
           $tmp = "";
@@ -1935,6 +1975,8 @@ function sync_package_freeswitch_dialplan_includes()
         $tmp = "<extension name=\"".$rowhelper['extensionname']."\">\n";
 
         if (count($a_dialplan_include_details) > 0) {
+
+			if (count($a_dialplan_include_details) > 0) { usort($a_dialplan_include_details, "cmp_number_dialplan_details"); }
 		
 			$conditioncount = 0;
 			$i = 0;
@@ -2037,6 +2079,18 @@ function sync_package_freeswitch_public_includes()
   $a_public_include_details 	= &$config['installedpackages']['freeswitchpublicincludedetails']['config'];
 
   if (count($a_public_includes) > 0) {
+
+	//order the array
+	function cmp_number_public_include_details($a, $b) {
+		if ($a["fieldorder"] > $b["fieldorder"]) {
+			return 1;
+		}
+		else {
+			return 0;
+		}
+	}
+
+ 
 	  foreach($a_public_includes as $rowhelper) {
 	      $tmp = "";
 	      $tmp .= "\n";
@@ -2050,6 +2104,8 @@ function sync_package_freeswitch_public_includes()
 	
 		if (count($a_public_include_details) > 0) {
 		
+			if (count($a_public_include_details) > 0) { usort($a_public_include_details, "cmp_number_public_include_details"); }
+			
 			$conditioncount = 0;
 			$i = 0;
 			foreach ($a_public_include_details as $ent) {
@@ -2166,7 +2222,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.8.8.1";
+	$freeswitch_package_version = "0.8.9";
 	$freeswitch_build_version = "1.0.4 pre 6";
 	$freeswitch_build_revision = "13238";
 	
@@ -2230,10 +2286,10 @@ function freeswitch_php_install_command()
 	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libogg.so.5.3");
 	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libvorbis.so.4");
 	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libcurl.so.5");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libspandsp.so.1");
 	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libodbc.so.1");
 	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libiconv.so.3");
-	
+	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libspandsp.so.1");
+	exec("cp /usr/local/lib/libspandsp.so.1 /usr/local/lib/libspandsp.so.2");
 	
 	//download xml package files
 	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.inc");
@@ -2247,7 +2303,7 @@ function freeswitch_php_install_command()
 	
 	//misc files
 	if (!is_dir('/usr/local/www/edit_area/')) {
-	   exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/edit_area.tgz");
+	   exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/edit_area.tgz");
 	   system('cd /usr/local/www; tar xvpfz /tmp/edit_area.tgz edit_area');
 	   unlink_if_exists("/tmp/edit_area.tgz");
 	}

@@ -57,6 +57,7 @@ if (isset($id) && $a_ivr_options[$id]) {
 	$pconfig['optionaction'] = $a_ivr_options[$id]['optionaction'];
 	$pconfig['optionnumber'] = $a_ivr_options[$id]['optionnumber'];
 	$pconfig['optiontype'] = $a_ivr_options[$id]['optiontype'];
+	$pconfig['optionprofile'] = $a_ivr_options[$id]['optionprofile'];	
 	$pconfig['optiondest'] = $a_ivr_options[$id]['optiondest'];
 	$pconfig['optiondescr'] = $a_ivr_options[$id]['optiondescr'];	
 }
@@ -80,6 +81,7 @@ if ($_POST) {
 		$ivroptionent['ivrid'] = $_POST['ivrid'];
 		$ivroptionent['optionnumber'] = $_POST['optionnumber'];
 		$ivroptionent['optiontype'] = $_POST['optiontype'];
+		$ivroptionent['optionprofile'] = $_POST['optionprofile'];		
 		$ivroptionent['optionaction'] = $_POST['optionaction'];		
 		$ivroptionent['optiondest'] = $_POST['optiondest'];
 		$ivroptionent['optiondescr'] = $_POST['optiondescr'];
@@ -124,7 +126,7 @@ display_top_tabs(build_menu());
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>
      <td class="tabcont" >
-
+		<br />
         <form action="freeswitch_ivr_options_edit.php" method="post" name="iform" id="iform">
             <table width="100%" border="0" cellpadding="6" cellspacing="0">
             <tr>
@@ -152,10 +154,40 @@ display_top_tabs(build_menu());
                 else {
                     echo "                <option>voicemail</option>\n";
                 }
+                if (htmlspecialchars($pconfig['huntgrouptimeouttype']) == "sip uri") {
+                    echo "                <option selected='yes'>sip uri</option>\n";
+                }
+                else {
+                    echo "                <option>sip uri</option>\n";
+                }
                 echo "                </select>\n";
                 ?>
               </td>
             </tr>
+			
+			<tr>
+              <td width="22%" valign="top" class="vncellreq">Profile</td>
+              <td width="78%" class="vtable">
+                <?php
+                echo "                <select name='optionprofile' class='formfld'>\n";
+                echo "                <option></option>\n";
+				
+				foreach (ListFiles('/usr/local/freeswitch/conf/sip_profiles') as $key=>$sip_profile_file){	
+					$sip_profile_name = str_replace(".xml", "", $sip_profile_file);
+
+					if (htmlspecialchars($pconfig['optionprofile']) == $sip_profile_name) {
+						echo "                <option selected='yes'>$sip_profile_name</option>\n";
+					}
+					else {
+						echo "                <option>$sip_profile_name</option>\n";
+					}
+				}
+                echo "                </select>\n";				
+				
+                ?>
+              </td>
+            </tr>
+			
             <tr>
               <td width="22%" valign="top" class="vncellreq">Destination</td>
               <td width="78%" class="vtable">
