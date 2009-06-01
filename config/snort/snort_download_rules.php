@@ -183,14 +183,6 @@ $md5_check_old = `/bin/echo "{$md5_check_old_parse}" | /usr/bin/awk '{ print $4 
 /* echo "You are Not Up to date!\n"; */
 update_status(gettext("You are NOT up to date..."));
 
-/*  remove old {$snortdir} files */
-if (file_exists("{$snortdir}")) {
-    /* echo "removing old {$snortdir} files\n"; */
-    update_status(gettext("Removing old snort rules..."));
-    update_output_window(gettext("May take a while..."));
-    exec("/bin/rm -r {$snortdir}/*");
-}
-
 /* download snortrules file */
 if (file_exists("{$tmpfname}/{$snort_filename}")) {
     /* echo "{$snort_filename} does exists\n"; */
