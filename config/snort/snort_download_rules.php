@@ -47,6 +47,7 @@ include("/usr/local/www/head.inc");
 <script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+
 <?php include("/usr/local/www/fbegin.inc"); ?>
 
 <?php
@@ -74,7 +75,6 @@ if(!$pgtitle_output)
 ?>
     </td>
   </tr>
-
         <tr>
           <td>
               <div id="mainarea">
@@ -91,11 +91,11 @@ if(!$pgtitle_output)
                 </table>
                       <br />
                       <!-- status box -->
-                      <textarea cols="60" rows="1" name="status" id="status" wrap="hard">
+                      <textarea cols="60" rows="2" name="status" id="status" wrap="hard">
                       <?=gettext("Initializing...");?>
                       </textarea>
                       <!-- command output box -->
-                      <textarea cols="60" rows="1" name="output" id="output" wrap="hard">
+                      <textarea cols="60" rows="2" name="output" id="output" wrap="hard">
                       </textarea>
                   </td>
                 </tr>
@@ -106,9 +106,10 @@ if(!$pgtitle_output)
 </table>
 </form>
 
-<?php include("fend.inc"); ?>
+<?php include("fend.inc");?>
 
 <?php
+
 
 /* Begin main code */
 /* Set user agent to Mozilla */
@@ -156,18 +157,39 @@ unhide_progress_bar_status();
 
 /*  download md5 sig */
 if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
-    /* echo "{$snort_filename_md5} does exists\n"; */
+  /* echo "{$snort_filename_md5} does exists\n"; */
     update_status(gettext("md5 temp file exists..."));
 } else {
     /* echo "downloading md5\n"; */
     update_status(gettext("Downloading md5 file..."));
-ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-$image = file_get_contents("http://dl.snort.org/reg-rules/snortrules-snapshot-2.8.tar.gz.md5?oink_code={$oinkid}");
-$f = fopen("{$tmpfname}/snortrules-snapshot-2.8.tar.gz.md5", 'w');
-fwrite($f, $image);
-fclose($f);
-     /* echo "done\n"; */
-     update_status(gettext("Done."));
+	ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
+        $image = @file_get_contents("http://dl.snort.org/reg-rules/snortrules-snapshot-2.8.tar.gz.md5?oink_code={$oinkid}");
+        $f = fopen("{$tmpfname}/snortrules-snapshot-2.8.tar.gz.md5", 'w');
+        fwrite($f, $image);
+        fclose($f);
+        /* echo "done\n"; */
+        update_status(gettext("Done."));
+}
+
+/* md5 fails to download exit
+if (@!file_get_contents("http://dl.snort.org/reg-rules/snortrules-snapshot-2.8.tar.gz.md5?oink_code={$oinkid}")){
+   update_status(gettext("Snort.org is down..."));
+   update_output_window(gettext("Try again later..."));
+   exit(0);
+}
+
+*/
+
+/* If md5 file is empty wait 15min exit */
+if (0 == filesize("{$tmpfname}/snortrules-snapshot-2.8.tar.gz.md5")){
+    update_status(gettext("Please wait... You may only check for New Rules every 15 minutes..."));
+    update_output_window(gettext("Rules are released every month from snort.org. You may download the Rules at any time."));
+    hide_progress_bar_status();
+/* Display last time of sucsessful md5 check from cache */
+    $last_md5_download = $config['installedpackages']['snort']['last_md5_download'];
+    echo "\n<p align=center><b>You last checked for updates: </b>{$last_md5_download}</p>\n";
+    echo "\n\n</body>\n</html>\n";
+    exit(0);
 }
 
 /* Check if were up to date */
@@ -176,8 +198,15 @@ $md5_check_new_parse = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
 $md5_check_new = `/bin/echo "{$md5_check_new_parse}" | /usr/bin/awk '{ print $4 }'`;
 $md5_check_old_parse = file_get_contents("{$snortdir}/{$snort_filename_md5}");
 $md5_check_old = `/bin/echo "{$md5_check_old_parse}" | /usr/bin/awk '{ print $4 }'`; 
+/* Write out time of last sucsessful md5 to cache */
+$config['installedpackages']['snort']['last_md5_download'] = date("Y-M-jS-h:i-A");
+write_config();
    if ($md5_check_new == $md5_check_old)
-           echo "You are Up to date!\n\n</body>\n</html>\n", update_status(gettext("Your rules are up to date...")), update_output_window(gettext("You may start Snort now.")), hide_progress_bar_status(), exit(0);
+             update_status(gettext("Your rules are up to date..."));
+             update_output_window(gettext("You may start Snort now."));
+             hide_progress_bar_status();
+             echo "\n\n</body>\n</html>\n";
+             exit(0);
 }
 
 /* echo "You are Not Up to date!\n"; */
@@ -189,7 +218,7 @@ if (file_exists("{$tmpfname}/{$snort_filename}")) {
     update_status(gettext("Snortrule tar file exists..."));
 } else {
     /* echo "downloading rules\n"; */
-    update_status(gettext("Downloading rules..."));
+    update_status(gettext("There is a new set of Snort rules posted. Downloading..."));
     update_output_window(gettext("May take 4 to 10 min..."));
 
 update_output_window("{$snort_filename}");
@@ -301,3 +330,6 @@ function read_body_firmware($ch, $string) {
 }
 
 ?>
+
+</body>
+</html>

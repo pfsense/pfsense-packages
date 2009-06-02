@@ -186,10 +186,10 @@ function create_snort_conf() {
 }
 
 function snort_deinstall() {
-	$text_ww   = "*/60\t* \t 1\t *\t *\t root\t /usr/bin/nice -n20 /usr/local/pkg/snort_check_for_rule_updates.php";
-	$filenamea = "/etc/crontab";
+//	$text_ww   = "*/60\t* \t 1\t *\t *\t root\t /usr/bin/nice -n20 /usr/local/pkg/snort_check_for_rule_updates.php";
+//	$filenamea = "/etc/crontab";
 	/* remove auto rules update helper */
-	remove_text_from_file($filenamea, $text_ww);
+//	remove_text_from_file($filenamea, $text_ww);
 	/* remove custom sysctl */
 	remove_text_from_file("/etc/sysctl.conf", "sysctl net.bpf.bufsize=20480");
 	/* decrease bpf buffers back to 4096, from 20480 */
@@ -216,11 +216,11 @@ function generate_snort_conf() {
 	$snort_config_pass_thru = $config['installedpackages']['snortadvanced']['config'][0]['configpassthru'];
 
 	/* add auto update scripts to /etc/crontab */
-	$text_ww   = "*/60\t* \t 1\t *\t *\t root\t /usr/bin/nice -n20 /usr/local/pkg/snort_check_for_rule_updates.php";
-	$filenamea = "/etc/crontab";
-	remove_text_from_file($filenamea, $text_ww);
-	add_text_to_file($filenamea, $text_ww);
-	exec("killall -HUP cron");
+//	$text_ww   = "*/60\t* \t 1\t *\t *\t root\t /usr/bin/nice -n20 /usr/local/pkg/snort_check_for_rule_updates.php";
+//	$filenamea = "/etc/crontab";
+//	remove_text_from_file($filenamea, $text_ww);
+//	add_text_to_file($filenamea, $text_ww);
+//	exec("killall -HUP cron"); */
 
 	/* should we install a automatic update crontab entry? */
 	$automaticrulesupdate = $config['installedpackages']['snort']['config'][0]['automaticrulesupdate'];
