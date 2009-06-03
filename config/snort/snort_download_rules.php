@@ -116,6 +116,9 @@ if(!$pgtitle_output)
 ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
 ini_set("memory_limit","125M");
 
+/* send current buffer */
+ob_flush();
+
 /* define oinkid */
 if($config['installedpackages']['snort'])
         $oinkid = $config['installedpackages']['snort']['config'][0]['oinkmastercode'];
@@ -128,6 +131,17 @@ if(!$oinkid) {
         exit;
 }
 
+/* premium_subscriber check  */
+//unset($config['installedpackages']['snort']['config'][0]['subscriber']);
+//write_config();
+$premium_subscriber_chk = $config['installedpackages']['snort']['config'][0]['subscriber'];
+
+if ($premium_subscriber_chk === on) {
+    $premium_subscriber = "_s";
+}else{
+    $premium_subscriber = "";
+}
+
 /* hide progress bar */
 hide_progress_bar_status();
 
@@ -136,7 +150,6 @@ ob_flush();
 
 /*  remove old $tmpfname files */
 if (file_exists("{$tmpfname}")) {
-    /* echo "removing old {$tmpfname} files\n"; */
     update_status(gettext("Removing old tmp files..."));
     exec("/bin/rm -r {$tmpfname}");
 }
@@ -146,7 +159,6 @@ ob_flush();
 
 /* If tmp dir does not exist create it */
 if (file_exists($tmpfname)) {
-    /* echo "The directory $tmpfname exists\n"; */
     update_status(gettext("The directory tmp exists..."));
 } else {
     mkdir("{$tmpfname}", 700);
@@ -157,146 +169,160 @@ unhide_progress_bar_status();
 
 /*  download md5 sig */
 if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
-  /* echo "{$snort_filename_md5} does exists\n"; */
     update_status(gettext("md5 temp file exists..."));
 } else {
-    /* echo "downloading md5\n"; */
     update_status(gettext("Downloading md5 file..."));
-	ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-        $image = @file_get_contents("http://dl.snort.org/reg-rules/snortrules-snapshot-2.8.tar.gz.md5?oink_code={$oinkid}");
-        $f = fopen("{$tmpfname}/snortrules-snapshot-2.8.tar.gz.md5", 'w');
-        fwrite($f, $image);
-        fclose($f);
-        /* echo "done\n"; */
-        update_status(gettext("Done."));
+    ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
+   $image = @file_get_contents("http://dl.snort.org/reg-rules/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz.md5?oink_code={$oinkid}");
+//    $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz.md5");
+    $f = fopen("{$tmpfname}/snortrules-snapshot-2.8.tar.gz.md5", 'w');
+    fwrite($f, $image);
+    fclose($f);
+    update_status(gettext("Done. downloading md5"));
 }
 
-/* md5 fails to download exit
-if (@!file_get_contents("http://dl.snort.org/reg-rules/snortrules-snapshot-2.8.tar.gz.md5?oink_code={$oinkid}")){
-   update_status(gettext("Snort.org is down..."));
-   update_output_window(gettext("Try again later..."));
-   exit(0);
-}
-
-*/
+/*  Time stamps define */
+$last_md5_download = $config['installedpackages']['snort']['last_md5_download'];
+$last_rules_install = $config['installedpackages']['snort']['last_rules_install'];
 
 /* If md5 file is empty wait 15min exit */
 if (0 == filesize("{$tmpfname}/snortrules-snapshot-2.8.tar.gz.md5")){
     update_status(gettext("Please wait... You may only check for New Rules every 15 minutes..."));
     update_output_window(gettext("Rules are released every month from snort.org. You may download the Rules at any time."));
     hide_progress_bar_status();
-/* Display last time of sucsessful md5 check from cache */
-    $last_md5_download = $config['installedpackages']['snort']['last_md5_download'];
+    /* Display last time of sucsessful md5 check from cache */
     echo "\n<p align=center><b>You last checked for updates: </b>{$last_md5_download}</p>\n";
+    echo "\n<p align=center><b>You last installed for rules: </b>{$last_rules_install}</p>\n";
+    echo "P is this code {$premium_subscriber}";
     echo "\n\n</body>\n</html>\n";
     exit(0);
 }
 
 /* Check if were up to date */
-if (file_exists("{$snortdir}/{$snort_filename_md5}")) {
+if (file_exists("{$snortdir}/snortrules-snapshot-2.8.tar.gz.md5")){
 $md5_check_new_parse = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
 $md5_check_new = `/bin/echo "{$md5_check_new_parse}" | /usr/bin/awk '{ print $4 }'`;
 $md5_check_old_parse = file_get_contents("{$snortdir}/{$snort_filename_md5}");
-$md5_check_old = `/bin/echo "{$md5_check_old_parse}" | /usr/bin/awk '{ print $4 }'`; 
+$md5_check_old = `/bin/echo "{$md5_check_old_parse}" | /usr/bin/awk '{ print $4 }'`;
 /* Write out time of last sucsessful md5 to cache */
 $config['installedpackages']['snort']['last_md5_download'] = date("Y-M-jS-h:i-A");
 write_config();
-   if ($md5_check_new == $md5_check_old)
-             update_status(gettext("Your rules are up to date..."));
-             update_output_window(gettext("You may start Snort now."));
-             hide_progress_bar_status();
-             echo "\n\n</body>\n</html>\n";
-             exit(0);
+if ($md5_check_new == $md5_check_old) {
+        update_status(gettext("Your rules are up to date..."));
+        update_output_window(gettext("You may start Snort now, check update."));
+        hide_progress_bar_status();
+        /* Timestamps to html  */
+        echo "\n<p align=center><b>You last checked for updates: </b>{$last_md5_download}</p>\n";
+        echo "\n<p align=center><b>You last installed for rules: </b>{$last_rules_install}</p>\n";
+//        echo "P is this code {$premium_subscriber}";
+        echo "\n\n</body>\n</html>\n";
+        exit(0);
+    }
 }
 
-/* echo "You are Not Up to date!\n"; */
+/* "You are Not Up to date */;
 update_status(gettext("You are NOT up to date..."));
 
 /* download snortrules file */
 if (file_exists("{$tmpfname}/{$snort_filename}")) {
-    /* echo "{$snort_filename} does exists\n"; */
     update_status(gettext("Snortrule tar file exists..."));
 } else {
-    /* echo "downloading rules\n"; */
     update_status(gettext("There is a new set of Snort rules posted. Downloading..."));
     update_output_window(gettext("May take 4 to 10 min..."));
-
-update_output_window("{$snort_filename}");
-download_file_with_progress_bar("http://dl.snort.org/reg-rules/snortrules-snapshot-2.8.tar.gz?oink_code={$oinkid}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
-update_all_status($static_output);
-    /* echo "done\n"; */
-    update_status(gettext("Done."));
+    download_file_with_progress_bar("http://dl.snort.org/reg-rules/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz?oink_code={$oinkid}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
+//    download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz", $tmpfname . "/{$snort_filename}", "read_body_firmware");
+    update_all_status($static_output);
+    update_status(gettext("Done downloading rules file."));
 }
 
 
-/* Compair md5 sigs */
+/* Compair md5 sig to file sig */
 $md555 = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
 $md5 = `/bin/echo "{$md555}" | /usr/bin/awk '{ print $4 }'`;
 $file_md5_ondisk = `/sbin/md5 {$tmpfname}/{$snort_filename} | /usr/bin/awk '{ print $4 }'`;
-
-   if ($md5 == $file_md5_ondisk)
-           /* echo "Valid checksum pass\n"; */
-           update_status(gettext("Valid checksum pass"));
+ 
+if ($md5 == $file_md5_ondisk) {
+    update_status(gettext("Valid md5 checksum pass..."));
+} else {
+    update_status(gettext("The downloaded file does not match the md5 file..."));
+    update_output_window(gettext("Error md5 Mismatch..."));
+    exit(0);
+}
 
 /* Untar snort rules file */
-if (file_exists("{$tmpfname}/rules")) {
-    /* echo "The directory {$tmpfname}/rules exists\n"; */
-    update_status(gettext("The directory rules exists..."));
-} else {
-    /* echo "extracting rules\n"; */
+if (file_exists("{$tmpfname}/$snort_filename")) {
     update_status(gettext("Extracting rules..."));
     update_output_window(gettext("May take a while..."));
     exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$tmpfname}");
-    update_status(gettext("Done."));
+    update_status(gettext("Done extracting."));
+} else {
+    update_status(gettext("The Download rules file missing..."));
+    update_output_window(gettext("Error rules extracting failed..."));
+    exit(0);
+}
+
+
+/*  Making Snort Directory */
+if (file_exists("{$snortdir}")) {
+    update_status(gettext("Directory rules exists..."));
+    update_output_window(gettext("Directory rules exists..."));
+} else {
+    update_status(gettext("Making Snort Directory..."));
+    update_output_window(gettext("should be fast..."));
+    exec("/bin/mkdir {$snortdir}");
+    update_status(gettext("Done making snort direcory."));
 }
 
 /*  Copy rules dir to snort dir */
-if (file_exists("{$snortdir}/rules")) {
-    /* echo "The directory {$snortdir}/rules exists\n"; */
-    update_status(gettext("Directory rules exists..."));
-} else {
-    /* echo "copying rules to {$snortdir}\n"; */
+if (file_exists("{$tmpfname}/rules")) {
     update_status(gettext("Copying rules..."));
     update_output_window(gettext("May take a while..."));
     exec("/bin/cp -r {$tmpfname}/rules {$snortdir}/rules");
-    update_status(gettext("Done."));
+    update_status(gettext("Done copping rules."));
+    /* Write out time of last sucsessful rule install catch */
+    $config['installedpackages']['snort']['last_rules_install'] = date("Y-M-jS-h:i-A");
+    write_config();
+} else {
+    update_status(gettext("Directory rules exists..."));
+    update_output_window(gettext("Error copping rules direcory..."));
+    exit(0);
 }
 
 /*  Copy md5 sig to snort dir */
-if (file_exists("{$snortdir}/$snort_filename_md5")) {
-    /* echo "The {$snort_filename_md5} exists in the {$snortdir} exists\n"; */
-    update_status(gettext("The md5 file exists..."));
-} else {
-    /* echo "copying sig to {$snortdir}\n"; */
+if (file_exists("{$tmpfname}/$snort_filename_md5")) {
     update_status(gettext("Copying md5 sig to snort directory..."));
     exec("/bin/cp {$tmpfname}/$snort_filename_md5 {$snortdir}/$snort_filename_md5");
+} else {
+    update_status(gettext("The md5 file exists..."));
+    update_output_window(gettext("Error copping config..."));
+    exit(0);
 }
 
 /*  Copy configs to snort dir */
-if (file_exists("{$snortdir}/Makefile.am")) {
-    /* echo "The Snort configs exists in the {$snortdir} exists\n"; */
-    update_status(gettext("The snort configs exists..."));
-} else {
-    /* echo "copying sig to {$snortdir}\n"; */
+if (file_exists("{$tmpfname}/etc/Makefile.am")) {
     update_status(gettext("Copying configs to snort directory..."));
     exec("/bin/cp {$tmpfname}/etc/* {$snortdir}");
+} else {
+    update_status(gettext("The snort configs exists..."));
+    update_output_window(gettext("Error copping config..."));
+    exit(0);
 }
 
 /*  Copy signatures dir to snort dir */
-if (file_exists("{$snortdir}/doc/signatures")) {
-    /* echo "The directory {$snortdir}/signatures exists\n"; */
-    update_status(gettext("Directory signatures exists..."));
-} else {
-    /* echo "copying signatures to {$snortdir}\n"; */
+if (file_exists("{$tmpfname}/doc/signatures")) {
     update_status(gettext("Copying signatures..."));
     update_output_window(gettext("May take a while..."));
     exec("/bin/cp -r {$tmpfname}/doc/signatures {$snortdir}/signatures");
-    update_status(gettext("Done."));
+    update_status(gettext("Done copying signatures."));
+} else {
+    update_status(gettext("Directory signatures exists..."));
+    update_output_window(gettext("Error copping signature..."));
+    exit(0);
 }
 
-/* echo "done finnal\n"; */
+/* php code finish */
 update_status(gettext("Rules update finished..."));
-update_output_window(gettext("You may start Snort now."));
+update_output_window(gettext("You may start Snort now finnal."));
 
 /* hide progress bar and lets end this party */
 hide_progress_bar_status();
