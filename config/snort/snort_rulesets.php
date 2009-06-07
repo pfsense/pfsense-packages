@@ -99,7 +99,7 @@ if(!$pgtitle_output)
 						<table id="sortabletable1" class="sortable" width="100%" border="0" cellpadding="0" cellspacing="0">
 						    <tr id="frheader">
 								<td width="5%" class="listhdrr">Enabled</td>
-								<td class="listhdrr">Ruleset</td>
+								<td class="listhdrr">Ruleset: Rules that end with "so.rules" are shared object rules.</td>
 								<!-- <td class="listhdrr">Description</td> -->
 							</tr>
 <?php
