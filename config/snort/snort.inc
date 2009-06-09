@@ -418,13 +418,22 @@ portvar TELNET_PORTS 23
 portvar MAIL_PORTS [25,143,465,691]
 portvar SSL_PORTS [25,443,465,636,993,995]
 
+# DCERPC NCACN-IP-TCP
+portvar DCERPC_NCACN_IP_TCP [139,445]
+portvar DCERPC_NCADG_IP_UDP [138,1024:]
+portvar DCERPC_NCACN_IP_LONG [135,139,445,593,1024:]
+portvar DCERPC_NCACN_UDP_LONG [135,1024:]
+portvar DCERPC_NCACN_UDP_SHORT [135,593,1024:]
+portvar DCERPC_NCACN_TCP [2103,2105,2107]
+portvar DCERPC_BRIGHTSTORE [6503,6504]
+
 #####################
                     #
 # Define Rule Paths #
                     #
 #####################
 
-var RULE_PATH ./rules
+var RULE_PATH /usr/local/etc/snort/rules
 # var PREPROC_RULE_PATH ./preproc_rules
 
 ################################
@@ -456,6 +465,7 @@ config event_queue: max_queue 8 log 3 order_events content_length
 #Configure dynamic loaded libraries
 dynamicpreprocessor directory /usr/local/lib/snort/dynamicpreprocessor/
 dynamicengine /usr/local/lib/snort/dynamicengine/libsf_engine.so
+dynamicdetection directory /usr/local/lib/snort/dynamicrules/
 
 ###################
                   #
@@ -626,8 +636,11 @@ preprocessor sfportscan: scan_type { all } \
               #
 ###############
 
-preprocessor dcerpc2
-preprocessor dcerpc2_server: default
+preprocessor dcerpc2: memcap 102400, events [smb, co, cl]
+preprocessor dcerpc2_server: default, policy WinXP, \
+    detect [smb [139,445], tcp 135, udp 135, rpc-over-http-server 593], \
+    autodetect [tcp 1025:, udp 1025:, rpc-over-http-server 1025:], \
+    smb_max_chain 3
 
 ####################
                    #
@@ -646,7 +659,7 @@ preprocessor dns: \
                              #
 ##############################
 
-preprocessor ssl: noinspect_encrypted, trustservers
+preprocessor ssl: ports { 443 465 563 636 989 992 993 994 995 }, trustservers, noinspect_encrypted
 
 #####################
                     #

@@ -244,31 +244,31 @@ if (file_exists("{$tmpfname}/{$snort_filename}")) {
 
 /* Compair md5 sig to file sig */
 
-$premium_url_chk = $config['installedpackages']['snort']['config'][0]['subscriber'];
-if ($premium_url_chk == on) {
-$md5 = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
-$file_md5_ondisk = `/sbin/md5 {$tmpfname}/{$snort_filename} | /usr/bin/awk '{ print $4 }'`;
- if ($md5 == $file_md5_ondisk) {
-    update_status(gettext("Valid md5 checksum pass..."));
-} else {
-    update_status(gettext("The downloaded file does not match the md5 file...P is ON"));
-    update_output_window(gettext("Error md5 Mismatch..."));
-    exit(0);
-  }
-}
+//$premium_url_chk = $config['installedpackages']['snort']['config'][0]['subscriber'];
+//if ($premium_url_chk == on) {
+//$md5 = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
+//$file_md5_ondisk = `/sbin/md5 {$tmpfname}/{$snort_filename} | /usr/bin/awk '{ print $4 }'`;
+// if ($md5 == $file_md5_ondisk) {
+//    update_status(gettext("Valid md5 checksum pass..."));
+//} else {
+//    update_status(gettext("The downloaded file does not match the md5 file...P is ON"));
+//    update_output_window(gettext("Error md5 Mismatch..."));
+//    exit(0);
+//  }
+//}
 
-$premium_url_chk = $config['installedpackages']['snort']['config'][0]['subscriber'];
-if ($premium_url_chk != on) {
-$md55 = `/bin/cat {$tmpfname}/{$snort_filename_md5} | /usr/bin/awk '{ print $4 }'`;
-$file_md5_ondisk2 = `/sbin/md5 {$tmpfname}/{$snort_filename} | /usr/bin/awk '{ print $4 }'`;
- if ($md55 == $file_md5_ondisk2) {
-    update_status(gettext("Valid md5 checksum pass..."));
-} else {
-    update_status(gettext("The downloaded file does not match the md5 file...Not P"));
-    update_output_window(gettext("Error md5 Mismatch..."));
-    exit(0);
-    }
-}
+//$premium_url_chk = $config['installedpackages']['snort']['config'][0]['subscriber'];
+//if ($premium_url_chk != on) {
+//$md55 = `/bin/cat {$tmpfname}/{$snort_filename_md5} | /usr/bin/awk '{ print $4 }'`;
+//$file_md5_ondisk2 = `/sbin/md5 {$tmpfname}/{$snort_filename} | /usr/bin/awk '{ print $4 }'`;
+// if ($md55 == $file_md5_ondisk2) {
+//    update_status(gettext("Valid md5 checksum pass..."));
+//} else {
+//    update_status(gettext("The downloaded file does not match the md5 file...Not P"));
+//    update_output_window(gettext("Error md5 Mismatch..."));
+//    exit(0);
+//    }
+//}
 
 /* Untar snort rules file individually to help people with low system specs */
 if (file_exists("{$tmpfname}/$snort_filename")) {
