@@ -207,9 +207,9 @@ if (0 == filesize("{$tmpfname}/snortrules-snapshot-2.8.tar.gz.md5")){
 /* Check if were up to date */
 if (file_exists("{$snortdir}/snortrules-snapshot-2.8.tar.gz.md5")){
 $md5_check_new_parse = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
-$md5_check_new = `/bin/echo "{$md5_check_new_parse}" | /usr/bin/awk '{ print $4 }'`;
+$md5_check_new = `/bin/echo "{$md5_check_new_parse}" | /usr/bin/awk '{ print $1 }'`;
 $md5_check_old_parse = file_get_contents("{$snortdir}/{$snort_filename_md5}");
-$md5_check_old = `/bin/echo "{$md5_check_old_parse}" | /usr/bin/awk '{ print $4 }'`;
+$md5_check_old = `/bin/echo "{$md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
 /* Write out time of last sucsessful md5 to cache */
 $config['installedpackages']['snort']['last_md5_download'] = date("Y-M-jS-h:i-A");
 write_config();
