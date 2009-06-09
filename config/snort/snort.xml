@@ -47,7 +47,7 @@
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
 	<version>2.8.4.1</version>
-	<title>Services: Snort 2.8.4.1 pkg v. 1.1</title>
+	<title>Services: Snort 2.8.4.1 pkg v. 1.2</title>
 	<include_file>/usr/local/pkg/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
@@ -259,9 +259,9 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Snort signature info files.</fielddescr>
-			<fieldname>signatureinfo</fieldname>
-			<description>15,000 snort alert info summary files. At leats a 1GHz system requierment</description>
+			<fielddescr>Install emergingthreats rules.</fielddescr>
+			<fieldname>emergingthreats</fieldname>
+			<description>Emerging Threats is an open source community that produces fastest moving and diverse Snort Rules.</description>
 			<type>checkbox</type>
 		</field>
     </fields>

@@ -111,6 +111,54 @@
 			<cols>40</cols>
 			<rows>5</rows>
 		</field>
+		<field>
+			<fielddescr>Snort signature info files.</fielddescr>
+			<fieldname>signatureinfo</fieldname>
+			<description>Snort signature info files will be installed during updates. At leats 500 mb of memory is needed.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Alerts Tab logging type.</fielddescr>
+			<fieldname>snortalertlogtype</fieldname>
+			<description>Please choose the type of Alert logging you will like see in the Alerts Tab. The options are Full descriptions or Fast short descriptions</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>fast</name>
+					<value>fast</value>
+				</option>
+				<option>
+					<name>full</name>
+					<value>full</value>
+				</option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Send alerts to main System logs.</fielddescr>
+			<fieldname>alertsystemlog</fieldname>
+			<description>Snort will send Alerts to the Pfsense system logs.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Log to a Tcpdump file.</fielddescr>
+			<fieldname>tcpdumplog</fieldname>
+			<description>Snort will log packets to a tcpdump-formatted file. The file then can be analyzed by a wireshark type of application. WARNING: File may become large.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Log to a mysql database.</fielddescr>
+			<fieldname>snortmysqllog</fieldname>
+			<description>Example: output database: log, mysql, dbname=snort user=snort host=localhost password=xyz</description>
+			<type>input</type>
+			<size>101</size>
+			<value></value>
+		</field>
+		<field>
+			<fielddescr>Log Alerts to a snort unified file.</fielddescr>
+			<fieldname>snortunifiedlog</fieldname>
+			<description>Snort will log Alerts to a file in the UNIFIED format.</description>
+			<type>checkbox</type>
+		</field>		
     </fields>
 	<custom_php_deinstall_command>
 		snort_advanced();

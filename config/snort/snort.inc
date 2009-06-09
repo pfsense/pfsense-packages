@@ -50,7 +50,7 @@ function sync_package_snort_reinstall()
 	start_service("snort");
 }
 
-function sync_package_snort() 
+function sync_package_snort()
 {
 	global $config, $g;
 
@@ -141,7 +141,7 @@ function sync_package_snort()
   /* TODO; get snort to start under nologin shell */
   foreach($snortInterfaces as $snortIf)
   {
-  	$start .= ";sleep 8;snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -D -i {$snortIf} -A fast -q";
+  	$start .= ";sleep 8;snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -D -i {$snortIf} -q";
   }    
     
 	/* if block offenders is checked, start snort2c */
@@ -207,6 +207,7 @@ function snort_deinstall() {
 }
 
 function generate_snort_conf() {
+
 	global $config, $g;
 	conf_mount_rw();
 	/* obtain external interface */
@@ -214,7 +215,32 @@ function generate_snort_conf() {
 	$snort_ext_int = $config['installedpackages']['snort']['config'][0]['iface_array'][0];
 
 	$snort_config_pass_thru = $config['installedpackages']['snortadvanced']['config'][0]['configpassthru'];
+	
+/* define snortalertlogtype */
+$snortalertlogtype = $config['installedpackages']['snortadvanced']['config'][0]['snortalertlogtype'];
+if ($snortalertlogtype == fast)
+    $snortalertlogtype_type = "output alert_fast: alert";
+else
+	$snortalertlogtype_type = "output alert_full: alert"; 
 
+/* define alertsystemlog */
+$alertsystemlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['alertsystemlog'];
+if ($alertsystemlog_info_chk == on)
+    $alertsystemlog_type = "output alert_syslog: log_alert";
+
+/* define tcpdumplog */
+$tcpdumplog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['tcpdumplog'];
+if ($tcpdumplog_info_chk == on)
+    $tcpdumplog_type = "output log_tcpdump: snorttcpd.log";
+
+/* define snortmysqllog */
+$snortmysqllog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortmysqllog'];
+
+/* define snortunifiedlog */
+$snortunifiedlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortunifiedlog'];
+if ($snortunifiedlog_info_chk == on)
+    $snortunifiedlog_type = "output alert_unified: snort.alert, limit 128\noutput log_unified: snort.log, limit 128";
+	
 	/* add auto update scripts to /etc/crontab */
 //	$text_ww   = "*/60\t* \t 1\t *\t *\t root\t /usr/bin/nice -n20 /usr/local/pkg/snort_check_for_rule_updates.php";
 //	$filenamea = "/etc/crontab";
@@ -667,8 +693,11 @@ preprocessor ssl: ports { 443 465 563 636 989 992 993 994 995 }, trustservers, n
                     #
 #####################
 
-output alert_syslog: LOG_AUTH LOG_ALERT LOG_CONS LOG_NDELAY LOG_PERROR LOG_PID
-output alert_unified: filename snort.alert, limit 128							
+$snortalertlogtype_type
+$alertsystemlog_type
+$tcpdumplog_type
+$snortmysqllog_info_chk
+$snortunifiedlog_type
 						
 #################
                 #

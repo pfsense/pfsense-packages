@@ -32,6 +32,8 @@ $tmpfname = "/tmp/snort_rules_up";
 $snortdir = "/usr/local/etc/snort";
 $snort_filename_md5 = "snortrules-snapshot-2.8.tar.gz.md5";
 $snort_filename = "snortrules-snapshot-2.8.tar.gz";
+$emergingthreats_filename_md5 = "version.txt";
+$emergingthreats_filename = "emerging.rules.tar.gz";
 
 require_once("guiconfig.inc");
 require_once("functions.inc");
@@ -174,7 +176,7 @@ if (file_exists($tmpfname)) {
 /* unhide progress bar and lets end this party */
 unhide_progress_bar_status();
 
-/*  download md5 sig */
+/*  download md5 sig from snort.org */
 if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
     update_status(gettext("md5 temp file exists..."));
 } else {
@@ -183,6 +185,19 @@ if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
     $image = @file_get_contents("http://dl.snort.org/{$premium_url}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz.md5?oink_code={$oinkid}");
 //    $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz.md5");
     $f = fopen("{$tmpfname}/snortrules-snapshot-2.8.tar.gz.md5", 'w');
+    fwrite($f, $image);
+    fclose($f);
+    update_status(gettext("Done. downloading md5"));
+}
+
+/*  download md5 sig from emergingthreats.net */
+$emergingthreats_url_chk = $config['installedpackages']['snort']['config'][0]['emergingthreats'];
+if ($emergingthreats_url_chk == on) {
+    update_status(gettext("Downloading md5 file..."));
+    ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
+    $image = @file_get_contents("http://www.emergingthreats.net/version.txt");
+//    $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/version.txt");
+    $f = fopen("{$tmpfname}/version.txt", 'w');
     fwrite($f, $image);
     fclose($f);
     update_status(gettext("Done. downloading md5"));
@@ -204,7 +219,22 @@ if (0 == filesize("{$tmpfname}/snortrules-snapshot-2.8.tar.gz.md5")){
     exit(0);
 }
 
-/* Check if were up to date */
+/* If emergingthreats md5 file is empty wait 15min exit */
+$emergingthreats_url_chk = $config['installedpackages']['snort']['config'][0]['emergingthreats'];
+if ($emergingthreats_url_chk == on) {
+if (0 == filesize("{$tmpfname}/version.txt")){
+    update_status(gettext("There was an error getting emergingthreats md5."));
+    update_output_window(gettext("There was an error getting emergingthreats md5."));
+    hide_progress_bar_status();
+    /* Display last time of sucsessful md5 check from cache */
+//   echo "\n<p align=center><b>You last checked for updates: </b>{$last_md5_download}</p>\n";
+//   echo "\n<p align=center><b>You last installed for rules: </b>{$last_rules_install}</p>\n";
+   echo "\n\n</body>\n</html>\n";
+   exit(0);
+  }
+}
+
+/* Check if were up to date snort.org */
 if (file_exists("{$snortdir}/snortrules-snapshot-2.8.tar.gz.md5")){
 $md5_check_new_parse = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
 $md5_check_new = `/bin/echo "{$md5_check_new_parse}" | /usr/bin/awk '{ print $1 }'`;
@@ -222,25 +252,92 @@ if ($md5_check_new == $md5_check_old) {
         echo "\n<p align=center><b>You last installed for rules: </b>{$last_rules_install}</p>\n";
 //        echo "P is this code {$premium_subscriber}";
         echo "\n\n</body>\n</html>\n";
-        exit(0);
+        $snort_md5_check_ok = on;
     }
 }
 
+/* Check if were up to date emergingthreats.net */
+$emergingthreats_url_chk = $config['installedpackages']['snort']['config'][0]['emergingthreats'];
+if ($emergingthreats_url_chk == on) {
+if (file_exists("{$snortdir}/version.txt")){
+$emerg_md5_check_new_parse = file_get_contents("{$tmpfname}/version.txt");
+$emerg_md5_check_new = `/bin/echo "{$emerg_md5_check_new_parse}" | /usr/bin/awk '{ print $1 }'`;
+$emerg_md5_check_old_parse = file_get_contents("{$snortdir}/version.txt");
+$emerg_md5_check_old = `/bin/echo "{$emerg_md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
+/* Write out time of last sucsessful md5 to cache */
+$config['installedpackages']['snort']['last_md5_download'] = date("Y-M-jS-h:i-A");
+write_config();
+if ($emerg_md5_check_new == $emerg_md5_check_old) {
+        update_status(gettext("Your emergingthreats rules are up to date..."));
+        update_output_window(gettext("You may start Snort now, check update."));
+        hide_progress_bar_status();
+        $emerg_md5_check_chk_ok = on;
+        /* Timestamps to html  */
+//        echo "\n<p align=center><b>You last checked for updates: </b>{$last_md5_download}</p>\n";
+//        echo "\n<p align=center><b>You last installed for rules: </b>{$last_rules_install}</p>\n";
+    }
+  }
+}
+
+/*  Make Clean Snort Directory emergingthreats not checked */
+if ($snort_md5_check_ok == on && $emergingthreats_url_chk != on) {
+	update_status(gettext("Cleaning the snort Directory..."));
+    update_output_window(gettext("removing..."));
+	exec("/bin/rm -r {$snortdir}/rules/emerging*");
+	exec("/bin/rm -r {$snortdir}/version.txt");
+	update_status(gettext("Done making snort direcory."));
+}
+
+/* Check if were up to date exits */
+if ($snort_md5_check_ok == on && $emerg_md5_check_chk_ok == on) {
+		update_status(gettext("Your rules are up to date..."));
+		update_output_window(gettext("You may start Snort now..."));
+		exit(0);
+}
+
+if ($snort_md5_check_ok == on && $emergingthreats_url_chk != on) {
+		update_status(gettext("Your rules are up to date..."));
+		update_output_window(gettext("You may start Snort now..."));
+		exit(0);
+}
+		
 /* "You are Not Up to date */;
 update_status(gettext("You are NOT up to date..."));
+		update_output_window(gettext("Stoping Snort service..."));
+stop_service("snort");
+sleep(2);
+// start_service("snort");
 
 /* download snortrules file */
+if ($snort_md5_check_ok != on) {
 if (file_exists("{$tmpfname}/{$snort_filename}")) {
     update_status(gettext("Snortrule tar file exists..."));
 } else {
+	unhide_progress_bar_status();
     update_status(gettext("There is a new set of Snort rules posted. Downloading..."));
     update_output_window(gettext("May take 4 to 10 min..."));
-//   download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz", $tmpfname . "/{$snort_filename}", "read_body_firmware");
-    download_file_with_progress_bar("http://dl.snort.org/{$premium_url}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz?oink_code={$oinkid}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
+//    download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz", $tmpfname . "/{$snort_filename}", "read_body_firmware");
+   download_file_with_progress_bar("http://dl.snort.org/{$premium_url}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz?oink_code={$oinkid}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
     update_all_status($static_output);
     update_status(gettext("Done downloading rules file."));
+ }
 }
 
+/* download emergingthreats rules file */
+if ($emergingthreats_url_chk == on) {
+if ($emerg_md5_check_chk_ok != on) {
+if (file_exists("{$tmpfname}/{$emergingthreats_filename}")) {
+    update_status(gettext("Emergingthreats tar file exists..."));
+} else {
+    update_status(gettext("There is a new set of Emergingthreats rules posted. Downloading..."));
+    update_output_window(gettext("May take 4 to 10 min..."));
+//   download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
+    download_file_with_progress_bar("http://www.emergingthreats.net/rules/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
+    update_all_status($static_output);
+    update_status(gettext("Done downloading Emergingthreats rules file."));
+   }
+  }
+ }
 
 /* Compair md5 sig to file sig */
 
@@ -271,7 +368,8 @@ if (file_exists("{$tmpfname}/{$snort_filename}")) {
 //}
 
 /* Untar snort rules file individually to help people with low system specs */
-if (file_exists("{$tmpfname}/$snort_filename")) {
+if ($snort_md5_check_ok != on) {
+if (file_exists("{$tmpfname}/{$snort_filename}")) {
     update_status(gettext("Extracting rules..."));
     update_output_window(gettext("May take a while..."));
     exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$tmpfname} rules/");
@@ -296,46 +394,70 @@ if (file_exists("{$tmpfname}/$snort_filename")) {
     update_status(gettext("The Download rules file missing..."));
     update_output_window(gettext("Error rules extracting failed..."));
     exit(0);
+ }
 }
 
+/* Untar emergingthreats rules to tmp */
+if ($emergingthreats_url_chk == on) {
+if ($emerg_md5_check_chk_ok != on) {
+if (file_exists("{$tmpfname}/{$emergingthreats_filename}")) {
+    update_status(gettext("Extracting rules..."));
+    update_output_window(gettext("May take a while..."));
+    exec("/usr/bin/tar xzf {$tmpfname}/{$emergingthreats_filename} -C {$tmpfname} rules/");
+  }
+ }
+}
+
+/* Untar snort signatures */
+if ($snort_md5_check_ok != on) {
+if (file_exists("{$tmpfname}/{$snort_filename}")) {
 $signature_info_chk = $config['installedpackages']['snort']['config'][0]['signatureinfo'];
 if ($premium_url_chk == on) {
 	update_status(gettext("Extracting Signatures..."));
 	update_output_window(gettext("May take a while..."));
 	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$tmpfname} doc/signatures/");
 	update_status(gettext("Done extracting Signatures."));
+  }
+ }
 }
 
-/*  Making Cleaning Snort Directory */
-if (file_exists("{$snortdir}")) {
+/*  Make Clean Snort Directory */
+if ($snort_md5_check_ok != on && $emerg_md5_check_chk_ok != on) {
+if (file_exists("{$snortdir}/rules")) {
     update_status(gettext("Cleaning the snort Directory..."));
     update_output_window(gettext("removing..."));
 	exec("/bin/rm -r {$snortdir}/*");
-    exec("/bin/rm -r /usr/local/lib/snort/dynamicrules/*");
+	exec("/bin/rm -r {$snortdir}/rules/*");
+    exec("/bin/rm -r /usr/local/lib/snort/dynamicrules/*");	
 } else {
     update_status(gettext("Making Snort Directory..."));
     update_output_window(gettext("should be fast..."));
     exec("/bin/mkdir {$snortdir}");
+	exec("/bin/mkdir {$snortdir}/rules");
 	exec("/bin/rm -r /usr/local/lib/snort/dynamicrules/*");
     update_status(gettext("Done making snort direcory."));
+  }
 }
 
-/*  Copy rules dir to snort dir */
+/*  Copy snort rules  and emergingthreats dir to snort dir */
+if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on) {
 if (file_exists("{$tmpfname}/rules")) {
     update_status(gettext("Copying rules..."));
     update_output_window(gettext("May take a while..."));
-    exec("/bin/mv -f {$tmpfname}/rules {$snortdir}/rules");
+    exec("/bin/cp {$tmpfname}/rules/* {$snortdir}/rules");
     update_status(gettext("Done copping rules."));
     /* Write out time of last sucsessful rule install catch */
     $config['installedpackages']['snort']['last_rules_install'] = date("Y-M-jS-h:i-A");
     write_config();
 } else {
     update_status(gettext("Directory rules does not exists..."));
-    update_output_window(gettext("Error copping rules direcory..."));
+    update_output_window(gettext("Error copying rules direcory..."));
     exit(0);
+ }
 }
 
 /*  Copy md5 sig to snort dir */
+if ($snort_md5_check_ok != on) {
 if (file_exists("{$tmpfname}/$snort_filename_md5")) {
     update_status(gettext("Copying md5 sig to snort directory..."));
     exec("/bin/cp {$tmpfname}/$snort_filename_md5 {$snortdir}/$snort_filename_md5");
@@ -343,9 +465,25 @@ if (file_exists("{$tmpfname}/$snort_filename_md5")) {
     update_status(gettext("The md5 file does not exist..."));
     update_output_window(gettext("Error copping config..."));
     exit(0);
+ }
+}
+
+/*  Copy emergingthreats md5 sig to snort dir */
+if ($emergingthreats_url_chk == on) {
+if ($emerg_md5_check_chk_ok != on) {
+if (file_exists("{$tmpfname}/$emergingthreats_filename_md5")) {
+    update_status(gettext("Copying md5 sig to snort directory..."));
+    exec("/bin/cp {$tmpfname}/$emergingthreats_filename_md5 {$snortdir}/$emergingthreats_filename_md5");
+} else {
+    update_status(gettext("The emergingthreats md5 file does not exist..."));
+    update_output_window(gettext("Error copping config..."));
+    exit(0);
+  }
+ }
 }
 
 /*  Copy configs to snort dir */
+if ($snort_md5_check_ok != on) {
 if (file_exists("{$tmpfname}/etc/Makefile.am")) {
     update_status(gettext("Copying configs to snort directory..."));
     exec("/bin/cp {$tmpfname}/etc/* {$snortdir}");
@@ -353,9 +491,11 @@ if (file_exists("{$tmpfname}/etc/Makefile.am")) {
     update_status(gettext("The snort configs does not exist..."));
     update_output_window(gettext("Error copping config..."));
     exit(0);
+ }
 }
 
 /*  Copy signatures dir to snort dir */
+if ($snort_md5_check_ok != on) {
 $signature_info_chk = $config['installedpackages']['snort']['config'][0]['signatureinfo'];
 if ($premium_url_chk == on) {
 if (file_exists("{$tmpfname}/doc/signatures")) {
@@ -368,9 +508,11 @@ if (file_exists("{$tmpfname}/doc/signatures")) {
     update_output_window(gettext("Error copping signature..."));
     exit(0);
   }
+ }
 }
-
+ 
 /*  Copy so_rules dir to snort lib dir */
+if ($snort_md5_check_ok != on) {
 if (file_exists("{$tmpfname}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/")) {
     update_status(gettext("Copying so_rules..."));
     update_output_window(gettext("May take a while..."));
@@ -394,12 +536,13 @@ if (file_exists("{$tmpfname}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/")) {
     update_status(gettext("Directory so_rules does not exist..."));
     update_output_window(gettext("Error copping so_rules..."));
     exit(0);
+ }
 }
 
 
 /* php code finish */
-update_status(gettext("Rules update finished..."));
-update_output_window(gettext("You may start Snort now finnal."));
+update_status(gettext("The Rules update finished..."));
+update_output_window(gettext("Please reboot Pfsense before starting Snort..."));
 
 /* hide progress bar and lets end this party */
 hide_progress_bar_status();
