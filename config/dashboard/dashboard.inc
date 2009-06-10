@@ -12,6 +12,7 @@ function dashboard_install() {
 	mwexec("tar xzvpUf /usr/local/pkg/widgets.tgz -C /");
 	assign_privs();
 	/* Clear the APC cache so that the updates to installed files will work. */
+	sleep(5);
 	apc_clear_cache();
 }
 
