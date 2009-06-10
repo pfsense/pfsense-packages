@@ -38,9 +38,11 @@ $a_hunt_group = &$config['installedpackages']['freeswitchhuntgroup']['config'];
 
 
 if ($_GET['act'] == "del") {
-    if ($_GET['type'] == 'hunt_group') {
+    if ($_GET['type'] == 'huntgroup') {
         if ($a_hunt_group[$_GET['id']]) {
-			unlink("/usr/local/freeswitch/scripts/hunt_group_".$_GET['huntgroupid'].".js");		
+			if file_exists("/usr/local/freeswitch/scripts/huntgroup_".$_GET['huntgroupid'].".js")) {
+				unlink("/usr/local/freeswitch/scripts/huntgroup_".$_GET['huntgroupid'].".js");
+			}
             unset($a_hunt_group[$_GET['id']]);
             write_config();
             sync_package_freeswitch_hunt_group();

@@ -60,6 +60,8 @@ function build_menu() {
 
 	$menu_selected = false;
 	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_features.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_fax.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_fax_edit.php") { $menu_selected = true; }
 	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_ivr.php") { $menu_selected = true; }
 	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_ivr_edit.php") { $menu_selected = true; }
 	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_ivr_options_edit.php") { $menu_selected = true; }
@@ -1060,7 +1062,7 @@ function sync_package_freeswitch_hunt_group()
 
 							$dialplanincludeid = guid();
 							$ent['dialplanincludeid'] = $dialplanincludeid;
-							$ent['extensionname'] = $rowhelper['ivrextension'];
+							$ent['extensionname'] = $rowhelper['huntgroupname'];
 							$ent['order'] = '9001'; //if update use the existing order number and extension name and desc
 							$ent['context'] = $rowhelper['huntgroupcontext'];
 							$ent['enabled'] = 'true';
@@ -1096,7 +1098,7 @@ function sync_package_freeswitch_hunt_group()
 						if ($action == 'update') {
 
 							$ent['dialplanincludeid'] = $dialplanincludeid;
-							$ent['extensionname'] = $rowhelper['huntgroupextension'];
+							$ent['extensionname'] = $rowhelper['huntgroupname'];
 							$ent['order'] = $order;
 							$ent['context'] = $context;
 							$ent['enabled'] = $enabled;		
@@ -1167,12 +1169,14 @@ function sync_package_freeswitch_hunt_group()
 					}
 					
 					//order the array
-					function cmp_hunt_group_order($a, $b) {
-						if ($a["destinationorder"] > $b["destinationorder"]) {
-							return 1;
-						}
-						else {
-							return 0;
+					if (!function_exists(cmp_hunt_group_order)) {
+						function cmp_hunt_group_order($a, $b) {
+							if ($a["destinationorder"] > $b["destinationorder"]) {
+								return 1;
+							}
+							else {
+								return 0;
+							}
 						}
 					}
 					
@@ -1232,14 +1236,16 @@ function sync_package_freeswitch_hunt_group()
 					case "simultaneous":
 						//print_r($tmp_array);
 						$x = 0;
-						foreach ($tmp_array as $row) {
-							if ($x < 1) {
-								$tmp_buffer = $row["data"];
+						if(count($tmp_array) > 0) {
+							foreach ($tmp_array as $row) {
+								if ($x < 1) {
+									$tmp_buffer = $row["data"];
+								}
+								else {
+									$tmp_buffer .= "+\",\"+".$row["data"];
+								}
+								$x++;						
 							}
-							else {
-								$tmp_buffer .= "+\",\"+".$row["data"];
-							}
-							$x++;						
 						}
 						
 						$delimiter = ",";
@@ -1294,6 +1300,199 @@ function sync_package_freeswitch_hunt_group()
 						fclose($fout);
 					}
 
+
+			} //end foreach
+		} //end if count
+		conf_mount_ro();
+		config_unlock();
+
+} //end function
+
+
+function sync_package_freeswitch_fax()
+{
+
+	global $config;
+	conf_mount_rw();
+	config_lock();
+	
+	//loop through all faxes
+		$a_fax = &$config['installedpackages']['freeswitchfax']['config'];
+		if (count($a_fax) > 0) {
+			foreach($a_fax as $rowhelper) {
+		
+				//get the fax information such as the name and description
+					//$rowhelper['faxid']
+					//$rowhelper['faxextension']
+					//$rowhelper['faxname']
+					//$rowhelper['faxemail']
+					//$rowhelper['faxdomain']
+					//$rowhelper['faxdescription']
+
+				//add each fax extension to the dialplan
+					$a_dialplan_includes          	= &$config['installedpackages']['freeswitchdialplanincludes']['config'];
+					$a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];
+
+					//determine if the entry should be an add, or update to the dialplan 
+					if (strlen($rowhelper['faxid']) > 0) {
+						$action = 'add'; //set default action to add
+						$i = 0;
+						if (count($a_dialplan_includes) > 0) {
+					  
+							foreach($a_dialplan_includes as $row) {
+
+								//$row['faxid'];
+								//$row['faxname'];
+								//$row['context'];
+								//$row['enabled'];
+
+								if ($row['opt1name'] == "faxid" && $row['opt1value'] == $rowhelper['faxid']) {
+									//update
+									$action = 'update';
+									
+									$dialplanincludeid = $rowhelper['dialplanincludeid'];
+									$extensionname = $row['extensionname'];
+									$order = $row['order'];
+									$context = $row['context'];
+									$enabled = $row['enabled'];
+									$descr = $row['descr'];
+									$opt1name = $row['opt1name'];
+									$opt1value = $row['opt1value'];
+									$id = $i;
+									//echo "update".$i."<br />\n";
+									
+									if (file_exists("/usr/local/freeswitch/conf/dialplan/default/".$order."_".$extensionname.".xml")){
+										unlink("/usr/local/freeswitch/conf/dialplan/default/".$order."_".$extensionname.".xml");
+									}
+								}
+								$i++;
+
+							}
+						}
+
+						$ent = array();
+						if ($action == 'add') {
+							$faxid = $rowhelper['faxid'];
+							if (strlen($rowhelper['faxname']) > 0) {
+								$ent['dialplanincludeid'] = $faxid;
+								$ent['extensionname'] = $rowhelper['faxname'];
+								$ent['order'] = '9001'; //if update use the existing order number and extension name and desc
+								$ent['context'] = "default";
+								//$ent['context'] = $rowhelper['huntgroupcontext'];
+								$ent['enabled'] = 'true';
+								$ent['descr'] = 'fax';
+								$ent['opt1name'] = 'faxid';
+								$ent['opt1value'] = $rowhelper['faxid'];
+
+								//add to the config
+									$a_dialplan_includes[] = $ent;
+									unset($ent);						
+
+								//<!-- default ${domain_name} -->
+								//<condition field="destination_number" expression="^\*9978$">
+								$ent = array();
+								$ent['dialplanincludeid'] = $faxid;
+								$ent['tag'] = 'condition'; //condition, action, antiaction							
+								$ent['fieldorder'] = '000';							
+								$ent['fieldtype'] = 'destination_number';
+								$ent['fielddata'] = '^'.$rowhelper['faxextension'].'$';
+								$a_dialplan_include_details[] = $ent;
+								unset($ent);
+
+								//<action application="answer" />
+								$ent = array();
+								$ent['dialplanincludeid'] = $faxid;
+								$ent['tag'] = 'action'; //condition, action, antiaction
+								$ent['fieldorder'] = '001';
+								$ent['fieldtype'] = 'answer';
+								$ent['fielddata'] = '';
+								$a_dialplan_include_details[] = $ent;
+								unset($ent);
+
+								//<action application="playback" data="silence_stream://2000"/>
+								$ent = array();
+								$ent['dialplanincludeid'] = $faxid;
+								$ent['tag'] = 'action'; //condition, action, antiaction
+								$ent['fieldorder'] = '002';
+								$ent['fieldtype'] = 'playback';
+								$ent['fielddata'] = 'silence_stream://2000';
+								$a_dialplan_include_details[] = $ent;
+								unset($ent);
+
+								//<action application="set" data="last_fax=${caller_id_number}-${strftime(%Y-%m-%d-%H-%M-%S)}"/>
+								$ent = array();
+								$ent['dialplanincludeid'] = $faxid;
+								$ent['tag'] = 'action'; //condition, action, antiaction
+								$ent['fieldorder'] = '003';
+								$ent['fieldtype'] = 'set';
+								$ent['fielddata'] = 'last_fax=${caller_id_number}-${strftime(%Y-%m-%d-%H-%M-%S)}';
+								$a_dialplan_include_details[] = $ent;
+								unset($ent);
+
+								//<action application="rxfax" data="/usr/local/freeswitch/storage/fax/inbox/${last_fax}.tif"/>
+								$ent = array();
+								$ent['dialplanincludeid'] = $faxid;
+								$ent['tag'] = 'action'; //condition, action, antiaction
+								$ent['fieldorder'] = '004';
+								$ent['fieldtype'] = 'rxfax';
+								$ent['fielddata'] = '/usr/local/freeswitch/storage/fax/'.$rowhelper['faxextension'].'/inbox/${last_fax}.tif';
+								$a_dialplan_include_details[] = $ent;
+								unset($ent);
+
+								//<action application="system" data="/opt/freeswitch/scripts/emailfax.sh USER DOMAIN /usr/local/freeswitch/storage/fax/inbox/9872/${last_fax}.tif"/>
+								$ent = array();
+								$ent['dialplanincludeid'] = $faxid;
+								$ent['tag'] = 'action'; //condition, action, antiaction
+								$ent['fieldorder'] = '005';
+								$ent['fieldtype'] = 'system'; 
+								$ent['fielddata'] = '/usr/local/bin/php /usr/local/www/packages/freeswitch/fax_to_email.php email='.$rowhelper['faxemail'].' extension='.$rowhelper['faxextension'].' name=${last_fax} >> /tmp/fax.txt';
+								$a_dialplan_include_details[] = $ent;
+								unset($ent);
+								
+								//<action application="hangup"/>
+								$ent = array();
+								$ent['dialplanincludeid'] = $faxid;
+								$ent['tag'] = 'action'; //condition, action, antiaction
+								$ent['fieldorder'] = '006';
+								$ent['fieldtype'] = 'hangup';
+								$ent['fielddata'] = '';
+								$a_dialplan_include_details[] = $ent;
+								unset($ent);
+							}
+
+							unset($faxid);
+
+						}
+						if ($action == 'update') {
+
+							$ent['dialplanincludeid'] =  $rowhelper['faxid'];
+							$ent['extensionname'] = $rowhelper['faxname'];
+							$ent['order'] = $order;
+							$ent['context'] = $context;
+							$ent['enabled'] = $enabled;
+							$ent['descr'] = $faxdescription;
+							$ent['opt1name'] = $opt1name;
+							$ent['opt1value'] = $opt1value;
+
+							//update the config
+							$a_dialplan_includes[$id] = $ent;
+
+							unset($ent);
+							unset($extensionname);
+							unset($order);
+							unset($context);
+							unset($enabled);
+							unset($descr);
+							unset($opt1name);
+							unset($opt1value);
+							unset($id);
+						}
+						write_config();
+								
+						sync_package_freeswitch_dialplan_includes();
+						unset($dialplanincludeid);
+						
+					} //end if strlen faxid; add the fax to the dialplan
 
 			} //end foreach
 		} //end if count
@@ -2243,6 +2442,15 @@ function freeswitch_php_install_command()
 	if (!is_dir('/usr/local/www/packages/freeswitch/')) {
 	   exec("mkdir /usr/local/www/packages/freeswitch/");
 	}
+	
+	if (!is_dir('/usr/local/freeswitch/storage/fax/')) {
+	   exec("mkdir /usr/local/freeswitch/storage/fax/");
+	}
+
+	if (!is_dir('/usr/local/freeswitch/storage/fax/receive/')) {
+	   exec("mkdir /usr/local/freeswitch/storage/fax/receive/");
+	}	
+	
 	//$struname = exec('uname -v');
 	//if (stristr($struname, 'FreeBSD 7.0')) {
 	//	$freebsd_version = "7.0";
