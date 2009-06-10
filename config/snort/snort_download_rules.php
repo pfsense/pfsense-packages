@@ -558,6 +558,7 @@ if (file_exists("/usr/local/lib/snort/dynamicrules//lib_sfdynamic_example_rule.s
 }
 
 /* php code to flush out cache some people are reportting missing files this might help  */
+sleep(5);
 apc_clear_cache();
 exec("/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync");
 
