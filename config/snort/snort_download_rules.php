@@ -161,6 +161,7 @@ ob_flush();
 if (file_exists("{$tmpfname}")) {
     update_status(gettext("Removing old tmp files..."));
     exec("/bin/rm -r {$tmpfname}");
+	apc_clear_cache();
 }
 
 /* send current buffer */
@@ -539,10 +540,30 @@ if (file_exists("{$tmpfname}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/")) {
  }
 }
 
+/* double make shure clean up emerg rules that dont belong */
+if (file_exists("/usr/local/etc/snort/rules/emerging-botcc-BLOCK.rules")) {
+	apc_clear_cache();
+	exec("/bin/rm -r /usr/local/etc/snort/rules/emerging-botcc-BLOCK.rules");
+	exec("/bin/rm -r /usr/local/etc/snort/rules/emerging-botcc.rules");
+	exec("/bin/rm -r /usr/local/etc/snort/rules/emerging-compromised-BLOCK.rules");
+	exec("/bin/rm -r /usr/local/etc/snort/rules/emerging-drop-BLOCK.rules");
+	exec("/bin/rm -r /usr/local/etc/snort/rules/emerging-dshield-BLOCK.rules");
+	exec("/bin/rm -r /usr/local/etc/snort/rules/emerging-rbn-BLOCK.rules");
+	exec("/bin/rm -r /usr/local/etc/snort/rules/emerging-tor-BLOCK.rules");
+}
+
+if (file_exists("/usr/local/lib/snort/dynamicrules//lib_sfdynamic_example_rule.so")) {
+	exec("/bin/rm -r /usr/local/lib/snort/dynamicrules//lib_sfdynamic_example_rule.so");
+	exec("/bin/rm -r /usr/local/lib/snort/dynamicrules//lib_sfdynamic_example*");
+}
+
+/* php code to flush out cache some people are reportting missing files this might help  */
+apc_clear_cache();
+exec("/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync");
 
 /* php code finish */
 update_status(gettext("The Rules update finished..."));
-update_output_window(gettext("Please reboot Pfsense before starting Snort..."));
+update_output_window(gettext("You may start snort now..."));
 
 /* hide progress bar and lets end this party */
 hide_progress_bar_status();
