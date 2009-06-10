@@ -154,7 +154,7 @@ display_top_tabs(build_menu());
                 else {
                     echo "                <option>voicemail</option>\n";
                 }
-                if (htmlspecialchars($pconfig['huntgrouptimeouttype']) == "sip uri") {
+                if (htmlspecialchars($pconfig['optiontype']) == "sip uri") {
                     echo "                <option selected='yes'>sip uri</option>\n";
                 }
                 else {
@@ -192,8 +192,16 @@ display_top_tabs(build_menu());
               <td width="22%" valign="top" class="vncellreq">Destination</td>
               <td width="78%" class="vtable">
                 <input name="optiondest" type="text" class="formfld" id="optiondest" size="40" value="<?=htmlspecialchars($pconfig['optiondest']);?>">
-                <br> <span class="vexpl">Destination<br>
-                e.g. <em>1001</em></span></td>
+                <br>
+				<span class="vexpl">
+					<!--<b>examples:</b><br />-->
+					extension: 1001<br />
+					voicemail: 1001<br />
+					sip uri (voicemail): sofia/default/*98@${domain}<br />
+					sip uri (external number): sofia/gateway/gatewayname/12081231234<br />
+					sip uri (auto attendant): sofia/default/5002@${domain}<br />
+				</span>
+			  </td>
             </tr>
             <tr>
               <td width="22%" valign="top" class="vncell">Description</td>

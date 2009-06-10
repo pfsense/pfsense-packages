@@ -130,9 +130,12 @@ if (isset($id) && $a_ivr[$id]) {
 	$pconfig['ivrextension'] = $a_ivr[$id]['ivrextension'];
 	$pconfig['ivrname'] = $a_ivr[$id]['ivrname'];
 	$pconfig['recordingidaction'] = $a_ivr[$id]['recordingidaction'];    	
-	$pconfig['recordingidantiaction'] = $a_ivr[$id]['recordingidantiaction'];	
+	$pconfig['recordingidantiaction'] = $a_ivr[$id]['recordingidantiaction'];
 	$pconfig['ivrtimeout'] = $a_ivr[$id]['ivrtimeout'];
-	$pconfig['ivrcontext'] = $a_ivr[$id]['ivrcontext'];  	
+	$pconfig['ivrcalltimeout'] = $a_ivr[$id]['ivrcalltimeout'];
+	$pconfig['ivrcontext'] = $a_ivr[$id]['ivrcontext'];
+	$pconfig['ivrdirectdial'] = $a_ivr[$id]['ivrdirectdial'];	
+	$pconfig['ivrringback'] = $a_ivr[$id]['ivrringback'];
 	$pconfig['ivrconditionjs'] = ($a_ivr[$id]['ivrconditionjs']);
 	$pconfig['ivrdescr'] = $a_ivr[$id]['ivrdescr'];
 }
@@ -170,7 +173,10 @@ if ($_POST) {
 		$ivrent['recordingidaction'] = $_POST['recordingidaction'];			
 		$ivrent['recordingidantiaction'] = $_POST['recordingidantiaction'];
 		$ivrent['ivrtimeout'] = $_POST['ivrtimeout'];
+		$ivrent['ivrcalltimeout'] = $_POST['ivrcalltimeout'];		
 		$ivrent['ivrcontext'] = $_POST['ivrcontext'];
+		$ivrent['ivrdirectdial'] = $_POST['ivrdirectdial'];		
+		$ivrent['ivrringback'] = $_POST['ivrringback'];		
 		$ivrent['ivrconditionjs'] = base64_encode($_POST['ivrconditionjs']);		
 		$ivrent['ivrdescr'] = $_POST['ivrdescr'];
 
@@ -195,8 +201,25 @@ if ($_POST) {
 include("head.inc");
 
 ?>
-
+<script language="Javascript">
+function sf() { document.forms[0].savetopath.focus(); }
+</script>
+<script language="Javascript" type="text/javascript" src="/edit_area/edit_area_full.js"></script>
+<script language="Javascript" type="text/javascript">
+	// initialisation
+	editAreaLoader.init({
+		id: "ivrconditionjs"	// id of the textarea to transform		
+		,start_highlight: true
+		,allow_toggle: false
+		,language: "en"
+		,syntax: "js"	
+		,toolbar: "search, go_to_line,|, fullscreen, |, undo, redo, |, select_font, |, syntax_selection, |, change_smooth_selection, highlight, reset_highlight, |, help"
+		,syntax_selection_allow: "css,html,js,php,xml,c,cpp,sql"
+		,show_line_colors: true
+	});	
+</script>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">FreeSWITCH: IVR: Edit</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
@@ -288,39 +311,112 @@ display_top_tabs(build_menu());
             }
             ?>
             <tr>
-              <td width="22%" valign="top" class="vncellreq">Timeout</td>
+              <td width="22%" valign="top" class="vncellreq">IVR Timeout</td>
               <td width="78%" class="vtable">
                 <input name="ivrtimeout" type="text" class="formfld" id="ivrtimeout" size="40" value="<?=htmlspecialchars($pconfig['ivrtimeout']);?>">
-                <br><span class="vexpl">After the recording concludes the
+                <br>
+				<span class="vexpl">After the recording concludes the
                 timeout sets the time in seconds to continue to wait for DTMF.
                 If the DTMF is <br />not detected during that time the 't'
-                timeout option is executed.</span>
+                timeout option is executed.
+				</span>
               </td>
             </tr>
             <tr>
-              <td width="22%" valign="top" class="vncell">Context</td>
+              <td width="22%" valign="top" class="vncellreq">Call Timeout</td>
+              <td width="78%" class="vtable">
+                <input name="ivrcalltimeout" type="text" class="formfld" id="ivrcalltimeout" size="40" value="<?=htmlspecialchars($pconfig['ivrcalltimeout']);?>">
+                <br>
+				<span class="vexpl">
+				Call timeout is the time in seconds to ring the destination. After this time is exceeded calls 
+				to extensions will be sent to voicemail. default: 30 seconds
+				</span>
+              </td>
+            </tr>
+            <tr>
+              <td width="22%" valign="top" class="vncellreq">Context</td>
               <td width="78%" class="vtable">
                 <input name="ivrcontext" type="text" class="formfld" id="ivrextension" size="40" value="<?=htmlspecialchars($pconfig['ivrcontext']);?>">
                 <br> <span class="vexpl">e.g. <em>default</em></span></td>
             </tr>
             <tr>
-              <td width="22%" valign="top" class="vncell">Description</td>
+              <td width="22%" valign="top" class="vncellreq">Direct Dial</td>
+              <td width="78%" class="vtable">
+                <?php
+                echo "                <select name='ivrdirectdial' class='formfld'>\n";
+                echo "                <option></option>\n";
+				if (strlen($pconfig['ivrdirectdial']) == 0) { //set default
+					echo "                <option value='true'>enable</option>\n";
+                    echo "                <option selected='yes' value='false'>disabled</option>\n";					
+                }
+                else {
+					if (htmlspecialchars($pconfig['ivrdirectdial']) == "true") {
+						echo "                <option selected='yes' value='true'>enabled</option>\n";
+					}
+					else {
+						echo "                <option value='true'>enable</option>\n";
+					}
+					if (htmlspecialchars($pconfig['ivrdirectdial']) == "false") {
+						echo "                <option selected='yes' value='false'>disabled</option>\n";
+					}
+					else {
+						echo "                <option value='false'>disable</option>\n";
+					}
+                }
+
+                echo "                </select>\n";
+                ?>
+				<br><span class="vexpl">Allows callers to dial directly to extensions and feature codes that are up to 5 digits in length.</span>
+              </td>
+            </tr>			
+            <tr>
+              <td width="22%" valign="top" class="vncellreq">Ring Back</td>
+              <td width="78%" class="vtable">
+                <?php
+                echo "                <select name='ivrringback' class='formfld'>\n";
+                echo "                <option></option>\n";
+                if (htmlspecialchars($pconfig['ivrringback']) == "ring") {
+                    echo "                <option selected='yes'>ring</option>\n";
+                }
+                else {
+                    echo "                <option>ring</option>\n";
+                }
+                if (htmlspecialchars($pconfig['ivrringback']) == "music") {
+                    echo "                <option selected='yes'>music</option>\n";
+                }
+                else {
+                    echo "                <option>music</option>\n";
+                }
+                echo "                </select>\n";
+                ?>
+				<br>
+				<span class="vexpl">
+				Defines what the caller will hear while destination is being called. The choices are music 
+				(music on hold) ring (ring tone.) default: music 
+				</span>
+              </td>
+            </tr>
+			
+            <tr>
+              <td width="22%" valign="top" class="vncellreq">Description</td>
               <td width="78%" class="vtable">
                 <input name="ivrdescr" type="text" class="formfld" id="descr" size="40" value="<?=htmlspecialchars($pconfig['ivrdescr']);?>">
-                <br> <span class="vexpl">You may enter a description here
-                for your reference (not parsed).</span></td>
+                <br>
+				<span class="vexpl">
+					You may enter a description here for your reference (not parsed).
+				</span>
+			  </td>
             </tr>
 
-
             <tr>
-              <td width="22%" valign="top" class="vncell">Javascript Condition</td>
+              <td width="22%" valign="top" class="vncellreq">Javascript Condition</td>
               <td width="78%" class="vtable">
               <?php
               if (strlen(htmlspecialchars(base64_decode($pconfig['ivrconditionjs']))) == 0) {
-                echo "<textarea name=\"ivrconditionjs\" cols=\"50\" rows=\"7\" wrap=\"off\">".$ivrconditionjs."</textarea>\n";
+                echo "<textarea name=\"ivrconditionjs\" id=\"ivrconditionjs\" cols=\"75\" rows=\"10\" wrap=\"off\">".$ivrconditionjs."</textarea>\n";
               }
               else {
-                echo "<textarea name=\"ivrconditionjs\" cols=\"50\" rows=\"7\" wrap=\"off\">".htmlspecialchars(base64_decode($pconfig['ivrconditionjs']))."</textarea>\n";
+                echo "<textarea name=\"ivrconditionjs\" id=\"ivrconditionjs\" cols=\"75\" rows=\"10\" wrap=\"off\">".htmlspecialchars(base64_decode($pconfig['ivrconditionjs']))."</textarea>\n";
               }
               ?>
                 <br> <span class="vexpl">A simple valid condition is:
@@ -387,11 +483,12 @@ display_top_tabs(build_menu());
 
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
-      <td width="20%" class="listhdrr">Option</td>
-      <td width="25%" class="listhdrr">Type</td>
-      <td width="25%" class="listhdrr">Destination</td>
-      <td width="25%" class="listhdr">Description</td>
-      <td width="10%" class="list">
+      <td width="30" class="listhdrr">Option</td>
+      <td width="30" class="listhdrr">Type</td>
+	  <td width="30" class="listhdrr">Profile</td>
+      <td width="150" class="listhdrr">Destination</td>
+      <td width="30%" class="listhdr">Description</td>
+      <td width="40" class="list">
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
@@ -415,6 +512,9 @@ display_top_tabs(build_menu());
                 <?=$ent['optiontype'];?>&nbsp;
               </td>
               <td class="listr" ondblclick="document.location='freeswitch_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
+                <?=$ent['optionprofile'];?>&nbsp;
+              </td>			  
+              <td class="listr" ondblclick="document.location='freeswitch_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
                 <?=$ent['optiondest'];?>&nbsp;
               </td>
               <td class="listbg" ondblclick="document.location='freeswitch_ivr_options_edit.php?id=<?=$id;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
@@ -436,7 +536,7 @@ display_top_tabs(build_menu());
       }
     ?>
     <tr>
-      <td class="list" colspan="4"></td>
+      <td class="list" colspan="5"></td>
       <td class="list">
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
@@ -449,7 +549,7 @@ display_top_tabs(build_menu());
 
 
      <tr>
-       <td class="list" colspan="4"></td>
+       <td class="list" colspan="5"></td>
        <td class="list"></td>
      </tr>
      </table>
@@ -485,11 +585,12 @@ display_top_tabs(build_menu());
 
     <table width="100%" border="0" cellpadding="0" cellspacing="0">
     <tr>
-      <td width="20%" class="listhdrr">Option</td>
-      <td width="25%" class="listhdrr">Type</td>
-      <td width="25%" class="listhdrr">Destination</td>
-      <td width="25%" class="listhdr">Description</td>
-      <td width="10%" class="list">
+      <td width="30" class="listhdrr">Option</td>
+      <td width="30" class="listhdrr">Type</td>
+	  <td width="30" class="listhdrr">Profile</td>
+      <td width="150" class="listhdrr">Destination</td>
+      <td width="30%" class="listhdr">Description</td>
+      <td width="40" class="list">
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
@@ -499,7 +600,7 @@ display_top_tabs(build_menu());
       </td>
 		</tr>
 
-		<?php
+	<?php
       $i = 0;
       if (count($a_ivr_options) > 0) {
         foreach ($a_ivr_options as $ent) {
@@ -512,6 +613,9 @@ display_top_tabs(build_menu());
               <td class="listr" ondblclick="document.location='freeswitch_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
                 <?=$ent['optiontype'];?>&nbsp;
               </td>
+              <td class="listr" ondblclick="document.location='freeswitch_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
+                <?=$ent['optionprofile'];?>&nbsp;
+              </td>			  
               <td class="listr" ondblclick="document.location='freeswitch_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
                 <?=$ent['optiondest'];?>&nbsp;
               </td>
@@ -534,7 +638,7 @@ display_top_tabs(build_menu());
       }
     ?>
     <tr>
-      <td class="list" colspan="4"></td>
+      <td class="list" colspan="5"></td>
       <td class="list">
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
@@ -547,7 +651,7 @@ display_top_tabs(build_menu());
 
 
      <tr>
-       <td class="list" colspan="4"></td>
+       <td class="list" colspan="5"></td>
        <td class="list"></td>
      </tr>
      </table>

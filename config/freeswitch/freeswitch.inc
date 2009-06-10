@@ -1534,7 +1534,9 @@ function sync_package_freeswitch_ivr()
 	    $rowhelper['ivrname']
 	    $rowhelper['recordingid']
 	    $rowhelper['ivrtimeout']
+		$rowhelper['ivrcalltimeout']		
 	    $rowhelper['ivrcontext']
+		$rowhelper['ivrdirectdial']		
 	    $rowhelper['ivrconditionjs']
 	    $rowhelper['ivrdescr']
 	    */
@@ -1695,8 +1697,29 @@ function sync_package_freeswitch_ivr()
 		$tmp .= " caller_id_name = session.getVariable(\"caller_id_name\");\n";
 		$tmp .= " caller_id_number = session.getVariable(\"caller_id_number\");\n";
 		$tmp .= "\n";
-		$tmp .= " session.execute(\"set\", \"ringback=\"+us_ring);          //set to ringtone\n";
-		$tmp .= " session.execute(\"set\", \"transfer_ringback=\"+us_ring); //set to ringtone\n";
+		
+		$tmp .= " session.execute(\"set\", \"continue_on_fail=true\");\n";
+		if (strlen($rowhelper['ivrcalltimeout']) == 0){
+			$tmp .= " session.execute(\"set\", \"call_timeout=30\");\n"; //ivrcalltimeout
+		}
+		else {
+			$tmp .= " session.execute(\"set\", \"call_timeout=".$rowhelper['ivrcalltimeout']."\");\n"; //ivrcalltimeout
+		}
+		
+		if (isset($rowhelper['ivrringback'])){
+			if ($rowhelper['ivrringback'] == "ring"){
+				$tmp .= " session.execute(\"set\", \"ringback=\"+us_ring);          //set to ringtone\n";
+				$tmp .= " session.execute(\"set\", \"transfer_ringback=\"+us_ring); //set to ringtone\n";
+			}
+			if ($rowhelper['ivrringback'] == "music"){
+				$tmp .= " session.execute(\"set\", \"ringback=\${hold_music}\");          //set to ringtone\n";
+				$tmp .= " session.execute(\"set\", \"transfer_ringback=\${hold_music}\"); //set to ringtone\n";
+			}
+		}
+		else {
+			$tmp .= " session.execute(\"set\", \"ringback=\${hold_music}\");          //set to ringtone\n";
+			$tmp .= " session.execute(\"set\", \"transfer_ringback=\${hold_music}\"); //set to ringtone\n";		
+		}
 		$tmp .= "\n";
 		$tmp .= "//console_log( \"info\", \"IVR Server Time is: \"+Hours+\":\"+Mins+\" \\n\" );\n";
 		$tmp .= "\n";
@@ -1763,6 +1786,7 @@ function sync_package_freeswitch_ivr()
             if ($actiondirecttype == "extension") {
 				$tmp .= "    sofia_contact_".$actiondirectdest." = get_sofia_contact(\"".$actiondirectdest."\",domain_name, \"".$actiondirectprofile."\");\n";									
                 $tmp .= "    session.execute(\"bridge\", sofia_contact_".$actiondirectdest."); //".$actiondirectdest."\n";
+                $tmp .= "    session.execute(\"voicemail\", \"".$actiondirectdest." XML default\");\n";
                 //$tmp .= "    session.execute(\"transfer\", \"".$actiondirectdest." XML default\"); //".$actiondirectdest."\n";
 			}
             if ($actiondirecttype == "voicemail") {
@@ -1808,6 +1832,7 @@ function sync_package_freeswitch_ivr()
       			                if ($row['optiontype'] == "extension") {
 									$tmp .= "                 	sofia_contact_".$row['optiondest']." = get_sofia_contact(\"".$row['optiondest']."\",domain_name, \"".$row['optionprofile']."\");\n";									
 									$tmp .= "                 	session.execute(\"bridge\", sofia_contact_".$row['optiondest']."); //".$row['optiondescr']."\n";
+									$tmp .= "                 	session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
       			                }
       			                if ($row['optiontype'] == "voicemail") {
 									//$tmp .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
@@ -1883,6 +1908,7 @@ function sync_package_freeswitch_ivr()
 								if ($row['optiontype'] == "extension") {
 									$tmpaction .= "                 sofia_contact_".$row['optiondest']." = get_sofia_contact(\"".$row['optiondest']."\",domain_name, \"".$row['optionprofile']."\");\n";									
 									$tmpaction .= "                 session.execute(\"bridge\", sofia_contact_".$row['optiondest']."); //".$row['optiondescr']."\n";
+									$tmpaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
 								}
 								if ($row['optiontype'] == "voicemail") {
 									//$tmpaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
@@ -1907,10 +1933,12 @@ function sync_package_freeswitch_ivr()
       	    } //end if count
       	
       	    $tmp .= $tmpaction;
-      	    $tmp .= "             else {\n";
-      	    $tmp .= "	                  session.execute(\"transfer\", dtmf.digits+\" XML default\");\n";
-      	    //$tmp .= $tmpactiondefault;
-      	    $tmp .= "             }\n";
+			if ($rowhelper['ivrdirectdial'] == "true") {
+				$tmp .= "             else {\n";
+				$tmp .= "	                  session.execute(\"transfer\", dtmf.digits+\" XML default\");\n";
+				//$tmp .= $tmpactiondefault;
+				$tmp .= "             }\n";
+			}
       	    $tmp .= "\n";
       	    unset($tmpaction);
       	
@@ -1957,6 +1985,7 @@ function sync_package_freeswitch_ivr()
             if ($actiondirecttype == "extension") {
 				$tmp .= "    sofia_contact_".$actiondirectdest." = get_sofia_contact(\"".$actiondirectdest."\",domain_name, \"".$actiondirectprofile."\");\n";									
                 $tmp .= "    session.execute(\"bridge\", sofia_contact_".$actiondirectdest."); //".$actiondirectdest."\n";
+                $tmp .= "    session.execute(\"voicemail\", \"".$actiondirectdest." XML default\");\n";
                 //$tmp .= "    session.execute(\"transfer\", \"".$actiondirectdest." XML default\"); //".$actiondirectdest."\n";
 			}
             if ($actiondirecttype == "voicemail") {
@@ -1999,6 +2028,7 @@ function sync_package_freeswitch_ivr()
       			                if ($row['optiontype'] == "extension") {
 									$tmp .= "                 	sofia_contact_".$row['optiondest']." = get_sofia_contact(\"".$row['optiondest']."\",domain_name, \"".$row['optionprofile']."\");\n";									
 									$tmp .= "                 	session.execute(\"bridge\", sofia_contact_".$row['optiondest']."); //".$row['optiondescr']."\n";
+									$tmp .= "                 	session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
 								}
       			                if ($row['optiontype'] == "voicemail") {
 									//$tmp .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
@@ -2030,7 +2060,7 @@ function sync_package_freeswitch_ivr()
       	    $tmp .= "         //pickup the remaining digits\n";
       	    $tmp .= "         //http://wiki.freeswitch.org/wiki/Session_getDigits\n";
       	    $tmp .= "         //getDigits(length, terminators, timeout, digit_timeout, abs_timeout)\n";
-      	    $tmp .= "         dtmf.digits +=  session.getDigits(3, \"#\", 3000);\n";
+      	    $tmp .= "         dtmf.digits +=  session.getDigits(4, \"#\", 3000);\n";
       	    $tmp .= "\n";
       	    $tmp .= "         console_log( \"info\", \"IVR Digit Pressed: \" + dtmf.digits + \"\\n\" );\n";
       	    $tmp .= "\n";
@@ -2074,6 +2104,7 @@ function sync_package_freeswitch_ivr()
       			                if ($row['optiontype'] == "extension") {
 									$tmpantiaction .= "                 sofia_contact_".$row['optiondest']." = get_sofia_contact(\"".$row['optiondest']."\",domain_name, \"".$row['optionprofile']."\");\n";									
 									$tmpantiaction .= "                 session.execute(\"bridge\", sofia_contact_".$row['optiondest']."); //".$row['optiondescr']."\n";
+									$tmpantiaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
 								}
       			                if ($row['optiontype'] == "voicemail") {
 									//$tmpantiaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
@@ -2097,10 +2128,12 @@ function sync_package_freeswitch_ivr()
       	    } //if count
       	
       	    $tmp .= $tmpantiaction;
-      	    $tmp .= "             else {\n";
-      	    $tmp .= "	                  session.execute(\"transfer\", dtmf.digits+\" XML default\");\n";	
-      	    //$tmp .= $tmpantiactiondefault;
-      	    $tmp .= "             }\n";
+			if ($rowhelper['ivrdirectdial'] == "true") {
+				$tmp .= "             else {\n";
+				$tmp .= "	                  session.execute(\"transfer\", dtmf.digits+\" XML default\");\n";	
+				//$tmp .= $tmpantiactiondefault;
+				$tmp .= "             }\n";
+			}
       	    $tmp .= "\n";
       	    unset($tmpantiaction);
       	
@@ -2421,7 +2454,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.8.9";
+	$freeswitch_package_version = "0.9.0";
 	$freeswitch_build_version = "1.0.4 pre 6";
 	$freeswitch_build_revision = "13238";
 	
@@ -2435,6 +2468,9 @@ function freeswitch_php_install_command()
 	conf_mount_rw();
 	config_lock();
 
+	//used with fax to png, and fax to pdf conversion
+	exec("pkg_add -r tiff2png");
+	
 	if (!is_dir('/usr/local/www/packages/')) {
 	   exec("mkdir /usr/local/www/packages/");
 	}
@@ -2557,6 +2593,18 @@ function freeswitch_php_install_command()
 	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_extensions_edit.tmp");
 	exec("cp /tmp/freeswitch_extensions_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_extensions_edit.php");
 	unlink_if_exists("/tmp/freeswitch_extensions_edit.tmp");
+	
+	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_fax.tmp");
+	exec("cp /tmp/freeswitch_fax.tmp /usr/local/www/packages/freeswitch/freeswitch_fax.php");
+	unlink_if_exists("/tmp/freeswitch_fax.tmp");
+
+	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_fax_edit.tmp");
+	exec("cp /tmp/freeswitch_fax_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_fax_edit.php");
+	unlink_if_exists("/tmp/freeswitch_fax_edit.tmp");
+
+	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/fax_to_email.tmp");
+	exec("cp /tmp/fax_to_email.tmp /usr/local/www/packages/freeswitch/fax_to_email.php");
+	unlink_if_exists("/tmp/fax_to_email.tmp");
 
 	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_features.tmp");
 	exec("cp /tmp/freeswitch_features.tmp /usr/local/www/packages/freeswitch/freeswitch_features.php");
