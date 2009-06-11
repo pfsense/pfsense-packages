@@ -171,7 +171,12 @@ display_top_tabs(build_menu());
                 <?php
                 echo "                <select name='optionprofile' class='formfld'>\n";
                 echo "                <option></option>\n";
-				
+				if (htmlspecialchars($pconfig['optionprofile']) == "auto") {
+					echo "                <option selected='yes'>auto</option>\n";
+				}
+				else {
+					echo "                <option>auto</option>\n";
+				}
 				foreach (ListFiles('/usr/local/freeswitch/conf/sip_profiles') as $key=>$sip_profile_file){	
 					$sip_profile_name = str_replace(".xml", "", $sip_profile_file);
 
