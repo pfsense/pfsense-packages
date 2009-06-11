@@ -2594,24 +2594,22 @@ function freeswitch_php_install_command()
 	   exec("mkdir /usr/local/www/packages/freeswitch/");
 	}
 	
+	//$struname = exec('uname -v');
+	//if (stristr($struname, 'FreeBSD 7.0')) {
+	//	$freebsd_version = "7.0";
+	//}
+	
+	//exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.tgz"); //handled by freeswitch.xml
+	exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
+	unlink_if_exists("/tmp/freeswitch.tgz");
+
 	if (!is_dir('/usr/local/freeswitch/storage/fax/')) {
 	   exec("mkdir /usr/local/freeswitch/storage/fax/");
 	}
 
 	if (!is_dir('/usr/local/freeswitch/storage/fax/receive/')) {
 	   exec("mkdir /usr/local/freeswitch/storage/fax/receive/");
-	}	
-	
-	//$struname = exec('uname -v');
-	//if (stristr($struname, 'FreeBSD 7.0')) {
-	//	$freebsd_version = "7.0";
-	//}
-
-	
-	//exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.tgz"); //handled by freeswitch.xml
-	exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
-	unlink_if_exists("/tmp/freeswitch.tgz");
-
+	}
 
 	//make a backup copy of the default config
 	exec("cp -R /usr/local/freeswitch/conf /usr/local/freeswitch/conf.orig");
