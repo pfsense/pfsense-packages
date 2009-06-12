@@ -284,9 +284,9 @@ if ($emerg_md5_check_new == $emerg_md5_check_old) {
 if ($snort_md5_check_ok == on && $emergingthreats_url_chk != on) {
 	update_status(gettext("Cleaning the snort Directory..."));
     update_output_window(gettext("removing..."));
-	exec("/bin/rm -r {$snortdir}/rules/emerging*");
-	exec("/bin/rm -r {$snortdir}/version.txt");
-	update_status(gettext("Done making snort direcory."));
+	exec("/bin/rm {$snortdir}/rules/emerging*");
+	exec("/bin/rm {$snortdir}/version.txt");
+	update_status(gettext("Done making cleaning emrg direcory."));
 }
 
 /* Check if were up to date exits */
@@ -427,15 +427,15 @@ if ($snort_md5_check_ok != on && $emerg_md5_check_chk_ok != on) {
 if (file_exists("{$snortdir}/rules")) {
     update_status(gettext("Cleaning the snort Directory..."));
     update_output_window(gettext("removing..."));
-	exec("/bin/rm -r {$snortdir}/*");
-	exec("/bin/rm -r {$snortdir}/rules/*");
-    exec("/bin/rm -r /usr/local/lib/snort/dynamicrules/*");	
+	exec("/bin/rm {$snortdir}/*");
+	exec("/bin/rm {$snortdir}/rules/*");
+    exec("/bin/rm /usr/local/lib/snort/dynamicrules/*");	
 } else {
     update_status(gettext("Making Snort Directory..."));
     update_output_window(gettext("should be fast..."));
     exec("/bin/mkdir {$snortdir}");
 	exec("/bin/mkdir {$snortdir}/rules");
-	exec("/bin/rm -r /usr/local/lib/snort/dynamicrules/*");
+	exec("/bin/rm /usr/local/lib/snort/dynamicrules/*");
     update_status(gettext("Done making snort direcory."));
   }
 }
@@ -543,18 +543,18 @@ if (file_exists("{$tmpfname}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/")) {
 /* double make shure clean up emerg rules that dont belong */
 if (file_exists("/usr/local/etc/snort/rules/emerging-botcc-BLOCK.rules")) {
 	apc_clear_cache();
-	exec("/bin/rm -r /usr/local/etc/snort/rules/emerging-botcc-BLOCK.rules");
-	exec("/bin/rm -r /usr/local/etc/snort/rules/emerging-botcc.rules");
-	exec("/bin/rm -r /usr/local/etc/snort/rules/emerging-compromised-BLOCK.rules");
-	exec("/bin/rm -r /usr/local/etc/snort/rules/emerging-drop-BLOCK.rules");
-	exec("/bin/rm -r /usr/local/etc/snort/rules/emerging-dshield-BLOCK.rules");
-	exec("/bin/rm -r /usr/local/etc/snort/rules/emerging-rbn-BLOCK.rules");
-	exec("/bin/rm -r /usr/local/etc/snort/rules/emerging-tor-BLOCK.rules");
+	exec("/bin/rm /usr/local/etc/snort/rules/emerging-botcc-BLOCK.rules");
+	exec("/bin/rm /usr/local/etc/snort/rules/emerging-botcc.rules");
+	exec("/bin/rm /usr/local/etc/snort/rules/emerging-compromised-BLOCK.rules");
+	exec("/bin/rm /usr/local/etc/snort/rules/emerging-drop-BLOCK.rules");
+	exec("/bin/rm /usr/local/etc/snort/rules/emerging-dshield-BLOCK.rules");
+	exec("/bin/rm /usr/local/etc/snort/rules/emerging-rbn-BLOCK.rules");
+	exec("/bin/rm /usr/local/etc/snort/rules/emerging-tor-BLOCK.rules");
 }
 
 if (file_exists("/usr/local/lib/snort/dynamicrules//lib_sfdynamic_example_rule.so")) {
-	exec("/bin/rm -r /usr/local/lib/snort/dynamicrules//lib_sfdynamic_example_rule.so");
-	exec("/bin/rm -r /usr/local/lib/snort/dynamicrules//lib_sfdynamic_example*");
+	exec("/bin/rm /usr/local/lib/snort/dynamicrules//lib_sfdynamic_example_rule.so");
+	exec("/bin/rm /usr/local/lib/snort/dynamicrules//lib_sfdynamic_example*");
 }
 
 /* php code to flush out cache some people are reportting missing files this might help  */
