@@ -3202,9 +3202,9 @@ function freeswitch_php_install_command()
   	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_zh']) == 0) {
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_zh'] = "disable";
   	}
-  	
-	// if backup file exists restore it		
-		if (!is_dir('/root/backup/')) {
+	
+	//create the backup directory
+		if (!is_dir('/root/backup/')) {		
 			exec("mkdir /root/backup/");
 		}
 	

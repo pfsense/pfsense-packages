@@ -33,14 +33,14 @@ require("/usr/local/pkg/tftp.inc");
 
 $filename = $_GET['filename'];
 if (($_GET['a'] == "download") && $_GET['t'] == "backup") {
-  $tmp = '/tmp/';
+  $tmp = '/root/backup/';
   $filename = 'tftp.bak.tgz';
-  system('cd /;tar cvzf /tmp/tftp.bak.tgz tftpboot');
+  system('cd /;tar cvzf /root/backup/tftp.bak.tgz tftpboot');
 }
-if (($_GET['a'] == "download") && file_exists("/tmp/".$filename)) {
+if (($_GET['a'] == "download") && file_exists("/root/backup/".$filename)) {
 
 	session_cache_limiter('public');
-	$fd = fopen("/tmp/".$filename, "rb");
+	$fd = fopen("/root/backup/".$filename, "rb");
 	header("Content-Type: application/force-download");
 	header("Content-Type: application/octet-stream");
 	header("Content-Type: application/download");
@@ -48,7 +48,7 @@ if (($_GET['a'] == "download") && file_exists("/tmp/".$filename)) {
 	header('Content-Disposition: attachment; filename="'.$filename.'"');
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
-	header("Content-Length: " . filesize("/tmp/".$filename));
+	header("Content-Length: " . filesize("/root/backup/".$filename));
 	fpassthru($fd);
 	exit;
 }
@@ -56,13 +56,13 @@ if (($_GET['a'] == "download") && file_exists("/tmp/".$filename)) {
 
 if ($_GET['a'] == "other") {
   if ($_GET['t'] == "restore") {
-    $tmp = '/tmp/';
+    $tmp = '/root/backup/';
     $filename = 'tftp.bak.tgz';
 
     //extract a specific directory to /tftpboot
-    if (file_exists('/tmp/'.$filename)) {
+    if (file_exists('/root/backup/'.$filename)) {
         //echo "The file $filename exists";
-        system('cd /; tar xvpfz /tmp/'.$filename);
+        system('cd /; tar xvpfz /root/backup/'.$filename);
         system('chmod -R 744 /tftpboot/*');
         header( 'Location: tftp_files.php?savemsg=Backup+has+been+restored.' ) ;
     }
@@ -164,14 +164,14 @@ if ($savemsg) {
 	echo "<tr>\n";
 	echo "<td width='80%'>\n";
 	echo "<b>Backup / Restore</b><br />\n";
-	echo "The 'backup' button will tar gzip /tftpboot/ to /tmp/tftp.bak.tgz it then presents a file to download. \n";
-	echo "If the backup file does not exist in /tmp/tftp.bak.tgz then the 'restore' button will be hidden. \n";
+	echo "The 'backup' button will tar gzip /tftpboot/ to /root/backup/tftp.bak.tgz it then presents a file to download. \n";
+	echo "If the backup file does not exist in /root/backup/tftp.bak.tgz then the 'restore' button will be hidden. \n";
 	echo "Use Diagnostics->Command->File to upload: to browse to the file and then click on upload it now ready to be restored. \n";
 	echo "<br /><br />\n";
 	echo "</td>\n";
 	echo "<td width='20%' valign='middle' align='right'>\n";
 	echo "  <input type='button' value='backup' onclick=\"document.location.href='/packages/tftp/tftp_files.php?a=download&t=backup';\" />\n";
-	if (file_exists('/tmp/tftp.bak.tgz')) {
+	if (file_exists('/root/backup/tftp.bak.tgz')) {
 	  echo "  <input type='button' value='restore' onclick=\"document.location.href='/packages/tftp/tftp_files.php?a=other&t=restore';\" />\n";
 	}
 	echo "</td>\n";

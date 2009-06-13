@@ -118,6 +118,11 @@ function php_install_command()
 	   // Create the tftp directory
 	   exec("mkdir /usr/local/www/packages/tftp");
 	}
+	
+	if (!is_dir('/root/backup/')) {
+		// Create the backup directory
+		exec("mkdir /root/backup/");
+	}
 
 	
 	//rename PHP files from .tmp to .php	
@@ -225,8 +230,8 @@ function php_install_command()
 	    $filename = 'tftp.bak.tgz';
 	    	   
 	    //extract a specific directory to /usr/local/freeswitch
-	    if (file_exists('/tmp/'.$filename)) {
-	        system('cd /; tar xvpfz /tmp/tftp.bak.tgz');
+	    if (file_exists('/root/backup/'.$filename)) {
+	        system('cd /; tar xvpfz /root/backup/tftp.bak.tgz');
 	        system('chmod -R 744 /tftpboot/*');			
 			unset($filename);
 	    }

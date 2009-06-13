@@ -95,6 +95,11 @@ function php_install_command()
 	if (!is_dir('/usr/local/www/packages/backup/')) {
 	   exec("mkdir /usr/local/www/packages/backup/");
 	}
+	
+	//create the backup directory
+	if (!is_dir('/root/backup/')) {		
+		exec("mkdir /root/backup/");
+	}
 
 	//rename PHP files from .tmp to .php
 	exec("cp /tmp/backup.tmp /usr/local/www/packages/backup/backup.php");

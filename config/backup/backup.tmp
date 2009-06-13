@@ -46,9 +46,9 @@ if ($_GET['act'] == "del") {
 
 if ($_GET['a'] == "download") {
 	if ($_GET['t'] == "backup") {
-		$tmp = '/tmp/';
+		$tmp = '/root/backup/';
 		$filename = 'pfsense.bak.tgz';
-		//system('cd /usr/local/;tar cvzf /tmp/pfsense.bak.tgz freeswitch');
+		//system('cd /usr/local/;tar cvzf /root/backup/pfsense.bak.tgz freeswitch');
 		
 		$i = 0;
 		if (count($a_backup) > 0) {
@@ -79,13 +79,13 @@ if ($_GET['a'] == "download") {
 
 if ($_GET['a'] == "other") {
   if ($_GET['t'] == "restore") {
-    $tmp = '/tmp/';
+    $tmp = '/root/backup/';
     $filename = 'pfsense.bak.tgz';
 
     //extract the tgz file
-    if (file_exists('/tmp/'.$filename)) {
+    if (file_exists('/root/backup/'.$filename)) {
 			//echo "The file $filename exists";
-			system('cd /; tar xvpfz /tmp/'.$filename.' ');
+			system('cd /; tar xvpfz /root/backup/'.$filename.' ');
 			header( 'Location: backup.php?savemsg=Backup+has+been+restored.' ) ;
     }
     else {
@@ -98,9 +98,9 @@ if ($_GET['a'] == "other") {
 
 if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_name'])) {
   $filename = 'pfsense.bak.tgz';
-	move_uploaded_file($_FILES['ulfile']['tmp_name'], "/tmp/" . $filename);
-	$savemsg = "Uploaded file to /tmp/" . htmlentities($_FILES['ulfile']['name']);
-	system('cd /; tar xvpfz /tmp/'.$filename.' ');
+	move_uploaded_file($_FILES['ulfile']['tmp_name'], "/root/backup/" . $filename);
+	$savemsg = "Uploaded file to /root/backup/" . htmlentities($_FILES['ulfile']['name']);
+	system('cd /; tar xvpfz /root/backup/'.$filename.' ');
 }
 
 
@@ -183,13 +183,13 @@ if ($_GET["savemsg"]) {
 	echo "<tr>\n";
 	echo "<td width='80%'>\n";
 	echo "<b>Backup / Restore</b><br />\n";
-	echo "The 'backup' button will tar gzip the directories that are listed below to /tmp/pfsense.bak.tgz it then presents a file to download. \n";
-	echo "If the backup file does not exist in /tmp/pfsense.bak.tgz then the 'restore' button will be hidden. \n";
+	echo "The 'backup' button will tar gzip the directories that are listed below to /root/backup/pfsense.bak.tgz it then presents a file to download. \n";
+	echo "If the backup file does not exist in /root/backup/pfsense.bak.tgz then the 'restore' button will be hidden. \n";
 	echo "<br /><br />\n";
 	echo "</td>\n";
 	echo "<td width='20%' valign='middle' align='right'>\n";
 	echo "  <input type='button' value='backup' onclick=\"document.location.href='backup.php?a=download&t=backup';\" />\n";
-	if (file_exists('/tmp/pfsense.bak.tgz')) {
+	if (file_exists('/root/backup/pfsense.bak.tgz')) {
 	  echo "  <input type='button' value='restore' onclick=\"document.location.href='backup.php?a=other&t=restore';\" />\n";
 	}
 	echo "</td>\n";
