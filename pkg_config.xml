@@ -825,4 +825,16 @@
       <config_file>http://www.pfsense.com/packages/config/ovpnenhance/ovpnenhance.xml</config_file>
       <configurationfile>ovpnenhance.xml</configurationfile>
     </package>
+    <package>
+      <name>rate</name>
+      <descr>This package adds a table of realtime bandwidth usage by IP address to Status -&gt; Traffic Graphs</descr>
+      <category>Network Management</category>
+      <version>0.9</version>
+      <status>BETA</status>
+      <maintainer></maintainer>
+      <depends_on_package_base_url>http://files.pfsense.com/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package>rate-0.9.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/rate/rate.xml</config_file>
+      <configurationfile>rate.xml</configurationfile>
+    </package>
 </pfsensepkgs>
