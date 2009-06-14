@@ -48,7 +48,7 @@
 	<name>rate</name>
 	<version>0.9</version>
 	<title>Rate</title>
-	<include_file>/usr/local/pkg/dashboard.inc</include_file>
+	<include_file>/usr/local/pkg/rate.inc</include_file>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
