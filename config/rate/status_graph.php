@@ -140,7 +140,7 @@ function updateBandwidthHosts(data){
             }
         }
     }
-    
+
     setTimeout('updateBandwidth()', 3000);
 }
 
@@ -160,7 +160,7 @@ if((isset($config['ipsec']['enable'])) || (isset($config['ipsec']['mobileclients
 }
 
 /* link the ipsec interface magically */
-if (isset($config['ipsec']['enable']) || isset($config['ipsec']['mobileclients']['enable'])) 
+if (isset($config['ipsec']['enable']) || isset($config['ipsec']['mobileclients']['enable']))
 	$ifdescrs['enc0'] = "IPsec";
 
 ?>
