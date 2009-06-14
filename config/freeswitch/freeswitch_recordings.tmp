@@ -320,6 +320,7 @@ if ($config_change == 1) {
       $i = 0;
       if (count($a_recordings) > 0) {
       	foreach ($a_recordings as $recordingent) {
+			if (strlen($recordingent['filename']) > 0) {
       ?>
       <tr>
       <td class="listlr" ondblclick="document.location='freeswitch_recordings_edit.php?id=<?=$i;?>'">
@@ -345,7 +346,14 @@ if ($config_change == 1) {
       </td>
       </tr>
       <?php
-      	$i++;
+			}
+			else {
+				//clean up blank entries
+				unset($a_recordings[$i]);
+				write_config();
+			}
+      	
+		$i++;
       	} //end for each
       } //end count
       ?>

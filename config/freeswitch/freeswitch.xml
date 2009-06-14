@@ -44,7 +44,7 @@
 		<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>FreeSWITCH Settings</name>
-	<version>0.9.1.1</version>
+	<version>0.9.2</version>
 	<title>FreeSWITCH: Settings</title>
 	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
 	<menu>
@@ -120,7 +120,7 @@
 		<field>
 			<fielddescr>Default Gateway</fielddescr>
 			<fieldname>default_gateway</fieldname>
-			<description>Enter the default gateway name here. example: asterlink.com</description>
+			<description>Enter the default gateway name here.</description>
 			<type>input</type>
 		</field>
 		<field>

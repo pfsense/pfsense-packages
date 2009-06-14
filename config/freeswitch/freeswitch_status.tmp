@@ -195,7 +195,13 @@ foreach (ListFiles('/usr/local/freeswitch/conf/sip_profiles') as $key=>$sip_prof
 	echo "<td width='50%' align='right'>\n";
 	echo "  <input type='button' value='start' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+".$sip_profile_name."+start';\" />\n";
 	echo "  <input type='button' value='stop' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+".$sip_profile_name."+stop';\" />\n";
-	echo "  <input type='button' value='flush_inbound_reg' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+".$sip_profile_name."+flush_inbound_reg';\" />\n";
+	echo "  <input type='button' value='restart' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+".$sip_profile_name."+restart';\" />\n";
+	if ($sip_profile_name == "external") {
+		echo "  <input type='button' value='rescan' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+".$sip_profile_name."+rescan';\" />\n";
+	}
+	else {
+		echo "  <input type='button' value='flush_inbound_reg' onclick=\"document.location.href='/packages/freeswitch/freeswitch_cmd.php?cmd=api+sofia+profile+".$sip_profile_name."+flush_inbound_reg';\" />\n";
+	}
 	echo "</td>\n";
 	echo "</tr>\n";
 	echo "</table>\n";

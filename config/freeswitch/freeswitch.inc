@@ -264,6 +264,12 @@ function byte_convert( $bytes ) {
 function lan_sip_profile()
 {
 	global $config;
+	
+	//if the lan directory does not exist then create it
+	if (!is_dir('/usr/local/freeswitch/conf/sip_profiles/lan')) {
+	   exec("mkdir /usr/local/freeswitch/conf/sip_profiles/lan/");
+	}
+	
 	//create the LAN profile if it doesn't exist
 	if (!file_exists('/usr/local/freeswitch/conf/sip_profiles/lan.xml')) {
 		$lan_ip = $config['interfaces']['lan']['ipaddr'];
@@ -2569,7 +2575,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.9.1.1";
+	$freeswitch_package_version = "0.9.2";
 	$freeswitch_build_version = "1.0.4 pre 6";
 	$freeswitch_build_revision = "13238";
 	
@@ -2611,7 +2617,18 @@ function freeswitch_php_install_command()
 	   exec("mkdir /usr/local/freeswitch/storage/fax/receive/");
 	}
 
-	//make a backup copy of the default config
+	//download the dialplan default.xml
+	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/dialplan.default.xml");
+	exec("cp /tmp/dialplan.default.xml /usr/local/freeswitch/conf/dialplan/default.xml");
+	unlink_if_exists("/tmp/dialplan.default.xml");
+	
+	//download the dialplan public.xml
+	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/dialplan.public.xml");
+	exec("cp /tmp/dialplan.public.xml /usr/local/freeswitch/conf/dialplan/public.xml");
+	unlink_if_exists("/tmp/dialplan.public.xml");
+	
+	
+	//make a backup copy of the default config used with the 'Restore Default' buttons on the text areas.
 	exec("cp -R /usr/local/freeswitch/conf /usr/local/freeswitch/conf.orig");
 	
 	//remove some default config files that are not needed
@@ -2625,7 +2642,9 @@ function freeswitch_php_install_command()
 	if (!is_dir('/usr/local/freeswitch/sounds/custom/8000/')) {
 	   exec("mkdir /usr/local/freeswitch/sounds/custom/8000/");
 	}
+	
 
+	
 	//copy audio files
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_your_pin_number.wav");
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_pin_number.wav");	
