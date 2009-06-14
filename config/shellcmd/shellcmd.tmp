@@ -34,7 +34,6 @@ $a_earlyshellcmd = &$config['system']['earlyshellcmd'];
 $a_shellcmd = &$config['system']['shellcmd'];
 //$a_afterfilterchangeshellcmd = &$config['system']['afterfilterchangeshellcmd'];
 
-
 include("head.inc");
 
 ?>
@@ -101,90 +100,40 @@ include("head.inc");
 
 <?php 
     
-    $i = 0;
-    if (count($a_earlyshellcmd) > 0) {
-		//if (isset($a_earlyshellcmd[0]["command"])) {
-			foreach ($a_earlyshellcmd as $ent) {
-				if (strlen($ent['command']) > 0) {
-					echo "  <tr>\n";
-					echo "	<td class=\"listr\" ondblclick=\"document.location='shellcmd_edit.php?id=".$i."';\">\n";
-					echo "	  ".$ent['command']."&nbsp;\n";
-					echo "	</td>\n";
-					echo "	<td class=\"listbg\" ondblclick=\"document.location='shellcmd_edit.php?id=".$i."';\">\n";
-					echo "	  earlyshellcmd &nbsp;\n";
-					echo "	</td>\n";
-					echo "	<td valign=\"middle\" nowrap class=\"list\">\n";
-					echo "	  <table border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
-					echo "		<tr>\n";
-					echo "		  <td valign=\"middle\"><a href=\"shellcmd_edit.php?t=earlyshellcmd&id=".$i."\"><img src=\"/themes/".$g['theme']."/images/icons/icon_e.gif\" width=\"17\" height=\"17\" border=\"0\"></a></td>\n";
-					echo "		  <td><a href=\"shellcmd_edit.php?t=earlyshellcmd&type=cmd&act=del&id=".$i."\" onclick=\"return confirm('Do you really want to delete this?')\"><img src=\"/themes/".$g['theme']."/images/icons/icon_x.gif\" width=\"17\" height=\"17\" border=\"0\"></a></td>\n";
-					echo "		</tr>\n";
-					echo "	 </table>\n";
-					echo "	</td>\n";
-					echo "  </tr>";
-				}
+    $categories = array("earlyshellcmd","shellcmd");
+    //$categories = array("earlyshellcmd","shellcmd","afterfilterchangeshellcmd");
+	
+	foreach ($categories as $category) {
+		$i = 0;
+		// dynamically create the category config name
+		$category_config = "a_".$category;
+		if (count($$category_config) > 0) {
+			foreach ($$category_config as $ent) { 
+				// previous versions of shellcmd stored the command in an additional <command>-xmltag, this unnests this for backwards compatibility
+				if (is_array($ent)) { $ent = $ent['command']; }
+
+				echo "  <tr>\n";
+				echo "	<td class=\"listr\" ondblclick=\"document.location='shellcmd_edit.php?t=".$category."&id=".$i."';\">\n";
+				echo "	  ".$ent."\n";
+				echo "	</td>\n";
+				echo "	<td class=\"listbg\" ondblclick=\"document.location='shellcmd_edit.php?t=".$category."&id=".$i."';\">\n";
+				echo "	  ".$category."\n";
+				echo "	</td>\n";
+				echo "	<td valign=\"middle\" nowrap class=\"list\">\n";
+				echo "	  <table border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
+				echo "		<tr>\n";
+				echo "		  <td valign=\"middle\"><a href=\"shellcmd_edit.php?t=".$category."&id=".$i."\"><img src=\"/themes/".$g['theme']."/images/icons/icon_e.gif\" width=\"17\" height=\"17\" border=\"0\"></a></td>\n";
+				echo "		  <td><a href=\"shellcmd_edit.php?t=".$category."&type=cmd&act=del&id=".$i."\" onclick=\"return confirm('Do you really want to delete this?')\"><img src=\"/themes/".$g['theme']."/images/icons/icon_x.gif\" width=\"17\" height=\"17\" border=\"0\"></a></td>\n";
+				echo "		</tr>\n";
+				echo "	 </table>\n";
+				echo "	</td>\n";
+				echo "  </tr>";
 				$i++; 
 			}
-		//}
-    }
+		}
+	}
 
-    
-    $i = 0;
-    if (count($a_shellcmd) > 0) {
-		//if (isset($a_shellcmd[0]["command"])) {
-			foreach ($a_shellcmd as $ent) {
-				if (strlen($ent['command']) > 0) {
-					echo "  <tr>\n";
-					echo "	<td class=\"listr\" ondblclick=\"document.location='shellcmd_edit.php?id=".$i."';\">\n";
-					echo "	  ".$ent['command']."&nbsp;\n";
-					echo "	</td>\n";			
-					echo "	<td class=\"listbg\" ondblclick=\"document.location='shellcmd_edit.php?id=".$i."';\">\n";
-					echo "	  shellcmd &nbsp;\n";
-					echo "	</td>\n";
-					echo "	<td valign=\"middle\" nowrap class=\"list\">\n";
-					echo "	  <table border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
-					echo "		<tr>\n";
-					echo "		  <td valign=\"middle\"><a href=\"shellcmd_edit.php?t=shellcmd&id=".$i."\"><img src=\"/themes/".$g['theme']."/images/icons/icon_e.gif\" width=\"17\" height=\"17\" border=\"0\"></a></td>\n";
-					echo "		  <td><a href=\"shellcmd_edit.php?t=shellcmd&type=cmd&act=del&id=".$i."\" onclick=\"return confirm('Do you really want to delete this?')\"><img src=\"/themes/".$g['theme']."/images/icons/icon_x.gif\" width=\"17\" height=\"17\" border=\"0\"></a></td>\n";
-					echo "		</tr>\n";
-					echo "	 </table>\n";
-					echo "	</td>\n";
-					echo "  </tr>";
-				}
-			  $i++; 
-			}
-		//}
-    }
 
-    /*
-    $i = 0;
-    if (count($a_afterfilterchangeshellcmd) > 0) {
-		//if (isset($a_afterfilterchangeshellcmd[0]["command"])) {
-			foreach ($a_afterfilterchangeshellcmd as $ent) {
-				if (strlen($ent['command']) > 0) {
-					echo "  <tr>\n";
-					echo "	<td class=\"listr\" ondblclick=\"document.location='shellcmd_edit.php?id=".$i."';\">\n";
-					echo "	  ".$ent['command']."&nbsp;\n";
-					echo "	</td>\n";
-					echo "	<td class=\"listr\" ondblclick=\"document.location='shellcmd_edit.php?id=".$i."';\">\n";
-					echo "	  afterfilterchangeshellcmd&nbsp;\n";
-					echo "	</td>\n";
-					echo "	<td valign=\"middle\" nowrap class=\"list\">\n";
-					echo "	  <table border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
-					echo "		<tr>\n";
-					echo "		  <td valign=\"middle\"><a href=\"shellcmd_edit.php?t=afterfilterchangeshellcmd&id=".$i."\"><img src=\"/themes/".$g['theme']."/images/icons/icon_e.gif\" width=\"17\" height=\"17\" border=\"0\"></a></td>\n";
-					echo "		  <td><a href=\"shellcmd_edit.php?t=afterfilterchangeshellcmd&type=cmd&act=del&id=".$i."\" onclick=\"return confirm('Do you really want to delete this?')\"><img src=\"/themes/".$g['theme']."/images/icons/icon_x.gif\" width=\"17\" height=\"17\" border=\"0\"></a></td>\n";
-					echo "		</tr>\n";
-					echo "	 </table>\n";
-					echo "	</td>\n";
-					echo "  </tr>";
-				}
-			  $i++;
-			}
-		//}
-
-    }
-	*/
 ?>
 
     <tr>

@@ -84,24 +84,27 @@ if (strlen($id) > 0) {
 	case "earlyshellcmd":
 		$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
 		if ($a_earlyshellcmd[$id]) {
-			$pconfig['command'] = $a_earlyshellcmd[$id]['command'];
+			$pconfig['command'] = $a_earlyshellcmd[$id];
 		}
 		break;
 	case "shellcmd":
 		$a_shellcmd = &$config['system']['shellcmd'];
 		if ($a_shellcmd[$id]) {
-			$pconfig['command'] = $a_shellcmd[$id]['command'];
+			$pconfig['command'] = $a_shellcmd[$id];
 		}
 		break;
 	case "afterfilterchangeshellcmd":
 		//$a_afterfilterchangeshellcmd = &$config['system']['afterfilterchangeshellcmd'];
 		//if ($a_afterfilterchangeshellcmd[$id]) {
-		//	$pconfig['command'] = $a_afterfilterchangeshellcmd[$id]['command'];
+		//	$pconfig['command'] = $a_afterfilterchangeshellcmd[$id];
 		//}
 		break;					
 	default:
 		break;	
-	}
+	}	
+	
+	// previous version of shellcmd wrapped all commands in a <command>-xmltag, unnesting this for backwards compatibility
+	if (is_array($pconfig['command'])) $pconfig['command'] = $pconfig['command']['command'];
 
 }
 
@@ -111,8 +114,8 @@ if ($_POST) {
   
 	if (!$input_errors) {
 		if (strlen($_POST['command']) > 0) {
-			$ent = array();
-			$ent['command'] = $_POST['command'];
+			
+			$ent = $_POST['command'];
 
 			if (strlen($id)>0) {
 				//update
@@ -187,7 +190,6 @@ function show_advanced_config() {
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle">Shellcmd: Edit</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-
 
 <div id="mainlevel">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
