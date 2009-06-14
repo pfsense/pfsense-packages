@@ -211,6 +211,17 @@
 
 			/* lcdproc default driver definitions */
 			switch($lcdproc_config[driver]) {
+				case "nexcom":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
+					$config_text .= "Contrast=350\n";
+					$config_text .= "Brightness=1000\n";
+					$config_text .= "OffBrightness=50\n";
+					$config_text .= "Speed=9600\n";
+					$config_text .= "NewFirmware=no\n";
+					$config_text .= "Reboot=no\n";				
+					break;
 				case "bayrad":
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "Device={$realport}\n";
