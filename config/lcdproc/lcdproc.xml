@@ -129,6 +129,10 @@
 			<type>select</type>
 			<options>
 				<option>
+					<value>nexcom</value>
+					<name>nexcom</name>
+				</option>
+				<option>
 					<value>bayrad</value>
 					<name>bayrad</name>
 				</option>
