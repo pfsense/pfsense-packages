@@ -831,7 +831,8 @@
       <category>Network Management</category>
       <version>0.9</version>
       <status>BETA</status>
-      <maintainer></maintainer>
+      <maintainer>jimp@pfsense.org</maintainer>
+      <required_version>1.2.2</required_version>
       <depends_on_package_base_url>http://files.pfsense.com/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>rate-0.9.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/rate/rate.xml</config_file>
