@@ -258,29 +258,31 @@
 
 		$activecounter = 0;
 		$inactivecounter = 0;
-	
-		foreach ($config['ipsec']['tunnel'] as $tunnel){ 
-			$ipsecstatus = false;
 
-			$tun_disabled = "false";
-			$foundsrc = false;
-			$founddst = false; 
+		if($config['ipsec']['tunnel']) {
+			foreach ($config['ipsec']['tunnel'] as $tunnel){ 
+				$ipsecstatus = false;
+
+				$tun_disabled = "false";
+				$foundsrc = false;
+				$founddst = false; 
 	
-			if (isset($tunnel['disabled'])) {
-				$tun_disabled = "true";
-				continue;
-			}		
+				if (isset($tunnel['disabled'])) {
+					$tun_disabled = "true";
+					continue;
+				}		
 			
-			if(output_ipsec_tunnel_status($tunnel)) {
-				/* tunnel is up */
-				$iconfn = "true";
-				$activecounter++;
-			} else {
-				/* tunnel is down */
-				$iconfn = "false";
-				$inactivecounter++;
+				if(output_ipsec_tunnel_status($tunnel)) {
+					/* tunnel is up */
+					$iconfn = "true";
+					$activecounter++;
+				} else {
+					/* tunnel is down */
+					$iconfn = "false";
+					$inactivecounter++;
+				}
+			
 			}
-			
 		}
 
 		if (is_array($config['ipsec']['tunnel'])) {
