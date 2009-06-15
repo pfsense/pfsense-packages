@@ -26,9 +26,13 @@
         ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
         POSSIBILITY OF SUCH DAMAGE.
 */
-
-	// require_once("config.inc");
-	// require_once("functions.inc");
+	
+	/*   trick interface into running this.  we are only
+	 *   calling from useland so this is not a security issue 
+	 */
+	$HTTP_SERVER_VARS['PHP_AUTH_USER'] = "root";
+	$HTTP_SERVER_VARS['AUTH_USER'] = "root";
+	require_once("config.inc");
 	require_once("/usr/local/pkg/lcdproc.inc");
 	require_once("/usr/local/www/includes/functions.inc.php");
 

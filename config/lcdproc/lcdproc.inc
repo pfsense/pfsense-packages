@@ -319,7 +319,7 @@ fi
 
 EOD;
 			$start = $stop ."\n";
-			$start .= "\t/usr/local/sbin/LCDd -c ". LCDPROC_CONFIG ." &\n";
+			$start .= "\t/usr/local/sbin/LCDd -c ". LCDPROC_CONFIG ."\n";
 			$start .= "\t". LCDPROC_CLIENT ." &\n";
 
 			/* write out the configuration */
