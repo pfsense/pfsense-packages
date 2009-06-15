@@ -37,6 +37,11 @@
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/lcdproc/bin/nexcom.so</item>
+	    <prefix>/usr/local/lib/lcdproc/</prefix>
+	    <chmod>0755</chmod>
+	</additional_files_needed>
 	<service>
 		<name>lcdproc</name>
 		<rcfile>lcdproc.sh</rcfile>
