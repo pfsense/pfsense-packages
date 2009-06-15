@@ -333,13 +333,8 @@ EOD;
 					));
 			conf_mount_ro();
 
-			/* if lcdproc not running start it */
-			if(!lcdproc_running()) {
-				lcdproc_notice("Starting service lcdproc");
-				lcdproc_action('start');	
-			}
 			/* or restart lcdproc if settings were changed */
-			elseif($_POST['comport']) {
+			if(lcdproc_running($_POST['comport'])) {
 				lcdproc_notice("Restarting service lcdproc");
 				lcdproc_action('restart');
 			}
