@@ -45,7 +45,7 @@
 	<service>
 		<name>lcdproc</name>
 		<rcfile>lcdproc.sh</rcfile>
-		<executable>lcdproc</executable>
+		<executable>LCDd</executable>
 	</service>
 	<fields>
 		<field>
