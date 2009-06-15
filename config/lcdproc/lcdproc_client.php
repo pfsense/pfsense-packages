@@ -174,7 +174,10 @@
 
 	function get_ipsec_tunnel_sad() {
 		/* query SAD */
-		$fd = @popen("/sbin/setkey -D", "r");
+		if(file_exists("/usr/local/sbin/setkey"))
+			$fd = @popen("/usr/local/sbin/setkey -D", "r"); 
+		else
+			$fd = @popen("/sbin/setkey -D", "r"); 
 		$sad = array();
 		if ($fd) {
 			while (!feof($fd)) {
