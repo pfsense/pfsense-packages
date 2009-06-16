@@ -1,3 +1,0 @@
-alert ip any any -> $HOME_NET $SIP_PROXY_PORTS (msg:"OPTIONS SIP scan"; content:"OPTIONS"; depth:7; threshold: type both , track by_src, count 30, seconds 3; sid:5000004; rev:1;)
-alert ip any any -> $SIP_PROXY_IP $SIP_PROXY_PORTS (msg:"Excessive number of SIP 4xx Responses - possible user or password guessing attack"; pcre:"/^SIP\/2.0 4\d{2}"; threshold: type both, track by_src, count 100, seconds 60; sid:5000009; rev:1;)
-alert ip any any -> $SIP_PROXY_IP $SIP_PROXY_PORTS (msg:"Ghost call attack"; content:"SIP/2.0 180"; depth:11; threshold: type both, track by_src, count 100, seconds 60; sid:5000009; rev:1;)
