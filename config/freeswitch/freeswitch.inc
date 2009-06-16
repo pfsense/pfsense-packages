@@ -815,6 +815,7 @@ function sync_package_freeswitch_modules()
       $tmpxml .= "\n";
       $tmpxml .= "    <!-- Languages -->\n";
       if ($rowhelper['mod_spidermonkey'] == "enable"){ $tmpxml .= "    <load module=\"mod_spidermonkey\"/>\n"; }
+	  if ($rowhelper['mod_spidermonkey_odbc'] == "enable"){ $tmpxml .= "    <load module=\"mod_spidermonkey_odbc\"/>\n"; }
       if ($rowhelper['mod_perl'] == "enable"){      $tmpxml .= "    <load module=\"mod_perl\"/>\n"; }
       if ($rowhelper['mod_python'] == "enable"){    $tmpxml .= "    <load module=\"mod_python\"/>\n"; }
       if ($rowhelper['mod_java'] == "enable"){      $tmpxml .= "    <load module=\"mod_java\"/>\n"; }
@@ -829,6 +830,12 @@ function sync_package_freeswitch_modules()
       $tmpxml .= "\n";
       $tmpxml .= "    <!-- Say -->\n";
       if ($rowhelper['mod_say_en'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_en\"/>\n"; }
+	  if ($rowhelper['mod_say_de'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_de\"/>\n"; }
+	  if ($rowhelper['mod_say_es'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_es\"/>\n"; }
+	  if ($rowhelper['mod_say_fr'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_fr\"/>\n"; }
+	  if ($rowhelper['mod_say_it'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_it\"/>\n"; }
+	  if ($rowhelper['mod_say_nl'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_nl\"/>\n"; }
+	  if ($rowhelper['mod_say_ru'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_ru\"/>\n"; }
       if ($rowhelper['mod_say_zh'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_zh\"/>\n"; }
       $tmpxml .= "  </modules>\n";
       $tmpxml .= "</configuration>";
@@ -2575,9 +2582,9 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.9.2";
-	$freeswitch_build_version = "1.0.4 pre 6";
-	$freeswitch_build_revision = "13238";
+	$freeswitch_package_version = "0.9.2.2";
+	$freeswitch_build_version = "1.0.4 pre 8";
+	$freeswitch_build_revision = "13775";
 	
 	//set script execution time limit to 24 hours
 	set_time_limit (86400);
@@ -2659,7 +2666,9 @@ function freeswitch_php_install_command()
 	//download lib files
 	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libtinfo.so.5.6");
 	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libncurses.so.5.6");
+	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libncurses.so.5.7");
 	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libogg.so.5.3");
+	exec("cp /usr/local/lib/libogg.so.5.3 /usr/local/lib/libogg.so.5");
 	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libvorbis.so.4");
 	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libcurl.so.5");
 	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libodbc.so.1");
@@ -3188,6 +3197,9 @@ function freeswitch_php_install_command()
   	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_spidermonkey']) == 0) {
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_spidermonkey'] = "enable";
   	}
+  	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_spidermonkey_odbc']) == 0) {
+  	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_spidermonkey_odbc'] = "disable";
+  	}
   	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_perl']) == 0) {
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_perl'] = "disable";
   	}
@@ -3217,6 +3229,24 @@ function freeswitch_php_install_command()
   	}          	
   	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_en']) == 0) {
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_en'] = "enable";
+  	}
+  	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_de']) == 0) {
+  	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_de'] = "disable";
+  	}
+	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_es']) == 0) {
+  	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_es'] = "disable";
+  	}
+  	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_fr']) == 0) {
+  	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_fr'] = "disable";
+  	}
+  	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_it']) == 0) {
+  	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_it'] = "disable";
+  	}
+	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_nl']) == 0) {
+  	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_nl'] = "disable";
+  	}
+  	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_ru']) == 0) {
+  	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_ru'] = "disable";
   	}
   	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_zh']) == 0) {
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_zh'] = "disable";
