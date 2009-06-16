@@ -2582,9 +2582,9 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.9.2.2";
+	$freeswitch_package_version = "0.9.2.3";
 	$freeswitch_build_version = "1.0.4 pre 8";
-	$freeswitch_build_revision = "13775";
+	$freeswitch_build_revision = "13784";
 	
 	//set script execution time limit to 24 hours
 	set_time_limit (86400);
