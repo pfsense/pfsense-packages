@@ -129,13 +129,14 @@ if (isset($id) && $a_ivr[$id]) {
 	$ivrid = $a_ivr[$id]['ivrid'];
 	$pconfig['ivrextension'] = $a_ivr[$id]['ivrextension'];
 	$pconfig['ivrname'] = $a_ivr[$id]['ivrname'];
-	$pconfig['recordingidaction'] = $a_ivr[$id]['recordingidaction'];    	
+	$pconfig['recordingidaction'] = $a_ivr[$id]['recordingidaction'];
 	$pconfig['recordingidantiaction'] = $a_ivr[$id]['recordingidantiaction'];
 	$pconfig['ivrtimeout'] = $a_ivr[$id]['ivrtimeout'];
 	$pconfig['ivrcalltimeout'] = $a_ivr[$id]['ivrcalltimeout'];
 	$pconfig['ivrcontext'] = $a_ivr[$id]['ivrcontext'];
-	$pconfig['ivrdirectdial'] = $a_ivr[$id]['ivrdirectdial'];	
+	$pconfig['ivrdirectdial'] = $a_ivr[$id]['ivrdirectdial'];
 	$pconfig['ivrringback'] = $a_ivr[$id]['ivrringback'];
+	$pconfig['ivrcidnameprefix'] = $a_ivr[$id]['ivrcidnameprefix'];	
 	$pconfig['ivrconditionjs'] = ($a_ivr[$id]['ivrconditionjs']);
 	$pconfig['ivrdescr'] = $a_ivr[$id]['ivrdescr'];
 }
@@ -170,14 +171,15 @@ if ($_POST) {
     	}
 		$ivrent['ivrextension'] = $_POST['ivrextension'];
 		$ivrent['ivrname'] = $_POST['ivrname'];
-		$ivrent['recordingidaction'] = $_POST['recordingidaction'];			
+		$ivrent['recordingidaction'] = $_POST['recordingidaction'];
 		$ivrent['recordingidantiaction'] = $_POST['recordingidantiaction'];
 		$ivrent['ivrtimeout'] = $_POST['ivrtimeout'];
-		$ivrent['ivrcalltimeout'] = $_POST['ivrcalltimeout'];		
+		$ivrent['ivrcalltimeout'] = $_POST['ivrcalltimeout'];
 		$ivrent['ivrcontext'] = $_POST['ivrcontext'];
-		$ivrent['ivrdirectdial'] = $_POST['ivrdirectdial'];		
-		$ivrent['ivrringback'] = $_POST['ivrringback'];		
-		$ivrent['ivrconditionjs'] = base64_encode($_POST['ivrconditionjs']);		
+		$ivrent['ivrdirectdial'] = $_POST['ivrdirectdial'];
+		$ivrent['ivrringback'] = $_POST['ivrringback'];
+		$ivrent['ivrcidnameprefix'] = $_POST['ivrcidnameprefix'];
+		$ivrent['ivrconditionjs'] = base64_encode($_POST['ivrconditionjs']);
 		$ivrent['ivrdescr'] = $_POST['ivrdescr'];
 
 		if (isset($id) && $a_ivr[$id]) {
@@ -395,6 +397,13 @@ display_top_tabs(build_menu());
 				(music on hold) ring (ring tone.) default: music 
 				</span>
               </td>
+            </tr>
+			
+            <tr>
+              <td width="22%" valign="top" class="vncellreq">CID Prefix</td>
+              <td width="78%" class="vtable">
+                <input name="ivrcidnameprefix" type="text" class="formfld" id="ivrcidnameprefix" size="40" value="<?=htmlspecialchars($pconfig['ivrcidnameprefix']);?>">
+                <br> <span class="vexpl">Set a prefix on the caller ID name. (optional)</span></td>
             </tr>
 			
             <tr>

@@ -1030,6 +1030,7 @@ function sync_package_freeswitch_hunt_group()
 					//$rowhelper['huntgrouptype']
 					//$rowhelper['huntgrouptimeout']
 					//$rowhelper['huntgroupcontext']
+					//$rowhelper['huntgroupcidnameprefix']					
 					//$rowhelper['huntgroupdescr']
 
 				//add each Hunt Group to the dialplan
@@ -1178,9 +1179,20 @@ function sync_package_freeswitch_hunt_group()
 					$tmp .= "	domain_name = session.getVariable(\"domain_name\");\n";
 					$tmp .= "	domain = session.getVariable(\"domain\");\n";
 					$tmp .= "	us_ring = session.getVariable(\"us-ring\");\n";
-					$tmp .= "	caller_id_name = session.getVariable(\"caller_id_name\");\n";
+					$tmp .= "	caller_id_name = session.getVariable(\"caller_id_name\");\n";					
 					$tmp .= "	caller_id_number = session.getVariable(\"caller_id_number\");\n";
+					$tmp .= "	effective_caller_id_name = session.getVariable(\"effective_caller_id_name\");\n";
+					$tmp .= "	effective_caller_id_number = session.getVariable(\"effective_caller_id_number\");\n";
+					$tmp .= "	outbound_caller_id_name = session.getVariable(\"outbound_caller_id_name\");\n";
+					$tmp .= "	outbound_caller_id_number = session.getVariable(\"outbound_caller_id_number\");\n";
 					$tmp .= "\n";
+					
+					//set caller id prefix
+					if (strlen($rowhelper['huntgroupcidnameprefix'])> 0) {
+						$tmp .= "session.execute(\"set\", \"caller_id_name=".$rowhelper['huntgroupcidnameprefix']."\"+caller_id_name);\n";
+						$tmp .= "session.execute(\"set\", \"effective_caller_id_name=".$rowhelper['huntgroupcidnameprefix']."\"+effective_caller_id_name);\n";
+						$tmp .= "session.execute(\"set\", \"outbound_caller_id_name=".$rowhelper['huntgroupcidnameprefix']."\"+outbound_caller_id_name);\n";
+					}
 					$tmp .= "	session.execute(\"set\", \"ringback=\"+us_ring);          //set to ringtone\n";
 					$tmp .= "	session.execute(\"set\", \"transfer_ringback=\"+us_ring); //set to ringtone\n";
 					if ($rowhelper['huntgrouptimeout'] > 0) {
@@ -1577,6 +1589,8 @@ function sync_package_freeswitch_ivr()
 	    $rowhelper['ivrcontext']
 	    $rowhelper['ivrdirectdial']
 	    $rowhelper['ivrconditionjs']
+	    $rowhelper['ivrringback']
+	    $rowhelper['ivrcidnameprefix']		
 	    $rowhelper['ivrdescr']
 	    */
 	
@@ -1733,8 +1747,21 @@ function sync_package_freeswitch_ivr()
 		$tmp .= " domain_name = session.getVariable(\"domain_name\");\n";
 		$tmp .= " domain = session.getVariable(\"domain\");\n";
 		$tmp .= " us_ring = session.getVariable(\"us-ring\");\n";
-		$tmp .= " caller_id_name = session.getVariable(\"caller_id_name\");\n";
+		$tmp .= " caller_id_name = session.getVariable(\"caller_id_name\");\n";					
 		$tmp .= " caller_id_number = session.getVariable(\"caller_id_number\");\n";
+		$tmp .= " effective_caller_id_name = session.getVariable(\"effective_caller_id_name\");\n";
+		$tmp .= " effective_caller_id_number = session.getVariable(\"effective_caller_id_number\");\n";
+		$tmp .= " outbound_caller_id_name = session.getVariable(\"outbound_caller_id_name\");\n";
+		$tmp .= " outbound_caller_id_number = session.getVariable(\"outbound_caller_id_number\");\n";		
+		$tmp .= "\n";
+					
+		//set caller id prefix
+		if (strlen($rowhelper['ivrcidnameprefix'])> 0) {
+			$tmp .= "session.execute(\"set\", \"caller_id_name=".$rowhelper['ivrcidnameprefix']."\"+caller_id_name);\n";
+			$tmp .= "session.execute(\"set\", \"effective_caller_id_name=".$rowhelper['ivrcidnameprefix']."\"+effective_caller_id_name);\n";
+			$tmp .= "session.execute(\"set\", \"outbound_caller_id_name=".$rowhelper['ivrcidnameprefix']."\"+outbound_caller_id_name);\n";
+		}
+		
 		$tmp .= "\n";
 		
 		$tmp .= " session.execute(\"set\", \"continue_on_fail=true\");\n";
@@ -1969,10 +1996,10 @@ function sync_package_freeswitch_ivr()
       		        	    //$tmpaction .= "\n";
       		        	
 						switch ($row['optionnumber']) {
-						case "t":      		
-								break;
-						case "d":      		
-								break;								
+						//case "t":      		
+						//		break;
+						//case "d":      		
+						//		break;								
 						default:
 								//$tmpaction .= "             //console_log( \"info\", \"IVR Detected 1 digit \\n\" );\n";
 								if ($x == 0) {
@@ -2194,10 +2221,10 @@ function sync_package_freeswitch_ivr()
       		        if ($row['optionaction'] == "anti-action") {
       		        	
       		        	switch ($row['optionnumber']) {
-      		            case "t":
-								//break;
-      		            case "d":
-								//break;
+      		            //case "t":
+						//		//break;
+      		            //case "d":
+						//		//break;
       		            default:
 								//$tmpantiaction .= "             //console_log( \"info\", \"IVR Detected 1 digit \\n\" );\n";
 
@@ -2582,7 +2609,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.9.2.3";
+	$freeswitch_package_version = "0.9.2.4";
 	$freeswitch_build_version = "1.0.4 pre 8";
 	$freeswitch_build_revision = "13784";
 	
@@ -2634,7 +2661,6 @@ function freeswitch_php_install_command()
 	exec("cp /tmp/dialplan.public.xml /usr/local/freeswitch/conf/dialplan/public.xml");
 	unlink_if_exists("/tmp/dialplan.public.xml");
 	
-	
 	//make a backup copy of the default config used with the 'Restore Default' buttons on the text areas.
 	exec("cp -R /usr/local/freeswitch/conf /usr/local/freeswitch/conf.orig");
 	
@@ -2650,8 +2676,6 @@ function freeswitch_php_install_command()
 	   exec("mkdir /usr/local/freeswitch/sounds/custom/8000/");
 	}
 	
-
-	
 	//copy audio files
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_your_pin_number.wav");
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_pin_number.wav");	
@@ -2662,6 +2686,8 @@ function freeswitch_php_install_command()
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/begin_recording.wav");
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/your_pin_number_is_incorect_goodbye.wav");
 
+	//mod_fax
+	exec("cd /usr/local/freeswitch/mod/;fetch http://www.pfsense.com/packages/config/freeswitch/mod_fax.so");
 	
 	//download lib files
 	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libtinfo.so.5.6");
