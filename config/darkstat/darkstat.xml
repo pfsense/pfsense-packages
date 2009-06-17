@@ -106,4 +106,7 @@
 	<custom_php_resync_config_command>
 		sync_package_darkstat();
 	</custom_php_resync_config_command>
+	<custom_php_deinstall_command>
+			exec("rm -f /usr/local/etc/rc.d/darkstat.sh");
+	</custom_php_deinstall_command>
 </packagegui>
