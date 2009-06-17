@@ -31,7 +31,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("services.inc");
+require_once("services.inc");
 
 function pkg_is_service_running($servicename) 
 {

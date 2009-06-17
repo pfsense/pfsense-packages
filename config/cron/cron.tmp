@@ -27,8 +27,8 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
-require("/usr/local/pkg/cron.inc");
+require_once("guiconfig.inc");
+require_once("/usr/local/pkg/cron.inc");
 
 $a_cron 	   = &$config['cron']['item'];
 
