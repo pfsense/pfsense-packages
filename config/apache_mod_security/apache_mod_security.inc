@@ -244,54 +244,54 @@ DocumentRoot "/usr/local/apache"
 #
 # This should be changed to whatever you set DocumentRoot to.
 #
-<Directory "/usr/local/www/apache22/data">
-    #
-    # Possible values for the Options directive are "None", "All",
-    # or any combination of:
-    #   Indexes Includes FollowSymLinks SymLinksifOwnerMatch ExecCGI MultiViews
-    #
-    # Note that "MultiViews" must be named *explicitly* --- "Options All"
-    # doesn't give it to you.
-    #
-    # The Options directive is both complicated and important.  Please see
-    # http://httpd.apache.org/docs/2.2/mod/core.html#options
-    # for more information.
-    #
-    Options Indexes FollowSymLinks
-
-    #
-    # AllowOverride controls what directives may be placed in .htaccess files.
-    # It can be "All", "None", or any combination of the keywords:
-    #   Options FileInfo AuthConfig Limit
-    #
-    AllowOverride None
-
-    #
-    # Controls who can get stuff from this server.
-    #
-    Order allow,deny
-    Allow from all
-
-</Directory>
-
+#<Directory "/usr/local/www/apache/">
+#    #
+#    # Possible values for the Options directive are "None", "All",
+#    # or any combination of:
+#    #   Indexes Includes FollowSymLinks SymLinksifOwnerMatch ExecCGI MultiViews
+#    #
+#    # Note that "MultiViews" must be named *explicitly* --- "Options All"
+#    # doesn't give it to you.
+#    #
+#    # The Options directive is both complicated and important.  Please see
+#    # http://httpd.apache.org/docs/2.2/mod/core.html#options
+#    # for more information.
+#    #
+#    Options Indexes FollowSymLinks
+#
+#    #
+#    # AllowOverride controls what directives may be placed in .htaccess files.
+#    # It can be "All", "None", or any combination of the keywords:
+#    #   Options FileInfo AuthConfig Limit
+#    #
+#    AllowOverride None
+#
+#    #
+#    # Controls who can get stuff from this server.
+#    #
+#    Order allow,deny
+#    Allow from all
+#
+#</Directory>
+#
 #
 # DirectoryIndex: sets the file that Apache will serve if a directory
 # is requested.
 #
-<IfModule dir_module>
-    DirectoryIndex index.html
-</IfModule>
-
+#<IfModule dir_module>
+#    DirectoryIndex index.html
+#</IfModule>
+#
 #
 # The following lines prevent .htaccess and .htpasswd files from being 
 # viewed by Web clients. 
 #
-<FilesMatch "^\.ht">
-    Order allow,deny
-    Deny from all
-    Satisfy All
-</FilesMatch>
-
+#<FilesMatch "^\.ht">
+#    Order allow,deny
+#    Deny from all
+#    Satisfy All
+#</FilesMatch>
+#
 #
 # ErrorLog: The location of the error log file.
 # If you do not specify an ErrorLog directive within a <VirtualHost>
@@ -337,55 +337,55 @@ LogLevel warn
     CustomLog "/var/log/httpd-access.log" combined
 </IfModule>
 
-<IfModule alias_module>
-    #
-    # Redirect: Allows you to tell clients about documents that used to 
-    # exist in your server's namespace, but do not anymore. The client 
-    # will make a new request for the document at its new location.
-    # Example:
-    # Redirect permanent /foo http://www.example.com/bar
+#<IfModule alias_module>
+#    #
+#    # Redirect: Allows you to tell clients about documents that used to 
+#    # exist in your server's namespace, but do not anymore. The client 
+#    # will make a new request for the document at its new location.
+#    # Example:
+#    # Redirect permanent /foo http://www.example.com/bar
+#
+#    #
+#    # Alias: Maps web paths into filesystem paths and is used to
+#    # access content that does not live under the DocumentRoot.
+#    # Example:
+#    # Alias /webpath /full/filesystem/path
+#    #
+#    # If you include a trailing / on /webpath then the server will
+#    # require it to be present in the URL.  You will also likely
+#    # need to provide a <Directory> section to allow access to
+#    # the filesystem path.
+#
+#    #
+#    # ScriptAlias: This controls which directories contain server scripts. 
+#    # ScriptAliases are essentially the same as Aliases, except that
+#    # documents in the target directory are treated as applications and
+#    # run by the server when requested rather than as documents sent to the
+#    # client.  The same rules about trailing "/" apply to ScriptAlias
+#    # directives as to Alias.
+#    #
+#    ScriptAlias /cgi-bin/ "/usr/local/www/apache22/cgi-bin/"
+#
+#</IfModule>
 
-    #
-    # Alias: Maps web paths into filesystem paths and is used to
-    # access content that does not live under the DocumentRoot.
-    # Example:
-    # Alias /webpath /full/filesystem/path
-    #
-    # If you include a trailing / on /webpath then the server will
-    # require it to be present in the URL.  You will also likely
-    # need to provide a <Directory> section to allow access to
-    # the filesystem path.
-
-    #
-    # ScriptAlias: This controls which directories contain server scripts. 
-    # ScriptAliases are essentially the same as Aliases, except that
-    # documents in the target directory are treated as applications and
-    # run by the server when requested rather than as documents sent to the
-    # client.  The same rules about trailing "/" apply to ScriptAlias
-    # directives as to Alias.
-    #
-    ScriptAlias /cgi-bin/ "/usr/local/www/apache22/cgi-bin/"
-
-</IfModule>
-
-<IfModule cgid_module>
-    #
-    # ScriptSock: On threaded servers, designate the path to the UNIX
-    # socket used to communicate with the CGI daemon of mod_cgid.
-    #
-    #Scriptsock /var/run/cgisock
-</IfModule>
+#<IfModule cgid_module>
+#    #
+#    # ScriptSock: On threaded servers, designate the path to the UNIX
+#    # socket used to communicate with the CGI daemon of mod_cgid.
+#    #
+#    #Scriptsock /var/run/cgisock
+#</IfModule>
 
 #
 # "/usr/local/www/apache22/cgi-bin" should be changed to whatever your ScriptAliased
 # CGI directory exists, if you have that configured.
 #
-<Directory "/usr/local/www/apache22/cgi-bin">
-    AllowOverride None
-    Options None
-    Order allow,deny
-    Allow from all
-</Directory>
+#<Directory "/usr/local/www/apache22/cgi-bin">
+#    AllowOverride None
+#    Options None
+#    Order allow,deny
+#    Allow from all
+#</Directory>
 
 #
 # DefaultType: the default MIME type the server will use for a document
