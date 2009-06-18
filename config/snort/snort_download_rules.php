@@ -236,20 +236,7 @@ if (0 == filesize("{$tmpfname}/snortrules-snapshot-2.8.tar.gz.md5")){
     exit(0);
 }
 
-/* If emergingthreats md5 file is empty wait 15min exit */
-$emergingthreats_url_chk = $config['installedpackages']['snort']['config'][0]['emergingthreats'];
-if ($emergingthreats_url_chk == on) {
-if (0 == filesize("{$tmpfname}/version.txt")){
-    update_status(gettext("There was an error getting emergingthreats md5."));
-    update_output_window(gettext("There was an error getting emergingthreats md5."));
-    hide_progress_bar_status();
-    /* Display last time of sucsessful md5 check from cache */
-//   echo "\n<p align=center><b>You last checked for updates: </b>{$last_md5_download}</p>\n";
-//   echo "\n<p align=center><b>You last installed for rules: </b>{$last_rules_install}</p>\n";
-   echo "\n\n</body>\n</html>\n";
-   exit(0);
-  }
-}
+/* If emergingthreats md5 file is empty wait 15min exit not needed */
 
 /* If pfsense md5 file is empty wait 15min exit */
 if (0 == filesize("{$tmpfname}/$pfsense_rules_filename_md5")){
@@ -360,6 +347,11 @@ if (file_exists("{$tmpfname}/{$snort_filename}")) {
     download_file_with_progress_bar("http://dl.snort.org/{$premium_url}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz?oink_code={$oinkid}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
     update_all_status($static_output);
     update_status(gettext("Done downloading rules file."));
+    if (150000 > filesize("{$tmpfname}/$snort_filename")){
+          update_status(gettext("There is on error with snort rules download..."));
+          update_output_window(gettext("Snort rules file download failed..."));
+          exit(0);
+  }		  
  }
 }
 
