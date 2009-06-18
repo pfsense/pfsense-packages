@@ -55,6 +55,10 @@
 	</additional_files_needed>
 	<tabs>
 		<tab>
+			<text>Proxy Server Settings</text>
+			<url>/pkg.php?xml=apache_mod_security.xml&amp;id=0</url>
+		</tab>
+		<tab>
 			<text>Site Proxies</text>
 			<url>/pkg.php?xml=apache_mod_security.xml</url>
 			<active/>

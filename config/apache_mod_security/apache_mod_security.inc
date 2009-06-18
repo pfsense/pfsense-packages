@@ -15,18 +15,35 @@ function generate_apache_configuration() {
 	// Generate mod_proxy specific configuration
 	$mod_proxy = "ProxyRequests on\n";
 	foreach($config['installedpackages']['apache_mod_security']['config'] $ams) {
-
-		$sitename = "";
-
-		$mod_proxy .= "ProxyPass /{$ams['sitename']}/ {$ams['siteurl']} \n";
-		$mod_proxy .= "ProxyHTMLURLMap {$ams['siteurl']} /{$ams['sitename']} \n";
-		$mod_proxy .= "<Location /{$ams['sitename']}/>\n";
+		$sitename = str_replace(" ", "", $ams['sitename']));
+		$mod_proxy .= "ProxyPass /{$sitename}/ {$sitename} \n";
+		$mod_proxy .= "ProxyHTMLURLMap {$ams['siteurl']} /{$sitename} \n";
+		$mod_proxy .= "<Location /{$sitename}/>\n";
 		$mod_proxy .= "        ProxyPassReverse /\n";
 		$mod_proxy .= "        SetOutputFilter  proxy-html\n";
-		$mod_proxy .= "        ProxyHTMLURLMap  /      /{$ams['sitename']}/\n";
-		$mod_proxy .= "        ProxyHTMLURLMap  /{$ams['sitename']}  /{$ams['sitename']}\n";
+		$mod_proxy .= "        ProxyHTMLURLMap  /      /{$sitename}/\n";
+		$mod_proxy .= "        ProxyHTMLURLMap  /{$ams['sitename']}  /{$sitename}\n";
 		$mod_proxy .= "        RequestHeader    unset  Accept-Encoding\n";
 		$mod_proxy .= "</Location>\n";
+	}
+
+	// Set global site e-mail
+	if($config['installedpackages']['apache_mod_security_settings']['config']['globalsiteadminemail']) {
+		$global_site_email = $config['installedpackages']['apache_mod_security_settings']['config']['globalsiteadminemail'];
+	} else {
+		$global_site_email = "admin@admin.comn";
+		log_error("WARNING!  Global site Administrator E-Mail address has not been set.  Defaulting to bogus e-mail address.");
+	}
+
+	// Set global site namne
+	if($config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoipaddr']) {
+		$global_listen  = "Listen " . $config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoipaddr'];
+		if($config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoport'])
+			$global_listen .= ":" . $config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoport'];
+		else 
+			$global_listen .= ":80";
+	} else {
+		$global_listen = "Listen {$config['system']['hostname']}.{$config['system']['domain']}";
 	}
 
 	$apache_config = <<<EOF
@@ -75,8 +92,7 @@ ServerRoot "/usr/local"
 # Change this to Listen on specific IP addresses as shown below to 
 # prevent Apache from glomming onto all bound IP addresses.
 #
-#Listen 12.34.56.78:80
-Listen 80
+{$global_listen}
 
 #
 # Dynamic Shared Object (DSO) Support
@@ -183,7 +199,7 @@ Group www
 # e-mailed.  This address appears on some server-generated pages, such
 # as error documents.  e.g. admin@your-domain.com
 #
-ServerAdmin you@example.com
+ServerAdmin {$global_site_email}
 
 #
 # ServerName gives the name and port that the server uses to identify itself.
@@ -192,7 +208,7 @@ ServerAdmin you@example.com
 #
 # If your host doesn't have a registered DNS name, enter its IP address here.
 #
-#ServerName www.example.com:80
+#ServerName {$globalsiteurl}:80
 
 #
 # DocumentRoot: The directory out of which you will serve your
