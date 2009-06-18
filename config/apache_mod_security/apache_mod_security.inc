@@ -1,14 +1,17 @@
 <?php
 
-
 // Syntax:ProxyPreserveHost On|Off
 
+require_once("apache_mod_security_physical.inc");
+
 function apache_mod_security_install() {
-	
+	conf_mount_rw();
+	if(!is_dir("/usr/local/apache")) 
+		safe_mkdir("/usr/local/apache");
 }
 
 function apache_mod_security_deinstall() {
-	
+
 }
 
 function generate_apache_configuration() {
@@ -215,7 +218,7 @@ ServerAdmin {$global_site_email}
 # documents. By default, all requests are taken from this directory, but
 # symbolic links and aliases may be used to point to other locations.
 #
-DocumentRoot "/usr/local/www/apache22/data"
+DocumentRoot "/usr/local/apache"
 
 #
 # Each directory to which Apache has access can be configured with respect
