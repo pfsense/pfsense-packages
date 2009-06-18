@@ -348,8 +348,8 @@ if (file_exists("{$tmpfname}/{$snort_filename}")) {
     update_all_status($static_output);
     update_status(gettext("Done downloading rules file."));
     if (150000 > filesize("{$tmpfname}/$snort_filename")){
-          update_status(gettext("There is on error with snort rules download..."));
-          update_output_window(gettext("Snort rules file download failed..."));
+          update_status(gettext("Error with the snort rules download..."));
+          update_output_window(gettext("Snort rules file downloaded failed..."));
           exit(0);
   }		  
  }
