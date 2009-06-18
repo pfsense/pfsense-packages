@@ -343,7 +343,7 @@ if ($snort_md5_check_ok == on && $pfsense_md5_check_ok == on && $emergingthreats
 		
 /* "You are Not Up to date */;
 update_status(gettext("You are NOT up to date..."));
-		update_output_window(gettext("Stoping Snort service..."));
+		update_output_window(gettext("Stopping Snort service..."));
 stop_service("snort");
 sleep(2);
 // start_service("snort");
