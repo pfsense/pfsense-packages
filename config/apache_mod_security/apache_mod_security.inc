@@ -2,8 +2,6 @@
 
 // Syntax:ProxyPreserveHost On|Off
 
-require_once("apache_mod_security_physical.inc");
-
 function apache_mod_security_install() {
 	conf_mount_rw();
 	if(!is_dir("/usr/local/apachemodsecurity")) 
