@@ -94,7 +94,10 @@
 		<name>apache_mod_security</name>
 		<rcfile>/usr/local/etc/rc.d/apache_mod_security.sh</rcfile>
 		<executable>httpd</executable>
-	</service>	
+	</service>
+	<custom_php_resync_config_command>
+		apache_mod_security_resync();
+	</custom_php_resync_config_command>
 	<custom_add_php_command_late>
 	</custom_add_php_command_late>
 	<custom_php_install_command>

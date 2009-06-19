@@ -11,7 +11,11 @@ function apache_mod_security_install() {
 }
 
 function apache_mod_security_deinstall() {
+	exec("rm -rf /usr/local/apachemodsecurity");
+}
 
+function apache_mod_security_resync() {
+	generate_apache_configuration();
 }
 
 function generate_apache_configuration() {
