@@ -396,7 +396,7 @@ LogLevel warn
 # keep browsers from trying to display binary files as though they are
 # text.
 #
-DefaultType text/plain
+DefaultType text/plainm
 
 <IfModule mime_module>
     #
