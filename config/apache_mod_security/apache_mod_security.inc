@@ -524,9 +524,39 @@ SSLRandomSeed startup builtin
 SSLRandomSeed connect builtin
 </IfModule>
 
-Include etc/apache22/Includes/*.conf
+<IfModule mod_security.c>
+    # Turn the filtering engine On or Off
+    SecFilterEngine On
+    
+    # Make sure that URL encoding is valid
+    SecFilterCheckURLEncoding On
+    
+    # Unicode encoding check
+    SecFilterCheckUnicodeEncoding Off
+    
+    # Only allow bytes from this range
+    SecFilterForceByteRange 0 255
+    
+    # Only log suspicious requests
+    SecAuditEngine RelevantOnly
+    
+    # The name of the audit log file
+    SecAuditLog logs/audit_log
+    # Debug level set to a minimum
+    SecFilterDebugLog logs/modsec_debug_log    
+    SecFilterDebugLevel 0
+    
+    # Should mod_security inspect POST payloads
+    SecFilterScanPOST On
+    
+    # By default log and deny suspicious requests
+    # with HTTP status 500
+    SecFilterDefaultAction "deny,log,status:500"
+</IfModule>
 
 {$mod_proxy}
+
+Include etc/apache22/Includes/*.conf
 
 EOF;
 
