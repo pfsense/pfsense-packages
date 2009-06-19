@@ -63,11 +63,6 @@
 			<url>/pkg.php?xml=apache_mod_security.xml</url>
 			<active/>
 		</tab>
-		<tab>
-			<text>Physical Hosting</text>
-			<url>/pkg.php?xml=apache_mod_security_physical_hosting.xml</url>
-			<active/>
-		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
