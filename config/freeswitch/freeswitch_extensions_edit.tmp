@@ -55,6 +55,7 @@ if (isset($id) && $a_extensions[$id]) {
 	$pconfig['outbound_caller_id_number'] = $a_extensions[$id]['outbound_caller_id_number'];
 	$pconfig['vm-mailto'] = $a_extensions[$id]['vm-mailto'];
 	$pconfig['vm-attach-file'] = $a_extensions[$id]['vm-attach-file'];
+	$pconfig['vm-keep-local-after-email'] = $a_extensions[$id]['vm-keep-local-after-email'];	
 	$pconfig['user_context'] = $a_extensions[$id]['user_context'];
 	$pconfig['callgroup'] = $a_extensions[$id]['callgroup'];
 	$pconfig['auth-acl'] = $a_extensions[$id]['auth-acl'];
@@ -71,6 +72,12 @@ if ($_POST) {
 
 	if (!$input_errors) {
 	
+		$effective_caller_id_number = $_POST['effective_caller_id_number'];
+		$outbound_caller_id_number =  $_POST['outbound_caller_id_number'];		
+		$replace_array = array("(", ")", " ", "-");
+		$effective_caller_id_number = str_replace($replace_array, "", $effective_caller_id_number);
+		$outbound_caller_id_number = str_replace($replace_array, "", $outbound_caller_id_number);
+		
 		$ent = array();
 		$ent['extension'] = $_POST['extension'];
 		$ent['password'] = $_POST['password'];
@@ -78,11 +85,12 @@ if ($_POST) {
 		$ent['vm-password'] = $_POST['vm-password'];
 		$ent['accountcode'] = $_POST['accountcode'];
 		$ent['effective_caller_id_name'] = $_POST['effective_caller_id_name'];
-		$ent['effective_caller_id_number'] = $_POST['effective_caller_id_number'];
+		$ent['effective_caller_id_number'] = $effective_caller_id_number;
 		$ent['outbound_caller_id_name'] = $_POST['outbound_caller_id_name'];
-		$ent['outbound_caller_id_number'] = $_POST['outbound_caller_id_number'];
+		$ent['outbound_caller_id_number'] = $outbound_caller_id_number;
 		$ent['vm-mailto'] = $_POST['vm-mailto'];
 		$ent['vm-attach-file'] = $_POST['vm-attach-file'];
+		$ent['vm-keep-local-after-email'] = $_POST['vm-keep-local-after-email];		
 		$ent['user_context'] = $_POST['user_context'];
 		$ent['callgroup'] = $_POST['callgroup'];		
 		$ent['auth-acl'] = $_POST['auth-acl'];
@@ -235,7 +243,32 @@ display_top_tabs(build_menu());
                 ?>
                 Choose whether to attach the file to the email.
               </td>
-            </tr>		
+            </tr>
+            <tr>
+              <td width="25%" valign="top" class="vncellreq" nowrap>vm-keep-local-after-email</td>
+              <td width="75%" class="vtable">
+                <?php
+                echo "              <select name='vm-keep-local-after-email' class='formfld unknown'>\n";
+                echo "                <option></option>\n";
+                switch (htmlspecialchars($pconfig['vm-keep-local-after-email'])) {
+                case "true":
+                    echo "              <option value='true' selected='yes'>true</option>\n";
+                    echo "              <option value='false'>false</option>\n";
+                    break;
+                case "false":
+                    echo "              <option value='true'>true</option>\n";
+                    echo "              <option value='false' selected='yes'>false</option>\n";
+
+                    break;
+                default:
+                    echo "              <option value='true' selected='yes'>true</option>\n";
+                    echo "              <option value='false'>false</option>\n";
+                }
+                echo "              </select>\n";
+                ?>
+                Keep local file after sending the email.
+              </td>
+            </tr>
             <tr>
               <td width="25%" valign="top" class="vncellreq">User Context</td>
               <td width="75%" class="vtable">

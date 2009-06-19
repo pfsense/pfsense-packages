@@ -57,6 +57,7 @@ if (isset($id) && $a_hunt_group[$id]) {
 	$pconfig['huntgrouptimeout'] = $a_hunt_group[$id]['huntgrouptimeout'];
 	$pconfig['huntgrouptimeoutdestination'] = $a_hunt_group[$id]['huntgrouptimeoutdestination'];
 	$pconfig['huntgrouptimeouttype'] = $a_hunt_group[$id]['huntgrouptimeouttype'];
+	$pconfig['huntgroupringback'] = $a_hunt_group[$id]['huntgroupringback'];	
 	$pconfig['huntgroupcidnameprefix'] = $a_hunt_group[$id]['huntgroupcidnameprefix'];
 	$pconfig['huntgroupdescr'] = $a_hunt_group[$id]['huntgroupdescr'];
 }
@@ -95,6 +96,7 @@ if ($_POST) {
 		$huntgroupent['huntgrouptimeout'] = $_POST['huntgrouptimeout'];
 		$huntgroupent['huntgrouptimeoutdestination'] = $_POST['huntgrouptimeoutdestination'];
 		$huntgroupent['huntgrouptimeouttype'] = $_POST['huntgrouptimeouttype'];
+		$huntgroupent['huntgroupringback'] = $_POST['huntgroupringback'];		
 		$huntgroupent['huntgroupcidnameprefix'] = $_POST['huntgroupcidnameprefix'];
 		$huntgroupent['huntgroupdescr'] = $_POST['huntgroupdescr'];
 
@@ -244,7 +246,33 @@ display_top_tabs(build_menu());
                 ?>
               </td>
             </tr>
-			
+            <tr>
+              <td width="22%" valign="top" class="vncellreq">Ring Back</td>
+              <td width="78%" class="vtable">
+                <?php
+                echo "                <select name='huntgroupringback' class='formfld'>\n";
+                echo "                <option></option>\n";
+                if (htmlspecialchars($pconfig['huntgroupringback']) == "ring") {
+                    echo "                <option selected='yes'>ring</option>\n";
+                }
+                else {
+                    echo "                <option>ring</option>\n";
+                }
+                if (htmlspecialchars($pconfig['huntgroupringback']) == "music") {
+                    echo "                <option selected='yes'>music</option>\n";
+                }
+                else {
+                    echo "                <option>music</option>\n";
+                }
+                echo "                </select>\n";
+                ?>
+				<br>
+				<span class="vexpl">
+				Defines what the caller will hear while destination is being called. The choices are music 
+				(music on hold) ring (ring tone.) default: music 
+				</span>
+              </td>
+            </tr>
             <tr>
               <td width="22%" valign="top" class="vncell">CID Prefix</td>
               <td width="78%" class="vtable">

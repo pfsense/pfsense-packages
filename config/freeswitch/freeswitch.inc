@@ -588,7 +588,16 @@ function sync_package_freeswitch_extensions()
               default:
               		$tmpxml .= "      <param name=\"vm-attach-file\" value=\"true\"/>\n";
               }
-
+              switch ($rowhelper['vm-keep-local-after-email']) {
+              case "true":
+              		$tmpxml .= "      <param name=\"vm-keep-local-after-email\" value=\"true\"/>\n";
+              		break;
+              case "false":
+              		$tmpxml .= "      <param name=\"vm-keep-local-after-email\" value=\"false\"/>\n";
+              		break;
+              default:
+              		$tmpxml .= "      <param name=\"vm-keep-local-after-email\" value=\"true\"/>\n";
+              }
               $tmpxml .= "      <param name=\"vm-mailto\" value=\"" . $rowhelper['vm-mailto'] . "\"/>\n";
           }
           if (strlen($rowhelper['auth-acl']) > 0) {
@@ -1030,6 +1039,7 @@ function sync_package_freeswitch_hunt_group()
 					//$rowhelper['huntgrouptype']
 					//$rowhelper['huntgrouptimeout']
 					//$rowhelper['huntgroupcontext']
+					//$rowhelper['huntgroupringback']
 					//$rowhelper['huntgroupcidnameprefix']					
 					//$rowhelper['huntgroupdescr']
 
@@ -1193,8 +1203,22 @@ function sync_package_freeswitch_hunt_group()
 						$tmp .= "session.execute(\"set\", \"effective_caller_id_name=".$rowhelper['huntgroupcidnameprefix']."\"+effective_caller_id_name);\n";
 						$tmp .= "session.execute(\"set\", \"outbound_caller_id_name=".$rowhelper['huntgroupcidnameprefix']."\"+outbound_caller_id_name);\n";
 					}
-					$tmp .= "	session.execute(\"set\", \"ringback=\"+us_ring);          //set to ringtone\n";
-					$tmp .= "	session.execute(\"set\", \"transfer_ringback=\"+us_ring); //set to ringtone\n";
+					
+					if (isset($rowhelper['huntgroupringback'])){
+						if ($rowhelper['huntgroupringback'] == "ring"){
+							$tmp .= " session.execute(\"set\", \"ringback=\"+us_ring);          //set to ringtone\n";
+							$tmp .= " session.execute(\"set\", \"transfer_ringback=\"+us_ring); //set to ringtone\n";
+						}
+						if ($rowhelper['huntgroupringback'] == "music"){
+							$tmp .= " session.execute(\"set\", \"ringback=\${hold_music}\");          //set to ringtone\n";
+							$tmp .= " session.execute(\"set\", \"transfer_ringback=\${hold_music}\"); //set to ringtone\n";
+						}
+					}
+					else {
+						$tmp .= " session.execute(\"set\", \"ringback=\${hold_music}\");          //set to ringtone\n";
+						$tmp .= " session.execute(\"set\", \"transfer_ringback=\${hold_music}\"); //set to ringtone\n";		
+					}
+					
 					if ($rowhelper['huntgrouptimeout'] > 0) {
 						$tmp .= "	session.execute(\"set\", \"call_timeout=".$rowhelper['huntgrouptimeout']."\");\n";
 						$tmp .= "	session.execute(\"set\", \"continue_on_fail=true\");\n";
@@ -2585,7 +2609,6 @@ function sync_package_freeswitch_public_includes()
 
 function sync_package_freeswitch()
 {
-
   global $config;
   sync_package_freeswitch_settings();
   sync_package_freeswitch_dialplan();
@@ -2609,7 +2632,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.9.2.4";
+	$freeswitch_package_version = "0.9.2.5";
 	$freeswitch_build_version = "1.0.4 pre 8";
 	$freeswitch_build_revision = "13784";
 	
