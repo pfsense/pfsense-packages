@@ -90,7 +90,7 @@ if ($_POST) {
 		$ent['outbound_caller_id_number'] = $outbound_caller_id_number;
 		$ent['vm-mailto'] = $_POST['vm-mailto'];
 		$ent['vm-attach-file'] = $_POST['vm-attach-file'];
-		$ent['vm-keep-local-after-email'] = $_POST['vm-keep-local-after-email];		
+		$ent['vm-keep-local-after-email'] = $_POST['vm-keep-local-after-email'];		
 		$ent['user_context'] = $_POST['user_context'];
 		$ent['callgroup'] = $_POST['callgroup'];		
 		$ent['auth-acl'] = $_POST['auth-acl'];
@@ -245,7 +245,7 @@ display_top_tabs(build_menu());
               </td>
             </tr>
             <tr>
-              <td width="25%" valign="top" class="vncellreq" nowrap>vm-keep-local-after-email</td>
+              <td width="25%" valign="top" class="vncellreq" nowrap>VM Keep Local After Email</td>
               <td width="75%" class="vtable">
                 <?php
                 echo "              <select name='vm-keep-local-after-email' class='formfld unknown'>\n";
