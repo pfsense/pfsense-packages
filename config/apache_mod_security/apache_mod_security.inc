@@ -6,8 +6,8 @@ require_once("apache_mod_security_physical.inc");
 
 function apache_mod_security_install() {
 	conf_mount_rw();
-	if(!is_dir("/usr/local/apache")) 
-		safe_mkdir("/usr/local/apache");
+	if(!is_dir("/usr/local/apachemodsecurity")) 
+		safe_mkdir("/usr/local/apachemodsecurity");
 }
 
 function apache_mod_security_deinstall() {
@@ -218,7 +218,7 @@ ServerAdmin {$global_site_email}
 # documents. By default, all requests are taken from this directory, but
 # symbolic links and aliases may be used to point to other locations.
 #
-DocumentRoot "/usr/local/apache"
+DocumentRoot "/usr/local/apachemodsecurity"
 
 #
 # Each directory to which Apache has access can be configured with respect
@@ -244,7 +244,7 @@ DocumentRoot "/usr/local/apache"
 #
 # This should be changed to whatever you set DocumentRoot to.
 #
-#<Directory "/usr/local/www/apache/">
+#<Directory "/usr/local/www/apachemodsecurity/">
 #    #
 #    # Possible values for the Options directive are "None", "All",
 #    # or any combination of:
