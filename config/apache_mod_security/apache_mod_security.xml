@@ -41,7 +41,6 @@
 	<name>apache_mod_security</name>
 	<version>1.0</version>
 	<title>Services: Mod_Security+Apache+Proxy</title>
-	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>
 	<menu>
 		<name>apache_mod_security</name>
 		<tooltiptext></tooltiptext>
@@ -106,4 +105,5 @@
 	</custom_php_deinstall_command>
 	<custom_php_after_form_command>
 	</custom_php_after_form_command>
+	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>	
 </packagegui>
