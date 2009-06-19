@@ -503,6 +503,8 @@ function tinydns_sync_on_changes() {
 		if($password && $sync_to_ip)
 			tinydns_do_xmlrpc_sync($sync_to_ip, $password);
 	}
+	tinydns_create_zone_file();
+	tinydns_setup_ping_items();
 	log_error("[tinydns] tinydns_xmlrpc_sync.php is ending.");
 }
 
