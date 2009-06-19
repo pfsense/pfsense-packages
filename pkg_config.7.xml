@@ -2,6 +2,24 @@
 <!-- pfSense packages -->
 <pfsensepkgs>
   <packages>
+    <package>
+      <name>Proxy Server with mod_security</name>
+      <pkginfolink>http://doc.pfsense.org/index.php/ProxyServerModSecurity_package</pkginfolink>
+      <website>http://www.modsecurity.org/</website>
+      <descr>ModSecurity is a web application firewall that can work either embedded or as a reverse proxy. It provides protection from a range of attacks against web applications and allows for HTTP traffic monitoring, logging and real-time analysis. </descr>
+      <category>Network Management</category>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <version>0.1.0</version>
+      <status>ALPHA-ALPHA-ALPHA</status>
+      <required_version>2.0</required_version>
+      <config_file>http://www.pfsense.com/packages/config/apache_mod_security/apache_mod_security.xml</config_file>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package>apache-2.2.11_7.tbz</depends_on_package>
+      <depends_on_package>mod_security21-2.1.7.tbz</depends_on_package>
+      <depends_on_package>modsecurity-core-rules_2.5-1.6.1.tar.gz</depends_on_package>
+      <configurationfile>apache_mod_security.xml</configurationfile>
+	  <after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
+    </package>
 	<package>
 		<name>frickin</name>
 		<descr>The Frickin PPTP Proxy allows a Point-to-Point Tunneling Protocol (PPTP) client to connect to a PPTP server through Network Address Translation.</descr>
