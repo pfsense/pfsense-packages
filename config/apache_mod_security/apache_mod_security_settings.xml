@@ -64,7 +64,7 @@
 		<field>
 			<fielddescr>Global site URL (FQDN)</fielddescr>
 			<fieldname>globalsiteurl</fieldname>
-			<description>Enter the site global site URL (EX: www.xyz234hosting.com)<br/>NOTE: Leave blank to use this devices hostname.</description>
+			<description>Enter the site global site URL<br/>NOTE: Leave blank to use this devices hostname.</description>
 			<type>input</type>
 		</field>
 		<field>
