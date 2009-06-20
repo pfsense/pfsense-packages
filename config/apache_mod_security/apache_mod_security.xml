@@ -88,8 +88,8 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>none</fielddescr>
-			<fieldname>none</fieldname>
+			<fielddescr>WebServers</fielddescr>
+			<fieldname>webservers</fieldname>
 		    <type>rowhelper</type>
 		    <rowhelper>
 				<rowhelperfield>
