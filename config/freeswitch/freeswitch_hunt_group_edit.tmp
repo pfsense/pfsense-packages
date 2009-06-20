@@ -212,13 +212,6 @@ display_top_tabs(build_menu());
               </td>
             </tr>
             <tr>
-              <td width="22%" valign="top" class="vncell">Timeout Destination</td>
-              <td width="78%" class="vtable">
-                <input name="huntgrouptimeoutdestination" type="text" class="formfld" id="huntgrouptimeoutdestination" size="40" value="<?=htmlspecialchars($pconfig['huntgrouptimeoutdestination']);?>">
-                <br> <span class="vexpl">Destination<br>
-                e.g. <em>1001</em></span></td>
-            </tr>
-            <tr>
               <td width="22%" valign="top" class="vncell">Timeout Type</td>
               <td width="78%" class="vtable">
                 <?php
@@ -245,6 +238,13 @@ display_top_tabs(build_menu());
                 echo "                </select>\n";
                 ?>
               </td>
+            </tr>
+            <tr>
+              <td width="22%" valign="top" class="vncell">Timeout Destination</td>
+              <td width="78%" class="vtable">
+                <input name="huntgrouptimeoutdestination" type="text" class="formfld" id="huntgrouptimeoutdestination" size="40" value="<?=htmlspecialchars($pconfig['huntgrouptimeoutdestination']);?>">
+                <br> <span class="vexpl">Destination<br>
+                e.g. <em>1001</em></span></td>
             </tr>
             <tr>
               <td width="22%" valign="top" class="vncell">Ring Back</td>
@@ -347,8 +347,11 @@ display_top_tabs(build_menu());
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
-            <td valign="middle"><a href="freeswitch_hunt_group_destinations_edit.php?parentid=<?=$parentid;?>&huntgroupid=<?=$huntgroupid;?>&a=action"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
-          </tr>
+            <td valign="middle">
+			<?php if (strlen($huntgroupid) > 1) { ?>
+				<a href="freeswitch_hunt_group_destinations_edit.php?parentid=<?=$parentid;?>&huntgroupid=<?=$huntgroupid;?>&a=action"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+			<?php } ?>
+		  </tr>
         </table>
       </td>
 	</tr>
@@ -396,12 +399,16 @@ display_top_tabs(build_menu());
 					<font color="#FFFFFF"><?=htmlspecialchars($ent['destinationdescr']);?>&nbsp;
 				  </td>
 				  <td valign="middle" nowrap class="list">
-					<table border="0" cellspacing="0" cellpadding="1">
-					  <tr>
-						<td valign="middle"><a href="freeswitch_hunt_group_destinations_edit.php?id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&huntgroupid=<?=$huntgroupid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-						<td><a href="freeswitch_hunt_group_destinations.php?type=huntgroupdestinations&act=del&id=<?=$ent['id'];?>&parentid=<?=$parentid;?>&huntgroupid=<?=$huntgroupid;?>" onclick="return confirm('Do you really want to delete this recording?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
-					  </tr>
-				   </table>
+				  <?php 
+				  if (strlen($huntgroupid) > 1) {
+					echo "<table border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
+					echo "  <tr>\n";
+					echo "	<td valign=\"middle\"><a href=\"freeswitch_hunt_group_destinations_edit.php?id=".$ent['id']."&parentid=".$parentid."&huntgroupid=".$huntgroupid."\"><img src=\"/themes/".$g['theme']."/images/icons/icon_e.gif\" width=\"17\" height=\"17\" border=\"0\"></a></td>\n";
+					echo "	<td><a href=\"freeswitch_hunt_group_destinations.php?type=huntgroupdestinations&act=del&id=".$ent['id']."&parentid=".$parentid."&huntgroupid=".$huntgroupid."\" onclick=\"return confirm('Do you really want to delete this recording?')\"><img src=\"/themes/".$g['theme']."/images/icons/icon_x.gif\" width=\"17\" height=\"17\" border=\"0\"></a></td>\n";
+					echo "  </tr>\n";
+				    echo "</table>\n";
+				  }
+				  ?>
 				  </td>
 				</tr>
 	<?php
@@ -416,7 +423,11 @@ display_top_tabs(build_menu());
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
-            <td valign="middle"><a href="freeswitch_hunt_group_destinations_edit.php?parentid=<?=$parentid;?>&huntgroupid=<?=$huntgroupid;?>&a=action"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+            <td valign="middle">
+			<?php if (strlen($huntgroupid) > 1) { ?>
+				<a href="freeswitch_hunt_group_destinations_edit.php?parentid=<?=$parentid;?>&huntgroupid=<?=$huntgroupid;?>&a=action"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
+			<?php } ?>
+			</td>
           </tr>
         </table>
 		  </td>
