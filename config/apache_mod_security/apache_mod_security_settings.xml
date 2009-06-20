@@ -58,7 +58,7 @@
 		<field>
 			<fielddescr>Global site E-mail administrator</fielddescr>
 			<fieldname>globalsiteadminemail</fieldname>
-			<description>Enter the site administrators e-mail address (EX: webmaster@xyz234hosting.com)</description>
+			<description>Enter the site administrators e-mail address</description>
 			<type>input</type>
 		</field>
 		<field>
