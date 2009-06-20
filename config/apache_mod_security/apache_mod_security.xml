@@ -97,6 +97,7 @@
 				    <fieldname>webserveripaddress</fieldname>
 				    <description>IP address of web server.  If it is behind the firewall this will generally be a private IP address in non-bridged situations.  Leave blank to use the Firewalls DNS resolution.  (EX: 10.2.3.1)</description>
 				    <type>input</type>
+					<size>16</size>
 				</rowhelperfield>
 		    </rowhelper>
 		</field>
