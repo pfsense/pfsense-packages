@@ -42,16 +42,15 @@
 	<version>1.0</version>
 	<title>Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=apache_mod_security_settings.xml&amp;id=0</aftersaveredirect>
-	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>
 	<tabs>
 		<tab>
 			<text>Proxy Server Settings</text>
 			<url>/pkg.php?xml=apache_mod_security_settings.xml&amp;id=0</url>
+			<active/>			
 		</tab>
 		<tab>
 			<text>Site Proxies</text>
 			<url>/pkg.php?xml=apache_mod_security.xml</url>
-			<active/>
 		</tab>
 	</tabs>
 	<fields>
@@ -64,7 +63,13 @@
 		<field>
 			<fielddescr>Global site URL (FQDN)</fielddescr>
 			<fieldname>globalsiteurl</fieldname>
-			<description>Enter the site global site URL<br/>NOTE: Leave blank to use this devices hostname.</description>
+			<description>
+				<![CDATA[
+					Enter the site global site URL.
+					<br/>
+					NOTE: Leave blank to use this devices hostname.
+				]]>
+			</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -84,4 +89,5 @@
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
 	</custom_php_resync_config_command>
+	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>	
 </packagegui>
