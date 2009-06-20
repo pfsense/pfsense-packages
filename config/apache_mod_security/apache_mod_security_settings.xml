@@ -75,13 +75,25 @@
 		<field>
 			<fielddescr>Bind to IP Address</fielddescr>
 			<fieldname>globalbindtoipaddr</fieldname>
-			<description>This is the IP address the Proxy Server will listen on. </description>
+			<description>
+				<![CDATA[
+					This is the IP address the Proxy Server will listen on. 
+					<br/>
+					NOTE: Leave blank to bind to *
+				]]>
+			</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Bind to port</fielddescr>
 			<fieldname>globalbindtoport</fieldname>
-			<description>This is the port the Proxy Server will listen on. </description>
+			<description>
+				<![CDATA[
+					This is the port the Proxy Server will listen on. 
+					<br/>
+					NOTE: Leave blank to bind to *
+				]]>					
+			</description>
 			<type>input</type>
 		</field>
 	</fields>

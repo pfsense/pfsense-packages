@@ -19,8 +19,9 @@ function apache_mod_security_resync() {
 function generate_apache_configuration() {
 	// Generate mod_proxy specific configuration
 	$mod_proxy = "ProxyRequests on\n";
-	if($config['installedpackages']['apache_mod_security']) {
-		foreach($config['installedpackages']['apache_mod_security']['config'] as $ams) {
+	
+	if($config['installedpackages']['apachemodsecurity']) {
+		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
 			$sitename = str_replace(" ", "", $ams['sitename']);
 			$mod_proxy .= "ProxyPass /{$sitename}/ {$sitename} \n";
 			$mod_proxy .= "ProxyHTMLURLMap {$ams['siteurl']} /{$sitename} \n";
