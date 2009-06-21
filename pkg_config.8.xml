@@ -12,10 +12,9 @@
       <status>ALPHA-ALPHA-ALPHA</status>
       <required_version>2.0</required_version>
       <config_file>http://www.pfsense.com/packages/config/apache_mod_security/apache_mod_security.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <depends_on_package>mod_security21-2.1.7.tbz</depends_on_package>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+      <depends_on_package>mod_security-2.5.9.tbz</depends_on_package>
       <configurationfile>apache_mod_security.xml</configurationfile>
-      <depends_on_package>libxml2-2.7.3.tbz</depends_on_package>
 	  <after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
     </package>
 	<package>
