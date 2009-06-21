@@ -121,16 +121,28 @@ ServerRoot "/usr/local"
 # Example:
 # LoadModule foo_module modules/mod_foo.so
 #
-LoadModule access_module libexec/apache22/mod_access.so
-LoadModule auth_module libexec/apache22/mod_auth.so
-LoadModule auth_anon_module libexec/apache22/mod_auth_anon.so
-LoadModule auth_dbm_module libexec/apache22/mod_auth_dbm.so
-#LoadModule auth_digest_module libexec/apache22/mod_auth_digest.so
-#LoadModule file_cache_module libexec/apache22/mod_file_cache.so
-LoadModule charset_lite_module libexec/apache22/mod_charset_lite.so
-#LoadModule cache_module libexec/apache22/mod_cache.so
-#LoadModule disk_cache_module libexec/apache22/mod_disk_cache.so
+# have to place corresponding `LoadModule' lines at this location so the
+# LoadModule foo_module modules/mod_foo.so
+LoadModule authn_file_module libexec/apache22/mod_authn_file.so
+LoadModule authn_dbm_module libexec/apache22/mod_authn_dbm.so
+LoadModule authn_anon_module libexec/apache22/mod_authn_anon.so
+LoadModule authn_default_module libexec/apache22/mod_authn_default.so
+LoadModule authn_alias_module libexec/apache22/mod_authn_alias.so
+LoadModule authz_host_module libexec/apache22/mod_authz_host.so
+LoadModule authz_groupfile_module libexec/apache22/mod_authz_groupfile.so
+LoadModule authz_user_module libexec/apache22/mod_authz_user.so
+LoadModule authz_dbm_module libexec/apache22/mod_authz_dbm.so
+LoadModule authz_owner_module libexec/apache22/mod_authz_owner.so
+LoadModule authz_default_module libexec/apache22/mod_authz_default.so
+LoadModule auth_basic_module libexec/apache22/mod_auth_basic.so
+LoadModule auth_digest_module libexec/apache22/mod_auth_digest.so
+LoadModule file_cache_module libexec/apache22/mod_file_cache.so
+LoadModule cache_module libexec/apache22/mod_cache.so
+LoadModule disk_cache_module libexec/apache22/mod_disk_cache.so
+LoadModule dumpio_module libexec/apache22/mod_dumpio.so
 LoadModule include_module libexec/apache22/mod_include.so
+LoadModule filter_module libexec/apache22/mod_filter.so
+LoadModule charset_lite_module libexec/apache22/mod_charset_lite.so
 LoadModule deflate_module libexec/apache22/mod_deflate.so
 LoadModule log_config_module libexec/apache22/mod_log_config.so
 LoadModule logio_module libexec/apache22/mod_logio.so
@@ -142,21 +154,26 @@ LoadModule headers_module libexec/apache22/mod_headers.so
 LoadModule usertrack_module libexec/apache22/mod_usertrack.so
 LoadModule unique_id_module libexec/apache22/mod_unique_id.so
 LoadModule setenvif_module libexec/apache22/mod_setenvif.so
-<IfDefine SSL>
+LoadModule version_module libexec/apache22/mod_version.so
+LoadModule proxy_module libexec/apache22/mod_proxy.so
+LoadModule proxy_connect_module libexec/apache22/mod_proxy_connect.so
+LoadModule proxy_ftp_module libexec/apache22/mod_proxy_ftp.so
+LoadModule proxy_http_module libexec/apache22/mod_proxy_http.so
+LoadModule proxy_ajp_module libexec/apache22/mod_proxy_ajp.so
+LoadModule proxy_balancer_module libexec/apache22/mod_proxy_balancer.so
 LoadModule ssl_module libexec/apache22/mod_ssl.so
-</IfDefine>
 LoadModule mime_module libexec/apache22/mod_mime.so
-#LoadModule dav_module libexec/apache22/mod_dav.so
+LoadModule dav_module libexec/apache22/mod_dav.so
 LoadModule status_module libexec/apache22/mod_status.so
 LoadModule autoindex_module libexec/apache22/mod_autoindex.so
 LoadModule asis_module libexec/apache22/mod_asis.so
 LoadModule info_module libexec/apache22/mod_info.so
 LoadModule cgi_module libexec/apache22/mod_cgi.so
-#LoadModule dav_fs_module libexec/apache22/mod_dav_fs.so
+LoadModule dav_fs_module libexec/apache22/mod_dav_fs.so
 LoadModule vhost_alias_module libexec/apache22/mod_vhost_alias.so
 LoadModule negotiation_module libexec/apache22/mod_negotiation.so
 LoadModule dir_module libexec/apache22/mod_dir.so
-LoadModule imap_module libexec/apache22/mod_imap.so
+LoadModule imagemap_module libexec/apache22/mod_imagemap.so
 LoadModule actions_module libexec/apache22/mod_actions.so
 LoadModule speling_module libexec/apache22/mod_speling.so
 LoadModule userdir_module libexec/apache22/mod_userdir.so
