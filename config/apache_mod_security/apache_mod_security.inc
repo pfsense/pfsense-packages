@@ -121,47 +121,47 @@ ServerRoot "/usr/local"
 # Example:
 # LoadModule foo_module modules/mod_foo.so
 #
-LoadModule access_module libexec/apache2/mod_access.so
-LoadModule auth_module libexec/apache2/mod_auth.so
-LoadModule auth_anon_module libexec/apache2/mod_auth_anon.so
-LoadModule auth_dbm_module libexec/apache2/mod_auth_dbm.so
-#LoadModule auth_digest_module libexec/apache2/mod_auth_digest.so
-#LoadModule file_cache_module libexec/apache2/mod_file_cache.so
-LoadModule charset_lite_module libexec/apache2/mod_charset_lite.so
-#LoadModule cache_module libexec/apache2/mod_cache.so
-#LoadModule disk_cache_module libexec/apache2/mod_disk_cache.so
-LoadModule include_module libexec/apache2/mod_include.so
-LoadModule deflate_module libexec/apache2/mod_deflate.so
-LoadModule log_config_module libexec/apache2/mod_log_config.so
-LoadModule logio_module libexec/apache2/mod_logio.so
-LoadModule env_module libexec/apache2/mod_env.so
-LoadModule mime_magic_module libexec/apache2/mod_mime_magic.so
-LoadModule cern_meta_module libexec/apache2/mod_cern_meta.so
-LoadModule expires_module libexec/apache2/mod_expires.so
-LoadModule headers_module libexec/apache2/mod_headers.so
-LoadModule usertrack_module libexec/apache2/mod_usertrack.so
-LoadModule unique_id_module libexec/apache2/mod_unique_id.so
-LoadModule setenvif_module libexec/apache2/mod_setenvif.so
+LoadModule access_module libexec/apache22/mod_access.so
+LoadModule auth_module libexec/apache22/mod_auth.so
+LoadModule auth_anon_module libexec/apache22/mod_auth_anon.so
+LoadModule auth_dbm_module libexec/apache22/mod_auth_dbm.so
+#LoadModule auth_digest_module libexec/apache22/mod_auth_digest.so
+#LoadModule file_cache_module libexec/apache22/mod_file_cache.so
+LoadModule charset_lite_module libexec/apache22/mod_charset_lite.so
+#LoadModule cache_module libexec/apache22/mod_cache.so
+#LoadModule disk_cache_module libexec/apache22/mod_disk_cache.so
+LoadModule include_module libexec/apache22/mod_include.so
+LoadModule deflate_module libexec/apache22/mod_deflate.so
+LoadModule log_config_module libexec/apache22/mod_log_config.so
+LoadModule logio_module libexec/apache22/mod_logio.so
+LoadModule env_module libexec/apache22/mod_env.so
+LoadModule mime_magic_module libexec/apache22/mod_mime_magic.so
+LoadModule cern_meta_module libexec/apache22/mod_cern_meta.so
+LoadModule expires_module libexec/apache22/mod_expires.so
+LoadModule headers_module libexec/apache22/mod_headers.so
+LoadModule usertrack_module libexec/apache22/mod_usertrack.so
+LoadModule unique_id_module libexec/apache22/mod_unique_id.so
+LoadModule setenvif_module libexec/apache22/mod_setenvif.so
 <IfDefine SSL>
-LoadModule ssl_module libexec/apache2/mod_ssl.so
+LoadModule ssl_module libexec/apache22/mod_ssl.so
 </IfDefine>
-LoadModule mime_module libexec/apache2/mod_mime.so
-#LoadModule dav_module libexec/apache2/mod_dav.so
-LoadModule status_module libexec/apache2/mod_status.so
-LoadModule autoindex_module libexec/apache2/mod_autoindex.so
-LoadModule asis_module libexec/apache2/mod_asis.so
-LoadModule info_module libexec/apache2/mod_info.so
-LoadModule cgi_module libexec/apache2/mod_cgi.so
-#LoadModule dav_fs_module libexec/apache2/mod_dav_fs.so
-LoadModule vhost_alias_module libexec/apache2/mod_vhost_alias.so
-LoadModule negotiation_module libexec/apache2/mod_negotiation.so
-LoadModule dir_module libexec/apache2/mod_dir.so
-LoadModule imap_module libexec/apache2/mod_imap.so
-LoadModule actions_module libexec/apache2/mod_actions.so
-LoadModule speling_module libexec/apache2/mod_speling.so
-LoadModule userdir_module libexec/apache2/mod_userdir.so
-LoadModule alias_module libexec/apache2/mod_alias.so
-LoadModule rewrite_module libexec/apache2/mod_rewrite.so
+LoadModule mime_module libexec/apache22/mod_mime.so
+#LoadModule dav_module libexec/apache22/mod_dav.so
+LoadModule status_module libexec/apache22/mod_status.so
+LoadModule autoindex_module libexec/apache22/mod_autoindex.so
+LoadModule asis_module libexec/apache22/mod_asis.so
+LoadModule info_module libexec/apache22/mod_info.so
+LoadModule cgi_module libexec/apache22/mod_cgi.so
+#LoadModule dav_fs_module libexec/apache22/mod_dav_fs.so
+LoadModule vhost_alias_module libexec/apache22/mod_vhost_alias.so
+LoadModule negotiation_module libexec/apache22/mod_negotiation.so
+LoadModule dir_module libexec/apache22/mod_dir.so
+LoadModule imap_module libexec/apache22/mod_imap.so
+LoadModule actions_module libexec/apache22/mod_actions.so
+LoadModule speling_module libexec/apache22/mod_speling.so
+LoadModule userdir_module libexec/apache22/mod_userdir.so
+LoadModule alias_module libexec/apache22/mod_alias.so
+LoadModule rewrite_module libexec/apache22/mod_rewrite.so
 
 <IfModule !mpm_netware_module>
 <IfModule !mpm_winnt_module>
@@ -358,7 +358,7 @@ LogLevel warn
 #    # client.  The same rules about trailing "/" apply to ScriptAlias
 #    # directives as to Alias.
 #    #
-#    ScriptAlias /cgi-bin/ "/usr/local/www/apache2/cgi-bin/"
+#    ScriptAlias /cgi-bin/ "/usr/local/www/apache22/cgi-bin/"
 #
 #</IfModule>
 
@@ -371,10 +371,10 @@ LogLevel warn
 #</IfModule>
 
 #
-# "/usr/local/www/apache2/cgi-bin" should be changed to whatever your ScriptAliased
+# "/usr/local/www/apache22/cgi-bin" should be changed to whatever your ScriptAliased
 # CGI directory exists, if you have that configured.
 #
-#<Directory "/usr/local/www/apache2/cgi-bin">
+#<Directory "/usr/local/www/apache22/cgi-bin">
 #    AllowOverride None
 #    Options None
 #    Order allow,deny
@@ -397,7 +397,7 @@ DefaultType text/plainm
     # TypesConfig points to the file containing the list of mappings from
     # filename extension to MIME-type.
     #
-    TypesConfig etc/apache2/mime.types
+    TypesConfig etc/apache22/mime.types
 
     #
     # AddType allows you to add to or override the MIME configuration
@@ -445,7 +445,7 @@ DefaultType text/plainm
 # contents of the file itself to determine its type.  The MIMEMagicFile
 # directive tells the module where the hint definitions are located.
 #
-#MIMEMagicFile etc/apache2/magic
+#MIMEMagicFile etc/apache22/magic
 
 #
 # Customizable error responses come in three flavors:
@@ -471,43 +471,43 @@ DefaultType text/plainm
 
 # Supplemental configuration
 #
-# The configuration files in the etc/apache2/extra/ directory can be 
+# The configuration files in the etc/apache22/extra/ directory can be 
 # included to add extra features or to modify the default configuration of 
 # the server, or you may simply copy their contents here and change as 
 # necessary.
 
 # Server-pool management (MPM specific)
-#Include etc/apache2/extra/httpd-mpm.conf
+#Include etc/apache22/extra/httpd-mpm.conf
 
 # Multi-language error messages
-#Include etc/apache2/extra/httpd-multilang-errordoc.conf
+#Include etc/apache22/extra/httpd-multilang-errordoc.conf
 
 # Fancy directory listings
-#Include etc/apache2/extra/httpd-autoindex.conf
+#Include etc/apache22/extra/httpd-autoindex.conf
 
 # Language settings
-#Include etc/apache2/extra/httpd-languages.conf
+#Include etc/apache22/extra/httpd-languages.conf
 
 # User home directories
-#Include etc/apache2/extra/httpd-userdir.conf
+#Include etc/apache22/extra/httpd-userdir.conf
 
 # Real-time info on requests and configuration
-#Include etc/apache2/extra/httpd-info.conf
+#Include etc/apache22/extra/httpd-info.conf
 
 # Virtual hosts
-#Include etc/apache2/extra/httpd-vhosts.conf
+#Include etc/apache22/extra/httpd-vhosts.conf
 
 # Local access to the Apache HTTP Server Manual
-#Include etc/apache2/extra/httpd-manual.conf
+#Include etc/apache22/extra/httpd-manual.conf
 
 # Distributed authoring and versioning (WebDAV)
-#Include etc/apache2/extra/httpd-dav.conf
+#Include etc/apache22/extra/httpd-dav.conf
 
 # Various default settings
-#Include etc/apache2/extra/httpd-default.conf
+#Include etc/apache22/extra/httpd-default.conf
 
 # Secure (SSL/TLS) connections
-#Include etc/apache2/extra/httpd-ssl.conf
+#Include etc/apache22/extra/httpd-ssl.conf
 #
 # Note: The following must must be present to support
 #       starting without SSL on platforms with no /dev/random equivalent
@@ -552,11 +552,11 @@ SSLRandomSeed connect builtin
 {$mod_proxy}
 
 # Include anything else
-Include etc/apache2/Includes/*.conf
+Include etc/apache22/Includes/*.conf
 
 EOF;
 
-	$fd = fopen("/usr/local/etc/apache2/httpd.conf", "w");
+	$fd = fopen("/usr/local/etc/apache22/httpd.conf", "w");
 	if(!$fd) {
 		$error_text = "Could not open httpd.conf for writing!";
 		echo $error_text;
