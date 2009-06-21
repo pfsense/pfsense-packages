@@ -3,20 +3,24 @@
 // Syntax:ProxyPreserveHost On|Off
 
 function apache_mod_security_install() {
+	global $config, $g;
 	conf_mount_rw();
 	if(!is_dir("/usr/local/apachemodsecurity")) 
 		safe_mkdir("/usr/local/apachemodsecurity");
 }
 
 function apache_mod_security_deinstall() {
+	global $config, $g;
 	exec("rm -rf /usr/local/apachemodsecurity");
 }
 
 function apache_mod_security_resync() {
+	global $config, $g;
 	generate_apache_configuration();
 }
 
 function generate_apache_configuration() {
+	global $config, $g;
 	// Generate mod_proxy specific configuration
 	$mod_proxy = "ProxyRequests on\n";
 	
@@ -26,10 +30,14 @@ function generate_apache_configuration() {
 			$mod_proxy .= "ProxyPass /{$sitename}/ {$sitename} \n";
 			$mod_proxy .= "ProxyHTMLURLMap {$ams['siteurl']} /{$sitename} \n";
 			$mod_proxy .= "<Location /{$sitename}/>\n";
+			$mod_proxy .= "        ProxyRemote {$ams['siteurl']}";
+				foreach($ams['row'] as $row)
+					$mod_proxy .= " {$row['webserveripaddr']}";
+			$mod_proxy .= "\n";
 			$mod_proxy .= "        ProxyPassReverse /\n";
 			$mod_proxy .= "        SetOutputFilter  proxy-html\n";
-			$mod_proxy .= "        ProxyHTMLURLMap  /      /{$sitename}/\n";
-			$mod_proxy .= "        ProxyHTMLURLMap  /{$ams['sitename']}  /{$sitename}\n";
+//			$mod_proxy .= "        ProxyHTMLURLMap  /      /{$sitename}/\n";
+//			$mod_proxy .= "        ProxyHTMLURLMap  /{$ams['sitename']}  /{$sitename}\n";
 			$mod_proxy .= "        RequestHeader    unset  Accept-Encoding\n";
 			$mod_proxy .= "</Location>\n";
 		}
@@ -558,8 +566,10 @@ SSLRandomSeed connect builtin
     SecFilterDefaultAction "deny,log,status:500"
 </IfModule>
 
+# Mod_security and proxy settings
 {$mod_proxy}
 
+# Include anything else
 Include etc/apache22/Includes/*.conf
 
 EOF;

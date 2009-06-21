@@ -73,6 +73,10 @@
 			<fielddescr>Site name</fielddescr>
 			<fieldname>sitename</fieldname>
 		</columnitem>
+		<columnitem>
+			<fielddescr>Site URL</fielddescr>
+			<fieldname>siteurl</fieldname>
+		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
@@ -85,20 +89,21 @@
 			<fielddescr>Site URL (FQDN)</fielddescr>
 			<fieldname>siteurl</fieldname>
 			<description></description>
+			<size>40</size>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Wenbservers</fielddescr>
+			<fielddescr>Webservers</fielddescr>
 			<fieldname>webservers</fieldname>
 		    <type>rowhelper</type>
 		    <description></description>
 		    <rowhelper>
 				<rowhelperfield>
-				    <fielddescr>Webserver IP address</fielddescr>
+				    <fielddescr>Webserver backend URL</fielddescr>
 				    <fieldname>webserveripaddr</fieldname>
-				    <description>Add each webserver IP address here.</description>
+				    <description>Add each webserver URL address here.</description>
 				    <type>input</type>
-				    <size>16</size>
+				    <size>50</size>
 				</rowhelperfield>
 		    </rowhelper>
 		</field>
