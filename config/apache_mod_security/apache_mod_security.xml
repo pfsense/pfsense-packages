@@ -60,7 +60,7 @@
 	<tabs>
 		<tab>
 			<text>Proxy Server Settings</text>
-			<url>/pkg.php?xml=apache_mod_security_settings.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=apache_mod_security_settings.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Site Proxies</text>
@@ -88,16 +88,17 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>WebServers</fielddescr>
+			<fielddescr>Wenbservers</fielddescr>
 			<fieldname>webservers</fieldname>
 		    <type>rowhelper</type>
+		    <description></description>
 		    <rowhelper>
 				<rowhelperfield>
-				    <fielddescr>Webserver IP Address</fielddescr>
-				    <fieldname>webserveripaddress</fieldname>
-				    <description>IP address of web server.  If it is behind the firewall this will generally be a private IP address in non-bridged situations.  Leave blank to use the Firewalls DNS resolution.  (EX: 10.2.3.1)</description>
+				    <fielddescr>Webserver IP address</fielddescr>
+				    <fieldname>webserveripaddr</fieldname>
+				    <description>Add each webserver IP address here.</description>
 				    <type>input</type>
-					<size>16</size>
+				    <size>16</size>
 				</rowhelperfield>
 		    </rowhelper>
 		</field>
