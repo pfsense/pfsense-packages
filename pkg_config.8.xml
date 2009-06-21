@@ -16,6 +16,7 @@
       <depends_on_package>apache-2.2.11_7.tbz</depends_on_package>
       <depends_on_package>mod_security21-2.1.7.tbz</depends_on_package>
       <configurationfile>apache_mod_security.xml</configurationfile>
+      <depends_on_package>libxml2-2.7.3.tbz</depends_on_package>
 	  <after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
     </package>
 	<package>
