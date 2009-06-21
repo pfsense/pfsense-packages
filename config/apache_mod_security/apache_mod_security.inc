@@ -574,7 +574,7 @@ Include etc/apache22/Includes/*.conf
 
 EOF;
 
-	$fd = fopen("/usr/local/etc/apache22/httpd.conf", "w");
+	$fd = fopen("/usr/local/etc/apache2/httpd.conf", "w");
 	if(!$fd) {
 		$error_text = "Could not open httpd.conf for writing!";
 		echo $error_text;
