@@ -40,7 +40,7 @@
         </copyright>
 	<name>apache_mod_security_settings</name>
 	<version>1.0</version>
-	<title>Settings</title>
+	<title>Services: Mod_Security+Apache+Proxy: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=apache_mod_security_settings.xml&amp;id=0</aftersaveredirect>
 	<tabs>
 		<tab>

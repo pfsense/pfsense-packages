@@ -40,9 +40,9 @@
         </copyright>
 	<name>apache_mod_security</name>
 	<version>1.0</version>
-	<title>Services: Mod_Security+Apache+Proxy</title>
+	<title>Services: Mod_Security+Apache+Proxy: Site Proxies</title>
 	<menu>
-		<name>apache_mod_security</name>
+		<name>Mod_Security+Apache+Proxy</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
 		<configfile>apache_mod_security.xml</configfile>
