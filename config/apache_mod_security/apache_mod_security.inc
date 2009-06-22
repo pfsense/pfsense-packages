@@ -55,6 +55,12 @@ EOF;
 		log_error("WARNING!  Global site Administrator E-Mail address has not been set.  Defaulting to bogus e-mail address.");
 	}
 
+	// Set ServerName
+	if($config['installedpackages']['apache_mod_security_settings']['config']['hostnmae']) {
+		$servername = "ServerName {$config['installedpackages']['apache_mod_security_settings']['config']['hostnmae']}\n";
+	else 
+		$servername = `hostname`;
+		
 	// Set global site namne
 	if($config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoipaddr']) {
 		$global_listen  = "Listen " . $config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoipaddr'];
@@ -263,7 +269,7 @@ ServerAdmin {$global_site_email}
 #
 # If your host doesn't have a registered DNS name, enter its IP address here.
 #
-#ServerName {$globalsiteurl}:80
+{$servername}
 
 #
 # DocumentRoot: The directory out of which you will serve your

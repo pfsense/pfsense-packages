@@ -68,11 +68,11 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Global site URL (FQDN)</fielddescr>
-			<fieldname>globalsiteurl</fieldname>
+			<fielddescr>Server hostnmae</fielddescr>
+			<fieldname>hostnmae</fieldname>
 			<description>
 				<![CDATA[
-					Enter the site global site URL.
+					Enter the servers hostname
 					<br/>
 					NOTE: Leave blank to use this devices hostname.
 				]]>
