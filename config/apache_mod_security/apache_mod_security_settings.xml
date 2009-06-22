@@ -58,7 +58,7 @@
 			<fielddescr>Enable mod_security protection</fielddescr>
 			<fieldname>enablemodsecurity</fieldname>
 			<description>Enables mod_security protection for all sites being proxied</description>
-			<type>input</type>
+			<type>checkbox</type>
 		</field>
 
 		<field>
