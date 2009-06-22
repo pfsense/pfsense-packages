@@ -2,11 +2,13 @@
 
 // Syntax:ProxyPreserveHost On|Off
 
+global $config, $g;
+conf_mount_rw();
+if(!is_dir("/usr/local/apachemodsecurity")) 
+	safe_mkdir("/usr/local/apachemodsecurity");
+
 function apache_mod_security_install() {
-	global $config, $g;
-	conf_mount_rw();
-	if(!is_dir("/usr/local/apachemodsecurity")) 
-		safe_mkdir("/usr/local/apachemodsecurity");
+
 }
 
 function apache_mod_security_deinstall() {
@@ -59,6 +61,10 @@ function generate_apache_configuration() {
 			$global_listen .= ":80";
 	} else {
 		$global_listen = "Listen {$config['system']['hostname']}.{$config['system']['domain']}";
+		if($config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoport'])
+			$global_listen .= ":" . $config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoport'];
+		else 
+			$global_listen .= ":80";
 	}
 
 	$apache_config = <<<EOF
