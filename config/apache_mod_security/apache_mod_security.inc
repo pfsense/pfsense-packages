@@ -1,14 +1,12 @@
 <?php
 
-// Syntax:ProxyPreserveHost On|Off
-
-global $config, $g;
-conf_mount_rw();
-if(!is_dir("/usr/local/apachemodsecurity")) 
+if(!is_dir("/usr/local/apachemodsecurity"))  {
 	safe_mkdir("/usr/local/apachemodsecurity");
+	conf_mount_rw();
+}
 
 function apache_mod_security_install() {
-
+	global $config, $g;
 }
 
 function apache_mod_security_deinstall() {
@@ -21,9 +19,11 @@ function apache_mod_security_resync() {
 	generate_apache_configuration();
 }
 
+// Generate mod_proxy specific configuration
 function generate_apache_configuration() {
 	global $config, $g;
-	// Generate mod_proxy specific configuration
+
+	// Syntax:ProxyPreserveHost On|Off ?
 	$mod_proxy = "ProxyRequests on\n";
 	
 	$mod_proxy = <<<EOF
@@ -33,7 +33,8 @@ function generate_apache_configuration() {
 </Proxy>	
 
 EOF;
-	
+
+	// Setup mod_proxy entries
 	if($config['installedpackages']['apachemodsecurity']) {
 		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
 			$backend_sites = "";
@@ -47,6 +48,7 @@ EOF;
 			}
 		}
 	}
+
 	// Set global site e-mail
 	if($config['installedpackages']['apache_mod_security_settings']['config']['globalsiteadminemail']) {
 		$global_site_email = $config['installedpackages']['apache_mod_security_settings']['config']['globalsiteadminemail'];
