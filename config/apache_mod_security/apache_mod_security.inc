@@ -61,7 +61,7 @@ EOF;
 	else 
 		$servername = `hostname`;
 		
-	// Set global site namne
+	// Set global listening directive
 	if($config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoipaddr']) {
 		$global_listen  = "Listen " . $config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoipaddr'];
 		if($config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoport'])
@@ -75,6 +75,8 @@ EOF;
 		else 
 			$global_listen .= ":80";
 	}
+
+	// Mod_security enabled?
 	if($config['installedpackages']['apache_mod_security_settings']['config']['enablemodsecurity'])  {
 		$enable_mod_security = true;
 		$mod_security = <<< EOF
