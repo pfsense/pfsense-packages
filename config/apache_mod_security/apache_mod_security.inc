@@ -36,7 +36,7 @@ EOF;
 
 	// Setup mod_proxy entries
 	if($config['installedpackages']['apachemodsecurity']) {
-		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
+		foreach($config['installedpackages']['apachemodsecurity'][0]['config'] as $ams) {
 			$backend_sites = "";
 			foreach($ams['row'] as $row)
 				$backend_sites .= "{$row['webserveripaddr']} ";
@@ -50,36 +50,37 @@ EOF;
 	}
 
 	// Set global site e-mail
-	if($config['installedpackages']['apache_mod_security_settings']['config']['globalsiteadminemail']) {
-		$global_site_email = $config['installedpackages']['apache_mod_security_settings']['config']['globalsiteadminemail'];
+	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalsiteadminemail']) {
+		$global_site_email = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalsiteadminemail'];
 	} else {
 		$global_site_email = "admin@admin.comn";
 		log_error("WARNING!  Global site Administrator E-Mail address has not been set.  Defaulting to bogus e-mail address.");
 	}
 
 	// Set ServerName
-	if($config['installedpackages']['apache_mod_security_settings']['config']['hostname']) {
-		$servername = "ServerName {$config['installedpackages']['apache_mod_security_settings']['config']['hostname']}\n";
-	else 
+	if($config['installedpackages']['apachemodsecuritysettings']['config']['hostname']) {
+		$servername = "ServerName {$config['installedpackages']['apachemodsecuritysettings']['config'][0]['hostname']}\n";
+	} else {
 		$servername = `hostname`;
+	}
 		
 	// Set global listening directive
-	if($config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoipaddr']) {
-		$global_listen  = "Listen " . $config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoipaddr'];
-		if($config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoport'])
-			$global_listen .= ":" . $config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoport'];
+	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr']) {
+		$global_listen  = "Listen " . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
+		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
+			$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
 		else 
 			$global_listen .= ":80";
 	} else {
 		$global_listen = "Listen {$config['system']['hostname']}.{$config['system']['domain']}";
-		if($config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoport'])
-			$global_listen .= ":" . $config['installedpackages']['apache_mod_security_settings']['config']['globalbindtoport'];
+		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
+			$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
 		else 
 			$global_listen .= ":80";
 	}
 
 	// Mod_security enabled?
-	if($config['installedpackages']['apache_mod_security_settings']['config']['enablemodsecurity'])  {
+	if($config['installedpackages']['apachemodsecuritysettings']['config']['enablemodsecurity'])  {
 		$enable_mod_security = true;
 		$mod_security = <<< EOF
 <IfModule mod_security.c>
