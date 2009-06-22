@@ -30,11 +30,83 @@
 	/*   trick interface into running this.  we are only
 	 *   calling from useland so this is not a security issue 
 	 */
-	$HTTP_SERVER_VARS['PHP_AUTH_USER'] = "root";
-	$HTTP_SERVER_VARS['AUTH_USER'] = "root";
 	require_once("config.inc");
+	require_once("functions.inc");
 	require_once("/usr/local/pkg/lcdproc.inc");
-	require_once("/usr/local/www/includes/functions.inc.php");
+
+	function get_pfstate() {
+		global $config;
+		$matches = "";
+		if (isset($config['system']['maximumstates']) and $config['system']['maximumstates'] > 0)
+			$maxstates="/{$config['system']['maximumstates']}";
+		else
+			$maxstates="/10000";
+
+		$curentries = `/sbin/pfctl -si |grep current`;
+		if (preg_match("/([0-9]+)/", $curentries, $matches)) {
+			$curentries = $matches[1];
+		}
+		return $curentries . $maxstates;
+	}
+
+	function disk_usage() {
+		$dfout = "";
+		exec("/bin/df -h | /usr/bin/grep -w '/' | /usr/bin/awk '{ print $5 }' | /usr/bin/cut -d '%' -f 1", $dfout);
+		$diskusage = trim($dfout[0]);
+
+		return $diskusage;
+	}
+
+	function mem_usage() {
+		$memory = "";
+		exec("/sbin/sysctl -n vm.stats.vm.v_page_count vm.stats.vm.v_inactive_count " .
+			"vm.stats.vm.v_cache_count vm.stats.vm.v_free_count", $memory);
+
+		$totalMem = $memory[0];
+		$availMem = $memory[1] + $memory[2] + $memory[3];
+		$usedMem = $totalMem - $availMem;
+		$memUsage = round(($usedMem * 100) / $totalMem, 0);
+
+		return $memUsage;
+	}
+
+	function array_combine($arr1, $arr2) {
+		$out = array();
+
+		$arr1 = array_values($arr1);
+		$arr2 = array_values($arr2);
+
+		foreach($arr1 as $key1 => $value1) {
+			$out[(string)$value1] = $arr2[$key1];
+		}
+
+		return $out;
+	}
+
+	/* Calculates non-idle CPU time and returns as a percentage */
+	function cpu_usage() {
+		$duration = 1;
+		$diff = array('user', 'nice', 'sys', 'intr', 'idle');
+		$cpuTicks = array_combine($diff, explode(" ", `/sbin/sysctl -n kern.cp_time`));
+		sleep($duration);
+		$cpuTicks2 = array_combine($diff, explode(" ", `/sbin/sysctl -n kern.cp_time`));
+
+		$totalStart = array_sum($cpuTicks);
+		$totalEnd = array_sum($cpuTicks2);
+
+		// Something wrapped ?!?!
+		if ($totalEnd <= $totalStart)
+			return 0;
+
+		// Calculate total cycles used
+		$totalUsed = ($totalEnd - $totalStart) - ($cpuTicks2['idle'] - $cpuTicks['idle']);
+
+		// Calculate the percentage used
+		$cpuUsage = floor(100 * ($totalUsed / ($totalEnd - $totalStart)));
+
+		return $cpuUsage;
+	}
+
 
 	function get_uptime_stats() {
 		exec("/usr/bin/uptime", $output, $ret);
