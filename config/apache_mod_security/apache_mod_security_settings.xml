@@ -68,8 +68,8 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Server hostnmae</fielddescr>
-			<fieldname>hostnmae</fieldname>
+			<fielddescr>Server hostname</fielddescr>
+			<fieldname>hostname</fieldname>
 			<description>
 				<![CDATA[
 					Enter the servers hostname

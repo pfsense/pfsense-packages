@@ -56,8 +56,8 @@ EOF;
 	}
 
 	// Set ServerName
-	if($config['installedpackages']['apache_mod_security_settings']['config']['hostnmae']) {
-		$servername = "ServerName {$config['installedpackages']['apache_mod_security_settings']['config']['hostnmae']}\n";
+	if($config['installedpackages']['apache_mod_security_settings']['config']['hostname']) {
+		$servername = "ServerName {$config['installedpackages']['apache_mod_security_settings']['config']['hostname']}\n";
 	else 
 		$servername = `hostname`;
 		
