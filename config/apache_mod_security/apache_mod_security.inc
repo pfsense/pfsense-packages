@@ -26,26 +26,25 @@ function generate_apache_configuration() {
 	// Generate mod_proxy specific configuration
 	$mod_proxy = "ProxyRequests on\n";
 	
+	$mod_proxy = <<<EOF
+<Proxy *>
+	Order deny,allow
+	Allow from all
+</Proxy>	
+
+EOF;
+	
 	if($config['installedpackages']['apachemodsecurity']) {
 		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
-			$sitename = str_replace(" ", "", $ams['sitename']);
-			$mod_proxy .= "ProxyPass /{$sitename}/  ";
+			$backend_sites = "";
 			foreach($ams['row'] as $row)
-				$mod_proxy .= " {$row['webserveripaddr']}";
+				$backend_sites .= "{$row['webserveripaddr']} ";
+			$sitename = str_replace(" ", "", $ams['sitename']);
 			$mod_proxy .= "\n";
-
-			$mod_proxy .= "<Location /{$sitename}/>\n";
-			$mod_proxy .= "        ProxyRemote {$ams['siteurl']}";
-				foreach($ams['row'] as $row)
-					$mod_proxy .= " {$row['webserveripaddr']}";
-			$mod_proxy .= "\n";
-			$mod_proxy .= "        ProxyPassReverse /\n";
-			$mod_proxy .= "        SetOutputFilter  proxy-html\n";
-//			$mod_proxy .= "ProxyHTMLURLMap {$ams['siteurl']} /{$sitename} \n";
-//			$mod_proxy .= "        ProxyHTMLURLMap  /      /{$sitename}/\n";
-//			$mod_proxy .= "        ProxyHTMLURLMap  /{$ams['sitename']}  /{$sitename}\n";
-			$mod_proxy .= "        RequestHeader    unset  Accept-Encoding\n";
-			$mod_proxy .= "</Location>\n";
+			if($backend_sites) {
+				$mod_proxy .= "ProxyPass /{$sitename}  {$backend_sites}\n";
+				$mod_proxy .= "ProxyPassReverse / {$backend_sites}\n";
+			}
 		}
 	}
 	// Set global site e-mail
