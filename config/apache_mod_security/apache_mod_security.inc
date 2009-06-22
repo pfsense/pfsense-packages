@@ -27,6 +27,9 @@ function generate_apache_configuration() {
 	$mod_proxy = "ProxyRequests on\n";
 	
 	$mod_proxy = <<<EOF
+
+ProxyRequests off
+
 <Proxy *>
 	Order deny,allow
 	Allow from all
@@ -36,15 +39,15 @@ EOF;
 
 	// Setup mod_proxy entries
 	if($config['installedpackages']['apachemodsecurity']) {
-		foreach($config['installedpackages']['apachemodsecurity'][0]['config'] as $ams) {
+		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
 			$backend_sites = "";
 			foreach($ams['row'] as $row)
 				$backend_sites .= "{$row['webserveripaddr']} ";
 			$sitename = str_replace(" ", "", $ams['sitename']);
 			$mod_proxy .= "\n";
 			if($backend_sites) {
-				$mod_proxy .= "ProxyPass /{$sitename}  {$backend_sites}\n";
-				$mod_proxy .= "ProxyPassReverse / {$backend_sites}\n";
+				$mod_proxy .= "ProxyPassReverse /{$sitename}  {$backend_sites}\n";
+				$mod_proxy .= "ProxyPass / {$backend_sites}\n";
 			}
 		}
 	}
