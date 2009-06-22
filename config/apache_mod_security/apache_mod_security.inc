@@ -61,7 +61,7 @@ EOF;
 	if($config['installedpackages']['apachemodsecuritysettings']['config']['hostname']) {
 		$servername = "ServerName {$config['installedpackages']['apachemodsecuritysettings']['config'][0]['hostname']}\n";
 	} else {
-		$servername = `hostname`;
+		$servername = `ServerName hostname`;
 	}
 		
 	// Set global listening directive
