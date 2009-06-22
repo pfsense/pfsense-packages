@@ -29,8 +29,11 @@ function generate_apache_configuration() {
 	if($config['installedpackages']['apachemodsecurity']) {
 		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
 			$sitename = str_replace(" ", "", $ams['sitename']);
-			$mod_proxy .= "ProxyPass /{$sitename}/ {$sitename} \n";
-			$mod_proxy .= "ProxyHTMLURLMap {$ams['siteurl']} /{$sitename} \n";
+			$mod_proxy .= "ProxyPass /{$sitename}/  ";
+			foreach($ams['row'] as $row)
+				$mod_proxy .= " {$row['webserveripaddr']}";
+			$mod_proxy .= "\n";
+
 			$mod_proxy .= "<Location /{$sitename}/>\n";
 			$mod_proxy .= "        ProxyRemote {$ams['siteurl']}";
 				foreach($ams['row'] as $row)
@@ -38,6 +41,7 @@ function generate_apache_configuration() {
 			$mod_proxy .= "\n";
 			$mod_proxy .= "        ProxyPassReverse /\n";
 			$mod_proxy .= "        SetOutputFilter  proxy-html\n";
+//			$mod_proxy .= "ProxyHTMLURLMap {$ams['siteurl']} /{$sitename} \n";
 //			$mod_proxy .= "        ProxyHTMLURLMap  /      /{$sitename}/\n";
 //			$mod_proxy .= "        ProxyHTMLURLMap  /{$ams['sitename']}  /{$sitename}\n";
 			$mod_proxy .= "        RequestHeader    unset  Accept-Encoding\n";
