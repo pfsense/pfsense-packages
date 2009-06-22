@@ -55,6 +55,13 @@
 	</tabs>
 	<fields>
 		<field>
+			<fielddescr>Enable mod_security protection</fielddescr>
+			<fieldname>enablemodsecurity</fieldname>
+			<description>Enables mod_security protection for all sites being proxied</description>
+			<type>input</type>
+		</field>
+
+		<field>
 			<fielddescr>Global site E-mail administrator</fielddescr>
 			<fieldname>globalsiteadminemail</fieldname>
 			<description>Enter the site administrators e-mail address</description>
