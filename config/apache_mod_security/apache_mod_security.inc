@@ -163,13 +163,11 @@ LoadModule proxy_ajp_module libexec/apache22/mod_proxy_ajp.so
 LoadModule proxy_balancer_module libexec/apache22/mod_proxy_balancer.so
 LoadModule ssl_module libexec/apache22/mod_ssl.so
 LoadModule mime_module libexec/apache22/mod_mime.so
-LoadModule dav_module libexec/apache22/mod_dav.so
 LoadModule status_module libexec/apache22/mod_status.so
 LoadModule autoindex_module libexec/apache22/mod_autoindex.so
 LoadModule asis_module libexec/apache22/mod_asis.so
 LoadModule info_module libexec/apache22/mod_info.so
 LoadModule cgi_module libexec/apache22/mod_cgi.so
-LoadModule dav_fs_module libexec/apache22/mod_dav_fs.so
 LoadModule vhost_alias_module libexec/apache22/mod_vhost_alias.so
 LoadModule negotiation_module libexec/apache22/mod_negotiation.so
 LoadModule dir_module libexec/apache22/mod_dir.so
