@@ -64,17 +64,32 @@ EOF;
 	if($config['installedpackages']['apachemodsecurity']) {
 		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
 			$backend_sites = "";
-			if(count($ams['row']) == 1) {
-				// 1 backend example
-				
-			} else {
-				// multiple backend examples
-				foreach($ams['row'] as $row)
-					$backend_sites .= "{$row['webserveripaddr']} ";
-			}
-			
+			foreach($ams['row'] as $row)
+				$additionalsitehostnames .= "{$row['additionalsitehostnames']} ";
+			foreach($ams['row'] as $row)
+				$backend_sites .= "{$row['webserveripaddr']} ";
+			$serveradmin = $ams['siteemail'];
+			$primarysitehostname = $ams['primarysitehostname'];
+			$additionalsitehostnames = $ams['primarysitehostname'];
 			$sitename = str_replace(" ", "", $ams['sitename']);
 			$mod_proxy .= "\n";
+			// Is this item a load balancer
+			if(count($ams['row'])>1) {
+				$balancer = true;
+				$mod_proxy .= "<Proxy balancer://{$sitename}>\n";
+				foreach($ams['row'] as $row)
+					$mod_proxy .= "	BalancerMember {$row['webserveripaddr']}\n";
+				$mod_proxy .= "</Proxy>\n";
+				$backend_sites = " balancer://{$sitename}\n";
+				$sitename = "";			// we are not using sitename in this case
+				$backend_sites = ""; 	// we are not using it, use the Proxy definition
+			}
+			if($additionalsitehostnames)
+				$mod_proxy .= "  ServerAlias $additionalsitehostnames\n";
+			if($serveradmin)
+				$mod_proxy .= "  ServerAdmin $serveradmin        \n";
+			if($primarysitehostname)
+				$mod_proxy .= "  ServerName $primarysitehostname \n";						
 			if($backend_sites) {
 				$mod_proxy .= "ProxyPassReverse /{$sitename}  {$backend_sites}\n";
 				$mod_proxy .= "ProxyPass / {$backend_sites}\n";
