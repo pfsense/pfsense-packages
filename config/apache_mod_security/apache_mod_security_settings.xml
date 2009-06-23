@@ -103,6 +103,50 @@
 			</description>
 			<type>input</type>
 		</field>
+
+		<field>
+			<fielddescr>Use mod_mem_cache</fielddescr>
+			<fieldname>mod_mem_cache</fieldname>
+			<description>
+				<![CDATA[
+					Enables mod_mem_cache which stores cached documents in memory.
+				]]>					
+			</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>mod_mem_cache memory usage</fielddescr>
+			<fieldname>mod_mem_cache_size</fieldname>
+			<description>
+				<![CDATA[
+					Sets the memory usage in megabytes.
+				]]>					
+			</description>
+			<type>input</type>
+		</field>
+
+		<field>
+			<fielddescr>Use mod_disk_cache</fielddescr>
+			<fieldname>mod_disk_cache</fieldname>
+			<description>
+				<![CDATA[
+					mod_disk_cache implements a disk based storage manager. It is primarily of use in conjunction with mod_cache.
+				]]>					
+			</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>mod_disk_cache memory usage</fielddescr>
+			<fieldname>mod_disk_cache_size</fieldname>
+			<description>
+				<![CDATA[
+					Sets the memory usage in Kbytes.
+				]]>					
+			</description>
+			<type>input</type>
+		</field>
+
+		
 	</fields>
 	<custom_php_validation_command>
 	</custom_php_validation_command>	

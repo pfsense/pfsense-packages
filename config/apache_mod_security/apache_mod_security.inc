@@ -52,7 +52,18 @@ function generate_apache_configuration() {
 		else 
 			$global_listen .= ":80";
 	}
+	
 
+
+	// XXX The maximum amount of memory used by the cache in KBytes
+	//MCacheSize 700000 
+	// CacheRoot Directive
+	// CacheRoot /var/apache_mod_security_cache
+	// htcacheclean can be used to maintain the cache size at a maximum level.
+	// XXX
+
+
+	
 	// Syntax:ProxyPreserveHost On|Off ?
 	$mod_proxy = "ProxyRequests on\n";
 	
