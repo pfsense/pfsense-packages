@@ -68,7 +68,8 @@ ProxyRequests off
 
 EOF;
 
-	/*  #####################################################
+	/*  
+		#####################################################
 		# Format for the Proxy servers:
 		# Please do not delete these from the source file
 		# in any "cleanups" that you feel you are performing.
@@ -100,16 +101,21 @@ EOF;
 	// Setup mod_proxy entries $mod_proxy
 	if($config['installedpackages']['apachemodsecurity']) {
 		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
-			$backend_sites = "";
 			// Set rowhelper used variables
 			foreach($ams['row'] as $row)
 				$additionalsitehostnames .= "{$row['additionalsitehostnames']} ";
+			$backend_sites = "";
 			foreach($ams['row'] as $row)
 				$backend_sites .= "{$row['webserveripaddr']} ";
 			// Set general items
-			$serveradmin = $ams['siteemail'];
-			$primarysitehostname = $ams['primarysitehostname'];
-			$additionalsitehostnames = $ams['primarysitehostname'];
+			if($ams['siteemail'])
+				$serveradmin = $ams['siteemail'];
+			else 
+				$serveradmin = $global_site_email;
+			if($ams['primarysitehostname'])
+				$primarysitehostname = $ams['primarysitehostname'];
+			if($ams['primarysitehostname'])
+				$additionalsitehostnames = $ams['primarysitehostname'];
 			$sitename = str_replace(" ", "", $ams['sitename']);			
 			// Set local listening directive
 			if($ams['ipaddress'] && $ams['port']) 
@@ -135,8 +141,8 @@ EOF;
 			if($primarysitehostname)
 				$mod_proxy .= "  ServerName $primarysitehostname \n";						
 			if($backend_sites) {
-				$mod_proxy .= "	ProxyPassReverse /{$sitename}  {$backend_sites}\n";
-				$mod_proxy .= "	ProxyPass / {$backend_sites}\n";
+				$mod_proxy .= "  ProxyPassReverse /{$sitename}  {$backend_sites}\n";
+				$mod_proxy .= "  ProxyPass / {$backend_sites}\n";
 			}
 			$mod_proxy .= "</VirtualHost>\n";
 			// End VirtualHost			
