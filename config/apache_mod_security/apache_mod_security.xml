@@ -82,31 +82,84 @@
 		<field>
 			<fielddescr>Site name</fielddescr>
 			<fieldname>sitename</fieldname>
-			<description>Name of the site.</description>
+			<description><![CDATA[Enter a short descriptive name for the site. (e.g. intranet)]]></description>
 			<type>input</type>
-		</field>
+		</field>	
 		<field>
-			<fielddescr>Site URL (FQDN)</fielddescr>
+			<fielddescr>Protocol</fielddescr>
 			<fieldname>siteurl</fieldname>
 			<description></description>
+			<size>1</size>
+			<type>select</type>			
+			<options>
+			    <option><name>HTTP</name><value>HTTP</value></option>
+			    <option><name>HTTPS</name><value>HTTPS</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>IP Address</fielddescr>
+			<fieldname>ipaddress</fieldname>
+			<description>Leave blank to use the default global IP address.</description>
 			<size>40</size>
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Webservers</fielddescr>
-			<fieldname>webservers</fieldname>
+			<fielddescr>Port</fielddescr>
+			<fieldname>port</fieldname>
+			<description>Leave blank to use the default global port.</description>
+			<size>40</size>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Primary site hostname</fielddescr>
+			<fieldname>primarysitehostname</fieldname>
+			<description><![CDATA[Enter the primary hostname (FQDN) for this website (e.g. www.example.com)]]></description>
+			<size>40</size>
+			<type>input</type>
+		</field>
+
+		<field>
+			<fielddescr>
+				<![CDATA[
+					Additional site hostnames
+					<br/>
+					(not required)
+				]]>
+			</fielddescr>
+			<fieldname>additionalsitehostnames</fieldname>
 		    <type>rowhelper</type>
-		    <description></description>
 		    <rowhelper>
 				<rowhelperfield>
-				    <fielddescr>Webserver backend URL</fielddescr>
-				    <fieldname>webserveripaddr</fieldname>
-				    <description>Add each webserver URL address here.</description>
+				    <fielddescr>Additional Site Hostname</fielddescr>
+				    <fieldname>additionalsitehostnames</fieldname>
+				    <description>Add each webserver hostname address here.</description>
 				    <type>input</type>
-				    <size>50</size>
+				    <size>53</size>
 				</rowhelperfield>
 		    </rowhelper>
 		</field>
+
+		<field>
+			<fielddescr>
+				<![CDATA[
+					Backend web servers
+					<br/>
+					NOTE:
+				]]>		
+			</fielddescr>
+			<fieldname>webservers</fieldname>
+		    <type>rowhelper</type>
+		    <rowhelper>
+				<rowhelperfield>
+				    <fielddescr>Web server backend IP</fielddescr>
+				    <fieldname>webserveripaddr</fieldname>
+				    <description>Add each web server IP address here.</description>
+				    <type>input</type>
+				    <size>53</size>
+				</rowhelperfield>
+		    </rowhelper>
+		</field>
+
 	</fields>
 	<service>
 		<name>apache_mod_security</name>
