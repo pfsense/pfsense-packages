@@ -116,8 +116,13 @@ EOF;
 			foreach($ams['row'] as $row)
 				$additionalsitehostnames .= "{$row['additionalsitehostnames']} ";
 			$backend_sites = "";
-			foreach($ams['row'] as $row)
-				$backend_sites .= "{$row['webserveripaddr']} ";
+			foreach($ams['row'] as $row) {
+				$backend_sites .= "{$row['webserveripaddr']}";
+				if(substr($row['webserveripaddr'],count($row['webserveripaddr']),1) != "/")
+					$backend_sites .= "/ ";
+				else 
+					$backend_sites .= " ";
+			}
 			// Set general items
 			if($ams['siteemail'])
 				$serveradmin = $ams['siteemail'];
@@ -160,8 +165,11 @@ EOF;
 		}
 	}
 
+	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['modsecuritycustom'])  
+		$mod_security_custom = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['modsecuritycustom'];
+
 	// Mod_security enabled?
-	if($config['installedpackages']['apachemodsecuritysettings']['config']['enablemodsecurity'])  {
+	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['enablemodsecurity'])  {
 		$enable_mod_security = true;
 		$mod_security = <<< EOF
 <IfModule mod_security.c>
@@ -286,9 +294,12 @@ EOF;
     #phpMyAdmin path vln
     SecFilterSelective REQUEST_URI "/css/phpmyadmin\.css\.php\?GLOBALS\[cfg\]\[ThemePath\]=/etc"
 
+	{$mod_security_custom}
+
 </IfModule>
 
 EOF;
+
 		
 }
 	$apache_config = <<<EOF
