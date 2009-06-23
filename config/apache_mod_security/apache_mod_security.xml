@@ -131,7 +131,6 @@
 			<size>40</size>
 			<type>input</type>
 		</field>
-
 		<field>
 			<fielddescr>
 				<![CDATA[
@@ -152,7 +151,6 @@
 				</rowhelperfield>
 		    </rowhelper>
 		</field>
-
 		<field>
 			<fielddescr>
 				<![CDATA[
