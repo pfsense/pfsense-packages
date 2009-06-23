@@ -23,6 +23,36 @@ function apache_mod_security_resync() {
 function generate_apache_configuration() {
 	global $config, $g;
 
+	// Set global site e-mail
+	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalsiteadminemail']) {
+		$global_site_email = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalsiteadminemail'];
+	} else {
+		$global_site_email = "admin@admin.comn";
+		log_error("WARNING!  Global site Administrator E-Mail address has not been set.  Defaulting to bogus e-mail address.");
+	}
+
+	// Set ServerName
+	if($config['installedpackages']['apachemodsecuritysettings']['config']['hostname']) {
+		$servername = "ServerName {$config['installedpackages']['apachemodsecuritysettings']['config'][0]['hostname']}\n";
+	} else {
+		$servername = `ServerName hostname`;
+	}
+		
+	// Set global listening directive
+	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr']) {
+		$global_listen  =  $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
+		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
+			$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
+		else 
+			$global_listen .= ":80";
+	} else {
+		$global_listen = "{$config['system']['hostname']}.{$config['system']['domain']}";
+		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
+			$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
+		else 
+			$global_listen .= ":80";
+	}
+
 	// Syntax:ProxyPreserveHost On|Off ?
 	$mod_proxy = "ProxyRequests on\n";
 	
@@ -67,19 +97,27 @@ EOF;
 		#####################################################
 	*/
 
-	// Setup mod_proxy entries
+	// Setup mod_proxy entries $mod_proxy
 	if($config['installedpackages']['apachemodsecurity']) {
 		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
 			$backend_sites = "";
+			// Set rowhelper used variables
 			foreach($ams['row'] as $row)
 				$additionalsitehostnames .= "{$row['additionalsitehostnames']} ";
 			foreach($ams['row'] as $row)
 				$backend_sites .= "{$row['webserveripaddr']} ";
+			// Set general items
 			$serveradmin = $ams['siteemail'];
 			$primarysitehostname = $ams['primarysitehostname'];
 			$additionalsitehostnames = $ams['primarysitehostname'];
-			$sitename = str_replace(" ", "", $ams['sitename']);
-			$mod_proxy .= "\n";
+			$sitename = str_replace(" ", "", $ams['sitename']);			
+			// Set local listening directive
+			if($ams['ipaddress'] && $ams['port']) 
+				$local_ip_port = "{$ams['ipaddress']}:{$ams['port']}";
+			else 
+				$local_ip_port = $global_listen;
+			// Begin VirtualHost
+			$mod_proxy .= "<VirtualHost {$local_ip_port}>\n";
 			// Is this item a load balancer
 			if(count($ams['row'])>1) {
 				$balancer = true;
@@ -91,46 +129,18 @@ EOF;
 				$sitename = "";			// we are not using sitename in this case
 			}
 			if($additionalsitehostnames)
-				$mod_proxy .= "  ServerAlias $additionalsitehostnames\n";
+				$mod_proxy .= "  ServerAlias $additionalsitehostnames";
 			if($serveradmin)
-				$mod_proxy .= "  ServerAdmin $serveradmin        \n";
+				$mod_proxy .= "  ServerAdmin $serveradmin\n";
 			if($primarysitehostname)
 				$mod_proxy .= "  ServerName $primarysitehostname \n";						
 			if($backend_sites) {
 				$mod_proxy .= "ProxyPassReverse /{$sitename}  {$backend_sites}\n";
 				$mod_proxy .= "ProxyPass / {$backend_sites}\n";
 			}
+			$mod_proxy .= "</VirtualHost>\n";
+			// End VirtualHost			
 		}
-	}
-
-	// Set global site e-mail
-	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalsiteadminemail']) {
-		$global_site_email = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalsiteadminemail'];
-	} else {
-		$global_site_email = "admin@admin.comn";
-		log_error("WARNING!  Global site Administrator E-Mail address has not been set.  Defaulting to bogus e-mail address.");
-	}
-
-	// Set ServerName
-	if($config['installedpackages']['apachemodsecuritysettings']['config']['hostname']) {
-		$servername = "ServerName {$config['installedpackages']['apachemodsecuritysettings']['config'][0]['hostname']}\n";
-	} else {
-		$servername = `ServerName hostname`;
-	}
-		
-	// Set global listening directive
-	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr']) {
-		$global_listen  = "Listen " . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
-		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
-			$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
-		else 
-			$global_listen .= ":80";
-	} else {
-		$global_listen = "Listen {$config['system']['hostname']}.{$config['system']['domain']}";
-		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
-			$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
-		else 
-			$global_listen .= ":80";
 	}
 
 	// Mod_security enabled?
@@ -215,7 +225,7 @@ ServerRoot "/usr/local"
 # Change this to Listen on specific IP addresses as shown below to 
 # prevent Apache from glomming onto all bound IP addresses.
 #
-{$global_listen}
+Listen {$global_listen}
 
 #
 # Dynamic Shared Object (DSO) Support
