@@ -82,7 +82,6 @@ EOF;
 				$mod_proxy .= "</Proxy>\n";
 				$backend_sites = " balancer://{$sitename}\n";
 				$sitename = "";			// we are not using sitename in this case
-				$backend_sites = ""; 	// we are not using it, use the Proxy definition
 			}
 			if($additionalsitehostnames)
 				$mod_proxy .= "  ServerAlias $additionalsitehostnames\n";
