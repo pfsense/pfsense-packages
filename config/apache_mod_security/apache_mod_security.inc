@@ -169,17 +169,37 @@ EOF;
     # Turn the filtering engine On or Off
     SecFilterEngine On
 
+	# XXX Add knobs for these
+	SecRuleEngine On
+	SecRequestBodyAccess On
+	SecResponseBodyAccess On
+	
+	# XXX Add knobs for these
+	SecRequestBodyInMemoryLimit 131072
+	SecRequestBodyLimit 10485760
+
+	SecResponseBodyMimeTypesClear
+	SecResponseBodyMimeType (null) text/plain text/html text/css text/xml
+
+	# XXX Add knobs for these
+	SecUploadDir /var/spool/apache/private
+	SecUploadKeepFiles Off
+
+	# XXX Add knobs for these
     # The audit engine works independently and
     # can be turned On of Off on the per-server or
     # on the per-directory basis
     SecAuditEngine RelevantOnly
 
+	# XXX Add knobs for these
     # Make sure that URL encoding is valid
     SecFilterCheckURLEncoding On
 
+	# XXX Add knobs for these
     # Unicode encoding check
     SecFilterCheckUnicodeEncoding On
 
+	# XXX Add knobs for these
     # Only allow bytes from this range
     SecFilterForceByteRange 1 255
 
