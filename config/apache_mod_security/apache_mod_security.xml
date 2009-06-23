@@ -74,8 +74,8 @@
 			<fieldname>sitename</fieldname>
 		</columnitem>
 		<columnitem>
-			<fielddescr>Site URL</fielddescr>
-			<fieldname>siteurl</fieldname>
+			<fielddescr>Site FQDN</fielddescr>
+			<fieldname>primarysitehostname</fieldname>
 		</columnitem>
 	</adddeleteeditpagefields>
 	<fields>
