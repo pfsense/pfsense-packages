@@ -165,33 +165,107 @@ EOF;
 		$enable_mod_security = true;
 		$mod_security = <<< EOF
 <IfModule mod_security.c>
+
     # Turn the filtering engine On or Off
     SecFilterEngine On
+
+    # The audit engine works independently and
+    # can be turned On of Off on the per-server or
+    # on the per-directory basis
+    SecAuditEngine RelevantOnly
 
     # Make sure that URL encoding is valid
     SecFilterCheckURLEncoding On
 
     # Unicode encoding check
-    SecFilterCheckUnicodeEncoding Off
+    SecFilterCheckUnicodeEncoding On
 
     # Only allow bytes from this range
-    SecFilterForceByteRange 0 255
+    SecFilterForceByteRange 1 255
 
-    # Only log suspicious requests
-    SecAuditEngine RelevantOnly
+    # Cookie format checks.
+    SecFilterCheckCookieFormat On
 
     # The name of the audit log file
     SecAuditLog logs/audit_log
-    # Debug level set to a minimum
-    SecFilterDebugLog logs/modsec_debug_log    
-    SecFilterDebugLevel 0
 
     # Should mod_security inspect POST payloads
     SecFilterScanPOST On
 
-    # By default log and deny suspicious requests
-    # with HTTP status 500
-    SecFilterDefaultAction "deny,log,status:500"
+    # Default action set
+    SecFilterDefaultAction "deny,log,status:406"
+
+    # Simple example filter
+    SecFilter 111
+
+    # Prevent path traversal (..) attacks
+    SecFilter "\.\./"
+
+    # Weaker XSS protection but allows common HTML tags
+    SecFilter "<( |\n)*script"
+
+    # Prevent XSS atacks (HTML/Javascript injection)
+    SecFilter "<(.|\n)+>"
+
+    # Very crude filters to prevent SQL injection attacks
+    SecFilter "delete[[:space:]]+from"
+    SecFilter "insert[[:space:]]+into"
+    SecFilter "select.+from"
+
+    # Require HTTP_USER_AGENT and HTTP_HOST headers
+    SecFilterSelective "HTTP_USER_AGENT|HTTP_HOST" "^$"
+
+    # Only accept request encodings we know how to handle
+    # we exclude GET requests from this because some (automated)
+    # clients supply "text/html" as Content-Type
+    SecFilterSelective REQUEST_METHOD "!^GET$" chain
+    SecFilterSelective HTTP_Content-Type "!(^$|^application/x-www-form-urlencoded$|^multipart/form-data)"
+
+    # Require Content-Length to be provided with
+    # every POST request
+    SecFilterSelective REQUEST_METHOD "^POST$" chain
+    SecFilterSelective HTTP_Content-Length "^$"
+
+    # Don't accept transfer encodings we know we don't handle
+    # (and you don't need it anyway)
+    SecFilterSelective HTTP_Transfer-Encoding "!^$"
+
+    # Some common application-related rules from
+    # http://modsecrules.monkeydev.org/rules.php?safety=safe
+
+    #Nuke Bookmarks XSS
+    SecFilterSelective THE_REQUEST "/modules\.php\?name=Bookmarks\&file=(del_cat\&catname|del_mark\&markname|edit_cat\&catname|edit_cat\&catcomment|marks\&catname|uploadbookmarks\&category)=(<[[:space:]]*script|(http|https|ftp)\:/)"
+
+    #Nuke Bookmarks Marks.php SQL Injection Vulnerability
+    SecFilterSelective THE_REQUEST "modules\.php\?name=Bookmarks\&file=marks\&catname=.*\&category=.*/\*\*/(union|select|delete|insert)"
+
+    #PHPNuke general XSS attempt
+    #/modules.php?name=News&file=article&sid=1&optionbox=
+    SecFilterSelective THE_REQUEST "/modules\.php\?*name=<[[:space:]]*script"
+
+    # PHPNuke SQL injection attempt
+    SecFilterSelective THE_REQUEST "/modules\.php\?*name=Search*instory="
+
+    #phpnuke sql insertion
+    SecFilterSelective THE_REQUEST "/modules\.php*name=Forums.*file=viewtopic*/forum=.*\'/"
+
+    # WEB-PHP phpbb quick-reply.php arbitrary command attempt
+
+    SecFilterSelective THE_REQUEST "/quick-reply\.php" chain
+    SecFilter "phpbb_root_path="
+
+    #Topic Calendar Mod for phpBB Cross-Site Scripting Attack
+    SecFilterSelective THE_REQUEST "/calendar_scheduler\.php\?start=(<[[:space:]]*script|(http|https|ftp)\:/)"
+
+    # phpMyAdmin: Safe
+
+    #phpMyAdmin Export.PHP File Disclosure Vulnerability
+    SecFilterSelective SCRIPT_FILENAME "export\.php$" chain
+    SecFilterSelective ARG_what "\.\."
+
+    #phpMyAdmin path vln
+    SecFilterSelective REQUEST_URI "/css/phpmyadmin\.css\.php\?GLOBALS\[cfg\]\[ThemePath\]=/etc"
+
 </IfModule>
 
 EOF;
