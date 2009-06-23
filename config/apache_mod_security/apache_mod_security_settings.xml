@@ -55,13 +55,6 @@
 	</tabs>
 	<fields>
 		<field>
-			<fielddescr>Enable mod_security protection</fielddescr>
-			<fieldname>enablemodsecurity</fieldname>
-			<description>Enables mod_security protection for all sites being proxied</description>
-			<type>checkbox</type>
-		</field>
-
-		<field>
 			<fielddescr>Global site E-mail administrator</fielddescr>
 			<fieldname>globalsiteadminemail</fieldname>
 			<description>Enter the site administrators e-mail address</description>
@@ -103,7 +96,6 @@
 			</description>
 			<type>input</type>
 		</field>
-
 		<field>
 			<fielddescr>Use mod_mem_cache</fielddescr>
 			<fieldname>mod_mem_cache</fieldname>
@@ -145,8 +137,20 @@
 			</description>
 			<type>input</type>
 		</field>
-
-		
+		<field>
+			<fielddescr>Enable mod_security protection</fielddescr>
+			<fieldname>enablemodsecurity</fieldname>
+			<description>Enables mod_security protection for all sites being proxied</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Custom mod_security rules</fielddescr>
+			<fieldname>Paste any custom mod_security rules that you would like to use</fieldname>
+			<description></description>
+			<type>textarea</type>
+	      	<rows>10</rows>
+	      	<cols>75</cols>			
+		</field>		
 	</fields>
 	<custom_php_validation_command>
 	</custom_php_validation_command>	
