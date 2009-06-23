@@ -35,30 +35,37 @@ ProxyRequests off
 	Allow from all
 </Proxy>	
 
-#----------------1 backend ip---------------------
-#<VirtualHost IP:port>
-#  ServerAdmin $serveradmin
-#  ServerName $primarysitehostname
-#  ServerAlias $additionalsitehostnames
-#  ProxyPass / $backendwebserverURL
-#  ProxyPassReverse / $backendwebserverURL
-#</VirtualHost>
-#where serveralias will be a space-separated list of "additional site hostnames"
-#i.e. if you have www1.example.com and www2.example.com there, it's "ServerAlias www1.example.com www2.example.com"
-#-------------------------------------------------
-
-#------------mutliple backend ips-----------------
-# Add:
-#<Proxy balancer://$sitename>
-#  BalancerMember $backend1
-#  BalancerMember $backend2
-#</Proxy>
-# Change:
-# ProxyPass / balancer://$sitename/
-# ProxyPassReverse / balancer://$sitename/
-#-------------------------------------------------
 
 EOF;
+
+	/*  #####################################################
+		# Format for the Proxy servers:
+		# Please do not delete these from the source file
+		# in any "cleanups" that you feel you are performing.
+		# They are here for sanity checking the code.
+		#----------------1 backend ip---------------------
+		#<VirtualHost IP:port>
+		#  ServerAdmin $serveradmin
+		#  ServerName $primarysitehostname
+		#  ServerAlias $additionalsitehostnames
+		#  ProxyPass / $backendwebserverURL
+		#  ProxyPassReverse / $backendwebserverURL
+		#</VirtualHost>
+		#where serveralias will be a space-separated list of "additional site hostnames"
+		#i.e. if you have www1.example.com and www2.example.com there, it's "ServerAlias www1.example.com www2.example.com"
+		#-------------------------------------------------
+		#------------mutliple backend ips-----------------
+		# Add:
+		#<Proxy balancer://$sitename>
+		#  BalancerMember $backend1
+		#  BalancerMember $backend2
+		#</Proxy>
+		# Change:
+		# ProxyPass / balancer://$sitename/
+		# ProxyPassReverse / balancer://$sitename/
+		#-------------------------------------------------
+		#####################################################
+	*/
 
 	// Setup mod_proxy entries
 	if($config['installedpackages']['apachemodsecurity']) {
