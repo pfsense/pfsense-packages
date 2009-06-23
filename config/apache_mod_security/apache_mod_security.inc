@@ -35,14 +35,44 @@ ProxyRequests off
 	Allow from all
 </Proxy>	
 
+#----------------1 backend ip---------------------
+#<VirtualHost IP:port>
+#  ServerAdmin $serveradmin
+#  ServerName $primarysitehostname
+#  ServerAlias $additionalsitehostnames
+#  ProxyPass / $backendwebserverURL
+#  ProxyPassReverse / $backendwebserverURL
+#</VirtualHost>
+#where serveralias will be a space-separated list of "additional site hostnames"
+#i.e. if you have www1.example.com and www2.example.com there, it's "ServerAlias www1.example.com www2.example.com"
+#-------------------------------------------------
+
+#------------mutliple backend ips-----------------
+# Add:
+#<Proxy balancer://$sitename>
+#  BalancerMember $backend1
+#  BalancerMember $backend2
+#</Proxy>
+# Change:
+# ProxyPass / balancer://$sitename/
+# ProxyPassReverse / balancer://$sitename/
+#-------------------------------------------------
+
 EOF;
 
 	// Setup mod_proxy entries
 	if($config['installedpackages']['apachemodsecurity']) {
 		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
 			$backend_sites = "";
-			foreach($ams['row'] as $row)
-				$backend_sites .= "{$row['webserveripaddr']} ";
+			if(count($ams['row']) == 1) {
+				// 1 backend example
+				
+			} else {
+				// multiple backend examples
+				foreach($ams['row'] as $row)
+					$backend_sites .= "{$row['webserveripaddr']} ";
+			}
+			
 			$sitename = str_replace(" ", "", $ams['sitename']);
 			$mod_proxy .= "\n";
 			if($backend_sites) {

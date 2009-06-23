@@ -84,7 +84,17 @@
 			<fieldname>sitename</fieldname>
 			<description><![CDATA[Enter a short descriptive name for the site. (e.g. intranet)]]></description>
 			<type>input</type>
-		</field>	
+		</field>
+		<field>
+			<fielddescr>Site Webmaster E-Mail address</fielddescr>
+			<fieldname>siteemail</fieldname>
+			<description>
+				<![CDATA[
+					Enter the Webmaster E-Mail address for this site.
+				]]>
+			</description>
+			<type>input</type>
+		</field>
 		<field>
 			<fielddescr>Protocol</fielddescr>
 			<fieldname>siteurl</fieldname>
@@ -113,7 +123,11 @@
 		<field>
 			<fielddescr>Primary site hostname</fielddescr>
 			<fieldname>primarysitehostname</fieldname>
-			<description><![CDATA[Enter the primary hostname (FQDN) for this website (e.g. www.example.com)]]></description>
+			<description>
+				<![CDATA[
+				Enter the primary hostname (FQDN) for this website (e.g. www.example.com)<br/>
+				Leave blank and define the IP Address / port above for IP site proxy (i.e. not named site proxy)
+				]]></description>
 			<size>40</size>
 			<type>input</type>
 		</field>
@@ -151,7 +165,7 @@
 		    <type>rowhelper</type>
 		    <rowhelper>
 				<rowhelperfield>
-				    <fielddescr>Web server backend IP</fielddescr>
+				    <fielddescr>Web server backend URL</fielddescr>
 				    <fieldname>webserveripaddr</fieldname>
 				    <description>Add each web server IP address here.</description>
 				    <type>input</type>
