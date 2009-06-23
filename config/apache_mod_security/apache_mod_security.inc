@@ -129,14 +129,14 @@ EOF;
 				$sitename = "";			// we are not using sitename in this case
 			}
 			if($additionalsitehostnames)
-				$mod_proxy .= "  ServerAlias $additionalsitehostnames";
+				$mod_proxy .= "  ServerAlias $additionalsitehostnames\n";
 			if($serveradmin)
 				$mod_proxy .= "  ServerAdmin $serveradmin\n";
 			if($primarysitehostname)
 				$mod_proxy .= "  ServerName $primarysitehostname \n";						
 			if($backend_sites) {
-				$mod_proxy .= "ProxyPassReverse /{$sitename}  {$backend_sites}\n";
-				$mod_proxy .= "ProxyPass / {$backend_sites}\n";
+				$mod_proxy .= "	ProxyPassReverse /{$sitename}  {$backend_sites}\n";
+				$mod_proxy .= "	ProxyPass / {$backend_sites}\n";
 			}
 			$mod_proxy .= "</VirtualHost>\n";
 			// End VirtualHost			
@@ -176,6 +176,7 @@ EOF;
     # with HTTP status 500
     SecFilterDefaultAction "deny,log,status:500"
 </IfModule>
+
 EOF;
 		
 }
