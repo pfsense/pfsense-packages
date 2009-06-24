@@ -222,7 +222,11 @@ EOF;
 				$additionalsitehostnames .= "{$row['additionalsitehostnames']} ";
 			$backend_sites = ""; // not technically needed.  added for readability due to .='s
 			foreach($ams['row'] as $row) {
+				// Ensure leading http(s)://
+				if(!strstr($row['webserveripaddr'], "http")) 
+					$backend_sites .= "http://";
 				$backend_sites .= "{$row['webserveripaddr']}";
+				// Ensure trailing /
 				if(substr($row['webserveripaddr'],count($row['webserveripaddr']),1) != "/")
 					$backend_sites .= "/ ";
 				else 
