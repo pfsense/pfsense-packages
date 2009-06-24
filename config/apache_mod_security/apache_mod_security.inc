@@ -455,7 +455,7 @@ LoadModule auth_digest_module libexec/apache22/mod_auth_digest.so
 LoadModule file_cache_module libexec/apache22/mod_file_cache.so
 LoadModule cache_module libexec/apache22/mod_cache.so
 LoadModule disk_cache_module libexec/apache22/mod_disk_cache.so
-LoadModule mem_cache_module libexec/apache22/mod_mem_cache.so
+LoadModule memcache_module libexec/apache22/mod_memcache.so
 LoadModule dumpio_module libexec/apache22/mod_dumpio.so
 LoadModule include_module libexec/apache22/mod_include.so
 LoadModule filter_module libexec/apache22/mod_filter.so
