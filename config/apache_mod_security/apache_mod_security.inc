@@ -41,8 +41,11 @@ function apache_mod_security_stop() {
 }
 
 function apache_mod_security_restart() {
-	apache_mod_security_stop();
-	apache_mod_security_start();
+	if(is_process_running("httpd")) {
+		exec("/usr/bin/killall -HUP httpd");
+	} else {
+		apache_mod_security_start();		
+	}
 }
 
 function apache_mod_security_install() {
