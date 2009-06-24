@@ -188,6 +188,22 @@ EOF;
 		#####################################################
 	*/
 
+	// Configure NameVirtualHost directives
+	$processed = array();
+	if($config['installedpackages']['apachemodsecurity']) {
+		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
+			if($ams['ipaddress'] && $ams['port']) 
+				$local_ip_port = "{$ams['ipaddress']}:{$ams['port']}";
+			else 
+				$local_ip_port = $global_listen;
+			// Do not add entries twice.
+			if(!in_array($local_ip_port, $processed)) {
+				$mod_proxy .= "NameVirtualHost $local_ip_port\n";
+				$processed[] = $local_ip_port;
+			}
+		}
+	}
+
 	// Setup mod_proxy entries $mod_proxy
 	if($config['installedpackages']['apachemodsecurity']) {
 		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
@@ -218,7 +234,7 @@ EOF;
 			else 
 				$local_ip_port = $global_listen;
 			// Begin VirtualHost
-			$mod_proxy .= "<VirtualHost {$local_ip_port}>\n";
+			$mod_proxy .= "\n<VirtualHost {$local_ip_port}>\n";
 			// Is this item a load balancer
 			if(count($ams['row'])>1) {
 				$balancer = true;
@@ -241,7 +257,7 @@ EOF;
 			}
 			if($ams['preserveproxyhostname']) 
 				$mod_proxy .= "  ProxyPreserveHost on\n";
-			$mod_proxy .= "</VirtualHost>\n";
+			$mod_proxy .= "</VirtualHost>\n\n";
 			// End VirtualHost			
 		}
 	}
