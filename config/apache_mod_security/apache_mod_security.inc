@@ -137,7 +137,7 @@ function generate_apache_configuration() {
 			$mcachesize = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['mod_mem_cache_size'];
 		else 
 			$mcachesize = "100";
-		$mem_cache = "MCacheSize $mcachesize\n";
+		//$mem_cache = "MCacheSize $mcachesize\n";
 	}
 
 	// CacheRoot Directive
