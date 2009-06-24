@@ -31,7 +31,10 @@
 require("guiconfig.inc");
 
 if($_REQUEST['getactivity']) {
-	$apachelogs = `cat /var/log/httpd-access.log`;
+	if($_REQUEST['logtype'] == "error")
+		$apachelogs = `cat /var/log/httpd-error.log`;
+	else
+		$apachelogs = `cat /var/log/httpd-access.log`;
 	echo "Apache+Mod_Security_Proxy Server logs as of " . date("D M j G:i:s T Y")  . "\n\n";
 	echo $apachelogs;
 	exit;
@@ -104,6 +107,13 @@ if ($_POST['clear']) { }
 	</form>
 </td>
 </div>
+<?php
+	if($_REQUEST['logtype'] == "error") {
+		echo "<br/>View <a href='apache_mod_security_view_logs.php?logtype=error'>error</a> logs";
+	} else {
+		echo "<br/>View <a href='apache_mod_security_view_logs.php'>access</a> logs";
+	}
+?>
 <?php include("fend.inc"); ?>
 </body>
 </html>
