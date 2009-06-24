@@ -102,7 +102,7 @@ function apache_mod_security_checkconfig() {
 	$status = `https -t`;
 	if(!strstr($status, "OK")) {
 		$input_error = "apache_mod_security_package: There was an error parsing the Apache configuration: {$status}";
-		log_error("apache_mod_security_package: There was an error parsing the Apache configuration: {$status}";);
+		log_error("apache_mod_security_package: There was an error parsing the Apache configuration: {$status}");
 	}
 }
 
