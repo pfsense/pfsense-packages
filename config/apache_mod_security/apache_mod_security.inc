@@ -99,7 +99,7 @@ function apache_mod_security_resync() {
 
 function apache_mod_security_checkconfig() {
 	global $config, $g;
-	$status = `https -t`;
+	$status = `/usr/local/sbin/httpd -t`;
 	if(!strstr($status, "OK")) {
 		$input_error = "apache_mod_security_package: There was an error parsing the Apache configuration: {$status}";
 		log_error("apache_mod_security_package: There was an error parsing the Apache configuration: {$status}");
