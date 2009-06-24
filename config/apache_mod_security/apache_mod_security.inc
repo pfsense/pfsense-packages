@@ -33,16 +33,16 @@ if(!is_dir("/usr/local/apachemodsecurity"))  {
 }
 
 function apache_mod_security_start() {
-	exec("/usr/local/sbin/httpd");
+	exec("/usr/local/sbin/httpd -k start");
 }
 
 function apache_mod_security_stop() {
-	exec("/usr/bin/killall httpd");
+	exec("/usr/local/sbin/httpd -k stop");
 }
 
 function apache_mod_security_restart() {
 	if(is_process_running("httpd")) {
-		exec("/usr/bin/killall -HUP httpd");
+		exec("/usr/local/sbin/httpd -k graceful");
 	} else {
 		apache_mod_security_start();		
 	}
