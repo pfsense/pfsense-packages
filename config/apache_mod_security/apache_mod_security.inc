@@ -1,7 +1,7 @@
 <?php
 /*
 	apache_mod_security.inc
-	part of the apache_mod_security package for pfSense
+	part of apache_mod_security package (http://www.pfSense.com)
 	Copyright (C) 2009 Scott Ullrich
 	All rights reserved.
 

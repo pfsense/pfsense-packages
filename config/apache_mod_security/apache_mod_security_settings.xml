@@ -8,7 +8,7 @@
 /* ========================================================================== */
 /*
     apache_mod_security_settings.xml
-    part of pfSense (http://www.pfSense.com)
+	part of apache_mod_security package (http://www.pfSense.com)
     Copyright (C) 2008 Scott Ullrich
     All rights reserved.
                                                                               */
