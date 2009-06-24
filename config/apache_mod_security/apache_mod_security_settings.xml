@@ -52,6 +52,10 @@
 			<text>Site Proxies</text>
 			<url>/pkg.php?xml=apache_mod_security.xml</url>
 		</tab>
+		<tab>
+			<text>Logs</text>
+			<url>/pkg.php?xml=apache_mod_security_view_logs.php</url>
+		</tab>
 	</tabs>
 	<fields>
 		<field>

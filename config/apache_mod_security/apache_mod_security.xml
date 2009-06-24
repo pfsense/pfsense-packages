@@ -65,7 +65,11 @@
 		<tab>
 			<text>Site Proxies</text>
 			<url>/pkg.php?xml=apache_mod_security.xml</url>
-			<active/>
+			<active/>			
+		</tab>
+		<tab>
+			<text>Logs</text>
+			<url>/pkg.php?xml=apache_mod_security_view_logs.php</url>
 		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
