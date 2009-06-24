@@ -1,27 +1,97 @@
 <?php
+/*
+	apache_mod_security.inc
+	part of the apache_mod_security package for pfSense
+	Copyright (C) 2009 Scott Ullrich
+	All rights reserved.
+
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
+
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
+
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
+
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
 
 if(!is_dir("/usr/local/apachemodsecurity"))  {
 	safe_mkdir("/usr/local/apachemodsecurity");
 	conf_mount_rw();
 }
 
+function apache_mod_security_start() {
+	exec("/usr/local/sbin/httpd");
+}
+
+function apache_mod_security_stop() {
+	exec("/usr/bin/killall httpd");
+}
+
+function apache_mod_security_restart() {
+	apache_mod_security_stop();
+	apache_mod_security_start();
+}
+
 function apache_mod_security_install() {
 	global $config, $g;
+
+	$filename = "apache_mod_security.sh";
+
+	$start = "php -q -d auto_prepend_file=config.inc <<ENDPHP
+	<?php
+		require_once(\"functions.inc\");
+		require_once(\"/usr/local/pkg/apache_mod_security.inc\");
+		apache_mod_security_start();
+	?>
+	ENDPHP\n";
+
+	$stop = "php -q -d auto_prepend_file=config.inc <<ENDPHP
+	<?php
+		require_once(\"functions.inc\");
+		require_once(\"/usr/local/pkg/apache_mod_security.inc\");
+		apache_mod_security_stop();
+	?>
+	ENDPHP\n";
+	
+	write_rcfile(array(
+			"file" => $filename,
+			"start" => $start,
+			"stop" => $stop
+		)
+	);
+
 }
 
 function apache_mod_security_deinstall() {
 	global $config, $g;
-	exec("rm -rf /usr/local/apachemodsecurity");
+	exec("/bin/rm -rf /usr/local/apachemodsecurity");
+	exec("/bin/rm -f /usr/local/etc/rc.d/apache_mod_security.sh");
 }
 
+// Regenerate apache configuration and handle server restart
 function apache_mod_security_resync() {
 	global $config, $g;
 	generate_apache_configuration();
+	apache_mod_security_restart();
 }
 
 // Generate mod_proxy specific configuration
 function generate_apache_configuration() {
 	global $config, $g;
+	$mod_proxy = "";
 
 	// Set global site e-mail
 	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalsiteadminemail']) {
@@ -53,29 +123,30 @@ function generate_apache_configuration() {
 			$global_listen .= ":80";
 	}
 	
+	// Setup mem_cache
+	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['mod_mem_cache']) {
+		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['mod_mem_cache_size'])
+			$mcachesize = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['mod_mem_cache_size'];
+		else 
+			$mcachesize = "100";
+		$mem_cache = "MCacheSize $mcachesize\n";
+	}
 
-
-	// XXX The maximum amount of memory used by the cache in KBytes
-	//MCacheSize 700000 
 	// CacheRoot Directive
-	// CacheRoot /var/apache_mod_security_cache
-	// htcacheclean can be used to maintain the cache size at a maximum level.
-	// XXX
+	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['mod_disk_cache']) {
+		safe_mkdir("/var/db/apachemodsecuritycache");
+		$cache_root .= "CacheRoot /var/db/apachemodsecuritycache\n";
+	}
+		
+	$mod_proxy .= <<<EOF
 
-
-	
-	// Syntax:ProxyPreserveHost On|Off ?
-	$mod_proxy = "ProxyRequests on\n";
-	
-	$mod_proxy = <<<EOF
-
+// Off when using ProxyPass
 ProxyRequests off
 
 <Proxy *>
 	Order deny,allow
 	Allow from all
-</Proxy>	
-
+</Proxy>
 
 EOF;
 
@@ -186,6 +257,8 @@ EOF;
 	SecRequestBodyInMemoryLimit 131072
 	SecRequestBodyLimit 10485760
 
+	{$mod_security_custom}
+
 	SecResponseBodyMimeTypesClear
 	SecResponseBodyMimeType (null) text/plain text/html text/css text/xml
 
@@ -293,8 +366,6 @@ EOF;
 
     #phpMyAdmin path vln
     SecFilterSelective REQUEST_URI "/css/phpmyadmin\.css\.php\?GLOBALS\[cfg\]\[ThemePath\]=/etc"
-
-	{$mod_security_custom}
 
 </IfModule>
 
@@ -773,6 +844,10 @@ DefaultType text/plainm
 SSLRandomSeed startup builtin
 SSLRandomSeed connect builtin
 </IfModule>
+
+# Cache settings
+{$mem_cache}
+{$cache_root}
 
 # Mod security
 {$mod_security}
