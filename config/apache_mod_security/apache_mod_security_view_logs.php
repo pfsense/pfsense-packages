@@ -52,6 +52,17 @@ if ($_POST['clear']) { }
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<style type='text/css'>
+pre {
+ overflow-x: auto; /* Use horizontal scroller if needed; for Firefox 2, not needed in Firefox 3 */
+ white-space: pre-wrap; /* css-3 */
+ white-space: -moz-pre-wrap !important; /* Mozilla, since 1999 */
+ white-space: -pre-wrap; /* Opera 4-6 */
+ white-space: -o-pre-wrap; /* Opera 7 */
+ /* width: 99%; */
+ word-wrap: break-word; /* Internet Explorer 5.5+ */
+}
+</style>
 <script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
 	<script type="text/javascript">
 		function getlogactivity() {
