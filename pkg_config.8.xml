@@ -18,7 +18,8 @@
       <depends_on_package>db42-4.2.52_5.tbz</depends_on_package>
       <depends_on_package>gdbm-1.8.3_3.tbz</depends_on_package>
 	  <depends_on_package>apr-gdbm-db42-1.3.5.1.3.7_3.tbz</depends_on_package>
-      <configurationfile>apache_mod_security.xml</configurationfile>
+	  <depends_on_package>mod_memcache-0.1.0.tbz</depends_on_package>
+     <configurationfile>apache_mod_security.xml</configurationfile>
 	  <after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
     </package>
 	<package>
