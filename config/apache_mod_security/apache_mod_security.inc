@@ -84,6 +84,7 @@ function apache_mod_security_install() {
 // Deinstall package routines
 function apache_mod_security_deinstall() {
 	global $config, $g;
+	apache_mod_security_stop();
 	exec("/bin/rm -rf /usr/local/apachemodsecurity");
 	exec("/bin/rm -f /usr/local/etc/rc.d/apache_mod_security.sh");
 }
