@@ -54,7 +54,7 @@ function apache_mod_security_install() {
 
 	$filename = "apache_mod_security.sh";
 
-	$start = "php -q -d auto_prepend_file=config.inc <<ENDPHP
+	$start = "/usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDPHP
 	<?php
 		require_once(\"functions.inc\");
 		require_once(\"/usr/local/pkg/apache_mod_security.inc\");
@@ -62,7 +62,7 @@ function apache_mod_security_install() {
 	?>
 	ENDPHP\n";
 
-	$stop = "php -q -d auto_prepend_file=config.inc <<ENDPHP
+	$stop = "/usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDPHP
 	<?php
 		require_once(\"functions.inc\");
 		require_once(\"/usr/local/pkg/apache_mod_security.inc\");
@@ -76,9 +76,9 @@ function apache_mod_security_install() {
 			"stop" => $stop
 		)
 	);
-
 }
 
+// Deinstall package routines
 function apache_mod_security_deinstall() {
 	global $config, $g;
 	exec("/bin/rm -rf /usr/local/apachemodsecurity");
@@ -109,9 +109,9 @@ function generate_apache_configuration() {
 	if($config['installedpackages']['apachemodsecuritysettings']['config']['hostname']) {
 		$servername = "ServerName {$config['installedpackages']['apachemodsecuritysettings']['config'][0]['hostname']}\n";
 	} else {
-		$servername = `ServerName hostname`;
+		$servername = "ServerName " . `hostname` . "\n";
 	}
-		
+
 	// Set global listening directive
 	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr']) {
 		$global_listen  =  $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
@@ -190,7 +190,7 @@ EOF;
 			// Set rowhelper used variables
 			foreach($ams['row'] as $row)
 				$additionalsitehostnames .= "{$row['additionalsitehostnames']} ";
-			$backend_sites = "";
+			$backend_sites = ""; // not technically needed.  added for readability due to .='s
 			foreach($ams['row'] as $row) {
 				$backend_sites .= "{$row['webserveripaddr']}";
 				if(substr($row['webserveripaddr'],count($row['webserveripaddr']),1) != "/")
