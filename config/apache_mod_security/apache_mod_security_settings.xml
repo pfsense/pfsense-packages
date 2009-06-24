@@ -145,8 +145,8 @@
 		</field>
 		<field>
 			<fielddescr>Custom mod_security rules</fielddescr>
-			<fieldname>Paste any custom mod_security rules that you would like to use</fieldname>
-			<description></description>
+			<fieldname>modsecuritycustom</fieldname>
+			<description>Paste any custom mod_security rules that you would like to use</description>
 			<type>textarea</type>
 	      	<rows>10</rows>
 	      	<cols>75</cols>			
