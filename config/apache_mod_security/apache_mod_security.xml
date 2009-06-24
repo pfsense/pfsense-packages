@@ -121,6 +121,12 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>Preserve Proxy hostname</fielddescr>
+			<fieldname>preserveproxyhostname</fieldname>
+			<description>When enabled, this option will pass the Host: line from the incoming request to the proxied host, instead of the backend IP address.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<fielddescr>Primary site hostname</fielddescr>
 			<fieldname>primarysitehostname</fieldname>
 			<description>

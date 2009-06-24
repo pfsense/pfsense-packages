@@ -239,6 +239,8 @@ EOF;
 				$mod_proxy .= "  ProxyPassReverse /{$sitename}  {$backend_sites}\n";
 				$mod_proxy .= "  ProxyPass / {$backend_sites}\n";
 			}
+			if($ams['preserveproxyhostname']) 
+				$mod_proxy .= "  ProxyPreserveHost on\n";
 			$mod_proxy .= "</VirtualHost>\n";
 			// End VirtualHost			
 		}
