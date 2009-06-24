@@ -93,7 +93,17 @@ function apache_mod_security_deinstall() {
 function apache_mod_security_resync() {
 	global $config, $g;
 	generate_apache_configuration();
+	apache_mod_security_checkconfig();
 	apache_mod_security_restart();
+}
+
+function apache_mod_security_checkconfig() {
+	global $config, $g;
+	$status = `https -t`;
+	if(!strstr($status, "OK")) {
+		$input_error = "apache_mod_security_package: There was an error parsing the Apache configuration: {$status}";
+		log_error("apache_mod_security_package: There was an error parsing the Apache configuration: {$status}";);
+	}
 }
 
 // Generate mod_proxy specific configuration
