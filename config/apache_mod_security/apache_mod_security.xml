@@ -57,6 +57,11 @@
 		<chmod>0644</chmod>
 		<item>http://www.pfsense.com/packages/config/apache_mod_security/apache_mod_security_settings.xml</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0644</chmod>
+		<item>http://www.pfsense.com/packages/config/apache_mod_security/apache_mod_security_view_logs.php</item>
+	</additional_files_needed>
 	<tabs>
 		<tab>
 			<text>Proxy Server Settings</text>
