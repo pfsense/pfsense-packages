@@ -140,7 +140,7 @@ function generate_apache_configuration() {
 		
 	$mod_proxy .= <<<EOF
 
-// Off when using ProxyPass
+# Off when using ProxyPass
 ProxyRequests off
 
 <Proxy *>
