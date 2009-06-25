@@ -219,6 +219,7 @@ EOF;
 		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
 			// Set rowhelper used variables
 			foreach($ams['row'] as $row) {
+				// Ensure leading http(s)://
 				if(!strstr($row['additionalsitehostnames'], "http")) 
 					$additionalsitehostnames .= "http://";				
 				$additionalsitehostnames .= "{$row['additionalsitehostnames']}";
