@@ -119,7 +119,7 @@ pre {
 </td>
 </div>
 <?php
-	if($_REQUEST['logtype'] == "error") {
+	if($_REQUEST['logtype'] = "error") {
 		echo "<br/>View <a href='apache_mod_security_view_logs.php?logtype=error'>error</a> logs";
 	} else {
 		echo "<br/>View <a href='apache_mod_security_view_logs.php'>access</a> logs";

@@ -247,8 +247,6 @@ EOF;
 				$local_ip_port = "{$ams['ipaddress']}:{$ams['port']}";
 			else 
 				$local_ip_port = $global_listen;
-			// Begin VirtualHost
-			$mod_proxy .= "\n<VirtualHost {$local_ip_port}>\n";
 			// Is this item a load balancer
 			if(count($ams['row'])>1) {
 				$balancer = true;
@@ -259,6 +257,8 @@ EOF;
 				$backend_sites = " balancer://{$sitename}\n";
 				$sitename = "";			// we are not using sitename in this case
 			}
+			// Begin VirtualHost
+			$mod_proxy .= "\n<VirtualHost {$local_ip_port}>\n";
 			if($additionalsitehostnames)
 				$mod_proxy .= "  ServerAlias $additionalsitehostnames\n";
 			if($serveradmin)
