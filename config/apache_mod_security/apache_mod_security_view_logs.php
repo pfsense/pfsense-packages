@@ -35,7 +35,7 @@ if($_REQUEST['getactivity']) {
 		$apachelogs = `cat /var/log/httpd-error.log`;
 	else
 		$apachelogs = `cat /var/log/httpd-access.log`;
-	echo "Apache+Mod_Security_Proxy Server logs as of " . date("D M j G:i:s T Y")  . "\n\n";
+	echo "</pre><h1>Apache+Mod_Security_Proxy Server logs as of " . date("D M j G:i:s T Y")  . "</h1><pre>\n\n";
 	echo $apachelogs;
 	exit;
 }
