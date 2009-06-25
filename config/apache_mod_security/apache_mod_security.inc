@@ -218,8 +218,16 @@ EOF;
 	if($config['installedpackages']['apachemodsecurity']) {
 		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
 			// Set rowhelper used variables
-			foreach($ams['row'] as $row)
-				$additionalsitehostnames .= "{$row['additionalsitehostnames']} ";
+			foreach($ams['row'] as $row) {
+				if(!strstr($row['additionalsitehostnames'], "http")) 
+					$additionalsitehostnames .= "http://";				
+				$additionalsitehostnames .= "{$row['additionalsitehostnames']}";
+				// Ensure trailing /
+				if(substr($row['additionalsitehostnames'],count($row['additionalsitehostnames']),1) != "/")
+					$additionalsitehostnames .= "/ ";
+				else 
+					$additionalsitehostnames .= " ";
+			}				
 			$backend_sites = ""; // not technically needed.  added for readability due to .='s
 			foreach($ams['row'] as $row) {
 				// Ensure leading http(s)://
