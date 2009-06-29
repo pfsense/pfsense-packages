@@ -186,7 +186,7 @@
 	 bridge (hangup_after-bridge=true) 
     -->
     <extension name="Local_Extension">
-      <condition field="destination_number" expression="^(\d{4}$|^\d{3})$">
+      <condition field="destination_number" expression="(^\d{4}$|^\d{3}$)">
 	<action application="set" data="dialed_extension=$1"/>
 	<action application="export" data="dialed_extension=$1"/>
 	<!-- bind_meta_app can have these args <key> [a|b|ab] [a|b|o|s] <app> -->
