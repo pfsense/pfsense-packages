@@ -321,10 +321,10 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	exec("/usr/local/bin/zip {$tempdir} {$tempdir}.zip");
 
 	// Read in file and deliver to client
-	$outfile = file_get_contents("{$tempdir}.zip");
+	$outfile = "{$tempdir}.zip";
 
 	// Remove temporary directory
-	exec("rm -rf {$tempdir} {$tempdir}.zip");
+	exec("rm -rf {$tempdir}");
 
 	return $outfile;
 
