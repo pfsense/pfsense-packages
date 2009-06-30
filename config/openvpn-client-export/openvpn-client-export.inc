@@ -298,19 +298,19 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	file_put_contents($cfgfile, $conf);
 
 	// write key files
-	$cafile = "{$tempdir}/config/{$prefix}-ca.crt";
+	$cafile = "{$tempdir}/{$prefix}-ca.crt";
 	file_put_contents($cafile, base64_decode($server_ca['crt']));
-	$crtfile = "{$tempdir}/config/{$prefix}-{$user['name']}.crt";
+	$crtfile = "{$tempdir}/{$prefix}-{$user['name']}.crt";
 	file_put_contents($crtfile, base64_decode($cert['crt']));
-	$keyfile = "{$tempdir}/config/{$prefix}-{$user['name']}.key";
+	$keyfile = "{$tempdir}/{$prefix}-{$user['name']}.key";
 	file_put_contents($keyfile, base64_decode($cert['prv']));
 	if ($settings['tls']) {
-		$tlsfile = "{$tempdir}/config/{$prefix}-tls.key";
+		$tlsfile = "{$tempdir}/{$prefix}-tls.key";
 		file_put_contents($tlsfile, base64_decode($settings['tls']));
 	}
 
 	// convert to pkcs12 format
-	$p12file = "{$tempdir}/config/{$prefix}.p12";
+	$p12file = "{$tempdir}/{$prefix}.p12";
 	if ($usetoken)
 		openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
 	else

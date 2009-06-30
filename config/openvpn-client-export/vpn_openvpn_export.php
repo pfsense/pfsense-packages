@@ -125,7 +125,7 @@ if($act == "visc") {
 		$password = $_GET['password']; ;
 
 	$exp_name = openvpn_client_export_prefix($srvid);
-	$exp_name = urlencode($exp_name."-Viscosity.visc");
+	$exp_name = urlencode($exp_name."-Viscosity.visc.zip");
 	$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $password);
 	$exp_size = filesize($exp_path);
 
