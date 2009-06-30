@@ -29,14 +29,9 @@
 	DISABLE_PHP_LINT_CHECKING
 */
 
+require("globals.inc");
 require("guiconfig.inc");
 require("openvpn-client-export.inc");
-
-// Handle Viscosiy upload
-if (is_uploaded_file($_FILES['ulfile']['tmp_name'])) {
-	rename($_FILES['ulfile']['tmp_name'], "{$g['upload_path']}/viscosity.zip");
-	
-}
 
 $pgtitle = array("OpenVPN", "Client Export Utility");
 
@@ -115,6 +110,33 @@ if($act == "conf") {
 	exit;
 }
 
+if($act == "visc") {
+	$srvid = $_GET['srvid'];
+	$usrid = $_GET['usrid'];
+	$crtid = $_GET['crtid'];
+	if (($srvid === false) || ($usrid === false) || ($crtid === false)) {
+		pfSenseHeader("vpn_openvpn_export.php");
+		exit;
+	}
+	$useaddr = $_GET['useaddr'];
+	$usetoken = $_GET['usetoken'];
+	$password = "";
+	if ($_GET['password'])
+		$password = $_GET['password']; ;
+
+	$exp_name = openvpn_client_export_prefix($srvid);
+	$exp_name = urlencode($exp_name."-Viscosity.visc");
+	$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $password);
+	$exp_size = filesize($exp_path);
+
+	header("Content-Type: application/octet-stream");
+	header("Content-Disposition: attachment; filename={$exp_name}");
+	header("Content-Length: $exp_size");
+	readfile($exp_path);
+	unlink($exp_path);
+	exit;
+}
+
 if($act == "inst") {
 	$srvid = $_GET['srvid'];
 	$usrid = $_GET['usrid'];
@@ -149,6 +171,7 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
 <script language="JavaScript">
+	var viscosityAvailable = false;
 <!--
 
 var servers = new Array();
@@ -227,6 +250,10 @@ function server_changed() {
 		cell2.innerHTML  = "<a href='javascript:download_begin(\"conf\"," + i + ")'>Configuration</a>";
 		cell2.innerHTML += "&nbsp;/&nbsp;";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>Windows Installer</a>";
+
+		cell2.innerHTML += "&nbsp;/&nbsp;";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>Viscosity Bundle</a>";
+
 	}
 }
 
@@ -341,23 +368,9 @@ function usepass_changed() {
 							</table>
 						</td>
 					</tr>
-
 					<tr>
 						<td colspan="2" class="list" height="12">&nbsp;</td>
 					</tr>
-					<?php if(is_dir("/usr/local/share/openvpn")): ?>
-
-					<?php else: ?>
-						<form action="vpn_openvpn_export.php" method="post" enctype="multipart/form-data">
-						<strong>Zipped Viscosity file:</strong>
-						<input name="ulfile" type="file" class="formfld">
-						</form>
-					<?php endif; ?>
-					<tr>
-						<td colspan="2" class="list" height="12">&nbsp;</td>
-					</tr>
-
-
 					<tr>
 						<td colspan="2" valign="top" class="listtopic">Client Install Packages</td>
 					</tr>

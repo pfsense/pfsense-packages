@@ -253,4 +253,81 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	return $outfile;	
 }
 
+function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass) {
+	global $config, $g;
+
+	$ovpndir = "/usr/local/share/openvpn/";
+	$tempdir = $g['tmp_path']."/openvpn-export-".uniqid();
+
+	// lookup server settings
+	$settings = $config['openvpn']['openvpn-server'][$srvid];
+	if (empty($settings))
+		return false;
+	if ($settings['disable'])
+		return false;
+
+	// lookup server certificate info
+	$server_cert =& lookup_cert($settings['certref']);
+	$server_ca =& lookup_ca($server_cert['caref']);
+	if (!$server_cert || !$server_ca)
+		return false;
+
+	// lookup user info
+	$user =& $config['system']['user'][$usrid];
+	if (!$user)
+		return false;
+
+	// lookup user certificate info
+	$cert =& $user['cert'][$crtid];
+	if (!$cert)
+		return false;
+
+	// create template directory
+	mkdir($tempdir, 0700, true);
+
+	// create config directory
+	$confdir = "{$tempdir}/config";
+	if (!is_dir($conf_dir))
+		mkdir($confdir, 0700, true);
+
+	// write cofiguration file
+	$prefix = openvpn_client_export_prefix($srvid);
+	$cfgfile = "{$confdir}/config.conf";
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken);
+	if (!$conf)
+		return false;
+	file_put_contents($cfgfile, $conf);
+
+	// write key files
+	$cafile = "{$tempdir}/config/{$prefix}-ca.crt";
+	file_put_contents($cafile, base64_decode($server_ca['crt']));
+	$crtfile = "{$tempdir}/config/{$prefix}-{$user['name']}.crt";
+	file_put_contents($crtfile, base64_decode($cert['crt']));
+	$keyfile = "{$tempdir}/config/{$prefix}-{$user['name']}.key";
+	file_put_contents($keyfile, base64_decode($cert['prv']));
+	if ($settings['tls']) {
+		$tlsfile = "{$tempdir}/config/{$prefix}-tls.key";
+		file_put_contents($tlsfile, base64_decode($settings['tls']));
+	}
+
+	// convert to pkcs12 format
+	$p12file = "{$tempdir}/config/{$prefix}.p12";
+	if ($usetoken)
+		openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
+	else
+		openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
+
+	// Zip Viscosity file
+	exec("/usr/local/bin/zip {$tempdir} {$tempdir}.zip");
+
+	// Read in file and deliver to client
+	$outfile = file_get_contents("{$tempdir}.zip");
+
+	// Remove temporary directory
+	exec("rm -rf {$tempdir} {$tempdir}.zip");
+
+	return $outfile;
+
+}
+
 ?>
