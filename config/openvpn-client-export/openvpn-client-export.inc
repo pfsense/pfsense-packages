@@ -284,14 +284,9 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	// create template directory
 	mkdir($tempdir, 0700, true);
 
-	// create config directory
-	$confdir = "{$tempdir}/config";
-	if (!is_dir($conf_dir))
-		mkdir($confdir, 0700, true);
-
 	// write cofiguration file
 	$prefix = openvpn_client_export_prefix($srvid);
-	$cfgfile = "{$confdir}/config.conf";
+	$cfgfile = "{$tempdir}/config.conf";
 	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken);
 	if (!$conf)
 		return false;
@@ -317,7 +312,7 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 		openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
 
 	// Zip Viscosity file
-	exec("/usr/local/bin/zip {$tempdir} {$tempdir}.zip");
+	exec("/usr/local/bin/zip {$tempdir}.zip {$tempdir}");
 
 	// Read in file and deliver to client
 	$outfile = "{$tempdir}.zip";

@@ -333,7 +333,7 @@ function usepass_changed() {
 							<table border="0" cellpadding="2" cellspacing="0">
 								<tr>
 									<td>
-										<input name="usepass" id="usepass" type="checkbox" value="yes" onClick="usepass_changed()" checked>
+										<input name="usepass" id="usepass" type="checkbox" onClick="usepass_changed()" checked>
 									</td>
 									<td>
 										<span class="vexpl">
