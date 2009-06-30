@@ -59,7 +59,11 @@
 			<url>/pkg.php?xml=openbgpd_groups.xml</url>
 			<active/>
 		</tab>
-		<tab>
+    <tab>
+      <text>Raw config</text>
+      <url>/openbgpd_raw.php</url>
+      </tab>
+    <tab>
 			<text>Status</text>
 			<url>/openbgpd_status.php</url>
 		</tab>

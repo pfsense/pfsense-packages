@@ -56,6 +56,11 @@
 		<item>http://www.pfsense.com/packages/config/openbgpd/openbgpd_status.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/openbgpd/openbgpd_raw.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/openbgpd/openbgpd.inc</item>
@@ -89,6 +94,10 @@
 		<tab>
 			<text>Groups</text>
 			<url>/pkg.php?xml=openbgpd_groups.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Raw config</text>
+			<url>/openbgpd_raw.php</url>
 		</tab>
 		<tab>
 			<text>Status</text>
