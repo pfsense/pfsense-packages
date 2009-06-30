@@ -42,7 +42,6 @@ function openvpn_client_export_install() {
 
 	exec("/usr/bin/tar zxf {$tarpath} -C {$ovpndir}");
 	unlink($tarpath);
-	rename("{$workdir}/{$phpfile}", "/usr/local/www/{$phpfile}");
 }
 
 function openvpn_client_export_deinstall() {
