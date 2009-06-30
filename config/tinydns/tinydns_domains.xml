@@ -250,6 +250,9 @@
 			log_error("Ping items done.");
 			tinydns_sync_on_changes();
 			log_error("Sync items done.");
+		} else {
+			tinydns_create_zone_file();
+			tinydns_setup_ping_items();
 		}
 	</custom_php_resync_config_command>
 	<custom_php_command_before_form>	
