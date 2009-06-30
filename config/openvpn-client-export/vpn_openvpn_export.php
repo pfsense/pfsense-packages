@@ -250,10 +250,8 @@ function server_changed() {
 		cell2.innerHTML  = "<a href='javascript:download_begin(\"conf\"," + i + ")'>Configuration</a>";
 		cell2.innerHTML += "&nbsp;/&nbsp;";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>Windows Installer</a>";
-
 		cell2.innerHTML += "&nbsp;/&nbsp;";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>Viscosity Bundle</a>";
-
+		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle</a>";
 	}
 }
 
