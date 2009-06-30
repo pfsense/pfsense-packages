@@ -32,6 +32,12 @@
 require("guiconfig.inc");
 require("openvpn-client-export.inc");
 
+// Handle Viscosiy upload
+if (is_uploaded_file($_FILES['ulfile']['tmp_name'])) {
+	rename($_FILES['ulfile']['tmp_name'], "{$g['upload_path']}/viscosity.zip");
+	
+}
+
 $pgtitle = array("OpenVPN", "Client Export Utility");
 
 if (!is_array($config['openvpn']['openvpn-server']))
@@ -335,9 +341,23 @@ function usepass_changed() {
 							</table>
 						</td>
 					</tr>
+
 					<tr>
 						<td colspan="2" class="list" height="12">&nbsp;</td>
 					</tr>
+					<?php if(is_dir("/usr/local/share/openvpn")): ?>
+
+					<?php else: ?>
+						<form action="vpn_openvpn_export.php" method="post" enctype="multipart/form-data">
+						<strong>Zipped Viscosity file:</strong>
+						<input name="ulfile" type="file" class="formfld">
+						</form>
+					<?php endif; ?>
+					<tr>
+						<td colspan="2" class="list" height="12">&nbsp;</td>
+					</tr>
+
+
 					<tr>
 						<td colspan="2" valign="top" class="listtopic">Client Install Packages</td>
 					</tr>
