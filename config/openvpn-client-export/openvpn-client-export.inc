@@ -189,7 +189,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 		return false;
 
 	// create template directory
-	$tempdir = $g['tmp_path']."/openvpn-export-".uniqid();
+	$tempdir = $g['tmp_path'] . "/openvpn-export-".uniqid();
 	mkdir($tempdir, 0700, true);
 
 	// create config directory
@@ -257,7 +257,7 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	global $config, $g;
 
 	$ovpndir = "/usr/local/share/openvpn/";
-	$tempdir = $g['tmp_path']."/openvpn-export-".uniqid();
+	$tempdir = $g['tmp_path'] . "/openvpn-export-" . uniqid();
 
 	// lookup server settings
 	$settings = $config['openvpn']['openvpn-server'][$srvid];
