@@ -18,11 +18,16 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/openvpn-client-export/openvpn-client-export.inc</item>
-        </additional_files_needed>
+	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/openvpn-client-export/openvpn-client-export.tgz</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/openvpn-client-export/vpn_openvpn_export.php</item>
 	</additional_files_needed>
 	<adddeleteeditpagefields>
 		<columnitem>
