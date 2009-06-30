@@ -288,36 +288,36 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	mkdir($tempdir . "/Viscosity.visc", 0700, true);
 
 	// Append new Viscosity.visc directory on top
-	$tempdir = $tempdir . "/Viscosity.visc";
+	$tempdir = $tempdir . "/Viscosity.visc/";
 
 	// write cofiguration file
 	$prefix = openvpn_client_export_prefix($srvid);
 	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken);
 	if (!$conf)
 		return false;
-	file_put_contents("{$tempdir}/config.conf", $conf);
+	$configfile = "{$tempdir}/config.conf";
+	file_put_contents($configfile, $conf);
 
-	// write key files
+	// write ca 
 	$cafile = "{$tempdir}/{$prefix}-ca.crt";
 	file_put_contents($cafile, base64_decode($server_ca['crt']));
+
+	// write user .crt
 	$crtfile = "{$tempdir}/{$prefix}-{$user['name']}.crt";
 	file_put_contents($crtfile, base64_decode($cert['crt']));
+
+	// write user .key
 	$keyfile = "{$tempdir}/{$prefix}-{$user['name']}.key";
 	file_put_contents($keyfile, base64_decode($cert['prv']));
+
+	// TLS support?
 	if ($settings['tls']) {
 		$tlsfile = "{$tempdir}/{$prefix}-tls.key";
 		file_put_contents($tlsfile, base64_decode($settings['tls']));
 	}
 
-	// convert to pkcs12 format
-	$p12file = "{$tempdir}/{$prefix}.p12";
-	if ($usetoken)
-		openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
-	else
-		openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
-
 	// Zip Viscosity file
-	exec("cd {$tempdir}/.. && /usr/local/bin/zip {$zipfile} Viscosity.visc Viscosity.visc/*");
+	exec("cd {$tempdir}/.. && /usr/local/bin/zip {$zipfile} Viscosity.visc Viscosity.visc/*.*");
 
 	// Remove temporary directory
 	exec("rm -rf {$tempdir}");
