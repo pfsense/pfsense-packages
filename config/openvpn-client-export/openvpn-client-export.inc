@@ -1,6 +1,7 @@
 <?php
 /*
 	openvpn-client-export.inc
+	Copyright (C) 2009 Scott Ullrich <sullrich@gmail.com>
 	Copyright (C) 2008 Shrew Soft Inc
 	All rights reserved.
 
@@ -304,6 +305,7 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 #viscosity dhcp true
 #viscosity dnssupport true
 #viscosity name {$friendly_name}
+
 EOF;
 
 	$configfile = "{$tempdir}/config.conf";
