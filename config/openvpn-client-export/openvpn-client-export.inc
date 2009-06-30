@@ -256,7 +256,9 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	global $config, $g;
 
 	$ovpndir = "/usr/local/share/openvpn/";
-	$tempdir = $g['tmp_path'] . "/openvpn-export-" . uniqid();
+	$uniq = uniqid();
+	$tempdir = $g['tmp_path'] . "/openvpn-export-" . $uniq;
+	$zipfile = $g['tmp_path'] . "{$uniq}-Viscosity.visc.zip";
 
 	// lookup server settings
 	$settings = $config['openvpn']['openvpn-server'][$srvid];
@@ -283,14 +285,17 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 
 	// create template directory
 	mkdir($tempdir, 0700, true);
+	mkdir($tempdir . "/Viscosity.visc", 0700, true);
+
+	// Append new Viscosity.visc directory on top
+	$tempdir = $tempdir . "/Viscosity.visc";
 
 	// write cofiguration file
 	$prefix = openvpn_client_export_prefix($srvid);
-	$cfgfile = "{$tempdir}/config.conf";
 	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken);
 	if (!$conf)
 		return false;
-	file_put_contents($cfgfile, $conf);
+	file_put_contents("{$tempdir}/config.conf", $conf);
 
 	// write key files
 	$cafile = "{$tempdir}/{$prefix}-ca.crt";
@@ -312,15 +317,12 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 		openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
 
 	// Zip Viscosity file
-	exec("/usr/local/bin/zip {$tempdir}.zip {$tempdir}");
-
-	// Read in file and deliver to client
-	$outfile = "{$tempdir}.zip";
+	exec("cd {$tempdir}/.. && /usr/local/bin/zip {$zipfile} Viscosity.visc Viscosity.visc/*");
 
 	// Remove temporary directory
 	exec("rm -rf {$tempdir}");
 
-	return $outfile;
+	return $zipfile;
 
 }
 
