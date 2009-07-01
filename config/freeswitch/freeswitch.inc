@@ -1206,17 +1206,17 @@ function sync_package_freeswitch_hunt_group()
 					
 					if (isset($rowhelper['huntgroupringback'])){
 						if ($rowhelper['huntgroupringback'] == "ring"){
-							$tmp .= " session.execute(\"set\", \"ringback=\"+us_ring);          //set to ringtone\n";
-							$tmp .= " session.execute(\"set\", \"transfer_ringback=\"+us_ring); //set to ringtone\n";
+							$tmp .= "	session.execute(\"set\", \"ringback=\"+us_ring);          //set to ringtone\n";
+							$tmp .= "	session.execute(\"set\", \"transfer_ringback=\"+us_ring); //set to ringtone\n";
 						}
 						if ($rowhelper['huntgroupringback'] == "music"){
-							$tmp .= " session.execute(\"set\", \"ringback=\${hold_music}\");          //set to ringtone\n";
-							$tmp .= " session.execute(\"set\", \"transfer_ringback=\${hold_music}\"); //set to ringtone\n";
+							$tmp .= "	session.execute(\"set\", \"ringback=\${hold_music}\");          //set to ringtone\n";
+							$tmp .= "	session.execute(\"set\", \"transfer_ringback=\${hold_music}\"); //set to ringtone\n";
 						}
 					}
 					else {
-						$tmp .= " session.execute(\"set\", \"ringback=\${hold_music}\");          //set to ringtone\n";
-						$tmp .= " session.execute(\"set\", \"transfer_ringback=\${hold_music}\"); //set to ringtone\n";		
+						$tmp .= "	session.execute(\"set\", \"ringback=\${hold_music}\");          //set to ringtone\n";
+						$tmp .= "	session.execute(\"set\", \"transfer_ringback=\${hold_music}\"); //set to ringtone\n";		
 					}
 					
 					if ($rowhelper['huntgrouptimeout'] > 0) {
@@ -1259,6 +1259,7 @@ function sync_package_freeswitch_hunt_group()
 					$a_hunt_group_destinations = &$config['installedpackages']['freeswitchhuntgroupdestinations']['config'];
 					if (count($a_hunt_group_destinations) > 0) { usort($a_hunt_group_destinations, "cmp_hunt_group_order"); }
 						if (count($a_hunt_group_destinations) > 0) {
+							
 							$x = 0;
 							foreach($a_hunt_group_destinations as $row) {
 							
@@ -1323,9 +1324,10 @@ function sync_package_freeswitch_hunt_group()
 							}
 						}
 						
-						$delimiter = ",";
-						
+						$delimiter = ",";						
 						$tmp_application = $tmp_array[0]["application"];
+						unset($tmp_array);
+						
 						$tmp .= "\n";
 						$tmp .= "		session.execute(\"".$tmp_application."\", $tmp_buffer);\n";
 						//$tmp .= "		session.execute(\"bridge\", sofia_contact_100+\",\"+sofia_contact_101+\",\"+sofia_contact_102+\",\"+sofia_contact_103+\",\"+sofia_contact_104);\n";
@@ -1333,13 +1335,14 @@ function sync_package_freeswitch_hunt_group()
 
 						break;
 					case "sequentially":
-					
+						
 						$tmp .= "\n";
 						//print_r($tmp_array);
 						$x = 0;
 						foreach ($tmp_array as $row) {
 							$tmp .= "		session.execute(\"".$row["application"]."\", ".$row["data"].");\n";					
 						}
+						unset($tmp_array);
 						
 						break;
 					}
@@ -1353,7 +1356,7 @@ function sync_package_freeswitch_hunt_group()
 					if ($row['huntgrouptimeouttype'] == "sip uri") { $huntgrouptimeouttype = "bridge"; }
 					$tmp .= "\n";
 					$tmp .= "		//timeout\n";
-					$tmp .= "		session.execute(\"".$huntgrouptimeouttype."\", \"default \"+domain+\" ".$huntgrouptimeoutdestination."\" );\n";
+					$tmp .= "		session.execute(\"".$huntgrouptimeouttype."\", \"default \"+domain+\" ".$huntgrouptimeoutdestination."\");\n";
 					
 					
 					$tmp .= "\n";
@@ -2632,7 +2635,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.9.3";
+	$freeswitch_package_version = "0.9.3.1";
 	$freeswitch_build_version = "1.0.4 pre 8";
 	$freeswitch_build_revision = "13784";
 	

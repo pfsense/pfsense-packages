@@ -1,7 +1,7 @@
 <?php
 /* $Id$ */
 /*
-	freeswitch_mailto.php
+	fax_to_email.php
 	Copyright (C) 2008 Mark J Crane
 	All rights reserved.
 
@@ -34,8 +34,8 @@ require_once("/etc/inc/config.inc");
 require_once("/usr/local/pkg/freeswitch.inc");
 global $config;
 
-//ob_end_clean();
-//ob_start();
+ob_end_clean();
+ob_start();
 
 echo "\n---------------------------------\n";
 
@@ -99,14 +99,15 @@ $tmp_smtpfromname = $config['installedpackages']['freeswitchsettings']['config']
 
 ini_set(max_execution_time,900); //15 minutes
 ini_set('memory_limit', '96M');
-//$fd = fopen("php://stdin", "r");
-//$email = file_get_contents ("php://stdin");
+$fd = fopen("php://stdin", "r");
 
-//fclose($fd);
+$email = file_get_contents ("php://stdin");
 
-//if($fd){
+fclose($fd);
+
+if($fd){
     $fp = fopen("/tmp/faxtoemail.txt", "w");
-//}
+}
 
 						
 
@@ -122,19 +123,22 @@ ini_set('memory_limit', '96M');
       $mail = new PHPMailer();
 
       $mail->IsSMTP();                  	// set mailer to use SMTP
-      $mail->SMTPAuth = $tmp_smtpauth;      // turn on/off SMTP authentication
+      if ($tmp_smtpauth == "true") {
+          $mail->SMTPAuth = $tmp_smtpauth;      // turn on/off SMTP authentication
+      }
       $mail->Host   = $tmp_smtphost;
       if (strlen($tmp_smtpsecure)>0) {
           $mail->SMTPSecure = $tmp_smtpsecure;
       }
-      if ($tmp_smtpauth) {
+      if ($tmp_smtpusername) {
           $mail->Username = $tmp_smtpusername;
           $mail->Password = $tmp_smtppassword;
       }
+      $mail->SMTPDebug  = 2;
 
-	  echo "tmp_smtpfrom: $tmp_smtpfrom\n";
-	  echo "tmp_smtpfromname: $tmp_smtpfromname\n";
-	  echo "tmp_subject: $tmp_subject\n";
+      echo "tmp_smtpfrom: $tmp_smtpfrom\n";
+      echo "tmp_smtpfromname: $tmp_smtpfromname\n";
+      echo "tmp_subject: $tmp_subject\n";
 
       $mail->From       = $tmp_smtpfrom;
       $mail->FromName   = $tmp_smtpfromname;
@@ -169,8 +173,8 @@ ini_set('memory_limit', '96M');
       }
 
 
-//$content = ob_get_contents(); //get the output from the buffer
-//ob_end_clean(); //clean the buffer
+$content = ob_get_contents(); //get the output from the buffer
+ob_end_clean(); //clean the buffer
 
 fwrite($fp, $content);
 fclose($fp);

@@ -30,7 +30,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require_once("config.inc");
+require_once("/etc/inc/config.inc");
 require_once("/usr/local/pkg/freeswitch.inc");
 global $config;
 
@@ -183,21 +183,24 @@ ob_start();
 
 //send the email
 
-      include "class.phpmailer.php";
-      include "class.smtp.php"; ; // optional, gets called from within class.phpmailer.php if not already loaded
+      include "/usr/local/www/packages/freeswitch/class.phpmailer.php";
+      include "/usr/local/www/packages/freeswitch/class.smtp.php"; // optional, gets called from within class.phpmailer.php if not already loaded
 
       $mail = new PHPMailer();
 
       $mail->IsSMTP();                  	// set mailer to use SMTP
+      if ($tmp_smtpauth == "true") {
       $mail->SMTPAuth = $tmp_smtpauth;      // turn on/off SMTP authentication
+	  }
       $mail->Host   = $tmp_smtphost;
       if (strlen($tmp_smtpsecure)>0) {
           $mail->SMTPSecure = $tmp_smtpsecure;
       }
-      if ($tmp_smtpauth) {
+      if ($tmp_smtpusername) {
           $mail->Username = $tmp_smtpusername;
           $mail->Password = $tmp_smtppassword;
       }
+      $mail->SMTPDebug  = 2;
 
 
       $mail->From       = $tmp_smtpfrom;
