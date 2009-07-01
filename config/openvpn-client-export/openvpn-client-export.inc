@@ -84,7 +84,7 @@ function openvpn_client_pem_to_pk12($outpath, $outpass, $crtpath, $keypath, $cap
 		unlink($capath);
 }
 
-function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken) {
+function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false) {
 	global $config;
 
 	// lookup server settings
@@ -140,15 +140,19 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 
 	// add key settings
 	$prefix = openvpn_client_export_prefix($srvid);
-	if ($usetoken) {
-		$conf .= "ca {$prefix}-ca.crt\n";
-		$conf .= "cryptoapicert \"SUBJ:{$user['name']}\"\n";
-	} else {
-		$conf .= "pkcs12 {$prefix}.p12\n";
+	if(!$nokeys) {
+		if ($usetoken) {
+			$conf .= "ca {$prefix}-ca.crt\n";
+			$conf .= "cryptoapicert \"SUBJ:{$user['name']}\"\n";
+		} else {
+			$conf .= "pkcs12 {$prefix}.p12\n";
+		}
 	}
 
-	if ($settings['tls'])
-		$conf .= "tls-auth {$prefix}-tls.key\n";
+	if(!$nokeys) {
+		if ($settings['tls'])
+			$conf .= "tls-auth {$prefix}-tls.key\n";
+	}
 
 	// add optional settings
 	if ($settings['compression'])
@@ -203,7 +207,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	// write cofiguration file
 	$prefix = openvpn_client_export_prefix($srvid);
 	$cfgfile = "{$confdir}/{$prefix}-config.ovpn";
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken);
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, false);
 	if (!$conf)
 		return false;
 	file_put_contents($cfgfile, $conf);
@@ -293,7 +297,7 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 
 	// write cofiguration file
 	$prefix = openvpn_client_export_prefix($srvid);
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken);
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, true);
 	if (!$conf)
 		return false;
 
