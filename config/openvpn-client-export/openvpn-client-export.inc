@@ -309,23 +309,31 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 EOF;
 
 	$configfile = "{$tempdir}/config.conf";
+	$conf .= <<<EOF
+cert cert.crt
+tls-auth ta.key
+ca ca.crt
+key key.key	
+EOF;
 	file_put_contents($configfile, $visc_settings . "\n" . $conf);
 
+	//	ca.crt		cert.crt	config.conf	key.key		ta.key
+
 	// write ca 
-	$cafile = "{$tempdir}/{$prefix}-ca.crt";
+	$cafile = "{$tempdir}/ca.crt";
 	file_put_contents($cafile, base64_decode($server_ca['crt']));
 
 	// write user .crt
-	$crtfile = "{$tempdir}/{$prefix}-{$user['name']}.crt";
+	$crtfile = "{$tempdir}/cert.crt";
 	file_put_contents($crtfile, base64_decode($cert['crt']));
 
 	// write user .key
-	$keyfile = "{$tempdir}/{$prefix}-{$user['name']}.key";
+	$keyfile = "{$tempdir}/key.key";
 	file_put_contents($keyfile, base64_decode($cert['prv']));
 
 	// TLS support?
 	if ($settings['tls']) {
-		$tlsfile = "{$tempdir}/{$prefix}-tls.key";
+		$tlsfile = "{$tempdir}/ta.key";
 		file_put_contents($tlsfile, base64_decode($settings['tls']));
 	}
 
