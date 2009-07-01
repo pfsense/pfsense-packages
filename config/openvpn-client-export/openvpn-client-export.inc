@@ -140,7 +140,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 
 	// add key settings
 	$prefix = openvpn_client_export_prefix($srvid);
-	if(!$nokeys) {
+	if($nokeys == false) {
 		if ($usetoken) {
 			$conf .= "ca {$prefix}-ca.crt\n";
 			$conf .= "cryptoapicert \"SUBJ:{$user['name']}\"\n";
@@ -149,7 +149,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 		}
 	}
 
-	if(!$nokeys) {
+	if($nokeys == false) {
 		if ($settings['tls'])
 			$conf .= "tls-auth {$prefix}-tls.key\n";
 	}
