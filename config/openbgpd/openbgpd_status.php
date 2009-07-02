@@ -120,7 +120,7 @@ function execCmds() {
 	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=openbgpd.xml&id=0");
 	$tab_array[] = array(gettext("Neighbors"), false, "/pkg.php?xml=openbgpd_neighbors.xml");
 	$tab_array[] = array(gettext("Groups"), false, "/pkg.php?xml=openbgpd_groups.xml");
-	$tab_array[] = array(gettext("Raw config"), true, "/openbgpd_raw.php");
+	$tab_array[] = array(gettext("Raw config"), false, "/openbgpd_raw.php");
 	$tab_array[] = array(gettext("Status"), true, "/openbgpd_status.php");
 	display_top_tabs($tab_array);
 ?>
