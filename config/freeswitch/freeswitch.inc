@@ -1339,10 +1339,12 @@ function sync_package_freeswitch_hunt_group()
 						$tmp .= "\n";
 						//print_r($tmp_array);
 						$x = 0;
-						foreach ($tmp_array as $row) {
-							$tmp .= "		session.execute(\"".$row["application"]."\", ".$row["data"].");\n";					
+						if (count($tmp_array) > 0) {
+							foreach ($tmp_array as $row) {
+								$tmp .= "		session.execute(\"".$row["application"]."\", ".$row["data"].");\n";					
+							}
+							unset($tmp_array);
 						}
-						unset($tmp_array);
 						
 						break;
 					}
