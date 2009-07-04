@@ -38,8 +38,11 @@ $a_extensions 	   = &$config['installedpackages']['freeswitchextensions']['confi
 
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'extensions') {
-        if ($a_extensions[$_GET['id']]) {		
-			unlink("/usr/local/freeswitch/conf/directory/default/".$_GET['extension'].".xml");
+        if ($a_extensions[$_GET['id']]) {
+			$tmp_file_name = "/usr/local/freeswitch/conf/directory/default/".$_GET['extension'].".xml";
+			if (file_exists($tmp_file_name)) {
+				unlink($tmp_file_name);
+			}
             unset($a_extensions[$_GET['id']]);
             write_config();
             header("Location: freeswitch_extensions.php");

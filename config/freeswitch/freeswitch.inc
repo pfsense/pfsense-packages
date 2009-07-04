@@ -562,66 +562,70 @@ function sync_package_freeswitch_extensions()
     	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/9*.xml");
   	
       foreach($config['installedpackages']['freeswitchextensions']['config'] as $rowhelper) {
+			if ($rowhelper['enabled'] != "false") {
+				  $fout = fopen("/usr/local/freeswitch/conf/directory/default/".$rowhelper['extension'].".xml","w");
 
-          $fout = fopen("/usr/local/freeswitch/conf/directory/default/".$rowhelper['extension'].".xml","w");
+				  $tmpxml = "<include>\n";
+				  if (strlen($rowhelper['cidr']) == 0) {
+					$tmpxml .= "  <user id=\"" . $rowhelper['extension'] . "\" mailbox=\"" . $rowhelper['mailbox'] . "\">\n";
+				  }
+				  else {
+					$tmpxml .= "  <user id=\"" . $rowhelper['extension'] . "\" mailbox=\"" . $rowhelper['mailbox'] . "\" cidr=\"" . $rowhelper['cidr'] . "\">\n";
+				  }
+				  $tmpxml .= "    <params>\n";
+				  $tmpxml .= "      <param name=\"password\" value=\"" . $rowhelper['password'] . "\"/>\n";
+				  $tmpxml .= "      <param name=\"vm-password\" value=\"" . $rowhelper['vm-password'] . "\"/>\n";
+				  if (strlen($rowhelper['vm-mailto']) > 0) {
+					  $tmpxml .= "      <param name=\"vm-email-all-messages\" value=\"true\"/>\n";
 
-          $tmpxml = "<include>\n";
-          if (strlen($rowhelper['cidr']) == 0) {
-          	$tmpxml .= "  <user id=\"" . $rowhelper['extension'] . "\" mailbox=\"" . $rowhelper['mailbox'] . "\">\n";
-          }
-          else {
-          	$tmpxml .= "  <user id=\"" . $rowhelper['extension'] . "\" mailbox=\"" . $rowhelper['mailbox'] . "\" cidr=\"" . $rowhelper['cidr'] . "\">\n";
-          }
-          $tmpxml .= "    <params>\n";
-          $tmpxml .= "      <param name=\"password\" value=\"" . $rowhelper['password'] . "\"/>\n";
-          $tmpxml .= "      <param name=\"vm-password\" value=\"" . $rowhelper['vm-password'] . "\"/>\n";
-          if (strlen($rowhelper['vm-mailto']) > 0) {
-              $tmpxml .= "      <param name=\"vm-email-all-messages\" value=\"true\"/>\n";
-
-              switch ($rowhelper['vm-attach-file']) {
-              case "true":
-              		$tmpxml .= "      <param name=\"vm-attach-file\" value=\"true\"/>\n";
-              		break;
-              case "false":
-              		$tmpxml .= "      <param name=\"vm-attach-file\" value=\"false\"/>\n";
-              		break;
-              default:
-              		$tmpxml .= "      <param name=\"vm-attach-file\" value=\"true\"/>\n";
-              }
-              switch ($rowhelper['vm-keep-local-after-email']) {
-              case "true":
-              		$tmpxml .= "      <param name=\"vm-keep-local-after-email\" value=\"true\"/>\n";
-              		break;
-              case "false":
-              		$tmpxml .= "      <param name=\"vm-keep-local-after-email\" value=\"false\"/>\n";
-              		break;
-              default:
-              		$tmpxml .= "      <param name=\"vm-keep-local-after-email\" value=\"true\"/>\n";
-              }
-              $tmpxml .= "      <param name=\"vm-mailto\" value=\"" . $rowhelper['vm-mailto'] . "\"/>\n";
-          }
-          if (strlen($rowhelper['auth-acl']) > 0) {
-          	$tmpxml .= "      <param name=\"auth-acl\" value=\"" . $rowhelper['auth-acl'] . "\"/>\n";
-          }          	
-          $tmpxml .= "    </params>\n";
-          $tmpxml .= "    <variables>\n";
-          $tmpxml .= "      <variable name=\"toll_allow\" value=\"domestic,international,local\"/>\n";
-          $tmpxml .= "      <variable name=\"accountcode\" value=\"" . $rowhelper['accountcode'] . "\"/>\n";
-          $tmpxml .= "      <variable name=\"user_context\" value=\"" . $rowhelper['user_context'] . "\"/>\n";
-          if (strlen($rowhelper['effective_caller_id_number']) > 0) {
-            $tmpxml .= "      <variable name=\"effective_caller_id_name\" value=\"" . $rowhelper['effective_caller_id_name'] . "\"/>\n";
-            $tmpxml .= "      <variable name=\"effective_caller_id_number\" value=\"" . $rowhelper['effective_caller_id_number'] . "\"/>\n";
-          }
-          if (strlen($rowhelper['outbound_caller_id_number']) > 0) {
-            $tmpxml .= "      <variable name=\"outbound_caller_id_name\" value=\"" . $rowhelper['outbound_caller_id_name'] . "\"/>\n";
-            $tmpxml .= "      <variable name=\"outbound_caller_id_number\" value=\"" . $rowhelper['outbound_caller_id_number'] . "\"/>\n";
-          }
-          $tmpxml .= "    </variables>\n";
-          $tmpxml .= "  </user>\n";
-          $tmpxml .= "</include>\n";
-          fwrite($fout, $tmpxml);
-          unset($tmpxml);
-          fclose($fout);
+					  switch ($rowhelper['vm-attach-file']) {
+					  case "true":
+							$tmpxml .= "      <param name=\"vm-attach-file\" value=\"true\"/>\n";
+							break;
+					  case "false":
+							$tmpxml .= "      <param name=\"vm-attach-file\" value=\"false\"/>\n";
+							break;
+					  default:
+							$tmpxml .= "      <param name=\"vm-attach-file\" value=\"true\"/>\n";
+					  }
+					  switch ($rowhelper['vm-keep-local-after-email']) {
+					  case "true":
+							$tmpxml .= "      <param name=\"vm-keep-local-after-email\" value=\"true\"/>\n";
+							break;
+					  case "false":
+							$tmpxml .= "      <param name=\"vm-keep-local-after-email\" value=\"false\"/>\n";
+							break;
+					  default:
+							$tmpxml .= "      <param name=\"vm-keep-local-after-email\" value=\"true\"/>\n";
+					  }
+					  $tmpxml .= "      <param name=\"vm-mailto\" value=\"" . $rowhelper['vm-mailto'] . "\"/>\n";
+				  }
+				  if (strlen($rowhelper['auth-acl']) > 0) {
+					$tmpxml .= "      <param name=\"auth-acl\" value=\"" . $rowhelper['auth-acl'] . "\"/>\n";
+				  }          	
+				  $tmpxml .= "    </params>\n";
+				  $tmpxml .= "    <variables>\n";
+				  $tmpxml .= "      <variable name=\"toll_allow\" value=\"domestic,international,local\"/>\n";
+				  $tmpxml .= "      <variable name=\"accountcode\" value=\"" . $rowhelper['accountcode'] . "\"/>\n";
+				  $tmpxml .= "      <variable name=\"user_context\" value=\"" . $rowhelper['user_context'] . "\"/>\n";
+				  if (strlen($rowhelper['effective_caller_id_number']) > 0) {
+					$tmpxml .= "      <variable name=\"effective_caller_id_name\" value=\"" . $rowhelper['effective_caller_id_name'] . "\"/>\n";
+					$tmpxml .= "      <variable name=\"effective_caller_id_number\" value=\"" . $rowhelper['effective_caller_id_number'] . "\"/>\n";
+				  }
+				  if (strlen($rowhelper['outbound_caller_id_number']) > 0) {
+					$tmpxml .= "      <variable name=\"outbound_caller_id_name\" value=\"" . $rowhelper['outbound_caller_id_name'] . "\"/>\n";
+					$tmpxml .= "      <variable name=\"outbound_caller_id_number\" value=\"" . $rowhelper['outbound_caller_id_number'] . "\"/>\n";
+				  }
+				  if (strlen($rowhelper['sip-force-contact']) > 0) {
+					$tmpxml .= "      <variable name=\"sip-force-contact\" value=\"" . $rowhelper['sip-force-contact'] . "\"/>\n";
+				  }
+				  $tmpxml .= "    </variables>\n";
+				  $tmpxml .= "  </user>\n";
+				  $tmpxml .= "</include>\n";
+				  fwrite($fout, $tmpxml);
+				  unset($tmpxml);
+				  fclose($fout);
+			}
       }
 
       conf_mount_ro();

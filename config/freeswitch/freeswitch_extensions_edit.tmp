@@ -60,6 +60,8 @@ if (isset($id) && $a_extensions[$id]) {
 	$pconfig['callgroup'] = $a_extensions[$id]['callgroup'];
 	$pconfig['auth-acl'] = $a_extensions[$id]['auth-acl'];
 	$pconfig['cidr'] = $a_extensions[$id]['cidr'];
+	$pconfig['sip-force-contact'] = $a_extensions[$id]['sip-force-contact'];
+	$pconfig['enabled'] = $a_extensions[$id]['enabled'];	
 	$pconfig['description'] = $a_extensions[$id]['description'];
 	
 }
@@ -94,8 +96,9 @@ if ($_POST) {
 		$ent['user_context'] = $_POST['user_context'];
 		$ent['callgroup'] = $_POST['callgroup'];		
 		$ent['auth-acl'] = $_POST['auth-acl'];
-		$ent['cidr'] = $_POST['cidr'];		
-		
+		$ent['cidr'] = $_POST['cidr'];
+		$ent['sip-force-contact'] = $_POST['sip-force-contact'];
+		$ent['enabled'] = $_POST['enabled'];		
 		$ent['description'] = $_POST['description'];
 
 		if (isset($id) && $a_extensions[$id]) {
@@ -325,10 +328,58 @@ display_top_tabs(build_menu());
 						<br><span class="vexpl">Enter the outbound caller id number here.<br></span>
 					</td>
 				</tr>
+                <tr>
+                    <td width="22%" valign="top" class="vncell">SIP-Force-Contact</td>
+                    <td width="78%" class="vtable">
+                      <?php
+                      echo "              <select name='sip-force-contact' class='formfld'>\n";
+                      echo "                <option></option>\n";
+                      switch (htmlspecialchars($pconfig['sip-force-contact'])) {
+                      case "NDLB-connectile-dysfunction":
+                          echo "              <option value='NDLB-connectile-dysfunction' selected='yes'>Rewrite contact IP and port</option>\n";				  
+                          echo "              <option value='NDLB-tls-connectile-dysfunction'>Rewrite contact port</option>\n";
+                          break;
+                      case "NDLB-tls-connectile-dysfunction":
+                          echo "              <option value='NDLB-connectile-dysfunction'>Rewrite contact IP and port</option>\n";				  
+                          echo "              <option value='NDLB-tls-connectile-dysfunction' selected='yes'>Rewrite contact port</option>\n";				  
+                      default:
+                          echo "              <option value='NDLB-connectile-dysfunction'>Rewrite contact IP and port</option>\n";				  
+                          echo "              <option value='NDLB-tls-connectile-dysfunction'>Rewrite contact port</option>\n";
+                      }
+                      echo "              </select>\n";
+                      ?>
+					  <br />
+                      Choose sip-force-contact can be used to NDLB-connectile-dysfunction rewrites contact IP and port, <br />and NDLB-tls-connectile-dysfunction rewrites the contact port.<br />
+                    </td>
+                </tr>
 				</table>
   			</div>
             			
-            <table width="100%" border="0" cellpadding="6" cellspacing="0">  			
+            <table width="100%" border="0" cellpadding="6" cellspacing="0">
+            <tr>
+              <td width="22%" valign="top" class="vncellreq">Enabled</td>
+              <td width="78%" class="vtable">
+                <?php
+                echo "              <select name='enabled' class='formfld'>\n";
+                echo "                <option></option>\n";
+                switch (htmlspecialchars($pconfig['enabled'])) {
+                case "true":
+                    echo "              <option value='true' selected='yes'>true</option>\n";
+                    echo "              <option value='false'>false</option>\n";
+                    break;
+                case "false":
+                    echo "              <option value='true'>true</option>\n";
+                    echo "              <option value='false' selected='yes'>false</option>\n";
+
+                    break;
+                default:
+                    echo "              <option value='true' selected='yes'>true</option>\n";
+                    echo "              <option value='false'>false</option>\n";
+                }
+                echo "              </select>\n";
+                ?>
+              </td>
+            </tr>
             <tr>
               <td width="25%" valign="top" class="vncellreq">Extension Description</td>
               <td width="75%" class="vtable">
