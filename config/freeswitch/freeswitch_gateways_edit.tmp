@@ -45,22 +45,29 @@ if (isset($_POST['id'])) {
 if (isset($id) && $a_gateways[$id]) {
 
 	$pconfig['gatewayid'] = $a_gateways[$id]['gatewayid'];
-	$gatewayid = $a_gateways[$id]['gatewayid'];	
+	$gatewayid = $a_gateways[$id]['gatewayid'];
 	$pconfig['gateway'] = $a_gateways[$id]['gateway'];
 	$pconfig['username'] = $a_gateways[$id]['username'];
 	$pconfig['password'] = $a_gateways[$id]['password'];
-	$pconfig['realm'] = $a_gateways[$id]['realm'];	
+	$pconfig['realm'] = $a_gateways[$id]['realm'];
 	$pconfig['from-user'] = $a_gateways[$id]['from-user'];
-	$pconfig['from-domain'] = $a_gateways[$id]['from-domain'];	
+	$pconfig['from-domain'] = $a_gateways[$id]['from-domain'];
 	$pconfig['proxy'] = $a_gateways[$id]['proxy'];
 	$pconfig['expire-seconds'] = $a_gateways[$id]['expire-seconds'];
 	$pconfig['register'] = $a_gateways[$id]['register'];
 	$pconfig['register-transport'] = $a_gateways[$id]['register-transport'];
 	$pconfig['retry-seconds'] = $a_gateways[$id]['retry-seconds'];
 	$pconfig['extension'] = $a_gateways[$id]['extension'];
-	$pconfig['context'] = $a_gateways[$id]['context'];
+	$pconfig['ping'] = $a_gateways[$id]['ping'];
 	$pconfig['caller-id-in-from'] = $a_gateways[$id]['caller-id-in-from'];
 	$pconfig['supress-cng'] = $a_gateways[$id]['supress-cng'];
+
+	$pconfig['effective_caller_id_name'] = $a_gateways[$id]['effective_caller_id_name'];
+	$pconfig['effective_caller_id_number'] = $a_gateways[$id]['effective_caller_id_number'];
+	$pconfig['outbound_caller_id_name'] = $a_gateways[$id]['outbound_caller_id_name'];
+	$pconfig['outbound_caller_id_number'] = $a_gateways[$id]['outbound_caller_id_number'];
+	
+	$pconfig['context'] = $a_gateways[$id]['context'];
 	$pconfig['enabled'] = $a_gateways[$id]['enabled'];
 	$pconfig['description'] = $a_gateways[$id]['description'];
 }
@@ -70,16 +77,21 @@ if ($_POST) {
 	unset($input_errors);
 	$pconfig = $_POST;
 
-
 	if (!$input_errors) {
 	
+		$effective_caller_id_number = $_POST['effective_caller_id_number'];
+		$outbound_caller_id_number =  $_POST['outbound_caller_id_number'];		
+		$replace_array = array("(", ")", " ", "-");
+		$effective_caller_id_number = str_replace($replace_array, "", $effective_caller_id_number);
+		$outbound_caller_id_number = str_replace($replace_array, "", $outbound_caller_id_number);
+		
 		$ent = array();
 		if (strlen($_POST['ivrid']) > 0) {
 		  $ent['gatewayid'] = $_POST['ivrid'];
 		}
 		else {
-      $ent['gatewayid'] = guid();
-    }
+			$ent['gatewayid'] = guid();
+		}
 		$ent['gateway'] = $_POST['gateway'];
 		$ent['username'] = $_POST['username'];
 		$ent['password'] = $_POST['password'];
@@ -92,13 +104,19 @@ if ($_POST) {
 		$ent['register-transport'] = $_POST['register-transport'];
 		$ent['retry-seconds'] = $_POST['retry-seconds'];
 		$ent['extension'] = $_POST['extension'];
-		$ent['context'] = $_POST['context'];
+		$ent['ping'] = $_POST['ping'];		
 		$ent['caller-id-in-from'] = $_POST['caller-id-in-from'];
 		$ent['supress-cng'] = $_POST['supress-cng'];
+		
+		$ent['effective_caller_id_name'] = $_POST['effective_caller_id_name'];
+		$ent['effective_caller_id_number'] = $effective_caller_id_number;
+		$ent['outbound_caller_id_name'] = $_POST['outbound_caller_id_name'];
+		$ent['outbound_caller_id_number'] = $outbound_caller_id_number;
+
+		$ent['context'] = $_POST['context'];
 		$ent['enabled'] = $_POST['enabled'];
 		$ent['description'] = $_POST['description'];
 		
-
 		if (isset($id) && $a_gateways[$id]) {
 		  	//update
       		$a_gateways[$id] = $ent;
@@ -107,9 +125,8 @@ if ($_POST) {
 		  	//add	
 			$a_gateways[] = $ent;
 		}
-		
 
-		
+
 		if (strlen(trim($_POST['dialplan_expression']))> 0) {
 		
 		    $gatewayid = $_POST['gatewayid'];		
@@ -390,6 +407,35 @@ display_top_tabs(build_menu());
             </tr>
 
             <tr>
+              <td width="22%" valign="top" class="vncell">Effective Caller ID Name</td>
+              <td width="78%" class="vtable">
+                <input name="effective_caller_id_name" type="text" class="formfld" id="effective_caller_id_name" size="40" value="<?=htmlspecialchars($pconfig['effective_caller_id_name']);?>">
+                <br> <span class="vexpl">Enter the effective caller ID name here.<br></span>
+              </td>
+            </tr>
+            <tr>
+              <td width="22%" valign="top" class="vncell">Effective Caller ID Number</td>
+              <td width="78%" class="vtable">
+                <input name="effective_caller_id_number" type="text" class="formfld" id="effective_caller_id_number" size="40" value="<?=htmlspecialchars($pconfig['effective_caller_id_number']);?>">
+                <br> <span class="vexpl">Enter the effective caller ID number here.<br></span>
+              </td>
+            </tr>
+            <tr>
+              <td width="22%" valign="top" class="vncell">Outbound Caller ID Name</td>
+              <td width="78%" class="vtable">
+                <input name="outbound_caller_id_name" type="text" class="formfld" id="outbound_caller_id_name" size="40" value="<?=htmlspecialchars($pconfig['outbound_caller_id_name']);?>">
+                <br> <span class="vexpl">Enter the outbound	caller ID name here.<br></span>
+              </td>
+            </tr>
+            <tr>
+              <td width="22%" valign="top" class="vncell">Outbound Caller ID Number</td>
+              <td width="78%" class="vtable">
+                <input name="outbound_caller_id_number" type="text" class="formfld" id="outbound_caller_id_number" size="40" value="<?=htmlspecialchars($pconfig['outbound_caller_id_number']);?>">
+                <br> <span class="vexpl">Enter the outbound caller ID number here.<br></span>
+              </td>
+            </tr>
+			
+            <tr>
               <td width="22%" valign="top" class="vncellreq">Context</td>
               <td width="78%" class="vtable">
                 <input name="context" type="text" class="formfld" id="context" size="40" value="<?=htmlspecialchars($pconfig['context']);?>">
@@ -439,12 +485,19 @@ display_top_tabs(build_menu());
                       ?>
                       Choose whether to register-transport.
                     </td>
-                  </tr>			
+                  </tr>
                   <tr>
                     <td width="22%" valign="top" class="vncell">Extension</td>
                     <td width="78%" class="vtable">
                       <input name="extension" type="text" class="formfld" id="extension" size="40" value="<?=htmlspecialchars($pconfig['extension']);?>">
                       <br> <span class="vexpl">Enter the extension here.<br></span>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td width="22%" valign="top" class="vncell">Ping</td>
+                    <td width="78%" class="vtable">
+                      <input name="ping" type="text" class="formfld" id="ping" size="40" value="<?=htmlspecialchars($pconfig['ping']);?>">
+                      <br> <span class="vexpl">Enter the ping interval here in seconds.<br></span>
                     </td>
                   </tr>
                   <tr>

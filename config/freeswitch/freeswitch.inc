@@ -704,14 +704,17 @@ function sync_package_freeswitch_gateways()
 		          if (strlen($rowhelper['extension']) > 0) {
 		            $tmpxml .= "      <param name=\"extension\" value=\"" . $rowhelper['extension'] . "\"/>\n";
 		          }
+		          if (strlen($rowhelper['ping']) > 0) {
+		            $tmpxml .= "      <param name=\"ping\" value=\"" . $rowhelper['ping'] . "\"/>\n";
+		          }
 		          if (strlen($rowhelper['context']) > 0) {
 		            $tmpxml .= "      <param name=\"context\" value=\"" . $rowhelper['context'] . "\"/>\n";
 		          }
 		          if (strlen($rowhelper['caller-id-in-from']) > 0) {
-		            $tmpxml .= "      <param name=\"context\" value=\"" . $rowhelper['context'] . "\"/>\n";
+		            $tmpxml .= "      <param name=\"caller-id-in-from\" value=\"" . $rowhelper['caller-id-in-from'] . "\"/>\n";
 		          }
 		          if (strlen($rowhelper['supress-cng']) > 0) {
-		            $tmpxml .= "      <param name=\"context\" value=\"" . $rowhelper['context'] . "\"/>\n";
+		            $tmpxml .= "      <param name=\"supress-cng\" value=\"" . $rowhelper['supress-cng'] . "\"/>\n";
 		          }
 		
 		          $tmpxml .= "    </gateway>\n";
@@ -2641,7 +2644,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.9.3.1";
+	$freeswitch_package_version = "0.9.4";
 	$freeswitch_build_version = "1.0.4 pre 8";
 	$freeswitch_build_revision = "13784";
 	

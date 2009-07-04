@@ -38,8 +38,11 @@ $a_gateways 	   = &$config['installedpackages']['freeswitchgateways']['config'];
 
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'gateways') {
-        if ($a_gateways[$_GET['id']]) {		
-			unlink("/usr/local/freeswitch/conf/sip_profiles/external/".$_GET['gateway'].".xml");
+        if ($a_gateways[$_GET['id']]) {
+			$tmp_file_name = "/usr/local/freeswitch/conf/sip_profiles/external/".$_GET['gateway'].".xml";
+			if (file_exists($tmp_file_name)) {
+				unlink($tmp_file_name);
+			}
             unset($a_gateways[$_GET['id']]);
             write_config();
             header("Location: freeswitch_gateways.php");
