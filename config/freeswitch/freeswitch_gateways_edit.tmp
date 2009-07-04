@@ -232,7 +232,48 @@ if ($_POST) {
 					$ent['fieldorder'] = '000';
 					$a_dialplan_include_details[] = $ent;
 					unset($ent);
-	            		
+
+					if (strlen($effective_caller_id_name) > 0) {
+						$ent = array();
+						$ent['dialplanincludeid'] = $dialplanincludeid;
+						$ent['tag'] = 'action'; //condition, action, antiaction
+						$ent['fieldtype'] = 'set';
+						$ent['fielddata'] = 'effective_caller_id_name='.$effective_caller_id_name;
+						$ent['fieldorder'] = '001';
+						$a_dialplan_include_details[] = $ent;
+						unset($ent);
+					}
+					if (strlen($effective_caller_id_number) > 0) {
+						$ent = array();
+						$ent['dialplanincludeid'] = $dialplanincludeid;
+						$ent['tag'] = 'action'; //condition, action, antiaction
+						$ent['fieldtype'] = 'set';
+						$ent['fielddata'] = 'effective_caller_id_number='.$effective_caller_id_number;
+						$ent['fieldorder'] = '001';
+						$a_dialplan_include_details[] = $ent;
+						unset($ent);
+					}
+					if (strlen($outbound_caller_id_name) > 0) {
+						$ent = array();
+						$ent['dialplanincludeid'] = $dialplanincludeid;
+						$ent['tag'] = 'action'; //condition, action, antiaction
+						$ent['fieldtype'] = 'set';
+						$ent['fielddata'] = 'outbound_caller_id_name='.$outbound_caller_id_name;
+						$ent['fieldorder'] = '001';
+						$a_dialplan_include_details[] = $ent;
+						unset($ent);
+					}
+					if (strlen($outbound_caller_id_number) > 0) {
+						$ent = array();
+						$ent['dialplanincludeid'] = $dialplanincludeid;
+						$ent['tag'] = 'action'; //condition, action, antiaction
+						$ent['fieldtype'] = 'set';
+						$ent['fielddata'] = 'outbound_caller_id_number='.$outbound_caller_id_number;
+						$ent['fieldorder'] = '001';
+						$a_dialplan_include_details[] = $ent;
+						unset($ent);
+					}
+					
 	                $ent = array();
 	                $ent['dialplanincludeid'] = $dialplanincludeid;
 	                $ent['tag'] = 'action'; //condition, action, antiaction
