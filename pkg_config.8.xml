@@ -242,6 +242,7 @@
       <maintainer>dv_serg@mail.ru</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>lightsquid-1.7.1_1.tbz</depends_on_package>
+      <depends_on_package>perl-5.8.8_1.tbz</depends_on_package>
       <status>Beta1</status>
       <required_version>1.2.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/lightsquid/lightsquid.xml</config_file>
