@@ -71,8 +71,10 @@ if(!$pgtitle_output)
         $tab_array[] = array(gettext("Update Rules"), true, "/snort_download_rules.php");
         $tab_array[] = array(gettext("Categories"), false, "/snort_rulesets.php");
         $tab_array[] = array(gettext("Rules"), false, "/snort_rules.php");
+		$tab_array[] = array(gettext("Servers"), false, "/pkg_edit.php?xml=snort_define_servers.xml&amp;id=0");
         $tab_array[] = array(gettext("Blocked"), false, "/snort_blocked.php");
         $tab_array[] = array(gettext("Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
+		$tab_array[] = array(gettext("Threshold"), false, "/pkg.php?xml=snort_threshold.xml");
         $tab_array[] = array(gettext("Alerts"), false, "/snort_alerts.php");
         $tab_array[] = array(gettext("Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
         display_top_tabs($tab_array);

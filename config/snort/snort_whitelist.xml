@@ -68,6 +68,10 @@
 			<url>/snort_rules.php</url>
 		</tab>
 		<tab>
+			<text>Servers</text>
+			<url>/pkg_edit.php?xml=snort_define_servers.xml&amp;id=0</url>
+		</tab>
+		<tab>
 			<text>Blocked</text>
 			<url>/snort_blocked.php</url>
 		</tab>
@@ -75,6 +79,10 @@
 			<text>Whitelist</text>
 			<url>/pkg.php?xml=snort_whitelist.xml</url>
 			<active/>
+		</tab>
+		<tab>
+			<text>Threshold</text>
+			<url>/pkg.php?xml=snort_threshold.xml</url>
 		</tab>
 		<tab>
 			<text>Alerts</text>

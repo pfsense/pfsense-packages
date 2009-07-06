@@ -240,7 +240,246 @@ $snortmysqllog_info_chk = $config['installedpackages']['snortadvanced']['config'
 /* define snortunifiedlog */
 $snortunifiedlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortunifiedlog'];
 if ($snortunifiedlog_info_chk == on)
-    $snortunifiedlog_type = "output alert_unified: snort.alert, limit 128\noutput log_unified: snort.log, limit 128";
+    $snortunifiedlog_type = "output unified2: filename snort.u2, limit 128";
+
+/* define servers and ports snortdefservers */
+
+/* def DNS_SERVSERS */
+$def_dns_servers_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_dns_servers'];
+if ($def_dns_servers_info_chk == "")
+	$def_dns_servers_type = "\$HOME_NET";
+else 
+	$def_dns_servers_type = "$def_dns_servers_info_chk";
+
+/* def DNS_PORTS */
+$def_dns_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_dns_ports'];
+if ($def_dns_ports_info_chk == "")
+	$def_dns_ports_type = "53";
+else 
+	$def_dns_ports_type = "$def_dns_ports_info_chk";
+
+/* def SMTP_SERVSERS */
+$def_smtp_servers_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_smtp_servers'];
+if ($def_smtp_servers_info_chk == "")
+	$def_smtp_servers_type = "\$HOME_NET";
+else 
+	$def_smtp_servers_type = "$def_smtp_servers_info_chk";
+
+/* def SMTP_PORTS */
+$def_smtp_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_smtp_ports'];
+if ($def_smtp_ports_info_chk == "")
+	$def_smtp_ports_type = "25";
+else 
+	$def_smtp_ports_type = "$def_smtp_ports_info_chk";
+
+/* def MAIL_PORTS */
+$def_mail_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_mail_ports'];
+if ($def_mail_ports_info_chk == "")
+	$def_mail_ports_type = "25,143,465,691";
+else 
+	$def_mail_ports_type = "$def_mail_ports_info_chk";
+	
+/* def HTTP_SERVSERS */
+$def_http_servers_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_http_servers'];
+if ($def_http_servers_info_chk == "")
+	$def_http_servers_type = "\$HOME_NET";
+else 
+	$def_http_servers_type = "$def_http_servers_info_chk";
+
+/* def WWW_SERVSERS */
+$def_www_servers_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_www_servers'];
+if ($def_www_servers_info_chk == "")
+	$def_www_servers_type = "\$HOME_NET";
+else 
+	$def_www_servers_type = "$def_www_servers_info_chk";
+
+/* def HTTP_PORTS */
+$def_http_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_http_ports'];
+if ($def_http_ports_info_chk == "")
+	$def_http_ports_type = "80";
+else 
+	$def_http_ports_type = "$def_http_ports_info_chk";
+	
+/* def SQL_SERVSERS */
+$def_sql_servers_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_sql_servers'];
+if ($def_sql_servers_info_chk == "")
+	$def_sql_servers_type = "\$HOME_NET";
+else 
+	$def_sql_servers_type = "$def_sql_servers_info_chk";
+
+/* def ORACLE_PORTS */
+$def_oracle_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_oracle_ports'];
+if ($def_oracle_ports_info_chk == "")
+	$def_oracle_ports_type = "1521";
+else 
+	$def_oracle_ports_type = "$def_oracle_ports_info_chk";
+
+/* def MSSQL_PORTS */
+$def_mssql_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_mssql_ports'];
+if ($def_mssql_ports_info_chk == "")
+	$def_mssql_ports_type = "1433";
+else 
+	$def_mssql_ports_type = "$def_mssql_ports_info_chk";
+
+/* def TELNET_SERVSERS */
+$def_telnet_servers_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_telnet_servers'];
+if ($def_telnet_servers_info_chk == "")
+	$def_telnet_servers_type = "\$HOME_NET";
+else 
+	$def_telnet_servers_type = "$def_telnet_servers_info_chk";
+	
+/* def TELNET_PORTS */
+$def_telnet_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_telnet_ports'];
+if ($def_telnet_ports_info_chk == "")
+	$def_telnet_ports_type = "23";
+else 
+	$def_telnet_ports_type = "$def_telnet_ports_info_chk";
+	
+/* def SNMP_SERVSERS */
+$def_snmp_servers_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_snmp_servers'];
+if ($def_snmp_servers_info_chk == "")
+	$def_snmp_servers_type = "\$HOME_NET";
+else 
+	$def_snmp_servers_type = "$def_snmp_servers_info_chk";
+	
+/* def SNMP_PORTS */
+$def_snmp_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_snmp_ports'];
+if ($def_snmp_ports_info_chk == "")
+	$def_snmp_ports_type = "161";
+else 
+	$def_snmp_ports_type = "$def_snmp_ports_info_chk";
+	
+/* def FTP_SERVSERS */
+$def_ftp_servers_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_ftp_servers'];
+if ($def_ftp_servers_info_chk == "")
+	$def_ftp_servers_type = "\$HOME_NET";
+else 
+	$def_ftp_servers_type = "$def_ftp_servers_info_chk";
+	
+/* def FTP_PORTS */
+$def_ftp_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_ftp_ports'];
+if ($def_ftp_ports_info_chk == "")
+	$def_ftp_ports_type = "21";
+else 
+	$def_ftp_ports_type = "$def_ftp_ports_info_chk";
+	
+/* def SSH_SERVSERS */
+$def_ssh_servers_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_ssh_servers'];
+if ($def_ssh_servers_info_chk == "")
+	$def_ssh_servers_type = "\$HOME_NET";
+else 
+	$def_ssh_servers_type = "$def_ssh_servers_info_chk";
+	
+/* if user has defined a custom ssh port, use it */
+if($config['system']['ssh']['port'])
+	$ssh_port = $config['system']['ssh']['port'];
+else
+	$ssh_port = "22";
+	
+/* def SSH_PORTS */
+$def_ssh_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_ssh_ports'];
+if ($def_ssh_ports_info_chk == "")
+	$def_ssh_ports_type = "{$ssh_port}";
+else 
+	$def_ssh_ports_type = "$def_ssh_ports_info_chk";
+	
+/* def POP_SERVSERS */
+$def_pop_servers_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_pop_servers'];
+if ($def_pop_servers_info_chk == "")
+	$def_pop_servers_type = "\$HOME_NET";
+else 
+	$def_pop_servers_type = "$def_pop_servers_info_chk";
+	
+/* def POP2_PORTS */
+$def_pop2_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_pop2_ports'];
+if ($def_pop2_ports_info_chk == "")
+	$def_pop2_ports_type = "109";
+else 
+	$def_pop2_ports_type = "$def_pop2_ports_info_chk";
+	
+/* def POP3_PORTS */
+$def_pop3_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_pop3_ports'];
+if ($def_pop3_ports_info_chk == "")
+	$def_pop3_ports_type = "110";
+else 
+	$def_pop3_ports_type = "$def_pop3_ports_info_chk";
+	
+/* def IMAP_SERVSERS */
+$def_imap_servers_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_imap_servers'];
+if ($def_imap_servers_info_chk == "")
+	$def_imap_servers_type = "\$HOME_NET";
+else 
+	$def_imap_servers_type = "$def_imap_servers_info_chk";
+	
+/* def IMAP_PORTS */
+$def_imap_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_imap_ports'];
+if ($def_imap_ports_info_chk == "")
+	$def_imap_ports_type = "143";
+else 
+	$def_imap_ports_type = "$def_imap_ports_info_chk";
+	
+/* def SIP_PROXY_IP */
+$def_sip_proxy_ip_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_sip_proxy_ip'];
+if ($def_sip_proxy_ip_info_chk == "")
+	$def_sip_proxy_ip_type = "\$HOME_NET";
+else 
+	$def_sip_proxy_ip_type = "$def_sip_proxy_ip_info_chk";
+	
+/* def SIP_PROXY_PORTS */
+$def_sip_proxy_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_sip_proxy_ports'];
+if ($def_sip_proxy_ports_info_chk == "")
+	$def_sip_proxy_ports_type = "5060:5090,16384:32768";
+else 
+	$def_sip_proxy_ports_type = "$def_sip_proxy_ports_info_chk";
+	
+/* def AUTH_PORTS */
+$def_auth_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_auth_ports'];
+if ($def_auth_ports_info_chk == "")
+	$def_auth_ports_type = "113";
+else 
+	$def_auth_ports_type = "$def_auth_ports_info_chk";
+	
+/* def FINGER_PORTS */
+$def_finger_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_finger_ports'];
+if ($def_finger_ports_info_chk == "")
+	$def_finger_ports_type = "79";
+else 
+	$def_finger_ports_type = "$def_finger_ports_info_chk";
+	
+/* def IRC_PORTS */
+$def_irc_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_irc_ports'];
+if ($def_irc_ports_info_chk == "")
+	$def_irc_ports_type = "6665,6666,6667,6668,6669,7000";
+else 
+	$def_irc_ports_type = "$def_irc_ports_info_chk";
+	
+/* def NNTP_PORTS */
+$def_nntp_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_nntp_ports'];
+if ($def_nntp_ports_info_chk == "")
+	$def_nntp_ports_type = "119";
+else 
+	$def_nntp_ports_type = "$def_nntp_ports_info_chk";
+	
+/* def RLOGIN_PORTS */
+$def_rlogin_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_rlogin_ports'];
+if ($def_rlogin_ports_info_chk == "")
+	$def_rlogin_ports_type = "513";
+else 
+	$def_rlogin_ports_type = "$def_rlogin_ports_info_chk";
+	
+/* def RSH_PORTS */
+$def_rsh_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_rsh_ports'];
+if ($def_rsh_ports_info_chk == "")
+	$def_rsh_ports_type = "514";
+else 
+	$def_rsh_ports_type = "$def_rsh_ports_info_chk";
+	
+/* def SSL_PORTS */
+$def_ssl_ports_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_ssl_ports'];
+if ($def_ssl_ports_info_chk == "")
+	$def_ssl_ports_type = "25,443,465,636,993,995";
+else 
+	$def_ssl_ports_type = "$def_ssl_ports_info_chk";
 	
 	/* add auto update scripts to /etc/crontab */
 //	$text_ww   = "*/60\t* \t 1\t *\t *\t root\t /usr/bin/nice -n20 /usr/local/pkg/snort_check_for_rule_updates.php";
@@ -275,12 +514,6 @@ if ($snortunifiedlog_info_chk == on)
 		if(isset($config['interfaces']['opt' . $j]['enable']))
 			if(!$config['interfaces']['opt' . $j]['gateway'])
 				$int_array[] = "opt{$j}";
-
-	/* if user has defined a custom ssh port, use it */
-	if($config['system']['ssh']['port'])
-		$ssh_port = $config['system']['ssh']['port'];
-	else
-		$ssh_port = "22";
 
 	/*  iterate through interface list and write out whitelist items
 	 *  and also compile a home_net list for snort.
@@ -364,6 +597,29 @@ if ($snortunifiedlog_info_chk == on)
 	/* close file */
 	fclose($whitelist);
 
+     /* open snort's threshold.conf for writing */
+     $threshlist = fopen("/usr/local/etc/snort/threshold.conf", "w");
+     if(!$threshlist) {
+             log_error("Could not open /usr/local/etc/snort/threshold.conf for writing.");
+             return;
+    }
+
+     /* list all entries to new lines  */
+    if($config['installedpackages']['snortthreshold'])
+            foreach($config['installedpackages']['snortthreshold']['config'] as $snortthreshlist)
+                    if($snortthreshlist['threshrule'])
+                             $snortthreshlist_r .= $snortthreshlist['threshrule'] . "\n";
+
+
+     /* foreach through threshlist, writing out to file */
+     $threshlist_split = split("\n", $snortthreshlist_r);
+     foreach($threshlist_split as $wl)
+             if(trim($wl))
+                     fwrite($threshlist, trim($wl) . "\n");
+
+     /* close snort's threshold.conf file */
+     fclose($threshlist);	
+
 	/* generate rule sections to load */
 	$enabled_rulesets = $config['installedpackages']['snort']['rulesets'];
 	if($enabled_rulesets) {
@@ -400,19 +656,19 @@ var EXTERNAL_NET !\$HOME_NET
                   #
 ###################
 
-var DNS_SERVERS \$HOME_NET
-var SMTP_SERVERS \$HOME_NET
-var HTTP_SERVERS \$HOME_NET
-var SQL_SERVERS \$HOME_NET
-var TELNET_SERVERS \$HOME_NET
-var SNMP_SERVERS \$HOME_NET
-var FTP_SERVERS \$HOME_NET
-var SSH_SERVERS \$HOME_NET
-var POP_SERVERS \$HOME_NET
-var IMAP_SERVERS \$HOME_NET
+var DNS_SERVERS [{$def_dns_servers_type}]
+var SMTP_SERVERS [{$def_smtp_servers_type}]
+var HTTP_SERVERS [{$def_http_servers_type}]
+var SQL_SERVERS [{$def_sql_servers_type}]
+var TELNET_SERVERS [{$def_telnet_servers_type}]
+var SNMP_SERVERS [{$def_snmp_servers_type}]
+var FTP_SERVERS [{$def_ftp_servers_type}]
+var SSH_SERVERS [{$def_ssh_servers_type}]
+var POP_SERVERS [{$def_pop_servers_type}]
+var IMAP_SERVERS [{$def_imap_servers_type}]
 var RPC_SERVERS \$HOME_NET
-var WWW_SERVERS \$HOME_NET
-var SIP_PROXY_IP \$HOME_NET
+var WWW_SERVERS [{$def_www_servers_type}]
+var SIP_PROXY_IP [{$def_sip_proxy_ip_type}]
 var AIM_SERVERS \
 [64.12.24.0/23,64.12.28.0/23,64.12.161.0/24,64.12.163.0/24,64.12.200.0/24,205.188.3.0/24,205.188.5.0/24,205.188.7.0/24,205.188.9.0/24,205.188.153.0/24,205.188.179.0/24,205.188.248.0/24]
 
@@ -422,30 +678,30 @@ var AIM_SERVERS \
                        #
 ########################
 
-portvar HTTP_PORTS 80
+portvar HTTP_PORTS [{$def_http_ports_type}]
 portvar SHELLCODE_PORTS !80
-portvar ORACLE_PORTS 1521
-portvar AUTH_PORTS 113
-portvar DNS_PORTS 53
-portvar FINGER_PORTS 79
-portvar FTP_PORTS 21
-portvar IMAP_PORTS 143
-portvar IRC_PORTS [6665,6666,6667,6668,6669,7000]
-portvar MSSQL_PORTS 1433
-portvar NNTP_PORTS 119
-portvar POP2_PORTS 109
-portvar POP3_PORTS 110
+portvar ORACLE_PORTS [{$def_oracle_ports_type}]
+portvar AUTH_PORTS [{$def_auth_ports_type}]
+portvar DNS_PORTS [{$def_dns_ports_type}]
+portvar FINGER_PORTS [{$def_finger_ports_type}]
+portvar FTP_PORTS [{$def_ftp_ports_type}]
+portvar IMAP_PORTS [{$def_imap_ports_type}]
+portvar IRC_PORTS [{$def_irc_ports_type}]
+portvar MSSQL_PORTS [{$def_mssql_ports_type}]
+portvar NNTP_PORTS [{$def_nntp_ports_type}]
+portvar POP2_PORTS [{$def_pop2_ports_type}]
+portvar POP3_PORTS [{$def_pop3_ports_type}]
 portvar SUNRPC_PORTS [111,32770,32771,32772,32773,32774,32775,32776,32777,32778,32779]
-portvar RLOGIN_PORTS 513
-portvar RSH_PORTS 514
+portvar RLOGIN_PORTS [{$def_rlogin_ports_type}]
+portvar RSH_PORTS [{$def_rsh_ports_type}]
 portvar SMB_PORTS [139,445]
-portvar SMTP_PORTS 25
-portvar SNMP_PORTS 161
-portvar SSH_PORTS {$ssh_port}
-portvar TELNET_PORTS 23
-portvar MAIL_PORTS [25,143,465,691]
-portvar SSL_PORTS [25,443,465,636,993,995]
-portvar SIP_PROXY_PORTS [5060:5090,16384:32768]
+portvar SMTP_PORTS [{$def_smtp_ports_type}]
+portvar SNMP_PORTS [{$def_snmp_ports_type}]
+portvar SSH_PORTS [{$def_ssh_ports_type}]
+portvar TELNET_PORTS [{$def_telnet_ports_type}]
+portvar MAIL_PORTS [{$def_mail_ports_type}]
+portvar SSL_PORTS [{$def_ssl_ports_type}]
+portvar SIP_PROXY_PORTS [{$def_sip_proxy_ports_type}]
 
 # DCERPC NCACN-IP-TCP
 portvar DCERPC_NCACN_IP_TCP [139,445]
@@ -932,6 +1188,11 @@ function write_snort_config_cache($snort_config) {
 }
 
 function snort_advanced() {
+	global $g, $config;
+	sync_package_snort();
+}
+
+function snort_define_servers() {
 	global $g, $config;
 	sync_package_snort();
 }

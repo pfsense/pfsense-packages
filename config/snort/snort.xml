@@ -47,7 +47,7 @@
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
 	<version>2.8.4.1</version>
-	<title>Services: Snort 2.8.4.1 pkg v. 1.3</title>
+	<title>Services: Snort 2.8.4.1 pkg v. 1.4</title>
 	<include_file>/usr/local/pkg/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
@@ -79,12 +79,20 @@
 			<url>/snort_rules.php</url>
 		</tab>
 		<tab>
+			<text>Servers</text>
+			<url>/pkg_edit.php?xml=snort_define_servers.xml&amp;id=0</url>
+		</tab>
+		<tab>
 			<text>Blocked</text>
 			<url>/snort_blocked.php</url>
 		</tab>
 		<tab>
 			<text>Whitelist</text>
 			<url>/pkg.php?xml=snort_whitelist.xml</url>
+		</tab>
+		<tab>
+			<text>Threshold</text>
+			<url>/pkg.php?xml=snort_threshold.xml</url>
 		</tab>
 		<tab>
 			<text>Alerts</text>
@@ -159,6 +167,16 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_advanced.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/snort_define_servers.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/snort_threshold.xml</item>
 	</additional_files_needed>
 	<fields>
 		<field>
