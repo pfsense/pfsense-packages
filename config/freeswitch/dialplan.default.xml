@@ -242,10 +242,19 @@
 
     <!-- voicemail main extension -->
     <extension name="vmain">
-      <condition field="destination_number" expression="^vmain|\*4000|\*98$">
+      <condition field="destination_number" expression="^vmain|\*98$">
 	<action application="answer"/>
 	<action application="sleep" data="1000"/>
-	<action application="voicemail" data="check default ${domain_name}"/>  
+	<action application="voicemail" data="check default ${domain_name} ${sip_from_user}"/>
+      </condition>
+    </extension>
+
+    <!-- voicemail main2 extension -->
+    <extension name="vmain2">
+      <condition field="destination_number" expression="^vmain2|\*4000">
+	<action application="answer"/>
+	<action application="sleep" data="1000"/>
+	<action application="voicemail" data="check default ${domain_name}"/>
       </condition>
     </extension>
 

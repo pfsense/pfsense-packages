@@ -1922,12 +1922,20 @@ function sync_package_freeswitch_ivr()
 				if ($actiondirecttype == "extension") {
 					$tmp .= "    sofia_contact_".$actiondirectdest." = get_sofia_contact(\"".$actiondirectdest."\",domain_name, \"".$actiondirectprofile."\");\n";									
 					$tmp .= "    session.execute(\"bridge\", sofia_contact_".$actiondirectdest."); //".$actiondirectdest."\n";
-					$tmp .= "    session.execute(\"voicemail\", \"".$actiondirectdest." XML default\");\n";
-					//$tmp .= "    session.execute(\"transfer\", \"".$actiondirectdest." XML default\"); //".$actiondirectdest."\n";
+					if ($actiondirectprofile == "auto") {
+						$tmp .= "    session.execute(\"voicemail\", \"default \${domain} ".$actiondirectdest."\");\n";
+					}
+					else {
+						$tmp .= "    session.execute(\"voicemail\", \"default \${domain} ".$actiondirectdest."\");\n";
+					}
 				}
 				if ($actiondirecttype == "voicemail") {
-					//$tmp .= "    session.execute(\"voicemail\", \"".$actiondirectdest." XML default\");\n";
-					$tmp .= "    session.execute(\"voicemail\", \"default \"+domain+\" ".$actiondirectdest."\");\n";
+					if ($actiondirectprofile == "auto") {
+						$tmp .= "    session.execute(\"voicemail\", \"default \${domain} ".$actiondirectdest."\");\n";
+					}
+					else {
+						$tmp .= "    session.execute(\"voicemail\", \"default \${domain} ".$actiondirectdest."\");\n";
+					}
 				}
 				if ($actiondirecttype == "sip uri") {
 					$tmp .= "    session.execute(\"bridge\", \"".$actiondirectdest."\"); //".$actiondirectdest."\n";
@@ -1969,14 +1977,22 @@ function sync_package_freeswitch_ivr()
       			                if ($row['optiontype'] == "extension") {
 									$tmp .= "                 	sofia_contact_".$row['optiondest']." = get_sofia_contact(\"".$row['optiondest']."\",domain_name, \"".$row['optionprofile']."\");\n";									
 									$tmp .= "                 	session.execute(\"bridge\", sofia_contact_".$row['optiondest']."); //".$row['optiondescr']."\n";
-									$tmp .= "                 	session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
+									if ($row['optionprofile'] == "auto") {
+										$tmp .= "                 	session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\");\n";
+									}
+									else {
+										$tmp .= "                 	session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\");\n";
+									}
       			                }
       			                if ($row['optiontype'] == "voicemail") {
-									//$tmp .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
-									$tmp .= "                 	session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
-      			                }
+									if ($row['optionprofile'] == "auto") {
+										$tmp .= "                 	session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+									}
+									else {
+										$tmp .= "                 	session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+									}
+								}
       			                if ($row['optiontype'] == "sip uri") {
-      			                    //$tmp .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
 									$tmp .= "                 	session.execute(\"bridge\", \"".$row['optiondest']."\"); //".$row['optiondescr']."\n";
       			                }
       		        	     }
@@ -2047,14 +2063,22 @@ function sync_package_freeswitch_ivr()
 								if ($row['optiontype'] == "extension") {
 									$tmpaction .= "                 sofia_contact_".$row['optiondest']." = get_sofia_contact(\"".$row['optiondest']."\",domain_name, \"".$row['optionprofile']."\");\n";									
 									$tmpaction .= "                 session.execute(\"bridge\", sofia_contact_".$row['optiondest']."); //".$row['optiondescr']."\n";
-									$tmpaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
+									if ($row['optionprofile'] == "auto") {
+										$tmpaction .= "                 session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\");\n";
+									}
+									else {
+										$tmpaction .= "                 session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+									}
 								}
 								if ($row['optiontype'] == "voicemail") {
-									//$tmpaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
-									$tmpaction .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+									if ($row['optionprofile'] == "auto") {
+										$tmpaction .= "                 session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+									}
+									else {
+										$tmpaction .= "                 session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+									}
 								}
 								if ($row['optiontype'] == "sip uri") {
-									//$tmpaction .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
 									$tmpaction .= "                 session.execute(\"bridge\", \"".$row['optiondest']."\"); //".$row['optiondescr']."\n";
 								}
 
@@ -2085,12 +2109,20 @@ function sync_package_freeswitch_ivr()
 					if ($actiondefaulttype == "extension") {
 						$tmp .= "	                  sofia_contact_".$actiondefaultdest." = get_sofia_contact(\"".$actiondefaultdest."\",domain_name, \"".$actiondirectprofile."\");\n";									
 						$tmp .= "	                  session.execute(\"bridge\", sofia_contact_".$actiondefaultdest."); //".$actiondefaultdest."\n";
-						$tmp .= "	                  session.execute(\"voicemail\", \"".$actiondefaultdest." XML default\");\n";
-						//$tmp .= "	                  session.execute(\"transfer\", \"".$actiondefaultdest." XML default\"); //".$actiondefaultdest."\n";
+						if ($actiondirectprofile == "auto") {
+							$tmp .= "	                  session.execute(\"voicemail\", \"default \${domain} ".$actiondefaultdest."\");\n";
+						}
+						else {
+							$tmp .= "	                  session.execute(\"voicemail\", \"default \${domain} ".$actiondefaultdest."\");\n";
+						}
 					}
 					if ($actiondefaulttype == "voicemail") {
-						//$tmp .= "	                  session.execute(\"voicemail\", \"".$actiondefaultdest." XML default\");\n";
-						$tmp .= "	                  session.execute(\"voicemail\", \"default \"+domain+\" ".$actiondefaultdest."\");\n";
+						if ($actiondirectprofile == "auto") {
+							$tmp .= "	                  session.execute(\"voicemail\", \"default \${domain} ".$actiondefaultdest."\");\n";
+						}
+						else {
+							$tmp .= "	                  session.execute(\"voicemail\", \"default \${domain} ".$actiondefaultdest."\");\n";
+						}
 					}
 					if ($actiondefaulttype == "sip uri") {
 						$tmp .= "	                  session.execute(\"bridge\", \"".$actiondefaultdest."\"); //".$actiondefaultdest."\n";
@@ -2153,12 +2185,20 @@ function sync_package_freeswitch_ivr()
             if ($antiactiondirecttype == "extension") {
 				$tmp .= "    sofia_contact_".$antiactiondirectdest." = get_sofia_contact(\"".$antiactiondirectdest."\",domain_name, \"".$antiactiondirectprofile."\");\n";									
                 $tmp .= "    session.execute(\"bridge\", sofia_contact_".$antiactiondirectdest."); //".$antiactiondirectdest."\n";
-                $tmp .= "    session.execute(\"voicemail\", \"".$antiactiondirectdest." XML default\");\n";
-                //$tmp .= "    session.execute(\"transfer\", \"".$antiactiondirectdest." XML default\"); //".$antiactiondirectdest."\n";
+                if ($antiactiondirectprofile == "auto") {
+					$tmp .= "    session.execute(\"voicemail\", \"default \${domain} ".$antiactiondirectdest."\");\n";
+				}
+				else {
+					$tmp .= "    session.execute(\"voicemail\", \"default \${domain} ".$antiactiondirectdest."\");\n";
+				}
 			}
             if ($antiactiondirecttype == "voicemail") {
-                //$tmp .= "    session.execute(\"voicemail\", \"".$antiactiondirectdest." XML default\");\n";
-                $tmp .= "    session.execute(\"voicemail\", \"default \"+domain+\" ".$antiactiondirectdest."\");\n";
+				if ($antiactiondirectprofile == "auto") {
+					$tmp .= "    session.execute(\"voicemail\", \"default \${domain} ".$antiactiondirectdest."\");\n";
+				}
+				else {
+					$tmp .= "    session.execute(\"voicemail\", \"default \${domain} ".$antiactiondirectdest."\");\n";
+				}
             }
             if ($antiactiondirecttype == "sip uri") {
                 $tmp .= "    session.execute(\"bridge\", \"".$antiactiondirectdest."\"); //".$antiactiondirectdest."\n";
@@ -2196,14 +2236,22 @@ function sync_package_freeswitch_ivr()
       			                if ($row['optiontype'] == "extension") {
 									$tmp .= "                 	sofia_contact_".$row['optiondest']." = get_sofia_contact(\"".$row['optiondest']."\",domain_name, \"".$row['optionprofile']."\");\n";									
 									$tmp .= "                 	session.execute(\"bridge\", sofia_contact_".$row['optiondest']."); //".$row['optiondescr']."\n";
-									$tmp .= "                 	session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
+									if ($row['optionprofile'] == "auto") {
+										$tmp .= "                 	session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\");\n";
+									}
+									else {
+										$tmp .= "                 	session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\");\n";
+									}
 								}
       			                if ($row['optiontype'] == "voicemail") {
-									//$tmp .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
-									$tmp .= "                 	session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+									if ($row['optionprofile'] == "auto") {
+										$tmp .= "                 	session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+									}
+									else {
+										$tmp .= "                 	session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+									}
       			                }
       			                if ($row['optiontype'] == "sip uri") {
-      			                    //$tmp .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
 									$tmp .= "                 	session.execute(\"bridge\", \"".$row['optiondest']."\"); //".$row['optiondescr']."\n";
 								}
       		        	     }
@@ -2274,14 +2322,22 @@ function sync_package_freeswitch_ivr()
       			                if ($row['optiontype'] == "extension") {
 									$tmpantiaction .= "                 sofia_contact_".$row['optiondest']." = get_sofia_contact(\"".$row['optiondest']."\",domain_name, \"".$row['optionprofile']."\");\n";									
 									$tmpantiaction .= "                 session.execute(\"bridge\", sofia_contact_".$row['optiondest']."); //".$row['optiondescr']."\n";
-									$tmpantiaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
+									if ($row['optionprofile'] == "auto") {
+										$tmpantiaction .= "                 session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\");\n";
+									}
+									else {
+										$tmpantiaction .= "                 session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\");\n";
+									}
 								}
       			                if ($row['optiontype'] == "voicemail") {
-									//$tmpantiaction .= "                 session.execute(\"voicemail\", \"".$row['optiondest']." XML default\");\n";
-									$tmpantiaction .= "                 session.execute(\"voicemail\", \"default \"+domain+\" ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
-      			                }
+									if ($row['optionprofile'] == "auto") {
+										$tmpantiaction .= "                 session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+									}
+									else {
+										$tmpantiaction .= "                 session.execute(\"voicemail\", \"default \${domain} ".$row['optiondest']."\"); //".$row['optiondescr']."\n";
+									}
+								}
       			                if ($row['optiontype'] == "sip uri") {
-      			                    //$tmpantiaction .= "                 session.execute(\"transfer\", \"".$row['optiondest']." XML default\"); //".$row['optiondescr']."\n";
 									$tmpantiaction .= "                 session.execute(\"bridge\", \"".$row['optiondest']."\"); //".$row['optiondescr']."\n";
 								}
 								$tmpantiaction .= "             }\n";      		
@@ -2312,12 +2368,20 @@ function sync_package_freeswitch_ivr()
 					if ($antiactiondefaulttype == "extension") {
 						$tmp .= "	                  sofia_contact_".$antiactiondefaultdest." = get_sofia_contact(\"".$antiactiondefaultdest."\",domain_name, \"".$actiondirectprofile."\");\n";									
 						$tmp .= "	                  session.execute(\"bridge\", sofia_contact_".$antiactiondefaultdest."); //".$antiactiondefaultdest."\n";
-						$tmp .= "	                  session.execute(\"voicemail\", \"".$antiactiondefaultdest." XML default\");\n";
-						//$tmp .= "	                  session.execute(\"transfer\", \"".$antiactiondefaultdest." XML default\"); //".$antiactiondefaultdest."\n";
+						if ($actiondirectprofile == "auto") {
+							$tmp .= "	                  session.execute(\"voicemail\", \"default \${domain} ".$antiactiondefaultdest."\");\n";
+						}
+						else {
+							$tmp .= "	                  session.execute(\"voicemail\", \"default \${domain} ".$antiactiondefaultdest."\");\n";
+						}
 					}
 					if ($antiactiondefaulttype == "voicemail") {
-						//$tmp .= "	                  session.execute(\"voicemail\", \"".$antiactiondefaultdest." XML default\");\n";
-						$tmp .= "	                  session.execute(\"voicemail\", \"default \"+domain+\" ".$antiactiondefaultdest."\");\n";
+						if ($actiondirectprofile == "auto") {
+							$tmp .= "	                  session.execute(\"voicemail\", \"default \${domain} ".$antiactiondefaultdest."\");\n";
+						}
+						else {
+							$tmp .= "	                  session.execute(\"voicemail\", \"default \${domain} ".$antiactiondefaultdest."\");\n";
+						}
 					}
 					if ($antiactiondefaulttype == "sip uri") {
 						$tmp .= "	                  session.execute(\"bridge\", \"".$antiactiondefaultdest."\"); //".$antiactiondefaultdest."\n";
@@ -2644,7 +2708,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.9.4.1";
+	$freeswitch_package_version = "0.9.4.2";
 	$freeswitch_build_version = "1.0.4 pre 8";
 	$freeswitch_build_revision = "13784";
 	
