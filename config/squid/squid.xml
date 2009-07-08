@@ -330,4 +330,5 @@
 		squid_deinstall_command();
 		exec("/bin/rm -f /usr/local/etc/rc.d/squid*");
 	</custom_php_deinstall_command>
+	<filter_rules_needed>squid_generate_rules</filter_rules_needed>
 </packagegui>

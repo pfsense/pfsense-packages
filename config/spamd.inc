@@ -160,6 +160,35 @@ function sync_package_spamd() {
 	log_error("SpamD setup completed");	
 }
 
+function spamd_generate_rules($type) {
+	global $config;
+
+	$natrules = "";
+	switch($type) {
+	case 'rdr':
+		$natrules .= "\n# spam table \n";
+                $wanif = $FilterIflist["wan"]['if'];
+                $natrules .= "table <whitelist> persist\n";
+                $natrules .= "table <blacklist> persist\n";
+                $natrules .= "table <spamd> persist\n";
+                if(file_exists("/var/db/whitelist.txt"))
+                        $natrules .= "table <spamd-white> persist file \"/var/db/whitelist.txt\"\n";
+                $natrules .= "rdr pass on {$wanif} proto tcp from <blacklist> to port smtp -> 127.0.0.1 port spamd\n";
+                $natrules .= "rdr pass on {$wanif} proto tcp from <spamd> to port smtp -> 127.0.0.1 port spamd\n";
+                $natrules .= "rdr pass on {$wanif} proto tcp from !<spamd-white> to port smtp -> 127.0.0.1 port spamd\n";
+                if($config['installedpackages']['spamdsettings']['config'])
+                        foreach($config['installedpackages']['spamdsettings']['config'] as $ss)
+                                $nextmta = $ss['nextmta'];
+                if($nextmta <> "") {
+                        $natrules .= "rdr pass on {$wanif} proto tcp from <spamd-white> to port smtp -> {$nextmta} port smtp\n";
+                }
+
+		break;
+	}
+	
+	return $natrules;
+}
+
 function remove_spaces($string) {
 	$string = str_replace(" ", "", $string);
 	return $string;

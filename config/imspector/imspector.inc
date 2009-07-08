@@ -104,6 +104,23 @@
 		//exec('pkg_delete imspector-0.4');
 	}
 
+	function imspector_generate_rules($type) {
+		
+		$rules = "";
+		switch ($type) {
+		case 'rdr':
+			$rules = "# IMSpector rdr anchor\n";
+			$rules .= "rdr-anchor \"imspector\"\n";
+			break;
+		case 'rule':
+			$rules = "# IMSpector \n";
+			$rules .= "anchor \"miniupnpd\"\n";
+			break;
+		}
+
+		return $rules;
+	}
+
 	function sync_package_imspector() {
 		global $config;
 		global $input_errors;

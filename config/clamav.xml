@@ -127,4 +127,5 @@
 	<custom_php_install_command>
 		clamav_install_command();
 	</custom_php_install_command>
+	<filter_rules_needed>clamav_generate_rules</filter_rules_needed>
 </packagegui>

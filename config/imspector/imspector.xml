@@ -218,4 +218,5 @@
 	<custom_php_deinstall_command>
 		deinstall_package_imspector();
 	</custom_php_deinstall_command>
+	<filter_rules_needed>imspector_generate_rules</filter_rules_needed>
 </packagegui>

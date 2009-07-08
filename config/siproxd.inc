@@ -73,6 +73,7 @@ function siproxd_generate_rules($type) {
 		}
 		break;
 	  case 'filter':
+	case 'rule':
 		foreach ($ifaces as $iface) {
 			$rules .= "# allow SIP signaling and RTP traffic\n";
 			$rules .= "pass in quick on {$iface} proto udp from any to any port = {$port}\n";

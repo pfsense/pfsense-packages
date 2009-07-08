@@ -235,6 +235,7 @@ function clamav_generate_rules($type) {
 				$rules .= "rdr on $iface proto tcp to port pop3 -> 127.0.0.1 port 8110\n";
 			break;
 		case 'filter':
+		case 'rule':
 			foreach ($ifaces as $iface)
 				$rules .= "pass quick on $iface proto tcp to port pop3 flags S/SA keep state\n";
 			break;
@@ -252,7 +253,7 @@ function clamav_generate_rules($type) {
 				$rules .= "rdr on $iface proto tcp to ($iface) port smtp -> 127.0.0.1 port 10025\n";
 		}
 
-		else {
+		else if ($type == 'filer' || $type == 'rule') {
 			foreach ($ifaces as $iface)
 				$rules .= "pass quick on $iface proto tcp to ($iface) port smtp flags S/SA keep state\n";
 		}
