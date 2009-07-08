@@ -263,10 +263,11 @@ function byte_convert( $bytes ) {
 
 function lan_sip_profile()
 {
-	global $config;
+	global $config;	
+	clearstatcache();
 	
 	//if the lan directory does not exist then create it
-	if (!is_dir('/usr/local/freeswitch/conf/sip_profiles/lan')) {
+	if (!is_dir('/usr/local/freeswitch/conf/sip_profiles/lan/')) {
 	   exec("mkdir /usr/local/freeswitch/conf/sip_profiles/lan/");
 	}
 	
@@ -515,28 +516,31 @@ function sync_package_freeswitch_dialplan()
   conf_mount_rw();
   config_unlock();
 
-  if(strlen($config['installedpackages']['freeswitchdialplan']['config'][0]['dialplan_default_xml']) == 0) {
-      /* dialplan not found in the pfsense config.xml get the default dialplan and save to config.xml. */
-    	$filename = "/usr/local/freeswitch/conf/dialplan/default.xml";
-      $fout = fopen($filename,"r");
-      $tmpxml = fread($fout, filesize($filename));
-      $config['installedpackages']['freeswitchdialplan']['config'][0]['dialplan_default_xml'] = base64_encode($tmpxml);
-      unset($filename, $dialplan);
-      fclose($fout);
-  }
-  else {
-      /* found the dialplan in the pfsense config.xml save it to default.xml. */
-    	$fout = fopen("/usr/local/freeswitch/conf/dialplan/default.xml","w");
-      $tmpxml = $config['installedpackages']['freeswitchdialplan']['config'][0]['dialplan_default_xml'];
-      fwrite($fout, base64_decode($tmpxml));
-      fclose($fout);
-      unset($tmpxml);
-  }
+  //using backup files rather than pfsense config.xml for this file
+  $config['installedpackages']['freeswitchpublic']['config'][0]['dialplan_default_xml'] = "";
+  
+  //if(strlen($config['installedpackages']['freeswitchdialplan']['config'][0]['dialplan_default_xml']) == 0) {
+		/* dialplan not found in the pfsense config.xml get the default dialplan and save to config.xml. */
+		//$filename = "/usr/local/freeswitch/conf/dialplan/default.xml";
+		//$fout = fopen($filename,"r");
+		//$tmpxml = fread($fout, filesize($filename));
+		//$config['installedpackages']['freeswitchdialplan']['config'][0]['dialplan_default_xml'] = base64_encode($tmpxml);
+		//unset($filename, $dialplan);
+		//fclose($fout);
+  //}
+  //else {
+		/* found the dialplan in the pfsense config.xml save it to default.xml. */
+		//$fout = fopen("/usr/local/freeswitch/conf/dialplan/default.xml","w");
+		//$tmpxml = $config['installedpackages']['freeswitchdialplan']['config'][0]['dialplan_default_xml'];
+		//fwrite($fout, base64_decode($tmpxml));
+		//fclose($fout);
+		//unset($tmpxml);
+  //}
 
   conf_mount_ro();
-  $cmd = "api reloadxml";
+  //$cmd = "api reloadxml";
   //event_socket_request_cmd($cmd);
-  unset($cmd);
+  //unset($cmd);
 
 }
 
@@ -876,29 +880,33 @@ function sync_package_freeswitch_public()
   conf_mount_rw();
   config_unlock();
 
-  if(strlen($config['installedpackages']['freeswitchpublic']['config'][0]['public_xml']) == 0) {
-      /* dialplan_public_xml not found in the pfsense config.xml get the default public.xml and save to config.xml. */
-      $filename = "/usr/local/freeswitch/conf/dialplan/public.xml";
-      $fout = fopen($filename,"r");
-      $tmpxml = fread($fout, filesize($filename));
-      $tmpxml = str_replace("<anti-action application=\"export\" data=\"domain_name=\${sip_req_host}\"/>", "<!--<anti-action application=\"export\" data=\"domain_name=\${sip_req_host}\"/>-->", $tmpxml);
-      $config['installedpackages']['freeswitchpublic']['config'][0]['public_xml'] = base64_encode($tmpxml);
-      unset($filename, $tmpxml);
-      fclose($fout);
-  }
-  else {
-      /* found dialplan_public_xml in the pfsense config.xml save it to public.xml. */
-      $fout = fopen("/usr/local/freeswitch/conf/dialplan/public.xml","w");
-      $tmpxml = $config['installedpackages']['freeswitchpublic']['config'][0]['public_xml'];
-      fwrite($fout, base64_decode($tmpxml));
-      fclose($fout);
-      unset($tmpxml);
-  }
+  //using backup files rather than pfsense config.xml for this file
+  $config['installedpackages']['freeswitchpublic']['config'][0]['public_xml'] = "";
+  
+  //if(strlen($config['installedpackages']['freeswitchpublic']['config'][0]['public_xml']) == 0) {
+  //    /* dialplan_public_xml not found in the pfsense config.xml get the default public.xml and save to config.xml. */
+  //    $filename = "/usr/local/freeswitch/conf/dialplan/public.xml";
+  //    $fout = fopen($filename,"r");
+  //    $tmpxml = fread($fout, filesize($filename));
+  //    $tmpxml = str_replace("<anti-action application=\"export\" data=\"domain_name=\${sip_req_host}\"/>", "<!--<anti-action application=\"export\" data=\"domain_name=\${sip_req_host}\"/>-->", $tmpxml);
+  //    $config['installedpackages']['freeswitchpublic']['config'][0]['public_xml'] = base64_encode($tmpxml);
+    
+  //    unset($filename, $tmpxml);
+  //    fclose($fout);
+  //}
+  //else {
+  //    /* found dialplan_public_xml in the pfsense config.xml save it to public.xml. */
+  //    $fout = fopen("/usr/local/freeswitch/conf/dialplan/public.xml","w");
+  //    $tmpxml = $config['installedpackages']['freeswitchpublic']['config'][0]['public_xml'];
+  //    fwrite($fout, base64_decode($tmpxml));
+  //    fclose($fout);
+  //    unset($tmpxml);
+  //}
 
   conf_mount_ro();
   //$cmd = "api reloadxml";
-  //event_socket_request_cmd($cmd);
-  unset($cmd);
+  ////event_socket_request_cmd($cmd);
+  //unset($cmd);
 
 }
 
@@ -910,28 +918,31 @@ function sync_package_freeswitch_vars()
   conf_mount_rw();
   config_unlock();
 
-  if(strlen($config['installedpackages']['freeswitchvars']['config'][0]['vars_xml']) == 0) {
-      /* dialplan not found in the pfsense config.xml get the default dialplan and save to config.xml. */
-    	$filename = "/usr/local/freeswitch/conf/vars.xml";
-      $fout = fopen($filename,"r");
-      $tmpxml = fread($fout, filesize($filename));
-      $config['installedpackages']['freeswitchvars']['config'][0]['vars_xml'] = base64_encode($tmpxml);
-      unset($filename, $dialplan);
-      fclose($fout);
-  }
-  else {
-      /* found the dialplan in the pfsense config.xml save it to default.xml. */
-    	$fout = fopen("/usr/local/freeswitch/conf/vars.xml","w");
-      $tmpxml = $config['installedpackages']['freeswitchvars']['config'][0]['vars_xml'];
-      fwrite($fout, base64_decode($tmpxml));
-      fclose($fout);
-      unset($tmpxml);
-  }
+  //using backup files rather than pfsense config.xml for this file
+  $config['installedpackages']['freeswitchpublic']['config'][0]['vars_xml'] = "";
+  
+  //if(strlen($config['installedpackages']['freeswitchvars']['config'][0]['vars_xml']) == 0) {
+  //    /* dialplan not found in the pfsense config.xml get the default dialplan and save to config.xml. */
+  //  	$filename = "/usr/local/freeswitch/conf/vars.xml";
+  //    $fout = fopen($filename,"r");
+  //    $tmpxml = fread($fout, filesize($filename));
+  //    $config['installedpackages']['freeswitchvars']['config'][0]['vars_xml'] = base64_encode($tmpxml);
+  //    unset($filename, $dialplan);
+  //    fclose($fout);
+  //}
+  //else {
+  //    /* found the dialplan in the pfsense config.xml save it to default.xml. */
+  //  	$fout = fopen("/usr/local/freeswitch/conf/vars.xml","w");
+  //    $tmpxml = $config['installedpackages']['freeswitchvars']['config'][0]['vars_xml'];
+  //    fwrite($fout, base64_decode($tmpxml));
+  //    fclose($fout);
+  //    unset($tmpxml);
+  //}
 
   conf_mount_ro();
-  $cmd = "api reloadxml";
-  //event_socket_request_cmd($cmd);
-  unset($cmd);
+  //$cmd = "api reloadxml";
+  ////event_socket_request_cmd($cmd);
+  //unset($cmd);
 
 }
 
@@ -1035,6 +1046,7 @@ function sync_package_freeswitch_hunt_group()
 		$tmp .= "\n";
 
 	//loop through all Hunt Groups
+		$x = 0;
 		$a_hunt_group = &$config['installedpackages']['freeswitchhuntgroup']['config'];
 		if (count($a_hunt_group) > 0) {
 			foreach($a_hunt_group as $rowhelper) {
@@ -1083,8 +1095,8 @@ function sync_package_freeswitch_hunt_group()
 
 								}
 								$i++;
-
 							}
+							unset($i);
 						}
 
 
@@ -1267,7 +1279,7 @@ function sync_package_freeswitch_hunt_group()
 					if (count($a_hunt_group_destinations) > 0) { usort($a_hunt_group_destinations, "cmp_hunt_group_order"); }
 						if (count($a_hunt_group_destinations) > 0) {
 							
-							$x = 0;
+							$i = 0;
 							foreach($a_hunt_group_destinations as $row) {
 							
 								/*
@@ -1288,29 +1300,28 @@ function sync_package_freeswitch_hunt_group()
 										$tmp .= "		sofia_contact_".$row['destinationnumber']." = get_sofia_contact(\"".$row['destinationnumber']."\",domain_name, \"".$row['destinationprofile']."\");\n";									
 										$tmp_sub_array["application"] = "bridge";
 										$tmp_sub_array["data"] = "sofia_contact_".$row['destinationnumber'];
-										$tmp_array[$x] = $tmp_sub_array;
+										$tmp_array[$i] = $tmp_sub_array;
 										unset($tmp_sub_array);									
 									}
 									if ($row['destinationtype'] == "voicemail") {							
-										//$tmp .= "		session.execute(\"voicemail\", \"".$row['destinationnumber']." XML default\");\n";
-										$tmp .= "		session.execute(\"voicemail\", \"default \"+domain+\" ".$row['destinationnumber']."\");\n";
+										$tmp .= "		session.execute(\"voicemail\", \"default \${domain} ".$row['destinationnumber']."\");\n";
 										$tmp_sub_array["application"] = "voicemail";
-										$tmp_sub_array["data"] = "default \"+domain+\" ".$row['destinationnumber'];
-										$tmp_array[$x] = $tmp_sub_array;
+										$tmp_sub_array["data"] = "default \${domain} ".$row['destinationnumber'];
+										$tmp_array[$i] = $tmp_sub_array;
 										unset($tmp_sub_array);
 									}
 									if ($row['destinationtype'] == "sip uri") {												
 										$tmp_sub_array["application"] = "bridge";
 										$tmp_sub_array["data"] = "\"".$row['destinationnumber']."\"";
-										$tmp_array[$x] = $tmp_sub_array;
+										$tmp_array[$i] = $tmp_sub_array;
 										unset($tmp_sub_array);
 									}
-									$x++;
+									$i++;
 						
 								} //end huntgroupid
 						
 							} //end for each
-							unset($x);
+							unset($i);
 						} //if count
 						
 						
@@ -1318,18 +1329,19 @@ function sync_package_freeswitch_hunt_group()
 					switch ($rowhelper['huntgrouptype']) {
 					case "simultaneous":
 						//print_r($tmp_array);
-						$x = 0;
+						$i = 0;
 						if(count($tmp_array) > 0) {
 							foreach ($tmp_array as $row) {
-								if ($x < 1) {
+								if ($i < 1) {
 									$tmp_buffer = $row["data"];
 								}
 								else {
 									$tmp_buffer .= "+\",\"+".$row["data"];
 								}
-								$x++;						
+								$i++;						
 							}
 						}
+						unset($i);
 						
 						$delimiter = ",";						
 						$tmp_application = $tmp_array[0]["application"];
@@ -1345,7 +1357,7 @@ function sync_package_freeswitch_hunt_group()
 						
 						$tmp .= "\n";
 						//print_r($tmp_array);
-						$x = 0;
+						$i = 0;
 						if (count($tmp_array) > 0) {
 							foreach ($tmp_array as $row) {
 								$tmp .= "		session.execute(\"".$row["application"]."\", ".$row["data"].");\n";					
@@ -1358,14 +1370,14 @@ function sync_package_freeswitch_hunt_group()
 
 
 					//set the timeout destination
-					$huntgrouptimeoutdestination = $a_hunt_group[0]['huntgrouptimeoutdestination'];
-					$huntgrouptimeouttype = $a_hunt_group[0]['huntgrouptimeouttype'];
+					$huntgrouptimeoutdestination = $a_hunt_group[$x]['huntgrouptimeoutdestination'];
+					$huntgrouptimeouttype = $a_hunt_group[$x]['huntgrouptimeouttype'];
 					if ($row['huntgrouptimeouttype'] == "extension") { $huntgrouptimeouttype = "bridge"; }
 					if ($row['huntgrouptimeouttype'] == "voicemail") { $huntgrouptimeouttype = "voicemail"; }
 					if ($row['huntgrouptimeouttype'] == "sip uri") { $huntgrouptimeouttype = "bridge"; }
 					$tmp .= "\n";
 					$tmp .= "		//timeout\n";
-					$tmp .= "		session.execute(\"".$huntgrouptimeouttype."\", \"default \"+domain+\" ".$huntgrouptimeoutdestination."\");\n";
+					$tmp .= "		session.execute(\"".$huntgrouptimeouttype."\", \"default \${default} ".$huntgrouptimeoutdestination."\");\n";
 					
 					
 					$tmp .= "\n";
@@ -1387,7 +1399,7 @@ function sync_package_freeswitch_hunt_group()
 						fclose($fout);
 					}
 
-
+			$x++;
 			} //end foreach
 		} //end if count
 		conf_mount_ro();
@@ -2708,7 +2720,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.9.4.2";
+	$freeswitch_package_version = "0.9.4.3";
 	$freeswitch_build_version = "1.0.4 pre 8";
 	$freeswitch_build_revision = "13784";
 	
@@ -2725,6 +2737,7 @@ function freeswitch_php_install_command()
 	//used with fax to png, and fax to pdf conversion
 	exec("pkg_add -r tiff2png");
 	
+	clearstatcache();
 	if (!is_dir('/usr/local/www/packages/')) {
 	   exec("mkdir /usr/local/www/packages/");
 	}
