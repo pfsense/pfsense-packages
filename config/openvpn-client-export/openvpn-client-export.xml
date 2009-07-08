@@ -4,7 +4,6 @@
 	<version>0.0.1</version>
 	<title>OpenVPN Client Export</title>
 	<include_file>/usr/local/pkg/openvpn-client-export.inc</include_file>
-	<include_file>openvpn.inc</include_file>
 	<backup_file></backup_file>
 	<aftersaveredirect></aftersaveredirect>
 	<configpath></configpath>

@@ -31,6 +31,7 @@
 */
 
 require_once("globals.inc");
+require_once("openvpn.inc");
 
 function openvpn_client_export_install() {
 	$tarpath = "/tmp/openvpn-client-export.tgz";
