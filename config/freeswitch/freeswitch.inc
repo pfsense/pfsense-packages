@@ -1377,7 +1377,7 @@ function sync_package_freeswitch_hunt_group()
 					if ($row['huntgrouptimeouttype'] == "sip uri") { $huntgrouptimeouttype = "bridge"; }
 					$tmp .= "\n";
 					$tmp .= "		//timeout\n";
-					$tmp .= "		session.execute(\"".$huntgrouptimeouttype."\", \"default \${default} ".$huntgrouptimeoutdestination."\");\n";
+					$tmp .= "		session.execute(\"".$huntgrouptimeouttype."\", \"default \${domain} ".$huntgrouptimeoutdestination."\");\n";
 					
 					
 					$tmp .= "\n";
@@ -2720,7 +2720,7 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	$freeswitch_package_version = "0.9.4.3";
+	$freeswitch_package_version = "0.9.4.4";
 	$freeswitch_build_version = "1.0.4 pre 8";
 	$freeswitch_build_revision = "13784";
 	
