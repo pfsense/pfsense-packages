@@ -274,6 +274,7 @@
       <required_version>1.2.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/lightsquid/lightsquid.xml</config_file>
       <configurationfile>lightsquid.xml</configurationfile>
+	  <noembedded>true</noembedded>
     </package>
     <package>
       <name>vnstat</name>
@@ -577,6 +578,7 @@
       <depends_on_package>openldap-client-2.4.10.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
       <configurationfile>squid.xml</configurationfile>
+	  <noembedded>true</noembedded>
     </package>
     <package>
       <name>squid3</name>
@@ -607,6 +609,7 @@
       <depends_on_package>lcdproc-0.5.2_2.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
       <configurationfile>lcdproc.xml</configurationfile>
+	  <noembedded>true</noembedded>
     </package>
     <package>
       <name>arpwatch</name>
@@ -641,6 +644,7 @@
       <depends_on_package>squidGuard-1.3_1.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
       <configurationfile>squidguard.xml</configurationfile>
+	  <noembedded>true</noembedded>
     </package>
     <package>
       <name>Zabbix Agent</name>
@@ -681,7 +685,8 @@
       <config_file>http://www.pfsense.com/packages/config/havp/havp.xml</config_file> 
       <configurationfile>havp.xml</configurationfile> 
       <maintainer>dv_serg@mail.ru</maintainer>
-      <after_install_info>Please check the HAVP settings.</after_install_info> 
+      <after_install_info>Please check the HAVP settings.</after_install_info>
+	  <noembedded>true</noembedded>
     </package>
     <package>
       <name>onatproto</name>
@@ -705,6 +710,7 @@
    <config_file>http://www.pfsense.com/packages/config/jailctl.xml</config_file>
    <configurationfile>jailctl.xml</configurationfile>
    <maintainer>ltning-jailctl@anduin.net</maintainer>
+   <noembedded>true</noembedded>
   </package>
   <package>
    <name>jail_template</name>
@@ -718,6 +724,7 @@
    <config_file>http://www.pfsense.com/packages/config/jail_template.xml</config_file>
    <configurationfile>jail_template.xml</configurationfile>
    <maintainer>ltning-jailctl@anduin.net</maintainer>
+   <noembedded>true</noembedded>
   </package>
   <package>
 	<name>IGMPproxy</name>
