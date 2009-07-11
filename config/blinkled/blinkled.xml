@@ -9,7 +9,7 @@
 		<name>Assign LEDs</name>
 		<tooltiptext>Assign LEDs to indicate network activity.</tooltiptext>
 		<section>Interfaces</section>
-		<url>/pkg_edit.php?xml=blinkled.xml;id=0</url>
+		<url>/pkg_edit.php?xml=blinkled.xml</url>
 	</menu>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/blinkled/blinkled.inc</item>
@@ -29,7 +29,7 @@
 	<tabs>
 		<tab>
 			<text>Assign LEDs</text>
-			<url>/pkg_edit.php?xml=miniupnpd.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=miniupnpd.xml</url>
 			<active/>
 		</tab>
 	</tabs>
