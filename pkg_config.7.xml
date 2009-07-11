@@ -779,5 +779,16 @@
       <config_file>http://www.pfsense.org/packages/config/rate/rate.xml</config_file>
       <configurationfile>rate.xml</configurationfile>
     </package>
+    <package>
+      <name>blinkled</name>
+      <descr>Allows you to use LEDs for network activity on supported platforms (ALIX, WRAP, Soekris, etc)</descr>
+      <category>System</category>
+      <version>0.0.0.0.0.1</version>
+      <status>So Alpha it's Omega</status>
+      <maintainer>jimp@pfsense.org</maintainer>
+      <required_version>1.2.3</required_version>
+      <config_file>http://www.pfsense.org/packages/config/blinkled/blinkled.xml</config_file>
+      <configurationfile>blinkled.xml</configurationfile>
+    </package>
   </packages>
 </pfsensepkgs>
