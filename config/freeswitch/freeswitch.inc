@@ -1972,9 +1972,9 @@ function sync_package_freeswitch_ivr()
       	    $tmp .= "           //session.streamFile( \"C:/Program Files/FreeSWITCH/sounds/".$recording_action_filename."\", mycb, \"dtmf ".$rowhelper['ivrtimeout']."\" );\n";
       	    $tmp .= "           session.streamFile( \"/usr/local/freeswitch/recordings/".$recording_action_filename."\", mycb, \"dtmf ".$rowhelper['ivrtimeout']."\" );\n";
       	    $tmp .= "           if (session.ready()) {\n";
-      	    $tmp .= "           	if (dtmf.digits == 0) {\n";
+      	    $tmp .= "           	if (dtmf.digits.length == 0) {\n";
       	    $tmp .= "           		dtmf.digits +=  session.getDigits(1, \"#\", ".($rowhelper['ivrtimeout']*1000)."); // ".$rowhelper['ivrtimeout']." seconds\n";
-      	    $tmp .= "           		if (dtmf.digits == 0) {\n";
+      	    $tmp .= "           		if (dtmf.digits.length == 0) {\n";
       	    //$tmp .= "           			console_log( "info", "time out option: " + dtmf.digits + "\n" );\n";
 
       	    $a_ivr_options = &$config['installedpackages']['freeswitchivroptions']['config'];	
@@ -2231,9 +2231,9 @@ function sync_package_freeswitch_ivr()
       	    $tmp .= "         while (session.ready() && ! exit ) {\n";
       	    $tmp .= "           session.streamFile( \"/usr/local/freeswitch/recordings/".$recording_antiaction_filename."\", mycb, \"dtmf ".$rowhelper['ivrtimeout']."\" );\n";
       	    $tmp .= "           if (session.ready()) {\n";
-      	    $tmp .= "           	if (dtmf.digits == 0) {\n";
+      	    $tmp .= "           	if (dtmf.digits.length == 0) {\n";
       	    $tmp .= "           		dtmf.digits +=  session.getDigits(1, \"#\", ".($rowhelper['ivrtimeout']*1000)."); // ".$rowhelper['ivrtimeout']." seconds\n";
-      	    $tmp .= "           		if (dtmf.digits == 0) {\n";
+      	    $tmp .= "           		if (dtmf.digits.length == 0) {\n";
       	    //$tmp .= "           			console_log( "info", "time out option: " + dtmf.digits + "\n" );\n";
 
 
@@ -2720,19 +2720,18 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
+	exec("/etc/./rc.conf_mount_rw");
+
 	$freeswitch_package_version = "0.9.4.4";
 	$freeswitch_build_version = "1.0.4 pre 8";
 	$freeswitch_build_revision = "13784";
-	
+
 	//set script execution time limit to 24 hours
 	set_time_limit (86400);
 	ini_set(max_execution_time,86400);
-	
+
 	//hide errors
 	ini_set('display_errors', '0'); 
-
-	conf_mount_rw();
-	config_lock();
 
 	//used with fax to png, and fax to pdf conversion
 	exec("pkg_add -r tiff2png");
@@ -2830,7 +2829,6 @@ function freeswitch_php_install_command()
 	   system('cd /usr/local/www; tar xvpfz /tmp/edit_area.tgz edit_area');
 	   unlink_if_exists("/tmp/edit_area.tgz");
 	}
-
 	
 	//rename PHP files from .tmp to .php
 	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/class.smtp.tmp");
@@ -3463,6 +3461,7 @@ function freeswitch_deinstall_command()
 
 	conf_mount_rw();
 	config_lock();
+	
 	exec("killall -9 freeswitch");
 	unlink_if_exists("/usr/local/pkg/freeswitch.xml");
 	unlink_if_exists("/usr/local/pkg/freeswitch.inc");
@@ -3506,7 +3505,8 @@ function freeswitch_deinstall_command()
 	exec("rm -R /usr/local/www/packages/freeswitch/");
 	unlink_if_exists("/usr/local/etc/rc.d/freeswitch.sh");
 	unlink_if_exists("/tmp/freeswitch.tar.gz");
-	unlink_if_exists("/tmp/pkg_mgr_FreeSWITCH.log");	
+	unlink_if_exists("/tmp/pkg_mgr_FreeSWITCH.log");
+	
 	conf_mount_ro();
 	config_unlock();
 
