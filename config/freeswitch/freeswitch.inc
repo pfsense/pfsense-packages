@@ -2720,9 +2720,9 @@ function sync_package_freeswitch()
 function freeswitch_php_install_command()
 {
 	global $config;
-	exec("/etc/./rc.conf_mount_rw");
+	//exec("/etc/./rc.conf_mount_rw");
 
-	$freeswitch_package_version = "0.9.4.5";
+	$freeswitch_package_version = "0.9.4.6";
 	$freeswitch_build_version = "1.0.4 pre 8";
 	$freeswitch_build_revision = "13784";
 
