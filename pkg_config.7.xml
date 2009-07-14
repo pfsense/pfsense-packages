@@ -111,14 +111,14 @@
       <pkginfolink>http://doc.pfsense.org/index.php/FreeSWITCH</pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/freeswitch/freeswitch.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <version>0.9.4.4</version>
+      <version>0.9.4.5</version>
       <status>Beta</status>
       <required_version>1.2.1</required_version>
       <maintainer>markjcrane@gmail.com</maintainer>
       <configurationfile>freeswitch.xml</configurationfile>
     </package>
     <package>
-      <name>FreeSWITCH dev</name>
+      <name>FreeSWITCH Dev</name>
       <website>http://www.freeswitch.org/</website>
       <descr>FreeSWITCH package development version.</descr>
       <category>Services</category>

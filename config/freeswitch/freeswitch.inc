@@ -2722,7 +2722,7 @@ function freeswitch_php_install_command()
 	global $config;
 	exec("/etc/./rc.conf_mount_rw");
 
-	$freeswitch_package_version = "0.9.4.4";
+	$freeswitch_package_version = "0.9.4.5";
 	$freeswitch_build_version = "1.0.4 pre 8";
 	$freeswitch_build_revision = "13784";
 
@@ -2751,7 +2751,7 @@ function freeswitch_php_install_command()
 	//}
 	
 	//exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.tgz"); //handled by freeswitch.xml
-	exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
+	exec("cd /usr/local/;tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
 	unlink_if_exists("/tmp/freeswitch.tgz");
 
 	if (!is_dir('/usr/local/freeswitch/storage/fax/')) {
