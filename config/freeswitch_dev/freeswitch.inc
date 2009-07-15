@@ -2736,6 +2736,9 @@ function freeswitch_php_install_command()
 	//used with fax to png, and fax to pdf conversion
 	exec("pkg_add -r tiff2png");
 	
+	//add sqlite package
+	exec("pkg_add -r sqlite34");
+	
 	clearstatcache();
 	if (!is_dir('/usr/local/www/packages/')) {
 	   exec("mkdir /usr/local/www/packages/");
