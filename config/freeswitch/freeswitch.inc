@@ -1305,9 +1305,9 @@ function sync_package_freeswitch_hunt_group()
 									}
 									if ($row['destinationtype'] == "voicemail") {							
 										$tmp .= "		session.execute(\"voicemail\", \"default \${domain} ".$row['destinationnumber']."\");\n";
-										$tmp_sub_array["application"] = "voicemail";
-										$tmp_sub_array["data"] = "default \${domain} ".$row['destinationnumber'];
-										$tmp_array[$i] = $tmp_sub_array;
+										//$tmp_sub_array["application"] = "voicemail";
+										//$tmp_sub_array["data"] = "default \${domain} ".$row['destinationnumber'];
+										//$tmp_array[$i] = $tmp_sub_array;
 										unset($tmp_sub_array);
 									}
 									if ($row['destinationtype'] == "sip uri") {												
@@ -2722,7 +2722,7 @@ function freeswitch_php_install_command()
 	global $config;
 	//exec("/etc/./rc.conf_mount_rw");
 
-	$freeswitch_package_version = "0.9.4.6";
+	$freeswitch_package_version = "0.9.4.7";
 	$freeswitch_build_version = "1.0.4 pre 8";
 	$freeswitch_build_revision = "13784";
 
@@ -2751,7 +2751,7 @@ function freeswitch_php_install_command()
 	//}
 	
 	//exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.tgz"); //handled by freeswitch.xml
-	exec("cd /usr/local/;tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
+	exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
 	unlink_if_exists("/tmp/freeswitch.tgz");
 
 	if (!is_dir('/usr/local/freeswitch/storage/fax/')) {
