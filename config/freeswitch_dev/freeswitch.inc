@@ -604,6 +604,9 @@ function sync_package_freeswitch_extensions()
 					  }
 					  $tmpxml .= "      <param name=\"vm-mailto\" value=\"" . $rowhelper['vm-mailto'] . "\"/>\n";
 				  }
+				  if (strlen($rowhelper['auth-user']) > 0) {
+					$tmpxml .= "      <param name=\"auth-user\" value=\"" . $rowhelper['auth-user'] . "\"/>\n";
+				  } 
 				  if (strlen($rowhelper['auth-acl']) > 0) {
 					$tmpxml .= "      <param name=\"auth-acl\" value=\"" . $rowhelper['auth-acl'] . "\"/>\n";
 				  }          	
@@ -2749,11 +2752,12 @@ function freeswitch_php_install_command()
 	}
 	
 	//$struname = exec('uname -v');
-	//if (stristr($struname, 'FreeBSD 7.0')) {
-	//	$freebsd_version = "7.0";
+	//if (stristr($struname, 'FreeBSD 7.2')) {
+	//	$freebsd_version = "7.2";
 	//}
 	
-	//exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.tgz"); //handled by freeswitch.xml
+	$download_path = 'http://www.pfsense.com/packages/config/freeswitch_dev/';
+	//exec("cd /tmp/;fetch ".$download_path."freeswitch.tgz"); //handled by freeswitch.xml
 	exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
 	unlink_if_exists("/tmp/freeswitch.tgz");
 
@@ -2766,12 +2770,12 @@ function freeswitch_php_install_command()
 	}
 
 	//download the dialplan default.xml
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/dialplan.default.xml");
+	exec("cd /tmp/;fetch ".$download_path."dialplan.default.xml");
 	exec("cp /tmp/dialplan.default.xml /usr/local/freeswitch/conf/dialplan/default.xml");
 	unlink_if_exists("/tmp/dialplan.default.xml");
 	
 	//download the dialplan public.xml
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/dialplan.public.xml");
+	exec("cd /tmp/;fetch ".$download_path."dialplan.public.xml");
 	exec("cp /tmp/dialplan.public.xml /usr/local/freeswitch/conf/dialplan/public.xml");
 	unlink_if_exists("/tmp/dialplan.public.xml");
 	
@@ -2791,206 +2795,200 @@ function freeswitch_php_install_command()
 	}
 	
 	//copy audio files
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_your_pin_number.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_pin_number.wav");	
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_extension_number.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_phone_number.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/call_forward_has_been_set.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/call_forward_has_been_deleted.wav");	
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/begin_recording.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/your_pin_number_is_incorect_goodbye.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_your_pin_number.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_the_pin_number.wav");	
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_the_extension_number.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_the_phone_number.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."call_forward_has_been_set.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."call_forward_has_been_deleted.wav");	
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."begin_recording.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."your_pin_number_is_incorect_goodbye.wav");
 
 	//mod_fax
-	exec("cd /usr/local/freeswitch/mod/;fetch http://www.pfsense.com/packages/config/freeswitch/mod_fax.so");
+	exec("cd /usr/local/freeswitch/mod/;fetch ".$download_path."mod_fax.so");
 	
 	//download lib files
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libtinfo.so.5.6");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libncurses.so.5.6");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libncurses.so.5.7");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libogg.so.5.3");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libtinfo.so.5.6");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libncurses.so.5.6");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libncurses.so.5.7");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libogg.so.5.3");
 	exec("cp /usr/local/lib/libogg.so.5.3 /usr/local/lib/libogg.so.5");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libvorbis.so.4");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libcurl.so.5");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libodbc.so.1");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libiconv.so.3");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libspandsp.so.1");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libvorbis.so.4");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libcurl.so.5");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libodbc.so.1");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libiconv.so.3");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libspandsp.so.1");
 	exec("cp /usr/local/lib/libspandsp.so.1 /usr/local/lib/libspandsp.so.2");
 	
 	//download xml package files
-	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.inc");
-	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.xml");
-	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan.xml");
-	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_external.xml");
-	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_internal.xml");
-	exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_modules.xml");
-	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_public.xml");
-	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_vars.xml");
+	exec("cd /usr/local/pkg/;fetch ".$download_path."freeswitch_modules.xml");
+
 	
 	//misc files
 	if (!is_dir('/usr/local/www/edit_area/')) {
-	   exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/edit_area.tgz");
+	   exec("cd /tmp/;fetch ".$download_path."edit_area.tgz");
 	   system('cd /usr/local/www; tar xvpfz /tmp/edit_area.tgz edit_area');
 	   unlink_if_exists("/tmp/edit_area.tgz");
 	}
 	
 	//rename PHP files from .tmp to .php
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/class.smtp.tmp");
+	exec("cd /tmp/;fetch ".$download_path."class.smtp.tmp");
 	exec("cp /tmp/class.smtp.tmp /usr/local/www/packages/freeswitch/class.smtp.php");
 	unlink_if_exists("/tmp/class.smtp.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/class.phpmailer.tmp");
+	exec("cd /tmp/;fetch ".$download_path."class.phpmailer.tmp");
 	exec("cp /tmp/class.phpmailer.tmp /usr/local/www/packages/freeswitch/class.phpmailer.php");
 	unlink_if_exists("/tmp/class.phpmailer.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_cmd.tmp");	
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_cmd.tmp");	
 	exec("cp /tmp/freeswitch_cmd.tmp /usr/local/www/packages/freeswitch/freeswitch_cmd.php");
 	unlink_if_exists("/tmp/freeswitch_cmd.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan.tmp");	
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_dialplan.tmp");	
 	exec("cp /tmp/freeswitch_dialplan.tmp /usr/local/www/packages/freeswitch/freeswitch_dialplan.php");
 	unlink_if_exists("/tmp/freeswitch_dialplan.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes_details.tmp");	
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_dialplan_includes_details.tmp");	
 	exec("cp /tmp/freeswitch_dialplan_includes_details.tmp /usr/local/www/packages/freeswitch/freeswitch_dialplan_includes_details.php");
 	unlink_if_exists("/tmp/freeswitch_dialplan_includes_details.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes_details_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_dialplan_includes_details_edit.tmp");
 	exec("cp /tmp/freeswitch_dialplan_includes_details_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_dialplan_includes_details_edit.php");
 	unlink_if_exists("/tmp/freeswitch_dialplan_includes_details_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_dialplan_includes.tmp");
 	exec("cp /tmp/freeswitch_dialplan_includes.tmp /usr/local/www/packages/freeswitch/freeswitch_dialplan_includes.php");
 	unlink_if_exists("/tmp/freeswitch_dialplan_includes.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes_edit.tmp");	
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_dialplan_includes_edit.tmp");	
 	exec("cp /tmp/freeswitch_dialplan_includes_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_dialplan_includes_edit.php");
 	unlink_if_exists("/tmp/freeswitch_dialplan_includes_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_extensions.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_extensions.tmp");
 	exec("cp /tmp/freeswitch_extensions.tmp /usr/local/www/packages/freeswitch/freeswitch_extensions.php");
 	unlink_if_exists("/tmp/freeswitch_extensions.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_extensions_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_extensions_edit.tmp");
 	exec("cp /tmp/freeswitch_extensions_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_extensions_edit.php");
 	unlink_if_exists("/tmp/freeswitch_extensions_edit.tmp");
 	
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_fax.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_fax.tmp");
 	exec("cp /tmp/freeswitch_fax.tmp /usr/local/www/packages/freeswitch/freeswitch_fax.php");
 	unlink_if_exists("/tmp/freeswitch_fax.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_fax_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_fax_edit.tmp");
 	exec("cp /tmp/freeswitch_fax_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_fax_edit.php");
 	unlink_if_exists("/tmp/freeswitch_fax_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/fax_to_email.tmp");
+	exec("cd /tmp/;fetch ".$download_path."fax_to_email.tmp");
 	exec("cp /tmp/fax_to_email.tmp /usr/local/www/packages/freeswitch/fax_to_email.php");
 	unlink_if_exists("/tmp/fax_to_email.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_features.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_features.tmp");
 	exec("cp /tmp/freeswitch_features.tmp /usr/local/www/packages/freeswitch/freeswitch_features.php");
 	unlink_if_exists("/tmp/freeswitch_features.tmp");	
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_gateways.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_gateways.tmp");
 	exec("cp /tmp/freeswitch_gateways.tmp /usr/local/www/packages/freeswitch/freeswitch_gateways.php");
 	unlink_if_exists("/tmp/freeswitch_gateways.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_gateways_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_gateways_edit.tmp");
 	exec("cp /tmp/freeswitch_gateways_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_gateways_edit.php");
 	unlink_if_exists("/tmp/freeswitch_gateways_edit.tmp");
 	
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_hunt_group.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_hunt_group.tmp");
 	exec("cp /tmp/freeswitch_hunt_group.tmp /usr/local/www/packages/freeswitch/freeswitch_hunt_group.php");
 	unlink_if_exists("/tmp/freeswitch_hunt_group.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_hunt_group_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_hunt_group_edit.tmp");
 	exec("cp /tmp/freeswitch_hunt_group_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_hunt_group_edit.php");
 	unlink_if_exists("/tmp/freeswitch_hunt_group_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_hunt_group_destinations.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_hunt_group_destinations.tmp");
 	exec("cp /tmp/freeswitch_hunt_group_destinations.tmp /usr/local/www/packages/freeswitch/freeswitch_hunt_group_destinations.php");
 	unlink_if_exists("/tmp/freeswitch_hunt_group_destinations.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_hunt_group_destinations_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_hunt_group_destinations_edit.tmp");
 	exec("cp /tmp/freeswitch_hunt_group_destinations_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_hunt_group_destinations_edit.php");
 	unlink_if_exists("/tmp/freeswitch_hunt_group_destinations_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr.tmp");	
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_ivr.tmp");	
 	exec("cp /tmp/freeswitch_ivr.tmp /usr/local/www/packages/freeswitch/freeswitch_ivr.php");
 	unlink_if_exists("/tmp/freeswitch_ivr.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_ivr_edit.tmp");
 	exec("cp /tmp/freeswitch_ivr_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_ivr_edit.php");
 	unlink_if_exists("/tmp/freeswitch_ivr_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr_options.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_ivr_options.tmp");
 	exec("cp /tmp/freeswitch_ivr_options.tmp /usr/local/www/packages/freeswitch/freeswitch_ivr_options.php");
 	unlink_if_exists("/tmp/freeswitch_ivr_options.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr_options_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_ivr_options_edit.tmp");
 	exec("cp /tmp/freeswitch_ivr_options_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_ivr_options_edit.php");
 	unlink_if_exists("/tmp/freeswitch_ivr_options_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_profiles.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_profiles.tmp");
 	exec("cp /tmp/freeswitch_profiles.tmp /usr/local/www/packages/freeswitch/freeswitch_profiles.php");
 	unlink_if_exists("/tmp/freeswitch_profiles.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_profile_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_profile_edit.tmp");
 	exec("cp /tmp/freeswitch_profile_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_profile_edit.php");
 	unlink_if_exists("/tmp/freeswitch_profile_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_public.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_public.tmp");
 	exec("cp /tmp/freeswitch_public.tmp /usr/local/www/packages/freeswitch/freeswitch_public.php");
 	unlink_if_exists("/tmp/freeswitch_public.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_public_includes.tmp");
 	exec("cp /tmp/freeswitch_public_includes.tmp /usr/local/www/packages/freeswitch/freeswitch_public_includes.php");
 	unlink_if_exists("/tmp/freeswitch_public_includes.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes_edit.tmp");    	
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_public_includes_edit.tmp");    	
 	exec("cp /tmp/freeswitch_public_includes_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_public_includes_edit.php");
 	unlink_if_exists("/tmp/freeswitch_public_includes_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes_details.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_public_includes_details.tmp");
 	exec("cp /tmp/freeswitch_public_includes_details.tmp /usr/local/www/packages/freeswitch/freeswitch_public_includes_details.php");
 	unlink_if_exists("/tmp/freeswitch_public_includes_details.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes_details_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_public_includes_details_edit.tmp");
 	exec("cp /tmp/freeswitch_public_includes_details_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_public_includes_details_edit.php");
 	unlink_if_exists("/tmp/freeswitch_public_includes_details_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_mailto.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_mailto.tmp");
 	exec("cp /tmp/freeswitch_mailto.tmp /usr/local/www/packages/freeswitch/freeswitch_mailto.php");
 	unlink_if_exists("/tmp/freeswitch_mailto.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_recordings.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_recordings.tmp");
 	exec("cp /tmp/freeswitch_recordings.tmp /usr/local/www/packages/freeswitch/freeswitch_recordings.php");
 	unlink_if_exists("/tmp/freeswitch_recordings.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_recordings_edit.tmp");	
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_recordings_edit.tmp");	
 	exec("cp /tmp/freeswitch_recordings_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_recordings_edit.php");
 	unlink_if_exists("/tmp/freeswitch_recordings_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_recordings_play.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_recordings_play.tmp");
 	exec("cp /tmp/freeswitch_recordings_play.tmp /usr/local/www/packages/freeswitch/freeswitch_recordings_play.php");
 	unlink_if_exists("/tmp/freeswitch_recordings_play.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_status.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_status.tmp");
 	exec("cp /tmp/freeswitch_status.tmp /usr/local/www/packages/freeswitch/freeswitch_status.php");
 	unlink_if_exists("/tmp/freeswitch_status.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_time_conditions.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_time_conditions.tmp");
 	exec("cp /tmp/freeswitch_time_conditions.tmp /usr/local/www/packages/freeswitch/freeswitch_time_conditions.php");
 	unlink_if_exists("/tmp/freeswitch_time_conditions.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_time_conditions_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_time_conditions_edit.tmp");
 	exec("cp /tmp/freeswitch_time_conditions_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_time_conditions_edit.php");
 	unlink_if_exists("/tmp/freeswitch_time_conditions_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_vars.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_vars.tmp");
 	exec("cp /tmp/freeswitch_vars.tmp /usr/local/www/packages/freeswitch/freeswitch_vars.php");
 	unlink_if_exists("/tmp/freeswitch_vars.tmp");
 
-	exec("cd /usr/local/freeswitch/scripts/;fetch http://www.pfsense.com/packages/config/freeswitch/disa.js");
+	exec("cd /usr/local/freeswitch/scripts/;fetch ".$download_path."disa.js");
 	exec("cp /usr/local/freeswitch/htdocs/slim.swf /usr/local/www/packages/freeswitch/slim.swf");
 
   /* freeswitch settings defaults */

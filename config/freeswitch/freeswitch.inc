@@ -604,6 +604,9 @@ function sync_package_freeswitch_extensions()
 					  }
 					  $tmpxml .= "      <param name=\"vm-mailto\" value=\"" . $rowhelper['vm-mailto'] . "\"/>\n";
 				  }
+				  if (strlen($rowhelper['auth-user']) > 0) {
+					$tmpxml .= "      <param name=\"auth-user\" value=\"" . $rowhelper['auth-user'] . "\"/>\n";
+				  } 
 				  if (strlen($rowhelper['auth-acl']) > 0) {
 					$tmpxml .= "      <param name=\"auth-acl\" value=\"" . $rowhelper['auth-acl'] . "\"/>\n";
 				  }          	
@@ -2749,8 +2752,8 @@ function freeswitch_php_install_command()
 	}
 	
 	//$struname = exec('uname -v');
-	//if (stristr($struname, 'FreeBSD 7.0')) {
-	//	$freebsd_version = "7.0";
+	//if (stristr($struname, 'FreeBSD 7.2')) {
+	//	$freebsd_version = "7.2";
 	//}
 	
 	//exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.tgz"); //handled by freeswitch.xml
