@@ -604,9 +604,6 @@ function sync_package_freeswitch_extensions()
 					  }
 					  $tmpxml .= "      <param name=\"vm-mailto\" value=\"" . $rowhelper['vm-mailto'] . "\"/>\n";
 				  }
-				  if (strlen($rowhelper['auth-user']) > 0) {
-					$tmpxml .= "      <param name=\"auth-user\" value=\"" . $rowhelper['auth-user'] . "\"/>\n";
-				  } 
 				  if (strlen($rowhelper['auth-acl']) > 0) {
 					$tmpxml .= "      <param name=\"auth-acl\" value=\"" . $rowhelper['auth-acl'] . "\"/>\n";
 				  }          	
@@ -666,6 +663,9 @@ function sync_package_freeswitch_gateways()
 		          if (strlen($rowhelper['username']) > 0) {
 		            $tmpxml .= "      <param name=\"username\" value=\"" . $rowhelper['username'] . "\"/>\n";
 		          }
+		          if (strlen($rowhelper['auth-username']) > 0) {
+		            $tmpxml .= "      <param name=\"auth-username\" value=\"" . $rowhelper['auth-username'] . "\"/>\n";
+		          } 
 		          if (strlen($rowhelper['password']) > 0) {
 		            $tmpxml .= "      <param name=\"password\" value=\"" . $rowhelper['password'] . "\"/>\n";
 		          }
@@ -2725,7 +2725,7 @@ function freeswitch_php_install_command()
 	global $config;
 	//exec("/etc/./rc.conf_mount_rw");
 
-	$freeswitch_package_version = "0.9.4.7";
+	$freeswitch_package_version = "0.9.4.8";
 	$freeswitch_build_version = "1.0.4 pre 8";
 	$freeswitch_build_revision = "13784";
 

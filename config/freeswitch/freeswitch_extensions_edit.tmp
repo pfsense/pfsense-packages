@@ -58,7 +58,6 @@ if (isset($id) && $a_extensions[$id]) {
 	$pconfig['vm-keep-local-after-email'] = $a_extensions[$id]['vm-keep-local-after-email'];	
 	$pconfig['user_context'] = $a_extensions[$id]['user_context'];
 	$pconfig['callgroup'] = $a_extensions[$id]['callgroup'];
-	$pconfig['auth-user'] = $a_extensions[$id]['auth-user'];
 	$pconfig['auth-acl'] = $a_extensions[$id]['auth-acl'];
 	$pconfig['cidr'] = $a_extensions[$id]['cidr'];
 	$pconfig['sip-force-contact'] = $a_extensions[$id]['sip-force-contact'];
@@ -96,7 +95,6 @@ if ($_POST) {
 		$ent['vm-keep-local-after-email'] = $_POST['vm-keep-local-after-email'];
 		$ent['user_context'] = $_POST['user_context'];
 		$ent['callgroup'] = $_POST['callgroup'];
-		$ent['auth-user'] = $_POST['auth-user'];
 		$ent['auth-acl'] = $_POST['auth-acl'];
 		$ent['cidr'] = $_POST['cidr'];
 		$ent['sip-force-contact'] = $_POST['sip-force-contact'];
@@ -302,13 +300,6 @@ display_top_tabs(build_menu());
   			</div>
   			<div id="showadvanced" style="display:none">
 				<table width="100%" border="0" cellpadding="6" cellspacing="0">
-				<tr>
-					<td width="25%" valign="top" class="vncell">Auth-User</td>
-					<td width="75%" class="vtable">
-						<input name="auth-user" type="text" class="formfld unknown" id="auth-user" size="40" value="<?=htmlspecialchars($pconfig['auth-user']);?>">
-						<br> <span class="vexpl">Enter the auth user here.<br></span>
-					</td>
-				</tr>
 				<tr>
 					<td width="25%" valign="top" class="vncell">Auth-ACL</td>
 					<td width="75%" class="vtable">

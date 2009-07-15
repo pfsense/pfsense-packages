@@ -47,7 +47,8 @@ if (isset($id) && $a_gateways[$id]) {
 	$pconfig['gatewayid'] = $a_gateways[$id]['gatewayid'];
 	$gatewayid = $a_gateways[$id]['gatewayid'];
 	$pconfig['gateway'] = $a_gateways[$id]['gateway'];
-	$pconfig['username'] = $a_gateways[$id]['username'];
+	$pconfig['username'] = $a_gateways[$id]['username'];	
+	$pconfig['auth-username'] = $a_gateways[$id]['auth-username'];
 	$pconfig['password'] = $a_gateways[$id]['password'];
 	$pconfig['realm'] = $a_gateways[$id]['realm'];
 	$pconfig['from-user'] = $a_gateways[$id]['from-user'];
@@ -94,6 +95,7 @@ if ($_POST) {
 		}
 		$ent['gateway'] = $_POST['gateway'];
 		$ent['username'] = $_POST['username'];
+		$ent['auth-username'] = $_POST['auth-username'];		
 		$ent['password'] = $_POST['password'];
 		$ent['realm'] = $_POST['realm'];
 		$ent['from-user'] = $_POST['from-user'];
@@ -492,10 +494,17 @@ display_top_tabs(build_menu());
                       <input type="button" onClick="show_advanced_config()" value="Advanced"></input></a>
                     </td>
                   </tr>
-                  </table>				
+                  </table>
       			</div>
       			<div id="showadvanced" style="display:none">
-                  <table width="100%" border="0" cellpadding="6" cellspacing="0">      			
+                  <table width="100%" border="0" cellpadding="6" cellspacing="0">
+				  <tr>
+                    <td width="22%" valign="top" class="vncell">Auth-username</td>
+                    <td width="78%" class="vtable">
+                      <input name="auth-username" type="text" class="formfld" id="auth-username" size="40" value="<?=htmlspecialchars($pconfig['auth-username']);?>">
+                      <br> <span class="vexpl">Enter the auth-username here.<br></span>
+                    </td>
+                  </tr>
                   <tr>
                     <td width="22%" valign="top" class="vncell">Register-transport</td>
                     <td width="78%" class="vtable">
