@@ -1173,7 +1173,7 @@ function sync_package_freeswitch_hunt_group()
 					} //end if strlen huntgroupid; add the Hunt Group to the dialplan
 	
 				//--- begin: pin number ------------------------------------
-				if ($rowhelper['huntgrouppin']) > 0) {
+				if (strlen($rowhelper['huntgrouppin']) > 0) {
 					echo "var pin = '".$rowhelper['huntgrouppin']."';\n";
 					echo "if (pin.length > 0) {\n";
 					echo "  var dtmf = new Object();\n";
