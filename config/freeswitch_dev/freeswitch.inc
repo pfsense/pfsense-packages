@@ -1172,6 +1172,29 @@ function sync_package_freeswitch_hunt_group()
 						
 					} //end if strlen huntgroupid; add the Hunt Group to the dialplan
 	
+				//--- begin: pin number ------------------------------------
+				if ($rowhelper['huntgrouppin']) > 0) {
+					echo "var pin = '".$rowhelper['huntgrouppin']."';\n";
+					echo "if (pin.length > 0) {\n";
+					echo "  var dtmf = new Object();\n";
+					echo "  dtmf.digits = \"\";\n";
+					echo "  digitmaxlength = 6;\n";
+					echo "  session.execute(\"set\", \"playback_terminators=#\");\n";
+					echo "  session.streamFile( \"/usr/local/freeswitch/sounds/custom/8000/please_enter_the_pin_number.wav\", mycb, \"dtmf\");\n";
+					echo "  session.collectInput( mycb, dtmf, timeoutpin );\n";
+					echo "\n";
+					echo "  if (dtmf.digits == pin || pin.length == 0) {\n";
+					echo "    //continue\n";
+					echo "  }\n";
+					echo "  else {\n";
+					echo "    console_log( \"info\", \"Pin: \" + dtmf.digits + \" is incorrect\\n\" );\n";
+					echo "    session.streamFile( \"/usr/local/freeswitch/sounds/custom/8000/your_pin_number_is_incorect_goodbye.wav\", mycb, \"dtmf\");\n";
+					echo "    session.hangup();\n";
+					echo "  }\n";
+					echo "}";
+				}
+				//--- end: pin number ------------------------------------
+
 				//Get the list of destinations then build the Hunt Group javascript
 					$tmp = "";					
 					$tmp .= "\n";

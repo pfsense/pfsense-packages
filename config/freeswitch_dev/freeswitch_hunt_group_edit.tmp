@@ -58,7 +58,8 @@ if (isset($id) && $a_hunt_group[$id]) {
 	$pconfig['huntgrouptimeoutdestination'] = $a_hunt_group[$id]['huntgrouptimeoutdestination'];
 	$pconfig['huntgrouptimeouttype'] = $a_hunt_group[$id]['huntgrouptimeouttype'];
 	$pconfig['huntgroupringback'] = $a_hunt_group[$id]['huntgroupringback'];	
-	$pconfig['huntgroupcidnameprefix'] = $a_hunt_group[$id]['huntgroupcidnameprefix'];
+	$pconfig['huntgroupcidnameprefix'] = $a_hunt_group[$id]['huntgroupcidnameprefix'];	
+	$pconfig['huntgrouppin'] = $a_hunt_group[$id]['huntgrouppin'];
 	$pconfig['huntgroupdescr'] = $a_hunt_group[$id]['huntgroupdescr'];
 }
 
@@ -97,7 +98,8 @@ if ($_POST) {
 		$huntgroupent['huntgrouptimeoutdestination'] = $_POST['huntgrouptimeoutdestination'];
 		$huntgroupent['huntgrouptimeouttype'] = $_POST['huntgrouptimeouttype'];
 		$huntgroupent['huntgroupringback'] = $_POST['huntgroupringback'];		
-		$huntgroupent['huntgroupcidnameprefix'] = $_POST['huntgroupcidnameprefix'];
+		$huntgroupent['huntgroupcidnameprefix'] = $_POST['huntgroupcidnameprefix'];		
+		$huntgroupent['huntgrouppin'] = $_POST['huntgrouppin'];		
 		$huntgroupent['huntgroupdescr'] = $_POST['huntgroupdescr'];
 
 		if (isset($id) && $a_hunt_group[$id]) {
@@ -283,6 +285,17 @@ display_top_tabs(build_menu());
 				</span>
               </td>
             </tr>
+            <tr>
+              <td width="22%" valign="top" class="vncell">PIN</td>
+              <td width="78%" class="vtable">
+                <input name="huntgrouppin" type="text" class="formfld" id="huntgrouppin" size="40" value="<?=htmlspecialchars($pconfig['huntgrouppin']);?>">
+                <br>
+				<span class="vexpl">
+				If this is provided then the caller will be required to enter the PIN number. (optional)
+				</span>
+              </td>
+            </tr>
+			
             <tr>
               <td width="22%" valign="top" class="vncell">Description</td>
               <td width="78%" class="vtable">
