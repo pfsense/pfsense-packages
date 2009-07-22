@@ -177,16 +177,16 @@
 	<action application="bridge" data="user/${dialed_extension}@${domain_name}"/>
       </condition>
     </extension>
-
+    
     <X-PRE-PROCESS cmd="include" data="default/*.xml"/>
-
+   
     <!-- 
-	 dial the extension (1000-1019) for 30 seconds and go to voicemail if the 
+	 dial the extension 3, 4, or 5 digit extensions for 30 seconds and go to voicemail if the 
 	 call fails (continue_on_fail=true), otherwise hang up after a successful
 	 bridge (hangup_after-bridge=true) 
     -->
     <extension name="Local_Extension">
-      <condition field="destination_number" expression="(^\d{4}$|^\d{3}$)">
+      <condition field="destination_number" expression="(^\d{5}$|^\d{4}$|^\d{3}$)">
 	<action application="set" data="dialed_extension=$1"/>
 	<action application="export" data="dialed_extension=$1"/>
 	<!-- bind_meta_app can have these args <key> [a|b|ab] [a|b|o|s] <app> -->
@@ -240,24 +240,54 @@
     </extension>
 	-->
 
-    <!-- voicemail main extension -->
-    <extension name="vmain">
-      <condition field="destination_number" expression="^vmain|\*98$">
-	<action application="answer"/>
-	<action application="sleep" data="1000"/>
-	<action application="voicemail" data="check default ${domain_name} ${sip_from_user}"/>
-      </condition>
-    </extension>
-
     <!-- voicemail main2 extension -->
     <extension name="vmain2">
-      <condition field="destination_number" expression="^vmain2|\*4000">
+      <condition field="destination_number" expression="^vmain2$|^\*97$|^\*4000$">
 	<action application="answer"/>
 	<action application="sleep" data="1000"/>
 	<action application="voicemail" data="check default ${domain_name}"/>
       </condition>
     </extension>
-
+    
+    <!-- voicemail main extension -->
+    <extension name="vmain">
+      <condition field="destination_number" expression="^vmain$|^\*98$">
+	<action application="answer"/>
+	<action application="sleep" data="1000"/>
+	<action application="voicemail" data="check default ${domain_name} ${sip_from_user}"/>
+      </condition>
+    </extension>
+    
+    <extension name="send_to_voicemail_5digits">
+      <condition field="destination_number" expression="^\*99(\d{5})$">
+	<action application="answer"/>
+	<action application="sleep" data="1000"/>
+	<action application="set" data="dialed_extension=$1"/>
+	<action application="export" data="dialed_extension=$1"/>
+	<action application="voicemail" data="default ${domain_name} ${dialed_extension}"/>
+      </condition>
+    </extension>
+    
+    <extension name="send_to_voicemail_4digits">
+      <condition field="destination_number" expression="^\*99(\d{4})$">
+	<action application="answer"/>
+	<action application="sleep" data="1000"/>
+	<action application="set" data="dialed_extension=$1"/>
+	<action application="export" data="dialed_extension=$1"/>
+	<action application="voicemail" data="default ${domain_name} ${dialed_extension}"/>
+      </condition>
+    </extension>
+    
+    <extension name="send_to_voicemail_3digits">
+      <condition field="destination_number" expression="^\*99(\d{3})$">
+	<action application="answer"/>
+	<action application="sleep" data="1000"/>
+	<action application="set" data="dialed_extension=$1"/>
+	<action application="export" data="dialed_extension=$1"/>
+	<action application="voicemail" data="default ${domain_name} ${dialed_extension}"/>
+      </condition>
+    </extension>
+    
     <!-- dial via SIP uri -->
     <extension name="sip_uri">
       <condition field="destination_number" expression="^sip:(.*)$">
