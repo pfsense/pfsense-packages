@@ -35,7 +35,8 @@ require("/usr/local/pkg/freeswitch.inc");
 
 
 $a_hunt_group = &$config['installedpackages']['freeswitchhuntgroup']['config'];
-
+$a_dialplan_includes          	= &$config['installedpackages']['freeswitchdialplanincludes']['config'];
+$a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];
 
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'huntgroup') {
@@ -43,6 +44,35 @@ if ($_GET['act'] == "del") {
 			if (file_exists("/usr/local/freeswitch/scripts/huntgroup_".$_GET['huntgroupid'].".js")) {
 				unlink("/usr/local/freeswitch/scripts/huntgroup_".$_GET['huntgroupid'].".js");
 			}
+			/*
+			//delete dialplan include details
+			if (count($a_dialplan_includes) > 0) {
+				$i = 0;
+				foreach($a_dialplan_includes as $row) {
+					echo $row['opt1value']." == {".$_GET['huntgroupid']."}<br />\n";
+					if ($row['opt1value'] == '{'.$_GET['huntgroupid'].'}') {
+						$dialplanincludeid = $row['dialplanincludeid'];
+						$id = $i;
+						unset($a_dialplan_include_details[$id]);
+					}
+					$i++;
+				}
+				unset($i);
+			}
+
+			//delete dialplan include details
+			if (count($a_dialplan_include_details) > 0) {
+				$i = 0;
+				foreach($a_dialplan_include_details as $row) {
+					if ($row['dialplanincludeid'] == $dialplanincludeid) {
+						$id = $i;
+						unset($a_dialplan_include_details[$id]);
+					}
+					$i++;
+				}
+				unset($i);
+			}
+			*/
             unset($a_hunt_group[$_GET['id']]);
             write_config();
             sync_package_freeswitch_hunt_group();

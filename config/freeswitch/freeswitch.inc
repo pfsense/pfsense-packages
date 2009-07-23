@@ -32,6 +32,8 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+//ob_start("ob_gzhandler");
+
 function build_menu() {
 
 	//$script_name_array = split ("/", $_SERVER["SCRIPT_NAME"]);
@@ -1062,13 +1064,14 @@ function sync_package_freeswitch_hunt_group()
 					//$rowhelper['huntgrouptimeout']
 					//$rowhelper['huntgroupcontext']
 					//$rowhelper['huntgroupringback']
-					//$rowhelper['huntgroupcidnameprefix']					
+					//$rowhelper['huntgroupcidnameprefix']
+					//$rowhelper['huntgrouppin']
+					//$rowhelper['huntgroupcallerannounce']
 					//$rowhelper['huntgroupdescr']
 
 				//add each Hunt Group to the dialplan
 					$a_dialplan_includes          	= &$config['installedpackages']['freeswitchdialplanincludes']['config'];
 					$a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];
-
 
 					if (strlen($rowhelper['huntgroupid']) > 0) {
 						$action = 'add'; //set default action to add
@@ -1083,7 +1086,6 @@ function sync_package_freeswitch_hunt_group()
 								//$row['enabled'];
 
 								if ($row['opt1name'] == "huntgroupid" && $row['opt1value'] == $rowhelper['huntgroupid']) {
-									//update
 									$action = 'update';
 									$dialplanincludeid = $row['dialplanincludeid'];
 									$extensionname = $row['extensionname'];
@@ -1094,8 +1096,6 @@ function sync_package_freeswitch_hunt_group()
 									$opt1name = $row['opt1name'];
 									$opt1value = $row['opt1value'];
 									$id = $i;
-									//echo "update".$i."<br />\n";
-
 								}
 								$i++;
 							}
@@ -1105,75 +1105,267 @@ function sync_package_freeswitch_hunt_group()
 
 						$ent = array();
 						if ($action == 'add') {
+							//create huntgroup extension in the dialplan
+								$ent = array();
+								$dialplanincludeid = guid();
+								$ent['dialplanincludeid'] = $dialplanincludeid;
+								$ent['extensionname'] = $rowhelper['huntgroupname'];
+								$ent['order'] = '9001'; //if update use the existing order number and extension name and desc
+								$ent['context'] = $rowhelper['huntgroupcontext'];
+								$ent['enabled'] = 'true';
+								$ent['descr'] = 'huntgroup';
+								$ent['opt1name'] = 'huntgroupid';
+								$ent['opt1value'] = $rowhelper['huntgroupid'];
+	
+								$a_dialplan_includes[] = $ent; //add to the config
+								unset($ent);
+								
+								$ent = array();
+								$ent['dialplanincludeid'] = $dialplanincludeid;
+								$ent['tag'] = 'condition'; //condition, action, antiaction
+								$ent['fieldtype'] = 'destination_number';
+								$ent['fielddata'] = '^'.$rowhelper['huntgroupextension'].'$';
+								$a_dialplan_include_details[] = $ent;
+								unset($ent);
 
+								$huntgroupid = str_replace(array("{", "}"), "", $rowhelper['huntgroupid']);
+
+								$ent = array();
+								$ent['dialplanincludeid'] = $dialplanincludeid;
+								$ent['tag'] = 'action'; //condition, action, antiaction
+								$ent['fieldtype'] = 'javascript';
+								$ent['fielddata'] = 'huntgroup_'.$huntgroupid.'.js';
+								$a_dialplan_include_details[] = $ent;
+								unset($ent);
+
+								unset($huntgroupid);
+									
+						}
+						if ($action == 'update') {
+							//update the huntgroup
+								$ent = array();
+								$ent['dialplanincludeid'] = $dialplanincludeid;
+								$ent['extensionname'] = $rowhelper['huntgroupname'];
+								$ent['order'] = $order;
+								$ent['context'] = $context;
+								$ent['enabled'] = $enabled;
+								$ent['descr'] = $descr;
+								$ent['opt1name'] = $opt1name;
+								$ent['opt1value'] = $opt1value;
+
+								//update the config
+								$a_dialplan_includes[$id] = $ent;
+
+								unset($ent);
+								unset($extensionname);
+								unset($order);
+								unset($context);
+								unset($enabled);
+								unset($descr);
+								unset($opt1name);
+								unset($opt1value);
+								unset($id);
+						}
+						unset($action);						
+						unset($dialplanincludeid);
+						
+						//check whether the fifo queue exists already
+							$action = 'add'; //set default action to add
+							$i = 0;
+							if (count($a_dialplan_includes) > 0) {
+						  
+								foreach($a_dialplan_includes as $row) {
+
+									//$row['dialplanincludeid'];
+									//$row['extensionname'];
+									//$row['context'];
+									//$row['enabled'];
+
+									if ($row['opt1name'] == "huntgroupfifoid" && $row['opt1value'] == $rowhelper['huntgroupid']) {
+										$action = 'update';
+										$dialplanincludeid = $row['dialplanincludeid'];
+										$extensionname = $row['extensionname'];
+										$order = $row['order'];
+										$context = $row['context'];
+										$enabled = $row['enabled'];
+										$descr = $row['descr'];
+										$opt1name = $row['opt1name'];
+										$opt1value = $row['opt1value'];
+										$id = $i;
+									}
+									$i++;
+								}
+								unset($i);
+							}
+
+						if ($action == 'add') {
+					
+							//create a fifo queue for each huntgroup
+							$ent = array();
 							$dialplanincludeid = guid();
 							$ent['dialplanincludeid'] = $dialplanincludeid;
-							$ent['extensionname'] = $rowhelper['huntgroupname'];
-							$ent['order'] = '9001'; //if update use the existing order number and extension name and desc
+							$ent['extensionname'] = $rowhelper['huntgroupname'].'.park';
+							$ent['order'] = '9999'; //if update use the existing order number and extension name and desc
 							$ent['context'] = $rowhelper['huntgroupcontext'];
 							$ent['enabled'] = 'true';
-							$ent['descr'] = 'huntgroup';
-							$ent['opt1name'] = 'huntgroupid';
+							$ent['descr'] = 'fifo '.$rowhelper['huntgroupextension'];
+							$ent['opt1name'] = 'huntgroupfifoid';
 							$ent['opt1value'] = $rowhelper['huntgroupid'];
+							$a_dialplan_includes[] = $ent; //add to the config
+							unset($ent);
 
-							//add to the config
-								$a_dialplan_includes[] = $ent;
-								unset($ent);
-							
 							$ent = array();
 							$ent['dialplanincludeid'] = $dialplanincludeid;
 							$ent['tag'] = 'condition'; //condition, action, antiaction
 							$ent['fieldtype'] = 'destination_number';
-							$ent['fielddata'] = '^'.$rowhelper['huntgroupextension'].'$';
-							$a_dialplan_include_details[] = $ent;
+							$ent['fielddata'] = '^\*'.$rowhelper['huntgroupextension'].'$';
+							$ent['fieldorder'] = '000';
+							$a_dialplan_include_details[] = $ent; //add to the config
 							unset($ent);
-
-							$huntgroupid = str_replace(array("{", "}"), "", $rowhelper['huntgroupid']);
 
 							$ent = array();
 							$ent['dialplanincludeid'] = $dialplanincludeid;
 							$ent['tag'] = 'action'; //condition, action, antiaction
-							$ent['fieldtype'] = 'javascript';
-							$ent['fielddata'] = 'huntgroup_'.$huntgroupid.'.js';
-							$a_dialplan_include_details[] = $ent;
+							$ent['fieldtype'] = 'set';
+							$ent['fielddata'] = 'fifo_music=$${hold_music}';
+							$ent['fieldorder'] = '001';
+							$a_dialplan_include_details[] = $ent; //add to the config
 							unset($ent);
 
-							unset($huntgroupid);
-									
+							$huntgrouptimeouttype = $rowhelper['huntgrouptimeouttype'];
+							$huntgrouptimeoutdestination = $rowhelper['huntgrouptimeoutdestination'];
+							if ($huntgrouptimeouttype == "voicemail") { $huntgrouptimeoutdestination = '***'.$huntgrouptimeoutdestination; }
+
+							$ent = array();
+							$ent['dialplanincludeid'] = $dialplanincludeid;
+							$ent['tag'] = 'action'; //condition, action, antiaction
+							$ent['fieldtype'] = 'set';
+							$ent['fielddata'] = 'fifo_orbit_exten='.$huntgrouptimeoutdestination.':'.$rowhelper['huntgrouptimeout'];
+							$ent['fieldorder'] = '002';
+							$a_dialplan_include_details[] = $ent;
+							unset($ent); //add to the config
+
+							$ent = array();
+							$ent['dialplanincludeid'] = $dialplanincludeid;
+							$ent['tag'] = 'action'; //condition, action, antiaction
+							$ent['fieldtype'] = 'fifo';
+							$ent['fielddata'] = $rowhelper['huntgroupextension'].'@${domain_name} in';
+							$ent['fieldorder'] = '003';
+							$a_dialplan_include_details[] = $ent; //add to the config
+							unset($ent);
 						}
 						if ($action == 'update') {
+							//update the huntgroup
+								$ent = array();
+								$ent['dialplanincludeid'] = $dialplanincludeid;
+								$ent['extensionname'] = $rowhelper['huntgroupname'].'.park';
+								$ent['order'] = $order;
+								$ent['context'] = $rowhelper['huntgroupcontext'];
+								$ent['enabled'] = $enabled;
+								$ent['descr'] = 'fifo '.$rowhelper['huntgroupextension'];
+								$ent['opt1name'] = $opt1name;
+								$ent['opt1value'] = $opt1value;
 
-							$ent['dialplanincludeid'] = $dialplanincludeid;
-							$ent['extensionname'] = $rowhelper['huntgroupname'];
-							$ent['order'] = $order;
-							$ent['context'] = $context;
-							$ent['enabled'] = $enabled;		
-							$ent['descr'] = $descr;
-							$ent['opt1name'] = $opt1name;
-							$ent['opt1value'] = $opt1value;
+								//update the config
+								$a_dialplan_includes[$id] = $ent;
 
-							//update the config
-							$a_dialplan_includes[$id] = $ent;
-
-							unset($ent);	      		
-							unset($extensionname);
-							unset($order);
-							unset($context);
-							unset($enabled);
-							unset($descr);
-							unset($opt1name);
-							unset($opt1value);
-							unset($id);                    		
-						}
-						write_config();
+								unset($ent);
+								unset($extensionname);
+								unset($order);
+								unset($context);
+								unset($enabled);
+								unset($descr);
+								unset($opt1name);
+								unset($opt1value);
+								unset($id);
 								
-						sync_package_freeswitch_dialplan_includes();		
+								//delete dialplan include details								
+								if (count($a_dialplan_include_details) > 0) {
+									foreach($a_dialplan_include_details as $row) {
+										if ($row['dialplanincludeid'] == $dialplanincludeid) {
+											$id = $i;
+											unset($a_dialplan_include_details[$id]);
+										}
+										$i++;
+									}
+									unset($i);
+								}
+
+								$ent = array();
+								$ent['dialplanincludeid'] = $dialplanincludeid;
+								$ent['tag'] = 'condition'; //condition, action, antiaction
+								$ent['fieldtype'] = 'destination_number';
+								$ent['fielddata'] = '^\*'.$rowhelper['huntgroupextension'].'$';
+								$ent['fieldorder'] = '000';
+								$a_dialplan_include_details[] = $ent; //add to the config
+								unset($ent);
+
+								$ent = array();
+								$ent['dialplanincludeid'] = $dialplanincludeid;
+								$ent['tag'] = 'action'; //condition, action, antiaction
+								$ent['fieldtype'] = 'set';
+								$ent['fielddata'] = 'fifo_music=$${hold_music}';
+								$ent['fieldorder'] = '001';
+								$a_dialplan_include_details[] = $ent; //add to the config
+								unset($ent);
+
+								$huntgrouptimeouttype = $rowhelper['huntgrouptimeouttype'];
+								$huntgrouptimeoutdestination = $rowhelper['huntgrouptimeoutdestination'];
+								if ($huntgrouptimeouttype == "voicemail") { $huntgrouptimeoutdestination = '***'.$huntgrouptimeoutdestination; }
+							
+								$ent = array();
+								$ent['dialplanincludeid'] = $dialplanincludeid;
+								$ent['tag'] = 'action'; //condition, action, antiaction
+								$ent['fieldtype'] = 'set';
+								$ent['fielddata'] = 'fifo_orbit_exten='.$huntgrouptimeoutdestination.':'.$rowhelper['huntgrouptimeout'];
+								$ent['fieldorder'] = '002';
+								$a_dialplan_include_details[] = $ent;
+								unset($ent); //add to the config
+
+								$ent = array();
+								$ent['dialplanincludeid'] = $dialplanincludeid;
+								$ent['tag'] = 'action'; //condition, action, antiaction
+								$ent['fieldtype'] = 'fifo';
+								$ent['fielddata'] = $rowhelper['huntgroupextension'].'@${domain_name} in';
+								$ent['fieldorder'] = '003';
+								$a_dialplan_include_details[] = $ent; //add to the config
+								unset($ent);
+						}
+						
+						write_config();
+						sync_package_freeswitch_dialplan_includes();
 						unset($dialplanincludeid);
 						
 					} //end if strlen huntgroupid; add the Hunt Group to the dialplan
 	
+	
+	
 				//Get the list of destinations then build the Hunt Group javascript
 					$tmp = "";					
+					$tmp .= "\n";
+					$tmp .= "session.answer();\n";
+					$tmp .= "var domain_name = session.getVariable(\"domain_name\");\n";
+					$tmp .= "var extension = '".$rowhelper['huntgroupextension']."';\n";
+					$tmp .= "var result;\n";
+					$tmp .= "var timeoutpin = 7500;\n";
+					$tmp .= "\n";
+					$tmp .= "var objdate = new Date();\n";
+					$tmp .= "var adjusthours = 0; //Adjust Server time that is set to GMT 7 hours\n";
+					$tmp .= "var adjustoperator = \"-\"; //+ or -\n";
+					$tmp .= "if (adjustoperator == \"-\") {\n";
+					$tmp .= "var objdate2 = new Date(objdate.getFullYear(),objdate.getMonth(),objdate.getDate(),(objdate.getHours() - adjusthours),objdate.getMinutes(),objdate.getSeconds());\n";
+					$tmp .= "}\n";
+					$tmp .= "if (adjustoperator == \"+\") {\n";
+					$tmp .= "var objdate2 = new Date(objdate.getFullYear(),objdate.getMonth(),objdate.getDate(),(objdate.getHours() + adjusthours),objdate.getMinutes(),objdate.getSeconds());\n";
+					$tmp .= "}\n";
+					$tmp .= "var Hours = objdate2.getHours();\n";
+					$tmp .= "var Mins = objdate2.getMinutes();\n";
+					$tmp .= "var Seconds = objdate2.getSeconds();\n";
+					$tmp .= "var Month = objdate2.getMonth() + 1;\n";
+					$tmp .= "var Date = objdate2.getDate();\n";
+					$tmp .= "var Year = objdate2.getYear()\n";
+					$tmp .= "var Day = objdate2.getDay()+1;\n";
+					$tmp .= "var exit = false;\n";
 					$tmp .= "\n";
 					
 					$tmp .= " function get_sofia_contact(extension,domain_name, profile){\n";
@@ -1206,57 +1398,131 @@ function sync_package_freeswitch_hunt_group()
 					$tmp .= "	return sofia_contact;\n";
 					$tmp .= " }\n";
 					$tmp .= "\n";
-					$tmp .= "\n";
-					$tmp .= "	dialed_extension = session.getVariable(\"dialed_extension\");\n";
-					$tmp .= "	domain_name = session.getVariable(\"domain_name\");\n";
-					$tmp .= "	domain = session.getVariable(\"domain\");\n";
-					$tmp .= "	us_ring = session.getVariable(\"us-ring\");\n";
-					$tmp .= "	caller_id_name = session.getVariable(\"caller_id_name\");\n";					
-					$tmp .= "	caller_id_number = session.getVariable(\"caller_id_number\");\n";
-					$tmp .= "	effective_caller_id_name = session.getVariable(\"effective_caller_id_name\");\n";
-					$tmp .= "	effective_caller_id_number = session.getVariable(\"effective_caller_id_number\");\n";
-					$tmp .= "	outbound_caller_id_name = session.getVariable(\"outbound_caller_id_name\");\n";
-					$tmp .= "	outbound_caller_id_number = session.getVariable(\"outbound_caller_id_number\");\n";
-					$tmp .= "\n";
 					
+					$tmp .= "\n";		
+					$tmp .= " function mycb( session, type, obj, arg ) {\n";
+					$tmp .= "    try {\n";
+					$tmp .= "        if ( type == \"dtmf\" ) {\n";
+					$tmp .= "          console_log( \"info\", \"digit: \"+obj.digit+\"\\n\" );\n";
+					$tmp .= "          if ( obj.digit == \"#\" ) {\n";
+					$tmp .= "            //console_log( \"info\", \"detected pound sign.\\n\" );\n";
+					$tmp .= "            exit = true;\n";
+					$tmp .= "            return( false );\n";
+					$tmp .= "          }\n";
+					$tmp .= "\n";
+					$tmp .= "          dtmf.digits += obj.digit;\n";
+					$tmp .= "\n";
+					$tmp .= "          if ( dtmf.digits.length >= digitmaxlength ) {\n";
+					$tmp .= "            exit = true;\n";
+					$tmp .= "            return( false );\n";
+					$tmp .= "          }\n";
+					$tmp .= "        }\n";
+					$tmp .= "    } catch (e) {\n";
+					$tmp .= "        console_log( \"err\", e+\"\\n\" );\n";
+					$tmp .= "    }\n";
+					$tmp .= "    return( true );\n";
+					$tmp .= " } //end function mycb\n";
+					$tmp .= "\n";
+		
+					$tmp .= "\n";
+					$tmp .= "dialed_extension = session.getVariable(\"dialed_extension\");\n";
+					$tmp .= "domain_name = session.getVariable(\"domain_name\");\n";
+					$tmp .= "domain = session.getVariable(\"domain\");\n";
+					$tmp .= "us_ring = session.getVariable(\"us-ring\");\n";
+					$tmp .= "caller_id_name = session.getVariable(\"caller_id_name\");\n";					
+					$tmp .= "caller_id_number = session.getVariable(\"caller_id_number\");\n";
+					$tmp .= "effective_caller_id_name = session.getVariable(\"effective_caller_id_name\");\n";
+					$tmp .= "effective_caller_id_number = session.getVariable(\"effective_caller_id_number\");\n";
+					$tmp .= "outbound_caller_id_name = session.getVariable(\"outbound_caller_id_name\");\n";
+					$tmp .= "outbound_caller_id_number = session.getVariable(\"outbound_caller_id_number\");\n";
+					$tmp .= "\n";
+									
+					
+					//pin number requested from caller if provided
+						if (strlen($rowhelper['huntgrouppin']) > 0) {
+							$tmp .= "var pin = '".$rowhelper['huntgrouppin']."';\n";
+							$tmp .= "if (pin.length > 0) {\n";
+							$tmp .= "  var dtmf = new Object();\n";
+							$tmp .= "  dtmf.digits = \"\";\n";
+							$tmp .= "  digitmaxlength = 6;\n";
+							$tmp .= "  session.execute(\"set\", \"playback_terminators=#\");\n";
+							$tmp .= "  session.streamFile( \"/usr/local/freeswitch/sounds/custom/8000/please_enter_the_pin_number.wav\", mycb, \"dtmf\");\n";
+							$tmp .= "  session.collectInput( mycb, dtmf, timeoutpin );\n";
+							$tmp .= "\n";
+							$tmp .= "  if (dtmf.digits == pin || pin.length == 0) {\n";
+							$tmp .= "    //continue\n";
+							$tmp .= "  }\n";
+							$tmp .= "  else {\n";
+							$tmp .= "    console_log( \"info\", \"Pin: \" + dtmf.digits + \" is incorrect\\n\" );\n";
+							$tmp .= "    session.streamFile( \"/usr/local/freeswitch/sounds/custom/8000/your_pin_number_is_incorect_goodbye.wav\", mycb, \"dtmf\");\n";
+							$tmp .= "    session.hangup();\n";
+							$tmp .= "  }\n";
+							$tmp .= "}\n";
+							$tmp .= "\n";
+						}
+						
+					//caller announce requested from caller if provided
+						if ($rowhelper['huntgroupcallerannounce'] == "true") {
+							$tmp .= "function originate(session, sipuri, extension, caller_announce, caller_id_name, caller_id_number) {\n";
+							$tmp .= "	caller_id_name = caller_id_name.replace(\" \", \"+\");\n";
+							$tmp .= "	apiExecute(\"jsrun\", \"originate.js \"+session.uuid+\" \"+sipuri+\" \"+extension+\" \"+caller_announce+\" \"+caller_id_name+\" \"+caller_id_number);\n";
+							$tmp .= "}";
+							$tmp .=	"\n";
+							$tmp .=	"var caller_announce = extension+\"_\"+Year+Month+Day+Hours+Mins+Seconds+\".wav\";\n";
+							$tmp .=	"session.streamFile( \"/usr/local/freeswitch/sounds/custom/8000/please_say_your_name_and_reason_for_calling.wav\");\n";
+							$tmp .=	"session.execute(\"gentones\", \"%(1000, 0, 640)\");\n";
+							$tmp .=	"session.execute(\"set\", \"playback_terminators=#\");\n";
+							$tmp .=	"session.execute(\"record\", \"/tmp/\"+caller_announce+\" 180 200\");\n";
+							$tmp .=	"\n";
+							$tmp .=	"result = session.setAutoHangup(false);\n";
+							$tmp .=	"session.execute(\"transfer\", \"*\"+extension+\" XML default\");\n";
+							$tmp .= "\n";
+						}
+
 					//set caller id prefix
-					if (strlen($rowhelper['huntgroupcidnameprefix'])> 0) {
-						$tmp .= "session.execute(\"set\", \"caller_id_name=".$rowhelper['huntgroupcidnameprefix']."\"+caller_id_name);\n";
-						$tmp .= "session.execute(\"set\", \"effective_caller_id_name=".$rowhelper['huntgroupcidnameprefix']."\"+effective_caller_id_name);\n";
-						$tmp .= "session.execute(\"set\", \"outbound_caller_id_name=".$rowhelper['huntgroupcidnameprefix']."\"+outbound_caller_id_name);\n";
-					}
+						if (strlen($rowhelper['huntgroupcidnameprefix'])> 0) {
+							$tmp .= "session.execute(\"set\", \"caller_id_name=".$rowhelper['huntgroupcidnameprefix']."\"+caller_id_name);\n";
+							$tmp .= "session.execute(\"set\", \"effective_caller_id_name=".$rowhelper['huntgroupcidnameprefix']."\"+effective_caller_id_name);\n";
+							$tmp .= "session.execute(\"set\", \"outbound_caller_id_name=".$rowhelper['huntgroupcidnameprefix']."\"+outbound_caller_id_name);\n";
+						}
 					
-					if (isset($rowhelper['huntgroupringback'])){
-						if ($rowhelper['huntgroupringback'] == "ring"){
-							$tmp .= "	session.execute(\"set\", \"ringback=\"+us_ring);          //set to ringtone\n";
-							$tmp .= "	session.execute(\"set\", \"transfer_ringback=\"+us_ring); //set to ringtone\n";
+					//set ring back
+						if (isset($rowhelper['huntgroupringback'])){
+							if ($rowhelper['huntgroupringback'] == "ring"){
+								$tmp .= "session.execute(\"set\", \"ringback=\"+us_ring);          //set to ringtone\n";
+								$tmp .= "session.execute(\"set\", \"transfer_ringback=\"+us_ring); //set to ringtone\n";
+							}
+							if ($rowhelper['huntgroupringback'] == "music"){
+								$tmp .= "session.execute(\"set\", \"ringback=\${hold_music}\");          //set to ringtone\n";
+								$tmp .= "session.execute(\"set\", \"transfer_ringback=\${hold_music}\"); //set to ringtone\n";
+							}
 						}
-						if ($rowhelper['huntgroupringback'] == "music"){
-							$tmp .= "	session.execute(\"set\", \"ringback=\${hold_music}\");          //set to ringtone\n";
-							$tmp .= "	session.execute(\"set\", \"transfer_ringback=\${hold_music}\"); //set to ringtone\n";
+						else {
+							$tmp .= "session.execute(\"set\", \"ringback=\${hold_music}\");          //set to ringtone\n";
+							$tmp .= "session.execute(\"set\", \"transfer_ringback=\${hold_music}\"); //set to ringtone\n";		
 						}
-					}
-					else {
-						$tmp .= "	session.execute(\"set\", \"ringback=\${hold_music}\");          //set to ringtone\n";
-						$tmp .= "	session.execute(\"set\", \"transfer_ringback=\${hold_music}\"); //set to ringtone\n";		
-					}
 					
 					if ($rowhelper['huntgrouptimeout'] > 0) {
-						$tmp .= "	session.execute(\"set\", \"call_timeout=".$rowhelper['huntgrouptimeout']."\");\n";
-						$tmp .= "	session.execute(\"set\", \"continue_on_fail=true\");\n";
+						$tmp .= "session.execute(\"set\", \"call_timeout=".$rowhelper['huntgrouptimeout']."\");\n";
+						$tmp .= "session.execute(\"set\", \"continue_on_fail=true\");\n";
 					}
-					$tmp .= "	session.execute(\"set\", \"hangup_after_bridge=true\");\n";
+					$tmp .= "session.execute(\"set\", \"hangup_after_bridge=true\");\n";
 					$tmp .= "\n";
-					$tmp .= "	//console_log( \"info\", \"dialed extension:\"+dialed_extension+\".\\n\" );\n";
-					$tmp .= "	//console_log( \"info\", \"domain: \"+domain+\".\\n\" );\n";
-					$tmp .= "	//console_log( \"info\", \"us_ring: \"+us_ring+\".\\n\" );\n";
-					$tmp .= "	//console_log( \"info\", \"domain: \"+domain+\".\\n\" );\n";
-					$tmp .= "	//console_log( \"info\", \"domain_name: \"+domain_name+\".\\n\" );\n";
+					$tmp .= "//console_log( \"info\", \"dialed extension:\"+dialed_extension+\".\\n\" );\n";
+					$tmp .= "//console_log( \"info\", \"domain: \"+domain+\".\\n\" );\n";
+					$tmp .= "//console_log( \"info\", \"us_ring: \"+us_ring+\".\\n\" );\n";
+					$tmp .= "//console_log( \"info\", \"domain: \"+domain+\".\\n\" );\n";
+					$tmp .= "//console_log( \"info\", \"domain_name: \"+domain_name+\".\\n\" );\n";
 					$tmp .= "\n";
 					
-					$tmp .= "	//console_log( \"info\", \"action call now don't wait for dtmf\\n\" );\n";
-					$tmp .= "	if ( session.ready() ) {\n";
-					$tmp .= "		session.answer();\n";
+					$tmp .= "//console_log( \"info\", \"action call now don't wait for dtmf\\n\" );\n";
+					if ($rowhelper['huntgroupcallerannounce'] == "true") {
+						//do nothing
+					}
+					else {
+						$tmp .= "if ( session.ready() ) {\n";
+						$tmp .= "	session.answer();\n";
+					}
 					$tmp .= "\n";
 
 					$a_hunt_group          = &$config['installedpackages']['freeswitchhuntgroup']['config'];
@@ -1300,20 +1566,21 @@ function sync_package_freeswitch_hunt_group()
 									if (strlen($row['destinationnumber']) == 0) { $row['destinationnumber'] = "internal"; }
 									
 									if ($row['destinationtype'] == "extension") {
-										$tmp .= "		sofia_contact_".$row['destinationnumber']." = get_sofia_contact(\"".$row['destinationnumber']."\",domain_name, \"".$row['destinationprofile']."\");\n";									
+										$tmp .= "sofia_contact_".$row['destinationnumber']." = get_sofia_contact(\"".$row['destinationnumber']."\",domain_name, \"".$row['destinationprofile']."\");\n";
 										$tmp_sub_array["application"] = "bridge";
 										$tmp_sub_array["data"] = "sofia_contact_".$row['destinationnumber'];
 										$tmp_array[$i] = $tmp_sub_array;
-										unset($tmp_sub_array);									
+										unset($tmp_sub_array);
 									}
-									if ($row['destinationtype'] == "voicemail") {							
-										$tmp .= "		session.execute(\"voicemail\", \"default \${domain} ".$row['destinationnumber']."\");\n";
+									if ($row['destinationtype'] == "voicemail") {
+										$tmp_sub_array["application"] = "voicemail";
+										$tmp .= "session.execute(\"voicemail\", \"default \${domain} ".$row['destinationnumber']."\");\n";
 										//$tmp_sub_array["application"] = "voicemail";
 										//$tmp_sub_array["data"] = "default \${domain} ".$row['destinationnumber'];
 										//$tmp_array[$i] = $tmp_sub_array;
 										unset($tmp_sub_array);
 									}
-									if ($row['destinationtype'] == "sip uri") {												
+									if ($row['destinationtype'] == "sip uri") {
 										$tmp_sub_array["application"] = "bridge";
 										$tmp_sub_array["data"] = "\"".$row['destinationnumber']."\"";
 										$tmp_array[$i] = $tmp_sub_array;
@@ -1327,50 +1594,71 @@ function sync_package_freeswitch_hunt_group()
 							unset($i);
 						} //if count
 						
-						
+					$i = 0;
+					if(count($tmp_array) > 0) {
+						foreach ($tmp_array as $row) {
+							$tmpdata = $row["data"];
+							if ($row["application"] == "voicemail") { $tmpdata = "***".$tmpdata; }
+							if ($i < 1) {
+								$tmp_buffer = $tmpdata;
+							}
+							else {
+								$tmp_buffer .= "+\",\"+".$tmpdata;
+							}
+							$i++;						
+						}
+					}
+					unset($i);					
+					$delimiter = ",";						
+					$tmp_application = $tmp_array[0]["application"];	
 					
 					switch ($rowhelper['huntgrouptype']) {
 					case "simultaneous":
 						//print_r($tmp_array);
-						$i = 0;
-						if(count($tmp_array) > 0) {
-							foreach ($tmp_array as $row) {
-								if ($i < 1) {
-									$tmp_buffer = $row["data"];
+						if ($rowhelper['huntgroupcallerannounce'] == "true") {
+							$i = 0;
+							if (count($tmp_array) > 0) {
+								foreach ($tmp_array as $row) {
+									$tmpdata = $row["data"];
+									if ($row["application"] == "voicemail") { $tmpdata = "***".$tmpdata; }
+									$tmp .= "	result = originate (session, ".$tmpdata.", extension, caller_announce, caller_id_name, caller_id_number);\n";
 								}
-								else {
-									$tmp_buffer .= "+\",\"+".$row["data"];
-								}
-								$i++;						
 							}
 						}
-						unset($i);
-						
-						$delimiter = ",";						
-						$tmp_application = $tmp_array[0]["application"];
+						else {
+							$tmp .= "\n";
+							$tmp .= "	session.execute(\"".$tmp_application."\", $tmp_buffer);\n";
+							//$tmp .= "	session.execute(\"bridge\", sofia_contact_100+\",\"+sofia_contact_101+\",\"+sofia_contact_102+\",\"+sofia_contact_103+\",\"+sofia_contact_104);\n";
+							//$tmp .= "	//session.execute(\"bridge\", \"sofia/gateway/flowroute.com/12081231234,\"+sofia_contact_101);\n";
+						}
 						unset($tmp_array);
-						
-						$tmp .= "\n";
-						$tmp .= "		session.execute(\"".$tmp_application."\", $tmp_buffer);\n";
-						//$tmp .= "		session.execute(\"bridge\", sofia_contact_100+\",\"+sofia_contact_101+\",\"+sofia_contact_102+\",\"+sofia_contact_103+\",\"+sofia_contact_104);\n";
-						//$tmp .= "		//session.execute(\"bridge\", \"sofia/gateway/flowroute.com/12081231234,\"+sofia_contact_101);\n";
-
 						break;
 					case "sequentially":
 						
 						$tmp .= "\n";
 						//print_r($tmp_array);
 						$i = 0;
-						if (count($tmp_array) > 0) {
-							foreach ($tmp_array as $row) {
-								$tmp .= "		session.execute(\"".$row["application"]."\", ".$row["data"].");\n";					
+						if (count($tmp_array) > 0) {							
+							if ($rowhelper['huntgroupcallerannounce'] == "true") {
+								$i = 0;
+								if (count($tmp_array) > 0) {
+									//foreach ($tmp_array as $row) {
+										//$tmpdata = $row["data"];
+										//if ($row["application"] == "voicemail") { $tmpdata = "***".$tmpdata; }
+										$tmp .= "	result = originate (session, ".$tmp_buffer.", extension, caller_announce, caller_id_name, caller_id_number);\n";
+									//}
+								}
+							}
+							else {
+								foreach ($tmp_array as $row) {
+									$tmp .= "	session.execute(\"".$row["application"]."\", ".$row["data"].");\n";
+								}
 							}
 							unset($tmp_array);
 						}
 						
 						break;
 					}
-
 
 					//set the timeout destination
 					$huntgrouptimeoutdestination = $a_hunt_group[$x]['huntgrouptimeoutdestination'];
@@ -1379,19 +1667,28 @@ function sync_package_freeswitch_hunt_group()
 					if ($row['huntgrouptimeouttype'] == "voicemail") { $huntgrouptimeouttype = "voicemail"; }
 					if ($row['huntgrouptimeouttype'] == "sip uri") { $huntgrouptimeouttype = "bridge"; }
 					$tmp .= "\n";
-					$tmp .= "		//timeout\n";
-					$tmp .= "		session.execute(\"".$huntgrouptimeouttype."\", \"default \${domain} ".$huntgrouptimeoutdestination."\");\n";
-					
-					
-					$tmp .= "\n";
-					$tmp .= "		//clear variables\n";
-					$tmp .= "		dialed_extension = \"\";\n";
-					$tmp .= "		new_extension = \"\";\n";
-					$tmp .= "		domain_name = \"\";\n";
-					$tmp .= "		domain = \"\";";
+					if ($rowhelper['huntgroupcallerannounce'] == "true") {
+						//do nothing
+					}
+					else {
+						$tmp .= "	//timeout\n";
+						$tmp .= "	session.execute(\"".$huntgrouptimeouttype."\", \"default \${domain} ".$huntgrouptimeoutdestination."\");\n";
+					}
 					
 					$tmp .= "\n";
-					$tmp .= "	} //end if session.ready\n";
+					$tmp .= "	//clear variables\n";
+					$tmp .= "	dialed_extension = \"\";\n";
+					$tmp .= "	new_extension = \"\";\n";
+					$tmp .= "	domain_name = \"\";\n";
+					$tmp .= "	domain = \"\";";
+					
+					$tmp .= "\n";
+					if ($rowhelper['huntgroupcallerannounce'] == "true") {
+						//do nothing
+					}
+					else {
+						$tmp .= "} //end if session.ready\n";
+					}
 					$tmp .= "\n";
 
 					if (strlen($rowhelper['huntgroupid']) > 0) {
@@ -2725,7 +3022,7 @@ function freeswitch_php_install_command()
 	global $config;
 	//exec("/etc/./rc.conf_mount_rw");
 
-	$freeswitch_package_version = "0.9.4.8";
+	$freeswitch_package_version = "0.9.5";
 	$freeswitch_build_version = "1.0.4 pre 8";
 	$freeswitch_build_revision = "13784";
 
@@ -2756,7 +3053,8 @@ function freeswitch_php_install_command()
 	//	$freebsd_version = "7.2";
 	//}
 	
-	//exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.tgz"); //handled by freeswitch.xml
+	$download_path = 'http://www.pfsense.com/packages/config/freeswitch/';
+	//exec("cd /tmp/;fetch ".$download_path."freeswitch.tgz"); //handled by freeswitch.xml
 	exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
 	unlink_if_exists("/tmp/freeswitch.tgz");
 
@@ -2769,12 +3067,12 @@ function freeswitch_php_install_command()
 	}
 
 	//download the dialplan default.xml
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/dialplan.default.xml");
+	exec("cd /tmp/;fetch ".$download_path."dialplan.default.xml");
 	exec("cp /tmp/dialplan.default.xml /usr/local/freeswitch/conf/dialplan/default.xml");
 	unlink_if_exists("/tmp/dialplan.default.xml");
 	
 	//download the dialplan public.xml
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/dialplan.public.xml");
+	exec("cd /tmp/;fetch ".$download_path."dialplan.public.xml");
 	exec("cp /tmp/dialplan.public.xml /usr/local/freeswitch/conf/dialplan/public.xml");
 	unlink_if_exists("/tmp/dialplan.public.xml");
 	
@@ -2794,206 +3092,208 @@ function freeswitch_php_install_command()
 	}
 	
 	//copy audio files
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_your_pin_number.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_pin_number.wav");	
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_extension_number.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/please_enter_the_phone_number.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/call_forward_has_been_set.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/call_forward_has_been_deleted.wav");	
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/begin_recording.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch http://www.pfsense.com/packages/config/freeswitch/your_pin_number_is_incorect_goodbye.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_your_pin_number.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_the_pin_number.wav");	
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_the_extension_number.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_the_phone_number.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."call_forward_has_been_set.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."call_forward_has_been_deleted.wav");	
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."begin_recording.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."your_pin_number_is_incorect_goodbye.wav");	
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_say_your_name_and_reason_for_calling.wav");
+	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."press_1_to_accept_2_to_reject_or_3_for_voicemail.wav");
 
 	//mod_fax
-	exec("cd /usr/local/freeswitch/mod/;fetch http://www.pfsense.com/packages/config/freeswitch/mod_fax.so");
+	exec("cd /usr/local/freeswitch/mod/;fetch ".$download_path."mod_fax.so");
 	
 	//download lib files
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libtinfo.so.5.6");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libncurses.so.5.6");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libncurses.so.5.7");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libogg.so.5.3");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libtinfo.so.5.6");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libncurses.so.5.6");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libncurses.so.5.7");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libogg.so.5.3");
 	exec("cp /usr/local/lib/libogg.so.5.3 /usr/local/lib/libogg.so.5");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libvorbis.so.4");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libcurl.so.5");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libodbc.so.1");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libiconv.so.3");
-	exec("cd /usr/local/lib/;fetch http://www.pfsense.com/packages/config/freeswitch/libspandsp.so.1");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libvorbis.so.4");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libcurl.so.5");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libodbc.so.1");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libiconv.so.3");
+	exec("cd /usr/local/lib/;fetch ".$download_path."libspandsp.so.1");
 	exec("cp /usr/local/lib/libspandsp.so.1 /usr/local/lib/libspandsp.so.2");
 	
 	//download xml package files
-	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.inc");
-	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch.xml");
-	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan.xml");
-	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_external.xml");
-	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_internal.xml");
-	exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_modules.xml");
-	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_public.xml");
-	//exec("cd /usr/local/pkg/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_vars.xml");
+	exec("cd /usr/local/pkg/;fetch ".$download_path."freeswitch_modules.xml");
+
 	
 	//misc files
 	if (!is_dir('/usr/local/www/edit_area/')) {
-	   exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/edit_area.tgz");
+	   exec("cd /tmp/;fetch ".$download_path."edit_area.tgz");
 	   system('cd /usr/local/www; tar xvpfz /tmp/edit_area.tgz edit_area');
 	   unlink_if_exists("/tmp/edit_area.tgz");
 	}
 	
+	
 	//rename PHP files from .tmp to .php
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/class.smtp.tmp");
+	exec("cd /tmp/;fetch ".$download_path."index.tmp");
+	exec("cp /tmp/index.tmp /usr/local/www/packages/freeswitch/index.php");
+	unlink_if_exists("/tmp/index.tmp");
+	
+	exec("cd /tmp/;fetch ".$download_path."class.smtp.tmp");
 	exec("cp /tmp/class.smtp.tmp /usr/local/www/packages/freeswitch/class.smtp.php");
 	unlink_if_exists("/tmp/class.smtp.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/class.phpmailer.tmp");
+	exec("cd /tmp/;fetch ".$download_path."class.phpmailer.tmp");
 	exec("cp /tmp/class.phpmailer.tmp /usr/local/www/packages/freeswitch/class.phpmailer.php");
 	unlink_if_exists("/tmp/class.phpmailer.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_cmd.tmp");	
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_cmd.tmp");	
 	exec("cp /tmp/freeswitch_cmd.tmp /usr/local/www/packages/freeswitch/freeswitch_cmd.php");
 	unlink_if_exists("/tmp/freeswitch_cmd.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan.tmp");	
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_dialplan.tmp");	
 	exec("cp /tmp/freeswitch_dialplan.tmp /usr/local/www/packages/freeswitch/freeswitch_dialplan.php");
 	unlink_if_exists("/tmp/freeswitch_dialplan.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes_details.tmp");	
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_dialplan_includes_details.tmp");	
 	exec("cp /tmp/freeswitch_dialplan_includes_details.tmp /usr/local/www/packages/freeswitch/freeswitch_dialplan_includes_details.php");
 	unlink_if_exists("/tmp/freeswitch_dialplan_includes_details.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes_details_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_dialplan_includes_details_edit.tmp");
 	exec("cp /tmp/freeswitch_dialplan_includes_details_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_dialplan_includes_details_edit.php");
 	unlink_if_exists("/tmp/freeswitch_dialplan_includes_details_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_dialplan_includes.tmp");
 	exec("cp /tmp/freeswitch_dialplan_includes.tmp /usr/local/www/packages/freeswitch/freeswitch_dialplan_includes.php");
 	unlink_if_exists("/tmp/freeswitch_dialplan_includes.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_dialplan_includes_edit.tmp");	
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_dialplan_includes_edit.tmp");	
 	exec("cp /tmp/freeswitch_dialplan_includes_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_dialplan_includes_edit.php");
 	unlink_if_exists("/tmp/freeswitch_dialplan_includes_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_extensions.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_extensions.tmp");
 	exec("cp /tmp/freeswitch_extensions.tmp /usr/local/www/packages/freeswitch/freeswitch_extensions.php");
 	unlink_if_exists("/tmp/freeswitch_extensions.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_extensions_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_extensions_edit.tmp");
 	exec("cp /tmp/freeswitch_extensions_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_extensions_edit.php");
 	unlink_if_exists("/tmp/freeswitch_extensions_edit.tmp");
 	
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_fax.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_fax.tmp");
 	exec("cp /tmp/freeswitch_fax.tmp /usr/local/www/packages/freeswitch/freeswitch_fax.php");
 	unlink_if_exists("/tmp/freeswitch_fax.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_fax_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_fax_edit.tmp");
 	exec("cp /tmp/freeswitch_fax_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_fax_edit.php");
 	unlink_if_exists("/tmp/freeswitch_fax_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/fax_to_email.tmp");
+	exec("cd /tmp/;fetch ".$download_path."fax_to_email.tmp");
 	exec("cp /tmp/fax_to_email.tmp /usr/local/www/packages/freeswitch/fax_to_email.php");
 	unlink_if_exists("/tmp/fax_to_email.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_features.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_features.tmp");
 	exec("cp /tmp/freeswitch_features.tmp /usr/local/www/packages/freeswitch/freeswitch_features.php");
 	unlink_if_exists("/tmp/freeswitch_features.tmp");	
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_gateways.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_gateways.tmp");
 	exec("cp /tmp/freeswitch_gateways.tmp /usr/local/www/packages/freeswitch/freeswitch_gateways.php");
 	unlink_if_exists("/tmp/freeswitch_gateways.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_gateways_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_gateways_edit.tmp");
 	exec("cp /tmp/freeswitch_gateways_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_gateways_edit.php");
 	unlink_if_exists("/tmp/freeswitch_gateways_edit.tmp");
 	
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_hunt_group.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_hunt_group.tmp");
 	exec("cp /tmp/freeswitch_hunt_group.tmp /usr/local/www/packages/freeswitch/freeswitch_hunt_group.php");
 	unlink_if_exists("/tmp/freeswitch_hunt_group.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_hunt_group_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_hunt_group_edit.tmp");
 	exec("cp /tmp/freeswitch_hunt_group_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_hunt_group_edit.php");
 	unlink_if_exists("/tmp/freeswitch_hunt_group_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_hunt_group_destinations.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_hunt_group_destinations.tmp");
 	exec("cp /tmp/freeswitch_hunt_group_destinations.tmp /usr/local/www/packages/freeswitch/freeswitch_hunt_group_destinations.php");
 	unlink_if_exists("/tmp/freeswitch_hunt_group_destinations.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_hunt_group_destinations_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_hunt_group_destinations_edit.tmp");
 	exec("cp /tmp/freeswitch_hunt_group_destinations_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_hunt_group_destinations_edit.php");
 	unlink_if_exists("/tmp/freeswitch_hunt_group_destinations_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr.tmp");	
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_ivr.tmp");	
 	exec("cp /tmp/freeswitch_ivr.tmp /usr/local/www/packages/freeswitch/freeswitch_ivr.php");
 	unlink_if_exists("/tmp/freeswitch_ivr.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_ivr_edit.tmp");
 	exec("cp /tmp/freeswitch_ivr_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_ivr_edit.php");
 	unlink_if_exists("/tmp/freeswitch_ivr_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr_options.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_ivr_options.tmp");
 	exec("cp /tmp/freeswitch_ivr_options.tmp /usr/local/www/packages/freeswitch/freeswitch_ivr_options.php");
 	unlink_if_exists("/tmp/freeswitch_ivr_options.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_ivr_options_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_ivr_options_edit.tmp");
 	exec("cp /tmp/freeswitch_ivr_options_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_ivr_options_edit.php");
 	unlink_if_exists("/tmp/freeswitch_ivr_options_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_profiles.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_profiles.tmp");
 	exec("cp /tmp/freeswitch_profiles.tmp /usr/local/www/packages/freeswitch/freeswitch_profiles.php");
 	unlink_if_exists("/tmp/freeswitch_profiles.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_profile_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_profile_edit.tmp");
 	exec("cp /tmp/freeswitch_profile_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_profile_edit.php");
 	unlink_if_exists("/tmp/freeswitch_profile_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_public.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_public.tmp");
 	exec("cp /tmp/freeswitch_public.tmp /usr/local/www/packages/freeswitch/freeswitch_public.php");
 	unlink_if_exists("/tmp/freeswitch_public.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_public_includes.tmp");
 	exec("cp /tmp/freeswitch_public_includes.tmp /usr/local/www/packages/freeswitch/freeswitch_public_includes.php");
 	unlink_if_exists("/tmp/freeswitch_public_includes.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes_edit.tmp");    	
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_public_includes_edit.tmp");    	
 	exec("cp /tmp/freeswitch_public_includes_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_public_includes_edit.php");
 	unlink_if_exists("/tmp/freeswitch_public_includes_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes_details.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_public_includes_details.tmp");
 	exec("cp /tmp/freeswitch_public_includes_details.tmp /usr/local/www/packages/freeswitch/freeswitch_public_includes_details.php");
 	unlink_if_exists("/tmp/freeswitch_public_includes_details.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_public_includes_details_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_public_includes_details_edit.tmp");
 	exec("cp /tmp/freeswitch_public_includes_details_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_public_includes_details_edit.php");
 	unlink_if_exists("/tmp/freeswitch_public_includes_details_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_mailto.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_mailto.tmp");
 	exec("cp /tmp/freeswitch_mailto.tmp /usr/local/www/packages/freeswitch/freeswitch_mailto.php");
 	unlink_if_exists("/tmp/freeswitch_mailto.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_recordings.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_recordings.tmp");
 	exec("cp /tmp/freeswitch_recordings.tmp /usr/local/www/packages/freeswitch/freeswitch_recordings.php");
 	unlink_if_exists("/tmp/freeswitch_recordings.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_recordings_edit.tmp");	
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_recordings_edit.tmp");	
 	exec("cp /tmp/freeswitch_recordings_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_recordings_edit.php");
 	unlink_if_exists("/tmp/freeswitch_recordings_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_recordings_play.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_recordings_play.tmp");
 	exec("cp /tmp/freeswitch_recordings_play.tmp /usr/local/www/packages/freeswitch/freeswitch_recordings_play.php");
 	unlink_if_exists("/tmp/freeswitch_recordings_play.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_status.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_status.tmp");
 	exec("cp /tmp/freeswitch_status.tmp /usr/local/www/packages/freeswitch/freeswitch_status.php");
 	unlink_if_exists("/tmp/freeswitch_status.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_time_conditions.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_time_conditions.tmp");
 	exec("cp /tmp/freeswitch_time_conditions.tmp /usr/local/www/packages/freeswitch/freeswitch_time_conditions.php");
 	unlink_if_exists("/tmp/freeswitch_time_conditions.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_time_conditions_edit.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_time_conditions_edit.tmp");
 	exec("cp /tmp/freeswitch_time_conditions_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_time_conditions_edit.php");
 	unlink_if_exists("/tmp/freeswitch_time_conditions_edit.tmp");
 
-	exec("cd /tmp/;fetch http://www.pfsense.com/packages/config/freeswitch/freeswitch_vars.tmp");
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_vars.tmp");
 	exec("cp /tmp/freeswitch_vars.tmp /usr/local/www/packages/freeswitch/freeswitch_vars.php");
 	unlink_if_exists("/tmp/freeswitch_vars.tmp");
 
-	exec("cd /usr/local/freeswitch/scripts/;fetch http://www.pfsense.com/packages/config/freeswitch/disa.js");
+	exec("cd /usr/local/freeswitch/scripts/;fetch ".$download_path."disa.js");
+	exec("cd /usr/local/freeswitch/scripts/;fetch ".$download_path."originate.js");
 	exec("cp /usr/local/freeswitch/htdocs/slim.swf /usr/local/www/packages/freeswitch/slim.swf");
 
   /* freeswitch settings defaults */
