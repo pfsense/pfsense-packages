@@ -32,7 +32,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-//ob_start("ob_gzhandler");
+ob_start("ob_gzhandler");
 
 function build_menu() {
 
@@ -427,9 +427,6 @@ function sync_package_freeswitch_settings()
   global $config;
   if($config['installedpackages']['freeswitchsettings']['config'] != "") {
 
-      conf_mount_rw();
-      config_unlock();
-	
       foreach($config['installedpackages']['freeswitchsettings']['config'] as $rowhelper) {
 
 		$fout = fopen("/usr/local/freeswitch/conf/directory/default/default.xml","w");		
@@ -503,7 +500,6 @@ function sync_package_freeswitch_settings()
 
       }
 
-      conf_mount_ro();
       $cmd = "api reloadxml";
       //event_socket_request_cmd($cmd);
       unset($cmd);
@@ -515,8 +511,6 @@ function sync_package_freeswitch_dialplan()
 {
 
   global $config;
-  conf_mount_rw();
-  config_unlock();
 
   //using backup files rather than pfsense config.xml for this file
   $config['installedpackages']['freeswitchpublic']['config'][0]['dialplan_default_xml'] = "";
@@ -539,7 +533,6 @@ function sync_package_freeswitch_dialplan()
 		//unset($tmpxml);
   //}
 
-  conf_mount_ro();
   //$cmd = "api reloadxml";
   //event_socket_request_cmd($cmd);
   //unset($cmd);
@@ -552,9 +545,6 @@ function sync_package_freeswitch_extensions()
 
   global $config;
   if($config['installedpackages']['freeswitchextensions']['config'] != "") {
-
-    	conf_mount_rw();
-    	config_unlock();
 	
       /* delete all old extensions to prepare for new ones */
     	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/1*.xml");
@@ -634,7 +624,6 @@ function sync_package_freeswitch_extensions()
 			}
       }
 
-      conf_mount_ro();
       $cmd = "api reloadxml";
       //event_socket_request_cmd($cmd);
       unset($cmd);
@@ -648,9 +637,6 @@ function sync_package_freeswitch_gateways()
 
   global $config;
   if($config['installedpackages']['freeswitchgateways']['config'] != "") {
-
-      conf_mount_rw();
-      config_unlock();
     	
       /* delete all old gateways to prepare for new ones */
       unlink_if_exists("/usr/local/freeswitch/conf/sip_profiles/external/*.xml");
@@ -736,7 +722,6 @@ function sync_package_freeswitch_gateways()
 
       }
 
-      conf_mount_ro();
       $cmd = "api sofia profile external restart reloadxml";
       //event_socket_request_cmd($cmd);
       unset($cmd);
@@ -750,8 +735,6 @@ function sync_package_freeswitch_modules()
 {
 
   global $config;
-  conf_mount_rw();
-  config_unlock();
 
   foreach($config['installedpackages']['freeswitchmodules']['config'] as $rowhelper) {
   		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/modules.conf.xml","w");
@@ -870,7 +853,6 @@ function sync_package_freeswitch_modules()
       fclose($fout);
   }
 
-  conf_mount_ro();
   $cmd = "api reloadxml";
   //event_socket_request_cmd($cmd);
   unset($cmd);
@@ -882,8 +864,6 @@ function sync_package_freeswitch_public()
 {
 
   global $config;
-  conf_mount_rw();
-  config_unlock();
 
   //using backup files rather than pfsense config.xml for this file
   $config['installedpackages']['freeswitchpublic']['config'][0]['public_xml'] = "";
@@ -908,7 +888,6 @@ function sync_package_freeswitch_public()
   //    unset($tmpxml);
   //}
 
-  conf_mount_ro();
   //$cmd = "api reloadxml";
   ////event_socket_request_cmd($cmd);
   //unset($cmd);
@@ -920,8 +899,6 @@ function sync_package_freeswitch_vars()
 {
 
   global $config;
-  conf_mount_rw();
-  config_unlock();
 
   //using backup files rather than pfsense config.xml for this file
   $config['installedpackages']['freeswitchpublic']['config'][0]['vars_xml'] = "";
@@ -944,7 +921,6 @@ function sync_package_freeswitch_vars()
   //    unset($tmpxml);
   //}
 
-  conf_mount_ro();
   //$cmd = "api reloadxml";
   ////event_socket_request_cmd($cmd);
   //unset($cmd);
@@ -955,8 +931,6 @@ function sync_package_freeswitch_vars()
 function sync_package_freeswitch_internal()
 {
 	global $config;
-	conf_mount_rw();
-	config_unlock();
 
   if(strlen($config['installedpackages']['freeswitchinternal']['config'][0]['internal_xml']) == 0) {
       /* internal_xml not found in the pfsense config.xml get the internal.xml and save to config.xml. */
@@ -976,7 +950,6 @@ function sync_package_freeswitch_internal()
       unset($tmpxml);
   }
 
-  conf_mount_ro();
   $cmd = "api reloadxml";
   //event_socket_request_cmd($cmd);
   unset($cmd);
@@ -987,8 +960,6 @@ function sync_package_freeswitch_internal()
 function sync_package_freeswitch_external()
 {
   global $config;
-  conf_mount_rw();
-  config_unlock();
 
   if(strlen($config['installedpackages']['freeswitchexternal']['config'][0]['external_xml']) == 0) {
       /* external_xml not found in the pfsense config.xml get the external.xml and save to config.xml. */
@@ -1008,7 +979,6 @@ function sync_package_freeswitch_external()
       unset($tmpxml);
   }
 
-  conf_mount_ro();
   $cmd = "api reloadxml";
   //event_socket_request_cmd($cmd);
   unset($cmd);
@@ -1028,9 +998,6 @@ function sync_package_freeswitch_hunt_group()
 
 			
 	global $config;
-	conf_mount_rw();
-	config_lock();
-	
 	
 	//get the domain
 		$password = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_password'];
@@ -1702,8 +1669,6 @@ function sync_package_freeswitch_hunt_group()
 			$x++;
 			} //end foreach
 		} //end if count
-		conf_mount_ro();
-		config_unlock();
 
 } //end function
 
@@ -1712,8 +1677,6 @@ function sync_package_freeswitch_fax()
 {
 
 	global $config;
-	conf_mount_rw();
-	config_lock();
 	
 	//loop through all faxes
 		$a_fax = &$config['installedpackages']['freeswitchfax']['config'];
@@ -1895,8 +1858,6 @@ function sync_package_freeswitch_fax()
 
 			} //end foreach
 		} //end if count
-		conf_mount_ro();
-		config_unlock();
 
 } //end function
 
@@ -1920,8 +1881,6 @@ function sync_package_freeswitch_ivr()
 {
 
   global $config;
-  conf_mount_rw();
-  config_lock();
 
   $a_ivr = &$config['installedpackages']['freeswitchivr']['config'];
   if (count($a_ivr) > 0) {
@@ -2732,8 +2691,6 @@ function sync_package_freeswitch_ivr()
 	
 	  } //end foreach
   } //end if count
-  conf_mount_ro();
-  config_unlock();
 
 } //end function
 
@@ -2743,8 +2700,6 @@ function sync_package_freeswitch_dialplan_includes()
 {
 
 	global $config;
-	conf_mount_rw();
-	config_lock();
 
 	$a_dialplan_includes          = &$config['installedpackages']['freeswitchdialplanincludes']['config'];
 	$a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];
@@ -2861,9 +2816,6 @@ function sync_package_freeswitch_dialplan_includes()
       } //end foreach
   } //if array count
 
-  conf_mount_ro();
-  config_unlock();
-
 }
 
 
@@ -2871,8 +2823,6 @@ function sync_package_freeswitch_public_includes()
 {
 
   global $config;
-  conf_mount_rw();
-  config_lock();
 
   $a_public_includes          	= &$config['installedpackages']['freeswitchpublicincludes']['config'];
   $a_public_include_details 	= &$config['installedpackages']['freeswitchpublicincludedetails']['config'];
@@ -2986,11 +2936,8 @@ function sync_package_freeswitch_public_includes()
 	    unset($publicincludefilename);
 	    unset($tmp);
 	
-	
 	  } //end foreach
-  } //end if count
-  conf_mount_ro();
-  config_unlock();
+  } //end count
 
 }
 
@@ -3756,18 +3703,12 @@ function freeswitch_php_install_command()
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_version'] = $freeswitch_build_version." revision ".$freeswitch_build_revision.".";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['freeswitch_package_version'] = $freeswitch_package_version;
 	
-	conf_mount_ro();
-	config_unlock();
-
 }
 
 
 function freeswitch_deinstall_command()
 {
 
-	conf_mount_rw();
-	config_lock();
-	
 	exec("killall -9 freeswitch");
 	unlink_if_exists("/usr/local/pkg/freeswitch.xml");
 	unlink_if_exists("/usr/local/pkg/freeswitch.inc");
@@ -3813,9 +3754,6 @@ function freeswitch_deinstall_command()
 	unlink_if_exists("/tmp/freeswitch.tar.gz");
 	unlink_if_exists("/tmp/pkg_mgr_FreeSWITCH.log");
 	
-	conf_mount_ro();
-	config_unlock();
-
 }
 
 ?>
