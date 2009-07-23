@@ -42,22 +42,22 @@
 /* ========================================================================== */
         ]]>
         </copyright>
-        <description>Describe your package here</description>
-        <requirements>Describe your package requirements here</requirements>
-        <faq>Currently there are no FAQ items provided.</faq>
-        <name>lightsquid</name>
-        <version>1.7.1</version>
-        <title>Services: Proxy server Report(LightSquid) -> Settings</title>
-        <category>Status</category>
-        <include_file>/usr/local/pkg/lightsquid.inc</include_file>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>lightsquid</name>
+	<version>1.7.1</version>
+	<title>Services: Proxy server Report(LightSquid) -> Settings</title>
+	<category>Status</category>
+	<include_file>/usr/local/pkg/lightsquid.inc</include_file>
 
         <!-- Installation -->
-        <menu>
-                <name>Proxy report</name>
-                <tooltiptext>Proxy server statistic report</tooltiptext>
-                <section>Status</section>
-                <url>/pkg_edit.php?xml=lightsquid.xml&amp;id=0</url>
-        </menu>
+	<menu>
+		<name>Proxy report</name>
+		<tooltiptext>Proxy server statistic report</tooltiptext>
+		<section>Status</section>
+		<url>/pkg_edit.php?xml=lightsquid.xml&amp;id=0</url>
+	</menu>
         <tabs>
                 <tab>
                         <text>Settings</text>
@@ -163,14 +163,14 @@
                         <description>
 			Select data refresh period. System will execute task every XX time as from 00:00 hours. &lt;br&gt;
 			For example: if selected 2h - system wil start task at 0-2-4-..-24h. &lt;br&gt;
-                     Note:  (!),(*) - use only for powerful system; (+) - recomended. &lt;br&gt;&lt;br&gt;
+			Note:  (!),(*) - use only for powerful system; (+) - recomended. &lt;br&gt;&lt;br&gt;
 			&lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Refresh now&quot;&gt;&lt;br&gt;
 			&lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Refresh full&quot;&gt;
 			&lt;br&gt; Press button for start background refresh (this take some time).
 			&lt;br&gt; &lt;span style=&quot;color: rgb(153, 51, 0);&quot;&gt; Note after installation: 
 			&lt;br&gt; On the first - enable log in squid package with &quot;/var/squid/log&quot; path.
 			&lt;br&gt; On the second - press Refresh button for create lightsquid reports, else you will have error diagnostic page.&lt;/span&gt;
-	          </description>
+			</description>
                         <type>select</type>
                         <value>lhp_none</value>
                         <options>
@@ -193,15 +193,15 @@
                 <field>
                         <fielddescr>Squid rotate log sheduler</fielddescr>
                         <fieldname>lightsquid_squidrotatelog_sheduler_time</fieldname>
-                        <description>
+			<description>
 					Select squid log rotate period. System will execute task every XX time as from 00:00 hours. &lt;br&gt;
 					This option will allow the updating of the faster &lt;br&gt;
 					For example: if selected '2 day' - system wil start task every 2 day of month. &lt;br&gt;
 					This option will allow the updating of the faster &lt;br&gt;
-                               	Note:  You must choose from that the rate of filling dialogue access.log squid; &lt;br&gt;
+				Note:  You must choose from that the rate of filling dialogue access.log squid; &lt;br&gt;
 					The more customers, the more often it should be the job.
-			    </description>
-                        <type>select</type>
+			</description>
+			<type>select</type>
                         <value>lsr_none</value>
                         <options>
                                 <option><name>none</name><value>lsr_none</value></option>
@@ -224,31 +224,28 @@
                                 <option><name>every 25 day</name><value>lsr_d25</value></option>
                                 <option><name>every 30 day</name><value>lsr_d30</value></option>
                         </options>
-                </field>
-                <field>
+		</field>
+		<field>
                         <fielddescr>Skip url</fielddescr>
                         <fieldname>lightsquid_skipurl</fieldname>
-                        <description>
+			<description>
                                 If you want skip some sites from stat, example our local www server
                                 Example, if you want skip LOCAL site, put it here
                                 zdd.com|192.168.1.|cnn.com
-                        </description>
-                        <type>textarea</type>
-                        <cols>60</cols>
-                     <rows>5</rows>
-                </field>
-        </fields>
-        <custom_add_php_command>
-       </custom_add_php_command>
-       <custom_php_resync_config_command>
+			</description>
+			<type>textarea</type>
+			<cols>60</cols>
+			<rows>5</rows>
+		</field>
+	</fields>
+	<custom_php_resync_config_command>
 	  	lightsquid_resync();
-       </custom_php_resync_config_command>
-       <custom_php_install_command>
+	</custom_php_resync_config_command>
+	<custom_php_install_command>
 		lightsquid_install();
-            		lightsquid_resync();
-       </custom_php_install_command>
-       <custom_php_deinstall_command>                
-#            		mwexec("pkg_delete lightsquid-1.7.1");       
-            		lightsquid_deinstall();
-       </custom_php_deinstall_command>
+		lightsquid_resync();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>                
+		lightsquid_deinstall();
+	</custom_php_deinstall_command>
 </packagegui>
