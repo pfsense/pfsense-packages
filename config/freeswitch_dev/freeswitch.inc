@@ -42,8 +42,8 @@ function build_menu() {
 	
 	$tab_array = array();
 	$menu_selected = false;
-	if ($_SERVER["SCRIPT_NAME"] == "/pkg_edit.php?xml=freeswitch.xml&amp;id=0") { $menu_selected = true; }
-	$tab_array[] = array(gettext("Settings"), $menu_selected, "/pkg_edit.php?xml=freeswitch.xml&amp;id=0");
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/freeswitch_settings.php") { $menu_selected = true; }
+	$tab_array[] = array(gettext("Settings"), $menu_selected, "/packages/freeswitch/freeswitch_settings.php");
 	unset($menu_selected);
 
 	$menu_selected = false;
@@ -2969,7 +2969,7 @@ function freeswitch_php_install_command()
 	global $config;
 	//exec("/etc/./rc.conf_mount_rw");
 
-	$freeswitch_package_version = "0.9.5";
+	$freeswitch_package_version = "0.9.5.1";
 	$freeswitch_build_version = "1.0.4 pre 8";
 	$freeswitch_build_revision = "13784";
 
@@ -3114,7 +3114,7 @@ function freeswitch_php_install_command()
 	exec("cd /tmp/;fetch ".$download_path."freeswitch_dialplan_includes_edit.tmp");	
 	exec("cp /tmp/freeswitch_dialplan_includes_edit.tmp /usr/local/www/packages/freeswitch/freeswitch_dialplan_includes_edit.php");
 	unlink_if_exists("/tmp/freeswitch_dialplan_includes_edit.tmp");
-
+	
 	exec("cd /tmp/;fetch ".$download_path."freeswitch_extensions.tmp");
 	exec("cp /tmp/freeswitch_extensions.tmp /usr/local/www/packages/freeswitch/freeswitch_extensions.php");
 	unlink_if_exists("/tmp/freeswitch_extensions.tmp");
@@ -3223,6 +3223,10 @@ function freeswitch_php_install_command()
 	exec("cp /tmp/freeswitch_recordings_play.tmp /usr/local/www/packages/freeswitch/freeswitch_recordings_play.php");
 	unlink_if_exists("/tmp/freeswitch_recordings_play.tmp");
 
+	exec("cd /tmp/;fetch ".$download_path."freeswitch_settings.tmp");
+	exec("cp /tmp/freeswitch_settings.tmp /usr/local/www/packages/freeswitch/freeswitch_settings.php");
+	unlink_if_exists("/tmp/freeswitch_settings.tmp");
+	
 	exec("cd /tmp/;fetch ".$download_path."freeswitch_status.tmp");
 	exec("cp /tmp/freeswitch_status.tmp /usr/local/www/packages/freeswitch/freeswitch_status.php");
 	unlink_if_exists("/tmp/freeswitch_status.tmp");
