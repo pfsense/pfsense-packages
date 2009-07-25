@@ -42,9 +42,9 @@
 /* ========================================================================== */
         ]]>
         </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
 	<name>squidcache</name>
 	<version>none</version>
 	<title>Proxy server: Cache management</title>
@@ -189,8 +189,8 @@
 			<description>As swap utilisation gets close to the high-water-mark object eviction becomes more aggressive.</description>
 			<type>input</type>
 			<default_value>95</default_value>
-		</field>    		
-    <field>
+		</field>
+		<field>
 			<fielddescr>Do not cache</fielddescr>
 			<fieldname>donotcache</fieldname>
 			<description>Enter each domain or IP address on a new line that should never be cached.</description>
