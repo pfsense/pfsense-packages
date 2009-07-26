@@ -44,7 +44,7 @@
 		<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>Settings</name>
-	<version>0.9.5.1</version>
+	<version>0.9.5.2</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/freeswitch.inc</include_file>
 	<menu>
@@ -103,7 +103,7 @@
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://portableusbapps.com/packages/config/freeswitch/freeswitch.tgz</item>
+		<item>http://portableusbapps.com/packages/config/freeswitch/dev/freeswitch.tgz</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>

@@ -126,7 +126,7 @@
       <pkginfolink>http://doc.pfsense.org/index.php/FreeSWITCH</pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/freeswitch_dev/freeswitch.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <version>0.9.5.1</version>
+      <version>0.9.5.2</version>
       <status>Beta</status>
       <required_version>1.2.3</required_version>
       <maintainer>markjcrane@gmail.com</maintainer>
@@ -612,7 +612,6 @@
       <depends_on_package>openldap-client-2.4.10.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/squid3/squid.xml</config_file>
       <configurationfile>squid.xml</configurationfile>
-	  <noembedded>true</noembedded>
     </package>
     <package>
       <name>LCDproc</name>
