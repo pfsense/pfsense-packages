@@ -170,7 +170,7 @@ display_top_tabs(build_menu());
               <td width="25%" valign="top" class="vncellreq">Extension</td>
               <td width="75%" class="vtable">
                 <input name="extension" type="text" class="formfld" id="extension" size="40" value="<?=htmlspecialchars($pconfig['extension']);?>">
-                <br><span class="vexpl">Enter the extension here. The default configuration 3 or 4 digit extensions.<br></span>
+                <br><span class="vexpl">Enter the extension here. The default configuration allows 3, 4, or 5 digit extensions.<br></span>
               </td>
             </tr>
 		        <tr>
