@@ -116,7 +116,7 @@ display_top_tabs(build_menu());
 			Direct Inward System Access (DISA) allows inbound callers to make internal or external calls. For security reasons it is disabled by default.  
 			To enable it first set a secure pin number from the Settings->Admin PIN Number.
 			Then go to Dialplan tab and find the DISA entry and edit it to set 'Enabled' to 'true'. 
-			To use DISA dial *3427 (disa) enter the admin pin code and the extension or phone number you wish to call.
+			To use DISA dial *3472 (disa) enter the admin pin code and the extension or phone number you wish to call.
 		</td>
 	</tr>
 	</table>
