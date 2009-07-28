@@ -3012,7 +3012,10 @@ function v_php_install_command()
 	if (!is_dir('/usr/local/freeswitch/storage/fax/receive/')) {
 	   exec("mkdir /usr/local/freeswitch/storage/fax/receive/");
 	}
-
+	
+	$static_output = 'Downloading Files';
+	update_output_window($static_output);
+	
 	//download the dialplan default.xml
 	exec("cd /tmp/;fetch ".$download_path."dialplan.default.xml");
 	exec("cp /tmp/dialplan.default.xml /usr/local/freeswitch/conf/dialplan/default.xml");
@@ -3038,6 +3041,9 @@ function v_php_install_command()
 	   exec("mkdir /usr/local/freeswitch/sounds/custom/8000/");
 	}
 	
+	$static_output = 'Downloading Audio Files';
+	update_output_window($static_output);
+	
 	//copy audio files
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_your_pin_number.wav");
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_the_pin_number.wav");	
@@ -3050,6 +3056,9 @@ function v_php_install_command()
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_say_your_name_and_reason_for_calling.wav");
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."press_1_to_accept_2_to_reject_or_3_for_voicemail.wav");
 
+	$static_output = 'Downloading Lib Files';
+	update_output_window($static_output);
+	
 	//mod_fax
 	exec("cd /usr/local/freeswitch/mod/;fetch ".$download_path."mod_fax.so");
 	
@@ -3243,6 +3252,7 @@ function v_php_install_command()
 	exec("cp /tmp/v_vars.tmp /usr/local/www/packages/freeswitch/v_vars.php");
 	unlink_if_exists("/tmp/v_vars.tmp");
 
+	
 	exec("cd /usr/local/freeswitch/scripts/;fetch ".$download_path."disa.js");
 	exec("cd /usr/local/freeswitch/scripts/;fetch ".$download_path."originate.js");
 	exec("cp /usr/local/freeswitch/htdocs/slim.swf /usr/local/www/packages/freeswitch/slim.swf");
@@ -3653,6 +3663,9 @@ function v_php_install_command()
 	//extract a specific directory to /usr/local/freeswitch
 		$filename = 'freeswitch.bak.tgz';
 		if (file_exists('/root/backup/'.$filename)) {
+			$static_output = 'Restore the Backup';
+			update_output_window($static_output);
+	
 			//echo "The file $filename exists";
 	
 			exec("rm -R /usr/local/freeswitch/conf/sip_profiles/");
@@ -3696,7 +3709,13 @@ function v_php_install_command()
 	
 	lan_sip_profile();
 
+	$static_output = 'Synchronize the config';
+	update_output_window($static_output);
+			
 	sync_package_freeswitch();
+	
+	$static_output = 'Start the Service';
+	update_output_window($static_output);
 	$handle = popen("/usr/local/etc/rc.d/freeswitch.sh start", "r");
 	pclose($handle);
 
@@ -3706,7 +3725,7 @@ function v_php_install_command()
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_version'] = $v_build_version." revision ".$v_build_revision.".";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = $v_package_version;
-	
+		
 }
 
 
