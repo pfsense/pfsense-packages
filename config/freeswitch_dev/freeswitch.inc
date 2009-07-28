@@ -2969,9 +2969,9 @@ function freeswitch_php_install_command()
 	global $config;
 	//exec("/etc/./rc.conf_mount_rw");
 
-	$freeswitch_package_version = "0.9.5.3";
-	$freeswitch_build_version = "1.0.4 pre 8";
-	$freeswitch_build_revision = "13784";
+	$freeswitch_package_version = "0.9.5.4";
+	$freeswitch_build_version = "1.0.4 pre 10";
+	$freeswitch_build_revision = "14306";
 
 	//set script execution time limit to 24 hours
 	set_time_limit (86400);
