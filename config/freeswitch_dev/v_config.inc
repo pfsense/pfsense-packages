@@ -3000,6 +3000,9 @@ function v_php_install_command()
 	//	$freebsd_version = "7.2";
 	//}
 	
+	$static_output = 'Extracting';
+	update_output_window($static_output);
+	
 	$download_path = 'http://www.pfsense.com/packages/config/freeswitch_dev/';
 	//exec("cd /tmp/;fetch ".$download_path."freeswitch.tgz"); //handled by freeswitch.xml
 	exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
