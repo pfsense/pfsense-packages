@@ -120,8 +120,11 @@ include("head.inc");
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">FreeSWITCH: Dialplan: Details: Edit</p>
+
+<?php
+include("fbegin.inc");
+echo "<p class=\"pgtitle\">$v_project_label: Dialplan: Details: Edit</p>\n";
+?>
 
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 

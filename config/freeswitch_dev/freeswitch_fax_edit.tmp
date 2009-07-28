@@ -341,9 +341,12 @@ function show_advanced_config() {
 </script>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">FreeSWITCH: FAX: Edit</p>
-<?php if ($input_errors) print_input_errors($input_errors); ?>
+<?php
+include("fbegin.inc");
+echo "<p class=\"pgtitle\">$v_project_label: FAX: Edit</p>\n";
+
+if ($input_errors) print_input_errors($input_errors);
+?>
 
 
 <div id="mainlevel">

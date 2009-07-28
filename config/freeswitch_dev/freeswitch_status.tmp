@@ -107,7 +107,7 @@ $host = $config['interfaces']['lan']['ipaddr'];
 
 $savemsg = $_GET["savemsg"];
 
-//if freeswitch is not running then start it
+//if service is not running then start it
 if (!pkg_is_service_running('freeswitch')) {
 	$handle = popen("/usr/local/etc/rc.d/freeswitch.sh start", "r");
 	pclose($handle);
@@ -133,11 +133,12 @@ if (!pkg_is_service_running('freeswitch')) {
 </script>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-
-<p class="pgtitle">FreeSWITCH: Status</font></p>
 
 <?php
+include("fbegin.inc");
+echo "<p class=\"pgtitle\">$v_project_label: Status</p>\n";
+
+
 if ($savemsg) {
   print_info_box($savemsg);
 }

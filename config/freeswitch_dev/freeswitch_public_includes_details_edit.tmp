@@ -116,10 +116,15 @@ include("head.inc");
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">FreeSWITCH: Public: Details: Edit</p>
 
-<?php if ($input_errors) print_input_errors($input_errors); ?>
+
+<?php
+include("fbegin.inc");
+echo "<p class=\"pgtitle\">$v_project_label: Public: Details: Edit</p>\n";
+
+if ($input_errors) { print_input_errors($input_errors); }
+
+?>
 
 <div id="mainlevel">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">

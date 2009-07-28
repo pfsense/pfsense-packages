@@ -128,8 +128,10 @@ function show_advanced_config() {
 </script>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">FreeSWITCH: Settings</p>
+<?php
+include("fbegin.inc");
+echo "<p class=\"pgtitle\">$v_project_labels: Settings</p>\n";
+?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 
 

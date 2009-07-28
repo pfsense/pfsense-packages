@@ -55,8 +55,11 @@ include("head.inc");
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
-<p class="pgtitle">FreeSWITCH: IVR</p>
+
+<?php
+include("fbegin.inc");
+echo "<p class=\"pgtitle\">$v_project_label: IVR</p>\n";
+?>
 
 <div id="mainlevel">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
