@@ -138,7 +138,7 @@ function pkg_is_service_running($servicename)
     foreach($psout as $line) {
     	$ps[] = trim(array_pop(explode(' ', array_pop(explode('/', $line)))));
     }
-    if(is_service_running($servicename, $ps) or is_process_running($servicename) ) {
+    if(pkg_is_service_running($servicename, $ps) or is_process_running($servicename) ) {
         return true;
     }
     else {

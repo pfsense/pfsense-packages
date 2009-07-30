@@ -133,17 +133,17 @@ function guid()
 
 function pkg_is_service_running($servicename)
 {
-    exec("/bin/ps ax | awk '{ print $5 }'", $psout);
-    array_shift($psout);
-    foreach($psout as $line) {
-    	$ps[] = trim(array_pop(explode(' ', array_pop(explode('/', $line)))));
-    }
-    if(is_service_running($servicename, $ps) or is_process_running($servicename) ) {
+    //exec("/bin/ps ax | awk '{ print $5 }'", $psout);
+    //array_shift($psout);
+    //foreach($psout as $line) {
+    //	$ps[] = trim(array_pop(explode(' ', array_pop(explode('/', $line)))));
+    //}
+    //if(pkg_is_service_running($servicename, $ps) or is_process_running($servicename) ) {
         return true;
-    }
-    else {
-        return false;
-    }
+    //}
+    //else {
+    //    return false;
+    //}
 }
 
 
@@ -3051,7 +3051,7 @@ function v_php_install_command()
 	
 	//install the packages
 		exec("pkg_add -f wget-1.11.4.tbz");
-		exec("pkg_add -f bash-4.0.24.tbz;);
+		exec("pkg_add -f bash-4.0.24.tbz;");
 		exec("pkg_add -f libgcrypt-1.4.4.tbz");
 		exec("pkg_add -f libgpg-error-1.7.tbz");
 		exec("pkg_add -f libiconv-1.13.1.tbz");
@@ -3802,7 +3802,7 @@ function v_deinstall_command()
 	exec("killall -9 freeswitch");
 	
 	exec("pkg_delete -f wget-1.11.4.tbz;");
-	exec("pkg_delete -f bash-4.0.24.tbz;;);
+	exec("pkg_delete -f bash-4.0.24.tbz;");
 	exec("pkg_delete -f libgcrypt-1.4.4.tbz;");
 	exec("pkg_delete -f libgpg-error-1.7.tbz;");
 	exec("pkg_delete -f libiconv-1.13.1.tbz;");
@@ -3815,8 +3815,8 @@ function v_deinstall_command()
 	exec("pkg_delete -f pkg-config-0.23_1.tbz;");
 	exec("pkg_delete -f ca_root_nss-3.11.9_2.tbz;");
 	exec("pkg_delete -f gettext-0.17_1.tbz;");
-	exec("pkg_delete -f zaptel-1.4.11_1.tbz;;
-	exec("pkg_delete -f gnutls-2.6.5.tbz;;
+	exec("pkg_delete -f zaptel-1.4.11_1.tbz;");
+	exec("pkg_delete -f gnutls-2.6.5.tbz;");
 	exec("pkg_delete -f ncurses-5.7.tbz;");
 	exec("pkg_delete -f unixODBC-2.2.14_1.tbz;");
 	exec("pkg_delete -f libvorbis-1.2.3,3.tbz;");
