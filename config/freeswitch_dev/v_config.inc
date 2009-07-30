@@ -2969,7 +2969,7 @@ function v_php_install_command()
 	global $config;
 	//exec("/etc/./rc.conf_mount_rw");
 
-	$v_package_version = "0.9.5.7";
+	$v_package_version = "0.9.5.8";
 	$v_build_version = "1.0.4 pre 10";
 	$v_build_revision = "14306";
 
@@ -3022,77 +3022,54 @@ function v_php_install_command()
 	if (!is_dir('/tmp/v_pkg/')) {
 	   exec("/tmp/v_pkg/");
 	}
-	
+
 	//download the packages
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/wget-1.11.4.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/bash-4.0.24.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/libgcrypt-1.4.4.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/libgpg-error-1.7.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/libiconv-1.13.1.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/libogg-1.1.4,4.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/libpri-1.4.1.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/libslang2-2.1.4_1.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/popt-1.14.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/p5-gettext-1.05_2.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/gdbm-1.8.3_3.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/pkg-config-0.23_1.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/ca_root_nss-3.11.9_2.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/gettext-0.17_1.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/zaptel-1.4.11_1.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/gnutls-2.6.5.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/ncurses-5.7.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/unixODBC-2.2.14_1.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/libvorbis-1.2.3,3.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/tiff-3.8.2_4.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/newt-0.51.0_8.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/jpeg-7.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/pcre-7.9.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/png-1.2.37.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/tiff2png-0.91_1,1.tbz");	
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/db42-4.2.52_5.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/curl-7.19.5_1.tbz");
-		exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/freeswitch-1.0.4.p10.tbz");
+		//chdir('/tmp/v_pkg/');
+		//exec("fetch ".$download_path."freebsd7.2/pre10/wget-1.11.4.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/bash-4.0.24.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/libgcrypt-1.4.4.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/libgpg-error-1.7.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/libiconv-1.13.1.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/libogg-1.1.4,4.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/libpri-1.4.1.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/libslang2-2.1.4_1.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/popt-1.14.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/p5-gettext-1.05_2.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/gdbm-1.8.3_3.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/pkg-config-0.23_1.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/ca_root_nss-3.11.9_2.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/gettext-0.17_1.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/zaptel-1.4.11_1.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/gnutls-2.6.5.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/ncurses-5.7.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/unixODBC-2.2.14_1.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/libvorbis-1.2.3,3.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/tiff-3.8.2_4.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/newt-0.51.0_8.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/jpeg-7.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/pcre-7.9.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/png-1.2.37.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/tiff2png-0.91_1,1.tbz");	
+		//exec("fetch ".$download_path."freebsd7.2/pre10/db42-4.2.52_5.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/curl-7.19.5_1.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/freeswitch-1.0.4.p10.tbz");
 	
 	//install the packages
-		exec("cd /tmp/v_pkg/; pkg_add wget-1.11.4.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add bash-4.0.24.tbz;");
-		exec("cd /tmp/v_pkg/; pkg_add libgcrypt-1.4.4.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add libgpg-error-1.7.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add libiconv-1.13.1.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add libogg-1.1.4,4.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add libpri-1.4.1.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add libslang2-2.1.4_1.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add popt-1.14.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add p5-gettext-1.05_2.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add gdbm-1.8.3_3.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add pkg-config-0.23_1.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add ca_root_nss-3.11.9_2.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add gettext-0.17_1.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add zaptel-1.4.11_1.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add gnutls-2.6.5.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add ncurses-5.7.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add unixODBC-2.2.14_1.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add libvorbis-1.2.3,3.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add tiff-3.8.2_4.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add newt-0.51.0_8.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add jpeg-7.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add pcre-7.9.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add png-1.2.37.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add tiff2png-0.91_1,1.tbz");	
-		exec("cd /tmp/v_pkg/; pkg_add db42-4.2.52_5.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add curl-7.19.5_1.tbz");
-		exec("cd /tmp/v_pkg/; pkg_add freeswitch-1.0.4.p10.tbz");
-		//exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/perl-5.8.9_3.tbz; pkg_add perl-5.8.9_3.tbz; rm perl-5.8.9_3.tbz");
-		//exec("cd /tmp/v_pkg/; fetch ".$download_path."freebsd7.2/pre10/zzz; pkg_add zzz; rm zzz");
-		//exec("rm /tmp/v_pkg/*.tbz");
+		chdir('/tmp/v_pkg/');
+		exec("pkg_add -r ".$download_path."freebsd7.2/pre10/freeswitch-1.0.4.p10.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/perl-5.8.9_3.tbz; pkg_add perl-5.8.9_3.tbz; rm perl-5.8.9_3.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/zzz; pkg_add zzz; rm zzz");
+		exec("rm /tmp/v_pkg/*.tbz");
 
 
 	//download the dialplan default.xml
+	chdir('/tmp/');
 	exec("cd /tmp/;fetch ".$download_path."dialplan.default.xml");
 	exec("cp /tmp/dialplan.default.xml /usr/local/freeswitch/conf/dialplan/default.xml");
 	unlink_if_exists("/tmp/dialplan.default.xml");
 	
 	//download the dialplan public.xml
+	chdir('/tmp/');
 	exec("cd /tmp/;fetch ".$download_path."dialplan.public.xml");
 	exec("cp /tmp/dialplan.public.xml /usr/local/freeswitch/conf/dialplan/public.xml");
 	unlink_if_exists("/tmp/dialplan.public.xml");
@@ -3116,6 +3093,7 @@ function v_php_install_command()
 	update_output_window($static_output);
 	
 	//copy audio files
+	chdir('/usr/local/freeswitch/sounds/custom/8000/');
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_your_pin_number.wav");
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_the_pin_number.wav");	
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_the_extension_number.wav");
@@ -3131,19 +3109,21 @@ function v_php_install_command()
 	update_output_window($static_output);
 	
 	//mod_fax
-	exec("cd /usr/local/freeswitch/mod/;fetch ".$download_path."mod_fax.so");
+	chdir('/usr/local/freeswitch/mod/');
+	exec("fetch ".$download_path."mod_fax.so");
 	
 	//download lib files
-	exec("cd /usr/local/lib/;fetch ".$download_path."libtinfo.so.5.6");
-	exec("cd /usr/local/lib/;fetch ".$download_path."libncurses.so.5.6");
-	exec("cd /usr/local/lib/;fetch ".$download_path."libncurses.so.5.7");
-	exec("cd /usr/local/lib/;fetch ".$download_path."libogg.so.5.3");
+	chdir('/usr/local/lib/');
+	exec("fetch ".$download_path."libtinfo.so.5.6");
+	exec("fetch ".$download_path."libncurses.so.5.6");
+	exec("fetch ".$download_path."libncurses.so.5.7");
+	exec("fetch ".$download_path."libogg.so.5.3");
 	exec("cp /usr/local/lib/libogg.so.5.3 /usr/local/lib/libogg.so.5");
-	exec("cd /usr/local/lib/;fetch ".$download_path."libvorbis.so.4");
-	exec("cd /usr/local/lib/;fetch ".$download_path."libcurl.so.5");
-	exec("cd /usr/local/lib/;fetch ".$download_path."libodbc.so.1");
-	exec("cd /usr/local/lib/;fetch ".$download_path."libiconv.so.3");
-	exec("cd /usr/local/lib/;fetch ".$download_path."libspandsp.so.1");
+	exec("fetch ".$download_path."libvorbis.so.4");
+	exec("fetch ".$download_path."libcurl.so.5");
+	exec("fetch ".$download_path."libodbc.so.1");
+	exec("fetch ".$download_path."libiconv.so.3");
+	exec("fetch ".$download_path."libspandsp.so.1");
 	exec("cp /usr/local/lib/libspandsp.so.1 /usr/local/lib/libspandsp.so.2");
 	
 	//download xml package files
@@ -3152,13 +3132,15 @@ function v_php_install_command()
 	
 	//misc files
 	if (!is_dir('/usr/local/www/edit_area/')) {
-	   exec("cd /tmp/;fetch ".$download_path."edit_area.tgz");
-	   system('cd /usr/local/www; tar xvpfz /tmp/edit_area.tgz edit_area');
-	   unlink_if_exists("/tmp/edit_area.tgz");
+		chdir('/tmp/');
+		exec("cd /tmp/;fetch ".$download_path."edit_area.tgz");
+		system('cd /usr/local/www; tar xvpfz /tmp/edit_area.tgz edit_area');
+		unlink_if_exists("/tmp/edit_area.tgz");
 	}
 	
 	
 	//rename PHP files from .tmp to .php
+	chdir('/tmp/');
 	exec("cd /tmp/;fetch ".$download_path."index.tmp");
 	exec("cp /tmp/index.tmp /usr/local/www/packages/freeswitch/index.php");
 	unlink_if_exists("/tmp/index.tmp");
@@ -3323,7 +3305,7 @@ function v_php_install_command()
 	exec("cp /tmp/v_vars.tmp /usr/local/www/packages/freeswitch/v_vars.php");
 	unlink_if_exists("/tmp/v_vars.tmp");
 
-	
+	chdir('/usr/local/freeswitch/scripts/');
 	exec("cd /usr/local/freeswitch/scripts/;fetch ".$download_path."disa.js");
 	exec("cd /usr/local/freeswitch/scripts/;fetch ".$download_path."originate.js");
 	exec("cp /usr/local/freeswitch/htdocs/slim.swf /usr/local/www/packages/freeswitch/slim.swf");
