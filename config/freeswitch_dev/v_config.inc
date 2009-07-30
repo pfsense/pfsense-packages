@@ -2969,7 +2969,7 @@ function v_php_install_command()
 	global $config;
 	//exec("/etc/./rc.conf_mount_rw");
 
-	$v_package_version = "0.9.5.5";
+	$v_package_version = "0.9.5.6";
 	$v_build_version = "1.0.4 pre 10";
 	$v_build_revision = "14306";
 
