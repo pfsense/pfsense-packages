@@ -133,17 +133,17 @@ function guid()
 
 function pkg_is_service_running($servicename)
 {
-    exec("/bin/ps ax | awk '{ print $5 }'", $psout);
-    array_shift($psout);
-    foreach($psout as $line) {
-    	$ps[] = trim(array_pop(explode(' ', array_pop(explode('/', $line)))));
-    }
-    if(pkg_is_service_running($servicename, $ps) or is_process_running($servicename) ) {
+    //exec("/bin/ps ax | awk '{ print $5 }'", $psout);
+    //array_shift($psout);
+    //foreach($psout as $line) {
+    //	$ps[] = trim(array_pop(explode(' ', array_pop(explode('/', $line)))));
+    //}
+    //if(pkg_is_service_running($servicename, $ps) or is_process_running($servicename) ) {
         return true;
-    }
-    else {
-        return false;
-    }
+    //}
+    //else {
+    //    return false;
+    //}
 }
 
 
