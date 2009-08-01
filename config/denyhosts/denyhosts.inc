@@ -58,7 +58,7 @@ function php_install_command()
 	   exec("mkdir /usr/local/www/packages/denyhosts/");
 	}
 
-	exec("pkg_delete denyhosts");
+	exec("pkg_add -r denyhosts");
 	
 	//misc files
 	if (!is_dir('/usr/local/www/edit_area/')) {
