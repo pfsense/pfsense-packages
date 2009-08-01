@@ -60,11 +60,19 @@ function php_install_command()
 
 	exec("pkg_delete denyhosts");
 	
+	//misc files
+	if (!is_dir('/usr/local/www/edit_area/')) {
+		chdir('/tmp/');
+		exec("cd /tmp/;fetch ".$download_path."edit_area.tgz");
+		chdir('/usr/local/www');
+		system('tar xvpfz /tmp/edit_area.tgz edit_area');
+		unlink_if_exists("/tmp/edit_area.tgz");
+	}
 
 	
 	$hosts_allow = "#\n";
 	$hosts_allow .= "# hosts.allow access control file for \"tcp wrapped\" applications.\n";
-	$hosts_allow .= "#\n;
+	$hosts_allow .= "#\n";
 	$hosts_allow .= "sshd : /etc/hosts.deniedssh : deny\n";
 	$hosts_allow .= "sshd : ALL : allow\n";
 	$hosts_allow .= "ALL : ALL : allow\n";
@@ -73,8 +81,14 @@ function php_install_command()
 	unset($hosts_allow);
 	fclose($fout);
 	
-	exec("touch /etc/hosts.deniedssh");
-	exec("chmod 755 /etc/hosts.deniedssh");
+	if(!is_file("/etc/hosts.deniedssh")) {
+		exec("touch /etc/hosts.deniedssh");
+		exec("chmod 755 /etc/hosts.deniedssh");
+	}
+	
+	if(!is_file("/var/log/denyhosts")) {
+		exec ('touch /var/log/denyhosts');
+	}
 	
 	$download_path = 'http://www.pfsense.com/packages/config/denyhosts/';
 	
@@ -104,7 +118,7 @@ function php_install_command()
 	unset($denyhosts_sh);
 	fclose($fout);
 	
-
+	
 	$filename = "/usr/local/etc/denyhosts.conf";
 	$handle = fopen($filename,"rb");
 	$denyhosts_conf = fread($handle, filesize($filename));	
@@ -117,12 +131,14 @@ function php_install_command()
 	unset($filename);
 	fclose($fout);
 	
+	
 	$filename = "/usr/local/etc/denyhosts.conf-dist";
 	$fout = fopen($filename,"w");
 	fwrite($fout, $denyhosts_conf);
 	unset($filename);
 	unset($denyhosts_conf);
 	fclose($fout);
+	
 	
 	//Error reading file: denyhosts.cfg
 	//write_rcfile(array(
@@ -135,8 +151,10 @@ function php_install_command()
 		  	       
 	php_sync_package();
 	
+	
 	//start denyhosts
 	exec("/usr/local/etc/rc.d/denyhosts.sh start");
+	
 	
 	//if (pkg_is_service_running('notes')) {  
 		//documentation purposes
@@ -152,7 +170,7 @@ function deinstall_command()
 
 	$hosts_allow = "#\n";
 	$hosts_allow .= "# hosts.allow access control file for \"tcp wrapped\" applications.\n";
-	$hosts_allow .= "#\n;
+	$hosts_allow .= "#\n";
 	$hosts_allow .= "ALL : ALL : allow\n";
 	$fout = fopen("/etc/hosts.allow","w");
 	fwrite($fout, $tmp);

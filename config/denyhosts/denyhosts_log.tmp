@@ -51,9 +51,18 @@ if ($_POST['a'] == "save") {
 }
 */
 
+if(!is_file("/var/log/denyhosts")) {
+	exec ('touch /var/log/denyhosts');
+}
+
 $filename = '/var/log/denyhosts';
 $fd = fopen($filename, "r");
-$content = fread($fd, filesize($filename));
+if (filesize($filename) > 0) {
+	$content = fread($fd, filesize($filename));
+}
+else {
+	$content = '';
+}
 fclose($fd);
 	
 include("head.inc");
@@ -83,7 +92,7 @@ function sf() { document.forms[0].savetopath.focus(); }
 
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: Variables</p>\n";
+echo "<p class=\"pgtitle\">Deny Hosts</p>\n";
 ?>
 
 <div id="mainlevel">
@@ -107,36 +116,38 @@ echo "<p class=\"pgtitle\">$v_project_label: Variables</p>\n";
 <?php
 
 ?>
+	<!--
   	<table width="98%" border="0" cellpadding="6" cellspacing="0">
       <tr>
-        <td width='90%'><p><span class="vexpl"><span class="red"><strong>DenyHosts Log<br>
+        <td width='90%'><p><span class="vexpl"><span class="red"><strong>zzz<br>
             </strong></span>
-            <!-- Description -->
+            Description
             </p>
 		</td>
-		<td width='10%' align='right' valign='middle'><!--<input type="submit" value="save" />--></td>
+		<td width='10%' align='right' valign='middle'><input type="submit" value="save" /></td>
       </tr>
     </table>
+	-->
     <br />
 	<br />
 		
 	<textarea style="width:98%" id="code" name="code" rows="30" cols="<?php echo $cols; ?>" name="content"><?php echo htmlentities($content); ?></textarea>
 	<br />
     <br />
-	<!--
+
   	<table width="98%" border="0" cellpadding="6" cellspacing="0">
       <tr>
-        <td>/usr/local/zzz/conf/zzz.xml</td>
+        <td>/var/log/denyhosts</td>
 		<td align='right'>
 			<input type="hidden" name="f" value="<?php echo $_GET['f']; ?>" />
 			<input type="hidden" name="a" value="save" />
 			<?php
-			echo "<input type='button' value='Restore Default' onclick=\"document.location.href='/packages/zzz/zzz.php?a=default&f=zzz';\" />";
+			//echo "<input type='button' value='Restore Default' onclick=\"document.location.href='/packages/zzz/zzz.php?a=default&f=zzz';\" />";
 			?>
 		</td>
       </tr>
 	</table>
-	-->
+
 <!--
 </form>
 -->
