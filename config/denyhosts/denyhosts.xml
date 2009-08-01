@@ -41,7 +41,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>DenyHosts</name>
-	<version>0.2</version>
+	<version>0.3</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/denyhosts.inc</include_file>
 	<menu>
@@ -51,6 +51,12 @@
 		<configfile>denyhosts.xml</configfile>
 		<url>/packages/denyhosts/denyhosts_log.php</url>
 	</menu>
+	<service>
+		<name>denyhosts</name>
+		<rcfile>denyhosts.sh</rcfile>
+		<executable>denyhosts</executable>
+		<description>DenyHosts analyzes logs for SSH login attempts and blocks offending IP addresses.</description>
+	</service>
 	<tabs>
 		<tab>
 			<text>Settings</text>

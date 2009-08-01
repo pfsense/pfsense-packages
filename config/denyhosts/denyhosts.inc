@@ -99,24 +99,25 @@ function php_install_command()
 	unlink_if_exists("/tmp/denyhosts_log.tmp");
 	
 
-	$denyhosts_sh = "\n";
-	$denyhosts_sh .= "name=\"denyhosts\"\n";
-	$denyhosts_sh .= "rcvar=\${name}_enable\n";
-	$denyhosts_sh .= "\n";
-	$denyhosts_sh .= "command=\"/usr/local/bin/denyhosts.py\"\n";
-	$denyhosts_sh .= "command_interpreter=\"/usr/local/bin/python2.5\"\n";
-	$denyhosts_sh .= "command_args=\"--config /usr/local/etc/denyhosts.conf --daemon\"\n";
-	$denyhosts_sh .= "pidfile=\"/var/run/\${name}.pid\"\n";
-	$denyhosts_sh .= "\n";
-	$denyhosts_sh .= "load_rc_config \$name\n";
-	$denyhosts_sh .= "\n";
-	$denyhosts_sh .= ": \${denyhosts_enable=\"YES\"}\n";
-	$denyhosts_sh .= "\n";
-	$denyhosts_sh .= "run_rc_command \"\$1\"\n";
-	$fout = fopen("/usr/local/etc/rc.d/denyhosts.sh","w");
-	fwrite($fout, $denyhosts_sh);
-	unset($denyhosts_sh);
-	fclose($fout);
+	//$denyhosts_sh = "\n";
+	//$denyhosts_sh .= "name=\"denyhosts\"\n";
+	//$denyhosts_sh .= "rcvar=\${name}_enable\n";
+	//$denyhosts_sh .= "\n";
+	//$denyhosts_sh .= "command=\"/usr/local/bin/denyhosts.py\"\n";
+	//$denyhosts_sh .= "command_interpreter=\"/usr/local/bin/python2.5\"\n";
+	//$denyhosts_sh .= "command_args=\"--config /usr/local/etc/denyhosts.conf --daemon\"\n";
+	//$denyhosts_sh .= "pidfile=\"/var/run/\${name}.pid\"\n";
+	//$denyhosts_sh .= "\n";
+	//$denyhosts_sh .= "load_rc_config \$name\n";
+	//$denyhosts_sh .= "\n";
+	//$denyhosts_sh .= ": \${denyhosts_enable=\"YES\"}\n";
+	//$denyhosts_sh .= "\n";
+	//$denyhosts_sh .= "run_rc_command \"\$1\"\n";
+	//$fout = fopen("/usr/local/etc/rc.d/denyhosts.sh","w");
+	//fwrite($fout, $denyhosts_sh);
+	//unset($denyhosts_sh);
+	//fclose($fout);
+	//exec("chmod 755 /usr/local/etc/rc.d/denyhosts.sh");
 	
 	
 	$filename = "/usr/local/etc/denyhosts.conf";
@@ -140,13 +141,12 @@ function php_install_command()
 	fclose($fout);
 	
 	
-	//Error reading file: denyhosts.cfg
-	//write_rcfile(array(
-	//	"file" => "denyhosts.sh",
-	//	"start" => "start command",
-	//	"stop" => "rm /var/run/nameofservice.pid"
-	//	)
-	//);
+	write_rcfile(array(
+		"file" => "denyhosts.sh",
+		"start" => "/usr/local/bin/python2.5 /usr/local/bin/denyhosts.py --config /usr/local/etc/denyhosts.conf --daemon",
+		"stop" => "rm /var/run/denyhosts.pid"
+		)
+	);
 	
 		  	       
 	php_sync_package();
