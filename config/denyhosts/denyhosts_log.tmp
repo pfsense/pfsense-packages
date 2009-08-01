@@ -116,18 +116,18 @@ echo "<p class=\"pgtitle\">Deny Hosts</p>\n";
 <?php
 
 ?>
-	<!--
+
   	<table width="98%" border="0" cellpadding="6" cellspacing="0">
       <tr>
-        <td width='90%'><p><span class="vexpl"><span class="red"><strong>zzz<br>
+        <td width='90%'><p><span class="vexpl"><span class="red"><strong>DenyHosts Logs<br>
             </strong></span>
-            Description
+             DenyHosts analyzes logs for SSH login attempts and blocks offending IP addresses.
             </p>
 		</td>
-		<td width='10%' align='right' valign='middle'><input type="submit" value="save" /></td>
+		<td width='10%' align='right' valign='middle'><!--<input type="submit" value="save" />--></td>
       </tr>
     </table>
-	-->
+
     <br />
 	<br />
 		
