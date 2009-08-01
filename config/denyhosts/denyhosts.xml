@@ -62,9 +62,9 @@
 			<text>Settings</text>
 			<url>/packages/denyhosts/denyhosts_log.php</url>
 			<active/>
-		</tab>	
+		</tab>
 	</tabs>
-	<configpath>installedpackages->package->$packagename->configuration->denyhosts</configpath>	
+	<configpath>installedpackages->package->denyhosts</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>		

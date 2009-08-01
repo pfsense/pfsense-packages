@@ -49,7 +49,9 @@ function php_install_command()
 {
 
 	global $config;
-
+	conf_mount_rw();
+	config_lock();
+	
 	if (!is_dir('/usr/local/www/packages/')) {
 	   exec("mkdir /usr/local/www/packages/");
 	}
@@ -160,7 +162,8 @@ function php_install_command()
 		//documentation purposes
 	//}
 
-
+	conf_mount_ro();
+	config_unlock();
   
 }
 
@@ -168,6 +171,9 @@ function php_install_command()
 function deinstall_command() 
 {
 
+	conf_mount_rw();
+	config_lock();
+	
 	$hosts_allow = "#\n";
 	$hosts_allow .= "# hosts.allow access control file for \"tcp wrapped\" applications.\n";
 	$hosts_allow .= "#\n";
@@ -180,6 +186,8 @@ function deinstall_command()
 	exec("pkg_delete denyhosts");
 	exec("rm -R /usr/local/www/packages/denyhosts/");
 	
+	conf_mount_ro();
+	config_unlock();
 }
 
 ?>
