@@ -2969,7 +2969,7 @@ function v_php_install_command()
 	global $config;
 	//exec("/etc/./rc.conf_mount_rw");
 
-	$v_package_version = "0.9.5.8";
+	$v_package_version = "0.9.5.";
 	$v_build_version = "1.0.4 pre 10";
 	$v_build_revision = "14306";
 
@@ -2979,12 +2979,6 @@ function v_php_install_command()
 
 	//hide errors
 	ini_set('display_errors', '0'); 
-
-	//used with fax to png, and fax to pdf conversion
-	exec("pkg_add -r tiff2png");
-	
-	//add sqlite package
-	exec("pkg_add -r sqlite34");
 	
 	clearstatcache();
 	if (!is_dir('/usr/local/www/packages/')) {
@@ -3060,6 +3054,12 @@ function v_php_install_command()
 		//exec("fetch ".$download_path."freebsd7.2/pre10/perl-5.8.9_3.tbz; pkg_add perl-5.8.9_3.tbz; rm perl-5.8.9_3.tbz");
 		//exec("fetch ".$download_path."freebsd7.2/pre10/zzz; pkg_add zzz; rm zzz");
 		exec("rm /tmp/v_pkg/*.tbz");
+		
+		//used with fax to png, and fax to pdf conversion
+		//exec("pkg_add -r tiff2png");
+		
+		//add sqlite package
+		exec("pkg_add -r sqlite34");
 
 
 	//download the dialplan default.xml
@@ -3109,22 +3109,22 @@ function v_php_install_command()
 	update_output_window($static_output);
 	
 	//mod_fax
-	chdir('/usr/local/freeswitch/mod/');
-	exec("fetch ".$download_path."mod_fax.so");
+	//chdir('/usr/local/freeswitch/mod/');
+	//exec("fetch ".$download_path."mod_fax.so");
 	
 	//download lib files
-	chdir('/usr/local/lib/');
-	exec("fetch ".$download_path."libtinfo.so.5.6");
-	exec("fetch ".$download_path."libncurses.so.5.6");
-	exec("fetch ".$download_path."libncurses.so.5.7");
-	exec("fetch ".$download_path."libogg.so.5.3");
-	exec("cp /usr/local/lib/libogg.so.5.3 /usr/local/lib/libogg.so.5");
-	exec("fetch ".$download_path."libvorbis.so.4");
-	exec("fetch ".$download_path."libcurl.so.5");
-	exec("fetch ".$download_path."libodbc.so.1");
-	exec("fetch ".$download_path."libiconv.so.3");
-	exec("fetch ".$download_path."libspandsp.so.1");
-	exec("cp /usr/local/lib/libspandsp.so.1 /usr/local/lib/libspandsp.so.2");
+	//chdir('/usr/local/lib/');
+	//exec("fetch ".$download_path."libtinfo.so.5.6");
+	//exec("fetch ".$download_path."libncurses.so.5.6");
+	//exec("fetch ".$download_path."libncurses.so.5.7");
+	//exec("fetch ".$download_path."libogg.so.5.3");
+	//exec("cp /usr/local/lib/libogg.so.5.3 /usr/local/lib/libogg.so.5");
+	//exec("fetch ".$download_path."libvorbis.so.4");
+	//exec("fetch ".$download_path."libcurl.so.5");
+	//exec("fetch ".$download_path."libodbc.so.1");
+	//exec("fetch ".$download_path."libiconv.so.3");
+	//exec("fetch ".$download_path."libspandsp.so.1");
+	//exec("cp /usr/local/lib/libspandsp.so.1 /usr/local/lib/libspandsp.so.2");
 	
 	//download xml package files
 	exec("cd /usr/local/pkg/;fetch ".$download_path."v_modules.xml");
