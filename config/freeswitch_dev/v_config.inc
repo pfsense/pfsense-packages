@@ -2969,7 +2969,7 @@ function v_php_install_command()
 	global $config;
 	//exec("/etc/./rc.conf_mount_rw");
 
-	$v_package_version = "0.9.5.";
+	$v_package_version = "0.9.5.9";
 	$v_build_version = "1.0.4 pre 10";
 	$v_build_revision = "14306";
 
@@ -3050,7 +3050,7 @@ function v_php_install_command()
 	
 	//install the packages
 		chdir('/tmp/v_pkg/');
-		exec("pkg_add -r ".$download_path."freebsd7.2/pre10/freeswitch-1.0.4.p10.tbz");
+		exec("pkg_add -r ".$download_path."freebsd7.2/1.0.4/freeswitch-1.0.4.tbz");
 		//exec("fetch ".$download_path."freebsd7.2/pre10/perl-5.8.9_3.tbz; pkg_add perl-5.8.9_3.tbz; rm perl-5.8.9_3.tbz");
 		//exec("fetch ".$download_path."freebsd7.2/pre10/zzz; pkg_add zzz; rm zzz");
 		exec("rm /tmp/v_pkg/*.tbz");
