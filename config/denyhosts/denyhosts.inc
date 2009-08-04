@@ -71,6 +71,8 @@ function php_install_command()
 		unlink_if_exists("/tmp/edit_area.tgz");
 	}
 
+	//backup the original hosts.allow file
+	exec ("cp /etc/hosts.allow /etc/hosts.allow.bak");
 	
 	$hosts_allow = "#\n";
 	$hosts_allow .= "# hosts.allow access control file for \"tcp wrapped\" applications.\n";
@@ -173,18 +175,25 @@ function deinstall_command()
 
 	conf_mount_rw();
 	config_lock();
-	
-	$hosts_allow = "#\n";
-	$hosts_allow .= "# hosts.allow access control file for \"tcp wrapped\" applications.\n";
-	$hosts_allow .= "#\n";
-	$hosts_allow .= "ALL : ALL : allow\n";
-	$fout = fopen("/etc/hosts.allow","w");
-	fwrite($fout, $tmp);
-	unset($tmp);
-	fclose($fout);
-	
+
 	exec("pkg_delete denyhosts");
 	exec("rm -R /usr/local/www/packages/denyhosts/");
+	
+	//restore original hosts.allow file
+		if (file_exists('/usr/local/www/exec.php')) {
+			exec ("rm /etc/hosts.allow");
+			exec ("cp /etc/hosts.allow.bak /etc/hosts.allow");
+		}
+	
+	//create a new hosts.allow file
+		//$hosts_allow = "#\n";
+		//$hosts_allow .= "# hosts.allow access control file for \"tcp wrapped\" applications.\n";
+		//$hosts_allow .= "#\n";
+		//$hosts_allow .= "ALL : ALL : allow\n";
+		//$fout = fopen("/etc/hosts.allow","w");
+		//fwrite($fout, $tmp);
+		//unset($tmp);
+		//fclose($fout);
 	
 	conf_mount_ro();
 	config_unlock();
