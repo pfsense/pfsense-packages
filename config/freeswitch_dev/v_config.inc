@@ -2968,15 +2968,18 @@ function pkg_add($pkg_download_path, $pkg_name)
 	chdir('/tmp/');
 	exec("fetch ".$pkg_download_path.$pkg_name);
 	exec("pkg_add -F ".$pkg_name);
-	exec("rm $pkg_name);
+	exec("rm ".$pkg_name);
 }
 
 function v_php_install_command()
 {
-	global $config;
-	//exec("/etc/./rc.conf_mount_rw");
 
-	$v_package_version = "0.9.5.9";
+	conf_mount_rw();
+	config_lock();
+
+	global $config;
+		
+	$v_package_version = "0.9.6";
 	$v_build_version = "1.0.4 pre 10";
 	$v_build_revision = "14306";
 
@@ -3773,6 +3776,9 @@ function v_php_install_command()
 
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_version'] = $v_build_version." revision ".$v_build_revision.".";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = $v_package_version;
+	
+	conf_mount_ro();
+	config_unlock();
 		
 }
 
@@ -3780,6 +3786,9 @@ function v_php_install_command()
 function v_deinstall_command()
 {
 
+	conf_mount_rw();
+	config_lock();
+	
 	exec("killall -9 freeswitch");
 	
 	exec("pkg_delete freeswitch-1.0.4");
@@ -3820,6 +3829,9 @@ function v_deinstall_command()
 	unlink_if_exists("/usr/local/etc/rc.d/freeswitch.sh");
 	unlink_if_exists("/tmp/freeswitch.tar.gz");
 	unlink_if_exists("/tmp/pkg_mgr_FreeSWITCH.log");
+	
+	conf_mount_ro();
+	config_unlock();
 	
 }
 
