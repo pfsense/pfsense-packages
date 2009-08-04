@@ -3019,39 +3019,39 @@ function v_php_install_command()
 
 	//download the packages
 		//chdir('/tmp/v_pkg/');
-		//exec("fetch ".$download_path."freebsd7.2/pre10/wget-1.11.4.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/bash-4.0.24.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/libgcrypt-1.4.4.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/libgpg-error-1.7.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/libiconv-1.13.1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/libogg-1.1.4,4.tbz");
+		
 		//exec("fetch ".$download_path."freebsd7.2/pre10/libpri-1.4.1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/libslang2-2.1.4_1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/popt-1.14.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/p5-gettext-1.05_2.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/gdbm-1.8.3_3.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/pkg-config-0.23_1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/ca_root_nss-3.11.9_2.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/gettext-0.17_1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/zaptel-1.4.11_1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/gnutls-2.6.5.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/ncurses-5.7.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/unixODBC-2.2.14_1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/libvorbis-1.2.3,3.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/tiff-3.8.2_4.tbz");
 		//exec("fetch ".$download_path."freebsd7.2/pre10/newt-0.51.0_8.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/jpeg-7.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/popt-1.14.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/gettext-0.17_1.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/libslang2-2.1.4_1.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/libiconv-1.13.1.tbz");
 		//exec("fetch ".$download_path."freebsd7.2/pre10/pcre-7.9.tbz");
 		//exec("fetch ".$download_path."freebsd7.2/pre10/png-1.2.37.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/tiff2png-0.91_1,1.tbz");	
+		//exec("fetch ".$download_path."freebsd7.2/pre10/zaptel-1.4.11_1.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/libvorbis-1.2.3,3.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/libogg-1.1.4,4.tbz");		
+		//exec("fetch ".$download_path."freebsd7.2/pre10/bash-4.0.24");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/unixODBC-2.2.14_1.tbz");
 		//exec("fetch ".$download_path."freebsd7.2/pre10/db42-4.2.52_5.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/gdbm-1.8.3_3.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/ncurses-5.7.tbz");		
+		//exec("fetch ".$download_path."freebsd7.2/pre10/pkg-config-0.23_1.tbz");
 		//exec("fetch ".$download_path."freebsd7.2/pre10/curl-7.19.5_1.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/tiff-3.8.2_4.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/tiff2png-0.91_1,1.tbz");
+		//exec("fetch ".$download_path."freebsd7.2/pre10/jpeg-7.tbz");
 		//exec("fetch ".$download_path."freebsd7.2/pre10/freeswitch-1.0.4.p10.tbz");
+		
+	
+		//exec("fetch ".$download_path."freebsd7.2/pre10/p5-gettext-1.05_2.tbz"); //used with perl
+		//exec("fetch ".$download_path."freebsd7.2/pre10/perl-5.8.9_3.tbz");
+		
 	
 	//install the packages
 		chdir('/tmp/v_pkg/');
-		exec("pkg_add -r ".$download_path."freebsd7.2/1.0.4/freeswitch-1.0.4.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/perl-5.8.9_3.tbz; pkg_add perl-5.8.9_3.tbz; rm perl-5.8.9_3.tbz");
+		exec("pkg_add -F -r ".$download_path."freebsd7.2/1.0.4/freeswitch-1.0.4.tbz");
+
 		//exec("fetch ".$download_path."freebsd7.2/pre10/zzz; pkg_add zzz; rm zzz");
 		exec("rm /tmp/v_pkg/*.tbz");
 		
