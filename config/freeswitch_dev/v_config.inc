@@ -2963,6 +2963,13 @@ function sync_package_freeswitch()
 
 }
 
+function pkg_add($pkg_download_path, $pkg_name)
+{
+	chdir('/tmp/');
+	exec("fetch ".$pkg_download_path.$pkg_name);
+	exec("pkg_add -F ".$pkg_name);
+	exec("rm $pkg_name);
+}
 
 function v_php_install_command()
 {
@@ -3013,50 +3020,38 @@ function v_php_install_command()
 	$static_output = 'Downloading Files';
 	update_output_window($static_output);
 
-	if (!is_dir('/tmp/v_pkg/')) {
-	   exec("/tmp/v_pkg/");
-	}
 
-	//download the packages
-		//chdir('/tmp/v_pkg/');
+	//downlaod and install the packages
+		$pkg_download_path = $download_path."freebsd7.2/1_0_4/";
 		
-		//exec("fetch ".$download_path."freebsd7.2/pre10/libpri-1.4.1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/newt-0.51.0_8.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/popt-1.14.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/gettext-0.17_1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/libslang2-2.1.4_1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/libiconv-1.13.1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/pcre-7.9.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/png-1.2.37.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/zaptel-1.4.11_1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/libvorbis-1.2.3,3.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/libogg-1.1.4,4.tbz");		
-		//exec("fetch ".$download_path."freebsd7.2/pre10/bash-4.0.24");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/unixODBC-2.2.14_1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/db42-4.2.52_5.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/gdbm-1.8.3_3.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/ncurses-5.7.tbz");		
-		//exec("fetch ".$download_path."freebsd7.2/pre10/pkg-config-0.23_1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/curl-7.19.5_1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/tiff-3.8.2_4.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/tiff2png-0.91_1,1.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/jpeg-7.tbz");
-		//exec("fetch ".$download_path."freebsd7.2/pre10/freeswitch-1.0.4.p10.tbz");
-		
-	
-		//exec("fetch ".$download_path."freebsd7.2/pre10/p5-gettext-1.05_2.tbz"); //used with perl
-		//exec("fetch ".$download_path."freebsd7.2/pre10/perl-5.8.9_3.tbz");
-		
-	
-	//install the packages
-		chdir('/tmp/v_pkg/');
-		exec("pkg_add -F -r ".$download_path."freebsd7.2/1.0.4/freeswitch-1.0.4.tbz");
-
-		//exec("fetch ".$download_path."freebsd7.2/pre10/zzz; pkg_add zzz; rm zzz");
-		exec("rm /tmp/v_pkg/*.tbz");
-		
-		//used with fax to png, and fax to pdf conversion
-		//exec("pkg_add -r tiff2png");
+		pkg_add($pkg_download_path, "libpri-1.4.1.tbz");
+		pkg_add($pkg_download_path, "png-1.2.37.tbz");
+		pkg_add($pkg_download_path, "pcre-7.9.tbz");
+		pkg_add($pkg_download_path, "libiconv-1.13.1.tbz");
+		pkg_add($pkg_download_path, "libslang2-2.1.4_1.tbz");
+		pkg_add($pkg_download_path, "gettext-0.17_1.tbz");
+		pkg_add($pkg_download_path, "popt-1.14.tbz");
+		pkg_add($pkg_download_path, "newt-0.51.0_8.tbz");
+		pkg_add($pkg_download_path, "zaptel-1.4.11_1.tbz");
+		pkg_add($pkg_download_path, "libogg-1.1.4,4.tbz");
+		pkg_add($pkg_download_path, "libvorbis-1.2.3,3.tbz");
+		pkg_add($pkg_download_path, "bash-4.0.24.tbz");
+		pkg_add($pkg_download_path, "unixODBC-2.2.14_1.tbz");
+		pkg_add($pkg_download_path, "db42-4.2.52_5.tbz");
+		pkg_add($pkg_download_path, "gdbm-1.8.3_3.tbz");
+		pkg_add($pkg_download_path, "ncurses-5.7.tbz");
+		pkg_add($pkg_download_path, "pkg-config-0.23_1.tbz");
+		pkg_add($pkg_download_path, "ca_root_nss-3.11.9_2.tbz");
+		pkg_add($pkg_download_path, "curl-7.19.5_1.tbz");
+		pkg_add($pkg_download_path, "jpeg-7.tbz");
+		pkg_add($pkg_download_path, "tiff-3.8.2_4.tbz");
+		pkg_add($pkg_download_path, "tiff2png-0.91_1,1.tbz");
+		pkg_add($pkg_download_path, "libgpg-error-1.7.tbz");
+		pkg_add($pkg_download_path, "libgcrypt-1.4.4.tbz");
+		pkg_add($pkg_download_path, "gnutls-2.6.5.tbz");
+		pkg_add($pkg_download_path, "freeswitch-1.0.4.tbz");		
+		//pkg_add($pkg_download_path, "p5-gettext-1.05_2.tbz"); //requirement for perl
+		//pkg_add($pkg_download_path, "perl-5.8.9_3.tbz");
 		
 		//add sqlite package
 		exec("pkg_add -r sqlite34");
@@ -3787,75 +3782,38 @@ function v_deinstall_command()
 
 	exec("killall -9 freeswitch");
 	
-	exec("pkg_delete wget-1.11.4.tbz;");
-	exec("pkg_delete bash-4.0.24.tbz;");
-	exec("pkg_delete libgcrypt-1.4.4.tbz;");
-	exec("pkg_delete libgpg-error-1.7.tbz;");
-	exec("pkg_delete libiconv-1.13.1.tbz;");
-	exec("pkg_delete libogg-1.1.4,4.tbz;");
-	exec("pkg_delete libpri-1.4.1.tbz;");
-	exec("pkg_delete libslang2-2.1.4_1.tbz;");
-	exec("pkg_delete popt-1.14.tbz;");
-	exec("pkg_delete p5-gettext-1.05_2.tbz;");
-	exec("pkg_delete gdbm-1.8.3_3.tbz;");
-	exec("pkg_delete pkg-config-0.23_1.tbz;");
-	exec("pkg_delete ca_root_nss-3.11.9_2.tbz;");
-	exec("pkg_delete gettext-0.17_1.tbz;");
-	exec("pkg_delete zaptel-1.4.11_1.tbz;");
-	exec("pkg_delete gnutls-2.6.5.tbz;");
-	exec("pkg_delete ncurses-5.7.tbz;");
-	exec("pkg_delete unixODBC-2.2.14_1.tbz;");
-	exec("pkg_delete libvorbis-1.2.3,3.tbz;");
-	exec("pkg_delete tiff-3.8.2_4.tbz;");
-	exec("pkg_delete newt-0.51.0_8.tbz;");
-	exec("pkg_delete jpeg-7.tbz;");
-	exec("pkg_delete pcre-7.9.tbz;");
-	exec("pkg_delete png-1.2.37.tbz;");
-	exec("pkg_delete tiff2png-0.91_1,1.tbz;");	
-	exec("pkg_delete db42-4.2.52_5.tbz;");
-	exec("pkg_delete curl-7.19.5_1.tbz;");
-	exec("pkg_delete freeswitch-1.0.4.p10.tbz;");	
-	//exec("pkg_delete perl-5.8.9_3.tbz;");
-	//exec("pkg_delete zzz;");
+	exec("pkg_delete freeswitch-1.0.4");
+	exec("pkg_delete gnutls-2.6.5");
+	exec("pkg_delete libgcrypt-1.4.4");
+	exec("pkg_delete libgpg-error-1.7");
+	exec("pkg_delete tiff2png-0.91_1,1");
+	exec("pkg_delete tiff-3.8.2_4");
+	exec("pkg_delete jpeg-7");
+	exec("pkg_delete curl-7.19.5_1");
+	exec("pkg_delete ca_root_nss-3.11.9_2");
+	exec("pkg_delete pkg-config-0.23_1");
+	exec("pkg_delete ncurses-5.7");
+	exec("pkg_delete gdbm-1.8.3_3");
+	exec("pkg_delete db42-4.2.52_5");
+	exec("pkg_delete unixODBC-2.2.14_1");
+	exec("pkg_delete bash-4.0.24");
+	exec("pkg_delete libvorbis-1.2.3,3");
+	exec("pkg_delete libogg-1.1.4,4");
+	exec("pkg_delete zaptel-1.4.11_1");
+	exec("pkg_delete newt-0.51.0_8");
+	exec("pkg_delete popt-1.14");
+	exec("pkg_delete gettext-0.17_1");
+	exec("pkg_delete libslang2-2.1.4_1");
+	exec("pkg_delete libiconv-1.13.1");
+	exec("pkg_delete pcre-7.9");
+	exec("pkg_delete png-1.2.37");
+	exec("pkg_delete libpri-1.4.1");
 	
+	exec("pkg_delete sqlite34");
 	
 	unlink_if_exists("/usr/local/pkg/freeswitch.xml");
 	unlink_if_exists("/usr/local/pkg/v_config.inc");
-	unlink_if_exists("/usr/local/pkg/v_dialplan.xml");
-	unlink_if_exists("/usr/local/pkg/v_extensions.xml");
-	unlink_if_exists("/usr/local/pkg/v_external.xml");
-	unlink_if_exists("/usr/local/pkg/v_internal.xml");
 	unlink_if_exists("/usr/local/pkg/v_modules.xml");	
-	unlink_if_exists("/usr/local/pkg/v_public.xml");
-	unlink_if_exists("/usr/local/pkg/v_vars.xml");	
-
-	unlink_if_exists("/usr/local/www/packages/freeswitch/class.smtp.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/class.phpmailer.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_cmd.php");	
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_dialplan_includes_details.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_dialplan_includes_edit.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_dialplan_includes.php");	
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_dialplan_includes_details_edit.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_extensions.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_extensions_edit.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_ivr.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_ivr_edit.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_ivr_options_edit.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_ivr_options.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_gateways.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_gateways_edit.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_mailto.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_public_includes_details.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_public_includes_edit.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_public_includes.php");	
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_public_includes_details_edit.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_recordings.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_recordings_edit.php");	
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_recordings_play.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_time_conditions.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_time_conditions_edit.php");
-	unlink_if_exists("/usr/local/www/packages/freeswitch/v_status.php");	
-	unlink_if_exists("/usr/local/www/packages/freeswitch/slim.swf");
 
 	exec("rm -R /usr/local/freeswitch/");
 	exec("rm -R /usr/local/www/packages/freeswitch/");
