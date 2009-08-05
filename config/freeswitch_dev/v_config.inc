@@ -3812,8 +3812,8 @@ function v_deinstall_command()
 	exec("pkg_delete tiff2png-0.91_1,1");
 	exec("pkg_delete tiff-3.8.2_4");
 	exec("pkg_delete jpeg-7");
-	exec("pkg_delete curl-7.19.5_1");
-	exec("pkg_delete ca_root_nss-3.11.9_2");
+	//exec("pkg_delete curl-7.19.5_1");
+	//exec("pkg_delete ca_root_nss-3.11.9_2");
 	exec("pkg_delete pkg-config-0.23_1");
 	exec("pkg_delete ncurses-5.7");
 	exec("pkg_delete gdbm-1.8.3_3");
