@@ -81,7 +81,7 @@ function openbgpd_install_conf() {
         if(is_array($openbgpd_neighbors)) {
           foreach($openbgpd_neighbors as $neighbor) {
             if($neighbor['groupname'] == $group['name']) {
-              $conffile .= "	neighbor {$neighbor['neighbor']} {\n";
+              $conffile .= "		neighbor {$neighbor['neighbor']} {\n";
               $conffile .= "		descr \"{$neighbor['descr']}\"\n";
               if($neighbor['md5sigpass']) 
                 $conffile .= "		tcp md5sig password {$neighbor['md5sigpass']}\n";
@@ -90,7 +90,7 @@ function openbgpd_install_conf() {
               foreach($neighbor['row'] as $row) {
                 $conffile .= "		{$row['paramaters']} {$row['parmvalue']} \n";
               }		
-              $conffile .= "	}\n";
+              $conffile .= "}\n";
             }
           }
         }

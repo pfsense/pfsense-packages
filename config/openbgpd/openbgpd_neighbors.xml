@@ -169,6 +169,10 @@
 					echo "found it: $counter";
 				}
 				$counter++;
+			} else {
+				$newoptions['option'][0]['name'] = "";
+				$newoptions['option'][0]['value'] = "";
+				$pkg['fields']['field'][2]['options'] =$newoptions;
 			}
 		}
 	</custom_php_command_before_form>
