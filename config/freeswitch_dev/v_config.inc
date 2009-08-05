@@ -2998,8 +2998,8 @@ function v_php_install_command()
 
 	global $config;
 		
-	$v_package_version = "0.9.7";
-	$v_build_version = "1.0.4 pre 10";
+	$v_package_version = "0.9.7.1";
+	$v_build_version = "1.0.4";
 	$v_build_revision = "14306";
 
 	//set script execution time limit to 24 hours
@@ -3833,9 +3833,9 @@ function v_deinstall_command()
 	exec("pkg_delete popt-1.14");
 	exec("pkg_delete gettext-0.17_1");
 	exec("pkg_delete libslang2-2.1.4_1");
-	exec("pkg_delete libiconv-1.13.1");
+	//exec("pkg_delete libiconv-1.13.1"); //pfsense needs this file.
 	exec("pkg_delete pcre-7.9");
-	exec("pkg_delete png-1.2.37");
+	//exec("pkg_delete png-1.2.37");
 	exec("pkg_delete libpri-1.4.1");
 	
 	exec("pkg_delete sqlite34");
