@@ -1,7 +1,7 @@
 <?php
 /* $Id$ */
 /*
-  v_extensions.php
+  v_features.php
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
 
@@ -30,19 +30,20 @@
 require("guiconfig.inc");
 require("/usr/local/pkg/v_config.inc");
 
-$a_extensions 	   = &$config['installedpackages']['freeswitchextensions']['config'];
+//$a_extensions 	   = &$config['installedpackages']['freeswitchextensions']['config'];
 
 
-if ($_GET['act'] == "del") {
-    if ($_GET['type'] == 'extensions') {
-        if ($a_extensions[$_GET['id']]) {
-            unset($a_extensions[$_GET['id']]);
-            write_config();
-            header("Location: v_extensions.php");
-            exit;
-        }
-    }
-}
+//if ($_GET['act'] == "del") {
+//    if ($_GET['type'] == 'extensions') {
+//        if ($a_extensions[$_GET['id']]) {
+//            unset($a_extensions[$_GET['id']]);
+//            write_config();
+//            header("Location: v_extensions.php");
+//            exit;
+//        }
+//    }
+//}
+
 
 include("head.inc");
 
@@ -63,7 +64,7 @@ echo "<p class=\"pgtitle\">$v_project_label: Features</p>\n";
 <?php
 
 display_top_tabs(build_menu());
- 	
+
 ?>
 </td></tr>
 </table>
@@ -81,10 +82,10 @@ display_top_tabs(build_menu());
       </tr>
     </table>
     <br />-->
-	
+
 	<br />
     <br />
-		
+
     <table width="100%" border="0" cellpadding="6" cellspacing="0">
     <tr>
       <td class="listtopic" colspan='2'>Auto Attendant</td>
@@ -99,10 +100,10 @@ display_top_tabs(build_menu());
 		</td>
 	</tr>
 	</table>
-	
+
     <br />
     <br />
-	
+
     <table width="100%" border="0" cellpadding="6" cellspacing="0">
     <tr>
       <td class="listtopic" colspan='2'>Direct Inward System Access</td>
@@ -117,7 +118,7 @@ display_top_tabs(build_menu());
 		</td>
 	</tr>
 	</table>
-	
+
     <br />
     <br />
 
@@ -132,10 +133,10 @@ display_top_tabs(build_menu());
 		</td>
 	</tr>
 	</table>
-	
+
     <br />
     <br />
-	
+
     <table width="100%" border="0" cellpadding="6" cellspacing="0">
     <tr>
       <td class="listtopic" colspan='2'>Hunt Group</td>
@@ -147,25 +148,25 @@ display_top_tabs(build_menu());
 		</td>
 	</tr>
 	</table>
-	
+
     <br />
-    <br />	
+    <br />
 
     <table width="100%" border="0" cellpadding="6" cellspacing="0">
     <tr>
       <td class="listtopic" colspan='2'>Modules</td>
 	</tr>
     <tr>
-		<td width='10%' class="vncell"><a href='/pkg_edit.php?xml=v_modules.xml&amp;id=0'>Open</a></td>
+		<td width='10%' class="vncell"><a href='v_modules.php'>Open</a></td>
 		<td class="vtable">
 			Modules add additional features and can be enabled or disabled to provide the desired features.
 		</td>
      </tr>
      </table>
-	
+
     <br />
     <br />
-	
+
     <table width="100%" border="0" cellpadding="6" cellspacing="0">
     <tr>
       <td class="listtopic" colspan='2'>Music on Hold</td>
@@ -178,10 +179,10 @@ display_top_tabs(build_menu());
 		</td>
 	</tr>
 	</table>
-	
+
     <br />
     <br />
-	
+
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
 	  <td class="listtopic" colspan='2'>Recordings</td>
@@ -195,7 +196,7 @@ display_top_tabs(build_menu());
 		</td>
 	</tr>
 	</table>	
-	
+
 <br />
 <br />
 <br />

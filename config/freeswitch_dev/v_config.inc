@@ -64,15 +64,16 @@ function build_menu() {
 	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_features.php") { $menu_selected = true; }
 	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_fax.php") { $menu_selected = true; }
 	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_fax_edit.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_ivr.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_ivr_edit.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_ivr_options_edit.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_recordings.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_recordings_edit.php") { $menu_selected = true; }
 	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_hunt_group.php") { $menu_selected = true; }
 	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_hunt_group_edit.php") { $menu_selected = true; }
 	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_hunt_group_destinations.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_hunt_group_destinations_edit.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_hunt_group_destinations_edit.php") { $menu_selected = true; }	
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_ivr.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_ivr_edit.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_ivr_options_edit.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_modules.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_recordings.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_recordings_edit.php") { $menu_selected = true; }
 	$tab_array[] = array(gettext("Features"), $menu_selected, "/packages/freeswitch/v_features.php");
 	unset($menu_selected);
 
@@ -159,33 +160,33 @@ function event_socket_create($host, $port, $password)
 		
 		//get the interface ip addresses and try to connect to them
 		foreach ($ifdescrs as $ifdescr => $ifname){
-        $ifinfo = get_interface_info($ifdescr);
-        $interface_ip_address = $ifinfo['ipaddr'];
+			$ifinfo = get_interface_info($ifdescr);
+			$interface_ip_address = $ifinfo['ipaddr'];
 
-        if (strlen($interface_ip_address) > 0) {
+			if (strlen($interface_ip_address) > 0) {
 
-           $fp = fsockopen($interface_ip_address, $port, $errno, $errdesc, 3);
-           socket_set_blocking($fp,false);
+			   $fp = fsockopen($interface_ip_address, $port, $errno, $errdesc, 3);
+			   socket_set_blocking($fp,false);
 
-           if (!$fp) {
-               //connection failed continue through the loop testing other addresses
-               //invalid handle
-           }
-           else {
-               //connected to the socket return the handle
+			   if (!$fp) {
+				   //connection failed continue through the loop testing other addresses
+				   //invalid handle
+			   }
+			   else {
+				   //connected to the socket return the handle
 
-               while (!feof($fp)) {
-                  $buffer = fgets($fp, 1024);
-                  usleep(100); //allow time for reponse
-                  if (trim($buffer) == "Content-Type: auth/request") {
-                     fputs($fp, "auth $password\n\n");
-                     break;
-                  }
-               }
-               return $fp;
-           }
+				   while (!feof($fp)) {
+					  $buffer = fgets($fp, 1024);
+					  usleep(100); //allow time for reponse
+					  if (trim($buffer) == "Content-Type: auth/request") {
+						 fputs($fp, "auth $password\n\n");
+						 break;
+					  }
+				   }
+				   return $fp;
+			   }
 
-        } //end if interface_ip_address
+			} //end if interface_ip_address
 		} //end foreach
 } //end function
 
@@ -734,128 +735,140 @@ function sync_package_v_gateways()
 function sync_package_v_modules()
 {
 
-  global $config;
+	global $config;
 
-  foreach($config['installedpackages']['freeswitchmodules']['config'] as $rowhelper) {
-  		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/modules.conf.xml","w");
+	foreach($config['installedpackages']['freeswitchmodules']['config'] as $rowhelper) {
+		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/modules.conf.xml","w");
 
-      $tmpxml ="";
-      $tmpxml .= "<configuration name=\"modules.conf\" description=\"Modules\">\n";
-      $tmpxml .= "  <modules>\n";
-      $tmpxml .= "\n";
-      $tmpxml .= "    <!-- Loggers (I'd load these first) -->\n";
-      if ($rowhelper['mod_console'] == "enable"){   $tmpxml .= "    <load module=\"mod_console\"/>\n"; }
-      if ($rowhelper['mod_logfile'] == "enable"){   $tmpxml .= "    <load module=\"mod_logfile\"/>\n"; }
-      if ($rowhelper['mod_syslog'] == "enable"){    $tmpxml .= "    <load module=\"mod_syslog\"/>\n"; }
-      $tmpxml .= "\n";
-      if ($rowhelper['mod_yaml'] == "enable"){      $tmpxml .= "    <load module=\"mod_yaml\"/>\n"; }
-      $tmpxml .= "\n";
-      $tmpxml .= "    <!-- Multi-Faceted -->\n";
-      $tmpxml .= "    <!-- mod_enum is a dialplan interface, an application interface and an api command interface -->\n";
-      if ($rowhelper['mod_enum'] == "enable"){      $tmpxml .= "    <load module=\"mod_enum\"/>\n"; }
-      $tmpxml .= "\n";
-      $tmpxml .= "    <!-- XML Interfaces -->\n";
-      if ($rowhelper['mod_xml_rpc'] == "enable"){   $tmpxml .= "    <load module=\"mod_xml_rpc\"/>\n"; }
-      if ($rowhelper['mod_xml_curl'] == "enable"){  $tmpxml .= "    <load module=\"mod_xml_curl\"/>\n"; }
-      if ($rowhelper['mod_xml_cdr'] == "enable"){   $tmpxml .= "    <load module=\"mod_xml_cdr\"/>\n"; }
-      $tmpxml .= "\n";
-      $tmpxml .= "    <!-- Event Handlers -->\n";
-      if ($rowhelper['mod_cdr_csv'] == "enable"){   $tmpxml .= "    <load module=\"mod_cdr_csv\"/>\n"; }
-      if ($rowhelper['mod_event_multicast'] == "enable"){ $tmpxml .= "    <load module=\"mod_event_multicast\"/>\n"; }
-      if ($rowhelper['mod_event_socket'] == "enable"){ $tmpxml .= "    <load module=\"mod_event_socket\"/>\n"; }
-      if ($rowhelper['mod_zeroconf'] == "enable"){  $tmpxml .= "    <load module=\"mod_zeroconf\"/>\n"; }
-      $tmpxml .= "\n";
-      $tmpxml .= "    <!-- Directory Interfaces -->\n";
-      if ($rowhelper['mod_ldap'] == "enable"){      $tmpxml .= "    <load module=\"mod_ldap\"/>\n"; }
-      $tmpxml .= "\n";
-      $tmpxml .= "    <!-- Endpoints -->\n";
-      if ($rowhelper['mod_dingaling'] == "enable"){ $tmpxml .= "    <load module=\"mod_dingaling\"/>\n"; }
-      if ($rowhelper['mod_iax'] == "enable"){       $tmpxml .= "    <load module=\"mod_iax\"/>\n"; }
-      if ($rowhelper['mod_portaudio'] == "enable"){ $tmpxml .= "    <load module=\"mod_portaudio\"/>\n"; }
-      if ($rowhelper['mod_alsa'] == "enable"){      $tmpxml .= "    <load module=\"mod_alsa\"/>\n"; }
-      if ($rowhelper['mod_sofia'] == "enable"){     $tmpxml .= "    <load module=\"mod_sofia\"/>\n"; }
-      if ($rowhelper['mod_loopback'] == "enable"){  $tmpxml .= "    <load module=\"mod_loopback\"/>\n"; }
-      if ($rowhelper['mod_wanpipe'] == "enable"){   $tmpxml .= "    <load module=\"mod_wanpipe\"/>\n"; }
-      if ($rowhelper['mod_woomera'] == "enable"){   $tmpxml .= "    <load module=\"mod_woomera\"/>\n"; }
-      if ($rowhelper['mod_openzap'] == "enable"){   $tmpxml .= "    <load module=\"mod_openzap\"/>\n"; }
-      $tmpxml .= "\n";
-      $tmpxml .= "    <!-- Applications -->\n";
-      if ($rowhelper['mod_commands'] == "enable"){  $tmpxml .= "    <load module=\"mod_commands\"/>\n"; }
-      if ($rowhelper['mod_conference'] == "enable"){ $tmpxml .= "    <load module=\"mod_conference\"/>\n"; }
-      if ($rowhelper['mod_dptools'] == "enable"){   $tmpxml .= "    <load module=\"mod_dptools\"/>\n"; }
-      if ($rowhelper['mod_expr'] == "enable"){      $tmpxml .= "    <load module=\"mod_expr\"/>\n"; }
-      if ($rowhelper['mod_fax'] == "enable"){      $tmpxml .= "    <load module=\"mod_fax\"/>\n"; }
-      if ($rowhelper['mod_fifo'] == "enable"){      $tmpxml .= "    <load module=\"mod_fifo\"/>\n"; }
-      if ($rowhelper['mod_voicemail'] == "enable"){ $tmpxml .= "    <load module=\"mod_voicemail\"/>\n"; }
-      if ($rowhelper['mod_limit'] == "enable"){     $tmpxml .= "    <load module=\"mod_limit\"/>\n"; }
-      if ($rowhelper['mod_esf'] == "enable"){       $tmpxml .= "    <load module=\"mod_esf\"/>\n"; }
-      if ($rowhelper['mod_fsv'] == "enable"){       $tmpxml .= "    <load module=\"mod_fsv\"/>\n"; }
-      $tmpxml .= "\n";
-      $tmpxml .= "    <!-- SNOM Module -->\n";
-      if ($rowhelper['mod_snom'] == "enable"){      $tmpxml .= "    <load module=\"mod_snom\"/>\n"; }
-      $tmpxml .= "\n";
-      $tmpxml .= "    <!-- Dialplan Interfaces -->\n";
-      if ($rowhelper['mod_dialplan_directory'] == "enable"){ $tmpxml .= "    <load module=\"mod_dialplan_directory\"/>\n"; }
-      if ($rowhelper['mod_dialplan_xml'] == "enable"){ $tmpxml .= "    <load module=\"mod_dialplan_xml\"/>\n"; }
-      if ($rowhelper['mod_dialplan_asterisk'] == "enable"){ $tmpxml .= "    <load module=\"mod_dialplan_asterisk\"/>\n"; }
-      $tmpxml .= "\n";
-      $tmpxml .= "    <!-- Codec Interfaces -->\n";
-      if ($rowhelper['mod_voipcodecs'] == "enable"){ $tmpxml .= "    <load module=\"mod_voipcodecs\"/>\n"; }
-      if ($rowhelper['mod_g723_1'] == "enable"){    $tmpxml .= "    <load module=\"mod_g723_1\"/>\n"; }
-      if ($rowhelper['mod_g729'] == "enable"){      $tmpxml .= "    <load module=\"mod_g729\"/>\n"; }
-      if ($rowhelper['mod_amr'] == "enable"){       $tmpxml .= "    <load module=\"mod_amr\"/>\n"; }
-      if ($rowhelper['mod_ilbc'] == "enable"){      $tmpxml .= "    <load module=\"mod_ilbc\"/>\n"; }
-      if ($rowhelper['mod_speex'] == "enable"){     $tmpxml .= "    <load module=\"mod_speex\"/>\n"; }
-      if ($rowhelper['mod_siren'] == "enable"){     $tmpxml .= "    <load module=\"mod_siren\"/>\n"; }
-      if ($rowhelper['mod_celt'] == "enable"){     $tmpxml .= "    <load module=\"mod_celt\"/>\n"; }
-      if ($rowhelper['mod_h26x'] == "enable"){      $tmpxml .= "    <load module=\"mod_h26x\"/>\n"; }
-      $tmpxml .= "\n";
-      $tmpxml .= "    <!-- File Format Interfaces -->\n";
-      if ($rowhelper['mod_sndfile'] == "enable"){   $tmpxml .= "    <load module=\"mod_sndfile\"/>\n"; }
-      if ($rowhelper['mod_native_file'] == "enable"){ $tmpxml .= "    <load module=\"mod_native_file\"/>\n"; }
-      $tmpxml .= "    <!--For icecast/mp3 streams/files-->\n";
-      if ($rowhelper['mod_shout'] == "enable"){     $tmpxml .= "    <load module=\"mod_shout\"/>\n"; }
-      $tmpxml .= "    <!--For local streams (play all the files in a directory)-->\n";
-      if ($rowhelper['mod_local_stream'] == "enable"){ $tmpxml .= "    <load module=\"mod_local_stream\"/>\n"; }
-      if ($rowhelper['mod_tone_stream'] == "enable"){ $tmpxml .= "    <load module=\"mod_tone_stream\"/>\n"; }
-      $tmpxml .= "\n";
-      $tmpxml .= "    <!-- Timers -->\n";
-      $tmpxml .= "\n";
-      $tmpxml .= "    <!-- Languages -->\n";
-      if ($rowhelper['mod_spidermonkey'] == "enable"){ $tmpxml .= "    <load module=\"mod_spidermonkey\"/>\n"; }
-	  if ($rowhelper['mod_spidermonkey_odbc'] == "enable"){ $tmpxml .= "    <load module=\"mod_spidermonkey_odbc\"/>\n"; }
-      if ($rowhelper['mod_perl'] == "enable"){      $tmpxml .= "    <load module=\"mod_perl\"/>\n"; }
-      if ($rowhelper['mod_python'] == "enable"){    $tmpxml .= "    <load module=\"mod_python\"/>\n"; }
-      if ($rowhelper['mod_java'] == "enable"){      $tmpxml .= "    <load module=\"mod_java\"/>\n"; }
-      if ($rowhelper['mod_lua'] == "enable"){       $tmpxml .= "    <load module=\"mod_lua\"/>\n"; }
-      $tmpxml .= "\n";
-      $tmpxml .= "    <!-- ASR /TTS -->\n";
-      if ($rowhelper['mod_flite'] == "enable"){     $tmpxml .= "    <load module=\"mod_flite\"/>\n"; }
-      if ($rowhelper['mod_pocketsphinx'] == "enable"){ $tmpxml .= "    <load module=\"mod_pocketsphinx\"/>\n"; }
-      if ($rowhelper['mod_cepstral'] == "enable"){  $tmpxml .= "    <load module=\"mod_cepstral\"/>\n"; }
-      if ($rowhelper['mod_openmrcp'] == "enable"){  $tmpxml .= "    <load module=\"mod_openmrcp\"/>\n"; }
-      if ($rowhelper['mod_rss'] == "enable"){       $tmpxml .= "    <load module=\"mod_rss\"/>\n"; }
-      $tmpxml .= "\n";
-      $tmpxml .= "    <!-- Say -->\n";
-      if ($rowhelper['mod_say_en'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_en\"/>\n"; }
-	  if ($rowhelper['mod_say_de'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_de\"/>\n"; }
-	  if ($rowhelper['mod_say_es'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_es\"/>\n"; }
-	  if ($rowhelper['mod_say_fr'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_fr\"/>\n"; }
-	  if ($rowhelper['mod_say_it'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_it\"/>\n"; }
-	  if ($rowhelper['mod_say_nl'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_nl\"/>\n"; }
-	  if ($rowhelper['mod_say_ru'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_ru\"/>\n"; }
-      if ($rowhelper['mod_say_zh'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_zh\"/>\n"; }
-      $tmpxml .= "  </modules>\n";
-      $tmpxml .= "</configuration>";
+		$tmpxml ="";
+		$tmpxml .= "<configuration name=\"modules.conf\" description=\"Modules\">\n";
+		$tmpxml .= "  <modules>\n";
+		$tmpxml .= "\n";
+		$tmpxml .= "    <!-- Loggers (I'd load these first) -->\n";
+		if ($rowhelper['mod_console'] == "enable"){   $tmpxml .= "    <load module=\"mod_console\"/>\n"; }
+		if ($rowhelper['mod_logfile'] == "enable"){   $tmpxml .= "    <load module=\"mod_logfile\"/>\n"; }
+		if ($rowhelper['mod_syslog'] == "enable"){    $tmpxml .= "    <load module=\"mod_syslog\"/>\n"; }
+		$tmpxml .= "\n";
+		if ($rowhelper['mod_yaml'] == "enable"){      $tmpxml .= "    <load module=\"mod_yaml\"/>\n"; }
+		$tmpxml .= "\n";
+		$tmpxml .= "    <!-- Multi-Faceted -->\n";
+		$tmpxml .= "    <!-- mod_enum is a dialplan interface, an application interface and an api command interface -->\n";
+		if ($rowhelper['mod_enum'] == "enable"){      $tmpxml .= "    <load module=\"mod_enum\"/>\n"; }
+		$tmpxml .= "\n";
+		$tmpxml .= "    <!-- XML Interfaces -->\n";
+		if ($rowhelper['mod_xml_rpc'] == "enable"){   $tmpxml .= "    <load module=\"mod_xml_rpc\"/>\n"; }
+		if ($rowhelper['mod_xml_curl'] == "enable"){  $tmpxml .= "    <load module=\"mod_xml_curl\"/>\n"; }
+		if ($rowhelper['mod_xml_cdr'] == "enable"){   $tmpxml .= "    <load module=\"mod_xml_cdr\"/>\n"; }
+		$tmpxml .= "\n";
+		$tmpxml .= "    <!-- Event Handlers -->\n";
+		if ($rowhelper['mod_cdr_csv'] == "enable"){   $tmpxml .= "    <load module=\"mod_cdr_csv\"/>\n"; }
+		if ($rowhelper['mod_event_multicast'] == "enable"){ $tmpxml .= "    <load module=\"mod_event_multicast\"/>\n"; }
+		if ($rowhelper['mod_event_socket'] == "enable"){ $tmpxml .= "    <load module=\"mod_event_socket\"/>\n"; }
+		if ($rowhelper['mod_zeroconf'] == "enable"){  $tmpxml .= "    <load module=\"mod_zeroconf\"/>\n"; }
+		$tmpxml .= "\n";
+		$tmpxml .= "    <!-- Directory Interfaces -->\n";
+		if ($rowhelper['mod_ldap'] == "enable"){      $tmpxml .= "    <load module=\"mod_ldap\"/>\n"; }
+		$tmpxml .= "\n";
+		$tmpxml .= "    <!-- Endpoints -->\n";
+		if ($rowhelper['mod_dingaling'] == "enable"){ $tmpxml .= "    <load module=\"mod_dingaling\"/>\n"; }
+		if ($rowhelper['mod_iax'] == "enable"){       $tmpxml .= "    <load module=\"mod_iax\"/>\n"; }
+		if ($rowhelper['mod_portaudio'] == "enable"){ $tmpxml .= "    <load module=\"mod_portaudio\"/>\n"; }
+		if ($rowhelper['mod_alsa'] == "enable"){      $tmpxml .= "    <load module=\"mod_alsa\"/>\n"; }
+		if ($rowhelper['mod_sofia'] == "enable"){     $tmpxml .= "    <load module=\"mod_sofia\"/>\n"; }
+		if ($rowhelper['mod_loopback'] == "enable"){  $tmpxml .= "    <load module=\"mod_loopback\"/>\n"; }
+		if ($rowhelper['mod_wanpipe'] == "enable"){   $tmpxml .= "    <load module=\"mod_wanpipe\"/>\n"; }
+		if ($rowhelper['mod_woomera'] == "enable"){   $tmpxml .= "    <load module=\"mod_woomera\"/>\n"; }
+		if ($rowhelper['mod_openzap'] == "enable"){   $tmpxml .= "    <load module=\"mod_openzap\"/>\n"; }
+		$tmpxml .= "\n";
+		$tmpxml .= "    <!-- Applications -->\n";
+		if ($rowhelper['mod_cidlookup'] == "enable"){ $tmpxml .= "    <load module=\"mod_cidlookup\"/>\n"; }
+		if ($rowhelper['mod_dptools'] == "enable"){   $tmpxml .= "    <load module=\"mod_dptools\"/>\n"; }
+		if ($rowhelper['mod_commands'] == "enable"){  $tmpxml .= "    <load module=\"mod_commands\"/>\n"; }
+		if ($rowhelper['mod_conference'] == "enable"){ $tmpxml .= "    <load module=\"mod_conference\"/>\n"; }
+		if ($rowhelper['mod_easyroute'] == "enable"){ $tmpxml .= "    <load module=\"mod_easyroute\"/>\n"; }
+		if ($rowhelper['mod_esf'] == "enable"){       $tmpxml .= "    <load module=\"mod_esf\"/>\n"; }
+		if ($rowhelper['mod_expr'] == "enable"){      $tmpxml .= "    <load module=\"mod_expr\"/>\n"; }
+		if ($rowhelper['mod_fax'] == "enable"){      $tmpxml .= "    <load module=\"mod_fax\"/>\n"; }
+		if ($rowhelper['mod_fifo'] == "enable"){      $tmpxml .= "    <load module=\"mod_fifo\"/>\n"; }
+		if ($rowhelper['mod_file_string'] == "enable"){ $tmpxml .= "    <load module=\"mod_file_string\"/>\n"; }
+		if ($rowhelper['mod_fsv'] == "enable"){       $tmpxml .= "    <load module=\"mod_fsv\"/>\n"; }
+		if ($rowhelper['mod_lcr'] == "enable"){ $tmpxml .= "    <load module=\"mod_lcr\"/>\n"; }
+		if ($rowhelper['mod_limit'] == "enable"){     $tmpxml .= "    <load module=\"mod_limit\"/>\n"; }
+		if ($rowhelper['mod_soundtouch'] == "enable"){ $tmpxml .= "    <load module=\"mod_soundtouch\"/>\n"; }
+		if ($rowhelper['mod_spy'] == "enable"){ $tmpxml .= "    <load module=\"mod_spy\"/>\n"; }
+		if ($rowhelper['mod_vmd'] == "enable"){ $tmpxml .= "    <load module=\"mod_vmd\"/>\n"; }
+		if ($rowhelper['mod_voicemail'] == "enable"){ $tmpxml .= "    <load module=\"mod_voicemail\"/>\n"; }
+		$tmpxml .= "\n";
+		$tmpxml .= "    <!-- SNOM Module -->\n";
+		if ($rowhelper['mod_snom'] == "enable"){      $tmpxml .= "    <load module=\"mod_snom\"/>\n"; }
+		$tmpxml .= "\n";
+		$tmpxml .= "    <!-- Dialplan Interfaces -->\n";
+		if ($rowhelper['mod_dialplan_directory'] == "enable"){ $tmpxml .= "    <load module=\"mod_dialplan_directory\"/>\n"; }
+		if ($rowhelper['mod_dialplan_xml'] == "enable"){ $tmpxml .= "    <load module=\"mod_dialplan_xml\"/>\n"; }
+		if ($rowhelper['mod_dialplan_asterisk'] == "enable"){ $tmpxml .= "    <load module=\"mod_dialplan_asterisk\"/>\n"; }
+		$tmpxml .= "\n";
+		$tmpxml .= "    <!-- Codec Interfaces -->\n";
+		if ($rowhelper['mod_voipcodecs'] == "enable"){ $tmpxml .= "    <load module=\"mod_voipcodecs\"/>\n"; }
+		if ($rowhelper['mod_g723_1'] == "enable"){    $tmpxml .= "    <load module=\"mod_g723_1\"/>\n"; }
+		if ($rowhelper['mod_g729'] == "enable"){      $tmpxml .= "    <load module=\"mod_g729\"/>\n"; }
+		if ($rowhelper['mod_amr'] == "enable"){       $tmpxml .= "    <load module=\"mod_amr\"/>\n"; }
+		if ($rowhelper['mod_amrwb'] == "enable"){       $tmpxml .= "    <load module=\"mod_amrwb\"/>\n"; }
+		if ($rowhelper['mod_ilbc'] == "enable"){      $tmpxml .= "    <load module=\"mod_ilbc\"/>\n"; }
+		if ($rowhelper['mod_speex'] == "enable"){     $tmpxml .= "    <load module=\"mod_speex\"/>\n"; }
+		if ($rowhelper['mod_siren'] == "enable"){     $tmpxml .= "    <load module=\"mod_siren\"/>\n"; }
+		if ($rowhelper['mod_celt'] == "enable"){     $tmpxml .= "    <load module=\"mod_celt\"/>\n"; }
+		if ($rowhelper['mod_h26x'] == "enable"){      $tmpxml .= "    <load module=\"mod_h26x\"/>\n"; }
+		$tmpxml .= "\n";
+		$tmpxml .= "    <!-- File Format Interfaces -->\n";
+		if ($rowhelper['mod_sndfile'] == "enable"){   $tmpxml .= "    <load module=\"mod_sndfile\"/>\n"; }
+		if ($rowhelper['mod_native_file'] == "enable"){ $tmpxml .= "    <load module=\"mod_native_file\"/>\n"; }
+		$tmpxml .= "    <!--For icecast/mp3 streams/files-->\n";
+		if ($rowhelper['mod_shout'] == "enable"){     $tmpxml .= "    <load module=\"mod_shout\"/>\n"; }
+		$tmpxml .= "    <!--For local streams (play all the files in a directory)-->\n";
+		if ($rowhelper['mod_local_stream'] == "enable"){ $tmpxml .= "    <load module=\"mod_local_stream\"/>\n"; }
+		if ($rowhelper['mod_tone_stream'] == "enable"){ $tmpxml .= "    <load module=\"mod_tone_stream\"/>\n"; }
+		$tmpxml .= "\n";
+		$tmpxml .= "    <!-- Timers -->\n";
+		$tmpxml .= "\n";
+		$tmpxml .= "    <!-- Languages -->\n";
+		if ($rowhelper['mod_spidermonkey'] == "enable"){ $tmpxml .= "    <load module=\"mod_spidermonkey\"/>\n"; }
+		if ($rowhelper['mod_spidermonkey_core_db'] == "enable"){ $tmpxml .= "    <load module=\"mod_spidermonkey_core_db\"/>\n"; }
+		if ($rowhelper['mod_spidermonkey_curl'] == "enable"){ $tmpxml .= "    <load module=\"mod_spidermonkey_curl\"/>\n"; }
+		if ($rowhelper['mod_spidermonkey_odbc'] == "enable"){ $tmpxml .= "    <load module=\"mod_spidermonkey_odbc\"/>\n"; }
+		if ($rowhelper['mod_spidermonkey_socket'] == "enable"){ $tmpxml .= "    <load module=\"mod_spidermonkey_socket\"/>\n"; }
+		if ($rowhelper['mod_spidermonkey_teletone'] == "enable"){ $tmpxml .= "    <load module=\"mod_spidermonkey_teletone\"/>\n"; }
+		if ($rowhelper['mod_perl'] == "enable"){      $tmpxml .= "    <load module=\"mod_perl\"/>\n"; }
+		if ($rowhelper['mod_python'] == "enable"){    $tmpxml .= "    <load module=\"mod_python\"/>\n"; }
+		if ($rowhelper['mod_java'] == "enable"){      $tmpxml .= "    <load module=\"mod_java\"/>\n"; }
+		if ($rowhelper['mod_lua'] == "enable"){       $tmpxml .= "    <load module=\"mod_lua\"/>\n"; }
+		$tmpxml .= "\n";
+		$tmpxml .= "    <!-- ASR /TTS -->\n";
+		if ($rowhelper['mod_flite'] == "enable"){     $tmpxml .= "    <load module=\"mod_flite\"/>\n"; }
+		if ($rowhelper['mod_pocketsphinx'] == "enable"){ $tmpxml .= "    <load module=\"mod_pocketsphinx\"/>\n"; }
+		if ($rowhelper['mod_cepstral'] == "enable"){  $tmpxml .= "    <load module=\"mod_cepstral\"/>\n"; }
+		if ($rowhelper['mod_openmrcp'] == "enable"){  $tmpxml .= "    <load module=\"mod_openmrcp\"/>\n"; }
+		if ($rowhelper['mod_rss'] == "enable"){       $tmpxml .= "    <load module=\"mod_rss\"/>\n"; }
+		$tmpxml .= "\n";
+		$tmpxml .= "    <!-- Say -->\n";
+		if ($rowhelper['mod_say_de'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_de\"/>\n"; }
+		if ($rowhelper['mod_say_en'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_en\"/>\n"; }	  
+		if ($rowhelper['mod_say_es'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_es\"/>\n"; }
+		if ($rowhelper['mod_say_fr'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_fr\"/>\n"; }
+		if ($rowhelper['mod_say_it'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_it\"/>\n"; }
+		if ($rowhelper['mod_say_nl'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_nl\"/>\n"; }
+		if ($rowhelper['mod_say_ru'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_ru\"/>\n"; }
+		if ($rowhelper['mod_say_zh'] == "enable"){    $tmpxml .= "    <load module=\"mod_say_zh\"/>\n"; }
+		$tmpxml .= "  </modules>\n";
+		$tmpxml .= "</configuration>";
 
-      fwrite($fout, $tmpxml);
-      unset($tmpxml);
-      fclose($fout);
-  }
+		fwrite($fout, $tmpxml);
+		unset($tmpxml);
+		fclose($fout);
+	}
 
-  $cmd = "api reloadxml";
-  //event_socket_request_cmd($cmd);
-  unset($cmd);
+	$cmd = "api reloadxml";
+	//event_socket_request_cmd($cmd);
+	unset($cmd);
 
 }
 
@@ -2979,7 +2992,7 @@ function v_php_install_command()
 
 	global $config;
 		
-	$v_package_version = "0.9.6";
+	$v_package_version = "0.9.7";
 	$v_build_version = "1.0.4 pre 10";
 	$v_build_revision = "14306";
 
@@ -3102,9 +3115,6 @@ function v_php_install_command()
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."your_pin_number_is_incorect_goodbye.wav");	
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_say_your_name_and_reason_for_calling.wav");
 	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."press_1_to_accept_2_to_reject_or_3_for_voicemail.wav");
-
-	$static_output = 'Downloading Lib Files';
-	update_output_window($static_output);
 	
 	//mod_fax
 	//chdir('/usr/local/freeswitch/mod/');
@@ -3127,6 +3137,8 @@ function v_php_install_command()
 	//download xml package files
 	exec("cd /usr/local/pkg/;fetch ".$download_path."v_modules.xml");
 
+	$static_output = 'Downloading Package Files';
+	update_output_window($static_output);
 	
 	//misc files
 	if (!is_dir('/usr/local/www/edit_area/')) {
@@ -3270,6 +3282,10 @@ function v_php_install_command()
 	exec("cd /tmp/;fetch ".$download_path."v_mailto.tmp");
 	exec("cp /tmp/v_mailto.tmp /usr/local/www/packages/freeswitch/v_mailto.php");
 	unlink_if_exists("/tmp/v_mailto.tmp");
+
+	exec("cd /tmp/;fetch ".$download_path."v_modules.tmp");
+	exec("cp /tmp/v_modules.tmp /usr/local/www/packages/freeswitch/v_modules.php");
+	unlink_if_exists("/tmp/v_modules.tmp");
 
 	exec("cd /tmp/;fetch ".$download_path."v_recordings.tmp");
 	exec("cp /tmp/v_recordings.tmp /usr/local/www/packages/freeswitch/v_recordings.php");
