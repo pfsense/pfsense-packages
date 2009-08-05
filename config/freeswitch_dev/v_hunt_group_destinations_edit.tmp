@@ -141,6 +141,7 @@ display_top_tabs(build_menu());
 					sip uri (voicemail): sofia/internal/*98@${domain}<br />
 					sip uri (external number): sofia/gateway/gatewayname/12081231234<br />
 					sip uri (auto attendant): sofia/internal/5002@${domain}<br />
+					sip uri (user): /user/1001@${domain}<br />
 				</span>
             </tr>
             <tr>

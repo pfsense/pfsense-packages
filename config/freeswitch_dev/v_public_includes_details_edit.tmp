@@ -310,12 +310,33 @@ display_top_tabs(build_menu());
       <tr><th class="vncellreq" align="left">Data:</th><td class="vtable">1001 XML default</td></tr>
       </table>
 
-
-      <br />
-      <br />
       <br />
       <br />
 
+      Or bridge the inbound call a SIP URI.
+      <br />
+      <br />
+      <table cellpadding='3'>
+      <tr><th class="vncellreq" width='75' align="left">Tag:</th><td class="vtable">action</td></tr>
+      <tr><th class="vncellreq" align="left">Application:</th><td class="vtable">bridge</td></tr>
+      <tr><th class="vncellreq" align="left">Data:</th><td class="vtable">sofia/internal/*98@${domain}</td></tr>
+      </table>
+	  
+	  <br />
+      <br />
+      <br />
+	  
+      <br />
+	  <b>SIP URI examples:</b>
+      <br />
+      <br />
+	  voicemail: sofia/internal/*98@${domain}<br />
+	  external number: sofia/gateway/gatewayname/12081231234<br />
+	  auto attendant: sofia/internal/5002@${domain}<br />
+	  user: /user/1001@${domain}<br />
+      <br />
+      <br />
+      <br />
 
       <b>Conditions</b>
       <br />
