@@ -3134,8 +3134,6 @@ function v_php_install_command()
 	//exec("fetch ".$download_path."libspandsp.so.1");
 	//exec("cp /usr/local/lib/libspandsp.so.1 /usr/local/lib/libspandsp.so.2");
 	
-	//download xml package files
-	exec("cd /usr/local/pkg/;fetch ".$download_path."v_modules.xml");
 
 	$static_output = 'Downloading Package Files';
 	update_output_window($static_output);
@@ -3838,7 +3836,6 @@ function v_deinstall_command()
 	
 	unlink_if_exists("/usr/local/pkg/freeswitch.xml");
 	unlink_if_exists("/usr/local/pkg/v_config.inc");
-	unlink_if_exists("/usr/local/pkg/v_modules.xml");	
 
 	exec("rm -R /usr/local/freeswitch/");
 	exec("rm -R /usr/local/www/packages/freeswitch/");
