@@ -2998,7 +2998,7 @@ function v_php_install_command()
 
 	global $config;
 		
-	$v_package_version = "0.9.7.1";
+	$v_package_version = "0.9.7.2";
 	$v_build_version = "1.0.4";
 	$v_build_revision = "14306";
 
@@ -3821,7 +3821,7 @@ function v_deinstall_command()
 	//exec("pkg_delete curl-7.19.5_1");
 	//exec("pkg_delete ca_root_nss-3.11.9_2");
 	exec("pkg_delete pkg-config-0.23_1");
-	exec("pkg_delete ncurses-5.7");
+	//exec("pkg_delete ncurses-5.7");
 	exec("pkg_delete gdbm-1.8.3_3");
 	exec("pkg_delete db42-4.2.52_5");
 	exec("pkg_delete unixODBC-2.2.14_1");
@@ -3831,7 +3831,7 @@ function v_deinstall_command()
 	exec("pkg_delete zaptel-1.4.11_1");
 	exec("pkg_delete newt-0.51.0_8");
 	exec("pkg_delete popt-1.14");
-	exec("pkg_delete gettext-0.17_1");
+	//exec("pkg_delete gettext-0.17_1");
 	exec("pkg_delete libslang2-2.1.4_1");
 	//exec("pkg_delete libiconv-1.13.1"); //pfsense needs this file.
 	exec("pkg_delete pcre-7.9");
