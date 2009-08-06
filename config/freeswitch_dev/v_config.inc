@@ -7,8 +7,6 @@
     Copyright (C) 2008 Mark J Crane
     All rights reserved.
 
-    
-
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
@@ -2998,7 +2996,7 @@ function v_php_install_command()
 
 	global $config;
 		
-	$v_package_version = "0.9.7.2";
+	$v_package_version = "0.9.7.3";
 	$v_build_version = "1.0.4";
 	$v_build_revision = "14306";
 
@@ -3818,10 +3816,10 @@ function v_deinstall_command()
 	exec("pkg_delete tiff2png-0.91_1,1");
 	exec("pkg_delete tiff-3.8.2_4");
 	exec("pkg_delete jpeg-7");
-	//exec("pkg_delete curl-7.19.5_1");
-	//exec("pkg_delete ca_root_nss-3.11.9_2");
+	//exec("pkg_delete curl-7.19.5_1");  //do not remove required for pfsense
+	//exec("pkg_delete ca_root_nss-3.11.9_2"); //do not remove required for pfsense
 	exec("pkg_delete pkg-config-0.23_1");
-	//exec("pkg_delete ncurses-5.7");
+	//exec("pkg_delete ncurses-5.7"); //do not remove required for pfsense
 	exec("pkg_delete gdbm-1.8.3_3");
 	exec("pkg_delete db42-4.2.52_5");
 	exec("pkg_delete unixODBC-2.2.14_1");
@@ -3831,10 +3829,10 @@ function v_deinstall_command()
 	exec("pkg_delete zaptel-1.4.11_1");
 	exec("pkg_delete newt-0.51.0_8");
 	exec("pkg_delete popt-1.14");
-	//exec("pkg_delete gettext-0.17_1");
+	//exec("pkg_delete gettext-0.17_1"); //do not remove required for pfsense
 	exec("pkg_delete libslang2-2.1.4_1");
-	//exec("pkg_delete libiconv-1.13.1"); //pfsense needs this file.
-	exec("pkg_delete pcre-7.9");
+	//exec("pkg_delete libiconv-1.13.1"); //do not remove required for pfsense
+	//exec("pkg_delete pcre-7.9"); //do not remove required for pfsense
 	//exec("pkg_delete png-1.2.37");
 	exec("pkg_delete libpri-1.4.1");
 	
