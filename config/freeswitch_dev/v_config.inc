@@ -457,7 +457,7 @@ function sync_package_v_settings()
 		unset($tmpxml, $event_socket_password);
 		fclose($fout);
 
-		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/xml_rpc.conf","w");
+		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/xml_rpc.conf.xml","w");
 		$tmpxml = "<configuration name=\"xml_rpc.conf\" description=\"XML RPC\">\n";
 		$tmpxml .= "  <settings>\n";
 		$tmpxml .= "    <!-- The port where you want to run the http service (default 8080) -->\n";
