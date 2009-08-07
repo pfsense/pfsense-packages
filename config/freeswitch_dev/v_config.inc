@@ -2977,10 +2977,14 @@ function sync_package_freeswitch()
 function pkg_add($pkg_download_path, $pkg_name)
 {
 
+	if (!is_dir('/usr/pkgs/')) {
+	   exec("mkdir /usr/pkgs/");
+	}
+	
 	$pkg_array = split("\.", $pkg_name);
 	//if the package is not installed then download and install it
 	if (!strlen(exec('pkg_info | grep '.$pkg_array[0])) > 0) {
-		chdir('/tmp/');
+		chdir('/usr/pkgs/');
 		exec("fetch ".$pkg_download_path.$pkg_name);
 		exec("pkg_add -F ".$pkg_name);
 		exec("rm ".$pkg_name);
@@ -2996,7 +3000,7 @@ function v_php_install_command()
 
 	global $config;
 		
-	$v_package_version = "0.9.7.3";
+	$v_package_version = "0.9.7.4";
 	$v_build_version = "1.0.4";
 	$v_build_revision = "14306";
 
