@@ -32,9 +32,15 @@ require("/usr/local/pkg/v_config.inc");
 
 //$a_extensions 	   = &$config['installedpackages']['freeswitchprofiles']['config'];
 
+<?php
+if ($v_path_show) {
+	echo $v_conf_dir."/sip_profiles/external/\n";
+}
+?>
+
 if ($_GET['a'] == "default") {
 	conf_mount_rw();
-	exec("cp /usr/local/freeswitch/conf.orig/dialplan/default.xml /usr/local/freeswitch/conf/dialplan/default.xml");
+	exec("cp ".$v_conf_dir.".orig/dialplan/default.xml ".$v_conf_dir."/dialplan/default.xml");
 	$savemsg = "Default Restored";
 	conf_mount_ro();
 }
@@ -42,7 +48,7 @@ if ($_GET['a'] == "default") {
 if ($_POST['a'] == "save") {
 	conf_mount_rw();
 	$content = ereg_replace("\r","",$_POST['code']);
-	$fd = fopen("/usr/local/freeswitch/conf/dialplan/default.xml", "w");
+	$fd = fopen($v_conf_dir."/dialplan/default.xml", "w");
 	fwrite($fd, $content);
 	fclose($fd);
 	$savemsg = "Saved";
@@ -50,8 +56,8 @@ if ($_POST['a'] == "save") {
 }
 
 
-$fd = fopen("/usr/local/freeswitch/conf/dialplan/default.xml", "r");
-$content = fread($fd, filesize("/usr/local/freeswitch/conf/dialplan/default.xml"));
+$fd = fopen($v_conf_dir."/dialplan/default.xml", "r");
+$content = fread($fd, filesize($v_conf_dir."/dialplan/default.xml"));
 fclose($fd);
 	
 include("head.inc");
@@ -81,7 +87,9 @@ function sf() { document.forms[0].savetopath.focus(); }
 
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: Dialplan</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: Dialplan</p>\n";
+}
 ?>
 
 <div id="mainlevel">
@@ -124,7 +132,13 @@ build_menu();
 
   	<table width="98%" border="0" cellpadding="6" cellspacing="0">
       <tr>
-        <td>/usr/local/freeswitch/conf/dialplan/default.xml</td>
+        <td>
+		<?php
+		if ($v_path_show) {
+			echo $v_conf_dir."/dialplan/default.xml\n";
+		}
+		?>
+		</td>
 		<td align='right'>
 			<input type="hidden" name="f" value="<?php echo $_GET['f']; ?>" />
 			<input type="hidden" name="a" value="save" />

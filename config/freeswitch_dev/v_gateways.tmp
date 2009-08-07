@@ -36,7 +36,7 @@ $a_gateways 	   = &$config['installedpackages']['freeswitchgateways']['config'];
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'gateways') {
         if ($a_gateways[$_GET['id']]) {
-			$tmp_file_name = "/usr/local/freeswitch/conf/sip_profiles/external/".$_GET['gateway'].".xml";
+			$tmp_file_name = $v_conf_dir."/sip_profiles/external/".$_GET['gateway'].".xml";
 			if (file_exists($tmp_file_name)) {
 				unlink($tmp_file_name);
 			}
@@ -57,7 +57,9 @@ include("head.inc");
 
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: Gateways</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: Gateways</p>\n";
+}
 ?>
 
 <div id="mainlevel">
@@ -191,8 +193,12 @@ if ($config_change == 1) {
 
 </form>
 
+<?php
+if ($v_path_show) {
+	echo $v_conf_dir."/sip_profiles/external/\n";
+}
+?>
 
-/usr/local/freeswitch/conf/sip_profiles/external/
 <br>
 <br>
 <br>

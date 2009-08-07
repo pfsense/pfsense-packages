@@ -87,7 +87,9 @@ include("head.inc");
 
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: Hunt Group</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: Hunt Group</p>\n";
+}
 ?>
 
 <div id="mainlevel">
@@ -188,7 +190,12 @@ build_menu();
 
 <br>
 <br>
-/usr/local/freeswitch/scripts/
+<?php
+if ($v_path_show) {
+	echo $v_scripts_dir."\n";
+}
+?>
+
 <br>
 <br>
 <br>

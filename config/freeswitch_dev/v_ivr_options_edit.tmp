@@ -108,8 +108,9 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: Options: Edit</p>\n";
-
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: Options: Edit</p>\n";
+}
 if ($input_errors) print_input_errors($input_errors); 
 
 ?>
@@ -178,7 +179,8 @@ build_menu();
 				else {
 					echo "                <option>auto</option>\n";
 				}
-				foreach (ListFiles('/usr/local/freeswitch/conf/sip_profiles') as $key=>$sip_profile_file){	
+
+				foreach (ListFiles($v_conf_dir.'/sip_profiles') as $key=>$sip_profile_file){	
 					$sip_profile_name = str_replace(".xml", "", $sip_profile_file);
 
 					if (htmlspecialchars($pconfig['optionprofile']) == $sip_profile_name) {

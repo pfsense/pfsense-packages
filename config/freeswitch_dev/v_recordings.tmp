@@ -31,8 +31,8 @@ require("guiconfig.inc");
 require("/usr/local/pkg/v_config.inc");
 
 $a_recordings 	   = &$config['installedpackages']['freeswitchrecordings']['config'];
-$dir_recordings = '/usr/local/freeswitch/recordings/';
-$dir_music_on_hold_8000 = '/usr/local/freeswitch/sounds/music/8000/';
+$dir_recordings = $v_recordings_dir.'/recordings/';
+$dir_music_on_hold_8000 = $v_dir.'/sounds/music/8000/';
 
 if ($_GET['a'] == "download") {
 
@@ -118,7 +118,7 @@ if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_na
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'rec') {
         if ($a_recordings[$_GET['id']]) {
-            unlink_if_exists('/usr/local/freeswitch/recordings/'.$a_recordings[$_GET['id']]['filename']);
+            unlink_if_exists($v_recordings_dir.$a_recordings[$_GET['id']]['filename']);
             unset($a_recordings[$_GET['id']]);
             write_config();
             header("Location: v_recordings.php");
@@ -150,7 +150,9 @@ function EvalSound(soundobj) {
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: Recordings</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: Recordings</p>\n";
+}
 ?>
 
 <div id="mainlevel">

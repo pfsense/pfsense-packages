@@ -106,7 +106,9 @@ include("head.inc");
 
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: Public</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_project_label: Public</p>\n";
+}
 ?>
 
 <div id="mainlevel">

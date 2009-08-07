@@ -30,7 +30,33 @@
 */
 
 //ob_start("ob_gzhandler");
-$v_project_label = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
+
+
+//global variables
+	$php_dir = '/usr/local/bin/php';
+	$tmp_dir = '/tmp/';
+	$v_package_version = "0.9.7.6";
+	$v_build_version = "1.0.4";
+	$v_build_revision = "";	
+	$v_label = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
+	$v_name = 'freeswitch';
+	$v_dir = '/usr/local/freeswitch';
+	$v_backup_dir = '/root/backup';
+	$v_web_dir = '/usr/local/www/packages/freeswitch';	
+	$v_conf_dir = '/usr/local/freeswitch/conf';
+	$v_db_dir = '/usr/local/freeswitch/db';
+	$v_htdocs_dir = '/usr/local/freeswitch/htdocs';
+	$v_log_dir = '/usr/local/freeswitch/log';
+	$v_mod_dir = '/usr/local/freeswitch/mod';
+	$v_scripts_dir = '/usr/local/freeswitch/scripts';
+	$v_storage_dir = '/usr/local/freeswitch/storage';
+	$v_recordings_dir = '/usr/local/freeswitch/recordings';
+
+//preferences
+	$v_label_show = true;
+	$v_path_show = true;
+	$v_menu_show = true;
+
 
 function build_menu() {
 
@@ -264,21 +290,22 @@ function byte_convert( $bytes ) {
 
 function lan_sip_profile()
 {
-	global $config;	
+	global $config;
+	global $v_conf_dir;
 	clearstatcache();
 	
 	//if the lan directory does not exist then create it
-	if (!is_dir('/usr/local/freeswitch/conf/sip_profiles/lan/')) {
-	   exec("mkdir /usr/local/freeswitch/conf/sip_profiles/lan/");
+	if (!is_dir($v_conf_dir.'/sip_profiles/lan/')) {
+	   exec("mkdir ".$v_conf_dir."/sip_profiles/lan/");
 	}
 	
 	//create the LAN profile if it doesn't exist
-	if (!file_exists('/usr/local/freeswitch/conf/sip_profiles/lan.xml')) {
+	if (!file_exists($v_conf_dir.'/sip_profiles/lan.xml')) {
 		$lan_ip = $config['interfaces']['lan']['ipaddr'];
 		if (strlen($lan_ip) > 0) {
-			exec("cp /usr/local/freeswitch/conf/sip_profiles/internal.xml /usr/local/freeswitch/conf/sip_profiles/lan.xml");
+			exec("cp ".$v_conf_dir."/sip_profiles/internal.xml ".$v_conf_dir."/sip_profiles/lan.xml");
 			
-			$filename = "/usr/local/freeswitch/conf/sip_profiles/lan.xml";
+			$filename = $v_conf_dir."/sip_profiles/lan.xml";
 			$handle = fopen($filename,"rb");
 			$contents = fread($handle, filesize($filename));	
 			fclose($handle);
@@ -326,9 +353,14 @@ function  recording_js()
 {
 
     global $config;
+	global $v_dir;	
+	global $v_conf_dir;
+	global $v_scripts_dir;
+	global $v_recordings_dir;
+	
     $admin_pin = $config['installedpackages']['freeswitchsettings']['config'][0]['admin_pin'];
 
-    $fout = fopen("/usr/local/freeswitch/scripts/recordings.js","w");
+    $fout = fopen($v_scripts_dir."/recordings.js","w");
     $tmp = "  var pin = \"".$admin_pin."\";\n";
     $tmp .= "  //var pin = \"\"; //don't require a pin\n";
     $tmp .= "    //if you choose not to require a pin then then you may want to add a dialplan condition for a specific caller id\n";
@@ -390,7 +422,7 @@ function  recording_js()
     //$tmp .= "      session.execute(\"speak\", \"Please enter your pin number now.\");\n";
     $tmp .= "      digitmaxlength = 6;\n";
     $tmp .= "      session.execute(\"set\", \"playback_terminators=#\");\n";
-    $tmp .= "      session.streamFile( \"/usr/local/freeswitch/sounds/custom/8000/please_enter_the_pin_number.wav\", mycb, \"dtmf\");\n";
+    $tmp .= "      session.streamFile( \"".$v_dir."/sounds/custom/8000/please_enter_the_pin_number.wav\", mycb, \"dtmf\");\n";
     $tmp .= "      session.collectInput( mycb, dtmf, timeoutpin );\n";
     $tmp .= "  }\n";
     $tmp .= "\n";
@@ -399,16 +431,16 @@ function  recording_js()
     //$tmp .= "      session.execute(\"set\", \"tts_engine=flite\");\n";
     //$tmp .= "      session.execute(\"set\", \"tts_voice=kal\");\n";
     //$tmp .= "      session.execute(\"speak\", \"Begin recording.\");\n";
-    $tmp .= "      session.streamFile( \"/usr/local/freeswitch/sounds/custom/8000/begin_recording.wav\", mycb, \"dtmf\");\n";
+    $tmp .= "      session.streamFile( \"".$v_dir."/sounds/custom/8000/begin_recording.wav\", mycb, \"dtmf\");\n";
     $tmp .= "      session.execute(\"set\", \"playback_terminators=#\");\n";
-    $tmp .= "      session.execute(\"record\", \"/usr/local/freeswitch/recordings/temp\"+Year+Month+Day+Hours+Mins+Seconds+\".wav 180 200\");\n";
+    $tmp .= "      session.execute(\"record\", \"".$v_recordings_dir."/temp\"+Year+Month+Day+Hours+Mins+Seconds+\".wav 180 200\");\n";
     $tmp .= "  }\n";
     $tmp .= "  else {\n";
     $tmp .= "      console_log( \"info\", \"Pin: \" + dtmf.digits + \" is incorrect\\n\" );\n";
     //$tmp .= "      session.execute(\"set\", \"tts_engine=flite\");\n";
     //$tmp .= "      session.execute(\"set\", \"tts_voice=kal\");\n";
     //$tmp .= "      session.execute(\"speak\", \"Your pin number is incorect, goodbye.\");\n";
-    $tmp .= "      session.streamFile( \"/usr/local/freeswitch/sounds/custom/8000/your_pin_number_is_incorect_goodbye.wav\", mycb, \"dtmf\");\n";
+    $tmp .= "      session.streamFile( \"".$v_dir."/sounds/custom/8000/your_pin_number_is_incorect_goodbye.wav\", mycb, \"dtmf\");\n";
     $tmp .= "  }\n";
     $tmp .= "  session.hangup();\n";
     $tmp .= "\n";
@@ -423,12 +455,15 @@ function  recording_js()
 function sync_package_v_settings()
 {
 
-  global $config;
+	global $config;
+	global $v_conf_dir;
+	global $v_scripts_dir;
+	
   if($config['installedpackages']['freeswitchsettings']['config'] != "") {
 
       foreach($config['installedpackages']['freeswitchsettings']['config'] as $rowhelper) {
 
-		$fout = fopen("/usr/local/freeswitch/conf/directory/default/default.xml","w");		
+		$fout = fopen($v_conf_dir."/directory/default/default.xml","w");		
 		$tmpxml = "<include>\n";
 		$tmpxml .= "  <user id=\"default\"> <!--if id is numeric mailbox param is not necessary-->\n";
 		$tmpxml .= "    <variables>\n";
@@ -444,7 +479,7 @@ function sync_package_v_settings()
 		unset($tmpxml);
 		fclose($fout);
 
-		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml","w");
+		$fout = fopen($v_conf_dir."/autoload_configs/event_socket.conf.xml","w");
 		$tmpxml = "<configuration name=\"event_socket.conf\" description=\"Socket Client\">\n";
 		$tmpxml .= "  <settings>\n";
 		$tmpxml .= "    <param name=\"listen-ip\" value=\"0.0.0.0\"/>\n";
@@ -457,7 +492,7 @@ function sync_package_v_settings()
 		unset($tmpxml, $event_socket_password);
 		fclose($fout);
 
-		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/xml_rpc.conf.xml","w");
+		$fout = fopen($v_conf_dir."/autoload_configs/xml_rpc.conf.xml","w");
 		$tmpxml = "<configuration name=\"xml_rpc.conf\" description=\"XML RPC\">\n";
 		$tmpxml .= "  <settings>\n";
 		$tmpxml .= "    <!-- The port where you want to run the http service (default 8080) -->\n";
@@ -475,7 +510,7 @@ function sync_package_v_settings()
 		recording_js();
 
 		//shout.conf.xml
-		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/shout.conf.xml","w");
+		$fout = fopen($v_conf_dir."/autoload_configs/shout.conf.xml","w");
 		$tmpxml = "<configuration name=\"shout.conf\" description=\"mod shout config\">\n";
 		$tmpxml .= "  <settings>\n";
 		$tmpxml .= "    <!-- Don't change these unless you are insane -->\n";
@@ -490,7 +525,7 @@ function sync_package_v_settings()
 		
 		//config.js
 		$admin_pin = $config['installedpackages']['freeswitchsettings']['config'][0]['admin_pin'];
-		$fout = fopen("/usr/local/freeswitch/scripts/config.js","w");
+		$fout = fopen($v_scripts_dir."/config.js","w");
 		$tmp = "//javascript include\n\n";
 		$tmp .= "var admin_pin = \"" . $admin_pin . "\";\n";
 		fwrite($fout, $tmp);
@@ -509,14 +544,15 @@ function sync_package_v_settings()
 function sync_package_v_dialplan()
 {
 
-  global $config;
+	global $config;
+	global $v_conf_dir;
 
   //using backup files rather than pfsense config.xml for this file
   $config['installedpackages']['freeswitchpublic']['config'][0]['dialplan_default_xml'] = "";
   
   //if(strlen($config['installedpackages']['freeswitchdialplan']['config'][0]['dialplan_default_xml']) == 0) {
 		/* dialplan not found in the pfsense config.xml get the default dialplan and save to config.xml. */
-		//$filename = "/usr/local/freeswitch/conf/dialplan/default.xml";
+		//$filename = $v_conf_dir."/dialplan/default.xml";
 		//$fout = fopen($filename,"r");
 		//$tmpxml = fread($fout, filesize($filename));
 		//$config['installedpackages']['freeswitchdialplan']['config'][0]['dialplan_default_xml'] = base64_encode($tmpxml);
@@ -525,7 +561,7 @@ function sync_package_v_dialplan()
   //}
   //else {
 		/* found the dialplan in the pfsense config.xml save it to default.xml. */
-		//$fout = fopen("/usr/local/freeswitch/conf/dialplan/default.xml","w");
+		//$fout = fopen($v_conf_dir."/dialplan/default.xml","w");
 		//$tmpxml = $config['installedpackages']['freeswitchdialplan']['config'][0]['dialplan_default_xml'];
 		//fwrite($fout, base64_decode($tmpxml));
 		//fclose($fout);
@@ -542,23 +578,25 @@ function sync_package_v_dialplan()
 function sync_package_v_extensions()
 {
 
-  global $config;
+	global $config;
+	global $v_conf_dir;
+
   if($config['installedpackages']['freeswitchextensions']['config'] != "") {
 	
       /* delete all old extensions to prepare for new ones */
-    	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/1*.xml");
-    	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/2*.xml");
-    	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/3*.xml");
-    	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/4*.xml");
-    	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/5*.xml");
-    	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/6*.xml");
-    	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/7*.xml");
-    	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/8*.xml");
-    	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/9*.xml");
+    	unlink_if_exists($v_conf_dir."/directory/default/1*.xml");
+    	unlink_if_exists($v_conf_dir."/directory/default/2*.xml");
+    	unlink_if_exists($v_conf_dir."/directory/default/3*.xml");
+    	unlink_if_exists($v_conf_dir."/directory/default/4*.xml");
+    	unlink_if_exists($v_conf_dir."/directory/default/5*.xml");
+    	unlink_if_exists($v_conf_dir."/directory/default/6*.xml");
+    	unlink_if_exists($v_conf_dir."/directory/default/7*.xml");
+    	unlink_if_exists($v_conf_dir."/directory/default/8*.xml");
+    	unlink_if_exists($v_conf_dir."/directory/default/9*.xml");
   	
       foreach($config['installedpackages']['freeswitchextensions']['config'] as $rowhelper) {
 			if ($rowhelper['enabled'] != "false") {
-				  $fout = fopen("/usr/local/freeswitch/conf/directory/default/".$rowhelper['extension'].".xml","w");
+				  $fout = fopen($v_conf_dir."/directory/default/".$rowhelper['extension'].".xml","w");
 
 				  $tmpxml = "<include>\n";
 				  if (strlen($rowhelper['cidr']) == 0) {
@@ -634,16 +672,18 @@ function sync_package_v_extensions()
 function sync_package_v_gateways()
 {
 
-  global $config;
+	global $config;
+	global $v_conf_dir;
+	
   if($config['installedpackages']['freeswitchgateways']['config'] != "") {
     	
       /* delete all old gateways to prepare for new ones */
-      unlink_if_exists("/usr/local/freeswitch/conf/sip_profiles/external/*.xml");
+      unlink_if_exists($v_conf_dir."/sip_profiles/external/*.xml");
     	
       foreach($config['installedpackages']['freeswitchgateways']['config'] as $rowhelper) {
 
           if ($rowhelper['enabled'] != "false") {
-		          $fout = fopen("/usr/local/freeswitch/conf/sip_profiles/external/".$rowhelper['gateway'].".xml","w");
+		          $fout = fopen($v_conf_dir."/sip_profiles/external/".$rowhelper['gateway'].".xml","w");
 		
 		          $tmpxml .= "<include>\n";
 		          $tmpxml .= "    <gateway name=\"" . $rowhelper['gateway'] . "\">\n";
@@ -734,9 +774,10 @@ function sync_package_v_modules()
 {
 
 	global $config;
+	global $v_conf_dir;
 
 	foreach($config['installedpackages']['freeswitchmodules']['config'] as $rowhelper) {
-		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/modules.conf.xml","w");
+		$fout = fopen($v_conf_dir."/autoload_configs/modules.conf.xml","w");
 
 		$tmpxml ="";
 		$tmpxml .= "<configuration name=\"modules.conf\" description=\"Modules\">\n";
@@ -874,14 +915,15 @@ function sync_package_v_modules()
 function sync_package_v_public()
 {
 
-  global $config;
+	global $config;
+	global $v_conf_dir;
 
   //using backup files rather than pfsense config.xml for this file
   $config['installedpackages']['freeswitchpublic']['config'][0]['public_xml'] = "";
   
   //if(strlen($config['installedpackages']['freeswitchpublic']['config'][0]['public_xml']) == 0) {
   //    /* dialplan_public_xml not found in the pfsense config.xml get the default public.xml and save to config.xml. */
-  //    $filename = "/usr/local/freeswitch/conf/dialplan/public.xml";
+  //    $filename = $v_conf_dir."/dialplan/public.xml";
   //    $fout = fopen($filename,"r");
   //    $tmpxml = fread($fout, filesize($filename));
   //    $tmpxml = str_replace("<anti-action application=\"export\" data=\"domain_name=\${sip_req_host}\"/>", "<!--<anti-action application=\"export\" data=\"domain_name=\${sip_req_host}\"/>-->", $tmpxml);
@@ -892,7 +934,7 @@ function sync_package_v_public()
   //}
   //else {
   //    /* found dialplan_public_xml in the pfsense config.xml save it to public.xml. */
-  //    $fout = fopen("/usr/local/freeswitch/conf/dialplan/public.xml","w");
+  //    $fout = fopen($v_conf_dir."/dialplan/public.xml","w");
   //    $tmpxml = $config['installedpackages']['freeswitchpublic']['config'][0]['public_xml'];
   //    fwrite($fout, base64_decode($tmpxml));
   //    fclose($fout);
@@ -910,13 +952,14 @@ function sync_package_v_vars()
 {
 
   global $config;
+  global $v_conf_dir;
 
   //using backup files rather than pfsense config.xml for this file
   $config['installedpackages']['freeswitchpublic']['config'][0]['vars_xml'] = "";
   
   //if(strlen($config['installedpackages']['freeswitchvars']['config'][0]['vars_xml']) == 0) {
   //    /* dialplan not found in the pfsense config.xml get the default dialplan and save to config.xml. */
-  //  	$filename = "/usr/local/freeswitch/conf/vars.xml";
+  //  	$filename = $v_conf_dir."/vars.xml";
   //    $fout = fopen($filename,"r");
   //    $tmpxml = fread($fout, filesize($filename));
   //    $config['installedpackages']['freeswitchvars']['config'][0]['vars_xml'] = base64_encode($tmpxml);
@@ -925,7 +968,7 @@ function sync_package_v_vars()
   //}
   //else {
   //    /* found the dialplan in the pfsense config.xml save it to default.xml. */
-  //  	$fout = fopen("/usr/local/freeswitch/conf/vars.xml","w");
+  //  	$fout = fopen($v_conf_dir."/vars.xml","w");
   //    $tmpxml = $config['installedpackages']['freeswitchvars']['config'][0]['vars_xml'];
   //    fwrite($fout, base64_decode($tmpxml));
   //    fclose($fout);
@@ -942,57 +985,59 @@ function sync_package_v_vars()
 function sync_package_v_internal()
 {
 	global $config;
+	global $v_conf_dir;
 
-  if(strlen($config['installedpackages']['freeswitchinternal']['config'][0]['internal_xml']) == 0) {
-      /* internal_xml not found in the pfsense config.xml get the internal.xml and save to config.xml. */
-    	$filename = "/usr/local/freeswitch/conf/sip_profiles/internal.xml";
-      $fout = fopen($filename,"r");
-      $tmpxml = fread($fout, filesize($filename));
-      $config['installedpackages']['freeswitchinternal']['config'][0]['internal_xml'] = base64_encode($tmpxml);
-      unset($filename, $dialplan);
-      fclose($fout);
-  }
-  else {
-      /* found the internal_xml in the pfsense config.xml save it to internal.xml. */
-    	$fout = fopen("/usr/local/freeswitch/conf/sip_profiles/internal.xml","w");
-      $tmpxml = $config['installedpackages']['freeswitchinternal']['config'][0]['internal_xml'];
-      fwrite($fout, base64_decode($tmpxml));
-      fclose($fout);
-      unset($tmpxml);
-  }
+	if(strlen($config['installedpackages']['freeswitchinternal']['config'][0]['internal_xml']) == 0) {
+		/* internal_xml not found in the pfsense config.xml get the internal.xml and save to config.xml. */
+		$filename = $v_conf_dir."/sip_profiles/internal.xml";
+		$fout = fopen($filename,"r");
+		$tmpxml = fread($fout, filesize($filename));
+		$config['installedpackages']['freeswitchinternal']['config'][0]['internal_xml'] = base64_encode($tmpxml);
+		unset($filename, $dialplan);
+		fclose($fout);
+	}
+	else {
+		/* found the internal_xml in the pfsense config.xml save it to internal.xml. */
+		$fout = fopen($v_conf_dir."/sip_profiles/internal.xml","w");
+		$tmpxml = $config['installedpackages']['freeswitchinternal']['config'][0]['internal_xml'];
+		fwrite($fout, base64_decode($tmpxml));
+		fclose($fout);
+		unset($tmpxml);
+	}
 
-  $cmd = "api reloadxml";
-  //event_socket_request_cmd($cmd);
-  unset($cmd);
+	$cmd = "api reloadxml";
+	//event_socket_request_cmd($cmd);
+	unset($cmd);
 
 }
 
 
 function sync_package_v_external()
 {
-  global $config;
+	global $config;
+	global $v_conf_dir;
 
-  if(strlen($config['installedpackages']['freeswitchexternal']['config'][0]['external_xml']) == 0) {
-      /* external_xml not found in the pfsense config.xml get the external.xml and save to config.xml. */
-      $filename = "/usr/local/freeswitch/conf/sip_profiles/external.xml";
-      $fout = fopen($filename,"r");
-      $tmpxml = fread($fout, filesize($filename));
-      $config['installedpackages']['freeswitchexternal']['config'][0]['external_xml'] = base64_encode($tmpxml);
-      unset($filename, $dialplan);
-      fclose($fout);
-  }
-  else {
-      /* found the external_xml in the pfsense config.xml save it to external.xml. */
-      $fout = fopen("/usr/local/freeswitch/conf/sip_profiles/external.xml","w");
-      $tmpxml = $config['installedpackages']['freeswitchexternal']['config'][0]['external_xml'];
-      fwrite($fout, base64_decode($tmpxml));
-      fclose($fout);
-      unset($tmpxml);
-  }
+	if(strlen($config['installedpackages']['freeswitchexternal']['config'][0]['external_xml']) == 0) {
+		/* external_xml not found in the pfsense config.xml get the external.xml and save to config.xml. */
+		$filename = $v_conf_dir."/sip_profiles/external.xml";
+		$fout = fopen($filename,"r");
+		$tmpxml = fread($fout, filesize($filename));
+		$config['installedpackages']['freeswitchexternal']['config'][0]['external_xml'] = base64_encode($tmpxml);
+		unset($filename, $dialplan);
+		fclose($fout);
+	}
+	else {
+		/* found the external_xml in the pfsense config.xml save it to external.xml. */
+		$fout = fopen($v_conf_dir."/sip_profiles/external.xml","w");
+		$tmpxml = $config['installedpackages']['freeswitchexternal']['config'][0]['external_xml'];
+		fwrite($fout, base64_decode($tmpxml));
+		fclose($fout);
+		unset($tmpxml);
+	}
 
-  $cmd = "api reloadxml";
-  //event_socket_request_cmd($cmd);
-  unset($cmd);
+	$cmd = "api reloadxml";
+	//event_socket_request_cmd($cmd);
+	unset($cmd);
 
 }
 
@@ -1009,6 +1054,10 @@ function sync_package_v_hunt_group()
 
 			
 	global $config;
+	global $v_dir;	
+	global $v_conf_dir;
+	global $v_scripts_dir;
+	global $v_recordings_dir;
 	
 	//get the domain
 		$password = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_password'];
@@ -1349,7 +1398,7 @@ function sync_package_v_hunt_group()
 					$tmp .= " function get_sofia_contact(extension,domain_name, profile){\n";
 					$tmp .= "	if (profile == \"auto\") {\n";
 					$i = 0;
-					foreach (ListFiles('/usr/local/freeswitch/conf/sip_profiles') as $key=>$sip_profile_file){
+					foreach (ListFiles($v_conf_dir.'/sip_profiles') as $key=>$sip_profile_file){
 						$sip_profile_name = str_replace(".xml", "", $sip_profile_file);
 						if ($i == 0) {
 						  $tmp .= "			profile = \"".$sip_profile_name."\";\n";
@@ -1424,7 +1473,7 @@ function sync_package_v_hunt_group()
 							$tmp .= "  dtmf.digits = \"\";\n";
 							$tmp .= "  digitmaxlength = 6;\n";
 							$tmp .= "  session.execute(\"set\", \"playback_terminators=#\");\n";
-							$tmp .= "  session.streamFile( \"/usr/local/freeswitch/sounds/custom/8000/please_enter_the_pin_number.wav\", mycb, \"dtmf\");\n";
+							$tmp .= "  session.streamFile( \"".$v_dir."/sounds/custom/8000/please_enter_the_pin_number.wav\", mycb, \"dtmf\");\n";
 							$tmp .= "  session.collectInput( mycb, dtmf, timeoutpin );\n";
 							$tmp .= "\n";
 							$tmp .= "  if (dtmf.digits == pin || pin.length == 0) {\n";
@@ -1432,7 +1481,7 @@ function sync_package_v_hunt_group()
 							$tmp .= "  }\n";
 							$tmp .= "  else {\n";
 							$tmp .= "    console_log( \"info\", \"Pin: \" + dtmf.digits + \" is incorrect\\n\" );\n";
-							$tmp .= "    session.streamFile( \"/usr/local/freeswitch/sounds/custom/8000/your_pin_number_is_incorect_goodbye.wav\", mycb, \"dtmf\");\n";
+							$tmp .= "    session.streamFile( \"".$v_conf_dir."/sounds/custom/8000/your_pin_number_is_incorect_goodbye.wav\", mycb, \"dtmf\");\n";
 							$tmp .= "    session.hangup();\n";
 							$tmp .= "  }\n";
 							$tmp .= "}\n";
@@ -1447,7 +1496,7 @@ function sync_package_v_hunt_group()
 							$tmp .= "}";
 							$tmp .=	"\n";
 							$tmp .=	"var caller_announce = extension+\"_\"+Year+Month+Day+Hours+Mins+Seconds+\".wav\";\n";
-							$tmp .=	"session.streamFile( \"/usr/local/freeswitch/sounds/custom/8000/please_say_your_name_and_reason_for_calling.wav\");\n";
+							$tmp .=	"session.streamFile( \"".$v_dir."/sounds/custom/8000/please_say_your_name_and_reason_for_calling.wav\");\n";
 							$tmp .=	"session.execute(\"gentones\", \"%(1000, 0, 640)\");\n";
 							$tmp .=	"session.execute(\"set\", \"playback_terminators=#\");\n";
 							$tmp .=	"session.execute(\"record\", \"/tmp/\"+caller_announce+\" 180 200\");\n";
@@ -1671,7 +1720,7 @@ function sync_package_v_hunt_group()
 
 					if (strlen($rowhelper['huntgroupid']) > 0) {
 						$huntgroupfilename = "huntgroup_".str_replace(array("{", "}"), "", $rowhelper['huntgroupid']).".js";
-						$fout = fopen("/usr/local/freeswitch/scripts/".$huntgroupfilename,"w");
+						$fout = fopen($v_scripts_dir."/".$huntgroupfilename,"w");
 						fwrite($fout, $tmp);
 						unset($huntgroupfilename);
 						fclose($fout);
@@ -1688,6 +1737,13 @@ function sync_package_v_fax()
 {
 
 	global $config;
+	global $php_dir;
+	global $tmp_dir;
+	global $v_dir;	
+	global $v_conf_dir;
+	global $v_scripts_dir;
+	global $v_storage_dir;
+	global $v_web_dir;
 	
 	//loop through all faxes
 		$a_fax = &$config['installedpackages']['freeswitchfax']['config'];
@@ -1734,8 +1790,8 @@ function sync_package_v_fax()
 									$id = $i;
 									//echo "update".$i."<br />\n";
 									
-									if (file_exists("/usr/local/freeswitch/conf/dialplan/default/".$order."_".$extensionname.".xml")){
-										unlink("/usr/local/freeswitch/conf/dialplan/default/".$order."_".$extensionname.".xml");
+									if (file_exists($v_conf_dir."/dialplan/default/".$order."_".$extensionname.".xml")){
+										unlink($v_conf_dir."/dialplan/default/".$order."_".$extensionname.".xml");
 									}
 								}
 								$i++;
@@ -1802,26 +1858,26 @@ function sync_package_v_fax()
 								$a_dialplan_include_details[] = $ent;
 								unset($ent);
 
-								//<action application="rxfax" data="/usr/local/freeswitch/storage/fax/inbox/${last_fax}.tif"/>
+								//<action application="rxfax" data="$v_storage_dir/fax/inbox/${last_fax}.tif"/>
 								$ent = array();
 								$ent['dialplanincludeid'] = $faxid;
 								$ent['tag'] = 'action'; //condition, action, antiaction
 								$ent['fieldorder'] = '004';
 								$ent['fieldtype'] = 'rxfax';
-								$ent['fielddata'] = '/usr/local/freeswitch/storage/fax/'.$rowhelper['faxextension'].'/inbox/${last_fax}.tif';
+								$ent['fielddata'] = $v_storage_dir.'/fax/'.$rowhelper['faxextension'].'/inbox/${last_fax}.tif';
 								$a_dialplan_include_details[] = $ent;
 								unset($ent);
 
-								//<action application="system" data="/opt/freeswitch/scripts/emailfax.sh USER DOMAIN /usr/local/freeswitch/storage/fax/inbox/9872/${last_fax}.tif"/>
+								//<action application="system" data="$v_scripts_dir/emailfax.sh USER DOMAIN $v_storage_dir/fax/inbox/9872/${last_fax}.tif"/>
 								$ent = array();
 								$ent['dialplanincludeid'] = $faxid;
 								$ent['tag'] = 'action'; //condition, action, antiaction
 								$ent['fieldorder'] = '005';
 								$ent['fieldtype'] = 'system'; 
-								$ent['fielddata'] = '/usr/local/bin/php /usr/local/www/packages/freeswitch/fax_to_email.php email='.$rowhelper['faxemail'].' extension='.$rowhelper['faxextension'].' name=${last_fax} >> /tmp/fax.txt';
+								$ent['fielddata'] = $php_dir.' '.$v_web_dir.'/fax_to_email.php email='.$rowhelper['faxemail'].' extension='.$rowhelper['faxextension'].' name=${last_fax} >> '.$tmp_dir.'/fax.txt';
 								$a_dialplan_include_details[] = $ent;
 								unset($ent);
-								
+
 								//<action application="hangup"/>
 								$ent = array();
 								$ent['dialplanincludeid'] = $faxid;
@@ -1891,7 +1947,15 @@ function get_recording_filename($id)
 function sync_package_v_ivr()
 {
 
-  global $config;
+	global $config;
+	global $php_dir;
+	global $tmp_dir;
+	global $v_dir;	
+	global $v_conf_dir;
+	global $v_scripts_dir;
+	global $v_recordings_dir;
+	global $v_storage_dir;
+	global $v_web_dir;
 
   $a_ivr = &$config['installedpackages']['freeswitchivr']['config'];
   if (count($a_ivr) > 0) {
@@ -2107,11 +2171,11 @@ function sync_package_v_ivr()
 		$tmp .= "\n";
 		$tmp .= "//console_log( \"info\", \"IVR Server Time is: \"+Hours+\":\"+Mins+\" \\n\" );\n";
 		$tmp .= "\n";
-		
+
 		$tmp .= " function get_sofia_contact(extension,domain_name, profile){\n";
 		$tmp .= "	if (profile == \"auto\") {\n";
 		$i = 0;
-		foreach (ListFiles('/usr/local/freeswitch/conf/sip_profiles') as $key=>$sip_profile_file){
+		foreach (ListFiles($v_conf_dir.'/sip_profiles') as $key=>$sip_profile_file){
 			$sip_profile_name = str_replace(".xml", "", $sip_profile_file);
 			if ($i == 0) {
 			  $tmp .= "			profile = \"".$sip_profile_name."\";\n";
@@ -2239,8 +2303,8 @@ function sync_package_v_ivr()
       	    $tmp .= "\n";
       	    $tmp .= "         digitmaxlength = 1;\n";
       	    $tmp .= "         while (session.ready() && ! exit ) {\n";
-      	    $tmp .= "           //session.streamFile( \"C:/Program Files/FreeSWITCH/sounds/".$recording_action_filename."\", mycb, \"dtmf ".$rowhelper['ivrtimeout']."\" );\n";
-      	    $tmp .= "           session.streamFile( \"/usr/local/freeswitch/recordings/".$recording_action_filename."\", mycb, \"dtmf ".$rowhelper['ivrtimeout']."\" );\n";
+      	    $tmp .= "           //session.streamFile( \"".$v_dir."/sounds/".$recording_action_filename."\", mycb, \"dtmf ".$rowhelper['ivrtimeout']."\" );\n";
+      	    $tmp .= "           session.streamFile( \"".$v_recordings_dir."/".$recording_action_filename."\", mycb, \"dtmf ".$rowhelper['ivrtimeout']."\" );\n";
       	    $tmp .= "           if (session.ready()) {\n";
       	    $tmp .= "           	if (dtmf.digits.length == 0) {\n";
       	    $tmp .= "           		dtmf.digits +=  session.getDigits(1, \"#\", ".($rowhelper['ivrtimeout']*1000)."); // ".$rowhelper['ivrtimeout']." seconds\n";
@@ -2499,7 +2563,7 @@ function sync_package_v_ivr()
       	    $tmp .= "\n";
       	    $tmp .= "         digitmaxlength = 1;\n";
       	    $tmp .= "         while (session.ready() && ! exit ) {\n";
-      	    $tmp .= "           session.streamFile( \"/usr/local/freeswitch/recordings/".$recording_antiaction_filename."\", mycb, \"dtmf ".$rowhelper['ivrtimeout']."\" );\n";
+      	    $tmp .= "           session.streamFile( \"".$v_recordings_dir."/".$recording_antiaction_filename."\", mycb, \"dtmf ".$rowhelper['ivrtimeout']."\" );\n";
       	    $tmp .= "           if (session.ready()) {\n";
       	    $tmp .= "           	if (dtmf.digits.length == 0) {\n";
       	    $tmp .= "           		dtmf.digits +=  session.getDigits(1, \"#\", ".($rowhelper['ivrtimeout']*1000)."); // ".$rowhelper['ivrtimeout']." seconds\n";
@@ -2691,10 +2755,10 @@ function sync_package_v_ivr()
 	    } //antiactioncount
 	    unset($tmpactiondefault);
 	    unset($tmpantiactiondefault);
-	
+
 	    if (strlen($rowhelper['ivrid']) > 0) {
 		    $ivrfilename = "ivr_".str_replace(array("{", "}"), "", $rowhelper['ivrid']).".js";
-		  	$fout = fopen("/usr/local/freeswitch/scripts/".$ivrfilename,"w");
+		  	$fout = fopen($v_scripts_dir."/".$ivrfilename,"w");
 		    fwrite($fout, $tmp);
 		    unset($ivrfilename);
 		    fclose($fout);
@@ -2711,6 +2775,14 @@ function sync_package_v_dialplan_includes()
 {
 
 	global $config;
+	global $php_dir;
+	global $tmp_dir;
+	global $v_dir;	
+	global $v_conf_dir;
+	global $v_scripts_dir;
+	global $v_recordings_dir;
+	global $v_storage_dir;
+	global $v_web_dir;
 
 	$a_dialplan_includes          = &$config['installedpackages']['freeswitchdialplanincludes']['config'];
 	$a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];
@@ -2816,7 +2888,7 @@ function sync_package_v_dialplan_includes()
 
         if ($rowhelper['enabled'] == "true") {
             $dialplanincludefilename = $rowhelper['order']."_".$rowhelper['extensionname'].".xml";
-          	$fout = fopen("/usr/local/freeswitch/conf/dialplan/default/".$dialplanincludefilename,"w");
+          	$fout = fopen($v_conf_dir."/dialplan/default/".$dialplanincludefilename,"w");
             fwrite($fout, $tmp);
             fclose($fout);
         }
@@ -2833,7 +2905,11 @@ function sync_package_v_dialplan_includes()
 function sync_package_v_public_includes()
 {
 
-  global $config;
+	global $config;
+	global $php_dir;
+	global $tmp_dir;
+	global $v_dir;	
+	global $v_conf_dir;
 
   $a_public_includes          	= &$config['installedpackages']['freeswitchpublicincludes']['config'];
   $a_public_include_details 	= &$config['installedpackages']['freeswitchpublicincludedetails']['config'];
@@ -2940,7 +3016,7 @@ function sync_package_v_public_includes()
 	
 	    if ($rowhelper['enabled'] == "true") {
 	        $publicincludefilename = $rowhelper['order']."_".$rowhelper['extensionname'].".xml";
-	      	$fout = fopen("/usr/local/freeswitch/conf/dialplan/public/".$publicincludefilename,"w");
+	      	$fout = fopen($v_conf_dir."/dialplan/public/".$publicincludefilename,"w");
 	        fwrite($fout, $tmp);
 	        fclose($fout);
 	    }
@@ -2999,10 +3075,20 @@ function v_php_install_command()
 	config_lock();
 
 	global $config;
-		
-	$v_package_version = "0.9.7.5";
-	$v_build_version = "1.0.4";
-	$v_build_revision = "14306";
+	global $v_package_version;
+	global $v_build_version;
+	global $v_build_revision;
+	global $php_dir;
+	global $tmp_dir;
+	global $v_label;
+	global $v_name;
+	global $v_dir;
+	global $v_conf_dir;
+	global $v_scripts_dir;
+	global $v_recordings_dir;
+	global $v_storage_dir;
+	global $v_web_dir;
+	global $v_htdocs_dir;
 
 	//set script execution time limit to 24 hours
 	set_time_limit (86400);
@@ -3016,8 +3102,8 @@ function v_php_install_command()
 	   exec("mkdir /usr/local/www/packages/");
 	}
 
-	if (!is_dir('/usr/local/www/packages/freeswitch/')) {
-	   exec("mkdir /usr/local/www/packages/freeswitch/");
+	if (!is_dir($v_web_dir)) {
+	   exec("mkdir ".$v_web_dir);
 	}
 	
 	//$struname = exec('uname -v');
@@ -3032,13 +3118,13 @@ function v_php_install_command()
 	//exec("cd /tmp/;fetch ".$download_path."freeswitch.tgz"); //handled by freeswitch.xml
 	//exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
 	//unlink_if_exists("/tmp/freeswitch.tgz");
-
-	if (!is_dir('/usr/local/freeswitch/storage/fax/')) {
-	   exec("mkdir /usr/local/freeswitch/storage/fax/");
+	
+	if (!is_dir($v_storage_dir.'/fax/')) {
+	   exec("mkdir ".$v_storage_dir."/fax/");
 	}
 
-	if (!is_dir('/usr/local/freeswitch/storage/fax/receive/')) {
-	   exec("mkdir /usr/local/freeswitch/storage/fax/receive/");
+	if (!is_dir($v_storage_dir.'/fax/receive/')) {
+	   exec("mkdir ".$v_storage_dir."/fax/receive/");
 	}
 	
 	$static_output = 'Downloading Files';
@@ -3082,50 +3168,51 @@ function v_php_install_command()
 
 
 	//download the dialplan default.xml
-	chdir('/tmp/');
-	exec("cd /tmp/;fetch ".$download_path."dialplan.default.xml");
-	exec("cp /tmp/dialplan.default.xml /usr/local/freeswitch/conf/dialplan/default.xml");
-	unlink_if_exists("/tmp/dialplan.default.xml");
+	chdir($tmp_dir.'/');
+	exec("cd ".$tmp_dir."/;fetch ".$download_path."dialplan.default.xml");
+	exec("cp ".$tmp_dir."/dialplan.default.xml ".$v_conf_dir."/dialplan/default.xml");
+	unlink_if_exists($tmp_dir."/dialplan.default.xml");
 	
 	//download the dialplan public.xml
-	chdir('/tmp/');
-	exec("cd /tmp/;fetch ".$download_path."dialplan.public.xml");
-	exec("cp /tmp/dialplan.public.xml /usr/local/freeswitch/conf/dialplan/public.xml");
-	unlink_if_exists("/tmp/dialplan.public.xml");
+	chdir($tmp_dir.'/');
+	exec("cd ".$tmp_dir."/;fetch ".$download_path."dialplan.public.xml");
+	exec("cp ".$tmp_dir."/dialplan.public.xml ".$v_conf_dir."/dialplan/public.xml");
+	unlink_if_exists($tmp_dir."/dialplan.public.xml");
 	
 	//make a backup copy of the default config used with the 'Restore Default' buttons on the text areas.
-	exec("cp -R /usr/local/freeswitch/conf /usr/local/freeswitch/conf.orig");
+	exec("cp -R ".$v_conf_dir." ".$v_conf_dir.".orig");
 	
 	//remove some default config files that are not needed
-	unlink_if_exists("/usr/local/freeswitch/conf/dialplan/default/01_example.com.xml");
-	unlink_if_exists("/usr/local/freeswitch/conf/dialplan/public/00_inbound_did.xml");	
+	unlink_if_exists($v_conf_dir."/dialplan/default/01_example.com.xml");
+	unlink_if_exists($v_conf_dir."/dialplan/public/00_inbound_did.xml");	
 
-	if (!is_dir('/usr/local/freeswitch/sounds/custom/')) {
-	   exec("mkdir /usr/local/freeswitch/sounds/custom/");
+	if (!is_dir($v_dir.'/sounds/custom/')) {
+	   exec("mkdir ".$v_dir."/sounds/custom/");
 	}
 
-	if (!is_dir('/usr/local/freeswitch/sounds/custom/8000/')) {
-	   exec("mkdir /usr/local/freeswitch/sounds/custom/8000/");
+	if (!is_dir($v_dir.'/sounds/custom/8000/')) {
+	   exec("mkdir ".$v_dir."/sounds/custom/8000/");
 	}
 	
 	$static_output = 'Downloading Audio Files';
 	update_output_window($static_output);
 	
 	//copy audio files
-	chdir('/usr/local/freeswitch/sounds/custom/8000/');
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_your_pin_number.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_the_pin_number.wav");	
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_the_extension_number.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_enter_the_phone_number.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."call_forward_has_been_set.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."call_forward_has_been_deleted.wav");	
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."begin_recording.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."your_pin_number_is_incorect_goodbye.wav");	
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."please_say_your_name_and_reason_for_calling.wav");
-	exec("cd /usr/local/freeswitch/sounds/custom/8000/;fetch ".$download_path."press_1_to_accept_2_to_reject_or_3_for_voicemail.wav");
-	
+	chdir($v_dir.'/sounds/custom/8000/');
+	exec("cd ".$v_dir."/sounds/custom/8000/;fetch ".$download_path."please_enter_your_pin_number.wav");
+	exec("cd ".$v_dir."/sounds/custom/8000/;fetch ".$download_path."please_enter_the_pin_number.wav");	
+	exec("cd ".$v_dir."/sounds/custom/8000/;fetch ".$download_path."please_enter_the_extension_number.wav");
+	exec("cd ".$v_dir."/sounds/custom/8000/;fetch ".$download_path."please_enter_the_phone_number.wav");
+	exec("cd ".$v_dir."/sounds/custom/8000/;fetch ".$download_path."call_forward_has_been_set.wav");
+	exec("cd ".$v_dir."/sounds/custom/8000/;fetch ".$download_path."call_forward_has_been_deleted.wav");	
+	exec("cd ".$v_dir."/sounds/custom/8000/;fetch ".$download_path."begin_recording.wav");
+	exec("cd ".$v_dir."/sounds/custom/8000/;fetch ".$download_path."your_pin_number_is_incorect_goodbye.wav");	
+	exec("cd ".$v_dir."/sounds/custom/8000/;fetch ".$download_path."please_say_your_name_and_reason_for_calling.wav");
+	exec("cd ".$v_dir."/sounds/custom/8000/;fetch ".$download_path."press_1_to_accept_2_to_reject_or_3_for_voicemail.wav");
+
+
 	//mod_fax
-	//chdir('/usr/local/freeswitch/mod/');
+	//chdir($v_mod_dir.'/mod/');
 	//exec("fetch ".$download_path."mod_fax.so");
 	
 	//download lib files
@@ -3153,189 +3240,190 @@ function v_php_install_command()
 		system('cd /usr/local/www; tar xvpfz /tmp/edit_area.tgz edit_area');
 		unlink_if_exists("/tmp/edit_area.tgz");
 	}
-	
+
 	
 	//rename PHP files from .tmp to .php
-	chdir('/tmp/');
-	exec("cd /tmp/;fetch ".$download_path."index.tmp");
-	exec("cp /tmp/index.tmp /usr/local/www/packages/freeswitch/index.php");
-	unlink_if_exists("/tmp/index.tmp");
+	chdir($tmp_dir.'/');
+	exec("fetch ".$download_path."index.tmp");
+	exec("cp ".$tmp_dir."/index.tmp ".$v_web_dir."/index.php");
+	unlink_if_exists($tmp_dir."/index.tmp");
 	
-	exec("cd /tmp/;fetch ".$download_path."class.smtp.tmp");
-	exec("cp /tmp/class.smtp.tmp /usr/local/www/packages/freeswitch/class.smtp.php");
-	unlink_if_exists("/tmp/class.smtp.tmp");
+	exec("fetch ".$download_path."class.smtp.tmp");
+	exec("cp ".$tmp_dir."/class.smtp.tmp ".$v_web_dir."/class.smtp.php");
+	unlink_if_exists($tmp_dir."/class.smtp.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."class.phpmailer.tmp");
-	exec("cp /tmp/class.phpmailer.tmp /usr/local/www/packages/freeswitch/class.phpmailer.php");
-	unlink_if_exists("/tmp/class.phpmailer.tmp");
+	exec("fetch ".$download_path."class.phpmailer.tmp");
+	exec("cp ".$tmp_dir."/class.phpmailer.tmp ".$v_web_dir."/class.phpmailer.php");
+	unlink_if_exists($tmp_dir."/class.phpmailer.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_cmd.tmp");	
-	exec("cp /tmp/v_cmd.tmp /usr/local/www/packages/freeswitch/v_cmd.php");
-	unlink_if_exists("/tmp/v_cmd.tmp");
+	exec("fetch ".$download_path."v_cmd.tmp");	
+	exec("cp ".$tmp_dir."/v_cmd.tmp ".$v_web_dir."/v_cmd.php");
+	unlink_if_exists($tmp_dir."/v_cmd.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_dialplan.tmp");	
-	exec("cp /tmp/v_dialplan.tmp /usr/local/www/packages/freeswitch/v_dialplan.php");
-	unlink_if_exists("/tmp/v_dialplan.tmp");
+	exec("fetch ".$download_path."v_dialplan.tmp");	
+	exec("cp ".$tmp_dir."/v_dialplan.tmp ".$v_web_dir."/v_dialplan.php");
+	unlink_if_exists($tmp_dir."/v_dialplan.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_dialplan_includes_details.tmp");	
-	exec("cp /tmp/v_dialplan_includes_details.tmp /usr/local/www/packages/freeswitch/v_dialplan_includes_details.php");
-	unlink_if_exists("/tmp/v_dialplan_includes_details.tmp");
+	exec("fetch ".$download_path."v_dialplan_includes_details.tmp");	
+	exec("cp ".$tmp_dir."/v_dialplan_includes_details.tmp ".$v_web_dir."/v_dialplan_includes_details.php");
+	unlink_if_exists($tmp_dir."/v_dialplan_includes_details.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_dialplan_includes_details_edit.tmp");
-	exec("cp /tmp/v_dialplan_includes_details_edit.tmp /usr/local/www/packages/freeswitch/v_dialplan_includes_details_edit.php");
-	unlink_if_exists("/tmp/v_dialplan_includes_details_edit.tmp");
+	exec("fetch ".$download_path."v_dialplan_includes_details_edit.tmp");
+	exec("cp ".$tmp_dir."/v_dialplan_includes_details_edit.tmp ".$v_web_dir."/v_dialplan_includes_details_edit.php");
+	unlink_if_exists($tmp_dir."/v_dialplan_includes_details_edit.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_dialplan_includes.tmp");
-	exec("cp /tmp/v_dialplan_includes.tmp /usr/local/www/packages/freeswitch/v_dialplan_includes.php");
-	unlink_if_exists("/tmp/v_dialplan_includes.tmp");
+	exec("fetch ".$download_path."v_dialplan_includes.tmp");
+	exec("cp ".$tmp_dir."/v_dialplan_includes.tmp ".$v_web_dir."/v_dialplan_includes.php");
+	unlink_if_exists($tmp_dir."/v_dialplan_includes.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_dialplan_includes_edit.tmp");	
-	exec("cp /tmp/v_dialplan_includes_edit.tmp /usr/local/www/packages/freeswitch/v_dialplan_includes_edit.php");
-	unlink_if_exists("/tmp/v_dialplan_includes_edit.tmp");
+	exec("fetch ".$download_path."v_dialplan_includes_edit.tmp");	
+	exec("cp ".$tmp_dir."/v_dialplan_includes_edit.tmp ".$v_web_dir."/v_dialplan_includes_edit.php");
+	unlink_if_exists($tmp_dir."/v_dialplan_includes_edit.tmp");
 	
-	exec("cd /tmp/;fetch ".$download_path."v_extensions.tmp");
-	exec("cp /tmp/v_extensions.tmp /usr/local/www/packages/freeswitch/v_extensions.php");
-	unlink_if_exists("/tmp/v_extensions.tmp");
+	exec("fetch ".$download_path."v_extensions.tmp");
+	exec("cp ".$tmp_dir."/v_extensions.tmp ".$v_web_dir."/v_extensions.php");
+	unlink_if_exists($tmp_dir."/v_extensions.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_extensions_edit.tmp");
-	exec("cp /tmp/v_extensions_edit.tmp /usr/local/www/packages/freeswitch/v_extensions_edit.php");
-	unlink_if_exists("/tmp/v_extensions_edit.tmp");
+	exec("fetch ".$download_path."v_extensions_edit.tmp");
+	exec("cp ".$tmp_dir."/v_extensions_edit.tmp ".$v_web_dir."/v_extensions_edit.php");
+	unlink_if_exists($tmp_dir."/v_extensions_edit.tmp");
 	
-	exec("cd /tmp/;fetch ".$download_path."v_fax.tmp");
-	exec("cp /tmp/v_fax.tmp /usr/local/www/packages/freeswitch/v_fax.php");
-	unlink_if_exists("/tmp/v_fax.tmp");
+	exec("fetch ".$download_path."v_fax.tmp");
+	exec("cp ".$tmp_dir."/v_fax.tmp ".$v_web_dir."/v_fax.php");
+	unlink_if_exists($tmp_dir."/v_fax.tmp");
 
 	exec("cd /tmp/;fetch ".$download_path."v_fax_edit.tmp");
-	exec("cp /tmp/v_fax_edit.tmp /usr/local/www/packages/freeswitch/v_fax_edit.php");
+	exec("cp ".$tmp_dir."/v_fax_edit.tmp ".$v_web_dir."/v_fax_edit.php");
 	unlink_if_exists("/tmp/v_fax_edit.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."fax_to_email.tmp");
-	exec("cp /tmp/fax_to_email.tmp /usr/local/www/packages/freeswitch/fax_to_email.php");
-	unlink_if_exists("/tmp/fax_to_email.tmp");
+	exec("fetch ".$download_path."fax_to_email.tmp");
+	exec("cp ".$tmp_dir."/fax_to_email.tmp ".$v_web_dir."/fax_to_email.php");
+	unlink_if_exists($tmp_dir."/fax_to_email.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_features.tmp");
-	exec("cp /tmp/v_features.tmp /usr/local/www/packages/freeswitch/v_features.php");
-	unlink_if_exists("/tmp/v_features.tmp");	
+	exec("fetch ".$download_path."v_features.tmp");
+	exec("cp ".$tmp_dir."/v_features.tmp ".$v_web_dir."/v_features.php");
+	unlink_if_exists($tmp_dir."/v_features.tmp");	
 
-	exec("cd /tmp/;fetch ".$download_path."v_gateways.tmp");
-	exec("cp /tmp/v_gateways.tmp /usr/local/www/packages/freeswitch/v_gateways.php");
-	unlink_if_exists("/tmp/v_gateways.tmp");
+	exec("fetch ".$download_path."v_gateways.tmp");
+	exec("cp ".$tmp_dir."/v_gateways.tmp ".$v_web_dir."/v_gateways.php");
+	unlink_if_exists($tmp_dir."/v_gateways.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_gateways_edit.tmp");
-	exec("cp /tmp/v_gateways_edit.tmp /usr/local/www/packages/freeswitch/v_gateways_edit.php");
-	unlink_if_exists("/tmp/v_gateways_edit.tmp");
+	exec("fetch ".$download_path."v_gateways_edit.tmp");
+	exec("cp ".$tmp_dir."/v_gateways_edit.tmp ".$v_web_dir."/v_gateways_edit.php");
+	unlink_if_exists($tmp_dir."/v_gateways_edit.tmp");
 	
-	exec("cd /tmp/;fetch ".$download_path."v_hunt_group.tmp");
-	exec("cp /tmp/v_hunt_group.tmp /usr/local/www/packages/freeswitch/v_hunt_group.php");
-	unlink_if_exists("/tmp/v_hunt_group.tmp");
+	exec("fetch ".$download_path."v_hunt_group.tmp");
+	exec("cp ".$tmp_dir."/v_hunt_group.tmp ".$v_web_dir."/v_hunt_group.php");
+	unlink_if_exists($tmp_dir."/v_hunt_group.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_hunt_group_edit.tmp");
-	exec("cp /tmp/v_hunt_group_edit.tmp /usr/local/www/packages/freeswitch/v_hunt_group_edit.php");
-	unlink_if_exists("/tmp/v_hunt_group_edit.tmp");
+	exec("fetch ".$download_path."v_hunt_group_edit.tmp");
+	exec("cp ".$tmp_dir."/v_hunt_group_edit.tmp ".$v_web_dir."/v_hunt_group_edit.php");
+	unlink_if_exists($tmp_dir."/v_hunt_group_edit.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_hunt_group_destinations.tmp");
-	exec("cp /tmp/v_hunt_group_destinations.tmp /usr/local/www/packages/freeswitch/v_hunt_group_destinations.php");
-	unlink_if_exists("/tmp/v_hunt_group_destinations.tmp");
+	exec("fetch ".$download_path."v_hunt_group_destinations.tmp");
+	exec("cp ".$tmp_dir."/v_hunt_group_destinations.tmp ".$v_web_dir."/v_hunt_group_destinations.php");
+	unlink_if_exists($tmp_dir."/v_hunt_group_destinations.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_hunt_group_destinations_edit.tmp");
-	exec("cp /tmp/v_hunt_group_destinations_edit.tmp /usr/local/www/packages/freeswitch/v_hunt_group_destinations_edit.php");
-	unlink_if_exists("/tmp/v_hunt_group_destinations_edit.tmp");
+	exec("fetch ".$download_path."v_hunt_group_destinations_edit.tmp");
+	exec("cp ".$tmp_dir."/v_hunt_group_destinations_edit.tmp ".$v_web_dir."/v_hunt_group_destinations_edit.php");
+	unlink_if_exists($tmp_dir."/v_hunt_group_destinations_edit.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_ivr.tmp");	
-	exec("cp /tmp/v_ivr.tmp /usr/local/www/packages/freeswitch/v_ivr.php");
-	unlink_if_exists("/tmp/v_ivr.tmp");
+	exec("fetch ".$download_path."v_ivr.tmp");	
+	exec("cp ".$tmp_dir."/v_ivr.tmp ".$v_web_dir."/v_ivr.php");
+	unlink_if_exists($tmp_dir."/v_ivr.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_ivr_edit.tmp");
-	exec("cp /tmp/v_ivr_edit.tmp /usr/local/www/packages/freeswitch/v_ivr_edit.php");
-	unlink_if_exists("/tmp/v_ivr_edit.tmp");
+	exec("fetch ".$download_path."v_ivr_edit.tmp");
+	exec("cp ".$tmp_dir."/v_ivr_edit.tmp ".$v_web_dir."/v_ivr_edit.php");
+	unlink_if_exists($tmp_dir."/v_ivr_edit.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_ivr_options.tmp");
-	exec("cp /tmp/v_ivr_options.tmp /usr/local/www/packages/freeswitch/v_ivr_options.php");
-	unlink_if_exists("/tmp/v_ivr_options.tmp");
+	exec("fetch ".$download_path."v_ivr_options.tmp");
+	exec("cp ".$tmp_dir."/v_ivr_options.tmp ".$v_web_dir."/v_ivr_options.php");
+	unlink_if_exists($tmp_dir."/v_ivr_options.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_ivr_options_edit.tmp");
-	exec("cp /tmp/v_ivr_options_edit.tmp /usr/local/www/packages/freeswitch/v_ivr_options_edit.php");
-	unlink_if_exists("/tmp/v_ivr_options_edit.tmp");
+	exec("fetch ".$download_path."v_ivr_options_edit.tmp");
+	exec("cp ".$tmp_dir."/v_ivr_options_edit.tmp ".$v_web_dir."/v_ivr_options_edit.php");
+	unlink_if_exists($tmp_dir."/v_ivr_options_edit.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_profiles.tmp");
-	exec("cp /tmp/v_profiles.tmp /usr/local/www/packages/freeswitch/v_profiles.php");
-	unlink_if_exists("/tmp/v_profiles.tmp");
+	exec("fetch ".$download_path."v_profiles.tmp");
+	exec("cp ".$tmp_dir."/v_profiles.tmp ".$v_web_dir."/v_profiles.php");
+	unlink_if_exists($tmp_dir."/v_profiles.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_profile_edit.tmp");
-	exec("cp /tmp/v_profile_edit.tmp /usr/local/www/packages/freeswitch/v_profile_edit.php");
-	unlink_if_exists("/tmp/v_profile_edit.tmp");
+	exec("fetch ".$download_path."v_profile_edit.tmp");
+	exec("cp ".$tmp_dir."/v_profile_edit.tmp ".$v_web_dir."/v_profile_edit.php");
+	unlink_if_exists($tmp_dir."/v_profile_edit.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_public.tmp");
-	exec("cp /tmp/v_public.tmp /usr/local/www/packages/freeswitch/v_public.php");
-	unlink_if_exists("/tmp/v_public.tmp");
+	exec("fetch ".$download_path."v_public.tmp");
+	exec("cp ".$tmp_dir."/v_public.tmp ".$v_web_dir."/v_public.php");
+	unlink_if_exists($tmp_dir."/v_public.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_public_includes.tmp");
-	exec("cp /tmp/v_public_includes.tmp /usr/local/www/packages/freeswitch/v_public_includes.php");
-	unlink_if_exists("/tmp/v_public_includes.tmp");
+	exec("fetch ".$download_path."v_public_includes.tmp");
+	exec("cp ".$tmp_dir."/v_public_includes.tmp ".$v_web_dir."/v_public_includes.php");
+	unlink_if_exists($tmp_dir."/v_public_includes.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_public_includes_edit.tmp");    	
-	exec("cp /tmp/v_public_includes_edit.tmp /usr/local/www/packages/freeswitch/v_public_includes_edit.php");
-	unlink_if_exists("/tmp/v_public_includes_edit.tmp");
+	exec("fetch ".$download_path."v_public_includes_edit.tmp");    	
+	exec("cp ".$tmp_dir."/v_public_includes_edit.tmp ".$v_web_dir."/v_public_includes_edit.php");
+	unlink_if_exists($tmp_dir."/v_public_includes_edit.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_public_includes_details.tmp");
-	exec("cp /tmp/v_public_includes_details.tmp /usr/local/www/packages/freeswitch/v_public_includes_details.php");
-	unlink_if_exists("/tmp/v_public_includes_details.tmp");
+	exec("fetch ".$download_path."v_public_includes_details.tmp");
+	exec("cp ".$tmp_dir."/v_public_includes_details.tmp ".$v_web_dir."/v_public_includes_details.php");
+	unlink_if_exists($tmp_dir."/v_public_includes_details.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_public_includes_details_edit.tmp");
-	exec("cp /tmp/v_public_includes_details_edit.tmp /usr/local/www/packages/freeswitch/v_public_includes_details_edit.php");
-	unlink_if_exists("/tmp/v_public_includes_details_edit.tmp");
+	exec("fetch ".$download_path."v_public_includes_details_edit.tmp");
+	exec("cp ".$tmp_dir."/v_public_includes_details_edit.tmp ".$v_web_dir."/v_public_includes_details_edit.php");
+	unlink_if_exists($tmp_dir."/v_public_includes_details_edit.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_mailto.tmp");
-	exec("cp /tmp/v_mailto.tmp /usr/local/www/packages/freeswitch/v_mailto.php");
-	unlink_if_exists("/tmp/v_mailto.tmp");
+	exec("fetch ".$download_path."v_mailto.tmp");
+	exec("cp ".$tmp_dir."/v_mailto.tmp ".$v_web_dir."/v_mailto.php");
+	unlink_if_exists($tmp_dir."/v_mailto.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_modules.tmp");
-	exec("cp /tmp/v_modules.tmp /usr/local/www/packages/freeswitch/v_modules.php");
-	unlink_if_exists("/tmp/v_modules.tmp");
+	exec("fetch ".$download_path."v_modules.tmp");
+	exec("cp ".$tmp_dir."/v_modules.tmp ".$v_web_dir."/v_modules.php");
+	unlink_if_exists($tmp_dir."/v_modules.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_recordings.tmp");
-	exec("cp /tmp/v_recordings.tmp /usr/local/www/packages/freeswitch/v_recordings.php");
-	unlink_if_exists("/tmp/v_recordings.tmp");
+	exec("fetch ".$download_path."v_recordings.tmp");
+	exec("cp ".$tmp_dir."/v_recordings.tmp ".$v_web_dir."/v_recordings.php");
+	unlink_if_exists($tmp_dir."/v_recordings.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_recordings_edit.tmp");	
-	exec("cp /tmp/v_recordings_edit.tmp /usr/local/www/packages/freeswitch/v_recordings_edit.php");
-	unlink_if_exists("/tmp/v_recordings_edit.tmp");
+	exec("fetch ".$download_path."v_recordings_edit.tmp");	
+	exec("cp ".$tmp_dir."/v_recordings_edit.tmp ".$v_web_dir."/v_recordings_edit.php");
+	unlink_if_exists($tmp_dir."/v_recordings_edit.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_recordings_play.tmp");
-	exec("cp /tmp/v_recordings_play.tmp /usr/local/www/packages/freeswitch/v_recordings_play.php");
-	unlink_if_exists("/tmp/v_recordings_play.tmp");
+	exec("fetch ".$download_path."v_recordings_play.tmp");
+	exec("cp ".$tmp_dir."/v_recordings_play.tmp ".$v_web_dir."/v_recordings_play.php");
+	unlink_if_exists($tmp_dir."/v_recordings_play.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_settings.tmp");
-	exec("cp /tmp/v_settings.tmp /usr/local/www/packages/freeswitch/v_settings.php");
-	unlink_if_exists("/tmp/v_settings.tmp");
+	exec("fetch ".$download_path."v_settings.tmp");
+	exec("cp ".$tmp_dir."/v_settings.tmp ".$v_web_dir."/v_settings.php");
+	unlink_if_exists($tmp_dir."/v_settings.tmp");
 	
-	exec("cd /tmp/;fetch ".$download_path."v_status.tmp");
-	exec("cp /tmp/v_status.tmp /usr/local/www/packages/freeswitch/v_status.php");
-	unlink_if_exists("/tmp/v_status.tmp");
+	exec("fetch ".$download_path."v_status.tmp");
+	exec("cp ".$tmp_dir."/v_status.tmp ".$v_web_dir."/v_status.php");
+	unlink_if_exists($tmp_dir."/v_status.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_time_conditions.tmp");
-	exec("cp /tmp/v_time_conditions.tmp /usr/local/www/packages/freeswitch/v_time_conditions.php");
-	unlink_if_exists("/tmp/v_time_conditions.tmp");
+	exec("fetch ".$download_path."v_time_conditions.tmp");
+	exec("cp ".$tmp_dir."/v_time_conditions.tmp ".$v_web_dir."/v_time_conditions.php");
+	unlink_if_exists($tmp_dir."/v_time_conditions.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_time_conditions_edit.tmp");
-	exec("cp /tmp/v_time_conditions_edit.tmp /usr/local/www/packages/freeswitch/v_time_conditions_edit.php");
-	unlink_if_exists("/tmp/v_time_conditions_edit.tmp");
+	exec("fetch ".$download_path."v_time_conditions_edit.tmp");
+	exec("cp ".$tmp_dir."/v_time_conditions_edit.tmp ".$v_web_dir."/v_time_conditions_edit.php");
+	unlink_if_exists($tmp_dir."/v_time_conditions_edit.tmp");
 
-	exec("cd /tmp/;fetch ".$download_path."v_vars.tmp");
-	exec("cp /tmp/v_vars.tmp /usr/local/www/packages/freeswitch/v_vars.php");
-	unlink_if_exists("/tmp/v_vars.tmp");
+	exec("fetch ".$download_path."v_vars.tmp");
+	exec("cp ".$tmp_dir."/v_vars.tmp ".$v_web_dir."/v_vars.php");
+	unlink_if_exists($tmp_dir."/v_vars.tmp");
 
-	chdir('/usr/local/freeswitch/scripts/');
-	exec("cd /usr/local/freeswitch/scripts/;fetch ".$download_path."disa.js");
-	exec("cd /usr/local/freeswitch/scripts/;fetch ".$download_path."originate.js");
-	exec("cp /usr/local/freeswitch/htdocs/slim.swf /usr/local/www/packages/freeswitch/slim.swf");
+	
+	chdir($v_scripts_dir);
+	exec("fetch ".$download_path."disa.js");
+	exec("fetch ".$download_path."originate.js");
+	exec("cp ".$v_htdocs_dir."/slim.swf ".$v_web_dir."/slim.swf");
 
   /* freeswitch settings defaults */
   	if (strlen($config['installedpackages']['freeswitchsettings']['config'][0]['numbering_plan']) == 0) {
   	   $config['installedpackages']['freeswitchsettings']['config'][0]['numbering_plan'] = "US";
   	}
     if(strlen($config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_password']) == 0) {
-  	   $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_password'] = "ClueCon";
+  	   $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_password'] = "7e4d3i";
   	}
   	if (strlen($config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_port']) == 0) {
   	   $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_port'] = "8021";
@@ -3344,13 +3432,13 @@ function v_php_install_command()
   	   $config['installedpackages']['freeswitchsettings']['config'][0]['xml_rpc_http_port'] = "8787";
   	}
   	if (strlen($config['installedpackages']['freeswitchsettings']['config'][0]['xml_rpc_auth_realm']) == 0) {
-  	   $config['installedpackages']['freeswitchsettings']['config'][0]['xml_rpc_auth_realm'] = "freeswitch";
+  	   $config['installedpackages']['freeswitchsettings']['config'][0]['xml_rpc_auth_realm'] = $v_name;
   	}
   	if (strlen($config['installedpackages']['freeswitchsettings']['config'][0]['xml_rpc_auth_user']) == 0) {
-  	   $config['installedpackages']['freeswitchsettings']['config'][0]['xml_rpc_auth_user'] = "freeswitch";
+  	   $config['installedpackages']['freeswitchsettings']['config'][0]['xml_rpc_auth_user'] = "xmlrpc"; 
   	}
   	if (strlen($config['installedpackages']['freeswitchsettings']['config'][0]['xml_rpc_auth_pass']) == 0) {
-  	   $config['installedpackages']['freeswitchsettings']['config'][0]['xml_rpc_auth_pass'] = "works";
+  	   $config['installedpackages']['freeswitchsettings']['config'][0]['xml_rpc_auth_pass'] = "7e4d3i";
   	}
   	if (strlen($config['installedpackages']['freeswitchsettings']['config'][0]['admin_pin']) == 0) {
   	   $config['installedpackages']['freeswitchsettings']['config'][0]['admin_pin'] = "7575";
@@ -3476,23 +3564,23 @@ function v_php_install_command()
 		unset($ent);
 
 	write_config();	
-    		
+
 	//prepare switch.conf.xml for voicemail to email
-		$filename = "/usr/local/freeswitch/conf/autoload_configs/switch.conf.xml";
+		$filename = $v_conf_dir."/autoload_configs/switch.conf.xml";
 		$handle = fopen($filename,"rb");
 		$contents = fread($handle, filesize($filename));	
 		fclose($handle);
 		
 		$handle = fopen($filename,"w");
-		$contents = str_replace("<param name=\"mailer-app\" value=\"sendmail\"/>", "<param name=\"mailer-app\" value=\"/usr/local/bin/php\"/>", $contents);
-		$contents = str_replace("<param name=\"mailer-app-args\" value=\"-t\"/>", "<param name=\"mailer-app-args\" value=\"/usr/local/www/packages/freeswitch/v_mailto.php\"/>", $contents);
+		$contents = str_replace("<param name=\"mailer-app\" value=\"sendmail\"/>", "<param name=\"mailer-app\" value=\"".$php_dir."\"/>", $contents);
+		$contents = str_replace("<param name=\"mailer-app-args\" value=\"-t\"/>", "<param name=\"mailer-app-args\" value=\"".$v_web_dir."/v_mailto.php\"/>", $contents);
 		fwrite($handle, $contents);		
 		unset($contents); 	
 		fclose($handle);
 		unset($filename);
 	
 	//prepare shout.conf.xml for mod_shout	
-		$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/shout.conf.xml","w");
+		$fout = fopen($v_conf_dir."/autoload_configs/shout.conf.xml","w");
 		$tmpxml = "<configuration name=\"shout.conf\" description=\"mod shout config\">\n";
 		$tmpxml .= "  <settings>\n";
 		$tmpxml .= "    <!-- Don't change these unless you are insane -->\n";
@@ -3505,7 +3593,7 @@ function v_php_install_command()
 		unset($tmpxml);
 		fclose($fout);
 	
-	$fout = fopen("/usr/local/freeswitch/conf/autoload_configs/event_socket.conf.xml","w");
+	$fout = fopen($v_conf_dir."/autoload_configs/event_socket.conf.xml","w");
 	$tmpxml = "<configuration name=\"event_socket.conf\" description=\"Socket Client\">\n";
 	$tmpxml .= "  <settings>\n";
 	$tmpxml .= "    <param name=\"listen-ip\" value=\"". $config['interfaces']['lan']['ipaddr'] ."\"/>\n";
@@ -3728,55 +3816,56 @@ function v_php_install_command()
   	   $config['installedpackages']['freeswitchmodules']['config'][0]['mod_say_zh'] = "disable";
   	}
 	
+	
 	//create the backup directory
-		if (!is_dir('/root/backup/')) {		
-			exec("mkdir /root/backup/");
+		if (!is_dir($v_backup_dir.'/')) {		
+			exec("mkdir ".$v_backup_dir."/");
 		}
 	
-	//extract a specific directory to /usr/local/freeswitch
-		$filename = 'freeswitch.bak.tgz';
-		if (file_exists('/root/backup/'.$filename)) {
+	//extract a specific directory
+		$filename = $v_name.'.bak.tgz';
+		if (file_exists($v_backup_dir.$filename)) {
 			$static_output = 'Restore the Backup';
 			update_output_window($static_output);
 	
 			//echo "The file $filename exists";
 	
-			exec("rm -R /usr/local/freeswitch/conf/sip_profiles/");
-			exec("rm -R /usr/local/freeswitch/sounds/music/");
+			exec("rm -R ".$v_conf_dir."/sip_profiles/");
+			exec("rm -R ".$v_dir."/sounds/music/");
 			
 			//Recommended
-			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/db/');
-			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/log/');
-			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/recordings/');
-			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/scripts/');
-			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/storage/');
-			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/sounds/custom/8000/');
-			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/sounds/music/8000/');
-			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/ssl/');
-			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/sip_profiles/');
-			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/vars.xml');
-			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/dialplan/default.xml');
-			system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/dialplan/public.xml');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/db/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/log/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/recordings/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/scripts/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/storage/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/sounds/custom/8000/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/sounds/music/8000/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/ssl/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/sip_profiles/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/vars.xml');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/dialplan/default.xml');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/dialplan/public.xml');
 
 			//Optional
-			//system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/conf/');
-			//system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/grammar/');
-			//system('cd /usr/local; tar xvpfz /root/backup/'.$filename.' freeswitch/htdocs/');
+			//system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/');
+			//system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/grammar/');
+			//system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/htdocs/');
 
 			unset($filename);
 		}
 
 
 	exec("rm -R /freeswitch");
-	exec("cp /usr/local/freeswitch/conf/directory/default/brian.xml /usr/local/freeswitch/conf/directory/default/brian.xml.noload");
-	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/brian.xml");
-	unlink_if_exists("/usr/local/freeswitch/conf/directory/default/example.com.xml");
-	unlink_if_exists("/usr/local/freeswitch/conf/dialplan/default/99999_enum.xml");
+	exec("cp ".$v_conf_dir."/directory/default/brian.xml ".$v_conf_dir."/directory/default/brian.xml.noload");
+	unlink_if_exists($v_conf_dir."/directory/default/brian.xml");
+	unlink_if_exists($v_conf_dir."/directory/default/example.com.xml");
+	unlink_if_exists($v_conf_dir."/dialplan/default/99999_enum.xml");
 		
 	write_rcfile(array(
-		"file" => "freeswitch.sh",
-		"start" => "/usr/local/freeswitch/bin/./freeswitch -nc",
-		"stop" => "/usr/local/freeswitch/bin/./freeswitch -stop"
+		"file" => $v_name.".sh",
+		"start" => $v_dir."/bin/./freeswitch -nc",
+		"stop" => $v_dir."/bin/./freeswitch -stop"
 		)
 	);
 	
@@ -3811,6 +3900,16 @@ function v_deinstall_command()
 	conf_mount_rw();
 	config_lock();
 	
+	global $config;
+	global $php_dir;
+	global $tmp_dir;
+	global $v_label;
+	global $v_name;
+	global $v_dir;
+	global $v_conf_dir;
+	global $v_scripts_dir;
+	global $v_web_dir;
+	
 	exec("killall -9 freeswitch");
 	
 	exec("pkg_delete freeswitch-1.0.4");
@@ -3842,14 +3941,14 @@ function v_deinstall_command()
 	
 	exec("pkg_delete sqlite34");
 	
-	unlink_if_exists("/usr/local/pkg/freeswitch.xml");
+	unlink_if_exists("/usr/local/pkg/".$v_name.".xml");
 	unlink_if_exists("/usr/local/pkg/v_config.inc");
 
-	exec("rm -R /usr/local/freeswitch/");
-	exec("rm -R /usr/local/www/packages/freeswitch/");
-	unlink_if_exists("/usr/local/etc/rc.d/freeswitch.sh");
-	unlink_if_exists("/tmp/freeswitch.tar.gz");
-	unlink_if_exists("/tmp/pkg_mgr_FreeSWITCH.log");
+	exec("rm -R ".$v_dir);
+	exec("rm -R ".$v_web_dir);
+	unlink_if_exists("/usr/local/etc/rc.d/".$v_name.".sh");
+	//unlink_if_exists($tmp_dir."/".$v_name.".tar.gz");
+	unlink_if_exists($tmp_dir."/pkg_mgr_".$v_label.".log");
 	
 	conf_mount_ro();
 	config_unlock();

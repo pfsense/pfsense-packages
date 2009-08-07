@@ -37,7 +37,7 @@ $a_ivr = &$config['installedpackages']['freeswitchivr']['config'];
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'ivr') {
         if ($a_ivr[$_GET['id']]) {
-		unlink("/usr/local/freeswitch/scripts/ivr_".$_GET['ivrid'].".js");		
+		unlink($v_scripts_dir."/ivr_".$_GET['ivrid'].".js");		
             unset($a_ivr[$_GET['id']]);
             write_config();
             sync_package_v_ivr();
@@ -55,7 +55,9 @@ include("head.inc");
 
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: IVR</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: IVR</p>\n";
+}
 ?>
 
 <div id="mainlevel">
@@ -159,7 +161,13 @@ build_menu();
 
 <br>
 <br>
-/usr/local/freeswitch/scripts/
+
+<?php
+if ($v_path_show) {
+	echo $v_scripts_dir."\n";
+}
+?>
+
 <br>
 <br>
 <br>

@@ -136,8 +136,8 @@ if ($_POST) {
 		              }
 		              if ($filenamechanged){
 		                $publicincludefilename = $rowhelper['order']."_".$rowhelper['extensionname'].".xml";
-		                if (file_exists("/usr/local/freeswitch/conf/dialplan/public/".$publicincludefilename)) {
-		                  unlink("/usr/local/freeswitch/conf/dialplan/public/".$publicincludefilename);
+		                if (file_exists($v_conf_dir."/dialplan/public/".$publicincludefilename)) {
+		                  unlink($v_conf_dir."/dialplan/public/".$publicincludefilename);
 		                }
 		                unset($publicincludefilename);
 		              }
@@ -172,7 +172,9 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: Public: Edit</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: Public: Edit</p>\n";
+}
 
 if ($input_errors) print_input_errors($input_errors);
 

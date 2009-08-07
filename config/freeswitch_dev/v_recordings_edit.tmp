@@ -72,7 +72,7 @@ if ($_POST) {
         		
   			//if file name is not the same then rename the file
   			if ($_POST['filename'] != $_POST['filename_orig']) {
-          	rename('/usr/local/freeswitch/recordings/'.$_POST['filename_orig'], '/usr/local/freeswitch/recordings/'.$_POST['filename']);	
+          	rename($v_recordings_dir.$_POST['filename_orig'], $v_recordings_dir.$_POST['filename']);	
 			}
       		$a_recordings[$id] = $recordingent;
 		}
@@ -97,7 +97,9 @@ include("head.inc");
 
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_labels: Recordings: Edit</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: Recordings: Edit</p>\n";
+}
 ?>
 
 <?php if ($input_errors) print_input_errors($input_errors); ?>

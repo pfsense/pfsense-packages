@@ -133,8 +133,8 @@ if ($_POST) {
 		              }
 		              if ($filenamechanged){
 		                $dialplanincludefilename = $rowhelper['order']."_".$rowhelper['extensionname'].".xml";
-		                if (file_exists("/usr/local/freeswitch/conf/dialplan/default/".$dialplanincludefilename)) {
-		                  unlink("/usr/local/freeswitch/conf/dialplan/default/".$dialplanincludefilename);
+		                if (file_exists($v_conf_dir."/dialplan/default/".$dialplanincludefilename)) {
+		                  unlink($v_conf_dir."/dialplan/default/".$dialplanincludefilename);
 		                }
 		                unset($dialplanincludefilename);
 		              }
@@ -170,7 +170,9 @@ include("head.inc");
 
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: Dialplan: Edit</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: Dialplan: Edit</p>\n";
+}
 ?>
 
 <?php if ($input_errors) print_input_errors($input_errors); ?>

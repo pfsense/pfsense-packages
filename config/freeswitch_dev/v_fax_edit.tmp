@@ -49,9 +49,9 @@ if (isset($id) && $a_fax[$id]) {
 }
 
 
-$dir_fax_inbox = '/usr/local/freeswitch/storage/fax/'.$pconfig['faxextension'].'/inbox/';
-$dir_fax_sent = '/usr/local/freeswitch/storage/fax/'.$pconfig['faxextension'].'/sent/';
-$dir_fax_temp = '/usr/local/freeswitch/storage/fax/'.$pconfig['faxextension'].'/temp/';
+$dir_fax_inbox = $v_storage_dir.'/fax/'.$pconfig['faxextension'].'/inbox/';
+$dir_fax_sent = $v_storage_dir.'/fax/'.$pconfig['faxextension'].'/sent/';
+$dir_fax_temp = $v_storage_dir.'/fax/'.$pconfig['faxextension'].'/temp/';
 
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'fax') {
@@ -86,8 +86,8 @@ if ($_GET['act'] == "del") {
 	            }
             }
 			
-			if (file_exists("/usr/local/freeswitch/conf/dialplan/default/".$order."_".$faxname.".xml")){
-				unlink("/usr/local/freeswitch/conf/dialplan/default/".$order."_".$faxname.".xml");
+			if (file_exists($v_conf_dir."/dialplan/default/".$order."_".$faxname.".xml")){
+				unlink($v_conf_dir."/dialplan/default/".$order."_".$faxname.".xml");
 			}
 	
 			//remove fax entries
@@ -298,11 +298,11 @@ if ($_POST) {
 			$a_fax[] = $ent;
 		}
 
-		if (!is_dir('/usr/local/freeswitch/storage/fax/')) {
-			exec("mkdir /usr/local/freeswitch/storage/fax/");
+		if (!is_dir($v_storage_dir.'/fax/')) {
+			exec("mkdir ".$v_storage_dir."/fax/");
 		}
 	
-		$faxfolder = '/usr/local/freeswitch/storage/fax/'.$_POST['faxextension'];
+		$faxfolder = $v_storage_dir.'/fax/'.$_POST['faxextension'];
 		if (!is_dir($faxfolder)) {
 			exec('mkdir '.$faxfolder);
 		}
@@ -340,8 +340,9 @@ function show_advanced_config() {
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: FAX: Edit</p>\n";
-
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: FAX: Edit</p>\n";
+}
 if ($input_errors) print_input_errors($input_errors);
 ?>
 

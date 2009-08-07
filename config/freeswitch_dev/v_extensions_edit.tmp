@@ -133,7 +133,9 @@ function show_advanced_config() {
 
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: Extensions: Edit</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: Extensions: Edit</p>\n";
+}
 ?>
 
 <?php if ($input_errors) print_input_errors($input_errors); ?>
@@ -158,7 +160,11 @@ build_menu();
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>Extension Setup<br>
             </strong></span>
-            /usr/local/freeswitch/conf/directory/default/
+			<?php
+			if ($v_path_show) {
+				echo $v_conf_dir."/directory/default/\n";
+			}
+			?>
             </p></td>
       </tr>
     </table>

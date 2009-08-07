@@ -127,7 +127,9 @@ function show_advanced_config() {
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: Settings</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: Settings</p>\n";
+}
 ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 
@@ -151,7 +153,11 @@ build_menu();
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>Settings<br />
             </strong></span>
-            /usr/local/freeswitch/conf/directory/default/
+			<?php
+			//if ($v_path_show) {
+			//	echo $v_conf_dir."/directory/default/\n";
+			//}
+			?>
             </p></td>
       </tr>
     </table>
@@ -193,7 +199,7 @@ build_menu();
               <td width="25%" valign="top" class="vncell">Event Socket Password</td>
               <td width="75%" class="vtable">
                 <input name="event_socket_password" type="password" class="formfld" id="event_socket_password" size="40" value="<?=htmlspecialchars($pconfig['event_socket_password']);?>">
-                <br /><span class="vexpl">Enter the event socket password here. default: ClueCon<br /></span>
+                <br /><span class="vexpl">Enter the event socket password here. default: 7e4d3i<br /></span>
               </td>
             </tr>
             <tr>
@@ -207,21 +213,21 @@ build_menu();
               <td width="25%" valign="top" class="vncell">XML RPC Auth Realm</td>
               <td width="75%" class="vtable">
                 <input name="xml_rpc_auth_realm" type="text" class="formfld" id="xml_rpc_auth_realm" size="40" value="<?=htmlspecialchars($pconfig['xml_rpc_auth_realm']);?>">
-                <br /><span class="vexpl">Enter the XML RPC Auth Realm here. default: freeswitch<br /></span>
+                <br /><span class="vexpl">Enter the XML RPC Auth Realm here. default: <?php echo $v_name; ?><br /></span>
               </td>
             </tr>
             <tr>
               <td width="25%" valign="top" class="vncell">XML RPC Auth User</td>
               <td width="75%" class="vtable">
                 <input name="xml_rpc_auth_user" type="text" class="formfld" id="xml_rpc_auth_user" size="40" value="<?=htmlspecialchars($pconfig['xml_rpc_auth_user']);?>">
-                <br /><span class="vexpl">Enter the XML RPC Auth User here. default: freeswitch<br /></span>
+                <br /><span class="vexpl">Enter the XML RPC Auth User here. default: xmlrpc<br /></span>
               </td>
             </tr>
             <tr>
               <td width="25%" valign="top" class="vncell">XML RPC Auth Password</td>
               <td width="75%" class="vtable">
                 <input name="xml_rpc_auth_pass" type="password" class="formfld" id="xml_rpc_auth_pass" size="40" value="<?=htmlspecialchars($pconfig['xml_rpc_auth_pass']);?>">
-                <br /><span class="vexpl">Enter the XML RPC Auth Password here. default: works<br /></span>
+                <br /><span class="vexpl">Enter the XML RPC Auth Password here. default: 7e4d3i<br /></span>
               </td>
             </tr>
             <tr>

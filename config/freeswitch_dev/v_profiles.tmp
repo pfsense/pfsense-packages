@@ -74,7 +74,9 @@ include("head.inc");
 
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: Profiles</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: Profiles</p>\n";
+}
 ?>
 
 <div id="mainlevel">

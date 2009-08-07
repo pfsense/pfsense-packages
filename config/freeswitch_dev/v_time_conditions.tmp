@@ -54,7 +54,9 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php
 //include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_labels: IVR Options</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: IVR Options</p>\n";
+}
 ?>
 
 <div id="mainlevel">

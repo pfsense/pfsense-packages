@@ -82,8 +82,8 @@ if ($_GET['act'] == "del") {
             }
 
             //if the dialplan include xml file exists then delete it
-            if (file_exists("/usr/local/freeswitch/conf/dialplan/default/".$dialplanincludefilename)) {
-              unlink("/usr/local/freeswitch/conf/dialplan/default/".$dialplanincludefilename);
+            if (file_exists($v_conf_dir."/dialplan/default/".$dialplanincludefilename)) {
+				unlink($v_conf_dir."/dialplan/default/".$dialplanincludefilename);
             }
 
             unset($dialplanincludefilename);
@@ -104,7 +104,9 @@ include("head.inc");
 
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: Dialplan</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: Dialplan</p>\n";
+}
 ?>
 
 <div id="mainlevel">
@@ -258,7 +260,12 @@ build_menu();
 
 </form>
 
-/usr/local/freeswitch/conf/dialplan/default/
+<?php
+if ($v_path_show) {
+	echo $v_conf_dir."/dialplan/default/\n";
+}
+?>
+
 <br>
 <br>
 <br>

@@ -31,7 +31,7 @@ require("guiconfig.inc");
 require("/usr/local/pkg/v_config.inc");
 
 $a_fax 	   = &$config['installedpackages']['freeswitchfax']['config'];
-$dir_fax = '/usr/local/freeswitch/storage/fax/inbox/';
+$dir_fax = $v_storage_dir.'/fax/inbox/';
 
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'fax') {
@@ -66,8 +66,8 @@ if ($_GET['act'] == "del") {
 	            }
             }
 			
-			if (file_exists("/usr/local/freeswitch/conf/dialplan/default/".$order."_".$faxname.".xml")){
-				unlink("/usr/local/freeswitch/conf/dialplan/default/".$order."_".$faxname.".xml");
+			if (file_exists($v_conf_dir."/dialplan/default/".$order."_".$faxname.".xml")){
+				unlink($v_conf_dir."/dialplan/default/".$order."_".$faxname.".xml");
 			}
 	
 			//remove fax entries
@@ -141,7 +141,9 @@ include("head.inc");
 
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: FAX</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: FAX</p>\n";
+}
 ?>
 
 <div id="mainlevel">

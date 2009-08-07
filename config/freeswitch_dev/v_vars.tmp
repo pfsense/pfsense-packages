@@ -34,7 +34,7 @@ require("/usr/local/pkg/v_config.inc");
 
 if ($_GET['a'] == "default") {
 	conf_mount_rw();
-	exec("cp /usr/local/freeswitch/conf.orig/vars.xml /usr/local/freeswitch/conf/vars.xml");
+	exec("cp ".$v_conf_dir.".orig/vars.xml ".$v_conf_dir."/vars.xml");
 	$savemsg = "Default Restored";
 	conf_mount_ro();
 }
@@ -42,7 +42,7 @@ if ($_GET['a'] == "default") {
 if ($_POST['a'] == "save") {
 	conf_mount_rw();
 	$content = ereg_replace("\r","",$_POST['code']);
-	$fd = fopen("/usr/local/freeswitch/conf/vars.xml", "w");
+	$fd = fopen($v_conf_dir."/vars.xml", "w");
 	fwrite($fd, $content);
 	fclose($fd);
 	$savemsg = "Saved";
@@ -50,8 +50,8 @@ if ($_POST['a'] == "save") {
 }
 
 
-$fd = fopen("/usr/local/freeswitch/conf/vars.xml", "r");
-$content = fread($fd, filesize("/usr/local/freeswitch/conf/vars.xml"));
+$fd = fopen($v_conf_dir."/vars.xml", "r");
+$content = fread($fd, filesize($v_conf_dir."/conf/vars.xml"));
 fclose($fd);
 	
 include("head.inc");
@@ -123,7 +123,13 @@ build_menu();
 
   	<table width="98%" border="0" cellpadding="6" cellspacing="0">
       <tr>
-        <td>/usr/local/freeswitch/conf/vars.xml</td>
+        <td>
+		<?php
+		if ($v_path_show) {
+			echo $v_conf_dir."/vars.xml\n";
+		}
+		?>
+		</td>
 		<td align='right'>
 			<input type="hidden" name="f" value="<?php echo $_GET['f']; ?>" />
 			<input type="hidden" name="a" value="save" />

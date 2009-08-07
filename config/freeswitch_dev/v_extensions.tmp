@@ -36,7 +36,7 @@ $a_extensions 	   = &$config['installedpackages']['freeswitchextensions']['confi
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'extensions') {
         if ($a_extensions[$_GET['id']]) {
-			$tmp_file_name = "/usr/local/freeswitch/conf/directory/default/".$_GET['extension'].".xml";
+			$tmp_file_name = $v_conf_dir."/directory/default/".$_GET['extension'].".xml";
 			if (file_exists($tmp_file_name)) {
 				unlink($tmp_file_name);
 			}
@@ -57,7 +57,9 @@ include("head.inc");
 
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: Extensions</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: Extensions</p>\n";
+}
 ?>
 
 <div id="mainlevel">
@@ -197,8 +199,12 @@ if ($config_change == 1) {
 
 </form>
 
+<?php
+if ($v_path_show) {
+	echo $v_conf_dir."/directory/default/\n";
+}
+?>
 
-/usr/local/freeswitch/conf/directory/default/
 <br>
 <br>
 <br>

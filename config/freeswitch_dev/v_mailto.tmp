@@ -217,7 +217,7 @@ ob_start();
       }
 
       if (strlen($strwav) > 0) {
-      		//$mail->AddAttachment("/usr/local/freeswitch/data/domain/example.wav");  // attachment
+      		//$mail->AddAttachment($v_dir."/data/domain/example.wav");  // attachment
       		$filename='voicemail.wav'; $encoding = "base64"; $type = "audio/wav";
       		$mail->AddStringAttachment(base64_decode($strwav),$filename,$encoding,$type);
       }
