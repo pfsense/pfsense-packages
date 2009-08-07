@@ -184,7 +184,7 @@ if ($input_errors) print_input_errors($input_errors);
 <tr><td class="tabnavtbl">
 <?php
 
-display_top_tabs(build_menu());
+build_menu();
  	
 ?>
 </td></tr>

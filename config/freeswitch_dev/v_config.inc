@@ -105,7 +105,7 @@ function build_menu() {
 	$tab_array[] = array(gettext("Vars"), $menu_selected, "/packages/freeswitch/v_vars.php");
 	unset($menu_selected);
 	
-	return $tab_array;
+	display_top_tabs($tab_array);
 }
 
 
@@ -3000,7 +3000,7 @@ function v_php_install_command()
 
 	global $config;
 		
-	$v_package_version = "0.9.7.4";
+	$v_package_version = "0.9.7.5";
 	$v_build_version = "1.0.4";
 	$v_build_revision = "14306";
 

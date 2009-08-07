@@ -95,7 +95,7 @@ echo "<p class=\"pgtitle\">$v_project_label: Hunt Group</p>\n";
 <tr><td class="tabnavtbl">
 <?php
 
-display_top_tabs(build_menu());
+build_menu();
  	
 ?>
 </td></tr>
