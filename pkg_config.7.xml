@@ -380,6 +380,7 @@
       <depends_on_package>icu-3.8.1_2.tbz</depends_on_package>
       <depends_on_package>gmake-3.81_3.tbz</depends_on_package>
       <depends_on_package>gettext-0.17_1.tbz</depends_on_package>
+	  <depends_on_package>glib-2.20.4.tbz</depends_on_package>
     </package>
     <package>
       <name>AutoConfigBackup</name>
