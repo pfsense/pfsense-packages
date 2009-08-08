@@ -30,11 +30,8 @@
 require("guiconfig.inc");
 require("/usr/local/pkg/v_config.inc");
 
-//$a_extensions 	   = &$config['installedpackages']['freeswitchprofiles']['config'];
+//$a_extensions 	   = $config['installedpackages']['freeswitchprofiles']['config'];
 
-if ($v_path_show) {
-	echo $v_conf_dir."/sip_profiles/external/\n";
-}
 
 if ($_GET['a'] == "default") {
 	conf_mount_rw();

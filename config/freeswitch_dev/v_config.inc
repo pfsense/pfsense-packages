@@ -50,7 +50,7 @@ function v_settings()
 	global $config;
 	$config['installedpackages']['freeswitchsettings']['config'][0]['php_dir'] = '/usr/local/bin/php';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['tmp_dir'] = '/tmp/';
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.11";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.12";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_version'] = "1.0.4";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_revision'] = "";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_label'] = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
