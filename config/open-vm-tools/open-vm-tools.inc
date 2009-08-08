@@ -25,14 +25,14 @@ start_precmd="\${checkvm_cmd}"
 unset start_cmd
 stop_precmd="\${checkvm_cmd}"
 unset stop_cmd
-command="/usr/local/sbin/vmware-guestd"
-command_args="--halt-command '/sbin/shutdown -p now' >/dev/null 2>&1"
+command="/usr/local/bin/vmtoolsd"
+command_args="-c /usr/local/share/vmware-tools/tools.conf -p /usr/local/lib/open-vm-tools/plugins/vmsvc"
 pidfile="/var/run/\${name}.pid"
 
 load_rc_config \$name
 vmware_guestd_enable="YES"
 vmware_guestd_flags="--background \${pidfile}"
-run_rc_command "\$1"
+run_rc_command "$1"
 
 EOF;
 
