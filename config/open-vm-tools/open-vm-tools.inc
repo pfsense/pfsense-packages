@@ -30,7 +30,7 @@ vmware_guestd_enable="YES"
 vmware_guestd_flags="--background \${pidfile}"
 run_rc_command "\$1"
 
-EOF
+EOF;
 
 	$vmware_kmod = <<<EOF
 #!/bin/sh
@@ -115,7 +115,7 @@ load_rc_config \$name
 vmware_guest_vmhgfs_enable="NO"
 run_rc_command "\$1"
 
-EOF
+EOF;
 
 	$fd = fopen("/usr/local/etc/rc.d/vmware-guestd.sh", "w");
 	if(!$fd) 
