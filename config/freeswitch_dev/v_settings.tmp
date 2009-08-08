@@ -101,7 +101,7 @@ if ($_POST) {
 		  	//add	
 			$a_settings[] = $ent;
 		}
-		
+		v_settings(); //add the global variables
 		write_config();
 		sync_package_v_settings();
 		
