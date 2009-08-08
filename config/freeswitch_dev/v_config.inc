@@ -35,7 +35,7 @@
 //global variables
 	$php_dir = '/usr/local/bin/php';
 	$tmp_dir = '/tmp/';
-	$v_package_version = "0.9.7.6";
+	$v_package_version = "0.9.7.7";
 	$v_build_version = "1.0.4";
 	$v_build_revision = "";	
 	$v_label = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
@@ -284,6 +284,7 @@ function byte_convert( $bytes ) {
 
     $convention=1000; //[1000->10^x|1024->2^x]
     $s=array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB');
+    $e=floor(log($bytes,$convention));
     $e=floor(log($bytes,$convention));
     return round($bytes/pow($convention,$e),2).' '.$s[$e];
 }
@@ -3071,8 +3072,8 @@ function pkg_add($pkg_download_path, $pkg_name)
 function v_php_install_command()
 {
 
-	conf_mount_rw();
-	config_lock();
+	//conf_mount_rw();
+	//config_lock();
 
 	global $config;
 	global $v_package_version;
@@ -3097,7 +3098,7 @@ function v_php_install_command()
 	//hide errors
 	ini_set('display_errors', '0'); 
 	
-	clearstatcache();
+	clearstatcache(); //clear file status cache
 	if (!is_dir('/usr/local/www/packages/')) {
 	   exec("mkdir /usr/local/www/packages/");
 	}
@@ -3118,13 +3119,13 @@ function v_php_install_command()
 	//exec("cd /tmp/;fetch ".$download_path."freeswitch.tgz"); //handled by freeswitch.xml
 	//exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
 	//unlink_if_exists("/tmp/freeswitch.tgz");
+
+	if (!is_dir($v_storage_dir)) {
+	   exec("mkdir ".$v_storage_dir);
+	}
 	
 	if (!is_dir($v_storage_dir.'/fax/')) {
 	   exec("mkdir ".$v_storage_dir."/fax/");
-	}
-
-	if (!is_dir($v_storage_dir.'/fax/receive/')) {
-	   exec("mkdir ".$v_storage_dir."/fax/receive/");
 	}
 	
 	$static_output = 'Downloading Files';
@@ -3888,8 +3889,8 @@ function v_php_install_command()
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_version'] = $v_build_version." revision ".$v_build_revision.".";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = $v_package_version;
 	
-	conf_mount_ro();
-	config_unlock();
+	//conf_mount_ro();
+	//config_unlock();
 		
 }
 
@@ -3897,8 +3898,8 @@ function v_php_install_command()
 function v_deinstall_command()
 {
 
-	conf_mount_rw();
-	config_lock();
+	//conf_mount_rw();
+	//config_lock();
 	
 	global $config;
 	global $php_dir;
@@ -3950,8 +3951,8 @@ function v_deinstall_command()
 	//unlink_if_exists($tmp_dir."/".$v_name.".tar.gz");
 	unlink_if_exists($tmp_dir."/pkg_mgr_".$v_label.".log");
 	
-	conf_mount_ro();
-	config_unlock();
+	//conf_mount_ro();
+	//config_unlock();
 	
 }
 

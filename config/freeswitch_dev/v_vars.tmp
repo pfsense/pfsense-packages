@@ -51,7 +51,7 @@ if ($_POST['a'] == "save") {
 
 
 $fd = fopen($v_conf_dir."/vars.xml", "r");
-$content = fread($fd, filesize($v_conf_dir."/conf/vars.xml"));
+$content = fread($fd, filesize($v_conf_dir."/vars.xml"));
 fclose($fd);
 	
 include("head.inc");

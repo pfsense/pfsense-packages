@@ -48,7 +48,7 @@ if (isset($id) && $a_fax[$id]) {
 	$pconfig['faxdescription'] = $a_fax[$id]['faxdescription'];
 }
 
-
+clearstatcache(); //clear file status cache
 $dir_fax_inbox = $v_storage_dir.'/fax/'.$pconfig['faxextension'].'/inbox/';
 $dir_fax_sent = $v_storage_dir.'/fax/'.$pconfig['faxextension'].'/sent/';
 $dir_fax_temp = $v_storage_dir.'/fax/'.$pconfig['faxextension'].'/temp/';
@@ -298,6 +298,10 @@ if ($_POST) {
 			$a_fax[] = $ent;
 		}
 
+		if (!is_dir($v_storage_dir)) {
+			exec("mkdir ".$v_storage_dir);
+		}
+		
 		if (!is_dir($v_storage_dir.'/fax/')) {
 			exec("mkdir ".$v_storage_dir."/fax/");
 		}
