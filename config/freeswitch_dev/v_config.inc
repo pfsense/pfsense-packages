@@ -29,34 +29,47 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-//ob_start("ob_gzhandler");
-
+require_once('config.inc');
+require_once('globals.inc');
+require_once('service-utils.inc');
 
 //global variables
-	$php_dir = '/usr/local/bin/php';
-	$tmp_dir = '/tmp/';
-	$v_package_version = "0.9.7.9";
-	$v_build_version = "1.0.4";
-	$v_build_revision = "";	
-	$v_label = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
-	$v_name = 'freeswitch';
-	$v_dir = '/usr/local/freeswitch';
-	$v_backup_dir = '/root/backup';
-	$v_web_dir = '/usr/local/www/packages/freeswitch';	
-	$v_conf_dir = '/usr/local/freeswitch/conf';
-	$v_db_dir = '/usr/local/freeswitch/db';
-	$v_htdocs_dir = '/usr/local/freeswitch/htdocs';
-	$v_log_dir = '/usr/local/freeswitch/log';
-	$v_mod_dir = '/usr/local/freeswitch/mod';
-	$v_scripts_dir = '/usr/local/freeswitch/scripts';
-	$v_storage_dir = '/usr/local/freeswitch/storage';
-	$v_recordings_dir = '/usr/local/freeswitch/recordings';
-	$v_download_path = 'http://www.pfsense.com/packages/config/freeswitch_dev/';
+	global config;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 	
 //preferences
 	$v_label_show = true;
 	$v_path_show = true;
 	$v_menu_show = true;
+
+
+function v_settings()
+{
+	global $config;
+	$config['installedpackages']['freeswitchsettings']['config'][0]['php_dir'] = '/usr/local/bin/php';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['tmp_dir'] = '/tmp/';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.10";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_version'] = "1.0.4";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_revision'] = "";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_label'] = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_name'] = 'freeswitch';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_dir'] = '/usr/local/freeswitch';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_backup_dir'] = '/root/backup';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_web_dir'] = '/usr/local/www/packages/freeswitch';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_conf_dir'] = '/usr/local/freeswitch/conf';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_db_dir'] = '/usr/local/freeswitch/db';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_htdocs_dir'] = '/usr/local/freeswitch/htdocs';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_log_dir'] = '/usr/local/freeswitch/log';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_mod_dir'] = '/usr/local/freeswitch/mod';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_scripts_dir'] = '/usr/local/freeswitch/scripts';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_storage_dir'] = '/usr/local/freeswitch/storage';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_recordings_dir'] = '/usr/local/freeswitch/recordings';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_download_path'] = 'http://www.pfsense.com/packages/config/freeswitch_dev/';
+
+}
 
 
 function build_menu() {
@@ -293,7 +306,10 @@ function byte_convert( $bytes ) {
 function lan_sip_profile()
 {
 	global $config;
-	global $v_conf_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 	clearstatcache();
 	
 	//if the lan directory does not exist then create it
@@ -355,10 +371,10 @@ function  recording_js()
 {
 
     global $config;
-	global $v_dir;	
-	global $v_conf_dir;
-	global $v_scripts_dir;
-	global $v_recordings_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 	
     $admin_pin = $config['installedpackages']['freeswitchsettings']['config'][0]['admin_pin'];
 
@@ -458,8 +474,10 @@ function sync_package_v_settings()
 {
 
 	global $config;
-	global $v_conf_dir;
-	global $v_scripts_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 	
   if($config['installedpackages']['freeswitchsettings']['config'] != "") {
 
@@ -547,7 +565,10 @@ function sync_package_v_dialplan()
 {
 
 	global $config;
-	global $v_conf_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 
   //using backup files rather than pfsense config.xml for this file
   $config['installedpackages']['freeswitchpublic']['config'][0]['dialplan_default_xml'] = "";
@@ -581,7 +602,10 @@ function sync_package_v_extensions()
 {
 
 	global $config;
-	global $v_conf_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 
   if($config['installedpackages']['freeswitchextensions']['config'] != "") {
 	
@@ -675,7 +699,10 @@ function sync_package_v_gateways()
 {
 
 	global $config;
-	global $v_conf_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 	
   if($config['installedpackages']['freeswitchgateways']['config'] != "") {
     	
@@ -776,7 +803,10 @@ function sync_package_v_modules()
 {
 
 	global $config;
-	global $v_conf_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 
 	foreach($config['installedpackages']['freeswitchmodules']['config'] as $rowhelper) {
 		$fout = fopen($v_conf_dir."/autoload_configs/modules.conf.xml","w");
@@ -918,7 +948,10 @@ function sync_package_v_public()
 {
 
 	global $config;
-	global $v_conf_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 
   //using backup files rather than pfsense config.xml for this file
   $config['installedpackages']['freeswitchpublic']['config'][0]['public_xml'] = "";
@@ -954,7 +987,10 @@ function sync_package_v_vars()
 {
 
   global $config;
-  global $v_conf_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 
   //using backup files rather than pfsense config.xml for this file
   $config['installedpackages']['freeswitchpublic']['config'][0]['vars_xml'] = "";
@@ -987,7 +1023,10 @@ function sync_package_v_vars()
 function sync_package_v_internal()
 {
 	global $config;
-	global $v_conf_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 
 	if(strlen($config['installedpackages']['freeswitchinternal']['config'][0]['internal_xml']) == 0) {
 		/* internal_xml not found in the pfsense config.xml get the internal.xml and save to config.xml. */
@@ -1017,7 +1056,10 @@ function sync_package_v_internal()
 function sync_package_v_external()
 {
 	global $config;
-	global $v_conf_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 
 	if(strlen($config['installedpackages']['freeswitchexternal']['config'][0]['external_xml']) == 0) {
 		/* external_xml not found in the pfsense config.xml get the external.xml and save to config.xml. */
@@ -1056,10 +1098,10 @@ function sync_package_v_hunt_group()
 
 			
 	global $config;
-	global $v_dir;	
-	global $v_conf_dir;
-	global $v_scripts_dir;
-	global $v_recordings_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 	
 	//get the domain
 		$password = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_password'];
@@ -1739,13 +1781,10 @@ function sync_package_v_fax()
 {
 
 	global $config;
-	global $php_dir;
-	global $tmp_dir;
-	global $v_dir;	
-	global $v_conf_dir;
-	global $v_scripts_dir;
-	global $v_storage_dir;
-	global $v_web_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 	
 	//loop through all faxes
 		$a_fax = &$config['installedpackages']['freeswitchfax']['config'];
@@ -1936,7 +1975,6 @@ function get_recording_filename($id)
   global $config;
   $a_recordings = &$config['installedpackages']['freeswitchrecordings']['config'];
     if (count($a_recordings) > 0) {
-      global $config;
       foreach($a_recordings as $rowhelper) {
         if ($rowhelper['recordingid'] == $id) {
             return $rowhelper['filename'];
@@ -1950,14 +1988,10 @@ function sync_package_v_ivr()
 {
 
 	global $config;
-	global $php_dir;
-	global $tmp_dir;
-	global $v_dir;	
-	global $v_conf_dir;
-	global $v_scripts_dir;
-	global $v_recordings_dir;
-	global $v_storage_dir;
-	global $v_web_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 
   $a_ivr = &$config['installedpackages']['freeswitchivr']['config'];
   if (count($a_ivr) > 0) {
@@ -2777,14 +2811,10 @@ function sync_package_v_dialplan_includes()
 {
 
 	global $config;
-	global $php_dir;
-	global $tmp_dir;
-	global $v_dir;	
-	global $v_conf_dir;
-	global $v_scripts_dir;
-	global $v_recordings_dir;
-	global $v_storage_dir;
-	global $v_web_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 
 	$a_dialplan_includes          = &$config['installedpackages']['freeswitchdialplanincludes']['config'];
 	$a_dialplan_include_details 	= &$config['installedpackages']['freeswitchdialplanincludedetails']['config'];
@@ -2908,10 +2938,10 @@ function sync_package_v_public_includes()
 {
 
 	global $config;
-	global $php_dir;
-	global $tmp_dir;
-	global $v_dir;	
-	global $v_conf_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 
   $a_public_includes          	= &$config['installedpackages']['freeswitchpublicincludes']['config'];
   $a_public_include_details 	= &$config['installedpackages']['freeswitchpublicincludedetails']['config'];
@@ -3073,13 +3103,10 @@ function pkg_add($pkg_download_path, $pkg_name)
 function v_php_install_phase_2() {
 
 	global $config;
-	global $tmp_dir;
-	global $v_dir;
-	global $v_web_dir;
-	global $v_download_path;
-	global $v_storage_dir;
-	global $v_scripts_dir;
-	global $v_htdocs_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 
 //	$static_output = 'Downloading Package Files';
 //	update_output_window($static_output);
@@ -3315,23 +3342,14 @@ function v_php_install_command()
 
 	//conf_mount_rw();
 	//config_lock();
-
+	
+	v_settings();
+	
 	global $config;
-	global $v_package_version;
-	global $v_build_version;
-	global $v_build_revision;
-	global $php_dir;
-	global $tmp_dir;
-	global $v_label;
-	global $v_name;
-	global $v_dir;
-	global $v_conf_dir;
-	global $v_scripts_dir;
-	global $v_recordings_dir;
-	global $v_storage_dir;
-	global $v_web_dir;
-	global $v_htdocs_dir;
-	global $v_download_path;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 
 	//set script execution time limit to 24 hours
 	set_time_limit (86400);
@@ -3879,23 +3897,55 @@ function v_php_install_command()
 	unlink_if_exists($v_conf_dir."/directory/default/brian.xml");
 	unlink_if_exists($v_conf_dir."/directory/default/example.com.xml");
 	unlink_if_exists($v_conf_dir."/dialplan/default/99999_enum.xml");
-		
-	write_rcfile(array(
-		"file" => $v_name.".sh",
-		"start" => $v_dir."/bin/./freeswitch -nc",
-		"stop" => $v_dir."/bin/./freeswitch -stop"
-		)
-	);
 	
-	lan_sip_profile();
+	
+	//write_rcfile(array(
+	//	"file" => $v_name.".sh",
+	//	"start" => $v_dir."/bin/./freeswitch -nc",
+	//	"stop" => $v_dir."/bin/./freeswitch -stop"
+	//	)
+	//);
+	
+	//write the rcfile
+		$fout = fopen("/usr/local/etc/rc.d/".$v_name.".sh","w");
+		$v_tmp = "#!/bin/sh\n";
+		$v_tmp .=  "# This file was automatically generated\n";
+		$v_tmp .= "# by the pfSense service handler.\n";
+		$v_tmp .= "\n";
+		$v_tmp .= "rc_start() {\n";
+		$v_tmp .= "	/usr/local/freeswitch/bin/./freeswitch -nc\n";
+		$v_tmp .= "}\n";
+		$v_tmp .= "\n";
+		$v_tmp .= "rc_stop() {\n";
+		$v_tmp .= "	/usr/local/freeswitch/bin/./freeswitch -stop\n";
+		$v_tmp .= "}\n";
+		$v_tmp .= "\n";
+		$v_tmp .= "case \$1 in\n";
+		$v_tmp .= "	start)\n";
+		$v_tmp .= "		rc_start\n";
+		$v_tmp .= "		;;\n";
+		$v_tmp .= "	stop)\n";
+		$v_tmp .= "		rc_stop\n";
+		$v_tmp .= "		;;\n";
+		$v_tmp .= "	restart)\n";
+		$v_tmp .= "		rc_stop\n";
+		$v_tmp .= "		rc_start\n";
+		$v_tmp .= "		;;\n";
+		$v_tmp .= "esac";
+		fwrite($fout, $v_tmp);
+		unset($v_tmp);
+		fclose($fout);
+		
+	
+//	lan_sip_profile();
 
 	$static_output = 'Synchronize the config';
 	update_output_window($static_output);
 			
 	sync_package_freeswitch();
 	
-	$static_output = 'Start the Service';
-	update_output_window($static_output);
+//	$static_output = 'Start the Service';
+//	update_output_window($static_output);
 	$handle = popen("/usr/local/etc/rc.d/freeswitch.sh start", "r");
 	pclose($handle);
 
@@ -3903,9 +3953,6 @@ function v_php_install_command()
 		sync_package_v_ivr();
 	}
 
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_version'] = $v_build_version." revision ".$v_build_revision.".";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = $v_package_version;
-	
 	//conf_mount_ro();
 	//config_unlock();
 		
@@ -3919,14 +3966,10 @@ function v_deinstall_command()
 	//config_lock();
 	
 	global $config;
-	global $php_dir;
-	global $tmp_dir;
-	global $v_label;
-	global $v_name;
-	global $v_dir;
-	global $v_conf_dir;
-	global $v_scripts_dir;
-	global $v_web_dir;
+	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
+	foreach($v_settings_array as $name => $value) {
+		$$name = $value;
+	}
 	
 	exec("killall -9 freeswitch");
 	
