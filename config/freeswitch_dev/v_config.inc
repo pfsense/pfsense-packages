@@ -3070,7 +3070,7 @@ function pkg_add($pkg_download_path, $pkg_name)
 
 }
 
-function v_get_files {
+function $v_php_install_stage_2() {
 
 	global $config;
 	global $tmp_dir;
@@ -3433,7 +3433,7 @@ function v_php_install_command()
 	//exec("fetch ".$download_path."mod_fax.so");
 	
 	//download and install additional files
-	$v_get_files();
+	$v_php_install_stage_2();
 
 
 
