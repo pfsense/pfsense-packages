@@ -75,7 +75,7 @@ stop_precmd="\${checkvm_cmd}"
 stop_cmd=":"
 
 load_rc_config \$name
-vmware_guest_vmmemctl_enable="NO"
+vmware_guest_vmmemctl_enable="YES"
 vmware_guest_vmmemctl_enable="\$vmware_guest_kmod_enable"
 run_rc_command "\$1"
 
@@ -88,7 +88,7 @@ stop_precmd="\${checkvm_cmd}"
 stop_cmd=":"
 
 load_rc_config \$name
-vmware_guest_vmxnet_enable="NO"
+vmware_guest_vmxnet_enable="YES"
 run_rc_command "\$1"
 
 # VMware kernel module: vmblock
@@ -100,7 +100,7 @@ stop_precmd="\${checkvm_cmd}"
 stop_cmd=":"
 
 load_rc_config \$name
-vmware_guest_vmblock_enable="NO"
+vmware_guest_vmblock_enable="YES"
 run_rc_command "\$1"
 
 # VMware kernel module: vmhgfs
@@ -112,7 +112,7 @@ stop_precmd="\${checkvm_cmd}"
 stop_cmd=":"
 
 load_rc_config \$name
-vmware_guest_vmhgfs_enable="NO"
+vmware_guest_vmhgfs_enable="YES"
 run_rc_command "\$1"
 
 EOF;
