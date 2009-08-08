@@ -34,7 +34,6 @@ require_once('globals.inc');
 require_once('service-utils.inc');
 
 //global variables
-	global config;
 	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
 	foreach($v_settings_array as $name => $value) {
 		$$name = $value;
@@ -51,7 +50,7 @@ function v_settings()
 	global $config;
 	$config['installedpackages']['freeswitchsettings']['config'][0]['php_dir'] = '/usr/local/bin/php';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['tmp_dir'] = '/tmp/';
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.10";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.1";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_version'] = "1.0.4";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_revision'] = "";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_label'] = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
@@ -256,7 +255,7 @@ function event_socket_request($fp, $cmd)
           usleep(100); //allow time for reponse
 
           //optional because of script timeout //don't let while loop become endless
-          if ($i > 10000) { break; }
+          if ($i > 1000) { break; }
 
           if ($contentlength > 0) { //is contentlength set
               //stop reading if all content has been read.
@@ -3100,7 +3099,7 @@ function pkg_add($pkg_download_path, $pkg_name)
 
 }
 
-function v_php_install_phase_2() {
+function v_install_phase_2() {
 
 	global $config;
 	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
@@ -3337,7 +3336,7 @@ function v_php_install_phase_2() {
 }
 
 
-function v_php_install_command()
+function v_install_phase_1()
 {
 
 	//conf_mount_rw();
@@ -3417,8 +3416,6 @@ function v_php_install_command()
 		//add sqlite package
 		//exec("pkg_add -r sqlite34");
 
-
-
 	
 	//make a backup copy of the default config used with the 'Restore Default' buttons on the text areas.
 	exec("cp -R ".$v_conf_dir." ".$v_conf_dir.".orig");
@@ -3427,10 +3424,15 @@ function v_php_install_command()
 	unlink_if_exists($v_conf_dir."/dialplan/default/01_example.com.xml");
 	unlink_if_exists($v_conf_dir."/dialplan/public/00_inbound_did.xml");	
 
+	//mod_fax
+	//chdir($v_mod_dir.'/mod/');
+	//exec("fetch ".$download_path."mod_fax.so");
 
-	
-//	$static_output = 'Downloading Audio Files';
-//	update_output_window($static_output);
+	//download and install additional files
+	v_install_phase_2();
+
+	$static_output = 'Downloading Audio Files';
+	update_output_window($static_output);
 	
 	//copy audio files
 	chdir($v_dir.'/sounds/custom/8000/');
@@ -3446,12 +3448,7 @@ function v_php_install_command()
 	exec("cd ".$v_dir."/sounds/custom/8000/;fetch ".$download_path."press_1_to_accept_2_to_reject_or_3_for_voicemail.wav");
 
 
-	//mod_fax
-	//chdir($v_mod_dir.'/mod/');
-	//exec("fetch ".$download_path."mod_fax.so");
-	
-	//download and install additional files
-	v_php_install_phase_2();
+
 
 
   /* freeswitch settings defaults */
@@ -3899,59 +3896,29 @@ function v_php_install_command()
 	unlink_if_exists($v_conf_dir."/dialplan/default/99999_enum.xml");
 	
 	
-	//write_rcfile(array(
-	//	"file" => $v_name.".sh",
-	//	"start" => $v_dir."/bin/./freeswitch -nc",
-	//	"stop" => $v_dir."/bin/./freeswitch -stop"
-	//	)
-	//);
+	write_rcfile(array(
+		"file" => $v_name.".sh",
+		"start" => $v_dir."/bin/./freeswitch -nc",
+		"stop" => $v_dir."/bin/./freeswitch -stop"
+		)
+	);
 	
-	//write the rcfile
-		$fout = fopen("/usr/local/etc/rc.d/".$v_name.".sh","w");
-		$v_tmp = "#!/bin/sh\n";
-		$v_tmp .=  "# This file was automatically generated\n";
-		$v_tmp .= "# by the pfSense service handler.\n";
-		$v_tmp .= "\n";
-		$v_tmp .= "rc_start() {\n";
-		$v_tmp .= "	/usr/local/freeswitch/bin/./freeswitch -nc\n";
-		$v_tmp .= "}\n";
-		$v_tmp .= "\n";
-		$v_tmp .= "rc_stop() {\n";
-		$v_tmp .= "	/usr/local/freeswitch/bin/./freeswitch -stop\n";
-		$v_tmp .= "}\n";
-		$v_tmp .= "\n";
-		$v_tmp .= "case \$1 in\n";
-		$v_tmp .= "	start)\n";
-		$v_tmp .= "		rc_start\n";
-		$v_tmp .= "		;;\n";
-		$v_tmp .= "	stop)\n";
-		$v_tmp .= "		rc_stop\n";
-		$v_tmp .= "		;;\n";
-		$v_tmp .= "	restart)\n";
-		$v_tmp .= "		rc_stop\n";
-		$v_tmp .= "		rc_start\n";
-		$v_tmp .= "		;;\n";
-		$v_tmp .= "esac";
-		fwrite($fout, $v_tmp);
-		unset($v_tmp);
-		fclose($fout);
-		
-	
-//	lan_sip_profile();
+
+	lan_sip_profile();
 
 	$static_output = 'Synchronize the config';
 	update_output_window($static_output);
 			
 	sync_package_freeswitch();
 	
-//	$static_output = 'Start the Service';
-//	update_output_window($static_output);
+	$static_output = 'Start the Service';
+	update_output_window($static_output);
 	$handle = popen("/usr/local/etc/rc.d/freeswitch.sh start", "r");
 	pclose($handle);
 
-	if (pkg_is_service_running('freeswitch')) {
-		sync_package_v_ivr();
-	}
+	//if (pkg_is_service_running('freeswitch')) {
+	//	sync_package_v_ivr();
+	//}
 
 	//conf_mount_ro();
 	//config_unlock();
