@@ -129,6 +129,7 @@ EOF;
 	fwrite($fd, $vmware_kmod);
 	fclose($fd);
 
+	exec("chmod a+rx /usr/local/etc/rc.d/*.sh");
 }
 
 ?>
