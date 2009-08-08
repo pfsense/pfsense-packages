@@ -32,7 +32,7 @@ pidfile="/var/run/\${name}.pid"
 load_rc_config \$name
 vmware_guestd_enable="YES"
 vmware_guestd_flags="--background \${pidfile}"
-run_rc_command "$1"
+run_rc_command "\$1"
 
 EOF;
 
