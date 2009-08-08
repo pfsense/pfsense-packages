@@ -1,5 +1,9 @@
 <?php
 
+function open_vm_tools_deinstall() {
+	exec("rm /usr/local/etc/rc.d/vmware*");
+}
+
 function open_vm_tools_install() {
 
 	$vmware_guestd = <<<EOF

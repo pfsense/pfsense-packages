@@ -59,6 +59,11 @@
 		conf_mount_ro();
     </custom_php_install_command>
     <custom_php_deinstall_command>
+		conf_mount_rw();
+		exec("/usr/local/etc/rc.d/vmware-guestd.sh stop");
+		exec("/usr/local/etc/rc.d/vmware-kmod.sh stop");
+		open_vm_tools_deinstall();
+		conf_mount_ro();
     </custom_php_deinstall_command>
 	<include_file>/usr/local/pkg/open-vm-tools.inc</include_file>
 </packagegui>
