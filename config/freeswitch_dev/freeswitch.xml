@@ -44,7 +44,7 @@
 		<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>Settings</name>
-	<version></version>
+	<version>0.9.7.8</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/v_config.inc</include_file>
 	<menu>
@@ -67,8 +67,36 @@
 			<active/>
 		</tab>
 		<tab>
+			<text>Dialplan</text>
+			<url>/packages/freeswitch/v_dialplan_includes.php</url>
+		</tab>
+		<tab>
 			<text>Extensions</text>
 			<url>/packages/freeswitch/v_extensions.php</url>
+		</tab>
+		<tab>
+			<text>Features</text>
+			<url>/packages/freeswitch/v_features.php</url>
+		</tab>		
+		<tab>
+			<text>Gateways</text>
+			<url>/packages/freeswitch/v_gateways.php</url>
+		</tab>
+		<tab>
+			<text>Profiles</text>
+			<url>/packages/freeswitch/v_profiles.php</url>
+		</tab>
+		<tab>
+			<text>Public</text>
+			<url>/packages/freeswitch/v_public_includes.php</url>
+		</tab>
+		<tab>
+			<text>Status</text>
+			<url>/packages/freeswitch/v_status.php</url>
+		</tab>
+		<tab>
+			<text>Vars</text>
+			<url>/packages/freeswitch/v_vars.php</url>
 		</tab>
 	</tabs>
 	<configpath>installedpackages->package->$packagename->configuration->freeswitchsettings</configpath>
@@ -88,6 +116,60 @@
 			<fielddescr>Default Gateway</fielddescr>
 			<fieldname>default_gateway</fieldname>
 			<description>Enter the default gateway name here.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Default Area Code</fielddescr>
+			<fieldname>default_area_code</fieldname>
+			<description>Enter the area code here. example: 918</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Event Socket Port</fielddescr>
+			<fieldname>event_socket_port</fieldname>
+			<description>Enter the event socket port here. default: 8021</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Event Socket Password</fielddescr>
+			<fieldname>event_socket_password</fieldname>
+			<description>Enter the event socket password here. default: ClueCon</description>
+			<type>password</type>
+		</field>
+		<field>
+			<fielddescr>XML RPC HTTP Port</fielddescr>
+			<fieldname>xml_rpc_http_port</fieldname>
+			<description>Enter the XML RPC HTTP Port here. default: 8787</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>XML RPC Auth Realm</fielddescr>
+			<fieldname>xml_rpc_auth_realm</fieldname>
+			<description>Enter the XML RPC Auth Realm here. default: freeswitch</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>XML RPC Auth User</fielddescr>
+			<fieldname>xml_rpc_auth_user</fieldname>
+			<description>Enter the XML RPC Auth User here. default: freeswitch</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>XML RPC Auth Password</fielddescr>
+			<fieldname>xml_rpc_auth_pass</fieldname>
+			<description>Enter the XML RPC Auth Password here. default: works</description>
+			<type>password</type>
+		</field>
+		<field>
+			<fielddescr>Admin PIN Number</fielddescr>
+			<fieldname>admin_pin</fieldname>
+			<description>Enter a admin pin number. Used to authenticate the admin from the phone.</description>
+			<type>password</type>
+		</field>
+		<field>
+			<fielddescr>SMTP Host</fielddescr>
+			<fieldname>smtphost</fieldname>
+			<description>Enter the SMTP host address. If you using a different port append it on the end with a colon. e.g. smtp.gmail.com:465</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -125,7 +207,43 @@
 					<value>false</value>
 				</option>
 			</options>
-		</field>	
+		</field>
+		<field>
+			<fielddescr>SMTP Username</fielddescr>
+			<fieldname>smtpusername</fieldname>
+			<description>Enter the SMTP authentication username.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>SMTP Password</fielddescr>
+			<fieldname>smtppassword</fieldname>
+			<description>Enter the SMTP authentication password.</description>
+			<type>password</type>
+		</field>
+		<field>
+			<fielddescr>SMTP From</fielddescr>
+			<fieldname>smtpfrom</fieldname>
+			<description>Enter the SMTP From email address.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>SMTP From Name</fielddescr>
+			<fieldname>smtpfromname</fieldname>
+			<description>Enter the SMTP From Name.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Mod Shout Decoder</fielddescr>
+			<fieldname>mod_shout_decoder</fieldname>
+			<description>Enter the Decoder. default: i386</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Mod Shout Volume</fielddescr>
+			<fieldname>mod_shout_volume</fieldname>
+			<description>Enter the Volume. default: 0.3</description>
+			<type>input</type>
+		</field>		
 	</fields>
 	<custom_add_php_command>
 	</custom_add_php_command>

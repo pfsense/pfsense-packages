@@ -35,7 +35,7 @@
 //global variables
 	$php_dir = '/usr/local/bin/php';
 	$tmp_dir = '/tmp/';
-	$v_package_version = "0.9.7.7";
+	$v_package_version = "0.9.7.8";
 	$v_build_version = "1.0.4";
 	$v_build_revision = "";	
 	$v_label = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
@@ -3112,8 +3112,8 @@ function v_php_install_command()
 	//	$freebsd_version = "7.2";
 	//}
 	
-	$static_output = 'Extracting';
-	update_output_window($static_output);
+//	$static_output = 'Extracting';
+//	update_output_window($static_output);
 	
 	$download_path = 'http://www.pfsense.com/packages/config/freeswitch_dev/';
 	//exec("cd /tmp/;fetch ".$download_path."freeswitch.tgz"); //handled by freeswitch.xml
@@ -3128,11 +3128,11 @@ function v_php_install_command()
 	   exec("mkdir ".$v_storage_dir."/fax/");
 	}
 	
-	$static_output = 'Downloading Files';
-	update_output_window($static_output);
+//	$static_output = 'Downloading Files';
+//	update_output_window($static_output);
 
 
-	//downlaod and install the packages
+	//download and install the packages
 		$pkg_download_path = $download_path."freebsd7.2/1_0_4/";
 		
 		pkg_add($pkg_download_path, "libpri-1.4.1.tbz");
@@ -3165,7 +3165,7 @@ function v_php_install_command()
 		//pkg_add($pkg_download_path, "perl-5.8.9_3.tbz");
 		
 		//add sqlite package
-		exec("pkg_add -r sqlite34");
+		//exec("pkg_add -r sqlite34");
 
 
 	//download the dialplan default.xml
@@ -3195,8 +3195,8 @@ function v_php_install_command()
 	   exec("mkdir ".$v_dir."/sounds/custom/8000/");
 	}
 	
-	$static_output = 'Downloading Audio Files';
-	update_output_window($static_output);
+//	$static_output = 'Downloading Audio Files';
+//	update_output_window($static_output);
 	
 	//copy audio files
 	chdir($v_dir.'/sounds/custom/8000/');
@@ -3216,23 +3216,11 @@ function v_php_install_command()
 	//chdir($v_mod_dir.'/mod/');
 	//exec("fetch ".$download_path."mod_fax.so");
 	
-	//download lib files
-	//chdir('/usr/local/lib/');
-	//exec("fetch ".$download_path."libtinfo.so.5.6");
-	//exec("fetch ".$download_path."libncurses.so.5.6");
-	//exec("fetch ".$download_path."libncurses.so.5.7");
-	//exec("fetch ".$download_path."libogg.so.5.3");
-	//exec("cp /usr/local/lib/libogg.so.5.3 /usr/local/lib/libogg.so.5");
-	//exec("fetch ".$download_path."libvorbis.so.4");
-	//exec("fetch ".$download_path."libcurl.so.5");
-	//exec("fetch ".$download_path."libodbc.so.1");
-	//exec("fetch ".$download_path."libiconv.so.3");
-	//exec("fetch ".$download_path."libspandsp.so.1");
-	//exec("cp /usr/local/lib/libspandsp.so.1 /usr/local/lib/libspandsp.so.2");
+
 	
 
-	$static_output = 'Downloading Package Files';
-	update_output_window($static_output);
+//	$static_output = 'Downloading Package Files';
+//	update_output_window($static_output);
 	
 	//misc files
 	if (!is_dir('/usr/local/www/edit_area/')) {
@@ -3826,8 +3814,8 @@ function v_php_install_command()
 	//extract a specific directory
 		$filename = $v_name.'.bak.tgz';
 		if (file_exists($v_backup_dir.$filename)) {
-			$static_output = 'Restore the Backup';
-			update_output_window($static_output);
+//			$static_output = 'Restore the Backup';
+//			update_output_window($static_output);
 	
 			//echo "The file $filename exists";
 	
