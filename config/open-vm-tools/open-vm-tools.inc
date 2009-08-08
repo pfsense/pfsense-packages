@@ -76,7 +76,7 @@ stop_cmd=":"
 
 load_rc_config \$name
 vmware_guest_vmmemctl_enable="YES"
-vmware_guest_vmmemctl_enable="\$vmware_guest_kmod_enable"
+vmware_guest_vmmemctl_enable="YES"
 run_rc_command "\$1"
 
 # VMware kernel module: vmxnet
