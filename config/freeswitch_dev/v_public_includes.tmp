@@ -157,7 +157,9 @@ build_menu();
             </strong></span></span>
         </td>
         <td align='right'>
-          <input type='button' value='public.xml' alt='' onclick="document.location.href='v_public.php';">
+		<?php
+          echo "<input type='button' value='public.xml' alt='' onclick=\"document.location.href='".$v_relative_url."/v_public.php';\">\n";
+		?>
         </td>
       </tr>
       <tr>
