@@ -52,7 +52,7 @@ function v_settings()
 	$config['installedpackages']['freeswitchsettings']['config'][0]['tmp_dir'] = '/tmp';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['bin_dir'] = '/usr/local/bin';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_startup_script_dir'] = '/usr/local/etc/rc.d';
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.13";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.14";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_version'] = "1.0.4";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_revision'] = "Release";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_label'] = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
@@ -3367,7 +3367,7 @@ function v_install_phase_1()
 	
 	
 	//exec("fetch ".$download_path."freeswitch.tgz"); //handled by freeswitch.xml
-	//exec("tar zxvf ".$tmp_dir."/freeswitch.tgz -C /usr/local/");
+	//exec("tar zxvf ".$tmp_dir."/freeswitch.tgz -C ".$v_parent_dir);
 	//unlink_if_exists($tmp_dir."/freeswitch.tgz");
 
 	
@@ -3445,9 +3445,6 @@ function v_install_phase_1()
 	exec("cd ".$v_dir."/sounds/custom/8000/;fetch ".$download_path."press_1_to_accept_2_to_reject_or_3_for_voicemail.wav");
 
 
-
-
-
   /* freeswitch settings defaults */
   	if (strlen($config['installedpackages']['freeswitchsettings']['config'][0]['numbering_plan']) == 0) {
   	   $config['installedpackages']['freeswitchsettings']['config'][0]['numbering_plan'] = "US";
@@ -3479,7 +3476,9 @@ function v_install_phase_1()
 	if (strlen($config['installedpackages']['freeswitchsettings']['config'][0]['mod_shout_volume']) == 0) {
 		$config['installedpackages']['freeswitchsettings']['config'][0]['mod_shout_volume'] = "0.3";
 	}
-    		
+	
+    v_settings();
+	
 	$numbering_plan = $config['installedpackages']['freeswitchsettings']['config'][0]['numbering_plan'];
 	$event_socket_password = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_password'];
 	$event_socket_port = $config['installedpackages']['freeswitchsettings']['config'][0]['event_socket_port'];
@@ -3864,23 +3863,24 @@ function v_install_phase_1()
 			exec("rm -R ".$v_dir."/sounds/music/");
 			
 			//Recommended
-			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/db/');
-			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/log/');
-			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/recordings/');
-			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/scripts/');
-			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/storage/');
-			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/sounds/custom/8000/');
-			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/sounds/music/8000/');
-			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/ssl/');
-			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/sip_profiles/');
-			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/vars.xml');
-			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/dialplan/default.xml');
-			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/dialplan/public.xml');
+			chdir($v_parent_dir);
+			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/db/');
+			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/log/');
+			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/recordings/');
+			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/scripts/');
+			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/storage/');
+			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/sounds/custom/8000/');
+			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/sounds/music/8000/');
+			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/ssl/');
+			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/sip_profiles/');
+			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/vars.xml');
+			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/dialplan/default.xml');
+			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/dialplan/public.xml');
 
 			//Optional
-			//system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/');
-			//system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/grammar/');
-			//system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/htdocs/');
+			//system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/');
+			//system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/grammar/');
+			//system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/htdocs/');
 
 			unset($filename);
 		}
@@ -3910,7 +3910,7 @@ function v_install_phase_1()
 	
 	$static_output = 'Start the Service';
 	update_output_window($static_output);
-	$handle = popen("/usr/local/etc/rc.d/freeswitch.sh start", "r");
+	$handle = popen($v_startup_script_dir."/freeswitch.sh start", "r");
 	pclose($handle);
 
 	//if (pkg_is_service_running('freeswitch')) {
@@ -3966,12 +3966,12 @@ function v_deinstall_command()
 	
 	exec("pkg_delete sqlite34");
 	
-	unlink_if_exists("/usr/local/pkg/".$v_name.".xml");
-	unlink_if_exists("/usr/local/pkg/v_config.inc");
+	unlink_if_exists($v_parent_dir."/pkg/".$v_name.".xml");
+	unlink_if_exists($v_parent_dir."/pkg/v_config.inc");
 
 	exec("rm -R ".$v_dir);
 	exec("rm -R ".$v_web_dir);
-	unlink_if_exists("/usr/local/etc/rc.d/".$v_name.".sh");
+	unlink_if_exists($v_startup_script_dir."/".$v_name.".sh");
 	//unlink_if_exists($tmp_dir."/".$v_name.".tar.gz");
 	unlink_if_exists($tmp_dir."/pkg_mgr_".$v_label.".log");
 	
