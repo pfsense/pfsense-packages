@@ -135,12 +135,12 @@ EOF;
 	// Write out conf files.
 	$fd = fopen("/usr/local/etc/rc.d/vmware-guestd.sh", "w");
 	if(!$fd) 
-		die("Could not open /usr/local/etc/rc.d/vmware-guestd.sh or writing");
+		die("Could not open /usr/local/etc/rc.d/vmware-guestd.sh for writing");
 	fwrite($fd, $vmware_guestd);
 	fclose($fd);
 	$fd = fopen("/usr/local/etc/rc.d/vmware-kmod.sh", "w");
 	if(!$fd) 
-		die("Could not open /usr/local/etc/rc.d/vmware-kmod.sh or writing");
+		die("Could not open /usr/local/etc/rc.d/vmware-kmod.sh for writing");
 	fwrite($fd, $vmware_kmod);
 	fclose($fd);
 
