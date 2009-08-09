@@ -32,8 +32,8 @@ require("/usr/local/pkg/v_config.inc");
 
 //$a_extensions 	   = &$config['installedpackages']['freeswitchprofiles']['config'];
 
-$fd = fopen("/usr/local/freeswitch/conf/sip_profiles/".$_GET['f'], "r");
-$content = fread($fd, filesize("/usr/local/freeswitch/conf/sip_profiles/".$_GET['f']));
+$fd = fopen($v_conf_dir."/sip_profiles/".$_GET['f'], "r");
+$content = fread($fd, filesize($v_conf_dir."/sip_profiles/".$_GET['f']));
 fclose($fd);
 	
 include("head.inc");
@@ -107,11 +107,15 @@ build_menu();
 
   	<table width="98%" border="0" cellpadding="6" cellspacing="0">
       <tr>
-        <td>/usr/local/freeswitch/conf/sip_profiles/<?php echo $_GET['f']; ?></td>
+        <td>
+		<?php
+		if ($v_path_show) {
+			echo $v_conf_dir."/sip_profiles/".$_GET['f']."</td>";
+		}
 		<td align='right'>
 			<input type="hidden" name="a" value="save" />
 			<?php
-			echo "<input type='button' value='Restore Default' onclick=\"document.location.href='/packages/freeswitch/v_profiles.php?a=default&f=".$_GET['f']."';\" />";
+			echo "<input type='button' value='Restore Default' onclick=\"document.location.href='v_profiles.php?a=default&f=".$_GET['f']."';\" />";
 			?>
 		</td>
       </tr>

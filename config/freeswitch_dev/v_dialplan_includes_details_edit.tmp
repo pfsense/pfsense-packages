@@ -96,16 +96,16 @@ if ($_POST) {
 
 
 		if (isset($id) && $a_dialplan_includes_details[$id]) {
-		  //update
-      $a_dialplan_includes_details[$id] = $ent;
+			//update
+			$a_dialplan_includes_details[$id] = $ent;
 		}
 		else {
-		  //add
+			//add
 			$a_dialplan_includes_details[] = $ent;
 		}
 				
 		write_config();
-    sync_package_v_dialplan_includes();
+		sync_package_v_dialplan_includes();
 		
 		header("Location: v_dialplan_includes_edit.php?id=".$parentid);
 		exit;
@@ -275,13 +275,17 @@ build_menu();
             </table>
         </form>
 
-      <br />
-      <br />
-      <b>Additional Information</b>
-      <br />
-      <br />
-      <a href='http://wiki.freeswitch.org/wiki/Dialplan_XML' target='_blank'>http://wiki.freeswitch.org/wiki/Dialplan_XML</a>
 
+	  <?php
+	  if ($v_path_show) {
+		echo "<br />\n";
+		echo "<br />\n";
+		echo "<b>Additional Information</b>\n";
+		echo "<br />\n";
+		echo "<br />\n";
+		echo "<a href='http://wiki.freeswitch.org/wiki/Dialplan_XML' target='_blank'>http://wiki.freeswitch.org/wiki/Dialplan_XML</a>";
+	  }
+	  ?>
       <br />
       <br />
       <br />
@@ -290,7 +294,7 @@ build_menu();
       <b>Conditions</b>
       <br />
       <br />
-      Conditions are pattern matching tags that help FreeSwitch decide if the current call should be processed in this extension or not. When matching conditions against the current call you have several <b>fields</b> that you can compare against.
+      Conditions are pattern matching tags that help decide if the current call should be processed in this extension or not. When matching conditions against the current call you have several <b>fields</b> that you can compare against.
       <ul>
           <li><b>context</b></li>
           <li><b>rdnis</b> Redirected Number, the directory number to which the call was last presented.</li>
@@ -301,7 +305,7 @@ build_menu();
           <li><b>ani</b> Automatic Number Identification, the number of the calling party (callee) -- cannot be masked</li>
           <li><b>ani2</b> The type of device placing the call [1]</li>
           <li><b>uuid</b> Unique identifier of the current call? (looks like a GUID)</li>
-          <li><b>source</b> Name of the FreeSwitch module that received the call (e.g. PortAudio)</li>
+          <li><b>source</b> Name of the module that received the call (e.g. PortAudio)</li>
           <li><b>chan_name</b> Name of the current channel (Example: PortAudio/1234). Give us examples when this one can be used.</li>
           <li><b>network_addr</b> IP address of the signalling source for a VoIP call.</li>
       </ul>
@@ -319,10 +323,14 @@ build_menu();
       <br />
       <br />
       Actions are executed when the <b>condition matches</b>. Anti-Actions are executed when the <b>condition does NOT match</b>.
-      Additional information on applications for Actions and Anti-Actions.<br />
-      <a href='http://wiki.freeswitch.org/wiki/Modules#Applications' target='_blank'>http://wiki.freeswitch.org/wiki/Modules#Applications</a>
-      <br />
-      <a href='http://wiki.freeswitch.org/wiki/Dialplan_Functions' target='_blank'>http://wiki.freeswitch.org/wiki/Dialplan_Functions</a>
+	  <?php
+	  if ($v_path_show) {
+		  echo "Additional information on applications for Actions and Anti-Actions.<br />\n";
+		  echo "<a href='http://wiki.freeswitch.org/wiki/Modules#Applications' target='_blank'>http://wiki.freeswitch.org/wiki/Modules#Applications</a>\n";
+		  echo "<br />\n";
+		  echo "<a href='http://wiki.freeswitch.org/wiki/Dialplan_Functions' target='_blank'>http://wiki.freeswitch.org/wiki/Dialplan_Functions</a>\n";
+	  }
+	  ?>
       <br />
       <br />
       <br />
@@ -358,8 +366,12 @@ build_menu();
       <b>Param</b>
       Example parameters by name and value
       <br />
-      <a href='http://wiki.freeswitch.org/wiki/Special:Search?search=param&go=Go' target='_blank'>http://wiki.freeswitch.org/wiki/Special:Search?search=param&go=Go</a>
-      <ul>
+	  <?php
+	  if ($v_path_show) {
+		echo "<a href='http://wiki.freeswitch.org/wiki/Special:Search?search=param&go=Go' target='_blank'>http://wiki.freeswitch.org/wiki/Special:Search?search=param&go=Go</a>\n";
+      }
+	  ?>
+	  <ul>
       <li><b>codec-ms</b> 20</li>
       <li><b>codec-prefs</b> PCMU@20i</li>
       <li><b>debug</b> 1</li>

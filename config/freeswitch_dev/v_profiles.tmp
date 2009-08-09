@@ -35,7 +35,7 @@ require("/usr/local/pkg/v_config.inc");
 
 if ($_GET['a'] == "default") {
 	conf_mount_rw();
-	exec("cp /usr/local/freeswitch/conf.orig/sip_profiles/".$_GET['f']." /usr/local/freeswitch/conf/sip_profiles/".$_GET['f']);
+	exec("cp ".$v_conf_dir.".orig/sip_profiles/".$_GET['f']." ".$v_conf_dir."/sip_profiles/".$_GET['f']);
 	$savemsg = "Restore Default";
 	conf_mount_ro();
 }
@@ -43,7 +43,7 @@ if ($_GET['a'] == "default") {
 if ($_POST['a'] == "save") {
 	conf_mount_rw();
 	$content = ereg_replace("\r","",$_POST['code']);
-	$fd = fopen("/usr/local/freeswitch/conf/sip_profiles/".$_POST['f'], "w");
+	$fd = fopen($v_conf_dir."/sip_profiles/".$_POST['f'], "w");
 	fwrite($fd, $content);
 	fclose($fd);
 	$savemsg = "Saved";
@@ -57,7 +57,7 @@ if ($_GET['a'] == "del") {
             //unset($a_extensions[$_GET['id']]);
             //write_config();
 
-			exec("rm /usr/local/freeswitch/conf/sip_profiles/".$_GET['f']);			
+			exec("rm ".$v_conf_dir."/sip_profiles/".$_GET['f']);			
             header("Location: v_profiles.php");
             exit;
         //}
@@ -118,7 +118,7 @@ build_menu();
 
 	<?php
 
-	foreach (ListFiles('/usr/local/freeswitch/conf/sip_profiles') as $key=>$file){
+	foreach (ListFiles($v_conf_dir.'/sip_profiles') as $key=>$file){
     ?>
           <tr>
             <td class="listr" ondblclick="document.location='v_profile_edit.php?f=<?=$file;?>';" valign="middle">
@@ -194,7 +194,11 @@ build_menu();
 
 <br>
 <br>
-/usr/local/freeswitch/conf/sip_profiles
+<?php
+if ($v_path_show) {
+	echo $v_conf_dir."/sip_profiles\n";
+}
+?>
 <br>
 <br>
 <br>

@@ -81,7 +81,7 @@ function sf() { document.forms[0].savetopath.focus(); }
 
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_project_label: Variables</p>\n";
+echo "<p class=\"pgtitle\">$v_label: Variables</p>\n";
 ?>
 
 <div id="mainlevel">
@@ -134,7 +134,7 @@ build_menu();
 			<input type="hidden" name="f" value="<?php echo $_GET['f']; ?>" />
 			<input type="hidden" name="a" value="save" />
 			<?php
-			echo "<input type='button' value='Restore Default' onclick=\"document.location.href='/packages/freeswitch/v_vars.php?a=default&f=vars.xml';\" />";
+			echo "<input type='button' value='Restore Default' onclick=\"document.location.href='v_vars.php?a=default&f=vars.xml';\" />";
 			?>
 		</td>
       </tr>

@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
 
-  v_ivr_edit.php
+  v_auto_attendant_edit.php
   Copyright (C) 2008 Mark J Crane
   All rights reserved.
 	
@@ -150,7 +150,7 @@ if ($_POST) {
             unset($a_ivr_options[$_GET['optionid']]);
             write_config();
             sync_package_v_ivr();
-            header("Location: v_ivr_edit.php?id=".$_GET['id']);
+            header("Location: v_auto_attendant_edit.php?id=".$_GET['id']);
             exit;
         }
     }
@@ -192,7 +192,7 @@ if ($_POST) {
 		write_config();
 		sync_package_v_ivr();
 		
-		header("Location: v_ivr.php");
+		header("Location: v_auto_attendant.php");
 		exit;
 	}
 }
@@ -255,7 +255,7 @@ build_menu();
         </table>
         <br />
     		
-        <form action="v_ivr_edit.php" method="post" name="iform" id="iform">
+        <form action="v_auto_attendant_edit.php" method="post" name="iform" id="iform">
             <table width="100%" border="0" cellpadding="6" cellspacing="0">
             <tr>
               <td width="22%" valign="top" class="vncellreq">Extension</td>
@@ -456,7 +456,7 @@ build_menu();
       <br>
       <br>
 
-      <form action="v_ivr_edit.php" method="post" name="iform2" id="iform2">
+      <form action="v_auto_attendant_edit.php" method="post" name="iform2" id="iform2">
       <?php
 
 
@@ -507,7 +507,7 @@ build_menu();
             <td width="17"></td>
             <td valign="middle">
 			<?php if (strlen($ivrid) > 1) { ?>
-				<a href="v_ivr_options_edit.php?parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=action"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
+				<a href="v_auto_attendant_options_edit.php?parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=action"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
 			<?php } ?>
 			</td>
           </tr>
@@ -522,26 +522,26 @@ build_menu();
           if ($ent['optionaction'] == "action" && $ivrid == $ent['ivrid']) {
     ?>
             <tr>
-              <td class="listlr" ondblclick="document.location='v_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>'">
+              <td class="listlr" ondblclick="document.location='v_auto_attendant_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>'">
                 <?=$ent['optionnumber']?>
               </td>
-              <td class="listr" ondblclick="document.location='v_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
+              <td class="listr" ondblclick="document.location='v_auto_attendant_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
                 <?=$ent['optiontype'];?>&nbsp;
               </td>
-              <td class="listr" ondblclick="document.location='v_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
+              <td class="listr" ondblclick="document.location='v_auto_attendant_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
                 <?=$ent['optionprofile'];?>&nbsp;
               </td>			  
-              <td class="listr" ondblclick="document.location='v_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
+              <td class="listr" ondblclick="document.location='v_auto_attendant_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
                 <?=$ent['optiondest'];?>&nbsp;
               </td>
-              <td class="listbg" ondblclick="document.location='v_ivr_options_edit.php?id=<?=$id;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
+              <td class="listbg" ondblclick="document.location='v_auto_attendant_options_edit.php?id=<?=$id;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
                 <font color="#FFFFFF"><?=htmlspecialchars($ent['optiondescr']);?>&nbsp;
               </td>
               <td valign="middle" nowrap class="list">
                 <table border="0" cellspacing="0" cellpadding="1">
                   <tr>
-                    <td valign="middle"><a href="v_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                    <td><a href="v_ivr_options.php?type=ivroptions&act=del&id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>" onclick="return confirm('Do you really want to delete this recording?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                    <td valign="middle"><a href="v_auto_attendant_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                    <td><a href="v_auto_attendant_options.php?type=ivroptions&act=del&id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>" onclick="return confirm('Do you really want to delete this recording?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                   </tr>
                </table>
               </td>
@@ -560,7 +560,7 @@ build_menu();
             <td width="17"></td>
             <td valign="middle">
 			<?php if (strlen($ivrid) > 1) { ?>
-				<a href="v_ivr_options_edit.php?parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=action"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
+				<a href="v_auto_attendant_options_edit.php?parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=action"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
 			<?php } ?>
 			</td>
           </tr>
@@ -579,7 +579,7 @@ build_menu();
 
 
 
-      <form action="v_ivr_edit.php" method="post" name="iform2" id="iform2">
+      <form action="v_auto_attendant_edit.php" method="post" name="iform2" id="iform2">
       <?php
 
 
@@ -617,7 +617,7 @@ build_menu();
             <td width="17"></td>
             <td valign="middle">
 			<?php if (strlen($ivrid) > 1) { ?>
-				<a href="v_ivr_options_edit.php?parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=antiaction"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
+				<a href="v_auto_attendant_options_edit.php?parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=antiaction"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
 			<?php } ?>
 			</td>
           </tr>
@@ -632,26 +632,26 @@ build_menu();
           if ($ent['optionaction'] == "anti-action" && $ivrid == $ent['ivrid']) {
     ?>
             <tr>
-              <td class="listlr" ondblclick="document.location='v_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>'">
+              <td class="listlr" ondblclick="document.location='v_auto_attendant_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>'">
                 <?=$ent['optionnumber']?>
               </td>
-              <td class="listr" ondblclick="document.location='v_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
+              <td class="listr" ondblclick="document.location='v_auto_attendant_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
                 <?=$ent['optiontype'];?>&nbsp;
               </td>
-              <td class="listr" ondblclick="document.location='v_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
+              <td class="listr" ondblclick="document.location='v_auto_attendant_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
                 <?=$ent['optionprofile'];?>&nbsp;
               </td>			  
-              <td class="listr" ondblclick="document.location='v_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
+              <td class="listr" ondblclick="document.location='v_auto_attendant_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
                 <?=$ent['optiondest'];?>&nbsp;
               </td>
-              <td class="listbg" ondblclick="document.location='v_ivr_options_edit.php?id=<?=$id;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
+              <td class="listbg" ondblclick="document.location='v_auto_attendant_options_edit.php?id=<?=$id;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>';">
                 <font color="#FFFFFF"><?=htmlspecialchars($ent['optiondescr']);?>&nbsp;
               </td>
               <td valign="middle" nowrap class="list">
                 <table border="0" cellspacing="0" cellpadding="1">
                   <tr>
-                    <td valign="middle"><a href="v_ivr_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                    <td><a href="v_ivr_options.php?type=ivroptions&act=del&id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>" onclick="return confirm('Do you really want to delete this recording?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                    <td valign="middle"><a href="v_auto_attendant_options_edit.php?id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                    <td><a href="v_auto_attendant_options.php?type=ivroptions&act=del&id=<?=$i;?>&parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>" onclick="return confirm('Do you really want to delete this recording?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                   </tr>
                </table>
               </td>
@@ -670,7 +670,7 @@ build_menu();
             <td width="17"></td>
             <td valign="middle">
 			<?php if (strlen($ivrid) > 1) { ?>
-				<a href="v_ivr_options_edit.php?parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=antiaction"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
+				<a href="v_auto_attendant_options_edit.php?parentid=<?=$parentid;?>&ivrid=<?=$ivrid;?>&a=antiaction"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a>
 			<? } ?>
 			</td>
           </tr>

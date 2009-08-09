@@ -50,7 +50,7 @@ $email = file_get_contents ("php://stdin");
 fclose($fd);
 
 if($fd){
-    $fp = fopen("/tmp/voicemailtoemail.txt", "w");
+    $fp = fopen($tmp_dir."/voicemailtoemail.txt", "w");
 }
 
 
@@ -180,8 +180,8 @@ ob_start();
 
 //send the email
 
-      include "/usr/local/www/packages/freeswitch/class.phpmailer.php";
-      include "/usr/local/www/packages/freeswitch/class.smtp.php"; // optional, gets called from within class.phpmailer.php if not already loaded
+      include $v_web_dir."/class.phpmailer.php";
+      include $v_web_dir."/class.smtp.php"; // optional, gets called from within class.phpmailer.php if not already loaded
 
       $mail = new PHPMailer();
 

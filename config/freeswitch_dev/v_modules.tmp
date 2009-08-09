@@ -334,7 +334,11 @@ build_menu();
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>Modules<br />
             </strong></span>
-            /usr/local/freeswitch/mod/
+			<?php
+			if ($v_path_show) {
+				echo $v_mod_dir."\n";
+			}
+			?>
             </p></td>
       </tr>
     </table>

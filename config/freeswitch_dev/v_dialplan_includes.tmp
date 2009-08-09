@@ -155,13 +155,15 @@ build_menu();
             </strong></span></span>
         </td>
         <td align='right'>
-          <input type='button' value='default.xml' onclick="document.location.href='/packages/freeswitch/v_dialplan.php';">
+          <input type='button' value='default.xml' onclick="document.location.href='v_dialplan.php';">
         </td>
       </tr>
       <tr>
         <td colspan='2'>
           <span class="vexpl">
-              The dialplan is used to setup call destinations based on conditions and context. You can use the dialplan to send calls to gateways, IVRs, external numbers, to scripts, or any destination.
+              The dialplan is used to setup call destinations based on conditions and context. 
+			  You can use the dialplan to send calls to gateways, auto attendants, external numbers, 
+			  to scripts, or any destination.
           </span>
         </td>
 

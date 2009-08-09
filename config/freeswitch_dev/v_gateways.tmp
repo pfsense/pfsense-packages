@@ -30,7 +30,7 @@
 require("guiconfig.inc");
 require("/usr/local/pkg/v_config.inc");
 
-$a_gateways 	   = &$config['installedpackages']['freeswitchgateways']['config'];
+$a_gateways = $config['installedpackages']['freeswitchgateways']['config'];
 
 
 if ($_GET['act'] == "del") {
@@ -87,7 +87,7 @@ if ($config_change == 1) {
 
 //if ($savemsg) print_info_box($savemsg);
 //if (file_exists($d_hostsdirty_path)): echo"<p>";
-//print_info_box_np("The FreeSWITCH gateways have been changed.<br>You must apply the changes in order for them to take effect.");
+//print_info_box_np("The gateways have been changed.<br>You must apply the changes in order for them to take effect.");
 //echo"<br />";
 //endif;
 

@@ -49,15 +49,20 @@ function v_settings()
 {
 	global $config;
 	$config['installedpackages']['freeswitchsettings']['config'][0]['php_dir'] = '/usr/local/bin/php';
-	$config['installedpackages']['freeswitchsettings']['config'][0]['tmp_dir'] = '/tmp/';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['tmp_dir'] = '/tmp';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['bin_dir'] = '/usr/local/bin';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_startup_script_dir'] = '/usr/local/etc/rc.d';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.13";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_version'] = "1.0.4";
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_revision'] = "";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_revision'] = "Release";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_label'] = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_name'] = 'freeswitch';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_dir'] = '/usr/local/freeswitch';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_parent_dir'] = '/usr/local/';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_backup_dir'] = '/root/backup';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_web_dir'] = '/usr/local/www/packages/freeswitch';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_web_root'] = '/usr/local/www/';	
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_relative_url'] = '/packages/freeswitch';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_conf_dir'] = '/usr/local/freeswitch/conf';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_db_dir'] = '/usr/local/freeswitch/db';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_htdocs_dir'] = '/usr/local/freeswitch/htdocs';
@@ -79,69 +84,69 @@ function build_menu() {
 	
 	$tab_array = array();
 	$menu_selected = false;
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_settings.php") { $menu_selected = true; }
-	$tab_array[] = array(gettext("Settings"), $menu_selected, "/packages/freeswitch/v_settings.php");
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_settings.php") { $menu_selected = true; }
+	$tab_array[] = array(gettext("Settings"), $menu_selected, $v_relative_url."/v_settings.php");
 	unset($menu_selected);
 
 	$menu_selected = false;
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_dialplan_includes.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_dialplan.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_dialplan_includes_edit.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_dialplan_includes_details_edit.php") { $menu_selected = true; }
-	$tab_array[] = array(gettext("Dialplan"), $menu_selected, "/packages/freeswitch/v_dialplan_includes.php");
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_dialplan_includes.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_dialplan.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_dialplan_includes_edit.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_dialplan_includes_details_edit.php") { $menu_selected = true; }
+	$tab_array[] = array(gettext("Dialplan"), $menu_selected, $v_relative_url."/v_dialplan_includes.php");
 	unset($menu_selected);
 
 	$menu_selected = false;
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_extensions.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_extensions_edit.php") { $menu_selected = true; }
-	$tab_array[] = array(gettext("Extensions"), $menu_selected, "/packages/freeswitch/v_extensions.php");
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_extensions.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_extensions_edit.php") { $menu_selected = true; }
+	$tab_array[] = array(gettext("Extensions"), $menu_selected, $v_relative_url."/v_extensions.php");
 	unset($menu_selected);
 
 	$menu_selected = false;
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_features.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_fax.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_fax_edit.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_hunt_group.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_hunt_group_edit.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_hunt_group_destinations.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_hunt_group_destinations_edit.php") { $menu_selected = true; }	
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_ivr.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_ivr_edit.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_ivr_options_edit.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_modules.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_recordings.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_recordings_edit.php") { $menu_selected = true; }
-	$tab_array[] = array(gettext("Features"), $menu_selected, "/packages/freeswitch/v_features.php");
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_features.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_fax.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_fax_edit.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_hunt_group.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_hunt_group_edit.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_hunt_group_destinations.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_hunt_group_destinations_edit.php") { $menu_selected = true; }	
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_auto_attendant.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_auto_attendant_edit.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_auto_attendant_options_edit.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_modules.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_recordings.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_recordings_edit.php") { $menu_selected = true; }
+	$tab_array[] = array(gettext("Features"), $menu_selected, $v_relative_url."/v_features.php");
 	unset($menu_selected);
 
 	$menu_selected = false;
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_gateways.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_gateways_edit.php") { $menu_selected = true; }
-	$tab_array[] = array(gettext("Gateways"), $menu_selected, "/packages/freeswitch/v_gateways.php");
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_gateways.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_gateways_edit.php") { $menu_selected = true; }
+	$tab_array[] = array(gettext("Gateways"), $menu_selected, $v_relative_url."/v_gateways.php");
 	unset($menu_selected);
 
 	$menu_selected = false;
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_profiles.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_profile_edit.php") { $menu_selected = true; }
-	$tab_array[] = array(gettext("Profiles"), $menu_selected, "/packages/freeswitch/v_profiles.php");
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_profiles.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_profile_edit.php") { $menu_selected = true; }
+	$tab_array[] = array(gettext("Profiles"), $menu_selected, $v_relative_url."/v_profiles.php");
 	unset($menu_selected);
 
 	$menu_selected = false;
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_public.php") { $menu_selected = true; }	
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_public_includes.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_public_includes_edit.php") { $menu_selected = true; }
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_public_includes_details_edit.php") { $menu_selected = true; }	
-	$tab_array[] = array(gettext("Public"), $menu_selected, "/packages/freeswitch/v_public_includes.php");
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_public.php") { $menu_selected = true; }	
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_public_includes.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_public_includes_edit.php") { $menu_selected = true; }
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_public_includes_details_edit.php") { $menu_selected = true; }	
+	$tab_array[] = array(gettext("Public"), $menu_selected, $v_relative_url."/v_public_includes.php");
 	unset($menu_selected);
 
 	$menu_selected = false;
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_status.php") { $menu_selected = true; }
-	$tab_array[] = array(gettext("Status"), $menu_selected, "/packages/freeswitch/v_status.php");
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_status.php") { $menu_selected = true; }
+	$tab_array[] = array(gettext("Status"), $menu_selected, $v_relative_url."/v_status.php");
 	unset($menu_selected);
 
 	$menu_selected = false;
-	if ($_SERVER["SCRIPT_NAME"] == "/packages/freeswitch/v_vars.php") { $menu_selected = true; }
-	$tab_array[] = array(gettext("Vars"), $menu_selected, "/packages/freeswitch/v_vars.php");
+	if ($_SERVER["SCRIPT_NAME"] == $v_relative_url."/v_vars.php") { $menu_selected = true; }
+	$tab_array[] = array(gettext("Vars"), $menu_selected, $v_relative_url."/v_vars.php");
 	unset($menu_selected);
 	
 	display_top_tabs($tab_array);
@@ -1542,7 +1547,7 @@ function sync_package_v_hunt_group()
 							$tmp .=	"session.streamFile( \"".$v_dir."/sounds/custom/8000/please_say_your_name_and_reason_for_calling.wav\");\n";
 							$tmp .=	"session.execute(\"gentones\", \"%(1000, 0, 640)\");\n";
 							$tmp .=	"session.execute(\"set\", \"playback_terminators=#\");\n";
-							$tmp .=	"session.execute(\"record\", \"/tmp/\"+caller_announce+\" 180 200\");\n";
+							$tmp .=	"session.execute(\"record\", \"".$tmp_dir."/\"+caller_announce+\" 180 200\");\n";
 							$tmp .=	"\n";
 							$tmp .=	"result = session.setAutoHangup(false);\n";
 							$tmp .=	"session.execute(\"transfer\", \"*\"+extension+\" XML default\");\n";
@@ -3112,8 +3117,8 @@ function v_install_phase_2() {
 
 	clearstatcache(); //clear file status cache
 	
-	if (!is_dir('/usr/local/www/packages/')) {
-	   exec("mkdir /usr/local/www/packages/");
+	if (!is_dir($v_web_root.'/packages/')) {
+	   exec("mkdir ".$v_web_root."/packages/");
 	}
 
 	if (!is_dir($v_web_dir)) {
@@ -3150,11 +3155,12 @@ function v_install_phase_2() {
 	
 	
 	//misc files
-	if (!is_dir('/usr/local/www/edit_area/')) {
-		chdir('/tmp/');
-		exec("cd /tmp/;fetch ".$v_download_path."edit_area.tgz");
-		system('cd /usr/local/www; tar xvpfz /tmp/edit_area.tgz edit_area');
-		unlink_if_exists("/tmp/edit_area.tgz");
+	if (!is_dir($v_web_root.'/edit_area/')) {
+		chdir($tmp_dir);
+		exec("fetch ".$v_download_path."edit_area.tgz");
+		chdir($v_web_root);
+		system('tar xvpfz ".tmp_dir."/edit_area.tgz edit_area');
+		unlink_if_exists($tmp_dir."/edit_area.tgz");
 	}
 
 	
@@ -3210,7 +3216,7 @@ function v_install_phase_2() {
 
 	exec("fetch ".$v_download_path."v_fax_edit.tmp");
 	exec("cp ".$tmp_dir."/v_fax_edit.tmp ".$v_web_dir."/v_fax_edit.php");
-	unlink_if_exists("/tmp/v_fax_edit.tmp");
+	unlink_if_exists($tmp_dir."/v_fax_edit.tmp");
 
 	exec("fetch ".$v_download_path."fax_to_email.tmp");
 	exec("cp ".$tmp_dir."/fax_to_email.tmp ".$v_web_dir."/fax_to_email.php");
@@ -3244,21 +3250,21 @@ function v_install_phase_2() {
 	exec("cp ".$tmp_dir."/v_hunt_group_destinations_edit.tmp ".$v_web_dir."/v_hunt_group_destinations_edit.php");
 	unlink_if_exists($tmp_dir."/v_hunt_group_destinations_edit.tmp");
 
-	exec("fetch ".$v_download_path."v_ivr.tmp");	
-	exec("cp ".$tmp_dir."/v_ivr.tmp ".$v_web_dir."/v_ivr.php");
-	unlink_if_exists($tmp_dir."/v_ivr.tmp");
+	exec("fetch ".$v_download_path."v_auto_attendant.tmp");	
+	exec("cp ".$tmp_dir."/v_auto_attendant.tmp ".$v_web_dir."/v_auto_attendant.php");
+	unlink_if_exists($tmp_dir."/v_auto_attendant.tmp");
 
-	exec("fetch ".$v_download_path."v_ivr_edit.tmp");
-	exec("cp ".$tmp_dir."/v_ivr_edit.tmp ".$v_web_dir."/v_ivr_edit.php");
-	unlink_if_exists($tmp_dir."/v_ivr_edit.tmp");
+	exec("fetch ".$v_download_path."v_auto_attendant_edit.tmp");
+	exec("cp ".$tmp_dir."/v_auto_attendant_edit.tmp ".$v_web_dir."/v_auto_attendant_edit.php");
+	unlink_if_exists($tmp_dir."/v_auto_attendant_edit.tmp");
 
-	exec("fetch ".$v_download_path."v_ivr_options.tmp");
-	exec("cp ".$tmp_dir."/v_ivr_options.tmp ".$v_web_dir."/v_ivr_options.php");
-	unlink_if_exists($tmp_dir."/v_ivr_options.tmp");
+	exec("fetch ".$v_download_path."v_auto_attendant_options.tmp");
+	exec("cp ".$tmp_dir."/v_auto_attendant_options.tmp ".$v_web_dir."/v_auto_attendant_options.php");
+	unlink_if_exists($tmp_dir."/v_auto_attendant_options.tmp");
 
-	exec("fetch ".$v_download_path."v_ivr_options_edit.tmp");
-	exec("cp ".$tmp_dir."/v_ivr_options_edit.tmp ".$v_web_dir."/v_ivr_options_edit.php");
-	unlink_if_exists($tmp_dir."/v_ivr_options_edit.tmp");
+	exec("fetch ".$v_download_path."v_auto_attendant_options_edit.tmp");
+	exec("cp ".$tmp_dir."/v_auto_attendant_options_edit.tmp ".$v_web_dir."/v_auto_attendant_options_edit.php");
+	unlink_if_exists($tmp_dir."/v_auto_attendant_options_edit.tmp");
 
 	exec("fetch ".$v_download_path."v_profiles.tmp");
 	exec("cp ".$tmp_dir."/v_profiles.tmp ".$v_web_dir."/v_profiles.php");
@@ -3316,18 +3322,9 @@ function v_install_phase_2() {
 	exec("cp ".$tmp_dir."/v_status.tmp ".$v_web_dir."/v_status.php");
 	unlink_if_exists($tmp_dir."/v_status.tmp");
 
-	exec("fetch ".$v_download_path."v_time_conditions.tmp");
-	exec("cp ".$tmp_dir."/v_time_conditions.tmp ".$v_web_dir."/v_time_conditions.php");
-	unlink_if_exists($tmp_dir."/v_time_conditions.tmp");
-
-	exec("fetch ".$v_download_path."v_time_conditions_edit.tmp");
-	exec("cp ".$tmp_dir."/v_time_conditions_edit.tmp ".$v_web_dir."/v_time_conditions_edit.php");
-	unlink_if_exists($tmp_dir."/v_time_conditions_edit.tmp");
-
 	exec("fetch ".$v_download_path."v_vars.tmp");
 	exec("cp ".$tmp_dir."/v_vars.tmp ".$v_web_dir."/v_vars.php");
 	unlink_if_exists($tmp_dir."/v_vars.tmp");
-
 	
 	chdir($v_scripts_dir);
 	exec("fetch ".$v_download_path."disa.js");
@@ -3369,9 +3366,9 @@ function v_install_phase_1()
 //	update_output_window($static_output);
 	
 	
-	//exec("cd /tmp/;fetch ".$download_path."freeswitch.tgz"); //handled by freeswitch.xml
-	//exec("tar zxvf /tmp/freeswitch.tgz -C /usr/local/");
-	//unlink_if_exists("/tmp/freeswitch.tgz");
+	//exec("fetch ".$download_path."freeswitch.tgz"); //handled by freeswitch.xml
+	//exec("tar zxvf ".$tmp_dir."/freeswitch.tgz -C /usr/local/");
+	//unlink_if_exists($tmp_dir."/freeswitch.tgz");
 
 	
 //	$static_output = 'Downloading Files';

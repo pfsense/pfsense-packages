@@ -30,8 +30,8 @@
 require("guiconfig.inc");
 require("/usr/local/pkg/v_config.inc");
 
-$a_recordings 	   = &$config['installedpackages']['freeswitchrecordings']['config'];
-$dir_recordings = $v_recordings_dir.'/recordings/';
+$a_recordings = $config['installedpackages']['freeswitchrecordings']['config'];
+$dir_recordings = $v_recordings_dir.'/';
 $dir_music_on_hold_8000 = $v_dir.'/sounds/music/8000/';
 
 if ($_GET['a'] == "download") {
@@ -286,7 +286,14 @@ if ($config_change == 1) {
 	<form action="" method="POST" enctype="multipart/form-data" name="frmUpload" onSubmit="">
 	  <table border='0'>
 	    <tr>
-	      <td width='50%'><b>location:</b> <?php echo $dir_recordings; ?></td>
+	      <td width='50%'>
+		  <?php
+		  if ($v_path_show) {
+			  echo "<b>location:</b>";
+			  echo $dir_recordings;
+		  }
+		  ?>
+		  </td>
 	      <td valign="top" class="label">
 	        <input name="type" type="hidden" value="rec">     	
         </td>
@@ -404,7 +411,14 @@ if ($config_change == 1) {
   	<form action="" method="POST" enctype="multipart/form-data" name="frmUpload" onSubmit="">
   	  <table border='0'>
   	    <tr>
-  	      <td width='50%'><b>location:</b> <?php echo $dir_music_on_hold_8000; ?></td>
+  	      <td width='50%'>
+		  <?php
+		  if ($v_path_show) {
+			  echo "<b>location:</b>";
+			  echo $dir_music_on_hold_8000;
+		  }
+		  ?>
+		  </td>
   	      <td valign="top" class="label">
   	        <input name="type" type="hidden" value="moh">     	
           </td>

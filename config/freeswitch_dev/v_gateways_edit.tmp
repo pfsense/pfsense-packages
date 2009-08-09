@@ -352,9 +352,14 @@ build_menu();
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>Gateway Setup<br>
             </strong></span>
-            The 'SIP Provider Examples' from the FreeSWITCH wiki can be used as reference to get started. <br />
-            <a href='http://wiki.freeswitch.org/wiki/SIP_Provider_Examples' target='_blank'>http://wiki.freeswitch.org/wiki/SIP_Provider_Examples</a>
-            </p></td>
+			Gateways provide access into other voice networks. These can be voice providers or other systems that require SIP registration. 
+			<?php
+			if ($v_path_show) {
+				echo "The 'SIP Provider Examples' from the FreeSWITCH wiki can be used as reference to get started. <br />\n";
+				echo "<a href='http://wiki.freeswitch.org/wiki/SIP_Provider_Examples' target='_blank'>http://wiki.freeswitch.org/wiki/SIP_Provider_Examples</a>\n";
+            }
+			?>
+			</p></td>
       </tr>
     </table>
     <br />

@@ -31,7 +31,7 @@ require("guiconfig.inc");
 require("/usr/local/pkg/v_config.inc");
 
 
-//freeswitchpublicincludes
+//v_public_includes
   //publicincludeid
   //extensionname
   //context
@@ -39,7 +39,7 @@ require("/usr/local/pkg/v_config.inc");
   //enabled
   //descr
 
-//freeswitchpublicincludedetails
+//v_public_include_details
 
   //publicincludeid
   //tag
@@ -84,8 +84,8 @@ if ($_GET['act'] == "del") {
             }
 
             //if the public include xml file exists then delete it
-            if (file_exists("/usr/local/freeswitch/conf/dialplan/public/".$publicincludefilename)) {
-				unlink("/usr/local/freeswitch/conf/dialplan/public/".$publicincludefilename);
+            if (file_exists($v_conf_dir."/dialplan/public/".$publicincludefilename)) {
+				unlink($v_conf_dir."/dialplan/public/".$publicincludefilename);
             }
 
             unset($publicincludefilename);
@@ -107,7 +107,7 @@ include("head.inc");
 <?php
 include("fbegin.inc");
 if ($v_label_show) {
-	echo "<p class=\"pgtitle\">$v_project_label: Public</p>\n";
+	echo "<p class=\"pgtitle\">$v_label: Public</p>\n";
 }
 ?>
 
@@ -142,7 +142,7 @@ build_menu();
 
 //if ($savemsg) print_info_box($savemsg);
 //if (file_exists($d_hostsdirty_path)): echo"<p>";
-//print_info_box_np("The FreeSWITCH recordings have been changed.<br>You must apply the changes in order for them to take effect.");
+//print_info_box_np("The recordings have been changed.<br>You must apply the changes in order for them to take effect.");
 //echo"<br />";
 //endif;
 
@@ -157,7 +157,7 @@ build_menu();
             </strong></span></span>
         </td>
         <td align='right'>
-          <input type='button' value='public.xml' alt='' onclick="document.location.href='/packages/freeswitch/v_public.php';">
+          <input type='button' value='public.xml' alt='' onclick="document.location.href='/v_public.php';">
         </td>
       </tr>
       <tr>
@@ -263,14 +263,17 @@ build_menu();
      </table>
 
 </form>
-
-/usr/local/freeswitch/conf/dialplan/public/
-<br>
-<br>
-<br>
-<br>
-<br>
-<br>
+<?php
+if ($v_path_show) {
+	echo $v_conf_dir."/dialplan/public/";
+}
+?>
+<br />
+<br />
+<br />
+<br />
+<br />
+<br />
 
 </td>
 </tr>

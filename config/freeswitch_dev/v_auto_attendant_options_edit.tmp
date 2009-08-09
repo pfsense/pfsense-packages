@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
 
-	v_recordings_edit.php
+	v_auto_attendant_options_edit.php
 	Copyright (C) 2008 Mark J Crane
 	All rights reserved.
 
@@ -96,7 +96,7 @@ if ($_POST) {
 		write_config();
 		sync_package_v_ivr();
 		
-		header("Location: v_ivr_edit.php?id=".$parentid);
+		header("Location: v_auto_attendant_edit.php?id=".$parentid);
 		exit;
 	}
 }
@@ -129,7 +129,7 @@ build_menu();
    <tr>
      <td class="tabcont" >
 		<br />
-        <form action="v_ivr_options_edit.php" method="post" name="iform" id="iform">
+        <form action="v_auto_attendant_options_edit.php" method="post" name="iform" id="iform">
             <table width="100%" border="0" cellpadding="6" cellspacing="0">
             <tr>
               <td width="22%" valign="top" class="vncellreq">Option Number</td>

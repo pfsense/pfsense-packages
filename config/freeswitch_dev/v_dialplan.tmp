@@ -112,7 +112,7 @@ build_menu();
         <td width='90%'><p><span class="vexpl"><span class="red"><strong>Default Dialplan<br>
             </strong></span>
             The default dialplan is used to setup call destinations based on conditions and context. 
-			You can use the dialplan to send calls to gateways, IVRs, external numbers, to scripts, or any destination.
+			You can use the dialplan to send calls to gateways, auto attendants, external numbers, to scripts, or any destination.
             </p>
 		</td>
 		<td width='10%' align='right' valign='middle'><input type="submit" value="save" /></td>
@@ -138,7 +138,7 @@ build_menu();
 			<input type="hidden" name="f" value="<?php echo $_GET['f']; ?>" />
 			<input type="hidden" name="a" value="save" />
 			<?php
-			echo "<input type='button' value='Restore Default' onclick=\"document.location.href='/packages/freeswitch/v_dialplan.php?a=default&f=default.xml';\" />";
+			echo "<input type='button' value='Restore Default' onclick=\"document.location.href='v_dialplan.php?a=default&f=default.xml';\" />";
 			?>
 		</td>
       </tr>

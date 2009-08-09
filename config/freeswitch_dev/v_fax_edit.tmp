@@ -152,8 +152,8 @@ if (($_POST['type'] == "fax_send") && is_uploaded_file($_FILES['fax_file']['tmp_
 		//exec("rm ".$dir_fax_temp.$fax_name.".tif");
 	
 	//convert the tif to pdf and png
-		exec("cd $dir_fax_sent; /usr/local/bin/tiff2png ".$dir_fax_sent.$fax_name.".tif");
-		exec("cd $dir_fax_sent; /usr/local/bin/tiff2pdf -f -o ".$fax_name.".pdf ".$dir_fax_sent.$fax_name.".tif");
+		exec("cd $dir_fax_sent; ".bin_dir."/tiff2png ".$dir_fax_sent.$fax_name.".tif");
+		exec("cd $dir_fax_sent; ".bin_dir."/tiff2pdf -f -o ".$fax_name.".pdf ".$dir_fax_sent.$fax_name.".tif");
 
 	header("Location: v_fax_edit.php?id=".$id."&msg=".$response);
 	exit;

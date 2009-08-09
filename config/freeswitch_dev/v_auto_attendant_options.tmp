@@ -1,7 +1,7 @@
 <?php
 /* $Id$ */
 /*
-	v_ivr_options.php
+	v_auto_attendant_options.php
 	Copyright (C) 2008 Mark J Crane
 	All rights reserved.
 
@@ -40,7 +40,7 @@ if ($_GET['act'] == "del") {
             unset($a_ivr_options[$_GET['id']]);
             write_config();
             sync_package_v_ivr();
-            header("Location: v_ivr_edit.php?id=".$_GET['parentid']);
+            header("Location: v_auto_attendant_edit.php?id=".$_GET['parentid']);
             exit;
         }
     }

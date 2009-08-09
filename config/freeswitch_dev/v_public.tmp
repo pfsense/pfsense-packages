@@ -30,11 +30,11 @@
 require("guiconfig.inc");
 require("/usr/local/pkg/v_config.inc");
 
-//$a_extensions 	   = &$config['installedpackages']['freeswitchprofiles']['config'];
+//$a_extensions = $config['installedpackages']['freeswitchprofiles']['config'];
 
 if ($_GET['a'] == "default") {
 	conf_mount_rw();
-	exec("cp /usr/local/freeswitch/conf.orig/dialplan/public.xml /usr/local/freeswitch/conf/dialplan/public.xml");
+	exec("cp "$v_conf_dir.".orig/dialplan/public.xml ".$v_conf_dir."/dialplan/public.xml");
 	$savemsg = "Default Restored";
 	conf_mount_ro();
 }
@@ -42,7 +42,7 @@ if ($_GET['a'] == "default") {
 if ($_POST['a'] == "save") {
 	conf_mount_rw();
 	$content = ereg_replace("\r","",$_POST['code']);
-	$fd = fopen("/usr/local/freeswitch/conf/dialplan/public.xml", "w");
+	$fd = fopen($v_conf_dir."/dialplan/public.xml", "w");
 	fwrite($fd, $content);
 	fclose($fd);
 	$savemsg = "Saved";
@@ -50,8 +50,8 @@ if ($_POST['a'] == "save") {
 }
 
 
-$fd = fopen("/usr/local/freeswitch/conf/dialplan/public.xml", "r");
-$content = fread($fd, filesize("/usr/local/freeswitch/conf/dialplan/public.xml"));
+$fd = fopen($v_conf_dir."/dialplan/public.xml", "r");
+$content = fread($fd, filesize($v_conf_dir."/dialplan/public.xml"));
 fclose($fd);
 	
 include("head.inc");
@@ -83,7 +83,7 @@ function sf() { document.forms[0].savetopath.focus(); }
 <?php
 include("fbegin.inc");
 if ($v_label_show) {
-	echo "<p class=\"pgtitle\">$v_project_label: Public</p>\n";
+	echo "<p class=\"pgtitle\">$v_label: Public</p>\n";
 }
 ?>
 
@@ -111,7 +111,7 @@ build_menu();
       <tr>
         <td width='90%'><p><span class="vexpl"><span class="red"><strong>Public<br>
             </strong></span>
-            Directs inbound calls to extensions, IVRs, external numbers, and scripts. 
+            Directs inbound calls to extensions, auto attendants, hunt groups, external numbers, voicemail, and scripts. 
             </p>
 		</td>
 		<td width='10%' align='right' valign='middle'><input type="submit" value="save" /></td>
@@ -126,12 +126,16 @@ build_menu();
 
   	<table width="98%" border="0" cellpadding="6" cellspacing="0">
       <tr>
-        <td>/usr/local/freeswitch/conf/dialplan/public.xml</td>
+        <td>
+		if ($v_path_show) {
+			echo $v_conf_dir."/dialplan/public.xml</td>";
+		}
+		</td> 
 		<td align='right'>
 			<input type="hidden" name="f" value="<?php echo $_GET['f']; ?>" />
 			<input type="hidden" name="a" value="save" />
 			<?php
-			echo "<input type='button' value='Restore Default' onclick=\"document.location.href='/packages/freeswitch/v_public.php?a=default&f=public.xml';\" />";
+			echo "<input type='button' value='Restore Default' onclick=\"document.location.href='v_public.php?a=default&f=public.xml';\" />";
 			?>
 		</td>
       </tr>

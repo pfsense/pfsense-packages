@@ -1,7 +1,7 @@
 <?php
 /* $Id$ */
 /*
-	v_ivr.php
+	v_auto_attendant.php
 	Copyright (C) 2008 Mark J Crane
 	All rights reserved.
 
@@ -41,7 +41,7 @@ if ($_GET['act'] == "del") {
             unset($a_ivr[$_GET['id']]);
             write_config();
             sync_package_v_ivr();
-            header("Location: v_ivr.php");
+            header("Location: v_auto_attendant.php");
             exit;
         }
     }
@@ -75,7 +75,7 @@ build_menu();
    <tr>
      <td class="tabcont" >
 
-<form action="v_ivr.php" method="post" name="iform" id="iform">
+<form action="v_auto_attendant.php" method="post" name="iform" id="iform">
 
   	<table width="100%" border="0" cellpadding="6" cellspacing="0">
       <tr>
@@ -99,7 +99,7 @@ build_menu();
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
-            <td valign="middle"><a href="v_ivr_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+            <td valign="middle"><a href="v_auto_attendant_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
           </tr>
         </table>
       </td>
@@ -115,20 +115,20 @@ build_menu();
 
     ?>
     <tr>
-      <td class="listlr" ondblclick="document.location='v_ivr_edit.php?id=<?=$i;?>'">
+      <td class="listlr" ondblclick="document.location='v_auto_attendant_edit.php?id=<?=$i;?>'">
         <?=$ent['ivrextension']?>
       </td>
-      <td class="listr" ondblclick="document.location='v_ivr_edit.php?id=<?=$i;?>';">
+      <td class="listr" ondblclick="document.location='v_auto_attendant_edit.php?id=<?=$i;?>';">
         <?=$ent['ivrname'];?>&nbsp;
       </td>
-      <td class="listbg" ondblclick="document.location='v_ivr_edit.php?id=<?=$i;?>';">
+      <td class="listbg" ondblclick="document.location='v_auto_attendant_edit.php?id=<?=$i;?>';">
         <font color="#FFFFFF"><?=htmlspecialchars($ent['ivrdescr']);?>&nbsp;
       </td>
       <td valign="middle" nowrap class="list">
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
-            <td valign="middle"><a href="v_ivr_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-            <td><a href="v_ivr.php?type=ivr&act=del&id=<?=$i;?>&ivrid=<?php echo $ivrid; ?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+            <td valign="middle"><a href="v_auto_attendant_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+            <td><a href="v_auto_attendant.php?type=ivr&act=del&id=<?=$i;?>&ivrid=<?php echo $ivrid; ?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
           </tr>
        </table>
       </td>
@@ -145,7 +145,7 @@ build_menu();
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td width="17"></td>
-            <td valign="middle"><a href="v_ivr_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+            <td valign="middle"><a href="v_auto_attendant_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
           </tr>
         </table>
 		  </td>

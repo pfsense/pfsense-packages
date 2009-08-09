@@ -46,7 +46,8 @@ if ($_GET['a'] == "download") {
 	if (!is_dir($v_backup_dir.'/')) {
 	   exec("mkdir ".$v_backup_dir."/");
 	}
-    system('cd /usr/local/;tar cvzf '.$v_backup_dir.'/'.$v_name.'.bak.tgz '.$v_name);
+	chdir($v_parent_dir);
+    system(tar cvzf '.$v_backup_dir.'/'.$v_name.'.bak.tgz '.$v_name);
   }
 	session_cache_limiter('public');
 	$fd = fopen($tmp.$filename, "rb");
@@ -105,7 +106,7 @@ $savemsg = $_GET["savemsg"];
 
 //if service is not running then start it
 if (!pkg_is_service_running($v_name)) {
-	$handle = popen("/usr/local/etc/rc.d/".$v_name.".sh start", "r");
+	$handle = popen($v_startup_script_dir."/".$v_name.".sh start", "r");
 	pclose($handle);
 	//give time for the service to load
 	sleep(7);

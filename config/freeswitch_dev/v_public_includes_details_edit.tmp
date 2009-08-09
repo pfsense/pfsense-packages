@@ -291,7 +291,7 @@ build_menu();
       <br />
       <br />
 
-      Transfer the inbound call to an IVR with extension of 5000.
+      Transfer the inbound call to an auto attendant with extension of 5000.
       <br />
       <br />
       <table cellpadding='3'>
@@ -372,10 +372,16 @@ build_menu();
       <br />
       <br />
       Actions are executed when the <b>condition matches</b>. Anti-Actions are executed when the <b>condition does NOT match</b>.
-      Additional information on applications for Actions and Anti-Actions.<br />
-      <a href='http://wiki.freeswitch.org/wiki/Modules#Applications' target='_blank'>http://wiki.freeswitch.org/wiki/Modules#Applications</a>
-      <br />
-      <a href='http://wiki.freeswitch.org/wiki/public_Functions' target='_blank'>http://wiki.freeswitch.org/wiki/public_Functions</a>
+	  <?php
+	  if ($v_path_show) {
+		echo "Additional information on applications for Actions and Anti-Actions.<br />\n";
+		echo "<a href='http://wiki.freeswitch.org/wiki/Modules#Applications' target='_blank'>http://wiki.freeswitch.org/wiki/Modules#Applications</a>\n";
+		echo "<br />\n";
+		echo "<a href='http://wiki.freeswitch.org/wiki/public_Functions' target='_blank'>http://wiki.freeswitch.org/wiki/public_Functions</a>\n";
+	  }
+	  ?>
+	  
+
       <br />
       <br />
       <br />
@@ -409,10 +415,14 @@ build_menu();
 
       <!--
       <b>Param</b>
-      Example parameters by name and value
-      <br />
-      <a href='http://wiki.freeswitch.org/wiki/Special:Search?search=param&go=Go' target='_blank'>http://wiki.freeswitch.org/wiki/Special:Search?search=param&go=Go</a>
-      <ul>
+      Example parameters by name and value<br />
+      
+	  <?php
+	  if ($v_path_show) {
+		echo "<a href='http://wiki.freeswitch.org/wiki/Special:Search?search=param&go=Go' target='_blank'>http://wiki.freeswitch.org/wiki/Special:Search?search=param&go=Go</a>\n";
+      }
+	  ?>
+	  <ul>
       <li><b>codec-ms</b> 20</li>
       <li><b>codec-prefs</b> PCMU@20i</li>
       <li><b>debug</b> 1</li>

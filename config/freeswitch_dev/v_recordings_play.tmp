@@ -51,8 +51,8 @@ $type = $_GET['type']; //moh //rec
         echo "<embed src=\"v_recordings.php?a=download&type=".$type."&filename=".$filename."\" autostart=true width=200 height=40 name=\"sound".$$filename."\" enablejavascript=\"true\">\n";
       }
       if ($file_ext == "mp3") {
-        echo "<object type=\"application/x-shockwave-flash\" width=\"400\" height=\"17\" data=\"slim.swf?autoplay=true&song_title=".urlencode($filename)."&song_url=".urlencode("/freeswitch/v_recordings.php?a=download&type=".$type."&filename=".$filename)."\">\n";
-        echo "<param name=\"movie\" value=\"slim.swf?autoplay=true&song_url=".urlencode("/freeswitch/v_recordings.php?a=download&type=".$type."&filename=".$filename)."\" />\n";
+        echo "<object type=\"application/x-shockwave-flash\" width=\"400\" height=\"17\" data=\"slim.swf?autoplay=true&song_title=".urlencode($filename)."&song_url=".urlencode($v_relative_url."/v_recordings.php?a=download&type=".$type."&filename=".$filename)."\">\n";
+        echo "<param name=\"movie\" value=\"slim.swf?autoplay=true&song_url=".urlencode($v_relative_url."/v_recordings.php?a=download&type=".$type."&filename=".$filename)."\" />\n";
         echo "<param name=\"quality\" value=\"high\"/>\n";
         echo "<param name=\"bgcolor\" value=\"#E6E6E6\"/>\n";
         echo "</object>\n";

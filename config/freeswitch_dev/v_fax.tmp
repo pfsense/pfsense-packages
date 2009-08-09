@@ -180,7 +180,16 @@ if ($config_change == 1) {
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>FAX<br>
             </strong></span>
-			To receive a FAX setup a fax extension and then direct the incoming FAX with a dedicated number or you can detect the FAX tone by using <a href='http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_tone_detect' target='_blank'>tone detection</a> on the Public tab.
+			To receive a FAX setup a fax extension and then direct the incoming FAX with a dedicated number or you can detect the FAX tone by using 
+			<?php
+			if ($v_path_show) {
+				echo "<a href='http://wiki.freeswitch.org/wiki/Misc._Dialplan_Tools_tone_detect' target='_blank'>tone detection</a>\n";
+			}
+			else {
+				echo "tone detection\n";
+			}
+			?>
+			on the Public tab.
             </p></td>
       </tr>
     </table>
