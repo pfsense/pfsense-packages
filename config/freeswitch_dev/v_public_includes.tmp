@@ -157,7 +157,7 @@ build_menu();
             </strong></span></span>
         </td>
         <td align='right'>
-          <input type='button' value='public.xml' alt='' onclick="document.location.href='/v_public.php';">
+          <input type='button' value='public.xml' alt='' onclick="document.location.href='v_public.php';">
         </td>
       </tr>
       <tr>
