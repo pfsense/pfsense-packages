@@ -47,7 +47,7 @@ if ($_GET['a'] == "download") {
 	   exec("mkdir ".$v_backup_dir."/");
 	}
 	chdir($v_parent_dir);
-    system(tar cvzf '.$v_backup_dir.'/'.$v_name.'.bak.tgz '.$v_name);
+    system('tar cvzf '.$v_backup_dir.'/'.$v_name.'.bak.tgz '.$v_name);
   }
 	session_cache_limiter('public');
 	$fd = fopen($tmp.$filename, "rb");

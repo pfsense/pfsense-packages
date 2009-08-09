@@ -81,10 +81,8 @@ build_menu();
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>IVR<br />
             </strong></span>
-              An interactive voice response (IVR) often refered to as an Auto Attendant.
-              It associates a recording to multiple options that can be used to direct calls
-              to extensions, voicemail, queues, other IVR applications, and external
-              phone numbers.
+			Auto Attendant provides callers the ability to choose between multiple options that direct 
+			calls to extensions, voicemail, conferences, queues, other auto attendants, and external phone numbers. 
             </span></p></td>
       </tr>
     </table>

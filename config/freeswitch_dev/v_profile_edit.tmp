@@ -112,6 +112,7 @@ build_menu();
 		if ($v_path_show) {
 			echo $v_conf_dir."/sip_profiles/".$_GET['f']."</td>";
 		}
+		?>
 		<td align='right'>
 			<input type="hidden" name="a" value="save" />
 			<?php

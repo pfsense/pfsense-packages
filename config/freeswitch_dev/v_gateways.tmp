@@ -96,7 +96,7 @@ if ($config_change == 1) {
       <tr>
         <td><p><span class="vexpl"><span class="red"><strong>Gateways<br>
             </strong></span>
-            Use this to configure your SIP gateways also known as providers.
+            Gateways provide access into other voice networks. These can be voice providers or other systems that require SIP registration. 
             </p></td>
       </tr>
     </table>

@@ -247,9 +247,9 @@ build_menu();
 
       	<table width="100%" border="0" cellpadding="6" cellspacing="0">
           <tr>
-            <td><p><span class="vexpl"><span class="red"><strong>General Settings:<br>
+            <td><p><span class="vexpl"><span class="red"><strong>Settings:<br>
                 </strong></span>
-                Interactive voice response general settings.
+                Auto Attendant general settings.
                 </span></p></td>
           </tr>
         </table>
