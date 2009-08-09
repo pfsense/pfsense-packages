@@ -109,7 +109,7 @@ include("head.inc");
 <?php
 include("fbegin.inc");
 if ($v_label_show) {
-	echo "<p class=\"pgtitle\">$v_label: Options: Edit</p>\n";
+	echo "<p class=\"pgtitle\">$v_label: Auto Attendant: Options: Edit</p>\n";
 }
 if ($input_errors) print_input_errors($input_errors); 
 
