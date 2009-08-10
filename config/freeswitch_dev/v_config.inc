@@ -52,7 +52,7 @@ function v_settings()
 	$config['installedpackages']['freeswitchsettings']['config'][0]['tmp_dir'] = '/tmp';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['bin_dir'] = '/usr/local/bin';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_startup_script_dir'] = '/usr/local/etc/rc.d';
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.17";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.18";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_version'] = "1.0.4";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_revision'] = "Release";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_label'] = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/

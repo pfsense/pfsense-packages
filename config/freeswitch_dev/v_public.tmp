@@ -127,9 +127,11 @@ build_menu();
   	<table width="98%" border="0" cellpadding="6" cellspacing="0">
       <tr>
         <td>
+		<?php
 		if ($v_path_show) {
 			echo $v_conf_dir."/dialplan/public.xml</td>";
 		}
+		?>
 		</td> 
 		<td align='right'>
 			<input type="hidden" name="f" value="<?php echo $_GET['f']; ?>" />
