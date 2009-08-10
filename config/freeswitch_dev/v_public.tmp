@@ -34,7 +34,7 @@ require("/usr/local/pkg/v_config.inc");
 
 if ($_GET['a'] == "default") {
 	conf_mount_rw();
-	exec("cp "$v_conf_dir.".orig/dialplan/public.xml ".$v_conf_dir."/dialplan/public.xml");
+	exec("cp ".$v_conf_dir.".orig/dialplan/public.xml ".$v_conf_dir."/dialplan/public.xml");
 	$savemsg = "Default Restored";
 	conf_mount_ro();
 }
