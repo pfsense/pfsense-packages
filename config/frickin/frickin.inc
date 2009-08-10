@@ -29,6 +29,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+if(!function_exists("filter_configure")) 
+	requre_once("filter.inc");
+
 function frickin_custom_php_install_command() {
 		global $config;
 		if(file_exists("/tmp/frickin.tgz")) {

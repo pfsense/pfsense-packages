@@ -30,7 +30,8 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require_once("filter.inc");
+if(!function_exists("filter_configure")) 
+	requre_once("filter.inc");
 
 function tinydns_custom_php_install_command() {
 	global $g, $config;

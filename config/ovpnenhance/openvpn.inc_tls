@@ -38,6 +38,9 @@ require_once('config.inc');
 require_once('pfsense-utils.inc');
 require_once('util.inc');
 
+if(!function_exists("filter_configure")) 
+	requre_once("filter.inc");
+
 // Return the list of ciphers OpenVPN supports
 function openvpn_get_ciphers($pkg) {
 		foreach ($pkg['fields']['field'] as $i => $field) {

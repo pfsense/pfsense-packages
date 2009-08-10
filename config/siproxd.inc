@@ -27,6 +27,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+if(!function_exists("filter_configure")) 
+	requre_once("filter.inc");
+
 function sync_package_sipproxd_users() {
 	conf_mount_rw();
 	config_lock();

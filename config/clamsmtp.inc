@@ -2,7 +2,9 @@
 require_once('globals.inc');
 require_once('config.inc');
 require_once('service-utils.inc');
-require_once('filter.inc');
+
+if(!function_exists("filter_configure")) 
+	requre_once("filter.inc");
 
 function clamsmtp_install_command() {
 	global $g;
@@ -51,4 +53,5 @@ EOD;
 	restart_service('clamsmtp');
 	filter_configure();
 }
+
 ?>

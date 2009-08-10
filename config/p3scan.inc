@@ -3,7 +3,9 @@ require_once('globals.inc');
 require_once('config.inc');
 require_once('util.inc');
 require_once('service-utils.inc');
-require_once('filter.inc');
+
+if(!function_exists("filter_configure")) 
+	requre_once("filter.inc");
 
 define('VIRUSDIR', '/var/tmp/p3scan');
 

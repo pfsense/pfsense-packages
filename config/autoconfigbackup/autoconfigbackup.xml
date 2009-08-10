@@ -149,6 +149,8 @@
 	<custom_php_resync_config_command>
         <![CDATA[		
 			exec("echo > /cf/conf/lastpfSbackup.txt");
+			if(!function_exists("filter_configure")) 
+				requre_once("filter.inc");
 			filter_configure();
 			if($savemsg) 
 				$savemsg .= "<br/>";
