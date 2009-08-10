@@ -81,7 +81,9 @@ function sf() { document.forms[0].savetopath.focus(); }
 
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_label: Variables</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: Variables</p>\n";
+}
 ?>
 
 <div id="mainlevel">

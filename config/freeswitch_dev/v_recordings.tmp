@@ -30,8 +30,7 @@
 require("guiconfig.inc");
 require("/usr/local/pkg/v_config.inc");
 
-$a_recordings = $config['installedpackages']['freeswitchrecordings']['config'];
-$dir_recordings = $v_recordings_dir.'/';
+$a_recordings = &$config['installedpackages']['freeswitchrecordings']['config'];
 $dir_music_on_hold_8000 = $v_dir.'/sounds/music/8000/';
 
 if ($_GET['a'] == "download") {
@@ -39,8 +38,8 @@ if ($_GET['a'] == "download") {
 	session_cache_limiter('public');
 	
   if ($_GET['type'] = "rec") {
-    if  (file_exists($dir_recordings.$_GET['filename'])) {
-      	$fd = fopen($dir_recordings.$_GET['filename'], "rb");
+    if  (file_exists($v_recordings_dir.'/'.$_GET['filename'])) {
+      	$fd = fopen($v_recordings_dir.'/'.$_GET['filename'], "rb");
       	if ($_GET['t'] == "bin") {
             header("Content-Type: application/force-download");
             header("Content-Type: application/octet-stream");
@@ -59,7 +58,7 @@ if ($_GET['a'] == "download") {
         }
         header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
         header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past	
-        header("Content-Length: " . filesize($dir_recordings.$_GET['filename']));
+        header("Content-Length: " . filesize($v_recordings_dir.'/'.$_GET['filename']));
         fpassthru($fd);
     }
   }
@@ -93,7 +92,7 @@ if ($_GET['a'] == "download") {
   exit;
 }
 else {
-  //echo $dir_recordings.$_GET['filename'];
+  //echo $v_recordings_dir.'/'.$_GET['filename'];
 }
 
 if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_name'])) {
@@ -105,9 +104,9 @@ if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_na
 		unset($_POST['txtCommand']);
 	}
 	if ($_POST['type'] == 'rec') {
-		move_uploaded_file($_FILES['ulfile']['tmp_name'], $dir_recordings . $_FILES['ulfile']['name']);
-		$savemsg = "Uploaded file to $dir_recordings" . htmlentities($_FILES['ulfile']['name']);
-		//system('chmod -R 744 $dir_recordings*');
+		move_uploaded_file($_FILES['ulfile']['tmp_name'], $v_recordings_dir.'/' . $_FILES['ulfile']['name']);
+		$savemsg = "Uploaded file to ".$v_recordings_dir."/". htmlentities($_FILES['ulfile']['name']);
+		//system('chmod -R 744 $v_recordings_dir*');
 		unset($_POST['txtCommand']);
 	}
 }
@@ -117,13 +116,14 @@ if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_na
 
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'rec') {
-        if ($a_recordings[$_GET['id']]) {
-            unlink_if_exists($v_recordings_dir.$a_recordings[$_GET['id']]['filename']);
+        //if ($_GET['id']) {
+		echo "id: ".$_GET['id'];
+			unlink_if_exists($v_recordings_dir."/".$_GET['filename']);
             unset($a_recordings[$_GET['id']]);
             write_config();
             header("Location: v_recordings.php");
             exit;
-        }
+        //}
     }
 
     if ($_GET['type'] == 'moh') {
@@ -186,15 +186,15 @@ if (count($a_recordings) > 0) {
 
 
 $config_change = 0; 	
-if (is_dir($dir_recordings)) {
-    if ($dh = opendir($dir_recordings)) {
+if (is_dir($v_recordings_dir.'/')) {
+    if ($dh = opendir($v_recordings_dir.'/')) {
         while (($file = readdir($dh)) !== false) {
-            if (filetype($dir_recordings . $file) == "file") {
+            if (filetype($v_recordings_dir.'/' . $file) == "file") {
 
                 if (strpos($config_recording_list, $file) === false) {
 
-                    //$handle = fopen($dir_recordings.$file,'rb');
-                    //$file_content = fread($handle,filesize($dir_recordings.$file));
+                    //$handle = fopen($v_recordings_dir.'/'.$file,'rb');
+                    //$file_content = fread($handle,filesize($v_recordings_dir.'/'.$file));
                     //fclose($handle);
 
                     $a_file = split("\.", $file);
@@ -230,12 +230,12 @@ if (is_dir($dir_recordings)) {
 //if (count($a_recordings) > 0) {
 //	foreach ($a_recordings as $recordingent) {
 	
-//	  if (!is_file($dir_recordings.$recordingent['filename'])) {
+//	  if (!is_file($v_recordings_dir.'/'.$recordingent['filename'])) {
 	      //echo "not found: ".$recordingent['filename']."<br />";
 	
 	      //recording not found restore the file from the config.xml
 	          //$file_content = $recordingent['filecontent'];
-	          //$handle = fopen($dir_recordings.$recordingent['filename'],'w');
+	          //$handle = fopen($v_recordings_dir.'/'.$recordingent['filename'],'w');
 	          //fwrite ($handle, base64_decode($file_content));
 	          //unset($file_content);
 	          //fclose($handle);
@@ -290,7 +290,7 @@ if ($config_change == 1) {
 		  <?php
 		  if ($v_path_show) {
 			  echo "<b>location:</b>";
-			  echo $dir_recordings;
+			  echo $v_recordings_dir.'/';
 		  }
 		  ?>
 		  </td>
@@ -348,7 +348,7 @@ if ($config_change == 1) {
         <table border="0" cellspacing="0" cellpadding="1">
           <tr>
             <td valign="middle"><a href="v_recordings_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-            <td><a href="v_recordings.php?type=rec&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+            <td><a href="v_recordings.php?type=rec&act=del&id=<?=$i;?>&filename=<?=$recordingent['filename'];?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
           </tr>
        </table>
       </td>

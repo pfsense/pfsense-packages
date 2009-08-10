@@ -310,7 +310,9 @@ function show_advanced_config() {
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php
 include("fbegin.inc");
-echo "<p class=\"pgtitle\">$v_label: Modules</p>\n";
+if ($v_label_show) {
+	echo "<p class=\"pgtitle\">$v_label: Modules</p>\n";
+}
 ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 

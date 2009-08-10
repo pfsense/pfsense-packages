@@ -52,7 +52,7 @@ function v_settings()
 	$config['installedpackages']['freeswitchsettings']['config'][0]['tmp_dir'] = '/tmp';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['bin_dir'] = '/usr/local/bin';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_startup_script_dir'] = '/usr/local/etc/rc.d';
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.18";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.19";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_version'] = "1.0.4";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_revision'] = "Release";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_label'] = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
@@ -3135,13 +3135,9 @@ function v_install_phase_2() {
 	if (!is_dir($v_dir.'/sounds/custom/8000/')) {
 	   exec("mkdir ".$v_dir."/sounds/custom/8000/");
 	}
-
-	if (!is_dir($v_storage_dir)) {
-	   exec("mkdir ".$v_storage_dir);
-	}
 	
 	if (!is_dir($v_storage_dir.'/fax/')) {
-	   exec("mkdir ".$v_storage_dir."/fax/");
+	   exec("mkdir -p ".$v_storage_dir."/fax/");
 	}
 	
 	//download the dialplan default.xml
@@ -3886,6 +3882,10 @@ function v_install_phase_1()
 			//system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/htdocs/');
 
 			unset($filename);
+			
+			if (!is_dir($v_storage_dir.'/fax/')) {
+			   exec("mkdir -p ".$v_storage_dir."/fax/");
+			}
 		}
 
 
