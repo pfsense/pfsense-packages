@@ -92,7 +92,8 @@ function squid_dash_z() {
 		mwexec("/usr/local/sbin/squid -z");
 	}
 
-	exec("chmod a+rw /var/squid/cache/swap.state");
+	if(file_exists("/var/squid/cache/swap.state"))
+		exec("chmod a+rw /var/squid/cache/swap.state");
 
 }
 
