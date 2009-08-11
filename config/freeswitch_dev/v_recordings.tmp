@@ -116,14 +116,13 @@ if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_na
 
 if ($_GET['act'] == "del") {
     if ($_GET['type'] == 'rec') {
-        //if ($_GET['id']) {
-		echo "id: ".$_GET['id'];
+        if ($_GET['id']) {
 			unlink_if_exists($v_recordings_dir."/".$_GET['filename']);
             unset($a_recordings[$_GET['id']]);
             write_config();
             header("Location: v_recordings.php");
             exit;
-        //}
+        }
     }
 
     if ($_GET['type'] == 'moh') {
