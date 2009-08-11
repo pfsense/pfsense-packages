@@ -37,7 +37,7 @@ require_once('service-utils.inc');
 //preferences
 	$v_label_show = true;
 	$v_path_show = true;
-	$v_menu_show = true;
+	$v_menu_tab_show = true;
 
 
 function v_settings()
