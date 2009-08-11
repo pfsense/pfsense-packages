@@ -46,6 +46,28 @@ if (isset($id) && $a_fax[$id]) {
 	$pconfig['faxemail'] = $a_fax[$id]['faxemail'];
 	$pconfig['faxdomain'] = $a_fax[$id]['faxdomain'];
 	$pconfig['faxdescription'] = $a_fax[$id]['faxdescription'];
+	
+	if (!is_dir($v_storage_dir)) {
+		exec("mkdir ".$v_storage_dir);
+	}
+	
+	if (!is_dir($v_storage_dir.'/fax/')) {
+		exec("mkdir ".$v_storage_dir."/fax/");
+	}
+
+	$faxfolder = $v_storage_dir.'/fax/'.$a_fax[$id]['faxextension'];
+	if (!is_dir($faxfolder)) {
+		exec('mkdir '.$faxfolder);
+	}
+	if (!is_dir($faxfolder.'/inbox/')) {
+		exec('mkdir '.$faxfolder.'/inbox/');
+	}
+	if (!is_dir($faxfolder.'/sent/')) {
+		exec('mkdir '.$faxfolder.'/sent/');
+	}
+	if (!is_dir($faxfolder.'/temp/')) {
+		exec('mkdir '.$faxfolder.'/temp/');
+	}
 }
 
 clearstatcache(); //clear file status cache
@@ -550,7 +572,12 @@ build_menu();
 			<span class="vexpl"><span class="red"><strong>Inbox</strong></span>
 		</td>
 		<td align='right'>
-			<b>location:</b> <?php echo $dir_fax_inbox; ?>
+		<?php
+		if ($v_path_show) {
+			echo "<b>location:</b> ";
+			echo $dir_fax_inbox;
+		}
+		?>
 		</td>		
 	</tr>
     </table>
@@ -636,7 +663,12 @@ build_menu();
 			<span class="vexpl"><span class="red"><strong>Sent</strong></span>
 		</td>
 		<td align='right'>
-			<b>location:</b> <?php echo $dir_fax_sent; ?>
+		<?php
+		if ($v_path_show) {
+			echo "<b>location:</b> ";
+			echo $dir_fax_sent;
+		}
+		?>
 		</td>		
 	</tr>
     </table>
