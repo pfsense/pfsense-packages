@@ -67,7 +67,8 @@ if ($_GET['a'] == "update") {
 		//exec("cp ".$tmp_dir."/v_config.tmp ".$v_parent_dir."/pkg/v_config.php");
 		//unlink_if_exists($tmp_dir."/v_config.tmp");
 		
-		header( 'Location: v_status.php?a=update&s=gui_phase_2' ) ;
+		header( 'Location: v_status.php?a=update&t=gui_phase_2' ) ;
+		exit;
 	}
 }
 
@@ -75,6 +76,7 @@ if ($_GET['a'] == "update") {
 	if ($_GET['t'] == "gui_phase_2") {		
 		v_install_phase_2(); //needs to run on the new page so that it uses the new v_config.inc file
 		header( 'Location: v_status.php?savemsg=Update+Completed.' ) ;
+		exit;
 	}
 }
 
