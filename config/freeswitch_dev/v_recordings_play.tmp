@@ -27,6 +27,8 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+require("/usr/local/pkg/v_config.inc");
+
 $filename = $_GET['filename'];
 $type = $_GET['type']; //moh //rec
 
