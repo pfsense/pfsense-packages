@@ -38,6 +38,7 @@ require_once('service-utils.inc');
 	$v_label_show = true;
 	$v_path_show = true;
 	$v_menu_tab_show = true;
+	$v_fax_show = true;
 
 
 function v_settings()

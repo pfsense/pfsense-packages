@@ -121,7 +121,9 @@ build_menu();
 
     <br />
     <br />
-
+	<?php
+	if ($v_fax_show) {
+	?>
     <table width="100%" border="0" cellpadding="6" cellspacing="0">
     <tr>
       <td class="listtopic" colspan='2'>FAX</td>
@@ -136,6 +138,9 @@ build_menu();
 
     <br />
     <br />
+	<?php
+	}
+	?>
 
     <table width="100%" border="0" cellpadding="6" cellspacing="0">
     <tr>
