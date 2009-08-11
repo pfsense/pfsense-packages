@@ -58,6 +58,26 @@ if ($_GET['a'] == "download") {
 	exit;
 }
 
+if ($_GET['a'] == "update") {
+	if ($_GET['t'] == "gui_phase_1") {
+	
+		//chdir('/tmp/');
+		chdir($v_parent_dir.'/pkg/');
+		exec("fetch ".$v_download_path."v_config.inc");
+		//exec("cp ".$tmp_dir."/v_config.tmp ".$v_parent_dir."/pkg/v_config.php");
+		//unlink_if_exists($tmp_dir."/v_config.tmp");
+		
+		header( 'Location: v_status.php?a=update&s=gui_phase_2' ) ;
+	}
+}
+
+if ($_GET['a'] == "update") {
+	if ($_GET['t'] == "gui_phase_2") {		
+		v_install_phase_2(); //needs to run on the new page so that it uses the new v_config.inc file
+		header( 'Location: v_status.php?savemsg=Update+Completed.' ) ;
+	}
+}
+
 if ($_GET['a'] == "other") {
   if ($_GET['t'] == "restore") {
     $tmp = '/root/backup/';
@@ -289,11 +309,24 @@ echo "<b>Call Detail Records</b><br />\n";
 echo $v_log_dir."/cdr-csv/Master.csv<br /><br />\n";
 echo "</td>\n";
 echo "<td width='50%' align='right'>\n";
-echo "  <input type='button' value='download cdr csv' onclick=\"document.location.href='v_status.php?a=download&t=cdrcsv';\" />\n";echo "</td>\n";
+echo "  <input type='button' value='download cdr csv' onclick=\"document.location.href='v_status.php?a=download&t=cdrcsv';\" />\n";
+echo "</td>\n";
 echo "</tr>\n";
 echo "</table>\n";
 echo "<br /><br />\n\n";
 
+echo "<table width='690' cellpadding='0' cellspacing='0' border='0'>\n";
+echo "<tr>\n";
+echo "<td width='50%'>\n";
+echo "<b>Web Interface</b><br />\n";
+echo Use the following button to update the web interface.<br /><br />\n";
+echo "</td>\n";
+echo "<td width='50%' align='right'>\n";
+echo "  <input type='button' value='update' onclick=\"document.location.href='v_status.php?a=update&t=gui_phase_1';\" />\n";
+echo "</td>\n";
+echo "</tr>\n";
+echo "</table>\n";
+echo "<br /><br />\n\n";
 
 echo "<table width='690' cellpadding='0' cellspacing='0' border='0'>\n";
 echo "<tr>\n";
