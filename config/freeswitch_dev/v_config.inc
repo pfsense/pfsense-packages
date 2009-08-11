@@ -382,6 +382,7 @@ function ListFiles($dir) {
     }
 }
 
+
 function  recording_js()
 {
 
@@ -398,9 +399,9 @@ function  recording_js()
     $tmp .= "  //var pin = \"\"; //don't require a pin\n";
     $tmp .= "    //if you choose not to require a pin then then you may want to add a dialplan condition for a specific caller id\n";
     $tmp .= "\n";
-    $tmp .= "  var digitmaxlength = 0;\n";
-    $tmp .= "  var timeoutpin = 7500;\n";
-    $tmp .= "  var timeouttransfer = 7500;\n";
+    $tmp .= " var digitmaxlength = 0;\n";
+    $tmp .= " var timeoutpin = 7500;\n";
+    $tmp .= " var timeouttransfer = 7500;\n";
     $tmp .= " var objdate = new Date();\n";
     $tmp .= "\n";
     $tmp .= " var adjusthours = 0; //Adjust Server time that is set to GMT 7 hours\n";
