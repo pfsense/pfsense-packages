@@ -3861,8 +3861,8 @@ function v_install_phase_1()
 	//extract a specific directory
 		$filename = $v_name.'.bak.tgz';
 		if (file_exists($v_backup_dir.$filename)) {
-//			$static_output = 'Restore the Backup';
-//			update_output_window($static_output);
+			$static_output = 'Restore the Backup';
+			update_output_window($static_output);
 	
 			//echo "The file $filename exists";
 	
@@ -3871,23 +3871,23 @@ function v_install_phase_1()
 			
 			//Recommended
 			chdir($v_parent_dir);
-			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/db/');
-			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/log/');
-			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/recordings/');
-			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/scripts/');
-			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/storage/');
-			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/sounds/custom/8000/');
-			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/sounds/music/8000/');
-			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/ssl/');
-			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/sip_profiles/');
-			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/vars.xml');
-			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/dialplan/default.xml');
-			system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/dialplan/public.xml');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/db/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/log/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/recordings/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/scripts/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/storage/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/sounds/custom/8000/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/sounds/music/8000/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/ssl');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/sip_profiles/');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/vars.xml');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/dialplan/default.xml');
+			system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/dialplan/public.xml');
 
 			//Optional
-			//system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/');
-			//system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/grammar/');
-			//system('tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/htdocs/');
+			//system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/conf/');
+			//system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/grammar/');
+			//system('cd /usr/local; tar xvpfz '.$v_backup_dir.'/'.$filename.' '.$v_name.'/htdocs/');
 
 			unset($filename);
 			
