@@ -109,8 +109,6 @@ function openbgpd_install_conf() {
           foreach($neighbor['row'] as $row) {
             $conffile .= "		{$row['paramaters']} {$row['parmvalue']} \n";
           }
-          if($used_this_item)		
-            $conffile .= "	}\n";
         }
       }
       if($used_this_item)
