@@ -119,15 +119,15 @@ function sync_package_snort()
 	//print_r($snortInterfaces);
 	
 	/* create log directory */
-	$start  = "/bin/mkdir -p /var/log/snort";
+	$start  = "/bin/mkdir -p /var/log/snort\n";
 
 	/* snort advanced features - bpf tuning */
 	if($bpfbufsize)
-		$start .= ";sysctl net.bpf.bufsize={$bpfbufsize}";
+		$start .= "sysctl net.bpf.bufsize={$bpfbufsize}\n";
 	if($bpfmaxbufsize)
-		$start .= ";sysctl net.bpf.maxbufsize={$bpfmaxbufsize}";
+		$start .= "sysctl net.bpf.maxbufsize={$bpfmaxbufsize}\n";
 	if($bpfmaxinsns)
-		$start .= ";sysctl net.bpf.maxinsns={$bpfmaxinsns}";
+		$start .= "sysctl net.bpf.maxinsns={$bpfmaxinsns}\n";
 
 	/* go ahead and issue bpf changes */
 	if($bpfbufsize)
@@ -138,20 +138,22 @@ function sync_package_snort()
 		mwexec_bg("sysctl net.bpf.maxinsns={$bpfmaxinsns}");
 
 	/* always stop snort2c before starting snort -gtm */
-  $start .= ";/usr/bin/killall snort2c";
+	$start .= "/usr/bin/killall snort2c\n";
 
-  /* start a snort process for each interface -gtm */
-  /* Note the sleep delay.  Seems to help getting mult interfaces to start -gtm */
-  /* snort start options are; config file, log file, demon, interface, packet flow, alert type, quiet */
-  /* TODO; get snort to start under nologin shell */
-  foreach($snortInterfaces as $snortIf)
-  {
-  	$start .= ";sleep 8;snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -D -i {$snortIf} -q";
-  }    
+	/* start a snort process for each interface -gtm */
+	/* Note the sleep delay.  Seems to help getting mult interfaces to start -gtm */
+	/* snort start options are; config file, log file, demon, interface, packet flow, alert type, quiet */
+	/* TODO; get snort to start under nologin shell */
+	foreach($snortInterfaces as $snortIf)
+	{
+		$start .= "sleep 8\n";
+		$start .= "snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -D -i {$snortIf} -q\n";
+	}    
     
 	/* if block offenders is checked, start snort2c */
 	if($_POST['blockoffenders'])
-		$start .= "\nsleep 8;snort2c -w /var/db/whitelist -a /var/log/snort/alert";
+		$start .= "\nsleep 8\n";
+		$start .= "snort2c -w /var/db/whitelist -a /var/log/snort/alert\n";
     
 	$sample_before = "\nBEFORE_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
 	$sample_after = "\nAFTER_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
