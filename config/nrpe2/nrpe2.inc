@@ -78,8 +78,8 @@ function nrpe2_custom_php_install_command()
 			'critical' => '200'
 		)
 	);
-
-	$fd = fopen('/usr/local/etc/rc.d/nrpe2', 'w');
+	unlink_if_exists('/usr/local/etc/rc.d/nrpe2');
+	$fd = fopen('/usr/local/etc/rc.d/nrpe2.sh', 'w');
 	$rc_file = <<<EOD
 #!/bin/sh
 #
@@ -177,11 +177,11 @@ function nrpe2_custom_php_service()
 	
 	if ($config['installedpackages']['nrpe2']['config'][0]['enabled'] == "on")
 	{		
-		exec("/usr/local/etc/rc.d/nrpe2 restart");
+		exec("/usr/local/etc/rc.d/nrpe2.sh restart");
 	}
 	else
 	{
-		exec("/usr/local/etc/rc.d/nrpe2 stop");
+		exec("/usr/local/etc/rc.d/nrpe2.sh stop");
 	}
 }
 
