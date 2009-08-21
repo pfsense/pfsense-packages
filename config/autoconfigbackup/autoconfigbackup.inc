@@ -95,7 +95,7 @@ function upload_config($reasonm = "") {
 
 	/*
 	 *   pfSense upload config to pfSense.org script
-	 *   This file plugs into filter.inc (/usr/local/pkg/pf)
+	 *   This file plugs into config.inc (/usr/local/pkg/parse_config)
 	 *   and runs every time the running firewall filter changes.
 	 * 
 	 *   Written by Scott Ullrich
