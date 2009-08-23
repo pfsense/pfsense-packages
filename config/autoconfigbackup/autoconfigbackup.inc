@@ -155,8 +155,8 @@ function upload_config($reasonm = "") {
 				update_filter_reload_status($notice_text);
 
 				// Encrypt config.xml
-				$raw_config_sha256_hash = trim(`/sbin/sha256 /cf/conf/config.xml | awk '{ print $4 }'`);
 				$data = file_get_contents("/cf/conf/config.xml");
+				$raw_config_sha256_hash = trim(`/sbin/sha256 /cf/conf/config.xml | awk '{ print $4 }'`);
 				$data = encrypt_data($data, $encryptpw);
 				tagfile_reformat($data, $data, "config.xml");
 

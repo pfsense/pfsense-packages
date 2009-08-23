@@ -195,7 +195,12 @@ function get_hostnames() {
 					$data = $data_split[1];
 					if (!tagfile_deformat($data, $data, "config.xml")) 
 						$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
-					$data = decrypt_data($data, $decrypt_password);
+					$out = decrypt_data($data, $decrypt_password);
+					
+					$pos = stripos($out, "</pfsense>");
+					$data = substr($out, 0, $pos);
+					$data = $data . "</pfsense>\n";
+
 					$fd = fopen("/tmp/config_restore.xml", "w");
 					fwrite($fd, $data);
 					fclose($fd);
@@ -204,7 +209,7 @@ function get_hostnames() {
 					$ondisksha256 = trim(`/sbin/sha256 /tmp/config_restore.xml | awk '{ print $4 }'`);
 					if($sha256 != "0" && $sha256 != "")  // we might not have a sha256 on file for older backups
 						if($ondisksha256 <> $sha256)
-							$input_errors[] = "SHA256 values do not match, cannot restore.";
+							$input_errors[] = "SHA256 values do not match, cannot restore. $ondisksha256 <> $sha256";
 					if (curl_errno($curl_session)) {
 						/* If an error occured, log the error in /tmp/ */
 						$fd = fopen("/tmp/acb_restoredebug.txt", "w");
@@ -233,7 +238,7 @@ EOF;
 					} else {
 						log_error("There was an error when restoring the AutoConfigBackup item");
 					}
-					unlink("/tmp/config_restore.xml");
+					//unlink("/tmp/config_restore.xml");
 				} 			
 				if($_REQUEST['download']) {
 					// Phone home and obtain backups

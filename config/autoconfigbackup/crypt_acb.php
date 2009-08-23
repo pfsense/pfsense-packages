@@ -73,11 +73,11 @@
 	}
 
 	function encrypt_data(& $data, $pass) {
-		return base64_encode(crypt_data($data, $pass, "-e"));
+		return trim(base64_encode(crypt_data($data, $pass, "-e")));
 	}
 
 	function decrypt_data(& $data, $pass) {
-		return crypt_data(base64_decode($data), $pass, "-d");
+		return trim(crypt_data(base64_decode($data), $pass, "-d"));
 	}
 
 	function tagfile_reformat($in, & $out, $tag) {
@@ -93,7 +93,9 @@
 			$oset += $size;
 		}
 
-		$out .= "---- END {$tag} ----\n";
+		$out .= "---- END {$tag} ----";
+
+		$out = trim($out);
 
 		return true;
 	}
@@ -118,6 +120,8 @@
 		$body_len -= strlen($etag_len);
 
 		$out = substr($in, $body_pos, $body_len);
+
+		$out = trim($out);
 
 		return true;
 	}
