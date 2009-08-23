@@ -214,7 +214,6 @@ function upload_config($reasonm = "") {
 		} else {
 			log_error("No https://portal.pfsense.org backup required.");
 		}
-
 	}	
 }
 

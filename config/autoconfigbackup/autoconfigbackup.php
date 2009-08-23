@@ -230,6 +230,8 @@ EOF;
 							$savemsg = "Unable to revert to the selected configuration.";
 						}
 						print_info_box($savemsg);
+					} else {
+						log_error("There was an error when restoring the AutoConfigBackup item");
 					}
 					unlink("/tmp/config_restore.xml");
 				} 			
@@ -314,6 +316,8 @@ EOF;
 					if($ds_split[2] && $ds_split[0])
 						$confvers[] = $tmp_array;
 				}
+				if ($input_errors)
+					print_input_errors($input_errors);
 			?>
 		</td>
 	</tr>
