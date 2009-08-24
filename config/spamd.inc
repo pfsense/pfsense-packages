@@ -30,7 +30,7 @@
 */
 
 if(!function_exists("filter_configure")) 
-	requre_once("filter.inc");
+	require_once("filter.inc");
 
 function sync_package_spamd() {
 	global $config, $g;
