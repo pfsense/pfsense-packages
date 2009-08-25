@@ -34,6 +34,7 @@ require_once('globals.inc');
 require_once('service-utils.inc');
 
 
+
 //preferences
 	$v_label_show = true;
 	$v_path_show = true;
@@ -48,7 +49,7 @@ function v_settings()
 	$config['installedpackages']['freeswitchsettings']['config'][0]['tmp_dir'] = '/tmp';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['bin_dir'] = '/usr/local/bin';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_startup_script_dir'] = '/usr/local/etc/rc.d';
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.21";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.22";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_version'] = "1.0.4";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_revision'] = "Release";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_label'] = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
@@ -67,7 +68,7 @@ function v_settings()
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_scripts_dir'] = '/usr/local/freeswitch/scripts';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_storage_dir'] = '/usr/local/freeswitch/storage';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_recordings_dir'] = '/usr/local/freeswitch/recordings';
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_download_path'] = 'http://www.pfsense.com/packages/config/freeswitch_dev/';
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_download_path'] = 'http://www.pfsense.com/packages/config/freeswitch_dev';
 
 }
 //Update the settings
@@ -3109,7 +3110,7 @@ function pkg_add($pkg_download_path, $pkg_name)
 	//if the package is not installed then download and install it
 	if (!strlen(exec('pkg_info | grep '.$pkg_array[0])) > 0) {
 		chdir('/usr/pkgs/');
-		exec("fetch ".$pkg_download_path.$pkg_name);
+		exec("fetch ".$pkg_download_path.'/'.$pkg_name);
 		exec("pkg_add -F ".$pkg_name);
 		exec("rm ".$pkg_name);
 	}
@@ -3338,14 +3339,15 @@ function v_install_phase_2() {
 	exec("fetch ".$v_download_path."disa.js");
 	exec("fetch ".$v_download_path."originate.js");
 	exec("cp ".$v_htdocs_dir."/slim.swf ".$v_web_dir."/slim.swf");
+
 }
 
 
 function v_install_phase_1()
 {
 
-	//conf_mount_rw();
-	//config_lock();
+	conf_mount_rw();
+	config_lock();
 	
 	v_settings();
 	
@@ -3358,9 +3360,10 @@ function v_install_phase_1()
 	//set script execution time limit to 24 hours
 	set_time_limit (86400);
 	ini_set(max_execution_time,86400);
+	
 
 	//hide errors
-	//ini_set('display_errors', '0'); 
+	ini_set('display_errors', '0'); 
 	
 	clearstatcache(); //clear file status cache
 
@@ -3384,7 +3387,7 @@ function v_install_phase_1()
 
 
 	//download and install the packages
-		$pkg_download_path = $v_download_path."freebsd7.2/1_0_4/";
+		$pkg_download_path = $v_download_path."/freebsd7.2/1_0_4";
 		
 		//if the package is not installed then install it
 		if(stristr(exec('pkg_info | grep freeswitch'), 'freeswitch') === FALSE) {
@@ -3929,8 +3932,8 @@ function v_install_phase_1()
 	//	sync_package_v_ivr();
 	//}
 
-	//conf_mount_ro();
-	//config_unlock();
+	conf_mount_ro();
+	config_unlock();
 		
 }
 
@@ -3938,8 +3941,8 @@ function v_install_phase_1()
 function v_deinstall_command()
 {
 
-	//conf_mount_rw();
-	//config_lock();
+	conf_mount_rw();
+	config_lock();
 	
 	global $config;
 	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
@@ -3987,8 +3990,8 @@ function v_deinstall_command()
 	//unlink_if_exists($tmp_dir."/".$v_name.".tar.gz");
 	unlink_if_exists($tmp_dir."/pkg_mgr_".$v_label.".log");
 	
-	//conf_mount_ro();
-	//config_unlock();
+	conf_mount_ro();
+	config_unlock();
 	
 }
 
