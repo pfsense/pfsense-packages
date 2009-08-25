@@ -262,6 +262,11 @@ function php_deinstall_command()
 {
 
 	//prepare inetd.conf for tftp
+		//tftp	dgram	udp	wait	root	/usr/libexec/tftpd	tftpd -l -s /tftpboot
+		
+		//pfsense 2.0 conflicting entry
+		//tftp	dgram	udp	wait	root	/usr/local/sbin/tftp-proxy -v
+		
 		$filename = "/etc/inetd.conf";
 		$handle = fopen($filename,"rb");
 		$contents = fread($handle, filesize($filename));	
@@ -269,9 +274,10 @@ function php_deinstall_command()
 		
 		$handle = fopen($filename,"w");
 		$contents = str_replace("tftp	dgram", "#tftp	dgram", $contents);
+		$contents = str_replace("tftpd -l -s /tftpboot", "/usr/local/sbin/tftp-proxy -v", $contents);
 		fwrite($handle, $contents);		
 		unset($contents); 	
-		fclose($fout);
+		fclose($handle);
 		unset($filename);
 		
 	exec("killall -9 inetd");

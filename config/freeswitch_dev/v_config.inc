@@ -3907,8 +3907,8 @@ function v_install_phase_1()
 	
 	write_rcfile(array(
 		"file" => $v_name.".sh",
-		"start" => $v_dir."/bin/./freeswitch -nc",
-		"stop" => $v_dir."/bin/./freeswitch -stop"
+		"start" => $v_dir."/bin/./".$v_name." -nc",
+		"stop" => $v_dir."/bin/./".$v_name." -stop"
 		)
 	);
 	
