@@ -49,7 +49,7 @@ function v_settings()
 	$config['installedpackages']['freeswitchsettings']['config'][0]['tmp_dir'] = '/tmp';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['bin_dir'] = '/usr/local/bin';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_startup_script_dir'] = '/usr/local/etc/rc.d';
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.23";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.24";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_version'] = "1.0.4";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_revision'] = "Release";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_label'] = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
@@ -58,7 +58,7 @@ function v_settings()
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_parent_dir'] = '/usr/local/';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_backup_dir'] = '/root/backup';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_web_dir'] = '/usr/local/www/packages/freeswitch';
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_web_root'] = '/usr/local/www/';	
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_web_root'] = '/usr/local/www/';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_relative_url'] = '/packages/freeswitch';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_conf_dir'] = '/usr/local/freeswitch/conf';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_db_dir'] = '/usr/local/freeswitch/db';
@@ -3131,11 +3131,11 @@ function v_install_phase_2() {
 //	update_output_window($static_output);
 
 	clearstatcache(); //clear file status cache
-	fwrite($handle, 'v_web_root: '.$v_web_root.'/packages/');
+	fwrite($handle, "v_web_root: ".$v_web_root."/packages/\n");
 	if (!is_dir($v_web_root.'/packages/')) {
 	   exec("mkdir ".$v_web_root."/packages/");
 	}
-	fwrite($handle, 'v_web_dir: '.$v_web_dir);
+	fwrite($handle, "v_web_dir: ".$v_web_dir."\n");
 	if (!is_dir($v_web_dir)) {
 	   exec("mkdir ".$v_web_dir);
 	}
@@ -3147,7 +3147,7 @@ function v_install_phase_2() {
 	if (!is_dir($v_dir.'/sounds/custom/8000/')) {
 	   exec("mkdir ".$v_dir."/sounds/custom/8000/");
 	}
-	
+
 	if (!is_dir($v_storage_dir.'/fax/')) {
 	   exec("mkdir -p ".$v_storage_dir."/fax/");
 	}
@@ -3164,7 +3164,6 @@ function v_install_phase_2() {
 	exec("cp ".$tmp_dir."/dialplan.public.xml ".$v_conf_dir."/dialplan/public.xml");
 	unlink_if_exists($tmp_dir."/dialplan.public.xml");
 
-
 	//misc files
 	if (!is_dir($v_web_root.'/edit_area/')) {
 		chdir($tmp_dir);
@@ -3174,170 +3173,170 @@ function v_install_phase_2() {
 		unlink_if_exists($tmp_dir."/edit_area.tgz");
 	}
 
-	fwrite($handle, 'tmp_dir: '.$tmp_dir);
-	fwrite($handle, "fetch ".$v_download_path."v_dialplan.tmp");
-	fwrite($handle, "cp ".$tmp_dir."/v_dialplan.tmp ".$v_web_dir."/v_dialplan.php");
-	fwrite($handle, $tmp_dir."/v_dialplan.tmp");
+	fwrite($handle, 'tmp_dir: '.$tmp_dir."\n");
+	fwrite($handle, "fetch ".$v_download_path."/v_dialplan.tmp\n");
+	fwrite($handle, "cp ".$tmp_dir."/v_dialplan.tmp ".$v_web_dir."/v_dialplan.php\n");
+	fwrite($handle, $tmp_dir."/v_dialplan.tmp\n");
 
 	//rename PHP files from .tmp to .php
 	chdir($tmp_dir.'/');
-	exec("fetch ".$v_download_path."index.tmp");
+	exec("fetch ".$v_download_path."/index.tmp");
 	exec("cp ".$tmp_dir."/index.tmp ".$v_web_dir."/index.php");
 	unlink_if_exists($tmp_dir."/index.tmp");
 
-	exec("fetch ".$v_download_path."class.smtp.tmp");
+	exec("fetch ".$v_download_path."/class.smtp.tmp");
 	exec("cp ".$tmp_dir."/class.smtp.tmp ".$v_web_dir."/class.smtp.php");
 	unlink_if_exists($tmp_dir."/class.smtp.tmp");
 
-	exec("fetch ".$v_download_path."class.phpmailer.tmp");
+	exec("fetch ".$v_download_path."/class.phpmailer.tmp");
 	exec("cp ".$tmp_dir."/class.phpmailer.tmp ".$v_web_dir."/class.phpmailer.php");
 	unlink_if_exists($tmp_dir."/class.phpmailer.tmp");
 
-	exec("fetch ".$v_download_path."v_cmd.tmp");	
+	exec("fetch ".$v_download_path."/v_cmd.tmp");	
 	exec("cp ".$tmp_dir."/v_cmd.tmp ".$v_web_dir."/v_cmd.php");
 	unlink_if_exists($tmp_dir."/v_cmd.tmp");
 
-	exec("fetch ".$v_download_path."v_dialplan.tmp");	
+	exec("fetch ".$v_download_path."/v_dialplan.tmp");	
 	exec("cp ".$tmp_dir."/v_dialplan.tmp ".$v_web_dir."/v_dialplan.php");
 	unlink_if_exists($tmp_dir."/v_dialplan.tmp");
 
-	exec("fetch ".$v_download_path."v_dialplan_includes_details.tmp");	
+	exec("fetch ".$v_download_path."/v_dialplan_includes_details.tmp");	
 	exec("cp ".$tmp_dir."/v_dialplan_includes_details.tmp ".$v_web_dir."/v_dialplan_includes_details.php");
 	unlink_if_exists($tmp_dir."/v_dialplan_includes_details.tmp");
 
-	exec("fetch ".$v_download_path."v_dialplan_includes_details_edit.tmp");
+	exec("fetch ".$v_download_path."/v_dialplan_includes_details_edit.tmp");
 	exec("cp ".$tmp_dir."/v_dialplan_includes_details_edit.tmp ".$v_web_dir."/v_dialplan_includes_details_edit.php");
 	unlink_if_exists($tmp_dir."/v_dialplan_includes_details_edit.tmp");
 
-	exec("fetch ".$v_download_path."v_dialplan_includes.tmp");
+	exec("fetch ".$v_download_path."/v_dialplan_includes.tmp");
 	exec("cp ".$tmp_dir."/v_dialplan_includes.tmp ".$v_web_dir."/v_dialplan_includes.php");
 	unlink_if_exists($tmp_dir."/v_dialplan_includes.tmp");
 
-	exec("fetch ".$v_download_path."v_dialplan_includes_edit.tmp");	
+	exec("fetch ".$v_download_path."/v_dialplan_includes_edit.tmp");	
 	exec("cp ".$tmp_dir."/v_dialplan_includes_edit.tmp ".$v_web_dir."/v_dialplan_includes_edit.php");
 	unlink_if_exists($tmp_dir."/v_dialplan_includes_edit.tmp");
 
-	exec("fetch ".$v_download_path."v_extensions.tmp");
+	exec("fetch ".$v_download_path."/v_extensions.tmp");
 	exec("cp ".$tmp_dir."/v_extensions.tmp ".$v_web_dir."/v_extensions.php");
 	unlink_if_exists($tmp_dir."/v_extensions.tmp");
 
-	exec("fetch ".$v_download_path."v_extensions_edit.tmp");
+	exec("fetch ".$v_download_path."/v_extensions_edit.tmp");
 	exec("cp ".$tmp_dir."/v_extensions_edit.tmp ".$v_web_dir."/v_extensions_edit.php");
 	unlink_if_exists($tmp_dir."/v_extensions_edit.tmp");
 
-	exec("fetch ".$v_download_path."v_fax.tmp");
+	exec("fetch ".$v_download_path."/v_fax.tmp");
 	exec("cp ".$tmp_dir."/v_fax.tmp ".$v_web_dir."/v_fax.php");
 	unlink_if_exists($tmp_dir."/v_fax.tmp");
 
-	exec("fetch ".$v_download_path."v_fax_edit.tmp");
+	exec("fetch ".$v_download_path."/v_fax_edit.tmp");
 	exec("cp ".$tmp_dir."/v_fax_edit.tmp ".$v_web_dir."/v_fax_edit.php");
 	unlink_if_exists($tmp_dir."/v_fax_edit.tmp");
 
-	exec("fetch ".$v_download_path."fax_to_email.tmp");
+	exec("fetch ".$v_download_path."/fax_to_email.tmp");
 	exec("cp ".$tmp_dir."/fax_to_email.tmp ".$v_web_dir."/fax_to_email.php");
 	unlink_if_exists($tmp_dir."/fax_to_email.tmp");
 
-	exec("fetch ".$v_download_path."v_features.tmp");
+	exec("fetch ".$v_download_path."/v_features.tmp");
 	exec("cp ".$tmp_dir."/v_features.tmp ".$v_web_dir."/v_features.php");
 	unlink_if_exists($tmp_dir."/v_features.tmp");	
 
-	exec("fetch ".$v_download_path."v_gateways.tmp");
+	exec("fetch ".$v_download_path."/v_gateways.tmp");
 	exec("cp ".$tmp_dir."/v_gateways.tmp ".$v_web_dir."/v_gateways.php");
 	unlink_if_exists($tmp_dir."/v_gateways.tmp");
 
-	exec("fetch ".$v_download_path."v_gateways_edit.tmp");
+	exec("fetch ".$v_download_path."/v_gateways_edit.tmp");
 	exec("cp ".$tmp_dir."/v_gateways_edit.tmp ".$v_web_dir."/v_gateways_edit.php");
 	unlink_if_exists($tmp_dir."/v_gateways_edit.tmp");
 
-	exec("fetch ".$v_download_path."v_hunt_group.tmp");
+	exec("fetch ".$v_download_path."/v_hunt_group.tmp");
 	exec("cp ".$tmp_dir."/v_hunt_group.tmp ".$v_web_dir."/v_hunt_group.php");
 	unlink_if_exists($tmp_dir."/v_hunt_group.tmp");
 
-	exec("fetch ".$v_download_path."v_hunt_group_edit.tmp");
+	exec("fetch ".$v_download_path."/v_hunt_group_edit.tmp");
 	exec("cp ".$tmp_dir."/v_hunt_group_edit.tmp ".$v_web_dir."/v_hunt_group_edit.php");
 	unlink_if_exists($tmp_dir."/v_hunt_group_edit.tmp");
 
-	exec("fetch ".$v_download_path."v_hunt_group_destinations.tmp");
+	exec("fetch ".$v_download_path."/v_hunt_group_destinations.tmp");
 	exec("cp ".$tmp_dir."/v_hunt_group_destinations.tmp ".$v_web_dir."/v_hunt_group_destinations.php");
 	unlink_if_exists($tmp_dir."/v_hunt_group_destinations.tmp");
 
-	exec("fetch ".$v_download_path."v_hunt_group_destinations_edit.tmp");
+	exec("fetch ".$v_download_path."/v_hunt_group_destinations_edit.tmp");
 	exec("cp ".$tmp_dir."/v_hunt_group_destinations_edit.tmp ".$v_web_dir."/v_hunt_group_destinations_edit.php");
 	unlink_if_exists($tmp_dir."/v_hunt_group_destinations_edit.tmp");
 
-	exec("fetch ".$v_download_path."v_auto_attendant.tmp");	
+	exec("fetch ".$v_download_path."/v_auto_attendant.tmp");	
 	exec("cp ".$tmp_dir."/v_auto_attendant.tmp ".$v_web_dir."/v_auto_attendant.php");
 	unlink_if_exists($tmp_dir."/v_auto_attendant.tmp");
 
-	exec("fetch ".$v_download_path."v_auto_attendant_edit.tmp");
+	exec("fetch ".$v_download_path."/v_auto_attendant_edit.tmp");
 	exec("cp ".$tmp_dir."/v_auto_attendant_edit.tmp ".$v_web_dir."/v_auto_attendant_edit.php");
 	unlink_if_exists($tmp_dir."/v_auto_attendant_edit.tmp");
 
-	exec("fetch ".$v_download_path."v_auto_attendant_options.tmp");
+	exec("fetch ".$v_download_path."/v_auto_attendant_options.tmp");
 	exec("cp ".$tmp_dir."/v_auto_attendant_options.tmp ".$v_web_dir."/v_auto_attendant_options.php");
 	unlink_if_exists($tmp_dir."/v_auto_attendant_options.tmp");
 
-	exec("fetch ".$v_download_path."v_auto_attendant_options_edit.tmp");
+	exec("fetch ".$v_download_path."/v_auto_attendant_options_edit.tmp");
 	exec("cp ".$tmp_dir."/v_auto_attendant_options_edit.tmp ".$v_web_dir."/v_auto_attendant_options_edit.php");
 	unlink_if_exists($tmp_dir."/v_auto_attendant_options_edit.tmp");
 
-	exec("fetch ".$v_download_path."v_profiles.tmp");
+	exec("fetch ".$v_download_path."/v_profiles.tmp");
 	exec("cp ".$tmp_dir."/v_profiles.tmp ".$v_web_dir."/v_profiles.php");
 	unlink_if_exists($tmp_dir."/v_profiles.tmp");
 
-	exec("fetch ".$v_download_path."v_profile_edit.tmp");
+	exec("fetch ".$v_download_path."/v_profile_edit.tmp");
 	exec("cp ".$tmp_dir."/v_profile_edit.tmp ".$v_web_dir."/v_profile_edit.php");
 	unlink_if_exists($tmp_dir."/v_profile_edit.tmp");
 
-	exec("fetch ".$v_download_path."v_public.tmp");
+	exec("fetch ".$v_download_path."/v_public.tmp");
 	exec("cp ".$tmp_dir."/v_public.tmp ".$v_web_dir."/v_public.php");
 	unlink_if_exists($tmp_dir."/v_public.tmp");
 
-	exec("fetch ".$v_download_path."v_public_includes.tmp");
+	exec("fetch ".$v_download_path."/v_public_includes.tmp");
 	exec("cp ".$tmp_dir."/v_public_includes.tmp ".$v_web_dir."/v_public_includes.php");
 	unlink_if_exists($tmp_dir."/v_public_includes.tmp");
 
-	exec("fetch ".$v_download_path."v_public_includes_edit.tmp");    	
+	exec("fetch ".$v_download_path."/v_public_includes_edit.tmp");    	
 	exec("cp ".$tmp_dir."/v_public_includes_edit.tmp ".$v_web_dir."/v_public_includes_edit.php");
 	unlink_if_exists($tmp_dir."/v_public_includes_edit.tmp");
 
-	exec("fetch ".$v_download_path."v_public_includes_details.tmp");
+	exec("fetch ".$v_download_path."/v_public_includes_details.tmp");
 	exec("cp ".$tmp_dir."/v_public_includes_details.tmp ".$v_web_dir."/v_public_includes_details.php");
 	unlink_if_exists($tmp_dir."/v_public_includes_details.tmp");
 
-	exec("fetch ".$v_download_path."v_public_includes_details_edit.tmp");
+	exec("fetch ".$v_download_path."/v_public_includes_details_edit.tmp");
 	exec("cp ".$tmp_dir."/v_public_includes_details_edit.tmp ".$v_web_dir."/v_public_includes_details_edit.php");
 	unlink_if_exists($tmp_dir."/v_public_includes_details_edit.tmp");
 
-	exec("fetch ".$v_download_path."v_mailto.tmp");
+	exec("fetch ".$v_download_path."/v_mailto.tmp");
 	exec("cp ".$tmp_dir."/v_mailto.tmp ".$v_web_dir."/v_mailto.php");
 	unlink_if_exists($tmp_dir."/v_mailto.tmp");
 
-	exec("fetch ".$v_download_path."v_modules.tmp");
+	exec("fetch ".$v_download_path."/v_modules.tmp");
 	exec("cp ".$tmp_dir."/v_modules.tmp ".$v_web_dir."/v_modules.php");
 	unlink_if_exists($tmp_dir."/v_modules.tmp");
 
-	exec("fetch ".$v_download_path."v_recordings.tmp");
+	exec("fetch ".$v_download_path."/v_recordings.tmp");
 	exec("cp ".$tmp_dir."/v_recordings.tmp ".$v_web_dir."/v_recordings.php");
 	unlink_if_exists($tmp_dir."/v_recordings.tmp");
 
-	exec("fetch ".$v_download_path."v_recordings_edit.tmp");	
+	exec("fetch ".$v_download_path."/v_recordings_edit.tmp");	
 	exec("cp ".$tmp_dir."/v_recordings_edit.tmp ".$v_web_dir."/v_recordings_edit.php");
 	unlink_if_exists($tmp_dir."/v_recordings_edit.tmp");
 
-	exec("fetch ".$v_download_path."v_recordings_play.tmp");
+	exec("fetch ".$v_download_path."/v_recordings_play.tmp");
 	exec("cp ".$tmp_dir."/v_recordings_play.tmp ".$v_web_dir."/v_recordings_play.php");
 	unlink_if_exists($tmp_dir."/v_recordings_play.tmp");
 
-	exec("fetch ".$v_download_path."v_settings.tmp");
+	exec("fetch ".$v_download_path."/v_settings.tmp");
 	exec("cp ".$tmp_dir."/v_settings.tmp ".$v_web_dir."/v_settings.php");
 	unlink_if_exists($tmp_dir."/v_settings.tmp");
 
-	exec("fetch ".$v_download_path."v_status.tmp");
+	exec("fetch ".$v_download_path."/v_status.tmp");
 	exec("cp ".$tmp_dir."/v_status.tmp ".$v_web_dir."/v_status.php");
 	unlink_if_exists($tmp_dir."/v_status.tmp");
 
-	exec("fetch ".$v_download_path."v_vars.tmp");
+	exec("fetch ".$v_download_path."/v_vars.tmp");
 	exec("cp ".$tmp_dir."/v_vars.tmp ".$v_web_dir."/v_vars.php");
 	unlink_if_exists($tmp_dir."/v_vars.tmp");
 
@@ -3448,15 +3447,15 @@ function v_install_phase_1()
 	//exec("fetch ".$download_path."mod_fax.so");
 
 	//download and install additional files
-	fwrite($handle, 'starting phase 2');
+	fwrite($handle, "starting phase 2\n");
 	fclose($handle);
 
 	v_install_phase_2();
 	$handle = fopen($tmp_dir.'/freeswitch_pkg.txt', "a");
 
-	fwrite($handle, 'starting phase 3');
-	fwrite($handle, 'downloading audio files');
-	$static_output = 'Downloading Audio Files';
+	fwrite($handle, "starting phase 3\n");
+	fwrite($handle, "downloading audio files\n");
+	$static_output = "Downloading Audio Files\n";
 	update_output_window($static_output);
 
 	//copy audio files
