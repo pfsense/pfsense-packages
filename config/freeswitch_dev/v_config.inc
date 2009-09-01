@@ -49,7 +49,7 @@ function v_settings()
 	$config['installedpackages']['freeswitchsettings']['config'][0]['tmp_dir'] = '/tmp';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['bin_dir'] = '/usr/local/bin';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_startup_script_dir'] = '/usr/local/etc/rc.d';
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.22";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.23";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_version'] = "1.0.4";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_revision'] = "Release";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_label'] = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
@@ -3125,19 +3125,21 @@ function v_install_phase_2() {
 		$$name = $value;
 	}
 
+	$handle = fopen($tmp_dir.'/freeswitch_pkg.txt', "a");
+
 //	$static_output = 'Downloading Package Files';
 //	update_output_window($static_output);
 
 	clearstatcache(); //clear file status cache
-	
+	fwrite($handle, 'v_web_root: '.$v_web_root.'/packages/');
 	if (!is_dir($v_web_root.'/packages/')) {
 	   exec("mkdir ".$v_web_root."/packages/");
 	}
-
+	fwrite($handle, 'v_web_dir: '.$v_web_dir);
 	if (!is_dir($v_web_dir)) {
 	   exec("mkdir ".$v_web_dir);
 	}
-	
+
 	if (!is_dir($v_dir.'/sounds/custom/')) {
 	   exec("mkdir ".$v_dir."/sounds/custom/");
 	}
@@ -3149,20 +3151,20 @@ function v_install_phase_2() {
 	if (!is_dir($v_storage_dir.'/fax/')) {
 	   exec("mkdir -p ".$v_storage_dir."/fax/");
 	}
-	
+
 	//download the dialplan default.xml
 	chdir($tmp_dir.'/');
 	exec("cd ".$tmp_dir."/;fetch ".$v_download_path."dialplan.default.xml");
 	exec("cp ".$tmp_dir."/dialplan.default.xml ".$v_conf_dir."/dialplan/default.xml");
 	unlink_if_exists($tmp_dir."/dialplan.default.xml");
-	
+
 	//download the dialplan public.xml
 	chdir($tmp_dir.'/');
 	exec("fetch ".$v_download_path."dialplan.public.xml");
 	exec("cp ".$tmp_dir."/dialplan.public.xml ".$v_conf_dir."/dialplan/public.xml");
 	unlink_if_exists($tmp_dir."/dialplan.public.xml");
-	
-	
+
+
 	//misc files
 	if (!is_dir($v_web_root.'/edit_area/')) {
 		chdir($tmp_dir);
@@ -3172,13 +3174,17 @@ function v_install_phase_2() {
 		unlink_if_exists($tmp_dir."/edit_area.tgz");
 	}
 
-	
+	fwrite($handle, 'tmp_dir: '.$tmp_dir);
+	fwrite($handle, "fetch ".$v_download_path."v_dialplan.tmp");
+	fwrite($handle, "cp ".$tmp_dir."/v_dialplan.tmp ".$v_web_dir."/v_dialplan.php");
+	fwrite($handle, $tmp_dir."/v_dialplan.tmp");
+
 	//rename PHP files from .tmp to .php
 	chdir($tmp_dir.'/');
 	exec("fetch ".$v_download_path."index.tmp");
 	exec("cp ".$tmp_dir."/index.tmp ".$v_web_dir."/index.php");
 	unlink_if_exists($tmp_dir."/index.tmp");
-	
+
 	exec("fetch ".$v_download_path."class.smtp.tmp");
 	exec("cp ".$tmp_dir."/class.smtp.tmp ".$v_web_dir."/class.smtp.php");
 	unlink_if_exists($tmp_dir."/class.smtp.tmp");
@@ -3210,7 +3216,7 @@ function v_install_phase_2() {
 	exec("fetch ".$v_download_path."v_dialplan_includes_edit.tmp");	
 	exec("cp ".$tmp_dir."/v_dialplan_includes_edit.tmp ".$v_web_dir."/v_dialplan_includes_edit.php");
 	unlink_if_exists($tmp_dir."/v_dialplan_includes_edit.tmp");
-	
+
 	exec("fetch ".$v_download_path."v_extensions.tmp");
 	exec("cp ".$tmp_dir."/v_extensions.tmp ".$v_web_dir."/v_extensions.php");
 	unlink_if_exists($tmp_dir."/v_extensions.tmp");
@@ -3218,7 +3224,7 @@ function v_install_phase_2() {
 	exec("fetch ".$v_download_path."v_extensions_edit.tmp");
 	exec("cp ".$tmp_dir."/v_extensions_edit.tmp ".$v_web_dir."/v_extensions_edit.php");
 	unlink_if_exists($tmp_dir."/v_extensions_edit.tmp");
-	
+
 	exec("fetch ".$v_download_path."v_fax.tmp");
 	exec("cp ".$tmp_dir."/v_fax.tmp ".$v_web_dir."/v_fax.php");
 	unlink_if_exists($tmp_dir."/v_fax.tmp");
@@ -3242,7 +3248,7 @@ function v_install_phase_2() {
 	exec("fetch ".$v_download_path."v_gateways_edit.tmp");
 	exec("cp ".$tmp_dir."/v_gateways_edit.tmp ".$v_web_dir."/v_gateways_edit.php");
 	unlink_if_exists($tmp_dir."/v_gateways_edit.tmp");
-	
+
 	exec("fetch ".$v_download_path."v_hunt_group.tmp");
 	exec("cp ".$tmp_dir."/v_hunt_group.tmp ".$v_web_dir."/v_hunt_group.php");
 	unlink_if_exists($tmp_dir."/v_hunt_group.tmp");
@@ -3326,7 +3332,7 @@ function v_install_phase_2() {
 	exec("fetch ".$v_download_path."v_settings.tmp");
 	exec("cp ".$tmp_dir."/v_settings.tmp ".$v_web_dir."/v_settings.php");
 	unlink_if_exists($tmp_dir."/v_settings.tmp");
-	
+
 	exec("fetch ".$v_download_path."v_status.tmp");
 	exec("cp ".$tmp_dir."/v_status.tmp ".$v_web_dir."/v_status.php");
 	unlink_if_exists($tmp_dir."/v_status.tmp");
@@ -3334,12 +3340,14 @@ function v_install_phase_2() {
 	exec("fetch ".$v_download_path."v_vars.tmp");
 	exec("cp ".$tmp_dir."/v_vars.tmp ".$v_web_dir."/v_vars.php");
 	unlink_if_exists($tmp_dir."/v_vars.tmp");
-	
+
 	chdir($v_scripts_dir);
 	exec("fetch ".$v_download_path."disa.js");
 	exec("fetch ".$v_download_path."originate.js");
 	exec("cp ".$v_htdocs_dir."/slim.swf ".$v_web_dir."/slim.swf");
 
+
+	fclose($handle);
 }
 
 
@@ -3348,26 +3356,28 @@ function v_install_phase_1()
 
 	conf_mount_rw();
 	config_lock();
-	
-	v_settings();
-	
+
 	global $config;
+	v_settings();
 	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
 	foreach($v_settings_array as $name => $value) {
 		$$name = $value;
 	}
 
+	$handle = fopen($tmp_dir.'/freeswitch_pkg.txt', "a");
+
+
 	//set script execution time limit to 24 hours
 	set_time_limit (86400);
 	ini_set(max_execution_time,86400);
-	
+
 
 	//hide errors
 	ini_set('display_errors', '0'); 
-	
+
 	clearstatcache(); //clear file status cache
 
-	
+
 	//$struname = exec('uname -v');
 	//if (stristr($struname, 'FreeBSD 7.2')) {
 	//	$freebsd_version = "7.2";
@@ -3375,20 +3385,20 @@ function v_install_phase_1()
 	
 //	$static_output = 'Extracting';
 //	update_output_window($static_output);
-	
-	
+
+
 	//exec("fetch ".$download_path."freeswitch.tgz"); //handled by freeswitch.xml
 	//exec("tar zxvf ".$tmp_dir."/freeswitch.tgz -C ".$v_parent_dir);
 	//unlink_if_exists($tmp_dir."/freeswitch.tgz");
 
-	
+
 //	$static_output = 'Downloading Files';
 //	update_output_window($static_output);
 
 
 	//download and install the packages
 		$pkg_download_path = $v_download_path."/freebsd7.2/1_0_4";
-		
+
 		//if the package is not installed then install it
 		if(stristr(exec('pkg_info | grep freeswitch'), 'freeswitch') === FALSE) {
 			pkg_add($pkg_download_path, "libpri-1.4.1.tbz");
@@ -3419,15 +3429,16 @@ function v_install_phase_1()
 			pkg_add($pkg_download_path, "freeswitch-1.0.4.tbz");		
 			//pkg_add($pkg_download_path, "p5-gettext-1.05_2.tbz"); //requirement for perl
 			//pkg_add($pkg_download_path, "perl-5.8.9_3.tbz");
+			fwrite($handle, 'packages have been installed');
 		}
 		
 		//add sqlite package
 		//exec("pkg_add -r sqlite34");
 
-	
+
 	//make a backup copy of the default config used with the 'Restore Default' buttons on the text areas.
 	exec("cp -R ".$v_conf_dir." ".$v_conf_dir.".orig");
-	
+
 	//remove some default config files that are not needed
 	unlink_if_exists($v_conf_dir."/dialplan/default/01_example.com.xml");
 	unlink_if_exists($v_conf_dir."/dialplan/public/00_inbound_did.xml");	
@@ -3437,11 +3448,17 @@ function v_install_phase_1()
 	//exec("fetch ".$download_path."mod_fax.so");
 
 	//download and install additional files
-	v_install_phase_2();
+	fwrite($handle, 'starting phase 2');
+	fclose($handle);
 
+	v_install_phase_2();
+	$handle = fopen($tmp_dir.'/freeswitch_pkg.txt', "a");
+
+	fwrite($handle, 'starting phase 3');
+	fwrite($handle, 'downloading audio files');
 	$static_output = 'Downloading Audio Files';
 	update_output_window($static_output);
-	
+
 	//copy audio files
 	chdir($v_dir.'/sounds/custom/8000/');
 	exec("cd ".$v_dir."/sounds/custom/8000/;fetch ".$download_path."please_enter_your_pin_number.wav");
@@ -3646,6 +3663,7 @@ function v_install_phase_1()
 	unset($tmpxml);
 	fclose($fout);
 
+	/* freeswitch modules defaults */
 	/* freeswitch modules defaults */
 
   	if (strlen($config['installedpackages']['freeswitchmodules']['config'][0]['mod_console']) == 0) {
