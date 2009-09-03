@@ -641,7 +641,6 @@
       <depends_on_package>lcdproc-0.5.2_2.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
       <configurationfile>lcdproc.xml</configurationfile>
-	  <noembedded>true</noembedded>
     </package>
     <package>
       <name>arpwatch</name>
