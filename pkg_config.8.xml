@@ -10,7 +10,7 @@
       <category>Network Management</category>
       <version>0.1.0</version>
       <status>ALPHA-ALPHA-ALPHA</status>
-      <required_version>2.0</required_version>
+      <required_version>1.2.3</required_version>
       <config_file>http://www.pfsense.com/packages/config/apache_mod_security/apache_mod_security.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>mod_security-2.5.9.tbz</depends_on_package>
