@@ -111,12 +111,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/bin/barnyard2</item>
+		<item>http://www.pfsense.com/packages/config/snort/bin/snort2c</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/bin/oinkmaster_contrib/create-sidmap.pl</item>
+		<item>http://www.pfsense.com/packages/config/snort/bin/mons2c</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
@@ -241,7 +241,7 @@
 		</field>
 		<field>
 			<fielddescr>Block offenders</fielddescr>
-			<fieldname>blockoffenders7</fieldname>
+			<fieldname>blockoffenders</fieldname>
 			<description>Checking this option will automatically block hosts that generate a snort alert.</description>
 			<type>checkbox</type>
 			<size>60</size>

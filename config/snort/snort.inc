@@ -137,8 +137,8 @@ function sync_package_snort()
 	if($bpfmaxinsns)
 		mwexec_bg("sysctl net.bpf.maxinsns={$bpfmaxinsns}");
 
-	/* always stop barnyard2 before starting snort -gtm */
-	$start .= "/usr/bin/killall barnyard2\n";
+	/* always stop snort2c before starting snort -gtm */
+	$start .= "/usr/bin/killall snort2c\n";
 
 	/* start a snort process for each interface -gtm */
 	/* Note the sleep delay.  Seems to help getting mult interfaces to start -gtm */
@@ -148,29 +148,24 @@ function sync_package_snort()
 	{
 		$start .= "sleep 8\n";
 		$start .= "snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -D -i {$snortIf} -q\n";
-        
-        /* define snortbarnyardlog_chk */
-        $snortbarnyardlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog'];
-        if ($snortbarnyardlog_info_chk == on)
-                $start .= "\nsleep 4;barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D -q\n";
 	}    
     
-	
-	
-    $if_snort_pid = "\nif ls /tmp/snort.sh.pid > /dev/null\nthen\n    echo \"snort.sh is running\"\n    exit 0\nelse\n    echo \"snort.sh is not running\"\nfi\n";        
-    $echo_snort_sh_pid = "\necho \"snort.sh run\" > /tmp/snort.sh.pid\n";
-    $echo_snort_sh_startup_log = "\necho \"snort.sh run\" >> /tmp/snort.sh_startup.log\n";	
+	/* if block offenders is checked, start snort2c */
+	if($_POST['blockoffenders']) {
+		$start .= "\nsleep 8\n";
+		$start .= "snort2c -w /var/db/whitelist -a /var/log/snort/alert\n";
+	}
+    
 	$sample_before = "\nBEFORE_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
 	$sample_after = "\nAFTER_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
 	$sleep_before_final = "\necho \"Sleeping before final memory sampling...\"\nsleep 17";
 	$total_free_after = "\nTOTAL_USAGE=`top | grep snort | grep -v grep | awk '{ print \$6 }'`\n";
 	$echo_usage = "\necho \"Ram free BEFORE starting Snort: \${BEFORE_MEM} -- Ram free AFTER starting Snort: \${AFTER_MEM}\" -- Mode {$snort_performance} -- Snort memory usage: \$TOTAL_USAGE | logger -p daemon.info -i -t SnortStartup\n";
-    $rm_snort_sh_pid = "\nrm /tmp/snort.sh.pid\n";
 
 	/* write out rc.d start/stop file */
 	write_rcfile(array(
 			"file" => "snort.sh",
-			"start" => "{$if_snort_pid}{$echo_snort_sh_pid}{$echo_snort_sh_startup_log}{$sample_before}{$start}{$sleep_before_final}{$sample_after}{$echo_usage}{$rm_snort_sh_pid}",
+			"start" => "{$sample_before}{$start}{$sleep_before_final}{$sample_after}{$echo_usage}",
 			"stop" => "/usr/bin/killall snort; killall snort2c"
 		)
 	);
@@ -178,67 +173,11 @@ function sync_package_snort()
 	/* create snort configuration file */
 	create_snort_conf();
 
-/* create barnyard2 configuration file */
-$snortbarnyardlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog'];
-if ($snortbarnyardlog_info_chk == on)
-       create_barnyard2_conf();
 	/* start snort service */
 	conf_mount_ro();
 	start_service("snort");
 }
-/* open barnyard2.conf for writing */
-function create_barnyard2_conf() {
-        global $bconfig, $bg;
-        /* write out barnyard2_conf */
-        $barnyard2_conf_text = generate_barnyard2_conf();
-//        conf_mount_rw();
-        $bconf = fopen("/usr/local/etc/barnyard2.conf", "w");
-        if(!$bconf) {
-                log_error("Could not open /usr/local/etc/barnyard2.conf for writing.");
-                exit;
-        }
-        fwrite($bconf, $barnyard2_conf_text);
-        fclose($bconf);
-//        conf_mount_ro();
-}
 
-/* open barnyard2.conf for writing" */
-function generate_barnyard2_conf() {
-
-        global $config, $g;
-        conf_mount_rw();
-
-/* define snortbarnyardlog */
-$snortbarnyardlog_database_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog_database'];
-
-$barnyard2_conf_text = <<<EOD
-
-        Copyright (C) 2006 Scott Ullrich
-        part of pfSense
-        All rights reserved.
-
-# set the appropriate paths to the file(s) your Snort process is using
-config reference-map:   /usr/local/etc/snort/reference.config
-config class-map:          /usr/local/etc/snort/classification.config
-config gen-msg-map:     /usr/local/etc/snort/gen-msg.map
-config sid-msg-map:         /usr/local/etc/snort/sid-msg.map
-
-config hostname:       pfsense.local
-config interface:      vr0
-
-# Step 2: setup the input plugins
-input unified2
-
-# database: log to a variety of databases
-# output database: log, mysql, user=snort password=snort123 dbname=snort host=192.168.1.22
-
-$snortbarnyardlog_database_info_chk
-
-EOD;
-
-        return $barnyard2_conf_text;
-
-}
 function create_snort_conf() {
 	global $config, $g;
 	/* write out snort.conf */
@@ -302,19 +241,14 @@ $tcpdumplog_info_chk = $config['installedpackages']['snortadvanced']['config'][0
 if ($tcpdumplog_info_chk == on)
     $tcpdumplog_type = "output log_tcpdump: snorttcpd.log";
 
-/* define snortbarnyardlog_chk */
-$snortbarnyardlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog'];
-if ($snortbarnyardlog_info_chk == on)
-    $snortbarnyardlog_type = "barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D";
+/* define snortmysqllog */
+$snortmysqllog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortmysqllog'];
+
 /* define snortunifiedlog */
 $snortunifiedlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortunifiedlog'];
 if ($snortunifiedlog_info_chk == on)
     $snortunifiedlog_type = "output unified2: filename snort.u2, limit 128";
 
-/* define spoink */
-$spoink_info_chk = $config['installedpackages']['snort']['config'][0]['blockoffenders7'];
-if ($spoink_info_chk == on)
-    $spoink_type = "output alert_pf: /var/db/whitelist,snort2c";
 /* define servers and ports snortdefservers */
 
 /* def DNS_SERVSERS */
@@ -1030,7 +964,6 @@ $alertsystemlog_type
 $tcpdumplog_type
 $snortmysqllog_info_chk
 $snortunifiedlog_type
-$spoink_type
 						
 #################
                 #

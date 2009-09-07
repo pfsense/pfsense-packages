@@ -154,14 +154,8 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-             <fielddescr>Enable Barnyard2.</fielddescr>
-             <fieldname>snortbarnyardlog</fieldname>
-             <description>This will enable barnyard2 in the snort package. You will also have to set the database credentials.</description>
-             <type>checkbox</type>
-        </field>
-		<field>
-			<fielddescr>Barnyard2 Log Mysql Database.</fielddescr>
-			<fieldname>snortbarnyardlog_database</fieldname>
+			<fielddescr>Log to a mysql database.</fielddescr>
+			<fieldname>snortmysqllog</fieldname>
 			<description>Example: output database: log, mysql, dbname=snort user=snort host=localhost password=xyz</description>
 			<type>input</type>
 			<size>101</size>
