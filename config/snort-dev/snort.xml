@@ -46,8 +46,8 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
-	<version>2.8.4.1</version>
-	<title>Services: Snort 2.8.4.1 pkg v. 1.5</title>
+	<version>2.8.4.1_1</version>
+	<title>Services: Snort 2.8.4.1_1 pkg v. 1.6 Beta</title>
 	<include_file>/usr/local/pkg/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
@@ -106,77 +106,77 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort.inc</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/bin/snort2c</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/bin/barnyard2</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/bin/mons2c</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/bin/oinkmaster_contrib/create-sidmap.pl</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_download_rules.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_download_rules.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_rules.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_rules.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_rules_edit.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_rules_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_rulesets.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_rulesets.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_whitelist.xml</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_whitelist.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_blocked.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_blocked.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_check_for_rule_updates.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_check_for_rule_updates.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_alerts.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_alerts.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_dynamic_ip_reload.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_dynamic_ip_reload.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_advanced.xml</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_advanced.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_define_servers.xml</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_define_servers.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_threshold.xml</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_threshold.xml</item>
 	</additional_files_needed>
 	<fields>
 		<field>
