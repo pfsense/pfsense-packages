@@ -253,6 +253,7 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/70/All/</depends_on_package_base_url>
 	  <depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
 	  <depends_on_package>pcre-7.9.tbz</depends_on_package>
+	  <depends_on_package>mysql-client-5.1.34.tbz</depends_on_package>
 	  <depends_on_package>snort-2.8.4.1_1.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/snort-dev/snort.xml</config_file>
       <version>2.8.4.1_1</version>
