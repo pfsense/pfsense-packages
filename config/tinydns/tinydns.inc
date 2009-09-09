@@ -122,8 +122,8 @@ function tinydns_custom_php_deinstall_command() {
 	global $g, $config;
 	conf_mount_rw();
 	/* destroy all daemontools items */
-	exec("killall supervise");
-	exec("killall tinydns");	
+	exec("/usr/bin/killall supervise");
+	exec("/usr/bin/killall tinydns");	
 	exec("/usr/sbin/pw groupdel Gtinydns");
 	exec("/usr/sbin/pw groupdel Gdnscache");
 	exec("/usr/sbin/pw groupdel Gdnslog");
@@ -135,8 +135,8 @@ function tinydns_custom_php_deinstall_command() {
 	exec("rm /usr/local/pkg/*tinydns*");
 	exec("rm /usr/local/pkg/pf/*tinydns*");
 	exec("rm -rf /etc/tinydns*");
-	conf_mount_ro();
 	filter_configure();
+	conf_mount_ro();
 }
 
 function tinydns_custom_php_changeip_command() {
