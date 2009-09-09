@@ -631,6 +631,11 @@ sleep(5);
 apc_clear_cache();
 exec("/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync");
 
+
+update_status(gettext("Updating Alert Messages..."));
+update_output_window(gettext("Please Wait..."));
+exec("/usr/local/bin/create-sidmap.pl /usr/local/etc/snort/rules > /usr/local/etc/snort/gen-msg.map");
+
 /* php code finish */
 update_status(gettext("The Rules update finished..."));
 update_output_window(gettext("You may start snort now..."));
