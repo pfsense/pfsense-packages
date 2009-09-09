@@ -132,7 +132,7 @@ function tinydns_custom_php_deinstall_command() {
 	exec("rm /usr/local/www/*tinydns*");
 	exec("rm /usr/local/pkg/*tinydns*");
 	exec("rm /usr/local/pkg/pf/*tinydns*");
-	exec("rm -rf /tinydns*");
+	exec("rm -rf /etc/tinydns*");
 	conf_mount_ro();
 	filter_configure();
 }
