@@ -50,7 +50,7 @@ require_once("freenas_guiconfig.inc");
 require_once("freenas_functions.inc");
 
 if(!function_exists("filter_configure")) 
-	requre_once("filter.inc");
+	require_once("filter.inc");
 
 $pconfig['reverse'] = isset($config['syslog']['reverse']);
 $pconfig['nentries'] = $config['syslog']['nentries'];

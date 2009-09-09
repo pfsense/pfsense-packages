@@ -32,7 +32,7 @@
 */
 
 if(!function_exists("filter_configure")) 
-	requre_once("filter.inc");
+	require_once("filter.inc");
 
 function global_write_squid_config()
 {

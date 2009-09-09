@@ -39,7 +39,7 @@ require_once('pkg-utils.inc');
 require_once('service-utils.inc');
 
 if(!function_exists("filter_configure")) 
-	requre_once("filter.inc");
+	require_once("filter.inc");
 
 # ------------------------------------------------------------------------------
 # globals

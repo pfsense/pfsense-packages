@@ -40,7 +40,7 @@ require_once("pkg-utils.inc");
 require_once("notices.inc");
 
 if(!function_exists("filter_configure")) 
-	requre_once("filter.inc");
+	require_once("filter.inc");
 
 if($config['system']['shapertype'] <> "m0n0")
 	require_once ("shaper.inc");

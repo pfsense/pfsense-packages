@@ -4,7 +4,7 @@ require_once('config.inc');
 require_once('service-utils.inc');
 
 if(!function_exists("filter_configure")) 
-	requre_once("filter.inc");
+	require_once("filter.inc");
 
 function clamsmtp_install_command() {
 	global $g;
