@@ -122,6 +122,8 @@ function tinydns_custom_php_deinstall_command() {
 	global $g, $config;
 	conf_mount_rw();
 	/* destroy all daemontools items */
+	exec("killall supervise");
+	exec("killall tinydns");	
 	exec("/usr/sbin/pw groupdel Gtinydns");
 	exec("/usr/sbin/pw groupdel Gdnscache");
 	exec("/usr/sbin/pw groupdel Gdnslog");
