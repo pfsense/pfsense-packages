@@ -68,11 +68,11 @@ function sync_package_snort()
 	$bpfmaxbufsize = $config['installedpackages']['snortadvanced']['config'][0]['bpfmaxbufsize'];
 	$bpfmaxinsns = $config['installedpackages']['snortadvanced']['config'][0]['bpfmaxinsns'];
 
-	/* set the snort performance model */
-	if($config['installedpackages']['snort']['config'][0]['performance'])
-		$snort_performance = $config['installedpackages']['snort']['config'][0]['performance'];
-	else
-		$snort_performance = "ac-bnfa";
+//	/* set the snort performance model */
+//	if($config['installedpackages']['snort']['config'][0]['performance'])
+//		$snort_performance = $config['installedpackages']['snort']['config'][0]['performance'];
+//	else
+//		$snort_performance = "ac-bnfa";
 
 	conf_mount_rw();
 	/* create a few directories and ensure the sample files are in place */
@@ -585,6 +585,121 @@ else
 	else
 		$snort_performance = "ac-bnfa";
 
+	/* set the snort block hosts time */
+	$snort_rm_blocked_info_ck = $config['installedpackages']['snort']['config'][0]['rm_blocked'];
+		if ($snort_rm_blocked_info_ck == "never_b")
+                $snort_rm_blocked_false = "";
+			else
+				$snort_rm_blocked_false = "true";
+
+function snort_rm_blocked_install_cron($should_install) {
+        global $config, $g;
+
+        if ($g['booting']==true)
+                return;
+
+        $is_installed = false;
+
+        if(!$config['cron']['item'])
+                return;
+
+        $x=0;
+        foreach($config['cron']['item'] as $item) {
+                if (strstr($item['command'], "snort2c")) {
+                        $is_installed = true;
+                        break;
+                }
+                $x++;
+        }
+	$snort_rm_blocked_info_ck = $config['installedpackages']['snort']['config'][0]['rm_blocked'];
+		if ($snort_rm_blocked_info_ck == "1h_b") {
+                $snort_rm_blocked_min = "*";
+                $snort_rm_blocked_hr = "*/1";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+		}
+		if ($snort_rm_blocked_info_ck == "3h_b") {
+                $snort_rm_blocked_min = "*";
+                $snort_rm_blocked_hr = "*/3";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+		}
+		if ($snort_rm_blocked_info_ck == "6h_b") {
+                $snort_rm_blocked_min = "*";
+                $snort_rm_blocked_hr = "*/6";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+		}
+		if ($snort_rm_blocked_info_ck == "12h_b") {
+                $snort_rm_blocked_min = "*";
+                $snort_rm_blocked_hr = "*/12";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+		}
+		if ($snort_rm_blocked_info_ck == "1d_b") {
+                $snort_rm_blocked_min = "*";
+                $snort_rm_blocked_hr = "*";
+                $snort_rm_blocked_mday = "*/1";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+		}
+		if ($snort_rm_blocked_info_ck == "4d_b") {
+                $snort_rm_blocked_min = "*";
+                $snort_rm_blocked_hr = "*";
+                $snort_rm_blocked_mday = "*/4";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+		}
+		if ($snort_rm_blocked_info_ck == "7d_b") {
+                $snort_rm_blocked_min = "*";
+                $snort_rm_blocked_hr = "*";
+                $snort_rm_blocked_mday = "*/7";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+		}
+		if ($snort_rm_blocked_info_ck == "28d_b") {
+                $snort_rm_blocked_min = "*";
+                $snort_rm_blocked_hr = "*";
+                $snort_rm_blocked_mday = "*/28";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+		}
+        switch($should_install) {
+                case true:
+                        if(!$is_installed) {		
+                                $cron_item = array();
+                                $cron_item['minute'] = "$snort_rm_blocked_min";
+                                $cron_item['hour'] = "$snort_rm_blocked_hr";
+                                $cron_item['mday'] = "$snort_rm_blocked_mday";
+                                $cron_item['month'] = "$snort_rm_blocked_month";
+                                $cron_item['wday'] = "$snort_rm_blocked_wday";
+                                $cron_item['who'] = "root";
+                                $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/sbin/expiretable -t 3600 snort2c";
+                                $config['cron']['item'][] = $cron_item;
+                                write_config("Installed 15 minute filter reload for Time Based Rules");
+                                configure_cron();
+                        }
+                break;
+                case false:
+                        if($is_installed == true) {
+                                if($x > 0) {
+                                        unset($config['cron']['item'][$x]);
+                                        write_config();
+                                }
+                                configure_cron();
+                        }
+                break;
+        }
+}
+
+snort_rm_blocked_install_cron("");
+snort_rm_blocked_install_cron($snort_rm_blocked_false);
+	
+	
 	/* open snort2c's whitelist for writing */
 	$whitelist = fopen("/var/db/whitelist", "w");
 	if(!$whitelist) {

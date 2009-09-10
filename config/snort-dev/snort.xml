@@ -247,6 +247,50 @@
 			<size>60</size>
 		</field>
 		<field>
+			<fielddescr>Remove blocked hosts every</fielddescr>
+			<fieldname>rm_blocked</fieldname>
+			<description>Please select the amount of time hosts are blocked</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>never</name>
+					<value>never_b</value>
+				</option>
+				<option>
+					<name>1 hour</name>
+					<value>1h_b</value>
+				</option>
+				<option>
+					<name>3 hours</name>
+					<value>3h_b</value>
+				</option>
+				<option>
+					<name>6 hours</name>
+					<value>6h_b</value>
+				</option>
+				<option>
+					<name>12 hours</name>
+					<value>12h_b</value>
+				</option>
+				<option>
+					<name>1 day</name>
+					<value>1d_b</value>
+				</option>
+				<option>
+					<name>4 days</name>
+					<value>4d_b</value>
+				</option>
+				<option>
+					<name>7 days</name>
+					<value>7d_b</value>
+				</option>
+				<option>
+					<name>28 days</name>
+					<value>28d_b</value>
+				</option>
+			</options>
+		</field>
+		<field>
 			<fielddescr>Update rules automatically</fielddescr>
 			<fieldname>automaticrulesupdate</fieldname>
 			<description>Checking this option will automatically check for and update rules once a week from snort.org.</description>
@@ -286,6 +330,7 @@
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
+		system("/bin/mkdir -p /usr/local/etc/snort/rules");
 		sync_package_snort();
 	</custom_php_resync_config_command>
     <custom_php_install_command>
