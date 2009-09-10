@@ -56,6 +56,8 @@ function sync_package_snort_reinstall()
 
 function sync_package_snort_install() {
 
+	global $g, $config;
+
 	/* create a few directories and ensure the sample files are in place */
 	exec("/bin/mkdir -p /usr/local/etc/snort");
 	exec("/bin/mkdir -p /var/log/snort");
