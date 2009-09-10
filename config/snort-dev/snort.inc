@@ -68,11 +68,11 @@ function sync_package_snort()
 	$bpfmaxbufsize = $config['installedpackages']['snortadvanced']['config'][0]['bpfmaxbufsize'];
 	$bpfmaxinsns = $config['installedpackages']['snortadvanced']['config'][0]['bpfmaxinsns'];
 
-//	/* set the snort performance model */
-//	if($config['installedpackages']['snort']['config'][0]['performance'])
-//		$snort_performance = $config['installedpackages']['snort']['config'][0]['performance'];
-//	else
-//		$snort_performance = "ac-bnfa";
+	/* set the snort performance model */
+	if($config['installedpackages']['snort']['config'][0]['performance'])
+		$snort_performance = $config['installedpackages']['snort']['config'][0]['performance'];
+	else
+		$snort_performance = "ac-bnfa";
 
 	conf_mount_rw();
 	/* create a few directories and ensure the sample files are in place */
@@ -88,7 +88,9 @@ function sync_package_snort()
 	exec("/bin/cp /usr/local/etc/snort/sid-sample /usr/local/etc/snort/sid");
 	exec("/bin/cp /usr/local/etc/snort/threshold.conf-sample /usr/local/etc/snort/threshold.conf");
 	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
+	exec("/usr/bin/touch /usr/local/etc/snort/rules/local.rules");
 	exec("/bin/rm -f /usr/local/etc/rc.d/snort");
+	
 
 	$first = 0;
 	$snortInterfaces = array(); /* -gtm  */
