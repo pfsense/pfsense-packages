@@ -126,7 +126,7 @@
       <pkginfolink>http://doc.pfsense.org/index.php/FreeSWITCH</pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/freeswitch_dev/freeswitch.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <version>0.9.7.24</version>
+      <version>0.9.7.25</version>
       <status>Beta</status>
       <required_version>1.2.3</required_version>
       <maintainer>markjcrane@gmail.com</maintainer>

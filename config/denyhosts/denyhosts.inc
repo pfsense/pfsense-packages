@@ -184,7 +184,10 @@ function deinstall_command()
 			exec ("rm /etc/hosts.allow");
 			exec ("cp /etc/hosts.allow.bak /etc/hosts.allow");
 		}
-	
+
+	//remove the configuration
+		exec ("rm /usr/local/etc/denyhosts*");
+
 	//create a new hosts.allow file
 		//$hosts_allow = "#\n";
 		//$hosts_allow .= "# hosts.allow access control file for \"tcp wrapped\" applications.\n";

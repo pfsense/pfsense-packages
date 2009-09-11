@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
     NOTICE:
     
@@ -9,6 +8,8 @@
     they can access.  You can also add a user in the directory with the cidr= attribute acl.conf.xml
     will build the domains acl using this value.
 -->
+
+<?xml version="1.0" encoding="utf-8"?>
 <!-- http://wiki.freeswitch.org/wiki/Dialplan_XML -->
 <include>
   <context name="default">
@@ -32,7 +33,7 @@
     <extension name="global-intercept">
       <condition field="destination_number" expression="^\*886$">
 	<action application="answer"/>
-	<action application="intercept" data="${hash(select/${domain_name}-last_dial/global)}"/>
+	<action application="intercept" data="${db(select/${domain_name}-last_dial/global)}"/>
 	<action application="sleep" data="2000"/>
       </condition>
     </extension>
@@ -40,7 +41,7 @@
     <extension name="group-intercept">
       <condition field="destination_number" expression="^\*8$">
 	<action application="answer"/>
-	<action application="intercept" data="${hash(select/${domain_name}-last_dial/${callgroup})}"/>
+	<action application="intercept" data="${db(select/${domain_name}-last_dial/${callgroup})}"/>
 	<action application="sleep" data="2000"/>
       </condition>
     </extension>
@@ -48,14 +49,14 @@
     <extension name="intercept-ext">
       <condition field="destination_number" expression="^\*\*(\d+)$">
 	<action application="answer"/>
-	<action application="intercept" data="${hash(select/${domain_name}-last_dial_ext/$1)}"/>
+	<action application="intercept" data="${db(select/${domain_name}-last_dial_ext/$1)}"/>
 	<action application="sleep" data="2000"/>
       </condition>
     </extension>
 
     <extension name="redial">
       <condition field="destination_number" expression="^\*870$">
-	<action application="transfer" data="${hash(select/${domain_name}-last_dial/${caller_id_number})}"/>
+	<action application="transfer" data="${db(select/${domain_name}-last_dial/${caller_id_number})}"/>
       </condition>
     </extension>
 
@@ -63,6 +64,10 @@
       <condition field="${network_addr}" expression="^$" break="never">
 	<action application="set" data="use_profile=${cond(${acl($${local_ip_v4} rfc1918)} == true ? nat : default)}"/>
 	<anti-action application="set" data="use_profile=${cond(${acl(${network_addr} rfc1918)} == true ? nat : default)}"/>
+      </condition>
+      <!-- This will setup some variables if the user isn't authenticated. -->
+      <condition field="${numbering_plan}" expression="^$" break="never">
+	<action application="set_user" data="default@${domain_name}"/>
       </condition>
       <condition field="${call_debug}" expression="^true$" break="never">
 	<action application="info"/>
@@ -81,11 +86,10 @@
 	<!-- Offer SRTP on outbound legs if we have it on inbound. -->
 	<!-- <action application="export" data="sip_secure_media=true"/> -->
       </condition>
-
       <condition>
-	<action application="hash" data="insert/${domain_name}-spymap/${caller_id_number}/${uuid}"/>
-	<action application="hash" data="insert/${domain_name}-last_dial/${caller_id_number}/${destination_number}"/>
-	<action application="hash" data="insert/${domain_name}-last_dial/global/${uuid}"/>
+	<action application="db" data="insert/${domain_name}-spymap/${caller_id_number}/${uuid}"/>
+	<action application="db" data="insert/${domain_name}-last_dial/${caller_id_number}/${destination_number}"/>
+	<action application="db" data="insert/${domain_name}-last_dial/global/${uuid}"/>
       </condition>
     </extension>
 
@@ -121,7 +125,7 @@
     <extension name="eavesdrop">
       <condition field="destination_number" expression="^\*88(.*)$|^\*0(.*)$">
 	<action application="answer"/>
-	<action application="eavesdrop" data="${hash(select/${domain_name}-spymap/$1)}"/>
+	<action application="eavesdrop" data="${db(select/${domain_name}-spymap/$1)}"/>
       </condition>
     </extension>
 
@@ -137,7 +141,7 @@
 
     <extension name="call_return">
       <condition field="destination_number" expression="^\*69$|^869$|^lcr$">
-	<action application="transfer" data="${hash(select/${domain_name}-call_return/${caller_id_number})}"/>
+	<action application="transfer" data="${db(select/${domain_name}-call_return/${caller_id_number})}"/>
       </condition>
     </extension>
 
@@ -200,11 +204,11 @@
 	<action application="set" data="hangup_after_bridge=true"/>
 	<!--<action application="set" data="continue_on_fail=NORMAL_TEMPORARY_FAILURE,USER_BUSY,NO_ANSWER,TIMEOUT,NO_ROUTE_DESTINATION"/> -->
 	<action application="set" data="continue_on_fail=true"/>
-	<action application="hash" data="insert/${domain_name}-call_return/${dialed_extension}/${caller_id_number}"/>
-	<action application="hash" data="insert/${domain_name}-last_dial_ext/${dialed_extension}/${uuid}"/>
+	<action application="db" data="insert/${domain_name}-call_return/${dialed_extension}/${caller_id_number}"/>
+	<action application="db" data="insert/${domain_name}-last_dial_ext/${dialed_extension}/${uuid}"/>
 	<action application="set" data="called_party_callgroup=${user_data(${dialed_extension}@${domain_name} var callgroup)}"/>
 	<!--<action application="export" data="nolocal:sip_secure_media=${user_data(${dialed_extension}@${domain_name} var sip_secure_media)}"/>-->
-	<action application="hash" data="insert/${domain_name}-last_dial/${called_party_callgroup}/${uuid}"/>
+	<action application="db" data="insert/${domain_name}-last_dial/${called_party_callgroup}/${uuid}"/>
 	<action application="bridge" data="user/${dialed_extension}@${domain_name}"/>
 	<action application="answer"/>
 	<action application="sleep" data="1000"/>
@@ -328,14 +332,6 @@
     <extension name="freeswitch_public_conf_via_sip">
       <condition field="destination_number" expression="^\*9(888|1616|3232)$">
 	<action application="export" data="hold_music=silence"/>
-	<!-- 
-	     This will take the SAS from the b-leg and send it to the display on the a-leg phone.
-	     Known working with Polycom and Snom maybe others.
-	-->
-	<!--
-	<action application="set" data="exec_after_bridge_app=${sched_api(+4 zrtp expand uuid_display ${uuid} \${uuid_getvar(\${uuid_getvar(${uuid} signal_bond)} zrtp_sas1_string )}  \${uuid_getvar(\${uuid_getvar(${uuid} signal_bond)} zrtp_sas2_string )} )}"/>
-	<action application="export" data="nolocal:zrtp_secure_media=true"/>
-	-->
 	<action application="bridge" data="sofia/${use_profile}/$1@conference.freeswitch.org"/>
       </condition>
     </extension>
@@ -633,6 +629,14 @@
       </condition>
     </extension>
 
+    <!-- install zrtp_agent.lua into scripts (ZRTP == 9787) -->
+    <extension name="zrtp_enrollement">
+      <condition field="destination_number" expression="^9787$">
+	<action application="answer"/>
+	<action application="lua" data="zrtp_agent.lua"/>
+      </condition>
+    </extension>
+
     <!--
 	You will no longer hear the bong tone.  The wav file is playing stating the call is secure.
 	The file will not play unless you have both TLS and SRTP active.
@@ -644,9 +648,10 @@
 	<action application="answer"/>
 	<action application="execute_extension" data="is_secure XML features"/>
 	<action application="playback" data="$${hold_music}"/>
-	<!-- This really should be an IVR for zrtp enrollment but this is just a demo-->
-	<anti-action application="set" data="zrtp_enrollment=true"/>
+	<anti-action application="set" data="zrtp_secure_media=true"/>
 	<anti-action application="answer"/>
+	<anti-action application="playback" data="silence_stream://2000"/>
+	<anti-action application="execute_extension" data="is_zrtp_secure XML features"/>
 	<anti-action application="playback" data="$${hold_music}"/>
       </condition>
     </extension>

@@ -49,7 +49,7 @@ function v_settings()
 	$config['installedpackages']['freeswitchsettings']['config'][0]['tmp_dir'] = '/tmp';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['bin_dir'] = '/usr/local/bin';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_startup_script_dir'] = '/usr/local/etc/rc.d';
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.24";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.25";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_version'] = "1.0.4";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_revision'] = "Release";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_label'] = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
@@ -3425,7 +3425,7 @@ function v_install_phase_1()
 			pkg_add($pkg_download_path, "libgpg-error-1.7.tbz");
 			pkg_add($pkg_download_path, "libgcrypt-1.4.4.tbz");
 			pkg_add($pkg_download_path, "gnutls-2.6.5.tbz");
-			pkg_add($pkg_download_path, "freeswitch-1.0.4.tbz");		
+			pkg_add($pkg_download_path, "freeswitch-1.0.4.tbz");
 			//pkg_add($pkg_download_path, "p5-gettext-1.05_2.tbz"); //requirement for perl
 			//pkg_add($pkg_download_path, "perl-5.8.9_3.tbz");
 			fwrite($handle, 'packages have been installed');
