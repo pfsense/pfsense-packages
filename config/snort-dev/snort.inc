@@ -64,7 +64,7 @@ function sync_package_snort_install() {
 	exec("/bin/mkdir -p /var/log/snort");
 	exec("/bin/mkdir -p /usr/local/etc/snort/rules");
 	
-	if(file_exists("/usr/local/etc/snort/unicode.map-sample")) {
+	if(!file_exists("/usr/local/etc/snort/unicode.map-sample"))
 		exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
 		exec("/bin/cp /usr/local/etc/snort/classification.config-sample /usr/local/etc/snort/classification.config");
 		exec("/bin/cp /usr/local/etc/snort/gen-msg.map-sample /usr/local/etc/snort/gen-msg.map");
@@ -76,7 +76,6 @@ function sync_package_snort_install() {
 		exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
 		exec("/bin/rm -f /usr/local/etc/rc.d/snort");
 		exec("/bin/rm /usr/local/lib/snort/dynamicrules/*");
-	}
 	
 	if(!file_exists("/usr/local/etc/snort/rules/local.rules"))
 		exec("/bin/cp /usr/local/pkg/local.rules /usr/local/etc/snort/rules/local.rules");
@@ -85,30 +84,7 @@ function sync_package_snort_install() {
 
 function sync_package_snort()
 {
-	global $config, $g;
-
-	/* create a few directories and ensure the sample files are in place */
-	exec("/bin/mkdir -p /usr/local/etc/snort_bkup");
-	exec("/bin/mkdir -p /usr/local/etc/snort");
-	exec("/bin/mkdir -p /var/log/snort");
-	exec("/bin/mkdir -p /usr/local/etc/snort/rules");
-	
-	if(file_exists("/usr/local/etc/snort/unicode.map-sample")) {
-		exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
-		exec("/bin/cp /usr/local/etc/snort/classification.config-sample /usr/local/etc/snort/classification.config");
-		exec("/bin/cp /usr/local/etc/snort/gen-msg.map-sample /usr/local/etc/snort/gen-msg.map");
-		exec("/bin/cp /usr/local/etc/snort/generators-sample /usr/local/etc/snort/generators");
-		exec("/bin/cp /usr/local/etc/snort/reference.config-sample /usr/local/etc/snort/reference.config");
-		exec("/bin/cp /usr/local/etc/snort/sid-msg.map-sample /usr/local/etc/snort/sid-msg.map");
-		exec("/bin/cp /usr/local/etc/snort/sid-sample /usr/local/etc/snort/sid");
-		exec("/bin/cp /usr/local/etc/snort/threshold.conf-sample /usr/local/etc/snort/threshold.conf");
-		exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
-		exec("/bin/rm -f /usr/local/etc/rc.d/snort");
-		exec("/bin/rm /usr/local/lib/snort/dynamicrules/*");
-	}
-	
-	if(!file_exists("/usr/local/etc/snort/rules/local.rules"))
-		exec("/bin/cp /usr/local/pkg/local.rules /usr/local/etc/snort/rules/local.rules");	
+	global $config, $g;	
 
 	if(!file_exists("/var/log/snort/alert"))
 		touch("/var/log/snort/alert");

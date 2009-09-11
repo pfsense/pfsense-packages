@@ -29,7 +29,7 @@
 require("guiconfig.inc");
 
 if(!is_dir("/usr/local/etc/snort/rules"))
-	Header("Location: snort_download_rules.php");
+	header("Location: snort_rules.php", false);
 
 function get_middle($source, $beginning, $ending, $init_pos) {
    $beginning_pos = strpos($source, $beginning, $init_pos);
