@@ -368,7 +368,6 @@
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
 		sync_package_snort();
-		sync_package_snort_install();
 	</custom_php_resync_config_command>
     <custom_php_install_command>
 		sync_package_snort_reinstall();
