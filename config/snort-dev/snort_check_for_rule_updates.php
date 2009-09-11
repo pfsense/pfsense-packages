@@ -45,6 +45,12 @@ require_once("config.inc");
 
 <?php
 
+$up_date_time = date('l jS \of F Y h:i:s A');
+echo "";
+echo "#########################";
+echo "$up_date_time";
+echo "#########################";
+echo "";
 
 /* Begin main code */
 /* Set user agent to Mozilla */
@@ -284,7 +290,7 @@ if ($pfsense_md5_check_ok != on) {
 if (file_exists("{$tmpfname}/{$pfsense_rules_filename}")) {
     echo "Snortrule tar file exists...\n";
 } else {
-	unhide_progress_bar_status();
+
     echo "There is a new set of Pfsense rules posted. Downloading...\n";
     echo "May take 4 to 10 min...\n";	
     ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
@@ -517,7 +523,7 @@ exec("/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/syn
 echo "Updating Alert Messages...\n";
 echo "Please Wait...\n";
 sleep(2);
-exec("/usr/local/bin/create-sidmap.pl /usr/local/etc/snort/rules > /usr/local/etc/snort/gen-msg.map");
+exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl /usr/local/etc/snort/rules > /usr/local/etc/snort/gen-msg.map");
 
 /* php code finish */
 echo "The Rules update finished...\n";

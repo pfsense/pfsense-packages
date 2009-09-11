@@ -64,17 +64,23 @@ function sync_package_snort_install() {
 	exec("/bin/mkdir -p /var/log/snort");
 	exec("/bin/mkdir -p /usr/local/etc/snort/rules");
 	
-	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
-	exec("/bin/cp /usr/local/etc/snort/classification.config-sample /usr/local/etc/snort/classification.config");
-	exec("/bin/cp /usr/local/etc/snort/gen-msg.map-sample /usr/local/etc/snort/gen-msg.map");
-	exec("/bin/cp /usr/local/etc/snort/generators-sample /usr/local/etc/snort/generators");
-	exec("/bin/cp /usr/local/etc/snort/reference.config-sample /usr/local/etc/snort/reference.config");
-	exec("/bin/cp /usr/local/etc/snort/sid-msg.map-sample /usr/local/etc/snort/sid-msg.map");
-	exec("/bin/cp /usr/local/etc/snort/sid-sample /usr/local/etc/snort/sid");
-	exec("/bin/cp /usr/local/etc/snort/threshold.conf-sample /usr/local/etc/snort/threshold.conf");
-	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
-	exec("/usr/bin/touch /usr/local/etc/snort/rules/local.rules");
-	exec("/bin/rm -f /usr/local/etc/rc.d/snort");
+	if(file_exists("/usr/local/etc/snort/unicode.map-sample")) {
+		exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
+		exec("/bin/cp /usr/local/etc/snort/classification.config-sample /usr/local/etc/snort/classification.config");
+		exec("/bin/cp /usr/local/etc/snort/gen-msg.map-sample /usr/local/etc/snort/gen-msg.map");
+		exec("/bin/cp /usr/local/etc/snort/generators-sample /usr/local/etc/snort/generators");
+		exec("/bin/cp /usr/local/etc/snort/reference.config-sample /usr/local/etc/snort/reference.config");
+		exec("/bin/cp /usr/local/etc/snort/sid-msg.map-sample /usr/local/etc/snort/sid-msg.map");
+		exec("/bin/cp /usr/local/etc/snort/sid-sample /usr/local/etc/snort/sid");
+		exec("/bin/cp /usr/local/etc/snort/threshold.conf-sample /usr/local/etc/snort/threshold.conf");
+		exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
+		exec("/bin/rm -f /usr/local/etc/rc.d/snort");
+		exec("/bin/rm /usr/local/lib/snort/dynamicrules/*");
+	}
+	
+	if(!file_exists("/usr/local/etc/snort/rules/local.rules"))
+		exec("/bin/cp /usr/local/pkg/local.rules /usr/local/etc/snort/rules/local.rules");
+	
 }
 
 function sync_package_snort()
@@ -723,6 +729,106 @@ function snort_rm_blocked_install_cron($should_install) {
 
 snort_rm_blocked_install_cron("");
 snort_rm_blocked_install_cron($snort_rm_blocked_false);
+
+	/* set the snort rules update time */
+	$snort_up_rules_info_ck = $config['installedpackages']['snort']['config'][0]['autorulesupdate7'];
+		if ($snort_up_rules_info_ck == "never_up")
+                $snort_up_rules_false = "";
+			else
+				$snort_up_rules_false = "true";
+
+function snort_up_rules_install_cron($should_install) {
+        global $config, $g;
+
+        if ($g['booting']==true)
+                return;
+
+        $is_installed = false;
+
+        if(!$config['cron']['item'])
+                return;
+
+        $x=0;
+        foreach($config['cron']['item'] as $item) {
+                if (strstr($item['command'], "snort_check_for_rule_updates.php")) {
+                        $is_installed = true;
+                        break;
+                }
+                $x++;
+        }
+	$snort_up_rules_info_ck = $config['installedpackages']['snort']['config'][0]['autorulesupdate7'];
+		if ($snort_up_rules_info_ck == "6h_up") {
+                $snort_up_rules_min = "*";
+                $snort_up_rules_hr = "*/6";
+                $snort_up_rules_mday = "*";
+                $snort_up_rules_month = "*";
+                $snort_up_rules_wday = "*";
+		}
+		if ($snort_up_rules_info_ck == "12h_up") {
+                $snort_up_rules_min = "*";
+                $snort_up_rules_hr = "*/12";
+                $snort_up_rules_mday = "*";
+                $snort_up_rules_month = "*";
+                $snort_up_rules_wday = "*";
+		}
+		if ($snort_up_rules_info_ck == "1d_up") {
+                $snort_up_rules_min = "*";
+                $snort_up_rules_hr = "*";
+                $snort_up_rules_mday = "*/1";
+                $snort_up_rules_month = "*";
+                $snort_up_rules_wday = "*";
+		}
+		if ($snort_up_rules_info_ck == "4d_up") {
+                $snort_up_rules_min = "*";
+                $snort_up_rules_hr = "*";
+                $snort_up_rules_mday = "*/4";
+                $snort_up_rules_month = "*";
+                $snort_up_rules_wday = "*";
+		}
+		if ($snort_up_rules_info_ck == "7d_up") {
+                $snort_up_rules_min = "*";
+                $snort_up_rules_hr = "*";
+                $snort_up_rules_mday = "*/7";
+                $snort_up_rules_month = "*";
+                $snort_up_rules_wday = "*";
+		}
+		if ($snort_up_rules_info_ck == "28d_up") {
+                $snort_up_rules_min = "*";
+                $snort_up_rules_hr = "*";
+                $snort_up_rules_mday = "*/28";
+                $snort_up_rules_month = "*";
+                $snort_up_rules_wday = "*";
+		}
+        switch($should_install) {
+                case true:
+                        if(!$is_installed) {		
+                                $cron_item = array();
+                                $cron_item['minute'] = "$snort_up_rules_min";
+                                $cron_item['hour'] = "$snort_up_rules_hr";
+                                $cron_item['mday'] = "$snort_up_rules_mday";
+                                $cron_item['month'] = "$snort_up_rules_month";
+                                $cron_item['wday'] = "$snort_up_rules_wday";
+                                $cron_item['who'] = "root";
+                                $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort_check_for_rule_updates.php >> /usr/local/etc/snort_bkup/snort_update.log";
+                                $config['cron']['item'][] = $cron_item;
+                                write_config("Installed 15 minute filter reload for Time Based Rules");
+                                configure_cron();
+                        }
+                break;
+                case false:
+                        if($is_installed == true) {
+                                if($x > 0) {
+                                        unset($config['cron']['item'][$x]);
+                                        write_config();
+                                }
+                                configure_cron();
+                        }
+                break;
+        }
+}
+
+snort_up_rules_install_cron("");
+snort_up_rules_install_cron($snort_up_rules_false);
 	
 	
 	/* open snort2c's whitelist for writing */

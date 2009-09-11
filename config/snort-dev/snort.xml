@@ -178,6 +178,11 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort-dev/snort_threshold.xml</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/pfsense_rules/local.rules</item>
+	</additional_files_needed>
 	<fields>
 		<field>
 			<fielddescr>Interface</fielddescr>
@@ -291,10 +296,42 @@
 			</options>
 		</field>
 		<field>
+		</field>
+		<field>
 			<fielddescr>Update rules automatically</fielddescr>
-			<fieldname>automaticrulesupdate</fieldname>
-			<description>Checking this option will automatically check for and update rules once a week from snort.org.</description>
-			<type>checkbox</type>
+			<fieldname>autorulesupdate7</fieldname>
+			<description>Please select the update times for rules.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>never</name>
+					<value>never_up</value>
+				</option>
+				<option>
+					<name>6 hours</name>
+					<value>6h_up</value>
+				</option>
+				<option>
+					<name>12 hours</name>
+					<value>12h_up</value>
+				</option>
+				<option>
+					<name>1 day</name>
+					<value>1d_up</value>
+				</option>
+				<option>
+					<name>4 days</name>
+					<value>4d_up</value>
+				</option>
+				<option>
+					<name>7 days</name>
+					<value>7d_up</value>
+				</option>
+				<option>
+					<name>28 days</name>
+					<value>28d_up</value>
+				</option>
+			</options>
 		</field>
 		<field>
 			<fielddescr>Whitelist VPNs automatically</fielddescr>
@@ -328,9 +365,9 @@
 		</field>
     </fields>
 	<custom_add_php_command>
-		sync_package_snort();
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
+		sync_package_snort();
 		sync_package_snort_install();
 	</custom_php_resync_config_command>
     <custom_php_install_command>
