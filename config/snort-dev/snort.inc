@@ -59,9 +59,11 @@ function sync_package_snort_install() {
 	global $g, $config;
 
 	/* create a few directories and ensure the sample files are in place */
+	exec("/bin/mkdir -p /usr/local/etc/snort_bkup");
 	exec("/bin/mkdir -p /usr/local/etc/snort");
 	exec("/bin/mkdir -p /var/log/snort");
 	exec("/bin/mkdir -p /usr/local/etc/snort/rules");
+	
 	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
 	exec("/bin/cp /usr/local/etc/snort/classification.config-sample /usr/local/etc/snort/classification.config");
 	exec("/bin/cp /usr/local/etc/snort/gen-msg.map-sample /usr/local/etc/snort/gen-msg.map");
