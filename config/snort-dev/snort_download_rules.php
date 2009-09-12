@@ -634,7 +634,7 @@ exec("/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/syn
 
 update_status(gettext("Updating Alert Messages..."));
 update_output_window(gettext("Please Wait..."));
-exec("/usr/local/bin/create-sidmap.pl /usr/local/etc/snort/rules > /usr/local/etc/snort/gen-msg.map");
+exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl /usr/local/etc/snort/rules > /usr/local/etc/snort/gen-msg.map");
 
 /* php code finish */
 update_status(gettext("The Rules update finished..."));

@@ -379,7 +379,8 @@ if ($snortunifiedlog_info_chk == on)
 $spoink_info_chk = $config['installedpackages']['snort']['config'][0]['blockoffenders7'];
 if ($spoink_info_chk == on)
     $spoink_type = "output alert_pf: /var/db/whitelist,snort2c";
-/* define servers and ports snortdefservers */
+
+	/* define servers and ports snortdefservers */
 
 /* def DNS_SERVSERS */
 $def_dns_servers_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_dns_servers'];
