@@ -1310,6 +1310,7 @@ $alertsystemlog_type
 $tcpdumplog_type
 $snortmysqllog_info_chk
 $snortunifiedlog_type
+$spoink_type
 						
 #################
                 #
