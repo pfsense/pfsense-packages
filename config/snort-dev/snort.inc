@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /* $Id$ */
 /*
 	snort.inc
@@ -53,38 +53,11 @@ function sync_package_snort_reinstall()
 	/* start snort service */
 	start_service("snort");
 }
-
-function sync_package_snort_install() {
-
-	global $g, $config;
-
-	/* create a few directories and ensure the sample files are in place */
-	exec("/bin/mkdir -p /usr/local/etc/snort_bkup");
-	exec("/bin/mkdir -p /usr/local/etc/snort");
-	exec("/bin/mkdir -p /var/log/snort");
-	exec("/bin/mkdir -p /usr/local/etc/snort/rules");
-	
-	if(!file_exists("/usr/local/etc/snort/unicode.map-sample"))
-		exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
-		exec("/bin/cp /usr/local/etc/snort/classification.config-sample /usr/local/etc/snort/classification.config");
-		exec("/bin/cp /usr/local/etc/snort/gen-msg.map-sample /usr/local/etc/snort/gen-msg.map");
-		exec("/bin/cp /usr/local/etc/snort/generators-sample /usr/local/etc/snort/generators");
-		exec("/bin/cp /usr/local/etc/snort/reference.config-sample /usr/local/etc/snort/reference.config");
-		exec("/bin/cp /usr/local/etc/snort/sid-msg.map-sample /usr/local/etc/snort/sid-msg.map");
-		exec("/bin/cp /usr/local/etc/snort/sid-sample /usr/local/etc/snort/sid");
-		exec("/bin/cp /usr/local/etc/snort/threshold.conf-sample /usr/local/etc/snort/threshold.conf");
-		exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
-		exec("/bin/rm -f /usr/local/etc/rc.d/snort");
-		exec("/bin/rm /usr/local/lib/snort/dynamicrules/*");
-	
-	if(!file_exists("/usr/local/etc/snort/rules/local.rules"))
-		exec("/bin/cp /usr/local/pkg/local.rules /usr/local/etc/snort/rules/local.rules");
-	
-}
-
 function sync_package_snort()
 {
-	global $config, $g;	
+	global $config, $g;
+
+	mwexec("mkdir -p /var/log/snort/");
 
 	if(!file_exists("/var/log/snort/alert"))
 		touch("/var/log/snort/alert");
@@ -102,20 +75,19 @@ function sync_package_snort()
 
 	conf_mount_rw();
 	/* create a few directories and ensure the sample files are in place */
-//	exec("/bin/mkdir -p /usr/local/etc/snort");
-//	exec("/bin/mkdir -p /var/log/snort");
-//	exec("/bin/mkdir -p /usr/local/etc/snort/rules");
-//	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
-//	exec("/bin/cp /usr/local/etc/snort/classification.config-sample /usr/local/etc/snort/classification.config");
-//	exec("/bin/cp /usr/local/etc/snort/gen-msg.map-sample /usr/local/etc/snort/gen-msg.map");
-//	exec("/bin/cp /usr/local/etc/snort/generators-sample /usr/local/etc/snort/generators");
-//	exec("/bin/cp /usr/local/etc/snort/reference.config-sample /usr/local/etc/snort/reference.config");
-//	exec("/bin/cp /usr/local/etc/snort/sid-msg.map-sample /usr/local/etc/snort/sid-msg.map");
-//	exec("/bin/cp /usr/local/etc/snort/sid-sample /usr/local/etc/snort/sid");
-//	exec("/bin/cp /usr/local/etc/snort/threshold.conf-sample /usr/local/etc/snort/threshold.conf");
-//	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
-//	exec("/bin/rm -f /usr/local/etc/rc.d/snort");
-	
+	exec("/bin/mkdir -p /usr/local/etc/snort");
+	exec("/bin/mkdir -p /var/log/snort");
+	exec("/bin/mkdir -p /usr/local/etc/snort/rules");
+	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
+	exec("/bin/cp /usr/local/etc/snort/classification.config-sample /usr/local/etc/snort/classification.config");
+	exec("/bin/cp /usr/local/etc/snort/gen-msg.map-sample /usr/local/etc/snort/gen-msg.map");
+	exec("/bin/cp /usr/local/etc/snort/generators-sample /usr/local/etc/snort/generators");
+	exec("/bin/cp /usr/local/etc/snort/reference.config-sample /usr/local/etc/snort/reference.config");
+	exec("/bin/cp /usr/local/etc/snort/sid-msg.map-sample /usr/local/etc/snort/sid-msg.map");
+	exec("/bin/cp /usr/local/etc/snort/sid-sample /usr/local/etc/snort/sid");
+	exec("/bin/cp /usr/local/etc/snort/threshold.conf-sample /usr/local/etc/snort/threshold.conf");
+	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
+	exec("/bin/rm -f /usr/local/etc/rc.d/snort");
 
 	$first = 0;
 	$snortInterfaces = array(); /* -gtm  */
@@ -164,7 +136,7 @@ function sync_package_snort()
 	if($bpfmaxinsns)
 		mwexec_bg("sysctl net.bpf.maxinsns={$bpfmaxinsns}");
 
-	/* always stop snort2c before starting snort -gtm */
+	/* always stop barnyard2 before starting snort -gtm */
 	$start .= "/usr/bin/killall barnyard2\n";
 
 	/* start a snort process for each interface -gtm */
@@ -175,34 +147,27 @@ function sync_package_snort()
 	{
 		$start .= "sleep 8\n";
 		$start .= "snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -D -i {$snortIf} -q\n";
-        
-        /* define snortbarnyardlog_chk */
+		/* define snortbarnyardlog_chk */
         $snortbarnyardlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog'];
         if ($snortbarnyardlog_info_chk == on)
-                $start .= "\nsleep 4;barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D -q\n";
+                $start .= "\nsleep 4;barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D -q\n";	
 	}    
     
-//	/* if block offenders is checked, start snort2c */
-//	if($_POST['blockoffenders']) {
-//		$start .= "\nsleep 8\n";
-//		$start .= "snort2c -w /var/db/whitelist -a /var/log/snort/alert\n";
-//	}
-
-        $if_snort_pid = "\nif ls /tmp/snort.sh.pid > /dev/null\nthen\n    echo \"snort.sh is running\"\n    exit 0\nelse\n    echo \"snort.sh is not running\"\nfi\n";        
-        $echo_snort_sh_pid = "\necho \"snort.sh run\" > /tmp/snort.sh.pid\n";
-        $echo_snort_sh_startup_log = "\necho \"snort.sh run\" >> /tmp/snort.sh_startup.log\n";
+    $if_snort_pid = "\nif ls /tmp/snort.sh.pid > /dev/null\nthen\n    echo \"snort.sh is running\"\n    exit 0\nelse\n    echo \"snort.sh is not running\"\nfi\n";        
+    $echo_snort_sh_pid = "\necho \"snort.sh run\" > /tmp/snort.sh.pid\n";
+    $echo_snort_sh_startup_log = "\necho \"snort.sh run\" >> /tmp/snort.sh_startup.log\n";
 	$sample_before = "\nBEFORE_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
 	$sample_after = "\nAFTER_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
 	$sleep_before_final = "\necho \"Sleeping before final memory sampling...\"\nsleep 17";
 	$total_free_after = "\nTOTAL_USAGE=`top | grep snort | grep -v grep | awk '{ print \$6 }'`\n";
 	$echo_usage = "\necho \"Ram free BEFORE starting Snort: \${BEFORE_MEM} -- Ram free AFTER starting Snort: \${AFTER_MEM}\" -- Mode {$snort_performance} -- Snort memory usage: \$TOTAL_USAGE | logger -p daemon.info -i -t SnortStartup\n";
-        $rm_snort_sh_pid = "\nrm /tmp/snort.sh.pid\n";        
-
+	$rm_snort_sh_pid = "\nrm /tmp/snort.sh.pid\n";
+		
 	/* write out rc.d start/stop file */
 	write_rcfile(array(
 			"file" => "snort.sh",
 			"start" => "{$if_snort_pid}{$echo_snort_sh_pid}{$echo_snort_sh_startup_log}{$sample_before}{$start}{$sleep_before_final}{$sample_after}{$echo_usage}{$rm_snort_sh_pid}",
-			"stop" => "/usr/bin/killall snort; killall snort2c"
+			"stop" => "/usr/bin/killall snort; killall barnyard2"
 		)
 	);
 
@@ -214,10 +179,12 @@ $snortbarnyardlog_info_chk = $config['installedpackages']['snortadvanced']['conf
 if ($snortbarnyardlog_info_chk == on)
        create_barnyard2_conf();
 
-
+	   /* snort will not start on install untill setting are set */
+if ($config['installedpackages']['snort']['config'][0]['autorulesupdate7'] != "") {
 	/* start snort service */
 	conf_mount_ro();
 	start_service("snort");
+	}
 }
 
 /* open barnyard2.conf for writing */
@@ -235,7 +202,6 @@ function create_barnyard2_conf() {
         fclose($bconf);
 //        conf_mount_ro();
 }
-
 /* open barnyard2.conf for writing" */
 function generate_barnyard2_conf() {
 
@@ -274,7 +240,6 @@ EOD;
 
 }
 
-
 function create_snort_conf() {
 	global $config, $g;
 	/* write out snort.conf */
@@ -291,10 +256,9 @@ function create_snort_conf() {
 }
 
 function snort_deinstall() {
-//	$text_ww   = "*/60\t* \t 1\t *\t *\t root\t /usr/bin/nice -n20 /usr/local/pkg/snort_check_for_rule_updates.php";
-//	$filenamea = "/etc/crontab";
-	/* remove auto rules update helper */
-//	remove_text_from_file($filenamea, $text_ww);
+
+	global $config, $g;
+
 	/* remove custom sysctl */
 	remove_text_from_file("/etc/sysctl.conf", "sysctl net.bpf.bufsize=20480");
 	/* decrease bpf buffers back to 4096, from 20480 */
@@ -309,6 +273,69 @@ function snort_deinstall() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep libdnet`");
 	exec("/usr/bin/killall -9 snort");
 	exec("/usr/bin/killall snort");
+
+	/* Remove snort cron entries Ugly code needs smoothness*/
+	
+	function snort_rm_blocked_deinstall_cron($should_install) {
+        global $config, $g;
+
+        $is_installed = false;
+
+        if(!$config['cron']['item'])
+                return;
+
+        $x=0;
+        foreach($config['cron']['item'] as $item) {
+                if (strstr($item['command'], "snort2c")) {
+                        $is_installed = true;
+                        break;
+                }
+                $x++;
+			}
+                      if($is_installed == true) {
+                         if($x > 0) {
+                                unset($config['cron']['item'][$x]);
+                                write_config();
+                         }
+                  configure_cron();
+			}
+		}
+
+	function snort_rules_up_deinstall_cron($should_install) {
+        global $config, $g;
+
+        $is_installed = false;
+
+        if(!$config['cron']['item'])
+                return;
+
+        $x=0;
+        foreach($config['cron']['item'] as $item) {
+                if (strstr($item['command'], "snort_check_for_rule_updates.php")) {
+                        $is_installed = true;
+                        break;
+                }
+                $x++;
+			}
+                      if($is_installed == true) {
+                         if($x > 0) {
+                                unset($config['cron']['item'][$x]);
+                                write_config();
+                         }
+                  configure_cron();
+			}
+		}
+
+snort_rm_blocked_deinstall_cron("");
+snort_rules_up_deinstall_cron("");
+
+		
+	/* Unset snort registers in conf.xml IMPORTANT snort will not start with out this */
+	/* Keep this as a last step */
+	unset($config['installedpackages']['snort']['config'][0]['autorulesupdate7']);
+    unset($config['installedpackages']['snort']['config'][0]['rm_blocked']);
+    write_config();
+	
 }
 
 function generate_snort_conf() {
@@ -352,7 +379,6 @@ if ($snortunifiedlog_info_chk == on)
 $spoink_info_chk = $config['installedpackages']['snort']['config'][0]['blockoffenders7'];
 if ($spoink_info_chk == on)
     $spoink_type = "output alert_pf: /var/db/whitelist,snort2c";
-
 /* define servers and ports snortdefservers */
 
 /* def DNS_SERVSERS */
@@ -612,13 +638,14 @@ else
 	else
 		$snort_performance = "ac-bnfa";
 
-	/* set the snort block hosts time */
+	/* set the snort block hosts time IMPORTANT snort has trouble installing if snort_rm_blocked_info_ck != "" */
 	$snort_rm_blocked_info_ck = $config['installedpackages']['snort']['config'][0]['rm_blocked'];
 		if ($snort_rm_blocked_info_ck == "never_b")
                 $snort_rm_blocked_false = "";
 			else
 				$snort_rm_blocked_false = "true";
 
+if ($snort_rm_blocked_info_ck != "") {
 function snort_rm_blocked_install_cron($should_install) {
         global $config, $g;
 
@@ -720,20 +747,21 @@ function snort_rm_blocked_install_cron($should_install) {
                                 configure_cron();
                         }
                 break;
-        }
+		}
+	}
+	snort_rm_blocked_install_cron("");
+	snort_rm_blocked_install_cron($snort_rm_blocked_false);
 }
 
-snort_rm_blocked_install_cron("");
-snort_rm_blocked_install_cron($snort_rm_blocked_false);
-
 	/* set the snort rules update time */
-	$snort_up_rules_info_ck = $config['installedpackages']['snort']['config'][0]['autorulesupdate7'];
-		if ($snort_up_rules_info_ck == "never_up")
-                $snort_up_rules_false = "";
+	$snort_rules_up_info_ck = $config['installedpackages']['snort']['config'][0]['autorulesupdate7'];
+		if ($snort_rules_up_info_ck == "never_up")
+                $snort_rules_up_false = "";
 			else
-				$snort_up_rules_false = "true";
+				$snort_rules_up_false = "true";
 
-function snort_up_rules_install_cron($should_install) {
+if ($snort_rules_up_info_ck != "") {
+function snort_rules_up_install_cron($should_install) {
         global $config, $g;
 
         if ($g['booting']==true)
@@ -752,58 +780,58 @@ function snort_up_rules_install_cron($should_install) {
                 }
                 $x++;
         }
-	$snort_up_rules_info_ck = $config['installedpackages']['snort']['config'][0]['autorulesupdate7'];
-		if ($snort_up_rules_info_ck == "6h_up") {
-                $snort_up_rules_min = "*";
-                $snort_up_rules_hr = "*/6";
-                $snort_up_rules_mday = "*";
-                $snort_up_rules_month = "*";
-                $snort_up_rules_wday = "*";
+	$snort_rules_up_info_ck = $config['installedpackages']['snort']['config'][0]['autorulesupdate7'];
+		if ($snort_rules_up_info_ck == "6h_up") {
+                $snort_rules_up_min = "*";
+                $snort_rules_up_hr = "*/6";
+                $snort_rules_up_mday = "*";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
 		}
-		if ($snort_up_rules_info_ck == "12h_up") {
-                $snort_up_rules_min = "*";
-                $snort_up_rules_hr = "*/12";
-                $snort_up_rules_mday = "*";
-                $snort_up_rules_month = "*";
-                $snort_up_rules_wday = "*";
+		if ($snort_rules_up_info_ck == "12h_up") {
+                $snort_rules_up_min = "*";
+                $snort_rules_up_hr = "*/12";
+                $snort_rules_up_mday = "*";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
 		}
-		if ($snort_up_rules_info_ck == "1d_up") {
-                $snort_up_rules_min = "*";
-                $snort_up_rules_hr = "*";
-                $snort_up_rules_mday = "*/1";
-                $snort_up_rules_month = "*";
-                $snort_up_rules_wday = "*";
+		if ($snort_rules_up_info_ck == "1d_up") {
+                $snort_rules_up_min = "*";
+                $snort_rules_up_hr = "*";
+                $snort_rules_up_mday = "*/1";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
 		}
-		if ($snort_up_rules_info_ck == "4d_up") {
-                $snort_up_rules_min = "*";
-                $snort_up_rules_hr = "*";
-                $snort_up_rules_mday = "*/4";
-                $snort_up_rules_month = "*";
-                $snort_up_rules_wday = "*";
+		if ($snort_rules_up_info_ck == "4d_up") {
+                $snort_rules_up_min = "*";
+                $snort_rules_up_hr = "*";
+                $snort_rules_up_mday = "*/4";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
 		}
-		if ($snort_up_rules_info_ck == "7d_up") {
-                $snort_up_rules_min = "*";
-                $snort_up_rules_hr = "*";
-                $snort_up_rules_mday = "*/7";
-                $snort_up_rules_month = "*";
-                $snort_up_rules_wday = "*";
+		if ($snort_rules_up_info_ck == "7d_up") {
+                $snort_rules_up_min = "*";
+                $snort_rules_up_hr = "*";
+                $snort_rules_up_mday = "*/7";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
 		}
-		if ($snort_up_rules_info_ck == "28d_up") {
-                $snort_up_rules_min = "*";
-                $snort_up_rules_hr = "*";
-                $snort_up_rules_mday = "*/28";
-                $snort_up_rules_month = "*";
-                $snort_up_rules_wday = "*";
+		if ($snort_rules_up_info_ck == "28d_up") {
+                $snort_rules_up_min = "*";
+                $snort_rules_up_hr = "*";
+                $snort_rules_up_mday = "*/28";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
 		}
         switch($should_install) {
                 case true:
                         if(!$is_installed) {		
                                 $cron_item = array();
-                                $cron_item['minute'] = "$snort_up_rules_min";
-                                $cron_item['hour'] = "$snort_up_rules_hr";
-                                $cron_item['mday'] = "$snort_up_rules_mday";
-                                $cron_item['month'] = "$snort_up_rules_month";
-                                $cron_item['wday'] = "$snort_up_rules_wday";
+                                $cron_item['minute'] = "$snort_rules_up_min";
+                                $cron_item['hour'] = "$snort_rules_up_hr";
+                                $cron_item['mday'] = "$snort_rules_up_mday";
+                                $cron_item['month'] = "$snort_rules_up_month";
+                                $cron_item['wday'] = "$snort_rules_up_wday";
                                 $cron_item['who'] = "root";
                                 $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort_check_for_rule_updates.php >> /usr/local/etc/snort_bkup/snort_update.log";
                                 $config['cron']['item'][] = $cron_item;
@@ -820,13 +848,12 @@ function snort_up_rules_install_cron($should_install) {
                                 configure_cron();
                         }
                 break;
-        }
+		}
+	}
+	snort_rules_up_install_cron("");
+	snort_rules_up_install_cron($snort_rm_blocked_false);
 }
 
-snort_up_rules_install_cron("");
-snort_up_rules_install_cron($snort_up_rules_false);
-	
-	
 	/* open snort2c's whitelist for writing */
 	$whitelist = fopen("/var/db/whitelist", "w");
 	if(!$whitelist) {
@@ -1283,7 +1310,6 @@ $alertsystemlog_type
 $tcpdumplog_type
 $snortmysqllog_info_chk
 $snortunifiedlog_type
-$spoink_type
 						
 #################
                 #
