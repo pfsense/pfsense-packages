@@ -49,7 +49,7 @@ function v_settings()
 	$config['installedpackages']['freeswitchsettings']['config'][0]['tmp_dir'] = '/tmp';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['bin_dir'] = '/usr/local/bin';
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_startup_script_dir'] = '/usr/local/etc/rc.d';
-	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.25";
+	$config['installedpackages']['freeswitchsettings']['config'][0]['v_package_version'] = "0.9.7.26";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_version'] = "1.0.4";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_build_revision'] = "Release";
 	$config['installedpackages']['freeswitchsettings']['config'][0]['v_label'] = 'FreeSWITCH'; //FreeSWITCH (TM) http://www.freeswitch.org/
@@ -1367,7 +1367,7 @@ function sync_package_v_hunt_group()
 								unset($opt1value);
 								unset($id);
 								
-								//delete dialplan include details								
+								//delete dialplan include details
 								if (count($a_dialplan_include_details) > 0) {
 									foreach($a_dialplan_include_details as $row) {
 										if ($row['dialplanincludeid'] == $dialplanincludeid) {
@@ -1429,7 +1429,7 @@ function sync_package_v_hunt_group()
 	
 	
 				//Get the list of destinations then build the Hunt Group javascript
-					$tmp = "";					
+					$tmp = "";
 					$tmp .= "\n";
 					$tmp .= "session.answer();\n";
 					$tmp .= "var domain_name = session.getVariable(\"domain_name\");\n";
@@ -1587,7 +1587,7 @@ function sync_package_v_hunt_group()
 						}
 						else {
 							$tmp .= "session.execute(\"set\", \"ringback=\${hold_music}\");          //set to ringtone\n";
-							$tmp .= "session.execute(\"set\", \"transfer_ringback=\${hold_music}\"); //set to ringtone\n";		
+							$tmp .= "session.execute(\"set\", \"transfer_ringback=\${hold_music}\"); //set to ringtone\n";
 						}
 					
 					if ($rowhelper['huntgrouptimeout'] > 0) {
@@ -1693,12 +1693,12 @@ function sync_package_v_hunt_group()
 							else {
 								$tmp_buffer .= "+\",\"+".$tmpdata;
 							}
-							$i++;						
+							$i++;
 						}
 					}
-					unset($i);					
-					$delimiter = ",";						
-					$tmp_application = $tmp_array[0]["application"];	
+					unset($i);
+					$delimiter = ",";
+					$tmp_application = $tmp_array[0]["application"];
 					
 					switch ($rowhelper['huntgrouptype']) {
 					case "simultaneous":
@@ -1726,7 +1726,7 @@ function sync_package_v_hunt_group()
 						$tmp .= "\n";
 						//print_r($tmp_array);
 						$i = 0;
-						if (count($tmp_array) > 0) {							
+						if (count($tmp_array) > 0) {
 							if ($rowhelper['huntgroupcallerannounce'] == "true") {
 								$i = 0;
 								if (count($tmp_array) > 0) {
@@ -1751,25 +1751,25 @@ function sync_package_v_hunt_group()
 					//set the timeout destination
 					$huntgrouptimeoutdestination = $a_hunt_group[$x]['huntgrouptimeoutdestination'];
 					$huntgrouptimeouttype = $a_hunt_group[$x]['huntgrouptimeouttype'];
-					if ($row['huntgrouptimeouttype'] == "extension") { $huntgrouptimeouttype = "bridge"; }
-					if ($row['huntgrouptimeouttype'] == "voicemail") { $huntgrouptimeouttype = "voicemail"; }
-					if ($row['huntgrouptimeouttype'] == "sip uri") { $huntgrouptimeouttype = "bridge"; }
+					if ($huntgrouptimeouttype == "extension") { $huntgrouptimeouttype = "bridge"; }
+					if ($huntgrouptimeouttype == "voicemail") { $huntgrouptimeouttype = "transfer"; $huntgrouptimeoutdestination = "*99".$huntgrouptimeoutdestination; }
+					if ($huntgrouptimeouttype == "sip uri") { $huntgrouptimeouttype = "bridge"; }
 					$tmp .= "\n";
-					if ($rowhelper['huntgroupcallerannounce'] == "true") {
+					if ($row['huntgroupcallerannounce'] == "true") {
 						//do nothing
 					}
 					else {
 						$tmp .= "	//timeout\n";
-						$tmp .= "	session.execute(\"".$huntgrouptimeouttype."\", \"default \${domain} ".$huntgrouptimeoutdestination."\");\n";
+						$tmp .= "	session.execute(\"".$huntgrouptimeouttype."\", \"".$huntgrouptimeoutdestination."\");\n";
 					}
-					
+
 					$tmp .= "\n";
 					$tmp .= "	//clear variables\n";
 					$tmp .= "	dialed_extension = \"\";\n";
 					$tmp .= "	new_extension = \"\";\n";
 					$tmp .= "	domain_name = \"\";\n";
 					$tmp .= "	domain = \"\";";
-					
+
 					$tmp .= "\n";
 					if ($rowhelper['huntgroupcallerannounce'] == "true") {
 						//do nothing

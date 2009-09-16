@@ -1279,7 +1279,7 @@ function sync_package_freeswitch_hunt_group()
 								unset($opt1value);
 								unset($id);
 								
-								//delete dialplan include details								
+								//delete dialplan include details
 								if (count($a_dialplan_include_details) > 0) {
 									foreach($a_dialplan_include_details as $row) {
 										if ($row['dialplanincludeid'] == $dialplanincludeid) {
@@ -1337,11 +1337,10 @@ function sync_package_freeswitch_hunt_group()
 						unset($dialplanincludeid);
 						
 					} //end if strlen huntgroupid; add the Hunt Group to the dialplan
-	
-	
-	
+
+
 				//Get the list of destinations then build the Hunt Group javascript
-					$tmp = "";					
+					$tmp = "";
 					$tmp .= "\n";
 					$tmp .= "session.answer();\n";
 					$tmp .= "var domain_name = session.getVariable(\"domain_name\");\n";
@@ -1367,7 +1366,7 @@ function sync_package_freeswitch_hunt_group()
 					$tmp .= "var Day = objdate2.getDay()+1;\n";
 					$tmp .= "var exit = false;\n";
 					$tmp .= "\n";
-					
+
 					$tmp .= " function get_sofia_contact(extension,domain_name, profile){\n";
 					$tmp .= "	if (profile == \"auto\") {\n";
 					$i = 0;
@@ -1399,7 +1398,7 @@ function sync_package_freeswitch_hunt_group()
 					$tmp .= " }\n";
 					$tmp .= "\n";
 					
-					$tmp .= "\n";		
+					$tmp .= "\n";
 					$tmp .= " function mycb( session, type, obj, arg ) {\n";
 					$tmp .= "    try {\n";
 					$tmp .= "        if ( type == \"dtmf\" ) {\n";
@@ -1429,15 +1428,15 @@ function sync_package_freeswitch_hunt_group()
 					$tmp .= "domain_name = session.getVariable(\"domain_name\");\n";
 					$tmp .= "domain = session.getVariable(\"domain\");\n";
 					$tmp .= "us_ring = session.getVariable(\"us-ring\");\n";
-					$tmp .= "caller_id_name = session.getVariable(\"caller_id_name\");\n";					
+					$tmp .= "caller_id_name = session.getVariable(\"caller_id_name\");\n";
 					$tmp .= "caller_id_number = session.getVariable(\"caller_id_number\");\n";
 					$tmp .= "effective_caller_id_name = session.getVariable(\"effective_caller_id_name\");\n";
 					$tmp .= "effective_caller_id_number = session.getVariable(\"effective_caller_id_number\");\n";
 					$tmp .= "outbound_caller_id_name = session.getVariable(\"outbound_caller_id_name\");\n";
 					$tmp .= "outbound_caller_id_number = session.getVariable(\"outbound_caller_id_number\");\n";
 					$tmp .= "\n";
-									
-					
+
+
 					//pin number requested from caller if provided
 						if (strlen($rowhelper['huntgrouppin']) > 0) {
 							$tmp .= "var pin = '".$rowhelper['huntgrouppin']."';\n";
@@ -1460,7 +1459,7 @@ function sync_package_freeswitch_hunt_group()
 							$tmp .= "}\n";
 							$tmp .= "\n";
 						}
-						
+
 					//caller announce requested from caller if provided
 						if ($rowhelper['huntgroupcallerannounce'] == "true") {
 							$tmp .= "function originate(session, sipuri, extension, caller_announce, caller_id_name, caller_id_number) {\n";
@@ -1605,12 +1604,12 @@ function sync_package_freeswitch_hunt_group()
 							else {
 								$tmp_buffer .= "+\",\"+".$tmpdata;
 							}
-							$i++;						
+							$i++;
 						}
 					}
-					unset($i);					
-					$delimiter = ",";						
-					$tmp_application = $tmp_array[0]["application"];	
+					unset($i);
+					$delimiter = ",";
+					$tmp_application = $tmp_array[0]["application"];
 					
 					switch ($rowhelper['huntgrouptype']) {
 					case "simultaneous":
@@ -1638,7 +1637,7 @@ function sync_package_freeswitch_hunt_group()
 						$tmp .= "\n";
 						//print_r($tmp_array);
 						$i = 0;
-						if (count($tmp_array) > 0) {							
+						if (count($tmp_array) > 0) {
 							if ($rowhelper['huntgroupcallerannounce'] == "true") {
 								$i = 0;
 								if (count($tmp_array) > 0) {
@@ -1663,18 +1662,18 @@ function sync_package_freeswitch_hunt_group()
 					//set the timeout destination
 					$huntgrouptimeoutdestination = $a_hunt_group[$x]['huntgrouptimeoutdestination'];
 					$huntgrouptimeouttype = $a_hunt_group[$x]['huntgrouptimeouttype'];
-					if ($row['huntgrouptimeouttype'] == "extension") { $huntgrouptimeouttype = "bridge"; }
-					if ($row['huntgrouptimeouttype'] == "voicemail") { $huntgrouptimeouttype = "voicemail"; }
-					if ($row['huntgrouptimeouttype'] == "sip uri") { $huntgrouptimeouttype = "bridge"; }
+					if ($huntgrouptimeouttype == "extension") { $huntgrouptimeouttype = "bridge"; }
+					if ($huntgrouptimeouttype == "voicemail") { $huntgrouptimeouttype = "transfer"; $huntgrouptimeoutdestination = "*99".$huntgrouptimeoutdestination; }
+					if ($huntgrouptimeouttype == "sip uri") { $huntgrouptimeouttype = "bridge"; }
 					$tmp .= "\n";
-					if ($rowhelper['huntgroupcallerannounce'] == "true") {
+					if ($row['huntgroupcallerannounce'] == "true") {
 						//do nothing
 					}
 					else {
 						$tmp .= "	//timeout\n";
-						$tmp .= "	session.execute(\"".$huntgrouptimeouttype."\", \"default \${domain} ".$huntgrouptimeoutdestination."\");\n";
+						$tmp .= "	session.execute(\"".$huntgrouptimeouttype."\", \"".$huntgrouptimeoutdestination."\");\n";
 					}
-					
+
 					$tmp .= "\n";
 					$tmp .= "	//clear variables\n";
 					$tmp .= "	dialed_extension = \"\";\n";
@@ -3022,7 +3021,7 @@ function freeswitch_php_install_command()
 	global $config;
 	//exec("/etc/./rc.conf_mount_rw");
 
-	$freeswitch_package_version = "0.9.5";
+	$freeswitch_package_version = "0.9.51";
 	$freeswitch_build_version = "1.0.4 pre 8";
 	$freeswitch_build_revision = "13784";
 
