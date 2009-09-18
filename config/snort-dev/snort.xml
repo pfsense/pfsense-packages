@@ -47,7 +47,7 @@
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
 	<version>2.8.4.1_1</version>
-	<title>Services: Snort 2.8.4.1_1 pkg v. 1.6 Beta</title>
+	<title>Services: Snort 2.8.4.1_1 pkg v. 1.6 RC2</title>
 	<include_file>/usr/local/pkg/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
@@ -118,6 +118,11 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort-dev/bin/oinkmaster_contrib/create-sidmap.pl</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/bin/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/bin/oinkmaster_contrib/oinkmaster.pl</item>
+	</additional_files_needed>	
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
@@ -194,9 +199,9 @@
 			<multiple>true</multiple>
 		</field>
 		<field>
-			<fielddescr>Performance</fielddescr>
+			<fielddescr>Memory Performance</fielddescr>
 			<fieldname>performance</fieldname>
-			<description>ac method is the fastest startup but consumes a lot more memory.  acs/ac-banded and ac-sparsebands/mwm/lowmem methods use quite a bit less.  ac-sparsebands is recommended.</description>
+			<description>Lowmem and ac-bnfa are recommended for low end systems, Ac: high memory, best performance, ac-std: moderate memory,high performance, acs: small memory, moderateperformance, ac-banded: small memory,moderate performance, ac-sparsebands: small memory, high performance.</description>
 			<type>select</type>
 			<options>
 				<option>
@@ -349,12 +354,6 @@
 			<fielddescr>Associate events on Blocked tab</fielddescr>
 			<fieldname>associatealertip</fieldname>
 			<description>Checking this option will automatically associate the blocked reason from the snort alerts file.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>Sync Snort configuration to secondary cluster members</fielddescr>
-			<fieldname>syncxmlrpc</fieldname>
-			<description>Checking this option will automatically sync the snort configuration via XMLRPC to CARP cluster members.</description>
 			<type>checkbox</type>
 		</field>
 		<field>

@@ -1119,14 +1119,17 @@ preprocessor frag3_engine: policy first
 preprocessor frag3_engine: policy bsd detect_anomalies
 
 preprocessor stream5_global: max_tcp 8192, track_tcp yes, \
-track_udp yes, track_icmp yes
+track_udp yes
+# adds 50 megs to mem
+# track_icmp yes
 preprocessor stream5_tcp: bind_to any, policy windows
 preprocessor stream5_tcp: bind_to any, policy linux
 preprocessor stream5_tcp: bind_to any, policy vista
 preprocessor stream5_tcp: bind_to any, policy macos
 preprocessor stream5_tcp: policy BSD, ports both all, use_static_footprint_sizes
 preprocessor stream5_udp
-preprocessor stream5_icmp
+# adds 50 mgs to mem
+# preprocessor stream5_icmp
 
 ##########################
                          #
@@ -1146,11 +1149,12 @@ preprocessor perfmonitor: time 300 file /var/log/snort/snort.stats pktcnt 10000
 preprocessor http_inspect: global iis_unicode_map unicode.map 1252
 
 preprocessor http_inspect_server: server default \
-                        ports  { 80 8080 3128 }  \
+                        ports  { 80 }  \
                         no_alerts \
                         non_strict \
                         non_rfc_char  { 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 }  \
-                        flow_depth 0  \
+                        flow_depth 400  \
+						client_flow_depth 300 \
                         apache_whitespace yes \
                         directory no \
                         iis_backslash no \
@@ -1160,8 +1164,9 @@ preprocessor http_inspect_server: server default \
                         bare_byte yes \
                         double_decode yes \
                         iis_unicode yes \
-                        iis_delimiter yes \
-                        multi_slash no
+                        iis_delimiter no \
+                        multi_slash no \
+						oversize_dir_length 450
 
 ##################
                  #

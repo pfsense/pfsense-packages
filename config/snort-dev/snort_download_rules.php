@@ -29,7 +29,8 @@
 
 /* Setup enviroment */
 $tmpfname = "/tmp/snort_rules_up";
-$snortdir = "/usr/local/etc/snort";
+$snortdir = "/usr/local/etc/snort_bkup";
+$snortdir_wan = "/usr/local/etc/snort";
 $snort_filename_md5 = "snortrules-snapshot-2.8.tar.gz.md5";
 $snort_filename = "snortrules-snapshot-2.8.tar.gz";
 $emergingthreats_filename_md5 = "version.txt";
@@ -167,6 +168,11 @@ if (file_exists("{$tmpfname}")) {
     exec("/bin/rm -r {$tmpfname}");
 	apc_clear_cache();
 }
+
+/*  Make shure snortdir exits */
+exec("/bin/mkdir -p {$snortdir}");
+exec("/bin/mkdir -p {$snortdir}/rules");
+exec("/bin/mkdir -p {$snortdir}/signatures");
 
 /* send current buffer */
 ob_flush();
@@ -314,6 +320,8 @@ if ($snort_md5_check_ok == on && $emergingthreats_url_chk != on) {
     update_output_window(gettext("removing..."));
 	exec("/bin/rm {$snortdir}/rules/emerging*");
 	exec("/bin/rm {$snortdir}/version.txt");
+	exec("/bin/rm {$snortdir_wan}/rules/emerging*");
+	exec("/bin/rm {$snortdir_wan}/version.txt");
 	update_status(gettext("Done making cleaning emrg direcory."));
 }
 
@@ -484,32 +492,107 @@ if ($snort_md5_check_ok != on && $emerg_md5_check_chk_ok != on && $pfsense_md5_c
 if (file_exists("{$snortdir}/rules")) {
     update_status(gettext("Cleaning the snort Directory..."));
     update_output_window(gettext("removing..."));
+    exec("/bin/mkdir -p {$snortdir}");
+	exec("/bin/mkdir -p {$snortdir}/rules");
+	exec("/bin/mkdir -p {$snortdir}/signatures");
 	exec("/bin/rm {$snortdir}/*");
 	exec("/bin/rm {$snortdir}/rules/*");
+	exec("/bin/rm {$snortdir_wan}/*");
+	exec("/bin/rm {$snortdir_wan}/rules/*");
+	
     exec("/bin/rm /usr/local/lib/snort/dynamicrules/*");	
 } else {
     update_status(gettext("Making Snort Directory..."));
     update_output_window(gettext("should be fast..."));
-    exec("/bin/mkdir {$snortdir}");
-	exec("/bin/mkdir {$snortdir}/rules");
-	exec("/bin/rm /usr/local/lib/snort/dynamicrules/*");
+    exec("/bin/mkdir -p {$snortdir}");
+	exec("/bin/mkdir -p {$snortdir}/rules");
+	exec("/bin/rm {$snortdir_wan}/*");
+	exec("/bin/rm {$snortdir_wan}/rules/*");
+	exec("/bin/rm /usr/local/lib/snort/dynamicrules/\*");
     update_status(gettext("Done making snort direcory."));
   }
 }
 
-/*  Copy snort rules  and emergingthreats and pfsense dir to snort dir */
-if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_check_ok != on) {
-if (file_exists("{$tmpfname}/rules")) {
-    update_status(gettext("Copying rules..."));
+/*  Copy so_rules dir to snort lib dir */
+if ($snort_md5_check_ok != on) {
+if (file_exists("{$tmpfname}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/")) {
+    update_status(gettext("Copying so_rules..."));
     update_output_window(gettext("May take a while..."));
-    exec("/bin/cp {$tmpfname}/rules/* {$snortdir}/rules");
-    update_status(gettext("Done copping rules."));
-    /* Write out time of last sucsessful rule install catch */
-    $config['installedpackages']['snort']['last_rules_install'] = date("Y-M-jS-h:i-A");
-    write_config();
+    exec("`/bin/cp -f {$tmpfname}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/* /usr/local/lib/snort/dynamicrules/`");
+	exec("/bin/cp {$tmpfname}/so_rules/bad-traffic.rules {$tmpfname}/rules/bad-traffic.so.rules");
+	exec("/bin/cp {$tmpfname}/so_rules/chat.rules {$tmpfname}/rules/chat.so.rules");
+	exec("/bin/cp {$tmpfname}/so_rules/dos.rules {$tmpfname}/rules/dos.so.rules");
+	exec("/bin/cp {$tmpfname}/so_rules/exploit.rules {$tmpfname}/rules/exploit.so.rules");
+	exec("/bin/cp {$tmpfname}/so_rules/imap.rules {$tmpfname}/rules/imap.so.rules");
+	exec("/bin/cp {$tmpfname}/so_rules/misc.rules {$tmpfname}/rules/misc.so.rules");
+	exec("/bin/cp {$tmpfname}/so_rules/multimedia.rules {$tmpfname}/rules/multimedia.so.rules");
+	exec("/bin/cp {$tmpfname}/so_rules/netbios.rules {$tmpfname}/rules/netbios.so.rules");
+	exec("/bin/cp {$tmpfname}/so_rules/nntp.rules {$tmpfname}/rules/nntp.so.rules");
+	exec("/bin/cp {$tmpfname}/so_rules/p2p.rules {$tmpfname}/rules/p2p.so.rules");
+	exec("/bin/cp {$tmpfname}/so_rules/smtp.rules {$tmpfname}/rules/smtp.so.rules");
+	exec("/bin/cp {$tmpfname}/so_rules/sql.rules {$tmpfname}/rules/sql.so.rules");
+	exec("/bin/cp {$tmpfname}/so_rules/web-client.rules {$tmpfname}/rules/web-client.so.rules");
+	exec("/bin/cp {$tmpfname}/so_rules/web.misc.rules {$tmpfname}/rules/web.misc.so.rules");
+    update_status(gettext("Done copying so_rules."));
 } else {
-    update_status(gettext("Directory rules does not exists..."));
-    update_output_window(gettext("Error copying rules direcory..."));
+    update_status(gettext("Directory so_rules does not exist..."));
+    update_output_window(gettext("Error copping so_rules..."));
+    exit(0);
+ }
+}
+
+/*  enable disable setting will carry over with updates */
+/*  TODO carry signature changes with the updates */
+if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_check_ok != on) {
+
+$enabled_sid_on = $config['installedpackages']['snort']['rule_sid_on'];
+$enabled_sid_on_array = split("\|\|", $enabled_sid_on);
+foreach($enabled_sid_on_array as $enabled_item_on)
+$selected_sid_on_sections .= "enable $enabled_item_on\n";
+
+$enabled_sid_off = $config['installedpackages']['snort']['rule_sid_off'];
+$enabled_sid_off_array = split("\|\|", $enabled_sid_off);
+foreach($enabled_sid_off_array as $enabled_item_off)
+$selected_sid_off_sections .= "disable $enabled_item_off\n";
+
+$snort_sid_text = <<<EOD
+
+###########################################
+#                                         #
+# this is auto generated on snort updates #
+#                                         #
+###########################################
+
+path = /bin:/usr/bin:/usr/local/bin
+
+update_files = \.rules$|\.config$|\.conf$|\.txt$|\.map$
+
+url = dir:///usr/local/etc/snort_bkup/rules
+
+$selected_sid_on_sections
+
+$selected_sid_off_sections
+
+EOD;
+
+     /* open snort's threshold.conf for writing */
+     $oinkmasterlist = fopen("/usr/local/etc/snort_bkup/oinkmaster.conf", "w");
+
+     fwrite($oinkmasterlist, "$snort_sid_text");
+
+     /* close snort's threshold.conf file */
+     fclose($oinkmasterlist);
+
+}
+
+/*  Copy configs to snort dir */
+if ($snort_md5_check_ok != on) {
+if (file_exists("{$tmpfname}/etc/Makefile.am")) {
+    update_status(gettext("Copying configs to snort directory..."));
+    exec("/bin/cp {$tmpfname}/etc/* {$snortdir}");
+} else {
+    update_status(gettext("The snort configs does not exist..."));
+    update_output_window(gettext("Error copping config..."));
     exit(0);
  }
 }
@@ -551,19 +634,7 @@ if (file_exists("{$tmpfname}/$pfsense_rules_filename_md5")) {
     exit(0);
  }
 }
-
-/*  Copy configs to snort dir */
-if ($snort_md5_check_ok != on) {
-if (file_exists("{$tmpfname}/etc/Makefile.am")) {
-    update_status(gettext("Copying configs to snort directory..."));
-    exec("/bin/cp {$tmpfname}/etc/* {$snortdir}");
-} else {
-    update_status(gettext("The snort configs does not exist..."));
-    update_output_window(gettext("Error copping config..."));
-    exit(0);
- }
-}
-
+ 
 /*  Copy signatures dir to snort dir */
 if ($snort_md5_check_ok != on) {
 $signature_info_chk = $config['installedpackages']['snort']['config'][0]['signatureinfo'];
@@ -580,50 +651,63 @@ if (file_exists("{$tmpfname}/doc/signatures")) {
   }
  }
 }
- 
-/*  Copy so_rules dir to snort lib dir */
-if ($snort_md5_check_ok != on) {
-if (file_exists("{$tmpfname}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/")) {
-    update_status(gettext("Copying so_rules..."));
+
+/*  Copy snort rules  and emergingthreats and pfsense dir to snort dir */
+if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_check_ok != on) {
+if (file_exists("{$tmpfname}/rules")) {
+    update_status(gettext("Copying rules..."));
     update_output_window(gettext("May take a while..."));
-    exec("`/bin/cp -f {$tmpfname}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/* /usr/local/lib/snort/dynamicrules/`");
-	exec("/bin/cp {$tmpfname}/so_rules/bad-traffic.rules {$snortdir}/rules/bad-traffic.so.rules");
-	exec("/bin/cp {$tmpfname}/so_rules/chat.rules {$snortdir}/rules/chat.so.rules");
-	exec("/bin/cp {$tmpfname}/so_rules/dos.rules {$snortdir}/rules/dos.so.rules");
-	exec("/bin/cp {$tmpfname}/so_rules/exploit.rules {$snortdir}/rules/exploit.so.rules");
-	exec("/bin/cp {$tmpfname}/so_rules/imap.rules {$snortdir}/rules/imap.so.rules");
-	exec("/bin/cp {$tmpfname}/so_rules/misc.rules {$snortdir}/rules/misc.so.rules");
-	exec("/bin/cp {$tmpfname}/so_rules/multimedia.rules {$snortdir}/rules/multimedia.so.rules");
-	exec("/bin/cp {$tmpfname}/so_rules/netbios.rules {$snortdir}/rules/netbios.so.rules");
-	exec("/bin/cp {$tmpfname}/so_rules/nntp.rules {$snortdir}/rules/nntp.so.rules");
-	exec("/bin/cp {$tmpfname}/so_rules/p2p.rules {$snortdir}/rules/p2p.so.rules");
-	exec("/bin/cp {$tmpfname}/so_rules/smtp.rules {$snortdir}/rules/smtp.so.rules");
-	exec("/bin/cp {$tmpfname}/so_rules/sql.rules {$snortdir}/rules/sql.so.rules");
-	exec("/bin/cp {$tmpfname}/so_rules/web-client.rules {$snortdir}/rules/web-client.so.rules");
-	exec("/bin/cp {$tmpfname}/so_rules/web.misc.rules {$snortdir}/rules/web.misc.so.rules");
-    update_status(gettext("Done copying so_rules."));
+    exec("/bin/cp {$tmpfname}/rules/* {$snortdir}/rules");
+    update_status(gettext("Done copping rules."));
+    /* Write out time of last sucsessful rule install catch */
+    $config['installedpackages']['snort']['last_rules_install'] = date("Y-M-jS-h:i-A");
+    write_config();
 } else {
-    update_status(gettext("Directory so_rules does not exist..."));
-    update_output_window(gettext("Error copping so_rules..."));
+    update_status(gettext("Directory rules does not exists..."));
+    update_output_window(gettext("Error copying rules direcory..."));
     exit(0);
  }
 }
 
-/* double make shure clean up emerg rules that dont belong */
-if (file_exists("/usr/local/etc/snort/rules/emerging-botcc-BLOCK.rules")) {
+/* double make shure cleanup emerg rules that dont belong */
+if (file_exists("/usr/local/etc/snort_bkup/rules/emerging-botcc-BLOCK.rules")) {
 	apc_clear_cache();
-	exec("/bin/rm /usr/local/etc/snort/rules/emerging-botcc-BLOCK.rules");
-	exec("/bin/rm /usr/local/etc/snort/rules/emerging-botcc.rules");
-	exec("/bin/rm /usr/local/etc/snort/rules/emerging-compromised-BLOCK.rules");
-	exec("/bin/rm /usr/local/etc/snort/rules/emerging-drop-BLOCK.rules");
-	exec("/bin/rm /usr/local/etc/snort/rules/emerging-dshield-BLOCK.rules");
-	exec("/bin/rm /usr/local/etc/snort/rules/emerging-rbn-BLOCK.rules");
-	exec("/bin/rm /usr/local/etc/snort/rules/emerging-tor-BLOCK.rules");
+	exec("/bin/rm /usr/local/etc/snort_bkup/rules/emerging-botcc-BLOCK.rules");
+	exec("/bin/rm /usr/local/etc/snort_bkup/rules/emerging-botcc.rules");
+	exec("/bin/rm /usr/local/etc/snort_bkup/rules/emerging-compromised-BLOCK.rules");
+	exec("/bin/rm /usr/local/etc/snort_bkup/rules/emerging-drop-BLOCK.rules");
+	exec("/bin/rm /usr/local/etc/snort_bkup/rules/emerging-dshield-BLOCK.rules");
+	exec("/bin/rm /usr/local/etc/snort_bkup/rules/emerging-rbn-BLOCK.rules");
+	exec("/bin/rm /usr/local/etc/snort_bkup/rules/emerging-tor-BLOCK.rules");
 }
 
-if (file_exists("/usr/local/lib/snort/dynamicrules//lib_sfdynamic_example_rule.so")) {
-	exec("/bin/rm /usr/local/lib/snort/dynamicrules//lib_sfdynamic_example_rule.so");
-	exec("/bin/rm /usr/local/lib/snort/dynamicrules//lib_sfdynamic_example*");
+if (file_exists("/usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so")) {
+	exec("/bin/rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so");
+	exec("/bin/rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example\*");
+}
+
+/* create a msg-map for snort  */
+update_status(gettext("Updating Alert Messages..."));
+update_output_window(gettext("Please Wait..."));
+exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl /usr/local/etc/snort_bkup/rules > /usr/local/etc/snort_bkup/gen-msg.map");
+
+/*  Run oinkmaster to snort_wan and cp configs */
+if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_check_ok != on) {
+update_status(gettext("Your enable and disable changes are being applied to your fresh set of rules..."));
+update_output_window(gettext("May take a while..."));
+
+exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}");
+exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}");
+exec("/bin/cp {$snortdir}/generators {$snortdir_wan}");
+exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}");
+exec("/bin/cp {$snortdir}/sid {$snortdir_wan}");
+exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}");
+exec("/bin/cp {$snortdir}/snort.conf {$snortdir_wan}");
+exec("/bin/cp {$snortdir}/threshold.conf {$snortdir_wan}");
+exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}");
+
+exec("/usr/local/bin/perl /usr/local/bin/oinkmaster.pl -C /usr/local/etc/snort_bkup/oinkmaster.conf -o /usr/local/etc/snort/rules > /usr/local/etc/snort_bkup/oinkmaster.log");
+
 }
 
 /* php code to flush out cache some people are reportting missing files this might help  */
@@ -631,10 +715,12 @@ sleep(5);
 apc_clear_cache();
 exec("/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync");
 
-
-update_status(gettext("Updating Alert Messages..."));
-update_output_window(gettext("Please Wait..."));
-exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl /usr/local/etc/snort/rules > /usr/local/etc/snort/gen-msg.map");
+/*  remove old $tmpfname files */
+if (file_exists("{$tmpfname}")) {
+    update_status(gettext("Cleaning up..."));
+    exec("/bin/rm -r {$tmpfname}");
+	apc_clear_cache();
+}
 
 /* php code finish */
 update_status(gettext("The Rules update finished..."));

@@ -170,7 +170,7 @@
 		<field>
 			<fielddescr>Log Alerts to a snort unified file.</fielddescr>
 			<fieldname>snortunifiedlog</fieldname>
-			<description>Snort will log Alerts to a file in the UNIFIED format.</description>
+			<description>Snort will log Alerts to a file in the UNIFIED2 format. This is a requirement barnyard2.</description>
 			<type>checkbox</type>
 		</field>		
     </fields>
