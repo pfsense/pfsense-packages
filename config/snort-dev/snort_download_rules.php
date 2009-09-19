@@ -545,15 +545,19 @@ if (file_exists("{$tmpfname}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/")) {
 /*  TODO carry signature changes with the updates */
 if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_check_ok != on) {
 
+if (!empty($config['installedpackages']['snort']['rule_sid_on'])) {
 $enabled_sid_on = $config['installedpackages']['snort']['rule_sid_on'];
-$enabled_sid_on_array = split("\|\|", $enabled_sid_on);
+$enabled_sid_on_array = split('\|\|', $enabled_sid_on);
 foreach($enabled_sid_on_array as $enabled_item_on)
-$selected_sid_on_sections .= "enable $enabled_item_on\n";
+$selected_sid_on_sections .= "$enabled_item_on\n";
+	}
 
+if (!empty($config['installedpackages']['snort']['rule_sid_off'])) {
 $enabled_sid_off = $config['installedpackages']['snort']['rule_sid_off'];
-$enabled_sid_off_array = split("\|\|", $enabled_sid_off);
+$enabled_sid_off_array = split('\|\|', $enabled_sid_off);
 foreach($enabled_sid_off_array as $enabled_item_off)
-$selected_sid_off_sections .= "disable $enabled_item_off\n";
+$selected_sid_off_sections .= "$enabled_item_off\n";
+	}
 
 $snort_sid_text = <<<EOD
 
@@ -692,22 +696,43 @@ update_output_window(gettext("Please Wait..."));
 exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl /usr/local/etc/snort_bkup/rules > /usr/local/etc/snort_bkup/gen-msg.map");
 
 /*  Run oinkmaster to snort_wan and cp configs */
+/*  If oinkmaster is not needed cp rules normally */
+/*  TODO add per interface settings here */
 if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_check_ok != on) {
+
+	if (empty($config['installedpackages']['snort']['rule_sid_on']) || empty($config['installedpackages']['snort']['rule_sid_off'])) {
 update_status(gettext("Your enable and disable changes are being applied to your fresh set of rules..."));
 update_output_window(gettext("May take a while..."));
 
-exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}");
-exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}");
-exec("/bin/cp {$snortdir}/generators {$snortdir_wan}");
-exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}");
-exec("/bin/cp {$snortdir}/sid {$snortdir_wan}");
-exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}");
-exec("/bin/cp {$snortdir}/snort.conf {$snortdir_wan}");
-exec("/bin/cp {$snortdir}/threshold.conf {$snortdir_wan}");
-exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}");
+    exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/rules/");
+	exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}");
+	exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}");
+	exec("/bin/cp {$snortdir}/generators {$snortdir_wan}");
+	exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}");
+	exec("/bin/cp {$snortdir}/sid {$snortdir_wan}");
+	exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}");
+	exec("/bin/cp {$snortdir}/snort.conf {$snortdir_wan}");
+	exec("/bin/cp {$snortdir}/threshold.conf {$snortdir_wan}");
+	exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}");
 
-exec("/usr/local/bin/perl /usr/local/bin/oinkmaster.pl -C /usr/local/etc/snort_bkup/oinkmaster.conf -o /usr/local/etc/snort/rules > /usr/local/etc/snort_bkup/oinkmaster.log");
+} else {
 
+		exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}");
+		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}");
+		exec("/bin/cp {$snortdir}/generators {$snortdir_wan}");
+		exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}");
+		exec("/bin/cp {$snortdir}/sid {$snortdir_wan}");
+		exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}");
+		exec("/bin/cp {$snortdir}/snort.conf {$snortdir_wan}");
+		exec("/bin/cp {$snortdir}/threshold.conf {$snortdir_wan}");
+		exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}");
+
+		/*  oinkmaster.pl will convert saved changes for the new updates then we have to change #alert to # alert for the gui */
+		/*  might have to add a sleep for 3sec for flash drives or old drives */
+		exec("/usr/local/bin/perl /usr/local/bin/oinkmaster.pl -C /usr/local/etc/snort_bkup/oinkmaster.conf -o /usr/local/etc/snort/rules > /usr/local/etc/snort_bkup/oinkmaster.log");
+		sleep(2);
+		exec("/usr/local/bin/perl -pi -e 's/#alert/# alert/g' /usr/local/etc/snort/rules/*.rules");
+	}
 }
 
 /* php code to flush out cache some people are reportting missing files this might help  */

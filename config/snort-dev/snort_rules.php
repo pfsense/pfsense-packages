@@ -27,6 +27,7 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 require("guiconfig.inc");
+require("config.inc");
 
 if(!is_dir("/usr/local/etc/snort/rules"))
 	header("Location: snort_rules.php", false);
@@ -200,10 +201,10 @@ if ($_POST)
 	}
 	
 	if ($_POST['apply']) {
-		stop_service("snort");
-		sleep(2);
-		start_service("snort");
-		$savemsg = "The snort rules selections have been saved. Restarting Snort.";
+//		stop_service("snort");
+//		sleep(2);
+//		start_service("snort");
+		$savemsg = "The snort rules selections have been saved. Please restart snort by clicking save on the settings tab.";
 		$stopMsg = false;
 	}
 
@@ -250,6 +251,54 @@ else if ($_GET['act'] == "toggle")
     $splitcontents = load_rule_file($file);
     
     $stopMsg = true;
+	
+		//write disable/enable sid to config.xml
+		if ($disabled == false) {
+            $string_sid = strstr($tempstring, 'sid:');
+            $sid_pieces = explode(";", $string_sid);
+            $sid_off_cut = $sid_pieces[0];
+            // sid being turned off
+            $sid_off  = str_replace("sid:", "", $sid_off_cut);
+			// rule_sid_on registers
+			$sid_on_pieces = $config['installedpackages']['snort']['rule_sid_on'];
+			// if off sid is the same as on sid remove it
+			$sid_on_old = str_replace("||enablesid $sid_off", "", "$sid_on_pieces");
+			// write the replace sid back as empty
+			$config['installedpackages']['snort']['rule_sid_on'] = $sid_on_old;
+			// rule sid off registers
+			$sid_off_pieces = $config['installedpackages']['snort']['rule_sid_off'];
+			// if off sid is the same as off sid remove it
+			$sid_off_old = str_replace("||disablesid $sid_off", "", "$sid_off_pieces");
+			// write the replace sid back as empty
+			$config['installedpackages']['snort']['rule_sid_off'] = $sid_off_old;
+			// add sid off registers to new off sid
+			$config['installedpackages']['snort']['rule_sid_off'] = "||disablesid $sid_off" . $config['installedpackages']['snort']['rule_sid_off'];
+			write_config();
+		}
+		else
+		{
+            $string_sid = strstr($tempstring, 'sid:');
+            $sid_pieces = explode(";", $string_sid);
+            $sid_on_cut = $sid_pieces[0];
+            // sid being turned off
+            $sid_on  = str_replace("sid:", "", $sid_on_cut);
+			// rule_sid_off registers
+			$sid_off_pieces = $config['installedpackages']['snort']['rule_sid_off'];
+			// if off sid is the same as on sid remove it
+			$sid_off_old = str_replace("||disablesid $sid_on", "", "$sid_off_pieces");
+			// write the replace sid back as empty
+			$config['installedpackages']['snort']['rule_sid_off'] = $sid_off_old;
+			// rule sid on registers
+			$sid_on_pieces = $config['installedpackages']['snort']['rule_sid_on'];
+			// if on sid is the same as on sid remove it
+			$sid_on_old = str_replace("||enablesid $sid_on", "", "$sid_on_pieces");
+			// write the replace sid back as empty
+			$config['installedpackages']['snort']['rule_sid_on'] = $sid_on_old;
+			// add sid on registers to new on sid
+			$config['installedpackages']['snort']['rule_sid_on'] = "||enablesid $sid_on" . $config['installedpackages']['snort']['rule_sid_on'];
+			write_config();
+		}
+	
 }
 
 
@@ -410,8 +459,8 @@ function go()
                                         $counter2++;
                                         $destination_port = $rule_content[$counter2];//destination port location
 
-                                        $message = get_middle($tempstring, 'msg:"', '";', 0);
-
+                                        $message = get_middle($tempstring, 'msg:"', '";', 0);										
+										
                                         echo "<tr>";
                                         echo "<td class=\"listt\">";
                                         echo $textss;
