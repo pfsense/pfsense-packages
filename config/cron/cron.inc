@@ -35,17 +35,17 @@ require_once("services.inc");
 
 function pkg_is_service_running($servicename) 
 {
-    exec("/bin/ps ax | awk '{ print $5 }'", $psout);
-    array_shift($psout);
-    foreach($psout as $line) {
-    	$ps[] = trim(array_pop(explode(' ', array_pop(explode('/', $line)))));
-    }
-    if(is_service_running($servicename, $ps) or is_process_running($servicename) ) {
-        return true;
-    }
-    else {
-        return false;
-    }
+	exec("/bin/ps ax | awk '{ print $5 }'", $psout);
+	array_shift($psout);
+	foreach($psout as $line) {
+		$ps[] = trim(array_pop(explode(' ', array_pop(explode('/', $line)))));
+	}
+	if(is_service_running($servicename, $ps) or is_process_running($servicename) ) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 function php_sync_package() 
@@ -70,30 +70,29 @@ function php_install_command()
 	config_lock();
 
 	if (!is_dir('/usr/local/www/packages/')) {
-	   exec("mkdir /usr/local/www/packages/");
-	}
-	
-	if (!is_dir('/usr/local/www/packages/cron/')) {
-	   exec("mkdir /usr/local/www/packages/cron/");
+		exec("mkdir /usr/local/www/packages/");
 	}
 
-	
+	if (!is_dir('/usr/local/www/packages/cron/')) {
+		exec("mkdir /usr/local/www/packages/cron/");
+	}
+
 	//rename PHP files from .tmp to .php
 	exec("cp /tmp/cron.tmp /usr/local/www/packages/cron/cron.php");
 	unlink_if_exists("/tmp/cron.tmp");
-	
+
 	exec("cp /tmp/cron_edit.tmp /usr/local/www/packages/cron/cron_edit.php");
 	unlink_if_exists("/tmp/cron_edit.tmp");
-		
-  //write_config();
-	  	
+
+	//write_config();
+
 	write_rcfile(array(
 		"file" => "cron.sh",
 		"start" => "/usr/sbin/cron -s &",
 		"stop" => "kill -9 `cat /var/run/cron.pid`"
 		)
 	);
-		  	       
+
 	php_sync_package();
 
 	//if (pkg_is_service_running('cron')) {
@@ -102,13 +101,12 @@ function php_install_command()
 
 	conf_mount_ro();
 	config_unlock();
-  
+
 }
 
 
 function deinstall_command() 
 {
-
 	conf_mount_rw();
 	config_lock();
 	$handle = popen("/usr/local/etc/rc.d/cron.sh stop", "r");
@@ -118,7 +116,6 @@ function deinstall_command()
 	//unlink_if_exists("/usr/local/etc/rc.d/cron.sh");
 	conf_mount_ro();
 	config_unlock();
-	
 }
 
 ?>
