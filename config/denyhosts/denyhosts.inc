@@ -60,8 +60,8 @@ function php_install_command()
 	   exec("mkdir /usr/local/www/packages/denyhosts/");
 	}
 
-	exec("pkg_add -r denyhosts");
-	
+	exec("pkg_add -r http://files.pfsense.com/packages/security/denyhosts-2.5.tbz");
+
 	//misc files
 	if (!is_dir('/usr/local/www/edit_area/')) {
 		chdir('/tmp/');
@@ -73,7 +73,7 @@ function php_install_command()
 
 	//backup the original hosts.allow file
 	exec ("cp /etc/hosts.allow /etc/hosts.allow.bak");
-	
+
 	$hosts_allow = "#\n";
 	$hosts_allow .= "# hosts.allow access control file for \"tcp wrapped\" applications.\n";
 	$hosts_allow .= "#\n";
@@ -84,24 +84,24 @@ function php_install_command()
 	fwrite($fout, $hosts_allow);
 	unset($hosts_allow);
 	fclose($fout);
-	
+
 	if(!is_file("/etc/hosts.deniedssh")) {
 		exec("touch /etc/hosts.deniedssh");
 		exec("chmod 755 /etc/hosts.deniedssh");
 	}
-	
+
 	if(!is_file("/var/log/denyhosts")) {
 		exec ('touch /var/log/denyhosts');
 	}
-	
+
 	$download_path = 'http://www.pfsense.com/packages/config/denyhosts/';
-	
+
 	//rename PHP files from .tmp to .php
 	chdir('/tmp/');
 	exec("cd /tmp/;fetch ".$download_path."denyhosts_log.tmp");
 	exec("cp /tmp/denyhosts_log.tmp /usr/local/www/packages/denyhosts/denyhosts_log.php");
 	unlink_if_exists("/tmp/denyhosts_log.tmp");
-	
+
 
 	//$denyhosts_sh = "\n";
 	//$denyhosts_sh .= "name=\"denyhosts\"\n";
@@ -122,8 +122,7 @@ function php_install_command()
 	//unset($denyhosts_sh);
 	//fclose($fout);
 	//exec("chmod 755 /usr/local/etc/rc.d/denyhosts.sh");
-	
-	
+
 	$filename = "/usr/local/etc/denyhosts.conf";
 	$handle = fopen($filename,"rb");
 	$denyhosts_conf = fread($handle, filesize($filename));	
@@ -135,31 +134,26 @@ function php_install_command()
 	fwrite($fout, $denyhosts_conf);
 	unset($filename);
 	fclose($fout);
-	
-	
+
 	$filename = "/usr/local/etc/denyhosts.conf-dist";
 	$fout = fopen($filename,"w");
 	fwrite($fout, $denyhosts_conf);
 	unset($filename);
 	unset($denyhosts_conf);
 	fclose($fout);
-	
-	
+
 	write_rcfile(array(
 		"file" => "denyhosts.sh",
 		"start" => "/usr/local/bin/python2.5 /usr/local/bin/denyhosts.py --config /usr/local/etc/denyhosts.conf --daemon",
 		"stop" => "rm /var/run/denyhosts.pid"
 		)
 	);
-	
-		  	       
+   
 	php_sync_package();
-	
-	
+
 	//start denyhosts
 	exec("/usr/local/etc/rc.d/denyhosts.sh start");
-	
-	
+
 	//if (pkg_is_service_running('notes')) {  
 		//documentation purposes
 	//}
@@ -197,7 +191,7 @@ function deinstall_command()
 		//fwrite($fout, $tmp);
 		//unset($tmp);
 		//fclose($fout);
-	
+
 	conf_mount_ro();
 	config_unlock();
 }
