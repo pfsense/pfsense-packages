@@ -156,17 +156,22 @@ function sync_package_snort()
     $if_snort_pid = "\nif ls /tmp/snort.sh.pid > /dev/null\nthen\n    echo \"snort.sh is running\"\n    exit 0\nelse\n    echo \"snort.sh is not running\"\nfi\n";        
     $echo_snort_sh_pid = "\necho \"snort.sh run\" > /tmp/snort.sh.pid\n";
     $echo_snort_sh_startup_log = "\necho \"snort.sh run\" >> /tmp/snort.sh_startup.log\n";
-	$sample_before = "\nBEFORE_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
-	$sample_after = "\nAFTER_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
-	$sleep_before_final = "\necho \"Sleeping before final memory sampling...\"\nsleep 17";
-	$total_free_after = "\nTOTAL_USAGE=`top | grep snort | grep -v grep | awk '{ print \$6 }'`\n";
-	$echo_usage = "\necho \"Ram free BEFORE starting Snort: \${BEFORE_MEM} -- Ram free AFTER starting Snort: \${AFTER_MEM}\" -- Mode {$snort_performance} -- Snort memory usage: \$TOTAL_USAGE | logger -p daemon.info -i -t SnortStartup\n";
+	$sample_before = "BEFORE_MEM=`top | grep Wired | awk '{print \$12}'`\n";
+	$sample_after = "AFTER_MEM=`top | grep Wired | awk '{print \$12}'`\n";
+	if ($snort_performance == "ac-bnfa")
+		$sleep_before_final = "\necho \"Sleeping before final memory sampling...\"\nWAITSECURE=60\n";
+	else
+		$sleep_before_final = "\necho \"Sleeping before final memory sampling...\"\nWAITSECURE=300\n";
+	$sleep_before_final .= "while [ \"\$MYSNORTLOG\" = \"\" -a \$WAITSECURE -gt 0 ] ; do\n\tsleep 2\n\tMYSNORTLOG=`/usr/sbin/clog /var/log/system.log | grep snort | tail | grep 'Snort initialization completed successfully'`\n\tWAITSECURE=`expr \$WAITSECURE - 1`\ndone\n";
+	$total_used_after = "TOTAL_USAGE=`top | grep snort | grep -v grep | awk '{ print \$6 }'`\n";
+	$echo_usage = "\nif [ \$WAITSECURE -eq 0 -a \"\$MYSNORTLOG\" = \"\" ] ; then\n\techo \"Snort has not finished starting, please check log for possible errors.\"\n";
+	$echo_usage .= "else\n\t" . $sample_after . "\t" . $total_used_after . "\techo \"Ram free BEFORE starting Snort: \$BEFORE_MEM -- Ram free AFTER starting Snort: \$AFTER_MEM -- Mode " . $snort_performance . " -- Snort memory usage: \$TOTAL_USAGE\" | logger -p daemon.info -i -t SnortStartup\nfi\n";
 	$rm_snort_sh_pid = "\nrm /tmp/snort.sh.pid\n";
 		
 	/* write out rc.d start/stop file */
 	write_rcfile(array(
 			"file" => "snort.sh",
-			"start" => "{$if_snort_pid}{$echo_snort_sh_pid}{$echo_snort_sh_startup_log}{$sample_before}{$start}{$sleep_before_final}{$sample_after}{$echo_usage}{$rm_snort_sh_pid}",
+			"start" => "{$if_snort_pid}{$echo_snort_sh_pid}{$echo_snort_sh_startup_log}{$sample_before}{$start}{$sleep_before_final}{$echo_usage}{$rm_snort_sh_pid}",
 			"stop" => "/usr/bin/killall snort; killall barnyard2"
 		)
 	);
@@ -947,11 +952,11 @@ function snort_rules_up_install_cron($should_install) {
 	/* should we whitelist vpns? */
 	$whitelistvpns = $config['installedpackages']['snort']['config'][0]['whitelistvpns'];
 
-	/* grab a list of vpns and whitelist if user desires */
+	/* grab a list of vpns and whitelist if user desires added by nestorfish 954 */
 	if($whitelistvpns) {
 		$vpns_list = get_vpns_list();
 		$whitelist_vpns = split(" ", $vpns_list);
-		foreach($whitelist_split as $wl)
+		foreach($whitelist_vpns as $wl)
 			if(trim($wl))
 				fwrite($whitelist, trim($wl) . "\n");
 	}
