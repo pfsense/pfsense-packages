@@ -668,60 +668,68 @@ function snort_rm_blocked_install_cron($should_install) {
         }
 	$snort_rm_blocked_info_ck = $config['installedpackages']['snort']['config'][0]['rm_blocked'];
 		if ($snort_rm_blocked_info_ck == "1h_b") {
+                $snort_rm_blocked_min = "*/5";
+                $snort_rm_blocked_hr = "*";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "1h";
+		}
+		if ($snort_rm_blocked_info_ck == "3h_b") {
+                $snort_rm_blocked_min = "*/15";
+                $snort_rm_blocked_hr = "*";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "3h";
+		}
+		if ($snort_rm_blocked_info_ck == "6h_b") {
+                $snort_rm_blocked_min = "*/30";
+                $snort_rm_blocked_hr = "*";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "6h";
+		}
+		if ($snort_rm_blocked_info_ck == "12h_b") {
                 $snort_rm_blocked_min = "*";
                 $snort_rm_blocked_hr = "*/1";
                 $snort_rm_blocked_mday = "*";
                 $snort_rm_blocked_month = "*";
                 $snort_rm_blocked_wday = "*";
-		}
-		if ($snort_rm_blocked_info_ck == "3h_b") {
-                $snort_rm_blocked_min = "*";
-                $snort_rm_blocked_hr = "*/3";
-                $snort_rm_blocked_mday = "*";
-                $snort_rm_blocked_month = "*";
-                $snort_rm_blocked_wday = "*";
-		}
-		if ($snort_rm_blocked_info_ck == "6h_b") {
-                $snort_rm_blocked_min = "*";
-                $snort_rm_blocked_hr = "*/6";
-                $snort_rm_blocked_mday = "*";
-                $snort_rm_blocked_month = "*";
-                $snort_rm_blocked_wday = "*";
-		}
-		if ($snort_rm_blocked_info_ck == "12h_b") {
-                $snort_rm_blocked_min = "*";
-                $snort_rm_blocked_hr = "*/12";
-                $snort_rm_blocked_mday = "*";
-                $snort_rm_blocked_month = "*";
-                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "12h";
 		}
 		if ($snort_rm_blocked_info_ck == "1d_b") {
                 $snort_rm_blocked_min = "*";
-                $snort_rm_blocked_hr = "*";
-                $snort_rm_blocked_mday = "*/1";
+                $snort_rm_blocked_hr = "*/2";
+                $snort_rm_blocked_mday = "*";
                 $snort_rm_blocked_month = "*";
                 $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "1d";
 		}
 		if ($snort_rm_blocked_info_ck == "4d_b") {
                 $snort_rm_blocked_min = "*";
-                $snort_rm_blocked_hr = "*";
-                $snort_rm_blocked_mday = "*/4";
+                $snort_rm_blocked_hr = "*/8";
+                $snort_rm_blocked_mday = "*";
                 $snort_rm_blocked_month = "*";
                 $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "4d";
 		}
 		if ($snort_rm_blocked_info_ck == "7d_b") {
                 $snort_rm_blocked_min = "*";
-                $snort_rm_blocked_hr = "*";
-                $snort_rm_blocked_mday = "*/7";
+                $snort_rm_blocked_hr = "*/14";
+                $snort_rm_blocked_mday = "*";
                 $snort_rm_blocked_month = "*";
                 $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "7d";
 		}
 		if ($snort_rm_blocked_info_ck == "28d_b") {
                 $snort_rm_blocked_min = "*";
                 $snort_rm_blocked_hr = "*";
-                $snort_rm_blocked_mday = "*/28";
+                $snort_rm_blocked_mday = "*/2";
                 $snort_rm_blocked_month = "*";
                 $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "28d";
 		}
         switch($should_install) {
                 case true:
@@ -733,7 +741,7 @@ function snort_rm_blocked_install_cron($should_install) {
                                 $cron_item['month'] = "$snort_rm_blocked_month";
                                 $cron_item['wday'] = "$snort_rm_blocked_wday";
                                 $cron_item['who'] = "root";
-                                $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/sbin/expiretable -t 3600 snort2c";
+                                $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/sbin/expiretable -t $snort_rm_blocked_expire snort2c";
                                 $config['cron']['item'][] = $cron_item;
                                 write_config("Installed 15 minute filter reload for Time Based Rules");
                                 configure_cron();
@@ -852,7 +860,7 @@ function snort_rules_up_install_cron($should_install) {
 		}
 	}
 	snort_rules_up_install_cron("");
-	snort_rules_up_install_cron($snort_rm_blocked_false);
+	snort_rules_up_install_cron($snort_rules_up_false);
 }
 
 	/* open snort2c's whitelist for writing */
