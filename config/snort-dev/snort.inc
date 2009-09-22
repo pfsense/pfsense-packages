@@ -152,10 +152,11 @@ function sync_package_snort()
         if ($snortbarnyardlog_info_chk == on)
                 $start .= "\nsleep 4;barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D -q\n";	
 	}    
-    
+    $check_if_snort_runs = "\nif [ \"`pgrep -x snort`\" != \"\" ] ; then\n\tlogger -p daemon.info -i -t SnortStartup \"Snort already running...\"\n\texit 1\nfi\n\n";
     $if_snort_pid = "\nif ls /tmp/snort.sh.pid > /dev/null\nthen\n    echo \"snort.sh is running\"\n    exit 0\nelse\n    echo \"snort.sh is not running\"\nfi\n";        
     $echo_snort_sh_pid = "\necho \"snort.sh run\" > /tmp/snort.sh.pid\n";
     $echo_snort_sh_startup_log = "\necho \"snort.sh run\" >> /tmp/snort.sh_startup.log\n";
+	$del_old_pids = "\nrm -f /var/run/snort_*\n";
 	$sample_before = "BEFORE_MEM=`top | grep Wired | awk '{print \$12}'`\n";
 	$sample_after = "AFTER_MEM=`top | grep Wired | awk '{print \$12}'`\n";
 	if ($snort_performance == "ac-bnfa")
@@ -171,7 +172,7 @@ function sync_package_snort()
 	/* write out rc.d start/stop file */
 	write_rcfile(array(
 			"file" => "snort.sh",
-			"start" => "{$if_snort_pid}{$echo_snort_sh_pid}{$echo_snort_sh_startup_log}{$sample_before}{$start}{$sleep_before_final}{$echo_usage}{$rm_snort_sh_pid}",
+			"start" => "{$check_if_snort_runs}{$if_snort_pid}{$echo_snort_sh_pid}{$echo_snort_sh_startup_log}{$del_old_pids}{$sample_before}{$start}{$sleep_before_final}{$echo_usage}{$rm_snort_sh_pid}",
 			"stop" => "/usr/bin/killall snort; killall barnyard2"
 		)
 	);
@@ -678,7 +679,7 @@ function snort_rm_blocked_install_cron($should_install) {
                 $snort_rm_blocked_mday = "*";
                 $snort_rm_blocked_month = "*";
                 $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "1h";
+				$snort_rm_blocked_expire = "3600";
 		}
 		if ($snort_rm_blocked_info_ck == "3h_b") {
                 $snort_rm_blocked_min = "*/15";
@@ -686,7 +687,7 @@ function snort_rm_blocked_install_cron($should_install) {
                 $snort_rm_blocked_mday = "*";
                 $snort_rm_blocked_month = "*";
                 $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "3h";
+				$snort_rm_blocked_expire = "10800";
 		}
 		if ($snort_rm_blocked_info_ck == "6h_b") {
                 $snort_rm_blocked_min = "*/30";
@@ -694,7 +695,7 @@ function snort_rm_blocked_install_cron($should_install) {
                 $snort_rm_blocked_mday = "*";
                 $snort_rm_blocked_month = "*";
                 $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "6h";
+				$snort_rm_blocked_expire = "21600";
 		}
 		if ($snort_rm_blocked_info_ck == "12h_b") {
                 $snort_rm_blocked_min = "*";
@@ -702,7 +703,7 @@ function snort_rm_blocked_install_cron($should_install) {
                 $snort_rm_blocked_mday = "*";
                 $snort_rm_blocked_month = "*";
                 $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "12h";
+				$snort_rm_blocked_expire = "43200";
 		}
 		if ($snort_rm_blocked_info_ck == "1d_b") {
                 $snort_rm_blocked_min = "*";
@@ -710,7 +711,7 @@ function snort_rm_blocked_install_cron($should_install) {
                 $snort_rm_blocked_mday = "*";
                 $snort_rm_blocked_month = "*";
                 $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "1d";
+				$snort_rm_blocked_expire = "86400";
 		}
 		if ($snort_rm_blocked_info_ck == "4d_b") {
                 $snort_rm_blocked_min = "*";
@@ -718,7 +719,7 @@ function snort_rm_blocked_install_cron($should_install) {
                 $snort_rm_blocked_mday = "*";
                 $snort_rm_blocked_month = "*";
                 $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "4d";
+				$snort_rm_blocked_expire = "345600";
 		}
 		if ($snort_rm_blocked_info_ck == "7d_b") {
                 $snort_rm_blocked_min = "*";
@@ -726,7 +727,7 @@ function snort_rm_blocked_install_cron($should_install) {
                 $snort_rm_blocked_mday = "*";
                 $snort_rm_blocked_month = "*";
                 $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "7d";
+				$snort_rm_blocked_expire = "604800";
 		}
 		if ($snort_rm_blocked_info_ck == "28d_b") {
                 $snort_rm_blocked_min = "*";
@@ -734,7 +735,7 @@ function snort_rm_blocked_install_cron($should_install) {
                 $snort_rm_blocked_mday = "*/2";
                 $snort_rm_blocked_month = "*";
                 $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "28d";
+				$snort_rm_blocked_expire = "2419200";
 		}
         switch($should_install) {
                 case true:
@@ -1132,8 +1133,7 @@ preprocessor frag3_engine: policy first
 preprocessor frag3_engine: policy bsd detect_anomalies
 
 preprocessor stream5_global: max_tcp 8192, track_tcp yes, \
-track_udp yes
-# adds 50 megs to mem
+track_udp yes 
 # track_icmp yes
 preprocessor stream5_tcp: bind_to any, policy windows
 preprocessor stream5_tcp: bind_to any, policy linux
@@ -1141,7 +1141,6 @@ preprocessor stream5_tcp: bind_to any, policy vista
 preprocessor stream5_tcp: bind_to any, policy macos
 preprocessor stream5_tcp: policy BSD, ports both all, use_static_footprint_sizes
 preprocessor stream5_udp
-# adds 50 mgs to mem
 # preprocessor stream5_icmp
 
 ##########################
@@ -1162,12 +1161,11 @@ preprocessor perfmonitor: time 300 file /var/log/snort/snort.stats pktcnt 10000
 preprocessor http_inspect: global iis_unicode_map unicode.map 1252
 
 preprocessor http_inspect_server: server default \
-                        ports  { 80 }  \
+                        ports  { 80 8080 }  \
                         no_alerts \
                         non_strict \
                         non_rfc_char  { 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 }  \
-                        flow_depth 400  \
-						client_flow_depth 300 \
+                        flow_depth 0  \
                         apache_whitespace yes \
                         directory no \
                         iis_backslash no \
@@ -1177,9 +1175,8 @@ preprocessor http_inspect_server: server default \
                         bare_byte yes \
                         double_decode yes \
                         iis_unicode yes \
-                        iis_delimiter no \
-                        multi_slash no \
-						oversize_dir_length 450
+                        iis_delimiter yes \
+                        multi_slash no
 
 ##################
                  #
