@@ -698,7 +698,7 @@ function snort_rm_blocked_install_cron($should_install) {
 				$snort_rm_blocked_expire = "21600";
 		}
 		if ($snort_rm_blocked_info_ck == "12h_b") {
-                $snort_rm_blocked_min = "*";
+                $snort_rm_blocked_min = "2";
                 $snort_rm_blocked_hr = "*/1";
                 $snort_rm_blocked_mday = "*";
                 $snort_rm_blocked_month = "*";
@@ -706,7 +706,7 @@ function snort_rm_blocked_install_cron($should_install) {
 				$snort_rm_blocked_expire = "43200";
 		}
 		if ($snort_rm_blocked_info_ck == "1d_b") {
-                $snort_rm_blocked_min = "*";
+                $snort_rm_blocked_min = "2";
                 $snort_rm_blocked_hr = "*/2";
                 $snort_rm_blocked_mday = "*";
                 $snort_rm_blocked_month = "*";
@@ -714,7 +714,7 @@ function snort_rm_blocked_install_cron($should_install) {
 				$snort_rm_blocked_expire = "86400";
 		}
 		if ($snort_rm_blocked_info_ck == "4d_b") {
-                $snort_rm_blocked_min = "*";
+                $snort_rm_blocked_min = "2";
                 $snort_rm_blocked_hr = "*/8";
                 $snort_rm_blocked_mday = "*";
                 $snort_rm_blocked_month = "*";
@@ -722,7 +722,7 @@ function snort_rm_blocked_install_cron($should_install) {
 				$snort_rm_blocked_expire = "345600";
 		}
 		if ($snort_rm_blocked_info_ck == "7d_b") {
-                $snort_rm_blocked_min = "*";
+                $snort_rm_blocked_min = "2";
                 $snort_rm_blocked_hr = "*/14";
                 $snort_rm_blocked_mday = "*";
                 $snort_rm_blocked_month = "*";
@@ -730,8 +730,8 @@ function snort_rm_blocked_install_cron($should_install) {
 				$snort_rm_blocked_expire = "604800";
 		}
 		if ($snort_rm_blocked_info_ck == "28d_b") {
-                $snort_rm_blocked_min = "*";
-                $snort_rm_blocked_hr = "*";
+                $snort_rm_blocked_min = "2";
+                $snort_rm_blocked_hr = "0";
                 $snort_rm_blocked_mday = "*/2";
                 $snort_rm_blocked_month = "*";
                 $snort_rm_blocked_wday = "*";
@@ -797,43 +797,43 @@ function snort_rules_up_install_cron($should_install) {
         }
 	$snort_rules_up_info_ck = $config['installedpackages']['snort']['config'][0]['autorulesupdate7'];
 		if ($snort_rules_up_info_ck == "6h_up") {
-                $snort_rules_up_min = "*";
+                $snort_rules_up_min = "3";
                 $snort_rules_up_hr = "*/6";
                 $snort_rules_up_mday = "*";
                 $snort_rules_up_month = "*";
                 $snort_rules_up_wday = "*";
 		}
 		if ($snort_rules_up_info_ck == "12h_up") {
-                $snort_rules_up_min = "*";
+                $snort_rules_up_min = "3";
                 $snort_rules_up_hr = "*/12";
                 $snort_rules_up_mday = "*";
                 $snort_rules_up_month = "*";
                 $snort_rules_up_wday = "*";
 		}
 		if ($snort_rules_up_info_ck == "1d_up") {
-                $snort_rules_up_min = "*";
-                $snort_rules_up_hr = "*";
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "0";
                 $snort_rules_up_mday = "*/1";
                 $snort_rules_up_month = "*";
                 $snort_rules_up_wday = "*";
 		}
 		if ($snort_rules_up_info_ck == "4d_up") {
-                $snort_rules_up_min = "*";
-                $snort_rules_up_hr = "*";
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "0";
                 $snort_rules_up_mday = "*/4";
                 $snort_rules_up_month = "*";
                 $snort_rules_up_wday = "*";
 		}
 		if ($snort_rules_up_info_ck == "7d_up") {
-                $snort_rules_up_min = "*";
-                $snort_rules_up_hr = "*";
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "0";
                 $snort_rules_up_mday = "*/7";
                 $snort_rules_up_month = "*";
                 $snort_rules_up_wday = "*";
 		}
 		if ($snort_rules_up_info_ck == "28d_up") {
-                $snort_rules_up_min = "*";
-                $snort_rules_up_hr = "*";
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "0";
                 $snort_rules_up_mday = "*/28";
                 $snort_rules_up_month = "*";
                 $snort_rules_up_wday = "*";
