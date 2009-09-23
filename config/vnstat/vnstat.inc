@@ -1,5 +1,6 @@
 <?php
 function vnstat_install_deinstall() {
+	conf_mount_rw();
 	global $config;
 // Remove Vnstat package and files
         exec("cd /var/db/pkg/ && pkg_delete `ls | grep vnstat`");
@@ -21,10 +22,12 @@ function vnstat_install_deinstall() {
             write_config();
         }
         configure_cron();
+		conf_mount_ro();
 }
 
 function vnstat_install_config() {
         global $config;
+		conf_mount_rw();
 // Unpack and move Vnstat frontend 
 	exec("cd ..");
 	exec("tar -zxovf /usr/local/pkg/vnstat_php_frontend-1.4.1.tar.gz");
@@ -223,7 +226,6 @@ EOF;
      }
      fwrite($hf, $config_file);
      fclose($hf);
+	conf_mount_ro();
 }
 ?>
-
-
