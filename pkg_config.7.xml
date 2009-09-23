@@ -648,6 +648,7 @@
       <depends_on_package>openldap-client-2.4.10.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/squid3/squid.xml</config_file>
       <configurationfile>squid.xml</configurationfile>
+	  <noembedded>true</noembedded>
     </package>
     <package>
       <name>LCDproc</name>
