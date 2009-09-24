@@ -42,8 +42,6 @@
 			<type>submit</type>
 		</field>
 	</fields>
-	<stepbeforeformdisplay>
-	</stepbeforeformdisplay>
 </step>
 <step>
 	<id>2</id>
