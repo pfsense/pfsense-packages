@@ -234,7 +234,7 @@
 			tinydns_sync_on_changes();
 		}
 		
-		Header("Location: /pkg.php?xml=tinydns_domains.xml");
+		Header("Location: /pkg.php?xml=tinydns.xml");
 	]]>	
 	</stepsubmitbeforesave>	
 </step>
