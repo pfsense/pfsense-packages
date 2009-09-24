@@ -233,8 +233,14 @@
 			tinydns_setup_ping_items();
 			tinydns_sync_on_changes();
 		}
-		
-		Header("Location: /pkg.php?xml=tinydns.xml");
+
+		// If service is running redirect to domains page.  
+		// Otherwise redirect to the tinydns settings page.
+		if(is_dir("/service/tinydns"))
+			Header("Location: /pkg.php?xml=tinydns_domains.xml");
+		else 
+			Header("Location: /pkg.php?xml=tinydns.xml");
+
 	]]>	
 	</stepsubmitbeforesave>	
 </step>
