@@ -86,9 +86,6 @@
 			<multiple>true</multiple>
 		</field>
 	</fields>
-	<custom_add_php_command>
-		setup_avahi();
-	</custom_add_php_command>
 	<custom_php_install_command>
 		exec("mkdir -p /usr/local/etc/avahi/services/");
 		exec("mv /usr/local/etc/avahi/*.service /usr/local/etc/avahi/services/");
