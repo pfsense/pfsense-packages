@@ -40,7 +40,10 @@ if($config['interfaces']['wan']['ipaddr'] == "pppoe" or
 		create_snort_conf();
 		mwexec("/sbin/pfctl -t snort2c -T flush");
 		exec("killall -HUP snort");
-		exec("/usr/bin/killall snort2c; snort2c -w /var/db/whitelist -a /var/log/snort/alert");
+		/* define snortbarnyardlog_chk */
+        $snortbarnyardlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog'];
+        if ($snortbarnyardlog_info_chk == on)
+                exec("/usr/bin/killall barnyard2; /usr/local/bin/barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D -q\n");
 }
 
 ?>

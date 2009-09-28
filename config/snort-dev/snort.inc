@@ -88,7 +88,9 @@ function sync_package_snort()
 	exec("/bin/cp /usr/local/etc/snort/threshold.conf-sample /usr/local/etc/snort/threshold.conf");
 	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
 	exec("/bin/rm -f /usr/local/etc/rc.d/snort");
-
+	exec("/bin/rm /tmp/snort_download_halt.pid");
+	exec("/bin/rm /tmp/snort.sh.pid");
+	
 	$first = 0;
 	$snortInterfaces = array(); /* -gtm  */
 	
@@ -152,7 +154,7 @@ function sync_package_snort()
         if ($snortbarnyardlog_info_chk == on)
                 $start .= "\nsleep 4;barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D -q\n";	
 	}    
-    $check_if_snort_runs = "\nif [ \"`pgrep -x snort`\" != \"\" ] ; then\n\tlogger -p daemon.info -i -t SnortStartup \"Snort already running...\"\n\texit 1\nfi\n\n";
+    $check_if_snort_runs = "\nif [ \"`pgrep -x snort`\" != \"\" ] ; then\n\tlogger -p daemon.info -i -t SnortStartup \"Snort already running...\"\n/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php\n\texit 1\nfi\n\n";
     $if_snort_pid = "\nif ls /tmp/snort.sh.pid > /dev/null\nthen\n    echo \"snort.sh is running\"\n    exit 0\nelse\n    echo \"snort.sh is not running\"\nfi\n";        
     $echo_snort_sh_pid = "\necho \"snort.sh run\" > /tmp/snort.sh.pid\n";
     $echo_snort_sh_startup_log = "\necho \"snort.sh run\" >> /tmp/snort.sh_startup.log\n";

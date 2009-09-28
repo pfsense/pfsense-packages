@@ -296,9 +296,6 @@ if ($emerg_md5_check_new == $emerg_md5_check_old) {
         update_output_window(gettext("You may start Snort now, check update."));
         hide_progress_bar_status();
         $emerg_md5_check_chk_ok = on;
-        /* Timestamps to html  */
-//        echo "\n<p align=center><b>You last checked for updates: </b>{$last_md5_download}</p>\n";
-//        echo "\n<p align=center><b>You last installed for rules: </b>{$last_rules_install}</p>\n";
     }
   }
 }
@@ -338,12 +335,15 @@ if ($snort_md5_check_ok == on && $pfsense_md5_check_ok == on && $emergingthreats
 		exit(0);
 }
 		
-/* "You are Not Up to date */;
+/* You are Not Up to date, always stop snort when updating rules for low end machines */;
 update_status(gettext("You are NOT up to date..."));
-		update_output_window(gettext("Stopping Snort service..."));
-stop_service("snort");
-sleep(2);
-// start_service("snort");
+update_output_window(gettext("Stopping Snort service..."));
+$chk_if_snort_up = exec("pgrep -x snort");
+if ($chk_if_snort_up != "") {
+	exec("/usr/bin/touch /tmp/snort_download_halt.pid");
+	stop_service("snort");
+	sleep(2);
+}
 
 /* download snortrules file */
 if ($snort_md5_check_ok != on) {
@@ -660,23 +660,6 @@ if (file_exists("{$snortdir}/doc/signatures")) {
  }
 }
 
-/*  Copy snort rules  and emergingthreats and pfsense dir to snort dir */
-// if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_check_ok != on) {
-// if (file_exists("{$tmpfname}/rules")) {
-//    update_status(gettext("Copying rules..."));
-//    update_output_window(gettext("May take a while..."));
-//    exec("/bin/cp {$tmpfname}/rules/* {$snortdir}/rules");
-//    update_status(gettext("Done copping rules."));
-//    /* Write out time of last sucsessful rule install catch */
-//    $config['installedpackages']['snort']['last_rules_install'] = date("Y-M-jS-h:i-A");
-//    write_config();
-// } else {
-//    update_status(gettext("Directory rules does not exists..."));
-//    update_output_window(gettext("Error copying rules direcory..."));
-//    exit(0);
-// }
-// }
-
 /* double make shure cleanup emerg rules that dont belong */
 if (file_exists("/usr/local/etc/snort_bkup/rules/emerging-botcc-BLOCK.rules")) {
 	apc_clear_cache();
@@ -705,9 +688,8 @@ exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl /usr/local/etc/snort_b
 if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_check_ok != on) {
 
 	if (empty($config['installedpackages']['snort']['rule_sid_on']) || empty($config['installedpackages']['snort']['rule_sid_off'])) {
-update_status(gettext("Your enable and disable changes are being applied to your fresh set of rules..."));
-update_output_window(gettext("May take a while..."));
-
+	update_status(gettext("Your first set of rules are being copied..."));
+	update_output_window(gettext("May take a while..."));
     exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/rules/");
 	exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}");
 	exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}");
@@ -720,15 +702,17 @@ update_output_window(gettext("May take a while..."));
 	exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}");
 
 } else {
+		update_status(gettext("Your enable and disable changes are being applied to your fresh set of rules..."));
+		update_output_window(gettext("May take a while..."));
 
 		exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}");
-		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}");
+//		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/generators {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/sid {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}");
-		exec("/bin/cp {$snortdir}/snort.conf {$snortdir_wan}");
-		exec("/bin/cp {$snortdir}/threshold.conf {$snortdir_wan}");
+//		exec("/bin/cp {$snortdir}/snort.conf {$snortdir_wan}");
+//		exec("/bin/cp {$snortdir}/threshold.conf {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}");
 
 		/*  oinkmaster.pl will convert saved changes for the new updates then we have to change #alert to # alert for the gui */
@@ -742,21 +726,28 @@ update_output_window(gettext("May take a while..."));
 	}
 }
 
+/*  remove old $tmpfname files */
+if (file_exists("{$tmpfname}")) {
+    update_status(gettext("Cleaning up..."));
+    exec("/bin/rm -r /tmp/snort_rules_up");
+//	apc_clear_cache();
+}
+
 /* php code to flush out cache some people are reportting missing files this might help  */
-sleep(5);
+sleep(2);
 apc_clear_cache();
 exec("/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync");
 
-/*  remove old $tmpfname files */
-//if (file_exists("{$tmpfname}")) {
-//    update_status(gettext("Cleaning up..."));
-//    exec("/bin/rm -r {$tmpfname}");
-//	apc_clear_cache();
-//}
-
-/* php code finish */
-update_status(gettext("The Rules update finished..."));
-update_output_window(gettext("You may start snort now..."));
+/* if snort is running hardrestart, if snort is not running do nothing */
+if (file_exists("/tmp/snort_download_halt.pid")) {
+	start_service("snort");
+	update_status(gettext("The Rules update finished..."));
+	update_output_window(gettext("Snort has restarted with your new set of rules..."));
+	exec("/bin/rm /tmp/snort_download_halt.pid");
+} else {
+		update_status(gettext("The Rules update finished..."));
+		update_output_window(gettext("You may start snort now..."));
+}
 
 /* hide progress bar and lets end this party */
 hide_progress_bar_status();
