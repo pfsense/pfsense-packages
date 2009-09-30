@@ -53,7 +53,6 @@ function sync_package_snort_reinstall()
 	/* start snort service */
 	start_service("snort");
 }
-
 function sync_package_snort()
 {
 	global $config, $g;
@@ -89,7 +88,7 @@ function sync_package_snort()
 	exec("/bin/cp /usr/local/etc/snort/threshold.conf-sample /usr/local/etc/snort/threshold.conf");
 	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
 	exec("/bin/rm -f /usr/local/etc/rc.d/snort");
-
+	
 	$first = 0;
 	$snortInterfaces = array(); /* -gtm  */
 	
@@ -137,8 +136,8 @@ function sync_package_snort()
 	if($bpfmaxinsns)
 		mwexec_bg("sysctl net.bpf.maxinsns={$bpfmaxinsns}");
 
-	/* always stop snort2c before starting snort -gtm */
-	$start .= "/usr/bin/killall snort2c\n";
+	/* always stop barnyard2 before starting snort -gtm */
+	$start .= "/usr/bin/killall barnyard2\n";
 
 	/* start a snort process for each interface -gtm */
 	/* Note the sleep delay.  Seems to help getting mult interfaces to start -gtm */
@@ -146,36 +145,103 @@ function sync_package_snort()
 	/* TODO; get snort to start under nologin shell */
 	foreach($snortInterfaces as $snortIf)
 	{
-		$start .= "sleep 8\n";
+		$start .= "sleep 4\n";
 		$start .= "snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -D -i {$snortIf} -q\n";
+		/* define snortbarnyardlog_chk */
+        $snortbarnyardlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog'];
+        if ($snortbarnyardlog_info_chk == on)
+                $start .= "\nsleep 4;barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D -q\n";	
 	}    
-    
-	/* if block offenders is checked, start snort2c */
-	if($_POST['blockoffenders']) {
-		$start .= "\nsleep 8\n";
-		$start .= "snort2c -w /var/db/whitelist -a /var/log/snort/alert\n";
-	}
-    
-	$sample_before = "\nBEFORE_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
-	$sample_after = "\nAFTER_MEM=`top | grep Free | grep Wired | awk '{print \$10}'`\n";
-	$sleep_before_final = "\necho \"Sleeping before final memory sampling...\"\nsleep 17";
-	$total_free_after = "\nTOTAL_USAGE=`top | grep snort | grep -v grep | awk '{ print \$6 }'`\n";
-	$echo_usage = "\necho \"Ram free BEFORE starting Snort: \${BEFORE_MEM} -- Ram free AFTER starting Snort: \${AFTER_MEM}\" -- Mode {$snort_performance} -- Snort memory usage: \$TOTAL_USAGE | logger -p daemon.info -i -t SnortStartup\n";
-
+    $check_if_snort_runs = "\n\tif [ \"`ls -A /usr/local/etc/snort/rules`\" ] ; then\n\techo \"rules exist\"\n\telse\n\techo \"rules DONT exist\"\n\texit 2\n\tfi \n\n\tif [ \"`pgrep -x snort`\" = \"\" ] ; then\n\t/bin/rm /tmp/snort.sh.pid\n\tfi \n\n\tif [ \"`pgrep -x snort`\" != \"\" ] ; then\n\tlogger -p daemon.info -i -t SnortStartup \"Snort already running...\"\n\t/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php\n\texit 1\n\tfi\n\n";
+    $if_snort_pid = "\nif ls /tmp/snort.sh.pid > /dev/null\nthen\n    echo \"snort.sh is running\"\n    exit 0\nelse\n    echo \"snort.sh is not running\"\nfi\n";        
+    $echo_snort_sh_pid = "\necho \"snort.sh run\" > /tmp/snort.sh.pid\n";
+    $echo_snort_sh_startup_log = "\necho \"snort.sh run\" >> /tmp/snort.sh_startup.log\n";
+	$del_old_pids = "\nrm -f /var/run/snort_*\n";
+	$sample_before = "BEFORE_MEM=`top | grep Wired | awk '{print \$12}'`\n";
+	$sample_after = "\n\tAFTER_MEM=`top | grep Wired | awk '{print \$12}'`\n";
+	if ($snort_performance == "ac-bnfa")
+		$sleep_before_final = "\necho \"Sleeping before final memory sampling...\"\nWAITSECURE=60\n";
+	else
+		$sleep_before_final = "\necho \"Sleeping before final memory sampling...\"\nWAITSECURE=300\n";
+	$sleep_before_final .= "while [ \"\$MYSNORTLOG\" = \"\" -a \$WAITSECURE -gt 0 ] ; do\n\tsleep 2\n\tMYSNORTLOG=`/usr/sbin/clog /var/log/system.log | grep snort | tail | grep 'Snort initialization completed successfully'`\n\tWAITSECURE=`expr \$WAITSECURE - 1`\ndone\n";
+	$total_used_after = "TOTAL_USAGE=`top | grep snort | grep -v grep | awk '{ print \$6 }'`\n";
+	$echo_usage .= $sample_after . "\t" . $total_used_after . "\techo \"Ram free BEFORE starting Snort: \$BEFORE_MEM -- Ram free AFTER starting Snort: \$AFTER_MEM -- Mode " . $snort_performance . " -- Snort memory usage: \$TOTAL_USAGE\" | logger -p daemon.info -i -t SnortStartup\n\n";
+		
 	/* write out rc.d start/stop file */
 	write_rcfile(array(
 			"file" => "snort.sh",
-			"start" => "{$sample_before}{$start}{$sleep_before_final}{$sample_after}{$echo_usage}",
-			"stop" => "/usr/bin/killall snort; killall snort2c"
+			"start" => "{$check_if_snort_runs}{$if_snort_pid}{$echo_snort_sh_pid}{$echo_snort_sh_startup_log}{$del_old_pids}{$sample_before}{$start}{$sleep_before_final}{$echo_usage}",
+			"stop" => "/usr/bin/killall snort; killall barnyard2"
 		)
 	);
 
 	/* create snort configuration file */
 	create_snort_conf();
 
+/* create barnyard2 configuration file */
+$snortbarnyardlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog'];
+if ($snortbarnyardlog_info_chk == on)
+       create_barnyard2_conf();
+
+	   /* snort will not start on install untill setting are set */
+if ($config['installedpackages']['snort']['config'][0]['autorulesupdate7'] != "") {
 	/* start snort service */
 	conf_mount_ro();
 	start_service("snort");
+	}
+}
+
+/* open barnyard2.conf for writing */
+function create_barnyard2_conf() {
+        global $bconfig, $bg;
+        /* write out barnyard2_conf */
+        $barnyard2_conf_text = generate_barnyard2_conf();
+//        conf_mount_rw();
+        $bconf = fopen("/usr/local/etc/barnyard2.conf", "w");
+        if(!$bconf) {
+                log_error("Could not open /usr/local/etc/barnyard2.conf for writing.");
+                exit;
+        }
+        fwrite($bconf, $barnyard2_conf_text);
+        fclose($bconf);
+//        conf_mount_ro();
+}
+/* open barnyard2.conf for writing" */
+function generate_barnyard2_conf() {
+
+        global $config, $g;
+        conf_mount_rw();
+
+/* define snortbarnyardlog */
+$snortbarnyardlog_database_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog_database'];
+
+$barnyard2_conf_text = <<<EOD
+
+        Copyright (C) 2006 Scott Ullrich
+        part of pfSense
+        All rights reserved.
+
+# set the appropriate paths to the file(s) your Snort process is using
+config reference-map:   /usr/local/etc/snort/reference.config
+config class-map:          /usr/local/etc/snort/classification.config
+config gen-msg-map:     /usr/local/etc/snort/gen-msg.map
+config sid-msg-map:         /usr/local/etc/snort/sid-msg.map
+
+config hostname:       pfsense.local
+config interface:      vr0
+
+# Step 2: setup the input plugins
+input unified2
+
+# database: log to a variety of databases
+# output database: log, mysql, user=snort password=snort123 dbname=snort host=192.168.1.22
+
+$snortbarnyardlog_database_info_chk
+
+EOD;
+
+        return $barnyard2_conf_text;
+
 }
 
 function create_snort_conf() {
@@ -194,10 +260,9 @@ function create_snort_conf() {
 }
 
 function snort_deinstall() {
-//	$text_ww   = "*/60\t* \t 1\t *\t *\t root\t /usr/bin/nice -n20 /usr/local/pkg/snort_check_for_rule_updates.php";
-//	$filenamea = "/etc/crontab";
-	/* remove auto rules update helper */
-//	remove_text_from_file($filenamea, $text_ww);
+
+	global $config, $g;
+
 	/* remove custom sysctl */
 	remove_text_from_file("/etc/sysctl.conf", "sysctl net.bpf.bufsize=20480");
 	/* decrease bpf buffers back to 4096, from 20480 */
@@ -212,6 +277,69 @@ function snort_deinstall() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep libdnet`");
 	exec("/usr/bin/killall -9 snort");
 	exec("/usr/bin/killall snort");
+
+	/* Remove snort cron entries Ugly code needs smoothness*/
+	
+	function snort_rm_blocked_deinstall_cron($should_install) {
+        global $config, $g;
+
+        $is_installed = false;
+
+        if(!$config['cron']['item'])
+                return;
+
+        $x=0;
+        foreach($config['cron']['item'] as $item) {
+                if (strstr($item['command'], "snort2c")) {
+                        $is_installed = true;
+                        break;
+                }
+                $x++;
+			}
+                      if($is_installed == true) {
+                         if($x > 0) {
+                                unset($config['cron']['item'][$x]);
+                                write_config();
+                         }
+                  configure_cron();
+			}
+		}
+
+	function snort_rules_up_deinstall_cron($should_install) {
+        global $config, $g;
+
+        $is_installed = false;
+
+        if(!$config['cron']['item'])
+                return;
+
+        $x=0;
+        foreach($config['cron']['item'] as $item) {
+                if (strstr($item['command'], "snort_check_for_rule_updates.php")) {
+                        $is_installed = true;
+                        break;
+                }
+                $x++;
+			}
+                      if($is_installed == true) {
+                         if($x > 0) {
+                                unset($config['cron']['item'][$x]);
+                                write_config();
+                         }
+                  configure_cron();
+			}
+		}
+
+snort_rm_blocked_deinstall_cron("");
+snort_rules_up_deinstall_cron("");
+
+		
+	/* Unset snort registers in conf.xml IMPORTANT snort will not start with out this */
+	/* Keep this as a last step */
+	unset($config['installedpackages']['snort']['config'][0]['autorulesupdate7']);
+    unset($config['installedpackages']['snort']['config'][0]['rm_blocked']);
+    write_config();
+	
 }
 
 function generate_snort_conf() {
@@ -241,15 +369,22 @@ $tcpdumplog_info_chk = $config['installedpackages']['snortadvanced']['config'][0
 if ($tcpdumplog_info_chk == on)
     $tcpdumplog_type = "output log_tcpdump: snorttcpd.log";
 
-/* define snortmysqllog */
-$snortmysqllog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortmysqllog'];
+/* define snortbarnyardlog_chk */
+$snortbarnyardlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog'];
+if ($snortbarnyardlog_info_chk == on)
+    $snortbarnyardlog_type = "barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D";
 
 /* define snortunifiedlog */
 $snortunifiedlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortunifiedlog'];
 if ($snortunifiedlog_info_chk == on)
     $snortunifiedlog_type = "output unified2: filename snort.u2, limit 128";
 
-/* define servers and ports snortdefservers */
+/* define spoink */
+$spoink_info_chk = $config['installedpackages']['snort']['config'][0]['blockoffenders7'];
+if ($spoink_info_chk == on)
+    $spoink_type = "output alert_pf: /var/db/whitelist,snort2c";
+
+	/* define servers and ports snortdefservers */
 
 /* def DNS_SERVSERS */
 $def_dns_servers_info_chk = $config['installedpackages']['snortdefservers']['config'][0]['def_dns_servers'];
@@ -508,6 +643,230 @@ else
 	else
 		$snort_performance = "ac-bnfa";
 
+	/* set the snort block hosts time IMPORTANT snort has trouble installing if snort_rm_blocked_info_ck != "" */
+	$snort_rm_blocked_info_ck = $config['installedpackages']['snort']['config'][0]['rm_blocked'];
+		if ($snort_rm_blocked_info_ck == "never_b")
+                $snort_rm_blocked_false = "";
+			else
+				$snort_rm_blocked_false = "true";
+
+if ($snort_rm_blocked_info_ck != "") {
+function snort_rm_blocked_install_cron($should_install) {
+        global $config, $g;
+
+        if ($g['booting']==true)
+                return;
+
+        $is_installed = false;
+
+        if(!$config['cron']['item'])
+                return;
+
+        $x=0;
+        foreach($config['cron']['item'] as $item) {
+                if (strstr($item['command'], "snort2c")) {
+                        $is_installed = true;
+                        break;
+                }
+                $x++;
+        }
+	$snort_rm_blocked_info_ck = $config['installedpackages']['snort']['config'][0]['rm_blocked'];
+		if ($snort_rm_blocked_info_ck == "1h_b") {
+                $snort_rm_blocked_min = "*/5";
+                $snort_rm_blocked_hr = "*";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "3600";
+		}
+		if ($snort_rm_blocked_info_ck == "3h_b") {
+                $snort_rm_blocked_min = "*/15";
+                $snort_rm_blocked_hr = "*";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "10800";
+		}
+		if ($snort_rm_blocked_info_ck == "6h_b") {
+                $snort_rm_blocked_min = "*/30";
+                $snort_rm_blocked_hr = "*";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "21600";
+		}
+		if ($snort_rm_blocked_info_ck == "12h_b") {
+                $snort_rm_blocked_min = "2";
+                $snort_rm_blocked_hr = "*/1";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "43200";
+		}
+		if ($snort_rm_blocked_info_ck == "1d_b") {
+                $snort_rm_blocked_min = "2";
+                $snort_rm_blocked_hr = "*/2";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "86400";
+		}
+		if ($snort_rm_blocked_info_ck == "4d_b") {
+                $snort_rm_blocked_min = "2";
+                $snort_rm_blocked_hr = "*/8";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "345600";
+		}
+		if ($snort_rm_blocked_info_ck == "7d_b") {
+                $snort_rm_blocked_min = "2";
+                $snort_rm_blocked_hr = "*/14";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "604800";
+		}
+		if ($snort_rm_blocked_info_ck == "28d_b") {
+                $snort_rm_blocked_min = "2";
+                $snort_rm_blocked_hr = "0";
+                $snort_rm_blocked_mday = "*/2";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "2419200";
+		}
+        switch($should_install) {
+                case true:
+                        if(!$is_installed) {		
+                                $cron_item = array();
+                                $cron_item['minute'] = "$snort_rm_blocked_min";
+                                $cron_item['hour'] = "$snort_rm_blocked_hr";
+                                $cron_item['mday'] = "$snort_rm_blocked_mday";
+                                $cron_item['month'] = "$snort_rm_blocked_month";
+                                $cron_item['wday'] = "$snort_rm_blocked_wday";
+                                $cron_item['who'] = "root";
+                                $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/sbin/expiretable -t $snort_rm_blocked_expire snort2c";
+                                $config['cron']['item'][] = $cron_item;
+                                write_config("Installed 15 minute filter reload for Time Based Rules");
+                                configure_cron();
+                        }
+                break;
+                case false:
+                        if($is_installed == true) {
+                                if($x > 0) {
+                                        unset($config['cron']['item'][$x]);
+                                        write_config();
+                                }
+                                configure_cron();
+                        }
+                break;
+		}
+	}
+	snort_rm_blocked_install_cron("");
+	snort_rm_blocked_install_cron($snort_rm_blocked_false);
+}
+
+	/* set the snort rules update time */
+	$snort_rules_up_info_ck = $config['installedpackages']['snort']['config'][0]['autorulesupdate7'];
+		if ($snort_rules_up_info_ck == "never_up")
+                $snort_rules_up_false = "";
+			else
+				$snort_rules_up_false = "true";
+
+if ($snort_rules_up_info_ck != "") {
+function snort_rules_up_install_cron($should_install) {
+        global $config, $g;
+
+        if ($g['booting']==true)
+                return;
+
+        $is_installed = false;
+
+        if(!$config['cron']['item'])
+                return;
+
+        $x=0;
+        foreach($config['cron']['item'] as $item) {
+                if (strstr($item['command'], "snort_check_for_rule_updates.php")) {
+                        $is_installed = true;
+                        break;
+                }
+                $x++;
+        }
+	$snort_rules_up_info_ck = $config['installedpackages']['snort']['config'][0]['autorulesupdate7'];
+		if ($snort_rules_up_info_ck == "6h_up") {
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "*/6";
+                $snort_rules_up_mday = "*";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
+		}
+		if ($snort_rules_up_info_ck == "12h_up") {
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "*/12";
+                $snort_rules_up_mday = "*";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
+		}
+		if ($snort_rules_up_info_ck == "1d_up") {
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "0";
+                $snort_rules_up_mday = "*/1";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
+		}
+		if ($snort_rules_up_info_ck == "4d_up") {
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "0";
+                $snort_rules_up_mday = "*/4";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
+		}
+		if ($snort_rules_up_info_ck == "7d_up") {
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "0";
+                $snort_rules_up_mday = "*/7";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
+		}
+		if ($snort_rules_up_info_ck == "28d_up") {
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "0";
+                $snort_rules_up_mday = "*/28";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
+		}
+        switch($should_install) {
+                case true:
+                        if(!$is_installed) {		
+                                $cron_item = array();
+                                $cron_item['minute'] = "$snort_rules_up_min";
+                                $cron_item['hour'] = "$snort_rules_up_hr";
+                                $cron_item['mday'] = "$snort_rules_up_mday";
+                                $cron_item['month'] = "$snort_rules_up_month";
+                                $cron_item['wday'] = "$snort_rules_up_wday";
+                                $cron_item['who'] = "root";
+                                $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort_check_for_rule_updates.php >> /usr/local/etc/snort_bkup/snort_update.log";
+                                $config['cron']['item'][] = $cron_item;
+                                write_config("Installed 15 minute filter reload for Time Based Rules");
+                                configure_cron();
+                        }
+                break;
+                case false:
+                        if($is_installed == true) {
+                                if($x > 0) {
+                                        unset($config['cron']['item'][$x]);
+                                        write_config();
+                                }
+                                configure_cron();
+                        }
+                break;
+		}
+	}
+	snort_rules_up_install_cron("");
+	snort_rules_up_install_cron($snort_rules_up_false);
+}
+
 	/* open snort2c's whitelist for writing */
 	$whitelist = fopen("/var/db/whitelist", "w");
 	if(!$whitelist) {
@@ -592,11 +951,11 @@ else
 	/* should we whitelist vpns? */
 	$whitelistvpns = $config['installedpackages']['snort']['config'][0]['whitelistvpns'];
 
-	/* grab a list of vpns and whitelist if user desires */
+	/* grab a list of vpns and whitelist if user desires added by nestorfish 954 */
 	if($whitelistvpns) {
 		$vpns_list = get_vpns_list();
 		$whitelist_vpns = split(" ", $vpns_list);
-		foreach($whitelist_split as $wl)
+		foreach($whitelist_vpns as $wl)
 			if(trim($wl))
 				fwrite($whitelist, trim($wl) . "\n");
 	}
@@ -772,14 +1131,15 @@ preprocessor frag3_engine: policy first
 preprocessor frag3_engine: policy bsd detect_anomalies
 
 preprocessor stream5_global: max_tcp 8192, track_tcp yes, \
-track_udp yes, track_icmp yes
+track_udp yes 
+# track_icmp yes
 preprocessor stream5_tcp: bind_to any, policy windows
 preprocessor stream5_tcp: bind_to any, policy linux
 preprocessor stream5_tcp: bind_to any, policy vista
 preprocessor stream5_tcp: bind_to any, policy macos
 preprocessor stream5_tcp: policy BSD, ports both all, use_static_footprint_sizes
 preprocessor stream5_udp
-preprocessor stream5_icmp
+# preprocessor stream5_icmp
 
 ##########################
                          #
@@ -799,7 +1159,7 @@ preprocessor perfmonitor: time 300 file /var/log/snort/snort.stats pktcnt 10000
 preprocessor http_inspect: global iis_unicode_map unicode.map 1252
 
 preprocessor http_inspect_server: server default \
-                        ports  { 80 8080 3128 }  \
+                        ports  { 80 8080 }  \
                         no_alerts \
                         non_strict \
                         non_rfc_char  { 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 }  \
@@ -964,6 +1324,7 @@ $alertsystemlog_type
 $tcpdumplog_type
 $snortmysqllog_info_chk
 $snortunifiedlog_type
+$spoink_type
 						
 #################
                 #

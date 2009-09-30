@@ -153,9 +153,15 @@
 			<description>Snort will log packets to a tcpdump-formatted file. The file then can be analyzed by a wireshark type of application. WARNING: File may become large.</description>
 			<type>checkbox</type>
 		</field>
+                <field>
+                        <fielddescr>Enable Barnyard2.</fielddescr>
+                        <fieldname>snortbarnyardlog</fieldname>
+                        <description>This will enable barnyard2 in the snort package. You will also have to set the database credentials.</description>
+                        <type>checkbox</type>
+                </field>
 		<field>
-			<fielddescr>Log to a mysql database.</fielddescr>
-			<fieldname>snortmysqllog</fieldname>
+			<fielddescr>Barnyard2 Log Mysql Database.</fielddescr>
+			<fieldname>snortbarnyardlog_database</fieldname>
 			<description>Example: output database: log, mysql, dbname=snort user=snort host=localhost password=xyz</description>
 			<type>input</type>
 			<size>101</size>
@@ -164,7 +170,7 @@
 		<field>
 			<fielddescr>Log Alerts to a snort unified file.</fielddescr>
 			<fieldname>snortunifiedlog</fieldname>
-			<description>Snort will log Alerts to a file in the UNIFIED format.</description>
+			<description>Snort will log Alerts to a file in the UNIFIED2 format. This is a requirement barnyard2.</description>
 			<type>checkbox</type>
 		</field>		
     </fields>

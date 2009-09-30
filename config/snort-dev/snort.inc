@@ -88,8 +88,6 @@ function sync_package_snort()
 	exec("/bin/cp /usr/local/etc/snort/threshold.conf-sample /usr/local/etc/snort/threshold.conf");
 	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
 	exec("/bin/rm -f /usr/local/etc/rc.d/snort");
-	exec("/bin/rm /tmp/snort_download_halt.pid");
-	exec("/bin/rm /tmp/snort.sh.pid");
 	
 	$first = 0;
 	$snortInterfaces = array(); /* -gtm  */
@@ -147,34 +145,32 @@ function sync_package_snort()
 	/* TODO; get snort to start under nologin shell */
 	foreach($snortInterfaces as $snortIf)
 	{
-		$start .= "sleep 8\n";
+		$start .= "sleep 4\n";
 		$start .= "snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -D -i {$snortIf} -q\n";
 		/* define snortbarnyardlog_chk */
         $snortbarnyardlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog'];
         if ($snortbarnyardlog_info_chk == on)
                 $start .= "\nsleep 4;barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D -q\n";	
 	}    
-    $check_if_snort_runs = "\nif [ \"`pgrep -x snort`\" != \"\" ] ; then\n\tlogger -p daemon.info -i -t SnortStartup \"Snort already running...\"\n/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php\n\texit 1\nfi\n\n";
+    $check_if_snort_runs = "\n\tif [ \"`ls -A /usr/local/etc/snort/rules`\" ] ; then\n\techo \"rules exist\"\n\telse\n\techo \"rules DONT exist\"\n\texit 2\n\tfi \n\n\tif [ \"`pgrep -x snort`\" = \"\" ] ; then\n\t/bin/rm /tmp/snort.sh.pid\n\tfi \n\n\tif [ \"`pgrep -x snort`\" != \"\" ] ; then\n\tlogger -p daemon.info -i -t SnortStartup \"Snort already running...\"\n\t/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php\n\texit 1\n\tfi\n\n";
     $if_snort_pid = "\nif ls /tmp/snort.sh.pid > /dev/null\nthen\n    echo \"snort.sh is running\"\n    exit 0\nelse\n    echo \"snort.sh is not running\"\nfi\n";        
     $echo_snort_sh_pid = "\necho \"snort.sh run\" > /tmp/snort.sh.pid\n";
     $echo_snort_sh_startup_log = "\necho \"snort.sh run\" >> /tmp/snort.sh_startup.log\n";
 	$del_old_pids = "\nrm -f /var/run/snort_*\n";
 	$sample_before = "BEFORE_MEM=`top | grep Wired | awk '{print \$12}'`\n";
-	$sample_after = "AFTER_MEM=`top | grep Wired | awk '{print \$12}'`\n";
+	$sample_after = "\n\tAFTER_MEM=`top | grep Wired | awk '{print \$12}'`\n";
 	if ($snort_performance == "ac-bnfa")
 		$sleep_before_final = "\necho \"Sleeping before final memory sampling...\"\nWAITSECURE=60\n";
 	else
 		$sleep_before_final = "\necho \"Sleeping before final memory sampling...\"\nWAITSECURE=300\n";
 	$sleep_before_final .= "while [ \"\$MYSNORTLOG\" = \"\" -a \$WAITSECURE -gt 0 ] ; do\n\tsleep 2\n\tMYSNORTLOG=`/usr/sbin/clog /var/log/system.log | grep snort | tail | grep 'Snort initialization completed successfully'`\n\tWAITSECURE=`expr \$WAITSECURE - 1`\ndone\n";
 	$total_used_after = "TOTAL_USAGE=`top | grep snort | grep -v grep | awk '{ print \$6 }'`\n";
-	$echo_usage = "\nif [ \$WAITSECURE -eq 0 -a \"\$MYSNORTLOG\" = \"\" ] ; then\n\techo \"Snort has not finished starting, please check log for possible errors.\"\n";
-	$echo_usage .= "else\n\t" . $sample_after . "\t" . $total_used_after . "\techo \"Ram free BEFORE starting Snort: \$BEFORE_MEM -- Ram free AFTER starting Snort: \$AFTER_MEM -- Mode " . $snort_performance . " -- Snort memory usage: \$TOTAL_USAGE\" | logger -p daemon.info -i -t SnortStartup\nfi\n";
-	$rm_snort_sh_pid = "\nrm /tmp/snort.sh.pid\n";
+	$echo_usage .= $sample_after . "\t" . $total_used_after . "\techo \"Ram free BEFORE starting Snort: \$BEFORE_MEM -- Ram free AFTER starting Snort: \$AFTER_MEM -- Mode " . $snort_performance . " -- Snort memory usage: \$TOTAL_USAGE\" | logger -p daemon.info -i -t SnortStartup\n\n";
 		
 	/* write out rc.d start/stop file */
 	write_rcfile(array(
 			"file" => "snort.sh",
-			"start" => "{$check_if_snort_runs}{$if_snort_pid}{$echo_snort_sh_pid}{$echo_snort_sh_startup_log}{$del_old_pids}{$sample_before}{$start}{$sleep_before_final}{$echo_usage}{$rm_snort_sh_pid}",
+			"start" => "{$check_if_snort_runs}{$if_snort_pid}{$echo_snort_sh_pid}{$echo_snort_sh_startup_log}{$del_old_pids}{$sample_before}{$start}{$sleep_before_final}{$echo_usage}",
 			"stop" => "/usr/bin/killall snort; killall barnyard2"
 		)
 	);

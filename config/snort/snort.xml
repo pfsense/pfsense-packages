@@ -46,8 +46,8 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
-	<version>2.8.4.1</version>
-	<title>Services: Snort 2.8.4.1 pkg v. 1.5</title>
+	<version>2.8.4.1_1</version>
+	<title>Services: Snort 2.8.4.1_2 pkg v. 1.6</title>
 	<include_file>/usr/local/pkg/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
@@ -59,6 +59,7 @@
 		<name>snort</name>
 		<rcfile>snort.sh</rcfile>
 		<executable>snort</executable>
+		<description>Snort is the most widely deployed IDS/IPS technology worldwide..</description>
 	</service>
 	<tabs>
 		<tab>
@@ -106,82 +107,87 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort.inc</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/bin/snort2c</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/bin/barnyard2</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/bin/oinkmaster_contrib/create-sidmap.pl</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/bin/oinkmaster_contrib/create-sidmap.pl</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/bin/mons2c</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/bin/oinkmaster_contrib/oinkmaster.pl</item>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_download_rules.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_download_rules.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_rules.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_rules.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_rules_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_rules_edit.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_rulesets.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_whitelist.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_rulesets.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_blocked.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_whitelist.xml</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_check_for_rule_updates.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_blocked.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_alerts.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/pf/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_dynamic_ip_reload.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_check_for_rule_updates.php</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/www/</prefix>
-		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_alerts.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_advanced.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_dynamic_ip_reload.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_define_servers.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_advanced.xml</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_threshold.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_define_servers.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_threshold.xml</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/pfsense_rules/local.rules</item>
 	</additional_files_needed>
 	<fields>
 		<field>
@@ -194,7 +200,7 @@
 			<multiple>true</multiple>
 		</field>
 		<field>
-			<fielddescr>Performance</fielddescr>
+			<fielddescr>Memory Performance</fielddescr>
 			<fieldname>performance</fieldname>
 			<description>Lowmem and ac-bnfa are recommended for low end systems, Ac: high memory, best performance, ac-std: moderate memory,high performance, acs: small memory, moderateperformance, ac-banded: small memory,moderate performance, ac-sparsebands: small memory, high performance.</description>
 			<type>select</type>
@@ -246,16 +252,92 @@
 		</field>
 		<field>
 			<fielddescr>Block offenders</fielddescr>
-			<fieldname>blockoffenders</fieldname>
+			<fieldname>blockoffenders7</fieldname>
 			<description>Checking this option will automatically block hosts that generate a snort alert.</description>
 			<type>checkbox</type>
 			<size>60</size>
 		</field>
 		<field>
+			<fielddescr>Remove blocked hosts every</fielddescr>
+			<fieldname>rm_blocked</fieldname>
+			<description>Please select the amount of time hosts are blocked</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>never</name>
+					<value>never_b</value>
+				</option>
+				<option>
+					<name>1 hour</name>
+					<value>1h_b</value>
+				</option>
+				<option>
+					<name>3 hours</name>
+					<value>3h_b</value>
+				</option>
+				<option>
+					<name>6 hours</name>
+					<value>6h_b</value>
+				</option>
+				<option>
+					<name>12 hours</name>
+					<value>12h_b</value>
+				</option>
+				<option>
+					<name>1 day</name>
+					<value>1d_b</value>
+				</option>
+				<option>
+					<name>4 days</name>
+					<value>4d_b</value>
+				</option>
+				<option>
+					<name>7 days</name>
+					<value>7d_b</value>
+				</option>
+				<option>
+					<name>28 days</name>
+					<value>28d_b</value>
+				</option>
+			</options>
+		</field>
+		<field>
+		</field>
+		<field>
 			<fielddescr>Update rules automatically</fielddescr>
-			<fieldname>automaticrulesupdate</fieldname>
-			<description>Checking this option will automatically check for and update rules once a week from snort.org.</description>
-			<type>checkbox</type>
+			<fieldname>autorulesupdate7</fieldname>
+			<description>Please select the update times for rules.</description>
+			<type>select</type>
+			<options>
+				<option>
+					<name>never</name>
+					<value>never_up</value>
+				</option>
+				<option>
+					<name>6 hours</name>
+					<value>6h_up</value>
+				</option>
+				<option>
+					<name>12 hours</name>
+					<value>12h_up</value>
+				</option>
+				<option>
+					<name>1 day</name>
+					<value>1d_up</value>
+				</option>
+				<option>
+					<name>4 days</name>
+					<value>4d_up</value>
+				</option>
+				<option>
+					<name>7 days</name>
+					<value>7d_up</value>
+				</option>
+				<option>
+					<name>28 days</name>
+					<value>28d_up</value>
+				</option>
+			</options>
 		</field>
 		<field>
 			<fielddescr>Whitelist VPNs automatically</fielddescr>
@@ -276,23 +358,17 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Sync Snort configuration to secondary cluster members</fielddescr>
-			<fieldname>syncxmlrpc</fieldname>
-			<description>Checking this option will automatically sync the snort configuration via XMLRPC to CARP cluster members.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
 			<fielddescr>Install emergingthreats rules.</fielddescr>
 			<fieldname>emergingthreats</fieldname>
 			<description>Emerging Threats is an open source community that produces fastest moving and diverse Snort Rules.</description>
 			<type>checkbox</type>
 		</field>
     </fields>
-	<custom_add_php_command>
-	</custom_add_php_command>
 	<custom_php_resync_config_command>
 		sync_package_snort();
 	</custom_php_resync_config_command>
+	<custom_add_php_command>
+	</custom_add_php_command>
     <custom_php_install_command>
 		sync_package_snort_reinstall();
     </custom_php_install_command>
