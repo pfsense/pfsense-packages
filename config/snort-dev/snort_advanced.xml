@@ -153,12 +153,12 @@
 			<description>Snort will log packets to a tcpdump-formatted file. The file then can be analyzed by a wireshark type of application. WARNING: File may become large.</description>
 			<type>checkbox</type>
 		</field>
-                <field>
-                        <fielddescr>Enable Barnyard2.</fielddescr>
-                        <fieldname>snortbarnyardlog</fieldname>
-                        <description>This will enable barnyard2 in the snort package. You will also have to set the database credentials.</description>
-                        <type>checkbox</type>
-                </field>
+        <field>
+            <fielddescr>Enable Barnyard2.</fielddescr>
+            <fieldname>snortbarnyardlog</fieldname>
+            <description>This will enable barnyard2 in the snort package. You will also have to set the database credentials.</description>
+            <type>checkbox</type>
+        </field>
 		<field>
 			<fielddescr>Barnyard2 Log Mysql Database.</fielddescr>
 			<fieldname>snortbarnyardlog_database</fieldname>
@@ -168,9 +168,25 @@
 			<value></value>
 		</field>
 		<field>
-			<fielddescr>Log Alerts to a snort unified file.</fielddescr>
+			<fielddescr>Barnyard2 Configure Hostname ID.</fielddescr>
+			<fieldname>snortbarnyardlog_hostname</fieldname>
+			<description>Example: pfsense.local</description>
+			<type>input</type>
+			<size>25</size>
+			<value></value>
+		</field>
+		<field>
+			<fielddescr>Barnyard2 Configure Interface ID</fielddescr>
+			<fieldname>snortbarnyardlog_interface</fieldname>
+			<description>Example: vr0</description>
+			<type>input</type>
+			<size>25</size>
+			<value></value>
+		</field>
+		<field>
+			<fielddescr>Log Alerts to a snort unified2 file.</fielddescr>
 			<fieldname>snortunifiedlog</fieldname>
-			<description>Snort will log Alerts to a file in the UNIFIED2 format. This is a requirement barnyard2.</description>
+			<description>Snort will log Alerts to a file in the UNIFIED2 format. This is a requirement for barnyard2.</description>
 			<type>checkbox</type>
 		</field>		
     </fields>

@@ -46,8 +46,8 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
-	<version>2.8.4.1_1</version>
-	<title>Services: Snort 2.8.4.1_2 pkg v. 1.6 RC5</title>
+	<version>2.8.4.1_2</version>
+	<title>Services: Snort 2.8.4.1_2 pkg v. 1.6</title>
 	<include_file>/usr/local/pkg/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
@@ -59,6 +59,7 @@
 		<name>snort</name>
 		<rcfile>snort.sh</rcfile>
 		<executable>snort</executable>
+		<description>Snort is the most widely deployed IDS/IPS technology worldwide..</description>
 	</service>
 	<tabs>
 		<tab>
@@ -194,6 +195,7 @@
 			<fieldname>iface_array</fieldname>
 			<description>Select the interface(s) Snort will listen on.</description>
 			<type>interfaces_selection</type>
+			<required/>
 			<size>3</size>
 			<value>lan</value>
 			<multiple>true</multiple>
@@ -233,6 +235,16 @@
 					<value>acs</value>
 				</option>
 			</options>
+			<required/>
+		</field>
+		<field>
+		</field>
+		<field>
+			<fielddescr>Install Snort.org rules.</fielddescr>
+			<fieldname>installsnortrules</fieldname>
+			<description>Free Snort.org rules that are maintained by Sourcefire. See the Pfsense Snort FAQ on how to get a subscription.</description>
+			<type>checkbox</type>
+			<required/>
 		</field>
 		<field>
 			<fielddescr>Oinkmaster code</fielddescr>
@@ -245,9 +257,25 @@
 		<field>
 			<fielddescr>Snort.org subscriber</fielddescr>
 			<fieldname>subscriber</fieldname>
-			<description>Check this box if you are a Snort.org subscriber (premium rules).</description>
+			<description>Check this box if you are a Snort.org subscriber (premium rules). &lt;b&gt;HIGHLY RECOMMENDED!&lt;/b&gt;</description>
 			<type>checkbox</type>
 			<size>60</size>
+		</field>
+		<field>
+		</field>
+		<field>
+			<fielddescr>Install emergingthreats rules.</fielddescr>
+			<fieldname>emergingthreats</fieldname>
+			<description>Emerging Threats is an open source community that produces fastest moving and diverse Snort Rules.</description>
+			<type>checkbox</type>
+			<required/>
+		</field>
+		<field>
+			<fielddescr>Install Pfsense rules.</fielddescr>
+			<fieldname>installpfsenserules</fieldname>
+			<description>Snort rules that Pfsense maintainers have requested for their packages.</description>
+			<type>checkbox</type>
+			<required/>
 		</field>
 		<field>
 			<fielddescr>Block offenders</fielddescr>
@@ -301,8 +329,6 @@
 			</options>
 		</field>
 		<field>
-		</field>
-		<field>
 			<fielddescr>Update rules automatically</fielddescr>
 			<fieldname>autorulesupdate7</fieldname>
 			<description>Please select the update times for rules.</description>
@@ -354,12 +380,6 @@
 			<fielddescr>Associate events on Blocked tab</fielddescr>
 			<fieldname>associatealertip</fieldname>
 			<description>Checking this option will automatically associate the blocked reason from the snort alerts file.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>Install emergingthreats rules.</fielddescr>
-			<fieldname>emergingthreats</fieldname>
-			<description>Emerging Threats is an open source community that produces fastest moving and diverse Snort Rules.</description>
 			<type>checkbox</type>
 		</field>
     </fields>
