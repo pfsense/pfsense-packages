@@ -72,15 +72,18 @@ function siproxd_generate_rules($type) {
 	case 'nat':
 		$rules .= "\n# Setup Sipproxd proxy redirect\n";
 		foreach ($ifaces as $iface) {
-			$rules .= "rdr on {$iface} proto udp from any to !($iface) port {$port} -> 127.0.0.1 port {$port}\n";
+			if($iface <> "")
+				$rules .= "rdr on {$iface} proto udp from any to !($iface) port {$port} -> 127.0.0.1 port {$port}\n";
 		}
 		break;
 	  case 'filter':
 	case 'rule':
 		foreach ($ifaces as $iface) {
-			$rules .= "# allow SIP signaling and RTP traffic\n";
-			$rules .= "pass in quick on {$iface} proto udp from any to any port = {$port}\n";
-			$rules .= "pass in quick on {$iface} proto udp from any to any port {$rtplower}:{$rtpupper}\n";
+			if($iface <> "") {
+				$rules .= "# allow SIP signaling and RTP traffic\n";
+				$rules .= "pass in quick on {$iface} proto udp from any to any port = {$port}\n";
+				$rules .= "pass in quick on {$iface} proto udp from any to any port {$rtplower}:{$rtpupper}\n";
+			}
 		}
 		break;
 	default:
