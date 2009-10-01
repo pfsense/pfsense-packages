@@ -196,7 +196,6 @@ function create_barnyard2_conf() {
         global $bconfig, $bg;
         /* write out barnyard2_conf */
         $barnyard2_conf_text = generate_barnyard2_conf();
-//        conf_mount_rw();
         $bconf = fopen("/usr/local/etc/barnyard2.conf", "w");
         if(!$bconf) {
                 log_error("Could not open /usr/local/etc/barnyard2.conf for writing.");
@@ -204,7 +203,6 @@ function create_barnyard2_conf() {
         }
         fwrite($bconf, $barnyard2_conf_text);
         fclose($bconf);
-//        conf_mount_ro();
 }
 /* open barnyard2.conf for writing" */
 function generate_barnyard2_conf() {
@@ -213,28 +211,56 @@ function generate_barnyard2_conf() {
         conf_mount_rw();
 
 /* define snortbarnyardlog */
+/* TODO add support for the other 5 output plugins */
+
 $snortbarnyardlog_database_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog_database'];
+$snortbarnyardlog_hostname_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog_hostname'];
+$snortbarnyardlog_interface_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog_interface'];
 
 $barnyard2_conf_text = <<<EOD
 
-        Copyright (C) 2006 Scott Ullrich
-        part of pfSense
-        All rights reserved.
+#	barnyard2.conf
+#   barnyard2 can be found at http://www.securixlive.com/barnyard2/index.php
+
+#	Copyright (C) 2006 Robert Zelaya
+#	part of pfSense
+#	All rights reserved.
+
+#	Redistribution and use in source and binary forms, with or without
+#	modification, are permitted provided that the following conditions are met:
+
+#	1. Redistributions of source code must retain the above copyright notice,
+#	   this list of conditions and the following disclaimer.
+
+#	2. Redistributions in binary form must reproduce the above copyright
+#	   notice, this list of conditions and the following disclaimer in the
+#	   documentation and/or other materials provided with the distribution.
+
+#	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+#	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+#	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+#	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+#	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+#	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+#	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+#	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#	POSSIBILITY OF SUCH DAMAGE.
 
 # set the appropriate paths to the file(s) your Snort process is using
 config reference-map:   /usr/local/etc/snort/reference.config
-config class-map:          /usr/local/etc/snort/classification.config
+config class-map:       /usr/local/etc/snort/classification.config
 config gen-msg-map:     /usr/local/etc/snort/gen-msg.map
-config sid-msg-map:         /usr/local/etc/snort/sid-msg.map
+config sid-msg-map:     /usr/local/etc/snort/sid-msg.map
 
-config hostname:       pfsense.local
-config interface:      vr0
+config hostname:       $snortbarnyardlog_hostname_info_chk
+config interface:      $snortbarnyardlog_interface_info_chk
 
 # Step 2: setup the input plugins
 input unified2
 
 # database: log to a variety of databases
-# output database: log, mysql, user=snort password=snort123 dbname=snort host=192.168.1.22
+# output database: log, mysql, user=xxxx password=xxxxxx dbname=xxxx host=xxx.xxx.xxx.xxxx
 
 $snortbarnyardlog_database_info_chk
 
@@ -1006,6 +1032,33 @@ function snort_rules_up_install_cron($should_install) {
 # package manager system
 # see /usr/local/pkg/snort.inc
 # for more information
+#	snort.conf
+#   Snort can be found at http://www.snort.org/
+
+#	Copyright (C) 2006 Robert Zelaya
+#	part of pfSense
+#	All rights reserved.
+
+#	Redistribution and use in source and binary forms, with or without
+#	modification, are permitted provided that the following conditions are met:
+
+#	1. Redistributions of source code must retain the above copyright notice,
+#	   this list of conditions and the following disclaimer.
+
+#	2. Redistributions in binary form must reproduce the above copyright
+#	   notice, this list of conditions and the following disclaimer in the
+#	   documentation and/or other materials provided with the distribution.
+
+#	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+#	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+#	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+#	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+#	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+#	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+#	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+#	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#	POSSIBILITY OF SUCH DAMAGE.
 
 #########################
                         #
