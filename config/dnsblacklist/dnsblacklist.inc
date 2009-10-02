@@ -103,7 +103,7 @@ function php_install_command()
 
 	//rename PHP files from .tmp to .php
 	exec("cp /tmp/dnsblacklist.tmp /usr/local/www/packages/dnsblacklist/dnsblacklist.php");
-	unlink_if_exists("/tmp/phpservice_php.tmp");
+	unlink_if_exists("/tmp/dnsblacklist.tmp");
 
 	//write_rcfile(array(
 	//	"file" => "phpservice.sh",
