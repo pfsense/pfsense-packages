@@ -51,16 +51,10 @@
 		<configfile>dnsblacklist.xml</configfile>
 		<url>/packages/dnsblacklist/dnsblacklist.php</url>
 	</menu>
-	<service>
-		<name>dnsblacklist</name>
-		<rcfile>dnsblacklist.sh</rcfile>
-		<executable>dnsblacklist</executable>
-		<description>DNS Blacklist service.</description>    
-	</service>
 	<tabs>
 		<tab>
 			<text>Settings</text>
-			<url>/pkg_edit.php?xml=dnsblacklist.xml&amp;id=0</url>
+			<url>/packages/dnsblacklist/dnsblacklist.php</url>
 			<active/>
 		</tab>
 	</tabs>
