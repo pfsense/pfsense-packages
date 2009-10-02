@@ -231,9 +231,9 @@
       <configurationfile>denyhosts.xml</configurationfile>
     </package>
     <package>
-      <name>DNSblacklist</name>
+      <name>DNS Blacklist</name>
       <website/>
-      <descr>DNSblacklist uses dnsmasq entries to block black listed domain names by category.</descr>
+      <descr>DNS Blacklist uses dnsmasq entries to block domain names by category.</descr>
       <category>Services</category>
       <pkginfolink></pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/dnsblacklist/dnsblacklist.xml</config_file>

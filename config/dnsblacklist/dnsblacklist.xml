@@ -45,7 +45,7 @@
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/dnsblacklist.inc</include_file>
 	<menu>
-		<name>DNSBlacklist</name>
+		<name>DNS Blacklist</name>
 		<tooltiptext>PHP Service settings.</tooltiptext>
 		<section>Services</section>
 		<configfile>dnsblacklist.xml</configfile>
