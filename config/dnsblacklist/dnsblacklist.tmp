@@ -55,6 +55,9 @@
 	//}
 
 if (count($_POST)>0) {
+
+	conf_mount_rw();
+
 	$dnsmasqfile = "/usr/local/etc/dnsmasq.conf";
 	$targetfile = "/usr/local/etc/dnsmasq.blacklist.conf";
 	$includestring = "conf-file=/usr/local/etc/dnsmasq.blacklist.conf";
@@ -104,7 +107,10 @@ if (count($_POST)>0) {
 				$fh2 = fopen($targetfile, 'a');
 				$fh = fopen($blackfile,'r');
 				while($line=fgets($fh)) {
-					fwrite($fh2, "address=/" .trim($line). "/74.125.45.100". "\n");
+					//remove all characters other than alpha numeric period and dash
+					preg_match("/([a-zA-Z0-9.-]*)/i", $line, $arraymatches);
+					$line = $arraymatches[1];
+					fwrite($fh2, "address=/" .$line. "/74.125.45.100". "\n");
 				}
 				fclose($fh);
 				fclose($fh2);
@@ -115,6 +121,7 @@ if (count($_POST)>0) {
 	services_dnsmasq_configure();
 	sleep(1);
 	$savemsg_dnsb = "DNS Blacklist settings have been saved. Restart dnsmasq service under 'Status' then 'Services' to make the settings active.";
+	conf_mount_ro();
 }
 ?>
 
