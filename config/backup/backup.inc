@@ -33,51 +33,42 @@
 
 
 function byte_convert( $bytes ) {
+	if ($bytes<=0)
+		return '0 Byte';
 
-    if ($bytes<=0)
-        return '0 Byte';
-
-    $convention=1000; //[1000->10^x|1024->2^x]
-    $s=array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB');
-    $e=floor(log($bytes,$convention));
-    return round($bytes/pow($convention,$e),2).' '.$s[$e];
+	$convention=1000; //[1000->10^x|1024->2^x]
+	$s=array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB');
+	$e=floor(log($bytes,$convention));
+	return round($bytes/pow($convention,$e),2).' '.$s[$e];
 }
 
  
 function backup_sync_package_php()
 {
 
-  global $config; 
-  if($config['installedpackages']['backup']['config'] != "") {
-
-    conf_mount_rw();
-    config_unlock();
-				      
+	global $config; 
+	if($config['installedpackages']['backup']['config'] != "") {
+		conf_mount_rw();
 		foreach($config['installedpackages']['backup']['config'] as $rowhelper) {
 			if ($rowhelper['enabled'] != "false") {
 				//$tmp_php = base64_decode($rowhelper['php']);
 				if (strlen($tmp_php) > 0) {
 					$tmp .= "// name: ".$rowhelper['name']." \n";
-					$tmp .= "// description: ".$rowhelper['description']." \n\n";				      
+					$tmp .= "// description: ".$rowhelper['description']." \n\n";
 					$tmp .= base64_decode($rowhelper['php']);
 					$tmp .= "\n";
 				}
 			}
-
 		}
-		          
 		conf_mount_ro();
-
-  }
+	}
 }
 
 
 function php_sync_package() 
 {
-  
 	global $config;   
 	backup_sync_package_php();
-
 }
 
 
@@ -86,47 +77,41 @@ function php_install_command()
 
 	global $config;
 	conf_mount_rw();
-	config_lock();
 
 	if (!is_dir('/usr/local/www/packages/')) {
 	   exec("mkdir /usr/local/www/packages/");
 	}
-	
+
 	if (!is_dir('/usr/local/www/packages/backup/')) {
 	   exec("mkdir /usr/local/www/packages/backup/");
 	}
-	
+
 	//create the backup directory
-	if (!is_dir('/root/backup/')) {		
+	if (!is_dir('/root/backup/')) {
 		exec("mkdir /root/backup/");
 	}
 
 	//rename PHP files from .tmp to .php
 	exec("cp /tmp/backup.tmp /usr/local/www/packages/backup/backup.php");
 	unlink_if_exists("/tmp/backup.tmp");
-	
+
 	exec("cp /tmp/backup_edit.tmp /usr/local/www/packages/backup/backup_edit.php");
 	unlink_if_exists("/tmp/backup_edit.tmp");
-		
+
 	php_sync_package();
 
 	conf_mount_ro();
-	config_unlock();
   
 }
 
 
 function deinstall_command() 
 {
-
 	conf_mount_rw();
-	config_lock();
 	unlink_if_exists("/usr/local/pkg/backup.xml");
 	unlink_if_exists("/usr/local/pkg/backup.inc");
 	exec("rm /usr/local/www/packages/backup/");
 	conf_mount_ro();
-	config_unlock();
-	
 }
 
 ?>
