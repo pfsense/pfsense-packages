@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
     edit_snortrule.php
-    Copyright (C) 2004, 2005 Scott Ullrich
+    Copyright (C) 2004, 2005 Scott Ullrich and Rober Zelaya
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,67 @@ require("guiconfig.inc");
 require("config.inc");
 
 if(!is_dir("/usr/local/etc/snort/rules"))
-	header("Location: snort_rules.php", false);
+	exec('mkdir /usr/local/etc/snort/rules/');
+
+/* Check if the rules dir is empy if so warn the user */
+/* TODO give the user the option to delete the installed rules rules */
+$isrulesfolderempty = exec('ls -A /usr/local/etc/snort/rules/*.rules');
+if ($isrulesfolderempty == "") {
+
+include("head.inc");
+include("fbegin.inc");
+
+echo "<body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\">";
+
+echo "<script src=\"/row_toggle.js\" type=\"text/javascript\"></script>\n
+<script src=\"/javascript/sorttable.js\" type=\"text/javascript\"></script>\n
+<table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
+   <tr>\n
+   		<td>\n";
+
+	$tab_array = array();
+	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
+	$tab_array[] = array(gettext("Update Rules"), false, "/snort_download_rules.php");
+	$tab_array[] = array(gettext("Categories"), false, "/snort_rulesets.php");
+	$tab_array[] = array(gettext("Rules"), true, "/snort_rules.php");
+	$tab_array[] = array(gettext("Servers"), false, "/pkg_edit.php?xml=snort_define_servers.xml&amp;id=0");
+	$tab_array[] = array(gettext("Blocked"), false, "/snort_blocked.php");
+	$tab_array[] = array(gettext("Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
+	$tab_array[] = array(gettext("Threshold"), false, "/pkg.php?xml=snort_threshold.xml");
+	$tab_array[] = array(gettext("Alerts"), false, "/snort_alerts.php");
+	$tab_array[] = array(gettext("Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
+	display_top_tabs($tab_array);
+
+echo  		"</td>\n
+  </tr>\n
+  <tr>\n
+    <td>\n
+		<div id=\"mainarea\">\n
+			<table id=\"maintable\" class=\"tabcont\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
+				<tr>\n
+					<td>\n
+# The rules directory is empty.\n
+		    		</td>\n
+		  		</tr>\n
+			</table>\n
+		</div>\n
+	</td>\n
+  </tr>\n
+</table>\n
+\n
+</form>\n
+\n
+<p>\n\n";
+
+echo "Please click on the Update Rules tab to install your selected rule sets.";
+include("fend.inc");
+
+echo "</body>";
+echo "</html>";
+
+exit(0);
+
+}
 
 function get_middle($source, $beginning, $ending, $init_pos) {
    $beginning_pos = strpos($source, $beginning, $init_pos);
