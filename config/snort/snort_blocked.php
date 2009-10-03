@@ -129,7 +129,38 @@ if(!$pgtitle_output)
 
 <p>
 
-This page lists hosts that have been blocked by Snort.   Hosts are automatically deleted every 60 minutes.
+<?php
+
+$blockedtab_msg_chk = $config['installedpackages']['snort']['config'][0]['rm_blocked'];
+	if ($blockedtab_msg_chk == "1h_b") {
+		$blocked_msg = "hour";
+	}
+	if ($blockedtab_msg_chk == "3h_b") {
+		$blocked_msg = "3 hours";
+	}
+	if ($blockedtab_msg_chk == "6h_b") {
+		$blocked_msg = "6 hours";
+	}
+	if ($blockedtab_msg_chk == "12h_b") {
+		$blocked_msg = "12 hours";
+	}
+	if ($blockedtab_msg_chk == "1d_b") {
+		$blocked_msg = "day";
+	}
+	if ($blockedtab_msg_chk == "4d_b") {
+		$blocked_msg = "4 days";
+	}
+	if ($blockedtab_msg_chk == "7d_b") {
+		$blocked_msg = "7 days";
+	}
+	if ($blockedtab_msg_chk == "28d_b") {
+		$blocked_msg = "28 days";
+	}
+
+echo "This page lists hosts that have been blocked by Snort. Hosts are automatically deleted every $blocked_msg.";
+
+?>
+
 <?php include("fend.inc"); ?>
 
 </body>
