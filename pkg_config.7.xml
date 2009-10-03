@@ -91,7 +91,8 @@
       <pkginfolink>http://doc.pfsense.org/index.php/Pubkey_package</pkginfolink>
       <config_file>http://www.pfsense.org/packages/config/pubkey.xml</config_file>
       <configurationfile>pubkey.xml</configurationfile>
-	<after_install_info>The pfSense release key has been updated.</after_install_info>
+	  <after_install_info>The pfSense release key has been updated.</after_install_info>
+	  <noembedded>true</noembedded>
     </package>
     <package>
       <name>Dashboard</name>
