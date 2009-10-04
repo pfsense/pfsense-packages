@@ -108,6 +108,7 @@
       <required_version>1.2.1</required_version>
       <maintainer>markjcrane@gmail.com</maintainer>
       <configurationfile>freeswitch.xml</configurationfile>
+	  <noembedded>true</noembedded>
     </package>
     <package>
       <name>Notes</name>
