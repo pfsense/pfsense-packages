@@ -50,6 +50,7 @@ function openbgpd_install_conf() {
       $openbgpd_neighbors = &$config['installedpackages']['openbgpdneighbors']['config'];
     
     $conffile = "# This file was created by the pfSense package manager.  Do not edit!\n\n";
+    $setkeycf = "";
     
     // Setup AS #
     if($openbgpd_conf['asnum']) 
@@ -83,10 +84,16 @@ function openbgpd_install_conf() {
             if($neighbor['groupname'] == $group['name']) {
               $conffile .= "		neighbor {$neighbor['neighbor']} {\n";
               $conffile .= "		descr \"{$neighbor['descr']}\"\n";
-              if($neighbor['md5sigpass']) 
+              if($neighbor['md5sigpass']) {
+		$setkeycf .= "delete {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000;\n";
+		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 \"{$neighbor['md5sigpass']}\";\n";
                 $conffile .= "		tcp md5sig password {$neighbor['md5sigpass']}\n";
-              if($neighbor['md5sigkey']) 
-                          $conffile .= "		tcp md5sig key {$neighbor['md5sigkey']}\n";						
+	      }
+              if($neighbor['md5sigkey']) {
+		$setkeycf .= "delete {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000;\n";
+		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 0x{$neighbor['md5sigkey']};\n";
+                $conffile .= "		tcp md5sig key {$neighbor['md5sigkey']}\n";
+	      }
               foreach($neighbor['row'] as $row) {
                 $conffile .= "		{$row['paramaters']} {$row['parmvalue']} \n";
               }		
@@ -103,11 +110,21 @@ function openbgpd_install_conf() {
       foreach($openbgpd_neighbors as $neighbor) {
         $used_this_item = false;
         if($neighbor['groupname'] == "") {
-          $conffile .= "	neighbor {$neighbor['neighbor']} {\n";
+          $conffile .= "neighbor {$neighbor['neighbor']} {\n";
           $conffile .= "		descr \"{$neighbor['descr']}\"\n";
+	  if  ($neighbor['md5sigpass']) {
+		$setkeycf .= "delete {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000;\n";
+		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 \"{$neighbor['md5sigpass']}\";\n";
+		$conffile .= "	tcp md5sig password {$neighbor['md5sigpass']}\n";
+	  }
+	  if ($neighbor['md5sigkey']) {
+		$setkeycf .= "delete {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000;\n";
+		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 0x{$neighbor['md5sigkey']};\n";
+		$conffile .= "	tcp md5sig key {$neighbor['md5sigkey']}\n";
+	  }
           $used_this_item = true;
           foreach($neighbor['row'] as $row) {
-            $conffile .= "		{$row['paramaters']} {$row['parmvalue']} \n";
+            $conffile .= "	{$row['paramaters']} {$row['parmvalue']} \n";
           }
         }
       }
@@ -144,6 +161,14 @@ function openbgpd_install_conf() {
 	exec("chmod a-rw /usr/local/etc/bgpd.conf");
 	exec("chmod u+rw /usr/local/etc/bgpd.conf");
 	
+	// TCP-MD5 support on freebsd. See tcp(5) for more
+	if ($neighbor['md5sigpass'] <> "" || $neighbor['md5sigkey'] <> "") {
+		$fd = fopen("{$g['tmp_path']}/bgpdsetkey.conf", "w");
+		fwrite($fd, $setkeycf );
+		fclose($fd);
+		exec("setkey -f {$g['tmp_path']}/bgpdsetkey.conf");
+	}
+
 	// bgpd process running?  if so reload, elsewise start.
 	if(is_openbgpd_running() == true) {
 		exec("bgpctl reload");
