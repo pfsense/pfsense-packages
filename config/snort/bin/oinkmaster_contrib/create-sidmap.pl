@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/local/bin/perl -w
 
 # $Id: create-sidmap.pl,v 1.21 2005/12/31 13:42:46 andreas_o Exp $ #
 
