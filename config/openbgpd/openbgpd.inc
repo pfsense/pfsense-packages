@@ -234,7 +234,7 @@ EOF;
 }
 
 function is_openbgpd_running() {
-	$status = `ps awux | grep bgpd | grep "parent" | wc -l | awk '{ print \$1 }'`;
+	$status = `ps awux | grep bgpd | grep "parent" | grep -v grep | wc -l | awk '{ print \$1 }'`;
 	if(intval($status) > 0) 
 		return true;
 	else 
