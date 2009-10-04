@@ -80,12 +80,10 @@ function sync_package_snort()
 	exec("/bin/mkdir -p /usr/local/etc/snort/rules");
 	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
 	exec("/bin/cp /usr/local/etc/snort/classification.config-sample /usr/local/etc/snort/classification.config");
-	exec("/bin/cp /usr/local/etc/snort/gen-msg.map-sample /usr/local/etc/snort/gen-msg.map");
 	exec("/bin/cp /usr/local/etc/snort/generators-sample /usr/local/etc/snort/generators");
 	exec("/bin/cp /usr/local/etc/snort/reference.config-sample /usr/local/etc/snort/reference.config");
 	exec("/bin/cp /usr/local/etc/snort/sid-msg.map-sample /usr/local/etc/snort/sid-msg.map");
 	exec("/bin/cp /usr/local/etc/snort/sid-sample /usr/local/etc/snort/sid");
-	exec("/bin/cp /usr/local/etc/snort/threshold.conf-sample /usr/local/etc/snort/threshold.conf");
 	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
 	exec("/bin/rm -f /usr/local/etc/rc.d/snort");
 	

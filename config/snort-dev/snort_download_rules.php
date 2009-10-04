@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
 	snort_rulesets.php
-	Copyright (C) 2006 Scott Ullrich
+	Copyright (C) 2006 Scott Ullrich and Robert Zelaya
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -697,8 +697,8 @@ if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_c
 	exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}");
 	exec("/bin/cp {$snortdir}/sid {$snortdir_wan}");
 	exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}");
-	exec("/bin/cp {$snortdir}/snort.conf {$snortdir_wan}");
-	exec("/bin/cp {$snortdir}/threshold.conf {$snortdir_wan}");
+//	exec("/bin/cp {$snortdir}/snort.conf {$snortdir_wan}");
+//	exec("/bin/cp {$snortdir}/threshold.conf {$snortdir_wan}");
 	exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}");
 
 } else {
@@ -706,7 +706,7 @@ if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_c
 		update_output_window(gettext("May take a while..."));
 
 		exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}");
-//		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}");
+		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/generators {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/sid {$snortdir_wan}");
