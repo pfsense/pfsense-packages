@@ -697,8 +697,8 @@ if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_c
 	exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}");
 	exec("/bin/cp {$snortdir}/sid {$snortdir_wan}");
 	exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}");
-	exec("/bin/cp {$snortdir}/snort.conf {$snortdir_wan}");
-	exec("/bin/cp {$snortdir}/threshold.conf {$snortdir_wan}");
+//	exec("/bin/cp {$snortdir}/snort.conf {$snortdir_wan}");
+//	exec("/bin/cp {$snortdir}/threshold.conf {$snortdir_wan}");
 	exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}");
 
 } else {
