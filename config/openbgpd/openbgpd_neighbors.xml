@@ -173,7 +173,7 @@
 			}	
 			$newoptions['option'][$counter]['name'] = "";
 			$newoptions['option'][$counter]['value'] = "";		
-			$pkg['fields']['field'][2]['options'] = $newoptions; 
+			$pkg['fields']['field'][4]['options'] = $newoptions;
 			$counter = 0;
 			foreach($pkg['fields']['field'] as $field) {
 				if($field['name'] == "group") {
@@ -185,7 +185,7 @@
 		} else {
 			$newoptions['option'][0]['name'] = "";
 			$newoptions['option'][0]['value'] = "";
-			$pkg['fields']['field'][2]['options'] =$newoptions;
+			$pkg['fields']['field'][4]['options'] =$newoptions;
 		}
 	</custom_php_command_before_form>
 	<custom_php_deinstall_command>
