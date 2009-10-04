@@ -580,15 +580,15 @@ echo "May take a while...\n";
 	exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}");
 	exec("/bin/cp {$snortdir}/sid {$snortdir_wan}");
 	exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}");
-	exec("/bin/cp {$snortdir}/snort.conf {$snortdir_wan}");
-	exec("/bin/cp {$snortdir}/threshold.conf {$snortdir_wan}");
+//	exec("/bin/cp {$snortdir}/snort.conf {$snortdir_wan}");
+//	exec("/bin/cp {$snortdir}/threshold.conf {$snortdir_wan}");
 	exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}");
 
 } else {
 		echo "Your enable and disable changes are being applied to your fresh set of rules...\n";
 		echo "May take a while...\n";
 		exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}");
-//		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}");
+		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/generators {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/sid {$snortdir_wan}");
