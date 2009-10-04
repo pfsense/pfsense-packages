@@ -78,13 +78,15 @@ function sync_package_snort()
 	exec("/bin/mkdir -p /usr/local/etc/snort");
 	exec("/bin/mkdir -p /var/log/snort");
 	exec("/bin/mkdir -p /usr/local/etc/snort/rules");
-	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
-	exec("/bin/cp /usr/local/etc/snort/classification.config-sample /usr/local/etc/snort/classification.config");
-	exec("/bin/cp /usr/local/etc/snort/generators-sample /usr/local/etc/snort/generators");
-	exec("/bin/cp /usr/local/etc/snort/reference.config-sample /usr/local/etc/snort/reference.config");
-	exec("/bin/cp /usr/local/etc/snort/sid-msg.map-sample /usr/local/etc/snort/sid-msg.map");
-	exec("/bin/cp /usr/local/etc/snort/sid-sample /usr/local/etc/snort/sid");
-	exec("/bin/cp /usr/local/etc/snort/unicode.map-sample /usr/local/etc/snort/unicode.map");
+	exec("/bin/rm /usr/local/etc/snort/snort.conf-sample");
+	exec("/bin/rm /usr/local/etc/snort/threshold.conf-sample");
+	exec("/bin/rm /usr/local/etc/snort/sid-msg.map-sample");
+	exec("/bin/rm /usr/local/etc/snort/unicode.map-sample");
+	exec("/bin/rm /usr/local/etc/snort/classification.config-sample");
+	exec("/bin/rm /usr/local/etc/snort/generators-sample");
+	exec("/bin/rm /usr/local/etc/snort/reference.config-sample");
+	exec("/bin/rm /usr/local/etc/snort/gen-msg.map-sample");
+	exec("/bin/rm /usr/local/etc/snort/sid");
 	exec("/bin/rm -f /usr/local/etc/rc.d/snort");
 	
 	$first = 0;

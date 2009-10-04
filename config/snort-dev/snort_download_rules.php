@@ -680,7 +680,7 @@ if (file_exists("/usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so
 /* create a msg-map for snort  */
 update_status(gettext("Updating Alert Messages..."));
 update_output_window(gettext("Please Wait..."));
-exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl /usr/local/etc/snort_bkup/rules > /usr/local/etc/snort_bkup/gen-msg.map");
+exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl /usr/local/etc/snort_bkup/rules > /usr/local/etc/snort_bkup/sid-msg.map");
 
 /*  Run oinkmaster to snort_wan and cp configs */
 /*  If oinkmaster is not needed cp rules normally */
@@ -697,22 +697,18 @@ if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_c
 	exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}");
 	exec("/bin/cp {$snortdir}/sid {$snortdir_wan}");
 	exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}");
-//	exec("/bin/cp {$snortdir}/snort.conf {$snortdir_wan}");
-//	exec("/bin/cp {$snortdir}/threshold.conf {$snortdir_wan}");
 	exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}");
 
 } else {
 		update_status(gettext("Your enable and disable changes are being applied to your fresh set of rules..."));
 		update_output_window(gettext("May take a while..."));
-
+		exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/rules/");
 		exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/generators {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/sid {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}");
-//		exec("/bin/cp {$snortdir}/snort.conf {$snortdir_wan}");
-//		exec("/bin/cp {$snortdir}/threshold.conf {$snortdir_wan}");
 		exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}");
 
 		/*  oinkmaster.pl will convert saved changes for the new updates then we have to change #alert to # alert for the gui */
