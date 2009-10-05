@@ -69,7 +69,6 @@ function phpservice_sync_package_php()
 function php_sync_package() 
 {
 	global $config;
-	phpservice_sync_package_php();
 }
 
 
@@ -119,17 +118,15 @@ function php_install_command()
 }
 
 
-function deinstall_command() 
+function php_deinstall_command() 
 {
 	conf_mount_rw();
-	config_lock();
 	$handle = popen("/usr/local/etc/rc.d/dnsblacklist.sh stop", "r");
 	unlink_if_exists("/usr/local/pkg/dnsblacklist.xml");
 	unlink_if_exists("/usr/local/pkg/dnsblacklist.inc");
-	//unlink_if_exists("/usr/local/etc/rc.d/dnsblacklist.sh");
+	exec("rm -R /usr/local/www/packages/dnsblacklist/blacklists");
 	exec("rm -R /usr/local/www/packages/dnsblacklist");
 	conf_mount_ro();
-	config_unlock();
 }
 
 ?>

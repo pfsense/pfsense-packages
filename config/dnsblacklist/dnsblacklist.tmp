@@ -143,7 +143,7 @@ else {
 <?php if ($savemsg_dnsb) print_info_box($savemsg_dnsb); ?>
 
 Below is a scroll-box filled with categories you can select to be added to your blacklist. <br><br> Each category has a list of known domains/sites that will be denied access by users of this network.
-<br><br><i>(Note: Using all categories at once will require 300Mb of free memory.  The <b>adult</b> category is rather memory intensive, requiring 200Mb together.)</i>
+<br><br><i>(Note: Using all categories at once will require 300Mb of free memory.  The <b>adult</b> category is rather memory intensive, requiring 200Mb.)</i>
 <br><br><br>
 
 

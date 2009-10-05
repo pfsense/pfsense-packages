@@ -7,7 +7,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-	phpservice.xml
+	dnsblacklist.xml
 	Copyright (C) 2009 Mark J Crane
 	All rights reserved.
                                                                               */
@@ -41,12 +41,12 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>DNS Blacklist Settings</name>
-	<version>0.2</version>
+	<version>0.2.2</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/dnsblacklist.inc</include_file>
 	<menu>
 		<name>DNS Blacklist</name>
-		<tooltiptext>PHP Service settings.</tooltiptext>
+		<tooltiptext>DNS Blacklist settings.</tooltiptext>
 		<section>Services</section>
 		<configfile>dnsblacklist.xml</configfile>
 		<url>/packages/dnsblacklist/dnsblacklist.php</url>
@@ -105,6 +105,6 @@
 		php_install_command();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		deinstall_command();
+		php_deinstall_command();
 	</custom_php_deinstall_command>
 </packagegui>
