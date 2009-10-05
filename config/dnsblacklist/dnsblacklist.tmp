@@ -26,7 +26,6 @@
 			$desc_en = trim($line_array[1]);
 			$category[$name]['desc_en'] = $desc_en;
 		}
-
 	}
 
 	//get line count for domains list
@@ -120,7 +119,7 @@ if (count($_POST)>0) {
 	write_config();
 	services_dnsmasq_configure();
 	sleep(1);
-	$savemsg_dnsb = "DNS Blacklist settings have been saved. Restart dnsmasq service under 'Status' then 'Services' to make the settings active.";
+	$savemsg_dnsb = "DNS Blacklist settings have been saved. ";
 	conf_mount_ro();
 }
 ?>
@@ -144,7 +143,7 @@ else {
 <?php if ($savemsg_dnsb) print_info_box($savemsg_dnsb); ?>
 
 Below is a scroll-box filled with categories you can select to be added to your blacklist. <br><br> Each category has a list of known domains/sites that will be denied access by users of this network.
-<br><br><i>(Note: Using all categories at once will require 300Mb of free memory.  The <b>adult</b> and <b>porn</b> categories are rather memory intensive, requiring 200Mb together.)</i>
+<br><br><i>(Note: Using all categories at once will require 300Mb of free memory.  The <b>adult</b> category is rather memory intensive, requiring 200Mb together.)</i>
 <br><br><br>
 
 

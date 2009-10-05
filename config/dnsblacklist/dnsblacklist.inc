@@ -59,16 +59,10 @@ function byte_convert( $bytes ) {
  
 function phpservice_sync_package_php()
 {
-
 	global $config; 
-
 	conf_mount_rw();
 	config_unlock();
-
-
 	conf_mount_ro();
-
-
 }
 
 
@@ -122,7 +116,6 @@ function php_install_command()
 
 	conf_mount_ro();
 	config_unlock();
-  
 }
 
 
@@ -130,12 +123,11 @@ function deinstall_command()
 {
 	conf_mount_rw();
 	config_lock();
-	exec("rm -R /usr/local/www/packages/dnsblacklist/");
-
 	$handle = popen("/usr/local/etc/rc.d/dnsblacklist.sh stop", "r");
 	unlink_if_exists("/usr/local/pkg/dnsblacklist.xml");
 	unlink_if_exists("/usr/local/pkg/dnsblacklist.inc");
-	unlink_if_exists("/usr/local/etc/rc.d/dnsblacklist.sh");
+	//unlink_if_exists("/usr/local/etc/rc.d/dnsblacklist.sh");
+	exec("rm -R /usr/local/www/packages/dnsblacklist");
 	conf_mount_ro();
 	config_unlock();
 }
