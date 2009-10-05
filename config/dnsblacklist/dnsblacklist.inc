@@ -57,13 +57,6 @@ function byte_convert( $bytes ) {
 }
 
  
-function phpservice_sync_package_php()
-{
-	global $config; 
-	conf_mount_rw();
-	config_unlock();
-	conf_mount_ro();
-}
 
 
 function php_sync_package() 
@@ -118,7 +111,7 @@ function php_install_command()
 }
 
 
-function php_deinstall_command() 
+function deinstall_command() 
 {
 	conf_mount_rw();
 	$handle = popen("/usr/local/etc/rc.d/dnsblacklist.sh stop", "r");
