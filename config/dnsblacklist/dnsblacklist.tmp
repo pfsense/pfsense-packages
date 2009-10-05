@@ -61,10 +61,21 @@ if (count($_POST)>0) {
 	$targetfile = "/usr/local/etc/dnsmasq.blacklist.conf";
 	$includestring = "conf-file=/usr/local/etc/dnsmasq.blacklist.conf";
 	$dnsmasqconf = "/usr/local/etc/dnsmasq.conf";
+
 	//clear previous values
+	$ent = array();
 	foreach($category as $key => $value) {
-		$config['installedpackages']['dnsblacklist']['config'][0][$key] = '';
+		$ent[$key] = '0';
 	}
+	$config['installedpackages']['dnsblacklist']['config'][0] = $ent;
+	//write_config();
+
+	//truncate the dnsmasq.blacklist.conf file
+	if (file_exists($targetfile)) {
+		$fh = fopen($targetfile, 'w');
+		fclose($fh);
+	}
+
 	if ($_POST['enable'] == 1) {
 		//echo "enabled";
 		$config['installedpackages']['dnsblacklist_settings']['config'][0]['enable'] = 1;
@@ -73,6 +84,7 @@ if (count($_POST)>0) {
 		//echo "disabled";
 		$config['installedpackages']['dnsblacklist_settings']['config'][0]['enable'] = 0;
 	}
+
 	//add the include entry for dnsmasq.blacklist.conf to dnsmasq.conf
 	if (file_exists($dnsmasqfile)) {
 		$getdnsmasq = file_get_contents($dnsmasqfile);
@@ -90,11 +102,7 @@ if (count($_POST)>0) {
 		fwrite($my2fhandle, $includestring);
 		fclose($my2fhandle);
 	}
-	//truncate the dnsmasq.blacklist.conf file
-	if (file_exists($targetfile)) {
-		$fh = fopen($targetfile, 'w');
-		fclose($fh);
-	}
+
 	//build the dnsmasq.blacklist.conf
 	if (count($_POST["blacklist"]) > 0) {
 		foreach($_POST["blacklist"] as $value) {
@@ -116,6 +124,7 @@ if (count($_POST)>0) {
 			}
 		}
 	}
+
 	write_config();
 	services_dnsmasq_configure();
 	sleep(1);
@@ -192,7 +201,10 @@ Select a category to edit:
 <br />
 <br />
 -->
-
+<?php
+	//This input guarantees that a POST is sent even if no category is selected.
+	echo "<input type='hidden' name='zzz' value='required'>";
+?>
 <input type="submit" value="Save">
 </td>
 </tr>
