@@ -3,7 +3,7 @@
 /* $Id$ */
 /*
 	snort_dynamic_ip_reload.php
-	Copyright (C) 2006 Scott Ullrich
+	Copyright (C) 2006 Scott Ullrich and Robert Zeleya
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 */
 
 /* NOTE: this file gets included from the pfSense filter.inc plugin process */
+/* NOTE: file location /usr/local/pkg/pf, all files in pf dir get exec on filter reloads */
 
 require_once("/usr/local/pkg/snort.inc");
 require_once("service-utils.inc");
@@ -38,12 +39,11 @@ require_once("config.inc");
 if($config['interfaces']['wan']['ipaddr'] == "pppoe" or
    $config['interfaces']['wan']['ipaddr'] == "dhcp") {
 		create_snort_conf();
-		mwexec("/sbin/pfctl -t snort2c -T flush");
 		exec("killall -HUP snort");
 		/* define snortbarnyardlog_chk */
         $snortbarnyardlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog'];
         if ($snortbarnyardlog_info_chk == on)
-                exec("/usr/bin/killall barnyard2; /usr/local/bin/barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D -q\n");
+                exec("killall -HUP barnyard2");
 }
 
 ?>

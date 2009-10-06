@@ -46,8 +46,8 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>Snort</name>
-	<version>2.8.4.1_3</version>
-	<title>Services: Snort 2.8.4.1_3 pkg v. 1.6</title>
+	<version>2.8.4.1_5</version>
+	<title>Services: Snort 2.8.4.1_5 pkg v. 1.6</title>
 	<include_file>/usr/local/pkg/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>

@@ -1184,15 +1184,14 @@ preprocessor frag3_engine: policy first
 preprocessor frag3_engine: policy bsd detect_anomalies
 
 preprocessor stream5_global: max_tcp 8192, track_tcp yes, \
-track_udp yes 
-# track_icmp yes
+track_udp yes, track_icmp yes
 preprocessor stream5_tcp: bind_to any, policy windows
 preprocessor stream5_tcp: bind_to any, policy linux
 preprocessor stream5_tcp: bind_to any, policy vista
 preprocessor stream5_tcp: bind_to any, policy macos
 preprocessor stream5_tcp: policy BSD, ports both all, use_static_footprint_sizes
 preprocessor stream5_udp
-# preprocessor stream5_icmp
+preprocessor stream5_icmp
 
 ##########################
                          #
