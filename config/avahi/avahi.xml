@@ -1,7 +1,8 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<copyright>
 		<![CDATA[
-			/* 
+			/*
 				$Id$
 				avahi.xml
 				part of pfSense (http://www.pfSense.com)
@@ -31,9 +32,11 @@
 			*/
 		]]>
 	</copyright>
+	<title>Services: Avahi</title>
 	<name>avahi</name>
 	<version>1.0</version>
-	<title>Services: Avahi</title>
+	<savetext>Save</savetext>
+	<include_file>/usr/local/pkg/avahi.inc</include_file>
 	<menu>
 		<name>Avahi</name>
 		<tooltiptext>Modify avahi settings.</tooltiptext>
@@ -42,29 +45,9 @@
 	</menu>
 	<service>
 		<name>avahi</name>
-		<rcfile>avahi.sh</rcfile>
-		<executable>avahi</executable>
+		<rcfile>avahi-daemon.sh</rcfile>
+		<executable>avahi-daemon</executable>
 	</service>
-	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/avahi/binaries/avahi.tgz</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/avahi/avahi.inc</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/etc/avahi/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/avahi/services/ssh.service</item>
-	</additional_files_needed>	
-	<additional_files_needed>
-		<prefix>/usr/local/etc/avahi/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/avahi/services/sftp-ssh.service</item>
-	</additional_files_needed>	
 	<fields>
 		<field>
 			<fielddescr>Enable</fielddescr>
@@ -86,14 +69,34 @@
 			<multiple>true</multiple>
 		</field>
 	</fields>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/avahi/binaries/avahi.tgz</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/avahi/avahi.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/etc/avahi/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/avahi/services/ssh.service</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/etc/avahi/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/avahi/services/sftp-ssh.service</item>
+	</additional_files_needed>
+	<custom_php_resync_config_command>
+		avahi_sync();
+	</custom_php_resync_config_command>
 	<custom_php_install_command>
-		exec("mkdir -p /usr/local/etc/avahi/services/");
-		exec("mv /usr/local/etc/avahi/*.service /usr/local/etc/avahi/services/");
-		setup_avahi();
+		avahi_install();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		unlink_if_exists("/usr/local/etc/rc.d/avahi-daemon.sh");
 		exec("killall avahi-daemon");
 	</custom_php_deinstall_command>
-	<include_file>/usr/local/pkg/avahi.inc</include_file>
 </packagegui>

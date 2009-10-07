@@ -4,7 +4,7 @@
 	$Id$
 	avahi.inc
 	part of pfSense (http://www.pfSense.com)
-	Copyright (C) 2009 Scott Ullrich
+	Copyright (C) 2009 Scott Ullrich, Jim Pingle
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -29,24 +29,24 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-function start_avahi() {
-	 mwexec_bg("sh /usr/local/etc/rc.d/avahi-daemon.sh start");
+function avahi_start() {
+	 mwexec_bg("/usr/local/etc/rc.d/avahi-daemon.sh start");
 }
 
-function stop_avahi() {
-	 mwexec_bg("sh /usr/local/etc/rc.d/avahi-daemon.sh stop");
+function avahi_stop() {
+	 mwexec_bg("/usr/local/etc/rc.d/avahi-daemon.sh stop");
 }
 
-function setup_avahi() {
+function avahi_install() {
 	global $g, $config;
-
-	// Make image RW
 	conf_mount_rw();
+	exec("mkdir -p /usr/local/etc/avahi/services/");
+	exec("mv /usr/local/etc/avahi/*.service /usr/local/etc/avahi/services/");
 
 	// Extract out libraries and avahi-daemon
-	if(file_exists("/tmp/avahi.tgz")) {
-		exec("/usr/bin/tar xzPf /tmp/avahi.tgz -C /");
-		unlink("/tmp/avahi.tgz");
+	if(file_exists("/root/avahi.tgz")) {
+		exec("/usr/bin/tar xzPUf /root/avahi.tgz -C /");
+		unlink("/root/avahi.tgz");
 	}
 
 	// Make sure everthing was extracted
@@ -55,22 +55,25 @@ function setup_avahi() {
 		return;
 	}
 
+	// Add needed users and groups
+	exec("/usr/sbin/pw useradd  avahi");
+	exec("/usr/sbin/pw groupadd avahi");
+
+	// Make image RO
+	conf_mount_ro();
+}
+
+function avahi_write_config() {
+	global $g, $config;
+	// Make image RW
+	conf_mount_rw();
+
 	// Pull some various values out of config.xml
 	$hostname = $config['system']['hostname'];
 	$domain = $config['system']['domain'];
 	$enable = $config['installedpackages']['avahi']['config'][0]['enable'];
 	$browsedomains = $config['installedpackages']['avahi']['config'][0]['browsedomains'];
 	$denyif = $config['installedpackages']['avahi']['config'][0]['denyinterfaces'];
-
-	// Is package disabled?
-	if ((!$enable) && file_exists("/usr/local/etc/rc.d/avahi-daemon.sh")) {
-		stop_avahi();
-		return;
-	}
-
-	// Add needed users and groups
-	exec("/usr/sbin/pw useradd  avahi");
-	exec("/usr/sbin/pw groupadd avahi");
 
 	// No supplied domains?  Use the defaults.
 	if(!$browsedomains)
@@ -162,7 +165,21 @@ EOF;
 	);
 	// Make image RO
 	conf_mount_ro();
-	start_avahi();
+
+}
+
+function avahi_sync() {
+	global $g, $config;
+
+	avahi_stop();
+
+	avahi_write_config();
+
+	// Is package enabled?
+	if (isset($config['installedpackages']['avahi']['config'][0]['enable'])
+	    && file_exists("/usr/local/etc/rc.d/avahi-daemon.sh")) {
+		avahi_start();
+	}
 }
 
 ?>
