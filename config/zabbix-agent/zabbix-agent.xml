@@ -126,6 +126,7 @@
 	<custom_add_php_command></custom_add_php_command>
 	<custom_php_resync_config_command>
     <![CDATA[
+		conf_mount_rw();
 		global $config;
 		global $g;
 
@@ -147,6 +148,7 @@
         $conf .= "Timeout=3\n";
 
         file_put_contents("/usr/local/etc/zabbix/zabbix_agentd.conf", $conf);
+        conf_mount_ro();
 
     ]]>
 	</custom_php_resync_config_command>
