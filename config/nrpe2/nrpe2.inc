@@ -126,6 +126,7 @@ run_rc_command "$1"
 EOD;
 	fwrite($fd, $rc_file);
 	fclose($fd);
+	chmod('/usr/local/etc/rc.d/nrpe2.sh', 0755);
 
 	conf_mount_ro();
 }
