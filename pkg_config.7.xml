@@ -32,7 +32,6 @@
 		<config_file>http://www.pfsense.com/packages/config/frickin/frickin.xml</config_file>
 		<configurationfile>frickin.xml</configurationfile>
 		<after_install_info>Please visit the Frickin PPTP settings tab and press save after setting the service up to start.</after_install_info>
-		<noembedded>true</noembedded>
 	</package>
     <package>
       <name>pure-ftpd</name>
@@ -64,7 +63,6 @@
       <config_file>http://www.pfsense.com/packages/config/avahi/avahi.xml</config_file>
       <configurationfile>avahi.xml</configurationfile>
 	  <after_install_info>Please visit the Avahi settings tab and select which interfaces you do not wish Avahi to listen on and click save to start the service.</after_install_info>
-	  <noembedded>true</noembedded>
     </package>
     <package>
       <name>ntop</name>
