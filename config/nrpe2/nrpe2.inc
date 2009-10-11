@@ -141,6 +141,7 @@ function nrpe2_custom_php_deinstall_command()
 function nrpe2_custom_php_write_config()
 {
 	global $g, $config;
+	conf_mount_rw();
 	
 	foreach ($config['installedpackages']['nrpe2']['config'][0]['row'] as $cmd)
 	{
@@ -169,6 +170,7 @@ connection_timeout=300
 EOD;
 	fwrite($fd, $nrpe_cfg);
 	fclose($fd);
+	conf_mount_ro();
 }
 
 function nrpe2_custom_php_service()
