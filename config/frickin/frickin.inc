@@ -34,9 +34,9 @@ if(!function_exists("filter_configure"))
 
 function frickin_custom_php_install_command() {
 		global $config;
-		if(file_exists("/tmp/frickin.tar.gz")) {
-			exec("tar xzPf /tmp/frickin.tar.gz -C /");
-			unlink("/tmp/frickin.tar.gz");
+		if(file_exists("/tmp/frickin2")) {
+			exec("mv /tmp/frickin2 /usr/local/sbin/");
+			exec("chmod 0555 /usr/local/sbin/frickin2");
 		}
 		$fout = fopen("/usr/local/etc/rc.d/frickin.sh", "w");
 		fwrite($fout, "#!/bin/sh\n# This package was automatically generated\n# by the pfSense package system.\n\n");

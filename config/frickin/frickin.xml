@@ -64,7 +64,7 @@
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/frickin/bin/frickin.tar.gz</item>
+		<item>http://www.pfsense.com/packages/config/frickin/bin/frickin2</item>
 	</additional_files_needed>
 	<fields>
 		<field>
