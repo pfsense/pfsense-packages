@@ -32,6 +32,7 @@
 		<config_file>http://www.pfsense.com/packages/config/frickin/frickin.xml</config_file>
 		<configurationfile>frickin.xml</configurationfile>
 		<after_install_info>Please visit the Frickin PPTP settings tab and press save after setting the service up to start.</after_install_info>
+		<noembedded>true</noembedded>
 	</package>
     <package>
       <name>pure-ftpd</name>
