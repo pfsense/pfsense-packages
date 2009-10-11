@@ -11,7 +11,7 @@ function freeradius_deinstall_command() {
 
 function freeradius_install_command() {
 	global $config;
-
+        conf_mount_rw();
 	$handle = opendir(RADDB);
 	while (false != ($file = readdir($handle))) {
 		if (false != ($pos = strpos($file, '.sample'))) {
@@ -28,7 +28,9 @@ function freeradius_install_command() {
 	$rcfile['file'] = 'radiusd.sh';
 	$rcfile['start'] = 'radiusd -s &';
 	$rcfile['stop'] = 'killall radiusd';
+        conf_mount_rw();
 	write_rcfile($rcfile);
+        conf_mount_ro();
 	start_service("freeradius");
 }
 
@@ -430,7 +432,9 @@ post-proxy {
 }
 
 EOD;
+        conf_mount_rw();
 	file_put_contents(RADDB . '/radiusd.conf', $conf);
+        conf_mount_ro();
 	restart_service("freeradius");
 }
 
@@ -486,8 +490,10 @@ EOD;
 		}
 	}
 	$filename = RADDB . '/users';
+        conf_mount_rw();
 	file_put_contents($filename, $conf);
 	chmod($filename, 0600);
+        conf_mount_ro();
 
 	restart_service('freeradius');
 }
@@ -521,7 +527,9 @@ client 127.0.0.1 {
 EOD;
 	}
 
+        conf_mount_rw();
 	file_put_contents(RADDB . '/clients.conf', $conf);
+        conf_mount_ro();
 	restart_service("freeradius");
 }
 ?>
