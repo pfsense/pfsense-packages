@@ -82,6 +82,7 @@
     </fields>
 	<custom_php_global_functions>
 		function sync_package_darkstat() {
+			conf_mount_rw();
 			$first = 0;
 			foreach($_POST['interface_array'] as $iface) {
 				$if = convert_friendly_interface_to_real_interface_name($iface);
@@ -98,6 +99,7 @@
 				)
 			);
 			start_service("darkstat");
+			conf_mount_ro();
 		}
 	</custom_php_global_functions>
 		<custom_add_php_command>
