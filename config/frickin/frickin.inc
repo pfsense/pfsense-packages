@@ -34,6 +34,7 @@ if(!function_exists("filter_configure"))
 
 function frickin_custom_php_install_command() {
 		global $config;
+		conf_mount_rw();
 		if(file_exists("/tmp/frickin2")) {
 			exec("mv /tmp/frickin2 /usr/local/sbin/");
 			exec("chmod 0555 /usr/local/sbin/frickin2");
@@ -86,6 +87,7 @@ EOD;
 //		$config['system']['scrubnodf'] = "enabled";
 //		write_config();
 
+		conf_mount_ro();
 		filter_configure();
 }
 
