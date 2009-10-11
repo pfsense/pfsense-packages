@@ -42,8 +42,6 @@ function vnstat_install_config() {
         $cron_item['who']       = "root";
         $cron_item['command']   = "/usr/local/bin/vnstat -u";
         $config['cron']['item'][] = $cron_item;
-        write_config();
-        configure_cron();
 // get system nic's and create a database for them
         $array_of_real_nic_names = array();
         $array_of_custom_nic_names = array();
@@ -226,6 +224,8 @@ EOF;
      }
      fwrite($hf, $config_file);
      fclose($hf);
+        write_config();
+        configure_cron();
 	conf_mount_ro();
 }
 ?>
