@@ -28,7 +28,7 @@
 */
 
 /* Setup enviroment */
-$tmpfname = "/tmp/snort_rules_up";
+$tmpfname = "/root/snort_rules_up";
 $snortdir = "/usr/local/etc/snort_bkup";
 $snortdir_wan = "/usr/local/etc/snort";
 $snort_filename_md5 = "snortrules-snapshot-2.8.tar.gz.md5";
@@ -543,7 +543,7 @@ if (file_exists("{$snortdir}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/")) {
     update_status(gettext("Done copying so_rules."));
 } else {
     update_status(gettext("Directory so_rules does not exist..."));
-    update_output_window(gettext("Error copping so_rules..."));
+    update_output_window(gettext("Error copying so_rules..."));
     exit(0);
  }
 }
@@ -731,7 +731,7 @@ if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_c
 /*  remove old $tmpfname files */
 if (file_exists("{$tmpfname}")) {
     update_status(gettext("Cleaning up..."));
-    exec("/bin/rm -r /tmp/snort_rules_up");
+    exec("/bin/rm -r /root/snort_rules_up");
 //	apc_clear_cache();
 }
 

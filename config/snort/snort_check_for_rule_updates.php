@@ -28,7 +28,7 @@
 */
 
 /* Setup enviroment */
-$tmpfname = "/tmp/snort_rules_up";
+$tmpfname = "/root/snort_rules_up";
 $snortdir = "/usr/local/etc/snort_bkup";
 $snortdir_wan = "/usr/local/etc/snort";
 $snort_filename_md5 = "snortrules-snapshot-2.8.tar.gz.md5";
@@ -611,7 +611,7 @@ echo "May take a while...\n";
 /*  remove old $tmpfname files */
 if (file_exists("{$tmpfname}")) {
     echo "Cleaning up...\n";
-    exec("/bin/rm -r /tmp/snort_rules_up");
+    exec("/bin/rm -r /root/snort_rules_up");
 }
 
 /* php code to flush out cache some people are reportting missing files this might help  */
