@@ -604,8 +604,8 @@ if (file_exists("{$snortdir}/etc/Makefile.am")) {
 	exec("/bin/rm -r {$snortdir}/etc");
 	
 } else {
-    update_status(gettext("The snort configs does not exist..."));
-    update_output_window(gettext("Error copping config..."));
+    update_status(gettext("The snort config does not exist..."));
+    update_output_window(gettext("Error copying config..."));
     exit(0);
  }
 }
@@ -617,7 +617,7 @@ if (file_exists("{$tmpfname}/$snort_filename_md5")) {
     exec("/bin/cp {$tmpfname}/$snort_filename_md5 {$snortdir}/$snort_filename_md5");
 } else {
     update_status(gettext("The md5 file does not exist..."));
-    update_output_window(gettext("Error copping config..."));
+    update_output_window(gettext("Error copying config..."));
     exit(0);
  }
 }
@@ -630,7 +630,7 @@ if (file_exists("{$tmpfname}/$emergingthreats_filename_md5")) {
     exec("/bin/cp {$tmpfname}/$emergingthreats_filename_md5 {$snortdir}/$emergingthreats_filename_md5");
 } else {
     update_status(gettext("The emergingthreats md5 file does not exist..."));
-    update_output_window(gettext("Error copping config..."));
+    update_output_window(gettext("Error copying config..."));
     exit(0);
   }
  }
@@ -643,7 +643,7 @@ if (file_exists("{$tmpfname}/$pfsense_rules_filename_md5")) {
     exec("/bin/cp {$tmpfname}/$pfsense_rules_filename_md5 {$snortdir}/$pfsense_rules_filename_md5");
 } else {
     update_status(gettext("The Pfsense md5 file does not exist..."));
-    update_output_window(gettext("Error copping config..."));
+    update_output_window(gettext("Error copying config..."));
     exit(0);
  }
 }
@@ -660,7 +660,7 @@ if (file_exists("{$snortdir}/doc/signatures")) {
     update_status(gettext("Done copying signatures."));
 } else {
     update_status(gettext("Directory signatures exist..."));
-    update_output_window(gettext("Error copping signature..."));
+    update_output_window(gettext("Error copying signature..."));
     exit(0);
   }
  }
