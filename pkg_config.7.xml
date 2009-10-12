@@ -629,7 +629,6 @@
       <depends_on_package>openldap-client-2.4.10.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
       <configurationfile>squid.xml</configurationfile>
-	  <noembedded>true</noembedded>
     </package>
     <package>
       <name>squid3</name>
@@ -695,7 +694,6 @@
       <depends_on_package>squidGuard-1.3_1.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
       <configurationfile>squidguard.xml</configurationfile>
-	  <noembedded>true</noembedded>
     </package>
     <package>
       <name>Zabbix Agent</name>
