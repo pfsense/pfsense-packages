@@ -73,7 +73,8 @@ if(!$oinkid) {
 
 /* premium_subscriber check  */
 //unset($config['installedpackages']['snort']['config'][0]['subscriber']);
-//write_config();
+//write_config(); // Will cause switch back to read-only on nanobsd
+//conf_mount_rw(); // Uncomment this if the previous line is uncommented
 $premium_subscriber_chk = $config['installedpackages']['snort']['config'][0]['subscriber'];
 
 if ($premium_subscriber_chk === on) {
@@ -92,6 +93,7 @@ if ($premium_url_chk === on) {
 /* send current buffer */
 ob_flush();
 
+conf_mount_rw();
 /*  remove old $tmpfname files */
 if (file_exists("{$tmpfname}")) {
     exec("/bin/rm -r {$tmpfname}");
@@ -177,7 +179,8 @@ $md5_check_old_parse = file_get_contents("{$snortdir}/{$snort_filename_md5}");
 $md5_check_old = `/bin/echo "{$md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
 /* Write out time of last sucsessful md5 to cache */
 $config['installedpackages']['snort']['last_md5_download'] = date("Y-M-jS-h:i-A");
-write_config();
+write_config(); // Will cause switch back to read-only on nanobsd
+conf_mount_rw();
 if ($md5_check_new == $md5_check_old) {
         echo "Your rules are up to date...\n";
         echo "You may start Snort now, check update.\n";
@@ -195,7 +198,8 @@ $emerg_md5_check_old_parse = file_get_contents("{$snortdir}/version.txt");
 $emerg_md5_check_old = `/bin/echo "{$emerg_md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
 /* Write out time of last sucsessful md5 to cache */
 $config['installedpackages']['snort']['last_md5_download'] = date("Y-M-jS-h:i-A");
-write_config();
+write_config(); // Will cause switch back to read-only on nanobsd
+conf_mount_rw();
 if ($emerg_md5_check_new == $emerg_md5_check_old) {
         echo "Your emergingthreats rules are up to date...\n";
         echo "You may start Snort now, check update.\n";
@@ -625,5 +629,6 @@ if (file_exists("/tmp/snort_download_halt.pid")) {
 		echo "The Rules update finished...\n";
 		echo "You may start snort now...\n";
 }
+conf_mount_ro();
 
 ?>

@@ -42,7 +42,9 @@ if (!$nentries)
 
 if ($_POST['clear']) {
 	exec("killall syslogd");
+	conf_mount_rw();
 	exec("rm {$snort_logfile}; touch {$snort_logfile}");
+	conf_mount_ro();
 	system_syslogd_start();
 	exec("/usr/bin/killall -HUP snort");
 	exec("/usr/bin/killall snort2c");

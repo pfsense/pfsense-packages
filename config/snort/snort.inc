@@ -56,6 +56,7 @@ function sync_package_snort_reinstall()
 function sync_package_snort()
 {
 	global $config, $g;
+	conf_mount_rw();
 
 	mwexec("mkdir -p /var/log/snort/");
 
@@ -73,7 +74,6 @@ function sync_package_snort()
 	else
 		$snort_performance = "ac-bnfa";
 
-	conf_mount_rw();
 	/* create a few directories and ensure the sample files are in place */
 	exec("/bin/mkdir -p /usr/local/etc/snort");
 	exec("/bin/mkdir -p /var/log/snort");
@@ -195,6 +195,7 @@ if ($config['installedpackages']['snort']['config'][0]['autorulesupdate7'] != ""
 function create_barnyard2_conf() {
         global $bconfig, $bg;
         /* write out barnyard2_conf */
+	conf_mount_rw();
         $barnyard2_conf_text = generate_barnyard2_conf();
         $bconf = fopen("/usr/local/etc/barnyard2.conf", "w");
         if(!$bconf) {
@@ -203,6 +204,7 @@ function create_barnyard2_conf() {
         }
         fwrite($bconf, $barnyard2_conf_text);
         fclose($bconf);
+	conf_mount_ro();
 }
 /* open barnyard2.conf for writing" */
 function generate_barnyard2_conf() {
@@ -265,7 +267,7 @@ input unified2
 $snortbarnyardlog_database_info_chk
 
 EOD;
-
+	conf_mount_rw();
         return $barnyard2_conf_text;
 
 }
@@ -679,7 +681,7 @@ else
 if ($snort_rm_blocked_info_ck != "") {
 function snort_rm_blocked_install_cron($should_install) {
         global $config, $g;
-
+        conf_mount_rw();
         if ($g['booting']==true)
                 return;
 
@@ -774,6 +776,7 @@ function snort_rm_blocked_install_cron($should_install) {
                                 $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/sbin/expiretable -t $snort_rm_blocked_expire snort2c";
                                 $config['cron']['item'][] = $cron_item;
                                 write_config("Installed 15 minute filter reload for Time Based Rules");
+				conf_mount_rw();
                                 configure_cron();
                         }
                 break;
@@ -782,6 +785,7 @@ function snort_rm_blocked_install_cron($should_install) {
                                 if($x > 0) {
                                         unset($config['cron']['item'][$x]);
                                         write_config();
+					conf_mount_rw();
                                 }
                                 configure_cron();
                         }
@@ -802,7 +806,7 @@ function snort_rm_blocked_install_cron($should_install) {
 if ($snort_rules_up_info_ck != "") {
 function snort_rules_up_install_cron($should_install) {
         global $config, $g;
-
+        conf_mount_rw();
         if ($g['booting']==true)
                 return;
 
@@ -875,6 +879,7 @@ function snort_rules_up_install_cron($should_install) {
                                 $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort_check_for_rule_updates.php >> /usr/local/etc/snort_bkup/snort_update.log";
                                 $config['cron']['item'][] = $cron_item;
                                 write_config("Installed 15 minute filter reload for Time Based Rules");
+                                conf_mount_rw();
                                 configure_cron();
                         }
                 break;
@@ -883,6 +888,7 @@ function snort_rules_up_install_cron($should_install) {
                                 if($x > 0) {
                                         unset($config['cron']['item'][$x]);
                                         write_config();
+                                        conf_mount_rw();
                                 }
                                 configure_cron();
                         }
@@ -1400,7 +1406,7 @@ include /usr/local/etc/snort/threshold.conf
 {$selected_rules_sections}
 
 EOD;
-
+        conf_mount_ro();
 	return $snort_conf_text;
 }
 
@@ -1467,6 +1473,7 @@ function verify_downloaded_file($filename) {
 /* extract rules */
 function extract_snort_rules_md5($tmpfname) {
 	global $snort_filename, $snort_filename_md5, $console_mode;
+	conf_mount_rw();
 	ob_flush();
 	if(!$console_mode) {
 		$static_output = gettext("Extracting snort rules...");
@@ -1489,6 +1496,7 @@ function extract_snort_rules_md5($tmpfname) {
 		log_error("Snort rules extracted.");
 		echo "Snort rules extracted.";
 	}
+	conf_mount_ro();
 }
 
 /* verify MD5 against downloaded item */

@@ -31,8 +31,11 @@ require("guiconfig.inc");
 require_once("service-utils.inc");
 require("/usr/local/pkg/snort.inc");
 
-if(!is_dir("/usr/local/etc/snort/rules"))
+if(!is_dir("/usr/local/etc/snort/rules")) {
+	conf_mount_rw();
 	exec('mkdir /usr/local/etc/snort/rules/');
+	conf_mount_ro();
+}
 
 /* Check if the rules dir is empy if so warn the user */
 /* TODO give the user the option to delete the installed rules rules */

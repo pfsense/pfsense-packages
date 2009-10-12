@@ -29,8 +29,11 @@
 require("guiconfig.inc");
 require("config.inc");
 
-if(!is_dir("/usr/local/etc/snort/rules"))
+if(!is_dir("/usr/local/etc/snort/rules")) {
+	conf_mount_rw();
 	exec('mkdir /usr/local/etc/snort/rules/');
+	conf_mount_ro();
+}
 
 /* Check if the rules dir is empy if so warn the user */
 /* TODO give the user the option to delete the installed rules rules */
@@ -102,6 +105,8 @@ function get_middle($source, $beginning, $ending, $init_pos) {
 
 function write_rule_file($content_changed, $received_file)
 {
+    conf_mount_rw();
+
     //read snort file with writing enabled
     $filehandle = fopen($received_file, "w");
 
@@ -117,6 +122,7 @@ function write_rule_file($content_changed, $received_file)
     //close file handle
     fclose($filehandle);
 
+    conf_mount_rw();
 }
 
 function load_rule_file($incoming_file)

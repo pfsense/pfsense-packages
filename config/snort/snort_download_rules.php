@@ -140,7 +140,9 @@ if(!$oinkid) {
 
 /* premium_subscriber check  */
 //unset($config['installedpackages']['snort']['config'][0]['subscriber']);
-//write_config();
+//write_config(); // Will cause switch back to read-only on nanobsd
+//conf_mount_rw(); // Uncomment this if the previous line is uncommented
+
 $premium_subscriber_chk = $config['installedpackages']['snort']['config'][0]['subscriber'];
 
 if ($premium_subscriber_chk === on) {
@@ -186,6 +188,8 @@ if (file_exists($tmpfname)) {
 
 /* unhide progress bar and lets end this party */
 unhide_progress_bar_status();
+
+conf_mount_rw();
 
 /*  download md5 sig from snort.org */
 if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
@@ -266,7 +270,8 @@ $md5_check_old_parse = file_get_contents("{$snortdir}/{$snort_filename_md5}");
 $md5_check_old = `/bin/echo "{$md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
 /* Write out time of last sucsessful md5 to cache */
 $config['installedpackages']['snort']['last_md5_download'] = date("Y-M-jS-h:i-A");
-write_config();
+write_config(); // Will cause switch back to read-only on nanobsd
+conf_mount_rw();
 if ($md5_check_new == $md5_check_old) {
         update_status(gettext("Your rules are up to date..."));
         update_output_window(gettext("You may start Snort now, check update."));
@@ -290,7 +295,8 @@ $emerg_md5_check_old_parse = file_get_contents("{$snortdir}/version.txt");
 $emerg_md5_check_old = `/bin/echo "{$emerg_md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
 /* Write out time of last sucsessful md5 to cache */
 $config['installedpackages']['snort']['last_md5_download'] = date("Y-M-jS-h:i-A");
-write_config();
+write_config(); // Will cause switch back to read-only on nanobsd
+conf_mount_rw();
 if ($emerg_md5_check_new == $emerg_md5_check_old) {
         update_status(gettext("Your emergingthreats rules are up to date..."));
         update_output_window(gettext("You may start Snort now, check update."));
@@ -747,7 +753,7 @@ if (file_exists("/tmp/snort_download_halt.pid")) {
 
 /* hide progress bar and lets end this party */
 hide_progress_bar_status();
-
+conf_mount_ro();
 ?>
 
 <?php
@@ -772,7 +778,9 @@ function read_body_firmware($ch, $string) {
                 flush();
                 $counter = 0;
         }
+        conf_mount_rw();
         fwrite($fout, $string);
+        conf_mount_ro();
         return $length;
 }
 
