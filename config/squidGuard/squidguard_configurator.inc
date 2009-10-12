@@ -128,7 +128,7 @@ define('SQUIDGUARD_BL_DB',             '/db');
 # DB/Blacklist defines
 define('SQUIDGUARD_BLK_ENTRIES',       '/blacklist.files');
 define('BLACKLIST_ARCHIVE',            '/blacklists.tar');
-define('BLK_LOCALFILE',                '/tmp/sg_blacklists.tar');
+define('BLK_LOCALFILE',                '/root/sg_blacklists.tar');
 define('DB_REBUILD_SH',                '/tmp/squidGuard_db_rebuild.sh');
 define('DB_REBUILD_CONF',              '/tmp/squidGuard_db_rebuild.conf');
 define('DB_REBUILD_BLK_CONF',          '/squidGuard_blk_rebuild.conf');
@@ -299,8 +299,9 @@ function sg_load_configxml($filename)
 function sg_save_configxml($filename)
 {
     global $squidguard_config;
-
+    conf_mount_rw();
     file_put_contents($filename, dump_xml_config($squidguard_config, F_SQUIDGUARD));
+    conf_mount_ro();
 }
 
 # ------------------------------------------------------------------------------
@@ -320,11 +321,13 @@ function sg_reconfigure()
     # 3. generate squidGuard config
     $conf = sg_create_config();
     if ($conf) {
+        conf_mount_rw();
         if ($squidguard_config[F_WORKDIR])
             $conf_file = $squidguard_config[F_WORKDIR] . SQUIDGUARD_CONFIGFILE;
         file_put_contents($conf_file, $conf);
         file_put_contents('/usr/local/etc/squid' . SQUIDGUARD_CONFIGFILE, $conf); # << squidGuard want config '/usr/local/etc/squid' by default
         set_file_access($squidguard_config[F_WORKDIR], OWNER_NAME, 0755);
+        conf_mount_ro();
         sg_addlog("sg_reconfigure: save squidGuard config to '$conf_file'.", 1);
     } else
         sg_addlog("sg_reconfigure: error make squidGuard config.", 2);
@@ -388,6 +391,7 @@ function squid_reconfigure($remove_only = '')
 function sg_check_system()
 {
     global $squidguard_config;
+    conf_mount_rw();
 
     # check work_dir & create if not exists
     $work_dir = $squidguard_config[F_WORKDIR];
@@ -425,6 +429,7 @@ function sg_check_system()
         set_file_access($db_dir, OWNER_NAME, 0755);
     }
     unset($db_dir);
+    conf_mount_ro();
 }
 # ==============================================================================
 # squidGuard DB
@@ -434,6 +439,7 @@ function sg_check_system()
 function sg_reconfigure_user_db()
 {
     global $squidguard_config;
+    conf_mount_rw();
     $dbhome = $squidguard_config[F_DBHOME];
 
     sg_addlog("sg_reconfigure_user_db: Begin with '$dbhome'", 1);
@@ -508,6 +514,7 @@ function sg_reconfigure_user_db()
 
     # 7. remove unused db entries
     sg_remove_unused_db_entries();
+    conf_mount_ro();
 }
 
 # ------------------------------------------------------------------------------
@@ -516,6 +523,7 @@ function sg_reconfigure_user_db()
 function sg_remove_unused_db_entries()
 {
     global $squidguard_config;
+    conf_mount_rw();
     $db_entries = array();
     $file_list = '';
     $dbhome  = $squidguard_config[F_DBHOME];
@@ -556,6 +564,7 @@ function sg_remove_unused_db_entries()
             }
         }
     }
+    conf_mount_ro();
 }
 # ------------------------------------------------------------------------------
 # sg_rebuild_db  Rebuild squidGuard DB from list items
@@ -569,6 +578,7 @@ function sg_remove_unused_db_entries()
 function sg_rebuild_db($shtag, $rdb_dbhome, $rdb_itemslist)
 {
     global $squidguard_config;
+    conf_mount_rw();
     $conf   = '';
     $conf_path = '';
     $logdir = $squidguard_config[F_LOGDIR];
@@ -608,6 +618,7 @@ function sg_rebuild_db($shtag, $rdb_dbhome, $rdb_itemslist)
     # ! not background exec !
     mwexec($shfile);
     sg_addlog("sg_rebuild_db: Started SH script '$shfile'.", 1);
+    conf_mount_ro();
 }
 
 # ==============================================================================
@@ -1391,7 +1402,9 @@ function sg_reconfigure_blacklist($source_filename, $opt = '')
         return;
     }
     # save black list archive content to local file
+    conf_mount_rw();
     file_put_contents(BLK_LOCALFILE, $sf_contents);
+    conf_mount_ro();
 
     # 4. update blacklist
     sg_update_blacklist(BLK_LOCALFILE);
@@ -1410,6 +1423,7 @@ function sg_reconfigure_blacklist($source_filename, $opt = '')
 function sg_update_blacklist($from_file)
 {
     global $squidguard_config;
+    conf_mount_rw();
     $dbhome  = SQUIDGUARD_DBHOME_DEF;
     $workdir = SQUIDGUARD_WORKDIR_DEF;
     $tmp_unpack_dir = SQUIDGUARD_TMP . SQUIDGUARD_BL_UNPACK;
@@ -1528,6 +1542,7 @@ function sg_update_blacklist($from_file)
 #           mwexec("rm -R $bl_temp");
          }
     }
+    conf_mount_ro();
 }
 
 
@@ -1579,6 +1594,7 @@ function sg_blacklist_rebuild_db()
 # ------------------------------------------------------------------------------
 function sg_uploadfile_from_url($url_file, $destination_file, $proxy = '')
 {
+    conf_mount_rw();
     # open destination file
     sg_addlog("sg_uploadfile_from_url: begin url'$url_file' proxy'$proxy'", 1);
 
@@ -1609,7 +1625,7 @@ function sg_uploadfile_from_url($url_file, $destination_file, $proxy = '')
 
     # for test
     file_put_contents(BLK_LOCALFILE, $result);
-
+    conf_mount_rw();
     return $result;
 }
 
@@ -1655,7 +1671,7 @@ function restore_arc_blacklist()
     $arc_blklist_file = SQUIDGUARD_VAR . SQUIDGUARD_BLK_ENTRIES;
 
     if (file_exists($arc_db_dir) and file_exists($arc_blklist_file)) {
-
+        conf_mount_rw();
         # copy arc blacklist to work DB with permissions
         mwexec("cp -R -p $arc_db_dir/ $dbhome");
         set_file_access($dbhome, OWNER_NAME, 0755);
@@ -1665,6 +1681,7 @@ function restore_arc_blacklist()
         copy($arc_blklist_file, $blklist_file);
         set_file_access($blklist_file, OWNER_NAME, 0755);
         sg_addlog("restore_arc_blacklist: Restore black list file from '$arc_blklist_file' to '$blklist_file'.", 1);
+        conf_mount_ro();
     } else {
         sg_addlog("restore_arc_blacklist: Error, file '$arc_db_dir' or '$blklist_file' not found.", 2);
     }
