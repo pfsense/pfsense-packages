@@ -1049,6 +1049,7 @@ function squid_resync_users() {
 
 function squid_resync() {
 	global $config;
+	conf_mount_rw();
 	$conf = squid_resync_general() . "\n";
 	$conf .= squid_resync_cache() . "\n";
 	$conf .= squid_resync_redirector() . "\n";
@@ -1061,6 +1062,13 @@ function squid_resync() {
 	/* make sure pinger is executable */
 	if(file_exists("/usr/local/libexec/squid/pinger"))
 		exec("chmod a+x /usr/local/libexec/squid/pinger");
+
+	foreach (array(	SQUID_CONFBASE,
+			SQUID_ACLDIR,
+	) as $dir) {
+			make_dirs($dir);
+			squid_chown_recursive($dir, 'proxy', 'proxy');
+	}
 
 	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
 
@@ -1083,6 +1091,7 @@ function squid_resync() {
 	}
 
 	filter_configure();
+	conf_mount_ro();
 }
 
 function squid_print_javascript_auth() {
