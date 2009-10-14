@@ -526,7 +526,6 @@ set by the 'retries' parameter (2).</div>
 					<td width="22%" valign="top" class="vncell">Max connections</td>
 					<td width="78%" class="vtable" colspan="2">
 						<input name="max_connections" type="text" <?if(isset($pconfig['max_connections'])) echo "value=\"{$pconfig['max_connections']}\"";?> size="10" maxlength="10">
-						<div>the time (in milliseconds) we give up if the connection does not complete within (8000).</div>
 					</td>
 				</tr>
 				<tr align="left">
