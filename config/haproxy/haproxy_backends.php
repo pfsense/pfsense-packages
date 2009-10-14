@@ -131,7 +131,7 @@ include("head.inc");
                 </tr>
                 <?php $i++; endforeach; ?>
                 <tr>
-                  <td class="list" colspan="3"></td>
+                  <td class="list" colspan="4"></td>
                   <td class="list">
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
