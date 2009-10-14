@@ -132,6 +132,7 @@ function enable_change(enable_change) {
 					Maximum connections
 				</td>
 				<td class="vtable">
+					<table><tr><td>
 					<table cellpadding="0" cellspacing="0">
 						<tr>
 							<td>
@@ -141,6 +142,7 @@ function enable_change(enable_change) {
 					</table>
 					Sets the maximum per-process number of concurrent connections to X.<br/>
 					<strong>NOTE:</strong> setting this value too high will result in haproxy not being able to allocate enough memory.<br/>
+					</td><td>
 					<table style="border: 1px solid #000;">
 						<tr>
 							<td><font size=-1>Connections</td>
@@ -168,6 +170,7 @@ function enable_change(enable_change) {
 							<td><font size=-1>467 Megabytes</td>
 						</tr>
 					</table>
+					</td></tr></table>
 				</td>
 			</tr>
 			<tr>
