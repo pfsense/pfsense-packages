@@ -107,8 +107,8 @@ function haproxy_configure() {
 		fwrite ($fd, "global\n");
 		fwrite ($fd, "\tmaxconn\t\t\t".$a_global['maxconn']."\n");
 		fwrite ($fd, "\tlog\t\t\t127.0.0.1 local0\n");
-		fwrite ($fd, "\tuid\t\t\t200\n");
-		fwrite ($fd, "\tgid\t\t\t200\n");
+		fwrite ($fd, "\tuid\t\t\t80\n");
+		fwrite ($fd, "\tgid\t\t\t80\n");
 		$numprocs = trim(`/sbin/sysctl kern.smp.cpus | cut -d" " -f2`);
 		fwrite ($fd, "\tnbproc\t\t\t$numprocs\n");
 		fwrite ($fd, "\tchroot\t\t\t/var/empty\n");
