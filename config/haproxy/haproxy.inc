@@ -76,10 +76,6 @@ haproxy_start () {
 ENDOFF
 }
 
-haproxy_restart_post() {
-	killall -HUP haproxy
-}
-
 haproxy_stop_post () {
         echo "Stopping haproxy."
         killall haproxy
