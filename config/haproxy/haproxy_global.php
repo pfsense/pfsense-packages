@@ -98,7 +98,7 @@ function enable_change(enable_change) {
 //-->
 </script>
 <?php if($one_two): ?>
-<p class="pgtitle"><?=$pgtitle?></font></p>
+<p class="pgtitle"><?=$pgtitle?></p>
 <?php endif; ?>
 <form action="haproxy_global.php" method="post" name="iform">
 <?php if ($input_errors) print_input_errors($input_errors); ?>

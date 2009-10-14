@@ -44,7 +44,7 @@
 	<name>haproxy</name>
 	<version>1.0</version>
 	<title>HAProxy</title>
-	<aftersaveredirect>/pkg_edit.php?xml=haproxy_servers.php</aftersaveredirect>
+	<aftersaveredirect>/pkg_ediwt.php?xml=haproxy_servers.php</aftersaveredirect>
 	<include_file>/usr/local/pkg/haproxy.inc</include_file>
 	<menu>
 		<name>HAProxy</name>

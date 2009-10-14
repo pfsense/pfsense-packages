@@ -77,7 +77,7 @@ include("head.inc");
 <?php include("fbegin.inc"); ?>
 <form action="haproxy_backends.php" method="post">
 <?php if($one_two): ?>
-<p class="pgtitle"><?=$pgtitle?></font></p>
+<p class="pgtitle"><?=$pgtitle?></p>
 <?php endif; ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>

@@ -364,7 +364,7 @@ include("head.inc");
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if($one_two): ?>
-<p class="pgtitle"><?=$pgtitle?></font></p>
+<p class="pgtitle"><?=$pgtitle?></p>
 <?php endif; ?>
 	<form action="haproxy_backends_edit.php" method="post" name="iform" id="iform">
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
