@@ -1,6 +1,7 @@
 <?php
 /*
     haproxy.inc
+	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
     Copyright (C) 2008 Remco Hoef
     All rights reserved.
 

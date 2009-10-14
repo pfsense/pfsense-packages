@@ -3,6 +3,7 @@
 /*
 	haproxy_backends_edit.php
 	part of pfSense (http://www.pfsense.com/)
+	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
 	All rights reserved.
 
