@@ -178,8 +178,13 @@ function haproxy_configure() {
 			if(is_array($a_servers)) {
 				foreach ($a_servers as $server) {
 					if($server['backend']==$backend['name']) {
-						if($server['status']=='active') 
-							fwrite ($fd, "\tserver\t\t\t".$server['name']." ".$server['address'].":".$server['port']." cookie ".$server['cookie']." check inter 1000 weight ".$server['weight']."\n");
+						if($server['status']=='active') {
+							if($server['cookie']) 
+								$cookie = " cookie {$server['cookie']} ";
+							else 
+								$cookie = "";
+							fwrite ($fd, "\tserver\t\t\t".$server['name']." ".$server['address'].":".$server['port']." $cookie "." check inter 1000 weight ".$server['weight']."\n");
+						}
 					}
 				}
 			}
