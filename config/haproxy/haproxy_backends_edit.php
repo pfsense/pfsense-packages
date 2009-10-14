@@ -595,7 +595,7 @@ set by the 'retries' parameter (2).</div>
 		<tr>
 			<br/>&nbsp;<br/>
 			<td colspan='3'>
-					<span class="vexpl">NOTE: You must add a firewall rule permitting access to this backend!</span>
+					<span class="vexpl"><b>NOTE:</b> You must add a firewall rule permitting access to this backend!</span>
 			</td>
 		</tr>
 	</table>
