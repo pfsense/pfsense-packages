@@ -76,7 +76,7 @@ haproxy_start () {
 ENDOFF
 }
 
-haproxy_stop_post () {
+haproxy_stop () {
         echo "Stopping haproxy."
         killall haproxy
 }
