@@ -98,7 +98,7 @@
 	<custom_php_install_command>
 		if(!file_exists("/usr/local/bin/haproxy")) {
 			$freebsdv=`uname -r | cut -d'.' -f1`;
-			download_file_with_progress_bar("http://www.pfsense.org/packages/config/haproxy/binaries{$frebsdv}/haproxy", "/usr/local/bin/haproxy");
+			download_file_with_progress_bar("http://www.pfsense.org/packages/config/haproxy/binaries{$freebsdv}/haproxy", "/usr/local/bin/haproxy");
 			exec("chmod a+rx /usr/local/bin/haproxy");
 		}
 	</custom_php_install_command>
