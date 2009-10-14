@@ -739,5 +739,25 @@
       <config_file>http://www.pfsense.org/packages/config/blinkled/blinkled.xml</config_file>
       <configurationfile>blinkled.xml</configurationfile>
     </package>
+    <package>
+      <name>Dashboard Widget: Snort</name>
+      <descr>Dashboard widget for Snort.</descr>
+      <category>System</category>
+      <config_file>http://www.pfsense.com/packages/config/widget-snort/widget-snort.xml</config_file>
+      <version>0.1</version>
+      <status>BETA</status>
+      <required_version>1.2</required_version>
+      <configurationfile>widget-snort.xml</configurationfile>
+    </package>
+    <package>
+      <name>Dashboard Widget: HAVP</name>
+      <descr>Dashboard widget for havp.</descr>
+      <category>System</category>
+      <config_file>http://www.pfsense.com/packages/config/widget-havp/widget-havp.xml</config_file>
+      <version>0.1</version>
+      <status>BETA</status>
+      <required_version>1.2</required_version>
+      <configurationfile>widget-havp.xml</configurationfile>
+    </package>
   </packages>
 </pfsensepkgs>

@@ -116,6 +116,26 @@
       <configurationfile>dashboard.xml</configurationfile>
     </package>
     <package>
+      <name>Dashboard Widget: Snort</name>
+      <descr>Dashboard widget for Snort.</descr>
+      <category>System</category>
+      <config_file>http://www.pfsense.com/packages/config/widget-snort/widget-snort.xml</config_file>
+      <version>0.1</version>
+      <status>BETA</status>
+      <required_version>1.2</required_version>
+      <configurationfile>widget-snort.xml</configurationfile>
+    </package>
+    <package>
+      <name>Dashboard Widget: HAVP</name>
+      <descr>Dashboard widget for havp.</descr>
+      <category>System</category>
+      <config_file>http://www.pfsense.com/packages/config/widget-havp/widget-havp.xml</config_file>
+      <version>0.1</version>
+      <status>BETA</status>
+      <required_version>1.2</required_version>
+      <configurationfile>widget-havp.xml</configurationfile>
+    </package>
+     <package>
       <name>FreeSWITCH</name>
       <website>http://www.freeswitch.org/</website>
       <descr>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow. pfSense 1.2.3 or higher is recommended.</descr>
