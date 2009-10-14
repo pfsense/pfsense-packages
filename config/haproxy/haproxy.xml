@@ -96,11 +96,9 @@
 	<custom_php_resync_config_command>
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
-		if(!file_exists("/usr/local/bin/haproxy")) {
-			$freebsdv=`uname -r | cut -d'.' -f1`;
-			download_file_with_progress_bar("http://www.pfsense.org/packages/config/haproxy/binaries{$freebsdv}/haproxy", "/usr/local/bin/haproxy");
-			exec("chmod a+rx /usr/local/bin/haproxy");
-		}
+		$freebsdv=`uname -r | cut -d'.' -f1`;
+		download_file_with_progress_bar("http://www.pfsense.org/packages/config/haproxy/binaries{$freebsdv}/haproxy", "/usr/local/sbin/haproxy");
+		exec("chmod a+rx /usr/local/sbin/haproxy");
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
 	</custom_php_deinstall_command>
