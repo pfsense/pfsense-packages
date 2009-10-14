@@ -101,20 +101,24 @@ include("head.inc");
               <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
                   <td width="30%" class="listhdrr">Name</td>
-                  <td width="50%" class="listhdrr">Description</td>
+                  <td width="40%" class="listhdrr">Description</td>
+                  <td width="10%" class="listhdrr">Stats URI</td>
                   <td width="10%" class="listhdrr">Type</td>
                   <td width="10%" class="list"></td>
 				</tr>
 			  <?php $i = 0; foreach ($a_backend as $backend): ?>
                 <tr>
                   <td class="listlr" ondblclick="document.location='haproxy_backends_edit.php?id=<?=$i;?>';">
-			<?=$backend['name'];?>
+					<?=$backend['name'];?>
                   </td>
                   <td class="listlr" ondblclick="document.location='haproxy_backends_edit.php?id=<?=$i;?>';">
-			<?=$backend['desc'];?>
+					<?=$backend['desc'];?>
                   </td>
+                 <td class="listlr" ondblclick="document.location='haproxy_backends_edit.php?id=<?=$i;?>';">
+					<?=$backend['stats_uri'];?>
+                 </td>
                   <td class="listlr" ondblclick="document.location='haproxy_backends_edit.php?id=<?=$i;?>';">
-			<?=$backend['type'];?>
+					<?=$backend['type'];?>
                   </td>
                   <td class="list" nowrap>
                     <table border="0" cellspacing="0" cellpadding="1">
