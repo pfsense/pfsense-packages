@@ -33,6 +33,12 @@ require_once("notices.inc");
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 
+function haproxy_custom_php_deinstall_command() {
+	exec("rm /usr/local/sbin/haproxy");
+	exec("rm /usr/local/pkg/haproxy.inc");
+	exec("rm /usr/local/www/haproxy*");
+}
+
 function haproxy_custom_php_install_command() {
 	global $g, $config;
 	conf_mount_rw();
