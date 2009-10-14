@@ -71,9 +71,13 @@ haproxy_start () {
 			require_once("globals.inc");		
 			require_once("functions.inc");
 			require_once("haproxy.inc");
-			function haproxy_configure();
+			haproxy_configure();
 		?>
 ENDOFF
+}
+
+haproxy_restart_post() {
+	killall -HUP haproxy
 }
 
 haproxy_stop_post () {
