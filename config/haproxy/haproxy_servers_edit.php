@@ -62,8 +62,8 @@ if ($_POST) {
 	unset($input_errors);
 	$pconfig = $_POST;
 	
-	$reqdfields = explode(" ", "name address port backend weight cookie");
-	$reqdfieldsn = explode(",", "Name,Address,Port,Backend,Weight,Cookie");		
+	$reqdfields = explode(" ", "name address port backend weight");
+	$reqdfieldsn = explode(",", "Name,Address,Port,Backend,Weight");		
 
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
