@@ -489,7 +489,7 @@ The left part of the URI (before the question mark) is hashed
 		<tr align="left" id='stats_password_row' name='stats_password_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
 			<td width="22%" valign="top" class="vncellreq">Stats Password</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input id="stats_password" name="stats_password" type="text" <?if(isset($pconfig['stats_password'])) echo "value=\"{$pconfig['stats_password']}\"";?> size="64">
+				<input id="stats_password" name="stats_password" type="password" <?if(isset($pconfig['stats_password'])) echo "value=\"{$pconfig['stats_password']}\"";?> size="64">
 				<br/>
 				Example: / or /index.php or /index.html or /testmypage.cgi
 			</td>
