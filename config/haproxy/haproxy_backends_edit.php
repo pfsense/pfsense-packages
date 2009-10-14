@@ -442,20 +442,6 @@ set by the 'retries' parameter (2).</div>
                   to clients which refuse session cookies. This algorithm is
                   static, which means that changing a server's weight on the
                   fly will have no effect.</td></tr>
-				<tr><td valign="top">
-				  <input type="radio" name="balance" id="balance" value="uri"<?php if($pconfig['balance'] == 
-"uri") echo " CHECKED"; ?>>URI</td><td>
-The left part of the URI (before the question mark) is hashed
-                  and divided by the total weight of the running servers. The
-                  result designates which server will receive the request. This
-                  ensures that a same URI will always be directed to the same
-                  server as long as no server goes up or down. This is used
-                  with proxy caches and anti-virus proxies in order to maximize
-                  the cache hit rate. Note that this algorithm may only be used
-                  in an HTTP backend. This algorithm is static, which means
-                  that changing a server's weight on the fly will have no
-                  effect.</td>
-				</tr>
 				</table>
 			</td>
 		</tr>
