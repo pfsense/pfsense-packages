@@ -58,7 +58,7 @@ command="/usr/local/bin/haproxy"
 haproxy_enable=\${haproxy-"YES"}
 
 start_cmd="haproxy_start"
-stop_postcmd="haproxy_stop_post"
+stop_postcmd="haproxy_stop"
 
 load_rc_config \$name
 
