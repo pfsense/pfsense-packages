@@ -582,6 +582,11 @@ set by the 'retries' parameter (2).</div>
 					</a><br/>
 					Fore more information about ACL's please see <a href='http://haproxy.1wt.eu/download/1.3/doc/configuration.txt' target='_new'>HAProxy Documentation</a> Section 7 - Using ACL's
 					</td>
+				<tr>
+					<td colspan='3'>
+							<span class="vexpl">NOTE: You must add a firewall rule permitting access to this backend!</span>
+					</td>
+				</tr>
 				</tr>
 			<tr align="left">
 			<td width="22%" valign="top">&nbsp;</td>
