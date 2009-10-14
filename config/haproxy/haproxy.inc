@@ -31,6 +31,8 @@ require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("notices.inc");
 
+$d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
+
 function haproxy_custom_php_install_command() {
 	global $g, $config;
 	conf_mount_rw();

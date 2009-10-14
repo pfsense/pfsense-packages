@@ -32,6 +32,8 @@ require("globals.inc");
 require("guiconfig.inc");
 require_once("haproxy.inc");
 
+$d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
+
 if (!is_array($config['installedpackages']['haproxy'])) {
 	$config['installedpackages']['haproxy'] = array();
 }
