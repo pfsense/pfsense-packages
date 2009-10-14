@@ -61,6 +61,10 @@ if ($_GET['act'] == "del") {
 	}
 }
 
+$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
+if(strstr($pfSversion, "1.2"))
+	$one_two = true;
+	
 $pgtitle = "Services: HAProxy: Backends";
 include("head.inc");
 
@@ -68,6 +72,9 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
 <form action="haproxy_backends.php" method="post">
+<?php if($one_two): ?>
+<p class="pgtitle"><?=$pgtitle?></font></p>
+<?php endif; ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_haproxyconfdirty_path)): ?><p>

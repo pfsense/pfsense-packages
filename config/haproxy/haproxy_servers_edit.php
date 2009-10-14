@@ -130,6 +130,10 @@ if ($_POST) {
 	}
 }
 
+$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
+if(strstr($pfSversion, "1.2"))
+	$one_two = true;
+
 $pgtitle = "HAProxy: Server: Edit";
 include("head.inc");
 
@@ -149,7 +153,9 @@ function clearcombo(){
 
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-
+<?php if($one_two): ?>
+<p class="pgtitle"><?=$pgtitle?></font></p>
+<?php endif; ?>
 	<form action="haproxy_servers_edit.php" method="post" name="iform" id="iform">
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>

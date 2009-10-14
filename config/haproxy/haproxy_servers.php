@@ -61,6 +61,10 @@ if ($_GET['act'] == "del") {
 	}
 }
 
+$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
+if(strstr($pfSversion, "1.2"))
+	$one_two = true;
+	
 $pgtitle = "Services: HAProxy: Backends";
 include("head.inc");
 

@@ -75,6 +75,10 @@ if ($_POST) {
 	
 }
 
+$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
+if(strstr($pfSversion, "1.2"))
+	$one_two = true;
+
 $pgtitle = "Services: HAProxy: Settings";
 include("head.inc");
 
@@ -90,6 +94,9 @@ function enable_change(enable_change) {
 }
 //-->
 </script>
+<?php if($one_two): ?>
+<p class="pgtitle"><?=$pgtitle?></font></p>
+<?php endif; ?>
 <form action="haproxy_global.php" method="post" name="iform">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
