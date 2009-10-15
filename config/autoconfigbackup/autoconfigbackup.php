@@ -221,6 +221,7 @@ function get_hostnames() {
 					    curl_close($curl_session);
 					}
 					if(!$input_errors && $data) {
+						conf_mount_rw();
 						if(config_restore("/tmp/config_restore.xml") == 0) {
 							$savemsg = "Successfully reverted the pfSense configuration to revision " . urldecode($_REQUEST['newver']) . ".";
 							$savemsg .= <<<EOF
@@ -238,7 +239,8 @@ EOF;
 					} else {
 						log_error("There was an error when restoring the AutoConfigBackup item");
 					}
-					//unlink("/tmp/config_restore.xml");
+					unlink_if_exists("/tmp/config_restore.xml");
+					conf_mount_ro();
 				} 			
 				if($_REQUEST['download']) {
 					// Phone home and obtain backups
