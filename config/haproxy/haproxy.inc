@@ -118,7 +118,7 @@ function haproxy_configure() {
 
 	if(is_array($a_backends)) {
 		foreach ($a_backends as $backend) {
-			if($frontend['extaddr']=='any') 
+			if($backend['extaddr']=='any') 
 				$listenip =  "listen {$backend['name']}\t\t\t0.0.0.0:".$backend['port']."\n";
 			else if($frontend['extaddr']=='') 
 				$listenip = "listen {$backend['name']}\t\t\t" . get_current_wan_address('wan').":" . $backend['port']."\n";
