@@ -89,7 +89,7 @@ include("head.inc");
         /* active tabs */
         $tab_array = array();
 		$tab_array[] = array("Settings", false, "haproxy_global.php");
-        $tab_array[] = array("Backends", false, "haproxy_backends.php");
+        $tab_array[] = array("Frontends/Backends", false, "haproxy_backends.php");
 		$tab_array[] = array("Servers", true, "haproxy_servers.php");
 		display_top_tabs($tab_array);
   ?>
