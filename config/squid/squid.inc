@@ -681,12 +681,13 @@ function squid_resync_cache() {
 	$offline_mode = ($settings['enable_offline'] == 'on' ? 'on' : 'off');
 
 	$conf = <<<EOD
-cache_dir $disk_cache_system $cachedir $disk_cache_size $level1 256
 cache_mem $memory_cache_size MB
-maximum_object_size $max_objsize KB
-minimum_object_size $min_objsize KB
-cache_replacement_policy $cache_policy
+maximum_object_size_in_memory 32 KB
 memory_replacement_policy $memory_policy
+cache_replacement_policy $cache_policy
+cache_dir $disk_cache_system $cachedir $disk_cache_size $level1 256
+minimum_object_size $min_objsize KB
+maximum_object_size $max_objsize KB
 offline_mode $offline_mode
 dns_children 32
 
