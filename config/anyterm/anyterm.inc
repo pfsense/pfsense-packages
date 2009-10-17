@@ -112,7 +112,6 @@ EOD;
 	fclose($fd);
 	exec("chmod a-r /usr/local/etc/anyterm.conf ; chmod ug+r /usr/local/etc/anyterm.conf ; killall anytermd");
 	exec($anytermd_command);
-	unlink("/usr/local/etc/anyterm.conf");
 
 }
 
