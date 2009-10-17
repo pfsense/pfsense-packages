@@ -93,7 +93,7 @@ EOD;
 	fwrite($fd, $anyterm);
 	fclose($fd);
 	// Make executable
-	exec("chmod a+rx /usr/local/etc/rc.d/anyterm.sh")
+	exec("chmod a+rx /usr/local/etc/rc.d/anyterm.sh");
 
 	// Write out Anyterm configuration file (username and password for auth)
 	$fd = fopen("/var/etc/anyterm.conf", "w");
