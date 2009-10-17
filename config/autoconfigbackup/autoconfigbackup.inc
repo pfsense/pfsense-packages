@@ -161,7 +161,7 @@ function upload_config($reasonm = "") {
 				tagfile_reformat($data, $data, "config.xml");
 
 				$post_fields = array(
-					'reason'					=> urlencode($reason),  
+					'reason'					=> urlencode((string)$reason),  
 					'hostname'					=> urlencode($hostname),  
 					'configxml'					=> urlencode($data),
 					'nooverwrite'				=> urlencode($nooverwrite),
