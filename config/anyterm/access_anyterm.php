@@ -37,10 +37,7 @@ if($config['installedpackages']['anyterm']['config'][0]['stunnelport']) {
 	$httpors = "http";
 }
 
-if($config['installedpackages']['anyterm']['config'][0]['stunnelipaddr'])
-	$location = "{$config['installedpackages']['anyterm']['config'][0]['stunnelipaddr']}:{$port}/anyterm.html";
-else
-	$location = "{$_SERVER['SERVER_ADDR']}:{$port}/anyterm.html";
+$location = "{$_SERVER['SERVER_ADDR']}:{$port}/anyterm.html";
 
 Header("Location: {$httpors}://{$location}");
 
