@@ -97,6 +97,7 @@
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
 		$freebsdv=trim(`uname -r | cut -d'.' -f1`);
+		conf_mount_rw();
 		`fetch -q -o /usr/local/sbin/ http://www.pfsense.org/packages/config/haproxy/binaries{$freebsdv}/haproxy`;
 		exec("chmod a+rx /usr/local/sbin/haproxy");
 		haproxy_custom_php_install_command();
