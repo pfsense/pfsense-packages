@@ -69,7 +69,7 @@
 	<tabs>
 		<tab>
 			<text>Settings</text>
-			<url>/pkg.php?xml=spamd.xml</url>
+			<url>/pkg.php?xml=anyterm.xml</url>
 			<active/>
 		</tab>
 		<tab>
