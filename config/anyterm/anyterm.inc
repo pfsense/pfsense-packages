@@ -84,7 +84,8 @@ anyterm_start () {
 						require_once("anyterm.inc");
 						anyterm_install();
 					?>
-			ENDOFF
+ENDOFF
+
 	fi
 }
 
