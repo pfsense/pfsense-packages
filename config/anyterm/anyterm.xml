@@ -69,7 +69,7 @@
 	<tabs>
 		<tab>
 			<text>Settings</text>
-			<url>/pkg.php?xml=anyterm.xml</url>
+			<url>/pkg_edit.php?xml=anyterm.xml&amp;id=0</url>
 			<active/>
 		</tab>
 		<tab>
