@@ -77,7 +77,14 @@ anyterm_start () {
 		fi
 		/usr/bin/env \
 			PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
-			$anytermd_command
+				/usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDOFF
+					<?php
+						require_once("globals.inc");		
+						require_once("functions.inc");
+						require_once("anyterm.inc");
+						anyterm_install();
+					?>
+			ENDOFF
 	fi
 }
 
@@ -104,6 +111,7 @@ EOD;
 	fclose($fd);
 	exec("chmod a-r /usr/local/etc/anyterm.conf ; chmod ug+r /usr/local/etc/anyterm.conf ; killall anytermd");
 	exec($anytermd_command);
+	unlink("/usr/local/etc/anyterm.conf");
 
 }
 
