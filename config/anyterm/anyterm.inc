@@ -72,9 +72,11 @@ load_rc_config \$name
 
 anyterm_start () {
 	if [ -f /var/etc/anyterm.conf ]; then
+		if [ `ps awux | grep -v grep | grep anytermd | wc -l` -gt 0 ]; then
+			killall anytermd 
+		fi
 		/usr/bin/env \
 			PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
-			killall anytermd \
 			$anytermd_command
 	fi
 }
