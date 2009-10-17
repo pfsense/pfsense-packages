@@ -71,7 +71,7 @@ stop_postcmd="anyterm_stop"
 load_rc_config \$name
 
 anyterm_start () {
-	if [ -f /var/etc/anyterm.conff ]; then
+	if [ -f /var/etc/anyterm.conf ]; then
 		if [ `ps awux | grep -v grep | grep anytermd | wc -l` -gt 0 ]; then
 			killall anytermd 
 		fi
@@ -106,11 +106,11 @@ EOD;
 	exec("chmod a+rx /usr/local/etc/rc.d/anyterm.sh");
 
 	// Write out Anyterm configuration file (username and password for auth)
-	$fd = fopen("/var/etc/anyterm.conff", "w");
+	$fd = fopen("/var/etc/anyterm.conf", "w");
 	fwrite($fd, $config['installedpackages']['anyterm']['config'][0]['username'] . "\n");
 	fwrite($fd, $config['installedpackages']['anyterm']['config'][0]['password'] . "\n");
 	fclose($fd);
-	exec("chmod a-r /var/etc/anyterm.conff ; chmod ug+r /var/etc/anyterm.conff ; killall anytermd");
+	exec("chmod a-r /var/etc/anyterm.conf ; chmod ug+r /var/etc/anyterm.conf ; killall anytermd");
 	exec($anytermd_command);
 
 }
