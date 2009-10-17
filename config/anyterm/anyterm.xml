@@ -50,7 +50,7 @@
 		<url>/pkg_edit.php?xml=anyterm.xml&amp;id=0</url>
 	</menu>
 	<service>
-		<name>anyterm</name>
+		<name>Anyterm</name>
 		<rcfile>anyterm.sh</rcfile>
 		<executable>anytermd</executable>
 		<description>Ajax Interactive Shell</description>
