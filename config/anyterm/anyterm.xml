@@ -99,22 +99,18 @@
 		<field>
 			<fielddescr>STunnel Port</fielddescr>
 			<fieldname>stunnelport</fieldname>
-			<description><![CDATA[[OPTIONAL] If you have setup a STunnel forward (recommended!) enter its port here.]]></description>
+			<description>
+				<![CDATA[
+					[OPTIONAL] If you have setup a STunnel forward (recommended!) enter its port here.
+				]]>
+			</description>
 			<type>input</type>
 		</field>
 	</fields>
-	<custom_delete_php_command>
-	</custom_delete_php_command>
-	<custom_add_php_command>
-	</custom_add_php_command>
 	<custom_php_resync_config_command>
 		anyterm_install();
 	</custom_php_resync_config_command>
-	<custom_php_install_command>
-	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		anyterm_deinstall();
 	</custom_php_deinstall_command>
-	<custom_php_command_before_form>	
-	</custom_php_command_before_form>
 </packagegui>
