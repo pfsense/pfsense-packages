@@ -37,7 +37,7 @@ if($config['installedpackages']['anyterm']['config'][0]['stunnelport']) {
 	$httpors = "https";
 }
 
-$location = "{$SERVER['SERVER_ADDR']}:{$port}";
+$location = "{$_SERVER['SERVER_ADDR']}:{$port}";
 
 Header("Location: {$httpors}://{$location}");
 
