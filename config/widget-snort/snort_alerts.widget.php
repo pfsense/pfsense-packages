@@ -30,10 +30,9 @@ global $config, $g;
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
 	<tbody>
 		<tr class="snort-alert-header">
-			<td width="5%"  class="widgetsubheader">Pri</td>
-			<td width="5%"  class="widgetsubheader">Category</td>
-			<td width="45%" class="widgetsubheader">Src</td>
-			<td width="45%" class="widgetsubheader">Dst</td>
+		  <td width="30%" class="widgetsubheader" >Date</td>
+			<td width="40%" class="widgetsubheader">Src/Dst</td>
+			<td width="40%" class="widgetsubheader">Details</td>
 		</tr>
 <?php   $counter=0;
  	foreach ($snort_alerts as $alert) { ?>
@@ -56,10 +55,9 @@ global $config, $g;
 	?>
 
 		<tr class="snort-alert-entry" <?php echo $activerow; ?>>
-			<td width="5%"  class="listr"><?= $alert["priority"] ?></td>
-			<td width="5%"  class="listr"><?= $alert["category"] ?></td>
-			<td width="45%" class="listr"><?= $alert["src"] ?></td>
-			<td width="45%" class="listr"><?= $alert["dst"] ?></td>
+		  <td width="30%" class="listr"><?= $alert['timeonly'] . ' ' . $alert['dateonly'] ?></td>		
+			<td width="40%" class="listr"><?= $alert["src"] . '<br>' . $alert["dst"] ?></td>
+			<td width="40%" class="listr"><?= 'Pri : ' . $alert["priority"] . '<br>' . 'Cat : ' . $alert['category'] ?></td>
 		</tr>
 <?php 		$counter++;
 	} ?>

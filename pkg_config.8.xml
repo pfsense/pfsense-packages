@@ -756,7 +756,7 @@
       <descr>Dashboard widget for Snort.</descr>
       <category>System</category>
       <config_file>http://www.pfsense.com/packages/config/widget-snort/widget-snort.xml</config_file>
-      <version>0.1</version>
+      <version>0.2</version>
       <status>BETA</status>
       <required_version>1.2</required_version>
       <configurationfile>widget-snort.xml</configurationfile>

@@ -72,10 +72,9 @@ function snort_alerts_fetch_new_rules_callback(callback_data) {
 		/* loop through rows */
 		row_split = data_split[x].split("||");
 		var line = '';
-		line =  '<td width="5%"  class="listr">' + row_split[1] + '</td>';
-		line += '<td width="5%"  class="listr">' + row_split[2] + '</td>';
-		line += '<td width="45%" class="listr">' + row_split[3] + '</td>';
-		line += '<td width="45%" class="listr">' + row_split[4] + '</td>';
+		line = '<td width="30%"  class="listr" >' + row_split[6] + '<br>' + row_split[7]+ '</td>';		
+		line += '<td width="40%"  class="listr" >' + row_split[3] + '<br>' + row_split[4] + '</td>';
+		line += '<td width="40%" class="listr" >' + 'Pri : ' +  row_split[1] + '<br>' + 'Cat : ' + row_split[2] + '</td>';
 		snortlastsawtime = row_split[5];
 		new_data_to_add[new_data_to_add.length] = line;
 	}
