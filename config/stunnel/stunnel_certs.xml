@@ -126,8 +126,7 @@
 			<rows>7</rows>
 			<cols>65</cols>
 		</field>
-	</fields>
-	
+	</fields>	
 	<include_file>/usr/local/pkg/stunnel.inc</include_file>
 	<custom_add_php_command>
 		stunnel_save_cert($config);
@@ -142,5 +141,4 @@
 	<custom_delete_php_command>
 		stunnel_delete($config);
 	</custom_delete_php_command>
-
 </packagegui>

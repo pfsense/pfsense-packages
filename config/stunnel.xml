@@ -133,9 +133,9 @@
 			<description>Select server certificate to use for this tunnel. Certificates are defined on the 'Certificates' page.</description>
 			<type>select</type>
 			<options>
-				<option><name> --- default --- </name><value></value></option>
+				<option><name>default</name><value></value></option>
 			</options>
-			<default_value></default_value>
+			<default_value>default</default_value>
 		</field>
 		<field>
 			<fielddescr>Redirects to IP</fielddescr>
