@@ -43,7 +43,7 @@ function anyterm_install() {
 	// Grab latest version of executablevi /
 	$freebsdv=trim(`uname -r | cut -d'.' -f1`);
 	`fetch -q -o /usr/local/sbin/ http://www.pfsense.org/packages/config/anyterm/binaries{$freebsdv}/anytermd`;
-	exec("chmod a+rx /usr/local/sbin/anyterm");
+	exec("chmod a+rx /usr/local/sbin/anytermd");
 
 	if($config['installedpackages']['anyterm']['config'][0]['username']) 
 		$port = " --port {$config['installedpackages']['anyterm']['config'][0]['port']}";
