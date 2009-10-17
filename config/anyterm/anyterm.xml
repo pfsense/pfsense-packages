@@ -97,6 +97,16 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>STunnel IP Address</fielddescr>
+			<fieldname>stunnelipaddr</fieldname>
+			<description>
+				<![CDATA[
+					[OPTIONAL] If you have setup a STunnel forward (recommended!) enter its listening IP address here (generally WAN IP).
+				]]>
+			</description>
+			<type>input</type>
+		</field>
+		<field>
 			<fielddescr>STunnel Port</fielddescr>
 			<fieldname>stunnelport</fieldname>
 			<description>
