@@ -4,7 +4,7 @@
   <packages>
 	<package>
 		<name>anyterm</name>
-		<descr>Ajax Interactive Shell - Have you ever wanted SSH or telnet access to your system from an “internet desert” - from behind a strict firewall, from an internet cafe, or even from a mobile phone? Anyterm is a combination of a web page and a process that runs on your web server that provides this access.  WARNING!  We suggest using Stunnel in combination with this package!</descr>
+		<descr>Ajax Interactive Shell - Have you ever wanted SSH or telnet access to your system from an internet desert - from behind a strict firewall, from an internet cafe, or even from a mobile phone? Anyterm is a combination of a web page and a process that runs on your web server that provides this access.  WARNING!  We suggest using Stunnel in combination with this package!</descr>
 		<website>http://haproxy.1wt.eu/</website>
 		<category>Diagnostics</category>
 		<version>0.2</version>
