@@ -49,7 +49,7 @@ function anyterm_install() {
 		$port = " --port {$config['installedpackages']['anyterm']['config'][0]['port']}";
 
 	// This will bring up the pfSense style menu
-	$anytermd_command = "anytermd --user root --command \"/usr/libexec/getty Pc\" --auth trivial $port";
+	$anytermd_command = "anytermd --user root --command '/etc/rc.initial' --auth trivial $port";
 
 			$anyterm = <<<EOD
 #!/bin/sh
