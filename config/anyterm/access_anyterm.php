@@ -29,11 +29,11 @@
 
 require("guiconfig.inc");
 
-if($config['installedpackages']['anyterm']['config']['stunnelport']) {
-	$port = $config['installedpackages']['anyterm']['config']['port'];
+if($config['installedpackages']['anyterm']['config'][0]['stunnelport']) {
+	$port = $config['installedpackages']['anyterm']['config'][0]['port'];
 	$httpors = "http";
 } else {
-	$port = $config['installedpackages']['anyterm']['config']['stunnelport'];
+	$port = $config['installedpackages']['anyterm']['config'][0]['stunnelport'];
 	$httpors = "https";
 }
 

@@ -45,8 +45,8 @@ function anyterm_install() {
 	`fetch -q -o /usr/local/sbin/ http://www.pfsense.org/packages/config/anyterm/binaries{$freebsdv}/anytermd`;
 	exec("chmod a+rx /usr/local/sbin/anyterm");
 
-	if($config['installedpackages']['anyterm']['config']['username']) 
-		$port = " --port {$config['installedpackages']['anyterm']['config']['port']}";
+	if($config['installedpackages']['anyterm']['config'][0]['username']) 
+		$port = " --port {$config['installedpackages']['anyterm']['config'][0]['port']}";
 
 	// This will bring up the pfSense style menu
 	$anytermd_command = "anytermd --user root --command \"/usr/libexec/getty Pc\" --auth trivial $port";
@@ -97,8 +97,8 @@ EOD;
 
 	// Write out Anyterm configuration file (username and password for auth)
 	$fd = fopen("/var/etc/anyterm.conf", "w");
-	fwrite($fd, $config['installedpackages']['anyterm']['config']['username'] . "\n");
-	fwrite($fd, $config['installedpackages']['anyterm']['config']['password'] . "\n");
+	fwrite($fd, $config['installedpackages']['anyterm']['config'][0]['username'] . "\n");
+	fwrite($fd, $config['installedpackages']['anyterm']['config'][0]['password'] . "\n");
 	fclose($fd);
 	exec("chmod a-r /var/etc/anyterm.conf ; chmod ug+r /var/etc/anyterm.conf ; killall anytermd");
 	exec($anytermd_command);
