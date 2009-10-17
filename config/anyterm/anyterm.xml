@@ -99,7 +99,7 @@
 		<field>
 			<fielddescr>STunnel Port</fielddescr>
 			<fieldname>stunnelport</fieldname>
-			<description>OPTIONAL. If you have setup a STunnel forward enter its port here.</description>
+			<description><![CDATA[[OPTIONAL] If you have setup a STunnel forward (recommended!) enter its port here.]]></description>
 			<type>input</type>
 		</field>
 	</fields>
