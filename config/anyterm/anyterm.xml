@@ -8,7 +8,7 @@
 /* ========================================================================== */
 /*
     anyterm.xml
-    part of pfSense (http://www.pfSense.com)
+    pfSense package (http://www.pfSense.com)
     Copyright (C) 2009 Scott Ullrich
     All rights reserved.
                                                                               */
@@ -53,7 +53,7 @@
 		<name>anyterm</name>
 		<rcfile>anyterm.sh</rcfile>
 		<executable>anytermd</executable>
-		<description>The Reliable, High Performance TCP/HTTP Load Balancer</description>
+		<description>Ajax Interactive Shell</description>
 	</service>	
 	<configpath>installedpackages->anyterm->config</configpath>
 	<additional_files_needed>
@@ -61,23 +61,40 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/anyterm/anyterm.inc</item>
 	</additional_files_needed>
+	<tabs>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg.php?xml=spamd.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Ajax Shell</text>
+			<url>access_anyterm.php</url>
+		</tab>
+	</tabs>
 	<fields>
 		<field>
 			<fielddescr>Username</fielddescr>
 			<fieldname>username</fieldname>
-			<description>Enter the username for Anyterm</description>
+			<description>Enter the username for accessing Anyterm</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Password</fielddescr>
 			<fieldname>password</fieldname>
-			<description>Enter the password for Anyterm</description>
+			<description>Enter the password for accessing Anyterm</description>
 			<type>password</type>
 		</field>
 		<field>
 			<fielddescr>Port</fielddescr>
 			<fieldname>port</fieldname>
-			<description>Enter the port that Anyterm will listen on.</description>
+			<description>Enter the port that Anyterm will listen on Default is 8080.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>STunnel Port</fielddescr>
+			<fieldname>stunnelport</fieldname>
+			<description>[OPTIONAL] If you have setup a STunnel forward enter its port here.</description>
 			<type>input</type>
 		</field>
 	</fields>
