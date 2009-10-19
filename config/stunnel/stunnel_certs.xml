@@ -112,7 +112,7 @@
 		<field>
 			<fielddescr>RSA private key</fielddescr>
 			<fieldname>cert_key</fieldname>
-			<description>RSA private key used for certificate. Do not change for existing certificates!&lt;br&gt;
+			<description>RSA private key used for certificate. Do not change for existing certificates!&lt;br&gt;</description>
 			<type>textarea</type>
 			<rows>7</rows>
 			<cols>65</cols>
