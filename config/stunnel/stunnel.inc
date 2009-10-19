@@ -23,14 +23,18 @@ if(!isset($_GET['id']) and !isset($_POST['id']) and $num_certs) {
 		$cert=$certs[$i];
 		$_info=openssl_x509_parse(base64_decode($cert['cert_chain']));
 		$valid=floor(($_info['validTo_time_t']-time())/86400);
-		if(!openssl_x509_check_private_key(base64_decode($cert['cert_chain']), base64_decode($cert['cert_key']))) {
-			$_status='<font color="#AA0000"><b>Invalid key/cert!</b></font>';
-		} elseif($valid<30) {
-			$_status='<font color="#B27D4B">Expires in '.$valid.' days!</font>';
+		if($cert['cert_chain']) {
+			if(!openssl_x509_check_private_key(base64_decode($cert['cert_chain']), base64_decode($cert['cert_key']))) {
+				$_status='<font color="#AA0000"><b>Invalid key/cert!</b></font>';
+			} elseif($valid<30) {
+				$_status='<font color="#B27D4B">Expires in '.$valid.' days!</font>';
+			} else {
+				$_status='<font color="#008800">OK ('.$valid.' days)</font>';
+			}
+			$config['installedpackages']['stunnelcerts']['config'][$i]['status']=$_status;
 		} else {
-			$_status='<font color="#008800">OK ('.$valid.' days)</font>';
+			unset($config['installedpackages']['stunnelcerts']['config'][$i]);
 		}
-		$config['installedpackages']['stunnelcerts']['config'][$i]['status']=$_status;
 	}
 }
 
