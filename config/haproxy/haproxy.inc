@@ -89,7 +89,7 @@ EOD;
 	$fd = fopen("/usr/local/etc/rc.d/haproxy.sh");
 	fwrite($fd, $haproxy);
 	fclose($fd);
-	exec("chmod a+rx /usr/local/etc/rc.d/haproxy.sh")
+	exec("chmod a+rx /usr/local/etc/rc.d/haproxy.sh");
 
 	conf_mount_ro();
 
