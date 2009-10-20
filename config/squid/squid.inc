@@ -689,7 +689,6 @@ cache_dir $disk_cache_system $cachedir $disk_cache_size $level1 256
 minimum_object_size $min_objsize KB
 maximum_object_size $max_objsize KB
 offline_mode $offline_mode
-dns_children 32
 
 EOD;
 
