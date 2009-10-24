@@ -164,6 +164,8 @@ hide_progress_bar_status();
 /* send current buffer */
 ob_flush();
 
+conf_mount_rw();
+
 /*  remove old $tmpfname files */
 if (file_exists("{$tmpfname}")) {
     update_status(gettext("Removing old tmp files..."));
@@ -188,8 +190,6 @@ if (file_exists($tmpfname)) {
 
 /* unhide progress bar and lets end this party */
 unhide_progress_bar_status();
-
-conf_mount_rw();
 
 /*  download md5 sig from snort.org */
 if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
