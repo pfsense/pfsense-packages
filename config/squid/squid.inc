@@ -252,20 +252,22 @@ EOD;
 function squid_deinstall_command() {
 	global $config;
   squid_install_cron(false);
-	$settings = $config['installedpackages']['squidcache']['config'][0];
+	$settings = &$config['installedpackages']['squidcache']['config'][0];
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
+		update_status("Checking Squid cache... One moment please...");
+		update_output_window("This operation may take quite some time, please be patient.  Do not press stop or attempt to navigate away from this page during this process.");
 	mwexec('rm -rf $cachedir');
 	mwexec('rm -rf $logdir');
-	// This should not be necessary but the above seems to not work!?
-	if(is_file("/var/squid/cache/swap.state"))
-		mwexec("rm -rf /var/squid/cache/swap.state");
+		update_status("Finishing package cleanup.");
+		update_output_window("This operation may take quite some time, please be patient.  Do not press stop or attempt to navigate away from this page during this process.");
 	mwexec('rm -f /usr/local/etc/rc.d/proxy_monitor.sh');
 	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
 	mwexec("ps awux | grep \"squid\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
 	mwexec("ps awux | grep \"dnsserver\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
 	mwexec("ps awux | grep \"unlinkd\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
-	filter_configure();
+	update_status("Relaoding filter...");
+	filter_configure_sync();
 }
 
 function squid_before_form_general($pkg) {
