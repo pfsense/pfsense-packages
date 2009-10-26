@@ -258,7 +258,7 @@ function squid_deinstall_command() {
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
 	update_status("Checking Squid cache... One moment please...");
 	update_output_window("$plswait_txt");
-	mwexec('rm -rf $cachedir');
+	mwexec('rm -rf $cachedir/swap.state');
 	mwexec('rm -rf $logdir');
 	update_status("Finishing package cleanup.");
 	mwexec('rm -f /usr/local/etc/rc.d/proxy_monitor.sh');
