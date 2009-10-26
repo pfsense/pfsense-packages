@@ -257,7 +257,8 @@ function squid_deinstall_command() {
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
 	mwexec('rm -rf $cachedir');
 	mwexec('rm -rf $logdir');
-	if(is_file("/var/squid/swap.state"))
+	// This should not be necessary but the above seems to not work!?
+	if(is_file("/var/squid/cache/swap.state"))
 		mwexec("rm -rf /var/squid/cache/swap.state");
 	mwexec('rm -f /usr/local/etc/rc.d/proxy_monitor.sh');
 	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
