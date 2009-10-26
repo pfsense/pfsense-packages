@@ -250,17 +250,17 @@ EOD;
 }
 
 function squid_deinstall_command() {
-	global $config;
-  squid_install_cron(false);
+	global $config, $g;
+	$plswait_txt = "This operation may take quite some time, please be patient.  Do not press stop or attempt to navigate away from this page during this process.";
+	squid_install_cron(false);
 	$settings = &$config['installedpackages']['squidcache']['config'][0];
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
-		update_status("Checking Squid cache... One moment please...");
-		update_output_window("This operation may take quite some time, please be patient.  Do not press stop or attempt to navigate away from this page during this process.");
+	update_status("Checking Squid cache... One moment please...");
+	update_output_window("$plswait_txt");
 	mwexec('rm -rf $cachedir');
 	mwexec('rm -rf $logdir');
-		update_status("Finishing package cleanup.");
-		update_output_window("This operation may take quite some time, please be patient.  Do not press stop or attempt to navigate away from this page during this process.");
+	update_status("Finishing package cleanup.");
 	mwexec('rm -f /usr/local/etc/rc.d/proxy_monitor.sh');
 	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
 	mwexec("ps awux | grep \"squid\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
