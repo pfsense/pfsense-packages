@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
 	squid.inc
-	Copyright (C) 2006 Scott Ullrich
+	Copyright (C) 2006-2009 Scott Ullrich
 	Copyright (C) 2006 Fernando Lemos
 	Copyright (C) 2008 Martin Fuchs	
 	All rights reserved.
@@ -134,36 +134,42 @@ function squid_install_command() {
 			$config['installedpackages']['squidnac']['config'][0]['allowed_subnets'] = $settingsnac['allowed_subnets'];
 		}
 	}
+
 	if(! empty($settingsnac['banned_hosts'])) {
 		if(strstr($settingsnac['banned_hosts'], ",")) {
 			$settingsnac['banned_hosts'] = base64_encode(implode("\n", explode(",", $settingsnac['banned_hosts'])));
 			$config['installedpackages']['squidnac']['config'][0]['banned_hosts'] = $settingsnac['banned_hosts'];
 		}
 	}
+
 	if(! empty($settingsnac['banned_macs'])) {
 		if(strstr($settingsnac['banned_macs'], ",")) {
 			$settingsnac['banned_macs'] = base64_encode(implode("\n", explode(",", $settingsnac['banned_macs'])));
 			$config['installedpackages']['squidnac']['config'][0]['banned_macs'] = $settingsnac['banned_macs'];
 		}
 	}
+
 	if(! empty($settingsnac['unrestricted_hosts'])) {
 		if(strstr($settingsnac['unrestricted_hosts'], ",")) {
 			$settingsnac['unrestricted_hosts'] = base64_encode(implode("\n", explode(",", $settingsnac['unrestricted_hosts'])));
 			$config['installedpackages']['squidnac']['config'][0]['unrestricted_hosts'] = $settingsnac['unrestricted_hosts'];
 		}
 	}
+
 	if(! empty($settingsnac['unrestricted_macs'])) {
 		if(strstr($settingsnac['unrestricted_macs'], ",")) {
 			$settingsnac['unrestricted_macs'] = base64_encode(implode("\n", explode(",", $settingsnac['unrestricted_macs'])));
 			$config['installedpackages']['squidnac']['config'][0]['unrestricted_macs'] = $settingsnac['unrestricted_macs'];
 		}
 	}
+
 	if(! empty($settingsnac['whitelist'])) {
 		if(strstr($settingsnac['whitelist'], ",")) {
 			$settingsnac['whitelist'] = base64_encode(implode("\n", explode(",", $settingsnac['whitelist'])));
 			$config['installedpackages']['squidnac']['config'][0]['whitelist'] = $settingsnac['whitelist'];
 		}
 	}
+
 	if(! empty($settingsnac['blacklist'])) {
 		if(strstr($settingsnac['blacklist'], ",")) {
 			$settingsnac['blacklist'] = base64_encode(implode("\n", explode(",", $settingsnac['blacklist'])));
@@ -207,7 +213,7 @@ if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
 	fi
 
 EOD;
-	update_status("Writing rc files... One moment please...");
+	update_status("Writing rc.d files... One moment please...");
 	write_rcfile($rc);
 
 	exec("chmod a+rx /usr/local/libexec/squid/dnsserver");
@@ -256,7 +262,7 @@ function squid_deinstall_command() {
 	$settings = &$config['installedpackages']['squidcache']['config'][0];
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
-	update_status("Checking Squid cache... One moment please...");
+	update_status("Removing swap.state ... One moment please...");
 	update_output_window("$plswait_txt");
 	mwexec('rm -rf $cachedir/swap.state');
 	mwexec('rm -rf $logdir');
