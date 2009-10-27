@@ -898,7 +898,8 @@ function snort_rules_up_install_cron($should_install) {
 	snort_rules_up_install_cron("");
 	snort_rules_up_install_cron($snort_rules_up_false);
 }
-
+	/* Be sure we're really rw before writing */
+        conf_mount_rw();
 	/* open snort2c's whitelist for writing */
 	$whitelist = fopen("/var/db/whitelist", "w");
 	if(!$whitelist) {
@@ -995,6 +996,8 @@ function snort_rules_up_install_cron($should_install) {
 	/* close file */
 	fclose($whitelist);
 
+     /* Be sure we're really rw before writing */
+     conf_mount_rw();
      /* open snort's threshold.conf for writing */
      $threshlist = fopen("/usr/local/etc/snort/threshold.conf", "w");
      if(!$threshlist) {
