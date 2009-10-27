@@ -62,6 +62,16 @@
 		<chmod>0644</chmod>
 		<item>http://www.pfsense.com/packages/config/apache_mod_security/apache_mod_security_view_logs.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/apachemodsecurity/rules/</prefix>
+		<chmod>0644</chmod>
+		<item>http://www.pfsense.com/packages/config/apache_mod_security/rules/default.conf</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/apachemodsecurity/rules/</prefix>
+		<chmod>0644</chmod>
+		<item>http://www.pfsense.com/packages/config/apache_mod_security/rules/10_asl_rules.conf</item>
+	</additional_files_needed>
 	<tabs>
 		<tab>
 			<text>Proxy Server Settings</text>
@@ -140,8 +150,8 @@
 			<fieldname>primarysitehostname</fieldname>
 			<description>
 				<![CDATA[
-				Enter the primary hostname (FQDN) for this website (e.g. www.example.com)<br/>
-				Leave blank and define the IP Address / port above for IP site proxy (i.e. not named site proxy)
+					Enter the primary hostname (FQDN) for this website (e.g. www.example.com)<br/>
+					Leave blank and define the IP Address / port above for IP site proxy (i.e. not named site proxy)
 				]]></description>
 			<size>40</size>
 			<type>input</type>
@@ -193,13 +203,5 @@
 	<custom_php_resync_config_command>
 		apache_mod_security_resync();
 	</custom_php_resync_config_command>
-	<custom_add_php_command_late>
-	</custom_add_php_command_late>
-	<custom_php_install_command>
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-	</custom_php_deinstall_command>
-	<custom_php_after_form_command>
-	</custom_php_after_form_command>
 	<include_file>/usr/local/pkg/apache_mod_security.inc</include_file>	
 </packagegui>

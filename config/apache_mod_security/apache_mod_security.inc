@@ -27,19 +27,29 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-if(!is_dir("/usr/local/apachemodsecurity"))  {
-	safe_mkdir("/usr/local/apachemodsecurity");
-	conf_mount_rw();
-}
+// Rules directory location
+define("rules_directory", "/usr/local/apachemodsecurity/rules");
 
+// Ensure NanoBSD can write. pkg_mgr will remount RO
+conf_mount_rw();
+
+// Needed mod_security directories
+if(!is_dir("/usr/local/apachemodsecurity"))  	
+	safe_mkdir("/usr/local/apachemodsecurity");
+if(!is_dir("/usr/local/apachemodsecurity")) 
+	safe_mkdir("/usr/local/apachemodsecurity/rules");
+
+// Startup function	
 function apache_mod_security_start() {
 	exec("/usr/local/sbin/httpd -k start");
 }
 
+// Shutdown function
 function apache_mod_security_stop() {
 	exec("/usr/local/sbin/httpd -k stop");
 }
 
+// Restart function
 function apache_mod_security_restart() {
 	if(is_process_running("httpd")) {
 		exec("/usr/local/sbin/httpd -k graceful");
@@ -48,6 +58,7 @@ function apache_mod_security_restart() {
 	}
 }
 
+// Install function
 function apache_mod_security_install() {
 	global $config, $g;
 
@@ -288,6 +299,19 @@ EOF;
 	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['modsecuritycustom'])  
 		$mod_security_custom = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['modsecuritycustom'];
 
+	// Process and include rules
+	if(is_dir(rules_directory)) {
+		$mod_security_rules = "";
+		$files = return_dir_as_array(rules_directory);
+		foreach($files as $file) { 
+			if(file_exists($file)) {
+				// XXX: TODO integrate snorts rule on / off thingie
+				$file_txt = get_file_contents($file);
+				$mod_security_rules .= $file_txt . "\n";
+			}
+		}
+	}
+
 	// Mod_security enabled?
 	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['enablemodsecurity'])  {
 		$enable_mod_security = true;
@@ -342,79 +366,8 @@ EOF;
     # Should mod_security inspect POST payloads
     SecFilterScanPOST On
 
-    # Default action set
-    SecFilterDefaultAction "deny,log,status:406"
-
-    # Simple example filter
-    SecFilter 111
-
-    # Prevent path traversal (..) attacks
-    SecFilter "\.\./"
-
-    # Weaker XSS protection but allows common HTML tags
-    SecFilter "<( |\n)*script"
-
-    # Prevent XSS atacks (HTML/Javascript injection)
-    SecFilter "<(.|\n)+>"
-
-    # Very crude filters to prevent SQL injection attacks
-    SecFilter "delete[[:space:]]+from"
-    SecFilter "insert[[:space:]]+into"
-    SecFilter "select.+from"
-
-    # Require HTTP_USER_AGENT and HTTP_HOST headers
-    SecFilterSelective "HTTP_USER_AGENT|HTTP_HOST" "^$"
-
-    # Only accept request encodings we know how to handle
-    # we exclude GET requests from this because some (automated)
-    # clients supply "text/html" as Content-Type
-    SecFilterSelective REQUEST_METHOD "!^GET$" chain
-    SecFilterSelective HTTP_Content-Type "!(^$|^application/x-www-form-urlencoded$|^multipart/form-data)"
-
-    # Require Content-Length to be provided with
-    # every POST request
-    SecFilterSelective REQUEST_METHOD "^POST$" chain
-    SecFilterSelective HTTP_Content-Length "^$"
-
-    # Don't accept transfer encodings we know we don't handle
-    # (and you don't need it anyway)
-    SecFilterSelective HTTP_Transfer-Encoding "!^$"
-
-    # Some common application-related rules from
-    # http://modsecrules.monkeydev.org/rules.php?safety=safe
-
-    #Nuke Bookmarks XSS
-    SecFilterSelective THE_REQUEST "/modules\.php\?name=Bookmarks\&file=(del_cat\&catname|del_mark\&markname|edit_cat\&catname|edit_cat\&catcomment|marks\&catname|uploadbookmarks\&category)=(<[[:space:]]*script|(http|https|ftp)\:/)"
-
-    #Nuke Bookmarks Marks.php SQL Injection Vulnerability
-    SecFilterSelective THE_REQUEST "modules\.php\?name=Bookmarks\&file=marks\&catname=.*\&category=.*/\*\*/(union|select|delete|insert)"
-
-    #PHPNuke general XSS attempt
-    #/modules.php?name=News&file=article&sid=1&optionbox=
-    SecFilterSelective THE_REQUEST "/modules\.php\?*name=<[[:space:]]*script"
-
-    # PHPNuke SQL injection attempt
-    SecFilterSelective THE_REQUEST "/modules\.php\?*name=Search*instory="
-
-    #phpnuke sql insertion
-    SecFilterSelective THE_REQUEST "/modules\.php*name=Forums.*file=viewtopic*/forum=.*\'/"
-
-    # WEB-PHP phpbb quick-reply.php arbitrary command attempt
-
-    SecFilterSelective THE_REQUEST "/quick-reply\.php" chain
-    SecFilter "phpbb_root_path="
-
-    #Topic Calendar Mod for phpBB Cross-Site Scripting Attack
-    SecFilterSelective THE_REQUEST "/calendar_scheduler\.php\?start=(<[[:space:]]*script|(http|https|ftp)\:/)"
-
-    # phpMyAdmin: Safe
-
-    #phpMyAdmin Export.PHP File Disclosure Vulnerability
-    SecFilterSelective SCRIPT_FILENAME "export\.php$" chain
-    SecFilterSelective ARG_what "\.\."
-
-    #phpMyAdmin path vln
-    SecFilterSelective REQUEST_URI "/css/phpmyadmin\.css\.php\?GLOBALS\[cfg\]\[ThemePath\]=/etc"
+	# Include rules from rules/ directory
+	{$mod_security_rules}
 
 </IfModule>
 
