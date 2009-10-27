@@ -272,7 +272,7 @@ function squid_deinstall_command() {
 	mwexec("ps awux | grep \"squid\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
 	mwexec("ps awux | grep \"dnsserver\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
 	mwexec("ps awux | grep \"unlinkd\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
-	update_status("Relaoding filter...");
+	update_status("Reloading filter...");
 	filter_configure_sync();
 }
 
