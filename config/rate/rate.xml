@@ -64,7 +64,6 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/rate/status_graph.php</item>
 	</additional_files_needed>
-
 	<custom_php_install_command>
 		rate_install();
 	</custom_php_install_command>

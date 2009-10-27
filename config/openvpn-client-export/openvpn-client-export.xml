@@ -39,21 +39,6 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/openvpn-client-export/vpn_openvpn_export.php</item>
 	</additional_files_needed>
-	<adddeleteeditpagefields>
-		<columnitem>
-			<fielddescr></fielddescr>
-			<fieldname></fieldname>
-		</columnitem>
-	</adddeleteeditpagefields>
-	<fields>
-		<field>
-			<fielddescr></fielddescr>
-			<fieldname></fieldname>
-			<description></description>
-			<size></size>
-			<type></type>
-		</field>
-	</fields>
 	<custom_php_install_command>
 		openvpn_client_export_install();
 	</custom_php_install_command>

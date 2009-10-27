@@ -142,10 +142,6 @@
 	<custom_php_validation_command>
 		custom_php_validation_command($_POST, &amp;$input_errors);
 	</custom_php_validation_command>
-	<custom_php_global_functions>
-	</custom_php_global_functions>
-	<custom_add_php_command>
-	</custom_add_php_command>
 	<custom_php_resync_config_command>
         <![CDATA[		
 			exec("echo > /cf/conf/lastpfSbackup.txt");
@@ -157,8 +153,4 @@
 			$savemsg .= "A configuration backup has been queued.";
         ]]>		
 	</custom_php_resync_config_command>
-	<custom_php_install_command>
-	</custom_php_install_command>
-	<custom_php_deinstall_command>
-	</custom_php_deinstall_command>
 </packagegui>

@@ -109,6 +109,4 @@
         <custom_add_php_command>
 			nmap_custom_add_php_command();
         </custom_add_php_command>
-		<custom_php_deinstall_command>
-		</custom_php_deinstall_command>
 </packagegui>

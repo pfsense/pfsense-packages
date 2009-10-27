@@ -156,15 +156,12 @@
 			<type>input</type>
 		</field>
 	</fields>
-
 	<service>
 	  <name>stunnel</name>
 	  <rcfile>/usr/local/etc/rc.d/stunnel.sh</rcfile>
 	  <executable>stunnel</executable>
-	</service>	
-
+	</service>
 	<include_file>/usr/local/pkg/stunnel.inc</include_file>
-
 	<custom_add_php_command_late>
 		stunnel_save($config);
 	</custom_add_php_command_late>
@@ -177,5 +174,4 @@
 	<custom_php_after_form_command>
 		stunnel_addcerts($config);
 	</custom_php_after_form_command>
-
 </packagegui>
