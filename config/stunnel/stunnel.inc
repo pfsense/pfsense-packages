@@ -215,12 +215,14 @@ function stunnel_install() {
 	fwrite($fout, "chroot = /var/tmp/stunnel \n");
 	fwrite($fout, "setuid = stunnel \n");
 	fwrite($fout, "setgid = stunnel \n");
-	foreach($config['installedpackages']['stunnel']['config'] as $pkgconfig) {
-		fwrite($fout, "\n[" . $pkgconfig['description'] . "]\n");
-		if($pkgconfig['sourceip']) fwrite($fout, "local = " . $pkgconfig['sourceip'] . "\n");
-		fwrite($fout, "accept = " . $pkgconfig['localip'] . ":" . $pkgconfig['localport'] . "\n");
-		fwrite($fout, "connect = " . $pkgconfig['redirectip'] . ":" . $pkgconfig['redirectport'] . "\n");
-		fwrite($fout, "TIMEOUTclose = 0\n\n");
+	if($config['installedpackages']['stunnel']['config']) {
+		foreach($config['installedpackages']['stunnel']['config'] as $pkgconfig) {
+			fwrite($fout, "\n[" . $pkgconfig['description'] . "]\n");
+			if($pkgconfig['sourceip']) fwrite($fout, "local = " . $pkgconfig['sourceip'] . "\n");
+			fwrite($fout, "accept = " . $pkgconfig['localip'] . ":" . $pkgconfig['localport'] . "\n");
+			fwrite($fout, "connect = " . $pkgconfig['redirectip'] . ":" . $pkgconfig['redirectport'] . "\n");
+			fwrite($fout, "TIMEOUTclose = 0\n\n");
+		}
 	}
 	fclose($fout);
 	conf_mount_ro();
