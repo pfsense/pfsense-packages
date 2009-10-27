@@ -142,10 +142,33 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>Configures the maximum request body size ModSecurity will store in memory.</fielddescr>
+			<fieldname>secrequestbodyinmemorylimit</fieldname>
+			<description>Configures the maximum request body size ModSecurity will store in memory.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Configures the maximum request body size ModSecurity will accept for buffering.</fielddescr>
+			<fieldname>secrequestbodylimit</fieldname>
+			<description>Configures the maximum request body size ModSecurity will accept for buffering.</description>
+			<type>input</type>
+		</field
+		<field>
 			<fielddescr>Enable mod_security protection</fielddescr>
 			<fieldname>enablemodsecurity</fieldname>
 			<description>Enables mod_security protection for all sites being proxied</description>
 			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Configures the audit logging engine.</fielddescr>
+			<fieldname>secauditengine</fieldname>
+			<description>Configures the audit logging engine.</description>
+			<type>select</type>			
+			<options>
+			    <option><name>RelevantOnly</name><value>RelevantOnly</value></option>
+			    <option><name>All</name><value>On</value></option>
+			    <option><name>Off</name><value>Off</value></option>
+			</options>
 		</field>
 		<field>
 			<fielddescr>Custom mod_security rules</fielddescr>
