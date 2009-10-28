@@ -285,7 +285,7 @@ padding: 15px 10px 50% 50px;
                   <td class="list" valign="middle" nowrap>
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
-                        <td><?php if ($nnats == 0): ?><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" title="delete selected rules" border="0"><?php else: ?><input name="del" type="image" src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" title="delete selected mappings" onclick="return confirm('Do you really want to delete the selected Snort Rule?')"><?php endif; ?></td>
+                        <td><?php if ($nnats == 0): ?><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" title="delete selected rules" border="0"><?php else: ?><input name="del" type="image" src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" title="delete selected mappings" onclick="return confirm('Do you really want to delete the selected Snort Rule?')"><?php endif; ?></td>
                       </tr>
                     </table>
 				</td>
