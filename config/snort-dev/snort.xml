@@ -48,7 +48,7 @@
 	<name>Snort</name>
 	<version>2.8.4.1_5</version>
 	<title>Services: Snort 2.8.4.1_5 pkg v. 1.7 alpha</title>
-	<include_file>/usr/local/pkg/snort.inc</include_file>
+	<include_file>/usr/local/pkg/snort/snort.inc</include_file>
 	<menu>
 		<name>Snort</name>
 		<tooltiptext>Setup snort specific settings</tooltiptext>
