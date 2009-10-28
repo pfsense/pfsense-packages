@@ -32,7 +32,7 @@
 */
 
 require("guiconfig.inc");
-require("/usr/local/pkg/snort_misc.inc");
+require("/usr/local/pkg/snort/snort_gui.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
