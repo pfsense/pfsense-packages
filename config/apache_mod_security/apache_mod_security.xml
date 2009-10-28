@@ -101,7 +101,11 @@
 		<field>
 			<fielddescr>Site name</fielddescr>
 			<fieldname>sitename</fieldname>
-			<description><![CDATA[Enter a short descriptive name for the site. (e.g. intranet)]]></description>
+			<description>
+				<![CDATA[
+					Enter a short descriptive name for the site. (e.g. intranet)
+				]]>
+			</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -142,7 +146,11 @@
 		<field>
 			<fielddescr>Preserve Proxy hostname</fielddescr>
 			<fieldname>preserveproxyhostname</fieldname>
-			<description>When enabled, this option will pass the Host: line from the incoming request to the proxied host, instead of the backend IP address.</description>
+			<description>
+				<![CDATA[
+					When enabled, this option will pass the Host: line from the incoming request to the proxied host, instead of the backend IP address.
+				]]>
+			</description>
 			<type>checkbox</type>
 		</field>
 		<field>
@@ -152,7 +160,8 @@
 				<![CDATA[
 					Enter the primary hostname (FQDN) for this website (e.g. www.example.com)<br/>
 					Leave blank and define the IP Address / port above for IP site proxy (i.e. not named site proxy)
-				]]></description>
+				]]>
+			</description>
 			<size>40</size>
 			<type>input</type>
 		</field>

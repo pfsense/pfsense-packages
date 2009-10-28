@@ -1,0 +1,2610 @@
+# WEB-ATTACKS ps command attempt
+SecFilterSelective THE_REQUEST "/bin/ps"
+
+# WEB-ATTACKS /bin/ps command attempt
+SecFilterSelective THE_REQUEST "ps\x20"
+
+# WEB-ATTACKS wget command attempt
+SecFilter "wget\x20"
+
+# WEB-ATTACKS uname -a command attempt
+SecFilter "uname\x20-a"
+
+# WEB-ATTACKS /usr/bin/id command attempt
+SecFilter "/usr/bin/id"
+
+# WEB-ATTACKS id command attempt
+SecFilter "\;id"
+
+# WEB-ATTACKS echo command attempt
+SecFilter "/bin/echo"
+
+# WEB-ATTACKS kill command attempt
+SecFilter "/bin/kill"
+
+# WEB-ATTACKS chmod command attempt
+SecFilter "/bin/chmod"
+
+# WEB-ATTACKS chgrp command attempt
+SecFilter "/chgrp"
+
+# WEB-ATTACKS chown command attempt
+SecFilter "/chown"
+
+# WEB-ATTACKS chsh command attempt
+SecFilter "/usr/bin/chsh"
+
+# WEB-ATTACKS tftp command attempt
+SecFilter "tftp\x20"
+
+# WEB-ATTACKS /usr/bin/gcc command attempt
+SecFilter "/usr/bin/gcc"
+
+# WEB-ATTACKS gcc command attempt
+SecFilter "gcc\x20-o"
+
+# WEB-ATTACKS /usr/bin/cc command attempt
+SecFilter "/usr/bin/cc"
+
+# WEB-ATTACKS cc command attempt
+SecFilter "cc\x20"
+
+# WEB-ATTACKS /usr/bin/cpp command attempt
+SecFilter "/usr/bin/cpp"
+
+# WEB-ATTACKS cpp command attempt
+SecFilter "cpp\x20"
+
+# WEB-ATTACKS /usr/bin/g++ command attempt
+SecFilter "/usr/bin/g\+\+"
+
+# WEB-ATTACKS g++ command attempt
+SecFilter "g\+\+\x20"
+
+# WEB-ATTACKS bin/python access attempt
+SecFilter "bin/python"
+
+# WEB-ATTACKS python access attempt
+SecFilter "python\x20"
+
+# WEB-ATTACKS bin/tclsh execution attempt
+SecFilter "bin/tclsh"
+
+# WEB-ATTACKS tclsh execution attempt
+SecFilter "tclsh8\x20"
+
+# WEB-ATTACKS bin/nasm command attempt
+SecFilter "bin/nasm"
+
+# WEB-ATTACKS nasm command attempt
+SecFilter "nasm\x20"
+
+# WEB-ATTACKS /usr/bin/perl execution attempt
+SecFilter "/usr/bin/perl"
+
+# WEB-ATTACKS perl execution attempt
+SecFilter "perl\x20"
+
+# WEB-ATTACKS nt admin addition attempt
+SecFilter "net localgroup administrators /add"
+
+# WEB-ATTACKS traceroute command attempt
+SecFilter "traceroute\x20"
+
+# WEB-ATTACKS ping command attempt
+SecFilter "/bin/ping"
+
+# WEB-ATTACKS netcat command attempt
+SecFilter "nc\x20"
+
+# WEB-ATTACKS nmap command attempt
+SecFilter "nmap\x20"
+
+# WEB-ATTACKS xterm command attempt
+SecFilter "/usr/X11R6/bin/xterm"
+
+# WEB-ATTACKS X application to remote host attempt
+SecFilter "\x20-display\x20"
+
+# WEB-ATTACKS lsof command attempt
+SecFilter "lsof\x20"
+
+# WEB-ATTACKS rm command attempt
+SecFilter "rm\x20"
+
+# WEB-ATTACKS mail command attempt
+SecFilter "/bin/mail"
+
+# WEB-ATTACKS mail command attempt
+SecFilter "mail\x20"
+
+# WEB-ATTACKS /bin/ls command attempt
+SecFilterSelective THE_REQUEST "/bin/ls"
+
+# WEB-ATTACKS /etc/inetd.conf access
+SecFilter "/etc/inetd\.conf" log,pass
+
+# WEB-ATTACKS /etc/motd access
+SecFilter "/etc/motd" log,pass
+
+# WEB-ATTACKS /etc/shadow access
+SecFilter "/etc/shadow" log,pass
+
+# WEB-ATTACKS conf/httpd.conf attempt
+SecFilter "conf/httpd\.conf" log,pass
+
+# WEB-ATTACKS .htgroup access
+SecFilterSelective THE_REQUEST "\.htgroup" log,pass
+
+# WEB-CGI HyperSeek hsx.cgi directory traversal attempt
+SecFilterSelective THE_REQUEST "/hsx\.cgi" chain
+SecFilter "\x00"
+
+# WEB-CGI HyperSeek hsx.cgi access
+SecFilterSelective THE_REQUEST "/hsx\.cgi" log,pass
+
+# WEB-CGI SWSoft ASPSeek Overflow attempt
+SecFilterSelective THE_REQUEST "/s\.cgi" chain
+SecFilter "tmpl="
+
+# WEB-CGI webspeed access
+SecFilterSelective THE_REQUEST "/wsisa\.dll/WService=" chain
+SecFilter "WSMadmin"
+
+# WEB-CGI yabb.cgi directory traversal attempt
+SecFilterSelective THE_REQUEST "/YaBB\.pl" chain
+SecFilter "\.\./"
+
+# WEB-CGI yabb.cgi access
+SecFilterSelective THE_REQUEST "/YaBB\.pl"
+
+# WEB-CGI /wwwboard/passwd.txt access
+SecFilterSelective THE_REQUEST "/wwwboard/passwd\.txt"
+
+# WEB-CGI webdriver access
+SecFilterSelective THE_REQUEST "/webdriver"
+
+# WEB-CGI whois_raw.cgi access
+SecFilterSelective THE_REQUEST "/whois_raw\.cgi"
+
+# WEB-CGI websitepro path access
+SecFilter " /HTTP/1\."
+
+# WEB-CGI webplus version access
+SecFilterSelective THE_REQUEST "/webplus\?about"
+
+# WEB-CGI webplus directory traversal
+SecFilterSelective THE_REQUEST "/webplus\?script" chain
+SecFilter "\.\./"
+
+# WEB-CGI websendmail access
+SecFilterSelective THE_REQUEST "/websendmail"
+
+# WEB-CGI dcforum.cgi directory traversal attempt
+SecFilterSelective THE_REQUEST "/dcforum\.cgi" chain
+SecFilter "forum=\.\./\.\."
+
+# WEB-CGI dcforum.cgi access
+SecFilterSelective THE_REQUEST "/dcforum\.cgi"
+
+# WEB-CGI dcboard.cgi invalid user addition attempt
+SecFilterSelective THE_REQUEST "/dcboard\.cgi" chain
+SecFilter "\x7cadmin"
+
+# WEB-CGI dcboard.cgi access
+SecFilterSelective THE_REQUEST "/dcboard\.cgi"
+
+# WEB-CGI mmstdod.cgi access
+SecFilterSelective THE_REQUEST "/mmstdod\.cgi"
+
+# WEB-CGI anaconda directory transversal attempt
+SecFilterSelective THE_REQUEST "/apexec\.pl" chain
+SecFilter "template=\.\./"
+
+# WEB-CGI imagemap.exe overflow attempt
+SecFilterSelective THE_REQUEST "/imagemap\.exe\?"
+
+# WEB-CGI imagemap.exe access
+SecFilterSelective THE_REQUEST "/imagemap\.exe" log,pass
+
+# WEB-CGI cvsweb.cgi access
+SecFilterSelective THE_REQUEST "/cvsweb\.cgi"
+
+# WEB-CGI php.cgi access
+SecFilterSelective THE_REQUEST "/php\.cgi"
+
+# WEB-CGI glimpse access
+SecFilterSelective THE_REQUEST "/glimpse"
+
+# WEB-CGI htmlscript attempt
+SecFilterSelective THE_REQUEST "/htmlscript\?\.\./\.\."
+
+# WEB-CGI htmlscript access
+SecFilterSelective THE_REQUEST "/htmlscript"
+
+# WEB-CGI info2www access
+SecFilterSelective THE_REQUEST "/info2www"
+
+# WEB-CGI maillist.pl access
+SecFilterSelective THE_REQUEST "/maillist\.pl"
+
+# WEB-CGI nph-test-cgi access
+SecFilterSelective THE_REQUEST "/nph-test-cgi"
+
+# WEB-CGI NPH-publish access
+SecFilterSelective THE_REQUEST "/nph-maillist\.pl"
+
+# WEB-CGI NPH-publish access
+SecFilterSelective THE_REQUEST "/nph-publish"
+
+# WEB-CGI rguest.exe access
+SecFilterSelective THE_REQUEST "/rguest\.exe"
+
+# WEB-CGI rwwwshell.pl access
+SecFilterSelective THE_REQUEST "/rwwwshell\.pl"
+
+# WEB-CGI test-cgi attempt
+SecFilterSelective THE_REQUEST "/test-cgi/*\?*"
+
+# WEB-CGI test-cgi access
+SecFilterSelective THE_REQUEST "/test-cgi"
+
+# WEB-CGI testcgi access
+SecFilterSelective THE_REQUEST "/testcgi" log,pass
+
+# WEB-CGI test.cgi access
+SecFilterSelective THE_REQUEST "/test\.cgi" log,pass
+
+# WEB-CGI textcounter.pl access
+SecFilterSelective THE_REQUEST "/textcounter\.pl"
+
+# WEB-CGI uploader.exe access
+SecFilterSelective THE_REQUEST "/uploader\.exe"
+
+# WEB-CGI webgais access
+SecFilterSelective THE_REQUEST "/webgais"
+
+# WEB-CGI finger access
+SecFilterSelective THE_REQUEST "/finger"
+
+# WEB-CGI perlshop.cgi access
+SecFilterSelective THE_REQUEST "/perlshop\.cgi"
+
+# WEB-CGI pfdisplay.cgi access
+SecFilterSelective THE_REQUEST "/pfdisplay\.cgi"
+
+# WEB-CGI aglimpse access
+SecFilterSelective THE_REQUEST "/aglimpse"
+
+# WEB-CGI anform2 access
+SecFilterSelective THE_REQUEST "/AnForm2"
+
+# WEB-CGI args.bat access
+SecFilterSelective THE_REQUEST "/args\.bat"
+
+# WEB-CGI args.cmd access
+SecFilterSelective THE_REQUEST "/args\.cmd"
+
+# WEB-CGI AT-admin.cgi access
+SecFilterSelective THE_REQUEST "/AT-admin\.cgi"
+
+# WEB-CGI AT-generated.cgi access
+SecFilterSelective THE_REQUEST "/AT-generated\.cgi"
+
+# WEB-CGI bnbform.cgi access
+SecFilterSelective THE_REQUEST "/bnbform\.cgi"
+
+# WEB-CGI campas access
+SecFilterSelective THE_REQUEST "/campas"
+
+# WEB-CGI view-source directory traversal
+SecFilterSelective THE_REQUEST "/view-source" chain
+SecFilter "\.\./"
+
+# WEB-CGI view-source access
+SecFilterSelective THE_REQUEST "/view-source"
+
+# WEB-CGI wais.pl access
+SecFilterSelective THE_REQUEST "/wais\.pl"
+
+# WEB-CGI wwwwais access
+SecFilterSelective THE_REQUEST "/wwwwais"
+
+# WEB-CGI files.pl access
+SecFilterSelective THE_REQUEST "/files\.pl"
+
+# WEB-CGI wguest.exe access
+SecFilterSelective THE_REQUEST "/wguest\.exe"
+
+# WEB-CGI wrap access
+SecFilterSelective THE_REQUEST "/wrap"
+
+# WEB-CGI classifieds.cgi access
+SecFilterSelective THE_REQUEST "/classifieds\.cgi"
+
+# WEB-CGI environ.cgi access
+SecFilterSelective THE_REQUEST "/environ\.cgi"
+
+# WEB-CGI faxsurvey attempt (full path)
+SecFilterSelective THE_REQUEST "/faxsurvey\?/"
+
+# WEB-CGI faxsurvey arbitrary file read attempt
+SecFilterSelective THE_REQUEST "/faxsurvey\?cat\x20"
+
+# WEB-CGI faxsurvey access
+SecFilterSelective THE_REQUEST "/faxsurvey" log,pass
+
+# WEB-CGI filemail access
+SecFilterSelective THE_REQUEST "/filemail\.pl"
+
+# WEB-CGI man.sh access
+SecFilterSelective THE_REQUEST "/man\.sh"
+
+# WEB-CGI snork.bat access
+SecFilterSelective THE_REQUEST "/snork\.bat"
+
+# WEB-CGI w3-msql access
+SecFilterSelective THE_REQUEST "/w3-msql/"
+
+# WEB-CGI day5datacopier.cgi access
+SecFilterSelective THE_REQUEST "/day5datacopier\.cgi"
+
+# WEB-CGI day5datanotifier.cgi access
+SecFilterSelective THE_REQUEST "/day5datanotifier\.cgi"
+
+# WEB-CGI post-query access
+SecFilterSelective THE_REQUEST "/post-query"
+
+# WEB-CGI visadmin.exe access
+SecFilterSelective THE_REQUEST "/visadmin\.exe"
+
+# WEB-CGI dumpenv.pl access
+SecFilterSelective THE_REQUEST "/dumpenv\.pl"
+
+# WEB-CGI calendar_admin.pl access
+SecFilterSelective THE_REQUEST "/calendar_admin\.pl" log,pass
+
+# WEB-CGI calendar-admin.pl access
+SecFilterSelective THE_REQUEST "/calendar-admin\.pl" log,pass
+
+# WEB-CGI calender.pl access
+SecFilterSelective THE_REQUEST "/calender\.pl"
+
+# WEB-CGI calendar access
+SecFilterSelective THE_REQUEST "/calendar"
+
+# WEB-CGI user_update_admin.pl access
+SecFilterSelective THE_REQUEST "/user_update_admin\.pl"
+
+# WEB-CGI user_update_passwd.pl access
+SecFilterSelective THE_REQUEST "/user_update_passwd\.pl"
+
+# WEB-CGI snorkerz.cmd access
+SecFilterSelective THE_REQUEST "/snorkerz\.cmd"
+
+# WEB-CGI survey.cgi access
+SecFilterSelective THE_REQUEST "/survey\.cgi"
+
+# WEB-CGI scriptalias access
+SecFilterSelective THE_REQUEST "///"
+
+# WEB-CGI win-c-sample.exe access
+SecFilterSelective THE_REQUEST "/win-c-sample\.exe"
+
+# WEB-CGI w3tvars.pm access
+SecFilterSelective THE_REQUEST "/w3tvars\.pm"
+
+# WEB-CGI admin.pl access
+SecFilterSelective THE_REQUEST "/admin\.pl"
+
+# WEB-CGI LWGate access
+SecFilterSelective THE_REQUEST "/LWGate"
+
+# WEB-CGI archie access
+SecFilterSelective THE_REQUEST "/archie"
+
+# WEB-CGI flexform access
+SecFilterSelective THE_REQUEST "/flexform"
+
+# WEB-CGI formmail arbitrary command execution attempt
+SecFilterSelective THE_REQUEST "/formmail" chain
+SecFilter "\x0a"
+
+# WEB-CGI formmail access
+SecFilterSelective THE_REQUEST "/formmail" log,pass
+
+# WEB-CGI phf arbitrary command execution attempt
+SecFilterSelective THE_REQUEST "/phf" chain
+SecFilter "\x0a/"
+
+# WEB-CGI phf access
+SecFilterSelective THE_REQUEST "/phf" log,pass
+
+# WEB-CGI www-sql access
+SecFilterSelective THE_REQUEST "/www-sql"
+
+# WEB-CGI wwwadmin.pl access
+SecFilterSelective THE_REQUEST "/wwwadmin\.pl"
+
+# WEB-CGI ppdscgi.exe access
+SecFilterSelective THE_REQUEST "/ppdscgi\.exe"
+
+# WEB-CGI sendform.cgi access
+SecFilterSelective THE_REQUEST "/sendform\.cgi"
+
+# WEB-CGI upload.pl access
+SecFilterSelective THE_REQUEST "/upload\.pl"
+
+# WEB-CGI AnyForm2 access
+SecFilterSelective THE_REQUEST "/AnyForm2"
+
+# WEB-CGI MachineInfo access
+SecFilterSelective THE_REQUEST "/MachineInfo"
+
+# WEB-CGI bb-hist.sh attempt
+SecFilterSelective THE_REQUEST "/bb-hist\.sh\?HISTFILE=\.\./\.\."
+
+# WEB-CGI bb-hist.sh access
+SecFilterSelective THE_REQUEST "/bb-hist\.sh"
+
+# WEB-CGI bb-histlog.sh access
+SecFilterSelective THE_REQUEST "/bb-histlog\.sh"
+
+# WEB-CGI bb-histsvc.sh access
+SecFilterSelective THE_REQUEST "/bb-histsvc\.sh"
+
+# WEB-CGI bb-hostscv.sh attempt
+SecFilterSelective THE_REQUEST "/bb-hostsvc\.sh\?HOSTSVC\?\.\./\.\."
+
+# WEB-CGI bb-hostscv.sh access
+SecFilterSelective THE_REQUEST "/bb-hostsvc\.sh" log,pass
+
+# WEB-CGI bb-rep.sh access
+SecFilterSelective THE_REQUEST "/bb-rep\.sh"
+
+# WEB-CGI bb-replog.sh access
+SecFilterSelective THE_REQUEST "/bb-replog\.sh"
+
+# WEB-CGI redirect access
+SecFilterSelective THE_REQUEST "/redirect"
+
+# WEB-CGI wayboard attempt
+SecFilterSelective THE_REQUEST "/way-board/way-board\.cgi" chain
+SecFilter "\.\./\.\."
+
+# WEB-CGI way-board access
+SecFilterSelective THE_REQUEST "/way-board" log,pass
+
+# WEB-CGI pals-cgi arbitrary file access attempt
+SecFilterSelective THE_REQUEST "/pals-cgi" chain
+SecFilter "documentName="
+
+# WEB-CGI pals-cgi access
+SecFilterSelective THE_REQUEST "/pals-cgi"
+
+# WEB-CGI commerce.cgi arbitrary file access attempt
+SecFilterSelective THE_REQUEST "/commerce\.cgi" chain
+SecFilter "/\.\./"
+
+# WEB-CGI commerce.cgi access
+SecFilterSelective THE_REQUEST "/commerce\.cgi"
+
+# WEB-CGI Amaya templates sendtemp.pl directory traversal attempt
+SecFilterSelective THE_REQUEST "/sendtemp\.pl" chain
+SecFilter "templ="
+
+# WEB-CGI Amaya templates sendtemp.pl access
+SecFilterSelective THE_REQUEST "/sendtemp\.pl" log,pass
+
+# WEB-CGI webspirs.cgi directory traversal attempt
+SecFilterSelective THE_REQUEST "/webspirs\.cgi" chain
+SecFilter "\.\./\.\./"
+
+# WEB-CGI webspirs.cgi access
+SecFilterSelective THE_REQUEST "/webspirs\.cgi"
+
+# WEB-CGI tstisapi.dll access
+SecFilterSelective THE_REQUEST "tstisapi\.dll"
+
+# WEB-CGI sendmessage.cgi access
+SecFilterSelective THE_REQUEST "/sendmessage\.cgi"
+
+# WEB-CGI lastlines.cgi access
+SecFilterSelective THE_REQUEST "/lastlines\.cgi"
+
+# WEB-CGI zml.cgi attempt
+SecFilterSelective THE_REQUEST "/zml\.cgi" chain
+SecFilter "file=\.\./" log,pass
+
+# WEB-CGI zml.cgi access
+SecFilterSelective THE_REQUEST "/zml\.cgi" log,pass
+
+# WEB-CGI AHG search.cgi access
+SecFilterSelective THE_REQUEST "/publisher/search\.cgi" chain
+SecFilter "template=" log,pass
+
+# WEB-CGI agora.cgi attempt
+SecFilterSelective THE_REQUEST "/store/agora\.cgi\?cart_id=<SCRIPT>"
+
+# WEB-CGI agora.cgi access
+SecFilterSelective THE_REQUEST "/store/agora\.cgi" log,pass
+
+# WEB-CGI rksh access
+SecFilterSelective THE_REQUEST "/rksh"
+
+# WEB-CGI bash access
+SecFilterSelective THE_REQUEST "/bash" log,pass
+
+# WEB-CGI perl.exe command attempt
+SecFilterSelective THE_REQUEST "/perl\.exe\?"
+
+# WEB-CGI perl.exe access
+SecFilterSelective THE_REQUEST "/perl\.exe"
+
+# WEB-CGI perl command attempt
+SecFilterSelective THE_REQUEST "/perl\?"
+
+# WEB-CGI zsh access
+SecFilterSelective THE_REQUEST "/zsh"
+
+# WEB-CGI csh access
+SecFilterSelective THE_REQUEST "/csh"
+
+# WEB-CGI tcsh access
+SecFilterSelective THE_REQUEST "/tcsh"
+
+# WEB-CGI rsh access
+SecFilterSelective THE_REQUEST "/rsh"
+
+# WEB-CGI ksh access
+SecFilterSelective THE_REQUEST "/ksh"
+
+# WEB-CGI auktion.cgi directory traversal attempt
+SecFilterSelective THE_REQUEST "/auktion\.cgi" chain
+SecFilter "menue=\.\./\.\./"
+
+# WEB-CGI auktion.cgi access
+SecFilterSelective THE_REQUEST "/auktion\.cgi" log,pass
+
+# WEB-CGI cgiforum.pl attempt
+SecFilterSelective THE_REQUEST "/cgiforum\.pl\?thesection=\.\./\.\."
+
+# WEB-CGI cgiforum.pl access
+SecFilterSelective THE_REQUEST "/cgiforum\.pl" log,pass
+
+# WEB-CGI directorypro.cgi attempt
+SecFilterSelective THE_REQUEST "/directorypro\.cgi" chain
+SecFilter "\.\./\.\."
+
+# WEB-CGI directorypro.cgi access
+SecFilterSelective THE_REQUEST "/directorypro\.cgi" log,pass
+
+# WEB-CGI Web Shopper shopper.cgi attempt
+SecFilterSelective THE_REQUEST "/shopper\.cgi" chain
+SecFilter "newpage=\.\./"
+
+# WEB-CGI Web Shopper shopper.cgi access
+SecFilterSelective THE_REQUEST "/shopper\.cgi"
+
+# WEB-CGI listrec.pl access
+SecFilterSelective THE_REQUEST "/listrec\.pl"
+
+# WEB-CGI mailnews.cgi access
+SecFilterSelective THE_REQUEST "/mailnews\.cgi"
+
+# WEB-CGI book.cgi access
+SecFilterSelective THE_REQUEST "/book\.cgi" log,pass
+
+# WEB-CGI newsdesk.cgi access
+SecFilterSelective THE_REQUEST "/newsdesk\.cgi"
+
+# WEB-CGI cal_make.pl directory traversal attempt
+SecFilterSelective THE_REQUEST "/cal_make\.pl" chain
+SecFilter "p0=\.\./\.\./"
+
+# WEB-CGI cal_make.pl access
+SecFilterSelective THE_REQUEST "/cal_make\.pl" log,pass
+
+# WEB-CGI mailit.pl access
+SecFilterSelective THE_REQUEST "/mailit\.pl"
+
+# WEB-CGI sdbsearch.cgi access
+SecFilterSelective THE_REQUEST "/sdbsearch\.cgi"
+
+# WEB-CGI swc access
+SecFilterSelective THE_REQUEST "/swc"
+
+# WEB-CGI ttawebtop.cgi arbitrary file attempt
+SecFilterSelective THE_REQUEST "/ttawebtop\.cgi" chain
+SecFilter "pg=\.\./"
+
+# WEB-CGI ttawebtop.cgi access
+SecFilterSelective THE_REQUEST "/ttawebtop\.cgi"
+
+# WEB-CGI upload.cgi access
+SecFilterSelective THE_REQUEST "/upload\.cgi"
+
+# WEB-CGI view_source access
+SecFilterSelective THE_REQUEST "/view_source"
+
+# WEB-CGI ustorekeeper.pl directory traversal attempt
+SecFilterSelective THE_REQUEST "/ustorekeeper\.pl" chain
+SecFilter "file=\.\./\.\./"
+
+# WEB-CGI ustorekeeper.pl access
+SecFilterSelective THE_REQUEST "/ustorekeeper\.pl" log,pass
+
+# WEB-CGI icat access
+SecFilterSelective THE_REQUEST "/icat" log,pass
+
+# WEB-CGI Bugzilla doeditvotes.cgi access
+SecFilterSelective THE_REQUEST "/doeditvotes\.cgi" log,pass
+
+# WEB-CGI htsearch arbitrary configuration file attempt
+SecFilterSelective THE_REQUEST "/htsearch\?-c"
+
+# WEB-CGI htsearch arbitrary file read attempt
+SecFilterSelective THE_REQUEST "/htsearch\?exclude=`"
+
+# WEB-CGI htsearch access
+SecFilterSelective THE_REQUEST "/htsearch" log,pass
+
+# WEB-CGI a1stats a1disp3.cgi directory traversal attempt
+SecFilterSelective THE_REQUEST "/a1disp3\.cgi\?/\.\./\.\./"
+
+# WEB-CGI a1stats a1disp3.cgi access
+SecFilterSelective THE_REQUEST "/a1disp3\.cgi" log,pass
+
+# WEB-CGI a1stats access
+SecFilterSelective THE_REQUEST "/a1stats/" log,pass
+
+# WEB-CGI admentor admin.asp access
+SecFilterSelective THE_REQUEST "/admentor/admin/admin\.asp" log,pass
+
+# WEB-CGI alchemy http server PRN arbitrary command execution attempt
+SecFilterSelective THE_REQUEST "/PRN/\.\./\.\./" log,pass
+
+# WEB-CGI alchemy http server NUL arbitrary command execution attempt
+SecFilterSelective THE_REQUEST "/NUL/\.\./\.\./" log,pass
+
+# WEB-CGI alibaba.pl access
+SecFilterSelective THE_REQUEST "/alibaba\.pl" log,pass
+
+# WEB-CGI AltaVista Intranet Search directory traversal attempt
+SecFilterSelective THE_REQUEST "/query\?mss=\.\."
+
+# WEB-CGI test.bat access
+SecFilterSelective THE_REQUEST "/test\.bat" log,pass
+
+# WEB-CGI input.bat access
+SecFilterSelective THE_REQUEST "/input\.bat" log,pass
+
+# WEB-CGI input2.bat access
+SecFilterSelective THE_REQUEST "/input2\.bat" log,pass
+
+# WEB-CGI envout.bat access
+SecFilterSelective THE_REQUEST "/envout\.bat" log,pass
+
+# WEB-CGI echo.bat arbitrary command execution attempt
+SecFilterSelective THE_REQUEST "/echo\.bat" chain
+SecFilter "&"
+
+# WEB-CGI echo.bat access
+SecFilterSelective THE_REQUEST "/echo\.bat" log,pass
+
+# WEB-CGI hello.bat arbitrary command execution attempt
+SecFilterSelective THE_REQUEST "/hello\.bat" chain
+SecFilter "&"
+
+# WEB-CGI hello.bat access
+SecFilterSelective THE_REQUEST "/hello\.bat" log,pass
+
+# WEB-CGI tst.bat access
+SecFilterSelective THE_REQUEST "/tst\.bat" log,pass
+
+# WEB-CGI /cgi-bin/ls access
+SecFilterSelective THE_REQUEST "/cgi-bin/ls" log,pass
+
+# WEB-CGI cgimail access
+SecFilterSelective THE_REQUEST "/cgimail" log,pass
+
+# WEB-CGI cgiwrap access
+SecFilterSelective THE_REQUEST "/cgiwrap" log,pass
+
+# WEB-CGI csSearch.cgi arbitrary command execution attempt
+SecFilterSelective THE_REQUEST "/csSearch\.cgi" chain
+SecFilter "`"
+
+# WEB-CGI csSearch.cgi access
+SecFilterSelective THE_REQUEST "/csSearch\.cgi" log,pass
+
+# WEB-CGI /cart/cart.cgi access
+SecFilterSelective THE_REQUEST "/cart/cart\.cgi" log,pass
+
+# WEB-CGI dbman db.cgi access
+SecFilterSelective THE_REQUEST "/dbman/db\.cgi" log,pass
+
+# WEB-CGI DCShop access
+SecFilterSelective THE_REQUEST "/dcshop" log,pass
+
+# WEB-CGI DCShop orders.txt access
+SecFilterSelective THE_REQUEST "/orders/orders\.txt" log,pass
+
+# WEB-CGI DCShop auth_user_file.txt access
+SecFilterSelective THE_REQUEST "/auth_data/auth_user_file\.txt" log,pass
+
+# WEB-CGI eshop.pl arbitrary commane execution attempt
+SecFilterSelective THE_REQUEST "/eshop\.pl\?seite=\;"
+
+# WEB-CGI eshop.pl access
+SecFilterSelective THE_REQUEST "/eshop\.pl" log,pass
+
+# WEB-CGI loadpage.cgi directory traversal attempt
+SecFilterSelective THE_REQUEST "/loadpage\.cgi" chain
+SecFilter "file=\.\./"
+
+# WEB-CGI loadpage.cgi access
+SecFilterSelective THE_REQUEST "/loadpage\.cgi" log,pass
+
+# WEB-CGI faqmanager.cgi arbitrary file access attempt
+SecFilterSelective THE_REQUEST "\x00"
+
+# WEB-CGI faqmanager.cgi access
+SecFilterSelective THE_REQUEST "/faqmanager\.cgi" log,pass
+
+# WEB-CGI /fcgi-bin/echo.exe access
+SecFilterSelective THE_REQUEST "/fcgi-bin/echo\.exe" log,pass
+
+# WEB-CGI FormHandler.cgi directory traversal attempt attempt
+SecFilterSelective THE_REQUEST "/FormHandler\.cgi" chain
+SecFilter "/\.\./"
+
+# WEB-CGI FormHandler.cgi external site redirection attempt
+SecFilterSelective THE_REQUEST "/FormHandler\.cgi" chain
+SecFilter "redirect=http"
+
+# WEB-CGI FormHandler.cgi access
+SecFilterSelective THE_REQUEST "/FormHandler\.cgi" log,pass
+
+# WEB-CGI guestbook.cgi access
+SecFilterSelective THE_REQUEST "/guestbook\.cgi" log,pass
+
+# WEB-CGI Home Free search.cgi directory traversal attempt
+SecFilterSelective THE_REQUEST "/search\.cgi" chain
+SecFilter "letter=\.\./\.\."
+
+# WEB-CGI search.cgi access
+SecFilterSelective THE_REQUEST "/search\.cgi" log,pass
+
+# WEB-CGI enivorn.pl access
+SecFilterSelective THE_REQUEST "/enivron\.pl" log,pass
+
+# WEB-CGI campus attempt
+SecFilterSelective THE_REQUEST "/campus\?\x0a"
+
+# WEB-CGI campus access
+SecFilterSelective THE_REQUEST "/campus" log,pass
+
+# WEB-CGI cart32.exe access
+SecFilterSelective THE_REQUEST "/cart32\.exe" log,pass
+
+# WEB-CGI pfdispaly.cgi arbitrary command execution attempt
+SecFilterSelective THE_REQUEST "/pfdispaly\.cgi\?'"
+
+# WEB-CGI pfdispaly.cgi access
+SecFilterSelective THE_REQUEST "/pfdispaly\.cgi" log,pass
+
+# WEB-CGI pagelog.cgi directory traversal attempt
+SecFilterSelective THE_REQUEST "/pagelog\.cgi" chain
+SecFilter "name=\.\./" log,pass
+
+# WEB-CGI pagelog.cgi access
+SecFilterSelective THE_REQUEST "/pagelog\.cgi" log,pass
+
+# WEB-CGI ad.cgi access
+SecFilterSelective THE_REQUEST "/ad\.cgi" log,pass
+
+# WEB-CGI bbs_forum.cgi access
+SecFilterSelective THE_REQUEST "/bbs_forum\.cgi" log,pass
+
+# WEB-CGI bsguest.cgi access
+SecFilterSelective THE_REQUEST "/bsguest\.cgi" log,pass
+
+# WEB-CGI bslist.cgi access
+SecFilterSelective THE_REQUEST "/bslist\.cgi" log,pass
+
+# WEB-CGI cgforum.cgi access
+SecFilterSelective THE_REQUEST "/cgforum\.cgi" log,pass
+
+# WEB-CGI newdesk access
+SecFilterSelective THE_REQUEST "/newdesk" log,pass
+
+# WEB-CGI register.cgi access
+SecFilterSelective THE_REQUEST "/register\.cgi" log,pass
+
+# WEB-CGI gbook.cgi access
+SecFilterSelective THE_REQUEST "/gbook\.cgi" log,pass
+
+# WEB-CGI simplestguest.cgi access
+SecFilterSelective THE_REQUEST "/simplestguest\.cgi" log,pass
+
+# WEB-CGI statusconfig.pl access
+SecFilterSelective THE_REQUEST "/statusconfig\.pl" log,pass
+
+# WEB-CGI talkback.cgi directory traversal attempt
+SecFilterSelective THE_REQUEST "/talkbalk\.cgi" chain
+SecFilter "article=\.\./\.\./"
+
+# WEB-CGI talkback.cgi access
+SecFilterSelective THE_REQUEST "/talkbalk\.cgi" log,pass
+
+# WEB-CGI adcycle access
+SecFilterSelective THE_REQUEST "/adcycle" log,pass
+
+# WEB-CGI MachineInfo access
+SecFilterSelective THE_REQUEST "/MachineInfo" log,pass
+
+# WEB-CGI emumail.cgi NULL attempt
+SecFilterSelective THE_REQUEST "/emumail\.cgi" chain
+SecFilter "\x00" log,pass
+
+# WEB-CGI emumail.cgi access
+SecFilterSelective THE_REQUEST "/emumail\.cgi" log,pass
+
+# WEB-CGI document.d2w access
+SecFilterSelective THE_REQUEST "/document\.d2w" log,pass
+
+# WEB-CGI db2www access
+SecFilterSelective THE_REQUEST "/db2www" log,pass
+
+# WEB-CGI /cgi-bin/ access
+SecFilterSelective THE_REQUEST "/cgi-bin/" chain
+SecFilter "/cgi-bin/ HTTP"
+
+# WEB-CGI /cgi-dos/ access
+SecFilterSelective THE_REQUEST "/cgi-dos/" chain
+SecFilter "/cgi-dos/ HTTP"
+
+# WEB-CGI technote main.cgi file directory traversal attempt
+SecFilterSelective THE_REQUEST "/technote/main\.cgi" chain
+SecFilter "\.\./\.\./"
+
+# WEB-CGI technote print.cgi directory traversal attempt
+SecFilterSelective THE_REQUEST "/technote/print\.cgi" chain
+SecFilter "\x00"
+
+# WEB-CGI eXtropia webstore directory traversal
+SecFilterSelective THE_REQUEST "/web_store\.cgi" chain
+SecFilter "page=\.\./"
+
+# WEB-CGI eXtropia webstore access
+SecFilterSelective THE_REQUEST "/web_store\.cgi" log,pass
+
+# WEB-CGI shopping cart directory traversal
+SecFilterSelective THE_REQUEST "/shop\.cgi" chain
+SecFilter "page=\.\./"
+
+# WEB-CGI Allaire Pro Web Shell attempt
+SecFilterSelective THE_REQUEST "/authenticate\.cgi\?PASSWORD" chain
+SecFilter "config\.ini"
+
+# WEB-CGI Armada Style Master Index directory traversal
+SecFilterSelective THE_REQUEST "/search\.cgi\?keys" chain
+SecFilter "catigory=\.\./"
+
+# WEB-CGI cached_feed.cgi moreover shopping cart directory traversal
+SecFilterSelective THE_REQUEST "/cached_feed\.cgi" chain
+SecFilter "\.\./"
+
+# WEB-CGI cached_feed.cgi moreover shopping cart access
+SecFilterSelective THE_REQUEST "/cached_feed\.cgi" log,pass
+
+# WEB-CGI Talentsoft Web+ exploit attempt
+SecFilterSelective THE_REQUEST "/webplus\.cgi\?Script=/webplus/webping/webping\.wml"
+
+# WEB-CGI Poll-it access
+SecFilterSelective THE_REQUEST "/pollit/Poll_It_SSI_v2\.0\.cgi" log,pass
+
+# WEB-CGI count.cgi access
+SecFilterSelective THE_REQUEST "/count\.cgi" log,pass
+
+# WEB-CGI webdist.cgi arbitrary command attempt
+SecFilterSelective THE_REQUEST "/webdist\.cgi" chain
+SecFilter "distloc=\;"
+
+# WEB-CGI webdist.cgi access
+SecFilterSelective THE_REQUEST "/webdist\.cgi" log,pass
+
+# WEB-CGI bigconf.cgi access
+SecFilterSelective THE_REQUEST "/bigconf\.cgi" log,pass
+
+# WEB-CGI /cgi-bin/jj access
+SecFilterSelective THE_REQUEST "/cgi-bin/jj" log,pass
+
+# WEB-CGI bizdbsearch attempt
+SecFilterSelective THE_REQUEST "/bizdb1-search\.cgi" chain
+SecFilter "mail"
+
+# WEB-CGI bizdbsearch access
+SecFilterSelective THE_REQUEST "/bizdb1-search\.cgi" log,pass
+
+# WEB-CGI sojourn.cgi File attempt
+SecFilterSelective THE_REQUEST "/sojourn\.cgi\?cat=" chain
+SecFilter "\x00"
+
+# WEB-CGI sojourn.cgi access
+SecFilterSelective THE_REQUEST "/sojourn\.cgi" log,pass
+
+# WEB-CGI SGI InfoSearch fname attempt
+SecFilterSelective THE_REQUEST "/infosrch\.cgi\?" chain
+SecFilter "fname="
+
+# WEB-CGI SGI InfoSearch fname access
+SecFilterSelective THE_REQUEST "/infosrch\.cgi" log,pass
+
+# WEB-CGI ax-admin.cgi access
+SecFilterSelective THE_REQUEST "/ax-admin\.cgi" log,pass
+
+# WEB-CGI axs.cgi access
+SecFilterSelective THE_REQUEST "/axs\.cgi" log,pass
+
+# WEB-CGI cachemgr.cgi access
+SecFilterSelective THE_REQUEST "/cachemgr\.cgi" log,pass
+
+# WEB-CGI responder.cgi access
+SecFilterSelective THE_REQUEST "/responder\.cgi" log,pass
+
+# WEB-CGI web-map.cgi access
+SecFilterSelective THE_REQUEST "/web-map\.cgi" log,pass
+
+# WEB-CGI ministats admin access
+SecFilterSelective THE_REQUEST "/ministats/admin\.cgi" log,pass
+
+# WEB-CGI dfire.cgi access
+SecFilterSelective THE_REQUEST "/dfire\.cgi" log,pass
+
+# WEB-CGI txt2html.cgi directory traversal attempt
+SecFilterSelective THE_REQUEST "/txt2html\.cgi" chain
+SecFilter "/\.\./\.\./\.\./\.\./"
+
+# WEB-CGI txt2html.cgi access
+SecFilterSelective THE_REQUEST "/txt2html\.cgi" log,pass
+
+# WEB-CGI store.cgi directory traversal attempt
+SecFilterSelective THE_REQUEST "/store\.cgi" chain
+SecFilter "\.\./"
+
+# WEB-CGI store.cgi access
+SecFilterSelective THE_REQUEST "/store\.cgi" log,pass
+
+# WEB-CGI SIX webboard generate.cgi attempt
+SecFilterSelective THE_REQUEST "/generate\.cgi" chain
+SecFilter "content=\.\./"
+
+# WEB-CGI SIX webboard generate.cgi access
+SecFilterSelective THE_REQUEST "/generate\.cgi" log,pass
+
+# WEB-CGI spin_client.cgi access
+SecFilterSelective THE_REQUEST "/spin_client\.cgi" log,pass
+
+# WEB-CGI csPassword.cgi access
+SecFilterSelective THE_REQUEST "/csPassword\.cgi" log,pass
+
+# WEB-CGI csPassword password.cgi.tmp access
+SecFilterSelective THE_REQUEST "/password\.cgi\.tmp" log,pass
+
+# WEB-CGI Nortel Contivity cgiproc DOS attempt
+SecFilterSelective THE_REQUEST "/cgiproc\?Nocfile="
+
+# WEB-CGI Nortel Contivity cgiproc DOS attempt
+SecFilterSelective THE_REQUEST "/cgiproc\?\$"
+
+# WEB-CGI Nortel Contivity cgiproc access
+SecFilterSelective THE_REQUEST "/cgiproc" log,pass
+
+# WEB-CGI Oracle reports CGI access
+SecFilterSelective THE_REQUEST "/rwcgi60" chain
+SecFilter "setauth=" log,pass
+
+# WEB-CGI alienform.cgi access
+SecFilterSelective THE_REQUEST "/alienform\.cgi" log,pass
+
+# WEB-CGI AlienForm af.cgi access
+SecFilterSelective THE_REQUEST "/af\.cgi" log,pass
+
+# WEB-CGI story.pl arbitrary file read attempt
+SecFilterSelective THE_REQUEST "/story\.pl" chain
+SecFilter "next=\.\./"
+
+# WEB-CGI story.pl access
+SecFilterSelective THE_REQUEST "/story\.pl"
+
+# WEB-CGI siteUserMod.cgi access
+SecFilterSelective THE_REQUEST "/\.cobalt/siteUserMod/siteUserMod\.cgi" log,pass
+
+# WEB-CGI cgicso access
+SecFilterSelective THE_REQUEST "/cgicso" log,pass
+
+# WEB-CGI nph-publish.cgi access
+SecFilterSelective THE_REQUEST "/nph-publish\.cgi" log,pass
+
+# WEB-CGI printenv access
+SecFilterSelective THE_REQUEST "/printenv" log,pass
+
+# WEB-CGI sdbsearch.cgi access
+SecFilterSelective THE_REQUEST "/sdbsearch\.cgi" log,pass
+
+# WEB-CGI rpc-nlog.pl access
+SecFilterSelective THE_REQUEST "/rpc-nlog\.pl" log,pass
+
+# WEB-CGI rpc-smb.pl access
+SecFilterSelective THE_REQUEST "/rpc-smb\.pl" log,pass
+
+# WEB-CGI cart.cgi access
+SecFilterSelective THE_REQUEST "/cart\.cgi" log,pass
+
+# WEB-CGI vpasswd.cgi access
+SecFilterSelective THE_REQUEST "/vpasswd\.cgi" log,pass
+
+# WEB-CGI alya.cgi access
+SecFilterSelective THE_REQUEST "/alya\.cgi" log,pass
+
+# WEB-CGI viralator.cgi access
+SecFilterSelective THE_REQUEST "/viralator\.cgi" log,pass
+
+# WEB-CGI smartsearch.cgi access
+SecFilterSelective THE_REQUEST "/smartsearch\.cgi" log,pass
+
+# WEB-CGI mrtg.cgi directory traversal attempt
+SecFilterSelective THE_REQUEST "/mrtg\.cgi" chain
+SecFilter "cfg=/\.\./"
+
+# WEB-CGI overflow.cgi access
+SecFilterSelective THE_REQUEST "/overflow\.cgi" log,pass
+
+# WEB-CGI way-board.cgi access
+SecFilterSelective THE_REQUEST "/way-board\.cgi" log,pass
+
+# WEB-CGI process_bug.cgi access
+SecFilterSelective THE_REQUEST "/process_bug\.cgi" log,pass
+
+# WEB-CGI enter_bug.cgi arbitrary command attempt
+SecFilterSelective THE_REQUEST "/enter_bug\.cgi" chain
+SecFilter "\;"
+
+# WEB-CGI enter_bug.cgi access
+SecFilterSelective THE_REQUEST "/enter_bug\.cgi" log,pass
+
+# WEB-CGI parse_xml.cgi access
+SecFilterSelective THE_REQUEST "/parse_xml\.cgi" log,pass
+
+# WEB-CGI streaming server parse_xml.cgi access
+SecFilter "/parse_xml\.cgi" log,pass
+
+# WEB-CGI album.pl access
+SecFilter "/album\.pl" log,pass
+
+# WEB-CGI chipcfg.cgi access
+SecFilterSelective THE_REQUEST "/chipcfg\.cgi" log,pass
+
+# WEB-CGI ikonboard.cgi access
+SecFilterSelective THE_REQUEST "/ikonboard\.cgi" log,pass
+
+# WEB-CGI swsrv.cgi access
+SecFilterSelective THE_REQUEST "/srsrv\.cgi" log,pass
+
+# WEB-CLIENT Outlook EML access
+SecFilterSelective THE_REQUEST "\.eml"
+
+# WEB-CLIENT XMLHttpRequest attempt
+SecFilter "file\://"
+
+# WEB-CLIENT readme.eml download attempt
+SecFilterSelective THE_REQUEST "/readme\.eml"
+
+# WEB-CLIENT readme.eml autoload attempt
+SecFilter "window\.open\(\"readme\.eml\""
+
+# WEB-CLIENT Javascript document.domain attempt
+SecFilter "document\.domain\("
+
+# WEB-CLIENT Javascript URL host spoofing attempt
+SecFilter "javascript\://"
+
+# WEB-COLDFUSION cfcache.map access
+SecFilterSelective THE_REQUEST "/cfcache\.map"
+
+# WEB-COLDFUSION exampleapp application.cfm
+SecFilterSelective THE_REQUEST "/cfdocs/exampleapp/email/application\.cfm"
+
+# WEB-COLDFUSION application.cfm access
+SecFilterSelective THE_REQUEST "/cfdocs/exampleapp/publish/admin/application\.cfm"
+
+# WEB-COLDFUSION getfile.cfm access
+SecFilterSelective THE_REQUEST "/cfdocs/exampleapp/email/getfile\.cfm"
+
+# WEB-COLDFUSION addcontent.cfm access
+SecFilterSelective THE_REQUEST "/cfdocs/exampleapp/publish/admin/addcontent\.cfm"
+
+# WEB-COLDFUSION administrator access
+SecFilterSelective THE_REQUEST "/cfide/administrator/index\.cfm"
+
+# WEB-COLDFUSION datasource username attempt
+SecFilter "CF_SETDATASOURCEUSERNAME\(\)"
+
+# WEB-COLDFUSION fileexists.cfm access
+SecFilterSelective THE_REQUEST "/cfdocs/snippets/fileexists\.cfm"
+
+# WEB-COLDFUSION exprcalc access
+SecFilterSelective THE_REQUEST "/cfdocs/expeval/exprcalc\.cfm"
+
+# WEB-COLDFUSION parks access
+SecFilterSelective THE_REQUEST "/cfdocs/examples/parks/detail\.cfm"
+
+# WEB-COLDFUSION cfappman access
+SecFilterSelective THE_REQUEST "/cfappman/index\.cfm"
+
+# WEB-COLDFUSION beaninfo access
+SecFilterSelective THE_REQUEST "/cfdocs/examples/cvbeans/beaninfo\.cfm"
+
+# WEB-COLDFUSION evaluate.cfm access
+SecFilterSelective THE_REQUEST "/cfdocs/snippets/evaluate\.cfm"
+
+# WEB-COLDFUSION getodbcdsn access
+SecFilter "CFUSION_GETODBCDSN\(\)"
+
+# WEB-COLDFUSION db connections flush attempt
+SecFilter "CFUSION_DBCONNECTIONS_FLUSH\(\)"
+
+# WEB-COLDFUSION expeval access
+SecFilterSelective THE_REQUEST "/cfdocs/expeval/"
+
+# WEB-COLDFUSION datasource passwordattempt
+SecFilter "CF_SETDATASOURCEPASSWORD\(\)"
+
+# WEB-COLDFUSION datasource attempt
+SecFilter "CF_ISCOLDFUSIONDATASOURCE\(\)"
+
+# WEB-COLDFUSION admin encrypt attempt
+SecFilter "CFUSION_ENCRYPT\(\)"
+
+# WEB-COLDFUSION displayfile access
+SecFilterSelective THE_REQUEST "/cfdocs/expeval/displayopenedfile\.cfm"
+
+# WEB-COLDFUSION getodbcin attempt
+SecFilter "CFUSION_GETODBCINI\(\)"
+
+# WEB-COLDFUSION admin decrypt attempt
+SecFilter "CFUSION_DECRYPT\(\)"
+
+# WEB-COLDFUSION mainframeset access
+SecFilterSelective THE_REQUEST "/cfdocs/examples/mainframeset\.cfm"
+
+# WEB-COLDFUSION set odbc ini attempt
+SecFilter "CFUSION_SETODBCINI\(\)"
+
+# WEB-COLDFUSION settings refresh attempt
+SecFilter "CFUSION_SETTINGS_REFRESH\(\)"
+
+# WEB-COLDFUSION exampleapp access
+SecFilterSelective THE_REQUEST "/cfdocs/exampleapp/"
+
+# WEB-COLDFUSION CFUSION_VERIFYMAIL access
+SecFilter "CFUSION_VERIFYMAIL\(\)"
+
+# WEB-COLDFUSION snippets attempt
+SecFilterSelective THE_REQUEST "/cfdocs/snippets/"
+
+# WEB-COLDFUSION cfmlsyntaxcheck.cfm access
+SecFilterSelective THE_REQUEST "/cfdocs/cfmlsyntaxcheck\.cfm"
+
+# WEB-COLDFUSION application.cfm access
+SecFilterSelective THE_REQUEST "/application\.cfm"
+
+# WEB-COLDFUSION onrequestend.cfm access
+SecFilterSelective THE_REQUEST "/onrequestend\.cfm"
+
+# WEB-COLDFUSION startstop DOS access
+SecFilterSelective THE_REQUEST "/cfide/administrator/startstop\.html"
+
+# WEB-COLDFUSION gettempdirectory.cfm access 
+SecFilterSelective THE_REQUEST "/cfdocs/snippets/gettempdirectory\.cfm"
+
+# WEB-COLDFUSION sendmail.cfm access
+SecFilterSelective THE_REQUEST "/sendmail\.cfm"
+
+# WEB-COLDFUSION ?Mode=debug attempt
+SecFilterSelective THE_REQUEST "Mode=debug" log,pass
+
+# WEB-FRONTPAGE rad fp30reg.dll access
+SecFilterSelective THE_REQUEST "/fp30reg\.dll" log,pass
+
+# WEB-FRONTPAGE frontpage rad fp4areg.dll access
+SecFilterSelective THE_REQUEST "/fp4areg\.dll" log,pass
+
+# WEB-FRONTPAGE _vti_rpc access
+SecFilterSelective THE_REQUEST "/_vti_rpc" log,pass
+
+# WEB-FRONTPAGE posting
+SecFilterSelective THE_REQUEST "/author\.dll" chain
+SecFilter "POST" log,pass
+
+# WEB-FRONTPAGE shtml.dll access
+SecFilterSelective THE_REQUEST "/_vti_bin/shtml\.dll" log,pass
+
+# WEB-FRONTPAGE contents.htm access
+SecFilterSelective THE_REQUEST "/admcgi/contents\.htm" log,pass
+
+# WEB-FRONTPAGE orders.htm access
+SecFilterSelective THE_REQUEST "/_private/orders\.htm" log,pass
+
+# WEB-FRONTPAGE fpsrvadm.exe access
+SecFilterSelective THE_REQUEST "/fpsrvadm\.exe" log,pass
+
+# WEB-FRONTPAGE fpremadm.exe access
+SecFilterSelective THE_REQUEST "/fpremadm\.exe" log,pass
+
+# WEB-FRONTPAGE fpadmin.htm access
+SecFilterSelective THE_REQUEST "/admisapi/fpadmin\.htm" log,pass
+
+# WEB-FRONTPAGE fpadmcgi.exe access
+SecFilterSelective THE_REQUEST "/scripts/Fpadmcgi\.exe" log,pass
+
+# WEB-FRONTPAGE orders.txt access
+SecFilterSelective THE_REQUEST "/_private/orders\.txt" log,pass
+
+# WEB-FRONTPAGE form_results access
+SecFilterSelective THE_REQUEST "/_private/form_results\.txt" log,pass
+
+# WEB-FRONTPAGE registrations.htm access
+SecFilterSelective THE_REQUEST "/_private/registrations\.htm" log,pass
+
+# WEB-FRONTPAGE cfgwiz.exe access
+SecFilterSelective THE_REQUEST "/cfgwiz\.exe" log,pass
+
+# WEB-FRONTPAGE authors.pwd access
+SecFilterSelective THE_REQUEST "/authors\.pwd" log,pass
+
+# WEB-FRONTPAGE author.exe access
+SecFilterSelective THE_REQUEST "/_vti_bin/_vti_aut/author\.exe" log,pass
+
+# WEB-FRONTPAGE administrators.pwd access
+SecFilterSelective THE_REQUEST "/administrators\.pwd" log,pass
+
+# WEB-FRONTPAGE form_results.htm access
+SecFilterSelective THE_REQUEST "/_private/form_results\.htm" log,pass
+
+# WEB-FRONTPAGE access.cnf access
+SecFilterSelective THE_REQUEST "/_vti_pvt/access\.cnf" log,pass
+
+# WEB-FRONTPAGE register.txt access
+SecFilterSelective THE_REQUEST "/_private/register\.txt" log,pass
+
+# WEB-FRONTPAGE registrations.txt access
+SecFilterSelective THE_REQUEST "/_private/registrations\.txt" log,pass
+
+# WEB-FRONTPAGE service.cnf access
+SecFilterSelective THE_REQUEST "/_vti_pvt/service\.cnf" log,pass
+
+# WEB-FRONTPAGE service.pwd
+SecFilterSelective THE_REQUEST "/service\.pwd" log,pass
+
+# WEB-FRONTPAGE service.stp access
+SecFilterSelective THE_REQUEST "/_vti_pvt/service\.stp" log,pass
+
+# WEB-FRONTPAGE services.cnf access
+SecFilterSelective THE_REQUEST "/_vti_pvt/services\.cnf" log,pass
+
+# WEB-FRONTPAGE shtml.exe access
+SecFilterSelective THE_REQUEST "/_vti_bin/shtml\.exe" log,pass
+
+# WEB-FRONTPAGE svcacl.cnf access
+SecFilterSelective THE_REQUEST "/_vti_pvt/svcacl\.cnf" log,pass
+
+# WEB-FRONTPAGE users.pwd access
+SecFilterSelective THE_REQUEST "/users\.pwd" log,pass
+
+# WEB-FRONTPAGE writeto.cnf access
+SecFilterSelective THE_REQUEST "/_vti_pvt/writeto\.cnf" log,pass
+
+# WEB-FRONTPAGE dvwssr.dll access
+SecFilterSelective THE_REQUEST "/dvwssr\.dll" log,pass
+
+# WEB-FRONTPAGE register.htm access
+SecFilterSelective THE_REQUEST "/_private/register\.htm" log,pass
+
+# WEB-FRONTPAGE /_vti_bin/ access
+SecFilterSelective THE_REQUEST "/_vti_bin/" log,pass
+
+# WEB-IIS MDAC Content-Type overflow attempt
+SecFilterSelective THE_REQUEST "/msadcs\.dll" chain
+SecFilter "Content-Type\:"
+
+# WEB-IIS repost.asp access
+SecFilterSelective THE_REQUEST "/scripts/repost\.asp" log,pass
+
+# WEB-IIS .htr Transfer-Encoding\: chunked
+SecFilterSelective THE_REQUEST "\.htr" chain
+SecFilter "chunked"
+
+# WEB-IIS .asp Transfer-Encoding\: chunked
+SecFilterSelective THE_REQUEST "\.asp" chain
+SecFilter "chunked"
+
+# WEB-IIS /StoreCSVS/InstantOrder.asmx request
+SecFilterSelective THE_REQUEST "/StoreCSVS/InstantOrder\.asmx" log,pass
+
+# WEB-IIS users.xml access
+SecFilterSelective THE_REQUEST "/users\.xml" log,pass
+
+# WEB-IIS as_web.exe access
+SecFilterSelective THE_REQUEST "/as_web\.exe" log,pass
+
+# WEB-IIS as_web4.exe access
+SecFilterSelective THE_REQUEST "/as_web4\.exe" log,pass
+
+# WEB-IIS NewsPro administration authentication attempt
+SecFilter "logged,true" log,pass
+
+# WEB-IIS pbserver access
+SecFilterSelective THE_REQUEST "/pbserver/pbserver\.dll" log,pass
+
+# WEB-IIS trace.axd access
+SecFilterSelective THE_REQUEST "/trace\.axd" log,pass
+
+# WEB-IIS /isapi/tstisapi.dll access
+SecFilterSelective THE_REQUEST "/isapi/tstisapi\.dll" log,pass
+
+# WEB-IIS mkilog.exe access
+SecFilterSelective THE_REQUEST "/mkilog\.exe" log,pass
+
+# WEB-IIS ctss.idc access
+SecFilterSelective THE_REQUEST "/ctss\.idc" log,pass
+
+# WEB-IIS /iisadmpwd/aexp2.htr access
+SecFilterSelective THE_REQUEST "/iisadmpwd/aexp2\.htr" log,pass
+
+# WEB-IIS WebDAV file lock attempt
+SecFilter "LOCK " log,pass
+
+# WEB-IIS ISAPI .printer access
+SecFilterSelective THE_REQUEST "\.printer" log,pass
+
+# WEB-IIS ISAPI .ida attempt
+SecFilterSelective THE_REQUEST "\.ida\?"
+
+# WEB-IIS ISAPI .ida access
+SecFilterSelective THE_REQUEST "\.ida" log,pass
+
+# WEB-IIS ISAPI .idq attempt
+SecFilterSelective THE_REQUEST "\.idq\?"
+
+# WEB-IIS ISAPI .idq access
+SecFilterSelective THE_REQUEST "\.idq" log,pass
+
+# WEB-IIS %2E-asp access
+SecFilterSelective THE_REQUEST "\x2e\.asp" log,pass
+
+# WEB-IIS *.idc attempt
+SecFilterSelective THE_REQUEST "/*\.idc"
+
+# WEB-IIS .bat? access
+SecFilterSelective THE_REQUEST "\.bat\?" log,pass
+
+# WEB-IIS .cnf access
+SecFilterSelective THE_REQUEST "\.cnf" log,pass
+
+# WEB-IIS ASP contents view
+SecFilter "&CiHiliteType=Full"
+
+# WEB-IIS ASP contents view
+SecFilterSelective THE_REQUEST "\.htw\?CiWebHitsFile"
+
+# WEB-IIS CGImail.exe access
+SecFilterSelective THE_REQUEST "/scripts/CGImail\.exe" log,pass
+
+# WEB-IIS unicode directory traversal attempt
+SecFilter "/\.\.\xc0\xaf\.\./"
+
+# WEB-IIS unicode directory traversal attempt
+SecFilter "/\.\.\xc1\x1c\.\./"
+
+# WEB-IIS unicode directory traversal attempt
+SecFilter "/\.\.\xc1\x9c\.\./"
+
+# WEB-IIS unicode directory traversal attempt
+SecFilter "/\.\.\x255c\.\."
+
+# WEB-IIS MSProxy access
+SecFilterSelective THE_REQUEST "/scripts/proxy/w3proxy\.dll" log,pass
+
+# WEB-IIS +.htr code fragment attempt
+SecFilterSelective THE_REQUEST "\+\.htr"
+
+# WEB-IIS .htr access
+SecFilterSelective THE_REQUEST "\.htr" log,pass
+
+# WEB-IIS SAM Attempt
+SecFilter "sam\._"
+
+# WEB-IIS Unicode2.pl script (File permission canonicalization)
+SecFilterSelective THE_REQUEST "/sensepost\.exe" log,pass
+
+# WEB-IIS _vti_inf access
+SecFilterSelective THE_REQUEST "_vti_inf\.html" log,pass
+
+# WEB-IIS achg.htr access
+SecFilterSelective THE_REQUEST "/iisadmpwd/achg\.htr" log,pass
+
+# WEB-IIS /scripts/iisadmin/default.htm access
+SecFilterSelective THE_REQUEST "/scripts/iisadmin/default\.htm"
+
+# WEB-IIS ism.dll access
+SecFilterSelective THE_REQUEST "/scripts/iisadmin/ism\.dll\?http/dir"
+
+# WEB-IIS anot.htr access
+SecFilterSelective THE_REQUEST "/iisadmpwd/anot" log,pass
+
+# WEB-IIS asp-dot attempt
+SecFilterSelective THE_REQUEST "\.asp\."
+
+# WEB-IIS asp-srch attempt
+SecFilterSelective THE_REQUEST "#filename=*\.asp"
+
+# WEB-IIS bdir.htr access
+SecFilterSelective THE_REQUEST "/bdir\.htr" log,pass
+
+# WEB-IIS cmd32.exe access
+SecFilter "cmd32\.exe"
+
+# WEB-IIS cmd.exe access
+SecFilter "cmd\.exe"
+
+# WEB-IIS cmd? access
+SecFilter "\.cmd\?&"
+
+# WEB-IIS cross-site scripting attempt
+SecFilterSelective THE_REQUEST "/Form_JScript\.asp"
+
+# WEB-IIS cross-site scripting attempt
+SecFilterSelective THE_REQUEST "/Form_VBScript\.asp"
+
+# WEB-IIS directory listing
+SecFilterSelective THE_REQUEST "/ServerVariables_Jscript\.asp"
+
+# WEB-IIS exec-src access
+SecFilter "#filename=*\.exe" log,pass
+
+# WEB-IIS fpcount attempt
+SecFilterSelective THE_REQUEST "/fpcount\.exe" chain
+SecFilter "Digits="
+
+# WEB-IIS fpcount access
+SecFilterSelective THE_REQUEST "/fpcount\.exe" log,pass
+
+# WEB-IIS getdrvs.exe access
+SecFilterSelective THE_REQUEST "/scripts/tools/getdrvs\.exe" log,pass
+
+# WEB-IIS global.asa access
+SecFilterSelective THE_REQUEST "/global\.asa" log,pass
+
+# WEB-IIS idc-srch attempt
+SecFilter "#filename=*\.idc"
+
+# WEB-IIS iisadmpwd attempt
+SecFilterSelective THE_REQUEST "/iisadmpwd/aexp"
+
+# WEB-IIS index server file source code attempt
+SecFilterSelective THE_REQUEST "\?CiWebHitsFile=/" chain
+SecFilter "&CiRestriction=none&CiHiliteType=Full"
+
+# WEB-IIS ism.dll attempt
+SecFilterSelective THE_REQUEST "\x20\x20\x20\x20\x20\.htr"
+
+# WEB-IIS jet vba access
+SecFilterSelective THE_REQUEST "/advworks/equipment/catalog_type\.asp" log,pass
+
+# WEB-IIS msadcs.dll access
+SecFilterSelective THE_REQUEST "/msadcs\.dll" log,pass
+
+# WEB-IIS newdsn.exe access
+SecFilterSelective THE_REQUEST "/scripts/tools/newdsn\.exe" log,pass
+
+# WEB-IIS perl access
+SecFilterSelective THE_REQUEST "/scripts/perl" log,pass
+
+# WEB-IIS perl-browse0a attempt
+SecFilterSelective THE_REQUEST "\x0a\.pl"
+
+# WEB-IIS perl-browse20 attempt
+SecFilterSelective THE_REQUEST "\x20\.pl"
+
+# WEB-IIS search97.vts access
+SecFilterSelective THE_REQUEST "/search97\.vts" log,pass
+
+# WEB-IIS showcode.asp access
+SecFilterSelective THE_REQUEST "/showcode\.asp" log,pass
+
+# WEB-IIS site server config access
+SecFilterSelective THE_REQUEST "/adsamples/config/site\.csc" log,pass
+
+# WEB-IIS srch.htm access
+SecFilterSelective THE_REQUEST "/samples/isapi/srch\.htm" log,pass
+
+# WEB-IIS srchadm access
+SecFilterSelective THE_REQUEST "/srchadm" log,pass
+
+# WEB-IIS uploadn.asp access
+SecFilterSelective THE_REQUEST "/scripts/uploadn\.asp" log,pass
+
+# WEB-IIS viewcode.asp access
+SecFilterSelective THE_REQUEST "/viewcode\.asp" log,pass
+
+# WEB-IIS webhits access
+SecFilterSelective THE_REQUEST "\.htw" log,pass
+
+# WEB-IIS doctodep.btr access
+SecFilterSelective THE_REQUEST "doctodep\.btr" log,pass
+
+# WEB-IIS site/iisamples access
+SecFilterSelective THE_REQUEST "/site/iisamples" log,pass
+
+# WEB-IIS CodeRed v2 root.exe access
+SecFilterSelective THE_REQUEST "/root\.exe"
+
+# WEB-IIS /scripts/samples/ access
+SecFilterSelective THE_REQUEST "/scripts/samples/"
+
+# WEB-IIS /msadc/samples/ access
+SecFilterSelective THE_REQUEST "/msadc/samples/"
+
+# WEB-IIS iissamples access
+SecFilterSelective THE_REQUEST "/iissamples/"
+
+# WEB-IIS multiple decode attempt
+SecFilterSelective THE_REQUEST "\.\."
+
+# WEB-IIS iisadmin access
+SecFilterSelective THE_REQUEST "/iisadmin"
+
+# WEB-IIS msdac access
+SecFilterSelective THE_REQUEST "/msdac/" log,pass
+
+# WEB-IIS _mem_bin access
+SecFilterSelective THE_REQUEST "/_mem_bin/" log,pass
+
+# WEB-IIS htimage.exe access
+SecFilterSelective THE_REQUEST "/htimage\.exe" log,pass
+
+# WEB-IIS MS Site Server default login attempt
+SecFilterSelective THE_REQUEST "/SiteServer/Admin/knowledge/persmbr/" chain
+SecFilter "Authorization\: Basic TERBUF9Bbm9ueW1vdXM6TGRhcFBhc3N3b3JkXzE="
+
+# WEB-IIS MS Site Server admin attempt
+SecFilterSelective THE_REQUEST "/Site Server/Admin/knowledge/persmbr/"
+
+# WEB-IIS postinfo.asp access
+SecFilterSelective THE_REQUEST "/scripts/postinfo\.asp" log,pass
+
+# WEB-IIS /exchange/root.asp attempt
+SecFilterSelective THE_REQUEST "/exchange/root\.asp\?acs=anon"
+
+# WEB-IIS /exchange/root.asp access
+SecFilterSelective THE_REQUEST "/exchange/root\.asp" log,pass
+
+# WEB-IIS Battleaxe Forum login.asp access
+SecFilterSelective THE_REQUEST "myaccount/login\.asp" log,pass
+
+# WEB-IIS nsiislog.dll access
+SecFilterSelective THE_REQUEST "/nsiislog\.dll" log,pass
+
+# WEB-IIS IISProtect siteadmin.asp access
+SecFilterSelective THE_REQUEST "/iisprotect/admin/SiteAdmin\.asp" log,pass
+
+# WEB-IIS IISProtect globaladmin.asp access
+SecFilterSelective THE_REQUEST "/iisprotect/admin/GlobalAdmin\.asp" log,pass
+
+# WEB-IIS IISProtect access
+SecFilterSelective THE_REQUEST "/iisprotect/admin/" log,pass
+
+# WEB-IIS Synchrologic Email Accelerator userid list access attempt
+SecFilterSelective THE_REQUEST "/en/admin/aggregate\.asp" log,pass
+
+# WEB-IIS MS BizTalk server access
+SecFilterSelective THE_REQUEST "/biztalkhttpreceive\.dll" log,pass
+
+# WEB-IIS register.asp access
+SecFilterSelective THE_REQUEST "/register\.asp" log,pass
+
+# WEB-MISC cross site scripting attempt
+SecFilter "<SCRIPT>"
+
+# WEB-MISC cross site scripting \(img src=javascript\) attempt
+SecFilter "img src=javascript"
+
+# WEB-MISC Cisco IOS HTTP configuration attempt
+SecFilterSelective THE_REQUEST "/exec/"
+
+# WEB-MISC Netscape Enterprise DOS
+SecFilter "REVLOG / "
+
+# WEB-MISC Netscape Enterprise directory listing attempt
+SecFilter "INDEX "
+
+# WEB-MISC iPlanet GETPROPERTIES attempt
+SecFilter "GETPROPERTIES"
+
+# WEB-MISC weblogic view source attempt
+SecFilterSelective THE_REQUEST "\.js\x70"
+
+# WEB-MISC Tomcat directory traversal attempt
+SecFilterSelective THE_REQUEST "\x00\.jsp"
+
+# WEB-MISC Tomcat view source attempt
+SecFilterSelective THE_REQUEST "\x252ejsp"
+
+# WEB-MISC ftp attempt
+SecFilter "ftp\.exe" log,pass
+
+# WEB-MISC xp_enumdsn attempt
+SecFilter "xp_enumdsn"
+
+# WEB-MISC xp_filelist attempt
+SecFilter "xp_filelist"
+
+# WEB-MISC xp_availablemedia attempt
+SecFilter "xp_availablemedia"
+
+# WEB-MISC xp_cmdshell attempt
+SecFilter "xp_cmdshell"
+
+# WEB-MISC nc.exe attempt
+SecFilter "nc\.exe" log,pass
+
+# WEB-MISC wsh attempt
+SecFilter "wsh\.exe" log,pass
+
+# WEB-MISC rcmd attempt
+SecFilter "rcmd\.exe" log,pass
+
+# WEB-MISC telnet attempt
+SecFilter "telnet\.exe" log,pass
+
+# WEB-MISC net attempt
+SecFilter "net\.exe" log,pass
+
+# WEB-MISC tftp attempt
+SecFilter "tftp\.exe" log,pass
+
+# WEB-MISC xp_regread attempt
+SecFilter "xp_regread" log,pass
+
+# WEB-MISC xp_regwrite attempt
+SecFilter "xp_regwrite" log,pass
+
+# WEB-MISC xp_regdeletekey attempt
+SecFilter "xp_regdeletekey" log,pass
+
+# WEB-MISC WebDAV search access
+SecFilter "SEARCH " log,pass
+
+# WEB-MISC .htpasswd access
+SecFilter "\.htpasswd"
+
+# WEB-MISC Lotus Domino directory traversal
+SecFilterSelective THE_REQUEST "\.\./"
+
+# WEB-MISC queryhit.htm access
+SecFilterSelective THE_REQUEST "/samples/search/queryhit\.htm" log,pass
+
+# WEB-MISC counter.exe access
+SecFilterSelective THE_REQUEST "/scripts/counter\.exe" log,pass
+
+# WEB-MISC WebDAV propfind access
+SecFilter "xmlns\:a=\"DAV\">" log,pass
+
+# WEB-MISC unify eWave ServletExec upload
+SecFilterSelective THE_REQUEST "/servlet/com\.unify\.servletexec\.UploadServlet"
+
+# WEB-MISC Netscape Servers suite DOS
+SecFilterSelective THE_REQUEST "/dsgw/bin/search\?context="
+
+# WEB-MISC amazon 1-click cookie theft
+SecFilter "ref\x3Cscript\x20language\x3D\x22Javascript"
+
+# WEB-MISC unify eWave ServletExec DOS
+SecFilterSelective THE_REQUEST "/servlet/ServletExec" log,pass
+
+# WEB-MISC Allaire JRUN DOS attempt
+SecFilterSelective THE_REQUEST "servlet/\.\.\.\.\.\.\."
+
+# WEB-MISC ICQ Webfront HTTP DOS
+SecFilterSelective THE_REQUEST "\?\?\?\?\?\?\?\?\?\?"
+
+# WEB-MISC Talentsoft Web+ Source Code view access
+SecFilterSelective THE_REQUEST "/webplus\.exe\?script=test\.wml"
+
+# WEB-MISC Talentsoft Web+ internal IP Address access
+SecFilterSelective THE_REQUEST "/webplus\.exe\?about" log,pass
+
+# WEB-MISC SmartWin CyberOffice Shopping Cart access
+SecFilterSelective THE_REQUEST "_private/shopping_cart\.mdb"
+
+# WEB-MISC cybercop scan
+SecFilterSelective THE_REQUEST "/cybercop" log,pass
+
+# WEB-MISC Nessus 404 probe
+SecFilterSelective THE_REQUEST "/nessus_is_probing_you_"
+
+# WEB-MISC Netscape admin passwd
+SecFilterSelective THE_REQUEST "/admin-serv/config/admpw"
+
+# WEB-MISC BigBrother access
+SecFilterSelective THE_REQUEST "/bb-hostsvc\.sh\?HOSTSVC"
+
+# WEB-MISC ftp.pl attempt
+SecFilterSelective THE_REQUEST "/ftp\.pl\?dir=\.\./\.\."
+
+# WEB-MISC ftp.pl access
+SecFilterSelective THE_REQUEST "/ftp\.pl" log,pass
+
+# WEB-MISC Tomcat server snoop access
+SecFilterSelective THE_REQUEST "\.snp"
+
+# WEB-MISC apache source.asp file access
+SecFilterSelective THE_REQUEST "/site/eg/source\.asp"
+
+# WEB-MISC Tomcat server exploit access
+SecFilterSelective THE_REQUEST "/contextAdmin/contextAdmin\.html"
+
+# WEB-MISC http directory traversal
+SecFilter "\.\.\\"
+
+# WEB-MISC ICQ webserver DOS
+SecFilterSelective THE_REQUEST "\.html/\.\.\.\.\.\."
+
+# WEB-MISC Lotus DelDoc attempt
+SecFilterSelective THE_REQUEST "\?DeleteDocument"
+
+# WEB-MISC Lotus EditDoc attempt
+SecFilterSelective THE_REQUEST "\?EditDocument"
+
+# WEB-MISC ls%20-l
+SecFilter "ls\x20-l"
+
+# WEB-MISC mlog.phtml access
+SecFilterSelective THE_REQUEST "/mlog\.phtml"
+
+# WEB-MISC mylog.phtml access
+SecFilterSelective THE_REQUEST "/mylog\.phtml"
+
+# WEB-MISC /etc/passwd
+SecFilter "/etc/passwd"
+
+# WEB-MISC ?PageServices access
+SecFilterSelective THE_REQUEST "\?PageServices"
+
+# WEB-MISC Ecommerce check.txt access
+SecFilterSelective THE_REQUEST "/config/check\.txt"
+
+# WEB-MISC webcart access
+SecFilterSelective THE_REQUEST "/webcart/"
+
+# WEB-MISC AuthChangeUrl access
+SecFilterSelective THE_REQUEST "_AuthChangeUrl\?"
+
+# WEB-MISC convert.bas access
+SecFilterSelective THE_REQUEST "/scripts/convert\.bas"
+
+# WEB-MISC cpshost.dll access
+SecFilterSelective THE_REQUEST "/scripts/cpshost\.dll"
+
+# WEB-MISC .htaccess access
+SecFilter "\.htaccess"
+
+# WEB-MISC .wwwacl access
+SecFilterSelective THE_REQUEST "\.wwwacl"
+
+# WEB-MISC .wwwacl access
+SecFilterSelective THE_REQUEST "\.www_acl"
+
+# WEB-MISC cd..
+SecFilter "cd\.\."
+
+# WEB-MISC guestbook.pl access
+SecFilterSelective THE_REQUEST "/guestbook\.pl"
+
+# WEB-MISC handler access
+SecFilterSelective THE_REQUEST "/handler" log,pass
+
+# WEB-MISC /.... access
+SecFilter "/\.\.\.\."
+
+# WEB-MISC ///cgi-bin access
+SecFilterSelective THE_REQUEST "///cgi-bin"
+
+# WEB-MISC /cgi-bin/// access
+SecFilterSelective THE_REQUEST "/cgi-bin///"
+
+# WEB-MISC /~root access
+SecFilterSelective THE_REQUEST "/~root"
+
+# WEB-MISC /~ftp access
+SecFilterSelective THE_REQUEST "/~ftp"
+
+# WEB-MISC Ecommerce import.txt access
+SecFilterSelective THE_REQUEST "/config/import\.txt"
+
+# WEB-MISC cat%20 access
+SecFilter "cat\x20"
+
+# WEB-MISC Ecommerce import.txt access
+SecFilterSelective THE_REQUEST "/orders/import\.txt"
+
+# WEB-MISC Domino catalog.nsf access
+SecFilterSelective THE_REQUEST "/catalog\.nsf"
+
+# WEB-MISC Domino domcfg.nsf access
+SecFilterSelective THE_REQUEST "/domcfg\.nsf"
+
+# WEB-MISC Domino domlog.nsf access
+SecFilterSelective THE_REQUEST "/domlog\.nsf"
+
+# WEB-MISC Domino log.nsf access
+SecFilterSelective THE_REQUEST "/log\.nsf"
+
+# WEB-MISC Domino names.nsf access
+SecFilterSelective THE_REQUEST "/names\.nsf"
+
+# WEB-MISC Domino mab.nsf access
+SecFilterSelective THE_REQUEST "/mab\.nsf"
+
+# WEB-MISC Domino cersvr.nsf access
+SecFilterSelective THE_REQUEST "/cersvr\.nsf"
+
+# WEB-MISC Domino setup.nsf access
+SecFilterSelective THE_REQUEST "/setup\.nsf"
+
+# WEB-MISC Domino statrep.nsf access
+SecFilterSelective THE_REQUEST "/statrep\.nsf"
+
+# WEB-MISC Domino webadmin.nsf access
+SecFilterSelective THE_REQUEST "/webadmin\.nsf"
+
+# WEB-MISC Domino events4.nsf access
+SecFilterSelective THE_REQUEST "/events4\.nsf"
+
+# WEB-MISC Domino ntsync4.nsf access
+SecFilterSelective THE_REQUEST "/ntsync4\.nsf"
+
+# WEB-MISC Domino collect4.nsf access
+SecFilterSelective THE_REQUEST "/collect4\.nsf"
+
+# WEB-MISC Domino mailw46.nsf access
+SecFilterSelective THE_REQUEST "/mailw46\.nsf"
+
+# WEB-MISC Domino bookmark.nsf access
+SecFilterSelective THE_REQUEST "/bookmark\.nsf"
+
+# WEB-MISC Domino agentrunner.nsf access
+SecFilterSelective THE_REQUEST "/agentrunner\.nsf"
+
+# WEB-MISC Domino mail.box access
+SecFilterSelective THE_REQUEST "/mail\.box"
+
+# WEB-MISC Ecommerce checks.txt access
+SecFilterSelective THE_REQUEST "/orders/checks\.txt"
+
+# WEB-MISC Netscape PublishingXpert access
+SecFilterSelective THE_REQUEST "/PSUser/PSCOErrPage\.htm" log,pass
+
+# WEB-MISC windmail.exe access
+SecFilterSelective THE_REQUEST "/windmail\.exe"
+
+# WEB-MISC webplus access
+SecFilterSelective THE_REQUEST "/webplus\?script"
+
+# WEB-MISC Netscape dir index wp
+SecFilterSelective THE_REQUEST "\?wp-"
+
+# WEB-MISC cart 32 AdminPwd access
+SecFilterSelective THE_REQUEST "/c32web\.exe/ChangeAdminPassword"
+
+# WEB-MISC shopping cart access
+SecFilterSelective THE_REQUEST "/quikstore\.cfg"
+
+# WEB-MISC Novell Groupwise gwweb.exe attempt
+SecFilterSelective THE_REQUEST "/GWWEB\.EXE\?HELP="
+
+# WEB-MISC Novell Groupwise gwweb.exe access
+SecFilter "/GWWEB\.EXE"
+
+# WEB-MISC ws_ftp.ini access
+SecFilterSelective THE_REQUEST "/ws_ftp\.ini"
+
+# WEB-MISC rpm_query access
+SecFilterSelective THE_REQUEST "/rpm_query"
+
+# WEB-MISC mall log order access
+SecFilterSelective THE_REQUEST "/mall_log_files/order\.log"
+
+# WEB-MISC architext_query.pl access
+SecFilterSelective THE_REQUEST "/ews/architext_query\.pl"
+
+# WEB-MISC wwwboard.pl access
+SecFilterSelective THE_REQUEST "/wwwboard\.pl"
+
+# WEB-MISC order.log access
+SecFilterSelective THE_REQUEST "/admin_files/order\.log"
+
+# WEB-MISC Netscape Enterprise Server directory view
+SecFilterSelective THE_REQUEST "\?wp-verify-link"
+
+# WEB-MISC get32.exe access
+SecFilterSelective THE_REQUEST "/get32\.exe"
+
+# WEB-MISC Annex Terminal DOS attempt
+SecFilterSelective THE_REQUEST "/ping\?query="
+
+# WEB-MISC cgitest.exe access
+SecFilterSelective THE_REQUEST "/cgitest\.exe" log,pass
+
+# WEB-MISC Netscape Enterprise Server directory view
+SecFilterSelective THE_REQUEST "\?wp-cs-dump"
+
+# WEB-MISC Netscape Enterprise Server directory view
+SecFilterSelective THE_REQUEST "\?wp-ver-info"
+
+# WEB-MISC Netscape Enterprise Server directory view
+SecFilterSelective THE_REQUEST "\?wp-ver-diff"
+
+# WEB-MISC SalesLogix Eviewer web command attempt
+SecFilterSelective THE_REQUEST "/slxweb\.dll/admin\?command="
+
+# WEB-MISC SalesLogix Eviewer access
+SecFilterSelective THE_REQUEST "/slxweb\.dll" log,pass
+
+# WEB-MISC Netscape Enterprise Server directory view
+SecFilterSelective THE_REQUEST "\?wp-start-ver"
+
+# WEB-MISC Netscape Enterprise Server directory view
+SecFilterSelective THE_REQUEST "\?wp-stop-ver"
+
+# WEB-MISC Netscape Enterprise Server directory view
+SecFilterSelective THE_REQUEST "\?wp-uncheckout"
+
+# WEB-MISC Netscape Enterprise Server directory view
+SecFilterSelective THE_REQUEST "\?wp-html-rend"
+
+# WEB-MISC Trend Micro OfficeScan attempt
+SecFilterSelective THE_REQUEST "event="
+
+# WEB-MISC Trend Micro OfficeScan access
+SecFilterSelective THE_REQUEST "/officescan/cgi/jdkRqNotify\.exe"
+
+# WEB-MISC oracle web arbitrary command execution attempt
+SecFilterSelective THE_REQUEST "\?&"
+
+# WEB-MISC oracle web application server access
+SecFilterSelective THE_REQUEST "/ows-bin/" log,pass
+
+# WEB-MISC Netscape Enterprise Server directory view
+SecFilterSelective THE_REQUEST "\?wp-usr-prop"
+
+# WEB-MISC search.vts access
+SecFilterSelective THE_REQUEST "/search\.vts"
+
+# WEB-MISC htgrep attempt
+SecFilterSelective THE_REQUEST "/htgrep" chain
+SecFilter "hdr=/"
+
+# WEB-MISC htgrep access
+SecFilterSelective THE_REQUEST "/htgrep" log,pass
+
+# WEB-MISC .nsconfig access
+SecFilterSelective THE_REQUEST "/\.nsconfig"
+
+# WEB-MISC Admin_files access
+SecFilterSelective THE_REQUEST "/admin_files"
+
+# WEB-MISC backup access
+SecFilterSelective THE_REQUEST "/backup"
+
+# WEB-MISC intranet access
+SecFilterSelective THE_REQUEST "/intranet/"
+
+# WEB-MISC filemail access
+SecFilterSelective THE_REQUEST "/filemail"
+
+# WEB-MISC plusmail access
+SecFilterSelective THE_REQUEST "/plusmail"
+
+# WEB-MISC adminlogin access
+SecFilterSelective THE_REQUEST "/adminlogin"
+
+# WEB-MISC ultraboard access
+SecFilterSelective THE_REQUEST "/ultraboard"
+
+# WEB-MISC musicat empower attempt
+SecFilterSelective THE_REQUEST "/empower\?DB="
+
+# WEB-MISC musicat empower access
+SecFilterSelective THE_REQUEST "/empower" log,pass
+
+# WEB-MISC ROADS search.pl attempt
+SecFilterSelective THE_REQUEST "/ROADS/cgi-bin/search\.pl" chain
+SecFilter "form="
+
+# WEB-MISC VirusWall FtpSave access
+SecFilterSelective THE_REQUEST "/FtpSave\.dll"
+
+# WEB-MISC VirusWall FtpSaveCSP access
+SecFilterSelective THE_REQUEST "/FtpSaveCSP\.dll"
+
+# WEB-MISC VirusWall FtpSaveCVP access
+SecFilterSelective THE_REQUEST "/FtpSaveCVP\.dll"
+
+# WEB-MISC Tomcat sourecode view
+SecFilterSelective THE_REQUEST "\.js\x2570"
+
+# WEB-MISC Tomcat sourecode view
+SecFilterSelective THE_REQUEST "\.j\x2573p"
+
+# WEB-MISC Tomcat sourecode view
+SecFilterSelective THE_REQUEST "\.\x256Asp"
+
+# WEB-MISC SWEditServlet directory traversal attempt
+SecFilterSelective THE_REQUEST "/SWEditServlet" chain
+SecFilter "template=\.\./\.\./\.\./"
+
+# WEB-MISC SWEditServlet access
+SecFilterSelective THE_REQUEST "/SWEditServlet"
+
+# WEB-MISC whisker HEAD/./
+SecFilter "HEAD/\./"
+
+# WEB-MISC HP OpenView Manager DOS
+SecFilterSelective THE_REQUEST "/OvCgi/OpenView5\.exe\?Context=Snmp&Action=Snmp&Host=&Oid="
+
+# WEB-MISC long basic authorization string
+SecFilter "Authorization\: Basic "
+
+# WEB-MISC sml3com access
+SecFilterSelective THE_REQUEST "/graphics/sml3com" log,pass
+
+# WEB-MISC carbo.dll access
+SecFilterSelective THE_REQUEST "/carbo\.dll" chain
+SecFilter "icatcommand="
+
+# WEB-MISC console.exe access
+SecFilterSelective THE_REQUEST "/cgi-bin/console\.exe"
+
+# WEB-MISC cs.exe access
+SecFilterSelective THE_REQUEST "/cgi-bin/cs\.exe"
+
+# WEB-MISC http directory traversal
+SecFilter "\.\./"
+
+# WEB-MISC sadmind worm access
+SecFilter "GET x HTTP/1\.0"
+
+# WEB-MISC jrun directory browse attempt
+SecFilterSelective THE_REQUEST "/\x3f\.jsp"
+
+# WEB-MISC mod-plsql administration access
+SecFilterSelective THE_REQUEST "/admin_/" log,pass
+
+# WEB-MISC Phorecast remote code execution attempt
+SecFilter "includedir="
+
+# WEB-MISC viewcode access
+SecFilterSelective THE_REQUEST "/viewcode"
+
+# WEB-MISC showcode access
+SecFilterSelective THE_REQUEST "/showcode"
+
+# WEB-MISC .history access
+SecFilterSelective THE_REQUEST "/\.history"
+
+# WEB-MISC .bash_history access
+SecFilterSelective THE_REQUEST "/\.bash_history"
+
+# WEB-MISC /~nobody access
+SecFilterSelective THE_REQUEST "/~nobody"
+
+# WEB-MISC RBS ISP /newuser  directory traversal attempt
+SecFilterSelective THE_REQUEST "/newuser\?Image=\.\./\.\."
+
+# WEB-MISC RBS ISP /newuser access
+SecFilterSelective THE_REQUEST "/newuser" log,pass
+
+# WEB-MISC *%0a.pl access
+SecFilterSelective THE_REQUEST "/*\x0a\.pl"
+
+# WEB-MISC mkplog.exe access
+SecFilterSelective THE_REQUEST "/mkplog\.exe" log,pass
+
+# WEB-MISC mkilog.exe access
+SecFilterSelective THE_REQUEST "/mkilog\.exe" log,pass
+
+# WEB-MISC PCCS mysql database admin tool access
+SecFilter "pccsmysqladm/incs/dbconnect\.inc"
+
+# WEB-MISC .DS_Store access
+SecFilterSelective THE_REQUEST "/\.DS_Store" log,pass
+
+# WEB-MISC .FBCIndex access
+SecFilterSelective THE_REQUEST "/\.FBCIndex" log,pass
+
+# WEB-MISC ExAir access
+SecFilterSelective THE_REQUEST "/exair/search/" log,pass
+
+# WEB-MISC apache ?M=D directory list attempt
+SecFilterSelective THE_REQUEST "/\?M=D" log,pass
+
+# WEB-MISC server-info access
+SecFilterSelective THE_REQUEST "/server-info" log,pass
+
+# WEB-MISC server-status access
+SecFilterSelective THE_REQUEST "/server-status" log,pass
+
+# WEB-MISC ans.pl attempt
+SecFilterSelective THE_REQUEST "/ans\.pl\?p=\.\./\.\./"
+
+# WEB-MISC ans.pl access
+SecFilterSelective THE_REQUEST "/ans\.pl" log,pass
+
+# WEB-MISC AxisStorpoint CD attempt
+SecFilterSelective THE_REQUEST "/cd/\.\./config/html/cnf_gi\.htm"
+
+# WEB-MISC Axis Storpoint CD access
+SecFilterSelective THE_REQUEST "/config/html/cnf_gi\.htm" log,pass
+
+# WEB-MISC basilix sendmail.inc access
+SecFilterSelective THE_REQUEST "/inc/sendmail\.inc" log,pass
+
+# WEB-MISC basilix mysql.class access
+SecFilterSelective THE_REQUEST "/class/mysql\.class" log,pass
+
+# WEB-MISC BBoard access
+SecFilterSelective THE_REQUEST "/servlet/sunexamples\.BBoardServlet" log,pass
+
+# WEB-MISC Cisco Catalyst command execution attempt
+SecFilterSelective THE_REQUEST "/exec/show/config/cr" log,pass
+
+# WEB-MISC Cisco /%% DOS attempt
+SecFilterSelective THE_REQUEST "/%%"
+
+# WEB-MISC /CVS/Entries access
+SecFilterSelective THE_REQUEST "/CVS/Entries" log,pass
+
+# WEB-MISC cvsweb version access
+SecFilterSelective THE_REQUEST "/cvsweb/version" log,pass
+
+# WEB-MISC /doc/packages access
+SecFilterSelective THE_REQUEST "/doc/packages" log,pass
+
+# WEB-MISC /doc/ access
+SecFilterSelective THE_REQUEST "/doc/" log,pass
+
+# WEB-MISC ?open access
+SecFilterSelective THE_REQUEST "\?open" log,pass
+
+# WEB-MISC login.htm attempt
+SecFilterSelective THE_REQUEST "/login\.htm\?password=" log,pass
+
+# WEB-MISC login.htm access
+SecFilterSelective THE_REQUEST "/login\.htm" log,pass
+
+# WEB-MISC DELETE attempt
+SecFilter "DELETE " log,pass
+
+# WEB-MISC /home/ftp access
+SecFilterSelective THE_REQUEST "/home/ftp" log,pass
+
+# WEB-MISC /home/www access
+SecFilterSelective THE_REQUEST "/home/www" log,pass
+
+# WEB-MISC global.inc access
+SecFilterSelective THE_REQUEST "/global\.inc"
+
+# WEB-MISC SecureSite authentication bypass attempt
+SecFilter "secure_site, ok"
+
+# WEB-MISC b2 arbitrary command execution attempt
+SecFilterSelective THE_REQUEST "/b2/b2-include/" chain
+SecFilter "http\://"
+
+# WEB-MISC b2 access
+SecFilterSelective THE_REQUEST "/b2/b2-include/" chain
+SecFilter "http\://"
+
+# WEB-MISC search.dll directory listing attempt
+SecFilterSelective THE_REQUEST "/search\.dll" chain
+SecFilter "query=\x00"
+
+# WEB-MISC search.dll access
+SecFilterSelective THE_REQUEST "/search\.dll" log,pass
+
+# WEB-MISC PIX firewall manager directory traversal attempt
+SecFilterSelective THE_REQUEST "/\.\./\.\./"
+
+# WEB-MISC iChat directory traversal attempt
+SecFilterSelective THE_REQUEST "/\.\./\.\./" log,pass
+
+# WEB-MISC Delegate whois overflow attempt
+SecFilter "whois\://" log,pass
+
+# WEB-MISC nstelemetry.adp access
+SecFilterSelective THE_REQUEST "/nstelemetry\.adp" log,pass
+
+# WEB-MISC Compaq Insight directory traversal
+SecFilterSelective THE_REQUEST "\.\./"
+
+# WEB-MISC VirusWall catinfo access
+SecFilterSelective THE_REQUEST "/catinfo"
+
+# WEB-MISC VirusWall catinfo access
+SecFilterSelective THE_REQUEST "/catinfo"
+
+# WEB-MISC Apache Chunked-Encoding worm attempt
+SecFilter "CCCCCCC\: AAAAAAAAAAAAAAAAAAA"
+
+# WEB-MISC Transfer-Encoding\: chunked
+SecFilter "chunked"
+
+# WEB-MISC CISCO VoIP DOS ATTEMPT
+SecFilterSelective THE_REQUEST "/StreamingStatistics"
+
+# WEB-MISC IBM Net.Commerce orderdspc.d2w access
+SecFilterSelective THE_REQUEST "/ncommerce3/ExecMacro/orderdspc\.d2w" log,pass
+
+# WEB-MISC WEB-INF access
+SecFilterSelective THE_REQUEST "/WEB-INF" log,pass
+
+# WEB-MISC Tomcat servlet mapping cross site scripting attempt
+SecFilterSelective THE_REQUEST "/org\.apache\."
+
+# WEB-MISC iPlanet Search directory traversal attempt
+SecFilterSelective THE_REQUEST "/search" chain
+SecFilter "\.\./\.\./"
+
+# WEB-MISC Tomcat TroubleShooter servlet access
+SecFilterSelective THE_REQUEST "/examples/servlet/TroubleShooter" log,pass
+
+# WEB-MISC Tomcat SnoopServlet servlet access
+SecFilterSelective THE_REQUEST "/examples/servlet/SnoopServlet" log,pass
+
+# WEB-MISC jigsaw dos attempt
+SecFilterSelective THE_REQUEST "/servlet/con"
+
+# WEB-MISC Macromedia SiteSpring cross site scripting attempt
+SecFilterSelective THE_REQUEST "<script"
+
+# WEB-MISC mailman cross site scripting attempt
+SecFilterSelective THE_REQUEST "<script"
+
+# WEB-MISC webalizer access
+SecFilterSelective THE_REQUEST "/webalizer/" log,pass
+
+# WEB-MISC webcart-lite access
+SecFilterSelective THE_REQUEST "/webcart-lite/" log,pass
+
+# WEB-MISC webfind.exe access
+SecFilterSelective THE_REQUEST "/webfind\.exe" log,pass
+
+# WEB-MISC active.log access
+SecFilterSelective THE_REQUEST "/active\.log" log,pass
+
+# WEB-MISC robots.txt access
+SecFilterSelective THE_REQUEST "/robots\.txt" log,pass
+
+# WEB-MISC robot.txt access
+SecFilterSelective THE_REQUEST "/robot\.txt" log,pass
+
+# WEB-MISC CISCO PIX Firewall Manager directory traversal attempt
+SecFilterSelective THE_REQUEST "/pixfir~1/how_to_login\.html"
+
+# WEB-MISC Sun JavaServer default password login attempt
+SecFilterSelective THE_REQUEST "/servlet/admin" chain
+SecFilter "ae9f86d6beaa3f9ecb9a5b7e072a4138"
+
+# WEB-MISC Linksys router default password login attempt \(\:admin\)
+SecFilter "Authorization\: Basic OmFkbWlu"
+
+# WEB-MISC Linksys router default password login attempt \(admin\:admin\)
+SecFilter "YWRtaW46YWRtaW4"
+
+# WEB-MISC Oracle XSQLConfig.xml access
+SecFilterSelective THE_REQUEST "/XSQLConfig\.xml" log,pass
+
+# WEB-MISC Oracle Dynamic Monitoring Services (dms) access
+SecFilterSelective THE_REQUEST "/dms0" log,pass
+
+# WEB-MISC globals.jsa access
+SecFilterSelective THE_REQUEST "/globals\.jsa" log,pass
+
+# WEB-MISC Oracle Java Process Manager access
+SecFilterSelective THE_REQUEST "/oprocmgr-status" log,pass
+
+# WEB-MISC /Carello/add.exe access
+SecFilterSelective THE_REQUEST "/Carello/add\.exe" log,pass
+
+# WEB-MISC /ecscripts/ecware.exe access
+SecFilterSelective THE_REQUEST "/ecscripts/ecware\.exe" log,pass
+
+# WEB-MISC ion-p access
+SecFilterSelective THE_REQUEST "/ion-p" log,pass
+
+# WEB-MISC SiteScope Service access
+SecFilterSelective THE_REQUEST "/SiteScope/cgi/go\.exe/SiteScope" log,pass
+
+# WEB-MISC answerbook2 admin attempt
+SecFilterSelective THE_REQUEST "/cgi-bin/admin/admin" log,pass
+
+# WEB-MISC answerbook2 arbitrary command execution attempt
+SecFilterSelective THE_REQUEST "/ab2/" chain
+SecFilter "\;"
+
+# WEB-MISC perl post attempt
+SecFilterSelective THE_REQUEST "/perl/" chain
+SecFilter "POST"
+
+# WEB-MISC TRACE attempt
+SecFilter "TRACE"
+
+# WEB-MISC helpout.exe access
+SecFilterSelective THE_REQUEST "/helpout\.exe" log,pass
+
+# WEB-MISC MsmMask.exe attempt
+SecFilterSelective THE_REQUEST "/MsmMask\.exe" chain
+SecFilter "mask="
+
+# WEB-MISC MsmMask.exe access
+SecFilterSelective THE_REQUEST "/MsmMask\.exe" log,pass
+
+# WEB-MISC DB4Web access
+SecFilterSelective THE_REQUEST "/DB4Web/" log,pass
+
+# WEB-MISC iPlanet .perf access
+SecFilterSelective THE_REQUEST "/\.perf" log,pass
+
+# WEB-MISC Demarc SQL injection attempt
+SecFilterSelective THE_REQUEST "/dm/demarc" chain
+SecFilter "'" log,pass
+
+# WEB-MISC Lotus Notes .csp script source download attempt
+SecFilterSelective THE_REQUEST "\.csp" chain
+SecFilter "\."
+
+# WEB-MISC Lotus Notes .pl script source download attempt
+SecFilterSelective THE_REQUEST "\.pl" chain
+SecFilter "\."
+
+# WEB-MISC Lotus Notes .exe script source download attempt
+SecFilterSelective THE_REQUEST "\.exe" chain
+SecFilter "\."
+
+# WEB-MISC BitKeeper arbitrary command attempt
+SecFilterSelective THE_REQUEST "/diffs/" chain
+SecFilter "'"
+
+# WEB-MISC chip.ini access
+SecFilterSelective THE_REQUEST "/chip\.ini" log,pass
+
+# WEB-MISC post32.exe access
+SecFilterSelective THE_REQUEST "/post32\.exe" log,pass
+
+# WEB-MISC lyris.pl access
+SecFilterSelective THE_REQUEST "/lyris\.pl" log,pass
+
+# WEB-MISC globals.pl access
+SecFilterSelective THE_REQUEST "/globals\.pl" log,pass
+
+# WEB-MISC philboard.mdb access
+SecFilterSelective THE_REQUEST "/philboard\.mdb" log,pass
+
+# WEB-MISC philboard_admin.asp authentication bypass attempt
+SecFilterSelective THE_REQUEST "/philboard_admin\.asp" chain
+SecFilter "philboard_admin=True"
+
+# WEB-MISC philboard_admin.asp access
+SecFilterSelective THE_REQUEST "/philboard_admin\.asp" log,pass
+
+# WEB-MISC logicworks.ini access
+SecFilterSelective THE_REQUEST "/logicworks\.ini" log,pass
+
+# WEB-MISC /*.shtml access
+SecFilterSelective THE_REQUEST "/*\.shtml" log,pass
+
+# WEB-MISC mod_gzip_status access
+SecFilterSelective THE_REQUEST "/mod_gzip_status" log,pass
+
+# WEB-PHP bb_smilies.php access
+SecFilterSelective THE_REQUEST "/bb_smilies\.php" log,pass
+
+# WEB-PHP squirrel mail spell-check arbitrary command attempt
+SecFilterSelective THE_REQUEST "/squirrelspell/modules/check_me\.mod\.php" chain
+SecFilter "SQSPELL_APP\["
+
+# WEB-PHP squirrel mail theme arbitrary command attempt
+SecFilterSelective THE_REQUEST "/left_main\.php" chain
+SecFilter "cmdd="
+
+# WEB-PHP DNSTools administrator authentication bypass attempt
+SecFilterSelective THE_REQUEST "/dnstools\.php" chain
+SecFilter "user_dnstools_administrator=true"
+
+# WEB-PHP DNSTools authentication bypass attempt
+SecFilterSelective THE_REQUEST "/dnstools\.php" chain
+SecFilter "user_logged_in=true"
+
+# WEB-PHP DNSTools access
+SecFilterSelective THE_REQUEST "/dnstools\.php" log,pass
+
+# WEB-PHP Blahz-DNS dostuff.php modify user attempt
+SecFilterSelective THE_REQUEST "/dostuff\.php\?action=modify_user"
+
+# WEB-PHP Blahz-DNS dostuff.php access
+SecFilterSelective THE_REQUEST "/dostuff\.php" log,pass
+
+# WEB-PHP Messagerie supp_membre.php access
+SecFilterSelective THE_REQUEST "/supp_membre\.php" log,pass
+
+# WEB-PHP php.exe access
+SecFilterSelective THE_REQUEST "/php\.exe" log,pass
+
+# WEB-PHP directory.php arbitrary command attempt
+SecFilterSelective THE_REQUEST "/directory\.php" chain
+SecFilter "\;"
+
+# WEB-PHP directory.php access
+SecFilterSelective THE_REQUEST "/directory\.php"
+
+# WEB-PHP PHP-Wiki cross site scripting attempt
+SecFilterSelective THE_REQUEST "<script"
+
+# WEB-PHP phpbb quick-reply.php arbitrary command attempt
+SecFilterSelective THE_REQUEST "/quick-reply\.php" chain
+SecFilter "phpbb_root_path="
+
+# WEB-PHP phpbb quick-reply.php access
+SecFilterSelective THE_REQUEST "/quick-reply\.php" log,pass
+
+# WEB-PHP read_body.php access attempt
+SecFilterSelective THE_REQUEST "/read_body\.php" log,pass
+
+# WEB-PHP calendar.php access
+SecFilterSelective THE_REQUEST "/calendar\.php" log,pass
+
+# WEB-PHP edit_image.php access
+SecFilterSelective THE_REQUEST "/edit_image\.php" log,pass
+
+# WEB-PHP readmsg.php access
+SecFilterSelective THE_REQUEST "/readmsg\.php" log,pass
+
+# WEB-PHP external include path
+SecFilterSelective THE_REQUEST "\.php" chain
+SecFilter "path=http\://"
+
+# WEB-PHP Phorum admin access
+SecFilterSelective THE_REQUEST "/admin\.php3"
+
+# WEB-PHP piranha passwd.php3 access
+SecFilterSelective THE_REQUEST "/passwd\.php3"
+
+# WEB-PHP Phorum read access
+SecFilterSelective THE_REQUEST "/read\.php3"
+
+# WEB-PHP Phorum violation access
+SecFilterSelective THE_REQUEST "/violation\.php3"
+
+# WEB-PHP Phorum code access
+SecFilterSelective THE_REQUEST "/code\.php3"
+
+# WEB-PHP admin.php file upload attempt
+SecFilterSelective THE_REQUEST "/admin\.php" chain
+SecFilter "file_name="
+
+# WEB-PHP admin.php access
+SecFilterSelective THE_REQUEST "/admin\.php"
+
+# WEB-PHP smssend.php access
+SecFilterSelective THE_REQUEST "/smssend\.php" log,pass
+
+# WEB-PHP PHP-Nuke remote file include attempt
+SecFilterSelective THE_REQUEST "index\.php" chain
+SecFilter "file=http\://"
+
+# WEB-PHP Phorum /support/common.php attempt
+SecFilterSelective THE_REQUEST "/support/common\.php" chain
+SecFilter "ForumLang=\.\./"
+
+# WEB-PHP Phorum /support/common.php access
+SecFilterSelective THE_REQUEST "/support/common\.php"
+
+# WEB-PHP Phorum authentication access
+SecFilter "PHP_AUTH_USER=boogieman"
+
+# WEB-PHP strings overflow
+SecFilterSelective THE_REQUEST "\?STRENGUR"
+
+# WEB-PHP PHPLIB remote command attempt
+SecFilter "_PHPLIB\[libdir\]"
+
+# WEB-PHP PHPLIB remote command attempt
+SecFilterSelective THE_REQUEST "/db_mysql\.inc"
+
+# WEB-PHP Mambo uploadimage.php upload php file attempt
+SecFilterSelective THE_REQUEST "/uploadimage\.php" chain
+SecFilter "\.php"
+
+# WEB-PHP Mambo upload.php upload php file attempt
+SecFilterSelective THE_REQUEST "/upload\.php" chain
+SecFilter "\.php"
+
+# WEB-PHP Mambo uploadimage.php access
+SecFilterSelective THE_REQUEST "/uploadimage\.php" log,pass
+
+# WEB-PHP Mambo upload.php access
+SecFilterSelective THE_REQUEST "/upload\.php" log,pass
+
+# WEB-PHP phpBB privmsg.php access
+SecFilterSelective THE_REQUEST "/privmsg\.php" log,pass
+
+# WEB-PHP p-news.php access
+SecFilterSelective THE_REQUEST "/p-news\.php" log,pass
+
+# WEB-PHP shoutbox.php directory traversal attempt
+SecFilterSelective THE_REQUEST "/shoutbox\.php" chain
+SecFilter "\.\./"
+
+# WEB-PHP shoutbox.php access
+SecFilterSelective THE_REQUEST "/shoutbox\.php" log,pass
+
+# WEB-PHP b2 cafelog gm-2-b2.php remote command execution attempt
+SecFilterSelective THE_REQUEST "/gm-2-b2\.php" chain
+SecFilter "b2inc=http"
+
+# WEB-PHP b2 cafelog gm-2-b2.php access
+SecFilterSelective THE_REQUEST "/gm-2-b2\.php" log,pass
+
+# WEB-PHP TextPortal admin.php default password (admin) attempt
+SecFilterSelective THE_REQUEST "/admin\.php" chain
+SecFilter "password=admin" log,pass
+
+# WEB-PHP TextPortal admin.php default password (12345) attempt
+SecFilterSelective THE_REQUEST "/admin\.php" chain
+SecFilter "password=12345" log,pass
+
+# WEB-PHP BLNews objects.inc.php4 remote command execution attempt
+SecFilterSelective THE_REQUEST "/objects\.inc\.php4" chain
+SecFilter "Server\[path\]=http"
+
+# WEB-PHP BLNews objects.inc.php4 access
+SecFilterSelective THE_REQUEST "/objects\.inc\.php4" log,pass
+
+# WEB-PHP Turba status.php access
+SecFilterSelective THE_REQUEST "/turba/status\.php" log,pass
+
+# WEB-PHP ttCMS header.php remote command execution attempt
+SecFilterSelective THE_REQUEST "/admin/templates/header\.php" chain
+SecFilter "admin_root=http"
+
+# WEB-PHP ttCMS header.php access
+SecFilterSelective THE_REQUEST "/admin/templates/header\.php" log,pass
+
+# WEB-PHP test.php access
+SecFilterSelective THE_REQUEST "/test\.php" log,pass
+
+# WEB-PHP autohtml.php directory traversal attempt
+SecFilterSelective THE_REQUEST "/autohtml\.php" chain
+SecFilter "\.\./\.\./"
+
+# WEB-PHP autohtml.php access
+SecFilterSelective THE_REQUEST "/autohtml\.php" log,pass
+
+# WEB-PHP ttforum remote command execution attempt
+SecFilterSelective THE_REQUEST "forum/index\.php" chain
+SecFilter "template=http"
+
