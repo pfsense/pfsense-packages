@@ -179,8 +179,6 @@
 	      	<cols>75</cols>			
 		</field>		
 	</fields>
-	<custom_php_validation_command>
-	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
 		apache_mod_security_resync();
 	</custom_php_resync_config_command>
