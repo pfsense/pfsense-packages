@@ -94,9 +94,9 @@
 		<item>http://www.pfsense.com/packages/config/snort-dev/snort_gui.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/snort/snort_misc/images/</prefix>
+		<prefix>/usr/local/www/snort/images/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort-dev/snort_misc/images/alert.jpg</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/images/alert.jpg</item>
 	</additional_files_needed>
 	<fields>
     </fields>

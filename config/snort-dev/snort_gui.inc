@@ -36,7 +36,7 @@ function print_info_box_np2($msg) {
         echo "   <td>\n";
         echo "      <div style='background-color:#990000' id='redbox'>\n";
         echo "       <table width='100%'><tr><td width='8%'>\n";
-        echo "        &nbsp;&nbsp;&nbsp;<img style='vertical-align:middle' src=\"/snort/snort_misc/images/alert.jpg\" width=\"32\" height=\"28\">\n";
+        echo "        &nbsp;&nbsp;&nbsp;<img style='vertical-align:middle' src=\"/snort/images/alert.jpg\" width=\"32\" height=\"28\">\n";
         echo "        </td>\n";
         echo "        <td width='70%'><font color='white'><b>{$msg}</b></font>\n";
         echo "        </td>";
