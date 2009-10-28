@@ -1,11 +1,11 @@
 <?php
 /* $Id$ */
 /*
-	firewall_nat_edit.php
+	snort_interfaces.php
 	part of m0n0wall (http://m0n0.ch/wall)
 
 	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
-	Copyright (C) 2003-2004 Robert Zelaya
+	Copyright (C) 2008-2009 Robert Zelaya.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -48,14 +48,17 @@ if (isset($_GET['dup'])) {
 }
 
 if (isset($id) && $a_nat[$id]) {
-	$pconfig['proto'] = $a_nat[$id]['protocol'];
-	list($pconfig['beginport'],$pconfig['endport']) = explode("-", $a_nat[$id]['external-port']);
-	$pconfig['localip'] = $a_nat[$id]['target'];
-	$pconfig['localbeginport'] = $a_nat[$id]['local-port'];
-	$pconfig['descr'] = $a_nat[$id]['descr'];
+
+	$pconfig['enable'] = $a_nat[$id]['enable'];
 	$pconfig['interface'] = $a_nat[$id]['interface'];
-	$pconfig['block'] = isset($a_nat[$id]['block']);
-	$pconfig['inline'] = isset($a_nat[$id]['inline']);
+	$pconfig['descr'] = $a_nat[$id]['descr'];
+	$pconfig['performance'] = $a_nat[$id]['performance'];
+	$pconfig['blockoffenders7'] = $a_nat[$id]['blockoffenders7'];
+	$pconfig['snortalertlogtype'] = $a_nat[$id]['snortalertlogtype'];
+	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
+	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
+	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
+		
 	if (!$pconfig['interface'])
 		$pconfig['interface'] = "wan";
 } else {
@@ -67,65 +70,49 @@ if (isset($_GET['dup']))
 
 if ($_POST) {
 
-	if ($_POST['beginport_cust'] && !$_POST['beginport'])
-		$_POST['beginport'] = $_POST['beginport_cust'];
-	if ($_POST['endport_cust'] && !$_POST['endport'])
-		$_POST['endport'] = $_POST['endport_cust'];
-	if ($_POST['localbeginport_cust'] && !$_POST['localbeginport'])
-		$_POST['localbeginport'] = $_POST['localbeginport_cust'];
-
-	if (!$_POST['endport'])
-		$_POST['endport'] = $_POST['beginport'];
-        /* Make beginning port end port if not defined and endport is */
-        if (!$_POST['beginport'] && $_POST['endport'])
-                $_POST['beginport'] = $_POST['endport'];
-
-	unset($input_errors);
-	$pconfig = $_POST;
-
 	/* input validation */
-	if(strtoupper($_POST['proto']) == "TCP" or strtoupper($_POST['proto']) == "UDP" or strtoupper($_POST['proto']) == "TCP/UDP") {
-		$reqdfields = explode(" ", "interface proto beginport endport localip localbeginport");
-		$reqdfieldsn = explode(",", "Interface,Protocol,External port from,External port to,NAT IP,Local port");
-	} else {
-		$reqdfields = explode(" ", "interface proto localip");
-		$reqdfieldsn = explode(",", "Interface,Protocol,NAT IP");
-	}
+//	if(strtoupper($_POST['proto']) == "TCP" or strtoupper($_POST['proto']) == "UDP" or strtoupper($_POST['proto']) == "TCP/UDP") {
+//		$reqdfields = explode(" ", "interface proto beginport endport localip localbeginport");
+//		$reqdfieldsn = explode(",", "Interface,Protocol,External port from,External port to,NAT IP,Local port");
+//	} else {
+//		$reqdfields = explode(" ", "interface proto localip");
+//		$reqdfieldsn = explode(",", "Interface,Protocol,NAT IP");
+//	}
 
-	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+//	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
 //	if (($_POST['localip'] && !is_ipaddroralias($_POST['localip']))) {
-//		$input_errors[] = "\"{$_POST['localip']}\" is not valid subnet address.";
+//		$input_errors[] = "\"{$_POST['localip']}\" is not valid NAT IP address or host alias.";
 //	}
 
 	/* only validate the ports if the protocol is TCP, UDP or TCP/UDP */
-	if(strtoupper($_POST['proto']) == "TCP" or strtoupper($_POST['proto']) == "UDP" or strtoupper($_POST['proto']) == "TCP/UDP") {
+//	if(strtoupper($_POST['proto']) == "TCP" or strtoupper($_POST['proto']) == "UDP" or strtoupper($_POST['proto']) == "TCP/UDP") {
 
-		if (($_POST['beginport'] && !is_ipaddroralias($_POST['beginport']) && !is_port($_POST['beginport']))) {
-			$input_errors[] = "The start port must be an integer between 1 and 65535.";
-		}
+//		if (($_POST['beginport'] && !is_ipaddroralias($_POST['beginport']) && !is_port($_POST['beginport']))) {
+//			$input_errors[] = "The start port must be an integer between 1 and 65535.";
+//		}
 
-		if (($_POST['endport'] && !is_ipaddroralias($_POST['endport']) && !is_port($_POST['endport']))) {
-			$input_errors[] = "The end port must be an integer between 1 and 65535.";
-		}
+//		if (($_POST['endport'] && !is_ipaddroralias($_POST['endport']) && !is_port($_POST['endport']))) {
+//			$input_errors[] = "The end port must be an integer between 1 and 65535.";
+//		}
 
-		if (($_POST['localbeginport'] && !is_ipaddroralias($_POST['localbeginport']) && !is_port($_POST['localbeginport']))) {
-			$input_errors[] = "The local port must be an integer between 1 and 65535.";
-		}
+//		if (($_POST['localbeginport'] && !is_ipaddroralias($_POST['localbeginport']) && !is_port($_POST['localbeginport']))) {
+//			$input_errors[] = "The local port must be an integer between 1 and 65535.";
+//		}
 
-		if ($_POST['beginport'] > $_POST['endport']) {
+//		if ($_POST['beginport'] > $_POST['endport']) {
 			/* swap */
-			$tmp = $_POST['endport'];
-			$_POST['endport'] = $_POST['beginport'];
-			$_POST['beginport'] = $tmp;
-		}
+//			$tmp = $_POST['endport'];
+//			$_POST['endport'] = $_POST['beginport'];
+//			$_POST['beginport'] = $tmp;
+//		}
 
-		if (!$input_errors) {
-			if (($_POST['endport'] - $_POST['beginport'] + $_POST['localbeginport']) > 65535)
-				$input_errors[] = "The target port range must be an integer between 1 and 65535.";
-		}
+//		if (!$input_errors) {
+//			if (($_POST['endport'] - $_POST['beginport'] + $_POST['localbeginport']) > 65535)
+//				$input_errors[] = "The target port range must be an integer between 1 and 65535.";
+//		}
 
-	}
+//	}
 
 	/* check for overlaps */
 	foreach ($a_nat as $natent) {
@@ -133,48 +120,21 @@ if ($_POST) {
 			continue;
 		if ($natent['interface'] != $_POST['interface'])
 			continue;
-		if ($natent['external-address'] != $_POST['extaddr'])
-			continue;
-		if (($natent['proto'] != $_POST['proto']) && ($natent['proto'] != "tcp/udp") && ($_POST['proto'] != "tcp/udp"))
-			continue;
-
-		list($begp,$endp) = explode("-", $natent['external-port']);
-		if (!$endp)
-			$endp = $begp;
-
-		if (!(   (($_POST['beginport'] < $begp) && ($_POST['endport'] < $begp))
-		      || (($_POST['beginport'] > $endp) && ($_POST['endport'] > $endp)))) {
-
-			$input_errors[] = "The external port range overlaps with an existing entry.";
-			break;
-		}
 	}
 
+/* if no errors write to conf */
 	if (!$input_errors) {
 		$natent = array();
-		if ($_POST['extaddr'])
-			$natent['external-address'] = $_POST['extaddr'];
-		$natent['protocol'] = $_POST['proto'];
-
-		if ($_POST['beginport'] == $_POST['endport'])
-			$natent['external-port'] = $_POST['beginport'];
-		else
-			$natent['external-port'] = $_POST['beginport'] . "-" . $_POST['endport'];
-
-		$natent['target'] = $_POST['localip'];
-		$natent['local-port'] = $_POST['localbeginport'];
-		$natent['interface'] = $_POST['interface'];
+		$natent['enable'] = $_POST['enable'] ? on : off;
+		/* if option is diabled add a default answer */
+		$natent['interface'] = $_POST['interface'] ? $_POST['interface'] : $pconfig['interface'];
 		$natent['descr'] = $_POST['descr'];
-
-		if($_POST['block'] == "yes")
-			$natent['block'] = true;
-		else
-			unset($natent['block']);
-			
-		if($_POST['inline'] == "yes")
-			$natent['inline'] = true;
-		else
-			unset($natent['inline']);
+		$natent['performance'] = $_POST['performance'];
+		$natent['blockoffenders7'] = $_POST['blockoffenders7'] ? on : off;
+		$natent['snortalertlogtype'] = $_POST['snortalertlogtype'];
+		$natent['alertsystemlog'] = $_POST['alertsystemlog'] ? on : off;
+		$natent['tcpdumplog'] = $_POST['tcpdumplog'] ? on : off;
+		$natent['flow_depth'] = $_POST['flow_depth'];
 
 		if (isset($id) && $a_nat[$id])
 			$a_nat[$id] = $natent;
@@ -183,7 +143,9 @@ if ($_POST) {
 				array_splice($a_nat, $after+1, 0, array($natent));
 			else
 				$a_nat[] = $natent;
-		}		
+		}
+
+		touch($d_natconfdirty_path);
 
 		write_config();
 
@@ -192,21 +154,66 @@ if ($_POST) {
 	}
 }
 
-$pgtitle = "Services: Snort Interfaces";
+$pgtitle = "Services: Snort Interfaces Edit";
 include("head.inc");
 
 ?>
-
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<?php 
+include("fbegin.inc");
+?>
+<style type="text/css">
+.alert {
+ position:absolute;
+ top:10px;
+ left:0px;
+ width:94%;
+background:#FCE9C0;
+background-position: 15px; 
+border-top:2px solid #DBAC48;
+border-bottom:2px solid #DBAC48;
+padding: 15px 10px 85% 50px;
+}
+</style> 
+<noscript><div class="alert" ALIGN=CENTER><img src="/themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
+<script language="JavaScript">
+<!--
+
+function enable_change(enable_change) {
+	endis = !(document.iform.enable.checked || enable_change);
+	// make shure a default answer is called if this is envoked.
+	endis2 = (document.iform.enable);
+
 <?php
-include("fbegin.inc"); ?>
+/* make shure all the settings exist or function hide will not work */
+/* if $id is emty allow if and discr to be open */
+if($id != "") 
+{
+echo "	
+	document.iform.interface.disabled = endis2;
+	document.iform.descr.disabled = endis;\n";
+}
+?>
+    document.iform.flow_depth.disabled = endis;
+	document.iform.performance.disabled = endis;
+	document.iform.blockoffenders7.disabled = endis;
+	document.iform.snortalertlogtype.disabled = endis;
+	document.iform.alertsystemlog.disabled = endis;
+	document.iform.tcpdumplog.disabled = endis;
+}
+//-->
+</script>
 <p class="pgtitle"><?=$pgtitle?></p>
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
-            <form action="snort_interfaces_edit.php" method="post" name="iform" id="iform">
- <tr><td>
+<?php if ($savemsg) print_info_box($savemsg); ?>
+<form action="snort_interfaces_edit.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td class="tabnavtbl">
 <?php
-	if($id != "") {
-	
+if($id != "") 
+{
+
 	 /* get the interface name */
 		$first = 0;
         $snortInterfaces = array(); /* -gtm  */
@@ -234,28 +241,75 @@ include("fbegin.inc"); ?>
                         return;
                 }
         }
+		
+		/* do for the selected interface */
 		foreach($snortInterfaces as $snortIf)
+		{
+		
+		/* if base directories dont exist create them */
+		if(!file_exists("/usr/local/pkg/snort/snort_{$snortIf}_{$id}/"))
+			{
+			exec("/bin/mkdir -p /usr/local/pkg/snort/snort_{$snortIf}_{$id}/");
+			if(!file_exists("/usr/local/www/snort/snort_{$snortIf}_{$id}/"))
+			exec("/bin/mkdir -p /usr/local/www/snort/snort_{$snortIf}_{$id}/");
+			}
 
-	$tab_array = array();
-	$tab_array[] = array("Interfaces", false, "snort_interfaces.php");
-	$tab_array[] = array("Settings", false, "/pkg_edit.php?xml=snort/snort_{$snortIf}/snort_{$snortIf}.xml&id=0");
-	$tab_array[] = array("Categories", false, "snort/snort_{$snortIf}/snort_rulesets_{$snortIf}.php");
-	$tab_array[] = array("Rules", false, "snort/snort_{$snortIf}/snort_rules_{$snortIf}.php");
-	$tab_array[] = array("Servers", false, "/pkg_edit.php?xml=snort/snort_{$snortIf}/snort_define_servers_{$snortIf}.xml&amp;id=0");
-	$tab_array[] = array("Threshold", false, "/pkg.php?xml=snort/snort_{$snortIf}/snort_threshold_{$snortIf}.xml");
-	$tab_array[] = array("Barnyard2", false, "/pkg_edit.php?xml=snort/snort_{$snortIf}/snort_barnyard2_{$snortIf}.xml&id=0");
-	display_top_tabs($tab_array);
-
-	}
+    $tab_array = array();
+    $tab_array[] = array("Snort Interfaces", false, "/snort_interfaces.php");
+    $tab_array[] = array("If Settings", true, "/snort_interfaces_edit.php");
+    $tab_array[] = array("Categories", false, "/snort/snort_{$snortIf}_{$id}/snort_rulesets_{$snortIf}_{$id}.php");
+    $tab_array[] = array("Rules", false, "/snort/snort_{$snortIf}_{$id}/snort_rules_{$snortIf}_{$id}.php");
+    $tab_array[] = array("Servers", false, "/pkg_edit.php?xml=snort/snort_{$snortIf}_{$id}/snort_define_servers_{$snortIf}_{$id}.xml&amp;id=0");
+    $tab_array[] = array("Barnyard2", false, "/pkg_edit.php?xml=snort/snort_{$snortIf}_{$id}/snort_barnyard2_{$snortIf}_{$id}.xml&id=0");
+    $tab_array[] = array("Barnyard2", false, "/pkg_edit.php?xml=snort/snort_{$snortIf}_{$id}/snort_barnyard2_{$snortIf}_{$id}.xml&id=0");
+    $tab_array[] = array("Barnyard2", false, "/pkg_edit.php?xml=snort/snort_{$snortIf}_{$id}/snort_barnyard2_{$snortIf}_{$id}.xml&id=0");
+    display_top_tabs($tab_array);	
+		}
+}
 ?>
- </td></tr>
-			<table width="100%" border="0" cellpadding="6" cellspacing="0">
-	  	<tr>
+</td>
+</tr>
+				<tr>
+				<td class="tabcont">
+				<table width="100%" border="0" cellpadding="6" cellspacing="0">
+				<?php
+				if($id == "") 
+				{
+				echo "
+				<tr>
+				<td width=\"22%\" valign=\"top\">&nbsp;</td>
+				<td width=\"78%\"><span class=\"vexpl\"><span class=\"red\"><strong>Note:</strong></span><br>
+					You will be redirected to the Snort Interfaces Menu to aprove changes.<br>
+					After approval, interface options will be made available.
+					<br><br>
+					Please select a interface and a description.
+				</td>
+				</tr>\n";
+				}
+				?>
+				<tr>
+				<td width="22%" valign="top" class="vtable">&nbsp;</td>
+				<td width="78%" class="vtable">
+					<?php
+					// <input name="enable" type="checkbox" value="yes" checked onClick="enable_change(false)">
+					// care with spaces
+					if ($pconfig['enable'] == "on")
+					$checked = checked;
+					if($id != "") 
+					{
+					$onclick_enable = "onClick=\"enable_change(false)\">";
+					}
+					echo "
+					<input name=\"enable\" type=\"checkbox\" value=\"yes\" $checked $onclick_enable
+					<strong>Enable Interface</strong></td>\n\n";
+					?>
+				</tr>
+				<tr>
                   <td width="22%" valign="top" class="vncellreq">Interface</td>
                   <td width="78%" class="vtable">
 					<select name="interface" class="formfld">
 						<?php
-						$interfaces = array('wan' => 'WAN', 'lan' => 'LAN');
+						$interfaces = array('wan' => 'WAN', 'lan' => 'LAN', 'pptp' => 'PPTP', 'pppoe' => 'PPPOE');
 						for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 							$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
 						}
@@ -268,133 +322,95 @@ include("fbegin.inc"); ?>
                      <span class="vexpl">Choose which interface this rule applies to.<br>
                      Hint: in most cases, you'll want to use WAN here.</span></td>
                 </tr>
-				<tr>
-					<td width="22%" valign="top" class="vncellreq">Block all offenders</td>
-					<td width="78%" class="vtable">
-						<input type="checkbox" value="yes" name="block"<?php if($pconfig['block']) echo " CHECKED"; ?>><br>
-						HINT: Block all offenders that trigger an alert on the selected interface.
-					</td>
-				</tr>
-				<tr>
-					<td width="22%" valign="top" class="vncellreq">Enable Inline Mode</td>
-					<td width="78%" class="vtable">
-						<input type="checkbox" value="yes" name="inline"<?php if($pconfig['inline']) echo " CHECKED"; ?>><br>
-						HINT: This will enable Snort Inline mode on the selected interafce.
-					</td>
-				</tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncellreq">Inline listening port </td>
-                  <td width="78%" class="vtable">
-                    <select name="localbeginport" class="formfld" onChange="ext_change();check_for_aliases();">
-                      <option value="">(other)</option>
-                      <?php $bfound = 0; foreach ($wkports as $wkport => $wkportdesc): ?>
-                      <?php endforeach; ?>
-                    </select> <input onChange="check_for_aliases();" autocomplete='off' class="formfldalias" name="localbeginport_cust" id="localbeginport_cust" type="text" size="5" value="<?php if (!$bfound) echo $pconfig['localbeginport']; ?>">
-                    <br>
-                    <span class="vexpl">Specify the port Snort Inline should lissten on.<br>
-                    Hint: Never enter a port that is already being used by the system.</span></td>
-                </tr>
-                <tr>
-                  <td width="22%" valign="top" class="vncellreq">Inline Divert Protocol</td>
-                  <td width="78%" class="vtable">
-                    <select name="proto" class="formfld" onChange="proto_change(); check_for_aliases();">
-                      <?php $protocols = explode(" ", "TCP UDP TCP/UDP GRE ESP All"); foreach ($protocols as $proto): ?>
-                      <option value="<?=strtolower($proto);?>" <?php if (strtolower($proto) == $pconfig['proto']) echo "selected"; ?>><?=htmlspecialchars($proto);?></option>
-                      <?php endforeach; ?>
-                    </select> <br> <span class="vexpl">Choose which IP protocol Snort Inline should divert.<br>
-                    Hint: in most cases, you should specify <em>All</em> &nbsp;here.</span></td>
-                </tr>
-                <tr>
-                  <td width="22%" valign="top" class="vncellreq">Inline Divert External port range </td>
-                  <td width="78%" class="vtable">
-                    <table border="0" cellspacing="0" cellpadding="0">
-                      <tr>
-                        <td>from:&nbsp;&nbsp;</td>
-                        <td><select name="beginport" class="formfld" onChange="ext_rep_change(); ext_change(); check_for_aliases();">
-                            <option value="">(other)</option>
-                            <?php $bfound = 0; foreach ($wkports as $wkport => $wkportdesc): ?>
-                            <option value="<?=$wkport;?>" <?php if ($wkport == $pconfig['beginport']) {
-								echo "selected";
-								$bfound = 1;
-							}?>>
-							<?=htmlspecialchars($wkportdesc);?>
-							</option>
-                            <?php endforeach; ?>
-                          </select> <input onChange="check_for_aliases();" autocomplete='off' class="formfldalias" name="beginport_cust" id="beginport_cust" type="text" size="5" value="<?php if (!$bfound) echo $pconfig['beginport']; ?>"></td>
-                      </tr>
-                      <tr>
-                        <td>to:</td>
-                        <td><select name="endport" class="formfld" onChange="ext_change(); check_for_aliases();">
-                            <option value="">(other)</option>
-                            <?php $bfound = 0; foreach ($wkports as $wkport => $wkportdesc): ?>
-                            <option value="<?=$wkport;?>" <?php if ($wkport == $pconfig['endport']) {
-								echo "selected";
-								$bfound = 1;
-							}?>>
-							<?=htmlspecialchars($wkportdesc);?>
-							</option>
-							<?php endforeach; ?>
-                          </select> <input onChange="check_for_aliases();" class="formfldalias" autocomplete='off' name="endport_cust" id="endport_cust" type="text" size="5" value="<?php if (!$bfound) echo $pconfig['endport']; ?>"></td>
-                      </tr>
-                    </table>
-                    <br> <span class="vexpl">Specify the port or port range Snort Inline should divert on the firewall's external address.<br>
-                    Hint: you can leave the <em>'to'</em> field empty if you only want to divert a single port<br>
-					Hint: you can leave from and to empty to divert all ports.</span></td>
-                </tr>
-                <tr>
-                  <td width="22%" valign="top" class="vncellreq">Inline IP Subnet</td>
-                  <td width="78%" class="vtable">
-                    <input autocomplete='off' name="localip" type="text" class="formfldalias" id="localip" size="20" value="<?=htmlspecialchars($pconfig['localip']);?>">
-                    <br> <span class="vexpl">Enter the internal IP subnet address you wish to sniff. Leave blank for all.<br>
-                    e.g. <em>192.168.1.0/24</em></span></td>
-                </tr>
-                <tr>
-                  <td width="22%" valign="top" class="vncell">Description</td>
+                  <td width="22%" valign="top" class="vncellreq">Description</td>
                   <td width="78%" class="vtable">
                     <input name="descr" type="text" class="formfld" id="descr" size="40" value="<?=htmlspecialchars($pconfig['descr']);?>">
                     <br> <span class="vexpl">You may enter a description here
                     for your reference (not parsed).</span></td>
                 </tr>
-                <?php if ((!(isset($id) && $a_nat[$id])) || (isset($_GET['dup']))): ?>
-				<?php endif; ?>
+				<tr>
+					<td width="22%" valign="top" class="vncell">Memory Performance</td>
+					<td width="78%" class="vtable">
+					<select name="performance" class="formfld" id="performance">
+						<?php
+							$interfaces2 = array('ac-bnfa' => 'AC-BNFA', 'lowmem' => 'LOWMEM', 'ac-std' => 'AC-STD', 'ac' => 'AC', 'ac-banded' => 'AC-BANDED', 'ac-sparsebands' => 'AC-SPARSEBANDS', 'acs' => 'ACS');
+							foreach ($interfaces2 as $iface2 => $ifacename2): ?>
+							<option value="<?=$iface2;?>" <?php if ($iface2 == $pconfig['performance']) echo "selected"; ?>>
+							<?=htmlspecialchars($ifacename2);?>
+							</option>
+						<?php endforeach; ?>
+					</select><br>
+					<span class="vexpl">Lowmem and ac-bnfa are recommended for low end systems, Ac: high memory, best performance, ac-std: moderate memory,high performance, acs: small memory, moderateperformance, ac-banded: small memory,moderate performance, ac-sparsebands: small memory, high performance.<br>
+					Hint: in most cases, you'll want to use WAN here.</span></td>
+				</tr>
+				<tr>
+				<td width="22%" valign="top" class="vncell">Block offenders</td>
+				<td width="78%" class="vtable">
+					<input name="blockoffenders7" type="checkbox" value="yes" <?php if ($pconfig['blockoffenders7'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					Checking this option will automatically block hosts that generate a snort alert.</td>
+				</tr>
+				<tr>
+				<td width="22%" valign="top" class="vncell">Alerts Tab description type</td>
+				<td width="78%" class="vtable">
+					<select name="snortalertlogtype" class="formfld" id="snortalertlogtype">
+						<?php
+							$interfaces4 = array('fast' => 'SHORT', 'full' => 'FULL');
+							foreach ($interfaces4 as $iface4 => $ifacename4): ?>
+							<option value="<?=$iface4;?>" <?php if ($iface4 == $pconfig['snortalertlogtype']) echo "selected"; ?>>
+							<?=htmlspecialchars($ifacename4);?>
+							</option>
+						<?php endforeach; ?>
+					</select><br>
+					<span class="vexpl">Please choose the type of Alert logging you will like see in the Alerts Tab.<br>
+					Hint: in most cases, short descriptions are best.</span></td>
+				</tr>
+				<tr>
+				<td width="22%" valign="top" class="vncell">Send alerts to main System logs</td>
+				<td width="78%" class="vtable">
+					<input name="alertsystemlog" type="checkbox" value="yes" <?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					Snort will send Alerts to the Pfsense system logs.</td>
+				</tr>
+				<tr>
+				<td width="22%" valign="top" class="vncell">Log to a Tcpdump file</td>
+				<td width="78%" class="vtable">
+					<input name="tcpdumplog" type="checkbox" value="yes" <?php if ($pconfig['tcpdumplog'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					Snort will log packets to a tcpdump-formatted file. The file then can be analyzed by a wireshark type of application. WARNING: File may become large.</td>
+				</tr>
+				<tr>
+				<td valign="top" class="vncell">HTTP server flow depth</td>
+				<td class="vtable">
+					<table cellpadding="0" cellspacing="0">
+					<tr>
+                    <td><input name="flow_depth" type="text" class="formfld" id="flow_depth" size="5" value="<?=htmlspecialchars($pconfig['flow_depth']);?>"> <strong>-1</strong> to <strong>1460</strong> (<strong>-1</strong> disables HTTP inspect, <strong>0</strong> enables all HTTP inspect)</td>
+					</tr>
+					</table>
+						Amount of HTTP server response payload to inspect. Snort's performance may increase by ajusting this value.<br>
+						Setting this value too low may cause false negatives. Value above 0 is in bytes.<br>
+						<strong>Default value is 0</strong></td>
+				</tr>
                 <tr>
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%">
-                    <input name="Submit" type="submit" class="formbtn" value="Save"> <input type="button" class="formbtn" value="Cancel" onclick="history.back()">
+                    <input name="Submit" type="submit" class="formbtn" value="Save"> <input name="Submit2" type="submit" class="formbtn" value="Start" onClick="enable_change(true)"> <input type="button" class="formbtn" value="Cancel" onclick="history.back()">
                     <?php if (isset($id) && $a_nat[$id]): ?>
                     <input name="id" type="hidden" value="<?=$id;?>">
                     <?php endif; ?>
                   </td>
                 </tr>
-              </table>
+	<tr>
+	  <td width="22%" valign="top">&nbsp;</td>
+	  <td width="78%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
+	  <br>
+		Please save your settings befor you click start. </td>
+	</tr>
+  </table>
+  </table>
 </form>
+
 <script language="JavaScript">
 <!--
-	ext_change();
-//-->
-</script>
-<?php
-$isfirst = 0;
-$aliases = "";
-$addrisfirst = 0;
-$aliasesaddr = "";
-if($config['aliases']['alias'] <> "")
-	foreach($config['aliases']['alias'] as $alias_name) {
-		if(!stristr($alias_name['address'], ".")) {
-			if($isfirst == 1) $aliases .= ",";
-			$aliases .= "'" . $alias_name['name'] . "'";
-			$isfirst = 1;
-		} else {
-			if($addrisfirst == 1) $aliasesaddr .= ",";
-			$aliasesaddr .= "'" . $alias_name['name'] . "'";
-			$addrisfirst = 1;
-		}
-	}
-?>
-<script language="JavaScript">
-<!--
-	var addressarray=new Array(<?php echo $aliasesaddr; ?>);
-	var customarray=new Array(<?php echo $aliases; ?>);
+enable_change(false);
 //-->
 </script>
 <?php include("fend.inc"); ?>

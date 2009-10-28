@@ -3,7 +3,6 @@
 /*
 	snort_interfaces.php
 	Copyright (C) 2004 Scott Ullrich
-	Copyright (C) 2004 Robert Zelaya
 	All rights reserved.
 
 	originally part of m0n0wall (http://m0n0.ch/wall)
@@ -33,11 +32,12 @@
 */
 
 require("guiconfig.inc");
+require("/usr/local/pkg/snort_misc.inc");
 
-if (!is_array($config['installedpackages']['snortglobal']))
-	$config['installedpackages']['snortglobal'] = array();
+if (!is_array($config['installedpackages']['snortglobal']['rule']))
+	$config['installedpackages']['snortglobal']['rule'] = array();
 
-$a_nat = &$config['installedpackages']['snortglobal'];
+$a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
 /* if a custom message has been passed along, lets process it */
 if ($_GET['savemsg'])
@@ -85,7 +85,7 @@ if (isset($_POST['del_x'])) {
 	    }
 	    write_config();
 	    touch($d_natconfdirty_path);
-	    header("Services: snort_interfaces.php");
+	    header("Location: snort_interfaces.php");
 	    exit;
 	}
 
@@ -128,38 +128,54 @@ if (isset($_POST['del_x'])) {
                 $a_nat = $a_nat_new;
                 write_config();
                 touch($d_natconfdirty_path);
-                header("Services: snort_interfaces.php");
+                header("Location: snort_interfaces.php");
                 exit;
         }
 }
 
-$pgtitle = "Services: Snort 2.8.4.1_5 pkg v. 1.7";
+$pgtitle = "Services: Snort Interfaces";
 include("head.inc");
 
 ?>
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle"><?=$pgtitle?></font></p>
+<style type="text/css">
+.alert {
+ position:absolute;
+ top:10px;
+ left:0px;
+ width:94%;
+background:#FCE9C0;
+background-position: 15px; 
+border-top:2px solid #DBAC48;
+border-bottom:2px solid #DBAC48;
+padding: 15px 10px 50% 50px;
+}
+</style> 
+<noscript><div class="alert" ALIGN=CENTER><img src="/themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
+
 <form action="snort_interfaces.php" method="post" name="iform">
 <script type="text/javascript" language="javascript" src="row_toggle.js">
 </script>
 <?php if (file_exists($d_natconfdirty_path)): ?><p>
 <?php
 	if($savemsg)
-		print_info_box_np("{$savemsg}<br>The NAT configuration has been changed.<br>You must apply the changes in order for them to take effect.");
+		print_info_box_np2("{$savemsg}<br>The Snort configuration has been changed.<br>You must apply the changes in order for them to take effect.");
 	else
-		print_info_box_np("The NAT configuration has been changed.<br>You must apply the changes in order for them to take effect.");
+		print_info_box_np2("The Snort configuration has been changed.<br>You must apply the changes in order for them to take effect.");
 ?>
 <?php endif; ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
 <?php
-	$tab_array = array();
-	$tab_array[] = array("Interfaces", true, "snort_interfaces.php");
-	$tab_array[] = array("Global Settings", false, "snort_interfaces.php");
-	$tab_array[] = array("Rules Update", false, "firewall_nat_1to1.php");
+   	$tab_array = array();
+	$tab_array[] = array("Snort Interfaces", true, "snort_interfaces.php");
+	$tab_array[] = array("Global Settings", false, "snort_interfaces_global.php");
+	$tab_array[] = array("Rule Updates", false, "firewall_nat_1to1.php");
 	$tab_array[] = array("Alerts", false, "firewall_nat_out.php");
 	$tab_array[] = array("Blocked", false, "firewall_nat_out.php");
+	$tab_array[] = array("Whitelists", false, "firewall_nat_out.php");
 	$tab_array[] = array("Help & Info", false, "firewall_nat_out.php");
 	display_top_tabs($tab_array);
 ?>
@@ -170,19 +186,18 @@ include("head.inc");
               <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr id="frheader">
 		  <td width="3%" class="list">&nbsp;</td>
-                  <td width="3%" class="list">&nbsp;</td>
-                  <td width="5%" class="listhdrr">If</td>
-                  <td width="5%" class="listhdrr">Inline</td>
-                  <td width="5%" class="listhdrr">Inline port</td>
-                  <td width="15%" class="listhdrr">Inline port range</td>
-                  <td width="5%" class="listhdrr">Block Hosts</td>
-				  <td width="5%" class="listhdrr">Barnyard2</td>
-                  <td width="15%" class="listhdr">Description</td>
-                  <td width="5%" class="list">
+		          <td width="1%" class="list">&nbsp;</td>
+                  <td width="10%" class="listhdrr">If</td>
+				  <td width="10%" class="listhdrr">Snort</td>
+				  <td width="10%" class="listhdrr">Snort</td>
+                  <td width="10%" class="listhdrr">Block Hosts</td>
+				  <td width="10%" class="listhdrr">Barnyard2</td>
+                  <td width="50%" class="listhdr">Description</td>
+                  <td width="3%" class="list">
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
 			<td width="17"></td>
-                        <td><a href="/snort_interfaces_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+                        <td><a href="snort_interfaces_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
                       </tr>
                     </table>
 		  </td>
@@ -206,43 +221,52 @@ include("head.inc");
 		    ?>
                   </td>
                   <td class="listr" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
-                    <?=strtoupper($natent['protocol']);?>
-                  </td>
-                  <td class="listr" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
-                    <?php
-						list($beginport, $endport) = split("-", $natent['external-port']);
-						if ((!$endport) || ($beginport == $endport)) {
-				  			echo $beginport;
-							if ($wkports[$beginport])
-								echo " (" . $wkports[$beginport] . ")";
-							else
-								echo "&nbsp;";
-						} else
-							echo $beginport . " - " . $endport;
+				  <?php
+				  $check_blockoffenders_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['blockoffenders7'];
+				  if ($check_blockoffenders_info == "on")
+					{
+					$check_blockoffenders = enabled;
+					} else {
+					$check_blockoffenders = disabled;
+					}
 				  ?>
+                    <?=strtoupper($check_blockoffenders);?>
                   </td>
                   <td class="listr" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
-                    <?=$natent['target'];?>
-					<?php if ($natent['external-address'])
-						echo "<br>(ext.: " . $natent['external-address'] . ")";
-					      else
-						echo "<br>(ext.: " . find_interface_ip(convert_friendly_interface_to_real_interface_name($natent['interface'])) . ")";
-					?>
-                  </td>
-                  <td class="listr" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
-                    <?php if ((!$endport) || ($beginport == $endport)) {
-				  			echo $natent['local-port'];
-							if ($wkports[$natent['local-port']])
-								echo " (" . $wkports[$natent['local-port']] . ")";
-							else
-								echo "&nbsp;";
-						} else
-							echo $natent['local-port'] . " - " .
-								($natent['local-port']+$endport-$beginport);
+				  <?php
+				  $check_blockoffenders_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['blockoffenders7'];
+				  if ($check_blockoffenders_info == "on")
+					{
+					$check_blockoffenders = enabled;
+					} else {
+					$check_blockoffenders = disabled;
+					}
 				  ?>
+                    <?=strtoupper($check_blockoffenders);?>
+                  </td>
+                  <td class="listr" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
+				  <?php
+				  $check_blockoffenders_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['blockoffenders7'];
+				  if ($check_blockoffenders_info == "on")
+					{
+					$check_blockoffenders = enabled;
+					} else {
+					$check_blockoffenders = disabled;
+					}
+				  ?>
+                    <?=strtoupper($check_blockoffenders);?>
                   </td>
 				  <td class="listr" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
-                    <?=strtoupper($natent['protocol']);?>
+				  <?php
+				  $check_snortbarnyardlog_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['snortbarnyardlog'];
+				  if ($check_snortbarnyardlog_info == "on")
+					{
+					$check_snortbarnyardlog = enabled;
+					} else {
+					$check_snortbarnyardlog = disabled;
+					}
+				  ?>
+                    <?=strtoupper($check_snortbarnyardlog);?>
                   </td>
                   <td class="listbg" onClick="fr_toggle(<?=$nnats;?>)" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 		  <font color="#ffffff">
@@ -253,10 +277,6 @@ include("head.inc");
                       <tr>
                         <td><a href="snort_interfaces_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" title="edit rule"></a></td>
                       </tr>
-                      <tr>
-                        <td><input onmouseover="fr_insline(<?=$nnats;?>, true)" onmouseout="fr_insline(<?=$nnats;?>, false)" name="move_<?=$i;?>" src="/themes/<?= $g['theme']; ?>/images/icons/icon_left.gif" title="move selected rules before this rule" height="17" type="image" width="17" border="0"></td>
-                        <td><a href="snort_interfaces_edit.php?dup=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="add a new nat based on this one" width="17" height="17" border="0"></a></td>
-                      </tr>
                     </table>
 		</tr>
   	     <?php $i++; $nnats++; endforeach; ?>
@@ -265,25 +285,31 @@ include("head.inc");
                   <td class="list" valign="middle" nowrap>
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
-                        <td><?php if ($nnats == 0): ?><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_left_d.gif" width="17" height="17" title="move selected mappings to end" border="0"><?php else: ?><input name="move_<?=$i;?>" type="image" src="/themes/<?= $g['theme']; ?>/images/icons/icon_left.gif" width="17" height="17" title="move selected mappings to end" border="0"><?php endif; ?></td>
-                        <td><a href="snort_interfaces_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+                        <td><?php if ($nnats == 0): ?><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" title="delete selected rules" border="0"><?php else: ?><input name="del" type="image" src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" title="delete selected mappings" onclick="return confirm('Do you really want to delete the selected Snort Rule?')"><?php endif; ?></td>
                       </tr>
-                      <tr>
-                        <td><?php if ($nnats == 0): ?><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" title="delete selected rules" border="0"><?php else: ?><input name="del" type="image" src="./themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" title="delete selected mappings" onclick="return confirm('Do you really want to delete the selected mappings?')"><?php endif; ?></td>
-						</tr>
                     </table>
-		  </td>
+				</td>
                 </tr>
 	</table>
 	</div>
 	</td>
   </tr>
 </table>
-				  	<td class="tabcont" colspan="3">
-					<p><span class="vexpl"><span class="red"><strong>Note:<br></strong></span>Snort Inline mode is disabled and in private testing. Snort Inline release target is pfSense 2.0.</span></p>
-					</td>
 
-
+<br>
+  <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+	  <td width="100%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
+	  <br>
+		 This is the <strong>Snort Interfaces Menu</strong> where you can see an over view of all your interface settings.
+		 <br>
+		 Please edit the <strong>Global Settings </strong> tab befor adding an interface.
+		 <br><br>
+		 Click on the <strong>Plus Icon</strong> to add a interface.
+		 <br>
+		 Click on the <strong>Edit Icon</strong> to edit interface settings.
+</td>
+    </table>
+ 
 <?php
 if ($pkg['tabs'] <> "") {
     echo "</td></tr></table>";
