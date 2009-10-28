@@ -1,3 +1,5 @@
+# Downloaded from http://www.modsecurity.org/documentation/snortmodsec-rules.txt
+
 # WEB-ATTACKS ps command attempt
 SecFilterSelective THE_REQUEST "/bin/ps"
 

@@ -72,6 +72,11 @@
 		<chmod>0644</chmod>
 		<item>http://www.pfsense.com/packages/config/apache_mod_security/rules/10_asl_rules.conf</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/apachemodsecurity/rules/</prefix>
+		<chmod>0644</chmod>
+		<item>http://www.pfsense.com/packages/config/apache_mod_security/rules/snortmodsec-rules.txt</item>
+	</additional_files_needed>
 	<tabs>
 		<tab>
 			<text>Proxy Server Settings</text>

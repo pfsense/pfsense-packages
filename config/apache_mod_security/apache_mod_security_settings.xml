@@ -171,13 +171,21 @@
 			</options>
 		</field>
 		<field>
+			<fielddescr>Custom mod_security ErrorDocument</fielddescr>
+			<fieldname>errordocument</fieldname>
+			<description></description>
+			<type>textarea</type>
+	      	<rows>10</rows>
+	      	<cols>75</cols>			
+		</field>
+		<field>
 			<fielddescr>Custom mod_security rules</fielddescr>
 			<fieldname>modsecuritycustom</fieldname>
 			<description>Paste any custom mod_security rules that you would like to use</description>
 			<type>textarea</type>
 	      	<rows>10</rows>
 	      	<cols>75</cols>			
-		</field>		
+		</field>
 	</fields>
 	<custom_php_resync_config_command>
 		apache_mod_security_resync();

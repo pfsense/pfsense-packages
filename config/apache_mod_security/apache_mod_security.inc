@@ -179,6 +179,12 @@ function generate_apache_configuration() {
 	else 
 		$secrequestbodylimit = "10485760";
 
+	// ErrorDocument
+	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['errordocument']) 
+		$errordocument = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['errordocument'];
+	else 
+		$errordocument = "";
+
 	// SecAuditEngine
 	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['secauditengine']) 
 		$secauditengine = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['secauditengine'];
@@ -798,6 +804,9 @@ DefaultType text/plainm
 # 1) plain text 2) local redirects 3) external redirects
 #
 # Some examples:
+
+{$errordocument}
+
 #ErrorDocument 500 "The server made a boo boo."
 #ErrorDocument 404 /missing.html
 #ErrorDocument 404 "/cgi-bin/missing_handler.pl"
