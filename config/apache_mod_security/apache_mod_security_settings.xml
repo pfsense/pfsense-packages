@@ -152,7 +152,7 @@
 			<fieldname>secrequestbodylimit</fieldname>
 			<description>Configures the maximum request body size ModSecurity will accept for buffering.</description>
 			<type>input</type>
-		</field
+		</field>
 		<field>
 			<fielddescr>Enable mod_security protection</fielddescr>
 			<fieldname>enablemodsecurity</fieldname>
