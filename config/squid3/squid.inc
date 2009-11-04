@@ -711,7 +711,11 @@ function squid_resync_upstream() {
 
 	$conf = '';
 	if ($settings['proxy_forwarding'] == 'on') {
-		$conf .= "cache_peer {$settings['proxy_addr']} parent {$settings['proxy_port']} {$settings['icp_port']} ";
+		$conf .= "cache_peer {$settings['proxy_addr']} parent {$settings['proxy_port']} ";
+		if ($settings['icp_port'] == '7')
+		  $conf .= "{$settings['icp_port']} no-query";
+    else
+      $conf .= "{$settings['icp_port']}"; 
 
 		if (!empty($settings['username']))
 			$conf .= " login={$settings['username']}";
