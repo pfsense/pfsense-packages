@@ -349,11 +349,11 @@
       <config_file>http://www.pfsense.org/packages/config/open-vm-tools/open-vm-tools.xml</config_file>
       <configurationfile>open-vm-tools.xml</configurationfile>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <depends_on_package>open-vm-tools-nox11-102166_7.tbz</depends_on_package>
-      <depends_on_package>libtool-1.5.26.tbz</depends_on_package>
-      <depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
-      <depends_on_package>libdnet-1.11_2.tbz</depends_on_package>
-      <depends_on_package>icu-3.8.1_1.tbz</depends_on_package>
+      <depends_on_package>open-vm-tools-nox11-167859_1.tbz</depends_on_package>
+      <depends_on_package>libtool-2.2.6a_1.tbz</depends_on_package>
+      <depends_on_package>libiconv-1.13.1.tbz</depends_on_package>
+      <depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
+      <depends_on_package>icu-3.8.1_2.tbz</depends_on_package>
       <depends_on_package>gmake-3.81_3.tbz</depends_on_package>
       <depends_on_package>gettext-0.17_1.tbz</depends_on_package>
     </package>
