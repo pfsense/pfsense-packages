@@ -1476,6 +1476,7 @@ function verify_downloaded_file($filename) {
 /* extract rules */
 function extract_snort_rules_md5($tmpfname) {
 	global $snort_filename, $snort_filename_md5, $console_mode;
+	ini_set("memory_limit","64M");
 	conf_mount_rw();
 	ob_flush();
 	if(!$console_mode) {
