@@ -212,7 +212,8 @@ function upload_config($reasonm = "") {
 				conf_mount_ro();
 
 		} else {
-			log_error("No https://portal.pfsense.org backup required.");
+			// debugging
+			//log_error("No https://portal.pfsense.org backup required.");
 		}
 	}	
 }
