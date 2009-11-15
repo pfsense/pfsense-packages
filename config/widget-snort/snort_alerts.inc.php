@@ -4,11 +4,11 @@ function get_snort_alerts($snort_alerts, $nentries, $tail = 20) {
 	$logarr = "";
 	/* Always do a reverse tail, to be sure we're grabbing the 'end' of the alerts. */
 	exec("/usr/bin/tail -r -n {$tail} {$snort_alerts}", $logarr);
-	
+
 	$snortalerts = array();
-	
+
 	$counter = 0;
-	
+
 	foreach ($logarr as $logent) {
 		if($counter >= $nentries)
 			break;
@@ -28,8 +28,8 @@ function parse_snort_alert_line($line) {
 	$log_split = "";
 	$datesplit = "";
 	preg_match("/^(.*)\s+\[\*\*\]\s+\[(\d+\:\d+:\d+)\]\s(.*)\s(.*)\s+\[\*\*\].*\s+\[Priority:\s(\d+)\]\s{(.*)}\s+(.*)\s->\s(.*)$/U", $line, $log_split);
-	
-	list($all, $alert['time'], $alert['rule'], $alert['category'], $alert['descr'], 
+
+	list($all, $alert['time'], $alert['rule'], $alert['category'], $alert['descr'],
 	  $alert['priority'], $alert['proto'], $alert['src'], $alert['dst']) = $log_split;
 
 	$usableline = true;
@@ -41,7 +41,16 @@ function parse_snort_alert_line($line) {
 
 	if($usableline == true) {
 	  preg_match("/^(\d+)\/(\d+)-(\d+\:\d+\:\d+).\d+$/U", $alert['time'], $datesplit);
-    $alert['dateonly'] = $datesplit[2] . "/"  . $datesplit[1];
+	  $now_time = strtotime("now");
+	  $checkdate = $datesplit[1] . "/"  . $datesplit[2] . "/" . date("Y");
+	  $fulldate = $datesplit[2] . "/"  . $datesplit[1] . "/" . date("Y");
+	  $logdate = $checkdate . " " . $datesplit[3];
+	  if ($now_time < strtotime($logdate) )
+	  {
+	     $fulldate = $datesplit[2] . "/"  . $datesplit[1] . "/" . ((int)date("Y") - 1);
+    }
+
+    $alert['dateonly'] = $fulldate;
     $alert['timeonly'] = $datesplit[3];
     $alert['category'] = strtoupper( substr($alert["category"],0 , 1) ) . strtolower( substr($alert["category"],1 ) );
 		return $alert;
@@ -68,9 +77,13 @@ function handle_snort_ajax($snort_alerts_logfile, $nentries = 5, $tail = 50) {
 		$snort_alerts = get_snort_alerts($snort_alerts_logfile, $nentries);
 		foreach($snort_alerts as $log_row) {
 			$time_regex = "";
-			preg_match("/.*([0-9][0-9]:[0-9][0-9]:[0-9][0-9]).*/", $log_row['time'], $time_regex);
-			$row_time = strtotime($time_regex[1]);
-			if($row_time > $lastsawtime) {
+			preg_match("/.*([0-9][0-9])\/([0-9][0-9])-([0-9][0-9]:[0-9][0-9]:[0-9][0-9]).*/", $log_row['time'], $time_regex);
+			$logdate = $time_regex[1] . "/" . $time_regex[2] . "/" . date("Y") . " " . $time_regex[3];
+	//preg_match("/.*([0-9][0-9])\/([0-9][0-9])-([0-9][0-9]:[0-9][0-9]:[0-9][0-9]).*/", $testsplit[1], $time_regex);
+	//		preg_match("/.*([0-9][0-9]:[0-9][0-9]:[0-9][0-9]).*/", $log_row['time'], $time_regex);
+			$row_time = strtotime($logdate);
+			$now_time = strtotime("now");
+			if($row_time > $lastsawtime and $row_time <= $nowtime) {
 				$new_rules .= "{$log_row['time']}||{$log_row['priority']}||{$log_row['category']}||{$log_row['src']}||{$log_row['dst']}||" . time() . "||{$log_row['timeonly']}||{$log_row['dateonly']}" . "||\n";
 			}
 		}

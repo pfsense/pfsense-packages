@@ -55,7 +55,7 @@ global $config, $g;
 	?>
 
 		<tr class="snort-alert-entry" <?php echo $activerow; ?>>
-		  <td width="30%" class="listr"><?= $alert['timeonly'] . ' ' . $alert['dateonly'] ?></td>		
+		  <td width="30%" class="listr"><?= $alert['timeonly'] . '<br>' . $alert['dateonly'] ?></td>		
 			<td width="40%" class="listr"><?= $alert["src"] . '<br>' . $alert["dst"] ?></td>
 			<td width="40%" class="listr"><?= 'Pri : ' . $alert["priority"] . '<br>' . 'Cat : ' . $alert['category'] ?></td>
 		</tr>
