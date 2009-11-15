@@ -40,19 +40,18 @@ function parse_snort_alert_line($line) {
 		$usableline = false;
 
 	if($usableline == true) {
-	  preg_match("/^(\d+)\/(\d+)-(\d+\:\d+\:\d+).\d+$/U", $alert['time'], $datesplit);
-	  $now_time = strtotime("now");
-	  $checkdate = $datesplit[1] . "/"  . $datesplit[2] . "/" . date("Y");
-	  $fulldate = $datesplit[2] . "/"  . $datesplit[1] . "/" . date("Y");
-	  $logdate = $checkdate . " " . $datesplit[3];
-	  if ($now_time < strtotime($logdate) )
-	  {
-	     $fulldate = $datesplit[2] . "/"  . $datesplit[1] . "/" . ((int)date("Y") - 1);
-    }
+		preg_match("/^(\d+)\/(\d+)-(\d+\:\d+\:\d+).\d+$/U", $alert['time'], $datesplit);
+		$now_time = strtotime("now");
+		$checkdate = $datesplit[1] . "/"  . $datesplit[2] . "/" . date("Y");
+		$fulldate = $datesplit[2] . "/"  . $datesplit[1] . "/" . date("Y");
+		$logdate = $checkdate . " " . $datesplit[3];
+		if ($now_time < strtotime($logdate)) {
+			$fulldate = $datesplit[2] . "/"  . $datesplit[1] . "/" . ((int)date("Y") - 1);
+		}
 
-    $alert['dateonly'] = $fulldate;
-    $alert['timeonly'] = $datesplit[3];
-    $alert['category'] = strtoupper( substr($alert["category"],0 , 1) ) . strtolower( substr($alert["category"],1 ) );
+		$alert['dateonly'] = $fulldate;
+		$alert['timeonly'] = $datesplit[3];
+		$alert['category'] = strtoupper( substr($alert["category"],0 , 1) ) . strtolower( substr($alert["category"],1 ) );
 		return $alert;
 	} else {
 		if($g['debug']) {
