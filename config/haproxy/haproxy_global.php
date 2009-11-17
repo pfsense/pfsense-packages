@@ -35,17 +35,20 @@ require_once("haproxy.inc");
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 
-if (!is_array($config['installedpackages']['haproxy'])) {
+if (!is_array($config['installedpackages']['haproxy'])) 
 	$config['installedpackages']['haproxy'] = array();
-}
 
 $pconfig['enable'] = isset($config['installedpackages']['haproxy']['enable']);
 $pconfig['maxconn'] = $config['installedpackages']['haproxy']['maxconn'];
+$pconfig['enablesync'] = isset($config['installedpackages']['haproxy']['enablesync']);
+$pconfig['syncpassword'] = $config['installedpackages']['haproxy']['syncpassword'];
+$pconfig['synchost1'] = $config['installedpackages']['haproxy']['synchost1'];
+$pconfig['synchost2'] = $config['installedpackages']['haproxy']['synchost2'];
+$pconfig['synchost3'] = $config['installedpackages']['haproxy']['synchost3'];
 
 if ($_POST) {
 	unset($input_errors);
 	$pconfig = $_POST;
-
 	
 	if ($_POST['apply']) {
 		$retval = 0;
@@ -58,19 +61,27 @@ if ($_POST) {
 		if ($_POST['enable']) {
 			$reqdfields = explode(" ", "maxconn");
 			$reqdfieldsn = explode(",", "Maximum connections");		
-		} else {
 		}
 
 		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
-		if ($_POST['maxconn'] && (!is_numeric($_POST['maxconn']))) {
+		if ($_POST['maxconn'] && (!is_numeric($_POST['maxconn']))) 
 			$input_errors[] = "The maximum number of connections should be numeric.";
-		}
+
+		if($_POST['synchost1'] && !is_ipaddr($_POST['synchost1']))
+			$input_errors[] = "Synchost1 needs to be an IPAddress.";
+		if($_POST['synchost2'] && !is_ipaddr($_POST['synchost2']))
+			$input_errors[] = "Synchost2 needs to be an IPAddress.";
+		if($_POST['synchost3'] && !is_ipaddr($_POST['synchost3']))
+			$input_errors[] = "Synchost3 needs to be an IPAddress.";
 
 		if (!$input_errors) {
 			$config['installedpackages']['haproxy']['enable'] = $_POST['enable'] ? true : false;
 			$config['installedpackages']['haproxy']['maxconn'] = $_POST['maxconn'] ? $_POST['maxconn'] : false;
-
+			$config['installedpackages']['haproxy']['enablesync'] = $_POST['enablesync'] ? true : false;
+			$config['installedpackages']['haproxy']['synchost1'] = $_POST['synchost1'] ? $_POST['synchost1'] : false;
+			$config['installedpackages']['haproxy']['synchost2'] = $_POST['synchost2'] ? $_POST['synchost2'] : false;
+			$config['installedpackages']['haproxy']['synchost2'] = $_POST['synchost3'] ? $_POST['synchost3'] : false;
 			touch($d_haproxyconfdirty_path);
 			write_config();
 		}
@@ -142,11 +153,12 @@ function enable_change(enable_change) {
 					</table>
 					Sets the maximum per-process number of concurrent connections to X.<br/>
 					<strong>NOTE:</strong> setting this value too high will result in haproxy not being able to allocate enough memory.<br/>
-<?php
+				<?php
 					$hapcpu = `top | grep haproxy | awk '{ print $6 }'`;
 					if($hapcpu)
 						echo "<p>Current memory usage {$hascpu}.</p>";
-?>					</td><td>
+				?>
+					</td><td>
 					<table style="border: 1px solid #000;">
 						<tr>
 							<td><font size=-1>Connections</td>
@@ -175,6 +187,45 @@ function enable_change(enable_change) {
 						</tr>
 					</table>
 					</td></tr></table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vtable">&nbsp;</td>
+				<td width="78%" class="vtable">
+					<input name="enablesync" type="checkbox" value="yes" <?php if ($pconfig['enablesync']) echo "checked"; ?>>
+					<strong>Sync XMLRPC configuration to backup CARP members</strong></td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vtable">Synchronization password</td>
+				<td width="78%" class="vtable">
+					<input name="syncpassword" type="password" value="<?=$pconfig['syncpassword'];?>">
+					<strong>Enter the password that will be used during configuration synchronization.  This is generally the remote webConfigurator password.</strong>
+				</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vtable">Sync host #1</td>
+				<td width="78%" class="vtable">
+					<input name="enablesync" value="<?=$pconfig['synchost1'];?>">
+					<strong>Synchronize settings to this hosts IP address.</strong>
+				</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vtable">Sync host #2</td>
+				<td width="78%" class="vtable">
+					<input name="enablesync" value="<?=$pconfig['synchost2'];?>">
+					<strong>Synchronize settings to this hosts IP address.</strong>
+				</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vtable">Sync host #3</td>
+				<td width="78%" class="vtable">
+					<input name="enablesync" value="<?=$pconfig['synchost3'];?>">
+					<strong>Synchronize settings to this hosts IP address.</strong>
 				</td>
 			</tr>
 			<tr>

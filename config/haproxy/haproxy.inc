@@ -195,6 +195,20 @@ function haproxy_configure() {
 			}
 			fwrite ($fd, "\n");
 		}
+		if(isset($config['installedpackages']['haproxy']['enablesync'])) {
+			if($config['installedpackages']['haproxy']['synchost1']) {
+				haproxy_do_xmlrpc_sync($config['installedpackages']['haproxy']['synchost1'], 
+					$config['installedpackages']['haproxy']['syncpassword']);
+			}
+			if($config['installedpackages']['haproxy']['synchost2']) {
+				haproxy_do_xmlrpc_sync($config['installedpackages']['haproxy']['synchost2'], 
+					$config['installedpackages']['haproxy']['syncpassword']);
+			}
+			if($config['installedpackages']['haproxy']['synchost3']) {
+				haproxy_do_xmlrpc_sync($config['installedpackages']['haproxy']['synchost3'], 
+					$config['installedpackages']['haproxy']['syncpassword']);				
+			}
+		}
 	}
 
 	// create config file
@@ -210,6 +224,66 @@ function haproxy_configure() {
 		return (0);
 	} else {
 		return (1);
+	}
+}
+
+function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
+	global $config, $g;
+
+	if(!$password)
+		return;
+
+	if(!$sync_to_ip)
+		return;
+
+	$xmlrpc_sync_neighbor = $sync_to_ip;
+    if($config['system']['webgui']['protocol'] != "") {
+		$synchronizetoip = $config['system']['webgui']['protocol'];
+		$synchronizetoip .= "://";
+    }
+    $port = $config['system']['webgui']['port'];
+    /* if port is empty lets rely on the protocol selection */
+    if($port == "") {
+		if($config['system']['webgui']['protocol'] == "http") 
+			$port = "80";
+		else 
+			$port = "443";
+    }
+	$synchronizetoip .= $sync_to_ip;
+
+	/* xml will hold the sections to sync */
+	$xml = array();
+	$xml['haproxy'] = $config['installedpackages']['haproxy'];
+
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($xml)
+	);
+
+	/* set a few variables needed for sync code borrowed from filter.inc */
+	$url = $synchronizetoip;
+	log_error("Beginning HAProxy XMLRPC sync to {$url}:{$port}.");
+	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials('admin', $password);
+	if($g['debug'])
+		$cli->setDebug(1);
+	/* send our XMLRPC message and timeout after 250 seconds */
+	$resp = $cli->send($msg, "250");
+	if(!$resp) {
+		$error = "A communications error occurred while attempting HAProxy XMLRPC sync with {$url}:{$port}.";
+		log_error($error);
+		file_notice("sync_settings", $error, "HAProxy Settings Sync", "");
+	} elseif($resp->faultCode()) {
+		$cli->setDebug(1);
+		$resp = $cli->send($msg, "250");
+		$error = "An error code was received while attempting HAProxy XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error($error);
+		file_notice("sync_settings", $error, "HAProxy Settings Sync", "");
+	} else {
+		log_error("HAProxy XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
 }
 
