@@ -422,26 +422,33 @@ set by the 'retries' parameter (2).</div>
 			<td width="78%" class="vtable" colspan="2">
 				<table width="100%">
 				<tr>
-					<td width="20%" valign="top"><input type="radio" name="balance" id="balance" value="roundrobin"<?php if($pconfig['balance'] == 
-"roundrobin") echo " CHECKED"; ?>>Round robin</td><td>Each server is used in turns, according to their weights.
-                  This is the smoothest and fairest algorithm when the server's
-                  processing time remains equally distributed. This algorithm
-                  is dynamic, which means that server weights may be adjusted
-                  on the fly for slow starts for instance.</td></tr>
+					<td width="20%" valign="top">
+						<input type="radio" name="balance" id="balance" value="roundrobin"<?php if($pconfig['balance'] == "roundrobin") echo " CHECKED"; ?>>Round robin
+					</td>
+					<td>
+						  Each server is used in turns, according to their weights.
+		                  This is the smoothest and fairest algorithm when the server's
+		                  processing time remains equally distributed. This algorithm
+		                  is dynamic, which means that server weights may be adjusted
+		                  on the fly for slow starts for instance.
+					</td>
+				</tr>
 				  <tr><td valign="top"><input type="radio" name="balance" id="balance" value="source"<?php if($pconfig['balance'] == 
 "source") echo " CHECKED"; ?>>Source</td><td>
-				The source IP address is hashed and divided by the total
-                  weight of the running servers to designate which server will
-                  receive the request. This ensures that the same client IP
-                  address will always reach the same server as long as no
-                  server goes down or up. If the hash result changes due to the
-                  number of running servers changing, many clients will be
-				  directed to a different server. This algorithm is generally
-                  used in TCP mode where no cookie may be inserted. It may also
-                  be used on the Internet to provide a best-effort stickyness
-                  to clients which refuse session cookies. This algorithm is
-                  static, which means that changing a server's weight on the
-                  fly will have no effect.</td></tr>
+		 			  The source IP address is hashed and divided by the total
+	                  weight of the running servers to designate which server will
+	                  receive the request. This ensures that the same client IP
+	                  address will always reach the same server as long as no
+	                  server goes down or up. If the hash result changes due to the
+	                  number of running servers changing, many clients will be
+					  directed to a different server. This algorithm is generally
+	                  used in TCP mode where no cookie may be inserted. It may also
+	                  be used on the Internet to provide a best-effort stickyness
+	                  to clients which refuse session cookies. This algorithm is
+	                  static, which means that changing a server's weight on the
+	                  fly will have no effect.
+					</td>
+				</tr>
 				</table>
 			</td>
 		</tr>
@@ -450,7 +457,6 @@ set by the 'retries' parameter (2).</div>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_enabled" name="stats_enabled" type="checkbox" value="yes" <?php if ($pconfig['stats_enabled']=='yes') echo "checked"; ?> onclick='toggle_stats();'><br/>
 				EXAMPLE: haproxystats
-			
 			</td>
 		</tr>
 		<tr align="left" id='stats_realm_row' name='stats_realm_row' <?if ($pconfig['stats_enabled']!='yes') echo "style=\"display: none;\"";?>>
@@ -500,17 +506,26 @@ set by the 'retries' parameter (2).</div>
 				  <td width="78%" class="vtable">
 					<select name="extaddr" class="formfld">
 						<option value="" <?php if (!$pconfig['extaddr']) echo "selected"; ?>>Interface address</option>
-		<?php					if (is_array($config['virtualip']['vip'])):
-						foreach ($config['virtualip']['vip'] as $sn): ?>
-						<option value="<?=$sn['subnet'];?>" <?php if ($sn['subnet'] == $pconfig['extaddr']) echo "selected"; ?>><?=htmlspecialchars("{$sn['subnet']} ({$sn['descr']})");?></option>
-		<?php					endforeach;
-						endif; ?>
+					<?php
+						if (is_array($config['virtualip']['vip'])):
+							foreach ($config['virtualip']['vip'] as $sn): 
+					?>
+						<option value="<?=$sn['subnet'];?>" <?php if ($sn['subnet'] == $pconfig['extaddr']) echo "selected"; ?>>
+							<?=htmlspecialchars("{$sn['subnet']} ({$sn['descr']})");?>
+						</option>
+					<?php
+							endforeach;
+						endif; 	
+					?>
 						<option value="any" <?php if($pconfig['extaddr'] == "any") echo "selected"; ?>>any</option>
 					</select>
 					<br />
 					<span class="vexpl">
-					If you want this rule to apply to another IP address than the IP address of the interface chosen above,
-					select it here (you need to define <a href="firewall_virtual_ip.php">Virtual IP</a> addresses on the first).  Also note that if you are trying to redirect connections on the LAN select the "any" option.</span></td>
+						If you want this rule to apply to another IP address than the IP address of the interface chosen above,
+						select it here (you need to define <a href="firewall_virtual_ip.php">Virtual IP</a> addresses on the first).  
+						Also note that if you are trying to redirect connections on the LAN select the "any" option.
+					</span>
+				  </td>
 				</tr>
 				<tr align="left">
 					<td width="22%" valign="top" class="vncellreq">Type</td>

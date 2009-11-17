@@ -121,12 +121,13 @@ function haproxy_configure() {
 
 	if(is_array($a_backends)) {
 		foreach ($a_backends as $backend) {
-			if($backend['extaddr']=='any') 
+
+			if($backend['extaddr'] == "any") 
 				$listenip =  "listen {$backend['name']}\t\t\t0.0.0.0:".$backend['port']."\n";
-			else if($frontend['extaddr']=='') 
-				$listenip = "listen {$backend['name']}\t\t\t" . get_current_wan_address('wan').":" . $backend['port']."\n";
+			if($backend['extaddr']) 
+				$listenip =  "listen {$backend['name']}\t\t\t" . $backend['extaddr'] . ":" . $backend['port']."\n";				
 			else 
-				$listenip =  "listen {$backend['name']}\t\t\t" . $backend['extaddr'] . ":" . $backend['port']."\n";
+				$listenip = "listen {$backend['name']}\t\t\t" . get_current_wan_address('wan').":" . $backend['port']."\n";
 
 			fwrite ($fd, "{$listenip}");
             fwrite ($fd, "\tmode\t\t\t".$backend['type'] . "\n");
