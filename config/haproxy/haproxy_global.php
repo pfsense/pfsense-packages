@@ -135,7 +135,10 @@ function enable_change(enable_change) {
 	<div id="mainarea">
 		<table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tr>
-				<td width="22%" valign="top" class="vtable">&nbsp;</td>
+				<td colspan="2" valign="top" class="listtopic">General settings</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">&nbsp;</td>
 				<td width="78%" class="vtable">
 				<input name="enable" type="checkbox" value="yes" <?php if ($pconfig['enable']) echo "checked"; ?> onClick="enable_change(false)">
 				<strong>Enable HAProxy</strong></td>
@@ -197,7 +200,10 @@ function enable_change(enable_change) {
 				</td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vtable">&nbsp;</td>
+				<td colspan="2" valign="top" class="listtopic">Configuration synchronization</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">&nbsp;</td>
 				<td width="78%" class="vtable">
 					<input name="enablesync" type="checkbox" value="yes" <?php if ($pconfig['enablesync']) echo "checked"; ?>>
 					<strong>Sync HAProxy configuration to backup CARP members via XMLRPC.</strong>
