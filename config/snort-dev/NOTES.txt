@@ -1,24 +1,58 @@
 
 
-November 17 2009
+November 18 2009
+
+Snort_inline due date is by Dec 1st. (Why ? Scott said so.)
+
+Gui is almost done. just odds and ends left.
 
 If you work on this package just comment on every-thing you change or add. 
 
+====================
+Goals
+====================
 
-Gui is almost done.
+Release the New snort GUI as a package for 1.2.3 so that we can work out bugs.
+
+Move the Snort GUI to base of Pfsense. The divert options should be added to firewall_nat.php or firewall_rules.php.
+
+Ask Ermal to add divert out to Pfsense again though, he has kept divert in.
+
+=====================
+What Im working on
+=====================
 
 snort.inc 
-Must be recoded so that it reads the [snortglobal][rule] options in conf.xml and makes a snort.sh, snort.conf, and barnyard.conf.
-This is easy, just cut and paste from the old snort.inc.
+Must be recoded so that it reads the [snortglobal] [snortglobal][rule] options in conf.xml and makes the files whitelist, snort.sh, snort.conf, and barnyard.conf.
+This is easy, just cut and paste from the old snort.inc. I will work on this.
+
+
+=================================
+Any Devs that would like to help please work on snort_rules_edit.php and snort_rules.php. They work but need cleaning up.
+=================================
 
 snort_rules_edit.php 
-What I am working on. Just make sure all snort sig options are supported.
+Make sure all snort sig options that are in the GUI are written to file.
 
 snort_rules.php 
 Change the way the rules get disabled, by removing the x icon image and replacing it with check boxes.
-This should improve the users use of the package. Moreover, check boxes could be added to blocked.php tab to improve performance.
+This should improve the users experience. Moreover, check boxes could be added to blocked.php tab to improve performance.
 Users always complain that the way were deleting options is slow. 
 
 create whitelist.php and help_info.php
 
+
+===========================================
+Misc.
+===========================================
+
+Adding extry options to the new snort gui for snort_inline should be easy once we have it working.
+
+Snort_inline binaries with custom c++ code ready to go.
+
+Snort_inline works with only one Wan and Lan. Add a Opt onterface and the TCP flow goes into a loop.
+This should be easy to fix by the firewall guru by modifying the divert rule I am using.
+ 
+
+ 
 Done.
