@@ -86,7 +86,7 @@ run_rc_command "\$1"
 
 EOD;
 
-	$fd = fopen("/usr/local/etc/rc.d/haproxy.sh", "w");
+	$fd = fopen("/usr/local/etc/rc.d/haproxy.sh", "W");
 	fwrite($fd, $haproxy);
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/haproxy.sh");
@@ -119,6 +119,7 @@ function haproxy_configure() {
 		fwrite ($fd, "\n");
 	}
 
+	// Construct and write out configuration file
 	if(is_array($a_backends)) {
 		foreach ($a_backends as $backend) {
 
@@ -195,6 +196,7 @@ function haproxy_configure() {
 			}
 			fwrite ($fd, "\n");
 		}
+		// Sync HAProxy configuration (if enabled)
 		if(isset($config['installedpackages']['haproxy']['enablesync'])) {
 			if($config['installedpackages']['haproxy']['synchost1']) {
 				haproxy_do_xmlrpc_sync($config['installedpackages']['haproxy']['synchost1'], 

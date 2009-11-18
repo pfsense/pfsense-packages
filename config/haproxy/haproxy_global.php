@@ -173,19 +173,19 @@ function enable_change(enable_change) {
 						</tr>
 						<tr>
 							<td align="right"><font size=-1>999</td>
-							<td><font size=-1>3276 Kilobytes</td>
+							<td><font size=-1>1888K</td>
 						</tr>
 						<tr>
 							<td align="right"><font size=-1>99999</td>
-							<td><font size=-1>8032 Kilobytes</td>
+							<td><font size=-1>8032K</td>
 						</tr>
 						<tr>
 							<td align="right"><font size=-1>999999</td>
-							<td><font size=-1>50016 Kilobytes</td>
+							<td><font size=-1>50016K</td>
 						</tr>
 						<tr>
 							<td align="right"><font size=-1>9999999</td>
-							<td><font size=-1>467 Megabytes</td>
+							<td><font size=-1>467M</td>
 						</tr>
 					</table>
 					</td></tr></table>

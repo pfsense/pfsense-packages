@@ -366,7 +366,6 @@ include("head.inc");
 <?php if($one_two): ?>
 <p class="pgtitle"><?=$pgtitle?></p>
 <?php endif; ?>
-	<form action="haproxy_backends_edit.php" method="post" name="iform" id="iform">
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
 			<td colspan="2" valign="top" class="listtopic">Edit haproxy backend</td>
