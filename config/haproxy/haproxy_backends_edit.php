@@ -484,13 +484,14 @@ set by the 'retries' parameter (2).</div>
 			<td width="78%" class="vtable" colspan="2">
 				<input id="stats_password" name="stats_password" type="password" <?if(isset($pconfig['stats_password'])) echo "value=\"{$pconfig['stats_password']}\"";?> size="64">
 				<br/>
-				Example: / or /index.php or /index.html or /testmypage.cgi
 			</td>
 		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" id="monitorport_text" class="vncell">Monitor Uri</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="monitor_uri" type="text" <?if(isset($pconfig['monitor_uri'])) echo "value=\"{$pconfig['monitor_uri']}\"";?> size="50" maxlength="50"><br>
+				<input name="monitor_uri" type="text" <?if(isset($pconfig['monitor_uri'])) echo "value=\"{$pconfig['monitor_uri']}\"";?> size="50" maxlength="50">
+				<br/>
+				Example: / or /index.php or /index.html or /testmypage.cgi
 			</td>
 		</tr>
 				</tr>
