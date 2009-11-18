@@ -31,6 +31,16 @@ This is easy, just cut and paste from the old snort.inc. I will work on this.
 Any Devs that would like to help please work on snort_rules_edit.php and snort_rules.php. They work but need cleaning up.
 =================================
 
+To get snort_rules_edit.php and snort_rules.php working 
+
+Add at least on rule to snort_interfaces.php.
+
+Add at least one snort rule file to /usr/local/etc/snort/snort_0vr1/rules/.
+Should look like this /usr/local/etc/snort/snort_0vr1/rules/attack-responses.rules.
+Note that "snort_0vr1" should be chaned to what interface option you added.
+
+http://www.emergingthreats.net/rules/emerging.rules.tar.gz
+
 snort_rules_edit.php 
 Make sure all snort sig options that are in the GUI are written to file.
 
