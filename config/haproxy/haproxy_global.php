@@ -38,13 +38,6 @@ $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 if (!is_array($config['installedpackages']['haproxy'])) 
 	$config['installedpackages']['haproxy'] = array();
 
-$pconfig['enable'] = isset($config['installedpackages']['haproxy']['enable']);
-$pconfig['maxconn'] = $config['installedpackages']['haproxy']['maxconn'];
-$pconfig['enablesync'] = isset($config['installedpackages']['haproxy']['enablesync']);
-$pconfig['syncpassword'] = $config['installedpackages']['haproxy']['syncpassword'];
-$pconfig['synchost1'] = $config['installedpackages']['haproxy']['synchost1'];
-$pconfig['synchost2'] = $config['installedpackages']['haproxy']['synchost2'];
-$pconfig['synchost3'] = $config['installedpackages']['haproxy']['synchost3'];
 
 if ($_POST) {
 	unset($input_errors);
@@ -82,12 +75,21 @@ if ($_POST) {
 			$config['installedpackages']['haproxy']['synchost1'] = $_POST['synchost1'] ? $_POST['synchost1'] : false;
 			$config['installedpackages']['haproxy']['synchost2'] = $_POST['synchost2'] ? $_POST['synchost2'] : false;
 			$config['installedpackages']['haproxy']['synchost2'] = $_POST['synchost3'] ? $_POST['synchost3'] : false;
+			$config['installedpackages']['haproxy']['syncpassword'] = $_POST['syncpassword'] ? $_POST['syncpassword'] : false;
 			touch($d_haproxyconfdirty_path);
 			write_config();
 		}
 	}
 	
 }
+
+$pconfig['enable'] = isset($config['installedpackages']['haproxy']['enable']);
+$pconfig['maxconn'] = $config['installedpackages']['haproxy']['maxconn'];
+$pconfig['enablesync'] = isset($config['installedpackages']['haproxy']['enablesync']);
+$pconfig['syncpassword'] = $config['installedpackages']['haproxy']['syncpassword'];
+$pconfig['synchost1'] = $config['installedpackages']['haproxy']['synchost1'];
+$pconfig['synchost2'] = $config['installedpackages']['haproxy']['synchost2'];
+$pconfig['synchost3'] = $config['installedpackages']['haproxy']['synchost3'];
 
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
@@ -212,7 +214,7 @@ function enable_change(enable_change) {
 			<tr>
 				<td width="22%" valign="top" class="vncell">Sync host #1</td>
 				<td width="78%" class="vtable">
-					<input name="enablesync" value="<?=$pconfig['synchost1'];?>">
+					<input name="synchost1" value="<?=$pconfig['synchost1'];?>">
 					<br/>
 					<strong>Synchronize settings to this hosts IP address.</strong>
 				</td>
@@ -220,7 +222,7 @@ function enable_change(enable_change) {
 			<tr>
 				<td width="22%" valign="top" class="vncell">Sync host #2</td>
 				<td width="78%" class="vtable">
-					<input name="enablesync" value="<?=$pconfig['synchost2'];?>">
+					<input name="synchost2" value="<?=$pconfig['synchost2'];?>">
 					<br/>
 					<strong>Synchronize settings to this hosts IP address.</strong>
 				</td>
@@ -228,7 +230,7 @@ function enable_change(enable_change) {
 			<tr>
 				<td width="22%" valign="top" class="vncell">Sync host #3</td>
 				<td width="78%" class="vtable">
-					<input name="enablesync" value="<?=$pconfig['synchost3'];?>">
+					<input name="synchost3" value="<?=$pconfig['synchost3'];?>">
 					<br/>
 					<strong>Synchronize settings to this hosts IP address.</strong>
 				</td>
