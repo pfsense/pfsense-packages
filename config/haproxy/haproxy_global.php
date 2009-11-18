@@ -157,7 +157,7 @@ function enable_change(enable_change) {
 						</tr>
 					</table>
 					Sets the maximum per-process number of concurrent connections to X.<br/>
-					<strong>NOTE:</strong> setting this value too high will result in haproxy not being able to allocate enough memory.<br/>
+					<strong>NOTE:</strong> setting this value too high will result in HAProxy not being able to allocate enough memory.<br/>
 				<?php
 					$hascpu = trim(`top | grep haproxy | awk '{ print $6 }'`);
 					if($hascpu)
