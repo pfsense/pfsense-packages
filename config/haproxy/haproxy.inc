@@ -287,4 +287,34 @@ function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
 	}
 }
 
+	/* tell haproxy to reload our settings on the destionation sync host. */
+	$method = 'pfsense.exec_php';
+	$execcmd  = "require_once('/usr/local/pkg/haproxy.inc');\n";
+	$execcmd .= "haproxy_configure();\n";
+	
+	/* assemble xmlrpc payload */
+	$params = array(
+		XML_RPC_encode($password),
+		XML_RPC_encode($execcmd)
+	);
+
+	log_error("HAProxy XMLRPC reload data {$url}:{$port}.");
+	$msg = new XML_RPC_Message($method, $params);
+	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
+	$cli->setCredentials('admin', $password);
+	$resp = $cli->send($msg, "250");
+	if(!$resp) {
+		$error = "A communications error occurred while attempting HAProxy XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+		log_error($error);
+		file_notice("sync_settings", $error, "HAProxy Settings Reload", "");
+	} elseif($resp->faultCode()) {
+		$cli->setDebug(1);
+		$resp = $cli->send($msg, "250");
+		$error = "An error code was received while attempting HAProxy XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		log_error($error);
+		file_notice("sync_settings", $error, "HAProxy Settings Sync", "");
+	} else {
+		log_error("HAProxy XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
+	}
+	
 ?>
