@@ -198,33 +198,39 @@ function enable_change(enable_change) {
 				<td width="22%" valign="top" class="vtable">&nbsp;</td>
 				<td width="78%" class="vtable">
 					<input name="enablesync" type="checkbox" value="yes" <?php if ($pconfig['enablesync']) echo "checked"; ?>>
-					<strong>Sync XMLRPC configuration to backup CARP members</strong></td>
+					<br/>
+					<strong>Sync XMLRPC configuration to backup CARP members</strong>
+				</td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vtable">Synchronization password</td>
+				<td width="22%" valign="top" class="vncell">Synchronization password</td>
 				<td width="78%" class="vtable">
 					<input name="syncpassword" type="password" value="<?=$pconfig['syncpassword'];?>">
+					<br/>
 					<strong>Enter the password that will be used during configuration synchronization.  This is generally the remote webConfigurator password.</strong>
 				</td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vtable">Sync host #1</td>
+				<td width="22%" valign="top" class="vncell">Sync host #1</td>
 				<td width="78%" class="vtable">
 					<input name="enablesync" value="<?=$pconfig['synchost1'];?>">
+					<br/>
 					<strong>Synchronize settings to this hosts IP address.</strong>
 				</td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vtable">Sync host #2</td>
+				<td width="22%" valign="top" class="vncell">Sync host #2</td>
 				<td width="78%" class="vtable">
 					<input name="enablesync" value="<?=$pconfig['synchost2'];?>">
+					<br/>
 					<strong>Synchronize settings to this hosts IP address.</strong>
 				</td>
 			</tr>
 			<tr>
-				<td width="22%" valign="top" class="vtable">Sync host #3</td>
+				<td width="22%" valign="top" class="vncell">Sync host #3</td>
 				<td width="78%" class="vtable">
 					<input name="enablesync" value="<?=$pconfig['synchost3'];?>">
+					<br/>
 					<strong>Synchronize settings to this hosts IP address.</strong>
 				</td>
 			</tr>
