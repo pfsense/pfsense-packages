@@ -2,7 +2,8 @@
 /* $Id$ */
 /*
     edit_snortrule.php
-    Copyright (C) 2004, 2005 Scott Ullrich and Rober Zelaya
+    Copyright (C) 2004, 2005 Scott Ullrich
+	Copyright (C) 2008, 2009 Robert Zelaya
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -69,18 +70,15 @@ echo "<script src=\"/row_toggle.js\" type=\"text/javascript\"></script>\n
    <tr>\n
    		<td>\n";
 
-	$tab_array = array();
-	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
-	$tab_array[] = array(gettext("Update Rules"), false, "/snort_download_rules.php");
-	$tab_array[] = array(gettext("Categories"), false, "/snort_rulesets.php");
-	$tab_array[] = array(gettext("Rules"), true, "/snort_rules.php");
-	$tab_array[] = array(gettext("Servers"), false, "/pkg_edit.php?xml=snort_define_servers.xml&amp;id=0");
-	$tab_array[] = array(gettext("Blocked"), false, "/snort_blocked.php");
-	$tab_array[] = array(gettext("Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
-	$tab_array[] = array(gettext("Threshold"), false, "/pkg.php?xml=snort_threshold.xml");
-	$tab_array[] = array(gettext("Alerts"), false, "/snort_alerts.php");
-	$tab_array[] = array(gettext("Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
-	display_top_tabs($tab_array);
+    $tab_array = array();
+    $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
+    $tab_array[] = array("If Settings", false, "/snort/snort_interfaces_edit.php?id={$id}");
+    $tab_array[] = array("Categories", false, "/snort/snort_rulesets.php?id={$id}");
+    $tab_array[] = array("Rules", true, "/snort/snort_rules.php?id={$id}");
+    $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
+    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
+    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
+    display_top_tabs($tab_array);
 
 echo  		"</td>\n
   </tr>\n
@@ -423,17 +421,14 @@ function go()
   <tr>
       <td>
 <?php
-    $tab_array = array();
-    $tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
-    $tab_array[] = array(gettext("Update Rules"), false, "/snort_download_rules.php");
-    $tab_array[] = array(gettext("Categories"), false, "/snort_rulesets.php");
-    $tab_array[] = array(gettext("Rules"), true, "/snort_rules.php");
-	$tab_array[] = array(gettext("Servers"), false, "/pkg_edit.php?xml=snort_define_servers.xml&amp;id=0");
-    $tab_array[] = array(gettext("Blocked"), false, "/snort_blocked.php");
-    $tab_array[] = array(gettext("Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
-	$tab_array[] = array(gettext("Threshold"), false, "/pkg.php?xml=snort_threshold.xml");
-    $tab_array[] = array(gettext("Alerts"), false, "/snort_alerts.php");
-    $tab_array[] = array(gettext("Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
+     $tab_array = array();
+    $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
+    $tab_array[] = array("If Settings", false, "/snort/snort_interfaces_edit.php?id={$id}");
+    $tab_array[] = array("Categories", false, "/snort/snort_rulesets.php?id={$id}");
+    $tab_array[] = array("Rules", true, "/snort/snort_rules.php?id={$id}");
+    $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
+    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
+    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
     display_top_tabs($tab_array);
 ?>
       </td>
@@ -528,7 +523,13 @@ function go()
                                             $textss = $textse = "";
                                             $iconb = "icon_block.gif";
                                         }
-
+										
+										if ($disabled_pos !== false){
+											$ischecked = "";
+										}else{
+											$ischecked = "checked";
+										}
+										
                                         $rule_content = explode(' ', $tempstring);
 
                                         $protocol = $rule_content[$counter2];//protocol location
@@ -551,6 +552,7 @@ function go()
                                         echo $textss;
                                         ?>
                                         <a href="?id=<?=$id;?>&openruleset=<?=$file;?>&act=toggle&ids=<?=$counter;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/<?=$iconb;?>" width="11" height="11" border="0" title="click to toggle enabled/disabled status"></a>
+										<input name="enable" type="checkbox" value="yes" <?= $ischecked; ?> onClick="enable_change(false)">
                                         <?php
                                         echo $textse;
                                         echo "</td>";
@@ -622,9 +624,12 @@ function go()
                                 <tr>
                                   <td><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block_d.gif" width="11" height="11"></td>
                                   <td nowrap>Rule Disabled</td>
-
-
+								</tr>
+								<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
+								<tr>
+								<td><pre><input name="Submit" type="submit" class="formbtn" value="Save">	<input type="button" class="formbtn" value="Cancel" onclick="history.back()"><pre></td>
                                 </tr>
+								</table>
                         <tr>
                           <td colspan="10">
                   <p>
@@ -634,11 +639,10 @@ function go()
                             </tr>
               </table>
             </table>
-
     </td>
   </tr>
+  
 </table>
-
 
 <?php include("fend.inc"); ?>
 </div></body>

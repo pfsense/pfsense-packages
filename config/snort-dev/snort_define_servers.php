@@ -109,6 +109,9 @@ if (isset($_GET['dup']))
 	unset($id);	
 }
 
+/* convert fake interfaces to real */
+$if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface']);
+
 if ($_POST) {
 
 	/* check for overlaps */
@@ -186,7 +189,7 @@ if ($_POST) {
 	}
 }
 
-$pgtitle = "Services: Snort Define Servers";
+$pgtitle = "Snort: Interface $id$if_real Define Servers";
 include("head.inc");
 
 ?>
@@ -221,15 +224,14 @@ if($id != "")
 {
 
     $tab_array = array();
-    $tab_array[] = array("Snort Interfaces", false, "/snort_interfaces.php");
-    $tab_array[] = array("If Settings", false, "/snort/snort_interfaces_edit.php?id=$id");
-    $tab_array[] = array("Categories", false, "/snort/snort_{$snortIf}_{$id}/snort_rulesets_{$snortIf}_{$id}.php");
-    $tab_array[] = array("Rules", false, "/snort/snort_{$snortIf}_{$id}/snort_rules_{$snortIf}_{$id}.php");
-    $tab_array[] = array("Servers", true, "/snort/snort_define_servers.php?id=$id");
-    $tab_array[] = array("Barnyard2", false, "/pkg_edit.php?xml=snort/snort_{$snortIf}_{$id}/snort_barnyard2_{$snortIf}_{$id}.xml&id=0");
-    $tab_array[] = array("Barnyard2", false, "/pkg_edit.php?xml=snort/snort_{$snortIf}_{$id}/snort_barnyard2_{$snortIf}_{$id}.xml&id=0");
-    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id=$id");
-    display_top_tabs($tab_array);	
+    $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
+    $tab_array[] = array("If Settings", false, "/snort/snort_interfaces_edit.php?id={$id}");
+    $tab_array[] = array("Categories", false, "/snort/snort_rulesets.php?id={$id}");
+    $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
+    $tab_array[] = array("Servers", true, "/snort/snort_define_servers.php?id={$id}");
+    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
+    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
+    display_top_tabs($tab_array);
 
 }
 ?>

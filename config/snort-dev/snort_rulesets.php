@@ -3,6 +3,7 @@
 /*
 	snort_rulesets.php
 	Copyright (C) 2006 Scott Ullrich
+	Copyright (C) 2009 Robert Zelaya
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -72,18 +73,15 @@ echo "<script src=\"/row_toggle.js\" type=\"text/javascript\"></script>\n
    <tr>\n
    		<td>\n";
 
-	$tab_array = array();
-	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
-	$tab_array[] = array(gettext("Update Rules"), false, "/snort_download_rules.php");
-	$tab_array[] = array(gettext("Categories"), true, "/snort_rulesets.php");
-	$tab_array[] = array(gettext("Rules"), false, "/snort_rules.php");
-	$tab_array[] = array(gettext("Servers"), false, "/pkg_edit.php?xml=snort_define_servers.xml&amp;id=0");
-	$tab_array[] = array(gettext("Blocked"), false, "/snort_blocked.php");
-	$tab_array[] = array(gettext("Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
-	$tab_array[] = array(gettext("Threshold"), false, "/pkg.php?xml=snort_threshold.xml");
-	$tab_array[] = array(gettext("Alerts"), false, "/snort_alerts.php");
-	$tab_array[] = array(gettext("Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
-	display_top_tabs($tab_array);
+    $tab_array = array();
+    $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
+    $tab_array[] = array("If Settings", false, "/snort/snort_interfaces_edit.php?id={$id}");
+    $tab_array[] = array("Categories", true, "/snort/snort_rulesets.php?id={$id}");
+    $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
+    $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
+    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
+    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
+    display_top_tabs($tab_array);
 
 echo  		"</td>\n
   </tr>\n
@@ -142,19 +140,14 @@ $enabled_rulesets = $a_nat[$id]['rulesets'];
 if($enabled_rulesets)
 	$enabled_rulesets_array = split("\|\|", $enabled_rulesets);
 
-$pgtitle = "Snort: {$id}{$if_real} Categories";
+$pgtitle = "Snort: Interface $id$if_real Categories";
 include("head.inc");
 
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php include("fbegin.inc"); ?>
-
-<?php
-if(!$pgtitle_output)
-	echo "<p class=\"pgtitle\"><?=$pgtitle?></p>";
-?>
-
+<p class="pgtitle"><?=$pgtitle?></p>
 <?php
 
 echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\" id=\"iform\">";
@@ -168,18 +161,15 @@ echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\
    <tr>
    		<td>
 <?php
-	$tab_array = array();
-	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
-	$tab_array[] = array(gettext("Update  Rules"), false, "/snort_download_rules.php");
-	$tab_array[] = array(gettext("Categories"), true, "/snort_rulesets.php");
-	$tab_array[] = array(gettext("Rules"), false, "/snort_rules.php");
-	$tab_array[] = array(gettext("Servers"), false, "/pkg_edit.php?xml=snort_define_servers.xml&amp;id=0");
-	$tab_array[] = array(gettext("Blocked"), false, "/snort_blocked.php");
-	$tab_array[] = array(gettext("Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
-	$tab_array[] = array(gettext("Threshold"), false, "/pkg.php?xml=snort_threshold.xml");
-	$tab_array[] = array(gettext("Alerts"), false, "/snort_alerts.php");
-	$tab_array[] = array(gettext("Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
-	display_top_tabs($tab_array);
+    $tab_array = array();
+    $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
+    $tab_array[] = array("If Settings", false, "/snort/snort_interfaces_edit.php?id={$id}");
+    $tab_array[] = array("Categories", true, "/snort/snort_rulesets.php?id={$id}");
+    $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
+    $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
+    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
+    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
+    display_top_tabs($tab_array);
 ?>
   		</td>
   </tr>

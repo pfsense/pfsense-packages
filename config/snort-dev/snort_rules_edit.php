@@ -3,6 +3,7 @@
 /*
     snort_rules_edit.php
     Copyright (C) 2004, 2005 Scott Ullrich
+	Copyright (C) 2004, 2009 Robert Zelaya
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -328,18 +329,15 @@ include("head.inc");
   <tr>
   	<td>
 <?php
-	$tab_array = array();
-	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
-	$tab_array[] = array(gettext("Update Rules"), false, "/snort_download_rules.php");
-	$tab_array[] = array(gettext("Categories"), false, "/snort_rulesets.php");
-	$tab_array[] = array(gettext("Rules"), true, "/snort_rules.php?openruleset=/usr/local/etc/snort/rules/attack-responses.rules");
-	$tab_array[] = array(gettext("Servers"), false, "/pkg_edit.php?xml=snort_define_servers.xml&amp;id=0");
-	$tab_array[] = array(gettext("Blocked"), false, "/snort_blocked.php");
-	$tab_array[] = array(gettext("Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
-	$tab_array[] = array(gettext("Threshold"), false, "/pkg.php?xml=snort_threshold.xml");
-	$tab_array[] = array(gettext("Alerts"), false, "/snort_alerts.php");
-	$tab_array[] = array(gettext("Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
-	display_top_tabs($tab_array);
+    $tab_array = array();
+    $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
+    $tab_array[] = array("If Settings", false, "/snort/snort_interfaces_edit.php?id={$id}");
+    $tab_array[] = array("Categories", false, "/snort/snort_rulesets.php?id={$id}");
+    $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
+    $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
+    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
+    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
+    display_top_tabs($tab_array);
 ?>
 
   	</td>
