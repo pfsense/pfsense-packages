@@ -198,7 +198,7 @@ function enable_change(enable_change) {
 				<td width="22%" valign="top" class="vtable">&nbsp;</td>
 				<td width="78%" class="vtable">
 					<input name="enablesync" type="checkbox" value="yes" <?php if ($pconfig['enablesync']) echo "checked"; ?>>
-					<strong>Sync XMLRPC configuration to backup CARP members</strong>
+					<strong>Sync HAProxy configuration to backup CARP members via XMLRPC.</strong>
 				</td>
 			</tr>
 			<tr>
