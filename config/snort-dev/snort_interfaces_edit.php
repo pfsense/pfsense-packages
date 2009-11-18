@@ -57,7 +57,10 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['snortalertlogtype'] = $a_nat[$id]['snortalertlogtype'];
 	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
 	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
+	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];
 	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
+	$pconfig['barnyard_enable'] = $a_nat[$id]['barnyard_enable'];
+	$pconfig['barnyard_mysql'] = $a_nat[$id]['barnyard_mysql'];
 		
 	if (!$pconfig['interface'])
 		$pconfig['interface'] = "wan";
@@ -125,16 +128,24 @@ if ($_POST) {
 /* if no errors write to conf */
 	if (!$input_errors) {
 		$natent = array();
-		$natent['enable'] = $_POST['enable'] ? on : off;
-		/* if option is diabled add a default answer */
+
+		/* write to conf for 1st time or rewrite the answer */
 		$natent['interface'] = $_POST['interface'] ? $_POST['interface'] : $pconfig['interface'];
-		$natent['descr'] = $_POST['descr'];
-		$natent['performance'] = $_POST['performance'];
-		$natent['blockoffenders7'] = $_POST['blockoffenders7'] ? on : off;
-		$natent['snortalertlogtype'] = $_POST['snortalertlogtype'];
-		$natent['alertsystemlog'] = $_POST['alertsystemlog'] ? on : off;
-		$natent['tcpdumplog'] = $_POST['tcpdumplog'] ? on : off;
-		$natent['flow_depth'] = $_POST['flow_depth'];
+		/* if post write to conf or rewite the answer */
+		$natent['enable'] = $_POST['enable'] ? on : off;
+		$natent['descr'] = $_POST['descr'] ? $_POST['descr'] : $pconfig['descr'];
+		$natent['performance'] = $_POST['performance'] ? $_POST['performance'] : $pconfig['performance'];
+		/* if post = on use on off or rewrite the conf */
+		if ($_POST['blockoffenders7'] == "on") { $natent['blockoffenders7'] = on; }else{ $natent['blockoffenders7'] = off; } if ($_POST['enable'] == "") { $natent['blockoffenders7'] = $pconfig['blockoffenders7']; }
+		$natent['snortalertlogtype'] = $_POST['snortalertlogtype'] ? $_POST['snortalertlogtype'] : $pconfig['snortalertlogtype'];
+		if ($_POST['alertsystemlog'] == "on") { $natent['alertsystemlog'] = on; }else{ $natent['alertsystemlog'] = off; } if ($_POST['enable'] == "") { $natent['alertsystemlog'] = $pconfig['alertsystemlog']; }
+		if ($_POST['tcpdumplog'] == "on") { $natent['tcpdumplog'] = on; }else{ $natent['tcpdumplog'] = off; } if ($_POST['enable'] == "") { $natent['tcpdumplog'] = $pconfig['tcpdumplog']; }
+		if ($_POST['snortunifiedlog'] == "on") { $natent['snortunifiedlog'] = on; }else{ $natent['snortunifiedlog'] = off; } if ($_POST['enable'] == "") { $natent['snortunifiedlog'] = $pconfig['snortunifiedlog']; }
+		/* if optiion = 0 then the old descr way will not work */
+		if ($_POST['flow_depth'] != "") { $natent['flow_depth'] = $_POST['flow_depth']; }else{ $natent['flow_depth'] = $pconfig['flow_depth']; }
+		/* rewrite the options that are not in post */
+		$natent['barnyard_enable'] = $pconfig['barnyard_enable'];
+		$natent['barnyard_mysql'] = $pconfig['barnyard_mysql'];
 
 		if (isset($id) && $a_nat[$id])
 			$a_nat[$id] = $natent;
@@ -200,6 +211,7 @@ echo "
 	document.iform.snortalertlogtype.disabled = endis;
 	document.iform.alertsystemlog.disabled = endis;
 	document.iform.tcpdumplog.disabled = endis;
+	document.iform.snortunifiedlog.disabled = endis;
 }
 //-->
 </script>
@@ -300,7 +312,7 @@ if($id != "")
 					$onclick_enable = "onClick=\"enable_change(false)\">";
 					}
 					echo "
-					<input name=\"enable\" type=\"checkbox\" value=\"yes\" $checked $onclick_enable
+					<input name=\"enable\" type=\"checkbox\" value=\"on\" $checked $onclick_enable
 					<strong>Enable Interface</strong></td>\n\n";
 					?>
 				</tr>
@@ -347,7 +359,7 @@ if($id != "")
 				<tr>
 				<td width="22%" valign="top" class="vncell">Block offenders</td>
 				<td width="78%" class="vtable">
-					<input name="blockoffenders7" type="checkbox" value="yes" <?php if ($pconfig['blockoffenders7'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					<input name="blockoffenders7" type="checkbox" value="on" <?php if ($pconfig['blockoffenders7'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					Checking this option will automatically block hosts that generate a snort alert.</td>
 				</tr>
 				<tr>
@@ -368,14 +380,20 @@ if($id != "")
 				<tr>
 				<td width="22%" valign="top" class="vncell">Send alerts to main System logs</td>
 				<td width="78%" class="vtable">
-					<input name="alertsystemlog" type="checkbox" value="yes" <?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					<input name="alertsystemlog" type="checkbox" value="on" <?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					Snort will send Alerts to the Pfsense system logs.</td>
 				</tr>
 				<tr>
 				<td width="22%" valign="top" class="vncell">Log to a Tcpdump file</td>
 				<td width="78%" class="vtable">
-					<input name="tcpdumplog" type="checkbox" value="yes" <?php if ($pconfig['tcpdumplog'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					<input name="tcpdumplog" type="checkbox" value="on" <?php if ($pconfig['tcpdumplog'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					Snort will log packets to a tcpdump-formatted file. The file then can be analyzed by a wireshark type of application. WARNING: File may become large.</td>
+				</tr>
+				<tr>
+				<td width="22%" valign="top" class="vncell">Log Alerts to a snort unified2 file</td>
+				<td width="78%" class="vtable">
+					<input name="snortunifiedlog" type="checkbox" value="on" <?php if ($pconfig['snortunifiedlog'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					Snort will log Alerts to a file in the UNIFIED2 format. This is a requirement for barnyard2.</td>
 				</tr>
 				<tr>
 				<td valign="top" class="vncell">HTTP server flow depth</td>

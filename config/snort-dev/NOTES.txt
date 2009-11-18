@@ -1,0 +1,23 @@
+
+
+November 17 2009
+
+If you work on this package just comment on every thing you change. 
+
+
+Gui is almost done.
+
+The Gui works just the interface tabs have to be pointed to the right files.
+
+snort.inc 
+Must be recoded so that it reads the [snortglobal][rule] options in conf.xml and makes a snort.sh, snort.conf, and barnyard.conf.
+This is easy, just cut and paste from the old snort.inc.
+
+snort_rules_edit.php 
+Is what Im working on. Just make sure all snort sig options are supported.
+
+snort_rules.php 
+Change the way the rules get disabled, by removing the x icon image and replacing it with check boxes.
+This should improve the users use of the package.
+
+Done.
