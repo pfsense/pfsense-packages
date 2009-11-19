@@ -31,6 +31,7 @@
 */
 
 require("guiconfig.inc");
+include_once("/usr/local/pkg/snort/snort.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -162,6 +163,12 @@ if ($_POST) {
 		touch($d_natconfdirty_path);
 
 		write_config();
+		// stop_service("snort");
+		//create_snort_conf();
+		//create_barnyard2_conf();
+		sync_package_snort();
+		// sleep(2);
+		// start_service("snort");
 
 		header("Location: snort_interfaces.php");
 		exit;

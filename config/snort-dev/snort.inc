@@ -34,6 +34,14 @@ require_once("pfsense-utils.inc");
 // Needed on 2.0 because of get_vpns_list()
 require_once("filter.inc");
 
+/* Get id and realinterfaces */
+
+$id = $_GET['id'];
+if (isset($_POST['id']))
+	$id = $_POST['id'];
+
+
+
 /* Allow additional execution time 0 = no limit. */
 ini_set('max_execution_time', '9999');
 ini_set('max_input_time', '9999');
@@ -92,34 +100,6 @@ function sync_package_snort()
 	exec("/bin/rm /usr/local/etc/snort/sid");
 	exec("/bin/rm -f /usr/local/etc/rc.d/snort");
 	
-	$first = 0;
-	$snortInterfaces = array(); /* -gtm  */
-	
-	$if_list = $config['installedpackages']['snortglobal']['rule'][0]['interface'];
-	$if_array = split(',', $if_list);
-	//print_r($if_array);
-	if($if_array) {
-		foreach($if_array as $iface) {
-			$if = convert_friendly_interface_to_real_interface_name($iface);
-			
-			if($config['interfaces'][$iface]['ipaddr'] == "pppoe") {
-				$if = "ng0";
-			}
-	      
-			/* build a list of user specified interfaces -gtm */      
-			if($if){      
-			  array_push($snortInterfaces, $if);
-			  $first = 1;
-			}
-		}	
-	    
-		if (count($snortInterfaces) < 1) {
-			log_error("Snort will not start.  You must select an interface for it to listen on.");
-			return;
-		}
-	}
-	//print_r($snortInterfaces);
-	
 	/* create log directory */
 	$start  = "/bin/mkdir -p /var/log/snort\n";
 
@@ -139,46 +119,128 @@ function sync_package_snort()
 	if($bpfmaxinsns)
 		mwexec_bg("sysctl net.bpf.maxinsns={$bpfmaxinsns}");
 
-	/* always stop barnyard2 before starting snort -gtm */
-	$start .= "/usr/bin/killall barnyard2\n";
+/* let there be snort.sh for each rule */
+/* start snort.sh for writing */
 
-	/* Note the sleep delay.  Seems to help getting mult interfaces to start -gtm */
-	/* snort start options are; config file, log file, demon, interface, packet flow, alert type, quiet */
-	/* TODO; get snort to start under nologin shell */
-	/* IMPORTANT: This has to be completely be rewritten, simple */
-	/* IMPORTANT: This has to be completely be rewritten, simple */
-	/* IMPORTANT: This has to be completely be rewritten, simple */
-	foreach($snortInterfaces as $snortIf)
-	{
-		$start .= "sleep 4\n";
-		$start .= "snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -D -i {$snortIf} -q\n";
-		/* define snortbarnyardlog_chk */
-        $snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][0]['barnyard_enable'];
-        if ($snortbarnyardlog_info_chk == on)
-                $start .= "\nsleep 4;barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D -q\n";	
-	}    
-    $check_if_snort_runs = "\n\tif [ \"`ls -A /usr/local/etc/snort/rules`\" ] ; then\n\techo \"rules exist\"\n\telse\n\techo \"rules DONT exist\"\n\texit 2\n\tfi \n\n\tif [ \"`pgrep -x snort`\" = \"\" ] ; then\n\t/bin/rm /tmp/snort.sh.pid\n\tfi \n\n\tif [ \"`pgrep -x snort`\" != \"\" ] ; then\n\tlogger -p daemon.info -i -t SnortStartup \"Snort already running...\"\n\t/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php\n\texit 1\n\tfi\n\n";
-    $if_snort_pid = "\nif ls /tmp/snort.sh.pid > /dev/null\nthen\n    echo \"snort.sh is running\"\n    exit 0\nelse\n    echo \"snort.sh is not running\"\nfi\n";        
-    $echo_snort_sh_pid = "\necho \"snort.sh run\" > /tmp/snort.sh.pid\n";
-    $echo_snort_sh_startup_log = "\necho \"snort.sh run\" >> /tmp/snort.sh_startup.log\n";
-	$del_old_pids = "\nrm -f /var/run/snort_*\n";
-	$sample_before = "BEFORE_MEM=`top | grep Wired | awk '{print \$12}'`\n";
-	$sample_after = "\n\tAFTER_MEM=`top | grep Wired | awk '{print \$12}'`\n";
-	if ($snort_performance == "ac-bnfa")
-		$sleep_before_final = "\necho \"Sleeping before final memory sampling...\"\nWAITSECURE=60\n";
+$rule_array = $config['installedpackages']['snortglobal']['rule'];
+$counter_rule = -1;
+foreach ($rule_array as $value) {
+
+$counter_rule += 1;
+
+$result_lan = $config['installedpackages']['snortglobal']['rule'][$counter_rule][interface];
+$if_real_c = convert_friendly_interface_to_real_interface_name($result_lan);
+
+/* open snort.sh for writing" */
+conf_mount_rw();
+
+$snort_sh_text = <<<EOD
+#	snort.sh
+#
+#	Copyright (C) 2009 Robert Zelaya
+#	part of pfSense
+#	All rights reserved.
+#
+#	1. Redistributions of source code must retain the above copyright notice,
+#	   this list of conditions and the following disclaimer.
+#
+#	2. Redistributions in binary form must reproduce the above copyright
+#	   notice, this list of conditions and the following disclaimer in the
+#	   documentation and/or other materials provided with the distribution.
+#
+#	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+#	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+#	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+#	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+#	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+#	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+#	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+#	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#	POSSIBILITY OF SUCH DAMAGE.
+#
+
+#!/bin/sh
+# This file was automatically generated
+# by the pfSense service handler.
+
+rc_start() {
+	
+	if [ "ls -A /usr/local/etc/snort/snort_$counter_rule$if_real_c/rules" ] ; then
+	echo "rules exist"
 	else
-		$sleep_before_final = "\necho \"Sleeping before final memory sampling...\"\nWAITSECURE=300\n";
-	$sleep_before_final .= "while [ \"\$MYSNORTLOG\" = \"\" -a \$WAITSECURE -gt 0 ] ; do\n\tsleep 2\n\tMYSNORTLOG=`/usr/sbin/clog /var/log/system.log | grep snort | tail | grep 'Snort initialization completed successfully'`\n\tWAITSECURE=`expr \$WAITSECURE - 1`\ndone\n";
-	$total_used_after = "TOTAL_USAGE=`top | grep snort | grep -v grep | awk '{ print \$6 }'`\n";
-	$echo_usage .= $sample_after . "\t" . $total_used_after . "\techo \"Ram free BEFORE starting Snort: \$BEFORE_MEM -- Ram free AFTER starting Snort: \$AFTER_MEM -- Mode " . $snort_performance . " -- Snort memory usage: \$TOTAL_USAGE\" | logger -p daemon.info -i -t SnortStartup\n\n";
+	echo "rules DONT exist"
+	exit 2
+	fi 
+
+	if [ "`pgrep -x snort`" = "" ] ; then
+	/bin/rm /tmp/snort_$counter_rule$if_real_c.sh.pid
+	fi 
+
+	if [ "`pgrep -x snort`" != "" ] ; then
+	logger -p daemon.info -i -t SnortStartup "Snort already running..."
+	/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php
+	exit 1
+	fi
+
+if ls /tmp/snort_$counter_rule$if_real_c.sh.pid > /dev/null
+then
+    echo "snort_$counter_rule$if_real_c.sh is running"
+    exit 0
+else
+    echo "snort_$counter_rule$if_real_c.sh is not running"
+fi
+
+echo "snort_$counter_rule$if_real_c.sh run" > /tmp/snort_$counter_rule$if_real_c.sh.pid
+
+echo "snort_$counter_rule$if_real_c.sh run" >> /tmp/snort_$counter_rule$if_real_c.sh_startup.log
+
+rm -f /var/run/snort_$counter_rule$if_real_c.sh
+BEFORE_MEM=`top | grep Wired | awk '{print $12}'`
+/bin/mkdir -p /var/log/snort
+/usr/bin/killall barnyard2
+
+sleep 4
+/usr/local/bin/snort -G $counter_rule$if_real_c -R $counter_rule$if_real_c -c /usr/local/etc/snort/snort_$counter_rule$if_real_c/snort.conf -l /var/log/snort -D -i $if_real_c -q
+
+# sleep 4
+# /usr/local/bin/barnyard2 -c /usr/local/etc/snort/snort_$counter_rule$if_real_c/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/snort_$counter_rule$if_real_c/barnyard2.waldo -D -q
+
+	sleep 2
+	MYSNORTLOG=`/usr/sbin/clog /var/log/system.log | grep snort | tail | grep 'Snort initialization completed successfully'`
+	
+}
+
+rc_stop() {
+	/usr/bin/killall snort; killall barnyard2
+}
+
+case $1 in
+	start)
+		rc_start
+		;;
+	stop)
+		rc_stop
+		;;
+	restart)
+		rc_stop
+		rc_start
+		;;
+esac
+
+EOD;
+
+        /* write out snort.sh */
+        $bconf = fopen("/usr/local/etc/rc.d/snort_$counter_rule$if_real_c.sh", "w");
+        if(!$bconf) {
+                log_error("Could not open /usr/local/etc/rc.d/snort_$counter_rule$if_real_c.sh for writing.");
+                exit;
+        }
+		/* write snort.sh */
+        fwrite($bconf, $snort_sh_text);
+        fclose($bconf);
 		
-	/* write out rc.d start/stop file */
-	write_rcfile(array(
-			"file" => "snort.sh",
-			"start" => "{$check_if_snort_runs}{$if_snort_pid}{$echo_snort_sh_pid}{$echo_snort_sh_startup_log}{$del_old_pids}{$sample_before}{$start}{$sleep_before_final}{$echo_usage}",
-			"stop" => "/usr/bin/killall snort; killall barnyard2"
-		)
-	);
+}
 
 	/* create snort configuration file */
 	create_snort_conf();
@@ -189,12 +251,14 @@ if ($snortbarnyardlog_info_chk == on)
        create_barnyard2_conf();
 
 	   /* snort will not start on install untill setting are set */
+	   /* do start snort create a funtion to start snort */
 if ($config['installedpackages']['snortglobal']['autorulesupdate7'] != "") {
 	/* start snort service */
 	conf_mount_ro();
 	start_service("snort");
 	}
 }
+
 
 /* open barnyard2.conf for writing */
 function create_barnyard2_conf() {
@@ -213,7 +277,7 @@ function create_barnyard2_conf() {
 /* open barnyard2.conf for writing" */
 function generate_barnyard2_conf() {
 
-        global $config, $g;
+        global $config, $g, $id;
         conf_mount_rw();
 
 /* define snortbarnyardlog */
@@ -231,21 +295,18 @@ $barnyard2_conf_text = <<<EOD
 
 #	barnyard2.conf
 #   barnyard2 can be found at http://www.securixlive.com/barnyard2/index.php
-
+#
 #	Copyright (C) 2006 Robert Zelaya
 #	part of pfSense
 #	All rights reserved.
-
-#	Redistribution and use in source and binary forms, with or without
-#	modification, are permitted provided that the following conditions are met:
-
+#
 #	1. Redistributions of source code must retain the above copyright notice,
 #	   this list of conditions and the following disclaimer.
-
+#
 #	2. Redistributions in binary form must reproduce the above copyright
 #	   notice, this list of conditions and the following disclaimer in the
 #	   documentation and/or other materials provided with the distribution.
-
+#
 #	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 #	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
 #	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
@@ -256,6 +317,7 @@ $barnyard2_conf_text = <<<EOD
 #	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 #	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 #	POSSIBILITY OF SUCH DAMAGE.
+#
 
 # set the appropriate paths to the file(s) your Snort process is using
 config reference-map:   /usr/local/etc/snort/reference.config
@@ -264,7 +326,7 @@ config gen-msg-map:     /usr/local/etc/snort/gen-msg.map
 config sid-msg-map:     /usr/local/etc/snort/sid-msg.map
 
 config hostname:       $snortbarnyardlog_hostname_info_chk
-config interface:      $snortbarnyardlog_interface_info_chk
+config interface:      $id$snortbarnyardlog_interface_info_chk
 
 # Step 2: setup the input plugins
 input unified2
