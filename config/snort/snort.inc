@@ -146,11 +146,11 @@ function sync_package_snort()
 	foreach($snortInterfaces as $snortIf)
 	{
 		$start .= "sleep 4\n";
-		$start .= "snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -D -i {$snortIf} -q\n";
+		$start .= "/usr/local/bin/snort -c /usr/local/etc/snort/snort.conf -l /var/log/snort -D -i {$snortIf} -q\n";
 		/* define snortbarnyardlog_chk */
         $snortbarnyardlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog'];
         if ($snortbarnyardlog_info_chk == on)
-                $start .= "\nsleep 4;barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D -q\n";	
+                $start .= "\nsleep 4;/usr/local/bin/barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D -q\n";	
 	}    
     $check_if_snort_runs = "\n\tif [ \"`ls -A /usr/local/etc/snort/rules`\" ] ; then\n\techo \"rules exist\"\n\telse\n\techo \"rules DONT exist\"\n\texit 2\n\tfi \n\n\tif [ \"`pgrep -x snort`\" = \"\" ] ; then\n\t/bin/rm /tmp/snort.sh.pid\n\tfi \n\n\tif [ \"`pgrep -x snort`\" != \"\" ] ; then\n\tlogger -p daemon.info -i -t SnortStartup \"Snort already running...\"\n\t/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php\n\texit 1\n\tfi\n\n";
     $if_snort_pid = "\nif ls /tmp/snort.sh.pid > /dev/null\nthen\n    echo \"snort.sh is running\"\n    exit 0\nelse\n    echo \"snort.sh is not running\"\nfi\n";        
