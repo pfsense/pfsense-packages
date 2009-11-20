@@ -1,0 +1,137 @@
+<packagegui>
+	<name>ospfd</name>
+	<version>0.1</version>
+	<title>ospfd: Settings</title>
+	<aftersaveredirect>pkg_edit.php?xml=ospfd.xml&amp;id=0</aftersaveredirect>
+	<menu>
+		<name>ospfd</name>
+		<tooltiptext>Modify ospfd settings.</tooltiptext>
+		<section>Services</section>
+		<configfile>ospfd.xml</configfile>
+		<url>/pkg_edit.php?xml=ospfd.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>ospfd</name>
+		<rcfile>ospfd.sh</rcfile>
+		<executable>ospfd</executable>
+	</service>
+	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
+	<fields>
+		<field>
+			<fielddescr>Router ID</fielddescr>
+			<fieldname>Router ID</fieldname>
+			<description>Specify the Router ID.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Area</fielddescr>
+			<fieldname>Area</fieldname>
+			<description>OSPF area for this instance of OSPFd.</description>
+			<type>input</type>
+		</field>
+                <field>
+                        <fielddescr>Update FIB (Routing table)</fielddescr>
+                        <fieldname>enable</fieldname>
+                        <description>Enables the updating of the host routing table</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Listening Interface</fielddescr>
+                        <fieldname>interface</fieldname>
+                        <description>Enter the desired participating interface here.</description>
+                        <type>interfaces_selection</type>
+                </field>
+		<field>
+			<fielddescr>Metric</fielddescr>
+			<fieldname>Metric</fieldname>
+			<description>Metric for this OSPF interface (leave blank for default).</description>
+			<type>input</type>
+                </field>
+                <field>
+                        <fielddescr>Enable MD5 password for this OSPFd interface (default no)</fielddescr>
+                        <fieldname>enable</fieldname>
+                        <description>Enables the use of an MD5 password to on this instance</description>
+                        <type>checkbox</type>
+                </field>
+		<field>
+			<fielddescr>Password</fielddescr>
+			<fieldname>Password</fieldname>
+			<description>Password for this OSPF interface.</description>
+			<type>input</type>
+                </field>
+                <field>
+                        <fielddescr>Redistribute connected subnets</fielddescr>
+                        <fieldname>enable</fieldname>
+                        <description>Enables the redistribution of connected networks (Default no)</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Redistribute default route</fielddescr>
+                        <fieldname>enable</fieldname>
+                        <description>Enables the redistribution of a default route to this device (Default no)</description>
+                        <type>checkbox</type>
+                </field>
+		<field>
+			<fielddescr>Router Priority</fielddescr>
+			<fieldname>Router priority for DR elections</fieldname>
+			<description>Router priority when participating in elections for DR (Default 1) Valid range is 0-255.  0 will cause the router to not participate in election.</description>
+			<type>input</type>
+                </field>
+		<field>
+			<fielddescr>Hello Interval</fielddescr>
+			<fieldname>Hello Interval in seconds</fieldname>
+			<description>Hello Interval this OSPF interface in seconds (Default 10).</description>
+			<type>input</type>
+                </field>
+		<field>
+			<fielddescr>Retransmit Interval</fielddescr>
+			<fieldname>Retransmit Interval</fieldname>
+			<description>Retransmit Interval this OSPF interface in seconds (Default 5).</description>
+			<type>input</type>
+                </field>
+		<field>
+			<fielddescr>Dead Timer</fielddescr>
+			<fieldname>Dead Timer</fieldname>
+			<description>Dead Timer for this OSPF interface in seconds (Default 40).</description>
+			<type>input</type>
+                </field>
+                <field>
+                        <fielddescr>Redistribute static</fielddescr>
+                        <fieldname>enable</fieldname>
+                        <description>Enables the redistribution of static routes</description>
+                        <type>checkbox</type>
+                </field>
+	</fields>
+	<custom_php_global_functions>
+		function sync_package_ospfd() {
+			conf_mount_rw();
+            		config_lock();
+            		global $config;
+            		foreach($config['installedpackages']['ospfd']['config'] as $cf) {
+				if($cf['host'] != "") {
+					$start .= "/usr/local/sbin/ospfd ";
+					$start .= " -n {$cf['host']}";
+					if($cf['port'] != "") 
+						$start .= ":{$cf['port']}";
+					if($cf['direction'] != "") 
+						$start .= " -S {$cf['direction']}";
+					if($cf['version'] != "") 
+						$start .= " -v {$cf['version']}";
+					write_rcfile(array(
+							"file" => "ospfd.sh",
+							"start" => $start,
+							"stop" => "/usr/bin/killall ospfd"
+						)
+					);
+					restart_service("ospfd");
+					break;
+				}
+			}
+			conf_mount_ro();
+			config_unlock();
+		}
+	</custom_php_global_functions>
+	<custom_add_php_command>
+		sync_package_ospfd();
+	</custom_add_php_command>
+</packagegui>
