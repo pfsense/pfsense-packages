@@ -120,7 +120,7 @@ if ($_POST) {
 	if (!is_numeric($_POST['max_connections']))
 		$input_errors[] = "The field 'Max connections' value is not a number.";
 
-	$ports = $_POST['port'];
+	$ports = split(",", $_POST['port'] . ",");
 	foreach($ports as $port)
 		if ($port && !is_numeric($port))
 			$input_errors[] = "The field 'Port' value is not a number.";
