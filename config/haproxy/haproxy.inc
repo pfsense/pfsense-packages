@@ -270,6 +270,12 @@ function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
 	$xml = array();
 	$xml['haproxy'] = $config['installedpackages']['haproxy'];
 
+	// Prevent sync loops
+	unset($xml['synchost1']);
+	unset($xml['synchost2']);
+	unset($xml['synchost3']);
+	unset($xml['syncpassword']);
+
 	/* assemble xmlrpc payload */
 	$params = array(
 		XML_RPC_encode($password),
