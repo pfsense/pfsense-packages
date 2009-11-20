@@ -124,25 +124,28 @@ function haproxy_configure() {
 		foreach ($a_backends as $backend) {
 
 			// Define our backend name
-			$backend = "listen {$backend['name']}\n";
+			$backendinfo = "listen {$backend['name']}\n";
 
 			// Prepare ports for processing by splitting
-			$backend['port'] .= ",";
-			$ports = split(",", $backend['port']);
-
+			$portss = "{$backend['port']},";
+			$ports = split(",", $portss);
+			
+			// Initialize variable
+			$listenip = "";
+			
 			// Process and add bind directives for ports
 			foreach($ports as $port) {
 				if($port) {
 					if($backend['extaddr'] == "any") 
-						$listenip =  "bind\t\t\t0.0.0.0:" . $port . "\n";
+						$listenip .=  "\tbind\t\t\t0.0.0.0:{$port}\n";
 					elseif($backend['extaddr']) 
-						$listenip =  "bind\t\t\t" . $backend['extaddr'] . ":" . $port ."\n";				
+						$listenip .=  "\tbind\t\t\t{$backend['extaddr']}:{$port}\n";				
 					else 
-						$listenip = "bind\t\t\t" . get_current_wan_address('wan').":" . $port ."\n";
+						$listenip .= "\tbind\t\t\t" . get_current_wan_address('wan') . ":{$port}\n";
 				}
 			}
 			
-			fwrite ($fd, "{$backend}");
+			fwrite ($fd, "{$backendinfo}");
 			fwrite ($fd, "{$listenip}");
             fwrite ($fd, "\tmode\t\t\t".$backend['type'] . "\n");
 			fwrite ($fd, "\tlog\t\t\tglobal\n");
