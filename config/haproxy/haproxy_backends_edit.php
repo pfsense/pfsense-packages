@@ -120,8 +120,10 @@ if ($_POST) {
 	if (!is_numeric($_POST['max_connections']))
 		$input_errors[] = "The field 'Max connections' value is not a number.";
 
-	if (!is_numeric($_POST['port']))
-		$input_errors[] = "The field 'Port' value is not a number.";
+	$ports = $_POST['port'];
+	foreach($ports as $port)
+		if ($port && !is_numeric($port))
+			$input_errors[] = "The field 'Port' value is not a number.";
 
 	if (!is_numeric($_POST['client_timeout']))
 		$input_errors[] = "The field 'Client timeout' value is not a number.";
@@ -498,7 +500,7 @@ set by the 'retries' parameter (2).</div>
 					<td width="22%" valign="top" class="vncellreq">Port</td>
 					<td width="78%" class="vtable" colspan="2">
 						<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="10" maxlength="10">
-						<div>the port to listen to</div>
+						<div>The port to listen to.  To specify multiple ports, separate with a comma (,). EXAMPLE: 80,443</div>
 					</td>
 				</tr>
 				<tr>
