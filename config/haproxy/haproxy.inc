@@ -300,7 +300,6 @@ function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
 	} else {
 		log_error("HAProxy XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
-}
 
 	/* tell haproxy to reload our settings on the destionation sync host. */
 	$method = 'pfsense.exec_php';
@@ -331,5 +330,6 @@ function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
 	} else {
 		log_error("HAProxy XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
 	}
-	
+}
+
 ?>
