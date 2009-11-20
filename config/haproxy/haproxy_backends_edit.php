@@ -528,16 +528,6 @@ set by the 'retries' parameter (2).</div>
 				  </td>
 				</tr>
 				<tr align="left">
-					<td width="22%" valign="top" class="vncellreq">Type</td>
-					<td width="78%" class="vtable" colspan="2">
-						<select name="type" id="type">
-							<option value="http"<?php if($pconfig['type'] == "http") echo " SELECTED"; ?>>HTTP</option>
-							<option value="tcp"<?php if($pconfig['type'] == "tcp") echo " SELECTED"; ?>>TCP</option>
-							<option value="health"<?php if($pconfig['type'] == "health") echo " SELECTED"; ?>>Health</option>
-						</select>
-					</td>
-				</tr>
-				<tr align="left">
 					<td width="22%" valign="top" class="vncell">Max connections</td>
 					<td width="78%" class="vtable" colspan="2">
 						<input name="max_connections" type="text" <?if(isset($pconfig['max_connections'])) echo "value=\"{$pconfig['max_connections']}\"";?> size="10" maxlength="10">
