@@ -371,6 +371,7 @@
       <name>vnstat</name>
       <website>http://humdi.net/vnstat/</website>
       <descr>A console-based network traffic monitor + vnstat PHP frontend</descr>
+      <pkginfolink>http://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
       <category>Network Management</category>
 	  <depends_on_package_base_url>http://www.pfsense.com/packages/config/vnstat/bin/</depends_on_package_base_url>
 	  <depends_on_package>vnstat-1.6_3.tbz</depends_on_package>
@@ -380,6 +381,7 @@
       <maintainer>crazypark2@yahoo.dk</maintainer>
       <config_file>http://www.pfsense.com/packages/config/vnstat/vnstat.xml</config_file>
       <configurationfile>vnstat.xml</configurationfile>
+      <after_install_info></after_install_info>
     </package>
     <package>
       <name>phpSysInfo</name>
