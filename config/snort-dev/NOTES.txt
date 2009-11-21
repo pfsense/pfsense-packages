@@ -26,8 +26,6 @@ snort.inc
 Must be recoded so that it reads the [snortglobal] [snortglobal][rule] options in conf.xml and makes the files whitelist, snort.sh, snort.conf, and barnyard.conf.
 This is easy, just cut and paste from the old snort.inc. I will work on this.
 
-Should be working for only one interface. Add code to wirite files for every snort rule in conf.xml
-
 
 =================================
 Any Devs that would like to help please work on snort_rules_edit.php and snort_rules.php. They work but need cleaning up.

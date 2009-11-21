@@ -75,7 +75,7 @@ if (isset($_GET['dup']))
 /* convert fake interfaces to real */
 $if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface']);
 
-if ($_POST) {
+if ($_POST["Submit"]) {
 
 	/* input validation */
 //	if(strtoupper($_POST['proto']) == "TCP" or strtoupper($_POST['proto']) == "UDP" or strtoupper($_POST['proto']) == "TCP/UDP") {
@@ -160,20 +160,34 @@ if ($_POST) {
 				$a_nat[] = $natent;
 		}
 
-		touch($d_natconfdirty_path);
-
 		write_config();
 		// stop_service("snort");
 		//create_snort_conf();
 		//create_barnyard2_conf();
-		sync_package_snort();
-		// sleep(2);
-		// start_service("snort");
 
-		header("Location: snort_interfaces.php");
+		if ($pconfig['performance'] != "") {
+		sync_package_snort();
+		}
+		
+		if ($pconfig['performance'] != "") {		
+		header("Location: /snort/snort_interfaces_edit.php?id=$id");
+		}else{
+		touch($d_natconfdirty_path);
+		header("Location: /snort_interfaces.php");
+		}
 		exit;
 	}
 }
+
+		if ($_POST["Submit2"]) {
+		if ($pconfig['performance'] != "") {
+		sync_package_snort();
+		sleep(1);
+		exec("/bin/sh /usr/local/etc/rc.d/snort_{$id}{$if_real}.sh restart");
+		header("Location: /snort/snort_interfaces_edit.php?id=$id");
+		exit;
+			}
+		}
 
 $pgtitle = "Snort: Interface: $id$if_real Settings Edit";
 include("head.inc");
@@ -269,11 +283,8 @@ if($id != "")
 		{
 		
 		/* if base directories dont exist create them */
-		if(!file_exists("/usr/local/pkg/snort/snort_{$snortIf}_{$id}/"))
-			{
-			exec("/bin/mkdir -p /usr/local/pkg/snort/snort_{$snortIf}_{$id}/");
-			if(!file_exists("/usr/local/www/snort/snort_{$snortIf}_{$id}/"))
-			exec("/bin/mkdir -p /usr/local/www/snort/snort_{$snortIf}_{$id}/");
+			if(!file_exists("/usr/local/etc/snort/snort_{$id}{$if_real}/")) {
+			exec("/bin/mkdir -p /usr/local/etc/snort/snort_{$id}{$if_real}/");
 			}
 
     $tab_array = array();
