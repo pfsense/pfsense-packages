@@ -86,7 +86,7 @@ run_rc_command "\$1"
 
 EOD;
 
-	$fd = fopen("/usr/local/etc/rc.d/haproxy.sh", "W");
+	$fd = fopen("/usr/local/etc/rc.d/haproxy.sh", "w");
 	fwrite($fd, $haproxy);
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/haproxy.sh");
