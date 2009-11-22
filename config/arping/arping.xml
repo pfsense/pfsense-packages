@@ -53,12 +53,12 @@
 		<name>Arping</name>
 		<tooltiptext>Host to arp ping</tooltiptext>
 		<section>Services</section>
-		<url>/pkg_edit.php?xml=arping.xml&amp;id=0</url>
+		<url><![CDATA[/pkg_edit.php?xml=arping.xml&id=0]]></url>
 	</menu>
 	<tabs>
 		<tab>
 			<text>arping Settings</text>
-			<url>/pkg_edit.php?xml=arping.xml&amp;id=0</url>
+			<url><![CDATA[/pkg_edit.php?xml=arping.xml&id=0]]></url>
 			<active/>
 		</tab>
 	</tabs>
