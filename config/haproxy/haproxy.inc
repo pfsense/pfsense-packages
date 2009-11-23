@@ -253,6 +253,10 @@ function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
 
 	if(!$sync_to_ip)
 		return;
+	
+	// Do not allow syncing to self.
+	if(`/sbin/ifconfig -a | grep "$sync_to_ip"`) 
+		return;
 
 	$xmlrpc_sync_neighbor = $sync_to_ip;
     if($config['system']['webgui']['protocol'] != "") {
