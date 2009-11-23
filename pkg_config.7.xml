@@ -312,7 +312,7 @@
       <name>snort-dev</name>
 	  <pkginfolink>http://forum.pfsense.org/index.php/topic,16847.0.html</pkginfolink>
       <website>http://www.snort.org</website>
-      <descr>Used by fortune 500 companies and goverments Snort is the most widely deployed IDS/IPS technology worldwide. It features rules based logging and can perform content searching/matching in addition to being used to detect a variety of other attacks and probes, such as buffer overflows, stealth port scans, CGI attacks, SMB probes, and much more.</descr>
+      <descr>WARNING: This is the Snort-dev branch and may be unstable.</descr>
       <category>Security</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/70/All/</depends_on_package_base_url>
 	  <depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
