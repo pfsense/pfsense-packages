@@ -255,8 +255,22 @@ function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
 		return;
 	
 	// Do not allow syncing to self.
-	if(`/sbin/ifconfig -a | grep "$sync_to_ip"`) 
+	$donotsync = false;
+	$lanip = find_interface_ip($config['interfaces']['lan']['if']);
+	if($lanip == $sync_to_ip) 
+		$donotsync = true;
+	$wanip = find_interface_ip($config['interfaces']['wan']['if']);
+	if($wanip == $sync_to_ip) 
+		$donotsync = true;
+	for ($j = 1; isset($config['interfaces']['opt' . $j]); $j++) {
+		$optip = find_interface_ip($config['interfaces']['opt' . $j]['if']);
+		if($optip == $sync_to_ip) 
+		$donotsync = true;
+	}
+	if($donotsync) {
+		log_error("Disallowing sync loop for HAProxy sync.");
 		return;
+	}
 
 	$xmlrpc_sync_neighbor = $sync_to_ip;
     if($config['system']['webgui']['protocol'] != "") {
