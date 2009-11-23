@@ -3,7 +3,7 @@
 /* $Id$ */
 /*
 	snort_dynamic_ip_reload.php
-	Copyright (C) 2006 Scott Ullrich and Robert Zeleya
+	Copyright (C) 2009 Robert Zeleya
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,6 @@
 
 /* NOTE: this file gets included from the pfSense filter.inc plugin process */
 /* NOTE: file location /usr/local/pkg/pf, all files in pf dir get exec on filter reloads */
-
-require_once("/usr/local/pkg/snort/snort.inc");
 
 require_once("/usr/local/pkg/snort/snort.inc");
 

@@ -119,7 +119,10 @@ if ($_POST["Submit"]) {
 //				$input_errors[] = "The target port range must be an integer between 1 and 65535.";
 //		}
 
-//	}
+//		if ($a_nat[$id]['performance'] == "lowmem") {
+//			$input_errors[] = "This is a test of error echecking";
+//		}
+
 
 	/* check for overlaps */
 	foreach ($a_nat as $natent) {
@@ -165,28 +168,26 @@ if ($_POST["Submit"]) {
 		//create_snort_conf();
 		//create_barnyard2_conf();
 
-		if ($pconfig['performance'] != "") {
+		if ($pconfig['interface'] != "") {
 		sync_package_snort();
 		}
 		
-		if ($pconfig['performance'] != "") {		
+		if ($pconfig['interface'] != "") {		
 		header("Location: /snort/snort_interfaces_edit.php?id=$id");
 		}else{
 		touch($d_natconfdirty_path);
-		header("Location: /snort_interfaces.php");
+		header("Location: /snort/snort_interfaces.php");
 		}
 		exit;
 	}
 }
 
 		if ($_POST["Submit2"]) {
-		if ($pconfig['performance'] != "") {
 		sync_package_snort();
 		sleep(1);
 		exec("/bin/sh /usr/local/etc/rc.d/snort_{$id}{$if_real}.sh restart");
 		header("Location: /snort/snort_interfaces_edit.php?id=$id");
 		exit;
-			}
 		}
 
 $pgtitle = "Snort: Interface: $id$if_real Settings Edit";
@@ -341,7 +342,7 @@ if($id != "")
                   <td width="78%" class="vtable">
 					<select name="interface" class="formfld">
 						<?php
-						$interfaces = array('wan' => 'WAN', 'lan' => 'LAN', 'pptp' => 'PPTP', 'pppoe' => 'PPPOE');
+						$interfaces = array('wan' => 'WAN', 'lan' => 'LAN');
 						for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
 							$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
 						}

@@ -28,7 +28,7 @@
 */
 
 require("guiconfig.inc");
-require("/usr/local/pkg/snort.inc");
+require("/usr/local/pkg/snort/snort.inc");
 
 if($_POST['todelete'] or $_GET['todelete']) {
 	if($_POST['todelete'])
@@ -38,18 +38,14 @@ if($_POST['todelete'] or $_GET['todelete']) {
 	exec("/sbin/pfctl -t snort2c -T delete {$ip}");
 }
 
-$pgtitle = "Snort: Snort Blocked";
+$pgtitle = "Snort: Services: Snort Blocked";
 include("head.inc");
 
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php include("fbegin.inc"); ?>
-
-<?php
-if(!$pgtitle_output)
-	echo "<p class=\"pgtitle\"><?=$pgtitle?></p>";
-?>
+<p class="pgtitle"><?=$pgtitle?></p>
 
 <form action="snort_rulesets.php" method="post" name="iform" id="iform">
 <script src="/row_toggle.js" type="text/javascript"></script>
@@ -60,16 +56,13 @@ if(!$pgtitle_output)
    		<td>
 <?php
 	$tab_array = array();
-	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
-	$tab_array[] = array(gettext("Update Rules"), false, "/snort_download_rules.php");
-	$tab_array[] = array(gettext("Categories"), false, "/snort_rulesets.php");
-	$tab_array[] = array(gettext("Rules"), false, "/snort_rules.php");
-	$tab_array[] = array(gettext("Servers"), false, "/pkg_edit.php?xml=snort_define_servers.xml&amp;id=0");
-	$tab_array[] = array(gettext("Blocked"), true, "/snort_blocked.php");
-	$tab_array[] = array(gettext("Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
-	$tab_array[] = array(gettext("Threshold"), false, "/pkg.php?xml=snort_threshold.xml");
-	$tab_array[] = array(gettext("Alerts"), false, "/snort_alerts.php");
-	$tab_array[] = array(gettext("Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
+	$tab_array[] = array("Snort Inertfaces", false, "/snort/snort_interfaces.php");
+	$tab_array[] = array("Global Settings", false, "/snort/snort_interfaces_global.php");
+	$tab_array[] = array("Rule Updates", false, "/snort/snort_download_rules.php");
+	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
+    $tab_array[] = array("Blocked", true, "/snort/snort_blocked.php");
+	$tab_array[] = array("Whitelists", false, "/pkg.php?xml=/snort/snort_whitelist.xml");
+	$tab_array[] = array("Help & Info", false, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 ?>
   		</td>

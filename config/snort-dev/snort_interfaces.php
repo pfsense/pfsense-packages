@@ -1,9 +1,6 @@
 <?php
 /* $Id$ */
 /*
-	snort_interfaces.php
-	Copyright (C) 2004 Scott Ullrich
-	All rights reserved.
 
 	originally part of m0n0wall (http://m0n0.ch/wall)
 	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
@@ -76,17 +73,28 @@ if (isset($_POST['del_x'])) {
     /* delete selected rules */
     if (is_array($_POST['rule']) && count($_POST['rule'])) {
 	    foreach ($_POST['rule'] as $rulei) {
-			$target = $rule['target'];
-			$helpers = exec("/bin/ps awwux | grep pftpx | grep \"{$target}\" | grep -v grep | awk '{ print \$2 }'");
-			if($helpers) {
-				/* kill ftp proxy helper */
-				mwexec("/bin/kill {$helpers}");
+			
+			/* convert fake interfaces to real */
+			$if_real = convert_friendly_interface_to_real_interface_name($a_nat[$rulei]['interface']);
+			
+			$snort_pid = exec("/bin/ps -auwx | grep -v grep | grep \"ng0 -c\" | awk '{print $2;}'");
+			
+			if ($snort_pid != "") {
+			exec("/bin/sh /usr/local/etc/rc.d/snort_{$rulei}{$if_real}.sh stop");			
 			}
+			
+			exec("/usr/bin/logger -p daemon.info -i -t SnortStartup \"Interface Rule remove for {$rulei}{$if_real}...\"");
+			exec("/bin/rm -r /usr/local/etc/snort/snort_$rulei$if_real");
+			exec("/bin/rm /usr/local/etc/rc.d/snort_$rulei$if_real.sh");
+			exec("/bin/rm /var/log/snort/snort.u2_$rulei$if_real\*");
+			exec("/bin/echo \"$snort_pid\" >> /usr/local/etc/rc.d/debug");
+			
 	        unset($a_nat[$rulei]);
+			
 	    }
 	    write_config();
 	    touch($d_natconfdirty_path);
-	    header("Location: snort_interfaces.php");
+	    header("Location: /snort/snort_interfaces.php");
 	    exit;
 	}
 
@@ -134,7 +142,7 @@ if (isset($_POST['del_x'])) {
         }
 }
 
-$pgtitle = "Services: Snort Interfaces";
+$pgtitle = "Services: Snort 2.8.4.1_5 pkg v. 1.8 alpha";
 include("head.inc");
 
 ?>
@@ -170,14 +178,14 @@ padding: 15px 10px 50% 50px;
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
 <?php
-   	$tab_array = array();
-	$tab_array[] = array("Snort Interfaces", true, "snort_interfaces.php");
-	$tab_array[] = array("Global Settings", false, "snort_interfaces_global.php");
-	$tab_array[] = array("Rule Updates", false, "firewall_nat_1to1.php");
-	$tab_array[] = array("Alerts", false, "firewall_nat_out.php");
-	$tab_array[] = array("Blocked", false, "firewall_nat_out.php");
-	$tab_array[] = array("Whitelists", false, "firewall_nat_out.php");
-	$tab_array[] = array("Help & Info", false, "firewall_nat_out.php");
+	$tab_array = array();
+	$tab_array[] = array("Snort Inertfaces", true, "/snort/snort_interfaces.php");
+	$tab_array[] = array("Global Settings", false, "/snort/snort_interfaces_global.php");
+	$tab_array[] = array("Rule Updates", false, "/snort/snort_download_rules.php");
+	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
+    $tab_array[] = array("Blocked", false, "/snort/snort_blocked.php");
+	$tab_array[] = array("Whitelists", false, "/pkg.php?xml=/snort/snort_whitelist.xml");
+	$tab_array[] = array("Help & Info", false, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 ?>
  </td></tr>
@@ -190,8 +198,8 @@ padding: 15px 10px 50% 50px;
 		          <td width="1%" class="list">&nbsp;</td>
                   <td width="10%" class="listhdrr">If</td>
 				  <td width="10%" class="listhdrr">Snort</td>
-				  <td width="10%" class="listhdrr">Snort</td>
-                  <td width="10%" class="listhdrr">Block Hosts</td>
+				  <td width="10%" class="listhdrr">Performance</td>
+                  <td width="10%" class="listhdrr">Block</td>
 				  <td width="10%" class="listhdrr">Barnyard2</td>
                   <td width="50%" class="listhdr">Description</td>
                   <td width="3%" class="list">
@@ -223,27 +231,26 @@ padding: 15px 10px 50% 50px;
                   </td>
                   <td class="listr" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 				  <?php
-				  $check_blockoffenders_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['blockoffenders7'];
-				  if ($check_blockoffenders_info == "on")
+				  $check_snort_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['enable'];
+				  if ($check_snort_info == "on")
 					{
-					$check_blockoffenders = enabled;
+					$check_snort = enabled;
 					} else {
-					$check_blockoffenders = disabled;
+					$check_snort = disabled;
 					}
 				  ?>
-                    <?=strtoupper($check_blockoffenders);?>
+                    <?=strtoupper($check_snort);?>
                   </td>
                   <td class="listr" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 				  <?php
-				  $check_blockoffenders_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['blockoffenders7'];
-				  if ($check_blockoffenders_info == "on")
-					{
-					$check_blockoffenders = enabled;
-					} else {
-					$check_blockoffenders = disabled;
+				  $check_performance_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['performance'];
+					if ($check_performance_info != "") {
+						$check_performance = $check_performance_info;
+					}else{
+						$check_performance = "lowmem";
 					}
 				  ?>
-                    <?=strtoupper($check_blockoffenders);?>
+                    <?=strtoupper($check_performance);?>
                   </td>
                   <td class="listr" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 				  <?php
@@ -259,7 +266,7 @@ padding: 15px 10px 50% 50px;
                   </td>
 				  <td class="listr" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 				  <?php
-				  $check_snortbarnyardlog_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['snortbarnyardlog'];
+				  $check_snortbarnyardlog_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['barnyard_enable'];
 				  if ($check_snortbarnyardlog_info == "on")
 					{
 					$check_snortbarnyardlog = enabled;

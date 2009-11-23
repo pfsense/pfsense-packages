@@ -104,24 +104,6 @@ function sync_package_snort()
 	exec("/bin/rm /usr/local/etc/snort/sid");
 	exec("/bin/rm -f /usr/local/etc/rc.d/snort");
 	}
-	
-	/* create basic files */
-	if ($id != "") {
-	if(!file_exists("/usr/local/etc/snort/snort/snort_$id$if_real")) {
-	exec("/bin/mkdir -p /usr/local/etc/snort/snort_$id$if_real/");
-	exec("/bin/mkdir -p /usr/local/etc/snort/snort_$id$if_real/rules");
-		}
-	if(!file_exists("/usr/local/etc/snort/snort_$id$if_real/gen-msg.map")) {
-	exec("/bin/cp /usr/local/etc/snort/classification.config /usr/local/etc/snort/snort_$id$if_real/classification.config");
-	exec("/bin/cp /usr/local/etc/snort/gen-msg.map /usr/local/etc/snort/snort_$id$if_real/gen-msg.map");
-	exec("/bin/cp /usr/local/etc/snort/reference.config /usr/local/etc/snort/snort_$id$if_real/reference.config");
-	exec("/bin/cp /usr/local/etc/snort/sid-msg.map /usr/local/etc/snort/snort_$id$if_real/sid-msg.map");
-	exec("/bin/cp /usr/local/etc/snort/unicode.map /usr/local/etc/snort/snort_$id$if_real/unicode.map");
-	exec("/bin/cp /usr/local/etc/snort/threshold.conf /usr/local/etc/snort/snort_$id$if_real/threshold.conf");
-	exec("/bin/cp /usr/local/etc/snort/snort.conf /usr/local/etc/snort/snort_$id$if_real/snort.conf");
-	exec("/bin/mkdir -p /usr/local/etc/snort/snort_$id$if_real/rules");
-		}
-	}
 
 	/* snort advanced features - bpf tuning */
 //	if($bpfbufsize)
@@ -139,23 +121,66 @@ function sync_package_snort()
 //	if($bpfmaxinsns)
 //		mwexec_bg("sysctl net.bpf.maxinsns={$bpfmaxinsns}");
 
+if ($id == "") {
+
+$rule_array = $config['installedpackages']['snortglobal']['rule'];
+$id = -1;
+foreach ($rule_array as $value) {
+
+$id += 1;
+
+$result_lan = $config['installedpackages']['snortglobal']['rule'][$id][interface];
+$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+
+	/* create snort configuration file */
+	create_snort_conf();
+
+	/* create snort.sh file */
+	create_snort_sh();	
+
+/* create barnyard2 configuration file */
+$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
+if ($snortbarnyardlog_info_chk == on)
+       create_barnyard2_conf();
+	
+	}
+
+}else{
+
+	/* create snort configuration file */
+	create_snort_conf();
+	
+	/* create snort.sh file */
+	create_snort_sh();
+
+	/* create barnyard2 configuration file */
+	$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
+	if ($snortbarnyardlog_info_chk == on)
+       create_barnyard2_conf();
+	
+}	   
+
+conf_mount_ro();
+
+}
+
+/* Start of main config files */
+/* Start of main config files */
+
+/* open snort.sh for writing" */
+function create_snort_sh() {
+
+        global $config, $g, $id, $if_real;
+        conf_mount_rw();
+
 /* let there be snort.sh for each rule */
 /* start snort.sh for writing */
 
-$rule_array = $config['installedpackages']['snortglobal']['rule'];
-$counter_rule = -1;
-foreach ($rule_array as $value) {
-
-$counter_rule += 1;
-
-$result_lan = $config['installedpackages']['snortglobal']['rule'][$counter_rule][interface];
-$if_real_c = convert_friendly_interface_to_real_interface_name($result_lan);
-
-$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$counter_rule]['barnyard_enable'];
+$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
 /* define snortbarnyardlog_chk */
 if ($snortbarnyardlog_info_chk == on) {
 
-$start_barnyard2 = "\nsleep 4\n/usr/local/bin/barnyard2 -c /usr/local/etc/snort/snort_$counter_rule$if_real_c/barnyard2.conf -d /var/log/snort -f snort.u2_$counter_rule$if_real_c -w /usr/local/etc/snort/snort_$counter_rule$if_real_c/barnyard2.waldo -D -q\n\n";
+$start_barnyard2 = "\nsleep 4\n/usr/local/bin/barnyard2 -c /usr/local/etc/snort/snort_$id$if_real/barnyard2.conf -d /var/log/snort -f snort.u2_$id$if_real -w /usr/local/etc/snort/snort_$id$if_real/barnyard2.waldo -D -q\n\n";
 
 }
 
@@ -196,19 +221,30 @@ $snort_sh_text = <<<EOD
 
 rc_start() {
 
-        if [ "`ps -auwx | grep -v grep | grep "$if_real_c -c" | awk '{print $2;}'`" != "" ] ; then
-        snort_pid="`ps -auwx | grep -v grep | grep "$if_real_c -c" | awk '{print $2;}'`"
-        cp /var/log/system.log /var/log/system.log.bk
-        logger -p daemon.info -i -t SnortStartup "Snort already running, soft restart"
-        /usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php $counter $if_real_c
-        kill -HUP \${snort_pid}
+        if /bin/ls /tmp/snort_$id$if_real.sh.pid > /dev/null ; then
+        /bin/echo "snort.sh is running"
+        exit 0
+        else
+        /bin/echo "snort.sh is not running"
+        fi
+
+        if [ "`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "$if_real -c" | /usr/bin/awk '{print $2;}'`" != "" ] ; then
+		/bin/echo "snort_$id$if_real.sh run" > /tmp/snort_$id$if_real.sh.pid
+        snort_pid="`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "$if_real -c" | /usr/bin/awk '{print $2;}'`"
+        /bin/cp /var/log/system.log /var/log/system.log.bk
+        /usr/bin/logger -p daemon.info -i -t SnortStartup "Snort already running, soft restart"
+        /usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php $id $if_real
+        /bin/kill -HUP \${snort_pid}
         sleep 3
-		AFTER_MEM=`top | grep Wired | awk '{print $12}'`
-        cp /var/log/system.log /var/log/snort/snort_sys_$if_real_c.log
+		AFTER_MEM=`/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{print $12}'`
+        /bin/cp /var/log/system.log /var/log/snort/snort_sys_$if_real.log
+		/bin/killall syslogd
         /usr/sbin/clog -i -s 262144 /var/log/system.log
-        cp /var/log/system.log.bk /var/log/system.log
-        logger -p daemon.info -i -t SnortStartup "Snort Soft Reload For $counter_rule$if_real_c..."
-		logger -p daemon.info -i -t SnortStartup "MEM after $counter_rule$if_real_c START \${AFTER_MEM}"
+        /bin/cp /var/log/system.log.bk /var/log/system.log
+		/usr/sbin/syslogd -c -ss -f /var/etc/syslog.conf
+        /usr/bin/logger -p daemon.info -i -t SnortStartup "Snort Soft Reload For $id$if_real..."
+		/usr/bin/logger -p daemon.info -i -t SnortStartup "MEM after $id$if_real START \${AFTER_MEM}"
+		/bin/rm /tmp/snort_$id$if_real.sh.pid
         exit 1
         fi
 		
@@ -219,71 +255,75 @@ rc_start_real() {
 	
         # If no rules dir exit
 
-        if [ "ls -A /usr/local/etc/snort/snort_$counter_rule$if_real_c/rules" ] ; then
-        echo "rules DO exist"
+        if [ "/bin/ls -A /usr/local/etc/snort/snort_$id$if_real/rules" ] ; then
+        /bin/echo "rules DO exist"
         else
         exit 2
         fi
 
         # If Snort.sh is running exit
 
-        if ls /tmp/snort_$counter_rule$if_real_c.sh.pid > /dev/null ; then
-        echo "snort.sh is running"
+        if /bin/ls /tmp/snort_$id$if_real.sh.pid > /dev/null ; then
+        /bin/echo "snort.sh is running"
         exit 3
         else
-        echo "snort.sh is not running"
+        /bin/echo "snort.sh is not running"
         fi
 
         # If Snort proc is running exit
 
-        if [ "`ps -auwx | grep -v grep | grep "$counter_rule$if_real_c -c" | awk '{print $2;}'`" != "" ] ; then
-        echo "Snort is  running"
+        if [ "`/bin/ps -auwx | grep -v grep | grep "$id$if_real -c" | awk '{print $2;}'`" != "" ] ; then
+        /bin/echo "Snort is  running"
         exit 4
         fi
 
-        cp /var/log/system.log /var/log/system.log.bk
-        logger -p daemon.info -i -t SnortStartup "Snort is NOT running, hard restart"
+        /bin/cp /var/log/system.log /var/log/system.log.bk
+        /usr/bin/logger -p daemon.info -i -t SnortStartup "Snort is NOT running, hard restart"
 
-        if [ "`ps -auwx | grep -v grep | grep "$counter_rule$if_real_c -c" | awk '{print $2;}'`" = "" ] ; then
-        /bin/rm /tmp/snort_$counter_rule$if_real_c.sh.pid
+        if [ "`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "$id$if_real -c" | /usr/bin/awk '{print $2;}'`" = "" ] ; then
+        /bin/rm /tmp/snort_$id$if_real.sh.pid
         fi
 
-        echo "snort_$counter_rule$if_real_c.sh run" > /tmp/snort_$counter_rule$if_real_c.sh.pid
+        /bin/echo "snort_$id$if_real.sh run" > /tmp/snort_$id$if_real.sh.pid
 
-        echo "snort_$counter_rule$if_real_c.sh run" >> /tmp/snort_$counter_rule$if_real_c.sh_startup.log
+        /bin/echo "snort_$id$if_real.sh run" >> /tmp/snort_$id$if_real.sh_startup.log
 
         # Start the interfaces
 
-        /usr/local/bin/snort -G $counter_rule$if_real_c -R $counter_rule$if_real_c -c /usr/local/etc/snort/snort_$counter_rule$if_real_c/snort.conf -l /var/log/snort -D -i $if_real_c -q
+        /usr/local/bin/snort -G $id$if_real -R $id$if_real -c /usr/local/etc/snort/snort_$id$if_real/snort.conf -l /var/log/snort -D -i $if_real -q
 
         sleep 3
-        AFTER_MEM=`top | grep Wired | awk '{print $12}'`
-        cp /var/log/system.log /var/log/snort/snort_sys_$counter_rule$if_real_c.log
+        AFTER_MEM=`/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{print $12}'`
+        /bin/cp /var/log/system.log /var/log/snort/snort_sys_$id$if_real.log
+		/bin/killall syslogd
         /usr/sbin/clog -i -s 262144 /var/log/system.log
-        cp /var/log/system.log.bk /var/log/system.log
-        logger -p daemon.info -i -t SnortStartup "Snort HARD Reload For $counter_rule$if_real_c..."
-        logger -p daemon.info -i -t SnortStartup "MEM after $counter_rule$if_real_c START \${AFTER_MEM}"
-        echo "snort is running, but snort.sh finished removed pid"
-        /bin/rm /tmp/snort_$counter_rule$if_real_c.sh.pid
+        /bin/cp /var/log/system.log.bk /var/log/system.log
+		/usr/sbin/syslogd -c -ss -f /var/etc/syslog.conf
+        /usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD Reload For $id$if_real..."
+        /usr/bin/logger -p daemon.info -i -t SnortStartup "MEM after $id$if_real START \${AFTER_MEM}"
+        /bin/echo "snort is running, but snort.sh finished removed pid"
+        /bin/rm /tmp/snort_$id$if_real.sh.pid
 	
 }
 
 rc_stop() {
 
-		pid_s=`ps -auwx | grep -v grep | grep "$counter_rule$if_real_c -c" | awk '{print \$2;}'`
-		pid_b=`ps -auwx | grep -v grep | grep "snort.u2_$counter_rule$if_real_c" | awk '{print \$2;}'`
+		pid_s=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "$id$if_real -c" | /usr/bin/awk '{print \$2;}'`
+		pid_b=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "snort.u2_$id$if_real" | /usr/bin/awk '{print \$2;}'`
 	
 		if [ \${pid_s} ] ; then
-        cp /var/log/system.log /var/log/system.log.bk
-        logger -p daemon.info -i -t SnortStartup "Snort IS running, hard STOP"
+        /bin/cp /var/log/system.log /var/log/system.log.bk
+        /usr/bin/logger -p daemon.info -i -t SnortStartup "Snort IS running, hard STOP"
 		/bin/kill \${pid_s}; /bin/kill \${pid_b};
         sleep 3
-        AFTER_MEM=`top | grep Wired | awk '{print $12}'`
-        cp /var/log/system.log /var/log/snort/snort_sys_$counter_rule$if_real_c.log
+        AFTER_MEM=`/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{print $12}'`
+        /bin/cp /var/log/system.log /var/log/snort/snort_sys_$id$if_real.log
+		/bin/killall syslogd
         /usr/sbin/clog -i -s 262144 /var/log/system.log
-        cp /var/log/system.log.bk /var/log/system.log
-        logger -p daemon.info -i -t SnortStartup "Snort HARD STOP For $counter_rule$if_real_c..."
-        logger -p daemon.info -i -t SnortStartup "MEM after $counter_rule$if_real_c STOP \${AFTER_MEM}"
+        /bin/cp /var/log/system.log.bk /var/log/system.log
+		/usr/sbin/syslogd -c -ss -f /var/etc/syslog.conf
+        /usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD STOP For $id$if_real..."
+        /usr/bin/logger -p daemon.info -i -t SnortStartup "MEM after $id$if_real STOP \${AFTER_MEM}"
 		fi
 }
 
@@ -306,29 +346,16 @@ esac
 EOD;
 
         /* write out snort.sh */
-        $bconf = fopen("/usr/local/etc/rc.d/snort_$counter_rule$if_real_c.sh", "w");
+        $bconf = fopen("/usr/local/etc/rc.d/snort_$id$if_real.sh", "w");
         if(!$bconf) {
-                log_error("Could not open /usr/local/etc/rc.d/snort_$counter_rule$if_real_c.sh for writing.");
+                log_error("Could not open /usr/local/etc/rc.d/snort_$id$if_real.sh for writing.");
                 exit;
         }
 		/* write snort.sh */
         fwrite($bconf, $snort_sh_text);
         fclose($bconf);
-		
-}
-
-	/* create snort configuration file */
-	create_snort_conf();
-
-/* create barnyard2 configuration file */
-$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
-if ($snortbarnyardlog_info_chk == on)
-       create_barnyard2_conf();
-
-conf_mount_ro();
 
 }
-
 
 /* open barnyard2.conf for writing */
 function create_barnyard2_conf() {
@@ -511,11 +538,29 @@ function generate_snort_conf() {
 
 	global $config, $g, $if_real, $id;
 	conf_mount_rw();
+
 	/* obtain external interface */
 	/* XXX: make multi wan friendly */
 	$snort_ext_int = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
 
 //	$snort_config_pass_thru = $config['installedpackages']['snortglobal']['rule'][$id]['configpassthru'];
+
+	/* create basic files */
+	if(!file_exists("/usr/local/etc/snort/snort/snort_$id$if_real")) {
+	exec("/bin/mkdir -p /usr/local/etc/snort/snort_$id$if_real/");
+	exec("/bin/mkdir -p /usr/local/etc/snort/snort_$id$if_real/rules");
+
+	if(!file_exists("/usr/local/etc/snort/snort_$id$if_real/gen-msg.map")) {
+	exec("/bin/cp /usr/local/etc/snort/classification.config /usr/local/etc/snort/snort_$id$if_real/classification.config");
+	exec("/bin/cp /usr/local/etc/snort/gen-msg.map /usr/local/etc/snort/snort_$id$if_real/gen-msg.map");
+	exec("/bin/cp /usr/local/etc/snort/reference.config /usr/local/etc/snort/snort_$id$if_real/reference.config");
+	exec("/bin/cp /usr/local/etc/snort/sid-msg.map /usr/local/etc/snort/snort_$id$if_real/sid-msg.map");
+	exec("/bin/cp /usr/local/etc/snort/unicode.map /usr/local/etc/snort/snort_$id$if_real/unicode.map");
+	exec("/bin/cp /usr/local/etc/snort/threshold.conf /usr/local/etc/snort/snort_$id$if_real/threshold.conf");
+	exec("/bin/cp /usr/local/etc/snort/snort.conf /usr/local/etc/snort/snort_$id$if_real/snort.conf");
+	exec("/bin/mkdir -p /usr/local/etc/snort/snort_$id$if_real/rules");
+		}
+	}
 	
 /* define snortalertlogtype */
 $snortalertlogtype = $config['installedpackages']['snortglobal']['rule'][$id]['snortalertlogtype'];
@@ -1086,8 +1131,8 @@ function snort_rules_up_install_cron($should_install) {
 			if($vip['subnet']) 
 				$home_net .= $vip['subnet'] . " ";
 
-	if($config['installedpackages']['snortwhitelist'])
-		foreach($config['installedpackages']['snortglobal']['snortwhitelist'] as $snort)
+	if($config['installedpackages']['snortglobal'])
+		foreach($config['installedpackages']['snortglobal']['whitelist'] as $snort)
 			if($snort['ip']) 
 				$home_net .= $snort['ip'] . " ";
 
@@ -1610,7 +1655,7 @@ function verify_snort_rules_md5($tmpfname) {
 	}
 
         $md555 = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
-        $md5 = `/bin/echo "{$md555}" | /usr/bin/awk '{ print $4 }'`;
+        $md5 = `echo "{$md555}" | /usr/bin/awk '{ print $4 }'`;
 	$file_md5_ondisk = `/sbin/md5 {$tmpfname}/{$snort_filename} | /usr/bin/awk '{ print $4 }'`;
 	if($md5 == $file_md5_ondisk) {
 		if(!$console_mode) {

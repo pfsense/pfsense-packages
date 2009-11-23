@@ -155,13 +155,13 @@ function enable_change(enable_change) {
   <tr><td class="tabnavtbl">
 <?php
 	$tab_array = array();
-	$tab_array[] = array("Snort Inertfaces", false, "snort_interfaces.php");
-	$tab_array[] = array("Global Settings", true, "snort_interfaces_global.php");
-	$tab_array[] = array("Rule Updates", false, "services_captiveportal_ip.php");
-	$tab_array[] = array("Alerts", false, "services_captiveportal_users.php");
-    $tab_array[] = array("Blocked", false, "services_captiveportal_filemanager.php");
-	$tab_array[] = array("Whitelists", false, "services_captiveportal_users.php");
-	$tab_array[] = array("Help & Info", false, "services_captiveportal_filemanager.php");
+	$tab_array[] = array("Snort Inertfaces", false, "/snort/snort_interfaces.php");
+	$tab_array[] = array("Global Settings", true, "/snort/snort_interfaces_global.php");
+	$tab_array[] = array("Rule Updates", false, "/snort/snort_download_rules.php");
+	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
+    $tab_array[] = array("Blocked", false, "/snort/snort_blocked.php");
+	$tab_array[] = array("Whitelists", false, "/pkg.php?xml=/snort/snort_whitelist.xml");
+	$tab_array[] = array("Help & Info", false, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 ?>    </td></tr>
   <tr>
