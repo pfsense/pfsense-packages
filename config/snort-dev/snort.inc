@@ -121,6 +121,8 @@ function sync_package_snort()
 //	if($bpfmaxinsns)
 //		mwexec_bg("sysctl net.bpf.maxinsns={$bpfmaxinsns}");
 
+/* do not start config build if rules is empty */
+if (!empty($config['installedpackages']['snortglobal']['rule'])) {
 if ($id == "") {
 
 $rule_array = $config['installedpackages']['snortglobal']['rule'];
@@ -158,7 +160,8 @@ if ($snortbarnyardlog_info_chk == on)
 	if ($snortbarnyardlog_info_chk == on)
        create_barnyard2_conf();
 	
-}	   
+	}
+}	
 
 conf_mount_ro();
 
@@ -1126,12 +1129,13 @@ function snort_rules_up_install_cron($should_install) {
 	$home_net .= "127.0.0.1 "; 	
 	
 	/* iterate all vips and add to whitelist */
+	
 	if($config['virtualip'])
 		foreach($config['virtualip']['vip'] as $vip)
 			if($vip['subnet']) 
 				$home_net .= $vip['subnet'] . " ";
 
-	if($config['installedpackages']['snortglobal'])
+	if($config['installedpackages']['snortglobal']['whitelist'])
 		foreach($config['installedpackages']['snortglobal']['whitelist'] as $snort)
 			if($snort['ip']) 
 				$home_net .= $snort['ip'] . " ";

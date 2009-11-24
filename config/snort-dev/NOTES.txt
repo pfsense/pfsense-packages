@@ -18,8 +18,6 @@ Move the Snort GUI to base of Pfsense. The divert options should be added to fir
 
 Ask Ermal to add divert out to Pfsense again though, he has kept divert in.
 
-
-
 =================================
 Any Devs that would like to help please work on snort_rules_edit.php and snort_rules.php. They work but need cleaning up.
 =================================
