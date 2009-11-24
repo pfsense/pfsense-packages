@@ -729,6 +729,9 @@ exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl /usr/local/etc/snort/r
 
 /* Start the proccess for every interface rule */
 /* TODO: try to make the code smother */
+
+if (!empty($config['installedpackages']['snortglobal']['rule'])) {
+
 $rule_array = $config['installedpackages']['snortglobal']['rule'];
 $id = -1;
 foreach ($rule_array as $value) {
@@ -743,9 +746,9 @@ $if_real = convert_friendly_interface_to_real_interface_name($result_lan);
 	
 	/* run oinkmaster for each interface rule */
 	oinkmaster_run();
-	
-}
 
+	}
+}
 
 /* open oinkmaster_conf for writing" function */
 function oinkmaster_conf() {
