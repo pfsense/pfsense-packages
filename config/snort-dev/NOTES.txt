@@ -18,6 +18,15 @@ Move the Snort GUI to base of Pfsense. The divert options should be added to fir
 
 Ask Ermal to add divert out to Pfsense again though, he has kept divert in.
 
+=====================
+What Im working on
+=====================
+
+snort.inc 
+Must be recoded so that it reads the [snortglobal] [snortglobal][rule] options in conf.xml and makes the files whitelist, snort.sh, snort.conf, and barnyard.conf.
+This is easy, just cut and paste from the old snort.inc. I will work on this.
+
+
 =================================
 Any Devs that would like to help please work on snort_rules_edit.php and snort_rules.php. They work but need cleaning up.
 =================================

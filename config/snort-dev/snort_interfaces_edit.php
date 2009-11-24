@@ -119,9 +119,13 @@ if ($_POST["Submit"]) {
 //				$input_errors[] = "The target port range must be an integer between 1 and 65535.";
 //		}
 
-//		if ($a_nat[$id]['performance'] == "lowmem") {
-//			$input_errors[] = "This is a test of error echecking";
-//		}
+		if ($_POST['interface'] == $pconfig['interface']) {
+			$input_errors[] = "The {$pconfig['interface']} interface is in use. Please select another interface.";
+		}
+		
+		if ($pconfig['descr'] == "") {
+			$input_errors[] = "Please  enter a description for your reference.";
+		}
 
 
 	/* check for overlaps */

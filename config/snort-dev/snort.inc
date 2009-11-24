@@ -239,7 +239,7 @@ rc_start() {
         /usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php $id $if_real
         /bin/kill -HUP \${snort_pid}
         sleep 3
-		AFTER_MEM=`/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{print $12}'`
+		AFTER_MEM=`/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{print $2}'`
         /bin/cp /var/log/system.log /var/log/snort/snort_sys_$if_real.log
 		/bin/killall syslogd
         /usr/sbin/clog -i -s 262144 /var/log/system.log

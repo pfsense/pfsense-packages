@@ -161,6 +161,17 @@ border-top:2px solid #DBAC48;
 border-bottom:2px solid #DBAC48;
 padding: 15px 10px 50% 50px;
 }
+.listbg2 {
+	border-right: 1px solid #999999;
+	border-bottom: 1px solid #999999;
+	font-size: 11px;
+	background-color: #090;
+	color: #000;	
+	padding-right: 16px;
+	padding-left: 6px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
 </style> 
 <noscript><div class="alert" ALIGN=CENTER><img src="/themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
 
@@ -215,7 +226,17 @@ padding: 15px 10px 50% 50px;
                 <tr valign="top" id="fr<?=$nnats;?>">
                   <td class="listt"><input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0; width: 15px; height: 15px;"></td>
                   <td class="listt" align="center"></td>
-                  <td class="listlr" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
+					<?php	
+					/* convert fake interfaces to real and check if iface is up */
+					$if_real = convert_friendly_interface_to_real_interface_name($natent['interface']);
+					$color_up = exec("/bin/ps -auwx | grep -v grep | grep \"{$nnats}{$if_real} -c\" | awk '{print $2;}'");		
+					If ($color_up != "") {
+						$class_color_up = "listbg2";
+					}else{
+						$class_color_up = "listbg";
+					}			
+					?>
+                  <td class="<?=$class_color_up;?>" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 		    <?php
 			if (!$natent['interface'] || ($natent['interface'] == "wan"))
 				echo "WAN";
@@ -226,7 +247,7 @@ padding: 15px 10px 50% 50px;
 			else if(strtolower($natent['interface']) == "pptp")
 				echo "PPTP";
 			else
-				echo strtoupper($config['interfaces'][$natent['interface']]['descr']);
+				echo strtoupper($config['interfaces']);
 		    ?>
                   </td>
                   <td class="listr" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
