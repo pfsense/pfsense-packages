@@ -16,8 +16,6 @@ function Fit123_install_config() {
 //Adding new themes
 	exec("tar -zxovf /usr/local/pkg/code-red.tar.gz");
 	exec("mv code-red /usr/local/www/themes/code-red");
-	exec("tar -zxovf /usr/local/pkg/pfsense_ng.tar.gz");
-	exec("mv pfsense\ ng /usr/local/www/themes/pfsense\ ng");
 //Creating backup directory
 	exec("mkdir /usr/local/pkg/Fit123");
 	exec("mkdir /usr/local/pkg/Fit123/backup");
