@@ -40,7 +40,7 @@ $id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
 
-$interface_fake = $config['installedpackages']['snortglobal']['rule'][$id][interface];
+$interface_fake = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
 $if_real = convert_friendly_interface_to_real_interface_name($interface_fake);
 
 /* Allow additional execution time 0 = no limit. */
@@ -131,7 +131,7 @@ foreach ($rule_array as $value) {
 
 $id += 1;
 
-$result_lan = $config['installedpackages']['snortglobal']['rule'][$id][interface];
+$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
 $if_real = convert_friendly_interface_to_real_interface_name($result_lan);
 
 	/* create snort configuration file */

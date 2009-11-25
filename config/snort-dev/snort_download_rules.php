@@ -738,7 +738,7 @@ foreach ($rule_array as $value) {
 
 $id += 1;
 
-$result_lan = $config['installedpackages']['snortglobal']['rule'][$id][interface];
+$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
 $if_real = convert_friendly_interface_to_real_interface_name($result_lan);
 
 	/* make oinkmaster.conf for each interface rule */

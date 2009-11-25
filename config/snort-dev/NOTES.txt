@@ -18,28 +18,14 @@ Move the Snort GUI to base of Pfsense. The divert options should be added to fir
 
 Ask Ermal to add divert out to Pfsense again though, he has kept divert in.
 
-=====================
-What Im working on
-=====================
-
-snort.inc 
-Must be recoded so that it reads the [snortglobal] [snortglobal][rule] options in conf.xml and makes the files whitelist, snort.sh, snort.conf, and barnyard.conf.
-This is easy, just cut and paste from the old snort.inc. I will work on this.
-
-
 =================================
 Any Devs that would like to help please work on snort_rules_edit.php and snort_rules.php. They work but need cleaning up.
 =================================
 
 To get snort_rules_edit.php and snort_rules.php working 
 
-Add at least on rule to snort_interfaces.php.
-
-Add at least one snort rule file to /usr/local/etc/snort/snort_0vr1/rules/.
-Should look like this /usr/local/etc/snort/snort_0vr1/rules/attack-responses.rules.
-Note that "snort_0vr1" should be chaned to what interface option you added.
-
-http://www.emergingthreats.net/rules/emerging.rules.tar.gz
+ * Update the rules.
+ * Add at least on rule to snort_interfaces.php.
 
 snort_rules_edit.php 
 Make sure all snort sig options that are in the GUI are written to file.
@@ -49,14 +35,19 @@ Change the way the rules get disabled, by removing the x icon image and replacin
 This should improve the users experience. Moreover, check boxes could be added to blocked.php tab to improve performance.
 Users always complain that the way were deleting options is slow. 
 
-create whitelist.php and help_info.php
-
-
 ===========================================
 Misc.
 ===========================================
 
-Adding extry options to the new snort gui for snort_inline should be easy once we have it working.
+All further development will be in Freebsd 8. 
+
+ALL further snort and barnyard builds will be mmx sse.
+
+All further snort builds will have snort_inline code.
+
+All further builds will have "did I start on a pfsense system" code, if not, exit.
+
+Adding extra options to the new snort gui for snort_inline should be easy.
 
 Snort_inline binaries with custom c++ code ready to go.
 
