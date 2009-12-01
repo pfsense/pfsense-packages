@@ -105,6 +105,10 @@ function sync_package_snort()
 		exec("/bin/rm -f /usr/local/etc/rc.d/snort");
 	}
 	
+	if(!file_exists("/usr/local/etc/snort/custom_rules")) {
+	exec("/bin/mkdir -p /usr/local/etc/snort/custom_rules/");
+	}
+	
 	/* remove example files */
 	/* TODO: remove these filese during binary builds */
 	if(file_exists("/usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so.0")) {
@@ -178,6 +182,17 @@ conf_mount_ro();
 
 /* Start of main config files */
 /* Start of main config files */
+
+/* if rules exist copy to new interfaces */
+$if_rule_dir = "/usr/local/etc/snort/snort_$id$if_real/rules";
+$folder_chk = (count(glob("$if_rule_dir/*")) === 0) ? 'empty' : 'full';
+
+if($folder_chk == "empty") {
+	exec("/bin/cp -R /usr/local/etc/snort/rules /usr/local/etc/snort/snort_$id$if_real");
+	if(file_exists("/usr/local/etc/snort/custom_rules/local_$id$if_real.rules")) {
+		exec("/bin/cp /usr/local/etc/snort/custom_rules/local_$id$if_real.rules /usr/local/etc/snort/snort_$id$if_real/rules/local_$id$if_real.rules");
+	}
+}
 
 /* open snort.sh for writing" */
 function create_snort_sh() {

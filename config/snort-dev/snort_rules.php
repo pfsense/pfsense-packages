@@ -416,6 +416,21 @@ function go()
 }
 // -->
 </script>
+<script type="text/javascript">
+<!--
+function popup(url) 
+{
+ params  = 'width='+screen.width;
+ params += ', height='+screen.height;
+ params += ', top=0, left=0'
+ params += ', fullscreen=yes';
+
+ newwin=window.open(url,'windowname4', params);
+ if (window.focus) {newwin.focus()}
+ return false;
+}
+// -->
+</script
 
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
   <tr>
@@ -601,7 +616,8 @@ function go()
                                           <td valign="middle" nowrap class="list">
                                             <table border="0" cellspacing="0" cellpadding="1">
                                                 <tr>
-                                                  <td><a href="snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$file;?>&ids=<?=$counter;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="edit rule" width="17" height="17" border="0"></a></td>
+                                                  <td><a href="javascript: void(0)"onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$file;?>&ids=<?=$counter;?>')"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="edit rule" width="17" height="17" border="0"></a></td>
+												  <!-- Codes by Quackit.com -->												
                                                 </tr>
                                             </table>
                                         </td>
