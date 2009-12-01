@@ -93,18 +93,27 @@ function sync_package_snort()
 	exec("/bin/mkdir -p /usr/local/etc/snort/rules");
 
 	if(file_exists("/usr/local/etc/snort/snort.conf-sample")) {
-	exec("/bin/rm /usr/local/etc/snort/snort.conf-sample");
-	exec("/bin/rm /usr/local/etc/snort/threshold.conf-sample");
-	exec("/bin/rm /usr/local/etc/snort/sid-msg.map-sample");
-	exec("/bin/rm /usr/local/etc/snort/unicode.map-sample");
-	exec("/bin/rm /usr/local/etc/snort/classification.config-sample");
-	exec("/bin/rm /usr/local/etc/snort/generators-sample");
-	exec("/bin/rm /usr/local/etc/snort/reference.config-sample");
-	exec("/bin/rm /usr/local/etc/snort/gen-msg.map-sample");
-	exec("/bin/rm /usr/local/etc/snort/sid");
-	exec("/bin/rm -f /usr/local/etc/rc.d/snort");
+		exec("/bin/rm /usr/local/etc/snort/snort.conf-sample");
+		exec("/bin/rm /usr/local/etc/snort/threshold.conf-sample");
+		exec("/bin/rm /usr/local/etc/snort/sid-msg.map-sample");
+		exec("/bin/rm /usr/local/etc/snort/unicode.map-sample");
+		exec("/bin/rm /usr/local/etc/snort/classification.config-sample");
+		exec("/bin/rm /usr/local/etc/snort/generators-sample");
+		exec("/bin/rm /usr/local/etc/snort/reference.config-sample");
+		exec("/bin/rm /usr/local/etc/snort/gen-msg.map-sample");
+		exec("/bin/rm /usr/local/etc/snort/sid");
+		exec("/bin/rm -f /usr/local/etc/rc.d/snort");
 	}
-
+	
+	/* remove example files */
+	/* TODO: remove these filese during binary builds */
+	if(file_exists("/usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so.0")) {
+	exec('/bin/rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example*');
+	}
+	if(file_exists("/usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example.so")) {
+	exec('/bin/rm /usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example*');
+	}	
+	
 	/* snort advanced features - bpf tuning */
 //	if($bpfbufsize)
 //		$start .= "sysctl net.bpf.bufsize={$bpfbufsize}\n";

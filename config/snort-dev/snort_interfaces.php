@@ -31,6 +31,7 @@
 
 require("guiconfig.inc");
 require("/usr/local/pkg/snort/snort_gui.inc");
+include_once("/usr/local/pkg/snort/snort.inc");
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
@@ -153,12 +154,15 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "") {
 	$snort_pid2 = exec("/bin/ps -auwx | grep -v grep | grep \"$if_real2 -c\" | awk '{print $2;}'");
 	if ($snort_pid2 != "") {
 		exec("/bin/sh /usr/local/etc/rc.d/snort_{$id}{$if_real2}.sh stop");
+		header("Location: snort_interfaces.php");
 	}else{
+		sync_package_snort();
 		exec("/bin/sh /usr/local/etc/rc.d/snort_{$id}{$if_real2}.sh start");
+		header("Location: snort_interfaces.php");
 	}
 }	
 
-$pgtitle = "Services: Snort 2.8.4.1_5 pkg v. 1.8 alpha";
+$pgtitle = "Services: Snort 2.8.4.1_5 pkg v. 1.8 beta";
 include("head.inc");
 
 ?>
