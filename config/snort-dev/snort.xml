@@ -146,7 +146,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort-dev/snort_rules.php.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_rules.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>

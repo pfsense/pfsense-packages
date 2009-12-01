@@ -32,6 +32,10 @@
 require("guiconfig.inc");
 require("/usr/local/pkg/snort/snort_gui.inc");
 
+$id = $_GET['id'];
+if (isset($_POST['id']))
+	$id = $_POST['id'];
+
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
 
@@ -77,7 +81,7 @@ if (isset($_POST['del_x'])) {
 			/* convert fake interfaces to real */
 			$if_real = convert_friendly_interface_to_real_interface_name($a_nat[$rulei]['interface']);
 			
-			$snort_pid = exec("/bin/ps -auwx | grep -v grep | grep \"ng0 -c\" | awk '{print $2;}'");
+			$snort_pid = exec("/bin/ps -auwx | grep -v grep | grep \"$if_real -c\" | awk '{print $2;}'");
 			
 			if ($snort_pid != "") {
 			exec("/bin/sh /usr/local/etc/rc.d/snort_{$rulei}{$if_real}.sh stop");			
@@ -142,6 +146,18 @@ if (isset($_POST['del_x'])) {
         }
 }
 
+
+/* start/stop snort */
+if ($_GET['act'] == "toggle" && $_GET['id'] != "") {
+	$if_real2 = convert_friendly_interface_to_real_interface_name($a_nat[$id]['interface']);
+	$snort_pid2 = exec("/bin/ps -auwx | grep -v grep | grep \"$if_real2 -c\" | awk '{print $2;}'");
+	if ($snort_pid2 != "") {
+		exec("/bin/sh /usr/local/etc/rc.d/snort_{$id}{$if_real2}.sh stop");
+	}else{
+		exec("/bin/sh /usr/local/etc/rc.d/snort_{$id}{$if_real2}.sh start");
+	}
+}	
+
 $pgtitle = "Services: Snort 2.8.4.1_5 pkg v. 1.8 alpha";
 include("head.inc");
 
@@ -205,7 +221,7 @@ padding: 15px 10px 50% 50px;
 	<div id="mainarea">
               <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr id="frheader">
-		  <td width="3%" class="list">&nbsp;</td>
+				<td width="4%" class="list">&nbsp;</td>
 		          <td width="1%" class="list">&nbsp;</td>
                   <td width="10%" class="listhdrr">If</td>
 				  <td width="10%" class="listhdrr">Snort</td>
@@ -217,25 +233,27 @@ padding: 15px 10px 50% 50px;
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
 			<td width="17"></td>
-                        <td><a href="snort_interfaces_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+                        <td><a href="snort_interfaces_edit.php"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
                       </tr>
                     </table>
 		  </td>
 		</tr>
 	<?php $nnats = $i = 0; foreach ($a_nat as $natent): ?>
                 <tr valign="top" id="fr<?=$nnats;?>">
-                  <td class="listt"><input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0; width: 15px; height: 15px;"></td>
-                  <td class="listt" align="center"></td>
 					<?php	
 					/* convert fake interfaces to real and check if iface is up */
 					$if_real = convert_friendly_interface_to_real_interface_name($natent['interface']);
 					$color_up = exec("/bin/ps -auwx | grep -v grep | grep \"{$nnats}{$if_real} -c\" | awk '{print $2;}'");		
 					If ($color_up != "") {
 						$class_color_up = "listbg2";
+						$iconfn = "block";
 					}else{
 						$class_color_up = "listbg";
+						$iconfn = "pass";
 					}			
 					?>
+                  <td class="listt"><a href="?act=toggle&id=<?=$i;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_<?=$iconfn;?>.gif" width="13" height="13" border="0" title="click to toggle start/stop snort"></a><input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0; width: 7px; height: 7px;"></td>
+                  <td class="listt" align="center"></td>
                   <td class="<?=$class_color_up;?>" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 		    <?php
 			if (!$natent['interface'] || ($natent['interface'] == "wan"))

@@ -124,28 +124,7 @@ if ($_POST) {
 include("head.inc");
 ?>
 <?php include("fbegin.inc"); ?>
-<script language="JavaScript">
-<!--
 
-/* make shure all the settings exist or function hide will not work */
-function enable_change(enable_change) {
-	var endis, radius_endis;
-	endis = !(document.iform.enable.checked || enable_change);
-//	radius_endis = !((!endis && document.iform.auth_method[2].checked) || enable_change);
-
-	document.iform.snortdownload[0].disabled = endis;
-	document.iform.snortdownload[1].disabled = endis;
-	document.iform.snortdownload[2].disabled = endis;
-	document.iform.oinkmastercode.disabled = endis;
-	document.iform.emergingthreats.disabled = endis;
-	document.iform.rm_blocked.disabled = endis;
-	document.iform.autorulesupdate7.disabled = endis;
-	document.iform.whitelistvpns.disabled = endis;
-	document.iform.clickablalerteurls.disabled = endis;
-	document.iform.associatealertip.disabled = endis;
-}
-//-->
-</script>
 <p class="pgtitle"><?=$pgtitle?></p>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php if ($input_errors) print_input_errors($input_errors); ?>

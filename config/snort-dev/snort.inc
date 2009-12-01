@@ -293,7 +293,7 @@ rc_start_real() {
 
         # Start the interfaces
 
-        /usr/local/bin/snort -G $id$if_real -R $id$if_real -c /usr/local/etc/snort/snort_$id$if_real/snort.conf -l /var/log/snort -D -i $if_real -q
+        /usr/local/bin/snort -G $id -R $id$if_real -c /usr/local/etc/snort/snort_$id$if_real/snort.conf -l /var/log/snort -D -i $if_real -q
 
         sleep 3
         AFTER_MEM=`/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{print $12}'`
@@ -1295,7 +1295,7 @@ portvar DCERPC_BRIGHTSTORE [6503,6504]
                     #
 #####################
 
-var RULE_PATH /usr/local/etc/snort/rules
+var RULE_PATH /usr/local/etc/snort/snort_$id$if_real/rules
 # var PREPROC_RULE_PATH ./preproc_rules
 
 ################################
@@ -1336,17 +1336,10 @@ dynamicdetection directory /usr/local/lib/snort/dynamicrules/
 ###################
 
 preprocessor frag3_global: max_frags 8192
-preprocessor frag3_engine: policy windows
-preprocessor frag3_engine: policy linux
-preprocessor frag3_engine: policy first
 preprocessor frag3_engine: policy bsd detect_anomalies
 
 preprocessor stream5_global: max_tcp 8192, track_tcp yes, \
 track_udp yes, track_icmp yes
-preprocessor stream5_tcp: bind_to any, policy windows
-preprocessor stream5_tcp: bind_to any, policy linux
-preprocessor stream5_tcp: bind_to any, policy vista
-preprocessor stream5_tcp: bind_to any, policy macos
 preprocessor stream5_tcp: policy BSD, ports both all, use_static_footprint_sizes
 preprocessor stream5_udp
 preprocessor stream5_icmp
@@ -1358,7 +1351,7 @@ preprocessor stream5_icmp
                          #
 ##########################
 
-preprocessor perfmonitor: time 300 file /var/log/snort/snort.stats pktcnt 10000
+preprocessor perfmonitor: time 300 file /var/log/snort/snort_$id$if_real.stats pktcnt 10000
 
 #################
                 #
@@ -1370,7 +1363,6 @@ preprocessor http_inspect: global iis_unicode_map unicode.map 1252
 
 preprocessor http_inspect_server: server default \
                         ports  { 80 8080 }  \
-                        no_alerts \
                         non_strict \
                         non_rfc_char  { 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 }  \
                         flow_depth 0  \
@@ -1542,9 +1534,9 @@ $spoink_type
                 #
 #################
 
-include /usr/local/etc/snort/reference.config
-include /usr/local/etc/snort/classification.config
-include /usr/local/etc/snort/threshold.conf
+include /usr/local/etc/snort/snort_$id$if_real/reference.config
+include /usr/local/etc/snort/snort_$id$if_real/classification.config
+include /usr/local/etc/snort/snort_$id$if_real/threshold.conf
 
 # Snort user pass through configuration
 {$snort_config_pass_thru}

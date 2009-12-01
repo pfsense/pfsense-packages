@@ -119,14 +119,28 @@ if ($_POST["Submit"]) {
 //				$input_errors[] = "The target port range must be an integer between 1 and 65535.";
 //		}
 
-		if ($_POST['interface'] == $pconfig['interface']) {
-			$input_errors[] = "The {$pconfig['interface']} interface is in use. Please select another interface.";
-		}
 		
-		if ($pconfig['descr'] == "") {
-			$input_errors[] = "Please  enter a description for your reference.";
-		}
+		// if ($config['installedpackages']['snortglobal']['rule']) {
+			if ($_POST['descr'] == "") {
+				$input_errors[] = "Please  enter a description for your reference.";
+				}
+			
+			if ($id == "" && $config['installedpackages']['snortglobal']['rule'][0]['interface'] != "") {
 
+			$rule_array = $config['installedpackages']['snortglobal']['rule'];
+			$id_c = -1;
+			foreach ($rule_array as $value) {
+
+			$id_c += 1;
+
+			$result_lan = $config['installedpackages']['snortglobal']['rule'][$id_c]['interface'];
+			$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+
+				if ($_POST['interface'] == $result_lan) {	
+				$input_errors[] = "Interface $result_lan is in use. Please select another interface.";
+					}			
+				}
+			}
 
 	/* check for overlaps */
 	foreach ($a_nat as $natent) {
@@ -169,8 +183,6 @@ if ($_POST["Submit"]) {
 
 		write_config();
 		// stop_service("snort");
-		//create_snort_conf();
-		//create_barnyard2_conf();
 
 		if ($pconfig['interface'] != "") {
 		sync_package_snort();
