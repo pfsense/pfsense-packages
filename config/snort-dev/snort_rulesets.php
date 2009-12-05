@@ -29,7 +29,7 @@
 */
 
 require("guiconfig.inc");
-require("filter.inc");
+require_once("filter.inc");
 require_once("service-utils.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {

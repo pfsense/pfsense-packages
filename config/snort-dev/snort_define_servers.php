@@ -57,7 +57,17 @@ if (isset($_GET['dup'])) {
 
 if (isset($id) && $a_nat[$id]) {
 
-	/* new options */
+	/* old options */
+	$pconfig['def_ssl_ports_ignore'] = $a_nat[$id]['def_ssl_ports_ignore'];
+	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
+	$pconfig['perform_stat'] = $a_nat[$id]['perform_stat'];
+	$pconfig['http_inspect'] = $a_nat[$id]['http_inspect'];
+	$pconfig['other_preprocs'] = $a_nat[$id]['other_preprocs'];
+	$pconfig['ftp_preprocessor'] = $a_nat[$id]['ftp_preprocessor'];
+	$pconfig['smtp_preprocessor'] = $a_nat[$id]['smtp_preprocessor'];
+	$pconfig['sf_portscan'] = $a_nat[$id]['sf_portscan'];
+	$pconfig['dce_rpc_2'] = $a_nat[$id]['dce_rpc_2'];
+	$pconfig['dns_preprocessor'] = $a_nat[$id]['dns_preprocessor'];
 	$pconfig['def_dns_servers'] = $a_nat[$id]['def_dns_servers'];
 	$pconfig['def_dns_ports'] = $a_nat[$id]['def_dns_ports'];
 	$pconfig['def_smtp_servers'] = $a_nat[$id]['def_smtp_servers'];
@@ -91,7 +101,6 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['def_rlogin_ports'] = $a_nat[$id]['def_rlogin_ports'];
 	$pconfig['def_rsh_ports'] = $a_nat[$id]['def_rsh_ports'];
 	$pconfig['def_ssl_ports'] = $a_nat[$id]['def_ssl_ports'];
-	/* old options */
 	$pconfig['barnyard_enable'] = $a_nat[$id]['barnyard_enable'];
 	$pconfig['barnyard_mysql'] = $a_nat[$id]['barnyard_mysql'];
 	$pconfig['enable'] = $a_nat[$id]['enable'];
@@ -103,7 +112,6 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
 	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
 	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];
-	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
 
 if (isset($_GET['dup']))
 	unset($id);	
@@ -119,19 +127,29 @@ if ($_POST) {
 /* if no errors write to conf */
 	if (!$input_errors) {
 		$natent = array();
-		/* repost the options already in conf */
-		$natent['enable'] = $pconfig['enable'];
-		$natent['interface'] = $pconfig['interface'];
-		$natent['descr'] = $pconfig['descr'];
-		$natent['performance'] = $pconfig['performance'];
-		$natent['blockoffenders7'] = $pconfig['blockoffenders7'];
-		$natent['snortalertlogtype'] = $pconfig['snortalertlogtype'];
-		$natent['alertsystemlog'] = $pconfig['alertsystemlog'];
-		$natent['tcpdumplog'] = $pconfig['tcpdumplog'];
-		$natent['snortunifiedlog'] = $pconfig['snortunifiedlog'];
-		$natent['flow_depth'] = $pconfig['flow_depth'];
-		$natent['barnyard_enable'] = $pconfig['barnyard_enable'];
-		$natent['barnyard_mysql'] = $pconfig['barnyard_mysql'];
+	/* repost the options already in conf */
+	if ($pconfig['interface'] != "") { $natent['interface'] = $pconfig['interface']; }
+	if ($pconfig['enable'] != "") { $natent['enable'] = $pconfig['enable']; }
+	if ($pconfig['descr'] != "") { $natent['descr'] = $pconfig['descr']; }
+	if ($pconfig['performance'] != "") { $natent['performance'] = $pconfig['performance']; }
+	if ($pconfig['blockoffenders7'] != "") { $natent['blockoffenders7'] = $pconfig['blockoffenders7']; }
+	if ($pconfig['snortalertlogtype'] != "") { $natent['snortalertlogtype'] = $pconfig['snortalertlogtype']; }
+	if ($pconfig['alertsystemlog'] != "") { $natent['alertsystemlog'] = $pconfig['alertsystemlog']; }
+	if ($pconfig['tcpdumplog'] != "") { $natent['tcpdumplog'] = $pconfig['tcpdumplog']; }
+	if ($pconfig['snortunifiedlog'] != "") { $natent['snortunifiedlog'] = $pconfig['snortunifiedlog']; }	
+	if ($pconfig['def_ssl_ports_ignore'] != "") { $natent['def_ssl_ports_ignore'] = $pconfig['def_ssl_ports_ignore']; }
+	if ($pconfig['flow_depth'] != "") { $natent['flow_depth'] = $pconfig['flow_depth']; }
+	if ($pconfig['perform_stat'] != "") { $natent['perform_stat'] = $pconfig['perform_stat']; }
+	if ($pconfig['http_inspect'] != "") { $natent['http_inspect'] = $pconfig['http_inspect']; }
+	if ($pconfig['other_preprocs'] != "") { $natent['other_preprocs'] = $pconfig['other_preprocs']; }
+	if ($pconfig['ftp_preprocessor'] != "") { $natent['ftp_preprocessor'] = $pconfig['ftp_preprocessor']; }
+	if ($pconfig['smtp_preprocessor'] != "") { $natent['smtp_preprocessor'] = $pconfig['smtp_preprocessor']; }
+	if ($pconfig['sf_portscan'] != "") { $natent['sf_portscan'] = $pconfig['sf_portscan']; }
+	if ($pconfig['dce_rpc_2'] != "") { $natent['dce_rpc_2'] = $pconfig['dce_rpc_2']; }
+	if ($pconfig['dns_preprocessor'] != "") { $natent['dns_preprocessor'] = $pconfig['dns_preprocessor']; }
+	if ($pconfig['barnyard_enable'] != "") { $natent['barnyard_enable'] = $pconfig['barnyard_enable']; }
+	if ($pconfig['barnyard_mysql'] != "") { $natent['barnyard_mysql'] = $pconfig['barnyard_mysql']; }
+	
 		
 		/* post new options */
 		if ($_POST['def_dns_servers'] != "") { $natent['def_dns_servers'] = $_POST['def_dns_servers']; }else{ $natent['def_dns_servers'] = ""; }

@@ -79,9 +79,6 @@ function snort_postinstall()
 {
 	global $config;
 	conf_mount_rw();
-	
-	exec("/usr/sbin/pw groupadd snort");
-	exec('/usr/sbin/pw useradd snort -c "SNORT USER" -d /nonexistent -g snort -s /sbin/nologin');
 
 	if(!file_exists("/var/log/snort/"))
 	mwexec("mkdir -p /var/log/snort/");
@@ -283,7 +280,7 @@ function create_snort_sh()
 	/* define snortbarnyardlog_chk */
 	if ($snortbarnyardlog_info_chk == on) {
 
-	$start_barnyard2 = "\nsleep 4\n/usr/local/bin/barnyard2 -c /usr/local/etc/snort/snort_$id$if_real/barnyard2.conf -d /var/log/snort -f snort.u2_$id$if_real -w /usr/local/etc/snort/snort_$id$if_real/barnyard2.waldo -D -q\n\n";
+	$start_barnyard2 = "\nsleep 4\n/usr/local/bin/barnyard2 -u snort -g snort -c /usr/local/etc/snort/snort_$id$if_real/barnyard2.conf -d /var/log/snort -f snort.u2_$id$if_real -w /usr/local/etc/snort/snort_$id$if_real/barnyard2.waldo -D -q\n\n";
 	
 }
 
@@ -395,6 +392,7 @@ rc_start_real() {
 		/bin/rm /var/run/snort_$if_real$id$if_real.pid.lck
 		/usr/local/bin/snort -u snort -g snort -G $id -R $id$if_real -c /usr/local/etc/snort/snort_$id$if_real/snort.conf -l /var/log/snort -D -i $if_real -q
 		/sbin/ifconfig $if_real_wan polling promisc
+		$start_barnyard2
 
         sleep 3
         /bin/cp /var/log/system.log /var/log/snort/snort_sys_$id$if_real.log
@@ -466,12 +464,18 @@ EOD;
 
 /* open barnyard2.conf for writing */
 function create_barnyard2_conf() {
-        global $bconfig, $bg;
+        global $bconfig, $bg, $id, $if_real;
         /* write out barnyard2_conf */
+
+		if(!file_exists("/usr/local/etc/snort/snort_$id$if_real/barnyard2.conf"))
+		{
+			exec("/bin//usr/bin/touch /usr/local/etc/snort/snort_$id$if_real/barnyard2.conf");
+		}
+		
         $barnyard2_conf_text = generate_barnyard2_conf();
-        $bconf = fopen("/usr/local/etc/snort/$id$if_real/barnyard2.conf", "w");
+        $bconf = fopen("/usr/local/etc/snort/snort_$id$if_real/barnyard2.conf", "w");
         if(!$bconf) {
-                log_error("Could not open /usr/local/etc/snort/$id$if_real/barnyard2.conf for writing.");
+                log_error("Could not open /usr/local/etc/snort/snort_$id$if_real/barnyard2.conf for writing.");
                 exit;
         }
         fwrite($bconf, $barnyard2_conf_text);
@@ -658,7 +662,8 @@ snort_rules_up_deinstall_cron("");
 	
 }
 
-function generate_snort_conf() {
+function generate_snort_conf()
+{
 
 	global $config, $g, $if_real, $id;
 	conf_mount_rw();
@@ -670,19 +675,22 @@ function generate_snort_conf() {
 //	$snort_config_pass_thru = $config['installedpackages']['snortglobal']['rule'][$id]['configpassthru'];
 
 	/* create basic files */
-	if(!file_exists("/usr/local/etc/snort/snort/snort_$id$if_real")) {
-	exec("/bin/mkdir -p /usr/local/etc/snort/snort_$id$if_real/");
-	exec("/bin/mkdir -p /usr/local/etc/snort/snort_$id$if_real/rules");
+	if(!file_exists("/usr/local/etc/snort/snort/snort_$id$if_real"))
+	{
+		exec("/bin/mkdir -p /usr/local/etc/snort/snort_$id$if_real/");
+		exec("/bin/mkdir -p /usr/local/etc/snort/snort_$id$if_real/rules");
 
-	if(!file_exists("/usr/local/etc/snort/snort_$id$if_real/gen-msg.map")) {
-	exec("/bin/cp /usr/local/etc/snort/classification.config /usr/local/etc/snort/snort_$id$if_real/classification.config");
-	exec("/bin/cp /usr/local/etc/snort/gen-msg.map /usr/local/etc/snort/snort_$id$if_real/gen-msg.map");
-	exec("/bin/cp /usr/local/etc/snort/reference.config /usr/local/etc/snort/snort_$id$if_real/reference.config");
-	exec("/bin/cp /usr/local/etc/snort/sid-msg.map /usr/local/etc/snort/snort_$id$if_real/sid-msg.map");
-	exec("/bin/cp /usr/local/etc/snort/unicode.map /usr/local/etc/snort/snort_$id$if_real/unicode.map");
-	exec("/bin/cp /usr/local/etc/snort/threshold.conf /usr/local/etc/snort/snort_$id$if_real/threshold.conf");
-	exec("/bin/cp /usr/local/etc/snort/snort.conf /usr/local/etc/snort/snort_$id$if_real/snort.conf");
-	exec("/bin/mkdir -p /usr/local/etc/snort/snort_$id$if_real/rules");
+		if(!file_exists("/usr/local/etc/snort/snort_$id$if_real/gen-msg.map"))
+		{
+			exec("/bin/cp /usr/local/etc/snort/classification.config /usr/local/etc/snort/snort_$id$if_real/classification.config");
+			exec("/bin/cp /usr/local/etc/snort/gen-msg.map /usr/local/etc/snort/snort_$id$if_real/gen-msg.map");
+			exec("/bin/cp /usr/local/etc/snort/reference.config /usr/local/etc/snort/snort_$id$if_real/reference.config");
+			exec("/bin/cp /usr/local/etc/snort/sid-msg.map /usr/local/etc/snort/snort_$id$if_real/sid-msg.map");
+			exec("/bin/cp /usr/local/etc/snort/unicode.map /usr/local/etc/snort/snort_$id$if_real/unicode.map");
+			exec("/bin/cp /usr/local/etc/snort/threshold.conf /usr/local/etc/snort/snort_$id$if_real/threshold.conf");
+			exec("/bin/cp /usr/local/etc/snort/snort.conf /usr/local/etc/snort/snort_$id$if_real/snort.conf");
+			exec("/bin//usr/bin/touch /usr/local/etc/snort/snort_$id$if_real/barnyard2.conf");
+			exec("/bin/mkdir -p /usr/local/etc/snort/snort_$id$if_real/rules");
 		}
 	}
 	
@@ -702,11 +710,6 @@ if ($alertsystemlog_info_chk == on)
 $tcpdumplog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['tcpdumplog'];
 if ($tcpdumplog_info_chk == on)
     $tcpdumplog_type = "output log_tcpdump: snorttcpd.log";
-
-/* define snortbarnyardlog_chk */
-$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['snortbarnyardlog'];
-if ($snortbarnyardlog_info_chk == on)
-    $snortbarnyardlog_type = "barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D";
 
 /* define snortunifiedlog */
 $snortunifiedlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['snortunifiedlog'];
@@ -1546,7 +1549,7 @@ $def_ssl_ports_ignore_info_chk = $config['installedpackages']['snortglobal']['ru
 if ($def_ssl_ports_ignore_info_chk == "")
 	$def_ssl_ports_ignore_type = "443 465 563 636 989 990 992 993 994 995";
 else 
-	$def_ssl_ports_ignore_type = "$def_ssl_ports_info_chk";
+	$def_ssl_ports_ignore_type = "$def_ssl_ports_ignore_info_chk";
 	
 //////////////////////////////////////////////////////////////////
 	/* build snort configuration file */
@@ -1744,7 +1747,7 @@ preprocessor stream5_icmp:
                              #
 ##############################
 
-preprocessor ssl: ports { $def_ssl_ports_ignore_type }, trustservers, noinspect_encrypted
+preprocessor ssl: ports { {$def_ssl_ports_ignore_type} }, trustservers, noinspect_encrypted
 
 #####################
                     #

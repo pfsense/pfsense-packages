@@ -162,7 +162,7 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "") {
 	}
 }	
 
-$pgtitle = "Services: Snort 2.8.4.1_5 pkg v. 1.8 beta";
+$pgtitle = "Services: Snort 2.8.4.1_6 pkg v. 1.8 RC1";
 include("head.inc");
 
 ?>
@@ -186,6 +186,17 @@ padding: 15px 10px 50% 50px;
 	border-bottom: 1px solid #999999;
 	font-size: 11px;
 	background-color: #090;
+	color: #000;	
+	padding-right: 16px;
+	padding-left: 6px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+.listbg3 {
+	border-right: 1px solid #777777;
+	border-bottom: 1px solid #777777;
+	font-size: 11px;
+	background-color: #777777;
 	color: #000;	
 	padding-right: 16px;
 	padding-left: 6px;
@@ -307,7 +318,17 @@ padding: 15px 10px 50% 50px;
 				  ?>
                     <?=strtoupper($check_blockoffenders);?>
                   </td>
-				  <td class="listr" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
+					<?php	
+					/* convert fake interfaces to real and check if iface is up */
+					$if_real2 = convert_friendly_interface_to_real_interface_name($natent['interface']);
+					$color_up_b = exec("/bin/ps -auwx | grep -v grep | grep \"snort.u2_{$nnats}{$if_real2}\" | awk '{print $2;}'");		
+					If ($color_up_b != "") {
+						$class_color_up_bb = "listbg2";
+					}else{
+						$class_color_up_bb = "listbg";
+					}			
+					?>
+				  <td class="<?=$class_color_up_bb;?>" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 				  <?php
 				  $check_snortbarnyardlog_info = $config['installedpackages']['snortglobal']['rule'][$nnats]['barnyard_enable'];
 				  if ($check_snortbarnyardlog_info == "on")
@@ -319,7 +340,7 @@ padding: 15px 10px 50% 50px;
 				  ?>
                     <?=strtoupper($check_snortbarnyardlog);?>
                   </td>
-                  <td class="listbg" onClick="fr_toggle(<?=$nnats;?>)" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
+                  <td class="listbg3" onClick="fr_toggle(<?=$nnats;?>)" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 		  <font color="#ffffff">
                     <?=htmlspecialchars($natent['descr']);?>&nbsp;
                   </td>
@@ -351,13 +372,15 @@ padding: 15px 10px 50% 50px;
   <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 	  <td width="100%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
 	  <br>
-		 This is the <strong>Snort Interfaces Menu</strong> where you can see an over view of all your interface settings.
+		 This is the <strong>Snort Menu</strong> where you can see an over view of all your interface settings.
 		 <br>
-		 Please edit the <strong>Global Settings </strong> tab befor adding an interface.
+		 Please edit the <strong>Global Settings</strong> tab befor adding an interface.
 		 <br><br>
-		 Click on the <strong>Plus Icon</strong> to add a interface.
+		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="Add Icon"> icon to add a interface.&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_pass.gif" width="13" height="13" border="0" title="Start Icon"> icon to <strong>start</strong> snort and barnyard.
 		 <br>
-		 Click on the <strong>Edit Icon</strong> to edit interface settings.
+		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" title="Edit Icon"> icon to edit a interface and settings.&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif" width="13" height="13" border="0" title="Stop Icon"> icon to <strong>stop</strong> snort and barnyard.
+		 <br>
+		<strong> Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="Delete Icon"> icon to delete a interface and settings.
 </td>
     </table>
  
