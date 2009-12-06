@@ -5,7 +5,7 @@ function rate_install() {
 	conf_mount_rw();
 	/* Copy files for backup. */
 	mwexec("cp /usr/local/www/status_graph.php /usr/local/www/status_graph.php.orig");
-	unlink("/usr/local/www/status_graph.php");
+	unlink_if_exists("/usr/local/www/status_graph.php");
 	mwexec("cp /usr/local/pkg/bandwidth_by_ip.php /usr/local/www/bandwidth_by_ip.php");
 	mwexec("cp /usr/local/pkg/status_graph.php /usr/local/www/status_graph.php");
 
@@ -17,8 +17,8 @@ function rate_install() {
 
 function rate_deinstall() {
 	conf_mount_rw();
-	unlink("/usr/local/www/status_graph.php");
-	unlink("/usr/local/www/bandwidth_by_ip.php");
+	unlink_if_exists("/usr/local/www/status_graph.php");
+	unlink_if_exists("/usr/local/www/bandwidth_by_ip.php");
 	mwexec("cp /usr/local/www/status_graph.php.orig /usr/local/www/status_graph.php");
 	conf_mount_ro();	
 }
