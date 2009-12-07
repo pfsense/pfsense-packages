@@ -242,10 +242,6 @@
 					<name>NoritakeVFD</name>
 				</option>
 				<option>
-					<value>picolcd</value>
-					<name>picolcd</name>
-				</option>
-				<option>
 					<value>pyramid</value>
 					<name>pyramid</name>
 				</option>
