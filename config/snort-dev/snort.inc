@@ -160,6 +160,53 @@ function sync_package_snort_reinstall()
 	conf_mount_ro();
 }
 
+/* stop snort interface  */
+function stop_snort()
+{
+	global $config, $g, $id, $if_real, $interface_fake;
+	
+	$a_nat = &$config['installedpackages']['snortglobal']['rule'];
+	$if_real2 = convert_friendly_interface_to_real_interface_name($a_nat[$id]['interface']);
+	
+	
+	$start_up_pre = exec("/bin/cat /var/run/snort_{$if_real2}{$id}{$if_real2}.pid");
+	$start_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
+	$start_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
+					
+	$start2_upb_pre = exec("/bin/cat /var/run/barnyard2_{$id}{$if_real2}.pid");
+	$start2_upb_s = exec("/usr/bin/top -U snort -u | grep barnyard2 | grep {$start2_upb_pre} | awk '{ print $1; }'");
+	$start2_upb_r = exec("/usr/bin/top -U root -u | grep barnyard2 | grep {$start2_upb_pre} | awk '{ print $1; }'");
+					
+	if ($start_up_s != "" || $start_up_r != "" || $start2_upb_s != "" || $start2_upb_r != "")
+	{	
+		if ($start_up_s != "")
+		{
+			exec("/bin/kill {$start_up_s}");
+			exec("/bin/rm /var/run/snort_$if_real2$id$if_real2*");
+		}
+		
+		if ($start2_upb_s != "")
+		{
+			exec("/bin/kill {$start2_upb_s}");
+			exec("/bin/rm /var/run/barnyard2_$id$if_real2*");
+		}
+		
+		if ($start_up_r != "")
+		{
+			exec("/bin/kill {$start_up_r}");
+			exec("/bin/rm /var/run/snort_$if_real2$id$if_real2*");
+		}
+		
+		if ($start2_upb_r != "")
+		{
+			exec("/bin/kill {$start2_upb_r}");
+			exec("/bin/rm /var/run/barnyard2_$id$if_real2*");
+		}
+	}
+
+}
+
+
 /* make sure this func on writes to files and does not start snort */
 function sync_package_snort()
 {
@@ -226,11 +273,12 @@ exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 		/* create snort.sh file */
 		create_snort_sh();
 
-		/* create barnyard2 configuration file */
-		$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
-		if ($snortbarnyardlog_info_chk == on)
-			create_barnyard2_conf();
-	
+			/* create barnyard2 configuration file */
+			$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
+			if ($snortbarnyardlog_info_chk == on)
+			{
+				create_barnyard2_conf();
+			}
 		}
 	}
 
@@ -337,7 +385,7 @@ rc_start() {
         sleep 3
 		AFTER_MEM=`/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{print $2}'`
         /bin/cp /var/log/system.log /var/log/snort/snort_sys_$if_real.log
-		/bin/killall syslogd
+		/usr/bin/killall syslogd
         /usr/sbin/clog -i -s 262144 /var/log/system.log
         /bin/cp /var/log/system.log.bk /var/log/system.log
 		/usr/sbin/syslogd -c -ss -f /var/etc/syslog.conf
@@ -396,7 +444,7 @@ rc_start_real() {
 
         sleep 3
         /bin/cp /var/log/system.log /var/log/snort/snort_sys_$id$if_real.log
-		/bin/killall syslogd
+		/usr/bin/killall syslogd
         /usr/sbin/clog -i -s 262144 /var/log/system.log
         /bin/cp /var/log/system.log.bk /var/log/system.log
 		/usr/sbin/syslogd -c -ss -f /var/etc/syslog.conf
@@ -411,19 +459,21 @@ rc_start_real() {
 rc_stop() {
 
 		pid_s=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "$id$if_real -c" | /usr/bin/awk '{print \$2;}'`
+		sleep 3
 		pid_b=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "snort.u2_$id$if_real" | /usr/bin/awk '{print \$2;}'`
 	
 		if [ \${pid_s} ] ; then
         /bin/cp /var/log/system.log /var/log/system.log.bk
         /usr/bin/logger -p daemon.info -i -t SnortStartup "Snort IS running, hard STOP"
-		/bin/kill \${pid_s}; /bin/kill \${pid_b};
+		/bin/kill \${pid_s}
+		sleep 3
+		/bin/kill \${pid_b}
 		/sbin/ifconfig $if_real_wan -promisc
 		/bin/rm /var/run/snort_$if_real$id$if_real.pid
 		/bin/rm /var/run/snort_$if_real$id$if_real.pid.lck
-        sleep 3
         AFTER_MEM=`/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{print $2}'`
         /bin/cp /var/log/system.log /var/log/snort/snort_sys_$id$if_real.log
-		/bin/killall syslogd
+		/usr/bin/killall syslogd
         /usr/sbin/clog -i -s 262144 /var/log/system.log
         /bin/cp /var/log/system.log.bk /var/log/system.log
 		/usr/sbin/syslogd -c -ss -f /var/etc/syslog.conf
@@ -571,13 +621,13 @@ function snort_deinstall() {
 	remove_text_from_file("/etc/sysctl.conf", "sysctl net.bpf.bufsize=20480");
 	/* decrease bpf buffers back to 4096, from 20480 */
 	exec("/sbin/sysctl net.bpf.bufsize=4096");
-	exec("/usr/bin/killall snort");
+	exec("/usr/usr/bin/killall snort");
 	sleep(2);
-	exec("/usr/bin/killall -9 snort");
+	exec("/usr/usr/bin/killall -9 snort");
 	sleep(2);
-	exec("/usr/bin/killall barnyard2");
+	exec("/usr/usr/bin/killall barnyard2");
 	sleep(2);
-	exec("/usr/bin/killall -9 barnyard2");
+	exec("/usr/usr/bin/killall -9 barnyard2");
 	sleep(2);
 	exec("/usr/sbin/pw userdel snort");
 	exec("/usr/sbin/pw groupdel snort");
@@ -586,8 +636,8 @@ function snort_deinstall() {
 	exec("cd /var/db/pkg && pkg_delete `ls | grep snort`");
 	exec("cd /var/db/pkg && pkg_delete `ls | grep mysql-client`");
 	exec("cd /var/db/pkg && pkg_delete `ls | grep libdnet`");
-	exec("/usr/bin/killall -9 snort");
-	exec("/usr/bin/killall snort");
+	exec("/usr/usr/bin/killall -9 snort");
+	exec("/usr/usr/bin/killall snort");
 
 	/* Remove snort cron entries Ugly code needs smoothness*/
 	
