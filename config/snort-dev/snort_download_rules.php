@@ -56,19 +56,18 @@ $last_rules_install = $config['installedpackages']['snortglobal']['last_rules_in
 $snort_rule_d_chk = $config['installedpackages']['snortglobal']['snortdownload'];
 $emrging_rule_d_chk = $config['installedpackages']['snortglobal']['emergingthreats'];
 
-if ($snort_rule_d_chk != premium || $snort_rule_d_chk == "" )
+if ($snort_rule_d_chk != premium || $snort_rule_d_chk == "")
 	$snort_rule_d_info = "no";
 
-if ($emrging_rule_d_chk != on || $emrging_rule_d_chk == "" )
+if ($emrging_rule_d_chk != on || $emrging_rule_d_chk == "")
 	$emrging_rule_d_info = "no";
 
-if ($snort_rule_d_info == "no" && $emrging_rule_d_info = "no")
-	$snort_$emrging_info = "stop";
-
+if ($snort_rule_d_info == "no" && $emrging_rule_d_info == "no")
+	$snort_emrging_info = "stop";
 
 
 /* If no id show the user a button */	
-if ($id_d == "" || $snort_$emrging_info = "stop") {
+if ($id_d == "" || $snort_emrging_info == "stop") {
 
 $pgtitle = "Services: Snort: Update Rules";
 
@@ -118,8 +117,13 @@ echo  		"</td>\n
 				<tr>\n
 					<td>\n
 <input name=\"Submit\" type=\"submit\" class=\"formbtn\" onClick=\"parent.location='/snort/snort_download_rules.php?id_d=up'\" value=\"Update Rules\"> <br><br> \n
-# The rules directory is empty. /usr/local/etc/snort/snort_{$id}{$if_real}/rules <br> \n
-		    		</td>\n
+# The rules directory is empty. /usr/local/etc/snort/rules <br><br>\n";
+
+if ($snort_emrging_info == "stop") {
+echo "<span class=\"red\"><strong>WARNING:</strong></span> &nbsp;&nbsp;Click on the <strong>\"Global Settings\"</strong> TAB and select ether snort.org or enmergingthreats.net rules to download. <br><br> \n";
+}
+
+echo "		    		</td>\n
 		  		</tr>\n
 			</table>\n
 		</div>\n
@@ -133,9 +137,6 @@ echo  		"</td>\n
 
 if ($id_d == "")
 echo "Click on the <strong>\"Update Rules\"</strong> button to start the updates. <br><br> \n";
-
-if ($snort_$emrging_info = "stop")
-echo "Click on the <strong>\"Global Settings\"</strong> TAB and select ether snort.org or enmergingthreats.net rules to download. <br><br> \n";
 
 if ($config['installedpackages']['snortglobal']['last_md5_download'] != "")
 echo "The last time the updates were started <strong>$last_md5_download</strong>. <br><br> \n";
