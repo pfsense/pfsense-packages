@@ -275,7 +275,7 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 
 }	
 
-$pgtitle = "Services: Snort 2.8.4.1_6 pkg v. 1.8 RC1";
+$pgtitle = "Services: Snort 2.8.4.1_6 pkg v. 1.8 RC2";
 include("head.inc");
 
 ?>
