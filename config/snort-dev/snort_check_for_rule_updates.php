@@ -67,6 +67,7 @@ $config['installedpackages']['snortglobal']['last_md5_download'] = date("Y-M-jS-
 
 /* send current buffer */
 ob_flush();
+conf_mount_rw();
 
 /* define oinkid */
 if($config['installedpackages']['snortglobal'])
@@ -101,6 +102,7 @@ if ($premium_url_chk == "premium") {
 
 /* send current buffer */
 ob_flush();
+conf_mount_rw();
 
 /*  remove old $tmpfname files */
 if (file_exists("{$tmpfname}")) {
@@ -116,6 +118,7 @@ exec("/bin/mkdir -p {$snortdir}/signatures");
 
 /* send current buffer */
 ob_flush();
+conf_mount_rw();
 
 /* If tmp dir does not exist create it */
 if (file_exists($tmpfname)) {
@@ -263,15 +266,19 @@ exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'SNORT RULES ARE OUT OF 
 exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Stopping All Snort Package Services...'");
 $chk_if_snort_up = exec("pgrep -x snort");
 if ($chk_if_snort_up != "") {
-	exec("/usr/bin/touch /tmp/snort_download_halt.pid");
+			
+			
+			exec("/usr/bin/touch /tmp/snort_download_halt.pid");
 		
 			/* dont flood the syslog code */
 			exec("/bin/cp /var/log/system.log /var/log/system.log.bk");
 			sleep(3);
 			
 			exec("/usr/bin/killall snort");
+			exec("/bin/rm /var/run/snort*");
 			sleep(2);
 			exec("/usr/bin/killall barnyard2");
+			exec("/bin/rm /var/run/barnyard2*");
 			
 			/* stop syslog flood code */		
 			exec("/bin/cp /var/log/system.log /var/log/snort/snort_sys_rules_update.log");
@@ -679,8 +686,8 @@ if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_c
 	if (empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on']) || empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off'])) {
 	echo "Your first set of rules are being copied...\n";
 	echo "May take a while...\n";
-	exec("/bin/echo \"test {$snortdir} {$snortdir_wan} $id$if_real\" > /root/debug");
-    exec("/bin/cp {$snortdir}/rules/\* {$snortdir_wan}/snort_$id$if_real/rules/");
+	exec("/bin/echo \"test {$snortdir} {$snortdir_wan} $id$if_real\" >> /root/debug");
+    exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/snort_$id$if_real/rules/");
 	exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}/snort_$id$if_real");
 	exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}/snort_$id$if_real");
 	exec("/bin/cp {$snortdir}/generators {$snortdir_wan}/snort_$id$if_real");
@@ -693,7 +700,7 @@ if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_c
 		echo "Your enable and disable changes are being applied to your fresh set of rules...\n";
 		echo "May take a while...\n";
 		exec("/bin/echo \"test2 {$snortdir} {$snortdir_wan} $id$if_real\" > /root/debug");
-		exec("/bin/cp {$snortdir}/rules/\* {$snortdir_wan}/snort_$id$if_real/rules/");
+		exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/snort_$id$if_real/rules/");
 		exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}/snort_$id$if_real");
 		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}/snort_$id$if_real");
 		exec("/bin/cp {$snortdir}/generators {$snortdir_wan}/snort_$id$if_real");
@@ -727,10 +734,17 @@ sleep(2);
 apc_clear_cache();
 exec("/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync");
 
+	/* make snort the owner */
+	exec("/usr/sbin/chown -R snort:snort /var/log/snort");
+	exec("/usr/sbin/chown -R snort:snort /usr/local/etc/snort");
+	exec("/usr/sbin/chown -R snort:snort /usr/local/lib/snort");
+	exec("/bin/chmod -R 755  /var/log/snort");
+	exec("/bin/chmod -R 755  /usr/local/etc/snort");
+	exec("/bin/chmod -R 755  /usr/local/lib/snort");
+
 /* if snort is running hardrestart, if snort is not running do nothing */
 if (file_exists("/tmp/snort_download_halt.pid")) {
 	exec("/bin/sh /usr/local/etc/rc.d/snort* start");
-	start_service("snort");
 	echo "The Rules update finished...\n";
 	echo "Snort has restarted with your new set of rules...\n";
 	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'SNORT RULE UPDATE FINNISHED...'");

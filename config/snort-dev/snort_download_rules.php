@@ -53,8 +53,22 @@ if (isset($_POST['id_d']))
 $last_md5_download = $config['installedpackages']['snortglobal']['last_md5_download'];
 $last_rules_install = $config['installedpackages']['snortglobal']['last_rules_install'];
 
+$snort_rule_d_chk = $config['installedpackages']['snortglobal']['snortdownload'];
+$emrging_rule_d_chk = $config['installedpackages']['snortglobal']['emergingthreats'];
+
+if ($snort_rule_d_chk != premium || $snort_rule_d_chk == "" )
+	$snort_rule_d_info = "no";
+
+if ($emrging_rule_d_chk != on || $emrging_rule_d_chk == "" )
+	$emrging_rule_d_info = "no";
+
+if ($snort_rule_d_info == "no" && $emrging_rule_d_info = "no")
+	$snort_$emrging_info = "stop";
+
+
+
 /* If no id show the user a button */	
-if ($id_d == "") {
+if ($id_d == "" || $snort_$emrging_info = "stop") {
 
 $pgtitle = "Services: Snort: Update Rules";
 
@@ -117,7 +131,11 @@ echo  		"</td>\n
 \n
 <p>\n\n";
 
+if ($id_d == "")
 echo "Click on the <strong>\"Update Rules\"</strong> button to start the updates. <br><br> \n";
+
+if ($snort_$emrging_info = "stop")
+echo "Click on the <strong>\"Global Settings\"</strong> TAB and select ether snort.org or enmergingthreats.net rules to download. <br><br> \n";
 
 if ($config['installedpackages']['snortglobal']['last_md5_download'] != "")
 echo "The last time the updates were started <strong>$last_md5_download</strong>. <br><br> \n";
