@@ -310,18 +310,6 @@
       <configurationfile>phpsysinfo.xml</configurationfile>
     </package>
     <package>
-      <name>Fit123</name>
-      <website>http://pfsense.comuf.com</website>
-      <descr>A list of small custom things that can be added to pfSense 1.2.3 :	Date,Code-red,LTSP,AFC and DDNS</descr>
-      <category>System</category>
-      <version>0.0.1</version>
-      <status>ALPHA</status>
-      <required_version>1.2.3</required_version>
-      <maintainer>crazypark2@yahoo.dk</maintainer>
-      <config_file>http://www.pfsense.com/packages/config/Fit123/fit123.xml</config_file>
-      <configurationfile>fit123.xml</configurationfile>
-    </package>
-    <package>
       <name>dns-server</name>
       <descr>pfSense version of TinyDNS which features failover host support</descr>
       <website>http://cr.yp.to/djbdns.html</website>
