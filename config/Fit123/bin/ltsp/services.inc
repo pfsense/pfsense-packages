@@ -61,6 +61,7 @@ function services_dhcpd_configure() {
 	fwrite($fd, "mkdir -p {$g['dhcpd_chroot_path']}/etc\n");
 	fwrite($fd, "mkdir -p {$g['dhcpd_chroot_path']}/usr/local/sbin\n");
 	fwrite($fd, "mkdir -p {$g['dhcpd_chroot_path']}/var/db\n");
+	fwrite($fd, "mkdir -p {$g['dhcpd_chroot_path']}/var/run\n");
 	fwrite($fd, "mkdir -p {$g['dhcpd_chroot_path']}/usr\n");
 	fwrite($fd, "mkdir -p {$g['dhcpd_chroot_path']}/lib\n");
 	fwrite($fd, "mkdir -p {$g['dhcpd_chroot_path']}/run\n");
@@ -278,9 +279,9 @@ EOD;
 				$dhcpdconf .= "	next-server {$dhcpifconf['next-server']};\n";
 				$dhcpdconf .= "	filename \"{$dhcpifconf['filename']}\";\n";
 			}
-		if ($dhcpifconf['rootpath'] <> "") {
-				$dhcpdconf .= "	option root-path \"{$dhcpifconf['rootpath']}\";\n";
-      }
+                if ($dhcpifconf['rootpath'] <> "") {
+                                $dhcpdconf .= " option root-path \"{$dhcpifconf['rootpath']}\";\n";
+       }
 		}
 		$dhcpdconf .= <<<EOD
 }
@@ -635,7 +636,7 @@ function services_dnsmasq_configure() {
 		//}
 
 		/* run dnsmasq */
-		mwexec("/usr/local/sbin/dnsmasq {$args}");
+		mwexec("/usr/local/sbin/dnsmasq --all-servers {$args}");
 
 		if ($g['booting'])
 			echo "done.\n";
@@ -927,7 +928,10 @@ EOD;
 			fclose($fd);
 
 			/* generate update instructions */
-			$upinst =  "update delete {$config['dnsupdate']['host']} A\n";
+			$upinst = "";
+			if ($config['dnsupdate']['server'])
+				$upinst .=  "server {$config['dnsupdate']['server']}\n";
+			$upinst .= "update delete {$config['dnsupdate']['host']} A\n";
 			$upinst .= "update add {$config['dnsupdate']['host']} {$config['dnsupdate']['ttl']} A {$wanip}\n";
 			$upinst .= "\n";	/* mind that trailing newline! */
 
@@ -936,7 +940,7 @@ EOD;
 			fclose($fd);
 
 			/* invoke nsupdate */
-			$cmd = "/usr/sbin/nsupdate -k {$g['varetc_path']}/K{$keyname}+157+00000.key";
+			$cmd = "/usr/bin/nsupdate -k {$g['varetc_path']}/K{$keyname}+157+00000.key";
 			if (isset($config['dnsupdate']['usetcp']))
 				$cmd .= " -v";
 			$cmd .= " {$g['varetc_path']}/nsupdatecmds";

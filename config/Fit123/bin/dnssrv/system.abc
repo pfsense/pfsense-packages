@@ -30,8 +30,6 @@
 */
 
 require("guiconfig.inc");
-if(!function_exists("filter_configure")) 
-	require_once("filter.inc");
 
 $pconfig['hostname'] = $config['system']['hostname'];
 $pconfig['domain'] = $config['system']['domain'];
@@ -145,10 +143,10 @@ if ($_POST) {
 			$config['system']['dnsserver'][] = $_POST['dns1'];
 		if ($_POST['dns2'])
 			$config['system']['dnsserver'][] = $_POST['dns2'];
-		if ($_POST['dns3'])
-			$config['system']['dnsserver'][] = $_POST['dns3'];
-		if ($_POST['dns4'])
-			$config['system']['dnsserver'][] = $_POST['dns4'];
+                if ($_POST['dns3'])
+                        $config['system']['dnsserver'][] = $_POST['dns3'];
+                if ($_POST['dns4'])
+                        $config['system']['dnsserver'][] = $_POST['dns4'];
 
 		$olddnsallowoverride = $config['system']['dnsallowoverride'];
 
