@@ -111,7 +111,10 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['snortalertlogtype'] = $a_nat[$id]['snortalertlogtype'];
 	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
 	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
-	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];
+	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];	
+	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
+	$pconfig['rule_sid_off'] = $a_nat[$id]['rule_sid_off'];
+	$pconfig['rule_sid_on'] = $a_nat[$id]['rule_sid_on'];
 		
 	if (!$pconfig['interface'])
 		$pconfig['interface'] = "wan";
@@ -191,7 +194,9 @@ if ($_POST) {
 	if ($pconfig['def_rlogin_ports'] != "") { $natent['def_rlogin_ports'] = $pconfig['def_rlogin_ports']; }
 	if ($pconfig['def_rsh_ports'] != "") { $natent['def_rsh_ports'] = $pconfig['def_rsh_ports']; }
 	if ($pconfig['def_ssl_ports'] != "") { $natent['def_ssl_ports'] = $pconfig['def_ssl_ports']; }
-	
+	if ($pconfig['rulesets'] != "") { $natent['rulesets'] = $pconfig['rulesets']; }
+	if ($pconfig['rule_sid_off'] != "") { $natent['rule_sid_off'] = $pconfig['rule_sid_off']; }
+	if ($pconfig['rule_sid_on'] != "") { $natent['rule_sid_on'] = $pconfig['rule_sid_on']; }	
 	
 		/* post new options */
 		$natent['barnyard_enable'] = $_POST['barnyard_enable'] ? on : off;

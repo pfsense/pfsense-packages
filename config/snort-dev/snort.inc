@@ -206,6 +206,227 @@ function stop_snort()
 
 }
 
+/* func for updating cron */
+function snort_rm_blocked_install_cron($should_install) 
+{
+        global $config, $g;
+
+        if ($g['booting']==true)
+                return;
+
+        $is_installed = false;
+
+        if(!$config['cron']['item'])
+                return;
+
+        $x=0;
+        foreach($config['cron']['item'] as $item)
+		{
+                if (strstr($item['command'], "snort2c"))
+				{
+                        $is_installed = true;
+                        break;
+                }
+                $x++;
+        }
+		
+	$snort_rm_blocked_info_ck = $config['installedpackages']['snortglobal']['rm_blocked'];
+		if ($snort_rm_blocked_info_ck == "1h_b")
+		{
+                $snort_rm_blocked_min = "*/5";
+                $snort_rm_blocked_hr = "*";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "3600";
+		}
+		if ($snort_rm_blocked_info_ck == "3h_b")
+		{
+                $snort_rm_blocked_min = "*/15";
+                $snort_rm_blocked_hr = "*";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "10800";
+		}
+		if ($snort_rm_blocked_info_ck == "6h_b")
+		{
+                $snort_rm_blocked_min = "*/30";
+                $snort_rm_blocked_hr = "*";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "21600";
+		}
+		if ($snort_rm_blocked_info_ck == "12h_b")
+		{
+                $snort_rm_blocked_min = "2";
+                $snort_rm_blocked_hr = "*/1";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "43200";
+		}
+		if ($snort_rm_blocked_info_ck == "1d_b")
+		{
+                $snort_rm_blocked_min = "2";
+                $snort_rm_blocked_hr = "*/2";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "86400";
+		}
+		if ($snort_rm_blocked_info_ck == "4d_b")
+		{
+                $snort_rm_blocked_min = "2";
+                $snort_rm_blocked_hr = "*/8";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "345600";
+		}
+		if ($snort_rm_blocked_info_ck == "7d_b")
+		{
+                $snort_rm_blocked_min = "2";
+                $snort_rm_blocked_hr = "*/14";
+                $snort_rm_blocked_mday = "*";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "604800";
+		}
+		if ($snort_rm_blocked_info_ck == "28d_b")
+		{
+                $snort_rm_blocked_min = "2";
+                $snort_rm_blocked_hr = "0";
+                $snort_rm_blocked_mday = "*/2";
+                $snort_rm_blocked_month = "*";
+                $snort_rm_blocked_wday = "*";
+				$snort_rm_blocked_expire = "2419200";
+		}
+        switch($should_install) 
+		{
+                case true:
+                        if(!$is_installed) 
+						{		
+                                $cron_item = array();
+                                $cron_item['minute'] = "$snort_rm_blocked_min";
+                                $cron_item['hour'] = "$snort_rm_blocked_hr";
+                                $cron_item['mday'] = "$snort_rm_blocked_mday";
+                                $cron_item['month'] = "$snort_rm_blocked_month";
+                                $cron_item['wday'] = "$snort_rm_blocked_wday";
+                                $cron_item['who'] = "root";
+                                $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/sbin/expiretable -t $snort_rm_blocked_expire snort2c";
+                                $config['cron']['item'][] = $cron_item;
+                                write_config("Installed $snort_rm_blocked_info_ck minute filter reload for Time Based Rules");
+                                configure_cron();
+                        }
+                break;
+                case false:
+                        if($is_installed == true) 
+						{
+                                if($x > 0) 
+								{
+                                        unset($config['cron']['item'][$x]);
+                                        write_config();
+										conf_mount_rw();
+                                }
+                                configure_cron();
+                        }
+                break;
+		}
+}
+
+/* func to install snort update */
+function snort_rules_up_install_cron($should_install) {
+        global $config, $g;
+
+        if ($g['booting']==true)
+                return;
+
+        $is_installed = false;
+
+        if(!$config['cron']['item'])
+                return;
+
+        $x=0;
+        foreach($config['cron']['item'] as $item) {
+                if (strstr($item['command'], "snort_check_for_rule_updates.php")) {
+                        $is_installed = true;
+                        break;
+                }
+                $x++;
+        }
+	$snort_rules_up_info_ck = $config['installedpackages']['snortglobal']['autorulesupdate7'];
+		if ($snort_rules_up_info_ck == "6h_up") {
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "*/6";
+                $snort_rules_up_mday = "*";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
+		}
+		if ($snort_rules_up_info_ck == "12h_up") {
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "*/12";
+                $snort_rules_up_mday = "*";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
+		}
+		if ($snort_rules_up_info_ck == "1d_up") {
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "0";
+                $snort_rules_up_mday = "*/1";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
+		}
+		if ($snort_rules_up_info_ck == "4d_up") {
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "0";
+                $snort_rules_up_mday = "*/4";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
+		}
+		if ($snort_rules_up_info_ck == "7d_up") {
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "0";
+                $snort_rules_up_mday = "*/7";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
+		}
+		if ($snort_rules_up_info_ck == "28d_up") {
+                $snort_rules_up_min = "3";
+                $snort_rules_up_hr = "0";
+                $snort_rules_up_mday = "*/28";
+                $snort_rules_up_month = "*";
+                $snort_rules_up_wday = "*";
+		}
+        switch($should_install) {
+                case true:
+                        if(!$is_installed) {		
+                                $cron_item = array();
+                                $cron_item['minute'] = "$snort_rules_up_min";
+                                $cron_item['hour'] = "$snort_rules_up_hr";
+                                $cron_item['mday'] = "$snort_rules_up_mday";
+                                $cron_item['month'] = "$snort_rules_up_month";
+                                $cron_item['wday'] = "$snort_rules_up_wday";
+                                $cron_item['who'] = "root";
+                                $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort/snort_check_for_rule_updates.php >> /usr/local/etc/snort/snort_update.log";
+                                $config['cron']['item'][] = $cron_item;
+                                write_config("Installed 15 minute filter reload for Time Based Rules");
+                                configure_cron();
+                        }
+                break;
+                case false:
+                        if($is_installed == true) {
+                                if($x > 0) {
+                                        unset($config['cron']['item'][$x]);
+                                        write_config();
+										conf_mount_rw();
+                                }
+                                configure_cron();
+                        }
+                break;
+		}
+}
 
 /* make sure this func on writes to files and does not start snort */
 function sync_package_snort()
@@ -1022,233 +1243,6 @@ else
 		$snort_performance = $config['installedpackages']['snortglobal']['rule'][$id]['performance'];
 	else
 		$snort_performance = "lowmem";
-
-	/* set the snort block hosts time IMPORTANT snort has trouble installing if snort_rm_blocked_info_ck != "" */
-	$snort_rm_blocked_info_ck = $config['installedpackages']['snortglobal']['rm_blocked'];
-		if ($snort_rm_blocked_info_ck == "never_b")
-                $snort_rm_blocked_false = "";
-			else
-				$snort_rm_blocked_false = "true";
-
-				
-if ($snort_rm_blocked_info_ck != "") {
-function snort_rm_blocked_install_cron($should_install) {
-        global $config, $g;
-
-        if ($g['booting']==true)
-                return;
-
-        $is_installed = false;
-
-        if(!$config['cron']['item'])
-                return;
-
-        $x=0;
-        foreach($config['cron']['item'] as $item) {
-                if (strstr($item['command'], "snort2c")) {
-                        $is_installed = true;
-                        break;
-                }
-                $x++;
-        }
-	$snort_rm_blocked_info_ck = $config['installedpackages']['snortglobal']['rm_blocked'];
-		if ($snort_rm_blocked_info_ck == "1h_b") {
-                $snort_rm_blocked_min = "*/5";
-                $snort_rm_blocked_hr = "*";
-                $snort_rm_blocked_mday = "*";
-                $snort_rm_blocked_month = "*";
-                $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "3600";
-		}
-		if ($snort_rm_blocked_info_ck == "3h_b") {
-                $snort_rm_blocked_min = "*/15";
-                $snort_rm_blocked_hr = "*";
-                $snort_rm_blocked_mday = "*";
-                $snort_rm_blocked_month = "*";
-                $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "10800";
-		}
-		if ($snort_rm_blocked_info_ck == "6h_b") {
-                $snort_rm_blocked_min = "*/30";
-                $snort_rm_blocked_hr = "*";
-                $snort_rm_blocked_mday = "*";
-                $snort_rm_blocked_month = "*";
-                $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "21600";
-		}
-		if ($snort_rm_blocked_info_ck == "12h_b") {
-                $snort_rm_blocked_min = "2";
-                $snort_rm_blocked_hr = "*/1";
-                $snort_rm_blocked_mday = "*";
-                $snort_rm_blocked_month = "*";
-                $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "43200";
-		}
-		if ($snort_rm_blocked_info_ck == "1d_b") {
-                $snort_rm_blocked_min = "2";
-                $snort_rm_blocked_hr = "*/2";
-                $snort_rm_blocked_mday = "*";
-                $snort_rm_blocked_month = "*";
-                $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "86400";
-		}
-		if ($snort_rm_blocked_info_ck == "4d_b") {
-                $snort_rm_blocked_min = "2";
-                $snort_rm_blocked_hr = "*/8";
-                $snort_rm_blocked_mday = "*";
-                $snort_rm_blocked_month = "*";
-                $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "345600";
-		}
-		if ($snort_rm_blocked_info_ck == "7d_b") {
-                $snort_rm_blocked_min = "2";
-                $snort_rm_blocked_hr = "*/14";
-                $snort_rm_blocked_mday = "*";
-                $snort_rm_blocked_month = "*";
-                $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "604800";
-		}
-		if ($snort_rm_blocked_info_ck == "28d_b") {
-                $snort_rm_blocked_min = "2";
-                $snort_rm_blocked_hr = "0";
-                $snort_rm_blocked_mday = "*/2";
-                $snort_rm_blocked_month = "*";
-                $snort_rm_blocked_wday = "*";
-				$snort_rm_blocked_expire = "2419200";
-		}
-        switch($should_install) {
-                case true:
-                        if(!$is_installed) {		
-                                $cron_item = array();
-                                $cron_item['minute'] = "$snort_rm_blocked_min";
-                                $cron_item['hour'] = "$snort_rm_blocked_hr";
-                                $cron_item['mday'] = "$snort_rm_blocked_mday";
-                                $cron_item['month'] = "$snort_rm_blocked_month";
-                                $cron_item['wday'] = "$snort_rm_blocked_wday";
-                                $cron_item['who'] = "root";
-                                $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/sbin/expiretable -t $snort_rm_blocked_expire snort2c";
-                                $config['cron']['item'][] = $cron_item;
-                                write_config("Installed 15 minute filter reload for Time Based Rules");
-                                configure_cron();
-                        }
-                break;
-                case false:
-                        if($is_installed == true) {
-                                if($x > 0) {
-                                        unset($config['cron']['item'][$x]);
-                                        write_config();
-										conf_mount_rw();
-                                }
-                                configure_cron();
-                        }
-                break;
-		}
-	}
-	snort_rm_blocked_install_cron("");
-	snort_rm_blocked_install_cron($snort_rm_blocked_false);
-}
-
-	/* set the snort rules update time */
-	$snort_rules_up_info_ck = $config['installedpackages']['snortglobal']['autorulesupdate7'];
-		if ($snort_rules_up_info_ck == "never_up")
-                $snort_rules_up_false = "";
-			else
-				$snort_rules_up_false = "true";
-
-if ($snort_rules_up_info_ck != "") {
-function snort_rules_up_install_cron($should_install) {
-        global $config, $g;
-
-        if ($g['booting']==true)
-                return;
-
-        $is_installed = false;
-
-        if(!$config['cron']['item'])
-                return;
-
-        $x=0;
-        foreach($config['cron']['item'] as $item) {
-                if (strstr($item['command'], "snort_check_for_rule_updates.php")) {
-                        $is_installed = true;
-                        break;
-                }
-                $x++;
-        }
-	$snort_rules_up_info_ck = $config['installedpackages']['snortglobal']['autorulesupdate7'];
-		if ($snort_rules_up_info_ck == "6h_up") {
-                $snort_rules_up_min = "3";
-                $snort_rules_up_hr = "*/6";
-                $snort_rules_up_mday = "*";
-                $snort_rules_up_month = "*";
-                $snort_rules_up_wday = "*";
-		}
-		if ($snort_rules_up_info_ck == "12h_up") {
-                $snort_rules_up_min = "3";
-                $snort_rules_up_hr = "*/12";
-                $snort_rules_up_mday = "*";
-                $snort_rules_up_month = "*";
-                $snort_rules_up_wday = "*";
-		}
-		if ($snort_rules_up_info_ck == "1d_up") {
-                $snort_rules_up_min = "3";
-                $snort_rules_up_hr = "0";
-                $snort_rules_up_mday = "*/1";
-                $snort_rules_up_month = "*";
-                $snort_rules_up_wday = "*";
-		}
-		if ($snort_rules_up_info_ck == "4d_up") {
-                $snort_rules_up_min = "3";
-                $snort_rules_up_hr = "0";
-                $snort_rules_up_mday = "*/4";
-                $snort_rules_up_month = "*";
-                $snort_rules_up_wday = "*";
-		}
-		if ($snort_rules_up_info_ck == "7d_up") {
-                $snort_rules_up_min = "3";
-                $snort_rules_up_hr = "0";
-                $snort_rules_up_mday = "*/7";
-                $snort_rules_up_month = "*";
-                $snort_rules_up_wday = "*";
-		}
-		if ($snort_rules_up_info_ck == "28d_up") {
-                $snort_rules_up_min = "3";
-                $snort_rules_up_hr = "0";
-                $snort_rules_up_mday = "*/28";
-                $snort_rules_up_month = "*";
-                $snort_rules_up_wday = "*";
-		}
-        switch($should_install) {
-                case true:
-                        if(!$is_installed) {		
-                                $cron_item = array();
-                                $cron_item['minute'] = "$snort_rules_up_min";
-                                $cron_item['hour'] = "$snort_rules_up_hr";
-                                $cron_item['mday'] = "$snort_rules_up_mday";
-                                $cron_item['month'] = "$snort_rules_up_month";
-                                $cron_item['wday'] = "$snort_rules_up_wday";
-                                $cron_item['who'] = "root";
-                                $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort_check_for_rule_updates.php >> /usr/local/etc/snort_bkup/snort_update.log";
-                                $config['cron']['item'][] = $cron_item;
-                                write_config("Installed 15 minute filter reload for Time Based Rules");
-                                configure_cron();
-                        }
-                break;
-                case false:
-                        if($is_installed == true) {
-                                if($x > 0) {
-                                        unset($config['cron']['item'][$x]);
-                                        write_config();
-										conf_mount_rw();
-                                }
-                                configure_cron();
-                        }
-                break;
-		}
-	}
-	snort_rules_up_install_cron("");
-	snort_rules_up_install_cron($snort_rules_up_false);
-}
 
 	/* open snort's whitelist for writing */
 	$whitelist = fopen("/var/db/whitelist", "w");

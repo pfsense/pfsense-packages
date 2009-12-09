@@ -275,7 +275,7 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 
 }	
 
-$pgtitle = "Services: Snort 2.8.4.1_6 pkg v. 1.8 RC2";
+$pgtitle = "Services: Snort 2.8.4.1_6 pkg v. 1.8 RC3";
 include("head.inc");
 
 ?>
@@ -398,7 +398,7 @@ padding: 15px 10px 50% 50px;
 			else if(strtolower($natent['interface']) == "pptp")
 				echo "PPTP";
 			else
-				echo strtoupper($config['interfaces']);
+				echo strtoupper($natent['interface']);
 		    ?>
                   </td>
                   <td class="listr" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">

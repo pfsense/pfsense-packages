@@ -112,6 +112,9 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
 	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
 	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];
+	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
+	$pconfig['rule_sid_off'] = $a_nat[$id]['rule_sid_off'];
+	$pconfig['rule_sid_on'] = $a_nat[$id]['rule_sid_on'];
 
 if (isset($_GET['dup']))
 	unset($id);	
@@ -149,6 +152,9 @@ if ($_POST) {
 	if ($pconfig['dns_preprocessor'] != "") { $natent['dns_preprocessor'] = $pconfig['dns_preprocessor']; }
 	if ($pconfig['barnyard_enable'] != "") { $natent['barnyard_enable'] = $pconfig['barnyard_enable']; }
 	if ($pconfig['barnyard_mysql'] != "") { $natent['barnyard_mysql'] = $pconfig['barnyard_mysql']; }
+	if ($pconfig['rulesets'] != "") { $natent['rulesets'] = $pconfig['rulesets']; }
+	if ($pconfig['rule_sid_off'] != "") { $natent['rule_sid_off'] = $pconfig['rule_sid_off']; }
+	if ($pconfig['rule_sid_on'] != "") { $natent['rule_sid_on'] = $pconfig['brule_sid_on']; }
 	
 		
 		/* post new options */

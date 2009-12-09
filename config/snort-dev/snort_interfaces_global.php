@@ -31,6 +31,7 @@
 
 $pgtitle = "Services:[Snort][Global Settings]";
 require("guiconfig.inc");
+require("/usr/local/pkg/snort/snort.inc");
 
 /* make things short  */
 $pconfig['snortdownload'] = $config['installedpackages']['snortglobal']['snortdownload'];
@@ -41,6 +42,7 @@ $pconfig['autorulesupdate7'] = $config['installedpackages']['snortglobal']['auto
 $pconfig['whitelistvpns'] = $config['installedpackages']['snortglobal']['whitelistvpns'];
 $pconfig['clickablalerteurls'] = $config['installedpackages']['snortglobal']['clickablalerteurls'];
 $pconfig['associatealertip'] = $config['installedpackages']['snortglobal']['associatealertip'];
+
 
 if ($_POST) {
 
@@ -111,13 +113,38 @@ if ($_POST) {
 		$config['installedpackages']['snortglobal']['associatealertip'] = $_POST['associatealertip'] ? on : off;
 
 		write_config();
+		sleep(2);
 
 		$retval = 0;
 
-		config_lock();
-		$retval = captiveportal_configure();
-		config_unlock();
+	/* set the snort block hosts time IMPORTANT */
+	$snort_rm_blocked_info_ck = $config['installedpackages']['snortglobal']['rm_blocked'];
+		if ($snort_rm_blocked_info_ck == "never_b")
+                $snort_rm_blocked_false = "";
+		else
+				$snort_rm_blocked_false = "true";
 
+	if ($snort_rm_blocked_info_ck != "") 
+		{	
+			snort_rm_blocked_install_cron("");
+			snort_rm_blocked_install_cron($snort_rm_blocked_false);
+		}
+		
+	/* set the snort rules update time */
+	$snort_rules_up_info_ck = $config['installedpackages']['snortglobal']['autorulesupdate7'];
+		if ($snort_rules_up_info_ck == "never_up")
+                $snort_rules_up_false = "";
+		else
+				$snort_rules_up_false = "true";
+
+	if ($snort_rules_up_info_ck != "")
+		{
+			snort_rules_up_install_cron("");
+			snort_rules_up_install_cron($snort_rules_up_false);
+		}
+		
+		
+		
 		$savemsg = get_std_save_message($retval);
 	}
 }
