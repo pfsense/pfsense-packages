@@ -50,12 +50,6 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Captive Portal Add-On</fielddescr>
-			<fieldname>cpaddon</fieldname>
-			<description>Add changes outlined in http://forum.pfsense.org/index.php/topic,13844.0.html</description>
-			<type>checkbox</type>
-		</field>
-		<field>
 			<fielddescr>LTSP</fielddescr>
 			<fieldname>ltsp</fieldname>
 			<description>Adds 3th network boot option</description>
