@@ -233,7 +233,7 @@ SCAN_TRIGGER="$scan_trigger"
 #
 PORT_BANNER="$port_banner"
 
-EOF
+EOF;
 
 	conf_mount_rw();
 	// Write out configuration
