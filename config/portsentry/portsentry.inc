@@ -1,6 +1,8 @@
 <?php
 
 function portsentry_custom_php_deinstall_command() {
+	global $config;
+
 	conf_mount_rw();
 	exec("killall portsentry");
 	exec("rm -rf /usr/local/etc/portsentry*");
