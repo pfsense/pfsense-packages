@@ -30,13 +30,17 @@ function portsentry_custom_php_install_command() {
 		$scantrigger = "0";
 
 	$isfirst = true;
-	$ports = "";
-	foreach($config['installedpackages']['portsentry']['config'][0]['row'] as $ps) {
-		if(!$isfirst) 
-			$ports .= ",";
-		if($ps['listenport'])
-			$ports .= $ps['listenport'];
-		$isfirst = false;
+
+	$ports = "1,11,15,110,111,143,540,635,1080,1524,2000,12345,12346,20034,32771,32772,32773,32774,49724,54320";
+	if($config['installedpackages']['portsentry']['config'][0]['row']) {
+		$ports = "";
+		foreach($config['installedpackages']['portsentry']['config'][0]['row'] as $ps) {
+			if(!$isfirst) 
+				$ports .= ",";
+			if($ps['listenport'])
+				$ports .= $ps['listenport'];
+			$isfirst = false;
+		}
 	}
 	$tcp_ports = $ports;
 	$udp_ports = $ports;
