@@ -1390,7 +1390,7 @@ preprocessor http_inspect_server: server default \
                         non_strict \
                         non_rfc_char  { 0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07 }  \
                         flow_depth 0  \
-                        apache_whitespace yes \
+                        apache_whitespace no \
                         directory no \
                         iis_backslash no \
                         u_encode yes \
@@ -1399,7 +1399,7 @@ preprocessor http_inspect_server: server default \
                         bare_byte yes \
                         double_decode yes \
                         iis_unicode yes \
-                        iis_delimiter yes \
+                        iis_delimiter no \
                         multi_slash no
 	
 EOD;
