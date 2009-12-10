@@ -46,7 +46,7 @@
 		<name>Portsentry</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
-		<url></url>
+		<url>http://sourceforge.net/projects/sentrytools/</url>
 	</menu>
 	<service>
 		<name>Portsentry</name>
