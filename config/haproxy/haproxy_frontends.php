@@ -59,7 +59,7 @@ if ($_GET['act'] == "del") {
 			unset($a_backend[$_GET['id']]);
 			write_config();
 			touch($d_haproxyconfdirty_path);
-			header("Location: haproxy_backends.php");
+			header("Location: haproxy_frontends.php");
 			exit;
 		}
 	}
@@ -69,13 +69,13 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 	
-$pgtitle = "Services: HAProxy: Backends";
+$pgtitle = "Services: HAProxy: Frontend";
 include("head.inc");
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<form action="haproxy_backends.php" method="post">
+<form action="haproxy_frontends.php" method="post">
 <?php if($one_two): ?>
 <p class="pgtitle"><?=$pgtitle?></p>
 <?php endif; ?>
@@ -90,7 +90,7 @@ include("head.inc");
         /* active tabs */
         $tab_array = array();
 		$tab_array[] = array("Settings", false, "haproxy_global.php");
-        $tab_array[] = array("Frontends/Backends", true, "haproxy_backends.php");		
+        $tab_array[] = array("Frontends", true, "haproxy_frontends.php");		
 		$tab_array[] = array("Servers", false, "haproxy_servers.php");
 		display_top_tabs($tab_array);
   ?>
@@ -123,8 +123,8 @@ include("head.inc");
                   <td class="list" nowrap>
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
-                        <td valign="middle"><a href="haproxy_backends_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                        <td valign="middle"><a href="haproxy_backends.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                        <td valign="middle"><a href="haproxy_frontends_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                        <td valign="middle"><a href="haproxy_frontends.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                       </tr>
                     </table>
                   </td>

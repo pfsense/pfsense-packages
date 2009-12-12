@@ -32,6 +32,7 @@
 require("guiconfig.inc");
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
+$a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 
 if (!is_array($config['installedpackages']['haproxy']['ha_servers']['item'])) {
 	$config['installedpackages']['haproxy']['ha_servers']['item'] = array();
@@ -63,8 +64,8 @@ if ($_POST) {
 	unset($input_errors);
 	$pconfig = $_POST;
 	
-	$reqdfields = explode(" ", "name address port backend weight");
-	$reqdfieldsn = explode(",", "Name,Address,Port,Backend,Weight");		
+	$reqdfields = explode(" ", "name address port weight");
+	$reqdfieldsn = explode(",", "Name,Address,Port,Weight");		
 
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
@@ -96,6 +97,15 @@ if ($_POST) {
 		if (($_POST['name'] == $config['installedpackages']['haproxy']['ha_servers']['item'][$i]['name']) && ($i != $id))
 			$input_errors[] = "This server name has already been used.  Server names must be unique.";
 
+	$backend = "";
+	for($x=0; $x<299; $x++) {
+		$comd = "\$backends = \$_POST['backend" . $x . "'];";
+		eval($comd);
+		if($backends) 
+			$backend .= "$backends ";
+	}
+	$backend = trim($backend);
+
 	if (!$input_errors) {
 		$server = array();
 		if(isset($id) && $a_server[$id])
@@ -103,14 +113,14 @@ if ($_POST) {
 			
 		if($server['name'] != "")
 			$changedesc .= " modified '{$server['name']}' pool:";
-		
+
 		update_if_changed("name", $server['name'], $_POST['name']);
-		update_if_changed("address", $server['address'], $_POST['address']);
 		update_if_changed("port", $server['port'], $_POST['port']);
-		update_if_changed("backend", $server['backend'], $_POST['backend']);
+		update_if_changed("backend", $server['backend'], $backend);
 		update_if_changed("cookie", $server['cookie'], $_POST['cookie']);
 		update_if_changed("weight", $server['weight'], $_POST['weight']);
 		update_if_changed("status", $server['status'], $_POST['status']);
+		update_if_changed("address", $server['address'], $_POST['address']);
 		
 		if (isset($id) && $a_server[$id]) {
 			$a_server[$id] = $server;
@@ -140,7 +150,11 @@ if(strstr($pfSversion, "1.2"))
 $pgtitle = "HAProxy: Server: Edit";
 include("head.inc");
 
+row_helper();
+
 ?>
+
+<input type='hidden' name='address_type' value='textbox' />
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <script type="text/javascript" language="javascript" src="pool.js"></script>
@@ -153,7 +167,11 @@ function clearcombo(){
   document.iform.serversSelect.selectedIndex = -1;
 }
 </script>
-
+<script type="text/javascript">
+	rowname[0] = "backend";
+	rowtype[0] = "select";
+	rowsize[0] = "1";
+</script>
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if($one_two): ?>
@@ -162,7 +180,7 @@ function clearcombo(){
 	<form action="haproxy_servers_edit.php" method="post" name="iform" id="iform">
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
-			<td colspan="2" valign="top" class="listtopic">Edit haproxy server</td>
+			<td colspan="2" valign="top" class="listtopic">Edit HAProxy server</td>
 		</tr>	
 		<tr align="left">
 			<td width="22%" valign="top" class="vncellreq">Name</td>
@@ -171,34 +189,73 @@ function clearcombo(){
 			</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Address</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input name="address" type="text" <?if(isset($pconfig['address'])) echo "value=\"{$pconfig['address']}\"";?> size="64">
-			</td>
+		  <td width="22%" valign="top" class="vncellreq">Frontend(s)</td>
+		  <td width="78%" class="vtable">
+			<table id="frontendtable">
+			  <tbody>
+				<tr>
+					<td><div id="onecolumn"></div></td>
+				</tr>
+				<?php
+					$counter = 0;
+					$tracker = 0;
+					$backend = $pconfig['backend'];
+					$item = explode(" ", $backend);
+					foreach($item as $ww) {
+						$address = $ww;
+						if($counter > 0) 
+							$tracker = $counter + 1;
+				?>
+				<tr>
+					<td>
+						<select name="backend<?php echo $tracker; ?>">
+						<?php 
+							$i = 0; 
+							if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
+								$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
+							}
+							$backends = split(" ", $pconfig['backend']);
+							foreach($backends as $be)
+								foreach ($a_backend as $backend) {
+						?>
+						<option value="<?=$backend['name'];?>" <?php if($backend['name']==$be) echo "SELECTED";?>><?=$backend['name'];?></option>
+						<?php } ?>
+						</select>
+					</td>
+				<td>
+				<?php
+						if($counter > 0)
+		  					echo "<input type=\"image\" src=\"/themes/".$g['theme']."/images/icons/icon_x.gif\" onclick=\"removeRow(this); return false;\" value=\"Delete\" />";
+				?>
+				</td>
+				</tr>
+				<?php
+					$counter++;
+				 } // end foreach
+				?>
+			  </tbody>
+			  <tfoot>
+			  </tfoot>
+		  </table>
+			<a onclick="javascript:addRowTo('frontendtable'); return false;" href="#">
+				<img border="0" src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" alt="" title="add another entry" />
+			</a>
+		</td>
+		</tr>
+		<tr>
+			<td width="22%" valign="top" class="vncellreq">
+			<div id="addressnetworkport">
+				IP Address
+			</div>
+		  </td>
+		  <td width="78%" class="vtable">
+			<input name="address" type="text" id="address" size="30" value="<?=htmlspecialchars($pconfig['address']);?>" />
+		</td>
 		</tr>
 		<tr align="left">
 			<td width="22%" valign="top" class="vncellreq">Port</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="5">
-			</td>
-		</tr>
-		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Backend</td>
-			<td width="78%" class="vtable" colspan="2">
-				<select name="backend">
-				<?php 
-					$i = 0; 
-					if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
-						$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
-					}
-					$a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
-
-					foreach ($a_backend as $backend) {
-				?>
-				<option value="<?=$backend['name'];?>" <?php if($backend['name']==$pconfig['backend']) echo "SELECTED";?>><?=$backend['name'];?></option>
-				<?php } ?>
-				</select>
-				<div></div>
 			</td>
 		</tr>
 		<tr align="left">
@@ -249,5 +306,104 @@ function clearcombo(){
 	</form>
 <br>
 <?php include("fend.inc"); ?>
+<script type="text/javascript">
+	field_counter_js = 1;
+	rows = 1;
+	totalrows = <?php echo $counter; ?>;
+	loaded = <?php echo $counter; ?>;
+</script>
 </body>
 </html>
+
+<?php
+
+function row_helper() {
+	global $pconfig, $a_backend;
+	$options = "";
+	foreach ($a_backend as $backend) {
+		$options .= "<option value='{$backend['name']}'";
+		if($backend['name'] == $pconfig['backend']) 
+			$options .=  "SELECTED";
+		$options .=  ">";
+		$options .=  $backend['name'];
+		$options .=  "</option>";
+	}
+	
+	echo <<<EOF
+<script type="text/javascript">
+// Global Variables
+var rowname = new Array(99);
+var rowtype = new Array(99);
+var newrow  = new Array(99);
+var rowsize = new Array(99);
+
+for (i = 0; i < 99; i++) {
+	rowname[i] = '';
+	rowtype[i] = '';
+	newrow[i] = '';
+	rowsize[i] = '25';
+}
+
+var field_counter_js = 0;
+var loaded = 0;
+var is_streaming_progress_bar = 0;
+var temp_streaming_text = "";
+
+var addRowTo = (function() {
+    return (function (tableId) {
+	var d, tbody, tr, td, bgc, i, ii, j;
+	d = document;
+	tbody = d.getElementById(tableId).getElementsByTagName("tbody").item(0);
+	tr = d.createElement("tr");
+	totalrows++;
+	for (i = 0; i < field_counter_js; i++) {
+		td = d.createElement("td");
+		if(rowtype[i] == 'textbox') {
+			td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows + "'></input><input size='" + rowsize[i] + "' name='" + rowname[i] + totalrows + "'></input> ";
+		} else if(rowtype[i] == 'select') {
+			td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows + "'></input><select size='" + rowsize[i] + "' name='" + rowname[i] + totalrows + "'>$options</select> ";
+		} else {
+			td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows + "'></input><input type='checkbox' name='" + rowname[i] + totalrows + "'></input> ";
+		}
+		tr.appendChild(td);
+	}
+	td = d.createElement("td");
+	td.rowSpan = "1";
+
+	td.innerHTML = '<input type="image" src="/themes/' + theme + '/images/icons/icon_x.gif" onclick="removeRow(this); return false;" value="Delete">';
+	tr.appendChild(td);
+	tbody.appendChild(tr);
+    });
+})();
+
+function removeRow(el) {
+    var cel;
+    while (el && el.nodeName.toLowerCase() != "tr")
+	    el = el.parentNode;
+
+    if (el && el.parentNode) {
+	cel = el.getElementsByTagName("td").item(0);
+	el.parentNode.removeChild(el);
+    }
+}
+
+function find_unique_field_name(field_name) {
+	// loop through field_name and strip off -NUMBER
+	var last_found_dash = 0;
+	for (var i = 0; i < field_name.length; i++) {
+		// is this a dash, if so, update
+		//    last_found_dash
+		if (field_name.substr(i,1) == "-" )
+			last_found_dash = i;
+	}
+	if (last_found_dash < 1)
+		return field_name;
+	return(field_name.substr(0,last_found_dash));
+}
+</script>
+
+EOF;
+
+}
+
+?>

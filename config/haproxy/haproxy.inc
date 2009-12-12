@@ -147,7 +147,14 @@ function haproxy_configure() {
 			
 			fwrite ($fd, "{$backendinfo}");
 			fwrite ($fd, "{$listenip}");
-            fwrite ($fd, "\tmode\t\t\t".$backend['type'] . "\n");
+
+			// https is an alias for tcp for clarity purpouses
+			if($backend['type'] == "https")
+				$backend = "tcp";
+			else 
+				$backend = $backend['type'];
+
+            fwrite ($fd, "\tmode\t\t\t" . $backend . "\n");
 			fwrite ($fd, "\tlog\t\t\tglobal\n");
 			fwrite ($fd, "\toption\t\t\tdontlognull\n");
 			fwrite ($fd, "\toption\t\t\thttpclose\n");
@@ -197,15 +204,21 @@ function haproxy_configure() {
 			foreach ($a_acl as $acl) 
 				fwrite ($fd, "\tacl\t\t\t".$acl['name']."\t\t".$acl['expression']."\n");
 
+			$server['backend'] .= " ";
 			if(is_array($a_servers)) {
 				foreach ($a_servers as $server) {
-					if($server['backend']==$backend['name']) {
-						if($server['status']=='active') {
-							if($server['cookie']) 
-								$cookie = " cookie {$server['cookie']} ";
-							else 
-								$cookie = "";
-							fwrite ($fd, "\tserver\t\t\t".$server['name']." ".$server['address'].":".$server['port']." $cookie "." check inter 1000 weight ".$server['weight']."\n");
+					$backends_to_process = split(" ", $server['backend']);
+					foreach($backends_to_process as $backend) {
+						if($backend == "")
+							continue;
+						if($backend ==$backend['name']) {
+							if($server['status']=='active') {
+								if($server['cookie']) 
+									$cookie = " cookie {$server['cookie']} ";
+								else 
+									$cookie = "";
+								fwrite ($fd, "\tserver\t\t\t".$server['name']." ".$server['address'].":".$server['port']." $cookie "." check inter 1000 weight ".$server['weight']."\n");
+							}
 						}
 					}
 				}

@@ -75,7 +75,7 @@ if (isset($id) && $a_backend[$id]) {
 
 }
 
-$changedesc = "Services: HAProxy: Backends";
+$changedesc = "Services: HAProxy: Frontend";
 $changecount = 0;
 
 if ($_POST) {
@@ -131,7 +131,7 @@ if ($_POST) {
 	/* Ensure that our pool names are unique */
 	for ($i=0; isset($config['installedpackages']['haproxy']['ha_backends']['item'][$i]); $i++)
 		if (($_POST['name'] == $config['installedpackages']['haproxy']['ha_backends']['item'][$i]['name']) && ($i != $id))
-			$input_errors[] = "This backend name has already been used. Backend names must be unique.";
+			$input_errors[] = "This backend name has already been used. Frontend names must be unique.";
 
 	$a_acl=array();			
 	$acl_names=array(); 
@@ -245,7 +245,7 @@ if ($_POST) {
 			write_config($changedesc);
 		}
 
-		header("Location: haproxy_backends.php");
+		header("Location: haproxy_frontends.php");
 		exit;
 	}
 }
@@ -254,7 +254,7 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 
-$pgtitle = "HAProxy: Backend: Edit";
+$pgtitle = "HAProxy: Frontend: Edit";
 include("head.inc");
 
 ?>
@@ -414,6 +414,7 @@ set by the 'retries' parameter (2).</div>
 			<td width="78%" class="vtable" colspan="2">
 				<select name="type" id="type" onchange="type_change();">
 					<option value="http"<?php if($pconfig['type'] == "http") echo " SELECTED"; ?>>HTTP</option>
+					<option value="https"<?php if($pconfig['type'] == "https") echo " SELECTED"; ?>>HTTPS</option>
 					<option value="tcp"<?php if($pconfig['type'] == "tcp") echo " SELECTED"; ?>>TCP</option>
 					<option value="health"<?php if($pconfig['type'] == "health") echo " SELECTED"; ?>>Health</option>
 				</select>
@@ -607,7 +608,7 @@ set by the 'retries' parameter (2).</div>
 		<tr>
 			<br/>&nbsp;<br/>
 			<td colspan='3'>
-					<span class="vexpl"><b>NOTE:</b> You must add a firewall rule permitting access to this backend!</span>
+					<span class="vexpl"><b>NOTE:</b> You must add a firewall rule permitting access to this frontend!</span>
 			</td>
 		</tr>
 	</table>

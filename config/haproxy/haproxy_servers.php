@@ -68,7 +68,7 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 	
-$pgtitle = "Services: HAProxy: Backends";
+$pgtitle = "Services: HAProxy: Servers";
 include("head.inc");
 
 ?>
@@ -89,7 +89,7 @@ include("head.inc");
         /* active tabs */
         $tab_array = array();
 		$tab_array[] = array("Settings", false, "haproxy_global.php");
-        $tab_array[] = array("Frontends/Backends", false, "haproxy_backends.php");
+        $tab_array[] = array("Frontends", false, "haproxy_frontends.php");
 		$tab_array[] = array("Servers", true, "haproxy_servers.php");
 		display_top_tabs($tab_array);
   ?>

@@ -50,7 +50,7 @@
 		<name>HAProxy</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
-		<url>/haproxy_backends.php</url>
+		<url>/haproxy_frontends.php</url>
 	</menu>
 	<service>
 		<name>HAProxy</name>
@@ -67,12 +67,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy/haproxy_backends.php</item>
+		<item>http://www.pfsense.com/packages/config/haproxy/haproxy_frontends.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy/haproxy_backends_edit.php</item>
+		<item>http://www.pfsense.com/packages/config/haproxy/haproxy_frontends_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>

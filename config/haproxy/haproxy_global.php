@@ -125,7 +125,7 @@ function enable_change(enable_change) {
 	/* active tabs */
 	$tab_array = array();
 	$tab_array[] = array("Settings", true, "haproxy_global.php");
-	$tab_array[] = array("Frontends/Backends", false, "haproxy_backends.php");	
+	$tab_array[] = array("Frontends", false, "haproxy_frontends.php");	
 	$tab_array[] = array("Servers", false, "haproxy_servers.php");	
 	display_top_tabs($tab_array);
 	?>
