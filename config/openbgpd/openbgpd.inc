@@ -83,7 +83,7 @@ function openbgpd_install_conf() {
           foreach($openbgpd_neighbors as $neighbor) {
             if($neighbor['groupname'] == $group['name']) {
               $conffile .= "		neighbor {$neighbor['neighbor']} {\n";
-              $conffile .= "		descr \"{$neighbor['descr']}\"\n";
+			  $conffile .= "    	 descr \"{$neighbor['descr']}\"\n";
 	      $setkeycf .= "delete {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000;\n";
               if($neighbor['md5sigpass']) {
 		$setkeycf .= "add {$openbgpd_conf['listenip']} {$neighbor['neighbor']} tcp 0x1000 -A tcp-md5 \"{$neighbor['md5sigpass']}\";\n";
@@ -125,9 +125,9 @@ function openbgpd_install_conf() {
             $conffile .= "	{$row['paramaters']} {$row['parmvalue']} \n";
           }
         }
+		if($used_this_item)
+			$conffile .= "}\n";
       }
-      if($used_this_item)
-        $conffile .= "}\n";
     }	
     
     // OpenBGPD filters
