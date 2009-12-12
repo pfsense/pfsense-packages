@@ -1758,15 +1758,17 @@ function sg_list_itemsfield($xml_items, $fld_name)
 # ------------------------------------------------------------------------------
 # is_url - check url an err_codes
 # ------------------------------------------------------------------------------
-function is_url($url)
-{
-    if (empty($url))                return false;
-    if (eregi("^http://", $url))    return true;
-    if (eregi("^https://", $url))   return true;
-    if (strstr("blank", $url))      return true;
-    if (strstr("blank_img", $url))  return true;
-    if (eregi("^((30[1235]{1})|(40[0-9]{1})|(41[0-7]{1})|(50[0-5]{1}))", $url)) return true; # http error code 30x, 4xx, 50x.
-    return false;
+if(!function_exists("is_url")) {
+	function is_url($url)
+	{
+	    if (empty($url))                return false;
+	    if (eregi("^http://", $url))    return true;
+	    if (eregi("^https://", $url))   return true;
+	    if (strstr("blank", $url))      return true;
+	    if (strstr("blank_img", $url))  return true;
+	    if (eregi("^((30[1235]{1})|(40[0-9]{1})|(41[0-7]{1})|(50[0-5]{1}))", $url)) return true; # http error code 30x, 4xx, 50x.
+	    return false;
+	}
 }
 
 # url as 'domain/path': 'mydomain.com/index.php'
