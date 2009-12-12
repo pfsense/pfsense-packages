@@ -102,7 +102,7 @@ include("head.inc");
                   <td width="30%" class="listhdrr">Name</td>
                   <td width="30%" class="listhdrr">Server</td>
                   <td width="20%" class="listhdrr">Status</td>
-                  <td width="30%" class="listhdrr">Backend</td>
+                  <td width="30%" class="listhdrr">Frontend</td>
                   <td width="10%" class="listhdrr">Cookie</td>
                   <td width="10%" class="listhdrr">Weight</td>
                   <td width="10%" class="list"></td>
