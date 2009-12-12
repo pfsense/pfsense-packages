@@ -209,17 +209,17 @@ function clearcombo(){
 				<tr>
 					<td>
 						<select name="backend<?php echo $tracker; ?>">
-						<?php 
-							$i = 0; 
-							if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
-								$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
-							}
-							$backends = split(" ", $pconfig['backend']);
-							foreach($backends as $be)
+							<?php 
+								$i = 0; 
+								if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) 
+									$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
+								$backends = split(" ", $pconfig['backend']);
 								foreach ($a_backend as $backend) {
-						?>
-						<option value="<?=$backend['name'];?>" <?php if($backend['name']==$be) echo "SELECTED";?>><?=$backend['name'];?></option>
-						<?php } ?>
+							?>
+							<option value="<?=$backend['name'];?>" <?php if($backend['name'] == $ww) echo "SELECTED";?>>
+								<?=$backend['name'];?>
+							</option>
+							<?php } ?>
 						</select>
 					</td>
 				<td>
