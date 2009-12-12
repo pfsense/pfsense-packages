@@ -296,7 +296,8 @@ function clearcombo(){
 		<tr align="left">
 			<td width="22%" valign="top">&nbsp;</td>
 			<td width="78%">
-				<input name="Submit" type="submit" class="formbtn" value="Save">
+				<input name="Submit" type="submit" class="formbtn" value="Save">  
+				<input type="button" class="formbtn" value="Cancel" onclick="history.back()">
 				<?php if (isset($id) && $a_server[$id]): ?>
 				<input name="id" type="hidden" value="<?=$id;?>">
 				<?php endif; ?>

@@ -599,7 +599,8 @@ set by the 'retries' parameter (2).</div>
 			<tr align="left">
 			<td width="22%" valign="top">&nbsp;</td>
 			<td width="78%">
-				<input name="Submit" type="submit" class="formbtn" value="Save">
+				<input name="Submit" type="submit" class="formbtn" value="Save">  
+				<input type="button" class="formbtn" value="Cancel" onclick="history.back()">
 				<?php if (isset($id) && $a_backend[$id]): ?>
 				<input name="id" type="hidden" value="<?=$id;?>">
 				<?php endif; ?>
