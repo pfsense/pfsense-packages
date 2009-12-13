@@ -64,11 +64,16 @@ $emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'
 		$snort_emrging_info = "stop";
 	}
 
-	if ($oinkid == "" && $snortdownload == "basic" || $oinkid == "" && $snortdownload == "premium")
+	if ($oinkid == "" && $snortdownload != "off")
 	{
 		$snort_oinkid_info = "stop";
 	}
 
+	
+	/* check if main rule directory is empty */
+	$if_mrule_dir = "/usr/local/etc/snort/rules";
+	$mfolder_chk = (count(glob("$if_mrule_dir/*")) === 0) ? 'empty' : 'full';
+	
 /* If no id show the user a button */	
 if ($id_d == "" || $snort_emrging_info == "stop" || $snort_oinkid_info == "stop") {
 
@@ -126,15 +131,17 @@ echo  		"</td>\n
 					<td>\n
 <input name=\"Submit\" type=\"submit\" class=\"formbtn\" $disable_enable_button value=\"Update Rules\" $disable_button> <br><br> \n";
 
-
-echo "The rules directory is empty. /usr/local/etc/snort/rules <br><br>\n";
+if ($mfolder_chk == "empty")
+{
+echo "<span class=\"red\"><strong>WARNING:</strong></span> &nbsp;&nbsp;The main rules <strong>directory</strong> is <strong>empty</strong>. /usr/local/etc/snort/rules <br><br>\n";
+}
 
 if ($snort_emrging_info == "stop") {
-echo "<span class=\"red\"><strong>WARNING:</strong></span> &nbsp;&nbsp;Click on the <strong>\"Global Settings\"</strong> TAB and select ether snort.org or enmergingthreats.net rules to download. <br><br> \n";
+echo "<span class=\"red\"><strong>WARNING:</strong></span> &nbsp;&nbsp;Click on the <strong>\"Global Settings\"</strong> tab and select ether snort.org or enmergingthreats.net rules to download. <br><br> \n";
 }
 
 if ($snort_oinkid_info == "stop") {
-echo "<span class=\"red\"><strong>WARNING:</strong></span> &nbsp;&nbsp;Click on the <strong>\"Global Settings\"</strong> TAB and enter a oinkmaster code. <br><br> \n";
+echo "<span class=\"red\"><strong>WARNING:</strong></span> &nbsp;&nbsp;Click on the <strong>\"Global Settings\"</strong> tab and enter a <strong>oinkmaster</strong> code. <br><br> \n";
 }
 
 
@@ -488,38 +495,63 @@ if ($emergingthreats == "on")
 		}
 	}
 
-/* Check if were up to date exits */
-
-if ($snort_md5_check_ok == "on" && $emerg_md5_check_ok == "on")
+/* Check if were up to date is so, exit */
+/* WARNING This code needs constant checks */
+if ($snortdownload != "off" && $emergingthreats != "off")
 {
-		update_status(gettext("All your rules are up to date..."));
-		update_output_window(gettext("You may start Snort now..."));
-		echo '
-<script type="text/javascript">
-<!--
-	displaymessagestop();	
-// -->
-</script>';
-echo "</body>";
-echo "</html>";
-conf_mount_ro();
-		exit(0);
+	if ($snort_md5_check_ok == "on" && $emerg_md5_check_ok == "on")
+	{
+			update_status(gettext("All your rules are up to date..."));
+			update_output_window(gettext("You may start Snort now..."));
+			echo '
+	<script type="text/javascript">
+	<!--
+		displaymessagestop();	
+	// -->
+	</script>';
+			echo "</body>";
+			echo "</html>";
+			conf_mount_ro();
+			exit(0);
+	}
 }
 
-if ($snort_md5_check_ok == "on" && $emerg_md5_check_ok == "on")
+if ($snortdownload == "on" && $emergingthreats == "off")
 {
-		update_status(gettext("All your rules are up to date..."));
-		update_output_window(gettext("You may start Snort now..."));
-		echo '
-<script type="text/javascript">
-<!--
-	displaymessagestop();	
-// -->
-</script>';
-		echo "</body>";
-		echo "</html>";
-		conf_mount_ro();
-		exit(0);
+	if ($snort_md5_check_ok == "on")
+	{
+			update_status(gettext("Your snort.org rules are up to date..."));
+			update_output_window(gettext("You may start Snort now..."));
+			echo '
+	<script type="text/javascript">
+	<!--
+		displaymessagestop();	
+	// -->
+	</script>';
+			echo "</body>";
+			echo "</html>";
+			conf_mount_ro();
+			exit(0);
+	}
+}
+
+if ($snortdownload == "off" && $emergingthreats == "on")
+{
+	if ($emerg_md5_check_ok == "on")
+	{
+			update_status(gettext("Your Emergingthreats rules are up to date..."));
+			update_output_window(gettext("You may start Snort now..."));
+			echo '
+	<script type="text/javascript">
+	<!--
+		displaymessagestop();	
+	// -->
+	</script>';
+			echo "</body>";
+			echo "</html>";
+			conf_mount_ro();
+			exit(0);
+	}
 }
 		
 /* You are Not Up to date, always stop snort when updating rules for low end machines */;
