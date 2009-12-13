@@ -183,7 +183,7 @@ include("/usr/local/www/head.inc");
 function displaymessage()
 {
 
-		$.blockUI.defaults.message = "Please be patient ROB...";
+		$.blockUI.defaults.message = "Please be patient....";
 
         $.blockUI({
 
@@ -1080,13 +1080,13 @@ if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_c
 $config['installedpackages']['snortglobal']['last_rules_install'] = date("Y-M-jS-h:i-A");
 
 /*  remove old $tmpfname files */
-//if (file_exists("{$tmpfname}")) {
-//    update_status(gettext("Cleaning up..."));
-//    exec("/bin/rm -r /tmp/snort_rules_up");
-//	sleep(2);
-//	exec("/bin/rm -r {$snortdir}/rules_bk/rules/");
-//	apc_clear_cache();
-//}
+if (file_exists("{$tmpfname}")) {
+    update_status(gettext("Cleaning up..."));
+    exec("/bin/rm -r /tmp/snort_rules_up");
+	sleep(2);
+	exec("/bin/rm -r {$snortdir}/rules_bk/rules/");
+	apc_clear_cache();
+}
 
 /* php code to flush out cache some people are reportting missing files this might help  */
 sleep(2);

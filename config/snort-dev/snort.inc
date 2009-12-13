@@ -433,22 +433,6 @@ function sync_package_snort()
 {
 	global $config, $g, $id, $if_real, $interface_fake;
 	conf_mount_rw();
-	
-	/* snort advanced features - bpf tuning */
-//	if($bpfbufsize)
-//		$start .= "sysctl net.bpf.bufsize={$bpfbufsize}\n";
-//	if($bpfmaxbufsize)
-//		$start .= "sysctl net.bpf.maxbufsize={$bpfmaxbufsize}\n";
-//	if($bpfmaxinsns)
-//		$start .= "sysctl net.bpf.maxinsns={$bpfmaxinsns}\n";
-
-	/* go ahead and issue bpf changes */
-//	if($bpfbufsize)
-//		mwexec_bg("sysctl net.bpf.bufsize={$bpfbufsize}");
-//	if($bpfmaxbufsize)
-//		mwexec_bg("sysctl net.bpf.maxbufsize={$bpfmaxbufsize}");
-//	if($bpfmaxinsns)
-//		mwexec_bg("sysctl net.bpf.maxinsns={$bpfmaxinsns}");
 
 /* RedDevil suggested code */
 /* TODO: more testing needs to be done */
@@ -477,7 +461,10 @@ exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 				create_snort_conf();
 
 				/* create snort.sh file */
-				create_snort_sh();	
+				create_snort_sh();
+				
+				/* if rules exist cp rules to each iface */
+				create_rules_iface();
 
 			/* create barnyard2 configuration file */
 			$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
@@ -493,6 +480,9 @@ exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 	
 		/* create snort.sh file */
 		create_snort_sh();
+		
+		/* if rules exist cp rules to each iface */
+		create_rules_iface();
 
 			/* create barnyard2 configuration file */
 			$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
@@ -523,14 +513,25 @@ exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 /* Start of main config files */
 /* Start of main config files */
 
-/* if rules exist copy to new interfaces */
-$if_rule_dir = "/usr/local/etc/snort/snort_$id$if_real/rules";
-$folder_chk = (count(glob("$if_rule_dir/*")) === 0) ? 'empty' : 'full';
 
-if($folder_chk == "empty") {
-	exec("/bin/cp -R /usr/local/etc/snort/rules /usr/local/etc/snort/snort_$id$if_real");
-	if(file_exists("/usr/local/etc/snort/custom_rules/local_$id$if_real.rules")) {
-		exec("/bin/cp /usr/local/etc/snort/custom_rules/local_$id$if_real.rules /usr/local/etc/snort/snort_$id$if_real/rules/local_$id$if_real.rules");
+
+/* if rules exist copy to new interfaces */
+function create_rules_iface()
+{
+
+    global $config, $g, $id, $if_real;
+    conf_mount_rw();
+
+	$if_rule_dir = "/usr/local/etc/snort/snort_$id$if_real/rules";
+	$folder_chk = (count(glob("$if_rule_dir/*")) === 0) ? 'empty' : 'full';
+
+	if ($folder_chk == "empty")
+	{
+		exec("/bin/cp -R /usr/local/etc/snort/rules /usr/local/etc/snort/snort_$id$if_real");
+		if (file_exists("/usr/local/etc/snort/custom_rules/local_$id$if_real.rules"))
+		{
+			exec("/bin/cp /usr/local/etc/snort/custom_rules/local_$id$if_real.rules /usr/local/etc/snort/snort_$id$if_real/rules/local_$id$if_real.rules");
+		}
 	}
 }
 
