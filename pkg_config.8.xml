@@ -119,20 +119,6 @@
       <configurationfile>ntop.xml</configurationfile>
     </package>
     <package>
-      <name>Pubkey</name>
-      <descr>pfSense release key</descr>
-      <website>http://pfsense.org</website>
-      <category>System</category>
-      <version>1.0</version>
-      <required_version>1.0</required_version>
-      <status>RELEASE</status>
-      <pkginfolink>http://doc.pfsense.org/index.php/Pubkey_package</pkginfolink>
-      <config_file>http://www.pfsense.org/packages/config/pubkey.xml</config_file>
-      <configurationfile>pubkey.xml</configurationfile>
-  	  <after_install_info>The pfSense release key has been updated.</after_install_info>
-	  <noembedded>true</noembedded>
-    </package>
-    <package>
       <name>FreeSWITCH</name>
       <website>http://www.freeswitch.org/</website>
       <descr>FreeSWITCH is an open source telephony platform designed to facilitate the creation of voice and chat driven products scaling from a soft-phone up to a soft-switch.  It can be used as a simple switching engine, a PBX, a media gateway or a media server to host IVR applications using simple scripts or XML to control the callflow. </descr>
