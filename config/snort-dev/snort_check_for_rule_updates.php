@@ -40,7 +40,26 @@ $pfsense_rules_filename_md5 = "pfsense_rules.tar.gz.md5";
 $pfsense_rules_filename = "pfsense_rules.tar.gz";
 
 require_once("config.inc");
-require("/usr/local/pkg/snort/snort.inc");
+// require("/usr/local/pkg/snort/snort.inc");
+
+/* define checks */
+$oinkid = $config['installedpackages']['snortglobal']['oinkmastercode'];
+$snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
+$emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'];
+
+if ($oinkid == "" && $snortdownload != "off")
+{
+        echo "You must obtain an oinkid from snort.org and set its value in the Snort settings tab.\n";
+		exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'You must obtain an oinkid from snort.org and set its value in the Snort settings tab.'");
+        exit;
+}
+
+if ($snortdownload != "on" && $emergingthreats != "on")
+{
+        echo 'Snort Global Settings: download snort.org rules = off and download emergingthreat rules = off.\n';
+		exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'No rules have been selected to download.'");
+        exit;
+}
 
 conf_mount_rw();
 
@@ -68,17 +87,6 @@ $config['installedpackages']['snortglobal']['last_md5_download'] = date("Y-M-jS-
 /* send current buffer */
 ob_flush();
 conf_mount_rw();
-
-/* define oinkid */
-if($config['installedpackages']['snortglobal'])
-        $config['installedpackages']['snortglobal']['oinkmastercode'];
-
-/* if missing oinkid exit */
-if($oinkid == "") {
-        echo "You must obtain an oinkid from snort.org and set its value in the Snort settings tab.\n";
-		exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'You must obtain an oinkid from snort.org and set its value in the Snort settings tab.'");
-        exit;
-}
 
 /* premium_subscriber check  */
 //unset($config['installedpackages']['snort']['config'][0]['subscriber']);
@@ -744,7 +752,7 @@ exec("/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/syn
 
 /* if snort is running hardrestart, if snort is not running do nothing */
 if (file_exists("/tmp/snort_download_halt.pid")) {
-	exec("/bin/sh /usr/local/etc/rc.d/snort* start");
+	exec("/bin/sh /usr/local/etc/rc.d/snort\* start");
 	echo "The Rules update finished...\n";
 	echo "Snort has restarted with your new set of rules...\n";
 	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'SNORT RULE UPDATE FINNISHED...'");
