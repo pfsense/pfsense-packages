@@ -465,36 +465,32 @@ if ($emergingthreats == "on")
 		if ($emerg_md5_check_new == $emerg_md5_check_old) 
 		{
         hide_progress_bar_status();
-        $emerg_md5_check_chk_ok = on;
+        $emerg_md5_check_ok = on;
 		}
 	}
 }
 
 /* Check if were up to date pfsense.org */
-if (file_exists("{$snortdir}/$pfsense_rules_filename_md5")){
-$pfsense_md5_check_new_parse = file_get_contents("{$tmpfname}/{$pfsense_rules_filename_md5}");
-$pfsense_md5_check_new = `/bin/echo "{$pfsense_md5_check_new_parse}" | /usr/bin/awk '{ print $1 }'`;
-$pfsense_md5_check_old_parse = file_get_contents("{$snortdir}/{$pfsense_rules_filename_md5}");
-$pfsense_md5_check_old = `/bin/echo "{$md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
-if ($pfsense_md5_check_new == $pfsense_md5_check_old) {
+	if (file_exists("{$snortdir}/pfsense_rules.tar.gz.md5"))
+	{
+		$pfsense_check_new_parse = file_get_contents("{$tmpfname}/pfsense_rules.tar.gz.md5");
+		$pfsense_md5_check_new = `/bin/echo "{$pfsense_md5_check_new_parse}" | /usr/bin/awk '{ print $1 }'`;
+		$pfsense_md5_check_old_parse = file_get_contents("{$snortdir}/pfsense_rules.tar.gz.md5");
+		$pfsense_md5_check_old = `/bin/echo "{$pfsense_md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
+		/* Write out time of last sucsessful md5 to cache */
+		// Will cause switch back to read-only on nanobsd
+		write_config();
+		conf_mount_rw();
+		if ($pfsense_md5_check_new == $pfsense_md5_check_old) 
+		{
+        hide_progress_bar_status();
         $pfsense_md5_check_ok = on;
-    }
-}
-
-/*  Make Clean Snort Directory emergingthreats not checked */
-if ($snortdownload != "off" && $emergingthreats != "on") {
-	update_status(gettext("Cleaning the snort Directory..."));
-    update_output_window(gettext("removing..."));
-	exec("/bin/rm {$snortdir}/rules/emerging*");
-	exec("/bin/rm {$snortdir}/version.txt");
-	exec("/bin/rm {$snortdir_wan}/rules/emerging*");
-	exec("/bin/rm {$snortdir_wan}/version.txt");
-	update_status(gettext("Done making cleaning emrg direcory."));
-}
+		}
+	}
 
 /* Check if were up to date exits */
 
-if ($snort_md5_check_ok == on && $emerg_md5_check_chk_ok == on && $pfsense_md5_check_ok == on)
+if ($snort_md5_check_ok == "on" && $emerg_md5_check_ok == "on")
 {
 		update_status(gettext("All your rules are up to date..."));
 		update_output_window(gettext("You may start Snort now..."));
@@ -510,9 +506,9 @@ conf_mount_ro();
 		exit(0);
 }
 
-if ($emergingthreats == "on" && $emerg_md5_check_chk_ok == on && $snortdownload == "off")
+if ($snort_md5_check_ok == "on" && $emerg_md5_check_ok == "on")
 {
-		update_status(gettext("Your Emergingthreat rules are up to date..."));
+		update_status(gettext("All your rules are up to date..."));
 		update_output_window(gettext("You may start Snort now..."));
 		echo '
 <script type="text/javascript">
@@ -520,28 +516,11 @@ if ($emergingthreats == "on" && $emerg_md5_check_chk_ok == on && $snortdownload 
 	displaymessagestop();	
 // -->
 </script>';
-echo "</body>";
-echo "</html>";
-conf_mount_ro();
+		echo "</body>";
+		echo "</html>";
+		conf_mount_ro();
 		exit(0);
 }
-
-if ($snortdownload != "off" && $snort_md5_check_ok == on && $emergingthreats != "on")
-{
-		update_status(gettext("Your Snort.org rules are up to date..."));
-		update_output_window(gettext("You may start Snort now..."));
-		echo '
-<script type="text/javascript">
-<!--
-	displaymessagestop();	
-// -->
-</script>';
-echo "</body>";
-echo "</html>";
-conf_mount_ro();
-		exit(0);
-}
-
 		
 /* You are Not Up to date, always stop snort when updating rules for low end machines */;
 update_status(gettext("You are NOT up to date..."));
@@ -588,7 +567,7 @@ conf_mount_ro();
 /* download emergingthreats rules file */
 if ($emergingthreats == "on") 
 {
-	if ($emerg_md5_check_chk_ok != on)
+	if ($emerg_md5_check_ok != on)
 	{
 	if (file_exists("{$tmpfname}/{$emergingthreats_filename}"))
 	{
@@ -698,7 +677,7 @@ conf_mount_ro();
 /* Untar emergingthreats rules to tmp */
 if ($emergingthreats == "on")
 {
-	if ($emerg_md5_check_chk_ok != on)
+	if ($emerg_md5_check_ok != on)
 	{
 		if (file_exists("{$tmpfname}/{$emergingthreats_filename}"))
 		{
@@ -841,9 +820,9 @@ if ($snortdownload != "off")
 	displaymessagestop();	
 // -->
 </script>';
-echo "</body>";
-echo "</html>";
-conf_mount_ro();
+		echo "</body>";
+		echo "</html>";
+		conf_mount_ro();
 		exit(0);
 		}
 	}
@@ -852,7 +831,7 @@ conf_mount_ro();
 /*  Copy emergingthreats md5 sig to snort dir */
 if ($emergingthreats == "on")
 {
-	if ($emerg_md5_check_chk_ok != on) 
+	if ($emerg_md5_check_ok != on) 
 	{
 		if (file_exists("{$tmpfname}/$emergingthreats_filename_md5"))
 		{
@@ -883,10 +862,10 @@ if (file_exists("{$tmpfname}/$pfsense_rules_filename_md5")) {
 	displaymessagestop();	
 // -->
 </script>';
-echo "</body>";
-echo "</html>";
-conf_mount_ro();
-    exit(0);
+		echo "</body>";
+		echo "</html>";
+		conf_mount_ro();
+		exit(0);
  }
 }
  
@@ -978,12 +957,12 @@ $if_real = convert_friendly_interface_to_real_interface_name($result_lan);
 /* open oinkmaster_conf for writing" function */
 function oinkmaster_conf() {
 
-        global $config, $g, $id, $if_real, $snortdir_wan, $snortdir, $snort_md5_check_ok, $emerg_md5_check_chk_ok, $pfsense_md5_check_ok;
+        global $config, $g, $id, $if_real, $snortdir_wan, $snortdir, $snort_md5_check_ok, $emerg_md5_check_ok, $pfsense_md5_check_ok;
         conf_mount_rw();
 		
 /*  enable disable setting will carry over with updates */
 /*  TODO carry signature changes with the updates */
-if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_check_ok != on) {
+if ($snort_md5_check_ok != on || $emerg_md5_check_ok != on || $pfsense_md5_check_ok != on) {
 
 if (!empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on'])) {
 $enabled_sid_on = $config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on'];
@@ -1035,10 +1014,10 @@ EOD;
 /*  TODO add per interface settings here */
 function oinkmaster_run() {
 
-        global $config, $g, $id, $if_real, $snortdir_wan, $snortdir, $snort_md5_check_ok, $emerg_md5_check_chk_ok, $pfsense_md5_check_ok;
+        global $config, $g, $id, $if_real, $snortdir_wan, $snortdir, $snort_md5_check_ok, $emerg_md5_check_ok, $pfsense_md5_check_ok;
         conf_mount_rw();
 
-if ($snort_md5_check_ok != on || $emerg_md5_check_chk_ok != on || $pfsense_md5_check_ok != on) {
+if ($snort_md5_check_ok != on || $emerg_md5_check_ok != on || $pfsense_md5_check_ok != on) {
 
 	if (empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on']) || empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off'])) {
 	update_status(gettext("Your first set of rules are being copied..."));

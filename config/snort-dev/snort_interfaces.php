@@ -142,18 +142,21 @@ if (isset($_POST['del_x'])) {
 			$after_mem = exec("/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{ print $2 }'");
 			exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'MEM after {$rulei}{$if_real} STOP {$after_mem}'");				
 			exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule removed for {$rulei}{$if_real}...'");
-						
+			
 				}
 			
 			}
-
-			exec("/bin/rm -r /usr/local/etc/snort/snort_$rulei$if_real");
-			exec("/bin/rm /usr/local/etc/rc.d/snort_$rulei$if_real.sh");
-			exec("/bin/rm /var/log/snort/snort.u2_$rulei$if_real*");
 			
 	        unset($a_nat[$rulei]);
 			
 	    }
+		
+			conf_mount_rw();
+			exec("/bin/rm -r /usr/local/etc/snort/snort_$rulei$if_real");
+			exec("/bin/rm /usr/local/etc/rc.d/snort_$rulei$if_real.sh");
+			exec("/bin/rm /var/log/snort/snort.u2_$rulei$if_real*");
+			conf_mount_ro();
+		
 	    write_config();
 	    // touch($d_natconfdirty_path);
 	    header("Location: /snort/snort_interfaces.php");
