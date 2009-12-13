@@ -81,7 +81,8 @@
       <version>1.0.21</version>
       <status>Stable</status>
       <configurationfile>pure-ftpd.xml</configurationfile>
-      <required_version>2.0</required_version>
+      <required_version>1.0</required_version>
+      <maximum_version>1.0</maximum_version>
       <logging>
         <facilityname>ftp</facilityname>
         <logfilename>pure-ftpd.log</logfilename>
