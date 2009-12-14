@@ -3,6 +3,7 @@
 /*
 	snort_blocked.php
 	Copyright (C) 2006 Scott Ullrich
+	Copyright (C) 2009 Robert Zelaya
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -38,8 +39,44 @@ if($_POST['todelete'] or $_GET['todelete']) {
 	exec("/sbin/pfctl -t snort2c -T delete {$ip}");
 }
 
-$pgtitle = "Snort: Services: Snort Blocked";
+if ($_POST['remove']) {
+
+exec("/sbin/pfctl -t snort2c -T flush");
+sleep(1);
+header("Location: /snort/snort_blocked.php");
+
+}
+
+
+$pgtitle = "Snort: Services: Snort Blocked Hosts";
 include("head.inc");
+
+/* tell the user what settings they have */
+$blockedtab_msg_chk = $config['installedpackages']['snortglobal']['rm_blocked'];
+	if ($blockedtab_msg_chk == "1h_b") {
+		$blocked_msg = "hour";
+	}
+	if ($blockedtab_msg_chk == "3h_b") {
+		$blocked_msg = "3 hours";
+	}
+	if ($blockedtab_msg_chk == "6h_b") {
+		$blocked_msg = "6 hours";
+	}
+	if ($blockedtab_msg_chk == "12h_b") {
+		$blocked_msg = "12 hours";
+	}
+	if ($blockedtab_msg_chk == "1d_b") {
+		$blocked_msg = "day";
+	}
+	if ($blockedtab_msg_chk == "4d_b") {
+		$blocked_msg = "4 days";
+	}
+	if ($blockedtab_msg_chk == "7d_b") {
+		$blocked_msg = "7 days";
+	}
+	if ($blockedtab_msg_chk == "28d_b") {
+		$blocked_msg = "28 days";
+	}
 
 ?>
 
@@ -47,7 +84,7 @@ include("head.inc");
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle"><?=$pgtitle?></p>
 
-<form action="snort_rulesets.php" method="post" name="iform" id="iform">
+<form action="snort_blocked.php" method="post" name="iform" id="iform">
 <script src="/row_toggle.js" type="text/javascript"></script>
 <script src="/javascript/sorttable.js" type="text/javascript"></script>
 <?php if ($savemsg) print_info_box($savemsg); ?>
@@ -71,8 +108,17 @@ include("head.inc");
     <td>
 		<div id="mainarea">
 			<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-				<tr>
+				<tr> 
 					<td>
+					<?php
+					if ($blockedtab_msg_chk != "never_b")
+					{
+						echo "<span class=\"red\"><strong>Note:</strong></span><br>This page lists hosts that have been blocked by Snort. Hosts are automatically deleted every <strong>$blocked_msg</strong>.<br><br>";
+					}else{
+						echo "<span class=\"red\"><strong>Note:</strong></span><br>This page lists hosts that have been blocked by Snort. Snort package settings are set to never <strong>remove</strong> hosts.<br><br>";
+					}
+					?>
+					<input name="remove" type="submit" class="formbtn" value="Remove"> all blocked hosts.<br><br>
 						<table id="sortabletable1" class="sortable" width="100%" border="0" cellpadding="0" cellspacing="0">
 						    <tr id="frheader">
 								<td width="5%" class="listhdrr">Remove</td>
@@ -85,7 +131,7 @@ include("head.inc");
 	// $ips = `/sbin/pfctl -t snort2c -T show`;
 	/* this improves loading of ips by a factor of 10 */
 	exec('/sbin/pfctl -t snort2c -T show > /tmp/snort_block.cache');
-	sleep(3);
+	sleep(1);
 	$ips_array = file('/tmp/snort_block.cache');
 	// $ips_array = split("\n", $ips);
 	$counter = 0;
@@ -128,34 +174,12 @@ include("head.inc");
 
 <?php
 
-/* tell the user what settings they have */
-$blockedtab_msg_chk = $config['installedpackages']['snortglobal']['rm_blocked7'];
-	if ($blockedtab_msg_chk == "1h_b") {
-		$blocked_msg = "hour";
-	}
-	if ($blockedtab_msg_chk == "3h_b") {
-		$blocked_msg = "3 hours";
-	}
-	if ($blockedtab_msg_chk == "6h_b") {
-		$blocked_msg = "6 hours";
-	}
-	if ($blockedtab_msg_chk == "12h_b") {
-		$blocked_msg = "12 hours";
-	}
-	if ($blockedtab_msg_chk == "1d_b") {
-		$blocked_msg = "day";
-	}
-	if ($blockedtab_msg_chk == "4d_b") {
-		$blocked_msg = "4 days";
-	}
-	if ($blockedtab_msg_chk == "7d_b") {
-		$blocked_msg = "7 days";
-	}
-	if ($blockedtab_msg_chk == "28d_b") {
-		$blocked_msg = "28 days";
-	}
-
-echo "This page lists hosts that have been blocked by Snort. Hosts are automatically deleted every $blocked_msg.";
+if ($blockedtab_msg_chk != "never_b")
+{
+echo "This page lists hosts that have been blocked by Snort. Hosts are automatically deleted every <strong>$blocked_msg</strong>.";
+}else{
+echo "This page lists hosts that have been blocked by Snort. Snort package settings are set to never <strong>remove</strong> hosts.";
+}
 
 ?>
 
