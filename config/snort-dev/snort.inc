@@ -867,6 +867,7 @@ function snort_deinstall()
 	function snort_rm_blocked_deinstall_cron($should_install)
 	{
         global $config, $g;
+		conf_mount_rw();
 
         $is_installed = false;
 
@@ -894,7 +895,8 @@ function snort_deinstall()
 							}
                   configure_cron();
 						}
-	conf_mount_ro();
+	}
+		conf_mount_ro();
 }
 		
 	function snort_rules_up_deinstall_cron($should_install) {
