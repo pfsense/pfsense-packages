@@ -108,16 +108,16 @@ include("head.inc");
 				</tr>
 			  <?php $i = 0; foreach ($a_backend as $backend): ?>
                 <tr>
-                  <td class="listlr" ondblclick="document.location='haproxy_backends_edit.php?id=<?=$i;?>';">
+                  <td class="listlr" ondblclick="document.location='haproxy_frontends_edit.php?id=<?=$i;?>';">
 					<?=$backend['name'];?>
                   </td>
-                  <td class="listlr" ondblclick="document.location='haproxy_backends_edit.php?id=<?=$i;?>';">
+                  <td class="listlr" ondblclick="document.location='haproxy_frontends_edit.php?id=<?=$i;?>';">
 					<?=$backend['desc'];?>
                   </td>
-                 <td class="listlr" ondblclick="document.location='haproxy_backends_edit.php?id=<?=$i;?>';">
+                 <td class="listlr" ondblclick="document.location='haproxy_frontends_edit.php?id=<?=$i;?>';">
 					<?=$backend['stats_uri'];?>
                  </td>
-                  <td class="listlr" ondblclick="document.location='haproxy_backends_edit.php?id=<?=$i;?>';">
+                  <td class="listlr" ondblclick="document.location='haproxy_frontends_edit.php?id=<?=$i;?>';">
 					<?=$backend['type'];?>
                   </td>
                   <td class="list" nowrap>
@@ -135,7 +135,7 @@ include("head.inc");
                   <td class="list">
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
-                        <td valign="middle"><a href="haproxy_backends_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+                        <td valign="middle"><a href="haproxy_frontends_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
                       </tr>
                     </table>
                   </td>

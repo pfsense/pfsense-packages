@@ -1,7 +1,7 @@
 <?php
 /* $Id: load_balancer_pool_edit.php,v 1.24.2.23 2007/03/03 00:07:09 smos Exp $ */
 /*
-	haproxy_backends_edit.php
+	haproxy_frontends_edit.php
 	part of pfSense (http://www.pfsense.com/)
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
@@ -367,7 +367,7 @@ include("head.inc");
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if($one_two): ?>
 <p class="pgtitle"><?=$pgtitle?></p>
-<form action="haproxy_backends_edit.php" method="post" name="iform" id="iform">
+<form action="haproxy_frontends_edit.php" method="post" name="iform" id="iform">
 <?php endif; ?>
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
