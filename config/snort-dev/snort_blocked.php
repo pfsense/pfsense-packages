@@ -82,8 +82,9 @@ include("head.inc");
 <?php
 
 	$associatealertip = $config['installedpackages']['snort']['config'][0]['associatealertip'];
-	$ips = `/sbin/pfctl -t snort2c -T show`;
-	$ips_array = split("\n", $ips);
+	// $ips = `/sbin/pfctl -t snort2c -T show`;
+	$ips_array = file('/usr/rob/test.log');
+	// $ips_array = split("\n", $ips);
 	$counter = 0;
 	foreach($ips_array as $ip) {
 		if(!$ip)
@@ -124,6 +125,7 @@ include("head.inc");
 
 <?php
 
+/* tell the user what settings they have */
 $blockedtab_msg_chk = $config['installedpackages']['snort']['config'][0]['rm_blocked'];
 	if ($blockedtab_msg_chk == "1h_b") {
 		$blocked_msg = "hour";

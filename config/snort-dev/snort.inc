@@ -834,7 +834,8 @@ function create_snort_conf() {
 	conf_mount_ro();
 }
 
-function snort_deinstall() {
+function snort_deinstall()
+{
 
 	global $config, $g, $id, $if_real;
 	conf_mount_rw();
@@ -863,31 +864,38 @@ function snort_deinstall() {
 
 	/* Remove snort cron entries Ugly code needs smoothness*/
 	
-	function snort_rm_blocked_deinstall_cron($should_install) {
+	function snort_rm_blocked_deinstall_cron($should_install)
+	{
         global $config, $g;
 
         $is_installed = false;
 
         if(!$config['cron']['item'])
-                return;
+        return;
 
         $x=0;
-        foreach($config['cron']['item'] as $item) {
-                if (strstr($item['command'], "snort2c")) {
+        foreach($config['cron']['item'] as $item)
+		{
+                if (strstr($item['command'], "snort2c"))
+				{
                         $is_installed = true;
                         break;
                 }
+				
                 $x++;
-			}
-                      if($is_installed == true) {
-                         if($x > 0) {
+		}
+                      if($is_installed == true)
+						{
+							if($x > 0)
+							{
                                 unset($config['cron']['item'][$x]);
                                 write_config();
 								conf_mount_rw();
-                         }
+							}
                   configure_cron();
-			}
-		}
+						}
+	conf_mount_ro();
+}
 		
 	function snort_rules_up_deinstall_cron($should_install) {
         global $config, $g;

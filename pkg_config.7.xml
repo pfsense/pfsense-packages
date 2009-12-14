@@ -324,7 +324,7 @@
       <version>2.8.4.1_7 pkg v. 1.8</version>
       <required_version>1.2.3</required_version>
       <status>RC4</status>
-      <configurationfile>/snort/snort.xml</configurationfile>
+      <configurationfile>/snort.xml</configurationfile>
 	  <after_install_info>This is the Snort-dev branch and is stable as of RC3.</after_install_info>
     </package>
     <package>
