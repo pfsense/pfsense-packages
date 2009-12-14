@@ -81,9 +81,12 @@ include("head.inc");
 							</tr>
 <?php
 
-	$associatealertip = $config['installedpackages']['snort']['config'][0]['associatealertip'];
+	$associatealertip = $config['installedpackages']['snortglobal']['associatealertip'];
 	// $ips = `/sbin/pfctl -t snort2c -T show`;
-	$ips_array = file('/usr/rob/test.log');
+	/* this improves loading of ips by a factor of 10 */
+	exec('/sbin/pfctl -t snort2c -T show > /tmp/snort_block.cache');
+	sleep(3);
+	$ips_array = file('/tmp/snort_block.cache');
 	// $ips_array = split("\n", $ips);
 	$counter = 0;
 	foreach($ips_array as $ip) {
@@ -97,7 +100,7 @@ include("head.inc");
 			$alert_description = "";
 		echo "\n<tr>";
 		echo "\n<td align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($ww_ip)) . "'>";
-		echo "\n<img title=\"Delete\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"./themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>";
+		echo "\n<img title=\"Delete\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>";
 		echo "\n<td>&nbsp;{$ww_ip}</td>";
 		echo "\n<td>&nbsp;{$alert_description}<!-- |{$ww_ip}| get_snort_alert($ww_ip); --></td>";
 		echo "\n</tr>";
@@ -126,7 +129,7 @@ include("head.inc");
 <?php
 
 /* tell the user what settings they have */
-$blockedtab_msg_chk = $config['installedpackages']['snort']['config'][0]['rm_blocked'];
+$blockedtab_msg_chk = $config['installedpackages']['snortglobal']['rm_blocked7'];
 	if ($blockedtab_msg_chk == "1h_b") {
 		$blocked_msg = "hour";
 	}
@@ -164,6 +167,7 @@ echo "This page lists hosts that have been blocked by Snort. Hosts are automatic
 <?php
 
 /* write out snort cache */
+conf_mount_rw();
 write_snort_config_cache($snort_config);
-
+conf_mount_ro();
 ?>

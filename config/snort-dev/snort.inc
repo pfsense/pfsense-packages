@@ -877,27 +877,30 @@ function snort_deinstall()
         $x=0;
         foreach($config['cron']['item'] as $item)
 		{
-                if (strstr($item['command'], "snort2c"))
-				{
-                        $is_installed = true;
-                        break;
-                }
+            if (strstr($item['command'], "snort2c"))
+			{
+                    $is_installed = true;
+                    break;
+            }
 				
-                $x++;
+            $x++;
+			
 		}
-                      if($is_installed == true)
+            if($is_installed == true)
+				{
+					if($x > 0)
 						{
-							if($x > 0)
-							{
-                                unset($config['cron']['item'][$x]);
-                                write_config();
-								conf_mount_rw();
-							}
-                  configure_cron();
+                            unset($config['cron']['item'][$x]);
+                            write_config();
+							conf_mount_rw();
 						}
-	}
-		conf_mount_ro();
+                
+				configure_cron();
+				
+						}
+				conf_mount_ro();
 }
+		
 		
 	function snort_rules_up_deinstall_cron($should_install) {
         global $config, $g;
