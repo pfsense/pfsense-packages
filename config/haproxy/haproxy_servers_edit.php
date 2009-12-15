@@ -254,7 +254,7 @@ function clearcombo(){
 		</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Port</td>
+			<td width="22%" valign="top" class="vncell">Port</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="5">
 				<br/>
