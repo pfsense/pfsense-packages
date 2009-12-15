@@ -149,7 +149,7 @@ function haproxy_configure() {
 			fwrite ($fd, "{$listenip}");
 
 			// https is an alias for tcp for clarity purpouses
-			if($backend['type'] == "https")
+			if(strtolower($backend['type']) == "https")
 				$backend_type = "tcp";
 			else 
 				$backend_type = $backend['type'];
@@ -160,14 +160,14 @@ function haproxy_configure() {
 			fwrite ($fd, "\toption\t\t\thttpclose\n");
 			fwrite ($fd, "\toption\t\t\tforwardfor\n");
 			
+			if($backend['type'] == "https") 
+				fwrite ($fd, "\toption\t\t\tssl-hello-chk\n");
+
 			if($backend['max_connections'])
 				fwrite ($fd, "\tmaxconn\t\t\t" . $backend['max_connections'] . "\n");
 
 			if($backend['client_timeout'])
 				fwrite ($fd, "\tclitimeout\t\t" . $backend['client_timeout'] . "\n");
-
-			if($backend['type'])
-				fwrite ($fd, "\tmode\t\t\t" . $backend['type'] . "\n");
 
 			if($backend['balance'])
 				fwrite ($fd, "\tbalance\t\t\t" . $backend['balance'] . "\n");
