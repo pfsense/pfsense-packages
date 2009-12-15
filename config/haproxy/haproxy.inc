@@ -217,7 +217,21 @@ function haproxy_configure() {
 									$cookie = " cookie {$server['cookie']} ";
 								else 
 									$cookie = "";
-								fwrite ($fd, "\tserver\t\t\t".$server['name']." ".$server['address'].":".$server['port']." $cookie "." check inter 1000 weight ".$server['weight']."\n");
+								if(!$server['port']) {
+									foreach($ports as $port) {
+										$isfirst = false;
+										$server_ports = "";
+										if($port) {
+											if(!$isfirst)
+												$server_ports .= ",";
+											$server_ports .= $port;
+											$isfirst = false;
+										}
+									}
+								} else {
+									$server_ports = $server['port'];
+								}
+								fwrite ($fd, "\tserver\t\t\t" . $server['name'] . " " . $server['address'].":" . $server_ports . " $cookie " . " check inter 1000 weight " . $server['weight'] . "\n");
 							}
 						}
 					}

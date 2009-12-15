@@ -64,8 +64,8 @@ if ($_POST) {
 	unset($input_errors);
 	$pconfig = $_POST;
 	
-	$reqdfields = explode(" ", "name address port weight");
-	$reqdfieldsn = explode(",", "Name,Address,Port,Weight");		
+	$reqdfields = explode(" ", "name address weight");
+	$reqdfieldsn = explode(",", "Name,Address,Weight");		
 
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
@@ -256,6 +256,8 @@ function clearcombo(){
 			<td width="22%" valign="top" class="vncellreq">Port</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="5">
+				<br/>
+				NOTE: Leave blank to use Frontend port selection.
 			</td>
 		</tr>
 		<tr align="left">
