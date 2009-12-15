@@ -37,7 +37,9 @@ $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 if (!is_array($config['installedpackages']['haproxy']['ha_servers']['item'])) {
 	$config['installedpackages']['haproxy']['ha_servers']['item'] = array();
 }
+
 $a_server = &$config['installedpackages']['haproxy']['ha_servers']['item'];
+$a_backends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 
 if ($_POST) {
 	$pconfig = $_POST;
@@ -113,7 +115,18 @@ include("head.inc");
 			<?=$server['name'];?>
                   </td>
                   <td class="listlr" ondblclick="document.location='haproxy_servers_edit.php?id=<?=$i;?>';">
-			<?=$server['address'] . ":". $server['port'];?>
+			<?=$server['address'] . ":"?>
+<?php
+			if($server['port']) {
+				echo $server['port'];
+			} else {
+				foreach ($a_backends as $backend) {
+					if($backend['name'] == $server['backend']) {
+						echo $backend['port'];
+					}
+				}
+			}
+?>
                   </td>
                   <td class="listlr" ondblclick="document.location='haproxy_servers_edit.php?id=<?=$i;?>';">
 			<?=$server['status'];?>
