@@ -150,11 +150,11 @@ function haproxy_configure() {
 
 			// https is an alias for tcp for clarity purpouses
 			if($backend['type'] == "https")
-				$backend = "tcp";
+				$backend_type = "tcp";
 			else 
-				$backend = $backend['type'];
+				$backend_type = $backend['type'];
 
-            fwrite ($fd, "\tmode\t\t\t" . $backend . "\n");
+            fwrite ($fd, "\tmode\t\t\t" . $backend_type . "\n");
 			fwrite ($fd, "\tlog\t\t\tglobal\n");
 			fwrite ($fd, "\toption\t\t\tdontlognull\n");
 			fwrite ($fd, "\toption\t\t\thttpclose\n");
