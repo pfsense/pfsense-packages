@@ -78,11 +78,12 @@ if ($_POST) {
 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['cookie']))
 		$input_errors[] = "The field 'Cookie' contains invalid characters.";
 
-	if (!is_numeric($_POST['port']))
+	if ($_POST['port'] && !is_numeric($_POST['port']))
 		$input_errors[] = "The field 'Port' value is not a number.";
 	else {
-		if (!($_POST['port']>=1 && $_POST['port']<=65535))
-			$input_errors[] = "The field 'Port' value must be between 1 and 65535.";
+		if ($_POST['port'])
+			if (!($_POST['port']>=1 && $_POST['port']<=65535))
+				$input_errors[] = "The field 'Port' value must be between 1 and 65535.";
 	}
 	
 	if (!is_numeric($_POST['weight']))

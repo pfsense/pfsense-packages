@@ -218,9 +218,9 @@ function haproxy_configure() {
 								else 
 									$cookie = "";
 								if(!$server['port']) {
+									$server_ports = "";
+									$isfirst = true;
 									foreach($ports as $port) {
-										$isfirst = false;
-										$server_ports = "";
 										if($port) {
 											if(!$isfirst)
 												$server_ports .= ",";
