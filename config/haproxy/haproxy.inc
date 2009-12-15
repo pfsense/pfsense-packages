@@ -208,10 +208,10 @@ function haproxy_configure() {
 			if(is_array($a_servers)) {
 				foreach ($a_servers as $server) {
 					$backends_to_process = split(" ", $server['backend']);
-					foreach($backends_to_process as $backend) {
-						if($backend == "")
+					foreach($backends_to_process as $backends) {
+						if($backends == "")
 							continue;
-						if($backend ==$backend['name']) {
+						if($backends == $backend['name']) {
 							if($server['status']=='active') {
 								if($server['cookie']) 
 									$cookie = " cookie {$server['cookie']} ";
