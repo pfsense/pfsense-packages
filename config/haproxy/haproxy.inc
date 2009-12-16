@@ -212,26 +212,22 @@ function haproxy_configure() {
 						if($backends == "")
 							continue;
 						if($backends == $backend['name']) {
+							$server_ports = array();
 							if($server['status']=='active') {
 								if($server['cookie']) 
 									$cookie = " cookie {$server['cookie']} ";
 								else 
 									$cookie = "";
 								if(!$server['port']) {
-									$server_ports = "";
-									$isfirst = true;
 									foreach($ports as $port) {
-										if($port) {
-											if(!$isfirst)
-												$server_ports .= ",";
-											$server_ports .= $port;
-											$isfirst = false;
-										}
+										if($port) 
+											$server_ports[] = $port;
 									}
 								} else {
-									$server_ports = $server['port'];
+									$server_ports[] = $server['port'];
 								}
-								fwrite ($fd, "\tserver\t\t\t" . $server['name'] . " " . $server['address'].":" . $server_ports . " $cookie " . " check inter 1000 weight " . $server['weight'] . "\n");
+								foreach($server_ports as $pport) 
+									fwrite ($fd, "\tserver\t\t\t" . $server['name'] . " " . $server['address'].":" . $pport . " $cookie " . " check inter 1000 weight " . $server['weight'] . "\n");
 							}
 						}
 					}
