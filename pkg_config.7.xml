@@ -312,7 +312,7 @@
       <name>snort-dev</name>
 	  <pkginfolink>http://forum.pfsense.org/index.php/topic,16847.0.html</pkginfolink>
       <website>http://www.snort.org</website>
-      <descr>This is the Snort-dev branch and is stable as of RC3.</descr>
+      <descr>WARNING: This is the Snort-dev branch and is unstable. Please post package version on the forums. Revert back to alpha.</descr>
       <category>Security</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/70/All/</depends_on_package_base_url>
 	  <depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
@@ -323,7 +323,7 @@
       <config_file>http://www.pfsense.com/packages/config/snort-dev/snort.xml</config_file>
       <version>2.8.4.1_7 pkg v. 1.8</version>
       <required_version>1.2.3</required_version>
-      <status>RC4</status>
+      <status>alpha</status>
       <configurationfile>/snort.xml</configurationfile>
 	  <after_install_info>This is the Snort-dev branch and is stable as of RC3.</after_install_info>
     </package>
