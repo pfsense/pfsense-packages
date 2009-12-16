@@ -75,6 +75,7 @@ if ($_POST) {
 			$config['installedpackages']['haproxy']['synchost1'] = $_POST['synchost1'] ? $_POST['synchost1'] : false;
 			$config['installedpackages']['haproxy']['synchost2'] = $_POST['synchost2'] ? $_POST['synchost2'] : false;
 			$config['installedpackages']['haproxy']['synchost2'] = $_POST['synchost3'] ? $_POST['synchost3'] : false;
+			$config['installedpackages']['haproxy']['remotesyslog'] = $_POST['remotesyslog'] ? $_POST['remotesyslog'] : false;
 			$config['installedpackages']['haproxy']['syncpassword'] = $_POST['syncpassword'] ? $_POST['syncpassword'] : false;
 			touch($d_haproxyconfdirty_path);
 			write_config();
@@ -90,6 +91,7 @@ $pconfig['syncpassword'] = $config['installedpackages']['haproxy']['syncpassword
 $pconfig['synchost1'] = $config['installedpackages']['haproxy']['synchost1'];
 $pconfig['synchost2'] = $config['installedpackages']['haproxy']['synchost2'];
 $pconfig['synchost3'] = $config['installedpackages']['haproxy']['synchost3'];
+$pconfig['remotesyslog'] = $config['installedpackages']['haproxy']['remotesyslog'];
 
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
@@ -192,6 +194,14 @@ function enable_change(enable_change) {
 						</tr>
 					</table>
 					</td></tr></table>
+				</td>
+			</tr>
+			<tr>
+				<td valign="top" class="vncell">
+					Remote syslog host
+				</td>
+				<td class="vtable">
+					<input name="remotesyslog" type="text" class="formfld" id="remotesyslog" size="18" value="<?=htmlspecialchars($pconfig['remotesyslog']);?>">
 				</td>
 			</tr>
 			<tr>

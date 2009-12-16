@@ -109,7 +109,10 @@ function haproxy_configure() {
 	if(is_array($a_global)) {
 		fwrite ($fd, "global\n");
 		fwrite ($fd, "\tmaxconn\t\t\t".$a_global['maxconn']."\n");
-		fwrite ($fd, "\tlog\t\t\t127.0.0.1 local0\n");
+		if($a_global['remotesyslog'])
+			fwrite ($fd, "\tlog\t\t\t{$a_global['remotesyslog']}\n");
+		else
+			fwrite ($fd, "\tlog\t\t\tglobal\n");
 		fwrite ($fd, "\tuid\t\t\t80\n");
 		fwrite ($fd, "\tgid\t\t\t80\n");
 		$numprocs = trim(`/sbin/sysctl kern.smp.cpus | cut -d" " -f2`);
