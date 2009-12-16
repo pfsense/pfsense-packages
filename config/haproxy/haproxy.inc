@@ -149,19 +149,19 @@ function haproxy_configure() {
 			fwrite ($fd, "{$listenip}");
 
 			// https is an alias for tcp for clarity purpouses
-			if(strtolower($backend['type']) == "https")
+			if(strtolower($backend['type']) == "https") {
 				$backend_type = "tcp";
-			else 
+				$httpchk = "ssl-hello-chk";
+			} else { 
 				$backend_type = $backend['type'];
+				$httpchk = "httpchk";
+			}
 
             fwrite ($fd, "\tmode\t\t\t" . $backend_type . "\n");
 			fwrite ($fd, "\tlog\t\t\tglobal\n");
 			fwrite ($fd, "\toption\t\t\tdontlognull\n");
 			fwrite ($fd, "\toption\t\t\thttpclose\n");
 			fwrite ($fd, "\toption\t\t\tforwardfor\n");
-			
-			if($backend['type'] == "https") 
-				fwrite ($fd, "\toption\t\t\tssl-hello-chk\n");
 
 			if($backend['max_connections'])
 				fwrite ($fd, "\tmaxconn\t\t\t" . $backend['max_connections'] . "\n");
@@ -184,7 +184,7 @@ function haproxy_configure() {
 			if($backend['cookie_name'])
 				fwrite ($fd, "\tcookie\t\t\t" . $backend['cookie_name'] . " insert indirect\n");
 
-			fwrite ($fd, "\toption\t\t\thttpchk HEAD " . $backend['monitor_uri'] . " HTTP/1.0\n");
+			fwrite ($fd, "\toption\t\t\t{$httpchk} HEAD " . $backend['monitor_uri'] . " HTTP/1.0\n");
 
 			if($backend['stats_enabled']=='yes') {
 				fwrite ($fd, "\tstats\t\t\tenable\n");
