@@ -51,32 +51,32 @@
 	<include_file>squid.inc</include_file>
 	<tabs>
 		<tab>
-			<text>General settings</text>
+			<text>General</text>
 			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Upstream proxy</text>
+			<text>Upstream Proxy</text>
 			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Cache management</text>
+			<text>Cache Mgmt</text>
 			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Access control</text>
+			<text>Access Control</text>
 			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Traffic management</text>
+			<text>Traffic Mgmt</text>
 			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Auth settings</text>
+			<text>Auth Settings</text>
 			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
 			<active/>
 		</tab>
 		<tab>
-			<text>Local users</text>
+			<text>Local Users</text>
 			<url>/pkg.php?xml=squid_users.xml</url>
 		</tab>
 	</tabs>

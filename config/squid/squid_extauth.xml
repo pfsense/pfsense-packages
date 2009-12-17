@@ -51,7 +51,7 @@
 	<aftersaveredirect>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</aftersaveredirect>
 	<tabs>
 		<tab>
-			<text>General Settings</text>
+			<text>General</text>
 			<url>/pkg_edit.php?xml=squid_ng.xml&amp;id=0</url>
 		</tab>
 
@@ -66,7 +66,7 @@
 		</tab>
 
 		<tab>
-			<text>Network Access Control</text>
+			<text>Access Control</text>
 			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
 		</tab>
 
@@ -76,12 +76,12 @@
 		</tab>
 
 		<tab>
-			<text>Auth Settings</text>
+			<text>Auth</text>
 			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
 		</tab>
 
 		<tab>
-			<text>Extended Auth Settings</text>
+			<text>Extended Auth</text>
 			<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>
 			<active/>
 		</tab>

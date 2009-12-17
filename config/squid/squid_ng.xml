@@ -90,11 +90,11 @@
 			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Auth Settings</text>
+			<text>Auth</text>
 			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Extended Auth Settings</text>
+			<text>Extended Auth</text>
 			<url>/pkg_edit.php?xml=squid_extauth.xml&amp;id=0</url>
 		</tab>
 	</tabs>
