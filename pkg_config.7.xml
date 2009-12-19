@@ -290,6 +290,20 @@
       <configurationfile>dnsblacklist.xml</configurationfile>
     </package>
     <package>
+      <name>vHosts</name>
+      <website/>
+      <descr>Web server package that can host html, javascript, php files. It uses the lighttpd web server that is already installed. Supports PHP5, PHP PDO and PDO SQLite.</descr>
+      <category>Services</category>
+      <pkginfolink>http://doc.pfsense.org/index.php/vhosts</pkginfolink>
+      <config_file>http://www.pfsense.com/packages/config/vhosts/vhosts.xml</config_file>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <version>0.1</version>
+      <status>Alpha</status>
+      <required_version>1.2.3</required_version>
+      <maintainer>markjcrane@gmail.com</maintainer>
+      <configurationfile>vhosts.xml</configurationfile>
+    </package>
+    <package>
       <name>snort</name>
 	  <pkginfolink>http://forum.pfsense.org/index.php/topic,16847.0.html</pkginfolink>
       <website>http://www.snort.org</website>
