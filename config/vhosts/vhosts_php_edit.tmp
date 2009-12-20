@@ -31,7 +31,6 @@
 require("guiconfig.inc");
 require("/usr/local/pkg/vhosts.inc");
 
-
 $a_vhosts = &$config['installedpackages']['vhosts']['config'];
 
 $id = $_GET['id'];
@@ -52,13 +51,18 @@ if ($_GET['act'] == "del") {
 }
 
 if (isset($id) && $a_vhosts[$id]) {
-	$pconfig['name'] = $a_vhosts[$id]['name'];
 	$pconfig['host'] = $a_vhosts[$id]['host'];
 	$pconfig['ipaddress'] = $a_vhosts[$id]['ipaddress'];
 	$pconfig['port'] = $a_vhosts[$id]['port'];
+	$pconfig['directory'] = $a_vhosts[$id]['directory'];
+	if (strlen($a_vhosts[$id]['certificate']) > 0) {
+		$pconfig['certificate'] = base64_decode($a_vhosts[$id]['certificate']);
+	}
+	if (strlen($a_vhosts[$id]['privatekey']) > 0) {
+		$pconfig['privatekey'] = base64_decode($a_vhosts[$id]['privatekey']);
+	}
 	$pconfig['enabled'] = $a_vhosts[$id]['enabled'];
 	$pconfig['description'] = $a_vhosts[$id]['description'];
-
 }
 
 if ($_POST) {
@@ -69,10 +73,23 @@ if ($_POST) {
 	if (!$input_errors) {
 
 		$ent = array();
-		$ent['name'] = $_POST['name'];
 		$ent['host'] = $_POST['host'];
 		$ent['ipaddress'] = $_POST['ipaddress'];
 		$ent['port'] = $_POST['port'];
+		$ent['directory'] = $_POST['directory'];
+
+		if (strlen($_POST['certificate']) > 0) {
+			$ent['certificate'] = base64_encode($_POST['certificate']);
+		}
+		else {
+			$ent['certificate'] = '';
+		}
+		if (strlen($_POST['privatekey']) > 0) {
+			$ent['privatekey'] = base64_encode($_POST['privatekey']);
+		}
+		else {
+			$ent['privatekey'] = '';
+		}
 		$ent['enabled'] = $_POST['enabled'];
 		$ent['description'] = $_POST['description'];
 
@@ -104,10 +121,19 @@ function show_advanced_config() {
 	aodiv = document.getElementById('showadvanced');
 	aodiv.style.display = "block";
 </script>
-
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<script language="javascript">
+    function openwindow(url) {
+            var oWin = window.open(url,"pfSensePop","width=620,height=400,top=150,left=150");
+            if (oWin==null || typeof(oWin)=="undefined") {
+                    return false;
+            } else {
+                    return true;
+            }
+    }
+</script>
+<body link="#0000CC" vlink="#000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">PHP Service: Edit</p>
+<p class="pgtitle">vHosts: Edit</p>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 
 
@@ -124,8 +150,8 @@ function show_advanced_config() {
 </td></tr>
 </table>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-	 <td class="tabcont" >
+<tr>
+<td class="tabcont" >
 
 	<!--
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">              
@@ -142,37 +168,65 @@ function show_advanced_config() {
 			<table width="100%" border="0" cellpadding="6" cellspacing="0">
 
 			<tr>
-				<td width="25%" valign="top" class="vncellreq">Name</td>
-				<td width="75%" class="vtable"> 
-					<input name="name" type="text" class="formfld" id="name" size="40" value="<?=htmlspecialchars($pconfig['name']);?>">
+				<td width="22%" valign="top" class="vncellreq">Host</td>
+				<td width="78%" class="vtable"> 
+					<input name="host" type="text" class="formfld" id="host" size="40" value="<?=htmlspecialchars($pconfig['host']);?>">
+					<br />
+					Required. If the host is intended for internal you can use the DNS forwarder to set a host name that is valid inside the local network. default: vhost01.local
 				</td>
-			</tr> 
+			</tr>
 
 			<tr>
-				<td width="25%" valign="top" class="vncellreq">Host</td>
-				<td width="75%" class="vtable"> 
-					<input name="name" type="text" class="formfld" id="host" size="40" value="<?=htmlspecialchars($pconfig['host']);?>">
+				<td width="22%" valign="top" class="vncellreq">IP Address</td>
+				<td width="78%" class="vtable"> 
+					<input name="ipaddress" type="text" class="formfld" id="ipaddress" size="40" value="<?=htmlspecialchars($pconfig['ipaddress']);?>">
+					<br />
+					Required. Make sure the IP and Port combination does not conflict with the local system. example: 192.168.0.1
 				</td>
-			</tr> 
+			</tr>
 
 			<tr>
-				<td width="25%" valign="top" class="vncellreq">IP Address</td>
-				<td width="75%" class="vtable"> 
-					<input name="name" type="text" class="formfld" id="ipaddress" size="40" value="<?=htmlspecialchars($pconfig['ipaddress']);?>">
+				<td width="22%" valign="top" class="vncell">Port</td>
+				<td width="78%" class="vtable"> 
+					<input name="port" type="text" class="formfld" id="port" size="40" value="<?=htmlspecialchars($pconfig['port']);?>">
+					<br />
+					Make sure the IP and Port combination does not conflict with the local system. default: 8001
 				</td>
-			</tr> 
+			</tr>
 
 			<tr>
-			  <td width="25%" valign="top" class="vncellreq">Port</td>
-			  <td width="75%" class="vtable"> 
-				<input name="name" type="text" class="formfld" id="port" size="40" value="<?=htmlspecialchars($pconfig['port']);?>">
-				Example: 8001
-			  </td>
-			</tr> 
+				<td width="22%" valign="top" class="vncell">Directory</td>
+				<td width="78%" class="vtable"> 
+					<input name="directory" type="text" class="formfld" id="directory" size="40" value="<?=htmlspecialchars($pconfig['directory']);?>">
+					<br />
+					This vHosts directory is located in /usr/local/vhosts. The default directory is the host name.
+					<br />
+					example: vhost01.local
+				</td>
+			</tr>
+
+<!--
+			<tr>
+				<td width="22%" valign="top" class="vncell">Certificate</td>
+				<td width="78%" class="vtable">
+					<textarea name="certificate" cols="65" rows="7" id="certificate" class="formpre"><?=htmlspecialchars($pconfig['certificate']);?></textarea>
+					<br />
+					Paste a signed certificate in X.509 PEM format here. <a href="javascript:if(openwindow('/packages/vhosts/system_advanced_create_certs.php') == false) alert('Popup blocker detected. Action aborted.');" >Create</a> certificates automatically.
+				</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">Key</td>
+				<td width="78%" class="vtable">
+					<textarea name="privatekey" cols="65" rows="7" id="privatekey" class="formpre"><?=htmlspecialchars($pconfig['privatekey']);?></textarea>
+					<br />
+					Paste an RSA private key in PEM format here.
+				</td>
+			</tr>
+-->
 
 			<tr>
-			  <td width="22%" valign="top" class="vncellreq">Enabled</td>
-			  <td width="78%" class="vtable"> 
+				<td width="22%" valign="top" class="vncellreq">Enabled</td>
+				<td width="78%" class="vtable"> 
 				<?php
 				echo "              <select name='enabled' class='formfld'>\n";
 				echo "                <option></option>\n";
@@ -191,37 +245,37 @@ function show_advanced_config() {
 				}
 				echo "              </select>\n";
 				?>
-			  </td>
+				</td>
 			</tr>
 			<tr>
-			  <td width="25%" valign="top" class="vncellreq">Description</td>
-			  <td width="75%" class="vtable"> 
-				<input name="description" type="text" class="formfld" id="description" size="40" value="<?=htmlspecialchars($pconfig['description']);?>">
-				<br><span class="vexpl">Enter the description here.<br></span>
-			  </td>
+				<td width="25%" valign="top" class="vncell">Description</td>
+				<td width="75%" class="vtable"> 
+					<input name="description" type="text" class="formfld" id="description" size="40" value="<?=htmlspecialchars($pconfig['description']);?>">
+					<br><span class="vexpl">Enter the description here.<br></span>
+				</td>
 			</tr>
 			
 			<tr>
-			  <td valign="top">&nbsp;</td>
-			  <td>
-				<input name="Submit" type="submit" class="formbtn" value="Save"> <input class="formbtn" type="button" value="Cancel" onclick="history.back()">
-				<?php if (isset($id) && $a_vhosts[$id]): ?>
-				  <input name="id" type="hidden" value="<?=$id;?>">
-				<?php endif; ?>
-			  </td>
+				<td valign="top">&nbsp;</td>
+				<td>
+					<input name="Submit" type="submit" class="formbtn" value="Save"> <input class="formbtn" type="button" value="Cancel" onclick="history.back()">
+					<?php if (isset($id) && $a_vhosts[$id]): ?>
+						<input name="id" type="hidden" value="<?=$id;?>">
+					<?php endif; ?>
+				</td>
 			</tr>
 			</table>
 		</form>
 
-	  <br>
-	  <br>
-	  <br>
-	  <br>
-	  <br>
-	  <br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
+		<br>
 
-	 </td>
-	</tr>
+</td>
+</tr>
 </table>
 
 </div>

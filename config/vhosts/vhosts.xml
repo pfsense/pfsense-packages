@@ -37,25 +37,25 @@
 /* ========================================================================== */
 		]]>
 		</copyright>
-	<description>PHP Service</description>
+	<description>vHosts</description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>vHosts Settings</name>
-	<version>0.1</version>
+	<version>0.2</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/vhosts.inc</include_file>
 	<menu>
-		<name>vhosts</name>
+		<name>vHosts</name>
 		<tooltiptext>vHosts Service settings.</tooltiptext>
 		<section>Services</section>
 		<configfile>vhosts.xml</configfile>
 		<url>/packages/vhosts/vhosts_php.php</url>
 	</menu>
 	<service>
-		<name>vhosts</name>
+		<name>vHosts</name>
 		<rcfile>vhosts.sh</rcfile>
 		<executable>vhosts</executable>
-		<description>Lighttpd web server service.</description>    
+		<description>LigHTTPD web server service. Uses PHP5 with fast cgi.</description>    
 	</service>
 	<tabs>
 		<tab>
@@ -94,6 +94,11 @@
 		<prefix>/var/etc/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/vhosts/lighty-vhosts.conf</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/var/etc/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/vhosts/system_advanced_create_certs.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>

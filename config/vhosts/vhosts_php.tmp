@@ -51,7 +51,7 @@ include("head.inc");
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">vHosts Service:</p>
+<p class="pgtitle">vHosts:</p>
 
 <div id="mainlevel">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -88,8 +88,7 @@ include("head.inc");
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">              
 			<tr>
 				<td><p><!--<span class="vexpl"><span class="red"><strong>PHP Service<br></strong></span>-->
-				Is command line PHP designed to run PHP as a Service. The custom PHP code that is defined below is run over and over again inside a continuous loop. There are many possible uses such as monitoring CPU, Memory, File System Space, interacting with Snort, and many others uses that are yet to be discovered. 
-				It can send events to the sylog that will can be viewed from the system log or remote syslog server. example: exec("logger This is a test");
+				vHosts is a web server package that can host HTML, Javascript, CSS, and PHP. It uses the lighttpd web server that is already installed. It uses PHP5 in FastCGI mode and has access to PHP Data Ojbects and PDO SQLite.
 				<br /><br />
 				For more information see: <a href='http://doc.pfsense.org/index.php/vhosts'>http://doc.pfsense.org/index.php/vhosts</a>            
 				</p></td>
@@ -99,7 +98,7 @@ include("head.inc");
 
 		<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr>
-		  <td width="30%" class="listhdrr">Name</td>
+		  <td width="30%" class="listhdrr">Host</td>
 		  <td width="20%" class="listhdrr">Enabled</td>
 		  <td width="40%" class="listhdr">Description</td>
 		  <td width="10%" class="list">
@@ -114,37 +113,49 @@ include("head.inc");
 		  </td>
 		</tr>
 
-
 		<?php 
-
 		$i = 0;
 		if (count($a_vhosts) > 0) {
-
-		foreach ($a_vhosts as $ent) {
-
-		?>
-			<tr>
-				<td class="listr" ondblclick="document.location='vhosts_php_edit.php?id=<?=$i;?>';">
-				  <?=$ent['name'];?>&nbsp;
-				</td>
-				<td class="listr" ondblclick="document.location='vhosts_php_edit.php?id=<?=$i;?>';">
-				  <?=$ent['enabled'];?>&nbsp;
-				</td>
-				<td class="listbg" ondblclick="document.location='vhosts_php_edit.php?id=<?=$i;?>';">
-				  <font color="#FFFFFF"><?=htmlspecialchars($ent['description']);?>&nbsp;
-				</td>
-				<td valign="middle" nowrap class="list">
-				  <table border="0" cellspacing="0" cellpadding="1">
-					<tr>
-					  <td valign="middle"><a href="vhosts_php_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-					  <td><a href="vhosts_php_edit.php?type=php&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
-					</tr>
-				 </table>
-				</td>
-			  </tr>
-			<?php 
-
-			$i++; 
+			//sort array
+				if (!function_exists('sort_host')) {
+					function sort_host($a, $b){
+						return strcmp($a["host"], $b["host"]);
+					}
+				}
+				//disable for now because it throws off the edit and delete
+				//if (count($a_vhosts) > 1) {
+				//	usort($a_vhosts, 'sort_host');
+				//}
+			foreach ($a_vhosts as $ent) {
+				$host = $ent['host'];
+				$port = $ent['port'];
+				if (strlen($ent['certificate']) == 0) { $http_protocol = 'http'; } else { $http_protocol = 'https'; }
+				if ($http_protocol == 'http' && $port == '80') { $port = ''; }
+				if ($http_protocol == 'https' && $port == '443') { $port = ''; }
+				if (strlen($port) > 0) { $port = ':'.$port; }
+				$vhost_url = $http_protocol.'://'.$host.$port;
+				?>
+				<tr>
+					<td class="listr" ondblclick="document.location='vhosts_php_edit.php?id=<?=$i;?>';">
+					  <a href='<?=$vhost_url;?>' target='_blank'><?=$ent['host'];?></a>&nbsp;
+					</td>
+					<td class="listr" ondblclick="document.location='vhosts_php_edit.php?id=<?=$i;?>';">
+					  <?=$ent['enabled'];?>&nbsp;
+					</td>
+					<td class="listbg" ondblclick="document.location='vhosts_php_edit.php?id=<?=$i;?>';">
+					  <font color="#FFFFFF"><?=htmlspecialchars($ent['description']);?>&nbsp;
+					</td>
+					<td valign="middle" nowrap class="list">
+					  <table border="0" cellspacing="0" cellpadding="1">
+						<tr>
+						  <td valign="middle"><a href="vhosts_php_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+						  <td><a href="vhosts_php_edit.php?type=php&act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+						</tr>
+					 </table>
+					</td>
+				  </tr>
+		<?php
+				$i++; 
 			}
 		}
 		?>
