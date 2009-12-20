@@ -1408,7 +1408,7 @@ preprocessor http_inspect_server: server default \
                         directory no \
                         iis_backslash no \
                         u_encode yes \
-                        ascii yes \
+                        ascii no \
                         chunk_length 500000 \
                         bare_byte yes \
                         double_decode yes \

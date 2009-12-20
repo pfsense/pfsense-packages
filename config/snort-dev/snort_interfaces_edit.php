@@ -101,7 +101,6 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['descr'] = $a_nat[$id]['descr'];
 	$pconfig['performance'] = $a_nat[$id]['performance'];
 	$pconfig['blockoffenders7'] = $a_nat[$id]['blockoffenders7'];
-	$pconfig['snortalertlogtype'] = $a_nat[$id]['snortalertlogtype'];
 	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
 	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
 	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];
@@ -209,7 +208,6 @@ if ($_POST["Submit"]) {
 		$natent['performance'] = $_POST['performance'] ? $_POST['performance'] : $pconfig['performance'];
 		/* if post = on use on off or rewrite the conf */
 		if ($_POST['blockoffenders7'] == "on") { $natent['blockoffenders7'] = on; }else{ $natent['blockoffenders7'] = off; } if ($_POST['enable'] == "") { $natent['blockoffenders7'] = $pconfig['blockoffenders7']; }
-		$natent['snortalertlogtype'] = $_POST['snortalertlogtype'] ? $_POST['snortalertlogtype'] : $pconfig['snortalertlogtype'];
 		if ($_POST['alertsystemlog'] == "on") { $natent['alertsystemlog'] = on; }else{ $natent['alertsystemlog'] = off; } if ($_POST['enable'] == "") { $natent['alertsystemlog'] = $pconfig['alertsystemlog']; }
 		if ($_POST['tcpdumplog'] == "on") { $natent['tcpdumplog'] = on; }else{ $natent['tcpdumplog'] = off; } if ($_POST['enable'] == "") { $natent['tcpdumplog'] = $pconfig['tcpdumplog']; }
 		if ($_POST['snortunifiedlog'] == "on") { $natent['snortunifiedlog'] = on; }else{ $natent['snortunifiedlog'] = off; } if ($_POST['enable'] == "") { $natent['snortunifiedlog'] = $pconfig['snortunifiedlog']; }
@@ -343,7 +341,6 @@ echo "
 ?>
 	document.iform.performance.disabled = endis;
 	document.iform.blockoffenders7.disabled = endis;
-	document.iform.snortalertlogtype.disabled = endis;
 	document.iform.alertsystemlog.disabled = endis;
 	document.iform.tcpdumplog.disabled = endis;
 	document.iform.snortunifiedlog.disabled = endis;
@@ -492,21 +489,6 @@ if($id != "")
 				<td width="78%" class="vtable">
 					<input name="blockoffenders7" type="checkbox" value="on" <?php if ($pconfig['blockoffenders7'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					Checking this option will automatically block hosts that generate a snort alert.</td>
-				</tr>
-				<tr>
-				<td width="22%" valign="top" class="vncell">Alerts Tab description type</td>
-				<td width="78%" class="vtable">
-					<select name="snortalertlogtype" class="formfld" id="snortalertlogtype">
-						<?php
-							$interfaces4 = array('fast' => 'SHORT', 'full' => 'FULL');
-							foreach ($interfaces4 as $iface4 => $ifacename4): ?>
-							<option value="<?=$iface4;?>" <?php if ($iface4 == $pconfig['snortalertlogtype']) echo "selected"; ?>>
-							<?=htmlspecialchars($ifacename4);?>
-							</option>
-						<?php endforeach; ?>
-					</select><br>
-					<span class="vexpl">Please choose the type of Alert logging you will like see in the Alerts Tab.<br>
-					Hint: in most cases, short descriptions are best.</span></td>
 				</tr>
 				<tr>
 				<td width="22%" valign="top" class="vncell">Send alerts to main System logs</td>

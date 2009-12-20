@@ -133,7 +133,7 @@ $blockedtab_msg_chk = $config['installedpackages']['snortglobal']['rm_blocked'];
 	exec('/sbin/pfctl -t snort2c -T show > /tmp/snort_block.cache');
 	sleep(1);
 	$ips_array = file('/tmp/snort_block.cache');
-	// $ips_array = split("\n", $ips);
+	//$ips_array = split("\n", $ips);
 	$counter = 0;
 	foreach($ips_array as $ip) {
 		if(!$ip)

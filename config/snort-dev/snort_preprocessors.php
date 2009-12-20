@@ -110,7 +110,6 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['descr'] = $a_nat[$id]['descr'];
 	$pconfig['performance'] = $a_nat[$id]['performance'];
 	$pconfig['blockoffenders7'] = $a_nat[$id]['blockoffenders7'];
-	$pconfig['snortalertlogtype'] = $a_nat[$id]['snortalertlogtype'];
 	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
 	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
 	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];
@@ -139,7 +138,6 @@ if ($_POST) {
 	if ($pconfig['descr'] != "") { $natent['descr'] = $pconfig['descr']; }
 	if ($pconfig['performance'] != "") { $natent['performance'] = $pconfig['performance']; }
 	if ($pconfig['blockoffenders7'] != "") { $natent['blockoffenders7'] = $pconfig['blockoffenders7']; }
-	if ($pconfig['snortalertlogtype'] != "") { $natent['snortalertlogtype'] = $pconfig['snortalertlogtype']; }
 	if ($pconfig['alertsystemlog'] != "") { $natent['alertsystemlog'] = $pconfig['alertsystemlog']; }
 	if ($pconfig['tcpdumplog'] != "") { $natent['tcpdumplog'] = $pconfig['tcpdumplog']; }
 	if ($pconfig['snortunifiedlog'] != "") { $natent['snortunifiedlog'] = $pconfig['snortunifiedlog']; }

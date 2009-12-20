@@ -4,7 +4,10 @@
 	part of m0n0wall (http://m0n0.ch/wall)
 
 	Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+	All rights reserved.
+	
 	Copyright (C) 2008-2009 Robert Zelaya
+	Modified for the Pfsense snort package.
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -42,6 +45,7 @@ $pconfig['autorulesupdate7'] = $config['installedpackages']['snortglobal']['auto
 $pconfig['whitelistvpns'] = $config['installedpackages']['snortglobal']['whitelistvpns'];
 $pconfig['clickablalerteurls'] = $config['installedpackages']['snortglobal']['clickablalerteurls'];
 $pconfig['associatealertip'] = $config['installedpackages']['snortglobal']['associatealertip'];
+$pconfig['snortalertlogtype'] = $config['installedpackages']['snortglobal']['snortalertlogtype'];
 
 
 if ($_POST) {
@@ -50,55 +54,38 @@ if ($_POST) {
 	$pconfig = $_POST;
 
 	/* input validation */
-	if ($_POST['enable']) {
-		$reqdfields = explode(" ", "interface");
-		$reqdfieldsn = explode(",", "Interface");
+	if ($_POST['enable'])
+	{
 
-		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
+//	if ($_POST['timeout'] && (!is_numeric($_POST['timeout']) || ($_POST['timeout'] < 1))) {
+//		$input_errors[] = "The timeout must be at least 1 minute.";
+//	}
+//	if ($_POST['idletimeout'] && (!is_numeric($_POST['idletimeout']) || ($_POST['idletimeout'] < 1))) {
+//		$input_errors[] = "The idle timeout must be at least 1 minute.";
+//	}
+//	if (($_POST['radiusip'] && !is_ipaddr($_POST['radiusip']))) {
+//		$input_errors[] = "A valid IP address must be specified. [".$_POST['radiusip']."]";
+//	}
+//	if (($_POST['radiusip2'] && !is_ipaddr($_POST['radiusip2']))) {
+//		$input_errors[] = "A valid IP address must be specified. [".$_POST['radiusip2']."]";
+//	}
+//	if (($_POST['radiusport'] && !is_port($_POST['radiusport']))) {
+//		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusport']."]";
+//	}
+//	if (($_POST['radiusport2'] && !is_port($_POST['radiusport2']))) {
+//		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusport2']."]";
+//	}
+//	if (($_POST['radiusacctport'] && !is_port($_POST['radiusacctport']))) {
+//		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusacctport']."]";
+//	}
+//	if ($_POST['maxproc'] && (!is_numeric($_POST['maxproc']) || ($_POST['maxproc'] < 4) || ($_POST['maxproc'] > 100))) {
+//		$input_errors[] = "The total maximum number of concurrent connections must be between 4 and 100.";
+//	}
+//	$mymaxproc = $_POST['maxproc'] ? $_POST['maxproc'] : 16;
+//	if ($_POST['maxprocperip'] && (!is_numeric($_POST['maxprocperip']) || ($_POST['maxprocperip'] > $mymaxproc))) {
+//		$input_errors[] = "The maximum number of concurrent connections per client IP address may not be larger than the global maximum.";
+//	}
 
-		if ($_POST['httpslogin_enable']) {
-		 	if (!$_POST['cert'] || !$_POST['key']) {
-				$input_errors[] = "Certificate and key must be specified for HTTPS login.";
-			} else {
-				if (!strstr($_POST['cert'], "BEGIN CERTIFICATE") || !strstr($_POST['cert'], "END CERTIFICATE"))
-					$input_errors[] = "This certificate does not appear to be valid.";
-				if (!strstr($_POST['key'], "BEGIN RSA PRIVATE KEY") || !strstr($_POST['key'], "END RSA PRIVATE KEY"))
-					$input_errors[] = "This key does not appear to be valid.";
-			}
-
-			if (!$_POST['httpsname'] || !is_domain($_POST['httpsname'])) {
-				$input_errors[] = "The HTTPS server name must be specified for HTTPS login.";
-			}
-		}
-	}
-
-	if ($_POST['timeout'] && (!is_numeric($_POST['timeout']) || ($_POST['timeout'] < 1))) {
-		$input_errors[] = "The timeout must be at least 1 minute.";
-	}
-	if ($_POST['idletimeout'] && (!is_numeric($_POST['idletimeout']) || ($_POST['idletimeout'] < 1))) {
-		$input_errors[] = "The idle timeout must be at least 1 minute.";
-	}
-	if (($_POST['radiusip'] && !is_ipaddr($_POST['radiusip']))) {
-		$input_errors[] = "A valid IP address must be specified. [".$_POST['radiusip']."]";
-	}
-	if (($_POST['radiusip2'] && !is_ipaddr($_POST['radiusip2']))) {
-		$input_errors[] = "A valid IP address must be specified. [".$_POST['radiusip2']."]";
-	}
-	if (($_POST['radiusport'] && !is_port($_POST['radiusport']))) {
-		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusport']."]";
-	}
-	if (($_POST['radiusport2'] && !is_port($_POST['radiusport2']))) {
-		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusport2']."]";
-	}
-	if (($_POST['radiusacctport'] && !is_port($_POST['radiusacctport']))) {
-		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusacctport']."]";
-	}
-	if ($_POST['maxproc'] && (!is_numeric($_POST['maxproc']) || ($_POST['maxproc'] < 4) || ($_POST['maxproc'] > 100))) {
-		$input_errors[] = "The total maximum number of concurrent connections must be between 4 and 100.";
-	}
-	$mymaxproc = $_POST['maxproc'] ? $_POST['maxproc'] : 16;
-	if ($_POST['maxprocperip'] && (!is_numeric($_POST['maxprocperip']) || ($_POST['maxprocperip'] > $mymaxproc))) {
-		$input_errors[] = "The maximum number of concurrent connections per client IP address may not be larger than the global maximum.";
 	}
 
 	if (!$input_errors) {
@@ -111,6 +98,7 @@ if ($_POST) {
 		$config['installedpackages']['snortglobal']['whitelistvpns'] = $_POST['whitelistvpns'] ? on : off;
 		$config['installedpackages']['snortglobal']['clickablalerteurls'] = $_POST['clickablalerteurls'] ? on : off;
 		$config['installedpackages']['snortglobal']['associatealertip'] = $_POST['associatealertip'] ? on : off;
+		$config['installedpackages']['snortglobal']['snortalertlogtype'] = $_POST['snortalertlogtype'];
 
 		write_config();
 		sleep(2);
@@ -247,12 +235,21 @@ include("head.inc");
         <input name="whitelistvpns" type="checkbox" value="yes" <?php if ($config['installedpackages']['snortglobal']['whitelistvpns'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
         Checking this option will install whitelists for all VPNs.</td>
     </tr>
-    <tr>
-      <td width="22%" valign="top" class="vncell">Convert Snort alerts urls to clickable links</td>
-      <td width="78%" class="vtable">
-        <input name="clickablalerteurls" type="checkbox" value="yes" <?php if ($config['installedpackages']['snortglobal']['clickablalerteurls'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
-        Checking this option will automatically convert URLs in the Snort alerts tab to clickable links.</td>
-    </tr>
+	<tr>
+	<td width="22%" valign="top" class="vncell">Alerts file description type</td>
+	<td width="78%" class="vtable">
+		<select name="snortalertlogtype" class="formfld" id="snortalertlogtype">
+			<?php
+				$interfaces4 = array('full' => 'FULL', 'fast' => 'SHORT');
+				foreach ($interfaces4 as $iface4 => $ifacename4): ?>
+				<option value="<?=$iface4;?>" <?php if ($iface4 == $pconfig['snortalertlogtype']) echo "selected"; ?>>
+				<?=htmlspecialchars($ifacename4);?>
+				</option>
+			<?php endforeach; ?>
+		</select><br>
+		<span class="vexpl">Please choose the type of Alert logging you will like see in your alert file.<br>
+		Hint: Best pratice is to chose full logging.</span>&nbsp;<span class="red"><strong>WARNING:</strong></span>&nbsp;<strong>On change, alert file will be cleared.</strong></td>
+	</tr>
     <tr>
       <td width="22%" valign="top" class="vncell">Associate events on Blocked tab</td>
       <td width="78%" class="vtable">
@@ -267,8 +264,8 @@ include("head.inc");
 	</tr>
 	<tr>
 	  <td width="22%" valign="top">&nbsp;</td>
-	  <td width="78%"><span class="vexpl"><span class="red"><strong>Note:<br>
-		</strong></span>Changing any settings on this page will disconnect all clients! Don't forget to enable the DHCP server on your captive portal interface! Make sure that the default/maximum DHCP lease time is higher than the timeout entered on this page. Also, the DNS forwarder needs to be enabled for DNS lookups by unauthenticated clients to work. </span></td>
+	  <td width="78%"><span class="vexpl"><span class="red"><strong>Note:<br></strong></span>
+	  Changing any settings on this page will affect all interfaces. Please, double check if your oink code is correct and the type of snort.org account you hold.</span></td>
 	</tr>
   </table>
   </td>
