@@ -71,7 +71,7 @@ blockquote, q { quotes: "" ""; }
 
 th {
 	background-color: #eee;
-	background: #eee url(images/icon-table-sort.png) no-repeat 2px 8px;
+	background: #eee url(/snort/images/icon-table-sort.png) no-repeat 2px 8px;
 	padding: 4px 4px 4px 14px;
 }
 
@@ -97,11 +97,11 @@ tr.altRow {
 }
 
 .sortedASC {
-	background: url(images/icon-table-sort-asc.png) no-repeat 2px 4px #eee;
+	background: url(/snort/images/icon-table-sort-asc.png) no-repeat 2px 4px #eee;
 }
 
 .sortedDESC {
-	background: url(images/icon-table-sort-desc.png) no-repeat 2px 10px #eee;
+	background: url(/snort/images/icon-table-sort-desc.png) no-repeat 2px 10px #eee;
 }
 
 .tableHeaderOver {

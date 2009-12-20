@@ -73,7 +73,7 @@
 		</tab>
 		<tab>
 			<text>Whitelist</text>
-			<url>/pkg.php?xml=/snort/snort_whitelist.xml</url>
+			<url>/pkg.php?xml=/snort_whitelist.xml</url>
 			<active/>
 		</tab>
 		<tab>
