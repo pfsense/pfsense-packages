@@ -71,22 +71,22 @@
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/bin/barnyard2</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/bin/barnyard2</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/bin/oinkmaster_contrib/create-sidmap.pl</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/bin/oinkmaster_contrib/create-sidmap.pl</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/bin/oinkmaster_contrib/oinkmaster.pl</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/bin/oinkmaster_contrib/oinkmaster.pl</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/bin/oinkmaster_contrib/snort_rename.pl</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/bin/oinkmaster_contrib/snort_rename.pl</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/snort/</prefix>
