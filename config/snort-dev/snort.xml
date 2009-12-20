@@ -104,19 +104,69 @@
 		<item>http://www.pfsense.com/packages/config/snort-dev/snort_whitelist.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/snort/</prefix>
+		<prefix>/usr/local/www/snort/images</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort-dev/images/alert.jpg</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/snort/</prefix>
+		<prefix>/usr/local/www/snort/images</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort-dev/jquery-1.3.2.js</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/images/down.gif</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/snort/</prefix>
+		<prefix>/usr/local/www/snort/images</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort-dev/jquery.blockUI.js</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/images/down2.gif</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/images</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/images/icon-table-sort.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/images</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/images/icon-table-sort-asc.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/images</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/images/icon-table-sort-desc.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/images</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/images/up.gif</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/images</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/images/up2.gif</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/javascript/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/javascript/jquery-1.3.2.js</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/javascript/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/javascript/jquery.blockUI.js</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/javascript/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/javascript/mootools.js</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/javascript/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/javascript/sortableTable.js</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/css/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/css/style.css</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
@@ -161,11 +211,6 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort-dev/style.css</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/www/snort/</prefix>
-		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort-dev/snort_interfaces.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
@@ -203,7 +248,7 @@
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
-		sync_package_snort();
+		sync_snort_package();
 	</custom_php_resync_config_command>
     <custom_php_install_command>
 		snort_postinstall();

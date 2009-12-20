@@ -271,7 +271,7 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 		
 		header("Location: snort_interfaces.php");				
 	}else{
-		sync_package_snort();
+		sync_snort_package_all();
 		exec("/bin/sh /usr/local/etc/rc.d/snort_{$id}{$if_real2}.sh start");
 		header("Location: snort_interfaces.php");
 	}

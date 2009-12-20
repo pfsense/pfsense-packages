@@ -429,7 +429,32 @@ function snort_rules_up_install_cron($should_install) {
 }
 
 /* make sure this func on writes to files and does not start snort */
-function sync_package_snort()
+function sync_snort_package()
+{
+	global $config, $g;
+	conf_mount_rw();
+
+
+
+	/* all new files are for the user snort nologin */
+	if(!file_exists("/var/log/snort"))
+	{
+		exec("/bin/mkdir -p /var/log/snort");
+	}
+	
+	exec("/usr/sbin/chown -R snort:snort /var/log/snort");
+	exec("/usr/sbin/chown -R snort:snort /usr/local/etc/snort");
+	exec("/usr/sbin/chown -R snort:snort /usr/local/lib/snort");
+	exec("/bin/chmod -R 755  /var/log/snort");
+	exec("/bin/chmod -R 755  /usr/local/etc/snort");
+	exec("/bin/chmod -R 755  /usr/local/lib/snort");	
+
+	conf_mount_ro();
+}
+
+
+/* make sure this func on writes to files and does not start snort */
+function sync_snort_package_all()
 {
 	global $config, $g, $id, $if_real, $interface_fake;
 	conf_mount_rw();
@@ -904,7 +929,8 @@ function snort_deinstall()
 		
 	function snort_rules_up_deinstall_cron($should_install) {
         global $config, $g;
-
+		conf_mount_rw();
+		
         $is_installed = false;
 
         if(!$config['cron']['item'])

@@ -181,8 +181,8 @@ include("/usr/local/www/head.inc");
 
 ?>
 <script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
-<script type="text/javascript" src="/snort/jquery-1.3.2.js"></script>
-<script type="text/javascript" src="/snort/jquery.blockUI.js?v2.28"></script>
+<script type="text/javascript" src="/snort/javascript/jquery-1.3.2.js"></script>
+<script type="text/javascript" src="/snort/javascript/jquery.blockUI.js?v2.28"></script>
 
 <script type="text/javascript">
 <!--
@@ -685,9 +685,9 @@ if ($snortdownload != "off")
 		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/web-misc.rules/");
 		/* add prefix to all snort.org files */
 		/* remove this part and make it all php with the simplst code posible */
-		chdir ("/usr/local/etc/snort/rules_bk/rules");
-		sleep(2);
-		exec('/usr/local/bin/snort_rename.pl s/^/snort_/ *.rules');
+		//chdir ("/usr/local/etc/snort/rules_bk/rules");
+		//sleep(2);
+		//exec('/usr/local/bin/snort_rename.pl s/^/snort_/ *.rules');
 		update_status(gettext("Done extracting Rules."));
 	}else{
 		update_status(gettext("The Download rules file missing..."));

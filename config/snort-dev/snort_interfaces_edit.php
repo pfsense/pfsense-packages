@@ -167,26 +167,26 @@ if ($_POST["Submit"]) {
 
 		
 		// if ($config['installedpackages']['snortglobal']['rule']) {
-			if ($_POST['descr'] == "") {
-				$input_errors[] = "Please  enter a description for your reference.";
-				}
+//			if ($_POST['descr'] == "") {
+//				$input_errors[] = "Please  enter a description for your reference.";
+//				}
 			
-			if ($id == "" && $config['installedpackages']['snortglobal']['rule'][0]['interface'] != "") {
+//			if ($id == "" && $config['installedpackages']['snortglobal']['rule'][0]['interface'] != "") {
 
-			$rule_array = $config['installedpackages']['snortglobal']['rule'];
-			$id_c = -1;
-			foreach ($rule_array as $value) {
+//			$rule_array = $config['installedpackages']['snortglobal']['rule'];
+//			$id_c = -1;
+//			foreach ($rule_array as $value) {
 
-			$id_c += 1;
+//			$id_c += 1;
 
-			$result_lan = $config['installedpackages']['snortglobal']['rule'][$id_c]['interface'];
-			$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+//			$result_lan = $config['installedpackages']['snortglobal']['rule'][$id_c]['interface'];
+//			$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
 
-				if ($_POST['interface'] == $result_lan) {	
-				$input_errors[] = "Interface $result_lan is in use. Please select another interface.";
-					}			
-				}
-			}
+//				if ($_POST['interface'] == $result_lan) {	
+//				$input_errors[] = "Interface $result_lan is in use. Please select another interface.";
+//					}			
+//				}
+//			}
 
 	/* check for overlaps */
 	foreach ($a_nat as $natent) {
@@ -278,7 +278,7 @@ if ($_POST["Submit"]) {
 		// stop_service("snort");
 
 		if ($pconfig['interface'] != "") {
-		sync_package_snort();
+		sync_snort_package_all();
 		}
 		
 		if ($pconfig['interface'] != "") {		
@@ -292,7 +292,7 @@ if ($_POST["Submit"]) {
 }
 
 		if ($_POST["Submit2"]) {
-		sync_package_snort();
+		sync_snort_package_all();
 		sleep(1);
 		exec("/bin/sh /usr/local/etc/rc.d/snort_{$id}{$if_real}.sh restart");
 		header("Location: /snort/snort_interfaces_edit.php?id=$id");

@@ -221,9 +221,9 @@ include("head.inc");
 
 ?>
 
-<link rel="stylesheet" href="/snort/style.css" type="text/css" media="all">
-<script type="text/javascript" src="/snort/mootools.js"></script>
-<script type="text/javascript" src="/snort/sortableTable.js"></script>
+<link rel="stylesheet" href="/snort/css/style.css" type="text/css" media="all">
+<script type="text/javascript" src="/snort/javascript/mootools.js"></script>
+<script type="text/javascript" src="/snort/javascript/sortableTable.js"></script>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
