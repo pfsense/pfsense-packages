@@ -143,19 +143,26 @@ function snort_postinstall()
 	exec('/bin/mkdir -p /usr/local/www/snort/css');
 	exec('/bin/mkdir -p /usr/local/www/snort/images');
 	exec('/bin/mkdir -p /usr/local/www/snort/javascript');
-	exec('/bin/mv /usr/local/www/snort/style.css /usr/local/www/snort/css/style.css');
-	exec('/bin/mv /usr/local/www/snort/alert.jpg /usr/local/www/snort/images/alert.jpg');
-	exec('/bin/mv /usr/local/www/snort/down.gif /usr/local/www/snort/images/down.gif');
-	exec('/bin/mv /usr/local/www/snort/down2.gif /usr/local/www/snort/images/down2.gif');
-	exec('/bin/mv /usr/local/www/snort/icon-table-sort.png /usr/local/www/snort/images/icon-table-sort.png');
-	exec('/bin/mv /usr/local/www/snort/icon-table-sort-asc.png /usr/local/www/snort/images/icon-table-sort-asc.png');
-	exec('/bin/mv /usr/local/www/snort/icon-table-sort-desc.png /usr/local/www/snort/images/icon-table-sort-desc.png');
-	exec('/bin/mv /usr/local/www/snort/up.gif /usr/local/www/snort/images/up.gif');
-	exec('/bin/mv /usr/local/www/snort/up2.gif /usr/local/www/snort/images/up2.gif');
-	exec('/bin/mv /usr/local/www/snort/jquery.blockUI.js /usr/local/www/snort/javascript/jquery.blockUI.js');
-	exec('/bin/mv /usr/local/www/snort/jquery-1.3.2.js /usr/local/www/snort/javascript/jquery-1.3.2.js');
-	exec('/bin/mv /usr/local/www/snort/mootools.js /usr/local/www/snort/javascript/mootools.js');
-	exec('/bin/mv /usr/local/www/snort/sortableTable.js /usr/local/www/snort/javascript/sortableTable.js');
+	
+	chdir ("/usr/local/www/snort/css/");
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/css/style.css');
+	chdir ("/usr/local/www/snort/images/");
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/alert.jpg');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/down.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/down2.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/icon-table-sort.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/icon-table-sort-asc.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/icon-table-sort-desc.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/up.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/up2.gif');
+	chdir ("/usr/local/www/snort/javascript/");
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery.blockUI.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery-1.3.2.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/mootools.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/sortableTable.js');
+	
+	/* back to default */
+	chdir ("/root/");
 	
 	conf_mount_ro();
 	
