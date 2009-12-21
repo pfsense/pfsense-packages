@@ -14,8 +14,8 @@ function Fit123_install_config() {
 	config_lock();
 	exec("cd ..");
 //Adding new themes
-	exec("tar -zxovf /usr/local/pkg/code-red.tar.gz");
-	exec("mv code-red /usr/local/www/themes/code-red");
+//	exec("tar -zxovf /usr/local/pkg/code-red.tar.gz");
+//	exec("mv code-red /usr/local/www/themes/code-red");
 //Creating backup directory
 	exec("mkdir /usr/local/pkg/Fit123");
 	exec("mkdir /usr/local/pkg/Fit123/backup");
@@ -23,8 +23,8 @@ function Fit123_install_config() {
 	//Date
 	exec("cp /usr/local/www/index.php /usr/local/pkg/Fit123/backup/");
 	//Captive Portal Add-On
-	exec("cp /etc/inc/filter.inc /usr/local/pkg/Fit123/backup/");
-	exec("cp /usr/local/www/services_captiveportal.php /usr/local/pkg/Fit123/backup/");
+//	exec("cp /etc/inc/filter.inc /usr/local/pkg/Fit123/backup/");
+//	exec("cp /usr/local/www/services_captiveportal.php /usr/local/pkg/Fit123/backup/");
 	//LTSP network boot Option
 	exec("cp /etc/inc/services.inc /usr/local/pkg/Fit123/backup/");
 	exec("cp /usr/local/www/services_dhcp.php /usr/local/pkg/Fit123/backup/");
@@ -97,6 +97,141 @@ global $config;
 	exec("cp /usr/local/pkg/Fit123/dnssrv/system.php /usr/local/www/system.php");
 	else
 	exec("cp /usr/local/pkg/Fit123/backup/system.php /usr/local/www/system.php");
+}
+
+function cass_config(){
+global $config;
+// Is CASS enable or not
+	$hoba2 = $config['installedpackages']['cass']['config'][0]['cass2'];
+	if($hoba2){
+	// Is CASS.sh already added as a conjob
+        $task_key = '/usr/local/pkg/Fit123/CASS.sh';
+        $x_name='';
+        $x=0;
+        foreach($config['cron']['item'] as $item) {
+            if($item['command']==$task_key) {
+               $x_name = $x;
+            }
+            $x++;
+        }
+        unset($x);
+        if(!$x_name > 0)
+	{
+	// Add cron job CASS.sh to config.xml
+        $cron_item = array();
+        $cron_item['minute']    = "*/1";
+        $cron_item['hour']      = "*";
+        $cron_item['mday']      = "*";
+        $cron_item['month']     = "*";
+        $cron_item['wday']      = "*";
+        $cron_item['who']       = "root";
+        $cron_item['command']   = "/usr/local/pkg/Fit123/CASS.sh";
+        $config['cron']['item'][] = $cron_item;
+        write_config();
+        configure_cron();
+	}
+	}
+	else
+	{
+	// Remove CASS.sh cron entry from config.xml
+        $task_key = '/usr/local/pkg/Fit123/CASS.sh';
+        $x_name='';
+        $x=0;
+        foreach($config['cron']['item'] as $item) {
+            if($item['command']==$task_key) {
+               $x_name = $x;
+            }
+            $x++;
+        }
+        unset($x);
+	if($x_name > 0)
+        {
+            unset($config['cron']['item'][$x_name]);
+            write_config();
+        }
+        configure_cron();
+}
+
+// Create local shell script to watch for wan ip change
+	$local_voip = $config['installedpackages']['cass']['config'][0]['ypia'];
+	$voip_p = $config['installedpackages']['cass']['config'][0]['iaoyv'];
+
+	//Open CASS.sh for writing	
+	$hfd = fopen("/usr/local/pkg/Fit123/CASS.sh","w");
+	if(!$hfd) {
+	  log_error("could not open /usr/local/pkg/Fit123/CASS.sh for writing");
+	exit;
+	}
+	// The start of the config file
+	fwrite($hfd, '#!/bin/sh');
+	fwrite($hfd, "\n");
+	fwrite($hfd, 'lip="');
+	fwrite($hfd, $local_voip);
+	fwrite($hfd, '"');
+	fwrite($hfd, "\n");
+	fwrite($hfd, 'rip="');
+	fwrite($hfd, $voip_p);
+	fwrite($hfd, '"');
+	fwrite($hfd, "\n");
+	fwrite($hfd, 'dns_file="/usr/local/pkg/Fit123/CASS.ip"');
+	fwrite($hfd, "\n");
+	fwrite($hfd, 'EXIT_SUCCESS=0');
+	fwrite($hfd, "\n");
+	fwrite($hfd, 'EXIT_FAILURE=1');
+	fwrite($hfd, "\n");
+	fwrite($hfd, 'if [ `id -u` -ne 0 ]');
+	fwrite($hfd, "\n");
+	fwrite($hfd, 'then');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '        echo "Only root may run this program."');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '        exit $EXIT_FAILURE');
+	fwrite($hfd, "\n");
+	fwrite($hfd, 'fi');
+	fwrite($hfd, "\n");
+	fwrite($hfd, 'get_ip(){');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '        if [ -f $dns_file ]');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '        then');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '                registered_ip=`cat ${dns_file}`');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '        else');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '                registered_ip=""');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '        fi');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '        current_ip=`fetch -qo- http://jackson.io/ip/`');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '}');
+	fwrite($hfd, "\n");
+	fwrite($hfd, 'update_hosts(){');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '        if [ "$registered_ip" != "$current_ip" ]');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '        then');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '                /sbin/pfctl -k $lip -k $rip');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '                echo $current_ip > $dns_file');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '                echo "WAN ip address changed, clearing states entries.." | logger');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '        fi');
+	fwrite($hfd, "\n");
+	fwrite($hfd, '}');
+	fwrite($hfd, "\n");
+	fwrite($hfd, 'get_ip');
+	fwrite($hfd, "\n");
+	fwrite($hfd, 'update_hosts');
+	fwrite($hfd, "\n");
+	fwrite($hfd, 'exit $EXIT_SUCCESS');
+	fwrite($hfd, "\n");
+	fclose($hfd);
+
+	exec("chmod 744 /usr/local/pkg/Fit123/CASS.sh");
 }
 
 function ddns_config(){

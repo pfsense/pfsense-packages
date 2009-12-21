@@ -26,6 +26,10 @@
 			<text>DDNS</text>
 			<url>/pkg_edit.php?xml=ddns.xml&amp;id=0</url>
 		</tab>
+		<tab>
+			<text>CASS</text>
+			<url>/pkg_edit.php?xml=cass.xml&amp;id=0</url>
+		</tab>
 	</tabs>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -40,7 +44,7 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/Fit123/bin/theme/code-red.tar.gz</item>
+		<item>http://www.pfsense.com/packages/config/Fit123/cass.xml</item>
 	</additional_files_needed>
 	<fields>
 		<field>

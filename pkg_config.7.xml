@@ -433,11 +433,12 @@
     <package>
       <name>Fit123</name>
       <website>http://pfsense.comuf.com</website>
-      <descr>With Fit123 a small set of features can be added to pfSense 1.2.3 (Date)Adds current date to front page (LTSP)Adds 3th network boot option (After Filter Change) Clear states after filter reload (DNS Servers)Adds option for a 3th and 4th DNS Server (DDNS)A more customize way to update dynamic dns (Themes)On install Code-red and the pfsense ng theme are added to the list of avalible themes.</descr>
+      <descr>With Fit123 a small set of features can be added to pfSense 1.2.3 (Date)Adds current date to front page (LTSP)Adds 3th network boot option (After Filter Change) Clear states after filter reload (DNS Servers)Adds option for a 3th and 4th DNS Server (DDNS)A more customize way to update dynamic dns (CASS) Clear states for 1 voip client after dynamic ip update on wan.</descr>
       <category>System</category>
-      <version>0.0.5</version>
-      <status>ALPHA</status>
+      <version>1.0</version>
+      <status>Beta</status>
       <required_version>1.2.3</required_version>
+      <maximum_version>1.2.3</maximum_version>
       <maintainer>crazypark2@yahoo.dk</maintainer>
       <config_file>http://www.pfsense.com/packages/config/Fit123/fit123.xml</config_file>
       <configurationfile>fit123.xml</configurationfile>

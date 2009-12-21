@@ -6,8 +6,8 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<name>ddns</name>
-	<title>DDNS</title>
+	<name>cass</name>
+	<title>CASS</title>
 	<include_file>/usr/local/pkg/fit123.inc</include_file>
 	<tabs>
 		<tab>
@@ -26,44 +26,31 @@
 	</tabs>
 	<fields>
 		<field>
-			<fielddescr>Dynamic DNS</fielddescr>
-			<fieldname>enable</fieldname>
+			<fielddescr>Clear a single state</fielddescr>
+			<fieldname>cass2</fieldname>
 			<description>
-			A more customize way to update dynamic dns and mainly for IP's that doesn't change very often.&lt;br&gt;
-			Will check for ip change every 5 min via local shell script and will only contact provider on change.&lt;br&gt;
-			</description>
+			When your dynamic ip on wan changes, the states of your voip phone needs to be cleared. 			</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Enter string that should be phrased</fielddescr>
-			<fieldname>line1</fieldname>
+			<fielddescr>Your phone ip address</fielddescr>
+			<fieldname>ypia</fieldname>
 			<description>
-			String for OpenDNS should look like:&lt;br&gt;
-			https://username:password@updates.opendns.com/nic/update?hostname=
 			</description>
-			<type>textarea</type>
-			<cols>80</cols>
-                        <rows>1</rows>
+			<type>input</type>
+			<size>15</size>
 		</field>
 		<field>
-			<fielddescr>Enter 2th string that should be phrased</fielddescr>
-			<fieldname>line2</fieldname>
-			<description>Leave empty if not used</description>
-			<type>textarea</type>
-			<cols>80</cols>
-                        <rows>1</rows>
-		</field>
-		<field>
-			<fielddescr>Enter 3th string that should be phrased</fielddescr>
-			<fieldname>line3</fieldname>
-			<description>Leave empty if not used</description>
-			<type>textarea</type>
-			<cols>80</cols>
-                        <rows>1</rows>
+			<fielddescr>IP address of your VOIP </fielddescr>
+			<fieldname>iaoyv</fieldname>
+			<description>
+			</description>
+			<type>input</type>
+			<size>15</size>
 		</field>
 	</fields>
 	<custom_add_php_command></custom_add_php_command>
-        <custom_php_command_before_form>ddns_config();</custom_php_command_before_form>
+        <custom_php_command_before_form>cass_config();</custom_php_command_before_form>
 	<custom_php_after_form_command></custom_php_after_form_command>
 	<custom_php_validation_command></custom_php_validation_command>
 	<custom_php_resync_config_command></custom_php_resync_config_command>
