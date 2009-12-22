@@ -227,8 +227,12 @@ function haproxy_configure() {
 								} else {
 									$server_ports[] = $server['port'];
 								}
+								if($server['advanced'])
+									$advanced_txt = " " . $server['advanced'];
+								else
+									$advanced_txt = "";
 								foreach($server_ports as $pport) 
-									fwrite ($fd, "\tserver\t\t\t" . $server['name'] . " " . $server['address'].":" . $pport . " $cookie " . " check inter 1000 weight " . $server['weight'] . "\n");
+									fwrite ($fd, "\tserver\t\t\t" . $server['name'] . " " . $server['address'].":" . $pport . " $cookie " . " check inter 1000 weight " . $server['weight'] . "{$advanced_txt}\n");
 							}
 						}
 					}

@@ -53,6 +53,7 @@ if (isset($id) && $a_server[$id]) {
 	$pconfig['weight'] = $a_server[$id]['weight'];
 	$pconfig['cookie'] = $a_server[$id]['cookie'];
 	$pconfig['status'] = $a_server[$id]['status'];
+	$pconfig['advanced'] = $a_server[$id]['advanced'];
 }
 
 $changedesc = "Services: HAProxy: Servers: ";
@@ -122,6 +123,7 @@ if ($_POST) {
 		update_if_changed("weight", $server['weight'], $_POST['weight']);
 		update_if_changed("status", $server['status'], $_POST['status']);
 		update_if_changed("address", $server['address'], $_POST['address']);
+		update_if_changed("advanced", $server['advanced'], $_POST['advanced']);
 		
 		if (isset($id) && $a_server[$id]) {
 			$a_server[$id] = $server;
@@ -294,6 +296,14 @@ function clearcombo(){
 					  instance between 10 and 100 to leave enough room above and below for later 
 					  adjustments.
 				
+			</td>
+		</tr>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncellreq">Advanced pass thru</td>
+			<td width="78%" class="vtable" colspan="2">
+				<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
+				<br/>
+				NOTE: paste text into this box that you would like to pass thru.
 			</td>
 		</tr>
 		<tr align="left">
