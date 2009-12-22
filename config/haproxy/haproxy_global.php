@@ -77,6 +77,7 @@ if ($_POST) {
 			$config['installedpackages']['haproxy']['synchost2'] = $_POST['synchost3'] ? $_POST['synchost3'] : false;
 			$config['installedpackages']['haproxy']['remotesyslog'] = $_POST['remotesyslog'] ? $_POST['remotesyslog'] : false;
 			$config['installedpackages']['haproxy']['syncpassword'] = $_POST['syncpassword'] ? $_POST['syncpassword'] : false;
+			$config['installedpackages']['haproxy']['advanced'] = $_POST['advanced'] ? $_POST['advanced'] : false;
 			touch($d_haproxyconfdirty_path);
 			write_config();
 		}
@@ -92,6 +93,7 @@ $pconfig['synchost1'] = $config['installedpackages']['haproxy']['synchost1'];
 $pconfig['synchost2'] = $config['installedpackages']['haproxy']['synchost2'];
 $pconfig['synchost3'] = $config['installedpackages']['haproxy']['synchost3'];
 $pconfig['remotesyslog'] = $config['installedpackages']['haproxy']['remotesyslog'];
+$pconfig['advanced'] = $config['installedpackages']['haproxy']['advanced'];
 
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
@@ -202,6 +204,22 @@ function enable_change(enable_change) {
 				</td>
 				<td class="vtable">
 					<input name="remotesyslog" type="text" class="formfld" id="remotesyslog" size="18" value="<?=htmlspecialchars($pconfig['remotesyslog']);?>">
+				</td>
+			</tr>
+			<tr>
+				<td>
+					&nbsp;
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" valign="top" class="listtopic">Global Advanced pass thru</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell">&nbsp;</td>
+				<td width="78%" class="vtable">
+					<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
+					<br/>
+					NOTE: paste text into this box that you would like to pass thru in the global settings area.
 				</td>
 			</tr>
 			<tr>

@@ -108,6 +108,8 @@ function haproxy_configure() {
 
 	if(is_array($a_global)) {
 		fwrite ($fd, "global\n");
+		if($a_global['advanced'])
+			fwrite ($fd, "\t" . $a_global['advanced'] . "\n");
 		fwrite ($fd, "\tmaxconn\t\t\t".$a_global['maxconn']."\n");
 		if($a_global['remotesyslog'])
 			fwrite ($fd, "\tlog\t\t\t{$a_global['remotesyslog']}\n");
