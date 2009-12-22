@@ -389,7 +389,7 @@ function vhosts_sync_package_php()
 			$tmp .= "#server.error-handler-404   = \"/error-handler.php\"\n";
 			$tmp .= "\n";
 			$tmp .= "## to help the rc.scripts\n";
-			$tmp .= "server.pid-file            = \"/var/run/lighty-vhosts.pid\"\n";
+			$tmp .= "server.pid-file            = \"/var/run/lighty-vhosts-http.pid\"\n";
 			$tmp .= "\n";
 			$tmp .= "## virtual directory listings\n";
 			$tmp .= "server.dir-listing         = \"disable\"\n";
@@ -429,7 +429,7 @@ function vhosts_sync_package_php()
 			$tmp .= "#### CGI module\n";
 			$tmp .= "cgi.assign                 = ( \".cgi\" => \"\" )\n";
 
-			$fout = fopen("/var/etc/lighty-vhosts.conf","w");
+			$fout = fopen("/var/etc/lighty-vhosts-http.conf","w");
 			fwrite($fout, $tmp);
 			unset($tmp);
 			fclose($fout);
@@ -750,9 +750,9 @@ function php_install_command() {
 	//write_config();
 
 	write_rcfile(array(
-		"file" => "vhosts.sh",
-		"start" => "/usr/local/sbin/lighttpd -f /var/etc/lighty-vhosts.conf",
-		"stop" => "kill `cat /var/run/lighty-vhosts.pid`"
+		"file" => "vhosts-http.sh",
+		"start" => "/usr/local/sbin/lighttpd -f /var/etc/lighty-vhosts-http.conf",
+		"stop" => "kill `cat /var/run/lighty-vhosts-http.pid`"
 		)
 	);
 
