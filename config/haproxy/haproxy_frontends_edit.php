@@ -72,6 +72,7 @@ if (isset($id) && $a_backend[$id]) {
 	$pconfig['stats_password'] = $a_backend[$id]['stats_password'];	
 	$pconfig['port'] = $a_backend[$id]['port'];	
 	$pconfig['a_acl']=&$a_backend[$id]['ha_acls']['item'];	
+	$pconfig['advanced'] = $a_backend[$id]['advanced'];	
 
 }
 
@@ -231,8 +232,9 @@ if ($_POST) {
 		update_if_changed("extaddr", $backend['extaddr'], $_POST['extaddr']);
 		update_if_changed("max_connections", $backend['max_connections'], $_POST['max_connections']);
 		update_if_changed("client_timeout", $backend['client_timeout'], $_POST['client_timeout']);
+		update_if_changed("advanced", $backend['advanced'], $_POST['advanced']);
 
-		$backend['ha_acls']['item']=$a_acl;
+		$backend['ha_acls']['item'] = $a_acl;
 
 		if (isset($id) && $a_backend[$id]) {
 			$a_backend[$id] = $backend;
@@ -595,7 +597,15 @@ set by the 'retries' parameter (2).</div>
 					</td>
 			</tr>
 */
-?>		
+?>
+			<tr align="left">
+				<td width="22%" valign="top" class="vncell">Advanced pass thru</td>
+				<td width="78%" class="vtable" colspan="2">
+					<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
+					<br/>
+					NOTE: paste text into this box that you would like to pass thru.
+				</td>
+			</tr>
 			<tr align="left">
 			<td width="22%" valign="top">&nbsp;</td>
 			<td width="78%">
