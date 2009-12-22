@@ -37,15 +37,94 @@ require("globals.inc");
 require("guiconfig.inc");
 
 $snortalertlogt = $config['installedpackages']['snortglobal']['snortalertlogtype'];
+$snort_logfile = '/var/log/snort/alert';
 
-if ($_POST['clear']) {
+$pconfig['arefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['arefresh'];
+$pconfig['alertnumber'] = $config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'];
+
+if ($pconfig['alertnumber'] == '' || $pconfig['alertnumber'] == '0')
+{
+	$anentries = '250';
+}else{
+	$anentries = $pconfig['alertnumber'];
+}
+
+if ($_POST['save'])
+{
+
+	//unset($input_errors);
+	//$pconfig = $_POST;
+
+	/* input validation */
+	if ($_POST['save'])
+	{
+
+	//	if (($_POST['radiusacctport'] && !is_port($_POST['radiusacctport']))) {
+	//		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusacctport']."]";
+	//	}
+	
+	}
+		
+		/* no errors */
+		if (!$input_errors)
+		{
+		
+		$config['installedpackages']['snortglobal']['alertsblocks']['arefresh'] = $_POST['arefresh'] ? on : off;
+		$config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'] = $_POST['alertnumber'];
+		
+		conf_mount_rw();
+		write_config();
+		//conf_mount_ro();
+		sleep(2);
+			
+		header("Location: /snort/snort_alerts.php");
+				
+		}
+		
+}
+
+
+if ($_POST['delete'])
+{
+
 	exec("killall syslogd");
 	conf_mount_rw();
-	exec("rm {$snort_logfile}; touch {$snort_logfile}");
+	if(file_exists("/var/log/snort/alert"))
+	{	
+		exec('/bin/rm /var/log/snort/*');
+		exec('/usr/bin/touch /var/log/snort/alert');
+	}
 	conf_mount_ro();
 	system_syslogd_start();
-	exec("/usr/bin/killall -HUP snort");
+	//exec("/usr/bin/killall -HUP snort");
+		
 }
+
+if ($_POST['download'])
+{
+
+	ob_start(); //importanr or other post will fail
+	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
+	$file_name = "snort_logs_{$save_date}.tar.gz";
+	exec("/usr/bin/tar cfz /tmp/snort_logs_{$save_date}.tar.gz /var/log/snort");
+
+	if(file_exists("/tmp/snort_logs_{$save_date}.tar.gz"))
+	{
+		$file = "/tmp/snort_logs_{$save_date}.tar.gz";
+		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT\n");
+		header('Content-type: application/force-download');
+		header('Content-Transfer-Encoding: Binary');
+		header("Content-length: ".filesize($file));
+		header("Content-disposition: attachment; filename = {$file_name}");
+		readfile("$file");
+		exec("/bin/rm /tmp/snort_logs_{$save_date}.tar.gz");
+		od_end_clean(); //importanr or other post will fail
+	}else{
+    echo 'Error no saved file.';
+	}
+
+}
+
 
 /* WARNING: took me forever to figure reg expression, dont lose */
 // $fileline = '12/09-18:12:02.086733  [**] [122:6:0] (portscan) TCP Filtered Decoy Portscan [**] [Priority: 3] {PROTO:255} 125.135.214.166 -> 70.61.243.50';
@@ -140,7 +219,7 @@ return $alert_ip_src;
 function get_snort_alert_src_p($fileline)
 {
 	/* source port */
-	if (preg_match('/:\d+\s/', $fileline, $matches5))
+	if (preg_match('/:\d+\s-/', $fileline, $matches5))
 	{
         $alert_src_p = "$matches5[0]";
 	}
@@ -226,7 +305,15 @@ include("head.inc");
 <script type="text/javascript" src="/snort/javascript/sortableTable.js"></script>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("fbegin.inc"); ?>
+<?php 
+
+include("fbegin.inc");
+
+if ($pconfig['arefresh'] == 'on')
+{
+echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php\" />\n";
+}
+?>
 <p class="pgtitle"><?=$pgtitle?></p>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
@@ -245,12 +332,36 @@ include("head.inc");
   <tr>
     <td>
 	<div id="mainarea">
-		<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
+		<table class="tabcont" width="100%" border="1" cellspacing="0" cellpadding="0">
 		  <tr>
-			<td colspan="1" class="listtopic">
-			<input name="clear" type="submit" class="formbtn" value="Clear log">
-			  Last <?=$nentries;?> Snort Alert entries</td>
+			<td colspan="0" class="listtopic">
+			Last <?=$anentries;?> Snort Alert Entries.&nbsp;&nbsp;&nbsp;&nbsp;Latest Alert Entries Are Listed First.
+			</td>
 		  </tr>
+    <tr>
+        <td width="22%" class="vncell">Save or Remove Logs</td>
+		<td width="78%" class="vtable">
+		<form action="/snort/snort_alerts.php" method="post">
+        <input name="download" type="submit" class="formbtn" value="Download">
+        All log files will be saved.
+		<input name="delete" type="submit" class="formbtn" value="Clear">
+		<span class="red"><strong>Warning:</strong></span> all log files will be deleted.
+		</form>
+		</td>
+    </tr>
+    <tr>
+        <td width="22%" class="vncell">Auto Refresh and Log View</td>
+		<td width="78%" class="vtable">
+		<form action="/snort/snort_alerts.php" method="post">
+		<input name="save" type="submit" class="formbtn" value="Save">
+		Refresh
+        <input name="arefresh" type="checkbox" value="on" <?php if ($config['installedpackages']['snortglobal']['alertsblocks']['arefresh']=="on") echo "checked"; ?>>
+        <strong>Default</strong> is <strong>ON</strong>.
+		<input name="alertnumber" type="text" class="formfld" id="alertnumber" size="5" value="<?=htmlspecialchars($anentries);?>">
+		Enter the number of log entries to view. <strong>Default</strong> is <strong>250</strong>.
+		</form>
+		</td>
+    </tr>
 		</table>
 	</div>
 	</td>
@@ -296,9 +407,17 @@ include("head.inc");
 			</thead>
 			<tbody>
 <?php
-	
-	$alerts = file_get_contents('/var/log/snort/alert');
-	$logent = '50';
+
+	/* make sure alert file exists */	
+	if(!file_exists('/var/log/snort/alert'))
+	{
+		conf_mount_rw();
+		exec('/usr/bin/touch /var/log/snort/alert');
+		conf_mount_ro();
+	}
+
+		$logent = $anentries;
+
 	
 	/* detect the alert file type */
 	if ($snortalertlogt == 'full')
@@ -391,7 +510,7 @@ include("head.inc");
 			
 			if($alert_src_p_str != '')
 			{
-				$alert_src_p_match = array(' ',':'); 
+				$alert_src_p_match = array(' -',':'); 
 				$alert_src_p = str_replace($alert_src_p_match, '', "$alert_src_p_str");
 			}else{			
 				$alert_src_p = 'empty';

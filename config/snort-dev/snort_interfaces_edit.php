@@ -466,8 +466,7 @@ if($id != "")
                   <td width="22%" valign="top" class="vncellreq">Description</td>
                   <td width="78%" class="vtable">
                     <input name="descr" type="text" class="formfld" id="descr" size="40" value="<?=htmlspecialchars($pconfig['descr']);?>">
-                    <br> <span class="vexpl">You may enter a description here
-                    for your reference (not parsed).</span></td>
+                    <br> <span class="vexpl">You may enter a description here for your reference (not parsed).</span></td>
                 </tr>
 				<tr>
 					<td width="22%" valign="top" class="vncell">Memory Performance</td>
