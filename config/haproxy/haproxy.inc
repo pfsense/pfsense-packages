@@ -153,7 +153,7 @@ function haproxy_configure() {
 
 			// Advanced pass trhu
 			if($backend['advanced'])
-				fwrite ($fd, "{$backend['advanced']}");
+				fwrite ($fd, "{$backend['advanced']}\n");
 
 			// https is an alias for tcp for clarity purpouses
 			if(strtolower($backend['type']) == "https") {
