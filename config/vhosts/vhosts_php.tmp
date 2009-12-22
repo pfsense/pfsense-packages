@@ -31,7 +31,7 @@ require("guiconfig.inc");
 require("/usr/local/pkg/vhosts.inc");
 
 $a_vhosts = &$config['installedpackages']['vhosts']['config'];
-$a_service   = $config['installedpackages']['service'];
+$a_service = $config['installedpackages']['service'];
 
 if ($_GET['act'] == "del") {
 	if ($_GET['type'] == 'php') {
@@ -118,9 +118,10 @@ include("head.inc");
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">              
 			<tr>
 				<td><p><!--<span class="vexpl"><span class="red"><strong>PHP Service<br></strong></span>-->
-				vHosts is a web server package that can host HTML, Javascript, CSS, and PHP. It uses the lighttpd web server 
-				that is already installed. It uses PHP5 in FastCGI mode and has access to PHP Data Ojbects and PDO SQLite.
-				After adding or updating and entry make sure to restart the <a href='/status_services.php'>service</a> to apply the settings.
+				vHosts is a web server package that can host HTML, Javascript, CSS, and PHP. It creates another instance of the lighttpd web server 
+				that is already installed. It uses PHP5 in FastCGI mode and has access to PHP Data Ojbects and PDO SQLite. To use SFTP enable SSH from 
+				System -> Advanced -> Enable Secure Shell. Then SFTP can be used to access the files at /usr/local/vhosts.
+				After adding or updating an entry make sure to restart the <a href='/status_services.php'>service</a> to apply the settings.
 				<br /><br />
 				For more information see: <a href='http://doc.pfsense.org/index.php/vhosts'>http://doc.pfsense.org/index.php/vhosts</a>            
 				</p></td>

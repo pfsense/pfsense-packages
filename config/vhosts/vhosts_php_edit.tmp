@@ -205,7 +205,6 @@ function show_advanced_config() {
 				</td>
 			</tr>
 
-<!--
 			<tr>
 				<td width="22%" valign="top" class="vncell">Certificate</td>
 				<td width="78%" class="vtable">
@@ -222,7 +221,6 @@ function show_advanced_config() {
 					Paste an RSA private key in PEM format here.
 				</td>
 			</tr>
--->
 
 			<tr>
 				<td width="22%" valign="top" class="vncellreq">Enabled</td>
