@@ -41,7 +41,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>vHosts Settings</name>
-	<version>0.2</version>
+	<version>0.5.1</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/vhosts.inc</include_file>
 	<menu>
@@ -52,9 +52,9 @@
 		<url>/packages/vhosts/vhosts_php.php</url>
 	</menu>
 	<service>
-		<name>vHosts</name>
-		<rcfile>vhosts.sh</rcfile>
-		<executable>vhosts</executable>
+		<name>vhosts-http</name>
+		<rcfile>vhosts-http.sh</rcfile>
+		<executable>vhosts-http</executable>
 		<description>LigHTTPD web server service. Uses PHP5 with fast cgi.</description>    
 	</service>
 	<tabs>
@@ -69,7 +69,7 @@
 			<active/>
 		</tab>
 	</tabs>
-	<configpath>installedpackages->package->$packagename->configuration->vhosts</configpath>	
+	<configpath>installedpackages->package->$packagename->configuration->vhosts</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
