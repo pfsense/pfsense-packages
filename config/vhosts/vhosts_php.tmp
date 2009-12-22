@@ -31,48 +31,7 @@ require("guiconfig.inc");
 require("/usr/local/pkg/vhosts.inc");
 
 $a_vhosts = &$config['installedpackages']['vhosts']['config'];
-$a_service = $config['installedpackages']['service'];
 
-if ($_GET['act'] == "del") {
-	if ($_GET['type'] == 'php') {
-		if ($a_vhosts[$_GET['id']]) {
-			//get vhost info
-			$x = 0;
-			foreach($a_vhosts as $rowhelper) {
-				if ($_GET['id'] == $x) {
-					print_r ($rowhelper); exit;
-					$id = $x; //return the id
-					$host = $rowhelper['host'];
-					$ipaddress = $rowhelper['ipaddress'];
-					$port = $rowhelper['port'];
-					$directory = $rowhelper['directory'];
-					if (strlen($certificate) > 0) {
-						$ssl = true;
-					}
-					else {
-						$ssl = false;
-					}
-				}
-				$x++;
-			}
-			//delete vhosts entry
-				unset($a_vhosts[$_GET['id']]);
-
-			//delete the SSL service
-				if ($ssl) {
-					unlink_if_exists("/var/etc/lighty-vhosts-".$ipaddress."-".$port."-ssl.conf");
-					unlink_if_exists("/usr/local/etc/rc.d/vhosts-".$ipaddress."-".$port."-ssl.sh");
-					$service_id = get_service_id ($a_service, 'rcfile', "vhosts-".$ipaddress."-".$port."-ssl.sh");
-					if (is_int($service_id)) {
-						unset($a_service[$service_id]);
-					}
-				}
-			write_config();
-			header("Location: vhosts_php.php");
-			exit;
-		}
-	}
-}
 
 include("head.inc");
 

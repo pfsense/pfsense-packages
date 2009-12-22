@@ -38,12 +38,53 @@ if (isset($_POST['id'])) {
 	$id = $_POST['id'];
 }
 
+$a_vhosts = &$config['installedpackages']['vhosts']['config'];
+$a_service = $config['installedpackages']['service'];
+
 if ($_GET['act'] == "del") {
 	if ($_GET['type'] == 'php') {
 		if ($a_vhosts[$_GET['id']]) {
-			unset($a_vhosts[$_GET['id']]);
+			//get vhost info
+			$x = 0;
+			$y = 0;
+			foreach($a_vhosts as $rowhelper) {
+				if (strlen($rowhelper['certificate']) > 0) {
+					$y++;
+				}
+				if ($_GET['id'] == $x) {
+					$id = $x; //return the id
+					$host = $rowhelper['host'];
+					$ipaddress = $rowhelper['ipaddress'];
+					$port = $rowhelper['port'];
+					$directory = $rowhelper['directory'];
+					if (strlen($rowhelper['certificate']) > 0) {
+						$ssl = true;
+						$ssl_id = $y;
+					}
+					else {
+						$ssl = false;
+					}
+				}
+
+				$x++;
+			}
+
+			//delete vhosts entry
+				unset($a_vhosts[$_GET['id']]);
+
+			//delete the SSL files and service
+				if ($ssl) {
+					unlink_if_exists("/var/etc/lighty-vhosts-".$ipaddress."-".$port."-ssl.conf");
+					unlink_if_exists("/var/etc/cert-vhosts-".$ipaddress."-".$port.".pem");
+					unlink_if_exists("/usr/local/etc/rc.d/vhosts-".$ipaddress."-".$port."-ssl.sh");
+					$service_id = get_service_id ($a_service, 'rcfile', "vhosts-".$ipaddress."-".$port."-ssl.sh");
+					if (is_int($service_id)) {
+						exec("kill `cat /var/run/lighty-vhosts-".$ipaddress."-".$port."-ssl.pid`");
+						unset($config['installedpackages']['service'][$service_id]);
+					}
+				}
+
 			write_config();
-			php_sync_package();
 			header("Location: vhosts_php.php");
 			exit;
 		}
