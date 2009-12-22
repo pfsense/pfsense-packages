@@ -299,7 +299,7 @@ function clearcombo(){
 			</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Advanced pass thru</td>
+			<td width="22%" valign="top" class="vncell">Advanced pass thru</td>
 			<td width="78%" class="vtable" colspan="2">
 				<textarea name='advanced' rows="4" cols="70" id='advanced'><?php echo $pconfig['advanced']; ?></textarea>
 				<br/>
