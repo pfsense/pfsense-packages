@@ -112,6 +112,8 @@ if ($_POST['download'])
 	{
 		$file = "/tmp/snort_logs_{$save_date}.tar.gz";
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT\n");
+		header("Pragma: private"); // needed for IE
+		header("Cache-Control: private, must-revalidate"); // needed for IE
 		header('Content-type: application/force-download');
 		header('Content-Transfer-Encoding: Binary');
 		header("Content-length: ".filesize($file));
@@ -309,7 +311,7 @@ include("head.inc");
 
 include("fbegin.inc");
 
-if ($pconfig['arefresh'] == 'on')
+if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 {
 echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php\" />\n";
 }
@@ -334,8 +336,11 @@ echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php\" />
 	<div id="mainarea">
 		<table class="tabcont" width="100%" border="1" cellspacing="0" cellpadding="0">
 		  <tr>
-			<td colspan="0" class="listtopic">
-			Last <?=$anentries;?> Snort Alert Entries.&nbsp;&nbsp;&nbsp;&nbsp;Latest Alert Entries Are Listed First.
+			<td width="22%" colspan="0" class="listtopic">
+			Last <?=$anentries;?> Alert Entries.
+			</td>
+			<td width="78%" class="listtopic">
+			Latest Alert Entries Are Listed First.
 			</td>
 		  </tr>
     <tr>
@@ -416,8 +421,9 @@ echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php\" />
 		conf_mount_ro();
 	}
 
-		$logent = $anentries;
-
+	$logent = $anentries;
+	
+	$alerts = file_get_contents('/var/log/snort/alert');
 	
 	/* detect the alert file type */
 	if ($snortalertlogt == 'full')
