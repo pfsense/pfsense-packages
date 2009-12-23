@@ -732,6 +732,25 @@ function php_install_command() {
 		exec("mkdir /usr/local/vhosts/");
 	}
 
+	if(stristr(php_uname('r'), '7.2') == TRUE) {
+		if (!file_exists('/usr/local/lib/libxml2.so.5')) {
+			chdir('/usr/local/lib/');
+			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/usr.local.lib/libxml2.so.5");
+		}
+		if (!file_exists('/usr/local/lib/libxml2.so')) {
+			chdir('/usr/local/lib/');
+			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/usr.local.lib/libxml2.so");
+		}
+		if (!file_exists('/usr/local/lib/libxml2.la')) {
+			chdir('/usr/local/lib/');
+			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/usr.local.lib/libxml2.la");
+		}
+		if (!file_exists('/usr/local/lib/libxml2.a')) {
+			chdir('/usr/local/lib/');
+			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/usr.local.lib/lib/libxml2.a");
+		}
+	}
+
 	//rename PHP files from .tmp to .php
 	exec("cp /tmp/vhosts_php.tmp /usr/local/www/packages/vhosts/vhosts_php.php");
 	unlink_if_exists("/tmp/vhosts_php.tmp");
