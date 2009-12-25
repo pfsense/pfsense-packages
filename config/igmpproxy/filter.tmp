@@ -2590,7 +2590,7 @@ if (!isset($config['shaper']['enable']) && !is_array($config['shaper']['queue'])
 # let out anything from the firewall host itself and decrypted IPsec traffic
 pass out quick on \$lan proto icmp keep state label "let out anything from firewall host itself"
 pass out quick on \$wan proto icmp keep state label "let out anything from firewall host itself"
-pass out quick on $wanif all keep state label "let out anything from firewall host itself"
+pass out quick on $wanif all allow-opts  keep state label "let out anything from firewall host itself"
 
 EOD;
 
@@ -2605,7 +2605,7 @@ EOD;
 
 # let out anything from the firewall host itself and decrypted IPsec traffic
 pass out quick on {$oc['if']} proto icmp keep state label "let out anything from firewall host itself"
-pass out quick on {$oc['if']} all keep state label "let out anything from firewall host itself"
+pass out quick on {$oc['if']} all allow-opts keep state label "let out anything from firewall host itself"
 
 EOD;
 
@@ -2989,7 +2989,7 @@ function create_firewall_outgoing_rules_to_itself() {
 				} else {
 					$q = "queue ({$queue['name']}, {$ackq})";
 				}
-				$rule .="pass out quick on {$int} all keep state tagged {$queue['name']} {$q} label \"let out anything from firewall host itself\"\n";
+				$rule .="pass out quick on {$int} all allow-opts keep state tagged {$queue['name']} {$q} label \"let out anything from firewall host itself\"\n";
 			}
 			/* Handle untagged packets */
 			if ($ackq == "" || $defq == "") {
@@ -2998,10 +2998,10 @@ function create_firewall_outgoing_rules_to_itself() {
 			} else {
 				$q = "queue ({$defq}, {$ackq})";
 			}
-			$rule .="pass out quick on {$int} all keep state {$q} label \"let out anything from firewall host itself\"\n";
+			$rule .="pass out quick on {$int} all keep state {$q} allow-opts label \"let out anything from firewall host itself\"\n";
 		} else {
 			/* first add a rule for the real interface, then for ng0 */
-			$rule .="pass out quick on {$int} all keep state label \"let out anything from firewall host itself\"\n";
+			$rule .="pass out quick on {$int} all allow-opts keep state label \"let out anything from firewall host itself\"\n";
 		}
 	}
 
@@ -3009,16 +3009,16 @@ function create_firewall_outgoing_rules_to_itself() {
 	/* is bridging turned on? */
 	for($x=0; $x<10; $x++) {
 		if(does_interface_exist("bridge{$x}") == true)
-			$rule .="pass out quick on bridge{$x} all keep state label \"let out anything from firewall host itself\"\n";
+			$rule .="pass out quick on bridge{$x} all allow-opts keep state label \"let out anything from firewall host itself\"\n";
 	}
 
 	update_filter_reload_status("Setting up pptp items");
 	if($config['pptpd']['mode'] == "server")
-		$rule .="pass out quick on \$pptp all keep state label \"let out anything from firewall host itself pptp\"\n";
+		$rule .="pass out quick on \$pptp all allow-opts  keep state label \"let out anything from firewall host itself pptp\"\n";
 
 	update_filter_reload_status("Setting up pppoe items");
 	if($config['pppoe']['mode'] == "server")
-		$rule .="pass out quick on \$pppoe all keep state label \"let out anything from firewall host itself pppoe\"\n";
+		$rule .="pass out quick on \$pppoe all allow-opts  keep state label \"let out anything from firewall host itself pppoe\"\n";
 
 	update_filter_reload_status("Setting up gif tunnels");
 	/* setup outgoing gif tunnels */
@@ -3026,7 +3026,7 @@ function create_firewall_outgoing_rules_to_itself() {
 	$number_of_gifs++;
 	for($x=0; $x<$number_of_gifs; $x++) {
 		if(does_interface_exist("gif{$x}") == true)
-			$rule .="pass out quick on gif{$x} all keep state label \"let out anything from firewall host itself ipsec gif\"\n";
+			$rule .="pass out quick on gif{$x} all allow-opts  keep state label \"let out anything from firewall host itself ipsec gif\"\n";
 	}
 
 	update_filter_reload_status("Setting up tun interfaces (openvpn)");
