@@ -6,10 +6,11 @@
 
 	Copyright (C) 2005 Bill Marquette <bill.marquette@gmail.com>.
 	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+	Copyright (C) 2006 Scott Ullrich
 	All rights reserved.
 	
-	Modified for the Pfsense snort package by
-	Copyright (C) 2003 Robert Zelaya
+	Modified for the Pfsense snort package v. 1.8+
+	Copyright (C) 2009 Robert Zelaya Sr. Developer
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -311,9 +312,10 @@ include("head.inc");
 
 include("fbegin.inc");
 
+/* refresh every 60 secs */
 if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 {
-echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php\" />\n";
+	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php\" />\n";
 }
 ?>
 <p class="pgtitle"><?=$pgtitle?></p>
@@ -330,7 +332,8 @@ echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php\" />
 	$tab_array[] = array("Help & Info", false, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 ?>
-  </td></tr>
+  </td>
+  </tr>
   <tr>
     <td>
 	<div id="mainarea">
@@ -423,14 +426,12 @@ echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php\" />
 
 	$logent = $anentries;
 	
-	$alerts = file_get_contents('/var/log/snort/alert');
-	
 	/* detect the alert file type */
 	if ($snortalertlogt == 'full')
 	{
-		$alerts_array = array_reverse(array_filter(explode("\n\n", $alerts)));
+		$alerts_array = array_reverse(array_filter(explode("\n\n", file_get_contents('/var/log/snort/alert'))));
 	}else{
-		$alerts_array = array_reverse(split("\n", $alerts));
+		$alerts_array = array_reverse(split("\n", file_get_contents('/var/log/snort/alert')));
 	}
 	
 	$counter = 0;
