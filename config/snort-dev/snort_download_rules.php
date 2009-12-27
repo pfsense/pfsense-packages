@@ -685,9 +685,9 @@ if ($snortdownload != "off")
 		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/web-misc.rules/");
 		/* add prefix to all snort.org files */
 		/* remove this part and make it all php with the simplst code posible */
-		//chdir ("/usr/local/etc/snort/rules_bk/rules");
-		//sleep(2);
-		//exec('/usr/local/bin/snort_rename.pl s/^/snort_/ *.rules');
+		chdir ("/usr/local/etc/snort/rules_bk/rules");
+		sleep(2);
+		exec('/usr/local/bin/perl /usr/local/bin/snort_rename.pl s/^/snort_/ *.rules');
 		update_status(gettext("Done extracting Rules."));
 	}else{
 		update_status(gettext("The Download rules file missing..."));
@@ -963,31 +963,9 @@ exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl /usr/local/etc/snort/r
 
 //////////////////
 
-/* Start the proccess for every interface rule */
-/* TODO: try to make the code smother */
-
-if (!empty($config['installedpackages']['snortglobal']['rule'])) {
-
-$rule_array = $config['installedpackages']['snortglobal']['rule'];
-$id = -1;
-foreach ($rule_array as $value) {
-
-$id += 1;
-
-$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
-
-	/* make oinkmaster.conf for each interface rule */
-	oinkmaster_conf();
-	
-	/* run oinkmaster for each interface rule */
-	oinkmaster_run();
-
-	}
-}
-
 /* open oinkmaster_conf for writing" function */
-function oinkmaster_conf() {
+function oinkmaster_conf()
+{
 
         global $config, $g, $id, $if_real, $snortdir_wan, $snortdir, $snort_md5_check_ok, $emerg_md5_check_ok, $pfsense_md5_check_ok;
         conf_mount_rw();
@@ -1031,7 +1009,7 @@ $selected_sid_off_sections
 EOD;
 
      /* open snort's oinkmaster.conf for writing */
-     $oinkmasterlist = fopen("/usr/local/etc/snort/oinkmaster_$if_real.conf", "w");
+     $oinkmasterlist = fopen("/usr/local/etc/snort/snort_$id$if_real/oinkmaster_$id$if_real.conf", "w");
 
      fwrite($oinkmasterlist, "$snort_sid_text");
 
@@ -1044,31 +1022,33 @@ EOD;
 /*  Run oinkmaster to snort_wan and cp configs */
 /*  If oinkmaster is not needed cp rules normally */
 /*  TODO add per interface settings here */
-function oinkmaster_run() {
+function oinkmaster_run()
+{
 
         global $config, $g, $id, $if_real, $snortdir_wan, $snortdir, $snort_md5_check_ok, $emerg_md5_check_ok, $pfsense_md5_check_ok;
         conf_mount_rw();
 
-if ($snort_md5_check_ok != on || $emerg_md5_check_ok != on || $pfsense_md5_check_ok != on) {
+	if ($snort_md5_check_ok != on || $emerg_md5_check_ok != on || $pfsense_md5_check_ok != on)
+	{
 
-	if (empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on']) || empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off'])) {
-	update_status(gettext("Your first set of rules are being copied..."));
-	update_output_window(gettext("May take a while..."));
-	exec("/bin/echo \"test {$snortdir} {$snortdir_wan} $id$if_real\" > /root/debug");
-    exec("/bin/cp {$snortdir}/rules/\* {$snortdir_wan}/snort_$id$if_real/rules/");
-	exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}/snort_$id$if_real");
-	exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}/snort_$id$if_real");
-	exec("/bin/cp {$snortdir}/generators {$snortdir_wan}/snort_$id$if_real");
-	exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}/snort_$id$if_real");
-	exec("/bin/cp {$snortdir}/sid {$snortdir_wan}/snort_$id$if_real");
-	exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}/snort_$id$if_real");
-	exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}/snort_$id$if_real");
-
-} else {
+		if ($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on'] == '' && $config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off'] == '')
+		{
+		update_status(gettext("Your first set of rules are being copied..."));
+		update_output_window(gettext("May take a while..."));
+		exec("/bin/echo \"test {$snortdir} {$snortdir_wan} $id$if_real\" > /root/debug");
+		exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/snort_$id$if_real/rules/");
+		exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}/snort_$id$if_real");
+		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}/snort_$id$if_real");
+		exec("/bin/cp {$snortdir}/generators {$snortdir_wan}/snort_$id$if_real");
+		exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}/snort_$id$if_real");
+		exec("/bin/cp {$snortdir}/sid {$snortdir_wan}/snort_$id$if_real");
+		exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}/snort_$id$if_real");
+		exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}/snort_$id$if_real");
+		}else{
 		update_status(gettext("Your enable and disable changes are being applied to your fresh set of rules..."));
 		update_output_window(gettext("May take a while..."));
 		exec("/bin/echo \"test2 {$snortdir} {$snortdir_wan} $id$if_real\" > /root/debug");
-		exec("/bin/cp {$snortdir}/rules/\* {$snortdir_wan}/snort_$id$if_real/rules/");
+		exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/snort_$id$if_real/rules/");
 		exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}/snort_$id$if_real");
 		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}/snort_$id$if_real");
 		exec("/bin/cp {$snortdir}/generators {$snortdir_wan}/snort_$id$if_real");
@@ -1077,11 +1057,33 @@ if ($snort_md5_check_ok != on || $emerg_md5_check_ok != on || $pfsense_md5_check
 		exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}/snort_$id$if_real");
 		exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}/snort_$id$if_real");
 
-		/*  oinkmaster.pl will convert saved changes for the new updates then we have to change #alert to # alert for the gui */
 		/*  might have to add a sleep for 3sec for flash drives or old drives */
-		exec("/usr/local/bin/perl /usr/local/bin/oinkmaster.pl -C /usr/local/etc/snort/oinkmaster_$id$if_real.conf -o /usr/local/etc/snort/snort_$id$if_real/rules > /usr/local/etc/snort/oinkmaster_$id$if_real.log");
-
+		exec("/usr/local/bin/perl /usr/local/bin/oinkmaster.pl -C /usr/local/etc/snort/snort_$id$if_real/oinkmaster_$id$if_real.conf -o /usr/local/etc/snort/snort_$id$if_real/rules > /usr/local/etc/snort/oinkmaster_$id$if_real.log");
 		}
+	}
+}
+
+/* Start the proccess for every interface rule */
+/* TODO: try to make the code smother */
+
+if (!empty($config['installedpackages']['snortglobal']['rule']))
+{
+
+	$rule_array = $config['installedpackages']['snortglobal']['rule'];
+	$id = -1;
+	foreach ($rule_array as $value) {
+
+	$id += 1;
+
+	$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
+	$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+
+	/* make oinkmaster.conf for each interface rule */
+	oinkmaster_conf();
+	
+	/* run oinkmaster for each interface rule */
+	oinkmaster_run();
+
 	}
 }
 
@@ -1091,9 +1093,10 @@ if ($snort_md5_check_ok != on || $emerg_md5_check_ok != on || $pfsense_md5_check
 $config['installedpackages']['snortglobal']['last_rules_install'] = date("Y-M-jS-h:i-A");
 
 /*  remove old $tmpfname files */
-if (file_exists("{$tmpfname}")) {
-    update_status(gettext("Cleaning up..."));
-    exec("/bin/rm -r /tmp/snort_rules_up");
+if (file_exists("{$tmpfname}"))
+{
+	update_status(gettext("Cleaning up..."));
+	exec("/bin/rm -r /tmp/snort_rules_up");
 	sleep(2);
 	exec("/bin/rm -r {$snortdir}/rules_bk/rules/");
 	apc_clear_cache();
@@ -1103,6 +1106,15 @@ if (file_exists("{$tmpfname}")) {
 sleep(2);
 apc_clear_cache();
 exec("/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync");
+
+/* make all dirs snorts */
+exec("/usr/sbin/chown -R snort:snort /var/log/snort");
+exec("/usr/sbin/chown -R snort:snort /usr/local/etc/snort");
+exec("/usr/sbin/chown -R snort:snort /usr/local/lib/snort");
+exec("/bin/chmod -R 755  /var/log/snort");
+exec("/bin/chmod -R 755  /usr/local/etc/snort");
+exec("/bin/chmod -R 755  /usr/local/lib/snort");
+
 
 /* if snort is running hardrestart, if snort is not running do nothing */
 if (file_exists("/tmp/snort_download_halt.pid")) {

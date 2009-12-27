@@ -167,7 +167,10 @@ function load_rule_file($incoming_file)
 $ruledir = "/usr/local/etc/snort/snort_{$id}{$if_real}/rules/";
 $dh  = opendir($ruledir);
 
-$message_reload = "The Snort rule configuration has been changed.<br>You must apply the changes in order for them to take effect.";
+if ($_GET['openruleset'] != '' && $_GET['ids'] != '')
+{
+	header("Location: /snort/snort_rules.php?id=$id&openruleset={$_GET['openruleset']}&saved=yes");
+}
 
 while (false !== ($filename = readdir($dh)))
 {
@@ -196,6 +199,9 @@ $splitcontents = load_rule_file($file);
 
 if ($_POST)
 {
+	
+	conf_mount_rw();
+	
 	if (!$_POST['apply']) {
 	    //retrieve POST data
 	    $post_lineid = $_POST['lineid'];
@@ -279,18 +285,12 @@ if ($_POST)
 	    
 	    $stopMsg = true;
 	}
-	
-	if ($_POST['apply']) {
-//		stop_service("snort");
-//		sleep(2);
-//		start_service("snort");
-		$savemsg = "The snort rules selections have been saved. Please restart snort by clicking save on the settings tab.";
-		$stopMsg = false;
-	}
-
 }
 else if ($_GET['act'] == "toggle")
 {
+
+	conf_mount_rw();
+
     $toggleid = $_GET['ids'];
 
     //copy rule contents from array into string
@@ -354,6 +354,8 @@ else if ($_GET['act'] == "toggle")
 			// add sid off registers to new off sid
 			$a_nat[$id]['rule_sid_off'] = "||disablesid $sid_off" . $a_nat[$id]['rule_sid_off'];
 			write_config();
+			conf_mount_rw();
+			
 		}
 		else
 		{
@@ -377,9 +379,22 @@ else if ($_GET['act'] == "toggle")
 			// add sid on registers to new on sid
 			$a_nat[$id]['rule_sid_on'] = "||enablesid $sid_on" . $a_nat[$id]['rule_sid_on'];
 			write_config();
+			conf_mount_rw();
 		}
 	
 }
+
+//if ($GET['saved'] == 'yes')
+//{
+		$message = "The Snort rule configuration has been changed.<br>You must apply the changes in order for them to take effect.";
+		echo "please work";
+//		stop_service("snort");
+//		sleep(2);
+//		start_service("snort");
+//		$savemsg = "";
+//		$stopMsg = false;
+
+//}
 
 $currentruleset = basename($file);
 
@@ -394,7 +409,7 @@ include("head.inc");
 <?php
 echo "<form action=\"snort_rules.php?id={$id}\" method=\"post\" name=\"iform\" id=\"iform\">";
 ?>
-<?php if ($savemsg){print_info_box($savemsg);} else if ($stopMsg){print_info_box_np($message_reload);}?>
+<?php // print_info_box($message);?>
 </form>
 <script type="text/javascript" language="javascript" src="row_toggle.js">
     <script src="/javascript/sorttable.js" type="text/javascript">
