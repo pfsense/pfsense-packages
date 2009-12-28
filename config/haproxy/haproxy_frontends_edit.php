@@ -55,6 +55,9 @@ if (isset($id) && $a_backend[$id]) {
 	$pconfig['balance'] = $a_backend[$id]['balance'];
 	$pconfig['monitor_uri'] = $a_backend[$id]['monitor_uri'];
 
+	$pconfig['forwardfor'] = $a_backend[$id]['forwardfor'];
+	$pconfig['httpclose'] = $a_backend[$id]['httpclose'];
+
 	$pconfig['stats_enabled'] = $a_backend[$id]['stats_enabled'];
 	$pconfig['stats_username'] = $a_backend[$id]['stats_username'];
 	$pconfig['stats_password'] = $a_backend[$id]['stats_password'];
@@ -65,11 +68,6 @@ if (isset($id) && $a_backend[$id]) {
 	$pconfig['extaddr'] = $a_backend[$id]['extaddr'];	
 	$pconfig['max_connections'] = $a_backend[$id]['max_connections'];	
 	$pconfig['client_timeout'] = $a_backend[$id]['client_timeout'];	
-	$pconfig['stats_enabled'] = $a_backend[$id]['stats_enabled'];	
-	$pconfig['stats_realm'] = $a_backend[$id]['stats_realm'];	
-	$pconfig['stats_uri'] = $a_backend[$id]['stats_uri'];	
-	$pconfig['stats_username'] = $a_backend[$id]['stats_username'];	
-	$pconfig['stats_password'] = $a_backend[$id]['stats_password'];	
 	$pconfig['port'] = $a_backend[$id]['port'];	
 	$pconfig['a_acl']=&$a_backend[$id]['ha_acls']['item'];	
 	$pconfig['advanced'] = $a_backend[$id]['advanced'];	
@@ -222,6 +220,8 @@ if ($_POST) {
 		update_if_changed("balance", $backend['balance'], $_POST['balance']);
 		update_if_changed("cookie_name", $backend['cookie_name'], $_POST['cookie_name']);
 		update_if_changed("monitor_uri", $backend['monitor_uri'], $_POST['monitor_uri']);
+		update_if_changed("forwardfor", $backend['forwardfor'], $_POST['forwardfor']);
+		update_if_changed("httpclose", $backend['httpclose'], $_POST['httpclose']);
 		update_if_changed("stats_enabled", $backend['stats_enabled'], $_POST['stats_enabled']);
 		update_if_changed("stats_username", $backend['stats_username'], $_POST['stats_username']);
 		update_if_changed("stats_password", $backend['stats_password'], $_POST['stats_password']);
@@ -598,6 +598,26 @@ set by the 'retries' parameter (2).</div>
 			</tr>
 */
 ?>
+			<tr align="left">
+				<td width="22%" valign="top" class="vncell">Use 'forwardfor' option</td>
+				<td width="78%" class="vtable" colspan="2">
+					<input id="forwardfor" name="forwardfor" type="checkbox" value="yes" <?php if ($pconfig['forwardfor']=='yes') echo "checked"; ?>>
+					<br/>
+					The 'forwardfor' option creates an HTTP 'X-Forwarded-For' header which
+					contains the client's IP address. This is useful to let the final web server
+					know what the client address was (eg for statistics on domains)
+				</td>
+			</tr>
+			<tr align="left">
+				<td width="22%" valign="top" class="vncell">Use 'httpclose' option</td>
+				<td width="78%" class="vtable" colspan="2">
+					<input id="httpclose" name="httpclose" type="checkbox" value="yes" <?php if ($pconfig['httpclose']=='yes') echo "checked"; ?>>
+					<br/>
+					The 'httpclose' option removes any 'Connection' header both ways, and
+					adds a 'Connection: close' header in each direction. This makes it easier to
+					disable HTTP keep-alive than the previous 4-rules block.
+				</td>
+			</tr>
 			<tr align="left">
 				<td width="22%" valign="top" class="vncell">Advanced pass thru</td>
 				<td width="78%" class="vtable" colspan="2">
