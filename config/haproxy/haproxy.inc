@@ -153,7 +153,7 @@ function haproxy_configure() {
 
 			// Advanced pass trhu
 			if($backend['advanced'])
-				fwrite ($fd, "\t" . str_replace("\n", " ", base64decode($backend['advanced'])) . "\n");
+				fwrite ($fd, "\t" . str_replace("\n", " ", base64_decode($backend['advanced'])) . "\n");
 
 			// https is an alias for tcp for clarity purpouses
 			if(strtolower($backend['type']) == "https") {
@@ -234,7 +234,7 @@ function haproxy_configure() {
 									$server_ports[] = $server['port'];
 								}
 								if($server['advanced'])
-									$advanced_txt = " " . str_replace("\n", " ", base64decode($server['advanced']));
+									$advanced_txt = " " . str_replace("\n", " ", base64_decode($server['advanced']));
 								else
 									$advanced_txt = "";
 								foreach($server_ports as $pport) 
