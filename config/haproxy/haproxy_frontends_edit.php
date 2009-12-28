@@ -84,11 +84,11 @@ if ($_POST) {
 	$pconfig = $_POST;
 	
 	if ($_POST['stats_enabled']) {
-		$reqdfields = explode(" ", "name connection_timeout server_timeout retries stats_username stats_password stats_uri stats_realm");
-		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout,Retries,Stats Username,Stats Password,Stats Uri,Stats Realm");		
+		$reqdfields = explode(" ", "name connection_timeout server_timeout stats_username stats_password stats_uri stats_realm");
+		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout,Stats Username,Stats Password,Stats Uri,Stats Realm");		
 	} else {
-		$reqdfields = explode(" ", "name connection_timeout server_timeout retries monitor_uri");
-		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout,Retries,Monitor Uri");		
+		$reqdfields = explode(" ", "name connection_timeout server_timeout monitor_uri");
+		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout,Monitor Uri");		
 	}
 	
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
@@ -107,7 +107,7 @@ if ($_POST) {
 	if (!is_numeric($_POST['server_timeout']))
 		$input_errors[] = "The field 'Server timeout' value is not a number.";
 
-	if (!is_numeric($_POST['retries']))
+	if (!$_POST['retries'] && is_numeric($_POST['retries']))
 		$input_errors[] = "The field 'Retries' value is not a number.";
 
 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['stats_username']))
@@ -402,7 +402,7 @@ include("head.inc");
 			</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Retries</td>
+			<td width="22%" valign="top" class="vncell">Retries</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="retries" type="text" <?if(isset($pconfig['retries'])) echo "value=\"{$pconfig['retries']}\"";?> size="64">
 				<div>After a connection failure to a server, it is possible to retry, potentially
