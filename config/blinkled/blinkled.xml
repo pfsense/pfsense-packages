@@ -29,7 +29,7 @@
 	<tabs>
 		<tab>
 			<text>Assign LEDs</text>
-			<url>/pkg_edit.php?xml=miniupnpd.xml</url>
+			<url>/pkg_edit.php?xml=blinkled.xml</url>
 			<active/>
 		</tab>
 	</tabs>
