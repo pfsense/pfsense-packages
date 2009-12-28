@@ -93,7 +93,7 @@ $pconfig['synchost1'] = $config['installedpackages']['haproxy']['synchost1'];
 $pconfig['synchost2'] = $config['installedpackages']['haproxy']['synchost2'];
 $pconfig['synchost3'] = $config['installedpackages']['haproxy']['synchost3'];
 $pconfig['remotesyslog'] = $config['installedpackages']['haproxy']['remotesyslog'];
-$pconfig['advanced'] = $config['installedpackages']['haproxy']['advanced'];
+$pconfig['advanced'] = base64decode($config['installedpackages']['haproxy']['advanced']);
 
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))

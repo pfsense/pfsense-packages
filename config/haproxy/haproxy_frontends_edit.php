@@ -70,7 +70,7 @@ if (isset($id) && $a_backend[$id]) {
 	$pconfig['client_timeout'] = $a_backend[$id]['client_timeout'];	
 	$pconfig['port'] = $a_backend[$id]['port'];	
 	$pconfig['a_acl']=&$a_backend[$id]['ha_acls']['item'];	
-	$pconfig['advanced'] = base64encode($a_backend[$id]['advanced']);
+	$pconfig['advanced'] = base64decode($a_backend[$id]['advanced']);
 
 }
 
@@ -232,7 +232,7 @@ if ($_POST) {
 		update_if_changed("extaddr", $backend['extaddr'], $_POST['extaddr']);
 		update_if_changed("max_connections", $backend['max_connections'], $_POST['max_connections']);
 		update_if_changed("client_timeout", $backend['client_timeout'], $_POST['client_timeout']);
-		update_if_changed("advanced", $backend['advanced'], $_POST['advanced']);
+		update_if_changed("advanced", $backend['advanced'], base64encode($_POST['advanced']));
 
 		$backend['ha_acls']['item'] = $a_acl;
 
