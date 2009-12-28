@@ -15,6 +15,7 @@
 		<configurationfile>anyterm.xml</configurationfile>
 	</package>
 	<package>
+		<pkginfolink>http://doc.pfsense.org/index.php/haproxy_package</pkginfolink>
 		<name>haproxy</name>
 		<descr>The Reliable, High Performance TCP/HTTP Load Balancer</descr>
 		<website>http://haproxy.1wt.eu/</website>
