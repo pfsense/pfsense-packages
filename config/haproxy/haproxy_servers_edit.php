@@ -123,7 +123,7 @@ if ($_POST) {
 		update_if_changed("weight", $server['weight'], $_POST['weight']);
 		update_if_changed("status", $server['status'], $_POST['status']);
 		update_if_changed("address", $server['address'], $_POST['address']);
-		update_if_changed("advanced", $server['advanced'], $_POST['advanced']);
+		update_if_changed("advanced", $server['advanced'], base64encode($_POST['advanced']));
 		
 		if (isset($id) && $a_server[$id]) {
 			$a_server[$id] = $server;

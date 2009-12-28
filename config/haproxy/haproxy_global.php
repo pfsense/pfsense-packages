@@ -77,7 +77,7 @@ if ($_POST) {
 			$config['installedpackages']['haproxy']['synchost2'] = $_POST['synchost3'] ? $_POST['synchost3'] : false;
 			$config['installedpackages']['haproxy']['remotesyslog'] = $_POST['remotesyslog'] ? $_POST['remotesyslog'] : false;
 			$config['installedpackages']['haproxy']['syncpassword'] = $_POST['syncpassword'] ? $_POST['syncpassword'] : false;
-			$config['installedpackages']['haproxy']['advanced'] = $_POST['advanced'] ? $_POST['advanced'] : false;
+			$config['installedpackages']['haproxy']['advanced'] = base64encode($_POST['advanced']) ? $_POST['advanced'] : false;
 			touch($d_haproxyconfdirty_path);
 			write_config();
 		}

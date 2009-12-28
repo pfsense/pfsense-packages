@@ -70,7 +70,7 @@ if (isset($id) && $a_backend[$id]) {
 	$pconfig['client_timeout'] = $a_backend[$id]['client_timeout'];	
 	$pconfig['port'] = $a_backend[$id]['port'];	
 	$pconfig['a_acl']=&$a_backend[$id]['ha_acls']['item'];	
-	$pconfig['advanced'] = $a_backend[$id]['advanced'];	
+	$pconfig['advanced'] = base64encode($a_backend[$id]['advanced']);
 
 }
 

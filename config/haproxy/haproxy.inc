@@ -109,7 +109,7 @@ function haproxy_configure() {
 	if(is_array($a_global)) {
 		fwrite ($fd, "global\n");
 		if($a_global['advanced'])
-			fwrite ($fd, "\t" . str_replace("\n", " ", $a_global['advanced']) . "\n");
+			fwrite ($fd, "\t" . str_replace("\n", " ", base64deode($a_global['advanced'])) . "\n");
 		fwrite ($fd, "\tmaxconn\t\t\t".$a_global['maxconn']."\n");
 		if($a_global['remotesyslog'])
 			fwrite ($fd, "\tlog\t\t\t{$a_global['remotesyslog']}\n");
@@ -153,7 +153,7 @@ function haproxy_configure() {
 
 			// Advanced pass trhu
 			if($backend['advanced'])
-				fwrite ($fd, "\t" . str_replace("\n", " ", $backend['advanced']) . "\n");
+				fwrite ($fd, "\t" . str_replace("\n", " ", base64decode($backend['advanced'])) . "\n");
 
 			// https is an alias for tcp for clarity purpouses
 			if(strtolower($backend['type']) == "https") {
@@ -234,7 +234,7 @@ function haproxy_configure() {
 									$server_ports[] = $server['port'];
 								}
 								if($server['advanced'])
-									$advanced_txt = " " . str_replace("\n", " ", $server['advanced']);
+									$advanced_txt = " " . str_replace("\n", " ", base64decode($server['advanced']));
 								else
 									$advanced_txt = "";
 								foreach($server_ports as $pport) 
