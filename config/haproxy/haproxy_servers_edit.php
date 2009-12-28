@@ -53,7 +53,7 @@ if (isset($id) && $a_server[$id]) {
 	$pconfig['weight'] = $a_server[$id]['weight'];
 	$pconfig['cookie'] = $a_server[$id]['cookie'];
 	$pconfig['status'] = $a_server[$id]['status'];
-	$pconfig['advanced'] = base64deode($a_server[$id]['advanced']);
+	$pconfig['advanced'] = base64_decode($a_server[$id]['advanced']);
 }
 
 $changedesc = "Services: HAProxy: Servers: ";
