@@ -154,7 +154,7 @@ function haproxy_configure() {
 			// Advanced pass thru
 			if($backend['advanced']) {
 				$advanced = base64_decode($backend['advanced']);
-				fwrite($fd, "\t" . $advanced) . "\n");
+				fwrite($fd, "\t" . $advanced . "\n");
 			}
 			
 			// https is an alias for tcp for clarity purpouses
