@@ -733,11 +733,11 @@
       <name>blinkled</name>
       <descr>Allows you to use LEDs for network activity on supported platforms (ALIX, WRAP, Soekris, etc)</descr>
       <category>System</category>
-      <version>0.1</version>
+      <version>0.2</version>
       <status>Beta</status>
       <maintainer>jimp@pfsense.org</maintainer>
       <required_version>1.2.3</required_version>
-      <config_file>http://www.pfsense.org/packages/config/blinkled/blinkled.xml</config_file>
+      <config_file>http://www.pfsense.org/packages/config/blinkled8/blinkled.xml</config_file>
       <configurationfile>blinkled.xml</configurationfile>
       <pkginfolink>http://doc.pfsense.org/index.php/BlinkLED_Package</pkginfolink>
       <website>http://doc.pfsense.org/index.php/BlinkLED_Package</website>
