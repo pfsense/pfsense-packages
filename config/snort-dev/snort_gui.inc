@@ -40,11 +40,6 @@ function print_info_box_np2($msg) {
         echo "        </td>\n";
         echo "        <td width='70%'><font color='white'><b>{$msg}</b></font>\n";
         echo "        </td>";
-        if(stristr($msg, "apply") == true) {
-                echo "         <td>";
-                echo "           <input name=\"apply\" type=\"submit\" class=\"formbtn\" id=\"apply\" value=\"Apply changes\">\n";
-                echo "         </td>";
-        }
         echo "        </tr></table>\n";
         echo "       </div>\n";
         echo "    </td>\n";

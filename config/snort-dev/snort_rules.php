@@ -29,6 +29,7 @@
 */
 require("guiconfig.inc");
 require("config.inc");
+require("/usr/local/pkg/snort/snort_gui.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -384,17 +385,16 @@ else if ($_GET['act'] == "toggle")
 	
 }
 
-//if ($GET['saved'] == 'yes')
-//{
-		$message = "The Snort rule configuration has been changed.<br>You must apply the changes in order for them to take effect.";
-		echo "please work";
+if ($_GET['saved'] == 'yes')
+{
+		$message = "The Snort rule configuration has been changed.<br>You must restart this snort interface in order for the changes to take effect.";
+
 //		stop_service("snort");
 //		sleep(2);
 //		start_service("snort");
 //		$savemsg = "";
 //		$stopMsg = false;
-
-//}
+}
 
 $currentruleset = basename($file);
 
@@ -409,7 +409,7 @@ include("head.inc");
 <?php
 echo "<form action=\"snort_rules.php?id={$id}\" method=\"post\" name=\"iform\" id=\"iform\">";
 ?>
-<?php // print_info_box($message);?>
+<?php if ($_GET['saved'] == 'yes') {print_info_box_np2($message);}?>
 </form>
 <script type="text/javascript" language="javascript" src="row_toggle.js">
     <script src="/javascript/sorttable.js" type="text/javascript">
@@ -582,7 +582,7 @@ function popup(url)
                                         echo $textss;
                                         ?>
                                         <a href="?id=<?=$id;?>&openruleset=<?=$file;?>&act=toggle&ids=<?=$counter;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/<?=$iconb;?>" width="11" height="11" border="0" title="click to toggle enabled/disabled status"></a>
-										<input name="enable" type="checkbox" value="yes" <?= $ischecked; ?> onClick="enable_change(false)">
+										<input name="enable" type="checkbox" value="yes" <?= $ischecked; ?> onClick="enable_change(false) ">
                                         <?php
                                         echo $textse;
                                         echo "</td>";
