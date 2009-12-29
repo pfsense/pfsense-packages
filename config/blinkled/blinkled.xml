@@ -26,13 +26,6 @@
 		<rcfile>blinkled.sh</rcfile>
 		<executable>blinkled</executable>
 	</service>
-	<tabs>
-		<tab>
-			<text>Assign LEDs</text>
-			<url>/pkg_edit.php?xml=blinkled.xml</url>
-			<active/>
-		</tab>
-	</tabs>
 	<fields>
 		<field>
 			<fielddescr>Enable blinkled</fielddescr>
