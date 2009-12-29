@@ -13,7 +13,6 @@
 		<tab>
 			<text>Fit123</text>
 			<url>/pkg_edit.php?xml=fit123.xml&amp;id=0</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>DDNS</text>
@@ -22,6 +21,7 @@
 		<tab>
 			<text>CASS</text>
 			<url>/pkg_edit.php?xml=cass.xml&amp;id=0</url>
+			<active/>
 		</tab>
 	</tabs>
 	<fields>

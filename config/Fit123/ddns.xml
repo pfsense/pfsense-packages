@@ -13,11 +13,11 @@
 		<tab>
 			<text>Fit123</text>
 			<url>/pkg_edit.php?xml=fit123.xml&amp;id=0</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>DDNS</text>
 			<url>/pkg_edit.php?xml=ddns.xml&amp;id=0</url>
+			<active/>
 		</tab>
 		<tab>
 			<text>CASS</text>
