@@ -323,7 +323,7 @@ $blocked_ips_array = str_replace('   ', '', array_filter(explode("\n", file_get_
 
 $logent = $bnentries;
 
-if ($blocked_ips_array[0] != '')
+if ($blocked_ips_array[0] != '' && $alerts_array[0] != '')
 {
 
 	/* build the list and compare blocks to alerts */
@@ -335,10 +335,21 @@ if ($blocked_ips_array[0] != '')
 
 	$alert_ip_src =  get_snort_alert_ip_src($fileline);
 	$alert_ip_disc = get_snort_alert_disc($fileline);
+	$alert_ip_src_array[] = get_snort_alert_ip_src($fileline);
 
-	if (in_array("$alert_ip_src", $blocked_ips_array))
-        $input[] = "[$alert_ip_src] " . "[$alert_ip_disc]\n";
+		if (in_array("$alert_ip_src", $blocked_ips_array))
+		{
+			$input[] = "[$alert_ip_src] " . "[$alert_ip_disc]\n";
+		}
+	}
 
+	foreach($blocked_ips_array as $alert_block_ip)
+	{
+
+		if (!in_array($alert_block_ip, $alert_ip_src_array))
+		{
+			$input[] = "[$alert_block_ip] " . "[N\A]\n";
+		}
 	}
 
 	/* reduce double occurrences */
@@ -374,7 +385,6 @@ if ($blocked_ips_array[0] != '')
 			$alert_block_disc = 'empty';
 		}
 
-
 		/* use one echo to do the magic*/
 		echo "<tr>
 			<td align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($alert_block_ip)) . "'>
@@ -385,13 +395,37 @@ if ($blocked_ips_array[0] != '')
 			</tr>\n";
 		
 	}
+
+}else{
+
+	/* if alerts file is empty and blocked table is not empty */
+	$counter2 = 0;
+
+	foreach($blocked_ips_array as $alert_block_ip)
+	{
+		if($logent <= $counter2)
+		continue;
+
+		$counter2++;
+		
+		$alert_block_disc = 'N/A';
+		
+		/* use one echo to do the magic*/
+		echo "<tr>
+			<td align=\"center\" valign=\"top\"'><a href='snort_blocked.php?todelete=" . trim(urlencode($alert_block_ip)) . "'>
+			<img title=\"Delete\" border=\"0\" name='todelete' id='todelete' alt=\"Delete\" src=\"../themes/{$g['theme']}/images/icons/icon_x.gif\"></a></td>
+			<td>&nbsp;{$counter2}</td>
+			<td>&nbsp;{$alert_block_ip}</td>
+			<td>&nbsp;{$alert_block_disc}</td>
+			</tr>\n";		
+	}
 }
 
 if ($blocked_ips_array[0] == '')
 {
 		echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\"><br><strong>There are currently no items being blocked by snort.</strong></td></tr>";
 }else{
-		echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\">{$counter} items listed.</td></tr>";
+		echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\">{$counter2} items listed.</td></tr>";
 }
 
 ?>

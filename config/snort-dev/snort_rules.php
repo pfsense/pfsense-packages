@@ -577,56 +577,55 @@ function popup(url)
 										if (strstr($tempstring, 'msg:"'))
 										$message = get_middle($tempstring, 'msg:"', '";', 0);										
 										
-                                        echo "<tr>";
-                                        echo "<td class=\"listt\">";
-                                        echo $textss;
+                                        echo "<tr>
+                                        <td class=\"listt\">
+                                        $textss\n";
                                         ?>
-                                        <a href="?id=<?=$id;?>&openruleset=<?=$file;?>&act=toggle&ids=<?=$counter;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/<?=$iconb;?>" width="11" height="11" border="0" title="click to toggle enabled/disabled status"></a>
-										<input name="enable" type="checkbox" value="yes" <?= $ischecked; ?> onClick="enable_change(false) ">
+                                        <a href="?id=<?=$id;?>&openruleset=<?=$file;?>&act=toggle&ids=<?=$counter;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/<?=$iconb;?>" width="10" height="10" border="0" title="click to toggle enabled/disabled status"></a>
+										<input name="enable" type="checkbox" value="yes" <?= $ischecked; ?> onClick="enable_change(false)">
                                         <?php
-                                        echo $textse;
-                                        echo "</td>";
-
-
-                                        echo "<td class=\"listlr\">";
-                                        echo $textss;
-                                        echo $sid;
-                                        echo $textse;
-                                        echo "</td>";
-
-                                        echo "<td class=\"listlr\">";
-                                        echo $textss;
-                                        echo $protocol;
+                                        echo "$textse
+                                        </td>
+                                        <td class=\"listlr\">
+                                        $textss
+                                        $sid
+                                        $textse
+                                        </td>
+                                        <td class=\"listlr\">
+                                        $textss
+                                        $protocol";
+										?>
+										<?php
                                         $printcounter++;
-                                        echo $textse;
-                                        echo "</td>";
-                                        echo "<td class=\"listlr\">";
-                                        echo $textss;
-                                        echo $source;
-                                        echo $textse;
-                                        echo "</td>";
-                                        echo "<td class=\"listlr\">";
-                                        echo $textss;
-                                        echo $source_port;
-                                        echo $textse;
-                                        echo "</td>";
-                                        echo "<td class=\"listlr\">";
-                                        echo $textss;
-                                        echo $destination;
-                                        echo $textse;
-                                        echo "</td>";
-                                        echo "<td class=\"listlr\">";
-                                        echo $textss;
-                                        echo $destination_port;
-                                        echo $textse;
-                                        echo "</td>";
+                                        echo "$textse
+                                        </td>
+                                        <td class=\"listlr\">
+                                        $textss
+                                        $source
+                                        $textse
+                                        </td>
+                                        <td class=\"listlr\">
+                                        $textss
+                                        $source_port
+                                        $textse
+                                        </td>
+                                        <td class=\"listlr\">
+                                        $textss
+                                        $destination
+                                        $textse
+                                        </td>
+                                        <td class=\"listlr\">
+                                        $textss
+                                        $destination_port
+                                        $textse
+                                        </td>";
                                         ?>
                                         <td class="listbg"><font color="white">
                                         <?php
-                                        echo $textss;
-                                        echo $message;
-                                        echo $textse;
-                                        echo "</td>";
+                                        echo "$textss
+                                        $message
+                                        $textse
+                                        </td>";
                                         ?>
                                           <td valign="middle" nowrap class="list">
                                             <table border="0" cellspacing="0" cellpadding="1">
@@ -639,10 +638,7 @@ function popup(url)
                                         <?php
                                     }
                             }
-                            echo "   ";
-                            echo "There are ";
-                            echo $printcounter;
-                            echo " rules in this category. <br><br>";
+                            echo "   There are $printcounter rules in this category. <br><br>";
                             ?>
                          </table>
                     </td>

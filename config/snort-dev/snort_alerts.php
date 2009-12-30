@@ -431,17 +431,23 @@ if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 	{
 		$alerts_array = array_reverse(array_filter(explode("\n\n", file_get_contents('/var/log/snort/alert'))));
 	}else{
-		$alerts_array = array_reverse(split("\n", file_get_contents('/var/log/snort/alert')));
+		$alerts_array = array_reverse(array_filter(split("\n", file_get_contents('/var/log/snort/alert'))));
 	}
+
+
 	
+if (is_array($alerts_array))
+{
+
 	$counter = 0;
 	foreach($alerts_array as $fileline)
 	{
+	
 	if($logent <= $counter)
     continue;
-	
+
 		$counter++;
-		
+	
 		/* Date */
 		$alert_date_str = get_snort_alert_date($fileline);
 		
@@ -573,7 +579,9 @@ if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 			}
 		
 		/* NOTE: using one echo improves performance by 2x */
-		echo "<tr id=\"{$counter}\">
+		if ($alert_disc != 'empty')
+		{
+			echo "<tr id=\"{$counter}\">
 				<td class=\"centerAlign\">{$counter}</td>
 				<td class=\"centerAlign\">{$alert_priority}</td>
 				<td class=\"centerAlign\">{$alert_proto}</td>
@@ -586,7 +594,8 @@ if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 				<td class=\"centerAlign\">{$alert_dst_p}</td>
 				<td class=\"centerAlign\">{$alert_sid}</td>
 				<td>{$alert_date}</td>
-				</tr>\n";		
+				</tr>\n";
+		}
 		
 //		<script type="text/javascript">
 //			var myTable = {};
@@ -596,6 +605,7 @@ if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 //		</script>
 		
 	}
+}
 
 ?>
 			</tbody>	

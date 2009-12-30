@@ -1463,7 +1463,7 @@ preprocessor http_inspect_server: server default \
                         chunk_length 500000 \
                         bare_byte yes \
                         double_decode yes \
-                        iis_unicode yes \
+                        iis_unicode no \
                         iis_delimiter no \
                         multi_slash no
 	
