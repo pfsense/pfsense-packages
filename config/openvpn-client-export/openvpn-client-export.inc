@@ -264,7 +264,7 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	$ovpndir = "/usr/local/share/openvpn/";
 	$uniq = uniqid();
 	$tempdir = $g['tmp_path'] . "/openvpn-export-" . $uniq;
-	$zipfile = $g['tmp_path'] . "{$uniq}-Viscosity.visc.zip";
+	$zipfile = $g['tmp_path'] . "/{$uniq}-Viscosity.visc.zip";
 
 	// lookup server settings
 	$settings = $config['openvpn']['openvpn-server'][$srvid];
