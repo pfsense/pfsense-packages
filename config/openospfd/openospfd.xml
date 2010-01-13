@@ -2,9 +2,10 @@
 	<name>OSPFd</name>
 	<version>0.1</version>
 	<title>Services: OSPFd</title>
+	<include_file>/usr/local/pkg/openospfd.inc</include_file>
 	<aftersaveredirect>pkg_edit.php?xml=openospfd.xml&amp;id=0</aftersaveredirect>
 	<menu>
-		<name>OSFPd</name>
+		<name>OSPFd</name>
 		<tooltiptext>Modify ospfd settings.</tooltiptext>
 		<section>Services</section>
 		<configfile>openospfd.xml</configfile>
@@ -18,15 +19,16 @@
 	<fields>
 		<field>
 			<fielddescr>Router ID</fielddescr>
-			<fieldname>RouterID</fieldname>
+			<fieldname>routerid</fieldname>
 			<description>Specify the Router ID.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Area</fielddescr>
-			<fieldname>Area</fieldname>
+			<fieldname>area</fieldname>
 			<description>OSPF area for this instance of OSPFd.</description>
 			<type>input</type>
+			<required/>
 		</field>
                 <field>
                         <fielddescr>Update FIB (Routing table)</fielddescr>
@@ -42,7 +44,7 @@
                 </field>
 		<field>
 			<fielddescr>Metric</fielddescr>
-			<fieldname>Metric</fieldname>
+			<fieldname>metric</fieldname>
 			<description>Metric for this OSPF interface (leave blank for default).</description>
 			<type>input</type>
                 </field>
@@ -54,83 +56,57 @@
                 </field>
 		<field>
 			<fielddescr>Password</fielddescr>
-			<fieldname>Password</fieldname>
+			<fieldname>password</fieldname>
 			<description>Password for this OSPF interface.</description>
 			<type>input</type>
                 </field>
                 <field>
                         <fielddescr>Redistribute connected subnets</fielddescr>
-                        <fieldname>Redistributeconnectedsubnets</fieldname>
+                        <fieldname>redistributeconnectedsubnets</fieldname>
                         <description>Enables the redistribution of connected networks (Default no)</description>
                         <type>checkbox</type>
                 </field>
                 <field>
                         <fielddescr>Redistribute default route</fielddescr>
-                        <fieldname>Redistributedefaultroute</fieldname>
+                        <fieldname>redistributedefaultroute</fieldname>
                         <description>Enables the redistribution of a default route to this device (Default no)</description>
                         <type>checkbox</type>
                 </field>
 		<field>
 			<fielddescr>Router Priority</fielddescr>
-			<fieldname>Routerpriorityelections</fieldname>
+			<fieldname>routerpriorityelections</fieldname>
 			<description>Router priority when participating in elections for DR (Default 1) Valid range is 0-255.  0 will cause the router to not participate in election.</description>
 			<type>input</type>
                 </field>
 		<field>
 			<fielddescr>Hello Interval</fielddescr>
-			<fieldname>HelloIntervalinseconds</fieldname>
+			<fieldname>hellointervalinseconds</fieldname>
 			<description>Hello Interval this OSPF interface in seconds (Default 10).</description>
 			<type>input</type>
                 </field>
 		<field>
 			<fielddescr>Retransmit Interval</fielddescr>
-			<fieldname>RetransmitInterval</fieldname>
+			<fieldname>retransmitinterval</fieldname>
 			<description>Retransmit Interval this OSPF interface in seconds (Default 5).</description>
 			<type>input</type>
                 </field>
 		<field>
 			<fielddescr>Dead Timer</fielddescr>
-			<fieldname>DeadTimer</fieldname>
+			<fieldname>deadtimer</fieldname>
 			<description>Dead Timer for this OSPF interface in seconds (Default 40).</description>
 			<type>input</type>
                 </field>
                 <field>
                         <fielddescr>Redistribute static</fielddescr>
-                        <fieldname>Resdistributestatic</fieldname>
+                        <fieldname>resdistributestatic</fieldname>
                         <description>Enables the redistribution of static routes</description>
                         <type>checkbox</type>
                 </field>
 	</fields>
-	<custom_php_global_functions>
-		function sync_package_ospfd() {
-			conf_mount_rw();
-            		config_lock();
-            		global $config;
-            		foreach($config['installedpackages']['ospfd']['config'] as $cf) {
-				if($cf['host'] != "") {
-					$start .= "/usr/local/sbin/ospfd ";
-					$start .= " -n {$cf['host']}";
-					if($cf['port'] != "") 
-						$start .= ":{$cf['port']}";
-					if($cf['direction'] != "") 
-						$start .= " -S {$cf['direction']}";
-					if($cf['version'] != "") 
-						$start .= " -v {$cf['version']}";
-					write_rcfile(array(
-							"file" => "ospfd.sh",
-							"start" => $start,
-							"stop" => "/usr/bin/killall ospfd"
-						)
-					);
-					restart_service("ospfd");
-					break;
-				}
-			}
-			conf_mount_ro();
-			config_unlock();
-		}
-	</custom_php_global_functions>
-	<custom_add_php_command>
-		sync_package_ospfd();
-	</custom_add_php_command>
+	<custom_php_resync_config_command>
+                ospfd_install_conf();
+        </custom_php_resync_config_command>
+	<custom_php_validation_command>
+		ospfd_validate_input();
+	</custom_php_validation_command>
 </packagegui>

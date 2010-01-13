@@ -44,8 +44,6 @@ function ospfd_install_conf() {
 			log_error("OSPFd: No config data found.");
 			return;
 		}
-		if($config['installedpackages']['ospfd']['config'][0]['row'])
-			$ospfd_rows = &$config['installedpackages']['ospfd']['config'][0]['row'];	
     
 		$conffile = "# This file was created by the pfSense package manager.  Do not edit!\n\n";
     
@@ -56,20 +54,57 @@ function ospfd_install_conf() {
 		if ($ospfd_conf['updatefib'])
 			$conffile .= "fib-update no\n";
 
-		if ($ospfd_conf['Redistributeconnectedsubnets'])
+		if ($ospfd_conf['redistributeconnectedsubnets'])
 			$conffile .= "redistribute connected\n";
 
-		if ($ospfd_conf['Redistributedefaultroute'])
+		if ($ospfd_conf['redistributedefaultroute'])
 			$conffile .= "redistribute default\n";
 
-		if ($ospfd_conf['Resdistributestatic'])
+		if ($ospfd_conf['resdistributestatic'])
 			$conffile .= "redistribute static\n";
 		
-		$conffile .= "area {$ospfd_conf['Area']} {\n";
+		$conffile .= "area {$ospfd_conf['area']} {\n";
 
-
+		$conffile .= "\tinterface " . $config['interfaces'][$ospfd_conf['interface']]['if'];
+		$options_present = false;
+		if (!empty($ospfd_conf['metric'])) {
+			$options_present = true;
+			$ifconfigs .= "\t\tmetric {$ospfd_conf['metric']}\n";
+		}
+		if (!empty($ospfd_conf['hellointervalinseconds'])) {
+			$options_present = true;
+			$ifconfigs .= "\t\thello-interval {$ospfd_conf['hellointervalinseconds']}\n";
+		}
+		if ($ospfd_conf['md5password'] && !empty($ospfd_conf['password'])) {
+                        $options_present = true;
+			$ifconfigs .= "\t\tauth-type crypt\n";
+			$ifconfigs .= "\t\tauth-md 1 \"" . substr($ospfd_conf['password'], 0, 15) . "\"\n";
+			$ifconfigs .= "\t\tauth-md-keyid 1\n";
+                } else if (!empty($ospfd_conf['passward'])) {
+			$options_present = true;
+			$ifconfigs .= "\t\tauth-type simple\n";
+			$ifconfigs .= "\t\tauth-key \"" . substr($ospfd_conf['password'], 0, 7) . "\"\n";
+		}
+		if (!empty($ospfd_conf['routerpriorityelections'])) {
+                        $options_present = true;
+                        $ifconfigs .= "\t\trouter-priority {$ospfd_conf['routerpriorityelections']}\n";
+                }
+		if (!empty($ospfd_conf['retransmitinterval'])) {
+			$options_present = true;
+			$ifconfigs .= "\t\tretransmit-interval {$ospfd_conf['retransmitinterval']}\n";
+		}
+		if (!empty($ospfd_conf['deadtimer'])) {
+                        $options_present = true;
+                        $ifconfigs .= "\t\trouter-dead-time {$ospfd_conf['deadtimer']}\n";
+                }
+		if (!empty($ifconfigs)) {
+			$conffile .= " {\n {$ifconfigs} \n";
+			if ($options_present == true)
+				$conffile .= "\t}\n";
+		} else
+			$conffile .= "\n";
 		$conffile .= "}\n";
-	}	
+	}
 
 	$fd = fopen("/usr/local/etc/ospfd.conf", "w");
 	
@@ -97,6 +132,17 @@ function ospfd_install_conf() {
 	}
 	
 	conf_mount_ro();
+}
+
+function ospfd_validate_input() {
+	global $config, $g, $input_errors;
+
+	if (!empty($_POST['routerid']) && !is_ipaddr($_POST['routerid']))
+		$input_errors[] = "Router ID must be an address.";
+	if (!is_ipaddr($_POST['area']))
+		$input_errors[] = "Area needs to be a valid ip_address.";
+	if ($_POST['md5password'] && empty($_POST['password']))
+		$input_errors[] = "Please input a password.";
 }
 
 // get the raw ospfd confi file for manual inspection/editing
