@@ -4,6 +4,11 @@
 	<title>Services: OSPFd</title>
 	<include_file>/usr/local/pkg/openospfd.inc</include_file>
 	<aftersaveredirect>pkg_edit.php?xml=openospfd.xml&amp;id=0</aftersaveredirect>
+	<additional_files_needed>
+                <prefix>/usr/local/pkg/</prefix>
+                <chmod>077</chmod>
+                <item>http://www.pfsense.com/packages/config/openospfd/openospfd.inc</item>
+        </additional_files_needed>
 	<menu>
 		<name>OSPFd</name>
 		<tooltiptext>Modify ospfd settings.</tooltiptext>
