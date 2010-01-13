@@ -378,10 +378,10 @@
       <maintainer>billm@pfsense.org</maintainer>
       <descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
       <category>Security</category>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <depends_on_package>nmap-4.76.tbz</depends_on_package>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/80/All/</depends_on_package_base_url>
+      <depends_on_package>nmap-5.00.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/nmap/nmap.xml</config_file>
-      <version>4.76</version>
+      <version>5.00</version>
       <status>Stable</status>
       <pkginfolink>http://doc.pfsense.org/index.php/Nmap_package</pkginfolink>
       <required_version>1.2.1</required_version>
