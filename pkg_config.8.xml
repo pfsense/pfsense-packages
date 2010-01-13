@@ -109,10 +109,10 @@
       <website>http://www.ntop.org/</website>
       <descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
       <category>Network Management</category>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <depends_on_package>ntop-3.3.8.tbz</depends_on_package>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/80/All/</depends_on_package_base_url>
+      <depends_on_package>ntop-3.3.10.tbz</depends_on_package>
       <depends_on_package>gdbm-1.8.3_3.tbz</depends_on_package>
-      <depends_on_package>perl-5.8.8_1.tbz</depends_on_package>
+      <depends_on_package>perl-5.8.9_3.tbz</depends_on_package>
       <version>3.3.8</version>
       <status>BETA</status>
       <required_version>1.2.1</required_version>
@@ -229,10 +229,10 @@
       <descr>Tarpits like spamd are fake SMTP servers, which accept connections but don't deliver mail. Instead, they keep the connections open and reply very slowly. If the peer is patient enough to actually complete the SMTP dialogue (which will take ten minutes or more), the tarpit returns a 'temporary error' code (4xx), which indicates that the mail could not be delivered successfully and that the sender should keep the mail in their queue and retry again later.</descr>
       <category>Services</category>
       <config_file>http://www.pfsense.com/packages/config/spamd.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <depends_on_package>spamd-4.1.2.tbz</depends_on_package>
-      <version>4.3.7</version>
-      <status>Stable</status>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/80/All/</depends_on_package_base_url>
+      <depends_on_package>spamd-4.5.0_3.tbz</depends_on_package>
+      <version>4.5.0_3</version>
+      <status>Beta</status>
       <required_version>1.2.1</required_version>
       <configurationfile>spamd.xml</configurationfile>
       <logging>
@@ -246,7 +246,7 @@
       <descr>Proxy for handling NAT of multiple SIP devices to a single public IP.</descr>
       <category>Services</category>
       <config_file>http://www.pfsense.com/packages/config/siproxd.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/80/All/</depends_on_package_base_url>
       <depends_on_package>siproxd-0.7.0_1.tbz</depends_on_package>
       <pkginfolink>http://doc.pfsense.org/index.php/Siproxd_package</pkginfolink>
       <version>0.7.2</version>
@@ -416,8 +416,8 @@
       <maintainer>rswagoner@gmail.com</maintainer>
       <config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
       <configurationfile>nut.xml</configurationfile>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <depends_on_package>nut-2.2.2.tbz</depends_on_package>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/80/All/</depends_on_package_base_url>
+      <depends_on_package>nut-2.4.1_3.tbz</depends_on_package>
     </package>
     <package>
       <name>diag_new_states</name>
@@ -436,9 +436,8 @@
       <website>http://dmr.ath.cx/net/darkstat/</website>
       <descr>darkstat is a network statistics gatherer. It's a packet sniffer that runs as a background process on a cable/DSL router, gathers all sorts of statistics about network usage, and serves them over HTTP.</descr>
       <category>Network Management</category>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/config/darkstat/bin/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/80/All/</depends_on_package_base_url>
       <depends_on_package>darkstat-3.0.712.tbz</depends_on_package>
-      <depends_on_package>gettext-0.17_1.tbz</depends_on_package>
       <version>3.0.712</version>
       <status>Stable</status>
       <required_version>1.2.1</required_version>
@@ -497,9 +496,8 @@
       <version>2.0.1.2</version>
       <status>BETA</status>
       <required_version>1.2.1</required_version>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <depends_on_package>bandwidthd-2.0.1_1.tbz</depends_on_package>
-      <depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/80/All/</depends_on_package_base_url>
+      <depends_on_package>bandwidthd-2.0.1_2.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
       <configurationfile>bandwidthd.xml</configurationfile>
     </package>
@@ -610,9 +608,9 @@
       <descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
       <website>http://www-nrg.ee.lbl.gov/</website>
       <category>Security</category>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/80/All/</depends_on_package_base_url>
       <depends_on_package>arpwatch-2.1.a15_4.tbz</depends_on_package>
-      <version>2.1.a13</version>
+      <version>2.1.a14_4</version>
       <status>ALPHA</status>
       <required_version>2.0</required_version>
       <config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
