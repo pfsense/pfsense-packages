@@ -1,25 +1,24 @@
 <packagegui>
-	<name>ospfd</name>
+	<name>OSPFd</name>
 	<version>0.1</version>
-	<title>ospfd: Settings</title>
-	<aftersaveredirect>pkg_edit.php?xml=ospfd.xml&amp;id=0</aftersaveredirect>
+	<title>Services: OSPFd</title>
+	<aftersaveredirect>pkg_edit.php?xml=openospfd.xml&amp;id=0</aftersaveredirect>
 	<menu>
-		<name>ospfd</name>
+		<name>OSFPd</name>
 		<tooltiptext>Modify ospfd settings.</tooltiptext>
 		<section>Services</section>
-		<configfile>ospfd.xml</configfile>
-		<url>/pkg_edit.php?xml=ospfd.xml&amp;id=0</url>
+		<configfile>openospfd.xml</configfile>
+		<url>/pkg_edit.php?xml=openospfd.xml&amp;id=0</url>
 	</menu>
 	<service>
 		<name>ospfd</name>
 		<rcfile>ospfd.sh</rcfile>
 		<executable>ospfd</executable>
 	</service>
-	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<fields>
 		<field>
 			<fielddescr>Router ID</fielddescr>
-			<fieldname>Router ID</fieldname>
+			<fieldname>RouterID</fieldname>
 			<description>Specify the Router ID.</description>
 			<type>input</type>
 		</field>
@@ -31,7 +30,7 @@
 		</field>
                 <field>
                         <fielddescr>Update FIB (Routing table)</fielddescr>
-                        <fieldname>enable</fieldname>
+                        <fieldname>updatefib</fieldname>
                         <description>Enables the updating of the host routing table</description>
                         <type>checkbox</type>
                 </field>
@@ -49,7 +48,7 @@
                 </field>
                 <field>
                         <fielddescr>Enable MD5 password for this OSPFd interface (default no)</fielddescr>
-                        <fieldname>enable</fieldname>
+                        <fieldname>md5password</fieldname>
                         <description>Enables the use of an MD5 password to on this instance</description>
                         <type>checkbox</type>
                 </field>
@@ -61,43 +60,43 @@
                 </field>
                 <field>
                         <fielddescr>Redistribute connected subnets</fielddescr>
-                        <fieldname>enable</fieldname>
+                        <fieldname>Redistributeconnectedsubnets</fieldname>
                         <description>Enables the redistribution of connected networks (Default no)</description>
                         <type>checkbox</type>
                 </field>
                 <field>
                         <fielddescr>Redistribute default route</fielddescr>
-                        <fieldname>enable</fieldname>
+                        <fieldname>Redistributedefaultroute</fieldname>
                         <description>Enables the redistribution of a default route to this device (Default no)</description>
                         <type>checkbox</type>
                 </field>
 		<field>
 			<fielddescr>Router Priority</fielddescr>
-			<fieldname>Router priority for DR elections</fieldname>
+			<fieldname>Routerpriorityelections</fieldname>
 			<description>Router priority when participating in elections for DR (Default 1) Valid range is 0-255.  0 will cause the router to not participate in election.</description>
 			<type>input</type>
                 </field>
 		<field>
 			<fielddescr>Hello Interval</fielddescr>
-			<fieldname>Hello Interval in seconds</fieldname>
+			<fieldname>HelloIntervalinseconds</fieldname>
 			<description>Hello Interval this OSPF interface in seconds (Default 10).</description>
 			<type>input</type>
                 </field>
 		<field>
 			<fielddescr>Retransmit Interval</fielddescr>
-			<fieldname>Retransmit Interval</fieldname>
+			<fieldname>RetransmitInterval</fieldname>
 			<description>Retransmit Interval this OSPF interface in seconds (Default 5).</description>
 			<type>input</type>
                 </field>
 		<field>
 			<fielddescr>Dead Timer</fielddescr>
-			<fieldname>Dead Timer</fieldname>
+			<fieldname>DeadTimer</fieldname>
 			<description>Dead Timer for this OSPF interface in seconds (Default 40).</description>
 			<type>input</type>
                 </field>
                 <field>
                         <fielddescr>Redistribute static</fielddescr>
-                        <fieldname>enable</fieldname>
+                        <fieldname>Resdistributestatic</fieldname>
                         <description>Enables the redistribution of static routes</description>
                         <type>checkbox</type>
                 </field>
