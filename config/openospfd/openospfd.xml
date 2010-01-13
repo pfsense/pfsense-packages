@@ -46,6 +46,7 @@
                         <fieldname>interface</fieldname>
                         <description>Enter the desired participating interface here.</description>
                         <type>interfaces_selection</type>
+			<required/>
                 </field>
 		<field>
 			<fielddescr>Metric</fielddescr>
