@@ -205,6 +205,20 @@
       <configurationfile>cron.xml</configurationfile>
     </package>
     <package>
+      <name>vHosts</name>
+      <website/>
+      <descr>It is a web server package that can host HTML, Javascript, CSS, and PHP. It uses the lighttpd web server that is already installed. It uses PHP5 in FastCGI mode and has access to PHP Data Ojbects and PDO SQLite.</descr>
+      <category>Services</category>
+      <pkginfolink>http://doc.pfsense.org/index.php/vhosts</pkginfolink>
+      <config_file>http://www.pfsense.com/packages/config/vhosts/vhosts.xml</config_file>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <version>0.7</version>
+      <status>Beta</status>
+      <required_version>1.2.3</required_version>
+      <maintainer>markjcrane@gmail.com</maintainer>
+      <configurationfile>vhosts.xml</configurationfile>
+    </package>
+    <package>
       <name>snort</name>
 	  <pkginfolink>http://forum.pfsense.org/index.php/topic,16847.0.html</pkginfolink>
       <website>http://www.snort.org</website>
