@@ -389,7 +389,7 @@ function vhosts_sync_package_php()
 			$tmp .= "#server.error-handler-404   = \"/error-handler.php\"\n";
 			$tmp .= "\n";
 			$tmp .= "## to help the rc.scripts\n";
-			$tmp .= "server.pid-file            = \"/var/run/lighty-vhosts-http.pid\"\n";
+			$tmp .= "server.pid-file            = \"/var/run/vhosts-http.pid\"\n";
 			$tmp .= "\n";
 			$tmp .= "## virtual directory listings\n";
 			$tmp .= "server.dir-listing         = \"disable\"\n";
@@ -429,7 +429,7 @@ function vhosts_sync_package_php()
 			$tmp .= "#### CGI module\n";
 			$tmp .= "cgi.assign                 = ( \".cgi\" => \"\" )\n";
 
-			$fout = fopen("/var/etc/lighty-vhosts-http.conf","w");
+			$fout = fopen("/var/etc/vhosts-http.conf","w");
 			fwrite($fout, $tmp);
 			unset($tmp);
 			fclose($fout);
@@ -628,7 +628,7 @@ function vhosts_sync_package_php()
 					$tmp .= "#server.error-handler-404   = \"/error-handler.php\"\n";
 					$tmp .= "\n";
 					$tmp .= "## to help the rc.scripts\n";
-					$tmp .= "server.pid-file            = \"/var/run/lighty-vhosts-".$ipaddress."-".$port."-ssl.pid\"\n";
+					$tmp .= "server.pid-file            = \"/var/run/vhosts-".$ipaddress."-".$port."-ssl.pid\"\n";
 					$tmp .= "\n";
 					$tmp .= "## virtual directory listings\n";
 					$tmp .= "server.dir-listing         = \"disable\"\n";
@@ -668,7 +668,7 @@ function vhosts_sync_package_php()
 					$tmp .= "#### CGI module\n";
 					$tmp .= "cgi.assign                 = ( \".cgi\" => \"\" )\n";
 
-					$fout = fopen("/var/etc/lighty-vhosts-".$ipaddress."-".$port."-ssl.conf","w");
+					$fout = fopen("/var/etc/vhosts-".$ipaddress."-".$port."-ssl.conf","w");
 					fwrite($fout, $tmp);
 					unset($tmp);
 					fclose($fout);
@@ -676,8 +676,8 @@ function vhosts_sync_package_php()
 					if (!function_exists('write_rcfile')) { require("/etc/inc/service-utils.inc"); }
 					write_rcfile(array(
 						"file" => "vhosts-".$ipaddress."-".$port."-ssl.sh",
-						"start" => "/usr/local/sbin/lighttpd -f /var/etc/lighty-vhosts-".$ipaddress."-".$port."-ssl.conf",
-						"stop" => "kill `cat /var/run/lighty-vhosts-".$ipaddress."-".$port."-ssl.pid`"
+						"start" => "/usr/local/sbin/lighttpd -f /var/etc/vhosts-".$ipaddress."-".$port."-ssl.conf",
+						"stop" => "kill `cat /var/run/vhosts-".$ipaddress."-".$port."-ssl.pid`"
 						)
 					);
 
@@ -776,19 +776,17 @@ function php_install_command() {
 	exec("cp /tmp/system_advanced_create_certs.tmp /usr/local/www/packages/vhosts/system_advanced_create_certs.php");
 	unlink_if_exists("/tmp/system_advanced_create_certs.tmp");
 
-
 	//write_config();
 
 	if (!function_exists('write_rcfile')) { require("/etc/inc/service-utils.inc"); }
 	write_rcfile(array(
 		"file" => "vhosts-http.sh",
-		"start" => "/usr/local/sbin/lighttpd -f /var/etc/lighty-vhosts-http.conf",
-		"stop" => "kill `cat /var/run/lighty-vhosts-http.pid`"
+		"start" => "/usr/local/sbin/lighttpd -f /var/etc/vhosts-http.conf",
+		"stop" => "kill `cat /var/run/vhosts-http.pid`"
 		)
 	);
 
 	php_sync_package();
-
 
 	//if (pkg_is_service_running('vhosts')) {  
 		//documentation purposes
@@ -808,7 +806,9 @@ function deinstall_command()
 	unlink_if_exists("/usr/local/pkg/vhosts.xml");
 	unlink_if_exists("/usr/local/pkg/vhosts.inc");
 	unlink_if_exists("/usr/local/www/vhosts.inc");
-	unlink_if_exists("/usr/local/etc/rc.d/vhosts.sh");
+	unlink_if_exists("/usr/local/etc/rc.d/vhosts-http.sh");
+	exec ("rm /usr/local/etc/rc.d/vhosts*");
+	exec ("rm /var/etc/vhosts*");
 	exec("rm -R /usr/local/php5");
 	conf_mount_ro();
 	config_unlock();
