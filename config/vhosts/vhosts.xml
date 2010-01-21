@@ -41,7 +41,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>vHosts Settings</name>
-	<version>0.7</version>
+	<version>0.7.1</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/vhosts.inc</include_file>
 	<menu>
@@ -95,17 +95,6 @@
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/vhosts/lighty-vhosts.conf</item>
 	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/var/etc/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/vhosts/system_advanced_create_certs.tmp</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/vhosts/php5.tar.gz</item>
-	</additional_files_needed>
-
 	<fields>
 		<field>
 			<fielddescr>Variable One</fielddescr>

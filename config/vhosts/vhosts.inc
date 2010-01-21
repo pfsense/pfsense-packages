@@ -673,6 +673,7 @@ function vhosts_sync_package_php()
 					unset($tmp);
 					fclose($fout);
 
+					if (!function_exists('write_rcfile')) { require("/etc/inc/service-utils.inc"); }
 					write_rcfile(array(
 						"file" => "vhosts-".$ipaddress."-".$port."-ssl.sh",
 						"start" => "/usr/local/sbin/lighttpd -f /var/etc/lighty-vhosts-".$ipaddress."-".$port."-ssl.conf",
@@ -733,6 +734,11 @@ function php_install_command() {
 	}
 
 	if(stristr(php_uname('r'), '7.2') == TRUE) {
+		if (!file_exists('/usr/local/php5')) {
+			chdir('/usr/local/');
+			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/php5.tar.gz");
+			exec("tar zxvf /usr/local/php5.tar.gz -C /usr/local/");
+		}
 		if (!file_exists('/usr/local/lib/libxml2.so.5')) {
 			chdir('/usr/local/lib/');
 			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/usr.local.lib/libxml2.so.5");
@@ -750,6 +756,13 @@ function php_install_command() {
 			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/usr.local.lib/lib/libxml2.a");
 		}
 	}
+	if(stristr(php_uname('r'), '8.0') == TRUE) {
+		if (!file_exists('/usr/local/php5')) {
+			chdir('/usr/local/');
+			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd8.0/php5.tar.gz");
+			exec("tar zxvf /usr/local/php5.tar.gz -C /usr/local/");
+		}
+	}
 
 	//rename PHP files from .tmp to .php
 	exec("cp /tmp/vhosts_php.tmp /usr/local/www/packages/vhosts/vhosts_php.php");
@@ -758,16 +771,15 @@ function php_install_command() {
 	exec("cp /tmp/vhosts_php_edit.tmp /usr/local/www/packages/vhosts/vhosts_php_edit.php");
 	unlink_if_exists("/tmp/vhosts_php_edit.tmp");
 
+	chdir('/tmp/');
+	exec ("fetch http://www.pfsense.com/packages/config/vhosts/system_advanced_create_certs.tmp");
 	exec("cp /tmp/system_advanced_create_certs.tmp /usr/local/www/packages/vhosts/system_advanced_create_certs.php");
 	unlink_if_exists("/tmp/system_advanced_create_certs.tmp");
 
-	//extract php5
-	chdir('/tmp');
-	exec("tar zxvf /tmp/php5.tar.gz -C /usr/local/");
-	unlink_if_exists("/tmp/php5.tar.gz");
 
 	//write_config();
 
+	if (!function_exists('write_rcfile')) { require("/etc/inc/service-utils.inc"); }
 	write_rcfile(array(
 		"file" => "vhosts-http.sh",
 		"start" => "/usr/local/sbin/lighttpd -f /var/etc/lighty-vhosts-http.conf",
