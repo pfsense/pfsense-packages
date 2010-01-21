@@ -169,8 +169,12 @@ function haproxy_configure() {
             fwrite ($fd, "\tmode\t\t\t" . $backend_type . "\n");
 			fwrite ($fd, "\tlog\t\t\tglobal\n");
 			fwrite ($fd, "\toption\t\t\tdontlognull\n");
-			fwrite ($fd, "\toption\t\t\thttpclose\n");
-			fwrite ($fd, "\toption\t\t\tforwardfor\n");
+
+			if($backend['httpclose']) 
+				fwrite ($fd, "\toption\t\t\thttpclose\n");
+
+			if($backend['forwardfor']) 
+				fwrite ($fd, "\toption\t\t\tforwardfor\n");
 
 			if($backend['max_connections'])
 				fwrite ($fd, "\tmaxconn\t\t\t" . $backend['max_connections'] . "\n");
