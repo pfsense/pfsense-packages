@@ -245,8 +245,12 @@ function haproxy_configure() {
 								} else {
 									$advanced_txt = "";
 								}
+								if($server['checkinter']) 
+									$checkinter = "check inter {$server['checkinter']}";
+								else 
+									$checkinter = "check inter 1000";
 								foreach($server_ports as $pport) 
-									fwrite ($fd, "\tserver\t\t\t" . $server['name'] . " " . $server['address'].":" . $pport . " $cookie " . " check inter 1000 weight " . $server['weight'] . "{$advanced_txt}\n");
+									fwrite ($fd, "\tserver\t\t\t" . $server['name'] . " " . $server['address'].":" . $pport . " $cookie " . " $checkinter weight " . $server['weight'] . "{$advanced_txt}\n");
 							}
 						}
 					}
@@ -273,6 +277,8 @@ function haproxy_configure() {
 
 	// create config file
 	fclose($fd);
+
+	exec("");
 
 	// reload haproxy
 	if(isset($a_global['enable'])) {

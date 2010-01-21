@@ -51,6 +51,7 @@ if (isset($id) && $a_server[$id]) {
 	$pconfig['port'] = $a_server[$id]['port'];
 	$pconfig['backend'] = $a_server[$id]['backend'];
 	$pconfig['weight'] = $a_server[$id]['weight'];
+	$pconfig['checkinter'] = $a_server[$id]['checkinter'];
 	$pconfig['cookie'] = $a_server[$id]['cookie'];
 	$pconfig['status'] = $a_server[$id]['status'];
 	$pconfig['advanced'] = base64_decode($a_server[$id]['advanced']);
@@ -124,7 +125,8 @@ if ($_POST) {
 		update_if_changed("status", $server['status'], $_POST['status']);
 		update_if_changed("address", $server['address'], $_POST['address']);
 		update_if_changed("advanced", $server['advanced'], base64_encode($_POST['advanced']));
-		
+		update_if_changed("checkinter", $server['checkinter'], $_POST['checkinter']);
+
 		if (isset($id) && $a_server[$id]) {
 			$a_server[$id] = $server;
 		} else {
@@ -286,6 +288,13 @@ function clearcombo(){
 			</td>
 		</tr>
 		<tr align="left">
+			<td width="22%" valign="top" class="vncell">Check inter</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="weight" type="text" <?if(isset($pconfig['checkinter'])) echo "value=\"{$pconfig['checkinter']}\"";?>size="64">
+				<br/>Defaults to 1000 if left blank.
+			</td>
+		</tr>
+		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Weight</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="weight" type="text" <?if(isset($pconfig['weight'])) echo "value=\"{$pconfig['weight']}\"";?>size="64"><br/>
@@ -295,7 +304,6 @@ function clearcombo(){
 					  is recommended to start with values which can both grow and shrink, for 
 					  instance between 10 and 100 to leave enough room above and below for later 
 					  adjustments.
-				
 			</td>
 		</tr>
 		<tr align="left">
