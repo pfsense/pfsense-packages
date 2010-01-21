@@ -738,6 +738,7 @@ function php_install_command() {
 			chdir('/usr/local/');
 			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/php5.tar.gz");
 			exec("tar zxvf /usr/local/php5.tar.gz -C /usr/local/");
+			exec("rm /usr/local/php5.tar.gz");
 		}
 		if (!file_exists('/usr/local/lib/libxml2.so.5')) {
 			chdir('/usr/local/lib/');
@@ -761,6 +762,7 @@ function php_install_command() {
 			chdir('/usr/local/');
 			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd8.0/php5.tar.gz");
 			exec("tar zxvf /usr/local/php5.tar.gz -C /usr/local/");
+			exec("rm /usr/local/php5.tar.gz");
 		}
 	}
 

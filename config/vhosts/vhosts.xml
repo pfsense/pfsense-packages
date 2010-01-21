@@ -41,7 +41,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>vHosts Settings</name>
-	<version>0.7.2</version>
+	<version>0.7.3</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/vhosts.inc</include_file>
 	<menu>
@@ -89,11 +89,6 @@
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/vhosts/vhosts_php_edit.tmp</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/var/etc/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/vhosts/lighty-vhosts.conf</item>
 	</additional_files_needed>
 	<fields>
 		<field>
