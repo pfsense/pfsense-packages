@@ -267,7 +267,7 @@ function vhosts_sync_package_php()
 			$tmp .= "######### Options that are good to be but not neccesary to be changed #######\n";
 			$tmp .= "\n";
 			$tmp .= "## bind to port (default: 80)\n";
-			$tmp .= "server.port                = 8001\n";
+			$tmp .= "#server.port                = 8001\n";
 			$tmp .= "\n";
 			$tmp .= "#the regex method isn't working\n";
 			$tmp .= "#\$HTTP[\"host\"] =~ \"(^|\\.)host01\\.com\$\" {\n";
