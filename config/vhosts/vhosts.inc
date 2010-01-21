@@ -811,6 +811,7 @@ function deinstall_command()
 	unlink_if_exists("/usr/local/etc/rc.d/vhosts-http.sh");
 	exec ("rm /usr/local/etc/rc.d/vhosts*");
 	exec ("rm /var/etc/vhosts*");
+	exec("rm -R /usr/local/www/packages/vhosts");
 	exec("rm -R /usr/local/php5");
 	conf_mount_ro();
 	config_unlock();
