@@ -278,7 +278,13 @@ function haproxy_configure() {
 	// create config file
 	fclose($fd);
 
-	exec("");
+	$freebsd_version = substr(trim(`uname -r`), 0, 1);
+	if(!file_exists("/usr/bin/limits")) {
+		exec("fetch -q -o /usr/bin/limits http://files.pfsense.org/extras/{$freebsd_version}/limits");
+		exec("chmod a+rx /usr/bin/limits");
+	}
+
+	exec("/usr/bin/limits -n 300014");
 
 	// reload haproxy
 	if(isset($a_global['enable'])) {
