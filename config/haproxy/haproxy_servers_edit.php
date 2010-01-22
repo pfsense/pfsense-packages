@@ -290,7 +290,7 @@ function clearcombo(){
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Check inter</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="weight" type="text" <?if(isset($pconfig['checkinter'])) echo "value=\"{$pconfig['checkinter']}\"";?>size="64">
+				<input name="checkinter" type="text" <?if(isset($pconfig['checkinter'])) echo "value=\"{$pconfig['checkinter']}\"";?>size="64">
 				<br/>Defaults to 1000 if left blank.
 			</td>
 		</tr>
