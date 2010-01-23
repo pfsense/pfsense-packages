@@ -115,7 +115,11 @@ function haproxy_configure() {
 			fwrite ($fd, "\tlog\t\t\t{$a_global['remotesyslog']}\n");
 		fwrite ($fd, "\tuid\t\t\t80\n");
 		fwrite ($fd, "\tgid\t\t\t80\n");
-		$numprocs = trim(`/sbin/sysctl kern.smp.cpus | cut -d" " -f2`);
+		// Set numprocs if defined or use system default (#cores)
+		if($a_global['nbproc'])
+			$numprocs = $a_global['nbproc'];
+		else 
+			$numprocs = trim(`/sbin/sysctl kern.smp.cpus | cut -d" " -f2`);			
 		fwrite ($fd, "\tnbproc\t\t\t$numprocs\n");
 		fwrite ($fd, "\tchroot\t\t\t/var/empty\n");
 		fwrite ($fd, "\tdaemon\n");

@@ -78,6 +78,7 @@ if ($_POST) {
 			$config['installedpackages']['haproxy']['remotesyslog'] = $_POST['remotesyslog'] ? $_POST['remotesyslog'] : false;
 			$config['installedpackages']['haproxy']['syncpassword'] = $_POST['syncpassword'] ? $_POST['syncpassword'] : false;
 			$config['installedpackages']['haproxy']['advanced'] = base64_encode($_POST['advanced']) ? $_POST['advanced'] : false;
+			$config['installedpackages']['haproxy']['nbproc'] = $_POST['nbproc'] ? $_POST['nbproc'] : false;			
 			touch($d_haproxyconfdirty_path);
 			write_config();
 		}
@@ -94,6 +95,7 @@ $pconfig['synchost2'] = $config['installedpackages']['haproxy']['synchost2'];
 $pconfig['synchost3'] = $config['installedpackages']['haproxy']['synchost3'];
 $pconfig['remotesyslog'] = $config['installedpackages']['haproxy']['remotesyslog'];
 $pconfig['advanced'] = base64_decode($config['installedpackages']['haproxy']['advanced']);
+$pconfig['nbproc'] = $config['installedpackages']['haproxy']['nbproc'];
 
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
@@ -196,6 +198,16 @@ function enable_change(enable_change) {
 						</tr>
 					</table>
 					</td></tr></table>
+				</td>
+			</tr>
+			<tr>
+				<td valign="top" class="vncell">
+					Number of processes to start.
+				</td>
+				<td class="vtable">
+					<input name="nbproc" type="text" class="formfld" id="nbproc" size="18" value="<?=htmlspecialchars($pconfig['nbproc']);?>">
+					<br/>
+					Defaults to number of cores/processors installed if left blank.
 				</td>
 			</tr>
 			<tr>
