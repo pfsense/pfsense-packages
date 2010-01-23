@@ -48,7 +48,7 @@ include("head.inc");
 <?php
 
 	$tab_array = array();
-	$tab_array[] = array(gettext("Settings"), false, "/packages/vhosts/vhosts_php.php");
+	$tab_array[] = array(gettext("Settings"), true, "/packages/vhosts/vhosts_php.php");
 	display_top_tabs($tab_array);
 
 ?>
