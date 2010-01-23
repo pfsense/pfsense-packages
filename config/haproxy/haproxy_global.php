@@ -299,19 +299,20 @@ function enable_change(enable_change) {
 	</div>
 </table>
 
-<p/>
-
-<div id="configuration" style="display:none; border-style:dashed; padding: 8px;">
-	<b><i>/var/etc/haproxy.cfg file contents:</b></i>
-	<?php
-		if(file_exists("/var/etc/haproxy.cfg")) {
-			echo "<pre>" . trim(file_get_contents("/var/etc/haproxy.cfg")) . "</pre>";
-		}
-	?>
-</div>
-<div id="showconfiguration">
-	<a onClick="new Effect.Fade('showconfiguration'); new Effect.Appear('configuration');  setTimeout('scroll_after_fade();', 250); return false;" href="#">Show</a> automatically generated configuration.
-</div>
+<?php if(file_exists("/var/etc/haproxy.cfg")): ?>
+	<p/>
+	<div id="configuration" style="display:none; border-style:dashed; padding: 8px;">
+		<b><i>/var/etc/haproxy.cfg file contents:</b></i>
+		<?php
+			if(file_exists("/var/etc/haproxy.cfg")) {
+				echo "<pre>" . trim(file_get_contents("/var/etc/haproxy.cfg")) . "</pre>";
+			}
+		?>
+	</div>
+	<div id="showconfiguration">
+		<a onClick="new Effect.Fade('showconfiguration'); new Effect.Appear('configuration');  setTimeout('scroll_after_fade();', 250); return false;" href="#">Show</a> automatically generated configuration.
+	</div>
+<?php endif; ?>
 
 </form>
 <script language="JavaScript">
