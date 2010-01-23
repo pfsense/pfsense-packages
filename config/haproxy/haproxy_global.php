@@ -310,13 +310,13 @@ function enable_change(enable_change) {
 	?>
 </div>
 <div id="showconfiguration">
-	<a onClick="new Effect.Fade('showconfiguration'); new Effect.Appear('configuration');  setTimeout('scroll_after_fade', 500); return false;" href="#">Show</a> automatically generated configuration.
+	<a onClick="new Effect.Fade('showconfiguration'); new Effect.Appear('configuration');  setTimeout('scroll_after_fade();', 250); return false;" href="#">Show</a> automatically generated configuration.
 </div>
 
 </form>
 <script language="JavaScript">
 	function scroll_after_fade() {
-		window.scrollBy(document_height, 0);
+		scrollTo(0,99999999999);
 	}
 <!--
 enable_change(false);
