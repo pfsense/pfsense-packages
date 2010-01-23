@@ -106,6 +106,8 @@ include("head.inc");
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<script type="text/javascript" src="javascript/scriptaculous/prototype.js"></script>
+<script type="text/javascript" src="javascript/scriptaculous/scriptaculous.js"></script>
 <?php include("fbegin.inc"); ?>
 <script language="JavaScript">
 <!--
@@ -296,8 +298,26 @@ function enable_change(enable_change) {
 		</table>
 	</div>
 </table>
+
+<p/>
+
+<div id="configuration" style="display:none; border-style:dashed; padding: 8px;">
+	<b><i>/var/etc/haproxy.cfg file contents:</b></i>
+	<?php
+		if(file_exists("/var/etc/haproxy.cfg")) {
+			echo "<pre>" . file_get_contents("/var/etc/haproxy.cfg") . "</pre>";
+		}
+	?>
+</div>
+<div id="showconfiguration">
+	<a onClick="new Effect.Fade('showconfiguration'); new Effect.Appear('configuration');  setTimeout('scroll_after_fade', 500); return false;" href="#">Show</a> automatically generated configuration.
+</div>
+
 </form>
 <script language="JavaScript">
+	function scroll_after_fade() {
+		window.scrollBy(document_height, 0);
+	}
 <!--
 enable_change(false);
 //-->
