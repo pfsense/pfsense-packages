@@ -305,7 +305,7 @@ function enable_change(enable_change) {
 	<b><i>/var/etc/haproxy.cfg file contents:</b></i>
 	<?php
 		if(file_exists("/var/etc/haproxy.cfg")) {
-			echo "<pre>" . file_get_contents("/var/etc/haproxy.cfg") . "</pre>";
+			echo "<pre>" . trim(file_get_contents("/var/etc/haproxy.cfg")) . "</pre>";
 		}
 	?>
 </div>
