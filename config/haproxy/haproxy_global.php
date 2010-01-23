@@ -207,7 +207,7 @@ function enable_change(enable_change) {
 				<td class="vtable">
 					<input name="nbproc" type="text" class="formfld" id="nbproc" size="18" value="<?=htmlspecialchars($pconfig['nbproc']);?>">
 					<br/>
-					Defaults to number of cores/processors installed if left blank.
+					Defaults to number of cores/processors installed if left blank (<?php echo trim(`/sbin/sysctl kern.smp.cpus | cut -d" " -f2`); ?> detected).
 				</td>
 			</tr>
 			<tr>
