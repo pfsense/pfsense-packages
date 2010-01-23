@@ -204,7 +204,7 @@ function enable_change(enable_change) {
 			</tr>
 			<tr>
 				<td valign="top" class="vncell">
-					Number of processes to start.
+					Number of processes to start
 				</td>
 				<td class="vtable">
 					<input name="nbproc" type="text" class="formfld" id="nbproc" size="18" value="<?=htmlspecialchars($pconfig['nbproc']);?>">
