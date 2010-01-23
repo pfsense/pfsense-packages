@@ -112,7 +112,7 @@ function haproxy_configure() {
 			fwrite ($fd, "\t" . base64deode($a_global['advanced']) . "\n");
 		fwrite ($fd, "\tmaxconn\t\t\t".$a_global['maxconn']."\n");
 		if($a_global['remotesyslog'])
-			fwrite ($fd, "\tlog\t\t\t{$a_global['remotesyslog']}\n");
+			fwrite ($fd, "\tlog\t\t\t{$a_global['remotesyslog']}\tlocal0\n");
 		fwrite ($fd, "\tuid\t\t\t80\n");
 		fwrite ($fd, "\tgid\t\t\t80\n");
 		// Set numprocs if defined or use system default (#cores)
