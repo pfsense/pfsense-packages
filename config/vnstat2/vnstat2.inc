@@ -4,7 +4,7 @@ function vnstat_install_deinstall() {
 	global $config;
 // Remove Vnstat package and files
         exec("cd /var/db/pkg/ && pkg_delete `ls | grep vnstat`");
-	exec("rm -d -R /usr/local/www/vnstat");
+	exec("rm -d -R /usr/local/www/vnstat2");
 // Remove vnstat cron entry from config.xml
         $task_key = '/usr/local/bin/vnstat -u';
         $x_name='';
@@ -28,11 +28,11 @@ function vnstat_install_deinstall() {
 function vnstat_install_config() {
         global $config;
 		conf_mount_rw();
+	exec("[ ! -d dir ] && mkdir /var/db/vnstat");
 // Unpack and move Vnstat frontend 
 	exec("cd ..");
 	exec("tar -zxovf /usr/local/pkg/vnstat_php_frontend-1.4.1.tar.gz");
 	exec("mv vnstat_php_frontend-1.4.1 /usr/local/www/vnstat2");
-	exec("[ ! -d dir ] && mkdir /var/db/vnstat");
 // Add cron job to config.xml
         $cron_item = array();
         $cron_item['minute']    = "*/1";
@@ -218,9 +218,9 @@ $graph_format2
 ?>
 EOF;
 
-     $hf = fopen("/usr/local/www/vnstat/config.php","w");
+     $hf = fopen("/usr/local/www/vnstat2/config.php","w");
      if(!$hf) {
-     log_error("could not open /usr/local/www/vnstat/config.php for writing");
+     log_error("could not open /usr/local/www/vnstat2/config.php for writing");
      exit;
      }
      fwrite($hf, $config_file);
