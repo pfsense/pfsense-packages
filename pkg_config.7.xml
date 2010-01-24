@@ -933,5 +933,16 @@
       <config_file>http://www.pfsense.org/packages/config/blinkled/blinkled.xml</config_file>
       <configurationfile>blinkled.xml</configurationfile>
     </package>
+    <package>
+      <name>OpenVPN Status</name>
+      <descr>OpenVPN Status Page, backported from 2.0</descr>
+      <category>System</category>
+      <version>1.0</version>
+      <status>Beta</status>
+      <maintainer>jimp@pfsense.org</maintainer>
+      <required_version>1.2.3</required_version>
+      <config_file>http://www.pfsense.org/packages/config/openvpn-status/openvpn-status.xml</config_file>
+      <configurationfile>openvpn-status.xml</configurationfile>
+    </package>
   </packages>
 </pfsensepkgs>
