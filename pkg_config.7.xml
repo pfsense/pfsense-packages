@@ -425,6 +425,7 @@
       <category>Network Management</category>
 	  <depends_on_package_base_url>http://www.pfsense.com/packages/config/vnstat2/bin/</depends_on_package_base_url>
 	  <depends_on_package>vnstat-1.10.tbz</depends_on_package>
+          <depends_on_package>libiconv-1.13.1.tbz</depends_on_package>
       <version>1.10</version>
       <status>test</status>
       <required_version>1.2.3</required_version>
