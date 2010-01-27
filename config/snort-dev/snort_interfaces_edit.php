@@ -294,7 +294,7 @@ if ($_POST["Submit"]) {
 		if ($_POST["Submit2"]) {
 		sync_snort_package_all();
 		sleep(1);
-		exec("/bin/sh /usr/local/etc/rc.d/snort_{$id}{$if_real}.sh restart");
+		exec("/bin/sh /usr/local/etc/rc.d/snort restart {$id}{$if_real}");
 		header("Location: /snort/snort_interfaces_edit.php?id=$id");
 		exit;
 		}
