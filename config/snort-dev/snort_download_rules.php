@@ -330,6 +330,7 @@ if (file_exists("{$tmpfname}")) {
 exec("/bin/mkdir -p {$snortdir}");
 exec("/bin/mkdir -p {$snortdir}/rules");
 exec("/bin/mkdir -p {$snortdir}/signatures");
+exec("/bin/mkdir -p /usr/local/lib/snort/dynamicrules/");
 
 /* send current buffer */
 ob_flush();
@@ -348,7 +349,8 @@ unhide_progress_bar_status();
 /*  download md5 sig from snort.org */
 if ($snortdownload == "basic" || $snortdownload == "premium")
 {
-	if (file_exists("{$tmpfname}/{$snort_filename_md5}")) {
+	if (file_exists("{$tmpfname}/{$snort_filename_md5}") &&
+	    filesize("{$tmpfname}/{$snort_filename_md5}") > 0) {
 		update_status(gettext("snort.org md5 temp file exists..."));
 	} else {
 		update_status(gettext("Downloading snort.org md5 file..."));
@@ -666,8 +668,8 @@ if ($snortdownload != "off")
 		update_status(gettext("Extracting rules..."));
 		update_output_window(gettext("May take a while..."));
 		exec("/bin/mkdir -p {$snortdir}/rules_bk/");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/rules_bk rules/" .
-			" etc/" .
+		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/rules_bk rules/");
+		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} etc/" .
 			" so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/" .
 			" so_rules/bad-traffic.rules/" .
 			" so_rules/chat.rules/" .
