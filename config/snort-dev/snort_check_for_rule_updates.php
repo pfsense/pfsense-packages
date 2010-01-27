@@ -752,7 +752,7 @@ exec("/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/syn
 
 /* if snort is running hardrestart, if snort is not running do nothing */
 if (file_exists("/tmp/snort_download_halt.pid")) {
-	exec("/bin/sh /usr/local/etc/rc.d/snort\* start");
+	exec("/bin/sh /usr/local/etc/rc.d/snort.sh start");
 	echo "The Rules update finished...\n";
 	echo "Snort has restarted with your new set of rules...\n";
 	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'SNORT RULE UPDATE FINNISHED...'");

@@ -82,7 +82,7 @@ if (isset($_POST['del_x'])) {
 
 		    /* dont flood the syslog code */
 		    exec("/bin/cp /var/log/system.log /var/log/system.log.bk");
-		    exec("/bin/sh /usr/local/etc/rc.d/snort stop $rulei");
+		    exec("/bin/sh /usr/local/etc/rc.d/snort.sh stop $rulei");
 
 		    /* stop syslog flood code */		
 		    $if_real_wan_rulei = $a_nat[$rulei]['interface'];
@@ -170,10 +170,10 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 	$snort_pid = exec("pgrep -F /var/run/snort_{$if_real2}{$name}.pid snort");
 	
 	if ($snort_pid != "") {
-		exec("/bin/sh /usr/local/etc/rc.d/snort stop $name");
+		exec("/bin/sh /usr/local/etc/rc.d/snort.sh stop $name");
 	}else{
 		sync_snort_package_all();
-		exec("/bin/sh /usr/local/etc/rc.d/snort start $name");
+		exec("/bin/sh /usr/local/etc/rc.d/snort.sh start $name");
 	}
 	header("Location: snort_interfaces.php");
 }	
