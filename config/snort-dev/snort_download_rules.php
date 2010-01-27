@@ -666,9 +666,9 @@ if ($snortdownload != "off")
 		update_status(gettext("Extracting rules..."));
 		update_output_window(gettext("May take a while..."));
 		exec("/bin/mkdir -p {$snortdir}/rules_bk/");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/rules_bk rules/\*" .
+		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/rules_bk rules/" .
 			" etc/" .
-			" so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/\*" .
+			" so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/" .
 			" so_rules/bad-traffic.rules/" .
 			" so_rules/chat.rules/" .
 			" so_rules/dos.rules/" .

@@ -392,23 +392,23 @@ if ($snort_md5_check_ok != on) {
 if (file_exists("{$tmpfname}/{$snort_filename}")) {
     echo "Extracting rules...\n";
     echo "May take a while...\n";
-    exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} rules/");
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} etc/");
-	exec("`/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/*`");
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules/");
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/chat.rules/");
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/dos.rules/");
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/exploit.rules/");
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/imap.rules/");
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/misc.rules/");
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/multimedia.rules/");
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/netbios.rules/");
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/nntp.rules/");
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/p2p.rules/");
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/smtp.rules/");
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/sql.rules/");
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/web-client.rules/");
-	exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/web-misc.rules/");
+    exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} rules/" .
+	    " etc/" .
+	    " so_rules/precompiled/FreeBSD-7.0/i386/2.8.4" .
+	    " so_rules/bad-traffic.rules/" .
+	    " so_rules/chat.rules/" .
+	    " so_rules/dos.rules/" .
+	    " so_rules/exploit.rules/" .
+	    " so_rules/imap.rules/" .
+	    " so_rules/misc.rules/" .
+	    " so_rules/multimedia.rules/" .
+	    " so_rules/netbios.rules/" .
+	    " so_rules/nntp.rules/" .
+	    " so_rules/p2p.rules/" .
+	    " so_rules/smtp.rules/" .
+	    " so_rules/sql.rules/" .
+	    " so_rules/web-client.rules/" .
+	    " so_rules/web-misc.rules/");
     echo "Done extracting Rules.\n";
 } else {
     echo "The Download rules file missing...\n";
