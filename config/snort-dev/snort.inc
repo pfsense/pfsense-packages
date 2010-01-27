@@ -108,6 +108,8 @@ function snort_postinstall()
 		exec("/bin/rm /usr/local/etc/snort/reference.config-sample");
 		exec("/bin/rm /usr/local/etc/snort/gen-msg.map-sample");
 		exec("/bin/rm /usr/local/etc/snort/sid");
+		exec("/bin/rm /usr/local/etc/rc.d/snort");
+		exec("/bin/rm /usr/local/etc/rc.d/bardyard2");
 	}
 	
 	if(!file_exists("/usr/local/etc/snort/custom_rules"))
