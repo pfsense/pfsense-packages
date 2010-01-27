@@ -560,7 +560,7 @@ update_output_window(gettext("Stopping Snort service..."));
 $chk_if_snort_up = exec("pgrep -x snort");
 if ($chk_if_snort_up != "") {
 	exec("/usr/bin/touch /tmp/snort_download_halt.pid");
-	stop_service("snort");
+	exec("/bin/sh /usr/local/etc/rc.d/snort.sh stop");
 	sleep(2);
 }
 
@@ -1118,7 +1118,7 @@ exec("/bin/chmod -R 755  /usr/local/lib/snort");
 
 /* if snort is running hardrestart, if snort is not running do nothing */
 if (file_exists("/tmp/snort_download_halt.pid")) {
-	start_service("snort");
+	exec("/bin/sh /usr/local/etc/rc.d/snort.sh start");
 	update_status(gettext("The Rules update finished..."));
 	update_output_window(gettext("Snort has restarted with your new set of rules..."));
 	exec("/bin/rm /tmp/snort_download_halt.pid");
