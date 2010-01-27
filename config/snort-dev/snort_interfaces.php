@@ -276,7 +276,7 @@ padding: 15px 10px 50% 50px;
 					$if_real = convert_friendly_interface_to_real_interface_name($natent['interface']);
 
 					$snort_pid = exec("pgrep -F /var/run/snort_{$if_real}{$nnats}{$if_real}.pid snort");
-					if ($snort_pid)
+					if ($snort_pid) {
 						$class_color_up = "listbg2";
 						$iconfn = "block";
 					}else{
@@ -340,7 +340,7 @@ padding: 15px 10px 50% 50px;
 				  <?php
 				 				  
 					$byard_pid = exec("pgrep -F /var/run/barnyard2_{$nnats}{$if_real}.pid barnyard2");
-					if ($byard_pid)
+					if ($byard_pid) {
 						$class_color_upb = "listbg2";
 					}else{
 						$class_color_upb = "listbg";
