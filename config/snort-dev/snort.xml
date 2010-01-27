@@ -178,16 +178,21 @@
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort-dev/snort_preprocessors.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/etc/rc.d/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort</item>
+	</additional_files_needed>
 	<fields>
-    </fields>
+	</fields>
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
 		sync_snort_package();
 	</custom_php_resync_config_command>
-    <custom_php_install_command>
+	<custom_php_install_command>
 		snort_postinstall();
-    </custom_php_install_command>
+	</custom_php_install_command>
 	<custom_php_deinstall_command>
 		snort_deinstall();
 	</custom_php_deinstall_command>

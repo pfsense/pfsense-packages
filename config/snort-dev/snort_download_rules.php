@@ -666,23 +666,23 @@ if ($snortdownload != "off")
 		update_status(gettext("Extracting rules..."));
 		update_output_window(gettext("May take a while..."));
 		exec("/bin/mkdir -p {$snortdir}/rules_bk/");
-		exec("`/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/rules_bk rules/*`");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} etc/");
-		exec("`/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/*`");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules/");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/chat.rules/");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/dos.rules/");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/exploit.rules/");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/imap.rules/");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/misc.rules/");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/multimedia.rules/");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/netbios.rules/");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/nntp.rules/");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/p2p.rules/");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/smtp.rules/");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/sql.rules/");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/web-client.rules/");
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/web-misc.rules/");
+		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir}/rules_bk rules/\*" .
+			"etc/" .
+			"so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/\*" .
+			"so_rules/bad-traffic.rules/" .
+			"so_rules/chat.rules/" .
+			"so_rules/dos.rules/" .
+			"so_rules/exploit.rules/" .
+			"so_rules/imap.rules/" .
+			"so_rules/misc.rules/" .
+			"so_rules/multimedia.rules/" .
+			"so_rules/netbios.rules/" .
+			"so_rules/nntp.rules/" .
+			"so_rules/p2p.rules/" .
+			"so_rules/smtp.rules/" .
+			"so_rules/sql.rules/" .
+			"so_rules/web-client.rules/" .
+			"so_rules/web-misc.rules/");
 		/* add prefix to all snort.org files */
 		/* remove this part and make it all php with the simplst code posible */
 		chdir ("/usr/local/etc/snort/rules_bk/rules");
@@ -749,7 +749,7 @@ if ($snortdownload != "off")
 	if (file_exists("{$snortdir}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/")) {
 		update_status(gettext("Copying so_rules..."));
 		update_output_window(gettext("May take a while..."));
-		exec("`/bin/cp -f {$snortdir}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/* /usr/local/lib/snort/dynamicrules/`");
+		exec("/bin/cp -f {$snortdir}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/* /usr/local/lib/snort/dynamicrules/");
 		exec("/bin/cp {$snortdir}/so_rules/bad-traffic.rules {$snortdir}/rules/snort_bad-traffic.so.rules");
 		exec("/bin/cp {$snortdir}/so_rules/chat.rules {$snortdir}/rules/snort_chat.so.rules");
 		exec("/bin/cp {$snortdir}/so_rules/dos.rules {$snortdir}/rules/snort_dos.so.rules");
