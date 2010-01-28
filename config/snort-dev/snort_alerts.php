@@ -318,7 +318,6 @@ if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php\" />\n";
 }
 ?>
-<p class="pgtitle"><?=$pgtitle?></p>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
 <?php

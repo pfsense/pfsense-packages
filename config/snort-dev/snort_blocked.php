@@ -240,8 +240,6 @@ if ($pconfig['brefresh'] == 'on' || $pconfig['brefresh'] == '')
 }
 ?>
 
-<p class="pgtitle"><?=$pgtitle?></p>
-
 <script src="/row_toggle.js" type="text/javascript"></script>
 <script src="/javascript/sorttable.js" type="text/javascript"></script>
 <?php if ($savemsg) print_info_box($savemsg); ?>

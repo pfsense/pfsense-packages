@@ -178,13 +178,12 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 	header("Location: snort_interfaces.php");
 }	
 
-$pgtitle = "Services: Snort 2.8.4.1_7 pkg v. 1.8 alpha";
+$pgtitle = "Services: Snort 2.8.5.2 pkg v. 1.9";
 include("head.inc");
 
 ?>
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle"><?=$pgtitle?></font></p>
 <style type="text/css">
 .alert {
  position:absolute;

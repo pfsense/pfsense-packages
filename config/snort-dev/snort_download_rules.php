@@ -97,7 +97,6 @@ padding: 15px 10px 85% 50px;
 }
 </style> 
 <noscript><div class=\"alert\" ALIGN=CENTER><img src=\"/themes/nervecenter/images/icons/icon_alert.gif\"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>\n";
-echo "<p class=\"pgtitle\">Services: Snort: Rules Update</p>\n";
 echo "<body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\">\n";
 
 echo "<script src=\"/row_toggle.js\" type=\"text/javascript\"></script>\n
