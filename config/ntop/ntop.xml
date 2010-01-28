@@ -109,8 +109,8 @@
 	    system("/bin/mkdir -p /var/db/ntop");
 	    system("/bin/mkdir -p /var/db/ntop/rrd");
 	    system("/bin/mkdir -p /var/db/ntop/rrd/graphics");
-	    system("chown nobody:nobody /var/db/ntop");
-	    system("chown nobody:nobody /var/db/ntop/rrd/graphics");
+	    system("/bin/chmod -R 755 /var/db/ntop");
+	    system("/usr/sbin/chown -R nobody:nobody /var/db/ntop");
 	    if($ntop_config['password'] and $ntop_config['passwordagain']) {
 		    if($ntop_config['password'] == $ntop_config['passwordagain']) {
 			    $first = 0;
