@@ -687,11 +687,8 @@ function snort_deinstall()
 	exec("/usr/sbin/pw userdel snort");
 	exec("/usr/sbin/pw groupdel snort");
 	exec("rm -rf /usr/local/etc/snort*");
+	exec("cd /var/db/pkg && pkg_delete `ls | grep barnyard2`");
 	exec("cd /var/db/pkg && pkg_delete `ls | grep snort`");
-	exec("cd /var/db/pkg && pkg_delete `ls | grep mysql-client`");
-	exec("cd /var/db/pkg && pkg_delete `ls | grep libdnet`");
-	exec("/usr/usr/bin/killall -9 snort");
-	exec("/usr/usr/bin/killall snort");
 
 	/* Remove snort cron entries Ugly code needs smoothness*/
 	
