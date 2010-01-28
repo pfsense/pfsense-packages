@@ -218,7 +218,6 @@ setTimeout($.unblockUI, 2000);
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("/usr/local/www/fbegin.inc"); ?>
-<p class="pgtitle"><?=$pgtitle?></p>
 
 
 
