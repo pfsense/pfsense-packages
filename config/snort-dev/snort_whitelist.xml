@@ -52,7 +52,7 @@
 	<!-- Menu is where this packages menu will appear -->
 	<tabs>
 		<tab>
-			<text>Snort Inertfaces</text>
+			<text>Snort Interfaces</text>
 			<url>/snort/snort_interfaces.php</url>
 		</tab>
 		<tab>

@@ -236,7 +236,7 @@ padding: 15px 10px 50% 50px;
   <tr><td>
 <?php
 	$tab_array = array();
-	$tab_array[] = array("Snort Inertfaces", true, "/snort/snort_interfaces.php");
+	$tab_array[] = array("Snort Interfaces", true, "/snort/snort_interfaces.php");
 	$tab_array[] = array("Global Settings", false, "/snort/snort_interfaces_global.php");
 	$tab_array[] = array("Rule Updates", false, "/snort/snort_download_rules.php");
 	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");

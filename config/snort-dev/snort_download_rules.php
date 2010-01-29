@@ -106,7 +106,7 @@ echo "<script src=\"/row_toggle.js\" type=\"text/javascript\"></script>\n
    		<td>\n";
 
 	$tab_array = array();
-	$tab_array[] = array("Snort Inertfaces", false, "/snort/snort_interfaces.php");
+	$tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
 	$tab_array[] = array("Global Settings", false, "/snort/snort_interfaces_global.php");
 	$tab_array[] = array("Rule Updates", true, "/snort/snort_download_rules.php");
 	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
@@ -229,7 +229,7 @@ setTimeout($.unblockUI, 2000);
     <td>
 <?php
 	$tab_array = array();
-	$tab_array[] = array("Snort Inertfaces", false, "/snort/snort_interfaces.php");
+	$tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
 	$tab_array[] = array("Global Settings", false, "/snort/snort_interfaces_global.php");
 	$tab_array[] = array("Rule Updates", true, "/snort/snort_download_rules.php");
 	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
