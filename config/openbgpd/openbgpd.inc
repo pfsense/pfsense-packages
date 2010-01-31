@@ -153,7 +153,11 @@ function openbgpd_install_conf() {
 	$fd = fopen("/usr/local/etc/rc.d/bgpd.sh","w");
 	fwrite($fd, "#!/bin/sh\n\n");
 	fwrite($fd, "# This file was created by the pfSense package manager.  Do not edit!\n\n");	
-	fwrite($fd, "/usr/local/sbin/bgpd -f /usr/local/etc/bgpd.conf\n");
+	fwrite($fd, "NUMBGPD=`ps auxw | grep bgpd | grep parent | grep -v grep | wc -l | awk '{print \$1}'`\n");
+	fwrite($fd, "# echo \$NUMBGPD\n");
+	fwrite($fd, "if [ \$NUMBGPD -lt 0 ] ; then\n");
+	fwrite($fd, "  /usr/local/sbin/bgpd -f /usr/local/etc/bgpd.conf\n");
+	fwrite($fd, "fi\n");
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/bgpd.sh");
 	exec("chmod a-rw /usr/local/etc/bgpd.conf");
