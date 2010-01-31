@@ -153,7 +153,7 @@ function load_rule_file($incoming_file)
 
 
     //string for populating category select
-    $currentruleset = basename($file);
+    $currentruleset = basename($rulefile);
 
     //delimiter for each new rule is a new line
     $delimiter = "\n";
@@ -187,16 +187,16 @@ sort($files);
 
 if ($_GET['openruleset'])
 {
-    $file = $_GET['openruleset'];
+    $rulefile = $_GET['openruleset'];
 }
 else
 {
-    $file = $ruledir.$files[0];
+    $rulefile = $ruledir.$files[0];
 
 }
 
 //Load the rule file
-$splitcontents = load_rule_file($file);
+$splitcontents = load_rule_file($rulefile);
 
 if ($_POST)
 {
@@ -279,10 +279,10 @@ if ($_POST)
 	    $splitcontents[$post_lineid] = $tempstring;
 	
 	    //write the new .rules file
-	    write_rule_file($splitcontents, $file);
+	    write_rule_file($splitcontents, $rulefile);
 	
 	    //once file has been written, reload file
-	    $splitcontents = load_rule_file($file);
+	    $splitcontents = load_rule_file($rulefile);
 	    
 	    $stopMsg = true;
 	}
@@ -326,10 +326,10 @@ else if ($_GET['act'] == "toggle")
     $splitcontents[$toggleid] = $tempstring;
 
     //write the new .rules file
-    write_rule_file($splitcontents, $file);
+    write_rule_file($splitcontents, $rulefile);
 
     //once file has been written, reload file
-    $splitcontents = load_rule_file($file);
+    $splitcontents = load_rule_file($rulefile);
     
     $stopMsg = true;
 	
@@ -396,7 +396,7 @@ if ($_GET['saved'] == 'yes')
 //		$stopMsg = false;
 }
 
-$currentruleset = basename($file);
+$currentruleset = basename($rulefile);
 
 $pgtitle = "Snort: Interface $id$if_real Rule File $currentruleset";
 require("guiconfig.inc");
@@ -486,7 +486,7 @@ function popup(url)
                                 echo "<br>Category: ";
 
                                 //string for populating category select
-                                $currentruleset = basename($file);
+                                $currentruleset = basename($rulefile);
 								
                                 ?>
                                 <form name="forms">
@@ -580,7 +580,7 @@ function popup(url)
                                         <td class=\"listt\">
                                         $textss\n";
                                         ?>
-                                        <a href="?id=<?=$id;?>&openruleset=<?=$file;?>&act=toggle&ids=<?=$counter;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/<?=$iconb;?>" width="10" height="10" border="0" title="click to toggle enabled/disabled status"></a>
+                                        <a href="?id=<?=$id;?>&openruleset=<?=$rulefile;?>&act=toggle&ids=<?=$counter;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/<?=$iconb;?>" width="10" height="10" border="0" title="click to toggle enabled/disabled status"></a>
 										<input name="enable" type="checkbox" value="yes" <?= $ischecked; ?> onClick="enable_change(false)">
                                         <?php
                                         echo "$textse
@@ -629,7 +629,7 @@ function popup(url)
                                           <td valign="middle" nowrap class="list">
                                             <table border="0" cellspacing="0" cellpadding="1">
                                                 <tr>
-                                                  <td><a href="javascript: void(0)"onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$file;?>&ids=<?=$counter;?>')"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="edit rule" width="17" height="17" border="0"></a></td>
+                                                  <td><a href="javascript: void(0)"onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$rulefile;?>&ids=<?=$counter;?>')"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="edit rule" width="17" height="17" border="0"></a></td>
 												  <!-- Codes by Quackit.com -->												
                                                 </tr>
                                             </table>
