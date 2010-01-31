@@ -299,7 +299,8 @@ if ($_POST["Submit"]) {
 		exit;
 		}
 
-$pgtitle = "Snort: Interface: $id$if_real Settings Edit";
+$ifname = strtoupper($pconfig['interface']);
+$pgtitle = "Snort: Interface: {$ifname} Settings Edit";
 include("head.inc");
 
 ?>
