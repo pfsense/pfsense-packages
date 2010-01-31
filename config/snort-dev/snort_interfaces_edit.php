@@ -480,13 +480,13 @@ if($id != "")
 						<?php endforeach; ?>
 					</select><br>
 					<span class="vexpl">Lowmem and ac-bnfa are recommended for low end systems, Ac: high memory, best performance, ac-std: moderate memory,high performance, acs: small memory, moderateperformance, ac-banded: small memory,moderate performance, ac-sparsebands: small memory, high performance.<br>
-					Hint: in most cases, you'll want to use WAN here.</span></td>
+					</span></td>
 				</tr>
 				<tr>
 				<td width="22%" valign="top" class="vncell">Block offenders</td>
 				<td width="78%" class="vtable">
 					<input name="blockoffenders7" type="checkbox" value="on" <?php if ($pconfig['blockoffenders7'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
-					Checking this option will automatically block hosts that generate a snort alert.</td>
+					Checking this option will automatically block hosts that generate a Snort alert.</td>
 				</tr>
 				<tr>
 				<td width="22%" valign="top" class="vncell">Send alerts to main System logs</td>
@@ -498,7 +498,7 @@ if($id != "")
 				<td width="22%" valign="top" class="vncell">Log to a Tcpdump file</td>
 				<td width="78%" class="vtable">
 					<input name="tcpdumplog" type="checkbox" value="on" <?php if ($pconfig['tcpdumplog'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
-					Snort will log packets to a tcpdump-formatted file. The file then can be analyzed by a wireshark type of application. WARNING: File may become large.</td>
+					Snort will log packets to a tcpdump-formatted file. The file then can be analyzed by an application such as Wireshark which understands pcap file formats. WARNING: File may become large.</td>
 				</tr>
 				<tr>
 				<td width="22%" valign="top" class="vncell">Log Alerts to a snort unified2 file</td>
@@ -519,7 +519,7 @@ if($id != "")
 	  <td width="22%" valign="top">&nbsp;</td>
 	  <td width="78%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
 	  <br>
-		Please save your settings befor you click start. </td>
+		Please save your settings before you click start. </td>
 	</tr>
   </table>
   </table>
