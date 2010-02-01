@@ -312,8 +312,8 @@ if($id != "")
                     <td><input name="flow_depth" type="text" class="formfld" id="flow_depth" size="5" value="<?=htmlspecialchars($pconfig['flow_depth']);?>"> <strong>-1</strong> to <strong>1460</strong> (<strong>-1</strong> disables HTTP inspect, <strong>0</strong> enables all HTTP inspect)</td>
 					</tr>
 					</table>
-						Amount of HTTP server response payload to inspect. Snort's performance may increase by ajusting this value.<br>
-						Setting this value too low may cause false negatives. Value above 0 is in bytes.<br>
+						Amount of HTTP server response payload to inspect. Snort's performance may increase by adjusting this value.<br>
+						Setting this value too low may cause false negatives. Values above 0 are specified in bytes.<br>
 						<strong>Default value is 0</strong></td>
 				</tr>
 				<tr>
