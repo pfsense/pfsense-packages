@@ -288,8 +288,8 @@ if($id != "")
 				<tr>
 					<td width="22%" valign="top">&nbsp;</td>
 					<td width="78%"><span class="vexpl"><span class="red"><strong>Note: </strong></span><br>
-					RULES MAY DEPENDENT ON Preprocessors!<br>
-					Please save your settings befor you click start.<br>					
+					Rules may be dependent on preprocessors!<br>
+					Please save your settings before you click start.<br>					
 					</td>
 				</tr>
 				<tr>
@@ -344,13 +344,13 @@ if($id != "")
 					<td width="22%" valign="top" class="vncell">Enable <br>DCE/RPC2 Detection</td>
 					<td width="78%" class="vtable">
 					<input name="dce_rpc_2" type="checkbox" value="on" <?php if ($pconfig['dce_rpc_2']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
-					The dcerpc preprocessor detects and decodes SMB and DCE/RPC traffic.</td>
+					The DCE/RPC preprocessor detects and decodes SMB and DCE/RPC traffic.</td>
 				</tr>
 				<tr>
 					<td width="22%" valign="top" class="vncell">Enable <br>DNS Detection</td>
 					<td width="78%" class="vtable">
 					<input name="dns_preprocessor" type="checkbox" value="on" <?php if ($pconfig['dns_preprocessor']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
-					The dns preprocessor (currently) decodes DNS Response traffic and detects a few vulnerabilities.</td>
+					The DNS preprocessor decodes DNS Response traffic and detects some vulnerabilities.</td>
 				</tr> 
                 <tr>
                   <td width="22%" valign="top" class="vncell">Define SSL_IGNORE</td>
@@ -372,7 +372,7 @@ if($id != "")
 	  <td width="22%" valign="top">&nbsp;</td>
 	  <td width="78%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
 	  <br>
-		Please save your settings befor you click start. </td>
+		Please save your settings before you click Start. </td>
 	</tr>
   </table>
   </table>
