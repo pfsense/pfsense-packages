@@ -714,17 +714,17 @@
       <name>HAVP antivirus</name> 
       <pkginfolink></pkginfolink> 
       <website>http://www.server-side.de/</website> 
-      <descr>Antivirus:  HAVP (HTTP Antivirus Proxy) is a proxy with a ClamAV anti-virus scanner. The main aims are continuous, non-blocking downloads and smooth scanning of dynamic and password protected HTTP traffic. Havp antivirus proxy has a parent and transparent proxy mode. It can be used with squid or standalone. And File Scanner for local files.</descr> 
-      <category>Network Management</category> 
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url> 
+      <descr>Antivirus:  HAVP (HTTP Antivirus Proxy) is a proxy with a ClamAV anti-virus scanner. The main aims are continuous, non-blocking downloads and smooth scanning of dynamic and password protected HTTP traffic. Havp antivirus proxy has a parent and transparent proxy mode. It can be used with squid or standalone. And File Scanner for local files.</descr>
+      <category>Network Management</category>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>havp-0.88.tbz</depends_on_package>
-      <version>0.88_05</version> 
-      <status>ALPHA</status> 
-      <required_version>1.2.2</required_version> 
-      <config_file>http://www.pfsense.com/packages/config/havp/havp.xml</config_file> 
-      <configurationfile>havp.xml</configurationfile> 
+      <version>0.88_05</version>
+      <status>ALPHA</status>
+      <required_version>1.2.2</required_version>
+      <config_file>http://www.pfsense.com/packages/config/havp/havp.xml</config_file>
+      <configurationfile>havp.xml</configurationfile>
       <maintainer>dv_serg@mail.ru</maintainer>
-      <after_install_info>Please check the HAVP settings.</after_install_info> 
+      <after_install_info>Please check the HAVP settings.</after_install_info>
     </package>
     <package>
       <name>onatproto</name>
