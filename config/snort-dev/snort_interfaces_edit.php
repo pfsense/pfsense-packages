@@ -419,10 +419,10 @@ if($id != "")
 				<tr>
 				<td width=\"22%\" valign=\"top\">&nbsp;</td>
 				<td width=\"78%\"><span class=\"vexpl\"><span class=\"red\"><strong>Note:</strong></span><br>
-					You will be redirected to the Snort Interfaces Menu to aprove changes.<br>
+					You will be redirected to the Snort Interfaces Menu to approve changes.<br>
 					After approval, interface options will be made available.
 					<br><br>
-					Please select a interface and a description.
+					Please select an interface and a description.
 				</td>
 				</tr>\n";
 				}
