@@ -286,7 +286,7 @@ if($id != "")
 				<tr>
 					<td width="22%" valign="top">&nbsp;</td>
 					<td width="78%"><span class="vexpl"><span class="red"><strong>Note:</strong></span><br>
-					Please save your settings befor you click start.<br>
+					Please save your settings before you click start.<br>
 					Please make sure there are <strong>no spaces</strong> in your definitions.
 					</td>
 				</tr>
@@ -501,7 +501,7 @@ if($id != "")
 	  <td width="22%" valign="top">&nbsp;</td>
 	  <td width="78%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
 	  <br>
-		Please save your settings befor you click start. </td>
+		Please save your settings before you click start. </td>
 	</tr>
   </table>
   </table>

@@ -390,15 +390,15 @@ padding: 15px 10px 50% 50px;
   <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 	  <td width="100%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
 	  <br>
-		 This is the <strong>Snort Menu</strong> where you can see an over view of all your interface settings.
+		 This is the <strong>Snort Menu</strong>, displaying an overview of all interface settings.
 		 <br>
-		 Please edit the <strong>Global Settings</strong> tab befor adding an interface.
+		 Please edit the <strong>Global Settings</strong> tab before adding an interface.
 		 <br><br>
-		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="Add Icon"> icon to add a interface.&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_pass.gif" width="13" height="13" border="0" title="Start Icon"> icon to <strong>start</strong> snort and barnyard.
+		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="Add Icon"> icon to add an interface.&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_pass.gif" width="13" height="13" border="0" title="Start Icon"> icon to <strong>start</strong> snort and barnyard.
 		 <br>
-		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" title="Edit Icon"> icon to edit a interface and settings.&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif" width="13" height="13" border="0" title="Stop Icon"> icon to <strong>stop</strong> snort and barnyard.
+		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" title="Edit Icon"> icon to edit an interface and settings.&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif" width="13" height="13" border="0" title="Stop Icon"> icon to <strong>stop</strong> snort and barnyard.
 		 <br>
-		<strong> Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="Delete Icon"> icon to delete a interface and settings.
+		<strong> Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="Delete Icon"> icon to delete an interface and settings.
 </td>
     </table>
  
