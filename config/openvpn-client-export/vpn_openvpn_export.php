@@ -101,13 +101,17 @@ if($act == "conf") {
 	$exp_name = openvpn_client_export_prefix($srvid);
 	$exp_name = urlencode($exp_name."-config.ovpn");
 	$exp_data = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken);
-	$exp_size = strlen($exp_data);
+	if (!$exp_data)
+		$input_errors[] = "Failed to export config files!";
+	else {
+		$exp_size = strlen($exp_data);
 
-	header("Content-Type: application/octet-stream");
-	header("Content-Disposition: attachment; filename={$exp_name}");
-	header("Content-Length: $exp_size");
-	echo $exp_data;
-	exit;
+		header("Content-Type: application/octet-stream");
+		header("Content-Disposition: attachment; filename={$exp_name}");
+		header("Content-Length: $exp_size");
+		echo $exp_data;
+		exit;
+	}
 }
 
 if($act == "visc") {
@@ -127,14 +131,18 @@ if($act == "visc") {
 	$exp_name = openvpn_client_export_prefix($srvid);
 	$exp_name = urlencode($exp_name."-Viscosity.visc.zip");
 	$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $password);
-	$exp_size = filesize($exp_path);
+	if (!$exp_path)
+		$input_errors[] = "Failed to export config files!";
+	else {
+		$exp_size = filesize($exp_path);
 
-	header("Content-Type: application/octet-stream");
-	header("Content-Disposition: attachment; filename={$exp_name}");
-	header("Content-Length: $exp_size");
-	readfile($exp_path);
-	//unlink($exp_path);
-	exit;
+		header("Content-Type: application/octet-stream");
+		header("Content-Disposition: attachment; filename={$exp_name}");
+		header("Content-Length: $exp_size");
+		readfile($exp_path);
+		//unlink($exp_path);
+		exit;
+	}
 }
 
 if($act == "inst") {
@@ -154,14 +162,18 @@ if($act == "inst") {
 	$exp_name = openvpn_client_export_prefix($srvid);
 	$exp_name = urlencode($exp_name."-install.exe");
 	$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $password);
-	$exp_size = filesize($exp_path);
+	if (!$exp_path)
+		$input_errors[] = "Failed to export config files!";
+	else {
+		$exp_size = filesize($exp_path);
 
-	header("Content-Type: application/octet-stream");
-	header("Content-Disposition: attachment; filename={$exp_name}");
-	header("Content-Length: $exp_size");
-	readfile($exp_path);
-	unlink($exp_path);
-	exit;
+		header("Content-Type: application/octet-stream");
+		header("Content-Disposition: attachment; filename={$exp_name}");
+		header("Content-Length: $exp_size");
+		readfile($exp_path);
+		unlink($exp_path);
+		exit;
+	}
 }
 
 include("head.inc");
