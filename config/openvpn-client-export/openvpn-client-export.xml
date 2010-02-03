@@ -25,16 +25,6 @@
 		<item>http://www.pfsense.com/packages/config/openvpn-client-export/openvpn-client-export.tgz</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/bin/</prefix>
-		<chmod>755</chmod>
-		<item>http://www.pfsense.com/packages/config/openvpn-client-export/bin/zip</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/bin/</prefix>
-		<chmod>755</chmod>
-		<item>http://www.pfsense.com/packages/config/openvpn-client-export/bin/unzip</item>
-	</additional_files_needed>	
-	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/openvpn-client-export/vpn_openvpn_export.php</item>
