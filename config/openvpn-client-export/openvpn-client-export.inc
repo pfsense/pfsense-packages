@@ -343,7 +343,7 @@ EOF;
 	}
 
 	// Zip Viscosity file
-	exec("cd {$tempdir}/.. && /usr/local/bin/zip {$zipfile} Viscosity.visc Viscosity.visc/*.*");
+	exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$zipfile} Viscosity.visc");
 
 	// Remove temporary directory
 	exec("rm -rf {$tempdir}");
