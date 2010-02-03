@@ -110,7 +110,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	if ($useaddr) {
 		$interface = $settings['interface'];
 		if (!$interface)
-			$interface = 'WAN';
+			$interface = 'wan';
 		$iface = convert_friendly_interface_to_real_interface_name($interface);
 		$lines = explode(' ', trim(shell_exec("ifconfig {$iface} | grep inet | grep -v inet6")));
 		$server_host = $lines[1];
