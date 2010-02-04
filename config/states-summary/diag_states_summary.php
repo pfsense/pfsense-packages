@@ -22,7 +22,7 @@ if(count($states) > 0) {
 		$parts = split(":", $ends[count($ends) - 1]);
 		$dstip = trim($parts[0]);
 		$dstport = trim($parts[1]);
-		
+
 		$srcipinfo[$srcip]['seen']++;
 		$srcipinfo[$srcip]['protos'][$proto]['seen']++;
 		if (!empty($srcport)) {
@@ -45,33 +45,33 @@ include("fbegin.inc");
 ?>
 <p class="pgtitle"><?=$pgtitle?></font></p>
 
-<table align="center" width="80%">
+<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
 	<tr>
-		<th>IP</th>
-		<th># States</th>
-		<th>Proto</th>
-		<th># States</th>
-		<th>Src Ports</th>
-		<th>Dst Ports</th>
+		<td class="listhdrr">IP</td>
+		<td class="listhdrr"># States</td>
+		<td class="listhdrr">Proto</td>
+		<td class="listhdrr"># States</td>
+		<td class="listhdrr">Src Ports</td>
+		<td class="listhdrr">Dst Ports</td>
 	</tr>
 <?php   uksort($srcipinfo, "sort_by_ip");
 	foreach($srcipinfo as $ip => $ipinfo) { ?>
 	<tr>
-		<td><?php echo $ip; ?></td>
-		<td align="center"><?php echo $ipinfo['seen']; ?></td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
+		<td class='vncell'><?php echo $ip; ?></td>
+		<td class='vncell'><?php echo $ipinfo['seen']; ?></td>
+		<td class='vncell'>&nbsp;</td>
+		<td class='vncell'>&nbsp;</td>
+		<td class='vncell'>&nbsp;</td>
+		<td class='vncell'>&nbsp;</td>
 	</tr>
 	<?php foreach($ipinfo['protos'] as $proto => $protoinfo) { ?>
 	<tr>
-		<td>&nbsp;</td>
-		<td>&nbsp;</td>
-		<td><?php echo $proto; ?></td>
-		<td align="center"><?php echo $protoinfo['seen']; ?></td>
-		<td align="center"><?php echo count($protoinfo['srcports']); ?></td>
-		<td align="center"><?php echo count($protoinfo['dstports']); ?></td>
+		<td class='list'>&nbsp;</td>
+		<td class='list'>&nbsp;</td>
+		<td class='listlr'><?php echo $proto; ?></td>
+		<td class='listr' align="center"><?php echo $protoinfo['seen']; ?></td>
+		<td class='listr' align="center"><?php echo count($protoinfo['srcports']); ?></td>
+		<td class='listr' align="center"><?php echo count($protoinfo['dstports']); ?></td>
 	</tr>
 	<?php } ?>
 <?php } ?>
