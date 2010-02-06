@@ -398,7 +398,8 @@ if ($_GET['saved'] == 'yes')
 
 $currentruleset = basename($rulefile);
 
-$pgtitle = "Snort: Interface $id$if_real Rule File $currentruleset";
+$ifname = strtoupper($pconfig['interface']);
+$pgtitle = "Snort: Interface $ifname Rule File $currentruleset";
 require("guiconfig.inc");
 include("head.inc");
 ?>

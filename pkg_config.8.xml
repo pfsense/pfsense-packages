@@ -340,7 +340,7 @@
       <depends_on_package>lightsquid-1.7.1_1.tbz</depends_on_package>
       <depends_on_package>perl-5.8.8_1.tbz</depends_on_package>
       <status>Beta1</status>
-      <required_version>1.2.1</required_version>
+      <required_version>3</required_version>
       <config_file>http://www.pfsense.com/packages/config/lightsquid/lightsquid.xml</config_file>
       <configurationfile>lightsquid.xml</configurationfile>
 	  <noembedded>true</noembedded>
@@ -625,7 +625,7 @@
       <category>Network</category>
       <version>2.6.21_11</version>
       <status>Stable</status>
-      <required_version>1.2.1</required_version>
+      <required_version>3</required_version>
       <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>squid-2.6.21.tbz</depends_on_package>
@@ -641,7 +641,7 @@
       <category>Network</category>
       <version>3.0.8_09</version>
       <status>ALPHA</status>
-      <required_version>1.2.1</required_version>
+      <required_version>3</required_version>
       <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>squid-3.0.8.tbz</depends_on_package>
