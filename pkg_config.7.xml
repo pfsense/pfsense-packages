@@ -966,7 +966,7 @@
       <name>States Summary</name>
       <descr>States Summary Page, which will summarize firewall states by IP address and protocol.</descr>
       <category>System</category>
-      <version>0.3</version>
+      <version>0.4</version>
       <status>Beta</status>
       <maintainer>jimp@pfsense.org</maintainer>
       <required_version>1.2.3</required_version>
