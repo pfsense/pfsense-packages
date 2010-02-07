@@ -266,7 +266,9 @@ function haproxy_configure() {
 							foreach($a_servers as $be) {
 								if(!$be['port'])
 									$be['port'] = $backend['port'];
-								fwrite ($fd, "\tserver\t\t\t" . $be['address'] . " " . $be['address'].":" . $be['port'] . " $cookie " . " $checkinter weight " . $be['weight'] . "{$advanced_txt}\n");
+								if (!$be['name'])
+									$be['name'] = $be['address'];
+								fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . " $cookie " . " $checkinter weight " . $be['weight'] . "{$advanced_txt}\n");
 							}
 						}
 					}

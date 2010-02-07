@@ -78,6 +78,7 @@ if ($_POST) {
 
 	$a_servers=array();			
 	for($x=0; $x<99; $x++) {
+		$server_name=$_POST['server_name'.$x];
 		$server_address=$_POST['server_address'.$x];
 		$server_port=$_POST['server_port'.$x];
 		$server_weight=$_POST['server_weight'.$x];
@@ -85,6 +86,7 @@ if ($_POST) {
 		if ($server_address) {
 
 			$server=array();
+			$server['name']=$server_name;
 			$server['address']=$server_address;
 			$server['port']=$server_port;
 			$server['weight']=$server_weight;
@@ -174,15 +176,18 @@ function clearcombo(){
 }
 </script>
 <script type="text/javascript">
-	rowname[0] = "server_address";
+	rowname[0] = "server_name";
 	rowtype[0] = "textbox";
 	rowsize[0] = "30";
-	rowname[1] = "server_port";
+	rowname[1] = "server_address";
 	rowtype[1] = "textbox";
-	rowsize[1] = "12";
-	rowname[2] = "server_weight";
+	rowsize[1] = "30";
+	rowname[2] = "server_port";
 	rowtype[2] = "textbox";
 	rowsize[2] = "12";
+	rowname[3] = "server_weight";
+	rowtype[3] = "textbox";
+	rowsize[3] = "12";
 </script>
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
@@ -226,10 +231,11 @@ function clearcombo(){
 			<td width="78%" class="vtable" colspan="2" valign="top">
 			<table class="" width="100%" cellpadding="0" cellspacing="0" id='servertable'>
 	                <tr>
-	                  <td width="35%" class="">Address</td>
-	                  <td width="40%" class="">Port</td>
-	                  <td width="20%" class="">Weight</td>
-	                  <td width="5%" class=""></td>
+	                  <td width="30%" class="">Name</td>
+	                  <td width="30%" class="">Address</td>
+	                  <td width="18%" class="">Port</td>
+	                  <td width="18%" class="">Weight</td>
+	                  <td width="4%" class=""></td>
 			</tr>
 			<?php 
 			$a_servers=$pconfig['a_servers'];
@@ -242,9 +248,14 @@ function clearcombo(){
 			foreach ($a_servers as $server) {
 			?>
 			<tr>
-				<td><input name="server_address<?=$counter;?>" type="text" value="<?=$server['address']; ?>" size="30"/></td>
-				<td><input name="server_port<?=$counter;?>" type="text" value="<?=$server['port']; ?>" size="12"/></td>
-				<td><input name="server_weight<?=$counter;?>" type="text" value="<?=$server['weight']; ?>" size="12"/></td>
+				<td class="vtable">
+				  <input name="server_name<?=$counter;?>" type="text" value="<?=$server['name']; ?>" size="30"/></td>
+				<td class="vtable">
+				  <input name="server_address<?=$counter;?>" type="text" value="<?=$server['address']; ?>" size="30"/></td>
+				<td class="vtable">
+				  <input name="server_port<?=$counter;?>" type="text" value="<?=$server['port']; ?>" size="12"/></td>
+				<td class="vtable">
+				  <input name="server_weight<?=$counter;?>" type="text" value="<?=$server['weight']; ?>" size="12"/></td>
 			  	<td class="list"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" onclick="removeRow(this); return false;"></td>
 			</tr>
 			<?php
@@ -260,7 +271,7 @@ function clearcombo(){
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Check freq</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="checkinter" type="text" <?if(isset($pconfig['checkinter'])) echo "value=\"{$pconfig['checkinter']}\"";?>size="64">
+				<input name="checkinter" type="text" <?if(isset($pconfig['checkinter'])) echo "value=\"{$pconfig['checkinter']}\"";?>size="20"> milliseconds
 				<br/>Defaults to 1000 if left blank.
 			</td>
 		</tr>
@@ -293,7 +304,7 @@ function clearcombo(){
 <br>
 <?php include("fend.inc"); ?>
 <script type="text/javascript">
-	field_counter_js = 3;
+	field_counter_js = 4;
 	rows = 1;
 	totalrows =  <?php echo $counter; ?>;
 	loaded =  <?php echo $counter; ?>;
@@ -340,6 +351,7 @@ var addRowTo = (function() {
 		} else {
 			td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows + "'></input><input type='checkbox' name='" + rowname[i] + totalrows + "'></input> ";
 		}
+		td.setAttribute("class","vtable");
 		tr.appendChild(td);
 	}
 	td = d.createElement("td");
