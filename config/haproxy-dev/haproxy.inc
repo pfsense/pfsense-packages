@@ -214,12 +214,36 @@ function haproxy_configure() {
 				fwrite ($fd, "\tstats\t\t\tauth " . $backend['stats_username'].":". $backend['stats_password']."\n");
 			}
 
-			$a_acl=&$frontend['ha_acls']['item'];
+			$a_acl=&$backend['ha_acls']['item'];
 			if(!is_array($a_acl)) 
 				$a_acl=array();
 			
-			foreach ($a_acl as $acl) 
-				fwrite ($fd, "\tacl\t\t\t".$acl['name']."\t\t".$acl['expression']."\n");
+			foreach ($a_acl as $acl) {
+				if ($acl['expression'] == "host_starts_with")
+					$expr = 'hdr_beg(host) -i';
+				else if ($acl['expression'] == "host_ends_with")
+					$expr = 'hdr_end(host) -i';
+				else if ($acl['expression'] == "host_matches")
+					$expr = 'hdr(host) -i';
+				else if ($acl['expression'] == "host_regex")
+					$expr = 'hdr_reg(host) -i';
+				else if ($acl['expression'] == "host_contains")
+					$expr = 'hdr_dir(host) -i';
+				else if ($acl['expression'] == "path_starts_with")
+					$expr = 'path_beg -i';
+				else if ($acl['expression'] == "path_ends_with")
+					$expr = 'path_end -i';
+				else if ($acl['expression'] == "path_matches")
+					$expr = 'path -i';
+				else if ($acl['expression'] == "path_regex")
+					$expr = 'path_reg -i';
+				else if ($acl['expression'] == "path_contains")
+					$expr = 'path_dir -i';
+				else if ($acl['expression'] == "source_ip")
+					$expr = 'src';
+				$expr .= " " . $acl['value'];	
+				fwrite ($fd, "\tacl\t\t\t".$acl['name']."\t".$expr."\n");
+			}
 
 			$server['backend'] .= " ";
 			if(is_array($a_servers)) {

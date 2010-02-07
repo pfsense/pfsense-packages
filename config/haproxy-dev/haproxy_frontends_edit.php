@@ -39,6 +39,19 @@ if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
 
 $a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 
+$a_expr = array();
+$a_expr[] = array("host_starts_with", "Host starts with:", "HTTP");
+$a_expr[] = array("host_ends_with", "Host ends with:", "HTTP");
+$a_expr[] = array("host_matches", "Host matches:", "HTTP");
+$a_expr[] = array("host_regex", "Host regex:", "HTTP");
+$a_expr[] = array("host_contains", "Host contains:", "HTTP");
+$a_expr[] = array("path_starts_with", "Path starts with:", "HTTP");
+$a_expr[] = array("path_ends_with", "Path ends with:", "HTTP");
+$a_expr[] = array("path_matches", "Path matches:", "HTTP");
+$a_expr[] = array("path_regex", "Path regex:", "HTTP");
+$a_expr[] = array("path_contains", "Path contains:", "HTTP");
+$a_expr[] = array("source_up", "Source IP:", "");
+
 if (isset($_POST['id']))
 	$id = $_POST['id'];
 else
@@ -47,13 +60,13 @@ else
 if (isset($id) && $a_backend[$id]) {
 	$pconfig['name'] = $a_backend[$id]['name'];
 	$pconfig['desc'] = $a_backend[$id]['desc'];
+	$pconfig['status'] = $a_backend[$id]['status'];
 	$pconfig['connection_timeout'] = $a_backend[$id]['connection_timeout'];
 	$pconfig['server_timeout'] = $a_backend[$id]['server_timeout'];
 	$pconfig['retries'] = $a_backend[$id]['retries'];
 	
 	$pconfig['type'] = $a_backend[$id]['type'];
 	$pconfig['balance'] = $a_backend[$id]['balance'];
-	$pconfig['monitor_uri'] = $a_backend[$id]['monitor_uri'];
 
 	$pconfig['forwardfor'] = $a_backend[$id]['forwardfor'];
 	$pconfig['httpclose'] = $a_backend[$id]['httpclose'];
@@ -74,7 +87,7 @@ if (isset($id) && $a_backend[$id]) {
 
 }
 
-$changedesc = "Services: HAProxy: Frontend";
+$changedesc = "Services: HAProxy: Listener";
 $changecount = 0;
 
 if ($_POST) {
@@ -87,7 +100,7 @@ if ($_POST) {
 		$reqdfields = explode(" ", "name connection_timeout server_timeout stats_username stats_password stats_uri stats_realm");
 		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout,Stats Username,Stats Password,Stats Uri,Stats Realm");		
 	} else {
-		$reqdfields = explode(" ", "name connection_timeout server_timeout monitor_uri");
+		$reqdfields = explode(" ", "name connection_timeout server_timeout");
 		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout,Monitor Uri");		
 	}
 	
@@ -137,6 +150,7 @@ if ($_POST) {
 	for($x=0; $x<99; $x++) {
 		$acl_name=$_POST['acl_name'.$x];
 		$acl_expression=$_POST['acl_expression'.$x];
+		$acl_value=$_POST['acl_value'.$x];
 
 		if ($acl_name) {
 			// check for duplicates
@@ -149,13 +163,14 @@ if ($_POST) {
 			$acl=array();
 			$acl['name']=$acl_name;
 			$acl['expression']=$acl_expression;
+			$acl['value']=$acl_value;
 			$a_acl[]=$acl;
 
 			if (preg_match("/[^a-zA-Z0-9\.\-_]/", $acl_name))
 				$input_errors[] = "The field 'Name' contains invalid characters.";
 
-			if (!preg_match("/.{2,}/", $acl_expression))
-				$input_errors[] = "The field 'Expression' is required.";
+			if (!preg_match("/.{2,}/", $acl_value))
+				$input_errors[] = "The field 'Value' is required.";
 
 			if (!preg_match("/.{2,}/", $acl_name))
 				$input_errors[] = "The field 'Name' is required.";
@@ -213,13 +228,13 @@ if ($_POST) {
 
 		update_if_changed("name", $backend['name'], $_POST['name']);
 		update_if_changed("description", $backend['desc'], $_POST['desc']);
+		update_if_changed("status", $backend['status'], $_POST['status']);
 		update_if_changed("connection_timeout", $backend['connection_timeout'], $_POST['connection_timeout']);
 		update_if_changed("server_timeout", $backend['server_timeout'], $_POST['server_timeout']);
 		update_if_changed("retries", $backend['retries'], $_POST['retries']);
 		update_if_changed("type", $backend['type'], $_POST['type']);
 		update_if_changed("balance", $backend['balance'], $_POST['balance']);
 		update_if_changed("cookie_name", $backend['cookie_name'], $_POST['cookie_name']);
-		update_if_changed("monitor_uri", $backend['monitor_uri'], $_POST['monitor_uri']);
 		update_if_changed("forwardfor", $backend['forwardfor'], $_POST['forwardfor']);
 		update_if_changed("httpclose", $backend['httpclose'], $_POST['httpclose']);
 		update_if_changed("stats_enabled", $backend['stats_enabled'], $_POST['stats_enabled']);
@@ -256,7 +271,7 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 
-$pgtitle = "HAProxy: Frontend: Edit";
+$pgtitle = "HAProxy: Listener: Edit";
 include("head.inc");
 
 ?>
@@ -293,7 +308,7 @@ include("head.inc");
 	                if(rowtype[i] == 'textbox') {
 	                        td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows + "'></input><input size='" + rowsize[i] + "' name='" + rowname[i] + totalrows + "'></input> ";
 	                } else if(rowtype[i] == 'select') {
-	                        td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows + "'></input><select name='" + rowname[i] + totalrows + "'><?php foreach ($a_backend as $backend) {?><option value=\"<?=$backend['name']?>\"><?=$backend['name']?></option><?php }?></select> ";
+	                        td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows + "'></input><select name='" + rowname[i] + totalrows + "'><?php foreach ($a_expr as $expr) {?><option value=\"<?=$expr[0]?>\"><?=$expr[1]?></option><?php }?></select> ";
 	                } else {
 	                        td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows + "'></input><input type='checkbox' name='" + rowname[i] + totalrows + "'></input> ";
 	                }
@@ -335,15 +350,15 @@ include("head.inc");
 
 	rowname[0] = "acl_name";
 	rowtype[0] = "textbox";
-	rowsize[0] = "30";
+	rowsize[0] = "20";
 
 	rowname[1] = "acl_expression";
-	rowtype[1] = "textbox";
-	rowsize[1] = "35";
+	rowtype[1] = "select";
+	rowsize[1] = "10";
 
-	rowname[2] = "acl_backend";
-	rowtype[2] = "select";
-	rowsize[2] = "10";
+	rowname[2] = "acl_value";
+	rowtype[2] = "textbox";
+	rowsize[2] = "35";
 
 	function toggle_stats() {
 		var stats_enabled=document.getElementById('stats_enabled');
@@ -373,9 +388,9 @@ include("head.inc");
 <?php endif; ?>
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
-			<td colspan="2" valign="top" class="listtopic">Edit haproxy backend</td>
-		</tr>		
-		<tr align="left">
+			<td colspan="2" valign="top" class="listtopic">Edit haproxy listener</td>
+		</tr>
+		<tr>
 			<td width="22%" valign="top" class="vncellreq">Name</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="name" type="text" <?if(isset($pconfig['name'])) echo "value=\"{$pconfig['name']}\"";?> size="25" maxlength="25">
@@ -387,6 +402,135 @@ include("head.inc");
 				<input name="desc" type="text" <?if(isset($pconfig['desc'])) echo "value=\"{$pconfig['desc']}\"";?> size="64">
 			</td>
 		</tr>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncellreq">Status</td>
+			<td width="78%" class="vtable" colspan="2">
+				<select name="status" id="status">
+					<option value="active"<?php if($pconfig['status'] == "active") echo " SELECTED"; ?>>Active</option>
+					<option value="disabled"<?php if($pconfig['status'] == "disabled") echo " SELECTED"; ?>>Disabled</option>
+				</select>
+			</td>
+		</tr>		
+		<tr>
+			  <td width="22%" valign="top" class="vncellreq">External address</td>
+			  <td width="78%" class="vtable">
+				<select name="extaddr" class="formfld">
+					<option value="" <?php if (!$pconfig['extaddr']) echo "selected"; ?>>Interface address</option>
+				<?php
+					if (is_array($config['virtualip']['vip'])):
+						foreach ($config['virtualip']['vip'] as $sn): 
+				?>
+					<option value="<?=$sn['subnet'];?>" <?php if ($sn['subnet'] == $pconfig['extaddr']) echo "selected"; ?>>
+						<?=htmlspecialchars("{$sn['subnet']} ({$sn['descr']})");?>
+					</option>
+				<?php
+						endforeach;
+					endif; 	
+				?>
+						<option value="any" <?php if($pconfig['extaddr'] == "any") echo "selected"; ?>>any</option>
+				</select>
+				<br />
+				<span class="vexpl">
+					If you want this rule to apply to another IP address than the IP address of the interface chosen above,
+					select it here (you need to define <a href="firewall_virtual_ip.php">Virtual IP</a> addresses on the first).  
+					Also note that if you are trying to redirect connections on the LAN select the "any" option.
+				</span>
+			  </td>
+		</tr>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncellreq">External port</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="10" maxlength="10">
+				<div>The port to listen to.  To specify multiple ports, separate with a comma (,). EXAMPLE: 80,443</div>
+			</td>
+		</tr>
+		<tr>
+			  <td width="22%" valign="top" class="vncellreq">Server pool</td>
+			  <td width="78%" class="vtable">
+				<select name="pool" class="formfld">
+				<?php
+					if (is_array($pconfig['ha_pools']['item'])) {
+						foreach ($config['ha_pools']['item'] as $p): 
+				?>
+					<option value="<?=$p['name'];?>" <?php if ($p['name'] == $pconfig['pool']) echo "selected"; ?>>
+						<?=htmlspecialchars("{$p['name']}");?>
+					</option>
+				<?php
+						endforeach;
+					} else { 	
+				?>
+					<option value="-">-</option>
+				<?php
+					}
+				?>
+				</select>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncellreq">Server Port</td>
+			<td width="78%" class="vtable" colspan="2">
+				<input name="svrport" type="text" <?if(isset($pconfig['svrport'])) echo "value=\"{$pconfig['svrport']}\"";?> size="10" maxlength="10">
+				<div>The default server port.</div>
+			</td>
+		</tr>
+		<tr align="left">
+			<td width="22%" valign="top" class="vncellreq">Type</td>
+			<td width="78%" class="vtable" colspan="2">
+				<select name="type" id="type" onchange="type_change();">
+					<option value="http"<?php if($pconfig['type'] == "http") echo " SELECTED"; ?>>HTTP</option>
+					<option value="https"<?php if($pconfig['type'] == "https") echo " SELECTED"; ?>>HTTPS</option>
+					<option value="tcp"<?php if($pconfig['type'] == "tcp") echo " SELECTED"; ?>>TCP</option>
+					<option value="health"<?php if($pconfig['type'] == "health") echo " SELECTED"; ?>>Health</option>
+				</select>
+			</td>
+		</tr>		
+		<tr>
+			<td width="22%" valign="top" class="vncell">Access Control lists</td>
+			<td width="78%" class="vtable" colspan="2" valign="top">
+			<table class="" width="100%" cellpadding="0" cellspacing="0" id='acltable'>
+	                <tr>
+	                  <td width="35%" class="">Name</td>
+	                  <td width="40%" class="">Expression</td>
+	                  <td width="20%" class="">Value</td>
+	                  <td width="5%" class=""></td>
+			</tr>
+			<?php 
+			$a_acl=$pconfig['a_acl'];
+
+			if (!is_array($a_acl)) {
+				$a_acl=array();
+			}
+
+			$i=0;
+			foreach ($a_acl as $acl) {
+			?>
+			<tr>
+				<td><input name="acl_name<?=$i;?>" type="text" value="<?=$acl['name']; ?>" size="20"/></td>
+				<td>
+				<select name="acl_expression<?=$i;?>" id="acl_expression<?=$i;?>">
+				<?php
+				foreach ($a_expr as $expr) { ?>
+					<option value="<?=$expr[0];?>"<?php if($acl['expression'] == $expr[0]) echo " SELECTED"; ?>><?=$expr[1];?></option>
+				<?php } ?>
+				</select>
+				</td>
+				<td><input name="acl_value<?=$i;?>" type="text" value="<?=$acl['value']; ?>" size="35"/></td>
+			  	<td class="list"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" onclick="removeRow(this); return false;"></td>
+			</tr>
+			<?php
+			$i++;
+			}
+			?>
+			</table>
+			<a onclick="javascript:addRowTo('acltable'); return false;" href="#">
+			<img border="0" src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" alt="" title="add another entry" />
+			</a><br/>
+			For more information about ACL's please see <a href='http://haproxy.1wt.eu/download/1.3/doc/configuration.txt' target='_new'>HAProxy Documentation</a> Section 7 - Using ACL's
+			</td>
+		</tr>
+	</table>
+	<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		<tr>
+			<td colspan="2" valign="top" class="listtopic">Advanced settings</td>
+		</tr>		
 		<tr align="left">
 			<td width="22%" valign="top" class="vncellreq">Connection timeout</td>
 			<td width="78%" class="vtable" colspan="2">
@@ -411,17 +555,6 @@ want the clients to see the failures. The number of attempts to reconnect is
 set by the 'retries' parameter (2).</div>
 			</td>
 		</tr>
-		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Type</td>
-			<td width="78%" class="vtable" colspan="2">
-				<select name="type" id="type" onchange="type_change();">
-					<option value="http"<?php if($pconfig['type'] == "http") echo " SELECTED"; ?>>HTTP</option>
-					<option value="https"<?php if($pconfig['type'] == "https") echo " SELECTED"; ?>>HTTPS</option>
-					<option value="tcp"<?php if($pconfig['type'] == "tcp") echo " SELECTED"; ?>>TCP</option>
-					<option value="health"<?php if($pconfig['type'] == "health") echo " SELECTED"; ?>>Health</option>
-				</select>
-			</td>
-		</tr>		
 		<tr align="left">
 			<td width="22%" valign="top" class="vncellreq">Balance</td>
 			<td width="78%" class="vtable" colspan="2">
@@ -491,48 +624,6 @@ set by the 'retries' parameter (2).</div>
 				<br/>
 			</td>
 		</tr>
-		<tr align="left">
-			<td width="22%" valign="top" id="monitorport_text" class="vncell">Monitor Uri</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input name="monitor_uri" type="text" <?if(isset($pconfig['monitor_uri'])) echo "value=\"{$pconfig['monitor_uri']}\"";?> size="50" maxlength="50">
-				<br/>
-				Example: / or /index.php or /index.html or /testmypage.cgi
-			</td>
-		</tr>
-				</tr>
-				<tr align="left">
-					<td width="22%" valign="top" class="vncellreq">Port</td>
-					<td width="78%" class="vtable" colspan="2">
-						<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="10" maxlength="10">
-						<div>The port to listen to.  To specify multiple ports, separate with a comma (,). EXAMPLE: 80,443</div>
-					</td>
-				</tr>
-				<tr>
-				  <td width="22%" valign="top" class="vncellreq">External address</td>
-				  <td width="78%" class="vtable">
-					<select name="extaddr" class="formfld">
-						<option value="" <?php if (!$pconfig['extaddr']) echo "selected"; ?>>Interface address</option>
-					<?php
-						if (is_array($config['virtualip']['vip'])):
-							foreach ($config['virtualip']['vip'] as $sn): 
-					?>
-						<option value="<?=$sn['subnet'];?>" <?php if ($sn['subnet'] == $pconfig['extaddr']) echo "selected"; ?>>
-							<?=htmlspecialchars("{$sn['subnet']} ({$sn['descr']})");?>
-						</option>
-					<?php
-							endforeach;
-						endif; 	
-					?>
-						<option value="any" <?php if($pconfig['extaddr'] == "any") echo "selected"; ?>>any</option>
-					</select>
-					<br />
-					<span class="vexpl">
-						If you want this rule to apply to another IP address than the IP address of the interface chosen above,
-						select it here (you need to define <a href="firewall_virtual_ip.php">Virtual IP</a> addresses on the first).  
-						Also note that if you are trying to redirect connections on the LAN select the "any" option.
-					</span>
-				  </td>
-				</tr>
 				<tr align="left">
 					<td width="22%" valign="top" class="vncell">Max connections</td>
 					<td width="78%" class="vtable" colspan="2">
@@ -547,56 +638,6 @@ set by the 'retries' parameter (2).</div>
 					</td>
 				</tr>
 <?php
-/*
-				<tr>
-					<td width="22%" valign="top" class="vncell">Access Control lists</td>
-					<td width="78%" class="vtable" colspan="2" valign="top">
-									<table class="" width="100%" cellpadding="0" cellspacing="0" id='acltable'>
-		                <tr>
-		                  <td width="35%" class="">Name</td>
-		                  <td width="40%" class="">Expression</td>
-		                  <td width="20%" class="">Backend</td>
-		                  <td width="5%" class=""></td>
-						</tr>
-						<?php 
-							$a_acl=$pconfig['a_acl'];
-
-							if (!is_array($a_acl)) {
-								$a_acl=array();
-							}
-
-							$i=0;
-							foreach ($a_acl as $acl) {
-						?>
-						<tr>
-							<td><input name="acl_name<?=$i;?>" type="text" value="<?=$acl['name']; ?>" size="30"/></td>
-							<td><input name="acl_expression<?=$i;?>" type="text" value="<?=$acl['expression']; ?>" size="35"/></td>
-							<td>
-								<select name="acl_backend<?=$i;?>" id="acl_backend<?=$i;?>">
-								<?php
-									if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
-										$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
-									}
-									$a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
-									foreach ($a_backend as $backend) { ?>
-										<option value="<?=$backend['name'];?>"<?php if($acl['backend'] == $backend['name']) echo " SELECTED"; ?>><?=$backend['name'];?></option>
-								<?php $i++; } ?>
-								</select>
-							</td>
-		                  <td class="list"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" onclick="removeRow(this); return false;"></td>
-						</tr>
-						<?php
-							$i++;
-							}
-						?>
-					</table>
-					<a onclick="javascript:addRowTo('acltable'); return false;" href="#">
-						<img border="0" src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" alt="" title="add another entry" />
-					</a><br/>
-					Fore more information about ACL's please see <a href='http://haproxy.1wt.eu/download/1.3/doc/configuration.txt' target='_new'>HAProxy Documentation</a> Section 7 - Using ACL's
-					</td>
-			</tr>
-*/
 ?>
 			<tr align="left">
 				<td width="22%" valign="top" class="vncell">Use 'forwardfor' option</td>

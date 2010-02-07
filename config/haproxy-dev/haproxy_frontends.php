@@ -69,7 +69,7 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 	
-$pgtitle = "Services: HAProxy: Frontend";
+$pgtitle = "Services: HAProxy: Listener";
 include("head.inc");
 
 ?>
@@ -89,10 +89,10 @@ include("head.inc");
   <?php
         /* active tabs */
         $tab_array = array();
-		$tab_array[] = array("Settings", false, "haproxy_global.php");
-        $tab_array[] = array("Frontends", true, "haproxy_frontends.php");		
-		$tab_array[] = array("Servers", false, "haproxy_servers.php");
-		display_top_tabs($tab_array);
+	$tab_array[] = array("Settings", false, "haproxy_global.php");
+        $tab_array[] = array("Listener", true, "haproxy_frontends.php");		
+	$tab_array[] = array("Server Pool", false, "haproxy_servers.php");
+	display_top_tabs($tab_array);
   ?>
   </td></tr>
   <tr>
@@ -102,7 +102,6 @@ include("head.inc");
                 <tr>
                   <td width="30%" class="listhdrr">Name</td>
                   <td width="40%" class="listhdrr">Description</td>
-                  <td width="10%" class="listhdrr">Stats URI</td>
                   <td width="10%" class="listhdrr">Type</td>
                   <td width="10%" class="list"></td>
 				</tr>
@@ -114,9 +113,6 @@ include("head.inc");
                   <td class="listlr" ondblclick="document.location='haproxy_frontends_edit.php?id=<?=$i;?>';">
 					<?=$backend['desc'];?>
                   </td>
-                 <td class="listlr" ondblclick="document.location='haproxy_frontends_edit.php?id=<?=$i;?>';">
-					<?=$backend['stats_uri'];?>
-                 </td>
                   <td class="listlr" ondblclick="document.location='haproxy_frontends_edit.php?id=<?=$i;?>';">
 					<?=$backend['type'];?>
                   </td>
