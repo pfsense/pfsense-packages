@@ -248,7 +248,14 @@ function clearcombo(){
 			$counter=0;
 			foreach ($a_servers as $server) {
 			?>
-			<tr>
+			<tr id="tr_view_<?=$counter;?>" name="tr_view_<?=$counter;?>">
+			<td class="vtable"><?=$server['name']; ?></td>
+			<td class="vtable"><?=$server['address']; ?></td>
+			<td class="vtable"><?=$server['port']; ?></td>
+			<td class="vtable"><?=$server['weight']; ?></td>
+			<td class="list"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" onclick="editRow(<?=$counter;?>); return false;"></td>
+			</tr>
+			<tr id="tr_edit_<?=$counter;?>" name="tr_edit_<?=$counter;?>" style="display: none;">
 				<td class="vtable">
 				  <input name="server_name<?=$counter;?>" type="text" value="<?=$server['name']; ?>" size="30"/></td>
 				<td class="vtable">
@@ -373,6 +380,13 @@ function removeRow(el) {
 	cel = el.getElementsByTagName("td").item(0);
 	el.parentNode.removeChild(el);
     }
+}
+function editRow(num) {
+    var trview = document.getElementById('tr_view_' + num);
+    var tredit = document.getElementById('tr_edit_' + num);
+
+    trview.style.display='none';
+    tredit.style.display='';
 }
 
 function find_unique_field_name(field_name) {
