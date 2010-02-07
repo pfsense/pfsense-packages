@@ -108,19 +108,21 @@ include("head.inc");
                   <td width="30%" class="listhdrr">Listener</td>
                   <td width="10%" class="list"></td>
 				</tr>
-                <?php $i = 0; foreach ($a_pools as $pool): ?>
+		<?php $i = 0; foreach ($a_pools as $pool):
+
+		foreach ($a_backends as $backend) {
+			unset($listener);
+			if($backend['pool'] == $pool['name']) {
+				$listener = $backend;
+			}
+		}
+ ?>
                 <tr>
                   <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
 			<?=$pool['name'];?>
                   </td>
                   <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
 <?php
-		foreach ($a_backends as $backend) {
-			if($backend['pool'] == $pool['name']) {
-				$listener = $backend;
-			}
-		}
-
        		if (is_array($listener)) {
 		     if ($listener['extaddr'])
 			     echo $listener['extaddr'];
