@@ -1,20 +1,20 @@
-<?php 
+<?php
 /*
 	status_ovpenvpn.php
 
     Copyright (C) 2008 Shrew Soft Inc.
     All rights reserved.
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
-	
+
 	1. Redistributions of source code must retain the above copyright notice,
 	   this list of conditions and the following disclaimer.
-	
+
 	2. Redistributions in binary form must reproduce the above copyright
 	   notice, this list of conditions and the following disclaimer in the
 	   documentation and/or other materials provided with the distribution.
-	
+
 	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
 	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
 	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
@@ -52,7 +52,7 @@ if (is_array($ovpnservers)) {
 		$errstr;
 
 		/* open a tcp connection to the management port of each server */
-		$fp = fsockopen("127.0.0.1", $port, $errval, $errstr, 1);
+		$fp = @fsockopen("127.0.0.1", $port, $errval, $errstr, 1);
 		if ($fp) {
 
 			/* send our status request */
@@ -89,6 +89,15 @@ if (is_array($ovpnservers)) {
 
 			/* cleanup */
 			fclose($fp);
+		} else {
+			$conn = array();
+			$conn['common_name'] = "[error]";
+			$conn['remote_host'] = "No Management Daemon";
+			$conn['virtual_addr'] = "See Note Below";
+			$conn['bytes_recv'] = 0;
+			$conn['bytes_sent'] = 0;
+			$conn['connect_time'] = 0;
+			$server['conns'][] = $conn;
 		}
 
 		$servers[] = $server;
@@ -106,7 +115,7 @@ echo $buff;
 
 	<table style="padding-top:0px; padding-bottom:0px; padding-left:0px; padding-right:0px" width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr>
-			<td colspan="6" class="listtopic"> 
+			<td colspan="6" class="listtopic">
 				Client connections for <?=$server['name'];?>
 			</td>
 		</tr>
