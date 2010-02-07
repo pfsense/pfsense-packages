@@ -126,6 +126,7 @@ if ($_POST) {
 
 		update_if_changed("name", $pool['name'], $_POST['name']);
 		update_if_changed("status", $pool['status'], $_POST['status']);
+		update_if_changed("cookie", $pool['cookie'], $_POST['cookie']);
 		update_if_changed("advanced", $pool['advanced'], base64_encode($_POST['advanced']));
 		update_if_changed("checkinter", $pool['checkinter'], $_POST['checkinter']);
 		update_if_changed("monitor_uri", $pool['monitor_uri'], $_POST['monitor_uri']);
