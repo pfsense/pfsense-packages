@@ -37,6 +37,9 @@ $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 if (!is_array($config['installedpackages']['haproxy']['ha_pools']['item'])) {
 	$config['installedpackages']['haproxy']['ha_pools']['item'] = array();
 }
+if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
+	$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
+}
 
 $a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
 $a_backends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
