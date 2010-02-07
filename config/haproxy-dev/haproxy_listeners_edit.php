@@ -104,7 +104,7 @@ if ($_POST) {
 		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout,Stats Username,Stats Password,Stats Uri,Stats Realm");		
 	} else {
 		$reqdfields = explode(" ", "name connection_timeout server_timeout");
-		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout,Monitor Uri");		
+		$reqdfieldsn = explode(",", "Name,Connection timeout,Server timeout");		
 	}
 	
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
@@ -365,7 +365,7 @@ include("head.inc");
 			</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Description</td>
+			<td width="22%" valign="top" class="vncell">Description</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="desc" type="text" <?if(isset($pconfig['desc'])) echo "value=\"{$pconfig['desc']}\"";?> size="64">
 			</td>
@@ -433,7 +433,7 @@ include("head.inc");
 				?>
 				</select>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Server Port</td>
+			<td width="22%" valign="top" class="vncell">Server Port</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="svrport" type="text" <?if(isset($pconfig['svrport'])) echo "value=\"{$pconfig['svrport']}\"";?> size="10" maxlength="10">
 				<div>The default server port.</div>
@@ -593,13 +593,13 @@ set by the 'retries' parameter (2).</div>
 			</td>
 		</tr>
 				<tr align="left">
-					<td width="22%" valign="top" class="vncell">Max connections</td>
+					<td width="22%" valign="top" class="vncellreq">Max connections</td>
 					<td width="78%" class="vtable" colspan="2">
 						<input name="max_connections" type="text" <?if(isset($pconfig['max_connections'])) echo "value=\"{$pconfig['max_connections']}\"";?> size="10" maxlength="10">
 					</td>
 				</tr>
 				<tr align="left">
-					<td width="22%" valign="top" class="vncell">Client timeout</td>
+					<td width="22%" valign="top" class="vncellreq">Client timeout</td>
 					<td width="78%" class="vtable" colspan="2">
 						<input name="client_timeout" type="text" <?if(isset($pconfig['client_timeout'])) echo "value=\"{$pconfig['client_timeout']}\"";?> size="10" maxlength="10">
 						<div>the time (in milliseconds) we accept to wait for data from the client, or for the client to accept data (30000).</div>
