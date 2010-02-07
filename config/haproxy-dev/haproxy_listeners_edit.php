@@ -51,7 +51,7 @@ $a_expr[] = array("path_ends_with", "Path ends with:", "HTTP");
 $a_expr[] = array("path_matches", "Path matches:", "HTTP");
 $a_expr[] = array("path_regex", "Path regex:", "HTTP");
 $a_expr[] = array("path_contains", "Path contains:", "HTTP");
-$a_expr[] = array("source_up", "Source IP:", "");
+$a_expr[] = array("source_ip", "Source IP:", "");
 
 if (isset($_POST['id']))
 	$id = $_POST['id'];

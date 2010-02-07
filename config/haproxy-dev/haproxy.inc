@@ -235,6 +235,8 @@ function haproxy_configure() {
 					$expr = 'path_dir -i';
 				else if ($acl['expression'] == "source_ip")
 					$expr = 'src';
+				else
+					$expr = $acl['expression'];
 				$expr .= " " . $acl['value'];	
 				fwrite ($fd, "\tacl\t\t\t".$acl['name']."\t".$expr."\n");
 			}
