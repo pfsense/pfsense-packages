@@ -2,7 +2,12 @@
 /*
 	status_ovpenvpn.php
 
+    Copyright (C) 2010 Jim Pingle
     Copyright (C) 2008 Shrew Soft Inc.
+
+    AJAX bits borrowed from diag_dump_states.php
+    Copyright (C) 2005 Scott Ullrich, Colin Smith
+
     All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -32,6 +37,42 @@ require("guiconfig.inc");
 require_once("vpn.inc");
 include("head.inc");
 
+/* Handle AJAX */
+if($_GET['action']) {
+	if($_GET['action'] == "kill") {
+		$port  = $_GET['port'];
+		$remipp  = $_GET['remipp'];
+		if (!empty($port) and !empty($remipp)) {
+			$retval = kill_client($port, $remipp);
+			echo htmlentities("|{$port}|{$remipp}|{$retval}|");
+		} else {
+			echo "invalid input";
+		}
+		exit;
+	}
+}
+
+
+function kill_client($port, $remipp) {
+	$fp = @fsockopen("127.0.0.1", $port, $errval, $errstr, 1);
+	$killed = -1;
+	if ($fp) {
+		fputs($fp, "kill {$remipp}\n");
+		while (!feof($fp)) {
+			$line = fgets($fp, 1024);
+			/* parse header list line */
+			if (strpos($line, "INFO:"))
+				continue;
+			if (strpos($line, "UCCESS")) {
+				$killed = 0;
+			}
+			break;
+		}
+		fclose($fp);
+	}
+	return $killed;
+}
+
 $servers = array();
 
 $ovpnservers = $config['installedpackages']['openvpnserver']['config'];
@@ -42,6 +83,7 @@ if (is_array($ovpnservers)) {
 		$port = $settings['local_port'];
 
 		$server = array();
+		$server['port'] = $settings['local_port'];
 		if ($settings['description'])
 			$server['name'] = "{$settings['description']} {$prot}:{$port}";
 		else
@@ -59,7 +101,6 @@ if (is_array($ovpnservers)) {
 			fputs($fp, "status 2\n");
 
 			/* recv all response lines */
-			$buff = "";
 			while (!feof($fp)) {
 
 				/* read the next line */
@@ -102,69 +143,107 @@ if (is_array($ovpnservers)) {
 
 		$servers[] = $server;
 	}
-}
+} ?>
 
-include("head.inc");
-include("fbegin.inc");
-echo "<p class=\"pgtitle\">$pgtitle</p>";
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC" onload="<?=$jsevents["body"]["onload"];?>">
+<script src="/javascript/sorttable.js" type="text/javascript"></script>
+<script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
+<script src="/javascript/scriptaculous/scriptaculous.js" type="text/javascript"></script>
+<?php include("fbegin.inc"); ?>
+<p class="pgtitle"><?php echo $pgtitle; ?></p>
+<form action="status_openvpn.php" method="get" name="iform">
 
-echo $buff;
+<script type="text/javascript">
+	function killClient(mport, remipp) {
+		var busy = function(icon) {
+			icon.onclick      = "";
+			icon.src          = icon.src.replace("\.gif", "_d.gif");
+			icon.style.cursor = "wait";
+		}
 
-?>
-	<?php foreach ($servers as $server): ?>
+		$A(document.getElementsByName("i:" + mport + ":" + remipp)).each(busy);
 
-	<table style="padding-top:0px; padding-bottom:0px; padding-left:0px; padding-right:0px" width="100%" border="0" cellpadding="0" cellspacing="0">
-		<tr>
-			<td colspan="6" class="listtopic">
-				Client connections for <?=$server['name'];?>
-			</td>
-		</tr>
-		<tr>
-			<td>
-				<table style="padding-top:0px; padding-bottom:0px; padding-left:0px; padding-right:0px" class="tabcont sortable" width="100%" border="0" cellpadding="0" cellspacing="0">
-				<tr>
-					<td class="listhdrr">Common Name</td>
-					<td class="listhdrr">Real Address</td>
-					<td class="listhdrr">Virtual Address</td>
-					<td class="listhdrr">Connected Since</td>
-					<td class="listhdrr">Bytes Sent</td>
-					<td class="listhdrr">Bytes Received</td>
-				</tr>
+		new Ajax.Request(
+			"<?=$_SERVER['SCRIPT_NAME'];?>" +
+				"?action=kill&port=" + mport + "&remipp=" + remipp,
+			{ method: "get", onComplete: killComplete }
+		);
+	}
 
-				<?php foreach ($server['conns'] as $conn): ?>
-				<tr>
-					<td class="listlr">
-						<?=$conn['common_name'];?>
-					</td>
-					<td class="listr">
-						<?=$conn['remote_host'];?>
-					</td>
-					<td class="listr">
-						<?=$conn['virtual_addr'];?>
-					</td>
-					<td class="listr">
-						<?=$conn['connect_time'];?>
-					</td>
-					<td class="listr">
-						<?=$conn['bytes_sent'];?>
-					</td>
-					<td class="listr">
-						<?=$conn['bytes_recv'];?>
-					</td>
-				</tr>
+	function killComplete(req) {
+		var values = req.responseText.split("|");
+		if(values[3] != "0") {
+			alert('<?=gettext("An error occurred.");?>' + ' (' + values[3] + ')');
+			return;
+		}
 
-				<?php endforeach; ?>
-				<tr>
-					<td colspan="6" class="list" height="12"></td>
-				</tr>
+		$A(document.getElementsByName("r:" + values[1] + ":" + values[2])).each(
+			function(row) { Effect.Fade(row, { duration: 1.0 }); }
+		);
+	}
+</script>
 
-			</table>
-			</td>
-		</tr>
-	</table>
 
-	<?php endforeach; ?>
-	<br/>
-	<br/><b>NOTE:</b> You must enable the OpenVPN management interface for each server you want to monitor. You can do this by placing "management 127.0.0.1 &lt;port&gt;;" in the custom options box for the server, where &lt;port&gt; is the port number set for that server.
+<?php foreach ($servers as $server): ?>
+
+<table style="padding-top:0px; padding-bottom:0px; padding-left:0px; padding-right:0px" width="100%" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		<td colspan="6" class="listtopic">
+			Client connections for <?=$server['name'];?>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table style="padding-top:0px; padding-bottom:0px; padding-left:0px; padding-right:0px" class="tabcont sortable" width="100%" border="0" cellpadding="0" cellspacing="0">
+			<tr>
+				<td class="listhdrr">Common Name</td>
+				<td class="listhdrr">Real Address</td>
+				<td class="listhdrr">Virtual Address</td>
+				<td class="listhdrr">Connected Since</td>
+				<td class="listhdrr">Bytes Sent</td>
+				<td class="listhdrr">Bytes Received</td>
+			</tr>
+
+			<?php foreach ($server['conns'] as $conn): ?>
+			<tr name='<?php echo "r:{$server['port']}:{$conn['remote_host']}"; ?>'>
+				<td class="listlr">
+					<?=$conn['common_name'];?>
+				</td>
+				<td class="listr">
+					<?=$conn['remote_host'];?>
+				</td>
+				<td class="listr">
+					<?=$conn['virtual_addr'];?>
+				</td>
+				<td class="listr">
+					<?=$conn['connect_time'];?>
+				</td>
+				<td class="listr">
+					<?=$conn['bytes_sent'];?>
+				</td>
+				<td class="listr">
+					<?=$conn['bytes_recv'];?>
+				</td>
+				<td class='list'>
+					<img src='/themes/<?php echo $g['theme']; ?>/images/icons/icon_x.gif' height='17' width='17' border='0'
+					   onclick="killClient('<?php echo $server['port']; ?>', '<?php echo $conn['remote_host']; ?>');" style='cursor:pointer;'
+					   name='<?php echo "i:{$server['port']}:{$conn['remote_host']}"; ?>'
+					   title='Kill client connection from <?php echo $conn['remote_host']; ?>' alt='' />
+				</td>
+			</tr>
+
+			<?php endforeach; ?>
+			<tr>
+				<td colspan="6" class="list" height="12"></td>
+			</tr>
+
+		</table>
+		</td>
+	</tr>
+</table>
+
+<?php endforeach; ?>
+<br/>
+<br/><b>NOTE:</b> You must enable the OpenVPN management interface for each server you want to monitor. You can do this by placing "management 127.0.0.1 &lt;port&gt;;" in the custom options box for the server, where &lt;port&gt; is the port number set for that server.
 
 <?php include("fend.inc"); ?>
