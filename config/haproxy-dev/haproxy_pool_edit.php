@@ -92,13 +92,25 @@ if ($_POST) {
 			$server['weight']=$server_weight;
 			$a_servers[]=$server;
 
+			if (preg_match("/[^a-zA-Z0-9\.\-_]/", $server_name))
+				$input_errors[] = "The field 'Name' contains invalid characters.";
 			if (preg_match("/[^a-zA-Z0-9\.\-_]/", $server_address))
 				$input_errors[] = "The field 'Address' contains invalid characters.";
+
+			if (!preg_match("/.{2,}/", $server_name))
+				$input_errors[] = "The field 'Name' is required.";
+
+			if (!preg_match("/.{2,}/", $server_address))
+				$input_errors[] = "The field 'Address' is required.";
 
 			if (!preg_match("/.{2,}/", $server_weight))
 				$input_errors[] = "The field 'Weight' is required.";
 
-			}
+			if (!is_numeric($server_weight))
+				$input_errors[] = "The field 'Weight' value is not a number.";
+			if ($server_port && !is_numeric($server_port))
+				$input_errors[] = "The field 'Port' value is not a number.";
+		}
 	}
 
 	if (!$input_errors) {
@@ -150,6 +162,7 @@ if ($_POST) {
 		header("Location: haproxy_pools.php");
 		exit;
 	}
+	$pconfig['a_servers']=&$a_pools[$id]['ha_servers']['item'];	
 }
 
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
