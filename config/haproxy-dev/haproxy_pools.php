@@ -103,45 +103,26 @@ include("head.inc");
               <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
                   <td width="30%" class="listhdrr">Name</td>
-                  <td width="30%" class="listhdrr">Server</td>
                   <td width="20%" class="listhdrr">Status</td>
                   <td width="30%" class="listhdrr">Listener</td>
                   <td width="10%" class="list"></td>
 				</tr>
-		<?php $i = 0; foreach ($a_pools as $pool):
-
-		foreach ($a_backends as $backend) {
-			unset($listener);
-			if($backend['pool'] == $pool['name']) {
-				$listener = $backend;
-			}
-		}
- ?>
+		<?php $i = 0; foreach ($a_pools as $pool): ?>
                 <tr>
                   <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
 			<?=$pool['name'];?>
-                  </td>
-                  <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
-<?php
-       		if (is_array($listener)) {
-		     if ($listener['extaddr'])
-			     echo $listener['extaddr'];
-		     else
-			     echo "any";
-		     if ($listener['port'])
-			     echo ":" . $listener['port'];
-		} else
-			echo '-';
-?>
-
                   </td>
                   <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
 			<?=$pool['status'];?>
                   </td>
                   <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
 <?php
-       		if (is_array($listener)) {
-		     echo $listener['name'];
+		$sep = "";
+		foreach ($a_backends as $backend) {
+			if($backend['pool'] == $pool['name']) {
+				echo $sep . $backend['name'];
+				$sep = ", ";
+			}
 		}
 ?>
                   </td>

@@ -100,11 +100,12 @@ include("head.inc");
 	<div id="mainarea">
               <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td width="30%" class="listhdrr">Name</td>
-                  <td width="40%" class="listhdrr">Description</td>
+                  <td width="20%" class="listhdrr">Name</td>
+                  <td width="30%" class="listhdrr">Description</td>
+                  <td width="20%" class="listhdrr">Address</td>
                   <td width="10%" class="listhdrr">Type</td>
-                  <td width="10%" class="listhdrr">Server pool</td>
-                  <td width="10%" class="list"></td>
+                  <td width="10%" class="listhdrr">Server&nbsp;pool</td>
+                  <td width="5%" class="list"></td>
 				</tr>
 			  <?php $i = 0; foreach ($a_backend as $backend): ?>
                 <tr>
@@ -113,6 +114,17 @@ include("head.inc");
                   </td>
                   <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$i;?>';">
 					<?=$backend['desc'];?>
+                  </td>
+                  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$i;?>';">
+<?php
+			if($backend['extaddr'] == "any") 
+				echo "0.0.0.0";
+			elseif($backend['extaddr']) 
+				echo $backend['extaddr'];
+			else 
+				echo get_current_wan_address('wan');
+			echo ":" . $backend['port'];
+?>
                   </td>
                   <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$i;?>';">
 					<?=$backend['type'];?>
