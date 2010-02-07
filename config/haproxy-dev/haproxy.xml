@@ -44,13 +44,13 @@
 	<name>haproxy</name>
 	<version>1.0</version>
 	<title>HAProxy</title>
-	<aftersaveredirect>/pkg_ediwt.php?xml=haproxy_servers.php</aftersaveredirect>
+	<aftersaveredirect>/pkg_ediwt.php?xml=haproxy_pools.php</aftersaveredirect>
 	<include_file>/usr/local/pkg/haproxy.inc</include_file>
 	<menu>
 		<name>HAProxy</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
-		<url>/haproxy_frontends.php</url>
+		<url>/haproxy_listeners.php</url>
 	</menu>
 	<service>
 		<name>HAProxy</name>
@@ -67,12 +67,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy-dev/haproxy_frontends.php</item>
+		<item>http://www.pfsense.com/packages/config/haproxy-dev/haproxy_listeners.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy-dev/haproxy_frontends_edit.php</item>
+		<item>http://www.pfsense.com/packages/config/haproxy-dev/haproxy_listeners_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
@@ -82,12 +82,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy-dev/haproxy_servers.php</item>
+		<item>http://www.pfsense.com/packages/config/haproxy-dev/haproxy_pools.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/haproxy-dev/haproxy_servers_edit.php</item>
+		<item>http://www.pfsense.com/packages/config/haproxy-dev/haproxy_pool_edit.php</item>
 	</additional_files_needed>
 	<custom_delete_php_command>
 	</custom_delete_php_command>

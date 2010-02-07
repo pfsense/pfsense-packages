@@ -1,7 +1,7 @@
 <?php
 /* $Id: load_balancer_pool_edit.php,v 1.24.2.23 2007/03/03 00:07:09 smos Exp $ */
 /*
-	haproxy_servers_edit.php
+	haproxy_pool_edit.php
 	part of pfSense (http://www.pfsense.com/)
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
@@ -34,30 +34,28 @@ require("guiconfig.inc");
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 $a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 
-if (!is_array($config['installedpackages']['haproxy']['ha_servers']['item'])) {
-	$config['installedpackages']['haproxy']['ha_servers']['item'] = array();
+if (!is_array($config['installedpackages']['haproxy']['ha_pools']['item'])) {
+	$config['installedpackages']['haproxy']['ha_pools']['item'] = array();
 }
 
-$a_server = &$config['installedpackages']['haproxy']['ha_servers']['item'];
+$a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
 
 if (isset($_POST['id']))
 	$id = $_POST['id'];
 else
 	$id = $_GET['id'];
 
-if (isset($id) && $a_server[$id]) {
-	$pconfig['name'] = $a_server[$id]['name'];
-	$pconfig['address'] = $a_server[$id]['address'];
-	$pconfig['port'] = $a_server[$id]['port'];
-	$pconfig['backend'] = $a_server[$id]['backend'];
-	$pconfig['weight'] = $a_server[$id]['weight'];
-	$pconfig['checkinter'] = $a_server[$id]['checkinter'];
-	$pconfig['cookie'] = $a_server[$id]['cookie'];
-	$pconfig['status'] = $a_server[$id]['status'];
-	$pconfig['advanced'] = base64_decode($a_server[$id]['advanced']);
+if (isset($id) && $a_pools[$id]) {
+	$pconfig['name'] = $a_pools[$id]['name'];
+	$pconfig['checkinter'] = $a_pools[$id]['checkinter'];
+	$pconfig['monitor_uri'] = $a_pools[$id]['monitor_uri'];
+	$pconfig['cookie'] = $a_pools[$id]['cookie'];
+	$pconfig['status'] = $a_pools[$id]['status'];
+	$pconfig['advanced'] = base64_decode($a_pools[$id]['advanced']);
+	$pconfig['a_servers']=&$a_pools[$id]['ha_servers']['item'];	
 }
 
-$changedesc = "Services: HAProxy: Servers: ";
+$changedesc = "Services: HAProxy: pools: ";
 $changecount = 0;
 
 if ($_POST) {
@@ -66,71 +64,62 @@ if ($_POST) {
 	unset($input_errors);
 	$pconfig = $_POST;
 	
-	$reqdfields = explode(" ", "name address weight");
-	$reqdfieldsn = explode(",", "Name,Address,Weight");		
+	$reqdfields = explode(" ", "name");
+	$reqdfieldsn = explode(",", "Name");		
 
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['name']))
 		$input_errors[] = "The field 'Name' contains invalid characters.";
 
-	if (preg_match("/[^a-zA-Z0-9\.]/", $_POST['address']))
-		$input_errors[] = "The field 'Address' contains invalid characters.";
-
-	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $_POST['cookie']))
-		$input_errors[] = "The field 'Cookie' contains invalid characters.";
-
-	if ($_POST['port'] && !is_numeric($_POST['port']))
-		$input_errors[] = "The field 'Port' value is not a number.";
-	else {
-		if ($_POST['port'])
-			if (!($_POST['port']>=1 && $_POST['port']<=65535))
-				$input_errors[] = "The field 'Port' value must be between 1 and 65535.";
-	}
-	
-	if (!is_numeric($_POST['weight']))
-		$input_errors[] = "The field 'Weight' value is not a number.";
-	else {
-		if (!($_POST['weight']>=1 && $_POST['weight']<=256))
-			$input_errors[] = "The field 'Weight' value must be between 1 and 256.";
-	}
-	
 	/* Ensure that our pool names are unique */
-	for ($i=0; isset($config['installedpackages']['haproxy']['ha_servers']['item'][$i]); $i++)
-		if (($_POST['name'] == $config['installedpackages']['haproxy']['ha_servers']['item'][$i]['name']) && ($i != $id))
-			$input_errors[] = "This server name has already been used.  Server names must be unique.";
+	for ($i=0; isset($config['installedpackages']['haproxy']['ha_pools']['item'][$i]); $i++)
+		if (($_POST['name'] == $config['installedpackages']['haproxy']['ha_pools']['item'][$i]['name']) && ($i != $id))
+			$input_errors[] = "This pool name has already been used.  Pool names must be unique.";
 
-	$backend = "";
-	for($x=0; $x<299; $x++) {
-		$comd = "\$backends = \$_POST['backend" . $x . "'];";
-		eval($comd);
-		if($backends) 
-			$backend .= "$backends ";
+	$a_servers=array();			
+	for($x=0; $x<99; $x++) {
+		$server_address=$_POST['server_address'.$x];
+		$server_port=$_POST['server_port'.$x];
+		$server_weight=$_POST['server_weight'.$x];
+
+		if ($server_address) {
+
+			$server=array();
+			$server['address']=$server_address;
+			$server['port']=$server_port;
+			$server['weight']=$server_weight;
+			$a_servers[]=$server;
+
+			if (preg_match("/[^a-zA-Z0-9\.\-_]/", $server_address))
+				$input_errors[] = "The field 'Address' contains invalid characters.";
+
+			if (!preg_match("/.{2,}/", $server_weight))
+				$input_errors[] = "The field 'Weight' is required.";
+
+			}
 	}
-	$backend = trim($backend);
 
 	if (!$input_errors) {
-		$server = array();
-		if(isset($id) && $a_server[$id])
-			$server = $a_server[$id];
+		$pool = array();
+		if(isset($id) && $a_pools[$id])
+			$pool = $a_pools[$id];
 			
-		if($server['name'] != "")
-			$changedesc .= " modified '{$server['name']}' pool:";
+		if($pool['name'] != "")
+			$changedesc .= " modified '{$pool['name']}' pool:";
 
-		update_if_changed("name", $server['name'], $_POST['name']);
-		update_if_changed("port", $server['port'], $_POST['port']);
-		update_if_changed("backend", $server['backend'], $backend);
-		update_if_changed("cookie", $server['cookie'], $_POST['cookie']);
-		update_if_changed("weight", $server['weight'], $_POST['weight']);
-		update_if_changed("status", $server['status'], $_POST['status']);
-		update_if_changed("address", $server['address'], $_POST['address']);
-		update_if_changed("advanced", $server['advanced'], base64_encode($_POST['advanced']));
-		update_if_changed("checkinter", $server['checkinter'], $_POST['checkinter']);
+		$pool['ha_servers']['item']=$a_servers;
 
-		if (isset($id) && $a_server[$id]) {
-			$a_server[$id] = $server;
+		update_if_changed("name", $pool['name'], $_POST['name']);
+		update_if_changed("status", $pool['status'], $_POST['status']);
+		update_if_changed("advanced", $pool['advanced'], base64_encode($_POST['advanced']));
+		update_if_changed("checkinter", $pool['checkinter'], $_POST['checkinter']);
+		update_if_changed("monitor_uri", $pool['monitor_uri'], $_POST['monitor_uri']);
+
+		if (isset($id) && $a_pools[$id]) {
+			$a_pools[$id] = $pool;
 		} else {
-			$a_server[] = $server;
+			$a_pools[] = $pool;
 		}
 
 		if ($changecount > 0) {
@@ -152,7 +141,7 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 
-$pgtitle = "HAProxy: Server: Edit";
+$pgtitle = "HAProxy: pool: Edit";
 include("head.inc");
 
 row_helper();
@@ -173,96 +162,30 @@ function clearcombo(){
 }
 </script>
 <script type="text/javascript">
-	rowname[0] = "backend";
-	rowtype[0] = "select";
-	rowsize[0] = "1";
+	rowname[0] = "server_address";
+	rowtype[0] = "textbox";
+	rowsize[0] = "30";
+	rowname[1] = "server_port";
+	rowtype[1] = "textbox";
+	rowsize[1] = "12";
+	rowname[2] = "server_weight";
+	rowtype[2] = "textbox";
+	rowsize[2] = "12";
 </script>
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if($one_two): ?>
 <p class="pgtitle"><?=$pgtitle?></p>
 <?php endif; ?>
-	<form action="haproxy_servers_edit.php" method="post" name="iform" id="iform">
+	<form action="haproxy_pool_edit.php" method="post" name="iform" id="iform">
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
-			<td colspan="2" valign="top" class="listtopic">Edit HAProxy server</td>
+			<td colspan="2" valign="top" class="listtopic">Edit HAProxy pool</td>
 		</tr>	
 		<tr align="left">
 			<td width="22%" valign="top" class="vncellreq">Name</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="name" type="text" <?if(isset($pconfig['name'])) echo "value=\"{$pconfig['name']}\"";?> size="16" maxlength="16">
-			</td>
-		</tr>
-		<tr align="left">
-		  <td width="22%" valign="top" class="vncellreq">Frontend(s)</td>
-		  <td width="78%" class="vtable">
-			<table id="frontendtable">
-			  <tbody>
-				<tr>
-					<td><div id="onecolumn"></div></td>
-				</tr>
-				<?php
-					$counter = 0;
-					$tracker = 0;
-					$backend = $pconfig['backend'];
-					$item = explode(" ", $backend);
-					foreach($item as $ww) {
-						$address = $ww;
-						if($counter > 0) 
-							$tracker = $counter + 1;
-				?>
-				<tr>
-					<td>
-						<select name="backend<?php echo $tracker; ?>">
-							<?php 
-								$i = 0; 
-								if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) 
-									$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
-								$backends = split(" ", $pconfig['backend']);
-								foreach ($a_backend as $backend) {
-							?>
-							<option value="<?=$backend['name'];?>" <?php if($backend['name'] == $ww) echo "SELECTED";?>>
-								<?=$backend['name'];?>
-							</option>
-							<?php } ?>
-						</select>
-					</td>
-				<td>
-				<?php
-						if($counter > 0)
-		  					echo "<input type=\"image\" src=\"/themes/".$g['theme']."/images/icons/icon_x.gif\" onclick=\"removeRow(this); return false;\" value=\"Delete\" />";
-				?>
-				</td>
-				</tr>
-				<?php
-					$counter++;
-				 } // end foreach
-				?>
-			  </tbody>
-			  <tfoot>
-			  </tfoot>
-		  </table>
-			<a onclick="javascript:addRowTo('frontendtable'); return false;" href="#">
-				<img border="0" src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" alt="" title="add another entry" />
-			</a>
-		</td>
-		</tr>
-		<tr>
-			<td width="22%" valign="top" class="vncellreq">
-			<div id="addressnetworkport">
-				IP Address
-			</div>
-		  </td>
-		  <td width="78%" class="vtable">
-			<input name="address" type="text" id="address" size="30" value="<?=htmlspecialchars($pconfig['address']);?>" />
-		</td>
-		</tr>
-		<tr align="left">
-			<td width="22%" valign="top" class="vncell">Port</td>
-			<td width="78%" class="vtable" colspan="2">
-				<input name="port" type="text" <?if(isset($pconfig['port'])) echo "value=\"{$pconfig['port']}\"";?> size="5">
-				<br/>
-				NOTE: Leave blank to use Frontend port selection.
 			</td>
 		</tr>
 		<tr align="left">
@@ -279,7 +202,7 @@ function clearcombo(){
 			<td width="78%" class="vtable" colspan="2">
 				<input name="cookie" type="text" <?if(isset($pconfig['cookie'])) echo "value=\"{$pconfig['cookie']}\"";?>size="64"><br/>
 				  This value will be checked in incoming requests, and the first
-				  operational server possessing the same value will be selected. In return, in
+				  operational pool possessing the same value will be selected. In return, in
 				  cookie insertion or rewrite modes, this value will be assigned to the cookie
 				  sent to the client. There is nothing wrong in having several servers sharing
 				  the same cookie value, and it is in fact somewhat common between normal and
@@ -287,23 +210,52 @@ function clearcombo(){
 				
 			</td>
 		</tr>
+		<tr>
+			<td width="78%" class="vtable" colspan="2" valign="top">
+			<table class="" width="100%" cellpadding="0" cellspacing="0" id='servertable'>
+	                <tr>
+	                  <td width="35%" class="">Address</td>
+	                  <td width="40%" class="">Port</td>
+	                  <td width="20%" class="">Weight</td>
+	                  <td width="5%" class=""></td>
+			</tr>
+			<?php 
+			$a_servers=$pconfig['a_servers'];
+
+			if (!is_array($a_servers)) {
+				$a_servers=array();
+			}
+
+			$counter=0;
+			foreach ($a_servers as $server) {
+			?>
+			<tr>
+				<td><input name="server_address<?=$counter;?>" type="text" value="<?=$server['address']; ?>" size="30"/></td>
+				<td><input name="server_port<?=$counter;?>" type="text" value="<?=$server['port']; ?>" size="12"/></td>
+				<td><input name="server_weight<?=$counter;?>" type="text" value="<?=$server['weight']; ?>" size="12"/></td>
+			  	<td class="list"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" onclick="removeRow(this); return false;"></td>
+			</tr>
+			<?php
+			$counter++;
+			}
+			?>
+			</table>
+			<a onclick="javascript:addRowTo('servertable'); return false;" href="#">
+			<img border="0" src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" alt="" title="add another entry" />
+			</a>
+			</td>
+		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncell">Check inter</td>
+			<td width="22%" valign="top" class="vncell">Check freq</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="checkinter" type="text" <?if(isset($pconfig['checkinter'])) echo "value=\"{$pconfig['checkinter']}\"";?>size="64">
 				<br/>Defaults to 1000 if left blank.
 			</td>
 		</tr>
 		<tr align="left">
-			<td width="22%" valign="top" class="vncell">Weight</td>
+			<td width="22%" valign="top" class="vncell">Health check URI</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="weight" type="text" <?if(isset($pconfig['weight'])) echo "value=\"{$pconfig['weight']}\"";?>size="64"><br/>
-				The default weight is 1, and the maximal value is 255.<br/>
-				NOTE: If this 
-					  parameter is used to distribute the load according to server's capacity, it 
-					  is recommended to start with values which can both grow and shrink, for 
-					  instance between 10 and 100 to leave enough room above and below for later 
-					  adjustments.
+				<input name="monitor_uri" type="text" <?if(isset($pconfig['monitor_uri'])) echo "value=\"{$pconfig['monitor_uri']}\"";?>size="64"><br/>
 			</td>
 		</tr>
 		<tr align="left">
@@ -319,7 +271,7 @@ function clearcombo(){
 			<td width="78%">
 				<input name="Submit" type="submit" class="formbtn" value="Save">  
 				<input type="button" class="formbtn" value="Cancel" onclick="history.back()">
-				<?php if (isset($id) && $a_server[$id]): ?>
+				<?php if (isset($id) && $a_pools[$id]): ?>
 				<input name="id" type="hidden" value="<?=$id;?>">
 				<?php endif; ?>
 			</td>
@@ -329,10 +281,10 @@ function clearcombo(){
 <br>
 <?php include("fend.inc"); ?>
 <script type="text/javascript">
-	field_counter_js = 1;
+	field_counter_js = 3;
 	rows = 1;
-	totalrows = <?php echo $counter; ?>;
-	loaded = <?php echo $counter; ?>;
+	totalrows =  <?php echo $counter; ?>;
+	loaded =  <?php echo $counter; ?>;
 </script>
 </body>
 </html>

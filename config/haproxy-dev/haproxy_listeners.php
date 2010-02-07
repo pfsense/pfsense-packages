@@ -54,14 +54,14 @@ if ($_POST) {
 }
 
 if ($_GET['act'] == "del") {
-	if ($a_backend[$_GET['id']]) {
+	if (isset($a_backend[$_GET['id']])) {
 		if (!$input_errors) {
 			unset($a_backend[$_GET['id']]);
 			write_config();
 			touch($d_haproxyconfdirty_path);
-			header("Location: haproxy_frontends.php");
-			exit;
 		}
+		header("Location: haproxy_listeners.php");
+		exit;
 	}
 }
 
@@ -75,7 +75,7 @@ include("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<form action="haproxy_frontends.php" method="post">
+<form action="haproxy_listeners.php" method="post">
 <?php if($one_two): ?>
 <p class="pgtitle"><?=$pgtitle?></p>
 <?php endif; ?>
@@ -90,8 +90,8 @@ include("head.inc");
         /* active tabs */
         $tab_array = array();
 	$tab_array[] = array("Settings", false, "haproxy_global.php");
-        $tab_array[] = array("Listener", true, "haproxy_frontends.php");		
-	$tab_array[] = array("Server Pool", false, "haproxy_servers.php");
+        $tab_array[] = array("Listener", true, "haproxy_listeners.php");		
+	$tab_array[] = array("Server Pool", false, "haproxy_pools.php");
 	display_top_tabs($tab_array);
   ?>
   </td></tr>
@@ -103,24 +103,28 @@ include("head.inc");
                   <td width="30%" class="listhdrr">Name</td>
                   <td width="40%" class="listhdrr">Description</td>
                   <td width="10%" class="listhdrr">Type</td>
+                  <td width="10%" class="listhdrr">Server pool</td>
                   <td width="10%" class="list"></td>
 				</tr>
 			  <?php $i = 0; foreach ($a_backend as $backend): ?>
                 <tr>
-                  <td class="listlr" ondblclick="document.location='haproxy_frontends_edit.php?id=<?=$i;?>';">
+                  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$i;?>';">
 					<?=$backend['name'];?>
                   </td>
-                  <td class="listlr" ondblclick="document.location='haproxy_frontends_edit.php?id=<?=$i;?>';">
+                  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$i;?>';">
 					<?=$backend['desc'];?>
                   </td>
-                  <td class="listlr" ondblclick="document.location='haproxy_frontends_edit.php?id=<?=$i;?>';">
+                  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$i;?>';">
 					<?=$backend['type'];?>
+                  </td>
+                  <td class="listlr" ondblclick="document.location='haproxy_listeners_edit.php?id=<?=$i;?>';">
+					<?=$backend['pool'];?>
                   </td>
                   <td class="list" nowrap>
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
-                        <td valign="middle"><a href="haproxy_frontends_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
-                        <td valign="middle"><a href="haproxy_frontends.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
+                        <td valign="middle"><a href="haproxy_listeners_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0"></a></td>
+                        <td valign="middle"><a href="haproxy_listeners.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this entry?')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0"></a></td>
                       </tr>
                     </table>
                   </td>
@@ -131,7 +135,7 @@ include("head.inc");
                   <td class="list">
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
-                        <td valign="middle"><a href="haproxy_frontends_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+                        <td valign="middle"><a href="haproxy_listeners_edit.php"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
                       </tr>
                     </table>
                   </td>

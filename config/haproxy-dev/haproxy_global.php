@@ -133,8 +133,8 @@ function enable_change(enable_change) {
 	/* active tabs */
 	$tab_array = array();
 	$tab_array[] = array("Settings", true, "haproxy_global.php");
-	$tab_array[] = array("Listener", false, "haproxy_frontends.php");	
-	$tab_array[] = array("Server Pool", false, "haproxy_servers.php");	
+	$tab_array[] = array("Listener", false, "haproxy_listeners.php");	
+	$tab_array[] = array("Server Pool", false, "haproxy_pools.php");	
 	display_top_tabs($tab_array);
 	?>
 	</td></tr>

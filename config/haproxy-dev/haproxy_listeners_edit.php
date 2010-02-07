@@ -1,7 +1,7 @@
 <?php
 /* $Id: load_balancer_pool_edit.php,v 1.24.2.23 2007/03/03 00:07:09 smos Exp $ */
 /*
-	haproxy_frontends_edit.php
+	haproxy_listeners_edit.php
 	part of pfSense (http://www.pfsense.com/)
 	Copyright (C) 2009 Scott Ullrich <sullrich@pfsense.com>
 	Copyright (C) 2008 Remco Hoef <remcoverhoef@pfsense.com>
@@ -38,6 +38,7 @@ if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
 }
 
 $a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
+$a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
 
 $a_expr = array();
 $a_expr[] = array("host_starts_with", "Host starts with:", "HTTP");
@@ -79,6 +80,7 @@ if (isset($id) && $a_backend[$id]) {
 	
 	$pconfig['type'] = $a_backend[$id]['type'];
 	$pconfig['extaddr'] = $a_backend[$id]['extaddr'];	
+	$pconfig['pool'] = $a_backend[$id]['pool'];	
 	$pconfig['max_connections'] = $a_backend[$id]['max_connections'];	
 	$pconfig['client_timeout'] = $a_backend[$id]['client_timeout'];	
 	$pconfig['port'] = $a_backend[$id]['port'];	
@@ -245,6 +247,7 @@ if ($_POST) {
 		update_if_changed("type", $backend['type'], $_POST['type']);
 		update_if_changed("port", $backend['port'], $_POST['port']);
 		update_if_changed("extaddr", $backend['extaddr'], $_POST['extaddr']);
+		update_if_changed("pool", $backend['pool'], $_POST['pool']);
 		update_if_changed("max_connections", $backend['max_connections'], $_POST['max_connections']);
 		update_if_changed("client_timeout", $backend['client_timeout'], $_POST['client_timeout']);
 		update_if_changed("advanced", $backend['advanced'], base64_encode($_POST['advanced']));
@@ -262,7 +265,7 @@ if ($_POST) {
 			write_config($changedesc);
 		}
 
-		header("Location: haproxy_frontends.php");
+		header("Location: haproxy_listeners.php");
 		exit;
 	}
 }
@@ -384,7 +387,7 @@ include("head.inc");
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if($one_two): ?>
 <p class="pgtitle"><?=$pgtitle?></p>
-<form action="haproxy_frontends_edit.php" method="post" name="iform" id="iform">
+<form action="haproxy_listeners_edit.php" method="post" name="iform" id="iform">
 <?php endif; ?>
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
@@ -449,8 +452,8 @@ include("head.inc");
 			  <td width="78%" class="vtable">
 				<select name="pool" class="formfld">
 				<?php
-					if (is_array($pconfig['ha_pools']['item'])) {
-						foreach ($config['ha_pools']['item'] as $p): 
+					if (is_array($a_pools)) {
+						foreach ($a_pools as $p): 
 				?>
 					<option value="<?=$p['name'];?>" <?php if ($p['name'] == $pconfig['pool']) echo "selected"; ?>>
 						<?=htmlspecialchars("{$p['name']}");?>
@@ -499,24 +502,24 @@ include("head.inc");
 				$a_acl=array();
 			}
 
-			$i=0;
+			$counter=0;
 			foreach ($a_acl as $acl) {
 			?>
 			<tr>
-				<td><input name="acl_name<?=$i;?>" type="text" value="<?=$acl['name']; ?>" size="20"/></td>
+				<td><input name="acl_name<?=$counter;?>" type="text" value="<?=$acl['name']; ?>" size="20"/></td>
 				<td>
-				<select name="acl_expression<?=$i;?>" id="acl_expression<?=$i;?>">
+				<select name="acl_expression<?=$counter;?>" id="acl_expression<?=$counter;?>">
 				<?php
 				foreach ($a_expr as $expr) { ?>
 					<option value="<?=$expr[0];?>"<?php if($acl['expression'] == $expr[0]) echo " SELECTED"; ?>><?=$expr[1];?></option>
 				<?php } ?>
 				</select>
 				</td>
-				<td><input name="acl_value<?=$i;?>" type="text" value="<?=$acl['value']; ?>" size="35"/></td>
+				<td><input name="acl_value<?=$counter;?>" type="text" value="<?=$acl['value']; ?>" size="35"/></td>
 			  	<td class="list"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" onclick="removeRow(this); return false;"></td>
 			</tr>
 			<?php
-			$i++;
+			$counter++;
 			}
 			?>
 			</table>
@@ -689,9 +692,8 @@ set by the 'retries' parameter (2).</div>
 <script type="text/javascript">
 	field_counter_js = 3;
 	rows = 1;
-	<?php $counter=0; ?>
-	totalrows =  <?php echo $counter; ?>;;
-	loaded =  <?php echo $counter; ?>;;
+	totalrows =  <?php echo $counter; ?>;
+	loaded =  <?php echo $counter; ?>;
 </script>
 <?php include("fend.inc"); ?>
 </body>

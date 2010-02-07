@@ -101,8 +101,7 @@ function haproxy_configure() {
 
 	$a_global = &$config['installedpackages']['haproxy'];
 	$a_backends = &$config['installedpackages']['haproxy']['ha_backends']['item'];
-	$a_frontends = &$config['installedpackages']['haproxy']['ha_frontends']['item'];
-	$a_servers = &$config['installedpackages']['haproxy']['ha_servers']['item'];
+	$a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
 
 	$fd = fopen("{$g['varetc_path']}/haproxy.cfg", "w");
 
@@ -170,7 +169,7 @@ function haproxy_configure() {
 				$httpchk = "httpchk";
 			}
 
-            fwrite ($fd, "\tmode\t\t\t" . $backend_type . "\n");
+			fwrite ($fd, "\tmode\t\t\t" . $backend_type . "\n");
 			fwrite ($fd, "\tlog\t\t\tglobal\n");
 			fwrite ($fd, "\toption\t\t\tdontlognull\n");
 
@@ -197,11 +196,6 @@ function haproxy_configure() {
 
 			if($backend['retries'])
 				fwrite ($fd, "\tretries\t\t\t" . $backend['retries'] . "\n");
-
-			if($backend['cookie_name'])
-				fwrite ($fd, "\tcookie\t\t\t" . $backend['cookie_name'] . " insert indirect\n");
-
-			fwrite ($fd, "\toption\t\t\t{$httpchk} HEAD " . $backend['monitor_uri'] . " HTTP/1.0\n");
 
 			if($backend['stats_enabled']=='yes') {
 				fwrite ($fd, "\tstats\t\t\tenable\n");
@@ -245,40 +239,34 @@ function haproxy_configure() {
 				fwrite ($fd, "\tacl\t\t\t".$acl['name']."\t".$expr."\n");
 			}
 
-			$server['backend'] .= " ";
-			if(is_array($a_servers)) {
-				foreach ($a_servers as $server) {
-					$backends_to_process = split(" ", $server['backend']);
-					foreach($backends_to_process as $backends) {
-						if($backends == "")
-							continue;
-						if($backends == $backend['name']) {
-							$server_ports = array();
-							if($server['status']=='active') {
-								if($server['cookie']) 
-									$cookie = " cookie {$server['cookie']} ";
-								else 
-									$cookie = "";
-								if(!$server['port']) {
-									foreach($ports as $port) {
-										if($port) 
-											$server_ports[] = $port;
-									}
-								} else {
-									$server_ports[] = $server['port'];
-								}
-								if($server['advanced']) {
-									$advanced = base64_decode($server['advanced']);
-									$advanced_txt = " " . $advanced;
-								} else {
-									$advanced_txt = "";
-								}
-								if($server['checkinter']) 
-									$checkinter = "check inter {$server['checkinter']}";
-								else 
-									$checkinter = "check inter 1000";
-								foreach($server_ports as $pport) 
-									fwrite ($fd, "\tserver\t\t\t" . $server['name'] . " " . $server['address'].":" . $pport . " $cookie " . " $checkinter weight " . $server['weight'] . "{$advanced_txt}\n");
+			if (is_array($a_pools)) {
+				foreach ($a_pools as $pool) {
+					if ($backend['pool'] == $pool['name'] && is_array($pool['ha_servers']['item'])) {
+						if($pool['status']=='active') {
+							if($pool['cookie_name'])
+								fwrite ($fd, "\tcookie\t\t\t" . $pool['cookie_name'] . " insert indirect\n");
+
+							fwrite ($fd, "\toption\t\t\t{$httpchk} HEAD " . $pool['monitor_uri'] . " HTTP/1.0\n");
+
+							if($pool['cookie']) 
+								$cookie = " cookie {$pool['cookie']} ";
+							else 
+								$cookie = "";
+							if($pool['advanced']) {
+								$advanced = base64_decode($pool['advanced']);
+								$advanced_txt = " " . $advanced;
+							} else {
+								$advanced_txt = "";
+							}
+							if($pool['checkinter']) 
+								$checkinter = "check inter {$pool['checkinter']}";
+							else 
+								$checkinter = "check inter 1000";
+							$a_servers = &$pool['ha_servers']['item'];
+							foreach($a_servers as $be) {
+								if(!$be['port'])
+									$be['port'] = $backend['port'];
+								fwrite ($fd, "\tserver\t\t\t" . $be['address'] . " " . $be['address'].":" . $be['port'] . " $cookie " . " $checkinter weight " . $be['weight'] . "{$advanced_txt}\n");
 							}
 						}
 					}
