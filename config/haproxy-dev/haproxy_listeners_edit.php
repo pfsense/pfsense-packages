@@ -84,6 +84,7 @@ if (isset($id) && $a_backend[$id]) {
 	$pconfig['max_connections'] = $a_backend[$id]['max_connections'];	
 	$pconfig['client_timeout'] = $a_backend[$id]['client_timeout'];	
 	$pconfig['port'] = $a_backend[$id]['port'];	
+	$pconfig['svrport'] = $a_backend[$id]['svrport'];	
 	$pconfig['a_acl']=&$a_backend[$id]['ha_acls']['item'];	
 	$pconfig['advanced'] = base64_decode($a_backend[$id]['advanced']);
 
@@ -209,6 +210,7 @@ if ($_POST) {
 		update_if_changed("stats_realm", $backend['stats_realm'], $_POST['stats_realm']);
 		update_if_changed("type", $backend['type'], $_POST['type']);
 		update_if_changed("port", $backend['port'], $_POST['port']);
+		update_if_changed("svrport", $backend['svrport'], $_POST['svrport']);
 		update_if_changed("extaddr", $backend['extaddr'], $_POST['extaddr']);
 		update_if_changed("pool", $backend['pool'], $_POST['pool']);
 		update_if_changed("max_connections", $backend['max_connections'], $_POST['max_connections']);
