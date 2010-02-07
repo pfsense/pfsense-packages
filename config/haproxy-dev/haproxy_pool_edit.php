@@ -32,7 +32,6 @@
 require("guiconfig.inc");
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
-$a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 
 if (!is_array($config['installedpackages']['haproxy']['ha_pools']['item'])) {
 	$config['installedpackages']['haproxy']['ha_pools']['item'] = array();
@@ -105,6 +104,19 @@ if ($_POST) {
 		if(isset($id) && $a_pools[$id])
 			$pool = $a_pools[$id];
 			
+		if ($pool['name'] != $_POST['name']) {
+			// name changed:
+			if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
+				$config['installedpackages']['haproxy']['ha_backends']['item'] = array();
+			}
+			$a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
+
+			for ( $i = 0; $i < count($a_backend); $i++) {
+				if ($a_backend[$i]['pool'] == $pool['name'])
+					$a_backend[$i]['pool'] = $_POST['name'];
+			}
+		}
+
 		if($pool['name'] != "")
 			$changedesc .= " modified '{$pool['name']}' pool:";
 
@@ -292,17 +304,6 @@ function clearcombo(){
 <?php
 
 function row_helper() {
-	global $pconfig, $a_backend;
-	$options = "";
-	foreach ($a_backend as $backend) {
-		$options .= "<option value='{$backend['name']}'";
-		if($backend['name'] == $pconfig['backend']) 
-			$options .=  "SELECTED";
-		$options .=  ">";
-		$options .=  $backend['name'];
-		$options .=  "</option>";
-	}
-	
 	echo <<<EOF
 <script type="text/javascript">
 // Global Variables

@@ -190,43 +190,6 @@ if ($_POST) {
 		if($backend['name'] != "")
 			$changedesc .= " modified '{$backend['name']}' pool:";
 		
-		if ($backend['name']!=$_POST['name']) {
-			// name changed:
-			// * update servers
-			// * update frontend (default backend and acl)
-			if (!is_array($config['installedpackages']['haproxy']['ha_servers']['item'])) {
-				$config['installedpackages']['haproxy']['ha_servers']['item'] = array();
-			}
-			$a_server = &$config['installedpackages']['haproxy']['ha_servers']['item'];
-
-			for ( $i = 0; $i < count($a_server); $i++) {
-				if ($a_server[$i]['backend']==$backend['name']) {
-					$a_server[$i]['backend']=$_POST['name'];
-				}
-			}
-
-			if (!is_array($config['installedpackages']['haproxy']['ha_frontends']['item'])) {
-				$config['installedpackages']['haproxy']['ha_frontends']['item'] = array();
-			}
-			$a_frontend = &$config['installedpackages']['haproxy']['ha_frontends']['item'];
-
-			for ( $i = 0; $i < count($a_frontend); $i++) {
-				if ($a_frontend[$i]['backend']==$backend['name']) {
-					$a_frontend[$i]['backend']=$_POST['name'];
-				}
-				
-				if (!is_array($a_frontend[$i]['ha_acls']['item'])) {
-					$a_frontend[$i]['ha_acls']['item'] = array();
-				}
-				
-				$a_acl = &$a_frontend[$i]['ha_acls']['item'];
-				for ( $j = 0; $j < count($a_acl); $j++) {
-					if ($a_acl[$j]['backend']==$backend['name']) {
-						$a_acl[$j]['backend']=$_POST['name'];
-					}
-				}
-			}
-		}
 
 		update_if_changed("name", $backend['name'], $_POST['name']);
 		update_if_changed("description", $backend['desc'], $_POST['desc']);
