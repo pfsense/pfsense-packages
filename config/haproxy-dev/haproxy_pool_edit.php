@@ -286,7 +286,8 @@ function clearcombo(){
 		<tr align="left">
 			<td width="22%" valign="top" class="vncell">Health check URI</td>
 			<td width="78%" class="vtable" colspan="2">
-				<input name="monitor_uri" type="text" <?if(isset($pconfig['monitor_uri'])) echo "value=\"{$pconfig['monitor_uri']}\"";?>size="64"><br/>
+				<input name="monitor_uri" type="text" <?if(isset($pconfig['monitor_uri'])) echo "value=\"{$pconfig['monitor_uri']}\"";?>size="64">
+				<br/>Defaults to / if left blank.
 			</td>
 		</tr>
 		<tr align="left">

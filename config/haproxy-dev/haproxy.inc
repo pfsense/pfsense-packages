@@ -246,7 +246,12 @@ function haproxy_configure() {
 							if($pool['cookie_name'])
 								fwrite ($fd, "\tcookie\t\t\t" . $pool['cookie_name'] . " insert indirect\n");
 
-							fwrite ($fd, "\toption\t\t\t{$httpchk} HEAD " . $pool['monitor_uri'] . " HTTP/1.0\n");
+							$uri = $pool['monitor_uri'];
+							if ($pool['monitor_uri'])
+								$uri = $pool['monitor_uri'];
+							else
+								$uri = "/";
+							fwrite ($fd, "\toption\t\t\t{$httpchk} HEAD " . $uri . " HTTP/1.0\n");
 
 							if($pool['cookie']) 
 								$cookie = " cookie {$pool['cookie']} ";
