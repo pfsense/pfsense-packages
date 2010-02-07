@@ -364,8 +364,9 @@ var addRowTo = (function() {
 	}
 	td = d.createElement("td");
 	td.rowSpan = "1";
+        td.setAttribute("class","list");
 
-	td.innerHTML = '<input type="image" src="/themes/' + theme + '/images/icons/icon_x.gif" onclick="removeRow(this); return false;" value="Delete">';
+	td.innerHTML = '<img src="/themes/' + theme + '/images/icons/icon_x.gif" width="17" height="17" border="0" onclick="removeRow(this); return false;">';
 	tr.appendChild(td);
 	tbody.appendChild(tr);
     });
