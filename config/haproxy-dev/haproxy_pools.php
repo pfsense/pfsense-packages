@@ -107,16 +107,25 @@ include("head.inc");
                   <td width="30%" class="listhdrr">Listener</td>
                   <td width="10%" class="list"></td>
 				</tr>
-		<?php $i = 0; foreach ($a_pools as $pool): ?>
+<?php
+		 $i = 0;
+		 foreach ($a_pools as $pool):
+		 $textss = $textse = "";
+		 if ($pool['status'] != 'active') {
+			 $textss = "<span class=\"gray\">";
+			 $textse = "</span>";
+		 }
+?>
                 <tr>
                   <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
-			<?=$pool['name'];?>
+			<?=$textss . $pool['name'] . $textse;?>
                   </td>
                   <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
-			<?=$pool['status'];?>
+			<?=$textss . $pool['status'] . $textse;?>
                   </td>
                   <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
 <?php
+		echo $textss;
 		$sep = "";
 		foreach ($a_backends as $backend) {
 			if($backend['pool'] == $pool['name']) {
@@ -124,6 +133,7 @@ include("head.inc");
 				$sep = ", ";
 			}
 		}
+		echo $textse;
 ?>
                   </td>
                   <td class="list" nowrap>
