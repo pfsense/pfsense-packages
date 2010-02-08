@@ -129,6 +129,8 @@ function haproxy_configure() {
 	if(is_array($a_backends)) {
 		foreach ($a_backends as $backend) {
 
+			if($backend['status'] != 'active')
+				continue;
 			// Define our backend name
 			$backendinfo = "listen {$backend['name']}\n";
 
@@ -244,47 +246,49 @@ function haproxy_configure() {
 			if (is_array($a_pools)) {
 				foreach ($a_pools as $pool) {
 					if ($backend['pool'] == $pool['name'] && is_array($pool['ha_servers']['item'])) {
-						if($pool['status']=='active') {
-							if($pool['cookie_name'])
-								fwrite ($fd, "\tcookie\t\t\t" . $pool['cookie_name'] . " insert indirect\n");
+						if($pool['status'] != 'active')
+							continue;
+						if($pool['cookie_name'])
+							fwrite ($fd, "\tcookie\t\t\t" . $pool['cookie_name'] . " insert indirect\n");
 
+						$uri = $pool['monitor_uri'];
+						if ($pool['monitor_uri'])
 							$uri = $pool['monitor_uri'];
-							if ($pool['monitor_uri'])
-								$uri = $pool['monitor_uri'];
-							else
-								$uri = "/";
-							fwrite ($fd, "\toption\t\t\t{$httpchk} HEAD " . $uri . " HTTP/1.0\n");
+						else
+							$uri = "/";
+						fwrite ($fd, "\toption\t\t\t{$httpchk} HEAD " . $uri . " HTTP/1.0\n");
 
-							if($pool['cookie']) 
-								$cookie = " cookie {$pool['cookie']} ";
-							else 
-								$cookie = "";
-							if($pool['advanced']) {
-								$advanced = base64_decode($pool['advanced']);
-								$advanced_txt = " " . $advanced;
-							} else {
-								$advanced_txt = "";
-							}
-							if($pool['checkinter']) 
-								$checkinter = "check inter {$pool['checkinter']}";
-							else 
-								$checkinter = "check inter 1000";
-							$a_servers = &$pool['ha_servers']['item'];
-							foreach($a_servers as $be) {
-								if(!$be['port']) {
-									// the listener can specify a default port
-									$be['port'] = $backend['svrport'];
-								}
-								if(!$be['port']) {
-									// last resort, use the frontend port
-									$ports = split(",", "{$backend['port']},");
-									$be['port'] = $ports[0];
-								}
-								if (!$be['name'])
-									$be['name'] = $be['address'];
-								fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . " $cookie " . " $checkinter weight " . $be['weight'] . "{$advanced_txt}\n");
-							}
+						if($pool['cookie']) 
+							$cookie = " cookie {$pool['cookie']} ";
+						else 
+							$cookie = "";
+						if($pool['advanced']) {
+							$advanced = base64_decode($pool['advanced']);
+							$advanced_txt = " " . $advanced;
+						} else {
+							$advanced_txt = "";
 						}
+						if($pool['checkinter']) 
+							$checkinter = "check inter {$pool['checkinter']}";
+						else 
+							$checkinter = "check inter 1000";
+
+						$a_servers = &$pool['ha_servers']['item'];
+						foreach($a_servers as $be) {
+							if(!$be['port']) {
+								// the listener can specify a default port
+								$be['port'] = $backend['svrport'];
+							}
+							if(!$be['port']) {
+								// last resort, use the frontend port
+								$ports = split(",", "{$backend['port']},");
+								$be['port'] = $ports[0];
+							}
+							if (!$be['name'])
+								$be['name'] = $be['address'];
+							fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . " $cookie " . " $checkinter weight " . $be['weight'] . "{$advanced_txt}\n");
+						}
+
 					}
 				}
 			}
