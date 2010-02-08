@@ -271,8 +271,15 @@ function haproxy_configure() {
 								$checkinter = "check inter 1000";
 							$a_servers = &$pool['ha_servers']['item'];
 							foreach($a_servers as $be) {
-								if(!$be['port'])
+								if(!$be['port']) {
+									// the listener can specify a default port
 									$be['port'] = $backend['svrport'];
+								}
+								if(!$be['port']) {
+									// last resort, use the frontend port
+									$ports = split(",", "{$backend['port']},");
+									$be['port'] = $ports[0];
+								}
 								if (!$be['name'])
 									$be['name'] = $be['address'];
 								fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . " $cookie " . " $checkinter weight " . $be['weight'] . "{$advanced_txt}\n");
