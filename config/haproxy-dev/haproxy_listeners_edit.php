@@ -58,6 +58,9 @@ if (isset($_POST['id']))
 else
 	$id = $_GET['id'];
 
+if (isset($_GET['dup']))
+	$id = $_GET['dup'];
+
 if (isset($id) && $a_backend[$id]) {
 	$pconfig['name'] = $a_backend[$id]['name'];
 	$pconfig['desc'] = $a_backend[$id]['desc'];
@@ -89,6 +92,9 @@ if (isset($id) && $a_backend[$id]) {
 	$pconfig['advanced'] = base64_decode($a_backend[$id]['advanced']);
 
 }
+
+if (isset($_GET['dup']))
+	unset($id);
 
 $changedesc = "Services: HAProxy: Listener";
 $changecount = 0;
@@ -267,6 +273,8 @@ include("head.inc");
 	var addRowTo = (function() {
 	    return (function (tableId) {
 	        var d, tbody, tr, td, bgc, i, ii, j;
+		var btable, btbody, btr, btd;
+
 	        d = document;
 	        tbody = d.getElementById(tableId).getElementsByTagName("tbody").item(0);
 	        tr = d.createElement("tr");
@@ -274,25 +282,68 @@ include("head.inc");
 	        for (i = 0; i < field_counter_js; i++) {
 	                td = d.createElement("td");
 	                if(rowtype[i] == 'textbox') {
-	                        td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows + "'></input><input size='" + rowsize[i] + "' name='" + rowname[i] + totalrows + "'></input> ";
+				td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows +
+					"'></input><input size='" + rowsize[i] + "' name='" + rowname[i] + totalrows +
+					"' id='" + rowname[i] + totalrows +
+				       	"'></input> ";
 	                } else if(rowtype[i] == 'select') {
-	                        td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows + "'></input><select name='" + rowname[i] + totalrows + "'><?php foreach ($a_expr as $expr) {?><option value=\"<?=$expr[0]?>\"><?=$expr[1]?></option><?php }?></select> ";
+				td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows +
+					"'></input><select name='" + rowname[i] + totalrows + 
+					"' id='" + rowname[i] + totalrows +
+					"'><?php foreach ($a_expr as $expr) {?><option value=\"<?=$expr[0]?>\"><?=$expr[1]?></option><?php }?></select> ";
 	                } else {
-	                        td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows + "'></input><input type='checkbox' name='" + rowname[i] + totalrows + "'></input> ";
+				td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows +
+					"'></input><input type='checkbox' name='" + rowname[i] + totalrows +
+				        "' id='" + rowname[i] + totalrows + "'></input> ";
 	                }
 	                tr.appendChild(td);
 	        }
-	        td = d.createElement("td");
-	        td.rowSpan = "1";
-			td.className = "list";
-	        td.innerHTML = '<img src="/themes/' + theme + '/images/icons/icon_x.gif" width="17" height="17" border="0" onclick="removeRow(this); return false;">';
+		td = d.createElement("td");
+		td.rowSpan = "1";
+		td.setAttribute("class","list");
+
+		// Recreate the button table.
+		btable = document.createElement("table");
+		btable.setAttribute("border", "0");
+		btable.setAttribute("cellspacing", "0");
+		btable.setAttribute("cellpadding", "1");
+		btbody = document.createElement("tbody");
+		btr = document.createElement("tr");
+		btd = document.createElement("td");
+		btd.setAttribute("valign", "middle");
+		btd.innerHTML = '<img src="/themes/' + theme + '/images/icons/icon_x.gif" title="delete entry" width="17" height="17" border="0" onclick="removeRow(this); return false;">';
+		btr.appendChild(btd);
+		btd = document.createElement("td");
+		btd.setAttribute("valign", "middle");
+		btd.innerHTML = '<img src="/themes/' + theme + "/images/icons/icon_plus.gif\" title=\"duplicate entry\" width=\"17\" height=\"17\" border=\"0\" onclick=\"dupRow(" + totalrows + ", 'acltable'); return false;\">";
+		btr.appendChild(btd);
+		btbody.appendChild(btr);
+		btable.appendChild(btbody);
+
+		td.appendChild(btable);
 	        tr.appendChild(td);
 	        tbody.appendChild(tr);
 	    });
 	})();
 
+	function dupRow(rowId, tableId) {
+		var dupEl;
+		var newEl;
+
+		addRowTo(tableId);
+		for (i = 0; i < field_counter_js; i++) {
+			dupEl = document.getElementById(rowname[i] + rowId);
+			newEl = document.getElementById(rowname[i] + totalrows);
+			if (dupEl && newEl)
+				newEl.value = dupEl.value;
+		}
+	}
+
 	function removeRow(el) {
 	    var cel;
+	    // Break out of one table first
+	    while (el && el.nodeName.toLowerCase() != "table")
+		    el = el.parentNode;
 	    while (el && el.nodeName.toLowerCase() != "tr")
 	            el = el.parentNode;
 
@@ -471,7 +522,7 @@ include("head.inc");
 			foreach ($a_acl as $acl) {
 			?>
 			<tr>
-				<td><input name="acl_name<?=$counter;?>" type="text" value="<?=$acl['name']; ?>" size="20"/></td>
+				<td><input name="acl_name<?=$counter;?>" id="acl_name<?=$counter;?>" type="text" value="<?=$acl['name']; ?>" size="20"/></td>
 				<td>
 				<select name="acl_expression<?=$counter;?>" id="acl_expression<?=$counter;?>">
 				<?php
@@ -480,8 +531,16 @@ include("head.inc");
 				<?php } ?>
 				</select>
 				</td>
-				<td><input name="acl_value<?=$counter;?>" type="text" value="<?=$acl['value']; ?>" size="35"/></td>
-			  	<td class="list"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" onclick="removeRow(this); return false;"></td>
+				<td><input name="acl_value<?=$counter;?>" id="acl_value<?=$counter;?>" type="text" value="<?=$acl['value']; ?>" size="35"/></td>
+			  	<td class="list">
+			         <table border="0" cellspacing="0" cellpadding="1"><tr>
+			         <td valign="middle">
+				  <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="delete entry" width="17" height="17" border="0" onclick="removeRow(this); return false;">
+			         </td>
+			         <td valign="middle">
+				 <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="duplicate entry" width="17" height="17" border="0" onclick="dupRow(<?=$counter;?>, 'acltable'); return false;">
+			         </td></tr></table>
+				</td>
 			</tr>
 			<?php
 			$counter++;

@@ -44,6 +44,9 @@ if (isset($_POST['id']))
 else
 	$id = $_GET['id'];
 
+if (isset($_GET['dup']))
+	$id = $_GET['dup'];
+
 if (isset($id) && $a_pools[$id]) {
 	$pconfig['name'] = $a_pools[$id]['name'];
 	$pconfig['checkinter'] = $a_pools[$id]['checkinter'];
@@ -53,6 +56,9 @@ if (isset($id) && $a_pools[$id]) {
 	$pconfig['advanced'] = base64_decode($a_pools[$id]['advanced']);
 	$pconfig['a_servers']=&$a_pools[$id]['ha_servers']['item'];	
 }
+
+if (isset($_GET['dup']))
+	unset($id);
 
 $changedesc = "Services: HAProxy: pools: ";
 $changecount = 0;
@@ -266,18 +272,34 @@ function clearcombo(){
 			<td class="vtable"><?=$server['address']; ?></td>
 			<td class="vtable"><?=$server['port']; ?></td>
 			<td class="vtable"><?=$server['weight']; ?></td>
-			<td class="list"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" onclick="editRow(<?=$counter;?>); return false;"></td>
+			<td class="list">
+			  <table border="0" cellspacing="0" cellpadding="1"><tr>
+			  <td valign="middle">
+			  <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="edit entry" width="17" height="17" border="0" onclick="editRow(<?=$counter;?>); return false;">
+			  </td>
+			  <td valign="middle">
+			  <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="duplicate entry" width="17" height="17" border="0" onclick="dupRow(<?=$counter;?>, 'servertable'); return false;">
+			  </td></tr></table>
+			</td>
 			</tr>
 			<tr id="tr_edit_<?=$counter;?>" name="tr_edit_<?=$counter;?>" style="display: none;">
 				<td class="vtable">
-				  <input name="server_name<?=$counter;?>" type="text" value="<?=$server['name']; ?>" size="30"/></td>
+				  <input name="server_name<?=$counter;?>" id="server_name<?=$counter;?>" type="text" value="<?=$server['name']; ?>" size="30"/></td>
 				<td class="vtable">
-				  <input name="server_address<?=$counter;?>" type="text" value="<?=$server['address']; ?>" size="30"/></td>
+				  <input name="server_address<?=$counter;?>" id="server_address<?=$counter;?>" type="text" value="<?=$server['address']; ?>" size="30"/></td>
 				<td class="vtable">
-				  <input name="server_port<?=$counter;?>" type="text" value="<?=$server['port']; ?>" size="12"/></td>
+				  <input name="server_port<?=$counter;?>" id="server_port<?=$counter;?>" type="text" value="<?=$server['port']; ?>" size="12"/></td>
 				<td class="vtable">
-				  <input name="server_weight<?=$counter;?>" type="text" value="<?=$server['weight']; ?>" size="12"/></td>
-			  	<td class="list"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" onclick="removeRow(this); return false;"></td>
+				  <input name="server_weight<?=$counter;?>" id="server_weight<?=$counter;?>" type="text" value="<?=$server['weight']; ?>" size="12"/></td>
+				<td class="list">
+			         <table border="0" cellspacing="0" cellpadding="1"><tr>
+			         <td valign="middle">
+				  <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" title="delete entry" width="17" height="17" border="0" onclick="removeRow(this); return false;">
+			         </td>
+			         <td valign="middle">
+				 <img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" title="duplicate entry" width="17" height="17" border="0" onclick="dupRow(<?=$counter;?>, 'servertable'); return false;">
+			         </td></tr></table>
+				</td>
 			</tr>
 			<?php
 			$counter++;
@@ -360,6 +382,8 @@ var temp_streaming_text = "";
 var addRowTo = (function() {
     return (function (tableId) {
 	var d, tbody, tr, td, bgc, i, ii, j;
+	var btable, btbody, btr, btd;
+
 	d = document;
 	tbody = d.getElementById(tableId).getElementsByTagName("tbody").item(0);
 	tr = d.createElement("tr");
@@ -367,11 +391,17 @@ var addRowTo = (function() {
 	for (i = 0; i < field_counter_js; i++) {
 		td = d.createElement("td");
 		if(rowtype[i] == 'textbox') {
-			td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows + "'></input><input size='" + rowsize[i] + "' name='" + rowname[i] + totalrows + "'></input> ";
+			td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows +
+				"'></input><input size='" + rowsize[i] + "' name='" + rowname[i] + totalrows +
+				"' id='" + rowname[i] + totalrows + "'></input> ";
 		} else if(rowtype[i] == 'select') {
-			td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows + "'></input><select size='" + rowsize[i] + "' name='" + rowname[i] + totalrows + "'>$options</select> ";
+			td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows +
+				"'></input><select size='" + rowsize[i] + "' name='" + rowname[i] + totalrows +
+			       	"' id='" + rowname[i] + totalrows + "'>$options</select> ";
 		} else {
-			td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows + "'></input><input type='checkbox' name='" + rowname[i] + totalrows + "'></input> ";
+			td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows +
+				"'></input><input type='checkbox' name='" + rowname[i] + totalrows +
+				"' id='" + rowname[i] + totalrows + "'></input> ";
 		}
 		td.setAttribute("class","vtable");
 		tr.appendChild(td);
@@ -380,14 +410,48 @@ var addRowTo = (function() {
 	td.rowSpan = "1";
         td.setAttribute("class","list");
 
-	td.innerHTML = '<img src="/themes/' + theme + '/images/icons/icon_x.gif" width="17" height="17" border="0" onclick="removeRow(this); return false;">';
+	// Recreate the button table.
+	btable = document.createElement("table");
+	btable.setAttribute("border", "0");
+	btable.setAttribute("cellspacing", "0");
+	btable.setAttribute("cellpadding", "1");
+	btbody = document.createElement("tbody");
+	btr = document.createElement("tr");
+	btd = document.createElement("td");
+	btd.setAttribute("valign", "middle");
+	btd.innerHTML = '<img src="/themes/' + theme + '/images/icons/icon_x.gif" title="delete entry" width="17" height="17" border="0" onclick="removeRow(this); return false;">';
+	btr.appendChild(btd);
+	btd = document.createElement("td");
+	btd.setAttribute("valign", "middle");
+	btd.innerHTML = '<img src="/themes/' + theme + "/images/icons/icon_plus.gif\" title=\"duplicate entry\" width=\"17\" height=\"17\" border=\"0\" onclick=\"dupRow(" + totalrows + ", 'servertable'); return false;\">";
+	btr.appendChild(btd);
+	btbody.appendChild(btr);
+	btable.appendChild(btbody);
+
+	td.appendChild(btable);
 	tr.appendChild(td);
 	tbody.appendChild(tr);
     });
 })();
 
+function dupRow(rowId, tableId) {
+    var dupEl;
+    var newEl;
+
+    addRowTo(tableId);
+    for (i = 0; i < field_counter_js; i++) {
+        dupEl = document.getElementById(rowname[i] + rowId);
+        newEl = document.getElementById(rowname[i] + totalrows);
+	if (dupEl && newEl)
+            newEl.value = dupEl.value;
+    }
+}
+
 function removeRow(el) {
     var cel;
+    // Break out of one table first
+    while (el && el.nodeName.toLowerCase() != "table")
+	    el = el.parentNode;
     while (el && el.nodeName.toLowerCase() != "tr")
 	    el = el.parentNode;
 
