@@ -152,7 +152,7 @@ if ($_POST) {
 	/* Ensure that our pool names are unique */
 	for ($i=0; isset($config['installedpackages']['haproxy']['ha_backends']['item'][$i]); $i++)
 		if (($_POST['name'] == $config['installedpackages']['haproxy']['ha_backends']['item'][$i]['name']) && ($i != $id))
-			$input_errors[] = "This backend name has already been used. Frontend names must be unique.";
+			$input_errors[] = "This listener name has already been used. Listener names must be unique.";
 
 	$a_acl=array();			
 	$acl_names=array(); 
