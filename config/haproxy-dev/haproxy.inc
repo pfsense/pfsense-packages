@@ -248,7 +248,7 @@ function haproxy_configure() {
 					if ($backend['pool'] == $pool['name'] && is_array($pool['ha_servers']['item'])) {
 						if($pool['status'] != 'active')
 							continue;
-						if($pool['cookie_name'])
+						if($pool['cookie_name'] && strtolower($backend['type']) == "http")
 							fwrite ($fd, "\tcookie\t\t\t" . $pool['cookie_name'] . " insert indirect\n");
 
 						$uri = $pool['monitor_uri'];
@@ -258,7 +258,7 @@ function haproxy_configure() {
 							$uri = "/";
 						fwrite ($fd, "\toption\t\t\t{$httpchk} HEAD " . $uri . " HTTP/1.0\n");
 
-						if($pool['cookie']) 
+						if($pool['cookie']  && strtolower($backend['type']) == "http") 
 							$cookie = " cookie {$pool['cookie']} ";
 						else 
 							$cookie = "";
