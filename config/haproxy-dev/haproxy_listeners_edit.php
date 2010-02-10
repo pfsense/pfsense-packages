@@ -251,6 +251,8 @@ include("head.inc");
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<script type="text/javascript" src="/javascript/scriptaculous/prototype.js"></script>
+<script type="text/javascript" src="/javascript/scriptaculous/scriptaculous.js"></script>
 <script type="text/javascript">
 	// Global Variables
 	var rowname = new Array(99);
@@ -410,7 +412,7 @@ include("head.inc");
 		}
 	}
 	function type_change() {
-		var type, d, i, j, el;
+		var type, d, i, j, el, row;
 		var count = <?=count($a_acltypes);?>;
 		var acl = [ <?php foreach ($a_acltypes as $expr) echo "'".$expr['name']."'," ?> ];
 		var mode = [ <?php foreach ($a_acltypes as $expr) echo "'".$expr['mode']."'," ?> ];
@@ -419,14 +421,15 @@ include("head.inc");
 		type = d.getElementById("type").value;
 		for (i = 0; i < 99; i++) {
 			el = d.getElementById("acl_expression" + i);
+			row = d.getElementById("aclrow" + i);
 			if (!el)
 				continue;
-			for (j = 0; j < 99; j++) {
+			for (j = 0; j < count; j++) {
 				if (acl[j] == el.value) {
 					if (mode[j] != '' && mode[j] != type) {
-						d.getElementById('aclrow' + i).style.display='none';
+						Effect.Fade(row,{ duration: 1.0 });
 					} else {
-						d.getElementById('aclrow' + i).style.display='';
+						Effect.Appear(row,{ duration: 1.0 });
 					}
 				}
 			}
