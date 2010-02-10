@@ -30,6 +30,18 @@
 */
 
 require("guiconfig.inc");
+require_once("haproxy.inc");
+
+function haproxy_acl_select($mode) {
+	global $a_acltypes;
+
+	$seltext = '';
+	foreach ($a_acltypes as $expr) {
+		if ($expr['mode'] == '' || $expr['mode'] == $mode)
+			$seltext .= "<option value='" . $expr['name'] . "'>" . $expr['descr'] ."</option>";
+	}
+	return $seltext;
+}
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 
@@ -40,18 +52,6 @@ if (!is_array($config['installedpackages']['haproxy']['ha_backends']['item'])) {
 $a_backend = &$config['installedpackages']['haproxy']['ha_backends']['item'];
 $a_pools = &$config['installedpackages']['haproxy']['ha_pools']['item'];
 
-$a_expr = array();
-$a_expr[] = array("host_starts_with", "Host starts with:", "HTTP");
-$a_expr[] = array("host_ends_with", "Host ends with:", "HTTP");
-$a_expr[] = array("host_matches", "Host matches:", "HTTP");
-$a_expr[] = array("host_regex", "Host regex:", "HTTP");
-$a_expr[] = array("host_contains", "Host contains:", "HTTP");
-$a_expr[] = array("path_starts_with", "Path starts with:", "HTTP");
-$a_expr[] = array("path_ends_with", "Path ends with:", "HTTP");
-$a_expr[] = array("path_matches", "Path matches:", "HTTP");
-$a_expr[] = array("path_regex", "Path regex:", "HTTP");
-$a_expr[] = array("path_contains", "Path contains:", "HTTP");
-$a_expr[] = array("source_ip", "Source IP:", "");
 
 if (isset($_POST['id']))
 	$id = $_POST['id'];
@@ -272,13 +272,24 @@ include("head.inc");
 
 	var addRowTo = (function() {
 	    return (function (tableId) {
-	        var d, tbody, tr, td, bgc, i, ii, j;
+	        var d, tbody, tr, td, bgc, i, ii, j, type, seltext;
 		var btable, btbody, btr, btd;
 
 	        d = document;
+		type = d.getElementById("type").value;
+		if (type == 'health')
+			seltext = "<?php echo haproxy_acl_select('health');?>";
+		else if (type == 'tcp')
+			seltext = "<?php echo haproxy_acl_select('tcp');?>";
+		else if (type == 'https')
+			seltext = "<?php echo haproxy_acl_select('https');?>";
+		else
+			seltext = "<?php echo haproxy_acl_select('http');?>";
+
 	        tbody = d.getElementById(tableId).getElementsByTagName("tbody").item(0);
 	        tr = d.createElement("tr");
 	        totalrows++;
+		tr.setAttribute("id","aclrow" + totalrows);
 	        for (i = 0; i < field_counter_js; i++) {
 	                td = d.createElement("td");
 	                if(rowtype[i] == 'textbox') {
@@ -290,7 +301,7 @@ include("head.inc");
 				td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows +
 					"'></input><select name='" + rowname[i] + totalrows + 
 					"' id='" + rowname[i] + totalrows +
-					"'><?php foreach ($a_expr as $expr) {?><option value=\"<?=$expr[0]?>\"><?=$expr[1]?></option><?php }?></select> ";
+					"'>" + seltext + "</select> ";
 	                } else {
 				td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows +
 					"'></input><input type='checkbox' name='" + rowname[i] + totalrows +
@@ -396,6 +407,29 @@ include("head.inc");
 			stats_username_row.style.display='none';
 			stats_password_row.style.display='none';
 			stats_uri_row.style.display='none';
+		}
+	}
+	function type_change() {
+		var type, d, i, j, el;
+		var count = <?=count($a_acltypes);?>;
+		var acl = [ <?php foreach ($a_acltypes as $expr) echo "'".$expr['name']."'," ?> ];
+		var mode = [ <?php foreach ($a_acltypes as $expr) echo "'".$expr['mode']."'," ?> ];
+
+	        d = document;
+		type = d.getElementById("type").value;
+		for (i = 0; i < 99; i++) {
+			el = d.getElementById("acl_expression" + i);
+			if (!el)
+				continue;
+			for (j = 0; j < 99; j++) {
+				if (acl[j] == el.value) {
+					if (mode[j] != '' && mode[j] != type) {
+						d.getElementById('aclrow' + i).style.display='none';
+					} else {
+						d.getElementById('aclrow' + i).style.display='';
+					}
+				}
+			}
 		}
 	}
 </script>
@@ -520,14 +554,18 @@ include("head.inc");
 
 			$counter=0;
 			foreach ($a_acl as $acl) {
+				$t = haproxy_find_acl($acl['expression']);
+				$display = '';
+				if (!$t || ($t['mode'] != '' && $t['mode'] != strtolower($backend['type'])))
+					$display = 'style="display: none;"';
 			?>
-			<tr>
+			<tr id="aclrow<?=$counter;?>" <?=$display;?>>
 				<td><input name="acl_name<?=$counter;?>" id="acl_name<?=$counter;?>" type="text" value="<?=$acl['name']; ?>" size="20"/></td>
 				<td>
 				<select name="acl_expression<?=$counter;?>" id="acl_expression<?=$counter;?>">
 				<?php
-				foreach ($a_expr as $expr) { ?>
-					<option value="<?=$expr[0];?>"<?php if($acl['expression'] == $expr[0]) echo " SELECTED"; ?>><?=$expr[1];?></option>
+				foreach ($a_acltypes as $expr) { ?>
+					<option value="<?=$expr['name'];?>"<?php if($acl['expression'] == $expr['name']) echo " SELECTED"; ?>><?=$expr['descr'];?></option>
 				<?php } ?>
 				</select>
 				</td>

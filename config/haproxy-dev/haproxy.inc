@@ -34,6 +34,28 @@ require_once("notices.inc");
 
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 
+$a_acltypes = array();
+$a_acltypes[] = array('name' => 'host_starts_with', 'descr' => 'Host starts with:', 'mode' => 'http');
+$a_acltypes[] = array('name' => 'host_ends_with', 'descr' => 'Host ends with:', 'mode' =>'http');
+$a_acltypes[] = array('name' => 'host_matches', 'descr' => 'Host matches:', 'mode' =>'http');
+$a_acltypes[] = array('name' => 'host_regex', 'descr' => 'Host regex:', 'mode' =>'http');
+$a_acltypes[] = array('name' => 'host_contains', 'descr' => 'Host contains:', 'mode' => 'http');
+$a_acltypes[] = array('name' => 'path_starts_with', 'descr' => 'Path starts with:', 'mode' => 'http');
+$a_acltypes[] = array('name' => 'path_ends_with', 'descr' => 'Path ends with:', 'mode' => 'http');
+$a_acltypes[] = array('name' => 'path_matches', 'descr' => 'Path matches:', 'mode' => 'http');
+$a_acltypes[] = array('name' => 'path_regex', 'descr' => 'Path regex:', 'mode' => 'http');
+$a_acltypes[] = array('name' => 'path_contains', 'descr' => 'Path contains:', 'mode' => 'http');
+$a_acltypes[] = array('name' => 'source_ip', 'descr' => 'Source IP:', 'mode' => '');
+
+function haproxy_find_acl($name) {
+	global $a_acltypes;
+
+	foreach ($a_acltypes as $acl) {
+		if ($acl['name'] == $name)
+			return $acl;
+	}
+}
+
 function haproxy_custom_php_deinstall_command() {
 	exec("rm /usr/local/sbin/haproxy");
 	exec("rm /usr/local/pkg/haproxy.inc");
@@ -215,6 +237,11 @@ function haproxy_configure() {
 				$a_acl=array();
 			
 			foreach ($a_acl as $acl) {
+				// Filter out acls for different modes
+				$t = haproxy_find_acl($acl['expression']);
+				if (!$t || ($t['mode'] != '' && $t['mode'] != strtolower($backend['type'])))
+					continue;
+
 				if ($acl['expression'] == "host_starts_with")
 					$expr = 'hdr_beg(host) -i';
 				else if ($acl['expression'] == "host_ends_with")
