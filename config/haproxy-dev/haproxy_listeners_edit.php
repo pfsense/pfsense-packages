@@ -251,8 +251,10 @@ include("head.inc");
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<?php if($one_two): ?>
 <script type="text/javascript" src="/javascript/scriptaculous/prototype.js"></script>
 <script type="text/javascript" src="/javascript/scriptaculous/scriptaculous.js"></script>
+<?php endif; ?>
 <script type="text/javascript">
 	// Global Variables
 	var rowname = new Array(99);
