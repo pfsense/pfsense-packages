@@ -289,6 +289,8 @@ include("head.inc");
 			seltext = "<?php echo haproxy_acl_select('https');?>";
 		else
 			seltext = "<?php echo haproxy_acl_select('http');?>";
+		if (seltext == '')
+			return;
 
 	        tbody = d.getElementById(tableId).getElementsByTagName("tbody").item(0);
 	        tr = d.createElement("tr");
