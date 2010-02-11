@@ -204,10 +204,10 @@ function clearcombo(){
 	rowsize[1] = "30";
 	rowname[2] = "server_port";
 	rowtype[2] = "textbox";
-	rowsize[2] = "12";
+	rowsize[2] = "5";
 	rowname[3] = "server_weight";
 	rowtype[3] = "textbox";
-	rowsize[3] = "12";
+	rowsize[3] = "5";
 </script>
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
@@ -288,9 +288,9 @@ function clearcombo(){
 				<td class="vtable">
 				  <input name="server_address<?=$counter;?>" id="server_address<?=$counter;?>" type="text" value="<?=$server['address']; ?>" size="30"/></td>
 				<td class="vtable">
-				  <input name="server_port<?=$counter;?>" id="server_port<?=$counter;?>" type="text" value="<?=$server['port']; ?>" size="12"/></td>
+				  <input name="server_port<?=$counter;?>" id="server_port<?=$counter;?>" type="text" value="<?=$server['port']; ?>" size="5"/></td>
 				<td class="vtable">
-				  <input name="server_weight<?=$counter;?>" id="server_weight<?=$counter;?>" type="text" value="<?=$server['weight']; ?>" size="12"/></td>
+				  <input name="server_weight<?=$counter;?>" id="server_weight<?=$counter;?>" type="text" value="<?=$server['weight']; ?>" size="5"/></td>
 				<td class="list">
 			         <table border="0" cellspacing="0" cellpadding="1"><tr>
 			         <td valign="middle">
