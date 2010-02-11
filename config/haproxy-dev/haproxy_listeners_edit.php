@@ -289,8 +289,10 @@ include("head.inc");
 			seltext = "<?php echo haproxy_acl_select('https');?>";
 		else
 			seltext = "<?php echo haproxy_acl_select('http');?>";
-		if (seltext == '')
+		if (seltext == '') {
+			alert("No ACL types available in current listener mode");
 			return;
+		}
 
 	        tbody = d.getElementById(tableId).getElementsByTagName("tbody").item(0);
 	        tr = d.createElement("tr");
