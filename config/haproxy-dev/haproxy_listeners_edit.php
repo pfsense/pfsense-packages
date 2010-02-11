@@ -563,7 +563,7 @@ include("head.inc");
 			foreach ($a_acl as $acl) {
 				$t = haproxy_find_acl($acl['expression']);
 				$display = '';
-				if (!$t || ($t['mode'] != '' && $t['mode'] != strtolower($backend['type'])))
+				if (!$t || ($t['mode'] != '' && $t['mode'] != strtolower($pconfig['type'])))
 					$display = 'style="display: none;"';
 			?>
 			<tr id="aclrow<?=$counter;?>" <?=$display;?>>
