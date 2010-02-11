@@ -247,6 +247,9 @@ function clearcombo(){
 				
 			</td>
 		</tr>
+		<tr align="left">
+			<td class="vncellreq" colspan="3">Server list</td>
+		</tr>
 		<tr>
 			<td width="78%" class="vtable" colspan="2" valign="top">
 			<table class="" width="100%" cellpadding="0" cellspacing="0" id='servertable'>
