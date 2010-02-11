@@ -35,17 +35,28 @@ require_once("notices.inc");
 $d_haproxyconfdirty_path = $g['varrun_path'] . "/haproxy.conf.dirty";
 
 $a_acltypes = array();
-$a_acltypes[] = array('name' => 'host_starts_with', 'descr' => 'Host starts with:', 'mode' => 'http');
-$a_acltypes[] = array('name' => 'host_ends_with', 'descr' => 'Host ends with:', 'mode' =>'http');
-$a_acltypes[] = array('name' => 'host_matches', 'descr' => 'Host matches:', 'mode' =>'http');
-$a_acltypes[] = array('name' => 'host_regex', 'descr' => 'Host regex:', 'mode' =>'http');
-$a_acltypes[] = array('name' => 'host_contains', 'descr' => 'Host contains:', 'mode' => 'http');
-$a_acltypes[] = array('name' => 'path_starts_with', 'descr' => 'Path starts with:', 'mode' => 'http');
-$a_acltypes[] = array('name' => 'path_ends_with', 'descr' => 'Path ends with:', 'mode' => 'http');
-$a_acltypes[] = array('name' => 'path_matches', 'descr' => 'Path matches:', 'mode' => 'http');
-$a_acltypes[] = array('name' => 'path_regex', 'descr' => 'Path regex:', 'mode' => 'http');
-$a_acltypes[] = array('name' => 'path_contains', 'descr' => 'Path contains:', 'mode' => 'http');
-$a_acltypes[] = array('name' => 'source_ip', 'descr' => 'Source IP:', 'mode' => '');
+$a_acltypes[] = array('name' => 'host_starts_with', 'descr' => 'Host starts with',
+				'mode' => 'http', 'syntax' => 'hdr_beg(host) -i');
+$a_acltypes[] = array('name' => 'host_ends_with', 'descr' => 'Host ends with',
+				'mode' =>'http', 'syntax' => 'hdr_end(host) -i');
+$a_acltypes[] = array('name' => 'host_matches', 'descr' => 'Host matches',
+				'mode' =>'http', 'syntax' => 'hdr(host) -i');
+$a_acltypes[] = array('name' => 'host_regex', 'descr' => 'Host regex',
+				'mode' =>'http', 'syntax' => 'hdr_reg(host) -i');
+$a_acltypes[] = array('name' => 'host_contains', 'descr' => 'Host contains',
+				'mode' => 'http', 'syntax' => 'hdr_dir(host) -i');
+$a_acltypes[] = array('name' => 'path_starts_with', 'descr' => 'Path starts with',
+				'mode' => 'http', 'syntax' => 'path_beg -i');
+$a_acltypes[] = array('name' => 'path_ends_with', 'descr' => 'Path ends with',
+				'mode' => 'http', 'syntax' => 'path_end -i');
+$a_acltypes[] = array('name' => 'path_matches', 'descr' => 'Path matches',
+				'mode' => 'http', 'syntax' => 'path -i');
+$a_acltypes[] = array('name' => 'path_regex', 'descr' => 'Path regex',
+				'mode' => 'http', 'syntax' => 'path_reg -i');
+$a_acltypes[] = array('name' => 'path_contains', 'descr' => 'Path contains',
+				'mode' => 'http', 'syntax' => 'path_dir -i');
+$a_acltypes[] = array('name' => 'source_ip', 'descr' => 'Source IP',
+				'mode' => '', 'syntax' => 'src');
 
 function haproxy_find_acl($name) {
 	global $a_acltypes;
@@ -236,38 +247,21 @@ function haproxy_configure() {
 			if(!is_array($a_acl)) 
 				$a_acl=array();
 			
-			foreach ($a_acl as $acl) {
-				// Filter out acls for different modes
-				$t = haproxy_find_acl($acl['expression']);
-				if (!$t || ($t['mode'] != '' && $t['mode'] != strtolower($backend['type'])))
+			foreach ($a_acl as $entry) {
+				$acl = haproxy_find_acl($entry['expression']);
+				if (!$acl)
 					continue;
 
-				if ($acl['expression'] == "host_starts_with")
-					$expr = 'hdr_beg(host) -i';
-				else if ($acl['expression'] == "host_ends_with")
-					$expr = 'hdr_end(host) -i';
-				else if ($acl['expression'] == "host_matches")
-					$expr = 'hdr(host) -i';
-				else if ($acl['expression'] == "host_regex")
-					$expr = 'hdr_reg(host) -i';
-				else if ($acl['expression'] == "host_contains")
-					$expr = 'hdr_dir(host) -i';
-				else if ($acl['expression'] == "path_starts_with")
-					$expr = 'path_beg -i';
-				else if ($acl['expression'] == "path_ends_with")
-					$expr = 'path_end -i';
-				else if ($acl['expression'] == "path_matches")
-					$expr = 'path -i';
-				else if ($acl['expression'] == "path_regex")
-					$expr = 'path_reg -i';
-				else if ($acl['expression'] == "path_contains")
-					$expr = 'path_dir -i';
-				else if ($acl['expression'] == "source_ip")
-					$expr = 'src';
+				// Filter out acls for different modes
+				if ($acl['mode'] != '' && $acl['mode'] != strtolower($backend['type']))
+					continue;
+
+				if ($acl['syntax'] != '')
+					$expr = $acl['syntax'] . " " . $entry['value'];
 				else
-					$expr = $acl['expression'];
-				$expr .= " " . $acl['value'];	
-				fwrite ($fd, "\tacl\t\t\t".$acl['name']."\t".$expr."\n");
+					$expr = $entry['expression'] . " " . $entry['value'];
+
+				fwrite ($fd, "\tacl\t\t\t".$entry['name']."\t".$expr."\n");
 			}
 
 			if (is_array($a_pools)) {

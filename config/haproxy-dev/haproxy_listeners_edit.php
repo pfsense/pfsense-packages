@@ -38,7 +38,7 @@ function haproxy_acl_select($mode) {
 	$seltext = '';
 	foreach ($a_acltypes as $expr) {
 		if ($expr['mode'] == '' || $expr['mode'] == $mode)
-			$seltext .= "<option value='" . $expr['name'] . "'>" . $expr['descr'] ."</option>";
+			$seltext .= "<option value='" . $expr['name'] . "'>" . $expr['descr'] .":</option>";
 	}
 	return $seltext;
 }
@@ -574,7 +574,7 @@ include("head.inc");
 				<select name="acl_expression<?=$counter;?>" id="acl_expression<?=$counter;?>">
 				<?php
 				foreach ($a_acltypes as $expr) { ?>
-					<option value="<?=$expr['name'];?>"<?php if($acl['expression'] == $expr['name']) echo " SELECTED"; ?>><?=$expr['descr'];?></option>
+					<option value="<?=$expr['name'];?>"<?php if($acl['expression'] == $expr['name']) echo " SELECTED"; ?>><?=$expr['descr'];?>:</option>
 				<?php } ?>
 				</select>
 				</td>
