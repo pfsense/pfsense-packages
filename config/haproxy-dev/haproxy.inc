@@ -61,6 +61,33 @@ $a_acltypes[] = array('name' => 'source_ip', 'descr' => 'Source IP',
 function haproxy_find_acl($name) {
 	global $a_acltypes;
 
+	/* XXX why is this broken from xmlsync? */
+	if (!$a_acltypes) {
+		$a_acltypes = array();
+		$a_acltypes[] = array('name' => 'host_starts_with', 'descr' => 'Host starts with',
+			'mode' => 'http', 'syntax' => 'hdr_beg(host) -i');
+		$a_acltypes[] = array('name' => 'host_ends_with', 'descr' => 'Host ends with',
+			'mode' =>'http', 'syntax' => 'hdr_end(host) -i');
+		$a_acltypes[] = array('name' => 'host_matches', 'descr' => 'Host matches',
+			'mode' =>'http', 'syntax' => 'hdr(host) -i');
+		$a_acltypes[] = array('name' => 'host_regex', 'descr' => 'Host regex',
+			'mode' =>'http', 'syntax' => 'hdr_reg(host) -i');
+		$a_acltypes[] = array('name' => 'host_contains', 'descr' => 'Host contains',
+			'mode' => 'http', 'syntax' => 'hdr_dir(host) -i');
+		$a_acltypes[] = array('name' => 'path_starts_with', 'descr' => 'Path starts with',
+			'mode' => 'http', 'syntax' => 'path_beg -i');
+		$a_acltypes[] = array('name' => 'path_ends_with', 'descr' => 'Path ends with',
+			'mode' => 'http', 'syntax' => 'path_end -i');
+		$a_acltypes[] = array('name' => 'path_matches', 'descr' => 'Path matches',
+			'mode' => 'http', 'syntax' => 'path -i');
+		$a_acltypes[] = array('name' => 'path_regex', 'descr' => 'Path regex',
+			'mode' => 'http', 'syntax' => 'path_reg -i');
+		$a_acltypes[] = array('name' => 'path_contains', 'descr' => 'Path contains',
+			'mode' => 'http', 'syntax' => 'path_dir -i');
+		$a_acltypes[] = array('name' => 'source_ip', 'descr' => 'Source IP',
+			'mode' => '', 'syntax' => 'src');
+	}
+
 	foreach ($a_acltypes as $acl) {
 		if ($acl['name'] == $name)
 			return $acl;
