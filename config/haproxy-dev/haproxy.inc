@@ -336,7 +336,12 @@ function haproxy_configure() {
 							}
 							if (!$be['name'])
 								$be['name'] = $be['address'];
-							fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . " $cookie " . " $checkinter weight " . $be['weight'] . "{$advanced_txt}\n");
+							if($be['backup']) {
+								$isbackup = "backup";
+							} else {
+								$isbackup = "";
+							}
+							fwrite ($fd, "\tserver\t\t\t" . $be['name'] . " " . $be['address'].":" . $be['port'] . " $cookie " . " $checkinter $isbackup weight " . $be['weight'] . "{$advanced_txt}\n");
 						}
 
 					}

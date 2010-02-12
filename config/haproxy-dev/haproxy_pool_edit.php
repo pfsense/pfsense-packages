@@ -88,6 +88,7 @@ if ($_POST) {
 		$server_address=$_POST['server_address'.$x];
 		$server_port=$_POST['server_port'.$x];
 		$server_weight=$_POST['server_weight'.$x];
+		$server_backup=$_POST['server_backup'.$x];
 
 		if ($server_address) {
 
@@ -96,6 +97,7 @@ if ($_POST) {
 			$server['address']=$server_address;
 			$server['port']=$server_port;
 			$server['weight']=$server_weight;
+			$server['backup']=$server_backup;
 			$a_servers[]=$server;
 
 			if (preg_match("/[^a-zA-Z0-9\.\-_]/", $server_name))
@@ -208,6 +210,9 @@ function clearcombo(){
 	rowname[3] = "server_weight";
 	rowtype[3] = "textbox";
 	rowsize[3] = "5";
+	rowname[4] = "server_backup";
+	rowtype[4] = "checkbox";
+	rowsize[4] = "5";
 </script>
 <?php include("fbegin.inc"); ?>
 <?php if ($input_errors) print_input_errors($input_errors); ?>
@@ -258,6 +263,7 @@ function clearcombo(){
 	                  <td width="30%" class="">Address</td>
 	                  <td width="18%" class="">Port</td>
 	                  <td width="18%" class="">Weight</td>
+	                  <td width="5%" class="">Backup</td>
 	                  <td width="4%" class=""></td>
 			</tr>
 			<?php 
@@ -275,6 +281,7 @@ function clearcombo(){
 			<td class="vtable"><?=$server['address']; ?></td>
 			<td class="vtable"><?=$server['port']; ?></td>
 			<td class="vtable"><?=$server['weight']; ?></td>
+			<td class="vtable"><?=$server['backup']; ?></td>
 			<td class="list">
 			  <table border="0" cellspacing="0" cellpadding="1"><tr>
 			  <td valign="middle">
@@ -294,6 +301,8 @@ function clearcombo(){
 				  <input name="server_port<?=$counter;?>" id="server_port<?=$counter;?>" type="text" value="<?=$server['port']; ?>" size="5"/></td>
 				<td class="vtable">
 				  <input name="server_weight<?=$counter;?>" id="server_weight<?=$counter;?>" type="text" value="<?=$server['weight']; ?>" size="5"/></td>
+				<td class="vtable">
+				  <input name="server_backup<?=$counter;?>" id="server_backup<?=$counter;?>" type="checkbox" value="yes" <?php if ($server['backup']=='yes') echo "checked"; ?>/></td>
 				<td class="list">
 			         <table border="0" cellspacing="0" cellpadding="1"><tr>
 			         <td valign="middle">
@@ -351,7 +360,7 @@ function clearcombo(){
 <br>
 <?php include("fend.inc"); ?>
 <script type="text/javascript">
-	field_counter_js = 4;
+	field_counter_js = 5;
 	rows = 1;
 	totalrows =  <?php echo $counter; ?>;
 	loaded =  <?php echo $counter; ?>;
@@ -404,7 +413,7 @@ var addRowTo = (function() {
 		} else {
 			td.innerHTML="<INPUT type='hidden' value='" + totalrows +"' name='" + rowname[i] + "_row-" + totalrows +
 				"'></input><input type='checkbox' name='" + rowname[i] + totalrows +
-				"' id='" + rowname[i] + totalrows + "'></input> ";
+				"' id='" + rowname[i] + totalrows + "' value='yes'></input> ";
 		}
 		td.setAttribute("class","vtable");
 		tr.appendChild(td);
@@ -446,7 +455,10 @@ function dupRow(rowId, tableId) {
         dupEl = document.getElementById(rowname[i] + rowId);
         newEl = document.getElementById(rowname[i] + totalrows);
 	if (dupEl && newEl)
-            newEl.value = dupEl.value;
+	    if(rowtype[i] == 'checkbox')
+		newEl.checked = dupEl.checked;
+	    else
+                newEl.value = dupEl.value;
     }
 }
 
