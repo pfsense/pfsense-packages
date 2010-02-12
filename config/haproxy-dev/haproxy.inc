@@ -88,9 +88,11 @@ function haproxy_find_acl($name) {
 			'mode' => '', 'syntax' => 'src');
 	}
 
-	foreach ($a_acltypes as $acl) {
-		if ($acl['name'] == $name)
-			return $acl;
+	if($a_acltypes) {
+		foreach ($a_acltypes as $acl) {
+			if ($acl['name'] == $name)
+				return $acl;
+		}
 	}
 }
 
