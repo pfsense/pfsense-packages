@@ -107,15 +107,20 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 		return false;
 
 	// determine basic variables
-	if ($useaddr) {
+	if ($useaddr == "serveraddr") {
 		$interface = $settings['interface'];
-		if (!$interface)
-			$interface = 'wan';
-		$iface = convert_friendly_interface_to_real_interface_name($interface);
-		$lines = explode(' ', trim(shell_exec("ifconfig {$iface} | grep inet | grep -v inet6")));
-		$server_host = $lines[1];
-	} else
+		if (!empty($settings['ipaddr']) && is_ipaddr($settings['ipaddr'])) {
+			$server_host = $settings['ipaddr'];
+		} else {
+			if (!$interface)
+				$interface = "wan";
+			$server_host = get_interface_ip($interface);
+		}
+	} else if ($useaddr == "serverhostname" || empty($useaddr)) {
 		$server_host = "{$config['system']['hostname']}.{$config['system']['domain']}";
+	} else
+		$server_host = $useaddr;
+
 	$server_port = $settings['local_port'];
 	$proto = ($settings['protocol'] == 'UDP' ? 'udp' : "tcp-client");
 	$cipher = $settings['crypto'];

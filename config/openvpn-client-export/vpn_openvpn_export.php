@@ -87,6 +87,7 @@ $act = $_GET['act'];
 if (isset($_POST['act']))
 	$act = $_POST['act'];
 
+$error = false;
 if($act == "conf") {
 	$srvid = $_GET['srvid'];
 	$usrid = $_GET['usrid'];
@@ -95,15 +96,25 @@ if($act == "conf") {
 		pfSenseHeader("vpn_openvpn_export.php");
 		exit;
 	}
-	$useaddr = $_GET['useaddr'];
+	if ($_GET['useaddr'] == "other") {
+		if (empty($_GET['useaddr_hostname'])) {
+                        $error = true;
+                        $input_errors[] = "You need to specify an IP or hostname.";
+		} else
+			$useaddr = $_GET['useaddr_hostname'];
+	} else
+		$useaddr = $_GET['useaddr'];
+
 	$usetoken = $_GET['usetoken'];
 
 	$exp_name = openvpn_client_export_prefix($srvid);
 	$exp_name = urlencode($exp_name."-config.ovpn");
 	$exp_data = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken);
-	if (!$exp_data)
+	if (!$exp_data) {
 		$input_errors[] = "Failed to export config files!";
-	else {
+		$error = true;
+	}
+	if (!$error) {
 		$exp_size = strlen($exp_data);
 
 		header("Content-Type: application/octet-stream");
@@ -122,7 +133,15 @@ if($act == "visc") {
 		pfSenseHeader("vpn_openvpn_export.php");
 		exit;
 	}
-	$useaddr = $_GET['useaddr'];
+	if ($_GET['useaddr'] == "other") {
+		if (empty($_GET['useaddr_hostname'])) {
+                        $error = true;
+                        $input_errors[] = "You need to specify an IP or hostname.";
+		} else
+                	$useaddr = $_GET['useaddr_hostname'];
+        } else
+                $useaddr = $_GET['useaddr'];
+
 	$usetoken = $_GET['usetoken'];
 	$password = "";
 	if ($_GET['password'])
@@ -131,9 +150,11 @@ if($act == "visc") {
 	$exp_name = openvpn_client_export_prefix($srvid);
 	$exp_name = urlencode($exp_name."-Viscosity.visc.zip");
 	$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $password);
-	if (!$exp_path)
+	if (!$exp_path) {
 		$input_errors[] = "Failed to export config files!";
-	else {
+		$error = true;
+	}
+	if (!$error) {
 		$exp_size = filesize($exp_path);
 
 		header("Content-Type: application/octet-stream");
@@ -153,7 +174,15 @@ if($act == "inst") {
 		pfSenseHeader("vpn_openvpn_export.php");
 		exit;
 	}
-	$useaddr = $_GET['useaddr'];
+	if ($_GET['useaddr'] == "other") {
+		if (empty($_GET['useaddr_hostname'])) {
+			$error = true;
+			$input_errors[] = "You need to specify an IP or hostname.";
+		} else 
+                	$useaddr = $_GET['useaddr_hostname'];
+        } else
+                $useaddr = $_GET['useaddr'];
+
 	$usetoken = $_GET['usetoken'];
 	$password = "";
 	if ($_GET['password'])
@@ -162,9 +191,11 @@ if($act == "inst") {
 	$exp_name = openvpn_client_export_prefix($srvid);
 	$exp_name = urlencode($exp_name."-install.exe");
 	$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $password);
-	if (!$exp_path)
+	if (!$exp_path) {
 		$input_errors[] = "Failed to export config files!";
-	else {
+		$error = true;
+	}
+	if (!$error) {
 		$exp_size = filesize($exp_path);
 
 		header("Content-Type: application/octet-stream");
@@ -204,10 +235,17 @@ function download_begin(act, i) {
 
 	var index = document.getElementById("server").selectedIndex;
 	var users = servers[index][1];
+	var useaddr;
 
-	var useaddr = 0;
-	if (document.getElementById("useaddr").checked)
-		useaddr = 1;
+	if (document.getElementById("useaddr").value == "other") {
+		if (document.getElementById("useaddr_hostname").value == "") {
+			alert("Please specify an IP address or hostname.");
+			return;
+		}
+		useaddr = document.getElementById("useaddr_hostname").value;
+	} else
+		useaddr = document.getElementById("useaddr").value;
+
 	var usetoken = 0;
 	if (document.getElementById("usetoken").checked)
 		usetoken = 1;
@@ -267,6 +305,15 @@ function server_changed() {
 	}
 }
 
+function useaddr_changed(obj) {
+
+	if (obj.value == "other")
+		$('HostName').show();
+	else
+		$('HostName').hide();
+	
+}
+
 function usepass_changed() {
 
 	if (document.getElementById("usepass").checked)
@@ -316,12 +363,18 @@ function usepass_changed() {
 							<table border="0" cellpadding="2" cellspacing="0">
 								<tr>
 									<td>
-										<input name="useaddr" id="useaddr" type="checkbox" value="yes">
-									</td>
-									<td>
-										<span class="vexpl">
-											Use the server IP address instead of the hostname.
-										</span>
+										<select name="useaddr" id="useaddr" class="formselect" onChange="useaddr_changed(this)">
+											<option value="serveraddr" >Interface IP Address</option>
+											<option value="serverhostname" >Installation hostname</option>
+											<option value="other">Other</option>
+										</select>
+										<br />
+										<div style="display:none;" name="HostName" id="HostName">
+											<input name="useaddr_hostname" id="useaddr_hostname" />
+											<span class="vexpl">
+												Enter the hostname or ip address desired to be used for the config.
+											</span>
+										</div>
 									</td>
 								</tr>
 							</table>
