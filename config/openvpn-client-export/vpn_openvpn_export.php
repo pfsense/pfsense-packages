@@ -47,6 +47,8 @@ $a_user = $config['system']['user'];
 
 $ras_server = array();
 foreach($a_server as $sindex => & $server) {
+	if (isset($server['disable']))
+		continue;
 	$ras_user = array();
 	if (stripos($server['mode'], "server") === false)
 		continue;
