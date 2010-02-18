@@ -314,17 +314,18 @@
     </package>
     <package>
       <name>Lightsquid</name>
-      <descr>High perfomance web proxy report. Requires squid.</descr>
+      <descr>High perfomance web proxy report. Requires squid HTTP proxy.</descr>
       <website>http://lightsquid.sf.net/</website>
-      <category>Network</category>
-      <version>1.7.1</version>
+      <category>Network Report</category>
+      <version>1.8.0</version>
       <maintainer>dv_serg@mail.ru</maintainer>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <depends_on_package>lightsquid-1.7.1_1.tbz</depends_on_package>
-      <depends_on_package>perl-5.8.8_1.tbz</depends_on_package>
-      <status>Beta1</status>
-      <required_version>3</required_version>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+      <depends_on_package>lightsquid-1.8.tbz</depends_on_package>
+      <depends_on_package>perl-5.8.9_3.tbz</depends_on_package>
+      <status>Beta</status>
+      <required_version>2</required_version>
       <config_file>http://www.pfsense.com/packages/config/lightsquid/lightsquid.xml</config_file>
+      <pkginfolink></pkginfolink>
       <configurationfile>lightsquid.xml</configurationfile>
 	  <noembedded>true</noembedded>
     </package>
@@ -668,8 +669,8 @@
     <package>
       <name>squidGuard</name>
       <descr>
-          High perfomance web proxy URL filter. 
-          Required proxy Squid package. 
+          High perfomance web proxy URL filter.
+          Required proxy Squid package.
 	  </descr>
       <website>http://www.squidGuard.org/</website>
       <maintainer>dv_serg@mail.ru</maintainer>
@@ -709,9 +710,9 @@
       <configurationfile>openvpn-client-export.xml</configurationfile>
     </package>
     <package>
-      <name>HAVP antivirus</name> 
-      <pkginfolink></pkginfolink> 
-      <website>http://www.server-side.de/</website> 
+      <name>HAVP antivirus</name>
+      <pkginfolink></pkginfolink>
+      <website>http://www.server-side.de/</website>
       <descr>Antivirus:  HAVP (HTTP Antivirus Proxy) is a proxy with a ClamAV anti-virus scanner. The main aims are continuous, non-blocking downloads and smooth scanning of dynamic and password protected HTTP traffic. Havp antivirus proxy has a parent and transparent proxy mode. It can be used with squid or standalone. And File Scanner for local files.</descr>
       <category>Network Management</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
