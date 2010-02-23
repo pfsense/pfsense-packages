@@ -3,6 +3,7 @@
 	openvpn-client-export.inc
 	Copyright (C) 2009 Scott Ullrich <sullrich@gmail.com>
 	Copyright (C) 2008 Shrew Soft Inc
+	Copyright (C) 2010 Ermal Luçi
 	All rights reserved.
 
 	Parts of this code was originally based on vpn_ipsec_sad.php
