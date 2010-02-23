@@ -66,7 +66,7 @@ function openvpn_client_export_prefix($srvid) {
 		return false;
 
 	$host = $config['system']['hostname'];
-	$prot = ($settings['protocol'] == 'UDP' ? 'udp' : "tcp-{$mode}");
+	$prot = ($settings['protocol'] == 'UDP' ? 'udp' : $settings['protocol']);
 	$port = $settings['local_port'];
 
 	return "{$host}-{$prot}-{$port}";
@@ -85,26 +85,34 @@ function openvpn_client_pem_to_pk12($outpath, $outpass, $crtpath, $keypath, $cap
 		unlink($capath);
 }
 
-function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false) {
-	global $config;
+function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy) {
+	global $config, $input_errors;
 
 	// lookup server settings
 	$settings = $config['openvpn']['openvpn-server'][$srvid];
-	if (empty($settings))
+	if (empty($settings)) {
+		$input_errors[] = "Could not locate server configuration.";
 		return false;
-	if ($settings['disable'])
+	}
+	if ($settings['disable']) {
+		$input_errors[] = "You cannot export for disabled servers.";
 		return false;
+	}
 
 	// lookup server certificate info
 	$server_cert =& lookup_cert($settings['certref']);
 	$server_ca =& lookup_ca($server_cert['caref']);
-	if (!$server_cert || !$server_ca)
+	if (!$server_cert || !$server_ca) {
+		$input_errors[] = "Could not locate certificate.";
 		return false;
+	}
 
 	// lookup user info
 	$user =& $config['system']['user'][$usrid];
-	if (!$user)
+	if (!$user) {
+		$input_errors[] = "Could not find user settings.";
 		return false;
+	}
 
 	// determine basic variables
 	if ($useaddr == "serveraddr") {
@@ -123,6 +131,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 
 	$server_port = $settings['local_port'];
 	$proto = ($settings['protocol'] == 'UDP' ? 'udp' : "tcp-client");
+
 	$cipher = $settings['crypto'];
 
 	// add basic settings
@@ -135,6 +144,20 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	$conf .= "client\n";
 	$conf .= "resolv-retry infinite\n";
 	$conf .= "remote {$server_host} {$server_port}\n";
+
+	if (!empty($proxy)) {
+                if ($proto == "udp") {
+                        $input_errors[] = "This server uses UDP protocol and cannot communicate with HTTP proxy.";
+                        return;
+                }
+                $conf .= "http-proxy {$proxy['ip']} {$proxy['port']} ";
+                if ($proxy['proxy_authtype'] != "none") {
+                        if (!isset($proxy['passwdfile']))
+                                $proxy['passwdfile'] =  openvpn_client_export_prefix($srvid) . "-proxy";
+                        $conf .= " {$proxy['passwdfile']} {$proxy['proxy_authtype']}";
+                }
+                $conf .= "\n";
+        }
 
 	// add user auth settings
 	switch($settings['mode']) {
@@ -169,7 +192,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	return $conf;
 }
 
-function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass) {
+function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass, $proxy) {
 	global $config, $g;
 
 	$ovpndir = "/usr/local/share/openvpn";
@@ -213,9 +236,16 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	// write cofiguration file
 	$prefix = openvpn_client_export_prefix($srvid);
 	$cfgfile = "{$confdir}/{$prefix}-config.ovpn";
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, false);
+	if (!empty($proxy) && $proxy['proxy_authtype'] != "none") {
+		$proxy['passwdfile'] =  "{$prefix}-password";
+		$pwdfle = "{$proxy['user']}\n";
+		$pwdfle .= "{$proxy['password']}\n";
+		file_put_contents("{$confdir}/{$proxy['passwdfile']}", $pwdfle);
+	}
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, false, $proxy);
 	if (!$conf)
 		return false;
+
 	file_put_contents($cfgfile, $conf);
 
 	// write key files
@@ -263,7 +293,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	return $outfile;	
 }
 
-function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass) {
+function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass, $proxy) {
 	global $config, $g;
 
 	$ovpndir = "/usr/local/share/openvpn/";
@@ -303,7 +333,14 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 
 	// write cofiguration file
 	$prefix = openvpn_client_export_prefix($srvid);
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, true);
+	if (!empty($proxy) && $proxy['proxy_authtype'] != "none") {
+		$proxy['passwdfile'] =  "config-password";
+                $pwdfle = "{$proxy['user']}\n";
+                $pwdfle .= "{$proxy['password']}\n";
+                file_put_contents("{$tempdir}/{$proxy['passwdfile']}", $pwdfle);
+        }
+	
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, true, $proxy);
 	if (!$conf)
 		return false;
 
