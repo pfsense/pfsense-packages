@@ -28,7 +28,7 @@
 */
 
 function ospfd_install_conf() {
-	global $config, $g;
+	global $config, $g, $input_errors;
 	
 	conf_mount_rw();
 	
@@ -63,46 +63,59 @@ function ospfd_install_conf() {
 		if ($ospfd_conf['resdistributestatic'])
 			$conffile .= "redistribute static\n";
 		
+		if ($ospfd_conf['spfholdtime'])
+			$conffile .= "spf-holdtime {$ospfd_conf['spfholdtime']}\n";
+
+		if ($ospfd_conf['spfdelay'])
+			$conffile .= "spf-delay {$ospfd_conf['spfdelay']}\n";
+
+		if ($ospfd_conf['rfc1583'])
+			$conffile .= "rfc1583compat yes\n";
+
 		$conffile .= "area {$ospfd_conf['area']} {\n";
 
-		$conffile .= "\tinterface " . $config['interfaces'][$ospfd_conf['interface']]['if'];
-		$options_present = false;
-		if (!empty($ospfd_conf['metric'])) {
-			$options_present = true;
-			$ifconfigs .= "\t\tmetric {$ospfd_conf['metric']}\n";
+		if ($config['installedpackages']['ospfdinterfaces']['config']) {
+                	foreach ($config['installedpackages']['ospfdinterfaces']['config'] as $conf) {
+				$conffile .= "\tinterface " . $config['interfaces'][$conf['interface']]['if'];
+				$options_present = false;
+				if (!empty($conf['metric'])) {
+					$options_present = true;
+					$ifconfigs .= "\t\tmetric {$conf['metric']}\n";
+				}
+				if (!empty($conf['hellointervalinseconds'])) {
+					$options_present = true;
+					$ifconfigs .= "\t\thello-interval {$conf['hellointervalinseconds']}\n";
+				}
+				if ($conf['md5password'] && !empty($conf['password'])) {
+					$options_present = true;
+					$ifconfigs .= "\t\tauth-type crypt\n";
+					$ifconfigs .= "\t\tauth-md 1 \"" . substr($conf['password'], 0, 15) . "\"\n";
+					$ifconfigs .= "\t\tauth-md-keyid 1\n";
+               			} else if (!empty($conf['passward'])) {
+					$options_present = true;
+					$ifconfigs .= "\t\tauth-type simple\n";
+					$ifconfigs .= "\t\tauth-key \"" . substr($conf['password'], 0, 7) . "\"\n";
+				}
+				if (!empty($conf['routerpriorityelections'])) {
+                        		$options_present = true;
+                        		$ifconfigs .= "\t\trouter-priority {$conf['routerpriorityelections']}\n";
+                		}
+				if (!empty($conf['retransmitinterval'])) {
+					$options_present = true;
+					$ifconfigs .= "\t\tretransmit-interval {$conf['retransmitinterval']}\n";
+				}
+				if (!empty($conf['deadtimer'])) {
+                        		$options_present = true;
+                        		$ifconfigs .= "\t\trouter-dead-time {$conf['deadtimer']}\n";
+                		}
+				if (!empty($ifconfigs)) {
+					$conffile .= " {\n {$ifconfigs} \n";
+					if ($options_present == true)
+						$conffile .= "\t}\n";
+				} else
+					$conffile .= "\n";
+			}
 		}
-		if (!empty($ospfd_conf['hellointervalinseconds'])) {
-			$options_present = true;
-			$ifconfigs .= "\t\thello-interval {$ospfd_conf['hellointervalinseconds']}\n";
-		}
-		if ($ospfd_conf['md5password'] && !empty($ospfd_conf['password'])) {
-                        $options_present = true;
-			$ifconfigs .= "\t\tauth-type crypt\n";
-			$ifconfigs .= "\t\tauth-md 1 \"" . substr($ospfd_conf['password'], 0, 15) . "\"\n";
-			$ifconfigs .= "\t\tauth-md-keyid 1\n";
-                } else if (!empty($ospfd_conf['passward'])) {
-			$options_present = true;
-			$ifconfigs .= "\t\tauth-type simple\n";
-			$ifconfigs .= "\t\tauth-key \"" . substr($ospfd_conf['password'], 0, 7) . "\"\n";
-		}
-		if (!empty($ospfd_conf['routerpriorityelections'])) {
-                        $options_present = true;
-                        $ifconfigs .= "\t\trouter-priority {$ospfd_conf['routerpriorityelections']}\n";
-                }
-		if (!empty($ospfd_conf['retransmitinterval'])) {
-			$options_present = true;
-			$ifconfigs .= "\t\tretransmit-interval {$ospfd_conf['retransmitinterval']}\n";
-		}
-		if (!empty($ospfd_conf['deadtimer'])) {
-                        $options_present = true;
-                        $ifconfigs .= "\t\trouter-dead-time {$ospfd_conf['deadtimer']}\n";
-                }
-		if (!empty($ifconfigs)) {
-			$conffile .= " {\n {$ifconfigs} \n";
-			if ($options_present == true)
-				$conffile .= "\t}\n";
-		} else
-			$conffile .= "\n";
 		$conffile .= "}\n";
 	}
 
@@ -134,6 +147,21 @@ function ospfd_install_conf() {
 	conf_mount_ro();
 }
 
+function ospfd_validate_interface() {
+        global $config, $g, $input_errors;
+
+	if ($config['installedpackages']['ospfdinterfaces']['config']) {
+		foreach ($config['installedpackages']['ospfdinterfaces']['config'] as $index => $conf) {
+			if ($index == 0)
+				continue;
+			if ($conf['interface'] == $_POST['interface'])
+				$input_errors[] = "Interface {$_POST['interface']} is already configured.";
+		}
+	}
+	if ($_POST['md5password'] && empty($_POST['password']))
+		$input_errors[] = "Please input a password.";
+}
+
 function ospfd_validate_input() {
 	global $config, $g, $input_errors;
 
@@ -141,8 +169,12 @@ function ospfd_validate_input() {
 		$input_errors[] = "Router ID must be an address.";
 	if (!is_ipaddr($_POST['area']))
 		$input_errors[] = "Area needs to be a valid ip_address.";
-	if ($_POST['md5password'] && empty($_POST['password']))
-		$input_errors[] = "Please input a password.";
+	if ($_POST['spfholdtime'] <> "" && ($_POST['spfholdtime'] < 1 || $_POST['spfholdtime'] > 5))
+		$input_errors[] = "SPF holdtime needs to be between 1 and 5.";
+	if ($_POST['spfdelay'] <> "" && ($_POST['spfdelay'] < 1 || $_POST['spfdelay'] > 10))
+		$input_errors[] = "SPF delay needs to be between 1 and 10.";
+	if (!$config['installedpackages']['ospfdinterfaces']['config'])
+		$input_errors[] = "Please select an interface to use for OSPFd.";
 }
 
 // get the raw ospfd confi file for manual inspection/editing

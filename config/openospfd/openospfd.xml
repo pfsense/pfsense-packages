@@ -16,6 +16,17 @@
 		<configfile>openospfd.xml</configfile>
 		<url>/pkg_edit.php?xml=openospfd.xml&amp;id=0</url>
 	</menu>
+	<tabs>
+		<tab>
+			<text>Global Settings</text>
+			<url>pkg_edit.php?xml=openospfd.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Interface Settings</text>
+			<url>pkg.php?xml=openospfd_interfaces.xml</url>
+		</tab>
+	</tabs>
 	<service>
 		<name>ospfd</name>
 		<rcfile>ospfd.sh</rcfile>
@@ -42,31 +53,6 @@
                         <type>checkbox</type>
                 </field>
                 <field>
-                        <fielddescr>Listening Interface</fielddescr>
-                        <fieldname>interface</fieldname>
-                        <description>Enter the desired participating interface here.</description>
-                        <type>interfaces_selection</type>
-			<required/>
-                </field>
-		<field>
-			<fielddescr>Metric</fielddescr>
-			<fieldname>metric</fieldname>
-			<description>Metric for this OSPF interface (leave blank for default).</description>
-			<type>input</type>
-                </field>
-                <field>
-                        <fielddescr>Enable MD5 password for this OSPFd interface (default no)</fielddescr>
-                        <fieldname>md5password</fieldname>
-                        <description>Enables the use of an MD5 password to on this instance</description>
-                        <type>checkbox</type>
-                </field>
-		<field>
-			<fielddescr>Password</fielddescr>
-			<fieldname>password</fieldname>
-			<description>Password for this OSPF interface.</description>
-			<type>input</type>
-                </field>
-                <field>
                         <fielddescr>Redistribute connected subnets</fielddescr>
                         <fieldname>redistributeconnectedsubnets</fieldname>
                         <description>Enables the redistribution of connected networks (Default no)</description>
@@ -79,35 +65,29 @@
                         <type>checkbox</type>
                 </field>
 		<field>
-			<fielddescr>Router Priority</fielddescr>
-			<fieldname>routerpriorityelections</fieldname>
-			<description>Router priority when participating in elections for DR (Default 1) Valid range is 0-255.  0 will cause the router to not participate in election.</description>
-			<type>input</type>
-                </field>
-		<field>
-			<fielddescr>Hello Interval</fielddescr>
-			<fieldname>hellointervalinseconds</fieldname>
-			<description>Hello Interval this OSPF interface in seconds (Default 10).</description>
-			<type>input</type>
-                </field>
-		<field>
-			<fielddescr>Retransmit Interval</fielddescr>
-			<fieldname>retransmitinterval</fieldname>
-			<description>Retransmit Interval this OSPF interface in seconds (Default 5).</description>
-			<type>input</type>
-                </field>
-		<field>
-			<fielddescr>Dead Timer</fielddescr>
-			<fieldname>deadtimer</fieldname>
-			<description>Dead Timer for this OSPF interface in seconds (Default 40).</description>
-			<type>input</type>
-                </field>
-                <field>
                         <fielddescr>Redistribute static</fielddescr>
                         <fieldname>resdistributestatic</fieldname>
                         <description>Enables the redistribution of static routes</description>
                         <type>checkbox</type>
                 </field>
+		<field>
+			<fielddescr>SPF Hold Time</fielddescr>
+			<fieldname>spfholdtime</fieldname>
+			<description>Set the SPF holdtime in seconds.  The minimum time between two consecutive shortest path first calculations.  The default value is 5 seconds; the valid range is 1-5 seconds.</description>
+			<type>input</type>
+                </field>
+		<field>
+			<fielddescr>SPF Delay</fielddescr>
+			<fieldname>spfdelay</fieldname>
+			<description>Set SPF delay in seconds.  The delay between receiving an update to the link state database and starting the shortest path first calculation.  The default value is 1; valid range is 1-10 sec-onds.</description>
+			<type>input</type>
+                </field>
+		<field>
+			<fielddescr>RFC 1583 compatible</fielddescr>
+			<fieldname>rfc1583</fieldname>
+			<description>If set to yes, decisions regarding AS-external routes are evaluated according to RFC 1583.  The default is no.</description>
+			<type>checkbox</type>
+		</field>
 	</fields>
 	<custom_php_resync_config_command>
                 ospfd_install_conf();
