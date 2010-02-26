@@ -306,7 +306,7 @@ servers[<?=$sindex;?>][1][<?=$uindex;?>] = new Array();
 servers[<?=$sindex;?>][1][<?=$uindex;?>][0] = '<?=$user['uindex'];?>';
 servers[<?=$sindex;?>][1][<?=$uindex;?>][1] = '<?=$user['cindex'];?>';
 servers[<?=$sindex;?>][1][<?=$uindex;?>][2] = '<?=$user['name'];?>';
-servers[<?=$sindex;?>][1][<?=$uindex;?>][3] = '<?=$user['certname'];?>';
+servers[<?=$sindex;?>][1][<?=$uindex;?>][3] = '<?=str_replace("'", "\\'", $user['certname']);?>';
 <?		endforeach; ?>
 <?	endforeach; ?>
 
