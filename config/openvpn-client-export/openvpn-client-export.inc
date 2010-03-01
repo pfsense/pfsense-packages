@@ -181,7 +181,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 
 	if($nokeys == false) {
 		if ($settings['tls'])
-			$conf .= "tls-auth {$prefix}-tls.key\n";
+			$conf .= "tls-auth {$prefix}-tls.key 1\n";
 	}
 
 	// add optional settings
@@ -359,7 +359,7 @@ EOF;
 	$configfile = "{$tempdir}/config.conf";
 	$conf .= <<<EOF
 cert cert.crt
-tls-auth ta.key
+tls-auth ta.key 1
 ca ca.crt
 key key.key	
 EOF;
