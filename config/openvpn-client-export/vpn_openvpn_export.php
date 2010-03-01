@@ -505,7 +505,7 @@ function useproxy_changed(obj) {
 										<div style="display:none;" name="HostName" id="HostName">
 											<input name="useaddr_hostname" id="useaddr_hostname" />
 											<span class="vexpl">
-												Enter the hostname or ip address desired to be used for the config.
+												Enter the hostname or IP address the client will use to connect to this server.
 											</span>
 										</div>
 									</td>
@@ -584,7 +584,7 @@ function useproxy_changed(obj) {
                                                                 <tr>
                                                                         <td align="right" width='25%'>
                                                                                 <span class="vexpl">
-                                                                                         &nbsp;     Ip Addr :&nbsp;
+                                                                                         &nbsp;     IP Address :&nbsp;
                                                                                 </span>
                                                                         </td>
                                                                         <td>
