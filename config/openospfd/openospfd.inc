@@ -91,7 +91,7 @@ function ospfd_install_conf() {
 					$ifconfigs .= "\t\tauth-type crypt\n";
 					$ifconfigs .= "\t\tauth-md 1 \"" . substr($conf['password'], 0, 15) . "\"\n";
 					$ifconfigs .= "\t\tauth-md-keyid 1\n";
-               			} else if (!empty($conf['passward'])) {
+               			} else if (!empty($conf['password'])) {
 					$options_present = true;
 					$ifconfigs .= "\t\tauth-type simple\n";
 					$ifconfigs .= "\t\tauth-key \"" . substr($conf['password'], 0, 7) . "\"\n";
@@ -190,7 +190,7 @@ function ospfd_put_raw_config($conffile) {
   else {
     $config['installedpackages']['ospfd']['rawconfig'] = array();
     $config['installedpackages']['ospfd']['rawconfig']['item'] = explode("\n",$_POST['ospfd_raw']);
-    //$config['installedpackages']['ospfd']['rawconfig'] = $conffile;
+    $config['installedpackages']['ospfd']['rawconfig'] = $conffile;
   }
 }
 
