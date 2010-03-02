@@ -136,6 +136,7 @@ function vhosts_sync_package_php()
 						$vhostarray_http[$x]['privatekey'] = '';
 						$vhostarray_http[$x]['enabled'] = $rowhelper['enabled'];
 						$vhostarray_http[$x]['description'] = $rowhelper['description'];
+						$server_port = $rowhelper['port'];
 					}
 					$x++;
 				}
@@ -267,7 +268,7 @@ function vhosts_sync_package_php()
 			$tmp .= "######### Options that are good to be but not neccesary to be changed #######\n";
 			$tmp .= "\n";
 			$tmp .= "## bind to port (default: 80)\n";
-			$tmp .= "#server.port                = 8001\n";
+			$tmp .= "server.port                = $server_port\n";
 			$tmp .= "\n";
 			$tmp .= "#the regex method isn't working\n";
 			$tmp .= "#\$HTTP[\"host\"] =~ \"(^|\\.)host01\\.com\$\" {\n";
@@ -321,9 +322,6 @@ function vhosts_sync_package_php()
 						$tmp .= "\$SERVER[\"socket\"] == \"".$ipaddress.":".$port."\" {\n";
 					}
 
-					if (strlen($rowhelper['description']) > 0) {
-						$tmp .= "# ".$rowhelper['description']." \n\n";
-					}
 					$tmp .= "	\$HTTP[\"host\"] == \"".$host."\" {\n";
 					$tmp .= "		server.document-root        = \"/usr/local/vhosts/".$directory."\"\n";
 
