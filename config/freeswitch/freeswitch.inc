@@ -263,42 +263,6 @@ function byte_convert( $bytes ) {
     return round($bytes/pow($convention,$e),2).' '.$s[$e];
 }
 
-function lan_sip_profile()
-{
-	global $config;	
-	clearstatcache();
-	
-	//if the lan directory does not exist then create it
-	if (!is_dir('/usr/local/freeswitch/conf/sip_profiles/lan/')) {
-	   exec("mkdir /usr/local/freeswitch/conf/sip_profiles/lan/");
-	}
-	
-	//create the LAN profile if it doesn't exist
-	if (!file_exists('/usr/local/freeswitch/conf/sip_profiles/lan.xml')) {
-		$lan_ip = $config['interfaces']['lan']['ipaddr'];
-		if (strlen($lan_ip) > 0) {
-			exec("cp /usr/local/freeswitch/conf/sip_profiles/internal.xml /usr/local/freeswitch/conf/sip_profiles/lan.xml");
-			
-			$filename = "/usr/local/freeswitch/conf/sip_profiles/lan.xml";
-			$handle = fopen($filename,"rb");
-			$contents = fread($handle, filesize($filename));	
-			fclose($handle);
-
-			$handle = fopen($filename,"w");
-			$contents = str_replace("<profile name=\"internal\">", "<profile name=\"lan\">", $contents);
-			$contents = str_replace("<alias name=\"default\"/>", "", $contents);
-			$contents = str_replace("<X-PRE-PROCESS cmd=\"include\" data=\"internal/*.xml\"/>", "<X-PRE-PROCESS cmd=\"include\" data=\"lan/*.xml\"/>", $contents);
-			$contents = str_replace("<param name=\"rtp-ip\" value=\"\$\${local_ip_v4}\"/>", "<param name=\"rtp-ip\" value=\"".$lan_ip."\"/>", $contents);
-			$contents = str_replace("<param name=\"sip-ip\" value=\"\$\${local_ip_v4}\"/>", "<param name=\"sip-ip\" value=\"".$lan_ip."\"/>", $contents);
-			fwrite($handle, $contents);		
-			unset($contents); 	
-			fclose($handle);
-			unset($filename);
-		}
-	}
-	
-}
-
 function ListFiles($dir) {
 
     if($dh = opendir($dir)) {
@@ -3741,8 +3705,6 @@ function freeswitch_php_install_command()
 		"stop" => "/usr/local/freeswitch/bin/./freeswitch -stop"
 		)
 	);
-	
-	lan_sip_profile();
 
 	sync_package_freeswitch();
 	$handle = popen("/usr/local/etc/rc.d/freeswitch.sh start", "r");
