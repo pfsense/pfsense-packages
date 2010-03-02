@@ -67,8 +67,6 @@ foreach($a_server as $sindex => & $server) {
 			$ras_user[] = $ras_userent;
 		}
 	}
-	if (!count($ras_user))
-		continue;
 	$ras_serverent = array();
 	$prot = $server['protocol'];
 	$port = $server['local_port'];
