@@ -9,6 +9,11 @@
                 <chmod>077</chmod>
                 <item>http://www.pfsense.com/packages/config/openospfd/openospfd.inc</item>
         </additional_files_needed>
+	<additional_files_needed>
+                <prefix>/usr/local/pkg/</prefix>
+                <chmod>077</chmod>
+                <item>http://www.pfsense.com/packages/config/openbgpd/openospfd_interfaces.xml</item>
+        </additional_files_needed>
 	<menu>
 		<name>OSPFd</name>
 		<tooltiptext>Modify ospfd settings.</tooltiptext>
