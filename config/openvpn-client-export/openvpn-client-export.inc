@@ -143,8 +143,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	$conf .= "persist-key\n";
 	$conf .= "proto {$proto}\n";
 	$conf .= "cipher {$cipher}\n";
-	if ($nokeys == false)
-		$conf .= "tls-client\n";
+	$conf .= "tls-client\n";
 	$conf .= "client\n";
 	$conf .= "resolv-retry infinite\n";
 	$conf .= "remote {$server_host} {$server_port}\n";
@@ -183,10 +182,8 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	} else if ($settings['mode'] == "server_user")
 		$conf .= "ca {$prefix}-ca.crt\n";
 
-	if($nokeys == false) {
-		if ($settings['tls'])
-			$conf .= "tls-auth {$prefix}-tls.key 1\n";
-	}
+	if ($settings['tls'])
+		$conf .= "tls-auth {$prefix}-tls.key 1\n";
 
 	// add optional settings
 	if ($settings['compression'])
@@ -272,16 +269,17 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 
 	$cafile = "{$tempdir}/config/{$prefix}-ca.crt";
 	file_put_contents($cafile, base64_decode($server_ca['crt']));
+	if ($settings['tls']) {
+		$tlsfile = "{$tempdir}/config/{$prefix}-tls.key";
+		file_put_contents($tlsfile, base64_decode($settings['tls']));
+	}
+
 	// write key files
 	if ($settings['mode'] != "server_user") {
 		$crtfile = "{$tempdir}/config/{$prefix}-{$user['name']}.crt";
 		file_put_contents($crtfile, base64_decode($cert['crt']));
 		$keyfile = "{$tempdir}/config/{$prefix}-{$user['name']}.key";
 		file_put_contents($keyfile, base64_decode($cert['prv']));
-		if ($settings['tls']) {
-			$tlsfile = "{$tempdir}/config/{$prefix}-tls.key";
-			file_put_contents($tlsfile, base64_decode($settings['tls']));
-		}
 	
 		// convert to pkcs12 format
 		$p12file = "{$tempdir}/config/{$prefix}.p12";
@@ -386,10 +384,10 @@ EOF;
 
 	$configfile = "{$tempdir}/config.conf";
 	$conf .= "ca ca.crt\n";
+	$conf .= "tls-auth ta.key 1\n";
 	if ($settings['mode'] != "server_user") {
 		$conf .= <<<EOF
 cert cert.crt
-tls-auth ta.key 1
 key key.key	
 EOF;
 	}
@@ -411,12 +409,12 @@ EOF;
 		// write user .key
 		$keyfile = "{$tempdir}/key.key";
 		file_put_contents($keyfile, base64_decode($cert['prv']));
+	}
 
-		// TLS support?
-		if ($settings['tls']) {
-			$tlsfile = "{$tempdir}/ta.key";
-			file_put_contents($tlsfile, base64_decode($settings['tls']));
-		}
+	// TLS support?
+	if ($settings['tls']) {
+		$tlsfile = "{$tempdir}/ta.key";
+		file_put_contents($tlsfile, base64_decode($settings['tls']));
 	}
 
 	// Zip Viscosity file
