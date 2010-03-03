@@ -54,13 +54,21 @@ function ospfd_install_conf() {
 		if ($ospfd_conf['updatefib'])
 			$conffile .= "fib-update no\n";
 
+		if (is_array($ospfd_conf['row'])) {
+			foreach ($ospfd_conf['row'] as $redistr) {
+				if (isset($redistr['redistribute']))
+					$conffile .= "no ";
+				$conffile .= "redistribute {$redistr['routevalue']}\n";
+			}
+		}
+
 		if ($ospfd_conf['redistributeconnectedsubnets'])
 			$conffile .= "redistribute connected\n";
 
 		if ($ospfd_conf['redistributedefaultroute'])
 			$conffile .= "redistribute default\n";
 
-		if ($ospfd_conf['resdistributestatic'])
+		if ($ospfd_conf['redistributestatic'])
 			$conffile .= "redistribute static\n";
 		
 		if ($ospfd_conf['spfholdtime'])
@@ -78,6 +86,7 @@ function ospfd_install_conf() {
                 	foreach ($config['installedpackages']['ospfdinterfaces']['config'] as $conf) {
 				$conffile .= "\tinterface " . $config['interfaces'][$conf['interface']]['if'];
 				$options_present = false;
+				$ifconfigs = "";
 				if (!empty($conf['metric'])) {
 					$options_present = true;
 					$ifconfigs .= "\t\tmetric {$conf['metric']}\n";
@@ -108,6 +117,10 @@ function ospfd_install_conf() {
                         		$options_present = true;
                         		$ifconfigs .= "\t\trouter-dead-time {$conf['deadtimer']}\n";
                 		}
+				if (!empty($conf['passive'])) {
+                                        $options_present = true;
+                                        $ifconfigs .= "\t\tpassive\n";
+                                }
 				if (!empty($ifconfigs)) {
 					$conffile .= " {\n {$ifconfigs} \n";
 					if ($options_present == true)

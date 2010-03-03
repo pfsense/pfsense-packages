@@ -62,6 +62,12 @@
 			<size>30</size>
                         <type>input</type>
                 </field>
+		<field>
+                        <fielddescr>Interface is Passive</fielddescr>
+                        <fieldname>passive</fieldname>
+                        <description>Prevent transmission and reception of OSPF packets on this interface.  The specified interface will be announced as a stub network.</description>
+                        <type>checkbox</type>
+                </field>
                 <field>
                         <fielddescr>Enable MD5 password for this OSPFd interface (default no)</fielddescr>
                         <fieldname>md5password</fieldname>
