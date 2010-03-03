@@ -109,10 +109,12 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	}
 
 	// lookup user info
-	$user =& $config['system']['user'][$usrid];
-	if (!$user) {
-		$input_errors[] = "Could not find user settings.";
-		return false;
+	if ($usrid) {
+		$user =& $config['system']['user'][$usrid];
+		if (!$user) {
+			$input_errors[] = "Could not find user settings.";
+			return false;
+		}
 	}
 
 	// determine basic variables
@@ -141,7 +143,8 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	$conf .= "persist-key\n";
 	$conf .= "proto {$proto}\n";
 	$conf .= "cipher {$cipher}\n";
-	$conf .= "tls-client\n";
+	if ($nokeys == false)
+		$conf .= "tls-client\n";
 	$conf .= "client\n";
 	$conf .= "resolv-retry infinite\n";
 	$conf .= "remote {$server_host} {$server_port}\n";
@@ -177,7 +180,8 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 		} else {
 			$conf .= "pkcs12 {$prefix}.p12\n";
 		}
-	}
+	} else if ($settings['mode'] == "server_user")
+		$conf .= "ca {$prefix}-ca.crt\n";
 
 	if($nokeys == false) {
 		if ($settings['tls'])
@@ -194,33 +198,48 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 }
 
 function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass, $proxy) {
-	global $config, $g;
+	global $config, $g, $input_errors;
 
 	$ovpndir = "/usr/local/share/openvpn";
 	$workdir = "{$ovpndir}/client-export";
 
 	// lookup server settings
 	$settings = $config['openvpn']['openvpn-server'][$srvid];
-	if (empty($settings))
+	if (empty($settings)) {
+		$input_errors[] = "Could not find a valid server config  for id: {$srvid}";
 		return false;
-	if ($settings['disable'])
+	}
+	if ($settings['disable']) {
+		$input_errors[] = "This server is disabled.";
 		return false;
+	}
+
+	$nokeys = false;
 
 	// lookup server certificate info
 	$server_cert =& lookup_cert($settings['certref']);
 	$server_ca =& lookup_ca($server_cert['caref']);
-	if (!$server_cert || !$server_ca)
+	if (!$server_cert || !$server_ca) {
+		$input_errors[] = "Could not find a valid certificate.";
 		return false;
+	}
 
 	// lookup user info
-	$user =& $config['system']['user'][$usrid];
-	if (!$user)
-		return false;
+	if ($usrid) {
+		$user =& $config['system']['user'][$usrid];
+		if (!$user) {
+			$input_errors[] = "Could not find the details about userid: {$usrid}";
+			return false;
+		}
+	}
 
 	// lookup user certificate info
-	$cert =& $user['cert'][$crtid];
-	if (!$cert)
-		return false;
+	if ($settings['mode'] != "server_user") {
+		$cert =& $user['cert'][$crtid];
+		if (!$cert)
+			return false;
+	} else
+		$nokeys = true;
 
 	// create template directory
 	$tempdir = $g['tmp_path'] . "/openvpn-export-".uniqid();
@@ -243,30 +262,34 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 		$pwdfle .= "{$proxy['password']}\n";
 		file_put_contents("{$confdir}/{$proxy['passwdfile']}", $pwdfle);
 	}
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, false, $proxy);
-	if (!$conf)
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy);
+	if (!$conf) {
+		$input_errors[] = "Could not create a config to export.";
 		return false;
+	}
 
 	file_put_contents($cfgfile, $conf);
 
-	// write key files
 	$cafile = "{$tempdir}/config/{$prefix}-ca.crt";
 	file_put_contents($cafile, base64_decode($server_ca['crt']));
-	$crtfile = "{$tempdir}/config/{$prefix}-{$user['name']}.crt";
-	file_put_contents($crtfile, base64_decode($cert['crt']));
-	$keyfile = "{$tempdir}/config/{$prefix}-{$user['name']}.key";
-	file_put_contents($keyfile, base64_decode($cert['prv']));
-	if ($settings['tls']) {
-		$tlsfile = "{$tempdir}/config/{$prefix}-tls.key";
-		file_put_contents($tlsfile, base64_decode($settings['tls']));
+	// write key files
+	if ($settings['mode'] != "server_user") {
+		$crtfile = "{$tempdir}/config/{$prefix}-{$user['name']}.crt";
+		file_put_contents($crtfile, base64_decode($cert['crt']));
+		$keyfile = "{$tempdir}/config/{$prefix}-{$user['name']}.key";
+		file_put_contents($keyfile, base64_decode($cert['prv']));
+		if ($settings['tls']) {
+			$tlsfile = "{$tempdir}/config/{$prefix}-tls.key";
+			file_put_contents($tlsfile, base64_decode($settings['tls']));
+		}
+	
+		// convert to pkcs12 format
+		$p12file = "{$tempdir}/config/{$prefix}.p12";
+		if ($usetoken)
+			openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
+		else
+			openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
 	}
-
-	// convert to pkcs12 format
-	$p12file = "{$tempdir}/config/{$prefix}.p12";
-	if ($usetoken)
-		openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
-	else
-		openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
 
 	// 7zip the configuration data
 	chdir($tempdir);
@@ -278,6 +301,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 		$files .= "procchain-import";
 	else
 		$files .= "procchain-standard";
+
 	exec("/usr/local/libexec/p7zip/7z -y a archive.7z {$files}");
 
 	// create the final installer
@@ -316,14 +340,18 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 		return false;
 
 	// lookup user info
-	$user =& $config['system']['user'][$usrid];
-	if (!$user)
-		return false;
+	if ($usrid) {
+		$user =& $config['system']['user'][$usrid];
+		if (!$user)
+			return false;
+	}
 
 	// lookup user certificate info
-	$cert =& $user['cert'][$crtid];
-	if (!$cert)
-		return false;
+	if ($settings['mode'] != "server_user") {
+		$cert =& $user['cert'][$crtid];
+		if (!$cert)
+			return false;
+	}
 
 	// create template directory
 	mkdir($tempdir, 0700, true);
@@ -357,12 +385,15 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 EOF;
 
 	$configfile = "{$tempdir}/config.conf";
-	$conf .= <<<EOF
+	$conf .= "ca ca.crt\n";
+	if ($settings['mode'] != "server_user") {
+		$conf .= <<<EOF
 cert cert.crt
 tls-auth ta.key 1
-ca ca.crt
 key key.key	
 EOF;
+	}
+
 	file_put_contents($configfile, $visc_settings . "\n" . $conf);
 
 	//	ca.crt		cert.crt	config.conf	key.key		ta.key
@@ -371,18 +402,21 @@ EOF;
 	$cafile = "{$tempdir}/ca.crt";
 	file_put_contents($cafile, base64_decode($server_ca['crt']));
 
-	// write user .crt
-	$crtfile = "{$tempdir}/cert.crt";
-	file_put_contents($crtfile, base64_decode($cert['crt']));
+	if ($settings['mode'] != "server_user") {
 
-	// write user .key
-	$keyfile = "{$tempdir}/key.key";
-	file_put_contents($keyfile, base64_decode($cert['prv']));
+		// write user .crt
+		$crtfile = "{$tempdir}/cert.crt";
+		file_put_contents($crtfile, base64_decode($cert['crt']));
 
-	// TLS support?
-	if ($settings['tls']) {
-		$tlsfile = "{$tempdir}/ta.key";
-		file_put_contents($tlsfile, base64_decode($settings['tls']));
+		// write user .key
+		$keyfile = "{$tempdir}/key.key";
+		file_put_contents($keyfile, base64_decode($cert['prv']));
+
+		// TLS support?
+		if ($settings['tls']) {
+			$tlsfile = "{$tempdir}/ta.key";
+			file_put_contents($tlsfile, base64_decode($settings['tls']));
+		}
 	}
 
 	// Zip Viscosity file

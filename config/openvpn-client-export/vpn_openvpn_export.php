@@ -77,6 +77,7 @@ foreach($a_server as $sindex => & $server) {
 	$ras_serverent['index'] = $sindex;
 	$ras_serverent['name'] = $name;
 	$ras_serverent['users'] = $ras_user;
+	$ras_serverent['mode'] = $server['mode'];
 	$ras_server[] = $ras_serverent;
 }
 
@@ -93,10 +94,20 @@ if($act == "conf") {
 	$srvid = $_GET['srvid'];
 	$usrid = $_GET['usrid'];
 	$crtid = $_GET['crtid'];
-	if (($srvid === false) || ($usrid === false) || ($crtid === false)) {
+	if ($srvid === false) {
+		pfSenseHeader("vpn_openvpn_export.php");
+		exit;
+	} else if (($config['openvpn']['openvpn-server'][$srvid]['mode'] != "server_user") &&
+	    (($usrid === false) || ($crtid === false))) {
 		pfSenseHeader("vpn_openvpn_export.php");
 		exit;
 	}
+
+	if ($config['openvpn']['openvpn-server'][$srvid]['mode'] == "server_user")
+		$nokeys = true;
+	else
+		$nokeys = false;
+
 	if (empty($_GET['useaddr'])) {
 		$error = true;
 		$input_errors[] = "You need to specify an IP or hostname.";
@@ -134,7 +145,7 @@ if($act == "conf") {
 	}
 
 	$exp_name = openvpn_client_export_prefix($srvid);
-	$exp_data = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, false, $proxy);
+	$exp_data = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy);
 	if (!$exp_data) {
 		$input_errors[] = "Failed to export config files!";
 		$error = true;
@@ -156,10 +167,14 @@ if($act == "visc") {
 	$srvid = $_GET['srvid'];
 	$usrid = $_GET['usrid'];
 	$crtid = $_GET['crtid'];
-	if (($srvid === false) || ($usrid === false) || ($crtid === false)) {
-		pfSenseHeader("vpn_openvpn_export.php");
-		exit;
-	}
+	if ($srvid === false) {
+                pfSenseHeader("vpn_openvpn_export.php");
+                exit;
+        } else if (($config['openvpn']['openvpn-server'][$srvid]['mode'] != "server_user") &&
+            (($usrid === false) || ($crtid === false))) {
+                pfSenseHeader("vpn_openvpn_export.php");
+                exit;
+        }
 	if (empty($_GET['useaddr'])) {
 		$error = true;
 		$input_errors[] = "You need to specify an IP or hostname.";
@@ -222,10 +237,14 @@ if($act == "inst") {
 	$srvid = $_GET['srvid'];
 	$usrid = $_GET['usrid'];
 	$crtid = $_GET['crtid'];
-	if (($srvid === false) || ($usrid === false) || ($crtid === false)) {
-		pfSenseHeader("vpn_openvpn_export.php");
-		exit;
-	}
+	if ($srvid === false) {
+                pfSenseHeader("vpn_openvpn_export.php");
+                exit;
+        } else if (($config['openvpn']['openvpn-server'][$srvid]['mode'] != "server_user") &&
+            (($usrid === false) || ($crtid === false))) {
+                pfSenseHeader("vpn_openvpn_export.php");
+                exit;
+        }
 	if (empty($_GET['useaddr'])) {
 		$error = true;
 		$input_errors[] = "You need to specify an IP or hostname.";
@@ -299,6 +318,7 @@ var servers = new Array();
 servers[<?=$sindex;?>] = new Array();
 servers[<?=$sindex;?>][0] = '<?=$server['index'];?>';
 servers[<?=$sindex;?>][1] = new Array();
+servers[<?=$sindex;?>][2] = '<?=$server['mode'];?>';;
 <?php 	foreach ($server['users'] as $uindex => & $user): ?>
 servers[<?=$sindex;?>][1][<?=$uindex;?>] = new Array();
 servers[<?=$sindex;?>][1][<?=$uindex;?>][0] = '<?=$user['uindex'];?>';
@@ -382,8 +402,10 @@ function download_begin(act, i) {
 	var dlurl;
 	dlurl  = "/vpn_openvpn_export.php?act=" + act;
 	dlurl += "&srvid=" + servers[index][0];
-	dlurl += "&usrid=" + users[i][0];
-	dlurl += "&crtid=" + users[i][1];
+	if (users[i]) {
+		dlurl += "&usrid=" + users[i][0];
+		dlurl += "&crtid=" + users[i][1];
+	}
 	dlurl += "&useaddr=" + useaddr;
 	dlurl += "&usetoken=" + usetoken;
 	if (usepass)
@@ -424,6 +446,22 @@ function server_changed() {
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>Windows Installer</a>";
 		cell2.innerHTML += "&nbsp;/&nbsp;";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle</a>";
+	}
+	if (servers[index][2] == 'server_user') {
+		var row = table.insertRow(table.rows.length);
+                var cell0 = row.insertCell(0);
+                var cell1 = row.insertCell(1);
+                var cell2 = row.insertCell(2);
+                cell0.className = "listlr";
+                cell0.innerHTML = "External authentication users";
+                cell1.className = "listr";
+                cell1.innerHTML = "none";
+                cell2.className = "listr";
+                cell2.innerHTML  = "<a href='javascript:download_begin(\"conf\"," + i + ")'>Configuration</a>";
+                cell2.innerHTML += "&nbsp;/&nbsp;";
+                cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>Windows Installer</a>";
+                cell2.innerHTML += "&nbsp;/&nbsp;";
+                cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle</a>";
 	}
 }
 
