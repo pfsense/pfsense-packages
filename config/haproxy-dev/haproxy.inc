@@ -293,18 +293,18 @@ function haproxy_configure() {
 				$a_bind[$bname]['extaddr'] = $backend['extaddr'];
 				$a_bind[$bname]['port'] = $backend['port'];
 			}
-			$bind = &$a_bind[$bname];
+			$b = &$a_bind[$bname];
 			
 			// Overwrite ?
-			$bind['type'] = $backend['type'];
-			$bind['forwardfor'] = $backend['forwardfor'];
-			$bind['httpclose'] = $backend['httpclose'];
-			$bind['max_connections'] = $backend['max_connections'];
-			$bind['client_timeout'] = $backend['client_timeout'];
-			$bind['advanced'] = $backend['advanced'];
+			$b['type'] = $backend['type'];
+			$b['forwardfor'] = $backend['forwardfor'];
+			$b['httpclose'] = $backend['httpclose'];
+			$b['max_connections'] = $backend['max_connections'];
+			$b['client_timeout'] = $backend['client_timeout'];
+			$b['advanced'] = $backend['advanced'];
 
 			// pointer to each backend 
-			$bind['config'][] = $backend;
+			$b['config'][] = $backend;
 		}
 	}
 	
