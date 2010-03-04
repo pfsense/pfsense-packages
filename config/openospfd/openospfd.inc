@@ -84,7 +84,14 @@ function ospfd_install_conf() {
 
 		if ($config['installedpackages']['ospfdinterfaces']['config']) {
                 	foreach ($config['installedpackages']['ospfdinterfaces']['config'] as $conf) {
-				$conffile .= "\tinterface " . $config['interfaces'][$conf['interface']]['if'];
+				if (intval($g['latest_config']) >= 6) {
+					$ospfdif = get_real_interface($conf['interface']);
+					if ($ospfdif)
+						$conffile .= "\tinterface {$ospfdif}";
+					else
+						continue;
+				} else
+					$conffile .= "\tinterface " . $config['interfaces'][$conf['interface']]['if'];
 				$options_present = false;
 				$ifconfigs = "";
 				if (!empty($conf['metric'])) {
