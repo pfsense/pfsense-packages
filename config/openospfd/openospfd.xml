@@ -84,7 +84,7 @@
 		<field>
 			<fielddescr>SPF Delay</fielddescr>
 			<fieldname>spfdelay</fieldname>
-			<description>Set SPF delay in seconds.  The delay between receiving an update to the link state database and starting the shortest path first calculation.  The default value is 1; valid range is 1-10 sec-onds.</description>
+			<description>Set SPF delay in seconds.  The delay between receiving an update to the link state database and starting the shortest path first calculation.  The default value is 1; valid range is 1-10 seconds.</description>
 			<type>input</type>
                 </field>
 		<field>
@@ -94,7 +94,7 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>This rules will take precedence over any other redistribute option specified above.</fielddescr>
+			<fielddescr>These rules take precedence over any redistribute options specified above.</fielddescr>
 			<fieldname>none</fieldname>
 			<type>rowhelper</type>
 			<rowhelper>
