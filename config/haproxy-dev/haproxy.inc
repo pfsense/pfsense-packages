@@ -374,6 +374,7 @@ function haproxy_configure() {
 			fwrite ($fd, "\tdefault_backend\t\t" . $bind['defaultpool'] . "\n");
 	
 			// Combine the rest of the listener configs
+			$i = 0;
 			foreach ($bind['config'] as $bconfig) {
 				$a_acl=&$bconfig['ha_acls']['item'];
 				if(!is_array($a_acl)) 
@@ -400,8 +401,10 @@ function haproxy_configure() {
 					else
 						$expr = $entry['expression'] . " " . $entry['value'];
 
-					fwrite ($fd, "\tacl\t\t\t".$entry['name']."\t".$expr."\n");
-					fwrite ($fd, "\tuse_backend\t\t$poolname if " . $entry['name'] . "\n");
+					$aclname = $i . "_" . $entry['name'];
+					fwrite ($fd, "\tacl\t\t\t" . $aclname . "\t" . $expr . "\n");
+					fwrite ($fd, "\tuse_backend\t\t" . $poolname . " if " . $aclname . "\n");
+					$i++;
 				}
 
 			}
