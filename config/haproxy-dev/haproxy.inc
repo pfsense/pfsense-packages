@@ -219,8 +219,10 @@ function write_backend($fd, $name, $pool, $frontend) {
 	}
 	if($pool['checkinter']) 
 		$checkinter = "check inter {$pool['checkinter']}";
-	else 
+	else if (strtolower($frontend['type']) != "tcp")
 		$checkinter = "check inter 1000";
+	else
+		$checkinter = "";
 
 	$a_servers = &$pool['ha_servers']['item'];
 	foreach($a_servers as $be) {
