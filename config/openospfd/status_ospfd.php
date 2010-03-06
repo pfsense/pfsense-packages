@@ -3,6 +3,7 @@
 /*
     status_ospfd.php
     Copyright (C) 2010 Nick Buraglio; nick@buraglio.com
+	Copyright (C) 2010 Scott Ullrich <sullrich@pfsense.org>
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -52,7 +53,7 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>
      <td class="tabcont" >
-      <form action="status_ospfd" method="post">
+      <form action="status_ospfd.php" method="post">
     </form>
     </td>
    </tr>
