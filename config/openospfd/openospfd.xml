@@ -1,5 +1,5 @@
 <packagegui>
-	<name>OpenOSPFd</name>
+	<name>ospfd</name>
 	<version>0.1</version>
 	<title>Services: OpenOSPFd</title>
 	<include_file>/usr/local/pkg/openospfd.inc</include_file>

@@ -1,5 +1,5 @@
 <packagegui>
-	<name>OpenOSPFd Interfaces</name>
+	<name>OSPFd Interfaces</name>
 	<version>0.1</version>
 	<title>Services: OpenOSPFd</title>
 	<include_file>/usr/local/pkg/openospfd.inc</include_file>
@@ -42,7 +42,7 @@
 		</columnitem>
 	</adddeleteeditpagefields>
 	<service>
-		<name>ospfd</name>
+		<name>OpenOSPFd</name>
 		<rcfile>ospfd.sh</rcfile>
 		<executable>ospfd</executable>
 	</service>
