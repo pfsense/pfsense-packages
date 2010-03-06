@@ -45,7 +45,7 @@ include("head.inc");
 <?php
 	$tab_array = array();
 	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=openospfd.xml&id=0");
-	$tab_array[] = array(gettext("Interfaces"), false, "/pkg.php?xml=openospfd_neighbors.xml");
+	$tab_array[] = array(gettext("Interfaces"), false, "/pkg.php?xml=openospfd_interfaces.xml");
 	$tab_array[] = array(gettext("Status"), true, "/status_ospfd.php");
 	display_top_tabs($tab_array);
 ?>
