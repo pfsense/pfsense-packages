@@ -74,7 +74,7 @@ function apache_mod_security_install() {
 		require_once(\"/usr/local/pkg/apache_mod_security.inc\");
 		apache_mod_security_start();
 	?>
-	ENDPHP\n";
+ENDPHP\n";
 
 	$stop = "/usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDPHP
 	<?php
@@ -82,7 +82,7 @@ function apache_mod_security_install() {
 		require_once(\"/usr/local/pkg/apache_mod_security.inc\");
 		apache_mod_security_stop();
 	?>
-	ENDPHP\n";
+ENDPHP\n";
 	
 	write_rcfile(array(
 			"file" => $filename,
