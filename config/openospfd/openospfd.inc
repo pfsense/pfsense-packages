@@ -1,6 +1,6 @@
 <?php
 /*
-	ospfd.inc
+	openospfd.inc
 	Copyright (C) 2010 Ermal Luçi
 	part of pfSense
 	All rights reserved.
@@ -83,7 +83,7 @@ function ospfd_install_conf() {
 		$conffile .= "area {$ospfd_conf['area']} {\n";
 
 		if ($config['installedpackages']['ospfdinterfaces']['config']) {
-                	foreach ($config['installedpackages']['ospfdinterfaces']['config'] as $conf) {
+			foreach ($config['installedpackages']['ospfdinterfaces']['config'] as $conf) {
 				if (intval($g['latest_config']) >= 6) {
 					$ospfdif = get_real_interface($conf['interface']);
 					if ($ospfdif)
@@ -107,27 +107,27 @@ function ospfd_install_conf() {
 					$ifconfigs .= "\t\tauth-type crypt\n";
 					$ifconfigs .= "\t\tauth-md 1 \"" . substr($conf['password'], 0, 15) . "\"\n";
 					$ifconfigs .= "\t\tauth-md-keyid 1\n";
-               			} else if (!empty($conf['password'])) {
+				} else if (!empty($conf['password'])) {
 					$options_present = true;
 					$ifconfigs .= "\t\tauth-type simple\n";
 					$ifconfigs .= "\t\tauth-key \"" . substr($conf['password'], 0, 7) . "\"\n";
 				}
 				if (!empty($conf['routerpriorityelections'])) {
-                        		$options_present = true;
-                        		$ifconfigs .= "\t\trouter-priority {$conf['routerpriorityelections']}\n";
-                		}
+					$options_present = true;
+					$ifconfigs .= "\t\trouter-priority {$conf['routerpriorityelections']}\n";
+				}
 				if (!empty($conf['retransmitinterval'])) {
 					$options_present = true;
 					$ifconfigs .= "\t\tretransmit-interval {$conf['retransmitinterval']}\n";
 				}
 				if (!empty($conf['deadtimer'])) {
-                        		$options_present = true;
-                        		$ifconfigs .= "\t\trouter-dead-time {$conf['deadtimer']}\n";
-                		}
+					$options_present = true;
+					$ifconfigs .= "\t\trouter-dead-time {$conf['deadtimer']}\n";
+                }
 				if (!empty($conf['passive'])) {
-                                        $options_present = true;
-                                        $ifconfigs .= "\t\tpassive\n";
-                                }
+					$options_present = true;
+					$ifconfigs .= "\t\tpassive\n";
+				}
 				if (!empty($ifconfigs)) {
 					$conffile .= " {\n {$ifconfigs} \n";
 					if ($options_present == true)
@@ -168,7 +168,7 @@ function ospfd_install_conf() {
 }
 
 function ospfd_validate_interface() {
-        global $config, $g, $input_errors;
+	global $config, $g, $input_errors;
 
 	if ($config['installedpackages']['ospfdinterfaces']['config']) {
 		foreach ($config['installedpackages']['ospfdinterfaces']['config'] as $index => $conf) {
@@ -199,19 +199,19 @@ function ospfd_validate_input() {
 
 // get the raw ospfd confi file for manual inspection/editing
 function ospfd_get_raw_config() {
-  return file_get_contents("/usr/local/etc/ospfd.conf");
+	return file_get_contents("/usr/local/etc/ospfd.conf");
 }
 
 // serialize the raw ospfd confi file to config.xml
 function ospfd_put_raw_config($conffile) {
-  global $config;
-  if ($conffile == "")
-    unset($config['installedpackages']['ospfd']['rawconfig']);
-  else {
-    $config['installedpackages']['ospfd']['rawconfig'] = array();
-    $config['installedpackages']['ospfd']['rawconfig']['item'] = explode("\n",$_POST['ospfd_raw']);
-    $config['installedpackages']['ospfd']['rawconfig'] = $conffile;
-  }
+	global $config;
+	if ($conffile == "")
+		unset($config['installedpackages']['ospfd']['rawconfig']);
+	else {
+		$config['installedpackages']['ospfd']['rawconfig'] = array();
+		$config['installedpackages']['ospfd']['rawconfig']['item'] = explode("\n",$_POST['ospfd_raw']);
+		$config['installedpackages']['ospfd']['rawconfig'] = $conffile;
+	}
 }
 
 function is_ospfd_running() {
