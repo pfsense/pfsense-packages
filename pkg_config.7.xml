@@ -539,7 +539,7 @@
       <name>OpenOSPFD</name>
       <descr>OSPF routing protocol</descr>
       <maintainer>cmb@pfsense.org</maintainer>
-      <version>0.2</version>
+      <version>0.3</version>
       <category>Routing</category>
       <status>ALPHA</status>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
