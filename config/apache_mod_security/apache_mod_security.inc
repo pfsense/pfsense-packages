@@ -62,13 +62,13 @@ function apache_mod_security_restart() {
 function apache_mod_security_install() {
 	global $config, $g;
 
-	exec("/usr/bin/fetch -q -o " . rules_directory . "/ http://www.pfsense.com/packages/config/apache_mod_security/rules/10_asl_rules.conf");
-	exec("/usr/bin/fetch -q -o " . rules_directory . "/ http://www.pfsense.com/packages/config/apache_mod_security/rules/a_exclude.conf");
-	exec("/usr/bin/fetch -q -o " . rules_directory . "/ http://www.pfsense.com/packages/config/apache_mod_security/rules/blacklist.conf");
-	exec("/usr/bin/fetch -q -o " . rules_directory . "/ http://www.pfsense.com/packages/config/apache_mod_security/rules/default.conf");
-	exec("/usr/bin/fetch -q -o " . rules_directory . "/ http://www.pfsense.com/packages/config/apache_mod_security/rules/recons.conf");
-	exec("/usr/bin/fetch -q -o " . rules_directory . "/ http://www.pfsense.com/packages/config/apache_mod_security/rules/rootkits.conf");
-	exec("/usr/bin/fetch -q -o " . rules_directory . "/ http://www.pfsense.com/packages/config/apache_mod_security/rules/useragents.conf");
+	exec("/usr/bin/fetch -q -o " . rules_directory . "/10_asl_rules.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/10_asl_rules.conf");
+	exec("/usr/bin/fetch -q -o " . rules_directory . "/a_exclude.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/a_exclude.conf");
+	exec("/usr/bin/fetch -q -o " . rules_directory . "/blacklist.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/blacklist.conf");
+	exec("/usr/bin/fetch -q -o " . rules_directory . "/rules/default.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/default.conf");
+	exec("/usr/bin/fetch -q -o " . rules_directory . "/recons.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/recons.conf");
+	exec("/usr/bin/fetch -q -o " . rules_directory . "/rootkits.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/rootkits.conf");
+	exec("/usr/bin/fetch -q -o " . rules_directory . "/useragents.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/useragents.conf");
 
 	// We might be reinstalling and a configuration
 	// already exists.
