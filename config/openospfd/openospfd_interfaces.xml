@@ -26,6 +26,10 @@
 		<url>pkg.php?xml=openospfd_interfaces.xml</url>
 		<active/>
 	</tab>
+	<tab>
+		<text>Status</text>
+		<url>/status_ospfd.php</url>
+	</tab>	
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
