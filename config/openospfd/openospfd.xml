@@ -61,7 +61,7 @@
 			<required/>
 		</field>
 		<field>
-			<fielddescr>Update FIB (Routing table)</fielddescr>
+			<fielddescr>Disable FIB updates (Routing table)</fielddescr>
 			<fieldname>updatefib</fieldname>
 			<description>Disables the updating of the host routing table(turns into stub router).</description>
 			<type>checkbox</type>
