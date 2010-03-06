@@ -103,6 +103,7 @@ function apache_mod_security_deinstall() {
 // Regenerate apache configuration and handle server restart
 function apache_mod_security_resync() {
 	global $config, $g;
+	apache_mod_security_install();
 	if(!file_exists(rules_directory . "/10_asl_rules.conf"))
 		exec("/usr/bin/fetch -q -o " . rules_directory . "/10_asl_rules.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/10_asl_rules.conf");
 	if(!file_exists(rules_directory . "/a_exclude.conf"))
