@@ -111,7 +111,7 @@ if(strstr($pfSversion, "1.2"))
 			<?php
 				$tab_array = array();
 				$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=openospfd.xml&id=0");
-				$tab_array[] = array(gettext("Interfaces"), false, "/pkg.php?xml=openospfd_interfaces.xml");
+				$tab_array[] = array(gettext("Interface Settings"), false, "/pkg.php?xml=openospfd_interfaces.xml");
 				$tab_array[] = array(gettext("Status"), true, "/status_ospfd.php");
 				display_top_tabs($tab_array);
 			?>
@@ -121,14 +121,14 @@ if(strstr($pfSversion, "1.2"))
 					<table width="100%" border="0" cellpadding="6" cellspacing="0">
 					<tr>
 						<td>
-					<?php
+<?php
 						defCmdT("OpenOSPFd Summary","/usr/local/sbin/ospfctl show summary"); 
 						defCmdT("OpenOSPFd Neighbors","/usr/local/sbin/ospfctl show neighbor"); 
 						defCmdT("OpenOSPFd FIB","/usr/local/sbin/ospfctl show fib");
 						defCmdT("OpenOSPFd RIB","/usr/local/sbin/ospfctl show rib"); 
 						defCmdT("OpenOSPFd Interfaces","/usr/local/sbin/ospfctl show interfaces"); 
 						defCmdT("OpenOSPFD Database","/usr/local/sbin/ospfctl show database"); 
-					?>
+?>
 					<div id="cmdspace" style="width:100%">
 						<?php listCmds(); ?>		
 						<?php execCmds(); ?>
