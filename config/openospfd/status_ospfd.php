@@ -32,12 +32,79 @@ require("guiconfig.inc");
 $pgtitle = "OpenOSPFD: Status";
 include("head.inc");
 
+/* List all of the commands as an index. */
+function listCmds() {
+    global $commands;
+    echo "<p>This status page includes the following information:\n";
+    echo "<ul width=\"700\">\n";
+    for ($i = 0; isset($commands[$i]); $i++ ) {
+        echo "<li><strong><a href=\"#" . $commands[$i][0] . "\">" . $commands[$i][0] . "</a></strong></li>\n";
+    }
+    echo "</ul>\n";
+}
+
+function execCmds() {
+    global $commands;
+    for ($i = 0; isset($commands[$i]); $i++ ) {
+        doCmdT($commands[$i][0], $commands[$i][1]);
+    }
+}
+
+/* Define a command, with a title, to be executed later. */
+function defCmdT($title, $command) {
+    global $commands;
+    $title = htmlspecialchars($title,ENT_NOQUOTES);
+    $commands[] = array($title, $command);
+}
+
+function doCmdT($title, $command) {
+    echo "<p>\n";
+    echo "<a name=\"" . $title . "\">\n";
+    echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
+    echo "<tr><td class=\"listtopic\">" . $title . "</td></tr>\n";
+    echo "<tr><td class=\"listlr\"><pre>";		/* no newline after pre */
+
+	if ($command == "dumpconfigxml") {
+		$fd = @fopen("/conf/config.xml", "r");
+		if ($fd) {
+			while (!feof($fd)) {
+				$line = fgets($fd);
+				/* remove sensitive contents */
+				$line = preg_replace("/<password>.*?<\\/password>/", "<password>xxxxx</password>", $line);
+				$line = preg_replace("/<pre-shared-key>.*?<\\/pre-shared-key>/", "<pre-shared-key>xxxxx</pre-shared-key>", $line);
+				$line = preg_replace("/<rocommunity>.*?<\\/rocommunity>/", "<rocommunity>xxxxx</rocommunity>", $line);
+				$line = str_replace("\t", "    ", $line);
+				echo htmlspecialchars($line,ENT_NOQUOTES);
+			}
+		}
+		fclose($fd);
+	} else {
+		$execOutput = "";
+		$execStatus = "";
+		exec ($command . " 2>&1", $execOutput, $execStatus);
+		for ($i = 0; isset($execOutput[$i]); $i++) {
+			if ($i > 0) {
+				echo "\n";
+			}
+			echo htmlspecialchars($execOutput[$i],ENT_NOQUOTES);
+		}
+	}
+    echo "</pre></tr>\n";
+    echo "</table>\n";
+}
+
+$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
+if(strstr($pfSversion, "1.2"))
+	$one_two = true;
+
 ?>
 
 <html>
 	<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 		<?php include("fbegin.inc"); ?>
-		<p class="pgtitle"><?=$pgtitle?></font></p>
+		<?php if($one_two): ?>
+			<p class="pgtitle"><?=$pgtitle?></font></p>
+		<?php endif; ?>
 		<?php if ($savemsg) print_info_box($savemsg); ?>
 		<div id="mainlevel">
 			<table width="100%" border="0" cellpadding="0" cellspacing="0">
