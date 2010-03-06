@@ -45,14 +45,14 @@ include("head.inc");
 	$tab_array = array();
 	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=openospfd.xml&id=0");
 	$tab_array[] = array(gettext("Interfaces"), false, "/pkg.php?xml=openospfd_neighbors.xml");
-	$tab_array[] = array(gettext("Status"), true, "/openospfd_status.php");
+	$tab_array[] = array(gettext("Status"), true, "/status_ospfd.php");
 	display_top_tabs($tab_array);
 ?>
 </table>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>
      <td class="tabcont" >
-      <form action="tinydns_status.php" method="post">
+      <form action="status_ospfd" method="post">
     </form>
     </td>
    </tr>
