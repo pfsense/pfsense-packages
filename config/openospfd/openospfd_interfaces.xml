@@ -5,10 +5,10 @@
 	<include_file>/usr/local/pkg/openospfd.inc</include_file>
 	<aftersaveredirect>pkg_edit.php?xml=openospfd.xml&amp;id=0</aftersaveredirect>
 	<additional_files_needed>
-                <prefix>/usr/local/pkg/</prefix>
-                <chmod>077</chmod>
-                <item>http://www.pfsense.com/packages/config/openospfd/openospfd.inc</item>
-        </additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/openospfd/openospfd.inc</item>
+	</additional_files_needed>
 	<menu>
 		<name>OSPFd</name>
 		<tooltiptext>Modify ospfd settings.</tooltiptext>
@@ -29,13 +29,13 @@
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
-                        <fielddescr>Interface</fielddescr>
-                        <fieldname>interface</fieldname>
-                </columnitem>
+			<fielddescr>Interface</fielddescr>
+			<fieldname>interface</fieldname>
+		</columnitem>
 		<columnitem>
-                        <fielddescr>Description</fielddescr>
-                        <fieldname>descr</fieldname>
-                </columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>descr</fieldname>
+		</columnitem>
 	</adddeleteeditpagefields>
 	<service>
 		<name>ospfd</name>
@@ -43,72 +43,74 @@
 		<executable>ospfd</executable>
 	</service>
 	<fields>
-                <field>
-                        <fielddescr>Interface</fielddescr>
-                        <fieldname>interface</fieldname>
-                        <description>Enter the desired participating interface here.</description>
-                        <type>interfaces_selection</type>
+		<field>
+			<fielddescr>Interface</fielddescr>
+			<fieldname>interface</fieldname>
+			<description>Enter the desired participating interface here.</description>
+			<type>interfaces_selection</type>
 			<required/>
-                </field>
+		</field>
 		<field>
 			<fielddescr>Metric</fielddescr>
 			<fieldname>metric</fieldname>
 			<description>Metric for this OSPF interface (leave blank for default).</description>
 			<type>input</type>
-                </field>
+		</field>
 		<field>
-                        <fielddescr>Description</fielddescr>
-                        <fieldname>descr</fieldname>
+			<fielddescr>Description</fielddescr>
+			<fieldname>descr</fieldname>
 			<size>30</size>
-                        <type>input</type>
-                </field>
+			<type>input</type>
+		</field>
 		<field>
-                        <fielddescr>Interface is Passive</fielddescr>
-                        <fieldname>passive</fieldname>
-                        <description>Prevent transmission and reception of OSPF packets on this interface.  The specified interface will be announced as a stub network.</description>
-                        <type>checkbox</type>
-                </field>
-                <field>
-                        <fielddescr>Enable MD5 password for this OSPFd interface (default no)</fielddescr>
-                        <fieldname>md5password</fieldname>
-                        <description>Enables the use of an MD5 password to on this instance</description>
-                        <type>checkbox</type>
-                </field>
+			<fielddescr>Interface is Passive</fielddescr>
+			<fieldname>passive</fieldname>
+			<description>Prevent transmission and reception of OSPF packets on this interface.  The specified interface will be announced as a stub network.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable MD5 password for this OSPFd interface (default no)</fielddescr>
+			<fieldname>md5password</fieldname>
+			<description>Enables the use of an MD5 password to on this instance</description>
+			<type>checkbox</type>
+		</field>
 		<field>
 			<fielddescr>Password</fielddescr>
 			<fieldname>password</fieldname>
 			<description>Password for this OSPF interface.</description>
 			<type>input</type>
-                </field>
+		</field>
 		<field>
 			<fielddescr>Router Priority</fielddescr>
 			<fieldname>routerpriorityelections</fieldname>
-			<description>Router priority when participating in elections for DR (Default 1) Valid range is 0-255.  0 will cause the router to not participate in election.</description>
+			<description>
+					Router priority when participating in elections for DR (Default 1) Valid range is 0-255.  0 will cause the router to not participate in election.
+			</description>
 			<type>input</type>
-                </field>
+		</field>
 		<field>
 			<fielddescr>Hello Interval</fielddescr>
 			<fieldname>hellointervalinseconds</fieldname>
 			<description>Hello Interval this OSPF interface in seconds (Default 10).</description>
 			<type>input</type>
-                </field>
+		</field>
 		<field>
 			<fielddescr>Retransmit Interval</fielddescr>
 			<fieldname>retransmitinterval</fieldname>
 			<description>Retransmit Interval this OSPF interface in seconds (Default 5).</description>
 			<type>input</type>
-                </field>
+		</field>
 		<field>
 			<fielddescr>Dead Timer</fielddescr>
 			<fieldname>deadtimer</fieldname>
 			<description>Dead Timer for this OSPF interface in seconds (Default 40).</description>
 			<type>input</type>
-                </field>
+		</field>
 	</fields>
 	<custom_php_resync_config_command>
-                ospfd_install_conf();
-        </custom_php_resync_config_command>
+		ospfd_install_conf();
+	</custom_php_resync_config_command>
 	<custom_php_validation_command>
-                ospfd_validate_interface();
-        </custom_php_validation_command>
+		ospfd_validate_interface();
+	</custom_php_validation_command>
 </packagegui>
