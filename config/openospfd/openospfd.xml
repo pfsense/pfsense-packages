@@ -52,7 +52,7 @@
 			<fieldname>routerid</fieldname>
 			<description>
 				<![CDATA[
-					Specify the Router ID. This is generally your LAN IP Address. For more information on router identifiers see <a target='_new' href='http://en.wikipedia.org/wiki/Open_Shortest_Path_First'>wikipedia</a>. 
+					Specify the Router ID. RID is the highest logical (loopback) IP address configured on a router. For more information on router identifiers see <a target='_new' href='http://en.wikipedia.org/wiki/Open_Shortest_Path_First'>wikipedia</a>. 
 				]]>
 			</description>
 			<type>input</type>
@@ -62,7 +62,7 @@
 			<fieldname>area</fieldname>
 			<description>
 				<![CDATA[
-					OpenOSPFd area for this instance of OSPF. For more information on Areas see <a target='_new'  href='http://en.wikipedia.org/wiki/Open_Shortest_Path_First'>wikipedia</a>.
+					OpenOSPFd area for this instance of OSPF. For more information on Areas see <a target='_new'  href='http://en.wikipedia.org/wiki/Open_Shortest_Path_First#Area_types'>wikipedia</a>.
 				]]>
 			</description>
 			<type>input</type>
