@@ -302,7 +302,7 @@
       <name>OpenOSPFD</name>
       <descr>OSPF routing protocol</descr>
       <maintainer>cmb@pfsense.org</maintainer>
-      <version>0.3</version>
+      <version>0.4</version>
       <category>Routing</category>
       <status>ALPHA</status>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
