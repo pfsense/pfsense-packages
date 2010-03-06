@@ -35,8 +35,8 @@ include("head.inc");
 /* List all of the commands as an index. */
 function listCmds() {
     global $commands;
-    echo "<p>This status page includes the following information:\n";
-    echo "<ul width=\"700\">\n";
+    echo "<br/>This status page includes the following information:\n";
+    echo "<ul width=\"100%\">\n";
     for ($i = 0; isset($commands[$i]); $i++ ) {
         echo "<li><strong><a href=\"#" . $commands[$i][0] . "\">" . $commands[$i][0] . "</a></strong></li>\n";
     }
@@ -107,7 +107,7 @@ if(strstr($pfSversion, "1.2"))
 		<?php endif; ?>
 		<?php if ($savemsg) print_info_box($savemsg); ?>
 		<div id="mainlevel">
-			<table width="100%" border="0" cellpadding="0" cellspacing="0">
+			<table width="100%" border="0" cellpadding="6" cellspacing="0">
 			<?php
 				$tab_array = array();
 				$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=openospfd.xml&id=0");
@@ -116,15 +116,11 @@ if(strstr($pfSversion, "1.2"))
 				display_top_tabs($tab_array);
 			?>
 			</table>
-			<table width="100%" border="0" cellpadding="0" cellspacing="0">
-			   <tr>
-			     <td class="tabcont" >
-			      <form action="status_ospfd.php" method="post">
-			    </form>
-			    </td>
-			   </tr>
 			   <tr>
 			    <td class="tabcont" >
+					<table width="100%" border="0" cellpadding="6" cellspacing="0">
+					<tr>
+						<td>
 					<?php
 						defCmdT("OpenOSPFD Summary","/usr/local/sbin/ospfctl show summary"); 
 						defCmdT("OpenOSPFD Neighbors","/usr/local/sbin/ospfctl show neighbor"); 
@@ -137,6 +133,8 @@ if(strstr($pfSversion, "1.2"))
 						<?php listCmds(); ?>		
 						<?php execCmds(); ?>
 					</div>
+					</td>
+					</tr>
 				</td>
 			   </tr>
 			</table>
