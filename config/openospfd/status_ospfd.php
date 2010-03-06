@@ -27,39 +27,62 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
+require("guiconfig.inc");
 
-echo "<h2>Basic OSPFd statistics </h2><br>";
-
-echo "<h3> OSPF Summary </h3>";
-echo '<pre>';
-
-$summary = system('/usr/local/sbin/ospfctl show summary', $summary);
-
-echo "<h3> OSPF Neighbors </h3>";
-echo '<pre>';
-
-$neighbor = system('/usr/local/sbin/ospfctl show neighbor', $neighbor);
-
-echo "<h3> FIB </h3>";
-echo '<pre>';
-
-$rib = system('/usr/local/sbin/ospfctl show fib', $rib);
-
-echo "<h3> RIB </h3>";
-echo '<pre>';
-
-$fib = system('/usr/local/sbin/ospfctl show rib', $fib);
-
-echo "<h3> OSPF Interfaces </h3>";
-echo '<pre>';
-
-$interfaces = system('/usr/local/sbin/ospfctl show interfaces', $interfaces);
-
-echo "<h3> OSPF Database </h3>";
-echo '<pre>';
-
-$database = system('/usr/local/sbin/ospfctl show database', $database);
-
+$pgtitle = "OpenOSPFD: Status";
+include("head.inc");
 
 ?>
 
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<?php include("fbegin.inc"); ?>
+<p class="pgtitle"><?=$pgtitle?></font></p>
+<?php if ($savemsg) print_info_box($savemsg); ?>
+
+<div id="mainlevel">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<?php
+	$tab_array = array();
+	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=openospfd.xml&id=0");
+	$tab_array[] = array(gettext("Interfaces"), false, "/pkg.php?xml=openospfd_neighbors.xml");
+	$tab_array[] = array(gettext("Status"), true, "/openospfd_status.php");
+	display_top_tabs($tab_array);
+?>
+</table>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+   <tr>
+     <td class="tabcont" >
+      <form action="tinydns_status.php" method="post">
+    </form>
+    </td>
+   </tr>
+   <tr>
+    <td class="tabcont" >
+
+<?php
+
+defCmdT("OpenOSPFD Summary","/usr/local/sbin/ospfctl show summary"); 
+defCmdT("OpenOSPFD Neighbors","/usr/local/sbin/ospfctl show neighbor"); 
+defCmdT("OpenOSPFD FIB","/usr/local/sbin/ospfctl show fib");
+defCmdT("OpenOSPFD RIB","/usr/local/sbin/ospfctl show rib"); 
+defCmdT("OpenOSPFD Interfaces","/usr/local/sbin/ospfctl show interfaces"); 
+defCmdT("OpenOSPFD Database","/usr/local/sbin/ospfctl show database"); 
+
+?>
+
+		<div id="cmdspace" style="width:100%">
+		<?php listCmds(); ?>
+		
+		<?php execCmds(); ?>
+		</div>
+
+      </table>
+     </td>
+    </tr>
+</table>
+</div>
+
+<?php include("fend.inc"); ?>
+
+</body>
+</html>
