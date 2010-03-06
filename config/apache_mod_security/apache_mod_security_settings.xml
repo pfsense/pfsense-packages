@@ -95,7 +95,7 @@
 				<![CDATA[
 					This is the port the Proxy Server will listen on. 
 					<br/>
-					NOTE: Leave blank to bind to *
+					NOTE: Leave blank to bind to 80
 				]]>					
 			</description>
 			<type>input</type>
