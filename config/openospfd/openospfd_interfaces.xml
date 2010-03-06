@@ -1,7 +1,7 @@
 <packagegui>
-	<name>OSPFd Interfaces</name>
+	<name>OpenOSPFd Interfaces</name>
 	<version>0.1</version>
-	<title>Services: OSPFd</title>
+	<title>Services: OpenOSPFd</title>
 	<include_file>/usr/local/pkg/openospfd.inc</include_file>
 	<aftersaveredirect>pkg_edit.php?xml=openospfd.xml&amp;id=0</aftersaveredirect>
 	<additional_files_needed>
@@ -10,7 +10,7 @@
 		<item>http://www.pfsense.com/packages/config/openospfd/openospfd.inc</item>
 	</additional_files_needed>
 	<menu>
-		<name>OSPFd</name>
+		<name>OSPF</name>
 		<tooltiptext>Modify ospfd settings.</tooltiptext>
 		<section>Services</section>
 		<configfile>openospfd.xml</configfile>
@@ -73,7 +73,7 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Enable MD5 password for this OSPFd interface (default no)</fielddescr>
+			<fielddescr>Enable MD5 password for this OpenOSPFd interface (default no)</fielddescr>
 			<fieldname>md5password</fieldname>
 			<description>Enables the use of an MD5 password to on this instance</description>
 			<type>checkbox</type>

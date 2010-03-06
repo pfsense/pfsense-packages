@@ -1,7 +1,7 @@
 <packagegui>
-	<name>OSPFd</name>
+	<name>OpenOSPFd</name>
 	<version>0.1</version>
-	<title>Services: OSPFd</title>
+	<title>Services: OpenOSPFd</title>
 	<include_file>/usr/local/pkg/openospfd.inc</include_file>
 	<aftersaveredirect>pkg_edit.php?xml=openospfd.xml&amp;id=0</aftersaveredirect>
 	<additional_files_needed>
@@ -20,7 +20,7 @@
 		<item>http://www.pfsense.com/packages/config/openospfd/status_ospfd.php</item>
 	</additional_files_needed>
 	<menu>
-		<name>OSPFd</name>
+		<name>OpenOSPFd</name>
 		<tooltiptext>Modify ospfd settings.</tooltiptext>
 		<section>Services</section>
 		<configfile>openospfd.xml</configfile>
@@ -56,7 +56,7 @@
 		<field>
 			<fielddescr>Area</fielddescr>
 			<fieldname>area</fieldname>
-			<description>OSPF area for this instance of OSPFd.</description>
+			<description>OpenOSPFd area for this instance of OSPF.</description>
 			<type>input</type>
 			<required/>
 		</field>

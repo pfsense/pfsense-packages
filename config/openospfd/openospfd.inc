@@ -41,7 +41,7 @@ function ospfd_install_conf() {
 		if($config['installedpackages']['ospfd']['config']) 
 			$ospfd_conf = &$config['installedpackages']['ospfd']['config'][0];
 		else {
-			log_error("OSPFd: No config data found.");
+			log_error("OpenOSPFd: No config data found.");
 			return;
 		}
     
@@ -194,7 +194,7 @@ function ospfd_validate_input() {
 	if ($_POST['spfdelay'] <> "" && ($_POST['spfdelay'] < 1 || $_POST['spfdelay'] > 10))
 		$input_errors[] = "SPF delay needs to be between 1 and 10.";
 	if (!$config['installedpackages']['ospfdinterfaces']['config'])
-		$input_errors[] = "Please select an interface to use for OSPFd.";
+		$input_errors[] = "Please select an interface to use for OpenOSPFd.";
 }
 
 // get the raw ospfd confi file for manual inspection/editing

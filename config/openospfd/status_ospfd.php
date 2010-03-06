@@ -29,7 +29,7 @@
 
 require("guiconfig.inc");
 
-$pgtitle = "OpenOSPFD: Status";
+$pgtitle = "OpenOSPFd: Status";
 include("head.inc");
 
 /* List all of the commands as an index. */
@@ -122,11 +122,11 @@ if(strstr($pfSversion, "1.2"))
 					<tr>
 						<td>
 					<?php
-						defCmdT("OpenOSPFD Summary","/usr/local/sbin/ospfctl show summary"); 
-						defCmdT("OpenOSPFD Neighbors","/usr/local/sbin/ospfctl show neighbor"); 
-						defCmdT("OpenOSPFD FIB","/usr/local/sbin/ospfctl show fib");
-						defCmdT("OpenOSPFD RIB","/usr/local/sbin/ospfctl show rib"); 
-						defCmdT("OpenOSPFD Interfaces","/usr/local/sbin/ospfctl show interfaces"); 
+						defCmdT("OpenOSPFd Summary","/usr/local/sbin/ospfctl show summary"); 
+						defCmdT("OpenOSPFd Neighbors","/usr/local/sbin/ospfctl show neighbor"); 
+						defCmdT("OpenOSPFd FIB","/usr/local/sbin/ospfctl show fib");
+						defCmdT("OpenOSPFd RIB","/usr/local/sbin/ospfctl show rib"); 
+						defCmdT("OpenOSPFd Interfaces","/usr/local/sbin/ospfctl show interfaces"); 
 						defCmdT("OpenOSPFD Database","/usr/local/sbin/ospfctl show database"); 
 					?>
 					<div id="cmdspace" style="width:100%">
