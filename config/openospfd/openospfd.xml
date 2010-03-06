@@ -42,7 +42,7 @@
 		</tab>
 	</tabs>
 	<service>
-		<name>ospfd</name>
+		<name>OpenOSPFd</name>
 		<rcfile>ospfd.sh</rcfile>
 		<executable>ospfd</executable>
 	</service>
