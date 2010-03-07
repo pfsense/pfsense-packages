@@ -432,7 +432,6 @@ if ($blocked_ips_array[0] == '')
 		    		</td>
 		  		</tr>
 			</table>
-		</div>
 	</td>
   </tr>
 </table>
