@@ -345,9 +345,9 @@ EOF;
 		$mod_security_rules = "";
 		$files = return_dir_as_array(rules_directory);
 		foreach($files as $file) { 
-			if(file_exists($file)) {
+			if(file_exists(rules_directory . "/" . $file)) {
 				// XXX: TODO integrate snorts rule on / off thingie
-				$file_txt = get_file_contents($file);
+				$file_txt = file_get_contents(rules_directory . "/" . $file);
 				$mod_security_rules .= $file_txt . "\n";
 			}
 		}
