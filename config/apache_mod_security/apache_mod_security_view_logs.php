@@ -3,7 +3,7 @@
 /*
 	apache_mod_security_view_logs.php.php
 	part of pfSense (http://www.pfsense.com/)
-	Copyright (C) 2009 Scott Ullrich <sullrich@gmail.com>
+	Copyright (C) 2009, 2010 Scott Ullrich <sullrich@gmail.com>
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without

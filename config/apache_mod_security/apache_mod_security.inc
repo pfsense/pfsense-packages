@@ -509,7 +509,6 @@ LoadModule auth_digest_module libexec/apache22/mod_auth_digest.so
 LoadModule file_cache_module libexec/apache22/mod_file_cache.so
 LoadModule cache_module libexec/apache22/mod_cache.so
 LoadModule disk_cache_module libexec/apache22/mod_disk_cache.so
-{$mod_mem_cache}
 LoadModule dumpio_module libexec/apache22/mod_dumpio.so
 LoadModule include_module libexec/apache22/mod_include.so
 LoadModule filter_module libexec/apache22/mod_filter.so
@@ -548,6 +547,7 @@ LoadModule speling_module libexec/apache22/mod_speling.so
 LoadModule userdir_module libexec/apache22/mod_userdir.so
 LoadModule alias_module libexec/apache22/mod_alias.so
 LoadModule rewrite_module libexec/apache22/mod_rewrite.so
+{$mod_mem_cache}
 
 <IfModule !mpm_netware_module>
 <IfModule !mpm_winnt_module>
