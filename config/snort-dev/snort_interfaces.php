@@ -218,6 +218,12 @@ padding: 15px 10px 50% 50px;
 	padding-top: 4px;
 	padding-bottom: 4px;
 }
+.listt4 {
+
+font-size: 11px;
+padding-right :15px;
+padding-left :15px;
+}
 </style> 
 <noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
 
@@ -286,7 +292,7 @@ padding: 15px 10px 50% 50px;
 					
 					
 					?>
-                  <td class="listt"><a href="?act=toggle&id=<?=$i;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_<?=$iconfn;?>.gif" width="13" height="13" border="0" title="click to toggle start/stop snort"></a><input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0; width: 7px; height: 7px;"></td>
+                  <td class="listt" width="5%><a href="?act=toggle&id=<?=$i;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_<?=$iconfn;?>.gif" width="13" height="13" border="0" title="click to toggle start/stop snort"></a><input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0;"></td>
                   <td class="listt" align="center"></td>
                   <td class="<?=$class_color_up;?>" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 		    <?php
