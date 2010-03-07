@@ -152,19 +152,33 @@ function generate_apache_configuration() {
 		$servername = "ServerName " . `hostname` . "\n";
 	}
 
-	// Set global listening directive
-	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr']) {
-		$global_listen  =  $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
-		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
-			$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
-		else 
-			$global_listen .= ":80";
+	// Set global listening directive and ensure nothing is listening on this port already
+	$globalbind = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
+	$socksstat = split("\n", `/usr/bin/sockstat | awk '{ print $6 }' | grep ":{$globalbind}" | cut -d ":" -f2`);
+	if(is_array($socksstat)) {
+		foreach($socksstat as $ss) {
+			if($ss == $globalbind) {
+				$already_binded = true;
+				$input_errors[] = "Sorry, there is a process already listening on port {$globalbind}";
+			}
+		}
+	}
+	if(!$already_binded) {
+		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr']) {
+			$global_listen  =  $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
+			if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
+				$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
+			else 
+				$global_listen .= ":80";
+		} else {
+			$global_listen = "{$config['system']['hostname']}.{$config['system']['domain']}";
+			if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
+				$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
+			else 
+				$global_listen .= ":80";
+		}
 	} else {
-		$global_listen = "{$config['system']['hostname']}.{$config['system']['domain']}";
-		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
-			$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
-		else 
-			$global_listen .= ":80";
+		log_error("Could not start mod_security + mod_proxy on port {$global_listen}.  Process is already bound to this port.");
 	}
 	
 	// Setup mem_cache
