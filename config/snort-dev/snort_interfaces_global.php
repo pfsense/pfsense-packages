@@ -157,10 +157,11 @@ include("head.inc");
 	$tab_array[] = array("Help & Info", false, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 ?>    </td></tr>
-  <tr>
-  <td class="tabcont">
-  <table width="100%" border="0" cellpadding="6" cellspacing="0">
-    <tr>
+<br>
+<tr>
+<td class="tabcont">
+<table width="100%" border="0" cellpadding="6" cellspacing="0">
+	<tr>
       <td width="22%" valign="top" class="vncell">Install Snort.org rules</td>
       <td width="78%" class="vtable">
         <table cellpadding="0" cellspacing="0">

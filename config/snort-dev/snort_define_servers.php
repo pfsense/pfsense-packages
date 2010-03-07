@@ -258,6 +258,7 @@ if($id != "")
 ?>
 </td>
 </tr>
+				<br>
 				<tr>
 				<td class="tabcont">
 				<table width="100%" border="0" cellpadding="6" cellspacing="0">

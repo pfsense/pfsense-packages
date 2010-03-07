@@ -170,10 +170,11 @@ echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\
     $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
     display_top_tabs($tab_array);
 ?>
-  		</td>
-  </tr>
-  <tr>
-    <td>
+	</td>
+	</tr>
+		<br>
+		<tr>
+		<td>
 		<div id="mainarea">
 			<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 				<tr>

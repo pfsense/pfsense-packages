@@ -257,10 +257,11 @@ if ($pconfig['brefresh'] == 'on' || $pconfig['brefresh'] == '')
 	$tab_array[] = array("Help & Info", false, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 ?>
-  	</td>
-  </tr>
-  <tr>
-    <td>
+	</td>
+	</tr>
+		<br>
+		<tr>
+		<td>
 		<div id="mainarea">
 		
 		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">

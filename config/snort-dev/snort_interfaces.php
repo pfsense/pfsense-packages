@@ -246,8 +246,9 @@ padding: 15px 10px 50% 50px;
 	display_top_tabs($tab_array);
 ?>
  </td></tr>
-  <tr>
-    <td>
+	<br>
+	<tr>
+	<td>
 	<div id="mainarea">
               <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr id="frheader">
@@ -263,8 +264,8 @@ padding: 15px 10px 50% 50px;
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
 			<td width="17"></td>
-                        <td><a href="snort_interfaces_edit.php"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
-                      </tr>
+					<td><a href="snort_interfaces_edit.php"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+					</tr>
                     </table>
 		  </td>
 		</tr>

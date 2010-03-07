@@ -331,10 +331,11 @@ if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 	$tab_array[] = array("Help & Info", false, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 ?>
-  </td>
-  </tr>
-  <tr>
-    <td>
+</td>
+</tr>
+	<br>
+	<tr>
+	<td>
 	<div id="mainarea">
 		<table class="tabcont" width="100%" border="1" cellspacing="0" cellpadding="0">
 		  <tr>

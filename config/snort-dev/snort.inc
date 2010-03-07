@@ -34,6 +34,16 @@ require_once("pfsense-utils.inc");
 // Needed on 2.0 because of filter_get_vpns_list()
 require_once("filter.inc");
 
+/* find out if were in 1.2.3-RELEASE */
+
+$pfsense_ver_chk = exec('/bin/cat /etc/version');
+if ($pfsense_ver_chk == '1.2.3-RELEASE')
+{
+	$pfsense_stable = 'yes';
+}else{
+	$pfsense_stable = 'no';
+}    
+
 /* Get id and realinterfaces */
 
 $id = $_GET['id'];
@@ -1173,7 +1183,15 @@ else
 
 	/* grab a list of vpns and whitelist if user desires added by nestorfish 954 */
 	if($whitelistvpns) {
-		$vpns_list = filter_get_vpns_list();
+		if ($pfsense_stable == 'yes') // chk what pfsense version were on
+		{
+			$vpns_list = get_vpns_list();
+		}
+		if ($pfsense_stable == 'no') // chk what pfsense version were on
+		{
+			$vpns_list = filter_get_vpns_list();
+		}
+
 		$whitelist_vpns = split(" ", $vpns_list);
 		foreach($whitelist_vpns as $wl)
 			if(trim($wl))

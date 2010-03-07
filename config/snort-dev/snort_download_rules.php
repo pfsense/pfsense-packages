@@ -245,10 +245,11 @@ setTimeout($.unblockUI, 2000);
 // -->
 </script>
 
-  </td>
-  </tr>
-        <tr>
-          <td>
+</td>
+</tr>
+		<br>
+		<tr>
+		<td>
               <div id="mainarea">
               <table class="tabcont" width="100%" border="0" cellpadding="6" cellspacing="0">
                 <tr>
