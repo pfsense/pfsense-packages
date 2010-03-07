@@ -118,7 +118,6 @@ function apache_mod_security_resync() {
 		exec("/usr/bin/fetch -q -o " . rules_directory . "/rootkits.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/rootkits.conf");
 	if(!file_exists(rules_directory . "/useragents.conf"))
 		exec("/usr/bin/fetch -q -o " . rules_directory . "/useragents.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/useragents.conf");
-	generate_apache_configuration();
 	apache_mod_security_checkconfig();
 	apache_mod_security_restart();
 }
