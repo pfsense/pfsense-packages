@@ -162,7 +162,7 @@ function generate_apache_configuration() {
 			}
 		}
 	}
-	if(!$already_binded) {
+//	if(!$already_binded) {
 		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr']) {
 			$global_listen  =  $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
 			if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
@@ -176,9 +176,9 @@ function generate_apache_configuration() {
 			else 
 				$global_listen .= ":80";
 		}
-	} else {
-		log_error("Could not start mod_security + mod_proxy on port {$global_listen}.  Process is already bound to this port.");
-	}
+//	} else {
+//		log_error("Could not start mod_security + mod_proxy on port {$global_listen}.  Process is already bound to this port.");
+//	}
 	
 	// Setup mem_cache
 	if(file_exists("/usr/local/libexec/apache22/mod_mem_cache.so")) {
