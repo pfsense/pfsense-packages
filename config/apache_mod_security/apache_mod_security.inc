@@ -2,7 +2,7 @@
 /*
 	apache_mod_security.inc
 	part of apache_mod_security package (http://www.pfSense.com)
-	Copyright (C) 2009 Scott Ullrich
+	Copyright (C) 2009, 2010 Scott Ullrich
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
