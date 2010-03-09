@@ -35,6 +35,7 @@
 		<columnitem>
 			<fielddescr>Interface</fielddescr>
 			<fieldname>interface</fieldname>
+			<type>interface</type>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Description</fielddescr>
