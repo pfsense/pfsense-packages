@@ -476,34 +476,35 @@ if ($premium_url_chk == on) {
 //  }
 //}
 
-/*  Copy so_rules dir to snort lib dir */
-if ($snort_md5_check_ok != on) {
-if (file_exists("{$snortdir}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/")) {
-    echo "Copying so_rules...\n";
-    echo "May take a while...\n";
-    exec("`/bin/cp -f {$snortdir}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/* /usr/local/lib/snort/dynamicrules/`");
-	exec("/bin/cp {$snortdir}/so_rules/bad-traffic.rules {$snortdir}/rules/bad-traffic.so.rules");
-	exec("/bin/cp {$snortdir}/so_rules/chat.rules {$snortdir}/rules/chat.so.rules");
-	exec("/bin/cp {$snortdir}/so_rules/dos.rules {$snortdir}/rules/dos.so.rules");
-	exec("/bin/cp {$snortdir}/so_rules/exploit.rules {$snortdir}/rules/exploit.so.rules");
-	exec("/bin/cp {$snortdir}/so_rules/imap.rules {$snortdir}/rules/imap.so.rules");
-	exec("/bin/cp {$snortdir}/so_rules/misc.rules {$snortdir}/rules/misc.so.rules");
-	exec("/bin/cp {$snortdir}/so_rules/multimedia.rules {$snortdir}/rules/multimedia.so.rules");
-	exec("/bin/cp {$snortdir}/so_rules/netbios.rules {$snortdir}/rules/netbios.so.rules");
-	exec("/bin/cp {$snortdir}/so_rules/nntp.rules {$snortdir}/rules/nntp.so.rules");
-	exec("/bin/cp {$snortdir}/so_rules/p2p.rules {$snortdir}/rules/p2p.so.rules");
-	exec("/bin/cp {$snortdir}/so_rules/smtp.rules {$snortdir}/rules/smtp.so.rules");
-	exec("/bin/cp {$snortdir}/so_rules/sql.rules {$snortdir}/rules/sql.so.rules");
-	exec("/bin/cp {$snortdir}/so_rules/web-client.rules {$snortdir}/rules/web-client.so.rules");
-	exec("/bin/cp {$snortdir}/so_rules/web.misc.rules {$snortdir}/rules/web.misc.so.rules");
-	exec("/bin/rm -r {$snortdir}/so_rules");
-    echo "Done copying so_rules.\n";
-} else {
-    echo "Directory so_rules does not exist...\n";
-    echo "Error copying so_rules...\n";
-    exit(0);
- }
-}
+/* Copy so_rules dir to snort lib dir */
+/* Disabled untill I figure out why there is a segment falut core dump on 2.8.5.3 */
+//if ($snort_md5_check_ok != on) {
+//if (file_exists("{$snortdir}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/")) {
+//   echo "Copying so_rules...\n";
+//    echo "May take a while...\n";
+//    exec("`/bin/cp -f {$snortdir}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/* /usr/local/lib/snort/dynamicrules/`");
+//	exec("/bin/cp {$snortdir}/so_rules/bad-traffic.rules {$snortdir}/rules/bad-traffic.so.rules");
+//	exec("/bin/cp {$snortdir}/so_rules/chat.rules {$snortdir}/rules/chat.so.rules");
+//	exec("/bin/cp {$snortdir}/so_rules/dos.rules {$snortdir}/rules/dos.so.rules");
+//	exec("/bin/cp {$snortdir}/so_rules/exploit.rules {$snortdir}/rules/exploit.so.rules");
+//	exec("/bin/cp {$snortdir}/so_rules/imap.rules {$snortdir}/rules/imap.so.rules");
+//	exec("/bin/cp {$snortdir}/so_rules/misc.rules {$snortdir}/rules/misc.so.rules");
+//	exec("/bin/cp {$snortdir}/so_rules/multimedia.rules {$snortdir}/rules/multimedia.so.rules");
+//	exec("/bin/cp {$snortdir}/so_rules/netbios.rules {$snortdir}/rules/netbios.so.rules");
+//	exec("/bin/cp {$snortdir}/so_rules/nntp.rules {$snortdir}/rules/nntp.so.rules");
+//	exec("/bin/cp {$snortdir}/so_rules/p2p.rules {$snortdir}/rules/p2p.so.rules");
+//	exec("/bin/cp {$snortdir}/so_rules/smtp.rules {$snortdir}/rules/smtp.so.rules");
+//	exec("/bin/cp {$snortdir}/so_rules/sql.rules {$snortdir}/rules/sql.so.rules");
+//	exec("/bin/cp {$snortdir}/so_rules/web-client.rules {$snortdir}/rules/web-client.so.rules");
+//	exec("/bin/cp {$snortdir}/so_rules/web.misc.rules {$snortdir}/rules/web.misc.so.rules");
+//	exec("/bin/rm -r {$snortdir}/so_rules");
+//  echo "Done copying so_rules.\n";
+//} else {
+//    echo "Directory so_rules does not exist...\n";
+//    echo "Error copying so_rules...\n";
+//    exit(0);
+// }
+//}
 
 /*  Copy configs to snort dir */
 if ($snort_md5_check_ok != on) {

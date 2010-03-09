@@ -743,46 +743,47 @@ if ($premium_url_chk == on) {
  }
 }
 
-/*  Copy so_rules dir to snort lib dir */
-if ($snortdownload != "off")
-{
-	if ($snort_md5_check_ok != on) {
-	if (file_exists("{$snortdir}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/")) {
-		update_status(gettext("Copying so_rules..."));
-		update_output_window(gettext("May take a while..."));
-		exec("/bin/cp -f {$snortdir}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/* /usr/local/lib/snort/dynamicrules/");
-		exec("/bin/cp {$snortdir}/so_rules/bad-traffic.rules {$snortdir}/rules/snort_bad-traffic.so.rules");
-		exec("/bin/cp {$snortdir}/so_rules/chat.rules {$snortdir}/rules/snort_chat.so.rules");
-		exec("/bin/cp {$snortdir}/so_rules/dos.rules {$snortdir}/rules/snort_dos.so.rules");
-		exec("/bin/cp {$snortdir}/so_rules/exploit.rules {$snortdir}/rules/snort_exploit.so.rules");
-		exec("/bin/cp {$snortdir}/so_rules/imap.rules {$snortdir}/rules/snort_imap.so.rules");
-		exec("/bin/cp {$snortdir}/so_rules/misc.rules {$snortdir}/rules/snort_misc.so.rules");
-		exec("/bin/cp {$snortdir}/so_rules/multimedia.rules {$snortdir}/rules/snort_multimedia.so.rules");
-		exec("/bin/cp {$snortdir}/so_rules/netbios.rules {$snortdir}/rules/snort_netbios.so.rules");
-		exec("/bin/cp {$snortdir}/so_rules/nntp.rules {$snortdir}/rules/snort_nntp.so.rules");
-		exec("/bin/cp {$snortdir}/so_rules/p2p.rules {$snortdir}/rules/snort_p2p.so.rules");
-		exec("/bin/cp {$snortdir}/so_rules/smtp.rules {$snortdir}/rules/snort_smtp.so.rules");
-		exec("/bin/cp {$snortdir}/so_rules/sql.rules {$snortdir}/rules/snort_sql.so.rules");
-		exec("/bin/cp {$snortdir}/so_rules/web-client.rules {$snortdir}/rules/snort_web-client.so.rules");
-		exec("/bin/cp {$snortdir}/so_rules/web.misc.rules {$snortdir}/rules/snort_web.misc.so.rules");
-		exec("/bin/rm -r {$snortdir}/so_rules");
-		update_status(gettext("Done copying so_rules."));
-	}else{
-    update_status(gettext("Directory so_rules does not exist..."));
-    update_output_window(gettext("Error copying so_rules..."));
-	echo '
-<script type="text/javascript">
-<!--
-	displaymessagestop();	
-// -->
-</script>';
-	echo "</body>";
-	echo "</html>";
-	conf_mount_ro();
-    exit(0);
-		}
-	}
-}
+/* Copy so_rules dir to snort lib dir */
+/* Disabed untill I find out why there is a segment failt coredump when using these rules on 2.8.5.3 */
+//if ($snortdownload != "off")
+//{
+//	if ($snort_md5_check_ok != on) {
+//	if (file_exists("{$snortdir}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/")) {
+//		update_status(gettext("Copying so_rules..."));
+//		update_output_window(gettext("May take a while..."));
+//		exec("/bin/cp -f {$snortdir}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.4/* /usr/local/lib/snort/dynamicrules/");
+//		exec("/bin/cp {$snortdir}/so_rules/bad-traffic.rules {$snortdir}/rules/snort_bad-traffic.so.rules");
+//		exec("/bin/cp {$snortdir}/so_rules/chat.rules {$snortdir}/rules/snort_chat.so.rules");
+//		exec("/bin/cp {$snortdir}/so_rules/dos.rules {$snortdir}/rules/snort_dos.so.rules");
+//		exec("/bin/cp {$snortdir}/so_rules/exploit.rules {$snortdir}/rules/snort_exploit.so.rules");
+//		exec("/bin/cp {$snortdir}/so_rules/imap.rules {$snortdir}/rules/snort_imap.so.rules");
+//		exec("/bin/cp {$snortdir}/so_rules/misc.rules {$snortdir}/rules/snort_misc.so.rules");
+//		exec("/bin/cp {$snortdir}/so_rules/multimedia.rules {$snortdir}/rules/snort_multimedia.so.rules");
+//		exec("/bin/cp {$snortdir}/so_rules/netbios.rules {$snortdir}/rules/snort_netbios.so.rules");
+//		exec("/bin/cp {$snortdir}/so_rules/nntp.rules {$snortdir}/rules/snort_nntp.so.rules");
+//		exec("/bin/cp {$snortdir}/so_rules/p2p.rules {$snortdir}/rules/snort_p2p.so.rules");
+//		exec("/bin/cp {$snortdir}/so_rules/smtp.rules {$snortdir}/rules/snort_smtp.so.rules");
+//		exec("/bin/cp {$snortdir}/so_rules/sql.rules {$snortdir}/rules/snort_sql.so.rules");
+//		exec("/bin/cp {$snortdir}/so_rules/web-client.rules {$snortdir}/rules/snort_web-client.so.rules");
+//		exec("/bin/cp {$snortdir}/so_rules/web.misc.rules {$snortdir}/rules/snort_web.misc.so.rules");
+//		exec("/bin/rm -r {$snortdir}/so_rules");
+//		update_status(gettext("Done copying so_rules."));
+//	}else{
+//   update_status(gettext("Directory so_rules does not exist..."));
+//   update_output_window(gettext("Error copying so_rules..."));
+//	echo '
+//<script type="text/javascript">
+//<!--
+//	displaymessagestop();	
+//// -->
+//</script>';
+//	echo "</body>";
+//	echo "</html>";
+//	conf_mount_ro();
+//   exit(0);
+//		}
+//	}
+//}
 
 /*  Copy renamed snort.org rules to snort dir */
 if ($snortdownload != "off")
