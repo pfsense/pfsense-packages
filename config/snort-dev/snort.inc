@@ -841,7 +841,7 @@ if ($snortunifiedlog_info_chk == on)
 
 /* define spoink (DISABLED)*/
 $spoink_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['blockoffenders7'];
-if (0 && $spoink_info_chk == on)
+if ($spoink_info_chk == on)
     $spoink_type = "output alert_pf: /var/db/whitelist,snort2c";
 
 	/* define servers and ports snortdefservers */
