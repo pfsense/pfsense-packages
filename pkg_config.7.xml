@@ -967,5 +967,15 @@
       <config_file>http://www.pfsense.org/packages/config/states-summary/states-summary.xml</config_file>
       <configurationfile>states-summary.xml</configurationfile>
     </package>
+    <package>
+      <name>IP Range Aliases</name>
+      <descr>Patch to add IP Range support to Network Aliases. WARNING! Cannot be uninstalled.</descr>
+      <category>System</category>
+      <config_file>http://www.pfsense.com/packages/config/iprangealiases/iprangealiases.xml</config_file>
+      <version>0.1</version>
+      <status>BETA</status>
+      <required_version>1.2.3</required_version>
+      <maximum_version>1.2.3</maximum_version>
+    </package>
   </packages>
 </pfsensepkgs>
