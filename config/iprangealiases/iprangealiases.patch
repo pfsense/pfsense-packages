@@ -129,7 +129,7 @@
  	return (preg_match("/[^0-9]/", $arg) ? false : true);
  }
 --- /usr/local/www/firewall_aliases_edit.php.orig	2010-03-09 13:08:12.000000000 -0500
-+++ /usr/local/www/firewall_aliases_edit.php	2010-03-10 15:49:57.000000000 -0500
++++ /usr/local/www/firewall_aliases_edit.php	2010-03-10 18:54:36.000000000 -0500
 @@ -96,11 +96,6 @@
  	$reqdfields = explode(" ", "name address");
  	$reqdfieldsn = explode(",", "Name,Address");
@@ -247,3 +247,19 @@
  			}
  		}
  	}
+@@ -358,7 +373,7 @@
+ $url_str = gettext("URL");
+ $update_freq_str = gettext("Update Freq.");
+ 
+-$networks_help = gettext("Networks can be expressed like 10.0.0.0 format.  Select the CIDR (network mask) that pertains to each entry.");
++$networks_help = gettext("Networks can be expressed like 10.0.0.0 format.  Select the CIDR (network mask) that pertains to each entry. You may also enter an IP Range such as 192.168.1.1-192.168.1.254.");
+ $hosts_help = gettext("Enter as many hosts as you would like.  Hosts should be expressed in their ip address format.");
+ $ports_help = gettext("Enter as many ports as you wish.  Port ranges can be expressed by seperating with a colon.");
+ $url_help = gettext("Enter as many urls as you wish.  Also set the time that you would like the url refreshed in days.  After saving {$g['product_name']} will download the URL and import the items into the alias.");
+@@ -595,4 +610,4 @@
+ 	}
+ 	fclose($fd);
+ }
+-?>
+\ No newline at end of file
++?>

@@ -46,7 +46,7 @@
     <requirements>pfSense 1.2.3</requirements>
     <faq>None</faq>
 	<name>IP Range Aliases</name>
-	<version>0.1</version>
+	<version>0.2</version>
 	<title>IP Range Aliases</title>
 	<include_file>/usr/local/pkg/iprangealiases.inc</include_file>
 	<additional_files_needed>
