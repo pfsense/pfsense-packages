@@ -35,6 +35,7 @@ require_once("globals.inc");
 require_once("openvpn.inc");
 
 function openvpn_client_export_install() {
+	conf_mount_rw();
 	$tarpath = "/tmp/openvpn-client-export.tgz";
 	$phpfile = "vpn_openvpn_export.php";
 	$ovpndir = "/usr/local/share/openvpn";
@@ -45,15 +46,18 @@ function openvpn_client_export_install() {
 
 	exec("/usr/bin/tar zxf {$tarpath} -C {$ovpndir}");
 	unlink($tarpath);
+	conf_mount_ro();
 }
 
 function openvpn_client_export_deinstall() {
+	conf_mount_rw();
 	$phpfile = "vpn_openvpn_export.php";
 	$ovpndir = "/usr/local/share/openvpn";
 	$workdir = "{$ovpndir}/client-export";
 
 	unlink_if_exists("/usr/local/www/{$phpfile}");
 	exec("/bin/rm -r {$workdir}");
+	conf_mount_ro();
 }
 
 function openvpn_client_export_prefix($srvid) {
