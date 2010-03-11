@@ -86,7 +86,7 @@ iframe
 </tr>
 </table>
 <div>
-	<iframe style="width: 780px; height: 600px; overflow-x: hidden;" src='/snort/help_and_info.html'></iframe>
+	<iframe style="width: 780px; height: 600px; overflow-x: hidden;" src='/snort/help_and_info.php'></iframe>
 </div>
 </div>
 	<div id="footer2">

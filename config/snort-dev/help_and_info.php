@@ -1,3 +1,8 @@
+<?php
+
+	require_once("guiconfig.inc");
+
+echo '
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -31,7 +36,7 @@
 	<br>
 <div class="content" id="item1">
 	<p>
-	<font size="5"><strong>Snort Package</strong></font> is a GUI based front-end for Sourcefire's Snort ® IDS/IPS software. The Snort Package goal is to be
+	<font size="5"><strong>Snort Package</strong></font> is a GUI based front-end for Sourcefire\'s Snort ® IDS/IPS software. The Snort Package goal is to be
 	the best open-source GUI to manage multiple snort sensors and multiple rule snapshots. The project other goal is to be a highly competitive GUI for
 	network monitoring for both private and enterprise use. Lastly, this project software development should bring programmers and users together to create 
 	software.
@@ -72,7 +77,7 @@ Coming soon............
 <div class="content" id="item5">
 <p>
 <font size="5"><strong>PfSense</strong></font> is brought to you by a dedicated group of developers who are security and network professionals by trade. The following people are active developers of the pfSense project. 
-Username is listed in parenthesis (generally also the person's forum username, IRC nickname, etc.).<br><br>
+Username is listed in parenthesis (generally also the person\'s forum username, IRC nickname, etc.).<br><br>
 
 <font size="5"><strong>Main Snort-dev Package Developer</strong></font><br>
 Robert Zelaya<br><br>
@@ -149,7 +154,7 @@ A: Right now all WAN interfaces and LAN interfaces. But if you select a LAN inte
 Q: What logs does the snort package keep. ?<br>
 
 A: Most of the snort logs are keept in the /var/log/snort.<br>
-    Snorts syslogs' are saved to the /var/log/snort/snort_sys_0ng0.<br>
+    Snorts syslogs\' are saved to the /var/log/snort/snort_sys_0ng0.<br>
     
 ==========================<br>
 
@@ -187,3 +192,5 @@ A: I started working on the snort package in May 2009.<br>
 </div>
 </body>
 </html>
+';
+?>
