@@ -339,7 +339,7 @@
       <name>snort-dev</name>
 	  <pkginfolink>http://forum.pfsense.org/index.php/topic,16847.0.html</pkginfolink>
       <website>http://www.snort.org</website>
-      <descr>WARNING: This is the Snort-dev branch and is unstable. Please post package version on the forums. Revert back to alpha.</descr>
+      <descr>WARNING: This is the Snort-dev branch and maybe broken while in development. Please post package version and Pfsense Version on the forums when posting bugs.</descr>
       <category>Security</category>
       <depends_on_package_base_url>http://www.pfsense.com/packages/config/snort-dev/bin/7.2.x86/</depends_on_package_base_url>
 	  <depends_on_package>pcre-8.00.tbz</depends_on_package>
@@ -347,11 +347,11 @@
       <depends_on_package>mysql-client-5.1.44_1.tbz</depends_on_package>
 	  <depends_on_package>snort-2.8.5.3.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/snort-dev/snort.xml</config_file>
-      <version>2.8.5.3 pkg v. 1.9</version>
+      <version>2.8.5.3 pkg v. 1.10</version>
       <required_version>1.2.3</required_version>
       <status>alpha</status>
       <configurationfile>/snort.xml</configurationfile>
-	  <after_install_info>This is the Snort-dev branch and is stable as of RC3.</after_install_info>
+	  <after_install_info>This is the Snort-dev branch and is stable as of Alpha.</after_install_info>
     </package>
     <package>
       <name>siproxd</name>

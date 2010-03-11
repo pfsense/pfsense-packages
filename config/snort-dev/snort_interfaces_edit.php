@@ -300,7 +300,7 @@ if ($_POST["Submit"]) {
 		}
 
 $ifname = strtoupper($pconfig['interface']);
-$pgtitle = "Snort: Interface: {$ifname} Settings Edit";
+$pgtitle = "Snort: Interface: $id$if_real Settings Edit";
 include("head.inc");
 
 ?>
@@ -308,6 +308,7 @@ include("head.inc");
 <?php 
 include("fbegin.inc");
 ?>
+<p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 <style type="text/css">
 .alert {
  position:absolute;
@@ -409,7 +410,6 @@ if($id != "")
 ?>
 </td>
 </tr>
-				<br>
 				<tr>
 				<td class="tabcont">
 				<table width="100%" border="0" cellpadding="6" cellspacing="0">

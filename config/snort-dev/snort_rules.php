@@ -30,6 +30,7 @@
 require("guiconfig.inc");
 require("config.inc");
 require("/usr/local/pkg/snort/snort_gui.inc");
+require("/usr/local/pkg/snort/snort.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -399,13 +400,18 @@ if ($_GET['saved'] == 'yes')
 $currentruleset = basename($rulefile);
 
 $ifname = strtoupper($pconfig['interface']);
-$pgtitle = "Snort: Interface $ifname Rule File $currentruleset";
+
 require("guiconfig.inc");
 include("head.inc");
+
+$pgtitle = "Snort: Interface $id$if_real Rule Category: $currentruleset";
+
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
+<p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
+
 <?php
 echo "<form action=\"snort_rules.php?id={$id}\" method=\"post\" name=\"iform\" id=\"iform\">";
 ?>
@@ -463,7 +469,6 @@ function popup(url)
 ?>
 	</td>
 	</tr>
-	<br>
 	<tr>
 	<td>
         <div id="mainarea">

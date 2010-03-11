@@ -77,11 +77,13 @@ $emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'
 /* If no id show the user a button */	
 if ($id_d == "" || $snort_emrging_info == "stop" || $snort_oinkid_info == "stop") {
 
-$pgtitle = "Services: Snort: Update Rules";
+$pgtitle = "Services: Snort: Rule Updates";
 
 include("head.inc");
 include("fbegin.inc");
-
+echo "<p class=\"pgtitle\">";
+if($pfsense_stable == 'yes'){echo $pgtitle;}
+echo "</p>\n";
 /* make sure user has javascript on */
 echo "<style type=\"text/css\">
 .alert {
@@ -218,8 +220,7 @@ setTimeout($.unblockUI, 2000);
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("/usr/local/www/fbegin.inc"); ?>
-
-
+<p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 
 <form action="snort_download_rules.php" method="post">
 <div id="inputerrors"></div>

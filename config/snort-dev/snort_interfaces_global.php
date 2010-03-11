@@ -32,7 +32,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = "Services:[Snort][Global Settings]";
+$pgtitle = "Services: Snort: Global Settings";
 require("guiconfig.inc");
 require("/usr/local/pkg/snort/snort.inc");
 
@@ -139,6 +139,7 @@ if ($_POST) {
 include("head.inc");
 ?>
 <?php include("fbegin.inc"); ?>
+<p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
@@ -157,7 +158,6 @@ include("head.inc");
 	$tab_array[] = array("Help & Info", false, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 ?>    </td></tr>
-<br>
 <tr>
 <td class="tabcont">
 <table width="100%" border="0" cellpadding="6" cellspacing="0">

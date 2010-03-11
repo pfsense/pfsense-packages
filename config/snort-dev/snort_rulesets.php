@@ -31,6 +31,9 @@
 require("guiconfig.inc");
 require_once("filter.inc");
 require_once("service-utils.inc");
+include_once("/usr/local/pkg/snort/snort.inc");
+
+$pgtitle = "Snort: Interface $id$if_real Categories";
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -64,6 +67,10 @@ if ($isrulesfolderempty == "") {
 
 include("head.inc");
 include("fbegin.inc");
+
+echo "<p class=\"pgtitle\">";
+if($pfsense_stable == 'yes'){echo $pgtitle;}
+echo "</p>\n";
 
 echo "<body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\">";
 
@@ -140,13 +147,13 @@ $enabled_rulesets = $a_nat[$id]['rulesets'];
 if($enabled_rulesets)
 	$enabled_rulesets_array = split("\|\|", $enabled_rulesets);
 
-$pgtitle = "Snort: Interface $id$if_real Categories";
 include("head.inc");
 
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php include("fbegin.inc"); ?>
+<p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 <?php
 
 echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\" id=\"iform\">";
@@ -172,7 +179,6 @@ echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\
 ?>
 	</td>
 	</tr>
-		<br>
 		<tr>
 		<td>
 		<div id="mainarea">

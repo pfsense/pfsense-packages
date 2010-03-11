@@ -39,6 +39,7 @@ Important add error checking
 */
 
 require("guiconfig.inc");
+require("/usr/local/pkg/snort/snort.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -229,6 +230,7 @@ include("head.inc");
 <?php 
 include("fbegin.inc");
 ?>
+<p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 <style type="text/css">
 .alert {
  position:absolute;
@@ -288,7 +290,6 @@ if($id != "")
 ?>
 </td>
 </tr>
-				<br>
 				<tr>
 				<td class="tabcont">
 				<table width="100%" border="0" cellpadding="6" cellspacing="0">

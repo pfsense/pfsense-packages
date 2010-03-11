@@ -31,6 +31,7 @@
 */
 
 require("guiconfig.inc");
+require("/usr/local/pkg/snort/snort.inc");
 
 $pconfig['brefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['brefresh'];
 $pconfig['blertnumber'] = $config['installedpackages']['snortglobal']['alertsblocks']['blertnumber'];
@@ -233,6 +234,10 @@ include("head.inc");
 
 include("fbegin.inc");
 
+echo "<p class=\"pgtitle\">";
+if($pfsense_stable == 'yes'){echo $pgtitle;}
+echo "</p>\n";
+
 /* refresh every 60 secs */
 if ($pconfig['brefresh'] == 'on' || $pconfig['brefresh'] == '')
 {
@@ -259,7 +264,6 @@ if ($pconfig['brefresh'] == 'on' || $pconfig['brefresh'] == '')
 ?>
 	</td>
 	</tr>
-		<br>
 		<tr>
 		<td>
 		<div id="mainarea">

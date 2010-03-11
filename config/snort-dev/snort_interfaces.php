@@ -31,7 +31,7 @@
 
 require("guiconfig.inc");
 require("/usr/local/pkg/snort/snort_gui.inc");
-include_once("/usr/local/pkg/snort/snort.inc");
+require("/usr/local/pkg/snort/snort.inc");
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
@@ -178,12 +178,13 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 	header("Location: snort_interfaces.php");
 }	
 
-$pgtitle = "Services: Snort 2.8.5.2 pkg v. 1.9";
+$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.10 Alpha";
 include("head.inc");
 
 ?>
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php include("fbegin.inc"); ?>
+<p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 <style type="text/css">
 .alert {
  position:absolute;
@@ -218,12 +219,6 @@ padding: 15px 10px 50% 50px;
 	padding-top: 4px;
 	padding-bottom: 4px;
 }
-.listt4 {
-
-font-size: 11px;
-padding-right :15px;
-padding-left :15px;
-}
 </style> 
 <noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
 
@@ -252,7 +247,6 @@ padding-left :15px;
 	display_top_tabs($tab_array);
 ?>
  </td></tr>
-	<br>
 	<tr>
 	<td>
 	<div id="mainarea">

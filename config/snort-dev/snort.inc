@@ -155,6 +155,7 @@ function snort_postinstall()
 	
 	chdir ("/usr/local/www/snort/css/");
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/css/style.css');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/css/style2.css');
 	chdir ("/usr/local/www/snort/images/");
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/alert.jpg');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/down.gif');
@@ -164,11 +165,14 @@ function snort_postinstall()
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/icon-table-sort-desc.png');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/up.gif');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/up2.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/logo.jpg');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/footer.jpg');
 	chdir ("/usr/local/www/snort/javascript/");
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery.blockUI.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery-1.3.2.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/mootools.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/sortableTable.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/tabs.js');
 	
 	/* back to default */
 	chdir ("/root/");

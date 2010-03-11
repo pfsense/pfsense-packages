@@ -34,14 +34,38 @@
 
 require("guiconfig.inc");
 
-
 header("snort_help_info.php");
+header( "Expires: Mon, 20 Dec 1998 01:00:00 GMT" );
+header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
+header( "Cache-Control: no-cache, must-revalidate" );
+header( "Pragma: no-cache" );
 
 $pgtitle = "Snort: Services: Help and Info";
 include('head.inc');
 ?>
+<style type="text/css">
+iframe
+{
+	border: 0;
+}
 
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+#footer2
+{
+	position: relative;
+	top: -2px;
+	background-color: #cccccc;
+	background-image: none;
+	background-repeat: repeat;
+	background-attachment: scroll;
+	background-position: 0% 0%;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 0px;
+}
+
+</style>
+<body>
 <?php include("fbegin.inc"); ?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -60,12 +84,24 @@ include('head.inc');
 ?>
     </td>
 </tr>
-	<td>
-	<iFrame src='/snort/help_and_info.html' frameborder=0 width=780px height=600px name='name' marginheight=0 marginwidth=0 scrolling=on></iFrame>
-	</td>
-
 </table>
+<div>
+	<iframe style="width: 780px; height: 600px; overflow-x: hidden;" src='/snort/help_and_info.html'></iframe>
+</div>
+</div>
+	<div id="footer2">
+		<IMG SRC="./images/footer.jpg" width="780px" height="63" ALT="Apps">
+			<font size="1">Snort® is a registered trademark of Sourcefire, Inc., Barnyard2® is a registered trademark of securixlive.com., Orion® copyright Robert Zelaya., 
+			Emergingthreats is a registered trademark of emergingthreats.net., Mysql® is a registered trademark of Mysql.com.</font>
+	</div>
+</div>
+        <div id="footer">
+			<a target="_blank" href="http://www.pfsense.org/?gui12" class="redlnk">pfSense</a> is &copy;
+			 2004 - 2009 by <a href="http://www.bsdperimeter.com" class="tblnk">BSD Perimeter LLC</a>. All Rights Reserved.
+			<a href="/license.php" class="tblnk">view license</a>]
+			<br/>
 
-<?php include("fend.inc"); ?>
+			<a target="_blank" href="https://portal.pfsense.org/?guilead=true" class="tblnk">Commercial Support Available</a>
+		</div> <!-- Footer DIV -->
 </body>
 </html>

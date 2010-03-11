@@ -36,6 +36,7 @@
 
 require("globals.inc");
 require("guiconfig.inc");
+require("/usr/local/pkg/snort/snort.inc");
 
 $snortalertlogt = $config['installedpackages']['snortglobal']['snortalertlogtype'];
 $snort_logfile = '/var/log/snort/alert';
@@ -312,6 +313,10 @@ include("head.inc");
 
 include("fbegin.inc");
 
+echo "<p class=\"pgtitle\">";
+if($pfsense_stable == 'yes'){echo $pgtitle;}
+echo "</p>\n";
+
 /* refresh every 60 secs */
 if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 {
@@ -333,7 +338,6 @@ if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 ?>
 </td>
 </tr>
-	<br>
 	<tr>
 	<td>
 	<div id="mainarea">
