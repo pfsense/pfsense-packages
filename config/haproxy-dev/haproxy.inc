@@ -569,7 +569,9 @@ function haproxy_check_run($reload) {
 			}
 			log_error("Starting haproxy on CARP master.");
 			/* fallthrough */
-		}
+		} else if ($reload == 0))
+			return (0);
+
 		if (haproxy_is_running()) {
 			exec("/usr/local/sbin/haproxy -f /var/etc/haproxy.cfg -p /var/run/haproxy.pid -st `cat /var/run/haproxy.pid`");
 		} else {
