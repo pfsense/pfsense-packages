@@ -186,13 +186,13 @@ function ospfd_install_conf() {
 }
 
 function ospfd_validate_interface() {
-	global $config, $g, $input_errors;
+	global $config, $g, $id, $input_errors;
 
 	if ($config['installedpackages']['ospfdinterfaces']['config']) {
 		foreach ($config['installedpackages']['ospfdinterfaces']['config'] as $index => $conf) {
 			if ($index == 0)
 				continue;
-			if ($conf['interface'] == $_POST['interface'])
+			if ($id != $index && $conf['interface'] == $_POST['interface'])
 				$input_errors[] = "Interface {$_POST['interface']} is already configured.";
 		}
 	}
