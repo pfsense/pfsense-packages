@@ -4,6 +4,7 @@
 	<title>Services: OpenOSPFd</title>
 	<include_file>/usr/local/pkg/openospfd.inc</include_file>
 	<aftersaveredirect>pkg.php?xml=openospfd_interfaces.xml</aftersaveredirect>
+	<custom_php_command_before_form>ospfd_display_friendlyiface();</custom_php_command_before_form>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>

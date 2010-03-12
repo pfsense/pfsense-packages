@@ -27,6 +27,24 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+function ospfd_display_friendlyiface () {
+        global $evaledvar, $config, $g;
+
+	if (intval($g['latest_config']) >= 6)
+		return;
+
+        if ($evaledvar) {
+                foreach ($evaledvar as $idx => $field) {
+                        if ($field['interface']) {
+                                if (empty($config['interfaces'][$field['interface']]['descr']))
+                                        $evaledvar[$idx]['interface'] = strtoupper($evaledvar[$idx]['interface']);
+                                else
+                                        $evaledvar[$idx]['interface'] = $config['interfaces'][$field['interface']]['descr'];
+                        }
+                }
+        }
+}
+
 function ospfd_install_conf() {
 	global $config, $g, $input_errors;
 	
