@@ -383,7 +383,6 @@ function haproxy_writeconf() {
 				$a_bind[$bname]['config'] = array();
 				// Settings which are constant for a merged frontend
 				$a_bind[$bname]['name'] = $backend['name'];
-				$a_bind[$bname]['defaultpool'] = $backend['pool'] . "_" . strtolower($backend['type']);
 				$a_bind[$bname]['extaddr'] = $backend['extaddr'];
 				$a_bind[$bname]['port'] = $backend['port'];
 			}
@@ -465,9 +464,9 @@ function haproxy_writeconf() {
 			if($bind['client_timeout'])
 				fwrite ($fd, "\tclitimeout\t\t" . $bind['client_timeout'] . "\n");
 
-			fwrite ($fd, "\tdefault_backend\t\t" . $bind['defaultpool'] . "\n");
 	
 			// Combine the rest of the listener configs
+			$default_once = 0;
 			$i = 0;
 			foreach ($bind['config'] as $bconfig) {
 				$a_acl=&$bconfig['ha_acls']['item'];
@@ -475,6 +474,17 @@ function haproxy_writeconf() {
 					$a_acl=array();
 			
 				$poolname = $bconfig['pool'] . "_" . strtolower($bconfig['type']);
+
+				// Create different pools if the svrport is set
+				if ($bconfig['svrport'] > 0)
+					$poolname .= "_" . $bconfig['svrport'];
+
+				// Write this out once, and must be before any backend config text
+				if ($default_once == 0) {
+					fwrite ($fd, "\tdefault_backend\t\t" . $poolname . "\n");
+					$default_once++;
+				}
+
 				if (!isset($a_pendingpl[$poolname])) {
 					$a_pendingpl[$poolname] = array();
 					$a_pendingpl[$poolname]['name'] = $poolname;
@@ -573,7 +583,7 @@ function haproxy_check_run($reload) {
 			}
 			log_error("Starting haproxy on CARP master.");
 			/* fallthrough */
-		} else if ($reload == 0))
+		} else if ($reload == 0)
 			return (0);
 
 		if (haproxy_is_running()) {
