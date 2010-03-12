@@ -138,16 +138,17 @@ EOD;
 	$devd = <<<EOD
 notify 0 {
         match "system"          "IFNET";
-        match "subsystem        "carp[0-9]+";
+        match "subsystem"       "carp[0-9]+";
         match "type"            "LINK_UP";
         action "/usr/local/etc/rc.d/haproxy.sh check";
 };
 notify 0 {
         match "system"          "IFNET";
-        match "subsystem        "carp[0-9]+";
+        match "subsystem"       "carp[0-9]+";
         match "type"            "LINK_DOWN";
         action "/usr/local/etc/rc.d/haproxy.sh check";
 };
+
 EOD;
 	exec("mkdir -p /etc/devd");
 	$fd = fopen("/etc/devd/haproxy.conf", "w");
@@ -542,6 +543,11 @@ function haproxy_writeconf() {
 	}
 }
 
+function haproxy_is_running() {
+        $running = (shell_exec("/bin/pgrep -x haproxy") != '');
+        return $running;
+}
+
 function haproxy_check_run($reload) {
 	global $config, $g;
 
@@ -553,21 +559,25 @@ function haproxy_check_run($reload) {
 		if (isset($a_global['carpdev'])) {
 			$status = get_carp_interface_status($a_global['carpdev']);
 			if ($status != "MASTER") {
-				exec("/bin/pkill -F /var/run/haproxy.pid haproxy");
+				if (haproxy_is_running()) {
+					log_error("Stopping haproxy on CARP backup.");
+					exec("/bin/pkill -F /var/run/haproxy.pid haproxy");
+				}
 				return (0);
-			} else if (is_process_running('haproxy') && $reload == 0) { 
-					return (0);
+			} else if (haproxy_is_running() && $reload == 0) { 
+				return (0);
 			}
+			log_error("Starting haproxy on CARP master.");
 			/* fallthrough */
 		}
-		if (is_process_running('haproxy')) {
+		if (haproxy_is_running()) {
 			exec("/usr/local/sbin/haproxy -f /var/etc/haproxy.cfg -p /var/run/haproxy.pid -st `cat /var/run/haproxy.pid`");
 		} else {
 			exec("/usr/local/sbin/haproxy -f /var/etc/haproxy.cfg -p /var/run/haproxy.pid -D");
 		}
 		return (0);
 	} else {
-		if ($reload && is_process_running('haproxy')) {
+		if ($reload && haproxy_is_running()) {
 			exec("/bin/pkill -F /var/run/haproxy.pid haproxy");
 		}
 		return (1);
