@@ -65,7 +65,6 @@ function haproxy_custom_php_deinstall_command() {
 	exec("rm /usr/local/etc/rc.d/haproxy.sh");
 	exec("rm /etc/devd/haproxy.conf");
 	exec("/etc/rc.d/devd restart");
-	haproxy_install_cron(false);
 }
 
 function haproxy_custom_php_install_command() {
@@ -156,7 +155,6 @@ EOD;
 	fclose($fd);
 	exec("/etc/rc.d/devd restart");
 
-	haproxy_install_cron(true);
 	conf_mount_ro();
 
 	exec("/usr/local/etc/rc.d/haproxy.sh start");
@@ -535,6 +533,11 @@ function haproxy_writeconf() {
 
 	// create config file
 	fclose($fd);
+
+	if (isset($a_global['carpdev']))
+		haproxy_install_cron(true);
+	else
+		haproxy_install_cron(false);
 
 	$freebsd_version = substr(trim(`uname -r`), 0, 1);
 	if(!file_exists("/usr/bin/limits")) {
