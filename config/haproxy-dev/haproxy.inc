@@ -62,6 +62,7 @@ function haproxy_custom_php_deinstall_command() {
 	exec("rm /usr/local/sbin/haproxy");
 	exec("rm /usr/local/pkg/haproxy.inc");
 	exec("rm /usr/local/www/haproxy*");
+	exec("rm /usr/local/etc/rc.d/haproxy.sh");
 	exec("rm /etc/devd/haproxy.conf");
 	exec("/etc/rc.d/devd restart");
 	haproxy_install_cron(false);
