@@ -103,38 +103,41 @@ include("head.inc");
               <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
                   <td width="30%" class="listhdrr">Name</td>
-                  <td width="20%" class="listhdrr">Status</td>
-                  <td width="30%" class="listhdrr">Listener</td>
+                  <td width="10%" class="listhdrr">Servers</td>
+                  <td width="40%" class="listhdrr">Listener</td>
                   <td width="10%" class="list"></td>
 				</tr>
 <?php
 		 $i = 0;
 		 foreach ($a_pools as $pool):
+
+		 $fe_list = "";
+		 $sep = "";
+		 foreach ($a_backends as $backend) {
+			 if($backend['pool'] == $pool['name']) {
+				 $fe_list .= $sep . $backend['name'];
+				 $sep = ", ";
+			 }
+		 }
 		 $textss = $textse = "";
-		 if ($pool['status'] != 'active') {
+		 if ($fe_list == "") {
 			 $textss = "<span class=\"gray\">";
 			 $textse = "</span>";
 		 }
+		 if (is_array($pool['ha_servers']['item']))
+			 $count = count($pool['ha_servers']['item']);
+		 else
+			 $count = 0;
 ?>
                 <tr>
                   <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
 			<?=$textss . $pool['name'] . $textse;?>
                   </td>
                   <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
-			<?=$textss . $pool['status'] . $textse;?>
+			<?=$textss . $count . $textse;?>
                   </td>
                   <td class="listlr" ondblclick="document.location='haproxy_pool_edit.php?id=<?=$i;?>';">
-<?php
-		echo $textss;
-		$sep = "";
-		foreach ($a_backends as $backend) {
-			if($backend['pool'] == $pool['name']) {
-				echo $sep . $backend['name'];
-				$sep = ", ";
-			}
-		}
-		echo $textse;
-?>
+			<?=$textss . $fe_list . $textse;?>
                   </td>
                   <td class="list" nowrap>
                     <table border="0" cellspacing="0" cellpadding="1">

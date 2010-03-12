@@ -245,7 +245,7 @@ function haproxy_find_acl($name) {
 }
 
 function write_backend($fd, $name, $pool, $frontend) {
-	if($pool['status'] != 'active' || !is_array($pool['ha_servers']['item']))
+	if(!is_array($pool['ha_servers']['item']))
 		continue;
 
 	fwrite ($fd, "backend " . $name . "\n");
