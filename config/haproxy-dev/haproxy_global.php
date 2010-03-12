@@ -56,6 +56,9 @@ if ($_POST) {
 			$reqdfieldsn = explode(",", "Maximum connections");		
 		}
 
+		if ($_POST['carpdev'] == "disabled")
+			unset($_POST['carpdev']);
+
 		do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
 		if ($_POST['maxconn'] && (!is_numeric($_POST['maxconn']))) 
@@ -78,6 +81,7 @@ if ($_POST) {
 			$config['installedpackages']['haproxy']['remotesyslog'] = $_POST['remotesyslog'] ? $_POST['remotesyslog'] : false;
 			$config['installedpackages']['haproxy']['logfacility'] = $_POST['logfacility'] ? $_POST['logfacility'] : false;
 			$config['installedpackages']['haproxy']['loglevel'] = $_POST['loglevel'] ? $_POST['loglevel'] : false;
+			$config['installedpackages']['haproxy']['carpdev'] = $_POST['carpdev'] ? $_POST['carpdev'] : false;
 			$config['installedpackages']['haproxy']['syncpassword'] = $_POST['syncpassword'] ? $_POST['syncpassword'] : false;
 			$config['installedpackages']['haproxy']['advanced'] = base64_encode($_POST['advanced']) ? $_POST['advanced'] : false;
 			$config['installedpackages']['haproxy']['nbproc'] = $_POST['nbproc'] ? $_POST['nbproc'] : false;			
@@ -98,6 +102,7 @@ $pconfig['synchost3'] = $config['installedpackages']['haproxy']['synchost3'];
 $pconfig['remotesyslog'] = $config['installedpackages']['haproxy']['remotesyslog'];
 $pconfig['logfacility'] = $config['installedpackages']['haproxy']['logfacility'];
 $pconfig['loglevel'] = $config['installedpackages']['haproxy']['loglevel'];
+$pconfig['carpdev'] = $config['installedpackages']['haproxy']['carpdev'];
 $pconfig['advanced'] = base64_decode($config['installedpackages']['haproxy']['advanced']);
 $pconfig['nbproc'] = $config['installedpackages']['haproxy']['nbproc'];
 
@@ -268,6 +273,34 @@ function enable_change(enable_change) {
 					endforeach;
 				?>
 					</select>
+				</td>
+			</tr>
+			<tr>
+				<td valign="top" class="vncell">
+					Carp monitor
+				</td>
+				<td class="vtable">
+					<select name="carpdev" class="formfld">
+					<option value="disabled" <?php if (!isset($pconfig['carpdev'])) echo "selected"; ?>>
+						disabled
+					</option>
+				<?php
+					if(is_array($config['virtualip']['vip'])) {
+					foreach($config['virtualip']['vip'] as $carp):
+						if ($carp['mode'] != "carp") continue;
+						$ipaddress = $carp['subnet'];
+						$carp_int = find_carp_interface($ipaddress);
+				?>
+					<option value="<?=$carp_int;?>" <?php if ($carp_int == $pconfig['carpdev']) echo "selected"; ?>>
+						<?=$carp_int;?> (<?=$ipaddress;?>)
+					</option>
+				<?php
+					endforeach;
+					}
+				?>
+					</select>
+					<br/>
+					Monitor carp interface and only run haproxy on the firewall which is MASTER.
 				</td>
 			</tr>
 			<tr>

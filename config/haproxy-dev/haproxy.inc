@@ -62,6 +62,9 @@ function haproxy_custom_php_deinstall_command() {
 	exec("rm /usr/local/sbin/haproxy");
 	exec("rm /usr/local/pkg/haproxy.inc");
 	exec("rm /usr/local/www/haproxy*");
+	exec("rm /etc/devd/haproxy.conf");
+	exec("/etc/rc.d/devd restart");
+	haproxy_install_cron(false);
 }
 
 function haproxy_custom_php_install_command() {
@@ -84,6 +87,8 @@ haproxy_enable=\${haproxy-"YES"}
 
 start_cmd="haproxy_start"
 stop_postcmd="haproxy_stop"
+check_cmd="haproxy_check"
+extra_commands="check"
 
 load_rc_config \$name
 
@@ -97,6 +102,20 @@ haproxy_start () {
 			require_once("functions.inc");
 			require_once("haproxy.inc");
 			haproxy_configure();
+		?>
+ENDOFF
+}
+
+haproxy_check () {
+        echo "Checking haproxy."
+        /usr/bin/env \
+        PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+		/usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDOFF
+		<?php
+			require_once("globals.inc");		
+			require_once("functions.inc");
+			require_once("haproxy.inc");
+			haproxy_check_run(0);
 		?>
 ENDOFF
 }
@@ -115,9 +134,75 @@ EOD;
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/haproxy.sh");
 
+	$devd = <<<EOD
+notify 0 {
+        match "system"          "IFNET";
+        match "subsystem        "carp[0-9]+";
+        match "type"            "LINK_UP";
+        action "/usr/local/etc/rc.d/haproxy.sh check";
+};
+notify 0 {
+        match "system"          "IFNET";
+        match "subsystem        "carp[0-9]+";
+        match "type"            "LINK_DOWN";
+        action "/usr/local/etc/rc.d/haproxy.sh check";
+};
+EOD;
+	exec("mkdir -p /etc/devd");
+	$fd = fopen("/etc/devd/haproxy.conf", "w");
+	fwrite($fd, $devd);
+	fclose($fd);
+	exec("/etc/rc.d/devd restart");
+
+	haproxy_install_cron(true);
 	conf_mount_ro();
 
 	exec("/usr/local/etc/rc.d/haproxy.sh start");
+}
+
+function haproxy_install_cron($should_install) {
+	global $config, $g;
+	if($g['booting']==true) 
+		return;
+	$is_installed = false;
+	if(!$config['cron']['item'])
+		return;
+	$x=0;
+	foreach($config['cron']['item'] as $item) {
+		if(strstr($item['command'], "/usr/local/etc/rc.d/haproxy.sh")) {
+			$is_installed = true;
+			break;
+		}
+		$x++;
+	}
+	switch($should_install) {
+		case true:
+			if(!$is_installed) {
+				$cron_item = array();
+				$cron_item['minute'] = "*/2";
+				$cron_item['hour'] = "*";
+				$cron_item['mday'] = "*";
+				$cron_item['month'] = "*";
+				$cron_item['wday'] = "*";
+				$cron_item['who'] = "root";
+				$cron_item['command'] = "/usr/local/etc/rc.d/haproxy.sh check";		
+				$config['cron']['item'][] = $cron_item;
+				parse_config(true);
+				write_config();
+				configure_cron();
+			}
+		break;
+		case false:
+			if($is_installed == true) {
+				if($x > 0) {
+					unset($config['cron']['item'][$x]);
+					parse_config(true);
+					write_config();
+				}
+				configure_cron();
+			}
+		break;
+	}
 }
 
 function haproxy_find_acl($name) {
@@ -248,6 +333,12 @@ function write_backend($fd, $name, $pool, $frontend) {
 }
 
 function haproxy_configure() {
+	// reload haproxy
+	haproxy_writeconf();
+	return haproxy_check_run(1);
+}
+
+function haproxy_writeconf() {
 	global $config, $g;
 
 	$a_global = &$config['installedpackages']['haproxy'];
@@ -448,20 +539,39 @@ function haproxy_configure() {
 		exec("fetch -q -o /usr/bin/limits http://files.pfsense.org/extras/{$freebsd_version}/limits");
 		exec("chmod a+rx /usr/bin/limits");
 	}
+}
+
+function haproxy_check_run($reload) {
+	global $config, $g;
+
+	$a_global = &$config['installedpackages']['haproxy'];
 
 	exec("/usr/bin/limits -n 300014");
 
-	// reload haproxy
 	if(isset($a_global['enable'])) {
-		if(is_process_running('haproxy')) {
+		if (isset($a_global['carpdev'])) {
+			$status = get_carp_interface_status($a_global['carpdev']);
+			if ($status != "MASTER") {
+				exec("/bin/pkill -F /var/run/haproxy.pid haproxy");
+				return (0);
+			} else if (is_process_running('haproxy') && $reload == 0) { 
+					return (0);
+			}
+			/* fallthrough */
+		}
+		if (is_process_running('haproxy')) {
 			exec("/usr/local/sbin/haproxy -f /var/etc/haproxy.cfg -p /var/run/haproxy.pid -st `cat /var/run/haproxy.pid`");
 		} else {
 			exec("/usr/local/sbin/haproxy -f /var/etc/haproxy.cfg -p /var/run/haproxy.pid -D");
 		}
 		return (0);
 	} else {
+		if ($reload && is_process_running('haproxy')) {
+			exec("/bin/pkill -F /var/run/haproxy.pid haproxy");
+		}
 		return (1);
 	}
+	
 }
 
 function haproxy_do_xmlrpc_sync($sync_to_ip, $password) {
