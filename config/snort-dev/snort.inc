@@ -444,12 +444,13 @@ function sync_snort_package()
 	conf_mount_ro();
 }
 
-
 /* make sure this func on writes to files and does not start snort */
 function sync_snort_package_all()
 {
 	global $config, $g, $id, $if_real, $interface_fake;
 	conf_mount_rw();
+
+
 
 /* RedDevil suggested code */
 /* TODO: more testing needs to be done */
@@ -457,6 +458,9 @@ exec("/sbin/sysctl net.bpf.bufsize=8388608");
 exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
 exec("/sbin/sysctl net.bpf.maxinsns=512");
 exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
+
+if ($id != '' && $if_real != '')
+{
 
 	/* do not start config build if rules is empty */
 	if (!empty($config['installedpackages']['snortglobal']['rule'])) 
@@ -477,6 +481,9 @@ exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 				/* create snort configuration file */
 				create_snort_conf();
 
+				/* create snort bootup file snort.sh */
+				create_snort_sh();
+
 				/* if rules exist cp rules to each iface */
 				create_rules_iface();
 
@@ -492,6 +499,8 @@ exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 			/* create snort configuration file */
 			create_snort_conf();
 
+			/* create snort bootup file snort.sh */
+			create_snort_sh();
 
 			/* if rules exist cp rules to each iface */
 			create_rules_iface();
@@ -554,11 +563,218 @@ exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 	conf_mount_ro();
 
 }
+}
 
 /* Start of main config files */
 /* Start of main config files */
 
+////////////////////////// >>>>>>>>>>
 
+
+/* open snort.sh for writing" */
+function create_snort_sh()
+{
+		# Don not add $id or this will break
+
+        global $config, $g, $if_real, $if_real_wan;
+        conf_mount_rw();
+
+	$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
+
+	/* define snortbarnyardlog_chk */
+	if ($snortbarnyardlog_info_chk == on) {
+
+	$start_barnyard2 = "sleep 4/n/usr/local/bin/barnyard2 -u snort -g snort -c /usr/local/etc/snort/snort_$id$if_real/barnyard2.conf -d /var/log/snort -f snort.u2_$id$if_real -w /usr/local/etc/snort/snort_$id$if_real/barnyard2.waldo -D -q";
+	
+}
+
+	/* do not start config build if rules is empty */
+	if (!empty($config['installedpackages']['snortglobal']['rule'])) 
+	{
+		if ($id == "") 
+		{
+
+			$rule_array = $config['installedpackages']['snortglobal']['rule'];
+			$id = -1;
+			foreach ($rule_array as $value)
+			{
+
+			$id += 1;
+			
+			$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
+			$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+
+	/* Get all interface startup commands ready */
+
+$snort_sh_text2[] = <<<EOD
+###### For Each Iface
+
+		# If Snort proc is NOT running
+		if [ "`/bin/ps -auwx | grep -v grep | grep "R $id$if_real" | awk '{print $2;}'`" = "" ]; then
+
+		/bin/echo "snort.sh run" > /tmp/snort.sh.pid
+		
+		# Start snort and barnyard2
+		/bin/rm /var/run/snort_$if_real$id$if_real.pid
+		/bin/rm /var/run/snort_$if_real$id$if_real.pid.lck
+
+		/usr/local/bin/snort -u snort -g snort -R $id$if_real -D -q -l /var/log/snort -G $id -c /usr/local/etc/snort/snort_$id$if_real/snort.conf -i $if_real
+		$start_barnyard2
+
+		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD Reload For $id$if_real..."
+
+		fi
+EOD;
+
+$snort_sh_text3[] = <<<EOE
+
+###### For Each Iface
+
+		#### Fake start only used on bootup and Pfsense IP changes
+		#### Only try to restart if snort is running on Iface
+		if [ "`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R $id$if_real" | /usr/bin/awk '{print $2;}'`" != "" ]; then
+
+		snort_pid="`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R $id$if_real" | /usr/bin/awk '{print $2;}'`"
+		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort already running, soft restart"
+
+		#### Remake the configs on boot Important!
+		/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php $id $if_real
+
+		#### Restart Iface
+		/bin/kill -HUP \${snort_pid}
+		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort Soft Reload For $id$if_real..."
+
+		fi
+
+EOE;
+
+$snort_sh_text4[] = <<<EOF
+
+		pid_s=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R $id$if_real" | /usr/bin/awk '{print \$2;}'`
+		sleep 3
+		pid_b=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "snort.u2_$id$if_real" | /usr/bin/awk '{print \$2;}'`
+
+		if [ \${pid_s} ] ; then
+		
+		/bin/echo "snort.sh run" > /tmp/snort.sh.pid
+		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD STOP For $id$if_real..."
+
+		/bin/kill \${pid_s}
+		sleep 3
+		/bin/kill \${pid_b}
+
+		/bin/rm /var/run/snort_$if_real$id$if_real.pid.lck
+		/bin/rm /var/run/snort_$if_real$id$if_real.pid
+
+		fi
+
+EOF;
+
+			}
+		}
+	}
+
+$start_snort_iface_start = implode("\n\n", $snort_sh_text2);
+
+$start_snort_iface_restart = implode("\n\n", $snort_sh_text3);
+
+$start_snort_iface_stop = implode("\n\n", $snort_sh_text4);
+
+/* open snort.sh for writing" */
+conf_mount_rw();
+
+$snort_sh_text = <<<EOD
+#!/bin/sh
+# This file was automatically generated
+# by the pfSense service handler.
+# Code added to protect from double starts on pfSense bootup
+######## Begining of Main snort.sh
+
+rc_start() {
+
+		#### Check for double starts, Pfsense has problems with that
+		if /bin/ls /tmp/snort.sh.pid > /dev/null ; then
+
+		/usr/bin/logger -p daemon.info -i -t SnortStartup "Error: snort.sh IS running"
+		exit 0
+
+		fi
+
+		/bin/echo "snort.sh run" > /tmp/snort.sh.pid
+
+$start_snort_iface_restart
+
+		/bin/rm /tmp/snort.sh.pid
+
+		#### If on Fake start snort is NOT running DO a real start.
+		if [ "`/bin/ps -auwx | grep -v grep | grep "R $id$if_real" | awk '{print $2;}'`" = "" ]; then
+
+		rc_start_real
+
+		fi
+}
+
+rc_start_real() {
+
+		#### Check for double starts, Pfsense has problems with that
+		if /bin/ls /tmp/snort.sh.pid > /dev/null ; then
+		/usr/bin/logger -p daemon.info -i -t SnortStartup "Error: snort.sh IS running"
+		exit 0
+		fi
+
+$start_snort_iface_start
+
+		/bin/rm /tmp/snort.sh.pid
+
+}
+
+rc_stop() {
+
+		#### Check for double starts, Pfsense has problems with that
+		if /bin/ls /tmp/snort.sh.pid > /dev/null ; then
+		/usr/bin/logger -p daemon.info -i -t SnortStartup "Error: snort.sh IS running"
+		exit 0
+		fi
+
+$start_snort_iface_stop
+
+		/bin/rm /tmp/snort.sh.pid
+		/bin/rm /var/run/snort*
+
+}
+
+case $1 in
+	start)
+		rc_start
+		;;
+	start_real)
+		rc_start_real
+		;;
+	stop)
+		rc_stop
+		;;
+	restart)
+		rc_stop
+		rc_start_real
+		;;
+esac
+
+EOD;
+
+        /* write out snort.sh */
+        $bconf = fopen("/usr/local/etc/rc.d/snort.sh", "w");
+        if(!$bconf) {
+                log_error("Could not open /usr/local/etc/rc.d/snort.sh for writing.");
+                exit;
+        }
+		/* write snort.sh */
+        fwrite($bconf, $snort_sh_text);
+        fclose($bconf);
+
+}
+
+
+///////////////////////// >>>>>>>>>>>>
 
 /* if rules exist copy to new interfaces */
 function create_rules_iface()
@@ -566,16 +782,19 @@ function create_rules_iface()
 
     global $config, $g, $id, $if_real;
     conf_mount_rw();
-
-	$if_rule_dir = "/usr/local/etc/snort/snort_$id$if_real/rules";
-	$folder_chk = (count(glob("$if_rule_dir/*")) === 0) ? 'empty' : 'full';
-
-	if ($folder_chk == "empty")
+	
+	if ($id != '' || $if_real != '')
 	{
-		exec("/bin/cp -R /usr/local/etc/snort/rules /usr/local/etc/snort/snort_$id$if_real");
-		if (file_exists("/usr/local/etc/snort/custom_rules/local_$id$if_real.rules"))
+		$if_rule_dir = "/usr/local/etc/snort/snort_$id$if_real/rules";
+		$folder_chk = (count(glob("$if_rule_dir/*")) === 0) ? 'empty' : 'full';
+
+		if ($folder_chk == "empty")
 		{
-			exec("/bin/cp /usr/local/etc/snort/custom_rules/local_$id$if_real.rules /usr/local/etc/snort/snort_$id$if_real/rules/local_$id$if_real.rules");
+			exec("/bin/cp -R /usr/local/etc/snort/rules /usr/local/etc/snort/snort_$id$if_real");
+			if (file_exists("/usr/local/etc/snort/custom_rules/local_$id$if_real.rules"))
+			{
+				exec("/bin/cp /usr/local/etc/snort/custom_rules/local_$id$if_real.rules /usr/local/etc/snort/snort_$id$if_real/rules/local_$id$if_real.rules");
+			}
 		}
 	}
 }
@@ -795,6 +1014,9 @@ function generate_snort_conf()
 	global $config, $g, $if_real, $id;
 	conf_mount_rw();
 
+if ($id != '' && $if_real != '')
+{
+
 	/* obtain external interface */
 	/* XXX: make multi wan friendly */
 	$snort_ext_int = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
@@ -820,6 +1042,7 @@ function generate_snort_conf()
 			exec("/bin/mkdir -p /usr/local/etc/snort/snort_$id$if_real/rules");
 		}
 	}
+}
 	
 /* define snortalertlogtype */
 $snortalertlogtype = $config['installedpackages']['snortglobal']['snortalertlogtype'];

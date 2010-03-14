@@ -31,7 +31,7 @@
 
 require("guiconfig.inc");
 require("/usr/local/pkg/snort/snort_gui.inc");
-require("/usr/local/pkg/snort/snort.inc");
+include_once("/usr/local/pkg/snort/snort.inc");
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
@@ -78,35 +78,84 @@ if (isset($_POST['del_x'])) {
     /* delete selected rules */
     if (is_array($_POST['rule']) && count($_POST['rule'])) {
 	    foreach ($_POST['rule'] as $rulei) {
-
-
-		    /* dont flood the syslog code */
-		    exec("/bin/cp /var/log/system.log /var/log/system.log.bk");
-		    exec("/bin/sh /usr/local/etc/rc.d/snort.sh stop $rulei");
-
-		    /* stop syslog flood code */		
-		    $if_real_wan_rulei = $a_nat[$rulei]['interface'];
-		    $if_real_wan_rulei2 = convert_friendly_interface_to_real_interface_name2($if_real_wan_rulei);
-		    exec("/bin/cp /var/log/system.log /var/log/snort/snort_sys_$rulei$if_real.log");
-		    exec("/usr/bin/killall syslogd");
-		    exec("/usr/sbin/clog -i -s 262144 /var/log/system.log");
-		    exec("/usr/sbin/syslogd -c -ss -f /var/etc/syslog.conf");
-		    sleep(2);
-		    exec("/bin/cp /var/log/system.log.bk /var/log/system.log");
-		    $after_mem = exec("/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{ print $2 }'");
-		    exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'MEM after {$rulei}{$if_real} STOP {$after_mem}'");				
-		    exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule removed for {$rulei}{$if_real}...'");
-
-		    unset($a_nat[$rulei]);
-
+			
+			/* convert fake interfaces to real */
+			$if_real = convert_friendly_interface_to_real_interface_name($a_nat[$rulei]['interface']);
+			
+			$snort_pid = exec("/bin/ps -auwx | grep -v grep | grep \"$if_real -c\" | awk '{print $2;}'");
+			
+			if ($snort_pid != "")
+			{
+			
+				$start_up_pre = exec("/bin/cat /var/run/snort_{$if_real}{$rulei}{$if_real}.pid");
+				$start_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
+				$start_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
+					
+				$start2_upb_pre = exec("/bin/cat /var/run/barnyard2_{$rulei}{$if_real}.pid");
+				$start2_upb_s = exec("/usr/bin/top -U snort -u | grep barnyard2 | grep {$start2_upb_pre} | awk '{ print $1; }'");
+				$start2_upb_r = exec("/usr/bin/top -U root -u | grep barnyard2 | grep {$start2_upb_pre} | awk '{ print $1; }'");
+				
+					
+				if ($start_up_s != "" || $start_up_r != "" || $start2_upb_s != "" || $start2_upb_r != "")
+				{
+				
+				/* dont flood the syslog code */
+				exec("/bin/cp /var/log/system.log /var/log/system.log.bk");
+				sleep(3);
+					
+					
+					/* remove only running instances */
+					if ($start_up_s != "")
+						{
+							exec("/bin/kill {$start_up_s}");
+							exec("/bin/rm /var/run/snort_$if_real$rulei$if_real*");
+						}
+		
+					if ($start2_upb_s != "")
+						{
+							exec("/bin/kill {$start2_upb_s}");
+							exec("/bin/rm /var/run/barnyard2_$rulei$if_real*");
+						}
+		
+					if ($start_up_r != "")
+						{
+							exec("/bin/kill {$start_up_r}");
+							exec("/bin/rm /var/run/snort_$if_real$rulei$if_real*");
+						}
+		
+					if ($start2_upb_r != "")
+						{
+							exec("/bin/kill {$start2_upb_r}");
+							exec("/bin/rm /var/run/barnyard2_$rulei$if_real*");
+						}
+						
+			/* stop syslog flood code */		
+			$if_real_wan_rulei = $a_nat[$rulei]['interface'];
+			$if_real_wan_rulei2 = convert_friendly_interface_to_real_interface_name2($if_real_wan_rulei);
+			exec("/sbin/ifconfig $if_real_wan_rulei2 -promisc");
+			exec("/bin/cp /var/log/system.log /var/log/snort/snort_sys_$rulei$if_real.log");
+			exec("/usr/bin/killall syslogd");
+			exec("/usr/sbin/clog -i -s 262144 /var/log/system.log");
+			exec("/usr/sbin/syslogd -c -ss -f /var/etc/syslog.conf");
+			sleep(2);
+			exec("/bin/cp /var/log/system.log.bk /var/log/system.log");
+			$after_mem = exec("/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{ print $2 }'");
+			exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'MEM after {$rulei}{$if_real} STOP {$after_mem}'");				
+			exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule removed for {$rulei}{$if_real}...'");
+			
+				}
+			
+			}
+			
+	        unset($a_nat[$rulei]);
+			
 	    }
-
-
-
-	    conf_mount_rw();
-	    exec("/bin/rm -r /usr/local/etc/snort/snort_$rulei$if_real");
-	    exec("/bin/rm /var/log/snort/snort.u2_$rulei$if_real*");
-	    conf_mount_ro();
+		
+			conf_mount_rw();
+			exec("/bin/rm -r /usr/local/etc/snort/snort_$rulei$if_real");
+			exec("/bin/rm /usr/local/etc/rc.d/snort_$rulei$if_real.sh");
+			exec("/bin/rm /var/log/snort/snort.u2_$rulei$if_real*");
+			conf_mount_ro();
 		
 	    write_config();
 	    // touch($d_natconfdirty_path);
@@ -166,19 +215,88 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 {
 
 	$if_real2 = convert_friendly_interface_to_real_interface_name($a_nat[$id]['interface']);
-	$name = "{$id}{$if_real2}";
-	$snort_pid = exec("pgrep -F /var/run/snort_{$if_real2}{$name}.pid snort");
 	
-	if ($snort_pid != "") {
-		exec("/bin/sh /usr/local/etc/rc.d/snort.sh stop $name");
+	$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$id}{$if_real2}\" | awk '{print \$1;}'");
+	$start_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
+	$start_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
+					
+	//$start2_upb_pre = exec("/bin/cat /var/run/barnyard2_{$id}{$if_real2}.pid");
+	//$start2_upb_s = exec("/usr/bin/top -U snort -u | grep barnyard2 | grep {$start2_upb_pre} | awk '{ print $1; }'");
+	//$start2_upb_r = exec("/usr/bin/top -U root -u | grep barnyard2 | grep {$start2_upb_pre} | awk '{ print $1; }'");
+
+
+	if ($start_up_s != "" || $start_up_r != "" || $start2_upb_s != "" || $start2_upb_r != "")
+	{
+	
+		/* stop syslog flood code */
+		//exec("/bin/cp /var/log/system.log /var/log/system.log.bk");
+		//sleep(3);	
+	
+		if ($start_up_s != "")
+		{
+			exec("/bin/kill {$start_up_s}");
+			exec("/bin/rm /var/run/snort_$if_real2$id$if_real2*");
+		}
+		
+		//if ($start2_upb_s != "")
+		//{
+			//exec("/bin/kill {$start2_upb_s}");
+			//exec("/bin/rm /var/run/barnyard2_$id$if_real2*");
+		//}
+		
+		if ($start_up_r != "")
+		{
+			exec("/bin/kill {$start_up_r}");
+			exec("/bin/rm /var/run/snort_$if_real2$id$if_real2*");
+		}
+		
+		//if ($start2_upb_r != "")
+		//{
+			//exec("/bin/kill {$start2_upb_r}");
+			//exec("/bin/rm /var/run/barnyard2_$id$if_real2*");
+		//}
+		
+					/* stop syslog flood code */
+					$if_real_wan_id = $a_nat[$id]['interface'];
+					$if_real_wan_id2 = convert_friendly_interface_to_real_interface_name2($if_real_wan_id);
+					exec("/sbin/ifconfig $if_real_wan_id2 -promisc");
+					//exec("/bin/cp /var/log/system.log /var/log/snort/snort_sys_$id$if_real2.log");
+					//exec("/usr/bin/killall syslogd");
+					//exec("/usr/sbin/clog -i -s 262144 /var/log/system.log");
+					//exec("/usr/sbin/syslogd -c -ss -f /var/etc/syslog.conf");
+					//sleep(2);
+					//exec("/bin/cp /var/log/system.log.bk /var/log/system.log");
+					//$after_mem2 = exec("/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{ print $2 }'");
+					//exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'MEM after {$id}{$if_real2} STOP {$after_mem2}'");
+					//exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule STOP for {$id}{$if_real2}...'");
+		
+
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		sleep(2);
+		header("Location: /snort/snort_interfaces.php");
+				
 	}else{
 		sync_snort_package_all();
-		exec("/bin/sh /usr/local/etc/rc.d/snort.sh start $name");
+
+		exec("/usr/local/bin/snort -u snort -g snort -R \"$id$if_real2\" -D -q -l /var/log/snort -G $id -c /usr/local/etc/snort/snort_$id$if_real2/snort.conf -i $if_real2");
+		//print_r("$id $if_real2");
+
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		sleep(2);
+		header("Location: /snort/snort_interfaces.php");
 	}
-	header("Location: snort_interfaces.php");
+
 }	
 
-$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.10 Alpha";
+$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.10 alpha";
 include("head.inc");
 
 ?>
@@ -186,6 +304,7 @@ include("head.inc");
 <?php include("fbegin.inc"); ?>
 <p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 <style type="text/css">
+
 .alert {
  position:absolute;
  top:10px;
@@ -219,6 +338,21 @@ padding: 15px 10px 50% 50px;
 	padding-top: 4px;
 	padding-bottom: 4px;
 }
+#footer2
+{
+	position: relative;
+	top: -17px;
+	background-color: #cccccc;
+	background-image: none;
+	background-repeat: repeat;
+	background-attachment: scroll;
+	background-position: 0% 0%;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 0px;
+}
+
 </style> 
 <noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
 
@@ -237,18 +371,18 @@ padding: 15px 10px 50% 50px;
   <tr><td>
 <?php
 	$tab_array = array();
-	$tab_array[] = array("Snort Interfaces", true, "/snort/snort_interfaces.php");
+	$tab_array[] = array("Snort Inertfaces", true, "/snort/snort_interfaces.php");
 	$tab_array[] = array("Global Settings", false, "/snort/snort_interfaces_global.php");
 	$tab_array[] = array("Rule Updates", false, "/snort/snort_download_rules.php");
 	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
     $tab_array[] = array("Blocked", false, "/snort/snort_blocked.php");
-	$tab_array[] = array("Whitelists", false, "/pkg.php?xml=/snort_whitelist.xml");
+	$tab_array[] = array("Whitelists", false, "/pkg.php?xml=/snort/snort_whitelist.xml");
 	$tab_array[] = array("Help & Info", false, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 ?>
  </td></tr>
-	<tr>
-	<td>
+  <tr>
+    <td>
 	<div id="mainarea">
               <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr id="frheader">
@@ -264,30 +398,47 @@ padding: 15px 10px 50% 50px;
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
 			<td width="17"></td>
-					<td><a href="snort_interfaces_edit.php"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
-					</tr>
+                        <td><a href="snort_interfaces_edit.php"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+                      </tr>
                     </table>
 		  </td>
 		</tr>
 	<?php $nnats = $i = 0; foreach ($a_nat as $natent): ?>
                 <tr valign="top" id="fr<?=$nnats;?>">
-					<?php	
+					<?php
+
 					/* convert fake interfaces to real and check if iface is up */
+					/* There has to be a smarter way to do this */
 					$if_real = convert_friendly_interface_to_real_interface_name($natent['interface']);
 
-					$snort_pid = exec("pgrep -F /var/run/snort_{$if_real}{$nnats}{$if_real}.pid snort");
-					if ($snort_pid) {
+					$color_up_ck = exec("/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep snort | /usr/bin/awk '{print \$2;}' | sed 1q");
+					
+					if ($color_up_ck == "")
+					{
+						$iconfn = "pass";
+						$class_color_up = "listbg";
+					}
+
+					if ($color_up_ck != "")
+					{	
+					//$color_up_pre = exec("/bin/cat /var/run/snort_{$if_real}{$nnats}{$if_real}.pid");
+					$color_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R $nnats$if_real\" | awk '{print \$1;}'");
+
+					//  /bin/ps -auwx | grep -v grep | grep "$id$if_real -c" | awk '{print $2;}'
+					$color_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$color_up_pre} | /usr/bin/awk '{print \$1;}'");
+					$color_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$color_up_pre} | /usr/bin/awk '{print \$1;}'");
+					if ($color_up_s != "" || $color_up_r != "") {
 						$class_color_up = "listbg2";
 						$iconfn = "block";
 					}else{
 						$class_color_up = "listbg";
 						$iconfn = "pass";
 					}
-					
+					}
 					
 					?>
-                  <td class="listt" width="5%><a href="?act=toggle&id=<?=$i;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_<?=$iconfn;?>.gif" width="13" height="13" border="0" title="click to toggle start/stop snort"></a><input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0;"></td>
-                  <td class="listt" align="center"></td>
+                  <td class="listt"><a href="?act=toggle&id=<?=$i;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_<?=$iconfn;?>.gif" width="13" height="13" border="0" title="click to toggle start/stop snort"></a><input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0; width: 7px; height: 7px;"></td>
+                 <td class="listt" align="center"></td>
                   <td class="<?=$class_color_up;?>" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 		    <?php
 			if (!$natent['interface'] || ($natent['interface'] == "wan"))
@@ -339,8 +490,11 @@ padding: 15px 10px 50% 50px;
                   </td>
 				  <?php
 				 				  
-					$byard_pid = exec("pgrep -F /var/run/barnyard2_{$nnats}{$if_real}.pid barnyard2");
-					if ($byard_pid) {
+					$color2_udp_pre = exec("/bin/cat /var/run/barnyard2_{$nnats}{$if_real}.pid");
+					
+					$color2_upb_s = exec("/usr/bin/top -U snort -u | grep barnyard2 | grep {$color2_udp_pre}");
+					$color2_upb_r = exec("/usr/bin/top -U root -u | grep barnyard2 | grep {$color2_udp_pre}");
+					if ($color2_upb_s != "" || $color2_upb_r != "") {
 						$class_color_upb = "listbg2";
 					}else{
 						$class_color_upb = "listbg";
@@ -391,15 +545,15 @@ padding: 15px 10px 50% 50px;
   <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 	  <td width="100%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
 	  <br>
-		 This is the <strong>Snort Menu</strong>, displaying an overview of all interface settings.
+		 This is the <strong>Snort Menu</strong> where you can see an over view of all your interface settings.
 		 <br>
-		 Please edit the <strong>Global Settings</strong> tab before adding an interface.
+		 Please edit the <strong>Global Settings</strong> tab befor adding an interface.
 		 <br><br>
-		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="Add Icon"> icon to add an interface.&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_pass.gif" width="13" height="13" border="0" title="Start Icon"> icon to <strong>start</strong> snort and barnyard.
+		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="Add Icon"> icon to add a interface.&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_pass.gif" width="13" height="13" border="0" title="Start Icon"> icon to <strong>start</strong> snort and barnyard.
 		 <br>
-		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" title="Edit Icon"> icon to edit an interface and settings.&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif" width="13" height="13" border="0" title="Stop Icon"> icon to <strong>stop</strong> snort and barnyard.
+		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" title="Edit Icon"> icon to edit a interface and settings.&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif" width="13" height="13" border="0" title="Stop Icon"> icon to <strong>stop</strong> snort and barnyard.
 		 <br>
-		<strong> Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="Delete Icon"> icon to delete an interface and settings.
+		<strong> Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="Delete Icon"> icon to delete a interface and settings.
 </td>
     </table>
  
@@ -410,6 +564,24 @@ if ($pkg['tabs'] <> "") {
 ?>
 
 </form>
-<?php include("fend.inc"); ?>
+</div> <!-- Right DIV -->
+</div> <!-- Content DIV -->
+
+	<div id="footer2">
+		<IMG SRC="./images/footer2.jpg" width="780px" height="35" ALT="Apps">
+			<font size="1">Snort® is a registered trademark of Sourcefire, Inc., Barnyard2® is a registered trademark of securixlive.com., Orion® copyright Robert Zelaya., 
+			Emergingthreats is a registered trademark of emergingthreats.net., Mysql® is a registered trademark of Mysql.com.</font>
+	</div>
+
+        <div id="footer">
+			<a target="_blank" href="http://www.pfsense.org/?gui12" class="redlnk">pfSense</a> is &copy;
+			 2004 - 2009 by <a href="http://www.bsdperimeter.com" class="tblnk">BSD Perimeter LLC</a>. All Rights Reserved.
+			[<a href="/license.php" class="tblnk">view license</a>] 
+			<br/>
+			[<a target="_blank" href="https://portal.pfsense.org/?guilead=true" class="tblnk">Commercial Support Available</a>]
+		</div> <!-- Footer DIV -->
+
+</div> <!-- Wrapper Div -->
+<script type="text/javascript" src="/themes/nervecenter/bottom-loader.js"></script>
 </body>
 </html>
