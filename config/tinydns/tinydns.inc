@@ -359,7 +359,6 @@ function tinydns_create_zone_file() {
 	conf_mount_rw();
 	if(file_exists("/tmp/config.cache"))
 		unlink("/tmp/config.cache");
-	parse_config(true);
 	config_lock();
 	if(file_exists("/service/tinydns/root/data"))
 		exec("rm -f /service/tinydns/root/data");
