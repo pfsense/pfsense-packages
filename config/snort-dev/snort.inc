@@ -54,11 +54,6 @@ $snort_up_ck = exec("/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep snort
 
 	if ($snort_up_ck == '')
 	{
-		$snort_up == 'false';
-	}
-
-	if ($snort_up_ck == '')
-	{
 		$snort_up = 'false';
 	}
 
@@ -75,6 +70,8 @@ $snort_up_ck = exec("/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep snort
 		}else{
 			$snort_up = 'false';
 		}
+		return $snort_up;
+	}else{
 		return $snort_up;
 	}
 }
