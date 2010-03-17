@@ -112,6 +112,6 @@
 	<custom_delete_php_command>
 	</custom_delete_php_command>
 	<custom_php_resync_config_command>
-		create_snort_conf();
+		sync_snort_package_empty();
 	</custom_php_resync_config_command>
 </packagegui>
