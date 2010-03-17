@@ -1452,8 +1452,8 @@ else
 			if($vip['subnet']) 
 				$home_net .= $vip['subnet'] . " ";
 
-	if($config['installedpackages']['snortglobal']['whitelist'])
-		foreach($config['installedpackages']['snortglobal']['whitelist'] as $snort)
+	if($config['installedpackages']['snortglobal']['config'])
+		foreach($config['installedpackages']['snortglobal']['config'] as $snort)
 			if($snort['ip']) 
 				$home_net .= $snort['ip'] . " ";
 
