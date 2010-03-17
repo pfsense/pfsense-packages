@@ -550,6 +550,9 @@ if ($id != '' && $if_real != '') //new
 				/* if rules exist cp rules to each iface */
 				create_rules_iface($id, $if_real, $snort_uuid);
 
+				/* create snort bootup file snort.sh only create once */
+				create_snort_sh();
+
 				/* create barnyard2 configuration file */
 				$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
 				if ($snortbarnyardlog_info_chk == 'on')
