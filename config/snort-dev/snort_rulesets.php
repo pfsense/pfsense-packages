@@ -33,7 +33,7 @@ require_once("filter.inc");
 require_once("service-utils.inc");
 include_once("/usr/local/pkg/snort/snort.inc");
 
-$pgtitle = "Snort: Interface $id$if_real Categories";
+
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -60,9 +60,16 @@ $if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface
 //if(!is_dir("/usr/local/etc/snort/rules"))
 //	exec('mkdir /usr/local/etc/snort/rules/');
 
+$iface_uuid = $a_nat[$id]['uuid'];
+
+$pgtitle = "Snort: Interface $id $iface_uuid $if_real Categories";
+
+
+
+
 /* Check if the rules dir is empy if so warn the user */
 /* TODO give the user the option to delete the installed rules rules */
-$isrulesfolderempty = exec("ls -A /usr/local/etc/snort/snort_{$id}{$if_real}/rules/*.rules");
+$isrulesfolderempty = exec("ls -A /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
 if ($isrulesfolderempty == "") {
 
 include("head.inc");
@@ -98,7 +105,7 @@ echo  		"</td>\n
 			<table id=\"maintable\" class=\"tabcont\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
 				<tr>\n
 					<td>\n
-# The rules directory is empty. /usr/local/etc/snort/snort_{$id}{$if_real}/rules \n
+# The rules directory is empty. /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules \n
 		    		</td>\n
 		  		</tr>\n
 			</table>\n
@@ -192,7 +199,7 @@ echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\
 								<!-- <td class="listhdrr">Description</td> -->
 							</tr>
 <?php
-	$dir = "/usr/local/etc/snort/snort_{$id}{$if_real}/rules/";
+	$dir = "/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/";
 	$dh  = opendir($dir);
 	while (false !== ($filename = readdir($dh))) {
    		$files[] = $filename;
@@ -214,7 +221,7 @@ echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\
 		echo "	<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />";
 		echo "</td>";
 		echo "<td>";
-		echo "<a href='snort_rules.php?openruleset=/usr/local/etc/snort/snort_{$id}{$if_real}/rules/" . urlencode($file) . "'>{$file}</a>";
+		echo "<a href='snort_rules.php?openruleset=/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/" . urlencode($file) . "'>{$file}</a>";
 		echo "</td>";
 		//echo "<td>";
 		//echo "description";

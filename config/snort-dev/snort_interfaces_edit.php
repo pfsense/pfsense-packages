@@ -444,7 +444,7 @@ if ($a_nat[$id]['interface'] != '') {
     $tab_array = array();
     $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
     $tab_array[] = array("If Settings", true, "/snort/snort_interfaces_edit.php?id={$id}");
-    $tab_array[] = array("Conf upload", false, "/snort/snort_conf_upload.php?id={$id}");
+    //$tab_array[] = array("upload", false, "/snort/snort_conf_upload.php?id={$id}");
     $tab_array[] = array("Categories", false, "/snort/snort_rulesets.php?id={$id}");
     $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
     $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");

@@ -53,12 +53,14 @@ if (isset($id) && $a_nat[$id]) {
 /* convert fake interfaces to real */
 $if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface']);
 
+$iface_uuid = $a_nat[$id]['uuid'];
+
 // if(!is_dir("/usr/local/etc/snort/rules"))
 //	exec('mkdir /usr/local/etc/snort/rules/');
 
 /* Check if the rules dir is empy if so warn the user */
 /* TODO give the user the option to delete the installed rules rules */
-$isrulesfolderempty = exec("ls -A /usr/local/etc/snort/snort_{$id}{$if_real}/rules/*.rules");
+$isrulesfolderempty = exec("ls -A /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
 if ($isrulesfolderempty == "") {
 
 include("head.inc");
@@ -166,7 +168,7 @@ function load_rule_file($incoming_file)
 
 }
 
-$ruledir = "/usr/local/etc/snort/snort_{$id}{$if_real}/rules/";
+$ruledir = "/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/";
 $dh  = opendir($ruledir);
 
 if ($_GET['openruleset'] != '' && $_GET['ids'] != '')
@@ -404,7 +406,7 @@ $ifname = strtoupper($pconfig['interface']);
 require("guiconfig.inc");
 include("head.inc");
 
-$pgtitle = "Snort: Interface $id$if_real Rule Category: $currentruleset";
+$pgtitle = "Snort: $id $iface_uuid $if_real Category: $currentruleset";
 
 ?>
 
