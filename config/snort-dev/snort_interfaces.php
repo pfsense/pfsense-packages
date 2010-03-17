@@ -42,6 +42,16 @@ if (!is_array($config['installedpackages']['snortglobal']['rule']))
 
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
+///////////
+
+if (isset($config['installedpackages']['snortglobal']['rule'])) {
+$id_gen = count($config['installedpackages']['snortglobal']['rule']);
+}else{
+$id_gen = '0';
+}
+
+///////////
+
 /* if a custom message has been passed along, lets process it */
 if ($_GET['savemsg'])
 	$savemsg = $_GET['savemsg'];
@@ -71,6 +81,8 @@ if ($_POST) {
 				unlink($d_filterconfdirty_path);
 		}
 
+		exec("echo  \"Sync Empty on POST on interfaces.php....\" >> /root/test.log");
+
 	}
 }
 
@@ -81,17 +93,19 @@ if (isset($_POST['del_x'])) {
 			
 			/* convert fake interfaces to real */
 			$if_real = convert_friendly_interface_to_real_interface_name($a_nat[$rulei]['interface']);
+			$snort_uuid = $a_nat[$rulei]['uuid'];
+
+			/* cool code to check if any snort is up */
+			$snort_up_ck = exec("/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep snort | /usr/bin/awk '{print \$2;}' | sed 1q");
 			
-			$snort_pid = exec("/bin/ps -auwx | grep -v grep | grep \"$if_real -c\" | awk '{print $2;}'");
-			
-			if ($snort_pid != "")
+			if ($snort_up_ck != "")
 			{
 			
-				$start_up_pre = exec("/bin/cat /var/run/snort_{$if_real}{$rulei}{$if_real}.pid");
+				$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}_{$if_real}\" | awk '{print \$1;}'");
 				$start_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
 				$start_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
 					
-				$start2_upb_pre = exec("/bin/cat /var/run/barnyard2_{$rulei}{$if_real}.pid");
+				$start2_upb_pre = exec("/bin/cat /var/run/barnyard2_{$snort_uuid}_{$if_real}.pid");
 				$start2_upb_s = exec("/usr/bin/top -U snort -u | grep barnyard2 | grep {$start2_upb_pre} | awk '{ print $1; }'");
 				$start2_upb_r = exec("/usr/bin/top -U root -u | grep barnyard2 | grep {$start2_upb_pre} | awk '{ print $1; }'");
 				
@@ -100,113 +114,68 @@ if (isset($_POST['del_x'])) {
 				{
 				
 				/* dont flood the syslog code */
-				exec("/bin/cp /var/log/system.log /var/log/system.log.bk");
-				sleep(3);
+				//exec("/bin/cp /var/log/system.log /var/log/system.log.bk");
+				//sleep(3);
 					
 					
 					/* remove only running instances */
 					if ($start_up_s != "")
 						{
 							exec("/bin/kill {$start_up_s}");
-							exec("/bin/rm /var/run/snort_$if_real$rulei$if_real*");
+							exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}*");
 						}
 		
 					if ($start2_upb_s != "")
 						{
 							exec("/bin/kill {$start2_upb_s}");
-							exec("/bin/rm /var/run/barnyard2_$rulei$if_real*");
+							exec("/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}*");
 						}
 		
 					if ($start_up_r != "")
 						{
 							exec("/bin/kill {$start_up_r}");
-							exec("/bin/rm /var/run/snort_$if_real$rulei$if_real*");
+							exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}*");
 						}
 		
 					if ($start2_upb_r != "")
 						{
 							exec("/bin/kill {$start2_upb_r}");
-							exec("/bin/rm /var/run/barnyard2_$rulei$if_real*");
+							exec("/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}*");
 						}
 						
 			/* stop syslog flood code */		
-			$if_real_wan_rulei = $a_nat[$rulei]['interface'];
-			$if_real_wan_rulei2 = convert_friendly_interface_to_real_interface_name2($if_real_wan_rulei);
-			exec("/sbin/ifconfig $if_real_wan_rulei2 -promisc");
-			exec("/bin/cp /var/log/system.log /var/log/snort/snort_sys_$rulei$if_real.log");
-			exec("/usr/bin/killall syslogd");
-			exec("/usr/sbin/clog -i -s 262144 /var/log/system.log");
-			exec("/usr/sbin/syslogd -c -ss -f /var/etc/syslog.conf");
-			sleep(2);
-			exec("/bin/cp /var/log/system.log.bk /var/log/system.log");
-			$after_mem = exec("/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{ print $2 }'");
-			exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'MEM after {$rulei}{$if_real} STOP {$after_mem}'");				
-			exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule removed for {$rulei}{$if_real}...'");
+			//$if_real_wan_rulei = $a_nat[$rulei]['interface'];
+			//$if_real_wan_rulei2 = convert_friendly_interface_to_real_interface_name2($if_real_wan_rulei);
+			//exec("/sbin/ifconfig $if_real_wan_rulei2 -promisc");
+			//exec("/bin/cp /var/log/system.log /var/log/snort/snort_sys_$rulei$if_real.log");
+			//exec("/usr/bin/killall syslogd");
+			//exec("/usr/sbin/clog -i -s 262144 /var/log/system.log");
+			//exec("/usr/sbin/syslogd -c -ss -f /var/etc/syslog.conf");
+			//sleep(2);
+			//exec("/bin/cp /var/log/system.log.bk /var/log/system.log");
+			//$after_mem = exec("/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{ print $2 }'");
+			//exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'MEM after {$rulei}{$if_real} STOP {$after_mem}'");				
+			//exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule removed for {$rulei}{$if_real}...'");
 			
 				}
 			
 			}
 			
 	        unset($a_nat[$rulei]);
-			
 	    }
 		
+			exec("echo  \"Removing old files ....\" >> /root/test.log");
 			conf_mount_rw();
-			exec("/bin/rm -r /usr/local/etc/snort/snort_$rulei$if_real");
-			exec("/bin/rm /usr/local/etc/rc.d/snort_$rulei$if_real.sh");
-			exec("/bin/rm /var/log/snort/snort.u2_$rulei$if_real*");
+			exec("/bin/rm /var/log/snort/snort.u2_{$snort_uuid}_{$if_real}*");
+			exec("/bin/rm -r /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}");
 			conf_mount_ro();
 		
 	    write_config();
-	    // touch($d_natconfdirty_path);
+	    touch($d_natconfdirty_path);
 	    header("Location: /snort/snort_interfaces.php");
 	    exit;
 	}
 
-} else {
-
-        /* yuck - IE won't send value attributes for image buttons, while Mozilla does - so we use .x/.y to find move button clicks instead... */
-        unset($movebtn);
-        foreach ($_POST as $pn => $pd) {
-                if (preg_match("/move_(\d+)_x/", $pn, $matches)) {
-                        $movebtn = $matches[1];
-                        break;
-                }
-        }
-        /* move selected rules before this rule */
-        if (isset($movebtn) && is_array($_POST['rule']) && count($_POST['rule'])) {
-                $a_nat_new = array();
-
-                /* copy all rules < $movebtn and not selected */
-                for ($i = 0; $i < $movebtn; $i++) {
-                        if (!in_array($i, $_POST['rule']))
-                                $a_nat_new[] = $a_nat[$i];
-                }
-
-                /* copy all selected rules */
-                for ($i = 0; $i < count($a_nat); $i++) {
-                        if ($i == $movebtn)
-                                continue;
-                        if (in_array($i, $_POST['rule']))
-                                $a_nat_new[] = $a_nat[$i];
-                }
-
-                /* copy $movebtn rule */
-                if ($movebtn < count($a_nat))
-                        $a_nat_new[] = $a_nat[$movebtn];
-
-                /* copy all rules > $movebtn and not selected */
-                for ($i = $movebtn+1; $i < count($a_nat); $i++) {
-                        if (!in_array($i, $_POST['rule']))
-                                $a_nat_new[] = $a_nat[$i];
-                }
-                $a_nat = $a_nat_new;
-                write_config();
-                touch($d_natconfdirty_path);
-                header("Location: snort_interfaces.php");
-				
-                exit;
-        }
 }
 
 
@@ -215,8 +184,10 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 {
 
 	$if_real2 = convert_friendly_interface_to_real_interface_name($a_nat[$id]['interface']);
+
+	$snort_uuid = $a_nat[$id]['uuid'];
 	
-	$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$id}{$if_real2}\" | awk '{print \$1;}'");
+	$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}_{$if_real2}\" | awk '{print \$1;}'");
 	$start_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
 	$start_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
 					
@@ -235,7 +206,7 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 		if ($start_up_s != "")
 		{
 			exec("/bin/kill {$start_up_s}");
-			exec("/bin/rm /var/run/snort_$if_real2$id$if_real2*");
+			exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real2}*");
 		}
 		
 		//if ($start2_upb_s != "")
@@ -247,7 +218,7 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 		if ($start_up_r != "")
 		{
 			exec("/bin/kill {$start_up_r}");
-			exec("/bin/rm /var/run/snort_$if_real2$id$if_real2*");
+			exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real2}*");
 		}
 		
 		//if ($start2_upb_r != "")
@@ -280,9 +251,9 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 		header("Location: /snort/snort_interfaces.php");
 				
 	}else{
-		sync_snort_package_all();
+		//sync_snort_package_all();
 
-		exec("/usr/local/bin/snort -u snort -g snort -R \"$id$if_real2\" -D -q -l /var/log/snort -G $id -c /usr/local/etc/snort/snort_$id$if_real2/snort.conf -i $if_real2");
+		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}_{$if_real2}\" -D -q -l /var/log/snort -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real2}/snort.conf -i {$if_real2}");
 		//print_r("$id $if_real2");
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -296,7 +267,7 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 
 }	
 
-$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.10 alpha";
+$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.12 Beta";
 include("head.inc");
 
 ?>
@@ -353,12 +324,12 @@ padding: 15px 10px 50% 50px;
 	padding-left: 0px;
 }
 
-</style> 
-<noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
+</style>
 
+
+
+<noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
 <form action="snort_interfaces.php" method="post" name="iform">
-<script type="text/javascript" language="javascript" src="row_toggle.js">
-</script>
 <?php if (file_exists($d_natconfdirty_path)): ?><p>
 <?php
 	if($savemsg)
@@ -398,7 +369,7 @@ padding: 15px 10px 50% 50px;
                     <table border="0" cellspacing="0" cellpadding="1">
                       <tr>
 			<td width="17"></td>
-                        <td><a href="snort_interfaces_edit.php"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
+                        <td><a href="snort_interfaces_edit.php?id=<?php echo $id_gen;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0"></a></td>
                       </tr>
                     </table>
 		  </td>
@@ -410,6 +381,7 @@ padding: 15px 10px 50% 50px;
 					/* convert fake interfaces to real and check if iface is up */
 					/* There has to be a smarter way to do this */
 					$if_real = convert_friendly_interface_to_real_interface_name($natent['interface']);
+					$snort_uuid = $natent['uuid'];
 
 					$color_up_ck = exec("/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep snort | /usr/bin/awk '{print \$2;}' | sed 1q");
 					
@@ -422,7 +394,7 @@ padding: 15px 10px 50% 50px;
 					if ($color_up_ck != "")
 					{	
 					//$color_up_pre = exec("/bin/cat /var/run/snort_{$if_real}{$nnats}{$if_real}.pid");
-					$color_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R $nnats$if_real\" | awk '{print \$1;}'");
+					$color_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}_{$if_real}\" | awk '{print \$1;}'");
 
 					//  /bin/ps -auwx | grep -v grep | grep "$id$if_real -c" | awk '{print $2;}'
 					$color_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$color_up_pre} | /usr/bin/awk '{print \$1;}'");

@@ -48,6 +48,25 @@ if (isset($_GET['dup'])) {
         $after = $_GET['dup'];
 }
 
+/* always have a limit of (65535) numbers only or snort will not start do to id limits */
+/* TODO: When inline gets added make the uuid the port number lisstening */
+//function gen_snort_uuid($fileline)
+//{
+        /* return the first 5 */
+        //if (preg_match("/...../", $fileline, $matches1))
+        //{
+        //$uuid_final =  "$matches1[0]";
+        //}
+//return $uuid_final;
+//}
+
+/* gen uuid for each iface !inportant */
+if ($a_nat[$id]['interface'] == '') {
+	//$snort_uuid = gen_snort_uuid(strrev(uniqid(true)));
+	$snort_uuid = mt_rand(0, 65534);
+	$pconfig['uuid'] = $snort_uuid;
+}
+
 if (isset($id) && $a_nat[$id]) {
 
 	/* old options */
@@ -97,10 +116,12 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['barnyard_enable'] = $a_nat[$id]['barnyard_enable'];
 	$pconfig['barnyard_mysql'] = $a_nat[$id]['barnyard_mysql'];
 	$pconfig['enable'] = $a_nat[$id]['enable'];
+	$pconfig['uuid'] = $a_nat[$id]['uuid'];
 	$pconfig['interface'] = $a_nat[$id]['interface'];
 	$pconfig['descr'] = $a_nat[$id]['descr'];
 	$pconfig['performance'] = $a_nat[$id]['performance'];
 	$pconfig['blockoffenders7'] = $a_nat[$id]['blockoffenders7'];
+	$pconfig['snortalertlogtype'] = $a_nat[$id]['snortalertlogtype'];
 	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
 	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
 	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];
@@ -121,7 +142,7 @@ if (isset($_GET['dup']))
 /* convert fake interfaces to real */
 $if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface']);
 
-if ($_POST['Submit']) {
+if ($_POST["Submit"]) {
 
 	/* input validation */
 //	if(strtoupper($_POST['proto']) == "TCP" or strtoupper($_POST['proto']) == "UDP" or strtoupper($_POST['proto']) == "TCP/UDP") {
@@ -167,26 +188,26 @@ if ($_POST['Submit']) {
 
 		
 		// if ($config['installedpackages']['snortglobal']['rule']) {
-//			if ($_POST['descr'] == "") {
-//				$input_errors[] = "Please  enter a description for your reference.";
-//				}
+			if ($_POST['descr'] == "") {
+				$input_errors[] = "Please  enter a description for your reference.";
+				}
 			
-//			if ($id == "" && $config['installedpackages']['snortglobal']['rule'][0]['interface'] != "") {
+			if ($id == "" && $config['installedpackages']['snortglobal']['rule'][0]['interface'] != "") {
 
-//			$rule_array = $config['installedpackages']['snortglobal']['rule'];
-//			$id_c = -1;
-//			foreach ($rule_array as $value) {
+			$rule_array = $config['installedpackages']['snortglobal']['rule'];
+			$id_c = -1;
+			foreach ($rule_array as $value) {
 
-//			$id_c += 1;
+			$id_c += 1;
 
-//			$result_lan = $config['installedpackages']['snortglobal']['rule'][$id_c]['interface'];
-//			$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+			$result_lan = $config['installedpackages']['snortglobal']['rule'][$id_c]['interface'];
+			$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
 
-//				if ($_POST['interface'] == $result_lan) {	
-//				$input_errors[] = "Interface $result_lan is in use. Please select another interface.";
-//					}			
-//				}
-//			}
+				if ($_POST['interface'] == $result_lan) {	
+				$input_errors[] = "Interface $result_lan is in use. Please select another interface.";
+					}			
+				}
+			}
 
 	/* check for overlaps */
 	foreach ($a_nat as $natent) {
@@ -204,10 +225,12 @@ if ($_POST['Submit']) {
 		$natent['interface'] = $_POST['interface'] ? $_POST['interface'] : $pconfig['interface'];
 		/* if post write to conf or rewite the answer */
 		$natent['enable'] = $_POST['enable'] ? on : off;
+		$natent['uuid'] = $pconfig['uuid'];
 		$natent['descr'] = $_POST['descr'] ? $_POST['descr'] : $pconfig['descr'];
 		$natent['performance'] = $_POST['performance'] ? $_POST['performance'] : $pconfig['performance'];
 		/* if post = on use on off or rewrite the conf */
 		if ($_POST['blockoffenders7'] == "on") { $natent['blockoffenders7'] = on; }else{ $natent['blockoffenders7'] = off; } if ($_POST['enable'] == "") { $natent['blockoffenders7'] = $pconfig['blockoffenders7']; }
+		$natent['snortalertlogtype'] = $_POST['snortalertlogtype'] ? $_POST['snortalertlogtype'] : $pconfig['snortalertlogtype'];
 		if ($_POST['alertsystemlog'] == "on") { $natent['alertsystemlog'] = on; }else{ $natent['alertsystemlog'] = off; } if ($_POST['enable'] == "") { $natent['alertsystemlog'] = $pconfig['alertsystemlog']; }
 		if ($_POST['tcpdumplog'] == "on") { $natent['tcpdumplog'] = on; }else{ $natent['tcpdumplog'] = off; } if ($_POST['enable'] == "") { $natent['tcpdumplog'] = $pconfig['tcpdumplog']; }
 		if ($_POST['snortunifiedlog'] == "on") { $natent['snortunifiedlog'] = on; }else{ $natent['snortunifiedlog'] = off; } if ($_POST['enable'] == "") { $natent['snortunifiedlog'] = $pconfig['snortunifiedlog']; }
@@ -277,35 +300,61 @@ if ($_POST['Submit']) {
 		write_config();
 		// stop_service("snort");
 
-		if ($pconfig['interface'] != '' && $id != '') {
+		if ($pconfig['interface'] != "") {
 		sync_snort_package_all();
-
 		}
 		
-		if ($pconfig['interface'] != '' && $id != '') {
+		//touch($d_natconfdirty_path);
 		header("Location: /snort/snort_interfaces_edit.php?id=$id");
-		}else{
-		touch($d_natconfdirty_path);
-		header("Location: /snort/snort_interfaces.php");
-		
-		}
+
 		exit;
 	}
 }
 
+	if (isset($config['installedpackages']['snortglobal']['rule'][$id]['interface']))
+	{
+		if	(uniq_snort_proc($id, $if_real) == 'false')
+		{
+			$snort_up_ck = '<input name="Submit2" type="submit" class="formbtn" value="Start" onClick="enable_change(true)">';
+		}else{
+			$snort_up_ck = '<input name="Submit3" type="submit" class="formbtn" value="Stop" onClick="enable_change(true)">';
+		}
+	}else{
+		$snort_up_ck = '';
+	}
+
 		if ($_POST["Submit2"]) {
-			if ($id != '')
-			{
-			sync_snort_package_all();
-			}
+		sync_snort_package_all($id, $if_real);
 		sleep(1);
-		exec("/bin/sh /usr/local/etc/rc.d/snort.sh start {$id}{$if_real}");
+		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}_{$if_real}\" -D -q -l /var/log/snort -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 		header("Location: /snort/snort_interfaces_edit.php?id=$id");
 		exit;
 		}
 
-$ifname = strtoupper($pconfig['interface']);
-$pgtitle = "Snort: Interface: $id$if_real Settings Edit";
+		if ($_POST["Submit3"])
+		{
+				sync_snort_package_all($id, $if_real);
+				sleep(1);
+
+				$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}_{$if_real}\" | awk '{print \$1;}'");
+				$start_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
+				$start_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
+
+			if ($start_up_s != '')
+			{
+				exec("/bin/kill {$start_up_s}");
+				exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}*");
+			}
+		
+			if ($start_up_r != '')
+			{
+				exec("/bin/kill {$start_up_r}");
+				exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}*");
+			}
+		}
+
+$iface_uuid = $a_nat[$id]['uuid'];
+$pgtitle = "Snort: Interface Edit: $id $iface_uuid $if_real";
 include("head.inc");
 
 ?>
@@ -313,7 +362,6 @@ include("head.inc");
 <?php 
 include("fbegin.inc");
 ?>
-<p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 <style type="text/css">
 .alert {
  position:absolute;
@@ -339,7 +387,7 @@ function enable_change(enable_change) {
 <?php
 /* make shure all the settings exist or function hide will not work */
 /* if $id is emty allow if and discr to be open */
-if($id != "") 
+if($iface_uuid != '') 
 {
 echo "	
 	document.iform.interface.disabled = endis2;
@@ -348,22 +396,22 @@ echo "
 ?>
 	document.iform.performance.disabled = endis;
 	document.iform.blockoffenders7.disabled = endis;
+	document.iform.snortalertlogtype.disabled = endis;
 	document.iform.alertsystemlog.disabled = endis;
 	document.iform.tcpdumplog.disabled = endis;
 	document.iform.snortunifiedlog.disabled = endis;
 }
 //-->
 </script>
+<p class="pgtitle"><?=$pgtitle?></p>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
-<form action="snort_interfaces_edit.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
+<form action="snort_interfaces_edit.php<?php echo "?id=$id";?>" method="post" enctype="multipart/form-data" name="iform" id="iform">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
 <?php
-if($id != "") 
-{
-
+if ($a_nat[$id]['interface'] != '') {
 	 /* get the interface name */
 		$first = 0;
         $snortInterfaces = array(); /* -gtm  */
@@ -391,48 +439,25 @@ if($id != "")
                         return;
                 }
         }
-		
-		/* do for the selected interface */
-		foreach($snortInterfaces as $snortIf)
-		{
-		
-		/* if base directories dont exist create them */
-			if(!file_exists("/usr/local/etc/snort/snort_{$id}{$if_real}/")) {
-			exec("/bin/mkdir -p /usr/local/etc/snort/snort_{$id}{$if_real}/");
-			}
 
+}
     $tab_array = array();
     $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
     $tab_array[] = array("If Settings", true, "/snort/snort_interfaces_edit.php?id={$id}");
+    $tab_array[] = array("Conf upload", false, "/snort/snort_conf_upload.php?id={$id}");
     $tab_array[] = array("Categories", false, "/snort/snort_rulesets.php?id={$id}");
     $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
     $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
     $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
     $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
     display_top_tabs($tab_array);	
-		}
-}
+		
 ?>
 </td>
 </tr>
 				<tr>
 				<td class="tabcont">
 				<table width="100%" border="0" cellpadding="6" cellspacing="0">
-				<?php
-				if($id == "") 
-				{
-				echo "
-				<tr>
-				<td width=\"22%\" valign=\"top\">&nbsp;</td>
-				<td width=\"78%\"><span class=\"vexpl\"><span class=\"red\"><strong>Note:</strong></span><br>
-					You will be redirected to the Snort Interfaces Menu to approve changes.<br>
-					After approval, interface options will be made available.
-					<br><br>
-					Please select an interface and a description.
-				</td>
-				</tr>\n";
-				}
-				?>
 				<tr>
 				<td width="22%" valign="top" class="vtable">&nbsp;</td>
 				<td width="78%" class="vtable">
@@ -441,10 +466,9 @@ if($id != "")
 					// care with spaces
 					if ($pconfig['enable'] == "on")
 					$checked = checked;
-					if($id != "") 
-					{
+
 					$onclick_enable = "onClick=\"enable_change(false)\">";
-					}
+					
 					echo "
 					<input name=\"enable\" type=\"checkbox\" value=\"on\" $checked $onclick_enable
 					<strong>Enable Interface</strong></td>\n\n";
@@ -516,7 +540,7 @@ if($id != "")
                 <tr>
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%">
-                    <input name="Submit" type="submit" class="formbtn" value="Save"> <input name="Submit2" type="submit" class="formbtn" value="Start" onClick="enable_change(true)"> <input type="button" class="formbtn" value="Cancel" onclick="history.back()">
+                    <input name="Submit" type="submit" class="formbtn" value="Save"> <?php echo $snort_up_ck; ?> <input type="button" class="formbtn" value="Cancel" onclick="history.back()">
                     <?php if (isset($id) && $a_nat[$id]): ?>
                     <input name="id" type="hidden" value="<?=$id;?>">
                     <?php endif; ?>
@@ -526,7 +550,7 @@ if($id != "")
 	  <td width="22%" valign="top">&nbsp;</td>
 	  <td width="78%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
 	  <br>
-		Please save your settings before you click start. </td>
+		Please save your settings befor you click start. </td>
 	</tr>
   </table>
   </table>

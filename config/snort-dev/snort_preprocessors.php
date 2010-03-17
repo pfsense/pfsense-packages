@@ -107,6 +107,7 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['barnyard_enable'] = $a_nat[$id]['barnyard_enable'];
 	$pconfig['barnyard_mysql'] = $a_nat[$id]['barnyard_mysql'];
 	$pconfig['enable'] = $a_nat[$id]['enable'];
+	$pconfig['uuid'] = $a_nat[$id]['uuid'];
 	$pconfig['interface'] = $a_nat[$id]['interface'];
 	$pconfig['descr'] = $a_nat[$id]['descr'];
 	$pconfig['performance'] = $a_nat[$id]['performance'];
@@ -136,6 +137,7 @@ if ($_POST) {
 		/* repost the options already in conf */
 	if ($pconfig['interface'] != "") { $natent['interface'] = $pconfig['interface']; }
 	if ($pconfig['enable'] != "") { $natent['enable'] = $pconfig['enable']; }
+	if ($pconfig['uuid'] != "") { $natent['uuid'] = $pconfig['uuid']; }
 	if ($pconfig['descr'] != "") { $natent['descr'] = $pconfig['descr']; }
 	if ($pconfig['performance'] != "") { $natent['performance'] = $pconfig['performance']; }
 	if ($pconfig['blockoffenders7'] != "") { $natent['blockoffenders7'] = $pconfig['blockoffenders7']; }

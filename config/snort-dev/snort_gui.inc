@@ -29,37 +29,40 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+include_once("/usr/local/pkg/snort/snort.inc");
+
 function print_info_box_np2($msg) {
-        global $g;
-        echo "<table height=\"32\" width=\"100%\">\n";
-        echo "  <tr>\n";
-        echo "   <td>\n";
-        echo "      <div style='background-color:#990000' id='redbox'>\n";
-        echo "       <table width='100%'><tr><td width='8%'>\n";
-        echo "        &nbsp;&nbsp;&nbsp;<img style='vertical-align:middle' src=\"/snort/images/alert.jpg\" width=\"32\" height=\"28\">\n";
-        echo "        </td>\n";
-        echo "        <td width='70%'><font color='white'><b>{$msg}</b></font>\n";
-        echo "        </td>";
-        echo "        </tr></table>\n";
-        echo "       </div>\n";
-        echo "    </td>\n";
-        echo "</table>\n";
-        echo "<script type=\"text/javascript\">\n";
-        echo "NiftyCheck();\n";
-        echo "Rounded(\"div#redbox\",\"all\",\"#FFF\",\"#990000\",\"smooth\");\n";
-        echo "Rounded(\"td#blackbox\",\"all\",\"#FFF\",\"#000000\",\"smooth\");\n";
-        echo "</script>\n";
-        echo "\n<br>\n";
+	global $config, $g;
+
+	echo "<table height=\"32\" width=\"100%\">\n";
+	echo "  <tr>\n";
+	echo "   <td>\n";
+	echo "      <div style='background-color:#990000' id='redbox'>\n";
+	echo "       <table width='100%'><tr><td width='8%'>\n";
+	echo "        &nbsp;&nbsp;&nbsp;<img style='vertical-align:middle' src=\"/snort/images/alert.jpg\" width=\"32\" height=\"28\">\n";
+	echo "        </td>\n";
+	echo "        <td width='70%'><font color='white'><b>{$msg}</b></font>\n";
+	echo "        </td>";
+	if(stristr($msg, "apply") == true) {
+		echo "         <td>";
+		echo "           <input name=\"apply\" type=\"submit\" class=\"formbtn\" id=\"apply\" value=\"Apply changes\">\n";
+		echo "         </td>";
+	}
+	echo "        </tr></table>\n";
+	echo "       </div>\n";
+	echo "    </td>\n";
+	echo "</table>\n";
+	echo "<script type=\"text/javascript\">\n";
+	echo "NiftyCheck();\n";
+	echo "Rounded(\"div#redbox\",\"all\",\"#FFF\",\"#990000\",\"smooth\");\n";
+	echo "Rounded(\"td#blackbox\",\"all\",\"#FFF\",\"#000000\",\"smooth\");\n";
+	echo "</script>\n";
+	echo "\n<br>\n";
+
+	exec("echo  \"Funtion print info ....\" >> /root/test.log");
+
+
 }
-
-
-
-
-
-
-
-
-
 
 
 ?>
