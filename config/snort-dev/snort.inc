@@ -932,11 +932,10 @@ exec("echo  \"Snort Deinstall $if_real $id....\" >> /root/test.log");
 	exec("/usr/sbin/pw userdel snort");
 	exec("/usr/sbin/pw groupdel snort");
 	exec("rm -rf /usr/local/etc/snort*");
-	exec("cd /var/db/pkg && pkg_delete `ls | grep barnyard2`");
+	//exec("cd /var/db/pkg && pkg_delete `ls | grep barnyard2`");
 	exec("cd /var/db/pkg && pkg_delete `ls | grep snort`");
 
 	/* Remove snort cron entries Ugly code needs smoothness*/
-}
 
 function snort_rm_blocked_deinstall_cron($should_install)
 {
@@ -973,10 +972,10 @@ exec("echo  \"Deinstall cron block....\" >> /root/test.log");
                 
 				configure_cron();
 				
-						}
+				}
 				conf_mount_ro();
-}
-		
+
+}		
 		
 	function snort_rules_up_deinstall_cron($should_install)
 {
@@ -1006,6 +1005,7 @@ exec("echo  \"Deinstall rules up ....\" >> /root/test.log");
                          }
                   configure_cron();
 			}
+}
 
 snort_rm_blocked_deinstall_cron("");
 snort_rules_up_deinstall_cron("");
@@ -1022,7 +1022,7 @@ snort_rules_up_deinstall_cron("");
 	exec("rm -r /usr/local/lib/snort/");
 	
 	conf_mount_ro();
-	
+
 }
 
 function generate_snort_conf($id, $if_real, $snort_uuid)
