@@ -305,6 +305,12 @@ if ($_POST["Submit"]) {
 		}
 		
 		//touch($d_natconfdirty_path);
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		sleep(2);
 		header("Location: /snort/snort_interfaces_edit.php?id=$id");
 
 		exit;
@@ -327,8 +333,13 @@ if ($_POST["Submit"]) {
 		sync_snort_package_all($id, $if_real);
 		sleep(1);
 		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}_{$if_real}\" -D -q -l /var/log/snort -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		sleep(2);
 		header("Location: /snort/snort_interfaces_edit.php?id=$id");
-		exit;
 		}
 
 		if ($_POST["Submit3"])
@@ -351,6 +362,15 @@ if ($_POST["Submit"]) {
 				exec("/bin/kill {$start_up_r}");
 				exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}*");
 			}
+			header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+			header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+			header( 'Cache-Control: post-check=0, pre-check=0', false );
+			header( 'Pragma: no-cache' );
+			sleep(2);
+			header("Location: /snort/snort_interfaces_edit.php?id=$id");
+
+
 		}
 
 $iface_uuid = $a_nat[$id]['uuid'];

@@ -473,7 +473,7 @@ class array_ereg {
                         $id += 1;
 
                         $result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-                        $if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+                        $if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
 
 						$snort_rules_list[] = "snort_$id$if_real";
 
@@ -555,12 +555,61 @@ if ($id != '' && $if_real != '') //new
 				if ($snortbarnyardlog_info_chk == 'on')
 					create_barnyard2_conf($id, $if_real, $snort_uuid);
 
+				sync_snort_package();
+
 		exec("echo  \"Funtion sync all $id $if_real $snort_uuid....\" >> /root/test.log");
 		conf_mount_ro();
 		}
 	}
 }
 
+/* only be run on new iface create, bootup and ip refresh */
+function sync_snort_package_empty()
+{
+	global $config, $g;
+	conf_mount_rw();
+
+	/* do not start config build if rules is empty */
+	if (!empty($config['installedpackages']['snortglobal']['rule'])) 
+	{
+		if ($id == "") 
+		{
+
+			$rule_array = $config['installedpackages']['snortglobal']['rule'];
+			$id = -1;
+			foreach ($rule_array as $value)
+			{
+
+				if ($id == '') {
+				$id = 0;
+				}
+
+				$id += 1;
+
+				$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
+				$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
+
+				/* create snort configuration file */
+				create_snort_conf($id, $if_real, $snort_uuid);
+
+				/* if rules exist cp rules to each iface */
+				create_rules_iface($id, $if_real, $snort_uuid);
+
+				/* create barnyard2 configuration file */
+				$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
+				if ($snortbarnyardlog_info_chk == 'on')
+					create_barnyard2_conf($id, $if_real, $snort_uuid);
+
+			}
+
+				/* create snort bootup file snort.sh only create once */
+				create_snort_sh();
+
+				sync_snort_package();
+				exec("echo  \"Funtion sync empty create files foreach $if_real $id....\" >> /root/test.log");
+		}
+	}
+}
 
 /* Start of main config files */
 /* Start of main config files */
@@ -637,9 +686,6 @@ $snort_sh_text3[] = <<<EOE
 		snort_pid="`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}_{$if_real}" | /usr/bin/awk '{print $2;}'`"
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort already running, soft restart"
 
-		#### Remake the configs on boot Important!
-		/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php $id $if_real
-
 		#### Restart Iface
 		/bin/kill -HUP \${snort_pid}
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort Soft Reload For {$snort_uuid}_{$if_real}..."
@@ -686,6 +732,7 @@ conf_mount_rw();
 
 $snort_sh_text = <<<EOD
 #!/bin/sh
+########
 # This file was automatically generated
 # by the pfSense service handler.
 # Code added to protect from double starts on pfSense bootup
@@ -702,6 +749,10 @@ rc_start() {
 		fi
 
 		/bin/echo "snort.sh run" > /tmp/snort.sh.pid
+
+		#### Remake the configs on boot Important!
+		/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php
+		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort Startup files Sync..."
 
 $start_snort_iface_restart
 
@@ -802,7 +853,7 @@ exec("echo  \"Create rules $snort_uuid $if_real $id ....\" >> /root/test.log");
 }
 
 /* open barnyard2.conf for writing */
-function create_barnyard2_conf() {
+function create_barnyard2_conf($id, $if_real, $snort_uuid) {
         global $bconfig, $bg, $id, $if_real;
         /* write out barnyard2_conf */
 
@@ -1930,54 +1981,6 @@ include /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/threshold.conf
 EOD;
 
 	return $snort_conf_text;
-}
-
-/* only be run on new iface create, bootup and ip refresh */
-function sync_snort_package_empty()
-//function sync_snort_package_all()
-{
-	global $config, $g;
-	conf_mount_rw();
-
-	/* do not start config build if rules is empty */
-	if (!empty($config['installedpackages']['snortglobal']['rule'])) 
-	{
-		if ($id == "") 
-		{
-
-			$rule_array = $config['installedpackages']['snortglobal']['rule'];
-			$id = -1;
-			foreach ($rule_array as $value)
-			{
-
-				if ($id == '') {
-				$id = 0;
-				}
-
-				$id += 1;
-
-				$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-				$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
-
-				/* create snort configuration file */
-				create_snort_conf($id, $if_real);
-
-				/* create snort bootup file snort.sh */
-				create_snort_sh($if_real);
-
-				/* if rules exist cp rules to each iface */
-				create_rules_iface($id, $if_real);
-
-				/* create barnyard2 configuration file */
-				$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
-				if ($snortbarnyardlog_info_chk == 'on')
-					create_barnyard2_conf($id, $if_real);
-				
-				exec("echo  \"Funtion sync empty create files foreach $if_real $id....\" >> /root/test.log");
-
-			}
-		}
-	}
 }
 
 /*   check downloaded text from snort.org to make sure that an error did not occur

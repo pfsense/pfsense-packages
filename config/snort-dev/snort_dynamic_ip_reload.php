@@ -35,23 +35,16 @@ require_once("/usr/local/pkg/snort/snort.inc");
 
 /* get the varibles from the command line */
 /* Note: snort.sh sould only be using this */
-$id = $_SERVER["argv"][1];
-$if_real = $_SERVER["argv"][2];
+//$id = $_SERVER["argv"][1];
+//$if_real = $_SERVER["argv"][2];
 
-$test_iface = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
+//$test_iface = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
 
-if ($id == "" || $if_real == "" || $test_iface == "") {
-	exec("/usr/bin/logger -p daemon.info -i -t SnortDynIP \"ERORR starting snort_dynamic_ip_reload.php\"");
-	exit;
-	}
+//if ($id == "" || $if_real == "" || $test_iface == "") {
+//	exec("/usr/bin/logger -p daemon.info -i -t SnortDynIP \"ERORR starting snort_dynamic_ip_reload.php\"");
+//	exit;
+//	}
 
-if ($id != "" && $if_real != "") {
-	create_snort_conf();
-
-/* create barnyard2 configuration file */
-$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
-if ($snortbarnyardlog_info_chk == on)
-       create_barnyard2_conf();
-}
+sync_snort_package_empty();
 
 ?>

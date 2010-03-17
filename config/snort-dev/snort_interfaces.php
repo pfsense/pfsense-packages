@@ -267,7 +267,7 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 
 }	
 
-$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.12 Beta";
+$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.14 Beta";
 include("head.inc");
 
 ?>
@@ -312,6 +312,7 @@ padding: 15px 10px 50% 50px;
 #footer2
 {
 	position: relative;
+	//top: 135px;
 	top: -17px;
 	background-color: #cccccc;
 	background-image: none;
@@ -321,7 +322,9 @@ padding: 15px 10px 50% 50px;
 	padding-top: 0px;
 	padding-right: 0px;
 	padding-bottom: 0px;
-	padding-left: 0px;
+	padding-left: 10px;
+	//padding-left: 0px;
+	clear: both;
 }
 
 </style>
@@ -536,10 +539,11 @@ if ($pkg['tabs'] <> "") {
 ?>
 
 </form>
+
 </div> <!-- Right DIV -->
 </div> <!-- Content DIV -->
 
-	<div id="footer2">
+	<div id="footer2"> <!-- style="width:760px; -->
 		<IMG SRC="./images/footer2.jpg" width="780px" height="35" ALT="Apps">
 			<font size="1">Snort® is a registered trademark of Sourcefire, Inc., Barnyard2® is a registered trademark of securixlive.com., Orion® copyright Robert Zelaya., 
 			Emergingthreats is a registered trademark of emergingthreats.net., Mysql® is a registered trademark of Mysql.com.</font>

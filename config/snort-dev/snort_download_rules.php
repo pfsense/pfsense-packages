@@ -969,7 +969,7 @@ exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl /usr/local/etc/snort/r
 //////////////////
 
 /* open oinkmaster_conf for writing" function */
-function oinkmaster_conf()
+function oinkmaster_conf($id, $if_real, $iface_uuid)
 {
 
         global $config, $g, $id, $if_real, $snortdir_wan, $snortdir, $snort_md5_check_ok, $emerg_md5_check_ok, $pfsense_md5_check_ok;
@@ -1014,7 +1014,7 @@ $selected_sid_off_sections
 EOD;
 
      /* open snort's oinkmaster.conf for writing */
-     $oinkmasterlist = fopen("/usr/local/etc/snort/snort_$id$if_real/oinkmaster_$id$if_real.conf", "w");
+     $oinkmasterlist = fopen("/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/oinkmaster_{$iface_uuid}_{$if_real}.conf", "w");
 
      fwrite($oinkmasterlist, "$snort_sid_text");
 
@@ -1027,7 +1027,7 @@ EOD;
 /*  Run oinkmaster to snort_wan and cp configs */
 /*  If oinkmaster is not needed cp rules normally */
 /*  TODO add per interface settings here */
-function oinkmaster_run()
+function oinkmaster_run($id, $if_real, $iface_uuid)
 {
 
         global $config, $g, $id, $if_real, $snortdir_wan, $snortdir, $snort_md5_check_ok, $emerg_md5_check_ok, $pfsense_md5_check_ok;
@@ -1040,30 +1040,30 @@ function oinkmaster_run()
 		{
 		update_status(gettext("Your first set of rules are being copied..."));
 		update_output_window(gettext("May take a while..."));
-		exec("/bin/echo \"test {$snortdir} {$snortdir_wan} $id$if_real\" > /root/debug");
-		exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/snort_$id$if_real/rules/");
-		exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}/snort_$id$if_real");
-		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}/snort_$id$if_real");
-		exec("/bin/cp {$snortdir}/generators {$snortdir_wan}/snort_$id$if_real");
-		exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}/snort_$id$if_real");
-		exec("/bin/cp {$snortdir}/sid {$snortdir_wan}/snort_$id$if_real");
-		exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}/snort_$id$if_real");
-		exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}/snort_$id$if_real");
+		exec("/bin/echo \"test {$snortdir} {$snortdir_wan} {$iface_uuid}_{$if_real}\" > /root/debug");
+		exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}/rules/");
+		exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
+		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
+		exec("/bin/cp {$snortdir}/generators {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
+		exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
+		exec("/bin/cp {$snortdir}/sid {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
+		exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
+		exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
 		}else{
 		update_status(gettext("Your enable and disable changes are being applied to your fresh set of rules..."));
 		update_output_window(gettext("May take a while..."));
-		exec("/bin/echo \"test2 {$snortdir} {$snortdir_wan} $id$if_real\" > /root/debug");
-		exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/snort_$id$if_real/rules/");
-		exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}/snort_$id$if_real");
-		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}/snort_$id$if_real");
-		exec("/bin/cp {$snortdir}/generators {$snortdir_wan}/snort_$id$if_real");
-		exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}/snort_$id$if_real");
-		exec("/bin/cp {$snortdir}/sid {$snortdir_wan}/snort_$id$if_real");
-		exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}/snort_$id$if_real");
-		exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}/snort_$id$if_real");
+		exec("/bin/echo \"test2 {$snortdir} {$snortdir_wan} {$iface_uuid}_{$if_real}\" > /root/debug");
+		exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}/rules/");
+		exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
+		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
+		exec("/bin/cp {$snortdir}/generators {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
+		exec("/bin/cp {$snortdir}/reference.config {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
+		exec("/bin/cp {$snortdir}/sid {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
+		exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
+		exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
 
 		/*  might have to add a sleep for 3sec for flash drives or old drives */
-		exec("/usr/local/bin/perl /usr/local/bin/oinkmaster.pl -C /usr/local/etc/snort/snort_$id$if_real/oinkmaster_$id$if_real.conf -o /usr/local/etc/snort/snort_$id$if_real/rules > /usr/local/etc/snort/oinkmaster_$id$if_real.log");
+		exec("/usr/local/bin/perl /usr/local/bin/oinkmaster.pl -C /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/oinkmaster_{$iface_uuid}_{$if_real}.conf -o /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules > /usr/local/etc/snort/oinkmaster_{$iface_uuid}_{$if_real}.log");
 		}
 	}
 }
@@ -1082,12 +1082,13 @@ if (!empty($config['installedpackages']['snortglobal']['rule']))
 
 	$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
 	$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+	$iface_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
 	/* make oinkmaster.conf for each interface rule */
-	oinkmaster_conf();
+	oinkmaster_conf($id, $if_real, $iface_uuid);
 	
 	/* run oinkmaster for each interface rule */
-	oinkmaster_run();
+	oinkmaster_run($id, $if_real, $iface_uuid);
 
 	}
 }
