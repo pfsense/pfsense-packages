@@ -550,7 +550,7 @@ if ($a_nat[$id]['interface'] != '') {
 	  <td width="22%" valign="top">&nbsp;</td>
 	  <td width="78%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
 	  <br>
-		Please save your settings befor you click start. </td>
+		Please save your settings before you click start. </td>
 	</tr>
   </table>
   </table>
