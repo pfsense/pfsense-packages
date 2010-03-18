@@ -351,7 +351,7 @@ function haproxy_writeconf() {
 	if(is_array($a_global)) {
 		fwrite ($fd, "global\n");
 		if($a_global['advanced'])
-			fwrite ($fd, "\t" . base64deode($a_global['advanced']) . "\n");
+			fwrite ($fd, "\t" . base64_decode($a_global['advanced']) . "\n");
 		fwrite ($fd, "\tmaxconn\t\t\t".$a_global['maxconn']."\n");
 		if($a_global['remotesyslog'])
 			fwrite ($fd, "\tlog\t\t\t{$a_global['remotesyslog']}\t{$a_global['logfacility']}\t{$a_global['loglevel']}\n");
