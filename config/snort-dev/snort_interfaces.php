@@ -267,7 +267,7 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 
 }	
 
-$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.14 Beta";
+$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.15 Beta";
 include("head.inc");
 
 ?>
@@ -522,7 +522,7 @@ padding: 15px 10px 50% 50px;
 	  <br>
 		 This is the <strong>Snort Menu</strong> where you can see an over view of all your interface settings.
 		 <br>
-		 Please edit the <strong>Global Settings</strong> tab befor adding an interface.
+		 Please edit the <strong>Global Settings</strong> tab before adding an interface.
 		 <br><br>
 		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="Add Icon"> icon to add a interface.&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_pass.gif" width="13" height="13" border="0" title="Start Icon"> icon to <strong>start</strong> snort and barnyard.
 		 <br>
