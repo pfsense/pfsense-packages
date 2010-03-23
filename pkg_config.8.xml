@@ -301,11 +301,11 @@
       <name>OpenOSPFD</name>
       <descr>OSPF routing protocol</descr>
       <maintainer>cmb@pfsense.org</maintainer>
-      <version>0.4</version>
+      <version>0.5</version>
       <category>Routing</category>
       <status>ALPHA</status>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-      <depends_on_package>openospfd-4.3.tbz</depends_on_package>
+      <depends_on_package>openospfd-4.6.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/openospfd/openospfd.xml</config_file>
       <pkginfolink></pkginfolink>
       <required_version>1.2.1</required_version>
