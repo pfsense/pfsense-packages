@@ -245,7 +245,7 @@ function custom_php_install_command() {
 	system("touch /var/db/whitelist.txt");
 	system("touch /var/db/blacklist.txt");
 	sync_package_spamd();
-	exec("pw usermod _spamd -g proxy -G _spamd,proxy");
+	exec("/usr/sbin/pw usermod _spamd -g proxy -G _spamd,proxy");
 }
 
 function custom_php_deinstall_command() {
