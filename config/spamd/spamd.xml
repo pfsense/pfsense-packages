@@ -95,42 +95,42 @@
     	<additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd_rules.php</item>
+	    <item>http://www.pfsense.com/packages/config/spamd/spamd_rules.php</item>
 	</additional_files_needed>
     	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd_whitelist.xml</item>
+	    <item>http://www.pfsense.com/packages/config/spamd/spamd_whitelist.xml</item>
 	</additional_files_needed>
     	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd_outlook.xml</item>
+	    <item>http://www.pfsense.com/packages/config/spamd/spamd_outlook.xml</item>
 	</additional_files_needed>
     	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd.inc</item>
+	    <item>http://www.pfsense.com/packages/config/spamd/spamd.inc</item>
 	</additional_files_needed>
     	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd_settings.xml</item>
+	    <item>http://www.pfsense.com/packages/config/spamd/spamd_settings.xml</item>
 	</additional_files_needed>
     <additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd_db.php</item>
+	    <item>http://www.pfsense.com/packages/config/spamd/spamd_db.php</item>
 	</additional_files_needed>
     <additional_files_needed>
 	    <prefix>/usr/local/www/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd_db_ext.php</item>
+	    <item>http://www.pfsense.com/packages/config/spamd/spamd_db_ext.php</item>
 	</additional_files_needed>
     <additional_files_needed>
 	    <prefix>/usr/local/bin/</prefix>
 	    <chmod>0755</chmod>
-	    <item>http://www.pfsense.com/packages/config/spamd_gather_stats.php</item>
+	    <item>http://www.pfsense.com/packages/config/spamd/spamd_gather_stats.php</item>
 	</additional_files_needed>	
 
 	<!-- fields gets invoked when the user adds or edits a item.   the following items

@@ -270,6 +270,23 @@
       <configurationfile>/snort.xml</configurationfile>
 	  <after_install_info>This is the Snort-dev branch and is stable as of Alpha.</after_install_info>
     </package>
+	<package>
+		<name>spamd</name>
+		<website>http://www.openbsd.org/spamd/</website>
+		<descr>Tarpits like spamd are fake SMTP servers, which accept connections but don't deliver mail. Instead, they keep the connections open and reply very slowly. If the peer is patient enough to actually complete the SMTP dialogue (which will take ten minutes or more), the tarpit returns a 'temporary error' code (4xx), which indicates that the mail could not be delivered successfully and that the sender should keep the mail in their queue and retry again later.</descr>
+		<category>Services</category>
+		<config_file>http://www.pfsense.com/packages/config/spamd/spamd.xml</config_file>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/80/All/</depends_on_package_base_url>
+		<depends_on_package>spamd-4.5.0_3.tbz</depends_on_package>
+		<version>4.5.0_4</version>
+		<status>Beta</status>
+		<required_version>1.2.1</required_version>
+		<configurationfile>spamd.xml</configurationfile>
+		<logging>
+			<facilityname>spamd</facilityname>
+			<logfilename>spamd.log</logfilename>
+		</logging>
+	</package>
     <package>
       <name>siproxd</name>
       <website>http://siproxd.sourceforge.net/</website>
