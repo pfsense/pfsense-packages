@@ -212,6 +212,8 @@ function tinydns_custom_php_changeip_command() {
 				
 			}
 			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog /etc/dnscache{$dnsidx} {$dnscacheip}");
+			if (!is_dir("/etc/dnscache{$dnsidx}/env/IP"))
+				exec("mkdir -p /etc/dnscache{$dnsidx}/env");
 			exec("echo {$dnscacheip} > /etc/dnscache{$dnsidx}/env/IP");
 			tinydns_dnscache_forwarding_servers($dnsidx);
 			if (!is_dir("/etc/dnscache{$dnsidx}/root/ip"))
