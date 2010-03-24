@@ -33,6 +33,15 @@
 if(!function_exists("filter_configure")) 
 	require_once("filter.inc");
 
+function tinydns_validate() {
+	global $input_errors, $config;
+
+	if ($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
+		if (isset($config['dnsmasq']['enable']))
+			$input_errors[] = "You have system dns-forwarder active. Disable it before enabling DNS-Cache Forwarders.";
+	}
+}
+
 function tinydns_custom_php_install_command() {
 	global $g, $config;
 	conf_mount_rw();
@@ -143,18 +152,14 @@ function tinydns_custom_php_changeip_command() {
 	global $g, $config;
 	conf_mount_rw();
 
-	$ip = $config['interfaces']['lan']['ipaddr'];
-	$ipmask = $config['interfaces']['lan']['subnet'];
-	$arr = tinydns_get_ip_subnet_arpa($ip, $ipmask);
-	$dnscacheip = $ip;
-	$dnsuserip = $arr[0];
-
 	/* For now force $dnsserverip to to 127.0.0.1 unless a separate IP is specified */
 	$localhost = "127.0.0.1";
 	$dnsserverip = $localhost;
 	if($config['installedpackages']['tinydns']['config'][0]['ipaddress'] != $localhost AND $config['installedpackages']['tinydns']['config'][0]['ipaddress'] != "")
 		$dnsserverip = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
 	if($config['installedpackages']['tinydns']['config'][0]['regdhcpstatic'] OR $config['installedpackages']['tinydns']['config'][0]['regdhcp']) 
+		$dnsserverip = $localhost;
+	if (!is_ipaddr($dnsserverip))
 		$dnsserverip = $localhost;
 	$config['installedpackages']['tinydns']['config'][0]['ipaddress'] = $dnsserverip;
 
@@ -185,27 +190,43 @@ function tinydns_custom_php_changeip_command() {
 	exec("/usr/bin/killall -9 tinydns");
 
 	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
-		if(!is_dir("/service/dnscache")) {
-			exec("/usr/sbin/pw useradd Gdnscache");
-			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog /etc/dnscache {$dnscacheip}");
-			exec("/bin/ln -s /etc/dnscache /service/");
-			exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.original");
-			exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.dnscache");
-		}
-		exec("echo {$dnscacheip} > /etc/dnscache/env/IP");
-		tinydns_dnscache_forwarding_servers();
-		exec("touch /etc/dnscache/root/ip/{$dnsuserip}");
-		tinydns_create_soa_domain_list($dnsserverip);
+		$interfaces = explode(",", $config['installedpackages']['tinydns']['config'][0]['interface']);
+		exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.original");
+		exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.dnscache");
 		exec("echo domain {$config['system']['domain']} > /var/etc/resolv.conf");
-		exec("echo nameserver {$dnscacheip} >> /var/etc/resolv.conf");
+		foreach ($interfaces as $dnsidx => $dnsif) {
+			$dnscacheif = convert_friendly_interface_to_real_interface_name($dnsif);
+			$dnscacheip = find_interface_ip($dnscacheif);
+			if (intval($config['version']) >= 6)
+				$ipmask = find_interface_subnet($dnscacheif);
+			else
+				$ipmask = $config['interfaces'][$dnsif]['subnet'];
+			$arr = tinydns_get_ip_subnet_arpa($dnscacheip, $ipmask);
+			$dnsuserip = $arr[0];
+			if(!is_dir("/etc/dnscache{$dnsidx}")) {
+				exec("mkdir /etc/dnscache{$dnsidx}");
+				exec("/bin/ln -s /etc/dnscache{$dnsidx} /service/");
+				
+			}
+			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog /etc/dnscache{$dnsidx} {$dnscacheip}");
+			exec("echo {$dnscacheip} > /etc/dnscache{$dnsidx}/env/IP");
+			tinydns_dnscache_forwarding_servers($dnsidx);
+			if (!is_dir("/etc/dnscache{$dnsidx}/root/ip"))
+				exec("mkdir -p /etc/dnscache{$dnsidx}/root/ip");
+			exec("touch /etc/dnscache{$dnsidx}/root/ip/{$dnsuserip}");
+			tinydns_create_soa_domain_list($dnsserverip, $dnsidx);
+			exec("echo nameserver {$dnscacheip} >> /var/etc/resolv.conf");
+		}
 		exec("/usr/bin/killall -9 dnscache");
 	} else {
 		if(file_exists("/var/etc/resolv.conf.original"))
 			exec("/bin/cp /var/etc/resolv.conf.original /var/etc/resolv.conf");
-		if(is_dir("/etc/dnscache")) {
-			dnscache_use_root_servers();
-			exec("/usr/bin/killall -9 dnscache");
+		$interfaces = explode(",", $$config['installedpackages']['tinydns']['config'][0]['interface']);
+		foreach ($interfaces as $dnsidx => $dnsif) {
+			if(is_dir("/etc/dnscache{$dnsidx}"))
+				dnscache_use_root_servers($dnsidx);
 		}
+		exec("/usr/bin/killall -9 dnscache");
 	}
 	conf_mount_ro();
 	filter_configure();
@@ -380,27 +401,45 @@ function tinydns_create_zone_file() {
 				fwrite($fd, $forwardingservers);
 			if($config['system']['hostname']['domain']) {
 				$dhcpdhostname = $config['system']['hostname'];		
-				if($config['dhcpd']['lan'])
+				if($config['system']['domain'])
 					$dhcpddomain = $config['system']['domain'];
-				$dhcpdlanip = $config['interfaces']['lan']['ipaddr'];		
-				$dhcpdipmask = $config['interfaces']['lan']['subnet'];		
-				$dhcpdfqdn = "{$dhcpdhostname}.{$dhcpddomain}";
-				tinydns_complete_soa_record($fd, $dhcpdlanip, $dhcpdipmask, $dhcpdhostname, $dhcpddomain);
+				$interfaces = explode(",", $config['installedpackages']['tinydns']['config'][0]['interface']);
+                		foreach ($interfaces as $dnsif) {
+					$dnsrif = convert_friendly_interface_to_real_interface_name($dnsif);
+                        		$dnsrip = find_interface_ip($dnsrif);
+                        		if (intval($config['version']) >= 6)
+                                		$ipmask = find_interface_subnet($dnsrif);
+                        		else
+                                		$ipmask = $config['interfaces'][$dnsif]['subnet'];
+					$dhcpdfqdn = "{$dhcpdhostname}.{$dhcpddomain}";
+					tinydns_complete_soa_record($fd, $dnsrip, $ipmask, $dhcpdhostname, $dhcpddomain);
+				}
 			}
 		}
 	
 		/* Register Static IPs */
         if($config['installedpackages']['tinydns']['config'][0]['regdhcpstatic']) {
-                foreach($config['dhcpd'] as $zone_key => $zone ) {
+		$interfaces = explode(",", $config['installedpackages']['tinydns']['config'][0]['interface']);
+		foreach ($interfaces as $dnsif) {
+			if (is_array($config['dhcpd'][$dnsif]))
+				continue;
+			$zone =& $config['dhcpd'][$dnsif];
+			if (!isset($dhcpifconf['enable']))
+				continue;
                         $dhcpdhostname = $config['system']['hostname'];
                         if ($zone['ddnsdomain']) 
                                 $dhcpddomain = $zone['ddnsdomain'];
                         else
                                 $dhcpddomain = $config['system']['domain'];
-                        $dhcpdlanip = $config['interfaces'][$zone_key]['ipaddr'];
-                        $dhcpdipmask = $config['interfaces'][$zone_key]['subnet'];
+			
+			$dnsrif = convert_friendly_interface_to_real_interface_name($dnsif);
+                        $dnsrip = find_interface_ip($dnsrif);
+                        if (intval($config['version']) >= 6)
+                                $ipmask = find_interface_subnet($dnsrif);
+                        else
+                                $ipmask = $config['interfaces'][$dnsif]['subnet'];
                         $dhcpdfqdn = "{$dhcpdhostname}.{$dhcpddomain}";
-                        tinydns_complete_soa_record($fd, $dhcpdlanip, $dhcpdipmask, $dhcpdhostname, $dhcpddomain);
+                        tinydns_complete_soa_record($fd, $dnsrip, $ipmask, $dhcpdhostname, $dhcpddomain);
        
                         if(is_array($zone['staticmap'])) {
                                 foreach($zone['staticmap'] as $dhcpdstatic) {
@@ -849,7 +888,7 @@ function tinydns_get_dns_record_type($tinydnsrecord) {
 
 /* This function will be replaced by an auto detect DNS cache servers routine */
 /* At the moment there is no tagging of DNSroute to a WAN port. It needs to be added  */
-function tinydns_dnscache_forwarding_servers() {
+function tinydns_dnscache_forwarding_servers($index) {
 	$fr = fopen("/var/etc/resolv.conf.dnscache", "r");
 	if (! $fr) {
 		printf("Error: cannot open resolv.conf.dnscache in tinydns_register_forwarding_servers().\n");
@@ -873,13 +912,13 @@ function tinydns_dnscache_forwarding_servers() {
 		}	
 	}
 	fclose($fr);
-	exec("echo 1 > /etc/dnscache/env/FORWARDONLY");
-	if(is_dir("/etc/dnscache/root/servers/")) 
+	exec("echo 1 > /etc/dnscache{$index}/env/FORWARDONLY");
+	if(is_dir("/etc/dnscache{$index}/root/servers/")) 
 		exec("rm -R /etc/dnscache/root/servers/");
-	exec("mkdir /etc/dnscache/root/servers/");
-	$fr = fopen("/etc/dnscache/root/servers/@", "w");
+	exec("mkdir -p /etc/dnscache{$index}/root/servers/");
+	$fr = fopen("/etc/dnscache{$index}/root/servers/@", "w");
 	if (! $fr) {
-		printf("Error: cannot write to /etc/dnscache/root/servers/@ in tinydns_dnscache_forwarding_servers().\n");
+		printf("Error: cannot write to /etc/dnscache{$index}/root/servers/@ in tinydns_dnscache_forwarding_servers().\n");
 		return 1;
 	}
 	if($iprecords)
@@ -888,7 +927,7 @@ function tinydns_dnscache_forwarding_servers() {
 }
 
 /* This routine adds filenames to /etc/dnscache/root/servers/ with the contents pointing to the tinyDNS server */
-function tinydns_create_soa_domain_list($dnsserverip) {
+function tinydns_create_soa_domain_list($dnsserverip, $index = 0) {
 	if(file_exists("/service/tinydns/root/data"))
 		$tinydns_data = file_get_contents("/service/tinydns/root/data");
 	else
@@ -905,9 +944,9 @@ function tinydns_create_soa_domain_list($dnsserverip) {
 		if($fqdn) {
 			$rtypes = tinydns_get_dns_record_type($dnsrecord);
 			if($rtypes[0] == "SOA") {
-				$fr = fopen("/etc/dnscache/root/servers/{$fqdn}", "w");
+				$fr = fopen("/etc/dnscache{$index}/root/servers/{$fqdn}", "w");
 				if (! $fr) {
-					printf("Error: cannot open /etc/dnscache/root/servers/{$fqdn} in tinydns_create_soa_domain_list().\n");
+					printf("Error: cannot open /etc/dnscache{$index}/root/servers/{$fqdn} in tinydns_create_soa_domain_list().\n");
 					return 1;
 				}
 				if($fqdn)fwrite($fr, $dnsserverip);
@@ -984,7 +1023,7 @@ EOD;
 	return $rootservers;
 }
 
-function dnscache_use_root_servers() {
+function dnscache_use_root_servers($index = 0) {
 	$rootservers =<<<EOD
 198.41.0.4
 192.228.79.201
@@ -1002,13 +1041,13 @@ function dnscache_use_root_servers() {
 
 EOD;
 
-	exec("echo 0 > /etc/dnscache/env/FORWARDONLY");
-	if(is_dir("/etc/dnscache/root/servers/")) 
-		exec("rm -R /etc/dnscache/root/servers/");
-	exec("mkdir /etc/dnscache/root/servers/");
-	$fr = fopen("/etc/dnscache/root/servers/@", "w");
+	exec("echo 0 > /etc/dnscache{$index}/env/FORWARDONLY");
+	if(is_dir("/etc/dnscache{$index}/root/servers/")) 
+		exec("rm -R /etc/dnscache{$index}/root/servers/");
+	exec("mkdir -p /etc/dnscache{$index}/root/servers/");
+	$fr = fopen("/etc/dnscache{$index}/root/servers/@", "w");
 	if (! $fr) {
-		printf("Error: cannot write to /etc/dnscache/root/servers/@ in dnscache_use_root_servers().\n");
+		printf("Error: cannot write to /etc/dnscache{$index}/root/servers/@ in dnscache_use_root_servers().\n");
 		return 1;
 	}
 	fwrite($fr, $rootservers);
