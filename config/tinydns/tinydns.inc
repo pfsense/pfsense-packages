@@ -197,6 +197,7 @@ function tinydns_custom_php_changeip_command() {
 		exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.original");
 		exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.dnscache");
 		exec("echo domain {$config['system']['domain']} > /var/etc/resolv.conf");
+		exec("rm -rf /etc/dnscache* /service/dnscache*");
 		foreach ($interfaces as $dnsidx => $dnsif) {
 			$dnscacheif = convert_friendly_interface_to_real_interface_name($dnsif);
 			$dnscacheip = find_interface_ip($dnscacheif);
@@ -206,12 +207,9 @@ function tinydns_custom_php_changeip_command() {
 				$ipmask = $config['interfaces'][$dnsif]['subnet'];
 			$arr = tinydns_get_ip_subnet_arpa($dnscacheip, $ipmask);
 			$dnsuserip = $arr[0];
-			if(!is_dir("/etc/dnscache{$dnsidx}")) {
-				exec("mkdir /etc/dnscache{$dnsidx}");
-				exec("/bin/ln -s /etc/dnscache{$dnsidx} /service/");
-				
-			}
+			exec("mkdir /etc/dnscache{$dnsidx}");
 			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog /etc/dnscache{$dnsidx} {$dnscacheip}");
+			exec("/bin/ln -s /etc/dnscache{$dnsidx} /service/");
 			if (!is_dir("/etc/dnscache{$dnsidx}/env/IP"))
 				exec("mkdir -p /etc/dnscache{$dnsidx}/env");
 			exec("echo {$dnscacheip} > /etc/dnscache{$dnsidx}/env/IP");
