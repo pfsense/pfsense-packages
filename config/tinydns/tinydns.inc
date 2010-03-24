@@ -894,41 +894,47 @@ function tinydns_get_dns_record_type($tinydnsrecord) {
 /* This function will be replaced by an auto detect DNS cache servers routine */
 /* At the moment there is no tagging of DNSroute to a WAN port. It needs to be added  */
 function tinydns_dnscache_forwarding_servers($index) {
-	$fr = fopen("/var/etc/resolv.conf.dnscache", "r");
-	if (! $fr) {
-		printf("Error: cannot open resolv.conf.dnscache in tinydns_register_forwarding_servers().\n");
-		return 1;
-	}
-	$lip = strlen("nameserver") + 1;
-	$j = 0;
-	$iprecords = "";
-	while (!feof($fr)) {
-		$routers = fgets($fr, 4096);
-		$discard = ($routers[0] == "\n"); 
-		if(!$discard) {
-			if ($routerip = strstr($routers,"nameserver")) {
-				$routerip = substr($routerip,$lip);
-				if($routerip) {
-					$j += 1;
-					$routera = "{$routerip}";
-					$iprecords .= $routera;
-				}	
-			}
-		}	
-	}
-	fclose($fr);
+	global $config;
+
 	exec("echo 1 > /etc/dnscache{$index}/env/FORWARDONLY");
 	if(is_dir("/etc/dnscache{$index}/root/servers/")) 
 		exec("rm -R /etc/dnscache/root/servers/");
 	exec("mkdir -p /etc/dnscache{$index}/root/servers/");
-	$fr = fopen("/etc/dnscache{$index}/root/servers/@", "w");
-	if (! $fr) {
-		printf("Error: cannot write to /etc/dnscache{$index}/root/servers/@ in tinydns_dnscache_forwarding_servers().\n");
-		return 1;
+	if (intval($config['version']) >= 6)
+		exec("/bin/cat /var/etc/nameserver_* > /etc/dnscache{$index}/root/servers/@");
+	else {
+		$fr = fopen("/var/etc/resolv.conf.dnscache", "r");
+		if (! $fr) {
+			printf("Error: cannot open resolv.conf.dnscache in tinydns_register_forwarding_servers().\n");
+			return 1;
+		}
+		$lip = strlen("nameserver") + 1;
+		$j = 0;
+		$iprecords = "";
+		while (!feof($fr)) {
+			$routers = fgets($fr, 4096);
+			$discard = ($routers[0] == "\n"); 
+			if(!$discard) {
+				if ($routerip = strstr($routers,"nameserver")) {
+					$routerip = substr($routerip,$lip);
+					if($routerip) {
+						$j += 1;
+						$routera = "{$routerip}";
+						$iprecords .= $routera;
+					}	
+				}
+			}	
+		}
+		fclose($fr);
+		$fr = fopen("/etc/dnscache{$index}/root/servers/@", "w");
+		if (! $fr) {
+			printf("Error: cannot write to /etc/dnscache{$index}/root/servers/@ in tinydns_dnscache_forwarding_servers().\n");
+			return 1;
+		}
+		if($iprecords)
+			fwrite($fr, $iprecords);
+		fclose($fr);
 	}
-	if($iprecords)
-		fwrite($fr, $iprecords);
-	fclose($fr);
 }
 
 /* This routine adds filenames to /etc/dnscache/root/servers/ with the contents pointing to the tinyDNS server */
