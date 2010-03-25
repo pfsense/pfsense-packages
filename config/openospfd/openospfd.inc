@@ -178,7 +178,13 @@ function ospfd_install_conf() {
 	// ospfd process running?  if so reload, elsewise start.
 	exec("/usr/local/sbin/ospfctl reload", $rval);
 	if ($rval != 0) {
+		/*
+		 * ospfd isnt actually running as nothing accepted a connection
+		 * on the /var/run/ospfd.sock unix socket by ospfctl, this is
+		 * just to ensure a clean state. Killing a live ospfd would be bad.
+		 */
 		exec("/bin/pkill -x ospfd");
+		// start ospfd
 		exec("/usr/local/sbin/ospfd -f /usr/local/etc/ospfd.conf");
 	}
 	
