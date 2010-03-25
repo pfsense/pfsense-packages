@@ -176,10 +176,10 @@ function ospfd_install_conf() {
 	exec("chmod u+rw /usr/local/etc/ospfd.conf");
 	
 	// ospfd process running?  if so reload, elsewise start.
-	if(is_ospfd_running() == true) {
-		exec("/usr/local/sbin/ospfctl reload");
-	} else {
-		exec("/usr/local/sbin/ospfd");
+	exec("/usr/local/sbin/ospfctl reload", $rval);
+	if ($rval != 0) {
+		exec("/bin/pkill -x ospfd");
+		exec("/usr/local/sbin/ospfd -f /usr/local/etc/ospfd.conf");
 	}
 	
 	conf_mount_ro();
@@ -231,13 +231,4 @@ function ospfd_put_raw_config($conffile) {
 		$config['installedpackages']['ospfd']['rawconfig'] = $conffile;
 	}
 }
-
-function is_ospfd_running() {
-	$status = `ps awux | grep ospfd | grep "parent" | grep -v grep | wc -l | awk '{ print \$1 }'`;
-	if(intval($status) > 0) 
-		return true;
-	else 
-		return false;
-}
-
 ?>
