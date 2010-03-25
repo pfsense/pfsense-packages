@@ -30,16 +30,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* 
 
-TODO: Nov 12 09
-Clean this code up its ugly
-Important add error checking
-
-*/
-
-require("guiconfig.inc");
-require("/usr/local/pkg/snort/snort.inc");
+require_once("guiconfig.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -96,7 +89,7 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['def_imap_servers'] = $a_nat[$id]['def_imap_servers'];
 	$pconfig['def_imap_ports'] = $a_nat[$id]['def_imap_ports'];
 	$pconfig['def_sip_proxy_ip'] = $a_nat[$id]['def_sip_proxy_ip'];
-	$pconfig['ip def_sip_proxy_ports'] = $a_nat[$id]['ip def_sip_proxy_ports'];
+	$pconfig['def_sip_proxy_ports'] = $a_nat[$id]['def_sip_proxy_ports'];
 	$pconfig['def_auth_ports'] = $a_nat[$id]['def_auth_ports'];
 	$pconfig['def_finger_ports'] = $a_nat[$id]['def_finger_ports'];
 	$pconfig['def_irc_ports'] = $a_nat[$id]['def_irc_ports'];
@@ -171,7 +164,7 @@ if ($_POST) {
 	if ($pconfig['def_imap_servers'] != "") { $natent['def_imap_servers'] = $pconfig['def_imap_servers']; }
 	if ($pconfig['def_imap_ports'] != "") { $natent['def_imap_ports'] = $pconfig['def_imap_ports']; }
 	if ($pconfig['def_sip_proxy_ip'] != "") { $natent['def_sip_proxy_ip'] = $pconfig['def_sip_proxy_ip']; }
-	if ($pconfig['ip def_sip_proxy_ports'] != "") { $natent['ip def_sip_proxy_ports'] = $pconfig['ip def_sip_proxy_ports']; }
+	if ($pconfig['def_sip_proxy_ports'] != "") { $natent['def_sip_proxy_ports'] = $pconfig['def_sip_proxy_ports']; }
 	if ($pconfig['def_auth_ports'] != "") { $natent['def_auth_ports'] = $pconfig['def_auth_ports']; }
 	if ($pconfig['def_finger_ports'] != "") { $natent['def_finger_ports'] = $pconfig['def_finger_ports']; }
 	if ($pconfig['def_irc_ports'] != "") { $natent['def_irc_ports'] = $pconfig['def_irc_ports']; }
@@ -207,6 +200,7 @@ if ($_POST) {
 
 		/* enable this if you want the user to aprove changes */
 		// touch($d_natconfdirty_path);
+		sync_snort_package_all();
 
 		write_config();
         
@@ -327,10 +321,10 @@ if($id != "")
 					Normalize/Decode RPC traffic and detects Back Orifice traffic on the network.</td>
 				</tr>
 				<tr>
-					<td width="22%" valign="top" class="vncell">Enable <br>FTP & Telnet Normalizer</td>
+					<td width="22%" valign="top" class="vncell">Enable <br>FTP and Telnet Normalizer</td>
 					<td width="78%" class="vtable">
 					<input name="ftp_preprocessor" type="checkbox" value="on" <?php if ($pconfig['ftp_preprocessor']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
-					Normalize/Decode FTP & Telnet traffic and protocol anomalies.</td>
+					Normalize/Decode FTP and Telnet traffic and protocol anomalies.</td>
 				</tr>
 				<tr>
 					<td width="22%" valign="top" class="vncell">Enable <br>SMTP Normalizer</td>

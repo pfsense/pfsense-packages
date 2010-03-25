@@ -30,10 +30,11 @@
 
 /* Setup enviroment */
 
-require("guiconfig.inc");
+/* TODO: review if include files are needed */
+require_once("guiconfig.inc");
 require_once("functions.inc");
 require_once("service-utils.inc");
-require("/usr/local/pkg/snort/snort.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
 
 $tmpfname = "/tmp/snort_rules_up";
 $snortdir = "/usr/local/etc/snort";

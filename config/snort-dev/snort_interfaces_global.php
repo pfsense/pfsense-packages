@@ -33,8 +33,8 @@
 */
 
 $pgtitle = "Services: Snort: Global Settings";
-require("guiconfig.inc");
-require("/usr/local/pkg/snort/snort.inc");
+require_once("guiconfig.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
 
 /* make things short  */
 $pconfig['snortdownload'] = $config['installedpackages']['snortglobal']['snortdownload'];
@@ -57,34 +57,7 @@ if ($_POST) {
 	if ($_POST['enable'])
 	{
 
-//	if ($_POST['timeout'] && (!is_numeric($_POST['timeout']) || ($_POST['timeout'] < 1))) {
-//		$input_errors[] = "The timeout must be at least 1 minute.";
-//	}
-//	if ($_POST['idletimeout'] && (!is_numeric($_POST['idletimeout']) || ($_POST['idletimeout'] < 1))) {
-//		$input_errors[] = "The idle timeout must be at least 1 minute.";
-//	}
-//	if (($_POST['radiusip'] && !is_ipaddr($_POST['radiusip']))) {
-//		$input_errors[] = "A valid IP address must be specified. [".$_POST['radiusip']."]";
-//	}
-//	if (($_POST['radiusip2'] && !is_ipaddr($_POST['radiusip2']))) {
-//		$input_errors[] = "A valid IP address must be specified. [".$_POST['radiusip2']."]";
-//	}
-//	if (($_POST['radiusport'] && !is_port($_POST['radiusport']))) {
-//		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusport']."]";
-//	}
-//	if (($_POST['radiusport2'] && !is_port($_POST['radiusport2']))) {
-//		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusport2']."]";
-//	}
-//	if (($_POST['radiusacctport'] && !is_port($_POST['radiusacctport']))) {
-//		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusacctport']."]";
-//	}
-//	if ($_POST['maxproc'] && (!is_numeric($_POST['maxproc']) || ($_POST['maxproc'] < 4) || ($_POST['maxproc'] > 100))) {
-//		$input_errors[] = "The total maximum number of concurrent connections must be between 4 and 100.";
-//	}
-//	$mymaxproc = $_POST['maxproc'] ? $_POST['maxproc'] : 16;
-//	if ($_POST['maxprocperip'] && (!is_numeric($_POST['maxprocperip']) || ($_POST['maxprocperip'] > $mymaxproc))) {
-//		$input_errors[] = "The maximum number of concurrent connections per client IP address may not be larger than the global maximum.";
-//	}
+/* TODO:a dd check user input code. */
 
 	}
 
@@ -250,16 +223,10 @@ include("head.inc");
 		<span class="vexpl">Please choose the type of Alert logging you will like see in your alert file.<br>
 		Hint: Best pratice is to chose full logging.</span>&nbsp;<span class="red"><strong>WARNING:</strong></span>&nbsp;<strong>On change, alert file will be cleared.</strong></td>
 	</tr>
-    <tr>
-      <td width="22%" valign="top" class="vncell">Associate events on Blocked tab</td>
-      <td width="78%" class="vtable">
-        <input name="associatealertip" type="checkbox" value="yes" <?php if ($config['installedpackages']['snortglobal']['associatealertip'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
-        Checking this option will automatically associate the blocked reason from the snort alerts file.</td>
-    </tr>
 	<tr>
 	  <td width="22%" valign="top">&nbsp;</td>
 	  <td width="78%">
-		<input name="Submit" type="submit" class="formbtn" value="Save" onClick="enable_change(true)">
+		<input name="Submit" type="submit" class="formbtn" value="Save" onClick="enable_change(true)"> <input type="button" class="formbtn" value="Cancel" onclick="history.back()">
 	  </td>
 	</tr>
 	<tr>

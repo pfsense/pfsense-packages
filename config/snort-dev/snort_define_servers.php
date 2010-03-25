@@ -38,8 +38,9 @@ Important add error checking
 
 */
 
-require("guiconfig.inc");
-require("/usr/local/pkg/snort/snort.inc");
+require_once("globals.inc");
+require_once("guiconfig.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -94,7 +95,7 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['def_imap_servers'] = $a_nat[$id]['def_imap_servers'];
 	$pconfig['def_imap_ports'] = $a_nat[$id]['def_imap_ports'];
 	$pconfig['def_sip_proxy_ip'] = $a_nat[$id]['def_sip_proxy_ip'];
-	$pconfig['ip def_sip_proxy_ports'] = $a_nat[$id]['ip def_sip_proxy_ports'];
+	$pconfig['def_sip_proxy_ports'] = $a_nat[$id]['def_sip_proxy_ports'];
 	$pconfig['def_auth_ports'] = $a_nat[$id]['def_auth_ports'];
 	$pconfig['def_finger_ports'] = $a_nat[$id]['def_finger_ports'];
 	$pconfig['def_irc_ports'] = $a_nat[$id]['def_irc_ports'];
@@ -155,7 +156,7 @@ if ($_POST) {
 	if ($pconfig['barnyard_mysql'] != "") { $natent['barnyard_mysql'] = $pconfig['barnyard_mysql']; }
 	if ($pconfig['rulesets'] != "") { $natent['rulesets'] = $pconfig['rulesets']; }
 	if ($pconfig['rule_sid_off'] != "") { $natent['rule_sid_off'] = $pconfig['rule_sid_off']; }
-	if ($pconfig['rule_sid_on'] != "") { $natent['rule_sid_on'] = $pconfig['brule_sid_on']; }
+	if ($pconfig['rule_sid_on'] != "") { $natent['rule_sid_on'] = $pconfig['rule_sid_on']; }
 	
 		
 		/* post new options */
@@ -205,6 +206,7 @@ if ($_POST) {
 
 		/* enable this if you want the user to aprove changes */
 		// touch($d_natconfdirty_path);
+		sync_snort_package_all();
 
 		write_config();
         

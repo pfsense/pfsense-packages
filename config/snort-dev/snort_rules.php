@@ -27,10 +27,11 @@
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
 */
-require("guiconfig.inc");
-require("config.inc");
-require("/usr/local/pkg/snort/snort_gui.inc");
-require("/usr/local/pkg/snort/snort.inc");
+
+
+require_once("guiconfig.inc");
+require_once("/usr/local/pkg/snort/snort_gui.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -453,7 +454,7 @@ function popup(url)
  return false;
 }
 // -->
-</script
+</script>
 
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
   <tr>
@@ -590,7 +591,8 @@ function popup(url)
                                         $textss\n";
                                         ?>
                                         <a href="?id=<?=$id;?>&openruleset=<?=$rulefile;?>&act=toggle&ids=<?=$counter;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/<?=$iconb;?>" width="10" height="10" border="0" title="click to toggle enabled/disabled status"></a>
-										<input name="enable" type="checkbox" value="yes" <?= $ischecked; ?> onClick="enable_change(false)">
+										<!-- <input name="enable" type="checkbox" value="yes" <?= $ischecked; ?> onClick="enable_change(false)"> -->
+										<!-- TODO: add checkbox and save so that that disabling is nicer -->
                                         <?php
                                         echo "$textse
                                         </td>
@@ -662,7 +664,8 @@ function popup(url)
 								</tr>
 								<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
 								<tr>
-								<td><pre><input name="Submit" type="submit" class="formbtn" value="Save">	<input type="button" class="formbtn" value="Cancel" onclick="history.back()"><pre></td>
+								<!-- TODO: add save and cancel for checkbox options -->
+								<!-- <td><pre><input name="Submit" type="submit" class="formbtn" value="Save">	<input type="button" class="formbtn" value="Cancel" onclick="history.back()"><pre></td> -->
                                 </tr>
 								</table>
                         <tr>

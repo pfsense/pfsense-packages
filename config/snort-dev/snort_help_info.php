@@ -32,7 +32,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
+require_once("guiconfig.inc");
 
 header("snort_help_info.php");
 header( "Expires: Mon, 20 Dec 1998 01:00:00 GMT" );
@@ -51,17 +51,24 @@ iframe
 
 #footer2
 {
-	position: relative;
-	top: -2px;
-	background-color: #cccccc;
-	background-image: none;
-	background-repeat: repeat;
-	background-attachment: scroll;
-	background-position: 0% 0%;
-	padding-top: 0px;
-	padding-right: 0px;
-	padding-bottom: 0px;
-	padding-left: 0px;
+
+top: 135px;
+position: relative;
+background-color: #FFFFFF;
+background-image: url("./images/footer.jpg");
+background-repeat: no-repeat;
+background-attachment: scroll;
+background-position: 0px 0px;
+bottom: 0px;
+width: 780px;
+height: 63px;
+color: #000000;
+text-align: center;
+font-size: 0.8em;
+padding-top:64px;
+padding-left: 0px;
+clear: both;
+	
 }
 
 </style>
@@ -88,12 +95,11 @@ iframe
 <div>
 	<iframe style="width: 780px; height: 600px; overflow-x: hidden;" src='/snort/help_and_info.php'></iframe>
 </div>
-</div>
 	<div id="footer2">
-		<IMG SRC="./images/footer.jpg" width="780px" height="63" ALT="Apps">
-			<font size="1">Snort® is a registered trademark of Sourcefire, Inc., Barnyard2® is a registered trademark of securixlive.com., Orion® copyright Robert Zelaya., 
-			Emergingthreats is a registered trademark of emergingthreats.net., Mysql® is a registered trademark of Mysql.com.</font>
+			Snort is a registered trademark of Sourcefire, Inc., Barnyard2 is a registered trademark of securixlive.com, Orion copyright Robert Zelaya, 
+			Emergingthreats is a registered trademark of emergingthreats.net, Mysql is a registered trademark of Mysql.com.
 	</div>
+</div>
 </div>
         <div id="footer">
 			<a target="_blank" href="http://www.pfsense.org/?gui12" class="redlnk">pfSense</a> is &copy;

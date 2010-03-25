@@ -36,10 +36,10 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 */
-require("guiconfig.inc");
-require("config.inc");
 
-//////////////////
+require_once("guiconfig.inc");
+require_once("config.inc");
+
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();

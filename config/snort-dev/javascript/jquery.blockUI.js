@@ -1,4 +1,4 @@
-﻿/*!
+/*!
  * jQuery blockUI plugin
  * Version 2.26 (09-SEP-2009)
  * @requires jQuery v1.2.3 or later

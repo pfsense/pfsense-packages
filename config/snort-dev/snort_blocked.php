@@ -30,8 +30,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
-require("/usr/local/pkg/snort/snort.inc");
+require_once("globals.inc");
+require_once("guiconfig.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
 
 $pconfig['brefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['brefresh'];
 $pconfig['blertnumber'] = $config['installedpackages']['snortglobal']['alertsblocks']['blertnumber'];

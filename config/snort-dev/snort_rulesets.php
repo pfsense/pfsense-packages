@@ -33,7 +33,15 @@ require_once("filter.inc");
 require_once("service-utils.inc");
 include_once("/usr/local/pkg/snort/snort.inc");
 
+/* firephp*/
+require_once('../FirePHPCore/FirePHP.class.php');
+require_once('../FirePHPCore/fb.php');
+ob_start();
+$firephp =& FirePHP::getInstance(true);
+$firephp->setEnabled(true);
 
+fb('Hello, world', FirePHP);
+/* firephp end */
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -57,14 +65,10 @@ if (isset($id) && $a_nat[$id]) {
 /* convert fake interfaces to real */
 $if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface']);
 
-//if(!is_dir("/usr/local/etc/snort/rules"))
-//	exec('mkdir /usr/local/etc/snort/rules/');
 
 $iface_uuid = $a_nat[$id]['uuid'];
 
 $pgtitle = "Snort: Interface $id $iface_uuid $if_real Categories";
-
-
 
 
 /* Check if the rules dir is empy if so warn the user */
@@ -77,12 +81,12 @@ include("fbegin.inc");
 
 echo "<p class=\"pgtitle\">";
 if($pfsense_stable == 'yes'){echo $pgtitle;}
+fb($pfsense_stable, FirePHP);
 echo "</p>\n";
 
 echo "<body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\">";
 
-echo "<script src=\"/row_toggle.js\" type=\"text/javascript\"></script>\n
-<script src=\"/javascript/sorttable.js\" type=\"text/javascript\"></script>\n
+echo "
 <table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
    <tr>\n
    		<td>\n";
@@ -143,10 +147,15 @@ if($_POST) {
 	}
 	$a_nat[$id]['rulesets'] = $enabled_items;
 	write_config();
-//	stop_service("snort");
-//	create_snort_conf();
-//	sleep(2);
-//	start_service("snort");
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		sleep(2);
+		sync_snort_package_all();
+		fb("$id, $if_real", FirePHP);
+		header("Location: /snort/snort_rulesets.php?id=$id");
 	$savemsg = "The snort ruleset selections have been saved.";
 }
 
@@ -160,15 +169,13 @@ include("head.inc");
 
 <body link="#000000" vlink="#000000" alink="#000000">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
+<p class="pgtitle"><?php if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 <?php
 
 echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\" id=\"iform\">";
 
 ?>
 
-<script src="/row_toggle.js" type="text/javascript"></script>
-<script src="/javascript/sorttable.js" type="text/javascript"></script>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
    <tr>
@@ -221,7 +228,7 @@ echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\
 		echo "	<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />";
 		echo "</td>";
 		echo "<td>";
-		echo "<a href='snort_rules.php?openruleset=/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/" . urlencode($file) . "'>{$file}</a>";
+		echo "<a href='snort_rules.php?id={$id}&openruleset=/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/" . urlencode($file) . "'>{$file}</a>";
 		echo "</td>";
 		//echo "<td>";
 		//echo "description";

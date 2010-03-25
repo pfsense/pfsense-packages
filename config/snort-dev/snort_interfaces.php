@@ -29,28 +29,36 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
-require("/usr/local/pkg/snort/snort_gui.inc");
-include_once("/usr/local/pkg/snort/snort.inc");
+require_once("guiconfig.inc");
+require_once("/usr/local/pkg/snort/snort_gui.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
+
+/* firephp */
+require_once('../FirePHPCore/FirePHP.class.php4');
+require_once('../FirePHPCore/fb.php4');
+ob_start();
+$firephp =& FirePHP::getInstance(true);
+$firephp->setEnabled(true);
+
+fb('Hello, world', FirePHP);
+/* firephp end */
+
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
+
 
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
 
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
-///////////
-
 if (isset($config['installedpackages']['snortglobal']['rule'])) {
 $id_gen = count($config['installedpackages']['snortglobal']['rule']);
 }else{
 $id_gen = '0';
 }
-
-///////////
 
 /* if a custom message has been passed along, lets process it */
 if ($_GET['savemsg'])
@@ -180,67 +188,23 @@ if (isset($_POST['del_x'])) {
 
 
 /* start/stop snort */
-if ($_GET['act'] == "toggle" && $_GET['id'] != "")
+if ($_GET['act'] == 'toggle' && $_GET['id'] != '')
 {
 
-	$if_real2 = convert_friendly_interface_to_real_interface_name($a_nat[$id]['interface']);
+	$if_real = convert_friendly_interface_to_real_interface_name($config['installedpackages']['snortglobal']['rule'][$id]['interface']);
+	$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
-	$snort_uuid = $a_nat[$id]['uuid'];
+		/* Log Iface stop */
+		exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Toggle for {$snort_uuid}_{$if_real}...'");
 	
-	$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}_{$if_real2}\" | awk '{print \$1;}'");
-	$start_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
-	$start_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
-					
-	//$start2_upb_pre = exec("/bin/cat /var/run/barnyard2_{$id}{$if_real2}.pid");
-	//$start2_upb_s = exec("/usr/bin/top -U snort -u | grep barnyard2 | grep {$start2_upb_pre} | awk '{ print $1; }'");
-	//$start2_upb_r = exec("/usr/bin/top -U root -u | grep barnyard2 | grep {$start2_upb_pre} | awk '{ print $1; }'");
+	$tester2 = Running_Ck($snort_uuid, $if_real, $id);
+	
+	if ($tester2 == 'yes') {
+		
+		/* Log Iface stop */
+		exec("/usr/bin/logger -p daemon.info -i -t SnortStartup '{$tester2} yn for {$snort_uuid}_{$if_real}...'");
 
-
-	if ($start_up_s != "" || $start_up_r != "" || $start2_upb_s != "" || $start2_upb_r != "")
-	{
-	
-		/* stop syslog flood code */
-		//exec("/bin/cp /var/log/system.log /var/log/system.log.bk");
-		//sleep(3);	
-	
-		if ($start_up_s != "")
-		{
-			exec("/bin/kill {$start_up_s}");
-			exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real2}*");
-		}
-		
-		//if ($start2_upb_s != "")
-		//{
-			//exec("/bin/kill {$start2_upb_s}");
-			//exec("/bin/rm /var/run/barnyard2_$id$if_real2*");
-		//}
-		
-		if ($start_up_r != "")
-		{
-			exec("/bin/kill {$start_up_r}");
-			exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real2}*");
-		}
-		
-		//if ($start2_upb_r != "")
-		//{
-			//exec("/bin/kill {$start2_upb_r}");
-			//exec("/bin/rm /var/run/barnyard2_$id$if_real2*");
-		//}
-		
-					/* stop syslog flood code */
-					$if_real_wan_id = $a_nat[$id]['interface'];
-					$if_real_wan_id2 = convert_friendly_interface_to_real_interface_name2($if_real_wan_id);
-					exec("/sbin/ifconfig $if_real_wan_id2 -promisc");
-					//exec("/bin/cp /var/log/system.log /var/log/snort/snort_sys_$id$if_real2.log");
-					//exec("/usr/bin/killall syslogd");
-					//exec("/usr/sbin/clog -i -s 262144 /var/log/system.log");
-					//exec("/usr/sbin/syslogd -c -ss -f /var/etc/syslog.conf");
-					//sleep(2);
-					//exec("/bin/cp /var/log/system.log.bk /var/log/system.log");
-					//$after_mem2 = exec("/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{ print $2 }'");
-					//exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'MEM after {$id}{$if_real2} STOP {$after_mem2}'");
-					//exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule STOP for {$id}{$if_real2}...'");
-		
+		Running_Stop($snort_uuid, $if_real, $id);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -251,11 +215,12 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 		header("Location: /snort/snort_interfaces.php");
 				
 	}else{
-		//sync_snort_package_all();
-
-		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}_{$if_real2}\" -D -q -l /var/log/snort -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real2}/snort.conf -i {$if_real2}");
-		//print_r("$id $if_real2");
-
+		
+		sync_snort_package_all($id, $if_real);
+		sync_snort_package();
+		
+		Running_Start($snort_uuid, $if_real, $id);
+		
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
@@ -264,10 +229,11 @@ if ($_GET['act'] == "toggle" && $_GET['id'] != "")
 		sleep(2);
 		header("Location: /snort/snort_interfaces.php");
 	}
+}
 
-}	
 
-$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.15 Beta";
+
+$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.17 RC Final";
 include("head.inc");
 
 ?>
@@ -309,30 +275,13 @@ padding: 15px 10px 50% 50px;
 	padding-top: 4px;
 	padding-bottom: 4px;
 }
-#footer2
-{
-	position: relative;
-	//top: 135px;
-	top: -17px;
-	background-color: #cccccc;
-	background-image: none;
-	background-repeat: repeat;
-	background-attachment: scroll;
-	background-position: 0% 0%;
-	padding-top: 0px;
-	padding-right: 0px;
-	padding-bottom: 0px;
-	padding-left: 10px;
-	//padding-left: 0px;
-	clear: both;
-}
 
 </style>
 
 
 
 <noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
-<form action="snort_interfaces.php" method="post" name="iform">
+<form action="/snort/snort_interfaces.php" method="post" name="iform">
 <?php if (file_exists($d_natconfdirty_path)): ?><p>
 <?php
 	if($savemsg)
@@ -386,29 +335,15 @@ padding: 15px 10px 50% 50px;
 					$if_real = convert_friendly_interface_to_real_interface_name($natent['interface']);
 					$snort_uuid = $natent['uuid'];
 
-					$color_up_ck = exec("/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep snort | /usr/bin/awk '{print \$2;}' | sed 1q");
-					
-					if ($color_up_ck == "")
+					$tester2 = Running_Ck($snort_uuid, $if_real, $id);
+
+					if ($tester2 == 'no')
 					{
-						$iconfn = "pass";
-						$class_color_up = "listbg";
-					}
-
-					if ($color_up_ck != "")
-					{	
-					//$color_up_pre = exec("/bin/cat /var/run/snort_{$if_real}{$nnats}{$if_real}.pid");
-					$color_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}_{$if_real}\" | awk '{print \$1;}'");
-
-					//  /bin/ps -auwx | grep -v grep | grep "$id$if_real -c" | awk '{print $2;}'
-					$color_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$color_up_pre} | /usr/bin/awk '{print \$1;}'");
-					$color_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$color_up_pre} | /usr/bin/awk '{print \$1;}'");
-					if ($color_up_s != "" || $color_up_r != "") {
-						$class_color_up = "listbg2";
-						$iconfn = "block";
+						$iconfn = 'pass';
+						$class_color_up = 'listbg';
 					}else{
-						$class_color_up = "listbg";
-						$iconfn = "pass";
-					}
+						$class_color_up = 'listbg2';
+						$iconfn = 'block';
 					}
 					
 					?>
@@ -464,15 +399,13 @@ padding: 15px 10px 50% 50px;
                     <?=strtoupper($check_blockoffenders);?>
                   </td>
 				  <?php
-				 				  
-					$color2_udp_pre = exec("/bin/cat /var/run/barnyard2_{$nnats}{$if_real}.pid");
-					
-					$color2_upb_s = exec("/usr/bin/top -U snort -u | grep barnyard2 | grep {$color2_udp_pre}");
-					$color2_upb_r = exec("/usr/bin/top -U root -u | grep barnyard2 | grep {$color2_udp_pre}");
-					if ($color2_upb_s != "" || $color2_upb_r != "") {
-						$class_color_upb = "listbg2";
+
+				    $color2_upb = Running_Ck_b($snort_uuid, $if_real, $id);
+				    
+					if ($color2_upb == 'yes') {
+						$class_color_upb = 'listbg2';
 					}else{
-						$class_color_upb = "listbg";
+						$class_color_upb = 'listbg';
 					}
 				   
 				  ?>
@@ -524,9 +457,9 @@ padding: 15px 10px 50% 50px;
 		 <br>
 		 Please edit the <strong>Global Settings</strong> tab before adding an interface.
 		 <br><br>
-		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="Add Icon"> icon to add a interface.&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_pass.gif" width="13" height="13" border="0" title="Start Icon"> icon to <strong>start</strong> snort and barnyard.
+		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="Add Icon"> icon to add a interface.<strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_pass.gif" width="13" height="13" border="0" title="Start Icon"> icon to <strong>start</strong> snort and barnyard.
 		 <br>
-		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" title="Edit Icon"> icon to edit a interface and settings.&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif" width="13" height="13" border="0" title="Stop Icon"> icon to <strong>stop</strong> snort and barnyard.
+		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" title="Edit Icon"> icon to edit a interface and settings.<strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif" width="13" height="13" border="0" title="Stop Icon"> icon to <strong>stop</strong> snort and barnyard.
 		 <br>
 		<strong> Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="Delete Icon"> icon to delete a interface and settings.
 </td>
@@ -540,14 +473,82 @@ if ($pkg['tabs'] <> "") {
 
 </form>
 
+<?php
+/* TODO: remove when 2.0 stable */
+if ($pfsense_stable == 'yes') {
+
+$footer2 = "
+
+<style type=\"text/css\">
+
+#footer2
+{
+	position: relative;
+	top: -17px;
+	background-color: #cccccc;
+	background-image: none;
+	background-repeat: repeat;
+	background-attachment: scroll;
+	background-position: 0% 0%;
+	font-size: 0.9em;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 10px;
+	clear: both;
+}
+
+</style>
+
+	<div id=\"footer2\">
+		<IMG SRC=\"./images/footer2.jpg\" width=\"780px\" height=\"35\" ALT=\"Apps\">
+			Snort is a registered trademark of Sourcefire, Inc, Barnyard2 is a registered trademark of securixlive.com, Orion copyright Robert Zelaya,
+			Emergingthreats is a registered trademark of emergingthreats.net, Mysql is a registered trademark of Mysql.com
+	</div>\n";
+}
+
+if ($pfsense_stable != 'yes') {
+$footer3 = "
+
+<style type=\"text/css\">
+
+#footer2
+{
+
+top: 105px;
+position: relative;
+background-color: #FFFFFF;
+background-image: url(\"./images/footer2.jpg\");
+background-repeat: no-repeat;
+background-attachment: scroll;
+background-position: 0px 0px;
+bottom: 0px;
+width: 770px;
+height: 35px;
+color: #000000;
+text-align: center;
+font-size: 0.8em;
+padding-top: 35px;
+padding-left: 0px;
+clear: both;
+	
+}
+
+</style>
+
+	<div id=\"footer2\">
+			Snort is a registered trademark of Sourcefire, Inc, Barnyard2 is a registered trademark of securixlive.com, Orion copyright Robert Zelaya,
+			Emergingthreats is a registered trademark of emergingthreats.net, Mysql is a registered trademark of Mysql.com
+	</div>\n";
+}
+?>
+
+<?php echo $footer3;?>
+
 </div> <!-- Right DIV -->
 </div> <!-- Content DIV -->
 
-	<div id="footer2"> <!-- style="width:760px; -->
-		<IMG SRC="./images/footer2.jpg" width="780px" height="35" ALT="Apps">
-			<font size="1">Snort® is a registered trademark of Sourcefire, Inc., Barnyard2® is a registered trademark of securixlive.com., Orion® copyright Robert Zelaya., 
-			Emergingthreats is a registered trademark of emergingthreats.net., Mysql® is a registered trademark of Mysql.com.</font>
-	</div>
+<?php echo $footer2;?>
 
         <div id="footer">
 			<a target="_blank" href="http://www.pfsense.org/?gui12" class="redlnk">pfSense</a> is &copy;

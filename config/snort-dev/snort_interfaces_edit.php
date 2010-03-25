@@ -30,8 +30,20 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
-include_once("/usr/local/pkg/snort/snort.inc");
+require_once("guiconfig.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
+
+/* firephp*/
+require_once('../FirePHPCore/FirePHP.class.php');
+require_once('../FirePHPCore/fb.php');
+ob_start();
+$firephp =& FirePHP::getInstance(true);
+$firephp->setEnabled(true);
+
+fb('Hello, world', FirePHP);
+/* firephp end */
+
+
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -61,10 +73,21 @@ if (isset($_GET['dup'])) {
 //}
 
 /* gen uuid for each iface !inportant */
-if ($a_nat[$id]['interface'] == '') {
+if ($config['installedpackages']['snortglobal']['rule'][$id]['uuid'] == '') {
 	//$snort_uuid = gen_snort_uuid(strrev(uniqid(true)));
-	$snort_uuid = mt_rand(0, 65534);
+$snort_uuid = 0;
+while ($snort_uuid > 65535 || $snort_uuid == 0) {
+	$snort_uuid = mt_rand(1, 65535);
 	$pconfig['uuid'] = $snort_uuid;
+	fb($snort_uuid, LOG);
+	}
+}
+
+/* convert fake interfaces to real */
+$if_real = convert_friendly_interface_to_real_interface_name($a_nat[$id]['interface']);
+
+if ($config['installedpackages']['snortglobal']['rule'][$id]['uuid'] != '') {
+	$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 }
 
 if (isset($id) && $a_nat[$id]) {
@@ -105,7 +128,7 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['def_imap_servers'] = $a_nat[$id]['def_imap_servers'];
 	$pconfig['def_imap_ports'] = $a_nat[$id]['def_imap_ports'];
 	$pconfig['def_sip_proxy_ip'] = $a_nat[$id]['def_sip_proxy_ip'];
-	$pconfig['ip def_sip_proxy_ports'] = $a_nat[$id]['ip def_sip_proxy_ports'];
+	$pconfig['def_sip_proxy_ports'] = $a_nat[$id]['def_sip_proxy_ports'];
 	$pconfig['def_auth_ports'] = $a_nat[$id]['def_auth_ports'];
 	$pconfig['def_finger_ports'] = $a_nat[$id]['def_finger_ports'];
 	$pconfig['def_irc_ports'] = $a_nat[$id]['def_irc_ports'];
@@ -138,57 +161,13 @@ if (isset($id) && $a_nat[$id]) {
 
 if (isset($_GET['dup']))
 	unset($id);
-	
-/* convert fake interfaces to real */
-$if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface']);
+
 
 if ($_POST["Submit"]) {
 
-	/* input validation */
-//	if(strtoupper($_POST['proto']) == "TCP" or strtoupper($_POST['proto']) == "UDP" or strtoupper($_POST['proto']) == "TCP/UDP") {
-//		$reqdfields = explode(" ", "interface proto beginport endport localip localbeginport");
-//		$reqdfieldsn = explode(",", "Interface,Protocol,External port from,External port to,NAT IP,Local port");
-//	} else {
-//		$reqdfields = explode(" ", "interface proto localip");
-//		$reqdfieldsn = explode(",", "Interface,Protocol,NAT IP");
-//	}
-
-//	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
-
-//	if (($_POST['localip'] && !is_ipaddroralias($_POST['localip']))) {
-//		$input_errors[] = "\"{$_POST['localip']}\" is not valid NAT IP address or host alias.";
-//	}
-
-	/* only validate the ports if the protocol is TCP, UDP or TCP/UDP */
-//	if(strtoupper($_POST['proto']) == "TCP" or strtoupper($_POST['proto']) == "UDP" or strtoupper($_POST['proto']) == "TCP/UDP") {
-
-//		if (($_POST['beginport'] && !is_ipaddroralias($_POST['beginport']) && !is_port($_POST['beginport']))) {
-//			$input_errors[] = "The start port must be an integer between 1 and 65535.";
-//		}
-
-//		if (($_POST['endport'] && !is_ipaddroralias($_POST['endport']) && !is_port($_POST['endport']))) {
-//			$input_errors[] = "The end port must be an integer between 1 and 65535.";
-//		}
-
-//		if (($_POST['localbeginport'] && !is_ipaddroralias($_POST['localbeginport']) && !is_port($_POST['localbeginport']))) {
-//			$input_errors[] = "The local port must be an integer between 1 and 65535.";
-//		}
-
-//		if ($_POST['beginport'] > $_POST['endport']) {
-			/* swap */
-//			$tmp = $_POST['endport'];
-//			$_POST['endport'] = $_POST['beginport'];
-//			$_POST['beginport'] = $tmp;
-//		}
-
-//		if (!$input_errors) {
-//			if (($_POST['endport'] - $_POST['beginport'] + $_POST['localbeginport']) > 65535)
-//				$input_errors[] = "The target port range must be an integer between 1 and 65535.";
-//		}
-
 		
 		// if ($config['installedpackages']['snortglobal']['rule']) {
-			if ($_POST['descr'] == "") {
+			if ($_POST['descr'] == '' && $pconfig['descr'] == '') {
 				$input_errors[] = "Please  enter a description for your reference.";
 				}
 			
@@ -273,7 +252,7 @@ if ($_POST["Submit"]) {
 	if ($pconfig['def_imap_servers'] != "") { $natent['def_imap_servers'] = $pconfig['def_imap_servers']; }
 	if ($pconfig['def_imap_ports'] != "") { $natent['def_imap_ports'] = $pconfig['def_imap_ports']; }
 	if ($pconfig['def_sip_proxy_ip'] != "") { $natent['def_sip_proxy_ip'] = $pconfig['def_sip_proxy_ip']; }
-	if ($pconfig['ip def_sip_proxy_ports'] != "") { $natent['ip def_sip_proxy_ports'] = $pconfig['ip def_sip_proxy_ports']; }
+	if ($pconfig['def_sip_proxy_ports'] != "") { $natent['def_sip_proxy_ports'] = $pconfig['def_sip_proxy_ports']; }
 	if ($pconfig['def_auth_ports'] != "") { $natent['def_auth_ports'] = $pconfig['def_auth_ports']; }
 	if ($pconfig['def_finger_ports'] != "") { $natent['def_finger_ports'] = $pconfig['def_finger_ports']; }
 	if ($pconfig['def_irc_ports'] != "") { $natent['def_irc_ports'] = $pconfig['def_irc_ports']; }
@@ -298,7 +277,6 @@ if ($_POST["Submit"]) {
 		}
 
 		write_config();
-		// stop_service("snort");
 
 		if ($pconfig['interface'] != "") {
 		sync_snort_package_all();
@@ -317,22 +295,28 @@ if ($_POST["Submit"]) {
 	}
 }
 
-	if (isset($config['installedpackages']['snortglobal']['rule'][$id]['interface']))
+		if (isset($config['installedpackages']['snortglobal']['rule'][$id]['interface']))
 	{
-		if	(uniq_snort_proc($id, $if_real) == 'false')
+		$snort_up_ck2_info = Running_Ck($snort_uuid, $if_real, $id);
+		if	($snort_up_ck2_info == 'no')
 		{
 			$snort_up_ck = '<input name="Submit2" type="submit" class="formbtn" value="Start" onClick="enable_change(true)">';
 		}else{
 			$snort_up_ck = '<input name="Submit3" type="submit" class="formbtn" value="Stop" onClick="enable_change(true)">';
 		}
 	}else{
-		$snort_up_ck = '';
+		$snort_up_ck = '';				
 	}
 
+	
 		if ($_POST["Submit2"]) {
-		sync_snort_package_all($id, $if_real);
+		
+		sync_snort_package_all();
+		sync_snort_package();
 		sleep(1);
-		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}_{$if_real}\" -D -q -l /var/log/snort -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+		
+		Running_Start($snort_uuid, $if_real, $id);
+				
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
@@ -344,24 +328,9 @@ if ($_POST["Submit"]) {
 
 		if ($_POST["Submit3"])
 		{
-				sync_snort_package_all($id, $if_real);
-				sleep(1);
-
-				$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}_{$if_real}\" | awk '{print \$1;}'");
-				$start_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
-				$start_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
-
-			if ($start_up_s != '')
-			{
-				exec("/bin/kill {$start_up_s}");
-				exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}*");
-			}
 		
-			if ($start_up_r != '')
-			{
-				exec("/bin/kill {$start_up_r}");
-				exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}*");
-			}
+			Running_Stop($snort_uuid, $if_real, $id);			
+			
 			header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 			header( 'Cache-Control: no-store, no-cache, must-revalidate' );
@@ -370,11 +339,9 @@ if ($_POST["Submit"]) {
 			sleep(2);
 			header("Location: /snort/snort_interfaces_edit.php?id=$id");
 
-
 		}
 
-$iface_uuid = $a_nat[$id]['uuid'];
-$pgtitle = "Snort: Interface Edit: $id $iface_uuid $if_real";
+$pgtitle = "Snort: Interface Edit: $id $snort_uuid $if_real";
 include("head.inc");
 
 ?>
@@ -395,7 +362,7 @@ border-bottom:2px solid #DBAC48;
 padding: 15px 10px 85% 50px;
 }
 </style> 
-<noscript><div class="alert" ALIGN=CENTER><img src="/themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
+<noscript><div class="alert" ALIGN=CENTER><img src="/themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</strong></div></noscript>
 <script language="JavaScript">
 <!--
 
@@ -407,7 +374,7 @@ function enable_change(enable_change) {
 <?php
 /* make shure all the settings exist or function hide will not work */
 /* if $id is emty allow if and discr to be open */
-if($iface_uuid != '') 
+if($config['installedpackages']['snortglobal']['rule'][$id]['interface'] != '') 
 {
 echo "	
 	document.iform.interface.disabled = endis2;
@@ -416,14 +383,13 @@ echo "
 ?>
 	document.iform.performance.disabled = endis;
 	document.iform.blockoffenders7.disabled = endis;
-	document.iform.snortalertlogtype.disabled = endis;
 	document.iform.alertsystemlog.disabled = endis;
 	document.iform.tcpdumplog.disabled = endis;
 	document.iform.snortunifiedlog.disabled = endis;
 }
 //-->
 </script>
-<p class="pgtitle"><?=$pgtitle?></p>
+<p class="pgtitle"><?php if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
@@ -549,7 +515,7 @@ if ($a_nat[$id]['interface'] != '') {
 				<td width="22%" valign="top" class="vncell">Log to a Tcpdump file</td>
 				<td width="78%" class="vtable">
 					<input name="tcpdumplog" type="checkbox" value="on" <?php if ($pconfig['tcpdumplog'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
-					Snort will log packets to a tcpdump-formatted file. The file then can be analyzed by an application such as Wireshark which understands pcap file formats. WARNING: File may become large.</td>
+					Snort will log packets to a tcpdump-formatted file. The file then can be analyzed by an application such as Wireshark which understands pcap file formats. <span class="red"><strong>WARNING:</strong></span> File may become large.</td>
 				</tr>
 				<tr>
 				<td width="22%" valign="top" class="vncell">Log Alerts to a snort unified2 file</td>

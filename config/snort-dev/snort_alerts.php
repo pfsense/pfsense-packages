@@ -34,9 +34,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("globals.inc");
-require("guiconfig.inc");
-require("/usr/local/pkg/snort/snort.inc");
+require_once("globals.inc");
+require_once("guiconfig.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
 
 $snortalertlogt = $config['installedpackages']['snortglobal']['snortalertlogtype'];
 $snort_logfile = '/var/log/snort/alert';
