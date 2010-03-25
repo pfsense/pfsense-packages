@@ -178,7 +178,7 @@ function ospfd_install_conf() {
 	// ospfd process running?  if so reload, elsewise start.
 	$oarray = array();
 	$rval = 0;
-	exec("/usr/local/sbin/ospfctl reload", , $oarray, $rval);
+	exec("/usr/local/sbin/ospfctl reload", $oarray, $rval);
 	if ($rval != 0) {
 		/*
 		 * ospfd isnt actually running as nothing accepted a connection
