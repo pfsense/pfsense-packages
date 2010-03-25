@@ -33,18 +33,6 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-/* firephp*/
-require_once('../FirePHPCore/FirePHP.class.php');
-require_once('../FirePHPCore/fb.php');
-ob_start();
-$firephp =& FirePHP::getInstance(true);
-$firephp->setEnabled(true);
-
-fb('Hello, world', FirePHP);
-/* firephp end */
-
-
-
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
 }
@@ -79,7 +67,6 @@ $snort_uuid = 0;
 while ($snort_uuid > 65535 || $snort_uuid == 0) {
 	$snort_uuid = mt_rand(1, 65535);
 	$pconfig['uuid'] = $snort_uuid;
-	fb($snort_uuid, LOG);
 	}
 }
 

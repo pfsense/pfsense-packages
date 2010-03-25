@@ -33,16 +33,6 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-/* firephp */
-require_once('../FirePHPCore/FirePHP.class.php4');
-require_once('../FirePHPCore/fb.php4');
-ob_start();
-$firephp =& FirePHP::getInstance(true);
-$firephp->setEnabled(true);
-
-fb('Hello, world', FirePHP);
-/* firephp end */
-
 
 $id = $_GET['id'];
 if (isset($_POST['id']))

@@ -33,15 +33,6 @@ require_once("filter.inc");
 require_once("service-utils.inc");
 include_once("/usr/local/pkg/snort/snort.inc");
 
-/* firephp*/
-require_once('../FirePHPCore/FirePHP.class.php');
-require_once('../FirePHPCore/fb.php');
-ob_start();
-$firephp =& FirePHP::getInstance(true);
-$firephp->setEnabled(true);
-
-fb('Hello, world', FirePHP);
-/* firephp end */
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -81,7 +72,6 @@ include("fbegin.inc");
 
 echo "<p class=\"pgtitle\">";
 if($pfsense_stable == 'yes'){echo $pgtitle;}
-fb($pfsense_stable, FirePHP);
 echo "</p>\n";
 
 echo "<body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\">";
@@ -154,7 +144,6 @@ if($_POST) {
 		header( 'Pragma: no-cache' );
 		sleep(2);
 		sync_snort_package_all();
-		fb("$id, $if_real", FirePHP);
 		header("Location: /snort/snort_rulesets.php?id=$id");
 	$savemsg = "The snort ruleset selections have been saved.";
 }
