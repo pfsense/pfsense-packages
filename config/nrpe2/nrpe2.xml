@@ -14,7 +14,7 @@
 		<url>/pkg_edit.php?xml=nrpe2.xml&amp;id=0</url>
 	</menu>
 	<service>
-		<name>NRPEv2</name>
+		<name>nrpe2</name>
 		<rcfile>nrpe2</rcfile>
 		<executable>nrpe2</executable>
 		<description>Nagios NRPE Daemon</description>
