@@ -1,19 +1,17 @@
 
 
-March 16 2019
-Snort-dev 2.8.5.3 pk v. 12 Beta
+March 26 2019
+Snort-dev 2.8.5.3 pk v. 18 final
 
-Snort is Stoping/Starting with new UUID. Files are independent of rule order now. Ya me.......
+Final day.
 
-TODO: 
-The snort.sh code needs to be looked at and made sure there is a new file at every enabe/disbale save, 
-reboot, rule delete.
+Odds and ends left.
 
-The snort_interfaces.php needs speed inprovments. !inportant.
-
-Make sure I ad a reset button someware the removes all of snort-devs addd to config.xml
+2.0 group snort gets lost on reboot.
 
 Pierre POMES code needs to be added.
+
+Threshold tab needs to be added.
 
 
 Done.

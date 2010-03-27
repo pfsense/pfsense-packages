@@ -73,7 +73,7 @@ clear: both;
 
 </style>
 <body>
-<?php include("fbegin.inc"); ?>
+<?php include("./snort_fbegin.inc"); ?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>

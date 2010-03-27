@@ -81,7 +81,7 @@ if ($id_d == "" || $snort_emrging_info == "stop" || $snort_oinkid_info == "stop"
 $pgtitle = "Services: Snort: Rule Updates";
 
 include("head.inc");
-include("fbegin.inc");
+include("./snort_fbegin.inc");
 echo "<p class=\"pgtitle\">";
 if($pfsense_stable == 'yes'){echo $pgtitle;}
 echo "</p>\n";
@@ -220,7 +220,7 @@ setTimeout($.unblockUI, 2000);
 </script>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("/usr/local/www/fbegin.inc"); ?>
+<?php include("./snort_fbegin.inc"); ?>
 <p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 
 <form action="snort_download_rules.php" method="post">

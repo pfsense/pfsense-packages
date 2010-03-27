@@ -327,6 +327,35 @@ if ($_POST["Submit"]) {
 			header("Location: /snort/snort_interfaces_edit.php?id=$id");
 
 		}
+		
+				if ($_POST["Reset"])
+		{
+
+			conf_mount_rw();
+		
+			Running_Stop($snort_uuid, $if_real, $id);
+			sleep(2);
+			
+			/* remove all snort iface dir */
+			exec('rm -r /usr/local/etc/snort/snort_*');
+			exec('rm /var/log/snort/*');
+
+			unset($config['installedpackages']['snortglobal']['rule'][$id]);
+    		write_config();
+			
+			header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+			header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+			header( 'Cache-Control: post-check=0, pre-check=0', false );
+			header( 'Pragma: no-cache' );
+			sleep(2);
+			header("Location: /snort/snort_interfaces_edit.php?id=$id");
+			
+			conf_mount_ro();
+
+		}	
+		
+		
 
 $pgtitle = "Snort: Interface Edit: $id $snort_uuid $if_real";
 include("head.inc");
@@ -334,7 +363,7 @@ include("head.inc");
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php 
-include("fbegin.inc");
+include("./snort_fbegin.inc");
 ?>
 <style type="text/css">
 .alert {
@@ -417,12 +446,15 @@ if ($a_nat[$id]['interface'] != '') {
     $tab_array = array();
     $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
     $tab_array[] = array("If Settings", true, "/snort/snort_interfaces_edit.php?id={$id}");
+    /* hide user tabs when no settings have be saved */
+	if ($config['installedpackages']['snortglobal']['rule'][$id]['interface'] != '') {
     //$tab_array[] = array("upload", false, "/snort/snort_conf_upload.php?id={$id}");
     $tab_array[] = array("Categories", false, "/snort/snort_rulesets.php?id={$id}");
     $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
     $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
     $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
     $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
+	}
     display_top_tabs($tab_array);	
 		
 ?>
@@ -511,7 +543,8 @@ if ($a_nat[$id]['interface'] != '') {
 					Snort will log Alerts to a file in the UNIFIED2 format. This is a requirement for barnyard2.</td>
 				</tr>
                 <tr>
-                  <td width="22%" valign="top">&nbsp;</td>
+                  <td width="22%" valign="top"><input name="Reset" type="submit" class="formbtn" value="Reset" onclick="return confirm('Do you really want to reset this Snort Interface?')" ><span class="red"><strong>&nbsp;WARNING:</strong><br>
+	  				This will reset this interface.</span>&nbsp;</td>
                   <td width="78%">
                     <input name="Submit" type="submit" class="formbtn" value="Save"> <?php echo $snort_up_ck; ?> <input type="button" class="formbtn" value="Cancel" onclick="history.back()">
                     <?php if (isset($id) && $a_nat[$id]): ?>

@@ -68,7 +68,7 @@ $isrulesfolderempty = exec("ls -A /usr/local/etc/snort/snort_{$iface_uuid}_{$if_
 if ($isrulesfolderempty == "") {
 
 include("head.inc");
-include("fbegin.inc");
+include("./snort_fbegin.inc");
 
 echo "<p class=\"pgtitle\">";
 if($pfsense_stable == 'yes'){echo $pgtitle;}
@@ -157,7 +157,7 @@ include("head.inc");
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
-<?php include("fbegin.inc"); ?>
+<?php include("./snort_fbegin.inc"); ?>
 <p class="pgtitle"><?php if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 <?php
 

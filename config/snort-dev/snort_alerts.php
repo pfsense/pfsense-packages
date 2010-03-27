@@ -311,7 +311,7 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php 
 
-include("fbegin.inc");
+include("./snort_fbegin.inc");
 
 echo "<p class=\"pgtitle\">";
 if($pfsense_stable == 'yes'){echo $pgtitle;}

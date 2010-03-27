@@ -169,7 +169,7 @@ if (isset($_POST['del_x'])) {
 			conf_mount_ro();
 		
 	    write_config();
-	    touch($d_natconfdirty_path);
+	    //touch($d_natconfdirty_path);
 	    header("Location: /snort/snort_interfaces.php");
 	    exit;
 	}
@@ -223,12 +223,12 @@ if ($_GET['act'] == 'toggle' && $_GET['id'] != '')
 
 
 
-$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.17 RC Final";
+$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.18 RC Final";
 include("head.inc");
 
 ?>
 <body link="#000000" vlink="#000000" alink="#000000">
-<?php include("fbegin.inc"); ?>
+<?php include("./snort_fbegin.inc"); ?>
 <p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 <style type="text/css">
 
@@ -337,7 +337,7 @@ padding: 15px 10px 50% 50px;
 					}
 					
 					?>
-                  <td class="listt"><a href="?act=toggle&id=<?=$i;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_<?=$iconfn;?>.gif" width="13" height="13" border="0" title="click to toggle start/stop snort"></a><input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0; width: 7px; height: 7px;"></td>
+                  <td class="listt"><a href="?act=toggle&id=<?=$i;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_<?=$iconfn;?>.gif" width="13" height="13" border="0" title="click to toggle start/stop snort"></a><input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0;"></td>
                  <td class="listt" align="center"></td>
                   <td class="<?=$class_color_up;?>" onClick="fr_toggle(<?=$nnats;?>)" id="frd<?=$nnats;?>" ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 		    <?php
@@ -480,7 +480,8 @@ $footer2 = "
 	background-repeat: repeat;
 	background-attachment: scroll;
 	background-position: 0% 0%;
-	font-size: 0.9em;
+	font-size: 0.8em;
+	text-align: center;
 	padding-top: 0px;
 	padding-right: 0px;
 	padding-bottom: 0px;

@@ -62,6 +62,8 @@ if ($_POST) {
 	}
 
 	if (!$input_errors) {
+		
+		if ($_POST["Submit"]) {
 
 		$config['installedpackages']['snortglobal']['snortdownload'] = $_POST['snortdownload'];
 		$config['installedpackages']['snortglobal']['oinkmastercode'] = $_POST['oinkmastercode'];
@@ -107,11 +109,135 @@ if ($_POST) {
 		
 		
 		$savemsg = get_std_save_message($retval);
+
+		}
+	}
+	
+	
+	if ($_POST["Reset"]) {
+		
+//////>>>>>>>>>
+
+	function snort_deinstall_settings()
+{
+
+	global $config, $g, $id, $if_real;
+	conf_mount_rw();
+
+
+	exec("/usr/usr/bin/killall snort");
+	sleep(2);
+	exec("/usr/usr/bin/killall -9 snort");
+	sleep(2);
+	exec("/usr/usr/bin/killall barnyard2");
+	sleep(2);
+	exec("/usr/usr/bin/killall -9 barnyard2");
+	sleep(2);
+
+	/* Remove snort cron entries Ugly code needs smoothness*/
+function snort_rm_blocked_deinstall_cron($should_install)
+{
+        global $config, $g;
+		conf_mount_rw();
+
+        $is_installed = false;
+
+        if(!$config['cron']['item'])
+        return;
+
+        $x=0;
+        foreach($config['cron']['item'] as $item)
+		{
+            if (strstr($item['command'], "snort2c"))
+			{
+                    $is_installed = true;
+                    break;
+            }
+				
+            $x++;
+			
+		}
+            if($is_installed == true)
+				{
+					if($x > 0)
+						{
+                            unset($config['cron']['item'][$x]);
+                            write_config();
+							conf_mount_rw();
+						}
+                
+				configure_cron();
+				
+				}
+				conf_mount_ro();
+
+}		
+		
+	function snort_rules_up_deinstall_cron($should_install)
+{
+        global $config, $g;
+		conf_mount_rw();
+
+        $is_installed = false;
+
+        if(!$config['cron']['item'])
+                return;
+
+        $x=0;
+        foreach($config['cron']['item'] as $item) {
+                if (strstr($item['command'], "snort_check_for_rule_updates.php")) {
+                        $is_installed = true;
+                        break;
+                }
+                $x++;
+			}
+                      if($is_installed == true) {
+                         if($x > 0) {
+                                unset($config['cron']['item'][$x]);
+                                write_config();
+								conf_mount_rw();
+                         }
+                  configure_cron();
+			}
+}
+
+snort_rm_blocked_deinstall_cron("");
+snort_rules_up_deinstall_cron("");
+
+		
+	/* Unset snort registers in conf.xml IMPORTANT snort will not start with out this */
+	/* Keep this as a last step */
+	unset($config['installedpackages']['snortglobal']);
+    write_config();
+	conf_mount_rw();
+	
+	/* remove all snort iface dir */
+	exec('rm -r /usr/local/etc/snort/snort_*');
+	exec('rm /var/log/snort/*');
+	
+	conf_mount_ro();
+
+}
+
+	snort_deinstall_settings();
+	
+			header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		sleep(2);
+		header("Location: /snort/snort_interfaces_global.php");
+
+		exit;
+    
+//////>>>>>>>>>
 	}
 }
+
 include("head.inc");
 ?>
-<?php include("fbegin.inc"); ?>
+<?php include("./snort_fbegin.inc"); ?>
 <p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
@@ -163,7 +289,6 @@ include("head.inc");
                 <td class="vncell" valign="top">Code</td>
                 <td class="vtable"><input name="oinkmastercode" type="text" class="formfld" id="oinkmastercode" size="52" value="<?=htmlspecialchars($pconfig['oinkmastercode']);?>"><br>
                 Obtain a snort.org Oinkmaster code and paste here.</td>
-    </td>
   </table>
     </tr>
     <tr>
@@ -224,7 +349,9 @@ include("head.inc");
 		Hint: Best pratice is to chose full logging.</span>&nbsp;<span class="red"><strong>WARNING:</strong></span>&nbsp;<strong>On change, alert file will be cleared.</strong></td>
 	</tr>
 	<tr>
-	  <td width="22%" valign="top">&nbsp;</td>
+	  <td width="22%" valign="top"><input name="Reset" type="submit" class="formbtn" value="Reset" onclick="return confirm('Do you really want to delete all global and interface settings?')"><span class="red"><strong>&nbsp;WARNING:</strong><br>
+	  This will reset all global and interface settings.</span>
+	  </td>
 	  <td width="78%">
 		<input name="Submit" type="submit" class="formbtn" value="Save" onClick="enable_change(true)"> <input type="button" class="formbtn" value="Cancel" onclick="history.back()">
 	  </td>
