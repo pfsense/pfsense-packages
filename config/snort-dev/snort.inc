@@ -286,6 +286,15 @@ function snort_postinstall()
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/sortableTable.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/tabs.js');
 	
+	/* install barnyard2 for 2.0 and 1.2.3 */
+	chdir ("/usr/local/bin/");
+	if ($pfsense_stable == 'yes') {
+		exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/bin/7.2.x86/barnyard2');
+	}else{
+		exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/bin/8.0.x86/barnyard2');
+	}
+	exec('/bin/chmod 077 /usr/local/bin/barnyard2');
+	
 	/* back to default */
 	chdir ("/root/");
 	
