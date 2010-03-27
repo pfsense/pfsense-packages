@@ -259,6 +259,15 @@ function snort_postinstall()
 		exec('/bin/rm /usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example*');
 	}
 
+	/* find out if were in 1.2.3-RELEASE */
+	$pfsense_ver_chk = exec('/bin/cat /etc/version');
+	if ($pfsense_ver_chk == '1.2.3-RELEASE')
+	{
+		$pfsense_stable = 'yes';
+	}else{
+		$pfsense_stable = 'no';
+	}
+
 	/* move files around, make it look clean */
 	exec('/bin/mkdir -p /usr/local/www/snort/css');
 	exec('/bin/mkdir -p /usr/local/www/snort/images');
