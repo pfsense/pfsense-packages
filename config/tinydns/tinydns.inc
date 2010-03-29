@@ -130,11 +130,17 @@ EOD;
 ?>
 ENDPHP\n";
 
-	$stop = <<<ENDSH
-	svc -dx /var/run/service/tinydns
-	/bin/rm -f /var/run/service/tinydns
-	PIDTOKILL=`cat /var/run/ping_hosts.pid`
-	kill \$PIDTOKILL
+	$stop = "";
+	$interfaces = explode(",", $config['installedpackages']['tinydns']['config'][0]['interface']);
+	foreach ($interfaces as $dnsidx => $dnsif)
+		$stop .= "\t/usr/local/bin/svc -dx {$g['varrun_path']}/service/dnscache{$dnsidx}\n";
+		
+	
+	$stop .= <<<ENDSH
+	/usr/local/bin/svc -dx {$g['varrun_path']}/service/tinydns
+	/usr/local/bin/svc -dx {$g['varrun_path']}/service/axfrdns
+	/bin/rm -rf {$g['varrun_path']}/service/tinydns {$g['varetc_path']}/tinydns {$g['varrun_path']}/dnscache* {$g['varetc_path']}/dnscache* {$g['varetc_path']}/axfrdns {$g['varrun_path']}/axfrdns
+	/bin/pkill -F /var/run/ping_hosts.pid
 ENDSH;
 
 	write_rcfile(array(
@@ -153,6 +159,8 @@ function tinydns_custom_php_deinstall_command() {
 
 	conf_mount_rw();
 	/* destroy all daemontools items */
+	exec("/usr/local/etc/rc.d/tinydns.sh stop");
+	exec("/usr/local/etc/rc.d/svscan.sh stop");
 	exec("/usr/bin/killall supervise");
 	exec("/usr/bin/killall tinydns");	
 	exec("/usr/sbin/pw groupdel Gtinydns");
@@ -165,7 +173,7 @@ function tinydns_custom_php_deinstall_command() {
 	exec("rm /usr/local/www/*tinydns*");
 	exec("rm /usr/local/pkg/*tinydns*");
 	exec("rm /usr/local/pkg/pf/*tinydns*");
-	exec("rm -rf {$g['varetc_path']}/etc/tinydns {$g['varrun_path']}/service/tinydns");
+	exec("rm -rf {$g['varetc_path']}/etc/tinydns {$g['varrun_path']}/service/tinydns {$g['varetc_path']}/axfrdns");
 	exec("rm -rf {$g['varetc_path']}/etc/dnscache* {$g['varrun_path']}/service/dnscache*");
 	filter_configure();
 	conf_mount_ro();
