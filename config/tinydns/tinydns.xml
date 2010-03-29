@@ -57,8 +57,14 @@
 		<url>/tinydns_status.php</url>
 	</menu>
 	<service>
-		<name>DNS Server</name>
+		<name>svscan</name>
 		<rcfile>svscan.sh</rcfile>
+		<executable>svscan</executable>
+		<description>Daemontools service directory watcher</description>
+	</service>	
+	<service>
+		<name>DNS Server</name>
+		<rcfile>tinydns.sh</rcfile>
 		<executable>tinydns</executable>
 		<description>TinyDNS DNS Server</description>
 	</service>	

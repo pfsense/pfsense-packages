@@ -111,8 +111,6 @@ svscan_start () {
 svscan_stop_post () {
         echo "Stopping svscan."
         find -L "\$svscan_servicedir" -mindepth 1 -maxdepth 2 -type d \( \! -path "\$svscan_servicedir/*/*" -or -name 'log' \) -print0 | xargs -0 /usr/local/bin/svc -dx
-        PIDTOKILL=`cat /var/run/ping_hosts.pid`
-        kill $PIDTOKILL
 }
 
 run_rc_command "\$1"
@@ -121,12 +119,33 @@ EOD;
 
 	fwrite($fd, $svscan);
 	fclose($fd);
+
+	$filename = "tinydns.sh";
+	$start = "/usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDPHP
+<?php
+	require_once(\"/usr/local/pkg/tinydns.inc\");
+	tinydns_custom_php_changeip_command();
+	tinydns_create_zone_file();
+	tinydns_setup_ping_items();
+?>
+ENDPHP\n";
+
+	$stop = <<<ENDSH
+	svc -dx /var/run/service/tinydns
+	/bin/rm -f /var/run/service/tinydns
+	PIDTOKILL=`cat /var/run/ping_hosts.pid`
+	kill \$PIDTOKILL
+ENDSH;
+
+	write_rcfile(array(
+		"file" => $filename,
+		"start" => $start,
+		"stop" => $stop
+		)
+	);
+
 	conf_mount_ro();
 	filter_configure();
-
-	tinydns_custom_php_changeip_command();
-	
-	exec("/usr/local/etc/rc.d/svscan.sh start");
 }
 
 function tinydns_custom_php_deinstall_command() {
