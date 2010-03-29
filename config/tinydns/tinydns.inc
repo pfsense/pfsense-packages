@@ -89,7 +89,7 @@ name="svscan"
 rcvar=`set_rcvar`
 command="/usr/local/bin/svscan"
 svscan_enable=\${svscan_enable-"YES"}
-svscan_servicedir=\${svscan_servicedir-"/service"}
+svscan_servicedir=\${svscan_servicedir-"{$g['varrun_path']}/service"}
 
 start_cmd="svscan_start"
 stop_postcmd="svscan_stop_post"
@@ -143,8 +143,8 @@ function tinydns_custom_php_deinstall_command() {
 	exec("rm /usr/local/www/*tinydns*");
 	exec("rm /usr/local/pkg/*tinydns*");
 	exec("rm /usr/local/pkg/pf/*tinydns*");
-	exec("rm -rf /etc/tinydns /service/tinydns");
-	exec("rm -rf /etc/dnscache* /service/dnscache*");
+	exec("rm -rf /etc/tinydns {$g['varrun_path']}/service/tinydns");
+	exec("rm -rf /etc/dnscache* {$g['varrun_path']}/service/dnscache*");
 	filter_configure();
 	conf_mount_ro();
 }
@@ -170,24 +170,24 @@ function tinydns_custom_php_changeip_command() {
 	$ztipaddress = populate_zt_array();
 
 	/* setup daemon tools service area */
-	if(!is_dir("/service"))	
-		exec("/bin/mkdir /service");
+	if(!is_dir("{$g['varrun_path']}/service"))	
+		exec("/bin/mkdir -p {$g['varrun_path']}/service");
 
 	exec("/usr/sbin/pw useradd Gtinydns");
 	exec("/usr/sbin/pw useradd Gdnslog");
 	exec("/usr/sbin/pw useradd Gdnscache");
 	exec("/usr/sbin/pw useradd Gaxfrdns");
 	exec("/bin/rm -r /etc/dnscache*");
-	exec("/bin/rm -r /service/dnscache*");
+	exec("/bin/rm -r {$g['varrun_path']}/service/dnscache*");
 
 	/* TinyDNS Server */
 	exec("/usr/local/bin/tinydns-conf Gtinydns Gdnslog /etc/tinydns {$dnsserverip}");
-	exec("/bin/ln -s /etc/tinydns /service/");
+	exec("/bin/ln -s /etc/tinydns {$g['varrun_path']}/service/");
 
 	/* AXFRDNS - Zone transfers */
 	if(is_array($ztipaddress)) 
 		exec("/usr/local/bin/axfrdns-conf Gaxfrdns Gdnslog /etc/axfrdns /etc/tinydns {$dnsserverip}");
-	exec("/bin/ln -s /etc/axfrdns /service/");
+	exec("/bin/ln -s /etc/axfrdns {$g['varrun_path']}/service/");
 
 	exec("echo {$dnsserverip} > /etc/tinydns/env/IP");
 	exec("/usr/bin/killall -9 tinydns");
@@ -197,7 +197,7 @@ function tinydns_custom_php_changeip_command() {
 		exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.original");
 		exec("/bin/cp /var/etc/resolv.conf /var/etc/resolv.conf.dnscache");
 		exec("echo domain {$config['system']['domain']} > /var/etc/resolv.conf");
-		exec("rm -rf /etc/dnscache* /service/dnscache*");
+		exec("rm -rf /etc/dnscache* {$g['varrun_path']}/service/dnscache*");
 		foreach ($interfaces as $dnsidx => $dnsif) {
 			$dnscacheif = convert_friendly_interface_to_real_interface_name($dnsif);
 			$dnscacheip = find_interface_ip($dnscacheif);
@@ -209,7 +209,7 @@ function tinydns_custom_php_changeip_command() {
 			$dnsuserip = $arr[0];
 			exec("mkdir /etc/dnscache{$dnsidx}");
 			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog /etc/dnscache{$dnsidx} {$dnscacheip}");
-			exec("/bin/ln -s /etc/dnscache{$dnsidx} /service/");
+			exec("/bin/ln -s /etc/dnscache{$dnsidx} {$g['varrun_path']}/service/");
 			if (!is_dir("/etc/dnscache{$dnsidx}/env/IP"))
 				exec("mkdir -p /etc/dnscache{$dnsidx}/env");
 			exec("echo {$dnscacheip} > /etc/dnscache{$dnsidx}/env/IP");
@@ -270,7 +270,7 @@ function tinydns_setup_axfrdns() {
 	}
 	fclose($fd);
 	// Recompile database
-	exec("cd /service/axfrdns && /usr/local/bin/tinydns-data");
+	exec("cd {$g['varrun_path']}/service/axfrdns && /usr/local/bin/tinydns-data");
 }
 
 function tinydns_get_record_status($record, $pingthreshold = "", $wanpingthreshold = "") {
@@ -384,13 +384,13 @@ function tinydns_create_zone_file() {
 	if(file_exists("/tmp/config.cache"))
 		unlink("/tmp/config.cache");
 	config_lock();
-	if(file_exists("/service/tinydns/root/data"))
-		exec("rm -f /service/tinydns/root/data");
-	if(!is_dir("/service/tinydns/root"))
+	if(file_exists("{$g['varrun_path']}/service/tinydns/root/data"))
+		exec("rm -f {$g['varrun_path']}/service/tinydns/root/data");
+	if(!is_dir("{$g['varrun_path']}/service/tinydns/root"))
 		return;
-	$fd = fopen("/service/tinydns/root/data", "w");
+	$fd = fopen("{$g['varrun_path']}/service/tinydns/root/data", "w");
 	if(!$fd) {
-		log_error("Could not open /service/tinydns/root/data for writing.");
+		log_error("Could not open {$g['varrun_path']}/service/tinydns/root/data for writing.");
 		return;
 	}
 	
@@ -519,7 +519,7 @@ function tinydns_create_zone_file() {
 	}
 	fclose($fd);
 	/* tell tinydns to reload zone file */
-	exec("cd /service/tinydns/root && /usr/local/bin/tinydns-data");
+	exec("cd {$g['varrun_path']}/service/tinydns/root && /usr/local/bin/tinydns-data");
 	config_unlock();
 	conf_mount_ro();
 }
@@ -937,8 +937,9 @@ function tinydns_dnscache_forwarding_servers($index) {
 
 /* This routine adds filenames to /etc/dnscache/root/servers/ with the contents pointing to the tinyDNS server */
 function tinydns_create_soa_domain_list($dnsserverip, $index = 0) {
-	if(file_exists("/service/tinydns/root/data"))
-		$tinydns_data = file_get_contents("/service/tinydns/root/data");
+	global $g;
+	if(file_exists("{$g['varrun_path']}/service/tinydns/root/data"))
+		$tinydns_data = file_get_contents("{$g['varrun_path']}/service/tinydns/root/data");
 	else
 		$tinydns_data = "";
 	$datalen = strlen($tinydns_data);
