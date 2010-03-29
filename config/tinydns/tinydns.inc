@@ -323,16 +323,17 @@ function tinydns_get_backup_record($record) {
 
 function tinydns_setup_ping_items() {
 	global $g, $config;
+
 	if(!$config['installedpackages']['tinydnsdomains'])
 		return;
 	$wanif = get_real_wan_interface();
 	$ip = find_interface_ip($wanif);
-	conf_mount_rw();
+
 	$processed = array();
 	/* XXX: make this work with other packages */
-	$fd = fopen("/var/db/pkgpinghosts", "w");
+	$fd = fopen("{$g['vardb_path']}/pkgpinghosts", "w");
 	if(!$fd) {
-		log_error("Could not open /var/db/pkgpinghosts for writing.");
+		log_error("Could not open {$g['vardb_path']}/pkgpinghosts for writing.");
 		return;
 	}
 	config_lock();
@@ -379,7 +380,6 @@ function tinydns_setup_ping_items() {
 	}
 	fclose($fd);
 	config_unlock();
-	conf_mount_ro();
 }
 
 function tinydns_create_zone_file() {
