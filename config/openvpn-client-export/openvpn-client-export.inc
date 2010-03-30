@@ -90,8 +90,8 @@ function openvpn_client_pem_to_pk12($outpath, $outpass, $crtpath, $keypath, $cap
 		unlink($capath);
 }
 
-function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy) {
-	global $config, $input_errors;
+function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy, $zipconf = false, $outpass = "") {
+	global $config, $input_errors, $g;
 
 	// lookup server settings
 	$settings = $config['openvpn']['openvpn-server'][$srvid];
@@ -195,7 +195,41 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	if ($settings['passtos'])
 		$conf .= "passtos\n";
 
-	return $conf;
+	if ($zipconf == true) {
+		// create template directory
+        	$tempdir = "{$g['tmp_path']}/{$prefix}";
+        	mkdir($tempdir, 0700, true);
+
+		file_put_contents("{$tempdir}/{$prefix}-ovpn.conf", $conf);
+
+        	file_put_contents("{$tempdir}/{$prefix}-ca.crt", base64_decode($server_ca['crt']));
+        	if ($settings['tls']) {
+                	$tlsfile = "{$tempdir}/{$prefix}-tls.key";
+                	file_put_contents($tlsfile, base64_decode($settings['tls']));
+        	}
+
+        	// write key files
+        	if ($settings['mode'] != "server_user") {
+                	$crtfile = "{$tempdir}/{$prefix}-cert.crt";
+                	file_put_contents($crtfile, base64_decode($cert['crt']));
+                	$keyfile = "{$tempdir}/{$prefix}.key";
+                	file_put_contents($keyfile, base64_decode($cert['prv']));
+
+			// convert to pkcs12 format
+                	$p12file = "{$tempdir}/{$prefix}.p12";
+                	if ($usetoken)
+                        	openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
+                	else
+                        	openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
+
+        		exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$g['tmp_path']}/{$prefix}-config.zip {$prefix}");
+
+        		// Remove temporary directory
+        		exec("rm -rf {$tempdir}");
+			return "{$prefix}-config.zip";
+        	}
+	}  else
+		return $conf;
 }
 
 function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass, $proxy) {
@@ -284,13 +318,12 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 		file_put_contents($crtfile, base64_decode($cert['crt']));
 		$keyfile = "{$tempdir}/config/{$prefix}-{$user['name']}.key";
 		file_put_contents($keyfile, base64_decode($cert['prv']));
-	
-		// convert to pkcs12 format
-		$p12file = "{$tempdir}/config/{$prefix}.p12";
-		if ($usetoken)
-			openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
-		else
-			openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
+               	// convert to pkcs12 format
+               	$p12file = "{$tempdir}/{$prefix}.p12";
+               	if ($usetoken)
+                       	openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
+               	else
+                       	openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
 	}
 
 	// 7zip the configuration data
