@@ -50,40 +50,38 @@ $id_gen = count($config['installedpackages']['snortglobal']['rule']);
 $id_gen = '0';
 }
 
-/* if a custom message has been passed along, lets process it */
-if ($_GET['savemsg'])
-	$savemsg = $_GET['savemsg'];
 
-if ($_POST) {
-
-	$pconfig = $_POST;
-
+/* alert file */
+$d_snortconfdirty_path_ls = exec('/bin/ls /var/run/snort_conf_*.dirty');
+	
+	/* this will exec when alert says apply */
 	if ($_POST['apply']) {
-
-		write_config();
-
-		$retval = 0;
-
-		if(stristr($retval, "error") <> true)
-		    $savemsg = get_std_save_message($retval);
-		else
-		    $savemsg = $retval;
-
-		unlink_if_exists("/tmp/config.cache");
-		$retval |= filter_configure();
-
-		if ($retval == 0) {
-			if (file_exists($d_natconfdirty_path))
-				unlink($d_natconfdirty_path);
-			if (file_exists($d_filterconfdirty_path))
-				unlink($d_filterconfdirty_path);
+		
+		if ($d_snortconfdirty_path_ls != '') {
+			
+			write_config();
+			
+			sync_snort_package_empty();
+			sync_snort_package();
+			
+			exec('/bin/rm /var/run/snort_conf_*.dirty');
+			
+			header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+			header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+			header( 'Cache-Control: post-check=0, pre-check=0', false );
+			header( 'Pragma: no-cache' );
+			sleep(2);
+			header("Location: /snort/snort_interfaces.php");
+			
+			exit;
+			
 		}
-
-		exec("echo  \"Sync Empty on POST on interfaces.php....\" >> /root/test.log");
-
+		
 	}
-}
-
+	
+	
+	
 if (isset($_POST['del_x'])) {
     /* delete selected rules */
     if (is_array($_POST['rule']) && count($_POST['rule'])) {
@@ -162,14 +160,21 @@ if (isset($_POST['del_x'])) {
 	        unset($a_nat[$rulei]);
 	    }
 		
-			exec("echo  \"Removing old files ....\" >> /root/test.log");
 			conf_mount_rw();
 			exec("/bin/rm /var/log/snort/snort.u2_{$snort_uuid}_{$if_real}*");
 			exec("/bin/rm -r /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}");
 			conf_mount_ro();
 		
 	    write_config();
-	    //touch($d_natconfdirty_path);
+	    
+	    touch("/var/run/snort_conf_delete.dirty");
+	    
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		sleep(2);
 	    header("Location: /snort/snort_interfaces.php");
 	    exit;
 	}
@@ -272,19 +277,40 @@ padding: 15px 10px 50% 50px;
 
 <noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
 <form action="/snort/snort_interfaces.php" method="post" name="iform">
-<?php if (file_exists($d_natconfdirty_path)): ?><p>
+
 <?php
-	if($savemsg)
-		print_info_box_np2("{$savemsg}<br>The Snort configuration has been changed.<br>You must apply the changes in order for them to take effect.");
-	else
-		print_info_box_np2("The Snort configuration has been changed.<br>You must apply the changes in order for them to take effect.");
+
+	/* Display Alert message */
+
+	if ($input_errors) {
+	print_input_errors($input_errors); // TODO: add checks
+	}
+
+	if ($savemsg) {
+	print_info_box2($savemsg);
+	}
+
+	//if (file_exists($d_snortconfdirty_path)) {
+	if ($d_snortconfdirty_path_ls != '') {
+	echo '<p>';
+
+		if($savemsg) {
+			print_info_box_np2("{$savemsg}");
+		}else{
+			print_info_box_np2('
+			The Snort configuration has changed for one or more interfaces.<br>
+			You must apply the changes in order for them to take effect.<br>
+			');
+		}
+	}
+
 ?>
-<?php endif; ?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
 <?php
 	$tab_array = array();
-	$tab_array[] = array("Snort Inertfaces", true, "/snort/snort_interfaces.php");
+	$tab_array[] = array("Snort Interfaces", true, "/snort/snort_interfaces.php");
 	$tab_array[] = array("Global Settings", false, "/snort/snort_interfaces_global.php");
 	$tab_array[] = array("Rule Updates", false, "/snort/snort_download_rules.php");
 	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
@@ -299,7 +325,7 @@ padding: 15px 10px 50% 50px;
 	<div id="mainarea">
               <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr id="frheader">
-				<td width="4%" class="list">&nbsp;</td>
+				<td width="5%" class="list">&nbsp;</td>
 		          <td width="1%" class="list">&nbsp;</td>
                   <td width="10%" class="listhdrr">If</td>
 				  <td width="10%" class="listhdrr">Snort</td>

@@ -29,9 +29,10 @@
 */
 
 require("guiconfig.inc");
-require_once("filter.inc");
-require_once("service-utils.inc");
+//require_once("filter.inc");
+//require_once("service-utils.inc");
 include_once("/usr/local/pkg/snort/snort.inc");
+require_once("/usr/local/pkg/snort/snort_gui.inc");
 
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
@@ -122,7 +123,26 @@ exit(0);
 
 }
 
-if($_POST) {
+	/* alert file */
+$d_snortconfdirty_path = "/var/run/snort_conf_{$iface_uuid}_{$if_real}.dirty";
+	
+	/* this will exec when alert says apply */
+	if ($_POST['apply']) {
+		
+		if (file_exists($d_snortconfdirty_path)) {
+			
+			write_config();
+			
+			sync_snort_package_all();
+			sync_snort_package();
+			
+			unlink($d_snortconfdirty_path);
+			
+		}
+		
+	}
+
+	if ($_POST["Submit"]) {
 	$enabled_items = "";
 	$isfirst = true;
 	if (is_array($_POST['toenable'])) {
@@ -136,7 +156,11 @@ if($_POST) {
 	$enabled_items = $_POST['toenable'];
 	}
 	$a_nat[$id]['rulesets'] = $enabled_items;
+	
 	write_config();
+	
+	touch($d_snortconfdirty_path);
+	
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
@@ -145,7 +169,7 @@ if($_POST) {
 		sleep(2);
 		sync_snort_package_all();
 		header("Location: /snort/snort_rulesets.php?id=$id");
-	$savemsg = "The snort ruleset selections have been saved.";
+
 }
 
 $enabled_rulesets = $a_nat[$id]['rulesets'];
@@ -165,7 +189,33 @@ echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\
 
 ?>
 
-<?php if ($savemsg) print_info_box($savemsg); ?>
+<?php
+
+	/* Display message */
+
+	if ($input_errors) {
+	print_input_errors($input_errors); // TODO: add checks
+	}
+
+	if ($savemsg) {
+	print_info_box2($savemsg);
+	}
+
+	if (file_exists($d_snortconfdirty_path)) {
+	echo '<p>';
+
+		if($savemsg) {
+			print_info_box_np2("{$savemsg}");
+		}else{
+			print_info_box_np2('
+			The Snort configuration has changed and snort needs to be restarted on this interface.<br>
+			You must apply the changes in order for them to take effect.<br>
+			');
+		}
+	}
+
+?>
+
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
    <tr>
    		<td>
@@ -231,7 +281,7 @@ echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\
 		  		<tr><td>&nbsp;</td></tr>
 		  		<tr><td>Check the rulesets that you would like Snort to load at startup.</td></tr>
 		  		<tr><td>&nbsp;</td></tr>
-		  		<tr><td><input value="Save" type="submit" name="save" id="save" /></td></tr>
+		  		<tr><td><input value="Save" type="submit" name="Submit" id="Submit" /></td></tr>
 			</table>
 		</div>
 	</td>

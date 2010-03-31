@@ -111,7 +111,11 @@ if ($_POST) {
 		$savemsg = get_std_save_message($retval);
 
 		}
-	}
+		
+		sync_snort_package_all();
+		sync_snort_package();
+		
+}
 	
 	
 	if ($_POST["Reset"]) {

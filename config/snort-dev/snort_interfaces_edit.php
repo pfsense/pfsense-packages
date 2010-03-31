@@ -32,6 +32,8 @@
 
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
+require_once("/usr/local/pkg/snort/snort_gui.inc");
+
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -47,6 +49,7 @@ if (isset($_GET['dup'])) {
         $id = $_GET['dup'];
         $after = $_GET['dup'];
 }
+
 
 /* always have a limit of (65535) numbers only or snort will not start do to id limits */
 /* TODO: When inline gets added make the uuid the port number lisstening */
@@ -149,10 +152,40 @@ if (isset($id) && $a_nat[$id]) {
 if (isset($_GET['dup']))
 	unset($id);
 
+/* alert file */
+$d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
+	
+	/* this will exec when alert says apply */
+	if ($_POST['apply']) {
+		
+			if (file_exists("/var/run/snort_conf_{$snort_uuid}_.dirty")) {
+			
+			write_config();
+			
+			sync_snort_package_empty();
+			sync_snort_package();
+			
+			unlink("/var/run/snort_conf_{$snort_uuid}_.dirty");
+			
+		}
+		
+		if (file_exists($d_snortconfdirty_path)) {
+			
+			write_config();
+			
+			sync_snort_package_all();
+			sync_snort_package();
+
+			unlink($d_snortconfdirty_path);
+			
+		}
+		
+	}
 
 if ($_POST["Submit"]) {
 
-		
+	
+	
 		// if ($config['installedpackages']['snortglobal']['rule']) {
 			if ($_POST['descr'] == '' && $pconfig['descr'] == '') {
 				$input_errors[] = "Please  enter a description for your reference.";
@@ -264,12 +297,9 @@ if ($_POST["Submit"]) {
 		}
 
 		write_config();
-
-		if ($pconfig['interface'] != "") {
-		sync_snort_package_all();
-		}
 		
-		//touch($d_natconfdirty_path);
+		touch("$d_snortconfdirty_path");
+		
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
@@ -281,20 +311,6 @@ if ($_POST["Submit"]) {
 		exit;
 	}
 }
-
-		if (isset($config['installedpackages']['snortglobal']['rule'][$id]['interface']))
-	{
-		$snort_up_ck2_info = Running_Ck($snort_uuid, $if_real, $id);
-		if	($snort_up_ck2_info == 'no')
-		{
-			$snort_up_ck = '<input name="Submit2" type="submit" class="formbtn" value="Start" onClick="enable_change(true)">';
-		}else{
-			$snort_up_ck = '<input name="Submit3" type="submit" class="formbtn" value="Stop" onClick="enable_change(true)">';
-		}
-	}else{
-		$snort_up_ck = '';				
-	}
-
 	
 		if ($_POST["Submit2"]) {
 		
@@ -327,34 +343,22 @@ if ($_POST["Submit"]) {
 			header("Location: /snort/snort_interfaces_edit.php?id=$id");
 
 		}
-		
-				if ($_POST["Reset"])
-		{
 
-			conf_mount_rw();
+	/* This code needs to be below headers */
+	if (isset($config['installedpackages']['snortglobal']['rule'][$id]['interface']))
+	{
+	
+		$snort_up_ck2_info = Running_Ck($snort_uuid, $if_real, $id);
 		
-			Running_Stop($snort_uuid, $if_real, $id);
-			sleep(2);
+		if	($snort_up_ck2_info == 'no') {
+			$snort_up_ck = '<input name="Submit2" type="submit" class="formbtn" value="Start" onClick="enable_change(true)">';
+		}else{
+			$snort_up_ck = '<input name="Submit3" type="submit" class="formbtn" value="Stop" onClick="enable_change(true)">';
+			}
 			
-			/* remove all snort iface dir */
-			exec('rm -r /usr/local/etc/snort/snort_*');
-			exec('rm /var/log/snort/*');
-
-			unset($config['installedpackages']['snortglobal']['rule'][$id]);
-    		write_config();
-			
-			header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
-			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-			header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-			header( 'Cache-Control: post-check=0, pre-check=0', false );
-			header( 'Pragma: no-cache' );
-			sleep(2);
-			header("Location: /snort/snort_interfaces_edit.php?id=$id");
-			
-			conf_mount_ro();
-
-		}	
-		
+	}else{
+		$snort_up_ck = '';				
+	}
 		
 
 $pgtitle = "Snort: Interface Edit: $id $snort_uuid $if_real";
@@ -407,9 +411,37 @@ echo "
 </script>
 <p class="pgtitle"><?php if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) print_info_box($savemsg); ?>
+
 <form action="snort_interfaces_edit.php<?php echo "?id=$id";?>" method="post" enctype="multipart/form-data" name="iform" id="iform">
+
+<?php
+
+	/* Display Alert message */
+
+	if ($input_errors) {
+	print_input_errors($input_errors); // TODO: add checks
+	}
+
+	if ($savemsg) {
+	print_info_box2($savemsg);
+	}
+
+	//if (file_exists($d_snortconfdirty_path)) {
+	if (file_exists($d_snortconfdirty_path) || file_exists("/var/run/snort_conf_{$snort_uuid}_.dirty")) {
+	echo '<p>';
+
+		if($savemsg) {
+			print_info_box_np2("{$savemsg}");
+		}else{
+			print_info_box_np2('
+			The Snort configuration has changed and snort needs to be restarted on this interface.<br>
+			You must apply the changes in order for them to take effect.<br>
+			');
+		}
+	}
+
+?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
 <?php
@@ -444,16 +476,20 @@ if ($a_nat[$id]['interface'] != '') {
 
 }
     $tab_array = array();
+	if (!file_exists("/var/run/snort_conf_{$snort_uuid}_.dirty")) {
     $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
+    }
     $tab_array[] = array("If Settings", true, "/snort/snort_interfaces_edit.php?id={$id}");
     /* hide user tabs when no settings have be saved */
 	if ($config['installedpackages']['snortglobal']['rule'][$id]['interface'] != '') {
+		if (!file_exists("/var/run/snort_conf_{$snort_uuid}_.dirty")) {
     //$tab_array[] = array("upload", false, "/snort/snort_conf_upload.php?id={$id}");
     $tab_array[] = array("Categories", false, "/snort/snort_rulesets.php?id={$id}");
     $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
     $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
     $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
     $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
+		}
 	}
     display_top_tabs($tab_array);	
 		
@@ -543,8 +579,7 @@ if ($a_nat[$id]['interface'] != '') {
 					Snort will log Alerts to a file in the UNIFIED2 format. This is a requirement for barnyard2.</td>
 				</tr>
                 <tr>
-                  <td width="22%" valign="top"><input name="Reset" type="submit" class="formbtn" value="Reset" onclick="return confirm('Do you really want to reset this Snort Interface?')" ><span class="red"><strong>&nbsp;WARNING:</strong><br>
-	  				This will reset this interface.</span>&nbsp;</td>
+                  <td width="22%" valign="top"></td>
                   <td width="78%">
                     <input name="Submit" type="submit" class="formbtn" value="Save"> <?php echo $snort_up_ck; ?> <input type="button" class="formbtn" value="Cancel" onclick="history.back()">
                     <?php if (isset($id) && $a_nat[$id]): ?>

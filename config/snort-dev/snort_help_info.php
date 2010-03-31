@@ -33,6 +33,7 @@
 */
 
 require_once("guiconfig.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
 
 header("snort_help_info.php");
 header( "Expires: Mon, 20 Dec 1998 01:00:00 GMT" );
@@ -92,15 +93,92 @@ clear: both;
     </td>
 </tr>
 </table>
+
+<?php
+/* TODO: remove when 2.0 stable */
+if ($pfsense_stable == 'yes') {
+
+$footer2 = "
+
+<style type=\"text/css\">
+
+#footer2
+{
+	position: relative;
+	top: 27px;
+	background-color: #cccccc;
+	background-image: none;
+	background-repeat: repeat;
+	background-attachment: scroll;
+	background-position: 0% 0%;
+	width: 810px;
+	right: 15px;
+	font-size: 0.8em;
+	text-align: center;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-bottom: 0px;
+	padding-left: 0px;
+	clear: both;
+}
+
+</style>
+
+	<div id=\"footer2\">
+		<IMG SRC=\"./images/footer2.jpg\" width=\"800px\" height=\"35\" ALT=\"Apps\">
+			Snort is a registered trademark of Sourcefire, Inc, Barnyard2 is a registered trademark of securixlive.com, Orion copyright Robert Zelaya,
+			Emergingthreats is a registered trademark of emergingthreats.net, Mysql is a registered trademark of Mysql.com
+	</div>\n";
+}
+
+if ($pfsense_stable != 'yes') {
+$footer3 = "
+
+<style type=\"text/css\">
+
+#footer3
+{
+
+top: 105px;
+position: relative;
+background-color: #FFFFFF;
+background-image: url(\"./images/footer2.jpg\");
+background-repeat: no-repeat;
+background-attachment: scroll;
+background-position: 0px 0px;
+bottom: 0px;
+width: 770px;
+height: 35px;
+color: #000000;
+text-align: center;
+font-size: 0.8em;
+padding-top: 35px;
+padding-left: 0px;
+clear: both;
+	
+}
+
+</style>
+
+	<div id=\"footer3\">
+			Snort is a registered trademark of Sourcefire, Inc, Barnyard2 is a registered trademark of securixlive.com, Orion copyright Robert Zelaya,
+			Emergingthreats is a registered trademark of emergingthreats.net, Mysql is a registered trademark of Mysql.com
+	</div>\n";
+}
+?>
+
+
 <div>
 	<iframe style="width: 780px; height: 600px; overflow-x: hidden;" src='/snort/help_and_info.php'></iframe>
 </div>
-	<div id="footer2">
-			Snort is a registered trademark of Sourcefire, Inc., Barnyard2 is a registered trademark of securixlive.com, Orion copyright Robert Zelaya, 
-			Emergingthreats is a registered trademark of emergingthreats.net, Mysql is a registered trademark of Mysql.com.
-	</div>
+
+<?php echo $footer2;?>
+
 </div>
 </div>
+
+<?php //echo $footer3;?>
+
         <div id="footer">
 			<a target="_blank" href="http://www.pfsense.org/?gui12" class="redlnk">pfSense</a> is &copy;
 			 2004 - 2009 by <a href="http://www.bsdperimeter.com" class="tblnk">BSD Perimeter LLC</a>. All Rights Reserved.

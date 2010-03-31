@@ -59,8 +59,6 @@ function print_info_box_np2($msg) {
 	echo "</script>\n";
 	echo "\n<br>\n";
 
-	exec("echo  \"Funtion print info ....\" >> /root/test.log");
-
 
 }
 

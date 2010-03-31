@@ -58,19 +58,23 @@ if ($pfsense_ver_chk == '1.2.3-RELEASE')
 	}
 
 	if(snort_up_ck != ''){
-	
-	$snort_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}_{$if_real}\" | awk '{print \$1;}'");
-	$snort_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$snort_up_pre} | /usr/bin/awk '{print \$1;}'");
-	$snort_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$snort_up_pre} | /usr/bin/awk '{print \$1;}'");
 
-	if ($snort_up_s != '' || $snort_up_r != '') {
-		$snort_up = 'yes';
+	//$snort_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}_{$if_real}\" | awk '{print \$1;}'");
+	//$snort_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$snort_up_pre} | /usr/bin/awk '{print \$1;}'");
+	//$snort_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$snort_up_pre} | /usr/bin/awk '{print \$1;}'");
+
+	/* use ob_clean to clear output buffer, this code needs to be watched */
+	ob_clean();
+	$snort_up_prell = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}_{$if_real}\" | awk '{print \$1;}'", $retval);
+
+	if ($snort_up_prell != "") {
+		$snort_uph = 'yes';
 	}else{
-		$snort_up = 'no';
+		$snort_uph = 'no';
 		}
 	}
 
-	return $snort_up;
+	return $snort_uph;
 	}
 
 /* checks to see if barnyard2 is running yes/no */
@@ -86,11 +90,15 @@ if ($pfsense_ver_chk == '1.2.3-RELEASE')
 
 	if(snort_up_ck_b != ''){
 	
-	$snort_up_pre_b = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"f snort_{$snort_uuid}_{$if_real}.u2\" | awk '{print \$1;}'");
-	$snort_up_s_b = exec("/usr/bin/top -U snort -u | grep barnyard2 | grep {$snort_up_pre_b} | /usr/bin/awk '{print \$1;}'");
-	$snort_up_r_b = exec("/usr/bin/top -U root -u | grep barnyard2 | grep {$snort_up_pre_b} | /usr/bin/awk '{print \$1;}'");
+	//$snort_up_pre_b = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"f snort_{$snort_uuid}_{$if_real}.u2\" | awk '{print \$1;}'");
+	//$snort_up_s_b = exec("/usr/bin/top -U snort -u | grep barnyard2 | grep {$snort_up_pre_b} | /usr/bin/awk '{print \$1;}'");
+	//$snort_up_r_b = exec("/usr/bin/top -U root -u | grep barnyard2 | grep {$snort_up_pre_b} | /usr/bin/awk '{print \$1;}'");
 
-	if ($snort_up_s_b != '' || $snort_up_r != '') {
+	/* use ob_clean to clear output buffer, this code needs to be watched */
+	ob_clean();
+	$snort_up_pre_b = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"f snort_{$snort_uuid}_{$if_real}.u2\" | awk '{print \$1;}'");
+
+	if ($snort_up_pre_b != '') {
 		$snort_up_b = 'yes';
 	}else{
 		$snort_up_b = 'no';
@@ -288,6 +296,7 @@ function snort_postinstall()
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/logo.jpg');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/footer.jpg');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/footer2.jpg');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/icon_excli.png');
 	chdir ("/usr/local/www/snort/javascript/");
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery.blockUI.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery-1.3.2.js');
@@ -592,7 +601,6 @@ $snort_dir_filter_search_result = array_diff($snort_dir_filter, $snort_rules_lis
                         foreach ($snort_dir_filter_search_result as $value)
                         {
 							exec("rm -r /usr/local/etc/snort/$value");
-							exec("echo \"rm -r /usr/local/etc/snort/$value\" >> /root/test.log");
                         }
 
 }
@@ -661,7 +669,6 @@ if ($id != '' && $if_real != '') //new
 
 				sync_snort_package();
 
-		exec("echo  \"Funtion sync all $id $if_real $snort_uuid....\" >> /root/test.log");
 		conf_mount_ro();
 		}
 	}
@@ -1062,8 +1069,6 @@ function snort_deinstall()
 	global $config, $g, $id, $if_real;
 	conf_mount_rw();
 
-exec("echo  \"Snort Deinstall $if_real $id....\" >> /root/test.log");
-
 	/* remove custom sysctl */
 	remove_text_from_file("/etc/sysctl.conf", "sysctl net.bpf.bufsize=20480");
 	/* decrease bpf buffers back to 4096, from 20480 */
@@ -1091,8 +1096,6 @@ function snort_rm_blocked_deinstall_cron($should_install)
 {
         global $config, $g;
 		conf_mount_rw();
-
-exec("echo  \"Deinstall cron block....\" >> /root/test.log");
 
         $is_installed = false;
 
@@ -1131,8 +1134,6 @@ exec("echo  \"Deinstall cron block....\" >> /root/test.log");
 {
         global $config, $g;
 		conf_mount_rw();
-		
-exec("echo  \"Deinstall rules up ....\" >> /root/test.log");
 
         $is_installed = false;
 
@@ -1170,6 +1171,7 @@ snort_rules_up_deinstall_cron("");
 	exec("rm -r /usr/local/www/snort");
 	exec("rm -r /usr/local/pkg/snort");
 	exec("rm -r /usr/local/lib/snort/");
+	exec("rm -r /var/log/snort/");
 	
 	conf_mount_ro();
 
@@ -2103,7 +2105,6 @@ function check_for_common_errors($filename) {
 			hide_progress_bar_status();
 		} else {
 			log_error("An error occured.  Scroll down to inspect it's contents.");
-			echo "An error occured.  Scroll down to inspect it's contents.";
 		}
 		if(!$console_mode) {
 			update_output_window(strip_tags("$contents"));

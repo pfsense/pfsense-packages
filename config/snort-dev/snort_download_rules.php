@@ -75,8 +75,15 @@ $emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'
 	$if_mrule_dir = "/usr/local/etc/snort/rules";
 	$mfolder_chk = (count(glob("$if_mrule_dir/*")) === 0) ? 'empty' : 'full';
 	
+
+if (file_exists('/var/run/snort.conf.dirty')) {
+	$snort_dirty_d = 'stop';
+} 
+
+	
+	
 /* If no id show the user a button */	
-if ($id_d == "" || $snort_emrging_info == "stop" || $snort_oinkid_info == "stop") {
+if ($id_d == "" || $snort_emrging_info == "stop" || $snort_oinkid_info == "stop" || $snort_dirty_d == 'stop') {
 
 $pgtitle = "Services: Snort: Rule Updates";
 
@@ -85,6 +92,27 @@ include("./snort_fbegin.inc");
 echo "<p class=\"pgtitle\">";
 if($pfsense_stable == 'yes'){echo $pgtitle;}
 echo "</p>\n";
+
+	echo "<table height=\"32\" width=\"100%\">\n";
+	echo "  <tr>\n";
+	echo "   <td>\n";
+	echo "      <div style='background-color:#E0E0E0' id='redbox'>\n";
+	echo "       <table width='100%'><tr><td width='8%'>\n";
+	echo "        &nbsp;&nbsp;&nbsp;<img style='vertical-align:middle' src=\"/snort/images/icon_excli.png\" width=\"40\" height=\"32\">\n";
+	echo "        </td>\n";
+	echo "        <td width='70%'><font color='#FF850A'><b>NOTE:</b></font><font color='#000000'>&nbsp;&nbsp;Snort.org and Emergingthreats.net will go down from time to time. Please be patient.</font>\n";
+	echo "        </td>";
+	echo "        </tr></table>\n";
+	echo "       </div>\n";
+	echo "    </td>\n";
+	echo "</table>\n";
+	echo "<script type=\"text/javascript\">\n";
+	echo "NiftyCheck();\n";
+	echo "Rounded(\"div#redbox\",\"all\",\"#FFF\",\"#E0E0E0\",\"smooth\");\n";
+	echo "Rounded(\"td#blackbox\",\"all\",\"#FFF\",\"#000000\",\"smooth\");\n";
+	echo "</script>\n";
+	echo "\n<br>\n";
+
 /* make sure user has javascript on */
 echo "<style type=\"text/css\">
 .alert {
@@ -146,6 +174,9 @@ if ($snort_oinkid_info == "stop") {
 echo "<span class=\"red\"><strong>WARNING:</strong></span> &nbsp;&nbsp;Click on the <strong>\"Global Settings\"</strong> tab and enter a <strong>oinkmaster</strong> code. <br><br> \n";
 }
 
+if ($snort_dirty_d == "stop") {
+echo "<span class=\"red\"><strong>WARNING:</span> CHANGES HAVE NOT BEEN APPLIED</strong> &nbsp;&nbsp;Click on the <strong>\"Apply Settings\"</strong> button at the main interface tab.<br><br> \n";
+}
 
 echo "		    		</td>\n
 		  		</tr>\n

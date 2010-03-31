@@ -41,6 +41,7 @@ Important add error checking
 require_once("globals.inc");
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
+require_once("/usr/local/pkg/snort/snort_gui.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -130,7 +131,28 @@ if (isset($_GET['dup']))
 $if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface']);
 $snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
-if ($_POST) {
+
+		/* alert file */
+$d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
+	
+	/* this will exec when alert says apply */
+	if ($_POST['apply']) {
+		
+		if (file_exists($d_snortconfdirty_path)) {
+			
+			write_config();
+			
+			sync_snort_package_all();
+			sync_snort_package();
+			
+			unlink($d_snortconfdirty_path);
+			
+		}
+		
+	}
+
+
+	if ($_POST["Submit"]) {
 
 	/* check for overlaps */
 	foreach ($a_nat as $natent) {
@@ -215,13 +237,16 @@ if ($_POST) {
 				$a_nat[] = $natent;
 		}
 
-		/* enable this if you want the user to aprove changes */
-		// touch($d_natconfdirty_path);
-		sync_snort_package_all();
-
 		write_config();
         
 		/* after click go to this page */
+		touch($d_snortconfdirty_path);
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		sleep(2);
 		header("Location: snort_barnyard.php?id=$id");
 		exit;
 	}
@@ -272,9 +297,34 @@ echo "
 //-->
 </script>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) print_info_box($savemsg); ?>
 <form action="snort_barnyard.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
+
+<?php
+
+	/* Display Alert message */
+	if ($input_errors) {
+	print_input_errors($input_errors); // TODO: add checks
+	}
+
+	if ($savemsg) {
+	print_info_box2($savemsg);
+	}
+
+	if (file_exists($d_snortconfdirty_path)) {
+	echo '<p>';
+
+		if($savemsg) {
+			print_info_box_np2("{$savemsg}");
+		}else{
+			print_info_box_np2('
+			The Snort configuration has changed and snort needs to be restarted on this interface.<br>
+			You must apply the changes in order for them to take effect.<br>
+			');
+		}
+	}
+
+?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
 <?php
@@ -365,7 +415,7 @@ if($id != "")
                 <tr>
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%">
-                    <input name="Submit" type="submit" class="formbtn" value="Save"> <input name="Submit2" type="submit" class="formbtn" value="Start" onClick="enable_change(true)"> <input type="button" class="formbtn" value="Cancel" onclick="history.back()">
+                    <input name="Submit" type="submit" class="formbtn" value="Save"><input type="button" class="formbtn" value="Cancel" onclick="history.back()">
                     <?php if (isset($id) && $a_nat[$id]): ?>
                     <input name="id" type="hidden" value="<?=$id;?>">
                     <?php endif; ?>
