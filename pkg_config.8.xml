@@ -393,20 +393,30 @@
       <descr>VMware Tools</descr>
       <website>http://open-vm-tools.sourceforge.net/</website>
       <category>Services</category>
-      <version>102166_7_2</version>
+      <version>217847</version>
       <status>Stable</status>
       <pkginfolink>http://doc.pfsense.org/index.php/Open_VM_Tools_package</pkginfolink>
-      <required_version>1.2.1</required_version>
-      <config_file>http://www.pfsense.org/packages/config/open-vm-tools/open-vm-tools.xml</config_file>
+      <required_version>2.0</required_version>
+      <config_file>http://www.pfsense.org/packages/config/open-vm-tools-2/open-vm-tools.xml</config_file>
       <configurationfile>open-vm-tools.xml</configurationfile>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <depends_on_package>open-vm-tools-nox11-167859_1.tbz</depends_on_package>
-      <depends_on_package>libtool-2.2.6a_1.tbz</depends_on_package>
-      <depends_on_package>libiconv-1.13.1.tbz</depends_on_package>
-      <depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
-      <depends_on_package>icu-3.8.1_2.tbz</depends_on_package>
-      <depends_on_package>gmake-3.81_3.tbz</depends_on_package>
-      <depends_on_package>gettext-0.17_1.tbz</depends_on_package>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+<depends_on_package>open-vm-tools-nox11-217847_1.tbz</depends_on_package>
+<depends_on_package>fusefs-kmod-0.3.9.p1.20080208_6.tbz</depends_on_package>
+<depends_on_package>fusefs-libs-2.7.4.tbz</depends_on_package>
+<depends_on_package>gettext-0.17_1.tbz</depends_on_package>
+<depends_on_package>glib-2.22.4.tbz</depends_on_package>
+<depends_on_package>gmake-3.81_3.tbz</depends_on_package>
+<depends_on_package>icu-3.8.1_2.tbz</depends_on_package>
+<depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
+<depends_on_package>libiconv-1.13.1_1.tbz</depends_on_package>
+<depends_on_package>libtool-2.2.6b.tbz</depends_on_package>
+<depends_on_package>pcre-8.00.tbz</depends_on_package>
+<depends_on_package>perl-5.10.1.tbz</depends_on_package>
+<depends_on_package>pkg-config-0.23_1.tbz</depends_on_package>
+<depends_on_package>python26-2.6.4.tbz</depends_on_package>
+<depends_on_package>ruby+oniguruma-1.8.7.248,1.tbz</depends_on_package>
+<depends_on_package>ruby18-deplate-0.8.5.tbz</depends_on_package>
+<depends_on_package>unzip-6.0.tbz</depends_on_package>
     </package>
     <package>
       <name>AutoConfigBackup</name>
@@ -623,15 +633,15 @@
       <descr>High performance web proxy cache.</descr>
       <website>http://www.squid-cache.org/</website>
       <category>Network</category>
-      <version>2.7.8</version>
+      <version>2.6.21_11</version>
       <status>Stable</status>
-      <required_version>2</required_version>
-      <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-      <depends_on_package>squid-2.7.8.tbz</depends_on_package>
+      <required_version>3</required_version>
+      <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package>squid-2.6.21.tbz</depends_on_package>
       <depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
-      <depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
-      <config_file>http://www.pfsense.org/packages/config/squid-8/squid.xml</config_file>
+      <depends_on_package>openldap-client-2.4.10.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
       <configurationfile>squid.xml</configurationfile>
     </package>
     <package>
