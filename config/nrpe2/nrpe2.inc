@@ -32,7 +32,7 @@ function nrpe2_custom_php_install_command()
 
 	$ip = $config['interfaces']['lan']['ipaddr'];
 
-	$config['installedpackages']['nrpe2']['config'][0]['enabled'] = TRUE;
+	$config['installedpackages']['nrpe2']['config'][0]['enabled'] = "on";
 	$config['installedpackages']['nrpe2']['config'][0]['server_address'] = $ip;
 	$config['installedpackages']['nrpe2']['config'][0]['server_port'] = 5666;
 	$config['installedpackages']['nrpe2']['config'][0]['allowed_hosts'] = "127.0.0.1";

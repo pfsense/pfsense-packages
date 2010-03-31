@@ -14,7 +14,7 @@
 		<url>/pkg_edit.php?xml=nrpe2.xml&amp;id=0</url>
 	</menu>
 	<service>
-		<name>NRPEv2</name>
+		<name>nrpe2</name>
 		<rcfile>nrpe2</rcfile>
 		<executable>nrpe2</executable>
 		<description>Nagios NRPE Daemon</description>
@@ -159,6 +159,8 @@
 		nrpe2_custom_php_write_config();
 	</custom_php_deinstall_command>
 	<custom_php_resync_config_command>
+                nrpe2_custom_php_write_config();
+                nrpe2_custom_php_service();
 	</custom_php_resync_config_command>
 	<custom_php_command_before_form>
 		unset($_POST['temp']);	
