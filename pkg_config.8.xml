@@ -397,7 +397,7 @@
       <status>Stable</status>
       <pkginfolink>http://doc.pfsense.org/index.php/Open_VM_Tools_package</pkginfolink>
       <required_version>2.0</required_version>
-      <config_file>http://www.pfsense.org/packages/config/open-vm-tools-2/open-vm-tools.xml</config_file>
+      <config_file>http://www.pfsense.org/packages/config/open-vm-tools_2/open-vm-tools.xml</config_file>
       <configurationfile>open-vm-tools.xml</configurationfile>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 <depends_on_package>open-vm-tools-nox11-217847_1.tbz</depends_on_package>
