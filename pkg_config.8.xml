@@ -623,15 +623,15 @@
       <descr>High performance web proxy cache.</descr>
       <website>http://www.squid-cache.org/</website>
       <category>Network</category>
-      <version>2.6.21_11</version>
+      <version>2.7.8</version>
       <status>Stable</status>
-      <required_version>3</required_version>
-      <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <depends_on_package>squid-2.6.21.tbz</depends_on_package>
+      <required_version>2</required_version>
+      <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+      <depends_on_package>squid-2.7.8.tbz</depends_on_package>
       <depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
-      <depends_on_package>openldap-client-2.4.10.tbz</depends_on_package>
-      <config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
+      <depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
+      <config_file>http://www.pfsense.org/packages/config/squid-8/squid.xml</config_file>
       <configurationfile>squid.xml</configurationfile>
     </package>
     <package>
