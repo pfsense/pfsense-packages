@@ -112,7 +112,6 @@ if ($_POST) {
 
 		}
 		
-		sync_snort_package_all();
 		sync_snort_package();
 		
 }
