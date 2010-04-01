@@ -912,7 +912,7 @@
 	<website>http://wiki.nagios.org/index.php/Howtos:nrpe_nsca</website>
 	<descr>NRPE is an addon for Nagios that allows you to execute plugins on remote Linux/Unix hosts. This is useful if you need to monitor local resources/attributes like disk usage, CPU load, memory usage, etc. on a remote host.</descr>
 	<category>Services</category>
-	<depends_on_package_base_url>http://www.pfsense.com/packages/config/nrpe2/bin/</depends_on_package_base_url>
+	<depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
 	<depends_on_package>nrpe-2.12_1.tbz</depends_on_package>
 	<depends_on_package>nagios-plugins-1.4.13,1.tbz</depends_on_package>
         <depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
