@@ -2,8 +2,7 @@
 /* $Id$ */
 /*
     edit_snortrule.php
-    Copyright (C) 2004, 2005 Scott Ullrich
-	Copyright (C) 2008, 2009 Robert Zelaya
+    Copyright (C) 2004, 2005 Scott Ullrich and Rober Zelaya
     All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
@@ -27,45 +26,22 @@
     ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
     POSSIBILITY OF SUCH DAMAGE.
 */
+require("guiconfig.inc");
+require("config.inc");
 
-
-require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
-require_once("/usr/local/pkg/snort/snort.inc");
-
-if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
-	$config['installedpackages']['snortglobal']['rule'] = array();
+if(!is_dir("/usr/local/etc/snort/rules")) {
+	conf_mount_rw();
+	exec('mkdir /usr/local/etc/snort/rules/');
+	conf_mount_ro();
 }
-
-//nat_rules_sort();
-$a_nat = &$config['installedpackages']['snortglobal']['rule'];
-
-$id = $_GET['id'];
-if (isset($_POST['id']))
-	$id = $_POST['id'];
-
-if (isset($id) && $a_nat[$id]) {
-
-	$pconfig['enable'] = $a_nat[$id]['enable'];
-	$pconfig['interface'] = $a_nat[$id]['interface'];
-	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
-}
-
-/* convert fake interfaces to real */
-$if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface']);
-
-$iface_uuid = $a_nat[$id]['uuid'];
-
-// if(!is_dir("/usr/local/etc/snort/rules"))
-//	exec('mkdir /usr/local/etc/snort/rules/');
 
 /* Check if the rules dir is empy if so warn the user */
 /* TODO give the user the option to delete the installed rules rules */
-$isrulesfolderempty = exec("ls -A /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
+$isrulesfolderempty = exec('ls -A /usr/local/etc/snort/rules/*.rules');
 if ($isrulesfolderempty == "") {
 
 include("head.inc");
-include("./snort_fbegin.inc");
+include("fbegin.inc");
 
 echo "<body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\">";
 
@@ -75,15 +51,18 @@ echo "<script src=\"/row_toggle.js\" type=\"text/javascript\"></script>\n
    <tr>\n
    		<td>\n";
 
-    $tab_array = array();
-    $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
-    $tab_array[] = array("If Settings", false, "/snort/snort_interfaces_edit.php?id={$id}");
-    $tab_array[] = array("Categories", false, "/snort/snort_rulesets.php?id={$id}");
-    $tab_array[] = array("Rules", true, "/snort/snort_rules.php?id={$id}");
-    $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
-    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
-    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
-    display_top_tabs($tab_array);
+	$tab_array = array();
+	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
+	$tab_array[] = array(gettext("Update Rules"), false, "/snort_download_rules.php");
+	$tab_array[] = array(gettext("Categories"), false, "/snort_rulesets.php");
+	$tab_array[] = array(gettext("Rules"), true, "/snort_rules.php");
+	$tab_array[] = array(gettext("Servers"), false, "/pkg_edit.php?xml=snort_define_servers.xml&amp;id=0");
+	$tab_array[] = array(gettext("Blocked"), false, "/snort_blocked.php");
+	$tab_array[] = array(gettext("Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
+	$tab_array[] = array(gettext("Threshold"), false, "/pkg.php?xml=snort_threshold.xml");
+	$tab_array[] = array(gettext("Alerts"), false, "/snort_alerts.php");
+	$tab_array[] = array(gettext("Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
+	display_top_tabs($tab_array);
 
 echo  		"</td>\n
   </tr>\n
@@ -126,6 +105,8 @@ function get_middle($source, $beginning, $ending, $init_pos) {
 
 function write_rule_file($content_changed, $received_file)
 {
+    conf_mount_rw();
+
     //read snort file with writing enabled
     $filehandle = fopen($received_file, "w");
 
@@ -141,6 +122,7 @@ function write_rule_file($content_changed, $received_file)
     //close file handle
     fclose($filehandle);
 
+    conf_mount_rw();
 }
 
 function load_rule_file($incoming_file)
@@ -155,9 +137,8 @@ function load_rule_file($incoming_file)
     //close handler
     fclose ($filehandle);
 
-
     //string for populating category select
-    $currentruleset = basename($rulefile);
+    $currentruleset = substr($file, 27);
 
     //delimiter for each new rule is a new line
     $delimiter = "\n";
@@ -169,13 +150,10 @@ function load_rule_file($incoming_file)
 
 }
 
-$ruledir = "/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/";
+$ruledir = "/usr/local/etc/snort/rules/";
 $dh  = opendir($ruledir);
 
-if ($_GET['openruleset'] != '' && $_GET['ids'] != '')
-{
-	header("Location: /snort/snort_rules.php?id=$id&openruleset={$_GET['openruleset']}&saved=yes");
-}
+$message_reload = "The Snort rule configuration has been changed.<br>You must apply the changes in order for them to take effect.";
 
 while (false !== ($filename = readdir($dh)))
 {
@@ -191,22 +169,19 @@ sort($files);
 
 if ($_GET['openruleset'])
 {
-    $rulefile = $_GET['openruleset'];
+    $file = $_GET['openruleset'];
 }
 else
 {
-    $rulefile = $ruledir.$files[0];
+    $file = $ruledir.$files[0];
 
 }
 
 //Load the rule file
-$splitcontents = load_rule_file($rulefile);
+$splitcontents = load_rule_file($file);
 
 if ($_POST)
 {
-	
-	conf_mount_rw();
-	
 	if (!$_POST['apply']) {
 	    //retrieve POST data
 	    $post_lineid = $_POST['lineid'];
@@ -283,20 +258,26 @@ if ($_POST)
 	    $splitcontents[$post_lineid] = $tempstring;
 	
 	    //write the new .rules file
-	    write_rule_file($splitcontents, $rulefile);
+	    write_rule_file($splitcontents, $file);
 	
 	    //once file has been written, reload file
-	    $splitcontents = load_rule_file($rulefile);
+	    $splitcontents = load_rule_file($file);
 	    
 	    $stopMsg = true;
 	}
+	
+	if ($_POST['apply']) {
+//		stop_service("snort");
+//		sleep(2);
+//		start_service("snort");
+		$savemsg = "The snort rules selections have been saved. Please restart snort by clicking save on the settings tab.";
+		$stopMsg = false;
+	}
+
 }
 else if ($_GET['act'] == "toggle")
 {
-
-	conf_mount_rw();
-
-    $toggleid = $_GET['ids'];
+    $toggleid = $_GET['id'];
 
     //copy rule contents from array into string
     $tempstring = $splitcontents[$toggleid];
@@ -330,10 +311,10 @@ else if ($_GET['act'] == "toggle")
     $splitcontents[$toggleid] = $tempstring;
 
     //write the new .rules file
-    write_rule_file($splitcontents, $rulefile);
+    write_rule_file($splitcontents, $file);
 
     //once file has been written, reload file
-    $splitcontents = load_rule_file($rulefile);
+    $splitcontents = load_rule_file($file);
     
     $stopMsg = true;
 	
@@ -345,22 +326,20 @@ else if ($_GET['act'] == "toggle")
             // sid being turned off
             $sid_off  = str_replace("sid:", "", $sid_off_cut);
 			// rule_sid_on registers
-			$sid_on_pieces = $a_nat[$id]['rule_sid_on'];
+			$sid_on_pieces = $config['installedpackages']['snort']['rule_sid_on'];
 			// if off sid is the same as on sid remove it
 			$sid_on_old = str_replace("||enablesid $sid_off", "", "$sid_on_pieces");
 			// write the replace sid back as empty
-			$a_nat[$id]['rule_sid_on'] = $sid_on_old;
+			$config['installedpackages']['snort']['rule_sid_on'] = $sid_on_old;
 			// rule sid off registers
-			$sid_off_pieces = $a_nat[$id]['rule_sid_off'];
+			$sid_off_pieces = $config['installedpackages']['snort']['rule_sid_off'];
 			// if off sid is the same as off sid remove it
 			$sid_off_old = str_replace("||disablesid $sid_off", "", "$sid_off_pieces");
 			// write the replace sid back as empty
-			$a_nat[$id]['rule_sid_off'] = $sid_off_old;
+			$config['installedpackages']['snort']['rule_sid_off'] = $sid_off_old;
 			// add sid off registers to new off sid
-			$a_nat[$id]['rule_sid_off'] = "||disablesid $sid_off" . $a_nat[$id]['rule_sid_off'];
+			$config['installedpackages']['snort']['rule_sid_off'] = "||disablesid $sid_off" . $config['installedpackages']['snort']['rule_sid_off'];
 			write_config();
-			conf_mount_rw();
-			
 		}
 		else
 		{
@@ -370,55 +349,39 @@ else if ($_GET['act'] == "toggle")
             // sid being turned off
             $sid_on  = str_replace("sid:", "", $sid_on_cut);
 			// rule_sid_off registers
-			$sid_off_pieces = $a_nat[$id]['rule_sid_off'];
+			$sid_off_pieces = $config['installedpackages']['snort']['rule_sid_off'];
 			// if off sid is the same as on sid remove it
 			$sid_off_old = str_replace("||disablesid $sid_on", "", "$sid_off_pieces");
 			// write the replace sid back as empty
-			$a_nat[$id]['rule_sid_off'] = $sid_off_old;
+			$config['installedpackages']['snort']['rule_sid_off'] = $sid_off_old;
 			// rule sid on registers
-			$sid_on_pieces = $a_nat[$id]['rule_sid_on'];
+			$sid_on_pieces = $config['installedpackages']['snort']['rule_sid_on'];
 			// if on sid is the same as on sid remove it
 			$sid_on_old = str_replace("||enablesid $sid_on", "", "$sid_on_pieces");
 			// write the replace sid back as empty
-			$a_nat[$id]['rule_sid_on'] = $sid_on_old;
+			$config['installedpackages']['snort']['rule_sid_on'] = $sid_on_old;
 			// add sid on registers to new on sid
-			$a_nat[$id]['rule_sid_on'] = "||enablesid $sid_on" . $a_nat[$id]['rule_sid_on'];
+			$config['installedpackages']['snort']['rule_sid_on'] = "||enablesid $sid_on" . $config['installedpackages']['snort']['rule_sid_on'];
 			write_config();
-			conf_mount_rw();
 		}
 	
 }
 
-if ($_GET['saved'] == 'yes')
-{
-		$message = "The Snort rule configuration has been changed.<br>You must restart this snort interface in order for the changes to take effect.";
 
-//		stop_service("snort");
-//		sleep(2);
-//		start_service("snort");
-//		$savemsg = "";
-//		$stopMsg = false;
-}
-
-$currentruleset = basename($rulefile);
-
-$ifname = strtoupper($pconfig['interface']);
-
+$pgtitle = "Snort: Rules";
 require("guiconfig.inc");
 include("head.inc");
-
-$pgtitle = "Snort: $id $iface_uuid $if_real Category: $currentruleset";
-
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("./snort_fbegin.inc"); ?>
-<p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
-
+<?php include("fbegin.inc"); ?>
 <?php
-echo "<form action=\"snort_rules.php?id={$id}\" method=\"post\" name=\"iform\" id=\"iform\">";
+if(!$pgtitle_output)
+	echo "<p class=\"pgtitle\"><?=$pgtitle?></p>";
 ?>
-<?php if ($_GET['saved'] == 'yes') {print_info_box_np2($message);}?>
+<form action="snort_rules.php" method="post" name="iform" id="iform">
+<?php if ($savemsg){print_info_box($savemsg);} else if ($stopMsg){print_info_box_np($message_reload);}?>
+<br>
 </form>
 <script type="text/javascript" language="javascript" src="row_toggle.js">
     <script src="/javascript/sorttable.js" type="text/javascript">
@@ -440,40 +403,28 @@ function go()
 }
 // -->
 </script>
-<script type="text/javascript">
-<!--
-function popup(url) 
-{
- params  = 'width='+screen.width;
- params += ', height='+screen.height;
- params += ', top=0, left=0'
- params += ', fullscreen=yes';
-
- newwin=window.open(url,'windowname4', params);
- if (window.focus) {newwin.focus()}
- return false;
-}
-// -->
-</script>
 
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
   <tr>
       <td>
 <?php
-     $tab_array = array();
-    $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
-    $tab_array[] = array("If Settings", false, "/snort/snort_interfaces_edit.php?id={$id}");
-    $tab_array[] = array("Categories", false, "/snort/snort_rulesets.php?id={$id}");
-    $tab_array[] = array("Rules", true, "/snort/snort_rules.php?id={$id}");
-    $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
-    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
-    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
+    $tab_array = array();
+    $tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
+    $tab_array[] = array(gettext("Update Rules"), false, "/snort_download_rules.php");
+    $tab_array[] = array(gettext("Categories"), false, "/snort_rulesets.php");
+    $tab_array[] = array(gettext("Rules"), true, "/snort_rules.php");
+	$tab_array[] = array(gettext("Servers"), false, "/pkg_edit.php?xml=snort_define_servers.xml&amp;id=0");
+    $tab_array[] = array(gettext("Blocked"), false, "/snort_blocked.php");
+    $tab_array[] = array(gettext("Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
+	$tab_array[] = array(gettext("Threshold"), false, "/pkg.php?xml=snort_threshold.xml");
+    $tab_array[] = array(gettext("Alerts"), false, "/snort_alerts.php");
+    $tab_array[] = array(gettext("Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
     display_top_tabs($tab_array);
 ?>
-	</td>
-	</tr>
-	<tr>
-	<td>
+      </td>
+  </tr>
+  <tr>
+    <td>
         <div id="mainarea">
             <table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
@@ -496,8 +447,7 @@ function popup(url)
                                 echo "<br>Category: ";
 
                                 //string for populating category select
-                                $currentruleset = basename($rulefile);
-								
+                                $currentruleset = substr($file, 27);
                                 ?>
                                 <form name="forms">
                                     <select name="selectbox" class="formfld" onChange="go()">
@@ -509,7 +459,7 @@ function popup(url)
                                             if ($files[$i] === $currentruleset)
                                                 $selectedruleset = "selected";
                                             ?>
-                                            <option value="?id=<?=$id;?>&openruleset=<?=$ruledir;?><?=$files[$i];?>" <?=$selectedruleset;?>><?=$files[$i];?></option>"
+                                            <option value="?&openruleset=<?=$ruledir;?><?=$files[$i];?>" <?=$selectedruleset;?>><?=$files[$i];?></option>"
                                             <?php
                                             $i++;
 
@@ -562,13 +512,7 @@ function popup(url)
                                             $textss = $textse = "";
                                             $iconb = "icon_block.gif";
                                         }
-										
-										if ($disabled_pos !== false){
-											$ischecked = "";
-										}else{
-											$ischecked = "checked";
-										}
-										
+
                                         $rule_content = explode(' ', $tempstring);
 
                                         $protocol = $rule_content[$counter2];//protocol location
@@ -581,93 +525,87 @@ function popup(url)
                                         $counter2++;
                                         $destination_port = $rule_content[$counter2];//destination port location
 
-										if (strstr($tempstring, 'msg: "'))
-											$message = get_middle($tempstring, 'msg: "', '";', 0);
-										if (strstr($tempstring, 'msg:"'))
-										$message = get_middle($tempstring, 'msg:"', '";', 0);										
+                                        $message = get_middle($tempstring, 'msg:"', '";', 0);										
 										
-                                        echo "<tr>
-                                        <td class=\"listt\">
-                                        $textss\n";
+                                        echo "<tr>";
+                                        echo "<td class=\"listt\">";
+                                        echo $textss;
                                         ?>
-                                        <a href="?id=<?=$id;?>&openruleset=<?=$rulefile;?>&act=toggle&ids=<?=$counter;?>"><img src="../themes/<?= $g['theme']; ?>/images/icons/<?=$iconb;?>" width="10" height="10" border="0" title="click to toggle enabled/disabled status"></a>
-										<!-- <input name="enable" type="checkbox" value="yes" <?= $ischecked; ?> onClick="enable_change(false)"> -->
-										<!-- TODO: add checkbox and save so that that disabling is nicer -->
+                                        <a href="?&openruleset=<?=$file;?>&act=toggle&id=<?=$counter;?>"><img src="./themes/<?= $g['theme']; ?>/images/icons/<?=$iconb;?>" width="11" height="11" border="0" title="click to toggle enabled/disabled status"></a>
                                         <?php
-                                        echo "$textse
-                                        </td>
-                                        <td class=\"listlr\">
-                                        $textss
-                                        $sid
-                                        $textse
-                                        </td>
-                                        <td class=\"listlr\">
-                                        $textss
-                                        $protocol";
-										?>
-										<?php
+                                        echo $textse;
+                                        echo "</td>";
+
+
+                                        echo "<td class=\"listlr\">";
+                                        echo $textss;
+                                        echo $sid;
+                                        echo $textse;
+                                        echo "</td>";
+
+                                        echo "<td class=\"listlr\">";
+                                        echo $textss;
+                                        echo $protocol;
                                         $printcounter++;
-                                        echo "$textse
-                                        </td>
-                                        <td class=\"listlr\">
-                                        $textss
-                                        $source
-                                        $textse
-                                        </td>
-                                        <td class=\"listlr\">
-                                        $textss
-                                        $source_port
-                                        $textse
-                                        </td>
-                                        <td class=\"listlr\">
-                                        $textss
-                                        $destination
-                                        $textse
-                                        </td>
-                                        <td class=\"listlr\">
-                                        $textss
-                                        $destination_port
-                                        $textse
-                                        </td>";
+                                        echo $textse;
+                                        echo "</td>";
+                                        echo "<td class=\"listlr\">";
+                                        echo $textss;
+                                        echo $source;
+                                        echo $textse;
+                                        echo "</td>";
+                                        echo "<td class=\"listlr\">";
+                                        echo $textss;
+                                        echo $source_port;
+                                        echo $textse;
+                                        echo "</td>";
+                                        echo "<td class=\"listlr\">";
+                                        echo $textss;
+                                        echo $destination;
+                                        echo $textse;
+                                        echo "</td>";
+                                        echo "<td class=\"listlr\">";
+                                        echo $textss;
+                                        echo $destination_port;
+                                        echo $textse;
+                                        echo "</td>";
                                         ?>
                                         <td class="listbg"><font color="white">
                                         <?php
-                                        echo "$textss
-                                        $message
-                                        $textse
-                                        </td>";
+                                        echo $textss;
+                                        echo $message;
+                                        echo $textse;
+                                        echo "</td>";
                                         ?>
                                           <td valign="middle" nowrap class="list">
                                             <table border="0" cellspacing="0" cellpadding="1">
                                                 <tr>
-                                                  <td><a href="javascript: void(0)"onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$rulefile;?>&ids=<?=$counter;?>')"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="edit rule" width="17" height="17" border="0"></a></td>
-												  <!-- Codes by Quackit.com -->												
+                                                  <td><a href="snort_rules_edit.php?openruleset=<?=$file;?>&id=<?=$counter;?>"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" title="edit rule" width="17" height="17" border="0"></a></td>
                                                 </tr>
                                             </table>
                                         </td>
                                         <?php
                                     }
                             }
-                            echo "   There are $printcounter rules in this category. <br><br>";
+                            echo "   ";
+                            echo "There are ";
+                            echo $printcounter;
+                            echo " rules in this category. <br><br>";
                             ?>
                          </table>
                     </td>
                 </tr>
                 <table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
                                 <tr>
-                                  <td width="16"><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif" width="11" height="11"></td>
+                                  <td width="16"><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_block.gif" width="11" height="11"></td>
                                   <td>Rule Enabled</td>
                                 </tr>
                                 <tr>
-                                  <td><img src="../themes/<?= $g['theme']; ?>/images/icons/icon_block_d.gif" width="11" height="11"></td>
+                                  <td><img src="./themes/<?= $g['theme']; ?>/images/icons/icon_block_d.gif" width="11" height="11"></td>
                                   <td nowrap>Rule Disabled</td>
-								</tr>
-								<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
-								<tr>
-								<!-- TODO: add save and cancel for checkbox options -->
-								<!-- <td><pre><input name="Submit" type="submit" class="formbtn" value="Save">	<input type="button" class="formbtn" value="Cancel" onclick="history.back()"><pre></td> -->
+
+
                                 </tr>
-								</table>
                         <tr>
                           <td colspan="10">
                   <p>
@@ -677,10 +615,11 @@ function popup(url)
                             </tr>
               </table>
             </table>
+
     </td>
   </tr>
-  
 </table>
+
 
 <?php include("fend.inc"); ?>
 </div></body>

@@ -3,7 +3,7 @@
 /* $Id$ */
 /*
 	snort_dynamic_ip_reload.php
-	Copyright (C) 2006 Scott Ullrich and Robert Zeleya
+	Copyright (C) 2009 Robert Zeleya
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -31,19 +31,20 @@
 /* NOTE: this file gets included from the pfSense filter.inc plugin process */
 /* NOTE: file location /usr/local/pkg/pf, all files in pf dir get exec on filter reloads */
 
-require_once("/usr/local/pkg/snort.inc");
-require_once("service-utils.inc");
-require_once("config.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
 
+/* get the varibles from the command line */
+/* Note: snort.sh sould only be using this */
+//$id = $_SERVER["argv"][1];
+//$if_real = $_SERVER["argv"][2];
 
-if($config['interfaces']['wan']['ipaddr'] == "pppoe" or
-   $config['interfaces']['wan']['ipaddr'] == "dhcp") {
-		create_snort_conf();
-		exec("killall -HUP snort");
-		/* define snortbarnyardlog_chk */
-        $snortbarnyardlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog'];
-        if ($snortbarnyardlog_info_chk == on)
-                exec("killall -HUP barnyard2");
-}
+//$test_iface = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
+
+//if ($id == "" || $if_real == "" || $test_iface == "") {
+//	exec("/usr/bin/logger -p daemon.info -i -t SnortDynIP \"ERORR starting snort_dynamic_ip_reload.php\"");
+//	exit;
+//	}
+
+sync_snort_package_empty();
 
 ?>

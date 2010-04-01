@@ -141,7 +141,7 @@ if (isset($_POST['del_x'])) {
 						
 			/* stop syslog flood code */		
 			//$if_real_wan_rulei = $a_nat[$rulei]['interface'];
-			//$if_real_wan_rulei2 = convert_friendly_interface_to_real_interface_name2($if_real_wan_rulei);
+			//$if_real_wan_rulei2 = convert_friendly_interface_to_real_interface_name($if_real_wan_rulei);
 			//exec("/sbin/ifconfig $if_real_wan_rulei2 -promisc");
 			//exec("/bin/cp /var/log/system.log /var/log/snort/snort_sys_$rulei$if_real.log");
 			//exec("/usr/bin/killall syslogd");
@@ -156,18 +156,21 @@ if (isset($_POST['del_x'])) {
 				}
 			
 			}
-			
-	        unset($a_nat[$rulei]);
-	    }
-		
-			conf_mount_rw();
+	        
+			/* for every iface do these steps */
+	        conf_mount_rw();
 			exec("/bin/rm /var/log/snort/snort.u2_{$snort_uuid}_{$if_real}*");
 			exec("/bin/rm -r /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}");
+			
 			conf_mount_ro();
-		
+			
+			unset($a_nat[$rulei]);
+	        
+	    }
+	    
 	    write_config();
 	    
-	    touch("/var/run/snort_conf_delete.dirty");
+	    //touch("/var/run/snort_conf_delete.dirty");
 	    
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -176,7 +179,7 @@ if (isset($_POST['del_x'])) {
 		header( 'Pragma: no-cache' );
 		sleep(2);
 	    header("Location: /snort/snort_interfaces.php");
-	    exit;
+	    //exit;
 	}
 
 }
@@ -211,7 +214,7 @@ if ($_GET['act'] == 'toggle' && $_GET['id'] != '')
 				
 	}else{
 		
-		sync_snort_package_all($id, $if_real);
+		sync_snort_package_all($id, $if_real, $snort_uuid);
 		sync_snort_package();
 		
 		Running_Start($snort_uuid, $if_real, $id);
@@ -228,7 +231,7 @@ if ($_GET['act'] == 'toggle' && $_GET['id'] != '')
 
 
 
-$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.18 RC Final";
+$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.19";
 include("head.inc");
 
 ?>

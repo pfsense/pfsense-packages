@@ -30,15 +30,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* 
 
-TODO: Nov 12 09
-Clean this code up its ugly
-Important add error checking
-
-*/
-
-require_once("globals.inc");
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
@@ -60,7 +52,7 @@ if (isset($_GET['dup'])) {
 
 if (isset($id) && $a_nat[$id]) {
 
-	/* old options */
+	/* new options */
 	$pconfig['def_ssl_ports_ignore'] = $a_nat[$id]['def_ssl_ports_ignore'];
 	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
 	$pconfig['perform_stat'] = $a_nat[$id]['perform_stat'];
@@ -71,6 +63,8 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['sf_portscan'] = $a_nat[$id]['sf_portscan'];
 	$pconfig['dce_rpc_2'] = $a_nat[$id]['dce_rpc_2'];
 	$pconfig['dns_preprocessor'] = $a_nat[$id]['dns_preprocessor'];
+	
+	/* old options */
 	$pconfig['def_dns_servers'] = $a_nat[$id]['def_dns_servers'];
 	$pconfig['def_dns_ports'] = $a_nat[$id]['def_dns_ports'];
 	$pconfig['def_smtp_servers'] = $a_nat[$id]['def_smtp_servers'];
@@ -114,25 +108,22 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['blockoffenders7'] = $a_nat[$id]['blockoffenders7'];
 	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
 	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
-	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];	
+	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];
+	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
 	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
 	$pconfig['rule_sid_off'] = $a_nat[$id]['rule_sid_off'];
 	$pconfig['rule_sid_on'] = $a_nat[$id]['rule_sid_on'];
-		
-	if (!$pconfig['interface'])
-		$pconfig['interface'] = "wan";
-} else {
-	$pconfig['interface'] = "wan";
-}
 
 if (isset($_GET['dup']))
-	unset($id);
-	
-$if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface']);
-$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
+	unset($id);	
+}
 
+/* convert fake interfaces to real */
+$if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interface']);
 
-		/* alert file */
+$snort_uuid = $pconfig['uuid'];
+
+	/* alert file */
 $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 	
 	/* this will exec when alert says apply */
@@ -142,7 +133,7 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 			
 			write_config();
 			
-			sync_snort_package_all();
+			sync_snort_package_all($id, $if_real, $snort_uuid);
 			sync_snort_package();
 			
 			unlink($d_snortconfdirty_path);
@@ -155,18 +146,11 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 	if ($_POST["Submit"]) {
 
 	/* check for overlaps */
-	foreach ($a_nat as $natent) {
-		if (isset($id) && ($a_nat[$id]) && ($a_nat[$id] === $natent))
-			continue;
-		if ($natent['interface'] != $_POST['interface'])
-			continue;
-	}
 
 /* if no errors write to conf */
 	if (!$input_errors) {
 		$natent = array();
-	/* repost the options already in conf */
-	
+		/* repost the options already in conf */
 	if ($pconfig['interface'] != "") { $natent['interface'] = $pconfig['interface']; }
 	if ($pconfig['enable'] != "") { $natent['enable'] = $pconfig['enable']; }
 	if ($pconfig['uuid'] != "") { $natent['uuid'] = $pconfig['uuid']; }
@@ -175,17 +159,9 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 	if ($pconfig['blockoffenders7'] != "") { $natent['blockoffenders7'] = $pconfig['blockoffenders7']; }
 	if ($pconfig['alertsystemlog'] != "") { $natent['alertsystemlog'] = $pconfig['alertsystemlog']; }
 	if ($pconfig['tcpdumplog'] != "") { $natent['tcpdumplog'] = $pconfig['tcpdumplog']; }
-	if ($pconfig['snortunifiedlog'] != "") { $natent['snortunifiedlog'] = $pconfig['snortunifiedlog']; }	
-	if ($pconfig['def_ssl_ports_ignore'] != "") { $natent['def_ssl_ports_ignore'] = $pconfig['def_ssl_ports_ignore']; }
-	if ($pconfig['flow_depth'] != "") { $natent['flow_depth'] = $pconfig['flow_depth']; }
-	if ($pconfig['perform_stat'] != "") { $natent['perform_stat'] = $pconfig['perform_stat']; }
-	if ($pconfig['http_inspect'] != "") { $natent['http_inspect'] = $pconfig['http_inspect']; }
-	if ($pconfig['other_preprocs'] != "") { $natent['other_preprocs'] = $pconfig['other_preprocs']; }
-	if ($pconfig['ftp_preprocessor'] != "") { $natent['ftp_preprocessor'] = $pconfig['ftp_preprocessor']; }
-	if ($pconfig['smtp_preprocessor'] != "") { $natent['smtp_preprocessor'] = $pconfig['smtp_preprocessor']; }
-	if ($pconfig['sf_portscan'] != "") { $natent['sf_portscan'] = $pconfig['sf_portscan']; }
-	if ($pconfig['dce_rpc_2'] != "") { $natent['dce_rpc_2'] = $pconfig['dce_rpc_2']; }
-	if ($pconfig['dns_preprocessor'] != "") { $natent['dns_preprocessor'] = $pconfig['dns_preprocessor']; }
+	if ($pconfig['snortunifiedlog'] != "") { $natent['snortunifiedlog'] = $pconfig['snortunifiedlog']; }
+	if ($pconfig['barnyard_enable'] != "") { $natent['barnyard_enable'] = $pconfig['barnyard_enable']; }
+	if ($pconfig['barnyard_mysql'] != "") { $natent['barnyard_mysql'] = $pconfig['barnyard_mysql']; }
 	if ($pconfig['def_dns_servers'] != "") { $natent['def_dns_servers'] = $pconfig['def_dns_servers']; }
 	if ($pconfig['def_dns_ports'] != "") { $natent['def_dns_ports'] = $pconfig['def_dns_ports']; }
 	if ($pconfig['def_smtp_servers'] != "") { $natent['def_smtp_servers'] = $pconfig['def_smtp_servers']; }
@@ -221,12 +197,20 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 	if ($pconfig['def_ssl_ports'] != "") { $natent['def_ssl_ports'] = $pconfig['def_ssl_ports']; }
 	if ($pconfig['rulesets'] != "") { $natent['rulesets'] = $pconfig['rulesets']; }
 	if ($pconfig['rule_sid_off'] != "") { $natent['rule_sid_off'] = $pconfig['rule_sid_off']; }
-	if ($pconfig['rule_sid_on'] != "") { $natent['rule_sid_on'] = $pconfig['rule_sid_on']; }	
-	
+	if ($pconfig['rule_sid_on'] != "") { $natent['rule_sid_on'] = $pconfig['rule_sid_on']; }
+		
 		/* post new options */
-		$natent['barnyard_enable'] = $_POST['barnyard_enable'] ? on : off;
-		$natent['barnyard_mysql'] = $_POST['barnyard_mysql'] ? $_POST['barnyard_mysql'] : $pconfig['barnyard_mysql'];
-		if ($_POST['barnyard_enable'] == "on") { $natent['snortunifiedlog'] = on; }else{ $natent['snortunifiedlog'] = off; } if ($_POST['barnyard_enable'] == "") { $natent['snortunifiedlog'] = off; }
+		$natent['perform_stat'] = $_POST['perform_stat'];
+		if ($_POST['def_ssl_ports_ignore'] != "") { $natent['def_ssl_ports_ignore'] = $_POST['def_ssl_ports_ignore']; }else{ $natent['def_ssl_ports_ignore'] = ""; }
+		if ($_POST['flow_depth'] != "") { $natent['flow_depth'] = $_POST['flow_depth']; }else{ $natent['flow_depth'] = ""; }
+		$natent['perform_stat'] = $_POST['perform_stat'] ? on : off;
+		$natent['http_inspect'] = $_POST['http_inspect'] ? on : off;
+		$natent['other_preprocs'] = $_POST['other_preprocs'] ? on : off;
+		$natent['ftp_preprocessor'] = $_POST['ftp_preprocessor'] ? on : off;
+		$natent['smtp_preprocessor'] = $_POST['smtp_preprocessor'] ? on : off;
+		$natent['sf_portscan'] = $_POST['sf_portscan'] ? on : off;
+		$natent['dce_rpc_2'] = $_POST['dce_rpc_2'] ? on : off;
+		$natent['dns_preprocessor'] = $_POST['dns_preprocessor'] ? on : off;		
 
 		if (isset($id) && $a_nat[$id])
 			$a_nat[$id] = $natent;
@@ -247,12 +231,12 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
 		sleep(2);
-		header("Location: snort_barnyard.php?id=$id");
+		header("Location: snort_preprocessors.php?id=$id");
 		exit;
 	}
 }
 
-$pgtitle = "Snort: Interface: $id$if_real Barnyard2 Edit";
+$pgtitle = "Snort: Interface $id$if_real Preprocessors and Flow";
 include("head.inc");
 
 ?>
@@ -274,34 +258,15 @@ border-bottom:2px solid #DBAC48;
 padding: 15px 10px 85% 50px;
 }
 </style> 
-<noscript><div class="alert" ALIGN=CENTER><img src="/themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
-<script language="JavaScript">
-<!--
+<noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
 
-function enable_change(enable_change) {
-	endis = !(document.iform.barnyard_enable.checked || enable_change);
-	// make shure a default answer is called if this is envoked.
-	endis2 = (document.iform.barnyard_enable);
-
-<?php
-/* make shure all the settings exist or function hide will not work */
-/* if $id is emty allow if and discr to be open */
-if($id != "") 
-{
-echo "	
-	document.iform.interface.disabled = endis2;\n";
-}
-?>
-    document.iform.barnyard_mysql.disabled = endis;
-}
-//-->
-</script>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<form action="snort_barnyard.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
+<form action="snort_preprocessors.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
 
 <?php
 
 	/* Display Alert message */
+
 	if ($input_errors) {
 	print_input_errors($input_errors); // TODO: add checks
 	}
@@ -337,9 +302,9 @@ if($id != "")
     $tab_array[] = array("Categories", false, "/snort/snort_rulesets.php?id={$id}");
     $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
     $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
-    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
-    $tab_array[] = array("Barnyard2", true, "/snort/snort_barnyard.php?id={$id}");
-    display_top_tabs($tab_array);	
+    $tab_array[] = array("Preprocessors", true, "/snort/snort_preprocessors.php?id={$id}");
+    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
+    display_top_tabs($tab_array);
 
 }
 ?>
@@ -366,56 +331,88 @@ if($id != "")
 				padding: 15px 10px 85% 50px;
 				}
 				</style> 
-				<div class=\"alert\" ALIGN=CENTER><img src=\"/themes/nervecenter/images/icons/icon_alert.gif\"/><strong>You can not edit options without an interface ID.</CENTER></div>\n";
+				<div class=\"alert\" ALIGN=CENTER><img src=\"../themes/nervecenter/images/icons/icon_alert.gif\"/><strong>You can not edit options without an interface ID.</CENTER></div>\n";
 				
 				}
 				?>
 				<tr>
-				<td width="22%" valign="top" class="vtable">&nbsp;</td>
-				<td width="78%" class="vtable">
-					<?php
-					// <input name="enable" type="checkbox" value="yes" checked onClick="enable_change(false)">
-					// care with spaces
-					if ($pconfig['barnyard_enable'] == "on")
-					$checked = checked;
-					if($id != "") 
-					{
-					$onclick_enable = "onClick=\"enable_change(false)\">";
-					}
-					echo "
-					<input name=\"barnyard_enable\" type=\"checkbox\" value=\"on\" $checked $onclick_enable
-					<strong>Enable Barnyard2 on this Interface</strong><br>
-					This will enable barnyard2 for this interface. You will also have to set the database credentials.</td>\n\n";
-					?>
+					<td width="22%" valign="top">&nbsp;</td>
+					<td width="78%"><span class="vexpl"><span class="red"><strong>Note: </strong></span><br>
+					Rules may be dependent on preprocessors!<br>
+					Please save your settings before you click start.<br>					
+					</td>
 				</tr>
 				<tr>
-                  <td width="22%" valign="top" class="vncell">Interface</td>
-                  <td width="78%" class="vtable">
-					<select name="interface" class="formfld">
-						<?php
-						$interfaces = array('wan' => 'WAN', 'lan' => 'LAN', 'pptp' => 'PPTP', 'pppoe' => 'PPPOE');
-						for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
-							$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
-						}
-						foreach ($interfaces as $iface => $ifacename): ?>
-						<option value="<?=$iface;?>" <?php if ($iface == $pconfig['interface']) echo "selected"; ?>>
-						<?=htmlspecialchars($ifacename);?>
-						</option>
-						<?php endforeach; ?>
-					</select><br>
-                     <span class="vexpl">Choose which interface this rule applies to.<br>
-                     Hint: in most cases, you'll want to use WAN here.</span></td>
-                </tr>
+					<td width="22%" valign="top" class="vncell">Enable <br>Performance Statistics</td>
+					<td width="78%" class="vtable">
+					<input name="perform_stat" type="checkbox" value="on" <?php if ($pconfig['perform_stat']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					Performance Statistics for this interface.</td>
+				</tr>
+				<tr>
+					<td width="22%" valign="top" class="vncell">Enable <br>HTTP Inspect</td>
+					<td width="78%" class="vtable">
+					<input name="http_inspect" type="checkbox" value="on" <?php if ($pconfig['http_inspect']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					Normalize/Decode and detect HTTP traffic and protocol anomalies.</td>
+				</tr>
+				<tr>
+				<td valign="top" class="vncell">HTTP server flow depth</td>
+				<td class="vtable">
+					<table cellpadding="0" cellspacing="0">
+					<tr>
+                    <td><input name="flow_depth" type="text" class="formfld" id="flow_depth" size="5" value="<?=htmlspecialchars($pconfig['flow_depth']);?>"> <strong>-1</strong> to <strong>1460</strong> (<strong>-1</strong> disables HTTP inspect, <strong>0</strong> enables all HTTP inspect)</td>
+					</tr>
+					</table>
+						Amount of HTTP server response payload to inspect. Snort's performance may increase by adjusting this value.<br>
+						Setting this value too low may cause false negatives. Values above 0 are specified in bytes.<br>
+						<strong>Default value is 0</strong></td>
+				</tr>
+				<tr>
+					<td width="22%" valign="top" class="vncell">Enable <br>RPC Decode and Back Orifice detector</td>
+					<td width="78%" class="vtable">
+					<input name="other_preprocs" type="checkbox" value="on" <?php if ($pconfig['other_preprocs']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					Normalize/Decode RPC traffic and detects Back Orifice traffic on the network.</td>
+				</tr>
+				<tr>
+					<td width="22%" valign="top" class="vncell">Enable <br>FTP and Telnet Normalizer</td>
+					<td width="78%" class="vtable">
+					<input name="ftp_preprocessor" type="checkbox" value="on" <?php if ($pconfig['ftp_preprocessor']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					Normalize/Decode FTP and Telnet traffic and protocol anomalies.</td>
+				</tr>
+				<tr>
+					<td width="22%" valign="top" class="vncell">Enable <br>SMTP Normalizer</td>
+					<td width="78%" class="vtable">
+					<input name="smtp_preprocessor" type="checkbox" value="on" <?php if ($pconfig['smtp_preprocessor']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					Normalize/Decode SMTP protocol for enforcement and buffer overflows.</td>
+				</tr>
+				<tr>
+					<td width="22%" valign="top" class="vncell">Enable <br>Portscan Detection</td>
+					<td width="78%" class="vtable">
+					<input name="sf_portscan" type="checkbox" value="on" <?php if ($pconfig['sf_portscan']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					Detects various types of portscans and portsweeps.</td>
+				</tr>
+				<tr>
+					<td width="22%" valign="top" class="vncell">Enable <br>DCE/RPC2 Detection</td>
+					<td width="78%" class="vtable">
+					<input name="dce_rpc_2" type="checkbox" value="on" <?php if ($pconfig['dce_rpc_2']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					The DCE/RPC preprocessor detects and decodes SMB and DCE/RPC traffic.</td>
+				</tr>
+				<tr>
+					<td width="22%" valign="top" class="vncell">Enable <br>DNS Detection</td>
+					<td width="78%" class="vtable">
+					<input name="dns_preprocessor" type="checkbox" value="on" <?php if ($pconfig['dns_preprocessor']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					The DNS preprocessor decodes DNS Response traffic and detects some vulnerabilities.</td>
+				</tr> 
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Log to a Mysql Database</td>
+                  <td width="22%" valign="top" class="vncell">Define SSL_IGNORE</td>
                   <td width="78%" class="vtable">
-                    <input name="barnyard_mysql" type="text" class="formfld" id="barnyard_mysql" size="40" value="<?=htmlspecialchars($pconfig['barnyard_mysql']);?>">
-                    <br> <span class="vexpl">Example: output database: log, mysql, dbname=snort user=snort host=localhost password=xyz</span></td>
+                    <input name="def_ssl_ports_ignore" type="text" class="formfld" id="def_ssl_ports_ignore" size="40" value="<?=htmlspecialchars($pconfig['def_ssl_ports_ignore']);?>">
+                    <br> <span class="vexpl"> Encrypted traffic should be ignored by Snort for both performance reasons and to reduce false positives.<br>
+					Default: "443 465 563 636 989 990 992 993 994 995".</span> <strong>Please use spaces and not commas.</strong></td>
                 </tr>
                 <tr>
                   <td width="22%" valign="top">&nbsp;</td>
                   <td width="78%">
-                    <input name="Submit" type="submit" class="formbtn" value="Save"><input type="button" class="formbtn" value="Cancel" onclick="history.back()">
+                    <input name="Submit" type="submit" class="formbtn" value="Save"> <input type="button" class="formbtn" value="Cancel" onclick="history.back()">
                     <?php if (isset($id) && $a_nat[$id]): ?>
                     <input name="id" type="hidden" value="<?=$id;?>">
                     <?php endif; ?>
@@ -425,7 +422,7 @@ if($id != "")
 	  <td width="22%" valign="top">&nbsp;</td>
 	  <td width="78%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
 	  <br>
-		Please save your settings befor you click start. </td>
+		Please save your settings before you click Start. </td>
 	</tr>
   </table>
   </table>

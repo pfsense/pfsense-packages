@@ -126,7 +126,7 @@ if (isset($_GET['dup']))
 }
 
 /* convert fake interfaces to real */
-$if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface']);
+$if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interface']);
 
 
 	if ($_POST["Submit"]) {
@@ -227,9 +227,10 @@ $if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface
 	}
 }
 
+$snort_uuid = $pconfig['uuid'];
 
 		/* alert file */
-$d_snortconfdirty_path = "/var/run/snort_conf_{$pconfig['uuid']}_{$if_real}.dirty";
+$d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid }_{$if_real}.dirty";
 	
 	/* this will exec when alert says apply */
 	if ($_POST['apply']) {
@@ -238,7 +239,7 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$pconfig['uuid']}_{$if_real}.dirt
 			
 			write_config();
 			
-			sync_snort_package_all();
+			sync_snort_package_all($id, $if_real, $snort_uuid);
 			sync_snort_package();
 			
 			unlink($d_snortconfdirty_path);
