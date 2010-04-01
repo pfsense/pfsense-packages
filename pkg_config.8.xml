@@ -299,7 +299,7 @@
       <name>OpenOSPFD</name>
       <descr>OSPF routing protocol</descr>
       <maintainer>cmb@pfsense.org</maintainer>
-      <version>0.5</version>
+      <version>0.5.1</version>
       <category>Routing</category>
       <status>BETA</status>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
@@ -308,6 +308,7 @@
       <pkginfolink></pkginfolink>
       <required_version>1.2.1</required_version>
       <configurationfile>openospfd.xml</configurationfile>
+      <depends_on_package>libevent-1.4.13.tbz</depends_on_package>
     </package>
     <package>
       <name>Lightsquid</name>
