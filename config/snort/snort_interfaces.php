@@ -494,7 +494,7 @@ if ($pkg['tabs'] <> "") {
 
 <?php
 /* TODO: remove when 2.0 stable */
-if ($pfsense_stable == 'yes') {
+if ($pfsense_theme_is == 'nervecenter') {
 
 $footer2 = "
 
@@ -527,12 +527,12 @@ $footer2 = "
 	</div>\n";
 }
 
-if ($pfsense_stable != 'yes') {
+if ($pfsense_theme_is == 'pfsense_ng') {
 $footer3 = "
 
 <style type=\"text/css\">
 
-#footer2
+#footer3
 {
 
 top: 105px;
@@ -556,7 +556,7 @@ clear: both;
 
 </style>
 
-	<div id=\"footer2\">
+	<div id=\"footer3\">
 			Snort is a registered trademark of Sourcefire, Inc, Barnyard2 is a registered trademark of securixlive.com, Orion copyright Robert Zelaya,
 			Emergingthreats is a registered trademark of emergingthreats.net, Mysql is a registered trademark of Mysql.com
 	</div>\n";

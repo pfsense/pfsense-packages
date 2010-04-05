@@ -128,7 +128,7 @@ if (isset($id) && $a_nat[$id]) {
 if (isset($_GET['dup']))
 	unset($id);
 	
-$if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interface']);
+$if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface']);
 $snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
 

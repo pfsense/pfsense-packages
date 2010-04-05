@@ -37,7 +37,6 @@ require_once("functions.inc");
 require_once("filter.inc");
 
 /* find out if were in 1.2.3-RELEASE */
-
 $pfsense_ver_chk = exec('/bin/cat /etc/version');
 if ($pfsense_ver_chk == '1.2.3-RELEASE')
 {
@@ -45,6 +44,9 @@ if ($pfsense_ver_chk == '1.2.3-RELEASE')
 }else{
 	$pfsense_stable = 'no';
 }
+
+/* tell me my theme */
+$pfsense_theme_is = $config['theme'];
 
 /* checks to see if snort is running yes/no and stop/start */
 	function Running_Ck($snort_uuid, $if_real, $id) {
@@ -588,7 +590,7 @@ class array_ereg {
                         $id += 1;
 
                         $result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-                        $if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
+                        $if_real = convert_friendly_interface_to_real_interface_name($result_lan);
 
 						$snort_rules_list[] = "snort_$id$if_real";
 
@@ -628,7 +630,7 @@ function sync_snort_package()
 	conf_mount_ro();
 }
 
-/* make sure this func on writes to files and does not start snort */
+/* only run when a single iface needs to sync */
 function sync_snort_package_all($id, $if_real, $snort_uuid)
 {
 	//global $config, $g, $id, $if_real, $snort_uuid, $interface_fake;
@@ -652,7 +654,7 @@ if ($id != '' && $if_real != '') //new
 
 				$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 				$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-				$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
+				$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
 
 				/* create snort configuration file */
 				create_snort_conf($id, $if_real, $snort_uuid);
@@ -675,7 +677,7 @@ if ($id != '' && $if_real != '') //new
 	}
 }
 
-/* only be run on new iface create, bootup and ip refresh */
+/* only run when all ifaces needed to sync */
 function sync_snort_package_empty()
 {
 	global $config, $g;
@@ -699,7 +701,7 @@ function sync_snort_package_empty()
 				$id += 1;
 
 				$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-				$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
+				$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
 				$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
 				if ($if_real != '' && $snort_uuid != '') {
@@ -720,10 +722,59 @@ function sync_snort_package_empty()
 				create_snort_sh();
 
 				sync_snort_package();
+				
+				conf_mount_ro();
 
 		}
 	}
 }
+
+/* only bootup and ip refresh */
+function sync_snort_package_config()
+{
+	global $config, $g;
+	conf_mount_rw();
+
+	/* do not start config build if rules is empty */
+	if (!empty($config['installedpackages']['snortglobal']['rule'])) 
+	{
+		if ($id == "") 
+		{
+
+			$rule_array = $config['installedpackages']['snortglobal']['rule'];
+			$id = -1;
+			foreach ($rule_array as $value)
+			{
+
+				if ($id == '') {
+				$id = 0;
+				}
+
+				$id += 1;
+
+				$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
+				$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+				$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
+
+				if ($if_real != '' && $snort_uuid != '') {
+				/* create snort configuration file */
+				create_snort_conf($id, $if_real, $snort_uuid);
+
+				/* create barnyard2 configuration file */
+				$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
+				if ($snortbarnyardlog_info_chk == 'on')
+					create_barnyard2_conf($id, $if_real, $snort_uuid);
+				}
+			}
+
+				sync_snort_package();
+				
+				conf_mount_ro();
+
+		}
+	}
+}
+
 
 /* Start of main config files */
 /* Start of main config files */
@@ -752,7 +803,7 @@ function create_snort_sh()
 
 			$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 			$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-			$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
+			$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
 
 	/* define snortbarnyardlog_chk */
 	$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
@@ -860,7 +911,7 @@ rc_start() {
 		/bin/echo "snort.sh run" > /tmp/snort.sh.pid
 
 		#### Remake the configs on boot Important!
-		/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php
+		/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php &
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort Startup files Sync..."
 
 $start_snort_iface_restart
@@ -1087,9 +1138,10 @@ function snort_deinstall()
 	exec("rm -rf /usr/local/etc/snort*");
 	//exec("cd /var/db/pkg && pkg_delete `ls | grep barnyard2`");
 	exec("cd /var/db/pkg && pkg_delete `ls | grep snort`");
-	exec("cd /var/db/pkg && pkg_delete `ls | grep mysql`");
-	exec("cd /var/db/pkg && pkg_delete `ls | grep pcre`");
-	exec("cd /var/db/pkg && pkg_delete `ls | grep perl`");
+	/* TODO: figure out how to detect pfsense packages that use the same freebsd pkckages  and not deinstall */
+	//exec("cd /var/db/pkg && pkg_delete `ls | grep mysql`");
+	//exec("cd /var/db/pkg && pkg_delete `ls | grep pcre`");
+	//exec("cd /var/db/pkg && pkg_delete `ls | grep perl`");
 
 	/* Remove snort cron entries Ugly code needs smoothness*/
 
@@ -1528,7 +1580,7 @@ else
 		$home_net .= "{$ip} ";
 	
 	/* Add Gateway on WAN interface to whitelist (For RRD graphs) */
-	$int = convert_friendly_interface_to_real_interface_name2("WAN");
+	$int = convert_friendly_interface_to_real_interface_name("WAN");
 	$gw = get_interface_gateway($int);
 	if($gw) 
 		$home_net .= "{$gw} ";

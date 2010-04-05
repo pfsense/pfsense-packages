@@ -38,7 +38,7 @@ Important add error checking
 
 */
 
-require_once("globals.inc");
+//require_once("globals.inc");
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
@@ -126,7 +126,12 @@ if (isset($_GET['dup']))
 }
 
 /* convert fake interfaces to real */
-$if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interface']);
+$if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface']);
+
+$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
+
+/* alert file */
+$d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 
 
 	if ($_POST["Submit"]) {
@@ -226,11 +231,6 @@ $if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interfac
 		exit;
 	}
 }
-
-$snort_uuid = $pconfig['uuid'];
-
-		/* alert file */
-$d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid }_{$if_real}.dirty";
 	
 	/* this will exec when alert says apply */
 	if ($_POST['apply']) {
@@ -278,7 +278,7 @@ padding: 15px 10px 85% 50px;
 
 <?php
 
-	/* Display message */
+	/* Display Alert message */
 
 	if ($input_errors) {
 	print_input_errors($input_errors); // TODO: add checks
@@ -288,7 +288,8 @@ padding: 15px 10px 85% 50px;
 	print_info_box2($savemsg);
 	}
 
-	if (file_exists($d_snortconfdirty_path)) {
+	//if (file_exists($d_snortconfdirty_path)) {
+	if (file_exists($d_snortconfdirty_path) || file_exists("/var/run/snort_conf_{$snort_uuid}_.dirty")) {
 	echo '<p>';
 
 		if($savemsg) {

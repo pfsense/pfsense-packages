@@ -119,7 +119,7 @@ if (isset($_GET['dup']))
 }
 
 /* convert fake interfaces to real */
-$if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interface']);
+$if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface']);
 
 $snort_uuid = $pconfig['uuid'];
 
@@ -212,7 +212,7 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 		$natent['dce_rpc_2'] = $_POST['dce_rpc_2'] ? on : off;
 		$natent['dns_preprocessor'] = $_POST['dns_preprocessor'] ? on : off;		
 
-		if (isset($id) && $a_nat[$id])
+			if (isset($id) && $a_nat[$id])
 			$a_nat[$id] = $natent;
 		else {
 			if (is_numeric($after))
@@ -220,11 +220,11 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 			else
 				$a_nat[] = $natent;
 		}
-
+		
 		write_config();
         
 		/* after click go to this page */
-		touch($d_snortconfdirty_path);
+		//touch($d_snortconfdirty_path);
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );

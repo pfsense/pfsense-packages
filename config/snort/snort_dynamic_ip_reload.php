@@ -33,18 +33,15 @@
 
 require_once("/usr/local/pkg/snort/snort.inc");
 
-/* get the varibles from the command line */
-/* Note: snort.sh sould only be using this */
-//$id = $_SERVER["argv"][1];
-//$if_real = $_SERVER["argv"][2];
+if (file_exists('/var/run/snort_dynamic_ip_reload.dirty')) {
+	exit();
+}
 
-//$test_iface = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
+exec('/usr/bin/touch /var/run/snort_dynamic_ip_reload.dirty');
 
-//if ($id == "" || $if_real == "" || $test_iface == "") {
-//	exec("/usr/bin/logger -p daemon.info -i -t SnortDynIP \"ERORR starting snort_dynamic_ip_reload.php\"");
-//	exit;
-//	}
+sync_snort_package_config();
+sync_snort_package();
 
-sync_snort_package_empty();
+exec('/bin/rm /var/run/snort_dynamic_ip_reload.dirty');
 
 ?>
