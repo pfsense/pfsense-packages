@@ -152,7 +152,7 @@ function sync_package_snort()
         if ($snortbarnyardlog_info_chk == on)
                 $start .= "\nsleep 4;/usr/local/bin/barnyard2 -c /usr/local/etc/barnyard2.conf -d /var/log/snort -f snort.u2 -w /usr/local/etc/snort/barnyard2.waldo -D -q\n";	
 	}    
-    $check_if_snort_runs = "\n\tif [ \"`ls -A /usr/local/etc/snort/rules`\" ] ; then\n\techo \"rules exist\"\n\telse\n\techo \"rules DONT exist\"\n\texit 2\n\tfi \n\n\tif [ \"`pgrep -x snort`\" = \"\" ] ; then\n\t/bin/rm /tmp/snort.sh.pid\n\tfi \n\n\tif [ \"`pgrep -x snort`\" != \"\" ] ; then\n\tlogger -p daemon.info -i -t SnortStartup \"Snort already running...\"\n\t/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php\n\texit 1\n\tfi\n\n";
+    $check_if_snort_runs = "\n\tif [ \"`ls -A /usr/local/etc/snort/rules`\" ] ; then\n\techo \"rules exist\"\n\telse\n\techo \"rules DONT exist\"\n\texit 2\n\tfi \n\n\tif [ \"`pgrep -x snort`\" = \"\" ] ; then\n\t/bin/rm /tmp/snort.sh.pid\n\tfi \n\n\tif [ \"`pgrep -x snort`\" != \"\" ] ; then\n\tlogger -p daemon.info -i -t SnortStartup \"Snort already running...\"\n\t/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php &\n\texit 1\n\tfi\n\n";
     $if_snort_pid = "\nif ls /tmp/snort.sh.pid > /dev/null\nthen\n    echo \"snort.sh is running\"\n    exit 0\nelse\n    echo \"snort.sh is not running\"\nfi\n";        
     $echo_snort_sh_pid = "\necho \"snort.sh run\" > /tmp/snort.sh.pid\n";
     $echo_snort_sh_startup_log = "\necho \"snort.sh run\" >> /tmp/snort.sh_startup.log\n";
@@ -290,7 +290,9 @@ function create_snort_conf() {
 function snort_deinstall() {
 
 	global $config, $g;
-
+	conf_mount_rw();
+	
+	
 	/* remove custom sysctl */
 	remove_text_from_file("/etc/sysctl.conf", "sysctl net.bpf.bufsize=20480");
 	/* decrease bpf buffers back to 4096, from 20480 */
@@ -361,12 +363,18 @@ function snort_deinstall() {
 snort_rm_blocked_deinstall_cron("");
 snort_rules_up_deinstall_cron("");
 
-		
-	/* Unset snort registers in conf.xml IMPORTANT snort will not start with out this */
-	/* Keep this as a last step */
-	unset($config['installedpackages']['snort']['config'][0]['autorulesupdate7']);
-    unset($config['installedpackages']['snort']['config'][0]['rm_blocked']);
-    write_config();
+/* Unset snort registers in conf.xml IMPORTANT snort will not start with out this */
+/* Keep this as a last step */
+
+unset($config['installedpackages']['snort']);
+unset($config['installedpackages']['snortdefservers']);
+unset($config['installedpackages']['snortwhitelist']);
+unset($config['installedpackages']['snortthreshold']);
+unset($config['installedpackages']['snortadvanced']);
+
+
+write_config();
+conf_mount_ro();
 	
 }
 
