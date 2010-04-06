@@ -573,11 +573,7 @@ if($id != "")
   </table>
 </form>
 
-<script language="JavaScript">
-<!--
-enable_change(false);
-//-->
-</script>
+
 <?php include("fend.inc"); ?>
 </body>
 </html>

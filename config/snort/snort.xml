@@ -58,7 +58,7 @@
 	<service>
 		<name>snort</name>
 		<rcfile></rcfile>
-		<executable>snort</executable>
+		<executable>/usr/local/bin/snort</executable>
 		<description>Snort is the most widely deployed IDS/IPS technology worldwide.</description>
 	</service>
 	<tabs>

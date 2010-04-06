@@ -169,6 +169,16 @@ if (isset($_POST['del_x'])) {
 	    }
 	    
 	    write_config();
+	    sleep(2);
+	    
+	    /* if there are no ifaces do not create snort.sh */
+	    if (isset($config['installedpackages']['snortglobal']['rule'][0]['enable'])) {
+	    	create_snort_sh();
+	    }else{
+	    	conf_mount_rw();
+	    	exec('/bin/rm /usr/local/etc/rc.d/snort.sh');
+	    	conf_mount_ro();
+	    }
 	    
 	    //touch("/var/run/snort_conf_delete.dirty");
 	    

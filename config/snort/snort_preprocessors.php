@@ -224,7 +224,7 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 		write_config();
         
 		/* after click go to this page */
-		//touch($d_snortconfdirty_path);
+		touch($d_snortconfdirty_path);
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
@@ -428,11 +428,6 @@ if($id != "")
   </table>
 </form>
 
-<script language="JavaScript">
-<!--
-enable_change(false);
-//-->
-</script>
 <?php include("fend.inc"); ?>
 </body>
 </html>
