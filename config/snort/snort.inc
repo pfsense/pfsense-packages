@@ -209,13 +209,18 @@ function snort_postinstall()
 	global $config;
 	conf_mount_rw();
 
-	if(!file_exists("/var/log/snort/")) {
-	mwexec("mkdir -p /var/log/snort/");
-	mwexec("mkdir -p /var/log/snort/barnyard2");
+	if(!file_exists('/var/log/snort/')) {
+	mwexec('mkdir -p /var/log/snort/');
+	mwexec('mkdir -p /var/log/snort/barnyard2');
 	}
 
-	if(!file_exists("/var/log/snort/alert"))
-		touch("/var/log/snort/alert");
+	if(!file_exists('/var/log/snort/alert')) {
+		touch('/var/log/snort/alert');
+	}else{
+		exec('/bin/rm -rf /var/log/snort/*');
+		touch('/var/log/snort/alert');
+	}
+		
 
 	/* snort -> advanced features */
 	$bpfbufsize = $config['installedpackages']['snortglobal']['bpfbufsize'];
@@ -224,47 +229,47 @@ function snort_postinstall()
 
 	
 	/* create a few directories and ensure the sample files are in place */
-	exec("/bin/mkdir -p /usr/local/etc/snort");
-	exec("/bin/mkdir -p /var/log/snort");
-	exec("/bin/mkdir -p /usr/local/etc/snort/rules");
+	exec('/bin/mkdir -p /usr/local/etc/snort');
+	exec('/bin/mkdir -p /var/log/snort');
+	exec('/bin/mkdir -p /usr/local/etc/snort/rules');
 
-	if(file_exists("/usr/local/etc/snort/snort.conf-sample")) 
+	if(file_exists('/usr/local/etc/snort/snort.conf-sample')) 
 	{
-		exec("/bin/rm /usr/local/etc/snort/snort.conf-sample");
-		exec("/bin/rm /usr/local/etc/snort/threshold.conf-sample");
-		exec("/bin/rm /usr/local/etc/snort/sid-msg.map-sample");
-		exec("/bin/rm /usr/local/etc/snort/unicode.map-sample");
-		exec("/bin/rm /usr/local/etc/snort/classification.config-sample");
-		exec("/bin/rm /usr/local/etc/snort/generators-sample");
-		exec("/bin/rm /usr/local/etc/snort/reference.config-sample");
-		exec("/bin/rm /usr/local/etc/snort/gen-msg.map-sample");
-		exec("/bin/rm /usr/local/etc/snort/sid");
-		exec("/bin/rm /usr/local/etc/rc.d/snort");
-		exec("/bin/rm /usr/local/etc/rc.d/bardyard2");
+		exec('/bin/rm /usr/local/etc/snort/snort.conf-sample');
+		exec('/bin/rm /usr/local/etc/snort/threshold.conf-sample');
+		exec('/bin/rm /usr/local/etc/snort/sid-msg.map-sample');
+		exec('/bin/rm /usr/local/etc/snort/unicode.map-sample');
+		exec('/bin/rm /usr/local/etc/snort/classification.config-sample');
+		exec('/bin/rm /usr/local/etc/snort/generators-sample');
+		exec('/bin/rm /usr/local/etc/snort/reference.config-sample');
+		exec('/bin/rm /usr/local/etc/snort/gen-msg.map-sample');
+		exec('/bin/rm /usr/local/etc/snort/sid');
+		exec('/bin/rm /usr/local/etc/rc.d/snort');
+		exec('/bin/rm /usr/local/etc/rc.d/bardyard2');
 	}
 	
-	if(!file_exists("/usr/local/etc/snort/custom_rules"))
+	if(!file_exists('/usr/local/etc/snort/custom_rules'))
 	{
-		exec("/bin/mkdir -p /usr/local/etc/snort/custom_rules/");
+		exec('/bin/mkdir -p /usr/local/etc/snort/custom_rules/');
 	}
 	
-	exec("/usr/sbin/pw groupadd snort");
+	exec('/usr/sbin/pw groupadd snort');
 	exec('/usr/sbin/pw useradd snort -c "SNORT USER" -d /nonexistent -g snort -s /sbin/nologin');
-	exec("/usr/sbin/chown -R snort:snort /var/log/snort");
-	exec("/usr/sbin/chown -R snort:snort /usr/local/etc/snort");
-	exec("/usr/sbin/chown -R snort:snort /usr/local/lib/snort");
-	exec("/bin/chmod -R 755  /var/log/snort");
-	exec("/bin/chmod -R 755  /usr/local/etc/snort");
-	exec("/bin/chmod -R 755  /usr/local/lib/snort");
+	exec('/usr/sbin/chown -R snort:snort /var/log/snort');
+	exec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort');
+	exec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort');
+	exec('/bin/chmod -R 755  /var/log/snort');
+	exec('/bin/chmod -R 755  /usr/local/etc/snort');
+	exec('/bin/chmod -R 755  /usr/local/lib/snort');
 	
 	
 	/* remove example files */
-	if(file_exists("/usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so.0"))
+	if(file_exists('/usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so.0'))
 	{
 		exec('/bin/rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example*');
 	}
 	
-	if(file_exists("/usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example.so"))
+	if(file_exists('/usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example.so'))
 	{
 		exec('/bin/rm /usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example*');
 	}
@@ -1118,24 +1123,26 @@ function create_snort_conf($id, $if_real, $snort_uuid)
 function snort_deinstall()
 {
 
-	global $config, $g, $id, $if_real;
+	global $config, $g;
 	conf_mount_rw();
 
 	/* remove custom sysctl */
 	remove_text_from_file("/etc/sysctl.conf", "sysctl net.bpf.bufsize=20480");
 	/* decrease bpf buffers back to 4096, from 20480 */
-	exec("/sbin/sysctl net.bpf.bufsize=4096");
-	exec("/usr/usr/bin/killall snort");
+	exec('/sbin/sysctl net.bpf.bufsize=4096');
+	exec('/usr/usr/bin/killall snort');
 	sleep(2);
-	exec("/usr/usr/bin/killall -9 snort");
+	exec('/usr/usr/bin/killall -9 snort');
 	sleep(2);
-	exec("/usr/usr/bin/killall barnyard2");
+	exec('/usr/usr/bin/killall barnyard2');
 	sleep(2);
-	exec("/usr/usr/bin/killall -9 barnyard2");
+	exec('/usr/usr/bin/killall -9 barnyard2');
 	sleep(2);
-	exec("/usr/sbin/pw userdel snort");
-	exec("/usr/sbin/pw groupdel snort");
-	exec("rm -rf /usr/local/etc/snort*");
+	exec('/usr/sbin/pw userdel snort');
+	exec('/usr/sbin/pw groupdel snort');
+	exec('rm -rf /usr/local/etc/snort*');
+	exec('rm -rf /usr/local/pkg/snort*');
+	exec('rm -rf /usr/local/pkg/pf/snort*');
 	//exec("cd /var/db/pkg && pkg_delete `ls | grep barnyard2`");
 	exec("cd /var/db/pkg && pkg_delete `ls | grep snort`");
 	/* TODO: figure out how to detect pfsense packages that use the same freebsd pkckages  and not deinstall */
