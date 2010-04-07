@@ -74,7 +74,7 @@ while ($snort_uuid > 65535 || $snort_uuid == 0) {
 }
 
 /* convert fake interfaces to real */
-$if_real = convert_friendly_interface_to_real_interface_name($a_nat[$id]['interface']);
+$if_real = convert_friendly_interface_to_real_interface_name2($a_nat[$id]['interface']);
 
 if ($config['installedpackages']['snortglobal']['rule'][$id]['uuid'] != '') {
 	$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
@@ -162,7 +162,7 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 				
 				write_config();
 			
-				$if_real = convert_friendly_interface_to_real_interface_name($a_nat[$id]['interface']);
+				$if_real = convert_friendly_interface_to_real_interface_name2($a_nat[$id]['interface']);
 
 				sync_snort_package_all($id, $if_real, $snort_uuid);
 				sync_snort_package();
@@ -202,7 +202,7 @@ if ($_POST["Submit"]) {
 			$id_c += 1;
 
 			$result_lan = $config['installedpackages']['snortglobal']['rule'][$id_c]['interface'];
-			$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+			$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
 
 				if ($_POST['interface'] == $result_lan) {	
 				$input_errors[] = "Interface $result_lan is in use. Please select another interface.";
@@ -457,7 +457,7 @@ if ($a_nat[$id]['interface'] != '') {
         //print_r($if_array);
         if($if_array) {
                 foreach($if_array as $iface2) {
-                        $if2 = convert_friendly_interface_to_real_interface_name($iface2);
+                        $if2 = convert_friendly_interface_to_real_interface_name2($iface2);
 
                         if($config['interfaces'][$iface2]['ipaddr'] == "pppoe") {
                                 $if2 = "ng0";

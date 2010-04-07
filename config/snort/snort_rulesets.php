@@ -55,7 +55,7 @@ if (isset($id) && $a_nat[$id]) {
 }
 
 /* convert fake interfaces to real */
-$if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface']);
+$if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interface']);
 
 
 $iface_uuid = $a_nat[$id]['uuid'];

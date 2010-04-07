@@ -88,7 +88,7 @@ if (isset($_POST['del_x'])) {
 	    foreach ($_POST['rule'] as $rulei) {
 			
 			/* convert fake interfaces to real */
-			$if_real = convert_friendly_interface_to_real_interface_name($a_nat[$rulei]['interface']);
+			$if_real = convert_friendly_interface_to_real_interface_name2($a_nat[$rulei]['interface']);
 			$snort_uuid = $a_nat[$rulei]['uuid'];
 
 			/* cool code to check if any snort is up */
@@ -97,7 +97,7 @@ if (isset($_POST['del_x'])) {
 			if ($snort_up_ck != "")
 			{
 			
-				$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}_{$if_real}\" | awk '{print \$1;}'");
+				$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}{$if_real}\" | awk '{print \$1;}'");
 				$start_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
 				$start_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
 					
@@ -141,7 +141,7 @@ if (isset($_POST['del_x'])) {
 						
 			/* stop syslog flood code */		
 			//$if_real_wan_rulei = $a_nat[$rulei]['interface'];
-			//$if_real_wan_rulei2 = convert_friendly_interface_to_real_interface_name($if_real_wan_rulei);
+			//$if_real_wan_rulei2 = convert_friendly_interface_to_real_interface_name2($if_real_wan_rulei);
 			//exec("/sbin/ifconfig $if_real_wan_rulei2 -promisc");
 			//exec("/bin/cp /var/log/system.log /var/log/snort/snort_sys_$rulei$if_real.log");
 			//exec("/usr/bin/killall syslogd");
@@ -199,7 +199,7 @@ if (isset($_POST['del_x'])) {
 if ($_GET['act'] == 'toggle' && $_GET['id'] != '')
 {
 
-	$if_real = convert_friendly_interface_to_real_interface_name($config['installedpackages']['snortglobal']['rule'][$id]['interface']);
+	$if_real = convert_friendly_interface_to_real_interface_name2($config['installedpackages']['snortglobal']['rule'][$id]['interface']);
 	$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
 		/* Log Iface stop */
@@ -241,7 +241,7 @@ if ($_GET['act'] == 'toggle' && $_GET['id'] != '')
 
 
 
-$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.19";
+$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.20";
 include("head.inc");
 
 ?>
@@ -361,7 +361,7 @@ padding: 15px 10px 50% 50px;
 
 					/* convert fake interfaces to real and check if iface is up */
 					/* There has to be a smarter way to do this */
-					$if_real = convert_friendly_interface_to_real_interface_name($natent['interface']);
+					$if_real = convert_friendly_interface_to_real_interface_name2($natent['interface']);
 					$snort_uuid = $natent['uuid'];
 
 					$tester2 = Running_Ck($snort_uuid, $if_real, $id);

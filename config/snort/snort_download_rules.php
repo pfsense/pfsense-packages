@@ -1113,7 +1113,7 @@ if (!empty($config['installedpackages']['snortglobal']['rule']))
 	$id += 1;
 
 	$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-	$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+	$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
 	$iface_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
 	/* make oinkmaster.conf for each interface rule */

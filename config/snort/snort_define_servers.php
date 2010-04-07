@@ -126,7 +126,7 @@ if (isset($_GET['dup']))
 }
 
 /* convert fake interfaces to real */
-$if_real = convert_friendly_interface_to_real_interface_name($pconfig['interface']);
+$if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interface']);
 
 $snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 

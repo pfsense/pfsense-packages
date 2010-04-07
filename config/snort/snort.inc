@@ -67,7 +67,7 @@ $pfsense_theme_is = $config['theme'];
 
 	/* use ob_clean to clear output buffer, this code needs to be watched */
 	ob_clean();
-	$snort_up_prell = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}_{$if_real}\" | awk '{print \$1;}'", $retval);
+	$snort_up_prell = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}{$if_real}\" | awk '{print \$1;}'", $retval);
 
 	if ($snort_up_prell != "") {
 		$snort_uph = 'yes';
@@ -113,7 +113,7 @@ $pfsense_theme_is = $config['theme'];
 	function Running_Stop($snort_uuid, $if_real, $id) {
 		global $config;
 		
-	$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}_{$if_real}\" | awk '{print \$1;}'");
+	$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}{$if_real}\" | awk '{print \$1;}'");
 	$start_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
 	$start_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
 	
@@ -158,7 +158,7 @@ $pfsense_theme_is = $config['theme'];
 
 		$snort_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['enable'];
 		if ($snort_info_chk == 'on') {
-		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}_{$if_real}\" -D -q -l /var/log/snort -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}{$if_real}\" -D -q -l /var/log/snort -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 		}
 		/* define snortbarnyardlog_chk */
 		/* top will have trouble if the uuid is to far back */
@@ -177,7 +177,7 @@ function convert_friendly_interface_to_real_interface_name2($interface)
 {
         global $config;
 		
-        $lc_interface = strtolower($interface);
+       $lc_interface = strtolower($interface);
         if($lc_interface == "lan") return $config['interfaces']['lan']['if'];
         if($lc_interface == "wan") return $config['interfaces']['wan']['if'];
         $ifdescrs = array();
@@ -194,7 +194,7 @@ function convert_friendly_interface_to_real_interface_name2($interface)
    return $interface;
 }
 
-$if_real_wan = convert_friendly_interface_to_real_interface_name2($interface_fake);
+//$if_real_wan = convert_friendly_interface_to_real_interface_name2($interface_fake);
 
 /* Allow additional execution time 0 = no limit. */
 ini_set('max_execution_time', '9999');
@@ -322,6 +322,16 @@ function snort_postinstall()
 	
 	/* back to default */
 	chdir ("/root/");
+	
+	/* make sure snort-pld is deinstalled */
+	/* remove when snort-old is removed */
+	unset($config['installedpackages']['snort']);
+	unset($config['installedpackages']['snortdefservers']);
+	unset($config['installedpackages']['snortwhitelist']);
+	unset($config['installedpackages']['snortthreshold']);
+	unset($config['installedpackages']['snortadvanced']);
+	write_config();
+	conf_mount_rw();	
 	
 	conf_mount_ro();
 	
@@ -595,7 +605,7 @@ class array_ereg {
                         $id += 1;
 
                         $result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-                        $if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+                        $if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
 
 						$snort_rules_list[] = "snort_$id$if_real";
 
@@ -659,7 +669,7 @@ if ($id != '' && $if_real != '') //new
 
 				$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 				$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-				$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+				$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
 
 				/* create snort configuration file */
 				create_snort_conf($id, $if_real, $snort_uuid);
@@ -706,7 +716,7 @@ function sync_snort_package_empty()
 				$id += 1;
 
 				$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-				$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+				$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
 				$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
 				if ($if_real != '' && $snort_uuid != '') {
@@ -758,7 +768,7 @@ function sync_snort_package_config()
 				$id += 1;
 
 				$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-				$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+				$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
 				$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
 				if ($if_real != '' && $snort_uuid != '') {
@@ -808,7 +818,7 @@ function create_snort_sh()
 
 			$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 			$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-			$if_real = convert_friendly_interface_to_real_interface_name($result_lan);
+			$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
 
 	/* define snortbarnyardlog_chk */
 	$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
@@ -824,7 +834,7 @@ $snort_sh_text2[] = <<<EOD
 ###### For Each Iface
 
 		# If Snort proc is NOT running
-		if [ "`/bin/ps -auwx | grep -v grep | grep "R {$snort_uuid}_{$if_real}" | awk '{print $2;}'`" = "" ]; then
+		if [ "`/bin/ps -auwx | grep -v grep | grep "R {$snort_uuid}{$if_real}" | awk '{print $2;}'`" = "" ]; then
 
 		/bin/echo "snort.sh run" > /tmp/snort.sh.pid
 		
@@ -832,7 +842,7 @@ $snort_sh_text2[] = <<<EOD
 		/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid
 		/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid.lck
 
-		/usr/local/bin/snort -u snort -g snort -R {$snort_uuid}_{$if_real} -D -q -l /var/log/snort -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
+		/usr/local/bin/snort -u snort -g snort -R {$snort_uuid}{$if_real} -D -q -l /var/log/snort -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
 		$start_barnyard2
 
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD Reload For {$snort_uuid}_{$if_real}..."
@@ -846,9 +856,9 @@ $snort_sh_text3[] = <<<EOE
 
 		#### Fake start only used on bootup and Pfsense IP changes
 		#### Only try to restart if snort is running on Iface
-		if [ "`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}_{$if_real}" | /usr/bin/awk '{print $2;}'`" != "" ]; then
+		if [ "`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}{$if_real}" | /usr/bin/awk '{print $2;}'`" != "" ]; then
 
-		snort_pid="`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}_{$if_real}" | /usr/bin/awk '{print $2;}'`"
+		snort_pid="`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}{$if_real}" | /usr/bin/awk '{print $2;}'`"
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort already running, soft restart"
 
 		#### Restart Iface
@@ -861,7 +871,7 @@ EOE;
 
 $snort_sh_text4[] = <<<EOF
 
-		pid_s=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}_{$if_real}" | /usr/bin/awk '{print \$2;}'`
+		pid_s=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}{$if_real}" | /usr/bin/awk '{print \$2;}'`
 		sleep 3
 		pid_b=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "snort_{$snort_uuid}_{$if_real}.u2" | /usr/bin/awk '{print \$2;}'`
 
@@ -924,7 +934,7 @@ $start_snort_iface_restart
 		/bin/rm /tmp/snort.sh.pid
 
 		#### If on Fake start snort is NOT running DO a real start.
-		if [ "`/bin/ps -auwx | grep -v grep | grep "R {$snort_uuid}_{$if_real}" | awk '{print $2;}'`" = "" ]; then
+		if [ "`/bin/ps -auwx | grep -v grep | grep "R {$snort_uuid}{$if_real}" | awk '{print $2;}'`" = "" ]; then
 
 		rc_start_real
 
@@ -1228,10 +1238,11 @@ snort_rules_up_deinstall_cron("");
     write_config();
 	conf_mount_rw();
 	
-	exec("rm -r /usr/local/www/snort");
-	exec("rm -r /usr/local/pkg/snort");
-	exec("rm -r /usr/local/lib/snort/");
-	exec("rm -r /var/log/snort/");
+	exec('rm -rf /usr/local/www/snort');
+	exec('rm -rf /usr/local/pkg/snort');
+	exec('rm -rf /usr/local/lib/snort/');
+	exec('rm -rf /var/log/snort/');
+	exec('rm -rf /usr/local/pkg/snort*');
 	
 	conf_mount_ro();
 
@@ -1587,7 +1598,7 @@ else
 		$home_net .= "{$ip} ";
 	
 	/* Add Gateway on WAN interface to whitelist (For RRD graphs) */
-	$int = convert_friendly_interface_to_real_interface_name("WAN");
+	$int = convert_friendly_interface_to_real_interface_name2("WAN");
 	$gw = get_interface_gateway($int);
 	if($gw) 
 		$home_net .= "{$gw} ";
