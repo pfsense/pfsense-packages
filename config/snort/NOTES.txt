@@ -7,8 +7,6 @@ Final day.
 
 Odds and ends left.
 
-2.0 group snort gets lost on reboot.
-
 Pierre POMES code needs to be added.
 
 Threshold tab needs to be added.
