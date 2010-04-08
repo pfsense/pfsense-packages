@@ -253,8 +253,8 @@ function snort_postinstall()
 		exec('/bin/mkdir -p /usr/local/etc/snort/custom_rules/');
 	}
 	
-	exec('/usr/sbin/pw groupadd snort');
-	exec('/usr/sbin/pw useradd snort -c "SNORT USER" -d /nonexistent -g snort -s /sbin/nologin');
+	exec('/usr/sbin/pw groupadd snort -g 920');
+	exec('/usr/sbin/pw useradd snort -u 920 -c "Snort User" -d /nonexistent -g snort -s /sbin/nologin');
 	exec('/usr/sbin/chown -R snort:snort /var/log/snort');
 	exec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort');
 	exec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort');
