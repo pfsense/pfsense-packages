@@ -110,6 +110,8 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
 	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];
 	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
+	$pconfig['configpassthru'] = $a_nat[$id]['configpassthru'];
+	$pconfig['barnconfigpassthru'] = $a_nat[$id]['barnconfigpassthru'];
 	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
 	$pconfig['rule_sid_off'] = $a_nat[$id]['rule_sid_off'];
 	$pconfig['rule_sid_on'] = $a_nat[$id]['rule_sid_on'];
@@ -195,6 +197,8 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 	if ($pconfig['def_rlogin_ports'] != "") { $natent['def_rlogin_ports'] = $pconfig['def_rlogin_ports']; }
 	if ($pconfig['def_rsh_ports'] != "") { $natent['def_rsh_ports'] = $pconfig['def_rsh_ports']; }
 	if ($pconfig['def_ssl_ports'] != "") { $natent['def_ssl_ports'] = $pconfig['def_ssl_ports']; }
+	if ($pconfig['configpassthru'] != "") { $natent['configpassthru'] = $pconfig['configpassthru'];	}
+	if ($pconfig['barnconfigpassthru'] != "") { $natent['barnconfigpassthru'] = $pconfig['barnconfigpassthru']; }
 	if ($pconfig['rulesets'] != "") { $natent['rulesets'] = $pconfig['rulesets']; }
 	if ($pconfig['rule_sid_off'] != "") { $natent['rule_sid_off'] = $pconfig['rule_sid_off']; }
 	if ($pconfig['rule_sid_on'] != "") { $natent['rule_sid_on'] = $pconfig['rule_sid_on']; }

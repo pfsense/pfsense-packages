@@ -1055,6 +1055,8 @@ function generate_barnyard2_conf($id, $if_real, $snort_uuid) {
 
 $snortbarnyardlog_database_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_mysql'];
 $snortbarnyardlog_hostname_info_chk = exec("/bin/hostname");
+/* user add arguments */
+$snortbarnyardlog_config_pass_thru = str_replace("\r", "", base64_decode($config['installedpackages']['snortglobal']['rule'][$id]['barnconfigpassthru']));
 
 $barnyard2_conf_text = <<<EOD
 
@@ -1093,6 +1095,12 @@ config sid_file:	        /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/sid
 
 config hostname:       $snortbarnyardlog_hostname_info_chk
 config interface:      {$snort_uuid}_{$if_real}
+
+## START user pass through ##
+
+{$snortbarnyardlog_config_pass_thru}
+
+## END user pass through ##
 
 # Step 2: setup the input plugins
 input unified2
@@ -1259,6 +1267,9 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 	/* XXX: make multi wan friendly */
 	$snort_ext_int = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
 
+	/* user added arguments */
+	$snort_config_pass_thru = str_replace("\r", "", base64_decode($config['installedpackages']['snortglobal']['rule'][$id]['configpassthru']));
+	
 	/* create basic files */
 	if(!file_exists("/usr/local/etc/snort/snort/snort_{$snort_uuid}_{$if_real}"))
 	{

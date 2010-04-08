@@ -114,7 +114,9 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['blockoffenders7'] = $a_nat[$id]['blockoffenders7'];
 	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
 	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
-	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];	
+	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];
+	$pconfig['configpassthru'] = $a_nat[$id]['configpassthru'];
+	$pconfig['barnconfigpassthru'] = base64_decode($a_nat[$id]['barnconfigpassthru']);	
 	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
 	$pconfig['rule_sid_off'] = $a_nat[$id]['rule_sid_off'];
 	$pconfig['rule_sid_on'] = $a_nat[$id]['rule_sid_on'];
@@ -219,6 +221,8 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 	if ($pconfig['def_rlogin_ports'] != "") { $natent['def_rlogin_ports'] = $pconfig['def_rlogin_ports']; }
 	if ($pconfig['def_rsh_ports'] != "") { $natent['def_rsh_ports'] = $pconfig['def_rsh_ports']; }
 	if ($pconfig['def_ssl_ports'] != "") { $natent['def_ssl_ports'] = $pconfig['def_ssl_ports']; }
+	if ($pconfig['snortunifiedlog'] != "") { $natent['snortunifiedlog'] = $pconfig['snortunifiedlog'];	}
+	if ($pconfig['configpassthru'] != "") { $natent['configpassthru'] = $pconfig['configpassthru'];	}
 	if ($pconfig['rulesets'] != "") { $natent['rulesets'] = $pconfig['rulesets']; }
 	if ($pconfig['rule_sid_off'] != "") { $natent['rule_sid_off'] = $pconfig['rule_sid_off']; }
 	if ($pconfig['rule_sid_on'] != "") { $natent['rule_sid_on'] = $pconfig['rule_sid_on']; }	
@@ -226,6 +230,7 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 		/* post new options */
 		$natent['barnyard_enable'] = $_POST['barnyard_enable'] ? on : off;
 		$natent['barnyard_mysql'] = $_POST['barnyard_mysql'] ? $_POST['barnyard_mysql'] : $pconfig['barnyard_mysql'];
+		$natent['barnconfigpassthru'] = base64_encode($_POST['barnconfigpassthru']) ? base64_encode($_POST['barnconfigpassthru']) : $pconfig['barnconfigpassthru'];
 		if ($_POST['barnyard_enable'] == "on") { $natent['snortunifiedlog'] = on; }else{ $natent['snortunifiedlog'] = off; } if ($_POST['barnyard_enable'] == "") { $natent['snortunifiedlog'] = off; }
 
 		if (isset($id) && $a_nat[$id])
@@ -293,6 +298,7 @@ echo "
 }
 ?>
     document.iform.barnyard_mysql.disabled = endis;
+    document.iform.barnconfigpassthru.disabled = endis;
 }
 //-->
 </script>
@@ -409,8 +415,16 @@ if($id != "")
                 <tr>
                   <td width="22%" valign="top" class="vncell">Log to a Mysql Database</td>
                   <td width="78%" class="vtable">
-                    <input name="barnyard_mysql" type="text" class="formfld" id="barnyard_mysql" size="40" value="<?=htmlspecialchars($pconfig['barnyard_mysql']);?>">
-                    <br> <span class="vexpl">Example: output database: log, mysql, dbname=snort user=snort host=localhost password=xyz</span></td>
+                    <input name="barnyard_mysql" type="text" class="formfld" id="barnyard_mysql" size="100" value="<?=htmlspecialchars($pconfig['barnyard_mysql']);?>">
+                    <br> <span class="vexpl">Example: output database: alert, mysql, dbname=snort user=snort host=localhost password=xyz<br>
+                    Example: output database: log, mysql, dbname=snort user=snort host=localhost password=xyz</span></td>
+                </tr>
+                <tr> 
+                  <td width="22%" valign="top" class="vncell">Advanced configuration pass through</td>
+                  <td width="78%" class="vtable"> 
+                    <textarea name="barnconfigpassthru" cols="100" rows="7" id="barnconfigpassthru" class="formpre"><?=htmlspecialchars($pconfig['barnconfigpassthru']);?></textarea>
+                    <br> 
+                    Arguments here will be automatically inserted into the running barnyard2 configuration.</td>
                 </tr>
                 <tr>
                   <td width="22%" valign="top">&nbsp;</td>

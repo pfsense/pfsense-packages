@@ -138,6 +138,8 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
 	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
 	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];
+	$pconfig['configpassthru'] = base64_decode($a_nat[$id]['configpassthru']);
+	$pconfig['barnconfigpassthru'] = $a_nat[$id]['barnconfigpassthru'];
 	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
 	$pconfig['rule_sid_off'] = $a_nat[$id]['rule_sid_off'];
 	$pconfig['rule_sid_on'] = $a_nat[$id]['rule_sid_on'];
@@ -235,6 +237,7 @@ if ($_POST["Submit"]) {
 		if ($_POST['alertsystemlog'] == "on") { $natent['alertsystemlog'] = on; }else{ $natent['alertsystemlog'] = off; } if ($_POST['enable'] == "") { $natent['alertsystemlog'] = $pconfig['alertsystemlog']; }
 		if ($_POST['tcpdumplog'] == "on") { $natent['tcpdumplog'] = on; }else{ $natent['tcpdumplog'] = off; } if ($_POST['enable'] == "") { $natent['tcpdumplog'] = $pconfig['tcpdumplog']; }
 		if ($_POST['snortunifiedlog'] == "on") { $natent['snortunifiedlog'] = on; }else{ $natent['snortunifiedlog'] = off; } if ($_POST['enable'] == "") { $natent['snortunifiedlog'] = $pconfig['snortunifiedlog']; }
+		$natent['configpassthru'] = base64_encode($_POST['configpassthru']) ? base64_encode($_POST['configpassthru']) : $pconfig['configpassthru'];
 		/* if optiion = 0 then the old descr way will not work */
 
 	/* rewrite the options that are not in post */
@@ -284,6 +287,7 @@ if ($_POST["Submit"]) {
 	if ($pconfig['def_ssl_ports'] != "") { $natent['def_ssl_ports'] = $pconfig['def_ssl_ports']; }
 	if ($pconfig['barnyard_enable'] != "") { $natent['barnyard_enable'] = $pconfig['barnyard_enable']; }
 	if ($pconfig['barnyard_mysql'] != "") { $natent['barnyard_mysql'] = $pconfig['barnyard_mysql'];	}
+	if ($pconfig['barnconfigpassthru'] != "") { $natent['barnconfigpassthru'] = $pconfig['barnconfigpassthru'];	}
 	if ($pconfig['rulesets'] != "") { $natent['rulesets'] = $pconfig['rulesets']; }
 	if ($pconfig['rule_sid_off'] != "") { $natent['rule_sid_off'] = $pconfig['rule_sid_off']; }
 	if ($pconfig['rule_sid_on'] != "") { $natent['rule_sid_on'] = $pconfig['rule_sid_on'];	}
@@ -408,6 +412,7 @@ echo "
 	document.iform.alertsystemlog.disabled = endis;
 	document.iform.tcpdumplog.disabled = endis;
 	document.iform.snortunifiedlog.disabled = endis;
+	document.iform.configpassthru.disabled = endis;
 }
 //-->
 </script>
@@ -580,6 +585,13 @@ if ($a_nat[$id]['interface'] != '') {
 					<input name="snortunifiedlog" type="checkbox" value="on" <?php if ($pconfig['snortunifiedlog'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					Snort will log Alerts to a file in the UNIFIED2 format. This is a requirement for barnyard2.</td>
 				</tr>
+                <tr> 
+                  <td width="22%" valign="top" class="vncell">Advanced configuration pass through</td>
+                  <td width="78%" class="vtable"> 
+                    <textarea name="configpassthru" cols="100" rows="7" id="configpassthru" class="formpre"><?=htmlspecialchars($pconfig['configpassthru']);?></textarea>
+                    <br> 
+                    Arguments here will be automatically inserted into the running snort configuration.</td>
+                </tr>
                 <tr>
                   <td width="22%" valign="top"></td>
                   <td width="78%">
