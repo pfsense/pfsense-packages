@@ -56,8 +56,8 @@ function avahi_install() {
 	}
 
 	// Add needed users and groups
-	exec("/usr/sbin/pw useradd  avahi");
-	exec("/usr/sbin/pw groupadd avahi");
+	exec("/usr/sbin/pw useradd  avahi -u 558");
+	exec("/usr/sbin/pw groupadd avahi -g 558");
 
 	// Make image RO
 	conf_mount_ro();
