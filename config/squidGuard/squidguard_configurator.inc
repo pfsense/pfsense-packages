@@ -1797,7 +1797,7 @@ function is_masksubnet($subnet)
 # ------------------------------------------------------------------------------
 # is_iprange - check ip1-ip2
 # ------------------------------------------------------------------------------
-function is_iprange($ip_range) {
+function is_iprange_sg($ip_range) {
     if (!is_string($ip_range))  return false;
 
     list($ip1,$ip2) = explode('-', $ip_range);
@@ -1813,7 +1813,7 @@ function is_iprange($ip_range) {
 # ------------------------------------------------------------------------------
 function is_ipaddr_valid($val)
 {
-    return is_string($val) && (is_ipaddr($val) || is_masksubnet($val) || is_subnet($val) || is_iprange($val));
+    return is_string($val) && (is_ipaddr($val) || is_masksubnet($val) || is_subnet($val) || is_iprange_sg($val));
 }
 
 # ------------------------------------------------------------------------------
@@ -1831,7 +1831,7 @@ function is_domain_valid($domain)
 # ------------------------------------------------------------------------------
 function is_username($username)
 {
-    $unm_fmt = "^\'[a-zA-Z_0-9\-]{1,}\'$";
+    $unm_fmt = "^\'[a-zA-Z_0-9\.\-]{1,}\'$";
     return is_string($username) && eregi($unm_fmt, trim($username));
 }
 # ------------------------------------------------------------------------------
