@@ -319,46 +319,6 @@ function byte_convert( $bytes ) {
     return round($bytes/pow($convention,$e),2).' '.$s[$e];
 }
 
-function lan_sip_profile()
-{
-	global $config;
-	$v_settings_array = $config['installedpackages']['freeswitchsettings']['config'][0];
-	foreach($v_settings_array as $name => $value) {
-		$$name = $value;
-	}
-	clearstatcache();
-	
-	//if the lan directory does not exist then create it
-	if (!is_dir($v_conf_dir.'/sip_profiles/lan/')) {
-	   exec("mkdir ".$v_conf_dir."/sip_profiles/lan/");
-	}
-	
-	//create the LAN profile if it doesn't exist
-	if (!file_exists($v_conf_dir.'/sip_profiles/lan.xml')) {
-		$lan_ip = $config['interfaces']['lan']['ipaddr'];
-		if (strlen($lan_ip) > 0) {
-			exec("cp ".$v_conf_dir."/sip_profiles/internal.xml ".$v_conf_dir."/sip_profiles/lan.xml");
-			
-			$filename = $v_conf_dir."/sip_profiles/lan.xml";
-			$handle = fopen($filename,"rb");
-			$contents = fread($handle, filesize($filename));	
-			fclose($handle);
-
-			$handle = fopen($filename,"w");
-			$contents = str_replace("<profile name=\"internal\">", "<profile name=\"lan\">", $contents);
-			$contents = str_replace("<alias name=\"default\"/>", "", $contents);
-			$contents = str_replace("<X-PRE-PROCESS cmd=\"include\" data=\"internal/*.xml\"/>", "<X-PRE-PROCESS cmd=\"include\" data=\"lan/*.xml\"/>", $contents);
-			$contents = str_replace("<param name=\"rtp-ip\" value=\"\$\${local_ip_v4}\"/>", "<param name=\"rtp-ip\" value=\"".$lan_ip."\"/>", $contents);
-			$contents = str_replace("<param name=\"sip-ip\" value=\"\$\${local_ip_v4}\"/>", "<param name=\"sip-ip\" value=\"".$lan_ip."\"/>", $contents);
-			fwrite($handle, $contents);		
-			unset($contents); 	
-			fclose($handle);
-			unset($filename);
-		}
-	}
-	
-}
-
 function ListFiles($dir) {
 
     if($dh = opendir($dir)) {
@@ -3923,23 +3883,20 @@ function v_install_phase_1()
 	unlink_if_exists($v_conf_dir."/directory/default/brian.xml");
 	unlink_if_exists($v_conf_dir."/directory/default/example.com.xml");
 	unlink_if_exists($v_conf_dir."/dialplan/default/99999_enum.xml");
-	
-	
+
 	write_rcfile(array(
 		"file" => $v_name.".sh",
 		"start" => $v_dir."/bin/./".$v_name." -nc",
 		"stop" => $v_dir."/bin/./".$v_name." -stop"
 		)
 	);
-	
 
-	lan_sip_profile();
 
 	$static_output = 'Synchronize the config';
 	update_output_window($static_output);
-			
+
 	sync_package_freeswitch();
-	
+
 	$static_output = 'Start the Service';
 	update_output_window($static_output);
 	$handle = popen($v_startup_script_dir."/freeswitch.sh start", "r");
@@ -3951,7 +3908,7 @@ function v_install_phase_1()
 
 	conf_mount_ro();
 	config_unlock();
-		
+
 }
 
 

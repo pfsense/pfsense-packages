@@ -3,6 +3,7 @@
 /*
 	snort_rulesets.php
 	Copyright (C) 2006 Scott Ullrich
+	Copyright (C) 2009 Robert Zelaya
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -28,43 +29,68 @@
 */
 
 require("guiconfig.inc");
-require_once("service-utils.inc");
-require("/usr/local/pkg/snort.inc");
+//require_once("filter.inc");
+//require_once("service-utils.inc");
+include_once("/usr/local/pkg/snort/snort.inc");
+require_once("/usr/local/pkg/snort/snort_gui.inc");
 
-if(!is_dir("/usr/local/etc/snort/rules")) {
-	conf_mount_rw();
-	exec('mkdir /usr/local/etc/snort/rules/');
-	conf_mount_ro();
+
+if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
+	$config['installedpackages']['snortglobal']['rule'] = array();
 }
+
+//nat_rules_sort();
+$a_nat = &$config['installedpackages']['snortglobal']['rule'];
+
+$id = $_GET['id'];
+if (isset($_POST['id']))
+	$id = $_POST['id'];
+	
+
+if (isset($id) && $a_nat[$id]) {
+
+	$pconfig['enable'] = $a_nat[$id]['enable'];
+	$pconfig['interface'] = $a_nat[$id]['interface'];
+	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
+}
+
+/* convert fake interfaces to real */
+$if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interface']);
+
+
+$iface_uuid = $a_nat[$id]['uuid'];
+
+$pgtitle = "Snort: Interface $id $iface_uuid $if_real Categories";
+
 
 /* Check if the rules dir is empy if so warn the user */
 /* TODO give the user the option to delete the installed rules rules */
-$isrulesfolderempty = exec('ls -A /usr/local/etc/snort/rules/*.rules');
+$isrulesfolderempty = exec("ls -A /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
 if ($isrulesfolderempty == "") {
 
 include("head.inc");
-include("fbegin.inc");
+include("./snort_fbegin.inc");
+
+echo "<p class=\"pgtitle\">";
+if($pfsense_stable == 'yes'){echo $pgtitle;}
+echo "</p>\n";
 
 echo "<body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\">";
 
-echo "<script src=\"/row_toggle.js\" type=\"text/javascript\"></script>\n
-<script src=\"/javascript/sorttable.js\" type=\"text/javascript\"></script>\n
+echo "
 <table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
    <tr>\n
    		<td>\n";
 
-	$tab_array = array();
-	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
-	$tab_array[] = array(gettext("Update Rules"), false, "/snort_download_rules.php");
-	$tab_array[] = array(gettext("Categories"), true, "/snort_rulesets.php");
-	$tab_array[] = array(gettext("Rules"), false, "/snort_rules.php");
-	$tab_array[] = array(gettext("Servers"), false, "/pkg_edit.php?xml=snort_define_servers.xml&amp;id=0");
-	$tab_array[] = array(gettext("Blocked"), false, "/snort_blocked.php");
-	$tab_array[] = array(gettext("Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
-	$tab_array[] = array(gettext("Threshold"), false, "/pkg.php?xml=snort_threshold.xml");
-	$tab_array[] = array(gettext("Alerts"), false, "/snort_alerts.php");
-	$tab_array[] = array(gettext("Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
-	display_top_tabs($tab_array);
+    $tab_array = array();
+    $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
+    $tab_array[] = array("If Settings", false, "/snort/snort_interfaces_edit.php?id={$id}");
+    $tab_array[] = array("Categories", true, "/snort/snort_rulesets.php?id={$id}");
+    $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
+    $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
+    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
+    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
+    display_top_tabs($tab_array);
 
 echo  		"</td>\n
   </tr>\n
@@ -74,7 +100,7 @@ echo  		"</td>\n
 			<table id=\"maintable\" class=\"tabcont\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
 				<tr>\n
 					<td>\n
-# The rules directory is empty.\n
+# The rules directory is empty. /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules \n
 		    		</td>\n
 		  		</tr>\n
 			</table>\n
@@ -87,7 +113,7 @@ echo  		"</td>\n
 \n
 <p>\n\n";
 
-echo "Please click on the Update Rules tab to install your selected rule sets.";
+echo "Please click on the Update Rules tab to install your selected rule sets. $isrulesfolderempty";
 include("fend.inc");
 
 echo "</body>";
@@ -97,66 +123,117 @@ exit(0);
 
 }
 
-if($_POST) {
+	/* alert file */
+$d_snortconfdirty_path = "/var/run/snort_conf_{$iface_uuid}_{$if_real}.dirty";
+	
+	/* this will exec when alert says apply */
+	if ($_POST['apply']) {
+		
+		if (file_exists($d_snortconfdirty_path)) {
+			
+			write_config();
+			
+			sync_snort_package_all($id, $if_real, $iface_uuid);
+			sync_snort_package();
+			
+			unlink($d_snortconfdirty_path);
+			
+		}
+		
+	}
+
+	if ($_POST["Submit"]) {
 	$enabled_items = "";
 	$isfirst = true;
+	if (is_array($_POST['toenable'])) {
 	foreach($_POST['toenable'] as $toenable) {
 		if(!$isfirst)
 			$enabled_items .= "||";
 		$enabled_items .= "{$toenable}";
 		$isfirst = false;
 	}
-	$config['installedpackages']['snort']['rulesets'] = $enabled_items;
+	}else{
+	$enabled_items = $_POST['toenable'];
+	}
+	$a_nat[$id]['rulesets'] = $enabled_items;
+	
 	write_config();
-	stop_service("snort");
-	create_snort_conf();
-	sleep(2);
-	start_service("snort");
-	$savemsg = "The snort ruleset selections have been saved.";
+	
+	touch($d_snortconfdirty_path);
+	
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		sleep(2);
+		sync_snort_package_all($id, $if_real, $iface_uuid);
+		header("Location: /snort/snort_rulesets.php?id=$id");
+
 }
 
-$enabled_rulesets = $config['installedpackages']['snort']['rulesets'];
+$enabled_rulesets = $a_nat[$id]['rulesets'];
 if($enabled_rulesets)
 	$enabled_rulesets_array = split("\|\|", $enabled_rulesets);
 
-$pgtitle = "Snort: Categories";
 include("head.inc");
 
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
-<?php include("fbegin.inc"); ?>
-
+<?php include("./snort_fbegin.inc"); ?>
+<p class="pgtitle"><?php if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 <?php
-if(!$pgtitle_output)
-	echo "<p class=\"pgtitle\"><?=$pgtitle?></p>";
+
+echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\" id=\"iform\">";
+
 ?>
 
-<form action="snort_rulesets.php" method="post" name="iform" id="iform">
-<script src="/row_toggle.js" type="text/javascript"></script>
-<script src="/javascript/sorttable.js" type="text/javascript"></script>
-<?php if ($savemsg) print_info_box($savemsg); ?>
+<?php
+
+	/* Display message */
+
+	if ($input_errors) {
+	print_input_errors($input_errors); // TODO: add checks
+	}
+
+	if ($savemsg) {
+	print_info_box2($savemsg);
+	}
+
+	if (file_exists($d_snortconfdirty_path)) {
+	echo '<p>';
+
+		if($savemsg) {
+			print_info_box_np2("{$savemsg}");
+		}else{
+			print_info_box_np2('
+			The Snort configuration has changed and snort needs to be restarted on this interface.<br>
+			You must apply the changes in order for them to take effect.<br>
+			');
+		}
+	}
+
+?>
+
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
    <tr>
    		<td>
 <?php
-	$tab_array = array();
-	$tab_array[] = array(gettext("Settings"), false, "/pkg_edit.php?xml=snort.xml&id=0");
-	$tab_array[] = array(gettext("Update  Rules"), false, "/snort_download_rules.php");
-	$tab_array[] = array(gettext("Categories"), true, "/snort_rulesets.php");
-	$tab_array[] = array(gettext("Rules"), false, "/snort_rules.php");
-	$tab_array[] = array(gettext("Servers"), false, "/pkg_edit.php?xml=snort_define_servers.xml&amp;id=0");
-	$tab_array[] = array(gettext("Blocked"), false, "/snort_blocked.php");
-	$tab_array[] = array(gettext("Whitelist"), false, "/pkg.php?xml=snort_whitelist.xml");
-	$tab_array[] = array(gettext("Threshold"), false, "/pkg.php?xml=snort_threshold.xml");
-	$tab_array[] = array(gettext("Alerts"), false, "/snort_alerts.php");
-	$tab_array[] = array(gettext("Advanced"), false, "/pkg_edit.php?xml=snort_advanced.xml&id=0");
-	display_top_tabs($tab_array);
+    $tab_array = array();
+    $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
+    $tab_array[] = array("If Settings", false, "/snort/snort_interfaces_edit.php?id={$id}");
+    $tab_array[] = array("Categories", true, "/snort/snort_rulesets.php?id={$id}");
+    $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
+    $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
+    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
+    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
+    display_top_tabs($tab_array);
 ?>
-  		</td>
-  </tr>
-  <tr>
-    <td>
+	</td>
+	</tr>
+		<tr>
+		<td>
 		<div id="mainarea">
 			<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 				<tr>
@@ -168,7 +245,7 @@ if(!$pgtitle_output)
 								<!-- <td class="listhdrr">Description</td> -->
 							</tr>
 <?php
-	$dir = "/usr/local/etc/snort/rules/";
+	$dir = "/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/";
 	$dh  = opendir($dir);
 	while (false !== ($filename = readdir($dh))) {
    		$files[] = $filename;
@@ -177,7 +254,7 @@ if(!$pgtitle_output)
 	foreach($files as $file) {
 		if(!stristr($file, ".rules"))
 			continue;
-		echo "<tr>";
+		echo "<tr>\n";
 		echo "<td align=\"center\" valign=\"top\">";
 		if(is_array($enabled_rulesets_array))
 			if(in_array($file, $enabled_rulesets_array)) {
@@ -187,11 +264,11 @@ if(!$pgtitle_output)
 			}
 		else
 			$CHECKED = "";
-		echo "	<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />";
-		echo "</td>";
-		echo "<td>";
-		echo "<a href='snort_rules.php?openruleset=/usr/local/etc/snort/rules/" . urlencode($file) . "'>{$file}</a>";
-		echo "</td>";
+		echo "	\n<input type='checkbox' name='toenable[]' value='$file' {$CHECKED} />\n";
+		echo "</td>\n";
+		echo "<td>\n";
+		echo "<a href='snort_rules.php?id={$id}&openruleset=/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/" . urlencode($file) . "'>{$file}</a>\n";
+		echo "</td>\n</tr>\n\n";
 		//echo "<td>";
 		//echo "description";
 		//echo "</td>";
@@ -204,7 +281,7 @@ if(!$pgtitle_output)
 		  		<tr><td>&nbsp;</td></tr>
 		  		<tr><td>Check the rulesets that you would like Snort to load at startup.</td></tr>
 		  		<tr><td>&nbsp;</td></tr>
-		  		<tr><td><input value="Save" type="submit" name="save" id="save" /></td></tr>
+		  		<tr><td><input value="Save" type="submit" name="Submit" id="Submit" /></td></tr>
 			</table>
 		</div>
 	</td>

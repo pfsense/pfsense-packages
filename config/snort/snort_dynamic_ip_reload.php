@@ -3,7 +3,7 @@
 /* $Id$ */
 /*
 	snort_dynamic_ip_reload.php
-	Copyright (C) 2006 Scott Ullrich and Robert Zeleya
+	Copyright (C) 2009 Robert Zeleya
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -31,19 +31,17 @@
 /* NOTE: this file gets included from the pfSense filter.inc plugin process */
 /* NOTE: file location /usr/local/pkg/pf, all files in pf dir get exec on filter reloads */
 
-require_once("/usr/local/pkg/snort.inc");
-require_once("service-utils.inc");
-require_once("config.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
 
-
-if($config['interfaces']['wan']['ipaddr'] == "pppoe" or
-   $config['interfaces']['wan']['ipaddr'] == "dhcp") {
-		create_snort_conf();
-		exec("killall -HUP snort");
-		/* define snortbarnyardlog_chk */
-        $snortbarnyardlog_info_chk = $config['installedpackages']['snortadvanced']['config'][0]['snortbarnyardlog'];
-        if ($snortbarnyardlog_info_chk == on)
-                exec("killall -HUP barnyard2");
+if (file_exists('/var/run/snort_dynamic_ip_reload.dirty')) {
+	exit();
 }
+
+exec('/usr/bin/touch /var/run/snort_dynamic_ip_reload.dirty');
+
+sync_snort_package_config();
+sync_snort_package();
+
+exec('/bin/rm /var/run/snort_dynamic_ip_reload.dirty');
 
 ?>

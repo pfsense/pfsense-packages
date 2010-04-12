@@ -232,28 +232,15 @@
 		}
 	</custom_php_validation_command>
 	<custom_add_php_command>
-		$dnssync = true;
-		log_error("Begin tinydns add");		
+	</custom_add_php_command>
+	<custom_php_resync_config_command>
+		log_error("Begin tinydns resync");
 		tinydns_create_zone_file();
 		log_error("Zone file done.");
 		tinydns_setup_ping_items();
 		log_error("Ping items done.");
 		tinydns_sync_on_changes();
 		log_error("Sync items done.");
-	</custom_add_php_command>
-	<custom_php_resync_config_command>
-		if(!$dnssync) {
-			log_error("Begin tinydns resync");
-			tinydns_create_zone_file();
-			log_error("Zone file done.");
-			tinydns_setup_ping_items();
-			log_error("Ping items done.");
-			tinydns_sync_on_changes();
-			log_error("Sync items done.");
-		} else {
-			tinydns_create_zone_file();
-			tinydns_setup_ping_items();
-		}
 	</custom_php_resync_config_command>
 	<custom_php_command_before_form>	
 		unset($_POST['temp']);

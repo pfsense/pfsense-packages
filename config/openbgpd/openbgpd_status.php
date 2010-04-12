@@ -94,7 +94,7 @@ function listCmds() {
     echo "<p>This status page includes the following information:\n";
     echo "<ul width=\"700\">\n";
     for ($i = 0; isset($commands[$i]); $i++ ) {
-        echo "<li><strong><a href=\"#" . $commands[$i][0] . "\">" . $commands[$i][0] . "</a></strong>\n";
+        echo "<li><strong><a href=\"#" . $commands[$i][0] . "\">" . $commands[$i][0] . "</a></strong></li>\n";
     }
     echo "</ul>\n";
 }

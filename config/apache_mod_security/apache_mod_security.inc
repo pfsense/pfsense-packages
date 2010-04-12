@@ -2,7 +2,7 @@
 /*
 	apache_mod_security.inc
 	part of apache_mod_security package (http://www.pfSense.com)
-	Copyright (C) 2009 Scott Ullrich
+	Copyright (C) 2009, 2010 Scott Ullrich
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -74,7 +74,7 @@ function apache_mod_security_install() {
 		require_once(\"/usr/local/pkg/apache_mod_security.inc\");
 		apache_mod_security_start();
 	?>
-	ENDPHP\n";
+ENDPHP\n";
 
 	$stop = "/usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDPHP
 	<?php
@@ -82,7 +82,7 @@ function apache_mod_security_install() {
 		require_once(\"/usr/local/pkg/apache_mod_security.inc\");
 		apache_mod_security_stop();
 	?>
-	ENDPHP\n";
+ENDPHP\n";
 	
 	write_rcfile(array(
 			"file" => $filename,
@@ -103,7 +103,21 @@ function apache_mod_security_deinstall() {
 // Regenerate apache configuration and handle server restart
 function apache_mod_security_resync() {
 	global $config, $g;
-	generate_apache_configuration();
+	apache_mod_security_install();
+	if(!file_exists(rules_directory . "/10_asl_rules.conf"))
+		exec("/usr/bin/fetch -q -o " . rules_directory . "/10_asl_rules.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/10_asl_rules.conf");
+	if(!file_exists(rules_directory . "/a_exclude.conf"))
+		exec("/usr/bin/fetch -q -o " . rules_directory . "/a_exclude.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/a_exclude.conf");
+	if(!file_exists(rules_directory . "/blacklist.conf"))
+		exec("/usr/bin/fetch -q -o " . rules_directory . "/blacklist.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/blacklist.conf");
+	if(!file_exists(rules_directory . "/default.conf"))
+		exec("/usr/bin/fetch -q -o " . rules_directory . "/rules/default.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/default.conf");
+	if(!file_exists(rules_directory . "/recons.conf"))
+		exec("/usr/bin/fetch -q -o " . rules_directory . "/recons.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/recons.conf");
+	if(!file_exists(rules_directory . "/rootkits.conf"))
+		exec("/usr/bin/fetch -q -o " . rules_directory . "/rootkits.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/rootkits.conf");
+	if(!file_exists(rules_directory . "/useragents.conf"))
+		exec("/usr/bin/fetch -q -o " . rules_directory . "/useragents.conf http://www.pfsense.com/packages/config/apache_mod_security/rules/useragents.conf");
 	apache_mod_security_checkconfig();
 	apache_mod_security_restart();
 }
@@ -137,28 +151,44 @@ function generate_apache_configuration() {
 		$servername = "ServerName " . `hostname` . "\n";
 	}
 
-	// Set global listening directive
-	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr']) {
-		$global_listen  =  $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
-		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
-			$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
-		else 
-			$global_listen .= ":80";
-	} else {
-		$global_listen = "{$config['system']['hostname']}.{$config['system']['domain']}";
-		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
-			$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
-		else 
-			$global_listen .= ":80";
+	// Set global listening directive and ensure nothing is listening on this port already
+	$globalbind = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
+	$socksstat = split("\n", `/usr/bin/sockstat | awk '{ print $6 }' | grep ":{$globalbind}" | cut -d ":" -f2`);
+	if(is_array($socksstat)) {
+		foreach($socksstat as $ss) {
+			if($ss == $globalbind) {
+				$already_binded = true;
+				$input_errors[] = "Sorry, there is a process already listening on port {$globalbind}";
+			}
+		}
 	}
+//	if(!$already_binded) {
+		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr']) {
+			$global_listen  =  $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
+			if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
+				$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
+			else 
+				$global_listen .= ":80";
+		} else {
+			$global_listen = "{$config['system']['hostname']}.{$config['system']['domain']}";
+			if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
+				$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
+			else 
+				$global_listen .= ":80";
+		}
+//	} else {
+//		log_error("Could not start mod_security + mod_proxy on port {$global_listen}.  Process is already bound to this port.");
+//	}
 	
 	// Setup mem_cache
-	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['mod_mem_cache']) {
-		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['mod_mem_cache_size'])
-			$mcachesize = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['mod_mem_cache_size'];
-		else 
-			$mcachesize = "100";
-		//$mem_cache = "MCacheSize $mcachesize\n";
+	if(file_exists("/usr/local/libexec/apache22/mod_mem_cache.so")) {
+		if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['mod_mem_cache']) {
+			if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['mod_mem_cache_size'])
+				$mcachesize = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['mod_mem_cache_size'];
+			else 
+				$mcachesize = "100";
+			//$mem_cache = "MCacheSize $mcachesize\n";
+		}
 	}
 
 	// CacheRoot Directive
@@ -328,9 +358,9 @@ EOF;
 		$mod_security_rules = "";
 		$files = return_dir_as_array(rules_directory);
 		foreach($files as $file) { 
-			if(file_exists($file)) {
+			if(file_exists(rules_directory . "/" . $file)) {
 				// XXX: TODO integrate snorts rule on / off thingie
-				$file_txt = get_file_contents($file);
+				$file_txt = file_get_contents(rules_directory . "/" . $file);
 				$mod_security_rules .= $file_txt . "\n";
 			}
 		}
@@ -396,6 +426,9 @@ EOF;
 EOF;
 
 }
+
+if(file_exists("/usr/local/libexec/apache22/mod_mem_cache.so"))
+	$mod_mem_cacheLoad = "Module mem_cache_module libexec/apache22/mod_mem_cache.so\n";
 
 	$apache_config = <<<EOF
 ##################################################################################
@@ -475,7 +508,6 @@ LoadModule auth_digest_module libexec/apache22/mod_auth_digest.so
 LoadModule file_cache_module libexec/apache22/mod_file_cache.so
 LoadModule cache_module libexec/apache22/mod_cache.so
 LoadModule disk_cache_module libexec/apache22/mod_disk_cache.so
-LoadModule mem_cache_module libexec/apache22/mod_mem_cache.so
 LoadModule dumpio_module libexec/apache22/mod_dumpio.so
 LoadModule include_module libexec/apache22/mod_include.so
 LoadModule filter_module libexec/apache22/mod_filter.so
@@ -514,6 +546,7 @@ LoadModule speling_module libexec/apache22/mod_speling.so
 LoadModule userdir_module libexec/apache22/mod_userdir.so
 LoadModule alias_module libexec/apache22/mod_alias.so
 LoadModule rewrite_module libexec/apache22/mod_rewrite.so
+{$mod_mem_cache}
 
 <IfModule !mpm_netware_module>
 <IfModule !mpm_winnt_module>

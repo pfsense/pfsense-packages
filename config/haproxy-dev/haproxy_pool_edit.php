@@ -52,7 +52,6 @@ if (isset($id) && $a_pools[$id]) {
 	$pconfig['checkinter'] = $a_pools[$id]['checkinter'];
 	$pconfig['monitor_uri'] = $a_pools[$id]['monitor_uri'];
 	$pconfig['cookie'] = $a_pools[$id]['cookie'];
-	$pconfig['status'] = $a_pools[$id]['status'];
 	$pconfig['advanced'] = base64_decode($a_pools[$id]['advanced']);
 	$pconfig['a_servers']=&$a_pools[$id]['ha_servers']['item'];	
 }
@@ -145,7 +144,6 @@ if ($_POST) {
 		$pool['ha_servers']['item']=$a_servers;
 
 		update_if_changed("name", $pool['name'], $_POST['name']);
-		update_if_changed("status", $pool['status'], $_POST['status']);
 		update_if_changed("cookie", $pool['cookie'], $_POST['cookie']);
 		update_if_changed("advanced", $pool['advanced'], base64_encode($_POST['advanced']));
 		update_if_changed("checkinter", $pool['checkinter'], $_POST['checkinter']);
@@ -228,15 +226,6 @@ function clearcombo(){
 			<td width="22%" valign="top" class="vncellreq">Name</td>
 			<td width="78%" class="vtable" colspan="2">
 				<input name="name" type="text" <?if(isset($pconfig['name'])) echo "value=\"{$pconfig['name']}\"";?> size="16" maxlength="16">
-			</td>
-		</tr>
-		<tr align="left">
-			<td width="22%" valign="top" class="vncellreq">Status</td>
-			<td width="78%" class="vtable" colspan="2">
-				<select name="status">
-				<option value="active"  <?php if($pconfig['status']=='active') echo "SELECTED";?>>active</option>
-				<option value="inactive" <?php  if($pconfig['status']=='inactive') echo "SELECTED";?>>inactive</option>
-				</select>
 			</td>
 		</tr>
 		<tr align="left">
