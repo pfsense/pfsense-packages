@@ -50,8 +50,6 @@
 	<title>Services: Proxy server Report(LightSquid) -> Settings</title>
 	<category>Status</category>
 	<include_file>/usr/local/pkg/lightsquid.inc</include_file>
-
-        <!-- Installation -->
 	<menu>
 		<name>Proxy report</name>
 		<tooltiptext>Proxy server statistic report</tooltiptext>
@@ -66,7 +64,7 @@
                 </tab>
                 <tab>
                         <text>Lightsquid Report</text>
-                        <url>/lightsquid/index.cgi</url>                        
+                        <url>/lightsquid/index.cgi</url>
                 </tab>
         </tabs>
         <additional_files_needed>
@@ -100,7 +98,6 @@
                                  <option><name>Ukrainian</name><value>ua</value></option>
                         </options>
                 </field>
-
                 <field>
                         <fielddescr>Bar color</fielddescr>
                         <fieldname>lightsquid_barcolor</fieldname>
@@ -115,8 +112,7 @@
                                 <option><name>Brown</name><value>brown</value></option>
                                 <option><name>Red</name><value>red</value></option>
                         </options>
-                </field>          
-
+                </field>
                 <field>
                         <fielddescr>Report scheme</fielddescr>
                         <fieldname>lightsquid_template</fieldname>
@@ -130,7 +126,6 @@
                                 <option><name>NovoPf</name><value>novopf</value></option>
                         </options>
                 </field>
-
                 <field>
                         <fielddescr>IP resolve method (future)</fielddescr>
                         <fieldname>lightsquid_ip2name</fieldname>
@@ -139,7 +134,7 @@
                         &lt;tr&gt;&lt;th colspan=2&gt; Select IP to Name resolve method (take effect only on new data): &lt;/th&gt;&lt;tr&gt;
                         &lt;tr&gt;&lt;th&gt; IP         &lt;/th&gt;&lt;td&gt; - return IP &lt;/td&gt;&lt;tr&gt;
                         &lt;tr&gt;&lt;th&gt; Demo       &lt;/th&gt;&lt;td&gt; - return AUTHNAME, else DNSNAME, else IP &lt;/td&gt;&lt;tr&gt;
-                        &lt;tr&gt;&lt;th&gt; DNS        &lt;/th&gt;&lt;td&gt; - return DNSNAME &lt;/td&gt;&lt;tr&gt; 
+                        &lt;tr&gt;&lt;th&gt; DNS        &lt;/th&gt;&lt;td&gt; - return DNSNAME &lt;/td&gt;&lt;tr&gt;
                         &lt;tr&gt;&lt;th&gt; Simple     &lt;/th&gt;&lt;td&gt; - return AUTHNAME else IP &lt;/td&gt;&lt;tr&gt;
                         &lt;tr&gt;&lt;th&gt; SMB        &lt;/th&gt;&lt;td&gt; - return SMB name of pc &lt;/td&gt;&lt;tr&gt;
                         &lt;tr&gt;&lt;th&gt; Squidauth  &lt;/th&gt;&lt;td&gt; - return AUTHNAME else IP, allow cyrilyc name &lt;/td&gt;&lt;tr&gt;
@@ -148,15 +143,14 @@
                         <type>select</type>
                         <value>dns</value>
                         <options>
-                                <option><name>IP</name><value>ip</value></option>                             
-                                <option><name>Demo</name><value>demo</value></option>                              
-                                <option><name>DNS</name><value>dns</value></option>                              
-                                <option><name>Simple</name><value>simple</value></option>                              
-                                <option><name>SMB</name><value>smb</value></option>                              
-                                <option><name>Squidauth</name><value>squidauth</value></option>                              
+                                <option><name>IP</name><value>ip</value></option>
+                                <option><name>Demo</name><value>demo</value></option>
+                                <option><name>DNS</name><value>dns</value></option>
+                                <option><name>Simple</name><value>simple</value></option>
+                                <option><name>SMB</name><value>smb</value></option>
+                                <option><name>Squidauth</name><value>squidauth</value></option>
                         </options>
                 </field>
-
                 <field>
                         <fielddescr>Refresh sheduler</fielddescr>
                         <fieldname>lightsquid_refreshsheduler_time</fieldname>
@@ -167,7 +161,7 @@
 			&lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Refresh now&quot;&gt;&lt;br&gt;
 			&lt;input type=&quot;submit&quot; name=&quot;Submit&quot; value=&quot;Refresh full&quot;&gt;
 			&lt;br&gt; Press button for start background refresh (this take some time).
-			&lt;br&gt; &lt;span style=&quot;color: rgb(153, 51, 0);&quot;&gt; Note after installation: 
+			&lt;br&gt; &lt;span style=&quot;color: rgb(153, 51, 0);&quot;&gt; Note after installation:
 			&lt;br&gt; On the first - enable log in squid package with &quot;/var/squid/log&quot; path.
 			&lt;br&gt; On the second - press Refresh button for create lightsquid reports, else you will have error diagnostic page.&lt;/span&gt;
 			</description>
@@ -226,8 +220,8 @@
                         </options>
 		</field>
 		<field>
-                        <fielddescr>Skip url</fielddescr>
-                        <fieldname>lightsquid_skipurl</fieldname>
+            <fielddescr>Skip url</fielddescr>
+            <fieldname>lightsquid_skipurl</fieldname>
 			<description>
                                 If you want skip some sites from stat, example our local www server
                                 Example, if you want skip LOCAL site, put it here
@@ -245,7 +239,7 @@
 		lightsquid_install();
 		lightsquid_resync();
 	</custom_php_install_command>
-	<custom_php_deinstall_command>                
+	<custom_php_deinstall_command>
 		lightsquid_deinstall();
 	</custom_php_deinstall_command>
 </packagegui>
