@@ -105,7 +105,7 @@ svscan_start () {
         /usr/bin/env \
         PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
         /usr/sbin/daemon -f /bin/sh -c "\$command \$svscan_servicedir 2>&1 | /usr/local/bin/readproctitle service errors: ................................................................................................................................................................................................................................................................................................................................................................................................................ &" > /dev/null
-        minicron {$refreshinterval} {$g['varrun_path']}/ping_hosts.pid "/etc/ping_hosts.sh; cd {$g['varetc_path']}/etc/tinydns/root && /usr/local/bin/tinydns-data"
+        minicron {$refreshinterval} {$g['varrun_path']}/ping_hosts.pid "/etc/ping_hosts.sh; cd {$g['varetc_path']}/tinydns/root && /usr/local/bin/tinydns-data"
 }
 
 svscan_stop_post () {
@@ -173,8 +173,8 @@ function tinydns_custom_php_deinstall_command() {
 	exec("rm /usr/local/www/*tinydns*");
 	exec("rm /usr/local/pkg/*tinydns*");
 	exec("rm /usr/local/pkg/pf/*tinydns*");
-	exec("rm -rf {$g['varetc_path']}/etc/tinydns {$g['varrun_path']}/service/tinydns {$g['varetc_path']}/axfrdns");
-	exec("rm -rf {$g['varetc_path']}/etc/dnscache* {$g['varrun_path']}/service/dnscache*");
+	exec("rm -rf {$g['varetc_path']}/tinydns {$g['varrun_path']}/service/tinydns {$g['varetc_path']}/axfrdns");
+	exec("rm -rf {$g['varetc_path']}/dnscache* {$g['varrun_path']}/service/dnscache*");
 	filter_configure();
 	conf_mount_ro();
 }
@@ -207,19 +207,19 @@ function tinydns_custom_php_changeip_command() {
 	exec("/usr/sbin/pw useradd Gdnslog");
 	exec("/usr/sbin/pw useradd Gdnscache");
 	exec("/usr/sbin/pw useradd Gaxfrdns");
-	exec("/bin/rm -r {$g['varetc_path']}/etc/dnscache*");
+	exec("/bin/rm -r {$g['varetc_path']}/dnscache*");
 	exec("/bin/rm -r {$g['varrun_path']}/service/dnscache*");
 
 	/* TinyDNS Server */
-	exec("/usr/local/bin/tinydns-conf Gtinydns Gdnslog {$g['varetc_path']}/etc/tinydns {$dnsserverip}");
-	exec("/bin/ln -s {$g['varetc_path']}/etc/tinydns {$g['varrun_path']}/service/");
+	exec("/usr/local/bin/tinydns-conf Gtinydns Gdnslog {$g['varetc_path']}/tinydns {$dnsserverip}");
+	exec("/bin/ln -s {$g['varetc_path']}/tinydns {$g['varrun_path']}/service/");
 
 	/* AXFRDNS - Zone transfers */
 	if(is_array($ztipaddress)) 
-		exec("/usr/local/bin/axfrdns-conf Gaxfrdns Gdnslog {$g['varetc_path']}/etc/axfrdns {$g['varetc_path']}/etc/tinydns {$dnsserverip}");
-	exec("/bin/ln -s {$g['varetc_path']}/etc/axfrdns {$g['varrun_path']}/service/");
+		exec("/usr/local/bin/axfrdns-conf Gaxfrdns Gdnslog {$g['varetc_path']}/axfrdns {$g['varetc_path']}/tinydns {$dnsserverip}");
+	exec("/bin/ln -s {$g['varetc_path']}/axfrdns {$g['varrun_path']}/service/");
 
-	exec("echo {$dnsserverip} > {$g['varetc_path']}/etc/tinydns/env/IP");
+	exec("echo {$dnsserverip} > {$g['varetc_path']}/tinydns/env/IP");
 	exec("/usr/bin/killall -9 tinydns");
 
 	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
@@ -227,7 +227,7 @@ function tinydns_custom_php_changeip_command() {
 		exec("/bin/cp {$g['varetc_path']}/resolv.conf {$g['varetc_path']}/resolv.conf.original");
 		exec("/bin/cp {$g['varetc_path']}/resolv.conf {$g['varetc_path']}/resolv.conf.dnscache");
 		exec("echo domain {$config['system']['domain']} > {$g['varetc_path']}/resolv.conf");
-		exec("rm -rf {$g['varetc_path']}/etc/dnscache* {$g['varrun_path']}/service/dnscache*");
+		exec("rm -rf {$g['varetc_path']}/dnscache* {$g['varrun_path']}/service/dnscache*");
 		foreach ($interfaces as $dnsidx => $dnsif) {
 			$dnscacheif = convert_friendly_interface_to_real_interface_name($dnsif);
 			$dnscacheip = find_interface_ip($dnscacheif);
@@ -237,26 +237,26 @@ function tinydns_custom_php_changeip_command() {
 				$ipmask = $config['interfaces'][$dnsif]['subnet'];
 			$arr = tinydns_get_ip_subnet_arpa($dnscacheip, $ipmask);
 			$dnsuserip = $arr[0];
-			exec("/bin/mkdir -p {$g['varetc_path']}/etc/dnscache{$dnsidx}");
-			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog {$g['varetc_path']}/etc/dnscache{$dnsidx} {$dnscacheip}");
-			exec("/bin/ln -s {$g['varetc_path']}/etc/dnscache{$dnsidx} {$g['varrun_path']}/service/");
-			if (!is_dir("{$g['varetc_path']}/etc/dnscache{$dnsidx}/env/IP"))
-				exec("/bin/mkdir -p {$g['varetc_path']}/etc/dnscache{$dnsidx}/env");
-			exec("echo {$dnscacheip} > {$g['varetc_path']}/etc/dnscache{$dnsidx}/env/IP");
+			exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}");
+			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog {$g['varetc_path']}/dnscache{$dnsidx} {$dnscacheip}");
+			exec("/bin/ln -s {$g['varetc_path']}/dnscache{$dnsidx} {$g['varrun_path']}/service/");
+			if (!is_dir("{$g['varetc_path']}/dnscache{$dnsidx}/env/IP"))
+				exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}/env");
+			exec("echo {$dnscacheip} > {$g['varetc_path']}/dnscache{$dnsidx}/env/IP");
 			tinydns_dnscache_forwarding_servers($dnsidx);
-			if (!is_dir("{$g['varetc_path']}/etc/dnscache{$dnsidx}/root/ip"))
-				exec("/bin/mkdir -p {$g['varetc_path']}/etc/dnscache{$dnsidx}/root/ip");
-			exec("/usr/bin/touch {$g['varetc_path']}/etc/dnscache{$dnsidx}/root/ip/{$dnsuserip}");
+			if (!is_dir("{$g['varetc_path']}/dnscache{$dnsidx}/root/ip"))
+				exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}/root/ip");
+			exec("/usr/bin/touch {$g['varetc_path']}/dnscache{$dnsidx}/root/ip/{$dnsuserip}");
 			tinydns_create_soa_domain_list($dnsserverip, $dnsidx);
 			exec("echo nameserver {$dnscacheip} >> {$g['varetc_path']}/resolv.conf");
 		}
 		exec("/usr/bin/killall -9 dnscache");
 	} else {
-		if(file_exists("/var/etc/resolv.conf.original"))
+		if(file_exists("{$g['varetc_path']}/resolv.conf.original"))
 			exec("/bin/cp {$g['varetc_path']}/resolv.conf.original {$g['varetc_path']}/resolv.conf");
 		$interfaces = explode(",", $$config['installedpackages']['tinydns']['config'][0]['interface']);
 		foreach ($interfaces as $dnsidx => $dnsif) {
-			if(is_dir("{$g['varetc_path']}/etc/dnscache{$dnsidx}"))
+			if(is_dir("{$g['varetc_path']}/dnscache{$dnsidx}"))
 				dnscache_use_root_servers($dnsidx);
 		}
 		exec("/usr/bin/killall -9 dnscache");
@@ -287,9 +287,9 @@ function tinydns_setup_axfrdns() {
 	$ztipaddress = populate_zt_array();
 	if(!is_array($ztipaddress)) 
 		return;
-	$fd = fopen("{$g['varetc_path']}/etc/axfrdns/tcp","w");
+	$fd = fopen("{$g['varetc_path']}/axfrdns/tcp","w");
 	if(!$fd) {
-		log_error("Could not open {$g['varetc_path']}/etc/axfrdns/tcp for writing");
+		log_error("Could not open {$g['varetc_path']}/axfrdns/tcp for writing");
 		return;
 	}
 	foreach($ztipaddress as $zt) {
@@ -925,12 +925,12 @@ function tinydns_get_dns_record_type($tinydnsrecord) {
 function tinydns_dnscache_forwarding_servers($index) {
 	global $g, $config;
 
-	exec("echo 1 > {$g['varetc_path']}/etc/dnscache{$index}/env/FORWARDONLY");
-	if(is_dir("{$g['varetc_path']}/etc/dnscache{$index}/root/servers/")) 
-		exec("rm -R {$g['varetc_path']}/etc/dnscache/root/servers/");
-	exec("/bin/mkdir -p {$g['varetc_path']}/etc/dnscache{$index}/root/servers/");
+	exec("echo 1 > {$g['varetc_path']}/dnscache{$index}/env/FORWARDONLY");
+	if(is_dir("{$g['varetc_path']}/dnscache{$index}/root/servers/")) 
+		exec("rm -R {$g['varetc_path']}/dnscache/root/servers/");
+	exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$index}/root/servers/");
 	if (intval($config['version']) >= 6)
-		exec("/bin/cat {$g['varetc_path']}/nameserver_* > {$g['varetc_path']}/etc/dnscache{$index}/root/servers/@");
+		exec("/bin/cat {$g['varetc_path']}/nameserver_* > {$g['varetc_path']}/dnscache{$index}/root/servers/@");
 	else {
 		$fr = fopen("{$g['varetc_path']}/resolv.conf.dnscache", "r");
 		if (! $fr) {
@@ -955,9 +955,9 @@ function tinydns_dnscache_forwarding_servers($index) {
 			}	
 		}
 		fclose($fr);
-		$fr = fopen("{$g['varetc_path']}/etc/dnscache{$index}/root/servers/@", "w");
+		$fr = fopen("{$g['varetc_path']}/dnscache{$index}/root/servers/@", "w");
 		if (! $fr) {
-			printf("Error: cannot write to {$g['varetc_path']}/etc/dnscache{$index}/root/servers/@ in tinydns_dnscache_forwarding_servers().\n");
+			printf("Error: cannot write to {$g['varetc_path']}/dnscache{$index}/root/servers/@ in tinydns_dnscache_forwarding_servers().\n");
 			return 1;
 		}
 		if($iprecords)
@@ -966,7 +966,7 @@ function tinydns_dnscache_forwarding_servers($index) {
 	}
 }
 
-/* This routine adds filenames to {$g['varetc_path']}/etc/dnscache/root/servers/ with the contents pointing to the tinyDNS server */
+/* This routine adds filenames to {$g['varetc_path']}/dnscache/root/servers/ with the contents pointing to the tinyDNS server */
 function tinydns_create_soa_domain_list($dnsserverip, $index = 0) {
 	global $g;
 	if(file_exists("{$g['varrun_path']}/service/tinydns/root/data"))
@@ -985,9 +985,9 @@ function tinydns_create_soa_domain_list($dnsserverip, $index = 0) {
 		if($fqdn) {
 			$rtypes = tinydns_get_dns_record_type($dnsrecord);
 			if($rtypes[0] == "SOA") {
-				$fr = fopen("{$g['varetc_path']}/etc/dnscache{$index}/root/servers/{$fqdn}", "w");
+				$fr = fopen("{$g['varetc_path']}/dnscache{$index}/root/servers/{$fqdn}", "w");
 				if (! $fr) {
-					printf("Error: cannot open {$g['varetc_path']}/etc/dnscache{$index}/root/servers/{$fqdn} in tinydns_create_soa_domain_list().\n");
+					printf("Error: cannot open {$g['varetc_path']}/dnscache{$index}/root/servers/{$fqdn} in tinydns_create_soa_domain_list().\n");
 					return 1;
 				}
 				if($fqdn)fwrite($fr, $dnsserverip);
@@ -1086,13 +1086,13 @@ function dnscache_use_root_servers($index = 0) {
 
 EOD;
 
-	exec("echo 0 > {$g['varetc_path']}/etc/dnscache{$index}/env/FORWARDONLY");
-	if(is_dir("{$g['varetc_path']}/etc/dnscache{$index}/root/servers/")) 
-		exec("/bin/rm -R {$g['varetc_path']}/etc/dnscache{$index}/root/servers/");
-	exec("/bin/mkdir -p {$g['varetc_path']}/etc/dnscache{$index}/root/servers/");
-	$fr = fopen("{$g['varetc_path']}/etc/dnscache{$index}/root/servers/@", "w");
+	exec("echo 0 > {$g['varetc_path']}/dnscache{$index}/env/FORWARDONLY");
+	if(is_dir("{$g['varetc_path']}/dnscache{$index}/root/servers/")) 
+		exec("/bin/rm -R {$g['varetc_path']}/dnscache{$index}/root/servers/");
+	exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$index}/root/servers/");
+	$fr = fopen("{$g['varetc_path']}/dnscache{$index}/root/servers/@", "w");
 	if (! $fr) {
-		printf("Error: cannot write to {$g['varetc_path']}/etc/dnscache{$index}/root/servers/@ in dnscache_use_root_servers().\n");
+		printf("Error: cannot write to {$g['varetc_path']}/dnscache{$index}/root/servers/@ in dnscache_use_root_servers().\n");
 		return 1;
 	}
 	fwrite($fr, $rootservers);
