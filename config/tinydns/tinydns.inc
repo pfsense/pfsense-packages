@@ -240,7 +240,7 @@ function tinydns_custom_php_changeip_command() {
 			//exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}");
 			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog {$g['varetc_path']}/dnscache{$dnsidx} {$dnscacheip}");
 			exec("/bin/ln -s {$g['varetc_path']}/dnscache{$dnsidx} {$g['varrun_path']}/service/");
-			if (!is_dir("{$g['varetc_path']}/dnscache{$dnsidx}/env/IP"))
+			if (!is_dir("{$g['varetc_path']}/dnscache{$dnsidx}/env"))
 				exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}/env");
 			exec("echo {$dnscacheip} > {$g['varetc_path']}/dnscache{$dnsidx}/env/IP");
 			tinydns_dnscache_forwarding_servers($dnsidx);
