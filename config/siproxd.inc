@@ -114,7 +114,7 @@ function sync_package_siproxd() {
 	}
 
 	if($_POST['if_outbound'] != "") {
-		if($config['interfaces'][$_POST['if_outbound']]['ipaddr'] == "pppoe") {
+		if(intval($config['version']) < 6 && $config['interfaces'][$_POST['if_outbound']]['ipaddr'] == "pppoe") {
 			fwrite($fout, "if_outbound = ng0\n");
                 } else {
 			fwrite($fout, "if_outbound = " . convert_friendly_interface_to_real_interface_name($_POST['if_outbound']) . "\n");
