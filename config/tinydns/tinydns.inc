@@ -237,7 +237,7 @@ function tinydns_custom_php_changeip_command() {
 				$ipmask = $config['interfaces'][$dnsif]['subnet'];
 			$arr = tinydns_get_ip_subnet_arpa($dnscacheip, $ipmask);
 			$dnsuserip = $arr[0];
-			exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}");
+			//exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}");
 			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog {$g['varetc_path']}/dnscache{$dnsidx} {$dnscacheip}");
 			exec("/bin/ln -s {$g['varetc_path']}/dnscache{$dnsidx} {$g['varrun_path']}/service/");
 			if (!is_dir("{$g['varetc_path']}/dnscache{$dnsidx}/env/IP"))
