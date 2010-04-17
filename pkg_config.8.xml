@@ -333,8 +333,8 @@
       <descr>A console-based network traffic monitor + vnstat PHP frontend</descr>
       <pkginfolink>http://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
       <category>Network Management</category>
-	  <depends_on_package_base_url>http://www.pfsense.com/packages/config/vnstat2/bin/</depends_on_package_base_url>
-	  <depends_on_package>vnstat-1.10_2.tbz</depends_on_package>
+	  <depends_on_package_base_url>http://ftp4.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/Latest/</depends_on_package_base_url>
+	  <depends_on_package>vnstat.tbz</depends_on_package>
       <version>1.10</version>
       <status>test</status>
       <required_version>2.0</required_version>
