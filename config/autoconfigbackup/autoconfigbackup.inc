@@ -55,6 +55,10 @@ function custom_php_validation_command($post, $input_errors) {
 function test_connection($post) {
 	global $savemsg, $config;
 
+	/* do nothing when booting */
+	if($g['booting']) 
+		return;
+
 	// Seperator used during client / server communications
 	$oper_sep			= "\|\|";
 
@@ -92,6 +96,10 @@ function test_connection($post) {
 
 function upload_config($reasonm = "") {
 	global $config, $g, $input_errors;
+
+	/* do nothing when booting */
+	if($g['booting']) 
+		return;
 
 	/*
 	 *   pfSense upload config to pfSense.org script
