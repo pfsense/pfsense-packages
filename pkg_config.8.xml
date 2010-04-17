@@ -328,18 +328,20 @@
 	  <noembedded>true</noembedded>
     </package>
     <package>
-      <name>vnstat</name>
+      <name>vnstat2</name>
       <website>http://humdi.net/vnstat/</website>
-      <descr>A console-based network traffic monitor</descr>
+      <descr>A console-based network traffic monitor + vnstat PHP frontend</descr>
+      <pkginfolink>http://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
       <category>Network Management</category>
-	  <depends_on_package_base_url>http://www.pfsense.com/packages/config/vnstat/bin/</depends_on_package_base_url>
-	  <depends_on_package>vnstat-1.6_3.tbz</depends_on_package>
-      <version>1.6.3</version>
-      <status>Beta</status>
-      <required_version>1.2.3</required_version>
+	  <depends_on_package_base_url>http://www.pfsense.com/packages/config/vnstat2/bin/</depends_on_package_base_url>
+	  <depends_on_package>vnstat-1.10_2.tbz</depends_on_package>
+      <version>1.10</version>
+      <status>test</status>
+      <required_version>2.0</required_version>
       <maintainer>crazypark2@yahoo.dk</maintainer>
-      <config_file>http://www.pfsense.com/packages/config/vnstat/vnstat.xml</config_file>
-      <configurationfile>vnstat.xml</configurationfile>
+      <config_file>http://www.pfsense.com/packages/config/vnstat2/vnstat2.xml</config_file>
+      <configurationfile>vnstat2.xml</configurationfile>
+      <after_install_info></after_install_info>
     </package>
     <package>
       <name>phpSysInfo</name>

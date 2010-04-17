@@ -424,24 +424,6 @@
       <after_install_info></after_install_info>
     </package>
     <package>
-      <name>vnstat2</name>
-      <website>http://humdi.net/vnstat/</website>
-      <descr>A console-based network traffic monitor + vnstat PHP frontend</descr>
-      <pkginfolink>http://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
-      <category>Network Management</category>
-	  <depends_on_package_base_url>http://www.pfsense.com/packages/config/vnstat2/bin/</depends_on_package_base_url>
-	  <depends_on_package>vnstat-1.10.tbz</depends_on_package>
-          <depends_on_package>gd-2.0.35,1.tbz</depends_on_package>
-          <depends_on_package>jpeg-6b_7.tbz</depends_on_package>
-      <version>1.10</version>
-      <status>test</status>
-      <required_version>1.2.3</required_version>
-      <maintainer>crazypark2@yahoo.dk</maintainer>
-      <config_file>http://www.pfsense.com/packages/config/vnstat2/vnstat2.xml</config_file>
-      <configurationfile>vnstat2.xml</configurationfile>
-      <after_install_info></after_install_info>
-    </package>
-    <package>
       <name>phpSysInfo</name>
       <website>http://phpsysinfo.sourceforge.net/</website>
       <descr>PHPSysInfo is a customizable PHP Script that parses /proc, and formats information nicely. It will display information about system facts like Uptime, CPU, Memory, PCI devices, SCSI devices, IDE devices, Network adapters, Disk usage, and more.</descr>
