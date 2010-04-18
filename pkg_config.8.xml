@@ -335,6 +335,12 @@
       <category>Network Management</category>
 	  <depends_on_package_base_url>http://ftp4.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/Latest/</depends_on_package_base_url>
 	  <depends_on_package>vnstat.tbz</depends_on_package>
+      <depends_on_package>expat-2.0.1_1</depends_on_package>
+      <depends_on_package>fontconfig-2.8.0,1</depends_on_package>
+      <depends_on_package>freetype2-2.3.11</depends_on_package>
+      <depends_on_package>gd-2.0.35_7,1</depends_on_package>
+      <depends_on_package>jpeg-8_1</depends_on_package>
+      <depends_on_package>png-1.4.1_1</depends_on_package>
       <version>1.10</version>
       <status>test</status>
       <required_version>2.0</required_version>
