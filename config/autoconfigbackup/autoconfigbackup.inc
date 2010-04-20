@@ -53,7 +53,7 @@ function custom_php_validation_command($post, $input_errors) {
 }
 
 function test_connection($post) {
-	global $savemsg, $config;
+	global $savemsg, $config, $g;
 
 	/* do nothing when booting */
 	if($g['booting']) 
