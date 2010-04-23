@@ -40,7 +40,6 @@ require("guiconfig.inc");
 if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item']))
 	$config['installedpackages']['snortglobal']['whitelist']['item'] = array();
 
-aliases_sort();
 $a_whitelist = &$config['installedpackages']['snortglobal']['whitelist']['item'];
 
 $id = $_GET['id'];
