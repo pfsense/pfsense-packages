@@ -160,7 +160,7 @@ function haproxy_find_acl($name) {
 
 function write_backend($fd, $name, $pool, $frontend) {
 	if($pool['status'] != 'active' || !is_array($pool['ha_servers']['item']))
-		continue;
+		return;
 
 	fwrite ($fd, "backend " . $name . "\n");
 	if($pool['cookie_name'] && strtolower($frontend['type']) == "http")
