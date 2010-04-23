@@ -117,9 +117,6 @@ global $config, $g;
                         $home_net .= "{$dns} ";         
         }
 	}
-
-        /* Add loopback to whitelist (ftphelper) */
-        $home_net .= "127.0.0.1";
 	
 	if($vips == 'yes') {		
         /* iterate all vips and add to whitelist */        
@@ -129,6 +126,13 @@ global $config, $g;
                                 $home_net .= $vip['subnet'] . " ";
 	}
 
+		/* Add loopback to whitelist (ftphelper) */
+		if($userwips == 'no') {
+        	$home_net .= "127.0.0.1";
+		}else{
+			$home_net .= "127.0.0.1 ";
+		}
+	
         /* grab a list of vpns and whitelist if user desires added by nestorfish 954 */
         if($vpns == 'yes')
         {
@@ -141,8 +145,9 @@ global $config, $g;
                 {
                         $vpns_list = filter_get_vpns_list();
                 }
-
-			$home_net .= "$vpns_list ";
+			if ($vpns_list != '') {
+				$home_net .= "$vpns_list ";
+			}
 		 }
 
 		 /* never ever compair numbers to words */
