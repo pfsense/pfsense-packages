@@ -1749,8 +1749,14 @@ if ($snortunifiedlog_info_chk == on)
 $spoink_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['blockoffenders7'];
 if ($spoink_info_chk == on) {
 	
-	preg_match('/^([a-zA-z0-9]+)/', $config['installedpackages']['snortglobal']['rule'][$id]['whitelistname'], $wlist_name_file);	
-	$spoink_whitelist_name = $wlist_name_file[0];
+	preg_match('/^([a-zA-z0-9]+)/', $config['installedpackages']['snortglobal']['rule'][$id]['whitelistname'], $wlist_name_file);
+
+	if ($wlist_name_file[0] == 'default') {
+		$spoink_whitelist_name = 'defaultwlist';
+	}else{
+		$spoink_whitelist_name = $wlist_name_file[0];
+	}
+	
     $spoink_type = "output alert_pf: /usr/local/etc/snort/whitelist/$spoink_whitelist_name,snort2c";
     
 }
