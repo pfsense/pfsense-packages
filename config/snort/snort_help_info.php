@@ -86,8 +86,8 @@ clear: both;
 	$tab_array[] = array("Rule Updates", false, "/snort/snort_download_rules.php");
 	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
     $tab_array[] = array("Blocked", false, "/snort/snort_blocked.php");
-	$tab_array[] = array("Whitelists", false, "/pkg.php?xml=/snort/snort_whitelist.xml");
-	$tab_array[] = array("Help & Info", true, "/snort/snort_help_info.php");
+	$tab_array[] = array("Whitelists", false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[] = array("Help", true, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 ?>
     </td>

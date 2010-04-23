@@ -134,6 +134,9 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['descr'] = $a_nat[$id]['descr'];
 	$pconfig['performance'] = $a_nat[$id]['performance'];
 	$pconfig['blockoffenders7'] = $a_nat[$id]['blockoffenders7'];
+	$pconfig['whitelistname'] = $a_nat[$id]['whitelistname'];
+	$pconfig['homelistname'] = $a_nat[$id]['homelistname'];
+	$pconfig['externallistname'] = $a_nat[$id]['externallistname'];
 	$pconfig['snortalertlogtype'] = $a_nat[$id]['snortalertlogtype'];
 	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
 	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
@@ -233,6 +236,9 @@ if ($_POST["Submit"]) {
 		$natent['performance'] = $_POST['performance'] ? $_POST['performance'] : $pconfig['performance'];
 		/* if post = on use on off or rewrite the conf */
 		if ($_POST['blockoffenders7'] == "on") { $natent['blockoffenders7'] = on; }else{ $natent['blockoffenders7'] = off; } if ($_POST['enable'] == "") { $natent['blockoffenders7'] = $pconfig['blockoffenders7']; }
+		$natent['whitelistname'] = $_POST['whitelistname'] ? $_POST['whitelistname'] : $pconfig['whitelistname'];
+		$natent['homelistname'] = $_POST['homelistname'] ? $_POST['homelistname'] : $pconfig['homelistname'];
+		$natent['externallistname'] = $_POST['externallistname'] ? $_POST['externallistname'] : $pconfig['externallistname'];	
 		$natent['snortalertlogtype'] = $_POST['snortalertlogtype'] ? $_POST['snortalertlogtype'] : $pconfig['snortalertlogtype'];
 		if ($_POST['alertsystemlog'] == "on") { $natent['alertsystemlog'] = on; }else{ $natent['alertsystemlog'] = off; } if ($_POST['enable'] == "") { $natent['alertsystemlog'] = $pconfig['alertsystemlog']; }
 		if ($_POST['tcpdumplog'] == "on") { $natent['tcpdumplog'] = on; }else{ $natent['tcpdumplog'] = off; } if ($_POST['enable'] == "") { $natent['tcpdumplog'] = $pconfig['tcpdumplog']; }
@@ -306,6 +312,9 @@ if ($_POST["Submit"]) {
 		
 		touch("$d_snortconfdirty_path");
 		
+		/* if snort.sh crashed this will remove the pid */
+		exec('/bin/rm /tmp/snort.sh.pid');
+		
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
@@ -338,7 +347,7 @@ if ($_POST["Submit"]) {
 		if ($_POST["Submit3"])
 		{
 		
-			Running_Stop($snort_uuid, $if_real, $id);			
+			Running_Stop($snort_uuid, $if_real, $id);
 			
 			header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 			header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -562,10 +571,105 @@ if ($a_nat[$id]['interface'] != '') {
 					</span></td>
 				</tr>
 				<tr>
+				<td width="22%" valign="top" class="vncell">Home net</td>
+				<td width="78%" class="vtable">
+				<select name="homelistname" class="formfld" id="homelistname">		
+						<?php
+						/* find whitelist names and filter by type */
+						$hlist_select = $config['installedpackages']['snortglobal']['whitelist']['item'];										
+						$hid = -1;
+						if ($pconfig['homelistname'] == 'default'){ $selected  = 'selected'; }
+							$wlist_sub2 = preg_match('/^([a-zA-z0-9]+)/', $pconfig['homelistname'], $hlist_sub);
+							echo "<option value=\"default\" $selected>default</option>
+							";
+							foreach ($hlist_select as $value):
+							$hid += 1;
+							if ($config['installedpackages']['snortglobal']['whitelist']['item'][$hid]['snortlisttype'] == 'netlist') {
+								$ilistname = $config['installedpackages']['snortglobal']['whitelist']['item'][$hid]['name'];
+								$whitelist_uuid = $config['installedpackages']['snortglobal']['whitelist']['item'][$hid]['uuid'];
+									if ($ilistname == $hlist_sub[0]){
+										echo "<option value=\"$ilistname $whitelist_uuid\" selected>";
+									}else{
+										echo "<option value=\"$ilistname $whitelist_uuid\">";
+									}
+								echo htmlspecialchars($ilistname) . '</option>
+								';
+							}
+							endforeach;			
+						?>							
+				</select><br>
+				<span class="vexpl">Choose the home net you will like this rule to use.
+				</span>&nbsp;<span class="red">Note:</span>&nbsp;Default home net adds only local networks.<br>
+				<span class="red">Hint:</span>&nbsp;Most users add a list of friendly ips that the firewall cant see.</td>
+				</tr>
+				<tr>
+				<td width="22%" valign="top" class="vncell">External net</td>
+				<td width="78%" class="vtable">
+				<select name="externallistname" class="formfld" id="externallistname">		
+						<?php
+						/* find whitelist names and filter by type */
+						$exlist_select = $config['installedpackages']['snortglobal']['whitelist']['item'];										
+						$exid = -1;
+						if ($pconfig['externallistname'] == 'default'){ $selected  = 'selected'; }
+							preg_match('/^([a-zA-z0-9]+)/', $pconfig['externallistname'], $exlist_sub);
+							echo "<option value=\"default\" $selected>default</option>
+							";
+							foreach ($exlist_select as $value):
+							$exid += 1;
+							if ($config['installedpackages']['snortglobal']['whitelist']['item'][$exid]['snortlisttype'] == 'netlist') {
+								$ilistname = $config['installedpackages']['snortglobal']['whitelist']['item'][$exid]['name'];
+								$whitelist_uuid = $config['installedpackages']['snortglobal']['whitelist']['item'][$exid]['uuid'];
+									if ($ilistname == $exlist_sub[0]){
+										echo "<option value=\"$ilistname $whitelist_uuid\" selected>";
+									}else{
+										echo "<option value=\"$ilistname $whitelist_uuid\">";
+									}
+								echo htmlspecialchars($ilistname) . '</option>
+								';
+							}
+							endforeach;			
+						?>							
+				</select><br>
+				<span class="vexpl">Choose the external net you will like this rule to use.
+				</span>&nbsp;<span class="red">Note:</span>&nbsp;Default external net, networks that are not home net.<br>
+				<span class="red">Hint:</span>&nbsp;Most users should leave this setting at default.</td>
+				</tr>
+				<tr>
 				<td width="22%" valign="top" class="vncell">Block offenders</td>
 				<td width="78%" class="vtable">
 					<input name="blockoffenders7" type="checkbox" value="on" <?php if ($pconfig['blockoffenders7'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					Checking this option will automatically block hosts that generate a Snort alert.</td>
+				</tr>
+				<tr>
+				<td width="22%" valign="top" class="vncell">Whitelist</td>
+				<td width="78%" class="vtable">
+				<select name="whitelistname" class="formfld" id="whitelistname">		
+						<?php
+						/* find whitelist names and filter by type, make sure to track by uuid */
+						$wlist_select = $config['installedpackages']['snortglobal']['whitelist']['item'];										
+						$wid = -1;
+						if ($pconfig['whitelistname'] == 'default'){ $selected  = 'selected'; }
+							preg_match('/^([a-zA-z0-9]+)/', $pconfig['whitelistname'], $wlist_sub);
+							echo "<option value=\"default\" $selected>default</option>
+							";
+							foreach ($wlist_select as $value):
+							$wid += 1;
+							if ($config['installedpackages']['snortglobal']['whitelist']['item'][$wid]['snortlisttype'] == 'whitelist') {
+								$ilistname = $config['installedpackages']['snortglobal']['whitelist']['item'][$wid]['name'];
+								$whitelist_uuid = $config['installedpackages']['snortglobal']['whitelist']['item'][$wid]['uuid'];
+									if ($ilistname == $wlist_sub[0]){
+										echo "<option value=\"$ilistname $whitelist_uuid\" selected>";
+									}else{
+										echo "<option value=\"$ilistname $whitelist_uuid\">";
+									}
+								echo htmlspecialchars($ilistname) . '</option>
+								';
+							}
+							endforeach;			
+						?>							
+				</select><br>
+				<span class="vexpl">Choose the whitelist you will like this rule to use.
+				</span>&nbsp;<span class="red">Note:</span>&nbsp;Default whitelist adds only local networks.</td>
 				</tr>
 				<tr>
 				<td width="22%" valign="top" class="vncell">Send alerts to main System logs</td>

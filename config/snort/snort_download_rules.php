@@ -142,8 +142,8 @@ echo "<script src=\"/row_toggle.js\" type=\"text/javascript\"></script>\n
 	$tab_array[] = array("Rule Updates", true, "/snort/snort_download_rules.php");
 	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
     $tab_array[] = array("Blocked", false, "/snort/snort_blocked.php");
-	$tab_array[] = array("Whitelists", false, "/pkg.php?xml=/snort/snort_whitelist.xml");
-	$tab_array[] = array("Help & Info", false, "/snort/snort_help_info.php");
+	$tab_array[] = array("Whitelists", false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[] = array("Help", false, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 
 if ($snort_emrging_info == "stop" && $snort_oinkid_info == "stop") {
@@ -267,8 +267,8 @@ setTimeout($.unblockUI, 2000);
 	$tab_array[] = array("Rule Updates", true, "/snort/snort_download_rules.php");
 	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
     $tab_array[] = array("Blocked", false, "/snort/snort_blocked.php");
-	$tab_array[] = array("Whitelists", false, "/pkg.php?xml=/snort/snort_whitelist.xml");
-	$tab_array[] = array("Help & Info", false, "/snort/snort_help_info.php");
+	$tab_array[] = array("Whitelists", false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[] = array("Help", false, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 ?>
 

@@ -85,21 +85,19 @@ if ($_POST['save'])
 		
 }
 
-
 if ($_POST['delete'])
 {
-
-	exec("killall syslogd");
 	conf_mount_rw();
-	if(file_exists("/var/log/snort/alert"))
-	{	
-		exec('/bin/rm /var/log/snort/*');
-		exec('/usr/bin/touch /var/log/snort/alert');
+	if(file_exists('/var/log/snort/alert'))
+	{
+		exec('/bin/echo "" > /var/log/snort/alert');
+		post_delete_logs();
+		exec('/usr/sbin/chown snort:snort /var/log/snort/*');
+		exec('/bin/chmod 660 /var/log/snort/*');
+		sleep(2);
+		exec('/usr/bin/killall -HUP snort');		
 	}
 	conf_mount_ro();
-	system_syslogd_start();
-	//exec("/usr/bin/killall -HUP snort");
-		
 }
 
 if ($_POST['download'])
@@ -332,8 +330,8 @@ if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 	$tab_array[] = array("Rule Updates", false, "/snort/snort_download_rules.php");
 	$tab_array[] = array("Alerts", true, "/snort/snort_alerts.php");
     $tab_array[] = array("Blocked", false, "/snort/snort_blocked.php");
-	$tab_array[] = array("Whitelists", false, "/pkg.php?xml=/snort/snort_whitelist.xml");
-	$tab_array[] = array("Help & Info", false, "/snort/snort_help_info.php");
+	$tab_array[] = array("Whitelists", false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[] = array("Help", false, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 ?>
 </td>
@@ -356,7 +354,7 @@ if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 		<form action="/snort/snort_alerts.php" method="post">
         <input name="download" type="submit" class="formbtn" value="Download">
         All log files will be saved.
-		<input name="delete" type="submit" class="formbtn" value="Clear">
+		<input name="delete" type="submit" class="formbtn" value="Clear" onclick="return confirm('Do you really want to remove all your logs ? All snort rule interfces may have to be restarted.')">
 		<span class="red"><strong>Warning:</strong></span> all log files will be deleted.
 		</form>
 		</td>

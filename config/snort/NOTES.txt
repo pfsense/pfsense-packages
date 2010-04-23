@@ -1,14 +1,15 @@
 
 
 March 26 2019
-Snort-dev 2.8.5.3 pk v. 18 final
+Snort-dev 2.8.5.3 pk v. 22 final
 
-Final day.
+TODO:
 
-Odds and ends left.
-
-Pierre POMES code needs to be added.
-
+Create Threshold GUI
+Pf snort block table should  survive reboots. Dont know how Im going to do this.  
+Create Upload GUI. Use Pierre POMES code.
+Use Chroot for snort.
+Add log rotation and log dir size display
 Threshold tab needs to be added.
 
 

@@ -48,6 +48,131 @@ if ($pfsense_ver_chk == '1.2.3-RELEASE')
 /* tell me my theme */
 $pfsense_theme_is = $config['theme'];
 
+/* func builds custom whitelests */
+function find_whitelist_key($find_wlist_number) {
+        global $config, $g;
+
+	$whitelist_array = $config['installedpackages']['snortglobal']['whitelist']['item'];
+	$w_key = -1;
+
+	foreach ($whitelist_array as $value) {
+	$w_key += 1;
+		if ($config['installedpackages']['snortglobal']['whitelist']['item'][$w_key]['uuid'] == $find_wlist_number) {
+			return $w_key;
+		}
+	}
+}
+
+/* func builds custom whitelests */
+function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $vpns, $userwips) {
+global $config, $g;
+
+        /* build an interface array list */
+        $int_array = array('lan');
+        for ($j = 1; isset ($config['interfaces']['opt' . $j]); $j++)
+                if(isset($config['interfaces']['opt' . $j]['enable']))
+                        if(!$config['interfaces']['opt' . $j]['gateway'])
+                                $int_array[] = "opt{$j}";
+
+        /*  iterate through interface list and write out whitelist items
+         *  and also compile a home_net list for snort.
+         */
+        foreach($int_array as $int) {
+                /* calculate interface subnet information */
+                $ifcfg = &$config['interfaces'][$int];
+                $subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
+                $subnetmask = gen_subnet_mask($ifcfg['subnet']);
+                if($subnet == "pppoe" or $subnet == "dhcp") {
+                        $subnet = find_interface_ip("ng0");
+                        if($subnet)
+                                $home_net .= "{$subnet} ";
+                } else {
+                        if ($subnet)
+                                if($ifcfg['subnet']) 
+                                        $home_net .= "{$subnet}/{$ifcfg['subnet']} ";
+                }
+        }
+
+	if($wanip == 'yes') {
+        /* add all WAN ips to the whitelist */
+        $wan_if = get_real_wan_interface();
+        $ip = find_interface_ip($wan_if);
+        if($ip) 
+                $home_net .= "{$ip} ";
+	}
+
+	if($wangw == 'yes') {
+        /* Add Gateway on WAN interface to whitelist (For RRD graphs) */
+        $int = convert_friendly_interface_to_real_interface_name2("WAN");
+        $gw = get_interface_gateway($int);
+        if($gw) 
+                $home_net .= "{$gw} ";
+	}
+
+	if($wandns == 'yes') {
+        /* Add DNS server for WAN interface to whitelist */
+        $dns_servers = get_dns_servers();
+        foreach($dns_servers as $dns) {
+                if($dns) 
+                        $home_net .= "{$dns} ";         
+        }
+	}
+
+        /* Add loopback to whitelist (ftphelper) */
+        $home_net .= "127.0.0.1";
+	
+	if($vips == 'yes') {		
+        /* iterate all vips and add to whitelist */        
+        if($config['virtualip'])
+                foreach($config['virtualip']['vip'] as $vip)
+                        if($vip['subnet']) 
+                                $home_net .= $vip['subnet'] . " ";
+	}
+
+        /* grab a list of vpns and whitelist if user desires added by nestorfish 954 */
+        if($vpns == 'yes')
+        {
+                if ($pfsense_stable == 'yes') // chk what pfsense version were on
+                {
+                        $vpns_list = get_vpns_list();
+                }
+
+                if ($pfsense_stable == 'no') // chk what pfsense version were on
+                {
+                        $vpns_list = filter_get_vpns_list();
+                }
+
+			$home_net .= "$vpns_list ";
+		 }
+
+		 /* never ever compair numbers to words */
+        if($userwips > -1)
+        {
+			if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item']))
+			$config['installedpackages']['snortglobal']['whitelist']['item'] = array();
+
+			$home_net .= $config['installedpackages']['snortglobal']['whitelist']['item'][$userwips]['address'];
+		}
+
+			/* this foe whitelistfile, convert spaces to carriage returns */
+			$whitelist_home_net = str_replace("  ", " ", $home_net);
+			$whitelist_home_net = str_replace(" ", "\n", $home_net);
+
+			/* this is for snort.conf */
+			$home_net = trim($home_net);
+			$home_net = str_replace(" ", ",", $home_net);
+			$home_net = "[{$home_net}]";
+
+		if($build_netlist == 'netlist') {
+			return $home_net;
+		}
+
+		if($build_netlist == 'whitelist') {
+			return $whitelist_home_net;
+		}		
+} 
+
+
 /* checks to see if snort is running yes/no and stop/start */
 	function Running_Ck($snort_uuid, $if_real, $id) {
 		global $config;
@@ -113,6 +238,9 @@ $pfsense_theme_is = $config['theme'];
 	function Running_Stop($snort_uuid, $if_real, $id) {
 		global $config;
 		
+		/* if snort.sh crashed this will remove the pid */
+		exec('/bin/rm /tmp/snort.sh.pid');
+		
 	$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}{$if_real}\" | awk '{print \$1;}'");
 	$start_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
 	$start_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
@@ -155,17 +283,20 @@ $pfsense_theme_is = $config['theme'];
 	
 	function Running_Start($snort_uuid, $if_real, $id) {
 		global $config;
+		
+		/* if snort.sh crashed this will remove the pid */
+		exec('/bin/rm /tmp/snort.sh.pid');
 
 		$snort_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['enable'];
 		if ($snort_info_chk == 'on') {
-		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}{$if_real}\" -D -q -l /var/log/snort -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}{$if_real}\" -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 		}
 		/* define snortbarnyardlog_chk */
 		/* top will have trouble if the uuid is to far back */
 		$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
 		$snortbarnyardlog_mysql_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_mysql'];
 		if ($snortbarnyardlog_info_chk == 'on' && $snortbarnyardlog_mysql_info_chk != '' && $snort_info_chk == 'on') {
-		exec("/usr/local/bin/barnyard2 -f \"snort_{$snort_uuid}_{$if_real}.u2\" -u snort -g snort -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -w /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.waldo -D -q");
+		exec("/usr/local/bin/barnyard2 -f \"snort_{$snort_uuid}_{$if_real}.u2\" -u snort -g snort --pid-path /var/log/snort/run -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -w /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.waldo -D -q");
 		}
 		
 		/* Log Iface stop */
@@ -203,36 +334,138 @@ ini_set('max_input_time', '9999');
 /* define oinkid */
 if($config['installedpackages']['snortglobal'])
 	$oinkid = $config['installedpackages']['snortglobal']['oinkmastercode'];
+
+	
+/* 
+this code block is for deleteing logs while keeping the newest file,
+snort is linked to these files while running, do not take the easy way out
+by touch and rm, snort will lose sync and not log.
+
+this code needs to be watched.
+*/
+
+/* list dir files */
+function snort_file_list($snort_log_dir, $snort_log_file)
+{
+        $dir = opendir ("$snort_log_dir");
+        while (false !== ($file = readdir($dir))) {
+                if (strpos($file, "$snort_log_file",1) ) {
+                    $file_list[] = $file;
+                }
+        }
+        return $file_list;
+}
+
+/* snort dir files */
+function snort_file_sort($snort_file1, $snort_file2)
+{
+    if ($snort_file1 == $snort_file2) {
+        return 0;
+    }
+    return ($snort_file1 < $snort_file2); // ? -1 : 1; // this flips the array
+}
+
+/* build files newest first array */
+function snort_build_order($snort_list)
+{
+        foreach ($snort_list as $value_list) {
+        $list_order[] = $value_list;
+        }
+        return $list_order;
+}
+
+/* keep the newest remove the rest */
+function snort_remove_files($snort_list_rm, $snort_file_safe)
+{
+        foreach ($snort_list_rm as $value_list)
+        {
+                if ($value_list != $snort_file_safe) {
+                       exec("/bin/rm /var/log/snort/$value_list");
+                }else{
+                       exec("/bin/echo '' > /var/log/snort/$snort_file_safe");
+                }
+        }
+}
+
+function post_delete_logs()
+{
+	global $config, $g;
+
+	
+	$snort_log_dir = '/var/log/snort';
+
+	/* do not start config build if rules is empty */
+	if (!empty($config['installedpackages']['snortglobal']['rule'])) 
+	{
+
+
+			$rule_array = $config['installedpackages']['snortglobal']['rule'];
+			$id = -1;
+			foreach ($rule_array as $value)
+			{
+
+				if ($id == '') {
+				$id = 0;
+				}
+
+				$id += 1;
+
+				$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
+				$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
+				$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
+
+				if ($if_real != '' && $snort_uuid != '')
+				{
+					if ($config['installedpackages']['snortglobal']['rule'][$id]['snortunifiedlog'] == 'on')
+					{
+						$snort_log_file_u2 = "{$snort_uuid}_{$if_real}.u2.";
+						$snort_list_u2 = snort_file_list($snort_log_dir, $snort_log_file_u2);
+						if (is_array($snort_list_u2)) {
+							usort($snort_list_u2, "snort_file_sort");
+							$snort_u2_rm_list = snort_build_order($snort_list_u2);
+							snort_remove_files($snort_u2_rm_list, $snort_u2_rm_list[0]);
+						}
+					}else{
+						exec("/bin/rm $snort_log_dir/snort_{$snort_uuid}_{$if_real}.u2*");
+					}
+
+					if ($config['installedpackages']['snortglobal']['rule'][$id]['tcpdumplog'] == 'on')
+					{
+						$snort_log_file_tcpd = "{$snort_uuid}_{$if_real}.tcpdump.";
+						$snort_list_tcpd = snort_file_list($snort_log_dir, $snort_log_file_tcpd);
+						if (is_array($snort_list_tcpd)) {
+							usort($snort_list_tcpd, "snort_file_sort");
+							$snort_tcpd_rm_list = snort_build_order($snort_list_tcpd);
+							snort_remove_files($snort_tcpd_rm_list, $snort_tcpd_rm_list[0]);
+						}
+					}else{
+						exec("/bin/rm $snort_log_dir/snort_{$snort_uuid}_{$if_real}.tcpdump*");
+					}
+
+					/* create barnyard2 configuration file */
+					//if ($config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'] == 'on')
+						//create_barnyard2_conf($id, $if_real, $snort_uuid);
+
+					if ($config['installedpackages']['snortglobal']['rule'][$id]['perform_stat'] == on)
+					{
+						exec("/bin/echo '' > /var/log/snort/snort_{$snort_uuid}_{$if_real}.stats");
+					}
+				}
+			}
+	}
+}
 	
 function snort_postinstall()
 {
 	global $config;
 	conf_mount_rw();
-
-	if(!file_exists('/var/log/snort/')) {
-	mwexec('mkdir -p /var/log/snort/');
-	mwexec('mkdir -p /var/log/snort/barnyard2');
-	}
-
-	if(!file_exists('/var/log/snort/alert')) {
-		touch('/var/log/snort/alert');
-	}else{
-		exec('/bin/rm -rf /var/log/snort/*');
-		touch('/var/log/snort/alert');
-	}
-		
-
+	
 	/* snort -> advanced features */
 	$bpfbufsize = $config['installedpackages']['snortglobal']['bpfbufsize'];
 	$bpfmaxbufsize = $config['installedpackages']['snortglobal']['bpfmaxbufsize'];
 	$bpfmaxinsns = $config['installedpackages']['snortglobal']['bpfmaxinsns'];
 
-	
-	/* create a few directories and ensure the sample files are in place */
-	exec('/bin/mkdir -p /usr/local/etc/snort');
-	exec('/bin/mkdir -p /var/log/snort');
-	exec('/bin/mkdir -p /usr/local/etc/snort/rules');
-
+	/* cleanup default files */
 	if(file_exists('/usr/local/etc/snort/snort.conf-sample')) 
 	{
 		exec('/bin/rm /usr/local/etc/snort/snort.conf-sample');
@@ -248,21 +481,6 @@ function snort_postinstall()
 		exec('/bin/rm /usr/local/etc/rc.d/bardyard2');
 	}
 	
-	if(!file_exists('/usr/local/etc/snort/custom_rules'))
-	{
-		exec('/bin/mkdir -p /usr/local/etc/snort/custom_rules/');
-	}
-	
-	exec('/usr/sbin/pw groupadd snort -g 920');
-	exec('/usr/sbin/pw useradd snort -u 920 -c "Snort User" -d /nonexistent -g snort -s /sbin/nologin');
-	exec('/usr/sbin/chown -R snort:snort /var/log/snort');
-	exec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort');
-	exec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort');
-	exec('/bin/chmod -R 755  /var/log/snort');
-	exec('/bin/chmod -R 755  /usr/local/etc/snort');
-	exec('/bin/chmod -R 755  /usr/local/lib/snort');
-	
-	
 	/* remove example files */
 	if(file_exists('/usr/local/lib/snort/dynamicrules/lib_sfdynamic_example_rule.so.0'))
 	{
@@ -273,6 +491,70 @@ function snort_postinstall()
 	{
 		exec('/bin/rm /usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example*');
 	}
+
+	/* add snort user and group note: 920 keep the numbers < 2000, above this is reserved in pfSense 2.0 */
+	exec('/usr/sbin/pw groupadd snort -g 920');
+	exec('/usr/sbin/pw useradd snort -u 920 -c "Snort User" -d /nonexistent -g snort -s /sbin/nologin');
+
+
+	/* create a few directories and ensure the sample files are in place */	
+	if(!file_exists('/usr/local/etc/snort'))
+	{
+		exec('/bin/mkdir -p /usr/local/etc/snort');
+	}
+	
+	if(!file_exists('/usr/local/etc/snort/custom_rules'))
+	{
+		exec('/bin/mkdir -p /usr/local/etc/snort/custom_rules/');
+	}
+	
+	if(!file_exists('/usr/local/etc/snort/whitelist'))
+	{
+		exec('/bin/mkdir -p /usr/local/etc/snort/whitelist/');
+	}
+	
+	if(!file_exists('/var/log/snort/run'))
+	{
+		exec('/bin/mkdir -p /var/log/snort/run');
+	}
+	
+	if(!file_exists('/var/log/snort/barnyard2'))
+	{
+		exec('/bin/mkdir -p /var/log/snort/barnyard2/');
+	}
+	
+	if(!file_exists('/var/db/whitelist'))
+	{
+		touch('/var/db/whitelist');
+	}
+
+	/* if users have old log files delete them */
+	if(!file_exists('/var/log/snort/alert')) {
+		touch('/var/log/snort/alert');
+	}else{
+		exec('/bin/rm -rf /var/log/snort/*');
+		touch('/var/log/snort/alert');
+	}
+	
+	/* important  */
+	exec('/usr/sbin/chown -R snort:snort /var/log/snort');
+	exec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort');
+	exec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort');
+	exec('/usr/sbin/chown snort:snort /tmp/snort*');
+	exec('/usr/sbin/chown snort:snort /var/db/whitelist');
+	exec('/bin/chmod 660 /var/log/snort/alert');
+	exec('/bin/chmod 660 /var/db/whitelist');
+	exec('/bin/chmod -R 660  /usr/local/etc/snort/*');
+	exec('/bin/chmod -R 660  /tmp/snort*');
+	exec('/bin/chmod -R 660  /var/run/snort*');
+	exec('/bin/chmod -R 660  /var/snort/run/*');
+	exec('/bin/chmod 770 /usr/local/lib/snort');
+	exec('/bin/chmod 770 /usr/local/etc/snort');
+	exec('/bin/chmod 770 /usr/local/etc/whitelist');
+	exec('/bin/chmod 770 /var/log/snort');
+	exec('/bin/chmod 770 /var/log/snort/run');
+	exec('/bin/chmod 770 /var/log/snort/barnyard2');
+
 
 	/* find out if were in 1.2.3-RELEASE */
 	$pfsense_ver_chk = exec('/bin/cat /etc/version');
@@ -318,20 +600,19 @@ function snort_postinstall()
 	}else{
 		exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/bin/8.0.x86/barnyard2');
 	}
-	exec('/bin/chmod 077 /usr/local/bin/barnyard2');
+	exec('/bin/chmod 755 /usr/local/bin/barnyard2');
 	
 	/* back to default */
 	chdir ("/root/");
 	
-	/* make sure snort-pld is deinstalled */
+	/* make sure snort-old is deinstalled */
 	/* remove when snort-old is removed */
 	unset($config['installedpackages']['snort']);
 	unset($config['installedpackages']['snortdefservers']);
 	unset($config['installedpackages']['snortwhitelist']);
 	unset($config['installedpackages']['snortthreshold']);
 	unset($config['installedpackages']['snortadvanced']);
-	write_config();
-	conf_mount_rw();	
+	write_config();	
 	
 	conf_mount_ro();
 	
@@ -629,18 +910,45 @@ function sync_snort_package()
 	conf_mount_rw();
 
 	/* all new files are for the user snort nologin */
-	if(!file_exists("/var/log/snort"))
+	if(!file_exists('/var/log/snort'))
 	{
-		exec("/bin/mkdir -p /var/log/snort");
+		exec('/bin/mkdir -p /var/log/snort');	
 	}
 	
-	exec("/usr/sbin/chown -R snort:snort /var/log/snort");
-	exec("/usr/sbin/chown -R snort:snort /usr/local/etc/snort");
-	exec("/usr/sbin/chown -R snort:snort /usr/local/lib/snort");
-	exec("/bin/chmod -R 755  /var/log/snort");
-	exec("/bin/chmod -R 755  /usr/local/etc/snort");
-	exec("/bin/chmod -R 755  /usr/local/lib/snort");
-
+	if(!file_exists('/var/log/snort/run'))
+	{
+		exec('/bin/mkdir -p /var/log/snort/run');
+	}
+	
+	if(!file_exists('/var/log/snort/barnyard2'))
+	{
+		exec('/bin/mkdir -p /var/log/snort/barnyard2');
+	}
+	
+	/* all new files are for the user snort nologin */
+	if(!file_exists('/var/log/snort/alert'))
+	{
+		exec('/usr/bin/touch /var/log/snort/alert');
+	}
+	
+	/* important  */
+	exec('/usr/sbin/chown -R snort:snort /var/log/snort');
+	exec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort');
+	exec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort');
+	exec('/usr/sbin/chown snort:snort /tmp/snort*');
+	exec('/usr/sbin/chown snort:snort /var/db/whitelist');
+	exec('/bin/chmod 770 /usr/local/lib/snort');
+	exec('/bin/chmod 770 /var/log/snort');
+	exec('/bin/chmod 770 /var/log/snort/run');
+	exec('/bin/chmod 770 /var/log/snort/barnyard2');
+	exec('/bin/chmod 660 /var/log/snort/alert');
+	exec('/bin/chmod 660  /var/db/whitelist');
+	exec('/bin/chmod -R 660  /usr/local/etc/snort/*');
+	exec('/bin/chmod -R 660  /tmp/snort*');
+	exec('/bin/chmod -R 660  /var/run/snort*');
+	exec('/bin/chmod -R 660  /var/snort/run/*');
+	exec('/bin/chmod 770 /usr/local/etc/snort/');
+	exec('/bin/chmod 770 /usr/local/etc/whitelist/');
 
 	conf_mount_ro();
 }
@@ -670,13 +978,18 @@ if ($id != '' && $if_real != '') //new
 				$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 				$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
 				$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
-
+				
 				/* create snort configuration file */
 				create_snort_conf($id, $if_real, $snort_uuid);
 
 				/* if rules exist cp rules to each iface */
 				create_rules_iface($id, $if_real, $snort_uuid);
-
+				
+				/* only build whitelist when needed */
+				if ($config['installedpackages']['snortglobal']['rule'][$id]['blockoffenders7'] == 'on'){
+					create_snort_whitelist($id, $if_real);
+				}
+				
 				/* create snort bootup file snort.sh only create once */
 				create_snort_sh();
 
@@ -720,11 +1033,17 @@ function sync_snort_package_empty()
 				$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
 				if ($if_real != '' && $snort_uuid != '') {
+					
 				/* create snort configuration file */
 				create_snort_conf($id, $if_real, $snort_uuid);
 
 				/* if rules exist cp rules to each iface */
 				create_rules_iface($id, $if_real, $snort_uuid);
+				
+				/* only build whitelist when needed */
+				if ($config['installedpackages']['snortglobal']['rule'][$id]['blockoffenders7'] == 'on'){
+					create_snort_whitelist($id, $if_real);
+				}
 
 				/* create barnyard2 configuration file */
 				$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
@@ -772,8 +1091,14 @@ function sync_snort_package_config()
 				$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
 				if ($if_real != '' && $snort_uuid != '') {
+					
 				/* create snort configuration file */
 				create_snort_conf($id, $if_real, $snort_uuid);
+				
+				/* only build whitelist when needed */
+				if ($config['installedpackages']['snortglobal']['rule'][$id]['blockoffenders7'] == 'on'){
+					create_snort_whitelist($id, $if_real);
+				}
 
 				/* create barnyard2 configuration file */
 				$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
@@ -794,6 +1119,106 @@ function sync_snort_package_config()
 /* Start of main config files */
 /* Start of main config files */
 
+function create_snort_whitelist($id, $if_real) {
+	
+	    global $config, $g;
+        conf_mount_rw();
+        
+        /* make sure dir is there */
+        if (!file_exists('/usr/local/etc/snort/whitelist/')) {
+        	exec('/bin/mkdir -p /usr/local/etc/snort/whitelist/');
+        }
+        
+        if ($config['installedpackages']['snortglobal']['rule'][$id]['whitelistname'] == 'default') {
+        
+        	/* open snort's whitelist for writing */
+        	$whitelist_w = fopen("/usr/local/etc/snort/whitelist/defaultwlist", "w");
+        	if(!$whitelist_w) {
+                log_error("Could not open /usr/local/etc/snort/whitelist/defaultwlist for writing.");
+                return;
+        	}
+        	
+        	$w_data = build_base_whitelist('whitelist', 'yes', 'yes', 'yes', 'yes', 'yes', 'no');
+
+        }else{
+
+        	preg_match('/^([a-zA-z0-9]+)/', $config['installedpackages']['snortglobal']['rule'][$id]['whitelistname'], $wlist_name_wrt);
+        	preg_match('/([0-9]+)$/', $config['installedpackages']['snortglobal']['rule'][$id]['whitelistname'], $wlist_num_wrt);
+        	
+        	$whitelist_key_w = find_whitelist_key($wlist_num_wrt[0]);
+        
+        	$build_netlist = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_w]['snortlisttype'];
+        	$wanip = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_w]['wanips'];
+        	$wangw = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_w]['wangateips'];
+        	$wandns = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_w]['wandnsips'];
+        	$vips = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_w]['vips'];
+        	$vpns = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_w]['vpnips'];
+        
+        	/* open snort's whitelist for writing */
+        	$whitelist_w = fopen("/usr/local/etc/snort/whitelist/$wlist_name_wrt[0]", "w");
+        	if(!$whitelist_w) {
+                log_error("Could not open /usr/local/etc/snort/whitelist/$wlist_name_wrt[0] for writing.");
+                return;
+        	}
+
+        	$w_data = build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $vpns, $whitelist_key_w);
+        
+        }
+        
+        fwrite($whitelist_w, $w_data);
+        fclose($whitelist_w);
+        conf_mount_ro();
+        
+}
+
+function create_snort_homenet($id, $if_real) {
+	
+	    global $config, $g;
+        conf_mount_rw();
+        
+        if ($config['installedpackages']['snortglobal']['rule'][$id]['homelistname'] == 'default' || $config['installedpackages']['snortglobal']['rule'][$id]['homelistname'] == '') {
+        	return build_base_whitelist('netlist', 'yes', 'yes', 'yes', 'yes', 'yes', 'no');
+        }else{
+        	preg_match('/([0-9]+)$/', $config['installedpackages']['snortglobal']['rule'][$id]['homelistname'], $hlist_num_wrt);
+        	
+        	$whitelist_key_h = find_whitelist_key($hlist_num_wrt[0]);
+        
+        	$build_netlist_h = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_h]['snortlisttype'];
+        	$wanip_h = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_h]['wanips'];
+        	$wangw_h = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_h]['wangateips'];
+       		$wandns_h = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_h]['wandnsips'];
+        	$vips_h = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_h]['vips'];
+        	$vpns_h = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_h]['vpnips'];
+        	
+        	return build_base_whitelist($build_netlist_h, $wanip_h, $wangw_h, $wandns_h, $vips_h, $vpns_h, $whitelist_key_h);
+
+        }
+        
+        conf_mount_ro();
+        
+}
+
+function create_snort_externalnet($id, $if_real) {
+	
+	    global $config, $g;
+        conf_mount_rw();
+
+        	preg_match('/([0-9]+)$/', $config['installedpackages']['snortglobal']['rule'][$id]['externallistname'], $exlist_num_wrt);
+        	
+        	$whitelist_key_ex = find_whitelist_key($exlist_num_wrt[0]);
+        
+        	$build_netlist_ex = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_ex]['snortlisttype'];
+        	$wanip_ex = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_ex]['wanips'];
+        	$wangw_ex = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_ex]['wangateips'];
+       		$wandns_ex = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_ex]['wandnsips'];
+        	$vips_ex = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_ex]['vips'];
+        	$vpns_ex = $config['installedpackages']['snortglobal']['whitelist']['item'][$whitelist_key_ex]['vpnips'];
+        	
+        	return build_base_whitelist($build_netlist_ex, $wanip_ex, $wangw_ex, $wandns_ex, $vips_ex, $vpns_ex, $whitelist_key_ex);
+        
+        conf_mount_ro();
+        
+}
 
 /* open snort.sh for writing" */
 function create_snort_sh()
@@ -825,7 +1250,7 @@ function create_snort_sh()
 	$snortbarnyardlog_mysql_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_mysql'];
 	
 	if ($snortbarnyardlog_info_chk == 'on' && $snortbarnyardlog_mysql_info_chk != '') {
-	$start_barnyard2 = "sleep 4;/usr/local/bin/barnyard2 -f snort_{$snort_uuid}_{$if_real}.u2 -u snort -g snort -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -w /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.waldo -D -q";
+	$start_barnyard2 = "sleep 4;/usr/local/bin/barnyard2 -f snort_{$snort_uuid}_{$if_real}.u2 -u snort -g snort --pid-path /var/log/snort/run -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -w /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.waldo -D -q";
 	}
 			
 /* Get all interface startup commands ready */
@@ -842,7 +1267,7 @@ $snort_sh_text2[] = <<<EOD
 		/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid
 		/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid.lck
 
-		/usr/local/bin/snort -u snort -g snort -R {$snort_uuid}{$if_real} -D -q -l /var/log/snort -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
+		/usr/local/bin/snort -u snort -g snort -R {$snort_uuid}{$if_real} -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
 		$start_barnyard2
 
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD Reload For {$snort_uuid}_{$if_real}..."
@@ -1258,11 +1683,19 @@ snort_rules_up_deinstall_cron("");
 
 function generate_snort_conf($id, $if_real, $snort_uuid)
 {
-
 	global $config, $g;
 	
 	conf_mount_rw();
-
+	
+	/* custom home nets */
+	$home_net = create_snort_homenet($id, $if_real);
+	
+	if ($config['installedpackages']['snortglobal']['rule'][$id]['externallistname'] == 'default'){
+		$external_net = '!$HOME_NET';
+	}else{
+		$external_net = create_snort_externalnet($id, $if_real);
+	}
+	
 	/* obtain external interface */
 	/* XXX: make multi wan friendly */
 	$snort_ext_int = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
@@ -1305,20 +1738,24 @@ if ($alertsystemlog_info_chk == on)
 /* define tcpdumplog */
 $tcpdumplog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['tcpdumplog'];
 if ($tcpdumplog_info_chk == on)
-    $tcpdumplog_type = "output log_tcpdump: snorttcpd.log";
+    $tcpdumplog_type = "output log_tcpdump: snort_{$snort_uuid}_{$if_real}.tcpdump";
 
 /* define snortunifiedlog */
 $snortunifiedlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['snortunifiedlog'];
 if ($snortunifiedlog_info_chk == on)
-    $snortunifiedlog_type = "output unified2: filename snort_{$snort_uuid}_{$if_real}.u2, limit 128";
+    $snortunifiedlog_type = "output unified2: filename snort_{$snort_uuid}_{$if_real}.u2, limit 128";   
 
 /* define spoink (DISABLED)*/
 $spoink_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['blockoffenders7'];
-if ($spoink_info_chk == on)
-    $spoink_type = "output alert_pf: /var/db/whitelist,snort2c";
-
-	/* define servers and ports snortdefservers */
-
+if ($spoink_info_chk == on) {
+	
+	preg_match('/^([a-zA-z0-9]+)/', $config['installedpackages']['snortglobal']['rule'][$id]['whitelistname'], $wlist_name_file);	
+	$spoink_whitelist_name = $wlist_name_file[0];
+    $spoink_type = "output alert_pf: /usr/local/etc/snort/whitelist/$spoink_whitelist_name,snort2c";
+    
+}
+    
+/* define servers and ports snortdefservers */
 /* def DNS_SERVSERS */
 $def_dns_servers_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['def_dns_servers'];
 if ($def_dns_servers_info_chk == "")
@@ -1569,111 +2006,7 @@ else
 	else
 		$snort_performance = "ac-bnfa";
 
-	/* open snort's whitelist for writing */
-	$whitelist = fopen("/var/db/whitelist", "w");
-	if(!$whitelist) {
-		log_error("Could not open /var/db/whitelist for writing.");
-		return;
-	}
 
-	/* build an interface array list */
-	$int_array = array('lan');
-	for ($j = 1; isset ($config['interfaces']['opt' . $j]); $j++)
-		if(isset($config['interfaces']['opt' . $j]['enable']))
-			if(!$config['interfaces']['opt' . $j]['gateway'])
-				$int_array[] = "opt{$j}";
-
-	/*  iterate through interface list and write out whitelist items
-	 *  and also compile a home_net list for snort.
-	 */
-	foreach($int_array as $int) {
-		/* calculate interface subnet information */
-		$ifcfg = &$config['interfaces'][$int];
-		$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
-		$subnetmask = gen_subnet_mask($ifcfg['subnet']);
-		if($subnet == "pppoe" or $subnet == "dhcp") {
-			$subnet = find_interface_ip("ng0");
-			if($subnet)
-				$home_net .= "{$subnet} ";
-		} else {
-			if ($subnet)
-				if($ifcfg['subnet']) 
-					$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
-		}
-	}
-
-	/* add all WAN ips to the whitelist */
-	$wan_if = get_real_wan_interface();
-	$ip = find_interface_ip($wan_if);
-	if($ip) 
-		$home_net .= "{$ip} ";
-	
-	/* Add Gateway on WAN interface to whitelist (For RRD graphs) */
-	$int = convert_friendly_interface_to_real_interface_name2("WAN");
-	$gw = get_interface_gateway($int);
-	if($gw) 
-		$home_net .= "{$gw} ";
-	
-	/* Add DNS server for WAN interface to whitelist */
-	$dns_servers = get_dns_servers();
-	foreach($dns_servers as $dns) {
-		if($dns) 
-			$home_net .= "{$dns} ";		
-	}
-		
-	/* Add loopback to whitelist (ftphelper) */
-	$home_net .= "127.0.0.1 "; 	
-	
-	/* iterate all vips and add to whitelist */
-	
-	if($config['virtualip'])
-		foreach($config['virtualip']['vip'] as $vip)
-			if($vip['subnet']) 
-				$home_net .= $vip['subnet'] . " ";
-
-	if($config['installedpackages']['snortglobal']['config'])
-		foreach($config['installedpackages']['snortglobal']['config'] as $snort)
-			if($snort['ip']) 
-				$home_net .= $snort['ip'] . " ";
-
-	/* write out whitelist, convert spaces to carriage returns */
-	$whitelist_home_net = str_replace("  ", " ", $home_net);
-	$whitelist_home_net = str_replace(" ", "\n", $home_net);
-
-	/* make $home_net presentable to snort */
-	$home_net = trim($home_net);
-	$home_net = str_replace(" ", ",", $home_net);
-	$home_net = "[{$home_net}]";
-
-	/* foreach through whitelist, writing out to file */
-	$whitelist_split = split("\n", $whitelist_home_net);
-	foreach($whitelist_split as $wl)
-		if(trim($wl))
-			fwrite($whitelist, trim($wl) . "\n");
-
-	/* should we whitelist vpns? */
-	$whitelistvpns = $config['installedpackages']['snortglobal']['whitelistvpns'];
-
-	/* grab a list of vpns and whitelist if user desires added by nestorfish 954 */
-	if($whitelistvpns) {
-		if ($pfsense_stable == 'yes') // chk what pfsense version were on
-		{
-			$vpns_list = get_vpns_list();
-		}
-		if ($pfsense_stable == 'no') // chk what pfsense version were on
-		{
-			$vpns_list = filter_get_vpns_list();
-		}
-
-		$whitelist_vpns = split(" ", $vpns_list);
-		foreach($whitelist_vpns as $wl)
-			if(trim($wl))
-				fwrite($whitelist, trim($wl) . "\n");
-	}
-
-	/* close file */
-	fclose($whitelist);
-	
 	/* generate rule sections to load */
 	$enabled_rulesets = $config['installedpackages']['snortglobal']['rule'][$id]['rulesets'];
 	if($enabled_rulesets) {
@@ -1934,7 +2267,7 @@ if ($def_ssl_ports_ignore_info_chk == "")
 else 
 	$def_ssl_ports_ignore_type = "$def_ssl_ports_ignore_info_chk";
 	
-//////////////////////////////////////////////////////////////////
+
 	/* build snort configuration file */
         /* TODO; feed back from pfsense users to reduce false positives */
 	$snort_conf_text = <<<EOD
@@ -1947,7 +2280,7 @@ else
 #	snort.conf
 #   Snort can be found at http://www.snort.org/
 #
-#	Copyright (C) 2009 Robert Zelaya
+#	Copyright (C) 2009-2010 Robert Zelaya
 #	part of pfSense
 #	All rights reserved.
 #
@@ -1979,7 +2312,7 @@ else
 #########################
 
 var HOME_NET {$home_net}
-var EXTERNAL_NET !\$HOME_NET
+var EXTERNAL_NET {$external_net}
 
 ###################
                   #

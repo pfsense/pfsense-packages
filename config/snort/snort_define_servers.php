@@ -111,6 +111,9 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['enable'] = $a_nat[$id]['enable'];
 	$pconfig['uuid'] = $a_nat[$id]['uuid'];
 	$pconfig['interface'] = $a_nat[$id]['interface'];
+	$pconfig['whitelistname'] = $a_nat[$id]['whitelistname'];
+	$pconfig['homelistname'] = $a_nat[$id]['homelistname'];
+	$pconfig['externallistname'] = $a_nat[$id]['externallistname'];
 	$pconfig['descr'] = $a_nat[$id]['descr'];
 	$pconfig['performance'] = $a_nat[$id]['performance'];
 	$pconfig['blockoffenders7'] = $a_nat[$id]['blockoffenders7'];
@@ -169,7 +172,11 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 	if ($pconfig['rule_sid_off'] != "") { $natent['rule_sid_off'] = $pconfig['rule_sid_off']; }
 	if ($pconfig['rule_sid_on'] != "") { $natent['rule_sid_on'] = $pconfig['rule_sid_on']; }
 	if ($pconfig['configpassthru'] != "") { $natent['configpassthru'] = $pconfig['configpassthru'];	}
-	if ($pconfig['barnconfigpassthru'] != "") { $natent['barnconfigpassthru'] = $pconfig['barnconfigpassthru'];	}
+	if ($pconfig['barnconfigpassthru'] != "") { $natent['barnconfigpassthru'] = $pconfig['barnconfigpassthru'];	}	
+	if ($pconfig['whitelistname'] != "") { $natent['whitelistname'] = $pconfig['whitelistname']; }
+	if ($pconfig['homelistname'] != "") { $natent['homelistname'] = $pconfig['homelistname'];	}
+	if ($pconfig['externallistname'] != "") { $natent['externallistname'] = $pconfig['externallistname'];	}
+
 		
 		/* post new options */
 		if ($_POST['def_dns_servers'] != "") { $natent['def_dns_servers'] = $_POST['def_dns_servers']; }else{ $natent['def_dns_servers'] = ""; }

@@ -104,6 +104,9 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['uuid'] = $a_nat[$id]['uuid'];
 	$pconfig['interface'] = $a_nat[$id]['interface'];
 	$pconfig['descr'] = $a_nat[$id]['descr'];
+	$pconfig['whitelistname'] = $a_nat[$id]['whitelistname'];
+	$pconfig['homelistname'] = $a_nat[$id]['homelistname'];
+	$pconfig['externallistname'] = $a_nat[$id]['externallistname'];
 	$pconfig['performance'] = $a_nat[$id]['performance'];
 	$pconfig['blockoffenders7'] = $a_nat[$id]['blockoffenders7'];
 	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
@@ -202,7 +205,11 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 	if ($pconfig['rulesets'] != "") { $natent['rulesets'] = $pconfig['rulesets']; }
 	if ($pconfig['rule_sid_off'] != "") { $natent['rule_sid_off'] = $pconfig['rule_sid_off']; }
 	if ($pconfig['rule_sid_on'] != "") { $natent['rule_sid_on'] = $pconfig['rule_sid_on']; }
-		
+	if ($pconfig['whitelistname'] != "") { $natent['whitelistname'] = $pconfig['whitelistname']; }
+	if ($pconfig['homelistname'] != "") { $natent['homelistname'] = $pconfig['homelistname']; }
+	if ($pconfig['externallistname'] != "") { $natent['externallistname'] = $pconfig['externallistname']; }
+	
+
 		/* post new options */
 		$natent['perform_stat'] = $_POST['perform_stat'];
 		if ($_POST['def_ssl_ports_ignore'] != "") { $natent['def_ssl_ports_ignore'] = $_POST['def_ssl_ports_ignore']; }else{ $natent['def_ssl_ports_ignore'] = ""; }

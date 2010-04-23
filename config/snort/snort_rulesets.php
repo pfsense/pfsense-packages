@@ -29,8 +29,6 @@
 */
 
 require("guiconfig.inc");
-//require_once("filter.inc");
-//require_once("service-utils.inc");
 include_once("/usr/local/pkg/snort/snort.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 

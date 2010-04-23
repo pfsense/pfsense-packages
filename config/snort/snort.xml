@@ -99,11 +99,6 @@
 		<item>http://www.pfsense.com/packages/config/snort/snort_dynamic_ip_reload.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/snort/</prefix>
-		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_whitelist.xml</item>
-	</additional_files_needed>
-	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_alerts.php</item>
@@ -177,6 +172,16 @@
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_preprocessors.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/snort_interfaces_whitelist.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/snort_interfaces_whitelist_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/etc/rc.d/</prefix>
