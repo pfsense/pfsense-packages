@@ -200,7 +200,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
         	$tempdir = "{$g['tmp_path']}/{$prefix}";
         	mkdir($tempdir, 0700, true);
 
-		file_put_contents("{$tempdir}/{$prefix}-ovpn.conf", $conf);
+		file_put_contents("{$tempdir}/{$prefix}.ovpn", $conf);
 
         	file_put_contents("{$tempdir}/{$prefix}-ca.crt", base64_decode($server_ca['crt']));
         	if ($settings['tls']) {
