@@ -534,13 +534,13 @@
       <website>http://www.freeradius.org/</website>
       <descr>A free implementation of the RADIUS protocol.</descr>
       <category>System</category>
-      <version>1.1.2_1</version>
+      <version>2.1.8_1</version>
       <status>BETA</status>
-      <required_version>1.2.1</required_version>
+      <required_version>2.0</required_version>
       <maintainer>none</maintainer>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <depends_on_package>freeradius-1.1.7_3.tbz</depends_on_package>
-      <depends_on_package>libltdl-1.5.26.tbz</depends_on_package>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+      <depends_on_package>freeradius-2.1.8_1.tbz</depends_on_package>
+      <depends_on_package>libltdl-2.2.6b.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
       <configurationfile>freeradius.xml</configurationfile>
     </package>
