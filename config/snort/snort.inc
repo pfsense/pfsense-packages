@@ -127,10 +127,12 @@ global $config, $g;
 	}
 
 		/* Add loopback to whitelist (ftphelper) */
-		if($userwips == 'no') {
-        	$home_net .= "127.0.0.1";
-		}else{
+		if($userwips > -1 && $build_netlist == 'netlist') {
+        	$home_net .= "127.0.0.1 ";
+		}elseif ($userwips > -1 &&  $build_netlist == 'whitelist') {
 			$home_net .= "127.0.0.1 ";
+		}else{
+			$home_net .= "127.0.0.1";
 		}
 	
         /* grab a list of vpns and whitelist if user desires added by nestorfish 954 */
@@ -160,7 +162,7 @@ global $config, $g;
 		}
 
 			/* this foe whitelistfile, convert spaces to carriage returns */
-			$whitelist_home_net = str_replace("  ", " ", $home_net);
+			$whitelist_home_net = str_replace("  ", "\n", $home_net);
 			$whitelist_home_net = str_replace(" ", "\n", $home_net);
 
 			/* this is for snort.conf */
