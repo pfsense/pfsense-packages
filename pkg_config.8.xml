@@ -535,7 +535,7 @@
       <descr>A free implementation of the RADIUS protocol.</descr>
       <category>System</category>
       <version>1.1.8</version>
-      <status>BETA</status>
+      <status>BROKEN</status>
       <required_version>2.0</required_version>
       <maintainer>none</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
