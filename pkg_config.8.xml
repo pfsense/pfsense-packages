@@ -77,7 +77,7 @@
       <descr>*DO NOT RUN THIS ON A FIREWALL. USE A DEDICATED MACHINE!* Pure FTPd Server is a fast, production quality, standards-conformant FTP server based on Troll-FTPd. It has no known vulnerabilities, is trivial to set up, and is especially designed for modern kernels. Features include PAM support, IPv6, chroot()ed home directories, virtual domains, built-in 'ls', FXP protocol, anti-warez system, bandwidth throttling, restricted ports for passive downloads, an LDAP backend, XML output, and more.</descr>
       <category>FTP</category>
       <config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>pure-ftpd-1.0.20_3.tbz</depends_on_package>
       <version>1.0.21</version>
       <status>Stable</status>
@@ -96,7 +96,7 @@
       <website>http://www.avahi.org/</website>
       <descr>Avahi is a system which facilitates service discovery on a local network. This means that you can plug your laptop or computer into a network and instantly be able to view other people who you can chat with, find printers to print to or find files being shared. This kind of technology is already found in Apple MacOS X (branded Rendezvous, Bonjour and sometimes Zeroconf) and is very convenient. Avahi is mainly based on Lennart Poettering's flexmdns mDNS implementation for Linux which has been discontinued in favour of Avahi.</descr>
       <category>Network Management</category>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <version>0.6.25_1</version>
       <status>ALPHA</status>
       <required_version>1.2.3</required_version>
@@ -126,7 +126,7 @@
       <category>Services</category>
       <pkginfolink>http://doc.pfsense.org/index.php/FreeSWITCH</pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/freeswitch/freeswitch.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <version>0.8.3.6</version>
       <status>Beta</status>
       <required_version>1.2.1</required_version>
@@ -141,7 +141,7 @@
       <category>Services</category>
       <pkginfolink>http://doc.pfsense.org/index.php/FreeSWITCH</pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/freeswitch_dev/freeswitch.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <version>0.9.7.26</version>
       <status>Beta</status>
       <required_version>1.2.3</required_version>
@@ -156,7 +156,7 @@
       <category>Status</category>
       <pkginfolink/>
       <config_file>http://www.pfsense.com/packages/config/notes/notes.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <version>0.2.4</version>
       <status>Alpha</status>
       <required_version>1.2.1</required_version>
@@ -170,7 +170,7 @@
       <category>Services</category>
       <pkginfolink/>
       <config_file>http://www.pfsense.com/packages/config/tftp/tftp.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <version>1.0.5</version>
       <status>Stable</status>
       <required_version>1.2.1</required_version>
@@ -184,7 +184,7 @@
       <category>Services</category>
       <pkginfolink>http://doc.pfsense.org/index.php/PHPService</pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/phpservice/phpservice.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <version>0.4.1</version>
       <status>Beta</status>
       <required_version>1.2.1</required_version>
@@ -198,7 +198,7 @@
       <category>System</category>
       <pkginfolink></pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/backup/backup.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <version>0.1.5</version>
       <status>Beta</status>
       <required_version>1.2</required_version>
@@ -212,7 +212,7 @@
       <category>Services</category>
       <pkginfolink></pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/cron/cron.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <version>0.1.5</version>
       <status>Beta</status>
       <required_version>1.2</required_version>
@@ -226,7 +226,7 @@
       <category>Services</category>
       <pkginfolink>http://doc.pfsense.org/index.php/vhosts</pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/vhosts/vhosts.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <version>0.7.4</version>
       <status>Stable</status>
       <required_version>1.2.3</required_version>
@@ -367,7 +367,7 @@
       <required_version>1.2</required_version>
       <config_file>http://www.pfsense.com/packages/config/tinydns/tinydns.xml</config_file>
       <configurationfile>tinydns.xml</configurationfile>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>ucspi-tcp-0.88_2.tbz</depends_on_package>
       <depends_on_package>daemontools-0.76_12.tbz</depends_on_package>
       <depends_on_package>djbdns-1.05_12.tbz</depends_on_package>
@@ -426,7 +426,7 @@
       <required_version>1.0.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/arping/arping.xml</config_file>
       <configurationfile>arping.xml</configurationfile>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>arping-2.06.tbz</depends_on_package>
     </package>
     <package>
@@ -455,7 +455,7 @@
       <pkginfolink>http://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
       <configurationfile>imspector.xml</configurationfile>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>imspector-0.8.tbz</depends_on_package>
       <depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
       <depends_on_package>mysql-client-5.0.77.tbz</depends_on_package>
@@ -520,7 +520,7 @@
       <descr>RFC1413 auth/identd daemon with fixed fake reply</descr>
       <website>http://www.webweaving.org/widentd</website>
       <category>Services</category>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>widentd-1.03_1.tbz</depends_on_package>
       <version>1.03_1</version>
       <status>Stable</status>
@@ -562,7 +562,7 @@
       <website>http://www.stunnel.org/</website>
       <descr>An SSL encryption wrapper between remote client and local or remote servers. </descr>
       <category>Network Management</category>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>stunnel-4.25.tbz</depends_on_package>
       <version>4.30.2</version>
       <status>Stable</status>
@@ -577,7 +577,7 @@
       <descr>Iperf is a tool for testing network throughput, loss, and jitter.</descr>
       <category>Network Management</category>
       <config_file>http://www.pfsense.com/packages/config/iperf.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>iperf-2.0.4.tbz</depends_on_package>
       <version>2.0.2_1</version>
       <status>Beta</status>
@@ -604,7 +604,7 @@
       <descr>Enhanced traceroute replacement</descr>
       <website>http://www.bitwizard.nl/mtr/</website>
       <category>Network Management</category>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>mtr-nox11-0.73_1.tbz</depends_on_package>
       <version>0.65_2</version>
       <status>Stable</status>
@@ -637,7 +637,7 @@
       <status>ALPHA</status>
       <required_version>3</required_version>
       <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>squid-3.0.8.tbz</depends_on_package>
       <depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
       <depends_on_package>openldap-client-2.4.10.tbz</depends_on_package>
@@ -654,7 +654,7 @@
       <status>BETA</status>
       <required_version>1.2.1</required_version>
       <maintainer>seth.mos@xs4all.nl</maintainer>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>lcdproc-0.5.2_2.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
       <configurationfile>lcdproc.xml</configurationfile>
@@ -688,7 +688,7 @@
       <version>1.3-2</version>
       <status>Beta</status>
       <required_version>1.1</required_version>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>squidGuard-1.3_1.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
       <configurationfile>squidguard.xml</configurationfile>
