@@ -121,6 +121,14 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 		}
 	}
 
+	// lookup user certificate info
+	if ($settings['mode'] != "server_user") {
+		$cert =& $user['cert'][$crtid];
+		if (!$cert)
+			return false;
+	} else
+		$nokeys = true;
+
 	// determine basic variables
 	if ($useaddr == "serveraddr") {
 		$interface = $settings['interface'];
