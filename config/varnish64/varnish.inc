@@ -126,30 +126,32 @@ EOFA;
 	if($config['installedpackages']['varnishbackends']['config'] != "") {
     	foreach($config['installedpackages']['varnishbackends']['config'] as $backend) {
 			$isfirst = true;
-			if($config['installedpackages']['varnish_lb_directors']['config'] != "") {
-    			foreach($config['installedpackages']['varnish_lb_directors']['config']['row'] as $urlmapping) {
-					if(!$isfirst) 
-						$urlmappings .= "else ";
-					$urlmappings .= <<<EOAU
-if (req.http.host == "{$urlmapping['urlmapping']}") {
-	set req.backend = "{$backend['backend']}";
-	set req.http.host = "{$urlmapping['urlmapping']}";
-}
- 
+			if($config['installedpackages']['varnishlbdirectors']['config'] != "") {
+    			foreach($config['installedpackages']['varnishlbdirectors']['config'] as $url) {
+					foreach($url['row'] as $urlmapping) {
+						if(!$isfirst) 
+							$urlmappings .= "else ";
+						$urlmappings .= <<<EOAU
+if (req.http.host == "{$url['directorurl']}") {
+		set req.backend = "{$url['directorname']}";
+		set req.http.host = "{$url['directorurl']}";
+	} 
 EOAU;
+						$isfirst = false;
+					}
 				}
 			}
-			if($config['installedpackages']['varnishbackends']['config'])
-   				foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
-					if($config['installedpackages']['varnishbackends']['config']['row'])
-    					foreach($config['installedpackages']['varnishbackends']['config']['row'] as $urlmapping) {
-							if(!$isfirst) 
-								$urlmappings .= "else ";
-							$urlmappings .= <<<EOAU
-if (req.http.host == "{$urlmapping['urlmapping']}") {
-	set req.backend = "{$backend['backend']}";
-	set req.http.host = "{$urlmapping['url']}";
-} 
+   			foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
+				if($config['installedpackages']['varnishbackends']['config'])
+    				foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
+						foreach($urlmapping['row'] as $url)
+						if(!$isfirst) 
+							$urlmappings .= "else ";
+						$urlmappings .= <<<EOAU
+if (req.http.host == "{$url['urlmapping']}") {
+		set req.backend = "{$urlmapping['backendname']}";
+		set req.http.host = "{$urlmapping['urlmapping']}";
+	} 
 EOAU;
 				$isfirst = false;
 				}
