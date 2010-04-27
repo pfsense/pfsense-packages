@@ -197,8 +197,13 @@ EOFA;
     	foreach($config['installedpackages']['varnishlbdirectors']['config'] as $backend) {
 			$director = "";
 			if($backend['row'])
-				foreach($backend['row'] as $be) 
-					$director .=  "\t{\n\t\t.backend = {$be['backendname']};\n\t}";
+				foreach($backend['row'] as $be) {
+					if($be['weight']) 
+						$weight = "\n\t\t\t.weight = {$be['weight']};\n"
+					else 
+						$weight = "";
+					$director .=  "\t{\n\t\t.backend = {$be['backendname']};\n{$weight}\t}";
+				}
 			$backends .= <<<EOFA
 director {$backend['directorname']} {$backend['directortype']} {
 {$director}

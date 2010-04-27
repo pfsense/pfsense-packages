@@ -134,6 +134,12 @@
 					<source_value>backendname</source_value>
 				    <type>select_source</type>
 				</rowhelperfield>
+				<rowhelperfield>
+				    <fielddescr>Weight</fielddescr>
+				    <fieldname>weight</fieldname>
+				    <description>Enter the weight of this backend.</description>
+				    <type>input</type>
+				</rowhelperfield>
 			</rowhelper>
 		</field>
 	</fields>
