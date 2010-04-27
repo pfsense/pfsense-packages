@@ -31,17 +31,6 @@
 
 require("guiconfig.inc");
 
-if($_REQUEST['getactivity']) {
-	$varnishlogs = `cat /var/etc/default.vcl`;
-	echo "Varnish Server configuration as of " . date("D M j G:i:s T Y")  . "\n\n";
-	echo $varnishlogs;
-	exit;
-}
-
-/* Defaults to this page but if no settings are present, redirect to setup page */
-if(!$config['installedpackages']['varnish']['config'][0])
-	Header("Location: /pkg_edit.php?xml=varnish.xml&id=0");
-
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
@@ -51,25 +40,6 @@ include("head.inc");
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
-	<script type="text/javascript">
-		function getlogactivity() {
-			var url = "/varnish_view_config.php";
-			var pars = 'getactivity=yes';
-			var myAjax = new Ajax.Request(
-				url,
-				{
-					method: 'post',
-					parameters: pars,
-					onComplete: activitycallback
-				});
-		}
-		function activitycallback(transport) {
-			$('varnishlogs').innerHTML = '<font face="Courier"><pre>' + transport.responseText  + '</pre></font>';
-			setTimeout('getlogactivity()', 2500);		
-		}
-		setTimeout('getlogactivity()', 10000);	
-	</script>
 <?php include("fbegin.inc"); ?>
 
 <?php if($one_two): ?>
@@ -95,19 +65,15 @@ include("head.inc");
    <tr>
      <td class="tabcont" >
       <form action="varnish_view_config.php" method="post">
-		<br>
-			<div id="varnishlogs">
-				<pre>One moment please, loading Varnish logs...</pre>
-			</div>
+<textarea id="varnishlogs" rows="50" cols="80">
+<?php 
+	$config_file = file_get_contents("/var/etc/default.vcl");
+	echo $config_file;
+?>
+</textarea>
      </td>
     </tr>
 </table>
-<td align="left" valign="top">
-	<form id="filterform" name="filterform" action="varnish_view_config.php" method="post" style="margin-top: 14px;">
-	<p/>
-	<input id="submit" name="clear" type="submit" class="formbtn" value="<?=gettext("Clear log");?>" />
-	</form>
-</td>
 </div>
 <?php include("fend.inc"); ?>
 </body>
