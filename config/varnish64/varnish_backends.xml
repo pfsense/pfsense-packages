@@ -130,6 +130,36 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>Probe URL</fielddescr>
+			<fieldname>probe_url</fieldname>
+			<description>Enter the URL that varnish will use to ensure that this backend is healthy.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Probe Interval</fielddescr>
+			<fieldname>probe_interval</fieldname>
+			<description>Enter the frequency in seconds that varnish will check the probe url.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Probe Timeout</fielddescr>
+			<fieldname>probe_timeout</fieldname>
+			<description>Enter the frequency in seconds that varnish will wait for a backend probe response.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Probe Window</fielddescr>
+			<fieldname>probe_window</fieldname>
+			<description>Enter the value of how many of the latest polls that should be examined.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Probe Threshold</fielddescr>
+			<fieldname>probe_threshold</fieldname>
+			<description>Enter the value of how many of those must have succeeded for us to consider the backend healthy.</description>
+			<type>input</type>
+		</field>
+		<field>
 			<fielddescr>none</fielddescr>
 			<fieldname>none</fieldname>
 		    <type>rowhelper</type>

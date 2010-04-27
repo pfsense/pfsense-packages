@@ -152,12 +152,41 @@ EOAU;
 				$first_byte_timeout = $backend['first_byte_timeout'] . "s";
 			else 
 				$first_byte_timeout = "300s";
+
+			if($backend['probe_url'])
+				$probe_url = $backend['probe_url'];
+			else 
+				$probe_url = "/";
+			if($backend['probe_interval'])
+				$probe_interval = $backend['probe_interval'] . "s";
+			else 
+				$probe_interval = "1s";
+			if($backend['probe_timeout'])
+				$probe_timeout = $backend['probe_timeout'] . "s";
+			else 
+				$probe_timeout = "1s";
+			if($backend['probe_window'])
+				$probe_window = $backend['probe_window'];
+			else 
+				$probe_window = "5";
+			if($backend['probe_threshold'])
+				$probe_threshold = $backend['probe_threshold'];
+			else 
+				$probe_threshold = "5";
+
 			$backends .= <<<EOFA
 backend {$backend['backendname']} {
 	.host = "{$backend['ipaddress']}";
 	.port = "{$backend['port']}";
 	.first_byte_timeout = {$first_byte_timeout};
 	.connect_timeout = {$connect_timeout};
+	.probe = {
+		.url = "{$backend['probe_url']}";
+		.interval = {$backend['probe_interval']};
+		.timeout = {$backend['probe_timeout']};
+		.window = {$backend['probe_window']};
+		.threshold = {$backend['probe_threshold']};
+	}
 }
 
 EOFA;
