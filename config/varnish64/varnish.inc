@@ -152,7 +152,6 @@ EOAU;
 				$first_byte_timeout = $backend['first_byte_timeout'] . "s";
 			else 
 				$first_byte_timeout = "300s";
-
 			if($backend['probe_url'])
 				$probe_url = $backend['probe_url'];
 			else 
@@ -173,7 +172,6 @@ EOAU;
 				$probe_threshold = $backend['probe_threshold'];
 			else 
 				$probe_threshold = "5";
-
 			$backends .= <<<EOFA
 backend {$backend['backendname']} {
 	.host = "{$backend['ipaddress']}";
@@ -199,7 +197,7 @@ EOFA;
 			if($backend['row'])
 				foreach($backend['row'] as $be) {
 					if($be['weight']) 
-						$weight = "\n\t\t\t.weight = {$be['weight']};\n"
+						$weight = "\t\t\t.weight = {$be['weight']};\n"
 					else 
 						$weight = "";
 					$director .=  "\t{\n\t\t.backend = {$be['backendname']};\n{$weight}\t}";
