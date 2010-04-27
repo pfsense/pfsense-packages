@@ -99,13 +99,71 @@ synthetic {"
 </body>
 </html>
 "};
-deliver;
+return(deliver);
 
 EOF;
 
 	$backends = "";
 	$urlmappings = "";
+	
+	if($config['installedpackages']['varnishbackends']['config'] != "") {
+    	foreach($config['installedpackages']['varnishbackends']['config'] as $backend) {
+			$isfirst = true;
+			if($config['installedpackages']['varnishlbdirectors']['config'] != "") {
+    			foreach($config['installedpackages']['varnishlbdirectors']['config'] as $url) {
+					foreach($url['row'] as $urlmapping) {
+						if(!$isfirst) 
+							$urlmappings .= "else ";
+						$urlmappings .= <<<EOAU
+if (req.http.host == "{$url['directorurl']}") {
+		set req.backend = {$url['directorname']};
+		set req.http.host = "{$url['directorurl']}";
+	} 
+EOAU;
+						$isfirst = false;
+					}
+				}
+			}
+   			foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
+				if($config['installedpackages']['varnishbackends']['config'])
+    				foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
+						foreach($urlmapping['row'] as $url)
+						if(!$isfirst) 
+							$urlmappings .= "else ";
+						$urlmappings .= <<<EOAU
+if (req.http.host == "{$url['urlmapping']}") {
+		set req.backend = {$urlmapping['backendname']};
+		set req.http.host = "{$urlmapping['urlmapping']}";
+	} 
+EOAU;
+				$isfirst = false;
+				}
+			}
 
+			if($backend['connect_timeout'])
+				$connect_timeout = $backend['connect_timeout'] . "s";
+			else 
+				$connect_timeout = "25s";
+			if($backend['port'])
+				$connect_timeout = $backend['port'] . "s";
+			else 
+				$connect_timeout = "80";
+			if($backend['first_byte_timeout'])
+				$first_byte_timeout = $backend['first_byte_timeout'] . "s";
+			else 
+				$first_byte_timeout = "300s";
+			$backends .= <<<EOFA
+backend {$backend['backendname']} {
+	.host = "{$backend['ipaddress']}";
+	.port = "{$backend['port']}";
+	.first_byte_timeout = {$first_byte_timeout};
+	.connect_timeout = {$connect_timeout};
+}
+
+EOFA;
+		}
+	}
+	
 	if($config['installedpackages']['varnishlbdirectors']['config'] != "") {
     	foreach($config['installedpackages']['varnishlbdirectors']['config'] as $backend) {
 			$director = "";
@@ -122,65 +180,6 @@ EOFA;
 		}
 	}
 
-	
-	if($config['installedpackages']['varnishbackends']['config'] != "") {
-    	foreach($config['installedpackages']['varnishbackends']['config'] as $backend) {
-			$isfirst = true;
-			if($config['installedpackages']['varnishlbdirectors']['config'] != "") {
-    			foreach($config['installedpackages']['varnishlbdirectors']['config'] as $url) {
-					foreach($url['row'] as $urlmapping) {
-						if(!$isfirst) 
-							$urlmappings .= "else ";
-						$urlmappings .= <<<EOAU
-if (req.http.host == "{$url['directorurl']}") {
-		set req.backend = "{$url['directorname']}";
-		set req.http.host = "{$url['directorurl']}";
-	} 
-EOAU;
-						$isfirst = false;
-					}
-				}
-			}
-   			foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
-				if($config['installedpackages']['varnishbackends']['config'])
-    				foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
-						foreach($urlmapping['row'] as $url)
-						if(!$isfirst) 
-							$urlmappings .= "else ";
-						$urlmappings .= <<<EOAU
-if (req.http.host == "{$url['urlmapping']}") {
-		set req.backend = "{$urlmapping['backendname']}";
-		set req.http.host = "{$urlmapping['urlmapping']}";
-	} 
-EOAU;
-				$isfirst = false;
-				}
-			}
-
-			if($backend['connect_timeout'])
-				$connect_timeout = $backend['connect_timeout'] . "s";
-			else 
-				$connect_timeout = "25s";
-			if($backend['port'])
-				$connect_timeout = $backend['port'];
-			else 
-				$connect_timeout = "80";
-			if($backend['first_byte_timeout'])
-				$first_byte_timeout = $backend['first_byte_timeout'];
-			else 
-				$first_byte_timeout = "300s";
-			$backends .= <<<EOFA
-backend {$backend['backendname']} {
-	.host = "{$backend['ipaddress']}";
-	.port = "{$backend['port']}";
-	.first_byte_timeout = "{$first_byte_timeout}";
-	.connect_timeout = "{$connect_timeout}";
-}
-
-EOFA;
-		}
-	}
-	
 if($vcl_fetch_early or $vcl_fetch_late) {
 	$vcl_fetch = <<<FETCH
 sub vcl_fetch {
@@ -229,7 +228,7 @@ sub vcl_recv {
 	{$urlmappings}
 	{$vcl_recv_custom_late}
 	if (req.request != "GET" && req.request != "HEAD") {
-		pipe;
+		return(pipe);
 	}
 	return(lookup);
 }
