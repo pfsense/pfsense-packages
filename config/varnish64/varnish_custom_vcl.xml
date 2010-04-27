@@ -62,7 +62,11 @@
 		<tab>
 			<text>LB Directors</text>
 			<url>/pkg.php?xml=varnish_lb_directors.xml</url>
-		</tab>		
+		</tab>
+		<tab>
+			<text>XMLRPC Sync</text>
+			<url>/pkg.php?xml=varnish_sync.xml</url>
+		</tab>
 	</tabs>
 	<fields>
 		<field>
