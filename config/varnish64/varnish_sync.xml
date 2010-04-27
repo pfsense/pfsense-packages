@@ -73,10 +73,10 @@
 		<field>
 			<type>listtopic</type>
 			<fieldname>temp</fieldname>
-			<name>Enbable Varnish zone sync</name>
+			<name>Enbable Varnish configuration sync</name>
 		</field>		
 		<field>
-			<fielddescr>Automatically sync Varnish zone changes</fielddescr>
+			<fielddescr>Automatically sync Varnish configuration changes</fielddescr>
 			<fieldname>synconchanges</fieldname>
 			<description>pfSense will automatically sync changes to the hosts defined below.</description>
 			<type>checkbox</type>
@@ -89,13 +89,13 @@
 		<field>
 			<fielddescr>IP Address</fielddescr>
 			<fieldname>ipaddress</fieldname>
-			<description>The IP address of the first host that Varnish will Sync its Varnish zone data to.</description>
+			<description>The IP address of the first host that Varnish will Sync its Varnish configuration data to.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Password</fielddescr>
 			<fieldname>password</fieldname>
-			<description>Admin password of the first host that Varnish will Sync its Varnish zone data to.</description>
+			<description>Admin password of the first host that Varnish will Sync its Varnish configuration data to.</description>
 			<type>password</type>
 		</field>
 		<field>
@@ -106,13 +106,13 @@
 		<field>
 			<fielddescr>IP Address 2</fielddescr>
 			<fieldname>ipaddress2</fieldname>
-			<description>OPTIONAL.  The IP address of the second host that Varnish will Sync its Varnish zone data to.</description>
+			<description>OPTIONAL.  The IP address of the second host that Varnish will Sync its Varnish configuration data to.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Password 2</fielddescr>
 			<fieldname>password2</fieldname>
-			<description>Admin password of the second host that Varnish will Sync its Varnish zone data to.</description>
+			<description>Admin password of the second host that Varnish will Sync its Varnish configuration data to.</description>
 			<type>password</type>
 		</field>
 		<field>
@@ -123,13 +123,13 @@
 		<field>
 			<fielddescr>IP Address 3</fielddescr>
 			<fieldname>ipaddress3</fieldname>
-			<description>OPTIONAL. The IP address of the third host that Varnish will Sync its Varnish zone data to.</description>
+			<description>OPTIONAL. The IP address of the third host that Varnish will Sync its Varnish configuration data to.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Password 3</fielddescr>
 			<fieldname>password3</fieldname>
-			<description>Admin password of the third host that Varnish will Sync its Varnish zone data to.</description>
+			<description>Admin password of the third host that Varnish will Sync its Varnish configuration data to.</description>
 			<type>password</type>
 		</field>
 	</fields>
