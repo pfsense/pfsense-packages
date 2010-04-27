@@ -67,6 +67,10 @@
 			<text>XMLRPC Sync</text>
 			<url>/pkg_edit.php?xml=varnish_sync.xml&amp;id=0</url>
 		</tab>
+		<tab>
+			<text>View Configuration</text>
+			<url>/varnish_view_config.php</url>
+		</tab>
 	</tabs>
 	<fields>
 		<field>

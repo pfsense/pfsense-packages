@@ -59,6 +59,11 @@
 	    <chmod>0755</chmod>
 	    <item>http://www.pfsense.com/packages/config/varnish64/varnish.inc</item>
 	</additional_files_needed>
+   	<additional_files_needed>
+	    <prefix>/usr/local/www/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://www.pfsense.com/packages/config/varnish64/varnish_view_config.php</item>
+	</additional_files_needed>
 	<menu>
 		<name>Varnish</name>
 		<tooltiptext>Varnish</tooltiptext>
@@ -67,7 +72,7 @@
 	</menu>
 	<tabs>
 		<tab>
-			<text>Varnish Backends</text>
+			<text>Backends</text>
 			<url>/pkg.php?xml=varnish_backends.xml</url>
 			<active/>
 		</tab>
@@ -86,6 +91,10 @@
 		<tab>
 			<text>XMLRPC Sync</text>
 			<url>/pkg_edit.php?xml=varnish_sync.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>View Configuration</text>
+			<url>/varnish_view_config.php</url>
 		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
