@@ -38,10 +38,6 @@ if($_REQUEST['getactivity']) {
 	exit;
 }
 
-/* Defaults to this page but if no settings are present, redirect to setup page */
-if(!$config['installedpackages']['varnish']['config'][0])
-	Header("Location: /pkg_edit.php?xml=varnish.xml&id=0");
-
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
@@ -97,7 +93,7 @@ include("head.inc");
       <form action="varnish_view_config.php" method="post">
 		<br>
 			<div id="varnishlogs">
-				<pre>One moment please, loading Varnish logs...</pre>
+				<pre>One moment please, loading Varnish configuration...</pre>
 			</div>
      </td>
     </tr>
