@@ -11,7 +11,7 @@
 		<version>0.2</version>
 		<status>ALPHA</status>
 		<required_version>2.0</required_version>
-		<config_file>http://www.pfsense.com/packages/config/varnish/varnish_backends.xml</config_file>
+		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>varnish-2.1.tbz</depends_on_package>
