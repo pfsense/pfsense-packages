@@ -74,15 +74,16 @@
                         <rows>5</rows>
                 </field>
                 <field>
-                        <fielddescr>Syslog</fielddescr>
-                        <fieldname>avsetsyslog</fieldname>
-                        <description>Check this for enable Syslog.</description>
-                        <type>checkbox</type>
-                </field>
-                <field>
                         <fielddescr>Log</fielddescr>
                         <fieldname>avsetlog</fieldname>
                         <description>Check this for enable log.</description>
+                        <type>checkbox</type>
+                        <enablefields>avsetsyslog</enablefields>
+                </field>
+                <field>
+                        <fielddescr>SysLog</fielddescr>
+                        <fieldname>avsetsyslog</fieldname>
+                        <description>Check this for enable SysLog.</description>
                         <type>checkbox</type>
                 </field>
         </fields>

@@ -46,6 +46,7 @@ if(!function_exists("filter_configure"))
 # ------------------------------------------------------------------------------
 # Debug / uncomment next for debug /
 define('HV_DEBUG',             'false');
+
 # use Clamd daemon (another - use libclam)
 define('HV_USE_CLAMD',         'true');
 define('HV_CLAMD_TCPSOCKET',   'true');
@@ -90,7 +91,7 @@ define('HVDEF_HAVP_WHITELIST',          HVDEF_WORK_DIR.'/whitelist');
 define('HVDEF_HAVP_BLACKLIST',          HVDEF_WORK_DIR.'/blacklist');
 define('HVDEF_HAVP_ACCESSLOG',          HVDEF_LOG_DIR .'/access.log');
 define('HVDEF_HAVP_ERRORLOG',           HVDEF_LOG_DIR .'/havp.log');
-define('HVDEF_HAVP_MINSRV',             '10');
+define('HVDEF_HAVP_MINSRV',             '3');
 define('HVDEF_HAVP_MAXSRV',             '100');
 
 # Clam
@@ -338,6 +339,7 @@ function havp_avset_resync()
     havp_convert_pfxml_xml();
     havp_check_system();
     # reconfigure
+    havp_reconfigure_clamd();
     havp_reconfigure_freshclam();
     havp_reconfigure_cron();
 }
@@ -406,9 +408,14 @@ function havp_check_system()
     hv_clamd_startup_script();
 
     # havp filter script
-    if (1 /*!file_exists(HVDEF_FILTER_RESYNC_SCRIPT)*/) {
-    	file_put_contents(HVDEF_FILTER_RESYNC_SCRIPT, havp_filter_resync_script());
-    	havp_set_file_access(HVDEF_FILTER_RESYNC_SCRIPT, HVDEF_AVUSER, '0755');
+    if (pfsense_version_() == '1') {
+        # script exists only for 1.2.x
+        file_put_contents(HVDEF_FILTER_RESYNC_SCRIPT, havp_filter_resync_script());
+        havp_set_file_access(HVDEF_FILTER_RESYNC_SCRIPT, HVDEF_AVUSER, '0755');
+    } else {
+        # delete script if exists
+        if (file_exists(HVDEF_FILTER_RESYNC_SCRIPT))
+            mwexec("rm -rf " . HVDEF_FILTER_RESYNC_SCRIPT);
     }
 
     # mount RAMDisk
@@ -512,10 +519,8 @@ function havp_convert_pfxml_xml()
     $havp_config[F_SCANSTREAM]      = ( $pfconf[F_SCANSTREAM] === 'on' ? 'true' : 'false' );
     $havp_config[F_SCANARCMAXSIZE]  = ( is_numeric($pfconf[F_SCANARCMAXSIZE]) ? $pfconf[F_SCANARCMAXSIZE] : HVDEF_MAXARCSCANSIZE );
     # log
-    $havp_config[F_SYSLOG]          = ( $pfconf[F_SYSLOG] === 'on' ? 'true' : 'false' );
-    $havp_config[F_LOG]             = ( $pfconf[F_LOG]    === 'on' ? 'true' : 'false' );
-    $havp_config[F_AVSETSYSLOG]     = ( $pfconf[F_AVSETSYSLOG] === 'on' ? 'true' : 'false' );
-    $havp_config[F_AVSETLOG]        = ( $pfconf[F_AVSETLOG]    === 'on' ? 'true' : 'false' );
+    $havp_config[F_SYSLOG]          = ( $pfconf[F_SYSLOG]      === 'on' ? 'true' : 'false' );
+    $havp_config[F_LOG]             = ( $pfconf[F_LOG]         === 'on' ? 'true' : 'false' );
     #
     # =-= Internal variables =-=
     # proxy
@@ -530,6 +535,10 @@ function havp_convert_pfxml_xml()
     $havp_config[F_HAVPUPDATE]      = $pf_avset_conf[F_HAVPUPDATE];
     $havp_config[F_DBREGION]        = $pf_avset_conf[F_DBREGION];
     $havp_config[F_AVUPDATESERVER]  = $pf_avset_conf[F_AVUPDATESERVER];
+    # avlog
+    $havp_config[F_AVSETSYSLOG]     = $pf_avset_conf[F_AVSETSYSLOG] === 'on' ? 'true' : 'false';
+    $havp_config[F_AVSETLOG]        = $pf_avset_conf[F_AVSETLOG]    === 'on' ? 'true' : 'false';
+
     #
     # store havp config cache
     $cfg_xml = dump_xml_config($havp_config, 'havp');
@@ -574,8 +583,8 @@ function havp_config_havp()
     $conf[] = "SYSLOGLEVEL    " . (HV_DEBUG === 'true' ? "debug" : "info");     # err | warning | info | debug
     #
     $conf[] = "\n# Level of HAVP logging\n#  0 = Only serious errors and information\n#  1 = Less interesting information is included";
-    $conf[] = "LOG_OKS        " . ( HV_DEBUG === 'true' ? "true" : "false" );   # true - for debug, false - for work
-    $conf[] = "LOGLEVEL       1"; # . ( HV_DEBUG === 'true' ? "1"    : "0" );       # 0 - work level, 1 - debug level
+    $conf[] = "LOG_OKS        false";                                       # false - access_log requests viruses only, true - access_log all requests
+    $conf[] = "LOGLEVEL       " . ( HV_DEBUG === 'true' ? "1"    : "0" );   # 0 - work level, 1 - debug level
     # temp
     $conf[] = "\n# temp ";
     $conf[] = "SCANTEMPFILE   " . $havp_config[HV_SCANTEMPFILE];
@@ -677,14 +686,19 @@ function havp_config_clam()
 # ==============================================================================
 ";
     $conf[] = "# log";
-    $conf[] = "LogFile                   " . HVDEF_CLAM_LOG;
     $conf[] = "LogFileUnlock             yes";
-    $conf[] = "LogFileMaxSize            1M";
+    $conf[] = "LogFileMaxSize            2M";
     $conf[] = "LogTime                   yes";
     $conf[] = "LogClean                  no";
-    $conf[] = "LogSyslog                 yes"; # todo - настройки Гуя
     $conf[] = "LogFacility               LOG_LOCAL6";
-    $conf[] = "LogVerbose                no";
+    $conf[] = "LogVerbose                " . ( HV_DEBUG === "true" ? "yes" : "no" );
+
+    # Syslog
+    $islog    = $havp_config[F_AVSETLOG]    === 'true';
+    $issyslog = $havp_config[F_AVSETSYSLOG] === 'true';
+    $conf[] = "LogSyslog                 " . ($islog && $issyslog ? 'yes' : 'no');
+    if ($islog && !$issyslog)
+        $conf[] = "LogFile                   " . HVDEF_CLAM_LOG;
     #
     $conf[] = "\n# sysdirs";
     $conf[] = "PidFile                   " . HVDEF_CLAM_PID;
@@ -731,7 +745,7 @@ function havp_config_clam()
     $conf[] = "ScanHTML                  yes";
     $conf[] = "# archives";
     $conf[] = "ScanArchive               yes";
-    $conf[] = "ArchiveLimitMemoryUsage   no";
+#    $conf[] = "ArchiveLimitMemoryUsage   no"; # deprecated on 0.95
     $conf[] = "ArchiveBlockEncrypted     no";
     $conf[] = "# limits";
     $conf[] = "MaxScanSize               50M";
@@ -767,17 +781,27 @@ function havp_config_freshclam()
     $conf[] = "DatabaseDirectory /var/db/clamav";
 
     # log
-    $conf[] = "UpdateLogFile            " . HVDEF_FRESHCLAM_LOG;
-    $conf[] = "LogFileMaxSize           10M";
+    
+    $conf[] = "LogFileMaxSize           2M";
     $conf[] = "LogTime                  yes";
-    $conf[] = "LogVerbose               yes";
+    $conf[] = "LogVerbose               " . ( HV_DEBUG === "true" ? "yes" : "no" );
+    $conf[] = "LogFacility              LOG_LOCAL6"; # LOG_LOCAL6 | LOG_MAIL
+    $conf[] = "\n# syslog";
 
     # Syslog
-    if ($pfconf[F_AVSETSYSLOG] === 'true') {
-        $conf[] = "\n# syslog";
-        $conf[] = "LogSyslog                yes";
-        $conf[] = "LogFacility              LOG_LOCAL6"; # LOG_LOCAL6 | LOG_MAIL
+    $is_syslog = ($pfconf[F_AVSETLOG] === 'true') && ($pfconf[F_AVSETSYSLOG] === 'true');
+    $conf[] = "LogSyslog                " . ( $is_syslog ? 'yes' : 'no');
+    unset ($is_syslog);
+
+    # log
+    # freshclam for 1.2.x have a bug with logfile permissions; now disable logfile for 1.2.x - only syslog
+    $is_log = (pfsense_version_() != "1") && ($pfconf[F_AVSETLOG] === 'true');
+    if ($is_log) {      
+        $conf[] = "UpdateLogFile            " . HVDEF_FRESHCLAM_LOG;
+    } else {
+        $conf[] = "# for pfsense 1.2.x Log disabled - permission bug exists!";
     }
+    unset ($is_log);
 
     $conf[] = "\n# pid";
     $conf[] = "PidFile /var/run/clamav/freshclam.pid";
@@ -892,6 +916,9 @@ function havp_config_freshclam()
 # Enable debug messages in libclamav.
 # Default: disabled
 #Debug yes
+
+    # use google safesearch AV database
+    $conf[] = "SafeBrowsing     yes";
 
     $conf[] = "";
     return implode("\n", $conf);
@@ -1082,11 +1109,6 @@ function havp_setup_cron($task_key, $options, $on_off)
 # ------------------------------------------------------------------------------
 function havp_generate_rules($type = 'filter')
 {
-    # not for 1.x
-    if (pfsense_version_() != '2') {
-	return;
-    }
-
     # pfSense v.2.x - welcome !
 
     # 'nat' 'filter'
@@ -1563,19 +1585,7 @@ EOD;
 # ------------------------------------------------------------------------------
 function havp_fix()
 {
-/*
-	global $config;
-	# unset old menu item
-    if (isset($config['installedpackages']['menu'])) {
-        foreach($config['installedpackages']['menu'] as $mkey => $mval) {
-        	if ($mval['name'] === 'HTTP Antivirus') {
-        		unset($config['installedpackages']['menu'][$mkey]);
-                write_config('Fix HAVP menu.');
-                break;
-        	}
-        }
-    }
-*/
+
 }
 
 ?>
