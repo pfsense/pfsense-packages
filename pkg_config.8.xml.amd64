@@ -4,7 +4,7 @@
   <packages>
 	<package>
 		<name>Varnish</name>
-		<descr></descr>
+		<descr>Varnish is a state-of-the-art, high-performance HTTP accelerator. It uses the advanced features in Linux 2.6, FreeBSD 6/7 and Solaris 10 to achieve its high performance.</descr>
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>http://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
 		<category>Services</category>
