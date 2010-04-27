@@ -40,7 +40,7 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<name>varnish_lb_directors</name>
+	<name>varnishlbdirectors</name>
 	<version>0.0.1</version>
 	<title>Varnish: Backends</title>
 	<include_file>/usr/local/pkg/varnish.inc</include_file>

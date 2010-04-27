@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    varnish_sync.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2008 Scott Ullrich
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>varnishsync</name>
+	<version>1.0</version>
+	<title>Varnish: Manual Sync</title>
+	<include_file>/usr/local/pkg/varnish.inc</include_file>
+	<tabs>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg_edit.php?xml=varnish.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Add/Edit Record</text>
+			<url>/varnish_filter.php</url>
+		</tab>
+		<tab>
+			<text>Failover Status</text>
+			<url>/varnish_status.php</url>
+		</tab>
+		<tab>
+			<text>Logs</text>
+			<url>/varnish_view_logs.php</url>
+		</tab>
+		<tab>
+			<text>Zone Sync</text>
+			<url>/pkg_edit.php?xml=varnish_sync.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>New domain wizard</text>
+			<url>/wizard.php?xml=new_zone_wizard.xml</url>
+		</tab>		
+	</tabs>
+	<configpath>installedpackages->package->varnish</configpath>
+	<fields>
+		<field>
+			<type>listtopic</type>
+			<fieldname>temp</fieldname>
+			<name>Enbable DNS zone sync</name>
+		</field>		
+		<field>
+			<fielddescr>Automatically sync DNS zone changes</fielddescr>
+			<fieldname>synconchanges</fieldname>
+			<description>pfSense will automatically sync changes to the hosts defined below.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>Sync host #1</name>
+			<fieldname>temp</fieldname>			
+		</field>		
+		<field>
+			<fielddescr>IP Address</fielddescr>
+			<fieldname>ipaddress</fieldname>
+			<description>The IP address of the first host that Varnish will Sync its DNS zone data to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Password</fielddescr>
+			<fieldname>password</fieldname>
+			<description>Admin password of the first host that Varnish will Sync its DNS zone data to.</description>
+			<type>password</type>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>Sync host #2</name>
+			<fieldname>temp</fieldname>
+		</field>		
+		<field>
+			<fielddescr>IP Address 2</fielddescr>
+			<fieldname>ipaddress2</fieldname>
+			<description>OPTIONAL.  The IP address of the second host that Varnish will Sync its DNS zone data to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Password 2</fielddescr>
+			<fieldname>password2</fieldname>
+			<description>Admin password of the second host that Varnish will Sync its DNS zone data to.</description>
+			<type>password</type>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>Sync host #3</name>
+			<fieldname>temp</fieldname>			
+		</field>				
+		<field>
+			<fielddescr>IP Address 3</fielddescr>
+			<fieldname>ipaddress3</fieldname>
+			<description>OPTIONAL. The IP address of the third host that Varnish will Sync its DNS zone data to.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Password 3</fielddescr>
+			<fieldname>password3</fieldname>
+			<description>Admin password of the third host that Varnish will Sync its DNS zone data to.</description>
+			<type>password</type>
+		</field>
+	</fields>
+	<custom_php_resync_config_command>
+		varnish_sync_on_changes();
+	</custom_php_resync_config_command>
+	<custom_php_command_before_form>	
+		unset($_POST['temp']);
+	</custom_php_command_before_form>
+</packagegui>
