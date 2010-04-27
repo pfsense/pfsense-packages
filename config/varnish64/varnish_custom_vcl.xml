@@ -96,7 +96,7 @@
 		<field>
 			<fielddescr>vcl_pipe_late</fielddescr>
 			<fieldname>vcl_fetch_late</fieldname>
-			<description>Paste your custom <![CDATA[<a target=_new href='http://varnish-cache.org/wiki/VCL'>vcl_pipe</a>]]> code here.  This code will be included at the beginning of the vcl_pipe function.</description>
+			<description>Paste your custom <![CDATA[<a target=_new href='http://varnish-cache.org/wiki/VCL'>vcl_pipe</a>]]> code here.  This code will be included at the end of the vcl_pipe function.</description>
 			<type>textarea</type>
 			<cols>50</cols>
 			<rows>10</rows>
