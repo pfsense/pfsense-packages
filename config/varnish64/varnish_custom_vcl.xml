@@ -6,11 +6,11 @@
         <![CDATA[
 /* ========================================================================== */
 /*
-    backends.xml
+    varnish_settings.xml
     part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2010 Scott Ullrich
-    All rights reserved.                                                      
-*/
+    Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
+    All rights reserved.
+                                                                              */
 /* ========================================================================== */
 /*
     Redistribution and use in source and binary forms, with or without
@@ -40,90 +40,63 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<name>varnishbackends</name>
+	<name>varnishcustomvcl</name>
 	<version>0.0.1</version>
-	<title>Varnish: Whitelist</title>
-	<menu>
-		<name>Varnish </name>
-		<tooltiptext></tooltiptext>
-		<section>Services</section>
-		<configfile>backends.xml</configfile>
-	</menu>
+	<title>Varnish custom VCL</title>
+	<aftersaveredirect>pkg_edit.php?xml=varnish_settings.xml&amp;id=0</aftersaveredirect>
+	<include_file>/usr/local/pkg/varnish.inc</include_file>
 	<tabs>
 		<tab>
-			<text>Varnish Backends</text>
+			<text>Backends</text>
 			<url>/pkg.php?xml=backends.xml</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>Settings</text>
 			<url>/pkg.php?xml=varnish_settings.xml</url>
+
 		</tab>
 		<tab>
 			<text>Custom VCL</text>
 			<url>/pkg.php?xml=varnish_custom_vcl.xml</url>
+			<active/>
 		</tab>
 	</tabs>
-	<adddeleteeditpagefields>
-		<columnitem>
-			<fielddescr>IPAddress</fielddescr>
-			<fieldname>ipaddress</fieldname>
-		</columnitem>
-		<columnitem>
-			<fielddescr>Name</fielddescr>
-			<fieldname>backendname</fieldname>
-		</columnitem>		
-	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<fielddescr>IPAddress</fielddescr>
-			<fieldname>ipaddress</fieldname>
-			<description>Enter the IP Address of the backend web server.</description>
-			<type>input</type>
+			<fielddescr>vcl_fetch_early</fielddescr>
+			<fieldname>vcl_fetch_early</fieldname>
+			<description></description>
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>10</rows>
 		</field>
 		<field>
-			<fielddescr>Backend name</fielddescr>
-			<fieldname>backendname</fieldname>
-			<description>Enter the name of this backend web server.</description>
-			<type>input</type>
+			<fielddescr>vcl_fetch_late</fielddescr>
+			<fieldname>vcl_fetch_late</fieldname>
+			<description></description>
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>10</rows>
 		</field>
 		<field>
-			<fielddescr>Port</fielddescr>
-			<fieldname>port</fieldname>
-			<description>Enter the TCP/IP port of the webserver.</description>
-			<type>input</type>
+			<fielddescr>vcl_pipe_early</fielddescr>
+			<fieldname>vcl_fetch_early</fieldname>
+			<description></description>			
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>10</rows>
 		</field>
 		<field>
-			<fielddescr>First byte timeout</fielddescr>
-			<fieldname>first_byte_timeout</fieldname>
-			<description> time to wait for the first byte from the backend and .between_bytes_timeout for time to wait between each received byte.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Connect timeout</fielddescr>
-			<fieldname>connect_timeout</fieldname>
-			<description>The time to wait for a backend connection.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>none</fielddescr>
-			<fieldname>none</fieldname>
-		    <type>rowhelper</type>
-		    <rowhelper>
-				<rowhelperfield>
-				    <fielddescr>URL</fielddescr>
-				    <fieldname>urlmapping</fieldname>
-				    <description>Enter the URL that will be mapped to this backend.</description>
-				    <type>input</type>
-				</rowhelperfield>
-			</rowhelper>
+			<fielddescr>vcl_pipe_late</fielddescr>
+			<fieldname>vcl_fetch_late</fieldname>
+			<description></description>
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>10</rows>
 		</field>
 	</fields>
-	<custom_php_command_before_form>
-	</custom_php_command_before_form>
-	<custom_delete_php_command>
-		sync_package_varnish();
-	</custom_delete_php_command>	
+	<custom_php_validation_command>
+	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
 		sync_package_varnish();
 	</custom_php_resync_config_command>

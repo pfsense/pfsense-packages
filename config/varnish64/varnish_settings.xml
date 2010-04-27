@@ -45,22 +45,21 @@
 	<title>Varnish Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=varnish_settings.xml&amp;id=0</aftersaveredirect>
 	<include_file>/usr/local/pkg/varnish.inc</include_file>
-	<menu>
-		<name>Varnish</name>
-		<section>Services</section>
-		<configfile>backends.xml</configfile>
-	</menu>
-	<service>
-		<name>varnish</name>
-		<rcfile>varnish.sh</rcfile>
-	</service>
 	<tabs>
 		<tab>
 			<text>Backends</text>
 			<url>/pkg.php?xml=backends.xml</url>
 		</tab>
+		<tab>
+			<text>Settings</text>
+			<url>/pkg.php?xml=varnish_settings.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Custom VCL</text>
+			<url>/pkg.php?xml=varnish_custom_vcl.xml</url>
+		</tab>
 	</tabs>
-	<configpath>['installedpackages']['varnish']['config']</configpath>
 	<fields>
 		<field>
 			<fielddescr>Storage type</fielddescr>
