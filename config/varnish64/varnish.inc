@@ -100,7 +100,7 @@ synthetic {"
 </head>
 <body>
 <b>
-<p>We are very sorry but an error occured during this request.</p>
+<p>We are very sorry but an error occurred during this request.</p>
 </b>
 <p>Please press refresh in your browser to try again.</p>
 <p>Varnish Error "} obj.status " " obj.response {"</p>
@@ -379,7 +379,7 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $password) {
 	/* send our XMLRPC message and timeout after 250 seconds */
 	$resp = $cli->send($msg, "250");
 	if(!$resp) {
-		$error = "A communications error occured while attempting varnish XMLRPC sync with {$url}:{$port}.";
+		$error = "A communications error occurred while attempting varnish XMLRPC sync with {$url}:{$port}.";
 		log_error($error);
 		file_notice("sync_settings", $error, "varnish Settings Sync", "");
 	} elseif($resp->faultCode()) {
@@ -409,7 +409,7 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $password) {
 	$cli->setCredentials('admin', $password);
 	$resp = $cli->send($msg, "250");
 	if(!$resp) {
-		$error = "A communications error occured while attempting varnish XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+		$error = "A communications error occurred while attempting varnish XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
 		log_error($error);
 		file_notice("sync_settings", $error, "varnish Settings Sync", "");
 	} elseif($resp->faultCode()) {
