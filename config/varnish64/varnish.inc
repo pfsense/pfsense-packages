@@ -191,11 +191,11 @@ backend {$backend['backendname']} {
 	.first_byte_timeout = {$first_byte_timeout};
 	.connect_timeout = {$connect_timeout};
 	.probe = {
-		.url = "{$backend['probe_url']}";
-		.interval = {$backend['probe_interval']};
-		.timeout = {$backend['probe_timeout']};
-		.window = {$backend['probe_window']};
-		.threshold = {$backend['probe_threshold']};
+		.url = "{$probe_url}";
+		.interval = {$probe_interval};
+		.timeout = {$probe_timeout};
+		.window = {$probe_window};
+		.threshold = {$probe_threshold};
 	}
 }
 
