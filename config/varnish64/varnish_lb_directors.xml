@@ -6,11 +6,11 @@
         <![CDATA[
 /* ========================================================================== */
 /*
-    varnish_settings.xml
+    varnish_lb_directors.xml
     part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
-    All rights reserved.
-                                                                              */
+    Copyright (C) 2010 Scott Ullrich
+    All rights reserved.                                                      
+*/
 /* ========================================================================== */
 /*
     Redistribution and use in source and binary forms, with or without
@@ -40,20 +40,39 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-	<name>varnishsettings</name>
+	<name>varnish_lb_directors</name>
 	<version>0.0.1</version>
-	<title>Varnish Settings</title>
-	<aftersaveredirect>pkg_edit.php?xml=varnish_settings.xml&amp;id=0</aftersaveredirect>
+	<title>Varnish: Backends</title>
 	<include_file>/usr/local/pkg/varnish.inc</include_file>
+   	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://www.pfsense.com/packages/config/varnish64/varnish_settings.xml</item>
+	</additional_files_needed>
+   	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://www.pfsense.com/packages/config/varnish64/varnish_custom_vcl.xml</item>
+	</additional_files_needed>
+   	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+	    <chmod>0755</chmod>
+	    <item>http://www.pfsense.com/packages/config/varnish64/varnish.inc</item>
+	</additional_files_needed>
+	<menu>
+		<name>Varnish </name>
+		<tooltiptext></tooltiptext>
+		<section>Services</section>
+		<configfile>varnish_lb_directors.xml</configfile>
+	</menu>
 	<tabs>
 		<tab>
-			<text>Backends</text>
+			<text>Varnish Backends</text>
 			<url>/pkg.php?xml=varnish_backends.xml</url>
 		</tab>
 		<tab>
 			<text>Settings</text>
 			<url>/pkg_edit.php?xml=varnish_settings.xml&amp;id=0</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>Custom VCL</text>
@@ -65,32 +84,60 @@
 			<active/>
 		</tab>
 	</tabs>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>URL</fielddescr>
+			<fieldname>directorurl</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Type</fielddescr>
+			<fieldname>directortype</fieldname>
+		</columnitem>		
+	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<fielddescr>Storage type</fielddescr>
-			<fieldname>storagetype</fieldname>
-			<description>Select which storage type you would like to use.</description>
+			<fielddescr>Director name</fielddescr>
+			<fieldname>directorname</fieldname>
+			<type>input</type>
+			<size>40</size>
+		</field>
+		<field>
+			<fielddescr>URL</fielddescr>
+			<fieldname>directorurl</fieldname>
+			<type>input</type>
+			<size>40</size>
+		</field>
+		<field>
+			<fielddescr>Type</fielddescr>
+			<fieldname>directortype</fieldname>
 			<type>select</type>
 			<options>
-				<option><name>Memory</name><value>malloc</value></option>
-				<option><name>Disk</name><value>ondisk</value></option>
+				<option><name>Round-robin</name><value>round-robin</value></option>
+				<option><name>Random</name><value>random</value></option>
 			</options>
 		</field>
 		<field>
-			<fielddescr>Cache storage size in megabytes</fielddescr>
-			<fieldname>storagesize</fieldname>
-			<description>Enter the size of the varnish cache in megabytes.  HINT: 1024 == 1 Gigabyte</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Listening port</fielddescr>
-			<fieldname>listeningport</fieldname>
-			<description>Enter the port you would like varnish to listen on.  Defaults to 80.</description>
-			<type>input</type>
+			<fielddescr>Backend</fielddescr>
+			<fieldname>Backend</fieldname>
+		    <type>rowhelper</type>
+		    <rowhelper>
+				<rowhelperfield>
+				    <fielddescr>Backend</fielddescr>
+				    <fieldname>backendname</fieldname>
+				    <description>Enter the URL that will be mapped to this lb_directors.</description>
+					<source><![CDATA[$config['installedpackages']['varnishbackends']['config']]]></source>
+					<source_name>backendname</source_name>
+					<source_value>backendname</source_value>
+				    <type>select_source</type>
+				</rowhelperfield>
+			</rowhelper>
 		</field>
 	</fields>
-	<custom_php_validation_command>
-	</custom_php_validation_command>	
+	<custom_php_command_before_form>
+	</custom_php_command_before_form>
+	<custom_delete_php_command>
+		sync_package_varnish();
+	</custom_delete_php_command>	
 	<custom_php_resync_config_command>
 		sync_package_varnish();
 	</custom_php_resync_config_command>

@@ -43,6 +43,7 @@
 	<name>varnishbackends</name>
 	<version>0.0.1</version>
 	<title>Varnish: Backends</title>
+	<include_file>/usr/local/pkg/varnish.inc</include_file>
    	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
@@ -72,11 +73,15 @@
 		</tab>
 		<tab>
 			<text>Settings</text>
-			<url>/pkg.php?xml=varnish_settings.xml</url>
+			<url>/pkg_edit.php?xml=varnish_settings.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Custom VCL</text>
-			<url>/pkg.php?xml=varnish_custom_vcl.xml</url>
+			<url>/pkg_edit.php?xml=varnish_custom_vcl.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>LB Directors</text>
+			<url>/pkg.php?xml=varnish_lb_directors.xml</url>
 		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
