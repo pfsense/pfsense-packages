@@ -92,6 +92,7 @@ define('HVDEF_HAVP_ACCESSLOG',          HVDEF_LOG_DIR .'/access.log');
 define('HVDEF_HAVP_ERRORLOG',           HVDEF_LOG_DIR .'/havp.log');
 define('HVDEF_HAVP_MINSRV',             '10');
 define('HVDEF_HAVP_MAXSRV',             '100');
+
 # Clam
 define('HVDEF_CLAM_RUNDIR',             '/var/run/clamav');
 define('HVDEF_AVLOG_DIR',               '/var/log/clamav');
@@ -104,6 +105,8 @@ define('HVDEF_CLAM_TCPSOCKET',          '3310');
 define('HVDEF_FRESHCLAM_CONF',          '/usr/local/etc/freshclam.conf');
 define('HVDEF_FRESHCLAM_LOG',           HVDEF_AVLOG_DIR . '/freshclam.log');
 define('HVDEF_CLAMSCAN_LOG',            '/var/log/clamscan.log');
+define('HVDEF_STATUS_FILE',             '/var/tmp/havp.status');
+
 # script's
 define('HVDEF_SCRIPT_DIR',              '/usr/local/etc/rc.d');
 define('HVDEF_AVCRON_SCRIPT',           '/clamav-freshclam');
@@ -111,6 +114,7 @@ define('HVDEF_FILTER_RESYNC_SCRIPT',    '/usr/local/pkg/pf/havp_filter_resync.sh
 define('HVDEF_HAVP_STARTUP_SCRIPT',     HVDEF_SCRIPT_DIR . '/havp.sh');
 define('HVDEF_CLAM_STARTUP_SCRIPT',     HVDEF_SCRIPT_DIR . '/clamd.sh');
 define('HVDEF_AVUPD_SCRIPT',            HVDEF_SCRIPT_DIR . '/havp_avupdate');
+
 # cron
 define('HVDEF_CLAM_UPD_CRONNAME',       'havp_clam_update');
 define('HVDEF_CLAM_UPD_CRONCMD',        HVDEF_SCRIPT_DIR . HVDEF_AVCRON_SCRIPT . " start");
@@ -179,8 +183,14 @@ havp_convert_pfxml_xml();
 # ==============================================================================
 function havp_install()
 {
+    update_status("HAVP check system..\n");
     havp_fix();
     havp_check_system();
+
+    havp_avset_resync();
+    havp_update_AV();
+
+    update_status("Start update Antivirus bases. Wait 5-20 min before use ..");
 }
 # ------------------------------------------------------------------------------
 function havp_deinstall()
@@ -319,7 +329,8 @@ function havp_resync()
     havp_reconfigure_cron();
 
     # configure system filter
-	filter_configure();
+    filter_configure();
+
 }
 # ------------------------------------------------------------------------------
 function havp_avset_resync()
@@ -351,6 +362,8 @@ function havp_check_system()
     havp_set_file_access(HVDEF_RAMTEMP_DIR, HVDEF_USER, '');
 
     # template permissions
+    if (!file_exists(HVDEF_TEMPLATES_EX))
+        mwexec("mkdir -p " . HVDEF_TEMPLATES_EX);
     havp_set_file_access(HVDEF_TEMPLATES,    HVDEF_USER, '');
     havp_set_file_access(HVDEF_TEMPLATES_EX, HVDEF_USER, '');
 
@@ -383,6 +396,10 @@ function havp_check_system()
     # AV update script
     file_put_contents(HVDEF_AVUPD_SCRIPT, havp_AVupdate_script());
     havp_set_file_access(HVDEF_AVUPD_SCRIPT, HVDEF_AVUSER, '0755');
+
+    # AV update notification script
+#    file_put_contents(HVDEF_ON_AVUPD_SCRIPT,    havp_on_avupd_script());
+#    havp_set_file_access(HVDEF_ON_AVUPD_SCRIPT, HVDEF_AVUSER, '0755');
 
     # startup script's (havp and clamd)
     havp_startup_script();
@@ -431,7 +448,7 @@ function havp_reconfigure_cron()
 # ------------------------------------------------------------------------------
 function havp_convert_pfxml_xml()
 {
-	global $config, $havp_config;
+    global $config, $havp_config;
 
     $pfconf = $config['installedpackages'][HVFORM_HAVP]['config'][0];
 
@@ -849,6 +866,11 @@ function havp_config_freshclam()
     $conf[] = "\n# Number of database checks per day. Default: 12 (every two hours)";
     $chks = 0;
     $conf[] = "Checks $chks";
+
+    $conf[] = "# notification";
+    $conf[] = "OnUpdateExecute  date \"+%d-%m-%Y %H:%M:%S Antivirus update success\" > " . HVDEF_STATUS_FILE;
+    $conf[] = "OnErrorExecute   date \"+%d-%m-%Y %H:%M:%S Antivirus update error\" > "   . HVDEF_STATUS_FILE;
+
     $conf[] = "Debug  " . (HV_DEBUG === 'true' ? "yes" : "no");
 
 #    $conf[] = "# Proxy settings";  # future
@@ -1001,6 +1023,7 @@ function check_bw_domain($_dm)
 
     return false;
 }
+
 # ------------------------------------------------------------------------------
 # cron
 # ------------------------------------------------------------------------------
@@ -1027,11 +1050,13 @@ function havp_setup_cron($task_key, $options, $on_off)
     if (!empty($task_key)) {
         $flag_cron_upd = false;
         # delete old cron task if exists
-        foreach($config['cron']['item'] as $key => $val) {
-            if (strpos($config['cron']['item'][$key]['command'], $task_key) !== false) {
-                unset($config['cron']['item'][$key]);
-                $flag_cron_upd = true;
-                break;
+        if (is_array($config['cron']['item'])) {
+            foreach($config['cron']['item'] as $key => $val) {
+                if (strpos($config['cron']['item'][$key]['command'], $task_key) !== false) {
+                    unset($config['cron']['item'][$key]);
+                    $flag_cron_upd = true;
+                    break;
+                }
             }
         }
 
@@ -1057,23 +1082,31 @@ function havp_setup_cron($task_key, $options, $on_off)
 # ------------------------------------------------------------------------------
 function havp_generate_rules($type = 'filter')
 {
+    # not for 1.x
+    if (pfsense_version_() != '2') {
+	return;
+    }
+
+    # pfSense v.2.x - welcome !
+
     # 'nat' 'filter'
     global $config, $havp_config;
     $rules = array();
 
+/*  # remove this code nax
     # nothing if havp not running
     if (!is_service_running('havp')) {
-	    if (HV_DEBUG === 'true')
-		    log_error("havp: Havp is installed but not started. Filter rules not created.");
-		return;
+        if (HV_DEBUG === 'true')
+            log_error("havp: Havp is installed but not started. Filter rules not created.");
+        return;
     }
-
+*/
     $proxymode = $havp_config[F_PROXYMODE];
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # =-= HAVP always listen 127.0.0.1:port =-=
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # Proxy mode:
-    # Standard 	       - Filter: Rdr ifaces:port => 127.0.0.1:port
+    # Standard         - Filter: Rdr ifaces:port => 127.0.0.1:port
     # Parent for Squid - Filter: No
     # Transparent      - Filter: Rdr ifaces:port => 127.0.0.1:port;
     #                    Rdr Any Http => 127.0.0.1:port + Allow Http traffic via iface
@@ -1086,54 +1119,73 @@ function havp_generate_rules($type = 'filter')
     $proxyport = ( $havp_config[F_PROXYPORT] ? $havp_config[F_PROXYPORT] : HVDEF_PROXYPORT );
 
     # squid already transparent
-	$squid_transparent_proxy = ($config['installedpackages']['squid']['config'][0]['transparent_proxy'] == 'on');
-	if (($proxymode === 'transparent') && $squid_transparent_proxy) {
-		$proxymode = 'standard';
-		log_error("Havp: Squid is already configured as transparent proxy. Use 'Standard' proxy mode.");
-	}
+    $squid_transparent_proxy = ($config['installedpackages']['squid']['config'][0]['transparent_proxy'] == 'on');
+    if (($proxymode === 'transparent') && $squid_transparent_proxy) {
+        $proxymode = 'standard';
+        log_error("Havp: Squid is already configured as transparent proxy. Use 'Standard' proxy mode.");
+    }
 
     # nat
-    if ($type === 'nat') {
-		$rules[] = "# havp proxy ifaces redirect";
-  	    foreach($ifaces as $iface) {
+    if ($type == 'nat') {
+        $rules[] = "";
+        $rules[] = "# havp proxy ifaces redirect";
+        foreach($ifaces as $iface) {
             switch($proxymode) {
-        	    case 'transparent':
+                case 'transparent':
                     # rdr any http => localhost:port
                     $rules[] = "rdr on $iface proto tcp from any to !($iface) port 80 -> $proxybindiface port $proxyport";
-        	    case 'standard':
-    	        case 'squid':
+                case 'standard':
+                case 'squid':
                     # rdr iface:port => localhost:port
                     $rules[] = "rdr on $iface proto tcp from any to ($iface) port $proxyport -> $proxybindiface port $proxyport";
-            		break;
-        	    # no more rdr
-            	case 'internal':
-        	    default: break;
+                    break;
+                    # no more rdr
+                case 'internal':
+                    default: break;
             }
         }
+        $rules[] = "";
     }
+
     # filter
-    else {
-		$rules[] = "# havp proxy ifaces rules";
-  	    foreach($ifaces as $iface) {
+    if ($type == 'filter' || $type == 'rule') {
+        $rules[] = "";
+        $rules[] = "# havp proxy ifaces rules";
+        foreach($ifaces as $iface) {
             switch($proxymode) {
-        	    case 'transparent':
+                case 'transparent':
                     # pass http on iface
                     $rules[] = "pass in quick on $iface proto tcp from any to !($iface) port 80 flags S/SA keep state";
                     break;
                 # no more rules
-        	    case 'standard':
-    	        case 'squid':
-            	case 'internal':
-        	    default: break;
+                case 'standard':
+                case 'squid':
+                case 'internal':
+                    default: break;
             }
         }
+        $rules[] = "";
     }
 
-	return implode("\n", $rules);
+    if ($type == 'pfearly') {
+
+    }
+
+    if ($type == 'pflate') {
+
+    }
+
+    # test
+    # file_put_contents("/tmp/havp_".$type, "state: $proxymode\n" . implode("\n", $rules));
+
+    return implode("\n", $rules);
 }
 # ------------------------------------------------------------------------------
 function havp_filter_update_3()
 {
+    # for 1.x only
+    if (pfsense_version_() != '1') return;
+
 	$rules_file = '/tmp/rules.debug';
     if (file_exists($rules_file)) {
         $newrules = array();
@@ -1168,7 +1220,7 @@ function havp_update_AV()
         file_put_contents(HVDEF_AVUPD_SCRIPT, havp_AVupdate_script());
         havp_set_file_access(HVDEF_AVUPD_SCRIPT, HVDEF_AVUSER, '0755');
     }
-    mwexec(HVDEF_AVUPD_SCRIPT);
+    mwexec_bg(HVDEF_AVUPD_SCRIPT); # run update background
 }
 # ==============================================================================
 # Scripts
@@ -1194,7 +1246,7 @@ EOD;
 # HAVP service startup script
 function havp_startup_script()
 {
-	global $havp_config;
+    global $havp_config;
     $pid = HVDEF_PID_FILE;
 
     # rc script
@@ -1223,18 +1275,18 @@ function havp_startup_script()
     $rc['stop'] = implode("\n", $s);
     unset($s);
 
-	write_rcfile($rc);
+    write_rcfile($rc);
 }
 # ------------------------------------------------------------------------------
 # clamd service startup script
 function hv_clamd_startup_script()
 {
-	global $havp_config;
+    global $havp_config;
     $pid = HVDEF_CLAM_PID;
 
     # rc script
     $rc = array();
-   	$rc['file'] = basename(HVDEF_CLAM_STARTUP_SCRIPT);
+    $rc['file'] = basename(HVDEF_CLAM_STARTUP_SCRIPT);
 
     $s[] = "# start";
     $s[] = "\tif [ -z \"`ps auxw | grep \"[c]lamd -c\"|awk '{print $2}'`\" ];then";
@@ -1264,7 +1316,7 @@ return <<<EOD
 #!/usr/local/bin/php -f
 <?php
 # havp filter hook
-if (/*is_package_installed('havp') &&*/ file_exists('/usr/local/pkg/havp.inc')) {
+if (file_exists('/usr/local/pkg/havp.inc')) {
 	require_once('havp.inc');
 	havp_filter_update_3();
 }
@@ -1278,9 +1330,9 @@ EOD;
 # ==============================================================================
 function mountRAMdisk($free_and_mount = true)
 {
-	global $havp_config;
-	$mnt_point = HVDEF_RAMTEMP_DIR;
-	$mnt_flag_file = "$mnt_point/.mnt";
+    global $havp_config;
+    $mnt_point = HVDEF_RAMTEMP_DIR;
+    $mnt_flag_file = "$mnt_point/.mnt";
 
     # RAM Disk disabled
     if (HV_USE_TMPRAMDISK !== 'true') {
@@ -1349,6 +1401,21 @@ function VMWare_detect()
 
     return (strpos($fc, "<VMware Virtual") !== false);
 }
+
+function pfsense_version_()
+{
+    $ver = '1';
+
+    if (file_exists('/etc/version')) {
+        $s = file_get_contents('/etc/version');
+        $s = str_replace('-', '.', $s); # '2.0-Beta' > '2.0.Beta'
+        $s = explode(".", $s);
+        $ver = $s ? $s[0] : '1';
+    }
+
+    return intval($ver);
+}
+
 # ------------------------------------------------------------------------------
 function start_antivirus_scanner($filename)
 {
@@ -1439,10 +1506,61 @@ function havp_fscan_html()
 Press button for start antivirus scanner now. After 5-10 minutes look log file '{$clamscan_log}'.<br>
 (Diagnostics: Execute Shell command: <b>'cat {$clamscan_log}'</b>)
 EOD;
+
+}
+
+/* Future - in next time */
+# blacklist, dns, down, error, invalid, maxsize, request, scanner, virus
+function havp_html_notification_page($type, $title, $notify, $message)
+{
+    $class = '';
+    switch($type) {
+        case 'blacklist': $class = 'notify-warn';     break;
+        case 'dns':       $class = 'notify-standart'; break;
+        case 'down':      $class = 'notify-standart'; break;
+        case 'error':     $class = 'notify-standart'; break;
+        case 'invalid':   $class = 'notify-standart'; break;
+        case 'maxsize':   $class = 'notify-warn';     break;
+        case 'request':   $class = 'notify-standart'; break;
+        case 'scanner':   $class = 'notify-warn';     break;
+        case 'virus':     $class = 'notify-danger';   break;
+   }
+
+    return <<<EOD
+<html>
+ <head>
+  <meta http-equiv="content-type" content="text/html; ">
+  <style type="text/css">
+   <!--
+    .havp_scheme			{width: 100%; border: 0px; color: black; vertical-align: bottom; text-align: center; font-family: arial,helvetica; padding-bottom: 3%}
+    .havp_scheme.header 		{font-size: 10pt; font-weight: bold; background-color: #FFFFFF; color: #446699;}
+    .havp_scheme.notify		{font-size: 14pt; font-weight: bold; background-color: #E9E9E9; color: #446699;}
+    .havp_scheme.notify-standart	{font-size: 14pt; font-weight: bold; background-color: #E9E9E9; color: #446699;}
+    .havp_scheme.notify-strong  	{font-size: 14pt; font-weight: bold; background-color: #E9E9E9; color: #446699;}
+    .havp_scheme.notify-danger  	{font-size: 14pt; font-weight: bold; background-color: #FFEFEF; color: #FF6666;}
+    .havp_scheme.notify-warn    	{font-size: 14pt; font-weight: bold; background-color: #FFEFDF; color: #FF9966;}
+    .havp_scheme.message  		{font-size: 10pt; background-color: #FFFFFF; color: #000066;}
+    .havp_scheme.footer		{font-size: 10pt; background-color: #DDDDDD; color: #000066;}
+   -->
+  </style
+  <title>HTTP AntiVirus Proxy: $type</title>
+ </head>
+ <body>
+  <table class='havp_scheme' cellpadding='2' cellspacing='0' align='center'>
+   <tr class='header'><td>$title<br>HTTP AntiVirus Proxy: $type</td></tr>
+   <tr class='$class'><td>$notify</td></tr>
+   <tr class='message'><td>$message<br><!--message--></td></tr>
+   <tr class='footer' ><td>Powered by havp.</td></tr>
+  </table>
+ </body>
+</html>
+EOD;
+
 }
 
 # ------------------------------------------------------------------------------
 # Fix
+# ------------------------------------------------------------------------------
 function havp_fix()
 {
 /*
@@ -1459,4 +1577,5 @@ function havp_fix()
     }
 */
 }
+
 ?>

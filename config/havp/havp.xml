@@ -5,22 +5,18 @@
         <category>Status</category>
         <version>0.88_03</version>
         <include_file>/usr/local/pkg/havp.inc</include_file>
-
-        <!-- Installation -->
         <menu>
                 <name>Antivirus</name>
                 <tooltiptext>Antivirus service</tooltiptext>
                 <section>Services</section>
                 <url>/pkg_edit.php?xml=havp.xml&amp;id=0</url>
         </menu>
-
         <service>
 		<name>havp</name>
 		<rcfile>havp.sh</rcfile>
 		<executable>havp</executable>
 		<description>Antivirus HTTP proxy Service</description>
         </service>
-
         <additional_files_needed>
                <item>http://www.pfsense.com/packages/config/havp/havp.inc</item>
                <prefix>/usr/local/pkg/</prefix>
@@ -36,7 +32,6 @@
                <prefix>/usr/local/pkg/</prefix>
                <chmod>0755</chmod>
         </additional_files_needed>
-
         <tabs>
                 <tab>
                         <text>HTTP proxy</text>
@@ -52,7 +47,6 @@
                         <url>/pkg_edit.php?xml=havp_avset.xml&amp;id=0</url>
                 </tab>
         </tabs>
-
         <fields>
                 <field>
                         <fielddescr>Enable</fielddescr>
@@ -79,7 +73,6 @@
                                  <option><value>internal</value><name>Internal</name></option>
                         </options>
                 </field>
-
                 <field>
                         <fielddescr>Proxy interface(s)</fielddescr>
                         <fieldname>proxyinterface</fieldname>
@@ -163,7 +156,6 @@
                         </description>
                         <type>checkbox</type>
                 </field>
-
                 <field>
                         <fielddescr>Whitelist</fielddescr>
                         <fieldname>whitelist</fieldname>
@@ -176,7 +168,6 @@
                         <rows>5</rows>
                         <encoding>base64</encoding>
                 </field>
-
                 <field>
                         <fielddescr>Blacklist</fielddescr>
                         <fieldname>blacklist</fieldname>
@@ -186,14 +177,12 @@
                         <rows>5</rows>
                         <encoding>base64</encoding>
                 </field>
-<!-- Scanner -->
                 <field>
                         <fielddescr>Block file if error scanning</fielddescr>
                         <fieldname>failscanerror</fieldname>
                         <description>If set, the proxy will block the files on which an error scanning.</description>
                         <type>checkbox</type>
                 </field>
-
                 <field>
                         <fielddescr>Enable RAM Disk</fielddescr>
                         <fieldname>enableramdisk</fieldname>
@@ -281,7 +270,6 @@
                         <type>checkbox</type>
                 </field>
         </fields>
-
         <custom_php_command_before_form>
             havp_before_form(&amp;$pkg);
         </custom_php_command_before_form>

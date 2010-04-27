@@ -5,7 +5,6 @@
         <category>Status</category>
         <version>none</version>
         <include_file>/usr/local/pkg/havp.inc</include_file>
-
         <tabs>
                 <tab>
                         <text>HTTP Proxy</text>
@@ -21,7 +20,6 @@
                         <url>/pkg_edit.php?xml=havp_avset.xml&amp;id=0</url>
                 </tab>
         </tabs>
-
         <fields>
                 <field>
                         <fielddescr>Scan file path</fielddescr>
@@ -32,31 +30,7 @@
                         <type>input</type>
                         <size>90</size>
                 </field>
-<!--
-                <field>
-                        <fielddescr>Files scan task</fielddescr>
-                        <fieldname>havpavupdate</fieldname>
-                        <description>
-                                &lt;input name='submit' type='submit' value='Update_AV'&gt;
-                                Press button for update AV database now.
-                        </description>
-                        <type>select</type>
-                        <value>hv_none</value>
-                        <options>
-                                <option><name>none</name><value>hv_none</value></option>
-                                <option><name>every 1  hours</name><value>hv_01h</value></option>
-                                <option><name>every 2  hours</name><value>hv_02h</value></option>
-                                <option><name>every 3  hours</name><value>hv_03h</value></option>
-                                <option><name>every 4  hours</name><value>hv_04h</value></option>
-                                <option><name>every 6  hours</name><value>hv_06h</value></option>
-                                <option><name>every 8  hours</name><value>hv_08h</value></option>
-                                <option><name>every 12 hours</name><value>hv_12h</value></option>
-                                <option><name>every 24 hours</name><value>hv_24h</value></option>
-                        </options>
-                </field>
--->
         </fields>
-
         <custom_php_command_before_form>
             havp_fscan_before_form(&amp;$pkg);
         </custom_php_command_before_form>
