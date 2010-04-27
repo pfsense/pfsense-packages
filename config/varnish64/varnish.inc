@@ -113,7 +113,8 @@ EOF;
 						$urlmappings .= "else ";
 					$urlmappings = <<<EOAU
 if (req.http.host == "{$urlmapping['url']}") {
-	set req.backend = {$urlmapping['backend']};
+	set req.backend = "{$urlmapping['backend']}";
+	set req.http.host = "{$urlmapping['url']}";
 } 
 EOAU;
 					$isfirst = false;

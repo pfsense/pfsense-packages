@@ -64,7 +64,7 @@
 		<field>
 			<fielddescr>Storage type</fielddescr>
 			<fieldname>storagetype</fieldname>
-			<description>The SMTP version banner that is reported upon initial connection.</description>
+			<description>Select which storage type you would like to use.</description>
 			<type>select</type>
 			<options>
 				<option><name>Memory</name><value>malloc</value></option>
