@@ -232,12 +232,12 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
                 	else
                         	openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
 
-        		exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$g['tmp_path']}/{$prefix}-config.zip {$prefix}");
-
-        		// Remove temporary directory
-        		exec("rm -rf {$tempdir}");
-			return "{$prefix}-config.zip";
         	}
+		exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$g['tmp_path']}/{$prefix}-config.zip {$prefix}");
+
+		// Remove temporary directory
+		exec("rm -rf {$tempdir}");
+		return "{$prefix}-config.zip";
 	}  else
 		return $conf;
 }
