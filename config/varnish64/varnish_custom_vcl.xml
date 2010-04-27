@@ -74,6 +74,22 @@
 	</tabs>
 	<fields>
 		<field>
+			<fielddescr>vcl_recv_early</fielddescr>
+			<fieldname>vcl_recv_early</fieldname>
+			<description>Paste your custom  <![CDATA[<a target=_new href='http://varnish-cache.org/wiki/VCL'>vcl_recv</a>]]> code here.  This code will be included at the beginning of the vcl_recv function.</description>
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>10</rows>
+		</field>
+		<field>
+			<fielddescr>vcl_recv_late</fielddescr>
+			<fieldname>vcl_recv_late</fieldname>
+			<description>Paste your custom  <![CDATA[<a target=_new href='http://varnish-cache.org/wiki/VCL'>vcl_recv</a>]]> code here.  This code will be included at the end of the vcl_recv function.</description>
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>10</rows>
+		</field>
+		<field>
 			<fielddescr>vcl_fetch_early</fielddescr>
 			<fieldname>vcl_fetch_early</fieldname>
 			<description>Paste your custom  <![CDATA[<a target=_new href='http://varnish-cache.org/wiki/VCL'>vcl_fetch</a>]]> code here.  This code will be included at the beginning of the vcl_fetch function.</description>

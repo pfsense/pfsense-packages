@@ -35,6 +35,10 @@ function sync_package_varnish() {
 	global $config, $g;
 	if($config['installedpackages']['varnishcustomvcl']['config'] != "") {
 		foreach($config['installedpackages']['varnishcustomvcl']['config'] as $vcl) {
+			if($vcl['vcl_recv_early']) 
+				$vcl_recv_early = $vcl['vcl_recv_early'];
+			if($vcl['vcl_recv_late']) 
+				$vcl_recv_late = $vcl['vcl_recv_late'];
 			if($vcl['vcl_fetch_early']) 
 				$vcl_fetch_early = $vcl['vcl_fetch_early'];
 			if($vcl['vcl_fetch_late']) 
@@ -139,16 +143,18 @@ EOAU;
    			foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
 				if($config['installedpackages']['varnishbackends']['config'])
     				foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
-						foreach($urlmapping['row'] as $url)
-						if(!$isfirst) 
-							$urlmappings .= "else ";
-						$urlmappings .= <<<EOAU
+						if($urlmapping['row'])
+							foreach($urlmapping['row'] as $url) {
+								if(!$isfirst) 
+									$urlmappings .= "else ";
+								$urlmappings .= <<<EOAU
 if (req.http.host == "{$url['urlmapping']}") {
 		set req.backend = {$urlmapping['backendname']};
 		set req.http.host = "{$urlmapping['urlmapping']}";
 	} 
 EOAU;
-				$isfirst = false;
+						$isfirst = false;
+					}
 				}
 			}
 
@@ -246,7 +252,7 @@ sub vcl_error {
 {$backends}
 
 sub vcl_recv {
-	{$vcl_recv_custom_early}
+	{$vcl_recv_early}
 	# If the client sent an X-Forwarded-For header, remove it. 
 	# It cannot betrusted.
 	unset req.http.X-Forwarded-For;
@@ -270,7 +276,7 @@ sub vcl_recv {
 		}
 	}
 	{$urlmappings}
-	{$vcl_recv_custom_late}
+	{$vcl_recv_late}
 	if (req.request != "GET" && req.request != "HEAD") {
 		return(pipe);
 	}
