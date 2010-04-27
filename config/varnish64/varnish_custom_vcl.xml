@@ -48,7 +48,7 @@
 	<tabs>
 		<tab>
 			<text>Backends</text>
-			<url>/pkg.php?xml=backends.xml</url>
+			<url>/pkg.php?xml=varnish_backends.xml</url>
 		</tab>
 		<tab>
 			<text>Settings</text>

@@ -6,7 +6,7 @@
         <![CDATA[
 /* ========================================================================== */
 /*
-    backends.xml
+    varnish_backends.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich
     All rights reserved.                                                      
@@ -42,7 +42,7 @@
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>varnishbackends</name>
 	<version>0.0.1</version>
-	<title>Varnish: Whitelist</title>
+	<title>Varnish: Backends</title>
    	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
@@ -62,12 +62,12 @@
 		<name>Varnish </name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
-		<configfile>backends.xml</configfile>
+		<configfile>varnish_backends.xml</configfile>
 	</menu>
 	<tabs>
 		<tab>
 			<text>Varnish Backends</text>
-			<url>/pkg.php?xml=backends.xml</url>
+			<url>/pkg.php?xml=varnish_backends.xml</url>
 			<active/>
 		</tab>
 		<tab>
