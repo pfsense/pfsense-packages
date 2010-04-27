@@ -60,8 +60,8 @@
 	    <item>http://www.pfsense.com/packages/config/varnish64/varnish.inc</item>
 	</additional_files_needed>
 	<menu>
-		<name>Varnish </name>
-		<tooltiptext></tooltiptext>
+		<name>Varnish</name>
+		<tooltiptext>Varnish</tooltiptext>
 		<section>Services</section>
 		<configfile>varnish_backends.xml</configfile>
 	</menu>
