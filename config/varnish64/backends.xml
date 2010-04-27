@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* ========================================================================== */
+/*
+    backends.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2010 Scott Ullrich
+    All rights reserved.                                                      
+*/
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>varnishbackends</name>
+	<version>0.0.1</version>
+	<title>Varnish: Whitelist</title>
+	<menu>
+		<name>Varnish </name>
+		<tooltiptext></tooltiptext>
+		<section>Services</section>
+		<configfile>backends.xml</configfile>
+	</menu>
+	<tabs>
+		<tab>
+			<text>Varnish Backends</text>
+			<url>/pkg.php?xml=backends.xml</url>
+			<active/>
+		</tab>
+	</tabs>
+	<configpath>['installedpackages']['varnish']['config']</configpath>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>IPAddress</fielddescr>
+			<fieldname>ipaddress</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Name</fielddescr>
+			<fieldname>backendname</fieldname>
+		</columnitem>		
+	</adddeleteeditpagefields>
+	<fields>
+		<field>
+			<fielddescr>IPAddress</fielddescr>
+			<fieldname>ipaddress</fieldname>
+			<description>Enter the IP Address of the backend web server.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Backend name</fielddescr>
+			<fieldname>backendname</fieldname>
+			<description>Enter the name of this backend web server.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Port</fielddescr>
+			<fieldname>port</fieldname>
+			<description>Enter the TCP/IP port of the webserver.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>First byte timeout</fielddescr>
+			<fieldname>first_byte_timeout</fieldname>
+			<description> time to wait for the first byte from the backend and .between_bytes_timeout for time to wait between each received byte.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Connect timeout</fielddescr>
+			<fieldname>connect_timeout</fieldname>
+			<description>The time to wait for a backend connection.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>none</fielddescr>
+			<fieldname>none</fieldname>
+		    <type>rowhelper</type>
+		    <rowhelper>
+				<rowhelperfield>
+				    <fielddescr>URL</fielddescr>
+				    <fieldname>urlmapping</fieldname>
+				    <description>Enter the URL that will be mapped to this backend.</description>
+				    <type>input</type>
+				</rowhelperfield>
+			</rowhelper>
+		</field>
+	</fields>
+	<custom_php_command_before_form>
+	</custom_php_command_before_form>
+	<custom_delete_php_command>
+		sync_package_varnish();
+	</custom_delete_php_command>	
+	<custom_php_resync_config_command>
+		sync_package_varnish();
+	</custom_php_resync_config_command>
+</packagegui>

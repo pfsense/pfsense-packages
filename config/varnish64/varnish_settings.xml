@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* ========================================================================== */
+/*
+    varnish_settings.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>varnishsettings</name>
+	<version>0.0.1</version>
+	<title>Varnish Settings</title>
+	<aftersaveredirect>pkg_edit.php?xml=varnish_settings.xml&amp;id=0</aftersaveredirect>
+	<include_file>/usr/local/pkg/varnish.inc</include_file>
+	<menu>
+		<name>Varnish</name>
+		<section>Services</section>
+		<configfile>backends.xml</configfile>
+	</menu>
+	<service>
+		<name>varnish</name>
+		<rcfile>varnish.sh</rcfile>
+	</service>
+	<tabs>
+		<tab>
+			<text>Backends</text>
+			<url>/pkg.php?xml=backends.xml</url>
+		</tab>
+	</tabs>
+	<configpath>['installedpackages']['varnish']['config']</configpath>
+	<fields>
+		<field>
+			<fielddescr>Storage type</fielddescr>
+			<fieldname>storagetype</fieldname>
+			<description>The SMTP version banner that is reported upon initial connection.</description>
+			<type>select</type>
+			<options>
+				<option><name>Memory</name><value>malloc</value></option>
+				<option><name>Disk</name><value>ondisk</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Cache storage size in megabytes</fielddescr>
+			<fieldname>storagesize</fieldname>
+			<description>Enter the size of the varnish cache in megabytes.  HINT: 1024 == 1 Gigabyte</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Listening port</fielddescr>
+			<fieldname>listeningport</fieldname>
+			<description>Enter the port you would like varnish to listen on.  Defaults to 80.</description>
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_php_validation_command>
+	</custom_php_validation_command>	
+	<custom_php_resync_config_command>
+		sync_package_varnish();
+	</custom_php_resync_config_command>
+</packagegui>
