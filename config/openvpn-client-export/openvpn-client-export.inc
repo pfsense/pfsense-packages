@@ -329,7 +329,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 		$keyfile = "{$tempdir}/config/{$prefix}-{$user['name']}.key";
 		file_put_contents($keyfile, base64_decode($cert['prv']));
                	// convert to pkcs12 format
-               	$p12file = "{$tempdir}/{$prefix}.p12";
+               	$p12file = "{$tempdir}/config/{$prefix}.p12";
                	if ($usetoken)
                        	openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
                	else
