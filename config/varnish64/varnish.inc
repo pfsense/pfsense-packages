@@ -197,7 +197,7 @@ EOFA;
 			if($backend['row'])
 				foreach($backend['row'] as $be) {
 					if($be['weight']) 
-						$weight = "\t\t\t.weight = {$be['weight']};\n"
+						$weight = "\t\t\t.weight = {$be['weight']};\n";
 					else 
 						$weight = "";
 					$director .=  "\t{\n\t\t.backend = {$be['backendname']};\n{$weight}\t}";
