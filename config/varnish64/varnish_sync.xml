@@ -106,7 +106,7 @@
 			<type>listtopic</type>
 			<name>Sync host #2</name>
 			<fieldname>temp</fieldname>
-		</field>		
+		</field>
 		<field>
 			<fielddescr>IP Address 2</fielddescr>
 			<fieldname>ipaddress2</fieldname>
@@ -137,6 +137,11 @@
 			<type>password</type>
 		</field>
 		<field>
+			<type>listtopic</type>
+			<name>Sync host #4</name>
+			<fieldname>temp</fieldname>
+		</field>
+		<field>
 			<fielddescr>IP Address 4</fielddescr>
 			<fieldname>ipaddress4</fieldname>
 			<description>OPTIONAL. The IP address of the third host that Varnish will Sync its Varnish configuration data to.</description>
@@ -149,6 +154,11 @@
 			<type>password</type>
 		</field>
 		<field>
+			<type>listtopic</type>
+			<name>Sync host #5</name>
+			<fieldname>temp</fieldname>
+		</field>
+		<field>
 			<fielddescr>IP Address 5</fielddescr>
 			<fieldname>ipaddress5</fieldname>
 			<description>OPTIONAL. The IP address of the third host that Varnish will Sync its Varnish configuration data to.</description>
@@ -159,6 +169,11 @@
 			<fieldname>password5</fieldname>
 			<description>Admin password of the third host that Varnish will Sync its Varnish configuration data to.</description>
 			<type>password</type>
+		</field>
+		<field>
+			<type>listtopic</type>
+			<name>Sync host #6</name>
+			<fieldname>temp</fieldname>
 		</field>
 		<field>
 			<fielddescr>IP Address 6</fielddescr>
