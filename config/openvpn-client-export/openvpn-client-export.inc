@@ -145,7 +145,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 		$server_host = $useaddr;
 
 	$server_port = $settings['local_port'];
-	$proto = ($settings['protocol'] == 'UDP' ? 'udp' : "tcp-client");
+	$proto = (strtoupper($settings['protocol']) == 'UDP' ? 'udp' : "tcp-client");
 
 	$cipher = $settings['crypto'];
 
@@ -184,15 +184,16 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 
 	// add key settings
 	$prefix = openvpn_client_export_prefix($srvid);
+	$cafile = "{$prefix}-ca.crt";
 	if($nokeys == false) {
 		if ($usetoken) {
-			$conf .= "ca {$prefix}-ca.crt\n";
+			$conf .= "ca {$cafile}\n";
 			$conf .= "cryptoapicert \"SUBJ:{$user['name']}\"\n";
 		} else {
 			$conf .= "pkcs12 {$prefix}.p12\n";
 		}
 	} else if ($settings['mode'] == "server_user")
-		$conf .= "ca {$prefix}-ca.crt\n";
+		$conf .= "ca {$cafile}\n";
 
 	if ($settings['tls'])
 		$conf .= "tls-auth {$prefix}-tls.key 1\n";
@@ -210,7 +211,8 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 
 		file_put_contents("{$tempdir}/{$prefix}.ovpn", $conf);
 
-        	file_put_contents("{$tempdir}/{$prefix}-ca.crt", base64_decode($server_ca['crt']));
+		$cafile  = "{$tempdir}/{$cafile}";
+        	file_put_contents("{$cafile}", base64_decode($server_ca['crt']));
         	if ($settings['tls']) {
                 	$tlsfile = "{$tempdir}/{$prefix}-tls.key";
                 	file_put_contents($tlsfile, base64_decode($settings['tls']));
