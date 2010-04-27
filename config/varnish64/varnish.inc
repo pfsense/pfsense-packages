@@ -54,7 +54,19 @@ function sync_package_varnish() {
 			if($vs['listeningport'])
 				$listeningport = "-a :{$vs['listeningport']}";
 			else 
-				$listeningport = "-a :80";	
+				$listeningport = "-a :80";
+			if($vs['minworkers'])
+				$minworkers = "{$vs['minworkers']}";
+			else 
+				$minworkers = "200";
+			if($vs['maxworkers'])
+				$maxworkers = "{$vs['maxworkers']}";
+			else 
+				$maxworkers = "4000";
+			if($vs['timeoutworkers'])
+				$timeoutworkers = "{$vs['timeoutworkers']}";
+			else 
+				$timeoutworkers = "50";				
 		}
 		$fd = fopen("/usr/local/etc/rc.d/varnish.sh", "w");
 		$rc_file = <<<EOF
@@ -67,7 +79,7 @@ sleep 1
 	{$listeningport} \
 	-f /var/etc/default.vcl \
 	{$storage_type} \
-	-w 200,4000,50
+	-w {$minworkers},{$maxworkers},{$timeoutworkers}
 
 EOF;
 		fwrite($fd, $rc_file);

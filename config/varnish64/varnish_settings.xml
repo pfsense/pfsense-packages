@@ -91,6 +91,24 @@
 			<description>Enter the port you would like varnish to listen on.  Defaults to 80.</description>
 			<type>input</type>
 		</field>
+		<field>
+			<fielddescr>Minimum worker threads</fielddescr>
+			<fieldname>minworkers</fieldname>
+			<description>Enter the minimum number of varnish worker threads.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Maximum worker threads</fielddescr>
+			<fieldname>maxworkers</fieldname>
+			<description>Enter the maximum number of varnish worker threads.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Worker thread timeout</fielddescr>
+			<fieldname>timeoutworkers</fieldname>
+			<description>Enter the timeout time for the worker threads.</description>
+			<type>input</type>
+		</field>
 	</fields>
 	<custom_php_validation_command>
 	</custom_php_validation_command>	
