@@ -139,6 +139,7 @@
 				    <fieldname>urlmapping</fieldname>
 				    <description>Enter the URL that will be mapped to this backend.</description>
 				    <type>input</type>
+					<size>30</size>
 				</rowhelperfield>
 			</rowhelper>
 		</field>
