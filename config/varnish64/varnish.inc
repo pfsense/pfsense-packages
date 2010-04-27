@@ -32,6 +32,7 @@
 /* ========================================================================== */
 
 function sync_package_varnish() {
+	global $config, $g;
 	if($config['installedpackages']['varnishcustomvcl']['config'] != "") {
 		foreach($config['installedpackages']['varnishcustomvcl']['config'] as $vcl) {
 			if($vcl['vcl_fetch_early']) 
@@ -103,23 +104,57 @@ deliver;
 EOF;
 
 	$backends = "";
+	$urlmappings = "";
+
+	if($config['installedpackages']['varnishlbdirectors']['config'] != "") {
+    	foreach($config['installedpackages']['varnishlbdirectors']['config'] as $backend) {
+			$director = "";
+			if($backend['row'])
+				foreach($backend['row'] as $be) 
+					$director .=  "\t{\n\t\t.backend = {$be['backendname']};\n\t}";
+			$backends .= <<<EOFA
+director {$backend['directorname']} {$backend['directortype']} {
+{$director}
+}
+
+
+EOFA;
+		}
+	}
+
+	
 	if($config['installedpackages']['varnishbackends']['config'] != "") {
     	foreach($config['installedpackages']['varnishbackends']['config'] as $backend) {
-			$urlmappings = "";
 			$isfirst = true;
-			if($config['installedpackages']['varnishurlmappings']['config'] != "") {
-    			foreach($config['installedpackages']['varnishurlmappings']['config'] as $urlmapping) {
+			if($config['installedpackages']['varnish_lb_directors']['config'] != "") {
+    			foreach($config['installedpackages']['varnish_lb_directors']['config']['row'] as $urlmapping) {
 					if(!$isfirst) 
 						$urlmappings .= "else ";
-					$urlmappings = <<<EOAU
-if (req.http.host == "{$urlmapping['url']}") {
-	set req.backend = "{$urlmapping['backend']}";
+					$urlmappings .= <<<EOAU
+if (req.http.host == "{$urlmapping['urlmapping']}") {
+	set req.backend = "{$backend['backend']}";
+	set req.http.host = "{$urlmapping['urlmapping']}";
+}
+ 
+EOAU;
+				}
+			}
+			if($config['installedpackages']['varnishbackends']['config'])
+   				foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
+					if($config['installedpackages']['varnishbackends']['config']['row'])
+    					foreach($config['installedpackages']['varnishbackends']['config']['row'] as $urlmapping) {
+							if(!$isfirst) 
+								$urlmappings .= "else ";
+							$urlmappings .= <<<EOAU
+if (req.http.host == "{$urlmapping['urlmapping']}") {
+	set req.backend = "{$backend['backend']}";
 	set req.http.host = "{$urlmapping['url']}";
 } 
 EOAU;
-					$isfirst = false;
+				$isfirst = false;
 				}
 			}
+
 			if($backend['connect_timeout'])
 				$connect_timeout = $backend['connect_timeout'] . "s";
 			else 
@@ -136,13 +171,24 @@ EOAU;
 backend {$backend['backendname']} {
 	.host = "{$backend['ipaddress']}";
 	.port = "{$backend['port']}";
-	.first_byte_timeout = "{$first_btye_timeout}";
+	.first_byte_timeout = "{$first_byte_timeout}";
 	.connect_timeout = "{$connect_timeout}";
 }
 
 EOFA;
 		}
 	}
+	
+if($vcl_fetch_early or $vcl_fetch_late) {
+	$vcl_fetch = <<<FETCH
+sub vcl_fetch {
+	{$vcl_fetch_early}
+	{$vcl_fetch_late}
+	return(deliver);
+}
+
+FETCH;
+}
 
 $varnish_config_file = <<<EOF
 # Varnish configuration file
@@ -198,11 +244,7 @@ sub vcl_pipe {
 	{$vcl_pipe_late}
 }
 
-sub vcl_fetch {
-	{$vcl_fetch_early}
-	{$vcl_fetch_late}
-	return(deliver);
-}
+{$vcl_fetch}
 
 EOF;
 
