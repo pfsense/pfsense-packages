@@ -78,6 +78,12 @@
 	</tabs>
 	<fields>
 		<field>
+			<fielddescr>StorageTypeLT</fielddescr>
+			<fieldname>StorageTypeLT</fieldname>
+			<type>listtopic</type>
+			<name>Storage type</name>
+		</field>
+		<field>
 			<fielddescr>Storage type</fielddescr>
 			<fieldname>storagetype</fieldname>
 			<description>Select which storage type you would like to use.</description>
@@ -94,10 +100,22 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>ListeningPortLT</fielddescr>
+			<fieldname>ListeningPortLT</fieldname>
+			<type>listtopic</type>
+			<name>Listening port</name>
+		</field>
+		<field>
 			<fielddescr>Listening port</fielddescr>
 			<fieldname>listeningport</fieldname>
 			<description>Enter the port you would like varnish to listen on.  Defaults to 80.</description>
 			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>WorkerThreadLT</fielddescr>
+			<fieldname>WorkerThreadLT</fieldname>
+			<type>listtopic</type>
+			<name>Worker thread configuration</name>
 		</field>
 		<field>
 			<fielddescr>Minimum worker threads</fielddescr>

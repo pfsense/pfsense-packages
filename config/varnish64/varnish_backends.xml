@@ -128,7 +128,7 @@
 			<fieldname>BackendSettings</fieldname>
 			<type>listtopic</type>
 			<name>Backend settings</name>
-		</field>		
+		</field>
 		<field>
 			<fielddescr>Backend name</fielddescr>
 			<fieldname>backendname</fieldname>
