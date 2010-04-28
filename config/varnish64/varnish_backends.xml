@@ -124,6 +124,12 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
+			<fielddescr>BackendSettings</fielddescr>
+			<fieldname>BackendSettings</fieldname>
+			<type>listtopic</type>
+			<name>Backend settings</name>
+		</field>		
+		<field>
 			<fielddescr>Backend name</fielddescr>
 			<fieldname>backendname</fieldname>
 			<description>Enter the name of this backend web server.</description>
@@ -144,6 +150,12 @@
 			<validate>^[0-9]+$</validate>
 		</field>
 		<field>
+			<fielddescr>PerformanceMetrics</fielddescr>
+			<fieldname>PerformanceMetrics</fieldname>
+			<type>listtopic</type>
+			<name>Performance metrics</name>
+		</field>		
+		<field>
 			<fielddescr>First byte timeout</fielddescr>
 			<fieldname>first_byte_timeout</fieldname>
 			<description> time to wait for the first byte from the backend and .between_bytes_timeout for time to wait between each received byte.</description>
@@ -155,6 +167,12 @@
 			<description>The time to wait for a backend connection.</description>
 			<type>input</type>
 		</field>
+		<field>
+			<fielddescr>ProbeInfo</fielddescr>
+			<fieldname>ProbeInfo</fieldname>
+			<type>listtopic</type>
+			<name>Probe settings</name>
+		</field>		
 		<field>
 			<fielddescr>Probe URL</fielddescr>
 			<fieldname>probe_interval</fieldname>
