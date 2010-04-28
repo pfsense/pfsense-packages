@@ -86,7 +86,7 @@ function varnish_start() {
 
 /* Return true if a backend is in use */
 function is_varnish_backend_in_use($backendname) {
-	global $g, $config;
+	global $config, $g;
 	if($config['installedpackages']['varnishlbdirectors']['config'] != "") 
 		foreach($config['installedpackages']['varnishlbdirectors']['config'] as $url) 
 			foreach($url['row'] as $urlmapping) 
@@ -144,7 +144,7 @@ EOAU;
 }
 
 function create_varnish_rcd_file() {
-	global $g, $config;
+	global $config, $g;
 	if($config['installedpackages']['varnishsettings']['config'] != "") {
 		foreach($config['installedpackages']['varnishsettings']['config'] as $vs) {
 			if($vs['storagetype'] == "malloc")
@@ -416,7 +416,7 @@ EOF;
 
 /* Uses XMLRPC to synchronize the changes to a remote node */
 function varnish_sync_on_changes() {
-	global $g, $config;
+	global $config, $g;
 	log_error("[varnish] varnish_xmlrpc_sync.php is starting.");
 	$synconchanges = $config['installedpackages']['varnishsync']['config'][0]['synconchanges'];	
 	if(!$synconchanges) 
