@@ -31,6 +31,18 @@
                                                                               */
 /* ========================================================================== */
 
+function varnish_install() {
+		create_varnish_rcd_file();
+}
+
+function varnish_deinstall() {
+		create_varnish_rcd_file();
+}
+
+function varnish_start() {
+	mwexec("/usr/local/etc/rc.d/varnish.sh");
+}
+
 /* Return true if a backend is in use */
 function is_varnish_backend_in_use($backendname) {
 	global $g, $config;
@@ -75,7 +87,7 @@ EOAU;
 						$urlmappings .= "else ";
 					$urlmappings .= <<<EOAU
 if (req.http.host == "{$url['urlmapping']}") {
-		set req.backend = {$urlmapping['backendname']};
+		set req.backend = {$urlmapping['backendname']}BACKEND;
 		set req.http.host = "{$urlmapping['urlmapping']}";
 	} 
 EOAU;
@@ -119,6 +131,16 @@ mkdir -p /var/varnish
 rm /var/varnish/storage.bin 2>/dev/null
 killall varnishd 2>/dev/null
 sleep 1
+/usr/bin/env \
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
+/usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDOFF
+<?php
+	require_once("globals.inc");		
+	require_once("functions.inc");
+	require_once("varnish.inc");
+	sync_package_varnish();
+?>
+ENDOFF
 /usr/local/sbin/varnishd \
 	{$listeningport} \
 	-f /var/etc/default.vcl \
@@ -133,6 +155,7 @@ EOF;
 
 function get_backend_config_txt() {
 	global $config, $g;
+	$backends_used = array();
 	if($config['installedpackages']['varnishbackends']['config'] != "") {
     	foreach($config['installedpackages']['varnishbackends']['config'] as $backend) {
 			if($backend['connect_timeout'])
@@ -168,8 +191,9 @@ function get_backend_config_txt() {
 			else 
 				$probe_threshold = "5";
 			if(is_varnish_backend_in_use($backend['backendname'])) 
-				$backends .= <<<EOFA
-backend {$backend['backendname']} {
+				if(!in_array($backend['backendname'], $backends_used))
+					$backends .= <<<EOFA
+backend {$backend['backendname']}BACKEND {
 	.host = "{$backend['ipaddress']}";
 	.port = "{$backend['port']}";
 	.first_byte_timeout = {$first_byte_timeout};
@@ -183,7 +207,9 @@ backend {$backend['backendname']} {
 	}
 }
 
+
 EOFA;
+			$backends_used[] = $backend['backendname'];
 		}
 	}
 	return $backends;
@@ -200,7 +226,7 @@ function get_lb_directors_config_txt() {
 						$weight = "\t\t\t.weight = {$be['weight']};\n";
 					else 
 						$weight = "";
-					$director .=  "\t{\n\t\t.backend = {$be['backendname']};\n{$weight}\t}";
+					$director .=  "\t{\n\t\t.backend = {$be['backendname']}BACKEND;\n{$weight}\t}";
 				}
 			$backends .= <<<EOFA
 director {$backend['directorname']} {$backend['directortype']} {
@@ -232,8 +258,6 @@ function sync_package_varnish() {
 				$vcl_pipe_late = $vcl['vcl_pipe_late'];
 		}
 	}
-
-	create_varnish_rcd_file();	
 
 	if(!$errorvcl) 
 		$errorvcl = <<<EOF
@@ -341,7 +365,6 @@ EOF;
 		$fd = fopen("/var/etc/default.vcl", "w");
 		fwrite($fd, $varnish_config_file);
 		fclose($fd);
-		exec("/usr/local/etc/rc.d/varnish.sh");
 
 		varnish_sync_on_changes();
 }
@@ -371,8 +394,6 @@ function varnish_sync_on_changes() {
 		if($password && $sync_to_ip)
 			varnish_do_xmlrpc_sync($sync_to_ip, $password);
 	}
-	varnish_create_zone_file();
-	varnish_setup_ping_items();
 	log_error("[varnish] varnish_xmlrpc_sync.php is ending.");
 }
 
