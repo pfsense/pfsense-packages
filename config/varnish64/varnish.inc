@@ -51,44 +51,36 @@ function is_varnish_backend_in_use($backendname) {
 function varnish_get_url_mappings_txt() {
 	global $g, $config, $urlmappings;
 	$backends = "";
-	
-	if($config['installedpackages']['varnishbackends']['config'] != "") {
-    	foreach($config['installedpackages']['varnishbackends']['config'] as $backend) {
-			$isfirst = true;
-			if($config['installedpackages']['varnishlbdirectors']['config'] != "") {
-    			foreach($config['installedpackages']['varnishlbdirectors']['config'] as $url) {
-					foreach($url['row'] as $urlmapping) 
-						if(!$isfirst) 
-							$urlmappings .= "else ";
-						$urlmappings .= <<<EOAU
+	$isfirst = true;
+	if($config['installedpackages']['varnishlbdirectors']['config'] != "") {
+  		foreach($config['installedpackages']['varnishlbdirectors']['config'] as $url) {
+			if(!$isfirst) 
+				$urlmappings .= "else ";
+			$urlmappings .= <<<EOAU
 if (req.http.host == "{$url['directorurl']}") {
 		set req.backend = {$url['directorname']};
 		set req.http.host = "{$url['directorurl']}";
 	} 
 EOAU;
-						$isfirst = false;
-					
-				}
-			}
+			$isfirst = false;
 		}
 	}
-	foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
-		if($config['installedpackages']['varnishbackends']['config'])
-	 		foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
-				if($urlmapping['row'])
-					foreach($urlmapping['row'] as $url) {
-						if(!$isfirst) 
-							$urlmappings .= "else ";
-						$urlmappings .= <<<EOAU
+	if($config['installedpackages']['varnishbackends']['config'])	 		
+		foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
+			if($urlmapping['row'])
+				foreach($urlmapping['row'] as $url) {
+					if(!$isfirst) 
+						$urlmappings .= "else ";
+					$urlmappings .= <<<EOAU
 if (req.http.host == "{$url['urlmapping']}") {
 		set req.backend = {$urlmapping['backendname']};
 		set req.http.host = "{$urlmapping['urlmapping']}";
 	} 
 EOAU;
-				$isfirst = false;
-			}
+					$isfirst = false;
 		}
 	}
+	
 	return $urlmappings;
 }
 
