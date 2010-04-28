@@ -91,7 +91,7 @@ if ($_POST['clear']) {
 	$tab_array[] = array(gettext("Custom VCL"), false, "/pkg_edit.php?xml=varnish_custom_vcl.xml&id=0");
 	$tab_array[] = array(gettext("LB Directors"), false, "/pkg.php?xml=varnish_lb_directors.xml");
 	$tab_array[] = array(gettext("XMLRPC Sync"), false, "/pkg_edit.php?xml=varnish_sync.xml&id=0");
-	$tab_array[] = array(gettext("View Configuration"), false, "/varnish_view-config.php");
+	$tab_array[] = array(gettext("View Configuration"), false, "/varnish_view_config.php");
 	$tab_array[] = array(gettext("VarnishSTAT"), true, "/varnishstat.php");
 	display_top_tabs($tab_array);
 ?>
