@@ -31,6 +31,19 @@
                                                                               */
 /* ========================================================================== */
 
+function varnish_settings_post_validate($post, $input_errors) {
+	if($post['storagesize'] && !is_int($post['storagesize'])) 
+		$input_errors[] = "A valid number is required for the field 'Storage type'";	
+	if($post['listeningport'] && !is_int($post['listeningport'])) 
+		$input_errors[] = "A valid number is required for the field 'Listening port'";	
+	if($post['minworkers'] && !is_int($post['minworkers'])) 
+		$input_errors[] = "A valid number is required for the field 'Minimum worker threads'";	
+	if($post['maxworkers'] && !is_int($post['maxworkers'])) 
+		$input_errors[] = "A valid number is required for the field 'Maximum worker threads'";	
+	if($post['timeoutworkers'] && !is_int($post['timeoutworkers'])) 
+		$input_errors[] = "A valid number is required for the field 'Worker thread timeout'";
+}
+
 function varnish_lb_directors_post_validate($post, $input_errors) {
 	if (preg_match("/[^a-zA-Z0-9]/", $post['directorname']))
 		$input_errors[] = "The directorname name must only contain the characters a-Z or 0-9";

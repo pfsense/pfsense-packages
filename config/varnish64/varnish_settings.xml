@@ -120,4 +120,7 @@
 		sync_package_varnish();
 		varnish_start();
 	</custom_php_resync_config_command>
+	<custom_php_validation_command>
+		varnish_settings_post_validate($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
 </packagegui>
