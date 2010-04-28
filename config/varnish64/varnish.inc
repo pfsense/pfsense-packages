@@ -129,7 +129,7 @@ EOAU;
 					$urlmappings .= <<<EOAU
 if (req.http.host == "{$url['urlmapping']}") {
 		set req.backend = {$urlmapping['backendname']}BACKEND;
-		set req.http.host = "{$urlmapping['urlmapping']}";
+		set req.http.host = "{$url['urlmapping']}";
 	} 
 EOAU;
 					$isfirst = false;
@@ -421,7 +421,7 @@ function varnish_sync_on_changes() {
 	$previous_ip = "";
 	$x=0;
 	$sh = $config['installedpackages']['varnishsync']['config'][0];
-	for($x=1; $x<5; $x++) {
+	for($x=1; $x<isset($sh[$x]); $x++) {
 		if($x > 1) 
 			$counter = $x;
 		else 

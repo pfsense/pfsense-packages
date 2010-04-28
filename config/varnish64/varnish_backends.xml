@@ -171,8 +171,8 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>none</fielddescr>
-			<fieldname>none</fieldname>
+			<fielddescr>Map URLs</fielddescr>
+			<fieldname>MapURLs</fieldname>
 		    <type>rowhelper</type>
 		    <rowhelper>
 				<rowhelperfield>
