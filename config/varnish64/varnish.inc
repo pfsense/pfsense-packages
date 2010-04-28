@@ -31,12 +31,33 @@
                                                                               */
 /* ========================================================================== */
 
+function varnish_backends_post_validate($post, $input_errors) {
+ 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $post['backendname']))
+		$input_errors[] = "The backend name must only contain the characters a-Z or 0-9";
+	if(!is_ipaddr($post['ipaddress'])) 
+		$input_errors[] = "A valid IP address is required for the field 'IPAddress'";
+	if($post['first_byte_timeout'] && !is_int($post['first_byte_timeout'])) 
+		$input_errors[] = "A valid number is required for the field 'first byte timeout'";
+	if($post['connect_timeout'] && !is_int($post['connect_timeout'])) 
+		$input_errors[] = "A valid number is required for the field 'connect timeout'";
+	if($post['probe_interval'] && !is_int($post['probe_interval'])) 
+		$input_errors[] = "A valid number is required for the field 'probe interval'";
+	if($post['probe_interval'] && !is_int($post['probe_interval'])) 
+		$input_errors[] = "A valid number is required for the field 'probe interval'";
+	if($post['probe_timeout'] && !is_int($post['probe_timeout'])) 
+		$input_errors[] = "A valid number is required for the field 'probe timeout'";
+	if($post['probe_window'] && !is_int($post['probe_window'])) 
+		$input_errors[] = "A valid number is required for the field 'probe window'";
+	if($post['probe_threshold'] && !is_int($post['probe_threshold'])) 
+		$input_errors[] = "A valid number is required for the field 'probe threshold'";
+}
+
 function varnish_install() {
-		create_varnish_rcd_file();
+	create_varnish_rcd_file();
 }
 
 function varnish_deinstall() {
-		create_varnish_rcd_file();
+	create_varnish_rcd_file();
 }
 
 function varnish_start() {

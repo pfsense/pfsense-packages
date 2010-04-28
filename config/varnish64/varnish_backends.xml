@@ -109,15 +109,16 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<fielddescr>IPAddress</fielddescr>
-			<fieldname>ipaddress</fieldname>
-			<description>Enter the IP Address of the backend web server.</description>
-			<type>input</type>
-		</field>
-		<field>
 			<fielddescr>Backend name</fielddescr>
 			<fieldname>backendname</fieldname>
 			<description>Enter the name of this backend web server.</description>
+			<type>input</type>
+			<validate>^[a-z0-9.|-]+$</validate>
+		</field>
+		<field>
+			<fielddescr>IPAddress</fielddescr>
+			<fieldname>ipaddress</fieldname>
+			<description>Enter the IP Address of the backend web server.</description>
 			<type>input</type>
 		</field>
 		<field>
@@ -125,6 +126,7 @@
 			<fieldname>port</fieldname>
 			<description>Enter the TCP/IP port of the webserver.</description>
 			<type>input</type>
+			<validate>^[0-9]+$</validate>
 		</field>
 		<field>
 			<fielddescr>First byte timeout</fielddescr>
@@ -140,7 +142,7 @@
 		</field>
 		<field>
 			<fielddescr>Probe URL</fielddescr>
-			<fieldname>probe_url</fieldname>
+			<fieldname>probe_interval</fieldname>
 			<description>Enter the URL that varnish will use to ensure that this backend is healthy.</description>
 			<type>input</type>
 		</field>
@@ -196,4 +198,7 @@
 		sync_package_varnish();
 		varnish_start();
 	</custom_php_resync_config_command>
+	<custom_php_validation_command>
+		varnish_backends_post_validate($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
 </packagegui>
