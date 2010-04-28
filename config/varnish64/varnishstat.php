@@ -43,14 +43,6 @@ if(strstr($pfSversion, "1.2"))
 $pgtitle = "VarnishSTAT: View Logs";
 include("head.inc");
 
-/* NEED TO FIX there are 2 logs /etc/varnishstat/log/main/current and /etc/dnscache/log/main/current */
-
-/* NEED TO FIX */
-if ($_POST['clear']) {
-//	exec("rm /etc/varnishstat/log/main/current");
-//	exec("touch /etc/varnishstat/log/main/current");
-}
-
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
@@ -81,7 +73,8 @@ if ($_POST['clear']) {
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <div id="mainlevel">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tr><td>
 <?php
 	$tab_array = array();
 	$tab_array[] = array(gettext("Backends"), false, "/pkg.php?xml=varnish_backends.xml");
@@ -93,25 +86,26 @@ if ($_POST['clear']) {
 	$tab_array[] = array(gettext("VarnishSTAT"), true, "/varnishstat.php");
 	display_top_tabs($tab_array);
 ?>
-</table>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
-   <tr>
-     <td class="tabcont" >
-      <form action="varnishstat_view_logs.php" method="post">
-		<br>
-			<div id="varnishstatlogs">
-				<pre>One moment please, loading VarnishSTAT logs...</pre>
-			</div>
-     </td>
-    </tr>
-</table>
-<td align="left" valign="top">
-	<form id="filterform" name="filterform" action="varnishstat_view_logs.php" method="post" style="margin-top: 14px;">
-	<p/>
-	<input id="submit" name="clear" type="submit" class="formbtn" value="<?=gettext("Clear log");?>" />
-	</form>
-</td>
+		</td></tr>
+ 		<tr>
+    		<td>
+				<div id="mainarea">
+					<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+						<tr>
+     						<td class="tabcont" >
+      							<form action="varnishstat_view_logs.php" method="post">
+								<div id="varnishstatlogs">
+									<pre>One moment please, loading VarnishSTAT...</pre>
+								</div>
+     						</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+	</table>
 </div>
+</form>
 <?php include("fend.inc"); ?>
 </body>
 </html>

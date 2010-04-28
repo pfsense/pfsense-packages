@@ -46,8 +46,11 @@ include("head.inc");
 
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
+<form action="varnishstat_view_config.php" method="post">
+	
 <div id="mainlevel">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tr><td>
 <?php
 	$tab_array = array();
 	$tab_array[] = array(gettext("Backends"), false, "/pkg.php?xml=varnish_backends.xml");
@@ -59,21 +62,28 @@ include("head.inc");
 	$tab_array[] = array(gettext("VarnishSTAT"), false, "/varnishstat.php");
 	display_top_tabs($tab_array);
 ?>
-</table>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
-   <tr>
-     <td class="tabcont" >
-      <form action="varnish_view_config.php" method="post">
-<textarea id="varnishlogs" rows="50" cols="100%">
+		</td></tr>
+ 		<tr>
+    		<td>
+				<div id="mainarea">
+					<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+						<tr>
+     						<td class="tabcont" >
+									<textarea id="varnishlogs" rows="50" cols="100%">
 <?php 
 	$config_file = file_get_contents("/var/etc/default.vcl");
 	echo $config_file;
 ?>
-</textarea>
-     </td>
-    </tr>
-</table>
+									</textarea>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</td>
+		</tr>
+	</table>
 </div>
+</form>
 <?php include("fend.inc"); ?>
 </body>
 </html>
