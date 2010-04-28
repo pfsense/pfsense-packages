@@ -1,5 +1,4 @@
 <?php
-/* $Id$ */
 /*
 	varnish_view_config.php
 	part of pfSense (http://www.pfsense.com/)
