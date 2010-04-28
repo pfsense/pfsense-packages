@@ -31,8 +31,15 @@
                                                                               */
 /* ========================================================================== */
 
+function varnish_lb_directors_post_validate($post, $input_errors) {
+	if (preg_match("/[^a-zA-Z0-9]/", $post['directorname']))
+		$input_errors[] = "The directorname name must only contain the characters a-Z or 0-9";
+	if(stristr($post['directorurl'], 'http'))
+		$input_errors[] = "You do not need to include the http:// string in the director URL";
+}
+
 function varnish_backends_post_validate($post, $input_errors) {
- 	if (preg_match("/[^a-zA-Z0-9\.\-_]/", $post['backendname']))
+ 	if (preg_match("/[^a-zA-Z0-9]/", $post['backendname']))
 		$input_errors[] = "The backend name must only contain the characters a-Z or 0-9";
 	if(!is_ipaddr($post['ipaddress'])) 
 		$input_errors[] = "A valid IP address is required for the field 'IPAddress'";
