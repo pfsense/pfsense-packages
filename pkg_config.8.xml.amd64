@@ -8,7 +8,7 @@
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>http://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
 		<category>Services</category>
-		<version>0.6</version>
+		<version>0.7</version>
 		<status>ALPHA</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
