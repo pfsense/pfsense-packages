@@ -137,6 +137,7 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['whitelistname'] = $a_nat[$id]['whitelistname'];
 	$pconfig['homelistname'] = $a_nat[$id]['homelistname'];
 	$pconfig['externallistname'] = $a_nat[$id]['externallistname'];
+	$pconfig['suppresslistname'] = $a_nat[$id]['suppresslistname'];
 	$pconfig['snortalertlogtype'] = $a_nat[$id]['snortalertlogtype'];
 	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
 	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
@@ -238,7 +239,8 @@ if ($_POST["Submit"]) {
 		if ($_POST['blockoffenders7'] == "on") { $natent['blockoffenders7'] = on; }else{ $natent['blockoffenders7'] = off; } if ($_POST['enable'] == "") { $natent['blockoffenders7'] = $pconfig['blockoffenders7']; }
 		$natent['whitelistname'] = $_POST['whitelistname'] ? $_POST['whitelistname'] : $pconfig['whitelistname'];
 		$natent['homelistname'] = $_POST['homelistname'] ? $_POST['homelistname'] : $pconfig['homelistname'];
-		$natent['externallistname'] = $_POST['externallistname'] ? $_POST['externallistname'] : $pconfig['externallistname'];	
+		$natent['externallistname'] = $_POST['externallistname'] ? $_POST['externallistname'] : $pconfig['externallistname'];
+		$natent['suppresslistname'] = $_POST['suppresslistname'] ? $_POST['suppresslistname'] : $pconfig['suppresslistname'];
 		$natent['snortalertlogtype'] = $_POST['snortalertlogtype'] ? $_POST['snortalertlogtype'] : $pconfig['snortalertlogtype'];
 		if ($_POST['alertsystemlog'] == "on") { $natent['alertsystemlog'] = on; }else{ $natent['alertsystemlog'] = off; } if ($_POST['enable'] == "") { $natent['alertsystemlog'] = $pconfig['alertsystemlog']; }
 		if ($_POST['tcpdumplog'] == "on") { $natent['tcpdumplog'] = on; }else{ $natent['tcpdumplog'] = off; } if ($_POST['enable'] == "") { $natent['tcpdumplog'] = $pconfig['tcpdumplog']; }
@@ -396,6 +398,11 @@ border-top:2px solid #DBAC48;
 border-bottom:2px solid #DBAC48;
 padding: 15px 10px 85% 50px;
 }
+
+.formpre {
+font-family: Tahoma,Verdana,Arial,Helvetica,sans-serif;
+font-size: 1.1em;
+}
 </style> 
 <noscript><div class="alert" ALIGN=CENTER><img src="/themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</strong></div></noscript>
 <script language="JavaScript">
@@ -419,6 +426,10 @@ echo "
 	document.iform.performance.disabled = endis;
 	document.iform.blockoffenders7.disabled = endis;
 	document.iform.alertsystemlog.disabled = endis;
+	document.iform.whitelistname.disabled = endis;
+	document.iform.externallistname.disabled = endis;
+	document.iform.homelistname.disabled = endis;
+	document.iform.suppresslistname.disabled = endis;
 	document.iform.tcpdumplog.disabled = endis;
 	document.iform.snortunifiedlog.disabled = endis;
 	document.iform.configpassthru.disabled = endis;
@@ -515,9 +526,12 @@ if ($a_nat[$id]['interface'] != '') {
 				<tr>
 				<td class="tabcont">
 				<table width="100%" border="0" cellpadding="6" cellspacing="0">
+                <tr>
+                  <td colspan="2" valign="top" class="listtopic">General Settings</td>
+                </tr>
 				<tr>
-				<td width="22%" valign="top" class="vtable">&nbsp;</td>
-				<td width="78%" class="vtable">
+				<td width="22%" valign="top" class="vncellreq">Interface</td>
+				<td width="22%" valign="top" class="vtable">&nbsp;
 					<?php
 					// <input name="enable" type="checkbox" value="yes" checked onClick="enable_change(false)">
 					// care with spaces
@@ -528,8 +542,9 @@ if ($a_nat[$id]['interface'] != '') {
 					
 					echo "
 					<input name=\"enable\" type=\"checkbox\" value=\"on\" $checked $onclick_enable
-					<strong>Enable Interface</strong></td>\n\n";
+					&nbsp;&nbsp;Enable or Disable</td>\n\n";
 					?>
+				</td>
 				</tr>
 				<tr>
                   <td width="22%" valign="top" class="vncellreq">Interface</td>
@@ -570,6 +585,9 @@ if ($a_nat[$id]['interface'] != '') {
 					<span class="vexpl">Lowmem and ac-bnfa are recommended for low end systems, Ac: high memory, best performance, ac-std: moderate memory,high performance, acs: small memory, moderateperformance, ac-banded: small memory,moderate performance, ac-sparsebands: small memory, high performance.<br>
 					</span></td>
 				</tr>
+                <tr>
+                  <td colspan="2" valign="top" class="listtopic">Choose the networks snort should inspect and whitelist.</td>
+                </tr>
 				<tr>
 				<td width="22%" valign="top" class="vncell">Home net</td>
 				<td width="78%" class="vtable">
@@ -605,7 +623,7 @@ if ($a_nat[$id]['interface'] != '') {
 				<tr>
 				<td width="22%" valign="top" class="vncell">External net</td>
 				<td width="78%" class="vtable">
-				<select name="externallistname" class="formfld" id="externallistname">		
+				<select name="externallistname" class="formfld" id="externallistname">
 						<?php
 						/* find whitelist names and filter by type */
 						$exlist_select = $config['installedpackages']['snortglobal']['whitelist']['item'];										
@@ -671,6 +689,40 @@ if ($a_nat[$id]['interface'] != '') {
 				<span class="vexpl">Choose the whitelist you will like this rule to use.
 				</span>&nbsp;<span class="red">Note:</span>&nbsp;Default whitelist adds only local networks.</td>
 				</tr>
+				
+				<tr>
+				<td width="22%" valign="top" class="vncell">Suppression and filtering</td>
+				<td width="78%" class="vtable">
+				<select name="suppresslistname" class="formfld" id="suppresslistname">		
+						<?php
+						/* find whitelist names and filter by type, make sure to track by uuid */
+						$slist_select = $config['installedpackages']['snortglobal']['suppress']['item'];										
+						$sid = -1;
+						if ($pconfig['suppresslistname'] == 'default'){ $selected  = 'selected'; }
+							preg_match('/^([a-zA-z0-9]+)/', $pconfig['suppresslistname'], $slist_sub);
+							echo "<option value=\"default\" $selected>default</option>
+							";
+							foreach ($slist_select as $value):
+							$sid += 1;
+								$ilistname = $config['installedpackages']['snortglobal']['suppress']['item'][$sid]['name'];
+								$suppress_uuid = $config['installedpackages']['snortglobal']['suppress']['item'][$sid]['uuid'];
+									if ($ilistname == $slist_sub[0]){
+										echo "<option value=\"$ilistname $suppress_uuid\" selected>";
+									}else{
+										echo "<option value=\"$ilistname $suppress_uuid\">";
+									}
+								echo htmlspecialchars($ilistname) . '</option>
+								';
+							endforeach;			
+						?>							
+				</select><br>
+				<span class="vexpl">Choose the suppression or filtering file you will like this rule to use.
+				</span>&nbsp;<span class="red">Note:</span>&nbsp;Default option disables suppression and filtering.</td>
+				</tr>
+				
+                <tr>
+                  <td colspan="2" valign="top" class="listtopic">Choose the types of logs snort should create.</td>
+                </tr>
 				<tr>
 				<td width="22%" valign="top" class="vncell">Send alerts to main System logs</td>
 				<td width="78%" class="vtable">
@@ -689,12 +741,14 @@ if ($a_nat[$id]['interface'] != '') {
 					<input name="snortunifiedlog" type="checkbox" value="on" <?php if ($pconfig['snortunifiedlog'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					Snort will log Alerts to a file in the UNIFIED2 format. This is a requirement for barnyard2.</td>
 				</tr>
+                <tr>
+                  <td colspan="2" valign="top" class="listtopic">Arguments here will be automatically inserted into the snort configuration.</td>
+                </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Advanced configuration pass through</td>
                   <td width="78%" class="vtable"> 
-                    <textarea name="configpassthru" cols="100" rows="7" id="configpassthru" class="formpre"><?=htmlspecialchars($pconfig['configpassthru']);?></textarea>
-                    <br> 
-                    Arguments here will be automatically inserted into the running snort configuration.</td>
+                    <textarea wrap="off" name="configpassthru" cols="75" rows="12" id="configpassthru" class="formpre2"><?=htmlspecialchars($pconfig['configpassthru']);?></textarea>
+                    </td>
                 </tr>
                 <tr>
                   <td width="22%" valign="top"></td>

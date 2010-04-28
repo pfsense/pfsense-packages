@@ -107,6 +107,7 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['whitelistname'] = $a_nat[$id]['whitelistname'];
 	$pconfig['homelistname'] = $a_nat[$id]['homelistname'];
 	$pconfig['externallistname'] = $a_nat[$id]['externallistname'];
+	$pconfig['suppresslistname'] = $a_nat[$id]['suppresslistname'];
 	$pconfig['performance'] = $a_nat[$id]['performance'];
 	$pconfig['blockoffenders7'] = $a_nat[$id]['blockoffenders7'];
 	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
@@ -208,6 +209,7 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 	if ($pconfig['whitelistname'] != "") { $natent['whitelistname'] = $pconfig['whitelistname']; }
 	if ($pconfig['homelistname'] != "") { $natent['homelistname'] = $pconfig['homelistname']; }
 	if ($pconfig['externallistname'] != "") { $natent['externallistname'] = $pconfig['externallistname']; }
+	if ($pconfig['suppresslistname'] != "") { $natent['suppresslistname'] = $pconfig['suppresslistname']; }
 	
 
 		/* post new options */

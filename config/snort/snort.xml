@@ -184,6 +184,16 @@
 		<item>http://www.pfsense.com/packages/config/snort/snort_interfaces_whitelist_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
+		<prefix>/usr/local/www/snort/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/snort_interfaces_suppress.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/snort/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/snort/snort_interfaces_suppress_edit.phpp</item>
+	</additional_files_needed>
+	<additional_files_needed>
 		<prefix>/usr/local/etc/rc.d/</prefix>
 		<chmod>755</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort.sh</item>

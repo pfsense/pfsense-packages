@@ -35,7 +35,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
+require_once("guiconfig.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
+require_once("/usr/local/pkg/snort/snort_gui.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item']))
 	$config['installedpackages']['snortglobal']['whitelist']['item'] = array();
@@ -101,7 +103,23 @@ if (isset($id) && $a_whitelist[$id]) {
 		$addresssubnettest = false;	
 }
 
-if ($_POST) {
+	/* this will exec when alert says apply */
+	if ($_POST['apply']) {
+		
+		if (file_exists("$d_snort_whitelist_dirty_path")) {
+			
+			write_config();
+			
+			sync_snort_package_config();
+			sync_snort_package();
+
+			unlink("$d_snort_whitelist_dirty_path");
+			
+		}
+		
+	}
+
+if ($_POST['submit']) {
 
 	unset($input_errors);
 	$pconfig = $_POST;
@@ -219,17 +237,6 @@ if ($_POST) {
 
 include("head.inc");
 
-
-
-
-$description_str = gettext("Description");
-$hosts_str = gettext("IP or CIDR items");
-$ip_str = gettext("IP");
-
-$update_freq_str = gettext("Update Freq.");
-
-
-
 ?>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC" onload="<?= $jsevents["body"]["onload"] ?>">
@@ -238,7 +245,7 @@ $update_freq_str = gettext("Update Freq.");
 	echo $jscriptstr;
 ?>
 
-<script type="text/javascript" src="../row_helper.js"></script>
+<script type="text/javascript" src="/snort/javascript/row_helper.js"></script>
 <input type='hidden' name='address_type' value='textbox' />
 <script type="text/javascript">
 	rowname[0] = "address";
@@ -257,6 +264,31 @@ $update_freq_str = gettext("Update Freq.");
 
 <form action="snort_interfaces_whitelist_edit.php?id=<?=$id?>" method="post" name="iform" id="iform">
 
+<?php
+	/* Display Alert message */
+	if ($input_errors) {
+	print_input_errors($input_errors); // TODO: add checks
+	}
+
+	if ($savemsg) {
+	print_info_box2($savemsg);
+	}
+
+	//if (file_exists($d_snortconfdirty_path)) {
+	if (file_exists($d_snort_whitelist_dirty_path)) {
+	echo '<p>';
+
+		if($savemsg) {
+			print_info_box_np2("{$savemsg}");
+		}else{
+			print_info_box_np2('
+			The Snort configuration has changed and snort needs to be restarted on this interface.<br>
+			You must apply the changes in order for them to take effect.<br>
+			');
+		}
+	}
+?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td class="tabnavtbl">
 <?php
@@ -267,6 +299,7 @@ $update_freq_str = gettext("Update Freq.");
 	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
     $tab_array[] = array("Blocked", false, "/snort/snort_blocked.php");
 	$tab_array[] = array("Whitelists", true, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[] = array("Suppress", false, "/snort/snort_interfaces_suppress.php");
 	$tab_array[] = array("Help", false, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 ?>    </td></tr>
@@ -275,6 +308,9 @@ $update_freq_str = gettext("Update Freq.");
 
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 <?php if(is_alias_inuse($pconfig['name']) == true): ?>
+  <tr>
+      <td colspan="2" valign="top" class="listtopic">Add the name and description of the file.</td>
+  </tr>
   <tr>
     <td valign="top" class="vncellreq">Name</td>
     <td class="vtable"> <input name="name" type="hidden" id="name" size="40" value="<?=htmlspecialchars($pconfig['name']);?>" />
@@ -285,6 +321,9 @@ $update_freq_str = gettext("Update Freq.");
     </td>
   </tr>
 <?php else: ?>
+  <tr>
+      <td colspan="2" valign="top" class="listtopic">Add the name and description of the file.</td>
+  </tr>
   <tr>
     <td valign="top" class="vncellreq">Name</td>
     <td class="vtable">
@@ -321,6 +360,9 @@ $update_freq_str = gettext("Update Freq.");
 		<span class="vexpl">Choose the type of list you will like see in your Interface Edit Tab.&nbsp;Hint: Best pratice is to test every list you make.
 		</span>&nbsp;<span class="red">Note:</span>&nbsp;NETLIST's are only for defining snort.conf's external or home NETS.</td>
 	</tr>
+    <tr>
+        <td colspan="2" valign="top" class="listtopic">Add auto generated ips.</td>
+   </tr>
   <tr>
     <td width="22%" valign="top" class="vncell">WAN IPs</td>
     <td width="78%" class="vtable">
@@ -365,6 +407,9 @@ $update_freq_str = gettext("Update Freq.");
         Add VPN Addresses to the list.
       </span>
     </td>
+  </tr>
+  <tr>
+     <td colspan="2" valign="top" class="listtopic">Add your own custom ips.</td>
   </tr>
   <tr>
     <td width="22%" valign="top" class="vncellreq"><div id="addressnetworkport">IP or CIDR items</div></td>
@@ -413,9 +458,8 @@ $update_freq_str = gettext("Update Freq.");
         } // end foreach
       ?>
         </tbody>
-		  </table>
-			<a onclick="javascript:addRowTo('maintable'); typesel_change(); return false;" href="#">
-        <img border="0" src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" alt="" title="add another entry" />
+		</table>
+		<a onclick="javascript:addRowTo('maintable'); return false;" href="#"><img border="0" src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" alt="" title="add another entry" />
       </a>
 		</td>
   </tr>

@@ -241,7 +241,7 @@ if ($_GET['act'] == 'toggle' && $_GET['id'] != '')
 
 
 
-$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.22";
+$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.21";
 include("head.inc");
 
 ?>
@@ -329,6 +329,7 @@ padding: 15px 10px 50% 50px;
 	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
     $tab_array[] = array("Blocked", false, "/snort/snort_blocked.php");
 	$tab_array[] = array("Whitelists", false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[] = array("Suppress", false, "/snort/snort_interfaces_suppress.php");
 	$tab_array[] = array("Help", false, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 ?>

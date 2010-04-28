@@ -38,19 +38,19 @@
 require("guiconfig.inc");
 
 
-if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item']))
-	$config['installedpackages']['snortglobal']['whitelist']['item'] = array();
+if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
+	$config['installedpackages']['snortglobal']['suppress']['item'] = array();
 
 //aliases_sort(); << what ?
-$a_whitelist = &$config['installedpackages']['snortglobal']['whitelist']['item'];
+$a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
 
-if (isset($config['installedpackages']['snortglobal']['whitelist']['item'])) {
-$id_gen = count($config['installedpackages']['snortglobal']['whitelist']['item']);
+if (isset($config['installedpackages']['snortglobal']['suppress']['item'])) {
+$id_gen = count($config['installedpackages']['snortglobal']['suppress']['item']);
 }else{
 $id_gen = '0';
 }
 
-$d_whitelistdirty_path = '/var/run/snort_whitelist.dirty';
+$d_suppresslistdirty_path = '/var/run/snort_suppress.dirty';
 
 if ($_POST) {
 
@@ -64,26 +64,26 @@ if ($_POST) {
 		else
 		    $savemsg = $retval;
 		if ($retval == 0) {
-			if (file_exists($d_whitelistdirty_path))
-				unlink($d_whitelistdirty_path);
+			if (file_exists($d_suppresslistdirty_path))
+				unlink($d_suppresslistdirty_path);
 		}
 	}
 }
 
 if ($_GET['act'] == "del") {
-	if ($a_whitelist[$_GET['id']]) {
+	if ($a_suppress[$_GET['id']]) {
 		/* make sure rule is not being referenced by any nat or filter rules */
 
-			unset($a_whitelist[$_GET['id']]);
+			unset($a_suppress[$_GET['id']]);
 			write_config();
 			filter_configure();
-			touch($d_whitelistdirty_path);
-			header("Location: /snort/snort_interfaces_whitelist.php");
+			touch($d_suppresslistdirty_path);
+			header("Location: /snort/snort_interfaces_suppress.php");
 			exit;
 	}
 }
 
-$pgtitle = "Services: Snort: Whitelist";
+$pgtitle = "Services: Snort: Suppression";
 include("head.inc");
 
 ?>
@@ -91,9 +91,9 @@ include("head.inc");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("./snort_fbegin.inc"); ?>
 <p class="pgtitle"><?=$pgtitle?></p>
-<form action="/snort/snort_interfaces_whitelist.php" method="post">
+<form action="/snort/snort_interfaces_suppress.php" method="post">
 <?php if ($savemsg) print_info_box($savemsg); ?>
-<?php if (file_exists($d_whitelistdirty_path)): ?><p>
+<?php if (file_exists($d_suppresslistdirty_path)): ?><p>
 <?php print_info_box_np("The white list has been changed.<br>You must apply the changes in order for them to take effect.");?>
 <?php endif; ?>
 
@@ -106,8 +106,8 @@ include("head.inc");
 	$tab_array[] = array("Rule Updates", false, "/snort/snort_download_rules.php");
 	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
     $tab_array[] = array("Blocked", false, "/snort/snort_blocked.php");
-	$tab_array[] = array("Whitelists", true, "/snort/snort_interfaces_whitelist.php");
-	$tab_array[] = array("Suppress", false, "/snort/snort_interfaces_suppress.php");
+	$tab_array[] = array("Whitelists", false, "/snort/snort_interfaces_whitelist.php");
+	$tab_array[] = array("Suppress", true, "/snort/snort_interfaces_suppress.php");
 	$tab_array[] = array("Help", false, "/snort/snort_help_info.php");
 	display_top_tabs($tab_array);
 ?>    </td></tr>
@@ -117,36 +117,26 @@ include("head.inc");
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 
 <tr>
-  <td width="20%" class="listhdrr">File Name</td>
-  <td width="40%" class="listhdrr">Values</td>
-  <td width="40%" class="listhdr">Description</td>
+  <td width="30%" class="listhdrr">File Name</td>
+  <td width="70%" class="listhdr">Description</td>
+
   <td width="10%" class="list">
   </td>
 </tr>
-	  <?php $i = 0; foreach ($a_whitelist as $list): ?>
+	  <?php $i = 0; foreach ($a_suppress as $list): ?>
 <tr>
-  <td class="listlr" ondblclick="document.location='snort_interfaces_whitelist_edit.php?id=<?=$i;?>';">
+  <td class="listlr" ondblclick="document.location='snort_interfaces_suppress_edit.php?id=<?=$i;?>';">
     <?=htmlspecialchars($list['name']);?>
   </td>
-  <td class="listr" ondblclick="document.location='snort_interfaces_whitelist_edit.php?id=<?=$i;?>';">
-      <?php
-	$addresses = implode(", ", array_slice(explode(" ", $list['address']), 0, 10));
-	echo $addresses;
-	if(count($addresses) < 10) {
-		echo " ";
-	} else {
-		echo "...";
-	}
-    ?>
-  </td>
-  <td class="listbg" ondblclick="document.location='snort_interfaces_whitelist_edit.php?id=<?=$i;?>';">
+  <td class="listbg" ondblclick="document.location='snort_interfaces_suppress_edit.php?id=<?=$i;?>';">
     <font color="#FFFFFF">
     <?=htmlspecialchars($list['descr']);?>&nbsp;
   </td>
+
   <td valign="middle" nowrap class="list">
     <table border="0" cellspacing="0" cellpadding="1">
       <tr>
-        <td valign="middle"><a href="snort_interfaces_whitelist_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" title="edit whitelist"></a></td>
+        <td valign="middle"><a href="snort_interfaces_suppress_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" title="edit whitelist"></a></td>
         <td><a href="/snort/snort_interfaces_whitelist.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this whitelist? All elements that still use it will become invalid (e.g. snort rules will fall back to the default whitelist)!')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="delete whitelist"></a></td>
       </tr>
     </table>
@@ -154,12 +144,12 @@ include("head.inc");
 </tr>
 	  <?php $i++; endforeach; ?>
 <tr>
-  <td class="list" colspan="3"></td>
+  <td class="list" colspan="2"></td>
   <td class="list">
     <table border="0" cellspacing="0" cellpadding="1">
       <tr>
 	<td valign="middle" width="17">&nbsp;</td>
-        <td valign="middle"><a href="snort_interfaces_whitelist_edit.php?id=<?php echo $id_gen;?> "><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="add a new list"></a></td>
+        <td valign="middle"><a href="snort_interfaces_suppress_edit.php?id=<?php echo $id_gen;?> "><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="add a new list"></a></td>
       </tr>
     </table>
   </td>
@@ -171,7 +161,7 @@ include("head.inc");
 <br>
 <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 <td width="100%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
-   <p><span class="vexpl">Here you can create whitelist files for your snort package rules.<br>Please add all the ips or networks you want to protect against snort block decisions.<br>Remember that the default whitelist only includes local networks.<br>Be careful, it is very easy to get locked out of you system.</span></p>
+   <p><span class="vexpl">Here you can create event filtering and suppression for your snort package rules.<br>Please note that you must restart a running rule so that changes can take effect.</span></p>
 </td>
 </table>
 </form>

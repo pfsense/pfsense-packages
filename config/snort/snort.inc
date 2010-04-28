@@ -48,7 +48,7 @@ if ($pfsense_ver_chk == '1.2.3-RELEASE')
 /* tell me my theme */
 $pfsense_theme_is = $config['theme'];
 
-/* func builds custom whitelests */
+/* func builds custom white lists */
 function find_whitelist_key($find_wlist_number) {
         global $config, $g;
 
@@ -59,6 +59,21 @@ function find_whitelist_key($find_wlist_number) {
 	$w_key += 1;
 		if ($config['installedpackages']['snortglobal']['whitelist']['item'][$w_key]['uuid'] == $find_wlist_number) {
 			return $w_key;
+		}
+	}
+}
+
+/* func builds custom suppress lists */
+function find_suppress_key($find_slist_number) {
+        global $config, $g;
+
+	$suppresslist_array = $config['installedpackages']['snortglobal']['suppress']['item'];
+	$s_key = -1;
+
+	foreach ($suppresslist_array as $value2) {
+	$s_key += 1;
+		if ($config['installedpackages']['snortglobal']['suppress']['item'][$s_key]['uuid'] == $find_slist_number) {
+			return $s_key;
 		}
 	}
 }
@@ -599,6 +614,7 @@ function snort_postinstall()
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/mootools.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/sortableTable.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/tabs.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/row_helper.js');
 	
 	/* install barnyard2 for 2.0 and 1.2.3 */
 	chdir ("/usr/local/bin/");
@@ -944,18 +960,13 @@ function sync_snort_package()
 	exec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort');
 	exec('/usr/sbin/chown snort:snort /tmp/snort*');
 	exec('/usr/sbin/chown snort:snort /var/db/whitelist');
-	exec('/bin/chmod 770 /usr/local/lib/snort');
-	exec('/bin/chmod 770 /var/log/snort');
-	exec('/bin/chmod 770 /var/log/snort/run');
-	exec('/bin/chmod 770 /var/log/snort/barnyard2');
-	exec('/bin/chmod 660 /var/log/snort/alert');
-	exec('/bin/chmod 660  /var/db/whitelist');
-	exec('/bin/chmod -R 660  /usr/local/etc/snort/*');
-	exec('/bin/chmod -R 660  /tmp/snort*');
-	exec('/bin/chmod -R 660  /var/run/snort*');
-	exec('/bin/chmod -R 660  /var/snort/run/*');
-	exec('/bin/chmod 770 /usr/local/etc/snort/');
-	exec('/bin/chmod 770 /usr/local/etc/whitelist/');
+
+	exec('/bin/chmod 770 /var/db/whitelist');
+	exec('/bin/chmod 770 /var/run/snort*');
+	exec('/bin/chmod 770 /tmp/snort*');
+	exec('/bin/chmod -R 770 /var/log/snort');
+	exec('/bin/chmod -R 770 /usr/local/lib/snort');
+	exec('/bin/chmod -R 770 /usr/local/etc/snort/');
 
 	conf_mount_ro();
 }
@@ -995,6 +1006,11 @@ if ($id != '' && $if_real != '') //new
 				/* only build whitelist when needed */
 				if ($config['installedpackages']['snortglobal']['rule'][$id]['blockoffenders7'] == 'on'){
 					create_snort_whitelist($id, $if_real);
+				}
+				
+				/* only build threshold when needed */
+				if ($config['installedpackages']['snortglobal']['rule'][$id]['suppresslistname'] != 'default'){
+					create_snort_suppress($id, $if_real);
 				}
 				
 				/* create snort bootup file snort.sh only create once */
@@ -1051,6 +1067,11 @@ function sync_snort_package_empty()
 				if ($config['installedpackages']['snortglobal']['rule'][$id]['blockoffenders7'] == 'on'){
 					create_snort_whitelist($id, $if_real);
 				}
+				
+				/* only build threshold when needed */
+				if ($config['installedpackages']['snortglobal']['rule'][$id]['suppresslistname'] != 'default'){
+					create_snort_suppress($id, $if_real);
+				}
 
 				/* create barnyard2 configuration file */
 				$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
@@ -1106,7 +1127,12 @@ function sync_snort_package_config()
 				if ($config['installedpackages']['snortglobal']['rule'][$id]['blockoffenders7'] == 'on'){
 					create_snort_whitelist($id, $if_real);
 				}
-
+				
+				/* only build threshold when needed */
+				if ($config['installedpackages']['snortglobal']['rule'][$id]['suppresslistname'] != 'default'){
+					create_snort_suppress($id, $if_real);
+				}
+				
 				/* create barnyard2 configuration file */
 				$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
 				if ($snortbarnyardlog_info_chk == 'on')
@@ -1125,6 +1151,48 @@ function sync_snort_package_config()
 
 /* Start of main config files */
 /* Start of main config files */
+
+/* create threshold file */
+/* TODO: other func should mirror this code */
+function create_snort_suppress($id, $if_real) {
+	
+	    global $config, $g;
+        conf_mount_rw();
+        
+        /* make sure dir is there */
+        if (!file_exists('/usr/local/etc/snort/suppress/')) {
+        	exec('/bin/mkdir -p /usr/local/etc/snort/suppress/');
+        }
+        
+        if ($config['installedpackages']['snortglobal']['rule'][$id]['suppresslistname'] != 'default') {
+
+        	preg_match('/([0-9]+)$/', $config['installedpackages']['snortglobal']['rule'][$id]['suppresslistname'], $slist_num_wrt);
+        	
+        	$whitelist_key_s = find_suppress_key($slist_num_wrt[0]);
+        
+        	/* file name */
+        	$suppress_file_name = $config['installedpackages']['snortglobal']['suppress']['item'][$whitelist_key_s]['name'];
+        	
+        	/* Message */
+			$s_data .= '# This file is auto generated by the snort package. Please do not edit this file by hand.' . "\n\n";
+      
+        	/* user added arguments */
+			$s_data .= str_replace("\r", "", base64_decode($config['installedpackages']['snortglobal']['suppress']['item'][$whitelist_key_s]['suppresspassthru']));
+        
+        	/* open snort's whitelist for writing */
+        	$suppresslist_w = fopen("/usr/local/etc/snort/suppress/$suppress_file_name", "w");
+        	if(!$suppresslist_w) {
+                log_error("Could not open /usr/local/etc/snort/suppress/$suppress_file_name for writing.");
+                return;
+        	}
+        
+        	fwrite($suppresslist_w, $s_data);
+        	fclose($suppresslist_w);
+        	conf_mount_ro();
+        
+        }
+        
+}
 
 function create_snort_whitelist($id, $if_real) {
 	
@@ -1465,6 +1533,13 @@ function create_barnyard2_conf($id, $if_real, $snort_uuid) {
 		{
 			exec("/bin//usr/bin/touch /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf");
 		}
+
+		if(!file_exists("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.waldo"))
+		{
+			exec("/bin//usr/bin/touch /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.waldo");
+			exec("/usr/sbin/chown snort:snort /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.waldo");
+			exec("/bin/chmod 770 /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.waldo");
+		}
 		
         $barnyard2_conf_text = generate_barnyard2_conf($id, $if_real, $snort_uuid);
         $bconf = fopen("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf", "w");
@@ -1752,7 +1827,7 @@ $snortunifiedlog_info_chk = $config['installedpackages']['snortglobal']['rule'][
 if ($snortunifiedlog_info_chk == on)
     $snortunifiedlog_type = "output unified2: filename snort_{$snort_uuid}_{$if_real}.u2, limit 128";   
 
-/* define spoink (DISABLED)*/
+/* define spoink */
 $spoink_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['blockoffenders7'];
 if ($spoink_info_chk == on) {
 	
@@ -1765,6 +1840,18 @@ if ($spoink_info_chk == on) {
 	}
 	
     $spoink_type = "output alert_pf: /usr/local/etc/snort/whitelist/$spoink_whitelist_name,snort2c";
+    
+}
+
+/* define threshold file */
+$threshold_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['suppresslistname'];
+if ($threshold_info_chk != 'default') {
+	
+	preg_match('/^([a-zA-z0-9]+)/', $config['installedpackages']['snortglobal']['rule'][$id]['suppresslistname'], $slist_name_file2);
+
+	$threshold_name = $slist_name_file2[0];
+	
+    $threshold_file_name = "include /usr/local/etc/snort/suppress/$threshold_name";
     
 }
     
@@ -2499,7 +2586,7 @@ $spoink_type
 
 include /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/reference.config
 include /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/classification.config
-include /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/threshold.conf
+$threshold_file_name
 
 # Snort user pass through configuration
 {$snort_config_pass_thru}
