@@ -94,7 +94,7 @@
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
-			<fielddescr>Name</fielddescr>
+			<fielddescr>Director name</fielddescr>
 			<fieldname>directorname</fieldname>
 		</columnitem>	
 		<columnitem>
