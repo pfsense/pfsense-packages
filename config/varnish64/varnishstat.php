@@ -1,10 +1,10 @@
 <?php
 /* $Id$ */
 /*
-	varnish_view_config.php
+	varnishstat_view_logs.php
 	part of pfSense (http://www.pfsense.com/)
 
-	Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
+	Copyright (C) 2006 Scott Ullrich <sullrich@gmail.com>
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -31,15 +31,49 @@
 
 require("guiconfig.inc");
 
+if($_REQUEST['getactivity']) {
+	$varnishstatlogs = `varnishstat -1`;
+	echo "VarnishSTAT Server logs as of " . date("D M j G:i:s T Y")  . "\n\n";
+	echo $varnishstatlogs;
+	exit;
+}
+
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 
-$pgtitle = "Varnish: View Logs";
+$pgtitle = "VarnishSTAT: View Logs";
 include("head.inc");
+
+/* NEED TO FIX there are 2 logs /etc/varnishstat/log/main/current and /etc/dnscache/log/main/current */
+
+/* NEED TO FIX */
+if ($_POST['clear']) {
+//	exec("rm /etc/varnishstat/log/main/current");
+//	exec("touch /etc/varnishstat/log/main/current");
+}
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		function getlogactivity() {
+			var url = "/varnishstat.php";
+			var pars = 'getactivity=yes';
+			var myAjax = new Ajax.Request(
+				url,
+				{
+					method: 'post',
+					parameters: pars,
+					onComplete: activitycallback
+				});
+		}
+		function activitycallback(transport) {
+			$('varnishstatlogs').innerHTML = '<font face="Courier"><pre>' + transport.responseText  + '</pre></font>';
+			setTimeout('getlogactivity()', 2500);		
+		}
+		setTimeout('getlogactivity()', 1000);	
+	</script>
 <?php include("fbegin.inc"); ?>
 
 <?php if($one_two): ?>
@@ -57,24 +91,28 @@ include("head.inc");
 	$tab_array[] = array(gettext("Custom VCL"), false, "/pkg_edit.php?xml=varnish_custom_vcl.xml&id=0");
 	$tab_array[] = array(gettext("LB Directors"), false, "/pkg.php?xml=varnish_lb_directors.xml");
 	$tab_array[] = array(gettext("XMLRPC Sync"), false, "/pkg_edit.php?xml=varnish_sync.xml&id=0");
-	$tab_array[] = array(gettext("View Configuration"), true, "/varnish_view-config.php");
-	$tab_array[] = array(gettext("VarnishSTAT"), false, "/varnishstat.php");
+	$tab_array[] = array(gettext("View Configuration"), false, "/varnish_view-config.php");
+	$tab_array[] = array(gettext("VarnishSTAT"), true, "/varnishstat.php");
 	display_top_tabs($tab_array);
 ?>
 </table>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>
      <td class="tabcont" >
-      <form action="varnish_view_config.php" method="post">
-<textarea id="varnishlogs" rows="50" cols="80">
-<?php 
-	$config_file = file_get_contents("/var/etc/default.vcl");
-	echo $config_file;
-?>
-</textarea>
+      <form action="varnishstat_view_logs.php" method="post">
+		<br>
+			<div id="varnishstatlogs">
+				<pre>One moment please, loading VarnishSTAT logs...</pre>
+			</div>
      </td>
     </tr>
 </table>
+<td align="left" valign="top">
+	<form id="filterform" name="filterform" action="varnishstat_view_logs.php" method="post" style="margin-top: 14px;">
+	<p/>
+	<input id="submit" name="clear" type="submit" class="formbtn" value="<?=gettext("Clear log");?>" />
+	</form>
+</td>
 </div>
 <?php include("fend.inc"); ?>
 </body>

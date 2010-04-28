@@ -91,6 +91,10 @@
 			<text>View Configuration</text>
 			<url>/varnish_view_config.php</url>
 		</tab>
+		<tab>
+			<text>VarnishSTAT</text>
+			<url>/varnishstat.php</url>
+		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
 		<columnitem>
