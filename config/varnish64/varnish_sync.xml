@@ -189,7 +189,7 @@
 		</field>
 	</fields>
 	<custom_php_resync_config_command>
-		varnish_sync_on_changes();
+		varnish_sync_on_changes();		
 	</custom_php_resync_config_command>
 	<custom_php_command_before_form>	
 		unset($_POST['temp']);
