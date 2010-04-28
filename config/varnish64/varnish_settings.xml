@@ -114,8 +114,6 @@
 			<type>input</type>
 		</field>
 	</fields>
-	<custom_php_validation_command>
-	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
 		sync_package_varnish();
 		varnish_start();
