@@ -186,6 +186,12 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>URL Mappings</fielddescr>
+			<fieldname>URL Mappings</fieldname>
+			<type>listtopic</type>
+			<name>If you plan to load balance to this backend then visit the LB Directors tab and do not add any mappings below.</name>
+		</field>
+		<field>
 			<fielddescr>Map URLs</fielddescr>
 			<fieldname>MapURLs</fieldname>
 		    <type>rowhelper</type>
