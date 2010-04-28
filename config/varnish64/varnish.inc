@@ -176,6 +176,11 @@ mkdir -p /var/varnish
 rm /var/varnish/storage.bin 2>/dev/null
 killall varnishd 2>/dev/null
 sleep 1
+sysctl kern.ipc.nmbclusters=65536
+sysctl kern.ipc.somaxconn=16384
+sysctl kern.maxfiles=131072
+sysctl kern.maxfilesperproc=104856
+sysctl kern.threads.max_threads_per_proc=4096
 /usr/bin/env \
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
 /usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDOFF
