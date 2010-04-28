@@ -31,7 +31,7 @@ require("guiconfig.inc");
 
 if($_REQUEST['getactivity']) {
 	$varnishstatlogs = `varnishstat -1`;
-	echo "VarnishSTAT Server logs as of " . date("D M j G:i:s T Y")  . "\n\n";
+	echo "<h2>VarnishSTAT Server logs as of " . date("D M j G:i:s T Y")  . "</h2>";
 	echo $varnishstatlogs;
 	exit;
 }
