@@ -68,12 +68,12 @@
 			<active/>
 		</tab>
 		<tab>
-			<text>VarnishSTAT</text>
-			<url>/varnishstat.php</url>
-		</tab>
-		<tab>
 			<text>View Configuration</text>
 			<url>/varnish_view_config.php</url>
+		</tab>
+		<tab>
+			<text>VarnishSTAT</text>
+			<url>/varnishstat.php</url>
 		</tab>
 	</tabs>
 	<configpath>installedpackages->package->varnish</configpath>
