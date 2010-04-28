@@ -89,9 +89,10 @@ function is_varnish_backend_in_use($backendname) {
 	global $config, $g;
 	if($config['installedpackages']['varnishlbdirectors']['config'] != "") 
 		foreach($config['installedpackages']['varnishlbdirectors']['config'] as $url) 
-			foreach($url['row'] as $urlmapping) 
-				if($urlmapping['backendname'] == $backendname) 
-					return true;
+			if($url['row'])
+				foreach($url['row'] as $urlmapping) 
+					if($urlmapping['backendname'] == $backendname) 
+						return true;
 	if($config['installedpackages']['varnishbackends']['config'] != "") 
 		foreach($config['installedpackages']['varnishbackends']['config'] as $backend) 
 			if($backend['backendname'] == $backendname)
