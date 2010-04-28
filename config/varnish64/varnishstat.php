@@ -40,7 +40,7 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 
-$pgtitle = "VarnishSTAT: View Logs";
+$pgtitle = "Varnish: VarnishSTAT";
 include("head.inc");
 
 ?>

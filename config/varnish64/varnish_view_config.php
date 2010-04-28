@@ -33,7 +33,7 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 
-$pgtitle = "Varnish: View Logs";
+$pgtitle = "Varnish: View Configuration";
 include("head.inc");
 
 ?>
