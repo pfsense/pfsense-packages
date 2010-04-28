@@ -75,6 +75,12 @@
 		<section>Services</section>
 		<configfile>varnish_backends.xml</configfile>
 	</menu>
+	<service>
+		<name>varnish</name>
+		<rcfile>varnish.sh</rcfile>
+		<executable>varnishd</executable>
+		<description>Varnish HTTP accelerator</description>
+	</service>
 	<tabs>
 		<tab>
 			<text>Backends</text>
