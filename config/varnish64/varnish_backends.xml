@@ -176,6 +176,22 @@
 		    <type>rowhelper</type>
 		    <rowhelper>
 				<rowhelperfield>
+				    <fielddescr>Match type</fielddescr>
+				    <fieldname>fieldtype</fieldname>
+				    <description>Select the field type that you would like to use in matching the URL.</description>
+					<type>select</type>
+					<options>
+						<option>
+							<name>Equals</name>
+							<value>==</value>
+						</option>
+						<option>
+							<name>Regex</name>
+							<value>~</value>
+						</option>
+					</options>
+				</rowhelperfield>
+				<rowhelperfield>
 				    <fielddescr>URL</fielddescr>
 				    <fieldname>urlmapping</fieldname>
 				    <description>Enter the URL that will be mapped to this backend.</description>

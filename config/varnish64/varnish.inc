@@ -124,10 +124,14 @@ EOAU;
 		foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
 			if($urlmapping['row'])
 				foreach($urlmapping['row'] as $url) {
+					if($url['fieldtype']) 
+						$fieldtype = $url['fieldtype'];
+					else 
+						$fieldtype = "==";
 					if(!$isfirst) 
 						$urlmappings .= "else ";
 					$urlmappings .= <<<EOAU
-if (req.http.host == "{$url['urlmapping']}") {
+if (req.http.host {$fieldtype} "{$url['urlmapping']}") {
 		set req.backend = {$urlmapping['backendname']}BACKEND;
 		set req.http.host = "{$url['urlmapping']}";
 	} 
