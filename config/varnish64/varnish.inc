@@ -508,7 +508,7 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $password) {
 	/* tell varnish to reload our settings on the destionation sync host. */
 	$method = 'pfsense.exec_php';
 	$execcmd  = "require_once('/usr/local/pkg/varnish.inc');\n";
-	$execcmd .= "sync_package_varnish();\n";
+	$execcmd .= "sync_package_varnish();\nvarnish_start();";
 	
 	/* assemble xmlrpc payload */
 	$params = array(
