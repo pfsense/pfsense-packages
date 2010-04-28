@@ -66,7 +66,7 @@ include("head.inc");
    <tr>
      <td class="tabcont" >
       <form action="varnish_view_config.php" method="post">
-<textarea id="varnishlogs" rows="50" cols="80">
+<textarea id="varnishlogs" rows="50" cols="100%">
 <?php 
 	$config_file = file_get_contents("/var/etc/default.vcl");
 	echo $config_file;
