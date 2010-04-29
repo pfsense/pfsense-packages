@@ -635,7 +635,16 @@ function snort_postinstall()
 	unset($config['installedpackages']['snortwhitelist']);
 	unset($config['installedpackages']['snortthreshold']);
 	unset($config['installedpackages']['snortadvanced']);
-	write_config();	
+	write_config();
+	conf_mount_rw();
+	
+	/* remake saved settings */
+	if($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
+		update_status(gettext("Saved settings detected..."));
+		update_output_window(gettext("Please wait... rebuilding files..."));
+		sync_snort_package_empty();
+		update_output_window(gettext("Finnished Rebuilding files..."));
+	}
 	
 	conf_mount_ro();
 	
@@ -1645,6 +1654,11 @@ function create_snort_conf($id, $if_real, $snort_uuid)
 	/* write out snort.conf */
 	
 	if ($if_real != '' && $snort_uuid != '') {
+		
+	if (!file_exists("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf")) {
+		exec("/bin/mkdir /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/");
+		exec("/usr/bin/touch /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf");
+	}
 
 	$snort_conf_text = generate_snort_conf($id, $if_real, $snort_uuid);
 	conf_mount_rw();

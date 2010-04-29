@@ -5,6 +5,7 @@ Snort-dev 2.8.5.3 pk v. 23 final
 
 TODO:
 
+Auto rule download has to be mirrored to the GUI download code.
 Snort block table should survive reboots. Dont know how Im going to do this.  
 Create Upload GUI. Use Pierre POMES code.
 Add log rotation and log dir size display
