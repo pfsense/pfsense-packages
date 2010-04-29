@@ -46,6 +46,8 @@ $pconfig['whitelistvpns'] = $config['installedpackages']['snortglobal']['whiteli
 $pconfig['clickablalerteurls'] = $config['installedpackages']['snortglobal']['clickablalerteurls'];
 $pconfig['associatealertip'] = $config['installedpackages']['snortglobal']['associatealertip'];
 $pconfig['snortalertlogtype'] = $config['installedpackages']['snortglobal']['snortalertlogtype'];
+$pconfig['forcekeepsettings'] = $config['installedpackages']['snortglobal']['forcekeepsettings'];
+
 
 
 if ($_POST) {
@@ -74,6 +76,7 @@ if ($_POST) {
 		$config['installedpackages']['snortglobal']['clickablalerteurls'] = $_POST['clickablalerteurls'] ? on : off;
 		$config['installedpackages']['snortglobal']['associatealertip'] = $_POST['associatealertip'] ? on : off;
 		$config['installedpackages']['snortglobal']['snortalertlogtype'] = $_POST['snortalertlogtype'];
+		$config['installedpackages']['snortglobal']['forcekeepsettings'] = $_POST['forcekeepsettings'] ? on : off;	
 
 		write_config();
 		sleep(2);
@@ -352,6 +355,12 @@ include("head.inc");
 		<span class="vexpl">Please choose the type of Alert logging you will like see in your alert file.<br>
 		Hint: Best pratice is to chose full logging.</span>&nbsp;<span class="red"><strong>WARNING:</strong></span>&nbsp;<strong>On change, alert file will be cleared.</strong></td>
 	</tr>
+    <tr>
+      <td width="22%" valign="top" class="vncell">Keep snort settings after deinstall</td>
+      <td width="78%" class="vtable">
+        <input name="forcekeepsettings" id="forcekeepsettings" type="checkbox" value="yes" <?php if ($config['installedpackages']['snortglobal']['forcekeepsettings']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
+        Settings will not be removed during deinstall.</td>
+    </tr>
 	<tr>
 	  <td width="22%" valign="top"><input name="Reset" type="submit" class="formbtn" value="Reset" onclick="return confirm('Do you really want to delete all global and interface settings?')"><span class="red"><strong>&nbsp;WARNING:</strong><br>
 	  This will reset all global and interface settings.</span>

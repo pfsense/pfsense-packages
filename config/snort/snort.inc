@@ -1033,6 +1033,13 @@ function sync_snort_package_empty()
 {
 	global $config, $g;
 	conf_mount_rw();
+	
+/* RedDevil suggested code */
+/* TODO: more testing needs to be done */
+exec("/sbin/sysctl net.bpf.bufsize=8388608");
+exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
+exec("/sbin/sysctl net.bpf.maxinsns=512");
+exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 
 	/* do not start config build if rules is empty */
 	if (!empty($config['installedpackages']['snortglobal']['rule'])) 
@@ -1096,6 +1103,13 @@ function sync_snort_package_config()
 {
 	global $config, $g;
 	conf_mount_rw();
+	
+/* RedDevil suggested code */
+/* TODO: more testing needs to be done */
+exec("/sbin/sysctl net.bpf.bufsize=8388608");
+exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
+exec("/sbin/sysctl net.bpf.maxinsns=512");
+exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 
 	/* do not start config build if rules is empty */
 	if (!empty($config['installedpackages']['snortglobal']['rule'])) 
@@ -1749,7 +1763,9 @@ snort_rules_up_deinstall_cron("");
 		
 	/* Unset snort registers in conf.xml IMPORTANT snort will not start with out this */
 	/* Keep this as a last step */
-	unset($config['installedpackages']['snortglobal']);
+	if($config['installedpackages']['snortglobal']['forcekeepsettings'] != 'on') {
+		unset($config['installedpackages']['snortglobal']);
+	}
     write_config();
 	conf_mount_rw();
 	

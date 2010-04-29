@@ -241,7 +241,7 @@ if ($_GET['act'] == 'toggle' && $_GET['id'] != '')
 
 
 
-$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.21";
+$pgtitle = "Services: Snort 2.8.5.3 pkg v. 1.23";
 include("head.inc");
 
 ?>
@@ -481,11 +481,16 @@ padding: 15px 10px 50% 50px;
 
 <br>
   <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-	  <td width="100%"><span class="vexpl"><span class="red"><strong>Note:</strong></span>
+	  <td width="100%"><span class="vexpl">
+	  <span class="red"><strong>Note:</strong></span>
 	  <br>
 		 This is the <strong>Snort Menu</strong> where you can see an over view of all your interface settings.
 		 <br>
 		 Please edit the <strong>Global Settings</strong> tab before adding an interface.
+		 <br><br>
+	  <span class="red"><strong>Warning:</strong></span>
+	  <br>
+		 <strong>New settings will not take effect until interface restart.</strong>
 		 <br><br>
 		 <strong>Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="Add Icon"> icon to add a interface.<strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_pass.gif" width="13" height="13" border="0" title="Start Icon"> icon to <strong>start</strong> snort and barnyard2.
 		 <br>

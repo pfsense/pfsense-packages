@@ -1,16 +1,25 @@
 
 
-March 26 2019
-Snort-dev 2.8.5.3 pk v. 22 final
+April 27 2010
+Snort-dev 2.8.5.3 pk v. 23 final
 
 TODO:
 
-Create Threshold GUI
-Pf snort block table should  survive reboots. Dont know how Im going to do this.  
+Snort block table should survive reboots. Dont know how Im going to do this.  
 Create Upload GUI. Use Pierre POMES code.
-Use Chroot for snort.
 Add log rotation and log dir size display
-Threshold tab needs to be added.
+Redo code for rule downloads so that changes in snort.org rule gzip file does not break the package.
+Add code suggested by Andrew Thompson.
+
+Long Term Goals:
+
+Use Chroot for snort.
+Isolate functions using classes so we dont have double $vars errors. ! Important
+The whitelist and supress code can be simplified.
+Go through each tab and delete old code.
+Snort Inline needs to be worked on. ! Important
 
 
-Done.
+Any other Devs that read this.
+Please add your intials and date to any code blocks you add. It helps me keep track.
+

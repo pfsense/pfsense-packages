@@ -345,7 +345,7 @@
       <required_version>1.2.3</required_version>
       <status>legacy</status>
       <configurationfile>snort.xml</configurationfile>
-	  <after_install_info>Please visit the Snort settings tab and enter your oinkid code.   Afterwards visit the update rules tab to download the snort rules.</after_install_info>
+	  <after_install_info>Please visit the Snort settings tab and enter your oinkid code. Afterwards visit the update rules tab to download the snort rules.</after_install_info>
     </package>
     <package>
       <name>snort</name>
@@ -359,11 +359,11 @@
       <depends_on_package>mysql-client-5.1.44_1.tbz</depends_on_package>
 	  <depends_on_package>snort-2.8.5.3.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
-      <version>2.8.5.3 pkg v. 1.22</version>
+      <version>2.8.5.3 pkg v. 1.23</version>
       <required_version>1.2.3</required_version>
       <status>Stable</status>
       <configurationfile>/snort.xml</configurationfile>
-	  <after_install_info>This is the Snort branch and is stable.</after_install_info>
+	  <after_install_info>Please visit the Snort settings tab and enter your oinkid code. Afterwards visit the update rules tab to download the snort rules.</after_install_info>
     </package>
     <package>
       <name>siproxd</name>
