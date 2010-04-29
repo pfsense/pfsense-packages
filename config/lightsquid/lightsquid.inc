@@ -103,12 +103,12 @@ function lightsquid_install() {
          if (file_exists($lstpl_file)) {
               mwexec("tar zxvf $lstpl_file -C " . LS_TEMPLATEPATH);
               update_log("lightsquid_install: Install templates from $lstpl_file");
-         }         
-         
+         }
+
          # check perl
-         if (!file_exists("/usr/bin/perl")) 
+         if (!file_exists("/usr/bin/perl"))
               mwexec("ln -s /usr/local/bin/perl /usr/bin/perl");
-         
+
          update_log("lightsquid_install: stopped");
 }
 
@@ -133,7 +133,7 @@ function lightsquid_resync() {
         $tm_squid = '';
 
         # check perl
-        if (!file_exists("/usr/bin/perl")) 
+        if (!file_exists("/usr/bin/perl"))
             mwexec("ln -s /usr/local/bin/perl /usr/bin/perl");
 
         // debug
@@ -231,15 +231,20 @@ function lightsquid_resync() {
                   case 'lhp_40m':  $on = true; $opt[0]= "*/40"; break;
                   case 'lhp_50m':  $on = true; $opt[0]= "*/50"; break;
                   case 'lhp_60m':  $on = true; $opt[0]= "*/60"; break;
-                  case 'lhp_2h':   $on = true; $opt[0]= "0"; $opt[1]= "*/2";  break;
-                  case 'lhp_3h':   $on = true; $opt[0]= "0"; $opt[1]= "*/3";  break;
-                  case 'lhp_4h':   $on = true; $opt[0]= "0"; $opt[1]= "*/4";  break;
-                  case 'lhp_6h':   $on = true; $opt[0]= "0"; $opt[1]= "*/6";  break;
-                  case 'lhp_8h':   $on = true; $opt[0]= "0"; $opt[1]= "*/8";  break;
-                  case 'lhp_12h':  $on = true; $opt[0]= "0"; $opt[1]= "*/12"; break;
-                  case 'lhp_24h':  $on = true; $opt[0]= "0"; $opt[1]= "0"; $opt[2]= "*/24"; break;
+                  case 'lhp_2h':   $on = true; $opt[0]= "0";  $opt[1]= "*/2";  break;
+                  case 'lhp_3h':   $on = true; $opt[0]= "0";  $opt[1]= "*/3";  break;
+                  case 'lhp_4h':   $on = true; $opt[0]= "0";  $opt[1]= "*/4";  break;
+                  case 'lhp_6h':   $on = true; $opt[0]= "0";  $opt[1]= "*/6";  break;
+                  case 'lhp_8h':   $on = true; $opt[0]= "0";  $opt[1]= "*/8";  break;
+                  case 'lhp_12h':  $on = true; $opt[0]= "0";  $opt[1]= "*/12"; break;
+                  case 'lhp_24h':  $on = true; $opt[0]= "45"; $opt[1]= "23";   break; # dayly at 23:45
             }
             ls_setup_cron("lightsquid_parser", $opt, CRONTAB_LS_JOBKEY, $on);
+
+            # fix possible data lost with 00:00 script start - rescan yesterday
+            $opt = array("15", "0", "*", "*", "*", "root", CRONTAB_LS_TEMPLATE . " yesterday");
+            ls_setup_cron("lightsquid_parser", $opt, CRONTAB_LS_JOBKEY, $on);
+
 		}  else
             ls_setup_cron("lightsquid_parser", "", "", false);
 
@@ -273,7 +278,7 @@ function lightsquid_resync() {
             ls_setup_cron("lightsquid_squid_rotate", $opt, CRONTAB_SQUID_JOBKEY, $on);
 		}  else
             ls_setup_cron("lightsquid_squid_rotate", "", "", false);
-            
+
          // update squid conf
 		if (isset($config['installedpackages']['squid']['config'][0])) {
 			$config['installedpackages']['squid']['config'][0]['log_enabled'] = 'on';
