@@ -526,8 +526,9 @@ function havp_convert_pfxml_xml()
     # proxy
     $havp_config[F_PROXYBINDIFACE] = 'localhost';
     # language template files path
-    $havp_config[F_TEMPLATEPATH]    = ( file_exists(HVDEF_TEMPLATES_EX) ? HVDEF_TEMPLATES_EX : HVDEF_TEMPLATES );
-    $havp_config[F_TEMPLATEPATH]   .= ( !empty($havp_config[F_LANGUAGE]) ? "/{$havp_config[F_LANGUAGE]}" : "/en" );
+    $lng = $havp_config[F_LANGUAGE] ? $havp_config[F_LANGUAGE] : "en";
+    $havp_config[F_TEMPLATEPATH]    = ( file_exists(HVDEF_TEMPLATES_EX  . "/$lng") ? HVDEF_TEMPLATES_EX : HVDEF_TEMPLATES );
+    $havp_config[F_TEMPLATEPATH]   .= "/$lng";
     #
     # =-= HVFORM_AVSET =-=
     # av settings
