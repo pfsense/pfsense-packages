@@ -35,8 +35,6 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-
-/* make sure I need these includes */
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");

@@ -35,7 +35,6 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* make sure I need these includes */
 require("guiconfig.inc");
 
 

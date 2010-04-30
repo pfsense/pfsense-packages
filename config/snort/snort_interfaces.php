@@ -29,15 +29,15 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+/* TODO: redo check if snort is up */
+
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
-
 $id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
-
 
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -49,7 +49,6 @@ $id_gen = count($config['installedpackages']['snortglobal']['rule']);
 }else{
 $id_gen = '0';
 }
-
 
 /* alert file */
 $d_snortconfdirty_path_ls = exec('/bin/ls /var/run/snort_conf_*.dirty');
