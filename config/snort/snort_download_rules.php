@@ -319,7 +319,7 @@ setTimeout($.unblockUI, 2000);
 conf_mount_rw();
 
 if (!file_exists('/usr/local/etc/snort/tmp')) {
-	exec('/bin/mkdir /usr/local/etc/snort/tmp -p');
+	exec('/bin/mkdir -p /usr/local/etc/snort/tmp');
 }
 
 /* Set user agent to Mozilla */
@@ -610,7 +610,7 @@ if ($snortdownload != "off")
 		update_status(gettext("Snortrule tar file exists..."));
 	} else {
 		unhide_progress_bar_status();
-		update_status(gettext("There is a new set of Snort rules posted. Downloading..."));
+		update_status(gettext("There is a new set of Snort.org rules posted. Downloading..."));
 		update_output_window(gettext("May take 4 to 10 min..."));
 //    download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz", $tmpfname . "/{$snort_filename}", "read_body_firmware");
 		download_file_with_progress_bar("http://dl.snort.org/{$premium_url}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz?oink_code={$oinkid}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
@@ -749,7 +749,7 @@ if ($snortdownload != "off")
 		exec("/bin/mv -f {$snortdir}/so_rules/web-activex.rules {$snortdir}/rules/snort_web-activex.so.rules");
 		exec("/bin/mv -f {$snortdir}/so_rules/web-client.rules {$snortdir}/rules/snort_web-client.so.rules");
 		exec("/bin/mv -f {$snortdir}/so_rules/web-iis.rules {$snortdir}/rules/snort_web-iis.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/web.misc.rules {$snortdir}/rules/snort_web.misc.so.rules");
+		exec("/bin/mv -f {$snortdir}/so_rules/web-misc.rules {$snortdir}/rules/snort_web-misc.so.rules");
 		exec("/bin/rm -r {$snortdir}/so_rules");
 		
 		/* extract base etc files */
@@ -1010,7 +1010,6 @@ function oinkmaster_run($id, $if_real, $iface_uuid)
 		{
 		update_status(gettext("Your first set of rules are being copied..."));
 		update_output_window(gettext("May take a while..."));
-		exec("/bin/echo \"test {$snortdir} {$snortdir_wan} {$iface_uuid}_{$if_real}\" > /root/debug");
 		exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}/rules/");
 		exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
 		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
@@ -1022,7 +1021,6 @@ function oinkmaster_run($id, $if_real, $iface_uuid)
 		}else{
 		update_status(gettext("Your enable and disable changes are being applied to your fresh set of rules..."));
 		update_output_window(gettext("May take a while..."));
-		exec("/bin/echo \"test2 {$snortdir} {$snortdir_wan} {$iface_uuid}_{$if_real}\" > /root/debug");
 		exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}/rules/");
 		exec("/bin/cp {$snortdir}/classification.config {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
 		exec("/bin/cp {$snortdir}/gen-msg.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");

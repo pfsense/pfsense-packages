@@ -870,7 +870,7 @@ function snort_rules_up_install_cron($should_install) {
                                 $cron_item['month'] = "$snort_rules_up_month";
                                 $cron_item['wday'] = "$snort_rules_up_wday";
                                 $cron_item['who'] = "root";
-                                $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort/snort_check_for_rule_updates.php >> /usr/local/etc/snort/snort_update.log";
+                                $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort/snort_check_for_rule_updates.php >> /tmp/snort_update.log";
                                 $config['cron']['item'][] = $cron_item;
                                 write_config("Installed 15 minute filter reload for Time Based Rules");
                                 configure_cron();
