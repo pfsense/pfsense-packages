@@ -968,10 +968,20 @@
     </package>
     <package>
       <name>IP Range Aliases</name>
-      <descr>Patch to add IP Range support to Network Aliases. WARNING! Cannot be uninstalled.</descr>
+      <descr>Patch to add IP Range support to Network Aliases. WARNING! Cannot be uninstalled. Probably does not play nice with URL Table patch.</descr>
       <category>System</category>
       <config_file>http://www.pfsense.com/packages/config/iprangealiases/iprangealiases.xml</config_file>
       <version>0.2</version>
+      <status>BETA</status>
+      <required_version>1.2.3</required_version>
+      <maximum_version>1.2.3</maximum_version>
+    </package>
+    <package>
+      <name>URL Table Aliases</name>
+      <descr>Patch to add URL Table alias support to pull a list of CIDRs/IPs from a file by URL into a persist table. WARNING! Cannot be uninstalled. Probably does not play nice with IP Range Aliases patch. This is NOT a way to add an alias for host URLs.</descr>
+      <category>System</category>
+      <config_file>http://www.pfsense.com/packages/config/urltables/urltables.xml</config_file>
+      <version>0.1</version>
       <status>BETA</status>
       <required_version>1.2.3</required_version>
       <maximum_version>1.2.3</maximum_version>
