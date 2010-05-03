@@ -307,20 +307,6 @@ include("head.inc");
 <td class="tabcont">
 
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
-<?php if(is_alias_inuse($pconfig['name']) == true): ?>
-  <tr>
-      <td colspan="2" valign="top" class="listtopic">Add the name and description of the file.</td>
-  </tr>
-  <tr>
-    <td valign="top" class="vncellreq">Name</td>
-    <td class="vtable"> <input name="name" type="hidden" id="name" size="40" value="<?=htmlspecialchars($pconfig['name']);?>" />
-		  <?php echo $pconfig['name']; ?>
-      <p>
-        <span class="vexpl">NOTE: This list is in use so the name may not be modified!</span>
-      </p>
-    </td>
-  </tr>
-<?php else: ?>
   <tr>
       <td colspan="2" valign="top" class="listtopic">Add the name and description of the file.</td>
   </tr>
@@ -334,7 +320,6 @@ include("head.inc");
       </span>
     </td>
   </tr>
-<?php endif; ?>
   <tr>
     <td width="22%" valign="top" class="vncell">Description</td>
     <td width="78%" class="vtable">

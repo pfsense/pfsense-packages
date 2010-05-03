@@ -311,14 +311,14 @@ global $config, $g;
 
 		$snort_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['enable'];
 		if ($snort_info_chk == 'on') {
-		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}{$if_real}\" -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}{$if_real}\" -D -q -t /var/log/snort -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 		}
 		/* define snortbarnyardlog_chk */
 		/* top will have trouble if the uuid is to far back */
 		$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
 		$snortbarnyardlog_mysql_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_mysql'];
 		if ($snortbarnyardlog_info_chk == 'on' && $snortbarnyardlog_mysql_info_chk != '' && $snort_info_chk == 'on') {
-		exec("/usr/local/bin/barnyard2 -f \"snort_{$snort_uuid}_{$if_real}.u2\" -u snort -g snort --pid-path /var/log/snort/run -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -w /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.waldo -D -q");
+		exec("/usr/local/bin/barnyard2 -f \"snort_{$snort_uuid}_{$if_real}.u2\" -u snort -g snort --pid-path /var/log/snort/run -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort -D -q");
 		}
 		
 		/* Log Iface stop */
@@ -988,10 +988,11 @@ function sync_snort_package_all($id, $if_real, $snort_uuid)
 
 /* RedDevil suggested code */
 /* TODO: more testing needs to be done */
-exec("/sbin/sysctl net.bpf.bufsize=8388608");
-exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
-exec("/sbin/sysctl net.bpf.maxinsns=512");
-exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
+/* may cause voip to fail */
+//exec("/sbin/sysctl net.bpf.bufsize=8388608");
+//exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
+//exec("/sbin/sysctl net.bpf.maxinsns=512");
+//exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 
 # Error checking
 if ($id != '' && $if_real != '') //new
@@ -1045,10 +1046,11 @@ function sync_snort_package_empty()
 	
 /* RedDevil suggested code */
 /* TODO: more testing needs to be done */
-exec("/sbin/sysctl net.bpf.bufsize=8388608");
-exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
-exec("/sbin/sysctl net.bpf.maxinsns=512");
-exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
+/* may cause voip to fail */
+//exec("/sbin/sysctl net.bpf.bufsize=8388608");
+//exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
+//exec("/sbin/sysctl net.bpf.maxinsns=512");
+//exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 
 	/* do not start config build if rules is empty */
 	if (!empty($config['installedpackages']['snortglobal']['rule'])) 
@@ -1115,10 +1117,11 @@ function sync_snort_package_config()
 	
 /* RedDevil suggested code */
 /* TODO: more testing needs to be done */
-exec("/sbin/sysctl net.bpf.bufsize=8388608");
-exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
-exec("/sbin/sysctl net.bpf.maxinsns=512");
-exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
+/* may cause voip to fail */
+//exec("/sbin/sysctl net.bpf.bufsize=8388608");
+//exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
+//exec("/sbin/sysctl net.bpf.maxinsns=512");
+//exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 
 	/* do not start config build if rules is empty */
 	if (!empty($config['installedpackages']['snortglobal']['rule'])) 
@@ -1348,7 +1351,7 @@ function create_snort_sh()
 	$snortbarnyardlog_mysql_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_mysql'];
 	
 	if ($snortbarnyardlog_info_chk == 'on' && $snortbarnyardlog_mysql_info_chk != '') {
-	$start_barnyard2 = "sleep 4;/usr/local/bin/barnyard2 -f snort_{$snort_uuid}_{$if_real}.u2 -u snort -g snort --pid-path /var/log/snort/run -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -w /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.waldo -D -q";
+	$start_barnyard2 = "sleep 4;/usr/local/bin/barnyard2 -f snort_{$snort_uuid}_{$if_real}.u2 -u snort -g snort --pid-path /var/log/snort/run -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort -D -q";
 	}
 			
 /* Get all interface startup commands ready */
@@ -1365,7 +1368,7 @@ $snort_sh_text2[] = <<<EOD
 		/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid
 		/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid.lck
 
-		/usr/local/bin/snort -u snort -g snort -R {$snort_uuid}{$if_real} -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
+		/usr/local/bin/snort -u snort -g snort -R {$snort_uuid}{$if_real} -D -q -t /var/log/snort -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
 		$start_barnyard2
 
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD Reload For {$snort_uuid}_{$if_real}..."
@@ -1554,14 +1557,14 @@ function create_barnyard2_conf($id, $if_real, $snort_uuid) {
 
 		if(!file_exists("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf"))
 		{
-			exec("/bin//usr/bin/touch /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf");
+			exec("/usr/bin/touch /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf");
 		}
 
-		if(!file_exists("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.waldo"))
+		if(!file_exists("/var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo"))
 		{
-			exec("/bin//usr/bin/touch /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.waldo");
-			exec("/usr/sbin/chown snort:snort /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.waldo");
-			exec("/bin/chmod 770 /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.waldo");
+			exec("/usr/bin/touch /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo");
+			exec("/usr/sbin/chown snort:snort /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo");
+			exec("/bin/chmod 770 /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo");
 		}
 		
         $barnyard2_conf_text = generate_barnyard2_conf($id, $if_real, $snort_uuid);
@@ -1625,6 +1628,8 @@ config sid_file:	        /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/sid
 
 config hostname:       $snortbarnyardlog_hostname_info_chk
 config interface:      {$snort_uuid}_{$if_real}
+config decode_data_link
+config waldo_file: /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo
 
 ## START user pass through ##
 
