@@ -986,5 +986,15 @@
       <required_version>1.2.3</required_version>
       <maximum_version>1.2.3</maximum_version>
     </package>
+    <package>
+      <name>dnsmasq EDNS size increase</name>
+      <descr>Patch to increase dnsmasq EDNS size to 4096 if needed. WARNING! Cannot be uninstalled.</descr>
+      <category>System</category>
+      <config_file>http://www.pfsense.com/packages/config/dnsmasq-edns/dnsmasq-edns.xml</config_file>
+      <version>0.1</version>
+      <status>BETA</status>
+      <required_version>1.2.3</required_version>
+      <maximum_version>1.2.3</maximum_version>
+    </package>
   </packages>
 </pfsensepkgs>
