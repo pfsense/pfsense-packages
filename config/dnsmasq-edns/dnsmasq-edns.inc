@@ -1,6 +1,6 @@
 <?php
 
-function dnsmasq-edns_install() {
+function dnsmasq_edns_install() {
 	global $g, $config;
 	
 	// Test to make sure the patch is not already applied. 

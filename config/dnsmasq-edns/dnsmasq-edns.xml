@@ -60,6 +60,6 @@
 		<item>http://www.pfsense.com/packages/config/dnsmasq-edns/dnsmasq-edns.patch</item>
 	</additional_files_needed>
 	<custom_php_install_command>
-		dnsmasq-edns_install();
+		dnsmasq_edns_install();
 	</custom_php_install_command>
 </packagegui>
