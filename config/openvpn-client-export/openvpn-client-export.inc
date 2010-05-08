@@ -90,7 +90,7 @@ function openvpn_client_pem_to_pk12($outpath, $outpass, $crtpath, $keypath, $cap
 		unlink($capath);
 }
 
-function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy, $zipconf = false, $outpass = "") {
+function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy, $zipconf = false, $outpass = "", $skiptls=false) {
 	global $config, $input_errors, $g;
 
 	// lookup server settings
@@ -195,7 +195,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	} else if ($settings['mode'] == "server_user")
 		$conf .= "ca {$cafile}\n";
 
-	if ($settings['tls'])
+	if ($settings['tls'] && !$skiptls)
 		$conf .= "tls-auth {$prefix}-tls.key 1\n";
 
 	// add optional settings
@@ -414,7 +414,7 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
                 file_put_contents("{$tempdir}/{$proxy['passwdfile']}", $pwdfle);
         }
 	
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, true, $proxy);
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, true, $proxy, false, "", true);
 	if (!$conf)
 		return false;
 
