@@ -342,13 +342,15 @@ function clearcombo(){
 function row_helper() {
 	global $pconfig, $a_backend;
 	$options = "";
-	foreach ($a_backend as $backend) {
-		$options .= "<option value='{$backend['name']}'";
-		if($backend['name'] == $pconfig['backend']) 
-			$options .=  "SELECTED";
-		$options .=  ">";
-		$options .=  $backend['name'];
-		$options .=  "</option>";
+	if($a_backend) {
+		foreach ($a_backend as $backend) {
+			$options .= "<option value='{$backend['name']}'";
+			if($backend['name'] == $pconfig['backend']) 
+				$options .=  "SELECTED";
+			$options .=  ">";
+			$options .=  $backend['name'];
+			$options .=  "</option>";
+		}
 	}
 	
 	echo <<<EOF
