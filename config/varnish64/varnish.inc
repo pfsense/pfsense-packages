@@ -32,15 +32,15 @@
 /* ========================================================================== */
 
 function varnish_settings_post_validate($post, $input_errors) {
-	if($post['storagesize'] && !is_int($post['storagesize'])) 
+	if($post['storagesize'] && !is_numeric($post['storagesize'])) 
 		$input_errors[] = "A valid number is required for the field 'Storage size'";	
-	if($post['listeningport'] && !is_int($post['listeningport'])) 
+	if($post['listeningport'] && !is_numeric($post['listeningport'])) 
 		$input_errors[] = "A valid number is required for the field 'Listening port'";	
-	if($post['minworkers'] && !is_int($post['minworkers'])) 
+	if($post['minworkers'] && !is_numeric($post['minworkers'])) 
 		$input_errors[] = "A valid number is required for the field 'Minimum worker threads'";	
-	if($post['maxworkers'] && !is_int($post['maxworkers'])) 
+	if($post['maxworkers'] && !is_numeric($post['maxworkers'])) 
 		$input_errors[] = "A valid number is required for the field 'Maximum worker threads'";	
-	if($post['timeoutworkers'] && !is_int($post['timeoutworkers'])) 
+	if($post['timeoutworkers'] && !is_numeric($post['timeoutworkers'])) 
 		$input_errors[] = "A valid number is required for the field 'Worker thread timeout'";
 }
 
@@ -56,19 +56,19 @@ function varnish_backends_post_validate($post, $input_errors) {
 		$input_errors[] = "The backend name must only contain the characters a-Z or 0-9";
 	if(!is_ipaddr($post['ipaddress'])) 
 		$input_errors[] = "A valid IP address is required for the field 'IPAddress'";
-	if($post['first_byte_timeout'] && !is_int($post['first_byte_timeout'])) 
+	if($post['first_byte_timeout'] && !is_numeric($post['first_byte_timeout'])) 
 		$input_errors[] = "A valid number is required for the field 'first byte timeout'";
-	if($post['connect_timeout'] && !is_int($post['connect_timeout'])) 
+	if($post['connect_timeout'] && !is_numeric($post['connect_timeout'])) 
 		$input_errors[] = "A valid number is required for the field 'connect timeout'";
-	if($post['probe_interval'] && !is_int($post['probe_interval'])) 
+	if($post['probe_interval'] && !is_numeric($post['probe_interval'])) 
 		$input_errors[] = "A valid number is required for the field 'probe interval'";
-	if($post['probe_interval'] && !is_int($post['probe_interval'])) 
+	if($post['probe_interval'] && !is_numeric($post['probe_interval'])) 
 		$input_errors[] = "A valid number is required for the field 'probe interval'";
-	if($post['probe_timeout'] && !is_int($post['probe_timeout'])) 
+	if($post['probe_timeout'] && !is_numeric($post['probe_timeout'])) 
 		$input_errors[] = "A valid number is required for the field 'probe timeout'";
-	if($post['probe_window'] && !is_int($post['probe_window'])) 
+	if($post['probe_window'] && !is_numeric($post['probe_window'])) 
 		$input_errors[] = "A valid number is required for the field 'probe window'";
-	if($post['probe_threshold'] && !is_int($post['probe_threshold'])) 
+	if($post['probe_threshold'] && !is_numeric($post['probe_threshold'])) 
 		$input_errors[] = "A valid number is required for the field 'probe threshold'";
 }
 
