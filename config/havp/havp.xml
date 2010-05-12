@@ -13,7 +13,7 @@
         </menu>
         <service>
 		<name>havp</name>
-		<rcfile>havp.sh</rcfile>
+		<rcfile>havp</rcfile>
 		<executable>havp</executable>
 		<description>Antivirus HTTP proxy Service</description>
         </service>

@@ -38,7 +38,7 @@ require_once('pfsense-utils.inc');
 require_once('pkg-utils.inc');
 require_once('service-utils.inc');
 
-if(!function_exists("filter_configure")) 
+if(!function_exists("filter_configure"))
 	require_once("filter.inc");
 
 # ------------------------------------------------------------------------------
@@ -95,7 +95,8 @@ define('HVDEF_HAVP_MINSRV',             '3');
 define('HVDEF_HAVP_MAXSRV',             '100');
 
 # Clam
-define('HVDEF_CLAM_RUNDIR',             '/var/run/clamav');
+#define('HVDEF_CLAM_RUNDIR',             '/var/run/clamav');
+define('HVDEF_CLAM_RUNDIR',             '/var/run');
 define('HVDEF_AVLOG_DIR',               '/var/log/clamav');
 define('HVDEF_CLAM_SOCKET',             HVDEF_CLAM_RUNDIR.'/clamd.sock');
 define('HVDEF_CLAM_PID',                HVDEF_CLAM_RUNDIR.'/clamd.pid');
@@ -112,8 +113,8 @@ define('HVDEF_STATUS_FILE',             '/var/tmp/havp.status');
 define('HVDEF_SCRIPT_DIR',              '/usr/local/etc/rc.d');
 define('HVDEF_AVCRON_SCRIPT',           '/clamav-freshclam');
 define('HVDEF_FILTER_RESYNC_SCRIPT',    '/usr/local/pkg/pf/havp_filter_resync.sh');
-define('HVDEF_HAVP_STARTUP_SCRIPT',     HVDEF_SCRIPT_DIR . '/havp.sh');
-define('HVDEF_CLAM_STARTUP_SCRIPT',     HVDEF_SCRIPT_DIR . '/clamd.sh');
+define('HVDEF_HAVP_STARTUP_SCRIPT',     HVDEF_SCRIPT_DIR . '/havp');
+define('HVDEF_CLAM_STARTUP_SCRIPT',     HVDEF_SCRIPT_DIR . '/clamd');
 define('HVDEF_AVUPD_SCRIPT',            HVDEF_SCRIPT_DIR . '/havp_avupdate');
 
 # cron
@@ -350,6 +351,11 @@ function havp_check_system()
 {
     global $havp_config;
 
+    # check user group
+    $grp = exec('pw group show ' . HVDEF_GROUP);
+    if (strpos($grp, HVDEF_GROUP) !== 0)
+        exec('pw group add ' . HVDEF_GROUP);
+
     # workdir permissions
     havp_set_file_access(HVDEF_WORK_DIR, HVDEF_USER, '');
 
@@ -391,9 +397,9 @@ function havp_check_system()
 
     # =-= ClamAV =-=
     # catalog for Pid and Socket files
-    if (!file_exists(HVDEF_CLAM_RUNDIR))
-        mwexec("mkdir -p " . HVDEF_CLAM_RUNDIR);
-    havp_set_file_access(HVDEF_CLAM_RUNDIR, HVDEF_USER, '0774');
+#    if (!file_exists(HVDEF_CLAM_RUNDIR))
+#        mwexec("mkdir -p " . HVDEF_CLAM_RUNDIR);
+#    havp_set_file_access(HVDEF_CLAM_RUNDIR, HVDEF_USER, '0774');
 
     # AV update script
     file_put_contents(HVDEF_AVUPD_SCRIPT, havp_AVupdate_script());
@@ -782,7 +788,7 @@ function havp_config_freshclam()
     $conf[] = "DatabaseDirectory /var/db/clamav";
 
     # log
-    
+
     $conf[] = "LogFileMaxSize           2M";
     $conf[] = "LogTime                  yes";
     $conf[] = "LogVerbose               " . ( HV_DEBUG === "true" ? "yes" : "no" );
@@ -797,7 +803,7 @@ function havp_config_freshclam()
     # log
     # freshclam for 1.2.x have a bug with logfile permissions; now disable logfile for 1.2.x - only syslog
     $is_log = (pfsense_version_() != "1") && ($pfconf[F_AVSETLOG] === 'true');
-    if ($is_log) {      
+    if ($is_log) {
         $conf[] = "UpdateLogFile            " . HVDEF_FRESHCLAM_LOG;
     } else {
         $conf[] = "# for pfsense 1.2.x Log disabled - permission bug exists!";
@@ -1271,17 +1277,33 @@ function havp_startup_script()
 {
     global $havp_config;
     $pid = HVDEF_PID_FILE;
+    $havpchk  = "ps auxw | grep \"[h]avp  -c\"|awk '{print $2}'";
+    $clamdchk = "ps auxw | grep \"[c]lamd -c\"|awk '{print $2}'";
 
     # rc script
     $rc = array();
    	$rc['file'] = basename(HVDEF_HAVP_STARTUP_SCRIPT);
 
     $s[] = "# start";
-    $s[] = "\tif [ -z \"`ps auxw | grep \"[h]avp -c\"|awk '{print $2}'`\" ];then";
+    $s[] = "\tif [ -z \"`{$havpchk}`\" ];then";
     if (HV_USE_CLAMD === 'true') {
+        $clampid_dir = HVDEF_CLAM_RUNDIR;
         $s[] = "\t\t# start clamd before (to be sure)";
-        $s[] = "\t\t/usr/local/etc/rc.d/clamd.sh start";
+        $s[] = "\t\t" . HVDEF_CLAM_STARTUP_SCRIPT . " start";
         $s[] = "\t\twait";
+        $s[] = "";
+
+        $s[] = "\t\t# if clamd started";
+        $s[] = "\t\tif [ -n \"`{$clamdchk}`\" ];then";
+        $s[] = "\t\t\t# Waiting CLAMD";
+        $s[] = "\t\t\techo -n \"Waiting CLAMD \"";
+        $s[] = "\t\t\twhile [ \"`{$clamdchk}`\" != \"`/bin/cat {$clampid_dir}/clamd.pid`\" ];do";
+        $s[] = "\t\t\t\techo -n '.'";
+        $s[] = "\t\t\t\tsleep 1";
+        $s[] = "\t\t\tdone";
+        $s[] = "\t\t\techo";
+        $s[] = "\t\tfi";
+        $s[] = "";
     }
     $s[] = "\t\t/usr/local/sbin/havp -c " . HVDEF_HAVP_CONFIG . " 2>/dev/null";
     $s[] = "\t\tsleep 2";
@@ -1291,7 +1313,8 @@ function havp_startup_script()
     unset($s);
 
     $s[] = "# stop";
-    $s[] = "\t killall -9 havp 2>/dev/null";
+    $s[] = "\t killall havp 2>/dev/null";
+    $s[] = "\t sleep 3";
     $s[] = "\t killall -9 havp 2>/dev/null";
     $s[] = "\t sleep 2";
     $s[] = "";
@@ -1306,13 +1329,14 @@ function hv_clamd_startup_script()
 {
     global $havp_config;
     $pid = HVDEF_CLAM_PID;
+    $clamdchk = "ps auxw | grep \"[c]lamd -c\"|awk '{print $2}'";
 
     # rc script
     $rc = array();
     $rc['file'] = basename(HVDEF_CLAM_STARTUP_SCRIPT);
 
     $s[] = "# start";
-    $s[] = "\tif [ -z \"`ps auxw | grep \"[c]lamd -c\"|awk '{print $2}'`\" ];then";
+    $s[] = "\tif [ -z \"`{$clamdchk}`\" ];then";
     $s[] = "\t\t/usr/local/sbin/clamd -c " . HVDEF_CLAM_CONFIG . " 2>/dev/null";
     $s[] = "\t\twait";
     $s[] = "\tfi";
@@ -1321,7 +1345,8 @@ function hv_clamd_startup_script()
     unset($s);
 
     $s[] = "#stop";
-    $s[] = "\t killall -9 clamd 2>/dev/null";
+    $s[] = "\t killall clamd 2>/dev/null";
+    $s[] = "\t sleep 5";
     $s[] = "\t killall -9 clamd 2>/dev/null";
     $s[] = "\t wait";
     $s[] = "";
@@ -1586,7 +1611,11 @@ EOD;
 # ------------------------------------------------------------------------------
 function havp_fix()
 {
-
+    # remove old named scripts
+    # havp/clamd start scripts can't be have '.sh' extensions -
+    # exists starting problem on reboot
+    unlink(HVDEF_HAVP_STARTUP_SCRIPT . ".sh");
+    unlink(HVDEF_CLAM_STARTUP_SCRIPT . ".sh");
 }
 
 ?>
