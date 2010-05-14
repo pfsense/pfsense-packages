@@ -76,11 +76,11 @@
 		<field>
 			<fielddescr>Port</fielddescr>
 			<fieldname>port</fieldname>
-			<description>Enter the port the RADIUS server will listen on. Leave blank to default to the system default, i.e., 1892.</description>
+			<description>Enter the port the RADIUS server will listen on. Leave blank to default to the system default, i.e., 1812.</description>
 			<type>input</type>
-      <default_value>1892</default_value>
+			<default_value>1812</default_value>
 		</field>
-    <field>
+	<field>
       <fielddescr>Radius Logging</fielddescr>
       <fieldname>radiuslogging</fieldname>
       <description>Enable radius logging to /var/log/radius.log?</description>
