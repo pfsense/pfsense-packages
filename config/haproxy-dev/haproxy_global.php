@@ -291,7 +291,8 @@ function enable_change(enable_change) {
 						$ipaddress = $carp['subnet'];
 						$carp_int = find_carp_interface($ipaddress);
 				?>
-					<option value="<?=$carp_int;?>" <?php if ($carp_int == $pconfig['carpdev']) echo "selected"; ?>>
+					<option value="<?=$carp_int;?>"
+					 <?php if (isset($pconfig['carpdev']) && $carp_int == $pconfig['carpdev']) echo "selected"; ?>>
 						<?=$carp_int;?> (<?=$ipaddress;?>)
 					</option>
 				<?php
