@@ -156,46 +156,46 @@ function lightsquid_resync() {
              $lsconf_var[LS_VAR_SQUIDLOGTYPE] = LS_DEF_SQUIDLOGTYPE;
 
              // update variables from package GUI config
-                if(isset($config['installedpackages']['lightsquid']['config'][0])) {
-                        $cfg = $config['installedpackages']['lightsquid']['config'][0];
+             if (isset($config['installedpackages']['lightsquid']['config'][0])) {
+                 $cfg = $config['installedpackages']['lightsquid']['config'][0];
 
-                        $tm = $cfg[LS_XML_SHEDULERTIME];
-                        $tm_squid = $cfg[LS_XML_SQUID_SHEDULERTIME];
+                 $tm = $cfg[LS_XML_SHEDULERTIME];
+                 $tm_squid = $cfg[LS_XML_SQUID_SHEDULERTIME];
 
-                        if (isset($cfg[LS_XML_LANG]) and !empty($cfg[LS_XML_LANG]))
-                            $lsconf_var[LS_VAR_LANG] = "\"" . $cfg[LS_XML_LANG] . "\";";
+                 if (isset($cfg[LS_XML_LANG]) and !empty($cfg[LS_XML_LANG]))
+                     $lsconf_var[LS_VAR_LANG] = "\"" . $cfg[LS_XML_LANG] . "\";";
 
-                        if (isset($cfg[LS_XML_SKIPURL]) and !empty($cfg[LS_XML_SKIPURL]))
-                            $lsconf_var[LS_VAR_SKIPURL] = "\"" . $cfg[LS_XML_SKIPURL] . "\";";
+                 if (isset($cfg[LS_XML_SKIPURL]) and !empty($cfg[LS_XML_SKIPURL]))
+                     $lsconf_var[LS_VAR_SKIPURL] = "\"" . $cfg[LS_XML_SKIPURL] . "\";";
 
-                        if (isset($cfg[LS_XML_IP2NAME]) and !empty($cfg[LS_XML_IP2NAME] ))
-                            $lsconf_var[LS_VAR_IP2NAME] = "\"" . $cfg[LS_XML_IP2NAME] . "\";";
+                 if (isset($cfg[LS_XML_IP2NAME]) and !empty($cfg[LS_XML_IP2NAME] ))
+                     $lsconf_var[LS_VAR_IP2NAME] = "\"" . $cfg[LS_XML_IP2NAME] . "\";";
 
-                        if (isset($cfg[LS_XML_TEMPLATE]) and !empty($cfg[LS_XML_TEMPLATE])) {
-                            $tpl_val = $cfg[LS_XML_TEMPLATE];
-                            // check template path
-                            if (!file_exists(LS_TEMPLATEPATH."/$tpl_val")) $tpl_val = 'base';
-                            $lsconf_var[LS_VAR_TEMPLATE] = "\"" . $tpl_val . "\";";
-                        }
+                 if (isset($cfg[LS_XML_TEMPLATE]) and !empty($cfg[LS_XML_TEMPLATE])) {
+                     $tpl_val = $cfg[LS_XML_TEMPLATE];
+                     // check template path
+                     if (!file_exists(LS_TEMPLATEPATH."/$tpl_val")) $tpl_val = 'base';
+                     $lsconf_var[LS_VAR_TEMPLATE] = "\"" . $tpl_val . "\";";
+                 }
 
-                        if (isset($cfg[LS_XML_BARCOLOR]) and !empty($cfg[LS_XML_BARCOLOR]))
-                            $lsconf_var[LS_VAR_BARCOLOR] = "\"" . $cfg[LS_XML_BARCOLOR] . "\";";
-                }
+                 if (isset($cfg[LS_XML_BARCOLOR]) and !empty($cfg[LS_XML_BARCOLOR]))
+                     $lsconf_var[LS_VAR_BARCOLOR] = "\"" . $cfg[LS_XML_BARCOLOR] . "\";";
+             }
 
              $lsconf = "";
              $lsconf_file = LS_CONFIGPATH . "/" . LS_CONFIGFILE;
              // open lightsquid config
              if (file_exists($lsconf_file)) {
                  $lsconf = file_get_contents($lsconf_file);
-                   update_log("Load config file $lsconf_file");
+                 update_log("Load config file $lsconf_file");
              } else {
-                   update_log("Error loading config file $lsconf_file");
+                 update_log("Error loading config file $lsconf_file");
                  // or open from 'lightsquid.cfg.dist'
                  $lsconf_dist_file = LS_CONFIGPATH . "/" . LS_CONFIGFILE_DIST;
                  if (file_exists($lsconf_dist_file)) {
-                           $lsconf = file_get_contents($lsconf_dist_file);
-                           update_log("Load config dist. file $lsconf_dist_file");
-                 } else    update_log("Error loading config dist. file $lsconf_dist_file");
+                        $lsconf = file_get_contents($lsconf_dist_file);
+                        update_log("Load config dist. file $lsconf_dist_file");
+                 } else update_log("Error loading config dist. file $lsconf_dist_file");
              }
 
              // update lightsquid config
@@ -239,17 +239,19 @@ function lightsquid_resync() {
                   case 'lhp_12h':  $on = true; $opt[0]= "0";  $opt[1]= "*/12"; break;
                   case 'lhp_24h':  $on = true; $opt[0]= "45"; $opt[1]= "23";   break; # dayly at 23:45
             }
-            ls_setup_cron("lightsquid_parser", $opt, CRONTAB_LS_JOBKEY, $on);
+            ls_setup_cron("lightsquid_parser_today", $opt, CRONTAB_LS_JOBKEY, $on);
 
             # fix possible data lost with 00:00 script start - rescan yesterday
             $opt = array("15", "0", "*", "*", "*", "root", CRONTAB_LS_TEMPLATE . " yesterday");
-            ls_setup_cron("lightsquid_parser", $opt, CRONTAB_LS_JOBKEY, $on);
+            ls_setup_cron("lightsquid_parser_yesterday", $opt, CRONTAB_LS_JOBKEY, $on);
 
-		}  else
-            ls_setup_cron("lightsquid_parser", "", "", false);
+        }  else {
+            ls_setup_cron("lightsquid_parser_today", "", "", false);
+            ls_setup_cron("lightsquid_parser_yesterday", "", "", false);
+        }
 
         // set shedule - squid rotate
-		if ($tm_squid) {
+        if ($tm_squid) {
             $on = false;
             $opt = array("0", "0", "*", "*", "*", "root", CRONTAB_SQUID_TEMPLATE);
             switch($tm_squid) {
@@ -276,16 +278,16 @@ function lightsquid_resync() {
                     case 'lsr_w7': $on = true; $opt[4]= "*/1"; break;
             }
             ls_setup_cron("lightsquid_squid_rotate", $opt, CRONTAB_SQUID_JOBKEY, $on);
-		}  else
+        }  else
             ls_setup_cron("lightsquid_squid_rotate", "", "", false);
 
          // update squid conf
-		if (isset($config['installedpackages']['squid']['config'][0])) {
-			$config['installedpackages']['squid']['config'][0]['log_enabled'] = 'on';
-			$config['installedpackages']['squid']['config'][0]['log_dir'] = LS_SQUIDLOGPATH;
-			write_config();
-			squid_resync();
-		}
+        if (isset($config['installedpackages']['squid']['config'][0])) {
+            $config['installedpackages']['squid']['config'][0]['log_enabled'] = 'on';
+            $config['installedpackages']['squid']['config'][0]['log_dir'] = LS_SQUIDLOGPATH;
+            write_config();
+            squid_resync();
+        }
     }
 
     if ($_POST['Submit'] === 'Refresh now')  refresh_now();
@@ -313,88 +315,50 @@ function ls_setup_cron($task_name, $options, $task_key, $on_off) {
             update_log("ls_setup_cron: exit - uncomplete input params.");
             return;
         }
-        // search cron config settings
-        if(!$config['cron']['item']) {
-            update_log("ls_setup_cron: exit - 'config.xml'->[cron]->[items] not found.");
-            return;
-        }
 
-        // searching task
-        $x_name='';
-        $x=0;
-        foreach($config['cron']['item'] as $item) {
-            if($item[FIELD_TASKNAME] and $task_name and ($item[FIELD_TASKNAME]==$task_name)) {
-               update_log("ls_setup_cron: found cron task with name=$task_name on [$x_name].");
-               $x_name = $x;
+        // delete old task(s)
+        if (is_array($config['cron']['item'])) {
+            foreach ($config['cron']['item'] as $key => $item) {
+                # unset crontask by name
+                if (!empty($task_name) && ($item[FIELD_TASKNAME] == $task_name)) {
+                    unset($config['cron']['item'][$key]);
+                } else
+                # unset crontask by cmd
+                if (strpos($item['command'], $options[6]) !== false) {
+                    unset($config['cron']['item'][$key]);
+                }
             }
-            $x++;
         }
-        unset($x);
 
-        // install cron:
-        //  - if not found with such name and not found 'task_key', when install task
-        //  - if found task with such name, when renew this item (delete and add new with all check's)
-        // deinstall cron:
-        //  - deinstall only, if found such name
-        switch($on_off) {
-                case true:
-                     if($task_key) {
-                          // searching task
-                          $x=0;
-                          $x_task='';
-                          foreach($config['cron']['item'] as $item) {
-                             if(strstr($item['command'], $task_key)) {
-                                $x_task = $x;
-                                update_log("ls_setup_cron: found cron task with key=$task_key on [$x].");
-                             }
-                             $x++;
-                          }
-                          unset($x);
+        # install cron task
+        if ($on_off) {
+            if ($task_key) {
+                if (is_array($options)) {
+                    # add new
+                    $cron_item = array();
+                    $cron_item[FIELD_TASKNAME] = $task_name;
+                    $cron_item['minute']    = $options[0];
+                    $cron_item['hour']      = $options[1];
+                    $cron_item['mday']      = $options[2];
+                    $cron_item['month']     = $options[3];
+                    $cron_item['wday']      = $options[4];
+                    $cron_item['who']       = $options[5];
+                    $cron_item['command']   = $options[6];
 
-                          if($x_task and (!$x_name or ($x_task != $x_name))) { // other task with $task_key alredy installed
-                                   update_log("ls_setup_cron: can't add cron task, while such task exists $task_key");
-                                   break;
-                          } else {
-                              if(is_array($options)) {
+                    # check options
+                    if (!$cron_item['who']) $cron_item['who'] = "nobody";
 
-                                   // delete this item (by name)
-                                   if($x_name > 0)
-                                      unset($config['cron']['item'][$x_name]);
-                                   // and add new
-                                   $cron_item = array();
-                                   $cron_item[FIELD_TASKNAME] = $task_name;
-                                   $cron_item['minute']    = $options[0];
-                                   $cron_item['hour']      = $options[1];
-                                   $cron_item['mday']      = $options[2];
-                                   $cron_item['month']     = $options[3];
-                                   $cron_item['wday']      = $options[4];
-                                   $cron_item['who']       = $options[5];
-                                   $cron_item['command']   = $options[6];
-                                   // check options
-                                   if(!$cron_item['who']) $cron_item['who'] = "nobody";
-                                   $config['cron']['item'][] = $cron_item;
-                                   write_config("Installed cron task '$task_name' for 'lightsquid' package");
-                                   configure_cron();
-                                   // log
-                                   update_log("ls_setup_cron: add cron task '$task_name'='" . $cron_item['command'] . "'");
-                              }
-                          }
-                     } else
-                          // log
-                          update_log("ls_setup_cron: input prm 'task_key' not defined");
-                break;
-                case false:
-                          // delete cron task with only name $task_name
-                          if($x_name > 0) {
-                             unset($config['cron']['item'][$x_name]);
-                             write_config();
-                             // log
-                             update_log("ls_setup_cron: delete cron task '$task_name'");
-                          }
-                break;
+                    $config['cron']['item'][] = $cron_item;
+                    update_log("ls_setup_cron: add cron task '{$task_name}'='{$cron_item['command']}'");
+                }        
+            } else
+                // log
+                update_log("ls_setup_cron: input prm 'task_key' not defined");
         }
+
+        write_config("Installed cron task '$task_name' for 'lightsquid' package");
         configure_cron();
-        update_log("ls_setup_cron: end");
+        update_log("ls_setup_cron: Apply new cron settings.");
 }
 
 function update_log($log) {
