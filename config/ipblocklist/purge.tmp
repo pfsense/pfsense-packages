@@ -1,0 +1,26 @@
+<?php
+$line = $_GET["line"];
+
+//echo("$line");
+//exec("more lists.txt > temp_lists.txt");
+if ($line == 0) {
+	exec("rm lists.txt");
+	} else {
+	exec("sed $line'd' lists.txt > temp_lists.txt");
+	}
+exec("more temp_lists.txt > lists.txt");
+exec("rm temp_lists.txt");
+
+
+?>
+<html>
+<HEAD>
+<SCRIPT language="JavaScript">
+<!--
+window.parent.location="ipblocklist.php";
+//-->
+</SCRIPT>
+</HEAD>
+
+
+</html>

@@ -1,0 +1,26 @@
+<?php
+$line = $_GET["line"];
+
+//echo("$line");
+//exec("more ips.ipfw > temp_ips.ipfw");
+if ($line == 0) {
+	exec("rm ips.ipfw");
+	} else {
+	exec("sed $line'd' ips.ipfw > temp_ips.ipfw");
+	}
+exec("more temp_ips.ipfw > ips.ipfw");
+exec("rm temp_ips.ipfw");
+
+
+?>
+<html>
+<HEAD>
+<SCRIPT language="JavaScript">
+<!--
+window.parent.location="ipblocklist.php";
+//-->
+</SCRIPT>
+</HEAD>
+
+
+</html>
