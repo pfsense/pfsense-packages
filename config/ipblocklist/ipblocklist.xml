@@ -62,57 +62,57 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/IP-Blocklist/ipblocklist.xml</item>
+		<item>http://www.pfsense.com/packages/config/ipblocklist/ipblocklist.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/IP-Blocklist/ipblocklist.inc</item>
+		<item>http://www.pfsense.com/packages/config/ipblocklist/ipblocklist.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/IP-Blocklist/ipblocklist.tmp</item>
+		<item>http://www.pfsense.com/packages/config/ipblocklist/ipblocklist.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/IP-Blocklist/ipblocklist_list.tmp</item>
+		<item>http://www.pfsense.com/packages/config/ipblocklist/ipblocklist_list.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/IP-Blocklist/convert.pl</item>
+		<item>http://www.pfsense.com/packages/config/ipblocklist/convert.pl</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/IP-Blocklist/convert-execute.sh</item>
+		<item>http://www.pfsense.com/packages/config/ipblocklist/convert-execute.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/IP-Blocklist/purge.tmp</item>
+		<item>http://www.pfsense.com/packages/config/ipblocklist/purge.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/IP-Blocklist/index.tmp</item>
+		<item>http://www.pfsense.com/packages/config/ipblocklist/index.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/IP-Blocklist/manual_add.tmp</item>
+		<item>http://www.pfsense.com/packages/config/ipblocklist/manual_add.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/IP-Blocklist/purgeip.tmp</item>
+		<item>http://www.pfsense.com/packages/config/ipblocklist/purgeip.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/IP-Blocklist/IP-Blocklist.sh</item>
+		<item>http://www.pfsense.com/packages/config/ipblocklist/ipblocklist.sh</item>
 	</additional_files_needed>
 	<fields>
 		<field>
