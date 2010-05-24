@@ -347,7 +347,7 @@
       <descr>A console-based network traffic monitor + vnstat PHP frontend</descr>
       <pkginfolink>http://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
       <category>Network Management</category>
-      <depends_on_package_base_url>http://pfsense.comuf.com/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>vnstat-1.10_2.tbz</depends_on_package>
       <version>1.10_2</version>
       <status>test</status>
