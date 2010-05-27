@@ -391,7 +391,7 @@ if ($snortdownload == "basic" || $snortdownload == "premium")
 	} else {
 		update_status(gettext("Downloading snort.org md5 file..."));
 		ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-		$image = @file_get_contents("http://dl.snort.org/{$premium_url}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz.md5?oink_code={$oinkid}");
+		$image = @file_get_contents("http://dl.snort.org/{$premium_url}/snortrules-snapshot-2860{$premium_subscriber}.tar.gz.md5?oink_code={$oinkid}");
 //    $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz.md5");
 		$f = fopen("{$tmpfname}/snortrules-snapshot-2.8.tar.gz.md5", 'w');
 		fwrite($f, $image);
@@ -613,7 +613,7 @@ if ($snortdownload != "off")
 		update_status(gettext("There is a new set of Snort.org rules posted. Downloading..."));
 		update_output_window(gettext("May take 4 to 10 min..."));
 //    download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz", $tmpfname . "/{$snort_filename}", "read_body_firmware");
-		download_file_with_progress_bar("http://dl.snort.org/{$premium_url}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz?oink_code={$oinkid}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
+		download_file_with_progress_bar("http://dl.snort.org/{$premium_url}/snortrules-snapshot-2860{$premium_subscriber}.tar.gz?oink_code={$oinkid}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
 		update_all_status($static_output);
 		update_status(gettext("Done downloading rules file."));
 		if (150000 > filesize("{$tmpfname}/$snort_filename")){
@@ -701,6 +701,14 @@ if ($snortdownload != "off")
 {
 	if ($snort_md5_check_ok != on) {
 	if (file_exists("{$tmpfname}/{$snort_filename}")) {
+		
+		if ($pfsense_stable == 'yes')
+		{
+			$freebsd_version_so = 'FreeBSD-7-2';
+		}else{
+			$freebsd_version_so = 'FreeBSD-8-0';	
+		}
+		
 		update_status(gettext("Extracting Snort.org rules..."));
 		update_output_window(gettext("May take a while..."));
 		/* extract snort.org rules and  add prefix to all snort.org files*/
@@ -711,9 +719,9 @@ if ($snortdownload != "off")
 		sleep(2);
 		exec('/usr/local/bin/perl /usr/local/bin/snort_rename.pl s/^/snort_/ *.rules');
 		/* extract so rules */
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/FreeBSD-7.0/i386/2.8.5.3/");
+		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/i386/2.8.6.0/");
 		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
-		exec("/bin/mv -f {$snortdir}/so_rules/precompiled/FreeBSD-7.0/i386/2.8.5.3/* /usr/local/lib/snort/dynamicrules/");
+		exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/i386/2.8.6.0/* /usr/local/lib/snort/dynamicrules/");
 		/* extract so rules none bin and rename */
 		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules/" .
 			" so_rules/chat.rules/" .
