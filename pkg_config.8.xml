@@ -378,13 +378,13 @@
       <version>1.0.6.6</version>
       <status>Beta</status>
       <pkginfolink>http://doc.pfsense.org/index.php/Tinydns_package</pkginfolink>
-      <required_version>1.2</required_version>
+      <required_version>2.0</required_version>
       <config_file>http://www.pfsense.com/packages/config/tinydns/tinydns.xml</config_file>
       <configurationfile>tinydns.xml</configurationfile>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>ucspi-tcp-0.88_2.tbz</depends_on_package>
-      <depends_on_package>daemontools-0.76_12.tbz</depends_on_package>
-      <depends_on_package>djbdns-1.05_12.tbz</depends_on_package>
+      <depends_on_package>daemontools-0.76_14.tbz</depends_on_package>
+      <depends_on_package>djbdns-1.05_13.tbz</depends_on_package>
     </package>
     <package>
       <name>Open-VM-Tools</name>
