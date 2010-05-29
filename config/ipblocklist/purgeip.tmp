@@ -4,12 +4,12 @@ $line = $_GET["line"];
 //echo("$line");
 //exec("more ips.ipfw > temp_ips.ipfw");
 if ($line == 0) {
-	exec("rm ips.ipfw");
+	exec("rm wlists.txt");
 	} else {
-	exec("sed $line'd' ips.ipfw > temp_ips.ipfw");
+	exec("sed $line'd' wlists.txt > temp_wlists.txt");
 	}
-exec("more temp_ips.ipfw > ips.ipfw");
-exec("rm temp_ips.ipfw");
+exec("more temp_wlists.txt > wlists.txt");
+exec("rm temp_wlists.txt");
 
 
 ?>

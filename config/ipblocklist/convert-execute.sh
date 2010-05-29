@@ -1,15 +1,29 @@
-pfctl -t ipblocklist -T kill
-sed -i -e '/ipblocklist/d' /tmp/rules.debug
+#Version 2
 
-#ipfw -f -q flush (Version 0.1.4)
+#kill tables to elminate dups
+pfctl -t ipblocklist -T kill
+pfctl -t ipblocklistW -T kill
+sed -i -e '/ipblocklist/d' /tmp/rules.debug
+sed -i -e '/ipblocklistW/d' /tmp/rules.debug
+
+#Generate lists to process
 ls lists > file_list.txt
+ls Wlists > file_Wlist.txt
 filelist="file_list.txt"
+Wfilelist="file_Wlist.txt"
 
 #READ contents in file_list.txt and process as file
 for fileline in $(cat $filelist); do
 iplist="lists/$fileline"
 iplistout="lists/ipfw.ipfw"
 perl convert.pl $iplist $iplistout
+done
+
+#Whitelist
+for Wfileline in $(cat $Wfilelist); do
+Wiplist="Wlists/$Wfileline"
+Wiplistout="Wlists/whitelist"
+perl convert.pl $Wiplist $Wiplistout
 done
 #echo "ipfw made"
 
@@ -19,12 +33,18 @@ sort lists/ipfw.ipfw | uniq -u >> lists/ipfw.ipfwTEMP
 mv lists/ipfw.ipfwTEMP lists/ipfw.ipfw
 #echo "ipfw clean"
 
+#clean up whitelist (duplicates)
+rm Wlists/whitelistTEMP
+sort Wlists/whitelist | uniq -u >> Wlists/whitelistTEMP
+mv Wlists/whitelistTEMP Wlists/whitelist
+#echo "whitelist clean"
+
 
 
 #Now edit /tmp/rules.debug
 
 #find my line for table
-export i=`grep -n 'block quick from any to <snort2c>' /tmp/rules.debug | grep -o '[0-9]\{2\}'`
+export i=`grep -n 'block quick from any to <snort2c>' /tmp/rules.debug | grep -o '[0-9]\{2,4\}'`
 export t=`grep -n 'User Aliases' /tmp/rules.debug |grep -o '[0-9]'`
 
 i=$(($i+'1'))
@@ -62,6 +82,9 @@ while read line
 		echo "" >> /tmp/rules.debug.tmp
 		echo "#ipblocklist" >> /tmp/rules.debug.tmp
 		echo "table <ipblocklist> persist file '/usr/local/www/packages/ipblocklist/lists/ipfw.ipfw'" >> /tmp/rules.debug.tmp
+		echo "table <ipblocklistW> persist file '/usr/local/www/packages/ipblocklist/Wlists/whitelist'" >> /tmp/rules.debug.tmp
+		echo "pass quick from <ipblocklistW> to any label 'IP-Blocklist'" >> /tmp/rules.debug.tmp
+		echo "pass quick from any to <ipblocklistW> label 'IP-Blocklist'" >> /tmp/rules.debug.tmp
 		echo "block quick from <ipblocklist> to any label 'IP-Blocklist'" >> /tmp/rules.debug.tmp
 		echo "block quick from any to <ipblocklist> label 'IP-Blocklist'" >> /tmp/rules.debug.tmp
 	fi

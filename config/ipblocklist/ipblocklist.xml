@@ -102,7 +102,7 @@
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/ipblocklist/manual_add.tmp</item>
+		<item>http://www.pfsense.com/packages/config/ipblocklist/whitelist.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>

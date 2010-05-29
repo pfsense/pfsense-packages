@@ -1,5 +1,5 @@
 <?php
-
+	//Version 2
 	
 	require_once('config.inc');
 	require("guiconfig.inc");
@@ -23,24 +23,34 @@ if (count($_POST)>0) {
 		//echo "enabled";
 		$config['installedpackages']['ipblocklist_settings']['config'][0]['enable'] = 1;
 		
-	//Load ipfw.ko
-	//exec("kldload ipfw.ko"); (Version 0.1.4)
 	//Process list by downloading and extracting
 		$myFile = "lists.txt";
+		$myWFile = "wlists.txt";
 		$fileContents = file_get_contents($myFile);
+		$fileWContents = file_get_contents($myWFile);
 		$lines = explode(PHP_EOL, $fileContents);
+		$Wlines = explode(PHP_EOL, $fileWContents);
 	//Remove DIR lists to eliminate duplates
 		exec("rm -R lists");
+		exec("rm -R Wlists");
 	//Process each list URL, Extract, and put in DIR lists
 		exec("mkdir lists");
+		exec("mkdir Wlists");
 		foreach ($lines as $line) {
 			exec("fetch -o lists $line");
 		 	$filename = basename($line);
 		 	//Extract list
 		 	exec("gzip -d lists/$filename");
 		 	}
+		foreach ($Wlines as $Wline) {
+			exec("fetch -o Wlists $Wline");
+			$Wfilename = basename($Wline);
+			//Extract Whitelist
+			exec("gzip -d Wlists/$Wfilename");
+			}
 	//Prep pfctl
 	mwexec("touch lists/ipfw.ipfw");
+	mwexec("touch Wlists/whitelist");
        //Now clear ipfw, and process each list to ipfw commands
 		mwexec("sh convert-execute.sh");
 				
@@ -101,23 +111,15 @@ else {
 	<a href="http://iblocklist.whitacrecomputers.com/files/bt_level2.gz">Level2</a>,
 	<a href="http://iblocklist.whitacrecomputers.com/files/bt_level3.gz">Level3</a>)
 	<br/>
-	Compressed lists should have .gz extention	<br/>
-	<br/>
-	<!--
-	<br/>
-	Be Patient - <u>Level3</u> lists take about 5m. <u>Level1</u> lists take about 1h<br/>
-	
-	 
-	<br/>If you use a Level1 list or multiple lists, the webserver will become unresponsive <a href="http://forum.pfsense.org/index.php/topic,24769.0.html"><img src="../../themes/nervecenter/images/icons/icon_log.gif"></a>
-	(version 0.1.4) 
-	-->
-	<br/><span style="color:red">Warning!</span> - Apply after each reboot or firewall change. Use at your own risk.
+	Compressed lists should have .gz extention and follows PeerBlock syntax	<br/>
+		
+	<br/><span style="color:red">Warning!</span> - Apply after firewall change or state reset. Use at your own risk.
 	<?php 
 	echo "<br/><br/>Current Status = ";
 	ob_start();
 	$results = exec("pfctl -s rules | grep -c ipblocklist");
 	ob_end_clean(); 
-	if ($results == '2') echo "Running";
+	if ($results > '2') echo "Running";
 	else
 	 echo "<span style='color:red'>NOT running</span>";
 		

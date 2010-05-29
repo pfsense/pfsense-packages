@@ -3,7 +3,7 @@
 /*
 /* ========================================================================== */
 /*
-	dnsblacklist.inc
+	ipblocklist.inc v2
 	Copyright (C) 2010 Tom Schaefer
 	All rights reserved.
 																			*/
@@ -29,7 +29,7 @@
 	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
-*/
+
 
 function pkg_is_service_running($servicename) 
 {
@@ -45,7 +45,7 @@ function pkg_is_service_running($servicename)
 		return false;
 	}
 }
-
+*/
 function byte_convert( $bytes ) {
 	if ($bytes<=0)
 		return '0 Byte';
@@ -94,8 +94,8 @@ function php_install_command()
 	unlink_if_exists("/tmp/purge.tmp");
 	exec("cp /tmp/index.tmp /usr/local/www/packages/ipblocklist/index.php");
 	unlink_if_exists("/tmp/index.tmp");
-	exec("cp /tmp/manual_add.tmp /usr/local/www/packages/ipblocklist/manual_add.php");
-	unlink_if_exists("/tmp/manual_add.tmp");
+	exec("cp /tmp/whitelist.tmp /usr/local/www/packages/ipblocklist/whitelist.php");
+	unlink_if_exists("/tmp/whitelist.tmp");
 	exec("cp /tmp/purgeip.tmp /usr/local/www/packages/ipblocklist/purgeip.php");
 	unlink_if_exists("/tmp/purgeip.tmp");
 	//Get scripts
@@ -104,7 +104,7 @@ function php_install_command()
 	exec("cp /tmp/convert-execute.sh /usr/local/www/packages/ipblocklist/convert-execute.sh");
 	unlink_if_exists("/tmp/convert-execute.sh");
 	exec("cp /tmp/IP-Blocklist.sh /usr/local/etc/rc.d/IP-Blocklist.sh");
-	unlink_if_exists("/tmp/convert-execute.sh");
+	unlink_if_exists("/tmp/IP-Blocklist.sh");
 	
 	
 
