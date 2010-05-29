@@ -1,6 +1,6 @@
 <html>
 <head>
-<a href="manual_add.php"><img src="../../themes/nervecenter/images/icons/icon_plus.gif" ALT="Manual" ALIGN=RIGHT></a>
+<a href="whitelist.php"><img src="../../themes/nervecenter/images/icons/icon_plus.gif" ALT="Whitelist" ALIGN=RIGHT></a>
 Add List URL: <form method="post" action="">
 <input name="content" type="text" />
 <input type="image" src="../../themes/nervecenter/images/icons/icon_plus.gif" value="submit">
