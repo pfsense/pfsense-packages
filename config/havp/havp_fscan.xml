@@ -7,6 +7,10 @@
         <include_file>/usr/local/pkg/havp.inc</include_file>
         <tabs>
                 <tab>
+                        <text>General page</text>
+                        <url>/antivirus.php</url>
+                </tab>
+                <tab>
                         <text>HTTP Proxy</text>
                         <url>/pkg_edit.php?xml=havp.xml&amp;id=0</url>
                 </tab>

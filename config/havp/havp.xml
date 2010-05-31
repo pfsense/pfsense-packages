@@ -9,11 +9,11 @@
                 <name>Antivirus</name>
                 <tooltiptext>Antivirus service</tooltiptext>
                 <section>Services</section>
-                <url>/pkg_edit.php?xml=havp.xml&amp;id=0</url>
+                <url>/antivirus.php</url>
         </menu>
         <service>
 		<name>havp</name>
-		<rcfile>havp</rcfile>
+		<rcfile>havp.sh</rcfile>
 		<executable>havp</executable>
 		<description>Antivirus HTTP proxy Service</description>
         </service>
@@ -32,7 +32,16 @@
                <prefix>/usr/local/pkg/</prefix>
                <chmod>0755</chmod>
         </additional_files_needed>
+        <additional_files_needed>
+               <item>http://www.pfsense.com/packages/config/havp/antivirus.php</item>
+               <prefix>/usr/local/www/</prefix>
+               <chmod>0755</chmod>
+        </additional_files_needed>
         <tabs>
+                <tab>
+                        <text>General page</text>
+                        <url>/antivirus.php</url>
+                </tab>
                 <tab>
                         <text>HTTP proxy</text>
                         <url>/pkg_edit.php?xml=havp.xml&amp;id=0</url>

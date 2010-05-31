@@ -113,18 +113,25 @@ define('HVDEF_STATUS_FILE',             '/var/tmp/havp.status');
 define('HVDEF_SCRIPT_DIR',              '/usr/local/etc/rc.d');
 define('HVDEF_AVCRON_SCRIPT',           '/clamav-freshclam');
 define('HVDEF_FILTER_RESYNC_SCRIPT',    '/usr/local/pkg/pf/havp_filter_resync.sh');
-define('HVDEF_HAVP_STARTUP_SCRIPT',     HVDEF_SCRIPT_DIR . '/havp');
+define('HVDEF_HAVP_STARTUP_SCRIPT',     HVDEF_SCRIPT_DIR . '/havp.sh');
 define('HVDEF_CLAM_STARTUP_SCRIPT',     HVDEF_SCRIPT_DIR . '/clamd');
 define('HVDEF_AVUPD_SCRIPT',            HVDEF_SCRIPT_DIR . '/havp_avupdate');
+
+# status
+define('HVDEF_HAVP_STATUS_FILE',        '/tmp/havp.status');
+define('HVDEF_CLAM_STATUS_FILE',        '/tmp/clam.status');
+define('HVDEF_UPD_STATUS_FILE',         '/tmp/havpupd.status');
 
 # cron
 define('HVDEF_CLAM_UPD_CRONNAME',       'havp_clam_update');
 define('HVDEF_CLAM_UPD_CRONCMD',        HVDEF_SCRIPT_DIR . HVDEF_AVCRON_SCRIPT . " start");
 define('HVDEF_CLAM_UPD_CRONKEY',        HVDEF_AVCRON_SCRIPT);
+
 # user
 define('HVDEF_USER',                    'havp');
 define('HVDEF_GROUP',                   'havp');
 define('HVDEF_AVUSER',                  HVDEF_USER);
+
 # fields
 define('HV_SCANTEMPFILE',	 'hv_scan_tempfile');
 
@@ -186,11 +193,12 @@ havp_convert_pfxml_xml();
 function havp_install()
 {
     update_status("HAVP check system..\n");
-    havp_fix();
     havp_check_system();
+    havp_fix();
 
     havp_avset_resync();
     havp_update_AV();
+
 
     update_status("Start update Antivirus bases. Wait 5-20 min before use ..");
 }
@@ -899,8 +907,8 @@ function havp_config_freshclam()
     $conf[] = "Checks $chks";
 
     $conf[] = "# notification";
-    $conf[] = "OnUpdateExecute  date \"+%d-%m-%Y %H:%M:%S Antivirus update success\" > " . HVDEF_STATUS_FILE;
-    $conf[] = "OnErrorExecute   date \"+%d-%m-%Y %H:%M:%S Antivirus update error\" > "   . HVDEF_STATUS_FILE;
+    $conf[] = "OnUpdateExecute  date \"+%d-%m-%Y %H:%M:%S Antivirus update success\" > " . HVDEF_UPD_STATUS_FILE;
+    $conf[] = "OnErrorExecute   date \"+%d-%m-%Y %H:%M:%S Antivirus update error\" > "   . HVDEF_UPD_STATUS_FILE;
 
     $conf[] = "Debug  " . (HV_DEBUG === 'true' ? "yes" : "no");
 
@@ -1122,14 +1130,6 @@ function havp_generate_rules($type = 'filter')
     global $config, $havp_config;
     $rules = array();
 
-/*  # remove this code nax
-    # nothing if havp not running
-    if (!is_service_running('havp')) {
-        if (HV_DEBUG === 'true')
-            log_error("havp: Havp is installed but not started. Filter rules not created.");
-        return;
-    }
-*/
     $proxymode = $havp_config[F_PROXYMODE];
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     # =-= HAVP always listen 127.0.0.1:port =-=
@@ -1245,10 +1245,8 @@ function havp_filter_update_3()
 function havp_update_AV()
 {
     # AV update script
-    if (file_exists(HVDEF_AVUPD_SCRIPT)) {
-        file_put_contents(HVDEF_AVUPD_SCRIPT, havp_AVupdate_script());
-        havp_set_file_access(HVDEF_AVUPD_SCRIPT, HVDEF_AVUSER, '0755');
-    }
+    file_put_contents(HVDEF_AVUPD_SCRIPT, havp_AVupdate_script());
+    havp_set_file_access(HVDEF_AVUPD_SCRIPT, HVDEF_AVUSER, '0755');
     mwexec_bg(HVDEF_AVUPD_SCRIPT); # run update background
 }
 # ==============================================================================
@@ -1257,12 +1255,10 @@ function havp_update_AV()
 # AV update script
 function havp_AVupdate_script()
 {
-
+$f = HVDEF_UPD_STATUS_FILE;
 return <<<EOD
 #!/bin/sh
-# AV update script
-# This file was automatically generated
-# by the pfSense service handler.
+date +"%d.%m.%Y %H:%M:%S Antivirus update started." > $f
 /usr/local/bin/freshclam
 wait
 /usr/local/bin/sigtool --unpack-current daily.cvd
@@ -1282,7 +1278,7 @@ function havp_startup_script()
 
     # rc script
     $rc = array();
-   	$rc['file'] = basename(HVDEF_HAVP_STARTUP_SCRIPT);
+    $rc['file'] = basename(HVDEF_HAVP_STARTUP_SCRIPT);
 
     $s[] = "# start";
     $s[] = "\tif [ -z \"`{$havpchk}`\" ];then";
@@ -1290,13 +1286,14 @@ function havp_startup_script()
         $clampid_dir = HVDEF_CLAM_RUNDIR;
         $s[] = "\t\t# start clamd before (to be sure)";
         $s[] = "\t\t" . HVDEF_CLAM_STARTUP_SCRIPT . " start";
-        $s[] = "\t\twait";
+        $s[] = "\t\tsleep 2";
         $s[] = "";
 
         $s[] = "\t\t# if clamd started";
         $s[] = "\t\tif [ -n \"`{$clamdchk}`\" ];then";
         $s[] = "\t\t\t# Waiting CLAMD";
         $s[] = "\t\t\techo -n \"Waiting CLAMD \"";
+        $s[] = "\t\t\techo 'Waiting CLAMD' > " . HVDEF_HAVP_STATUS_FILE;
         $s[] = "\t\t\twhile [ \"`{$clamdchk}`\" != \"`/bin/cat {$clampid_dir}/clamd.pid`\" ];do";
         $s[] = "\t\t\t\techo -n '.'";
         $s[] = "\t\t\t\tsleep 1";
@@ -1306,7 +1303,8 @@ function havp_startup_script()
         $s[] = "";
     }
     $s[] = "\t\t/usr/local/sbin/havp -c " . HVDEF_HAVP_CONFIG . " 2>/dev/null";
-    $s[] = "\t\tsleep 2";
+    $s[] = "\t\twait";
+    $s[] = "\t\techo 'Started' > " . HVDEF_HAVP_STATUS_FILE;
     $s[] = "\tfi";
     $s[] = "";
     $rc['start'] = implode("\n", $s);
@@ -1314,12 +1312,18 @@ function havp_startup_script()
 
     $s[] = "# stop";
     $s[] = "\t killall havp 2>/dev/null";
-    $s[] = "\t sleep 3";
-    $s[] = "\t killall -9 havp 2>/dev/null";
     $s[] = "\t sleep 2";
+    $s[] = "\t killall -9 havp 2>/dev/null";
+    $s[] = "\t wait";
+    $s[] = "\t echo 'Stopped' > " . HVDEF_HAVP_STATUS_FILE;
     $s[] = "";
     $rc['stop'] = implode("\n", $s);
     unset($s);
+
+    # we don't use start if package disabled
+    if ($havp_config[F_ENABLE] !== 'true') {
+        $rc['start'] = "\t echo 'Disabled' > " . HVDEF_HAVP_STATUS_FILE;
+    }
 
     write_rcfile($rc);
 }
@@ -1334,27 +1338,31 @@ function hv_clamd_startup_script()
     # rc script
     $rc = array();
     $rc['file'] = basename(HVDEF_CLAM_STARTUP_SCRIPT);
+    $s[] = "\t\techo 'Starting..' > " . HVDEF_CLAM_STATUS_FILE;
 
     $s[] = "# start";
     $s[] = "\tif [ -z \"`{$clamdchk}`\" ];then";
     $s[] = "\t\t/usr/local/sbin/clamd -c " . HVDEF_CLAM_CONFIG . " 2>/dev/null";
     $s[] = "\t\twait";
     $s[] = "\tfi";
+    $s[] = "\techo 'Started' > " . HVDEF_CLAM_STATUS_FILE;
     $s[] = "";
     $rc['start'] = implode("\n", $s);
     unset($s);
 
     $s[] = "#stop";
     $s[] = "\t killall clamd 2>/dev/null";
-    $s[] = "\t sleep 5";
+    $s[] = "\t sleep 2";
     $s[] = "\t killall -9 clamd 2>/dev/null";
     $s[] = "\t wait";
+    $s[] = "\t\techo 'Stopped' > " . HVDEF_CLAM_STATUS_FILE;
     $s[] = "";
     $rc['stop'] = implode("\n", $s);
     unset($s);
 
-	write_rcfile($rc);
+    write_rcfile($rc);
 }
+
 # ------------------------------------------------------------------------------
 # HAVP filter resync script
 function havp_filter_resync_script()
@@ -1429,7 +1437,7 @@ function mountRAMdisk($free_and_mount = true)
 # ------------------------------------------------------------------------------
 function umountRAMDisk()
 {
-	global $havp_config;
+    global $havp_config;
 
     # detach and free all resources used by /dev/md10:
     mwexec("umount -f " . HVDEF_RAMTEMP_DIR);
@@ -1480,27 +1488,12 @@ function start_antivirus_scanner($filename)
     $param[] = "-l " . HVDEF_CLAMSCAN_LOG;                                      # Save scan report to FILE
     $param[] = "-r";                                                            # Scan subdirectories recursively
     $param[] = "--remove";                                                      # Remove infected files. Be careful!
-#   $param[] = "--move=DIRECTORY";                                              # Move infected files into DIRECTORY
-#   $param[] = "--exclude=PATT";                                                # Don't scan file names containing PATT
-#   $param[] = "--exclude-dir=PATT";                                            # Don't scan directories containing PATT
-#   $param[] = "--include=PATT";                                                # Only scan file names containing PATT
-#   $param[] = "--include-dir=PATT";                                            # Only scan directories containing PATT
-#    $param[] = "--detect-pua";                                                  # Detect Possibly Unwanted Applications
     $param[] = "--detect-broken";                                               # Try to detect broken executable files
     $param[] = "--max-filesize=10000000";                                       # Files larger than this will be skipped and assumed clean
     $param[] = "--max-scansize=5000000";                                        # The maximum amount of data to scan for each container file (*)
     $param[] = "--max-files=10000";                                             # The maximum number of files to scan for each container file (*)
     $param[] = "--max-recursion=255";                                           # Maximum archive recursion level for container file (*)
     $param[] = "--max-dir-recursion=255";                                       # Maximum directory recursion level
-#   $param[] = "--unzip[=FULLPATH]";       # Enable support for .zip files
-#   $param[] = "--unrar[=FULLPATH]";       # Enable support for .rar files
-#   $param[] = "--arj[=FULLPATH]";         # Enable support for .arj files
-#   $param[] = "--unzoo[=FULLPATH]";       # Enable support for .zoo files
-#   $param[] = "--lha[=FULLPATH]";         # Enable support for .lha files
-#   $param[] = "--jar[=FULLPATH]";         # Enable support for .jar files
-#   $param[] = "--tar[=FULLPATH]";         # Enable support for .tar files
-#   $param[] = "--deb[=FULLPATH to ar]";   # Enable support for .deb files
-#   $param[] = "--tgz[=FULLPATH]";         # Enable support for .tar.gz, .tgz files
 
     $param = implode(" ", $param);
     if (HV_USE_CLAMD === 'true')
@@ -1515,9 +1508,10 @@ function start_antivirus_scanner($filename)
 
     	 # put to log scanning file
     	 $cont="Starting scan file {$filename}\n";
-         file_put_contents(HVDEF_CLAMSCAN_LOG, $cont);
+        file_put_contents(HVDEF_CLAMSCAN_LOG, $cont);
 
-         mwexec_bg("$param");
+        mwexec_bg("$param");
+        exec("date +\"%d.%m.%Y %H:%M:%S Starting scan file '$filename'.\" > " . HVDEF_CLAMSCAN_LOG);
     }
     else log_error("Antivirus: Can't starting file scanner. File '$filename' not exists.");
 }
@@ -1606,16 +1600,68 @@ EOD;
 
 }
 
+# ==============================================================================
+# Status, widgets
+# ==============================================================================
+function havp_get_scan_log()
+{
+    $s = '';
+    $clamscanlog = "/var/log/clamscan.log";
+    if (file_exists($clamscanlog)) {
+        $s = file_get_contents("/var/log/clamscan.log");
+    }
+    if (empty($s)) $s = "Not found.";
+    return $s;
+}
+
+function havp_get_filescanlist()
+{
+    $slist = array();
+    $slist['Squid cache path (scan you squid cache now).'] = '/var/squid';
+    $slist['Common DB path.'] = '/var/db';
+    $slist['Temp path'] = '/tmp';
+    return $slist;
+}
+
+function havp_get_av_viruslog()
+{
+    $s = array();
+    if (file_exists(HVDEF_HAVP_ACCESSLOG)) {
+        $log   = file_get_contents(HVDEF_HAVP_ACCESSLOG);
+
+        $log   = explode("\n", $log);
+        $count = 0;
+        foreach($log as $ln) {
+            if (substr_count(strtolower($ln), "virus clamd:"))
+                $s[] = $ln;
+        }
+    }
+
+    return $s;
+}
+
+function havp_get_av_statistic()
+{
+    $s = "Unknown.";
+    if (file_exists(HVDEF_HAVP_ACCESSLOG)) {
+        $log   = file_get_contents(HVDEF_HAVP_ACCESSLOG);
+
+        $count = substr_count(strtolower($log), "virus clamd:");
+        $s     = "Found $count viruses (total).";
+    }
+
+    return $s;
+}
+
 # ------------------------------------------------------------------------------
 # Fix
 # ------------------------------------------------------------------------------
 function havp_fix()
 {
     # remove old named scripts
-    # havp/clamd start scripts can't be have '.sh' extensions -
-    # exists starting problem on reboot
-    unlink(HVDEF_HAVP_STARTUP_SCRIPT . ".sh");
-    unlink(HVDEF_CLAM_STARTUP_SCRIPT . ".sh");
+    # now must exists 'havp.sh'/'clamd'
+    mwexec(HVDEF_SCRIPT_DIR . "/havp");
+    mwexec(HVDEF_SCRIPT_DIR . "/clamd.sh");
 }
 
 ?>
