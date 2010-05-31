@@ -137,7 +137,7 @@ include("head.inc");
     <table border="0" cellspacing="0" cellpadding="1">
       <tr>
         <td valign="middle"><a href="snort_interfaces_suppress_edit.php?id=<?=$i;?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" title="edit whitelist"></a></td>
-        <td><a href="/snort/snort_interfaces_whitelist.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this whitelist? All elements that still use it will become invalid (e.g. snort rules will fall back to the default whitelist)!')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="delete whitelist"></a></td>
+        <td><a href="/snort/snort_interfaces_suppress.php?act=del&id=<?=$i;?>" onclick="return confirm('Do you really want to delete this whitelist? All elements that still use it will become invalid (e.g. snort rules will fall back to the default whitelist)!')"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="delete whitelist"></a></td>
       </tr>
     </table>
   </td>
