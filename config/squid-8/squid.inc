@@ -691,12 +691,18 @@ function squid_resync_cache() {
 	$memory_policy = ($settings['memory_replacement_policy'] ? $settings['memory_replacement_policy'] : 'heap GDSF');
 	$offline_mode = ($settings['enable_offline'] == 'on' ? 'on' : 'off');
 
+	if ($disk_cache_system == "null") {
+		$disk_cache_opts = "{$disk_cache_system} /tmp";
+	} else {
+		$disk_cache_opts = "{$disk_cache_system} {$cachedir} {$disk_cache_size} {$level1} 256";
+	}
+
 	$conf = <<<EOD
 cache_mem $memory_cache_size MB
 maximum_object_size_in_memory 32 KB
 memory_replacement_policy $memory_policy
 cache_replacement_policy $cache_policy
-cache_dir $disk_cache_system $cachedir $disk_cache_size $level1 256
+cache_dir $disk_cache_opts
 minimum_object_size $min_objsize KB
 maximum_object_size $max_objsize KB
 offline_mode $offline_mode
