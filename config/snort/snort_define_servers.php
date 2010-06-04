@@ -65,6 +65,8 @@ if (isset($id) && $a_nat[$id]) {
 	/* old options */
 	$pconfig['def_ssl_ports_ignore'] = $a_nat[$id]['def_ssl_ports_ignore'];
 	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
+	$pconfig['max_queued_bytes'] = $a_nat[$id]['max_queued_bytes'];
+	$pconfig['max_queued_segs'] = $a_nat[$id]['max_queued_segs'];
 	$pconfig['perform_stat'] = $a_nat[$id]['perform_stat'];
 	$pconfig['http_inspect'] = $a_nat[$id]['http_inspect'];
 	$pconfig['other_preprocs'] = $a_nat[$id]['other_preprocs'];
@@ -159,6 +161,8 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 	if ($pconfig['snortunifiedlog'] != "") { $natent['snortunifiedlog'] = $pconfig['snortunifiedlog']; }	
 	if ($pconfig['def_ssl_ports_ignore'] != "") { $natent['def_ssl_ports_ignore'] = $pconfig['def_ssl_ports_ignore']; }
 	if ($pconfig['flow_depth'] != "") { $natent['flow_depth'] = $pconfig['flow_depth']; }
+	if ($pconfig['max_queued_bytes'] != "") { $natent['max_queued_bytes'] = $pconfig['max_queued_bytes']; }
+	if ($pconfig['max_queued_segs'] != "") { $natent['max_queued_segs'] = $pconfig['max_queued_segs']; }
 	if ($pconfig['perform_stat'] != "") { $natent['perform_stat'] = $pconfig['perform_stat']; }
 	if ($pconfig['http_inspect'] != "") { $natent['http_inspect'] = $pconfig['http_inspect']; }
 	if ($pconfig['other_preprocs'] != "") { $natent['other_preprocs'] = $pconfig['other_preprocs']; }
