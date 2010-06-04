@@ -404,11 +404,11 @@ include("head.inc");
           <tr>
             <td colspan="4">
       		    <div style="padding:5px; margin-top: 16px; margin-bottom: 16px; border:1px dashed #000066; background-color: #ffffff; color: #000000; font-size: 8pt;" id="itemhelp">
-      		    Enter only ips, do not enter CIDRs. Example: 192.168.4.1</div>
+      		    Enter only ips and CIDRs, do not enter CIDRs for whitelists. Example: 192.168.4.1 or 192.168.4.0/24</div>
             </td>
           </tr>
           <tr>
-            <td><div id="onecolumn">IP</div></td>
+            <td><div id="onecolumn">IP or CIDR</div></td>
            <td><div id="threecolumn">Add a Description or leave blank and a date will be added.</div></td>
           </tr>
 
