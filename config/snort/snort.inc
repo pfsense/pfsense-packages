@@ -311,7 +311,7 @@ global $config, $g;
 
 		$snort_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['enable'];
 		if ($snort_info_chk == 'on') {
-		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}{$if_real}\" -D -q -t /var/log/snort -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}{$if_real}\" -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 		}
 		/* define snortbarnyardlog_chk */
 		/* top will have trouble if the uuid is to far back */
@@ -1368,7 +1368,7 @@ $snort_sh_text2[] = <<<EOD
 		/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid
 		/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid.lck
 
-		/usr/local/bin/snort -u snort -g snort -R {$snort_uuid}{$if_real} -D -q -t /var/log/snort -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
+		/usr/local/bin/snort -u snort -g snort -R {$snort_uuid}{$if_real} -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
 		$start_barnyard2
 
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD Reload For {$snort_uuid}_{$if_real}..."
@@ -2177,11 +2177,13 @@ else
 	$def_perform_stat_type = "";
 	
 $def_flow_depth_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['flow_depth'];
-if ($def_flow_depth_info_chk == '')
-	$def_flow_depth_type = '0';
-else 
-	$def_flow_depth_type = $config['installedpackages']['snortglobal']['rule'][$id]['flow_depth'];
-	
+	if ($def_flow_depth_info_chk == '')
+	{
+		$def_flow_depth_type = '0';
+	}else{ 
+		$def_flow_depth_type = $config['installedpackages']['snortglobal']['rule'][$id]['flow_depth'];
+	}
+
 /* def http_inspect */
 $snort_http_inspect = <<<EOD
 #################
@@ -2402,7 +2404,26 @@ if ($def_ssl_ports_ignore_info_chk == "")
 else 
 	$def_ssl_ports_ignore_type = "$def_ssl_ports_ignore_info_chk";
 	
+/* stream5 queued settings */
 
+
+$def_max_queued_bytes_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['max_queued_bytes'];
+	if ($def_max_queued_bytes_info_chk == '')
+	{
+		$def_max_queued_bytes_type = '';
+	}else{ 
+		$def_max_queued_bytes_type = ' max_queued_bytes ' . $config['installedpackages']['snortglobal']['rule'][$id]['max_queued_bytes'] . ',';
+	}
+	
+$def_max_queued_segs_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['max_queued_segs'];
+	if ($def_max_queued_segs_info_chk == '')
+	{
+		$def_max_queued_segs_type = '';
+	}else{ 
+		$def_max_queued_segs_type = ' max_queued_segs ' . $config['installedpackages']['snortglobal']['rule'][$id]['max_queued_segs'] . ',';
+	}
+	
+	
 	/* build snort configuration file */
         /* TODO; feed back from pfsense users to reduce false positives */
 	$snort_conf_text = <<<EOD
@@ -2561,7 +2582,7 @@ preprocessor frag3_engine: policy bsd detect_anomalies
 
 preprocessor stream5_global: max_tcp 8192, track_tcp yes, \
 track_udp yes, track_icmp yes
-preprocessor stream5_tcp: policy BSD, ports both all, use_static_footprint_sizes
+preprocessor stream5_tcp: policy BSD, ports both all,{$def_max_queued_bytes_type}{$def_max_queued_segs_type} use_static_footprint_sizes
 preprocessor stream5_udp:
 preprocessor stream5_icmp:
 

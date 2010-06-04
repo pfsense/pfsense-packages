@@ -55,6 +55,8 @@ if (isset($id) && $a_nat[$id]) {
 	/* new options */
 	$pconfig['def_ssl_ports_ignore'] = $a_nat[$id]['def_ssl_ports_ignore'];
 	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
+	$pconfig['max_queued_bytes'] = $a_nat[$id]['max_queued_bytes'];
+	$pconfig['max_queued_segs'] = $a_nat[$id]['max_queued_segs'];
 	$pconfig['perform_stat'] = $a_nat[$id]['perform_stat'];
 	$pconfig['http_inspect'] = $a_nat[$id]['http_inspect'];
 	$pconfig['other_preprocs'] = $a_nat[$id]['other_preprocs'];
@@ -216,6 +218,9 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 		$natent['perform_stat'] = $_POST['perform_stat'];
 		if ($_POST['def_ssl_ports_ignore'] != "") { $natent['def_ssl_ports_ignore'] = $_POST['def_ssl_ports_ignore']; }else{ $natent['def_ssl_ports_ignore'] = ""; }
 		if ($_POST['flow_depth'] != "") { $natent['flow_depth'] = $_POST['flow_depth']; }else{ $natent['flow_depth'] = ""; }
+		if ($_POST['max_queued_bytes'] != "") { $natent['max_queued_bytes'] = $_POST['max_queued_bytes']; }else{ $natent['max_queued_bytes'] = ""; }
+		if ($_POST['max_queued_segs'] != "") { $natent['max_queued_segs'] = $_POST['max_queued_segs']; }else{ $natent['max_queued_segs'] = ""; }
+		
 		$natent['perform_stat'] = $_POST['perform_stat'] ? on : off;
 		$natent['http_inspect'] = $_POST['http_inspect'] ? on : off;
 		$natent['other_preprocs'] = $_POST['other_preprocs'] ? on : off;
@@ -352,20 +357,26 @@ if($id != "")
 					<td width="22%" valign="top">&nbsp;</td>
 					<td width="78%"><span class="vexpl"><span class="red"><strong>Note: </strong></span><br>
 					Rules may be dependent on preprocessors!<br>
-					Please save your settings before you click start.<br>					
+					Defaults will be used when there is no user input.<br>					
 					</td>
 				</tr>
+                <tr>
+                  <td colspan="2" valign="top" class="listtopic">Performance Statistics</td>
+                </tr>
 				<tr>
-					<td width="22%" valign="top" class="vncell">Enable <br>Performance Statistics</td>
+					<td width="22%" valign="top" class="vncell">Enable</td>
 					<td width="78%" class="vtable">
-					<input name="perform_stat" type="checkbox" value="on" <?php if ($pconfig['perform_stat']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
+					<input name="perform_stat" type="checkbox" value="on" <?php if ($pconfig['perform_stat']=="on") echo "checked"; ?> onClick="enable_change(false)">
 					Performance Statistics for this interface.</td>
 				</tr>
+                <tr>
+                  <td colspan="2" valign="top" class="listtopic">HTTP Inspect Settings</td>
+                </tr>
 				<tr>
-					<td width="22%" valign="top" class="vncell">Enable <br>HTTP Inspect</td>
+					<td width="22%" valign="top" class="vncell">Enable</td>
 					<td width="78%" class="vtable">
-					<input name="http_inspect" type="checkbox" value="on" <?php if ($pconfig['http_inspect']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
-					Normalize/Decode and detect HTTP traffic and protocol anomalies.</td>
+					<input name="http_inspect" type="checkbox" value="on" <?php if ($pconfig['http_inspect']=="on") echo "checked"; ?> onClick="enable_change(false)">
+					 Use HTTP Inspect to Normalize/Decode and detect HTTP traffic and protocol anomalies.</td>
 				</tr>
 				<tr>
 				<td valign="top" class="vncell">HTTP server flow depth</td>
@@ -376,9 +387,37 @@ if($id != "")
 					</tr>
 					</table>
 						Amount of HTTP server response payload to inspect. Snort's performance may increase by adjusting this value.<br>
-						Setting this value too low may cause false negatives. Values above 0 are specified in bytes.<br>
-						<strong>Default value is 0</strong></td>
+						Setting this value too low may cause false negatives. Values above 0 are specified in bytes. Default value is <strong>0</strong><br>
+				</td>
 				</tr>
+                <tr>
+                  <td colspan="2" valign="top" class="listtopic">Stream5 Settings</td>
+                </tr>
+				<tr>
+				<td valign="top" class="vncell">Max Queued Bytes</td>
+				<td class="vtable">
+					<table cellpadding="0" cellspacing="0">
+					<tr>
+                    <td><input name="max_queued_bytes" type="text" class="formfld" id="max_queued_bytes" size="5" value="<?=htmlspecialchars($pconfig['max_queued_bytes']);?>"> Minimum is <strong>1024</strong>, Maximum is <strong>1073741824</strong> ( default value is <strong>1048576</strong>, <strong>0</strong> means Maximum )</td>
+					</tr>
+					</table>
+						The number of bytes to be queued for reassembly for TCP sessions in memory. Default value is <strong>1048576</strong><br>
+				</td>
+				</tr>
+				<tr>
+				<td valign="top" class="vncell">Max Queued Segs</td>
+				<td class="vtable">
+					<table cellpadding="0" cellspacing="0">
+					<tr>
+                    <td><input name="max_queued_segs" type="text" class="formfld" id="max_queued_segs" size="5" value="<?=htmlspecialchars($pconfig['max_queued_segs']);?>"> Minimum is <strong>2</strong>, Maximum is <strong>1073741824</strong> ( default value is <strong>2621</strong>, <strong>0</strong> means Maximum )</td>
+					</tr>
+					</table>
+						The number of segments to be queued for reassembly for TCP sessions in memory. Default value is <strong>2621</strong><br>
+				</td>
+				</tr>
+                <tr>
+                  <td colspan="2" valign="top" class="listtopic">General Preprocessor Settings</td>
+                </tr>
 				<tr>
 					<td width="22%" valign="top" class="vncell">Enable <br>RPC Decode and Back Orifice detector</td>
 					<td width="78%" class="vtable">
