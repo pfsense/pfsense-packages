@@ -166,30 +166,31 @@ function ospfd_install_conf() {
 	fclose($fd);
 	
 	// Create rc.d file
-	$fd = fopen("/usr/local/etc/rc.d/ospfd.sh","w");
-	fwrite($fd, "#!/bin/sh\n\n");
-	fwrite($fd, "# This file was created by the pfSense package manager.  Do not edit!\n\n");	
-	fwrite($fd, "/usr/local/sbin/ospfd -f /usr/local/etc/ospfd.conf\n");
-	fclose($fd);
+	$rc_file_stop = "killall ospfd";
+	$rc_file_start = <<<EOF
+/usr/local/sbin/ospfctl reload
+if [ "$0" != "0" ]; then
+	/bin/pkill -x ospfd
+	/usr/local/sbin/ospfd -f /usr/local/etc/ospfd.conf
+fi
+
+EOF;
+	write_rcfile(array(
+			"file" => "ospfd.sh",
+			"start" => $rc_file_start,
+			"stop" =>  $rc_file_stop
+		)
+	);
+	
+	// Ensure files have correct permissions
 	exec("chmod a+rx /usr/local/etc/rc.d/ospfd.sh");
 	exec("chmod a-rw /usr/local/etc/ospfd.conf");
 	exec("chmod u+rw /usr/local/etc/ospfd.conf");
-	
-	// ospfd process running?  if so reload, elsewise start.
-	$oarray = array();
-	$rval = 0;
-	exec("/usr/local/sbin/ospfctl reload", $oarray, $rval);
-	if ($rval != 0) {
-		/*
-		 * ospfd isnt actually running as nothing accepted a connection
-		 * on the /var/run/ospfd.sock unix socket by ospfctl, this is
-		 * just to ensure a clean state. Killing a live ospfd would be bad.
-		 */
-		exec("/bin/pkill -x ospfd");
-		// start ospfd
-		exec("/usr/local/sbin/ospfd -f /usr/local/etc/ospfd.conf");
-	}
-	
+
+	// Kick off newly created rc.d script
+	exec("/usr/local/etc/rc.d/ospfd.sh start");
+
+	// Back to RO mount for NanoBSD and friends
 	conf_mount_ro();
 }
 
@@ -239,4 +240,5 @@ function ospfd_put_raw_config($conffile) {
 		$config['installedpackages']['ospfd']['rawconfig'] = $conffile;
 	}
 }
+
 ?>
