@@ -55,6 +55,9 @@ function openbgpd_install_conf() {
     // Setup AS #
     if($openbgpd_conf['asnum']) 
       $conffile .= "AS {$openbgpd_conf['asnum']}\n";
+      
+    if($openbgpd_conf['fibupdate'])
+      $conffile .= "fib-update {$openbgpd_conf['fibupdate']}\n";
     
     // Setup holdtime if defined.  Default is 90.
     if($openbgpd_conf['holdtime']) 
@@ -155,7 +158,7 @@ function openbgpd_install_conf() {
 	fwrite($fd, "# This file was created by the pfSense package manager.  Do not edit!\n\n");	
 	fwrite($fd, "NUMBGPD=`ps auxw | grep bgpd | grep parent | grep -v grep | wc -l | awk '{print \$1}'`\n");
 	fwrite($fd, "# echo \$NUMBGPD\n");
-	fwrite($fd, "if [ \$NUMBGPD -lt 0 ] ; then\n");
+	fwrite($fd, "if [ \$NUMBGPD -lt 1 ] ; then\n");
 	fwrite($fd, "  /usr/local/sbin/bgpd -f /usr/local/etc/bgpd.conf\n");
 	fwrite($fd, "fi\n");
 	fclose($fd);
