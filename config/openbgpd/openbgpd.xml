@@ -132,7 +132,7 @@
 		<field>
 			<fielddescr>Listen on IP</fielddescr>
 			<fieldname>listenip</fieldname>
-			<description>Specify the local IP address bgpd(8) should listen on.</description>
+			<description>Specify the local IP address bgpd(8) should listen on, or leave blank to bind to all IPs.</description>
 			<type>input</type>
 		</field>
 
@@ -166,4 +166,7 @@
 	<custom_php_resync_config_command>
 		openbgpd_install_conf();
 	</custom_php_resync_config_command>
+	<custom_php_validation_command>
+		bgpd_validate_input();
+	</custom_php_validation_command>
 </packagegui>

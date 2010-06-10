@@ -412,7 +412,7 @@
       <descr>OpenBGPD is a FREE implementation of the Border Gateway Protocol, Version 4. It allows ordinary machines to be used as routers exchanging routes with other systems speaking the BGP protocol.</descr>
       <category>NET</category>
       <config_file>http://www.pfsense.com/packages/config/openbgpd/openbgpd.xml</config_file>
-      <version>0.4.1</version>
+      <version>0.4.2</version>
       <status>STABLE</status>
       <required_version>1.3</required_version>
       <configurationfile>openbgpd.xml</configurationfile>

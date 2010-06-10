@@ -112,8 +112,6 @@
 		openbgpd_install_conf();
 	</custom_php_resync_config_command>
 	<custom_php_validation_command>
-		$status = check_group_usage($_POST['groupname']);
-		if($status != "") 
-			$input_errors[] = "Sorry this group is in use by {$status} and cannot be deleted.";
+		bgpd_validate_group();
 	</custom_php_validation_command>
 </packagegui>

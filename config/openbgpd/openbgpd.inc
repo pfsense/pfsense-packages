@@ -245,6 +245,41 @@ function check_group_usage($groupname) {
 	return "";
 }
 
+function bgpd_validate_input() {
+	global $config, $g, $input_errors;
+
+
+	if (!empty($_POST['asnum']) && !is_numeric($_POST['asnum']))
+		$input_errors[] = "AS must be entered as a number only.";
+		
+	if (!empty($_POST['routerid']) && !is_ipaddr($_POST['routerid']))
+		$input_errors[] = "Router ID must be an IP address.";
+		
+	if (!empty($_POST['holdtime']) && !is_numeric($_POST['holdtime']))
+		$input_errors[] = "Holdtime must be entered as a number.";
+		
+	if (!empty($_POST['listenip']) && !is_ipaddr($_POST['listenip']))
+		$input_errors[] = "Listen IP must be an IP address or blank to bind to all IPs.";
+		
+}
+
+function bgpd_validate_group() {
+	global $config, $g, $id, $input_errors;
+
+	if (!is_numeric($_POST['remoteas']))
+		$input_errors[] = "Remote AS must be entered as a number only.";
+	
+	if ($_POST['name'] == "")
+		$input_errors[] = "You must enter a name.";
+		
+	$_POST['name'] = remove_bad_chars($_POST['name']);
+		
+}
+
+function remove_bad_chars($string) {
+	return preg_replace('/[^a-z|_|0-9]/i','',$string);
+}
+
 function grey_out_value_boxes() {
 	echo <<<EOF
 	<script language="javascript">
