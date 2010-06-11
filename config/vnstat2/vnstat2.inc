@@ -81,7 +81,7 @@ function vnstat_install_config() {
          		$real_nic_names3 = get_real_interface($ifdescr);
          		If ($real_nic_names3 == $vnstat_nic_out)
                {
-               $ifname_out = $ifname;
+               $ifname_out = $ifdescr;
                $iface_title_array_items = "\$iface_title['$vnstat_nic_out'] = '$ifname_out';\n";
 	       array_push($iface_title_array_items2, $iface_title_array_items);
                }
