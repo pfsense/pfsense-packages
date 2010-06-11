@@ -51,8 +51,7 @@ function vnstat_install_config() {
 			$ifdescrs['opt' . $j] = $config['interfaces']['opt' . $j]['descr'];
 		}
          		foreach ($ifdescrs as $ifdescr => $ifname):
-			$ifinfo = get_interface_info($ifdescr);
-			$real_nic_names = convert_friendly_interface_to_real_interface_name($ifname);
+			$real_nic_names = get_real_interface($ifdescr);
 			array_push($array_of_real_nic_names, $real_nic_names);
 		endforeach;
         // Get already nic's assigned to vnstat
