@@ -78,7 +78,7 @@ function vnstat_install_config() {
 			$ifdescrs['opt' . $j] = $config['interfaces']['opt' . $j]['descr'];
 		}
          	foreach ($ifdescrs as $ifdescr => $ifname):
-         		$real_nic_names3 = convert_friendly_interface_to_real_interface_name($ifname);
+         		$real_nic_names3 = get_real_interface($ifdescr);
          		If ($real_nic_names3 == $vnstat_nic_out)
                {
                $ifname_out = $ifname;
