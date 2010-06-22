@@ -219,11 +219,11 @@ if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
 
 EOD;
 	update_status("Writing rc.d files... One moment please...");
+	conf_mount_rw();
 	write_rcfile($rc);
 
 	exec("chmod a+rx /usr/local/libexec/squid/dnsserver");
 
-	conf_mount_rw();
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
 	) as $dir) {
