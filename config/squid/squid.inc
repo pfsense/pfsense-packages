@@ -257,7 +257,7 @@ EOD;
 	mwexec_bg("/usr/local/etc/rc.d/proxy_monitor.sh");
 
 	update_status("Reconfiguring filter... One moment please...");
-	filter_configure_sync();
+	filter_configure();
 }
 
 function squid_deinstall_command() {
