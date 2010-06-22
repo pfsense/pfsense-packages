@@ -1193,16 +1193,18 @@ function sg_check_config_data ($input_errors)
     }
 
     # --- Blacklist ---
-    $blk_entries_file = $squidguard_config[F_WORKDIR] . SQUIDGUARD_BLK_ENTRIES;
-    if (file_exists($blk_entries_file)) {
-        $blk_entr = explode("\n", file_get_contents($blk_entries_file));
-        foreach($blk_entr as $entr) {
-            if ($entr) {
-                $destinations[] = $entr;
-                # check entry for exists
-                $dbfile = $squidguard_config[F_DBHOME] . "/$entr";
-                if (!file_exists($dbfile))
-                    $elog[] = "(B1) BLACKLIST '$entr' error: file '$dbfile' not found";
+    if ($squidguard_config[F_BLACKLISTENABLED]) {
+        $blk_entries_file = $squidguard_config[F_WORKDIR] . SQUIDGUARD_BLK_ENTRIES;
+        if (file_exists($blk_entries_file)) {
+            $blk_entr = explode("\n", file_get_contents($blk_entries_file));
+            foreach($blk_entr as $entr) {
+                if ($entr) {
+                    $destinations[] = $entr;
+                    # check entry for exists
+                    $dbfile = $squidguard_config[F_DBHOME] . "/$entr";
+                    if (!file_exists($dbfile))
+                        $elog[] = "(B1) BLACKLIST '$entr' error: file '$dbfile' not found";
+                }
             }
         }
     }
@@ -2057,6 +2059,8 @@ function acl_remove_blacklist_items($items)
 {
     # add !items and ^items
     $db_entries = sg_entries_blacklist();
+    if (!is_array($db_entries))
+    	return;
     $tdb_entries = array();
     foreach ($db_entries as $ent) {
         $tdb_entries[] = $ent;

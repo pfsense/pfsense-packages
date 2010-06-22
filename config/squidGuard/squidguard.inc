@@ -316,11 +316,11 @@ function squidguard_resync() {
     }
 
     # apply changes
-    if ($submit == APPLY_BTN) {
+    //if ($submit == APPLY_BTN) {
 #           write_config('Update squidGuard options.'); # store, if not 'Save' button
 # перенести в validate для детектирования ошибок?
         sg_reconfigure();
-    }
+    //}
 }
 
 # -----------------------------------------------------------------------------
