@@ -1125,6 +1125,8 @@ function squid_resync() {
 		mwexec("/usr/local/sbin/squid -k reconfigure");
 	}
 
+	// Sleep for a couple seconds to give squid a chance to fire up fully.
+	sleep(5);
 	filter_configure();
 	conf_mount_ro();
 }
@@ -1256,12 +1258,13 @@ function squid_generate_rules($type) {
 	global $config;
 
 	$squid_conf = $config['installedpackages']['squid']['config'][0];
-	if (!is_service_running('squid')) {
-		log_error("SQUID is installed but not started.  Not installing redirect rules.");
+
+	if (($squid_conf['transparent_proxy'] != 'on') || ($squid_conf['allow_interface'] != 'on')) {
 		return;
 	}
 
-	if (($squid_conf['transparent_proxy'] != 'on') || ($squid_conf['allow_interface'] != 'on')) {
+	if (!is_service_running('squid')) {
+		log_error("SQUID is installed but not started.  Not installing \"{$type}\" rules.");
 		return;
 	}
 
