@@ -223,6 +223,7 @@ EOD;
 
 	exec("chmod a+rx /usr/local/libexec/squid/dnsserver");
 
+	conf_mount_rw();
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
 	) as $dir) {
