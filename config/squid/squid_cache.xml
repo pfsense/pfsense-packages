@@ -209,9 +209,6 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
-		if (($g['platform'] == "nanobsd") && (!isset($config['installedpackages']['squidcache']['config'][0]['harddisk_cache_system']))) {
-			$config['installedpackages']['squidcache']['config'][0]['harddisk_cache_system'] = "null";
-		}
 		if($_POST['harddisk_cache_size'] != $config['installedpackages']['squidcache']['config'][0]['harddisk_cache_size']) {
 			$needs_dash_z = true;
 		}
