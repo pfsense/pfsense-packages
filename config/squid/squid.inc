@@ -76,6 +76,11 @@ function squid_chown_recursive($dir, $user, $group) {
 function squid_dash_z() {
 	global $config;
 	$settings = $config['installedpackages']['squidcache']['config'][0];
+
+	// If the cache system is null, there is no need to initialize the (irrelevant) cache dir.
+	if ($settings['harddisk_cache_system'] == "null")
+		return;
+
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 
 	if(!is_dir($cachedir.'/')) {
