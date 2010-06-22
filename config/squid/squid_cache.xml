@@ -92,13 +92,14 @@
 		<field>
 			<fielddescr>Hard disk cache system</fielddescr>
 			<fieldname>harddisk_cache_system</fieldname>
-			<description>This specifies the kind of storage system to use. &lt;p&gt; &lt;b&gt; ufs &lt;/b&gt; is the old well-known Squid storage format that has always been there. &lt;p&gt; &lt;b&gt; aufs &lt;/b&gt; uses POSIX-threads to avoid blocking the main Squid process on disk-I/O. (Formerly known as async-io.) &lt;p&gt; &lt;b&gt; diskd &lt;/b&gt; uses a separate process to avoid blocking the main Squid process on disk-I/O.</description>
+			<description>This specifies the kind of storage system to use. &lt;p&gt; &lt;b&gt; ufs &lt;/b&gt; is the old well-known Squid storage format that has always been there. &lt;p&gt; &lt;b&gt; aufs &lt;/b&gt; uses POSIX-threads to avoid blocking the main Squid process on disk-I/O. (Formerly known as async-io.) &lt;p&gt; &lt;b&gt; diskd &lt;/b&gt; uses a separate process to avoid blocking the main Squid process on disk-I/O. &lt;p&gt; &lt;b&gt; null &lt;/b&gt; Does not use any storage.</description>
 			<type>select</type>
 			<default_value>aufs</default_value>
 			<options>
 				<option><name>ufs</name><value>ufs</value></option>
 				<option><name>aufs</name><value>aufs</value></option>
 				<option><name>diskd</name><value>diskd</value></option>
+				<option><name>null</name><value>null</value></option>
 			</options>
 		</field>		
 		<field>
@@ -208,6 +209,9 @@
 		</field>
 	</fields>
 	<custom_php_command_before_form>
+		if (($g['platform'] == "nanobsd") && (!isset($config['installedpackages']['squidcache']['config'][0]['harddisk_cache_system']))) {
+			$config['installedpackages']['squidcache']['config'][0]['harddisk_cache_system'] = "null";
+		}
 		if($_POST['harddisk_cache_size'] != $config['installedpackages']['squidcache']['config'][0]['harddisk_cache_size']) {
 			$needs_dash_z = true;
 		}
