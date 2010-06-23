@@ -1120,14 +1120,17 @@ function squid_resync() {
 
 	if (!is_service_running('squid')) {
 		log_error("Starting Squid");
-		mwexec_bg("/usr/local/sbin/squid -D");
+		mwexec("/usr/local/sbin/squid -D");
 	} else {
 		log_error("Reloading Squid for configuration sync");
 		mwexec("/usr/local/sbin/squid -k reconfigure");
 	}
 
 	// Sleep for a couple seconds to give squid a chance to fire up fully.
-	sleep(5);
+	for ($i=0; $i < 10; $i++) {
+		if (!is_service_running('squid'))
+			sleep(1);
+	}
 	filter_configure();
 	conf_mount_ro();
 }
