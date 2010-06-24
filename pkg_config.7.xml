@@ -1053,5 +1053,15 @@
       <config_file>http://www.pfsense.org/packages/config/rrd-summary/rrd-summary.xml</config_file>
       <configurationfile>rrd-summary.xml</configurationfile>
     </package>
+    <package>
+      <name>Patch rc to leave filter_dirty</name>
+      <descr>Patch to stop /etc/rc from removing /tmp/filter_dirty on boot. Fixes boot issues with some packages on certain platforms.</descr>
+      <category>System</category>
+      <config_file>http://www.pfsense.com/packages/config/patch_rc_filter_dirty/patch_rc_filter_dirty.xml</config_file>
+      <version>0.1</version>
+      <status>BETA</status>
+      <required_version>1.2.3</required_version>
+      <maximum_version>1.2.3</maximum_version>
+    </package>
   </packages>
 </pfsensepkgs>
