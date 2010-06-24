@@ -42,7 +42,7 @@
 /* ========================================================================== */
 	]]>
 	</copyright>
-	<description>HAVP widget add-on for Dashboard package</description>
+	<description>HAVP alerts widget add-on for Dashboard package</description>
 	<requirements>Dashboard package and HAVP</requirements>
 	<faq>Currently there are no FAQ	items provided.</faq>
 	<name>widget-havp</name>
