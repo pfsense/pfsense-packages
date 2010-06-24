@@ -44,9 +44,9 @@ function avahi_install() {
 	exec("mv /usr/local/etc/avahi/*.service /usr/local/etc/avahi/services/");
 
 	// Extract out libraries and avahi-daemon
-	if(file_exists("/tmp/avahi.tar.gz")) {
-		exec("/usr/bin/tar xzPUf /tmp/avahi.tar.gz -C /");
-		unlink("/tmp/avahi.tar.gz");
+	if(file_exists("/root/avahi.tar.gz")) {
+		exec("/usr/bin/tar xzPUf /root/avahi.tar.gz -C /");
+		unlink("/root/avahi.tar.gz");
 	}
 
 	// Make sure everthing was extracted
