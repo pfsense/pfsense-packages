@@ -45,11 +45,11 @@ function fetch_rrd_summary($rrd, $start, $end, $resolution="3600") {
 }
 
 function print_rrd_summary_table($data) { ?>
-<table>
+<table cellspacing="5">
 	<tr><th>&nbsp;</th><th>Bandwidth</th></tr>
-	<tr><td>In</td><td><?php echo $data[0]; ?> MBytes</td></tr>
-	<tr><td>Out</td><td><?php echo $data[1]; ?> MBytes</td></tr>
-	<tr><td>Total</td><td><?php echo $data[0] + $data[1]; ?> MBytes</td></tr>
+	<tr><td>In</td><td align="right"><?php echo $data[0]; ?> MBytes</td></tr>
+	<tr><td>Out</td><td align="right"><?php echo $data[1]; ?> MBytes</td></tr>
+	<tr><td>Total</td><td align="right"><?php echo $data[0] + $data[1]; ?> MBytes</td></tr>
 </table>
 <?php
 }
