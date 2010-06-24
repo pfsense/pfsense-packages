@@ -1042,5 +1042,16 @@
       <required_version>1.2.3</required_version>
       <maximum_version>1.2.3</maximum_version>
     </package>
+    <package>
+      <name>RRD Summary</name>
+      <descr>RRD Summary Page, which will give a total amount of traffic passed In/Out during this and the previous month.</descr>
+      <category>System</category>
+      <version>1.0</version>
+      <status>Beta</status>
+      <maintainer>jimp@pfsense.org</maintainer>
+      <required_version>1.2.3</required_version>
+      <config_file>http://www.pfsense.org/packages/config/rrd-summary/rrd-summary.xml</config_file>
+      <configurationfile>rrd-summary.xml</configurationfile>
+    </package>
   </packages>
 </pfsensepkgs>
