@@ -36,7 +36,7 @@ require_once("openvpn.inc");
 
 function openvpn_client_export_install() {
 	conf_mount_rw();
-	$tarpath = "/tmp/openvpn-client-export.tgz";
+	$tarpath = "/root/openvpn-client-export.tgz";
 	$phpfile = "vpn_openvpn_export.php";
 	$ovpndir = "/usr/local/share/openvpn";
 	$workdir = "{$ovpndir}/client-export";
