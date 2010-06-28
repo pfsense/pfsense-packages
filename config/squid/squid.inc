@@ -40,6 +40,7 @@ if(!function_exists("filter_configure"))
 	require_once("filter.inc");
 
 define('SQUID_CONFBASE', '/usr/local/etc/squid');
+define('SQUID_BASE', '/var/squid/');
 define('SQUID_ACLDIR', '/var/squid/acl');
 define('SQUID_PASSWD', '/var/etc/squid.passwd');
 
@@ -226,9 +227,9 @@ EOD;
 
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
-	) as $dir) {
-			make_dirs($dir);
-			squid_chown_recursive($dir, 'proxy', 'proxy');
+			SQUID_BASE ) as $dir) {
+		make_dirs($dir);
+		squid_chown_recursive($dir, 'proxy', 'proxy');
 	}
 
 	/* kill any running proxy alarm scripts */
@@ -1101,9 +1102,9 @@ function squid_resync() {
 
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
-	) as $dir) {
-			make_dirs($dir);
-			squid_chown_recursive($dir, 'proxy', 'proxy');
+			SQUID_BASE ) as $dir) {
+		make_dirs($dir);
+		squid_chown_recursive($dir, 'proxy', 'proxy');
 	}
 
 	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
