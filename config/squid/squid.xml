@@ -195,7 +195,7 @@
 			<type>input</type>
 			<size>60</size>
 			<required/>
-			<default_value>/var/squid/log</default_value>
+			<default_value>/var/squid/logs</default_value>
 		</field>
 		<field>
 			<fielddescr>Log rotate</fielddescr>

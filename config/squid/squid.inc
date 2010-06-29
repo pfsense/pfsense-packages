@@ -268,7 +268,7 @@ function squid_deinstall_command() {
 	squid_install_cron(false);
 	$settings = &$config['installedpackages']['squidcache']['config'][0];
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
-	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
+	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
 	update_status("Removing swap.state ... One moment please...");
 	update_output_window("$plswait_txt");
 	mwexec('rm -rf $cachedir/swap.state');
@@ -618,7 +618,7 @@ function squid_resync_general() {
 	$hostname = ($settings['visible_hostname'] ? $settings['visible_hostname'] : 'localhost');
 	$email = ($settings['admin_email'] ? $settings['admin_email'] : 'admin@localhost');
 
-	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
+	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
 
 	$logdir_cache = $logdir . '/cache.log';
 	$logdir_access = ($settings['log_enabled'] == 'on' ? $logdir . '/access.log' : '/dev/null');
