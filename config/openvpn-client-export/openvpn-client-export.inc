@@ -195,8 +195,10 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	} else if ($settings['mode'] == "server_user")
 		$conf .= "ca {$cafile}\n";
 
-	if ($settings['tls'] && !$skiptls)
+	if ($settings['tls'] && !$skiptls) {
 		$conf .= "tls-auth {$prefix}-tls.key 1\n";
+		$conf .= "remote-cert-tls server\n";
+	}
 
 	// add optional settings
 	if ($settings['compression'])
