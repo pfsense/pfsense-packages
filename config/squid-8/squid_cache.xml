@@ -92,7 +92,7 @@
 		<field>
 			<fielddescr>Hard disk cache system</fielddescr>
 			<fieldname>harddisk_cache_system</fieldname>
-			<description>This specifies the kind of storage system to use. &lt;p&gt; &lt;b&gt; ufs &lt;/b&gt; is the old well-known Squid storage format that has always been there. &lt;p&gt; &lt;b&gt; aufs &lt;/b&gt; uses POSIX-threads to avoid blocking the main Squid process on disk-I/O. (Formerly known as async-io.) &lt;p&gt; &lt;b&gt; diskd &lt;/b&gt; uses a separate process to avoid blocking the main Squid process on disk-I/O. &lt;p&gt; &lt;b&gt; null &lt;/b&gt; Does not use any storage.</description>
+			<description>This specifies the kind of storage system to use. &lt;p&gt; &lt;b&gt; ufs &lt;/b&gt; is the old well-known Squid storage format that has always been there. &lt;p&gt; &lt;b&gt; aufs &lt;/b&gt; uses POSIX-threads to avoid blocking the main Squid process on disk-I/O. (Formerly known as async-io.) &lt;p&gt; &lt;b&gt; diskd &lt;/b&gt; uses a separate process to avoid blocking the main Squid process on disk-I/O. &lt;p&gt; &lt;b&gt; null &lt;/b&gt; Does not use any storage. Ideal for Embedded/NanoBSD.</description>
 			<type>select</type>
 			<default_value>aufs</default_value>
 			<options>

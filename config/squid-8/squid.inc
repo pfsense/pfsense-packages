@@ -40,6 +40,7 @@ if(!function_exists("filter_configure"))
 	require_once("filter.inc");
 
 define('SQUID_CONFBASE', '/usr/local/etc/squid');
+define('SQUID_BASE', '/var/squid/');
 define('SQUID_ACLDIR', '/var/squid/acl');
 define('SQUID_PASSWD', '/var/etc/squid.passwd');
 
@@ -76,6 +77,11 @@ function squid_chown_recursive($dir, $user, $group) {
 function squid_dash_z() {
 	global $config;
 	$settings = $config['installedpackages']['squidcache']['config'][0];
+
+	// If the cache system is null, there is no need to initialize the (irrelevant) cache dir.
+	if ($settings['harddisk_cache_system'] == "null")
+		return;
+
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 
 	if(!is_dir($cachedir.'/')) {
@@ -214,15 +220,16 @@ if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
 
 EOD;
 	update_status("Writing rc.d files... One moment please...");
+	conf_mount_rw();
 	write_rcfile($rc);
 
 	exec("chmod a+rx /usr/local/libexec/squid/dnsserver");
 
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
-	) as $dir) {
-			make_dirs($dir);
-			squid_chown_recursive($dir, 'proxy', 'proxy');
+			SQUID_BASE ) as $dir) {
+		make_dirs($dir);
+		squid_chown_recursive($dir, 'proxy', 'proxy');
 	}
 
 	/* kill any running proxy alarm scripts */
@@ -261,7 +268,7 @@ function squid_deinstall_command() {
 	squid_install_cron(false);
 	$settings = &$config['installedpackages']['squidcache']['config'][0];
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
-	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
+	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
 	update_status("Removing swap.state ... One moment please...");
 	update_output_window("$plswait_txt");
 	mwexec('rm -rf $cachedir/swap.state');
@@ -611,7 +618,7 @@ function squid_resync_general() {
 	$hostname = ($settings['visible_hostname'] ? $settings['visible_hostname'] : 'localhost');
 	$email = ($settings['admin_email'] ? $settings['admin_email'] : 'admin@localhost');
 
-	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
+	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
 
 	$logdir_cache = $logdir . '/cache.log';
 	$logdir_access = ($settings['log_enabled'] == 'on' ? $logdir . '/access.log' : '/dev/null');
@@ -676,13 +683,12 @@ EOD;
 
 
 function squid_resync_cache() {
-	global $config;
+	global $config, $g;
 
 	$settings = $config['installedpackages']['squidcache']['config'][0];
 
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 	$disk_cache_size = ($settings['harddisk_cache_size'] ? $settings['harddisk_cache_size'] : 100);
-	$disk_cache_system = ($settings['harddisk_cache_system'] ? $settings['harddisk_cache_system'] : 'aufs');
 	$level1 = ($settings['level1_subdirs'] ? $settings['level1_subdirs'] : 16);
 	$memory_cache_size = ($settings['memory_cache_size'] ? $settings['memory_cache_size'] : 8);
 	$max_objsize = ($settings['maximum_object_size'] ? $settings['maximum_object_size'] : 10);
@@ -690,6 +696,16 @@ function squid_resync_cache() {
 	$cache_policy = ($settings['cache_replacement_policy'] ? $settings['cache_replacement_policy'] : 'heap LFUDA');
 	$memory_policy = ($settings['memory_replacement_policy'] ? $settings['memory_replacement_policy'] : 'heap GDSF');
 	$offline_mode = ($settings['enable_offline'] == 'on' ? 'on' : 'off');
+
+	if (!isset($settings['harddisk_cache_system'])) {
+		if ($g['platform'] == "nanobsd") {
+			$disk_cache_system = 'null';
+		} else {
+			$disk_cache_system = 'aufs';
+		}
+	} else {
+		$disk_cache_system = $settings['harddisk_cache_system'];
+	}
 
 	if ($disk_cache_system == "null") {
 		$disk_cache_opts = "{$disk_cache_system} /tmp";
@@ -1086,9 +1102,9 @@ function squid_resync() {
 
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
-	) as $dir) {
-			make_dirs($dir);
-			squid_chown_recursive($dir, 'proxy', 'proxy');
+			SQUID_BASE ) as $dir) {
+		make_dirs($dir);
+		squid_chown_recursive($dir, 'proxy', 'proxy');
 	}
 
 	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
@@ -1105,12 +1121,17 @@ function squid_resync() {
 
 	if (!is_service_running('squid')) {
 		log_error("Starting Squid");
-		mwexec_bg("/usr/local/sbin/squid -D");
+		mwexec("/usr/local/sbin/squid -D");
 	} else {
 		log_error("Reloading Squid for configuration sync");
 		mwexec("/usr/local/sbin/squid -k reconfigure");
 	}
 
+	// Sleep for a couple seconds to give squid a chance to fire up fully.
+	for ($i=0; $i < 10; $i++) {
+		if (!is_service_running('squid'))
+			sleep(1);
+	}
 	filter_configure();
 	conf_mount_ro();
 }
@@ -1242,12 +1263,13 @@ function squid_generate_rules($type) {
 	global $config;
 
 	$squid_conf = $config['installedpackages']['squid']['config'][0];
-	if (!is_service_running('squid')) {
-		log_error("SQUID is installed but not started.  Not installing redirect rules.");
+
+	if (($squid_conf['transparent_proxy'] != 'on') || ($squid_conf['allow_interface'] != 'on')) {
 		return;
 	}
 
-	if (($squid_conf['transparent_proxy'] != 'on') || ($squid_conf['allow_interface'] != 'on')) {
+	if (!is_service_running('squid')) {
+		log_error("SQUID is installed but not started.  Not installing \"{$type}\" rules.");
 		return;
 	}
 
