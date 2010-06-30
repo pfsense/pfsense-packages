@@ -24,6 +24,62 @@ function vnstat_install_deinstall() {
         configure_cron();
 		conf_mount_ro();
 }
+function change_vnstat_conf(){
+	conf_mount_rw();
+	global $config;
+	$monthrotate = $_POST['monthrotate']; 
+
+// ************ Write new vnstat.conf *****************
+
+	$vnstat_conf_file = <<<EOF
+# vnStat 1.10 config file
+##
+
+# location of the database directory
+# DatabaseDir "/usr/local/pkg/vnstat"
+
+# on which day should months change
+MonthRotate $monthrotate
+
+# vnstati
+##
+
+# image colors
+CBackground     "F0F0F0"
+CEdge           "AEAEAE"
+CHeader         "990000"
+CHeaderTitle    "F0F0F0"
+CHeaderDate     "FFFFFF"
+CText           "000000"
+CLine           "B0B0B0"
+CLineL          "-"
+CRx             "666666"
+CTx             "990000"
+CRxD            "-"
+CTxD            "-"
+EOF;
+
+	$hf2 = fopen("/usr/local/etc/vnstat.conf","w");
+	if(!$hf2) {
+	log_error("could not open /usr/local/etc/vnstat.conf for writing");
+	exit;
+	}
+	fwrite($hf2, $vnstat_conf_file);
+	fclose($hf2);
+	conf_mount_ro();
+}
+
+function create_vnstati_image() {
+	conf_mount_rw();
+	global $config;
+	exec("[ ! -d dir ] && mkdir /usr/local/www/vnstati");
+	$iface = $_POST['vnstat_interface']; 
+	$iface2 = $_POST['output_type']; 
+	$ifaces_final = convert_friendly_interface_to_real_interface_name($iface);
+//	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -". $iface2 ." -o /usr/local/www/vnstati/". $ifaces_final ."-". $iface2 .".png");
+	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -". $iface2 ." -o /usr/local/www/vnstati/newpicture.png");
+	conf_mount_ro();
+}
 
 function vnstat_install_config() {
         global $config;
