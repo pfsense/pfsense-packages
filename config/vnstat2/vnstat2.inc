@@ -28,11 +28,14 @@ function vnstat_install_deinstall() {
 function vnstat_install_config() {
         global $config;
 		conf_mount_rw();
-	exec("[ ! -d dir ] && mkdir /var/db/vnstat");
+// Create vnstat database dir where it also will work for nanobsd
+	exec("[ ! -d dir ] && mkdir /usr/local/pkg/vnstat");
 // Unpack and move Vnstat frontend 
 	exec("cd ..");
 	exec("tar -zxovf /usr/local/pkg/vnstat_php_frontend-1.4.1.tar.gz");
 	exec("mv vnstat_php_frontend-1.4.1 /usr/local/www/vnstat2");
+// Move Vnstat config
+	exec("mv /usr/local/pkg/vnstat.conf /usr/local/etc/vnstat.conf");
 // Add cron job to config.xml
         $cron_item = array();
         $cron_item['minute']    = "*/1";
@@ -55,7 +58,7 @@ function vnstat_install_config() {
 			array_push($array_of_real_nic_names, $real_nic_names);
 		endforeach;
         // Get already nic's assigned to vnstat
-        exec("ls /var/db/vnstat/ | grep -v '\.'", $vnstat_nic);
+        exec("ls /usr/local/pkg/vnstat/ | grep -v '\.'", $vnstat_nic);
         // Compare real nic's with nic's assigned to vnstat
         $result = array_diff($array_of_real_nic_names, $vnstat_nic);
         // Create database for each nic 
@@ -65,7 +68,7 @@ function vnstat_install_config() {
         }
 // Find information to be writing in config.php 
 	// $iface_list_array_items
-        exec("ls /var/db/vnstat/ | grep -v '\.'", $vnstat_nic_in);
+        exec("ls /usr/local/pkg/vnstat/ | grep -v '\.'", $vnstat_nic_in);
         $iface_list_array_items = implode("', '", $vnstat_nic_in);
         $iface_list_array = "\$iface_list = array('$iface_list_array_items');";
         // $iface_title_array_items
