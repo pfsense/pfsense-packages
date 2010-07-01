@@ -103,7 +103,7 @@ function vnstat_install_config() {
         $cron_item['month']     = "*";
         $cron_item['wday']      = "*";
         $cron_item['who']       = "root";
-        $cron_item['command']   = "/usr/local/bin/vnstat -u";
+        $cron_item['command']   = "/usr/local/pkg/vnstat.sh";
         $config['cron']['item'][] = $cron_item;
 // get system nic's and create a database for them
         $array_of_real_nic_names = array();
@@ -125,6 +125,26 @@ function vnstat_install_config() {
         {
            exec("/usr/local/bin/vnstat -u -i ". $result2);
         }
+
+// ************ Write new vnstat.sh *****************
+
+	$vnstat_bash_file = <<<EOF
+#!/bin/sh
+
+/etc/rc.conf_mount_rw
+/usr/local/bin/vnstat -u
+sleep 0.2
+/etc/rc.conf_mount_ro
+EOF;
+
+	$hf3 = fopen("/usr/local/pkg/vnstat.sh","w");
+	if(!$hf3) {
+	log_error("could not open /usr/local/pkg/vnstat.sh for writing");
+	exit;
+	}
+	fwrite($hf3, $vnstat_bash_file);
+	fclose($hf3)
+
 // Find information to be writing in config.php 
 	// $iface_list_array_items
         exec("ls /usr/local/pkg/vnstat/ | grep -v '\.'", $vnstat_nic_in);
