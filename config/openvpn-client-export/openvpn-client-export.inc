@@ -200,7 +200,8 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	}
 
 	// Prevent MITM attacks by verifying the server certificate.
-	$conf .= "remote-cert-tls server\n";
+	// - Disable for now, it requires the server cert to include special options
+	//$conf .= "remote-cert-tls server\n";
 
 	// add optional settings
 	if ($settings['compression'])
