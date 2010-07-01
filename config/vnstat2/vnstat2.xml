@@ -54,7 +54,7 @@
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0644</chmod>
+		<chmod>0744</chmod>
 		<item>http://www.pfsense.com/packages/config/vnstat2/vnstat2.sh</item>
 	</additional_files_needed>
 	<fields>
