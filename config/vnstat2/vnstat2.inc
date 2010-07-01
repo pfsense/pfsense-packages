@@ -26,6 +26,7 @@ function vnstat_install_deinstall() {
         configure_cron();
 		conf_mount_ro();
 }
+
 function change_vnstat_conf(){
 	conf_mount_rw();
 	global $config;
@@ -74,7 +75,7 @@ EOF;
 function create_vnstati_image() {
 	conf_mount_rw();
 	global $config;
-	exec("[ ! -d dir ] && mkdir /usr/local/www/vnstati");
+	exec("[ ! -d /usr/local/www/vnstati ] && mkdir /usr/local/www/vnstati");
 	$iface = $_POST['vnstat_interface']; 
 	$iface2 = $_POST['output_type']; 
 	$ifaces_final = convert_friendly_interface_to_real_interface_name($iface);
@@ -87,13 +88,13 @@ function vnstat_install_config() {
         global $config;
 		conf_mount_rw();
 // Create vnstat database dir where it also will work for nanobsd
-	exec("[ ! -d dir ] && mkdir /usr/local/pkg/vnstat");
+	exec("[ ! -d /usr/local/pkg/vnstat ] && mkdir /usr/local/pkg/vnstat");
 // Unpack and move Vnstat frontend 
 	exec("cd ..");
 	exec("tar -zxovf /usr/local/pkg/vnstat_php_frontend-1.4.1.tar.gz");
 	exec("mv vnstat_php_frontend-1.4.1 /usr/local/www/vnstat2");
 // Move Vnstat config
-	exec("mv /usr/local/pkg/vnstat.conf /usr/local/etc/vnstat.conf");
+	exec("[ ! -f /usr/local/etc/vnstat.conf ] && mv /usr/local/pkg/vnstat.conf /usr/local/etc/vnstat.conf");
 // Add cron job to config.xml
         $cron_item = array();
         $cron_item['minute']    = "*/1";
