@@ -744,7 +744,7 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>p7zip-9.04.tbz</depends_on_package>
       <depends_on_package>zip-3.0.tbz</depends_on_package>
-      <version>0.2</version>
+      <version>0.3</version>
       <status>BETA</status>
       <required_version>2.0</required_version>
       <config_file>http://www.pfsense.com/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
