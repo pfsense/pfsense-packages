@@ -5,6 +5,8 @@ function vnstat_install_deinstall() {
 // Remove Vnstat package and files
         exec("cd /var/db/pkg/ && pkg_delete `ls | grep vnstat`");
 	exec("rm -d -R /usr/local/www/vnstat2");
+	exec("rm -d -R /usr/local/www/vnstati");
+	exec("rm /usr/local/pkg/vnstat_php_frontend.xml");
 // Remove vnstat cron entry from config.xml
         $task_key = '/usr/local/bin/vnstat -u';
         $x_name='';
@@ -36,7 +38,7 @@ function change_vnstat_conf(){
 ##
 
 # location of the database directory
-# DatabaseDir "/usr/local/pkg/vnstat"
+DatabaseDir "/usr/local/pkg/vnstat"
 
 # on which day should months change
 MonthRotate $monthrotate
