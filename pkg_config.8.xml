@@ -706,10 +706,7 @@
     </package>
     <package>
       <name>squidGuard</name>
-      <descr>
-          High perfomance web proxy URL filter.
-          Required proxy Squid package.
-	  </descr>
+      <descr>High perfomance web proxy URL filter. Requires proxy Squid package.</descr>
       <website>http://www.squidGuard.org/</website>
       <maintainer>dv_serg@mail.ru</maintainer>
       <category>Network Management</category>
