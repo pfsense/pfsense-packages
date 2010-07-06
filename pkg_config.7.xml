@@ -835,13 +835,13 @@
       <descr>Monitoring agent.</descr>
       <category>Services</category>
       <config_file>http://www.pfsense.com/packages/config/zabbix-agent/zabbix-agent.xml</config_file>
-      <version>0.22</version>
+      <version>1.8.2_2</version>
       <status>FINAL</status>
       <required_version>1.2.3</required_version>
       <configurationfile>zabbix-agent.xml</configurationfile>
       <maintainer>remco.verhoef@redfive.biz</maintainer>
-      <depends_on_package_base_url>http://www.pfsense.com/packages/config/zabbix-agent/bin/</depends_on_package_base_url>
-      <depends_on_package>zabbix-agent-1.4.5,2.tbz</depends_on_package>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package>zabbix-agent-1.8.2_2,2.tbz</depends_on_package>
     </package>
     <package>
       <name>OpenVPN Client Export Utility</name>
