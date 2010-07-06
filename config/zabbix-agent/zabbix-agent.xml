@@ -116,7 +116,7 @@
         $start  .= "echo \"Starting Zabbix Agent\"...\n";
 
 		/* start zabbix agent */
-		$start .= "/usr/local/bin/zabbix_agentd\n";
+		$start .= "/usr/local/sbin/zabbix_agentd\n";
 
         $stop = "echo \"Stopping Zabbix Agent\"\n";
         $stop .= "/usr/bin/killall zabbix_agentd\n";
