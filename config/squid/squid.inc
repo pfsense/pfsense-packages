@@ -554,7 +554,7 @@ function squid_install_cron($should_install) {
 		return;
 	$x=0;
 	foreach($config['cron']['item'] as $item) {
-		if(strstr($item['command'], "/usr/local/sbin/squid")) {
+		if(strstr($item['task_name'], "squid_rotate_logs")) {
 			$is_installed = true;
 			break;
 		}
@@ -564,6 +564,7 @@ function squid_install_cron($should_install) {
 		case true:
 			if(!$is_installed) {
 				$cron_item = array();
+				$cron_item['task_name'] = "squid_rotate_logs";
 				$cron_item['minute'] = "0";
 				$cron_item['hour'] = "0";
 				$cron_item['mday'] = "*";
