@@ -653,7 +653,7 @@
       <depends_on_package>squid-2.7.9.tbz</depends_on_package>
       <depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
       <depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
-      <config_file>http://www.pfsense.org/packages/config/squid-8/squid.xml</config_file>
+      <config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
       <configurationfile>squid.xml</configurationfile>
     </package>
     <package>
