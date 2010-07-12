@@ -517,13 +517,13 @@
       <configurationfile>open-vm-tools.xml</configurationfile>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>open-vm-tools-nox11-167859_1.tbz</depends_on_package>
-      <depends_on_package>libtool-2.2.6a.tbz</depends_on_package>
+      <depends_on_package>libtool-2.2.6b.tbz</depends_on_package>
       <depends_on_package>libiconv-1.13.1.tbz</depends_on_package>
       <depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
-      <depends_on_package>icu-3.8.1_2.tbz</depends_on_package>
-      <depends_on_package>gmake-3.81_3.tbz</depends_on_package>
+      <depends_on_package>icu-3.8.1_3.tbz</depends_on_package>
+      <depends_on_package>gmake-3.81_4.tbz</depends_on_package>
       <depends_on_package>gettext-0.17_1.tbz</depends_on_package>
-  	  <depends_on_package>glib-2.20.4.tbz</depends_on_package>
+  	  <depends_on_package>glib-2.24.1_1.tbz</depends_on_package>
     </package>
     <package>
       <name>AutoConfigBackup</name>
