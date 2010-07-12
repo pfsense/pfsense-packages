@@ -516,7 +516,7 @@
       <config_file>http://www.pfsense.org/packages/config/open-vm-tools/open-vm-tools.xml</config_file>
       <configurationfile>open-vm-tools.xml</configurationfile>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-      <depends_on_package>open-vm-tools-nox11-167859_1.tbz</depends_on_package>
+      <depends_on_package>open-vm-tools-nox11-253928.tbz</depends_on_package>
       <depends_on_package>libtool-2.2.6b.tbz</depends_on_package>
       <depends_on_package>libiconv-1.13.1.tbz</depends_on_package>
       <depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
