@@ -33,9 +33,9 @@ $start = "00 " . date("m/{$startday}/Y");
 $lastmonth = "00 " . date("m/{$startday}/Y", strtotime("-1 month", strtotime(date("m/{$startday}/Y"))));
 
 $thismonth = fetch_rrd_summary($rrd, $start, "now");
-$lastmonth = fetch_rrd_summary($rrd, $lastmonth, $start, "86400");
+$lastmonth = fetch_rrd_summary($rrd, $lastmonth, $start, 720*60);
 
-function fetch_rrd_summary($rrd, $start, $end, $resolution="3600") {
+function fetch_rrd_summary($rrd, $start, $end, $resolution=(60*60)) {
 	$traffic = array();
 	$rrd   = escapeshellarg("/var/db/rrd/{$rrd}");
 	$start = escapeshellarg($start);
