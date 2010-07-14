@@ -2,14 +2,14 @@
 <!-- pfSense packages -->
 <pfsensepkgs>
   <packages>
-      <package>
+	<package>
 		<name>Country Block</name>
 		<website/>
 		<descr>Block countries</descr>
 		<category>Firewall</category>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,25732.0.html</pkginfolink>
 		<config_file>http://pfsense.org/packages/config/countryblock/countryblock.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<version>0.1.2</version>
 		<status>Beta</status>
 		<required_version>1.2.2</required_version>
@@ -23,7 +23,7 @@
 		<category>Firewall</category>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,24769.0.html</pkginfolink>
 		<config_file>http://pfsense.org/packages/config/ipblocklist/ipblocklist.xml</config_file>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<version>0.2.0</version>
 		<status>Beta</status>
 		<required_version>1.2.2</required_version>
@@ -44,6 +44,86 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>varnish-2.1.tbz</depends_on_package>
 		<depends_on_package>gcc-4.2.5.20090325_3.tbz</depends_on_package>
+	</package>
+	<package>
+		<name>Notes</name>
+		<website/>
+		<descr>Track things you want to note for this system.</descr>
+		<category>Status</category>
+		<pkginfolink/>
+		<config_file>http://www.pfsense.com/packages/config/notes/notes.xml</config_file>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<version>0.2.4</version>
+		<status>Alpha</status>
+		<required_version>1.2.1</required_version>
+		<maintainer>markjcrane@gmail.com</maintainer>
+		<configurationfile>notes.xml</configurationfile>
+	</package>
+	<package>
+		<name>PHPService</name>
+		<website/>
+		<descr>PHP run as a service it can do anything PHP can do including but not limited to monitoring files, CPU, RAM, and send alerts to the syslog.</descr>
+		<category>Services</category>
+		<pkginfolink>http://doc.pfsense.org/index.php/PHPService</pkginfolink>
+		<config_file>http://www.pfsense.com/packages/config/phpservice/phpservice.xml</config_file>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<version>0.4.1</version>
+		<status>Beta</status>
+		<required_version>1.2.1</required_version>
+		<maintainer>markjcrane@gmail.com</maintainer>
+		<configurationfile>phpservice.xml</configurationfile>
+	</package>
+	<package>
+		<name>Backup</name>
+		<website/>
+		<descr>Tool to Backup and Restore files and directories.</descr>
+		<category>System</category>
+		<pkginfolink></pkginfolink>
+		<config_file>http://www.pfsense.com/packages/config/backup/backup.xml</config_file>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<version>0.1.5</version>
+		<status>Beta</status>
+		<required_version>1.2</required_version>
+		<maintainer>markjcrane@gmail.com</maintainer>
+		<configurationfile>backup.xml</configurationfile>
+	</package>
+	<package>
+		<name>Cron</name>
+		<website/>
+		<descr>The cron utility is used to manage commands on a schedule.</descr>
+		<category>Services</category>
+		<pkginfolink></pkginfolink>
+		<config_file>http://www.pfsense.com/packages/config/cron/cron.xml</config_file>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<version>0.1.5</version>
+		<status>Beta</status>
+		<required_version>1.2</required_version>
+		<maintainer>markjcrane@gmail.com</maintainer>
+		<configurationfile>cron.xml</configurationfile>
+	</package>
+	<package>
+		<name>AutoConfigBackup</name>
+		<maintainer>portal@bsdperimeter.com</maintainer>
+		<descr>Automatically backs up your pfSense configuration.  All contents are encrypted on the server.  Requires pfSense Premium Support Portal Subscription from https://portal.pfsense.org</descr>
+		<website>https://portal.pfsense.org</website>
+		<category>Services</category>
+		<version>1.18</version>
+		<status>Stable</status>
+		<required_version>1.2</required_version>
+		<pkginfolink>http://doc.pfsense.org/index.php/AutoConfigBackup</pkginfolink>
+		<config_file>http://www.pfsense.com/packages/config/autoconfigbackup/autoconfigbackup.xml</config_file>
+		<configurationfile>autoconfigbackup.xml</configurationfile>
+	</package>
+	<package>
+		<name>RRD Summary</name>
+		<descr>RRD Summary Page, which will give a total amount of traffic passed In/Out during this and the previous month.</descr>
+		<category>System</category>
+		<version>1.1</version>
+		<status>Beta</status>
+		<maintainer>jimp@pfsense.org</maintainer>
+		<required_version>1.2.3</required_version>
+		<config_file>http://www.pfsense.org/packages/config/rrd-summary/rrd-summary.xml</config_file>
+		<configurationfile>rrd-summary.xml</configurationfile>
 	</package>
   </packages>
 </pfsensepkgs>
