@@ -129,7 +129,7 @@
 		<name>OpenVPN Client Export Utility</name>
 		<descr>Allows a pre-configured OpenVPN Windows Client or  or Mac OSX's Viscosity configuration bundle to be exported directly from pfSense.</descr>
 		<category>Security</category>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>p7zip-9.04.tbz</depends_on_package>
 		<depends_on_package>zip-3.0.tbz</depends_on_package>
 		<version>0.3</version>
@@ -223,6 +223,313 @@
 		<status>BETA</status>
 		<required_version>1.2</required_version>
 		<configurationfile>widget-havp.xml</configurationfile>
+	</package>
+	<package>
+		<name>siproxd</name>
+		<website>http://siproxd.sourceforge.net/</website>
+		<descr>Proxy for handling NAT of multiple SIP devices to a single public IP.</descr>
+		<category>Services</category>
+		<config_file>http://www.pfsense.com/packages/config/siproxd.xml</config_file>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>siproxd-0.7.2.tbz</depends_on_package>
+		<pkginfolink>http://doc.pfsense.org/index.php/Siproxd_package</pkginfolink>
+		<version>0.7.2,1</version>
+		<status>Beta</status>
+		<required_version>1.2.1</required_version>
+		<configurationfile>siproxd.xml</configurationfile>
+	</package>
+	<package>
+		<name>OpenBGPD</name>
+		<descr>OpenBGPD is a FREE implementation of the Border Gateway Protocol, Version 4. It allows ordinary machines to be used as routers exchanging routes with other systems speaking the BGP protocol.</descr>
+		<category>NET</category>
+		<config_file>http://www.pfsense.com/packages/config/openbgpd/openbgpd.xml</config_file>
+		<version>0.5.2</version>
+		<status>STABLE</status>
+		<pkginfolink>http://doc.pfsense.org/index.php/OpenBGPD_package</pkginfolink>
+		<required_version>1.3</required_version>
+		<configurationfile>openbgpd.xml</configurationfile>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>openbgpd-4.7.20100410.tbz</depends_on_package>
+	</package>
+	<package>
+		<name>vnstat2</name>
+		<website>http://humdi.net/vnstat/</website>
+		<descr>A console-based network traffic monitor + vnstat PHP frontend</descr>
+		<pkginfolink>http://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
+		<category>Network Management</category>
+		<depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-8.1-release/All/</depends_on_package_base_url>
+		<depends_on_package>vnstat-1.10_2.tbz</depends_on_package>
+		<version>1.10_2</version>
+		<status>test</status>
+		<required_version>2.0</required_version>
+		<maintainer>crazypark2@yahoo.dk</maintainer>
+		<config_file>http://www.pfsense.com/packages/config/vnstat2/vnstat2.xml</config_file>
+		<configurationfile>vnstat2.xml</configurationfile>
+		<after_install_info></after_install_info>
+	</package>
+	<package>
+		<name>dns-server</name>
+		<descr>pfSense version of TinyDNS which features failover host support</descr>
+		<website>http://cr.yp.to/djbdns.html</website>
+		<category>Services</category>
+		<version>1.0.6.6</version>
+		<status>Beta</status>
+		<pkginfolink>http://doc.pfsense.org/index.php/Tinydns_package</pkginfolink>
+		<required_version>2.0</required_version>
+		<config_file>http://www.pfsense.com/packages/config/tinydns/tinydns.xml</config_file>
+		<configurationfile>tinydns.xml</configurationfile>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>ucspi-tcp-0.88_2.tbz</depends_on_package>
+		<depends_on_package>daemontools-0.76_15.tbz</depends_on_package>
+		<depends_on_package>djbdns-1.05_13.tbz</depends_on_package>
+	</package>
+	<package>
+		<name>arping</name>
+		<descr>Broadcasts a who-has ARP packet on the network and prints answers. </descr>
+		<website>http://www.habets.pp.se/synscan/programs.php?prog=arping</website>
+		<category>Services</category>
+		<version>2.08</version>
+		<status>Beta</status>
+		<pkginfolink>http://doc.pfsense.org/index.php/Arping_package</pkginfolink>
+		<required_version>1.0.1</required_version>
+		<config_file>http://www.pfsense.com/packages/config/arping/arping.xml</config_file>
+		<configurationfile>arping.xml</configurationfile>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>arping-2.08.tbz</depends_on_package>
+	</package>
+	<package>
+		<name>nmap</name>
+		<maintainer>billm@pfsense.org</maintainer>
+		<descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
+		<category>Security</category>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>nmap-5.00.tbz</depends_on_package>
+		<config_file>http://www.pfsense.com/packages/config/nmap/nmap.xml</config_file>
+		<version>5.00</version>
+		<status>Stable</status>
+		<pkginfolink>http://doc.pfsense.org/index.php/Nmap_package</pkginfolink>
+		<required_version>1.2.1</required_version>
+		<configurationfile>nmap.xml</configurationfile>
+	</package>
+	<package>
+		<name>imspector</name>
+		<descr>IMSpector is an Instant Messenger transparent proxy with logging capabilities. Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees.</descr>
+		<website>http://www.imspector.org/</website>
+		<category>Network Management</category>
+		<maintainer>billm@pfsense.org</maintainer>
+		<version>0.8-9</version>
+		<required_version>1.2.1</required_version>
+		<status>BETA</status>
+		<pkginfolink>http://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
+		<config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
+		<configurationfile>imspector.xml</configurationfile>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>imspector-0.8.tbz</depends_on_package>
+		<depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
+		<depends_on_package>mysql-client-5.0.77.tbz</depends_on_package>
+		<depends_on_package>sqlite3-3.6.10.tbz</depends_on_package>
+	</package>
+	<package>
+		<name>nut</name>
+		<descr>Network UPS Tools</descr>
+		<website>http://www.networkupstools.org/</website>
+		<category>Network Management</category>
+		<version>2.2.2_3a</version>
+		<status>BETA</status>
+		<required_version>2.0</required_version>
+		<maintainer>rswagoner@gmail.com</maintainer>
+		<config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
+		<configurationfile>nut.xml</configurationfile>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>nut-2.2.2_3.tbz</depends_on_package>
+		<depends_on_package>perl-5.10.1.tbz</depends_on_package>
+		<pkginfolink>http://doc.pfsense.org/index.php/Nut_package</pkginfolink>
+	</package>
+	<package>
+		<name>darkstat</name>
+		<website>http://dmr.ath.cx/net/darkstat/</website>
+		<descr>darkstat is a network statistics gatherer. It's a packet sniffer that runs as a background process on a cable/DSL router, gathers all sorts of statistics about network usage, and serves them over HTTP.</descr>
+		<category>Network Management</category>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>darkstat-3.0.712.tbz</depends_on_package>
+		<version>3.0.712</version>
+		<status>Stable</status>
+		<required_version>1.2.1</required_version>
+		<maintainer>sullrich+pfsp@gmail.com</maintainer>
+		<config_file>http://www.pfsense.com/packages/config/darkstat/darkstat.xml</config_file>
+		<configurationfile>darkstat.xml</configurationfile>
+	</package>
+	<package>
+		<name>pfflowd</name>
+		<website>http://www.mindrot.org/pfflowd.html</website>
+		<descr>pfflowd converts OpenBSD PF status messages (sent via the pfsync interface) to Cisco NetFlow datagrams. These datagrams may be sent (via UDP) to a host of one's choice. Utilising the OpenBSD stateful packet filter infrastructure means that flow tracking is very fast and accurate.</descr>
+		<category>Network Management</category>
+		<config_file>http://www.pfsense.com/packages/config/pfflowd.xml</config_file>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>pfflowd-0.7.tbz</depends_on_package>
+		<version>0.7</version>
+		<status>Stable</status>
+		<required_version>1.2.1</required_version>
+		<configurationfile>pfflowd.xml</configurationfile>
+		<maintainer>nick@buraglio.com</maintainer>
+	</package>
+	<package>
+		<name>widentd</name>
+		<descr>RFC1413 auth/identd daemon with fixed fake reply</descr>
+		<website>http://www.webweaving.org/widentd</website>
+		<category>Services</category>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>widentd-1.03_1.tbz</depends_on_package>
+		<version>1.03_1</version>
+		<status>Stable</status>
+		<pkginfolink>http://doc.pfsense.org/index.php/Widentd_package</pkginfolink>
+		<required_version>1.2.1</required_version>
+		<config_file>http://www.pfsense.com/packages/config/widentd.xml</config_file>
+		<configurationfile>widentd.xml</configurationfile>
+	</package>
+	<package>
+		<name>freeradius</name>
+		<website>http://www.freeradius.org/</website>
+		<descr>A free implementation of the RADIUS protocol.</descr>
+		<category>System</category>
+		<version>1.1.8</version>
+		<status>BROKEN</status>
+		<required_version>2.0</required_version>
+		<maintainer>none</maintainer>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>freeradius-1.1.8.tbz</depends_on_package>
+		<depends_on_package>libltdl-2.2.6b.tbz</depends_on_package>
+		<config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
+		<configurationfile>freeradius.xml</configurationfile>
+	</package>
+	<package>
+		<name>bandwidthd</name>
+		<website>http://bandwidthd.sourceforge.net/</website>
+		<descr>BandwidthD tracks usage of TCP/IP network subnets and builds html files with graphs to display utilization. Charts are built by individual IPs, and by default display utilization over 2 day, 8 day, 40 day, and 400 day periods. Furthermore, each ip address's utilization can be logged out at intervals of 3.3 minutes, 10 minutes, 1 hour or 12 hours in cdf format, or to a backend database server. HTTP, TCP, UDP, ICMP, VPN, and P2P traffic are color coded.</descr>
+		<category>System</category>
+		<version>2.0.1_4</version>
+		<status>BETA</status>
+		<required_version>1.2.1</required_version>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>bandwidthd-2.0.1_4.tbz</depends_on_package>
+		<config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
+		<configurationfile>bandwidthd.xml</configurationfile>
+	</package>
+	<package>
+		<name>iperf</name>
+		<website>http://dast.nlanr.net/Projects/Iperf/</website>
+		<descr>Iperf is a tool for testing network throughput, loss, and jitter.</descr>
+		<category>Network Management</category>
+		<config_file>http://www.pfsense.com/packages/config/iperf.xml</config_file>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>iperf-2.0.4.tbz</depends_on_package>
+		<version>2.0.4</version>
+		<status>Beta</status>
+		<pkginfolink>http://doc.pfsense.org/index.php/Iperf_package</pkginfolink>
+		<required_version>1.2.1</required_version>
+		<configurationfile>iperf.xml</configurationfile>
+	</package>
+	<package>
+		<name>netio</name>
+		<website>http://freshmeat.net/projects/netio/</website>
+		<descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and DOS only support TCP/IP) using various different packet sizes.</descr>
+		<category>Network Management</category>
+		<config_file>http://www.pfsense.com/packages/config/netio.xml</config_file>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>netio-1.26.tbz</depends_on_package>
+		<version>1.26</version>
+		<required_version>2.0</required_version>
+		<status>ALPHA</status>
+		<configurationfile>netio.xml</configurationfile>
+	</package>
+	<package>
+		<name>mtr-nox11</name>
+		<maintainer>billm@pfsense.org</maintainer>
+		<descr>Enhanced traceroute replacement</descr>
+		<website>http://www.bitwizard.nl/mtr/</website>
+		<category>Network Management</category>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>mtr-nox11-0.80.tbz</depends_on_package>
+		<version>0.80</version>
+		<status>Stable</status>
+		<required_version>2.0</required_version>
+		<config_file>http://www.pfsense.com/packages/config/mtr-nox11.xml</config_file>
+		<configurationfile>mtr-nox11.xml</configurationfile>
+	</package>
+	<package>
+		<name>LCDproc</name>
+		<descr>LCD display driver</descr>
+		<website>http://www.lcdproc.org/</website>
+		<category>Utility</category>
+		<version>lcdproc-0.5.3</version>
+		<status>BETA</status>
+		<required_version>1.2.1</required_version>
+		<maintainer>seth.mos@xs4all.nl</maintainer>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>lcdproc-0.5.3.tbz</depends_on_package>
+		<config_file>http://www.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
+		<configurationfile>lcdproc.xml</configurationfile>
+	</package>
+	<package>
+		<name>arpwatch</name>
+		<descr>Arpwatch monitors ethernet/ip address pairings. It also logs certain changes to syslog.</descr>
+		<website>http://www-nrg.ee.lbl.gov/</website>
+		<category>Security</category>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>arpwatch-2.1.a15_5.tbz</depends_on_package>
+		<version>2.1.a15_5</version>
+		<status>ALPHA</status>
+		<required_version>2.0</required_version>
+		<config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
+		<configurationfile>arpwatch.xml</configurationfile>
+		<logging>
+			<facilityname>arpwatch</facilityname>
+			<logfilename>arpwatch.log</logfilename>
+		</logging>
+	</package>
+	<package>
+		<name>portsentry</name>
+		<descr>The Sentry tools provide host-level security services for the Unix platform. PortSentry protect against portscans, and detect suspicious login activity on a continuous basis.</descr>
+		<website>http://sourceforge.net/projects/sentrytools/</website>
+		<category>Services</category>
+		<version>0.1</version>
+		<status>BETA</status>
+		<required_version>2.0</required_version>
+		<config_file>http://www.pfsense.com/packages/config/portsentry/portsentry.xml</config_file>
+		<configurationfile>portsentry.xml</configurationfile>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>portsentry-1.2.tbz</depends_on_package>
+	</package>
+	<package>
+		<name>spamd</name>
+		<website>http://www.openbsd.org/spamd/</website>
+		<descr>Tarpits like spamd are fake SMTP servers, which accept connections but don't deliver mail. Instead, they keep the connections open and reply very slowly. If the peer is patient enough to actually complete the SMTP dialogue (which will take ten minutes or more), the tarpit returns a 'temporary error' code (4xx), which indicates that the mail could not be delivered successfully and that the sender should keep the mail in their queue and retry again later.</descr>
+		<category>Services</category>
+		<config_file>http://www.pfsense.com/packages/config/spamd/spamd.xml</config_file>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>spamd-4.5.0_4.tbz</depends_on_package>
+		<version>4.5.0_4</version>
+		<status>Beta</status>
+		<required_version>1.2.1</required_version>
+		<configurationfile>spamd.xml</configurationfile>
+		<logging>
+			<facilityname>spamd</facilityname>
+			<logfilename>spamd.log</logfilename>
+		</logging>
+	</package>
+	<package>
+		<name>stunnel</name>
+		<website>http://www.stunnel.org/</website>
+		<descr>An SSL encryption wrapper between remote client and local or remote servers. </descr>
+		<category>Network Management</category>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package>stunnel-4.25.tbz</depends_on_package>
+		<version>4.30.2</version>
+		<status>Stable</status>
+		<pkginfolink>http://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
+		<required_version>1.2.1</required_version>
+		<config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
+		<configurationfile>stunnel.xml</configurationfile>
 	</package>
   </packages>
 </pfsensepkgs>
