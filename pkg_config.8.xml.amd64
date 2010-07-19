@@ -44,6 +44,8 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>varnish-2.1.tbz</depends_on_package>
 		<depends_on_package>gcc-4.2.5.20090325_3.tbz</depends_on_package>
+		<build_port_path>/usr/ports/www/varnish</build_port_path>
+		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
 	</package>
 	<package>
 		<name>Notes</name>

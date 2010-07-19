@@ -53,6 +53,7 @@
 		<required_version>1.2.3</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
+		<build_port_path>/usr/ports/net/haproxy-devel</build_port_path>
 	</package>
 	<package>
 		<name>portsentry</name>
@@ -66,6 +67,7 @@
 		<configurationfile>portsentry.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>portsentry-1.2.tbz</depends_on_package>
+		<build_port_path>/usr/ports/security/portsentry</build_port_path>
 	</package>
     <package>
       <name>Proxy Server with mod_security</name>
