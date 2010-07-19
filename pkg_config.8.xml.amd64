@@ -134,6 +134,8 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>p7zip-9.04.tbz</depends_on_package>
 		<depends_on_package>zip-3.0.tbz</depends_on_package>
+		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
+		<build_port_path>/usr/ports/archivers/zip</build_port_path>
 		<version>0.3</version>
 		<status>BETA</status>
 		<required_version>2.0</required_version>
@@ -153,6 +155,9 @@
 		<depends_on_package>squid-2.7.9.tbz</depends_on_package>
 		<depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
+		<build_port_path>/usr/ports/www/squid</build_port_path>
+		<build_port_path>/usr/ports/www/squid_radius_auth</build_port_path>
+		<build_port_path>/usr/ports/www/libwww</build_port_path>
 		<config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
 		<configurationfile>squid.xml</configurationfile>
 	</package>
@@ -170,6 +175,10 @@
 		<depends_on_package>db41-4.1.25_4.tbz</depends_on_package>
 		<depends_on_package>db3-3.3.11_3,1.tbz</depends_on_package>
 		<depends_on_package>cyrus-sasl-2.1.23.tbz</depends_on_package>
+		<build_port_path>/usr/ports/www/squidguard</build_port_path>
+		<build_port_path>/usr/ports/databases/db41</build_port_path>
+		<build_port_path>/usr/ports/databases/db3</build_port_path>
+		<build_port_path>/usr/ports/security/cyrus-sasl2</build_port_path>
 		<config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
 		<configurationfile>squidguard.xml</configurationfile>
 	</package>
@@ -183,6 +192,8 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>lightsquid-1.8_2.tbz</depends_on_package>
 		<depends_on_package>perl-5.10.1.tbz</depends_on_package>
+		<build_port_path>/usr/ports/www/lightsquid</build_port_path>
+		<build_port_path>/usr/ports/lang/perl5.10</build_port_path>
 		<status>Beta</status>
 		<required_version>2</required_version>
 		<config_file>http://www.pfsense.com/packages/config/lightsquid/lightsquid.xml</config_file>
@@ -198,6 +209,7 @@
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-8.1-release/All/</depends_on_package_base_url>
 		<depends_on_package>havp-0.91_1.tbz</depends_on_package>
+		<build_port_path>/usr/ports/www/havp</build_port_path>
 		<version>0.91</version>
 		<status>BETA</status>
 		<required_version>1.2.2</required_version>
@@ -235,6 +247,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>siproxd-0.7.2.tbz</depends_on_package>
 		<pkginfolink>http://doc.pfsense.org/index.php/Siproxd_package</pkginfolink>
+		<build_port_path>/usr/ports/net/siproxd</build_port_path>
 		<version>0.7.2,1</version>
 		<status>Beta</status>
 		<required_version>1.2.1</required_version>
@@ -252,6 +265,7 @@
 		<configurationfile>openbgpd.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>openbgpd-4.7.20100410.tbz</depends_on_package>
+		<build_port_path>/usr/ports/net/openbgpd</build_port_path>
 	</package>
 	<package>
 		<name>vnstat2</name>
@@ -261,6 +275,7 @@
 		<category>Network Management</category>
 		<depends_on_package_base_url>ftp://ftp.freebsd.org/pub/FreeBSD/ports/amd64/packages-8.1-release/All/</depends_on_package_base_url>
 		<depends_on_package>vnstat-1.10_2.tbz</depends_on_package>
+		<build_port_path>/usr/ports/net/vnstat</build_port_path>
 		<version>1.10_2</version>
 		<status>test</status>
 		<required_version>2.0</required_version>
@@ -284,6 +299,9 @@
 		<depends_on_package>ucspi-tcp-0.88_2.tbz</depends_on_package>
 		<depends_on_package>daemontools-0.76_15.tbz</depends_on_package>
 		<depends_on_package>djbdns-1.05_13.tbz</depends_on_package>
+		<build_port_path>/usr/ports/sysutils/ucspi-tcp</build_port_path>
+		<build_port_path>/usr/ports/sysutils/daemontools</build_port_path>
+		<build_port_path>/usr/ports/dns/djbdns</build_port_path>
 	</package>
 	<package>
 		<name>arping</name>
@@ -298,6 +316,7 @@
 		<configurationfile>arping.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>arping-2.08.tbz</depends_on_package>
+		<build_port_path>/usr/ports/net/arping</build_port_path>
 	</package>
 	<package>
 		<name>nmap</name>
@@ -306,6 +325,7 @@
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>nmap-5.00.tbz</depends_on_package>
+		<build_port_path>/usr/ports/security/nmap</build_port_path>
 		<config_file>http://www.pfsense.com/packages/config/nmap/nmap.xml</config_file>
 		<version>5.00</version>
 		<status>Stable</status>
@@ -330,6 +350,10 @@
 		<depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
 		<depends_on_package>mysql-client-5.0.77.tbz</depends_on_package>
 		<depends_on_package>sqlite3-3.6.10.tbz</depends_on_package>
+		<build_port_path>/usr/ports/net-im/imspector</build_port_path>
+		<build_port_path>/usr/ports/converters/libiconv</build_port_path>
+		<build_port_path>/usr/ports/databases/mysql50-client</build_port_path>
+		<build_port_path>/usr/ports/databases/sqlite3</build_port_path>		
 	</package>
 	<package>
 		<name>nut</name>
@@ -345,6 +369,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>nut-2.2.2_3.tbz</depends_on_package>
 		<depends_on_package>perl-5.10.1.tbz</depends_on_package>
+		<build_port_path>/usr/ports/lang/perl5.10</build_port_path>		
 		<pkginfolink>http://doc.pfsense.org/index.php/Nut_package</pkginfolink>
 	</package>
 	<package>
@@ -360,6 +385,7 @@
 		<maintainer>sullrich+pfsp@gmail.com</maintainer>
 		<config_file>http://www.pfsense.com/packages/config/darkstat/darkstat.xml</config_file>
 		<configurationfile>darkstat.xml</configurationfile>
+		<build_port_path>/usr/ports/net-mgmt/darkstat</build_port_path>
 	</package>
 	<package>
 		<name>pfflowd</name>
@@ -374,6 +400,7 @@
 		<required_version>1.2.1</required_version>
 		<configurationfile>pfflowd.xml</configurationfile>
 		<maintainer>nick@buraglio.com</maintainer>
+		<build_port_path>/usr/ports/net/pfflowd</build_port_path>
 	</package>
 	<package>
 		<name>widentd</name>
@@ -388,6 +415,7 @@
 		<required_version>1.2.1</required_version>
 		<config_file>http://www.pfsense.com/packages/config/widentd.xml</config_file>
 		<configurationfile>widentd.xml</configurationfile>
+		<build_port_path>/usr/ports/net/widentd</build_port_path>
 	</package>
 	<package>
 		<name>freeradius</name>
@@ -401,6 +429,8 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>freeradius-1.1.8.tbz</depends_on_package>
 		<depends_on_package>libltdl-2.2.6b.tbz</depends_on_package>
+		<build_port_path>/usr/ports/net/freeradius</<build_port_path>
+		<build_port_path>/usr/ports/devel/libltdl22</<build_port_path>>
 		<config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 	</package>
@@ -416,6 +446,7 @@
 		<depends_on_package>bandwidthd-2.0.1_4.tbz</depends_on_package>
 		<config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
 		<configurationfile>bandwidthd.xml</configurationfile>
+		<build_port_path>/usr/ports/net-mgmt/bandwidthd</build_port_path>
 	</package>
 	<package>
 		<name>iperf</name>
@@ -425,6 +456,7 @@
 		<config_file>http://www.pfsense.com/packages/config/iperf.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>iperf-2.0.4.tbz</depends_on_package>
+		<build_port_path>/usr/ports/benchmarks/iperf</build_port_path>
 		<version>2.0.4</version>
 		<status>Beta</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Iperf_package</pkginfolink>
@@ -439,6 +471,7 @@
 		<config_file>http://www.pfsense.com/packages/config/netio.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>netio-1.26.tbz</depends_on_package>
+		<build_port_path>/usr/ports/benchmarks/netio</build_port_path>
 		<version>1.26</version>
 		<required_version>2.0</required_version>
 		<status>ALPHA</status>
@@ -452,6 +485,7 @@
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>mtr-nox11-0.80.tbz</depends_on_package>
+		<build_port_path>/usr/ports/net/mtr</<build_port_path>>
 		<version>0.80</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
@@ -479,6 +513,7 @@
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>arpwatch-2.1.a15_5.tbz</depends_on_package>
+		<build_port_path>/usr/ports/net-mgmt/arpwatch</build_port_path>
 		<version>2.1.a15_5</version>
 		<status>ALPHA</status>
 		<required_version>2.0</required_version>
@@ -501,6 +536,7 @@
 		<configurationfile>portsentry.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>portsentry-1.2.tbz</depends_on_package>
+		<build_port_path>/usr/ports/security/portsentry</build_port_path>
 	</package>
 	<package>
 		<name>spamd</name>
@@ -510,6 +546,7 @@
 		<config_file>http://www.pfsense.com/packages/config/spamd/spamd.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>spamd-4.5.0_4.tbz</depends_on_package>
+		<build_port_path>/usr/ports/mail/spamd</build_port_path>
 		<version>4.5.0_4</version>
 		<status>Beta</status>
 		<required_version>1.2.1</required_version>
@@ -532,6 +569,7 @@
 		<required_version>1.2.1</required_version>
 		<config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
 		<configurationfile>stunnel.xml</configurationfile>
+		<build_port_path>/usr/ports/security/stunnel</build_port_path>
 	</package>
   </packages>
 </pfsensepkgs>
