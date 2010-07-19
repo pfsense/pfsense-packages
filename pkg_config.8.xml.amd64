@@ -430,7 +430,7 @@
 		<depends_on_package>freeradius-1.1.8.tbz</depends_on_package>
 		<depends_on_package>libltdl-2.2.6b.tbz</depends_on_package>
 		<build_port_path>/usr/ports/net/freeradius</build_port_path>
-		<build_port_path>/usr/ports/devel/libltdl22</build_port_path>>
+		<build_port_path>/usr/ports/devel/libltdl22</build_port_path>
 		<config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 	</package>
@@ -485,7 +485,7 @@
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>mtr-nox11-0.80.tbz</depends_on_package>
-		<build_port_path>/usr/ports/net/mtr</build_port_path>>
+		<build_port_path>/usr/ports/net/mtr</build_port_path>
 		<version>0.80</version>
 		<status>Stable</status>
 		<required_version>2.0</required_version>
