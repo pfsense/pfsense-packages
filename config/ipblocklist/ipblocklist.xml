@@ -41,7 +41,7 @@
 	<requirements>perl</requirements>
 	<faq>http://forum.pfsense.org/index.php/topic,24769.0.html</faq>
 	<name>IP Blocklist Settings</name>
-	<version>0.1.9</version>
+	<version>0.2.1</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/ipblocklist.inc</include_file>
 	<menu>

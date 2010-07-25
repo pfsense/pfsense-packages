@@ -1,4 +1,5 @@
-#Version 2
+#!/bin/sh
+#Version 2.1
 
 #kill tables to elminate dups
 pfctl -t ipblocklist -T kill
@@ -45,7 +46,7 @@ mv Wlists/whitelistTEMP Wlists/whitelist
 
 #find my line for table
 export i=`grep -n 'block quick from any to <snort2c>' /tmp/rules.debug | grep -o '[0-9]\{2,4\}'`
-export t=`grep -n 'User Aliases' /tmp/rules.debug |grep -o '[0-9]'`
+export t=`grep -n 'User Aliases' /tmp/rules.debug |grep -o '[0-9]\{1,2\}'`
 
 i=$(($i+'1'))
 t=$(($t+'1'))

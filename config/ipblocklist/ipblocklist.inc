@@ -3,7 +3,7 @@
 /*
 /* ========================================================================== */
 /*
-	ipblocklist.inc v2
+	ipblocklist.inc v2.1
 	Copyright (C) 2010 Tom Schaefer
 	All rights reserved.
 																			*/
@@ -105,6 +105,8 @@ function php_install_command()
 	unlink_if_exists("/tmp/convert-execute.sh");
 	exec("cp /tmp/IP-Blocklist.sh /usr/local/etc/rc.d/IP-Blocklist.sh");
 	unlink_if_exists("/tmp/IP-Blocklist.sh");
+	//Touch files
+	touch /usr/local/www/packages/ipblocklist/wlists.txt
 	
 	
 
