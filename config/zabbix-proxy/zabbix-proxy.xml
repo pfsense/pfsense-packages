@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packagegui>
+  <name>zabbixproxy</name>
+  <title>Services: Zabbix Proxy</title>
+  <category>Monitoring</category>
+  <version>1.0</version>
+  <addedit_string>Zabbix Proxy has been created/modified.</addedit_string>
+  <delete_string>Zabbix Proxy has been deleted.</delete_string>
+  <restart_command>/usr/local/etc/rc.d/zabbix_proxy.sh restart</restart_command>
+  <menu>
+    <name>Zabbix Proxy</name>
+    <tooltiptext>Setup Zabbix Proxy specific settings</tooltiptext>
+    <section>Services</section>
+    <url>/pkg_edit.php?xml=zabbix-proxy.xml&amp;id=0</url>
+  </menu>
+  <service>
+    <name>zabbix-proxy</name>
+    <rcfile>zabbix-proxy.sh</rcfile>
+    <executable>zabbix_proxy</executable>
+  </service>
+  <tabs>
+    <tab>
+      <text>Settings</text>
+      <url>/pkg_edit.php?xml=zabbix-proxy.xml&amp;id=0</url>
+      <active />
+    </tab>
+  </tabs>
+  <fields>
+    <field>
+      <fielddescr>Server</fielddescr>
+      <fieldname>server</fieldname>
+      <description>List of comma delimited IP addresses (or hostnames) of ZABBIX servers</description>
+      <value>127.0.0.1</value>
+      <type>input</type>
+      <size>60</size>
+      <required>true</required>
+    </field>
+    <field>
+      <fielddescr>Server Port</fielddescr>
+      <fieldname>serverport</fieldname>
+      <description>Server port (generally 10051)</description>
+      <value>10051</value>
+      <type>input</type>
+      <size>60</size>
+      <required>true</required>
+    </field>
+    <field>
+      <fielddescr>Hostname</fielddescr>
+      <fieldname>hostname</fieldname>
+      <description>Unique, case-sensitive proxy name. Make sure the proxy name is known to the server</description>
+      <value>localhost</value>
+      <type>input</type>
+      <size>60</size>
+      <required>true</required>
+    </field>
+  </fields>
+	<custom_php_install_command>
+	<![CDATA[
+		global $config, $g;
+
+		mwexec("mkdir -p /var/log/zabbix/");
+		mwexec("mkdir -p /var/run/zabbix/");
+
+		conf_mount_rw();
+
+		/* create a few directories and ensure the sample files are in place */
+		exec("/bin/mkdir -p /usr/local/etc/zabbix");
+		exec("/bin/mkdir -p /var/log/zabbix");
+		exec("/bin/mkdir -p /var/run/zabbix");
+
+		exec("/bin/rm -f /usr/local/etc/rc.d/zabbix_proxy");
+
+		$start  = "/bin/mkdir -p /var/log/zabbix\n";
+		$start  .= "/usr/sbin/chown -R zabbix:zabbix /var/log/zabbix\n";
+
+		$start  .= "/bin/mkdir -p /var/run/zabbix\n";
+		$start  .= "/usr/sbin/chown -R zabbix:zabbix /var/run/zabbix\n";
+
+        $start  .= "echo \"Starting Zabbix Proxy\"...\n";
+
+		/* start zabbix proxy */
+		$start .= "/usr/local/sbin/zabbix_proxy\n";
+
+        $stop = "echo \"Stopping Zabbix Proxy\"\n";
+        $stop .= "/usr/bin/killall zabbix_proxy\n";
+		/* write out rc.d start/stop file */
+		write_rcfile(array(
+						"file" => "zabbix_proxy.sh",
+						"start" => "{$start}",
+						"restart" => "$stop\n" . "sleep 5\n" . "{$start}",
+						"stop" => "$stop"
+				)
+		);
+
+		conf_mount_ro();
+	]]>
+	</custom_php_install_command>
+	<custom_php_command_before_form></custom_php_command_before_form>
+	<custom_php_after_head_command></custom_php_after_head_command>
+	<custom_php_after_form_command></custom_php_after_form_command>
+	<custom_php_validation_command>
+	<![CDATA[
+        global $_POST;
+        
+        $ServerPort=$_POST['serverport'];
+        if (!preg_match("/^\d+$/", $ServerPort)) {
+                $input_errors[]='Server Port is not numeric.';
+        }
+    ]]>
+	</custom_php_validation_command>
+	<custom_add_php_command></custom_add_php_command>
+	<custom_php_resync_config_command>
+    <![CDATA[
+		conf_mount_rw();
+		global $config;
+		global $g;
+
+		$Server=$config['installedpackages']['zabbixproxy']['config'][0]['server'];
+		$ServerPort=$config['installedpackages']['zabbixproxy']['config'][0]['serverport'];
+		$Hostname=$config['installedpackages']['zabbixproxy']['config'][0]['hostname'];
+		$ListenPort=$config['installedpackages']['zabbixproxy']['config'][0]['listenport'];
+		$RefreshActChecks=$config['installedpackages']['zabbixproxy']['config'][0]['refreshactchecks'];
+		$Timeout=$config['installedpackages']['zabbixproxy']['config'][0]['timeout'];
+		$UserParams=$config['installedpackages']['zabbixproxy']['config'][0]['userparams'];
+
+        $conf = "Server=$Server\n";
+        $conf .= "ServerPort=$ServerPort\n";
+        $conf .= "Hostname=$Hostname\n";
+        $conf .= "PidFile=/var/run/zabbix/zabbix_proxy.pid\n";
+		$conf .= "DBName=/var/run/zabbix/proxy.db\n";
+        $conf .= "LogFile=/var/log/zabbix/zabbix_proxy.log\n";
+		$conf .= "ConfigFrequency=60\n";
+
+        file_put_contents("/usr/local/etc/zabbix/zabbix_proxy.conf", $conf);
+        conf_mount_ro();
+
+    ]]>
+	</custom_php_resync_config_command>
+	<custom_php_deinstall_command>
+    <![CDATA[
+		exec("/usr/bin/killall zabbix_proxy");
+
+		exec("/bin/rm /usr/local/etc/rc.d/zabbix_proxy.sh");
+
+		exec("/bin/rm -r /var/log/zabbix/");
+		exec("/bin/rm -r /var/run/zabbix/");
+	]]>
+	</custom_php_deinstall_command>
+</packagegui>
+

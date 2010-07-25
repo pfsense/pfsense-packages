@@ -845,6 +845,19 @@
       <depends_on_package>zabbix-agent-1.8.2_2,2.tbz</depends_on_package>
     </package>
     <package>
+      <name>Zabbix Proxy</name>
+      <descr>Monitoring agent proxy.</descr>
+      <category>Services</category>
+      <config_file>http://www.pfsense.com/packages/config/zabbix-proxy/zabbix-proxy.xml</config_file>
+      <version>1.8.2_2</version>
+      <status>FINAL</status>
+      <required_version>1.2.3</required_version>
+      <configurationfile>zabbix-proxy.xml</configurationfile>
+      <maintainer>cmb@pfsense.org</maintainer>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
+      <depends_on_package>zabbix-proxy-1.8.2_2,2.tbz</depends_on_package>
+    </package>
+    <package>
       <name>OpenVPN Client Export Utility</name>
       <descr>Allows a pre-configured OpenVPN Windows Client or Mac OSX's Viscosity configuration bundle to be exported directly from pfSense.</descr>
       <category>Security</category>
