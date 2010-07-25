@@ -106,7 +106,7 @@ function php_install_command()
 	exec("cp /tmp/IP-Blocklist.sh /usr/local/etc/rc.d/IP-Blocklist.sh");
 	unlink_if_exists("/tmp/IP-Blocklist.sh");
 	//Touch files
-	touch /usr/local/www/packages/ipblocklist/wlists.txt
+	exec("touch /usr/local/www/packages/ipblocklist/wlists.txt");
 	
 	
 
