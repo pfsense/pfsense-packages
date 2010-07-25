@@ -1,3 +1,4 @@
+#!/bin/sh
 pfctl -t countryblock -T kill
 sed -i -e '/countryblock/d' /tmp/rules.debug
 
@@ -5,7 +6,7 @@ sed -i -e '/countryblock/d' /tmp/rules.debug
 
 #find my line for table
 export i=`grep -n 'block quick from any to <snort2c>' /tmp/rules.debug | grep -o '[0-9]\{2,4\}'`
-export t=`grep -n 'User Aliases' /tmp/rules.debug |grep -o '[0-9]'`
+export t=`grep -n 'User Aliases' /tmp/rules.debug |grep -o '[0-9]\{1,2\}'`
 
 i=$(($i+'1'))
 t=$(($t+'1'))
@@ -44,6 +45,9 @@ while read line
 		echo "" >> /tmp/rules.debug.tmp
 		echo "#countryblock" >> /tmp/rules.debug.tmp
 		echo "table <countryblock> persist file '/usr/local/www/packages/countryblock/lists/countries.txt'" >> /tmp/rules.debug.tmp
+		echo "table <countryblockW> persist file '/usr/local/www/packages/countryblock/countries-white.txt'" >> /tmp/rules.debug.tmp
+		echo "pass quick from <countryblockW> to any label 'countryblock'" >> /tmp/rules.debug.tmp
+		echo "pass quick from any to <countryblockW> label 'countryblock'" >> /tmp/rules.debug.tmp
 		echo "block quick from <countryblock> to any label 'countryblock'" >> /tmp/rules.debug.tmp
 		if [ -f OUTBOUND ]; then
 			echo "block quick from any to <countryblock> label 'countryblock'" >> /tmp/rules.debug.tmp

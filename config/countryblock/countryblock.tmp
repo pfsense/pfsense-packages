@@ -74,8 +74,16 @@ if (count($_POST)>0) {
 	conf_mount_ro();
 }
 ?>
-
+<head>
 <?php include("fbegin.inc"); ?>
+<style type="text/css">
+<!--
+.white {
+	text-align: center;
+}
+-->
+</style>
+
 <p class="pgtitle">Firewall: Country Block</p>
 <form method=POST action="">
 
@@ -135,7 +143,7 @@ mwexec("touch countries.txt");
 		}
 	}
 ?>
-<head>
+
 
 <script type="text/javascript" src="jquery.min.js"></script>
 
@@ -178,6 +186,8 @@ ddaccordion.init({
 </script>
 
 <style type="text/css">
+
+a img {border:none; }
 
 .arrowlistmenu{
 width: 180px; /*width of accordion menu*/
@@ -251,12 +261,19 @@ background-color: #F3F3F3;
 	
 	<form action="<?php echo htmlentities($_SERVER['PHP_SELF']); ?>" method="post">
 	<p>
-		Check the country that you would like to block completely.<br/>
-		
-
-		
-	</p>
-	
+		Check the country that you would like to block completely. Currently 
+		<?php 
+		$countfile = "countries.txt";
+		if (file_exists($countfile)) {
+			$countlines =  count(file($countfile)); 
+			echo "$countlines"; 
+		} else {
+				echo "0 ";
+		}
+			
+		?> 
+            
+      of 245 selected. <a href="whitelist.php" target="_parent"><img src="../../themes/nervecenter/images/icons/icon_plus.gif" ALT="Manual" ALIGN=RIGHT></a></p>
 	<p>
 		Block outbound?
 <?php
@@ -270,8 +287,7 @@ background-color: #F3F3F3;
 
 		<input type="checkbox" name="checkall" onclick="checkUncheckAll(this);"/>select/unselect
 	</p>
-		
-	<br/>
+<br/>
 	
 
 <table style="width: 50%">
@@ -588,7 +604,7 @@ ob_end_clean();
 		echo "<li><input name='formCountry[]' type='checkbox' value='BT' checked/>Bhutan</li>";
 	else
 		echo "<li><input name='formCountry[]' type='checkbox' value='BT' />Bhutan</li>";
-
+/*
 ob_start();
 $results = exec("cat countries.txt | grep XA");
 ob_end_clean();
@@ -596,7 +612,7 @@ ob_end_clean();
 		echo "<li><input name='formCountry[]' type='checkbox' value='XA' checked/>Bogons</li>";
 	else
 		echo "<li><input name='formCountry[]' type='checkbox' value='XA' />Bogons</li>";
-
+*/
 ob_start();
 $results = exec("cat countries.txt | grep BO");
 ob_end_clean();
@@ -2534,8 +2550,8 @@ ob_end_clean();
 	<br/><span style="color:red">Warning!</span> - Apply after every firewall change or state reset. Use at your own risk.
 	<br/><br/>
 	<input type="submit" name="formSubmit" value="Commit Countries" />
-	</form>
-	<br/>
+</form>
+<br/>
 
 	<?php 
 	echo "Current Status = ";

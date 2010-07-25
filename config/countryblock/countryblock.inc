@@ -72,10 +72,14 @@ function php_install_command()
 	unlink_if_exists("/tmp/ddaccordion.js");
 	exec("cp /tmp/public_smo_scripts.js /usr/local/www/packages/countryblock/public_smo_scripts.js");
 	unlink_if_exists("/tmp/public_smo_scripts.js");
-	exec("cp /tmp/titlebar.png /usr/local/www/packages/countryblock/titlebar.pngs");
+	exec("cp /tmp/titlebar.png /usr/local/www/packages/countryblock/titlebar.png");
 	unlink_if_exists("/tmp/titlebar.png");
 	exec("cp /tmp/titlebar-active.png /usr/local/www/packages/countryblock/titlebar-active.png");
 	unlink_if_exists("/tmp/titlebar-active.png");
+	exec("cp /tmp/purge.tmp /usr/local/www/packages/countryblock/purge.php");
+	unlink_if_exists("/tmp/purge.tmp");
+	exec("cp /tmp/whitelist.tmp /usr/local/www/packages/countryblock/whitelist.php");
+	unlink_if_exists("/tmp/whitelist.tmp");
 	
 	
 
