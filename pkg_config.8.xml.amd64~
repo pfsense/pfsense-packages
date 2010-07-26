@@ -3,19 +3,6 @@
 <pfsensepkgs>
   <packages>
 	<package>
-		<name>File Manger</name>
-		<website/>
-		<descr>PHP File Manager</descr>
-		<category>Diagnostics</category>
-		<pkginfolink>http://forum.pfsense.org/index.php/topic,26974.0.html</pkginfolink>
-		<config_file>http://pfsense.org/packages/config/filemgr/filemgr.xml</config_file>
-		<version>0.1.0</version>
-		<status>Beta</status>
-		<required_version>1.2.2</required_version>
-		<maintainer>tom@tomschaefer.org</maintainer>
-		<configurationfile>filemgr.xml</configurationfile>
-	</package>
-	<package>
 		<name>Country Block</name>
 		<website/>
 		<descr>Block countries</descr>

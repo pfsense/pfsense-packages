@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+	<![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+	filemgr.xml
+	
+	All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+		]]>
+		</copyright>
+	<description>PHP File Manager</description>
+	<requirements>none</requirements>
+	<faq>http://forum.pfsense.org/index.php/topic,26974.0.html</faq>
+	<name>File Manager</name>
+	<version>0.1.0</version>
+	<title>Settings</title>
+	<include_file>/usr/local/pkg/filemgr.inc</include_file>
+	<menu>
+		<name>File Manager</name>
+		<tooltiptext>File Manager settings</tooltiptext>
+		<section>Diagnostics</section>
+		<configfile>filemgr.xml</configfile>
+		<url>/packages/filemgr/file_manager.php</url>
+	</menu>
+	<tabs>
+		<tab>
+			<text>Settings</text>
+			<url>/packages/filemgr/file_manager.php</url>
+			<active/>
+		</tab>
+	</tabs>
+	<configpath>installedpackages->package->$packagename->configuration->filemgr</configpath>	
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/filemgr.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/filemgr.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/file_manager.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/index.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/bg_footer.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/bg_header.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/bg_page.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/file_editor_bg.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/folder.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/folder_go.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/folder_up.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/go.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_delete.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_download.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_file.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_html.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_open_as_web.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_php.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_picture.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_rename.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_script_edit.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_use_file.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/ico_use_file_inactive.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/index.html</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfmimg/new.png</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfminc/config.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfminc/download.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfminc/file_editor_style.css</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfminc/functions.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfminc/index.html</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfminc/rename.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.com/packages/config/filemgr/rbfminc/session.tmp</item>
+	</additional_files_needed>
+	<fields>
+		<field>
+			<fielddescr>Variable One</fielddescr>
+			<fieldname>var1</fieldname>
+			<description>Enter the variable one here.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Variable Two</fielddescr>
+			<fieldname>var1</fieldname>
+			<description>Enter the variable one here.</description>
+			<type>input</type>
+		</field>
+	</fields>
+	<custom_add_php_command>
+	</custom_add_php_command>
+	<custom_php_resync_config_command>
+		php_sync_package();
+	</custom_php_resync_config_command>
+	<custom_delete_php_command>    
+		php_sync_package();
+	</custom_delete_php_command>
+	<custom_php_install_command>
+		php_install_command();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		deinstall_command();
+	</custom_php_deinstall_command>
+</packagegui>

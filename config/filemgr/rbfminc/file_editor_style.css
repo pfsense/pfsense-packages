@@ -1,0 +1,148 @@
+@charset "utf-8";
+/* CSS Document */
+
+body,td,th {
+	font-family: Arial, Helvetica, sans-serif;
+	
+	color: #000000;
+}
+
+body {
+	background-color: #999999;
+}
+
+img {
+	vertical-align: middle;
+}
+.file_editor {
+	width: 710px;
+	/*height: 410px;*/
+	margin: 0px auto;
+	padding: 0px;
+	background: url(../rbfmimg/bg_page.png) repeat-y center top;
+}
+.file_editor .header {
+	height: 35px;
+	margin: 0px 0px 3px;
+	padding: 0px;
+	background: url(../rbfmimg/bg_header.png) repeat-y center top;
+}
+.file_editor .footer {
+	background: url(../rbfmimg/bg_footer.png) no-repeat center bottom;
+	height: 12px;
+}
+.file_editor .header .close {
+	width: 41px;
+	height: 17px;
+	margin: 5px 0px 0px 645px;
+	padding: 0px;
+	cursor:pointer;
+}
+.file_editor #path {
+	margin: 0px auto;
+	padding: 0px;
+	width: 670px;
+	height: 20px;
+}
+.file_editor #path #location {
+	width: 625px;
+	vertical-align: middle;
+	border-top: 1px solid #878787;
+	border-right: 1px solid #878787;
+	border-bottom: 1px solid #878787;
+	border-left: 2px solid #878787;
+	padding-left: 2px;
+}
+.file_editor #path #go {
+	vertical-align: middle;
+	cursor:pointer;
+}
+.file_editor .container {
+	margin: 5px auto;
+	padding: 5px;
+	height: 280px;
+	overflow: auto;
+	position: relative;
+	border: 1px solid #878787;
+	width: 670px;
+}
+.file_editor .container .list tr td{
+	cursor: default;
+	white-space: nowrap;
+	padding-right: 5px;
+	height: 20px;
+	text-align: left;
+	vertical-align: top;
+	padding-left: 5px;
+}
+.file_editor .container .list tr th{
+	cursor: default;
+	text-align: left;
+	background: #f0f0f0;
+}
+.file_editor .container .list tr{
+	background: #FFFFFF;
+}
+.file_editor .container .list tr:hover {
+	background: #9AE6FC;
+}
+.rename_field {
+	display:none;
+	margin: 0px;
+	padding: 0px;
+}
+.rename_field .input_name {
+	background: #FFFFFF;
+	width: 99%;
+	border-top: 1px solid #666666;
+	border-right: 1px solid #CCCCCC;
+	border-bottom: 1px solid #CCCCCC;
+	border-left: 1px solid #666666;
+	margin: 0px;
+	padding: 0px;
+	font: 11px Arial, Helvetica, sans-serif;
+}
+.column1 {
+	margin: 0px;
+	padding: 0px;
+	height: 20px;
+	width: 16px;
+}
+.file_editor .results {
+	height: 0px;
+	display: none;
+	width: 0px;
+	border-top: none;
+	border-right: none;
+	border-bottom: none;
+	border-left: none;
+	margin: 0px;
+	padding: 0px;
+}
+.fileperms{
+	font-family: "Courier New", Courier, monospace;
+}
+.form_upload{
+	display: block;
+	padding: 5px;
+	background: #C6EBFD;
+	text-align: left;
+	border: 1px solid #878787;
+	width: 670px;
+	margin: 3px auto;
+}
+.form_upload input{
+	vertical-align: middle;
+}
+.url_path {
+	margin-left: 20px;
+}
+.file_editor .header .logout {
+	float: right;
+	margin-top: 5px;
+	padding-right: 15px;
+	color: #FF0000;
+}
+.file_editor .header .logout a{
+	color: #FF0000;
+}

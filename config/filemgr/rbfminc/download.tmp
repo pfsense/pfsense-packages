@@ -1,0 +1,22 @@
+<?php
+include "config.php";
+include "session.php";
+
+if($user_login == 'ok'){
+
+	include "functions.php";
+	
+	$_GET['file_name'] = urldecode($_GET['file_name']);
+	$_GET['p'] = urldecode($_GET['p']);
+	
+	if($_GET['file_name'] and $_GET['p']){
+		if(file_exists($_GET['p'].$_GET['file_name'])){
+			$file = file_get_contents($_GET['p'].$_GET['file_name']);
+			$type = wp_check_filetype($_GET['file_name']);
+			header('Content-type: {$type[type]}');
+			header('Content-Disposition: attachment; filename="'.$_GET['file_name'].'"');
+			echo $file;
+		}
+	}
+}
+?>
