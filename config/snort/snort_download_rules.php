@@ -391,7 +391,7 @@ if ($snortdownload == "basic" || $snortdownload == "premium")
 	} else {
 		update_status(gettext("Downloading snort.org md5 file..."));
 		ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-		$image = @file_get_contents("http://dl.snort.org/{$premium_url}/snortrules-snapshot-2860{$premium_subscriber}.tar.gz.md5?oink_code={$oinkid}");
+		$image = @file_get_contents("http://www.snort.org/{$premium_url}/snortrules-snapshot-2860.tar.gz.md5/{$oinkid}");
 //    $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz.md5");
 		$f = fopen("{$tmpfname}/snortrules-snapshot-2.8.tar.gz.md5", 'w');
 		fwrite($f, $image);
@@ -613,7 +613,7 @@ if ($snortdownload != "off")
 		update_status(gettext("There is a new set of Snort.org rules posted. Downloading..."));
 		update_output_window(gettext("May take 4 to 10 min..."));
 //    download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz", $tmpfname . "/{$snort_filename}", "read_body_firmware");
-		download_file_with_progress_bar("http://dl.snort.org/{$premium_url}/snortrules-snapshot-2860{$premium_subscriber}.tar.gz?oink_code={$oinkid}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
+		snort_download_file_with_progress_bar("http://www.snort.org/{$premium_url}/snortrules-snapshot-2860.tar.gz/{$oinkid}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
 		update_all_status($static_output);
 		update_status(gettext("Done downloading rules file."));
 		if (150000 > filesize("{$tmpfname}/$snort_filename")){
@@ -646,7 +646,7 @@ if ($emergingthreats == "on")
 		update_status(gettext("There is a new set of Emergingthreats rules posted. Downloading..."));
 		update_output_window(gettext("May take 4 to 10 min..."));
 //   download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
-		download_file_with_progress_bar("http://www.emergingthreats.net/rules/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
+		snort_download_file_with_progress_bar("http://www.emergingthreats.net/rules/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
 		update_all_status($static_output);
 		update_status(gettext("Done downloading Emergingthreats rules file."));
 		}
@@ -662,7 +662,7 @@ if (file_exists("{$tmpfname}/{$pfsense_rules_filename}")) {
     update_status(gettext("There is a new set of Pfsense rules posted. Downloading..."));
     update_output_window(gettext("May take 4 to 10 min..."));
 //    download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
-    download_file_with_progress_bar("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
+    snort_download_file_with_progress_bar("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
     update_all_status($static_output);
     update_status(gettext("Done downloading rules file."));
  }
@@ -1147,6 +1147,36 @@ function read_body_firmware($ch, $string) {
         fwrite($fout, $string);
         conf_mount_ro();
         return $length;
+}
+
+function snort_download_file_with_progress_bar($url_file, $destination_file, $readbody = 'read_body') {
+        global $ch, $fout, $file_size, $downloaded;
+        $file_size  = 1;
+        $downloaded = 1;
+        /* open destination file */
+        $fout = fopen($destination_file, "wb");
+
+        /*
+         *      Originally by Author: Keyvan Minoukadeh
+         *      Modified by Scott Ullrich to return Content-Length size
+         */
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url_file);
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'read_header');
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_WRITEFUNCTION, $readbody);
+        curl_setopt($ch, CURLOPT_NOPROGRESS, '1');
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, '5');
+        curl_setopt($ch, CURLOPT_TIMEOUT, 0);
+
+        curl_exec($ch);
+        $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        if($fout)
+                fclose($fout);
+        curl_close($ch);
+        return ($http_code == 200) ? true : $http_code;
 }
 
 ?>
