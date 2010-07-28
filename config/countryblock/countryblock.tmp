@@ -29,7 +29,8 @@ if (count($_POST)>0) {
 	if ($_POST['enable'] == 1) {
 		//echo "enabled";
 		$config['installedpackages']['countryblock_settings']['config'][0]['enable'] = 1;
-		
+	//touch countries-white.txt to fix bug
+		exec("touch /usr/local/www/packages/countryblock/countries-white.txt");	
 	//Process list by downloading and extracting
 		$myFile = "countries.txt";
 		$fileContents = file_get_contents($myFile);
