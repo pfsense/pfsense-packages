@@ -39,8 +39,8 @@ require_once("/usr/local/pkg/snort/snort.inc");
 $tmpfname = "/usr/local/etc/snort/tmp/snort_rules_up";
 $snortdir = "/usr/local/etc/snort";
 $snortdir_wan = "/usr/local/etc/snort";
-$snort_filename_md5 = "snortrules-snapshot-2.8.tar.gz.md5";
-$snort_filename = "snortrules-snapshot-2.8.tar.gz";
+$snort_filename_md5 = "snortrules-snapshot-2860.tar.gz.md5";
+$snort_filename = "snortrules-snapshot-2860.tar.gz";
 $emergingthreats_filename_md5 = "version.txt";
 $emergingthreats_filename = "emerging.rules.tar.gz";
 $pfsense_rules_filename_md5 = "pfsense_rules.tar.gz.md5";
@@ -59,15 +59,14 @@ $oinkid = $config['installedpackages']['snortglobal']['oinkmastercode'];
 $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
 $emergingthreats = $config['installedpackages']['snortglobal']['emergingthreats'];
 
-
-	if ($snortdownload == "off" && $emergingthreats != "on")
+	if ($snortdownload == 'off' && $emergingthreats != 'on')
 	{
-		$snort_emrging_info = "stop";
+		$snort_emrging_info = 'stop';
 	}
 
-	if ($oinkid == "" && $snortdownload != "off")
+	if ($oinkid == "" && $snortdownload != 'off')
 	{
-		$snort_oinkid_info = "stop";
+		$snort_oinkid_info = 'stop';
 	}
 
 	
@@ -324,7 +323,7 @@ if (!file_exists('/usr/local/etc/snort/tmp')) {
 
 /* Set user agent to Mozilla */
 ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-ini_set("memory_limit","125M");
+ini_set("memory_limit","150M");
 
 /* mark the time update started */
 $config['installedpackages']['snortglobal']['last_md5_download'] = date("Y-M-jS-h:i-A");
@@ -332,21 +331,6 @@ $config['installedpackages']['snortglobal']['last_md5_download'] = date("Y-M-jS-
 /* send current buffer */
 ob_flush();
 conf_mount_rw();
-
-$premium_subscriber_chk = $config['installedpackages']['snortglobal']['snortdownload'];
-
-if ($premium_subscriber_chk == "premium") {
-    $premium_subscriber = "_s";
-}else{
-    $premium_subscriber = "";
-}
-
-$premium_url_chk = $config['installedpackages']['snortglobal']['snortdownload'];
-if ($premium_url_chk == "premium") {
-    $premium_url = "sub-rules";
-}else{
-    $premium_url = "reg-rules";
-}
 
 /* hide progress bar */
 hide_progress_bar_status();
@@ -382,8 +366,10 @@ if (file_exists($tmpfname)) {
 /* unhide progress bar and lets end this party */
 unhide_progress_bar_status();
 
+
+
 /*  download md5 sig from snort.org */
-if ($snortdownload == "basic" || $snortdownload == "premium")
+if ($snortdownload == 'on')
 {
 	if (file_exists("{$tmpfname}/{$snort_filename_md5}") &&
 	    filesize("{$tmpfname}/{$snort_filename_md5}") > 0) {
@@ -391,9 +377,8 @@ if ($snortdownload == "basic" || $snortdownload == "premium")
 	} else {
 		update_status(gettext("Downloading snort.org md5 file..."));
 		ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-		$image = @file_get_contents("http://www.snort.org/{$premium_url}/snortrules-snapshot-2860.tar.gz.md5/{$oinkid}");
-//    $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz.md5");
-		$f = fopen("{$tmpfname}/snortrules-snapshot-2.8.tar.gz.md5", 'w');
+		$image = @file_get_contents("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}");
+		$f = fopen("{$tmpfname}/{$snort_filename_md5}", 'w');
 		fwrite($f, $image);
 		fclose($f);
 		update_status(gettext("Done downloading snort.org md5"));
@@ -428,9 +413,9 @@ if (file_exists("{$tmpfname}/{$pfsense_rules_filename_md5}")) {
 }
 
 /* If md5 file is empty wait 15min exit */
-if ($snortdownload != "off")
+if ($snortdownload == 'on')
 {
-	if (0 == filesize("{$tmpfname}/snortrules-snapshot-2.8.tar.gz.md5"))
+	if (0 == filesize("{$tmpfname}/{$snort_filename_md5}"))
 	{
 		update_status(gettext("Please wait... You may only check for New Rules every 15 minutes..."));
 		update_output_window(gettext("Rules are released every month from snort.org. You may download the Rules at any time."));
@@ -472,9 +457,9 @@ conf_mount_ro();
 }
 
 /* Check if were up to date snort.org */
-if ($snortdownload != "off")
+if ($snortdownload == 'on')
 {
-	if (file_exists("{$snortdir}/snortrules-snapshot-2.8.tar.gz.md5"))
+	if (file_exists("{$snortdir}/{$snort_filename_md5}"))
 	{
 		$md5_check_new_parse = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
 		$md5_check_new = `/bin/echo "{$md5_check_new_parse}" | /usr/bin/awk '{ print $1 }'`;
@@ -535,9 +520,9 @@ if ($emergingthreats == "on")
 
 /* Check if were up to date is so, exit */
 /* WARNING This code needs constant checks */
-if ($snortdownload != "off" && $emergingthreats != "off")
+if ($snortdownload == 'on' && $emergingthreats == 'on')
 {
-	if ($snort_md5_check_ok == "on" && $emerg_md5_check_ok == "on")
+	if ($snort_md5_check_ok == 'on' && $emerg_md5_check_ok == 'on')
 	{
 			update_status(gettext("All your rules are up to date..."));
 			update_output_window(gettext("You may start Snort now..."));
@@ -554,9 +539,9 @@ if ($snortdownload != "off" && $emergingthreats != "off")
 	}
 }
 
-if ($snortdownload == "on" && $emergingthreats == "off")
+if ($snortdownload == 'on' && $emergingthreats == 'off')
 {
-	if ($snort_md5_check_ok == "on")
+	if ($snort_md5_check_ok == 'on')
 	{
 			update_status(gettext("Your snort.org rules are up to date..."));
 			update_output_window(gettext("You may start Snort now..."));
@@ -573,9 +558,9 @@ if ($snortdownload == "on" && $emergingthreats == "off")
 	}
 }
 
-if ($snortdownload == "off" && $emergingthreats == "on")
+if ($snortdownload == 'off' && $emergingthreats == 'on')
 {
-	if ($emerg_md5_check_ok == "on")
+	if ($emerg_md5_check_ok == 'on')
 	{
 			update_status(gettext("Your Emergingthreats rules are up to date..."));
 			update_output_window(gettext("You may start Snort now..."));
@@ -603,7 +588,7 @@ if ($chk_if_snort_up != "") {
 }
 
 /* download snortrules file */
-if ($snortdownload != "off")
+if ($snortdownload == 'on')
 {
 	if ($snort_md5_check_ok != on) {
 	if (file_exists("{$tmpfname}/{$snort_filename}")) {
@@ -612,12 +597,13 @@ if ($snortdownload != "off")
 		unhide_progress_bar_status();
 		update_status(gettext("There is a new set of Snort.org rules posted. Downloading..."));
 		update_output_window(gettext("May take 4 to 10 min..."));
-//    download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/snortrules-snapshot-2.8{$premium_subscriber}.tar.gz", $tmpfname . "/{$snort_filename}", "read_body_firmware");
-		snort_download_file_with_progress_bar("http://www.snort.org/{$premium_url}/snortrules-snapshot-2860.tar.gz/{$oinkid}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
+		conf_mount_rw();
+		snort_download_file_with_progress_bar("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
 		update_all_status($static_output);
 		update_status(gettext("Done downloading rules file."));
 		if (150000 > filesize("{$tmpfname}/$snort_filename")){
 			update_status(gettext("Error with the snort rules download..."));
+
 			update_output_window(gettext("Snort rules file downloaded failed..."));
 			echo '
 <script type="text/javascript">
@@ -646,7 +632,7 @@ if ($emergingthreats == "on")
 		update_status(gettext("There is a new set of Emergingthreats rules posted. Downloading..."));
 		update_output_window(gettext("May take 4 to 10 min..."));
 //   download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
-		snort_download_file_with_progress_bar("http://www.emergingthreats.net/rules/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
+		download_file_with_progress_bar("http://www.emergingthreats.net/rules/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
 		update_all_status($static_output);
 		update_status(gettext("Done downloading Emergingthreats rules file."));
 		}
@@ -662,7 +648,7 @@ if (file_exists("{$tmpfname}/{$pfsense_rules_filename}")) {
     update_status(gettext("There is a new set of Pfsense rules posted. Downloading..."));
     update_output_window(gettext("May take 4 to 10 min..."));
 //    download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
-    snort_download_file_with_progress_bar("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
+    download_file_with_progress_bar("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
     update_all_status($static_output);
     update_status(gettext("Done downloading rules file."));
  }
@@ -697,7 +683,7 @@ if (file_exists("{$tmpfname}/{$pfsense_rules_filename}")) {
 //}
 
 /* Untar snort rules file individually to help people with low system specs */
-if ($snortdownload != "off")
+if ($snortdownload == 'on')
 {
 	if ($snort_md5_check_ok != on) {
 	if (file_exists("{$tmpfname}/{$snort_filename}")) {
@@ -820,7 +806,7 @@ if ($premium_url_chk == on) {
 }
 
 /*  Copy md5 sig to snort dir */
-if ($snortdownload != "off")
+if ($snortdownload == 'on')
 {
 	if ($snort_md5_check_ok != on) {
 	if (file_exists("{$tmpfname}/$snort_filename_md5")) {
@@ -885,7 +871,7 @@ if (file_exists("{$tmpfname}/$pfsense_rules_filename_md5")) {
 }
  
 /*  Copy signatures dir to snort dir */
-if ($snortdownload != "off")
+if ($snortdownload == 'on')
 {
 	if ($snort_md5_check_ok != on)
 	{
@@ -1143,9 +1129,7 @@ function read_body_firmware($ch, $string) {
                 flush();
                 $counter = 0;
         }
-        conf_mount_rw();
         fwrite($fout, $string);
-        conf_mount_ro();
         return $length;
 }
 
@@ -1178,7 +1162,6 @@ function snort_download_file_with_progress_bar($url_file, $destination_file, $re
         curl_close($ch);
         return ($http_code == 200) ? true : $http_code;
 }
-
 ?>
 
 </body>

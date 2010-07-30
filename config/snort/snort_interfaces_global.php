@@ -268,23 +268,24 @@ include("head.inc");
 <td class="tabcont">
 <table width="100%" border="0" cellpadding="6" cellspacing="0">
 	<tr>
+  <tr>
+      <td colspan="2" valign="top" class="listtopic">Please Choose The Type Of Rules You Wish To Download</td>
+  </tr>
       <td width="22%" valign="top" class="vncell">Install Snort.org rules</td>
       <td width="78%" class="vtable">
         <table cellpadding="0" cellspacing="0">
         <tr>
-          <td colspan="2"><input name="snortdownload" type="radio" id="snortdownload" value="off" onClick="enable_change(false)" <?php if($pconfig['snortdownload']!="premium" && $pconfig['snortdownload']!="basic") echo "checked"; ?>>
-  Do <strong>NOT</strong> install</td>
+          <td colspan="2"><input name="snortdownload" type="radio" id="snortdownload" value="off" onClick="enable_change(false)" <?php if($pconfig['snortdownload']=='off' || $pconfig['snortdownload']=='') echo 'checked'; ?>>
+  Do <strong>NOT</strong> Install</td>
           </tr>
         <tr>
-          <td colspan="2"><input name="snortdownload" type="radio" id="snortdownload" value="premium" onClick="enable_change(false)" <?php if($pconfig['snortdownload']=="premium") echo "checked"; ?>>
-  Premium rules <a href="http://forum.pfsense.org/index.php/topic,16847.0.html" target="_blank">HIGHLY RECOMMENDED</a></td>
-          </tr>
-        <tr>
-          <td colspan="2"><input name="snortdownload" type="radio" id="snortdownload" value="basic" onClick="enable_change(false)" <?php if($pconfig['snortdownload']=="basic") echo "checked"; ?>>
-  Basic Rules</td>
+          <td colspan="2"><input name="snortdownload" type="radio" id="snortdownload" value="on" onClick="enable_change(false)" <?php if($pconfig['snortdownload']=='on') echo 'checked'; ?>>
+  Install Basic Rules or Premium rules <br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="https://www.snort.org/signup" target="_blank">Sign Up for a Basic Rule Account</a><br>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="http://www.snort.org/vrt/buy-a-subscription" target="_blank">Sign Up for Sourcefire VRT Certified Premium Rules. This Is Highly Recommended</a>
+		</td>
           </tr>
           <tr>
-          <td>&nbsp;</td>
           <td>&nbsp;</td>
           </tr>
         </table>
@@ -305,21 +306,6 @@ include("head.inc");
         Emerging Threats is an open source community that produces fastest moving and diverse Snort Rules.</td>
     </tr>
     <tr>
-        <td width="22%" valign="top" class="vncell">Remove blocked hosts every</td>
-        <td width="78%" class="vtable">
-        <select name="rm_blocked" class="formfld" id="rm_blocked">
-               <?php
-                  $interfaces3 = array('never_b' => 'NEVER', '1h_b' => '1 HOUR', '3h_b' => '3 HOURS', '6h_b' => '6 HOURS', '12h_b' => '12 HOURS', '1d_b' => '1 DAY', '4d_b' => '4 DAYS', '7d_b' => '7 DAYS', '28d_b' => '28 DAYS');
-                  foreach ($interfaces3 as $iface3 => $ifacename3): ?>
-                  <option value="<?=$iface3;?>" <?php if ($iface3 == $pconfig['rm_blocked']) echo "selected"; ?>>
-                  <?=htmlspecialchars($ifacename3);?>
-                  </option>
-               <?php endforeach; ?>
-         </select><br>
-         <span class="vexpl">Please select the amount of time you would like hosts to be blocked for.<br>
-         Hint: in most cases, 1 hour is a good choice.</span></td>
-    </tr>
-    <tr>
         <td width="22%" valign="top" class="vncell">Update rules automatically</td>
         <td width="78%" class="vtable">
         <select name="autorulesupdate7" class="formfld" id="autorulesupdate7">
@@ -334,11 +320,23 @@ include("head.inc");
          <span class="vexpl">Please select the update times for rules.<br>
          Hint: in most cases, every 12 hours is a good choice.</span></td>
     </tr>
+  <tr>
+      <td colspan="2" valign="top" class="listtopic">General Settings</td>
+  </tr>
     <tr>
-      <td width="22%" valign="top" class="vncell">Whitelist VPNs automatically</td>
-      <td width="78%" class="vtable">
-        <input name="whitelistvpns" type="checkbox" value="yes" <?php if ($config['installedpackages']['snortglobal']['whitelistvpns'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
-        Checking this option will install whitelists for all VPNs.</td>
+        <td width="22%" valign="top" class="vncell">Remove blocked hosts every</td>
+        <td width="78%" class="vtable">
+        <select name="rm_blocked" class="formfld" id="rm_blocked">
+               <?php
+                  $interfaces3 = array('never_b' => 'NEVER', '1h_b' => '1 HOUR', '3h_b' => '3 HOURS', '6h_b' => '6 HOURS', '12h_b' => '12 HOURS', '1d_b' => '1 DAY', '4d_b' => '4 DAYS', '7d_b' => '7 DAYS', '28d_b' => '28 DAYS');
+                  foreach ($interfaces3 as $iface3 => $ifacename3): ?>
+                  <option value="<?=$iface3;?>" <?php if ($iface3 == $pconfig['rm_blocked']) echo "selected"; ?>>
+                  <?=htmlspecialchars($ifacename3);?>
+                  </option>
+               <?php endforeach; ?>
+         </select><br>
+         <span class="vexpl">Please select the amount of time you would like hosts to be blocked for.<br>
+         Hint: in most cases, 1 hour is a good choice.</span></td>
     </tr>
 	<tr>
 	<td width="22%" valign="top" class="vncell">Alerts file description type</td>
