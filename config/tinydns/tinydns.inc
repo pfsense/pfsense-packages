@@ -53,6 +53,10 @@ function tinydns_custom_php_install_command() {
 		log_error("Could not open /usr/local/etc/rc.d/svscan.sh for writing.");
 		return;
 	}
+	
+	// Ensure svscan.sh has a+rx
+	exec("chmod a+rx /usr/local/etc/rc.d/svscan.sh");
+	
 	$ipaddress = $config['installedpackages']['tinydns']['config'][0]['ipaddress'];
 
 	$minsegment = "10240";
