@@ -320,7 +320,11 @@
 		tinydns_custom_php_deinstall_command();
 		tinydns_sync_on_changes();		
 	</custom_php_deinstall_command>
-	<custom_php_command_before_form>	
-		unset($_POST['temp']);		
+	<custom_php_command_before_form>
+		<![CDATA[
+			unset($_POST['temp']);
+			if(!is_process_running("svscan"))
+				$savemsg = "NOTE: svscan is not running.  Please <a href='/status_services.php?mode=restartservice&service=svscan'>start svscan</a> to bring up the DNS Server";
+		]]>
 	</custom_php_command_before_form>
 </packagegui>
