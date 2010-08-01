@@ -32,7 +32,10 @@
 
 if(!function_exists("filter_configure")) 
 	require_once("filter.inc");
-
+	
+if(!function_exists("get_real_wan_interface")) 
+	require_once("interfaces.inc");
+	
 function tinydns_validate() {
 	global $input_errors, $config;
 
