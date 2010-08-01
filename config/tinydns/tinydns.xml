@@ -165,18 +165,18 @@
 		<field>
 			<fielddescr>IP Address</fielddescr>
 			<fieldname>ipaddress</fieldname>
-			<description>Bind TinyDNS to this IP address. Enable DNS Forwarders bind TinyDNS to the LAN IP.</description>
+			<description>Bind TinyDNS to this IP address. This is the IP that will service DNS requests for this server. This IP cannot be used as a DNS server on client machines. Bind to 127.0.0.1 and use Port Forward entries to redirect DNS traffic internal or external to this resolver from multiple IPs. </description>
 			<type>input</type>
 		</field>
 		<field>
 			<type>listtopic</type>
-			<name>DNS-Cache server</name>
+			<name>Recursive DNS Resolver</name>
 			<fieldname>temp</fieldname>						
 		</field>		
 		<field>
-		 	<fielddescr>Enable DNS Forwarders</fielddescr>
+		 	<fielddescr>Enable recursive DNS responder</fielddescr>
 			<fieldname>enableforwarding</fieldname>
-			<description>Enable DNScache forwarder on LAN IP and register LAN's SOA, NS, A, and PTR Records with  TinyDNS Server.</description>
+			<description>Enable DNScache caching recursive resolver. Registers LAN's SOA, NS, A, and PTR Records with TinyDNS Server.</description>
 			<type>checkbox</type>
 		</field>
 		<field>
@@ -201,13 +201,13 @@
 		</field>
 		<field>
 			<type>listtopic</type>
-			<name>Monitoring address refresh interval</name>
+			<name>Monitoring IP refresh interval</name>
 			<fieldname>temp</fieldname>						
 		</field>
 		<field>
 			<fielddescr>Refresh Interval</fielddescr>
 			<fieldname>refreshinterval</fieldname>
-			<description>Controls how often the monitoring ip adresses are polled</description>
+			<description>Controls polling frequency of monitoring IP address</description>
 			<type>input</type>
 		</field>
 		<field>

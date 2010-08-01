@@ -131,7 +131,7 @@
 		<field>
 			<fielddescr>Record Data (FQDN, IP Address, or "raw" TinyDNS record)</fielddescr>
 			<fieldname>ipaddress</fieldname>
-			<description>Use IP Address for A Records - FQDN or Hostname for SOA, PTR, CNAME Records - NS Records use colon-separated IP and FQDN, e.g. 1.2.3.4:mydomain.com</description>
+			<description>Enter the record data here. Use IP Address for A and PTR records. Use FQDN or Hostname for SOA and CNAME Records. NS Records use colon-separated IP and FQDN, e.g. 1.2.3.4:example.com</description>
 			<type>input</type>
 			<size>80</size>
 			<required/>
@@ -165,19 +165,21 @@
 			<fieldname>temp</fieldname>						
 		</field>
 		<field>
-			<fielddescr>IP to ping to ensure service is up</fielddescr>
+			<fielddescr>Monitor IP</fielddescr>
+			<description>IP to ping to determine host availability</description>
 			<fieldname>monitorip</fieldname>
 			<type>input</type>
 			<size>35</size>
 		</field>
 		<field>
-			<fielddescr>Time in minutes before DNS switches to backup host</fielddescr>
+			<fielddescr>Failover hold time</fielddescr>
+			<description>Time in minutes before DNS switches to backup host</description>
 			<fieldname>threshhold</fieldname>
 			<type>input</type>
 			<size>35</size>
 		</field>
 		<field>
-			<fielddescr>none</fielddescr>
+			<fielddescr>Failover Records</fielddescr>
 			<fieldname>none</fieldname>
 		    <type>rowhelper</type>
 		    <rowhelper>

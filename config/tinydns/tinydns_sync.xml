@@ -77,10 +77,10 @@
 		<field>
 			<type>listtopic</type>
 			<fieldname>temp</fieldname>
-			<name>Enbable DNS zone sync</name>
+			<name>Enable DNS zone sync</name>
 		</field>		
 		<field>
-			<fielddescr>Automatically sync DNS zone changes</fielddescr>
+			<fielddescr>Enable DNS zone synchronization</fielddescr>
 			<fieldname>synconchanges</fieldname>
 			<description>pfSense will automatically sync changes to the hosts defined below.</description>
 			<type>checkbox</type>
@@ -93,13 +93,13 @@
 		<field>
 			<fielddescr>IP Address</fielddescr>
 			<fieldname>ipaddress</fieldname>
-			<description>The IP address of the first host that TinyDNS will Sync its DNS zone data to.</description>
+			<description>IP address of the first TinyDNS sync host.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Password</fielddescr>
 			<fieldname>password</fieldname>
-			<description>Admin password of the first host that TinyDNS will Sync its DNS zone data to.</description>
+			<description>Admin password of the first TinyDNS sync host.</description>
 			<type>password</type>
 		</field>
 		<field>
@@ -110,13 +110,13 @@
 		<field>
 			<fielddescr>IP Address 2</fielddescr>
 			<fieldname>ipaddress2</fieldname>
-			<description>OPTIONAL.  The IP address of the second host that TinyDNS will Sync its DNS zone data to.</description>
+			<description>IP address of the second TinyDNS sync host. (optional)</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Password 2</fielddescr>
 			<fieldname>password2</fieldname>
-			<description>Admin password of the second host that TinyDNS will Sync its DNS zone data to.</description>
+			<description>Admin password of the second TinyDNS sync host.</description>
 			<type>password</type>
 		</field>
 		<field>
@@ -127,13 +127,13 @@
 		<field>
 			<fielddescr>IP Address 3</fielddescr>
 			<fieldname>ipaddress3</fieldname>
-			<description>OPTIONAL. The IP address of the third host that TinyDNS will Sync its DNS zone data to.</description>
+			<description>IP address of the third TinyDNS sync host. (optional)</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Password 3</fielddescr>
 			<fieldname>password3</fieldname>
-			<description>Admin password of the third host that TinyDNS will Sync its DNS zone data to.</description>
+			<description>Admin password of the third TinyDNS sync host.</description>
 			<type>password</type>
 		</field>
 	</fields>
