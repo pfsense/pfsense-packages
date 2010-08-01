@@ -239,7 +239,7 @@
 		if(is_dir("/service/tinydns"))
 			Header("Location: /pkg.php?xml=tinydns_domains.xml");
 		else 
-			Header("Location: /pkg.php?xml=tinydns.xml");
+			Header("Location: /pkg_edit.php?xml=tinydns.xml&id=0");
 
 	]]>	
 	</stepsubmitbeforesave>	
