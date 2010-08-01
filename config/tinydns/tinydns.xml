@@ -51,7 +51,7 @@
 	<aftersaveredirect>/pkg_edit.php?xml=tinydns.xml&amp;id=0</aftersaveredirect>
 	<include_file>/usr/local/pkg/tinydns.inc</include_file>
 	<menu>
-		<name>DNS Servers</name>
+		<name>DNS Server</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
 		<url>/tinydns_view_logs.php</url>
