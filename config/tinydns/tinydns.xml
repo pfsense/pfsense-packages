@@ -54,7 +54,7 @@
 		<name>DNS Servers</name>
 		<tooltiptext></tooltiptext>
 		<section>Services</section>
-		<url>/tinydns_status.php</url>
+		<url>/tinydns_view_logs.php</url>
 	</menu>
 	<service>
 		<name>svscan</name>
