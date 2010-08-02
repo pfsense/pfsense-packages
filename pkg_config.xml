@@ -132,7 +132,7 @@
       <descr>pfSense version of TinyDNS which features failover host support</descr>
       <website>http://cr.yp.to/djbdns.html</website>
       <category>Services</category>
-      <version>1.0.6.3</version>
+      <version>1.0.6.9</version>
       <status>ALPHA</status>
       <required_version>1.2</required_version>
       <config_file>http://www.pfsense.com/packages/config/tinydns/tinydns.xml</config_file>
