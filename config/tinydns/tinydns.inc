@@ -532,8 +532,14 @@ function tinydns_create_zone_file() {
 				}
 			}
 			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname, $domain['rdns'], $dist);
-			if($record_data) 
+			if($record_data) {
 				fwrite($fd, $record_data . "\n");
+				if ($domain['rdns'] || ($domain['recordtype'] == 'PTR')) {
+					$rip = tinydns_get_ip_subnet_arpa($ipaddress, 32);
+					if($rip)
+						fwrite($fd, ".{$rip[1]}::{$config['system']['hostname']}.{$config['system']['domain']}\n");
+				}
+			}
 			/* process load balanced items */
 			if($domain['row']) {
 				foreach($domain['row'] as $row) {
