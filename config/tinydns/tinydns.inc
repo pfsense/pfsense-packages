@@ -504,6 +504,7 @@ function tinydns_create_zone_file() {
 				return;
 			}
 			tinydns_add_active_leases($fl,$fd, $dhcpddomain);
+            fclose($fl);
 		}
 	}
 		
@@ -839,50 +840,95 @@ function tinydns_complete_soa_record($fd, $ip, $ipmask, $nsname, $domain) {
 }
 
 /* Search for active leases in the dhcpd.leases file and add them to tinyDNS */
-/* Currently it will add duplicate leases that are ignored by thee tinyDNS server*/
-/* Should duplicate leases be purged by DCHCP server in a remove stale records operation? */
-function tinydns_add_active_leases($fl,$fd, $leasedomain) {
-	$i = 0;
-	$lip = strlen("lease") + 1;
-	$lis = strlen("binding state active");
-	$lic = strlen("client-hostname");
-	$leaseip = "";
-	$leasestatus = "";
-	$leasehostname = "";
+function tinydns_parse_leases($fl,
+        $datekeys = array('starts', 'ends'),
+        $stringkeys = array('binding state', 'client-hostname', 'hardware ethernet'))
+{
+    $entry = NULL;
+    $result = array();
+
 	while (!feof($fl)) {
-		$leases = fgets($fl, 4096);
-		$discard = ($leases[0] == "#") OR ($leases[0] == "\n"); 
-		if(!$discard) {
-			if($leaseip == "") {
-				if ($leaseip = strstr($leases,"lease")) {
-					$leaseip = substr($leaseip,$lip,strpos($leases,"{") - $lip - 1);
-				}
-			}
-			elseif($leasestatus == FALSE) {
-				if (stristr($leases,"binding state active")) {
-					$leasestatus = TRUE;
-				}
-			}
-			elseif($leasestatus == TRUE AND $leasehostname == "") {
-				if($leasehostname = stristr($leases,"client-hostname")) {
-					$qstrt = strpos($leasehostname,'"') + 1;
-					$qlen  = strrpos($leasehostname,'"') - $qstrt;
-					$leasehostname = substr($leasehostname,$qstrt,$qlen);
-				}
-			}
-			if($leases[0] == "}") {
-				$leasefqdn = "{$leasehostname}.{$leasedomain}";
-				$leasea = "={$leasefqdn}:{$leaseip}";
-				if($leasehostname AND $leasestatus)fwrite($fd, $leasea . "\n");
-				$leaseip = "";
-				$leasehostname = "";
-				$leasestatus = FALSE;
-			}
-			$i = $i + 1;
+		$line = fgets($fl, 4096);
+
+        /* skip comments and empty lines */
+        if (($line[0] == "#") OR ($line[0] == "\n"))
+            continue;
+
+        /* parse beginning of lease entry */
+		if (1 == sscanf($line, "lease %[0-9.] {", $ip)) {
+            $entry = array('ip' => $ip);
+            continue;
 		}
+
+        /* parse end of lease entry */
+        if($line[0] == "}") {
+            $result[] = $entry;
+            $entry = NULL;
+            continue;
+		}
+
+        /* parse row with date value. dates are always in gmt! */
+        foreach ($datekeys as $datekey) {
+            if(7 == sscanf($line, "  ${datekey} %d %d/%d/%d %d:%d:%d;",
+                $wd, $year, $month, $day, $hour, $minute, $sec))
+            {
+                $entry[$datekey] =
+                    gmmktime($hour, $minute, $sec, $month, $day, $year);
+                continue 2;
+            }
+        }
+
+        /* parse standard row value */
+        foreach ($stringkeys as $stringkey) {
+            if(1 == sscanf($line, "  ${stringkey} %[^;];", $value)) {
+                $entry[$stringkey] = trim($value, "\"");
+                continue 2;
+            }
+        }
 	}
-	fclose($fl);
-	$leaselines = $i;
+    return $result;
+}
+
+/**
+ * Filter out inactive and expired dhcpd leases
+ *
+ * Loop thru a sorted list of dhcp leases parsed using tinydns_parse_leases and
+ * remove inactive and expired entries. Returns an unsorted subset of the
+ * original leases array.
+ */
+function tinydns_filter_active_leases($leases, $now = NULL) {
+    if ($now == NULL)
+        $now = time();
+
+    $result = array();
+    foreach ($leases as $lease) {
+        if ($lease['binding state'] == 'active' AND $lease['ends'] > $now)
+            $result[$lease['ip']] = $lease;
+        elseif ($lease['binding state'] == 'free')
+            unset($result[$lease['ip']]);
+    }
+    return $result;
+}
+
+/**
+ * Add active dhcp leases as tinydns host entries
+ */
+function tinydns_add_active_leases($fl, $fd, $leasedomain) {
+    $leases = tinydns_parse_leases($fl);
+
+    $leases = tinydns_filter_active_leases($leases);
+    foreach ($leases as $lease) {
+        if ($lease['binding state'] != 'active')
+            continue;
+
+        /* 
+         * write tinydns host entry using 0 as ttl and the lease end as the 
+         * timestamp in tai64 format. See tinydns-data and djbs tai64 site:
+         * http://cr.yp.to/libtai/tai64.html
+         */
+        fprintf($fd, "=%s.%s:%s:0:4%015x\n", $lease['client-hostname'],
+            $leasedomain, $lease['ip'], $lease['ends'] + 10);
+    }
 }
 
 function tinydns_get_dns_record_type($tinydnsrecord) {
