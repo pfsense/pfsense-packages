@@ -462,10 +462,10 @@ function tinydns_create_zone_file() {
         if($config['installedpackages']['tinydns']['config'][0]['regdhcpstatic']) {
 		$interfaces = explode(",", $config['installedpackages']['tinydns']['config'][0]['interface']);
 		foreach ($interfaces as $dnsif) {
-			if (is_array($config['dhcpd'][$dnsif]))
+			if (!is_array($config['dhcpd'][$dnsif]))
 				continue;
 			$zone =& $config['dhcpd'][$dnsif];
-			if (!isset($dhcpifconf['enable']))
+			if (!isset($zone['enable']))
 				continue;
                         $dhcpdhostname = $config['system']['hostname'];
                         if ($zone['ddnsdomain']) 
