@@ -137,6 +137,15 @@
 						]]>
 					</regex>
 				</item>				
+				<item>
+					<name>Record data</name>
+					<fieldname>ipaddress</fieldname>
+					<regex>
+						<![CDATA[
+							/^%FILTERTEXT%$/i
+						]]>
+					</regex>
+				</item>				
 			</sortablefields>
 		</field>
 		<field>
