@@ -97,6 +97,67 @@
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
+			<type>sorting</type>
+			<include_filtering_inputbox/>
+			<display_maximum_rows>200</display_maximum_rows>
+			<sortablefields>
+				<item>
+					<name>Domain</name>
+					<fieldname>hostname</fieldname>
+					<regex>
+						<![CDATA[
+							/^.*\.%FILTERTEXT%.*$/
+						]]>
+					</regex>
+				</item>
+				<item>
+					<name>Hostname</name>
+					<fieldname>hostname</fieldname>
+					<regex>
+						<![CDATA[
+							/^%FILTERTEXT%.*$/
+						]]>
+					</regex>
+				</item>
+				<item>
+					<name>A Records</name>
+					<fieldname>recordtype</fieldname>
+					<regex>
+						<![CDATA[
+							/^A$/
+						]]>
+					</regex>
+				</item>
+				<item>
+					<name>MX Records</name>
+					<fieldname>recordtype</fieldname>
+					<regex>
+						<![CDATA[
+							/^MX$/
+						]]>
+					</regex>
+				</item>
+				<item>
+					<name>PTR Records</name>
+					<fieldname>recordtype</fieldname>
+					<regex>
+						<![CDATA[
+							/^PTR$/
+						]]>
+					</regex>
+				</item>
+				<item>
+					<name>SOA Records</name>
+					<fieldname>recordtype</fieldname>
+					<regex>
+						<![CDATA[
+							/^SOA$/
+						]]>
+					</regex>
+				</item>
+			</sortablefields>
+		</field>
+		<field>
 			<type>listtopic</type>
 			<name>General</name>
 			<fieldname>temp</fieldname>			

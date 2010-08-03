@@ -180,13 +180,13 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-                        <fielddescr>Interface to listen</fielddescr>
-                        <fieldname>interface</fieldname>
-                        <type>interfaces_selection</type>
-                        <multiple>on</multiple>
-                        <size>4</size>
+			<fielddescr>Interface to listen</fielddescr>
+			<fieldname>interface</fieldname>
+			<type>interfaces_selection</type>
+			<multiple>on</multiple>
+			<size>4</size>
 			<required>on</required>
-                </field>
+		</field>
 		<field>
 		 	<fielddescr>Register DHCP static mappings with server</fielddescr>
 			<fieldname>regdhcpstatic</fieldname>
