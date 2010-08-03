@@ -120,38 +120,11 @@
 					</regex>
 				</item>
 				<item>
-					<name>A Records</name>
+					<name>Record type</name>
 					<fieldname>recordtype</fieldname>
 					<regex>
 						<![CDATA[
-							/^A$/
-						]]>
-					</regex>
-				</item>
-				<item>
-					<name>MX Records</name>
-					<fieldname>recordtype</fieldname>
-					<regex>
-						<![CDATA[
-							/^MX$/
-						]]>
-					</regex>
-				</item>
-				<item>
-					<name>PTR Records</name>
-					<fieldname>recordtype</fieldname>
-					<regex>
-						<![CDATA[
-							/^PTR$/
-						]]>
-					</regex>
-				</item>
-				<item>
-					<name>SOA Records</name>
-					<fieldname>recordtype</fieldname>
-					<regex>
-						<![CDATA[
-							/^SOA$/
+							/^%FILTERTEXT%$/
 						]]>
 					</regex>
 				</item>
