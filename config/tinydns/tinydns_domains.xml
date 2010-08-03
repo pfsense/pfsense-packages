@@ -142,7 +142,7 @@
 					<fieldname>ipaddress</fieldname>
 					<regex>
 						<![CDATA[
-							/^%FILTERTEXT%$/i
+							/%FILTERTEXT%/i
 						]]>
 					</regex>
 				</item>				
