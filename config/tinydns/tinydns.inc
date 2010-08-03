@@ -39,7 +39,7 @@ if(!function_exists("get_real_wan_interface"))
 function tinydns_validate() {
 	global $input_errors, $config;
 
-	if ($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
+	if ($_POST['enableforwarding']) {
 		if (isset($config['dnsmasq']['enable']))
 			$input_errors[] = "You have system dns-forwarder active. Disable it before enabling DNS-Cache Forwarders.";
 	}
@@ -229,7 +229,7 @@ function tinydns_custom_php_changeip_command() {
 	exec("echo {$dnsserverip} > {$g['varetc_path']}/tinydns/env/IP");
 	exec("/usr/bin/killall -9 tinydns");
 
-	if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
+	if(!empty($config['installedpackages']['tinydns']['config'][0]['enableforwarding'])) {
 		$interfaces = explode(",", $config['installedpackages']['tinydns']['config'][0]['interface']);
 		exec("/bin/cp {$g['varetc_path']}/resolv.conf {$g['varetc_path']}/resolv.conf.original");
 		exec("/bin/cp {$g['varetc_path']}/resolv.conf {$g['varetc_path']}/resolv.conf.dnscache");
@@ -436,7 +436,7 @@ function tinydns_create_zone_file() {
 	if($config['installedpackages']['tinydns']['config'][0]['ipaddress'] == "127.0.0.1") {
 		/* Load the root servers if Forwarding is enabled  */
 		/* Register LAN IP and SOA Forward and Reverse DNS recors in TinyDNS Server*/
-		if($config['installedpackages']['tinydns']['config'][0]['enableforwarding']) {
+		if(!empty($config['installedpackages']['tinydns']['config'][0]['enableforwarding'])) {
 			$forwardingservers = tinydns_register_root_servers();
 			if($forwardingservers) 
 				fwrite($fd, $forwardingservers);
