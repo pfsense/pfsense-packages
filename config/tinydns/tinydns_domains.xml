@@ -99,7 +99,7 @@
 		<field>
 			<type>sorting</type>
 			<include_filtering_inputbox/>
-			<display_maximum_rows>200</display_maximum_rows>
+			<display_maximum_rows>50</display_maximum_rows>
 			<sortablefields>
 				<item>
 					<name>Domain</name>
