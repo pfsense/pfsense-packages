@@ -106,7 +106,7 @@
 					<fieldname>hostname</fieldname>
 					<regex>
 						<![CDATA[
-							/^%FILTERTEXT%.*$/i
+							/^.*\.%FILTERTEXT%.*$/i
 						]]>
 					</regex>
 				</item>
@@ -115,7 +115,7 @@
 					<fieldname>hostname</fieldname>
 					<regex>
 						<![CDATA[
-							/^.*\.%FILTERTEXT%.*$/i
+							/^%FILTERTEXT%.*$/i
 						]]>
 					</regex>
 				</item>
