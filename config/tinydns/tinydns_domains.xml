@@ -106,7 +106,7 @@
 					<fieldname>hostname</fieldname>
 					<regex>
 						<![CDATA[
-							/^.*\.%FILTERTEXT%.*$/
+							/^.*\.%FILTERTEXT%.*$/i
 						]]>
 					</regex>
 				</item>
@@ -115,7 +115,7 @@
 					<fieldname>hostname</fieldname>
 					<regex>
 						<![CDATA[
-							/^%FILTERTEXT%.*$/
+							/^%FILTERTEXT%.*$/i
 						]]>
 					</regex>
 				</item>
@@ -124,7 +124,7 @@
 					<fieldname>recordtype</fieldname>
 					<regex>
 						<![CDATA[
-							/^%FILTERTEXT%$/
+							/^%FILTERTEXT%$/i
 						]]>
 					</regex>
 				</item>
@@ -133,7 +133,7 @@
 					<fieldname>ttl</fieldname>
 					<regex>
 						<![CDATA[
-							/^%FILTERTEXT%$/
+							/^%FILTERTEXT%$/i
 						]]>
 					</regex>
 				</item>				
