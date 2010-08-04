@@ -302,7 +302,7 @@
 		<descr>pfSense version of TinyDNS which features failover host support</descr>
 		<website>http://cr.yp.to/djbdns.html</website>
 		<category>Services</category>
-		<version>1.0.6.10</version>
+		<version>1.0.6.11</version>
 		<status>Beta</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Tinydns_package</pkginfolink>
 		<required_version>2.0</required_version>
