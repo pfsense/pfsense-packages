@@ -1,18 +1,14 @@
-diff --git a/usr/local/www/diag_packet_capture.php b/usr/local/www/diag_packet_capture.php
-index 69fd677..91d61cd 100644
---- a/usr/local/www/diag_packet_capture.php
-+++ b/usr/local/www/diag_packet_capture.php
-@@ -265,6 +265,9 @@ include("head.inc"); ?>
- 						<textarea style="width:98%" name="code" rows="15" cols="66" wrap="off" readonly="readonly">
+--- diag_packet_capture.php.orig	2010-08-05 18:33:38.000000000 +0000
++++ diag_packet_capture.php	2010-08-05 18:40:24.000000000 +0000
+@@ -266,6 +266,7 @@
  						<?php
  						system ("/usr/sbin/tcpdump $disabledns $detail -r $fp$fn");?>
-+
-+						conf_mount_ro();
-+
  						</textarea><?php
++						conf_mount_ro();
  					}
  				}?>
-@@ -277,8 +280,6 @@ include("head.inc"); ?>
+ 				</td>
+@@ -277,8 +278,6 @@
  </td></tr></table>
  <?php 
  

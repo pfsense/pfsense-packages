@@ -1061,7 +1061,7 @@
       <descr>Patch to fix packet capture on 1.2.3 embedded (NanoBSD)</descr>
       <category>System</category>
       <config_file>http://www.pfsense.com/packages/config/packetcapturefix/packetcapturefix.xml</config_file>
-      <version>0.1</version>
+      <version>0.2</version>
       <status>BETA</status>
       <required_version>1.2.3</required_version>
       <maximum_version>1.2.3</maximum_version>
