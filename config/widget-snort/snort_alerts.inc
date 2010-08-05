@@ -3,7 +3,7 @@
 require_once("includes/snort_alerts.inc.php");
 
 $snort_alerts_title = "Snort Alerts";
-$snort_alerts_title_link = "snort_alerts.php";
+$snort_alerts_title_link = "snort/snort_alerts.php";
 
 $snort_alerts_logfile = "{$g['varlog_path']}/snort/alert";
 $nentries = 5;
