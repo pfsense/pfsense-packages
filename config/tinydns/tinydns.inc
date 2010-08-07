@@ -106,8 +106,6 @@ load_rc_config \$name
 required_dirs="\${svscan_servicedir}"
 
 svscan_start () {
-	global $g;
-
         echo "Starting svscan."
         /usr/bin/env \
         PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
@@ -141,13 +139,18 @@ ENDPHP\n";
 	$interfaces = explode(",", $config['installedpackages']['tinydns']['config'][0]['interface']);
 	foreach ($interfaces as $dnsidx => $dnsif)
 		$stop .= "\t/usr/local/bin/svc -dx {$g['varrun_path']}/service/dnscache{$dnsidx}\n";
-		
-	
+
 	$stop .= <<<ENDSH
 	/usr/local/bin/svc -dx {$g['varrun_path']}/service/tinydns
 	/usr/local/bin/svc -dx {$g['varrun_path']}/service/axfrdns
-	/bin/rm -rf {$g['varrun_path']}/service/tinydns {$g['varetc_path']}/tinydns {$g['varrun_path']}/dnscache* {$g['varetc_path']}/dnscache* {$g['varetc_path']}/axfrdns {$g['varrun_path']}/axfrdns
+	/bin/rm -rf {$g['varrun_path']}/service/tinydns 2>/dev/null
+	/bin/rm -rf {$g['varetc_path']}/tinydns 2>/dev/null
+	/bin/rm -rf {$g['varrun_path']}/dnscache* 2>/dev/null
+	/bin/rm -rf {$g['varetc_path']}/dnscache* 2>/dev/null
+	/bin/rm -rf {$g['varetc_path']}/axfrdns 2>/dev/null
+	/bin/rm -rf {$g['varrun_path']}/axfrdns 2>/dev/null
 	/bin/pkill -F /var/run/ping_hosts.pid
+
 ENDSH;
 
 	write_rcfile(array(
@@ -222,9 +225,10 @@ function tinydns_custom_php_changeip_command() {
 	exec("/bin/ln -s {$g['varetc_path']}/tinydns {$g['varrun_path']}/service/");
 
 	/* AXFRDNS - Zone transfers */
-	if(is_array($ztipaddress)) 
+	if(is_array($ztipaddress)) {
 		exec("/usr/local/bin/axfrdns-conf Gaxfrdns Gdnslog {$g['varetc_path']}/axfrdns {$g['varetc_path']}/tinydns {$dnsserverip}");
-	exec("/bin/ln -s {$g['varetc_path']}/axfrdns {$g['varrun_path']}/service/");
+		exec("/bin/ln -s {$g['varetc_path']}/axfrdns {$g['varrun_path']}/service/");
+	}
 
 	exec("echo {$dnsserverip} > {$g['varetc_path']}/tinydns/env/IP");
 	exec("/usr/bin/killall -9 tinydns");
