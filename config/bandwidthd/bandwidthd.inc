@@ -154,7 +154,7 @@ $output_cdf
 #Read back the cdf file on startup
 $recover_cdf
 
-#Libpcap format filter string used to control what bandwidthd see's
+#Libpcap format filter string used to control what bandwidthd sees
 #Please always include "ip" in the string to avoid strange problems
 $filter_text
 

@@ -122,14 +122,14 @@
 		<field>
 			<fielddescr>filter</fielddescr>
 			<fieldname>filter</fieldname>
-			<description>Libpcap format filter string used to control what bandwidthd see's.  Please always include "ip" in the string to avoid strange problems.</description>
+			<description>Libpcap format filter string used to control what bandwidthd sees.  Please always include "ip" in the string to avoid strange problems.</description>
 			<type>input</type>
 			<value>ip</value>
 		</field>
 		<field>
 			<fielddescr>Draw Graphs</fielddescr>
 			<fieldname>drawgraphs</fieldname>
-			<description>This default to true to graph the traffic bandwidthd is recording.  Usually set this to false if you only want cdf output or you are using the database output option.  Bandwidthd will use very little ram and cpu if this is set to false.</description>
+			<description>This defaults to true to graph the traffic bandwidthd is recording. Set this to false if you only want cdf output or you are using the database output option. Bandwidthd will use very little RAM and CPU if this is set to false.</description>
 			<type>checkbox</type>
 			<value>checked</value>
 		</field>
