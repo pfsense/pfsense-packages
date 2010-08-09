@@ -788,10 +788,11 @@
       <depends_on_package>db41-4.1.25_4.tbz</depends_on_package>
       <depends_on_package>db3-3.3.11_3,1.tbz</depends_on_package>
       <depends_on_package>cyrus-sasl-2.1.23.tbz</depends_on_package>
-	  <build_port_path>/usr/ports/www/squidguard</build_port_path>
-	  <build_port_path>/usr/ports/databases/db41</build_port_path>
-	  <build_port_path>/usr/ports/databases/db3</build_port_path>
-	  <build_port_path>/usr/ports/security/cyrus-sasl2</build_port_path>
+	<build_port_path>/usr/ports/www/squidguard</build_port_path>
+	<build_port_path>/usr/ports/databases/db41</build_port_path>
+	<build_port_path>/usr/ports/databases/db3</build_port_path>
+	<build_port_path>/usr/ports/security/cyrus-sasl2</build_port_path>
+	<build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_CARP=true WITHOUT_SQUID_SSL=true WITHOUT_SQUID_PINGER=true WITHOUT_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITH_SQUID_WCCP=true WITHOUT_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITHOUT_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITH_SQUID_AUFS=true WITH_SQUID_COSS=true WITH_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true WITH_SAMPLE_BL=true WITH_LDAP=true WITH_SASL=true WITH_FETCH=true</build_options>
       <config_file>http://www.pfsense.org/packages/config/squidGuard/squidguard.xml</config_file>
       <configurationfile>squidguard.xml</configurationfile>
     </package>
