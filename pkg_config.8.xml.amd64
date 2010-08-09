@@ -461,9 +461,10 @@
       <depends_on_package>ucspi-tcp-0.88_2.tbz</depends_on_package>
       <depends_on_package>daemontools-0.76_14.tbz</depends_on_package>
       <depends_on_package>djbdns-1.05_13.tbz</depends_on_package>
-	  <build_port_path>/usr/ports/sysutils/ucspi-tcp</build_port_path>
-	  <build_port_path>/usr/ports/sysutils/daemontools</build_port_path>
-	  <build_port_path>/usr/ports/dns/djbdns</build_port_path>
+	<build_port_path>/usr/ports/sysutils/ucspi-tcp</build_port_path>
+	<build_port_path>/usr/ports/sysutils/daemontools</build_port_path>
+	<build_port_path>/usr/ports/dns/djbdns</build_port_path>
+	<build_options>WITHOUT_MAN=true WITH_SRV=true</build_options>
     </package>
     <package>
       <name>Open-VM-Tools</name>
