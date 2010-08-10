@@ -120,6 +120,7 @@ function stunnel_save($config) {
 	fwrite($fout, "chroot = /var/tmp/stunnel \n");
 	fwrite($fout, "setuid = stunnel \n");
 	fwrite($fout, "setgid = stunnel \n");
+	if(!is_array($config['installedpackages']['stunnel']['config'])) { $config['installedpackages']['stunnel']['config']=Array(); }
 	foreach($config['installedpackages']['stunnel']['config'] as $pkgconfig) {
 		fwrite($fout, "\n[" . $pkgconfig['description'] . "]\n");
 		if($pkgconfig['certificate']) {
