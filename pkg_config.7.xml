@@ -890,7 +890,7 @@
       <category>Network Management</category> 
       <depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-7-stable/All/</depends_on_package_base_url> 
       <depends_on_package>havp-0.91_1.tbz</depends_on_package>
-      <version>0.90</version> 
+      <version>0.91</version>
       <status>BETA</status> 
       <required_version>1.2.2</required_version> 
       <config_file>http://www.pfsense.com/packages/config/havp/havp.xml</config_file> 
