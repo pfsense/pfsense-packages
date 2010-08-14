@@ -71,20 +71,6 @@
 		<configurationfile>haproxy.xml</configurationfile>
 		<build_port_path>/usr/ports/net/haproxy-devel</build_port_path>
 	</package>
-	<package>
-		<name>portsentry</name>
-		<descr>The Sentry tools provide host-level security services for the Unix platform. PortSentry protect against portscans, and detect suspicious login activity on a continuous basis.</descr>
-		<website>http://sourceforge.net/projects/sentrytools/</website>
-		<category>Services</category>
-		<version>0.1</version>
-		<status>BETA</status>
-		<required_version>2.0</required_version>
-		<config_file>http://www.pfsense.com/packages/config/portsentry/portsentry.xml</config_file>
-		<configurationfile>portsentry.xml</configurationfile>
-		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>portsentry-1.2.tbz</depends_on_package>
-		<build_port_path>/usr/ports/security/portsentry</build_port_path>
-	</package>
     <package>
       <name>Proxy Server with mod_security</name>
       <pkginfolink>http://doc.pfsense.org/index.php/ProxyServerModSecurity_package</pkginfolink>
