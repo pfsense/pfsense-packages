@@ -65,7 +65,7 @@ function squid_chown_recursive($dir, $user, $group) {
 			$path = "$dir/$item";
 			if (is_dir($path))
 				squid_chown_recursive($path, $user, $group);
-			else {
+			elseif (is_file($path)) {
 				chown($path, $user);
 				chgrp($path, $group);
 			}
