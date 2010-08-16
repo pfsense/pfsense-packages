@@ -1,42 +1,137 @@
-<?php
-
-	require_once("guiconfig.inc");
-
-echo '
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>Help & Info</title>
-<base target="main">
-<script src="./javascript/tabs.js" type="text/javascript"></script>
-<link href="./css/style2.css" rel="stylesheet" type="text/css" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>The Snort Package Help Page</title>
+<style type="text/css">
+body {
+	background: #f0f0f0;
+	margin: 0;
+	padding: 0;
+	font: 10px normal Verdana, Arial, Helvetica, sans-serif;
+	color: #444;
+}
+h1 {font-size: 3em; margin: 20px 0;}
+.container {width: 800px; margin: 10px auto;}
+ul.tabs {
+	margin: 0;
+	padding: 0;
+	float: left;
+	list-style: none;
+	height: 25px;
+	border-bottom: 1px solid #999;
+	border-left: 1px solid #999;
+	width: 100%;
+}
+ul.tabs li {
+	float: left;
+	margin: 0;
+	padding: 0;
+	height: 24px;
+	line-height: 24px;
+	border: 1px solid #000000;
+	border-left: none;
+	margin-bottom: -1px;
+	background: #ffffff;
+	overflow: hidden;
+	position: relative;
+}
+ul.tabs li a {
+	text-decoration: none;
+	color: #000000;
+	display: block;
+	font-size: 1.2em;
+	padding: 0 20px;
+	border: 1px solid #fff;
+	outline: none;
+}
+ul.tabs li a:hover {
+	background: #eeeeee;
+}
+	
+html ul.tabs li.active, html ul.tabs li.active a:hover  {
+	background: #fff;
+	border-bottom: 1px solid #fff;
+	color: #000000;
+}
+.tab_container {
+	border: 1px solid #999;
+	border-top: none;
+	clear: both;
+	float: left; 
+	width: 100%;
+	background: #fff;
+	-moz-border-radius-bottomright: 5px;
+	-khtml-border-radius-bottomright: 5px;
+	-webkit-border-bottom-right-radius: 5px;
+	-moz-border-radius-bottomleft: 5px;
+	-khtml-border-radius-bottomleft: 5px;
+	-webkit-border-bottom-left-radius: 5px;
+}
+.tab_content {
+	padding: 20px;
+	font-size: 1.2em;
+}
+.tab_content h2 {
+	font-weight: normal;
+	padding-bottom: 10px;
+	border-bottom: 1px dashed #ddd;
+	font-size: 1.8em;
+}
+.tab_content h3 a{
+	color: #254588;
+}
+.tab_content img {
+	float: left;
+	margin: 0 20px 20px 0;
+	border: 1px solid #ddd;
+	padding: 5px;
+}
+</style>
+
+<script type="text/javascript" src="./javascript/jquery-1.4.2.min.js"></script>
+
+<script type="text/javascript">
+
+jQuery(document).ready(function() {
+
+	//Default Action
+	jQuery(".tab_content").hide(); //Hide all content
+	jQuery("ul.tabs li:first").addClass("active").show(); //Activate first tab
+	jQuery(".tab_content:first").show(); //Show first tab content
+	
+	//On Click Event
+	jQuery("ul.tabs li").click(function() {
+		jQuery("ul.tabs li").removeClass("active"); //Remove any "active" class
+		jQuery(this).addClass("active"); //Add "active" class to selected tab
+		jQuery(".tab_content").hide(); //Hide all tab content
+		var activeTab = jQuery(this).find("a").attr("href"); //Find the rel attribute value to identify the active tab + content
+		jQuery(activeTab).fadeIn(); //Fade in the active content
+		return false;
+	});
+
+});
+
+</script>
+
 </head>
 
 <body>
 
-<style type="text/css">
-</style>
-
-<div id="container">
-	<div id="header">
-	<IMG SRC="./images/logo.jpg" width="780px" height="76" ALT="Snort Package">
-	</div>
-	<div class="navigation" id="navigation">
-		<ul>
-			<li><a href="#item1" target="_self">Home</a></li>
-			<li><a href="#item2" target="_self">About Me</a></li>
-			<li><a href="#item3" target="_self">Services</a></li>
-			<li><a href="#item4" target="_self">Change Log</a></li>
-			<li><a href="#item7" target="_self">Faq</a></li>
-			<li><a href="#item6" target="_self">Heros</a></li>
-			<li><a href="#item5" target="_self">Developers</a></li>
-		</ul>
-	</div>
-	<br>
-<div class="content" id="item1">
-	<p>
-	<font size="5"><strong>Snort Package</strong></font> is a GUI based front-end for Sourcefire\'s Snort Â® IDS/IPS software. The Snort Package goal is to be
+<div class="container">
+    <ul class="tabs">
+        <li><a href="#tab1">Home</a></li>
+        <li><a href="#tab2">Change Log</a></li>
+        <li><a href="#tab3">Getting Help</a></li>
+        <li><a href="#tab4">Heros</a></li>
+    </ul>
+    <div class="tab_container">
+        <div id="tab1" class="tab_content">
+        <h2><a href="#"> <img src="./images/logo.jpg" width="750px" height="76" ALT="Snort Package" /></a></h2>
+			
+            <p>           
+	<font size="5"><strong>Snort Package</strong></font> is a GUI based front-end for Sourcefire\'s Snort ® IDS/IPS software. The Snort Package goal is to be
 	the best open-source GUI to manage multiple snort sensors and multiple rule snapshots. The project other goal is to be a highly competitive GUI for
 	network monitoring for both private and enterprise use. Lastly, this project software development should bring programmers and users together to create 
 	software.
@@ -54,143 +149,89 @@ echo '
     The more interfaces you select the more memory you need.<br><br>
     Development is done on a Alix 2D3 system (500 MHz AMD Geode LX800 CPU 256MB DDR DRAM).
 	</p>
-</div>
-<div class="content" id="item2">
-    <p>
-About Me<br><br>
-Coming soon............
-
-</p>
-</div>
-<div class="content" id="item3">
-    <p>
-Services<br><br>
-Coming soon............
-</p>
-</div>
-<div class="content" id="item4">
+			
+        </div>
+		
+        <div id="tab2" class="tab_content">
+            <h2><a href="#"> <img src="./images/logo.jpg" width="750px" height="76" ALT="Snort Package" /></a></h2>
+			
+			<p><font size="5"><strong>Change Log</strong></font><p>
+            
+            <p>Changes to this package can be viwed by following <a href="https://rcs.pfsense.org/projects/pfsense-packages" target="_blank"><font size="2" color="#990000"><strong>pfSense packages repository</strong></font></a></p>
+		</div>
+		
+        <div id="tab3" class="tab_content">
+            <h2><a href="#"> <img src="./images/logo.jpg" width="750px" height="76" ALT="Snort Package" /></a></h2>
+			
+            <p><font size="5"><strong>Getting Help</strong></font></p>
+            
 <p>
-Change Log<br><br>
-Coming soon............
+<font size="2"><strong>Obtaining Support</strong></font><br>
+
+We provide several means of obtaining support for pfSense.
 </p>
-</div>
-<div class="content" id="item5">
+
 <p>
-<font size="5"><strong>PfSense</strong></font> is brought to you by a dedicated group of developers who are security and network professionals by trade. The following people are active developers of the pfSense project. 
-Username is listed in parenthesis (generally also the person\'s forum username, IRC nickname, etc.).<br><br>
-
-<font size="5"><strong>Main Snort-dev Package Developer</strong></font><br>
-Robert Zelaya<br><br>
-
-<font size="5"><strong>Founders</strong></font><br>
-In alphabetical order<br><br>
-
-Chris Buechler (cmb)<br>
-Scott Ullrich (sullrich)<br><br>
-
-<font size="5"><strong>Active Developers</strong></font><br>
-Listed in order of seniority along with date of first contribution.<br><br>
-
-Bill Marquette (billm) - February 2005<br>
-Holger Bauer (hoba) - May 2005<br>
-Erik Kristensen (ekristen) - August 2005<br>
-Seth Mos (smos) - November 2005<br>
-Scott Dale (sdale) - December 2006<br>
-Martin Fuchs (mfuchs) - June 2007<br>
-Ermal LuÃ§i (ermal) - January 2008<br>
-Matthew Grooms (mgrooms) - July 2008<br>
-Mark Crane (mcrane) - October 2008<br>
-Jim Pingle (jim-p) - February 2009<br>
-Rob Zelaya (robiscool) - March 2009<br>
-Renato Botelho (rbgarga) - May 2009<br><br>
-
-<font size="5"><strong>FreeBSD Developer Assistance</strong></font><br>
-We would like to thank the following FreeBSD developers for their assistance.<br><br>
-
-Max Laier (mlaier)<br>
-Christian S.J. Peron (csjp)<br>
-Andrew Thompson (thompsa)<br>
-Bjoern A. Zeeb (bz)<br><br>
-
-among many others who help us directly, and everyone who contributes to FreeBSD.<br><br>
-
-<font size="5"><strong>Inactive Developers</strong></font><br>
-The following individuals are no longer active contributors, having moved on because of other commitments, or employers forbidding contributions. We thank them for their past contributions.<br><br>
-
-Daniel Berlin (dberlin)<br>
-Daniel Haischt (dsh)<br>
-Espen Johansen (lsf)<br>
-Scott Kamp (dingo)<br>
-Bachman Kharazmi (bkw)<br>
-Fernando TarlÃ¡ Cardoso Lemos (fernando)<br>
-Kyle Mott (kyle)<br>
-Colin Smith (colin)<br>
+<font color="#990000" size="4"><strong>Free Options</strong></font><br>
+Our free options include our <a href="http://forum.pfsense.org/" target="_blank"><font color="#990000"><strong>forum</strong></font></a>, <a href="http://www.pfsense.org/index.php?option=com_content&task=view&id=66&Itemid=71" target="_blank"><font color="#990000"><strong>mailing list</strong></font></a> , and <a href="http://www.pfsense.org/index.php?option=com_content&task=view&id=64&Itemid=72" target="_blank"><font color="#990000"><strong>IRC channel</strong></font></a>. Before using any of these resources, please review the Project Rules below.
 </p>
-</div>
-<div class="content" id="item6">
+
 <p>
-Heros<br><br>
-Coming soon............
+<font color="#990000" size="4"><strong>Commercial Support</strong></font><br>
+
+<a href="https://portal.pfsense.org/index.php/support-subscription" target="_blank"><font color="#990000"><strong>Commercial support</strong></font></a> is available from the company founded by the founders of the pfSense project, <a href="http://www.bsdperimeter.com/" target="_blank"><font color="#990000"><strong>BSD Perimeter</strong></font></a>. Phone and email support is available for <a href="https://portal.pfsense.org/index.php/support-subscription" target="_blank"><font color="#990000"><strong>support subscribers</strong></font></a> only.
 </p>
-</div>
-<div class="content" id="item7">
+
 <p>
-=========================<br>
-
-Q: Do you have a quick install tutorial and tabs explanation.<br>
-
-A: Yes.<br>
-    
-    http://doc.pfsense.org/index.php/Setup_Snort_Package<br>
-
-=========================<br>
-
-Q: What interfaces can snort listen on ?<br>
-
-A: Right now all WAN interfaces and LAN interfaces. But if you select a LAN interface you may need to adjust the snort rules to use the LAN interface.<br>
-    
-==========================<br>
-
-Q: What logs does the snort package keep. ?<br>
-
-A: Most of the snort logs are keept in the /var/log/snort.<br>
-    Snorts syslogs\' are saved to the /var/log/snort/snort_sys_0ng0.<br>
-    
-==========================<br>
-
-Q: What is the best Performance setting ? or Snort is using 90% cpu and all my memory.<br>
-
-A: Depends how much memory you have and how many rules you want to run.; lowmem for systems with less than 256 mb memory, ac-bnfa for systems<br>
-   with over 256 mb of memory. The other options are; ac high memory, best performance, ac-std moderate memory, high performance,acs small<br>
-   memory, moderate performance,ac-banded small memory,moderate performance,ac-sparsebands small memory, high performance.<br>
-
-   Short version: For most people ac-bnfa is the best setting.<br>
-
-=========================<br>
-
-Q: What is the Oinkmaster code ? How do I get the code ?<br>
-
-A: The Oinkmaster code is your personal password in order to download snort rules.<br>
-    You get a Oinkmaster code when you register with snort.org. It is free to register.<br>
-    Goto https://www.snort.org/signup to get your personal code.<br>
-    
-=========================<br>
-
-Q: What is the Snort.org subscriber option? How do I become a  Snort.org subscriber?<br>
-
-A: Snort.org subscribers get the the latest rule updates 30 days faster than registered users.<br>
-    Goto http://www.snort.org/vrt/buy-a-subscription/.
-    It is highly suggested that you get a paid subscription so that you can always have the latest rules.<br>
-    
-=========================<br>
-
-Q: When did you start working on the snort package.<br>
-
-A: I started working on the snort package in May 2009.<br>
+<font color="#990000" size="4"><strong>Project Rules</strong></font><br>
+To keep things orderly, and be fair to everyone, we must enforce these rules. 
 </p>
+
+<p>
+Please do not post support questions to the blog comments. The comments are for discussion of the post, and letting people ask questions there would make a mess of the purpose of those comments. Any support questions will not be moderator approved.
+</p>
+
+<p>
+Please do not cross post questions between the forum and mailing list, unless your inquiry has gone unanswered for at least 24 hours. Do not bump your mailing list or forum posts for at least 24 hours. If you have not received a reply after more than 24 hours, you are welcome to bump your thread.
+</p>
+
+<p>
+Please do not email individuals, the coreteam address, or private message people on the forum to ask questions. We provide a wide variety of means for obtaining help in a public forum, where it helps others who have the same questions in the future. We don't have enough time to answer all the questions our users post in the public forums, much less via email and private messages. Since we cannot possibly reply to everyone's email and private messages, to be fair we will not reply to anyone. Individual attention via phone and email support is available for commercial support customers. 
+</p>          
+        </div>
+		
+        <div id="tab4" class="tab_content">
+            <h2><a href="#"> <img src="./images/logo.jpg" width="750px" height="76" ALT="Snort Package" /></a></h2>
+			
+            <p><font size="5"><strong>Heros</strong></font></p>
+			
+            <p>Pfsense Snort Package users who have cared enough to donate to this project. I can't thank you enough for all your help. With-out your support I would have stoped long time ago.</p>
+			
+			<p>If your not on this list PM me and I will add you. If you would like to be removed pm me and I will remove you.</p>
+			
+			<p><font size="5"><strong>Names</strong></font></p>
+			
+			<p>sandro tavella</p>
+			<p>João Kemp Filho</p>
+			<p>Julio Fumoso</p>
+			<p>Rolland Hart</p>
+			<p>DiMarco Technology Solutions Inc.</p>
+			<p>Brett Burley</p>
+			<p>Tomasz Iskra</p>
+			<p>Bruno Buchschacher</p>
+			<p>Marco Pannetto</p>
+			<p>Christopher Weakland</p>
+			<p>Antonio Riveros</p>
+			<p>Jeremy Harany</p>
+			<p>Serialdie</p>
+			<p>Dlawley</p>
+			<p>Onhel</p>
+			<p>Jerrygoldsmith</p>
+
+ 
+		</div>
+    </div>
 </div>
-</div>
+
 </body>
 </html>
-';
-?>

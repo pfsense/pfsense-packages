@@ -30,8 +30,8 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require_once("globals.inc");
 require_once("guiconfig.inc");
+require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 $pconfig['brefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['brefresh'];
@@ -226,18 +226,25 @@ $blocked_msg_txt = "Settings are set to never <strong>remove</strong> hosts.";
 }
 	
 $pgtitle = "Services: Snort Blocked Hosts";
-include("head.inc");
+include("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
+
+		<script>
+			jQuery(document).ready(function(){
+			
+				//Examples of how to assign the ColorBox event to elements
+				jQuery(".example8").colorbox({width:"820px", height:"700px", iframe:true, overlayClose:false});
+				
+			});
+		</script>
+
 <?php 
 
-include("./snort_fbegin.inc");
-
-echo "<p class=\"pgtitle\">";
-if($pfsense_stable == 'yes'){echo $pgtitle;}
-echo "</p>\n";
+include("fbegin.inc");
+echo $snort_general_css;
 
 /* refresh every 60 secs */
 if ($pconfig['brefresh'] == 'on' || $pconfig['brefresh'] == '')
@@ -246,26 +253,37 @@ if ($pconfig['brefresh'] == 'on' || $pconfig['brefresh'] == '')
 }
 ?>
 
-<script src="/row_toggle.js" type="text/javascript"></script>
+<div class="body2">
+
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+
+<!-- not needed maybe 
+<script src="/javascript/row_toggle.js" type="text/javascript"></script>
 <script src="/javascript/sorttable.js" type="text/javascript"></script>
+-->
+
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
    <tr>
    		<td>
-<?php
-	$tab_array = array();
-	$tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
-	$tab_array[] = array("Global Settings", false, "/snort/snort_interfaces_global.php");
-	$tab_array[] = array("Rule Updates", false, "/snort/snort_download_rules.php");
-	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
-    $tab_array[] = array("Blocked", true, "/snort/snort_blocked.php");
-	$tab_array[] = array("Whitelists", false, "/snort/snort_interfaces_whitelist.php");
-	$tab_array[] = array("Suppress", false, "/snort/snort_interfaces_suppress.php");
-	$tab_array[] = array("Help", false, "/snort/snort_help_info.php");
-	display_top_tabs($tab_array);
-?>
+
+<div class="snorttabs" style="margin:1px 0px; width:775px;">
+<!-- Tabbed bar code-->
+<ul class="snorttabs">
+    <li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
+	<li><a href="/snort/snort_interfaces_global.php"><span>Global Settings</span></a></li>
+    <li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
+    <li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
+	<li class="snorttabs_active"><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
+    <li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
+    <li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
+	<li><a class="example8" href="/snort/help_and_info.php"><span>Help</span></a></li>
+  </ul>
+</div>  
+		
 	</td>
 	</tr>
+	
 		<tr>
 		<td>
 		<div id="mainarea">
@@ -426,6 +444,8 @@ if ($blocked_ips_array[0] != '' && $alerts_array[0] != '')
 	}
 }
 
+echo '</table>' . "\n";
+
 if ($blocked_ips_array[0] == '')
 {
 		echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\"><br><strong>There are currently no items being blocked by snort.</strong></td></tr>";
@@ -434,13 +454,16 @@ if ($blocked_ips_array[0] == '')
 }
 
 ?>
-						</table>
 		    		</td>
 		  		</tr>
 			</table>
 	</td>
   </tr>
 </table>
+
+</div>
+
 <?php include("fend.inc"); ?>
+
 </body>
 </html>

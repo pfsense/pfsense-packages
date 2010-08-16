@@ -36,6 +36,9 @@ require_once("functions.inc");
 // Needed on 2.0 because of filter_get_vpns_list()
 require_once("filter.inc");
 
+/* package version */
+$snort_package_version = 'Snort 2.8.6 pkg v. 1.32';
+
 /* find out if were in 1.2.3-RELEASE */
 $pfsense_ver_chk = exec('/bin/cat /etc/version');
 if ($pfsense_ver_chk == '1.2.3-RELEASE')
@@ -214,7 +217,7 @@ global $config, $g;
 
 	/* use ob_clean to clear output buffer, this code needs to be watched */
 	ob_clean();
-	$snort_up_prell = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}{$if_real}\" | awk '{print \$1;}'", $retval);
+	$snort_up_prell = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}\" | awk '{print \$1;}'", $retval);
 
 	if ($snort_up_prell != "") {
 		$snort_uph = 'yes';
@@ -263,7 +266,7 @@ global $config, $g;
 		/* if snort.sh crashed this will remove the pid */
 		exec('/bin/rm /tmp/snort.sh.pid');
 		
-	$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}{$if_real}\" | awk '{print \$1;}'");
+	$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}\" | awk '{print \$1;}'");
 	$start_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
 	$start_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
 	
@@ -275,8 +278,9 @@ global $config, $g;
 		{
 			if ($start_up_s != "")
 			{
-				exec("/bin/kill {$start_up_s}");
-				exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}*");
+				exec("/bin/kill {$start_up_s}");				
+				exec("rm /var/log/snort/run/snort_{$if_real}{$snort_uuid}*");
+				exec("rm /var/log/snort/snort_{$snort_uuid}_{$if_real}*");
 			}
 		
 			if ($start2_upb_s != "")
@@ -288,7 +292,8 @@ global $config, $g;
 			if ($start_up_r != "")
 			{
 				exec("/bin/kill {$start_up_r}");
-				exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}*");
+				exec("rm /var/log/snort/run/snort_{$if_real}{$snort_uuid}*");
+				exec("rm /var/log/snort/snort_{$snort_uuid}_{$if_real}*");
 			}
 		
 			if ($start2_upb_r != "")
@@ -311,7 +316,7 @@ global $config, $g;
 
 		$snort_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['enable'];
 		if ($snort_info_chk == 'on') {
-		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}{$if_real}\" -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}\" -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 		}
 		/* define snortbarnyardlog_chk */
 		/* top will have trouble if the uuid is to far back */
@@ -594,7 +599,9 @@ function snort_postinstall()
 	
 	chdir ("/usr/local/www/snort/css/");
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/css/style.css');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/css/style2.css');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/css/colorbox.css');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/css/new_tab_menu.css');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/css/sexybuttons.css');
 	chdir ("/usr/local/www/snort/images/");
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/alert.jpg');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/down.gif');
@@ -605,17 +612,18 @@ function snort_postinstall()
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/up.gif');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/up2.gif');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/logo.jpg');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/footer.jpg');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/footer2.jpg');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/icon_excli.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/arrow_down.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/awesome-overlay-sprite.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/controls.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/logo22.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/new_tab_menu.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/page_white_text.png');
 	chdir ("/usr/local/www/snort/javascript/");
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/jquery.blockUI.js');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/jquery-1.3.2.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/jquery.colorbox.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/jquery-1.4.2.min.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/mootools.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/sortableTable.js');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/tabs.js');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/row_helper.js');
-	
 	/* install barnyard2 for 2.0 and 1.2.3 */
 	chdir ("/usr/local/bin/");
 	if ($pfsense_stable == 'yes') {
@@ -1368,7 +1376,7 @@ $snort_sh_text2[] = <<<EOD
 		/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid
 		/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid.lck
 
-		/usr/local/bin/snort -u snort -g snort -R {$snort_uuid}{$if_real} -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
+		/usr/local/bin/snort -u snort -g snort -R {$snort_uuid} -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
 		$start_barnyard2
 
 		/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD Reload For {$snort_uuid}_{$if_real}..."
@@ -1839,6 +1847,10 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 			exec("/bin/mkdir -p /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/rules");
 		}
 	}
+
+
+/* define basic log filename */
+$snortunifiedlogbasic_type = "output unified: filename snort_{$snort_uuid}_{$if_real}.log, limit 128"; 
 	
 /* define snortalertlogtype */
 $snortalertlogtype = $config['installedpackages']['snortglobal']['snortalertlogtype'];
@@ -2627,6 +2639,7 @@ preprocessor ssl: ports { {$def_ssl_ports_ignore_type} }, trustservers, noinspec
                     #
 #####################
 
+$snortunifiedlogbasic_type
 $snortalertlogtype_type
 $alertsystemlog_type
 $tcpdumplog_type

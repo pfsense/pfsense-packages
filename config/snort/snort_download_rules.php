@@ -79,203 +79,34 @@ if (file_exists('/var/run/snort.conf.dirty')) {
 	$snort_dirty_d = 'stop';
 }
 	
-/* If no id show the user a button */	
-if ($id_d == "" || $snort_emrging_info == "stop" || $snort_oinkid_info == "stop" || $snort_dirty_d == 'stop') {
-
-$pgtitle = "Services: Snort: Rule Updates";
-
-include("head.inc");
-include("./snort_fbegin.inc");
-echo "<p class=\"pgtitle\">";
-if($pfsense_stable == 'yes'){echo $pgtitle;}
-echo "</p>\n";
-
-	echo "<table height=\"32\" width=\"100%\">\n";
-	echo "  <tr>\n";
-	echo "   <td>\n";
-	echo "      <div style='background-color:#E0E0E0' id='redbox'>\n";
-	echo "       <table width='100%'><tr><td width='8%'>\n";
-	echo "        &nbsp;&nbsp;&nbsp;<img style='vertical-align:middle' src=\"/snort/images/icon_excli.png\" width=\"40\" height=\"32\">\n";
-	echo "        </td>\n";
-	echo "        <td width='70%'><font color='#FF850A'><b>NOTE:</b></font><font color='#000000'>&nbsp;&nbsp;Snort.org and Emergingthreats.net will go down from time to time. Please be patient.</font>\n";
-	echo "        </td>";
-	echo "        </tr></table>\n";
-	echo "       </div>\n";
-	echo "    </td>\n";
-	echo "</table>\n";
-	echo "<script type=\"text/javascript\">\n";
-	echo "NiftyCheck();\n";
-	echo "Rounded(\"div#redbox\",\"all\",\"#FFF\",\"#E0E0E0\",\"smooth\");\n";
-	echo "Rounded(\"td#blackbox\",\"all\",\"#FFF\",\"#000000\",\"smooth\");\n";
-	echo "</script>\n";
-	echo "\n<br>\n";
-
-/* make sure user has javascript on */
-echo "<style type=\"text/css\">
-.alert {
- position:absolute;
- top:10px;
- left:0px;
- width:94%;
-background:#FCE9C0;
-background-position: 15px; 
-border-top:2px solid #DBAC48;
-border-bottom:2px solid #DBAC48;
-padding: 15px 10px 85% 50px;
-}
-</style> 
-<noscript><div class=\"alert\" ALIGN=CENTER><img src=\"/themes/nervecenter/images/icons/icon_alert.gif\"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>\n";
-echo "<body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\">\n";
-
-echo "<script src=\"/row_toggle.js\" type=\"text/javascript\"></script>\n
-<script src=\"/javascript/sorttable.js\" type=\"text/javascript\"></script>\n
-<table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
-   <tr>\n
-   		<td>\n";
-
-	$tab_array = array();
-	$tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
-	$tab_array[] = array("Global Settings", false, "/snort/snort_interfaces_global.php");
-	$tab_array[] = array("Rule Updates", true, "/snort/snort_download_rules.php");
-	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
-    $tab_array[] = array("Blocked", false, "/snort/snort_blocked.php");
-	$tab_array[] = array("Whitelists", false, "/snort/snort_interfaces_whitelist.php");
-	$tab_array[] = array("Suppress", false, "/snort/snort_interfaces_suppress.php");
-	$tab_array[] = array("Help", false, "/snort/snort_help_info.php");
-	display_top_tabs($tab_array);
-
-if ($snort_emrging_info == "stop" && $snort_oinkid_info == "stop") {
-$disable_enable_button = 'onclick="this.disabled=true"';
-}else{
-$disable_enable_button = "onClick=\"parent.location='/snort/snort_download_rules.php?id_d=up'\"";
-}
-echo  		"</td>\n
-  </tr>\n
-  <tr>\n
-    <td>\n
-		<div id=\"mainarea\">\n
-			<table id=\"maintable\" class=\"tabcont\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
-				<tr>\n
-					<td>\n
-<input name=\"Submit\" type=\"submit\" class=\"formbtn\" $disable_enable_button value=\"Update Rules\" $disable_button> <br><br> \n";
-
-if ($mfolder_chk == "empty")
-{
-echo "<span class=\"red\"><strong>WARNING:</strong></span> &nbsp;&nbsp;The main rules <strong>directory</strong> is <strong>empty</strong>. /usr/local/etc/snort/rules <br><br>\n";
-}
-
-if ($snort_emrging_info == "stop") {
-echo "<span class=\"red\"><strong>WARNING:</strong></span> &nbsp;&nbsp;Click on the <strong>\"Global Settings\"</strong> tab and select ether snort.org or enmergingthreats.net rules to download. <br><br> \n";
-}
-
-if ($snort_oinkid_info == "stop") {
-echo "<span class=\"red\"><strong>WARNING:</strong></span> &nbsp;&nbsp;Click on the <strong>\"Global Settings\"</strong> tab and enter a <strong>oinkmaster</strong> code. <br><br> \n";
-}
-
-if ($snort_dirty_d == "stop") {
-echo "<span class=\"red\"><strong>WARNING:</span> CHANGES HAVE NOT BEEN APPLIED</strong> &nbsp;&nbsp;Click on the <strong>\"Apply Settings\"</strong> button at the main interface tab.<br><br> \n";
-}
-
-echo "		    		</td>\n
-		  		</tr>\n
-			</table>\n
-		</div>\n
-	</td>\n
-  </tr>\n
-</table>\n
-\n
-</form>\n
-\n
-<p>\n\n";
-
-if ($id_d == "")
-echo "Click on the <strong>\"Update Rules\"</strong> button to start the updates. <br><br> \n";
-
-if ($config['installedpackages']['snortglobal']['last_md5_download'] != "")
-echo "The last time the updates were started <strong>$last_md5_download</strong>. <br><br> \n";
-
-if ($config['installedpackages']['snortglobal']['last_rules_install'] != "")
-echo "The last time the updates were installed <strong>$last_rules_install</strong>. <br><br> \n";
-
-include("fend.inc");
-
-echo "</body>";
-echo "</html>";
-
-exit(0);
-
-}
-
 $pgtitle = "Services: Snort: Update Rules";
 
-include("/usr/local/www/head.inc");
+include("./snort_head.inc");
 
 ?>
-<script src="/javascript/scriptaculous/prototype.js" type="text/javascript"></script>
-<script type="text/javascript" src="/snort/javascript/jquery-1.3.2.js"></script>
-<script type="text/javascript" src="/snort/javascript/jquery.blockUI.js?v2.28"></script>
-
-<script type="text/javascript">
-<!--
-
-function displaymessage()
-{
-
-		$.blockUI.defaults.message = "Please be patient....";
-
-        $.blockUI({
-
-			css: {
-            border: 'none',
-            padding: '15px',
-            backgroundColor: '#000',
-            '-webkit-border-radius': '10px',
-            '-moz-border-radius': '10px',
-            opacity: .5,
-            color: '#fff',
-				}
-				});
-               
-}
-
-function displaymessagestop()
-{
-
-setTimeout($.unblockUI, 2000);
-
-}
-
-// -->
-</script>
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("./snort_fbegin.inc"); ?>
-<p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
 
-<form action="snort_download_rules.php" method="post">
-<div id="inputerrors"></div>
+<!-- before fbegin -->
+
+<?php //include("./snort_fbegin.inc"); ?>
+
+
+<div id="wrapper" style="top:200px">
+	<div id="content">
+		<div id="right" style="min-height:200px">
+
+<br>
+
+<!-- after fbegin -->
+
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+
+<form action="./snort_testing.php" method="post">
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td>
-<?php
-	$tab_array = array();
-	$tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
-	$tab_array[] = array("Global Settings", false, "/snort/snort_interfaces_global.php");
-	$tab_array[] = array("Rule Updates", true, "/snort/snort_download_rules.php");
-	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
-    $tab_array[] = array("Blocked", false, "/snort/snort_blocked.php");
-	$tab_array[] = array("Whitelists", false, "/snort/snort_interfaces_whitelist.php");
-	$tab_array[] = array("Suppress", false, "/snort/snort_interfaces_suppress.php");
-	$tab_array[] = array("Help", false, "/snort/snort_help_info.php");
-	display_top_tabs($tab_array);
-?>
-
-<script type="text/javascript">
-<!--
-	displaymessage();	
-// -->
-</script>
 
 </td>
 </tr>
@@ -309,11 +140,35 @@ setTimeout($.unblockUI, 2000);
           </td>
         </tr>
 </table>
-</form>
+<form>
+
+<style type="text/css">
+
+#footer {
+position: relative;
+background-color: transparent;
+background-repeat: no-repeat;
+background-attachment: scroll;
+background-position: 0% 0%;
+top: -18px;
+left: 0px;
+width: 810px;
+height: 75px;
+color: #ffffff;
+text-align: center;
+font-size: 0.9em;
+padding-top: 0px;
+margin-bottom: 0px;
+clear: both;
+}
+
+</style>
+
 <?php include("fend.inc");?>
 
 <?php
 
+/* Start of code */
 /* Begin main code */
 conf_mount_rw();
 
@@ -377,7 +232,9 @@ if ($snortdownload == 'on')
 	} else {
 		update_status(gettext("Downloading snort.org md5 file..."));
 		ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-		$image = @file_get_contents("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}");
+		
+		$image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}");
+		// $image = @file_get_contents("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}");
 		$f = fopen("{$tmpfname}/{$snort_filename_md5}", 'w');
 		fwrite($f, $image);
 		fclose($f);
@@ -390,8 +247,8 @@ if ($emergingthreats == "on")
 {
 		update_status(gettext("Downloading emergingthreats md5 file..."));
 		ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-		$image = @file_get_contents("http://www.emergingthreats.net/version.txt");
-//    $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/version.txt");
+		$image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/version.txt");
+		// $image = @file_get_contents("http://www.emergingthreats.net/version.txt");
 		$f = fopen("{$tmpfname}/version.txt", 'w');
 		fwrite($f, $image);
 		fclose($f);
@@ -404,8 +261,8 @@ if (file_exists("{$tmpfname}/{$pfsense_rules_filename_md5}")) {
 } else {
     update_status(gettext("Downloading pfsense md5 file..."));
     ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-    $image = @file_get_contents("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz.md5");
-//    $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz.md5");
+	$image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz.md5");
+    // $image = @file_get_contents("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz.md5");
     $f = fopen("{$tmpfname}/pfsense_rules.tar.gz.md5", 'w');
     fwrite($f, $image);
     fclose($f);
@@ -422,12 +279,6 @@ if ($snortdownload == 'on')
 		hide_progress_bar_status();
 		/* Display last time of sucsessful md5 check from cache */
 		echo "\n\n</body>\n</html>\n";
-		echo '
-<script type="text/javascript">
-<!--
-	displaymessagestop();	
-// -->
-</script>';
 echo "</body>";
 echo "</html>";
 conf_mount_ro();
@@ -444,12 +295,6 @@ if (0 == filesize("{$tmpfname}/$pfsense_rules_filename_md5")){
     hide_progress_bar_status();
     /* Display last time of sucsessful md5 check from cache */
     echo "\n\n</body>\n</html>\n";
-	echo '
-<script type="text/javascript">
-<!--
-	displaymessagestop();	
-// -->
-</script>';
 echo "</body>";
 echo "</html>";
 conf_mount_ro();
@@ -526,12 +371,6 @@ if ($snortdownload == 'on' && $emergingthreats == 'on')
 	{
 			update_status(gettext("All your rules are up to date..."));
 			update_output_window(gettext("You may start Snort now..."));
-			echo '
-	<script type="text/javascript">
-	<!--
-		displaymessagestop();	
-	// -->
-	</script>';
 			echo "</body>";
 			echo "</html>";
 			conf_mount_ro();
@@ -545,12 +384,6 @@ if ($snortdownload == 'on' && $emergingthreats == 'off')
 	{
 			update_status(gettext("Your snort.org rules are up to date..."));
 			update_output_window(gettext("You may start Snort now..."));
-			echo '
-	<script type="text/javascript">
-	<!--
-		displaymessagestop();	
-	// -->
-	</script>';
 			echo "</body>";
 			echo "</html>";
 			conf_mount_ro();
@@ -564,12 +397,6 @@ if ($snortdownload == 'off' && $emergingthreats == 'on')
 	{
 			update_status(gettext("Your Emergingthreats rules are up to date..."));
 			update_output_window(gettext("You may start Snort now..."));
-			echo '
-	<script type="text/javascript">
-	<!--
-		displaymessagestop();	
-	// -->
-	</script>';
 			echo "</body>";
 			echo "</html>";
 			conf_mount_ro();
@@ -598,19 +425,14 @@ if ($snortdownload == 'on')
 		update_status(gettext("There is a new set of Snort.org rules posted. Downloading..."));
 		update_output_window(gettext("May take 4 to 10 min..."));
 		conf_mount_rw();
-		snort_download_file_with_progress_bar("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
+		snort_download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
+		//snort_download_file_with_progress_bar("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
 		update_all_status($static_output);
 		update_status(gettext("Done downloading rules file."));
 		if (150000 > filesize("{$tmpfname}/$snort_filename")){
 			update_status(gettext("Error with the snort rules download..."));
 
 			update_output_window(gettext("Snort rules file downloaded failed..."));
-			echo '
-<script type="text/javascript">
-<!--
-	displaymessagestop();	
-// -->
-</script>';
 echo "</body>";
 echo "</html>";
 conf_mount_ro();
@@ -630,9 +452,9 @@ if ($emergingthreats == "on")
 		update_status(gettext("Emergingthreats tar file exists..."));
 	}else{
 		update_status(gettext("There is a new set of Emergingthreats rules posted. Downloading..."));
-		update_output_window(gettext("May take 4 to 10 min..."));
-//   download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
-		download_file_with_progress_bar("http://www.emergingthreats.net/rules/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
+		update_output_window(gettext("May take 4 to 10 min..."));		
+		download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
+		// download_file_with_progress_bar("http://www.emergingthreats.net/rules/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
 		update_all_status($static_output);
 		update_status(gettext("Done downloading Emergingthreats rules file."));
 		}
@@ -647,8 +469,8 @@ if (file_exists("{$tmpfname}/{$pfsense_rules_filename}")) {
 	unhide_progress_bar_status();
     update_status(gettext("There is a new set of Pfsense rules posted. Downloading..."));
     update_output_window(gettext("May take 4 to 10 min..."));
-//    download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
-    download_file_with_progress_bar("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
+	download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
+    // download_file_with_progress_bar("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
     update_all_status($static_output);
     update_status(gettext("Done downloading rules file."));
  }
@@ -755,12 +577,6 @@ if ($snortdownload == 'on')
 	}else{
 		update_status(gettext("Error extracting Snort.org Rules..."));
 		update_output_window(gettext("Error Line 755"));
-	echo '
-<script type="text/javascript">
-<!--
-	displaymessagestop();	
-// -->
-</script>';
 echo "</body>";
 echo "</html>";
 conf_mount_ro();
@@ -815,12 +631,6 @@ if ($snortdownload == 'on')
 	}else{
 		update_status(gettext("The md5 file does not exist..."));
 		update_output_window(gettext("Error copying config..."));
-		echo '
-<script type="text/javascript">
-<!--
-	displaymessagestop();	
-// -->
-</script>';
 		echo "</body>";
 		echo "</html>";
 		conf_mount_ro();
@@ -857,12 +667,6 @@ if (file_exists("{$tmpfname}/$pfsense_rules_filename_md5")) {
 } else {
     update_status(gettext("The Pfsense md5 file does not exist..."));
     update_output_window(gettext("Error copying config..."));
-	echo '
-<script type="text/javascript">
-<!--
-	displaymessagestop();	
-// -->
-</script>';
 		echo "</body>";
 		echo "</html>";
 		conf_mount_ro();
@@ -887,12 +691,6 @@ if ($snortdownload == 'on')
 		}else{
 			update_status(gettext("Directory signatures exist..."));
 			update_output_window(gettext("Error copying signature..."));
-			echo '
-<script type="text/javascript">
-<!--
-	displaymessagestop();	
-// -->
-</script>';
 echo "</body>";
 echo "</html>";
 conf_mount_ro();
@@ -1094,13 +892,6 @@ if (file_exists("/tmp/snort_download_halt.pid")) {
 		update_status(gettext("The Rules update finished..."));
 		update_output_window(gettext("You may start snort now..."));
 }
-
-echo '
-<script type="text/javascript">
-<!--
-	displaymessagestop();	
-// -->
-</script>';
 
 /* hide progress bar and lets end this party */
 hide_progress_bar_status();

@@ -63,4 +63,121 @@ function print_info_box_np2($msg) {
 }
 
 
+/* makes boxes round */
+/* load at bottom */
+
+$snort_custom_rnd_box = '
+<script type="text/javascript">
+<!--
+
+	NiftyCheck();
+	Rounded("div#mainarea2","bl br tr","#FFF","#dddddd","smooth");
+	Rounded("div#mainarea3","bl br tr","#FFF","#eeeeee","smooth");
+	Rounded("div#mainarea4","all","#FFF","#eeeeee","smooth");
+	Rounded("div#mainarea5","all","#eeeeee","#dddddd","smooth");
+
+//-->
+</script>' . "\n";
+
+/* general css code */
+$snort_general_css = '
+
+<style type="text/css">
+
+.alert {
+ position:absolute;
+ top:10px;
+ left:0px;
+ width:94%;
+ height:90%;
+ 
+background:#FCE9C0;
+background-position: 15px; 
+border-top:2px solid #DBAC48;
+border-bottom:2px solid #DBAC48;
+padding: 15px 10px 85% 50px;
+}
+
+.formpre {
+font-family:arial;
+font-size: 1.1em;
+}
+
+#download_rules {
+font-family: arial;
+font-size: 13px;
+font-weight: bold;
+text-align: center
+}
+
+#download_rules_td {
+font-family: arial;
+font-size: 13px;
+font-weight: bold;
+text-align: center
+}
+
+body2 {
+font-family:arial;
+font-size:12px;
+}
+
+.tabcont {
+background-color: #eeeeee;
+padding-right: 12px;
+padding-left: 12px;
+padding-top: 12px;
+padding-bottom: 12px;
+}
+
+.tabcont2 {
+background-color: #eeeeee;
+padding-right: 12px;
+padding-left: 12px;
+padding-top: 12px;
+padding-bottom: 12px;
+}
+
+.tabcont5 {
+background-color: #dddddd;
+padding-right: 12px;
+padding-left: 12px;
+padding-top: 12px;
+padding-bottom: 12px;
+}
+
+</style> ' . "\n";
+
+
+/* general css code for snort_interface.php */
+$snort_interfaces_css = '
+
+<style type="text/css">
+
+.listbg2 {
+	border-right: 1px solid #999999;
+	border-bottom: 1px solid #999999;
+	font-size: 11px;
+	background-color: #090;
+	color: #000;	
+	padding-right: 16px;
+	padding-left: 6px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+.listbg3 {
+	border-right: 1px solid #999999;
+	border-bottom: 1px solid #999999;
+	font-size: 11px;
+	background-color: #777777;
+	color: #000;	
+	padding-right: 16px;
+	padding-left: 6px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+</style>' . "\n";
+
 ?>

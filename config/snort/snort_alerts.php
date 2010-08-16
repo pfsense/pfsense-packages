@@ -34,9 +34,13 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require_once("globals.inc");
 require_once("guiconfig.inc");
+require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
+
+/* load only javascript that is needed */
+$snort_load_sortabletable = 'yes';
+$snort_load_mootools = 'yes';
 
 $snortalertlogt = $config['installedpackages']['snortglobal']['snortalertlogtype'];
 $snort_logfile = '/var/log/snort/alert';
@@ -298,22 +302,25 @@ return $alert_sid;
 //
 
 $pgtitle = "Services: Snort: Snort Alerts";
-include("head.inc");
+include("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
 
-<link rel="stylesheet" href="/snort/css/style.css" type="text/css" media="all">
-<script type="text/javascript" src="/snort/javascript/mootools.js"></script>
-<script type="text/javascript" src="/snort/javascript/sortableTable.js"></script>
-
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+
+		<script>
+			jQuery(document).ready(function(){
+			
+				//Examples of how to assign the ColorBox event to elements
+				jQuery(".example8").colorbox({width:"820px", height:"700px", iframe:true, overlayClose:false});
+				
+			});
+		</script>
+
 <?php 
 
-include("./snort_fbegin.inc");
-
-echo "<p class=\"pgtitle\">";
-if($pfsense_stable == 'yes'){echo $pgtitle;}
-echo "</p>\n";
+include("fbegin.inc");
+echo $snort_general_css;
 
 /* refresh every 60 secs */
 if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
@@ -321,20 +328,28 @@ if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php\" />\n";
 }
 ?>
+
+<div class="body2">
+
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
-<?php
-	$tab_array = array();
-	$tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
-	$tab_array[] = array("Global Settings", false, "/snort/snort_interfaces_global.php");
-	$tab_array[] = array("Rule Updates", false, "/snort/snort_download_rules.php");
-	$tab_array[] = array("Alerts", true, "/snort/snort_alerts.php");
-    $tab_array[] = array("Blocked", false, "/snort/snort_blocked.php");
-	$tab_array[] = array("Whitelists", false, "/snort/snort_interfaces_whitelist.php");
-	$tab_array[] = array("Suppress", false, "/snort/snort_interfaces_suppress.php");
-	$tab_array[] = array("Help", false, "/snort/snort_help_info.php");
-	display_top_tabs($tab_array);
-?>
+  
+<div class="snorttabs" style="margin:1px 0px; width:775px;">
+<!-- Tabbed bar code-->
+<ul class="snorttabs">
+    <li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
+	<li><a href="/snort/snort_interfaces_global.php"><span>Global Settings</span></a></li>
+    <li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
+    <li class="snorttabs_active"><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
+	<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
+    <li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
+    <li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
+	<li><a class="example8" href="/snort/help_and_info.php"><span>Help</span></a></li>
+  </ul>
+</div>
+
 </td>
 </tr>
 	<tr>
@@ -615,6 +630,8 @@ if (is_array($alerts_array))
 		</table>
 	</td>
 </table>
+
+</div>
 
 <?php include("fend.inc"); ?>
 

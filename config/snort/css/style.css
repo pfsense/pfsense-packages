@@ -1,3 +1,42 @@
+.alert {
+ position:absolute;
+ top:10px;
+ left:0px;
+ width:94%;
+background:#FCE9C0;
+background-position: 15px; 
+border-top:2px solid #DBAC48;
+border-bottom:2px solid #DBAC48;
+padding: 15px 10px 85% 50px;
+}
+
+.formpre {
+font-family:arial;
+font-size: 1.1em;
+}
+
+#download_rules {
+font-family: arial;
+font-size: 13px;
+font-weight: bold;
+text-align: center
+}
+
+#download_rules_td {
+font-family: arial;
+font-size: 13px;
+font-weight: bold;
+text-align: center
+}
+
+.body2 {
+font-family:arial;
+font-size:12px;
+}
+
+
+
+
 /* Start of main css Pfsense */
 /* Start of main css Pfsense */
 
@@ -146,8 +185,4 @@ tr.hide {
 .tableFilter select {
 	border: 1px solid #ccc;
 }
-
-
-/*************************************************************/
-
 

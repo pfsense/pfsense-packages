@@ -28,9 +28,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
-include_once("/usr/local/pkg/snort/snort.inc");
+require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
 
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
@@ -66,8 +66,8 @@ $pgtitle = "Snort: Interface $id $iface_uuid $if_real Categories";
 $isrulesfolderempty = exec("ls -A /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
 if ($isrulesfolderempty == "") {
 
-include("head.inc");
-include("./snort_fbegin.inc");
+include("/usr/local/pkg/snort/snort_head.inc");
+include("fbegin.inc");
 
 echo "<p class=\"pgtitle\">";
 if($pfsense_stable == 'yes'){echo $pgtitle;}
@@ -79,16 +79,19 @@ echo "
 <table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
    <tr>\n
    		<td>\n";
-
-    $tab_array = array();
-    $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
-    $tab_array[] = array("If Settings", false, "/snort/snort_interfaces_edit.php?id={$id}");
-    $tab_array[] = array("Categories", true, "/snort/snort_rulesets.php?id={$id}");
-    $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
-    $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
-    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
-    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
-    display_top_tabs($tab_array);
+	
+echo '<div class="snorttabs" style="margin:1px 0px; width:775px;">' . "\n";
+echo '<!-- Tabbed bar code -->' . "\n";
+echo '<ul class="snorttabs">' . "\n";
+	echo '<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>' . "\n";
+	echo "<li><a href=\"/snort/snort_interfaces_edit.php?id={$id}\"><span>If Settings</span></a></li>\n";
+    echo "<li class=\"snorttabs_active\"><a href=\"/snort/snort_rulesets.php?id={$id}\"><span>Categories</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_rules.php?id={$id}\"><span>Rules</span></a></li>\n";
+	echo "<li><a href=\"/snort/snort_define_servers.php?id={$id}\"><span>Servers</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_preprocessors.php?id={$id}\"><span>Preprocessors</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_barnyard.php?id={$id}\"><span>Barnyard2</span></a></li>\n";
+echo '</ul>' . "\n";
+echo '</div>' . "\n";		
 
 echo  		"</td>\n
   </tr>\n
@@ -174,13 +177,23 @@ $enabled_rulesets = $a_nat[$id]['rulesets'];
 if($enabled_rulesets)
 	$enabled_rulesets_array = split("\|\|", $enabled_rulesets);
 
-include("head.inc");
+include("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
-<?php include("./snort_fbegin.inc"); ?>
-<p class="pgtitle"><?php if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
+
+<?php include("fbegin.inc"); ?>
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+
+<?php
+echo "{$snort_general_css}\n";
+?>
+
+<div class="body2">
+
+<noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
+
 <?php
 
 echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\" id=\"iform\">";
@@ -217,17 +230,22 @@ echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
    <tr>
    		<td>
+		
 <?php
-    $tab_array = array();
-    $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
-    $tab_array[] = array("If Settings", false, "/snort/snort_interfaces_edit.php?id={$id}");
-    $tab_array[] = array("Categories", true, "/snort/snort_rulesets.php?id={$id}");
-    $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
-    $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
-    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
-    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
-    display_top_tabs($tab_array);
+echo '<div class="snorttabs" style="margin:1px 0px; width:775px;">' . "\n";
+echo '<!-- Tabbed bar code -->' . "\n";
+echo '<ul class="snorttabs">' . "\n";
+	echo '<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>' . "\n";
+	echo "<li><a href=\"/snort/snort_interfaces_edit.php?id={$id}\"><span>If Settings</span></a></li>\n";
+    echo "<li class=\"snorttabs_active\"><a href=\"/snort/snort_rulesets.php?id={$id}\"><span>Categories</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_rules.php?id={$id}\"><span>Rules</span></a></li>\n";
+	echo "<li><a href=\"/snort/snort_define_servers.php?id={$id}\"><span>Servers</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_preprocessors.php?id={$id}\"><span>Preprocessors</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_barnyard.php?id={$id}\"><span>Barnyard2</span></a></li>\n";
+echo '</ul>' . "\n";
+echo '</div>' . "\n";
 ?>
+
 	</td>
 	</tr>
 		<tr>
@@ -288,7 +306,9 @@ echo "<form action=\"snort_rulesets.php?id={$id}\" method=\"post\" name=\"iform\
 
 </form>
 
-<p><b>NOTE:</b> You can click on a ruleset name to edit the ruleset.
+<p><b>NOTE:</b> You can click on a ruleset name to edit the ruleset.</p>
+
+</div>
 
 <?php include("fend.inc"); ?>
 

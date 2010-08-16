@@ -40,8 +40,8 @@ Important add error checking
 
 //require_once("globals.inc");
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -265,30 +265,21 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 	}
 
 $pgtitle = "Snort: Interface $id$if_real Define Servers";
-include("head.inc");
+include("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php 
-include("./snort_fbegin.inc");
-?>
-<p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
-<style type="text/css">
-.alert {
- position:absolute;
- top:10px;
- left:0px;
- width:94%;
-background:#FCE9C0;
-background-position: 15px; 
-border-top:2px solid #DBAC48;
-border-bottom:2px solid #DBAC48;
-padding: 15px 10px 85% 50px;
-}
-</style> 
-<noscript><div class="alert" ALIGN=CENTER><img src="/themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
 
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<?php include("fbegin.inc"); ?>
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+
+<?php
+echo "{$snort_general_css}\n";
+?>
+
+<div class="body2">
+
+<noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
 
 <form action="snort_define_servers.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
 
@@ -326,15 +317,18 @@ padding: 15px 10px 85% 50px;
 if($id != "") 
 {
 
-    $tab_array = array();
-    $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
-    $tab_array[] = array("If Settings", false, "/snort/snort_interfaces_edit.php?id={$id}");
-    $tab_array[] = array("Categories", false, "/snort/snort_rulesets.php?id={$id}");
-    $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
-    $tab_array[] = array("Servers", true, "/snort/snort_define_servers.php?id={$id}");
-    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
-    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
-    display_top_tabs($tab_array);
+echo '<div class="snorttabs" style="margin:1px 0px; width:775px;">' . "\n";
+echo '<!-- Tabbed bar code -->' . "\n";
+echo '<ul class="snorttabs">' . "\n";
+	echo '<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>' . "\n";
+	echo "<li><a href=\"/snort/snort_interfaces_edit.php?id={$id}\"><span>If Settings</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_rulesets.php?id={$id}\"><span>Categories</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_rules.php?id={$id}\"><span>Rules</span></a></li>\n";
+	echo "<li class=\"snorttabs_active\"><a href=\"/snort/snort_define_servers.php?id={$id}\"><span>Servers</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_preprocessors.php?id={$id}\"><span>Preprocessors</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_barnyard.php?id={$id}\"><span>Barnyard2</span></a></li>\n";
+echo '</ul>' . "\n";
+echo '</div>' . "\n";
 
 }
 ?>
@@ -372,6 +366,9 @@ if($id != "")
 					Please make sure there are <strong>no spaces</strong> in your definitions.
 					</td>
 				</tr>
+                <tr>
+                  <td colspan="2" valign="top" class="listtopic">Define Servers</td>
+                </tr>
                 <tr>
                   <td width="22%" valign="top" class="vncell">Define DNS_SERVERS</td>
                   <td width="78%" class="vtable">
@@ -588,6 +585,8 @@ if($id != "")
   </table>
   </table>
 </form>
+
+</div>
 
 
 <?php include("fend.inc"); ?>

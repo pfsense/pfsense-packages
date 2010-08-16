@@ -35,7 +35,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
+require_once("guiconfig.inc");
+require_once("/usr/local/pkg/snort/snort_gui.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
 
 
 if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
@@ -84,13 +86,30 @@ if ($_GET['act'] == "del") {
 }
 
 $pgtitle = "Services: Snort: Suppression";
-include("head.inc");
+include("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
 
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php include("./snort_fbegin.inc"); ?>
-<p class="pgtitle"><?=$pgtitle?></p>
+<body link="#000000" vlink="#000000" alink="#000000">
+
+		<script>
+			jQuery(document).ready(function(){
+			
+				//Examples of how to assign the ColorBox event to elements
+				jQuery(".example8").colorbox({width:"820px", height:"700px", iframe:true, overlayClose:false});
+				
+			});
+		</script>
+
+<?php 
+include("fbegin.inc");
+echo $snort_general_css;
+?>
+
+<div class="body2">
+
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+
 <form action="/snort/snort_interfaces_suppress.php" method="post">
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <?php if (file_exists($d_suppresslistdirty_path)): ?><p>
@@ -98,19 +117,26 @@ include("head.inc");
 <?php endif; ?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr><td class="tabnavtbl">
-<?php
-	$tab_array = array();
-	$tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
-	$tab_array[] = array("Global Settings", false, "/snort/snort_interfaces_global.php");
-	$tab_array[] = array("Rule Updates", false, "/snort/snort_download_rules.php");
-	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
-    $tab_array[] = array("Blocked", false, "/snort/snort_blocked.php");
-	$tab_array[] = array("Whitelists", false, "/snort/snort_interfaces_whitelist.php");
-	$tab_array[] = array("Suppress", true, "/snort/snort_interfaces_suppress.php");
-	$tab_array[] = array("Help", false, "/snort/snort_help_info.php");
-	display_top_tabs($tab_array);
-?>    </td></tr>
+  <tr>
+  <td class="tabnavtbl">
+  
+<div class="snorttabs" style="margin:1px 0px; width:775px;">
+<!-- Tabbed bar code-->
+<ul class="snorttabs">
+    <li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
+	<li><a href="/snort/snort_interfaces_global.php"><span>Global Settings</span></a></li>
+    <li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
+    <li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
+	<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
+    <li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
+    <li class="snorttabs_active"><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
+	<li><a class="example8" href="/snort/help_and_info.php"><span>Help</span></a></li>
+  </ul>
+</div> 
+  
+</td>
+</tr>
+
 <tr>
 <td class="tabcont">
 
@@ -165,6 +191,9 @@ include("head.inc");
 </td>
 </table>
 </form>
+
+</div>
+
 <?php include("fend.inc"); ?>
 </body>
 </html>

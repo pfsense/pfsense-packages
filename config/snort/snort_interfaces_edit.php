@@ -31,8 +31,8 @@
 */
 
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
 
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
@@ -383,31 +383,20 @@ if ($_POST["Submit"]) {
 		
 
 $pgtitle = "Snort: Interface Edit: $id $snort_uuid $if_real";
-include("head.inc");
+include("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php 
-include("./snort_fbegin.inc");
+include("fbegin.inc");
 ?>
-<style type="text/css">
-.alert {
- position:absolute;
- top:10px;
- left:0px;
- width:94%;
-background:#FCE9C0;
-background-position: 15px; 
-border-top:2px solid #DBAC48;
-border-bottom:2px solid #DBAC48;
-padding: 15px 10px 85% 50px;
-}
 
-.formpre {
-font-family: Tahoma,Verdana,Arial,Helvetica,sans-serif;
-font-size: 1.1em;
-}
-</style> 
+<?php
+echo "{$snort_general_css}\n";
+?>
+
+<div class="body2">
+
 <noscript><div class="alert" ALIGN=CENTER><img src="/themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</strong></div></noscript>
 <script language="JavaScript">
 <!--
@@ -506,25 +495,30 @@ if ($a_nat[$id]['interface'] != '') {
         }
 
 }
-    $tab_array = array();
+
+
+echo '<div class="snorttabs" style="margin:1px 0px; width:775px;">' . "\n";
+echo '<!-- Tabbed bar code -->' . "\n";
+echo '<ul class="snorttabs">' . "\n";
 	if (!file_exists("/var/run/snort_conf_{$snort_uuid}_.dirty")) {
-    $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
-    }
-    $tab_array[] = array("If Settings", true, "/snort/snort_interfaces_edit.php?id={$id}");
-    /* hide user tabs when no settings have be saved */
+		echo '<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>' . "\n";
+	}
+	echo "<li  class=\"snorttabs_active\"><a href=\"/snort/snort_interfaces_edit.php?id={$id}\"><span>If Settings</span></a></li>\n";
+	/* hide user tabs when no settings have be saved */
 	if ($config['installedpackages']['snortglobal']['rule'][$id]['interface'] != '') {
 		if (!file_exists("/var/run/snort_conf_{$snort_uuid}_.dirty")) {
-    //$tab_array[] = array("upload", false, "/snort/snort_conf_upload.php?id={$id}");
-    $tab_array[] = array("Categories", false, "/snort/snort_rulesets.php?id={$id}");
-    $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
-    $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
-    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
-    $tab_array[] = array("Barnyard2", false, "/snort/snort_barnyard.php?id={$id}");
+    echo "<li><a href=\"/snort/snort_rulesets.php?id={$id}\"><span>Categories</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_rules.php?id={$id}\"><span>Rules</span></a></li>\n";
+	echo "<li><a href=\"/snort/snort_define_servers.php?id={$id}\"><span>Servers</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_preprocessors.php?id={$id}\"><span>Preprocessors</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_barnyard.php?id={$id}\"><span>Barnyard2</span></a></li>\n";
 		}
 	}
-    display_top_tabs($tab_array);	
-		
+echo '</ul>' . "\n";
+echo '</div>' . "\n";
+
 ?>
+
 </td>
 </tr>
 				<tr>
@@ -773,11 +767,17 @@ if ($a_nat[$id]['interface'] != '') {
   </table>
 </form>
 
+</div>
+
 <script language="JavaScript">
 <!--
 enable_change(false);
 //-->
 </script>
+
 <?php include("fend.inc"); ?>
+
+<div>
+
 </body>
 </html>

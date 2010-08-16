@@ -239,55 +239,36 @@ if ($_GET['act'] == 'toggle' && $_GET['id'] != '')
 }
 
 
-
-$pgtitle = "Services: Snort 2.8.6 pkg v. 1.31";
-include("head.inc");
+$pgtitle = "Services: $snort_package_version";
+include_once("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
+
 <body link="#000000" vlink="#000000" alink="#000000">
-<?php include("./snort_fbegin.inc"); ?>
-<p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
-<style type="text/css">
 
-.alert {
- position:absolute;
- top:10px;
- left:0px;
- width:94%;
-background:#FCE9C0;
-background-position: 15px; 
-border-top:2px solid #DBAC48;
-border-bottom:2px solid #DBAC48;
-padding: 15px 10px 50% 50px;
-}
-.listbg2 {
-	border-right: 1px solid #999999;
-	border-bottom: 1px solid #999999;
-	font-size: 11px;
-	background-color: #090;
-	color: #000;	
-	padding-right: 16px;
-	padding-left: 6px;
-	padding-top: 4px;
-	padding-bottom: 4px;
-}
-.listbg3 {
-	border-right: 1px solid #999999;
-	border-bottom: 1px solid #999999;
-	font-size: 11px;
-	background-color: #777777;
-	color: #000;	
-	padding-right: 16px;
-	padding-left: 6px;
-	padding-top: 4px;
-	padding-bottom: 4px;
-}
+		<script>
+			jQuery(document).ready(function(){
+			
+				//Examples of how to assign the ColorBox event to elements
+				jQuery(".example8").colorbox({width:"820px", height:"700px", iframe:true, overlayClose:false});
+				
+			});
+		</script>
 
-</style>
+<?php include("fbegin.inc"); ?>
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 
+<?php
+echo "{$snort_general_css}\n";
+echo "$snort_interfaces_css\n";
+?>
+
+<div class="body2">
 
 <noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
+
+
 <form action="/snort/snort_interfaces.php" method="post" name="iform">
 
 <?php
@@ -320,23 +301,26 @@ padding: 15px 10px 50% 50px;
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
-<?php
-	$tab_array = array();
-	$tab_array[] = array("Snort Interfaces", true, "/snort/snort_interfaces.php");
-	$tab_array[] = array("Global Settings", false, "/snort/snort_interfaces_global.php");
-	$tab_array[] = array("Rule Updates", false, "/snort/snort_download_rules.php");
-	$tab_array[] = array("Alerts", false, "/snort/snort_alerts.php");
-    $tab_array[] = array("Blocked", false, "/snort/snort_blocked.php");
-	$tab_array[] = array("Whitelists", false, "/snort/snort_interfaces_whitelist.php");
-	$tab_array[] = array("Suppress", false, "/snort/snort_interfaces_suppress.php");
-	$tab_array[] = array("Help", false, "/snort/snort_help_info.php");
-	display_top_tabs($tab_array);
-?>
+  
+<div class="snorttabs" style="margin:1px 0px; width:775px;">
+<!-- Tabbed bar code-->
+<ul class="snorttabs">
+    <li class="snorttabs_active"><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
+	<li><a href="/snort/snort_interfaces_global.php"><span>Global Settings</span></a></li>
+    <li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
+    <li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
+	<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
+    <li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
+    <li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
+	<li><a class="example8" href="/snort/help_and_info.php"><span>Help</span></a></li>
+  </ul>
+</div>
+
  </td></tr>
   <tr>
     <td>
-	<div id="mainarea">
-              <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+	<div id="mainarea3">
+              <table class="tabcont2" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr id="frheader">
 				<td width="5%" class="list">&nbsp;</td>
 		          <td width="1%" class="list">&nbsp;</td>
@@ -479,8 +463,12 @@ padding: 15px 10px 50% 50px;
 </table>
 
 <br>
-  <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
-	  <td width="100%"><span class="vexpl">
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td>
+	<div id="mainarea4">
+  <table class="tabcont2" width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tr id="frheader">
+	  <td width="100%">
 	  <span class="red"><strong>Note:</strong></span>
 	  <br>
 		 This is the <strong>Snort Menu</strong> where you can see an over view of all your interface settings.
@@ -497,7 +485,11 @@ padding: 15px 10px 50% 50px;
 		 <br>
 		<strong> Click</strong> on the <img src="../themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="Delete Icon"> icon to delete a interface and settings.
 </td>
+</tr>
     </table>
+	</div>
+  </tr></td>
+</table>
  
 <?php
 if ($pkg['tabs'] <> "") {
@@ -506,94 +498,46 @@ if ($pkg['tabs'] <> "") {
 ?>
 
 </form>
+</div>
 
-<?php
-/* TODO: remove when 2.0 stable */
-if ($pfsense_theme_is == 'nervecenter') {
+<br><br>
 
-$footer2 = "
-
-<style type=\"text/css\">
-
+<style type="text/css">
 #footer2
 {
-	position: relative;
-	top: -17px;
-	background-color: #cccccc;
-	background-image: none;
-	background-repeat: repeat;
-	background-attachment: scroll;
-	background-position: 0% 0%;
-	font-size: 0.8em;
-	text-align: center;
-	padding-top: 0px;
-	padding-right: 0px;
-	padding-bottom: 0px;
-	padding-left: 10px;
-	clear: both;
-}
-
-</style>
-
-	<div id=\"footer2\">
-		<IMG SRC=\"./images/footer2.jpg\" width=\"780px\" height=\"35\" ALT=\"Apps\">
-			Snort is a registered trademark of Sourcefire, Inc, Barnyard2 is a registered trademark of securixlive.com, Orion copyright Robert Zelaya,
-			Emergingthreats is a registered trademark of emergingthreats.net, Mysql is a registered trademark of Mysql.com
-	</div>\n";
-}
-
-if ($pfsense_theme_is == 'pfsense_ng') {
-$footer3 = "
-
-<style type=\"text/css\">
-
-#footer3
-{
-
-top: 105px;
 position: relative;
-background-color: #FFFFFF;
-background-image: url(\"./images/footer2.jpg\");
+background-color: transparent;
+background-image: url("./images/logo22.png");
 background-repeat: no-repeat;
 background-attachment: scroll;
-background-position: 0px 0px;
-bottom: 0px;
+background-position: 0% 0%;
+top: 10px;
+left: 0px;
 width: 770px;
-height: 35px;
+height: 60px;
 color: #000000;
 text-align: center;
 font-size: 0.8em;
-padding-top: 35px;
-padding-left: 0px;
+padding-top: 40px;
+margin-bottom: -35px;
 clear: both;
-	
 }
-
 </style>
 
-	<div id=\"footer3\">
-			Snort is a registered trademark of Sourcefire, Inc, Barnyard2 is a registered trademark of securixlive.com, Orion copyright Robert Zelaya,
-			Emergingthreats is a registered trademark of emergingthreats.net, Mysql is a registered trademark of Mysql.com
-	</div>\n";
-}
-?>
-
-<?php echo $footer3;?>
-
-</div> <!-- Right DIV -->
-</div> <!-- Content DIV -->
-
-<?php echo $footer2;?>
-
-        <div id="footer">
-			<a target="_blank" href="http://www.pfsense.org/?gui12" class="redlnk">pfSense</a> is &copy;
-			 2004 - 2009 by <a href="http://www.bsdperimeter.com" class="tblnk">BSD Perimeter LLC</a>. All Rights Reserved.
-			[<a href="/license.php" class="tblnk">view license</a>] 
-			<br/>
-			[<a target="_blank" href="https://portal.pfsense.org/?guilead=true" class="tblnk">Commercial Support Available</a>]
+        <div id="footer2">
+		Snort is a registered trademark of Sourcefire, Inc, Barnyard2 is a registered trademark of securixlive.com, Orion copyright Robert Zelaya, 
+		Emergingthreats is a registered trademark of emergingthreats.net, Mysql is a registered trademark of Mysql.com 
 		</div> <!-- Footer DIV -->
 
-</div> <!-- Wrapper Div -->
-<script type="text/javascript" src="/themes/nervecenter/bottom-loader.js"></script>
+<?php 
+
+include("fend.inc"); 
+
+echo $snort_custom_rnd_box;
+
+?>
+
+
+
 </body>
 </html>

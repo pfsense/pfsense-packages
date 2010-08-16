@@ -1,4 +1,3 @@
-#!/usr/local/bin/php
 <?php
 /*
 	system_edit.php
@@ -76,8 +75,12 @@ $filehandle = fopen($file, "r");
 //get rule id
 $lineid = $_GET['ids'];
 
-//read file into string, and get filesize
-$contents2 = fread($filehandle, filesize($file));
+//read file into string, and get filesize also chk for empty files
+if (filesize($file) > 0 ) {
+	$contents2 = fread($filehandle, filesize($file));
+}else{
+	$contents2 = '';
+}
 
 //close handler
 fclose ($filehandle);
@@ -146,7 +149,7 @@ if ($_POST)
 	    //write the new .rules file
 	    write_rule_file($splitcontents, $file);
 		
-		header("Location: /snort/snort_rules_edit.php?id=$id&openruleset=$file&ids=$ids");	
+		header("Location: /snort/snort_view_edit.php?id=$id&openruleset=$file&ids=$ids");	
 		
 	}
 }
@@ -162,81 +165,63 @@ $pgtitle = array(gettext("Advanced"), gettext("File Editor"));
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td class="tabcont">
-			<form action="snort_rules_edit.php?id=<?=$id; ?>&openruleset=<?=$file; ?>&ids=<?=$ids; ?>" method="post">
+			<form action="snort_view_edit.php?id=<?=$id; ?>&openruleset=<?=$file; ?>&ids=<?=$ids; ?>" method="post">
 				<?php if ($savemsg) print_info_box($savemsg);?>
-				<table width="100%" cellpadding='9' cellspacing='9' bgcolor='#eeeeee'>
+				
+				<?php 
+				if ($file != '/usr/local/etc/snort/snort_update.log') 
+				{
+				
+				echo '
+				<table width="100%" cellpadding="9" cellspacing="9" bgcolor="#eeeeee">
 					<tr>
 						<td>
 							<input name="save" type="submit" class="formbtn" id="save" value="save" /> <input type="button" class="formbtn" value="Cancel" onclick="history.back()">
 							<hr noshade="noshade" />
-							<?=gettext("Disable original rule"); ?>:
-							<input id="highlighting_enabled" name="highlight2" type="radio" value="yes" <?php if($highlight == "yes") echo " checked=\"checked\""; ?> />
-							<label for="highlighting_enabled"><?=gettext("Enabled"); ?></label>
-							<input id="highlighting_disabled" name="highlight2" type="radio" value="no"<?php if($highlight == "no") echo " checked=\"checked\""; ?> />
-							<label for="highlighting_disabled"><?=gettext("Disabled"); ?></label>
+					' . "\n";
+				
+							echo 'Disable original rule :';
+							
+
+				echo '	<input id="highlighting_enabled" name="highlight2" type="radio" value="yes"'; if($highlight == "yes") echo " checked=\"checked\""; echo '/>
+							<label for="highlighting_enabled">'; gettext("Enabled"); echo '</label>
+							<input id="highlighting_disabled" name="highlight2" type="radio" value="no"'; if($highlight == "no") echo " checked=\"checked\""; echo '	/>
+							<label for="highlighting_disabled">'; gettext("Disabled"); echo '	</label>
 						</td>
 					</tr>
 				</table>
-				<table width='100%'>
+				
+				<table width="100%">
 					<tr>
 						<td valign="top" class="label">
 							<div style="background: #eeeeee;" id="textareaitem">
 							<!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
-							<textarea  wrap="off" style="width: 98%; margin: 7px;" class="<?php echo $language; ?>:showcolumns" rows="<?php echo $rows; ?>" cols="<?php echo $cols; ?>" name="code"><?php echo $tempstring;?></textarea>
+							<textarea wrap="off" style="width: 98%; margin: 7px;" class="'; echo $language; echo '	:showcolumns" rows="'; echo $rows; echo '	" cols="'; echo $cols;	echo '	" name="code">'; echo $tempstring; echo ' </textarea>
 							</div>
 						</td>
 					</tr>
-				</table>
+				</table>';
+				
+				}
+				?>
+				
 				<table width='100%'>
 					<tr>
 						<td valign="top" class="label">
 							<div style="background: #eeeeee;" id="textareaitem">
 							<!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
-							<textarea   disabled wrap="off" style="width: 98%; margin: 7px;" class="<?php echo $language; ?>:showcolumns" rows="33" cols="<?php echo $cols; ?>" name="code2"><?php echo $contents2;?></textarea>
+							<textarea <? if ($file != '/usr/local/etc/snort/snort_update.log') { echo 'disabled'; } ?> wrap="off" style="width: 98%; margin: 7px;" class="<?php echo $language; ?>:showcolumns" rows="33" cols="<?php echo $cols; ?>" name="code2"><?php echo $contents2;?></textarea>
 							</div>
 						</td>
 					</tr>
 				</table>
 				<?php // include("formend.inc");?>
 			</form>
+			<? echo "$file\n"; ?>
 		</td>
 	</tr>
 </table>
-<script class="javascript" src="/snort/syntaxhighlighter/shCore.js"></script>
-<script class="javascript" src="/snort/syntaxhighlighter/shBrushCSharp.js"></script>
-<script class="javascript" src="/snort/syntaxhighlighter/shBrushPhp.js"></script>
-<script class="javascript" src="/snort/syntaxhighlighter/shBrushJScript.js"></script>
-<script class="javascript" src="/snort/syntaxhighlighter/shBrushJava.js"></script>
-<script class="javascript" src="/snort/syntaxhighlighter/shBrushVb.js"></script>
-<script class="javascript" src="/snort/syntaxhighlighter/shBrushSql.js"></script>
-<script class="javascript" src="/snort/syntaxhighlighter/shBrushXml.js"></script>
-<script class="javascript" src="/snort/syntaxhighlighter/shBrushDelphi.js"></script>
-<script class="javascript" src="/snort/syntaxhighlighter/shBrushPython.js"></script>
-<script class="javascript" src="/snort/syntaxhighlighter/shBrushRuby.js"></script>
-<script class="javascript" src="/snort/syntaxhighlighter/shBrushCss.js"></script>
-<script class="javascript">
-<!--
-  // Set focus.
-  document.forms[0].savetopath.focus();
 
-  // Append css for syntax highlighter.
-  var head = document.getElementsByTagName("head")[0];
-  var linkObj = document.createElement("link");
-  linkObj.setAttribute("type","text/css");
-  linkObj.setAttribute("rel","stylesheet");
-  linkObj.setAttribute("href","/snort/syntaxhighlighter/SyntaxHighlighter.css");
-  head.appendChild(linkObj);
-
-  // Activate dp.SyntaxHighlighter?
-  <?php
-  if($_POST['highlight'] == "yes") {
-    echo "dp.SyntaxHighlighter.HighlightAll('code', true, true);\n";
-    // Disable 'Save' button.
-    echo "document.forms[0].Save.disabled = 1;\n";
-  }
-?>
-//-->
-</script>
 <?php //include("fend.inc");?>
 
 </body>

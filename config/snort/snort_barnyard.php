@@ -38,10 +38,9 @@ Important add error checking
 
 */
 
-require_once("globals.inc");
 require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
+require_once("/usr/local/pkg/snort/snort.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -271,28 +270,23 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 }
 
 $pgtitle = "Snort: Interface: $id$if_real Barnyard2 Edit";
-include("head.inc");
+include("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-<?php 
-include("./snort_fbegin.inc");
+
+
+<?php include("fbegin.inc"); ?>
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+
+<?php
+echo "{$snort_general_css}\n";
 ?>
-<p class="pgtitle"><?if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
-<style type="text/css">
-.alert {
- position:absolute;
- top:10px;
- left:0px;
- width:94%;
-background:#FCE9C0;
-background-position: 15px; 
-border-top:2px solid #DBAC48;
-border-bottom:2px solid #DBAC48;
-padding: 15px 10px 85% 50px;
-}
-</style> 
-<noscript><div class="alert" ALIGN=CENTER><img src="/themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
+
+<div class="body2">
+
+<noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
+
 <script language="JavaScript">
 <!--
 
@@ -350,15 +344,18 @@ echo "
 if($id != "") 
 {
 
-    $tab_array = array();
-    $tab_array[] = array("Snort Interfaces", false, "/snort/snort_interfaces.php");
-    $tab_array[] = array("If Settings", false, "/snort/snort_interfaces_edit.php?id={$id}");
-    $tab_array[] = array("Categories", false, "/snort/snort_rulesets.php?id={$id}");
-    $tab_array[] = array("Rules", false, "/snort/snort_rules.php?id={$id}");
-    $tab_array[] = array("Servers", false, "/snort/snort_define_servers.php?id={$id}");
-    $tab_array[] = array("Preprocessors", false, "/snort/snort_preprocessors.php?id={$id}");
-    $tab_array[] = array("Barnyard2", true, "/snort/snort_barnyard.php?id={$id}");
-    display_top_tabs($tab_array);	
+echo '<div class="snorttabs" style="margin:1px 0px; width:775px;">' . "\n";
+echo '<!-- Tabbed bar code -->' . "\n";
+echo '<ul class="snorttabs">' . "\n";
+	echo '<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>' . "\n";
+	echo "<li><a href=\"/snort/snort_interfaces_edit.php?id={$id}\"><span>If Settings</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_rulesets.php?id={$id}\"><span>Categories</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_rules.php?id={$id}\"><span>Rules</span></a></li>\n";
+	echo "<li><a href=\"/snort/snort_define_servers.php?id={$id}\"><span>Servers</span></a></li>\n";
+    echo "<li><a href=\"/snort/snort_preprocessors.php?id={$id}\"><span>Preprocessors</span></a></li>\n";
+    echo "<li class=\"snorttabs_active\"><a href=\"/snort/snort_barnyard.php?id={$id}\"><span>Barnyard2</span></a></li>\n";
+echo '</ul>' . "\n";
+echo '</div>' . "\n";
 
 }
 ?>
@@ -389,6 +386,9 @@ if($id != "")
 				
 				}
 				?>
+                <tr>
+                  <td colspan="2" valign="top" class="listtopic">General Barnyard2 Settings</td>
+                </tr>
 				<tr>
 				<td width="22%" valign="top" class="vtable">&nbsp;</td>
 				<td width="78%" class="vtable">
@@ -426,11 +426,17 @@ if($id != "")
                      Hint: in most cases, you'll want to use WAN here.</span></td>
                 </tr>
                 <tr>
+                  <td colspan="2" valign="top" class="listtopic">Mysql Settings</td>
+                </tr>
+                <tr>
                   <td width="22%" valign="top" class="vncell">Log to a Mysql Database</td>
                   <td width="78%" class="vtable">
                     <input name="barnyard_mysql" type="text" class="formfld" id="barnyard_mysql" size="100" value="<?=htmlspecialchars($pconfig['barnyard_mysql']);?>">
                     <br> <span class="vexpl">Example: output database: alert, mysql, dbname=snort user=snort host=localhost password=xyz<br>
                     Example: output database: log, mysql, dbname=snort user=snort host=localhost password=xyz</span></td>
+                </tr>
+                <tr>
+                  <td colspan="2" valign="top" class="listtopic">Advanced Settings</td>
                 </tr>
                 <tr> 
                   <td width="22%" valign="top" class="vncell">Advanced configuration pass through</td>
@@ -457,6 +463,8 @@ if($id != "")
   </table>
   </table>
 </form>
+
+</div>
 
 <script language="JavaScript">
 <!--
