@@ -81,7 +81,7 @@ if (file_exists('/var/run/snort.conf.dirty')) {
 	
 $pgtitle = "Services: Snort: Update Rules";
 
-include("./snort_head.inc");
+include("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
 
@@ -233,8 +233,8 @@ if ($snortdownload == 'on')
 		update_status(gettext("Downloading snort.org md5 file..."));
 		ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
 		
-		$image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}");
-		// $image = @file_get_contents("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}");
+		//$image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}");
+		$image = @file_get_contents("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}");
 		$f = fopen("{$tmpfname}/{$snort_filename_md5}", 'w');
 		fwrite($f, $image);
 		fclose($f);
@@ -247,8 +247,8 @@ if ($emergingthreats == "on")
 {
 		update_status(gettext("Downloading emergingthreats md5 file..."));
 		ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-		$image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/version.txt");
-		// $image = @file_get_contents("http://www.emergingthreats.net/version.txt");
+		// $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/version.txt");
+		$image = @file_get_contents("http://www.emergingthreats.net/version.txt");
 		$f = fopen("{$tmpfname}/version.txt", 'w');
 		fwrite($f, $image);
 		fclose($f);
@@ -261,8 +261,8 @@ if (file_exists("{$tmpfname}/{$pfsense_rules_filename_md5}")) {
 } else {
     update_status(gettext("Downloading pfsense md5 file..."));
     ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
-	$image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz.md5");
-    // $image = @file_get_contents("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz.md5");
+	//$image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz.md5");
+    $image = @file_get_contents("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz.md5");
     $f = fopen("{$tmpfname}/pfsense_rules.tar.gz.md5", 'w');
     fwrite($f, $image);
     fclose($f);
@@ -425,8 +425,8 @@ if ($snortdownload == 'on')
 		update_status(gettext("There is a new set of Snort.org rules posted. Downloading..."));
 		update_output_window(gettext("May take 4 to 10 min..."));
 		conf_mount_rw();
-		snort_download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
-		//snort_download_file_with_progress_bar("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
+		//snort_download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
+		snort_download_file_with_progress_bar("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
 		update_all_status($static_output);
 		update_status(gettext("Done downloading rules file."));
 		if (150000 > filesize("{$tmpfname}/$snort_filename")){
@@ -453,8 +453,8 @@ if ($emergingthreats == "on")
 	}else{
 		update_status(gettext("There is a new set of Emergingthreats rules posted. Downloading..."));
 		update_output_window(gettext("May take 4 to 10 min..."));		
-		download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
-		// download_file_with_progress_bar("http://www.emergingthreats.net/rules/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
+		// download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
+		download_file_with_progress_bar("http://www.emergingthreats.net/rules/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
 		update_all_status($static_output);
 		update_status(gettext("Done downloading Emergingthreats rules file."));
 		}
@@ -469,8 +469,8 @@ if (file_exists("{$tmpfname}/{$pfsense_rules_filename}")) {
 	unhide_progress_bar_status();
     update_status(gettext("There is a new set of Pfsense rules posted. Downloading..."));
     update_output_window(gettext("May take 4 to 10 min..."));
-	download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
-    // download_file_with_progress_bar("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
+	// download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
+    download_file_with_progress_bar("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
     update_all_status($static_output);
     update_status(gettext("Done downloading rules file."));
  }
