@@ -437,7 +437,7 @@
 	<build_port_path>/usr/ports/sysutils/daemontools</build_port_path>
 	<build_port_path>/usr/ports/dns/djbdns</build_port_path>
 	<build_options>WITHOUT_MAN=true WITH_SRV=true</build_options>
-	<supportedbybsdperimeter>true</supportedbybsdperimeter>
+	<supportedbybsdperimeter>YES</supportedbybsdperimeter>
     </package>
     <package>
       <name>Open-VM-Tools</name>
