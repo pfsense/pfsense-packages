@@ -101,8 +101,8 @@ header( "Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT" );
 header( "Cache-Control: no-cache, must-revalidate" );
 header( "Pragma: no-cache" );
 
-$snort_package_version = 'Snort 2.8.6 pkg v. 1.32';
-$pgtitle = "Services: $snort_package_version";
+
+$pgtitle = "Services: Snort: Updates";
 include_once("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
