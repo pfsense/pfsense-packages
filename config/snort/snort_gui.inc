@@ -72,8 +72,8 @@ $snort_custom_rnd_box = '
 
 	NiftyCheck();
 	Rounded("div#mainarea2","bl br tr","#FFF","#dddddd","smooth");
-	Rounded("div#mainarea3","bl br tr","#FFF","#eeeeee","smooth");
-	Rounded("div#mainarea4","all","#FFF","#eeeeee","smooth");
+	Rounded("div#mainarea3","bl br tr","#FFF","#dddddd","smooth");
+	Rounded("div#mainarea4","all","#FFF","#dddddd","smooth");
 	Rounded("div#mainarea5","all","#eeeeee","#dddddd","smooth");
 
 //-->
@@ -123,7 +123,7 @@ font-size:12px;
 }
 
 .tabcont {
-background-color: #eeeeee;
+background-color: #dddddd;
 padding-right: 12px;
 padding-left: 12px;
 padding-top: 12px;
@@ -138,12 +138,21 @@ padding-top: 12px;
 padding-bottom: 12px;
 }
 
-.tabcont5 {
-background-color: #dddddd;
-padding-right: 12px;
-padding-left: 12px;
-padding-top: 12px;
-padding-bottom: 12px;
+.vncell2 {
+	background-color: #eeeeee;
+	padding-right: 20px;
+	padding-left: 8px;
+	border-bottom: 1px solid #999999;
+}
+
+.vncellreq2 {
+background-color: #eeeeee;
+padding-right: 20px;
+padding-left: 8px;
+font-weight: bold;
+border-bottom-width: 1px;
+border-bottom-style: solid;
+border-bottom-color: #999999;
 }
 
 </style> ' . "\n";

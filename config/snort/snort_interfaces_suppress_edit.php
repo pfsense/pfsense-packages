@@ -183,6 +183,9 @@ include("fbegin.inc");
 echo $snort_general_css;
 ?>
 
+<!-- hack to fix the hardcoed fbegin link in header -->
+<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
+
 <div class="body2">
 
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
@@ -245,7 +248,7 @@ echo $snort_general_css;
                   <td colspan="2" valign="top" class="listtopic">Add the name and description of the file.</td>
                 </tr>
   <tr>
-    <td valign="top" class="vncellreq">Name</td>
+    <td valign="top" class="vncellreq2">Name</td>
     <td class="vtable">
       <input name="name" type="text" id="name" size="40" value="<?=htmlspecialchars($pconfig['name']);?>" />
       <br />
@@ -255,7 +258,7 @@ echo $snort_general_css;
     </td>
   </tr>
   <tr>
-    <td width="22%" valign="top" class="vncell">Description</td>
+    <td width="22%" valign="top" class="vncell2">Description</td>
     <td width="78%" class="vtable">
       <input name="descr" type="text"  id="descr" size="40" value="<?=$pconfig['descr'];?>" />
       <br />

@@ -253,6 +253,9 @@ if ($pconfig['brefresh'] == 'on' || $pconfig['brefresh'] == '')
 }
 ?>
 
+<!-- hack to fix the hardcoed fbegin link in header -->
+<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
+
 <div class="body2">
 
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
@@ -286,7 +289,7 @@ if ($pconfig['brefresh'] == 'on' || $pconfig['brefresh'] == '')
 	
 		<tr>
 		<td>
-		<div id="mainarea">
+		<div id="mainarea2">
 		
 		<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 		  <tr>
@@ -321,15 +324,15 @@ if ($pconfig['brefresh'] == 'on' || $pconfig['brefresh'] == '')
 		</form>
 		</td>
     </tr>
-		</table>
-		
+		</table>		
 	</div>
+	<br>
 	</td>
   </tr>
-
-					<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
+  
+				<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">					
 				<tr> 
-					<td>
+					<td>					
 						<table id="sortabletable1" class="sortable" width="100%" border="0" cellpadding="0" cellspacing="0">
 						    <tr id="frheader">
 								<td width="5%" class="listhdrr">Remove</td>
@@ -460,10 +463,16 @@ if ($blocked_ips_array[0] == '')
 	</td>
   </tr>
 </table>
-
 </div>
 
-<?php include("fend.inc"); ?>
+<?php
+
+include("fend.inc"); 
+
+echo $snort_custom_rnd_box;
+
+?>
+
 
 </body>
 </html>

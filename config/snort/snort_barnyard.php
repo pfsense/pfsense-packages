@@ -283,6 +283,9 @@ include("/usr/local/pkg/snort/snort_head.inc");
 echo "{$snort_general_css}\n";
 ?>
 
+<!-- hack to fix the hardcoed fbegin link in header -->
+<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
+
 <div class="body2">
 
 <noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
@@ -390,7 +393,7 @@ echo '</div>' . "\n";
                   <td colspan="2" valign="top" class="listtopic">General Barnyard2 Settings</td>
                 </tr>
 				<tr>
-				<td width="22%" valign="top" class="vtable">&nbsp;</td>
+				<td width="22%" valign="top" class="vncellreq2">Enable</td>
 				<td width="78%" class="vtable">
 					<?php
 					// <input name="enable" type="checkbox" value="yes" checked onClick="enable_change(false)">
@@ -408,7 +411,7 @@ echo '</div>' . "\n";
 					?>
 				</tr>
 				<tr>
-                  <td width="22%" valign="top" class="vncell">Interface</td>
+                  <td width="22%" valign="top" class="vncell2">Interface</td>
                   <td width="78%" class="vtable">
 					<select name="interface" class="formfld">
 						<?php
@@ -429,7 +432,7 @@ echo '</div>' . "\n";
                   <td colspan="2" valign="top" class="listtopic">Mysql Settings</td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Log to a Mysql Database</td>
+                  <td width="22%" valign="top" class="vncell2">Log to a Mysql Database</td>
                   <td width="78%" class="vtable">
                     <input name="barnyard_mysql" type="text" class="formfld" id="barnyard_mysql" size="100" value="<?=htmlspecialchars($pconfig['barnyard_mysql']);?>">
                     <br> <span class="vexpl">Example: output database: alert, mysql, dbname=snort user=snort host=localhost password=xyz<br>
@@ -439,7 +442,7 @@ echo '</div>' . "\n";
                   <td colspan="2" valign="top" class="listtopic">Advanced Settings</td>
                 </tr>
                 <tr> 
-                  <td width="22%" valign="top" class="vncell">Advanced configuration pass through</td>
+                  <td width="22%" valign="top" class="vncell2">Advanced configuration pass through</td>
                   <td width="78%" class="vtable"> 
                     <textarea name="barnconfigpassthru" cols="100" rows="7" id="barnconfigpassthru" class="formpre"><?=htmlspecialchars($pconfig['barnconfigpassthru']);?></textarea>
                     <br> 

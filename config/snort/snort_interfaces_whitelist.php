@@ -106,6 +106,9 @@ include("fbegin.inc");
 echo $snort_general_css;
 ?>
 
+<!-- hack to fix the hardcoed fbegin link in header -->
+<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
+
 <div class="body2">
 
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>

@@ -423,6 +423,9 @@ $pgtitle = "Snort: $id $iface_uuid $if_real Category: $currentruleset";
 echo "{$snort_general_css}\n";
 ?>
 
+<!-- hack to fix the hardcoed fbegin link in header -->
+<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
+
 <div class="body2">
 
 <noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
@@ -492,7 +495,7 @@ echo '</div>' . "\n";
 	</tr>
 	<tr>
 	<td>
-        <div id="mainarea">
+        <div id="mainarea2">
             <table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr>
                     <td>
@@ -702,6 +705,13 @@ echo '</div>' . "\n";
 
 </div>
 
-<?php include("fend.inc"); ?>
+<?php
+
+include("fend.inc");
+
+echo $snort_custom_rnd_box;
+
+?>
+
 </div></body>
 </html>

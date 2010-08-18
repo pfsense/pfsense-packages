@@ -256,8 +256,10 @@ include_once("/usr/local/pkg/snort/snort_head.inc");
 		</script>
 
 <?php include("fbegin.inc"); ?>
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+<!-- hack to fix the hardcoed fbegin link in header -->
+<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
 
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <?php
 echo "{$snort_general_css}\n";
@@ -319,8 +321,8 @@ echo "$snort_interfaces_css\n";
  </td></tr>
   <tr>
     <td>
-	<div id="mainarea3">
-              <table class="tabcont2" width="100%" border="0" cellpadding="0" cellspacing="0">
+	<div id="mainarea2">
+              <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
                 <tr id="frheader">
 				<td width="5%" class="list">&nbsp;</td>
 		          <td width="1%" class="list">&nbsp;</td>
@@ -466,7 +468,7 @@ echo "$snort_interfaces_css\n";
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr><td>
 	<div id="mainarea4">
-  <table class="tabcont2" width="100%" border="0" cellpadding="0" cellspacing="0">
+  <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 		<tr id="frheader">
 	  <td width="100%">
 	  <span class="red"><strong>Note:</strong></span>
@@ -500,7 +502,7 @@ if ($pkg['tabs'] <> "") {
 </form>
 </div>
 
-<br><br>
+<br><br><br>
 
 <style type="text/css">
 #footer2
@@ -525,8 +527,8 @@ clear: both;
 </style>
 
         <div id="footer2">
-		Snort is a registered trademark of Sourcefire, Inc, Barnyard2 is a registered trademark of securixlive.com, Orion copyright Robert Zelaya, 
-		Emergingthreats is a registered trademark of emergingthreats.net, Mysql is a registered trademark of Mysql.com 
+		SNORT registered ® by Sourcefire, Inc, Barnyard2 registered ® by securixlive.com, Orion registered ® by Robert Zelaya, 
+		Emergingthreats registered ® by emergingthreats.net, Mysql registered ® by Mysql.com 
 		</div> <!-- Footer DIV -->
 
 <?php 

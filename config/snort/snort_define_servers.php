@@ -277,6 +277,9 @@ include("/usr/local/pkg/snort/snort_head.inc");
 echo "{$snort_general_css}\n";
 ?>
 
+<!-- hack to fix the hardcoed fbegin link in header -->
+<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
+
 <div class="body2">
 
 <noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
@@ -370,199 +373,199 @@ echo '</div>' . "\n";
                   <td colspan="2" valign="top" class="listtopic">Define Servers</td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define DNS_SERVERS</td>
+                  <td width="22%" valign="top" class="vncell2">Define DNS_SERVERS</td>
                   <td width="78%" class="vtable">
                     <input name="def_dns_servers" type="text" class="formfld" id="def_dns_servers" size="40" value="<?=htmlspecialchars($pconfig['def_dns_servers']);?>">
                     <br> <span class="vexpl">Example: "192.168.1.3/24,192.168.1.4/24". Leave blank to scan all networks.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define DNS_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define DNS_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_dns_ports" type="text" class="formfld" id="def_dns_ports" size="40" value="<?=htmlspecialchars($pconfig['def_dns_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 53.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define SMTP_SERVERS</td>
+                  <td width="22%" valign="top" class="vncell2">Define SMTP_SERVERS</td>
                   <td width="78%" class="vtable">
                     <input name="def_smtp_servers" type="text" class="formfld" id="def_smtp_servers" size="40" value="<?=htmlspecialchars($pconfig['def_smtp_servers']);?>">
                     <br> <span class="vexpl">Example: "192.168.1.3/24,192.168.1.4/24". Leave blank to scan all networks.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define SMTP_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define SMTP_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_smtp_ports" type="text" class="formfld" id="def_smtp_ports" size="40" value="<?=htmlspecialchars($pconfig['def_smtp_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 25.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define Mail_Ports</td>
+                  <td width="22%" valign="top" class="vncell2">Define Mail_Ports</td>
                   <td width="78%" class="vtable">
                     <input name="def_mail_ports" type="text" class="formfld" id="def_mail_ports" size="40" value="<?=htmlspecialchars($pconfig['def_mail_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 25,143,465,691.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define HTTP_SERVERS</td>
+                  <td width="22%" valign="top" class="vncell2">Define HTTP_SERVERS</td>
                   <td width="78%" class="vtable">
                     <input name="def_http_servers" type="text" class="formfld" id="def_http_servers" size="40" value="<?=htmlspecialchars($pconfig['def_http_servers']);?>">
                     <br> <span class="vexpl">Example: "192.168.1.3/24,192.168.1.4/24". Leave blank to scan all networks.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define WWW_SERVERS</td>
+                  <td width="22%" valign="top" class="vncell2">Define WWW_SERVERS</td>
                   <td width="78%" class="vtable">
                     <input name="def_www_servers" type="text" class="formfld" id="def_www_servers" size="40" value="<?=htmlspecialchars($pconfig['def_www_servers']);?>">
                     <br> <span class="vexpl">Example: "192.168.1.3/24,192.168.1.4/24". Leave blank to scan all networks.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define HTTP_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define HTTP_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_http_ports" type="text" class="formfld" id="def_http_ports" size="40" value="<?=htmlspecialchars($pconfig['def_http_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 80.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define SQL_SERVERS</td>
+                  <td width="22%" valign="top" class="vncell2">Define SQL_SERVERS</td>
                   <td width="78%" class="vtable">
                     <input name="def_sql_servers" type="text" class="formfld" id="def_sql_servers" size="40" value="<?=htmlspecialchars($pconfig['def_sql_servers']);?>">
                     <br> <span class="vexpl">Example: "192.168.1.3/24,192.168.1.4/24". Leave blank to scan all networks.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define ORACLE_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define ORACLE_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_oracle_ports" type="text" class="formfld" id="def_oracle_ports" size="40" value="<?=htmlspecialchars($pconfig['def_oracle_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 1521.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define MSSQL_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define MSSQL_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_mssql_ports" type="text" class="formfld" id="def_mssql_ports" size="40" value="<?=htmlspecialchars($pconfig['def_mssql_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 1433.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define TELNET_SERVERS</td>
+                  <td width="22%" valign="top" class="vncell2">Define TELNET_SERVERS</td>
                   <td width="78%" class="vtable">
                     <input name="def_telnet_servers" type="text" class="formfld" id="def_telnet_servers" size="40" value="<?=htmlspecialchars($pconfig['def_telnet_servers']);?>">
                     <br> <span class="vexpl">Example: "192.168.1.3/24,192.168.1.4/24". Leave blank to scan all networks.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define TELNET_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define TELNET_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_telnet_ports" type="text" class="formfld" id="def_telnet_ports" size="40" value="<?=htmlspecialchars($pconfig['def_telnet_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 23.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define SNMP_SERVERS</td>
+                  <td width="22%" valign="top" class="vncell2">Define SNMP_SERVERS</td>
                   <td width="78%" class="vtable">
                     <input name="def_snmp_servers" type="text" class="formfld" id="def_snmp_servers" size="40" value="<?=htmlspecialchars($pconfig['def_snmp_servers']);?>">
                     <br> <span class="vexpl">Example: "192.168.1.3/24,192.168.1.4/24". Leave blank to scan all networks.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define SNMP_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define SNMP_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_snmp_ports" type="text" class="formfld" id="def_snmp_ports" size="40" value="<?=htmlspecialchars($pconfig['def_snmp_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 161.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define FTP_SERVERS</td>
+                  <td width="22%" valign="top" class="vncell2">Define FTP_SERVERS</td>
                   <td width="78%" class="vtable">
                     <input name="def_ftp_servers" type="text" class="formfld" id="def_ftp_servers" size="40" value="<?=htmlspecialchars($pconfig['def_ftp_servers']);?>">
                     <br> <span class="vexpl">Example: "192.168.1.3/24,192.168.1.4/24". Leave blank to scan all networks.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define FTP_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define FTP_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_ftp_ports" type="text" class="formfld" id="def_ftp_ports" size="40" value="<?=htmlspecialchars($pconfig['def_ftp_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 21.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define SSH_SERVERS</td>
+                  <td width="22%" valign="top" class="vncell2">Define SSH_SERVERS</td>
                   <td width="78%" class="vtable">
                     <input name="def_ssh_servers" type="text" class="formfld" id="def_ssh_servers" size="40" value="<?=htmlspecialchars($pconfig['def_ssh_servers']);?>">
                     <br> <span class="vexpl">Example: "192.168.1.3/24,192.168.1.4/24". Leave blank to scan all networks.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define SSH_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define SSH_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_ssh_ports" type="text" class="formfld" id="def_ssh_ports" size="40" value="<?=htmlspecialchars($pconfig['def_ssh_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is Pfsense SSH port.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define POP_SERVERS</td>
+                  <td width="22%" valign="top" class="vncell2">Define POP_SERVERS</td>
                   <td width="78%" class="vtable">
                     <input name="def_pop_servers" type="text" class="formfld" id="def_pop_servers" size="40" value="<?=htmlspecialchars($pconfig['def_pop_servers']);?>">
                     <br> <span class="vexpl">Example: "192.168.1.3/24,192.168.1.4/24". Leave blank to scan all networks.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define POP2_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define POP2_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_pop2_ports" type="text" class="formfld" id="def_pop2_ports" size="40" value="<?=htmlspecialchars($pconfig['def_pop2_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 109.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define POP3_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define POP3_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_pop3_ports" type="text" class="formfld" id="def_pop3_ports" size="40" value="<?=htmlspecialchars($pconfig['def_pop3_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 110.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define IMAP_SERVERS</td>
+                  <td width="22%" valign="top" class="vncell2">Define IMAP_SERVERS</td>
                   <td width="78%" class="vtable">
                     <input name="def_imap_servers" type="text" class="formfld" id="def_imap_servers" size="40" value="<?=htmlspecialchars($pconfig['def_imap_servers']);?>">
                     <br> <span class="vexpl">Example: "192.168.1.3/24,192.168.1.4/24". Leave blank to scan all networks.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define IMAP_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define IMAP_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_imap_ports" type="text" class="formfld" id="def_imap_ports" size="40" value="<?=htmlspecialchars($pconfig['def_imap_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 143.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define SIP_PROXY_IP</td>
+                  <td width="22%" valign="top" class="vncell2">Define SIP_PROXY_IP</td>
                   <td width="78%" class="vtable">
                     <input name="def_sip_proxy_ip" type="text" class="formfld" id="def_sip_proxy_ip" size="40" value="<?=htmlspecialchars($pconfig['def_sip_proxy_ip']);?>">
                     <br> <span class="vexpl">Example: "192.168.1.3/24,192.168.1.4/24". Leave blank to scan all networks.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define SIP_PROXY_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define SIP_PROXY_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_sip_proxy_ports" type="text" class="formfld" id="def_sip_proxy_ports" size="40" value="<?=htmlspecialchars($pconfig['def_sip_proxy_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 5060:5090,16384:32768.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define AUTH_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define AUTH_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_auth_ports" type="text" class="formfld" id="def_auth_ports" size="40" value="<?=htmlspecialchars($pconfig['def_auth_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 113.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define FINGER_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define FINGER_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_finger_ports" type="text" class="formfld" id="def_finger_ports" size="40" value="<?=htmlspecialchars($pconfig['def_finger_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 79.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define IRC_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define IRC_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_irc_ports" type="text" class="formfld" id="def_irc_ports" size="40" value="<?=htmlspecialchars($pconfig['def_irc_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 6665,6666,6667,6668,6669,7000.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define NNTP_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define NNTP_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_nntp_ports" type="text" class="formfld" id="def_nntp_ports" size="40" value="<?=htmlspecialchars($pconfig['def_nntp_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 119.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define RLOGIN_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define RLOGIN_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_rlogin_ports" type="text" class="formfld" id="def_rlogin_ports" size="40" value="<?=htmlspecialchars($pconfig['def_rlogin_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 513.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define RSH_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define RSH_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_rsh_ports" type="text" class="formfld" id="def_rsh_ports" size="40" value="<?=htmlspecialchars($pconfig['def_rsh_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 514.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define SSL_PORTS</td>
+                  <td width="22%" valign="top" class="vncell2">Define SSL_PORTS</td>
                   <td width="78%" class="vtable">
                     <input name="def_ssl_ports" type="text" class="formfld" id="def_ssl_ports" size="40" value="<?=htmlspecialchars($pconfig['def_ssl_ports']);?>">
                     <br> <span class="vexpl">Example: Specific ports "25,443" or All ports betwen "5060:5090 . Default is 25,443,465,636,993,995.</span></td>

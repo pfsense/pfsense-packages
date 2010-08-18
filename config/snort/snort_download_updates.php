@@ -130,6 +130,9 @@ echo $snort_general_css;
 echo $snort_general_css;
 ?>
 
+<!-- hack to fix the hardcoed fbegin link in header -->
+<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
+
 <div class="body2">
 
 <noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
@@ -178,12 +181,6 @@ echo $snort_general_css;
 			<table id="maintable4" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
 				<tr>
 				<td>
-				
-		<div id="mainarea5">
-			<table id="maintable5" class="tabcont5" width="100%" border="0" cellpadding="0" cellspacing="0">
-				<tr>
-				<td>
-				<!-- start of main content -->
 
 <!-- grey line -->			
 <table height="12px" width="725px" border="0" cellpadding="5px" cellspacing="0">
@@ -344,11 +341,7 @@ echo $snort_general_css;
     </td>
 	  </tr>
 </table>
-				<!-- end main content -->
-				</td>
-				</tr>
-			</table>
-		</div>								
+								
 				</td>
 				</tr>
 			</table>

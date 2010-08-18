@@ -267,6 +267,9 @@ include("/usr/local/pkg/snort/snort_head.inc");
 echo "{$snort_general_css}\n";
 ?>
 
+<!-- hack to fix the hardcoed fbegin link in header -->
+<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
+
 <div class="body2">
 
 <noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
@@ -360,7 +363,7 @@ echo '</div>' . "\n";
                   <td colspan="2" valign="top" class="listtopic">Performance Statistics</td>
                 </tr>
 				<tr>
-					<td width="22%" valign="top" class="vncell">Enable</td>
+					<td width="22%" valign="top" class="vncell2">Enable</td>
 					<td width="78%" class="vtable">
 					<input name="perform_stat" type="checkbox" value="on" <?php if ($pconfig['perform_stat']=="on") echo "checked"; ?> onClick="enable_change(false)">
 					Performance Statistics for this interface.</td>
@@ -369,13 +372,13 @@ echo '</div>' . "\n";
                   <td colspan="2" valign="top" class="listtopic">HTTP Inspect Settings</td>
                 </tr>
 				<tr>
-					<td width="22%" valign="top" class="vncell">Enable</td>
+					<td width="22%" valign="top" class="vncell2">Enable</td>
 					<td width="78%" class="vtable">
 					<input name="http_inspect" type="checkbox" value="on" <?php if ($pconfig['http_inspect']=="on") echo "checked"; ?> onClick="enable_change(false)">
 					 Use HTTP Inspect to Normalize/Decode and detect HTTP traffic and protocol anomalies.</td>
 				</tr>
 				<tr>
-				<td valign="top" class="vncell">HTTP server flow depth</td>
+				<td valign="top" class="vncell2">HTTP server flow depth</td>
 				<td class="vtable">
 					<table cellpadding="0" cellspacing="0">
 					<tr>
@@ -390,7 +393,7 @@ echo '</div>' . "\n";
                   <td colspan="2" valign="top" class="listtopic">Stream5 Settings</td>
                 </tr>
 				<tr>
-				<td valign="top" class="vncell">Max Queued Bytes</td>
+				<td valign="top" class="vncell2">Max Queued Bytes</td>
 				<td class="vtable">
 					<table cellpadding="0" cellspacing="0">
 					<tr>
@@ -401,7 +404,7 @@ echo '</div>' . "\n";
 				</td>
 				</tr>
 				<tr>
-				<td valign="top" class="vncell">Max Queued Segs</td>
+				<td valign="top" class="vncell2">Max Queued Segs</td>
 				<td class="vtable">
 					<table cellpadding="0" cellspacing="0">
 					<tr>
@@ -415,43 +418,43 @@ echo '</div>' . "\n";
                   <td colspan="2" valign="top" class="listtopic">General Preprocessor Settings</td>
                 </tr>
 				<tr>
-					<td width="22%" valign="top" class="vncell">Enable <br>RPC Decode and Back Orifice detector</td>
+					<td width="22%" valign="top" class="vncell2">Enable <br>RPC Decode and Back Orifice detector</td>
 					<td width="78%" class="vtable">
 					<input name="other_preprocs" type="checkbox" value="on" <?php if ($pconfig['other_preprocs']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					Normalize/Decode RPC traffic and detects Back Orifice traffic on the network.</td>
 				</tr>
 				<tr>
-					<td width="22%" valign="top" class="vncell">Enable <br>FTP and Telnet Normalizer</td>
+					<td width="22%" valign="top" class="vncell2">Enable <br>FTP and Telnet Normalizer</td>
 					<td width="78%" class="vtable">
 					<input name="ftp_preprocessor" type="checkbox" value="on" <?php if ($pconfig['ftp_preprocessor']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					Normalize/Decode FTP and Telnet traffic and protocol anomalies.</td>
 				</tr>
 				<tr>
-					<td width="22%" valign="top" class="vncell">Enable <br>SMTP Normalizer</td>
+					<td width="22%" valign="top" class="vncell2">Enable <br>SMTP Normalizer</td>
 					<td width="78%" class="vtable">
 					<input name="smtp_preprocessor" type="checkbox" value="on" <?php if ($pconfig['smtp_preprocessor']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					Normalize/Decode SMTP protocol for enforcement and buffer overflows.</td>
 				</tr>
 				<tr>
-					<td width="22%" valign="top" class="vncell">Enable <br>Portscan Detection</td>
+					<td width="22%" valign="top" class="vncell2">Enable <br>Portscan Detection</td>
 					<td width="78%" class="vtable">
 					<input name="sf_portscan" type="checkbox" value="on" <?php if ($pconfig['sf_portscan']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					Detects various types of portscans and portsweeps.</td>
 				</tr>
 				<tr>
-					<td width="22%" valign="top" class="vncell">Enable <br>DCE/RPC2 Detection</td>
+					<td width="22%" valign="top" class="vncell2">Enable <br>DCE/RPC2 Detection</td>
 					<td width="78%" class="vtable">
 					<input name="dce_rpc_2" type="checkbox" value="on" <?php if ($pconfig['dce_rpc_2']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					The DCE/RPC preprocessor detects and decodes SMB and DCE/RPC traffic.</td>
 				</tr>
 				<tr>
-					<td width="22%" valign="top" class="vncell">Enable <br>DNS Detection</td>
+					<td width="22%" valign="top" class="vncell2">Enable <br>DNS Detection</td>
 					<td width="78%" class="vtable">
 					<input name="dns_preprocessor" type="checkbox" value="on" <?php if ($pconfig['dns_preprocessor']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					The DNS preprocessor decodes DNS Response traffic and detects some vulnerabilities.</td>
 				</tr> 
                 <tr>
-                  <td width="22%" valign="top" class="vncell">Define SSL_IGNORE</td>
+                  <td width="22%" valign="top" class="vncell2">Define SSL_IGNORE</td>
                   <td width="78%" class="vtable">
                     <input name="def_ssl_ports_ignore" type="text" class="formfld" id="def_ssl_ports_ignore" size="40" value="<?=htmlspecialchars($pconfig['def_ssl_ports_ignore']);?>">
                     <br> <span class="vexpl"> Encrypted traffic should be ignored by Snort for both performance reasons and to reduce false positives.<br>

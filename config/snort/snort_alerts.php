@@ -329,6 +329,9 @@ if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 }
 ?>
 
+<!-- hack to fix the hardcoed fbegin link in header -->
+<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
+
 <div class="body2">
 
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
@@ -354,7 +357,7 @@ if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 </tr>
 	<tr>
 	<td>
-	<div id="mainarea">
+	<div id="mainarea2">
 		<table class="tabcont" width="100%" border="1" cellspacing="0" cellpadding="0">
 		  <tr>
 			<td width="22%" colspan="0" class="listtopic">
@@ -633,7 +636,14 @@ if (is_array($alerts_array))
 
 </div>
 
-<?php include("fend.inc"); ?>
+<?php
+
+include("fend.inc"); 
+
+echo $snort_custom_rnd_box;
+
+?>
+
 
 		<script type="text/javascript">
 			var myTable = {};

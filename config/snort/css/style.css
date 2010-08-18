@@ -29,6 +29,24 @@ font-weight: bold;
 text-align: center
 }
 
+/* hack fix the hard coded fbegin link */
+#header-left2 {
+position: absolute;
+background-position: center center;
+height: 67px;
+width: 147px;
+top: -77px;
+left: 8px;
+float: left;
+z-index:999;
+}
+#header-left2 #status-link2 {
+	position: relative;
+	top: 3px;
+	left: 2px;
+}
+/* end of fbegin hack */
+
 .body2 {
 font-family:arial;
 font-size:12px;

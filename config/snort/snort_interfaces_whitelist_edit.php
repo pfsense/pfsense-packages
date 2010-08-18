@@ -254,9 +254,12 @@ include("fbegin.inc");
 echo $snort_general_css;
 ?>
 
+<!-- hack to fix the hardcoed fbegin link in header -->
+<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
+
 <div class="body2">
 
-<script type="text/javascript" src="/javascript/row_helper.js"></script>
+<script type="text/javascript" src="./javascript/row_helper.js"></script>
 
 <input type='hidden' name='address_type' value='textbox' />
 <script type="text/javascript">
@@ -329,7 +332,7 @@ echo $snort_general_css;
       <td colspan="2" valign="top" class="listtopic">Add the name and description of the file.</td>
   </tr>
   <tr>
-    <td valign="top" class="vncellreq">Name</td>
+    <td valign="top" class="vncellreq2">Name</td>
     <td class="vtable">
       <input name="name" type="text" id="name" size="40" value="<?=htmlspecialchars($pconfig['name']);?>" />
       <br />
@@ -339,7 +342,7 @@ echo $snort_general_css;
     </td>
   </tr>
   <tr>
-    <td width="22%" valign="top" class="vncell">Description</td>
+    <td width="22%" valign="top" class="vncell2">Description</td>
     <td width="78%" class="vtable">
       <input name="descr" type="text"  id="descr" size="40" value="<?=$pconfig['descr'];?>" />
       <br />
@@ -349,7 +352,7 @@ echo $snort_general_css;
     </td>
   </tr>
 	<tr>
-	<td width="22%" valign="top" class="vncell">List Type</td>
+	<td width="22%" valign="top" class="vncell2">List Type</td>
 	<td width="78%" class="vtable">
 		<select name="snortlisttype" class="formfld" id="snortlisttype">
 			<?php
@@ -367,7 +370,7 @@ echo $snort_general_css;
         <td colspan="2" valign="top" class="listtopic">Add auto generated ips.</td>
    </tr>
   <tr>
-    <td width="22%" valign="top" class="vncell">WAN IPs</td>
+    <td width="22%" valign="top" class="vncell2">WAN IPs</td>
     <td width="78%" class="vtable">
       <input name="wanips" type="checkbox"  id="wanips" size="40" value="yes" <?php if($pconfig['wanips'] == 'yes'){ echo "checked";} if($pconfig['wanips'] == ''){ echo "checked";} ?>/>
       <span class="vexpl">
@@ -376,7 +379,7 @@ echo $snort_general_css;
     </td>
   </tr>
   <tr>
-    <td width="22%" valign="top" class="vncell">Wan Gateways</td>
+    <td width="22%" valign="top" class="vncell2">Wan Gateways</td>
     <td width="78%" class="vtable">
       <input name="wangateips" type="checkbox"  id="wangateips" size="40" value="yes" <?php if($pconfig['wangateips'] == 'yes'){ echo "checked";} if($pconfig['wangateips'] == ''){ echo "checked";} ?>/>
       <span class="vexpl">
@@ -385,7 +388,7 @@ echo $snort_general_css;
     </td>
   </tr>
   <tr>
-    <td width="22%" valign="top" class="vncell">Wan DNS servers</td>
+    <td width="22%" valign="top" class="vncell2">Wan DNS servers</td>
     <td width="78%" class="vtable">
       <input name="wandnsips" type="checkbox"  id="wandnsips" size="40" value="yes" <?php if($pconfig['wandnsips'] == 'yes'){ echo "checked";} if($pconfig['wandnsips'] == ''){ echo "checked";} ?>/>
       <span class="vexpl">
@@ -394,7 +397,7 @@ echo $snort_general_css;
     </td>
   </tr>
   <tr>
-    <td width="22%" valign="top" class="vncell">Virtual IP Addresses</td>
+    <td width="22%" valign="top" class="vncell2">Virtual IP Addresses</td>
     <td width="78%" class="vtable">
       <input name="vips" type="checkbox"  id="vips" size="40" value="yes" <?php if($pconfig['vips'] == 'yes'){ echo "checked";} if($pconfig['vips'] == ''){ echo "checked";} ?>/>
       <span class="vexpl">
@@ -403,7 +406,7 @@ echo $snort_general_css;
     </td>
   </tr>
    <tr>
-    <td width="22%" valign="top" class="vncell">VPNs</td>
+    <td width="22%" valign="top" class="vncell2">VPNs</td>
     <td width="78%" class="vtable">
       <input name="vpnips" type="checkbox"  id="vpnips" size="40" value="yes" <?php if($pconfig['vpnips'] == 'yes'){ echo "checked";} if($pconfig['vpnips'] == ''){ echo "checked";} ?>/>
       <span class="vexpl">
@@ -415,7 +418,7 @@ echo $snort_general_css;
      <td colspan="2" valign="top" class="listtopic">Add your own custom ips.</td>
   </tr>
   <tr>
-    <td width="22%" valign="top" class="vncellreq"><div id="addressnetworkport">IP or CIDR items</div></td>
+    <td width="22%" valign="top" class="vncellreq2"><div id="addressnetworkport">IP or CIDR items</div></td>
     <td width="78%" class="vtable">
       <table id="maintable">
         <tbody>

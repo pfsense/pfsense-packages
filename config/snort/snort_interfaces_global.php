@@ -263,6 +263,9 @@ include_once("fbegin.inc");
 echo $snort_general_css;
 ?>
 
+<!-- hack to fix the hardcoed fbegin link in header -->
+<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
+
 <div class="body2">
 
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
@@ -298,7 +301,7 @@ echo $snort_general_css;
   <tr>
       <td colspan="2" valign="top" class="listtopic">Please Choose The Type Of Rules You Wish To Download</td>
   </tr>
-      <td width="22%" valign="top" class="vncell">Install Snort.org rules</td>
+      <td width="22%" valign="top" class="vncell2">Install Snort.org rules</td>
       <td width="78%" class="vtable">
         <table cellpadding="0" cellspacing="0">
         <tr>
@@ -321,19 +324,19 @@ echo $snort_general_css;
                 <td colspan="2" valign="top" class="optsect_t2">Oinkmaster code</td>
             </tr>
             <tr>
-                <td class="vncell" valign="top">Code</td>
+                <td class="vncell2" valign="top">Code</td>
                 <td class="vtable"><input name="oinkmastercode" type="text" class="formfld" id="oinkmastercode" size="52" value="<?=htmlspecialchars($pconfig['oinkmastercode']);?>"><br>
                 Obtain a snort.org Oinkmaster code and paste here.</td>
   </table>
     </tr>
     <tr>
-      <td width="22%" valign="top" class="vncell">Install <strong>Emergingthreats</strong> rules</td>
+      <td width="22%" valign="top" class="vncell2">Install <strong>Emergingthreats</strong> rules</td>
       <td width="78%" class="vtable">
         <input name="emergingthreats" type="checkbox" value="yes" <?php if ($config['installedpackages']['snortglobal']['emergingthreats']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
         Emerging Threats is an open source community that produces fastest moving and diverse Snort Rules.</td>
     </tr>
     <tr>
-        <td width="22%" valign="top" class="vncell">Update rules automatically</td>
+        <td width="22%" valign="top" class="vncell2">Update rules automatically</td>
         <td width="78%" class="vtable">
         <select name="autorulesupdate7" class="formfld" id="autorulesupdate7">
                <?php
@@ -351,7 +354,7 @@ echo $snort_general_css;
       <td colspan="2" valign="top" class="listtopic">General Settings</td>
   </tr>
     <tr>
-        <td width="22%" valign="top" class="vncell">Remove blocked hosts every</td>
+        <td width="22%" valign="top" class="vncell2">Remove blocked hosts every</td>
         <td width="78%" class="vtable">
         <select name="rm_blocked" class="formfld" id="rm_blocked">
                <?php
@@ -366,7 +369,7 @@ echo $snort_general_css;
          Hint: in most cases, 1 hour is a good choice.</span></td>
     </tr>
 	<tr>
-	<td width="22%" valign="top" class="vncell">Alerts file description type</td>
+	<td width="22%" valign="top" class="vncell2">Alerts file description type</td>
 	<td width="78%" class="vtable">
 		<select name="snortalertlogtype" class="formfld" id="snortalertlogtype">
 			<?php
@@ -381,7 +384,7 @@ echo $snort_general_css;
 		Hint: Best pratice is to chose full logging.</span>&nbsp;<span class="red"><strong>WARNING:</strong></span>&nbsp;<strong>On change, alert file will be cleared.</strong></td>
 	</tr>
     <tr>
-      <td width="22%" valign="top" class="vncell">Keep snort settings after deinstall</td>
+      <td width="22%" valign="top" class="vncell2">Keep snort settings after deinstall</td>
       <td width="78%" class="vtable">
         <input name="forcekeepsettings" id="forcekeepsettings" type="checkbox" value="yes" <?php if ($config['installedpackages']['snortglobal']['forcekeepsettings']=="on") echo "checked"; ?> onClick="enable_change(false)"><br>
         Settings will not be removed during deinstall.</td>

@@ -395,6 +395,9 @@ include("fbegin.inc");
 echo "{$snort_general_css}\n";
 ?>
 
+<!-- hack to fix the hardcoed fbegin link in header -->
+<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
+
 <div class="body2">
 
 <noscript><div class="alert" ALIGN=CENTER><img src="/themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</strong></div></noscript>
@@ -528,7 +531,7 @@ echo '</div>' . "\n";
                   <td colspan="2" valign="top" class="listtopic">General Settings</td>
                 </tr>
 				<tr>
-				<td width="22%" valign="top" class="vncellreq">Interface</td>
+				<td width="22%" valign="top" class="vncellreq2">Interface</td>
 				<td width="22%" valign="top" class="vtable">&nbsp;
 					<?php
 					// <input name="enable" type="checkbox" value="yes" checked onClick="enable_change(false)">
@@ -545,7 +548,7 @@ echo '</div>' . "\n";
 				</td>
 				</tr>
 				<tr>
-                  <td width="22%" valign="top" class="vncellreq">Interface</td>
+                  <td width="22%" valign="top" class="vncellreq2">Interface</td>
                   <td width="78%" class="vtable">
 					<select name="interface" class="formfld">
 						<?php
@@ -563,13 +566,13 @@ echo '</div>' . "\n";
                      Hint: in most cases, you'll want to use WAN here.</span></td>
                 </tr>
                 <tr>
-                  <td width="22%" valign="top" class="vncellreq">Description</td>
+                  <td width="22%" valign="top" class="vncellreq2">Description</td>
                   <td width="78%" class="vtable">
                     <input name="descr" type="text" class="formfld" id="descr" size="40" value="<?=htmlspecialchars($pconfig['descr']);?>">
                     <br> <span class="vexpl">You may enter a description here for your reference (not parsed).</span></td>
                 </tr>
 				<tr>
-					<td width="22%" valign="top" class="vncell">Memory Performance</td>
+					<td width="22%" valign="top" class="vncell2">Memory Performance</td>
 					<td width="78%" class="vtable">
 					<select name="performance" class="formfld" id="performance">
 						<?php
@@ -587,7 +590,7 @@ echo '</div>' . "\n";
                   <td colspan="2" valign="top" class="listtopic">Choose the networks snort should inspect and whitelist.</td>
                 </tr>
 				<tr>
-				<td width="22%" valign="top" class="vncell">Home net</td>
+				<td width="22%" valign="top" class="vncell2">Home net</td>
 				<td width="78%" class="vtable">
 				<select name="homelistname" class="formfld" id="homelistname">		
 						<?php
@@ -619,7 +622,7 @@ echo '</div>' . "\n";
 				<span class="red">Hint:</span>&nbsp;Most users add a list of friendly ips that the firewall cant see.</td>
 				</tr>
 				<tr>
-				<td width="22%" valign="top" class="vncell">External net</td>
+				<td width="22%" valign="top" class="vncell2">External net</td>
 				<td width="78%" class="vtable">
 				<select name="externallistname" class="formfld" id="externallistname">
 						<?php
@@ -651,13 +654,13 @@ echo '</div>' . "\n";
 				<span class="red">Hint:</span>&nbsp;Most users should leave this setting at default.</td>
 				</tr>
 				<tr>
-				<td width="22%" valign="top" class="vncell">Block offenders</td>
+				<td width="22%" valign="top" class="vncell2">Block offenders</td>
 				<td width="78%" class="vtable">
 					<input name="blockoffenders7" type="checkbox" value="on" <?php if ($pconfig['blockoffenders7'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					Checking this option will automatically block hosts that generate a Snort alert.</td>
 				</tr>
 				<tr>
-				<td width="22%" valign="top" class="vncell">Whitelist</td>
+				<td width="22%" valign="top" class="vncell2">Whitelist</td>
 				<td width="78%" class="vtable">
 				<select name="whitelistname" class="formfld" id="whitelistname">		
 						<?php
@@ -689,7 +692,7 @@ echo '</div>' . "\n";
 				</tr>
 				
 				<tr>
-				<td width="22%" valign="top" class="vncell">Suppression and filtering</td>
+				<td width="22%" valign="top" class="vncell2">Suppression and filtering</td>
 				<td width="78%" class="vtable">
 				<select name="suppresslistname" class="formfld" id="suppresslistname">		
 						<?php
@@ -722,19 +725,19 @@ echo '</div>' . "\n";
                   <td colspan="2" valign="top" class="listtopic">Choose the types of logs snort should create.</td>
                 </tr>
 				<tr>
-				<td width="22%" valign="top" class="vncell">Send alerts to main System logs</td>
+				<td width="22%" valign="top" class="vncell2">Send alerts to main System logs</td>
 				<td width="78%" class="vtable">
 					<input name="alertsystemlog" type="checkbox" value="on" <?php if ($pconfig['alertsystemlog'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					Snort will send Alerts to the Pfsense system logs.</td>
 				</tr>
 				<tr>
-				<td width="22%" valign="top" class="vncell">Log to a Tcpdump file</td>
+				<td width="22%" valign="top" class="vncell2">Log to a Tcpdump file</td>
 				<td width="78%" class="vtable">
 					<input name="tcpdumplog" type="checkbox" value="on" <?php if ($pconfig['tcpdumplog'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					Snort will log packets to a tcpdump-formatted file. The file then can be analyzed by an application such as Wireshark which understands pcap file formats. <span class="red"><strong>WARNING:</strong></span> File may become large.</td>
 				</tr>
 				<tr>
-				<td width="22%" valign="top" class="vncell">Log Alerts to a snort unified2 file</td>
+				<td width="22%" valign="top" class="vncell2">Log Alerts to a snort unified2 file</td>
 				<td width="78%" class="vtable">
 					<input name="snortunifiedlog" type="checkbox" value="on" <?php if ($pconfig['snortunifiedlog'] == "on") echo "checked"; ?> onClick="enable_change(false)"><br>
 					Snort will log Alerts to a file in the UNIFIED2 format. This is a requirement for barnyard2.</td>
@@ -743,7 +746,7 @@ echo '</div>' . "\n";
                   <td colspan="2" valign="top" class="listtopic">Arguments here will be automatically inserted into the snort configuration.</td>
                 </tr>
                 <tr> 
-                  <td width="22%" valign="top" class="vncell">Advanced configuration pass through</td>
+                  <td width="22%" valign="top" class="vncell2">Advanced configuration pass through</td>
                   <td width="78%" class="vtable"> 
                     <textarea wrap="off" name="configpassthru" cols="75" rows="12" id="configpassthru" class="formpre2"><?=htmlspecialchars($pconfig['configpassthru']);?></textarea>
                     </td>

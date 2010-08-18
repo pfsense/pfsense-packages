@@ -37,7 +37,7 @@ require_once("functions.inc");
 require_once("filter.inc");
 
 /* package version */
-$snort_package_version = 'Snort 2.8.6 pkg v. 1.32';
+$snort_package_version = 'Snort 2.8.6 pkg v. 1.33';
 
 /* find out if were in 1.2.3-RELEASE */
 $pfsense_ver_chk = exec('/bin/cat /etc/version');
@@ -619,11 +619,14 @@ function snort_postinstall()
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/logo22.png');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/new_tab_menu.png');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/page_white_text.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/transparent.gif');
 	chdir ("/usr/local/www/snort/javascript/");
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/jquery.colorbox.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/jquery-1.4.2.min.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/mootools.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/sortableTable.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/row_helper.js');
+	
 	/* install barnyard2 for 2.0 and 1.2.3 */
 	chdir ("/usr/local/bin/");
 	if ($pfsense_stable == 'yes') {
