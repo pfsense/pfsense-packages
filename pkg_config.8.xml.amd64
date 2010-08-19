@@ -174,10 +174,11 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/80/All/</depends_on_package_base_url>
       <depends_on_package>ntop-3.3.10.tbz</depends_on_package>
       <depends_on_package>gdbm-1.8.3_3.tbz</depends_on_package>
-      <depends_on_package>perl-5.8.9_3.tbz</depends_on_package>
+      <depends_on_package>perl-5.10.1_2.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/net/ntop</build_port_path>
 	  <build_port_path>/usr/ports/databases/gdbm</build_port_path>
-	  <build_port_path>/usr/ports/lang/perl5.8</build_port_path>
+	  <build_port_path>/usr/ports/lang/perl5.10</build_port_path>
+	<build_options>WITHOUT_DEBUGGING=true WITHOUT_GDBM=true WITHOUT_PERL_MALLOC=true WITH_PERL_64BITINT=true WITHOUT_THREADS=true WITHOUT_MULTIPLICITY=true WITHOUT_SUIDPERL=true WITHOUT_SITECUSTOMIZE=true WITH_USE_PERL=true</build_options>
       <version>3.3.8</version>
       <status>BETA</status>
       <required_version>1.2.1</required_version>
@@ -308,13 +309,14 @@
       <category>Security</category>
       <depends_on_package_base_url>http://www.pfsense.com/packages/config/snort/bin/8.0.x86/</depends_on_package_base_url>
 	  <depends_on_package>pcre-8.02.tbz</depends_on_package>
-	  <depends_on_package>perl-5.10.1.tbz</depends_on_package>
+	  <depends_on_package>perl-5.10.1_2.tbz</depends_on_package>
       <depends_on_package>mysql-client-5.0.90.tbz</depends_on_package>
 	  <depends_on_package>snort-2.8.6.1.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/devel/pcre</build_port_path>
 	  <build_port_path>/usr/ports/lang/perl5.10</build_port_path>
 	  <build_port_path>/usr/ports/databases/mysql51-client</build_port_path>
 	  <build_port_path>/usr/ports/security/snort</build_port_path>
+	<build_options>WITHOUT_DEBUGGING=true WITHOUT_GDBM=true WITHOUT_PERL_MALLOC=true WITH_PERL_64BITINT=true WITHOUT_THREADS=true WITHOUT_MULTIPLICITY=true WITHOUT_SUIDPERL=true WITHOUT_SITECUSTOMIZE=true WITH_USE_PERL=true</build_options>
       <config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
       <version>2.8.6 pkg v. 1.31</version>
       <required_version>2.0</required_version>
@@ -394,9 +396,10 @@
       <maintainer>dv_serg@mail.ru</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
       <depends_on_package>lightsquid-1.8.tbz</depends_on_package>
-      <depends_on_package>perl-5.10.1_1.tbz</depends_on_package>
+      <depends_on_package>perl-5.10.1_2.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/www/lightsquid</build_port_path>
 	  <build_port_path>/usr/ports/lang/perl5.10</build_port_path>
+	<build_options>WITHOUT_DEBUGGING=true WITHOUT_GDBM=true WITHOUT_PERL_MALLOC=true WITH_PERL_64BITINT=true WITHOUT_THREADS=true WITHOUT_MULTIPLICITY=true WITHOUT_SUIDPERL=true WITHOUT_SITECUSTOMIZE=true WITH_USE_PERL=true</build_options>
       <status>Beta</status>
       <required_version>2</required_version>
       <config_file>http://www.pfsense.com/packages/config/lightsquid/lightsquid.xml</config_file>
@@ -479,7 +482,7 @@
       <depends_on_package>libiconv-1.13.1_1.tbz</depends_on_package>
       <depends_on_package>libtool-2.2.6b.tbz</depends_on_package>
       <depends_on_package>pcre-8.00.tbz</depends_on_package>
-      <depends_on_package>perl-5.10.1.tbz</depends_on_package>
+      <depends_on_package>perl-5.10.1_2.tbz</depends_on_package>
       <depends_on_package>pkg-config-0.23_1.tbz</depends_on_package>
       <depends_on_package>python26-2.6.4.tbz</depends_on_package>
       <depends_on_package>ruby+oniguruma-1.8.7.248,1.tbz</depends_on_package>
@@ -729,7 +732,7 @@
 	<build_port_path>/usr/ports/www/squid</build_port_path>
 	<build_port_path>/usr/ports/www/squid_radius_auth</build_port_path>
 	<build_port_path>/usr/ports/www/libwww</build_port_path>
-	<build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_CARP=true WITHOUT_SQUID_SSL=true WITHOUT_SQUID_PINGER=true WITHOUT_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITH_SQUID_WCCP=true WITHOUT_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITHOUT_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITH_SQUID_AUFS=true WITH_SQUID_COSS=true WITH_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true</build_options>
+	<build_options>WITH_SQUID_KERB_AUTH=true WITH_SQUID_LDAP_AUTH=true WITH_SQUID_NIS_AUTH=true WITH_SQUID_SASL_AUTH=true WITH_SQUID_DELAY_POOLS=true WITH_SQUID_SNMP=true WITH_SQUID_CARP=true WITHOUT_SQUID_SSL=true WITHOUT_SQUID_PINGER=true WITHOUT_SQUID_DNS_HELPER=true WITH_SQUID_HTCP=true WITH_SQUID_VIA_DB=true WITH_SQUID_CACHE_DIGESTS=true WITH_SQUID_WCCP=true WITHOUT_SQUID_WCCPV2=true WITHOUT_SQUID_STRICT_HTTP=true WITH_SQUID_IDENT=true WITH_SQUID_REFERER_LOG=true WITHOUT_SQUID_USERAGENT_LOG=true WITH_SQUID_ARP_ACL=true WITH_SQUID_PF=true WITHOUT_SQUID_IPFILTER=true WITH_SQUID_FOLLOW_XFF=true WITH_SQUID_AUFS=true WITH_SQUID_COSS=true WITH_SQUID_KQUEUE=true WITH_SQUID_LARGEFILE=true WITHOUT_SQUID_STACKTRACES=true WITHOUT_DEBUGGING=true WITHOUT_GDBM=true WITHOUT_PERL_MALLOC=true WITH_PERL_64BITINT=true WITHOUT_THREADS=true WITHOUT_MULTIPLICITY=true WITHOUT_SUIDPERL=true WITHOUT_SITECUSTOMIZE=true WITH_USE_PERL=true</build_options>
       <config_file>http://www.pfsense.org/packages/config/squid/squid.xml</config_file>
       <configurationfile>squid.xml</configurationfile>
     </package>
