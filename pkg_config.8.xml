@@ -12,7 +12,7 @@
 		<category>Diagnostics</category>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,26974.0.html</pkginfolink>
 		<config_file>http://pfsense.org/packages/config/filemgr/filemgr.xml</config_file>
-		<version>0.1.0</version>
+		<version>0.1.1</version>
 		<status>Beta</status>
 		<required_version>1.2.2</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>

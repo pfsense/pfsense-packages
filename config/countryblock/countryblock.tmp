@@ -2603,7 +2603,7 @@ ob_end_clean();
 	$results = exec("pfctl -T show -t countryblock |grep -v -c Z");
 	ob_end_clean();
 	echo $results;
-	echo " IPs";
+	echo " Networks";
 	?>
 
 
