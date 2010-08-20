@@ -1,5 +1,5 @@
 #!/bin/sh
-#Version 2.1
+#Version 2.2 logging
 
 #kill tables to elminate dups
 pfctl -t ipblocklist -T kill
@@ -86,8 +86,13 @@ while read line
 		echo "table <ipblocklistW> persist file '/usr/local/www/packages/ipblocklist/Wlists/whitelist'" >> /tmp/rules.debug.tmp
 		echo "pass quick from <ipblocklistW> to any label 'IP-Blocklist'" >> /tmp/rules.debug.tmp
 		echo "pass quick from any to <ipblocklistW> label 'IP-Blocklist'" >> /tmp/rules.debug.tmp
-		echo "block quick from <ipblocklist> to any label 'IP-Blocklist'" >> /tmp/rules.debug.tmp
-		echo "block quick from any to <ipblocklist> label 'IP-Blocklist'" >> /tmp/rules.debug.tmp
+		if [ -f logging ]; then
+			echo "block log quick from <ipblocklist> to any label 'IP-Blocklist'" >> /tmp/rules.debug.tmp
+			echo "block log quick from any to <ipblocklist> label 'IP-Blocklist'" >> /tmp/rules.debug.tmp
+		else
+			echo "block quick from <ipblocklist> to any label 'IP-Blocklist'" >> /tmp/rules.debug.tmp
+			echo "block quick from any to <ipblocklist> label 'IP-Blocklist'" >> /tmp/rules.debug.tmp
+		fi
 	fi
 	echo $line >> /tmp/rules.debug.tmp
 done < "/tmp/rules.debug"

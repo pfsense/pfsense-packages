@@ -1,5 +1,5 @@
 <?php
-	//Version 2.1
+	//Version 2.2
 	
 	require_once('config.inc');
 	require("guiconfig.inc");
@@ -90,7 +90,22 @@ else {
 	echo "<input name='enable' type='checkbox' value='1'>\n";
 }
 ?>
-
+<?php
+if(isset($_POST['formSubmit'])) 
+    {
+		
+	
+		if(isset($_POST['formlogging'])) 
+        {
+			exec("touch logging");
+		} 
+        else 
+        {
+			exec("rm logging");
+		}
+		
+	}
+?>
 <strong>Enable IP-Blocklist</strong><br><br>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
@@ -98,8 +113,17 @@ else {
 	<?php if ($savemsg_dnsb) print_info_box($savemsg_dnsb); ?>
 
 	</form>
+    <?php
+
+	if (file_exists("logging")) {
+		echo "<input name='formlogging' type='checkbox' value='Yes' checked/>";
+	} else {
+		echo "<input name='formlogging' type='checkbox' value='Yes'/>";
+	}
+?>
+    Enable Logging <input type="submit" name="formSubmit" value="Save" /><br />
 	<center>
-	<iframe frameboarder=0 boarder=0 src="ipblocklist_list.php" name="lists" id="lists" width="100%" height="200">
+    <iframe frameboarder=0 boarder=0 src="ipblocklist_list.php" name="lists" id="lists" width="100%" height="200">
 	</iframe>
 	</center>
 	<br/>
@@ -130,6 +154,14 @@ else {
 	echo "<br/><span style='color:red'>";
 	echo $results;
 	echo "</span>";
+	
+	//Get IP Count
+	echo "<br>You are blocking ";
+	ob_start();
+	$results = exec("pfctl -T show -t ipblocklist |grep -v -c Z");
+	ob_end_clean();
+	echo $results;
+	echo " IPs";
 	?>
 
 

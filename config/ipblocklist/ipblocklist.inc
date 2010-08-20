@@ -3,7 +3,7 @@
 /*
 /* ========================================================================== */
 /*
-	ipblocklist.inc v2.1
+	ipblocklist.inc
 	Copyright (C) 2010 Tom Schaefer
 	All rights reserved.
 																			*/
@@ -30,42 +30,15 @@
 	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 	POSSIBILITY OF SUCH DAMAGE.
 
-
-function pkg_is_service_running($servicename) 
-{
-	exec("/bin/ps ax | awk '{ print $5 }'", $psout);
-	array_shift($psout);
-	foreach($psout as $line) {
-		$ps[] = trim(array_pop(explode(' ', array_pop(explode('/', $line)))));
-	}
-	if(is_service_running($servicename, $ps) or is_process_running($servicename) ) {
-		return true;
-	}
-	else {
-		return false;
-	}
-}
 */
-function byte_convert( $bytes ) {
-	if ($bytes<=0)
-		return '0 Byte';
 
-	$convention=1000; //[1000->10^x|1024->2^x]
-	$s=array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB');
-	$e=floor(log($bytes,$convention));
-	return round($bytes/pow($convention,$e),2).' '.$s[$e];
-}
-
- 
-
-
-function php_sync_package() 
+function php_sync_package_ip() 
 {
 	global $config;
 }
 
 
-function php_install_command() 
+function php_install_command_ip() 
 {
 
 	global $config;
@@ -82,8 +55,8 @@ function php_install_command()
 
 	
 	//install PERL
-	exec("pkg_add -r ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-7.2-release/All/perl-5.8.9_2.tbz");
-	exec("pkg_add -r ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-7.2-release/All/p5-Net-CIDR-0.13.tbz");
+	exec("pkg_add -r http://www.pfsense.org/packages/config/ipblocklist/perl-5.8.9_2.tbz");
+	exec("pkg_add -r http://www.pfsense.org/packages/config/ipblocklist/p5-Net-CIDR-0.13.tbz");
 
 	//rename PHP files from .tmp to .php
 	exec("cp /tmp/ipblocklist.tmp /usr/local/www/packages/ipblocklist/ipblocklist.php");
@@ -115,7 +88,7 @@ function php_install_command()
 }
 
 
-function deinstall_command() 
+function deinstall_command_ip() 
 {
 	conf_mount_rw();
 	$handle = popen("/usr/local/etc/rc.d/ipblocklist.sh stop", "r");
