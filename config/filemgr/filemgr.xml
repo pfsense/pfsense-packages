@@ -31,7 +31,7 @@
 	<requirements>none</requirements>
 	<faq>http://forum.pfsense.org/index.php/topic,26974.0.html</faq>
 	<name>File Manager</name>
-	<version>0.1.0</version>
+	<version>0.1.1</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/filemgr.inc</include_file>
 	<menu>
@@ -226,15 +226,15 @@
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
-		php_sync_package();
+		php_sync_package_fm();
 	</custom_php_resync_config_command>
 	<custom_delete_php_command>    
-		php_sync_package();
+		php_sync_package_fm();
 	</custom_delete_php_command>
 	<custom_php_install_command>
-		php_install_command();
+		php_install_command_fm();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		deinstall_command();
+		deinstall_command_fm();
 	</custom_php_deinstall_command>
 </packagegui>
