@@ -74,8 +74,7 @@ if (count($_POST)>0) {
 	$savemsg_cb = "Country Block settings have been saved/updated. ";
 	conf_mount_ro();
 }
-?>
-<head>
+?><head>
 <?php include("fbegin.inc"); ?>
 <style type="text/css">
 <!--
@@ -84,6 +83,7 @@ if (count($_POST)>0) {
 }
 -->
 </style>
+
 
 <p class="pgtitle">Firewall: Country Block</p>
 <form method=POST action="">
@@ -118,6 +118,15 @@ mwexec("touch countries.txt");
         {
 			$output2 = " and Outbound access is ALLOWED.</b>";
 			exec("rm OUTBOUND");
+		}
+		
+		if(isset($_POST['formlogging'])) 
+        {
+			exec("touch logging");
+		} 
+        else 
+        {
+			exec("rm logging");
 		}
 
 		
@@ -274,7 +283,7 @@ background-color: #F3F3F3;
 			
 		?> 
             
-      of 245 selected. <a href="whitelist.php" target="_parent"><img src="../../themes/nervecenter/images/icons/icon_plus.gif" ALT="Manual" ALIGN=RIGHT></a></p>
+      of 246 selected. <a href="whitelist.php" target="_parent"><img src="../../themes/nervecenter/images/icons/icon_plus.gif" ALT="Manual" ALIGN=RIGHT></a></p>
 	<p>
 		Block outbound?
 <?php
@@ -288,6 +297,15 @@ background-color: #F3F3F3;
 
 		<input type="checkbox" name="checkall" onclick="checkUncheckAll(this);"/>select/unselect
 	</p>
+    Enable Logging?
+<?php
+
+	if (file_exists("logging")) {
+		echo "<input name='formlogging' type='checkbox' value='Yes' checked/>";
+	} else {
+		echo "<input name='formlogging' type='checkbox' value='Yes'/>";
+	}
+?>
 <br/>
 	
 
@@ -469,9 +487,9 @@ ob_start();
 $results = exec("cat countries.txt | grep AR");
 ob_end_clean();
 	if ($results == 'AR')
-		echo "		<li><input name='formCountry[]' type='checkbox' value='AR' checked/>Argentia</li>";
+		echo "		<li><input name='formCountry[]' type='checkbox' value='AR' checked/>Argentina</li>";
 	else
-		echo "		<li><input name='formCountry[]' type='checkbox' value='AR' />Argentia</li>";
+		echo "		<li><input name='formCountry[]' type='checkbox' value='AR' />Argentina</li>";
 
 ob_start();
 $results = exec("cat countries.txt | grep AM");
@@ -682,9 +700,9 @@ ob_start();
 $results = exec("cat countries.txt | grep BF");
 ob_end_clean();
 	if ($results == 'BF')
-		echo "<li><input name='formCountry[]' type='checkbox' value='BF' checked/>Burkia Faso</li>";
+		echo "<li><input name='formCountry[]' type='checkbox' value='BF' checked/>Burkina Faso</li>";
 	else
-		echo "<li><input name='formCountry[]' type='checkbox' value='BF' />Burkia Faso</li>";
+		echo "<li><input name='formCountry[]' type='checkbox' value='BF' />Burkina Faso</li>";
 
 ob_start();
 $results = exec("cat countries.txt | grep BI");
@@ -1650,6 +1668,14 @@ ob_end_clean();
 		echo "<li><input name='formCountry[]' type='checkbox' value='MN' />Mongolia</li>";
 
 ob_start();
+$results = exec("cat countries.txt | grep ME");
+ob_end_clean();
+	if ($results == 'ME')
+		echo "<li><input name='formCountry[]' type='checkbox' value='ME' checked/>Montenegro</li>";
+	else
+		echo "<li><input name='formCountry[]' type='checkbox' value='ME' />Montenegro</li>";
+
+ob_start();
 $results = exec("cat countries.txt | grep MS");
 ob_end_clean();
 	if ($results == 'MS')
@@ -2570,6 +2596,14 @@ ob_end_clean();
 	echo "<br/><span style='color:red'>";
 	echo $results;
 	echo "</span>";
+	
+	//Get IP Count
+	echo "<br>You are blocking ";
+	ob_start();
+	$results = exec("pfctl -T show -t countryblock |grep -v -c Z");
+	ob_end_clean();
+	echo $results;
+	echo " IPs";
 	?>
 
 

@@ -33,13 +33,13 @@
 
 
 
-function php_sync_package() 
+function php_sync_package_cb() 
 {
 	global $config;
 }
 
 
-function php_install_command() 
+function php_install_command_cb() 
 {
 
 	global $config;
@@ -88,7 +88,7 @@ function php_install_command()
 }
 
 
-function deinstall_command() 
+function deinstall_command_cb() 
 {
 	conf_mount_rw();
 	$handle = popen("/usr/local/etc/rc.d/countryblock.sh stop", "r");

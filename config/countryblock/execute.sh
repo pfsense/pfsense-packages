@@ -48,7 +48,11 @@ while read line
 		echo "table <countryblockW> persist file '/usr/local/www/packages/countryblock/countries-white.txt'" >> /tmp/rules.debug.tmp
 		echo "pass quick from <countryblockW> to any label 'countryblock'" >> /tmp/rules.debug.tmp
 		echo "pass quick from any to <countryblockW> label 'countryblock'" >> /tmp/rules.debug.tmp
-		echo "block quick from <countryblock> to any label 'countryblock'" >> /tmp/rules.debug.tmp
+		if [ -f logging ]; then
+			echo "block log quick from <countryblock> to any label 'countryblock'" >> /tmp/rules.debug.tmp
+		else
+			echo "block quick from <countryblock> to any label 'countryblock'" >> /tmp/rules.debug.tmp
+		fi
 		if [ -f OUTBOUND ]; then
 			echo "block quick from any to <countryblock> label 'countryblock'" >> /tmp/rules.debug.tmp
 		fi

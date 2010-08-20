@@ -41,7 +41,7 @@
 	<requirements>Active Internet</requirements>
 	<faq>http://forum.pfsense.org/index.php/topic,25732.0.html</faq>
 	<name>Country Block Settings</name>
-	<version>0.1.3</version>
+	<version>0.1.5</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/countryblock.inc</include_file>
 	<menu>
@@ -62,67 +62,67 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/countryblock/countryblock.xml</item>
+		<item>http://www.pfsense.org/packages/config/countryblock/countryblock.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/countryblock/countryblock.inc</item>
+		<item>http://www.pfsense.org/packages/config/countryblock/countryblock.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/countryblock/countryblock.tmp</item>
+		<item>http://www.pfsense.org/packages/config/countryblock/countryblock.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/countryblock/execute.sh</item>
+		<item>http://www.pfsense.org/packages/config/countryblock/execute.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/countryblock/countryblock.sh</item>
+		<item>http://www.pfsense.org/packages/config/countryblock/countryblock.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/countryblock/index.tmp</item>
+		<item>http://www.pfsense.org/packages/config/countryblock/index.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/countryblock/ddaccordion.js</item>
+		<item>http://www.pfsense.org/packages/config/countryblock/ddaccordion.js</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/countryblock/jquery.min.js</item>
+		<item>http://www.pfsense.org/packages/config/countryblock/jquery.min.js</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/countryblock/public_smo_scripts.js</item>
+		<item>http://www.pfsense.org/packages/config/countryblock/public_smo_scripts.js</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/countryblock/titlebar.png</item>
+		<item>http://www.pfsense.org/packages/config/countryblock/titlebar.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/countryblock/titlebar-active.png</item>
+		<item>http://www.pfsense.org/packages/config/countryblock/titlebar-active.png</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/countryblock/purge.tmp</item>
+		<item>http://www.pfsense.org/packages/config/countryblock/purge.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.com/packages/config/countryblock/whitelist.tmp</item>
+		<item>http://www.pfsense.org/packages/config/countryblock/whitelist.tmp</item>
 	</additional_files_needed>
 	<fields>
 		<field>
@@ -141,15 +141,15 @@
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
-		php_sync_package();
+		php_sync_package_cb();
 	</custom_php_resync_config_command>
 	<custom_delete_php_command>    
-		php_sync_package();
+		php_sync_package_cb();
 	</custom_delete_php_command>
 	<custom_php_install_command>
-		php_install_command();
+		php_install_command_cb();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		deinstall_command();
+		deinstall_command_cb();
 	</custom_php_deinstall_command>
 </packagegui>
