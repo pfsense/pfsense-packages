@@ -205,6 +205,10 @@
 					<value>bestfcom00</value>
 				</option>
 				<option>
+					<name>Compaq R3000h</name>
+					<value>upscode200</value>
+				</option>
+				<option>
 					<name>Cyber Power Systems 320AVR</name>
 					<value>cyberpower00</value>
 				</option>
@@ -239,6 +243,22 @@
 				<option>
 					<name>Cyber Power Systems 1500AVR</name>
 					<value>cyberpower08</value>
+				</option>
+				<option>
+					<name>Fiskars PowerRite MAX</name>
+					<value>upscode201</value>
+				</option>
+				<option>
+					<name>Fiskars PowerServer 10</name>
+					<value>upscode202</value>
+				</option>
+				<option>
+					<name>Fiskars PowerServer 30</name>
+					<value>upscode203</value>
+				</option>
+				<option>
+					<name>Fiskars 9200 UPS Information Unit</name>
+					<value>upscode204</value>
 				</option>
 				<option>
 					<name>Inform GUARD Line Interactive</name>
@@ -371,6 +391,22 @@
 				<option>
 					<name>Powercom Various</name>
 					<value>powercom02</value>
+				</option>
+				<option>
+					<name>Powerware 9110</name>
+					<value>upscode205</value>
+				</option>
+				<option>
+					<name>Powerware 9120</name>
+					<value>upscode206</value>
+				</option>
+				<option>
+					<name>Powerware 9150</name>
+					<value>upscode207</value>
+				</option>
+				<option>
+					<name>Powerware 9305</name>
+					<value>upscode208</value>
 				</option>
 				<option>
 					<name>Tripp-Lite SmartUPS</name>
