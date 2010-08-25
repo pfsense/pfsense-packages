@@ -160,7 +160,8 @@
       <depends_on_package>perl-5.8.9_3.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/net/ntop</build_port_path>
 	  <build_port_path>/usr/ports/databases/gdbm</build_port_path>
-	  <build_port_path>/usr/ports/lang/perl5.8</build_port_path>
+	  <build_port_path>/usr/ports/lang/perl5.10</build_port_path>
+	<build_options>WITHOUT_APNG=true WITHOUT_COLLATION_FIX=true WITHOUT_DEBUGGING=true WITHOUT_DEJAVU=true WITHOUT_DEVIL=true WITHOUT_DIGCOLA=true WITHOUT_EXTRA_PATCHES=true WITHOUT_FONTCONFIG=true WITHOUT_FPECTL=true WITHOUT_GAM_POLLER=true WITHOUT_GDBM=true WITHOUT_GDK_PIXBUF=true WITHOUT_GHOSTSCRIPT=true WITHOUT_GLITZ=true WITHOUT_GNOMEUI=true WITHOUT_GTK=true WITHOUT_GUILE=true WITHOUT_HUGE_STACK_SIZE=true WITHOUT_ICONV=true WITHOUT_IPSEPCOLA=true WITHOUT_LIBSIGSEGV=true WITHOUT_LOCALE=true WITHOUT_LUA=true WITHOUT_MING=true WITHOUT_MMAP=true WITHOUT_MULTIPLICITY=true WITHOUT_PANGOCAIRO=true WITHOUT_PCAP_PORT=true WITHOUT_PERL=true WITHOUT_PERL_MALLOC=true WITHOUT_PERL_MODULE=true WITHOUT_PHP=true WITHOUT_PTH=true WITHOUT_PYTHON=true WITHOUT_PYTHON_MODULE=true WITHOUT_RSVG=true WITHOUT_RUBY=true WITHOUT_RUBY_MODULE=true WITHOUT_SEM=true WITHOUT_SIMD=true WITHOUT_SITECUSTOMIZE=true WITHOUT_SMYRNA=true WITHOUT_SUIDPERL=true WITHOUT_TCL=true WITHOUT_THREADS=true WITHOUT_TK=true WITHOUT_X11=true WITHOUT_XCB=true WITHOUT_XMLDUMP=true WITHOUT_XPM=true WITHOUT_ZSH=true WITH_BASH=true WITH_EXTRA_ENCODINGS=true WITH_ICONV=true WITH_IPV6=true WITH_NLS=true WITH_PERL_64BITINT=true WITH_PYMALLOC=true WITH_TCPWRAPPER=true WITH_THREADS=true WITH_UCS4=true WITH_USE_PERL=true</build_options>
       <version>3.3.8</version>
       <status>BETA</status>
       <required_version>1.2.1</required_version>
