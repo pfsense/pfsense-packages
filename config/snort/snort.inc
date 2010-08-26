@@ -37,7 +37,7 @@ require_once("functions.inc");
 require_once("filter.inc");
 
 /* package version */
-$snort_package_version = 'Snort 2.8.6 pkg v. 1.33';
+$snort_package_version = 'Snort 2.8.6.1 pkg v. 1.33';
 
 /* find out if were in 1.2.3-RELEASE */
 $pfsense_ver_chk = exec('/bin/cat /etc/version');
@@ -46,6 +46,18 @@ if ($pfsense_ver_chk == '1.2.3-RELEASE')
 	$pfsense_stable = 'yes';
 }else{
 	$pfsense_stable = 'no';
+}
+
+/* find out what arch where in x86 , x64 */
+/* TODO: should be more clear in this code */
+if ($pfsense_stable == 'no') {
+	$snort_arch_ck = '';
+	exec('uname -m', $snort_arch_ck);
+	if($snort_arch_ck[0] == 'i386') {
+		$snort_arch = 'x86';
+	}else{
+		$snort_arch = 'x64';
+	}
 }
 
 /* tell me my theme */
@@ -627,13 +639,18 @@ function snort_postinstall()
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/sortableTable.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/row_helper.js');
 	
-	/* install barnyard2 for 2.0 and 1.2.3 */
+	/* install barnyard2 for 2.0 x86 x64 and 1.2.3 x86 */
 	chdir ("/usr/local/bin/");
 	if ($pfsense_stable == 'yes') {
-		exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/bin/7.2.x86/barnyard2');
+		exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/bin/7.3.x86/barnyard2');
 	}else{
-		exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/bin/8.0.x86/barnyard2');
+			if ($snort_arch == 'x86') {
+				exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/bin/8.1x86/barnyard2');
+			}else{
+				exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/bin/8.1x64/barnyard2');
+			}
 	}
+	
 	exec('/bin/chmod 755 /usr/local/bin/barnyard2');
 	
 	/* back to default */

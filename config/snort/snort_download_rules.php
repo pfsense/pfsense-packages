@@ -39,8 +39,8 @@ require_once("/usr/local/pkg/snort/snort.inc");
 $tmpfname = "/usr/local/etc/snort/tmp/snort_rules_up";
 $snortdir = "/usr/local/etc/snort";
 $snortdir_wan = "/usr/local/etc/snort";
-$snort_filename_md5 = "snortrules-snapshot-2860.tar.gz.md5";
-$snort_filename = "snortrules-snapshot-2860.tar.gz";
+$snort_filename_md5 = "snortrules-snapshot-2861.tar.gz.md5";
+$snort_filename = "snortrules-snapshot-2861.tar.gz";
 $emergingthreats_filename_md5 = "version.txt";
 $emergingthreats_filename = "emerging.rules.tar.gz";
 $pfsense_rules_filename_md5 = "pfsense_rules.tar.gz.md5";
@@ -527,9 +527,9 @@ if ($snortdownload == 'on')
 		sleep(2);
 		exec('/usr/local/bin/perl /usr/local/bin/snort_rename.pl s/^/snort_/ *.rules');
 		/* extract so rules */
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/i386/2.8.6.0/");
+		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/i386/2.8.6.1/");
 		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
-		exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/i386/2.8.6.0/* /usr/local/lib/snort/dynamicrules/");
+		exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/i386/2.8.6.1/* /usr/local/lib/snort/dynamicrules/");
 		/* extract so rules none bin and rename */
 		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules/" .
 			" so_rules/chat.rules/" .
