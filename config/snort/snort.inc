@@ -643,12 +643,14 @@ function snort_postinstall()
 	chdir ("/usr/local/bin/");
 	if ($pfsense_stable == 'yes') {
 		exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/bin/7.3.x86/barnyard2');
-	}else{
-			if ($snort_arch == 'x86') {
-				exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/bin/8.1x86/barnyard2');
-			}else{
-				exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/bin/8.1x64/barnyard2');
-			}
+	}
+
+	if ($pfsense_stable == 'no' && $snort_arch == 'x86') {
+		exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/bin/8.1x86/barnyard2');
+	}
+	
+	if ($pfsense_stable == 'no' && $snort_arch == 'x64') {
+		exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/bin/8.1x64/barnyard2');
 	}
 	
 	exec('/bin/chmod 755 /usr/local/bin/barnyard2');
