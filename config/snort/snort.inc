@@ -50,14 +50,12 @@ if ($pfsense_ver_chk == '1.2.3-RELEASE')
 
 /* find out what arch where in x86 , x64 */
 /* TODO: should be more clear in this code */
-if ($pfsense_stable == 'no') {
-	$snort_arch_ck = '';
-	exec('uname -m', $snort_arch_ck);
-	if($snort_arch_ck[0] == 'i386') {
-		$snort_arch = 'x86';
-	}else{
-		$snort_arch = 'x64';
-	}
+$snort_arch_ck = '';
+exec('/usr/bin/uname -m', $snort_arch_ck);
+if($snort_arch_ck[0] == 'i386') {
+	$snort_arch = 'x86';
+}else{
+	$snort_arch = 'x64';
 }
 
 /* tell me my theme */
@@ -496,7 +494,7 @@ function post_delete_logs()
 	
 function snort_postinstall()
 {
-	global $config;
+	global $config, $pfsense_stable, $snort_arch;
 	conf_mount_rw();
 	
 	/* snort -> advanced features */
@@ -575,6 +573,11 @@ function snort_postinstall()
 		touch('/var/log/snort/alert');
 	}
 	
+	/* rm barnyard2 important */
+	if(!file_exists('/usr/local/bin/barnyard2')) {
+		exec('/bin/rm /usr/local/bin/barnyard2');
+	}
+	
 	/* important  */
 	exec('/usr/sbin/chown -R snort:snort /var/log/snort');
 	exec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort');
@@ -593,16 +596,6 @@ function snort_postinstall()
 	exec('/bin/chmod 770 /var/log/snort');
 	exec('/bin/chmod 770 /var/log/snort/run');
 	exec('/bin/chmod 770 /var/log/snort/barnyard2');
-
-
-	/* find out if were in 1.2.3-RELEASE */
-	$pfsense_ver_chk = exec('/bin/cat /etc/version');
-	if ($pfsense_ver_chk == '1.2.3-RELEASE')
-	{
-		$pfsense_stable = 'yes';
-	}else{
-		$pfsense_stable = 'no';
-	}
 
 	/* move files around, make it look clean */
 	exec('/bin/mkdir -p /usr/local/www/snort/css');
@@ -641,6 +634,9 @@ function snort_postinstall()
 	
 	/* install barnyard2 for 2.0 x86 x64 and 1.2.3 x86 */
 	chdir ("/usr/local/bin/");
+	
+	update_status(gettext("Installing Barnyard2 for $snort_arch..."));
+	update_output_window(gettext("Please wait..."));
 	if ($pfsense_stable == 'yes') {
 		exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/bin/7.3.x86/barnyard2');
 	}
@@ -652,6 +648,7 @@ function snort_postinstall()
 	if ($pfsense_stable == 'no' && $snort_arch == 'x64') {
 		exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/bin/8.1x64/barnyard2');
 	}
+	update_output_window(gettext("Finnished Installing Barnyard2..."));
 	
 	exec('/bin/chmod 755 /usr/local/bin/barnyard2');
 	
@@ -1731,12 +1728,15 @@ function snort_deinstall()
 	exec('rm -rf /usr/local/etc/snort*');
 	exec('rm -rf /usr/local/pkg/snort*');
 	exec('rm -rf /usr/local/pkg/pf/snort*');
-	//exec("cd /var/db/pkg && pkg_delete `ls | grep barnyard2`");
+
 	exec("cd /var/db/pkg && pkg_delete `ls | grep snort`");
+	exec("cd /var/db/pkg && pkg_delete `ls | grep mysql-client-5.1.50_1`");
+	exec('rm -r /usr/local/bin/barnyard2');
+	
 	/* TODO: figure out how to detect pfsense packages that use the same freebsd pkckages  and not deinstall */
-	//exec("cd /var/db/pkg && pkg_delete `ls | grep mysql`");
-	//exec("cd /var/db/pkg && pkg_delete `ls | grep pcre`");
 	//exec("cd /var/db/pkg && pkg_delete `ls | grep perl`");
+	//exec("cd /var/db/pkg && pkg_delete `ls | grep barnyard2`");	
+	//exec("cd /var/db/pkg && pkg_delete `ls | grep pcre`"); // Never remove pcre or pfsense will break
 
 	/* Remove snort cron entries Ugly code needs smoothness*/
 
