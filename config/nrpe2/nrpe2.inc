@@ -23,7 +23,7 @@
  * 
  */
 
-require('filter.inc');
+require_once('filter.inc');
 
 function nrpe2_custom_php_install_command()
 {
