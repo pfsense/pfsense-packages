@@ -494,8 +494,26 @@ function post_delete_logs()
 	
 function snort_postinstall()
 {
-	global $config, $pfsense_stable, $snort_arch;
+	global $config;
 	conf_mount_rw();
+	
+/* find out if were in 1.2.3-RELEASE */
+$pfsense_ver_chk = exec('/bin/cat /etc/version');
+if ($pfsense_ver_chk == '1.2.3-RELEASE')
+{
+	$pfsense_stable = 'yes';
+}else{
+	$pfsense_stable = 'no';
+}
+
+/* find out what arch where in x86 , x64 */
+$snort_arch_ck = '';
+exec('/usr/bin/uname -m', $snort_arch_ck);
+if($snort_arch_ck[0] == 'i386') {
+	$snort_arch = 'x86';
+}else{
+	$snort_arch = 'x64';
+}
 	
 	/* snort -> advanced features */
 	$bpfbufsize = $config['installedpackages']['snortglobal']['bpfbufsize'];
