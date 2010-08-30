@@ -307,17 +307,10 @@
       <website>http://www.snort.org</website>
       <descr>Used by fortune 500 companies and governments Snort is the most widely deployed IDS/IPS technology worldwide. It features rules based logging and can perform content searching/matching in addition to being used to detect a variety of other attacks and probes, such as buffer overflows, stealth port scans, CGI attacks, SMB probes, and much more.</descr>
       <category>Security</category>
-<<<<<<< HEAD
-      <depends_on_package_base_url>http://www.pfsense.com/packages/config/snort/bin/8.0.x86/</depends_on_package_base_url>
-	  <depends_on_package>pcre-8.02.tbz</depends_on_package>
-	  <depends_on_package>perl-5.10.1_2.tbz</depends_on_package>
-      <depends_on_package>mysql-client-5.0.90.tbz</depends_on_package>
-=======
       <depends_on_package_base_url>http://www.pfsense.com/packages/config/snort/bin/8.1x64/</depends_on_package_base_url>
 	  <depends_on_package>pcre-8.10.tbz</depends_on_package>
 	  <depends_on_package>perl-threaded-5.12.1_1.tbz</depends_on_package>
       <depends_on_package>mysql-client-5.1.50_1.tbz</depends_on_package>
->>>>>>> snort, update binaries for 1.2.3 x86, 2.0 x86, x64, update rule files to match.
 	  <depends_on_package>snort-2.8.6.1.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/devel/pcre</build_port_path>
 	  <build_port_path>/usr/ports/lang/perl5.10</build_port_path>
