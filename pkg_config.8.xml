@@ -813,6 +813,7 @@
       <maintainer>cmb@pfsense.org</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>zabbix-proxy-1.8.2_2,2.tbz</depends_on_package>
+      <depends_on_package>mysql-client-5.1.50_1.tbz</depends_on_package>
     </package>
     <package>
       <name>OpenVPN Client Export Utility</name>
