@@ -174,7 +174,8 @@
 			$lt[] = "{$wt}={$wv}";
 		}
 		file_put_contents("/boot/loader.conf", implode("\n", $lt) . "\n");
-
+		chmod("/var/log/zabbix", 0777);
+		chmod("/var/run/zabbix", 0777);
 		conf_mount_ro();
 
     ]]>
