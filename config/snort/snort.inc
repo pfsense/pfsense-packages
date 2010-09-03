@@ -1837,10 +1837,9 @@ snort_rules_up_deinstall_cron("");
 	conf_mount_rw();
 	
 	exec('rm -rf /usr/local/www/snort');
-	exec('rm -rf /usr/local/pkg/snort');
 	exec('rm -rf /usr/local/lib/snort/');
 	exec('rm -rf /var/log/snort/');
-	exec('rm -rf /usr/local/pkg/snort*');
+	exec('rm -rf /usr/local/pkg/snort');
 	
 	conf_mount_ro();
 

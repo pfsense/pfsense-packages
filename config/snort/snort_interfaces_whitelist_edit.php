@@ -105,7 +105,7 @@ if (isset($id) && $a_whitelist[$id]) {
 	if ($_POST['apply']) {
 		
 		if (file_exists("$d_snort_whitelist_dirty_path")) {
-			
+			conf_mount_rw();
 			write_config();
 			
 			sync_snort_package_config();
@@ -118,6 +118,8 @@ if (isset($id) && $a_whitelist[$id]) {
 	}
 
 if ($_POST['submit']) {
+
+	conf_mount_rw();
 
 	unset($input_errors);
 	$pconfig = $_POST;
@@ -259,7 +261,7 @@ echo $snort_general_css;
 
 <div class="body2">
 
-<script type="text/javascript" src="./javascript/row_helper.js"></script>
+<script type="text/javascript" src="/snort/javascript/row_helper.js"></script>
 
 <input type='hidden' name='address_type' value='textbox' />
 <script type="text/javascript">
@@ -354,6 +356,12 @@ echo $snort_general_css;
 	<tr>
 	<td width="22%" valign="top" class="vncell2">List Type</td>
 	<td width="78%" class="vtable">
+	
+      		    <div style="padding:5px; margin-top: 16px; margin-bottom: 16px; border:1px dashed #ff3333; background-color: #eee; color: #000; font-size: 8pt;" id="itemhelp">
+      		    <strong>WHITELIST:</strong>&nbsp;&nbsp;&nbsp;This list specifies addresses that Snort Package should not block.<br><br>
+				<strong>NETLIST:</strong>&nbsp;&nbsp;&nbsp;This list is for defining addresses as $HOME_NET or $EXTERNAL_NET in the snort.conf file.
+				</div>
+	
 		<select name="snortlisttype" class="formfld" id="snortlisttype">
 			<?php
 				$interfaces4 = array('whitelist' => 'WHITELIST', 'netlist' => 'NETLIST');
@@ -362,9 +370,10 @@ echo $snort_general_css;
 				<?=htmlspecialchars($ifacename4);?>
 				</option>
 			<?php endforeach; ?>
-		</select><br>
-		<span class="vexpl">Choose the type of list you will like see in your Interface Edit Tab.&nbsp;Hint: Best pratice is to test every list you make.
-		</span>&nbsp;<span class="red">Note:</span>&nbsp;NETLIST's are only for defining snort.conf's external or home NETS.</td>
+		</select>
+		<span class="vexpl">
+		&nbsp;&nbsp;&nbsp;Choose the type of list you will like see in your <span class="red">Interface Edit Tab</span>.
+		</span></td>
 	</tr>
     <tr>
         <td colspan="2" valign="top" class="listtopic">Add auto generated ips.</td>
@@ -424,8 +433,10 @@ echo $snort_general_css;
         <tbody>
           <tr>
             <td colspan="4">
-      		    <div style="padding:5px; margin-top: 16px; margin-bottom: 16px; border:1px dashed #000066; background-color: #ffffff; color: #000000; font-size: 8pt;" id="itemhelp">
-      		    Enter only ips and CIDRs, do not enter CIDRs for whitelists. Example: 192.168.4.1 or 192.168.4.0/24</div>
+      		    <div style="padding:5px; margin-top: 16px; margin-bottom: 16px; border:1px dashed #ff3333; background-color: #eee; color: #000; font-size: 8pt;" id="itemhelp">
+      		    For <strong>WHITELIST's</strong> enter <strong>ONLY IPs not CIDRs</strong>. Example: 192.168.4.1<br><br>
+				For <strong>NETLIST's</strong> you may enter <strong>IPs and CIDRs</strong>. Example: 192.168.4.1 or 192.168.4.0/24
+				</div>
             </td>
           </tr>
           <tr>
@@ -487,10 +498,12 @@ echo $snort_general_css;
 
 <script type="text/javascript">
 	/* row and col adjust when you add extra entries */
-	field_counter_js = 2;
+	
+	field_counter_js = 3;
 	rows = 1;
 	totalrows = <?php echo $counter; ?>;
 	loaded = <?php echo $counter; ?>;
+	
 </script>
 
 </div>
