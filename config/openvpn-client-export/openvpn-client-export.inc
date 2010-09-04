@@ -126,6 +126,9 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 		$cert =& $user['cert'][$crtid];
 		if (!$cert)
 			return false;
+		// If $cert is not an array, it's a certref not a cert.
+		if (!is_array($cert))
+			$cert = lookup_cert($cert);
 	} else
 		$nokeys = true;
 
@@ -288,6 +291,9 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 		$cert =& $user['cert'][$crtid];
 		if (!$cert)
 			return false;
+		// If $cert is not an array, it's a certref not a cert.
+		if (!is_array($cert))
+			$cert = lookup_cert($cert);
 	} else
 		$nokeys = true;
 
@@ -401,6 +407,9 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 		$cert =& $user['cert'][$crtid];
 		if (!$cert)
 			return false;
+		// If $cert is not an array, it's a certref not a cert.
+		if (!is_array($cert))
+			$cert = lookup_cert($cert);
 	}
 
 	// create template directory

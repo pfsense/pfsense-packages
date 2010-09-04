@@ -47,16 +47,20 @@ if (!is_array($config['system']['user']))
 $a_user = $config['system']['user'];
 
 $ras_server = array();
-foreach($a_server as $sindex => & $server) {
+foreach($a_server as $sindex => $server) {
 	if (isset($server['disable']))
 		continue;
 	$ras_user = array();
 	if (stripos($server['mode'], "server") === false)
 		continue;
-	foreach($a_user as $uindex => & $user) {
+	foreach($a_user as $uindex => $user) {
 		if (!is_array($user['cert']))
 			continue;
-		foreach($user['cert'] as $cindex => & $cert) {
+		foreach($user['cert'] as $cindex => $cert) {
+			// If $cert is not an array, it's a certref not a cert.
+			if (!is_array($cert))
+				$cert = lookup_cert($cert);
+
 			if ($cert['caref'] != $server['caref'])
 				continue;
 			$ras_userent = array();
