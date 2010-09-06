@@ -679,12 +679,12 @@ if($snort_arch_ck[0] == 'i386') {
 	
 	
 	/* install perl-threaded */
-	if(!file_exists('/root/tmp2'))
+	if(!file_exists('/tmp/pkg_s'))
 	{
-		exec('/bin/mkdir -p /root/tmp2');
+		exec('/bin/mkdir -p /tmp/pkg_s');
 	}
 	
-	chdir ("/root/tmp2");
+	chdir ('/tmp/pkg_s');
 	
 	update_status(gettext("Installing perl-threaded for $snort_arch..."));
 	update_output_window(gettext("Please wait downloading..."));
@@ -700,20 +700,20 @@ if($snort_arch_ck[0] == 'i386') {
 		exec('/usr/bin/fetch http://files.pfsense.org/packages/snort/8.1x64/perl-threaded-5.12.1_1.tbz');
 	}
 
-	update_status(gettext("Installing perl-threaded for $snort_arch..."));
 	update_output_window(gettext("Please wait Installing..."));
-	if(file_exists('/root/tmp2/perl-threaded-5.12.1_1.tbz')){
-		exec('/usr/sbin/pkg_add /root/tmp2/perl-threaded-5.12.1_1.tbz');
+	if(file_exists('/tmp/pkg_s/perl-threaded-5.12.1_1.tbz')){
+		exec('/usr/sbin/pkg_add -f /tmp/pkg_s/perl-threaded-5.12.1_1.tbz');
 	}
 	
-	if(file_exists('/root/tmp2/')){
-		exec('/bin/rm -r /root/tmp2/');
+	update_output_window(gettext("Please wait Cleaning Up..."));
+	if(file_exists('/tmp/pkg_s/')){
+		exec('/bin/rm -r /tmp/pkg_s/');
 	}	
 	
 	update_output_window(gettext("Finnished Installing perl-threaded..."));	
 	
 	/* back to default */
-	chdir ("/root/");
+	chdir ('/root/');
 	
 	/* make sure snort-old is deinstalled */
 	/* remove when snort-old is removed */
