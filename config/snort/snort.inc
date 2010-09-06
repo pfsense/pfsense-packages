@@ -655,6 +655,7 @@ if($snort_arch_ck[0] == 'i386') {
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/mootools.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/sortableTable.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/row_helper.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/prototype.js');
 	
 	/* install barnyard2 for 2.0 x86 x64 and 1.2.3 x86 */
 	chdir ("/usr/local/bin/");
