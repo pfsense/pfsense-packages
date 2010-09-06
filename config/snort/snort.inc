@@ -706,7 +706,7 @@ if($snort_arch_ck[0] == 'i386') {
 		exec('/usr/sbin/pkg_add /root/tmp2/perl-threaded-5.12.1_1.tbz');
 	}
 	
-	if(!file_exists('/root/tmp2/')){
+	if(file_exists('/root/tmp2/')){
 		exec('/bin/rm -r /root/tmp2/');
 	}	
 	
