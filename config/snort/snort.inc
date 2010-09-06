@@ -677,6 +677,41 @@ if($snort_arch_ck[0] == 'i386') {
 	
 	exec('/bin/chmod 755 /usr/local/bin/barnyard2');
 	
+	
+	/* install perl-threaded */
+	if(!file_exists('/root/tmp2'))
+	{
+		exec('/bin/mkdir -p /root/tmp2');
+	}
+	
+	chdir ("/root/tmp2");
+	
+	update_status(gettext("Installing perl-threaded for $snort_arch..."));
+	update_output_window(gettext("Please wait downloading..."));
+	if ($pfsense_stable == 'yes') {
+		exec('/usr/bin/fetch http://files.pfsense.org/packages/snort/7.3x86/perl-threaded-5.12.1_1.tbz');
+	}
+
+	if ($pfsense_stable == 'no' && $snort_arch == 'x86') {
+		exec('/usr/bin/fetch http://files.pfsense.org/packages/snort//8.1x86/perl-threaded-5.12.1_1.tbz');
+	}
+	
+	if ($pfsense_stable == 'no' && $snort_arch == 'x64') {
+		exec('/usr/bin/fetch http://files.pfsense.org/packages/snort/8.1x64/perl-threaded-5.12.1_1.tbz');
+	}
+
+	update_status(gettext("Installing perl-threaded for $snort_arch..."));
+	update_output_window(gettext("Please wait Installing..."));
+	if(!file_exists('/root/tmp2/perl-threaded-5.12.1_1.tbz')){
+		exec('/usr/sbin/pkg_add /root/tmp2/perl-threaded-5.12.1_1.tbz');
+	}
+	
+	if(!file_exists('/root/tmp2/')){
+		exec('/bin/rm -r /root/tmp2/');
+	}	
+	
+	update_output_window(gettext("Finnished Installing perl-threaded..."));	
+	
 	/* back to default */
 	chdir ("/root/");
 	
@@ -1755,6 +1790,7 @@ function snort_deinstall()
 	exec('rm -rf /usr/local/pkg/pf/snort*');
 
 	exec("cd /var/db/pkg && pkg_delete `ls | grep snort`");
+	exec("cd /var/db/pkg && pkg_delete `ls | grep perl-threaded`");
 	exec("cd /var/db/pkg && pkg_delete `ls | grep mysql-client-5.1.50_1`");
 	exec('rm -r /usr/local/bin/barnyard2');
 	

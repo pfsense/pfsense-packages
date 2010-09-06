@@ -406,7 +406,6 @@
       <category>Security</category>
       <depends_on_package_base_url>http://www.pfsense.com/packages/config/snort/bin/7.3.x86/</depends_on_package_base_url>
 	  <depends_on_package>pcre-8.10.tbz</depends_on_package>
-	  <depends_on_package>perl-threaded-5.12.1_1.tbz</depends_on_package>
       <depends_on_package>mysql-client-5.1.50_1.tbz</depends_on_package>
 	  <depends_on_package>snort-2.8.6.1.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
