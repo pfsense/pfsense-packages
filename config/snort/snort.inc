@@ -37,7 +37,7 @@ require_once("functions.inc");
 require_once("filter.inc");
 
 /* package version */
-$snort_package_version = 'Snort 2.8.6.1 pkg v. 1.33';
+$snort_package_version = 'Snort 2.8.6.1 pkg v. 1.34';
 
 /* find out if were in 1.2.3-RELEASE */
 $pfsense_ver_chk = exec('/bin/cat /etc/version');
@@ -546,6 +546,7 @@ if($snort_arch_ck[0] == 'i386') {
 	{
 		exec('/bin/rm /usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example*');
 	}
+	
 
 	/* add snort user and group note: 920 keep the numbers < 2000, above this is reserved in pfSense 2.0 */
 	exec('/usr/sbin/pw groupadd snort -g 920');
@@ -576,6 +577,11 @@ if($snort_arch_ck[0] == 'i386') {
 	if(!file_exists('/var/log/snort/barnyard2'))
 	{
 		exec('/bin/mkdir -p /var/log/snort/barnyard2/');
+	}
+
+	if(!file_exists('/usr/local/lib/snort/dynamicrules/'))
+	{
+		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
 	}
 	
 	if(!file_exists('/var/db/whitelist'))

@@ -106,12 +106,15 @@ if (isset($id) && $a_whitelist[$id]) {
 		
 		if (file_exists("$d_snort_whitelist_dirty_path")) {
 			conf_mount_rw();
-			write_config();
 			
-			sync_snort_package_config();
+			/* create whitelist and homenet file  then sync files */
+			sync_snort_package_empty();
 			sync_snort_package();
 
 			unlink("$d_snort_whitelist_dirty_path");
+			
+			write_config();
+			conf_mount_ro();
 			
 		}
 		
@@ -233,6 +236,7 @@ if ($_POST['submit']) {
                 $pconfig['address'] = $address;
 				$pconfig['detail'] = $final_address_details;
 	}
+	
 }
 
 $pgtitle = "Services: Snort: Whitelist: Edit $whitelist_uuid";

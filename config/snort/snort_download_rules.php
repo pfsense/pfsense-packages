@@ -526,12 +526,15 @@ if ($snortdownload == 'on')
 		chdir ("/usr/local/etc/snort/rules");
 		sleep(2);
 		exec('/usr/local/bin/perl /usr/local/bin/snort_rename.pl s/^/snort_/ *.rules');
-		/* extract so rules */
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/i386/2.8.6.1/");
-		exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
-		exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/i386/2.8.6.1/* /usr/local/lib/snort/dynamicrules/");
-		/* extract so rules none bin and rename */
-		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules/" .
+		
+		/* extract so rules on for x86 for now */
+		/* TODO: ask snort.org to build x64 version of so rules for Freebsd 8.1 Sept 05,2010 */
+		if($snort_arch == 'x86'){
+			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/i386/2.8.6.1/");
+			exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
+			exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/i386/2.8.6.1/* /usr/local/lib/snort/dynamicrules/");
+			/* extract so rules none bin and rename */
+			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules/" .
 			" so_rules/chat.rules/" .
 			" so_rules/dos.rules/" .
 			" so_rules/exploit.rules/" .
@@ -549,24 +552,25 @@ if ($snortdownload == 'on')
 			" so_rules/web-iis.rules/" .
 			" so_rules/web-misc.rules/");
 		
-		exec("/bin/mv -f {$snortdir}/so_rules/bad-traffic.rules {$snortdir}/rules/snort_bad-traffic.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/chat.rules {$snortdir}/rules/snort_chat.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/dos.rules {$snortdir}/rules/snort_dos.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/exploit.rules {$snortdir}/rules/snort_exploit.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/icmp.rules {$snortdir}/rules/snort_icmp.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/imap.rules {$snortdir}/rules/snort_imap.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/misc.rules {$snortdir}/rules/snort_misc.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/multimedia.rules {$snortdir}/rules/snort_multimedia.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/netbios.rules {$snortdir}/rules/snort_netbios.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/nntp.rules {$snortdir}/rules/snort_nntp.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/p2p.rules {$snortdir}/rules/snort_p2p.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/smtp.rules {$snortdir}/rules/snort_smtp.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/sql.rules {$snortdir}/rules/snort_sql.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/web-activex.rules {$snortdir}/rules/snort_web-activex.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/web-client.rules {$snortdir}/rules/snort_web-client.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/web-iis.rules {$snortdir}/rules/snort_web-iis.so.rules");
-		exec("/bin/mv -f {$snortdir}/so_rules/web-misc.rules {$snortdir}/rules/snort_web-misc.so.rules");
-		exec("/bin/rm -r {$snortdir}/so_rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/bad-traffic.rules {$snortdir}/rules/snort_bad-traffic.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/chat.rules {$snortdir}/rules/snort_chat.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/dos.rules {$snortdir}/rules/snort_dos.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/exploit.rules {$snortdir}/rules/snort_exploit.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/icmp.rules {$snortdir}/rules/snort_icmp.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/imap.rules {$snortdir}/rules/snort_imap.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/misc.rules {$snortdir}/rules/snort_misc.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/multimedia.rules {$snortdir}/rules/snort_multimedia.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/netbios.rules {$snortdir}/rules/snort_netbios.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/nntp.rules {$snortdir}/rules/snort_nntp.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/p2p.rules {$snortdir}/rules/snort_p2p.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/smtp.rules {$snortdir}/rules/snort_smtp.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/sql.rules {$snortdir}/rules/snort_sql.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/web-activex.rules {$snortdir}/rules/snort_web-activex.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/web-client.rules {$snortdir}/rules/snort_web-client.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/web-iis.rules {$snortdir}/rules/snort_web-iis.so.rules");
+			exec("/bin/mv -f {$snortdir}/so_rules/web-misc.rules {$snortdir}/rules/snort_web-misc.so.rules");
+			exec("/bin/rm -r {$snortdir}/so_rules");
+		}
 		
 		/* extract base etc files */
 		exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} etc/");
@@ -824,6 +828,12 @@ function oinkmaster_run($id, $if_real, $iface_uuid)
 
 		/*  might have to add a sleep for 3sec for flash drives or old drives */
 		exec("/usr/local/bin/perl /usr/local/bin/oinkmaster.pl -C /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/oinkmaster_{$iface_uuid}_{$if_real}.conf -o /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules > /usr/local/etc/snort/oinkmaster_{$iface_uuid}_{$if_real}.log");
+
+			/* TODO: Remove this code when x64 so rules are ready */
+			if($snort_arch == 'x64'){
+				exec("/bin/rm -r /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/*.so.rules");
+			}
+		
 		}
 	}
 }
