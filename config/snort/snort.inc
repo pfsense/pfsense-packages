@@ -702,7 +702,7 @@ if($snort_arch_ck[0] == 'i386') {
 
 	update_status(gettext("Installing perl-threaded for $snort_arch..."));
 	update_output_window(gettext("Please wait Installing..."));
-	if(!file_exists('/root/tmp2/perl-threaded-5.12.1_1.tbz')){
+	if(file_exists('/root/tmp2/perl-threaded-5.12.1_1.tbz')){
 		exec('/usr/sbin/pkg_add /root/tmp2/perl-threaded-5.12.1_1.tbz');
 	}
 	
