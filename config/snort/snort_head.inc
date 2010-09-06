@@ -72,12 +72,12 @@ $pagetitle = gentitle( $pgtitle );
 			echo "\t<script type=\"text/javascript\" src=\"/snort/javascript/sortableTable.js\"></script>\n";
 		}	
 		
-		if ($snort_load_pfjavascript_defaults == 'yes') {
-			echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/prototype.js\"></script>\n";
-			echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/scriptaculous.js\"></script>\n";
-			echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/effects.js\"></script>\n";
-			echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/dragdrop.js\"></script>\n";
-		}
+		/* some pfsense commercial versions require these to be in every tab on the GUI, overwrite GUI */
+		echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/prototype.js\"></script>\n";
+		echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/scriptaculous.js\"></script>\n";
+		echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/effects.js\"></script>\n";
+		echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/dragdrop.js\"></script>\n";
+		
 		//if(file_exists("{$g['www_path']}/javascript/global.js"))
 			//echo "\t<script type=\"text/javascript\" src=\"../javascript/global.js\"></script>\n";
 	/*
