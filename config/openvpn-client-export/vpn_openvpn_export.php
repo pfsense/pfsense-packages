@@ -168,10 +168,8 @@ if($act == "conf" || $act == "confall") {
 			$exp_size = strlen($exp_data);
 		}
 
-		if (isset($_SERVER['HTTPS'])) {
-			header('Pragma: ');
-			header('Cache-Control: ');
-		}
+		header('Pragma: ');
+		header('Cache-Control: ');
 		header("Content-Type: application/octet-stream");
 		header("Content-Disposition: attachment; filename={$exp_name}");
 		header("Content-Length: $exp_size");
@@ -246,10 +244,8 @@ if($act == "visc") {
 	if (!$error) {
 		$exp_size = filesize($exp_path);
 
-		if (isset($_SERVER['HTTPS'])) {
-			header('Pragma: ');
-			header('Cache-Control: ');
-		}
+		header('Pragma: ');
+		header('Cache-Control: ');
 		header("Content-Type: application/octet-stream");
 		header("Content-Disposition: attachment; filename={$exp_name}");
 		header("Content-Length: $exp_size");
@@ -320,10 +316,8 @@ if($act == "inst") {
 	if (!$error) {
 		$exp_size = filesize($exp_path);
 
-		if (isset($_SERVER['HTTPS'])) {
-			header('Pragma: ');
-			header('Cache-Control: ');
-		}
+		header('Pragma: ');
+		header('Cache-Control: ');
 		header("Content-Type: application/octet-stream");
 		header("Content-Disposition: attachment; filename={$exp_name}");
 		header("Content-Length: $exp_size");
