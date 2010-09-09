@@ -819,7 +819,7 @@
       <descr>Allows a pre-configured OpenVPN Windows Client or  or Mac OSX's Viscosity configuration bundle to be exported directly from pfSense.</descr>
       <category>Security</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-      <depends_on_package>p7zip-9.04.tbz</depends_on_package>
+      <depends_on_package>p7zip-9.13.tbz</depends_on_package>
       <depends_on_package>zip-3.0.tbz</depends_on_package>
 	<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 	<build_port_path>/usr/ports/archivers/zip</build_port_path>
