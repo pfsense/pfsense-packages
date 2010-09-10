@@ -1,3 +1,9 @@
+<?php
+
+	require_once("guiconfig.inc");
+
+echo '
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -196,7 +202,7 @@ Please do not cross post questions between the forum and mailing list, unless yo
 </p>
 
 <p>
-Please do not email individuals, the coreteam address, or private message people on the forum to ask questions. We provide a wide variety of means for obtaining help in a public forum, where it helps others who have the same questions in the future. We don't have enough time to answer all the questions our users post in the public forums, much less via email and private messages. Since we cannot possibly reply to everyone's email and private messages, to be fair we will not reply to anyone. Individual attention via phone and email support is available for commercial support customers. 
+Please do not email individuals, the coreteam address, or private message people on the forum to ask questions. We provide a wide variety of means for obtaining help in a public forum, where it helps others who have the same questions in the future. We don\'t have enough time to answer all the questions our users post in the public forums, much less via email and private messages. Since we cannot possibly reply to everyone\'s email and private messages, to be fair we will not reply to anyone. Individual attention via phone and email support is available for commercial support customers. 
 </p>          
         </div>
 		
@@ -205,13 +211,13 @@ Please do not email individuals, the coreteam address, or private message people
 			
             <p><font size="5"><strong>Heros</strong></font></p>
 			
-            <p>Pfsense Snort Package users who have cared enough to donate to this project. I can't thank you enough for all your help. With-out your support I would have stoped long time ago.</p>
+            <p>Pfsense Snort Package users who have cared enough to donate to this project. I can\'t thank you enough for all your help. With-out your support I would have stoped long time ago.</p>
 			
 			<p>If your not on this list PM me and I will add you. If you would like to be removed pm me and I will remove you.</p>
 			
 			<p><font size="5"><strong>Names</strong></font></p>
 			
-			<p>Sandro Tavella</p>
+			<p>sandro tavella</p>
 			<p>João Kemp Filho</p>
 			<p>Julio Fumoso</p>
 			<p>Rolland Hart</p>
@@ -235,3 +241,7 @@ Please do not email individuals, the coreteam address, or private message people
 
 </body>
 </html>
+
+';
+
+?>
