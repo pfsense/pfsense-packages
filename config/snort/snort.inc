@@ -703,7 +703,7 @@ function snort_postinstall()
 
 	update_output_window(gettext("Please wait Installing..."));
 	if(file_exists('/tmp/pkg_s/perl-threaded-5.12.1_1.tbz')){
-		exec('/usr/sbin/pkg_add -f /tmp/pkg_s/perl-threaded-5.12.1_1.tbz');
+		exec('/usr/sbin/pkg_add -fv /tmp/pkg_s/perl-threaded-5.12.1_1.tbz');
 	}
 
 	update_output_window(gettext("Please wait Cleaning Up..."));
