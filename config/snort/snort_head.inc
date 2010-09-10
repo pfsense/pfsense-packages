@@ -1,16 +1,16 @@
 <?php
 /*
-	pfSense_MODULE:	header
-*/
+ pfSense_MODULE:	header
+ */
 
-/* 
+/*
  *   if user has selected a custom template, use it.
  *   otherwise default to pfsense tempalte
  */
 if($config['theme'] <> "")
-	$g['theme'] = $config['theme'];
+$g['theme'] = $config['theme'];
 else
-	$g['theme'] = "pfsense";
+$g['theme'] = "pfsense";
 
 /*
  *  If this device is an apple ipod/iphone
@@ -18,8 +18,8 @@ else
  */
 $apple_ua = array("iPhone","iPod", "iPad");
 foreach($apple_ua as $useragent)
-	if(strstr($_SERVER['HTTP_USER_AGENT'], $useragent))
-		$g['theme'] = "pfsense";
+if(strstr($_SERVER['HTTP_USER_AGENT'], $useragent))
+$g['theme'] = "pfsense";
 
 $pagetitle = gentitle( $pgtitle );
 
@@ -28,80 +28,86 @@ $pagetitle = gentitle( $pgtitle );
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-	<title><?php echo($config['system']['hostname'] . "." . $config['system']['domain'] . " - " . $pagetitle); ?></title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-	<link rel="apple-touch-icon" href="/themes/<?php echo $g['theme']; ?>/apple-touch-icon.png"/>
-        <?php if (strpos($_SERVER["SCRIPT_FILENAME"], "wizard.php") !== false &&
-                  file_exists("{$g['www_path']}/themes/{$g['theme']}/wizard.css")): ?>
-					<?php echo "<style type=\"text/css\" src=\"/themes/{$g['theme']}/wizard.css\"></style>"; ?>
-        <?php else: ?>
-        	<link rel="stylesheet" href="/themes/<?php echo $g['theme']; ?>/all.css" media="all" />
-        <?php endif; ?>
-		<link rel="stylesheet" type="text/css" href="../niftycssCode.css">
-		<link rel="stylesheet" type="text/css" href="../niftycssprintCode.css" media="print">
-		
-		<link rel="stylesheet" type="text/css" href="./css/new_tab_menu.css" media="all">
-		<link rel="stylesheet" type="text/css" href="./css/sexybuttons.css" media="all"/>
-		<link rel="stylesheet" type="text/css" href="./css/colorbox.css" media="all"/>
-		<link rel="stylesheet" type="text/css" href="./css/style.css" media="all"/>
-		
-		
-		<script type="text/javascript" src="../javascript/niftyjsCode.js"></script>
-		<script type="text/javascript">
-			var theme = "<?php echo $g['theme']; ?>";
-		</script>
-		<?php echo "\t<script type=\"text/javascript\" src=\"/themes/{$g['theme']}/loader.js\"></script>\n"; ?>
-<?php
-		if($_GET['enablefirebuglite']) {
-			echo "\t<script type=\"text/javascript\" src=\"/javascript/pi.js\"></script>\n";
-			echo "\t<script type=\"text/javascript\" src=\"/javascript/firebug-lite.js\"></script>\n";
-		}
-		
-		/* only load javascript that you need, jquery and prototype dont play together */
-		//if ($snort_load_jquery == 'yes') {
-			echo "\t<script type=\"text/javascript\" src=\"/snort/javascript/jquery-1.4.2.min.js\"></script>\n";
-		//}
-		//if ($snort_load_jquery_colorbox == 'yes') {
-			echo "\t<script type=\"text/javascript\" src=\"/snort/javascript/jquery.colorbox.js\"></script>\n";
-			echo "\t<script type=\"text/javascript\" src=\"/javascript/sorttable.js\"></script>\n";
-		//}
-		if ($snort_load_mootools == 'yes') {
-			echo "\t<script type=\"text/javascript\" src=\"/snort/javascript/mootools.js\"></script>\n";
-		}		
-		if ($snort_load_sortabletable == 'yes') {
-			echo "\t<script type=\"text/javascript\" src=\"/snort/javascript/sortableTable.js\"></script>\n";
-		}	
-		
-		/* some pfsense commercial versions require prototype to be in every tab on the GUI, for custom logos */
-		echo "\t<script type=\"text/javascript\" src=\"/snort/javascript/prototype.js\"></script>\n";
-		// echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/prototype.js\"></script>\n";
-		// echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/scriptaculous.js\"></script>\n";
-		// echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/effects.js\"></script>\n";
-		// echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/dragdrop.js\"></script>\n";
-		
-		if(file_exists("{$g['www_path']}/javascript/global.js"))
-			echo "\t<script type=\"text/javascript\" src=\"../javascript/global.js\"></script>\n";
-	/*
-	 *	Find all javascript files that need to be included
-	 *	for this page ... from the arrays ... :)
-	 *	Coded by: Erik Kristensen
-	 */
+<title><?php echo($config['system']['hostname'] . "." . $config['system']['domain'] . " - " . $pagetitle); ?></title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<link rel="apple-touch-icon"
+	href="/themes/<?php echo $g['theme']; ?>/apple-touch-icon.png" />
+<?php if (strpos($_SERVER["SCRIPT_FILENAME"], "wizard.php") !== false &&
+file_exists("{$g['www_path']}/themes/{$g['theme']}/wizard.css")): ?>
+<?php echo "<style type=\"text/css\" src=\"/themes/{$g['theme']}/wizard.css\"></style>"; ?>
+<?php else: ?>
+<link rel="stylesheet" href="/themes/<?php echo $g['theme']; ?>/all.css"
+	media="all" />
+<?php endif; ?>
+<link rel="stylesheet" type="text/css" href="../niftycssCode.css">
+<link rel="stylesheet" type="text/css" href="../niftycssprintCode.css"
+	media="print">
 
-	$dir  = trim(basename($_SERVER["SCRIPT_FILENAME"]), '.php');
-	$path = "{$g['www_path']}/javascript/" . $dir . "/";
-	if (is_dir($path)) {
-		if ($dh = opendir($path)) {
-			while (($file = readdir($dh)) !== false) {
-		   		if (is_dir($file)) 
-					continue;
-				echo "\t<script type=\"text/javascript\" src=\"/javascript/{$dir}/{$file}\"></script>\n";
-			}
-			closedir($dh);
+<link rel="stylesheet" type="text/css" href="./css/new_tab_menu.css"
+	media="all">
+<link rel="stylesheet" type="text/css" href="./css/sexybuttons.css"
+	media="all" />
+<link rel="stylesheet" type="text/css" href="./css/colorbox.css"
+	media="all" />
+<link rel="stylesheet" type="text/css" href="./css/style.css"
+	media="all" />
+
+
+<script type="text/javascript" src="../javascript/niftyjsCode.js"></script>
+<script type="text/javascript">
+			var theme = "<?php echo $g['theme']; ?>";
+		</script> <?php echo "\t<script type=\"text/javascript\" src=\"/themes/{$g['theme']}/loader.js\"></script>\n"; ?>
+<?php
+if($_GET['enablefirebuglite']) {
+	echo "\t<script type=\"text/javascript\" src=\"/javascript/pi.js\"></script>\n";
+	echo "\t<script type=\"text/javascript\" src=\"/javascript/firebug-lite.js\"></script>\n";
+}
+
+/* only load javascript that you need, jquery and prototype dont play together */
+//if ($snort_load_jquery == 'yes') {
+echo "\t<script type=\"text/javascript\" src=\"/snort/javascript/jquery-1.4.2.min.js\"></script>\n";
+//}
+//if ($snort_load_jquery_colorbox == 'yes') {
+echo "\t<script type=\"text/javascript\" src=\"/snort/javascript/jquery.colorbox.js\"></script>\n";
+echo "\t<script type=\"text/javascript\" src=\"/javascript/sorttable.js\"></script>\n";
+//}
+if ($snort_load_mootools == 'yes') {
+	echo "\t<script type=\"text/javascript\" src=\"/snort/javascript/mootools.js\"></script>\n";
+}
+if ($snort_load_sortabletable == 'yes') {
+	echo "\t<script type=\"text/javascript\" src=\"/snort/javascript/sortableTable.js\"></script>\n";
+}
+
+/* some pfsense commercial versions require prototype to be in every tab on the GUI, for custom logos */
+echo "\t<script type=\"text/javascript\" src=\"/snort/javascript/prototype.js\"></script>\n";
+// echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/prototype.js\"></script>\n";
+// echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/scriptaculous.js\"></script>\n";
+// echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/effects.js\"></script>\n";
+// echo "\t<script type=\"text/javascript\" src=\"../javascript/scriptaculous/dragdrop.js\"></script>\n";
+
+if(file_exists("{$g['www_path']}/javascript/global.js"))
+echo "\t<script type=\"text/javascript\" src=\"../javascript/global.js\"></script>\n";
+/*
+ *	Find all javascript files that need to be included
+ *	for this page ... from the arrays ... :)
+ *	Coded by: Erik Kristensen
+ */
+
+$dir  = trim(basename($_SERVER["SCRIPT_FILENAME"]), '.php');
+$path = "{$g['www_path']}/javascript/" . $dir . "/";
+if (is_dir($path)) {
+	if ($dh = opendir($path)) {
+		while (($file = readdir($dh)) !== false) {
+			if (is_dir($file))
+			continue;
+			echo "\t<script type=\"text/javascript\" src=\"/javascript/{$dir}/{$file}\"></script>\n";
 		}
+		closedir($dh);
 	}
+}
 
 if (!isset($closehead))
-	echo "</head>";
+echo "</head>";
 
 /*  If this page is being remotely managed then do not allow the loading of the contents. */
 if($config['remote_managed_pages']['item']) {
@@ -112,7 +118,7 @@ if($config['remote_managed_pages']['item']) {
 			include("fend.inc");
 			exit;
 		}
-	}	
+	}
 }
 
 ?>

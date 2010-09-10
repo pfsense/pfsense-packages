@@ -1,38 +1,38 @@
 <?php
 /* $Id$ */
 /*
-	snort_alerts.php
-	part of pfSense
+ snort_alerts.php
+ part of pfSense
 
-	Copyright (C) 2005 Bill Marquette <bill.marquette@gmail.com>.
-	Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
-	Copyright (C) 2006 Scott Ullrich
-	All rights reserved.
-	
-	Modified for the Pfsense snort package v. 1.8+
-	Copyright (C) 2009 Robert Zelaya Sr. Developer
+ Copyright (C) 2005 Bill Marquette <bill.marquette@gmail.com>.
+ Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+ Copyright (C) 2006 Scott Ullrich
+ All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions are met:
+ Modified for the Pfsense snort package v. 1.8+
+ Copyright (C) 2009 Robert Zelaya Sr. Developer
 
-	1. Redistributions of source code must retain the above copyright notice,
-	   this list of conditions and the following disclaimer.
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
 
-	2. Redistributions in binary form must reproduce the above copyright
-	   notice, this list of conditions and the following disclaimer in the
-	   documentation and/or other materials provided with the distribution.
+ 1. Redistributions of source code must retain the above copyright notice,
+ this list of conditions and the following disclaimer.
 
-	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-	POSSIBILITY OF SUCH DAMAGE.
-*/
+ 2. Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+
+ THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+ */
 
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
@@ -65,28 +65,28 @@ if ($_POST['save'])
 	if ($_POST['save'])
 	{
 
-	//	if (($_POST['radiusacctport'] && !is_port($_POST['radiusacctport']))) {
-	//		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusacctport']."]";
-	//	}
-	
+		//	if (($_POST['radiusacctport'] && !is_port($_POST['radiusacctport']))) {
+		//		$input_errors[] = "A valid port number must be specified. [".$_POST['radiusacctport']."]";
+		//	}
+
 	}
-		
-		/* no errors */
-		if (!$input_errors)
-		{
-		
+
+	/* no errors */
+	if (!$input_errors)
+	{
+
 		$config['installedpackages']['snortglobal']['alertsblocks']['arefresh'] = $_POST['arefresh'] ? on : off;
 		$config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'] = $_POST['alertnumber'];
-		
+
 		conf_mount_rw();
 		write_config();
 		//conf_mount_ro();
 		sleep(2);
 			
 		header("Location: /snort/snort_alerts.php");
-				
-		}
-		
+
+	}
+
 }
 
 if ($_POST['delete'])
@@ -99,7 +99,7 @@ if ($_POST['delete'])
 		exec('/usr/sbin/chown snort:snort /var/log/snort/*');
 		exec('/bin/chmod 660 /var/log/snort/*');
 		sleep(2);
-		exec('/usr/bin/killall -HUP snort');		
+		exec('/usr/bin/killall -HUP snort');
 	}
 	conf_mount_ro();
 }
@@ -126,7 +126,7 @@ if ($_POST['download'])
 		exec("/bin/rm /tmp/snort_logs_{$save_date}.tar.gz");
 		od_end_clean(); //importanr or other post will fail
 	}else{
-    echo 'Error no saved file.';
+		echo 'Error no saved file.';
 	}
 
 }
@@ -140,10 +140,10 @@ function get_snort_alert_date($fileline)
 	/* date full date \d+\/\d+-\d+:\d+:\d+\.\d+\s */
 	if (preg_match("/\d+\/\d+-\d+:\d+:\d\d/", $fileline, $matches1))
 	{
-        $alert_date =  "$matches1[0]";
+		$alert_date =  "$matches1[0]";
 	}
 
-return $alert_date;
+	return $alert_date;
 
 }
 
@@ -152,10 +152,10 @@ function get_snort_alert_disc($fileline)
 	/* disc */
 	if (preg_match("/\[\*\*\] (\[.*\]) (.*) (\[\*\*\])/", $fileline, $matches))
 	{
-        $alert_disc =  "$matches[2]";
+		$alert_disc =  "$matches[2]";
 	}
 
-return $alert_disc;
+	return $alert_disc;
 
 }
 
@@ -164,10 +164,10 @@ function get_snort_alert_class($fileline)
 	/* class */
 	if (preg_match('/\[Classification:\s.+[^\d]\]/', $fileline, $matches2))
 	{
-        $alert_class = "$matches2[0]";
+		$alert_class = "$matches2[0]";
 	}
 
-return $alert_class;
+	return $alert_class;
 
 }
 
@@ -176,10 +176,10 @@ function get_snort_alert_priority($fileline)
 	/* Priority */
 	if (preg_match('/Priority:\s\d/', $fileline, $matches3))
 	{
-        $alert_priority = "$matches3[0]";
+		$alert_priority = "$matches3[0]";
 	}
 
-return $alert_priority;
+	return $alert_priority;
 
 }
 
@@ -188,22 +188,22 @@ function get_snort_alert_proto($fileline)
 	/* Priority */
 	if (preg_match('/\{.+\}/', $fileline, $matches3))
 	{
-        $alert_proto = "$matches3[0]";
+		$alert_proto = "$matches3[0]";
 	}
 
-return $alert_proto;
+	return $alert_proto;
 
 }
 
 function get_snort_alert_proto_full($fileline)
 {
-		/* Protocal full */
-		if (preg_match('/.+\sTTL/', $fileline, $matches2))
-		{
-			$alert_proto_full = "$matches2[0]";
-		}
+	/* Protocal full */
+	if (preg_match('/.+\sTTL/', $fileline, $matches2))
+	{
+		$alert_proto_full = "$matches2[0]";
+	}
 
-return $alert_proto_full;
+	return $alert_proto_full;
 
 }
 
@@ -215,10 +215,10 @@ function get_snort_alert_ip_src($fileline)
 
 	if ($c=preg_match_all ("/".$re1.$re2."/is", $fileline, $matches4))
 	{
-      $alert_ip_src = $matches4[1][0];
+		$alert_ip_src = $matches4[1][0];
 	}
 
-return $alert_ip_src;
+	return $alert_ip_src;
 
 }
 
@@ -227,10 +227,10 @@ function get_snort_alert_src_p($fileline)
 	/* source port */
 	if (preg_match('/:\d+\s-/', $fileline, $matches5))
 	{
-        $alert_src_p = "$matches5[0]";
+		$alert_src_p = "$matches5[0]";
 	}
 
-return $alert_src_p;
+	return $alert_src_p;
 
 }
 
@@ -239,10 +239,10 @@ function get_snort_alert_flow($fileline)
 	/* source port */
 	if (preg_match('/(->|<-)/', $fileline, $matches5))
 	{
-        $alert_flow = "$matches5[0]";
+		$alert_flow = "$matches5[0]";
 	}
 
-return $alert_flow;
+	return $alert_flow;
 
 }
 
@@ -256,46 +256,46 @@ function get_snort_alert_ip_dst($fileline)
 
 	if ($c=preg_match_all ("/".$re1dp.$re2dp.$re3dp.$re4dp."/is", $fileline, $matches6))
 	{
-      $alert_ip_dst = $matches6[1][0];
+		$alert_ip_dst = $matches6[1][0];
 	}
-  
-return $alert_ip_dst;
+
+	return $alert_ip_dst;
 
 }
-  
+
 function get_snort_alert_dst_p($fileline)
-{ 
+{
 	/* dst port */
 	if (preg_match('/:\d+$/', $fileline, $matches7))
 	{
-        $alert_dst_p = "$matches7[0]";
+		$alert_dst_p = "$matches7[0]";
 	}
 
-return $alert_dst_p;
+	return $alert_dst_p;
 
 }
 
 function get_snort_alert_dst_p_full($fileline)
-{ 
+{
 	/* dst port full */
 	if (preg_match('/:\d+\n[A-Z]+\sTTL/', $fileline, $matches7))
 	{
-        $alert_dst_p = "$matches7[0]";
+		$alert_dst_p = "$matches7[0]";
 	}
 
-return $alert_dst_p;
+	return $alert_dst_p;
 
 }
 
 function get_snort_alert_sid($fileline)
-{ 
+{
 	/* SID */
 	if (preg_match('/\[\d+:\d+:\d+\]/', $fileline, $matches8))
 	{
-        $alert_sid = "$matches8[0]";
+		$alert_sid = "$matches8[0]";
 	}
 
-return $alert_sid;
+	return $alert_sid;
 
 }
 
@@ -306,9 +306,10 @@ include("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
 
-<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
+<body
+	link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-		<script>
+<script>
 			jQuery(document).ready(function(){
 			
 				//Examples of how to assign the ColorBox event to elements
@@ -317,7 +318,7 @@ include("/usr/local/pkg/snort/snort_head.inc");
 			});
 		</script>
 
-<?php 
+<?php
 
 include("fbegin.inc");
 echo $snort_general_css;
@@ -330,279 +331,278 @@ if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 ?>
 
 <!-- hack to fix the hardcoed fbegin link in header -->
-<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
+<div id="header-left2"><a href="../index.php" id="status-link2"><img
+	src="./images/transparent.gif" border="0"></img></a></div>
 
-<div class="body2">
-
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+<div class="body2"><?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr><td>
-  
-<div class="snorttabs" style="margin:1px 0px; width:775px;">
-<!-- Tabbed bar code-->
-<ul class="snorttabs">
-    <li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
-	<li><a href="/snort/snort_interfaces_global.php"><span>Global Settings</span></a></li>
-    <li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
-    <li class="snorttabs_active"><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
-	<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
-    <li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
-    <li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
-	<li><a class="example8" href="/snort/help_and_info.php"><span>Help</span></a></li>
-  </ul>
-</div>
-
-</td>
-</tr>
 	<tr>
-	<td>
-	<div id="mainarea2">
-		<table class="tabcont" width="100%" border="1" cellspacing="0" cellpadding="0">
-		  <tr>
-			<td width="22%" colspan="0" class="listtopic">
-			Last <?=$anentries;?> Alert Entries.
-			</td>
-			<td width="78%" class="listtopic">
-			Latest Alert Entries Are Listed First.
-			</td>
-		  </tr>
-    <tr>
-        <td width="22%" class="vncell">Save or Remove Logs</td>
-		<td width="78%" class="vtable">
-		<form action="/snort/snort_alerts.php" method="post">
-        <input name="download" type="submit" class="formbtn" value="Download">
-        All log files will be saved.
-		<input name="delete" type="submit" class="formbtn" value="Clear" onclick="return confirm('Do you really want to remove all your logs ? All snort rule interfces may have to be restarted.')">
-		<span class="red"><strong>Warning:</strong></span> all log files will be deleted.
-		</form>
+		<td>
+
+		<div class="snorttabs" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
+		<ul class="snorttabs">
+			<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
+			<li><a href="/snort/snort_interfaces_global.php"><span>Global
+			Settings</span></a></li>
+			<li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
+			<li class="snorttabs_active"><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
+			<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
+			<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
+			<li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
+			<li><a class="example8" href="/snort/help_and_info.php"><span>Help</span></a></li>
+		</ul>
+		</div>
+
 		</td>
-    </tr>
-    <tr>
-        <td width="22%" class="vncell">Auto Refresh and Log View</td>
-		<td width="78%" class="vtable">
-		<form action="/snort/snort_alerts.php" method="post">
-		<input name="save" type="submit" class="formbtn" value="Save">
-		Refresh
-        <input name="arefresh" type="checkbox" value="on" <?php if ($config['installedpackages']['snortglobal']['alertsblocks']['arefresh']=="on") echo "checked"; ?>>
-        <strong>Default</strong> is <strong>ON</strong>.
-		<input name="alertnumber" type="text" class="formfld" id="alertnumber" size="5" value="<?=htmlspecialchars($anentries);?>">
-		Enter the number of log entries to view. <strong>Default</strong> is <strong>250</strong>.
-		</form>
-		</td>
-    </tr>
+	</tr>
+	<tr>
+		<td>
+		<div id="mainarea2">
+		<table class="tabcont" width="100%" border="1" cellspacing="0"
+			cellpadding="0">
+			<tr>
+				<td width="22%" colspan="0" class="listtopic">Last <?=$anentries;?>
+				Alert Entries.</td>
+				<td width="78%" class="listtopic">Latest Alert Entries Are Listed
+				First.</td>
+			</tr>
+			<tr>
+				<td width="22%" class="vncell">Save or Remove Logs</td>
+				<td width="78%" class="vtable">
+				<form action="/snort/snort_alerts.php" method="post"><input
+					name="download" type="submit" class="formbtn" value="Download"> All
+				log files will be saved. <input name="delete" type="submit"
+					class="formbtn" value="Clear"
+					onclick="return confirm('Do you really want to remove all your logs ? All snort rule interfces may have to be restarted.')">
+				<span class="red"><strong>Warning:</strong></span> all log files
+				will be deleted.</form>
+				</td>
+			</tr>
+			<tr>
+				<td width="22%" class="vncell">Auto Refresh and Log View</td>
+				<td width="78%" class="vtable">
+				<form action="/snort/snort_alerts.php" method="post"><input
+					name="save" type="submit" class="formbtn" value="Save"> Refresh <input
+					name="arefresh" type="checkbox" value="on"
+					<?php if ($config['installedpackages']['snortglobal']['alertsblocks']['arefresh']=="on") echo "checked"; ?>>
+				<strong>Default</strong> is <strong>ON</strong>. <input
+					name="alertnumber" type="text" class="formfld" id="alertnumber"
+					size="5" value="<?=htmlspecialchars($anentries);?>"> Enter the
+				number of log entries to view. <strong>Default</strong> is <strong>250</strong>.
+				</form>
+				</td>
+			</tr>
 		</table>
-	</div>
-	</td>
-  </tr>
+		</div>
+		</td>
+	</tr>
 </table>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-	  <td width="100%">
-	  <br>
-			<div class="tableFilter">
-		  		<form id="tableFilter" onsubmit="myTable.filter(this.id); return false;">Filter: 
-					<select id="column">
-						<option value="1">PRIORITY</option>
-						<option value="2">PROTO</option>
-						<option value="3">DESCRIPTION</option>
-						<option value="4">CLASS</option>
-						<option value="5">SRC</option>
-						<option value="6">SRC PORT</option>
-						<option value="7">FLOW</option>
-						<option value="8">DST</option>
-						<option value="9">DST PORT</option>
-						<option value="10">SID</option>
-						<option value="11">Date</option>
-					</select>
-					<input type="text" id="keyword" />
-					<input type="submit" value="Submit" />
-					<input type="reset" value="Clear" />
-				</form>
-		  </div>
-<table class="allRow" id="myTable" width="100%" border="2" cellpadding="1" cellspacing="1">
-		  	<thead>
-				<th axis="number">#</th>
-				<th axis="string">PRI</th>
-				<th axis="string">PROTO</th>
-				<th axis="string">DESCRIPTION</th>
-				<th axis="string">CLASS</th>
-				<th axis="string">SRC</th>
-				<th axis="string">SPORT</th>
-				<th axis="string">FLOW</th>
-				<th axis="string">DST</th>
-				<th axis="string">DPORT</th>
-				<th axis="string">SID</th>
-				<th axis="date">Date</th>
-			</thead>
-			<tbody>
-<?php
+	<td width="100%"><br>
+	<div class="tableFilter">
+	<form id="tableFilter"
+		onsubmit="myTable.filter(this.id); return false;">Filter: <select
+		id="column">
+		<option value="1">PRIORITY</option>
+		<option value="2">PROTO</option>
+		<option value="3">DESCRIPTION</option>
+		<option value="4">CLASS</option>
+		<option value="5">SRC</option>
+		<option value="6">SRC PORT</option>
+		<option value="7">FLOW</option>
+		<option value="8">DST</option>
+		<option value="9">DST PORT</option>
+		<option value="10">SID</option>
+		<option value="11">Date</option>
+	</select> <input type="text" id="keyword" /> <input type="submit"
+		value="Submit" /> <input type="reset" value="Clear" /></form>
+	</div>
+	<table class="allRow" id="myTable" width="100%" border="2"
+		cellpadding="1" cellspacing="1">
+		<thead>
+			<th axis="number">#</th>
+			<th axis="string">PRI</th>
+			<th axis="string">PROTO</th>
+			<th axis="string">DESCRIPTION</th>
+			<th axis="string">CLASS</th>
+			<th axis="string">SRC</th>
+			<th axis="string">SPORT</th>
+			<th axis="string">FLOW</th>
+			<th axis="string">DST</th>
+			<th axis="string">DPORT</th>
+			<th axis="string">SID</th>
+			<th axis="date">Date</th>
+		</thead>
+		<tbody>
+		<?php
 
-	/* make sure alert file exists */	
-	if(!file_exists('/var/log/snort/alert'))
-	{
-		conf_mount_rw();
-		exec('/usr/bin/touch /var/log/snort/alert');
-		conf_mount_ro();
-	}
-
-	$logent = $anentries;
-	
-	/* detect the alert file type */
-	if ($snortalertlogt == 'full')
-	{
-		$alerts_array = array_reverse(array_filter(explode("\n\n", file_get_contents('/var/log/snort/alert'))));
-	}else{
-		$alerts_array = array_reverse(array_filter(split("\n", file_get_contents('/var/log/snort/alert'))));
-	}
-
-
-	
-if (is_array($alerts_array))
-{
-
-	$counter = 0;
-	foreach($alerts_array as $fileline)
-	{
-	
-	if($logent <= $counter)
-    continue;
-
-		$counter++;
-	
-		/* Date */
-		$alert_date_str = get_snort_alert_date($fileline);
-		
-			if($alert_date_str != '')
-			{
-				$alert_date = $alert_date_str;
-			}else{			
-				$alert_date = 'empty';
-			}
-
-		/* Discription */
-		$alert_disc_str = get_snort_alert_disc($fileline);
-		
-			if($alert_disc_str != '')
-			{
-				$alert_disc = $alert_disc_str;
-			}else{			
-				$alert_disc = 'empty';
-			}		
-		
-		/* Classification */
-		$alert_class_str = get_snort_alert_class($fileline);
-		
-			if($alert_class_str != '')
-			{
-
-				$alert_class_match = array('[Classification:',']'); 
-				$alert_class = str_replace($alert_class_match, '', "$alert_class_str");
-			}else{			
-				$alert_class = 'Prep';
-			}
-			
-		/* Priority */
-		$alert_priority_str = get_snort_alert_priority($fileline);
-		
-			if($alert_priority_str != '')
-			{
-				$alert_priority_match = array('Priority: ',']'); 
-				$alert_priority = str_replace($alert_priority_match, '', "$alert_priority_str");
-			}else{		
-				$alert_priority = 'empty';
-			}
-
-		/* Protocol */
-		/* Detect alert file type */
-	if ($snortalertlogt == 'full')
-	{
-		$alert_proto_str = get_snort_alert_proto_full($fileline);
-	}else{
-		$alert_proto_str = get_snort_alert_proto($fileline);
-	}
-
-			if($alert_proto_str != '')
-			{
-				$alert_proto_match = array(" TTL",'{','}'); 
-				$alert_proto = str_replace($alert_proto_match, '', "$alert_proto_str");
-			}else{
-				$alert_proto = 'empty';
-			}
-			
-		/* IP SRC */
-		$alert_ip_src_str = get_snort_alert_ip_src($fileline);
-		
-		if($alert_ip_src_str != '')
+		/* make sure alert file exists */
+		if(!file_exists('/var/log/snort/alert'))
 		{
-			$alert_ip_src = $alert_ip_src_str;
-		}else{
-			$alert_ip_src = 'empty';
-		}	
-			
-		/* IP SRC Port */
-		$alert_src_p_str = get_snort_alert_src_p($fileline);
-			
-			if($alert_src_p_str != '')
-			{
-				$alert_src_p_match = array(' -',':'); 
-				$alert_src_p = str_replace($alert_src_p_match, '', "$alert_src_p_str");
-			}else{			
-				$alert_src_p = 'empty';
-			}			
-		
-		/* Flow */
-		$alert_flow_str = get_snort_alert_flow($fileline);
-		
-			if($alert_flow_str != '')
-			{
-				$alert_flow = $alert_flow_str;
-			}else{			
-				$alert_flow = 'empty';
-			}		
-		
-		/* IP Destination */
-		$alert_ip_dst_str = get_snort_alert_ip_dst($fileline);
-		
-		if($alert_ip_dst_str != '')
-		{
-			$alert_ip_dst = $alert_ip_dst_str;
-		}else{
-			$alert_ip_dst = 'empty';
+			conf_mount_rw();
+			exec('/usr/bin/touch /var/log/snort/alert');
+			conf_mount_ro();
 		}
-				
-		/* IP DST Port */
-	if ($snortalertlogt == 'full')
-	{
-		$alert_dst_p_str = get_snort_alert_dst_p_full($fileline);
-	}else{
-		$alert_dst_p_str = get_snort_alert_dst_p($fileline);
-	}
-	
-			if($alert_dst_p_str != '')
-			{
-				$alert_dst_p_match = array(':',"\n"," TTL");
-				$alert_dst_p_str2 = str_replace($alert_dst_p_match, '', "$alert_dst_p_str");
-				$alert_dst_p_match2 = array('/[A-Z]/');
-				$alert_dst_p = preg_replace($alert_dst_p_match2, '', "$alert_dst_p_str2");
-			}else{
-				$alert_dst_p = 'empty';
-			}
 
-		/* SID */
-		$alert_sid_str = get_snort_alert_sid($fileline);
-		
-			if($alert_sid_str != '')
-			{
-				$alert_sid_match = array('[',']'); 
-				$alert_sid = str_replace($alert_sid_match, '', "$alert_sid_str");
-			}else{
-				$alert_sid_str = 'empty';	
-			}
-		
-		/* NOTE: using one echo improves performance by 2x */
-		if ($alert_disc != 'empty')
+		$logent = $anentries;
+
+		/* detect the alert file type */
+		if ($snortalertlogt == 'full')
 		{
-			echo "<tr id=\"{$counter}\">
+			$alerts_array = array_reverse(array_filter(explode("\n\n", file_get_contents('/var/log/snort/alert'))));
+		}else{
+			$alerts_array = array_reverse(array_filter(split("\n", file_get_contents('/var/log/snort/alert'))));
+		}
+
+
+
+		if (is_array($alerts_array))
+		{
+
+			$counter = 0;
+			foreach($alerts_array as $fileline)
+			{
+
+				if($logent <= $counter)
+				continue;
+
+				$counter++;
+
+				/* Date */
+				$alert_date_str = get_snort_alert_date($fileline);
+
+				if($alert_date_str != '')
+				{
+					$alert_date = $alert_date_str;
+				}else{
+					$alert_date = 'empty';
+				}
+
+				/* Discription */
+				$alert_disc_str = get_snort_alert_disc($fileline);
+
+				if($alert_disc_str != '')
+				{
+					$alert_disc = $alert_disc_str;
+				}else{
+					$alert_disc = 'empty';
+				}
+
+				/* Classification */
+				$alert_class_str = get_snort_alert_class($fileline);
+
+				if($alert_class_str != '')
+				{
+
+					$alert_class_match = array('[Classification:',']');
+					$alert_class = str_replace($alert_class_match, '', "$alert_class_str");
+				}else{
+					$alert_class = 'Prep';
+				}
+					
+				/* Priority */
+				$alert_priority_str = get_snort_alert_priority($fileline);
+
+				if($alert_priority_str != '')
+				{
+					$alert_priority_match = array('Priority: ',']');
+					$alert_priority = str_replace($alert_priority_match, '', "$alert_priority_str");
+				}else{
+					$alert_priority = 'empty';
+				}
+
+				/* Protocol */
+				/* Detect alert file type */
+				if ($snortalertlogt == 'full')
+				{
+					$alert_proto_str = get_snort_alert_proto_full($fileline);
+				}else{
+					$alert_proto_str = get_snort_alert_proto($fileline);
+				}
+
+				if($alert_proto_str != '')
+				{
+					$alert_proto_match = array(" TTL",'{','}');
+					$alert_proto = str_replace($alert_proto_match, '', "$alert_proto_str");
+				}else{
+					$alert_proto = 'empty';
+				}
+					
+				/* IP SRC */
+				$alert_ip_src_str = get_snort_alert_ip_src($fileline);
+
+				if($alert_ip_src_str != '')
+				{
+					$alert_ip_src = $alert_ip_src_str;
+				}else{
+					$alert_ip_src = 'empty';
+				}
+					
+				/* IP SRC Port */
+				$alert_src_p_str = get_snort_alert_src_p($fileline);
+					
+				if($alert_src_p_str != '')
+				{
+					$alert_src_p_match = array(' -',':');
+					$alert_src_p = str_replace($alert_src_p_match, '', "$alert_src_p_str");
+				}else{
+					$alert_src_p = 'empty';
+				}
+
+				/* Flow */
+				$alert_flow_str = get_snort_alert_flow($fileline);
+
+				if($alert_flow_str != '')
+				{
+					$alert_flow = $alert_flow_str;
+				}else{
+					$alert_flow = 'empty';
+				}
+
+				/* IP Destination */
+				$alert_ip_dst_str = get_snort_alert_ip_dst($fileline);
+
+				if($alert_ip_dst_str != '')
+				{
+					$alert_ip_dst = $alert_ip_dst_str;
+				}else{
+					$alert_ip_dst = 'empty';
+				}
+
+				/* IP DST Port */
+				if ($snortalertlogt == 'full')
+				{
+					$alert_dst_p_str = get_snort_alert_dst_p_full($fileline);
+				}else{
+					$alert_dst_p_str = get_snort_alert_dst_p($fileline);
+				}
+
+				if($alert_dst_p_str != '')
+				{
+					$alert_dst_p_match = array(':',"\n"," TTL");
+					$alert_dst_p_str2 = str_replace($alert_dst_p_match, '', "$alert_dst_p_str");
+					$alert_dst_p_match2 = array('/[A-Z]/');
+					$alert_dst_p = preg_replace($alert_dst_p_match2, '', "$alert_dst_p_str2");
+				}else{
+					$alert_dst_p = 'empty';
+				}
+
+				/* SID */
+				$alert_sid_str = get_snort_alert_sid($fileline);
+
+				if($alert_sid_str != '')
+				{
+					$alert_sid_match = array('[',']');
+					$alert_sid = str_replace($alert_sid_match, '', "$alert_sid_str");
+				}else{
+					$alert_sid_str = 'empty';
+				}
+
+				/* NOTE: using one echo improves performance by 2x */
+				if ($alert_disc != 'empty')
+				{
+					echo "<tr id=\"{$counter}\">
 				<td class=\"centerAlign\">{$counter}</td>
 				<td class=\"centerAlign\">{$alert_priority}</td>
 				<td class=\"centerAlign\">{$alert_proto}</td>
@@ -616,36 +616,36 @@ if (is_array($alerts_array))
 				<td class=\"centerAlign\">{$alert_sid}</td>
 				<td>{$alert_date}</td>
 				</tr>\n";
-		}
-		
-//		<script type="text/javascript">
-//			var myTable = {};
-//			window.addEvent('domready', function(){
-//				myTable = new sortableTable('myTable', {overCls: 'over', onClick: function(){alert(this.id)}});
-//			});
-//		</script>
-		
-	}
-}
+				}
 
-?>
-			</tbody>	
-		</table>
+				//		<script type="text/javascript">
+				//			var myTable = {};
+				//			window.addEvent('domready', function(){
+				//				myTable = new sortableTable('myTable', {overCls: 'over', onClick: function(){alert(this.id)}});
+				//			});
+				//		</script>
+
+			}
+		}
+
+		?>
+		</tbody>
+	</table>
 	</td>
 </table>
 
 </div>
 
-<?php
+		<?php
 
-include("fend.inc"); 
+		include("fend.inc");
 
-echo $snort_custom_rnd_box;
+		echo $snort_custom_rnd_box;
 
-?>
+		?>
 
 
-		<script type="text/javascript">
+<script type="text/javascript">
 			var myTable = {};
 			window.addEvent('domready', function(){
 				myTable = new sortableTable('myTable', {overCls: 'over'});
