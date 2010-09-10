@@ -680,8 +680,7 @@ function snort_postinstall()
 
 	/* install perl-threaded */
 	/* TODO: invoke this through pkg_util.inc */
-	if(!file_exists('/tmp/pkg_s'))
-	{
+	if(!file_exists('/tmp/pkg_s')) {
 		exec('/bin/mkdir -p /tmp/pkg_s');
 	}
 
@@ -701,14 +700,22 @@ function snort_postinstall()
 		exec('/usr/bin/fetch http://files.pfsense.org/packages/snort/8.1x64/perl-threaded-5.12.1_1.tbz');
 	}
 
+	conf_mount_rw();
+	if(!file_exists('/root/pkg_s')) {
+		exec('/bin/mkdir -p /root/pkg_s');
+	}
+
 	update_output_window(gettext("Please wait Installing..."));
-	if(file_exists('/tmp/pkg_s/perl-threaded-5.12.1_1.tbz')){
-		exec('/usr/sbin/pkg_add -fv /tmp/pkg_s/perl-threaded-5.12.1_1.tbz');
+	if(file_exists('/tmp/pkg_s/perl-threaded-5.12.1_1.tbz')) {
+		exec('/bin/mv /tmp/pkg_s/perl-threaded-5.12.1_1.tbz /root/pkg_s/perl-threaded-5.12.1_1.tbz');
+		sleep(2);		
+		exec('/bin/rm -r /tmp/pkg_s/');
+		exec('/usr/sbin/pkg_add -fv /root/pkg_s/perl-threaded-5.12.1_1.tbz');
 	}
 
 	update_output_window(gettext("Please wait Cleaning Up..."));
-	if(file_exists('/tmp/pkg_s/')){
-		exec('/bin/rm -r /tmp/pkg_s/');
+	if(file_exists('/root/pkg_s/')){
+		exec('/bin/rm -r /root/pkg_s/');
 	}
 
 	update_output_window(gettext("Finnished Installing perl-threaded..."));
