@@ -3,7 +3,7 @@
 /*
 	snort.inc
 	Copyright (C) 2006 Scott Ullrich
-	Copyright (C) 2009 Robert Zelaya
+	Copyright (C) 2009-2010 Robert Zelaya
 	part of pfSense
 	All rights reserved.
 
@@ -195,7 +195,8 @@ global $config, $g;
 
 			/* this is for snort.conf */
 			$home_net = trim($home_net);
-			$home_net = str_replace(" ", ",", $home_net);
+			// $home_net = str_replace(" ", ",", $home_net); // old code
+			$home_net = str_replace(",,", ",", $home_net); // by Thrae, helps people with more than one gateway
 			$home_net = "[{$home_net}]";
 
 		if($build_netlist == 'netlist') {
@@ -362,7 +363,6 @@ function convert_friendly_interface_to_real_interface_name2($interface)
    return $interface;
 }
 
-//$if_real_wan = convert_friendly_interface_to_real_interface_name2($interface_fake);
 
 /* Allow additional execution time 0 = no limit. */
 ini_set('max_execution_time', '9999');
@@ -679,6 +679,7 @@ if($snort_arch_ck[0] == 'i386') {
 	
 	
 	/* install perl-threaded */
+	/* TODO: invoke this through pkg_util.inc */
 	if(!file_exists('/tmp/pkg_s'))
 	{
 		exec('/bin/mkdir -p /tmp/pkg_s');
@@ -753,6 +754,72 @@ function sync_package_snort_reinstall()
 	
 	conf_mount_ro();
 }
+
+function snort_Getdirsize($node) {
+    if(!is_readable($node))
+    return false;
+
+    $blah = exec( "/usr/bin/du -kd $node" );
+    return substr( $blah, 0, strpos($blah, 9) );
+}
+
+/* func for log dir size limit cron */
+function snort_snortloglimit_install_cron($should_install) {
+        global $config, $g;
+
+        if ($g['booting']==true)
+                return;
+
+        $is_installed = false;
+
+        if(!$config['cron']['item'])
+                return;
+
+        $x=0;
+        foreach($config['cron']['item'] as $item) {
+                if (strstr($item['command'], '/usr/local/pkg/snort/snort_check_cron_misc.inc')) {
+                        $is_installed = true;
+                        break;
+               }
+                $x++;
+        }
+
+        $snort_snortloglimit_info_ck = $config['installedpackages']['snortglobal']['snortloglimit'];
+        $snort_snortloglimitsize_info_ck = $config['installedpackages']['snortglobal']['snortloglimitsize'];
+
+        switch($should_install) {
+                case true:
+                        if(!$is_installed)  {
+
+                                $cron_item = array();
+                                $cron_item['minute'] = "*/5";
+                                $cron_item['hour'] = "*";
+                                $cron_item['mday'] = "*";
+                                $cron_item['month'] = "*";
+                                $cron_item['wday'] = "*";
+                                $cron_item['who'] = "root";
+                                $cron_item['command'] = "/usr/bin/nice -n20 /usr/local/bin/php -f /usr/local/pkg/snort/snort_check_cron_misc.inc";
+                                $config['cron']['item'][] = $cron_item;
+                                write_config('Installed snort log limit size');
+                                configure_cron();
+                                exec('/usr/bin/killall -HUP cron'); // TODO: remove when 2.0 is stable
+                        }
+                break;
+                case false:
+                        if($is_installed == true) {
+                                if($x > 0)
+                                                                {
+                                        unset($config['cron']['item'][$x]);
+                                        write_config();
+                                        conf_mount_rw();
+                                }
+                                configure_cron();
+                                exec('/usr/bin/killall -HUP cron'); // TODO: remove when 2.0 is stable
+                        }
+                break;
+                }
+}
+
 
 /* func for updating cron */
 function snort_rm_blocked_install_cron($should_install) 
@@ -867,6 +934,7 @@ function snort_rm_blocked_install_cron($should_install)
                                 $config['cron']['item'][] = $cron_item;
                                 write_config("Installed $snort_rm_blocked_info_ck minute filter reload for Time Based Rules");
                                 configure_cron();
+                                exec('/usr/bin/killall -HUP cron'); // TODO: remove when 2.0 is stable
                         }
                 break;
                 case false:
@@ -879,6 +947,7 @@ function snort_rm_blocked_install_cron($should_install)
 										conf_mount_rw();
                                 }
                                 configure_cron();
+                                exec('/usr/bin/killall -HUP cron'); // TODO: remove when 2.0 is stable
                         }
                 break;
 		}
@@ -961,6 +1030,7 @@ function snort_rules_up_install_cron($should_install) {
                                 $config['cron']['item'][] = $cron_item;
                                 write_config("Installed 15 minute filter reload for Time Based Rules");
                                 configure_cron();
+                                exec('/usr/bin/killall -HUP cron'); // TODO: remove when 2.0 is stable
                         }
                 break;
                 case false:
@@ -971,6 +1041,7 @@ function snort_rules_up_install_cron($should_install) {
 										conf_mount_rw();
                                 }
                                 configure_cron();
+                                exec('/usr/bin/killall -HUP cron'); // TODO: remove when 2.0 is stable
                         }
                 break;
 		}
@@ -1063,6 +1134,23 @@ function sync_snort_package()
 	exec('/bin/chmod -R 770 /var/log/snort');
 	exec('/bin/chmod -R 770 /usr/local/lib/snort');
 	exec('/bin/chmod -R 770 /usr/local/etc/snort/');
+	
+	/* auto install loglimit dfault if value not set */
+	$snortloglimitsize = $config['installedpackages']['snortglobal']['snortloglimitsize'];
+
+	if ($snortloglimitsize == '') {
+		/* code will set limit to 21% of slice that is unused */
+		$snortloglimitDSKsize = round(exec('df -k /var | grep -v "Filesystem" | awk \'{print $4}\'') * .21 / 1024);
+		$config['installedpackages']['snortglobal']['snortloglimitsize'] = $snortloglimitDSKsize;
+		write_config();
+		conf_mount_rw();	
+	}
+	
+	$snort_snortloglimit_info_ck = $config['installedpackages']['snortglobal']['snortloglimit'];
+	if ($snort_snortloglimit_info_ck == '') {
+			snort_snortloglimit_install_cron('');
+			snort_snortloglimit_install_cron('true');
+	}
 
 	conf_mount_ro();
 }

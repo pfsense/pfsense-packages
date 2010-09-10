@@ -432,7 +432,7 @@ echo "
 }
 //-->
 </script>
-<p class="pgtitle"><?php if($pfsense_stable == 'yes'){echo $pgtitle;}?></p>
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <form action="snort_interfaces_edit.php<?php echo "?id=$id";?>" method="post" enctype="multipart/form-data" name="iform" id="iform">

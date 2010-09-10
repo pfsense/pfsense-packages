@@ -113,27 +113,24 @@ include_once("/usr/local/pkg/snort/snort_head.inc");
 			jQuery(document).ready(function(){
 			
 				//Examples of how to assign the ColorBox event to elements
-				jQuery(".example7").colorbox({width:"900px", height:"400px", iframe:true, overlayClose:false});
 				jQuery(".example8").colorbox({width:"820px", height:"700px", iframe:true, overlayClose:false});
-				jQuery(".example9").colorbox({width:"90%", height:"65%", iframe:true, overlayClose:false});
 				
 			});
 		</script>
 
-<?php 
-include_once("fbegin.inc");
-echo $snort_general_css;
-?>
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
 <?php
-echo $snort_general_css;
+echo "{$snort_general_css}\n";
+echo "$snort_interfaces_css\n";
 ?>
+
+<?php include("fbegin.inc"); ?>
+
+<div class="body2">
 
 <!-- hack to fix the hardcoed fbegin link in header -->
 <div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
 
-<div class="body2">
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
 

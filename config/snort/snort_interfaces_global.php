@@ -37,34 +37,40 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
+$d_snort_global_dirty_path = '/var/run/snort_global.dirty';
+
 /* make things short  */
 $pconfig['snortdownload'] = $config['installedpackages']['snortglobal']['snortdownload'];
 $pconfig['oinkmastercode'] = $config['installedpackages']['snortglobal']['oinkmastercode'];
 $pconfig['emergingthreats'] = $config['installedpackages']['snortglobal']['emergingthreats'];
 $pconfig['rm_blocked'] = $config['installedpackages']['snortglobal']['rm_blocked'];
+$pconfig['snortloglimit'] = $config['installedpackages']['snortglobal']['snortloglimit'];
+$pconfig['snortloglimitsize'] = $config['installedpackages']['snortglobal']['snortloglimitsize'];
 $pconfig['autorulesupdate7'] = $config['installedpackages']['snortglobal']['autorulesupdate7'];
-$pconfig['whitelistvpns'] = $config['installedpackages']['snortglobal']['whitelistvpns'];
-$pconfig['clickablalerteurls'] = $config['installedpackages']['snortglobal']['clickablalerteurls'];
-$pconfig['associatealertip'] = $config['installedpackages']['snortglobal']['associatealertip'];
 $pconfig['snortalertlogtype'] = $config['installedpackages']['snortglobal']['snortalertlogtype'];
 $pconfig['forcekeepsettings'] = $config['installedpackages']['snortglobal']['forcekeepsettings'];
 
+	/* this will exec when alert says apply */
+	if ($_POST['apply']) {
+		
+		if (file_exists("$d_snort_global_dirty_path")) {
+			conf_mount_rw();
+			
+			/* create whitelist and homenet file  then sync files */
+			sync_snort_package_empty();
+			sync_snort_package();
 
-
-if ($_POST) {
-
-	unset($input_errors);
-	$pconfig = $_POST;
-
-	/* input validation */
-	if ($_POST['enable'])
-	{
-
-/* TODO:a dd check user input code. */
-
+			unlink("$d_snort_global_dirty_path");
+			
+			write_config();
+			conf_mount_ro();			
+		}
 	}
+	
 
-	if (!$input_errors) {
+	
+/* if no errors move foward */
+if (!$input_errors) {
 		
 		if ($_POST["Submit"]) {
 
@@ -72,10 +78,9 @@ if ($_POST) {
 		$config['installedpackages']['snortglobal']['oinkmastercode'] = $_POST['oinkmastercode'];
 		$config['installedpackages']['snortglobal']['emergingthreats'] = $_POST['emergingthreats'] ? on : off;
 		$config['installedpackages']['snortglobal']['rm_blocked'] = $_POST['rm_blocked'];
+		$config['installedpackages']['snortglobal']['snortloglimit'] = $_POST['snortloglimit'];
+		$config['installedpackages']['snortglobal']['snortloglimitsize'] = $_POST['snortloglimitsize'];
 		$config['installedpackages']['snortglobal']['autorulesupdate7'] = $_POST['autorulesupdate7'];
-		$config['installedpackages']['snortglobal']['whitelistvpns'] = $_POST['whitelistvpns'] ? on : off;
-		$config['installedpackages']['snortglobal']['clickablalerteurls'] = $_POST['clickablalerteurls'] ? on : off;
-		$config['installedpackages']['snortglobal']['associatealertip'] = $_POST['associatealertip'] ? on : off;
 		$config['installedpackages']['snortglobal']['snortalertlogtype'] = $_POST['snortalertlogtype'];
 		$config['installedpackages']['snortglobal']['forcekeepsettings'] = $_POST['forcekeepsettings'] ? on : off;	
 
@@ -83,6 +88,18 @@ if ($_POST) {
 		sleep(2);
 
 		$retval = 0;
+
+
+	$snort_snortloglimit_info_ck = $config['installedpackages']['snortglobal']['snortloglimit'];
+	if ($snort_snortloglimit_info_ck == 'on') {
+			snort_snortloglimit_install_cron('');
+			snort_snortloglimit_install_cron('true');
+	}
+	
+	if ($snort_snortloglimit_info_ck == 'off') {
+			snort_snortloglimit_install_cron('');
+	}
+	
 
 	/* set the snort block hosts time IMPORTANT */
 	$snort_rm_blocked_info_ck = $config['installedpackages']['snortglobal']['rm_blocked'];
@@ -111,22 +128,27 @@ if ($_POST) {
 		}
 		
 		
-		
+		touch($d_snort_global_dirty_path);
 		$savemsg = get_std_save_message($retval);
+		write_config();
 
-		}
-		
 		sync_snort_package();
 		
+		/* forces page to reload new settings */
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
+		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
+		header( 'Cache-Control: post-check=0, pre-check=0', false );
+		header( 'Pragma: no-cache' );
+		header("Location: /snort/snort_interfaces_global.php");
+		
+		}
 }
 	
 	
-	if ($_POST["Reset"]) {
-		
-//////>>>>>>>>>
+if ($_POST["Reset"]) {
 
-	function snort_deinstall_settings()
-{
+	function snort_deinstall_settings() {
 
 	global $config, $g, $id, $if_real;
 	conf_mount_rw();
@@ -142,8 +164,8 @@ if ($_POST) {
 	sleep(2);
 
 	/* Remove snort cron entries Ugly code needs smoothness*/
-function snort_rm_blocked_deinstall_cron($should_install)
-{
+	function snort_rm_blocked_deinstall_cron($should_install)
+	{
         global $config, $g;
 		conf_mount_rw();
 
@@ -208,8 +230,8 @@ function snort_rm_blocked_deinstall_cron($should_install)
 			}
 }
 
-snort_rm_blocked_deinstall_cron("");
-snort_rules_up_deinstall_cron("");
+	snort_rm_blocked_deinstall_cron("");
+	snort_rules_up_deinstall_cron("");
 
 		
 	/* Unset snort registers in conf.xml IMPORTANT snort will not start with out this */
@@ -228,7 +250,7 @@ snort_rules_up_deinstall_cron("");
 
 	snort_deinstall_settings();
 	
-			header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
+		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
@@ -237,12 +259,10 @@ snort_rules_up_deinstall_cron("");
 		header("Location: /snort/snort_interfaces_global.php");
 
 		exit;
-    
-//////>>>>>>>>>
-	}
 }
 
-$pgtitle = "Services: Snort: Global Settings";
+
+$pgtitle = 'Services: Snort: Global Settings';
 include_once("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
@@ -258,24 +278,45 @@ include_once("/usr/local/pkg/snort/snort_head.inc");
 			});
 		</script>
 
-<?php 
-include_once("fbegin.inc");
-echo $snort_general_css;
+<?php
+echo "{$snort_general_css}\n";
+echo "$snort_interfaces_css\n";
 ?>
+
+<?php include("fbegin.inc"); ?>
+
+<div class="body2">
 
 <!-- hack to fix the hardcoed fbegin link in header -->
 <div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
 
-<div class="body2">
-
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
-<?php if ($input_errors) print_input_errors($input_errors); ?>
-<?php if ($savemsg) print_info_box($savemsg); ?>
+<noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
+
+
 <form action="snort_interfaces_global.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
+
+<?php
+	/* Display Alert message, under form tag or no refresh */
+	if ($input_errors) {
+		print_input_errors($input_errors); // TODO: add checks
+	}
+	
+	if (!$input_errors) {
+		if (file_exists($d_snort_global_dirty_path)) {
+
+			print_info_box_np2('
+			The Snort configuration has changed and snort needs to be restarted on this interface.<br>
+			You must apply the changes in order for them to take effect.<br>
+			');
+		}
+	}
+?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
-  <td class="tabnavtbl">
+  <td>
 
 <div class="snorttabs" style="margin:1px 0px; width:775px;">
 <!-- Tabbed bar code-->
@@ -353,6 +394,32 @@ echo $snort_general_css;
   <tr>
       <td colspan="2" valign="top" class="listtopic">General Settings</td>
   </tr>
+  
+	<tr>
+      <td width="22%" valign="top" class="vncell2">Log Directory Size Limit</td>
+      <td width="78%" class="vtable">
+        <table cellpadding="0" cellspacing="0">
+        <tr>
+          <td colspan="2"><input name="snortloglimit" type="radio" id="snortloglimit" value="on" onClick="enable_change(false)" <?php if($pconfig['snortloglimit']=='on' || $pconfig['snortloglimit']=='') echo 'checked'; ?>>
+  <strong>Enable</strong> directory size limit (<strong>Default</strong>)</td>
+          </tr>
+        <tr>
+          <td colspan="2"><input name="snortloglimit" type="radio" id="snortloglimit" value="off" onClick="enable_change(false)" <?php if($pconfig['snortloglimit']=='off') echo 'checked'; ?>>
+  <strong>Disable</strong> directory size limit<br><br><span class="red"><strong>Warning</span>:</strong> Pfsense Nanobsd should use no more than 10MB of space.
+		</td>
+          </tr>
+          <tr>
+          <td>&nbsp;</td>
+          </tr>
+        </table>
+        <table width="100%" border="0" cellpadding="6" cellspacing="0">
+            <tr>
+                <td class="vncell3" >Size in <strong>MB</strong></td>
+                <td class="vtable"><input name="snortloglimitsize" type="text" class="formfld" id="snortloglimitsize" size="7" value="<?=htmlspecialchars($pconfig['snortloglimitsize']);?>">
+                Default is <strong>20%</strong> of available space.</td>
+  </table>
+    </tr>
+  
     <tr>
         <td width="22%" valign="top" class="vncell2">Remove blocked hosts every</td>
         <td width="78%" class="vtable">

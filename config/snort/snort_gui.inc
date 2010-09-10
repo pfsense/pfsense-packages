@@ -145,6 +145,17 @@ padding-bottom: 12px;
 	border-bottom: 1px solid #999999;
 }
 
+/* global tab, white lil box */
+.vncell3 {
+	width: 50px;
+	background-color: #eeeeee;
+	padding-right: 2px;
+	padding-left: 2px;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #999999;
+}
+
 .vncellreq2 {
 background-color: #eeeeee;
 padding-right: 20px;

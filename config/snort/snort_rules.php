@@ -69,6 +69,8 @@ include("fbegin.inc");
 
 echo "<body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\">";
 
+if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
+
 echo "<script src=\"/row_toggle.js\" type=\"text/javascript\"></script>\n
 <script src=\"/javascript/sorttable.js\" type=\"text/javascript\"></script>\n
 <table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n

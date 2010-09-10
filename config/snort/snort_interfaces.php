@@ -255,23 +255,24 @@ include_once("/usr/local/pkg/snort/snort_head.inc");
 			});
 		</script>
 
-<?php include("fbegin.inc"); ?>
-<!-- hack to fix the hardcoed fbegin link in header -->
-<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
-
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
 <?php
 echo "{$snort_general_css}\n";
 echo "$snort_interfaces_css\n";
 ?>
 
+<?php include("fbegin.inc"); ?>
+
 <div class="body2">
+
+<!-- hack to fix the hardcoed fbegin link in header -->
+<div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
+
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <noscript><div class="alert" ALIGN=CENTER><img src="../themes/nervecenter/images/icons/icon_alert.gif"/><strong>Please enable JavaScript to view this content</CENTER></div></noscript>
 
 
-<form action="/snort/snort_interfaces.php" method="post" name="iform">
+<form action="snort_interfaces_global.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
 
 <?php
 
@@ -302,7 +303,8 @@ echo "$snort_interfaces_css\n";
 ?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-  <tr><td>
+  <tr>
+  <td>
   
 <div class="snorttabs" style="margin:1px 0px; width:775px;">
 <!-- Tabbed bar code-->
