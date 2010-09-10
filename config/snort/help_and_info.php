@@ -211,7 +211,7 @@ Please do not email individuals, the coreteam address, or private message people
 			
 			<p><font size="5"><strong>Names</strong></font></p>
 			
-			<p>sandro tavella</p>
+			<p>Sandro Tavella</p>
 			<p>João Kemp Filho</p>
 			<p>Julio Fumoso</p>
 			<p>Rolland Hart</p>
@@ -222,7 +222,7 @@ Please do not email individuals, the coreteam address, or private message people
 			<p>Marco Pannetto</p>
 			<p>Christopher Weakland</p>
 			<p>Antonio Riveros</p>
-			<p>Jeremy Harany</p>
+			<p>DigitalJer</p>
 			<p>Serialdie</p>
 			<p>Dlawley</p>
 			<p>Onhel</p>
