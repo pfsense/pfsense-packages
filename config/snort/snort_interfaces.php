@@ -276,8 +276,9 @@ enable JavaScript to view this content
 </noscript>
 
 
-<form action="snort_interfaces_global.php" method="post"
-	enctype="multipart/form-data" name="iform" id="iform"><?php
+<form action="snort_interfaces.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
+
+	<?php
 
 	/* Display Alert message */
 
