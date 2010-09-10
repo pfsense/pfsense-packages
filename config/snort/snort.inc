@@ -195,8 +195,8 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 
 	/* this is for snort.conf */
 	$home_net = trim($home_net);
-	// $home_net = str_replace(" ", ",", $home_net); // old code
-	$home_net = str_replace(",,", ",", $home_net); // by Thrae, helps people with more than one gateway
+	$home_net = str_replace(" ", ",", $home_net);
+	// $home_net = str_replace(",,", ",", $home_net); // by Thrae, helps people with more than one gateway, breaks snort as is
 	$home_net = "[{$home_net}]";
 
 	if($build_netlist == 'netlist') {
@@ -213,24 +213,20 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 function Running_Ck($snort_uuid, $if_real, $id) {
 	global $config;
 
-	$snort_up_ck = exec("/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep snort | /usr/bin/awk '{print \$2;}' | sed 1q");
+	$snort_up_ck = exec("/bin/ps -U snort | grep snort | /usr/bin/awk '{print \$1;}'");
 
-	if(snort_up_ck == ''){
+	if(snort_up_ck == '') {
 		$snort_up = 'no';
 		return $snort_up;
 	}
 
 	if(snort_up_ck != ''){
 
-		//$snort_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}_{$if_real}\" | awk '{print \$1;}'");
-		//$snort_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$snort_up_pre} | /usr/bin/awk '{print \$1;}'");
-		//$snort_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$snort_up_pre} | /usr/bin/awk '{print \$1;}'");
-
 		/* use ob_clean to clear output buffer, this code needs to be watched */
 		ob_clean();
-		$snort_up_prell = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}\" | awk '{print \$1;}'", $retval);
+		$snort_up_prell = exec("/bin/ps -U snort | grep \"\-R {$snort_uuid}\" | awk '{print \$1;}'");
 
-		if ($snort_up_prell != "") {
+		if ($snort_up_prell != '') {
 			$snort_uph = 'yes';
 		}else{
 			$snort_uph = 'no';
@@ -244,22 +240,17 @@ function Running_Ck($snort_uuid, $if_real, $id) {
 function Running_Ck_b($snort_uuid, $if_real, $id) {
 	global $config;
 
-	$snort_up_ck_b = exec("/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep barnyard2 | /usr/bin/awk '{print \$2;}' | sed 1q");
+	$snort_up_ck_b = exec("/bin/ps -U snort | /usr/bin/grep barnyard2 | /usr/bin/awk '{print \$1;}'");
 
 	if($snort_up_ck_b == ''){
 		$snort_up_b = 'no';
 		return $snort_up_b;
 	}
 
-	if(snort_up_ck_b != ''){
-
-		//$snort_up_pre_b = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"f snort_{$snort_uuid}_{$if_real}.u2\" | awk '{print \$1;}'");
-		//$snort_up_s_b = exec("/usr/bin/top -U snort -u | grep barnyard2 | grep {$snort_up_pre_b} | /usr/bin/awk '{print \$1;}'");
-		//$snort_up_r_b = exec("/usr/bin/top -U root -u | grep barnyard2 | grep {$snort_up_pre_b} | /usr/bin/awk '{print \$1;}'");
-
-		/* use ob_clean to clear output buffer, this code needs to be watched */
+	if(snort_up_ck_b != '') {
+		
 		ob_clean();
-		$snort_up_pre_b = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"f snort_{$snort_uuid}_{$if_real}.u2\" | awk '{print \$1;}'");
+		$snort_up_pre_b = exec("/bin/ps -U snort | grep \"f snort_{$snort_uuid}_{$if_real}.u2\" | awk '{print \$1;}'");
 
 		if ($snort_up_pre_b != '') {
 			$snort_up_b = 'yes';
@@ -276,38 +267,36 @@ function Running_Stop($snort_uuid, $if_real, $id) {
 
 	/* if snort.sh crashed this will remove the pid */
 	exec('/bin/rm /tmp/snort.sh.pid');
+	
+	$start_up_s = exec("/bin/ps -U snort | grep \"\-R {$snort_uuid}\" | awk '{ print \$1; }'");
+	$start_up_r = exec("/bin/ps -U root | grep \"\-R {$snort_uuid}\" | awk '{ print \$1; }'");
+	
+	$start2_upb_s = exec("/bin/ps -U snort | grep \"snort_{$snort_uuid}_{$if_real}.u2\" | awk '{ print \$1; }'");
+	$start2_upb_r = exec("/bin/ps -U root | grep \"snort_{$snort_uuid}_{$if_real}.u2\" | awk '{ print \$1; }'");
 
-	$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}\" | awk '{print \$1;}'");
-	$start_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
-	$start_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
-
-	$start2_upb_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"snort_{$snort_uuid}_{$if_real}.u2\" | awk '{print \$1;}'");
-	$start2_upb_s = exec("/usr/bin/top -U snort -u | grep barnyard2 | grep {$start2_upb_pre} | awk '{ print $1; }'");
-	$start2_upb_r = exec("/usr/bin/top -U root -u | grep barnyard2 | grep {$start2_upb_pre} | awk '{ print $1; }'");
-
-	if ($start_up_s != "" || $start_up_r != "" || $start2_upb_s != "" || $start2_upb_r != "")
+	if ($start_up_s != '' || $start_up_r != '' || $start2_upb_s != '' || $start2_upb_r != '')
 	{
-		if ($start_up_s != "")
+		if ($start_up_s != '')
 		{
 			exec("/bin/kill {$start_up_s}");
 			exec("rm /var/log/snort/run/snort_{$if_real}{$snort_uuid}*");
 			exec("rm /var/log/snort/snort_{$snort_uuid}_{$if_real}*");
 		}
 
-		if ($start2_upb_s != "")
+		if ($start2_upb_s != '')
 		{
 			exec("/bin/kill {$start2_upb_s}");
 			exec("/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}*");
 		}
 
-		if ($start_up_r != "")
+		if ($start_up_r != '')
 		{
 			exec("/bin/kill {$start_up_r}");
 			exec("rm /var/log/snort/run/snort_{$if_real}{$snort_uuid}*");
 			exec("rm /var/log/snort/snort_{$snort_uuid}_{$if_real}*");
 		}
 
-		if ($start2_upb_r != "")
+		if ($start2_upb_r != '')
 		{
 			exec("/bin/kill {$start2_upb_r}");
 			exec("/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}*");

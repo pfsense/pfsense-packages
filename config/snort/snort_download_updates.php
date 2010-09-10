@@ -114,7 +114,9 @@ include_once("/usr/local/pkg/snort/snort_head.inc");
 			jQuery(document).ready(function(){
 			
 				//Examples of how to assign the ColorBox event to elements
+				jQuery(".example7").colorbox({width:"900px", height:"400px", iframe:true, overlayClose:false});
 				jQuery(".example8").colorbox({width:"820px", height:"700px", iframe:true, overlayClose:false});
+				jQuery(".example9").colorbox({width:"90%", height:"65%", iframe:true, overlayClose:false});
 				
 			});
 		</script>

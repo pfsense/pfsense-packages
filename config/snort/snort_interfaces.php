@@ -359,11 +359,10 @@ enable JavaScript to view this content
 			/* There has to be a smarter way to do this */
 			$if_real = convert_friendly_interface_to_real_interface_name2($natent['interface']);
 			$snort_uuid = $natent['uuid'];
-
+			
 			$tester2 = Running_Ck($snort_uuid, $if_real, $id);
 
-			if ($tester2 == 'no')
-			{
+			if ($tester2 == 'no') {
 				$iconfn = 'pass';
 				$class_color_up = 'listbg';
 			}else{
@@ -567,9 +566,9 @@ enable JavaScript to view this content
 }
 </style>
 
-<div id="footer2">SNORT registered ® by Sourcefire, Inc, Barnyard2
-registered ® by securixlive.com, Orion registered ® by Robert Zelaya,
-Emergingthreats registered ® by emergingthreats.net, Mysql registered ®
+<div id="footer2">SNORT registered ï¿½ by Sourcefire, Inc, Barnyard2
+registered ï¿½ by securixlive.com, Orion registered ï¿½ by Robert Zelaya,
+Emergingthreats registered ï¿½ by emergingthreats.net, Mysql registered ï¿½
 by Mysql.com</div>
 <!-- Footer DIV -->
 
