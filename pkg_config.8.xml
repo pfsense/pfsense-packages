@@ -810,6 +810,8 @@
       <required_version>1.2.3</required_version>
       <configurationfile>zabbix-proxy.xml</configurationfile>
       <maintainer>cmb@pfsense.org</maintainer>
+	<build_port_path>/usr/ports/net-mgmt/zabbix-proxy</build_port_path>
+	<build_options>WITHOUT_CARES=true WITHOUT_CURL_DEBUG=true WITHOUT_DEBUGGING=true WITHOUT_DMALLOC=true WITHOUT_ETCSYMLINK=true WITHOUT_EXTRA_PATCHES=true WITHOUT_GDBM=true WITHOUT_GNUTLS=true WITHOUT_IODBC=true WITHOUT_IPMI=true WITHOUT_KERBEROS4=true WITHOUT_LDAP=true WITHOUT_LDAPS=true WITHOUT_LIBIDN=true WITHOUT_LIBSIGSEGV=true WITHOUT_LIBSSH2=true WITHOUT_MFD_REWRITES=true WITHOUT_MULTIPLICITY=true WITHOUT_MYSQL=true WITHOUT_NTLM=true WITHOUT_PERL_MALLOC=true WITHOUT_PGSQL=true WITHOUT_RTMP=true WITHOUT_SITECUSTOMIZE=true WITHOUT_SSH=true WITHOUT_SUIDPERL=true WITHOUT_THREADS=true WITHOUT_TKMIB=true WITHOUT_TRACKMEMORY=true WITHOUT_UNIXODBC=true WITH_CA_BUNDLE=true WITH_CURL=true WITH_DUMMY=true WITH_EXTRA_ENCODINGS=true WITH_FETCH=true WITH_FPING=true WITH_IPV6=true WITH_JABBER=true WITH_LDAP=true WITH_OPENSSL=true WITH_PERL=true WITH_PERL_64BITINT=true WITH_PERL_EMBEDDED=true WITH_PROXY=true WITH_SASL=true WITH_SQLITE=true WITH_USE_PERL=true WITH_WERROR=true</build_options>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>zabbix-proxy-1.8.2_2,2.tbz</depends_on_package>
       <depends_on_package>mysql-client-5.1.50_1.tbz</depends_on_package>
