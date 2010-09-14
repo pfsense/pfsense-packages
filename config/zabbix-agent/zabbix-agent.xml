@@ -83,6 +83,7 @@
     <field>
       <fielddescr>User Parameters</fielddescr>
       <fieldname>userparams</fieldname>
+	<encoding>base64</encoding>
       <value></value>
 	<type>textarea</type>
 	<rows>5</rows>
