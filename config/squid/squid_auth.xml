@@ -144,6 +144,14 @@
 			<size>60</size>
 		</field>
 		<field>
+			<fielddescr>LDAP username DN attribute</fielddescr>
+			<fieldname>ldap_userattribute</fieldname>
+			<description>Enter LDAP username DN attibute.</description>
+			<type>input</type>
+			<size>60</size>
+			<default_value>uid</default_value>
+		</field>
+		<field>
 			<fielddescr>LDAP search filter</fielddescr>
 			<fieldname>ldap_filter</fieldname>
 			<description>Enter LDAP search filter.</description>

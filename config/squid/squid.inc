@@ -1018,7 +1018,7 @@ function squid_resync_auth() {
 			case 'ldap':
 				$port = (isset($settings['auth_port']) ? ":{$settings['auth_port']}" : '');
 				$password = (isset($settings['ldap_pass']) ? "-w {$settings['ldap_pass']}" : '');
-				$conf .= "auth_param basic program /usr/local/libexec/squid/squid_ldap_auth -v {$settings['ldap_version']} -b {$settings['ldap_basedomain']} -D {$settings['ldap_user']} $password -f \"{$settings['ldap_filter']}\" -u uid -P {$settings['auth_server']}$port\n";
+				$conf .= "auth_param basic program /usr/local/libexec/squid/squid_ldap_auth -v {$settings['ldap_version']} -b {$settings['ldap_basedomain']} -D {$settings['ldap_user']} $password -f \"{$settings['ldap_filter']}\" -u {$settings['ldap_userattribute']} -P {$settings['auth_server']}$port\n";
 				break;
 			case 'radius':
 				$port = (isset($settings['auth_port']) ? "-p {$settings['auth_server_port']}" : '');
