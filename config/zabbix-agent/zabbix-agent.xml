@@ -174,7 +174,7 @@
 		$ListenPort=$config['installedpackages']['zabbixagent']['config'][0]['listenport'];
 		$RefreshActChecks=$config['installedpackages']['zabbixagent']['config'][0]['refreshactchecks'];
 		$Timeout=$config['installedpackages']['zabbixagent']['config'][0]['timeout'];
-		$UserParams=$config['installedpackages']['zabbixagent']['config'][0]['userparams'];
+		$UserParams=base64_decode($config['installedpackages']['zabbixagent']['config'][0]['userparams']);
 
         $conf = "Server=$Server\n";
         $conf .= "ServerPort=$ServerPort\n";
