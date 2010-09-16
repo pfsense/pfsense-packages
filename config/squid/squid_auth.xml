@@ -123,6 +123,13 @@
 			<size>60</size>
 		</field>
 		<field>
+			<fielddescr>NT domain</fielddescr>
+			<fieldname>auth_ntdomain</fieldname>
+			<description>Enter here the NT domain.</description>
+			<type>input</type>
+			<size>60</size>
+		</field>
+		<field>
 			<fielddescr>LDAP server user DN</fielddescr>
 			<fieldname>ldap_user</fieldname>
 			<description>Enter here the user DN to use to connect to the LDAP server.</description>
