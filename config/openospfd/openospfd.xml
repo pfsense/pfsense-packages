@@ -116,14 +116,14 @@
 			<type>rowhelper</type>
 			<rowhelper>
 				<rowhelperfield>
-					<fielddescr>Disable Redistribute</fielddescr>
+					<fielddescr>Disable &lt;br/&gt;Redistribution</fielddescr>
 					<fieldname>redistribute</fieldname>
 					<description>Redistribute rules.</description>
 					<type>checkbox</type>
 					<size>20</size>
 				</rowhelperfield>
 				<rowhelperfield>
-					<fielddescr>Route value</fielddescr>
+					<fielddescr>Subnet to Route</fielddescr>
 					<fieldname>routevalue</fieldname>
 					<type>input</type>
 					<size>25</size>
