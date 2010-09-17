@@ -861,7 +861,7 @@
       <descr>Monitoring agent proxy.</descr>
       <category>Services</category>
       <config_file>http://www.pfsense.com/packages/config/zabbix-proxy/zabbix-proxy.xml</config_file>
-      <version>1.8.3_2</version>
+      <version>1.8.3,2_1</version>
       <status>FINAL</status>
       <required_version>1.2.3</required_version>
       <configurationfile>zabbix-proxy.xml</configurationfile>
