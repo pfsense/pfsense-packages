@@ -30,7 +30,11 @@
 
 require("guiconfig.inc");
 
-$pgtitle = "OpenBGPD: Status";
+if ($config['version'] >= 6)
+	$pgtitle = array("OpenBGPD", "Status");
+else
+	$pgtitle = "OpenBGPD: Status";
+
 include("head.inc");
 
 function doCmdT($title, $command) {
@@ -110,7 +114,12 @@ function execCmds() {
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle"><?=$pgtitle?></font></p>
+
+<?php
+	if ($config['version'] < 6)
+		echo '<p class="pgtitle">' . $pgtitle . '</font></p>';
+?>
+
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <div id="mainlevel">

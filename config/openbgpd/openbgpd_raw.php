@@ -31,6 +31,8 @@
 require("guiconfig.inc");
 require("openbgpd.inc");
 
+global $config;
+
 if (isset($_POST['openbgpd_raw'])) {
   openbgpd_put_raw_config($_POST['openbgpd_raw']);
   write_config();
@@ -39,13 +41,22 @@ if (isset($_POST['openbgpd_raw'])) {
 
 $openbgpd_raw = openbgpd_get_raw_config();
 
-$pgtitle = "OpenBGPD: raw config";
+if ($config['version'] >= 6)
+	$pgtitle = array("OpenBGPD", "Raw config");
+else
+	$pgtitle = "OpenBGPD: Raw config";
+
 include("head.inc");
 
 ?>
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle"><?=$pgtitle?></font></p>
+
+<?php
+	if ($config['version'] < 6)
+		echo '<p class="pgtitle">' . $pgtitle . '</font></p>';
+?>
+
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <div id="mainlevel">
@@ -60,29 +71,28 @@ include("head.inc");
 	display_top_tabs($tab_array);
 ?>
 </table>
-<form action="openbgpd_raw.php" method="post" name="iform" id="iform">
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <form action="openbgpd_raw.php" method="post" name="iform" id="iform">
    <tr>
     <td class="tabcont" >
       You can edit the raw bgpd.conf here.<br>
       Note: Once you click "Save" below, the assistant (in the "Settings", "Neighbors" and "Groups" tabs above) will be overridden with whatever you type here. To get back the assisted config save this form below once with an empty input field.
      </td>
-    </tr>
+   </tr>
    <tr>
     <td class="tabcont" >
       <textarea name="openbgpd_raw" rows="40" cols="80"><? echo $openbgpd_raw; ?></textarea>
      </td>
     </tr>
-  <tr>
+   <tr>
     <td>
       <input name="Submit" type="submit" class="formbtn" value="Save"> <input class="formbtn" type="button" value="Cancel" on
       click="history.back()">
     </td>
-  </tr>
+   </tr>
+  </form>
 </table>
-
-</form>
 
 </div>
 
