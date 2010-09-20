@@ -28,8 +28,12 @@
 
 require_once("guiconfig.inc");
 
-$pgtitle = "Diagnostics: Show States";
+global $config;
 
+if ($config['version'] >= 6)
+	$pgtitle = array("Diagnostics", "Show States");
+else
+	$pgtitle = "Diagnostics: Show States";
 
 /* put your custom HTML head content here        */
 /* using some of the $pfSenseHead function calls */
@@ -310,7 +314,12 @@ include("head.inc");
 <script src="/javascript/sorttable.js" type="text/javascript"></script>
 
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle"><?=$pgtitle?></p>
+
+<?php
+	if ($config['version'] < 6)
+		echo '<p class="pgtitle">' . $pgtitle . '</p>';
+?>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
   	<td class="listhdrr" colspan="9">Statistics snapshot control</td>
