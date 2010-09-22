@@ -518,6 +518,15 @@ function squidguard_before_form_acl($pkg, $is_acl=true) {
     }
 
     # --- Destinations ---
+    # User destinations
+    if ($squidguard_config[F_DESTINATIONS]) {
+        foreach($squidguard_config[F_DESTINATIONS]['item'] as $dst)
+            $dest_items[] = array ('name'=>$dst[F_NAME],
+                                   'upt_value'=>$acls_up[$dst[F_NAME]],
+                                   'ovt_value'=>$acls_over[$dst[F_NAME]],
+                                   'description'=>$dst[F_DESCRIPTION]);
+    }
+
     # Blacklist
     if ($squidguard_config[F_BLACKLISTENABLED] === 'on') {
         $blk_entries = sg_entries_blacklist();
@@ -528,15 +537,6 @@ function squidguard_before_form_acl($pkg, $is_acl=true) {
                                        'ovt_value'=>$acls_over[$dst],
                                        'description'=>'');
         }
-    }
-
-    # User destinations
-    if ($squidguard_config[F_DESTINATIONS]) {
-        foreach($squidguard_config[F_DESTINATIONS]['item'] as $dst)
-            $dest_items[] = array ('name'=>$dst[F_NAME],
-                                   'upt_value'=>$acls_up[$dst[F_NAME]],
-                                   'ovt_value'=>$acls_over[$dst[F_NAME]],
-                                   'description'=>$dst[F_DESCRIPTION]);
     }
 
     # Default all
