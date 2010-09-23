@@ -163,49 +163,6 @@ if ($_POST['startupdate'] != '') {
 # ------------------------------------------------------------------------------
 ?>
 
-<style type="text/css">
-<!--
-.avheader { 
-	padding-right: 20px;
-	padding-left: 8px;
-	font-weight: bold;
-	border-bottom: 1px solid #E9E9E9;
-	font-size: 11px;
-}
-.avlist_h { 
-	background-color: #BBBBBB; 
-	padding-right: 16px; 
-	padding-left: 6px; 
-	padding-top: 2px; 
-	padding-bottom: 2px; 
-	font-size: 11px; font-weight: 
-	bold; border-bottom: 1px solid #999999; 
-}
-.avlist_lr {
-	background-color: #FFFFFF; 
-	border-right: 1px solid #999999; 
-	border-bottom: 1px solid #999999; 
-	border-left: 1px solid #999999; 
-	font-size: 11px; 
-	padding-right: 6px; 
-	padding-left: 6px;
-	padding-top: 4px;
-	padding-bottom: 4px;
-}
-.avlisttopic {
-	background-color: #990000;
-	padding-right: 16px;
-	padding-left: 6px;
-	padding-top: 2px;
-	padding-bottom: 2px;
-	border-right: 1px solid #999999;
-	font-size: 11px;
-	font-weight: bold;
-	color: #FFFFFF;
-}
--->
-</style>
-
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
 
@@ -226,7 +183,7 @@ if (pfsense_version_A() == '1') {
           <td width="50%" valign="top">
 
             <table width="100%" border="0" cellpadding="0" cellspacing="0">
-              <tr><td class="avlist_h">Service</td></tr>	              
+              <tr><td class="listhdrr">Service</td></tr>
               <tr>
                 <td>
                   <table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -266,7 +223,7 @@ if (pfsense_version_A() == '1') {
                 </td>
               </tr>
               <tr><td>&nbsp;</td></tr>
-              <tr><td class="avlist_h">Settings</td></tr>	              
+              <tr><td class="listhdrr">Settings</td></tr>
               <tr>                
                 <td class="vncellt">
                     <a href="/pkg_edit.php?xml=havp.xml&amp;id=0">
@@ -276,7 +233,7 @@ if (pfsense_version_A() == '1') {
                 </td>
               </tr>
               <tr><td>&nbsp;</td></tr>
-              <tr><td class="avlist_h">Update</td></tr>	              
+              <tr><td class="listhdrr">Update</td></tr>
               <tr>
                 <td class="vncellt" nowrap>
                   <?php echo "<input height=14 title='Start antivirus update' name='startupdate' type='image' value='startupdate' border=0 src='./themes/".$g['theme']."/images/icons/icon_service_start.gif'>"; ?>
@@ -284,7 +241,7 @@ if (pfsense_version_A() == '1') {
                 </td>
               </tr>
               <tr><td>&nbsp;</td></tr>
-              <tr><td class="avlist_h">File scanner</td></tr>	              
+              <tr><td class="listhdrr">File scanner</td></tr>
               <tr>
                 <td class="vtable">
                   <table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -320,7 +277,7 @@ if (pfsense_version_A() == '1') {
           </td>
           <td width="50%" valign="top">
             <table width="100%" border="0" cellpadding="6" cellspacing="0">
-              <tr><td class="avlisttopic" colspan=2>Antivirus version info</td></tr>	              
+              <tr><td class="listhdrr" colspan=2>Antivirus version info</td></tr>
               <tr>
                 <td class="vncellt">Antivirus Server</td>
                 <td class="listr" width=75%>
@@ -336,7 +293,7 @@ if (pfsense_version_A() == '1') {
             </table>
             <br>
             <table width="100%" border="0" cellspacing="0" cellpadding="1" ><tbody>
-              <tr class="avlisttopic" align="center"><td>Database</td><td>Date</td><td>Size</td><td>Ver.</td><td>Signatures</td><td>Builder</td></tr>
+              <tr  align="center"><td class="listhdrr">Database</td><td class="listhdrr">Date</td><td class="listhdrr">Size</td><td class="listhdrr">Ver.</td><td class="listhdrr">Signatures</td><td class="listhdrr">Builder</td></tr>
               <?php echo get_avdb_info("daily.cld"); ?>
               <?php echo get_avdb_info("daily.cvd"); ?>
               <?php echo get_avdb_info("main.cld"); ?>
@@ -346,14 +303,14 @@ if (pfsense_version_A() == '1') {
             </tbody></table>
             <br>
             <table width="100%" border="0" cellspacing="0" cellpadding="1" ><tbody>
-              <tr><td class="avlisttopic">Update status</td></tr>	              
+              <tr><td class="listhdrr">Update status</td></tr>
               <tr><td class="listr" width=75%>
                 <?php echo avupdate_status(); ?>
               </td></tr>
             </tbody></table>
             <br>
             <table width="100%" border="0" cellspacing="0" cellpadding="1" ><tbody>
-              <tr><td class="avlisttopic">Scanner status</td></tr>	              
+              <tr><td class="listhdrr">Scanner status</td></tr>
               <tr>
                 <td class="listr" width=75%><?php echo get_scan_log(); ?></td>
               </tr>
@@ -363,7 +320,7 @@ if (pfsense_version_A() == '1') {
         <tr>
           <td colspan=2>
             <table width="100%" border="0" cellspacing="0" cellpadding="1" ><tbody>
-              <tr class="vncellt"><td class="avlist_h" colspan="4">Last Viruses</td></tr>	              
+              <tr class="vncellt"><td class="listhdrr" colspan="4">Last Viruses</td></tr>
               <?php 
                   $count = 30;
                   $stl   = "style='padding-right: 4px;'";
