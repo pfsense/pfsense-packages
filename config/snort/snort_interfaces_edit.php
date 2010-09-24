@@ -34,6 +34,7 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
+global $g;
 
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
@@ -403,7 +404,7 @@ if (isset($_GET['dup'])) {
 
 <noscript>
 <div class="alert" ALIGN=CENTER><img
-	src="/themes/nervecenter/images/icons/icon_alert.gif" /><strong>Please
+	src="/themes/<?php echo $g['theme']; ?>/images/icons/icon_alert.gif" /><strong>Please
 enable JavaScript to view this content</strong></div>
 </noscript>
 <script language="JavaScript">

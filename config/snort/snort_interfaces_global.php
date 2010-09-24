@@ -37,6 +37,8 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
+global $g;
+
 $d_snort_global_dirty_path = '/var/run/snort_global.dirty';
 
 /* make things short  */
@@ -293,7 +295,7 @@ echo "$snort_interfaces_css\n";
 
 <noscript>
 <div class="alert" ALIGN=CENTER><img
-	src="../themes/nervecenter/images/icons/icon_alert.gif" /><strong>Please
+	src="../themes/<?php echo $g['theme']; ?>/images/icons/icon_alert.gif" /><strong>Please
 enable JavaScript to view this content
 </CENTER></div>
 </noscript>

@@ -35,6 +35,8 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
+global $g;
+
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
 }
@@ -276,7 +278,7 @@ echo "{$snort_general_css}\n";
 
 <noscript>
 <div class="alert" ALIGN=CENTER><img
-	src="../themes/nervecenter/images/icons/icon_alert.gif" /><strong>Please
+	src="../themes/<?php echo $g['theme']; ?>/images/icons/icon_alert.gif" /><strong>Please
 enable JavaScript to view this content
 </CENTER></div>
 </noscript>
@@ -353,7 +355,7 @@ enable JavaScript to view this content
 				padding: 15px 10px 85% 50px;
 				}
 				</style> 
-				<div class=\"alert\" ALIGN=CENTER><img src=\"../themes/nervecenter/images/icons/icon_alert.gif\"/><strong>You can not edit options without an interface ID.</CENTER></div>\n";
+				<div class=\"alert\" ALIGN=CENTER><img src=\"../themes/{$g['theme']}/images/icons/icon_alert.gif\"/><strong>You can not edit options without an interface ID.</CENTER></div>\n";
 
 		}
 		?>
