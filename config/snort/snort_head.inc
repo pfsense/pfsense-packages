@@ -43,8 +43,14 @@ file_exists("{$g['www_path']}/themes/{$g['theme']}/wizard.css")): ?>
 <link rel="stylesheet" type="text/css" href="../niftycssprintCode.css"
 	media="print">
 
+<?php if ($config['version'] >= 6): ?>
+<link rel="stylesheet" type="text/css" href="/themes/<?php echo $g['theme']; ?>/new_tab_menu.css"
+	media="all">
+<?php else: ?>
 <link rel="stylesheet" type="text/css" href="./css/new_tab_menu.css"
 	media="all">
+<?php endif; ?>
+
 <link rel="stylesheet" type="text/css" href="./css/sexybuttons.css"
 	media="all" />
 <link rel="stylesheet" type="text/css" href="./css/colorbox.css"

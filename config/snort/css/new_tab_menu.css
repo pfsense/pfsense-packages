@@ -48,10 +48,10 @@
 			
 */
 
-.snorttabs ul, li{border:0; margin:0; padding:0; list-style:none;}
+.newtabmenu ul, li{border:0; margin:0; padding:0; list-style:none;}
 
-.snorttabs li{float:left; margin-right:2px; text-align: center;}
-.snorttabs a:link, .snorttabs a:visited{
+.newtabmenu li{float:left; margin-right:2px; text-align: center;}
+.newtabmenu a:link, .newtabmenu a:visited{
 	background:url(/snort/images/new_tab_menu.png) right 45px;
 	color:#ffffff; /* noactive font */
 	display:block;
@@ -64,7 +64,7 @@
 	line-height:20px;
 	text-decoration:none;
 }
-.snorttabs a span{
+.newtabmenu a span{
 	background:url(/snort/images/new_tab_menu.png) left 45px;
 	display:block;
 	/* fix for IE6 */
@@ -74,7 +74,7 @@
 	margin-right:7px;
 	padding-left:7px;
 }
-.snorttabs a:hover{
+.newtabmenu a:hover{
 	background:url(/snort/images/new_tab_menu.png) right 23px;
 	display:block;
 	/* fix for IE6 */
@@ -82,7 +82,7 @@
 	/*     END     */
 	color:#ffffff; /* hover over font */
 }
-.snorttabs a:hover span{
+.newtabmenu a:hover span{
 	background:url(/snort/images/new_tab_menu.png) left 23px;
 	display:block;
 	/* fix for IE6 */
@@ -92,10 +92,10 @@
 
 /* -------------------------------- */
 /* 	ACTIVE ELEMENTS					*/
-.snorttabs_active a:link, .snorttabs_active a:visited, .snorttabs_active a:visited, .snorttabs_active a:hover{
+.newtabmenu_active a:link, .newtabmenu_active a:visited, .newtabmenu_active a:visited, .newtabmenu_active a:hover{
 	color:#000000; /* active font */
 	background:url(/snort/images/new_tab_menu.png) right 0 no-repeat;
 } 
-.snorttabs_active a span, .snorttabs_active a:hover span{
+.newtabmenu_active a span, .newtabmenu_active a:hover span{
 	background:url(/snort/images/new_tab_menu.png) left 0 no-repeat;
 }

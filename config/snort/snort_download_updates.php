@@ -147,12 +147,12 @@ enable JavaScript to view this content
 	<tr>
 		<td>
 
-		<div class="snorttabs" style="margin: 1px 10px; width: 760px;"><!-- Tabbed bar code-->
-		<ul class="snorttabs">
+		<div class="newtabmenu" style="margin: 1px 10px; width: 760px;"><!-- Tabbed bar code-->
+		<ul class="newtabmenu">
 			<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
 			<li><a href="/snort/snort_interfaces_global.php"><span>Global
 			Settings</span></a></li>
-			<li class="snorttabs_active"><a
+			<li class="newtabmenu_active"><a
 				href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
 			<li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
 			<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
@@ -168,10 +168,10 @@ enable JavaScript to view this content
 	<tr>
 		<td>
 
-		<div class="snorttabs" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
-		<ul class="snorttabs">
+		<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
+		<ul class="newtabmenu">
 
-			<li class="snorttabs_active"><a
+			<li class="newtabmenu_active"><a
 				href="/snort/snort_download_rules.php"><span>Rule Update</span></a></li>
 			<li><a href="#"><span>Upload Custom Rules</span></a></li>
 			<li><a href="#"><span>Gui Update</span></a></li>

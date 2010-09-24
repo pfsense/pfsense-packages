@@ -355,16 +355,16 @@ echo "
 		if($id != "")
 		{
 
-			echo '<div class="snorttabs" style="margin:1px 0px; width:775px;">' . "\n";
+			echo '<div class="newtabmenu" style="margin:1px 0px; width:775px;">' . "\n";
 			echo '<!-- Tabbed bar code -->' . "\n";
-			echo '<ul class="snorttabs">' . "\n";
+			echo '<ul class="newtabmenu">' . "\n";
 			echo '<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>' . "\n";
 			echo "<li><a href=\"/snort/snort_interfaces_edit.php?id={$id}\"><span>If Settings</span></a></li>\n";
 			echo "<li><a href=\"/snort/snort_rulesets.php?id={$id}\"><span>Categories</span></a></li>\n";
 			echo "<li><a href=\"/snort/snort_rules.php?id={$id}\"><span>Rules</span></a></li>\n";
 			echo "<li><a href=\"/snort/snort_define_servers.php?id={$id}\"><span>Servers</span></a></li>\n";
 			echo "<li><a href=\"/snort/snort_preprocessors.php?id={$id}\"><span>Preprocessors</span></a></li>\n";
-			echo "<li class=\"snorttabs_active\"><a href=\"/snort/snort_barnyard.php?id={$id}\"><span>Barnyard2</span></a></li>\n";
+			echo "<li class=\"newtabmenu_active\"><a href=\"/snort/snort_barnyard.php?id={$id}\"><span>Barnyard2</span></a></li>\n";
 			echo '</ul>' . "\n";
 			echo '</div>' . "\n";
 

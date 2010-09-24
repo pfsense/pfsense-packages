@@ -340,13 +340,13 @@ if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 	<tr>
 		<td>
 
-		<div class="snorttabs" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
-		<ul class="snorttabs">
+		<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
+		<ul class="newtabmenu">
 			<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
 			<li><a href="/snort/snort_interfaces_global.php"><span>Global
 			Settings</span></a></li>
 			<li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
-			<li class="snorttabs_active"><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
+			<li class="newtabmenu_active"><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
 			<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
 			<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
 			<li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>

@@ -312,9 +312,9 @@ enable JavaScript to view this content
 	<tr>
 		<td>
 
-		<div class="snorttabs" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
-		<ul class="snorttabs">
-			<li class="snorttabs_active"><a href="/snort/snort_interfaces.php"><span>Snort
+		<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
+		<ul class="newtabmenu">
+			<li class="newtabmenu_active"><a href="/snort/snort_interfaces.php"><span>Snort
 			Interfaces</span></a></li>
 			<li><a href="/snort/snort_interfaces_global.php"><span>Global
 			Settings</span></a></li>

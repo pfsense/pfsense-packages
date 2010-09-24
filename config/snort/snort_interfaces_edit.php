@@ -504,13 +504,13 @@ echo "
 		}
 
 
-		echo '<div class="snorttabs" style="margin:1px 0px; width:775px;">' . "\n";
+		echo '<div class="newtabmenu" style="margin:1px 0px; width:775px;">' . "\n";
 		echo '<!-- Tabbed bar code -->' . "\n";
-		echo '<ul class="snorttabs">' . "\n";
+		echo '<ul class="newtabmenu">' . "\n";
 		if (!file_exists("/var/run/snort_conf_{$snort_uuid}_.dirty")) {
 			echo '<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>' . "\n";
 		}
-		echo "<li  class=\"snorttabs_active\"><a href=\"/snort/snort_interfaces_edit.php?id={$id}\"><span>If Settings</span></a></li>\n";
+		echo "<li  class=\"newtabmenu_active\"><a href=\"/snort/snort_interfaces_edit.php?id={$id}\"><span>If Settings</span></a></li>\n";
 		/* hide user tabs when no settings have be saved */
 		if ($config['installedpackages']['snortglobal']['rule'][$id]['interface'] != '') {
 			if (!file_exists("/var/run/snort_conf_{$snort_uuid}_.dirty")) {
