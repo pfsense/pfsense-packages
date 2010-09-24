@@ -1617,9 +1617,12 @@ function havp_get_scan_log()
 function havp_get_filescanlist()
 {
     $slist = array();
-    $slist['Squid cache path (scan you squid cache now).'] = '/var/squid';
-    $slist['Common DB path.'] = '/var/db';
-    $slist['Temp path'] = '/tmp';
+    $slist[0]['descr'] = 'Squid cache path (scan you squid cache now).';
+    $slist[0]['path']  = '/var/squid';
+    $slist[1]['descr'] = 'Common DB path.';
+    $slist[1]['path']  = '/var/db';
+    $slist[2]['descr'] = 'Temp path.';
+    $slist[2]['path']  = '/tmp';
     return $slist;
 }
 

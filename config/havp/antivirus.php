@@ -254,10 +254,10 @@ if (pfsense_version_A() == '1') {
                         <?php
                           $scanlist = get_scanlist();
                           if (is_array($scanlist))
-                              foreach($scanlist as $key => $val) {
-                                  echo "<span onclick=\"document.getElementById('scanpath').value='{$val}';\" style=\"cursor: pointer;\">\n";
+                              foreach($scanlist as $scan) {
+                                  echo "<span onclick=\"document.getElementById('scanpath').value='{$scan['path']}';\" style=\"cursor: pointer;\">\n";
                                   echo "<img src='./themes/".$g['theme']."/images/icons/icon_pass.gif'>\n";
-                                  echo "<u>{$key}</u>\n";
+                                  echo "<u>{$scan['descr']}</u>\n";
                                   echo "</span>";
                                   echo "<br>";
                               }
