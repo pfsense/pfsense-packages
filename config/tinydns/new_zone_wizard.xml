@@ -234,14 +234,17 @@
 			tinydns_sync_on_changes();
 		}
 
+	]]>
+	</stepsubmitbeforesave>
+	<stepsubmitphpaction>
+	<![CDATA[
 		// If service is running redirect to domains page.
 		// Otherwise redirect to the tinydns settings page.
 		if(is_dir("/service/tinydns"))
 			Header("Location: /pkg.php?xml=tinydns_domains.xml");
 		else
 			Header("Location: /pkg_edit.php?xml=tinydns.xml&id=0");
-
 	]]>
-	</stepsubmitbeforesave>
+	</stepsubmitphpaction>
 </step>
 </pfsensewizard>
