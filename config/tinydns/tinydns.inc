@@ -936,8 +936,8 @@ function tinydns_add_active_leases($fl, $fd, $leasedomain) {
          * timestamp in tai64 format. See tinydns-data and djbs tai64 site:
          * http://cr.yp.to/libtai/tai64.html
          */
-        fprintf($fd, "=%s.%s:%s:0:4%015x\n", $lease['client-hostname'],
-            $leasedomain, $lease['ip'], $lease['ends'] + 10);
+        fwrite($fd, sprintf("=%s.%s:%s:0:4%015x\n", $lease['client-hostname'],
+            $leasedomain, $lease['ip'], $lease['ends'] + 10));
     }
 }
 
