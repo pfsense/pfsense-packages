@@ -8,26 +8,26 @@
 		Copyright (C) 2008 Scott Ullrich
 		All rights reserved.
 
-        Redistribution and use in source and binary forms, with or without
-        modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-        1. Redistributions of source code must retain the above copyright notice,
-           this list of conditions and the following disclaimer.
+	1. Redistributions of source code must retain the above copyright notice,
+	   this list of conditions and the following disclaimer.
 
-        2. Redistributions in binary form must reproduce the above copyright
-           notice, this list of conditions and the following disclaimer in the
-           documentation and/or other materials provided with the distribution.
+	2. Redistributions in binary form must reproduce the above copyright
+	   notice, this list of conditions and the following disclaimer in the
+	   documentation and/or other materials provided with the distribution.
 
-        THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-        INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-        AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-        AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-        OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-        SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-        INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-        CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-        ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-        POSSIBILITY OF SUCH DAMAGE.
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
 */
 </copyright>
 <totalsteps>2</totalsteps>
@@ -58,7 +58,7 @@
 		<field>
 			<name>Primary Nameserver</name>
 			<type>listtopic</type>
-		</field>		
+		</field>
 		<field>
 			<name>Primary Nameserver</name>
 			<type>input</type>
@@ -69,7 +69,7 @@
 		<field>
 			<name>Secondary Nameserver</name>
 			<type>listtopic</type>
-		</field>		
+		</field>
 		<field>
 			<name>Secondary Nameserver</name>
 			<type>input</type>
@@ -84,29 +84,29 @@
 			<name>Mail exchanger record hostname</name>
 			<type>input</type>
 			<arraynum>1</arraynum>
-			<description>Enter the hostname of your Mail exchanger (MX) - (ex: exchange.example.com)</description>									
+			<description>Enter the hostname of your Mail exchanger (MX) - (ex: exchange.example.com)</description>
 		</field>
 		<field>
 			<name>Mail exchanger record IP address</name>
 			<type>input</type>
 			<arraynum>1</arraynum>
-			<description>Enter the IP address of your Mail exchanger (MX) - (not needed if hostname above is in a different domain)</description>									
+			<description>Enter the IP address of your Mail exchanger (MX) - (not needed if hostname above is in a different domain)</description>
 		</field>
 		<field>
 			<name>First A record (optional)</name>
 			<type>listtopic</type>
-		</field>		
+		</field>
 		<field>
 			<name>First A record hostname</name>
 			<type>input</type>
 			<arraynum>1</arraynum>
-			<description>Enter the first A records hostname (ex: www.example.com)</description>						
+			<description>Enter the first A records hostname (ex: www.example.com)</description>
 		</field>
 		<field>
 			<name>First A record IP address</name>
 			<type>input</type>
 			<arraynum>1</arraynum>
-			<description>Enter the first A records IP address (ex: 1.2.3.4)</description>									
+			<description>Enter the first A records IP address (ex: 1.2.3.4)</description>
 		</field>
 		<field>
 			<name>Secondary A record (optional)</name>
@@ -116,13 +116,13 @@
 			<name>Second A record IP hostname</name>
 			<type>input</type>
 			<arraynum>1</arraynum>
-			<description>Enter the second A records hostname (ex: example.com)</description>												
+			<description>Enter the second A records hostname (ex: example.com)</description>
 		</field>
 		<field>
 			<name>Second A record IP address</name>
 			<type>input</type>
 			<arraynum>1</arraynum>
-			<description>Enter the second A records IP address (ex: 5.6.7.8)</description>									
+			<description>Enter the second A records IP address (ex: 5.6.7.8)</description>
 		</field>
 		<field>
 			<name>Third A record (optional)</name>
@@ -132,13 +132,13 @@
 			<name>Third A record IP hostname</name>
 			<type>input</type>
 			<arraynum>1</arraynum>
-			<description>Enter the third A records hostname (ex: www2.example.com)</description>												
+			<description>Enter the third A records hostname (ex: www2.example.com)</description>
 		</field>
 		<field>
 			<name>Third A record IP address</name>
 			<type>input</type>
 			<arraynum>1</arraynum>
-			<description>Enter the third A records IP address (ex: 9.10.11.12)</description>									
+			<description>Enter the third A records IP address (ex: 9.10.11.12)</description>
 		</field>
 		<field>
 			<name>Next</name>
@@ -147,31 +147,31 @@
 	</fields>
 	<stepsubmitbeforesave>
 	<![CDATA[
-	
-		$changed = false; 
-				
+
+		$changed = false;
+
 		if($_POST['domainname'] and $_POST['primarynameserver']) {
 			$tmp = array();
 			$tmp['hostname'] = $_POST['domainname'];
 			$tmp['recordtype'] = "SOA";
 			$tmp['ipaddress'] = $_POST['primarynameserver'];
 			if(!preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/",$tmp['ipaddress']) && substr($tmp['ipaddress'],-1) != ".")
-				$tmp['ipaddress'] = $tmp['ipaddress'] . ".";				
+				$tmp['ipaddress'] = $tmp['ipaddress'] . ".";
 			$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
 			unset($tmp);
-			$changed = true; 
+			$changed = true;
 		}
 
 		if($_POST['domainname'] and $_POST['secondarynameserver']) {
-			$tmp = array();	
+			$tmp = array();
 			$tmp['hostname'] = $_POST['domainname'];
 			$tmp['recordtype'] = "SOA";
 			$tmp['ipaddress'] = $_POST['secondarynameserver'];
 			if(!preg_match("/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/",$tmp['ipaddress']) && substr($tmp['ipaddress'],-1) != ".")
-				$tmp['ipaddress'] = $tmp['ipaddress'] . ".";				
+				$tmp['ipaddress'] = $tmp['ipaddress'] . ".";
 			$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
 			unset($tmp);
-			$changed = true; 
+			$changed = true;
 		}
 
 		if($_POST['firstarecordhostname'] and $_POST['firstarecordipaddress']) {
@@ -181,9 +181,9 @@
 			$tmp['ipaddress'] = $_POST['firstarecordipaddress'];
 			$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
 			unset($tmp);
-			$changed = true; 
+			$changed = true;
 		}
-		
+
 		if($_POST['secondarecordiphostname'] and $_POST['secondarecordipaddress']) {
 			$tmp = array();
 			$tmp['hostname'] = $_POST['secondarecordiphostname'];
@@ -191,7 +191,7 @@
 			$tmp['ipaddress'] = $_POST['secondarecordipaddress'];
 			$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
 			unset($tmp);
-			$changed = true; 
+			$changed = true;
 		}
 
 		if($_POST['thirdarecordiphostname'] and $_POST['thirdarecordipaddress']) {
@@ -201,7 +201,7 @@
 			$tmp['ipaddress'] = $_POST['thirdarecordipaddress'];
 			$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
 			unset($tmp);
-			$changed = true; 
+			$changed = true;
 		}
 
 		if($_POST['mailexchangerrecordhostname']) {
@@ -210,7 +210,7 @@
 			$tmp['recordtype'] = "MX";
 			$tmp['ipaddress'] = $_POST['mailexchangerrecordhostname'];
 			if(substr($tmp['ipaddress'],-1) != ".")
-				$tmp['ipaddress'] = $tmp['ipaddress'] . ".";				
+				$tmp['ipaddress'] = $tmp['ipaddress'] . ".";
 			$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
 			unset($tmp);
 			$changed = true;
@@ -219,13 +219,13 @@
 				$tmp = array();
 				$tmp['hostname'] = $_POST['mailexchangerrecordhostname'];
 				$tmp['recordtype'] = "A";
-				$tmp['ipaddress'] = $_POST['mailexchangerrecordipaddress'];		
+				$tmp['ipaddress'] = $_POST['mailexchangerrecordipaddress'];
 				$config['installedpackages']['tinydnsdomains']['config'][] = $tmp;
 				unset($tmp);
 				$changed = true;
-			}	
+			}
 		}
-		
+
 		if($changed) {
 			write_config("new_zone_wizard.xml is creating a new zone {$_POST['domainname']}");
 			require_once("/usr/local/pkg/tinydns.inc");
@@ -234,14 +234,14 @@
 			tinydns_sync_on_changes();
 		}
 
-		// If service is running redirect to domains page.  
+		// If service is running redirect to domains page.
 		// Otherwise redirect to the tinydns settings page.
 		if(is_dir("/service/tinydns"))
 			Header("Location: /pkg.php?xml=tinydns_domains.xml");
-		else 
+		else
 			Header("Location: /pkg_edit.php?xml=tinydns.xml&id=0");
 
-	]]>	
-	</stepsubmitbeforesave>	
+	]]>
+	</stepsubmitbeforesave>
 </step>
 </pfsensewizard>
