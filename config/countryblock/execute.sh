@@ -42,20 +42,22 @@ while read line
 	do a=$(($a+1));
 	echo $a; 
 	if [ "$a" = "$i" ]; then
+		for i in $(cat interfaces.txt); do
 		echo "" >> /tmp/rules.debug.tmp
 		echo "#countryblock" >> /tmp/rules.debug.tmp
 		echo "table <countryblock> persist file '/usr/local/www/packages/countryblock/lists/countries.txt'" >> /tmp/rules.debug.tmp
 		echo "table <countryblockW> persist file '/usr/local/www/packages/countryblock/countries-white.txt'" >> /tmp/rules.debug.tmp
-		echo "pass quick from <countryblockW> to any label 'countryblock'" >> /tmp/rules.debug.tmp
-		echo "pass quick from any to <countryblockW> label 'countryblock'" >> /tmp/rules.debug.tmp
+		echo "pass quick from <countryblockW> to $i label 'countryblock'" >> /tmp/rules.debug.tmp
+		echo "pass quick from $i to <countryblockW> label 'countryblock'" >> /tmp/rules.debug.tmp
 		if [ -f logging ]; then
-			echo "block log quick from <countryblock> to any label 'countryblock'" >> /tmp/rules.debug.tmp
+			echo "block log quick from <countryblock> to $i label 'countryblock'" >> /tmp/rules.debug.tmp
 		else
-			echo "block quick from <countryblock> to any label 'countryblock'" >> /tmp/rules.debug.tmp
+			echo "block quick from <countryblock> to $i label 'countryblock'" >> /tmp/rules.debug.tmp
 		fi
 		if [ -f OUTBOUND ]; then
-			echo "block quick from any to <countryblock> label 'countryblock'" >> /tmp/rules.debug.tmp
+			echo "block quick from $i to <countryblock> label 'countryblock'" >> /tmp/rules.debug.tmp
 		fi
+		done
 	fi
 	echo $line >> /tmp/rules.debug.tmp
 done < "/tmp/rules.debug"
