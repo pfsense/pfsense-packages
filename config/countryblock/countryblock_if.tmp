@@ -171,9 +171,14 @@ include("head.inc");
   
 </table>
 </div>
-<br>
-<input type="submit" class="formbtn" value="Save"><br><br>
-<p></p></td>
+    <p><br>
+  <input type="submit" class="formbtn" value="Save">
+    </p>
+    <p>Select the interfaces you want secured. </p>
+    <p>I <strong>highly</strong> recommend selecting <u>all</u> interfaces. <br>
+      <br>
+    </p>
+    <p></p></td>
 	</tr>
 </table>
 </form>
