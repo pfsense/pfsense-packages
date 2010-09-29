@@ -124,6 +124,16 @@
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/countryblock/whitelist.tmp</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/countryblock/countryblock_if.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/countryblock/firewall_shaper.tmp</item>
+	</additional_files_needed>
 	<fields>
 		<field>
 			<fielddescr>Variable One</fielddescr>

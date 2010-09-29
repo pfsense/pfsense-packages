@@ -59,8 +59,12 @@ function php_install_command_cb()
 	//rename PHP files from .tmp to .php
 	exec("cp /tmp/countryblock.tmp /usr/local/www/packages/countryblock/countryblock.php");
 	unlink_if_exists("/tmp/countryblock.tmp");
+	exec("cp /tmp/countryblock_if.tmp /usr/local/www/packages/countryblock/countryblock_if.php");
+	unlink_if_exists("/tmp/countryblock_if.tmp");
 	exec("cp /tmp/index.tmp /usr/local/www/packages/countryblock/index.php");
 	unlink_if_exists("/tmp/index.tmp");
+	exec("cp /tmp/firewall_shaper.tmp /usr/local/www/packages/countryblock/firewall_shaper.php");
+	unlink_if_exists("/tmp/firewall_shaper.tmp");
 	//Get scripts
 	exec("cp /tmp/countryblock.sh /usr/local/etc/rc.d/countryblock.sh");
 	unlink_if_exists("/tmp/countryblock.sh");

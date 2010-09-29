@@ -68,7 +68,7 @@ if (count($_POST)>0) {
 	}
 
 
-	write_config();
+	//write_config();
 	//services_dnsmasq_configure();
 	sleep(1);
 	$savemsg_cb = "Country Block settings have been saved/updated. ";
@@ -98,7 +98,7 @@ else {
 ?>
 <?php
 
-
+conf_mount_rw();
 mwexec("touch countries.txt");
 //$myFile = "countries.txt";
 //$fh = fopen($myFile, 'a+');
@@ -152,6 +152,7 @@ mwexec("touch countries.txt");
 			echo("</p>");
 		}
 	}
+conf_mount_ro();
 ?>
 
 
@@ -260,7 +261,7 @@ background-color: #F3F3F3;
 <strong>Enable Country Block</strong><br><br>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
-	<td class="tabcont" >
+	<td >
 	<?php if ($savemsg_cb) print_info_box($savemsg_cb); 
 		//if ($output) print_info_box($output,$output2);
 		echo($output);
@@ -271,7 +272,18 @@ background-color: #F3F3F3;
 	
 	<form action="<?php echo htmlentities($_SERVER['PHP_SELF']); ?>" method="post">
 	<p>
-		Check the country that you would like to block completely. Currently 
+    	<?php 
+		$countif = "interfaces.txt";
+		if (file_exists($countif)) {
+			$countif =  count(file($countif)); 
+			echo "$countlines"; 
+		} else {
+				echo "<span style='color:red'>Warning! No Interfaces Selected Click <a href='countryblock_if.php' target='_parent'><img src='../../themes/nervecenter/images/icons/icon_cablenic.gif' ALT='if'></a></span>";
+		}
+			
+		?>
+        </p>
+		<p>Check the country that you would like to block completely. Currently 
 		<?php 
 		$countfile = "countries.txt";
 		if (file_exists($countfile)) {
@@ -284,6 +296,7 @@ background-color: #F3F3F3;
 		?> 
             
       of 246 selected. <a href="whitelist.php" target="_parent"><img src="../../themes/nervecenter/images/icons/icon_plus.gif" ALT="Manual" ALIGN=RIGHT></a></p>
+      <p><a href="countryblock_if.php" target="_parent"><img src="../../themes/nervecenter/images/icons/icon_cablenic.gif" ALT="Manual" ALIGN=RIGHT></a></p>
 	<p>
 		Block outbound?
 <?php
@@ -569,9 +582,9 @@ ob_end_clean();
 		echo "<li><input name='formCountry[]' type='checkbox' value='BD' />Bangladesh</li>";
 
 ob_start();
-$results = exec("cat countries.txt | grep BD");
+$results = exec("cat countries.txt | grep BB");
 ob_end_clean();
-	if ($results == 'BD')
+	if ($results == 'BB')
 		echo "<li><input name='formCountry[]' type='checkbox' value='BB' checked/>Barbados</li>";
 	else
 		echo "<li><input name='formCountry[]' type='checkbox' value='BB' />Barbados</li>";
@@ -819,6 +832,7 @@ ob_end_clean();
 		echo "<li><input name='formCountry[]' type='checkbox' value='CG' checked/>Congo - Brazzaville</li>";
 	else
 		echo "<li><input name='formCountry[]' type='checkbox' value='CG' />Congo - Brazzaville</li>";
+
 
 ob_start();
 $results = exec("cat countries.txt | grep CD");
@@ -2558,6 +2572,7 @@ ob_end_clean();
 		echo "<li><input name='formCountry[]' type='checkbox' value='ZW' />Zimbabwe </li>";
 
 ?>		
+
 </ul>
 
 
