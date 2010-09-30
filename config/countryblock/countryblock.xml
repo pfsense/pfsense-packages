@@ -67,12 +67,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/interfaces.txt</item>
+		<item>http://www.pfsense.org/packages/config/countryblock/countryblock.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
+		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/countryblock.inc</item>
+		<item>http://www.pfsense.org/packages/config/countryblock/interfaces.txt</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
