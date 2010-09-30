@@ -148,9 +148,11 @@ include("head.inc");
 		  	<?php  if ($portname == $iface['if']) {
 			
 			ob_start();
+			$resultsany = exec("cat interfaces.txt | grep any");
 			$results = exec("cat interfaces.txt | grep $portname");
 			ob_end_clean();
-			if ($results == $portname)
+			
+			if ($results == $portname || $resultsany == any)
 				echo "<input name='$portname' type='checkbox' value='$portname' checked/>$portname";
 			else
 				echo "<input name='$portname' type='checkbox' value='$portname' />$portname";
@@ -174,8 +176,8 @@ include("head.inc");
     <p><br>
   <input type="submit" class="formbtn" value="Save">
     </p>
-    <p>Select the interfaces you want secured. </p>
-    <p>I <strong>highly</strong> recommend selecting <u>all</u> interfaces. <br>
+    <p>Select the interfaces you want secured. It's recommended to select all interfaces. </p>
+    <p>Default: All interfaces are seleted. <br>
       <br>
     </p>
     <p></p></td>

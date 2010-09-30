@@ -2586,12 +2586,16 @@ ob_end_clean();
 
 
 	
-	<u>Usage</u>
+	<p><u>Usage</u>
 	<br/>
-	Check the country that you would like to block completely. Affects in & out traffic.
-	<br/><span style="color:red">Warning!</span> - Apply after every firewall change or state reset. Use at your own risk.
-	<br/><br/>
-	<input type="submit" name="formSubmit" value="Commit Countries" />
+	Check the country that you would like to block completely. Choose if you want to block outbound access and if you want to log attempts. Click &quot;Commit Countries&quot; to store your settings. <br/>
+	When your settings are stored select &quot;Enable Country Block&quot; and press save to enable to package.<br />
+    To run countryblock as a cron job use /usr/local/etc/rc.d/countryblock.sh <br />
+    To whitelist a CIDR range press <a href="whitelist.php" target="_parent"><img src="../../themes/nervecenter/images/icons/icon_plus.gif" ALT="Manual"></a> and to specify interfaces press <a href="countryblock_if.php" target="_parent"><img src="../../themes/nervecenter/images/icons/icon_cablenic.gif" ALT="Manual"></a>. By default all interfaces are selected. <br />
+	  <span style="color:red">Warning!</span> - Apply after every firewall change or state reset. Use at your own risk.
+	  <br/><br/>
+	  <input type="submit" name="formSubmit" value="Commit Countries" />
+	  </p>
 </form>
 <br/>
 
@@ -2630,7 +2634,7 @@ ob_end_clean();
 
 </td>
 </tr>
-</table>
+</table><br />
 <input type="submit" value="Save/Update">
 </form>
 

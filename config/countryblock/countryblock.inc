@@ -84,6 +84,8 @@ function php_install_command_cb()
 	unlink_if_exists("/tmp/purge.tmp");
 	exec("cp /tmp/whitelist.tmp /usr/local/www/packages/countryblock/whitelist.php");
 	unlink_if_exists("/tmp/whitelist.tmp");
+	exec("cp /tmp/interfaces.txt /usr/local/www/packages/countryblock/interfaces.txt");
+	unlink_if_exists("/tmp/interfaces.txt");
 	
 	
 
