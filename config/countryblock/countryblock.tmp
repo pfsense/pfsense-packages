@@ -1,5 +1,5 @@
 <?php
-
+$pgtitle = "Firewall: Countryblock";
 	//	TomSchaefer.org countryblock package 2010
 	//
 	//	Notes: Find: ^(.*)$
@@ -8,7 +8,7 @@
 	//
 	//
 	//
-	require_once('config.inc');
+	//require_once('config.inc');
 	require("guiconfig.inc");
 	include("head.inc");
 
@@ -74,28 +74,57 @@ if (count($_POST)>0) {
 	$savemsg_cb = "Country Block settings have been saved/updated. ";
 	conf_mount_ro();
 }
-?><head>
+?>
+
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<style type="text/css">
-<!--
-.white {
-	text-align: center;
-}
--->
-</style>
-
-
-<p class="pgtitle">Firewall: Country Block</p>
+<p class="pgtitle"><?=$pgtitle?></p>
+<?php if ($input_errors) print_input_errors($input_errors); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <form method=POST action="">
-
 <?php
+ob_start();
+$resultstop = exec("pfctl -s rules | grep -c countryblock");
+ob_end_clean();
 if ($config['installedpackages']['countryblock_settings']['config'][0]['enable'] == 1) {
 	echo "<input name='enable' type='checkbox' value='1' checked>\n";
+}
+elseif ($resultstop > '0') {
+echo "<input name='enable' type='checkbox' value='1' checked>\n";
 }
 else {
 	echo "<input name='enable' type='checkbox' value='1'>\n";
 }
-?>
+?><strong>Enable Country Block</strong><br><br>
+<?php if ($savemsg_cb) print_info_box($savemsg_cb); 
+		//if ($output) print_info_box($output,$output2);
+		echo($output);
+		echo($output2);
+	?>
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+  <tr><td class="tabnavtbl">
+<?php
+	$tab_array = array();
+	$tab_array[0] = array("Countries", true, "countryblock.php");
+	$tab_array[1] = array("Settings", false, "settings.php");
+	$tab_array[2] = array("Whitelist", false, "whitelist.php");
+	$tab_array[3] = array("Interfaces", false, "countryblock_if.php");
+	$tab_array[4] = array("Help", false, "help.php");
+	display_top_tabs($tab_array);
+?>  
+  </td></tr>
+  <tr> 
+    <td>
+	<div id="mainarea">
+        <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+       <tr> 
+	<td class="listhdrr">Main</td>
+    
+	  </tr>
+      
+    <tr> 
+	<td class="listlr" valign="middle">
+    
 <?php
 
 conf_mount_rw();
@@ -109,26 +138,6 @@ mwexec("touch countries.txt");
     {
 		$aCountry = $_POST['formCountry'];
 	
-		if(isset($_POST['formOutbound'])) 
-        {
-			$output2 = " and Outbound access is BLOCKED.</b>";
-			exec("touch OUTBOUND");
-		} 
-        else 
-        {
-			$output2 = " and Outbound access is ALLOWED.</b>";
-			exec("rm OUTBOUND");
-		}
-		
-		if(isset($_POST['formlogging'])) 
-        {
-			exec("touch logging");
-		} 
-        else 
-        {
-			exec("rm logging");
-		}
-
 		
 		if(empty($aCountry)) 
         {
@@ -244,6 +253,7 @@ font-size: 90%;
 
 .arrowlistmenu ul li a:visited{
 color: #A70303;
+
 }
 
 .arrowlistmenu ul li a:hover{ /*hover state CSS*/
@@ -258,15 +268,11 @@ background-color: #F3F3F3;
 </head>
 
 
-<strong>Enable Country Block</strong><br><br>
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
 	<td >
-	<?php if ($savemsg_cb) print_info_box($savemsg_cb); 
-		//if ($output) print_info_box($output,$output2);
-		echo($output);
-		echo($output2);
-	?>
+	
 
 	</form>
 	
@@ -283,7 +289,7 @@ background-color: #F3F3F3;
 			
 		?>
         </p>
-		<p>Check the country that you would like to block completely. Currently 
+		<h3><p>Check the country that you would like to block completely. Currently 
 		<?php 
 		$countfile = "countries.txt";
 		if (file_exists($countfile)) {
@@ -295,30 +301,8 @@ background-color: #F3F3F3;
 			
 		?> 
             
-      of 246 selected. <a href="whitelist.php" target="_parent"><img src="../../themes/nervecenter/images/icons/icon_plus.gif" ALT="Manual" ALIGN=RIGHT></a></p>
-      <p><a href="countryblock_if.php" target="_parent"><img src="../../themes/nervecenter/images/icons/icon_cablenic.gif" ALT="Manual" ALIGN=RIGHT></a></p>
-	<p>
-		Block outbound?
-<?php
-
-	if (file_exists("OUTBOUND")) {
-		echo "<input name='formOutbound' type='checkbox' value='Yes' checked/>";
-	} else {
-		echo "<input name='formOutbound' type='checkbox' value='Yes'/>";
-	}
-?>
-
-		<input type="checkbox" name="checkall" onclick="checkUncheckAll(this);"/>select/unselect
-	</p>
-    Enable Logging?
-<?php
-
-	if (file_exists("logging")) {
-		echo "<input name='formlogging' type='checkbox' value='Yes' checked/>";
-	} else {
-		echo "<input name='formlogging' type='checkbox' value='Yes'/>";
-	}
-?>
+      of 246 selected. </h3>
+      
 <br/>
 	
 
@@ -2362,6 +2346,7 @@ ob_end_clean();
 ob_start();
 $results = exec("cat countries.txt | grep TM");
 ob_end_clean();
+
 	if ($results == 'TM')
 		echo "<li><input name='formCountry[]' type='checkbox' value='TM' checked/>Turkmenistan</li>";
 	else
@@ -2585,21 +2570,35 @@ ob_end_clean();
 </table>
 
 
-	
-	<p><u>Usage</u>
-	<br/>
-	Check the country that you would like to block completely. Choose if you want to block outbound access and if you want to log attempts. Click &quot;Commit Countries&quot; to store your settings. <br/>
-	When your settings are stored select &quot;Enable Country Block&quot; and press save to enable to package.<br />
-    To run countryblock as a cron job use /usr/local/etc/rc.d/countryblock.sh <br />
-    To whitelist a CIDR range press <a href="whitelist.php" target="_parent"><img src="../../themes/nervecenter/images/icons/icon_plus.gif" ALT="Manual"></a> and to specify interfaces press <a href="countryblock_if.php" target="_parent"><img src="../../themes/nervecenter/images/icons/icon_cablenic.gif" ALT="Manual"></a>. By default all interfaces are selected. <br />
-	  <span style="color:red">Warning!</span> - Apply after every firewall change or state reset. Use at your own risk.
+	  
 	  <br/><br/>
 	  <input type="submit" name="formSubmit" value="Commit Countries" />
 	  </p>
 </form>
 <br/>
 
-	<?php 
+	
+
+
+</div>
+<?php
+	//This input guarantees that a POST is sent
+	echo "<input type='hidden' name='zzz' value='required'>";
+?>
+
+</td>
+</tr>
+</table>
+    </td>
+	  
+	 
+    </tr>
+   
+  
+</table>
+</div>
+<br>
+<?php 
 	echo "Current Status = ";
 	ob_start();
 	$results = exec("pfctl -s rules | grep -c countryblock");
@@ -2624,21 +2623,15 @@ ob_end_clean();
 	echo $results;
 	echo " Networks";
 	?>
-
-
-</div>
-<?php
-	//This input guarantees that a POST is sent
-	echo "<input type='hidden' name='zzz' value='required'>";
-?>
-
+<br><br>
+<input type="submit" value="Save/Update"><br><br>
+<p>
+</p>
 </td>
-</tr>
-</table><br />
-<input type="submit" value="Save/Update">
+	</tr>
+</table>
 </form>
-
 <?php include("fend.inc"); ?>
-
 </body>
 </html>
+

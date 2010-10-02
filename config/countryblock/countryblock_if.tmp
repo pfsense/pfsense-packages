@@ -29,7 +29,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = "Country Block - Interfaces";
+$pgtitle = "Firewall: Countryblock - Interfaces";
 require("guiconfig.inc");
 
 /*
@@ -100,7 +100,7 @@ if ($_POST) {
 
 
 
-$pgtitle = "CountryBlock Interfaces";
+
 include("head.inc");
 
 
@@ -117,7 +117,11 @@ include("head.inc");
   <tr><td class="tabnavtbl">
 <?php
 	$tab_array = array();
-	$tab_array[0] = array("Interface assignments", true, "");
+	$tab_array[0] = array("Countries", false, "countryblock.php");
+	$tab_array[1] = array("Settings", false, "settings.php");
+	$tab_array[2] = array("Whitelist", false, "whitelist.php");
+	$tab_array[3] = array("Interfaces", true, "countryblock_if.php");
+	$tab_array[4] = array("Help", false, "help.php");
 	display_top_tabs($tab_array);
 ?>  
   </td></tr>
