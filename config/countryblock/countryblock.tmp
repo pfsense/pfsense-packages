@@ -301,7 +301,7 @@ background-color: #F3F3F3;
 			
 		?> 
             
-      of 246 selected. </h3>
+      of 246 selected. </h3><input type="checkbox" name="checkall" onclick="checkUncheckAll(this);"/>select/unselect
       
 <br/>
 	

@@ -1,14 +1,6 @@
 <?php
-
-	//	TomSchaefer.org countryblock package 2010
-	//
-	//	Notes: Find: ^(.*)$
-	//		Replace: ob_start();\n$results = exec("cat countries-white.txt | grep XX");\nob_end_clean();\n\tif ($results == 'XX')\n\t\techo "\1";\n\telse\n\t\techo "\1";\n
-	//
-	//
-	//
-	//
-	require_once('config.inc');
+$pgtitle = "Firewall: Countryblock - Whitelist";
+	
 	require("guiconfig.inc");
 	include("head.inc");
 
@@ -21,25 +13,19 @@
 	//phpinfo();
 	
 
-		
 	
-?><head>
+
+
+	
+?>
+
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<style type="text/css">
-<!--
-.white {
-	text-align: center;
-}
--->
-</style>
-
-
-
-
-
-<p class="pgtitle">Firewall: Country Block - Whitelist</p>
+<p class="pgtitle"><?=$pgtitle?></p>
+<?php if ($input_errors) print_input_errors($input_errors); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <form method=POST action="">
-  <?php
+<?php
 
 
 mwexec("touch countries-white.txt");
@@ -48,37 +34,34 @@ mwexec("touch countries-white.txt");
 
 
 ?>
-
-
-<script type="text/javascript" src="jquery.min.js"></script>
-
-
-
-<style type="text/css">
-
-a img {border:none; }
-
-</style>
-<!--<span class="tabcont">-->
-<?php if ($savemsg_cb) print_info_box($savemsg_cb); 
-		//if ($output) print_info_box($output,$output2);
-		echo($output);
-		echo($output2);
-	?>
-</span>
-
-</head>
-<br><br>
-
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-
+  <tr><td class="tabnavtbl">
+<?php
+	$tab_array = array();
+	$tab_array[0] = array("Countries", false, "countryblock.php");
+	$tab_array[1] = array("Settings", false, "settings.php");
+	$tab_array[2] = array("Whitelist", true, "whitelist.php");
+	$tab_array[3] = array("Interfaces", false, "countryblock_if.php");
+	$tab_array[4] = array("Help", false, "help.php");
+	display_top_tabs($tab_array);
+?>  
+  </td></tr>
+  <tr> 
+    <td>
+	<div id="mainarea">
+        <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+       <tr> 
+	<td class="listhdrr">Whitelist</td>
+    
+	  </tr>
+      
+    <tr> 
+	<td class="listlr" valign="middle">
+  
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
-	<td class="tabcont" >
-    <a href="countryblock.php" target="_parent"><img src="../../themes/nervecenter/images/icons/icon_alias_url_reload.gif" ALT="Manual" ALIGN=RIGHT></a>
-</form>
-	
-	<form action="<?php echo htmlentities($_SERVER['PHP_SELF']); ?>" method="post">
-	<p>
+
+<p>
 	  Enter the CIDR Range you would like to whitlist</p>
 	<p><form method="post" action="">
 <input name="content" type="text" />
@@ -200,14 +183,58 @@ echo "<br/><br/>";
 	  <br/><br/>
 	  </p>
 </form>
-<br/>
+
+
 </div>
+
+
 </td>
 </tr>
 </table>
+    </td>
+	  
+	 
+    </tr>
+   
+  
+</table>
+</div>
+<br>
+<?php 
+	echo "Current Status = ";
+	ob_start();
+	$results = exec("pfctl -s rules | grep -c countryblock");
+	ob_end_clean(); 
+	if ($results > '0') echo "Running";
+	else
+	 echo "<span style='color:red'>NOT running</span>";
+		
+	//Get Errors if exists
+	ob_start();
+	$results = exec("tail -r errorOUT.txt");
+	ob_end_clean(); 
+	echo "<br/><span style='color:red'>";
+	echo $results;
+	echo "</span>";
+	
+	//Get IP Count
+	echo "<br>You are blocking ";
+	ob_start();
+	$results = exec("pfctl -T show -t countryblock |grep -v -c Z");
+	ob_end_clean();
+	echo $results;
+	echo " Networks";
+	?>
+
+<br><br>
+
+<p>
+</p>
+</td>
+	</tr>
+</table>
 </form>
-
 <?php include("fend.inc"); ?>
-
 </body>
 </html>
+
