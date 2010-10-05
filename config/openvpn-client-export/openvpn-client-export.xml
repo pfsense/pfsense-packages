@@ -20,7 +20,7 @@
 		<item>http://www.pfsense.com/packages/config/openvpn-client-export/openvpn-client-export.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/root/</prefix>
+		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
 		<item>http://files.pfsense.com/packages/openvpn-client-export/openvpn-client-export.tgz</item>
 	</additional_files_needed>
