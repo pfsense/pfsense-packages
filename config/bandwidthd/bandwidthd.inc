@@ -86,7 +86,7 @@ function bandwidthd_install_config() {
 	if(is_array($ifdescrs)) {
 		foreach($ifdescrs as $int) {
 			/* calculate interface subnet information */
-			$ifcfg = &$config['interfaces'][$int];
+			$ifcfg = $config['interfaces'][$int];
 			$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
 			$subnetmask = gen_subnet_mask($ifcfg['subnet']);
 			if($subnet == "pppoe") {
