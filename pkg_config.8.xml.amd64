@@ -824,7 +824,7 @@
       <depends_on_package>zip-3.0.tbz</depends_on_package>
 	<build_port_path>/usr/ports/archivers/p7zip</build_port_path>
 	<build_port_path>/usr/ports/archivers/zip</build_port_path>
-      <version>0.4</version>
+      <version>0.5</version>
       <status>BETA</status>
       <required_version>2.0</required_version>
       <config_file>http://www.pfsense.com/packages/config/openvpn-client-export/openvpn-client-export.xml</config_file>
