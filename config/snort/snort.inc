@@ -131,8 +131,7 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 
 	if($wangw == 'yes') {
 		/* Add Gateway on WAN interface to whitelist (For RRD graphs) */
-		$int = convert_friendly_interface_to_real_interface_name2("WAN");
-		$gw = get_interface_gateway($int);
+		$gw = get_interface_gateway('wan');
 		if($gw)
 		$home_net .= "{$gw} ";
 	}
