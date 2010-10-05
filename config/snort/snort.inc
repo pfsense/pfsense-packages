@@ -99,8 +99,8 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 	$int_array = array('lan');
 	for ($j = 1; isset ($config['interfaces']['opt' . $j]); $j++)
 	if(isset($config['interfaces']['opt' . $j]['enable']))
-	if(!$config['interfaces']['opt' . $j]['gateway'])
-	$int_array[] = "opt{$j}";
+	if(isset($config['interfaces']['opt' . $j]['gateway']))
+		$int_array[] = "opt{$j}";
 
 	/*  iterate through interface list and write out whitelist items
 	 *  and also compile a home_net list for snort.
@@ -344,9 +344,9 @@ function convert_friendly_interface_to_real_interface_name2($interface)
 	foreach ($ifdescrs as $ifdescr => $ifname)
 	{
 		if(strtolower($ifname) == $lc_interface)
-		return $config['interfaces'][$ifname]['if'];
-		if(strtolower($config['interfaces'][$ifname]['descr']) == $lc_interface)
-		return $config['interfaces'][$ifname]['if'];
+			return $config['interfaces'][$ifname]['if'];
+		if(isset($config['interfaces'][$ifname]['descr']) && (strtolower($config['interfaces'][$ifname]['descr']) == $lc_interface))
+			return $config['interfaces'][$ifname]['if'];
 	}
 	 
 	return $interface;
@@ -2318,8 +2318,8 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 	$automaticrulesupdate = $config['installedpackages']['snortglobal']['automaticrulesupdate7'];
 
 	/* if user is on pppoe, we really want to use ng0 interface */
-	if($config['interfaces'][$snort_ext_int]['ipaddr'] == "pppoe")
-	$snort_ext_int = "ng0";
+	if(isset($config['interfaces'][$snort_ext_int]['ipaddr']) && ($config['interfaces'][$snort_ext_int]['ipaddr'] == "pppoe"))
+		$snort_ext_int = "ng0";
 
 	/* set the snort performance model */
 	if($config['installedpackages']['snortglobal']['rule'][$id]['performance'])

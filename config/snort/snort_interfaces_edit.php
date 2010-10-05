@@ -484,7 +484,7 @@ echo "
 				foreach($if_array as $iface2) {
 					$if2 = convert_friendly_interface_to_real_interface_name2($iface2);
 
-					if($config['interfaces'][$iface2]['ipaddr'] == "pppoe") {
+					if(isset($config['interfaces'][$iface2]['ipaddr']) && ($config['interfaces'][$iface2]['ipaddr'] == "pppoe")) {
 						$if2 = "ng0";
 					}
 
