@@ -107,7 +107,7 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 	 */
 	foreach($int_array as $int) {
 		/* calculate interface subnet information */
-		$ifcfg = &$config['interfaces'][$int];
+		$ifcfg = $config['interfaces'][$int];
 		$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
 		$subnetmask = gen_subnet_mask($ifcfg['subnet']);
 		if($subnet == "pppoe" or $subnet == "dhcp") {
