@@ -1,4 +1,17 @@
 #!/bin/sh
+
+#is countryblock running
+#export resultr=`pfctl -s rules | grep -c countryblock`
+#echo $resultr
+#if [ "$resultr" -gt "0" ]; then
+#	echo running
+#	exit 1
+#else
+#	echo not running
+#	/usr/bin/logger -s "Countryblock was found not running"
+#	echo "Countryblock not running" | /usr/local/bin/php /usr/local/www/packages/countryblock/email_send.php
+#fi
+
 pfctl -t countryblock -T kill
 sed -i -e '/countryblock/d' /tmp/rules.debug
 
@@ -68,4 +81,4 @@ mv /tmp/rules.debug /tmp/rules.debug.old
 mv /tmp/rules.debug.tmp /tmp/rules.debug
 
 rm errorOUT.txt
-pfctl -o basic -f /tmp/rules.debug > errorOUT.txt 2>&1
+pfctl -o basic -f /tmp/rules.debug > /usr/local/www/packages/countryblock/errorOUT.txt 2>&1

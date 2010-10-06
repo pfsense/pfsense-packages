@@ -41,7 +41,7 @@
 	<requirements>Active Internet</requirements>
 	<faq>http://forum.pfsense.org/index.php/topic,25732.0.html</faq>
 	<name>Country Block Settings</name>
-	<version>0.1.7</version>
+	<version>0.1.8</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/countryblock.inc</include_file>
 	<menu>
@@ -63,6 +63,21 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/countryblock/countryblock.xml</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/countryblock/class.phpmailer.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/countryblock/class.smtp.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/countryblock/email.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>

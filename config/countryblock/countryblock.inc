@@ -57,6 +57,12 @@ function php_install_command_cb()
 	
 	
 	//rename PHP files from .tmp to .php
+	exec("cp /tmp/class.phpmailer.tmp /usr/local/www/packages/countryblock/class.phpmailer.php");
+	unlink_if_exists("/tmp/class.phpmailer.tmp ");
+	exec("cp /tmp/class.smtp.tmp /usr/local/www/packages/countryblock/class.smtp.php");
+	unlink_if_exists("/tmp/class.smtp.tmp");
+	exec("cp /tmp/email.tmp /usr/local/www/packages/countryblock/email.php");
+	unlink_if_exists("/tmp/email.tmp");
 	exec("cp /tmp/countryblock.tmp /usr/local/www/packages/countryblock/countryblock.php");
 	unlink_if_exists("/tmp/countryblock.tmp");
 	exec("cp /tmp/countryblock_if.tmp /usr/local/www/packages/countryblock/countryblock_if.php");

@@ -51,6 +51,8 @@ if (count($_POST)>0) {
 	mwexec("rm lists/temp");
 	//mwexec("touch lists/ipfw.ipfw");
        //Now clear ipfw, and process each list to ipfw commands
+	   	//mwexec("pfctl -t countryblock -T kill");
+		//mwexec("sed -i -e '/countryblock/d' /tmp/rules.debug");
 		mwexec("sh execute.sh");
 				
 	}
@@ -110,6 +112,7 @@ else {
 	$tab_array[2] = array("Whitelist", false, "whitelist.php");
 	$tab_array[3] = array("Interfaces", false, "countryblock_if.php");
 	$tab_array[4] = array("Help", false, "help.php");
+	$tab_array[5] = array("Email", false, "email.php");
 	display_top_tabs($tab_array);
 ?>  
   </td></tr>
@@ -301,7 +304,7 @@ background-color: #F3F3F3;
 			
 		?> 
             
-      of 246 selected. </h3><input type="checkbox" name="checkall" onclick="checkUncheckAll(this);"/>select/unselect
+      of 246 selected. </h3><input type="checkbox" name="checkall" onClick="checkUncheckAll(this);"/>select/unselect
       
 <br/>
 	

@@ -122,6 +122,7 @@ include("head.inc");
 	$tab_array[2] = array("Whitelist", false, "whitelist.php");
 	$tab_array[3] = array("Interfaces", true, "countryblock_if.php");
 	$tab_array[4] = array("Help", false, "help.php");
+	$tab_array[5] = array("Email", false, "email.php");
 	display_top_tabs($tab_array);
 ?>  
   </td></tr>
