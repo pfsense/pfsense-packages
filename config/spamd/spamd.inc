@@ -170,7 +170,7 @@ function spamd_generate_rules($type) {
 
 	$natrules = "";
 	switch($type) {
-	case 'rdr':
+	case 'nat':
 		$natrules .= "\n# spam table \n";
                 $wanif = get_real_interface("wan");
                 $natrules .= "table <whitelist> persist\n";
