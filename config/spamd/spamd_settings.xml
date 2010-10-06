@@ -55,6 +55,7 @@
 	<service>
                 <name>spamd</name>
                 <rcfile>spamd.sh</rcfile>
+                <executable>spamd</executable>
         </service>
 	<tabs>
 		<tab>

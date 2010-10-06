@@ -54,7 +54,8 @@
 	</menu>
 	<service>
                 <name>spamd</name>
-                <rcfile>/usr/local/etc/rc.d/spamd.sh</rcfile>
+                <rcfile>spamd.sh</rcfile>
+                <executable>spamd</executable>
         </service>
 	<tabs>
 		<tab>
