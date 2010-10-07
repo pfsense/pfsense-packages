@@ -41,12 +41,12 @@ if (isset($_GET['save'])) {
 	fwrite($fp, ";\n\$mail->Username   = \"") or die("Couldn't write values to file!");
 	fwrite($fp, $user) or die("Couldn't write values to file!");
 	fwrite($fp, "\";\n\$mail->Password   = \"") or die("Couldn't write values to file!");
-	fwrite($fp, $pass) or die("Couldn't write values to file!");
+	fwrite($fp, $pass);
 	fwrite($fp, "\";\n\$mail->AddReplyTo(\"") or die("Couldn't write values to file!");
 	fwrite($fp, $from) or die("Couldn't write values to file!");
 	fwrite($fp, "\",\"pfsense countryblock\");\n\$mail->From       = \"") or die("Couldn't write values to file!");
 	fwrite($fp, $from) or die("Couldn't write values to file!");
-	fwrite($fp, "\";\n\$mail->Subject    = \"Countryblock - pfsense\";\n\$mail->AltBody    = \"To view the message, please use an HTML compatible email viewer!\";\n\$mail->WordWrap   = 50;\n\$body 		    = \"Countryblock encountered an event. A system log entry was made with details of event\";\n\$body 		   .= \"<br><br>\" . date('l jS \of F Y h:i:s A') . \"<br><br>Current Status = \";\nob_start();\n\$results = exec(\"pfctl -s rules | grep -c countryblock\");\nob_end_clean();\nif (\$results > '0')\n\$body 		   .= \"Running\";\nelse\n\$body 		   .= \"<span style='color:red'>Restarting</span>\";\nob_start();\n\$results = exec(\"tail -r /usr/local/www/packages/countryblock/errorOUT.txt\");\nob_end_clean();\n\$body 		   .= \"<br/><span style='color:red'>\";\n\$body 		   .= \$results;\n\$body 		   .= \"</span>\";\n\$body 		   .= \"<br>You are blocking \";\nob_start();\n\$results = exec(\"pfctl -T show -t countryblock |grep -v -c Z\");\nob_end_clean();\n\$body 		   .= \$results;\n\$body 		   .= \" Networks\";\n\n\$mail->MsgHTML(\$body);\n\$mail->AddAddress(\"") or die("Couldn't write values to file!");
+	fwrite($fp, "\";\n\$mail->Subject    = \"" . $subject . "\";\n\$mail->AltBody    = \"To view the message, please use an HTML compatible email viewer!\";\n\$mail->WordWrap   = 50;\n\$body 		    = \"Countryblock encountered an event. A system log entry was made with details of event\";\n\$body 		   .= \"<br><br>\" . date('l jS \of F Y h:i:s A') . \"<br><br>Current Status = \";\nob_start();\n\$results = exec(\"pfctl -s rules | grep -c countryblock\");\nob_end_clean();\nif (\$results > '0')\n\$body 		   .= \"Running\";\nelse\n\$body 		   .= \"<span style='color:red'>Restarting</span>\";\nob_start();\n\$results = exec(\"tail -r /usr/local/www/packages/countryblock/errorOUT.txt\");\nob_end_clean();\n\$body 		   .= \"<br/><span style='color:red'>\";\n\$body 		   .= \$results;\n\$body 		   .= \"</span>\";\n\$body 		   .= \"<br>You are blocking \";\nob_start();\n\$results = exec(\"pfctl -T show -t countryblock |grep -v -c Z\");\nob_end_clean();\n\$body 		   .= \$results;\n\$body 		   .= \" Networks\";\n\n\$mail->MsgHTML(\$body);\n\$mail->AddAddress(\"") or die("Couldn't write values to file!");
 	fwrite($fp, $to) or die("Couldn't write values to file!");
 	fwrite($fp, "\");\n\$mail->IsHTML(") or die("Couldn't write values to file!");
 	fwrite($fp, $html) or die("Couldn't write values to file!");
@@ -60,13 +60,19 @@ if (isset($_GET['save'])) {
 	$fp2 = fopen($file2, "w") or die("Couldn't open $file for writing!");
 	fwrite($fp2, "<table width=\"100%\" b align=\"center\"> 
   <tr> 
-    <td>SMTP Auth</td> 
-    <td><select name=\"smtp_auth\"><option label=\"true\" value=\"true\">Yes</option><option label=\"false\" value=\"false\">No</option></select></td> 
-  </tr> 
+    <td>SMTP Auth</td>") or die("Couldn't write values to file!");
+	if ($smtp_auth=="true")
+    fwrite($fp2, "<td><select name=\"smtp_auth\"><option label=\"true\" value=\"true\" selected>Yes</option><option label=\"false\" value=\"false\">No</option></select></td>") or die("Couldn't write values to file!");
+	else
+	fwrite($fp2, "<td><select name=\"smtp_auth\"><option label=\"true\" value=\"true\">Yes</option><option label=\"false\" value=\"false\" selected>No</option></select></td>") or die("Couldn't write values to file!");
+  fwrite($fp2, "</tr> 
   <tr class=\"d0\"> 
-    <td>SMTP Security</td> 
-    <td><select name=\"smtp_secure\"><option label=\"ssl\" value=\"ssl\">ssl</option><option label=\"\" value=\"\">None</option></select></td> 
-  </tr> 
+    <td>SMTP Security</td>") or die("Couldn't write values to file!");
+	if ($smtp_secure=="ssl")
+    fwrite($fp2, "<td><select name=\"smtp_secure\"><option label=\"ssl\" value=\"ssl\" selected>ssl</option><option label=\"none\" value=\"none\">None</option></select></td>") or die("Couldn't write values to file!");
+	else 
+	fwrite($fp2, "<td><select name=\"smtp_secure\"><option label=\"ssl\" value=\"ssl\">ssl</option><option label=\"none\" value=\"none\" selected>None</option></select></td>") or die("Couldn't write values to file!");
+  fwrite($fp2, "</tr> 
   <tr> 
     <td>Host</td> 
     <td><input type=\"text\" name=\"host\" value=\"" . $host ."\"></td> 
@@ -84,9 +90,12 @@ if (isset($_GET['save'])) {
     <td><input type=\"password\" name=\"pass\" value=\"" . $pass . "\"></td> 
   </tr> 
   <tr> 
-    <td>Use HTML formatting</td> 
-    <td><select name=\"html\"><option label=\"true\" value=\"true\">Yes</option><option label=\"false\" value=\"false\">No</option></select></td> 
-  </tr> 
+    <td>Use HTML formatting</td>") or die("Couldn't write values to file!");
+	if ($html=="true") 
+    fwrite($fp2, "<td><select name=\"html\"><option label=\"true\" value=\"true\" selected>Yes</option><option label=\"false\" value=\"false\">No</option></select></td>") or die("Couldn't write values to file!"); 
+	else
+	fwrite($fp2, "<td><select name=\"html\"><option label=\"true\" value=\"true\">Yes</option><option label=\"false\" value=\"false\" selected>No</option></select></td>") or die("Couldn't write values to file!");
+  fwrite($fp2, "</tr> 
   <tr class=\"d0\"> 
     <td>From email address</td> 
     <td><input type=\"from\" name=\"from\" value=\"" . $from . "\"></td> 
@@ -177,54 +186,54 @@ if (file_exists("email_send.php")) {
 	echo "\n";
 } else {
     echo "<table width=\"100%\" b align=\"center\">\n"; 
-echo "  <tr>\n"; 
-echo "    <td>SMTP Auth</td>\n"; 
-echo "    <td><select name=\"smtp_auth\"><option label=\"true\" value=\"true\">Yes</option><option label=\"false\" value=\"false\">No</option></select></td>\n"; 
-echo "  </tr>\n"; 
-echo "  <tr class=\"d0\">\n"; 
-echo "    <td>SMTP Security</td>\n"; 
-echo "    <td><select name=\"smtp_secure\"><option label=\"ssl\" value=\"ssl\">ssl</option><option label=\"\" value=\"\">None</option></select></td>\n"; 
-echo "  </tr>\n"; 
-echo "  <tr>\n"; 
-echo "    <td>Host</td>\n"; 
-echo "    <td><input type=\"text\" name=\"host\" value=\"\"></td>\n"; 
-echo "  </tr>\n"; 
-echo "  <tr class=\"d0\">\n"; 
-echo "    <td>Port</td>\n"; 
-echo "    <td><input type=\"port\" name=\"port\" value=\"\"></td>\n"; 
-echo "  </tr>\n"; 
-echo "  <tr>\n"; 
-echo "    <td>Username</td>\n"; 
-echo "    <td><input type=\"user\" name=\"user\" value=\"\"></td>\n"; 
-echo "  </tr>\n"; 
-echo "  <tr class=\"d0\">\n"; 
-echo "    <td>Password</td>\n"; 
-echo "    <td><input type=\"password\" name=\"pass\" value=\"\"></td>\n"; 
-echo "  </tr>\n"; 
-echo "  <tr>\n"; 
-echo "    <td>Use HTML formatting</td>\n"; 
-echo "    <td><select name=\"html\"><option label=\"true\" value=\"true\">Yes</option><option label=\"false\" value=\"false\">No</option></select></td>\n"; 
-echo "  </tr>\n"; 
-echo "  <tr class=\"d0\">\n"; 
-echo "    <td>From email address</td>\n"; 
-echo "    <td><input type=\"from\" name=\"from\" value=\"\"></td>\n"; 
-echo "  </tr>\n"; 
-echo "  <tr>\n"; 
-echo "    <td>To email address</td>\n"; 
-echo "    <td><input type=\"to\" name=\"to\" value=\"\"></td>\n"; 
-echo "  </tr>\n"; 
-echo "  <tr class=\"d0\">\n"; 
-echo "    <td>Subject</td>\n"; 
-echo "    <td><input type=\"subject\" name=\"subject\" value=\"\"></td>\n"; 
-echo "  </tr>\n"; 
-echo "</table>\n"; 
-echo "\n"; 
-echo "<br>\n"; 
-echo "<input type=\"submit\" value=\"Save\">\n"; 
-echo "\n"; 
-echo "\n"; 
-echo "\n"; 
-echo "</form>\n";
+	echo "  <tr>\n"; 
+	echo "    <td>SMTP Auth</td>\n"; 
+	echo "    <td><select name=\"smtp_auth\"><option label=\"true\" value=\"true\">Yes</option><option label=\"false\" value=\"false\">No</option></select></td>\n"; 
+	echo "  </tr>\n"; 
+	echo "  <tr class=\"d0\">\n"; 
+	echo "    <td>SMTP Security</td>\n"; 
+	echo "    <td><select name=\"smtp_secure\"><option label=\"ssl\" value=\"ssl\">ssl</option><option label=\"none\" value=\"none\">None</option></select></td>\n"; 
+	echo "  </tr>\n"; 
+	echo "  <tr>\n"; 
+	echo "    <td>Host</td>\n"; 
+	echo "    <td><input type=\"text\" name=\"host\" value=\"\"></td>\n"; 
+	echo "  </tr>\n"; 
+	echo "  <tr class=\"d0\">\n"; 
+	echo "    <td>Port</td>\n"; 
+	echo "    <td><input type=\"port\" name=\"port\" value=\"\"></td>\n"; 
+	echo "  </tr>\n"; 
+	echo "  <tr>\n"; 
+	echo "    <td>Username</td>\n"; 
+	echo "    <td><input type=\"user\" name=\"user\" value=\"\"></td>\n"; 
+	echo "  </tr>\n"; 
+	echo "  <tr class=\"d0\">\n"; 
+	echo "    <td>Password</td>\n"; 
+	echo "    <td><input type=\"password\" name=\"pass\" value=\"\"></td>\n"; 
+	echo "  </tr>\n"; 
+	echo "  <tr>\n"; 
+	echo "    <td>Use HTML formatting</td>\n"; 
+	echo "    <td><select name=\"html\"><option label=\"true\" value=\"true\">Yes</option><option label=\"false\" value=\"false\">No</option></select></td>\n"; 
+	echo "  </tr>\n"; 
+	echo "  <tr class=\"d0\">\n"; 
+	echo "    <td>From email address</td>\n"; 
+	echo "    <td><input type=\"from\" name=\"from\" value=\"\"></td>\n"; 
+	echo "  </tr>\n"; 
+	echo "  <tr>\n"; 
+	echo "    <td>To email address</td>\n"; 
+	echo "    <td><input type=\"to\" name=\"to\" value=\"\"></td>\n"; 
+	echo "  </tr>\n"; 
+	echo "  <tr class=\"d0\">\n"; 
+	echo "    <td>Subject</td>\n"; 
+	echo "    <td><input type=\"subject\" name=\"subject\" value=\"\"></td>\n"; 
+	echo "  </tr>\n"; 
+	echo "</table>\n"; 
+	echo "\n"; 
+	echo "<br>\n"; 
+	echo "<input type=\"submit\" value=\"Save\">\n"; 
+	echo "\n"; 
+	echo "\n"; 
+	echo "\n"; 
+	echo "</form>\n";
 }
 ?>
 

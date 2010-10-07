@@ -41,7 +41,7 @@
 	<requirements>Active Internet</requirements>
 	<faq>http://forum.pfsense.org/index.php/topic,25732.0.html</faq>
 	<name>Country Block Settings</name>
-	<version>0.1.8</version>
+	<version>0.1.9</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/countryblock.inc</include_file>
 	<menu>
