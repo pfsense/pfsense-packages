@@ -992,13 +992,15 @@ function squid_resync_auth() {
 	$auth_method = (($settings['auth_method'] && !$transparent_proxy) ? $settings['auth_method'] : 'none');
 	// Allow the remaining ACLs if no authentication is set
 	if ($auth_method == 'none') {
+		$conf .="# Setup allowed acls\n";
+		$allowed = array('allowed_subnets');
 		if ($settingsconfig['allow_interface'] == 'on') {
 			$conf .= "# Allow local network(s) on interface(s)\n";
-			$allowed = array('localnet', 'allowed_subnets');
-			$allowed = array_filter($allowed, 'squid_is_valid_acl');
-			foreach ($allowed as $acl)
-				$conf .= "http_access allow $acl\n";
+			$allowed[] = "localnet";
 		}
+		$allowed = array_filter($allowed, 'squid_is_valid_acl');
+		foreach ($allowed as $acl)
+			$conf .= "http_access allow $acl\n";
 	}
 	else {
 		$noauth = implode(' ', explode("\n", base64_decode($settings['no_auth_hosts'])));
