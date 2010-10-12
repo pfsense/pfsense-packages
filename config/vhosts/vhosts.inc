@@ -755,7 +755,7 @@ function php_install_command() {
 			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd7.2/usr.local.lib/lib/libxml2.a");
 		}
 	}
-	if(stristr(php_uname('r'), '8.0') == TRUE) {
+	if(stristr(php_uname('r'), '8.1') == TRUE) {
 		if (!file_exists('/usr/local/php5')) {
 			chdir('/usr/local/');
 			exec ("fetch http://www.pfsense.com/packages/config/vhosts/freebsd8.0/php5.tar.gz");
