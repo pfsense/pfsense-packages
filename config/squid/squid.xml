@@ -339,4 +339,3 @@
 	</custom_php_deinstall_command>
 	<filter_rules_needed>squid_generate_rules</filter_rules_needed>
 </packagegui>
- 
