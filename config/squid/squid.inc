@@ -344,13 +344,23 @@ function squid_validate_general($post, $input_errors) {
 	
 	if (($post['transparent_proxy'] != 'on') && !empty($post['defined_ip_proxy_off'])) {
 		$input_errors[] = "You can not bypass traffic from specific IPs without using the transparent proxy.";
-	}	
+	}
+	if (($post['transparent_proxy'] != 'on') && !empty($post['defined_ip_proxy_off_dest'])) {
+		$input_errors[] = "You can not bypass traffic to specific IPs without using the transparent proxy.";
+	}
 
 	foreach (array('defined_ip_proxy_off') as $hosts) {
 		foreach (explode(";", $post[$hosts]) as $host) {
 			$host = trim($host);
-			if (!empty($host) && !is_ipaddr($host))
-				$input_errors[] = "The entry '$host' is not a valid IP address";
+			if (!empty($host) && !is_ipaddr($host) && !is_alias($host) && !is_hostname($host))
+				$input_errors[] = "The entry '$host' is not a valid IP address, hostname, or alias";
+		}
+	}
+	foreach (array('defined_ip_proxy_off_dest') as $hosts) {
+		foreach (explode(";", $post[$hosts]) as $host) {
+			$host = trim($host);
+			if (!empty($host) && !is_ipaddr($host) && !is_alias($host) && !is_hostname($host))
+				$input_errors[] = "The entry '$host' is not a valid IP address, hostname, or alias";
 		}
 	}
 
@@ -1330,14 +1340,32 @@ function squid_generate_rules($type) {
 				foreach ($defined_ip_proxy_off as $ip_proxy_off) {
 					if(!empty($ip_proxy_off)) {
 						$ip_proxy_off = trim($ip_proxy_off);
+						if (is_alias($ip_proxy_off))
+							$ip_proxy_off = '$'.$ip_proxy_off;
 						$exempt_ip .= ", $ip_proxy_off";
 					}
 				}
 				$exempt_ip = substr($exempt_ip,2);
 				foreach ($ifaces as $iface) {
 					$rules .= "no rdr on $iface proto tcp from { $exempt_ip } to any port 80\n";         
-				}          
-			}     
+				}
+			}
+			if (!empty($squid_conf['defined_ip_proxy_off_dest'])) {
+				$defined_ip_proxy_off_dest = explode(";", $squid_conf['defined_ip_proxy_off_dest']);
+				$exempt_dest = "";
+				foreach ($defined_ip_proxy_off_dest as $ip_proxy_off_dest) {
+					if(!empty($ip_proxy_off_dest)) {
+						$ip_proxy_off_dest = trim($ip_proxy_off_dest);
+						if (is_alias($ip_proxy_off_dest))
+							$ip_proxy_off_dest = '$'.$ip_proxy_off_dest;
+						$exempt_dest .= ", $ip_proxy_off_dest";
+					}
+				}
+				$exempt_dest = substr($exempt_dest,2);
+				foreach ($ifaces as $iface) {
+					$rules .= "no rdr on $iface proto tcp from any to { $exempt_dest } port 80\n";         
+				}
+			}
 			foreach ($ifaces as $iface) {
 				$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> 127.0.0.1 port 80\n";
 			}

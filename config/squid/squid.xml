@@ -177,10 +177,17 @@
 		<field>
 			<fielddescr>Bypass proxy for these source IPs</fielddescr>
 			<fieldname>defined_ip_proxy_off</fieldname>
-			<description>Do not forward traffic from these &lt;b&gt;source&lt;/b&gt; IPs through the proxy server but directly through the firewall. Separate by semi-colons (;).</description>
+			<description>Do not forward traffic from these &lt;b&gt;source&lt;/b&gt; IPs, hostnames, or aliases through the proxy server but directly through the firewall. Separate by semi-colons (;).</description>
 			<type>input</type>
   		<size>80</size>
-		</field>		
+		</field>
+		<field>
+			<fielddescr>Bypass proxy for these destination IPs</fielddescr>
+			<fieldname>defined_ip_proxy_off_dest</fieldname>
+			<description>Do not proxy traffic going to these &lt;b&gt;destination&lt;/b&gt; IPs, hostnames, or aliases, but let it pass directly through the firewall. Separate by semi-colons (;).</description>
+			<type>input</type>
+		<size>80</size>
+		</field>
 		<field>
 			<fielddescr>Enabled logging</fielddescr>
 			<fieldname>log_enabled</fieldname>
@@ -332,3 +339,4 @@
 	</custom_php_deinstall_command>
 	<filter_rules_needed>squid_generate_rules</filter_rules_needed>
 </packagegui>
+ 
