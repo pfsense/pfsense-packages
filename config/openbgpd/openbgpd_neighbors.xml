@@ -122,8 +122,8 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>none</fielddescr>
-			<fieldname>none</fieldname>
+			<fielddescr>Neighbor Parameters</fielddescr>
+			<fieldname>Neighbor Parameters</fieldname>
 		    <type>rowhelper</type>
 		    <rowhelper>
 				<rowhelperfield>
