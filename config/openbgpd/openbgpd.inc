@@ -35,7 +35,7 @@ function openbgpd_install_conf() {
 	conf_mount_rw();
 	
   if ($config['installedpackages']['openbgpd']['rawconfig'] && $config['installedpackages']['openbgpd']['rawconfig']['item']) {
-    // if there is a raw config specifyed in tthe config.xml use that instead of the assisted config
+    // if there is a raw config specified in the config.xml use that instead of the assisted config
     $conffile = implode("\n",$config['installedpackages']['openbgpd']['rawconfig']['item']);
     //$conffile = $config['installedpackages']['openbgpd']['rawconfig'];
   } else {
@@ -97,7 +97,7 @@ function openbgpd_install_conf() {
                 $conffile .= "		tcp md5sig key {$neighbor['md5sigkey']}\n";
 	      }
               foreach($neighbor['row'] as $row) {
-                $conffile .= "		{$row['paramaters']} {$row['parmvalue']} \n";
+                $conffile .= "		{$row['parameters']} {$row['parmvalue']} \n";
               }		
               $conffile .= "}\n";
             }
@@ -125,7 +125,7 @@ function openbgpd_install_conf() {
 	  }
           $used_this_item = true;
           foreach($neighbor['row'] as $row) {
-            $conffile .= "	{$row['paramaters']} {$row['parmvalue']} \n";
+            $conffile .= "	{$row['parameters']} {$row['parmvalue']} \n";
           }
         }
 		if($used_this_item)
@@ -172,7 +172,7 @@ function openbgpd_install_conf() {
 	fclose($fd);
 	exec("setkey -f {$g['tmp_path']}/bgpdsetkey.conf");
 
-	// bgpd process running?  if so reload, elsewise start.
+	// bgpd process running?  if so reload, else start.
 	if(is_openbgpd_running() == true) {
 		exec("bgpctl reload");
 	} else {
@@ -187,7 +187,7 @@ function openbgpd_get_raw_config() {
   return file_get_contents("/usr/local/etc/bgpd.conf");
 }
 
-// serialize the raw openbgpd confi file to config.xml
+// serialize the raw openbgpd config file to config.xml
 function openbgpd_put_raw_config($conffile) {
   global $config;
   if ($conffile == "")
@@ -286,8 +286,8 @@ function grey_out_value_boxes() {
 		function grey_out_value_boxes() {
 			var x = 0;
 			for(x=0; x<99; x++) {
-				if( \$('paramaters' + x) ) {
-					var fieldvalue = $('paramaters' + x).options[$('paramaters' + x).selectedIndex].text;
+				if( \$('parameters' + x) ) {
+					var fieldvalue = $('parameters' + x).options[$('parameters' + x).selectedIndex].text;
 					var length = fieldvalue.length;
 					length = length -2;
 					var last_two = fieldvalue.substring(length);

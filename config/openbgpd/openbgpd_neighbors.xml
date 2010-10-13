@@ -127,8 +127,8 @@
 		    <type>rowhelper</type>
 		    <rowhelper>
 				<rowhelperfield>
-				    <fielddescr>Paramaters</fielddescr>
-				    <fieldname>paramaters</fieldname>
+				    <fielddescr>Parameters</fielddescr>
+				    <fieldname>parameters</fieldname>
 				    <description>Neighbor settings.</description>
 				    <type>select</type>
 					<options>
@@ -147,7 +147,12 @@
 						<option><name>Softreconfig out yes</name><value>softreconfig out yes</value></option>
 						<option><name>Softreconfig out no</name><value>softreconfig out no</value></option>
 						<option><name>Tcp md5sig password X</name><value>tcp md5sig password</value></option>
-						<option><name>Local address X</name><value>local-address</value></option>			
+						<option><name>Local address X</name><value>local-address</value></option>
+						<option><name>set nexthop X</name><value>set nexthop</value></option>	
+						<option><name>set nexthop blackhole</name><value>set nexthop blackhole</value></option>			
+						<option><name>set nexthop reject</name><value>set nexthop reject</value></option>	
+						<option><name>set nexthop no-modify</name><value>set nexthop no-modify</value></option>	
+						<option><name>set nexthop self</name><value>set nexthop self</value></option>	
 					</options>
 				</rowhelperfield>
 				<rowhelperfield>
