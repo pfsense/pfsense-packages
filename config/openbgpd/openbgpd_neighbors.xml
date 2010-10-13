@@ -100,13 +100,13 @@
 		<field>
 			<fielddescr>TCP-MD5 key</fielddescr>
 			<fieldname>md5sigkey</fieldname>
-			<description>The md5 key to communicate with the peer. Does not work with a Cisco BGP router.</description>
+			<description>The md5 key to communicate with the peer. Does not work with Cisco BGP routers.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>TCP-MD5 password</fielddescr>
 			<fieldname>md5sigpass</fieldname>
-			<description>The md5 password to communicate with the peer. Use this when communication with Cisco BGP router.</description>
+			<description>The md5 password to communicate with the peer. Use this when communicating with a Cisco BGP router.</description>
 			<type>input</type>
 		</field>
 		<field>
