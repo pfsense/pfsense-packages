@@ -718,7 +718,7 @@ function squid_resync_cache() {
 		if ($g['platform'] == "nanobsd") {
 			$disk_cache_system = 'null';
 		} else {
-			$disk_cache_system = 'aufs';
+			$disk_cache_system = 'ufs';
 		}
 	} else {
 		$disk_cache_system = $settings['harddisk_cache_system'];
