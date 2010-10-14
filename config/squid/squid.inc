@@ -112,10 +112,16 @@ function squid_is_valid_acl($acl) {
 
 function squid_install_command() {
 	global $config;
+	global $g;
 	/* migrate existing csv config fields */
 	$settingsauth = $config['installedpackages']['squidauth']['config'][0];
 	$settingscache = $config['installedpackages']['squidcache']['config'][0];
 	$settingsnac = $config['installedpackages']['squidnac']['config'][0];
+
+	/* Set storage system */
+	if ($g['platform'] == "nanobsd") {
+		$config['installedpackages']['squidcache']['config'][0]['harddisk_cache_system'] = 'null';
+	}
 
 	/* migrate auth settings */
 	if (!empty($settingsauth['no_auth_hosts'])) {
