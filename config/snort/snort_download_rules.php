@@ -41,7 +41,7 @@ $snortdir = "/usr/local/etc/snort";
 $snortdir_wan = "/usr/local/etc/snort";
 $snort_filename_md5 = "snortrules-snapshot-2861.tar.gz.md5";
 $snort_filename = "snortrules-snapshot-2861.tar.gz";
-$emergingthreats_filename_md5 = "version.txt";
+$emergingthreats_filename_md5 = "emerging.rules.tar.gz.md5";
 $emergingthreats_filename = "emerging.rules.tar.gz";
 $pfsense_rules_filename_md5 = "pfsense_rules.tar.gz.md5";
 $pfsense_rules_filename = "pfsense_rules.tar.gz";
@@ -239,8 +239,8 @@ if ($emergingthreats == "on")
 	update_status(gettext("Downloading emergingthreats md5 file..."));
 	ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
 	// $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/version.txt");
-	$image = @file_get_contents("http://www.emergingthreats.net/version.txt");
-	$f = fopen("{$tmpfname}/version.txt", 'w');
+	$image = @file_get_contents('http://rules.emergingthreats.net/open/snort-2.8.6/emerging.rules.tar.gz.md5');
+	$f = fopen("{$tmpfname}/{$emergingthreats_filename_md5}", 'w');
 	fwrite($f, $image);
 	fclose($f);
 	update_status(gettext("Done downloading emergingthreats md5"));
@@ -318,11 +318,11 @@ if ($snortdownload == 'on')
 /* Check if were up to date emergingthreats.net */
 if ($emergingthreats == "on")
 {
-	if (file_exists("{$snortdir}/version.txt"))
+	if (file_exists("{$snortdir}/{$emergingthreats_filename_md5}"))
 	{
-		$emerg_md5_check_new_parse = file_get_contents("{$tmpfname}/version.txt");
+		$emerg_md5_check_new_parse = file_get_contents("{$tmpfname}/{$emergingthreats_filename_md5}");
 		$emerg_md5_check_new = `/bin/echo "{$emerg_md5_check_new_parse}" | /usr/bin/awk '{ print $1 }'`;
-		$emerg_md5_check_old_parse = file_get_contents("{$snortdir}/version.txt");
+		$emerg_md5_check_old_parse = file_get_contents("{$snortdir}/{$emergingthreats_filename_md5}");
 		$emerg_md5_check_old = `/bin/echo "{$emerg_md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
 		/* Write out time of last sucsessful md5 to cache */
 		// Will cause switch back to read-only on nanobsd
@@ -440,14 +440,14 @@ if ($emergingthreats == "on")
 	{
 		if (file_exists("{$tmpfname}/{$emergingthreats_filename}"))
 		{
-			update_status(gettext("Emergingthreats tar file exists..."));
+			update_status(gettext('Emergingthreats tar file exists...'));
 		}else{
 			update_status(gettext("There is a new set of Emergingthreats rules posted. Downloading..."));
 			update_output_window(gettext("May take 4 to 10 min..."));
 			// download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
-			download_file_with_progress_bar("http://www.emergingthreats.net/rules/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
+			download_file_with_progress_bar('http://rules.emergingthreats.net/open/snort-2.8.6/emerging.rules.tar.gz', $tmpfname . "/{$emergingthreats_filename}", 'read_body_firmware');
 			update_all_status($static_output);
-			update_status(gettext("Done downloading Emergingthreats rules file."));
+			update_status(gettext('Done downloading Emergingthreats rules file.'));
 		}
 	}
 }
