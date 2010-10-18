@@ -1069,8 +1069,7 @@ function sg_redirector_base_url($rdr_info, $redirect_mode)
     # gui port, ip & proto
     $guiip = (!empty($squidguard_config[F_CURRENT_LAN_IP])) ? $squidguard_config[F_CURRENT_LAN_IP] : '127.0.0.1';
     $guiport = (!empty($squidguard_config[F_CURRENT_GUI_PORT])) ? $squidguard_config[F_CURRENT_GUI_PORT] : '80';
-    $guiproto = ($squidguard_config[F_CURRENT_GUI_PROTO] === "https") ? "https" : "http";
-    $rdr_path = "$guiproto://$guiip:$guiport" . REDIRECT_BASE_URL;
+    $rdr_path = "http://$guiip:$guiport" . REDIRECT_BASE_URL;
 
     # check redirect
     $errmsg = '';

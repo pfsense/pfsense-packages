@@ -1074,21 +1074,20 @@ function convert_pfxml_to_sgxml() {
 
 	# other
     $sgxml['view_gui_log'] = $pfxml['view_gui_log'];
+    $lanip = $config['interfaces']['lan']['ipaddr'];
+    $sgxml[F_CURRENT_LAN_IP] = $lanip;
 
     # transparent
     $squidxml = $config['installedpackages']['squid']['config'][0];
-    if(isset($squidxml['transparent_proxy'])) {
-        $lanip = $config['interfaces']['lan']['ipaddr'];
+    if($squidxml['transparent_proxy'] == 'on') {
         $guiport = $config['system']['webgui']['port'];
         $guiprotocol = $config['system']['webgui']['protocol'];
 
         $sgxml[F_SQUID_TRANSPARENT_MODE] = 'on';
-        $sgxml[F_CURRENT_LAN_IP] = $lanip;
         $sgxml[F_CURRENT_GUI_PORT] = $guiport;
         $sgxml[F_CURRENT_GUI_PROTO] = $guiprotocol;
     } else {
         unset($sgxml[F_SQUID_TRANSPARENT_MODE]);
-        unset($sgxml[F_CURRENT_LAN_IP]);
         unset($sgxml[F_CURRENT_GUI_PORT]);
         unset($sgxml[F_CURRENT_GUI_PROTO]);
     }
