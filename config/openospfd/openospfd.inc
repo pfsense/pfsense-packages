@@ -128,7 +128,7 @@ function ospfd_install_conf() {
 				} else if (!empty($conf['password'])) {
 					$options_present = true;
 					$ifconfigs .= "\t\tauth-type simple\n";
-					$ifconfigs .= "\t\tauth-key \"" . substr($conf['password'], 0, 7) . "\"\n";
+					$ifconfigs .= "\t\tauth-key \"" . substr($conf['password'], 0, 8) . "\"\n";
 				}
 				if (!empty($conf['routerpriorityelections'])) {
 					$options_present = true;
