@@ -67,7 +67,7 @@ foreach($a_server as $sindex => $server) {
 			$ras_userent['uindex'] = $uindex;
 			$ras_userent['cindex'] = $cindex;
 			$ras_userent['name'] = $user['name'];
-			$ras_userent['certname'] = $cert['name'];
+			$ras_userent['certname'] = $cert['descr'];
 			$ras_user[] = $ras_userent;
 		}
 	}
