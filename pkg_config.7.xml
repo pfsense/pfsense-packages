@@ -1086,5 +1086,16 @@
       <required_version>1.2.3</required_version>
       <maximum_version>1.2.3</maximum_version>
     </package>
+	<package>
+		<name>ifBWStats</name>
+		<website/>
+		<descr>Interface Bandwidth Stats.  Tracks data usage on each interface.  Helpful if your isp caps your montly data usage.  No dependancies (ie rrd).</descr>
+		<category>Diagnostics</category>
+		<config_file>http://192.168.0.5/packages/config/ifbwstats/ifbwstats.xml</config_file>
+		<version>1.0</version>
+		<status>Beta</status>
+		<required_version>1.2.3</required_version>
+		<configurationfile>ifbwstats.xml</configurationfile>
+	</package>
   </packages>
 </pfsensepkgs>
