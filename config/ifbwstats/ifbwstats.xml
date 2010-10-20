@@ -79,32 +79,32 @@
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://192.168.0.5/packages/config/ifbwstats/ifbwstats_daily.php</item>
+		<item>http://files.pfsense.org/packages/config/ifbwstats/ifbwstats_daily.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://192.168.0.5/packages/config/ifbwstats/ifbwstats_disp.php</item>
+		<item>http://files.pfsense.org/packages/config/ifbwstats/ifbwstats_disp.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
-		<item>http://192.168.0.5/packages/config/ifbwstats/ifbwstats_cur.php</item>
+		<item>http://files.pfsense.org/packages/config/ifbwstats/ifbwstats_cur.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0777</chmod>
-		<item>http://192.168.0.5/packages/config/ifbwstats/ifbwstats_daemon.php</item>
+		<item>http://files.pfsense.org/packages/config/ifbwstats/ifbwstats_daemon.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
-		<item>http://192.168.0.5/packages/config/ifbwstats/ifbwstats.inc</item>
+		<item>http://files.pfsense.org/packages/config/ifbwstats/ifbwstats.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/etc/rc.d/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://192.168.0.5/packages/config/ifbwstats/ifbwstats.sh</item>
+		<item>http://files.pfsense.org/packages/config/ifbwstats/ifbwstats.sh</item>
 	</additional_files_needed>
 	<fields>
 		<field>
