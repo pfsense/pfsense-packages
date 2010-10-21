@@ -729,6 +729,12 @@ function useproxy_changed(obj) {
 						<td width="25%" class="listhdrr"><?=gettext("Export");?></td>
 					</tr>
 				</table>
+				<table width="100%" width="100%" border="0" cellpadding="5" cellspacing="10">
+					<tr>
+						<td align="right" valign="top" width="5%"><?= gettext("NOTE:") ?></td>
+						<td><?= gettext("If you expect to see a certain client in the list but it is not there, it is usually due to a CA mismatch between the OpenVPN server instance and the client certificates found in the User Manager.") ?></td>
+					</tr>
+				</table>
 			</div>
 		</td>
 	</tr>
