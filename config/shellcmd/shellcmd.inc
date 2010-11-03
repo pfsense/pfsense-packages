@@ -79,11 +79,8 @@ function php_install_command()
 
 	
 	//rename PHP files from .tmp to .php
-	exec("cp /tmp/shellcmd.tmp /usr/local/www/packages/shellcmd/shellcmd.php");
-	unlink_if_exists("/tmp/shellcmd.tmp");
-	
-	exec("cp /tmp/shellcmd_edit.tmp /usr/local/www/packages/shellcmd/shellcmd_edit.php");
-	unlink_if_exists("/tmp/shellcmd_edit.tmp");
+	exec("cp /usr/local/pkg/shellcmd.tmp /usr/local/www/packages/shellcmd/shellcmd.php");
+	exec("cp /usr/local/pkg/shellcmd_edit.tmp /usr/local/www/packages/shellcmd/shellcmd_edit.php");
 		
 	//write_config();
 	  	

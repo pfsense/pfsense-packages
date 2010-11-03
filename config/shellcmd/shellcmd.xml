@@ -75,12 +75,12 @@
 		<item>http://www.pfsense.com/packages/config/shellcmd/shellcmd.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
+		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/shellcmd/shellcmd.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/tmp/</prefix>
+		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/shellcmd/shellcmd_edit.tmp</item>
 	</additional_files_needed>			
