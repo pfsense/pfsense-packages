@@ -707,13 +707,13 @@ function vhosts_sync_package_php()
 }
 
 
-function php_sync_package() {
+function vhosts_sync_package() {
 	global $config;   
 	vhosts_sync_package_php();
 }
 
 
-function php_install_command() {
+function vhosts_install_command() {
 
 	global $config;
 	conf_mount_rw();
@@ -786,7 +786,7 @@ function php_install_command() {
 		)
 	);
 
-	php_sync_package();
+	vhosts_sync_package();
 
 	//if (pkg_is_service_running('vhosts')) {  
 		//documentation purposes
@@ -798,7 +798,7 @@ function php_install_command() {
 }
 
 
-function deinstall_command() 
+function vhosts_deinstall_command()
 {
 	conf_mount_rw();
 	config_lock();
