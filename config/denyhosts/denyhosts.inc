@@ -31,7 +31,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-function php_sync_package() 
+function denyhosts_sync_package()
 {
   
 	//global $config; 
@@ -45,7 +45,7 @@ function php_sync_package()
 // http://en.wikipedia.org/wiki/DenyHosts
 
 
-function php_install_command() 
+function denyhosts_install_command()
 {
 
 	global $config;
@@ -149,7 +149,7 @@ function php_install_command()
 		)
 	);
    
-	php_sync_package();
+	denyhosts_sync_package();
 
 	//start denyhosts
 	exec("/usr/local/etc/rc.d/denyhosts.sh start");
@@ -164,7 +164,7 @@ function php_install_command()
 }
 
 
-function deinstall_command() 
+function denyhosts_deinstall_command()
 {
 
 	conf_mount_rw();
