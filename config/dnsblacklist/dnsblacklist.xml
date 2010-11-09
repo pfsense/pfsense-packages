@@ -96,15 +96,15 @@
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
-		php_sync_package();
+		dnsblacklist_sync_package();
 	</custom_php_resync_config_command>
 	<custom_delete_php_command>    
-		php_sync_package();
+		dnsblacklist_sync_package();
 	</custom_delete_php_command>
 	<custom_php_install_command>
-		php_install_command();
+		dnsblacklist_install_command();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		deinstall_command();
+		dnsblacklist_deinstall_command();
 	</custom_php_deinstall_command>
 </packagegui>

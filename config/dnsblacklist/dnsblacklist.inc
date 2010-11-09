@@ -59,13 +59,13 @@ function byte_convert( $bytes ) {
  
 
 
-function php_sync_package() 
+function dnsblacklist_sync_package()
 {
 	global $config;
 }
 
 
-function php_install_command() 
+function dnsblacklist_install_command()
 {
 
 	global $config;
@@ -98,7 +98,7 @@ function php_install_command()
 	//	)
 	//);
 
-	//php_sync_package();
+	//dnsblacklist_sync_package();
 	//$handle = popen("/usr/local/etc/rc.d/phpservice.sh start", "r");
 	//pclose($handle);
 
@@ -111,7 +111,7 @@ function php_install_command()
 }
 
 
-function deinstall_command() 
+function dnsblacklist_deinstall_command()
 {
 	conf_mount_rw();
 	$handle = popen("/usr/local/etc/rc.d/dnsblacklist.sh stop", "r");
