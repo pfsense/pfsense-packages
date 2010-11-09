@@ -31,7 +31,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-function php_sync_package() 
+function notes_sync_package()
 {
   
 	//global $config;  
@@ -39,7 +39,7 @@ function php_sync_package()
 }
     
 
-function php_install_command() 
+function notes_install_command()
 {
 
 	global $config;
@@ -71,7 +71,7 @@ function php_install_command()
 	//);
 	
 		  	       
-	php_sync_package();
+	notes_sync_package();
 
 	
 	//if (pkg_is_service_running('notes')) {  
@@ -84,7 +84,7 @@ function php_install_command()
 }
 
 
-function deinstall_command() 
+function notes_deinstall_command()
 {
 
 	conf_mount_rw();
