@@ -31,7 +31,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-function pkg_is_service_running($servicename) 
+function pkg_is_service_running($servicename)
 {
     exec("/bin/ps ax | awk '{ print $5 }'", $psout);
     array_shift($psout);
@@ -153,7 +153,7 @@ function phpservice_sync_package_php()
 }
 
 
-function php_sync_package() 
+function phpservice_sync_package()
 {
   
 	global $config;   
@@ -162,7 +162,7 @@ function php_sync_package()
 }
     
 
-function php_install_command() 
+function phpservice_install_command()
 {
 
 	global $config;
@@ -194,7 +194,7 @@ function php_install_command()
 		)
 	);
 		  	       
-	php_sync_package();
+	phpservice_sync_package();
 	//$handle = popen("/usr/local/etc/rc.d/phpservice.sh start", "r");
 	//pclose($handle);
 	
@@ -208,7 +208,7 @@ function php_install_command()
 }
 
 
-function deinstall_command() 
+function phpservice_deinstall_command()
 {
 
 	conf_mount_rw();
