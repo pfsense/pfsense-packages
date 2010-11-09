@@ -53,7 +53,7 @@ function guid()
 //echo guid();
 
 
-function pkg_is_service_running($servicename) 
+function pkg_is_service_running($servicename)
 {
     exec("/bin/ps ax | awk '{ print $5 }'", $psout);
     array_shift($psout);
@@ -80,7 +80,7 @@ function byte_convert( $bytes ) {
 }
 
 
-function php_sync_package() 
+function tftp_sync_package()
 {
   
   //global $config;   
@@ -93,7 +93,7 @@ function php_sync_package()
 }
     
 
-function php_install_command() 
+function tftp_install_command()
 {
 
 	global $config;
@@ -244,7 +244,7 @@ function php_install_command()
 	);
 	
 		  	       
-	//php_sync_package();
+	//tftp_sync_package();
 	$handle = popen("/usr/sbin/inetd", "r");
 	pclose($handle);
 	
@@ -258,7 +258,7 @@ function php_install_command()
 }
 
 
-function php_deinstall_command() 
+function tftp_deinstall_command()
 {
 
 	//prepare inetd.conf for tftp
