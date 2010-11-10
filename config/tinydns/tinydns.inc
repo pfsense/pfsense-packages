@@ -719,9 +719,18 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 				if(!$dist)
 					$dist = "10"; // default to 10 if no preference has been defined.  0 is ugly.
 
-				// Check if we were given an IP, if so, put it in the ip field and leave the x field blank.
+				// Check if the user entered a custom record data with a : (for ip:host), and if it is valid, use it.
+				// If not, check if we were given an IP, if so, put it in the ip field and leave the x field blank.
 				// Otherwise leave the IP blank and put in the hostname.
-				if (is_ipaddr($recordip))
+				if (strpos($recordip, ':') !== false) {
+					list($rip, $rhost) = explode(':', $recordip);
+					if ((empty($rip) && is_hostname($rhost))
+						|| (empty($rhost) && is_ipaddr($rip))
+						|| (is_ipaddr($rip) && is_hostname($rhost)))
+						$record_string = $recordip;
+					else
+						break; // Don't add an invalid record.
+				} elseif (is_ipaddr($recordip))
 					$record_string = "{$recordip}:";
 				else
 					$record_string = ":{$recordip}";

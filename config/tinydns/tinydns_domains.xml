@@ -183,7 +183,7 @@
 		<field>
 			<fielddescr>Record Data (FQDN, IP Address, or "raw" TinyDNS record)</fielddescr>
 			<fieldname>ipaddress</fieldname>
-			<description>Enter the record data here. Use IP Address for A and PTR records. Use FQDN or Hostname for SOA and CNAME Records. NS Records use colon-separated IP and FQDN, e.g. 1.2.3.4:example.com</description>
+			<description>Enter the record data here. Use IP Address for A and PTR records. Use FQDN or Hostname for SOA and CNAME Records. MX records can be an IP, FQDN, or both separated by a colon, e.g. 1.2.3.4, mail.example.com, or 1.2.3.4:mail.example.com. NS Records use colon-separated IP and FQDN, e.g. 1.2.3.4:example.com</description>
 			<type>input</type>
 			<size>80</size>
 			<required/>
