@@ -715,9 +715,17 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 				break;
 			case "MX":
 				//      @fqdn:ip:x:dist:ttl:timestamp:lo
+				//               ^- This is a hostname
 				if(!$dist)
 					$dist = "10"; // default to 10 if no preference has been defined.  0 is ugly.
-				$record_data = "@{$hostname}::{$recordip}:{$dist}{$ttl_string}";
+
+				// Check if we were given an IP, if so, put it in the ip field and leave the x field blank.
+				// Otherwise leave the IP blank and put in the hostname.
+				if (is_ipaddr($recordip))
+					$record_string = "{$recordip}:";
+				else
+					$record_string = ":{$recordip}";
+				$record_data = "@{$hostname}:{$record_string}:{$dist}{$ttl_string}";
 				break;
 			case "PTR":
 				/* "^" creates "PTR" record only to allow reverse DNS */
