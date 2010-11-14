@@ -14,11 +14,11 @@
                         <text>HTTP Proxy</text>
                         <url>/pkg_edit.php?xml=havp.xml&amp;id=0</url>
                 </tab>
-                <tab>
+                <!--tab>
                         <text>Files Scanner</text>
                         <url>/pkg_edit.php?xml=havp_fscan.xml&amp;id=0</url>
                         <active/>
-                </tab>
+                </tab-->
                 <tab>
                         <text>Settings</text>
                         <url>/pkg_edit.php?xml=havp_avset.xml&amp;id=0</url>

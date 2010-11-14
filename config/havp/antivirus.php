@@ -178,75 +178,106 @@ if (pfsense_version_A() == '1') {
 <tr><td><div id="mainarea"><table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td class="tabcont" valign="top">
-      <table width="100%" border="0" cellpadding="6" cellspacing="0">
+      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+<!-- Service -->
         <tr>
-          <td width="50%" valign="top">
-
-            <table width="100%" border="0" cellpadding="0" cellspacing="0">
-              <tr><td class="listhdrr">Service</td></tr>
-              <tr>
-                <td>
-                  <table width="100%" border="0" cellpadding="6" cellspacing="0">
-                    <tr>
-                      <td class="listlr">HTTP Antivirus Proxy ( <?php echo(havp_status()); ?> )</td>
-                      <td class="listr"><center>
-                      <?php
+          <td class="listhdrr">Service</td>
+          <td class="listhdrr">Status </td>
+          <td class="listhdrr">&nbsp; </td>
+          <td class="listhdrr">Version</td>
+          <td class="listhdrr">Settings</td>
+        </tr>
+        <tr>
+          <td class="listlr">HTTP Antivirus Proxy ( <?php echo(havp_status()); ?> )</td>
+          <td class="listr" ><center>
+                  <?php
                           $running = (is_service_running("havp", $ps) or is_process_running("havp"));
                           if ($running) 
                                echo "<img src=\"/themes/" . $g["theme"] . "/images/icons/icon_pass.gif\"  > Running";
                           else echo "<img src=\"/themes/" . $g["theme"] . "/images/icons/icon_block.gif\"> Stopped";                          
-                      ?>
-                      </td>
-                      <td class="listr">
-                      <?php
+                  ?>
+          </td>
+          <td class="listr" nowrap>
+                  <?php
                           if($running) {
 		                   echo "<input title='Restart Service' name='restart' type='image' value='havp' border=0 src='./themes/".$g['theme']."/images/icons/icon_service_restart.gif'>";
 		                   echo "&nbsp";
 		                   echo "<input title='Stop Service'    name='stop'    type='image' value='havp' border=0 src='./themes/".$g['theme']."/images/icons/icon_service_stop.gif'>";
 		            } else echo "<input title='Start Service'   name='start'   type='image' value='havp' border=0 src='./themes/".$g['theme']."/images/icons/icon_service_start.gif'>";		            
-		        ?>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td class="listlr">Antivirus Server ( <?php echo(clamd_status()); ?> )</td>
-                      <td class="listr"><center>
-                      <?php
+		    ?>
+          </td>
+          <td class="listr">
+                  <?php echo exec("pkg_info | grep \"[h]avp\""); ?>
+          </td>
+          <td class="listr">
+                  <a href="/pkg_edit.php?xml=havp.xml&amp;id=0">
+                      <?php echo "<input height=14 title='Show Proxy settings page' name='scan' type='image' value='scan' border=0 src='./themes/".$g['theme']."/images/icons/icon_service_start.gif'>"; ?>
+                      <font size="2">&nbsp;Proxy  Settings</size>                    
+                  </a>
+          </td>
+        </tr>
+        <tr>
+          <td class="listlr">Antivirus Server ( <?php echo(clamd_status()); ?> )</td>
+          <td class="listr"><center>
+                  <?php
                           $running = (is_service_running("clamd", $ps) or is_process_running("clamd"));
                           if ($running) 
                                echo "<img src=\"/themes/" . $g["theme"] . "/images/icons/icon_pass.gif\"  > Running";
                           else echo "<img src=\"/themes/" . $g["theme"] . "/images/icons/icon_block.gif\"> Stopped";                          
-                      ?>
-                      </td>
-                      <td class="listr">&nbsp;</td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-              <tr><td>&nbsp;</td></tr>
-              <tr><td class="listhdrr">Settings</td></tr>
-              <tr>                
-                <td class="vncellt">
-                    <a href="/pkg_edit.php?xml=havp.xml&amp;id=0">
+                  ?>
+          </td>
+          <td class="listr">&nbsp;</td>
+          <td class="listr">
+                  <?php echo exec("clamd -V"); ?>
+          </td>
+          <td class="listr">
+                  <a href="/pkg_edit.php?xml=havp_avset.xml&id=0">
                       <?php echo "<input height=14 title='Show Antivirus settings page' name='scan' type='image' value='scan' border=0 src='./themes/".$g['theme']."/images/icons/icon_service_start.gif'>"; ?>
-                      <font size="2">&nbsp;Show Antivirus Settings</size>                    
-                    </a>
-                </td>
-              </tr>
-              <tr><td>&nbsp;</td></tr>
-              <tr><td class="listhdrr">Update</td></tr>
-              <tr>
-                <td class="vncellt" nowrap>
+                      <font size="2">&nbsp;Antivirus Settings</size>                    
+                  </a>
+          </td>
+        </tr>
+
+        <tr><td>&nbsp;</td></tr>
+<!-- Update -->
+        <tr>
+          <td class="listhdrr" colspan="3">Antivirus Update</td>
+          <td class="listhdrr" colspan="2">Update status</td></tr>
+        </tr>
+        <tr>
+          <td class="listlr" colspan="3" nowrap>
                   <?php echo "<input height=14 title='Start antivirus update' name='startupdate' type='image' value='startupdate' border=0 src='./themes/".$g['theme']."/images/icons/icon_service_start.gif'>"; ?>
-                  <font size="-1">&nbsp;Start update</font>
-                </td>
-              </tr>
-              <tr><td>&nbsp;</td></tr>
-              <tr><td class="listhdrr">File scanner</td></tr>
-              <tr>
-                <td class="vtable">
-                  <table width="100%" border="0" cellpadding="6" cellspacing="0">
-                    <tr>
-                      <td class="listlr">
+                  <font size="-1">&nbsp;Start Update</font>
+          </td>
+          <td class="listr" colspan="2">
+                  <?php echo avupdate_status(); ?>
+          </td>
+        </tr>
+        <tr>
+          <td class="listlr"colspan="3">Antivirus Base Info</td>
+          <td colspan="2">
+            <table width="100%" border="0" cellspacing="0" cellpadding="1" ><tbody>
+              <tr  align="center"><td class="listhdrr">Database</td><td class="listhdrr">Date</td><td class="listhdrr">Size</td><td class="listhdrr">Ver.</td><td class="listhdrr">Signatures</td><td class="listhdrr">Builder</td></tr>
+              <?php echo get_avdb_info("daily.cld"); ?>
+              <?php echo get_avdb_info("daily.cvd"); ?>
+              <?php echo get_avdb_info("main.cld"); ?>
+              <?php echo get_avdb_info("main.cvd"); ?>
+              <?php echo get_avdb_info("safebrowsing.cld"); ?>
+              <?php echo get_avdb_info("safebrowsing.cvd"); ?>
+            </tbody></table>
+          </td>
+        </tr>
+        <tr><td>&nbsp;</td></tr>
+<!-- File Scanner -->
+        <tr>
+          <td class="listhdrr" colspan="3">File scanner</td>
+          <td class="listhdrr" colspan="2">Scanner status</td>
+        </tr>
+        <tr>
+          <td class="vtable" colspan="3">
+              <table width="100%" border="0" cellpadding="6" cellspacing="0">
+                <tr>
+                  <td class="listlr">
                         &nbsp;Path: <br>
                         <input size="60%" id="scanpath" name="scanpath" value=""><br>
                         &nbsp;Enter file path or catalog for scanning.
@@ -262,63 +293,24 @@ if (pfsense_version_A() == '1') {
                                   echo "<br>";
                               }
                         ?>
-                      </td>
-                    </tr>	              
-                    <tr>
-                      <td class="vncellt" nowrap>
+                  </td>
+                </tr>	              
+                <tr>
+                  <td class="vncellr" nowrap>
                         <?php echo "<input height=14 title='Scan selected file or catalog' name='scan' type='image' value='scan' border=0 src='./themes/".$g['theme']."/images/icons/icon_service_start.gif'>"; ?>
                         <font size="-1">&nbsp;Start Scanner</font>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>	              
-            </table>
+                  </td>
+                </tr>
+              </table>
           </td>
-          <td width="50%" valign="top">
-            <table width="100%" border="0" cellpadding="6" cellspacing="0">
-              <tr><td class="listhdrr" colspan=2>Antivirus version info</td></tr>
-              <tr>
-                <td class="vncellt">Antivirus Server</td>
-                <td class="listr" width=75%>
-                  <?php echo exec("clamd -V"); ?>
-                </td>
-              </tr>
-              <tr>
-                <td class="vncellt">HTTP Proxy</td>
-                <td class="listr" width=75%>
-                  <?php echo exec("pkg_info | grep \"[h]avp\""); ?>
-                </td>
-              </tr>
-            </table>
-            <br>
-            <table width="100%" border="0" cellspacing="0" cellpadding="1" ><tbody>
-              <tr  align="center"><td class="listhdrr">Database</td><td class="listhdrr">Date</td><td class="listhdrr">Size</td><td class="listhdrr">Ver.</td><td class="listhdrr">Signatures</td><td class="listhdrr">Builder</td></tr>
-              <?php echo get_avdb_info("daily.cld"); ?>
-              <?php echo get_avdb_info("daily.cvd"); ?>
-              <?php echo get_avdb_info("main.cld"); ?>
-              <?php echo get_avdb_info("main.cvd"); ?>
-              <?php echo get_avdb_info("safebrowsing.cld"); ?>
-              <?php echo get_avdb_info("safebrowsing.cvd"); ?>
-            </tbody></table>
-            <br>
-            <table width="100%" border="0" cellspacing="0" cellpadding="1" ><tbody>
-              <tr><td class="listhdrr">Update status</td></tr>
-              <tr><td class="listr" width=75%>
-                <?php echo avupdate_status(); ?>
-              </td></tr>
-            </tbody></table>
-            <br>
-            <table width="100%" border="0" cellspacing="0" cellpadding="1" ><tbody>
-              <tr><td class="listhdrr">Scanner status</td></tr>
-              <tr>
-                <td class="listr" width=75%><?php echo get_scan_log(); ?></td>
-              </tr>
-            </tbody></table>
+          <td class="listr" colspan="2">
+              <?php echo get_scan_log(); ?>
           </td>
         </tr>
+        <tr><td>&nbsp;</td></tr>
+<!-- Last Viruses -->
         <tr>
-          <td colspan=2>
+          <td colspan="5">
             <table width="100%" border="0" cellspacing="0" cellpadding="1" ><tbody>
               <tr class="vncellt"><td class="listhdrr" colspan="4">Last Viruses</td></tr>
               <?php 
