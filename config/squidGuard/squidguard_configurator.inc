@@ -913,7 +913,7 @@ function sg_create_config()
                     $acl[F_OVERDESTINATIONNAME] = "!in-addr {$acl[F_OVERDESTINATIONNAME]}";
                 }
 
-                # re-order acl pass (<allow><deny<all|none>)
+                # re-order acl pass (<white><!in-addr><deny><allow><all|none>)
                 $acl[F_DESTINATIONNAME]     = sg_aclpass_reorder($acl[F_DESTINATIONNAME]);
                 $acl[F_OVERDESTINATIONNAME] = sg_aclpass_reorder($acl[F_OVERDESTINATIONNAME]);
 
@@ -1102,7 +1102,7 @@ function sg_aclpass_reorder($pass)
 {
     $ar_pass = explode(" ", $pass);
 
-    # 'pass' order: <allow> <deny> <all|none>
+    # 'pass' order: <white> <!in_addr> <deny> <allow> <all|none>
     if (is_array($ar_pass)) {
         $pass_end = '';
         $pass_fst = array(); # whitelist - '^' prefix (will deleted)
@@ -1919,9 +1919,10 @@ function sg_check_dest($sgx, $input_errors)
     array_packitems(&$dm);
     array_packitems(&$ur);
 
-    # domain
-    foreach ($dm as $d_it)
-        if ($d_it && !is_domain_valid($d_it)) $elog[] = "Item '$d_it' is not a domain.";
+    # domain or ip
+    foreach ($dm as $d_it) {
+        if ($d_it && !is_domain_valid($d_it) && !is_ipaddr($d_it)) $elog[] = "Item '$d_it' is not a domain.";
+    }
 
     # url
     foreach ($ur as $u_it)

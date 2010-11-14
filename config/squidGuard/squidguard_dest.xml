@@ -51,18 +51,18 @@
                         <fielddescr>Destination name</fielddescr>
                         <fieldname>name</fieldname>
                 </columnitem>
-                <columnitem>
+                <!--columnitem>
                         <fielddescr>Domain list</fielddescr>
                         <fieldname>domains</fieldname>
-                </columnitem>
-                <columnitem>
+                </columnitem-->
+                <!--columnitem>
                         <fielddescr>URL list</fielddescr>
                         <fieldname>urls</fieldname>
-                </columnitem>
-                <columnitem>
+                </columnitem-->
+                <!--columnitem>
                         <fielddescr>Expressions</fielddescr>
                         <fieldname>expressions</fieldname>
-                </columnitem>
+                </columnitem-->
                 <columnitem>
                         <fielddescr>Redirect</fielddescr>
                         <fieldname>redirect</fieldname>
@@ -90,8 +90,8 @@
                         <fielddescr>Domains list</fielddescr>
                         <fieldname>domains</fieldname>
                         <description>
-                                Enter destination domains here. For separate domains names use ' '(space).
-                                &lt;p&gt; &lt;b&gt;Example:&lt;/b&gt; 'mail.ru e-mail.ru yahoo.com' .
+                                Enter destination domains or IP-address here. For separate use ' '(space).
+                                &lt;p&gt; &lt;b&gt;Example:&lt;/b&gt; 'mail.ru e-mail.ru yahoo.com 192.168.1.1' .
                         </description>
                         <type>textarea</type>
                         <cols>60</cols>

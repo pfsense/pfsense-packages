@@ -829,7 +829,7 @@ function make_grid_controls($type, $items, $enable_overtime = true) {
         $tbl .= "<td $color><select id=$tnm name=\"$tnm\">";
         if (substr_count($name, "all") === 0) {
             $tbl .= "<option value=none  name=\"----\"  $upt_A>----</option>";
-            $tbl .= "<option value=white name=\"white\" $upt_C>white</option>";
+            $tbl .= "<option value=white name=\"white\" $upt_C>whitelist</option>";
             $tbl .= "<option value=deny  name=\"deny\"  $upt_D>deny </option>";
             $tbl .= "<option value=allow name=\"allow\" $upt_B>allow</option>";
         }
@@ -867,7 +867,7 @@ function make_grid_controls($type, $items, $enable_overtime = true) {
         $thdr = '';
         $hdr1up = "<big>Destination rules</big>";
         $hdr1ov = "<big>Destination rules in overtime</big>";
-        $hds3   = "ACCESS: 'white' - always pass; 'deny' - block; 'allow' - pass, if not blocked.";
+        $hds3   = "ACCESS: 'whitelist' - always pass; 'deny' - block; 'allow' - pass, if not blocked.";
         if ($enable_overtime) {
             $thdr .= "<tr><td colspan='8' align=left>$hds3</td></tr>";
             $thdr .= "<tr $color><th colspan='4' align=middle>$hdr1up</th><th colspan='4' align=middle>$hdr1ov</th></tr>";

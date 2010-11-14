@@ -55,10 +55,10 @@
                         <fielddescr>Name</fielddescr>
                         <fieldname>name</fieldname>
                 </columnitem>
-                <columnitem>
+                <!--columnitem>
                         <fielddescr>Source</fielddescr>
                         <fieldname>source</fieldname>
-                </columnitem>
+                </columnitem-->
                 <!--columnitem>
                         <fielddescr>Destinations</fielddescr>
                         <fieldname>dest</fieldname>
@@ -162,6 +162,7 @@
                         <description>
                                 To make sure that people don't bypass the URL filter.
                                 by simply using the IP addresses instead of the fully qualified domain names, you can check this option.
+                                This option has no effect on the WhiteList.
                         </description>
                         <type>checkbox</type>
                 </field>
