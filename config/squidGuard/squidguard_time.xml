@@ -42,7 +42,7 @@
 		</tab>
 		<tab>
 			<text>Log</text>
-			<url>/pkg_edit.php?xml=squidguard_log.xml</url>
+			<url>/pkg_edit.php?xml=squidguard_log.xml&amp;id=0</url>
 		</tab>
 	</tabs>
 
