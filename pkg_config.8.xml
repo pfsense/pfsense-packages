@@ -527,8 +527,8 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>imspector-0.8.tbz</depends_on_package>
       <depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
-      <depends_on_package>mysql-client-5.0.77.tbz</depends_on_package>
-      <depends_on_package>sqlite3-3.6.10.tbz</depends_on_package>
+      <depends_on_package>mysql-client-5.0.27.tbz</depends_on_package>
+      <depends_on_package>sqlite3-3.3.7.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/net-im/imspector</build_port_path>
 	  <build_port_path>/usr/ports/converters/libiconv</build_port_path>
 	  <build_port_path>/usr/ports/databases/mysql50-client</build_port_path>
