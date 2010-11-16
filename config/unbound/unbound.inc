@@ -39,13 +39,13 @@ function unbound_initial_setup() {
 		
 	// Setup unbound
 	mwexec("/bin/mkdir -p /usr/local/etc/unbound /usr/local/etc/unbound/dev");
-	touch("/usr/local/etc/unbound/root.hints");
-	touch("/usr/local/etc/unbound/root-trust-anchor");
-	chown("/usr/local/etc/unbound/root-trust-anchor", "unbound");
-	chgrp("/usr/local/etc/unbound/root-trust-anchor", "wheel");
-	chmod("/usr/local/etc/unbound/root-trust-anchor", 0600);
-	unlink("/usr/local/etc/unbound/unbound.conf.sample");
-	unlink("/usr/local/etc/rc.d/unbound");
+	@touch("/usr/local/etc/unbound/root.hints");
+	@touch("/usr/local/etc/unbound/root-trust-anchor");
+	@chown("/usr/local/etc/unbound/root-trust-anchor", "unbound");
+	@chgrp("/usr/local/etc/unbound/root-trust-anchor", "wheel");
+	@chmod("/usr/local/etc/unbound/root-trust-anchor", 0600);
+	@unlink("/usr/local/etc/unbound/unbound.conf.sample");
+	@unlink("/usr/local/etc/rc.d/unbound");
 		
 	// Setup rc file for startup and shutdown.
 	unbound_rc_setup();
