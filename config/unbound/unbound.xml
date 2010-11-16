@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+		<![CDATA[
+		/*
+		    unbound.xml
+		    part of pfSense (http://www.pfSense.com)
+		    Copyright (C) 2010 to whom it may belong
+		    All rights reserved.
+		                                                       						  */
+		/* ========================================================================== */
+		/*
+		    Redistribution and use in source and binary forms, with or without
+		    modification, are permitted provided that the following conditions are met:
+
+		     1. Redistributions of source code must retain the above copyright notice,
+		        this list of conditions and the following disclaimer.
+
+		     2. Redistributions in binary form must reproduce the above copyright
+		        notice, this list of conditions and the following disclaimer in the
+		        documentation and/or other materials provided with the distribution.
+
+		    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+		    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+		    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+		    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+		    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+		    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+		    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+		    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+		    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+		    POSSIBILITY OF SUCH DAMAGE.
+		                                                                              */
+		/* ========================================================================== */
+		        ]]>
+	</copyright>
+	<description>Unbound is a validating, recursive, and caching DNS resolver.</description>
+	<requirements/>
+	<faq/>
+	<name>unbound</name>
+	<version>1.4.6</version>
+	<title>Services: Unbound DNS Forwarder</title>
+	<include_file>/usr/local/pkg/unbound.inc</include_file>
+	<menu>
+		<name>Unbound DNS</name>
+		<tooltiptext>Setup Unbound specific settings</tooltiptext>
+		<section>Services</section>
+		<url>pkg_edit.php?xml=unbound.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>unbound</name>
+		<rcfile>unbound.sh</rcfile>
+		<executable>unbound</executable>
+		<description>Unbound is a validating, recursive, and caching DNS resolver.</description>
+	</service>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>http://pkg.percol8.co.za/packages/config/unbound/unbound.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>http://pkg.percol8.co.za/packages/config/unbound/unbound.xml</item>
+	</additional_files_needed>
+	<tabs>
+		<tab>
+			<text>Unbound DNS Settings</text>
+			<url>/pkg_edit.php?xml=unbound.xml&amp;id=0</url>
+			<active/>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<name>Unbound DNS Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fieldname>unbound_status</fieldname>
+			<fielddescr>Enable Unbound</fielddescr>
+			<description>Enable the use of Unbound as your DNS forwarder.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Network interface</fielddescr>
+			<fieldname>active_interface</fieldname>
+			<description>The network interface(s) the Unbound DNS server will queries from.</description>
+			<type>interfaces_selection</type>
+			<required/>
+			<default_value>wan</default_value>
+			<multiple/>
+		</field>
+		<field>
+			<fieldname>dnssec_status</fieldname>
+			<fielddescr>Enable DNSSEC</fielddescr>
+			<description>Enable the use of DNSSEC. &lt;br/&gt;
+				&lt;b&gt;Note:&lt;/b&gt; It is recommended that when enabling DNSSEC you disable the use of forwarding mode and allow Unbound to do the resolving. This is to ensure that DNS replies are valid and authentic.</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
+		</field>
+		<field>
+			<fieldname>forwarding_mode</fieldname>
+			<fielddescr>Enable forwarding mode</fielddescr>
+			<description>Configure the server to make use of the DNS servers configured in &lt;a href="system.php"&gt;System: General setup&lt;/a&gt;. &lt;br/&gt;
+						&lt;b&gt;Note:&lt;/b&gt; Disabling this will cause Unbound to perform DNS queries without 
+						using the upstream configured DNS servers.</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
+		</field>
+	</fields>
+	<custom_add_php_command>
+	</custom_add_php_command>
+	<custom_php_command_before_form/>
+	<custom_php_resync_config_command>
+		unbound_reconfigure();
+	</custom_php_resync_config_command>
+	<custom_php_install_command>
+		unbound_install();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		unbound_uninstall();
+	</custom_php_deinstall_command>
+</packagegui>
