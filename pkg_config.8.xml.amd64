@@ -967,7 +967,7 @@
       <pkginfolink>http://doc.pfsense.org/index.php/Unbound_package</pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/unbound/unbound.xml</config_file>
       <configurationfile>unbound.xml</configurationfile>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+	  <depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
       <depends_on_package>unbound-1.4.7.tbz</depends_on_package>
       <depends_on_package>expat-2.0.1_1.tbz</depends_on_package>
       <depends_on_package>openssl-1.0.0_2.tbz</depends_on_package>
