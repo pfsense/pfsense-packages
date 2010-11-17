@@ -323,8 +323,8 @@ function fetch_root_hints() {
 	
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
-		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, '5');
+		curl_setopt($ch,CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, '25');
 		$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 		$data = curl_exec($ch);
 		curl_close($ch);
@@ -380,14 +380,19 @@ function unbound_uninstall() {
  */
 function unbound_add_host_entries() {
 	global $config;
-	
-	if (isset($config['dnsmasq']['hosts'])) {
-		$hosts = $config['dnsmasq']['hosts'];		
-		$host_entries = "";
 
+	if (isset($config['dnsmasq']['hosts'])) {
+		$hosts = $config['dnsmasq']['hosts'];
+		$host_entries = "";
+		$added_item = array();
 		foreach ($hosts as $host) {
-			$host_entries .= "local-data: '{$host['host']}.{$host['domain']}. IN A {$host['ip']}'\n";
-			$host_entries .= "\tlocal-data: '{$host['host']}.{$host['domain']}. TXT \"{$host['descr']}\"'\n";
+			$current_host = $host['host'];
+			if(!$added_item[$current_host]) {
+				$host_entries .= "\tlocal-data: '{$host['host']}.{$host['domain']}. IN A {$host['ip']}'\n";
+				$host_entries .= "\tlocal-data: '{$host['host']}.{$host['domain']}. TXT \"{$host['descr']}\"'\n";
+				// Do not add duplicate entries
+				$added_item[$current_host] = true;
+			}
 		}
 		return $host_entries;	
 	}
@@ -397,16 +402,20 @@ function unbound_add_host_entries() {
  */
 function unbound_add_domain_overrides() {
 	global $config;
-	
+
 	if (isset($config['dnsmasq']['domainoverrides'])) {
 		$domains = $config['dnsmasq']['domainoverrides'];
 		$domain_entries = "";
-		
+		$added_item = array();
 		foreach($domains as $domain) {
-			$domain_entries .= "local-zone: '{$domain['domain']}.' redirect\n";
-			$domain_entries .= "\tlocal-data: '{$domain['domain']}. A {$domain['ip']}'\n";
-			$domain_entries .= "\tlocal-data: '{$domain['domain']}. TXT \"{$domain['descr']}\"'\n";
-			
+			$current_domain = $domain['domain'];
+			if(!$added_item[$current_domain]) {
+				$domain_entries .= "local-zone: '{$domain['domain']}.' redirect\n";
+				$domain_entries .= "\tlocal-data: '{$domain['domain']}. A {$domain['ip']}'\n";
+				$domain_entries .= "\tlocal-data: '{$domain['domain']}. TXT \"{$domain['descr']}\"'\n";
+				// Do not add duplicate entries
+				$added_item[$current_domain] = true;
+			}
 		}
 		return $domain_entries;
 	}
