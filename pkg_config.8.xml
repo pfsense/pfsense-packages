@@ -944,7 +944,7 @@
       <website>http://www.unbound.net/</website>
       <category>Services</category>
       <version>1.0</version>
-      <status>Beta</status>
+      <status>Alpha</status>
       <required_version>2.0</required_version>
       <pkginfolink>http://doc.pfsense.org/index.php/Unbound_package</pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/unbound/unbound.xml</config_file>
