@@ -258,49 +258,61 @@ function unbound_resync_config() {
 	$domain_overrides = unbound_add_domain_overrides();
 	
 	$unbound_conf = <<<EOD
-# Unbound configuration
+#########################
+# Unbound configuration #
+#########################
 
+###
+# Server config
+###
 server:
-	verbosity: 1
-	port: 53
-	do-ip4: yes
-	do-ip6: no
-	do-udp: yes
-	do-tcp: yes
-	do-daemonize: yes
-	statistics-interval: 300
-	extended-statistics: yes
-	statistics-cumulative: no
-	{$unbound_bind_interfaces}
-	chroot: ""
-	username: "unbound"
-	directory: "/usr/local/etc/unbound"
-	pidfile: "/var/run/unbound.pid"
-	root-hints: "root.hints"
-	harden-dnssec-stripped: {$unbound_config['harden-dnssec-stripped']}
-	harden-referral-path: no
-	private-address: 10.0.0.0/8
-	private-address: 172.16.0.0/12
-	private-address: 192.168.0.0/16
-	prefetch: yes
-	prefetch-key: yes
-	use-syslog: {$unbound_config['use-syslog']}
-	module-config: "{$module_config}"
-	unwanted-reply-threshold: 10000000
-	{$anchor_file}
-	access-control: 127.0.0.0/8 allow
-	{$unbound_allowed_networks}
-	{$host_entries}
-	{$domain_overrides}
+verbosity: 1
+port: 53
+do-ip4: yes
+do-ip6: no
+do-udp: yes
+do-tcp: yes
+do-daemonize: yes
+statistics-interval: 300
+extended-statistics: yes
+statistics-cumulative: no
+# Interface IP(s) to bind to
+{$unbound_bind_interfaces}
+chroot: ""
+username: "unbound"
+directory: "/usr/local/etc/unbound"
+pidfile: "/var/run/unbound.pid"
+root-hints: "root.hints"
+harden-dnssec-stripped: {$unbound_config['harden-dnssec-stripped']}
+harden-referral-path: no
+private-address: 10.0.0.0/8
+private-address: 172.16.0.0/12
+private-address: 192.168.0.0/16
+prefetch: yes
+prefetch-key: yes
+use-syslog: {$unbound_config['use-syslog']}
+module-config: "{$module_config}"
+unwanted-reply-threshold: 10000000
+{$anchor_file}
+# Networks allowed to utilize service
+access-control: 127.0.0.0/8 allow
+{$unbound_allowed_networks}
+# Host entries
+{$host_entries}
+# Domain overrides
+{$domain_overrides}
 
+###
+# Remote Control Config
+###
 remote-control:
-		control-enable: yes
-		control-interface: 127.0.0.1
-		control-port: 953
-		server-key-file: "/usr/local/etc/unbound/unbound_server.key"
-		server-cert-file: "/usr/local/etc/unbound/unbound_server.pem"
-		control-key-file: "/usr/local/etc/unbound/unbound_control.key"
-		control-cert-file: "/usr/local/etc/unbound/unbound_control.pem"
+control-enable: yes
+control-interface: 127.0.0.1
+control-port: 953
+server-key-file: "/usr/local/etc/unbound/unbound_server.key"
+server-cert-file: "/usr/local/etc/unbound/unbound_server.pem"
+control-key-file: "/usr/local/etc/unbound/unbound_control.key"
+control-cert-file: "/usr/local/etc/unbound/unbound_control.pem"
 
 EOD;
 
@@ -388,9 +400,9 @@ function unbound_add_host_entries() {
 		foreach ($hosts as $host) {
 			$current_host = $host['host'];
 			if(!$added_item[$current_host]) {
-				$host_entries .= "\tlocal-data: '{$host['host']}.{$host['domain']}. IN A {$host['ip']}'\n";
+				$host_entries .= "local-data: '{$host['host']}.{$host['domain']}. IN A {$host['ip']}'\n";
 				if (!empty($host['descr']))
-					$host_entries .= "\tlocal-data: '{$host['host']}.{$host['domain']}. TXT \"{$host['descr']}\"'\n";
+					$host_entries .= "local-data: '{$host['host']}.{$host['domain']}. TXT \"{$host['descr']}\"'\n";
 				// Do not add duplicate entries
 				$added_item[$current_host] = true;
 			}
@@ -412,9 +424,9 @@ function unbound_add_domain_overrides() {
 			$current_domain = $domain['domain'];
 			if(!$added_item[$current_domain]) {
 				$domain_entries .= "local-zone: '{$domain['domain']}.' redirect\n";
-				$domain_entries .= "\tlocal-data: '{$domain['domain']}. A {$domain['ip']}'\n";
+				$domain_entries .= "local-data: '{$domain['domain']}. A {$domain['ip']}'\n";
 				if (!empty($domain['descr']))
-					$domain_entries .= "\tlocal-data: '{$domain['domain']}. TXT \"{$domain['descr']}\"'\n";
+					$domain_entries .= "local-data: '{$domain['domain']}. TXT \"{$domain['descr']}\"'\n";
 				// Do not add duplicate entries
 				$added_item[$current_domain] = true;
 			}
