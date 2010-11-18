@@ -418,17 +418,24 @@ function unbound_add_domain_overrides() {
 
 	if (isset($config['dnsmasq']['domainoverrides'])) {
 		$domains = $config['dnsmasq']['domainoverrides'];
+
+		// Domain overrides that have multiple entries need multiple forward-addr: added
+		$sorted_domains = msort($domains, "domain");
+		$result = array();
+		foreach($sorted_domains as $domain) {
+			$domain_key = current($domain);
+			if(!isset($result[$domain_key])) {
+				$result[$domain_key] = array();
+			}
+			$result[$domain_key][] = $domain['ip'];
+		}
+		
 		$domain_entries = "";
-		$added_item = array();
-		foreach($domains as $domain) {
-			$current_domain = $domain['domain'];
-			if(!$added_item[$current_domain]) {
-				$domain_entries .= "local-zone: '{$domain['domain']}.' redirect\n";
-				$domain_entries .= "local-data: '{$domain['domain']}. A {$domain['ip']}'\n";
-				if (!empty($domain['descr']))
-					$domain_entries .= "local-data: '{$domain['domain']}. TXT \"{$domain['descr']}\"'\n";
-				// Do not add duplicate entries
-				$added_item[$current_domain] = true;
+		foreach($result as $domain=>$ips) {
+			$domain_entries .= "forward-zone:\n";
+			$domain_entries .= "\tname: \"$domain\"\n";
+			foreach($ips as $ip) {
+				$domain_entries .= "\tforward-addr: $ip\n";
 			}
 		}
 		return $domain_entries;
