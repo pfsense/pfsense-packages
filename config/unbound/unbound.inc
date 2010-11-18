@@ -28,6 +28,7 @@ if(!function_exists("get_dns_servers"))
 
 if(!function_exists("get_nameservers"))
 	require_once("system.inc");
+	
 
 function unbound_initial_setup() {
 	global $config;
@@ -204,17 +205,31 @@ function unbound_get_network_interface_addresses($subnet=false, $mask=false) {
 		$unboundrealif = convert_friendly_interface_to_real_interface_name($unboundif);
 		$unboundip = find_interface_ip($unboundrealif);
 		$ipmask = find_interface_subnet($unboundrealif);
+	
 		// If $subnet is passed then calculate the beginning of the network range for the IP address
 		if ($subnet)
 			$network = gen_subnet($unboundip, $ipmask);
 		else
 			$network = $unboundip;
-		if ($mask)
+			
+		if ($mask) 
 			$unbound_interfaces[] = "$network/$ipmask";
-		else
-			$unbound_interfaces[] = "$network";
-	}	
+		else {
+			$unbound_interfaces[] = $network;
+			// Check for CARP addresses and also return those
+			if (isset($config['virtualip'])) {
+				foreach($config['virtualip']['vip'] as $vip) {
+					if (($vip['interface'] == $unboundif) && ($vip['mode'] == "carp")) {
+						$virtual_ip = find_interface_ip(link_ip_to_carp_interface($vip['subnet']));
+						$unbound_interfaces[] = $virtual_ip;
+					}
+				}
+			}
+		}
+	}
+	
 	return $unbound_interfaces;
+	
 }
 
 function unbound_resync_config() {
