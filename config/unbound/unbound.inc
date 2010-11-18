@@ -389,7 +389,8 @@ function unbound_add_host_entries() {
 			$current_host = $host['host'];
 			if(!$added_item[$current_host]) {
 				$host_entries .= "\tlocal-data: '{$host['host']}.{$host['domain']}. IN A {$host['ip']}'\n";
-				$host_entries .= "\tlocal-data: '{$host['host']}.{$host['domain']}. TXT \"{$host['descr']}\"'\n";
+				if (!empty($host['descr']))
+					$host_entries .= "\tlocal-data: '{$host['host']}.{$host['domain']}. TXT \"{$host['descr']}\"'\n";
 				// Do not add duplicate entries
 				$added_item[$current_host] = true;
 			}
@@ -412,7 +413,8 @@ function unbound_add_domain_overrides() {
 			if(!$added_item[$current_domain]) {
 				$domain_entries .= "local-zone: '{$domain['domain']}.' redirect\n";
 				$domain_entries .= "\tlocal-data: '{$domain['domain']}. A {$domain['ip']}'\n";
-				$domain_entries .= "\tlocal-data: '{$domain['domain']}. TXT \"{$domain['descr']}\"'\n";
+				if (!empty($domain['descr']))
+					$domain_entries .= "\tlocal-data: '{$domain['domain']}. TXT \"{$domain['descr']}\"'\n";
 				// Do not add duplicate entries
 				$added_item[$current_domain] = true;
 			}
