@@ -58,12 +58,12 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://pkg.percol8.co.za/packages/config/unbound/unbound.inc</item>
+		<item>http://www.pfsense.org/packages/config/unbound/unbound.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://pkg.percol8.co.za/packages/config/unbound/unbound.xml</item>
+		<item>http://www.pfsense.org/packages/config/unbound/unbound.xml</item>
 	</additional_files_needed>
 	<tabs>
 		<tab>
