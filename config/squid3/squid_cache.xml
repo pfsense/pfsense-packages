@@ -42,41 +42,41 @@
 /* ========================================================================== */
         ]]>
         </copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
 	<name>squidcache</name>
 	<version>none</version>
 	<title>Proxy server: Cache management</title>
 	<include_file>squid.inc</include_file>
 	<tabs>
 		<tab>
-			<text>General settings</text>
+			<text>General</text>
 			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Upstream proxy</text>
+			<text>Upstream Proxy</text>
 			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Cache management</text>
+			<text>Cache Mgmt</text>
 			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
 			<active/>
 		</tab>
 		<tab>
-			<text>Access control</text>
+			<text>Access Control</text>
 			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Traffic management</text>
+			<text>Traffic Mgmt</text>
 			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Auth settings</text>
+			<text>Auth Settings</text>
 			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Local users</text>
+			<text>Local Users</text>
 			<url>/pkg.php?xml=squid_users.xml</url>
 		</tab>
 	</tabs>
@@ -92,13 +92,14 @@
 		<field>
 			<fielddescr>Hard disk cache system</fielddescr>
 			<fieldname>harddisk_cache_system</fieldname>
-			<description>This specifies the kind of storage system to use. &lt;p&gt; &lt;b&gt; ufs &lt;/b&gt; is the old well-known Squid storage format that has always been there. &lt;p&gt; &lt;b&gt; aufs &lt;/b&gt; uses POSIX-threads to avoid blocking the main Squid process on disk-I/O. (Formerly known as async-io.) &lt;p&gt; &lt;b&gt; diskd &lt;/b&gt; uses a separate process to avoid blocking the main Squid process on disk-I/O.</description>
+			<description>This specifies the kind of storage system to use. &lt;p&gt; &lt;b&gt; ufs &lt;/b&gt; is the old well-known Squid storage format that has always been there. &lt;p&gt; &lt;b&gt; aufs &lt;/b&gt; uses POSIX-threads to avoid blocking the main Squid process on disk-I/O. (Formerly known as async-io.) &lt;p&gt; &lt;b&gt; diskd &lt;/b&gt; uses a separate process to avoid blocking the main Squid process on disk-I/O. &lt;p&gt; &lt;b&gt; null &lt;/b&gt; Does not use any storage. Ideal for Embedded/NanoBSD.</description>
 			<type>select</type>
-			<default_value>aufs</default_value>
+			<default_value>ufs</default_value>
 			<options>
 				<option><name>ufs</name><value>ufs</value></option>
 				<option><name>aufs</name><value>aufs</value></option>
 				<option><name>diskd</name><value>diskd</value></option>
+				<option><name>null</name><value>null</value></option>
 			</options>
 		</field>		
 		<field>

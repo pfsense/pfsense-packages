@@ -46,7 +46,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>squid</name>
-	<version>3.0.8</version>
+	<version>2.6.STABLE18</version>
 	<title>Proxy server: General settings</title>
 	<include_file>/usr/local/pkg/squid.inc</include_file>
 	<menu>
@@ -63,32 +63,32 @@
 	</service>
 	<tabs>
 		<tab>
-			<text>General settings</text>
+			<text>General</text>
 			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
 			<active/>
 		</tab>
 		<tab>
-			<text>Upstream proxy</text>
+			<text>Upstream Proxy</text>
 			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Cache management</text>
+			<text>Cache Mgmt</text>
 			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Access control</text>
+			<text>Access Control</text>
 			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Traffic management</text>
+			<text>Traffic Mgmt</text>
 			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Auth settings</text>
+			<text>Auth Settings</text>
 			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Local users</text>
+			<text>Local Users</text>
 			<url>/pkg.php?xml=squid_users.xml</url>
 		</tab>
 	</tabs>
@@ -96,52 +96,52 @@
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid3/squid.inc</item>
+		<item>http://www.pfsense.org/packages/config/squid/squid.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid3/squid_cache.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid/squid_cache.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid3/squid_nac.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid/squid_nac.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid3/squid_ng.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid/squid_ng.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid3/squid_traffic.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid/squid_traffic.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid3/squid_upstream.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid/squid_upstream.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid3/squid_auth.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid/squid_auth.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid3/squid_users.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid/squid_users.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/etc/rc.d/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid3/proxy_monitor.sh</item>
+		<item>http://www.pfsense.org/packages/config/squid/proxy_monitor.sh</item>
 	</additional_files_needed>
 	<additional_files_needed>
 	    <prefix>/usr/local/pkg/</prefix>
 	    <chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/squid3/squid_cache.xml</item>
+		<item>http://www.pfsense.org/packages/config/squid/squid_cache.xml</item>
 	</additional_files_needed>
 	<fields>
 		<field>
@@ -177,10 +177,17 @@
 		<field>
 			<fielddescr>Bypass proxy for these source IPs</fielddescr>
 			<fieldname>defined_ip_proxy_off</fieldname>
-			<description>Do not forward traffic from these &lt;b&gt;source&lt;/b&gt; IPs through the proxy server but directly through the firewall. Separate by semi-colons (;).</description>
+			<description>Do not forward traffic from these &lt;b&gt;source&lt;/b&gt; IPs, hostnames, or aliases through the proxy server but directly through the firewall. Separate by semi-colons (;).</description>
 			<type>input</type>
   		<size>80</size>
-		</field>		
+		</field>
+		<field>
+			<fielddescr>Bypass proxy for these destination IPs</fielddescr>
+			<fieldname>defined_ip_proxy_off_dest</fieldname>
+			<description>Do not proxy traffic going to these &lt;b&gt;destination&lt;/b&gt; IPs, hostnames, or aliases, but let it pass directly through the firewall. Separate by semi-colons (;).</description>
+			<type>input</type>
+		<size>80</size>
+		</field>
 		<field>
 			<fielddescr>Enabled logging</fielddescr>
 			<fieldname>log_enabled</fieldname>
@@ -195,7 +202,7 @@
 			<type>input</type>
 			<size>60</size>
 			<required/>
-			<default_value>/var/squid/log</default_value>
+			<default_value>/var/squid/logs</default_value>
 		</field>
 		<field>
 			<fielddescr>Log rotate</fielddescr>
@@ -296,8 +303,8 @@
 			<fieldname>disable_squidversion</fieldname>
 			<description>If set, suppress Squid version string info in HTTP headers and HTML error pages.</description>
 			<type>checkbox</type>
-		</field>		
-		<field>
+		</field>
+    <field>
 			<fielddescr>Custom Options</fielddescr>
 			<fieldname>custom_options</fieldname>
 			<description>You can put your own custom options here, separated by semi-colons (;). They'll be added to the configuration. They need to be squid.conf native options, otherwise squid will NOT work.</description>
@@ -330,4 +337,5 @@
 		squid_deinstall_command();
 		exec("/bin/rm -f /usr/local/etc/rc.d/squid*");
 	</custom_php_deinstall_command>
+	<filter_rules_needed>squid_generate_rules</filter_rules_needed>
 </packagegui>

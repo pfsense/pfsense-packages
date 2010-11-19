@@ -2,7 +2,7 @@
 /* $Id$ */
 /*
 	squid.inc
-	Copyright (C) 2006 Scott Ullrich
+	Copyright (C) 2006-2009 Scott Ullrich
 	Copyright (C) 2006 Fernando Lemos
 	Copyright (C) 2008 Martin Fuchs	
 	All rights reserved.
@@ -40,6 +40,7 @@ if(!function_exists("filter_configure"))
 	require_once("filter.inc");
 
 define('SQUID_CONFBASE', '/usr/local/etc/squid');
+define('SQUID_BASE', '/var/squid/');
 define('SQUID_ACLDIR', '/var/squid/acl');
 define('SQUID_PASSWD', '/var/etc/squid.passwd');
 
@@ -64,7 +65,7 @@ function squid_chown_recursive($dir, $user, $group) {
 			$path = "$dir/$item";
 			if (is_dir($path))
 				squid_chown_recursive($path, $user, $group);
-			else {
+			elseif (is_file($path)) {
 				chown($path, $user);
 				chgrp($path, $group);
 			}
@@ -76,6 +77,11 @@ function squid_chown_recursive($dir, $user, $group) {
 function squid_dash_z() {
 	global $config;
 	$settings = $config['installedpackages']['squidcache']['config'][0];
+
+	// If the cache system is null, there is no need to initialize the (irrelevant) cache dir.
+	if ($settings['harddisk_cache_system'] == "null")
+		return;
+
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 
 	if(!is_dir($cachedir.'/')) {
@@ -92,7 +98,8 @@ function squid_dash_z() {
 		mwexec("/usr/local/sbin/squid -z");
 	}
 
-	exec("chmod a+rw /var/squid/cache/swap.state");
+	if(file_exists("/var/squid/cache/swap.state"))
+		exec("chmod a+rw /var/squid/cache/swap.state");
 
 }
 
@@ -105,10 +112,16 @@ function squid_is_valid_acl($acl) {
 
 function squid_install_command() {
 	global $config;
+	global $g;
 	/* migrate existing csv config fields */
 	$settingsauth = $config['installedpackages']['squidauth']['config'][0];
 	$settingscache = $config['installedpackages']['squidcache']['config'][0];
 	$settingsnac = $config['installedpackages']['squidnac']['config'][0];
+
+	/* Set storage system */
+	if ($g['platform'] == "nanobsd") {
+		$config['installedpackages']['squidcache']['config'][0]['harddisk_cache_system'] = 'null';
+	}
 
 	/* migrate auth settings */
 	if (!empty($settingsauth['no_auth_hosts'])) {
@@ -133,36 +146,42 @@ function squid_install_command() {
 			$config['installedpackages']['squidnac']['config'][0]['allowed_subnets'] = $settingsnac['allowed_subnets'];
 		}
 	}
+
 	if(! empty($settingsnac['banned_hosts'])) {
 		if(strstr($settingsnac['banned_hosts'], ",")) {
 			$settingsnac['banned_hosts'] = base64_encode(implode("\n", explode(",", $settingsnac['banned_hosts'])));
 			$config['installedpackages']['squidnac']['config'][0]['banned_hosts'] = $settingsnac['banned_hosts'];
 		}
 	}
+
 	if(! empty($settingsnac['banned_macs'])) {
 		if(strstr($settingsnac['banned_macs'], ",")) {
 			$settingsnac['banned_macs'] = base64_encode(implode("\n", explode(",", $settingsnac['banned_macs'])));
 			$config['installedpackages']['squidnac']['config'][0]['banned_macs'] = $settingsnac['banned_macs'];
 		}
 	}
+
 	if(! empty($settingsnac['unrestricted_hosts'])) {
 		if(strstr($settingsnac['unrestricted_hosts'], ",")) {
 			$settingsnac['unrestricted_hosts'] = base64_encode(implode("\n", explode(",", $settingsnac['unrestricted_hosts'])));
 			$config['installedpackages']['squidnac']['config'][0]['unrestricted_hosts'] = $settingsnac['unrestricted_hosts'];
 		}
 	}
+
 	if(! empty($settingsnac['unrestricted_macs'])) {
 		if(strstr($settingsnac['unrestricted_macs'], ",")) {
 			$settingsnac['unrestricted_macs'] = base64_encode(implode("\n", explode(",", $settingsnac['unrestricted_macs'])));
 			$config['installedpackages']['squidnac']['config'][0]['unrestricted_macs'] = $settingsnac['unrestricted_macs'];
 		}
 	}
+
 	if(! empty($settingsnac['whitelist'])) {
 		if(strstr($settingsnac['whitelist'], ",")) {
 			$settingsnac['whitelist'] = base64_encode(implode("\n", explode(",", $settingsnac['whitelist'])));
 			$config['installedpackages']['squidnac']['config'][0]['whitelist'] = $settingsnac['whitelist'];
 		}
 	}
+
 	if(! empty($settingsnac['blacklist'])) {
 		if(strstr($settingsnac['blacklist'], ",")) {
 			$settingsnac['blacklist'] = base64_encode(implode("\n", explode(",", $settingsnac['blacklist'])));
@@ -206,16 +225,17 @@ if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
 	fi
 
 EOD;
-	update_status("Writing rc files... One moment please...");
+	update_status("Writing rc.d files... One moment please...");
+	conf_mount_rw();
 	write_rcfile($rc);
 
 	exec("chmod a+rx /usr/local/libexec/squid/dnsserver");
 
 	foreach (array(	SQUID_CONFBASE,
 			SQUID_ACLDIR,
-	) as $dir) {
-			make_dirs($dir);
-			squid_chown_recursive($dir, 'proxy', 'proxy');
+			SQUID_BASE ) as $dir) {
+		make_dirs($dir);
+		squid_chown_recursive($dir, 'proxy', 'proxy');
 	}
 
 	/* kill any running proxy alarm scripts */
@@ -249,20 +269,24 @@ EOD;
 }
 
 function squid_deinstall_command() {
-	global $config;
-  squid_install_cron(false);
-	$settings = $config['installedpackages']['squidcache']['config'][0];
+	global $config, $g;
+	$plswait_txt = "This operation may take quite some time, please be patient.  Do not press stop or attempt to navigate away from this page during this process.";
+	squid_install_cron(false);
+	$settings = &$config['installedpackages']['squidcache']['config'][0];
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
-	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
-
-	mwexec('rm -rf $cachedir');
+	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
+	update_status("Removing swap.state ... One moment please...");
+	update_output_window("$plswait_txt");
+	mwexec('rm -rf $cachedir/swap.state');
 	mwexec('rm -rf $logdir');
+	update_status("Finishing package cleanup.");
 	mwexec('rm -f /usr/local/etc/rc.d/proxy_monitor.sh');
 	mwexec("ps awux | grep \"proxy_monitor\" | grep -v \"grep\" | grep -v \"php\" | awk '{ print $2 }' | xargs kill");
 	mwexec("ps awux | grep \"squid\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
 	mwexec("ps awux | grep \"dnsserver\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
 	mwexec("ps awux | grep \"unlinkd\" | grep -v \"grep\" | awk '{ print $2 }' | xargs kill");
-	filter_configure();
+	update_status("Reloading filter...");
+	filter_configure_sync();
 }
 
 function squid_before_form_general($pkg) {
@@ -288,6 +312,10 @@ function squid_before_form_general($pkg) {
 
 function squid_validate_general($post, $input_errors) {
 	global $config;
+	$settings = $config['installedpackages']['squid']['config'][0];
+	$port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
+	$port = $post['proxy_port'] ? $post['proxy_port'] : $port;
+
 	$icp_port = trim($post['icp_port']);
 	if (!empty($icp_port) && !is_port($icp_port))
 		$input_errors[] = 'You must enter a valid port number in the \'ICP port\' field';
@@ -322,13 +350,23 @@ function squid_validate_general($post, $input_errors) {
 	
 	if (($post['transparent_proxy'] != 'on') && !empty($post['defined_ip_proxy_off'])) {
 		$input_errors[] = "You can not bypass traffic from specific IPs without using the transparent proxy.";
-	}	
+	}
+	if (($post['transparent_proxy'] != 'on') && !empty($post['defined_ip_proxy_off_dest'])) {
+		$input_errors[] = "You can not bypass traffic to specific IPs without using the transparent proxy.";
+	}
 
 	foreach (array('defined_ip_proxy_off') as $hosts) {
 		foreach (explode(";", $post[$hosts]) as $host) {
 			$host = trim($host);
-			if (!empty($host) && !is_ipaddr($host))
-				$input_errors[] = "The entry '$host' is not a valid IP address";
+			if (!empty($host) && !is_ipaddr($host) && !is_alias($host) && !is_hostname($host))
+				$input_errors[] = "The entry '$host' is not a valid IP address, hostname, or alias";
+		}
+	}
+	foreach (array('defined_ip_proxy_off_dest') as $hosts) {
+		foreach (explode(";", $post[$hosts]) as $host) {
+			$host = trim($host);
+			if (!empty($host) && !is_ipaddr($host) && !is_alias($host) && !is_hostname($host))
+				$input_errors[] = "The entry '$host' is not a valid IP address, hostname, or alias";
 		}
 	}
 
@@ -532,7 +570,7 @@ function squid_install_cron($should_install) {
 		return;
 	$x=0;
 	foreach($config['cron']['item'] as $item) {
-		if(strstr($item['command'], "/usr/local/sbin/squid")) {
+		if(strstr($item['task_name'], "squid_rotate_logs")) {
 			$is_installed = true;
 			break;
 		}
@@ -542,6 +580,7 @@ function squid_install_cron($should_install) {
 		case true:
 			if(!$is_installed) {
 				$cron_item = array();
+				$cron_item['task_name'] = "squid_rotate_logs";
 				$cron_item['minute'] = "0";
 				$cron_item['hour'] = "0";
 				$cron_item['mday'] = "*";
@@ -585,8 +624,7 @@ function squid_resync_general() {
 		}
 	}
 	if (($settings['transparent_proxy'] == 'on')) {
-		$conf .= "http_port 127.0.0.1:80 transparent\n"; // for squid < v.3.1 (for pf)	
-//	$conf .= "http_port 127.0.0.1:80 intercept\n"; // new from squid >= 3.1 (for pf)	
+		$conf .= "http_port 127.0.0.1:80 transparent\n";
 	}
 	$icp_port = ($settings['icp_port'] ? $settings['icp_port'] : 0);
 
@@ -597,7 +635,7 @@ function squid_resync_general() {
 	$hostname = ($settings['visible_hostname'] ? $settings['visible_hostname'] : 'localhost');
 	$email = ($settings['admin_email'] ? $settings['admin_email'] : 'admin@localhost');
 
-	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/log');
+	$logdir = ($settings['log_dir'] ? $settings['log_dir'] : '/var/squid/logs');
 
 	$logdir_cache = $logdir . '/cache.log';
 	$logdir_access = ($settings['log_enabled'] == 'on' ? $logdir . '/access.log' : '/dev/null');
@@ -647,7 +685,7 @@ EOD;
 	if ($settings['disable_squidversion']) $conf .= "httpd_suppress_version_string on\n";
 	if (!empty($settings['uri_whitespace'])) $conf .= "uri_whitespace {$settings['uri_whitespace']}\n";
   else $conf .= "uri_whitespace strip\n"; //only used for first run
-	
+
 	if(!empty($settings['dns_nameservers'])) {
 	  $altdns = explode(";", ($settings['dns_nameservers']));
     $conf .= "dns_nameservers ";
@@ -662,13 +700,12 @@ EOD;
 
 
 function squid_resync_cache() {
-	global $config;
+	global $config, $g;
 
 	$settings = $config['installedpackages']['squidcache']['config'][0];
 
 	$cachedir =($settings['harddisk_cache_location'] ? $settings['harddisk_cache_location'] : '/var/squid/cache');
 	$disk_cache_size = ($settings['harddisk_cache_size'] ? $settings['harddisk_cache_size'] : 100);
-	$disk_cache_system = ($settings['harddisk_cache_system'] ? $settings['harddisk_cache_system'] : 'aufs');
 	$level1 = ($settings['level1_subdirs'] ? $settings['level1_subdirs'] : 16);
 	$memory_cache_size = ($settings['memory_cache_size'] ? $settings['memory_cache_size'] : 8);
 	$max_objsize = ($settings['maximum_object_size'] ? $settings['maximum_object_size'] : 10);
@@ -677,15 +714,31 @@ function squid_resync_cache() {
 	$memory_policy = ($settings['memory_replacement_policy'] ? $settings['memory_replacement_policy'] : 'heap GDSF');
 	$offline_mode = ($settings['enable_offline'] == 'on' ? 'on' : 'off');
 
+	if (!isset($settings['harddisk_cache_system'])) {
+		if ($g['platform'] == "nanobsd") {
+			$disk_cache_system = 'null';
+		} else {
+			$disk_cache_system = 'ufs';
+		}
+	} else {
+		$disk_cache_system = $settings['harddisk_cache_system'];
+	}
+
+	if ($disk_cache_system == "null") {
+		$disk_cache_opts = "{$disk_cache_system} /tmp";
+	} else {
+		$disk_cache_opts = "{$disk_cache_system} {$cachedir} {$disk_cache_size} {$level1} 256";
+	}
+
 	$conf = <<<EOD
-cache_dir $disk_cache_system $cachedir $disk_cache_size $level1 256
 cache_mem $memory_cache_size MB
-maximum_object_size $max_objsize KB
-minimum_object_size $min_objsize KB
-cache_replacement_policy $cache_policy
+maximum_object_size_in_memory 32 KB
 memory_replacement_policy $memory_policy
+cache_replacement_policy $cache_policy
+cache_dir $disk_cache_opts
+minimum_object_size $min_objsize KB
+maximum_object_size $max_objsize KB
 offline_mode $offline_mode
-dns_children 32
 
 EOD;
 
@@ -748,6 +801,7 @@ function squid_resync_nac() {
 	$conf = <<<EOD
 
 # Setup some default acls
+acl all src 0.0.0.0/0.0.0.0
 acl localhost src 127.0.0.1/255.255.255.255
 acl safeports port 21 70 80 210 280 443 488 563 591 631 777 901 $webgui_port $port 1025-65535
 acl sslports port 443 563 $webgui_port
@@ -837,7 +891,7 @@ function squid_resync_traffic() {
 	$up_limit = ($settings['max_upload_size'] ? $settings['max_upload_size'] : 0);
 	$down_limit = ($settings['max_download_size'] ? $settings['max_download_size'] : 0);
 	$conf .= "request_body_max_size $up_limit KB\n";
-	$conf .= 'reply_body_max_size ' . ($down_limit * 1024) . "\n";
+	$conf .= 'reply_body_max_size ' . ($down_limit * 1024) . " allow all\n";
 
 	// Only apply throttling past 10MB
 	// XXX: Should this really be hardcoded?
@@ -954,13 +1008,15 @@ function squid_resync_auth() {
 	$auth_method = (($settings['auth_method'] && !$transparent_proxy) ? $settings['auth_method'] : 'none');
 	// Allow the remaining ACLs if no authentication is set
 	if ($auth_method == 'none') {
+		$conf .="# Setup allowed acls\n";
+		$allowed = array('allowed_subnets');
 		if ($settingsconfig['allow_interface'] == 'on') {
 			$conf .= "# Allow local network(s) on interface(s)\n";
-			$allowed = array('localnet', 'allowed_subnets');
-			$allowed = array_filter($allowed, 'squid_is_valid_acl');
-			foreach ($allowed as $acl)
-				$conf .= "http_access allow $acl\n";
+			$allowed[] = "localnet";
 		}
+		$allowed = array_filter($allowed, 'squid_is_valid_acl');
+		foreach ($allowed as $acl)
+			$conf .= "http_access allow $acl\n";
 	}
 	else {
 		$noauth = implode(' ', explode("\n", base64_decode($settings['no_auth_hosts'])));
@@ -978,16 +1034,17 @@ function squid_resync_auth() {
 				$conf .= 'auth_param basic program /usr/local/libexec/squid/ncsa_auth ' . SQUID_PASSWD . "\n";
 				break;
 			case 'ldap':
-				$port = (isset($settings['auth_port']) ? ":{$settings['auth_port']}" : '');
+				$port = (isset($settings['auth_server_port']) ? ":{$settings['auth_server_port']}" : '');
 				$password = (isset($settings['ldap_pass']) ? "-w {$settings['ldap_pass']}" : '');
-				$conf .= "auth_param basic program /usr/local/libexec/squid/squid_ldap_auth -v {$settings['ldap_version']} -b {$settings['ldap_basedomain']} -D {$settings['ldap_user']} $password -f \"{$settings['ldap_filter']}\" -u uid -P {$settings['auth_server']}$port\n";
+				$conf .= "auth_param basic program /usr/local/libexec/squid/squid_ldap_auth -v {$settings['ldap_version']} -b {$settings['ldap_basedomain']} -D {$settings['ldap_user']} $password -f \"{$settings['ldap_filter']}\" -u {$settings['ldap_userattribute']} -P {$settings['auth_server']}$port\n";
 				break;
 			case 'radius':
-				$port = (isset($settings['auth_port']) ? "-p {$settings['auth_server_port']}" : '');
+				$port = (isset($settings['auth_server_port']) ? "-p {$settings['auth_server_port']}" : '');
 				$conf .= "auth_param basic program /usr/local/libexec/squid/squid_radius_auth -w {$settings['radius_secret']} -h {$settings['auth_server']} $port\n";
 				break;
 			case 'msnt':
 				$conf .= "auth_param basic program /usr/local/libexec/squid/msnt_auth\n";
+				squid_resync_msnt();
 				break;
 		}
 		$conf .= <<<EOD
@@ -1047,8 +1104,22 @@ function squid_resync_users() {
 	chmod(SQUID_PASSWD, 0600);
 }
 
+function squid_resync_msnt() {
+	global $config;
+
+	$settings = $config['installedpackages']['squidauth']['config'][0];
+	$pdcserver = $settings['auth_server'];
+	$bdcserver = str_replace(',',' ',$settings['msnt_secondary']);
+	$ntdomain = $settings['auth_ntdomain'];
+
+	file_put_contents(SQUID_CONFBASE."/msntauth.conf","server {$pdcserver} {$bdcserver} {$ntdomain}");
+	chown(SQUID_CONFBASE."/msntauth.conf", 'proxy');
+	chmod(SQUID_CONFBASE."/msntauth.conf", 0600);
+}
+
 function squid_resync() {
 	global $config;
+	conf_mount_rw();
 	$conf = squid_resync_general() . "\n";
 	$conf .= squid_resync_cache() . "\n";
 	$conf .= squid_resync_redirector() . "\n";
@@ -1061,6 +1132,13 @@ function squid_resync() {
 	/* make sure pinger is executable */
 	if(file_exists("/usr/local/libexec/squid/pinger"))
 		exec("chmod a+x /usr/local/libexec/squid/pinger");
+
+	foreach (array(	SQUID_CONFBASE,
+			SQUID_ACLDIR,
+			SQUID_BASE ) as $dir) {
+		make_dirs($dir);
+		squid_chown_recursive($dir, 'proxy', 'proxy');
+	}
 
 	file_put_contents(SQUID_CONFBASE . '/squid.conf', $conf);
 
@@ -1076,13 +1154,19 @@ function squid_resync() {
 
 	if (!is_service_running('squid')) {
 		log_error("Starting Squid");
-		mwexec_bg("/usr/local/sbin/squid -D");
+		mwexec("/usr/local/sbin/squid -D");
 	} else {
 		log_error("Reloading Squid for configuration sync");
 		mwexec("/usr/local/sbin/squid -k reconfigure");
 	}
 
+	// Sleep for a couple seconds to give squid a chance to fire up fully.
+	for ($i=0; $i < 10; $i++) {
+		if (!is_service_running('squid'))
+			sleep(1);
+	}
 	filter_configure();
+	conf_mount_ro();
 }
 
 function squid_print_javascript_auth() {
@@ -1097,11 +1181,13 @@ function squid_print_javascript_auth() {
 function on_auth_method_changed() {
 	document.iform.auth_method.disabled = 1;
 	document.iform.auth_server.disabled = 1;
+	document.iform.auth_ntdomain.disabled = 1;
 	document.iform.auth_server_port.disabled = 1;
 	document.iform.ldap_user.disabled = 1;
 	document.iform.ldap_version.disabled = 1;
+	document.iform.ldap_userattribute.disabled = 1;
 	document.iform.ldap_filter.disabled = 1;
-	document.iform.ldap_password.disabled = 1;
+	document.iform.ldap_pass.disabled = 1;
 	document.iform.ldap_basedomain.disabled = 1;
 	document.iform.radius_secret.disabled = 1;
 	document.iform.msnt_secondary.disabled = 1;
@@ -1127,10 +1213,12 @@ function on_auth_method_changed() {
 	if (auth_method == 'none') {
 		document.iform.auth_server.disabled = 1;
 		document.iform.auth_server_port.disabled = 1;
+		document.iform.auth_ntdomain.disabled = 1;
 		document.iform.ldap_user.disabled = 1;
 		document.iform.ldap_version.disabled = 1;
+		document.iform.ldap_userattribute.disabled = 1;
 		document.iform.ldap_filter.disabled = 1;
-		document.iform.ldap_password.disabled = 1;
+		document.iform.ldap_pass.disabled = 1;
 		document.iform.ldap_basedomain.disabled = 1;
 		document.iform.radius_secret.disabled = 1;
 		document.iform.msnt_secondary.disabled = 1;
@@ -1152,9 +1240,11 @@ function on_auth_method_changed() {
 		case 'local':
 			document.iform.auth_server.disabled = 1;
 			document.iform.auth_server_port.disabled = 1;
+			document.iform.auth_ntdomain.disabled = 1;
 			document.iform.ldap_user.disabled = 1;
-			document.iform.ldap_password.disabled = 1;
+			document.iform.ldap_pass.disabled = 1;
 			document.iform.ldap_version.disabled = 1;
+			document.iform.ldap_userattribute.disabled = 1;
 			document.iform.ldap_filter.disabled = 1;
 			document.iform.ldap_basedomain.disabled = 1;
 			document.iform.radius_secret.disabled = 1;
@@ -1164,30 +1254,36 @@ function on_auth_method_changed() {
 			document.iform.auth_server.disabled = 0;
 			document.iform.auth_server_port.disabled = 0;
 			document.iform.ldap_user.disabled = 0;
-			document.iform.ldap_password.disabled = 0;
+			document.iform.ldap_pass.disabled = 0;
 			document.iform.ldap_version.disabled = 0;
+			document.iform.ldap_userattribute.disabled = 0;
 			document.iform.ldap_filter.disabled = 0;
 			document.iform.ldap_basedomain.disabled = 0;
 			document.iform.radius_secret.disabled = 1;
 			document.iform.msnt_secondary.disabled = 1;
+			document.iform.auth_ntdomain.disabled = 1;
 			break;
 		case 'radius':
 			document.iform.auth_server.disabled = 0;
 			document.iform.auth_server_port.disabled = 0;
 			document.iform.ldap_user.disabled = 1;
-			document.iform.ldap_password.disabled = 1;
+			document.iform.ldap_pass.disabled = 1;
 			document.iform.ldap_version.disabled = 1;
+			document.iform.ldap_userattribute.disabled = 1;
 			document.iform.ldap_filter.disabled = 1;
 			document.iform.ldap_basedomain.disabled = 1;
 			document.iform.radius_secret.disabled = 0;
 			document.iform.msnt_secondary.disabled = 1;
+			document.iform.auth_ntdomain.disabled = 1;
 			break;
 		case 'msnt':
 			document.iform.auth_server.disabled = 0;
 			document.iform.auth_server_port.disabled = 1;
+			document.iform.auth_ntdomain.disabled = 0;
 			document.iform.ldap_user.disabled = 1;
-			document.iform.ldap_password.disabled = 1;
+			document.iform.ldap_pass.disabled = 1;
 			document.iform.ldap_version.disabled = 1;
+			document.iform.ldap_userattribute.disabled = 1;
 			document.iform.ldap_filter.disabled = 1;
 			document.iform.ldap_basedomain.disabled = 1;
 			document.iform.radius_secret.disabled = 1;
@@ -1212,12 +1308,13 @@ function squid_generate_rules($type) {
 	global $config;
 
 	$squid_conf = $config['installedpackages']['squid']['config'][0];
-	if (!is_service_running('squid')) {
-		log_error("SQUID is installed but not started.  Not installing redirect rules.");
+
+	if (($squid_conf['transparent_proxy'] != 'on') || ($squid_conf['allow_interface'] != 'on')) {
 		return;
 	}
 
-	if (($squid_conf['transparent_proxy'] != 'on') || ($squid_conf['allow_interface'] != 'on')) {
+	if (!is_service_running('squid')) {
+		log_error("SQUID is installed but not started.  Not installing \"{$type}\" rules.");
 		return;
 	}
 
@@ -1225,47 +1322,89 @@ function squid_generate_rules($type) {
 	$ifaces = array_map('convert_friendly_interface_to_real_interface_name', $ifaces);
 	$port = ($squid_conf['proxy_port'] ? $squid_conf['proxy_port'] : 3128);
 
+	$fw_aliases = filter_generate_aliases();
+	if(strstr($fw_aliases, "pptp ="))
+		$PPTP_ALIAS = "\$pptp";
+	else 
+		$PPTP_ALIAS = "\$PPTP";
+	if(strstr($fw_aliases, "PPPoE ="))
+		$PPPOE_ALIAS = "\$PPPoE";
+	else 
+		$PPPOE_ALIAS = "\$pppoe";
+		
 	switch($type) {
-	case 'nat':
-		$rules .= "\n# Setup Squid proxy redirect\n";
-    if ($squid_conf['private_subnet_proxy_off'] == 'on') {
-      foreach ($ifaces as $iface){
-       $rules .= "no rdr on $iface proto tcp from any to { 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8 } port 80\n";         
-      }
-     }
-    
-    if (!empty($squid_conf['defined_ip_proxy_off'])) {
-      $defined_ip_proxy_off = explode(";", $squid_conf['defined_ip_proxy_off']);
-      $exempt_ip = "";
-        foreach ($defined_ip_proxy_off as $ip_proxy_off) {
-          if(!empty($ip_proxy_off)) {
-            $ip_proxy_off = trim($ip_proxy_off);
-            $exempt_ip .= ", $ip_proxy_off";
-          }
-        }
-        $exempt_ip = substr($exempt_ip,2);
-        foreach ($ifaces as $iface){
-          $rules .= "no rdr on $iface proto tcp from { $exempt_ip } to any port 80\n";         
-        }          
-    }
-     
-		foreach ($ifaces as $iface){
-			$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> 127.0.0.1 port 80\n";
-			};
-		$rules .= "\n";
-		break;
-	case 'filter':
-		foreach ($ifaces as $iface){
-			$rules .= "# Setup squid pass rules for proxy\n";
-			$rules .= "pass in quick on $iface proto tcp from any to !($iface) port 80 flags S/SA keep state\n";
-			$rules .= "pass in quick on $iface proto tcp from any to !($iface) port $port flags S/SA keep state\n";
+		case 'nat':
+			$rules .= "\n# Setup Squid proxy redirect\n";
+			if ($squid_conf['private_subnet_proxy_off'] == 'on') {
+				foreach ($ifaces as $iface) {
+					$rules .= "no rdr on $iface proto tcp from any to { 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8 } port 80\n";         
+				}
+			}
+			if (!empty($squid_conf['defined_ip_proxy_off'])) {
+				$defined_ip_proxy_off = explode(";", $squid_conf['defined_ip_proxy_off']);
+				$exempt_ip = "";
+				foreach ($defined_ip_proxy_off as $ip_proxy_off) {
+					if(!empty($ip_proxy_off)) {
+						$ip_proxy_off = trim($ip_proxy_off);
+						if (is_alias($ip_proxy_off))
+							$ip_proxy_off = '$'.$ip_proxy_off;
+						$exempt_ip .= ", $ip_proxy_off";
+					}
+				}
+				$exempt_ip = substr($exempt_ip,2);
+				foreach ($ifaces as $iface) {
+					$rules .= "no rdr on $iface proto tcp from { $exempt_ip } to any port 80\n";         
+				}
+			}
+			if (!empty($squid_conf['defined_ip_proxy_off_dest'])) {
+				$defined_ip_proxy_off_dest = explode(";", $squid_conf['defined_ip_proxy_off_dest']);
+				$exempt_dest = "";
+				foreach ($defined_ip_proxy_off_dest as $ip_proxy_off_dest) {
+					if(!empty($ip_proxy_off_dest)) {
+						$ip_proxy_off_dest = trim($ip_proxy_off_dest);
+						if (is_alias($ip_proxy_off_dest))
+							$ip_proxy_off_dest = '$'.$ip_proxy_off_dest;
+						$exempt_dest .= ", $ip_proxy_off_dest";
+					}
+				}
+				$exempt_dest = substr($exempt_dest,2);
+				foreach ($ifaces as $iface) {
+					$rules .= "no rdr on $iface proto tcp from any to { $exempt_dest } port 80\n";         
+				}
+			}
+			foreach ($ifaces as $iface) {
+				$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> 127.0.0.1 port 80\n";
+			}
+			/* Handle PPPOE case */
+			if($config['pppoe']['mode'] == "server" && $config['pppoe']['localip']) {
+				$rules .= "rdr on $PPPOE_ALIAS proto tcp from any to !127.0.0.1 port 80 -> 127.0.0.1 port 80\n";
+			}
+			/* Handle PPTP case */
+			if($config['pptpd']['mode'] == "server" && $config['pptpd']['localip']) {
+				$rules .= "rdr on $PPTP_ALIAS proto tcp from any to !127.0.0.1 port 80 -> 127.0.0.1 port 80\n";
+			}
 			$rules .= "\n";
+			break;
+		case 'filter':
+		case 'rule':
+			foreach ($ifaces as $iface) {
+				$rules .= "# Setup squid pass rules for proxy\n";
+				$rules .= "pass in quick on $iface proto tcp from any to !($iface) port 80 flags S/SA keep state\n";
+				$rules .= "pass in quick on $iface proto tcp from any to !($iface) port $port flags S/SA keep state\n";
+				$rules .= "\n";
 			};
-		break;
-	default:
-		break;
+			if($config['pppoe']['mode'] == "server" && $config['pppoe']['localip']) {
+				$rules .= "pass in quick on $PPPOE_ALIAS proto tcp from any to !127.0.0.1 port $port flags S/SA keep state\n";			
+			}			
+			if($config['pptpd']['mode'] == "server" && $config['pptpd']['localip']) {
+				$rules .= "pass in quick on $PPTP_ALIAS proto tcp from any to !127.0.0.1 port $port flags S/SA keep state\n";
+			}
+			break;
+		default:
+			break;
 	}
 
 	return $rules;
 }
+
 ?>
