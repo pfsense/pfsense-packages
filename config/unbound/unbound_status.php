@@ -31,7 +31,7 @@
 
 require("guiconfig.inc");
 
-$pgtitle = "TinyDNS: Status";
+$pgtitle = "Unbound: Status";
 include("head.inc");
 
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
@@ -123,37 +123,37 @@ function execCmds() {
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <div id="mainlevel">
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
-<?php
-	$tab_array = array();
-	$tab_array[] = array(gettext("Unbound DNS Settings"), false, "/pkg_edit.php?xml=unbound.xml&amp;id=0");
-	$tab_array[] = array(gettext("Unbound DNS Status"), true, "/unbound_status.php");
-	display_top_tabs($tab_array);
-?>
-</table>
-<table width="100%" border="0" cellpadding="0" cellspacing="0">
-   <tr>
-     <td class="tabcont" >
-      <form action="unbound_status.php" method="post">
-    </form>
-    </td>
-   </tr>
-   <tr>
-    <td class="tabcont" width="100%">
-		<?php
-			defCmdT("Unbound status", "unbound-control status");
-			defCmdT("Unbound stats_noreset", "unbound-control stats_noreset");
-			defCmdT("Unbound list_stubs", "unbound-control list_stubs");
-			defCmdT("Unbound list_forwards", "unbound-control list_forwards");
-			defCmdT("Unbound list_local_zones", "unbound-control list_local_zones");
-			defCmdT("Unbound list_local_data", "unbound-control list_local_data");
-			listCmds();
-			execCmds();
-		?>
-    </td>
-   </tr>
-</table>
-</div>
+	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	<?php
+		$tab_array = array();
+		$tab_array[] = array(gettext("Unbound DNS Settings"), false, "/pkg_edit.php?xml=unbound.xml&amp;id=0");
+		$tab_array[] = array(gettext("Unbound DNS Status"), true, "/unbound_status.php");
+		display_top_tabs($tab_array);
+	?>
+	</table>
+	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+	   <tr>
+	     <td class="tabcont" >
+	      <form action="unbound_status.php" method="post">
+	    </form>
+	    </td>
+	   </tr>
+	   <tr>
+	    <td class="tabcont" width="100%">
+			<?php
+				defCmdT("Unbound status", "unbound-control status");
+				defCmdT("Unbound stats_noreset", "unbound-control stats_noreset");
+				defCmdT("Unbound list_stubs", "unbound-control list_stubs");
+				defCmdT("Unbound list_forwards", "unbound-control list_forwards");
+				defCmdT("Unbound list_local_zones", "unbound-control list_local_zones");
+				defCmdT("Unbound list_local_data", "unbound-control list_local_data");
+				listCmds();
+				execCmds();
+			?>
+	    </td>
+	   </tr>
+	</table>
+	</div>
 <?php include("fend.inc"); ?>
 <meta http-equiv="refresh" content="60;url=<?php print $_SERVER['SCRIPT_NAME']; ?>">
 </body>
