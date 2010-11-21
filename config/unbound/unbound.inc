@@ -37,9 +37,13 @@ function unbound_initial_setup() {
 		$config['installedpackages']['unbound']['config'] = array();
 
 	$unbound_config = &$config['installedpackages']['unbound']['config'][0];
-		
+
+	// Ensure Unbound user exists
+	exec("/usr/sbin/pw useradd unbound");
+
 	// Setup unbound
 	mwexec("/bin/mkdir -p /usr/local/etc/unbound /usr/local/etc/unbound/dev");
+	@chown("/usr/local/etc/unbound/.", "unbound");
 	@touch("/usr/local/etc/unbound/root.hints");
 	@touch("/usr/local/etc/unbound/root-trust-anchor");
 	@chown("/usr/local/etc/unbound/root-trust-anchor", "unbound");
@@ -63,6 +67,8 @@ function unbound_initial_setup() {
 	unbound_anchor_setup();
 	unbound_resync_config();
 	unbound_keys_setup();
+
+	exec("/usr/sbin/chown unbound:wheel /usr/local/etc/unbound/*");
 
 	// Write out the XML config
 	write_config();
@@ -398,6 +404,9 @@ function unbound_uninstall() {
 	// Remove pkg config directory and startup file
 	mwexec("rm -rf /usr/local/etc/unbound");
 	mwexec("rm -f /usr/local/etc/rc.d/unbound.sh");
+
+	// Remove unbound user
+	exec("/usr/sbin/pw userdel unbound");
 
     conf_mount_ro();
 
