@@ -73,7 +73,7 @@ function unbound_initial_setup() {
 	unbound_resync_config();
 	unbound_keys_setup();
 
-	exec("/usr/sbin/chown unbound:wheel /usr/local/etc/unbound/*");
+	exec("/usr/sbin/chown -R unbound:wheel /usr/local/etc/unbound/*");
 
 	// Write out the XML config
 	write_config();
