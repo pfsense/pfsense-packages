@@ -53,6 +53,9 @@ if (count($_POST)>0) {
 	//Prep pfctl
 	mwexec("/usr/bin/touch lists/ipfw.ipfw");
 	mwexec("/usr/bin/touch Wlists/whitelist");
+	mwexec("/bin/mkdir /usr/local/www/packages/countryblock/lists");
+	mwexec("/usr/bin/touch /usr/local/www/packages/countryblock/lists/countries.txt");
+	mwexec("/usr/bin/touch /usr/local/www/packages/countryblock/countries-white.txt");
        //Now clear ipfw, and process each list to ipfw commands
 		exec("/bin/sh convert-execute.sh");
 				
