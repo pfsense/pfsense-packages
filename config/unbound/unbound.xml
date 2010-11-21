@@ -76,6 +76,10 @@
 			<url>/pkg_edit.php?xml=unbound.xml&amp;id=0</url>
 			<active/>
 		</tab>
+		<tab>
+			<text>Unbound DNS Status</text>
+			<url>/unbound_status.php</url>
+		</tab>
 	</tabs>
 	<fields>
 		<field>
