@@ -43,12 +43,12 @@ $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2"))
 	$one_two = true;
 
-function doCmdT($title, $command) {
+function doCmdT($title, $command, $rows) {
     echo "<p>\n";
     echo "<a name=\"" . $title . "\">\n";
     echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
     echo "<tr><td class=\"listtopic\">" . $title . "</td></tr>\n";
-    echo "<tr><td class=\"listlr\"><textarea style=\"font-family:courier\"cols=\"101\" rows=\"20\">";		/* no newline after pre */
+    echo "<tr><td class=\"listlr\"><textarea style=\"font-family:courier\"cols=\"101\" rows=\"$rows\">";		/* no newline after pre */
 
 	if ($command == "dumpconfigxml") {
 		$fd = @fopen("/conf/config.xml", "r");
@@ -85,10 +85,10 @@ function doCmd($command) {
 }
 
 /* Define a command, with a title, to be executed later. */
-function defCmdT($title, $command) {
+function defCmdT($title, $command, $rows = "20") {
     global $commands;
     $title = htmlspecialchars($title,ENT_NOQUOTES);
-    $commands[] = array($title, $command);
+    $commands[] = array($title, $command, $rows);
 }
 
 /* Define a command, with a title which is the same as the command,
@@ -113,7 +113,7 @@ function listCmds() {
 function execCmds() {
     global $commands;
     for ($i = 0; isset($commands[$i]); $i++ ) {
-        doCmdT($commands[$i][0], $commands[$i][1]);
+        doCmdT($commands[$i][0], $commands[$i][1], $commands[$i][2]);
     }
 }
 
@@ -140,13 +140,13 @@ function execCmds() {
 	   <tr>
 	    <td class="tabcont" width="100%">
 			<?php
-				defCmdT("Unbound status", "unbound-control status");
+				defCmdT("Unbound status", "unbound-control status", "8");
 				defCmdT("Unbound stats_noreset", "unbound-control stats_noreset");
-				defCmdT("Unbound list_stubs", "unbound-control list_stubs");
+				defCmdT("Unbound list_stubs", "unbound-control list_stubs", "8");
 				defCmdT("Unbound list_forwards", "unbound-control list_forwards");
 				defCmdT("Unbound list_local_zones", "unbound-control list_local_zones");
 				defCmdT("Unbound list_local_data", "unbound-control list_local_data");
-				defCmdT("Unbound configuration", "/bin/cat /usr/local/etc/unbound/unbound.conf");
+				defCmdT("Unbound configuration", "/bin/cat /usr/local/etc/unbound/unbound.conf", "40");
 				listCmds();
 				execCmds();
 			?>
