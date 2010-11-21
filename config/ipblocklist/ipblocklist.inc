@@ -58,6 +58,7 @@ function php_install_command_ip()
 	exec("pkg_add -r http://www.pfsense.org/packages/config/ipblocklist/perl-5.8.9_2.tbz");
 	exec("pkg_add -r http://www.pfsense.org/packages/config/ipblocklist/p5-Net-CIDR-0.13.tbz");
 	exec("pkg_add -r http://www.pfsense.org/packages/config/ipblocklist/compat7x.tbz");
+	exec("pkg_add -r http://www.pfsense.org/packages/config/ipblocklist/compat6x.tbz");
 
 	//rename PHP files from .tmp to .php
 	exec("cp /tmp/class.phpmailer.tmp /usr/local/www/packages/ipblocklist/class.phpmailer.php");
@@ -96,6 +97,14 @@ function php_install_command_ip()
 	unlink_if_exists("/tmp/IP-Blocklist.sh");
 	//Touch files
 	exec("touch /usr/local/www/packages/ipblocklist/wlists.txt");
+	exec("/bin/mkdir /usr/local/www/packages/countryblock/lists");
+	exec("/bin/mkdir /usr/local/www/packages/ipblocklist/lists");
+	exec("/bin/mkdir /usr/local/www/packages/ipblocklist/Wlists");
+	exec("/usr/bin/touch /usr/local/www/packages/countryblock/lists/countries.txt");
+	exec("/usr/bin/touch /usr/local/www/packages/countryblock/countries-white.txt");
+	exec("/usr/bin/touch /usr/local/www/packages/ipblocklist/lists/ipfw.ipfw");
+	exec("/usr/bin/touch /usr/local/www/packages/ipblocklist/Wlists/whitelist");
+	exec("/usr/bin/touch /usr/local/www/packages/ipblocklist/OUTBOUND");
 	
 	
 

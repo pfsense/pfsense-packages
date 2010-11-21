@@ -115,8 +115,8 @@ function deinstall_command_ip()
 {
 	conf_mount_rw();
 	$handle = popen("/usr/local/etc/rc.d/ipblocklist.sh stop", "r");
-	unlink_if_exists("/usr/local/pkg/ipblocklist.xml");
-	unlink_if_exists("/usr/local/pkg/ipblocklist.inc");
+	unlink_if_exists("/usr/local/pkg/ipblocklist7.xml");
+	unlink_if_exists("/usr/local/pkg/ipblocklist7.inc");
 	exec("rm -R /usr/local/www/packages/ipblocklist/ipblocklists");
 	exec("rm -R /usr/local/www/packages/ipblocklist");
 	exec("rm /usr/local/etc/rc.d/IP-Blocklist.sh");
