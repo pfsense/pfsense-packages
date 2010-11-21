@@ -147,6 +147,7 @@ function execCmds() {
 				defCmdT("Unbound list_forwards", "unbound-control list_forwards");
 				defCmdT("Unbound list_local_zones", "unbound-control list_local_zones");
 				defCmdT("Unbound list_local_data", "unbound-control list_local_data");
+				defCmdT("Unbound configuration", "/bin/cat /usr/local/etc/unbound/unbound.conf");
 				listCmds();
 				execCmds();
 			?>
