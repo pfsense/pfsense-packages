@@ -43,7 +43,7 @@ function doCmdT($title, $command) {
     echo "<a name=\"" . $title . "\">\n";
     echo "<table width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n";
     echo "<tr><td class=\"listtopic\">" . $title . "</td></tr>\n";
-    echo "<tr><td class=\"listlr\"><pre>";		/* no newline after pre */
+    echo "<tr><td class=\"listlr\"><textarea cols=\"101\" rows=\"20\">";		/* no newline after pre */
 
 	if ($command == "dumpconfigxml") {
 		$fd = @fopen("/conf/config.xml", "r");
@@ -70,7 +70,7 @@ function doCmdT($title, $command) {
 			echo htmlspecialchars($execOutput[$i],ENT_NOQUOTES);
 		}
 	}
-    echo "</pre></tr>\n";
+    echo "</textarea></tr>\n";
     echo "</table>\n";
 }
 
