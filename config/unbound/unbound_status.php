@@ -133,12 +133,6 @@ function execCmds() {
 	</table>
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 	   <tr>
-	     <td class="tabcont" >
-	      <form action="unbound_status.php" method="post">
-	    </form>
-	    </td>
-	   </tr>
-	   <tr>
 	    <td class="tabcont" width="100%">
 			<?php
 				defCmdT("Unbound status", "unbound-control status");
