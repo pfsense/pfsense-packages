@@ -42,15 +42,20 @@ function unbound_initial_setup() {
 	exec("/usr/sbin/pw useradd unbound");
 
 	// Setup unbound
+	// Create and chown dirs
 	mwexec("/bin/mkdir -p /usr/local/etc/unbound /usr/local/etc/unbound/dev");
 	@chown("/usr/local/etc/unbound/.", "unbound");
+	@chown("/usr/local/etc/unbound/dev.", "unbound");
+	// Touch needed files
 	@touch("/usr/local/etc/unbound/root.hints");
 	@touch("/usr/local/etc/unbound/root-trust-anchor");
+	// Ensure files and folders belong to unbound
 	@chown("/usr/local/etc/unbound/root-trust-anchor", "unbound");
 	@chgrp("/usr/local/etc/unbound/root-trust-anchor", "wheel");
 	@chmod("/usr/local/etc/unbound/root-trust-anchor", 0600);
-	@unlink("/usr/local/etc/unbound/unbound.conf.sample");
-	@unlink("/usr/local/etc/rc.d/unbound");
+	// We do not need the sample conf or the default rc.d startup file
+	@unlink_if_exists("/usr/local/etc/unbound/unbound.conf.sample");
+	@unlink_if_exists("/usr/local/etc/rc.d/unbound");
 		
 	// Setup rc file for startup and shutdown.
 	unbound_rc_setup();
