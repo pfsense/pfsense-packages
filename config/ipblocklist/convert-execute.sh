@@ -30,7 +30,10 @@ Wfilelist="/usr/local/www/packages/ipblocklist/file_Wlist.txt"
 for fileline in $(cat $filelist); do
 iplist="/usr/local/www/packages/ipblocklist/lists/$fileline"
 iplistout="/usr/local/www/packages/ipblocklist/lists/ipfw.ipfw"
-/usr/bin/perl convert.pl $iplist $iplistout
+if [ "$iplist" != "/usr/local/www/packages/ipblocklist/lists/ipfw.ipfw" ]; then
+	/usr/bin/perl /usr/local/www/packages/ipblocklist/convert.pl $iplist $iplistout
+	#echo "THIS JUST RAN"
+fi
 done
 
 #Whitelist
