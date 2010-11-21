@@ -1,26 +1,20 @@
 <?php
+header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 $line = $_GET["line"];
 
 //echo("$line");
+
 //exec("more lists.txt > temp_lists.txt");
 if ($line == 0) {
-	exec("rm lists.txt");
+	exec("/bin/rm lists.txt");
 	} else {
-	exec("sed $line'd' lists.txt > temp_lists.txt");
+	exec("/usr/bin/sed $line'd' lists.txt > temp_lists.txt");
 	}
-exec("more temp_lists.txt > lists.txt");
-exec("rm temp_lists.txt");
+exec("/usr/bin/more temp_lists.txt > lists.txt");
+exec("/bin/rm temp_lists.txt");
 
+
+header('Location: ipblocklist.php');
 
 ?>
-<html>
-<HEAD>
-<SCRIPT language="JavaScript">
-<!--
-window.parent.location="ipblocklist.php";
-//-->
-</SCRIPT>
-</HEAD>
-
-
-</html>

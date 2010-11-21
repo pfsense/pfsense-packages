@@ -1,6 +1,7 @@
 <?php
 	//Version 2.2
-	
+	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 	require_once('config.inc');
 	require("guiconfig.inc");
 	include("head.inc");
@@ -24,6 +25,7 @@ if (count($_POST)>0) {
 		$config['installedpackages']['ipblocklist_settings']['config'][0]['enable'] = 1;
 		
 	//Process list by downloading and extracting
+	
 		$myFile = "lists.txt";
 		$myWFile = "wlists.txt";
 		$fileContents = file_get_contents($myFile);
@@ -31,28 +33,28 @@ if (count($_POST)>0) {
 		$lines = explode(PHP_EOL, $fileContents);
 		$Wlines = explode(PHP_EOL, $fileWContents);
 	//Remove DIR lists to eliminate duplates
-		exec("rm -R lists");
-		exec("rm -R Wlists");
+		exec("/bin/rm -R lists");
+		exec("/bin/rm -R Wlists");
 	//Process each list URL, Extract, and put in DIR lists
-		exec("mkdir lists");
-		exec("mkdir Wlists");
+		exec("/bin/mkdir lists");
+		exec("/bin/mkdir Wlists");
 		foreach ($lines as $line) {
-			exec("fetch -o lists $line");
+			exec("/usr/bin/fetch -o lists $line");
 		 	$filename = basename($line);
 		 	//Extract list
-		 	exec("gzip -d lists/$filename");
+		 	exec("/usr/bin/gzip -d lists/$filename");
 		 	}
 		foreach ($Wlines as $Wline) {
-			exec("fetch -o Wlists $Wline");
+			exec("/usr/bin/fetch -o Wlists $Wline");
 			$Wfilename = basename($Wline);
 			//Extract Whitelist
-			exec("gzip -d Wlists/$Wfilename");
+			exec("/usr/bin/gzip -d Wlists/$Wfilename");
 			}
 	//Prep pfctl
-	mwexec("touch lists/ipfw.ipfw");
-	mwexec("touch Wlists/whitelist");
+	mwexec("/usr/bin/touch lists/ipfw.ipfw");
+	mwexec("/usr/bin/touch Wlists/whitelist");
        //Now clear ipfw, and process each list to ipfw commands
-		mwexec("sh convert-execute.sh");
+		exec("/bin/sh convert-execute.sh");
 				
 	}
 	else {
@@ -78,10 +80,12 @@ if (count($_POST)>0) {
 }
 ?>
 
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle">Firewall: IP-Blocklist</p>
+<p class="pgtitle"><?=$pgtitle?></p>
+<?php if ($input_errors) print_input_errors($input_errors); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <form method=POST action="">
-
 <?php
 if ($config['installedpackages']['ipblocklist_settings']['config'][0]['enable'] == 1) {
 	echo "<input name='enable' type='checkbox' value='1' checked>\n";
@@ -97,37 +101,96 @@ if(isset($_POST['formSubmit']))
 	
 		if(isset($_POST['formlogging'])) 
         {
-			exec("touch logging");
+			exec("/usr/bin/touch logging");
 		} 
         else 
         {
-			exec("rm logging");
+			exec("/bin/rm logging");
 		}
 		
 	}
 ?>
 <strong>Enable IP-Blocklist</strong><br><br>
+<?php if ($savemsg_cb) print_info_box($savemsg_cb); 
+		//if ($output) print_info_box($output,$output2);
+		echo($output);
+		echo($output2);
+	?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-<tr>
-	<td class="tabcont" >
-	<?php if ($savemsg_dnsb) print_info_box($savemsg_dnsb); ?>
-
-	</form>
-    <?php
-
-	if (file_exists("logging")) {
-		echo "<input name='formlogging' type='checkbox' value='Yes' checked/>";
-	} else {
-		echo "<input name='formlogging' type='checkbox' value='Yes'/>";
-	}
-?>
-    Enable Logging <input type="submit" name="formSubmit" value="Save" /><br />
+  <tr><td class="tabnavtbl">
+<?php
+	$tab_array = array();
+	$tab_array[0] = array("IP-Blocklist", true, "ipblocklist.php");
+	$tab_array[1] = array("Settings", false, "settings.php");
+	$tab_array[2] = array("Whitelist", false, "whitelist.php");
+	$tab_array[3] = array("Interfaces", false, "ipblocklist_if.php");
+	$tab_array[4] = array("Help", false, "http://forum.pfsense.org/index.php/topic,24769.0.html");
+	$tab_array[5] = array("Email", false, "email.php");
+	display_top_tabs($tab_array);
+?> 
+</form>
+</td></tr>
+  <tr> 
+    <td>
+	<div id="mainarea">
+        <table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+       <tr> 
+	<td class="listhdrr">Main</td>
+    
+	  </tr>
+      
+    <tr> 
+	<td class="listlr" valign="middle">
+    <br />
 	<center>
     <iframe frameboarder=0 boarder=0 src="ipblocklist_list.php" name="lists" id="lists" width="100%" height="200">
 	</iframe>
 	</center>
-	<br/>
-	<u>Usage</u>
+
+
+
+
+
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0">
+<tr>
+	<td >
+	
+
+	</form>
+	
+	
+
+
+	  
+	  <br/><br/>
+	  <input type="submit" name="formSubmit" value="Save/Update" />
+	  </p>
+</form>
+<br/>
+
+	
+
+
+</div>
+<?php
+	//This input guarantees that a POST is sent
+	echo "<input type='hidden' name='zzz' value='required'>";
+?>
+
+</td>
+</tr>
+</table>
+    </td>
+	  
+	 
+    </tr>
+   
+  
+</table>
+</div>
+<br>
+<u>Usage</u>
 	<br/>
 	Add direct link to list and press <img src="../../themes/nervecenter/images/icons/icon_plus.gif">
  	(Example: 
@@ -141,7 +204,7 @@ if(isset($_POST['formSubmit']))
 	<?php 
 	echo "<br/><br/>Current Status = ";
 	ob_start();
-	$results = exec("pfctl -s rules | grep -c ipblocklist");
+	$results = exec("/sbin/pfctl -s rules | grep -c ipblocklist");
 	ob_end_clean(); 
 	if ($results > '2') echo "Running";
 	else
@@ -149,7 +212,7 @@ if(isset($_POST['formSubmit']))
 		
 	//Get Errors if exists
 	ob_start();
-	$results = exec("tail -r errorOUT.txt");
+	$results = exec("/usr/bin/tail -r errorOUT.txt");
 	ob_end_clean(); 
 	echo "<br/><span style='color:red'>";
 	echo $results;
@@ -158,33 +221,20 @@ if(isset($_POST['formSubmit']))
 	//Get IP Count
 	echo "<br>You are blocking ";
 	ob_start();
-	$results = exec("pfctl -T show -t ipblocklist |grep -v -c Z");
+	$results = exec("/sbin/pfctl -T show -t ipblocklist |grep -v -c Z");
 	ob_end_clean();
 	echo $results;
-	echo " IPs";
+	echo " Networks/IPs";
 	?>
-
-
-
-<br/>
-<br/>
-
-
-
-
-</div>
-<?php
-	//This input guarantees that a POST is sent
-	echo "<input type='hidden' name='zzz' value='required'>";
-?>
-
+<br><br>
+<!--<input type="submit" value="Save/Update"><br><br>
+--><p>
+</p>
 </td>
-</tr>
+	</tr>
 </table>
-<input type="submit" value="Save/Update">
 </form>
-
 <?php include("fend.inc"); ?>
-
 </body>
 </html>
+

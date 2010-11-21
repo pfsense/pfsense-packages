@@ -57,8 +57,24 @@ function php_install_command_ip()
 	//install PERL
 	exec("pkg_add -r http://www.pfsense.org/packages/config/ipblocklist/perl-5.8.9_2.tbz");
 	exec("pkg_add -r http://www.pfsense.org/packages/config/ipblocklist/p5-Net-CIDR-0.13.tbz");
+	exec("pkg_add -r http://www.pfsense.org/packages/config/ipblocklist/compat7x.tbz");
 
 	//rename PHP files from .tmp to .php
+	exec("cp /tmp/class.phpmailer.tmp /usr/local/www/packages/ipblocklist/class.phpmailer.php");
+	unlink_if_exists("/tmp/class.phpmailer.tmp ");
+	exec("cp /tmp/class.smtp.tmp /usr/local/www/packages/ipblocklist/class.smtp.php");
+	unlink_if_exists("/tmp/class.smtp.tmp");
+	exec("cp /tmp/email.tmp /usr/local/www/packages/ipblocklist/email.php");
+	unlink_if_exists("/tmp/email.tmp");
+	exec("cp /tmp/ipblocklist_if.tmp /usr/local/www/packages/ipblocklist/ipblocklist_if.php");
+	unlink_if_exists("/tmp/ipblocklist_if.tmp");
+	exec("cp /tmp/settings.tmp /usr/local/www/packages/ipblocklist/settings.php");
+	unlink_if_exists("/tmp/settings.tmp");
+	exec("cp /tmp/interfaces.txt /usr/local/www/packages/ipblocklist/interfaces.txt");
+	unlink_if_exists("/tmp/interfaces.txt");
+	exec("cp /tmp/firewall_shaper.tmp /usr/local/www/packages/ipblocklist/firewall_shaper.php");
+	unlink_if_exists("/tmp/firewall_shaper.tmp");
+
 	exec("cp /tmp/ipblocklist.tmp /usr/local/www/packages/ipblocklist/ipblocklist.php");
 	unlink_if_exists("/tmp/ipblocklist.tmp");
 	exec("cp /tmp/ipblocklist_list.tmp /usr/local/www/packages/ipblocklist/ipblocklist_list.php");

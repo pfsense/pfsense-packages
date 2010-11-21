@@ -1,17 +1,15 @@
-<html>
-<head>
-<a href="whitelist.php"><img src="../../themes/nervecenter/images/icons/icon_plus.gif" ALT="Whitelist" ALIGN=RIGHT></a>
-Add List URL: <form method="post" action="">
-<input name="content" type="text" />
-<input type="image" src="../../themes/nervecenter/images/icons/icon_plus.gif" value="submit">
-<a href="purge.php?line=0">Purge All</a>
-
-<STYLE type="text/css">
-   a img {border:none; }
- </STYLE>
-</head>
-
 <?php
+header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
+header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
+
+echo "<a href=\"whitelist.php\"><img src=\"../../themes/nervecenter/images/icons/icon_plus.gif\" ALT=\"Whitelist\" ALIGN=RIGHT></a>\n"; 
+echo "Add List URL: <form method=\"post\" action=\"\">\n"; 
+echo "<input name=\"content\" type=\"text\" />\n"; 
+echo "<input type=\"image\" src=\"../../themes/nervecenter/images/icons/icon_plus.gif\" value=\"submit\">\n"; 
+echo "<a href=\"purge.php?line=0\">Purge All</a>\n";
+echo "<STYLE type=\"text/css\">\n"; 
+echo "   a img {border:none; }\n"; 
+echo " </STYLE>\n";
 
 function delLineFromFile($fileName, $lineNum){
 // check the file exists 

@@ -41,7 +41,7 @@
 	<requirements>perl</requirements>
 	<faq>http://forum.pfsense.org/index.php/topic,24769.0.html</faq>
 	<name>IP Blocklist Settings</name>
-	<version>0.2.2</version>
+	<version>0.3.0</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/ipblocklist.inc</include_file>
 	<menu>
@@ -77,7 +77,22 @@
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/ipblocklist/interfaces.txt</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/ipblocklist/ipblocklist_list.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/ipblocklist/ipblocklist_if.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/ipblocklist/firewall_shaper.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
@@ -113,6 +128,26 @@
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/ipblocklist/IP-Blocklist.sh</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/ipblocklist/settings.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/ipblocklist/class.phpmailer.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/ipblocklist/class.smtp.tmp</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/tmp/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/ipblocklist/email.tmp</item>
 	</additional_files_needed>
 	<fields>
 		<field>
