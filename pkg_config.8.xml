@@ -946,7 +946,7 @@
       <descr>Unbound is a validating, recursive, and caching DNS resolver. Also supports DNSSEC extensions.</descr>
       <website>http://www.unbound.net/</website>
       <category>Services</category>
-      <version>1.2.1</version>
+      <version>1.2.2</version>
       <status>Alpha</status>
       <required_version>2.0</required_version>
       <pkginfolink>http://doc.pfsense.org/index.php/Unbound_package</pkginfolink>
