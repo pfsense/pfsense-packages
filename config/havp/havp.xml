@@ -89,7 +89,7 @@
                         <type>interfaces_selection</type>
                         <required/>
                         <multiple/>
-                        <value>lan</value>
+                        <default_value>lan</default_value>
                 </field>
                 <field>
                         <fielddescr>Proxy port</fielddescr>
@@ -100,7 +100,7 @@
                         <type>input</type>
                         <size>10</size>
                         <required/>
-                        <value>3125</value>
+                        <default_value>3125</default_value>
                 </field>
                 <field>
                         <fielddescr>Parent proxy</fielddescr>

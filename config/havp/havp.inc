@@ -120,7 +120,8 @@ define('HVDEF_AVUPD_SCRIPT',            HVDEF_SCRIPT_DIR . '/havp_avupdate');
 # status
 define('HVDEF_HAVP_STATUS_FILE',        '/tmp/havp.status');
 define('HVDEF_CLAM_STATUS_FILE',        '/tmp/clam.status');
-define('HVDEF_UPD_STATUS_FILE',         '/tmp/havpupd.status');
+define('HVDEF_UPD_STATUS_FILE',         '/tmp/havp.update.status');
+define('HVDEF_FRESHCLAM_STATUS_FILE',   '/tmp/havp.freshclam.status');
 
 # cron
 define('HVDEF_CLAM_UPD_CRONNAME',       'havp_clam_update');
@@ -254,6 +255,11 @@ function havp_validate_settings($post, $input_errors)
         else $input_errors[] = "File or path not exists '{$post[F_SCANFILEPATH]}'.";
     }
     else {
+        # ifaces
+        if (!isset($post[F_PROXYINTERFACE]) || empty($post[F_PROXYINTERFACE])) {
+            $post[F_PROXYINTERFACE] = "lan";
+        }
+
         # port validate
         $prxport = trim($post[F_PROXYPORT]);
         if (!empty($prxport) && !is_port($prxport))
@@ -262,8 +268,8 @@ function havp_validate_settings($post, $input_errors)
         # parent proxy validate
         $parent = trim($post[F_PARENT]);
 
-	    # max download size validate
-	    $maxval = trim($post[F_MAXDOWNLOADSIZE]);
+        # max download size validate
+        $maxval = trim($post[F_MAXDOWNLOADSIZE]);
         if (!empty($maxval) && !is_numericint($maxval)) # is_port - validate value
             $input_errors[] = 'You must enter a valid numeric value in \'Max download size\' field.';
 
@@ -339,7 +345,7 @@ function havp_resync()
     havp_reconfigure_cron();
 
     # configure system filter
-    filter_configure();
+    if (pfsense_version_() == '1') filter_configure();
 
 }
 # ------------------------------------------------------------------------------
@@ -429,7 +435,7 @@ function havp_check_system()
     } else {
         # delete script if exists
         if (file_exists(HVDEF_FILTER_RESYNC_SCRIPT))
-            mwexec("rm -rf " . HVDEF_FILTER_RESYNC_SCRIPT);
+            mwexec("rm -f " . HVDEF_FILTER_RESYNC_SCRIPT);
     }
 
     # mount RAMDisk
@@ -907,8 +913,8 @@ function havp_config_freshclam()
     $conf[] = "Checks $chks";
 
     $conf[] = "# notification";
-    $conf[] = "OnUpdateExecute  date \"+%d-%m-%Y %H:%M:%S Antivirus update success\" > " . HVDEF_UPD_STATUS_FILE;
-    $conf[] = "OnErrorExecute   date \"+%d-%m-%Y %H:%M:%S Antivirus update error\" > "   . HVDEF_UPD_STATUS_FILE;
+    $conf[] = "OnUpdateExecute  date \"+%d-%m-%Y %H:%M:%S Antivirus update success\" > " . HVDEF_FRESHCLAM_STATUS_FILE;
+    $conf[] = "OnErrorExecute   date \"+%d-%m-%Y %H:%M:%S Antivirus update error\" > "   . HVDEF_FRESHCLAM_STATUS_FILE;
 
     $conf[] = "Debug  " . (HV_DEBUG === 'true' ? "yes" : "no");
 
@@ -1241,6 +1247,7 @@ function havp_filter_update_3()
         mwexec("pfctl -f $rules_file");
     }
 }
+
 # ------------------------------------------------------------------------------
 function havp_update_AV()
 {
@@ -1256,14 +1263,18 @@ function havp_update_AV()
 function havp_AVupdate_script()
 {
 $f = HVDEF_UPD_STATUS_FILE;
+$u = HVDEF_FRESHCLAM_STATUS_FILE;
 return <<<EOD
 #!/bin/sh
-date +"%d.%m.%Y %H:%M:%S Antivirus update started." > $f
+date +"%d.%m.%Y %H:%M:%S Antivirus update started."  > $f
+date +"%d.%m.%Y %H:%M:%S Antivirus database already is updated." > $u
 /usr/local/bin/freshclam
 wait
+cat $u >> $f
 /usr/local/bin/sigtool --unpack-current daily.cvd
 /usr/local/bin/sigtool --unpack-current main.cvd
 wait
+date +"%d.%m.%Y %H:%M:%S Antivirus update end." >> $f
 EOD;
 
 }

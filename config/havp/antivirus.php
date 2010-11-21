@@ -42,27 +42,40 @@ define('PATH_CLAMDB',   '/var/db/clamav');
 define('PATH_HAVPLOG',  '/var/log/havp/access.log');
 define('PATH_AVSTATUS', '/var/tmp/havp.status');
 
-function get_avdb_info($filename)
+function get_avdb_info()
 {
-    $stl = "style='padding-top: 0px; padding-bottom: 0px; padding-left: 4px; padding-right: 4px; border-left: 1px solid #999999;'";
-    $r = '';
+    $r    = '';
     $path = PATH_CLAMDB . "/{$filename}";
-    if (file_exists($path)) {
-        $handle = '';
-        if ($handle = fopen($path, "r")) {
-            $fsize = sprintf("%.2f M", filesize($path)/1024/1024);
-            
-            $s = fread($handle, 1024);
-            $s = explode(':', $s);
+    $fl   = get_dir(PATH_CLAMDB . "/");
 
-            # datetime
-            $dt = explode(" ", $s[1]);
-            $s[1] = strftime("%d.%m.%Y", strtotime("{$dt[0]} {$dt[1]} {$dt[2]}"));
-            if ($s[0] == 'ClamAV-VDB')
-                $r .= "<tr class='listr'><td $stl>{$filename}</td><td $stl>{$s[1]}</td><td $stl align='right'>$fsize</td><td $stl align='right'>{$s[2]}</td><td $stl align='right'>{$s[3]}</td><td $stl>{$s[7]}</td></tr>";
+    array_shift($fl);
+    array_shift($fl);
+
+    foreach ($fl as $fname) {
+        $path = PATH_CLAMDB . "/{$fname}";
+        $ext  = end(explode(".", $fname));
+
+        if ( $ext == "cvd" || $ext == "cld") {
+            $stl = "style='padding-top: 0px; padding-bottom: 0px; padding-left: 4px; padding-right: 4px; border-left: 1px solid #999999;'";
+            if (file_exists($path)) {
+                $handle = '';
+                if ($handle = fopen($path, "r")) {
+                    $fsize = sprintf("%.2f M", filesize($path)/1024/1024);
+            
+                    $s = fread($handle, 1024);
+                    $s = explode(':', $s);
+
+                    # datetime
+                    $dt = explode(" ", $s[1]);
+                    $s[1] = strftime("%d.%m.%Y", strtotime("{$dt[0]} {$dt[1]} {$dt[2]}"));
+                    if ($s[0] == 'ClamAV-VDB')
+                        $r .= "<tr class='listr'><td $stl>{$fname}</td><td $stl>{$s[1]}</td><td $stl align='right'>$fsize</td><td $stl align='right'>{$s[2]}</td><td $stl align='right'>{$s[3]}</td><td $stl>{$s[7]}</td></tr>";
+                }
+                fclose($handle);
+            }
         }
-        fclose($handle);
     }
+
     return $r;
 }
 
@@ -114,7 +127,7 @@ function avupdate_status()
     $s = "Not found.";
     if (HVDEF_UPD_STATUS_FILE && file_exists(HVDEF_UPD_STATUS_FILE))
         $s = file_get_contents(HVDEF_UPD_STATUS_FILE);
-    return $s;
+    return str_replace( "\n", "<br>", $s );
 }
 # ------------------------------------------------------------------------------
 
@@ -258,12 +271,7 @@ if (pfsense_version_A() == '1') {
           <td colspan="2">
             <table width="100%" border="0" cellspacing="0" cellpadding="1" ><tbody>
               <tr  align="center"><td class="listhdrr">Database</td><td class="listhdrr">Date</td><td class="listhdrr">Size</td><td class="listhdrr">Ver.</td><td class="listhdrr">Signatures</td><td class="listhdrr">Builder</td></tr>
-              <?php echo get_avdb_info("daily.cld"); ?>
-              <?php echo get_avdb_info("daily.cvd"); ?>
-              <?php echo get_avdb_info("main.cld"); ?>
-              <?php echo get_avdb_info("main.cvd"); ?>
-              <?php echo get_avdb_info("safebrowsing.cld"); ?>
-              <?php echo get_avdb_info("safebrowsing.cvd"); ?>
+              <?php echo get_avdb_info(); ?>
             </tbody></table>
           </td>
         </tr>
