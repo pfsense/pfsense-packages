@@ -44,7 +44,7 @@ if ($_GET['act'] == "del") {
       if ($a_phpservice[$_GET['id']]) {
           unset($a_phpservice[$_GET['id']]);
           write_config();
-          php_sync_package();
+          phpservice_sync_package();
           header("Location: phpservice_php.php");
           exit;
       }
@@ -83,7 +83,7 @@ if ($_POST) {
 		}
 		
 		write_config();
-		php_sync_package();
+		phpservice_sync_package();
 		
 		header("Location: phpservice_php.php");
 		exit;

@@ -144,7 +144,7 @@ if ($_POST) {
 		}
 
 		write_config();
-		php_sync_package();
+		vhosts_sync_package();
 
 		header("Location: vhosts_php.php");
 		exit;

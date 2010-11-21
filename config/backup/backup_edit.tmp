@@ -45,7 +45,7 @@ if ($_GET['act'] == "del") {
 			conf_mount_rw();
 			unset($a_backup[$_GET['id']]);
 			write_config();
-			php_sync_package();
+			backup_sync_package();
 			header("Location: backup.php");
 			conf_mount_ro();
 			exit;
@@ -85,7 +85,7 @@ if ($_POST) {
 		}
 
 		write_config();
-		php_sync_package();
+		backup_sync_package();
 
 		header("Location: backup.php");
 		exit;

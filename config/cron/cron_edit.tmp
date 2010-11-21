@@ -44,7 +44,7 @@ if ($_GET['act'] == "del") {
       if ($a_cron[$_GET['id']]) {
           unset($a_cron[$_GET['id']]);
           write_config();
-          php_sync_package();
+          cron_sync_package();
           header("Location: cron.php");
           exit;
       }
@@ -89,7 +89,7 @@ if ($_POST) {
 		}
 		
 		write_config();
-		php_sync_package();
+		cron_sync_package();
 		
 		header("Location: cron.php");
 		exit;

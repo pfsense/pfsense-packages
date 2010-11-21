@@ -50,7 +50,7 @@ if ($_GET['act'] == "del") {
 			$a_earlyshellcmd = &$config['system']['earlyshellcmd'];
 			unset($a_earlyshellcmd[$_GET['id']]);
 			write_config();
-			php_sync_package();
+			shellcmd_sync_package();
 			header("Location: shellcmd.php");
 			exit;
 			break;
@@ -58,7 +58,7 @@ if ($_GET['act'] == "del") {
 			$a_shellcmd = &$config['system']['shellcmd'];
 			unset($a_shellcmd[$_GET['id']]);
 			write_config();
-			php_sync_package();
+			shellcmd_sync_package();
 			header("Location: shellcmd.php");
 			exit;
 			break;
@@ -66,7 +66,7 @@ if ($_GET['act'] == "del") {
 			//  $a_afterfilterchangeshellcmd = &$config['system']['afterfilterchangeshellcmd'];
 			//	unset($a_afterfilterchangeshellcmd[$_GET['id']]);
 			//	write_config();
-			//	php_sync_package();
+			//	shellcmd_sync_package();
 			//	header("Location: shellcmd.php");
 			//	exit;
 			break;					
@@ -166,7 +166,7 @@ if ($_POST) {
 			}
 
 			write_config();
-			php_sync_package();
+			shellcmd_sync_package();
 		}
 
 		header("Location: shellcmd.php");
