@@ -140,7 +140,7 @@ function execCmds() {
 	   <tr>
 	    <td class="tabcont" width="100%">
 			<?php
-				$entries = trim(system("/usr/local/sbin/unbound-control dump_cache | wc -l"));
+				$entries = trim(exec("/usr/local/sbin/unbound-control dump_cache | wc -l"));
 				defCmdT("Unbound status", "unbound-control status", "6");
 				defCmdT("Unbound stats", "unbound-control stats_noreset");
 				defCmdT("Unbound stubs", "unbound-control list_stubs", "8");
