@@ -635,9 +635,11 @@
       <required_version>1.2.1</required_version>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>bandwidthd-2.0.1_4.tbz</depends_on_package>
+	<depends_on_package>libpcap-1.1.1.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
       <configurationfile>bandwidthd.xml</configurationfile>
-	  <build_port_path>/usr/ports/net-mgmt/bandwidthd</build_port_path>
+	<build_port_path>/usr/ports/net-mgmt/bandwidthd</build_port_path>
+	<build_port_path>/usr/ports/net/libpcap</build_port_path>
     </package>
     <package>
       <name>stunnel</name>
