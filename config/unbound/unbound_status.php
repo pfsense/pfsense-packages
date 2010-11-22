@@ -141,11 +141,11 @@ function execCmds() {
 	    <td class="tabcont" width="100%">
 			<?php
 				defCmdT("Unbound status", "unbound-control status", "6");
-				defCmdT("Unbound stats_noreset", "unbound-control stats_noreset");
-				defCmdT("Unbound list_stubs", "unbound-control list_stubs", "8");
-				defCmdT("Unbound list_forwards", "unbound-control list_forwards");
-				defCmdT("Unbound list_local_zones", "unbound-control list_local_zones");
-				defCmdT("Unbound list_local_data", "unbound-control list_local_data");
+				defCmdT("Unbound stats", "unbound-control stats_noreset");
+				defCmdT("Unbound stubs", "unbound-control list_stubs", "8");
+				defCmdT("Unbound forwards", "unbound-control list_forwards");
+				defCmdT("Unbound local zones", "unbound-control list_local_zones");
+				defCmdT("Unbound local data", "unbound-control list_local_data");
 				defCmdT("Unbound cache", "unbound-control dump_cache", "60");
 				defCmdT("Unbound configuration", "/bin/cat /usr/local/etc/unbound/unbound.conf", "60");
 				listCmds();
