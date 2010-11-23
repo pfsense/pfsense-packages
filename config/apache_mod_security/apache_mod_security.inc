@@ -221,6 +221,12 @@ function generate_apache_configuration() {
 	else 
 		$secauditengine = "RelevantOnly";
 
+	// SecReadStateLimit
+	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['SecReadStateLimit']) 
+		$secreadstatelimit = "SecReadStateLimit " . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['SecReadStateLimit'] ."\n";
+	else 
+		$secreadstatelimit = "";
+
 	$mod_proxy .= <<<EOF
 
 # Off when using ProxyPass
@@ -408,6 +414,9 @@ EOF;
 	# XXX Add knobs for these
     # Only allow bytes from this range
     SecFilterForceByteRange 1 255
+
+	# Help prevent the effects of a Slowloris-type of attack
+	$secreadstatelimit
 
     # Cookie format checks.
     SecFilterCheckCookieFormat On

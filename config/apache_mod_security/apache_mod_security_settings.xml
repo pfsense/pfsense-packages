@@ -120,7 +120,6 @@
 			</description>
 			<type>input</type>
 		</field>
-
 		<field>
 			<fielddescr>Use mod_disk_cache</fielddescr>
 			<fieldname>mod_disk_cache</fieldname>
@@ -137,6 +136,16 @@
 			<description>
 				<![CDATA[
 					Sets the memory usage in Kbytes.
+				]]>					
+			</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Limits number of POSTS accepted from same IP address</fielddescr>
+			<fieldname>SecReadStateLimit</fieldname>
+			<description>
+				<![CDATA[
+					Help prevent the effects of a Slowloris-type of attack.  More information about this attack can be found here: http://blog.spiderlabs.com/2010/11/advanced-topic-of-the-week-mitigating-slow-http-dos-attacks.html
 				]]>					
 			</description>
 			<type>input</type>
