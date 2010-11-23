@@ -416,7 +416,7 @@ EOF;
     SecFilterForceByteRange 1 255
 
 	# Help prevent the effects of a Slowloris-type of attack
-	$secreadstatelimit
+	# $secreadstatelimit
 
     # Cookie format checks.
     SecFilterCheckCookieFormat On
