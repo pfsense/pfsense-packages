@@ -30,7 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 /* TODO: redo check if snort is up */
-
+$nocsrf = true;
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
