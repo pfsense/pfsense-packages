@@ -96,6 +96,12 @@ function sync_package_siproxd() {
     	global $config;
 
 	conf_mount_rw();
+
+	$siproxd_chroot = "/var/siproxd/";
+	@mkdir($siproxd_chroot);
+	@chown($siproxd_chroot, "nobody");
+	@chgrp($siproxd_chroot, "nobody");
+
 	unlink_if_exists("/usr/local/etc/rc.d/siproxd");
 	$conf = &$config['installedpackages']['siproxd']['config'][0];
 	$fout = fopen("/usr/local/etc/siproxd.conf","w");
@@ -129,9 +135,9 @@ function sync_package_siproxd() {
 
 	fwrite($fout, "daemonize = 1\n");
 	fwrite($fout, "silence_log = 0\n");
-	fwrite($fout, "log_calls = 1\n");
+	//fwrite($fout, "log_calls = 1\n");
 	fwrite($fout, "user = nobody\n");
-	fwrite($fout, "chrootjail = /usr/local/siproxd/\n");
+	fwrite($fout, "chrootjail = {$siproxd_chroot}\n");
 	fwrite($fout, "registration_file = siproxd_registrations\n");
 	fwrite($fout, "pid_file = siproxd.pid\n");
 
@@ -141,11 +147,12 @@ function sync_package_siproxd() {
 		fwrite($fout, "rtp_proxy_enable = 1\n");
 	}
 
-	if($_POST['rtplower'] != "") {
-		if($_POST['rtpupper'] != "") {
-			fwrite($fout, "rtp_port_low = " . $_POST['rtplower'] . "\n");
-			fwrite($fout, "rtp_port_high = " . $_POST['rtpupper'] . "\n");
-		}
+	if(($_POST['rtplower'] != "") && ($_POST['rtpupper'] != "")) {
+		fwrite($fout, "rtp_port_low = " . $_POST['rtplower'] . "\n");
+		fwrite($fout, "rtp_port_high = " . $_POST['rtpupper'] . "\n");
+	} else {
+		fwrite($fout, "rtp_port_low = 7070\n");
+		fwrite($fout, "rtp_port_high = 7079\n");
 	}
 
         if($_POST['rtptimeout'] != "") {
