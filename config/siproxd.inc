@@ -139,6 +139,7 @@ function sync_package_siproxd() {
 	fwrite($fout, "user = nobody\n");
 	fwrite($fout, "chrootjail = {$siproxd_chroot}\n");
 	fwrite($fout, "registration_file = siproxd_registrations\n");
+	fwrite($fout, "autosave_registrations = 10\n");
 	fwrite($fout, "pid_file = siproxd.pid\n");
 
 	if($_POST['rtpenable'] != "") {
