@@ -40,7 +40,7 @@ function sync_package_sipproxd_users() {
 			fwrite($fout, $rowhelper['username'] . " " . $rowhelper['password'] . "\n");
 		}
 	}
- 	fclose($fout);
+	fclose($fout);
 	conf_mount_ro();
 	system("/usr/bin/killall -HUP siproxd");
 }
