@@ -169,6 +169,7 @@
 		sync_package_siproxd();
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
+		sync_package_siproxd();
 	</custom_php_resync_config_command>
 	<filter_rules_needed>siproxd_generate_rules</filter_rules_needed>
 </packagegui>
