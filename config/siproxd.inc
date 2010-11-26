@@ -197,6 +197,30 @@ function sync_package_siproxd() {
 	if ($siproxd_conf['tcp_keepalive'] != "")
 		fwrite($fout, "tcp_keepalive = " . $siproxd_conf['tcp_keepalive'] . "\n");
 
+	fwrite($fout, "plugindir=/usr/local/lib/siproxd/\n");
+	fwrite($fout, "load_plugin=plugin_logcall.la\n");
+
+	if ($siproxd_conf['plugin_defaulttarget'] != "")
+		fwrite($fout, "load_plugin=plugin_defaulttarget.la\n");
+	if (($siproxd_conf['plugin_defaulttarget'] != "") && ($siproxd_conf['plugin_defaulttarget_log'] != ""))
+		fwrite($fout, "plugin_defaulttarget_log = 1\n");
+	if (($siproxd_conf['plugin_defaulttarget'] != "") && ($siproxd_conf['plugin_defaulttarget_target'] != ""))
+		fwrite($fout, "plugin_defaulttarget_target = " . $siproxd_conf['plugin_defaulttarget_target'] . "\n");
+
+	if ($siproxd_conf['plugin_fix_bogus_via'] != "")
+		fwrite($fout, "load_plugin=plugin_fix_bogus_via.la\n");
+	if (($siproxd_conf['plugin_fix_bogus_via'] != "") && ($siproxd_conf['plugin_fix_bogus_via_networks'] != ""))
+		fwrite($fout, "plugin_fix_bogus_via_networks = " . $siproxd_conf['plugin_fix_bogus_via_networks'] . "\n");
+
+	if ($siproxd_conf['plugin_stun'] != "")
+		fwrite($fout, "load_plugin=plugin_stun.la\n");
+	if (($siproxd_conf['plugin_stun'] != "") && ($siproxd_conf['plugin_stun_server'] != ""))
+		fwrite($fout, "plugin_stun_server = " . $siproxd_conf['plugin_stun_server'] . "\n");
+	if (($siproxd_conf['plugin_stun'] != "") && ($siproxd_conf['plugin_stun_port'] != ""))
+		fwrite($fout, "plugin_stun_port = " . $siproxd_conf['plugin_stun_port'] . "\n");
+	if (($siproxd_conf['plugin_stun'] != "") && ($siproxd_conf['plugin_stun_period'] != ""))
+		fwrite($fout, "plugin_stun_period = " . $siproxd_conf['plugin_stun_period'] . "\n");
+
 	fclose($fout);
 
 	write_rcfile(array(
@@ -245,6 +269,13 @@ function validate_form_siproxd($post, $input_errors) {
 		$input_errors[] = '"TCP Connect Timeout" must be numeric and greater than 0.';
 	if ($post['tcp_keepalive'] && (!is_numeric($post['tcp_keepalive']) || ($post['tcp_keepalive'] < 0)))
 		$input_errors[] = '"TCP Keepalive" must be numeric and greater than 0.';
+	if ($post['plugin_stun_server'] && (!is_hostname($post['plugin_stun_server']) && !is_ipaddr($post['plugin_stun_server'])))
+		$input_errors[] = 'Invalid hostname or IP address entered for "STUN Server".';
+	if ($post['plugin_stun_port'] && !is_port($post['plugin_stun_port']))
+		$input_errors[] = 'Invalid port entered for "STUN Port".';
+	if ($post['plugin_stun_period'] && (!is_numeric($post['plugin_stun_period']) || ($post['plugin_stun_period'] < 0)))
+		$input_errors[] = '"STUN Period" must be numeric and greater than 0.';
+
 }
 
 ?>

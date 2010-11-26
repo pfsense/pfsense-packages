@@ -93,6 +93,16 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>Default expiration timeout</fielddescr>
+			<fieldname>defaulttimeout</fieldname>
+			<description>If a REGISTER request dose not contain an Expires header or expires= parameter, this number of seconds will be used and reported back to the UA in the answer.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<name>RTP Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Enable RTP proxy</fielddescr>
 			<fieldname>rtpenable</fieldname>
 			<description>Enable or disable the RTP proxy. (default is enabled)</description>
@@ -127,10 +137,8 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Default expiration timeout</fielddescr>
-			<fieldname>defaulttimeout</fieldname>
-			<description>If a REGISTER request dose not contain an Expires header or expires= parameter, this number of seconds will be used and reported back to the UA in the answer.</description>
-			<type>input</type>
+			<name>Dejittering Settings</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>Input Dejitter</fielddescr>
@@ -143,6 +151,10 @@
 			<fieldname>rtp_output_dejitter</fieldname>
 			<description>Artificial delay to be used to de-jitter RTP data streams. This time is in microseconds. 0 - completely disable dejitter (default)</description>
 			<type>input</type>
+		</field>
+		<field>
+			<name>SIP over TCP Settings</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>TCP inactivity timeout</fielddescr>
@@ -163,6 +175,10 @@
 			<type>input</type>
 		</field>
 		<field>
+			<name>Proxy Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Enable proxy authentication</fielddescr>
 			<fieldname>authentication</fieldname>
 			<description>If this is checked, clients will be forced to authenticate themselves at the proxy (for registration only).</description>
@@ -181,6 +197,10 @@
 			<type>input</type>
 		</field>
 		<field>
+			<name>DSCP Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>Expedited RTP Forwarding</fielddescr>
 			<fieldname>expeditedforwarding</fieldname>
 			<description>This service is designed to allow ISPs to offer a service with attributes similar to a "leased line". This service offers the ULTIMATE IN LOW LOSS, LOW LATENCY AND LOW JITTER by ensuring that there is always sufficient room in output queues for the contracted expedited forwarding traffic.
@@ -192,6 +212,72 @@
 			<fieldname>expeditedsipforwarding</fieldname>
 			<description>This service is designed to allow ISPs to offer a service with attributes similar to a "leased line". This service offers the ULTIMATE IN LOW LOSS, LOW LATENCY AND LOW JITTER by ensuring that there is always sufficient room in output queues for the contracted expedited forwarding traffic.</description>
 			<type>checkbox</type>
+		</field>
+		<field>
+			<name>Plugin Settings - Default Target</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable Default Target Plugin</fielddescr>
+			<fieldname>plugin_defaulttarget</fieldname>
+			<description>Redirect unknown calls to a specified target.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Log redirected calls</fielddescr>
+			<fieldname>plugin_defaulttarget_log</fieldname>
+			<description>Log redirected calls.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Default Target</fielddescr>
+			<fieldname>plugin_defaulttarget_target</fieldname>
+			<description>Target must be a full SIP URI with the syntax sip:user@host[:port]</description>
+			<type>input</type>
+		</field>
+		<field>
+			<name>Plugin Settings - Bogus VIA Networks</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable Fix Bogus Via Networks Plugin</fielddescr>
+			<fieldname>plugin_fix_bogus_via</fieldname>
+			<description>Incoming (from public network) SIP messages are checked for broken SIP Via headers. If the IP address in the latest Via Header is part of the list below, it will be replaced by the IP where the SIP message has been received from.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Bogus Via Networks</fielddescr>
+			<fieldname>plugin_fix_bogus_via_networks</fieldname>
+			<description>Comma separated list of networks which should have their via headers rewritten. Example: 10.0.0.0/8,172.16.0.0/12,192.168.0.0/16</description>
+			<type>input</type>
+		</field>
+		<field>
+			<name>Plugin Settings - STUN</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Enable STUN Plugin</fielddescr>
+			<fieldname>plugin_stun</fieldname>
+			<description>Uses an external STUN server to determine the public IP address of siproxd. Useful for "in-front-of-NAT-router" scenarios.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>STUN Hostname</fielddescr>
+			<fieldname>plugin_stun_server</fieldname>
+			<description>External STUN server hostname.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>STUN Port</fielddescr>
+			<fieldname>plugin_stun_port</fieldname>
+			<description>External STUN server port.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>STUN Period</fielddescr>
+			<fieldname>plugin_stun_period</fieldname>
+			<description>Period in seconds to request IP info from STUN server.</description>
+			<type>input</type>
 		</field>
 	</fields>
 	<custom_php_global_functions>
