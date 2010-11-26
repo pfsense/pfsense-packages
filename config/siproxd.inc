@@ -1,5 +1,4 @@
 <?php
-/* $Id$ */
 /*
 	siproxd.inc
 	Copyright (C) 2006 Scott Ullrich
