@@ -27,7 +27,7 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-if(!function_exists("filter_configure")) 
+if(!function_exists("filter_configure"))
 	require_once("filter.inc");
 
 function sync_package_sipproxd_users() {
@@ -53,7 +53,7 @@ function siproxd_generate_rules($type) {
 		log_error("Sipproxd is installed but not started.  Not installing redirect rules.");
 		return;
 	}
-	
+
 	/* proxy is turned off in package settings */
 	if($siproxd_conf['rtpenable'] == "0") {
 		log_error("WARNING: siproxd RTP proxy has not been enabled.  Not installing rules.");
@@ -74,7 +74,7 @@ function siproxd_generate_rules($type) {
 				$rules .= "rdr on {$iface} proto udp from any to !($iface) port {$port} -> 127.0.0.1 port {$port}\n";
 		}
 		break;
-	  case 'filter':
+	case 'filter':
 	case 'rule':
 		foreach ($ifaces as $iface) {
 			if($iface <> "") {
@@ -93,7 +93,7 @@ function siproxd_generate_rules($type) {
 }
 
 function sync_package_siproxd() {
-    	global $config;
+	global $config;
 
 	conf_mount_rw();
 
@@ -122,7 +122,7 @@ function sync_package_siproxd() {
 	if($siproxd_conf['if_outbound'] != "") {
 		if(intval($config['version']) < 6 && $config['interfaces'][$siproxd_conf['if_outbound']]['ipaddr'] == "pppoe") {
 			fwrite($fout, "if_outbound = ng0\n");
-                } else {
+		} else {
 			fwrite($fout, "if_outbound = " . convert_friendly_interface_to_real_interface_name($siproxd_conf['if_outbound']) . "\n");
 		}
 	}
@@ -156,22 +156,22 @@ function sync_package_siproxd() {
 		fwrite($fout, "rtp_port_high = 7079\n");
 	}
 
-        if($siproxd_conf['rtptimeout'] != "") {
+	if($siproxd_conf['rtptimeout'] != "") {
 		fwrite($fout, "rtp_timeout = " . $siproxd_conf['rtptimeout'] . "\n");
-        } else {
-                fwrite($fout, "rtp_timeout = 300\n");
-        }
+	} else {
+		fwrite($fout, "rtp_timeout = 300\n");
+	}
 
-        if($siproxd_conf['defaulttimeout'] != "") {
-                fwrite($fout, "default_expires = " . $siproxd_conf['defaulttimeout'] . "\n");
-        } else {
-        	fwrite($fout, "default_expires = 600\n");
-        }
+	if($siproxd_conf['defaulttimeout'] != "") {
+		fwrite($fout, "default_expires = " . $siproxd_conf['defaulttimeout'] . "\n");
+	} else {
+		fwrite($fout, "default_expires = 600\n");
+	}
 
-        if($siproxd_conf['authentication']) {
-                fwrite($fout, "proxy_auth_realm = Authentication_Realm\n");
+	if($siproxd_conf['authentication']) {
+		fwrite($fout, "proxy_auth_realm = Authentication_Realm\n");
 		fwrite($fout, "proxy_auth_pwfile = /usr/local/etc/siproxd_passwd.cfg\n");
-        }
+	}
 
 	fwrite($fout, "debug_level = 0x00000000\n");
 	if($siproxd_conf['outboundproxyhost'] != "") {
@@ -193,10 +193,10 @@ function sync_package_siproxd() {
 		)
 	);
 
-   	exec("killall siproxd");
-	
+	exec("killall siproxd");
+
 	sleep(1);
-			
+
 	start_service("siproxd");
 
 	filter_configure();

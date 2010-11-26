@@ -2,8 +2,8 @@
 <!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
-        <copyright>
-        <![CDATA[
+	<copyright>
+	<![CDATA[
 /* $Id$ */
 /* ========================================================================== */
 /*
@@ -36,11 +36,11 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
-        ]]>
-        </copyright>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
+	]]>
+	</copyright>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
 	<name>siproxdsettings</name>
 	<version>0.5.13_pfs2</version>
 	<title>siproxd: Settings</title>
@@ -70,14 +70,14 @@
 	</tabs>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>		
+		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/siproxdusers.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/siproxd.inc</item>
-	</additional_files_needed>	
+	</additional_files_needed>
 	<fields>
 		<field>
 			<fielddescr>Inbound interface</fielddescr>
@@ -156,12 +156,12 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Expedited Forwarding</fielddescr>
+			<fielddescr>Expedited RTP Forwarding</fielddescr>
 			<fieldname>expeditedforwarding</fieldname>
 			<description>This service is designed to allow ISPs to offer a service with attributes similar to a "leased line". This service offers the ULTIMATE IN LOW LOSS, LOW LATENCY AND LOW JITTER by ensuring that there is always sufficient room in output queues for the contracted expedited forwarding traffic.
 			</description>
 			<type>checkbox</type>
-		</field>		
+		</field>
 	</fields>
 	<custom_php_global_functions>
 	</custom_php_global_functions>
