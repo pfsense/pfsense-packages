@@ -205,4 +205,23 @@ function sync_package_siproxd() {
 
 }
 
+function validate_form_siproxd($post, $input_errors) {
+	if ($post['port'] && !is_port($post['port']))
+		$input_errors[] = 'Invalid port entered for "Listening Port"';
+	if ($post['rtplower'] && !is_port($post['rtplower']))
+		$input_errors[] = 'Invalid port entered for "RTP port range (lower)".';
+	if ($post['rtpupper'] && !is_port($post['rtpupper']))
+		$input_errors[] = 'Invalid port entered for "RTP port range (upper)".';
+	if ($post['rtplower'] && $post['rtpupper'] && ($post['rtplower'] >= $post['rtpupper']))
+		$input_errors[] = 'RTP lower port cannot be equal to or higher than the RTP upper port.';
+	if ($post['rtptimeout'] && (!is_numeric($post['rtptimeout']) || ($post['rtptimeout'] < 0)))
+		$input_errors[] = '"RTP stream timeout" must be numeric and greater than 0.';
+	if ($post['defaulttimeout'] && (!is_numeric($post['defaulttimeout']) || ($post['defaulttimeout'] < 0)))
+		$input_errors[] = '"Default expiration timeout" must be numeric and greater than 0.';
+	if ($post['outboundproxyhost'] && (!is_hostname($post['outboundproxyhost']) && !is_ipaddr($post['outboundproxyhost'])))
+		$input_errors[] = 'Invalid hostname or IP address entered for "Outbound Proxy Host".';
+	if ($post['outboundproxyport'] && !is_port($post['outboundproxyport']))
+		$input_errors[] = 'Invalid port entered for "Outbound Proxy Port".';
+}
+
 ?>
