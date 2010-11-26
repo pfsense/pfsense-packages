@@ -2,6 +2,7 @@
 /*
 	siproxd.inc
 	Copyright (C) 2006 Scott Ullrich
+	Copyright (C) 2010 Jim Pingle
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
