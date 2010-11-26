@@ -133,6 +133,36 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>Input Dejitter</fielddescr>
+			<fieldname>rtp_input_dejitter</fieldname>
+			<description>Artificial delay to be used to de-jitter RTP data streams. This time is in microseconds. 0 - completely disable dejitter (default)</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Output Dejitter</fielddescr>
+			<fieldname>rtp_output_dejitter</fieldname>
+			<description>Artificial delay to be used to de-jitter RTP data streams. This time is in microseconds. 0 - completely disable dejitter (default)</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>TCP inactivity timeout</fielddescr>
+			<fieldname>tcp_timeout</fieldname>
+			<description>Inactivity timeout (seconds). After that an idling TCP connection is disconnected. NOTE: Making this too short may cause multiple parallel registrations for the same phone. This timeout must be set larger than the used registration interval.</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>TCP Connect Timeout</fielddescr>
+			<fieldname>tcp_connect_timeout</fieldname>
+			<description>Defines How many msecs siproxd will wait for an successful connect when establishing an outgoing SIP signalling connection. This should be kept as short as possible as waiting for an TCP connection to establish is a BLOCKING operation - while waiting for a connect to succeed no SIP messages are processed (RTP is not affected).</description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>TCP Keepalive</fielddescr>
+			<fieldname>tcp_keepalive</fieldname>
+			<description>For TCP SIP signalling, if > 0 empty SIP packets will be sent every 'n' seconds to keep the connection alive. Default is off.</description>
+			<type>input</type>
+		</field>
+		<field>
 			<fielddescr>Enable proxy authentication</fielddescr>
 			<fieldname>authentication</fieldname>
 			<description>If this is checked, clients will be forced to authenticate themselves at the proxy (for registration only).</description>
@@ -155,6 +185,12 @@
 			<fieldname>expeditedforwarding</fieldname>
 			<description>This service is designed to allow ISPs to offer a service with attributes similar to a "leased line". This service offers the ULTIMATE IN LOW LOSS, LOW LATENCY AND LOW JITTER by ensuring that there is always sufficient room in output queues for the contracted expedited forwarding traffic.
 			</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Expedited SIP Forwarding</fielddescr>
+			<fieldname>expeditedsipforwarding</fieldname>
+			<description>This service is designed to allow ISPs to offer a service with attributes similar to a "leased line". This service offers the ULTIMATE IN LOW LOSS, LOW LATENCY AND LOW JITTER by ensuring that there is always sufficient room in output queues for the contracted expedited forwarding traffic.</description>
 			<type>checkbox</type>
 		</field>
 	</fields>

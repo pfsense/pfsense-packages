@@ -183,6 +183,19 @@ function sync_package_siproxd() {
 
 	if($siproxd_conf['expeditedforwarding'] != "")
 		fwrite($fout, "rtp_dscp = 46\n");
+	if($siproxd_conf['expeditedsipforwarding'] != "")
+		fwrite($fout, "sip_dscp = 26\n");
+
+	if ($siproxd_conf['rtp_input_dejitter'] != "")
+		fwrite($fout, "rtp_input_dejitter = " . $siproxd_conf['rtp_input_dejitter'] . "\n");
+	if ($siproxd_conf['rtp_output_dejitter'] != "")
+		fwrite($fout, "rtp_output_dejitter = " . $siproxd_conf['rtp_output_dejitter'] . "\n");
+	if ($siproxd_conf['tcp_timeout'] != "")
+		fwrite($fout, "tcp_timeout = " . $siproxd_conf['tcp_timeout'] . "\n");
+	if ($siproxd_conf['tcp_connect_timeout'] != "")
+		fwrite($fout, "tcp_connect_timeout = " . $siproxd_conf['tcp_connect_timeout'] . "\n");
+	if ($siproxd_conf['tcp_keepalive'] != "")
+		fwrite($fout, "tcp_keepalive = " . $siproxd_conf['tcp_keepalive'] . "\n");
 
 	fclose($fout);
 
@@ -222,6 +235,16 @@ function validate_form_siproxd($post, $input_errors) {
 		$input_errors[] = 'Invalid hostname or IP address entered for "Outbound Proxy Host".';
 	if ($post['outboundproxyport'] && !is_port($post['outboundproxyport']))
 		$input_errors[] = 'Invalid port entered for "Outbound Proxy Port".';
+	if ($post['rtp_input_dejitter'] && (!is_numeric($post['rtp_input_dejitter']) || ($post['rtp_input_dejitter'] < 0)))
+		$input_errors[] = '"Input Dejitter" must be numeric and greater than 0.';
+	if ($post['rtp_output_dejitter'] && (!is_numeric($post['rtp_output_dejitter']) || ($post['rtp_output_dejitter'] < 0)))
+		$input_errors[] = '"Output Dejitter" must be numeric and greater than 0.';
+	if ($post['tcp_timeout'] && (!is_numeric($post['tcp_timeout']) || ($post['tcp_timeout'] < 0)))
+		$input_errors[] = '"TCP inactivity timeout" must be numeric and greater than 0.';
+	if ($post['tcp_connect_timeout'] && (!is_numeric($post['tcp_connect_timeout']) || ($post['tcp_connect_timeout'] < 0)))
+		$input_errors[] = '"TCP Connect Timeout" must be numeric and greater than 0.';
+	if ($post['tcp_keepalive'] && (!is_numeric($post['tcp_keepalive']) || ($post['tcp_keepalive'] < 0)))
+		$input_errors[] = '"TCP Keepalive" must be numeric and greater than 0.';
 }
 
 ?>
