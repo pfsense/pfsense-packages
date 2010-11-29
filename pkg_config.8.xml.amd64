@@ -408,11 +408,11 @@
       <descr>High perfomance web proxy report. Requires squid HTTP proxy.</descr>
       <website>http://lightsquid.sf.net/</website>
       <category>Network Report</category>
-      <version>1.8.0</version>
+      <version>1.8.2</version>
       <maintainer>dv_serg@mail.ru</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-      <depends_on_package>lightsquid-1.8.tbz</depends_on_package>
-      <depends_on_package>perl-5.10.1_2.tbz</depends_on_package>
+      <depends_on_package>lightsquid-1.8_2.tbz</depends_on_package>
+      <depends_on_package>perl-5.10.1_3.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/www/lightsquid</build_port_path>
 	  <build_port_path>/usr/ports/lang/perl5.10</build_port_path>
 	<build_options>WITHOUT_DEBUGGING=true WITHOUT_GDBM=true WITHOUT_PERL_MALLOC=true WITH_PERL_64BITINT=true WITHOUT_THREADS=true WITHOUT_MULTIPLICITY=true WITHOUT_SUIDPERL=true WITHOUT_SITECUSTOMIZE=true WITH_USE_PERL=true</build_options>
