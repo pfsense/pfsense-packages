@@ -449,7 +449,7 @@
       <status>Beta</status>
       <required_version>1.0</required_version>
       <depends_on_package_base_url>http://www.pfsense.com/packages/config/phpsysinfo/bin/</depends_on_package_base_url>
-      <depends_on_package>mbmon-205_4.tbz</depends_on_package>
+      <depends_on_package>mbmon-205_5.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/sysutils/mbmon</build_port_path>
       <config_file>http://www.pfsense.com/packages/config/phpsysinfo/phpsysinfo.xml</config_file>
       <configurationfile>phpsysinfo.xml</configurationfile>
