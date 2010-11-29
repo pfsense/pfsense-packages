@@ -34,8 +34,10 @@ global $config, $g;
 			<td width="40%" class="widgetsubheader">Src/Dst</td>
 			<td width="40%" class="widgetsubheader">Details</td>
 		</tr>
-<?php   $counter=0;
- 	foreach ($snort_alerts as $alert) { ?>
+<?php
+$counter=0;
+if (is_array($snort_alerts)) {
+	foreach ($snort_alerts as $alert) { ?>
 
 	<?php
 		if(isset($config['syslog']['reverse'])) {
@@ -60,6 +62,7 @@ global $config, $g;
 			<td width="40%" class="listr"><?= 'Pri : ' . $alert["priority"] . '<br>' . 'Cat : ' . $alert['category'] ?></td>
 		</tr>
 <?php 		$counter++;
-	} ?>
+	}
+} ?>
 	</tbody>
 </table>
