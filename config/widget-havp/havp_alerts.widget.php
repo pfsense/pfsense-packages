@@ -33,7 +33,9 @@ global $config, $g;
 			<td width="25%" class="widgetsubheader">Date</td>
 			<td width="75%" class="widgetsubheader">Details</td>
 		</tr>
-<?php   $counter=0;
+<?php
+$counter=0;
+if (is_array($havp_alerts)) {
  	foreach ($havp_alerts as $alert) { ?>
 
 	<?php
@@ -58,6 +60,7 @@ global $config, $g;
 			<td width="75%" class="listr"><?= $alert["url"] . "<br>" . $alert["virusname"] ?></td>
 		</tr>
 <?php 		$counter++;
-	} ?>
+	}
+} ?>
 	</tbody>
 </table>
