@@ -561,10 +561,10 @@
       <config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
       <configurationfile>imspector.xml</configurationfile>
       <depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-      <depends_on_package>imspector-0.8.tbz</depends_on_package>
-      <depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
-      <depends_on_package>mysql-client-5.0.77.tbz</depends_on_package>
-      <depends_on_package>sqlite3-3.6.10.tbz</depends_on_package>
+      <depends_on_package>imspector-0.5.tbz</depends_on_package>
+      <depends_on_package>libiconv-1.13.1_1.tbz</depends_on_package>
+      <depends_on_package>mysql-client-5.1.53.tbz</depends_on_package>
+      <depends_on_package>sqlite3-3.7.3_1.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/net-im/imspector</build_port_path>
 	  <build_port_path>/usr/ports/converters/libiconv</build_port_path>
 	  <build_port_path>/usr/ports/databases/mysql50-client</build_port_path>
