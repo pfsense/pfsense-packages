@@ -62,6 +62,10 @@
 			<text>Users</text>
 			<url>/pkg.php?xml=siproxdusers.xml</url>
 		</tab>
+		<tab>
+			<text>Registered Phones</text>
+			<url>/siproxd_registered_phones.php</url>
+		</tab>
 	</tabs>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -72,6 +76,11 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/siproxd.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/siproxd_registered_phones.php</item>
 	</additional_files_needed>
 	<fields>
 		<field>
@@ -293,3 +302,4 @@
 		validate_form_siproxd($_POST, &amp;$input_errors);
 	</custom_php_validation_command>
 </packagegui>
+ 

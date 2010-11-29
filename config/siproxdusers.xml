@@ -59,6 +59,10 @@
 			<url>/pkg.php?xml=siproxdusers.xml</url>
 			<active/>
 		</tab>
+		<tab>
+			<text>Registered Phones</text>
+			<url>/siproxd_registered_phones.php</url>
+		</tab>
 	</tabs>
 	<configpath>installedpackages->package->$packagename->configuration->settings</configpath>
 	<adddeleteeditpagefields>

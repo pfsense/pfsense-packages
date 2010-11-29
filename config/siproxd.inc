@@ -226,15 +226,17 @@ function sync_package_siproxd() {
 	write_rcfile(array(
 		"file" => "siproxd.sh",
 		"start" => "/usr/local/sbin/siproxd -c /usr/local/etc/siproxd.conf &",
-		"stop" => "/usr/bin/killall siproxd"
+		"stop" => "/usr/bin/killall -9 siproxd"
 		)
 	);
 
-	exec("killall siproxd");
+	exec("killall -9 siproxd");
 
-	sleep(1);
+	sleep(3);
 
 	start_service("siproxd");
+
+	sleep(3);
 
 	filter_configure();
 
