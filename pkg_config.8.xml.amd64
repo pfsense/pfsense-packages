@@ -772,9 +772,9 @@
       <website>http://www-nrg.ee.lbl.gov/</website>
       <category>Security</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-      <depends_on_package>arpwatch-2.1.a15_4.tbz</depends_on_package>
+      <depends_on_package>arpwatch-2.1.a15_5.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/net-mgmt/arpwatch</build_port_path>
-      <version>2.1.a14_4</version>
+      <version>2.1.a15_5</version>
       <status>ALPHA</status>
       <required_version>2.0</required_version>
       <config_file>http://www.pfsense.com/packages/config/arpwatch.xml</config_file>
