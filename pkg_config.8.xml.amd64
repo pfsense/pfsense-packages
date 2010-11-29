@@ -347,8 +347,8 @@
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/spamd/spamd.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>spamd-4.5.0_3.tbz</depends_on_package>
-		<version>4.5.0_4</version>
+		<depends_on_package>spamd-4.8.0.tbz</depends_on_package>
+		<version>4.8.0</version>
 		<status>Beta</status>
 		<required_version>1.2.1</required_version>
 		<configurationfile>spamd.xml</configurationfile>
