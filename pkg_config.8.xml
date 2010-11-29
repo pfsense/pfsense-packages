@@ -433,7 +433,7 @@
       <configurationfile>tinydns.xml</configurationfile>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>ucspi-tcp-0.88_2.tbz</depends_on_package>
-      <depends_on_package>daemontools-0.76_14.tbz</depends_on_package>
+      <depends_on_package>daemontools-0.76_16.tbz</depends_on_package>
       <depends_on_package>djbdns-1.05_13.tbz</depends_on_package>
 	<build_port_path>/usr/ports/sysutils/ucspi-tcp</build_port_path>
 	<build_port_path>/usr/ports/sysutils/daemontools</build_port_path>
