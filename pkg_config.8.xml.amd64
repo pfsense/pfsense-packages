@@ -530,7 +530,7 @@
       <config_file>http://www.pfsense.com/packages/config/arping/arping.xml</config_file>
       <configurationfile>arping.xml</configurationfile>
       <depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-      <depends_on_package>arping-2.06.tbz</depends_on_package>
+      <depends_on_package>arping-2.09.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/net/arping</build_port_path>
     </package>
     <package>
