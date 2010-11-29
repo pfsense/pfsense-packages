@@ -154,9 +154,9 @@
       <category>FTP</category>
       <config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-      <depends_on_package>pure-ftpd-1.0.20_3.tbz</depends_on_package>
+      <depends_on_package>pure-ftpd-1.0.29_1.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/ftp/pure-ftpd</build_port_path>
-      <version>1.0.21</version>
+      <version>1.0.29_1</version>
       <status>Stable</status>
       <configurationfile>pure-ftpd.xml</configurationfile>
       <required_version>1.0</required_version>
