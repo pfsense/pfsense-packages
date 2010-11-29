@@ -326,7 +326,7 @@
       <category>Security</category>
       <depends_on_package_base_url>http://www.pfsense.com/packages/config/snort/bin/8.1x64/</depends_on_package_base_url>
 	  <depends_on_package>pcre-8.10.tbz</depends_on_package>
-      <depends_on_package>mysql-client-5.1.50_1.tbz</depends_on_package>
+	<depends_on_package>mysql-client-5.1.53.tbz</depends_on_package>
 	  <depends_on_package>snort-2.8.6.1.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/devel/pcre</build_port_path>
 	  <build_port_path>/usr/ports/lang/perl5.10</build_port_path>
