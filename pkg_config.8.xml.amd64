@@ -974,5 +974,18 @@
         <build_port_path>/usr/ports/dns/unbound</build_port_path>
         <build_options>WITHOUT_MAN=true</build_options>
     </package>
+	<package>
+		<name>Shellcmd</name>
+		<website/>
+		<descr>The shellcmd utility is used to manage commands on system startup.</descr>
+		<category>Services</category>
+		<pkginfolink></pkginfolink>
+		<config_file>http://www.pfsense.com/packages/config/shellcmd/shellcmd.xml</config_file>
+		<version>0.5</version>
+		<status>Beta</status>
+		<required_version>1.2</required_version>
+		<maintainer>markjcrane@gmail.com</maintainer>
+		<configurationfile>shellcmd.xml</configurationfile>
+	</package>
   </packages>
 </pfsensepkgs>
