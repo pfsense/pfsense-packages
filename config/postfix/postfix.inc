@@ -33,8 +33,6 @@ require_once("util.inc");
 function sync_package_postfix() {
 	global $config;
 
-	$myhostname = $config['system']['hostname'] . '.' . $config['system']['domain'];
-	$mydomain = $config['system']['domain'];
 	$relay_domains = "";
 	$transport = "";
 
@@ -51,10 +49,11 @@ function sync_package_postfix() {
 	}
 
 	$postfix_main =
-		"myhostname = {$myhostname}\n" .
-		"mydomain = {$mydomain}\n" .
 		"relay_domains ={$relay_domains}\n" .
-		"local_recipient_maps =\n";
+		"transport_maps = hash:/usr/local/etc/postfix/transport\n" .
+		"local_recipient_maps =\n" .
+		"mydestination =\n" .
+		"mynetworks_style = host\n";
 
 	conf_mount_rw();
 
