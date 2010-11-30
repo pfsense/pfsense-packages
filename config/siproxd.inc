@@ -173,7 +173,16 @@ function sync_package_siproxd() {
 		fwrite($fout, "proxy_auth_pwfile = /usr/local/etc/siproxd_passwd.cfg\n");
 	}
 
-	fwrite($fout, "debug_level = 0x00000000\n");
+	if($siproxd_conf['debug_level'] != "") {
+		fwrite($fout, "debug_level = " . $siproxd_conf['debug_level'] . "\n");
+	} else {
+		fwrite($fout, "debug_level = 0x00000000\n");
+	}
+
+	if($siproxd_conf['debug_port'] != "") {
+		fwrite($fout, "debug_port = " . $siproxd_conf['debug_port'] . "\n");
+	}
+
 	if($siproxd_conf['outboundproxyhost'] != "") {
 		if($siproxd_conf['outboundproxyport'] != "") {
 			fwrite($fout, "outbound_proxy_host = " . $siproxd_conf['outboundproxyhost'] . "\n");

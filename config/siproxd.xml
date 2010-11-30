@@ -288,6 +288,40 @@
 			<description>Period in seconds to request IP info from STUN server.</description>
 			<type>input</type>
 		</field>
+		<field>
+			<name>Debug Options</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Debug Level</fielddescr>
+			<fieldname>debug_level</fieldname>
+			<type>select</type>
+			<size>1</size>
+			<options>
+				<option><value>0x00000000</value><name>No Debug Info</name></option>
+				<option><value>0x00000001</value><name>babble (like entering/leaving func)</name></option>
+				<option><value>0x00000002</value><name>network</name></option>
+				<option><value>0x00000004</value><name>SIP manipulations</name></option>
+				<option><value>0x00000008</value><name>Client registration</name></option>
+				<option><value>0x00000010</value><name>non specified class</name></option>
+				<option><value>0x00000020</value><name>proxy</name></option>
+				<option><value>0x00000040</value><name>DNS stuff</name></option>
+				<option><value>0x00000080</value><name>network traffic</name></option>
+				<option><value>0x00000100</value><name>configuration</name></option>
+				<option><value>0x00000200</value><name>RTP proxy</name></option>
+				<option><value>0x00000400</value><name>Access list evaluation</name></option>
+				<option><value>0x00000800</value><name>Authentication</name></option>
+				<option><value>0x00001000</value><name>Plugins</name></option>
+				<option><value>0x00002000</value><name>RTP babble</name></option>
+				<option><value>-1</value><name>Everything</name></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>TCP Debug Port</fielddescr>
+			<fieldname>debug_port</fieldname>
+			<description>You may connect to this port from a remote machine and receive debug output. This allows better creation of debug output on embedded systems that do not have enough memory for large disk files. Port number 0 means this feature is disabled.</description>
+			<type>input</type>
+		</field>
 	</fields>
 	<custom_php_global_functions>
 	</custom_php_global_functions>
