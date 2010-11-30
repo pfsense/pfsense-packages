@@ -323,6 +323,21 @@
 			<logfilename>spamd.log</logfilename>
 		</logging>
 	</package>
+	<package>
+		<name>Postfix Forwarder</name>
+		<website>http://www.postfix.org/</website>
+		<descr>Postfix mail forwarder acts as a relay to send incoming mail to the designated mail server for each domain.</descr>
+		<category>Services</category>
+		<config_file>http://www.pfsense.com/packages/config/postfix/postfix.xml</config_file>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package>postfix-2.7.2%2c1.tbz</depends_on_package>
+		<version>2.7.2,1</version>
+		<status>Beta</status>
+		<required_version>2.0</required_version>
+		<configurationfile>postfix.xml</configurationfile>
+	  	<build_port_path>/usr/ports/mail/postfix</build_port_path>
+		<build_options>WITHOUT_PCRE=true</build_options>
+	</package>
     <package>
       <name>siproxd</name>
       <website>http://siproxd.sourceforge.net/</website>
