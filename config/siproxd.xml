@@ -302,4 +302,3 @@
 		validate_form_siproxd($_POST, &amp;$input_errors);
 	</custom_php_validation_command>
 </packagegui>
- 
