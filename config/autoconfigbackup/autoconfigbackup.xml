@@ -49,7 +49,7 @@
 		<url>/autoconfigbackup.php</url>
 	</menu>
 	<additional_files_needed>
-	    <prefix>/usr/local/pkg/parse_config/</prefix>
+	    <prefix>/usr/local/pkg/write_config/</prefix>
 	    <chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/autoconfigbackup/parse_config_upload.inc</item>
 	</additional_files_needed>
@@ -74,7 +74,7 @@
 		<item>http://www.pfsense.com/packages/config/autoconfigbackup/autoconfigbackup_backup.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
-	    <prefix>/usr/local/pkg/parse_config/</prefix>
+	    <prefix>/usr/local/pkg/write_config/</prefix>
 	    <chmod>0755</chmod>
 		<item>http://www.pfsense.com/packages/config/autoconfigbackup/parse_config_upload.php</item>
 	</additional_files_needed>
