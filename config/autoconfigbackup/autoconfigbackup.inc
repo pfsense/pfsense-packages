@@ -195,7 +195,7 @@ function upload_config($reasonm = "") {
 				curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);		
 				curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
 				curl_setopt($curl_session, CURLOPT_CONNECTTIMEOUT, 35);
-				curl_setopt($curl_session, CURLOPT_TIMEOUT, 60);
+				curl_setopt($curl_session, CURLOPT_TIMEOUT, 10);
 
 				$data = curl_exec($curl_session);
 				if (curl_errno($curl_session)) {
