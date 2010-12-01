@@ -194,6 +194,8 @@ function upload_config($reasonm = "") {
 				curl_setopt($curl_session, CURLOPT_POSTFIELDS, $fields_string);
 				curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);		
 				curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
+				curl_setopt($curl_session, CURLOPT_CONNECTTIMEOUT, 35);
+				
 				$data = curl_exec($curl_session);
 				if (curl_errno($curl_session)) {
 					$fd = fopen("/tmp/backupdebug.txt", "w");
