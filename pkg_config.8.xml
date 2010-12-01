@@ -330,7 +330,7 @@
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/postfix/postfix.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>postfix-2.7.2%2c1.tbz</depends_on_package>
+		<depends_on_package>postfix-2.7.2,1.tbz</depends_on_package>
 		<version>2.7.2,1</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
