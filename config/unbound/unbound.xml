@@ -6,8 +6,8 @@
 		<![CDATA[
 		/*
 		    unbound.xml
-		    part of pfSense (http://www.pfSense.com)
-		    Copyright (C) 2010 to whom it may belong
+		    part of the Unbound package for pfSense (http://www.pfSense.com)
+		    Copyright (C) 2010 Warren Baker
 		    All rights reserved.
 		                                                       						  */
 		/* ========================================================================== */
