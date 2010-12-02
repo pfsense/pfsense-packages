@@ -49,7 +49,6 @@ function unbound_initial_setup() {
 	// Touch needed files
 	@touch("/usr/local/etc/unbound/root.hints");
 	@touch("/usr/local/etc/unbound/root-trust-anchor");
-	@touch("{$g['varlog_path']}/unbound.log");
 	// Ensure files and folders belong to unbound
 	@chown("/usr/local/etc/unbound/root-trust-anchor", "unbound");
 	@chgrp("/usr/local/etc/unbound/root-trust-anchor", "wheel");
