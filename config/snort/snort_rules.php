@@ -411,8 +411,8 @@ $currentruleset = basename($rulefile);
 
 $ifname = strtoupper($pconfig['interface']);
 
-require("guiconfig.inc");
-include("/usr/local/pkg/snort/snort_head.inc");
+require_once("guiconfig.inc");
+include_once("/usr/local/pkg/snort/snort_head.inc");
 
 $pgtitle = "Snort: $id $iface_uuid $if_real Category: $currentruleset";
 
