@@ -975,6 +975,11 @@
       <depends_on_package>openssl-1.0.0_2.tbz</depends_on_package>
 	<build_port_path>/usr/ports/dns/unbound</build_port_path>
 	<build_options>WITHOUT_MAN=true</build_options>
+      <logging>
+        <facilityname>unbound</facilityname>
+        <logfilename>unbound.log</logfilename>
+		<logtab>Unbound</logtab>
+      </logging>
     </package>
 	<package>
 		<name>Shellcmd</name>

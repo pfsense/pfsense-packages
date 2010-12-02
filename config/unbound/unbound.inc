@@ -31,7 +31,7 @@ if(!function_exists("get_nameservers"))
 	
 
 function unbound_initial_setup() {
-	global $config;
+	global $config, $g;
 
 	if (!array($config['installedpackages']['unbound']['config']))
 		$config['installedpackages']['unbound']['config'] = array();
@@ -49,10 +49,12 @@ function unbound_initial_setup() {
 	// Touch needed files
 	@touch("/usr/local/etc/unbound/root.hints");
 	@touch("/usr/local/etc/unbound/root-trust-anchor");
+	@touch("{$g['varlog_path']}/unbound.log");
 	// Ensure files and folders belong to unbound
 	@chown("/usr/local/etc/unbound/root-trust-anchor", "unbound");
 	@chgrp("/usr/local/etc/unbound/root-trust-anchor", "wheel");
 	@chmod("/usr/local/etc/unbound/root-trust-anchor", 0600);
+	@chown("{$g['varlog_path']}/unbound.log", "unbound");
 	// We do not need the sample conf or the default rc.d startup file
 	@unlink_if_exists("/usr/local/etc/unbound/unbound.conf.sample");
 	@unlink_if_exists("/usr/local/etc/rc.d/unbound");
@@ -274,9 +276,6 @@ function unbound_resync_config() {
 	 */
 	$unbound_config['harden-dnssec-stripped'] = "yes";
 	
-	// Syslog logging
-	$unbound_config['use-syslog'] = "yes";
-	
 	// Host entries
 	$host_entries = unbound_add_host_entries();
 	
@@ -299,7 +298,7 @@ do-ip6: no
 do-udp: yes
 do-tcp: yes
 do-daemonize: yes
-statistics-interval: 300
+statistics-interval: 3600
 extended-statistics: yes
 statistics-cumulative: no
 # Interface IP(s) to bind to
@@ -307,7 +306,7 @@ statistics-cumulative: no
 chroot: ""
 username: "unbound"
 directory: "/usr/local/etc/unbound"
-pidfile: "/var/run/unbound.pid"
+pidfile: "{$g['varrun_path']}/unbound.pid"
 root-hints: "root.hints"
 harden-dnssec-stripped: {$unbound_config['harden-dnssec-stripped']}
 harden-referral-path: no
@@ -316,7 +315,7 @@ private-address: 172.16.0.0/12
 private-address: 192.168.0.0/16
 prefetch: yes
 prefetch-key: yes
-use-syslog: {$unbound_config['use-syslog']}
+use-syslog: yes
 module-config: "{$module_config}"
 unwanted-reply-threshold: 10000000
 {$anchor_file}
@@ -409,6 +408,7 @@ function unbound_uninstall() {
 	// Remove pkg config directory and startup file
 	mwexec("rm -rf /usr/local/etc/unbound");
 	mwexec("rm -f /usr/local/etc/rc.d/unbound.sh");
+	mwexec("rm -f {$g['varlog_path']}/unbound.log");
 
 	// Remove unbound user
 	exec("/usr/sbin/pw userdel unbound");
