@@ -118,6 +118,45 @@
 			<type>checkbox</type>
 			<default_value>on</default_value>
 		</field>
+		<field>
+			<fieldname>stats</fieldname>
+			<fielddescr>Enable Statistics</fielddescr>
+			<description>Unbound will log the number of queries that the resolver handles.</description>
+			<type>checkbox</type>
+			<enablefields>stats_interval,cumulative_stats,extended_stats</enablefields>
+		</field>
+		<field>
+			<fieldname>stats_interval</fieldname>
+			<fielddescr>Statistics Interval</fielddescr>
+			<description>Select the time as to when statistics will be written to the Unbound log file.</description>
+			<type>select</type>
+			<default_value>3600</default_value>
+			<options>
+				<option><name>5 minutes</name><value>300</value></option>
+				<option><name>10 minutes</name><value>600</value></option>
+				<option><name>20 minutes</name><value>1200</value></option>
+				<option><name>30 minutes</name><value>2400</value></option>
+				<option><name>1 hour</name><value>3600</value></option>
+				<option><name>2 hours</name><value>7200</value></option>
+			</options>
+		</field>
+		<field>
+			<fieldname>cumulative_stats</fieldname>
+			<fielddescr>Enable Cumulative Statistics</fielddescr>
+			<description>Once unbound is started, the statistics collected are cumulative and are not cleared after each report has been logged.</description>
+			<type>select</type>
+			<default_value>no</default_value>
+			<options>
+				<option><name>No</name><value>no</value></option>
+				<option><name>Yes</name><value>yes</value></option>
+			</options>
+		</field>
+		<field>
+			<fieldname>extended_stats</fieldname>
+			<fielddescr>Enable Extended Statistics</fielddescr>
+			<description>In addition to collecting the total number of queries also collect what type of queries are handled by the resolver.</description>
+			<type>checkbox</type>
+		</field>
 	</fields>
 	<custom_add_php_command>
 	</custom_add_php_command>

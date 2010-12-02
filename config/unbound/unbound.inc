@@ -49,11 +49,11 @@ function unbound_initial_setup() {
 	// Touch needed files
 	@touch("/usr/local/etc/unbound/root.hints");
 	@touch("/usr/local/etc/unbound/root-trust-anchor");
+	@touch("{$g['varlog_path']}/unbound.log");
 	// Ensure files and folders belong to unbound
 	@chown("/usr/local/etc/unbound/root-trust-anchor", "unbound");
 	@chgrp("/usr/local/etc/unbound/root-trust-anchor", "wheel");
 	@chmod("/usr/local/etc/unbound/root-trust-anchor", 0600);
-	@chown("{$g['varlog_path']}/unbound.log", "unbound");
 	// We do not need the sample conf or the default rc.d startup file
 	@unlink_if_exists("/usr/local/etc/unbound/unbound.conf.sample");
 	@unlink_if_exists("/usr/local/etc/rc.d/unbound");
@@ -281,6 +281,20 @@ function unbound_resync_config() {
 	// Domain Overrides
 	$domain_overrides = unbound_add_domain_overrides();
 	
+	// Unbound Statistics
+	if($unbound_config['stats'] == "on") {
+		$stats_interval = $unbound_config['stats_interval'];
+		$cumulative_stats = $unbound_config['cumulative_stats'];
+		if ($unbound_config['extended_stats'] == "on")
+			$extended_stats = "yes";
+		else
+			$extended_stats = "no";	
+	} else {
+		$stats_interval = "0";
+		$cumulative_stats = "no";
+		$extended_stats = "no";
+	}
+	
 	$unbound_conf = <<<EOD
 #########################
 # Unbound configuration #
@@ -297,9 +311,9 @@ do-ip6: no
 do-udp: yes
 do-tcp: yes
 do-daemonize: yes
-statistics-interval: 3600
-extended-statistics: yes
-statistics-cumulative: no
+statistics-interval: {$stats_interval}
+extended-statistics: {$extended_stats}
+statistics-cumulative: {$cumulative_stats}
 # Interface IP(s) to bind to
 {$unbound_bind_interfaces}
 chroot: ""
