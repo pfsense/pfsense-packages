@@ -49,7 +49,7 @@
 		<name>Postfix Forwarder</name>
 		<tooltiptext>Configure Postfix Forwarder</tooltiptext>
 		<section>Services</section>
-		<configfile>postfix.xml</configfile>
+		<url>pkg_edit.php?xml=postfix.xml&amp;id=0</url>
 	</menu>
 	<service>
 		<name>postfix</name>
