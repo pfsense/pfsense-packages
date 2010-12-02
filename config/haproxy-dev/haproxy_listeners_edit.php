@@ -446,8 +446,8 @@ include("head.inc");
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if($one_two): ?>
 <p class="pgtitle"><?=$pgtitle?></p>
-<form action="haproxy_listeners_edit.php" method="post" name="iform" id="iform">
 <?php endif; ?>
+<form action="haproxy_listeners_edit.php" method="post" name="iform" id="iform">
 	<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<tr>
 			<td colspan="2" valign="top" class="listtopic">Edit haproxy listener</td>
