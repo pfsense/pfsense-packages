@@ -590,14 +590,14 @@
       <descr>Network UPS Tools</descr>
       <website>http://www.networkupstools.org/</website>
       <category>Network Management</category>
-      <version>2.2.2_3b</version>
+      <version>2.2.2_5</version>
       <status>BETA</status>
       <required_version>2.0</required_version>
       <maintainer>rswagoner@gmail.com</maintainer>
       <config_file>http://www.pfsense.com/packages/config/nut/nut.xml</config_file>
       <configurationfile>nut.xml</configurationfile>
       <depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-      <depends_on_package>nut-2.2.2_3.tbz</depends_on_package>
+      <depends_on_package>nut-2.2.2_5.tbz</depends_on_package>
 	<build_port_path>/usr/ports/sysutils/nut22</build_port_path>
       <pkginfolink>http://doc.pfsense.org/index.php/Nut_package</pkginfolink>
     </package>
