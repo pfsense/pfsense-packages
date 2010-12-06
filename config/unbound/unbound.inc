@@ -429,27 +429,76 @@ function unbound_uninstall() {
 
 }
 
+
 /* Setup /etc/hosts entries by overriding with local-data
  */
 function unbound_add_host_entries() {
 	global $config;
 
-	if (isset($config['dnsmasq']['hosts'])) {
-		$hosts = $config['dnsmasq']['hosts'];
+	$unboundcfg = $config['installedpackages']['unbound']['config'][0];
+	$syscfg = $config['system'];
+	$dnsmasqcfg = $config['dnsmasq'];
+	
+	$unbound_entries = "local-zone: \"{$syscfg['domain']}\" transparent\n";
+	// IPv4 entries
+	$unbound_entries .= "local-data-ptr: \"127.0.0.1 localhost\"\n";
+	$unbound_entries .= "local-data: \"localhost A 127.0.0.1\"\n";
+	$unbound_entries .= "local-data: \"localhost.{$syscfg['domain']} A 127.0.0.1\"\n";
+	
+	if ($config['interfaces']['lan']) {
+		$cfgip = get_interface_ip("lan");
+		if (is_ipaddr($cfgip)) {
+			$unbound_entries .= "local-data-ptr: \"{$cfgip} {$syscfg['hostname']}.{$syscfg['domain']}\"\n";
+			$unbound_entries .= "local-data: \"{$syscfg['hostname']}.{$syscfg['domain']} A {$cfgip}\"\n";
+			$unbound_entries .= "local-data: \"{$syscfg['hostname']} A {$cfgip}\"\n";
+		}
+	} else {
+		$sysiflist = get_configured_interface_list();
+		foreach ($sysiflist as $sysif) {
+			if (!interface_has_gateway($sysif)) {
+				$cfgip = get_interface_ip($sysif);
+				if (is_ipaddr($cfgip)) {
+					$unbound_entries .= "local-data-ptr: \"{$cfgip} {$syscfg['hostname']}.{$syscfg['domain']}\"\n";
+					$unbound_entries .= "local-data: \"{$syscfg['hostname']}.{$syscfg['domain']} A {$cfgip}\"\n";
+					$unbound_entries .= "local-data: \"{$syscfg['hostname']} A {$cfgip}\"\n";
+					break;
+				}
+			}
+		}
+	}
+
+	// DNSMasq entries static host entries
+	if (isset($dnsmasqcfg['hosts'])) {
+		$hosts = $dnsmasqcfg['hosts'];
 		$host_entries = "";
 		$added_item = array();
 		foreach ($hosts as $host) {
 			$current_host = $host['host'];
 			if(!$added_item[$current_host]) {
-				$host_entries .= "local-data: '{$host['host']}.{$host['domain']}. IN A {$host['ip']}'\n";
+				$host_entries .= "local-data-ptr: \"{$host['ip']} {$host['host']}.{$host['domain']}\"\n";
+				$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} IN A {$host['ip']}\"\n";
 				if (!empty($host['descr']))
-					$host_entries .= "local-data: '{$host['host']}.{$host['domain']}. TXT \"{$host['descr']}\"'\n";
+					$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} TXT '{$host['descr']}'\"\n";
 				// Do not add duplicate entries
 				$added_item[$current_host] = true;
 			}
 		}
-		return $host_entries;	
+		$unbound_entries .= $host_entries;	
 	}
+	// Static DHCP entries
+	if (isset($unboundcfg['regdhcpstatic']) && is_array($config['dhcpd'])) {
+		foreach ($config['dhcpd'] as $dhcpif => $dhcpifconf)
+			if(is_array($dhcpifconf['staticmap']) && isset($dhcpifconf['enable']))
+				foreach ($dhcpifconf['staticmap'] as $host)
+					if ($host['ipaddr'] && $host['hostname']) {
+						$static_dhcp_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['hostname']}.{$syscfg['domain']}\"\n";
+						$static_dhcp_entries .= "local-data: \"{$host['hostname']}.{$syscfg['domain']} IN A {$host['ipaddr']}\"\n";
+						if (!empty($host['descr']))
+							$static_dhcp_entries .= "local-data: \"{$host['hostname']}.{$syscfg['domain']} TXT '{$host['descr']}'\"\n";
+					}
+		$unbound_entries .= $static_dhcp_entries;
+    }
+	return $unbound_entries;
 }
 
 /* Setup any domain overrides that have been configured with local-zone
@@ -480,7 +529,7 @@ function unbound_add_domain_overrides() {
 			}
 		}
 		return $domain_entries;
-	}
+	}	
 }
 
 ?>
