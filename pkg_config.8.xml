@@ -377,7 +377,8 @@
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>openospfd-4.6.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/openospfd/openospfd.xml</config_file>
-	  <build_port_path>/usr/ports/net/openospfd</build_port_path>
+	<build_port_path>/usr/ports/net/openospfd</build_port_path>
+	<build_port_path>/usr/ports/devel/libevent</build_port_path>
       <pkginfolink></pkginfolink>
       <required_version>1.2.1</required_version>
       <configurationfile>openospfd.xml</configurationfile>
