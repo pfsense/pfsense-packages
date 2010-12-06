@@ -229,10 +229,12 @@ function unbound_get_network_interface_addresses($subnet=false, $mask=false) {
 			$unbound_interfaces[] = $network;
 			// Check for CARP addresses and also return those
 			if (isset($config['virtualip'])) {
-				foreach($config['virtualip']['vip'] as $vip) {
-					if (($vip['interface'] == $unboundif) && ($vip['mode'] == "carp")) {
-						$virtual_ip = find_interface_ip(link_ip_to_carp_interface($vip['subnet']));
-						$unbound_interfaces[] = $virtual_ip;
+				if(is_array($config['virtualip']['vip'])) {
+					foreach($config['virtualip']['vip'] as $vip) {
+						if (($vip['interface'] == $unboundif) && ($vip['mode'] == "carp")) {
+							$virtual_ip = find_interface_ip(link_ip_to_carp_interface($vip['subnet']));
+							$unbound_interfaces[] = $virtual_ip;
+						}
 					}
 				}
 			}
@@ -429,12 +431,36 @@ function unbound_uninstall() {
 
 }
 
+function read_hosts() {
+	
+	// Open /etc/hosts and extract the only dhcpleases info
+	$etc_hosts = array();
+   	foreach (file('/etc/hosts') as $line) {
+		$d = preg_split('/\s/', $line, -1, PREG_SPLIT_NO_EMPTY);
+		if (empty($d) || substr(reset($d), 0, 1) == "#")
+			continue;
+		if ($d[3] == "#") {
+			$ip = array_shift($d);
+			$fqdn = array_shift($d);
+			$name = array_shift($d);
+			if ($fqdn != "empty") {
+				if ($name != "empty")
+					array_push($etc_hosts, array(ipaddr => "$ip", fqdn => "$fqdn", name => "$name"));
+				else
+					array_push($etc_hosts, array(ipaddr => "$ip", fqdn => "$fqdn"));
+			}
+		}
+	}
+	return $etc_hosts;
+}
 
 /* Setup /etc/hosts entries by overriding with local-data
  */
 function unbound_add_host_entries() {
 	global $config;
-
+	
+	/* XXX: break this out into a separate config file and make use of include */
+	
 	$unboundcfg = $config['installedpackages']['unbound']['config'][0];
 	$syscfg = $config['system'];
 	$dnsmasqcfg = $config['dnsmasq'];
@@ -486,18 +512,34 @@ function unbound_add_host_entries() {
 		$unbound_entries .= $host_entries;	
 	}
 	// Static DHCP entries
+	$host_entries = "";
 	if (isset($unboundcfg['regdhcpstatic']) && is_array($config['dhcpd'])) {
 		foreach ($config['dhcpd'] as $dhcpif => $dhcpifconf)
 			if(is_array($dhcpifconf['staticmap']) && isset($dhcpifconf['enable']))
 				foreach ($dhcpifconf['staticmap'] as $host)
 					if ($host['ipaddr'] && $host['hostname']) {
-						$static_dhcp_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['hostname']}.{$syscfg['domain']}\"\n";
-						$static_dhcp_entries .= "local-data: \"{$host['hostname']}.{$syscfg['domain']} IN A {$host['ipaddr']}\"\n";
+						$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['hostname']}.{$syscfg['domain']}\"\n";
+						$host_entries .= "local-data: \"{$host['hostname']}.{$syscfg['domain']} IN A {$host['ipaddr']}\"\n";
 						if (!empty($host['descr']))
-							$static_dhcp_entries .= "local-data: \"{$host['hostname']}.{$syscfg['domain']} TXT '{$host['descr']}'\"\n";
+							$host_entries .= "local-data: \"{$host['hostname']}.{$syscfg['domain']} TXT '{$host['descr']}'\"\n";
 					}
-		$unbound_entries .= $static_dhcp_entries;
+		$unbound_entries .= $host_entries;
     }
+
+	// Handle DHCPLeases added host entries
+	$dhcplcfg = read_hosts();
+	$host_entries = "";
+	if(is_array($dhcplcfg)) {
+		foreach($dhcplcfg as $key=>$host) {
+			$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['fqdn']}\"\n";
+			$host_entries .= "local-data: \"{$host['fqdn']} IN A {$host['ipaddr']}\"\n";
+			if (!empty($host['name'])) {
+				$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['name']}\"\n";
+				$host_entries .= "local-data: \"{$host['name']} IN A {$host['ipaddr']}\"\n";
+			}
+		}
+		$unbound_entries .= $host_entries;
+	}
 	return $unbound_entries;
 }
 
