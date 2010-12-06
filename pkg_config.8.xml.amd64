@@ -995,6 +995,7 @@
         	<logfilename>unbound.log</logfilename>
 			<logtab>Unbound</logtab>
 		</logging>
+		<after_install_info>Note: if your DHCP server makes use of pfSense as the DNS server, then you will now need to add the IP address of the respective interface to the DNS servers field, in the DHCP server configuration page.</after_install_info>
    </package>
 	<package>
 		<name>Shellcmd</name>
