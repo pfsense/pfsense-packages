@@ -120,7 +120,7 @@
       <category>FTP</category>
       <config_file>http://www.pfsense.com/packages/config/pure-ftpd.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-      <depends_on_package>pure-ftpd-1.0.20_3.tbz</depends_on_package>
+      <depends_on_package>pure-ftpd-1.0.29_1.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/ftp/pure-ftpd</build_port_path>
       <version>1.0.21</version>
       <status>Stable</status>
@@ -155,9 +155,9 @@
       <descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
       <category>Network Management</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-      <depends_on_package>ntop-3.3.10.tbz</depends_on_package>
+      <depends_on_package>ntop-3.3.10_7.tbz</depends_on_package>
       <depends_on_package>gdbm-1.8.3_3.tbz</depends_on_package>
-      <depends_on_package>perl-5.8.9_3.tbz</depends_on_package>
+      <depends_on_package>perl-5.10.1_3.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/net/ntop</build_port_path>
 	  <build_port_path>/usr/ports/databases/gdbm</build_port_path>
 	  <build_port_path>/usr/ports/lang/perl5.10</build_port_path>
@@ -292,7 +292,7 @@
       <category>Security</category>
       <depends_on_package_base_url>http://www.pfsense.com/packages/config/snort/bin/8.1x86/</depends_on_package_base_url>
 	  <depends_on_package>pcre-8.10.tbz</depends_on_package>
-      <depends_on_package>mysql-client-5.1.50_1.tbz</depends_on_package>
+      <depends_on_package>mysql-client-5.1.53.tbz</depends_on_package>
 	  <depends_on_package>snort-2.8.6.1.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/devel/pcre</build_port_path>
 	  <build_port_path>/usr/ports/lang/perl5.10</build_port_path>
@@ -312,7 +312,7 @@
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/spamd/spamd.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>spamd-4.5.0_3.tbz</depends_on_package>
+		<depends_on_package>spamd-4.5.0_4.tbz</depends_on_package>
 		<version>4.5.0_4</version>
 		<status>Beta</status>
 		<required_version>1.2.1</required_version>
@@ -391,8 +391,8 @@
       <version>1.8.0</version>
       <maintainer>dv_serg@mail.ru</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-      <depends_on_package>lightsquid-1.8.tbz</depends_on_package>
-      <depends_on_package>perl-5.10.1_1.tbz</depends_on_package>
+      <depends_on_package>lightsquid-1.8_2.tbz</depends_on_package>
+      <depends_on_package>perl-5.10.1_3.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/www/lightsquid</build_port_path>
 	  <build_port_path>/usr/ports/lang/perl5.10</build_port_path>
       <status>Beta</status>
@@ -429,7 +429,7 @@
       <required_version>1.0</required_version>
       <maximum_version>1.2.3</maximum_version>
       <depends_on_package_base_url>http://www.pfsense.com/packages/config/phpsysinfo/bin/</depends_on_package_base_url>
-      <depends_on_package>mbmon-205_4.tbz</depends_on_package>
+      <depends_on_package>mbmon-205_5.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/sysutils/mbmon</build_port_path>
       <config_file>http://www.pfsense.com/packages/config/phpsysinfo/phpsysinfo.xml</config_file>
       <configurationfile>phpsysinfo.xml</configurationfile>
@@ -471,17 +471,17 @@
       <depends_on_package>open-vm-tools-nox11-217847_1.tbz</depends_on_package>
       <depends_on_package>fusefs-kmod-0.3.9.p1.20080208_6.tbz</depends_on_package>
       <depends_on_package>fusefs-libs-2.7.4.tbz</depends_on_package>
-      <depends_on_package>gettext-0.17_1.tbz</depends_on_package>
+      <depends_on_package>gettext-0.18.1.1.tbz</depends_on_package>
       <depends_on_package>glib-2.22.4.tbz</depends_on_package>
-      <depends_on_package>gmake-3.81_3.tbz</depends_on_package>
+      <depends_on_package>gmake-3.81_4.tbz</depends_on_package>
       <depends_on_package>icu-3.8.1_2.tbz</depends_on_package>
       <depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
       <depends_on_package>libiconv-1.13.1_1.tbz</depends_on_package>
       <depends_on_package>libtool-2.2.6b.tbz</depends_on_package>
-      <depends_on_package>pcre-8.00.tbz</depends_on_package>
-      <depends_on_package>perl-5.10.1.tbz</depends_on_package>
-      <depends_on_package>pkg-config-0.23_1.tbz</depends_on_package>
-      <depends_on_package>python26-2.6.4.tbz</depends_on_package>
+      <depends_on_package>pcre-8.10.tbz</depends_on_package>
+      <depends_on_package>perl-5.10.1_3.tbz</depends_on_package>
+      <depends_on_package>pkg-config-0.25_1.tbz</depends_on_package>
+      <depends_on_package>python26-2.6.5_1.tbz</depends_on_package>
       <depends_on_package>ruby+oniguruma-1.8.7.248,1.tbz</depends_on_package>
       <depends_on_package>ruby18-deplate-0.8.5.tbz</depends_on_package>
       <depends_on_package>unzip-6.0.tbz</depends_on_package>
@@ -520,7 +520,7 @@
       <descr>NMap is a utility for network exploration or security auditing. It supports ping scanning (determine which hosts are up), many port scanning techniques (determine what services the hosts are offering), version detection (determine what application/service is runing on a port), and TCP/IP fingerprinting (remote host OS or device identification). It also offers flexible target and port specification, decoy/stealth scanning, SunRPC scanning, and more. Most Unix and Windows platforms are supported in both GUI and command line modes. Several popular handheld devices are also supported, including the Sharp Zaurus and the iPAQ.</descr>
       <category>Security</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-      <depends_on_package>nmap-5.00.tbz</depends_on_package>
+      <depends_on_package>nmap-5.35.d1.tbz</depends_on_package>
       <config_file>http://www.pfsense.com/packages/config/nmap/nmap.xml</config_file>
       <version>5.00</version>
       <status>Stable</status>
@@ -543,9 +543,9 @@
       <configurationfile>imspector.xml</configurationfile>
       <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
       <depends_on_package>imspector-0.8.tbz</depends_on_package>
-      <depends_on_package>libiconv-1.11_1.tbz</depends_on_package>
-      <depends_on_package>mysql-client-5.0.27.tbz</depends_on_package>
-      <depends_on_package>sqlite3-3.3.7.tbz</depends_on_package>
+      <depends_on_package>libiconv-1.13.1_1.tbz</depends_on_package>
+      <depends_on_package>mysql-client-5.1.53.tbz</depends_on_package>
+      <depends_on_package>sqlite3-3.7.3_1.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/net-im/imspector</build_port_path>
 	  <build_port_path>/usr/ports/converters/libiconv</build_port_path>
 	  <build_port_path>/usr/ports/databases/mysql50-client</build_port_path>
@@ -707,7 +707,7 @@
       <website>http://www.bitwizard.nl/mtr/</website>
       <category>Network Management</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-      <depends_on_package>mtr-nox11-0.73_1.tbz</depends_on_package>
+      <depends_on_package>mtr-nox11-0.80.tbz</depends_on_package>
       <version>0.65_2</version>
       <status>Stable</status>
       <required_version>2.0</required_version>
