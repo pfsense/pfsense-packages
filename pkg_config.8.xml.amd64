@@ -773,12 +773,12 @@
       <descr>LCD display driver</descr>
       <website>http://www.lcdproc.org/</website>
       <category>Utility</category>
-      <version>lcdproc-0.5.3</version>
+      <version>lcdproc-0.5.3_1</version>
       <status>BETA</status>
       <required_version>1.2.1</required_version>
       <maintainer>seth.mos@xs4all.nl</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-      <depends_on_package>lcdproc-0.5.3.tbz</depends_on_package>
+      <depends_on_package>lcdproc-0.5.3_1.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
       <configurationfile>lcdproc.xml</configurationfile>
 	<build_port_path>/usr/ports/sysutils/lcdproc</build_port_path>
