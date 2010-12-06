@@ -767,6 +767,8 @@
       <depends_on_package>lcdproc-0.5.2_2.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/lcdproc/lcdproc.xml</config_file>
       <configurationfile>lcdproc.xml</configurationfile>
+	<build_port_path>/usr/ports/sysutils/lcdproc</build_port_path>
+	<build_options>WITH_USB=true</build_options>
     </package>
     <package>
       <name>arpwatch</name>
