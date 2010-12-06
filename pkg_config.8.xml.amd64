@@ -417,7 +417,7 @@
       <pkginfolink></pkginfolink>
       <required_version>1.2.1</required_version>
       <configurationfile>openospfd.xml</configurationfile>
-      <depends_on_package>libevent-1.4.13.tbz</depends_on_package>
+      <depends_on_package>libevent-1.4.14b_1.tbz</depends_on_package>
     </package>
     <package>
       <name>Lightsquid</name>
