@@ -469,23 +469,7 @@
       <configurationfile>open-vm-tools.xml</configurationfile>
 	<build_port_path>/usr/ports/emulators/open-vm-tools-nox11/</build_port_path>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-      <depends_on_package>open-vm-tools-nox11-217847_1.tbz</depends_on_package>
-      <depends_on_package>fusefs-kmod-0.3.9.p1.20080208_6.tbz</depends_on_package>
-      <depends_on_package>fusefs-libs-2.7.4.tbz</depends_on_package>
-      <depends_on_package>gettext-0.18.1.1.tbz</depends_on_package>
-      <depends_on_package>glib-2.22.4.tbz</depends_on_package>
-      <depends_on_package>gmake-3.81_4.tbz</depends_on_package>
-      <depends_on_package>icu-3.8.1_2.tbz</depends_on_package>
-      <depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
-      <depends_on_package>libiconv-1.13.1_1.tbz</depends_on_package>
-      <depends_on_package>libtool-2.2.6b.tbz</depends_on_package>
-      <depends_on_package>pcre-8.10.tbz</depends_on_package>
-      <depends_on_package>perl-5.10.1_3.tbz</depends_on_package>
-      <depends_on_package>pkg-config-0.25_1.tbz</depends_on_package>
-      <depends_on_package>python26-2.6.5_1.tbz</depends_on_package>
-      <depends_on_package>ruby+oniguruma-1.8.7.248,1.tbz</depends_on_package>
-      <depends_on_package>ruby18-deplate-0.8.5.tbz</depends_on_package>
-      <depends_on_package>unzip-6.0.tbz</depends_on_package>
+      <depends_on_package>open-vm-tools-nox11-313025_1.tbz</depends_on_package>
     </package>
     <package>
       <name>AutoConfigBackup</name>
