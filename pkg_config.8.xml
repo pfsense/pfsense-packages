@@ -820,6 +820,7 @@
       <required_version>1.2.3</required_version>
       <configurationfile>zabbix-agent.xml</configurationfile>
       <maintainer>remco.verhoef@redfive.biz</maintainer>
+	<build_port_path>/usr/ports/net-mgmt/zabbix-agent</build_port_path>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>zabbix-agent-1.8.2_2,2.tbz</depends_on_package>
     </package>
