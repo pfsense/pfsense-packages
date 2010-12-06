@@ -598,6 +598,7 @@
       <configurationfile>nut.xml</configurationfile>
       <depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
       <depends_on_package>nut-2.2.2_3.tbz</depends_on_package>
+	<build_port_path>/usr/ports/sysutils/nut22</build_port_path>
       <pkginfolink>http://doc.pfsense.org/index.php/Nut_package</pkginfolink>
     </package>
     <package>
