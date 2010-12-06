@@ -504,7 +504,8 @@ function unbound_add_host_entries() {
 				$host_entries .= "local-data-ptr: \"{$host['ip']} {$host['host']}.{$host['domain']}\"\n";
 				$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} IN A {$host['ip']}\"\n";
 				if (!empty($host['descr']))
-					$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} TXT '{$host['descr']}'\"\n";
+					$host_entries .= "local-data: '{$host['host']}.{$host['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
+					
 				// Do not add duplicate entries
 				$added_item[$current_host] = true;
 			}
@@ -521,7 +522,7 @@ function unbound_add_host_entries() {
 						$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['hostname']}.{$syscfg['domain']}\"\n";
 						$host_entries .= "local-data: \"{$host['hostname']}.{$syscfg['domain']} IN A {$host['ipaddr']}\"\n";
 						if (!empty($host['descr']))
-							$host_entries .= "local-data: \"{$host['hostname']}.{$syscfg['domain']} TXT '{$host['descr']}'\"\n";
+							$host_entries .= "local-data: '{$host['hostname']}.{$syscfg['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
 					}
 		$unbound_entries .= $host_entries;
     }
