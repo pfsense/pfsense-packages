@@ -89,6 +89,9 @@ function test_connection($post) {
 	curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
 	curl_setopt($curl_session, CURLOPT_POST, 1);
 	curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);
+	curl_setopt($curl_session, CURLOPT_CONNECTTIMEOUT, 55);
+	curl_setopt($curl_session, CURLOPT_TIMEOUT, 30);
+
 	curl_setopt($curl_session, CURLOPT_POSTFIELDS, "action=showbackups&hostname={$hostname}");
 	$data = curl_exec($curl_session);
 
@@ -194,8 +197,8 @@ function upload_config($reasonm = "") {
 				curl_setopt($curl_session, CURLOPT_POSTFIELDS, $fields_string);
 				curl_setopt($curl_session, CURLOPT_RETURNTRANSFER, 1);		
 				curl_setopt($curl_session, CURLOPT_SSL_VERIFYPEER, 0);
-				curl_setopt($curl_session, CURLOPT_CONNECTTIMEOUT, 35);
-				curl_setopt($curl_session, CURLOPT_TIMEOUT, 10);
+				curl_setopt($curl_session, CURLOPT_CONNECTTIMEOUT, 55);
+				curl_setopt($curl_session, CURLOPT_TIMEOUT, 30);
 
 				$data = curl_exec($curl_session);
 				if (curl_errno($curl_session)) {
