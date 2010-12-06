@@ -34,8 +34,8 @@
 		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>varnish-2.1.tbz</depends_on_package>
-		<depends_on_package>gcc-4.2.5.20090325_3.tbz</depends_on_package>
+		<depends_on_package>varnish-2.1.4_1.tbz</depends_on_package>
+		<depends_on_package>gcc-4.2.5.20090325_5.tbz</depends_on_package>
 		<build_port_path>/usr/ports/www/varnish</build_port_path>
 		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
 	</package>
@@ -506,16 +506,16 @@
       <depends_on_package>open-vm-tools-313025_1.tbz</depends_on_package>
       <depends_on_package>fusefs-kmod-0.3.9.p1.20080208_7.tbz</depends_on_package>
       <depends_on_package>fusefs-libs-2.7.4.tbz</depends_on_package>
-      <depends_on_package>gettext-0.17_1.tbz</depends_on_package>
+      <depends_on_package>gettext-0.18.1.1.tbz</depends_on_package>
       <depends_on_package>glib-2.24.2.tbz</depends_on_package>
-      <depends_on_package>gmake-3.81_3.tbz</depends_on_package>
+      <depends_on_package>gmake-3.81_4.tbz</depends_on_package>
       <depends_on_package>icu-3.8.1_3.tbz</depends_on_package>
       <depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
       <depends_on_package>libiconv-1.13.1_1.tbz</depends_on_package>
-      <depends_on_package>libtool-2.2.6b.tbz</depends_on_package>
+      <depends_on_package>libtool-2.2.10.tbz</depends_on_package>
       <depends_on_package>pcre-8.10.tbz</depends_on_package>
       <depends_on_package>perl-5.10.1_3.tbz</depends_on_package>
-      <depends_on_package>pkg-config-0.23_1.tbz</depends_on_package>
+      <depends_on_package>pkg-config-0.25_1.tbz</depends_on_package>
       <depends_on_package>python26-2.6.6.tbz</depends_on_package>
       <depends_on_package>ruby18-deplate-0.8.5.tbz</depends_on_package>
       <depends_on_package>unzip-6.0.tbz</depends_on_package>
@@ -667,8 +667,8 @@
       <required_version>2.0</required_version>
       <maintainer>none</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-      <depends_on_package>freeradius-1.1.8.tbz</depends_on_package>
-      <depends_on_package>libltdl-2.2.6b.tbz</depends_on_package>
+      <depends_on_package>freeradius-1.1.8_2.tbz</depends_on_package>
+      <depends_on_package>libltdl-2.2.10.tbz</depends_on_package>
       <config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
       <configurationfile>freeradius.xml</configurationfile>
 	  <build_port_path>/usr/ports/net/freeradius</build_port_path>
@@ -696,7 +696,7 @@
       <descr>An SSL encryption wrapper between remote client and local or remote servers. </descr>
       <category>Network Management</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-      <depends_on_package>stunnel-4.34.tbz</depends_on_package>
+      <depends_on_package>stunnel-4.34_1.tbz</depends_on_package>
       <version>4.34</version>
       <status>Stable</status>
       <pkginfolink>http://doc.pfsense.org/index.php/Stunnel_package</pkginfolink>
@@ -712,7 +712,7 @@
       <category>Network Management</category>
       <config_file>http://www.pfsense.com/packages/config/iperf.xml</config_file>
       <depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-      <depends_on_package>iperf-2.0.4.tbz</depends_on_package>
+      <depends_on_package>iperf-2.0.5.tbz</depends_on_package>
       <version>2.0.2_1</version>
       <status>Beta</status>
       <pkginfolink>http://doc.pfsense.org/index.php/Iperf_package</pkginfolink>
@@ -987,7 +987,7 @@
 	  <depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
       <depends_on_package>unbound-1.4.7.tbz</depends_on_package>
       <depends_on_package>expat-2.0.1_1.tbz</depends_on_package>
-      <depends_on_package>openssl-1.0.0_2.tbz</depends_on_package>
+      <depends_on_package>openssl-1.0.0_3.tbz</depends_on_package>
         <build_port_path>/usr/ports/dns/unbound</build_port_path>
         <build_options>WITHOUT_MAN=true</build_options>
 		<logging>
