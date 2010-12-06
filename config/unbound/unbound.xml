@@ -118,6 +118,22 @@
 			<type>checkbox</type>
 			<default_value>on</default_value>
 		</field>
+		<!--<field>
+			<fieldname>regdhcp</fieldname>
+			<fielddescr>Register DHCP leases</fielddescr>
+			<description>If this option is set, then machines that specify their hostname when requesting a DHCP lease will be registered in the DNS forwarder, so that their name can be resolved. You should also set the domain in &lt;a href="system.php"&gt;System: General setup&lt;/a&gt; to the proper value.</description>
+			<type>checkbox</type>
+		</field>-->
+		<field>
+			<fieldname>regdhcpstatic</fieldname>
+			<fielddescr>Register DHCP static mappings</fielddescr>
+			<description>If this option is set, then DHCP static mappings will be registered in the DNS forwarder, so that their name can be resolved. You should also set the domain in &lt;a href="system.php"&gt;System: General setup&lt;/a&gt; to the proper value.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<name>Unbound Statistics</name>
+			<type>listtopic</type>
+		</field>
 		<field>
 			<fieldname>stats</fieldname>
 			<fielddescr>Enable Statistics</fielddescr>
