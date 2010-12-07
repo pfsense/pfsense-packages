@@ -59,11 +59,11 @@
 	<tabs>
 		<tab>
 			<text>Client</text>
-			<url>/pkg_edit.php?xml=iperf.xml</url>
+			<url>/pkg_edit.php?xml=iperf.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Server</text>
-			<url>/pkg_edit.php?xml=iperfserver.xml</url>
+			<url>/pkg_edit.php?xml=iperfserver.xml&amp;id=0</url>
 			<active/>
 		</tab>
 	</tabs>
