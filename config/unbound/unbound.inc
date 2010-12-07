@@ -59,9 +59,6 @@ function unbound_initial_setup() {
 		
 	// Setup rc file for startup and shutdown.
 	unbound_rc_setup();
-
-	// Disable DNSMasq and enable UNBound
-	$unbound_config['unbound_status'] = "on";
 	
 	// Set initial interfaces that are allowed to query to lan, if that does not exist set it to the wan
 	if(count($config['interfaces']) > 1)
@@ -389,8 +386,16 @@ function fetch_root_hints() {
 	}
 }
 
+function unbound_validate($post) {
+	global $config, $input_errors;
+
+	if($_POST['unbound_status'] == "on" && isset($config['dnsmasq']['enable']))
+		$input_errors[] = "The system dns-forwarder is still active. Disable it before enabling the Unbound service.";
+	
+}
+
 function unbound_reconfigure() {
-	global $config,$g;
+	global $config, $g, $input_errors;
 	
 	$unbound_config = $config['installedpackages']['unbound']['config'][0];
 	
@@ -399,18 +404,13 @@ function unbound_reconfigure() {
 			unbound_control("termstop");
 		}
 	} else {
-		if(isset($config['dnsmasq']['enable'])) {
-			unset($config['dnsmasq']['enable']);
-			sigkillbypid("{$g['varrun_path']}/dnsmasq.pid", "TERM");
-		}
 		if(is_service_running("unbound")) {
 			unbound_control("termstop");
 		}
 		unbound_resync_config();
 		unbound_control("start");
 		unbound_control("forward");
-	}
-	
+	}	
 }
 
 function unbound_uninstall() {
