@@ -8,6 +8,7 @@ function vnstat_install_deinstall() {
 	exec("rm -d -R /usr/local/www/vnstati");
 	exec("rm /usr/local/pkg/vnstat_php_frontend.xml");
 	exec("rm /usr/local/pkg/vnstat2.sh");
+	exec("rm /usr/local/etc/vnstat2.conf");
 // Remove vnstat cron entry from config.xml
         $task_key = '/usr/local/pkg/vnstat2.sh';
         $x_name='';
@@ -31,7 +32,14 @@ function vnstat_install_deinstall() {
 function change_vnstat_conf(){
 	conf_mount_rw();
 	global $config;
-	$monthrotate = $_POST['monthrotate']; 
+	$config['installedpackages']['vnstat2']['config'][0]['monthrotate'] = $_POST['monthrotate']; 
+	write_conf_f();
+	conf_mount_ro();
+}
+
+function write_conf_f(){
+global $config;
+$monthrotate = $config['installedpackages']['vnstat2']['config'][0]['monthrotate'];
 
 // ************ Write new vnstat.conf *****************
 
@@ -40,7 +48,7 @@ function change_vnstat_conf(){
 ##
 
 # location of the database directory
-DatabaseDir "/usr/local/pkg/vnstat"
+DatabaseDir "/conf/vnstat"
 
 # on which day should months change
 MonthRotate $monthrotate
@@ -70,7 +78,6 @@ EOF;
 	}
 	fwrite($hf2, $vnstat_conf_file);
 	fclose($hf2);
-	conf_mount_ro();
 }
 
 function create_vnstati_image() {
@@ -89,13 +96,17 @@ function vnstat_install_config() {
         global $config;
 		conf_mount_rw();
 // Create vnstat database dir where it also will work for nanobsd
-	exec("[ ! -d /usr/local/pkg/vnstat ] && mkdir /usr/local/pkg/vnstat");
+	exec("[ -d /var/db/vnstat ] && mv /var/db/pkg/vnstat /conf/vnstat");
+	exec("[ -d /usr/local/pkg/vnstat ] && mv /usr/local/pkg/vnstat /conf/vnstat");
+	exec("[ ! -d /conf/vnstat ] && mkdir /conf/vnstat");
 // Unpack and move Vnstat frontend 
 	exec("cd ..");
 	exec("tar -zxovf /usr/local/pkg/vnstat_php_frontend-1.4.1.tar.gz");
 	exec("mv vnstat_php_frontend-1.4.1 /usr/local/www/vnstat2");
-// Move Vnstat config
-	exec("[ ! -f /usr/local/etc/vnstat.conf ] && mv /usr/local/pkg/vnstat.conf /usr/local/etc/vnstat.conf");
+$no_monthrotate = $config['installedpackages']['vnstat2']['config'][0]['monthrotate'];
+if ($no_monthrotate == ""){
+	$config['installedpackages']['vnstat2']['config'][0]['monthrotate'] = "1";
+	write_conf_f();
 // Add cron job to config.xml
         $cron_item = array();
         $cron_item['minute']    = "*/1";
@@ -106,6 +117,16 @@ function vnstat_install_config() {
         $cron_item['who']       = "root";
         $cron_item['command']   = "/usr/local/pkg/vnstat2.sh";
         $config['cron']['item'][] = $cron_item;
+	shared_vnstat();
+}
+else
+{
+write_conf_f();
+shared_vnstat();
+}
+}
+
+function shared_vnstat() {
 // get system nic's and create a database for them
         $array_of_real_nic_names = array();
         $array_of_custom_nic_names = array();
@@ -118,7 +139,7 @@ function vnstat_install_config() {
 			array_push($array_of_real_nic_names, $real_nic_names);
 		endforeach;
         // Get already nic's assigned to vnstat
-        exec("ls /usr/local/pkg/vnstat/ | grep -v '\.'", $vnstat_nic);
+        exec("ls /conf/vnstat/ | grep -v '\.'", $vnstat_nic);
         // Compare real nic's with nic's assigned to vnstat
         $result = array_diff($array_of_real_nic_names, $vnstat_nic);
         // Create database for each nic 
@@ -129,7 +150,7 @@ function vnstat_install_config() {
 
 // Find information to be writing in config.php 
 	// $iface_list_array_items
-        exec("ls /usr/local/pkg/vnstat/ | grep -v '\.'", $vnstat_nic_in);
+        exec("ls /conf/vnstat/ | grep -v '\.'", $vnstat_nic_in);
         $iface_list_array_items = implode("', '", $vnstat_nic_in);
         $iface_list_array = "\$iface_list = array('$iface_list_array_items');";
         // $iface_title_array_items

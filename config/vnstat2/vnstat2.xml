@@ -45,11 +45,6 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0644</chmod>
-		<item>http://www.pfsense.com/packages/config/vnstat2/bin/vnstat.conf</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/usr/local/pkg/</prefix>
-		<chmod>0644</chmod>
 		<item>http://www.pfsense.com/packages/config/vnstat2/vnstati.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
@@ -98,7 +93,7 @@
 		</field>
 	</fields>
 	<custom_add_php_command>change_vnstat_conf();</custom_add_php_command>
-	<custom_php_resync_config_command></custom_php_resync_config_command>
+	<custom_php_resync_config_command>vnstat_install_config();</custom_php_resync_config_command>
 	<custom_php_install_command>vnstat_install_config();</custom_php_install_command>
 	<custom_php_deinstall_command>vnstat_install_deinstall();</custom_php_deinstall_command>
 </packagegui>
