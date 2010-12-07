@@ -947,7 +947,7 @@
       <descr>Unbound is a validating, recursive, and caching DNS resolver. This package is a drop in replacement for Services: DNS Forwarder and also supports DNSSEC extensions.</descr>
       <website>http://www.unbound.net/</website>
       <category>Services</category>
-      <version>1.2.3</version>
+      <version>1.2.4</version>
       <status>Alpha</status>
       <required_version>2.0</required_version>
       <pkginfolink>http://doc.pfsense.org/index.php/Unbound_package</pkginfolink>
@@ -957,14 +957,15 @@
       <depends_on_package>unbound-1.4.7.tbz</depends_on_package>
       <depends_on_package>expat-2.0.1_1.tbz</depends_on_package>
       <depends_on_package>openssl-1.0.0_2.tbz</depends_on_package>
+      <depends_on_package>libevent-1.4.14b_1.tbz</depends_on_package>
 	<build_port_path>/usr/ports/dns/unbound</build_port_path>
-	<build_options>WITHOUT_MAN=true</build_options>
+	<build_options>WITH_LIBEVENT=true WITH_THREADS=true WITH_GOST=true WITHOUT_MAN=true</build_options>
       <logging>
         <facilityname>unbound</facilityname>
         <logfilename>unbound.log</logfilename>
 		<logtab>Unbound</logtab>
       </logging>
-	<after_install_info>Note: if your DHCP server makes use of pfSense as the DNS server, then you will now need to add the IP address of the respective interface to the DNS servers field, in the DHCP server configuration page.</after_install_info>
+		<after_install_info>Please visit Services: Unbound to configure Unbound. Remember you will need to disable Services: DNS Forwarder before starting Unbound. Also note if your DHCP server makes use of pfSense as the DNS server, then you will now need to add the IP address of the respective interface to the DNS servers field, in the DHCP server configuration page.</after_install_info>
     </package>
 	<package>
 		<name>Shellcmd</name>
