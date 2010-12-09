@@ -38,8 +38,8 @@ function change_vnstat_conf(){
 }
 
 function write_conf_f(){
-global $config;
-$monthrotate = $config['installedpackages']['vnstat2']['config'][0]['monthrotate'];
+	global $config;
+	$monthrotate = $config['installedpackages']['vnstat2']['config'][0]['monthrotate'];
 
 // ************ Write new vnstat.conf *****************
 
@@ -127,6 +127,7 @@ shared_vnstat();
 }
 
 function shared_vnstat() {
+	global $config;
 // get system nic's and create a database for them
         $array_of_real_nic_names = array();
         $array_of_custom_nic_names = array();
