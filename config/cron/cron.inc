@@ -33,7 +33,7 @@
 
 require_once("services.inc");
 
-function pkg_is_service_running($servicename)
+function cron_pkg_is_service_running($servicename)
 {
 	exec("/bin/ps ax | awk '{ print $5 }'", $psout);
 	array_shift($psout);
