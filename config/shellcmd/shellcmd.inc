@@ -31,21 +31,23 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("services.inc");
+require_once("services.inc");
 
-function pkg_is_service_running($servicename)
-{
-    exec("/bin/ps ax | awk '{ print $5 }'", $psout);
-    array_shift($psout);
-    foreach($psout as $line) {
-    	$ps[] = trim(array_pop(explode(' ', array_pop(explode('/', $line)))));
-    }
-    if(is_service_running($servicename, $ps) or is_process_running($servicename) ) {
-        return true;
-    }
-    else {
-        return false;
-    }
+if (!function_exists("pkg_is_service_running")) {
+	function pkg_is_service_running($servicename)
+	{
+	    exec("/bin/ps ax | awk '{ print $5 }'", $psout);
+	    array_shift($psout);
+	    foreach($psout as $line) {
+		$ps[] = trim(array_pop(explode(' ', array_pop(explode('/', $line)))));
+	    }
+	    if(is_service_running($servicename, $ps) or is_process_running($servicename) ) {
+		return true;
+	    }
+	    else {
+		return false;
+	    }
+	}
 }
 
 function shellcmd_sync_package()

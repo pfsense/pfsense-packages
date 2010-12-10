@@ -31,32 +31,34 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-function pkg_is_service_running($servicename)
-{
-    exec("/bin/ps ax | awk '{ print $5 }'", $psout);
-    array_shift($psout);
-    foreach($psout as $line) {
-    	$ps[] = trim(array_pop(explode(' ', array_pop(explode('/', $line)))));
-    }
-    if(is_service_running($servicename, $ps) or is_process_running($servicename) ) {
-        return true;
-    }
-    else {
-        return false;
-    }
+if (!function_exists("pkg_is_service_running")) {
+	function pkg_is_service_running($servicename)
+	{
+	    exec("/bin/ps ax | awk '{ print $5 }'", $psout);
+	    array_shift($psout);
+	    foreach($psout as $line) {
+		$ps[] = trim(array_pop(explode(' ', array_pop(explode('/', $line)))));
+	    }
+	    if(is_service_running($servicename, $ps) or is_process_running($servicename) ) {
+		return true;
+	    }
+	    else {
+		return false;
+	    }
+	}
 }
 
-function byte_convert( $bytes ) {
+if (!function_exists("byte_convert")) {
+	function byte_convert( $bytes ) {
+	    if ($bytes<=0)
+		return '0 Byte';
 
-    if ($bytes<=0)
-        return '0 Byte';
-
-    $convention=1000; //[1000->10^x|1024->2^x]
-    $s=array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB');
-    $e=floor(log($bytes,$convention));
-    return round($bytes/pow($convention,$e),2).' '.$s[$e];
+	    $convention=1000; //[1000->10^x|1024->2^x]
+	    $s=array('B', 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB');
+	    $e=floor(log($bytes,$convention));
+	    return round($bytes/pow($convention,$e),2).' '.$s[$e];
+	}
 }
-
  
 function phpservice_sync_package_php()
 {
