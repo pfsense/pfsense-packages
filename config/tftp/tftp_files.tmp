@@ -28,8 +28,8 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
-require("guiconfig.inc");
-require("/usr/local/pkg/tftp.inc");
+require_once("guiconfig.inc");
+require_once("/usr/local/pkg/tftp.inc");
 
 $filename = $_GET['filename'];
 if (($_GET['a'] == "download") && $_GET['t'] == "backup") {
@@ -202,7 +202,7 @@ if ($savemsg) {
             if ($file != "." && $file != "..") {
                 
                 $tftp_filesize = filesize('/tftpboot/'.$file);
-				$tftp_filesize = byte_convert($tftp_filesize);
+				$tftp_filesize = tftp_byte_convert($tftp_filesize);
 
                 echo "<tr>\n";
                 echo "  <td class=\"listlr\" ondblclick=\"\">\n";

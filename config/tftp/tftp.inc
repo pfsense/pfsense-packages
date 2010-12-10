@@ -32,7 +32,7 @@
 */
 
 
-function guid()
+function tftp_guid()
 {
     if (function_exists('com_create_guid')){
         return com_create_guid();
@@ -53,7 +53,7 @@ function guid()
 //echo guid();
 
 
-function pkg_is_service_running($servicename)
+function tftp_pkg_is_service_running($servicename)
 {
     exec("/bin/ps ax | awk '{ print $5 }'", $psout);
     array_shift($psout);
@@ -68,7 +68,7 @@ function pkg_is_service_running($servicename)
     }
 }
 
-function byte_convert( $bytes ) {
+function tftp_byte_convert( $bytes ) {
    
     if ($bytes<=0)
         return '0 Byte';
