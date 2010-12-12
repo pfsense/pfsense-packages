@@ -27,12 +27,22 @@
     POSSIBILITY OF SUCH DAMAGE.
 */
 
-$pgtitle = "Antivirus: General page";
 require_once("guiconfig.inc");
 require_once("pkg-utils.inc");
 require_once("service-utils.inc");
 
 include("head.inc");
+ 
+header("Content-type: text/html; charset=utf-8");
+
+	putenv("LC_ALL=ru_RU");
+	setlocale (LC_ALL,"ru_RU.utf8");
+	$domain = "messages";
+	bindtextdomain ($domain, "./locale");
+	bind_textdomain_codeset($domain, 'UTF-8');
+	textdomain ($domain);
+
+$pgtitle = "Antivirus: General page";
 
 if (file_exists("/usr/local/pkg/havp.inc"))
    require_once("/usr/local/pkg/havp.inc");
@@ -188,7 +198,20 @@ if (pfsense_version_A() == '1') {
 <form action="antivirus.php" method="post">
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-<tr><td><div id="mainarea"><table width="100%" border="0" cellpadding="0" cellspacing="0">
+<!-- Tabs -->
+  <tr>
+    <td>
+<?php
+	$tab_array = array();
+	$tab_array[] = array(gettext("General page"), true, "antivirus.php");
+	$tab_array[] = array(gettext("HTTP proxy"), false, "pkg_edit.php?xml=havp.xml&amp;id=0");
+	$tab_array[] = array(gettext("Settings"), false, "pkg_edit.php?xml=havp_avset.xml&amp;id=0");
+
+	display_top_tabs($tab_array);
+?>
+    </td>
+  </tr>
+  <tr><td><div id="mainarea"><table width="100%" border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td class="tabcont" valign="top">
       <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -198,7 +221,7 @@ if (pfsense_version_A() == '1') {
           <td class="listhdrr">Status </td>
           <td class="listhdrr">&nbsp; </td>
           <td class="listhdrr">Version</td>
-          <td class="listhdrr">Settings</td>
+<!--          <td class="listhdrr">Settings</td> -->
         </tr>
         <tr>
           <td class="listlr">HTTP Antivirus Proxy ( <?php echo(havp_status()); ?> )</td>
@@ -222,12 +245,14 @@ if (pfsense_version_A() == '1') {
           <td class="listr">
                   <?php echo exec("pkg_info | grep \"[h]avp\""); ?>
           </td>
+<!--
           <td class="listr">
                   <a href="/pkg_edit.php?xml=havp.xml&amp;id=0">
                       <?php echo "<input height=14 title='Show Proxy settings page' name='scan' type='image' value='scan' border=0 src='./themes/".$g['theme']."/images/icons/icon_service_start.gif'>"; ?>
                       <font size="2">&nbsp;Proxy  Settings</size>                    
                   </a>
           </td>
+-->
         </tr>
         <tr>
           <td class="listlr">Antivirus Server ( <?php echo(clamd_status()); ?> )</td>
@@ -243,32 +268,34 @@ if (pfsense_version_A() == '1') {
           <td class="listr">
                   <?php echo exec("clamd -V"); ?>
           </td>
+<!--
           <td class="listr">
                   <a href="/pkg_edit.php?xml=havp_avset.xml&id=0">
                       <?php echo "<input height=14 title='Show Antivirus settings page' name='scan' type='image' value='scan' border=0 src='./themes/".$g['theme']."/images/icons/icon_service_start.gif'>"; ?>
                       <font size="2">&nbsp;Antivirus Settings</size>                    
                   </a>
           </td>
+-->
         </tr>
 
         <tr><td>&nbsp;</td></tr>
 <!-- Update -->
         <tr>
           <td class="listhdrr" colspan="3">Antivirus Update</td>
-          <td class="listhdrr" colspan="2">Update status</td></tr>
+          <td class="listhdrr" colspan="1">Update status</td></tr>
         </tr>
         <tr>
           <td class="listlr" colspan="3" nowrap>
                   <?php echo "<input height=14 title='Start antivirus update' name='startupdate' type='image' value='startupdate' border=0 src='./themes/".$g['theme']."/images/icons/icon_service_start.gif'>"; ?>
                   <font size="-1">&nbsp;Start Update</font>
           </td>
-          <td class="listr" colspan="2">
+          <td class="listr" colspan="1">
                   <?php echo avupdate_status(); ?>
           </td>
         </tr>
         <tr>
           <td class="listlr"colspan="3">Antivirus Base Info</td>
-          <td colspan="2">
+          <td colspan="1">
             <table width="100%" border="0" cellspacing="0" cellpadding="1" ><tbody>
               <tr  align="center"><td class="listhdrr">Database</td><td class="listhdrr">Date</td><td class="listhdrr">Size</td><td class="listhdrr">Ver.</td><td class="listhdrr">Signatures</td><td class="listhdrr">Builder</td></tr>
               <?php echo get_avdb_info(); ?>
@@ -279,7 +306,7 @@ if (pfsense_version_A() == '1') {
 <!-- File Scanner -->
         <tr>
           <td class="listhdrr" colspan="3">File scanner</td>
-          <td class="listhdrr" colspan="2">Scanner status</td>
+          <td class="listhdrr" colspan="1">Scanner status</td>
         </tr>
         <tr>
           <td class="vtable" colspan="3">
@@ -311,14 +338,14 @@ if (pfsense_version_A() == '1') {
                 </tr>
               </table>
           </td>
-          <td class="listr" colspan="2">
+          <td class="listr" colspan="1">
               <?php echo get_scan_log(); ?>
           </td>
         </tr>
         <tr><td>&nbsp;</td></tr>
 <!-- Last Viruses -->
         <tr>
-          <td colspan="5">
+          <td colspan="4">
             <table width="100%" border="0" cellspacing="0" cellpadding="1" ><tbody>
               <tr class="vncellt"><td class="listhdrr" colspan="4">Last Viruses</td></tr>
               <?php 

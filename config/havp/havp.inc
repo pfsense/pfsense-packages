@@ -327,17 +327,17 @@ function havp_resync()
     file_put_contents   (HVDEF_HAVP_CONFIG, havp_config_havp());
     havp_set_file_access(HVDEF_WORK_DIR, HVDEF_USER, '0755');
 
-	if ($havp_config[F_ENABLE] === 'true') {
-		mwexec_bg(HVDEF_HAVP_STARTUP_SCRIPT . " restart");
-		log_error("Starting HAVP");
-	}
-	else {
-		mwexec_bg(HVDEF_HAVP_STARTUP_SCRIPT . " stop");
-		log_error("Stopping HAVP");
-	}
+    if ($havp_config[F_ENABLE] === 'true') {
+        mwexec_bg(HVDEF_HAVP_STARTUP_SCRIPT . " restart");
+        log_error("Starting HAVP");
+    }
+    else {
+        mwexec_bg(HVDEF_HAVP_STARTUP_SCRIPT . " stop");
+        log_error("Stopping HAVP");
+    }
 
-	# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	# reconfigure squid
+    # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    # reconfigure squid
     havp_configure_squid();
 
     # reconfigure AV parts
@@ -367,8 +367,10 @@ function havp_check_system()
 
     # check user group
     $grp = exec('pw group show ' . HVDEF_GROUP);
-    if (strpos($grp, HVDEF_GROUP) !== 0)
+    if (strpos($grp, HVDEF_GROUP) !== 0) {
         exec('pw group add ' . HVDEF_GROUP);
+    	 log_error("Antivirus: Username '" . HVDEF_GROUP . "' was added.");
+    }
 
     # workdir permissions
     havp_set_file_access(HVDEF_WORK_DIR, HVDEF_USER, '');
@@ -1000,10 +1002,12 @@ function havp_whitelist_def()
 # ==============================================================================
 function havp_set_file_access($dir, $owner, $mod)
 {
-    mwexec("chgrp -R -v $owner $dir");
-    mwexec("chown -R -v $owner $dir");
-    if (!empty($mod)) {
-         mwexec( "chmod -R -v $mod $dir");
+    if ( file_exists($dir) ) {
+        mwexec("chgrp -R -v $owner $dir");
+        mwexec("chown -R -v $owner $dir");
+        if (!empty($mod)) {
+             mwexec( "chmod -R -v $mod $dir");
+        }
     }
 }
 # ------------------------------------------------------------------------------
