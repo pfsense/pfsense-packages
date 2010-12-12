@@ -527,7 +527,7 @@
       <pkginfolink>http://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>
       <config_file>http://www.pfsense.com/packages/config/imspector/imspector.xml</config_file>
       <configurationfile>imspector.xml</configurationfile>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/All/</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>imspector-0.8.tbz</depends_on_package>
 	<build_port_path>/usr/home/pfsense/tools/pfPorts/imspector</build_port_path>
     </package>
