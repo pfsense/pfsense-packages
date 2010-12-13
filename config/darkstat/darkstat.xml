@@ -82,6 +82,8 @@
     </fields>
 	<custom_php_global_functions>
 		function sync_package_darkstat() {
+			if (!is_array($_POST['interface_array']))
+				return;
 			conf_mount_rw();
 			$first = 0;
 			foreach($_POST['interface_array'] as $iface) {
