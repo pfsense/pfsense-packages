@@ -959,7 +959,7 @@
       <depends_on_package>openssl-1.0.0_2.tbz</depends_on_package>
       <depends_on_package>libevent-1.4.14b_1.tbz</depends_on_package>
 	<build_port_path>/usr/ports/dns/unbound</build_port_path>
-	<build_options>WITH_LIBEVENT=true WITH_THREADS=true WITH_GOST=true WITHOUT_MAN=true</build_options>
+	<build_options>WITH_LIBEVENT=true WITH_THREADS=true WITHOUT_GOST=true WITHOUT_MAN=true</build_options>
       <logging>
         <facilityname>unbound</facilityname>
         <logfilename>unbound.log</logfilename>
