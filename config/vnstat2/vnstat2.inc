@@ -10,24 +10,51 @@ function vnstat_install_deinstall() {
 	exec("rm /usr/local/pkg/vnstat2.sh");
 	exec("rm /usr/local/etc/vnstat2.conf");
 // Remove vnstat cron entry from config.xml
-        $task_key = '/usr/local/pkg/vnstat2.sh';
-        $x_name='';
-        $x=0;
-        foreach($config['cron']['item'] as $item) {
-            if($item['command']==$task_key) {
-               $x_name = $x;
-            }
-            $x++;
-        }
-        unset($x);
-        if($x_name > 0)
-        {
-            unset($config['cron']['item'][$x_name]);
-            write_config();
-        }
-        configure_cron();
-		conf_mount_ro();
+	vnstat2_install_cron(false);
+	conf_mount_ro();
 }
+
+function vnstat2_install_cron($vnstat_cron_value) {
+	global $config;
+	$is_installed = false;
+	if(!$config['cron']['item'])
+		return;
+	$x=0;
+	foreach($config['cron']['item'] as $item) {
+		if(strstr($item['command'], "/usr/local/pkg/vnstat2.sh")) {
+			$is_installed = true;
+			break;
+		}
+		$x++;
+	}
+	switch($vnstat_cron_value) {
+		case true:
+			if(!$is_installed) {
+				$cron_item = array();
+				$cron_item['minute']    = "*/1";
+	        		$cron_item['hour']      = "*";
+	        		$cron_item['mday']      = "*";
+	        		$cron_item['month']     = "*";
+	        		$cron_item['wday']      = "*";
+	        		$cron_item['who']       = "root";
+	        		$cron_item['command']   = "/usr/local/pkg/vnstat2.sh";
+	        		$config['cron']['item'][] = $cron_item;		
+				write_config();
+				configure_cron();
+			}
+		break;
+		case false:
+			if($is_installed == true) {
+				if($x > 0) {
+					unset($config['cron']['item'][$x]);
+					write_config();
+				}
+				configure_cron();
+			}
+		break;
+	}
+}
+
 
 function change_vnstat_conf(){
 	conf_mount_rw();
@@ -94,7 +121,7 @@ function create_vnstati_image() {
 
 function vnstat_install_config() {
         global $config;
-		conf_mount_rw();
+	conf_mount_rw();
 // Create vnstat database dir where it also will work for nanobsd
 	exec("[ -d /var/db/vnstat ] && mv /var/db/pkg/vnstat /conf/vnstat");
 	exec("[ -d /usr/local/pkg/vnstat ] && mv /usr/local/pkg/vnstat /conf/vnstat");
@@ -103,31 +130,14 @@ function vnstat_install_config() {
 	exec("cd ..");
 	exec("tar -zxovf /usr/local/pkg/vnstat_php_frontend-1.4.1.tar.gz");
 	exec("mv vnstat_php_frontend-1.4.1 /usr/local/www/vnstat2");
-$no_monthrotate = $config['installedpackages']['vnstat2']['config'][0]['monthrotate'];
-if ($no_monthrotate == ""){
-	$config['installedpackages']['vnstat2']['config'][0]['monthrotate'] = "1";
+// Add MonthRotate value to config.xml and write /usr/local/etc/vnstat.conf
+	$no_monthrotate = $config['installedpackages']['vnstat2']['config'][0]['monthrotate'];	
+	if ($no_monthrotate == ""){
+		$config['installedpackages']['vnstat2']['config'][0]['monthrotate'] = "1";
+	}
 	write_conf_f();
 // Add cron job to config.xml
-        $cron_item = array();
-        $cron_item['minute']    = "*/1";
-        $cron_item['hour']      = "*";
-        $cron_item['mday']      = "*";
-        $cron_item['month']     = "*";
-        $cron_item['wday']      = "*";
-        $cron_item['who']       = "root";
-        $cron_item['command']   = "/usr/local/pkg/vnstat2.sh";
-        $config['cron']['item'][] = $cron_item;
-	shared_vnstat();
-}
-else
-{
-write_conf_f();
-shared_vnstat();
-}
-}
-
-function shared_vnstat() {
-	global $config;
+	vnstat2_install_cron(true);
 // get system nic's and create a database for them
         $array_of_real_nic_names = array();
         $array_of_custom_nic_names = array();
@@ -310,8 +320,6 @@ EOF;
      }
      fwrite($hf, $config_file);
      fclose($hf);
-        write_config();
-        configure_cron();
-	conf_mount_ro();
+     conf_mount_ro();
 }
 ?>
