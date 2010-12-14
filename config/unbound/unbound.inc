@@ -569,8 +569,8 @@ function unbound_add_domain_overrides() {
 			$domain_entries .= "\tname: \"$domain\"\n";
 			foreach($ips as $ip) {
 				$domain_entries .= "\tstub-addr: $ip\n";
-				$domain_entries .= "\tstub-prime: no\n";
 			}
+			$domain_entries .= "\tstub-prime: no\n";
 		}
 		return $domain_entries;
 	}	
