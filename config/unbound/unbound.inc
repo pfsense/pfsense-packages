@@ -277,6 +277,7 @@ function unbound_resync_config() {
 	$host_entries = unbound_add_host_entries();
 	
 	// Domain Overrides
+	$private_domains = unbound_add_domain_overrides(true);
 	$domain_overrides = unbound_add_domain_overrides();
 	
 	// Unbound Statistics
@@ -321,9 +322,6 @@ pidfile: "{$g['varrun_path']}/unbound.pid"
 root-hints: "root.hints"
 harden-dnssec-stripped: {$unbound_config['harden-dnssec-stripped']}
 harden-referral-path: no
-private-address: 10.0.0.0/8
-private-address: 172.16.0.0/12
-private-address: 192.168.0.0/16
 prefetch: yes
 prefetch-key: yes
 use-syslog: yes
@@ -333,6 +331,16 @@ unwanted-reply-threshold: 10000000
 # Networks allowed to utilize service
 access-control: 127.0.0.0/8 allow
 {$unbound_allowed_networks}
+# For DNS Rebinding prevention
+private-address: 10.0.0.0/8
+private-address: 172.16.0.0/12
+private-address: 192.168.0.0/16
+private-address: 192.254.0.0/16
+# private-address: fd00::/8
+# private-address: fe80::/10
+# Set private domains in case authorative name server returns a RFC1918 IP address
+{$private_domains}
+
 # Host entries
 {$host_entries}
 # Domain overrides
@@ -544,17 +552,17 @@ function unbound_add_host_entries() {
 	return $unbound_entries;
 }
 
-/* Setup any domain overrides that have been configured with local-zone
+/* Setup any domain overrides that have been configured with stub-zone parameter
  */
-function unbound_add_domain_overrides() {
+function unbound_add_domain_overrides($pvt=false) {
 	global $config;
 
 	if (isset($config['dnsmasq']['domainoverrides'])) {
 		$domains = $config['dnsmasq']['domainoverrides'];
 
-		// Domain overrides that have multiple entries need multiple forward-addr: added
+		// Domain overrides that have multiple entries need multiple stub-addr: added
 		$sorted_domains = msort($domains, "domain");
-		$result = array();
+		$result = array();		
 		foreach($sorted_domains as $domain) {
 			$domain_key = current($domain);
 			if(!isset($result[$domain_key])) {
@@ -565,12 +573,16 @@ function unbound_add_domain_overrides() {
 		
 		$domain_entries = "";
 		foreach($result as $domain=>$ips) {
-			$domain_entries .= "stub-zone:\n";
-			$domain_entries .= "\tname: \"$domain\"\n";
-			foreach($ips as $ip) {
-				$domain_entries .= "\tstub-addr: $ip\n";
+			if($pvt == true) {
+				$domain_entries .= "private-domain: \"$domain\"\n";
+			} else {
+				$domain_entries .= "stub-zone:\n";
+				$domain_entries .= "\tname: \"$domain\"\n";
+				foreach($ips as $ip) {
+					$domain_entries .= "\tstub-addr: $ip\n";
+				}
+				$domain_entries .= "\tstub-prime: no\n";
 			}
-			$domain_entries .= "\tstub-prime: no\n";
 		}
 		return $domain_entries;
 	}	
