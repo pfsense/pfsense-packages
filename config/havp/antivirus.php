@@ -35,13 +35,6 @@ include("head.inc");
  
 header("Content-type: text/html; charset=utf-8");
 
-	putenv("LC_ALL=ru_RU");
-	setlocale (LC_ALL,"ru_RU.utf8");
-	$domain = "messages";
-	bindtextdomain ($domain, "./locale");
-	bind_textdomain_codeset($domain, 'UTF-8');
-	textdomain ($domain);
-
 $pgtitle = "Antivirus: General page";
 
 if (file_exists("/usr/local/pkg/havp.inc"))
