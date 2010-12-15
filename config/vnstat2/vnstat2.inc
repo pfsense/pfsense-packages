@@ -9,6 +9,8 @@ function vnstat_install_deinstall() {
 	exec("rm /usr/local/pkg/vnstat_php_frontend.xml");
 	exec("rm /usr/local/pkg/vnstat2.sh");
 	exec("rm /usr/local/etc/vnstat2.conf");
+	exec("rm /usr/local/www/diag_vnstat.php");
+	exec("rm /usr/local/www/diag_vnstat2.php");
 // Remove vnstat cron entry from config.xml
 	vnstat2_install_cron(false);
 	conf_mount_ro();
@@ -119,6 +121,16 @@ function create_vnstati_image() {
 	conf_mount_ro();
 }
 
+function create_vnstat_output() {
+	conf_mount_rw();
+	global $config;
+	$iface2 = $_POST['vnstat_interface2']; 
+	$ifaces_final2 = convert_friendly_interface_to_real_interface_name($iface2);
+	$config['installedpackages']['vnstat2']['config'][0]['vnstat_output_nic'] = $ifaces_final2;
+	write_config();
+	conf_mount_ro();
+}
+
 function vnstat_install_config() {
         global $config;
 	conf_mount_rw();
@@ -126,6 +138,8 @@ function vnstat_install_config() {
 	exec("[ -d /var/db/vnstat ] && mv /var/db/pkg/vnstat /conf/vnstat");
 	exec("[ -d /usr/local/pkg/vnstat ] && mv /usr/local/pkg/vnstat /conf/vnstat");
 	exec("[ ! -d /conf/vnstat ] && mkdir /conf/vnstat");
+	exec("[ ! -f /usr/local/www/diag_vnstat2.php ] && cp /usr/local/pkg/diag_vnstat2.abc /usr/local/www/diag_vnstat2.php");
+	exec("[ ! -f /usr/local/www/diag_vnstat.php ] && cp /usr/local/pkg/diag_vnstat.abc /usr/local/www/diag_vnstat.php");
 // Unpack and move Vnstat frontend 
 	exec("cd ..");
 	exec("tar -zxovf /usr/local/pkg/vnstat_php_frontend-1.4.1.tar.gz");

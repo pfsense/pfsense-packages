@@ -406,14 +406,14 @@
     <package>
       <name>vnstat2</name>
       <website>http://humdi.net/vnstat/</website>
-      <descr>A console-based network traffic monitor + vnstat PHP frontend</descr>
+      <descr>Vnstat is a console-based network traffic monitor&lt;br /&gt;The vnstat PHP frontend and vnstati adds a more user friendly way of displaying traffic usage.</descr>
       <pkginfolink>http://forum.pfsense.org/index.php/topic,14179.0.html</pkginfolink>
       <category>Network Management</category>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>vnstat-1.10_2.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/net/vnstat</build_port_path>
       <version>1.10_2</version>
-      <status>test</status>
+      <status>Beta</status>
       <required_version>2.0</required_version>
       <maintainer>crazypark2@yahoo.dk</maintainer>
       <config_file>http://www.pfsense.com/packages/config/vnstat2/vnstat2.xml</config_file>

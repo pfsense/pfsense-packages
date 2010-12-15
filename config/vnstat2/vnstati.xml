@@ -31,6 +31,14 @@
 			<text>Access vnstat php frontend</text>
 			<url>/vnstat2</url>
 		</tab>
+		<tab>
+			<text>vnstat info</text>
+			<url>/pkg_edit.php?xml=vnstatoutput.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>vnstat summary</text>
+			<url>/diag_vnstat.php</url>
+		</tab>
 	</tabs>
 	<fields>
 		<field>
