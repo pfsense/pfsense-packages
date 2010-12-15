@@ -141,13 +141,13 @@ function execCmds() {
 	    <td class="tabcont" width="100%">
 			<?php
 				$entries = trim(exec("/usr/local/sbin/unbound-control dump_cache | wc -l"));
-				defCmdT("Unbound status", "unbound-control status", "6");
-				defCmdT("Unbound stats", "unbound-control stats_noreset");
-				defCmdT("Unbound stubs", "unbound-control list_stubs", "8");
-				defCmdT("Unbound forwards", "unbound-control list_forwards");
-				defCmdT("Unbound local zones", "unbound-control list_local_zones");
-				defCmdT("Unbound local data", "unbound-control list_local_data");
-				defCmdT("Unbound cache ($entries entries)", "unbound-control dump_cache", "60");
+				defCmdT("Unbound status", "/usr/local/sbin/unbound-control status", "6");
+				defCmdT("Unbound stats", "/usr/local/sbin/unbound-control stats_noreset");
+				defCmdT("Unbound stubs", "/usr/local/sbin/unbound-control list_stubs", "8");
+				defCmdT("Unbound forwards", "/usr/local/sbin/unbound-control list_forwards");
+				defCmdT("Unbound local zones", "/usr/local/sbin/unbound-control list_local_zones");
+				defCmdT("Unbound local data", "/usr/local/sbin/unbound-control list_local_data");
+				defCmdT("Unbound cache ($entries entries)", "/usr/local/sbin/unbound-control dump_cache", "60");
 				defCmdT("Unbound configuration", "/bin/cat /usr/local/etc/unbound/unbound.conf", "60");
 				listCmds();
 				execCmds();
