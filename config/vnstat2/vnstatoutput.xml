@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
+<packagegui>
+    <copyright></copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>vnstat2</name>
+	<version>1.0</version>
+	<title>Vnstat2</title>
+	<aftersaveredirect>/diag_vnstat2.php</aftersaveredirect>
+	<include_file>/usr/local/pkg/vnstat2.inc</include_file>
+	<menu>
+		<name>vnstat2</name>
+		<tooltiptext></tooltiptext>
+		<section>Status</section>
+		<url>/pkg_edit.php?xml=vnstat2.xml&amp;id=0</url>
+	</menu>
+	<tabs>
+		<tab>
+			<text>Config</text>
+			<url>/pkg_edit.php?xml=vnstat2.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Vnstati</text>
+			<url>/pkg_edit.php?xml=vnstati.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Access vnstat php frontend</text>
+			<url>/vnstat2</url>
+		</tab>
+		<tab>
+			<text>vnstat info</text>
+			<url>/pkg_edit.php?xml=vnstatoutput.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>vnstat summary</text>
+			<url>/diag_vnstat.php</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fielddescr>Interface</fielddescr>
+			<fieldname>vnstat_interface2</fieldname>
+			<description>Select interface</description>
+			<type>interfaces_selection</type>
+		</field>
+	</fields>
+	<custom_php_global_functions></custom_php_global_functions>
+	<custom_add_php_command>create_vnstat_output();</custom_add_php_command>
+	<custom_php_resync_config_command></custom_php_resync_config_command>
+	<custom_php_install_command>vnstat_install_config();</custom_php_install_command>
+	<custom_php_deinstall_command>vnstat_install_deinstall();</custom_php_deinstall_command>
+</packagegui>
