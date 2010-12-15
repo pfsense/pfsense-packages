@@ -293,7 +293,15 @@ function unbound_resync_config() {
 		$cumulative_stats = "no";
 		$extended_stats = "no";
 	}
-	
+
+	// Set the number of threads equal to number of CPUs.
+	// Use 1 if for some reason this sysctl fails.
+	$numprocs = intval(trim(`/sbin/sysctl kern.smp.cpus | /usr/bin/cut -d" " -f2`));
+	if($numprocs > 0)
+		$number_threads = "num-threads: {$numprocs}";
+	else 
+		$number_threads = "num-threads: 1";
+
 	$unbound_conf = <<<EOD
 #########################
 # Unbound configuration #
@@ -303,6 +311,7 @@ function unbound_resync_config() {
 # Server config
 ###
 server:
+{$number_threads}
 verbosity: 1
 port: 53
 do-ip4: yes
