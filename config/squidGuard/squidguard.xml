@@ -6,7 +6,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>squidguardgeneral</name>
-	<version>1.2.0_2</version>
+	<version>1.3_1 pkg v.1.5</version>
 	<title>Proxy filter SquidGuard: General settings</title>
 	<include_file>/usr/local/pkg/squidguard.inc</include_file>
 	<!-- Installation -->
