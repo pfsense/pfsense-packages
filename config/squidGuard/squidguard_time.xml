@@ -5,15 +5,12 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-
 	<name>squidguardtime</name>
 	<version>none</version>
 	<title>Proxy filter SquidGuard: Times</title>
 	<include_file>/usr/local/pkg/squidguard.inc</include_file>
-
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
-
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -42,10 +39,9 @@
 		</tab>
 		<tab>
 			<text>Log</text>
-			<url>/pkg_edit.php?xml=squidguard_log.xml&amp;id=0</url>
+			<url>/squidGuard/squidguard_log.php</url>
 		</tab>
 	</tabs>
-
 	<adddeleteeditpagefields>
 		<columnitem>
 			<fielddescr>Timename</fielddescr>
@@ -130,7 +126,6 @@
 			<size>80</size>
 		</field>
 	</fields>
-
 	<custom_php_after_form_command>
 		squidGuard_print_javascript();
 	</custom_php_after_form_command>

@@ -69,7 +69,6 @@ define('F_EXPRESSIONS',     'expressions');
 define('F_DOMAINS',         'domains');
 define('F_URLS',            'urls');
 define('F_DISABLED',        'disabled');
-define('F_ENABLELOG',       'enablelog');
 define('F_SQUIDGUARDENABLE','squidguard_enable');
 define('F_BLACKLIST',       'blacklist');
 
@@ -147,6 +146,10 @@ function squidguard_validate_acl($post, $input_errors)
         if (!sg_check_unique_name(F_ACLS, $name))
             $input_errors[] = "Name '$name' already exists.";
 
+        # check reserved
+        if (!sg_check_reserved_name($name))
+             $input_errors[] = "Name '$name' is reserved.";
+
         # check source
         $sgx = array();
         $sgx[F_NAME] = $post[F_NAME];
@@ -218,6 +221,10 @@ function squidguard_validate_times($post, $input_errors)
         # check unique name
         if (!sg_check_unique_name(F_TIMES, $name))
              $input_errors[] = "Name '$name' already exists";
+
+        # check reserved
+        if (!sg_check_reserved_name($name))
+             $input_errors[] = "Name '$name' is reserved.";
     }
 
     # --- check format ---
@@ -261,6 +268,10 @@ function squidguard_validate_destination($post, $input_errors) {
         # check unique name
         if (!sg_check_unique_name(F_DESTINATIONS, $name))
              $input_errors[] = "Name '$name' already exists";
+
+        # check reserved
+        if (!sg_check_reserved_name($name))
+             $input_errors[] = "Name '$name' is reserved.";
     }
 
     # --- check format ---
@@ -282,12 +293,16 @@ function squidguard_validate_rewrite($post, $input_errors) {
          # check name
          $name = trim($post[F_NAME]);
          if(!empty($name)) {
-             # check name format <char><symbols without space> - Ab123
-             check_name_format($name, &$input_errors);
+            # check name format <char><symbols without space> - Ab123
+            check_name_format($name, &$input_errors);
 
-             # check unique name
-             if (!sg_check_unique_name(F_REWRITES, $name))
+            # check unique name
+            if (!sg_check_unique_name(F_REWRITES, $name))
                  $input_errors[] = "Name '$name' already exists";
+
+            # check reserved
+            if (!sg_check_reserved_name($name))
+                 $input_errors[] = "Name '$name' is reserved.";
          }
 }
 
@@ -304,6 +319,8 @@ function squidguard_resync() {
     $url    = isset($_POST['blacklist_url'])   ? $_POST['blacklist_url']   : $_GET['blacklist_url'];
     $proxy  = isset($_POST['blacklist_proxy']) ? $_POST['blacklist_proxy'] : $_GET['blacklist_proxy'];
 
+    sg_init(convert_pfxml_to_sgxml());
+
     # blacklist upload
     if ($submit == BLACKLIST_BTN_URL) {
         if ($url)
@@ -319,8 +336,11 @@ function squidguard_resync() {
     //if ($submit == APPLY_BTN) {
 #           write_config('Update squidGuard options.'); # store, if not 'Save' button
 # перенести в validate для детектирования ошибок?
+
         sg_reconfigure();
     //}
+
+    squidguard_cron_install();
 }
 
 # -----------------------------------------------------------------------------
@@ -409,11 +429,6 @@ function squidguard_before_form($pkg) {
             case 'squidguard_enable':
                 $fld = &$pkg['fields']['field'][$i];
                 $fld['description'] .= make_grid_general_items();   # insert to description custom controls
-            break;
-            # GUI log
-            case 'view_gui_log':
-                $fld = &$pkg['fields']['field'][$i];
-                $fld['description'] .= make_grid_general_items('gui_log');   # insert to description custom controls
             break;
         }
         $i++;
@@ -587,140 +602,13 @@ function squidguard_before_form_acl($pkg, $is_acl=true) {
 }
 
 # -----------------------------------------------------------------------------
-# squidguard_before_form_log
+# squidguard_before_form_log - must be deleted
 # -----------------------------------------------------------------------------
 define('LOGSHOW_BUFSIZE', 16384);
 
-function squidguard_before_form_log($pkg) {
-	# ! nothing for config - only report. Possible use global $config !
-    global $config;
-    $i=0;
-    $move_pos = 0;
-    $move_step = 50;
-
-    foreach($pkg['fields']['field'] as $field) {
-        if ($field['fieldname'] == 'logtype') {
-            $slog = '';
-            $mlog = $config['installedpackages'][MODULE_LOG]['config'][0];
-
-            $filename = '';
-            $fld = &$pkg['fields']['field'][$i];
-            $move_pos = ($move_pos) ? $move_pos : 0;
-
-            switch ($mlog['logtype']) {
-                    case 'block_log':
-                    {
-                    $filename = SQUIDGUARD_LOGDIR . "/" . SQUIDGUARD_ACCESSBLOCK_FILE;
-                    $fh = '';
-                    if (file_exists($filename))  {
-                        $fh = fopen($filename, "r");
-                        if ($fh) {
-                            $fsize = filesize($filename);
-                            # take LOGSHOW_BUFSIZE bytes from end
-                            if ($fsize > LOGSHOW_BUFSIZE)
-                                fseek($fh, -LOGSHOW_BUFSIZE, SEEK_END);
-                            $s = fread($fh, LOGSHOW_BUFSIZE);
-                            fclose($fh);
-
-                            $slog .= "<tr><td colspan='7'>Block log '$filename'. Last 100:<td><tr>";
-
-                            $s = explode("\n", $s);
-                            unset($s[0]); # unset us'nt complete string
-
-                            $slog .= "<tr><th>Num</th><th>DateTime</th><th>IP</th><th>URL</th><th>Filter</th><th>ID</th><th>Mtd</th></tr>";
-                            foreach($s as $key => $vs) {
-                                $nkey = $move_pos + intval($key);
-                                $slog .= "<tr>";
-                                $sx = $vs;
-                                $sx = str_replace(array("/- -", "/-", "Request", "request","(", ")", "[", "]"), "", $sx);
-                                $sx = explode(" ", $sx);
-
-                                # formatting url
-                                $spos =0;
-                                $stmp = '';
-                                while($spos + 81 < strlen($sx[4])) {
-                                    $stmp .= substr($sx[4], $spos, 81) . "<br>";
-                                    $spos += 81;
-                                }
-                                $stmp .= substr($sx[4], $spos, strlen($sx[4]) - $spos);
-                                $sx[4] = $stmp;
-
-                                if (!empty($vs))
-                                    $slog .= "<tr>
-                                              <td style='vertical-align: top; white-space: nowrap;'>" . strval($nkey) . "</td>
-                                              <td style='vertical-align: top; white-space: nowrap;'>$sx[0] $sx[1]</td>
-                                              <td style='vertical-align: top;'>$sx[5]</td>
-                                              <td style='vertical-align: top;'>$sx[4]</td>
-                                              <td style='vertical-align: top;'>$sx[3]</td>
-                                              <td style='vertical-align: top;'>$sx[2]</td>
-                                              <td style='vertical-align: top;'>$sx[6]</td></tr>";
-                            }
-                        }
-                    }
-
-                }
-                break;
-                    case 'configurator_log':
-                    {
-                    $filename = SQUIDGUARD_LOGDIR . SQUIDGUARDCONF_LOGFILE;
-                    $slog .= "<b>$filename</b><br>";
-                    if (file_exists($filename)) {
-                        $slog .= file_get_contents($filename);
-                        $slog = str_replace("\n", "<br>", $slog);
-                        $slog = "<tr><td>$slog</td></tr>";
-                    }
-                }
-                break;
-                case 'squidguard_log':
-                {
-                    $slog .= 'squidguard_log report disabled';
-/*
-                            $filename = SQUIDGUARD_LOGDIR . '/squidGuard.log';
-                            $slog .= "<b>$filename</b><br>";
-                            if (file_exists($filename)) {
-                                $slog .= file_get_contents($filename);
-                                $slog = explode("\n", $slog);
-                                while (count($slog) > 500)  array_shift($slog);
-                                $slog = implode("\n", $slog);
-                                $slog = str_replace("\n", "<br>", $slog);
-                                $slog = "<tr><td>$slog</td></tr>";
-                            }
-*/
-                }
-                break;
-                case 'squid_config':
-                {
-                    $filename = SQUID_CONFIGFILE;
-                    $slog .= "<b>$filename</b><br>";
-                    if (file_exists($filename)) {
-                        $slog .= file_get_contents($filename);
-                        $slog = str_replace("\n", "<br>", $slog);
-                        $slog = str_replace("\t", " ", $slog);
-                        $slog = "<tr><td>$slog</td></tr>";
-                    }
-                }
-                break;
-                case 'squidguard_config':
-                {
-                    $filename = SQUIDGUARD_WORKDIR . "/squidGuard.conf";
-                    $slog .= "<b>$filename</b><br>";
-                    if (file_exists($filename)) {
-                        $slog .= file_get_contents($filename);
-                        $slog = str_replace("\n", "<br>", $slog);
-                        $slog = str_replace("\t", " ", $slog);
-                        $slog = "<tr><td>$slog</td></tr>";
-                    }
-                }
-                break;
-            } # switch
-
-            $fld['description'] .=
-                "<INPUT class=formbtn type=submit value='Get log' name=Submit>
-                </tr><tr>
-                <td colspan='2'><table width='100%' class=tabcont cellSpacing=0 cellPadding=1 border=1>$slog</table>";
-        }
-        $i++;
-    }
+function squidguard_before_form_log($pkg) 
+{
+# delete me
 }
 
 # -----------------------------------------------------------------------------
@@ -748,14 +636,6 @@ function make_grid_general_items($id = '')
         if (is_blacklist_update_started())
             $sgstate .= "<br><span style='color: #800000;'>Wait: began updating the blacklist.<br>New data will be available after some time.<br>After the upgrade, it is necessary to check the configuration.</span>";
         $res .= "<tr $bg_color><td><big>SquidGuard service state: <b>$sgstate</b></big></td></tr>";
-    }
-    elseif ($id === 'gui_log') {
-        if ($squidguard_config['view_gui_log'] == 'on') {
-            $log_content = sg_getlog(50);
-            $log_content = str_replace("\n","<br>", $log_content);
-            $res .= "<tr $bg_color><td><font size='-1'><b>Web GUI log (Latest 50)</b></font></td></tr>";
-            $res .= "<tr $bg_color><td vAlign=top width='100%'><font size='-2'>$log_content</font></td></tr>";
-        }
     }
 
     $res .= "</table>";
@@ -925,6 +805,20 @@ function sg_check_unique_name($module_id, $name, $log='') {
     return $res;
 }
 
+# -----------------------------------------------------------------------------
+# check unique name
+# -----------------------------------------------------------------------------
+function sg_check_reserved_name($name, $log='')
+{
+    $res = true;
+    $reserved = array("acl", "all", "dbhome", "default", "dest", "in-addr", "log", "logdir", "none", "pass", "rew", "src", "url", "user");
+
+    if (in_array(strtolower(trim($name)), $reserved)) {
+        $res = false;
+    }
+
+    return $res;
+}
 # ------------------------------------------------------------------------------
 # Install & deinstall
 # ------------------------------------------------------------------------------
@@ -1011,36 +905,6 @@ function squidGuard_print_javascript() {
         $javascript .= "\n</script>";
     }
 
-    if ($xml === "squidguard_src.xml") { ### will deleted ###
-        $javascript .= "\n<script language='JavaScript'>";
-        $javascript .= "\n<!--";
-        $javascript .= "\n    function on_updatecontrols() {";
-        $javascript .= "\n        document.iform.elements['order'].disabled = 0;";
-        $javascript .= "\n        document.iform.elements['order'].onfocus = on_orderfocus;";
-        $javascript .= "\n    }";
-        $javascript .= "\n    function on_orderfocus() {";
-        $javascript .= "\n        document.iform.elements['order'].blur();";
-        $javascript .= "\n    }";
-        $javascript .= "\n    function on_moveup() {";
-        $javascript .= "\n        var order = parseInt(document.iform.elements['order'].value)";
-        $javascript .= "\n        if (order > 0)";
-        $javascript .= "\n             order = order - 1;";
-        $javascript .= "\n        else order = 0;";
-        $javascript .= "\n        document.iform.elements['order'].value = order;";
-        $javascript .= "\n    }";
-        $javascript .= "\n    function on_movedown() {";
-        $javascript .= "\n        var order = parseInt(document.iform.elements['order'].value)";
-        $javascript .= "\n        if (order >= 0)";
-        $javascript .= "\n             order = order + 1;";
-        $javascript .= "\n        else order = 0;";
-        $javascript .= "\n        document.iform.elements['order'].value = order;";
-        $javascript .= "\n    }";
-        $javascript .= "\n    on_updatecontrols();";
-        $javascript .= "\n    ";
-        $javascript .= "\n//-->";
-        $javascript .= "\n</script>";
-    }
-
     print($javascript);
 }
 
@@ -1072,8 +936,14 @@ function convert_pfxml_to_sgxml() {
     $sgxml[F_ACLS]             = convert_pfxml_to_sgxml_acl($config);
     $sgxml[F_DEFAULT]          = convert_pfxml_to_sgxml_default($config);
 
-	# other
-    $sgxml['view_gui_log'] = $pfxml['view_gui_log'];
+
+
+    # log
+    $sgxml[F_ENABLELOG]    = $pfxml['enable_log']    == 'on' ? 'on' : 'off';
+    $sgxml[F_ENABLEGUILOG] = $pfxml['enable_guilog'] == 'on' ? 'on' : 'off';
+    $sgxml[F_LOGROTATION]  = $pfxml['log_rotation']  == 'on' ? 'on' : 'off';
+
+    # other
     $lanip = $config['interfaces']['lan']['ipaddr'];
     $sgxml[F_CURRENT_LAN_IP] = $lanip;
 
@@ -1084,7 +954,7 @@ function convert_pfxml_to_sgxml() {
         $guiprotocol = $config['system']['webgui']['protocol'];
 
         $sgxml[F_SQUID_TRANSPARENT_MODE] = 'on';
-        $sgxml[F_CURRENT_GUI_PORT] = $guiport;
+        $sgxml[F_CURRENT_GUI_PORT]  = $guiport;
         $sgxml[F_CURRENT_GUI_PROTO] = $guiprotocol;
     } else {
         unset($sgxml[F_SQUID_TRANSPARENT_MODE]);
@@ -1393,5 +1263,110 @@ function squidguard_adt_safesrch_add($rewrite_item)
     $rewrite_item[] = array(F_TARGETURL => '(search\.msn\..*/.*q=.*)', F_REPLACETO => '\1\&adlt=strict', F_MODE => 'i');
 
     return $rewrite_item;
+}
+
+# get squid config list
+function squidguard_squid_conflist( )
+{
+    $fname = SQUID_CONFIGFILE;
+    $res   = "";
+
+    if (file_exists( $fname ))
+         $res = file_get_contents( $fname );
+    else $res = "File '$fname' not found.";
+
+    return $res;
+}
+
+# get squidguard config list
+function squidguard_conflist( )
+{
+    $fname = SQUIDGUARD_CONFBASE_DEF . SQUIDGUARD_CONFIGFILE;
+    $res   = "";
+
+    if (file_exists( $fname ))
+         $res = file_get_contents( $fname );
+    else $res = "File '$fname' not found.";
+ 
+    return $res;
+}
+
+# get squidguard log report
+
+define('LOGSHOW_BUFSIZE', '16384');
+
+function squidguard_logrep( $filename, $lncount, $reverse )
+{
+    $res = "";
+
+    $lncount = $lncount ? $lncount : 50;
+    $reverse = $reverse ? $reverse : false;
+
+    if (file_exists($filename)) {
+        $fh = fopen($filename, "r");
+        if ($fh) {
+            $fsize = filesize($filename);
+            # take LOGSHOW_BUFSIZE bytes from end
+            if ($fsize > LOGSHOW_BUFSIZE)
+                    fseek($fh, -LOGSHOW_BUFSIZE, SEEK_END);
+            $cont = fread($fh,  LOGSHOW_BUFSIZE);
+            fclose($fh);
+        }
+
+        $cont = explode( "\n", $cont );
+        $cont = array_slice($cont, -$lncount);
+
+        if ($reverse) $cont = array_reverse( $cont );
+
+        $res .= "<table class='tabcont' width='100%' border='0' cellpadding='0' cellspacing='0'>\n";
+        $res .= "<tr><td nowrap class='listtopic' colspan='2'>Last {$lncount} entries</td></tr>\n";
+        foreach($cont as $cn) {
+            $cn = trim($cn);
+            if ($cn) {
+                $cn = explode(" ", $cn, 4);
+
+                # split strings
+                $st    = str_split ($cn[3], 25);
+                $cn[3] = "";
+                foreach( $st as $s ) $cn[3] .= $s . "<wbr/>";                
+
+                $res .= "<tr><td nowrap class='listlr'>{$cn[0]} {$cn[1]}</td><td class='listr'>{$cn[3]}</td></tr>";
+            }
+        }
+        $res .= "</table>";
+    }
+
+    return $res;
+}
+
+# get blacklist list
+function squidguard_blacklist_list()
+{
+    $res   = "";
+    $fname = "/var/squidGuard/blacklist.files";
+
+    $res .= "<table class='tabcont' width='100%' border='0' cellpadding='0' cellspacing='0'>\n";
+    $res .= "<tr><td class='listtopic'>Name</td><td class='listtopic'>Domains</td><td class='listtopic'>Urls</td><td class='listtopic'>Expressions</td></tr>\n";
+    if (file_exists($fname)) {
+        $cont = explode("\n", file_get_contents($fname));
+        foreach($cont as $cn) {
+            $ph = "/var/db/squidGuard/$cn";
+
+            if (file_exists($ph)) {
+                $dm = "&nbsp;";
+                $ur = "&nbsp;";
+                $ex = "&nbsp;";
+
+                if (file_exists("$ph/domains"))     $dm = "domains";
+                if (file_exists("$ph/urls"))        $ur = "urls";
+                if (file_exists("$ph/expressions")) $ex = "expressions";
+
+                $res .= "<tr><td class='listlr'>$cn</td><td class='listr'>$dm</td><td class='listr'>$ur</td><td class='listr'>$ex</td></tr>";
+            }
+        }
+    }
+    $res .= "</table>";
+
+    return $res;
 }
 ?>

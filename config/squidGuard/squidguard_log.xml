@@ -5,15 +5,12 @@
     <description>Describe your package here</description>
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
-
 	<name>squidguardlog</name>
 	<version>none</version>
 	<title>Proxy filter SquidGuard: Log</title>
 	<include_file>/usr/local/pkg/squidguard.inc</include_file>
-
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
-
 	<tabs>
 		<tab>
 			<text>General settings</text>
@@ -41,17 +38,17 @@
 		</tab>
 		<tab>
 			<text>Log</text>
-			<url>/pkg_edit.php?xml=squidguard_log.xml&amp;id=0</url>
+			<url>/squidGuard/squidguard_log.php</url>
 			<active/>
 		</tab>
 	</tabs>
-
+<advanced_options>enabled</advanced_options>
 	<fields>
 		<field>
 			<fielddescr>Log type</fielddescr>
 			<fieldname>logtype</fieldname>
 			<description></description>
-			<type>select</type>
+			<type>input</type>
 			<value>access_log</value>
 			<options>
 			    	<option><name>Blocked URL's log</name><value>block_log</value></option>
@@ -61,8 +58,67 @@
 			    	<option><name>squidGuard config</name><value>squidguard_config</value></option>
 			</options>
 		</field>
+		<field>
+			<fielddescr>Log type</fielddescr>
+			<fieldname>logtype</fieldname>
+			<description></description>
+			<type>listtopic</type>
+<name>Ext</name>
+			<value>access_log</value>
+			<options>
+			    	<option><name>Blocked URL's log</name><value>block_log</value></option>
+			    	<option><name>Configurator log</name><value>configurator_log</value></option>
+			    	<option><name>squidGuard log</name><value>squidguard_log</value></option>
+			    	<option><name>squid config</name><value>squid_config</value></option>
+			    	<option><name>squidGuard config</name><value>squidguard_config</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Log type</fielddescr>
+			<fieldname>logtype</fieldname>
+			<description></description>
+			<type>input</type>
+			<value>access_log</value>
+			<options>
+			    	<option><name>Blocked URL's log</name><value>block_log</value></option>
+			    	<option><name>Configurator log</name><value>configurator_log</value></option>
+			    	<option><name>squidGuard log</name><value>squidguard_log</value></option>
+			    	<option><name>squid config</name><value>squid_config</value></option>
+			    	<option><name>squidGuard config</name><value>squidguard_config</value></option>
+			</options>
+<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Log type</fielddescr>
+			<fieldname>logtype2</fieldname>
+			<description></description>
+			<type>input</type>
+			<value>access_log</value>
+			<options>
+			    	<option><name>Blocked URL's log</name><value>block_log</value></option>
+			    	<option><name>Configurator log</name><value>configurator_log</value></option>
+			    	<option><name>squidGuard log</name><value>squidguard_log</value></option>
+			    	<option><name>squid config</name><value>squid_config</value></option>
+			    	<option><name>squidGuard config</name><value>squidguard_config</value></option>
+			</options>
+<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Log type</fielddescr>
+			<fieldname>logtype1</fieldname>
+			<description></description>
+			<type>input</type>
+			<value>access_log</value>
+			<options>
+			    	<option><name>Blocked URL's log</name><value>block_log</value></option>
+			    	<option><name>Configurator log</name><value>configurator_log</value></option>
+			    	<option><name>squidGuard log</name><value>squidguard_log</value></option>
+			    	<option><name>squid config</name><value>squid_config</value></option>
+			    	<option><name>squidGuard config</name><value>squidguard_config</value></option>
+			</options>
+<advancedfield/>
+		</field>
 	</fields>
-
 	<custom_php_command_before_form>
 		squidguard_before_form_log(&amp;$pkg);
 	</custom_php_command_before_form>

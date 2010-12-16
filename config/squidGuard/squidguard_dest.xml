@@ -2,51 +2,47 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
-
-        <name>squidguarddest</name>
-        <version>none</version>
-        <title>Proxy filter SquidGuard: Destinations</title>
-        <include_file>/usr/local/pkg/squidguard.inc</include_file>
-
-        <delete_string>A proxy server user has been deleted.</delete_string>
-        <addedit_string>A proxy server user has been created/modified.</addedit_string>
-
-        <tabs>
-                <tab>
-                        <text>General settings</text>
-                        <url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
-                </tab>
-                <tab>
-                        <text>Default</text>
-                        <url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
-                </tab>
-                <tab>
-                        <text>ACL</text>
-                        <url>/pkg.php?xml=squidguard_acl.xml</url>
-                </tab>
-                <tab>
-                        <text>Destinations</text>
-                        <url>/pkg.php?xml=squidguard_dest.xml</url>
-                        <active/>
-                </tab>
-                <tab>
-                        <text>Times</text>
-                        <url>/pkg.php?xml=squidguard_time.xml</url>
-                </tab>
-                <tab>
-                        <text>Rewrites</text>
-                        <url>/pkg.php?xml=squidguard_rewr.xml</url>
-                </tab>
-                <tab>
-                        <text>Log</text>
-                        <url>/pkg_edit.php?xml=squidguard_log.xml&amp;id=0</url>
-                </tab>
-        </tabs>
-
-        <adddeleteeditpagefields>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>squidguarddest</name>
+	<version>none</version>
+	<title>Proxy filter SquidGuard: Destinations</title>
+	<include_file>/usr/local/pkg/squidguard.inc</include_file>
+	<delete_string>A proxy server user has been deleted.</delete_string>
+	<addedit_string>A proxy server user has been created/modified.</addedit_string>
+	<tabs>
+		<tab>
+			<text>General settings</text>
+			<url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Default</text>
+			<url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>ACL</text>
+			<url>/pkg.php?xml=squidguard_acl.xml</url>
+		</tab>
+		<tab>
+			<text>Destinations</text>
+			<url>/pkg.php?xml=squidguard_dest.xml</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Times</text>
+			<url>/pkg.php?xml=squidguard_time.xml</url>
+		</tab>
+		<tab>
+			<text>Rewrites</text>
+			<url>/pkg.php?xml=squidguard_rewr.xml</url>
+		</tab>
+		<tab>
+			<text>Log</text>
+			<url>/squidGuard/squidguard_log.php</url>
+		</tab>
+	</tabs>
+	<adddeleteeditpagefields>
                 <columnitem>
                         <fielddescr>Destination name</fielddescr>
                         <fieldname>name</fieldname>
@@ -71,9 +67,8 @@
                         <fielddescr>Description</fielddescr>
                         <fieldname>description</fieldname>
                 </columnitem>
-        </adddeleteeditpagefields>
-
-        <fields>
+	</adddeleteeditpagefields>
+	<fields>
                 <field>
                         <fielddescr>Name</fielddescr>
                         <fieldname>name</fieldname>
@@ -164,10 +159,10 @@
                         <rows>2</rows>
                 </field>
                 <field>
-                        <fielddescr>Enable log</fielddescr>
+                        <fielddescr>Log</fielddescr>
                         <fieldname>enablelog</fieldname>
                         <type>checkbox</type>
-                        <description>Check this for enable log.</description>
+                        <description>Check this for log this item.</description>
                 </field>
                 <field>
                         <fielddescr>Description</fielddescr>
@@ -176,15 +171,14 @@
                         <type>input</type>
                         <size>90</size>
                 </field>
-        </fields>
-
-        <custom_delete_php_command/>
-        <custom_php_validation_command>
+	</fields>
+	<custom_delete_php_command/>
+	<custom_php_validation_command>
                 squidguard_validate_destination($_POST, &amp;$input_errors);
-        </custom_php_validation_command>
-        <custom_php_resync_config_command>
-        </custom_php_resync_config_command>
-        <custom_php_after_form_command>
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+	</custom_php_resync_config_command>
+	<custom_php_after_form_command>
                 squidGuard_print_javascript();
-        </custom_php_after_form_command>
+	</custom_php_after_form_command>
 </packagegui>

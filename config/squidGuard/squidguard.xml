@@ -2,113 +2,129 @@
 <!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
 <packagegui>
-    <description>Describe your package here</description>
-    <requirements>Describe your package requirements here</requirements>
-    <faq>Currently there are no FAQ items provided.</faq>
-
-        <name>squidguardgeneral</name>
-        <version>1.2.0_2</version>
-        <title>Proxy filter SquidGuard: General settings</title>
-        <include_file>/usr/local/pkg/squidguard.inc</include_file>
-
-        <!-- Installation -->
-        <menu>
-                <name>Proxy filter</name>
-                <tooltiptext>Modify the proxy server's filter settings</tooltiptext>
-                <section>Services</section>
-                <url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
-        </menu>
-
-        <tabs>
-                <tab>
-                        <text>General settings</text>
-                        <url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
-                        <active/>
-                </tab>
-                <tab>
-                        <text>Default</text>
-                        <url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
-                </tab>
-                <tab>
-                        <text>ACL</text>
-                        <url>/pkg.php?xml=squidguard_acl.xml</url>
-                </tab>
-                <tab>
-                        <text>Destinations</text>
-                        <url>/pkg.php?xml=squidguard_dest.xml</url>
-                </tab>
-                <tab>
-                        <text>Times</text>
-                        <url>/pkg.php?xml=squidguard_time.xml</url>
-                </tab>
-                <tab>
-                        <text>Rewrites</text>
-                        <url>/pkg.php?xml=squidguard_rewr.xml</url>
-                </tab>
-                <tab>
-                        <text>Log</text>
-                        <url>/pkg_edit.php?xml=squidguard_log.xml&amp;id=0</url>
-                </tab>
-        </tabs>
-
-        <service>
+	<description>Describe your package here</description>
+	<requirements>Describe your package requirements here</requirements>
+	<faq>Currently there are no FAQ items provided.</faq>
+	<name>squidguardgeneral</name>
+	<version>1.2.0_2</version>
+	<title>Proxy filter SquidGuard: General settings</title>
+	<include_file>/usr/local/pkg/squidguard.inc</include_file>
+	<!-- Installation -->
+	<menu>
+		<name>Proxy filter</name>
+		<tooltiptext>Modify the proxy server's filter settings</tooltiptext>
+		<section>Services</section>
+		<url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
+	</menu>
+	<tabs>
+		<tab>
+			<text>General settings</text>
+			<url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Default</text>
+			<url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>ACL</text>
+			<url>/pkg.php?xml=squidguard_acl.xml</url>
+		</tab>
+		<tab>
+			<text>Destinations</text>
+			<url>/pkg.php?xml=squidguard_dest.xml</url>
+		</tab>
+		<tab>
+			<text>Times</text>
+			<url>/pkg.php?xml=squidguard_time.xml</url>
+		</tab>
+		<tab>
+			<text>Rewrites</text>
+			<url>/pkg.php?xml=squidguard_rewr.xml</url>
+		</tab>
+		<tab>
+			<text>Log</text>
+			<url>/squidGuard/squidguard_log.php</url>
+		</tab>
+	</tabs>
+	<service>
                 <name>squidGuard</name>
                 <description>Proxy server filter Service</description>
                 <executable>squidGuard</executable>
-        </service>
-
-        <additional_files_needed>
+	</service>
+	<additional_files_needed>
                 <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
                 <item>http://www.pfsense.org/packages/config/squidGuard/squidguard.inc</item>
-        </additional_files_needed>
-        <additional_files_needed>
+	</additional_files_needed>
+	<additional_files_needed>
                 <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
                 <item>http://www.pfsense.org/packages/config/squidGuard/squidguard_configurator.inc</item>
-        </additional_files_needed>
-        <additional_files_needed>
+	</additional_files_needed>
+	<additional_files_needed>
                 <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
                 <item>http://www.pfsense.org/packages/config/squidGuard/squidguard_acl.xml</item>
-        </additional_files_needed>
-        <additional_files_needed>
+	</additional_files_needed>
+	<additional_files_needed>
                 <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
                 <item>http://www.pfsense.org/packages/config/squidGuard/squidguard_default.xml</item>
-        </additional_files_needed>
-        <additional_files_needed>
+	</additional_files_needed>
+	<additional_files_needed>
                 <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
                 <item>http://www.pfsense.org/packages/config/squidGuard/squidguard_dest.xml</item>
-        </additional_files_needed>
-        <additional_files_needed>
+	</additional_files_needed>
+	<additional_files_needed>
                 <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
                 <item>http://www.pfsense.org/packages/config/squidGuard/squidguard_rewr.xml</item>
-        </additional_files_needed>
-        <additional_files_needed>
+	</additional_files_needed>
+	<additional_files_needed>
                 <prefix>/usr/local/pkg/</prefix>
             <chmod>0755</chmod>
                 <item>http://www.pfsense.org/packages/config/squidGuard/squidguard_time.xml</item>
-        </additional_files_needed>
-        <additional_files_needed>
-                <prefix>/usr/local/pkg/</prefix>
-            <chmod>0755</chmod>
-                <item>http://www.pfsense.org/packages/config/squidGuard/squidguard_log.xml</item>
-        </additional_files_needed>
-        <additional_files_needed>
+	</additional_files_needed>
+	<additional_files_needed>
+                <prefix>/usr/local/www/squidGuard/</prefix>
+                <chmod>0755</chmod>
+                <item>http://www.pfsense.org/packages/config/squidGuard/squidguard_log.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
                 <prefix>/usr/local/www/</prefix>
                 <chmod>0755</chmod>
                 <item>http://www.pfsense.org/packages/config/squidGuard/sgerror.php</item>
-        </additional_files_needed>
-
-        <fields>
+	</additional_files_needed>
+	<fields>
                 <field>
                         <fielddescr>Enable</fielddescr>
                         <fieldname>squidguard_enable</fieldname>
                         <description>Check this for enable squidGuard</description>
                         <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Enable GUI log</fielddescr>
+                        <fieldname>enable_guilog</fieldname>
+                        <description>Check this for enable GUI log.</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Enable log</fielddescr>
+                        <fieldname>enable_log</fieldname>
+                        <description>Check this for enable log of the proxy filter. Usually log used for testing filter settings.</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Enable log rotation</fielddescr>
+                        <fieldname>log_rotation</fieldname>
+                        <description>Check this for enable daily rotate a log of the proxy filter. Use this option for limit log file size.</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <name>Blacklist options</name>
+                        <type>listtopic</type>
                 </field>
                 <field>
                         <fielddescr>Blacklist</fielddescr>
@@ -134,31 +150,25 @@
                         <type>input</type>
                         <size>100</size>
                 </field>
-                <field>
-                        <fielddescr>View GUI log</fielddescr>
-                        <fieldname>view_gui_log</fieldname>
-                        <description>Check this for view GUI log</description>
-                        <type>checkbox</type>
-                </field>
-        </fields>
-        <custom_add_php_command/>
-        <custom_php_validation_command>
+	</fields>
+	<custom_add_php_command/>
+	<custom_php_validation_command>
                 squidguard_validate(&amp;$_POST, &amp;$input_errors);
-        </custom_php_validation_command>
-        <custom_php_command_before_form>
+	</custom_php_validation_command>
+	<custom_php_command_before_form>
                 squidguard_before_form(&amp;$pkg);
-        </custom_php_command_before_form>
-        <custom_php_after_form_command>
-        squidGuard_print_javascript();
-        </custom_php_after_form_command>
-        <custom_php_resync_config_command>
-                squidguard_resync();
-        </custom_php_resync_config_command>
-        <custom_php_install_command>
-                squidguard_install_command();
-                squidguard_resync();
-        </custom_php_install_command>
-        <custom_php_deinstall_command>
-                squidguard_deinstall_command();
-        </custom_php_deinstall_command>
+	</custom_php_command_before_form>
+	<custom_php_after_form_command>
+		squidGuard_print_javascript();
+	</custom_php_after_form_command>
+	<custom_php_resync_config_command>
+		squidguard_resync();
+	</custom_php_resync_config_command>
+	<custom_php_install_command>
+		squidguard_install_command();
+		squidguard_resync();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		squidguard_deinstall_command();
+	</custom_php_deinstall_command>
 </packagegui>
