@@ -33,6 +33,9 @@ if(!function_exists("get_nameservers"))
 function unbound_initial_setup() {
 	global $config, $g;
 
+	// Make sure read-write
+	conf_mount_rw();
+	
 	if (!array($config['installedpackages']['unbound']['config']))
 		$config['installedpackages']['unbound']['config'] = array();
 
@@ -75,6 +78,8 @@ function unbound_initial_setup() {
 	// Write out the XML config
 	write_config();
 	
+	// Back to read-only
+	conf_mount_ro();
 }
 
 function unbound_anchor_setup() {
@@ -382,6 +387,7 @@ function fetch_root_hints() {
 
 	$destination_file = "/usr/local/etc/unbound/root.hints";
 	if (filesize($destination_file) == 0 ) {
+		conf_mount_rw();
 		$fout = fopen($destination_file, "w");
 		$url = "ftp://ftp.internic.net/domain/named.cache";
 	
@@ -395,6 +401,7 @@ function fetch_root_hints() {
 
 		fwrite($fout, $data);
 		fclose($fout);
+		conf_mount_ro();
 	
 		return ($http_code == 200) ? true : $http_code;
 	} else {
