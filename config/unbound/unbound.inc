@@ -281,7 +281,6 @@ function unbound_resync_config() {
 	$host_entries = unbound_add_host_entries();
 	
 	// Domain Overrides
-	$private_domains = unbound_add_domain_overrides(true);
 	$domain_overrides = unbound_add_domain_overrides();
 	
 	// Unbound Statistics
@@ -296,6 +295,24 @@ function unbound_resync_config() {
 		$stats_interval = "0";
 		$cumulative_stats = "no";
 		$extended_stats = "no";
+	}
+	
+	// Private-address support for DNS Rebinding
+	if($unbound_config['private_address'] == "on") {
+		$pvt_addr = <<<EOF
+# For DNS Rebinding prevention
+private-address: 10.0.0.0/8
+private-address: 172.16.0.0/12
+private-address: 192.168.0.0/16
+private-address: 192.254.0.0/16
+# private-address: fd00::/8
+# private-address: fe80::/10
+# Set private domains in case authorative name server returns a RFC1918 IP address
+EOF;
+
+	// Add private-domain options
+	$private_domains = unbound_add_domain_overrides(true);
+
 	}
 
 	// Set the number of threads equal to number of CPUs.
@@ -344,14 +361,7 @@ unwanted-reply-threshold: 10000000
 # Networks allowed to utilize service
 access-control: 127.0.0.0/8 allow
 {$unbound_allowed_networks}
-# For DNS Rebinding prevention
-private-address: 10.0.0.0/8
-private-address: 172.16.0.0/12
-private-address: 192.168.0.0/16
-private-address: 192.254.0.0/16
-# private-address: fd00::/8
-# private-address: fe80::/10
-# Set private domains in case authorative name server returns a RFC1918 IP address
+{$pvt_addr}
 {$private_domains}
 
 # Host entries

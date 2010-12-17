@@ -118,6 +118,13 @@
 			<type>checkbox</type>
 			<default_value>on</default_value>
 		</field>
+		<field>
+			<fieldname>private_address</fieldname>
+			<fielddescr>Private Address support</fielddescr>
+			<description>With this option enabled &lt;a href="http://tools.ietf.org/html/rfc1918"&gt;RFC1918&lt;/a&gt; addresses are stripped away from DNS answers. Additionally, the DNSSEC validator may mark the answers bogus. This protects against &lt;a href="http://en.wikipedia.org/wiki/DNS_rebinding"&gt;DNS Rebinding&lt;/a&gt;. &lt;br/&gt; &lt;b&gt;Note:&lt;/b&gt; Domain Overrides and Host entries will be allowed to return answers if this option is enabled.</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
+		</field>
 		<!--<field>
 			<fieldname>regdhcp</fieldname>
 			<fielddescr>Register DHCP leases</fielddescr>
