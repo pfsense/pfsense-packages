@@ -167,7 +167,6 @@ function unbound_control($action) {
 					
 					if(is_service_running("unbound")) {
 						unbound_ctl_exec("forward $dns_servers");
-						unbound_ctl_exec("reload");
 					} else {
 						unbound_control("start");
 						unbound_control("forward");
