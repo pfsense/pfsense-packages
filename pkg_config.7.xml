@@ -744,7 +744,7 @@
       <descr>This is a network benchmark for DOS, OS/2 2.x, Windows NT/2000 and Unix. It measures the net throughput of a network via NetBIOS and/or TCP/IP protocols (Unix and DOS only support TCP/IP) using various different packet sizes.</descr>
       <category>Network Management</category>
       <config_file>http://www.pfsense.com/packages/config/netio.xml</config_file>
-      <depends_on_package_base_url>http://files.pfsense.org/packages/All</depends_on_package_base_url>
+      <depends_on_package_base_url>http://files.pfsense.org/packages/7/All</depends_on_package_base_url>
       <depends_on_package>netio-1.26.tbz</depends_on_package>
       <version>1.26</version>
       <required_version>2.0</required_version>
