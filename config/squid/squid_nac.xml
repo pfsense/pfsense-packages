@@ -133,6 +133,22 @@
 			<type>input</type>
 			<size>60</size>
 		</field>	
+		<field>
+			<fielddescr>acl safeports</fielddescr>
+			<fieldname>addtl_ports</fieldname>
+			<description>This is a space-separated list of "safe ports" in addition to the already defined list: 21 70 80 210 280 443 488 563 591 631 777 901 1025-65535</description>
+			<type>input</type>
+			<size>60</size>
+			<default_value></default_value>
+		</field>
+		<field>
+			<fielddescr>acl sslports</fielddescr>
+			<fieldname>addtl_sslports</fieldname>
+			<description>This is a space-separated list of ports to allow SSL "CONNECT" in addition to the already defined list: 443 563</description>
+			<type>input</type>
+			<size>60</size>
+			<default_value></default_value>
+		</field>
 	</fields>
 	<custom_php_validation_command>
 		squid_validate_nac($_POST, &amp;$input_errors);
