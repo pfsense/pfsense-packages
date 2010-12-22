@@ -9,7 +9,7 @@
 	<name>vnstat2</name>
 	<version>1.0</version>
 	<title>Vnstat2</title>
-	<aftersaveredirect>/vnstati/newpicture.png</aftersaveredirect>
+	<aftersaveredirect>/vnstati.php</aftersaveredirect>
 	<include_file>/usr/local/pkg/vnstat2.inc</include_file>
 	<menu>
 		<name>vnstat2</name>
@@ -46,22 +46,6 @@
 			<fieldname>vnstat_interface</fieldname>
 			<description>Select interface</description>
 			<type>interfaces_selection</type>
-		</field>
-		<field>
-			<description>Select output type</description>
-			<fielddescr>Output Type</fielddescr>
-			<fieldname>output_type</fieldname>
-			<type>select</type>
-			<size>7</size>
-                        <options>
-                                 <option><name>Output traffic for the last 24 hours</name><value>h</value></option>
-                                 <option><name>Output traffic for days</name><value>d</value></option>
-                                 <option><name>Output traffic for months</name><value>m</value></option>
-                                 <option><name>Output traffic summary</name><value>s</value></option>
-                                 <option><name>Output traffic summary including hourly data using a vertical layout</name><value>vs</value></option>
-                                 <option><name>Output traffic summary including hourly data using a horizontal layout</name><value>hs</value></option>
-                                 <option><name>Output all time top10 traffic days</name><value>t</value></option>
-			</options>
 		</field>
 	</fields>
 	<custom_php_global_functions></custom_php_global_functions>

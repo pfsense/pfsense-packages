@@ -11,6 +11,8 @@ function vnstat_install_deinstall() {
 	exec("rm /usr/local/etc/vnstat2.conf");
 	exec("rm /usr/local/www/diag_vnstat.php");
 	exec("rm /usr/local/www/diag_vnstat2.php");
+	exec("rm /usr/local/www/vnstati.php");
+	exec("rm /usr/local/www/vnstat2_img.php");
 // Remove vnstat cron entry from config.xml
 	vnstat2_install_cron(false);
 	conf_mount_ro();
@@ -112,12 +114,13 @@ EOF;
 function create_vnstati_image() {
 	conf_mount_rw();
 	global $config;
-	exec("[ ! -d /usr/local/www/vnstati ] && mkdir /usr/local/www/vnstati");
-	$iface = $_POST['vnstat_interface']; 
-	$iface2 = $_POST['output_type']; 
+	$iface = $_POST['vnstat_interface'];
+	$config['installedpackages']['vnstat2']['config'][0]['vnstati_interface'] = $iface;
 	$ifaces_final = convert_friendly_interface_to_real_interface_name($iface);
-//	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -". $iface2 ." -o /usr/local/www/vnstati/". $ifaces_final ."-". $iface2 .".png");
-	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -". $iface2 ." -o /usr/local/www/vnstati/newpicture.png");
+	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -vs -o /tmp/newpicture1.png");
+	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -m -o /tmp/newpicture2.png");
+	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -d -o /tmp/newpicture3.png");
+	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -t -o /tmp/newpicture4.png");
 	conf_mount_ro();
 }
 
@@ -140,6 +143,8 @@ function vnstat_install_config() {
 	exec("[ ! -d /conf/vnstat ] && mkdir /conf/vnstat");
 	exec("[ ! -f /usr/local/www/diag_vnstat2.php ] && cp /usr/local/pkg/diag_vnstat2.abc /usr/local/www/diag_vnstat2.php");
 	exec("[ ! -f /usr/local/www/diag_vnstat.php ] && cp /usr/local/pkg/diag_vnstat.abc /usr/local/www/diag_vnstat.php");
+	exec("[ ! -f /usr/local/www/vnstati.php ] && cp /usr/local/pkg/vnstati.abc /usr/local/www/vnstati.php");
+	exec("[ ! -f /usr/local/www/vnstat2_img.php ] && cp /usr/local/pkg/vnstat2_img.abc /usr/local/www/vnstat2_img.php");
 // Unpack and move Vnstat frontend 
 	exec("cd ..");
 	exec("tar -zxovf /usr/local/pkg/vnstat_php_frontend-1.4.1.tar.gz");
@@ -334,6 +339,7 @@ EOF;
      }
      fwrite($hf, $config_file);
      fclose($hf);
+     write_config();
      conf_mount_ro();
 }
 ?>
