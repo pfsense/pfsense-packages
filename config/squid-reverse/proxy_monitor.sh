@@ -41,7 +41,7 @@ sleep 5
 # Squid monitor 1.2
 while [ /bin/true ]; do
         if [  ! -f /var/run/squid_alarm ]; then
-                NUM_PROCS=`ps auxw | grep "[s]quid -D"|awk '{print $2}'| wc -l | awk '{ print $1 }'`
+		NUM_PROCS=`ps auxw | grep "[s]quid -D"|awk '{print $2}'| wc -l | awk '{ print $1 }'`
                 if [ $NUM_PROCS -lt 1 ]; then
                         # squid is down
                         echo "Squid has exited.  Reconfiguring filter." | \
@@ -50,16 +50,16 @@ while [ /bin/true ]; do
                         /usr/local/etc/rc.d/squid.sh start
                         sleep 3
                         echo "Reconfiguring filter..." | logger -p daemon.info -i -t Squid_Alarm
-                        /etc/rc.filter_configure_sync
+                        /etc/rc.filter_configure
                         touch /var/run/squid_alarm
                 fi
         fi
-        NUM_PROCS=`ps auxw | grep "[s]quid -D"|awk '{print $2}'| wc -l | awk '{ print $1 }'`
+	NUM_PROCS=`ps auxw | grep "[s]quid -D"|awk '{print $2}'| wc -l | awk '{ print $1 }'`
         if [ $NUM_PROCS -gt 0 ]; then
                 if [ -f /var/run/squid_alarm ]; then
                         echo "Squid has resumed. Reconfiguring filter." | \
                                 logger -p daemon.info -i -t Squid_Alarm
-						/etc/rc.filter_configure_sync
+						/etc/rc.filter_configure
                         rm /var/run/squid_alarm
                 fi
         fi
