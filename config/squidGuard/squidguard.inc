@@ -1326,9 +1326,18 @@ function squidguard_logrep( $filename, $lncount, $reverse )
                 $cn = explode(" ", $cn, 4);
 
                 # split strings
-                $st    = str_split ($cn[3], 25);
+#                $st    = str_split ($cn[3], 25);
+#                $cn[3] = "";
+#                foreach( $st as $s ) $cn[3] .= $s . "<wbr/>";
+                $p     = 0;
+                $pstep = 15;
+                $str   = $cn[3];
                 $cn[3] = "";
-                foreach( $st as $s ) $cn[3] .= $s . "<wbr/>";                
+                for ( $p = 0; $p < strlen($str); $p += $pstep ) {
+                     $s = substr( $str, $p, $pstep );
+                     if ( !$s ) break;
+                     $cn[3] .= $s . "<wbr/>";
+                }
 
                 $res .= "<tr><td nowrap class='listlr'>{$cn[0]} {$cn[1]}</td><td class='listr'>{$cn[3]}</td></tr>";
             }
