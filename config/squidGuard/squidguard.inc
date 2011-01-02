@@ -1,7 +1,7 @@
 <?php
 # ------------------------------------------------------------------------------
 /*  squidguard.inc
-    (C)2006-2008 Serg Dvoriancev
+    (C)2006-2011 Serg Dvoriancev
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
 
@@ -33,50 +33,39 @@ require_once('pkg-utils.inc');
 require_once('filter.inc');
 require_once('service-utils.inc');
 require_once('squidguard_configurator.inc');
-# ------------------------------------------------------------------------------
-define('SQUIDGUARD_CONFBASE',  '/usr/local/etc/squid');
-define('SQUIDGUARD_CONFFILE',  '/squidguard.conf');
-define('SQUIDGUARD_CONFXML',   '/squidguard_conf.xml');
-define('SQUIDGUARD_BINPATH',   '/usr/local/bin');
-define('SQUIDGUARD_WORKDIR',   '/usr/local/etc/squidGuard');
-define('SQUIDGUARD_LOGDIR',    '/var/squidGuard/log');
-define('SQUIDGUARD_DBHOME',    '/var/db/squidGuard');
-
-define('SQUIDGUARD_WEBGUI_LOG',         '/squidguard_gui.log');
-define('SQUIDGUARD_WEBGUI_HISTORY_LOG', '/squidguard_gui_history.log');
 
 # ------------------------------------------------------------------------------
-
-define('F_NAME',        'name');
-define('F_DEST',        'dest');
-define('F_SOURCE',      'source');
-define('F_DESTINATION', 'dest');
-define('F_REWRITE',     'rewrite');
-define('F_REDIRECT',    'redirect');
-define('F_TIME',        'time');
-define('F_OVERDESTINATION', 'overdestination');
-define('F_OVERREWRITE',     'overrewrite');
-define('F_OVERREDIRECT',    'overredirect');
-define('F_TARGETURL',       'targeturl');
-define('F_REPLACETO',       'replaceto');
-define('F_TIMETYPE',        'timetype');
-define('F_TIMEDAYS',        'timedays');
-define('F_DATERANGE',       'daterange');
-define('F_TIMERANGE',       'sg_timerange');
-define('F_IPLIST',          'iplist');
-define('F_DESCRIPTION',     'description');
-define('F_EXPRESSIONS',     'expressions');
-define('F_DOMAINS',         'domains');
-define('F_URLS',            'urls');
-define('F_DISABLED',        'disabled');
-define('F_SQUIDGUARDENABLE','squidguard_enable');
-define('F_BLACKLIST',       'blacklist');
-
+# fields
+define('F_NAME',             'name');
+define('F_DEST',             'dest');
+define('F_SOURCE',           'source');
+define('F_DESTINATION',      'dest');
+define('F_REWRITE',          'rewrite');
+define('F_REDIRECT',         'redirect');
+define('F_TIME',             'time');
+define('F_OVERDESTINATION',  'overdestination');
+define('F_OVERREWRITE',      'overrewrite');
+define('F_OVERREDIRECT',     'overredirect');
+define('F_TARGETURL',        'targeturl');
+define('F_REPLACETO',        'replaceto');
+define('F_TIMETYPE',         'timetype');
+define('F_TIMEDAYS',         'timedays');
+define('F_DATERANGE',        'daterange');
+define('F_TIMERANGE',        'sg_timerange');
+define('F_IPLIST',           'iplist');
+define('F_DESCRIPTION',      'description');
+define('F_EXPRESSIONS',      'expressions');
+define('F_DOMAINS',          'domains');
+define('F_URLS',             'urls');
+define('F_DISABLED',         'disabled');
+define('F_SQUIDGUARDENABLE', 'squidguard_enable');
+define('F_BLACKLIST',        'blacklist');
+# prefixes
 define('PREF_UPTIME',        'uptime_');
 define('PREF_UPTIME_DENY',   'uptimedeny_');
 define('PREF_OVERTIME',      'overtime_');
 define('PREF_OVERTIME_DENY', 'overtimedeny_');
-
+# modules
 define('MODULE_GENERAL',         'squidguardgeneral');
 define('MODULE_DEFAULT',         'squidguarddefault');
 define('MODULE_ACL',             'squidguardacl');
@@ -85,18 +74,16 @@ define('MODULE_REWRITE',         'squidguardrewrite');
 define('MODULE_SOURCE',          'squidguardsrc');
 define('MODULE_TIME',            'squidguardtime');
 define('MODULE_LOG',             'squidguardlog');
-
-define('BLACKLIST_DEFAULT_URL',  'http://ftp.teledanmark.no/pub/www/proxy/squidGuard/contrib/blacklists.tar.gz'); # 360Kb
+# blacklist
+define('BLACKLIST_DEFAULT_URL',  'http://squidguard.mesd.k12.or.us/blacklists.tgz'); # 5Mb
 define('BLACKLIST_DEFAULT_URL1', 'http://www.shallalist.de/Downloads/shallalist.tar.gz'); # ~7Mb
-define('BLACKLIST_TMP_FILE',    '/var/tmp/blacklists.tar.gz');
-define('BLACKLIST_BTN_URL',     'Upload Url');
-define('BLACKLIST_BTN_LAST',    'Restore last');
-
-define('BLACKLIST_LOGFILE',     'blacklist.log');
-define('APPLY_BTN', 'Apply');
-define('WEBGUI_HISTORY_LOG', 'on');
-define('TEST_LOG', '/var/tmp/sqtest.test');
-define('SAFESEARCH', 'safesearch');
+define('BLACKLIST_TMP_FILE',     '/var/tmp/blacklists.tar.gz');
+define('BLACKLIST_BTN_URL',      'Upload Url');
+define('BLACKLIST_BTN_DEFAULT',  'Restore default');
+define('BLACKLIST_LOGFILE',      'blacklist.log');
+#
+define('APPLY_BTN',              'Apply');
+define('SAFESEARCH',             'safesearch');
 
 # ==============================================================================
 # Initialization
@@ -328,9 +315,9 @@ function squidguard_resync() {
     }
 
     # blacklist restore last (if exists)
-    if ($submit == BLACKLIST_BTN_LAST) {
-        restore_arc_blacklist();
-    }
+   if ($submit == BLACKLIST_BTN_DEFAULT) {
+       restore_arc_blacklist();
+   }
 
     # apply changes
     //if ($submit == APPLY_BTN) {
@@ -535,22 +522,24 @@ function squidguard_before_form_acl($pkg, $is_acl=true) {
     # --- Destinations ---
     # User destinations
     if ($squidguard_config[F_DESTINATIONS]) {
-        foreach($squidguard_config[F_DESTINATIONS]['item'] as $dst)
+        foreach($squidguard_config[F_DESTINATIONS]['item'] as $dst) {
             $dest_items[] = array ('name'=>$dst[F_NAME],
                                    'upt_value'=>$acls_up[$dst[F_NAME]],
                                    'ovt_value'=>$acls_over[$dst[F_NAME]],
                                    'description'=>$dst[F_DESCRIPTION]);
+        }
     }
 
     # Blacklist
     if ($squidguard_config[F_BLACKLISTENABLED] === 'on') {
         $blk_entries = sg_entries_blacklist();
         if (!empty($blk_entries)) {
-            foreach($blk_entries as $dst)
+            foreach($blk_entries as $dst) {
                 $dest_items[] = array ('name'=>$dst,
                                        'upt_value'=>$acls_up[$dst],
                                        'ovt_value'=>$acls_over[$dst],
                                        'description'=>'');
+            }
         }
     }
 
@@ -602,16 +591,6 @@ function squidguard_before_form_acl($pkg, $is_acl=true) {
 }
 
 # -----------------------------------------------------------------------------
-# squidguard_before_form_log - must be deleted
-# -----------------------------------------------------------------------------
-define('LOGSHOW_BUFSIZE', 16384);
-
-function squidguard_before_form_log($pkg) 
-{
-# delete me
-}
-
-# -----------------------------------------------------------------------------
 # make_grid_general_items
 # -----------------------------------------------------------------------------
 function make_grid_general_items($id = '')
@@ -649,7 +628,7 @@ function make_grid_blacklist() {
     $res = '';
     # button 'Upload URL' and button 'Restore last blacklist'
     $res = "<hr><input name='submit' value='" . BLACKLIST_BTN_URL  . "' type='submit'>";
-    $res .= "&nbsp;<input name='submit' value='" . BLACKLIST_BTN_LAST  . "' type='submit'>";
+    $res .= "&nbsp;<input name='submit' value='" . BLACKLIST_BTN_DEFAULT  . "' type='submit'>";
     return $res;
 }
 
@@ -677,10 +656,12 @@ function make_grid_controls($type, $items, $enable_overtime = true) {
             $x = 0;
         }
 
-        $name    = $item['name'];
+        $name    = trim($item['name']);
         $upt_val = $item['upt_value'];
         $ovt_val = $item['ovt_value'];
         $description = $item['description'];
+
+        if (!$name) continue; # skip empty
 
         $sel = "selected=\"selected\"";
         $upt_A = $upt_B = $upt_C = $upt_D = '';
@@ -707,7 +688,7 @@ function make_grid_controls($type, $items, $enable_overtime = true) {
         $tbl .= "<td $color>$description [$name]</td>";
         $tbl .= "<td $color>access</td>";
         $tbl .= "<td $color><select id=$tnm name=\"$tnm\">";
-        if (substr_count($name, "all") === 0) {
+        if ($name !== "all"/*substr_count($name, "all") === 0*/) {
             $tbl .= "<option value=none  name=\"----\"  $upt_A>----</option>";
             $tbl .= "<option value=white name=\"white\" $upt_C>whitelist</option>";
             $tbl .= "<option value=deny  name=\"deny\"  $upt_D>deny </option>";
@@ -726,9 +707,9 @@ function make_grid_controls($type, $items, $enable_overtime = true) {
             $tbl .= "<td $color>$description [$name]</td>";
             $tbl .= "<td $color>access</td>";
             $tbl .= "<td $color><select id=$tnm name=\"$tnm\">";
-            if (substr_count($name, "all") === 0) {
+            if ($name !== "all"/*substr_count($name, "all") === 0*/) {
                 $tbl .= "<option value=none  name=\"----\"  $ovt_A>----</option>";
-                $tbl .= "<option value=white name=\"white\" $ovt_C>white</option>";
+                $tbl .= "<option value=white name=\"white\" $ovt_C>whitelist</option>";
                 $tbl .= "<option value=deny  name=\"deny\"  $ovt_D>deny </option>";
                 $tbl .= "<option value=allow name=\"allow\" $ovt_B>allow</option>";
             }
@@ -745,13 +726,13 @@ function make_grid_controls($type, $items, $enable_overtime = true) {
     if (!empty($tbl)) {
         $color = 'style="background-color: #dddddd;"';
         $thdr = '';
-        $hdr1up = "<big>Destination rules</big>";
-        $hdr1ov = "<big>Destination rules in overtime</big>";
+        $hdr1up = "<big>Destination Categories</big>";
+        $hdr1ov = "<big>Destination Categories in overtime</big>";
         $hds3   = "ACCESS: 'whitelist' - always pass; 'deny' - block; 'allow' - pass, if not blocked.";
         if ($enable_overtime) {
             $thdr .= "<tr><td colspan='8' align=left>$hds3</td></tr>";
             $thdr .= "<tr $color><th colspan='4' align=middle>$hdr1up</th><th colspan='4' align=middle>$hdr1ov</th></tr>";
-            $thdr .= "<tr $color><td colspan='4' align=middle></td><td colspan='4' align=middle>If <b>'Time'</b> not defined, this ruleset will be ignored</td></tr>";
+            $thdr .= "<tr $color><td colspan='4' align=middle></td><td colspan='4' align=middle>If <b>'Time'</b> not defined, this is column will be ignored.</td></tr>";
             # formatting
             $thdr .= "<tr><td/><td width='35%'/><td/><td/><td/><td width='35%'/><td/><td/></tr>";
         }
@@ -765,9 +746,9 @@ function make_grid_controls($type, $items, $enable_overtime = true) {
         $res .= "<table cellspacing='0' width='100%'> $thdr $tbl </table>";
 
         $rstyle = "";
-	 $ha = "<div $color>" .
+        $ha = "<div $color>" .
               "<span onClick='document.getElementById(\"destrules\").style.display = \"block\";' style=\"cursor: pointer;\">" .
-              "<font size='-12'><big>Destination ruleset (click)</big>&nbsp;" .
+              "<font size='-12'><big>Destination Categories (click)</big>&nbsp;" .
               "<img src='./themes/{$g['theme']}/images/icons/icon_pass.gif' title='Show rules'>&nbsp;" .
               "</span>" .
                "<span style=\"cursor: pointer;\">" .
@@ -811,7 +792,7 @@ function sg_check_unique_name($module_id, $name, $log='') {
 function sg_check_reserved_name($name, $log='')
 {
     $res = true;
-    $reserved = array("acl", "all", "dbhome", "default", "dest", "in-addr", "log", "logdir", "none", "pass", "rew", "src", "url", "user");
+    $reserved = array("acl", "all", "allow", "dbhome", "default", "dest", "in-addr", "log", "logdir", "none", "pass", "rew", "src", "url", "user");
 
     if (in_array(strtolower(trim($name)), $reserved)) {
         $res = false;
@@ -829,13 +810,18 @@ function squidguard_install_command() {
         sg_check_system();
 
         # generate squidGuard blacklist entries file (check with squidGuard PORT)
-        conf_mount_rw();
-        $entries = array("ads", "aggressive", "audio-video", "drugs", "gambling", "hacking",
-                         "mail", "porn", "proxy", "violence", "warez");
-        file_put_contents(SQUIDGUARD_WORKDIR . SQUIDGUARD_BLK_ENTRIES, implode("\n", $entries));
+#        conf_mount_rw();
+        $blklist_file = SQUIDGUARD_WORKDIR . SQUIDGUARD_BLK_ENTRIES;
+
+      	# рассмотреть вариант слияния examples базы и существующей в системе
+        if (!file_exists($blklist_file)) {
+        	# if blacklist not exists, then copy default db from samples
+#            $entries = array("ads", "aggressive", "audio-video", "drugs", "gambling", "hacking", "mail", "porn", "proxy", "violence", "warez");
+#            file_put_contents($blklist_file, implode("\n", $entries));
+        }
         set_file_access(SQUIDGUARD_WORKDIR, OWNER_NAME, 0755);
         set_file_access(SQUIDGUARD_DBHOME, OWNER_NAME, 0755);
-        conf_mount_ro();
+#        conf_mount_ro();
 
         sg_reconfigure();
     }
@@ -845,12 +831,14 @@ function squidguard_deinstall_command() {
     # remove entries from squid config
     squid_reconfigure('remove redirector options');
 
+    # Note: When you reinstall should remain Database
+
     # remove package and his depends
-    mwexec("pkg_delete squidGuard-1.2.0_1");
-    mwexec("rm -rf " . SQUIDGUARD_WORKDIR);
+    #mwexec("pkg_delete squidGuard-1.2.0_1");
+    #mwexec("rm -rf " . SQUIDGUARD_WORKDIR);
     # i known't, really need delete blacklist base?
-    mwexec("rm -rf " . SQUIDGUARD_DBHOME);
-    mwexec("/bin/rm -f " . SQUIDGUARD_CONFBASE . "/squidGuard*");
+    #mwexec("rm -rf " . SQUIDGUARD_DBHOME);
+    #mwexec("/bin/rm -f " . SQUIDGUARD_CONFBASE . "/squidGuard*");
 }
 
 # ------------------------------------------------------------------------------
@@ -1281,13 +1269,13 @@ function squidguard_squid_conflist( )
 # get squidguard config list
 function squidguard_conflist( )
 {
-    $fname = SQUIDGUARD_CONFBASE_DEF . SQUIDGUARD_CONFIGFILE;
+    $fname = SQUIDGUARD_CONFBASE . SQUIDGUARD_CONFIGFILE;
     $res   = "";
 
     if (file_exists( $fname ))
          $res = file_get_contents( $fname );
     else $res = "File '$fname' not found.";
- 
+
     return $res;
 }
 
