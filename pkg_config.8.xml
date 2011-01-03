@@ -389,7 +389,7 @@
       <descr>High perfomance web proxy report. Requires squid HTTP proxy.</descr>
       <website>http://lightsquid.sf.net/</website>
       <category>Network Report</category>
-      <version>1.8.0</version>
+      <version>1.8.0 pkg v.1.2</version>
       <maintainer>dv_serg@mail.ru</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
       <depends_on_package>lightsquid-1.8_2.tbz</depends_on_package>
@@ -774,7 +774,7 @@
       <website>http://www.squidGuard.org/</website>
       <maintainer>dv_serg@mail.ru</maintainer>
       <category>Network Management</category>
-      <version>1.4_2 pkg v.1.5</version>
+      <version>1.4_2 pkg v.1.6</version>
       <status>Beta</status>
       <required_version>1.1</required_version>
       <depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
