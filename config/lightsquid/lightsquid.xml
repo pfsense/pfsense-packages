@@ -184,7 +184,7 @@
                                 <option><name>24(00)h</name><value>lhp_24h</value></option>
                         </options>
                 </field>
-                <field>
+                <!--field>
                         <fielddescr>Squid rotate log sheduler</fielddescr>
                         <fieldname>lightsquid_squidrotatelog_sheduler_time</fieldname>
 			<description>
@@ -218,7 +218,7 @@
                                 <option><name>every 25 day</name><value>lsr_d25</value></option>
                                 <option><name>every 30 day</name><value>lsr_d30</value></option>
                         </options>
-		</field>
+		</field-->
 		<field>
             <fielddescr>Skip url</fielddescr>
             <fieldname>lightsquid_skipurl</fieldname>

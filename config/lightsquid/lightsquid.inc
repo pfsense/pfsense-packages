@@ -251,34 +251,34 @@ function lightsquid_resync() {
         }
 
         // set shedule - squid rotate
-        if ($tm_squid) {
-            $on = false;
-            $opt = array("0", "0", "*", "*", "*", "root", CRONTAB_SQUID_TEMPLATE);
-            switch($tm_squid) {
-                    // day of month
-                    case 'lsr_none':$on = false;     break;
-                    case 'lsr_d1':  $on = true; $opt[2]= "*/1"; break;
-                    case 'lsr_d2':  $on = true; $opt[2]= "*/2";  break;
-                    case 'lsr_d3':  $on = true; $opt[2]= "*/3";  break;
-                    case 'lsr_d4':  $on = true; $opt[2]= "*/4";  break;
-                    case 'lsr_d5':  $on = true; $opt[2]= "*/5";  break;
-                    case 'lsr_d6':  $on = true; $opt[2]= "*/6";  break;
-                    case 'lsr_d10': $on = true; $opt[2]= "*/10"; break;
-                    case 'lsr_d15': $on = true; $opt[2]= "*/15"; break;
-                    case 'lsr_d20': $on = true; $opt[2]= "*/20"; break;
-                    case 'lsr_d25': $on = true; $opt[2]= "*/25"; break;
-                    case 'lsr_d30': $on = true; $opt[2]= "*/30"; break;
-                    // day of week
-                    case 'lsr_w1': $on = true; $opt[4]= "*/1"; break;
-                    case 'lsr_w2': $on = true; $opt[4]= "*/1"; break;
-                    case 'lsr_w3': $on = true; $opt[4]= "*/1"; break;
-                    case 'lsr_w4': $on = true; $opt[4]= "*/1"; break;
-                    case 'lsr_w5': $on = true; $opt[4]= "*/1"; break;
-                    case 'lsr_w6': $on = true; $opt[4]= "*/1"; break;
-                    case 'lsr_w7': $on = true; $opt[4]= "*/1"; break;
-            }
-            ls_setup_cron("lightsquid_squid_rotate", $opt, CRONTAB_SQUID_JOBKEY, $on);
-        }  else
+#        if ($tm_squid) {
+#            $on = false;
+#            $opt = array("0", "0", "*", "*", "*", "root", CRONTAB_SQUID_TEMPLATE);
+#            switch($tm_squid) {
+#                    // day of month
+#                    case 'lsr_none':$on = false;     break;
+#                    case 'lsr_d1':  $on = true; $opt[2]= "*/1"; break;
+#                    case 'lsr_d2':  $on = true; $opt[2]= "*/2";  break;
+#                    case 'lsr_d3':  $on = true; $opt[2]= "*/3";  break;
+#                    case 'lsr_d4':  $on = true; $opt[2]= "*/4";  break;
+#                    case 'lsr_d5':  $on = true; $opt[2]= "*/5";  break;
+#                    case 'lsr_d6':  $on = true; $opt[2]= "*/6";  break;
+#                    case 'lsr_d10': $on = true; $opt[2]= "*/10"; break;
+#                    case 'lsr_d15': $on = true; $opt[2]= "*/15"; break;
+#                    case 'lsr_d20': $on = true; $opt[2]= "*/20"; break;
+#                    case 'lsr_d25': $on = true; $opt[2]= "*/25"; break;
+#                    case 'lsr_d30': $on = true; $opt[2]= "*/30"; break;
+#                    // day of week
+#                    case 'lsr_w1': $on = true; $opt[4]= "*/1"; break;
+#                    case 'lsr_w2': $on = true; $opt[4]= "*/1"; break;
+#                    case 'lsr_w3': $on = true; $opt[4]= "*/1"; break;
+#                    case 'lsr_w4': $on = true; $opt[4]= "*/1"; break;
+#                    case 'lsr_w5': $on = true; $opt[4]= "*/1"; break;
+#                    case 'lsr_w6': $on = true; $opt[4]= "*/1"; break;
+#                    case 'lsr_w7': $on = true; $opt[4]= "*/1"; break;
+#            }
+#            ls_setup_cron("lightsquid_squid_rotate", $opt, CRONTAB_SQUID_JOBKEY, $on);
+#        }  else
             ls_setup_cron("lightsquid_squid_rotate", "", "", false);
 
          // update squid conf
