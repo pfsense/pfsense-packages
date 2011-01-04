@@ -77,12 +77,9 @@ function cron_install_command()
 		exec("mkdir /usr/local/www/packages/cron/");
 	}
 
-	//rename PHP files from .tmp to .php
-	exec("cp /tmp/cron.tmp /usr/local/www/packages/cron/cron.php");
-	unlink_if_exists("/tmp/cron.tmp");
-
-	exec("cp /tmp/cron_edit.tmp /usr/local/www/packages/cron/cron_edit.php");
-	unlink_if_exists("/tmp/cron_edit.tmp");
+	//Copy PHP files from .tmp to .php - don't move or put them in /tmp or the pkg system will miss them if it gets cleared.
+	exec("cp /usr/local/www/packages/cron/cron.tmp /usr/local/www/packages/cron/cron.php");
+	exec("cp /usr/local/www/packages/cron/cron_edit.tmp /usr/local/www/packages/cron/cron_edit.php");
 
 	//write_config();
 
