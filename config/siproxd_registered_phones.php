@@ -36,8 +36,8 @@
 ##|*MATCH=siproxd_registered_phones.php*
 ##|-PRIV
 
-$pgtitle = array(gettext("Status"), gettext("siproxd Registered Phones"));
 require("guiconfig.inc");
+$pgtitle = array(gettext("Status"), gettext("siproxd Registered Phones"));
 
 $phonetext = file_get_contents("/var/siproxd/siproxd_registrations");
 $phonedata = explode("\n", $phonetext);
