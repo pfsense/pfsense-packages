@@ -23,6 +23,9 @@
 	POSSIBILITY OF SUCH DAMAGE.
 */
 
+if(!function_exists("is_service_running"))
+	require_once("service-utils.inc");
+
 if(!function_exists("get_dns_servers"))
 	require_once("pfsense-utils.inc");
 
@@ -315,13 +318,8 @@ EOF;
 
 	}
 
-	// Set the number of threads equal to number of CPUs.
-	// Use 1 if for some reason this sysctl fails.
-	$numprocs = intval(trim(`/sbin/sysctl kern.smp.cpus | /usr/bin/cut -d" " -f2`));
-	if($numprocs > 0)
-		$number_threads = "num-threads: {$numprocs}";
-	else 
-		$number_threads = "num-threads: 1";
+	//Setup optimization
+	$optimization = unbound_optimization();
 
 	$unbound_conf = <<<EOD
 #########################
@@ -332,7 +330,16 @@ EOF;
 # Server config
 ###
 server:
-{$number_threads}
+{$optimization['number_threads']}
+{$optimization['msg_cache_slabs']}
+{$optimization['rrset_cache_slabs']}
+{$optimization['infra_cache_slabs']}
+{$optimization['key_cache_slabs']}
+{$optimization['msg_cache_size']}
+{$optimization['rrset_cache_size']}
+{$optimization['outgoing_range']}
+{$optimization['so_rcvbuf']}
+num-queries-per-thread: 1024
 verbosity: 1
 port: 53
 do-ip4: yes
@@ -391,6 +398,70 @@ function unbound_ctl_exec($cmd) {
 	
 	mwexec("/usr/local/sbin/unbound-control $cmd");
 		
+}
+
+
+/* unbound_optimization - custom settings that can be configured to make Unbound perform better
+ * in larger installations.
+ */
+function unbound_optimization() {
+	global $config;
+
+	$unbound_config = $config['installedpackages']['unbound']['config'][0];	
+	$optimization_settings = array();
+	
+	// Set the number of threads equal to number of CPUs.
+	// Use 1 (disable threading) if for some reason this sysctl fails.
+	$numprocs = intval(trim(`/sbin/sysctl kern.smp.cpus | /usr/bin/cut -d" " -f2`));
+	if($numprocs > 0)
+		$optimization['number_threads'] = "num-threads: {$numprocs}";
+	else
+		$optimization['number_threads'] = "num-threads: 1";
+	
+	// Slabs to help reduce lock contention.
+	if ($numprocs > 4) {
+		$optimization['msg_cache_slabs'] = "msg-cache-slabs: {$numprocs}";
+		$optimization['rrset_cache_slabs'] = "rrset-cache-slabs: {$numprocs}";
+		$optimization['infra_cache_slabs'] = "infra-cache-slabs: {$numprocs}";
+		$optimization['key_cache_slabs'] = "key-cache-slabs: {$numprocs}";
+	} else {
+		$optimization['msg_cache_slabs'] = "msg-cache-slabs: 4";
+		$optimization['rrset_cache_slabs'] = "rrset-cache-slabs: 4";
+		$optimization['infra_cache_slabs'] = "infra-cache-slabs: 4";
+		$optimization['key_cache_slabs'] = "key-cache-slabs: 4";
+	}
+	
+	// Memory usage - default is 4Mb if nothing has been selected
+	if(isset($unbound_config['msg_cache_size'])) {
+		$rr = $unbound_config['msg_cache_size']*2;
+		$optimization['msg_cache_size'] = "msg-cache-size: {$unbound_config['msg_cache_size']}m";
+		$optimization['rrset_cache_size'] = "rrset-cache-size: {$rr}m";
+	} else {
+		$optimization['msg_cache_size'] = "msg-cache-size: 4m";
+		$optimization['rrset_cache_size'] = "rrset_cache_size: 8m";
+	}
+	
+	// More outgoing connections per thread otherwise assign a default of 4096 for a single thread
+	if($numprocs > 0) {
+		$or = (1024/$numprocs) - 50;
+		$optimization['outgoing_range'] = "outgoing-range: {$or}";
+	} else {
+		$optimization['outgoing_range'] = "outgoing-range: {4096}";
+	}
+
+	// Larger socket buffer for busy servers
+	// Check that it is set to 4MB (by default the OS has it configured to 4MB)
+	foreach ($config['sysctl']['item'] as $tunable) {
+		if ($tunable['tunable'] == 'kern.ipc.maxsockbuf') {
+			$so = floor(($tunable['value']/1024/1024)-1);
+			$optimization['so_rcvbuf'] = "so-rcvbuf: {$so}m";
+		}
+	}
+	// Safety check in case kern.ipc.maxsockbuf is deleted.
+	if(!isset($optimization['so_rcvbuf']))
+		$optimization['so_rcvbuf'] = "#so-rcvbuf: 4m";
+
+	return $optimization;
 }
 
 function fetch_root_hints() {
@@ -536,7 +607,7 @@ function unbound_add_host_entries() {
 			if(!$added_item[$current_host]) {
 				$host_entries .= "local-data-ptr: \"{$host['ip']} {$host['host']}.{$host['domain']}\"\n";
 				$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} IN A {$host['ip']}\"\n";
-				if (!empty($host['descr']))
+				if (!empty($host['descr']) && $unboundcfg['txtsupport'] == 'on')
 					$host_entries .= "local-data: '{$host['host']}.{$host['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
 					
 				// Do not add duplicate entries
@@ -554,7 +625,7 @@ function unbound_add_host_entries() {
 					if ($host['ipaddr'] && $host['hostname']) {
 						$host_entries .= "local-data-ptr: \"{$host['ipaddr']} {$host['hostname']}.{$syscfg['domain']}\"\n";
 						$host_entries .= "local-data: \"{$host['hostname']}.{$syscfg['domain']} IN A {$host['ipaddr']}\"\n";
-						if (!empty($host['descr']))
+						if (!empty($host['descr']) && $unboundcfg['txtsupport'] == 'on')
 							$host_entries .= "local-data: '{$host['hostname']}.{$syscfg['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
 					}
 		$unbound_entries .= $host_entries;

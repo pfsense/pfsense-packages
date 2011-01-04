@@ -138,6 +138,30 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fieldname>msg_cache_size</fieldname>
+			<fielddescr>Message Cache Size</fielddescr>
+			<description>Size of the message cache. The message cache stores DNS rcodes and validation statuses. The RRSet cache will automatically be set to twice this amount. The RRSet cache contains the RR data. The default is 4 megabytes.</description>
+			<type>select</type>
+			<default_value>4</default_value>
+			<options>
+				<option><name>4MB</name><value>4</value></option>
+				<option><name>10MB</name><value>10</value></option>
+				<option><name>20MB</name><value>20</value></option>
+				<option><name>50MB</name><value>50</value></option>
+				<option><name>100MB</name><value>100</value></option>
+				<option><name>250MB</name><value>250</value></option>
+				<option><name>250MB</name><value>250</value></option>
+				<option><name>512MB</name><value>512</value></option>
+			</options>
+		</field>
+		<field>
+			<fieldname>txtsupport</fieldname>
+			<fielddescr>TXT Comment Support</fielddescr>
+			<description>If this option is set, then any descriptions associated with Host entries and DHCP Static mappings will create a corresponding &lt;a href="http://en.wikipedia.org/wiki/List_of_DNS_record_types"&gt;TXT record&lt;/a&gt;.</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
+		</field>
+		<field>
 			<name>Unbound Statistics</name>
 			<type>listtopic</type>
 		</field>
