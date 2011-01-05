@@ -5,7 +5,8 @@ include("head.inc");
 include("fbegin.inc");
 $aaaa = $config['installedpackages']['vnstat2']['config'][0]['vnstat_interface'];
 $bbbb = convert_friendly_interface_to_real_interface_name($aaaa);
-$pgtitle = gettext("Vnstati info for $aaaa ($bbbb)");
+$cccc = convert_real_interface_to_friendly_descr($bbbb);
+$pgtitle = gettext("Vnstati info for $cccc ($bbbb)");
 echo "<a href=$myurl/pkg_edit.php?xml=vnstati.xml&id=0>Go Back</a><br />";
 echo "<center><p class=\"pgtitle\">{$pgtitle}</p>";
 ?>
