@@ -124,6 +124,12 @@
                                  <option><name>28</name><value>28</value></option>
                         </options>
 		</field>
+		<field>
+			<description>Enable vnstat php frontend (Note that no login will be needed)</description>
+			<fielddescr>Enable php frontend for vnstat</fielddescr>
+			<fieldname>vnstat_phpfrontend</fieldname>
+			<type>checkbox</type>
+		</field>
 	</fields>
 	<custom_add_php_command>change_vnstat_conf();</custom_add_php_command>
 	<custom_php_resync_config_command></custom_php_resync_config_command>

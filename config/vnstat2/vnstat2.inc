@@ -63,8 +63,17 @@ function vnstat2_install_cron($vnstat_cron_value) {
 function change_vnstat_conf(){
 	conf_mount_rw();
 	global $config;
-	$config['installedpackages']['vnstat2']['config'][0]['monthrotate'] = $_POST['monthrotate']; 
+	$config['installedpackages']['vnstat2']['config'][0]['monthrotate'] = $_POST['monthrotate'];
+	$config['installedpackages']['vnstat2']['config'][0]['vnstat_phpfrontend'] = $_POST['vnstat_phpfrontend']; 
 	write_conf_f();
+	write_config();
+	$no_vnstat_phpfrontend = $config['installedpackages']['vnstat2']['config'][0]['vnstat_phpfrontend'];
+        if ($no_vnstat_phpfrontend == "on"){
+ 		vnstat_php_frontend();
+	}
+	else {
+	exec("[ -d /usr/local/www/vnstat2 ] && rm -d -R /usr/local/www/vnstat2");
+}
 	conf_mount_ro();
 }
 
@@ -145,14 +154,14 @@ function vnstat_install_config() {
 	exec("[ ! -f /usr/local/www/diag_vnstat.php ] && cp /usr/local/pkg/diag_vnstat.abc /usr/local/www/diag_vnstat.php");
 	exec("[ ! -f /usr/local/www/vnstati.php ] && cp /usr/local/pkg/vnstati.abc /usr/local/www/vnstati.php");
 	exec("[ ! -f /usr/local/www/vnstat2_img.php ] && cp /usr/local/pkg/vnstat2_img.abc /usr/local/www/vnstat2_img.php");
-// Unpack and move Vnstat frontend 
-	exec("cd ..");
-	exec("tar -zxovf /usr/local/pkg/vnstat_php_frontend-1.4.1.tar.gz");
-	exec("mv vnstat_php_frontend-1.4.1 /usr/local/www/vnstat2");
 // Add MonthRotate value to config.xml and write /usr/local/etc/vnstat.conf
 	$no_monthrotate = $config['installedpackages']['vnstat2']['config'][0]['monthrotate'];	
 	if ($no_monthrotate == ""){
 		$config['installedpackages']['vnstat2']['config'][0]['monthrotate'] = "1";
+	}
+	$no_vnstat_phpfrontend = $config['installedpackages']['vnstat2']['config'][0]['vnstat_phpfrontend'];
+        if ($no_vnstat_phpfrontend == "on"){
+ 		vnstat_php_frontend();
 	}
 	write_conf_f();
 // Add cron job to config.xml
@@ -177,7 +186,16 @@ function vnstat_install_config() {
         {
            exec("/usr/local/bin/vnstat -u -i ". $result2);
         }
+     	write_config();
+     	conf_mount_ro();
+}
 
+function vnstat_php_frontend(){
+	global $config;
+// Unpack and move Vnstat frontend 
+	exec("cd ..");
+	exec("tar -zxovf /usr/local/pkg/vnstat_php_frontend-1.4.1.tar.gz");
+	exec("mv vnstat_php_frontend-1.4.1 /usr/local/www/vnstat2");
 // Find information to be writing in config.php 
 	// $iface_list_array_items
         exec("ls /conf/vnstat/ | grep -v '\.'", $vnstat_nic_in);
@@ -210,7 +228,6 @@ function vnstat_install_config() {
         $colorscheme2 = "\$colorscheme['light'] = array(";
         $colorscheme3 = "\$colorscheme['red'] = array(";
         $colorscheme4 = "\$colorscheme['pfSense'] = array(";
-
 // ************ Write new config.php ******************
         $config_file = <<<EOF
 <?php
@@ -339,7 +356,5 @@ EOF;
      }
      fwrite($hf, $config_file);
      fclose($hf);
-     write_config();
-     conf_mount_ro();
 }
 ?>
