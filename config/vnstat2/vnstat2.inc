@@ -130,6 +130,7 @@ function create_vnstati_image() {
 	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -m -o /tmp/newpicture2.png");
 	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -d -o /tmp/newpicture3.png");
 	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -t -o /tmp/newpicture4.png");
+	write_config();
 	conf_mount_ro();
 }
 
