@@ -60,11 +60,6 @@
 	<tabs>
 		<tab>
 			<text>Settings</text>
-			<url>/pkg_edit.php?xml=cron.xml&amp;id=0</url>
-			<active/>
-		</tab>
-		<tab>
-			<text>Settings</text>
 			<url>/packages/cron.php</url>
 			<active/>
 		</tab>		
