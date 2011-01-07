@@ -76,12 +76,12 @@
 		<item>http://www.pfsense.com/packages/config/cron/cron.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/packages/cron/</prefix>
+		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/cron/cron.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/www/packages/cron/</prefix>
+		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>		
 		<item>http://www.pfsense.com/packages/config/cron/cron_edit.tmp</item>
 	</additional_files_needed>

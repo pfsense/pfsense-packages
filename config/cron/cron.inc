@@ -69,17 +69,13 @@ function cron_install_command()
 	conf_mount_rw();
 	config_lock();
 
-	if (!is_dir('/usr/local/www/packages/')) {
-		exec("mkdir /usr/local/www/packages/");
-	}
-
 	if (!is_dir('/usr/local/www/packages/cron/')) {
-		exec("mkdir /usr/local/www/packages/cron/");
+		exec("mkdir -p /usr/local/www/packages/cron/");
 	}
 
 	//Copy PHP files from .tmp to .php - don't move or put them in /tmp or the pkg system will miss them if it gets cleared.
-	exec("cp /usr/local/www/packages/cron/cron.tmp /usr/local/www/packages/cron/cron.php");
-	exec("cp /usr/local/www/packages/cron/cron_edit.tmp /usr/local/www/packages/cron/cron_edit.php");
+	exec("cp /usr/local/pkg/cron.tmp /usr/local/www/packages/cron/cron.php");
+	exec("cp /usr/local/pkg/cron_edit.tmp /usr/local/www/packages/cron/cron_edit.php");
 
 	//write_config();
 
