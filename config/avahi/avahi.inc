@@ -43,10 +43,12 @@ function avahi_install() {
 	exec("mkdir -p /usr/local/etc/avahi/services/");
 	exec("mv /usr/local/etc/avahi/*.service /usr/local/etc/avahi/services/");
 
+	$archive = (substr(trim(file_get_contents("/etc/version")),0,1) == "2") ? "avahi8.tar.gz" : "avahi.tar.gz";
+
 	// Extract out libraries and avahi-daemon
-	if(file_exists("/root/avahi.tar.gz")) {
-		exec("/usr/bin/tar xzPUf /root/avahi.tar.gz -C /");
-		unlink("/root/avahi.tar.gz");
+	if(file_exists("/root/{$archive}")) {
+		exec("/usr/bin/tar xzPUf /root/{$archive} -C /");
+		unlink("/root/{$archive}");
 	}
 
 	// Make sure everthing was extracted
