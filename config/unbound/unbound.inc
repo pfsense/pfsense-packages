@@ -454,7 +454,12 @@ function unbound_optimization() {
 	foreach ($config['sysctl']['item'] as $tunable) {
 		if ($tunable['tunable'] == 'kern.ipc.maxsockbuf') {
 			$so = floor(($tunable['value']/1024/1024)-1);
-			$optimization['so_rcvbuf'] = "so-rcvbuf: {$so}m";
+			// Check to ensure that the number is not a negative
+			if ($so > 0)
+				$optimization['so_rcvbuf'] = "so-rcvbuf: {$so}m";
+			else
+				unset($optimization['so_rcvbuf']);
+			
 		}
 	}
 	// Safety check in case kern.ipc.maxsockbuf is deleted.
@@ -490,11 +495,16 @@ function fetch_root_hints() {
 	}
 }
 
-function unbound_validate($post) {
+function unbound_validate($post, $acl=false) {
 	global $config, $input_errors;
 
-	if($_POST['unbound_status'] == "on" && isset($config['dnsmasq']['enable']))
+	if($post['unbound_status'] == "on" && isset($config['dnsmasq']['enable']))
 		$input_errors[] = "The system dns-forwarder is still active. Disable it before enabling the Unbound service.";
+		
+	if($acl) {
+		if(isset($post['row']['acl_network']))
+			print_r($post); exit;
+	}
 	
 }
 
