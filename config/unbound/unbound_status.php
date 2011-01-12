@@ -132,6 +132,7 @@ function execCmds() {
 	<?php
 		$tab_array = array();
 		$tab_array[] = array(gettext("Unbound DNS Settings"), false, "/pkg_edit.php?xml=unbound.xml&amp;id=0");
+		$tab_array[] = array(gettext("Unbound ACLs"), false, "/pkg.php?xml=unbound_acls.xml");
 		$tab_array[] = array(gettext("Unbound DNS Status"), true, "/unbound_status.php");
 		display_top_tabs($tab_array);
 	?>

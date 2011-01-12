@@ -40,7 +40,7 @@
 	<requirements/>
 	<faq/>
 	<name>unbound</name>
-	<version>1.4.6</version>
+	<version>1.4.7</version>
 	<title>Services: Unbound DNS Forwarder</title>
 	<include_file>/usr/local/pkg/unbound.inc</include_file>
 	<menu>
@@ -70,11 +70,20 @@
 		<chmod>0644</chmod>
 		<item>http://www.pfsense.org/packages/config/unbound/unbound_status.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0644</chmod>
+		<item>http://www.pfsense.org/packages/config/unbound/unbound_acls.xml</item>
+	</additional_files_needed>
 	<tabs>
 		<tab>
 			<text>Unbound DNS Settings</text>
 			<url>/pkg_edit.php?xml=unbound.xml&amp;id=0</url>
 			<active/>
+		</tab>
+		<tab>
+			<text>Unbound ACLs</text>
+			<url>/pkg.php?xml=unbound_acls.xml</url>
 		</tab>
 		<tab>
 			<text>Unbound DNS Status</text>

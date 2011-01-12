@@ -249,6 +249,24 @@ function unbound_get_network_interface_addresses($subnet=false, $mask=false) {
 	
 }
 
+function unbound_acls_config() {
+	global $config;
+	
+	if(array($config['installedpackages']['unboundacls']['config'])) {
+		$unbound_acls = $config['installedpackages']['unboundacls']['config'];
+		$unboundcfg = "";
+		foreach($unbound_acls as $unbound_acl){
+			$unboundcfg .= "#{$unbound_acl['aclname']}\n";
+			foreach($unbound_acl['row'] as $network) {
+				$unboundcfg .= "access-control: {$network['acl_network']}/{$network['mask']} {$unbound_acl['aclaction']}\n";
+			}			
+		}
+		return $unboundcfg;
+	} else {
+		return;
+	}
+}
+
 function unbound_resync_config() {
 	global $config, $g;
 	
@@ -256,11 +274,13 @@ function unbound_resync_config() {
 		$config['installedpackages']['unbound']['config'] = array();
 
 	$unbound_config = &$config['installedpackages']['unbound']['config'][0];
-			
+	
+	// Add networks physically attached to allowed networks and then call the acls		
 	$interfaces = unbound_get_network_interface_addresses(true, true);
 	foreach($interfaces as $allowed_network) {
 		$unbound_allowed_networks .= "access-control: $allowed_network allow\n";
 	}
+	$unbound_allowed_networks .= unbound_acls_config();
 	
 	if($unbound_config['dnssec_status'] == "on") {
 		$module_config = "validator iterator";
@@ -365,7 +385,8 @@ use-syslog: yes
 module-config: "{$module_config}"
 unwanted-reply-threshold: 10000000
 {$anchor_file}
-# Networks allowed to utilize service
+#### Access Control ####
+# Local attached networks allowed to utilize service and any user added ACLs
 access-control: 127.0.0.0/8 allow
 {$unbound_allowed_networks}
 {$pvt_addr}
@@ -502,10 +523,25 @@ function unbound_validate($post, $acl=false) {
 		$input_errors[] = "The system dns-forwarder is still active. Disable it before enabling the Unbound service.";
 		
 	if($acl) {
-		if(isset($post['row']['acl_network']))
-			print_r($post); exit;
-	}
-	
+		$acls = $post;
+		// Check to ensure values entered is an action that is in the list
+		if ($acls['aclaction'] != 'refuse' && $acls['aclaction'] != 'allow' && $acls['aclaction'] && 'allow_snoop' && $acls['aclaction'] != 'deny')
+			$input_errors[] = "{$acls['aclaction']} is not a valid ACL Action. Please select one of the four actions defined in the list.";
+		
+		// Make sure there is at least 1 network defined.
+		if (!isset($acls['acl_network0']))	
+			$input_errors[] = "You need to specify at least one network to create a valid ACL.";
+			
+		$count = 0;
+		// Get number of rows added, should be passed by the form - will look into that later
+		for($i=0; $i<99; $i++) {
+			if (isset($acls['acl_network'.$i])) {
+				// Check to ensure values entered are networks
+				if(!is_ipaddr($acls['acl_network'.$i]) && !is_subnet($acls['mask'.$i]))
+					$input_errors[] = "{$acls['acl_network'.$i]}/{$acls['mask'.$i]} is not a valid network.";
+			}				
+		}
+	}	
 }
 
 function unbound_reconfigure() {
