@@ -41,8 +41,8 @@ function openvpn_client_export_install() {
 	$ovpndir = "/usr/local/share/openvpn";
 	$workdir = "{$ovpndir}/client-export";
 
-	if(!is_dir("/usr/local/share/openvpn"))
-		mkdir("/usr/local/share/openvpn");
+	if (!is_dir($workdir))
+		mkdir($workdir, 0777, true);
 
 	exec("/usr/bin/tar zxf {$tarpath} -C {$ovpndir}");
 	conf_mount_ro();
@@ -53,6 +53,8 @@ function openvpn_client_export_deinstall() {
 	$phpfile = "vpn_openvpn_export.php";
 	$ovpndir = "/usr/local/share/openvpn";
 	$workdir = "{$ovpndir}/client-export";
+	if (!file_exists($workdir . "/template/openvpn-install.exe"))
+		openvpn_client_export_install();
 
 	unlink_if_exists("/usr/local/www/{$phpfile}");
 	exec("/bin/rm -r {$workdir}");
@@ -254,6 +256,8 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 
 	$ovpndir = "/usr/local/share/openvpn";
 	$workdir = "{$ovpndir}/client-export";
+	if (!file_exists($workdir . "/template/openvpn-install.exe"))
+		openvpn_client_export_install();
 
 	// lookup server settings
 	$settings = $config['openvpn']['openvpn-server'][$srvid];
@@ -377,6 +381,9 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	global $config, $g;
 
 	$ovpndir = "/usr/local/share/openvpn/";
+	if (!file_exists($workdir . "/template/openvpn-install.exe"))
+		openvpn_client_export_install();
+
 	$uniq = uniqid();
 	$tempdir = $g['tmp_path'] . "/openvpn-export-" . $uniq;
 	$zipfile = $g['tmp_path'] . "/{$uniq}-Viscosity.visc.zip";
