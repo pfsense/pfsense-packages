@@ -39,7 +39,7 @@ function unbound_initial_setup() {
 	// Make sure read-write
 	conf_mount_rw();
 	
-	if (!array($config['installedpackages']['unbound']['config']))
+	if (!is_array($config['installedpackages']['unbound']['config']))
 		$config['installedpackages']['unbound']['config'] = array();
 
 	$unbound_config = &$config['installedpackages']['unbound']['config'][0];
@@ -252,7 +252,7 @@ function unbound_get_network_interface_addresses($subnet=false, $mask=false) {
 function unbound_acls_config() {
 	global $config;
 	
-	if(array($config['installedpackages']['unboundacls']['config'])) {
+	if(is_array($config['installedpackages']['unboundacls']['config'])) {
 		$unbound_acls = $config['installedpackages']['unboundacls']['config'];
 		$unboundcfg = "";
 		foreach($unbound_acls as $unbound_acl){
@@ -270,7 +270,7 @@ function unbound_acls_config() {
 function unbound_resync_config() {
 	global $config, $g;
 	
-	if (!array($config['installedpackages']['unbound']['config']))
+	if (!is_array($config['installedpackages']['unbound']['config']))
 		$config['installedpackages']['unbound']['config'] = array();
 
 	$unbound_config = &$config['installedpackages']['unbound']['config'][0];
