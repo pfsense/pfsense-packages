@@ -687,7 +687,8 @@
       <required_version>1.2.1</required_version>
       <config_file>http://www.pfsense.com/packages/config/stunnel.xml</config_file>
       <configurationfile>stunnel.xml</configurationfile>
-	  <build_port_path>/usr/ports/security/stunnel</build_port_path>
+	<build_port_path>/usr/ports/security/stunnel</build_port_path>
+	<build_options>WITHOUT_FORK=true WITH_PTHREAD=true WITHOUT_UCONTEXT=true WITHOUT_IPV6=true WITH_LIBWRAP=true WITHOUT_SSL_PORT=true</build_options>
     </package>
     <package>
       <name>iperf</name>
