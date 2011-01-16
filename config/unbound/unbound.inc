@@ -529,7 +529,7 @@ function unbound_validate($post, $acl=false) {
 	if($acl) {
 		$acls = $post;
 		// Check to ensure values entered is an action that is in the list
-		if ($acls['aclaction'] != 'refuse' && $acls['aclaction'] != 'allow' && $acls['aclaction'] && 'allow_snoop' && $acls['aclaction'] != 'deny')
+		if ($acls['aclaction'] != 'refuse' && $acls['aclaction'] != 'allow' && $acls['aclaction'] != 'allow_snoop' && $acls['aclaction'] != 'deny')
 			$input_errors[] = "{$acls['aclaction']} is not a valid ACL Action. Please select one of the four actions defined in the list.";
 		
 		// Make sure there is at least 1 network defined.
