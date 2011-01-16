@@ -66,11 +66,15 @@ function unbound_initial_setup() {
 	// Setup rc file for startup and shutdown.
 	unbound_rc_setup();
 	
-	// Set initial interfaces that are allowed to query to lan, if that does not exist set it to the wan
-	if(count($config['interfaces']) > 1)
-		$unbound_config['active_interface'] = "lan";
-	else
-		$unbound_config['active_interface'] = "wan";
+	/* Check to see if Set initial interfaces that are allowed to query to lan, if that does not exist set it to the wan
+	 *
+	 */
+	if(!isset($unbound_config['active_interface'])) {
+		if(count($config['interfaces']) > 1)
+			$unbound_config['active_interface'] = "lan";
+		else
+			$unbound_config['active_interface'] = "wan";
+	}
 	
 	unbound_anchor_setup();
 	unbound_resync_config();
