@@ -721,6 +721,7 @@ function unbound_add_domain_overrides($pvt=false) {
 		foreach($result as $domain=>$ips) {
 			if($pvt == true) {
 				$domain_entries .= "private-domain: \"$domain\"\n";
+				$domain_entries .= "domain-insecure: \"$domain\"\n";
 			} else {
 				$domain_entries .= "stub-zone:\n";
 				$domain_entries .= "\tname: \"$domain\"\n";
