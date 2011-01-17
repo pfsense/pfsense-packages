@@ -27,6 +27,7 @@
 */
 
 require_once("filter.inc");
+require_once("notices.inc");
 
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
 if(strstr($pfSversion, "1.2")) 
