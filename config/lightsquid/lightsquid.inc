@@ -324,7 +324,7 @@ function ls_setup_cron($task_name, $options, $task_key, $on_off) {
                     unset($config['cron']['item'][$key]);
                 } else
                 # unset crontask by cmd
-                if (strpos($item['command'], $options[6]) !== false) {
+                if ($options[6] && (strpos($item['command'], $options[6]) !== false) {
                     unset($config['cron']['item'][$key]);
                 }
             }
@@ -350,7 +350,7 @@ function ls_setup_cron($task_name, $options, $task_key, $on_off) {
 
                     $config['cron']['item'][] = $cron_item;
                     update_log("ls_setup_cron: add cron task '{$task_name}'='{$cron_item['command']}'");
-                }        
+                }
             } else
                 // log
                 update_log("ls_setup_cron: input prm 'task_key' not defined");
