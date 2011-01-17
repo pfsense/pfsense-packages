@@ -324,7 +324,7 @@ function ls_setup_cron($task_name, $options, $task_key, $on_off) {
                     unset($config['cron']['item'][$key]);
                 } else
                 # unset crontask by cmd
-                if ($options[6] && (strpos($item['command'], $options[6]) !== false) {
+                if ($options[6] && (strpos($item['command'], $options[6]) !== false)) {
                     unset($config['cron']['item'][$key]);
                 }
             }
