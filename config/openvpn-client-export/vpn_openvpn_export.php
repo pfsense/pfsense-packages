@@ -338,12 +338,12 @@ include("head.inc");
 <!--
 
 var servers = new Array();
-<?php foreach ($ras_server as $sindex => & $server): ?>
+<?php foreach ($ras_server as $sindex => $server): ?>
 servers[<?=$sindex;?>] = new Array();
 servers[<?=$sindex;?>][0] = '<?=$server['index'];?>';
 servers[<?=$sindex;?>][1] = new Array();
 servers[<?=$sindex;?>][2] = '<?=$server['mode'];?>';;
-<?php 	foreach ($server['users'] as $uindex => & $user): ?>
+<?php 	foreach ($server['users'] as $uindex => $user): ?>
 servers[<?=$sindex;?>][1][<?=$uindex;?>] = new Array();
 servers[<?=$sindex;?>][1][<?=$uindex;?>][0] = '<?=$user['uindex'];?>';
 servers[<?=$sindex;?>][1][<?=$uindex;?>][1] = '<?=$user['cindex'];?>';

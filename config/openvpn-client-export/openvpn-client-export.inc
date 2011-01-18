@@ -106,8 +106,8 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	}
 
 	// lookup server certificate info
-	$server_cert =& lookup_cert($settings['certref']);
-	$server_ca =& lookup_ca($server_cert['caref']);
+	$server_cert = lookup_cert($settings['certref']);
+	$server_ca = lookup_ca($server_cert['caref']);
 	if (!$server_cert || !$server_ca) {
 		$input_errors[] = "Could not locate certificate.";
 		return false;
@@ -115,7 +115,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 
 	// lookup user info
 	if ($usrid) {
-		$user =& $config['system']['user'][$usrid];
+		$user = $config['system']['user'][$usrid];
 		if (!$user) {
 			$input_errors[] = "Could not find user settings.";
 			return false;
@@ -124,7 +124,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 
 	// lookup user certificate info
 	if ($settings['mode'] != "server_user") {
-		$cert =& $user['cert'][$crtid];
+		$cert = $user['cert'][$crtid];
 		if (!$cert)
 			return false;
 		// If $cert is not an array, it's a certref not a cert.
@@ -273,8 +273,8 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	$nokeys = false;
 
 	// lookup server certificate info
-	$server_cert =& lookup_cert($settings['certref']);
-	$server_ca =& lookup_ca($server_cert['caref']);
+	$server_cert = lookup_cert($settings['certref']);
+	$server_ca = lookup_ca($server_cert['caref']);
 	if (!$server_cert || !$server_ca) {
 		$input_errors[] = "Could not find a valid certificate.";
 		return false;
@@ -282,7 +282,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 
 	// lookup user info
 	if ($usrid) {
-		$user =& $config['system']['user'][$usrid];
+		$user = $config['system']['user'][$usrid];
 		if (!$user) {
 			$input_errors[] = "Could not find the details about userid: {$usrid}";
 			return false;
@@ -291,7 +291,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 
 	// lookup user certificate info
 	if ($settings['mode'] != "server_user") {
-		$cert =& $user['cert'][$crtid];
+		$cert = $user['cert'][$crtid];
 		if (!$cert)
 			return false;
 		// If $cert is not an array, it's a certref not a cert.
@@ -396,21 +396,21 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 		return false;
 
 	// lookup server certificate info
-	$server_cert =& lookup_cert($settings['certref']);
-	$server_ca =& lookup_ca($server_cert['caref']);
+	$server_cert = lookup_cert($settings['certref']);
+	$server_ca = lookup_ca($server_cert['caref']);
 	if (!$server_cert || !$server_ca)
 		return false;
 
 	// lookup user info
 	if ($usrid) {
-		$user =& $config['system']['user'][$usrid];
+		$user = $config['system']['user'][$usrid];
 		if (!$user)
 			return false;
 	}
 
 	// lookup user certificate info
 	if ($settings['mode'] != "server_user") {
-		$cert =& $user['cert'][$crtid];
+		$cert = $user['cert'][$crtid];
 		if (!$cert)
 			return false;
 		// If $cert is not an array, it's a certref not a cert.
