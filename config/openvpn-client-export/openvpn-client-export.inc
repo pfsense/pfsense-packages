@@ -53,8 +53,6 @@ function openvpn_client_export_deinstall() {
 	$phpfile = "vpn_openvpn_export.php";
 	$ovpndir = "/usr/local/share/openvpn";
 	$workdir = "{$ovpndir}/client-export";
-	if (!file_exists($workdir . "/template/openvpn-install.exe"))
-		openvpn_client_export_install();
 
 	unlink_if_exists("/usr/local/www/{$phpfile}");
 	exec("/bin/rm -r {$workdir}");
