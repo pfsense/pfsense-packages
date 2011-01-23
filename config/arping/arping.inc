@@ -35,16 +35,7 @@ function arping_package_reinstall() {
 }
 
 function arping_package_php_command() {
-	$pgtitle = "Services: Arping";
-	include("head.inc");
-
-	echo "<body link=\"#0000CC\" vlink=\"#0000CC\" alink=\"#0000CC\">";
-	include("fbegin.inc");
-	echo "<p class=\"pgtitle\">{$pgtitle}</p>";
-
-	echo "<pre>";
 	system("arping -c3 " . $_POST['hostip']);
-	echo "</pre>";
 	exit;
 }
 

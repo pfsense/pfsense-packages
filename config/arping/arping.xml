@@ -47,7 +47,10 @@
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>arping</name>
 	<version>2.6.0.2</version>
-	<title>Services: arping</title>
+	<title>Services: ARPing</title>
+	<savetext>ARPing</savetext>
+	<preoutput>yes</preoutput>
+	<donotsave>true</donotsave>
 	<include_file>/usr/local/pkg/arping.inc</include_file>
 	<menu>
 		<name>Arping</name>
@@ -69,9 +72,9 @@
 	</additional_files_needed>
 	<fields>
 		<field>
-			<fielddescr>Host IP or Mac</fielddescr>
+			<fielddescr>Host IP or MAC</fielddescr>
 			<fieldname>hostip</fieldname>
-			<description>Select all WAN type interfaces</description>
+			<description>Enter the host IP or MAC address to ARP ping</description>
 			<type>input</type>
 		</field>
     </fields>
