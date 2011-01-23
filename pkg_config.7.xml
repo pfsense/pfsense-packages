@@ -3,7 +3,7 @@
 <pfsensepkgs>
   <packages>
       <package>
-		<name>File Manger</name>
+		<name>File Manager</name>
 		<website/>
 		<descr>PHP File Manager</descr>
 		<category>Diagnostics</category>

@@ -43,7 +43,7 @@
 		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
 	</package>
       <package>
-		<name>File Manger</name>
+		<name>File Manager</name>
 		<website/>
 		<descr>PHP File Manager</descr>
 		<category>Diagnostics</category>
