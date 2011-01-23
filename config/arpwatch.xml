@@ -7,7 +7,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
+    arpwatch.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2007 to whom it may belong
     All rights reserved.
@@ -82,7 +82,7 @@
 		<field>
 			<fielddescr>Listening Interface</fielddescr>
 			<fieldname>interface</fieldname>
-			<description>Enter the desired listening interface here.</description>
+			<description>Choose the desired listening interface here.</description>
 			<type>interfaces_selection</type>
 		</field>
 	</fields>
@@ -113,4 +113,3 @@
 		unlink_if_exists("/usr/local/etc/rc.d/arpwatch.sh");
         </custom_php_install_command>
 </packagegui>
-
