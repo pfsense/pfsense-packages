@@ -124,8 +124,8 @@ function create_vnstati_image() {
 	conf_mount_rw();
 	global $config;
 	$iface = $_POST['vnstat_interface'];
-	$config['installedpackages']['vnstat2']['config'][0]['vnstati_interface'] = $iface;
 	$ifaces_final = convert_friendly_interface_to_real_interface_name($iface);
+	$config['installedpackages']['vnstat2']['config'][0]['vnstat_interface'] = $ifaces_final;
 	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -vs -o /tmp/newpicture1.png");
 	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -m -o /tmp/newpicture2.png");
 	exec("/usr/local/bin/vnstati -i ". $ifaces_final ." -d -o /tmp/newpicture3.png");
@@ -139,7 +139,7 @@ function create_vnstat_output() {
 	global $config;
 	$iface2 = $_POST['vnstat_interface2']; 
 	$ifaces_final2 = convert_friendly_interface_to_real_interface_name($iface2);
-	$config['installedpackages']['vnstat2']['config'][0]['vnstat_output_nic'] = $ifaces_final2;
+	$config['installedpackages']['vnstat2']['config'][0]['vnstat_interface2'] = $ifaces_final2;
 	write_config();
 	conf_mount_ro();
 }
