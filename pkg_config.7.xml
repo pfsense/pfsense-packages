@@ -110,18 +110,6 @@
       <configurationfile>apache_mod_security.xml</configurationfile>
 	  <after_install_info>Please visit the ProxyServer settings tab and set the service up so that it may be started.</after_install_info>
     </package>
-	<package>
-		<name>frickin</name>
-		<descr>The BROKEN Frickin PPTP Proxy DOES NOT allows a Point-to-Point Tunneling Protocol (PPTP) client to connect to a PPTP server through Network Address Translation.</descr>
-		<website>http://www.placid.tv</website>
-		<category>Services</category>
-		<version>2.0</version>
-		<status>BROKEN</status>
-		<required_version>2.3</required_version>
-		<config_file>http://www.pfsense.com/packages/config/frickin/frickin.xml</config_file>
-		<configurationfile>frickin.xml</configurationfile>
-		<after_install_info>Please visit the Frickin PPTP settings tab and press save after setting the service up to start.</after_install_info>
-	</package>
     <package>
       <name>pure-ftpd</name>
       <website>http://www.pureftpd.org/</website>
