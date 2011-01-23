@@ -7,7 +7,7 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
+    iperfserver.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2007 to whom it may belong
     All rights reserved.
@@ -135,7 +135,7 @@
 		if($_POST['window'] != "") $iperf_options .= " -w {$_POST['window']}";
 		if($_POST['port'] != "") $iperf_options .= " -p {$_POST['port']}";
 		$iperf_options .= " -s";
-		system("/usr/local/bin/iperf" . $iperf_options);
+		mwexec_bg("/usr/local/bin/iperf" . $iperf_options);
 	</custom_add_php_command>
 </packagegui>
 
