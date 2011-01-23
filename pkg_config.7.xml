@@ -563,6 +563,7 @@
       <configurationfile>arping.xml</configurationfile>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
       <depends_on_package>arping-2.06.tbz</depends_on_package>
+      <pkginfolink>http://doc.pfsense.org/index.php/Arping</pkginfolink>
     </package>
     <package>
       <name>nmap</name>
