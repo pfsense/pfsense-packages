@@ -75,7 +75,10 @@ foreach($connect_times as $c) {
 echo "N:";
 echo $open_connections;
 echo ":";
-echo round(($average_connect_time / $total_connections));
+if($total_connections == 0)
+	echo 0;
+else
+	echo round(($average_connect_time / $total_connections));
 
 exit;
 
