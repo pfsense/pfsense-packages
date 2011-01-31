@@ -2680,6 +2680,7 @@ ob_end_clean();
 <br><br>
 <input type="submit" value="Save/Update"><br><br>
 <p>
+<small>Lists provided by <a href="http://www.countryipblocks.net/">countryipblocks.net</a></small>
 </p>
 </td>
 	</tr>
@@ -2688,4 +2689,3 @@ ob_end_clean();
 <?php include("fend.inc"); ?>
 </body>
 </html>
-
