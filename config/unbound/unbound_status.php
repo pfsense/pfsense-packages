@@ -36,7 +36,7 @@ if(!is_process_running("unbound")) {
 	exit;
 }
 
-$pgtitle = "Services: Unbound: Status";
+$pgtitle = "Services: Unbound DNS Forwarder: Status";
 include("head.inc");
 
 $pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
@@ -129,6 +129,8 @@ function execCmds() {
 
 <div id="mainlevel">
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td>
 	<?php
 		$tab_array = array();
 		$tab_array[] = array(gettext("Unbound DNS Settings"), false, "/pkg_edit.php?xml=unbound.xml&amp;id=0");
@@ -136,6 +138,8 @@ function execCmds() {
 		$tab_array[] = array(gettext("Unbound DNS Status"), true, "/unbound_status.php");
 		display_top_tabs($tab_array);
 	?>
+			</td>
+		</tr>
 	</table>
 	<table width="100%" border="0" cellpadding="0" cellspacing="0">
 	   <tr>
