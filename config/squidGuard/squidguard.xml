@@ -6,7 +6,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>squidguardgeneral</name>
-	<version>1.3_1 pkg v.1.5</version>
+	<version>1.3_1 pkg v.1.6</version>
 	<title>Proxy filter SquidGuard: General settings</title>
 	<include_file>/usr/local/pkg/squidguard.inc</include_file>
 	<!-- Installation -->
@@ -23,15 +23,15 @@
 			<active/>
 		</tab>
 		<tab>
-			<text>Default</text>
+			<text>Common ACL</text>
 			<url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>ACL</text>
+			<text>Special ACL</text>
 			<url>/pkg.php?xml=squidguard_acl.xml</url>
 		</tab>
 		<tab>
-			<text>Destinations</text>
+			<text>Target categories</text>
 			<url>/pkg.php?xml=squidguard_dest.xml</url>
 		</tab>
 		<tab>
@@ -41,6 +41,10 @@
 		<tab>
 			<text>Rewrites</text>
 			<url>/pkg.php?xml=squidguard_rewr.xml</url>
+		</tab>
+		<tab>
+			<text>Blacklist</text>
+			<url>/squidGuard/squidguard_blacklist.php</url>
 		</tab>
 		<tab>
 			<text>Log</text>
@@ -91,6 +95,11 @@
                 <prefix>/usr/local/www/squidGuard/</prefix>
                 <chmod>0755</chmod>
                 <item>http://www.pfsense.org/packages/config/squidGuard/squidguard_log.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+                <prefix>/usr/local/www/squidGuard/</prefix>
+                <chmod>0755</chmod>
+                <item>http://www.pfsense.org/packages/config/squidGuard/squidguard_blacklist.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
                 <prefix>/usr/local/www/</prefix>

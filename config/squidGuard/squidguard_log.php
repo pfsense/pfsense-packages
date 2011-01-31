@@ -60,11 +60,12 @@ if (!in_array( $mode, array("blocked", "fgui", "flog", "pconf", "fconf"))) $mode
 <?php
         $tab_array = array();
         $tab_array[] = array(gettext("General settings"), false, "/pkg_edit.php?xml=squidguard.xml&amp;id=0");
-        $tab_array[] = array(gettext("Default"),          false, "/pkg_edit.php?xml=squidguard_default.xml&amp;id=0");
-        $tab_array[] = array(gettext("ACL"),              false, "/pkg.php?xml=squidguard_acl.xml");
-        $tab_array[] = array(gettext("Destinations"),     false, "/pkg.php?xml=squidguard_dest.xml");
+        $tab_array[] = array(gettext("Common ACL"),       false, "/pkg_edit.php?xml=squidguard_default.xml&amp;id=0");
+        $tab_array[] = array(gettext("Special ACL"),      false, "/pkg.php?xml=squidguard_acl.xml");
+        $tab_array[] = array(gettext("Target categories"),false, "/pkg.php?xml=squidguard_dest.xml");
         $tab_array[] = array(gettext("Times"),            false, "/pkg.php?xml=squidguard_time.xml");
         $tab_array[] = array(gettext("Rewrites"),         false, "/pkg.php?xml=squidguard_rewr.xml");
+        $tab_array[] = array(gettext("Blacklist"),        false, "/squidGuard/squidguard_blacklist.php");
         $tab_array[] = array(gettext("Log"),              true,  "$selfpath");
         display_top_tabs($tab_array);
 ?>
@@ -132,9 +133,9 @@ if (!in_array( $mode, array("blocked", "fgui", "flog", "pconf", "fconf"))) $mode
 
 <?php include("fend.inc"); ?>
 
-<script type="text/javascript"> 
+<!--script type="text/javascript"> 
   NiftyCheck(); 
   Rounded("div#mainarea","bl br","#FFF","#eeeeee","smooth");
-</script>
+</script-->
 </body>
 </html>

@@ -7,7 +7,7 @@
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>squidguardacl</name>
 	<version>none</version>
-	<title>Proxy filter SquidGuard: Access Control List (ACL)</title>
+	<title>Proxy filter SquidGuard: Special Access Control List (ACL)</title>
 	<include_file>/usr/local/pkg/squidguard.inc</include_file>
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
@@ -17,16 +17,16 @@
 			<url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Default</text>
+			<text>Common ACL</text>
 			<url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>ACL</text>
+			<text>Special ACL</text>
 			<url>/pkg.php?xml=squidguard_acl.xml</url>
 			<active/>
 		</tab>
 		<tab>
-			<text>Destinations</text>
+			<text>Target categories</text>
 			<url>/pkg.php?xml=squidguard_dest.xml</url>
 		</tab>
 		<tab>
@@ -36,6 +36,10 @@
 		<tab>
 			<text>Rewrites</text>
 			<url>/pkg.php?xml=squidguard_rewr.xml</url>
+		</tab>
+		<tab>
+			<text>Blacklist</text>
+			<url>/squidGuard/squidguard_blacklist.php</url>
 		</tab>
 		<tab>
 			<text>Log</text>
@@ -51,14 +55,6 @@
                         <fielddescr>Name</fielddescr>
                         <fieldname>name</fieldname>
                 </columnitem>
-                <!--columnitem>
-                        <fielddescr>Source</fielddescr>
-                        <fieldname>source</fieldname>
-                </columnitem-->
-                <!--columnitem>
-                        <fielddescr>Destinations</fielddescr>
-                        <fieldname>dest</fieldname>
-                </columnitem-->
                 <columnitem>
                         <fielddescr>Time</fielddescr>
                         <fieldname>time</fieldname>
@@ -100,10 +96,10 @@
                         <type>select</type>
                 </field>
                 <field>
-                        <fielddescr>Source IP adresses and domains</fielddescr>
+                        <fielddescr>Client (source)</fielddescr>
                         <fieldname>source</fieldname>
                         <description>
-                                Enter source IP address or domain or "username" here. For separate use space.
+                                Enter client's IP address or domain or "username" here. For separate use space.
                                 &lt;br&gt;&lt;b&gt;Example:&lt;/b&gt;
                                 &lt;br&gt;ip: 192.168.0.1 or subnet 192.168.0.0/24 or subnet 192.168.1.0/255.255.255.0 or range 192.168.1.1-192.168.1.10
                                 &lt;br&gt;domain: foo.bar match foo.bar or *.foo.bar
@@ -114,38 +110,14 @@
                         <rows>3</rows>
                         <required/>
                 </field>
-                <!--field>
-                        <fielddescr>Source IP addresses</fielddescr>
-                        <fieldname>iplist</fieldname>
-                        <description>
-                                Enter source IP addresses here with space(' ') divider.
-                                IP addresses must have format:&lt;br&gt;
-                                single example: '192.168.0.1' &lt;br&gt;
-                                range examples: '192.168.0.0/24', '192.168.1.0/255.255.255.0', '192.168.1.1-192.168.1.10'
-                        </description>
-                        <type>textarea</type>
-                        <cols>65</cols>
-                        <rows>3</rows>
-                </field>
-                <field>
-                        <fielddescr>Source Domains</fielddescr>
-                        <fieldname>domains</fieldname>
-                        <description>
-                                Enter source domains names here with space(' ') divider.
-                                Example: &lt;b&gt;'foo.bar'&lt;/b&gt; match &lt;b&gt;'foo.bar'&lt;/b&gt; or &lt;b&gt;'*.foo.bar'&lt;/b&gt;.
-                        </description>
-                        <type>textarea</type>
-                        <cols>65</cols>
-                        <rows>3</rows>
-                </field-->
                 <field>
                         <fielddescr>Time</fielddescr>
                         <fieldname>time</fieldname>
-                        <description>Enter time name in current which this rule permitted.</description>
+                        <description>Select time in which 'Target Rules' will operate, or leave 'none' for action of rules without time restriction. If this option is set, then in off-time will operate the second rule set.</description>
                         <type>select</type>
                 </field>
                 <field>
-                        <fielddescr>Destination</fielddescr>
+                        <fielddescr>Target Rules</fielddescr>
                         <fieldname>dest</fieldname>
                         <description></description>
                         <type>input</type>
@@ -205,7 +177,7 @@
                 </field>
 <!-- not need now
                 <field>
-                        <fielddescr>Overtime redirect</fielddescr>
+                        <fielddescr>Redirect for off-time</fielddescr>
                         <fieldname>overredirect</fieldname>
                         <description>
                             Enter external redirection URL, error message or size (bytes) here.
@@ -232,7 +204,7 @@
                         <type>select</type>
                 </field>
                 <field>
-                        <fielddescr>Overtime rewrite</fielddescr>
+                        <fielddescr>Rewrite for off-time</fielddescr>
                         <fieldname>overrewrite</fieldname>
                         <description>Enter rewrite condition name for this rule, or leave blank.</description>
                         <type>select</type>

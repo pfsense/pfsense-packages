@@ -15,15 +15,15 @@
 			<url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Default</text>
+			<text>Common ACL</text>
 			<url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>ACL</text>
+			<text>Special ACL</text>
 			<url>/pkg.php?xml=squidguard_acl.xml</url>
 		</tab>
 		<tab>
-			<text>Destinations</text>
+			<text>Target categories</text>
 			<url>/pkg.php?xml=squidguard_dest.xml</url>
 		</tab>
 		<tab>
@@ -34,6 +34,10 @@
 			<text>Rewrites</text>
 			<url>/pkg.php?xml=squidguard_rewr.xml</url>
 			<active/>
+		</tab>
+		<tab>
+			<text>Blacklist</text>
+			<url>/squidGuard/squidguard_blacklist.php</url>
 		</tab>
 		<tab>
 			<text>Log</text>

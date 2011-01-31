@@ -60,6 +60,7 @@ define('F_URLS',             'urls');
 define('F_DISABLED',         'disabled');
 define('F_SQUIDGUARDENABLE', 'squidguard_enable');
 define('F_BLACKLIST',        'blacklist');
+
 # prefixes
 define('PREF_UPTIME',        'uptime_');
 define('PREF_UPTIME_DENY',   'uptimedeny_');
@@ -303,7 +304,7 @@ function squidguard_resync() {
     $proxy  = '';
 
     $submit = isset($_POST['submit'])          ? $_POST['submit']          : $_GET['submit'];
-    $url    = isset($_POST['blacklist_url'])   ? $_POST['blacklist_url']   : $_GET['blacklist_url'];
+    $url    = isset($_POST[F_BLACKLISTURL])    ? $_POST[F_BLACKLISTURL]    : $_GET[F_BLACKLISTURL];
     $proxy  = isset($_POST['blacklist_proxy']) ? $_POST['blacklist_proxy'] : $_GET['blacklist_proxy'];
 
     sg_init(convert_pfxml_to_sgxml());
@@ -315,9 +316,9 @@ function squidguard_resync() {
     }
 
     # blacklist restore last (if exists)
-   if ($submit == BLACKLIST_BTN_DEFAULT) {
-       restore_arc_blacklist();
-   }
+#   if ($submit == BLACKLIST_BTN_DEFAULT) {
+#       restore_arc_blacklist();
+#   }
 
     # apply changes
     //if ($submit == APPLY_BTN) {
@@ -408,10 +409,10 @@ function squidguard_before_form($pkg) {
     foreach($pkg['fields']['field'] as $field) {
         # blacklist controls
         switch ($field['fieldname']) {
-            case 'blacklist_url':
-                $fld = &$pkg['fields']['field'][$i];
-                $fld['description'] .= make_grid_blacklist();        # insert to description custom controls
-            break;
+#            case F_BLACKLISTURL:
+#                $fld = &$pkg['fields']['field'][$i];
+#                $fld['description'] .= make_grid_blacklist();        # insert to description custom controls
+#            break;
             # Apply button
             case 'squidguard_enable':
                 $fld = &$pkg['fields']['field'][$i];
@@ -613,7 +614,7 @@ function make_grid_general_items($id = '')
             $sgstate = "<span style='color: #008000;'>STARTED</span>";
 
         if (is_blacklist_update_started())
-            $sgstate .= "<br><span style='color: #800000;'>Wait: began updating the blacklist.<br>New data will be available after some time.<br>After the upgrade, it is necessary to check the configuration.</span>";
+            $sgstate .= "<br><span style='color: #800000;'>Wait: began updating the blacklist. New data will be available after some time.<br>After the upgrade, it is necessary to check the configuration.</span>";
         $res .= "<tr $bg_color><td><big>SquidGuard service state: <b>$sgstate</b></big></td></tr>";
     }
 
@@ -726,8 +727,8 @@ function make_grid_controls($type, $items, $enable_overtime = true) {
     if (!empty($tbl)) {
         $color = 'style="background-color: #dddddd;"';
         $thdr = '';
-        $hdr1up = "<big>Destination Categories</big>";
-        $hdr1ov = "<big>Destination Categories in overtime</big>";
+        $hdr1up = "<big>Target Categories</big>";
+        $hdr1ov = "<big>Target Categories for off-time</big>";
         $hds3   = "ACCESS: 'whitelist' - always pass; 'deny' - block; 'allow' - pass, if not blocked.";
         if ($enable_overtime) {
             $thdr .= "<tr><td colspan='8' align=left>$hds3</td></tr>";
@@ -748,7 +749,7 @@ function make_grid_controls($type, $items, $enable_overtime = true) {
         $rstyle = "";
         $ha = "<div $color>" .
               "<span onClick='document.getElementById(\"destrules\").style.display = \"block\";' style=\"cursor: pointer;\">" .
-              "<font size='-12'><big>Destination Categories (click)</big>&nbsp;" .
+              "<font size='-12'><big>Target Rules List (click here)</big>&nbsp;" .
               "<img src='./themes/{$g['theme']}/images/icons/icon_pass.gif' title='Show rules'>&nbsp;" .
               "</span>" .
                "<span style=\"cursor: pointer;\">" .
@@ -811,7 +812,7 @@ function squidguard_install_command() {
 
         # generate squidGuard blacklist entries file (check with squidGuard PORT)
 #        conf_mount_rw();
-        $blklist_file = SQUIDGUARD_WORKDIR . SQUIDGUARD_BLK_ENTRIES;
+        $blklist_file = SQUIDGUARD_BLK_FILELISTPATH;
 
       	# рассмотреть вариант слияния examples базы и существующей в системе
         if (!file_exists($blklist_file)) {
@@ -917,14 +918,13 @@ function convert_pfxml_to_sgxml() {
     $sgxml[F_SGCONF_XML]       = SQUIDGUARD_WORKDIR . SQUIDGUARD_CONFXML;
     $sgxml[F_ENABLED]          = $pfxml[F_SQUIDGUARDENABLE];
     $sgxml[F_BLACKLISTENABLED] = $pfxml[F_BLACKLIST];
+    $sgxml[F_BLACKLISTURL]     = $pfxml[F_BLACKLISTURL];
     $sgxml[F_SOURCES]          = convert_pfxml_to_sgxml_source($config);
     $sgxml[F_DESTINATIONS]     = convert_pfxml_to_sgxml_destination($config);
     $sgxml[F_REWRITES]         = convert_pfxml_to_sgxml_rewrite($config);
     $sgxml[F_TIMES]            = convert_pfxml_to_sgxml_time($config);
     $sgxml[F_ACLS]             = convert_pfxml_to_sgxml_acl($config);
     $sgxml[F_DEFAULT]          = convert_pfxml_to_sgxml_default($config);
-
-
 
     # log
     $sgxml[F_ENABLELOG]    = $pfxml['enable_log']    == 'on' ? 'on' : 'off';
@@ -1314,9 +1314,6 @@ function squidguard_logrep( $filename, $lncount, $reverse )
                 $cn = explode(" ", $cn, 4);
 
                 # split strings
-#                $st    = str_split ($cn[3], 25);
-#                $cn[3] = "";
-#                foreach( $st as $s ) $cn[3] .= $s . "<wbr/>";
                 $p     = 0;
                 $pstep = 15;
                 $str   = $cn[3];
@@ -1340,7 +1337,7 @@ function squidguard_logrep( $filename, $lncount, $reverse )
 function squidguard_blacklist_list()
 {
     $res   = "";
-    $fname = "/var/squidGuard/blacklist.files";
+    $fname = SQUIDGUARD_BLK_FILELISTPATH;
 
     $res .= "<table class='tabcont' width='100%' border='0' cellpadding='0' cellspacing='0'>\n";
     $res .= "<tr><td class='listtopic'>Name</td><td class='listtopic'>Domains</td><td class='listtopic'>Urls</td><td class='listtopic'>Expressions</td></tr>\n";

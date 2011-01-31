@@ -7,7 +7,7 @@
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>squidguarddest</name>
 	<version>none</version>
-	<title>Proxy filter SquidGuard: Destinations</title>
+	<title>Proxy filter SquidGuard: Target categories</title>
 	<include_file>/usr/local/pkg/squidguard.inc</include_file>
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
@@ -17,15 +17,15 @@
 			<url>/pkg_edit.php?xml=squidguard.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Default</text>
+			<text>Common ACL</text>
 			<url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>ACL</text>
+			<text>Special ACL</text>
 			<url>/pkg.php?xml=squidguard_acl.xml</url>
 		</tab>
 		<tab>
-			<text>Destinations</text>
+			<text>Target categories</text>
 			<url>/pkg.php?xml=squidguard_dest.xml</url>
 			<active/>
 		</tab>
@@ -38,27 +38,19 @@
 			<url>/pkg.php?xml=squidguard_rewr.xml</url>
 		</tab>
 		<tab>
+			<text>Blacklist</text>
+			<url>/squidGuard/squidguard_blacklist.php</url>
+		</tab>
+		<tab>
 			<text>Log</text>
 			<url>/squidGuard/squidguard_log.php</url>
 		</tab>
 	</tabs>
 	<adddeleteeditpagefields>
                 <columnitem>
-                        <fielddescr>Destination name</fielddescr>
+                        <fielddescr>Name</fielddescr>
                         <fieldname>name</fieldname>
                 </columnitem>
-                <!--columnitem>
-                        <fielddescr>Domain list</fielddescr>
-                        <fieldname>domains</fieldname>
-                </columnitem-->
-                <!--columnitem>
-                        <fielddescr>URL list</fielddescr>
-                        <fieldname>urls</fieldname>
-                </columnitem-->
-                <!--columnitem>
-                        <fielddescr>Expressions</fielddescr>
-                        <fieldname>expressions</fieldname>
-                </columnitem-->
                 <columnitem>
                         <fielddescr>Redirect</fielddescr>
                         <fieldname>redirect</fieldname>
@@ -93,24 +85,24 @@
                         <rows>10</rows>
                 </field>
                 <field>
-                        <fielddescr>Expressions</fielddescr>
-                        <fieldname>expressions</fieldname>
-                        <description>
-                                Enter word fragments, what may be contains in destinations URL path.
-                                For separate expression words use '|'.
-                                &lt;p&gt; &lt;b&gt;Example:&lt;/b&gt; 'mail|casino|game' .
-                        </description>
-                        <type>textarea</type>
-                        <cols>60</cols>
-                        <rows>10</rows>
-                </field>
-                <field>
                         <fielddescr>URLs list</fielddescr>
                         <fieldname>urls</fieldname>
                         <description>
                                 Enter url's here.
                                 For separate urls's use ' '(space).
                                 &lt;p&gt; &lt;b&gt;Example:&lt;/b&gt; 'host.com/xxx 12.10.220.125/alisa' .
+                        </description>
+                        <type>textarea</type>
+                        <cols>60</cols>
+                        <rows>10</rows>
+                </field>
+                <field>
+                        <fielddescr>Expressions</fielddescr>
+                        <fieldname>expressions</fieldname>
+                        <description>
+                                Enter word fragments, what may be contains in destinations URL path.
+                                For separate expression words use '|'.
+                                &lt;p&gt; &lt;b&gt;Example:&lt;/b&gt; 'mail|casino|game' .
                         </description>
                         <type>textarea</type>
                         <cols>60</cols>
