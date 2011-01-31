@@ -171,6 +171,12 @@
 			<default_value>on</default_value>
 		</field>
 		<field>
+			<fieldname>dumpcache</fieldname>
+			<fielddescr>Cache Restoration Support</fielddescr>
+			<description>This option allows the restoration of the current Unbound cache, so that in the event of a reboot or shutdown the cache is restored instantly. This helps speed up DNS resolving.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
 			<name>Unbound Statistics</name>
 			<type>listtopic</type>
 		</field>

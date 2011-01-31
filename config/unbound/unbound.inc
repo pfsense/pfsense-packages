@@ -119,6 +119,7 @@ function unbound_rc_setup() {
 	fetch_root_hints();
 	unbound_control(\"start\");
 	unbound_control(\"forward\");
+	unbound_control(\"restore_cache\");
 	echo \"done.\\n\";
 ?>
 ENDPHP\n";
@@ -127,6 +128,7 @@ $stop = "/usr/local/bin/php -q -d auto_prepend_file=config.inc <<ENDPHP
 <?php
 	require_once(\"/usr/local/pkg/unbound.inc\");
 	echo \"Stopping Unbound...\";
+	unbound_control(\"dump_cache\");
 	unbound_control(\"termstop\");
 	echo \"done.\\n\";
 ?>
@@ -154,6 +156,7 @@ function unbound_control($action) {
 	global $config, $g;
 	
 	$unbound_config = $config['installedpackages']['unbound']['config'][0];
+	$cache_dumpfile = "/var/tmp/unbound_cache";
 	
 	switch ($action) {
 		case "forward":
@@ -205,6 +208,21 @@ function unbound_control($action) {
 		case "termstop":
 				//Stop Unbound by sigkillbypid();
 				sigkillbypid("{$g['varrun_path']}/unbound.pid", "TERM");
+				break;
+				
+		case "dump_cache":
+				//Dump Unbound's Cache
+				if($unbound_config['dumpcache'] == "on")
+					unbound_ctl_exec("dump_cache > $cache_dumpfile");
+				break;
+				
+		case "restore_cache":
+				//Restore Unbound's Cache
+				if($unbound_config['dumpcache'] == "on") {
+					$cache_dumpfile = "/var/tmp/unbound_cache";
+					if(file_exists($cache_dumpfile))
+						unbound_ctl_exec("load_cache < $cache_dumpfile");
+				}
 				break;
 		
 		default:
@@ -555,14 +573,17 @@ function unbound_reconfigure() {
 	
 	if ($unbound_config['unbound_status'] != "on") {
 		if(is_service_running("unbound")) {
+			unbound_control("dump_cache");
 			unbound_control("termstop");
 		}
 	} else {
 		if(is_service_running("unbound")) {
+			unbound_control("dump_cache");
 			unbound_control("termstop");
 		}
 		unbound_resync_config();
 		unbound_control("start");
+		unbound_control("restore_cache");
 		unbound_control("forward");
 	}	
 }
@@ -577,9 +598,6 @@ function unbound_uninstall() {
 	mwexec("rm -rf /usr/local/etc/unbound");
 	mwexec("rm -f /usr/local/etc/rc.d/unbound.sh");
 	mwexec("rm -f {$g['varlog_path']}/unbound.log");
-
-	// Remove unbound user
-	exec("/usr/sbin/pw userdel unbound");
 
     conf_mount_ro();
 
