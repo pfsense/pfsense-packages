@@ -4,7 +4,7 @@
 /* ========================================================================== */
 /*
 	countryblock.inc
-	Copyright (C) 2010 Tom Schaefer
+	Copyright (C) 2011 Tom Schaefer
 	All rights reserved.
 																			*/
 /* ========================================================================== */
@@ -54,6 +54,11 @@ function php_install_command_cb()
 		exec("mkdir /usr/local/www/packages/countryblock/");
 	}
 
+	if (!is_dir('/usr/local/www/packages/countryblock/CIDR')) {
+		exec("mkdir /usr/local/www/packages/countryblock/CIDR");
+	}
+
+
 	
 	
 	//rename PHP files from .tmp to .php
@@ -97,7 +102,15 @@ function php_install_command_cb()
 	exec("cp /tmp/interfaces.txt /usr/local/www/packages/countryblock/interfaces.txt");
 	unlink_if_exists("/tmp/interfaces.txt");
 	
+	exec("cp /tmp/CIDR.tar.gz /usr/local/www/packages/countryblock/CIDR.tar.gz");
+	unlink_if_exists("/tmp/CIDR.tar.gz");
 	
+	exec("tar xzf /usr/local/www/packages/countryblock/CIDR.tar.gz -C /usr/local/www/packages/countryblock/CIDR");
+	exec("rm /usr/local/www/packages/countryblock/CIDR.tar.gz");
+
+	exec("mkdir /usr/local/www/packages/countryblock/lists");
+	exec("touch /usr/local/www/packages/countryblock/lists/countries.txt");
+
 
 	conf_mount_ro();
 	config_unlock();

@@ -14,7 +14,7 @@
 		<config_file>http://pfsense.org/packages/config/filemgr/filemgr.xml</config_file>
 		<version>0.1.1</version>
 		<status>Beta</status>
-		<required_version>1.2.2</required_version>
+		<required_version>2.0</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
 		<configurationfile>filemgr.xml</configurationfile>
       </package>
@@ -26,9 +26,9 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,25732.0.html</pkginfolink>
 		<config_file>http://pfsense.org/packages/config/countryblock/countryblock.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-		<version>0.1.9</version>
+		<version>0.2.0</version>
 		<status>Beta</status>
-		<required_version>1.2.2</required_version>
+		<required_version>2.0</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
 		<configurationfile>countryblock.xml</configurationfile>
       </package>
@@ -42,7 +42,7 @@
 		<depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
 		<version>0.3.1</version>
 		<status>Beta</status>
-		<required_version>1.2.2</required_version>
+		<required_version>2.0</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
 		<configurationfile>ipblocklist.xml</configurationfile>
 	</package>

@@ -41,7 +41,9 @@ if (count($_POST)>0) {
 		exec("mkdir lists");
 		foreach ($lines as $line) {
 			//echo("fetch -o lists http://www.countryipblocks.net/e_country_data/{$line}_cidr.txt");
-			exec("fetch -o lists/temp http://www.countryipblocks.net/e_country_data/{$line}_cidr.txt");
+			//Fetch countries from server
+			exec("fetch -o lists/temp http://127.0.0.1//packages/countryblock/CIDR/{$line}_cidr.txt");
+			//exec("fetch -o lists/temp http://www.countryipblocks.net/e_country_data/{$line}_cidr.txt");
 			exec("cat lists/temp >> lists/countries.txt");
 		 	$filename = basename($line);
 		 	//Extract list
@@ -80,7 +82,7 @@ if (count($_POST)>0) {
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
-<p class="pgtitle"><?=$pgtitle?></p>
+
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <?php if ($savemsg) print_info_box($savemsg); ?>
 <form method=POST action="">
@@ -304,7 +306,7 @@ background-color: #F3F3F3;
 			
 		?> 
             
-      of 246 selected. </h3><input type="checkbox" name="checkall" onClick="checkUncheckAll(this);"/>select/unselect
+      of 252 selected. </h3><input type="checkbox" name="checkall" onClick="checkUncheckAll(this);"/>select/unselect
       
 <br/>
 	
@@ -639,6 +641,14 @@ ob_end_clean();
 		echo "<li><input name='formCountry[]' type='checkbox' value='BO' checked/>Bolivia</li>";
 	else
 		echo "<li><input name='formCountry[]' type='checkbox' value='BO' />Bolivia</li>";
+		
+ob_start();
+$results = exec("cat countries.txt | grep BQ");
+ob_end_clean();
+	if ($results == 'BQ')
+		echo "<li><input name='formCountry[]' type='checkbox' value='BQ' checked/>Bonaire, Saint Eustatius and Saba</li>";
+	else
+		echo "<li><input name='formCountry[]' type='checkbox' value='BQ' />Bonaire, Saint Eustatius and Saba</li>";
 
 ob_start();
 $results = exec("cat countries.txt | grep BA");
@@ -868,6 +878,15 @@ ob_end_clean();
 		echo "<li><input name='formCountry[]' type='checkbox' value='CU' checked/>Cuba</li>";
 	else
 		echo "<li><input name='formCountry[]' type='checkbox' value='CU' />Cuba</li>";
+		
+ob_start();
+$results = exec("cat countries.txt | grep CW");
+ob_end_clean();
+	if ($results == 'CW')
+		echo "<li><input name='formCountry[]' type='checkbox' value='CW' checked/>Curacao</li>";
+	else
+		echo "<li><input name='formCountry[]' type='checkbox' value='CW' />Curacao</li>";
+
 
 ob_start();
 $results = exec("cat countries.txt | grep CY");
@@ -1361,6 +1380,14 @@ ob_end_clean();
 		echo "<li><input name='formCountry[]' type='checkbox' value='JP' checked/>Japan</li>";
 	else
 		echo "<li><input name='formCountry[]' type='checkbox' value='JP' />Japan</li>";
+		
+ob_start();
+$results = exec("cat countries.txt | grep JE");
+ob_end_clean();
+	if ($results == 'JE')
+		echo "<li><input name='formCountry[]' type='checkbox' value='JE' checked/>Jersey</li>";
+	else
+		echo "<li><input name='formCountry[]' type='checkbox' value='JE' />Jersey</li>";
 
 ob_start();
 $results = exec("cat countries.txt | grep JO");
@@ -2013,6 +2040,14 @@ ob_end_clean();
 <ul class="categoryitems">
 <?php
 ob_start();
+$results = exec("cat countries.txt | grep BL");
+ob_end_clean();
+	if ($results == 'BL')
+		echo "<li><input name='formCountry[]' type='checkbox' value='BL' checked/>Saint Barthelemy</li>";
+	else
+		echo "<li><input name='formCountry[]' type='checkbox' value='BL' />Saint Barthelemy</li>";
+		
+ob_start();
 $results = exec("cat countries.txt | grep SH");
 ob_end_clean();
 	if ($results == 'SH')
@@ -2035,6 +2070,14 @@ ob_end_clean();
 		echo "<li><input name='formCountry[]' type='checkbox' value='LC' checked/>Saint Lucia</li>";
 	else
 		echo "<li><input name='formCountry[]' type='checkbox' value='LC' />Saint Lucia</li>";
+		
+ob_start();
+$results = exec("cat countries.txt | grep MF");
+ob_end_clean();
+	if ($results == 'MF')
+		echo "<li><input name='formCountry[]' type='checkbox' value='MF' checked/>Saint Martin</li>";
+	else
+		echo "<li><input name='formCountry[]' type='checkbox' value='MF' />Saint Martin</li>";
 
 ob_start();
 $results = exec("cat countries.txt | grep PM");
@@ -2123,6 +2166,14 @@ ob_end_clean();
 		echo "<li><input name='formCountry[]' type='checkbox' value='SG' checked/>Singapore</li>";
 	else
 		echo "<li><input name='formCountry[]' type='checkbox' value='SG' />Singapore</li>";
+		
+ob_start();
+$results = exec("cat countries.txt | grep SX");
+ob_end_clean();
+	if ($results == 'SX')
+		echo "<li><input name='formCountry[]' type='checkbox' value='SX' checked/>Sint Maarten</li>";
+	else
+		echo "<li><input name='formCountry[]' type='checkbox' value='SX' />Sint Maarten</li>";
 
 ob_start();
 $results = exec("cat countries.txt | grep SK");
