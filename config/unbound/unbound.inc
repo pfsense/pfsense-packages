@@ -1,6 +1,6 @@
 <?php
 /*	unbound.inc
-	(C)2010 Warren Baker
+	(C)2010 Warren Baker (warren@decoy.co.za)
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
