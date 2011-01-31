@@ -596,8 +596,9 @@ function unbound_uninstall() {
 	unbound_control("termstop");
 	// Remove pkg config directory and startup file
 	mwexec("rm -rf /usr/local/etc/unbound");
-	mwexec("rm -f /usr/local/etc/rc.d/unbound.sh");
-	mwexec("rm -f {$g['varlog_path']}/unbound.log");
+	@unlink("/usr/local/etc/rc.d/unbound.sh");
+	@unlink("{$g['varlog_path']}/unbound.log");
+	@unlink("/var/tmp/unbound_cache");
 
     conf_mount_ro();
 
