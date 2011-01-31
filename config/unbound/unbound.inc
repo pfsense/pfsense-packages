@@ -593,6 +593,7 @@ function unbound_uninstall() {
 
 	conf_mount_rw();
 
+	unbound_control("dump_cache");
 	unbound_control("termstop");
 	// Remove pkg config directory and startup file
 	mwexec("rm -rf /usr/local/etc/unbound");
