@@ -1,5 +1,6 @@
 #!/bin/sh
 
+#version 2.0
 #check if countryblock running
 export resultr=`pfctl -s rules | grep -c countryblock`
 #echo $resultr
