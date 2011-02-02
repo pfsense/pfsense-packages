@@ -42,9 +42,13 @@ if (count($_POST)>0) {
 		foreach ($lines as $line) {
 			//echo("fetch -o lists http://www.countryipblocks.net/e_country_data/{$line}_cidr.txt");
 			//Fetch countries from server
-			exec("fetch -o lists/temp http://127.0.0.1//packages/countryblock/CIDR/{$line}_cidr.txt");
+			//exec("fetch -o lists/temp http://127.0.0.1//packages/countryblock/CIDR/{$line}_cidr.txt");
+			//Pull from local file since https or http on other ports may be used
+			exec("cat CIDR/{$line}_cidr.txt >> lists/countries.txt");
 			//exec("fetch -o lists/temp http://www.countryipblocks.net/e_country_data/{$line}_cidr.txt");
-			exec("cat lists/temp >> lists/countries.txt");
+			//Remove cat lists/temp since fetch is not used
+			//Thank you g4m3c4ck, 'He got a real pretty mouth ain't he', 1 Feb 2011
+			//exec("cat lists/temp >> lists/countries.txt");
 		 	$filename = basename($line);
 		 	//Extract list
 		 	//exec("gzip -d lists/$filename");
