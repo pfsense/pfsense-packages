@@ -161,7 +161,7 @@
 		<field>
 			<fielddescr>IP Address</fielddescr>
 			<fieldname>ipaddress</fieldname>
-			<description>Bind TinyDNS to this IP address. This is the IP that will service DNS requests for this server. This IP cannot be used as a DNS server on client machines. Bind to 127.0.0.1 and use Port Forward entries to redirect DNS traffic internal or external to this resolver from multiple IPs.  You may also specify a pfSense alias which contains the IP addresses that we should bind to.</description>
+			<description>Bind TinyDNS to this IP address. This is the IP that will service DNS requests for this server. This IP cannot be used as a DNS server on client machines. Bind to 127.0.0.1 and use Port Forward entries to redirect DNS traffic internal or external to this resolver from multiple IPs.</description>
 			<type>input</type>
 		</field>
 		<field>
