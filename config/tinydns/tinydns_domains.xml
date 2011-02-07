@@ -164,7 +164,7 @@
 		<field>
 			<fielddescr>Record Type</fielddescr>
 			<fieldname>recordtype</fieldname>
-			<description>Supported Record types: A, PTR, MX, NS, SOA, TXT, CNAME, raw  ("raw" allows direct entry of a complete TinyDNS record in the FQDN field below)</description>
+			<description>Supported Record types: A, AAAA, PTR, MX, NS, SOA, TXT, CNAME, raw  ("raw" allows direct entry of a complete TinyDNS record in the FQDN field below)</description>
 			<type>select</type>
 			<size>1</size>
 			<required/>
@@ -184,7 +184,7 @@
 		<field>
 			<fielddescr>Record Data (FQDN, IP Address, or "raw" TinyDNS record)</fielddescr>
 			<fieldname>ipaddress</fieldname>
-			<description>Enter the record data here. Use IP Address for A and PTR records. Use FQDN or Hostname for SOA and CNAME Records. MX records can be an IP, FQDN, or both separated by a colon, e.g. 1.2.3.4, mail.example.com, or 1.2.3.4:mail.example.com. NS Records use colon-separated IP and FQDN, e.g. 1.2.3.4:example.com.  IPV6 AAAA records should be formatted in 128 bit format.</description>
+			<description>Enter the record data here. Use IP Address for A and PTR records. Use FQDN or Hostname for SOA and CNAME Records. MX records can be an IP, FQDN, or both separated by a colon, e.g. 1.2.3.4, mail.example.com, or 1.2.3.4:mail.example.com. NS Records use colon-separated IP and FQDN, e.g. 1.2.3.4:example.com.  IPV6 AAAA records should be formatted in 128 bit format.  Example AAAA Record: 0000:0000:0000:0000:0000:0000:0000:0000</description>
 			<type>input</type>
 			<size>80</size>
 			<required/>
