@@ -209,13 +209,19 @@
 			<size>35</size>
 		</field>
 		<field>
-			<fielddescr>(SRV) Server record weight</fielddescr>
+			<fielddescr>(SRV) Server record priority (optional)</fielddescr>
+			<fieldname>srv_priority</fieldname>
+			<type>input</type>
+			<size>35</size>
+		</field>
+		<field>
+			<fielddescr>(SRV) Server record weight (optional)</fielddescr>
 			<fieldname>srv_weight</fieldname>
 			<type>input</type>
 			<size>35</size>
 		</field>
 		<field>
-			<fielddescr>(SRV) Server record timestamp</fielddescr>
+			<fielddescr>(SRV) Server record timestamp (optional)</fielddescr>
 			<fieldname>srv_timestamp</fieldname>
 			<type>input</type>
 			<size>35</size>
@@ -231,9 +237,7 @@
 			<fieldname>ttl</fieldname>
 			<type>input</type>
 			<size>35</size>
-		</field>				
-
-
+		</field>
 		<field>
 			<type>listtopic</type>
 			<name>Reverse lookup</name>
