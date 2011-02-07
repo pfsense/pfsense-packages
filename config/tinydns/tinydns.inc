@@ -759,7 +759,7 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 				} else {
 					/* ":" creates "AAAA" records only to allow forward DNS */
 					//		:fqdn:ip:ttl:timestamp:lo
-					$record_data = ":{$hostname}:{$recordip}{$ttl_string}";
+					$record_data = "6{$hostname}:{$recordip}{$ttl_string}";
 				}
 				break;
 			case "CNAME":
