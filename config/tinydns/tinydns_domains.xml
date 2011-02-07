@@ -171,6 +171,7 @@
 			<options>
 			    <option><name></name><value></value></option>
 			    <option><name>A</name><value>A</value></option>
+			    <option><name>AAAA</name><value>AAAA</value></option>
 			    <option><name>MX</name><value>MX</value></option>
 			    <option><name>NS</name><value>NS</value></option>
 			    <option><name>SOA</name><value>SOA</value></option>

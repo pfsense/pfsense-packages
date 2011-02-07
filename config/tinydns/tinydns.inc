@@ -752,6 +752,16 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 					$record_data = "+{$hostname}:{$recordip}{$ttl_string}";
 				}
 				break;
+			case "AAAA":
+				if($rdns) {
+					//		=fqdn:ip:ttl:timestamp:lo
+					$record_data = "^{$hostname}:{$recordip}{$ttl_string}";
+				} else {
+					/* ":" creates "AAAA" records only to allow forward DNS */
+					//		:fqdn:ip:ttl:timestamp:lo
+					$record_data = ":{$hostname}:{$recordip}{$ttl_string}";
+				}
+				break;
 			case "CNAME":
 				//     Cfqdn:p:ttl:timestamp:lo
 				$record_data = "C{$hostname}:{$recordip}{$ttl_string}";
