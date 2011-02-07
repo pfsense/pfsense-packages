@@ -754,12 +754,10 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 				break;
 			case "AAAA":
 				if($rdns) {
-					//		=fqdn:ip:ttl:timestamp:lo
 					$record_data = "^{$hostname}:{$recordip}{$ttl_string}";
 				} else {
-					/* ":" creates "AAAA" records only to allow forward DNS */
-					//		:fqdn:ip:ttl:timestamp:lo
-					$record_data = "6{$hostname}:{$recordip}{$ttl_string}";
+					$recip_san = str_replace(":", "", $recordip);
+					$record_data = "6{$hostname}:{$recip_san}{$ttl_string}";
 				}
 				break;
 			case "CNAME":
