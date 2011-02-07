@@ -175,6 +175,7 @@
 			    <option><name>MX</name><value>MX</value></option>
 			    <option><name>NS</name><value>NS</value></option>
 			    <option><name>SOA</name><value>SOA</value></option>
+			    <option><name>SRV</name><value>SRV</value></option>
 			    <option><name>PTR</name><value>PTR</value></option>
 			    <option><name>CNAME</name><value>CNAME</value></option>
 			    <option><name>TXT</name><value>TXT</value></option>
@@ -200,7 +201,39 @@
 			<fieldname>ttl</fieldname>
 			<type>input</type>
 			<size>35</size>
+		</field>
+		<field>
+			<fielddescr>(SRV) Server record port</fielddescr>
+			<fieldname>srv_port</fieldname>
+			<type>input</type>
+			<size>35</size>
+		</field>
+		<field>
+			<fielddescr>(SRV) Server record weight</fielddescr>
+			<fieldname>srv_weight</fieldname>
+			<type>input</type>
+			<size>35</size>
+		</field>
+		<field>
+			<fielddescr>(SRV) Server record timestamp</fielddescr>
+			<fieldname>srv_timestamp</fieldname>
+			<type>input</type>
+			<size>35</size>
+		</field>
+		<field>
+			<fielddescr>DNS record time to live (in seconds)</fielddescr>
+			<fieldname>ttl</fieldname>
+			<type>input</type>
+			<size>35</size>
 		</field>				
+		<field>
+			<fielddescr>DNS record time to live (in seconds)</fielddescr>
+			<fieldname>ttl</fieldname>
+			<type>input</type>
+			<size>35</size>
+		</field>				
+
+
 		<field>
 			<type>listtopic</type>
 			<name>Reverse lookup</name>

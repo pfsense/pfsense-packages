@@ -535,7 +535,7 @@ function tinydns_create_zone_file() {
 						log_error("tinydns_get_backup_record returned $ipaddress ");
 				}
 			}
-			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname, $domain['rdns'], $dist);
+			$record_data = tinydns_get_rowline_data($ipaddress, $domain['recordtype'], $ttl, $hostname, $domain['rdns'], $dist, $domain['src_port'], $domain['src_weight'], $domain['src_priority'], $domain['src_timestamp']);
 			if($record_data) {
 				fwrite($fd, $record_data . "\n");
 				if ($domain['rdns'] || ($domain['recordtype'] == 'PTR')) {
@@ -558,7 +558,7 @@ function tinydns_create_zone_file() {
 							$wanpingthreshold = "";
 						$status = tinydns_get_record_status($row['failoverip'], $pingthreshold, $wanpingthreshold);
 						if($status == "DOWN") {
-							$record_data = tinydns_get_rowline_data($row['failoverip'], $domain['recordtype'], $ttl, $hostname, "");
+							$record_data = tinydns_get_rowline_data($row['failoverip'], $domain['recordtype'], $ttl, $hostname, "", $domain['rdns'], $dist, $domain['src_port'], $domain['src_weight'], $domain['src_priority'], $domain['src_timestamp']);
 							fwrite($fd, $record_data . "\n");
 						}
 					}
@@ -696,7 +696,7 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 }
 
 /* formats data as a tinydns data row item */
-function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns, $dist) {
+function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns, $dist, $srv_port = "5000", $srv_weight = "0", $srv_priority = "0", $srv_timestamp = "1") {
 		if($ttl)
 			$ttl_string = ":{$ttl}";
 		else
@@ -759,6 +759,10 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 					$recip_san = str_replace(":", "", $recordip);
 					$record_data = "6{$hostname}:{$recip_san}{$ttl_string}";
 				}
+				break;
+			case "SRV":
+					$recip_san = str_replace(":", "", $recordip);
+					$record_data = "S{$hostname}:{$recip_san}{$rec_port}{$rec_weight}{$srv_priority}{$ttl_string}{$srv_timestamp}";
 				break;
 			case "CNAME":
 				//     Cfqdn:p:ttl:timestamp:lo
