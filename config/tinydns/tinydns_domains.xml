@@ -164,7 +164,7 @@
 		<field>
 			<fielddescr>Record Type</fielddescr>
 			<fieldname>recordtype</fieldname>
-			<description>Supported Record types: A, AAAA, PTR, MX, NS, SOA, TXT, CNAME, raw  ("raw" allows direct entry of a complete TinyDNS record in the FQDN field below)</description>
+			<description>Supported Record types: A, AAAA, PTR, MX, NS, SOA, SRV, TXT, CNAME, and raw  ("raw" allows direct entry of a complete TinyDNS record in the FQDN field below)</description>
 			<type>select</type>
 			<size>1</size>
 			<required/>
