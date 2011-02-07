@@ -478,7 +478,7 @@
 	  <supportedbybsdperimeter>YES</supportedbybsdperimeter>
 	<build_port_path>/usr/ports/sysutils/ucspi-tcp</build_port_path>
 	<build_port_path>/usr/ports/sysutils/daemontools</build_port_path>
-	<build_port_path>/usr/ports/dns/djbdns</build_port_path>
+	<build_port_path>/home/pfsense/tools/pfPorts/djbdns</build_port_path>
 	<build_options>WITHOUT_MAN=true WITH_SRV=true</build_options>
     </package>
     <package>
