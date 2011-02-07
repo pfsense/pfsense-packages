@@ -191,17 +191,17 @@
 			<required/>
 		</field>
 		<field>
-			<fielddescr>MX priority (only used for MX records)</fielddescr>
-			<fieldname>dist</fieldname>
-			<type>input</type>
-			<size>4</size>
-		</field>				
-		<field>
 			<fielddescr>DNS record time to live (in seconds)</fielddescr>
 			<fieldname>ttl</fieldname>
 			<type>input</type>
 			<size>35</size>
 		</field>
+		<field>
+			<fielddescr>(MX) priority (only used for MX records)</fielddescr>
+			<fieldname>dist</fieldname>
+			<type>input</type>
+			<size>4</size>
+		</field>				
 		<field>
 			<fielddescr>(SRV) Server record port</fielddescr>
 			<fieldname>srv_port</fieldname>
@@ -223,18 +223,6 @@
 		<field>
 			<fielddescr>(SRV) Server record timestamp (optional)</fielddescr>
 			<fieldname>srv_timestamp</fieldname>
-			<type>input</type>
-			<size>35</size>
-		</field>
-		<field>
-			<fielddescr>DNS record time to live (in seconds)</fielddescr>
-			<fieldname>ttl</fieldname>
-			<type>input</type>
-			<size>35</size>
-		</field>				
-		<field>
-			<fielddescr>DNS record time to live (in seconds)</fielddescr>
-			<fieldname>ttl</fieldname>
 			<type>input</type>
 			<size>35</size>
 		</field>
