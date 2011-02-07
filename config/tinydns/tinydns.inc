@@ -696,7 +696,7 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 }
 
 /* formats data as a tinydns data row item */
-function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns, $dist, $srv_port = "5000", $srv_weight = "0", $srv_priority = "0", $srv_timestamp = "1") {
+function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns, $dist, $srv_port = "5000", $srv_weight = "0", $srv_priority = "0", $srv_timestamp = "") {
 		if($ttl)
 			$ttl_string = ":{$ttl}";
 		else
