@@ -1,9 +1,11 @@
 <?php
 /* $Id$ */
 /*
-	sg_log.inc
-	All rights reserved.
+	squidguard_log.php
+       2006-2011 Serg Dvoriancev
 
+       part of pfSense (www.pfSense.com)
+       
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
 
@@ -61,7 +63,7 @@ if (!in_array( $mode, array("blocked", "fgui", "flog", "pconf", "fconf"))) $mode
         $tab_array = array();
         $tab_array[] = array(gettext("General settings"), false, "/pkg_edit.php?xml=squidguard.xml&amp;id=0");
         $tab_array[] = array(gettext("Common ACL"),       false, "/pkg_edit.php?xml=squidguard_default.xml&amp;id=0");
-        $tab_array[] = array(gettext("Special ACL"),      false, "/pkg.php?xml=squidguard_acl.xml");
+        $tab_array[] = array(gettext("Groups ACL"),       false, "/pkg.php?xml=squidguard_acl.xml");
         $tab_array[] = array(gettext("Target categories"),false, "/pkg.php?xml=squidguard_dest.xml");
         $tab_array[] = array(gettext("Times"),            false, "/pkg.php?xml=squidguard_time.xml");
         $tab_array[] = array(gettext("Rewrites"),         false, "/pkg.php?xml=squidguard_rewr.xml");

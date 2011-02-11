@@ -1,8 +1,10 @@
 <?php
 /* $Id$ */
 /*
-	sg_log.inc
-	All rights reserved.
+	squidguard_blacklist.php
+       2006-2011 Serg Dvoriancev
+
+       part of pfSense (www.pfSense.com)
 
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
@@ -63,7 +65,8 @@ function squidguard_blacklist_AJAX_response( $request )
     if     ($request['blacklist_download_start'])  squidguard_blacklist_update_start( $request['blacklist_url'] ); # update start
     elseif ($request['blacklist_download_cancel']) squidguard_blacklist_update_cancel();                           # update cancel
     elseif ($request['blacklist_restore_default']) squidguard_blacklist_restore_arcdb();                           # restore default db
-
+    elseif ($request['blacklist_clear_log'])       squidguard_blacklist_update_clearlog();                         # clear log
+ 
     # Activity
     # Rebuild progress /check SG rebuild process/
     if (is_squidGuardProcess_rebuild_started()) {
@@ -92,13 +95,16 @@ function squidguard_blacklist_AJAX_response( $request )
     $status = '';
     if (file_exists(SGUPD_STATFILE)) {
         $status = file_get_contents(SGUPD_STATFILE);
+        if ($sz && $sz != 100) $status .= "Completed {$sz} %";
     }
     if ($status) {
         $status = str_replace("\n", "\\r\\n", trim($status));
         $res .= "el('update_state').innerHTML = '{$status}';";
+        $res .= "el('update_state_cls').style.display='';";
         $res .= "el('update_state_row').style.display='';";
     } else {
         $res .= "el('update_state').innerHTML = '';";
+        $res .= "el('update_state_cls').style.display='none';";
         $res .= "el('update_state_row').style.display='none';";
     }
 
@@ -147,12 +153,7 @@ function is_squidGuardProcess_rebuild_started()
     # if cmd more then 132 need use 'ww..' key
     return exec("ps -auxwwww | grep 'squidGuard -c .* -C all' | grep -v grep | awk '{print $2}' | wc -l | awk '{ print $1 }'");
 }
-/*
-function squidguard_blacklist_update_IsStarted()
-{
-    return exec("ps auxwwww | grep '" . SCR_NAME_BLKUPDATE . "' | grep -v 'grep' | awk '{print $2}' | wc -l | awk '{ print $1 }'");
-}
-*/
+
 # ------------------------------------------------------------------------------
 # HTML Page
 # ------------------------------------------------------------------------------
@@ -187,6 +188,7 @@ function getactivity(action) {
     if (action == 'download')          pars = pars + '&blacklist_download_start=yes&blacklist_url=' + el('blacklist_url').value;
     if (action == 'cancel')            pars = pars + '&blacklist_download_cancel=yes';
     if (action == 'restore_default')   pars = pars + '&blacklist_restore_default=yes';
+    if (action == 'clear_log')         pars = pars + '&blacklist_clear_log=yes';
 
     var myAjax = new Ajax.Request( url,
         {
@@ -244,7 +246,7 @@ window.setTimeout('getactivity()', 150);
         $tab_array = array();
         $tab_array[] = array(gettext("General settings"), false, "/pkg_edit.php?xml=squidguard.xml&amp;id=0");
         $tab_array[] = array(gettext("Common ACL"),       false, "/pkg_edit.php?xml=squidguard_default.xml&amp;id=0");
-        $tab_array[] = array(gettext("Special ACL"),      false, "/pkg.php?xml=squidguard_acl.xml");
+        $tab_array[] = array(gettext("Groups ACL"),       false, "/pkg.php?xml=squidguard_acl.xml");
         $tab_array[] = array(gettext("Target categories"),false, "/pkg.php?xml=squidguard_dest.xml");
         $tab_array[] = array(gettext("Times"),            false, "/pkg.php?xml=squidguard_time.xml");
         $tab_array[] = array(gettext("Rewrites"),         false, "/pkg.php?xml=squidguard_rewr.xml");
@@ -274,7 +276,7 @@ window.setTimeout('getactivity()', 150);
                     echo "&nbsp;&nbsp;&nbsp;<u id='progress_text' name='progress_text'>0 %</u>";
                     echo "</nobr>";
                     echo "<br><br>";
- ?>
+?>
                     <nobr>
                     <input class="formfld unknown" size="70" id="blacklist_url" name="blacklist_url" value= '<?php echo "$blacklist_url"; ?>' > &nbsp
                     <!--input size='70' id='blacklist_download_start' name='blacklist_download_start' value='Download' type='button' onclick="getactivity('download');">&nbsp
@@ -287,6 +289,15 @@ window.setTimeout('getactivity()', 150);
                     <br><br>
                     Enter FTP or HTTP path to the blacklist archive here.
                     <br><br>
+                  </td>
+                </tr>
+                <tr id='update_state_cls' name='update_state_cls' style='display:none;'>
+                  <td>&nbsp;</td>
+                  <td>
+                    <span  style="cursor: pointer;">
+                      <img src=<?php echo "'/themes/{$g['theme']}/images/icons/icon_block.gif'" ?> onClick="getactivity('clear_log');" title='Clear Log and Close'>
+                    </span>
+                    &nbsp; <big><b>Blacklist update Log</b></big>
                   </td>
                 </tr>
                 <tr id='update_state_row' name='update_state_row' style='display:none;'>

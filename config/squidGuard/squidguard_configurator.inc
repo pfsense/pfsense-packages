@@ -1,7 +1,10 @@
 <?php
 # ------------------------------------------------------------------------------
 /*  squidguard_configurator.inc
-    (C)2006-2011 Serg Dvoriancev
+    2006-2011 Serg Dvoriancev
+
+    part of pfSense (www.pfSense.com)
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
 
@@ -1857,7 +1860,8 @@ function sg_script_logrotate()
 #
 # This file generated automaticly with SquidGuard configurator
 rm -f {$sglogname}.0
-mv -f {$sglogname} {$sglogname}.0
+cp -f {$sglogname} {$sglogname}.0
+echo '' > {$sglogname}
 EOD;
     return $res;
 }
@@ -1989,7 +1993,7 @@ function squidguard_blacklist_update_start($url_filename)
 }
 
 # -----------------------------------------------------------------------------
-# squidguard_blacklist_update_cancel()
+# squidguard_blacklist_update_cancel
 # -----------------------------------------------------------------------------
 function squidguard_blacklist_update_cancel()
 {
@@ -1999,6 +2003,15 @@ function squidguard_blacklist_update_cancel()
     squidguard_ramdisk(false);
 
     squidguard_update_log("Blacklist update terminated by user.", "");
+}
+
+# -----------------------------------------------------------------------------
+# squidguard_blacklist_update_clearlog
+# -----------------------------------------------------------------------------
+function squidguard_blacklist_update_clearlog()
+{
+    # zero file
+    file_put_contents(SG_UPDATE_STATFILE, "");
 }
 
 # -----------------------------------------------------------------------------
@@ -2089,8 +2102,8 @@ function sg_update_blacklist($from_file)
         if (file_exists($squidguard_config[F_WORKDIR])) $workdir = $squidguard_config[F_WORKDIR];
 
         # delete old tmp dir's
-        if (file_exists($tmp_unpack_dir)) mwexec("rm -R  . $tmp_unpack_dir");
-        if (file_exists($arc_db_dir))     mwexec("rm -R  . $arc_db_dir");
+        if (file_exists($tmp_unpack_dir)) mwexec("rm -R $tmp_unpack_dir");
+        if (file_exists($arc_db_dir))     mwexec("rm -R $arc_db_dir");
         squidguard_ramdisk(false);
 
         # create new tmp/arc dir's, use ramdisk for quick operations
@@ -2155,6 +2168,7 @@ function sg_update_blacklist($from_file)
             squidguard_rebuild_db("blk_", $arc_db_dir, $blk_list);
 
             squidguard_update_log("Copy DB to workdir.");
+            $blklist_file = $arc_db_dir . SQUIDGUARD_BLK_FILELIST;
             mwexec("cp -R -p $arc_db_dir/ $dbhome");
             mwexec("cp -f -p $blklist_file " . SQUIDGUARD_WORKDIR);
             set_file_access($dbhome, OWNER_NAME, 0755);

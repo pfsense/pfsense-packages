@@ -7,7 +7,7 @@
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>squidguardacl</name>
 	<version>none</version>
-	<title>Proxy filter SquidGuard: Special Access Control List (ACL)</title>
+	<title>Proxy filter SquidGuard: Groups Access Control List (ACL)</title>
 	<include_file>/usr/local/pkg/squidguard.inc</include_file>
 	<delete_string>A proxy server user has been deleted.</delete_string>
 	<addedit_string>A proxy server user has been created/modified.</addedit_string>
@@ -21,7 +21,7 @@
 			<url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Special ACL</text>
+			<text>Groups ACL</text>
 			<url>/pkg.php?xml=squidguard_acl.xml</url>
 			<active/>
 		</tab>
@@ -188,11 +188,11 @@
                 </field>
 -->
                 <field>
-                        <fielddescr>Spec: Use safe search engine</fielddescr>
+                        <fielddescr>Use SafeSearch engine</fielddescr>
                         <fieldname>safesearch</fieldname>
                         <description>
                                 To protect your children from adult content, you can use the protected mode of search engines.
-                                Now it is supported by Google, Yandex, Yahoo, MSN, Live Search. Make sure that the search engines can, and others, it is recommended to prohibit.
+                                Now it is supported by Google, Yandex, Yahoo, MSN, Live Search, Bing. Make sure that the search engines can, and others, it is recommended to prohibit.
                                 &lt;br&gt;Note: ! This option overrides 'Rewrite' setting. !
                         </description>
                         <type>checkbox</type>

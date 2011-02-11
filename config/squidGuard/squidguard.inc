@@ -1,7 +1,10 @@
 <?php
 # ------------------------------------------------------------------------------
 /*  squidguard.inc
-    (C)2006-2011 Serg Dvoriancev
+    2006-2011 Serg Dvoriancev
+
+    part of pfSense (www.pfSense.com)
+
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
 
@@ -747,13 +750,13 @@ function make_grid_controls($type, $items, $enable_overtime = true) {
         $res .= "<table cellspacing='0' width='100%'> $thdr $tbl </table>";
 
         $rstyle = "";
-        $ha = "<div $color>" .
+        $ha = "<div class='listtopic'>" .
               "<span onClick='document.getElementById(\"destrules\").style.display = \"block\";' style=\"cursor: pointer;\">" .
               "<font size='-12'><big>Target Rules List (click here)</big>&nbsp;" .
-              "<img src='./themes/{$g['theme']}/images/icons/icon_pass.gif' title='Show rules'>&nbsp;" .
+              "<img src='/themes/{$g['theme']}/images/icons/icon_pass.gif' title='Show rules'>&nbsp;" .
               "</span>" .
                "<span style=\"cursor: pointer;\">" .
-              "<img src='./themes/{$g['theme']}/images/icons/icon_block.gif' title='Hide rules' onClick='document.getElementById(\"destrules\").style.display = \"none\";'>" .
+              "<img src='/themes/{$g['theme']}/images/icons/icon_block.gif' title='Hide rules' onClick='document.getElementById(\"destrules\").style.display = \"none\";'>" .
               "</span>" .
               "</div>";
         $res = "<hr>$ha<div id=\"destrules\" style='DISPLAY: none'>$res</div>";
@@ -1244,11 +1247,12 @@ function squidguard_adt_safesrch_add($rewrite_item)
     $rewrite_item[] = array(F_TARGETURL => '(yandex\..*/yandsearch?.*text=.*)', F_REPLACETO => '\1\&fyandex=1', F_MODE => 'i');
 
     # Yahoo
-    $rewrite_item[] = array(F_TARGETURL => '(search\.yahoo\..*/search.*p=.*)', F_REPLACETO => '\1\&vm=r', F_MODE => 'i');
+    $rewrite_item[] = array(F_TARGETURL => '(search\.yahoo\..*/search.*p=.*)', F_REPLACETO => '\1\&vm=r&v=1', F_MODE => 'i');
 
-    # MSN Live search
-    $rewrite_item[] = array(F_TARGETURL => '(search\.live\..*/.*q=.*)', F_REPLACETO => '\1\&adlt=strict', F_MODE => 'i');
-    $rewrite_item[] = array(F_TARGETURL => '(search\.msn\..*/.*q=.*)', F_REPLACETO => '\1\&adlt=strict', F_MODE => 'i');
+    # MSN Live search, Bing
+    $rewrite_item[] = array(F_TARGETURL => '(search\.live\..*/.*q=.*)',  F_REPLACETO => '\1\&adlt=strict', F_MODE => 'i');
+    $rewrite_item[] = array(F_TARGETURL => '(search\.msn\..*/.*q=.*)',   F_REPLACETO => '\1\&adlt=strict', F_MODE => 'i');
+    $rewrite_item[] = array(F_TARGETURL => '(\.bing\..*/.*q=.*)',        F_REPLACETO => '\1\&adlt=strict', F_MODE => 'i');
 
     return $rewrite_item;
 }

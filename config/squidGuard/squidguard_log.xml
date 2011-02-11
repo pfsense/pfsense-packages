@@ -21,7 +21,7 @@
 			<url>/pkg_edit.php?xml=squidguard_default.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Special ACL</text>
+			<text>Groups ACL</text>
 			<url>/pkg.php?xml=squidguard_acl.xml</url>
 		</tab>
 		<tab>
