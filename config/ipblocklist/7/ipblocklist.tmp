@@ -125,7 +125,7 @@ if(isset($_POST['formSubmit']))
 	$tab_array[1] = array("Settings", false, "settings.php");
 	$tab_array[2] = array("Whitelist", false, "whitelist.php");
 	$tab_array[3] = array("Interfaces", false, "ipblocklist_if.php");
-	$tab_array[4] = array("Help", false, "http://forum.pfsense.org/index.php/topic,24769.0.html");
+	$tab_array[4] = array("Help", false, "http://doc.pfsense.org/index.php/IP_Blocklist");
 	$tab_array[5] = array("Email", false, "email.php");
 	display_top_tabs($tab_array);
 ?> 
@@ -228,6 +228,7 @@ if(isset($_POST['formSubmit']))
 	echo " Networks/IPs";
 	?>
 <br><br>
+<small>Created by <a href="http://www.tomschaefer.org/pfsense">TomSchaefer</a></small>
 <!--<input type="submit" value="Save/Update"><br><br>
 --><p>
 </p>

@@ -586,6 +586,7 @@ body {
 		<input name="login" type="hidden" value="login" />
 	</form>
 </div>
+<small>Created by <a href="http://www.tomschaefer.org/pfsense">TomSchaefer</a></small>
 </body>
 </html>
 
