@@ -2685,6 +2685,7 @@ ob_end_clean();
 <input type="submit" value="Save/Update"><br><br>
 <p>
 <small>Lists provided by <a href="http://www.countryipblocks.net/">countryipblocks.net</a></small>
+<br /><small>Created by <a href="http://www.tomschaefer.org/pfsense">TomSchaefer</a></small>
 </p>
 </td>
 	</tr>
