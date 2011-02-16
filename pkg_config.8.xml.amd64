@@ -324,7 +324,7 @@
 	  <build_port_path>/usr/ports/lang/perl5.10</build_port_path>
 	  <build_port_path>/usr/ports/databases/mysql51-client</build_port_path>
 	  <build_port_path>/usr/ports/security/snort</build_port_path>
-	<build_options>WITHOUT_DEBUGGING=true WITHOUT_GDBM=true WITHOUT_PERL_MALLOC=true WITH_PERL_64BITINT=true WITHOUT_THREADS=true WITHOUT_MULTIPLICITY=true WITHOUT_SUIDPERL=true WITHOUT_SITECUSTOMIZE=true WITH_USE_PERL=true</build_options>
+	<build_options>WITH_IPV6=true WITH_MPLS=true WITH_GRE=true WITHOUT_TARGETBASED=true WITH_DECODERPRE=true WITH_ZLIB=true WITH_NORMALIZER=true WITH_REACT=true WITH_PERFPROFILE=true WITH_FLEXRESP3=true WITHOUT_MYSQL=true WITHOUT_ODBC=true WITHOUT_POSTGRESQL=true WITHOUT_PRELUDE=true WITH_SNORTSAM=true WITH_PFSENSE=true</build_options>
       <config_file>http://www.pfsense.com/packages/config/snort/snort.xml</config_file>
       <version>2.8.6.1 pkg v. 1.35</version>
       <required_version>2.0</required_version>
