@@ -145,6 +145,7 @@
       <depends_on_package>ntop-3.3.10_7.tbz</depends_on_package>
       <depends_on_package>gdbm-1.8.3_3.tbz</depends_on_package>
       <depends_on_package>perl-5.10.1_3.tbz</depends_on_package>
+	<depends_on_package>libpcap-1.1.1.tbz</depends_on_package>
 	  <build_port_path>/usr/ports/net/ntop</build_port_path>
 	  <build_port_path>/usr/ports/databases/gdbm</build_port_path>
 	  <build_port_path>/usr/ports/lang/perl5.10</build_port_path>
@@ -501,6 +502,7 @@
       <required_version>1.2.1</required_version>
       <configurationfile>nmap.xml</configurationfile>
       <build_port_path>/usr/ports/security/nmap</build_port_path>
+	<depends_on_package>libpcap-1.1.1.tbz</depends_on_package>
     </package>
     <package>
       <name>imspector</name>
