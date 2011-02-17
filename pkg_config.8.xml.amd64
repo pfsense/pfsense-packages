@@ -342,7 +342,7 @@
 		<website>http://www.snort.org</website>
 		<descr>Used by fortune 500 companies and governments Snort is the most widely deployed IDS/IPS technology worldwide. It features rules based logging and can perform content searching/matching in addition to being used to detect a variety of other attacks and probes, such as buffer overflows, stealth port scans, CGI attacks, SMB probes, and much more.</descr>
 		<category>Security</category>
-		<depends_on_package_base_url>http://www.pfsense.com/packages/config/snort/bin/8.1x64/</depends_on_package_base_url>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>pcre-8.10.tbz</depends_on_package>
 		<depends_on_package>mysql-client-5.1.53.tbz</depends_on_package>
 		<depends_on_package>snort-2.8.6.1.tbz</depends_on_package>
