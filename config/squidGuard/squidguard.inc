@@ -1257,6 +1257,88 @@ function squidguard_adt_safesrch_add($rewrite_item)
     return $rewrite_item;
 }
 
+# log dump
+function squidguard_logdump($filename, $lnoffset, $lncount, $reverse)
+{
+    define('LOGSHOW_BUFSIZE', '65536');
+    $cnt = '';
+
+    if (file_exists($filename)) {
+        $fh = fopen($filename, "r");
+        if ($fh) {
+            $fsize = filesize($filename);
+
+            # take LOGSHOW_BUFSIZE bytes from end
+            if ($fsize > LOGSHOW_BUFSIZE)
+                   fseek($fh, -LOGSHOW_BUFSIZE, SEEK_END);
+            $cnt = fread($fh,  LOGSHOW_BUFSIZE);
+
+            fclose($fh);
+        }
+    }
+
+    $cnt = explode( "\n", $cnt );
+
+    # delete broken first element
+    array_shift($cnt);
+
+    # offset must be >= 0 and can't be > count($cnt)
+    $lnoffset = $lnoffset >= 0 ? $lnoffset : 0;
+    $lnoffset = ($lnoffset + $lncount) < count($cnt) ? $lnoffset : 0;
+
+    $pos = ($lncount + $lnoffset);
+
+    # take elements from end of array
+    $cnt = array_slice($cnt, -$pos, $lncount);
+
+    # reverse array order
+    if ($reverse) $cnt = array_reverse( $cnt );
+
+    return $cnt;
+}
+
+# dump SG log
+function squidguard_filterdump($lnoffset, $lncount, $reverse)
+{
+    $res  = array();
+    $cont = squidguard_logdump(SQUIDGUARD_LOGDIR . '/squidGuard.log', &$lnoffset, $lncount, $reverse);
+
+    foreach($cont as $cn) {
+        $cn = explode(" ", trim($cn), 4);
+        $res[] = array( "{$cn[0]} {$cn[1]}", $cn[3] );
+    }
+
+    return $res;
+}
+
+# dump SG Gui log
+function squidguard_guidump($lnoffset, $lncount, $reverse)
+{
+    $res  = array();
+    $cont = squidguard_logdump(SQUIDGUARD_LOGDIR . SQUIDGUARD_CONFLOGFILE, &$lnoffset, $lncount, $reverse);
+
+    foreach($cont as $cn) {
+        $cn = explode(" ", trim($cn), 4);
+        $res[] = array( "{$cn[0]} {$cn[1]}", $cn[3] );
+    }
+
+    return $res;
+}
+
+# dump SG blocked
+function squidguard_blockdump($lnoffset, $lncount, $reverse)
+{
+    $res  = array();
+    $cont = squidguard_logdump(SQUIDGUARD_LOGDIR . '/' . SQUIDGUARD_LOGFILE, &$lnoffset, $lncount, $reverse);
+
+    foreach($cont as $cn) {
+        $cn = explode(" ", trim($cn), 9);
+        $res[] = array( "{$cn[0]} {$cn[1]}", $cn[5], $cn[4], "{$cn[3]} {$cn[6]} {$cn[7]} {$cn[8]}");
+    }
+
+    return $res;
+}
+
 # get squid config list
 function squidguard_squid_conflist( )
 {
@@ -1279,60 +1361,6 @@ function squidguard_conflist( )
     if (file_exists( $fname ))
          $res = file_get_contents( $fname );
     else $res = "File '$fname' not found.";
-
-    return $res;
-}
-
-# get squidguard log report
-
-define('LOGSHOW_BUFSIZE', '16384');
-
-function squidguard_logrep( $filename, $lncount, $reverse )
-{
-    $res = "";
-
-    $lncount = $lncount ? $lncount : 50;
-    $reverse = $reverse ? $reverse : false;
-
-    if (file_exists($filename)) {
-        $fh = fopen($filename, "r");
-        if ($fh) {
-            $fsize = filesize($filename);
-            # take LOGSHOW_BUFSIZE bytes from end
-            if ($fsize > LOGSHOW_BUFSIZE)
-                    fseek($fh, -LOGSHOW_BUFSIZE, SEEK_END);
-            $cont = fread($fh,  LOGSHOW_BUFSIZE);
-            fclose($fh);
-        }
-
-        $cont = explode( "\n", $cont );
-        $cont = array_slice($cont, -$lncount);
-
-        if ($reverse) $cont = array_reverse( $cont );
-
-        $res .= "<table class='tabcont' width='100%' border='0' cellpadding='0' cellspacing='0'>\n";
-        $res .= "<tr><td nowrap class='listtopic' colspan='2'>Last {$lncount} entries</td></tr>\n";
-        foreach($cont as $cn) {
-            $cn = trim($cn);
-            if ($cn) {
-                $cn = explode(" ", $cn, 4);
-
-                # split strings
-                $p     = 0;
-                $pstep = 15;
-                $str   = $cn[3];
-                $cn[3] = "";
-                for ( $p = 0; $p < strlen($str); $p += $pstep ) {
-                     $s = substr( $str, $p, $pstep );
-                     if ( !$s ) break;
-                     $cn[3] .= $s . "<wbr/>";
-                }
-
-                $res .= "<tr><td nowrap class='listlr'>{$cn[0]} {$cn[1]}</td><td class='listr'>{$cn[3]}</td></tr>";
-            }
-        }
-        $res .= "</table>";
-    }
 
     return $res;
 }

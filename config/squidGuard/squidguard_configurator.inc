@@ -1849,9 +1849,12 @@ function acl_remove_blacklist_items($items)
 
 # -----------------------------------------------------------------------------
 # sg_script_logrotate
+# truncate SG logfile to $lines
 # -----------------------------------------------------------------------------
 function sg_script_logrotate()
 {
+    $lines = 1000; # SG logfile truncate lines count
+
     global $squidguard_config;
     $sglogname = $squidguard_config[F_LOGDIR] . "/" . SQUIDGUARD_LOGFILE;
     $res =
@@ -1859,9 +1862,9 @@ function sg_script_logrotate()
 #!/bin/sh
 #
 # This file generated automaticly with SquidGuard configurator
+tail -{$lines} {$sglogname} > {$sglogname}.0
+tail -{$lines} {$sglogname}.0 > {$sglogname}
 rm -f {$sglogname}.0
-cp -f {$sglogname} {$sglogname}.0
-echo '' > {$sglogname}
 EOD;
     return $res;
 }

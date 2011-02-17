@@ -192,7 +192,7 @@ function getactivity(action) {
 
     var myAjax = new Ajax.Request( url,
         {
-            method:     'post',
+            method:    'get',
             parameters: pars,
             onComplete: activitycallback
         });
@@ -211,23 +211,7 @@ function activitycallback(transport) {
     //alert(transport.responseText);
 }
 
-//document.observe('dom:loaded', function() {
-    // refresh
-//    setTimeout('getactivity()', 150);
-//});
-
-//document.observe('dom:loaded', function() {
-    // refresh
-//    setTimeout('getactivity()', 150);
-//});
-
 window.setTimeout('getactivity()', 150);
-//if(!ajaxStarted) {
-//    try {
-//        window.setTimeout('getactivity()', 150);
-//        var ajaxStarted = true;
-//    }catch(e){}
-//}
 
 </script>
 
