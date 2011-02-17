@@ -974,5 +974,18 @@
 		<maintainer>markjcrane@gmail.com</maintainer>
 		<configurationfile>shellcmd.xml</configurationfile>
 	</package>
+	<package>
+		<name>widescreen</name>
+		<descr>The package makes pfSense adapt to browser's current width. It is particularly convenient for Status->Dashboard page that allocates columns for widgets according to browser's current width. ATTENTION: the package heavily modifies pfsense_ng theme and affects other's themes appearance. Please REFRESH your browser's window after installing/uninstalling this package.</descr>
+		<website></website>
+		<pkginfolink></pkginfolink>
+		<category>Enhancements</category>
+		<version>0.2</version>
+		<status>BETA</status>
+		<required_version>2.0</required_version>
+		<maintainer>ey@tm-k.com</maintainer>
+		<config_file>http://www.pfsense.org/packages/config/widescreen/widescreen.xml</config_file>
+		<configurationfile>widescreen.xml</configurationfile>
+	</package>
 </packages>
 </pfsensepkgs>
