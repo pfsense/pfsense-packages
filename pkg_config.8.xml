@@ -6,6 +6,19 @@
 <copy_packages_to_folder_ssh>/usr/local/www/files/packages/8/All/</copy_packages_to_folder_ssh>
 <packages>
 	<package>
+		<name>MAC-to-Vendor</name>
+		<descr>The package make pfSense show NIC Vendor names instead of MAC addresses in the form Asustek:xx:xx:xx, full info about MAC and vendor is available in tooltip. Applies to pages Status->Interfaces, Status->DHCP leases, Status->Wireless, Diagnostics->ARP table. Vendor names are stored in the file /usr/local/pkg/mactovendor/mac-prefixes</descr>
+		<website></website>
+		<pkginfolink></pkginfolink>
+		<category>Enhancements</category>
+		<version>0.2</version>
+		<status>BETA</status>
+		<required_version>2.0</required_version>
+		<maintainer>ey@tm-k.com</maintainer>
+		<config_file>http://www.pfsense.com/packages/config/mactovendor/mactovendor.xml</config_file>
+		<configurationfile>mactovendor.xml</configurationfile>
+	</package>
+	<package>
 		<name>File Manager</name>
 		<website/>
 		<descr>PHP File Manager</descr>
