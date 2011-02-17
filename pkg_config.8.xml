@@ -626,8 +626,10 @@
 		<depends_on_package>postgresql-client-8.4.7.tbz</depends_on_package>
 		<config_file>http://www.pfsense.org/packages/config/bandwidthd/bandwidthd.xml</config_file>
 		<configurationfile>bandwidthd.xml</configurationfile>
-		<build_port_path>/usr/ports/net-mgmt/bandwidthd</build_port_path>
 		<build_port_path>/usr/ports/net/libpcap</build_port_path>
+		<build_port_path>/usr/ports/databases/postgresql84-client</build_port_path>
+		<build_port_path>/usr/ports/net-mgmt/bandwidthd</build_port_path>
+		<build_options>WITH_NLS=true WITHOUT_PAM=true WITHOUT_LDAP=true WITHOUT_MIT_KRB5=true WITHOUT_HEIMDAL_KRB5=true WITHOUT_OPTIMIZED_CFLAGS=true WITHOUT_XML=true WITHOUT_TZDATA=true WITHOUT_DEBUG=true WITHOUT_GSSAPI=true WITHOUT_ICU=true WITH_INTDATE=true</build_options>
 	</package>
 	<package>
 		<name>stunnel</name>
