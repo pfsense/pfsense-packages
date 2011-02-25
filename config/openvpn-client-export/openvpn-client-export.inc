@@ -163,18 +163,18 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	$conf .= "remote {$server_host} {$server_port}\n";
 
 	if (!empty($proxy)) {
-                if ($proto == "udp") {
-                        $input_errors[] = "This server uses UDP protocol and cannot communicate with HTTP proxy.";
-                        return;
-                }
-                $conf .= "http-proxy {$proxy['ip']} {$proxy['port']} ";
-                if ($proxy['proxy_authtype'] != "none") {
-                        if (!isset($proxy['passwdfile']))
-                                $proxy['passwdfile'] =  openvpn_client_export_prefix($srvid) . "-proxy";
-                        $conf .= " {$proxy['passwdfile']} {$proxy['proxy_authtype']}";
-                }
-                $conf .= "\n";
-        }
+		if ($proto == "udp") {
+			$input_errors[] = "This server uses UDP protocol and cannot communicate with HTTP proxy.";
+			return;
+		}
+		$conf .= "http-proxy {$proxy['ip']} {$proxy['port']} ";
+		if ($proxy['proxy_authtype'] != "none") {
+			if (!isset($proxy['passwdfile']))
+				$proxy['passwdfile'] = openvpn_client_export_prefix($srvid) . "-proxy";
+			$conf .= " {$proxy['passwdfile']} {$proxy['proxy_authtype']}";
+		}
+		$conf .= "\n";
+	}
 
 	// add user auth settings
 	switch($settings['mode']) {
@@ -213,39 +213,39 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 
 	if ($zipconf == true) {
 		// create template directory
-        	$tempdir = "{$g['tmp_path']}/{$prefix}";
-        	mkdir($tempdir, 0700, true);
+		$tempdir = "{$g['tmp_path']}/{$prefix}";
+		mkdir($tempdir, 0700, true);
 
 		file_put_contents("{$tempdir}/{$prefix}.ovpn", $conf);
 
-		$cafile  = "{$tempdir}/{$cafile}";
-        	file_put_contents("{$cafile}", base64_decode($server_ca['crt']));
-        	if ($settings['tls']) {
-                	$tlsfile = "{$tempdir}/{$prefix}-tls.key";
-                	file_put_contents($tlsfile, base64_decode($settings['tls']));
-        	}
+		$cafile = "{$tempdir}/{$cafile}";
+		file_put_contents("{$cafile}", base64_decode($server_ca['crt']));
+		if ($settings['tls']) {
+			$tlsfile = "{$tempdir}/{$prefix}-tls.key";
+			file_put_contents($tlsfile, base64_decode($settings['tls']));
+		}
 
-        	// write key files
-        	if ($settings['mode'] != "server_user") {
-                	$crtfile = "{$tempdir}/{$prefix}-cert.crt";
-                	file_put_contents($crtfile, base64_decode($cert['crt']));
-                	$keyfile = "{$tempdir}/{$prefix}.key";
-                	file_put_contents($keyfile, base64_decode($cert['prv']));
+		// write key files
+		if ($settings['mode'] != "server_user") {
+			$crtfile = "{$tempdir}/{$prefix}-cert.crt";
+			file_put_contents($crtfile, base64_decode($cert['crt']));
+			$keyfile = "{$tempdir}/{$prefix}.key";
+			file_put_contents($keyfile, base64_decode($cert['prv']));
 
 			// convert to pkcs12 format
-                	$p12file = "{$tempdir}/{$prefix}.p12";
-                	if ($usetoken)
-                        	openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
-                	else
-                        	openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
+			$p12file = "{$tempdir}/{$prefix}.p12";
+			if ($usetoken)
+				openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
+			else
+				openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
 
-        	}
+		}
 		exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$g['tmp_path']}/{$prefix}-config.zip {$prefix}");
 
 		// Remove temporary directory
 		exec("rm -rf {$tempdir}");
 		return "{$prefix}-config.zip";
-	}  else
+	} else
 		return $conf;
 }
 
@@ -260,7 +260,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	// lookup server settings
 	$settings = $config['openvpn']['openvpn-server'][$srvid];
 	if (empty($settings)) {
-		$input_errors[] = "Could not find a valid server config  for id: {$srvid}";
+		$input_errors[] = "Could not find a valid server config for id: {$srvid}";
 		return false;
 	}
 	if ($settings['disable']) {
@@ -314,7 +314,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	$prefix = openvpn_client_export_prefix($srvid);
 	$cfgfile = "{$confdir}/{$prefix}-config.ovpn";
 	if (!empty($proxy) && $proxy['proxy_authtype'] != "none") {
-		$proxy['passwdfile'] =  "{$prefix}-password";
+		$proxy['passwdfile'] = "{$prefix}-password";
 		$pwdfle = "{$proxy['user']}\n";
 		$pwdfle .= "{$proxy['password']}\n";
 		file_put_contents("{$confdir}/{$proxy['passwdfile']}", $pwdfle);
@@ -340,12 +340,12 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 		file_put_contents($crtfile, base64_decode($cert['crt']));
 		$keyfile = "{$tempdir}/config/{$prefix}-{$user['name']}.key";
 		file_put_contents($keyfile, base64_decode($cert['prv']));
-               	// convert to pkcs12 format
-               	$p12file = "{$tempdir}/config/{$prefix}.p12";
-               	if ($usetoken)
-                       	openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
-               	else
-                       	openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
+		// convert to pkcs12 format
+		$p12file = "{$tempdir}/config/{$prefix}.p12";
+		if ($usetoken)
+			openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile);
+		else
+			openvpn_client_pem_to_pk12($p12file, $outpass, $crtfile, $keyfile, $cafile);
 	}
 
 	// 7zip the configuration data
@@ -372,7 +372,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	// cleanup
 	exec("/bin/rm -r {$tempdir}");
 
-	return $outfile;	
+	return $outfile;
 }
 
 function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass, $proxy) {
@@ -426,12 +426,12 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 	// write cofiguration file
 	$prefix = openvpn_client_export_prefix($srvid);
 	if (!empty($proxy) && $proxy['proxy_authtype'] != "none") {
-		$proxy['passwdfile'] =  "config-password";
-                $pwdfle = "{$proxy['user']}\n";
-                $pwdfle .= "{$proxy['password']}\n";
-                file_put_contents("{$tempdir}/{$proxy['passwdfile']}", $pwdfle);
-        }
-	
+		$proxy['passwdfile'] = "config-password";
+		$pwdfle = "{$proxy['user']}\n";
+		$pwdfle .= "{$proxy['password']}\n";
+		file_put_contents("{$tempdir}/{$proxy['passwdfile']}", $pwdfle);
+	}
+
 	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, true, $proxy, false, "", true);
 	if (!$conf)
 		return false;
@@ -461,7 +461,7 @@ EOF;
 	if ($settings['mode'] != "server_user") {
 		$conf .= <<<EOF
 cert cert.crt
-key key.key	
+key key.key
 EOF;
 	}
 
@@ -469,7 +469,7 @@ EOF;
 
 	//	ca.crt		cert.crt	config.conf	key.key		ta.key
 
-	// write ca 
+	// write ca
 	$cafile = "{$tempdir}/ca.crt";
 	file_put_contents($cafile, base64_decode($server_ca['crt']));
 

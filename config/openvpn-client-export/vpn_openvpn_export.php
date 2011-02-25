@@ -37,12 +37,12 @@ require("openvpn-client-export.inc");
 $pgtitle = array("OpenVPN", "Client Export Utility");
 
 if (!is_array($config['openvpn']['openvpn-server']))
-    $config['openvpn']['openvpn-server'] = array();
+	$config['openvpn']['openvpn-server'] = array();
 
 $a_server = $config['openvpn']['openvpn-server'];
 
 if (!is_array($config['system']['user']))
-    $config['system']['user'] = array();
+	$config['system']['user'] = array();
 
 $a_user = $config['system']['user'];
 
@@ -102,7 +102,7 @@ if($act == "conf" || $act == "confall") {
 		pfSenseHeader("vpn_openvpn_export.php");
 		exit;
 	} else if (($config['openvpn']['openvpn-server'][$srvid]['mode'] != "server_user") &&
-	    (($usrid === false) || ($crtid === false))) {
+		(($usrid === false) || ($crtid === false))) {
 		pfSenseHeader("vpn_openvpn_export.php");
 		exit;
 	}
@@ -120,8 +120,8 @@ if($act == "conf" || $act == "confall") {
 
 	$usetoken = $_GET['usetoken'];
 	$password = "";
-        if ($_GET['password'])
-                $password = $_GET['password'];
+	if ($_GET['password'])
+		$password = $_GET['password'];
 
 	$proxy = "";
 	if (!empty($_GET['proxy_addr']) || !empty($_GET['proxy_port'])) {
@@ -162,7 +162,7 @@ if($act == "conf" || $act == "confall") {
 	if (!$error) {
 		if ($act == "confall") {
 			$exp_name = urlencode($exp_data);
-                	$exp_size = filesize("{$g['tmp_path']}/{$exp_data}");
+			$exp_size = filesize("{$g['tmp_path']}/{$exp_data}");
 		} else {
 			$exp_name = urlencode($exp_name."-config.ovpn");
 			$exp_size = strlen($exp_data);
@@ -188,18 +188,18 @@ if($act == "visc") {
 	$usrid = $_GET['usrid'];
 	$crtid = $_GET['crtid'];
 	if ($srvid === false) {
-                pfSenseHeader("vpn_openvpn_export.php");
-                exit;
-        } else if (($config['openvpn']['openvpn-server'][$srvid]['mode'] != "server_user") &&
-            (($usrid === false) || ($crtid === false))) {
-                pfSenseHeader("vpn_openvpn_export.php");
-                exit;
-        }
+		pfSenseHeader("vpn_openvpn_export.php");
+		exit;
+	} else if (($config['openvpn']['openvpn-server'][$srvid]['mode'] != "server_user") &&
+		(($usrid === false) || ($crtid === false))) {
+		pfSenseHeader("vpn_openvpn_export.php");
+		exit;
+	}
 	if (empty($_GET['useaddr'])) {
 		$error = true;
 		$input_errors[] = "You need to specify an IP or hostname.";
-        } else
-                $useaddr = $_GET['useaddr'];
+	} else
+		$useaddr = $_GET['useaddr'];
 
 	$usetoken = $_GET['usetoken'];
 	$password = "";
@@ -207,32 +207,32 @@ if($act == "visc") {
 		$password = $_GET['password'];
 
 	$proxy = "";
-        if (!empty($_GET['proxy_addr']) || !empty($_GET['proxy_port'])) {
-                $proxy = array();
-                if (empty($_GET['proxy_addr'])) {
-                        $error = true;
-                        $input_errors[] = "You need to specify an address for the proxy port.";
-                } else
-                        $proxy['ip'] = $_GET['proxy_addr'];
-                if (empty($_GET['proxy_port'])) {
-                        $error = true;
-                        $input_errors[] = "You need to specify a port for the proxy ip.";
-                } else
-                        $proxy['port'] = $_GET['proxy_port'];
-                $proxy['proxy_authtype'] = $_GET['proxy_authtype'];
-                if ($_GET['proxy_authtype'] != "none") {
-                        if (empty($_GET['proxy_user'])) {
-                                $error = true;
-                                $input_errors[] = "You need to specify a username with the proxy config.";
-                        } else
-                                $proxy['user'] = $_GET['proxy_user'];
-                        if (!empty($_GET['proxy_user']) && empty($_GET['proxy_password'])) {
-                                $error = true;
-                                $input_errors[] = "You need to specify a password with the proxy user.";
-                        } else
-                                $proxy['password'] = $_GET['proxy_password'];
-                }
-        }
+	if (!empty($_GET['proxy_addr']) || !empty($_GET['proxy_port'])) {
+		$proxy = array();
+		if (empty($_GET['proxy_addr'])) {
+			$error = true;
+			$input_errors[] = "You need to specify an address for the proxy port.";
+		} else
+			$proxy['ip'] = $_GET['proxy_addr'];
+		if (empty($_GET['proxy_port'])) {
+			$error = true;
+			$input_errors[] = "You need to specify a port for the proxy ip.";
+		} else
+			$proxy['port'] = $_GET['proxy_port'];
+		$proxy['proxy_authtype'] = $_GET['proxy_authtype'];
+		if ($_GET['proxy_authtype'] != "none") {
+			if (empty($_GET['proxy_user'])) {
+				$error = true;
+				$input_errors[] = "You need to specify a username with the proxy config.";
+			} else
+				$proxy['user'] = $_GET['proxy_user'];
+			if (!empty($_GET['proxy_user']) && empty($_GET['proxy_password'])) {
+				$error = true;
+				$input_errors[] = "You need to specify a password with the proxy user.";
+			} else
+				$proxy['password'] = $_GET['proxy_password'];
+		}
+	}
 
 	$exp_name = openvpn_client_export_prefix($srvid);
 	$exp_name = urlencode($exp_name."-Viscosity.visc.zip");
@@ -260,18 +260,18 @@ if($act == "inst") {
 	$usrid = $_GET['usrid'];
 	$crtid = $_GET['crtid'];
 	if ($srvid === false) {
-                pfSenseHeader("vpn_openvpn_export.php");
-                exit;
-        } else if (($config['openvpn']['openvpn-server'][$srvid]['mode'] != "server_user") &&
-            (($usrid === false) || ($crtid === false))) {
-                pfSenseHeader("vpn_openvpn_export.php");
-                exit;
-        }
+		pfSenseHeader("vpn_openvpn_export.php");
+		exit;
+	} else if (($config['openvpn']['openvpn-server'][$srvid]['mode'] != "server_user") &&
+		(($usrid === false) || ($crtid === false))) {
+		pfSenseHeader("vpn_openvpn_export.php");
+		exit;
+	}
 	if (empty($_GET['useaddr'])) {
 		$error = true;
 		$input_errors[] = "You need to specify an IP or hostname.";
-        } else
-                $useaddr = $_GET['useaddr'];
+	} else
+		$useaddr = $_GET['useaddr'];
 
 	$usetoken = $_GET['usetoken'];
 	$password = "";
@@ -279,32 +279,32 @@ if($act == "inst") {
 		$password = $_GET['password'];
 
 	$proxy = "";
-        if (!empty($_GET['proxy_addr']) || !empty($_GET['proxy_port'])) {
-                $proxy = array();
-                if (empty($_GET['proxy_addr'])) {
-                        $error = true;
-                        $input_errors[] = "You need to specify an address for the proxy port.";
-                } else
-                        $proxy['ip'] = $_GET['proxy_addr'];
-                if (empty($_GET['proxy_port'])) {
-                        $error = true;
-                        $input_errors[] = "You need to specify a port for the proxy ip.";
-                } else
-                        $proxy['port'] = $_GET['proxy_port'];
-                $proxy['proxy_authtype'] = $_GET['proxy_authtype'];
-                if ($_GET['proxy_authtype'] != "none") {
-                        if (empty($_GET['proxy_user'])) {
-                                $error = true;
-                                $input_errors[] = "You need to specify a username with the proxy config.";
-                        } else
-                                $proxy['user'] = $_GET['proxy_user'];
-                        if (!empty($_GET['proxy_user']) && empty($_GET['proxy_password'])) {
-                                $error = true;
-                                $input_errors[] = "You need to specify a password with the proxy user.";
-                        } else
-                                $proxy['password'] = $_GET['proxy_password'];
-                }
-        }
+	if (!empty($_GET['proxy_addr']) || !empty($_GET['proxy_port'])) {
+		$proxy = array();
+		if (empty($_GET['proxy_addr'])) {
+			$error = true;
+			$input_errors[] = "You need to specify an address for the proxy port.";
+		} else
+			$proxy['ip'] = $_GET['proxy_addr'];
+		if (empty($_GET['proxy_port'])) {
+			$error = true;
+			$input_errors[] = "You need to specify a port for the proxy ip.";
+		} else
+			$proxy['port'] = $_GET['proxy_port'];
+		$proxy['proxy_authtype'] = $_GET['proxy_authtype'];
+		if ($_GET['proxy_authtype'] != "none") {
+			if (empty($_GET['proxy_user'])) {
+				$error = true;
+				$input_errors[] = "You need to specify a username with the proxy config.";
+			} else
+				$proxy['user'] = $_GET['proxy_user'];
+			if (!empty($_GET['proxy_user']) && empty($_GET['proxy_password'])) {
+				$error = true;
+				$input_errors[] = "You need to specify a password with the proxy user.";
+			} else
+				$proxy['password'] = $_GET['proxy_password'];
+		}
+	}
 
 	$exp_name = openvpn_client_export_prefix($srvid);
 	$exp_name = urlencode($exp_name."-install.exe");
@@ -389,39 +389,39 @@ function download_begin(act, i) {
 
 	var useproxy = 0;
 	var useproxypass = 0;
-        if (document.getElementById("useproxy").checked)
-                useproxy = 1;
+	if (document.getElementById("useproxy").checked)
+		useproxy = 1;
 
-        var proxyaddr = document.getElementById("proxyaddr").value;
-        var proxyport = document.getElementById("proxyport").value;
-        if (useproxy) {
-                if (!proxyaddr || !proxyport) {
-                        alert("The proxy ip and port cannot be empty");
-                        return;
-                }
+	var proxyaddr = document.getElementById("proxyaddr").value;
+	var proxyport = document.getElementById("proxyport").value;
+	if (useproxy) {
+		if (!proxyaddr || !proxyport) {
+			alert("The proxy ip and port cannot be empty");
+			return;
+		}
 
-        	if (document.getElementById("useproxypass").value != 'none')
-                	useproxypass = 1;
+		if (document.getElementById("useproxypass").value != 'none')
+			useproxypass = 1;
 
 		var proxyauth = document.getElementById("useproxypass").value;
-        	var proxyuser = document.getElementById("proxyuser").value;
-        	var proxypass = document.getElementById("proxypass").value;
-        	var proxyconf = document.getElementById("proxyconf").value;
-        	if (useproxypass) {
+		var proxyuser = document.getElementById("proxyuser").value;
+		var proxypass = document.getElementById("proxypass").value;
+		var proxyconf = document.getElementById("proxyconf").value;
+		if (useproxypass) {
 			if (!proxyuser) {
 				alert("Please fill the proxy username and passowrd.");
 				return;
 			}
-                	if (!proxypass || !proxyconf) {
-                        	alert("The proxy password or confirm field is empty");
-                       		return;
-                	}
-                	if (proxypass != proxyconf) {
-                        	alert("The proxy password and confirm fields must match");
-                        	return;
-                	}
-        	}
-        }
+			if (!proxypass || !proxyconf) {
+				alert("The proxy password or confirm field is empty");
+				return;
+			}
+			if (proxypass != proxyconf) {
+				alert("The proxy password and confirm fields must match");
+				return;
+			}
+		}
+	}
 
 	var dlurl;
 	dlurl  = "/vpn_openvpn_export.php?act=" + act;
@@ -437,10 +437,10 @@ function download_begin(act, i) {
 	if (useproxy) {
 		dlurl += "&proxy_addr=" + proxyaddr;
 		dlurl += "&proxy_port=" + proxyport;
-               	dlurl += "&proxy_authtype=" + proxyauth;
+		dlurl += "&proxy_authtype=" + proxyauth;
 		if (useproxypass) {
-                	dlurl += "&proxy_user=" + proxyuser;
-                	dlurl += "&proxy_password=" + proxypass;
+			dlurl += "&proxy_user=" + proxyuser;
+			dlurl += "&proxy_password=" + proxypass;
 		}
 	}
 
@@ -475,21 +475,21 @@ function server_changed() {
 	}
 	if (servers[index][2] == 'server_user') {
 		var row = table.insertRow(table.rows.length);
-                var cell0 = row.insertCell(0);
-                var cell1 = row.insertCell(1);
-                var cell2 = row.insertCell(2);
-                cell0.className = "listlr";
-                cell0.innerHTML = "External authentication users";
-                cell1.className = "listr";
-                cell1.innerHTML = "none";
-                cell2.className = "listr";
-                cell2.innerHTML = "<a href='javascript:download_begin(\"conf\"," + i + ")'>Configuration</a>";
-                cell2.innerHTML += "&nbsp;/&nbsp;";
+		var cell0 = row.insertCell(0);
+		var cell1 = row.insertCell(1);
+		var cell2 = row.insertCell(2);
+		cell0.className = "listlr";
+		cell0.innerHTML = "External authentication users";
+		cell1.className = "listr";
+		cell1.innerHTML = "none";
+		cell2.className = "listr";
+		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\"," + i + ")'>Configuration</a>";
+		cell2.innerHTML += "&nbsp;/&nbsp;";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confall\"," + i + ")'>Configuration archive</a>";
 		cell2.innerHTML += "&nbsp;/&nbsp;";
-                cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>Windows Installer</a>";
-                cell2.innerHTML += "&nbsp;/&nbsp;";
-                cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>Windows Installer</a>";
+		cell2.innerHTML += "&nbsp;/&nbsp;";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle</a>";
 	}
 }
 
@@ -630,92 +630,92 @@ function useproxy_changed(obj) {
 						</td>
 					</tr>
 					<tr>
-                                                <td width="22%" valign="top" class="vncell">Use HTTP Proxy</td>
-                                                <td width="78%" class="vtable">
+						<td width="22%" valign="top" class="vncell">Use HTTP Proxy</td>
+						<td width="78%" class="vtable">
 							 <table border="0" cellpadding="2" cellspacing="0">
-                                                                <tr>
-                                                                        <td>
-                                                                                <input name="useproxy" id="useproxy" type="checkbox" value="yes" onClick="useproxy_changed(this)">
+								<tr>
+									<td>
+										<input name="useproxy" id="useproxy" type="checkbox" value="yes" onClick="useproxy_changed(this)">
 
-                                                                        </td>
-                                                                        <td>
-                                                                                <span class="vexpl">
-                                                                                        Use HTTP proxy to communicate with the server.
-                                                                                </span>
-                                                                        </td>
-                                                                </tr>
-                                                        </table>
-                                                        <table border="0" cellpadding="2" cellspacing="0" id="useproxy_opts" style="display:none">
-                                                                <tr>
-                                                                        <td align="right" width='25%'>
-                                                                                <span class="vexpl">
-                                                                                         &nbsp;     IP Address :&nbsp;
-                                                                                </span>
-                                                                        </td>
-                                                                        <td>
-                                                                                <input name="proxyaddr" id="proxyaddr" class="formfld unknown" size="20" value="" />
-                                                                        </td>
-                                                                </tr>
-                                                                <tr>
-                                                                        <td align="right" width='25%'>
-                                                                                <span class="vexpl">
-                                                                                         &nbsp;      Port :&nbsp;
-                                                                                </span>
-                                                                                                                <td>
-                                                                                <input name="proxyport" id="proxyport" class="formfld unknown" size="5" value="" />
-                                                                        </td>
-                                                                </tr>
+									</td>
+									<td>
+										<span class="vexpl">
+											Use HTTP proxy to communicate with the server.
+										</span>
+									</td>
+								</tr>
+							</table>
+							<table border="0" cellpadding="2" cellspacing="0" id="useproxy_opts" style="display:none">
+								<tr>
+									<td align="right" width='25%'>
+										<span class="vexpl">
+											 &nbsp;     IP Address :&nbsp;
+										</span>
+									</td>
+									<td>
+										<input name="proxyaddr" id="proxyaddr" class="formfld unknown" size="20" value="" />
+									</td>
+								</tr>
+								<tr>
+									<td align="right" width='25%'>
+										<span class="vexpl">
+											 &nbsp;      Port :&nbsp;
+										</span>
+														<td>
+										<input name="proxyport" id="proxyport" class="formfld unknown" size="5" value="" />
+									</td>
+								</tr>
 							<br />
-                                                                <tr>
-                                                                        <td width="25%">
+								<tr>
+									<td width="25%">
 
-                                                                        </td>
+									</td>
 									<td>
 										<select name="useproxypass" id="useproxypass" class="formselect" onChange="useproxy_changed(this)">
 											<option value="none">none</option>
 											<option value="basic">basic</option>
 											<option value="ntlm">ntlm</option>
 										</select>
-                                                                                <span class="vexpl">
-                                                                                        Choose HTTP proxy authentication if any.
-                                                                                </span>
+										<span class="vexpl">
+											Choose HTTP proxy authentication if any.
+										</span>
 							<br />
-                                                        <table border="0" cellpadding="2" cellspacing="0" id="useproxypass_opts" style="display:none">
+							<table border="0" cellpadding="2" cellspacing="0" id="useproxypass_opts" style="display:none">
 								<tr>
-                                                                        <td align="right" width="25%">
-                                                                                <span class="vexpl">
-                                                                                         &nbsp;Username :&nbsp;
-                                                                                </span>
-                                                                        </td>
-                                                                        <td>
-                                                                                <input name="proxyuser" id="proxyuser" class="formfld unknown" size="20" value="" />
-                                                                        </td>
-                                                                </tr>
-                                                                <tr>
-                                                                        <td align="right" width="25%">
-                                                                                <span class="vexpl">
-                                                                                         &nbsp;Password :&nbsp;
-                                                                                </span>
-                                                                        </td>
-                                                                        <td>
-                                                                                <input name="proxypass" id="proxypass" type="password" class="formfld pwd" size="20" value="" />
-                                                                        </td>
-                                                                </tr>
-                                                                <tr>
-                                                                        <td align="right" width="25%">
-                                                                                <span class="vexpl">
-                                                                                         &nbsp;Confirm :&nbsp;
-                                                                                </span>
-					                                                                        <td>
-                                                                                <input name="proxyconf" id="proxyconf" type="password" class="formfld pwd" size="20" value="" />
-                                                                        </td>
-                                                                </tr>
-                                                        </table>
-                                                                        </td>
-                                                                </tr>
+									<td align="right" width="25%">
+										<span class="vexpl">
+											 &nbsp;Username :&nbsp;
+										</span>
+									</td>
+									<td>
+										<input name="proxyuser" id="proxyuser" class="formfld unknown" size="20" value="" />
+									</td>
+								</tr>
+								<tr>
+									<td align="right" width="25%">
+										<span class="vexpl">
+											 &nbsp;Password :&nbsp;
+										</span>
+									</td>
+									<td>
+										<input name="proxypass" id="proxypass" type="password" class="formfld pwd" size="20" value="" />
+									</td>
+								</tr>
+								<tr>
+									<td align="right" width="25%">
+										<span class="vexpl">
+											 &nbsp;Confirm :&nbsp;
+										</span>
+														<td>
+										<input name="proxyconf" id="proxyconf" type="password" class="formfld pwd" size="20" value="" />
+									</td>
+								</tr>
 							</table>
-                                                </td>
-                                        </tr>
+									</td>
+								</tr>
+							</table>
+						</td>
+					</tr>
 					<tr>
 						<td colspan="2" class="list" height="12">&nbsp;</td>
 					</tr>
