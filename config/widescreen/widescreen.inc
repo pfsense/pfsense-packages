@@ -25,7 +25,7 @@
 
 require('filter.inc');
 
-function mactovendor_custom_php_install_command()
+function widescreen_custom_php_install_command()
 {
         exec("mkdir -p /usr/local/pkg/widescreen/backup");
 	// Let's backup everything
@@ -47,7 +47,7 @@ function mactovendor_custom_php_install_command()
 	copy("/usr/local/pkg/widescreen/horiz-right.png", "/usr/local/www/themes/pfsense_ng/images/horiz-right.png");
 }
 
-function mactovendor_custom_php_deinstall_command()
+function widescreen_custom_php_deinstall_command()
 {
 	copy("/usr/local/pkg/widescreen/backup/all.css.bak", "/usr/local/www/themes/pfsense_ng/all.css");
 	copy("/usr/local/pkg/widescreen/backup/fbegin.inc.bak", "/usr/local/www/fbegin.inc");

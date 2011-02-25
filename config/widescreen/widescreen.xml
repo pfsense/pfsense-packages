@@ -63,9 +63,9 @@
 		<item>http://www.pfsense.org/packages/config/widescreen/bin/index.php_</item>
 	</additional_files_needed>
 	<custom_php_install_command>
-		mactovendor_custom_php_install_command();
+		widescreen_custom_php_install_command();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		mactovendor_custom_php_deinstall_command();
+		widescreen_custom_php_deinstall_command();
 	</custom_php_deinstall_command>
 </packagegui>
