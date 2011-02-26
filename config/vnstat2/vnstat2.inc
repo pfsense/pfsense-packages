@@ -148,9 +148,10 @@ function vnstat_install_config() {
         global $config;
 	conf_mount_rw();
 // Create vnstat database dir where it also will work for nanobsd
-	exec("[ -d /var/db/vnstat ] && mv /var/db/pkg/vnstat /conf/vnstat");
+//	exec("[ -d /var/db/vnstat ] && mv /var/db/vnstat /conf/vnstat");
 	exec("[ -d /usr/local/pkg/vnstat ] && mv /usr/local/pkg/vnstat /conf/vnstat");
 	exec("[ ! -d /conf/vnstat ] && mkdir /conf/vnstat");
+// Copy files to web dir
 	exec("[ ! -f /usr/local/www/diag_vnstat2.php ] && cp /usr/local/pkg/diag_vnstat2.abc /usr/local/www/diag_vnstat2.php");
 	exec("[ ! -f /usr/local/www/diag_vnstat.php ] && cp /usr/local/pkg/diag_vnstat.abc /usr/local/www/diag_vnstat.php");
 	exec("[ ! -f /usr/local/www/vnstati.php ] && cp /usr/local/pkg/vnstati.abc /usr/local/www/vnstati.php");
