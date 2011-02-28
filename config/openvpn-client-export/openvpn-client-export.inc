@@ -500,4 +500,97 @@ EOF;
 
 }
 
+function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipconf = false) {
+	global $config, $input_errors, $g;
+
+	// lookup server settings
+	$settings = $config['openvpn']['openvpn-server'][$srvid];
+	if (empty($settings)) {
+		$input_errors[] = "Could not locate server configuration.";
+		return false;
+	}
+	if ($settings['disable']) {
+		$input_errors[] = "You cannot export for disabled servers.";
+		return false;
+	}
+
+	// determine basic variables
+	if ($useaddr == "serveraddr") {
+		$interface = $settings['interface'];
+		if (!empty($settings['ipaddr']) && is_ipaddr($settings['ipaddr'])) {
+			$server_host = $settings['ipaddr'];
+		} else {
+			if (!$interface)
+				$interface = "wan";
+			$server_host = get_interface_ip($interface);
+		}
+	} else if ($useaddr == "serverhostname" || empty($useaddr)) {
+		$server_host = "{$config['system']['hostname']}.{$config['system']['domain']}";
+	} else
+		$server_host = $useaddr;
+
+	$server_port = $settings['local_port'];
+	$proto = (strtoupper($settings['protocol']) == 'UDP' ? 'udp' : "tcp-client");
+
+	$cipher = $settings['crypto'];
+
+	// add basic settings
+	$conf  = "dev tun\n";
+	$conf .= "persist-tun\n";
+	$conf .= "persist-key\n";
+	$conf .= "proto {$proto}\n";
+	$conf .= "cipher {$cipher}\n";
+	$conf .= "client\n";
+	$conf .= "resolv-retry infinite\n";
+	$conf .= "remote {$server_host} {$server_port}\n";
+	if ($settings['local_network']) {
+		list($ip, $mask) = explode('/', $settings['local_network']);
+		$mask = gen_subnet_mask($mask);
+		$conf .= "route $ip $mask\n";
+	}
+
+	if (!empty($proxy)) {
+		if ($proto == "udp") {
+			$input_errors[] = "This server uses UDP protocol and cannot communicate with HTTP proxy.";
+			return;
+		}
+		$conf .= "http-proxy {$proxy['ip']} {$proxy['port']} ";
+		if ($proxy['proxy_authtype'] != "none") {
+			if (!isset($proxy['passwdfile']))
+				$proxy['passwdfile'] = openvpn_client_export_prefix($srvid) . "-proxy";
+			$conf .= " {$proxy['passwdfile']} {$proxy['proxy_authtype']}";
+		}
+		$conf .= "\n";
+	}
+
+	// add key settings
+	$prefix = openvpn_client_export_prefix($srvid);
+	$shkeyfile = "{$prefix}.secret";
+	$conf .= "secret {$shkeyfile}\n";
+
+	// add optional settings
+	if ($settings['compression'])
+		$conf .= "comp-lzo\n";
+	if ($settings['passtos'])
+		$conf .= "passtos\n";
+
+	if ($zipconf == true) {
+		// create template directory
+		$tempdir = "{$g['tmp_path']}/{$prefix}";
+		mkdir($tempdir, 0700, true);
+
+		file_put_contents("{$tempdir}/{$prefix}.ovpn", $conf);
+
+		$shkeyfile = "{$tempdir}/{$shkeyfile}";
+		file_put_contents("{$shkeyfile}", base64_decode($settings['shared_key']));
+
+		exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$g['tmp_path']}/{$prefix}-config.zip {$prefix}");
+
+		// Remove temporary directory
+		exec("rm -rf {$tempdir}");
+		return "{$prefix}-config.zip";
+	} else
+		return $conf;
+}
+
 ?>
