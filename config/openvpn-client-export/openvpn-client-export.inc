@@ -51,10 +51,12 @@ function openvpn_client_export_install() {
 function openvpn_client_export_deinstall() {
 	conf_mount_rw();
 	$phpfile = "vpn_openvpn_export.php";
+	$phpfile2 = "vpn_openvpn_export_shared.php";
 	$ovpndir = "/usr/local/share/openvpn";
 	$workdir = "{$ovpndir}/client-export";
 
 	unlink_if_exists("/usr/local/www/{$phpfile}");
+	unlink_if_exists("/usr/local/www/{$phpfile2}");
 	exec("/bin/rm -r {$workdir}");
 	conf_mount_ro();
 }
@@ -548,6 +550,16 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 		$mask = gen_subnet_mask($mask);
 		$conf .= "route $ip $mask\n";
 	}
+	if (!empty($settings['tunnel_network'])) {
+		list($ip, $mask) = explode('/', $settings['tunnel_network']);
+		$mask = gen_subnet_mask($mask);
+		$baselong = ip2long32($ip) & ip2long($mask);
+		$ip1 = long2ip32($baselong + 1);
+		$ip2 = long2ip32($baselong + 2);
+		$conf .= "ifconfig $ip2 $ip1\n";
+	}
+	$conf .= "keepalive 10 60\n";
+	$conf .= "ping-timer-rem\n";
 
 	if (!empty($proxy)) {
 		if ($proto == "udp") {

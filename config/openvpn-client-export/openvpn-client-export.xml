@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <packagegui>
 	<name>OpenVPN Client Export</name>
-	<version>0.3</version>
+	<version>0.6</version>
 	<title>OpenVPN Client Export</title>
 	<include_file>/usr/local/pkg/openvpn-client-export.inc</include_file>
 	<backup_file></backup_file>
@@ -12,6 +12,11 @@
 			<name>Client Export</name>
 			<tabgroup>OpenVPN</tabgroup>
 			<url>/vpn_openvpn_export.php</url>
+		</tab>
+		<tab>
+			<name>Shared Key Export</name>
+			<tabgroup>OpenVPN</tabgroup>
+			<url>/vpn_openvpn_export_shared.php</url>
 		</tab>
 	</tabs>
 	<additional_files_needed>
@@ -28,6 +33,11 @@
 		<prefix>/usr/local/www/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/openvpn-client-export/vpn_openvpn_export.php</item>
+	</additional_files_needed>
+	<additional_files_needed>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>077</chmod>
+		<item>http://www.pfsense.com/packages/config/openvpn-client-export/vpn_openvpn_export_shared.php</item>
 	</additional_files_needed>
 	<custom_php_install_command>
 		openvpn_client_export_install();
