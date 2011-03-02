@@ -219,9 +219,8 @@ function unbound_control($action) {
 		case "restore_cache":
 				//Restore Unbound's Cache
 				if($unbound_config['dumpcache'] == "on") {
-					$cache_dumpfile = "/var/tmp/unbound_cache";
-					if(file_exists($cache_dumpfile))
-						unbound_ctl_exec("load_cache < $cache_dumpfile");
+					if(file_exists($cache_dumpfile) && filesize($cache_dumpfile) > 0)
+						unbound_ctl_exec("load_cache < /var/tmp/unbound_cache");
 				}
 				break;
 		
@@ -567,15 +566,13 @@ function unbound_validate($post, $acl=false) {
 }
 
 function unbound_reconfigure() {
-	global $config, $g, $input_errors;
+	global $config;
 	
 	$unbound_config = $config['installedpackages']['unbound']['config'][0];
-	
+		
 	if ($unbound_config['unbound_status'] != "on") {
-		if(is_service_running("unbound")) {
-			unbound_control("dump_cache");
+		if(is_service_running("unbound"))
 			unbound_control("termstop");
-		}
 	} else {
 		if(is_service_running("unbound")) {
 			unbound_control("dump_cache");
@@ -583,8 +580,10 @@ function unbound_reconfigure() {
 		}
 		unbound_resync_config();
 		unbound_control("start");
-		unbound_control("restore_cache");
-		unbound_control("forward");
+		if(is_service_running("unbound")) {
+			unbound_control("forward");
+			unbound_control("restore_cache");
+		}
 	}	
 }
 
