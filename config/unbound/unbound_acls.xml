@@ -7,7 +7,7 @@
 		/*
 		    unbound_acls.xml
 		    part of the Unbound package for pfSense (http://www.pfSense.com)
-		    Copyright (C) 2010 Warren Baker
+		    Copyright (C) 2011 Warren Baker (warren@decoy.co.za)
 		    All rights reserved.
 		                                                       						  */
 		/* ========================================================================== */
@@ -40,7 +40,7 @@
 	<requirements/>
 	<faq/>
 	<name>unboundacls</name>
-	<version>1.4.7</version>
+	<version>1.4.8</version>
 	<title>Services: Unbound DNS Forwarder: ACLs</title>
 	<include_file>/usr/local/pkg/unbound.inc</include_file>
 	<menu>
@@ -55,7 +55,7 @@
 			<url>/pkg_edit.php?xml=unbound.xml&amp;id=0</url>
 		</tab>
 		<tab>
-			<text>Unbound ACLs</text>
+			<text>Unbound DNS ACLs</text>
 			<url>/pkg.php?xml=unbound_acls.xml</url>
 			<active/>
 		</tab>
