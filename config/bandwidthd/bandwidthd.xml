@@ -88,6 +88,12 @@
 			<default_value>lan</default_value>
 		</field>	
 		<field>
+                        <fielddescr>Subnet</fielddescr>
+                        <fieldname>subnets_custom</fieldname>
+                        <description>The subnet that bandwidthd will bind to. (separe with ';' for multiple subnets)</description>
+                        <type>input</type>
+		</field>
+		<field>
 			<fielddescr>Skip intervals</fielddescr>
 			<fieldname>skipintervals</fieldname>
 			<description></description>

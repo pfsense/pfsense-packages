@@ -76,6 +76,8 @@ function bandwidthd_install_config() {
 		log_error("You should specify a interface for bandwidthd to listen on.  exiting.");
 	}
 
+	$subnets_custom = split(';',str_replace(' ','',$config['installedpackages']['bandwidthd']['config'][0]['subnets_custom']));
+
 	/* initialize to "" */
 	$subnets = "";
 	//$ifdescrs = array("lan", "wan");
@@ -96,6 +98,12 @@ function bandwidthd_install_config() {
 				if($subnet)
 					$subnets .= "subnet {$subnet}/{$ifcfg['subnet']}\n";
 			}
+		}
+	}
+
+	if(is_array($subnets_custom)) {
+		foreach($subnets_custom as $sub) {
+			$subnets .= "subnet {$sub}\n";
 		}
 	}
 
