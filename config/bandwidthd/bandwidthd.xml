@@ -75,7 +75,7 @@
 	<configpath>installedpackages->package->bandwidthd</configpath>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
-		<chmod>077</chmod>
+		<chmod>0677</chmod>
 		<item>http://www.pfsense.com/packages/config/bandwidthd/bandwidthd.inc</item>
 	</additional_files_needed>
 	<fields>
