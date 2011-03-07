@@ -90,7 +90,7 @@
 		<field>
                         <fielddescr>Subnet</fielddescr>
                         <fieldname>subnets_custom</fieldname>
-                        <description>The subnet that bandwidthd will bind to. (separe with ';' for multiple subnets)</description>
+                        <description>The subnet(s) on which bandwidthd will report. (separate with ';' for multiple subnets, e.g. 192.168.1.0/24;10.0.0.0/24)</description>
                         <type>input</type>
 		</field>
 		<field>
@@ -103,7 +103,7 @@
 		<field>
 			<fielddescr>Graph cutoff</fielddescr>
 			<fieldname>graphcutoff</fieldname>
-			<description>Graph cutoff is how many k must be transfered by an ip before we bother to graph it</description>
+			<description>Graph cutoff is how many KB must be transferred by an IP before it is graphed</description>
 			<type>input</type>
 			<value>1024</value>
 		</field>
