@@ -279,6 +279,10 @@ EOF;
 				$local_ip_port = $global_listen;
 			// Do not add entries twice.
 			if(!in_array($local_ip_port, $processed)) {
+				// explicit bind if not global ip:port
+				if ($local_ip_port != $global_listen) {
+					$mod_proxy .= "Listen $local_ip_port\n";
+				}
 				$mod_proxy .= "NameVirtualHost $local_ip_port\n";
 				$processed[] = $local_ip_port;
 			}
@@ -337,8 +341,26 @@ EOF;
 				$backend_sites = " balancer://{$sitename}\n";
 				$sitename = "";			// we are not using sitename in this case
 			}
+			// Set SSL items
+			if($ams['siteurl'])
+				$siteurl = $ams['siteurl'];
+			if($ams['certificatefile'])
+				$certificatefile = $ams['certificatefile'];
+			if($ams['certificatekeyfile'])
+				$certificatekeyfile = $ams['certificatekeyfile'];
+			if($ams['certificatechainfile'])
+				$certificatechainfile = $ams['certificatechainfile'];
 			// Begin VirtualHost
 			$mod_proxy .= "\n<VirtualHost {$local_ip_port}>\n";
+			if($siteurl == "HTTPS" && $certificatefile && $certificatekeyfile) {
+				$mod_proxy .= "  SSLEngine on\n";
+				if ($certificatefile)
+					$mod_proxy .= "  SSLCertificateFile /usr/local/etc/apache22/$certificatefile\n";  
+				if ($certificatekeyfile)
+					$mod_proxy .= "  SSLCertificateKeyFile /usr/local/etc/apache22/$certificatekeyfile\n";
+				if ($certificatechainfile)
+					$mod_proxy .= "  SSLCertificateChainFile /usr/local/etc/apache22/$certificatechainfile\n";
+			}
 			if($additionalsitehostnames)
 				$mod_proxy .= "  ServerAlias $additionalsitehostnames\n";
 			if($serveradmin)

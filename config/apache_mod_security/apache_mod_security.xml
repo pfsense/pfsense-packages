@@ -134,6 +134,42 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>Certificate File</fielddescr>
+			<fieldname>certificatefile</fieldname>
+			<description>
+				<![CDATA[
+					Name of certificate file under /usr/local/apache22/etc/<br/>
+					(required if Protocol is https)
+				]]>
+			</description>
+			<size>40</size>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Certificate Key File</fielddescr>
+			<fieldname>certificatekeyfile</fieldname>
+			<description>
+				<![CDATA[
+					Name of certificate key file under /usr/local/apache22/etc/<br/>
+					(required if Protocol is https)
+				]]>
+			</description>
+			<size>40</size>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Certificate Chain File</fielddescr>
+			<fieldname>certificatechainfile</fieldname>
+			<description>
+				<![CDATA[
+					Name of certificate chain file under /usr/local/apache22/etc/<br/>
+					(not required)
+				]]> 
+			</description>
+			<size>40</size>
+			<type>input</type>
+		</field>
+		<field>
 			<fielddescr>Preserve Proxy hostname</fielddescr>
 			<fieldname>preserveproxyhostname</fieldname>
 			<description>
