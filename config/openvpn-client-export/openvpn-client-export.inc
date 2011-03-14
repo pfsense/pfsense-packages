@@ -79,11 +79,15 @@ function openvpn_client_export_prefix($srvid) {
 }
 
 function openvpn_client_pem_to_pk12($outpath, $outpass, $crtpath, $keypath, $capath = false) {
-
-	if ($capath)
-		exec("/usr/bin/openssl pkcs12 -export -in {$crtpath} -inkey {$keypath} -certfile {$capath} -out {$outpath} -passout pass:{$outpass}");
-	else
-		exec("/usr/bin/openssl pkcs12 -export -in {$crtpath} -inkey {$keypath} -out {$outpath} -passout pass:{$outpass}");
+	$eoutpath = escapeshellarg($outpath);
+	$eoutpass = escapeshellarg($outpass);
+	$ecrtpath = escapeshellarg($crtpath);
+	$ekeypath = escapeshellarg($keypath);
+	if ($capath) {
+		$ecapath = escapeshellarg($capath);
+		exec("/usr/bin/openssl pkcs12 -export -in {$ecrtpath} -inkey {$ekeypath} -certfile {$ecapath} -out {$eoutpath} -passout pass:{$eoutpass}");
+	} else
+		exec("/usr/bin/openssl pkcs12 -export -in {$ecrtpath} -inkey {$ekeypath} -out {$eoutpath} -passout pass:{$eoutpass}");
 
 	unlink($crtpath);
 	unlink($keypath);

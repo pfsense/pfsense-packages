@@ -425,22 +425,22 @@ function download_begin(act, i) {
 
 	var dlurl;
 	dlurl  = "/vpn_openvpn_export.php?act=" + act;
-	dlurl += "&srvid=" + servers[index][0];
+	dlurl += "&srvid=" + escape(servers[index][0]);
 	if (users[i]) {
-		dlurl += "&usrid=" + users[i][0];
-		dlurl += "&crtid=" + users[i][1];
+		dlurl += "&usrid=" + escape(users[i][0]);
+		dlurl += "&crtid=" + escape(users[i][1]);
 	}
-	dlurl += "&useaddr=" + useaddr;
-	dlurl += "&usetoken=" + usetoken;
+	dlurl += "&useaddr=" + escape(useaddr);
+	dlurl += "&usetoken=" + escape(usetoken);
 	if (usepass)
-		dlurl += "&password=" + pass;
+		dlurl += "&password=" + escape(pass);
 	if (useproxy) {
-		dlurl += "&proxy_addr=" + proxyaddr;
-		dlurl += "&proxy_port=" + proxyport;
-		dlurl += "&proxy_authtype=" + proxyauth;
+		dlurl += "&proxy_addr=" + escape(proxyaddr);
+		dlurl += "&proxy_port=" + escape(proxyport);
+		dlurl += "&proxy_authtype=" + escape(proxyauth);
 		if (useproxypass) {
-			dlurl += "&proxy_user=" + proxyuser;
-			dlurl += "&proxy_password=" + proxypass;
+			dlurl += "&proxy_user=" + escape(proxyuser);
+			dlurl += "&proxy_password=" + escape(proxypass);
 		}
 	}
 
