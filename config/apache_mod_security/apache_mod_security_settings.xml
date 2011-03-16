@@ -77,7 +77,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Bind to IP Address</fielddescr>
+			<fielddescr>Default Bind to IP Address</fielddescr>
 			<fieldname>globalbindtoipaddr</fieldname>
 			<description>
 				<![CDATA[
@@ -89,7 +89,7 @@
 			<type>input</type>
 		</field>
 		<field>
-			<fielddescr>Bind to port</fielddescr>
+			<fielddescr>Default Bind to port</fielddescr>
 			<fieldname>globalbindtoport</fieldname>
 			<description>
 				<![CDATA[
@@ -99,6 +99,33 @@
 				]]>					
 			</description>
 			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>
+				<![CDATA[
+					Additional Addresses<br/>
+					Do not edit. This field will be automatically populated from Site Proxies settings.
+				]]>
+			</fielddescr>
+			<fieldname>additionaladdresses</fieldname>
+			<description></description>
+			<type>rowhelper</type>
+			<rowhelper>
+				<rowhelperfield>
+					<fielddescr>IP Address</fielddescr>
+					<fieldname>ipaddress</fieldname>
+					<description></description>
+					<type>input</type>
+					<size>45</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Port</fielddescr>
+					<fieldname>ipport</fieldname>
+					<description></description>
+					<type>input</type>
+					<size>10</size>
+				</rowhelperfield>
+			</rowhelper>
 		</field>
 		<field>
 			<fielddescr>Use mod_mem_cache</fielddescr>

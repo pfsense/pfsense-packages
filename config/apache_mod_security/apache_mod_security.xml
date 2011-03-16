@@ -194,38 +194,25 @@
 		<field>
 			<fielddescr>
 				<![CDATA[
-					Additional site hostnames
-					<br/>
-					(not required)
+					Backend Web Servers and Additional Site Hostnames
 				]]>
 			</fielddescr>
-			<fieldname>additionalsitehostnames</fieldname>
+			<fieldname>additionalparameters</fieldname>
 		    <type>rowhelper</type>
 		    <rowhelper>
 				<rowhelperfield>
-				    <fielddescr>Additional Site Hostname</fielddescr>
+                                    <fielddescr>Web server backend URLs</fielddescr>
+                                    <fieldname>webserveripaddr</fieldname>
+                                    <description>Add each web server IP address here.</description>
+				    <type>input</type>
+                                    <size>40</size>
+				</rowhelperfield>
+				<rowhelperfield>
+				    <fielddescr>Additional Site Hostnames (not required)</fielddescr>
 				    <fieldname>additionalsitehostnames</fieldname>
 				    <description>Add each webserver hostname address here.</description>
 				    <type>input</type>
-				    <size>53</size>
-				</rowhelperfield>
-		    </rowhelper>
-		</field>
-		<field>
-			<fielddescr>
-				<![CDATA[
-					Backend web servers
-				]]>		
-			</fielddescr>
-			<fieldname>webservers</fieldname>
-		    <type>rowhelper</type>
-		    <rowhelper>
-				<rowhelperfield>
-				    <fielddescr>Web server backend URL</fielddescr>
-				    <fieldname>webserveripaddr</fieldname>
-				    <description>Add each web server IP address here.</description>
-				    <type>input</type>
-				    <size>53</size>
+				    <size>40</size>
 				</rowhelperfield>
 		    </rowhelper>
 		</field>

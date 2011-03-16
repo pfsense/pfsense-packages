@@ -140,15 +140,21 @@ function generate_apache_configuration() {
 	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalsiteadminemail']) {
 		$global_site_email = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalsiteadminemail'];
 	} else {
-		$global_site_email = "admin@admin.comn";
+                $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalsiteadminemail'] = "admin@admin.com";
+                $global_site_email = $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalsiteadminemail'];
+                // update configuration with default value in this case
+                write_config($pkg['addedit_string']);
 		log_error("WARNING!  Global site Administrator E-Mail address has not been set.  Defaulting to bogus e-mail address.");
 	}
 
 	// Set ServerName
-	if($config['installedpackages']['apachemodsecuritysettings']['config']['hostname']) {
+	if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['hostname']) {
 		$servername = "ServerName {$config['installedpackages']['apachemodsecuritysettings']['config'][0]['hostname']}\n";
 	} else {
 		$servername = "ServerName " . `hostname` . "\n";
+		$config['installedpackages']['apachemodsecuritysettings']['config'][0]['hostname'] = `hostname`;
+                // update configuration with default value in this case
+                write_config($pkg['addedit_string']);
 	}
 
 	// Set global listening directive and ensure nothing is listening on this port already
@@ -170,7 +176,10 @@ function generate_apache_configuration() {
 			else 
 				$global_listen .= ":80";
 		} else {
-			$global_listen = "{$config['system']['hostname']}.{$config['system']['domain']}";
+ 	               $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'] = "{$config['system']['hostname']}.{$config['system']['domain']}";
+        	        $global_listen  =  $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
+			// update configuration with default value in this case
+			 write_config($pkg['addedit_string']);		
 			if($config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'])
 				$global_listen .= ":" . $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoport'];
 			else 
@@ -268,9 +277,27 @@ EOF;
 		#-------------------------------------------------
 		#####################################################
 	*/
+	$mod_proxy .= "\n";
 
+	$configuredaliases = array();
+	// Read already configured addresses
+        if($config['installedpackages']['apachemodsecuritysettings']['config']['0']) {
+		foreach($config['installedpackages']['apachemodsecuritysettings']['config']['0']['row'] as $row) {
+                	if ($row['ipaddress'] && $row['ipport']) {
+				$configuredaliases[] = $row; 
+                        }
+               	}
+	} 
+
+
+	// clear list of bound addresses
+        $config['installedpackages']['apachemodsecuritysettings']['config'][0]['row'] = array();
+
+	// Process proxy sites
 	// Configure NameVirtualHost directives
+        $aliases = "";
 	$processed = array();
+
 	if($config['installedpackages']['apachemodsecurity']) {
 		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
 			if($ams['ipaddress'] && $ams['port']) 
@@ -281,7 +308,9 @@ EOF;
 			if(!in_array($local_ip_port, $processed)) {
 				// explicit bind if not global ip:port
 				if ($local_ip_port != $global_listen) {
-					$mod_proxy .= "Listen $local_ip_port\n";
+					$aliases .= "Listen $local_ip_port\n";
+					// Automatically add this to configuration
+                                	$config['installedpackages']['apachemodsecuritysettings']['config'][0]['row'][] = array('ipaddress' => $ams['ipaddress'], 'ipport' => $ams['port']); 
 				}
 				$mod_proxy .= "NameVirtualHost $local_ip_port\n";
 				$processed[] = $local_ip_port;
@@ -289,32 +318,57 @@ EOF;
 		}
 	}
 
+//** Uncomment to allow adding ip/ports not used by any site proxies
+//** Otherwise unused addresses/ports will be automatically deleted from the configuration
+//	foreach ($configuredaliases as $ams) {
+//		$local_ip_port = "{$ams['ipaddress']}:{$ams['ipport']}";
+//               if(!in_array($local_ip_port, $processed)) {
+//                	// explicit bind if not global ip:port
+//                        if ($local_ip_port != $global_listen) {
+//                        	$aliases .= "Listen $local_ip_port\n";    
+//                                // Automatically add this to configuration
+//                                $config['installedpackages']['apachemodsecuritysettings']['config'][0]['row'][] = array('ipaddress' => $ams['ipaddress'], 'ipport' => $ams['ipport']);
+//                        }
+//		}
+//	}
+
+	// update configuration with actual ip bindings
+	write_config($pkg['addedit_string']);
+
+
 	// Setup mod_proxy entries $mod_proxy
 	if($config['installedpackages']['apachemodsecurity']) {
 		foreach($config['installedpackages']['apachemodsecurity']['config'] as $ams) {
 			// Set rowhelper used variables
+                        $additionalsitehostnames = "";
 			foreach($ams['row'] as $row) {
-				// Ensure leading http(s)://
-				if(!strstr($row['additionalsitehostnames'], "http")) 
-					$additionalsitehostnames .= "http://";				
-				$additionalsitehostnames .= "{$row['additionalsitehostnames']}";
-				// Ensure trailing /
-				if(substr($row['additionalsitehostnames'],count($row['additionalsitehostnames']),1) != "/")
-					$additionalsitehostnames .= "/ ";
-				else 
-					$additionalsitehostnames .= " ";
+				if ($row['additionalsitehostnames']) {
+					$additionalsitehostnames .= "{$row['additionalsitehostnames']} ";
 			}				
-			$backend_sites = ""; // not technically needed.  added for readability due to .='s
+			}				
+			$backend_sites = ""; 
+			$sslproxyengine = ""; 
+			$backend_sites_count = 0;
+			$balancer_members = ""; // not technically needed.
 			foreach($ams['row'] as $row) {
+				if ($row['webserveripaddr']) {
+					$normalised_ipaddr = "";
+					if (substr(trim($row['webserveripaddr']), 0, strlen("https:")) == "https:") {
+						// if backend is https, then enable SSLProxyEngine
+						$sslproxyengine = "SSLProxyEngine on";
+					} else if (substr(trim($row['webserveripaddr']), 0, strlen("http:")) != "http:") {
 				// Ensure leading http(s)://
-				if(!strstr($row['webserveripaddr'], "http")) 
-					$backend_sites .= "http://";
-				$backend_sites .= "{$row['webserveripaddr']}";
+						$normalised_ipaddr .= "http://";
+					}
+					$normalised_ipaddr .=  trim($row['webserveripaddr']);				
+					$balancer_members .= " BalancerMember " . $normalised_ipaddr . "\n";
 				// Ensure trailing /
-				if(substr($row['webserveripaddr'],count($row['webserveripaddr']),1) != "/")
-					$backend_sites .= "/ ";
-				else 
-					$backend_sites .= " ";
+					if(substr($normalised_ipaddr,-1) != "/") {
+						$normalised_ipaddr .= "/";
+					}
+					$backend_sites .= $normalised_ipaddr . " ";
+                                        $backend_sites_count++;
+				}
 			}
 			// Set general items
 			if($ams['siteemail'])
@@ -323,8 +377,6 @@ EOF;
 				$serveradmin = $global_site_email;
 			if($ams['primarysitehostname'])
 				$primarysitehostname = $ams['primarysitehostname'];
-			if($ams['primarysitehostname'])
-				$additionalsitehostnames = $ams['primarysitehostname'];
 			$sitename = str_replace(" ", "", $ams['sitename']);			
 			// Set local listening directive
 			if($ams['ipaddress'] && $ams['port']) 
@@ -332,13 +384,12 @@ EOF;
 			else 
 				$local_ip_port = $global_listen;
 			// Is this item a load balancer
-			if(count($ams['row'])>1) {
+			if($backend_sites_count>1) {
 				$balancer = true;
 				$mod_proxy .= "<Proxy balancer://{$sitename}>\n";
-				foreach($ams['row'] as $row)
-					$mod_proxy .= "	BalancerMember {$row['webserveripaddr']}\n";
+				$mod_proxy .= $balancer_members;
 				$mod_proxy .= "</Proxy>\n";
-				$backend_sites = " balancer://{$sitename}\n";
+				$backend_sites = " balancer://{$sitename}/";
 				$sitename = "";			// we are not using sitename in this case
 			}
 			// Set SSL items
@@ -361,6 +412,8 @@ EOF;
 				if ($certificatechainfile)
 					$mod_proxy .= "  SSLCertificateChainFile /usr/local/etc/apache22/$certificatechainfile\n";
 			}
+			if($sslproxyengine)
+				$mod_proxy .= "  {$sslproxyengine}\n";
 			if($additionalsitehostnames)
 				$mod_proxy .= "  ServerAlias $additionalsitehostnames\n";
 			if($serveradmin)
@@ -508,6 +561,7 @@ ServerRoot "/usr/local"
 # prevent Apache from glomming onto all bound IP addresses.
 #
 Listen {$global_listen}
+{$aliases}
 
 #
 # Dynamic Shared Object (DSO) Support
