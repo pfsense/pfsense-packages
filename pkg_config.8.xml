@@ -473,7 +473,7 @@
 		<configurationfile>open-vm-tools.xml</configurationfile>
 		<build_port_path>/usr/ports/emulators/open-vm-tools-nox11/</build_port_path>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>open-vm-tools-nox11-313025_1.tbz</depends_on_package>
+		<depends_on_package>open-vm-tools-nox11-313025_2.tbz</depends_on_package>
 	</package>
 	<package>
 		<name>AutoConfigBackup</name>
