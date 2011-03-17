@@ -118,7 +118,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	}
 
 	// lookup user info
-	if ($usrid) {
+	if (is_numeric($usrid)) {
 		$user = $config['system']['user'][$usrid];
 		if (!$user) {
 			$input_errors[] = "Could not find user settings.";
