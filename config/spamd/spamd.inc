@@ -165,6 +165,25 @@ function sync_package_spamd() {
 	log_error("SpamD setup completed");	
 }
 
+function sync_package_spamd_whitelist() {
+	global $config;
+	conf_mount_rw();
+	config_lock();
+	/* write out ip to the whitelist db */
+	$fd = fopen("/var/db/whitelist.txt","w");
+	if($config['installedpackages']['spamdwhitelist']['config'] != "") {
+		foreach($config['installedpackages']['spamdwhitelist']['config'] as $spamd) {
+			fwrite($fd, $spamd['ip'] . "\n");
+		}
+	}
+	fclose($fd);
+	/* signal a reload of all files */
+	mwexec("/usr/bin/killall -HUP spamlogd");
+	mwexec("/sbin/pfctl -t spamd-white -T add {$spamd['ip']}");
+	conf_mount_ro();
+	config_unlock();
+}
+
 function spamd_generate_rules($type) {
 	global $config;
 
