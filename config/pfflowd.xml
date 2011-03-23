@@ -1,6 +1,6 @@
 <packagegui>
 	<name>pfflowd</name>
-	<version>0.6</version>
+	<version>0.8</version>
 	<title>pfflowd: Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=pfflowd.xml&amp;id=0</aftersaveredirect>
 	<menu>
@@ -56,20 +56,12 @@
 			<type>select</type>
 			<options>
 				<option>
+					<name>9</name>
+					<value>9</value>
+				</option>
+				<option>
 					<name>5</name>
 					<value>5</value>
-				</option>
-				<option>
-					<name>4</name>
-					<value>4</value>
-				</option>
-				<option>
-					<name>3</name>
-					<value>3</value>
-				</option>
-				<option>
-					<name>2</name>
-					<value>2</value>
 				</option>
 				<option>
 					<name>1</name>
@@ -112,4 +104,3 @@
 		sync_package_pfflowd();
 	</custom_add_php_command>
 </packagegui>
-
