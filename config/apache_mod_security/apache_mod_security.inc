@@ -176,7 +176,7 @@ function generate_apache_configuration() {
 			else 
 				$global_listen .= ":80";
 		} else {
- 	               $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'] = "{$config['system']['hostname']}.{$config['system']['domain']}";
+ 	               	$config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'] = "";
         	        $global_listen  =  $config['installedpackages']['apachemodsecuritysettings']['config'][0]['globalbindtoipaddr'];
 			// update configuration with default value in this case
 			 write_config($pkg['addedit_string']);		
