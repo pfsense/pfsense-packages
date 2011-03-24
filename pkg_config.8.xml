@@ -585,8 +585,8 @@
 		<category>Network Management</category>
 		<config_file>http://www.pfsense.com/packages/config/pfflowd.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>pfflowd-0.7.tbz</depends_on_package>
-		<version>0.7</version>
+		<depends_on_package>pfflowd-0.8.tbz</depends_on_package>
+		<version>0.8</version>
 		<status>Stable</status>
 		<required_version>1.2.1</required_version>
 		<configurationfile>pfflowd.xml</configurationfile>
