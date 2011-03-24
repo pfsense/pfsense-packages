@@ -32,7 +32,7 @@ function mactovendor_custom_php_install_command()
 	copy("/usr/local/www/diag_arp.php", "/usr/local/pkg/mactovendor/backup/diag_arp.php.bak");
 	copy("/usr/local/www/status_dhcp_leases.php", "/usr/local/pkg/mactovendor/backup/status_dhcp_leases.php.bak");
 	copy("/usr/local/www/status_interfaces.php", "/usr/local/pkg/mactovendor/backup/status_interfaces.php.bak");
-        copy("/usr/local/www/status_wireless.php", "/usr/local/pkg/mactovendor/backup/status_wireless.php.php.bak");
+        copy("/usr/local/www/status_wireless.php", "/usr/local/pkg/mactovendor/backup/status_wireless.php.bak");
 
 	
 	// Install patches
