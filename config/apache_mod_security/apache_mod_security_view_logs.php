@@ -103,7 +103,7 @@ pre {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
    <tr>
      <td class="tabcont" >
-      <form action="apache_mod_security_view_logs.php.php" method="post">
+      <form action="apache_mod_security_view_logs.php" method="post">
 		<br>
 			<div id="apachelogs">
 				<pre>One moment please, loading Apache logs...</pre>
@@ -112,7 +112,7 @@ pre {
     </tr>
 </table>
 <td align="left" valign="top">
-	<form id="filterform" name="filterform" action="apache_mod_security_view_logs.php.php" method="post" style="margin-top: 14px;">
+	<form id="filterform" name="filterform" action="apache_mod_security_view_logs.php" method="post" style="margin-top: 14px;">
 	<p/>
 	<input id="submit" name="clear" type="submit" class="formbtn" value="<?=gettext("Clear log");?>" />
 	</form>
