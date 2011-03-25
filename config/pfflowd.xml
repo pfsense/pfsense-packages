@@ -30,6 +30,12 @@
 			<type>input</type>
 		</field>
 		<field>
+			<fielddescr>Source Hostname/IP</fielddescr>
+			<fieldname>sourcehost</fieldname>
+			<description>Specify the hostname/ip that datagrams are to be sent from. The hostname/ip should be from local installation ip.</description>
+			<type>input</type>
+		</field>
+		<field>
 			<fielddescr>pf rule direction restriction</fielddescr>
 			<fieldname>direction</fieldname>
 			<description>Restrict creation of flow records to states matching a certain direction (in, out, or any).</description>
@@ -82,6 +88,8 @@
 					$start .= " -n {$cf['host']}";
 					if($cf['port'] != "") 
 						$start .= ":{$cf['port']}";
+					if(!empty($cf['sourcehost']))
+						$start .= " -s {$cf['sourcehost']} ";
 					if($cf['direction'] != "") 
 						$start .= " -S {$cf['direction']}";
 					if($cf['version'] != "") 
