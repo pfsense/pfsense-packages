@@ -635,11 +635,11 @@
 		<config_file>http://www.pfsense.com/packages/config/pfflowd.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>pfflowd-0.8.tbz</depends_on_package>
-		<version>0.8</version>
+		<version>0.8.1</version>
 		<status>Stable</status>
-		<required_version>1.2.1</required_version>
+		<required_version>2.0</required_version>
 		<configurationfile>pfflowd.xml</configurationfile>
-		<maintainer>nick@buraglio.com</maintainer>
+		<maintainer></maintainer>
 		<build_port_path>/usr/ports/net/pfflowd</build_port_path>
 	</package>
 	<package>
