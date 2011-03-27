@@ -32,7 +32,7 @@
 		<field>
 			<fielddescr>Source Hostname/IP</fielddescr>
 			<fieldname>sourcehost</fieldname>
-			<description>Specify the hostname/ip that datagrams are to be sent from. The hostname/ip should be from local installation ip.</description>
+			<description>Specify the hostname or IP address that datagrams are to be sent from. The hostname/IP must be local to this system.</description>
 			<type>input</type>
 		</field>
 		<field>
