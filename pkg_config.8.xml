@@ -465,16 +465,36 @@
 		<descr>VMware Tools</descr>
 		<website>http://open-vm-tools.sourceforge.net/</website>
 		<category>Services</category>
-		<version>217847</version>
+		<version>313025</version>
 		<status>Stable</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/Open_VM_Tools_package</pkginfolink>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.org/packages/config/open-vm-tools_2/open-vm-tools.xml</config_file>
 		<configurationfile>open-vm-tools.xml</configurationfile>
-		<build_port_path>/usr/ports/emulators/open-vm-tools-nox11/</build_port_path>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>open-vm-tools-nox11-313025_2.tbz</depends_on_package>
-	</package>
+		<build_port_path>/usr/ports/emulators/open-vm-tools-nox11/</build_port_path>
+		<depends_on_package>fusefs-kmod-0.3.9.p1.20080208_7.tbz</depends_on_package>
+		<build_port_path>/usr/ports/packages/sysutils/</build_port_path>
+		<depends_on_package>fusefs-libs-2.7.4.tbz</depends_on_package>
+		<build_port_path>/usr/ports/packages/sysutils/</build_port_path>
+		<depends_on_package>glib-2.26.1_1.tbz</depends_on_package>
+		<build_port_path>/usr/ports/packages/devel/</build_port_path>
+		<depends_on_package>icu-4.6.1.tbz</depends_on_package>
+		<build_port_path>/usr/ports/packages/devel/</build_port_path>		
+    <depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
+		<build_port_path>/usr/ports/packages/net/</build_port_path>
+    <depends_on_package>libiconv-1.13.1_1.tbz</depends_on_package>
+		<build_port_path>/usr/ports/packages/converters/</build_port_path>
+		<depends_on_package>pcre-8.12.tbz</depends_on_package>
+		<build_port_path>/usr/ports/packages/devel/</build_port_path>
+		<depends_on_package>perl-5.10.1_3.tbz</depends_on_package>
+		<build_port_path>/usr/ports/packages/perl5/</build_port_path>
+		<depends_on_package>pkg-config-0.25_1.tbz</depends_on_package>
+		<build_port_path>/usr/ports/packages/devel/</build_port_path>		
+    <depends_on_package>python27-2.7.1_1.tbz</depends_on_package>
+		<build_port_path>/usr/ports/packages/python/</build_port_path>    
+  </package>
 	<package>
 		<name>AutoConfigBackup</name>
 		<maintainer>portal@bsdperimeter.com</maintainer>
