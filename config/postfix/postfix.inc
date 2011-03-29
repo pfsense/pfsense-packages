@@ -35,9 +35,12 @@ function sync_package_postfix() {
 
 	$relay_domains = "";
 	$transport = "";
+	$message_size_limit = "10240000";
 
 	if (is_array($config['installedpackages']['postfix']['config'])) {
 		foreach ($config['installedpackages']['postfix']['config'] as $postfix_config) {
+			if (isset($postfix_config['message_size_limit']))
+				$message_size_limit = $postfix_config['message_size_limit'];
 			if (is_array($postfix_config['row'])) {
 				foreach ($postfix_config['row'] as $postfix_row) {
 					$relay_domains .= ' ' . $postfix_row['domain'];
@@ -53,7 +56,8 @@ function sync_package_postfix() {
 		"transport_maps = hash:/usr/local/etc/postfix/transport\n" .
 		"local_recipient_maps =\n" .
 		"mydestination =\n" .
-		"mynetworks_style = host\n";
+		"mynetworks_style = host\n" .
+		"message_size_limit = {$message_size_limit}\n";
 
 	conf_mount_rw();
 

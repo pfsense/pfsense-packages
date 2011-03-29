@@ -42,7 +42,7 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>postfix</name>
-	<version>1.0</version>
+	<version>1.1</version>
 	<title>Services: Postfix Forwarder</title>
 	<include_file>/usr/local/pkg/postfix.inc</include_file>
 	<menu>
@@ -62,6 +62,22 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<fields>
+		<field>
+			<name>Posftix General Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Maximum message size</fielddescr>
+			<fieldname>message_size_limit</fieldname>
+			<type>input</type>
+			<description>
+				This setting governs the largest message size that will be accepted by this mail server. Ensure you have enough space to accommodate this size, and ensure this setting matches or is lower than the destination server(s).&lt;br/&gt;Default: 10240000 (10MB).
+			</description>
+		</field>
+		<field>
+			<name>Domains to Forward</name>
+			<type>listtopic</type>
+		</field>
 		<field>
 			<fielddescr>Forwarding</fielddescr>
 			<fieldname>none</fieldname>
