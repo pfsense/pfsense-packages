@@ -63,7 +63,7 @@
 	</additional_files_needed>
 	<fields>
 		<field>
-			<name>Posftix General Settings</name>
+			<name>Postfix General Settings</name>
 			<type>listtopic</type>
 		</field>
 		<field>
