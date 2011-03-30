@@ -108,7 +108,7 @@
 			config_unlock();
 		}
 	</custom_php_global_functions>
-	<custom_add_php_command>
+	<custom_php_resync_config_command>
 		sync_package_pfflowd();
-	</custom_add_php_command>
+	</custom_php_resync_config_command>
 </packagegui>
