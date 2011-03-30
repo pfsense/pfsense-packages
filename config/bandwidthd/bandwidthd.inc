@@ -103,7 +103,8 @@ function bandwidthd_install_config() {
 
 	if(is_array($subnets_custom)) {
 		foreach($subnets_custom as $sub) {
-			$subnets .= "subnet {$sub}\n";
+			if (!empty($sub) && is_subnet($sub))
+				$subnets .= "subnet {$sub}\n";
 		}
 	}
 
