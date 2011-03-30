@@ -42,7 +42,7 @@
         ]]>
         </copyright>
 	<name>open-vm-tools</name>
-	<version>217847</version>
+	<version>313025</version>
 	<title>Open VM Tools</title>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
