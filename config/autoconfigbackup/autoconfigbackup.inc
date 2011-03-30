@@ -213,7 +213,7 @@ function upload_config($reasonm = "") {
 				}
 
 				if(!strstr($data, "500")) {
-					$notice_text = "An error occured while uploading your pfSense configuration to portal.pfsense.org";
+					$notice_text = "An error occurred while uploading your pfSense configuration to portal.pfsense.org";
 					log_error($notice_text . " - " . $data);
 					file_notice("autoconfigurationbackup", $notice_text, $data, "");			
 					update_filter_reload_status($notice_text . " - " . $data);	
