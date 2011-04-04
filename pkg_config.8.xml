@@ -482,9 +482,9 @@
 		<build_port_path>/usr/ports/packages/devel/</build_port_path>
 		<depends_on_package>icu-4.6.1.tbz</depends_on_package>
 		<build_port_path>/usr/ports/packages/devel/</build_port_path>		
-    <depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
+		<depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
 		<build_port_path>/usr/ports/packages/net/</build_port_path>
-    <depends_on_package>libiconv-1.13.1_1.tbz</depends_on_package>
+		<depends_on_package>libiconv-1.13.1_1.tbz</depends_on_package>
 		<build_port_path>/usr/ports/packages/converters/</build_port_path>
 		<depends_on_package>pcre-8.12.tbz</depends_on_package>
 		<build_port_path>/usr/ports/packages/devel/</build_port_path>
@@ -492,8 +492,10 @@
 		<build_port_path>/usr/ports/packages/perl5/</build_port_path>
 		<depends_on_package>pkg-config-0.25_1.tbz</depends_on_package>
 		<build_port_path>/usr/ports/packages/devel/</build_port_path>		
-    <depends_on_package>python27-2.7.1_1.tbz</depends_on_package>
-		<build_port_path>/usr/ports/packages/python/</build_port_path>    
+    	<depends_on_package>python27-2.7.1_1.tbz</depends_on_package>
+		<build_port_path>/usr/ports/packages/python/</build_port_path>
+    	<depends_on_package>icu-4.6.1.tbz</depends_on_package>
+		<build_port_path>/usr/ports/devel/icu</build_port_path>
   </package>
 	<package>
 		<name>AutoConfigBackup</name>
