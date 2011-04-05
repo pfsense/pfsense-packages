@@ -645,7 +645,7 @@
 		<config_file>http://www.pfsense.org/packages/config/freeradius.xml</config_file>
 		<configurationfile>freeradius.xml</configurationfile>
 		<build_port_path>/usr/ports/net/freeradius</build_port_path>
-		<build_port_path>/usr/ports/devel/libltdl22</build_port_path>
+		<build_port_path>/usr/ports/devel/libltdl</build_port_path>
 	</package>
 	<package>
 		<name>bandwidthd</name>
