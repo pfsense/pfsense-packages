@@ -40,21 +40,21 @@ function avahi_stop() {
 function avahi_install() {
 	global $g, $config;
 	conf_mount_rw();
-	exec("mkdir -p /usr/local/etc/avahi/services/");
-	exec("mv /usr/local/etc/avahi/*.service /usr/local/etc/avahi/services/");
 
-	$archive = (substr(trim(file_get_contents("/etc/version")),0,1) == "2") ? "avahi8.tar.gz" : "avahi.tar.gz";
+	if (php_uname("m") == "i386")
+		$archive = (substr(trim(file_get_contents("/etc/version")),0,1) == "2") ? "avahi8.tar.gz" : "avahi.tar.gz";
 
 	// Extract out libraries and avahi-daemon
-	if(file_exists("/root/{$archive}")) {
+	if(!empty($archive) && file_exists("/root/{$archive}")) {
+		exec("mkdir -p /usr/local/etc/avahi/services/");
+		exec("mv /usr/local/etc/avahi/*.service /usr/local/etc/avahi/services/");
 		exec("/usr/bin/tar xzPUf /root/{$archive} -C /");
 		unlink("/root/{$archive}");
-	}
-
-	// Make sure everthing was extracted
-	if(!file_exists("/usr/local/sbin/avahi-daemon")) {
-		log_error("Sorry, something went wrong while extract avahi binaries.  Please try the operation again");
-		return;
+		// Make sure everthing was extracted
+		if(!file_exists("/usr/local/sbin/avahi-daemon")) {
+			log_error("Sorry, something went wrong while extract avahi binaries.  Please try the operation again");
+			return;
+		}
 	}
 
 	// Add needed users and groups
