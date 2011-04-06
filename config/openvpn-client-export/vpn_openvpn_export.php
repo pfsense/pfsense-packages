@@ -466,11 +466,11 @@ function server_changed() {
 		cell1.innerHTML = users[i][3];
 		cell2.className = "listr";
 		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\"," + i + ")'>Configuration</a>";
-		cell2.innerHTML += "&nbsp;/&nbsp;";
+		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confall\"," + i + ")'>Configuration archive</a>";
-		cell2.innerHTML += "&nbsp;/&nbsp;";
+		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>Windows Installer</a>";
-		cell2.innerHTML += "&nbsp;/&nbsp;";
+		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle</a>";
 	}
 	if (servers[index][2] == 'server_user') {
@@ -484,11 +484,11 @@ function server_changed() {
 		cell1.innerHTML = "none";
 		cell2.className = "listr";
 		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\"," + i + ")'>Configuration</a>";
-		cell2.innerHTML += "&nbsp;/&nbsp;";
+		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"confall\"," + i + ")'>Configuration archive</a>";
-		cell2.innerHTML += "&nbsp;/&nbsp;";
+		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>Windows Installer</a>";
-		cell2.innerHTML += "&nbsp;/&nbsp;";
+		cell2.innerHTML += "<br/>";
 		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle</a>";
 	}
 }
