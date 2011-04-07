@@ -58,6 +58,7 @@ foreach($a_server as $sindex => $server) {
 		$name = "Shared Key Server {$prot}:{$port}";
 	$ras_serverent['index'] = $sindex;
 	$ras_serverent['name'] = $name;
+	$ras_serverent['mode'] = $server['mode'];
 	$ras_server[] = $ras_serverent;
 }
 
@@ -159,7 +160,7 @@ var servers = new Array();
 servers[<?=$sindex;?>] = new Array();
 servers[<?=$sindex;?>][0] = '<?=$server['index'];?>';
 servers[<?=$sindex;?>][1] = new Array();
-servers[<?=$sindex;?>][2] = '<?=$server['mode'];?>';;
+servers[<?=$sindex;?>][2] = '<?=$server['mode'];?>';
 <?	endforeach; ?>
 
 function download_begin(act) {
@@ -213,7 +214,7 @@ function download_begin(act) {
 	}
 
 	var dlurl;
-	dlurl  = "/vpn_openvpn_export.php?act=" + act;
+	dlurl  = "/vpn_openvpn_export_shared.php?act=" + act;
 	dlurl += "&srvid=" + servers[index][0];
 	dlurl += "&useaddr=" + useaddr;
 	if (useproxy) {
@@ -237,15 +238,17 @@ function server_changed() {
 
 	var index = document.getElementById("server").selectedIndex;
 
-	var row = table.insertRow(table.rows.length);
-	var cell0 = row.insertCell(0);
-	var cell1 = row.insertCell(1);
-	cell0.className = "listlr";
-	cell0.innerHTML = "Other Shared Key OS Client";
-	cell1.className = "listr";
-	cell1.innerHTML = "<a href='javascript:download_begin(\"skconf\")'>Configuration</a>";
-	cell1.innerHTML += "&nbsp;/&nbsp;";
-	cell1.innerHTML += "<a href='javascript:download_begin(\"skzipconf\")'>Configuration archive</a>";
+	if (servers[index][2] == 'p2p_shared_key') {
+		var row = table.insertRow(table.rows.length);
+		var cell0 = row.insertCell(0);
+		var cell1 = row.insertCell(1);
+		cell0.className = "listlr";
+		cell0.innerHTML = "Other Shared Key OS Client";
+		cell1.className = "listr";
+		cell1.innerHTML = "<a href='javascript:download_begin(\"skconf\")'>Configuration</a>";
+		cell1.innerHTML += "<br/>";
+		cell1.innerHTML += "<a href='javascript:download_begin(\"skzipconf\")'>Configuration archive</a>";
+	}
 }
 
 function useaddr_changed(obj) {
