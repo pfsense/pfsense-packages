@@ -82,6 +82,7 @@ function php_install_command_cb()
 	unlink_if_exists("/tmp/settings.tmp");
 	//Get scripts
 	exec("cp /tmp/countryblock.sh /usr/local/etc/rc.d/countryblock.sh");
+	exec("cp /tmp/countryblock.sh /usr/local/pkg/pf/countryblock.sh");
 	unlink_if_exists("/tmp/countryblock.sh");
 	exec("cp /tmp/execute.sh /usr/local/www/packages/countryblock/execute.sh");
 	unlink_if_exists("/tmp/execute.sh");

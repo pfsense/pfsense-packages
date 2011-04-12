@@ -93,6 +93,7 @@ function php_install_command_ip()
 	exec("cp /tmp/convert-execute.sh /usr/local/www/packages/ipblocklist/convert-execute.sh");
 	unlink_if_exists("/tmp/convert-execute.sh");
 	exec("cp /tmp/IP-Blocklist.sh /usr/local/etc/rc.d/IP-Blocklist.sh");
+	exec("cp /tmp/IP-Blocklist.sh /usr/local/pkg/pf/IP-Blocklist.sh");
 	unlink_if_exists("/tmp/IP-Blocklist.sh");
 	//Touch files
 	exec("touch /usr/local/www/packages/ipblocklist/wlists.txt");
