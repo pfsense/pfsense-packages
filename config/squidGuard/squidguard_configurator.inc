@@ -578,7 +578,7 @@ function sg_remove_unused_db_entries()
 
     # black list entries
     # * worked only with 'blacklist entries list file - else may be deleted black list entry
-    if (SQUIDGUARD_BLK_FILELISTPATH) {
+    if (file_exists(SQUIDGUARD_BLK_FILELISTPATH)) {
         $file_for_del = array();
 
         # load blk entries
