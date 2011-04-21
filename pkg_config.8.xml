@@ -480,8 +480,6 @@
 		<build_port_path>/usr/ports/packages/sysutils/</build_port_path>
 		<depends_on_package>glib-2.26.1_1.tbz</depends_on_package>
 		<build_port_path>/usr/ports/packages/devel/</build_port_path>
-		<depends_on_package>icu-4.6.1.tbz</depends_on_package>
-		<build_port_path>/usr/ports/packages/devel/</build_port_path>		
 		<depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
 		<build_port_path>/usr/ports/packages/net/</build_port_path>
 		<depends_on_package>libiconv-1.13.1_1.tbz</depends_on_package>
