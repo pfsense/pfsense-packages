@@ -46,31 +46,49 @@ if (!is_array($config['system']['user']))
 
 $a_user = $config['system']['user'];
 
+if (!is_array($config['cert']))
+	$config['cert'] = array();
+
+$a_cert = $config['cert'];
+
 $ras_server = array();
 foreach($a_server as $sindex => $server) {
 	if (isset($server['disable']))
 		continue;
 	$ras_user = array();
+	$ras_certs = array();
 	if (stripos($server['mode'], "server") === false)
 		continue;
-	foreach($a_user as $uindex => $user) {
-		if (!is_array($user['cert']))
-			continue;
-		foreach($user['cert'] as $cindex => $cert) {
-			// If $cert is not an array, it's a certref not a cert.
-			if (!is_array($cert))
-				$cert = lookup_cert($cert);
-
+	if ($server['authmode'] == "Local Database" && ($server['mode'] != "server_user")) {
+		foreach($a_user as $uindex => $user) {
+			if (!is_array($user['cert']))
+				continue;
+			foreach($user['cert'] as $cindex => $cert) {
+				// If $cert is not an array, it's a certref not a cert.
+				if (!is_array($cert))
+					$cert = lookup_cert($cert);
+	
+				if ($cert['caref'] != $server['caref'])
+					continue;
+				$ras_userent = array();
+				$ras_userent['uindex'] = $uindex;
+				$ras_userent['cindex'] = $cindex;
+				$ras_userent['name'] = $user['name'];
+				$ras_userent['certname'] = $cert['descr'];
+				$ras_user[] = $ras_userent;
+			}
+		}
+	} elseif (!empty($server['authmode']) && ($server['mode'] != "server_user")) {
+		foreach($a_cert as $cindex => $cert) {
 			if ($cert['caref'] != $server['caref'])
 				continue;
-			$ras_userent = array();
-			$ras_userent['uindex'] = $uindex;
-			$ras_userent['cindex'] = $cindex;
-			$ras_userent['name'] = $user['name'];
-			$ras_userent['certname'] = $cert['descr'];
-			$ras_user[] = $ras_userent;
+			$ras_cert_entry['cindex'] = $cindex;
+			$ras_cert_entry['certname'] = $cert['descr'];
+			$ras_cert_entry['certref'] = $cert['refid'];
+			$ras_certs[] = $ras_cert_entry;
 		}
 	}
+
 	$ras_serverent = array();
 	$prot = $server['protocol'];
 	$port = $server['local_port'];
@@ -81,6 +99,7 @@ foreach($a_server as $sindex => $server) {
 	$ras_serverent['index'] = $sindex;
 	$ras_serverent['name'] = $name;
 	$ras_serverent['users'] = $ras_user;
+	$ras_serverent['certs'] = $ras_certs;
 	$ras_serverent['mode'] = $server['mode'];
 	$ras_server[] = $ras_serverent;
 }
@@ -342,20 +361,29 @@ var servers = new Array();
 servers[<?=$sindex;?>] = new Array();
 servers[<?=$sindex;?>][0] = '<?=$server['index'];?>';
 servers[<?=$sindex;?>][1] = new Array();
-servers[<?=$sindex;?>][2] = '<?=$server['mode'];?>';;
-<?php 	foreach ($server['users'] as $uindex => $user): ?>
+servers[<?=$sindex;?>][2] = '<?=$server['mode'];?>';
+servers[<?=$sindex;?>][3] = new Array();
+<?php		foreach ($server['users'] as $uindex => $user): ?>
 servers[<?=$sindex;?>][1][<?=$uindex;?>] = new Array();
 servers[<?=$sindex;?>][1][<?=$uindex;?>][0] = '<?=$user['uindex'];?>';
 servers[<?=$sindex;?>][1][<?=$uindex;?>][1] = '<?=$user['cindex'];?>';
 servers[<?=$sindex;?>][1][<?=$uindex;?>][2] = '<?=$user['name'];?>';
 servers[<?=$sindex;?>][1][<?=$uindex;?>][3] = '<?=str_replace("'", "\\'", $user['certname']);?>';
 <?		endforeach; ?>
+<?php		$c=0;
+		foreach ($server['certs'] as $cert): ?>
+servers[<?=$sindex;?>][3][<?=$c;?>] = new Array();
+servers[<?=$sindex;?>][3][<?=$c;?>][0] = '<?=$cert['cindex'];?>';
+servers[<?=$sindex;?>][3][<?=$c;?>][1] = '<?=str_replace("'", "\\'", $cert['certname']);?>';
+<?		$c++;
+		endforeach; ?>
 <?	endforeach; ?>
 
-function download_begin(act, i) {
+function download_begin(act, i, j) {
 
 	var index = document.getElementById("server").selectedIndex;
 	var users = servers[index][1];
+	var certs = servers[index][3];
 	var useaddr;
 
 	if (document.getElementById("useaddr").value == "other") {
@@ -430,6 +458,10 @@ function download_begin(act, i) {
 		dlurl += "&usrid=" + escape(users[i][0]);
 		dlurl += "&crtid=" + escape(users[i][1]);
 	}
+	if (certs[j]) {
+		dlurl += "&usrid=";
+		dlurl += "&crtid=" + escape(certs[j][0]);
+	}
 	dlurl += "&useaddr=" + escape(useaddr);
 	dlurl += "&usetoken=" + escape(usetoken);
 	if (usepass)
@@ -455,6 +487,7 @@ function server_changed() {
 
 	var index = document.getElementById("server").selectedIndex;
 	var users = servers[index][1];
+	var certs = servers[index][3];
 	for (i=0; i < users.length; i++) {
 		var row = table.insertRow(table.rows.length);
 		var cell0 = row.insertCell(0);
@@ -465,13 +498,31 @@ function server_changed() {
 		cell1.className = "listr";
 		cell1.innerHTML = users[i][3];
 		cell2.className = "listr";
-		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\"," + i + ")'>Configuration</a>";
+		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\"," + i + ", -1)'>Configuration</a>";
 		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"confall\"," + i + ")'>Configuration archive</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confall\"," + i + ", -1)'>Configuration archive</a>";
 		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ")'>Windows Installer</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\"," + i + ", -1)'>Windows Installer</a>";
 		cell2.innerHTML += "<br/>";
-		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ")'>Viscosity Bundle</a>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\"," + i + ", -1)'>Viscosity Bundle</a>";
+	}
+	for (j=0; j < certs.length; j++) {
+		var row = table.insertRow(table.rows.length);
+		var cell0 = row.insertCell(0);
+		var cell1 = row.insertCell(1);
+		var cell2 = row.insertCell(2);
+		cell0.className = "listlr";
+		cell0.innerHTML = "External Auth+Cert";
+		cell1.className = "listr";
+		cell1.innerHTML = certs[j][1];
+		cell2.className = "listr";
+		cell2.innerHTML = "<a href='javascript:download_begin(\"conf\", -1," + j + ")'>Configuration</a>";
+		cell2.innerHTML += "<br/>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"confall\", -1," + j + ")'>Configuration archive</a>";
+		cell2.innerHTML += "<br/>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"inst\", -1," + j + ")'>Windows Installer</a>";
+		cell2.innerHTML += "<br/>";
+		cell2.innerHTML += "<a href='javascript:download_begin(\"visc\", -1," + j + ")'>Viscosity Bundle</a>";
 	}
 	if (servers[index][2] == 'server_user') {
 		var row = table.insertRow(table.rows.length);

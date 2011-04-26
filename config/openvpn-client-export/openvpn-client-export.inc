@@ -128,7 +128,11 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 
 	// lookup user certificate info
 	if ($settings['mode'] != "server_user") {
-		$cert = $user['cert'][$crtid];
+		if ($settings['authmode'] == "Local Database") {
+			$cert = $user['cert'][$crtid];
+		} else {
+			$cert = $config['cert'][$crtid];
+		}
 		if (!$cert)
 			return false;
 		// If $cert is not an array, it's a certref not a cert.
@@ -295,7 +299,11 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 
 	// lookup user certificate info
 	if ($settings['mode'] != "server_user") {
-		$cert = $user['cert'][$crtid];
+		if ($settings['authmode'] == "Local Database") {
+			$cert = $user['cert'][$crtid];
+		} else {
+			$cert = $config['cert'][$crtid];
+		}
 		if (!$cert)
 			return false;
 		// If $cert is not an array, it's a certref not a cert.
@@ -414,7 +422,11 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 
 	// lookup user certificate info
 	if ($settings['mode'] != "server_user") {
-		$cert = $user['cert'][$crtid];
+		if ($settings['authmode'] == "Local Database") {
+			$cert = $user['cert'][$crtid];
+		} else {
+			$cert = $config['cert'][$crtid];
+		}
 		if (!$cert)
 			return false;
 		// If $cert is not an array, it's a certref not a cert.
