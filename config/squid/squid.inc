@@ -63,7 +63,8 @@ function squid_chown_recursive($dir, $user, $group) {
 	while (($item = readdir($handle)) !== false) {
 		if (($item != ".") && ($item != "..")) {
 			$path = "$dir/$item";
-			if (is_dir($path))
+			// Recurse unless it's the cache dir, that is slow and rarely necessary.
+			if (is_dir($path) && (basename($dir) != "cache"))
 				squid_chown_recursive($path, $user, $group);
 			elseif (is_file($path)) {
 				chown($path, $user);
@@ -98,8 +99,11 @@ function squid_dash_z() {
 		mwexec("/usr/local/sbin/squid -z");
 	}
 
-	if(file_exists("/var/squid/cache/swap.state"))
+	if(file_exists("/var/squid/cache/swap.state")) {
+		chown("/var/squid/cache/swap.state", "proxy");
+		chgrp("/var/squid/cache/swap.state", "proxy");
 		exec("chmod a+rw /var/squid/cache/swap.state");
+	}
 
 }
 
