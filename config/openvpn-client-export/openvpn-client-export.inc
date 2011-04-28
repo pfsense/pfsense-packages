@@ -163,6 +163,9 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 
 	// add basic settings
 	$conf  = "dev tun\n";
+	if(! empty($settings['tunnel_networkv6'])) {
+		$conf .= "tun-ipv6\n";
+	}
 	$conf .= "persist-tun\n";
 	$conf .= "persist-key\n";
 	$conf .= "proto {$proto}\n";
@@ -554,6 +557,9 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 
 	// add basic settings
 	$conf  = "dev tun\n";
+	if(! empty($settings['tunnel_networkv6'])) {
+		$conf .= "tun-ipv6\n";
+	}
 	$conf .= "persist-tun\n";
 	$conf .= "persist-key\n";
 	$conf .= "proto {$proto}\n";
