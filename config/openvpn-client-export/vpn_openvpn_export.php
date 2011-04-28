@@ -78,7 +78,7 @@ foreach($a_server as $sindex => $server) {
 				$ras_user[] = $ras_userent;
 			}
 		}
-	} elseif (!empty($server['authmode']) && ($server['mode'] != "server_user")) {
+	} elseif ((!empty($server['authmode']) && ($server['mode'] != "server_user")) || ($server['mode'] == "server_tls")) {
 		foreach($a_cert as $cindex => $cert) {
 			if ($cert['caref'] != $server['caref'])
 				continue;
@@ -512,7 +512,11 @@ function server_changed() {
 		var cell1 = row.insertCell(1);
 		var cell2 = row.insertCell(2);
 		cell0.className = "listlr";
-		cell0.innerHTML = "External Auth+Cert";
+		if (servers[index][2] == "server_tls") {
+			cell0.innerHTML = "Certificate (SSL/TLS, no Auth)";
+		} else {
+			cell0.innerHTML = "Certificate with External Auth";
+		}
 		cell1.className = "listr";
 		cell1.innerHTML = certs[j][1];
 		cell2.className = "listr";
@@ -530,7 +534,7 @@ function server_changed() {
 		var cell1 = row.insertCell(1);
 		var cell2 = row.insertCell(2);
 		cell0.className = "listlr";
-		cell0.innerHTML = "External authentication users";
+		cell0.innerHTML = "Authentication Only (No Cert)";
 		cell1.className = "listr";
 		cell1.innerHTML = "none";
 		cell2.className = "listr";
