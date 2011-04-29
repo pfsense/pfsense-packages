@@ -77,11 +77,12 @@
 		</field>
 	</fields>
 	<custom_php_global_functions>
+		<![CDATA[
 		function sync_package_pfflowd() {
 			conf_mount_rw();
-            		config_lock();
-            		global $config;
-            		foreach($config['installedpackages']['pfflowd']['config'] as $cf) {
+			config_lock();
+			global $config;
+			foreach($config['installedpackages']['pfflowd']['config'] as $cf) {
 				if($cf['host'] != "") {
 					$start = "\n/sbin/ifconfig pfsync0 up\n";
 					$start .= "/usr/local/sbin/pfflowd ";
@@ -107,8 +108,36 @@
 			conf_mount_ro();
 			config_unlock();
 		}
+
+		function validate_form_pfflowd($post, $input_errors) {
+			if(($post['host'] == "") || !is_ipaddr($post['host']))
+				$input_errors[] = 'You must specify a valid ip address in the \'Host\' field';
+			if(($post['port'] == "") || !is_port($post['port']))
+				$input_errors[] = 'You must specify a valid port number in the \'Port\' field';
+		}
+		
+		function cleanup_config_pfflowd() {
+			global $a_pkg;
+			$pffconf = array();
+			if (is_array($a_pkg)) {
+				foreach($a_pkg as $cf) {
+					if($cf['host'] != "") {
+						$pffconf = $cf;
+					}
+				}
+			}
+			$a_pkg = array();
+			$a_pkg[0] = $pffconf;
+		}
+		]]>
 	</custom_php_global_functions>
 	<custom_php_resync_config_command>
 		sync_package_pfflowd();
 	</custom_php_resync_config_command>
+	<custom_php_validation_command>
+		validate_form_pfflowd($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_php_command_before_form>
+		cleanup_config_pfflowd();
+	</custom_php_command_before_form>
 </packagegui>
