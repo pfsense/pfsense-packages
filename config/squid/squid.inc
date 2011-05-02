@@ -362,14 +362,14 @@ function squid_validate_general($post, $input_errors) {
 	foreach (array('defined_ip_proxy_off') as $hosts) {
 		foreach (explode(";", $post[$hosts]) as $host) {
 			$host = trim($host);
-			if (!empty($host) && !is_ipaddr($host) && !is_alias($host) && !is_hostname($host))
+			if (!empty($host) && !is_ipaddr($host) && !is_alias($host) && !is_hostname($host) && !is_subnet($host))
 				$input_errors[] = "The entry '$host' is not a valid IP address, hostname, or alias";
 		}
 	}
 	foreach (array('defined_ip_proxy_off_dest') as $hosts) {
 		foreach (explode(";", $post[$hosts]) as $host) {
 			$host = trim($host);
-			if (!empty($host) && !is_ipaddr($host) && !is_alias($host) && !is_hostname($host))
+			if (!empty($host) && !is_ipaddr($host) && !is_alias($host) && !is_hostname($host) && !is_subnet($host))
 				$input_errors[] = "The entry '$host' is not a valid IP address, hostname, or alias";
 		}
 	}
