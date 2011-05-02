@@ -88,7 +88,8 @@ function squid_dash_z() {
 	if(!is_dir($cachedir.'/')) {
 		log_error("Creating Squid cache dir $cachedir");
 		make_dirs($cachedir);
-		squid_chown_recursive($cachedir, 'proxy', 'proxy');
+		// Double check permissions here, should be safe to recurse cache dir if it's small here.
+		mwexec("/usr/sbin/chown -R proxy:proxy $cachedir");
 	}
 
 	if(!is_dir($cachedir.'/00/')) {
@@ -96,6 +97,8 @@ function squid_dash_z() {
 		mwexec("/usr/local/sbin/squid -k shutdown");
 		sleep(5);
 		mwexec("/usr/local/sbin/squid -k kill");
+		// Double check permissions here, should be safe to recurse cache dir if it's small here.
+		mwexec("/usr/sbin/chown -R proxy:proxy $cachedir");
 		mwexec("/usr/local/sbin/squid -z");
 	}
 
