@@ -19,7 +19,6 @@ EOF;
 		file_put_contents("/boot/loader.conf", $load_conf);
 	}
 
-	$boot_loader
 	$vmware_guestd = <<<EOF
 #!/bin/sh
 #
