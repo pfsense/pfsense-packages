@@ -6,8 +6,27 @@ if(isset($_POST['__csrf_magic']))
   unset($_POST['__csrf_magic']);
 }
 
+
+function snortSql_fetchAllInterfaceRules($table, $dbname)
+{
+	// do let user pick the DB path
+    $db = sqlite_open("/usr/local/pkg/snort/{$dbname}"); 
+    
+    $result = sqlite_query($db,
+            "SELECT * FROM {$table} WHERE id > 0;
+     ");
+    
+	    $chktable = sqlite_fetch_all($result, SQLITE_ASSOC);   
+	    
+	  	sqlite_close($db);
+	  
+	  	return $chktable;  
+  
+}
+
+
 // fetch db Settings NONE Json
-function snortSql_fetchAllSettings($table, $type, $id_uuid) 
+function snortSql_fetchAllSettings($dbname, $table, $type, $id_uuid) 
 {
 
   if ($table == '') 
@@ -15,7 +34,7 @@ function snortSql_fetchAllSettings($table, $type, $id_uuid)
     return false;
   }
   
-  $db = sqlite_open('/usr/local/pkg/snort/snortDB');
+  $db = sqlite_open("/usr/local/pkg/snort/$dbname");
   
   if ($type == 'id')
   {   
@@ -145,7 +164,7 @@ function snortSql_updateSettings($settings, $type, $id_uuid) {
 
 // fetch for snort_interfaces_whitelist.php NONE Json
 // use sqlite_fetch_array for single and sqlite_fetch_all for lists
-function snortSql_fetchAllWhitelistTypes($table) 
+function snortSql_fetchAllWhitelistTypes($table, $table2) 
 {
 
   if ($table == '') 
@@ -167,29 +186,33 @@ function snortSql_fetchAllWhitelistTypes($table)
     return false;
   }
  
-    foreach ($chktable  as $value)
-    { 
-      
-      $filename2 = $value['filename'];
-    
-        $result2 = sqlite_query($db,
-                "SELECT ip FROM {$table}ips WHERE filename = \"{$filename2}\" LIMIT 4;
-         ");
-    
-        $chktable2 = sqlite_fetch_all($result2, SQLITE_ASSOC); 
- 
-        $final2 = array('id' => $value['id']);
-        $final2['date'] = $value['date']; 
-        $final2['uuid'] = $value['uuid'];    
-        $final2['filename'] = $value['filename'];
-        $final2['description'] = $value['description'];
-          
-        $final2['list'] = $chktable2;   
-        
-        $final[] = $final2;
-    
-    } // end foreach
-
+ 	if ($table2 != '')
+ 	{
+	    foreach ($chktable  as $value)
+	    { 
+	      
+	      $filename2 = $value['filename'];
+	    
+	        $result2 = sqlite_query($db,
+	                "SELECT ip FROM {$table2} WHERE filename = \"{$filename2}\" LIMIT 4;
+	         ");
+	    
+	        $chktable2 = sqlite_fetch_all($result2, SQLITE_ASSOC); 
+	 
+	        $final2 = array('id' => $value['id']);
+	        $final2['date'] = $value['date']; 
+	        $final2['uuid'] = $value['uuid'];    
+	        $final2['filename'] = $value['filename'];
+	        $final2['description'] = $value['description'];
+	          
+	        $final2['list'] = $chktable2;   
+	        
+	        $final[] = $final2;
+	    
+	    } // end foreach
+ 	}else{
+ 		$final = $chktable;
+ 	}
   sqlite_close($db);
   
   return $final;
@@ -336,57 +359,35 @@ function snortSql_updateWhitelistIps($table, $newPostListips, $filename)
       
 } // end of func
 
-// Whitelist Delete
-function snortSql_updateWhitelistDelete($table, $uuid)
+// RMlist Delete
+function snortSql_updatelistDelete($usrDB, $table, $type, $uuid_filename)
 {
   
-    $db = '/usr/local/pkg/snort/snortDB';
+    $db = "/usr/local/pkg/snort/$usrDB";
     $mydb = sqlite_open("$db");
-    
-    $query = sqlite_query($mydb, // @ supress warnings usonly in production
-    "SELECT filename FROM {$table} WHERE uuid = '{$uuid}'; 
-    ");
-    
-    $query_ck_filename = sqlite_fetch_array($query, SQLITE_ASSOC);         
-    
-    if (!empty($query_ck_filename['filename']))
+
+    if ($type == 'uuid')
     {
+	    $query = sqlite_query($mydb, // @ supress warnings usonly in production
+	    "DELETE FROM {$table} WHERE uuid = '{$uuid_filename}'; 
+	    ");
+    }
 
-      $query2 = sqlite_query($mydb, // @ supress warnings usonly in production
-      "DELETE FROM {$table} WHERE uuid = '{$uuid}';
-      ");
-
+    if ($type == 'filename')
+    {    
+		$query = sqlite_query($mydb, // @ supress warnings use only in production
+		"DELETE FROM {$table} WHERE filename = '{$uuid_filename}';
+		");
+    }
+    
       if (sqlite_changes($mydb) < 1)
       {
         sqlite_close($mydb);
         return 'Error in query';   
-      }  
-       
-      $query3 = sqlite_query($mydb, // @ supress warnings usonly in production
-      "SELECT ip FROM {$table}ips WHERE filename = '{$query_ck_filename['filename']}';
-      ");
-      
-      $query_rm_ips_ck = sqlite_fetch_array($query3, SQLITE_ASSOC);        
-
-      if (!empty($query_rm_ips_ck))
-      {
-                        
-        $query = sqlite_query($mydb, // @ supress warnings usonly in production
-        "DELETE FROM {$table}ips WHERE filename = '{$query_ck_filename['filename']}';
-        ");
-        
-        if (sqlite_changes($mydb) < 1)
-        {
-          sqlite_close($mydb);
-          return 'Error in query';   
-        }
-        
-      }        
-      
-    }
-
+      } 
+    
     sqlite_close($mydb);
-    return true;   
+    return true;
   
 } // END main func
 
@@ -399,6 +400,237 @@ function snortDropDownList($list, $setting) {
   } 
 }
 
+// downlod all snort logs
+function snort_downloadAllLogs() {
+	
+	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
+	$file_name = "snort_logs_{$save_date}.tar.gz";
+	
+	exec('/bin/rm /tmp/snort_logs_*.gz'); // remove old file
+	exec('/bin/rm /tmp/snort_blocked_*.gz'); // remove old file
+	exec('/bin/rm /tmp/snort_block.pf'); // remove old file
+	exec('/bin/rm -r /tmp/snort_blocked'); // remove old file
+	exec("/usr/bin/tar cfz /tmp/snort_logs_{$save_date}.tar.gz /var/log/snort");
+	
+	if (file_exists("/tmp/snort_logs_{$save_date}.tar.gz")) {
+		echo "
+			{
+			\"snortdownload\": \"success\",
+			\"downloadfilename\": \"{$save_date}\"	
+			}
+			";
+		return true;
+	}else{
+		return false;
+	}
+}
+
+// send log files to browser GET function
+function sendFileSnortLogDownload() {
+	//ob_start(); //importanr or other post will fail
+	$file_name_date = $_GET['snortlogfilename'];
+	
+	$file_name1 = "/tmp/snort_logs_{$file_name_date}.tar.gz";
+	$file_name2 = "/tmp/snort_blocked_{$file_name_date}.tar.gz";
+	
+	if (file_exists($file_name1)) {
+		$file_name = "snort_logs_{$file_name_date}.tar.gz";
+	}
+	
+	if (file_exists($file_name2)) {
+		$file_name = "snort_blocked_{$file_name_date}.tar.gz";
+	}
+	
+	if ($file_name == '') {
+		echo 'Error no saved file.';
+		return false;
+	}	
+
+	if(file_exists("/tmp/{$file_name}"))
+	{
+		$file = "/tmp/{$file_name}";
+		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT\n");
+		header("Pragma: private"); // needed for IE
+		header("Cache-Control: private, must-revalidate"); // needed for IE
+		header('Content-type: application/force-download');
+		header('Content-Transfer-Encoding: Binary');
+		header("Content-length: ".filesize($file));
+		header("Content-disposition: attachment; filename = {$file_name}");
+		readfile("$file");
+		exec("/bin/rm /tmp/{$file_name}");
+		//od_end_clean(); //importanr or other post will fail
+	}else{
+		echo 'Error no saved file.';
+		return false;
+	}
+}
+
+// Warning code not finnish untill rule code is DONE !
+// Delete Snort logs
+function snortDeleteLogs() {
+	if(file_exists('/var/log/snort/alert'))
+	{
+		exec('/bin/echo "" > /var/log/snort/alert');
+		//post_delete_logs();
+		exec('/usr/sbin/chown snort:snort /var/log/snort/*');
+		exec('/bin/chmod 660 /var/log/snort/*');
+		sleep(2);
+		exec('/usr/bin/killall -HUP snort');
+	}
+	
+	echo '
+	{
+	"snortdelete": "success"	
+	}
+	';
+	return true;
+	
+}
+
+// Warning code not finnish untill rule code is DONE !
+// code neeed to be worked on when finnished rules code
+function post_delete_logs()
+{
+	global $config, $g;
+
+
+	$snort_log_dir = '/var/log/snort';
+
+	/* do not start config build if rules is empty */
+	if (!empty($config['installedpackages']['snortglobal']['rule']))
+	{
+
+
+		$rule_array = $config['installedpackages']['snortglobal']['rule'];
+		$id = -1;
+		foreach ($rule_array as $value)
+		{
+
+			if ($id == '') {
+				$id = 0;
+			}
+
+			$id += 1;
+
+			$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
+			$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
+			$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
+
+			if ($if_real != '' && $snort_uuid != '')
+			{
+				if ($config['installedpackages']['snortglobal']['rule'][$id]['snortunifiedlog'] == 'on')
+				{
+					$snort_log_file_u2 = "{$snort_uuid}_{$if_real}.u2.";
+					$snort_list_u2 = snort_file_list($snort_log_dir, $snort_log_file_u2);
+					if (is_array($snort_list_u2)) {
+						usort($snort_list_u2, "snort_file_sort");
+						$snort_u2_rm_list = snort_build_order($snort_list_u2);
+						snort_remove_files($snort_u2_rm_list, $snort_u2_rm_list[0]);
+					}
+				}else{
+					exec("/bin/rm $snort_log_dir/snort_{$snort_uuid}_{$if_real}.u2*");
+				}
+
+				if ($config['installedpackages']['snortglobal']['rule'][$id]['tcpdumplog'] == 'on')
+				{
+					$snort_log_file_tcpd = "{$snort_uuid}_{$if_real}.tcpdump.";
+					$snort_list_tcpd = snort_file_list($snort_log_dir, $snort_log_file_tcpd);
+					if (is_array($snort_list_tcpd)) {
+						usort($snort_list_tcpd, "snort_file_sort");
+						$snort_tcpd_rm_list = snort_build_order($snort_list_tcpd);
+						snort_remove_files($snort_tcpd_rm_list, $snort_tcpd_rm_list[0]);
+					}
+				}else{
+					exec("/bin/rm $snort_log_dir/snort_{$snort_uuid}_{$if_real}.tcpdump*");
+				}
+
+				/* create barnyard2 configuration file */
+				//if ($config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'] == 'on')
+				//create_barnyard2_conf($id, $if_real, $snort_uuid);
+
+				if ($config['installedpackages']['snortglobal']['rule'][$id]['perform_stat'] == on)
+				{
+					exec("/bin/echo '' > /var/log/snort/snort_{$snort_uuid}_{$if_real}.stats");
+				}
+			}
+		}
+	}
+}
+
+// END General Functions
+
+// downlod all blocked ips to log
+function snort_downloadBlockedIPs() {
+	
+	exec('/bin/rm /tmp/snort_logs_*.gz'); // remove old file
+	exec('/bin/rm /tmp/snort_blocked_*.gz'); // remove old file
+	exec('/bin/rm /tmp/snort_block.pf'); // remove old file
+	exec('/bin/rm -r /tmp/snort_blocked'); // remove old file
+	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
+	$file_name = "snort_blocked_{$save_date}.tar.gz";
+	exec('/bin/mkdir /tmp/snort_blocked');
+	exec('/sbin/pfctl -t snort2c -T show > /tmp/snort_block.pf');
+
+	$blocked_ips_array_save = str_replace('   ', '', array_filter(explode("\n", file_get_contents('/tmp/snort_block.pf'))));
+
+	if ($blocked_ips_array_save[0] != '')
+	{
+		/* build the list */
+		$counter = 0;
+		foreach($blocked_ips_array_save as $fileline3)
+		{
+			$counter++;
+			exec("/bin/echo  $fileline3 >> /tmp/snort_blocked/snort_block.pf");
+		}
+	}
+
+	exec("/usr/bin/tar cfz /tmp/snort_blocked_{$save_date}.tar.gz /tmp/snort_blocked");
+	
+	if (file_exists("/tmp/snort_blocked_{$save_date}.tar.gz")) {
+		echo "
+			{
+			\"snortdownload\": \"success\",
+			\"downloadfilename\": \"{$save_date}\"	
+			}
+			";
+		return true;
+	}else{
+		return false;
+	}
+
+}
+
+// flush all ips from snort2c table
+function snortRemoveBlockedIPs() {	
+	
+	exec("/sbin/pfctl -t snort2c -T flush");
+	
+	echo '
+	{
+	"snortdelete": "success"	
+	}
+	';
+	return true;
+	
+}
+
+/* returns true if $name is a valid name for a whitelist file name or ip */
+function is_validFileName($name) {
+	
+	if ($name == '')
+		return false;
+	
+	if (!is_string($name))
+		return false;
+	
+	if (preg_match("/\s+/", $name))
+		return false;
+
+	if (!preg_match("/[^a-zA-Z0-9\-_]/", $name))
+		return true;
+
+	return false;
+}
 
 /* gen Alpha Num Mix for uuids or anything random, NEVER USE rand() */
 /* mt_rand/mt_srand is insecure way to gen random nums and strings, when posible use /dev/random or /dev/urandom */

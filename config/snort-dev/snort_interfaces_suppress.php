@@ -38,20 +38,21 @@ require_once("/usr/local/pkg/snort/snort_new.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 
 
-$a_whitelist = snortSql_fetchAllWhitelistTypes('SnortWhitelist', 'SnortWhitelistips');
+$a_suppress = snortSql_fetchAllWhitelistTypes('SnortSuppress', '');
 
-	if (!is_array($a_whitelist))
+	if (!is_array($a_suppress))
 	{
-		$a_whitelist = array();
+		$a_suppress = array();
 	}
 
-	if ($a_whitelist == 'Error') 
+
+	if ($a_suppress == 'Error') 
 	{
 		echo 'Error';
 		exit(0);
 	}
 
-	$pgtitle = "Services: Snort: Whitelist";
+	$pgtitle = "Services: Snort: Suppression";
 	include("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
@@ -85,8 +86,8 @@ $a_whitelist = snortSql_fetchAllWhitelistTypes('SnortWhitelist', 'SnortWhitelist
 			<li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
 			<li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
 			<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
-			<li class="newtabmenu_active"><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
-			<li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
+			<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
+			<li class="newtabmenu_active"><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
 			<li><a href="/snort/snort_help_info.php"><span>Help</span></a></li>
 			</li>			
 		</ul>
@@ -103,51 +104,22 @@ $a_whitelist = snortSql_fetchAllWhitelistTypes('SnortWhitelist', 'SnortWhitelist
 		<!-- START MAIN AREA -->
 						
 			<tr> <!-- db to lookup -->
-				<td width="20%" class="listhdrr">File Name</td>
-				<td width="45%" class="listhdrr">Values</td>
-				<td width="35%" class="listhdr">Description</td>
+				<td width="30%" class="listhdrr">File Name</td>
+				<td width="70%" class="listhdr">Description</td>
 				<td width="10%" class="list"></td>
 			</tr>
-			<?php foreach ($a_whitelist as $list): ?>
-			<tr id="maintable_<?=$list['uuid']?>" data-options='{"pagetable":"SnortWhitelist", "pagedb":"snortDB", "DoPOST":"true"}' >
-				<td class="listlr" ondblclick="document.location='snort_interfaces_whitelist_edit.php?uuid=<?=$list['uuid'];?>'"><?=$list['filename'];?></td>
-				<td class="listr" ondblclick="document.location='snort_interfaces_whitelist_edit.php?uuid=<?=$list['uuid'];?>'">
-			<?php
-            $a = 0;
-            $countList = count($list['list']);
-            foreach ($list['list'] as $value) 
-            {
-            
-              $a++;
-              
-              if ($a != $countList || $countList == 1) 
-              {
-                echo $value['ip'];
-              }
-              
-               if ($a > 0 && $a != $countList) 
-              {
-                echo ',' . ' ';
-              }else{
-                echo ' ';
-              }
-              
-            } // end foreach
-            
-            if ($a > 3)
-            {
-              echo '...';
-            }         
-					?>	
-				</td>
-				<td class="listbg" ondblclick="document.location='snort_interfaces_whitelist_edit.php?uuid=<?=$list['uuid'];?>'">
+			<?php foreach ($a_suppress as $list): ?>
+			<tr id="maintable_<?=$list['uuid']?>" data-options='{"pagetable":"SnortSuppress", "pagedb":"snortDB", "DoPOST":"true"}' >
+				<td class="listlr" ondblclick="document.location='snort_interfaces_suppress_edit.php?uuid=<?=$list['uuid'];?>'"><?=$list['filename'];?></td>
+				<td class="listbg" ondblclick="document.location='snort_interfaces_suppress_edit.php?uuid=<?=$list['uuid'];?>'">
 				<font color="#FFFFFF"> <?=htmlspecialchars($list['description']);?>&nbsp;
 				</td>
+				<td></td>
 				<td valign="middle" nowrap class="list">
 				<table border="0" cellspacing="0" cellpadding="1">
 					<tr>
 						<td valign="middle">
-						<a href="snort_interfaces_whitelist_edit.php?uuid=<?=$list['uuid'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"width="17" height="17" border="0" title="edit whitelist"></a>
+						<a href="snort_interfaces_suppress_edit.php?uuid=<?=$list['uuid'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"width="17" height="17" border="0" title="edit suppress list"></a>
 						</td>
 						<td>
 						<img id="icon_x_<?=$list['uuid'];?>" class="icon_click icon_x" src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="delete list" >
@@ -164,7 +136,7 @@ $a_whitelist = snortSql_fetchAllWhitelistTypes('SnortWhitelist', 'SnortWhitelist
 				<table border="0" cellspacing="0" cellpadding="1">
 			<tr>
 				<td valign="middle" width="17">&nbsp;</td>
-				<td valign="middle"><a href="snort_interfaces_whitelist_edit.php?uuid=<?=genAlphaNumMixFast(28, 28);?> "><img src="/themes/nervecenter/images/icons/icon_plus.gif" width="17" height="17" border="0" title="add a new list"></a></td>
+				<td valign="middle"><a href="snort_interfaces_suppress_edit.php?uuid=<?=genAlphaNumMixFast(28, 28);?> "><img src="/themes/nervecenter/images/icons/icon_plus.gif" width="17" height="17" border="0" title="add a new list"></a></td>
 					</tr>
 				</table>
 				</td>
@@ -191,10 +163,8 @@ $a_whitelist = snortSql_fetchAllWhitelistTypes('SnortWhitelist', 'SnortWhitelist
 	<span class="vexpl">
 	<span class="red"><strong>Note:</strong></span>
 	<p><span class="vexpl">
-	Here you can create whitelist files for your snort package rules.<br>
-	Please add all the ips or networks you want to protect against snort block decisions.<br>
-	Remember that the default whitelist only includes local networks.<br>
-	Be careful, it is very easy to get locked out of you system.
+		Here you can create event filtering and suppression for your snort package rules.<br>
+		Please note that you must restart a running rule so that changes can take effect.<br>
 	</span></p>
 	</td>
 </table>

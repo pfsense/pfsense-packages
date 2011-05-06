@@ -10,30 +10,55 @@ if(isset($_POST['__csrf_magic']))
   unset($_POST['__csrf_magic']);
 }
 
-// Cancel echo back
-if ($_POST['Cancel'] == 1) {
+// return codes
+$snortJsonReturnCode_success = '
+{
+"snortgeneralsettings": "success"	
+}
+';
 
-  if ($_POST['CancelType'] == '') {
-    echo '
-    {
-    "snortpost": "fail" 
-    }
-    ';
-    return false;
-  }
+$snortJsonReturnCode_fail = '
+{
+"snortgeneralsettings": "fail"	
+}
+';
 
-
-  if ($_POST['CancelType'] == 'SnortSettings') {
-  	snortSql_fetchSettingsAllToJson($_POST['CancelType'], '');
-  	return true;
-  }
-
-  if ($_POST['CancelType'] == 'SnortWhitelist' || $_POST['CancelType'] == 'SnortWhitelistips') {
-    snortSql_fetchSettingsAllToJson($_POST['CancelType'], $_POST['CancelName']);
-    return true;
-  }
- 
-
+// row from db by uuid
+if ($_POST['RMlistDelRow'] == 1)
+{
+	
+	//conf_mount_rw();
+	
+	if ($_POST['RMlistTable'] == 'Snortrules' || $_POST['RMlistTable'] == 'SnortSuppress')
+	{
+	  	if (snortSql_updatelistDelete($_POST['RMlistDB'], $_POST['RMlistTable'], 'uuid', $_POST['RMlistUuid']))
+	  	{
+	  		echo $snortJsonReturnCode_success;
+			return true; 		
+	  	}else{
+			echo $snortJsonReturnCode_fail;
+			return false; 		
+	  	}
+	}
+	
+	if ($_POST['RMlistTable'] == 'SnortWhitelist')
+	{
+		$fetchExtraWhitelistEntries = snortSql_fetchAllSettings($_POST['RMlistDB'], $_POST['RMlistTable'], 'uuid', $_POST['RMlistUuid']);
+		
+		if (snortSql_updatelistDelete($_POST['RMlistDB'], 'SnortWhitelistips', 'filename', $fetchExtraWhitelistEntries['filename']))
+		{	
+			snortSql_updatelistDelete($_POST['RMlistDB'], $_POST['RMlistTable'], 'uuid', $_POST['RMlistUuid']);
+			
+	  		echo $snortJsonReturnCode_success;
+			return true; 		
+	  		}else{
+			echo $snortJsonReturnCode_fail;
+			return false; 			
+		}
+	}	
+	
+	//conf_mount_ro();
+	
 }
 
 
@@ -46,8 +71,7 @@ if ($_POST['snortSaveSettings'] == 1)
  
       if ($_POST['ifaceTab'] == 'snort_interfaces_global')
       {    
-        // checkboxes when set to off never get included in POST thus this code
-        $_POST['emergingthreats'] = ($_POST['emergingthreats'] == '' ? off : $_POST['emergingthreats']);        
+        // checkboxes when set to off never get included in POST thus this code      
         $_POST['forcekeepsettings'] = ($_POST['forcekeepsettings'] == '' ? off : $_POST['forcekeepsettings']);
 
       }
@@ -89,17 +113,56 @@ if ($_POST['snortSaveSettings'] == 1)
 	
 }
 
+// Suppress settings save
+if ($_POST['snortSaveSuppresslist'] == 1) 
+{
+
+	// post for supress_edit	
+	if ($_POST['ifaceTab'] == 'snort_interfaces_suppress_edit') 
+	{
+		
+	    // make sure filename is valid  
+		if (!is_validFileName($_POST['filename']))
+		{
+			echo 'Error: FileName';
+			return false;
+		}
+		
+		// unset POSTs that are markers not in db
+		unset($_POST['snortSaveSuppresslist']);
+		unset($_POST['ifaceTab']);
+		
+		// convert textbox to base64
+		$_POST['suppresspassthru'] = base64_encode($_POST['suppresspassthru']);
+		
+		//conf_mount_rw();
+		snortSql_updateSettings($_POST, 'uuid', $_POST['uuid']);
+		//conf_mount_ro();		
+		
+		echo '
+		{
+		"snortgeneralsettings": "success" 
+		}
+		';
+		return true;	  
+	  
+	}
+
+
+	
+}
+
 // Whitelist settings save
 if ($_POST['snortSaveWhitelist'] == 1) 
 {
 
   if ($_POST['ifaceTab'] == 'snort_interfaces_whitelist_edit') {
         
-        if ($_POST['filename'] == '')
-        {
-          echo 'Error: No FileName';
-          return false;
-        }
+		if (!is_validFileName($_POST['filename']))
+		{
+			echo 'Error: FileName';
+			return false;
+		}
         
           $_POST['wanips'] = ($_POST['wanips'] == '' ? off : $_POST['wanips']); 
           $_POST['wangateips'] = ($_POST['wangateips'] == '' ? off : $_POST['wangateips']);
@@ -133,14 +196,6 @@ if ($_POST['snortSaveWhitelist'] == 1)
     ';
     return true;
 
-}
-
-// Whitelist settings delete
-if ($_POST['WhitelistDelRow'] == 1) 
-{
-  //conf_mount_rw();
-  snortSql_updateWhitelistDelete($_POST['WhitelistTable'], $_POST['WhitelistUuid']);
-  //conf_mount_ro();
 }
 
 // download code for alerts page

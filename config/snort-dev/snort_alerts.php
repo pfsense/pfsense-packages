@@ -34,7 +34,7 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_new.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 
-$generalSettings = snortSql_fetchAllSettings('SnortSettings', 'id', '1');
+$generalSettings = snortSql_fetchAllSettings('snortDB', 'SnortSettings', 'id', '1');
 
 $alertnumber = $generalSettings['alertnumber'];
 
@@ -44,26 +44,9 @@ $arefresh_on = ($generalSettings['arefresh']  == 'on' ? 'checked' : '');
 	include("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
-		
-	
+			
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-<script type="text/javascript">
-
-	// set the page resets watchThis
-	function resetSnortDefaults(general0) {
-		
-		jQuery("#alertnumber").val(general0.alertnumber);
-		
-		if (general0.arefresh == 'on') {
-			jQuery("#arefresh").attr("checked", "checked");
-		}else{
-			jQuery("#arefresh").removeAttr('checked');
-		}
-
-	}
-	
-</script>
 
 <div id="loadingWaiting">
   <p class="loadingWaitingMessage"><img src="./images/loading.gif" /> <br>Please Wait...</p>
@@ -79,10 +62,6 @@ $arefresh_on = ($generalSettings['arefresh']  == 'on' ? 'checked' : '');
 
 <div class="body2"><!-- hack to fix the hardcoed fbegin link in header -->
 <div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
-
-<? //if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
-echo '<p class="pgtitle">' . $pgtitle . '</p>';
-?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
@@ -120,14 +99,14 @@ echo '<p class="pgtitle">' . $pgtitle . '</p>';
 			<tr>
 				<td class="vncell2" valign="center" width="21%"><span class="vexpl">Save or Remove Logs</span></td>
 				<td class="vtable" width="40%">
-					<form id="iform" action="./snort_json_post.php" method="post">
+					<form id="iform" >
 					<input name="snortlogsdownload"  type="submit" class="formbtn" value="Download" >
 					<input type="hidden" name="snortlogsdownload" value="1" />
 					<span class="vexpl">Save All Log Files.</span>
 					</form>
 				</td>
 				<td class="vtable">
-					<form id="iform2" action="./snort_json_post.php" method="post">
+					<form id="iform2" >
 					<input name="snortlogsdelete"  type="submit" class="formbtn" value="Clear" onclick="return confirm('Do you really want to remove all your logs ? All Snort Logs will be removed !')" >
 					<input type="hidden" name="snortlogsdelete" value="1" />
 					<span class="vexpl red"><strong>Warning:</strong></span><span class="vexpl"> all logs will be deleted.</span>
@@ -138,7 +117,7 @@ echo '<p class="pgtitle">' . $pgtitle . '</p>';
 			<tr>
 				<td class="vncell2" valign="center"><span class="vexpl">Auto Refresh and Log View</span></td>
 				<td class="vtable">
-					<form id="iform3" action="./snort_json_post.php" method="post">
+					<form id="iform3" >
 					<input name="save" type="submit" class="formbtn" value="Save">
 					<input id="cancel" type="button" class="formbtn" value="Cancel">
 					<input name="arefresh" id="arefresh" type="checkbox" value="on" <?=htmlspecialchars($arefresh_on);?> >
@@ -146,7 +125,7 @@ echo '<p class="pgtitle">' . $pgtitle . '</p>';
 					<span class="vexpl"><strong>Default ON</strong>.</span> 
 				</td>
 				<td class="vtable">
-					<input name="alertnumber" type="text" class="formfld" id="alertnumber" size="5" value="<?=htmlspecialchars($alertnumber);?>" >
+					<input name="alertnumber" type="text" class="formfld2" id="alertnumber" size="5" value="<?=htmlspecialchars($alertnumber);?>" >
 					<span class="vexpl">Limit entries to view. <strong>Default 250</strong>.</span>
 
           <input type="hidden" name="snortSaveSettings" value="1" /> <!-- what to do, save -->

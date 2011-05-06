@@ -34,15 +34,41 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_new.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 
+// set page vars
 
-$generalSettings = snortSql_fetchAllSettings('snortDB', 'SnortSettings', 'id', '1');
+$uuid = $_GET['uuid'];
+if (isset($_POST['uuid']))
+$uuid = $_POST['uuid'];
 
-$blertnumber = $generalSettings['blertnumber'];
+if ($uuid == '') {
+	echo 'error: no uuid';
+	exit(0);
+}
 
-$brefresh_on = ($generalSettings['brefresh'] == 'on' ? 'checked' : '');
+$a_list = snortSql_fetchAllSettings('snortDB', 'SnortSuppress', 'uuid', $uuid);
 
-	$pgtitle = "Services: Snort Blocked Hosts";
-	include("/usr/local/pkg/snort/snort_head.inc");
+
+// $a_list returns empty use defaults
+if ($a_list == '')
+{
+  
+  $a_list = array(
+      'id' => '',
+      'date' => date(U),
+      'uuid' => $uuid,
+      'filename' => '',
+      'description' => '',
+      'suppresspassthru' => ''
+
+  );
+  
+}
+
+
+
+
+	$pgtitle = 'Services: Snort: Suppression: Edit: ' . $uuid;
+	include('/usr/local/pkg/snort/snort_head.inc');
 
 ?>
 		
@@ -64,6 +90,8 @@ $brefresh_on = ($generalSettings['brefresh'] == 'on' ? 'checked' : '');
 <div class="body2"><!-- hack to fix the hardcoed fbegin link in header -->
 <div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
 
+<form id="iform">
+
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td>
@@ -74,9 +102,9 @@ $brefresh_on = ($generalSettings['brefresh'] == 'on' ? 'checked' : '');
 			<li><a href="/snort/snort_interfaces_global.php"><span>Global Settings</span></a></li>
 			<li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
 			<li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
-			<li class="newtabmenu_active"><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
+			<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
 			<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
-			<li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
+			<li class="newtabmenu_active"><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
 			<li><a href="/snort/snort_help_info.php"><span>Help</span></a></li>
 			</li>			
 		</ul>
@@ -91,53 +119,65 @@ $brefresh_on = ($generalSettings['brefresh'] == 'on' ? 'checked' : '');
 		<td class="tabnavtbl">
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<!-- START MAIN AREA -->
-			
-			<tr id="maintable" data-options='{"pagetable":"SnortSettings"}'> <!-- db to lookup -->
-				<td width="22%" colspan="0" class="listtopic">Last 500 Blocked.</td>
-				<td class="listtopic">This page lists hosts that have been blocked by Snort.&nbsp;&nbsp;Hosts are removed every <strong>hour</strong>.</td>
-			</tr>
-			<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		
+      <!-- table point -->
+      <input name="snortSaveSuppresslist" type="hidden" value="1" />
+      <input name="ifaceTab" type="hidden" value="snort_interfaces_suppress_edit" />
+      <input name="dbTable" type="hidden" value="SnortSuppress" />
+      <input name="date" type="hidden" value="<?=$a_list['date'];?>" />
+      <input name="uuid" type="hidden" value="<?=$a_list['uuid'];?>" />		
+	
+		<table width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tr>
-				<td class="vncell2" valign="center" width="22%"><span class="vexpl">Save or Remove Hosts</span></td>
-				<td width="40%" class="vtable">
-				<form id="iform" >
-				<input name="snortblockedlogsdownload"  type="submit" class="formbtn" value="Download" >
-				<input type="hidden" name="snortblockedlogsdownload" value="1" />
-				<span class="vexpl">Save All Blocked Hosts</span>
-				</form>
-				</td>
-				<td class="vtable">
-				<form id="iform2" >
-				<input name="remove" type="submit" class="formbtn" value="Clear" onclick="return confirm('Do you really want to remove all blocked hosts ? All Blocked Hosts will be removed !')" > 
-				<input type="hidden" name="snortflushpftable" value="1" />
-				<span class="vexpl red"><strong>Warning:</strong></span><span class="vexpl"> all hosts will be removed.</span>
-				</form>
-				</td>
-				<div class="hiddendownloadlink"></div>
+				<td colspan="2" valign="top" class="listtopic">Add the name anddescription of the file.</td>
 			</tr>
 			<tr>
-				<td class="vncell2" valign="center"><span class="vexpl">Auto Refresh and Log View</span></td>
+				<td valign="top" class="vncellreq2">Name</td>
 				<td class="vtable">
-				<form id="iform3" >
-				<input name="save" type="submit" class="formbtn" value="Save"> 
+				<input class="formfld2" name="filename" type="text" id="filename" size="40" value="<?=$a_list['filename'] ?>" /> <br />
+				<span class="vexpl"> The list name may only consist of the characters a-z, A-Z and 0-9. <span class="red">Note: </span> No Spaces. </span>
+				</td>
+			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell2">Description</td>
+				<td width="78%" class="vtable">
+				<input class="formfld2" name="description" type="text" id="description" size="40" value="<?=$a_list['description'] ?>" /> <br />
+				<span class="vexpl"> You may enter a description here for your reference (not parsed). </span>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" valign="top" class="listtopic"> 
+				Examples:
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" valign="top" class="vncell2">
+				<b>Example 1;</b> suppress gen_id 1, sig_id 1852, track by_src, ip 10.1.1.54<br>
+				<b>Example 2;</b> event_filter gen_id 1, sig_id 1851, type limit,track by_src, count 1, seconds 60<br>
+				<b>Example 3;</b> rate_filter gen_id 135, sig_id 1, track by_src, count 100, seconds 1, new_action log, timeout 10
+				</td>
+			</tr>
+		</table>
+		<table width="100%" border="0" cellpadding="0" cellspacing="0">
+			<tr>
+				<td colspan="2" valign="top" class="listtopic"> 
+				Apply suppression or filters to rules. Valid keywords are 'suppress', 'event_filter' and 'rate_filter'.
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2" valign="top" class="vncelltextbox">
+				<textarea wrap="off" name="suppresspassthru" cols="101" rows="28" id="suppresspassthru" class="formfld2"><?=base64_decode($a_list['suppresspassthru']); ?></textarea>
+				</td>
+			</tr>
+		</table>
+			<tr>
+				<td style="padding-left: 160px;">
+				<input name="Submit" type="submit" class="formbtn" value="Save">
 				<input id="cancel" type="button" class="formbtn" value="Cancel">
-				<span class="vexpl">Auto Refresh</span> 
-				<input name="brefresh" id="brefresh" type="checkbox" value="on" <?=$brefresh_on; ?> >
-				<span class="vexpl"><strong>Default ON</strong>.</span>
-				</td>
-				<td class="vtable">
-				<input name="blertnumber" type="text" class="formfld2" id="blertnumber" size="5" value="<?=$blertnumber;?>" > 
-				<span class="vexpl">Limit entries to view. <strong>Default 500</strong>.</span>
-				
-        <input type="hidden" name="snortSaveSettings" value="1" /> <!-- what to do, save -->
-        <input type="hidden" name="dbTable" value="SnortSettings" /> <!-- what db-->
-        <input type="hidden" name="ifaceTab" value="snort_alerts_blocked" /> <!-- what interface tab -->
-				
-				</form>
 				</td>
 			</tr>
-			</table>			
-			
+	</form>
+		
 		<!-- STOP MAIN AREA -->
 		</table>
 		</td>

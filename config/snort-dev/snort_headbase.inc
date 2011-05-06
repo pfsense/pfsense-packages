@@ -10,11 +10,13 @@
 <?php
 
 
-echo "\t<script type=\"text/javascript\" src=\"./javascript/jquery-1.4.4.min.js\"></script>\n";
+echo "\t<script type=\"text/javascript\" src=\"./javascript/jquery-1.6.min.js\"></script>\n";
 
 echo "\t<script type=\"text/javascript\" src=\"./javascript/jquery.form.js\"></script>\n";
 
-echo "\t<script type=\"text/javascript\" src=\"./javascript/jquery.dataTables.min.js\"></script>\n";
+
+echo "\t<link href=\"./css/jquery.bubblepopup.v2.3.1.css\" rel=\"stylesheet\" type=\"text/css\" />\n";
+echo "\t<script src=\"./javascript/jquery.bubblepopup.v2.3.1.min.js\" type=\"text/javascript\"></script>\n";
 
 echo "\t<script type=\"text/javascript\" src=\"./javascript/snort_globalsend.js\"></script>\n";
 
@@ -26,12 +28,14 @@ echo "\t<script type=\"text/javascript\" src=\"./javascript/snort_globalsend.js\
 $snort_custom_rnd_box = '
 <script>
 	/* makes boxes round */
-	/* load at bottom */
+	/* load at bottom    */
 	NiftyCheck();
 	Rounded("div#mainarea2","bl br tr","#FFF","#dddddd","smooth");
 	Rounded("div#mainarea3","bl br tr","#FFF","#dddddd","smooth");
 	Rounded("td#tdbggrey","bl br tr","#FFF","#dddddd","smooth");
+	Rounded("td#tdbggrey2","bl br tr","#FFF","#dddddd","smooth");
 	Rounded("div#mainarea4","all","#FFF","#dddddd","smooth");
+	Rounded("div#mainarea6","all","#FFF","#dddddd","smooth");
 	Rounded("div#mainarea5","all","#eeeeee","#dddddd","smooth");
 </script>	
 ';

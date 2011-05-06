@@ -36,16 +36,18 @@ require_once("/usr/local/pkg/snort/snort_gui.inc");
 
 // set page vars
 
-$generalSettings = snortSql_fetchAllSettings('SnortSettings', 'id', '1');
+$generalSettings = snortSql_fetchAllSettings('snortDB', 'SnortSettings', 'id', '1');
 
 $snortdownload_off = ($generalSettings['snortdownload'] == 'off' ? 'checked' : '');
 $snortdownload_on = ($generalSettings['snortdownload'] == 'on' ? 'checked' : '');
+$oinkmastercode = $generalSettings['oinkmastercode'];
 
-$emergingthreats_on = ($generalSettings['emergingthreats'] == 'on' ? 'checked' : '');
+$emergingthreatsdownload_off = ($generalSettings['emergingthreatsdownload'] == 'off' ? 'checked' : '');
+$emergingthreatsdownload_basic = ($generalSettings['emergingthreatsdownload'] == 'basic' ? 'checked' : '');
+$emergingthreatsdownload_pro = ($generalSettings['emergingthreatsdownload'] == 'pro' ? 'checked' : '');
+$emergingthreatscode = $generalSettings['emergingthreatscode'];
 
 $updaterules = $generalSettings['updaterules'];
-
-$oinkmastercode = $generalSettings['oinkmastercode'];
 
 $rm_blocked = $generalSettings['rm_blocked'];
 
@@ -70,47 +72,71 @@ $snortlogCurrentDSKsize = round(exec('df -k /var | grep -v "Filesystem" | awk \'
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <script type="text/javascript">
+<!--
+jQuery(document).ready(function(){
 
-	// set the page resets watchThis
-	function resetSnortDefaults(general0) {
-	
-		if (general0.snortdownload == 'on') {
-			jQuery("#snortdownloadon").attr("checked", "checked");
-		}else{
-			jQuery("#snortdownloadoff").attr("checked", "checked");
-		}
+	//create a bubble popup for each DOM element with class attribute as "text", "button" or "link" and LI, P, IMG elements.
+	jQuery('.cBubblePopup').CreateBubblePopup({
 		
-		jQuery("#oinkmastercode").val(general0.oinkmastercode);
-		
-		if (general0.emergingthreats == 'on') {
-			jQuery("#emergingthreats").attr("checked", "checked");
-		}else{
-			jQuery("#emergingthreats").removeAttr('checked');
-		}
-		
-		jQuery("#updaterules").val(general0.updaterules);
-		
-		if (general0.snortloglimit == 'on') {
-			jQuery("#snortloglimiton").attr("checked", "checked");
-		}else{
-			jQuery("#snortloglimitoff").attr("checked", "checked");
-		}
-		
-		jQuery("#snortloglimitsize").val(general0.snortloglimitsize);
-		
-		jQuery("#rm_blocked").val(general0.rm_blocked);
-		
-		jQuery("#snortalertlogtype").val(general0.snortalertlogtype);
-		
-		if (general0.forcekeepsettings == 'on') {
-			jQuery("#forcekeepsettings").attr("checked", "checked");
-		}else{
-			jQuery("#forcekeepsettings").removeAttr('checked');
-		}
-		
-	}
-	
+		position : 'top',		
+		align	 : 'center',	
+		//innerHtml: 'Take a look to the HTML source of this page <br /> to learn how the plugin works!',
+		innerHtmlStyle: {
+		color:
+		'#FFFFFF', 
+		'text-align':'center'
+		},		
+		themeName: 	'all-black',
+		themePath: 	'images/jquerybubblepopup-theme',
+		manageMouseEvents:	false 	
+			
+	});
+
+	// all popups of <AREA> tags are invisible
+	jQuery('cBubblePopup').data('visible', false);
+	//set a timer
+	var timer;
+
+	// add a customized mouseover event for each <AREA> tag...
+	jQuery('.cBubblePopup').mouseover(function(){
+			clearTimeout(timer);
+			if( !jQuery(this).data('visible') ){
+				// all popups must be invisible, but only this one is visible
+				jQuery('.cBubblePopup').data('visible', false);
+				jQuery(this).data('visible', true);
+				//hide all popups, update the innerHtml and show this popup
+				jQuery('.cBubblePopup').HideAllBubblePopups();
+				jQuery(this).SetBubblePopupInnerHtml( jQuery(this).attr('alt') );
+				jQuery(this).ShowBubblePopup();	
+			};
+	});
+
+	//if the mouse leaves the <AREA>, wait 2 seconds then hide all bubble poups...
+	jQuery('.cBubblePopup').mouseleave(function(){
+		if( jQuery(this).data('visible') ){
+			var seconds_to_wait = 1;
+			function doCountdown(){
+				timer = setTimeout(function(){
+					seconds_to_wait--;
+					if(seconds_to_wait > 0){
+						doCountdown();
+					}else{
+						clearTimeout(timer);
+						jQuery('.cBubblePopup').HideAllBubblePopups();
+						jQuery('.cBubblePopup').data('visible', false);
+					};
+				},1000);
+			};
+			doCountdown();
+		};
+	});				
+
+});
+
+//-->
+
 </script>
+
 
 <div id="loadingWaiting">
   <p class="loadingWaitingMessage"><img src="./images/loading.gif" /> <br>Please Wait...</p>
@@ -127,11 +153,7 @@ $snortlogCurrentDSKsize = round(exec('df -k /var | grep -v "Filesystem" | awk \'
 <div class="body2"><!-- hack to fix the hardcoed fbegin link in header -->
 <div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
 
-<? //if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
-echo '<p class="pgtitle">' . $pgtitle . '</p>';
-?>
-
-<form id="iform" action="./snort_json_post.php" method="post">
+<form id="iform" >
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
@@ -182,18 +204,19 @@ echo '<p class="pgtitle">' . $pgtitle . '</p>';
 						<td colspan="2">
 						<input name="snortdownload" type="radio" id="snortdownloadon" value="on" <?=$snortdownload_on;?> > 
 						<span class="vexpl">Install Basic Rules or Premium rules</span> <br>
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<a href="https://www.snort.org/signup" target="_blank">
+						</td>
+					</tr>
+				</table>
+				<table STYLE="padding-top: 5px">
+					<tr>
+						<td colspan="2">
+						<a class="vncell2 cBubblePopup" href="https://www.snort.org/signup" target="_blank" alt="Basic rules are free but 30 days old.">
 						Sign Up for a Basic Rule Account
-						</a><br>
-						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						<a href="http://www.snort.org/vrt/buy-a-subscription" target="_blank">
+						</a><br><br>				
+						<a class="vncell2 cBubblePopup" href="http://www.snort.org/vrt/buy-a-subscription" target="_blank" alt="Premium users receive rules 30 days faster than basic users.">
 						Sign Up for Sourcefire VRT Certified Premium Rules. This Is Highly Recommended
 						</a>
 						</td>
-					</tr>
-					<tr>
-						<td>&nbsp;</td>
 					</tr>
 				</table>
 				<table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -203,22 +226,61 @@ echo '<p class="pgtitle">' . $pgtitle . '</p>';
 					<tr>
 						<td class="vncell2" valign="top"><span class="vexpl">Code</span></td>
 						<td class="vtable">
-						<input name="oinkmastercode" type="text"class="formfld" id="oinkmastercode" size="52" value="<?=$oinkmastercode;?>" > <br>
+						<input name="oinkmastercode" type="text"class="formfld2" id="oinkmastercode" size="52" value="<?=$oinkmastercode;?>" > <br>
 						<span class="vexpl">Obtain a snort.org Oinkmaster code and paste here.</span>
 						</td>				
 				</table>			
 			</tr>
+			
 			<tr>
-				<td width="22%" valign="top" class="vncell2"><span>Install <strong>Emergingthreats</strong> rules</span></td>
+				<td width="22%" valign="top" class="vncell2">Install Emergingthreats rules</td>
 				<td width="78%" class="vtable">
-				<input name="emergingthreats" id="emergingthreats" type="checkbox" value="on" <?=$emergingthreats_on; ?>> <br>
-				<span class="vexpl">Emerging Threats is an open source community that produces fastest moving and diverse Snort Rules.</span>
-				</td>
+				<table cellpadding="0" cellspacing="0">
+					<tr>
+						<td colspan="2">
+						<input name="emergingthreatsdownload" type="radio" id="emergingthreatsdownloadoff" value="off" <?=$emergingthreatsdownload_off;?> >
+						<span class="vexpl">Do <strong>NOT</strong> Install</span>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+						<input name="emergingthreatsdownload" type="radio" id="emergingthreatsdownloadon" value="basic" <?=$emergingthreatsdownload_basic;?> > 
+						<span class="vexpl">Install <b>Basic</b> Rules: No need to register</span> <br>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+						<input name="emergingthreatsdownload" type="radio" id="emergingthreatsprodownloadon" value="pro" <?=$emergingthreatsdownload_pro;?> > 
+						<span class="vexpl">Install <b>Pro</b> rules: You need to register</span> <br>
+						</td>
+					</tr>
+				</table>
+				<table STYLE="padding-top: 5px">
+					<tr>
+						<td colspan="2">			
+						<a class="vncell2 cBubblePopup" href="http://www.emergingthreatspro.com" target="_blank" alt="Premium users receive rules 30 days faster than basic users.">
+						Sign Up for Emerging Threats Pro Certified Premium Rules. This Is Highly Recommended
+						</a>
+						</td>
+					</tr>
+				</table>
+				<table width="100%" border="0" cellpadding="6" cellspacing="0">
+					<tr>
+						<td colspan="2" valign="top"><span class="vexpl">Pro rules code</span></td>
+					</tr>
+					<tr>
+						<td class="vncell2" valign="top"><span class="vexpl">Code</span></td>
+						<td class="vtable">
+						<input name="emergingthreatscode" type="text"class="formfld2" id="emergingthreatscode" size="52" value="<?=$emergingthreatscode;?>" > <br>
+						<span class="vexpl">Obtain a emergingthreatspro.com Pro rules code and paste here.</span>
+						</td>				
+				</table>			
 			</tr>
+
 			<tr>
 				<td width="22%" valign="top" class="vncell2"><span>Update rules automatically</span></td>
 				<td width="78%" class="vtable">
-				<select name="updaterules" class="formfld" id="updaterules">
+				<select name="updaterules" class="formfld2" id="updaterules">
 					<?php 					
 					$updateDaysList = array('never' => 'NEVER', '6h_up' => '6 HOURS', '12h_up' => '12 HOURS', '1d_up' => '1 DAY', '4d_up' => '4 DAYS', '7d_up' => '7 DAYS', '28d_up' => '28 DAYS');					
 					snortDropDownList($updateDaysList, $updaterules);					
@@ -260,7 +322,7 @@ echo '<p class="pgtitle">' . $pgtitle . '</p>';
 					<tr>
 						<td class="vncell3"><span>Size in <strong>MB</strong></span></td>
 						<td class="vtable">
-						<input name="snortloglimitsize" type="text" class="formfld" id="snortloglimitsize" size="7" value="<?=$snortloglimitsize;?>">
+						<input name="snortloglimitsize" type="text" class="formfld2" id="snortloglimitsize" size="7" value="<?=$snortloglimitsize;?>">
 						<span class="vexpl">Default is <strong>20%</strong> of available space.</span>
 						</td>				
 				</table>			
@@ -268,7 +330,7 @@ echo '<p class="pgtitle">' . $pgtitle . '</p>';
 			<tr>
 				<td width="22%" valign="top" class="vncell2"><span>Remove blocked hosts every</span></td>
 				<td width="78%" class="vtable">								
-					<select name="rm_blocked" class="formfld" id="rm_blocked">
+					<select name="rm_blocked" class="formfld2" id="rm_blocked">
 					<?php 
 						$BlockTimeReset = array('never' => 'NEVER', '1h_b' => '1 HOUR', '3h_b' => '3 HOURS', '6h_b' => '6 HOURS', '12h_b' => '12 HOURS', '1d_b' => '1 DAY', '4d_b' => '4 DAYS', '7d_b' => '7 DAYS', '28d_b' => '28 DAYS');
 						snortDropDownList($BlockTimeReset, $rm_blocked);				
@@ -280,7 +342,7 @@ echo '<p class="pgtitle">' . $pgtitle . '</p>';
 			<tr>
 				<td width="22%" valign="top" class="vncell2"><span>Alerts file descriptiontype</span></td>
 				<td width="78%" class="vtable">
-				<select name="snortalertlogtype" class="formfld" id="snortalertlogtype">
+				<select name="snortalertlogtype" class="formfld2" id="snortalertlogtype">
 					<?php
 						// TODO: make this option a check box with all log types
 						$alertLogTypeList = array('full' => 'FULL', 'fast' => 'SHORT');
@@ -308,7 +370,7 @@ echo '<p class="pgtitle">' . $pgtitle . '</p>';
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell2">
-				<form id="iform2" action="./snort_json_post.php" method="post">
+				<form id="iform2" >
 				<input name="Reset" type="submit" class="formbtn" value="Reset" onclick="return confirm('Do you really want to remove all your settings ? All Snort Settings will be reset !')" >
 				<input type="hidden" name="reset_snortgeneralsettings" value="1" />
 				<span class="vexpl red"><strong>&nbsp;WARNING:</strong><br> This will reset all global and interface settings.</span>

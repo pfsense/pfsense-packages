@@ -34,6 +34,8 @@ require_once('guiconfig.inc');
 require_once('/usr/local/pkg/snort/snort_new.inc');
 require_once('/usr/local/pkg/snort/snort_gui.inc');
 
+//$GLOBALS['csrf']['rewrite-js'] = false;
+
 $uuid = $_GET['uuid'];
 if (isset($_POST['uuid']))
 $uuid = $_POST['uuid'];
@@ -43,7 +45,7 @@ if ($uuid == '') {
 	exit(0);
 }
 
-$a_list = snortSql_fetchAllSettings('SnortWhitelist', 'uuid', $uuid);
+$a_list = snortSql_fetchAllSettings('snortDB', 'SnortWhitelist', 'uuid', $uuid);
 
 // $a_list returns empty use defaults
 if ($a_list == '')
@@ -94,79 +96,6 @@ $vpnips_on = ($vpnips_chk == 'on' ? 'checked' : '');
 	
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-<script type="text/javascript">
-
-  // set the page resets watchThis
-  function resetSnortDefaults(general0) {
-
-    jQuery("#name").val(general0.filename);
-    jQuery("#descr").val(general0.description);
-    jQuery("#snortlisttype").val(general0.snortlisttype);
-    
-    if (general0.wanips == 'on') {
-      jQuery("#wanips").attr("checked", "checked");
-    }else{
-      jQuery("#wanips").removeAttr('checked');
-    }
-    
-    if (general0.wangateips == 'on') {
-      jQuery("#wangateips").attr("checked", "checked");
-    }else{
-      jQuery("#wangateips").removeAttr('checked');
-    }    
-
-    if (general0.wandnsips == 'on') {
-      jQuery("#wandnsips").attr("checked", "checked");
-    }else{
-      jQuery("#wandnsips").removeAttr('checked');
-    }    
-
-    if (general0.vips == 'on') {
-      jQuery("#vips").attr("checked", "checked");
-    }else{
-      jQuery("#vips").removeAttr('checked');
-    } 
-    
-    if (general0.vpnips == 'on') {
-      jQuery("#vpnips").attr("checked", "checked");
-    }else{
-      jQuery("#vpnips").removeAttr('checked');
-    }   
-    
-  }
-  
-  function resetSnortDefaultsList1(list1) {
-    
-    jQuery('.icon_xrow').remove();
-    
-    var rowNumCount = 0;
-    
-    jQuery.each(list1, function() {
-    
-      //alert(this.ip);
-      
-      jQuery('#listloopblock').append(
-          "\n" + "<tr id=\"rowlist_" + rowNumCount + '" ' + 'class="icon_xrow" ' + "data-options='{\"rowuuid\":\"" + this.uuid + "\"}'>" + "\n" +
-          '<td>' + "\n" +
-          '<input class="formfld" name="list[' + rowNumCount + '][ip]" type="text" id="address" size="30" value="' + this.ip + '" />' + "\n" +
-          '</td>' + "\n" + 
-          '<td>' + "\n" + 
-          '<input class="formfld" name="list[' + rowNumCount + '][description]" type="text" id="detail" size="50" value="' + this.description + '" />' + "\n" +
-          '</td>' + "\n" + 
-          '<td>' + "\n" + 
-          '<img id="icon_x_' + rowNumCount + '" class="icon_click icon_x" src="/themes/nervecenter/images/icons/icon_x.gif" width="17" height="17" border="0" title="delete list" >' + "\n" + 
-          '</td>' + "\n" + 
-          '<input name="list[' + rowNumCount + '][uuid]" value="' + this.uuid + '" type="hidden">' + "\n" + 
-          '</tr>' + "\n"
-      );
-      
-     rowNumCount++;       
-      
-    });
-  
-  }  
-  
-</script>
 
 <div id="loadingWaiting">
   <p class="loadingWaitingMessage"><img src="/snort/images/loading.gif" /> <br>Please Wait...</p>
@@ -183,11 +112,7 @@ $vpnips_on = ($vpnips_chk == 'on' ? 'checked' : '');
 <div class="body2"><!-- hack to fix the hardcoed fbegin link in header -->
 <div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
 
-<? //if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
-echo '<p class="pgtitle">' . $pgtitle . '</p>';
-?>
-
-<form id="iform" action="./snort_json_post.php" method="post">
+<form id="iform">
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
@@ -231,14 +156,14 @@ echo '<p class="pgtitle">' . $pgtitle . '</p>';
 			<tr id="filename" data-options='{"filename":"<?=$listFilename; ?>"}' >
 				<td valign="top" class="vncellreq2">Name</td>
 				<td class="vtable">
-				<input class="formfld" name="filename" type="text" id="name" size="40" value="<?=$listFilename; ?>" /> <br />
+				<input class="formfld2" name="filename" type="text" id="name" size="40" value="<?=$listFilename; ?>" /> <br />
 				<span class="vexpl"> The list name may only consist of the characters a-z, A-Z and 0-9. <span class="red">Note: </span> No Spaces. </span>
 				</td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Description</td>
 				<td width="78%" class="vtable">
-				<input class="formfld" name="description" type="text" id="descr" size="40" value="<?=$a_list['description']; ?>" /> <br />
+				<input class="formfld2" name="description" type="text" id="descr" size="40" value="<?=$a_list['description']; ?>" /> <br />
 				<span class="vexpl"> You may enter a description here for your reference (not parsed). </span>
 				</td>
 			</tr>
@@ -249,7 +174,7 @@ echo '<p class="pgtitle">' . $pgtitle . '</p>';
 				<strong>WHITELIST:</strong>&nbsp;&nbsp;&nbsp;This list specifies addresses that Snort Package should not block.<br><br>
 				<strong>NETLIST:</strong>&nbsp;&nbsp;&nbsp;This list is for defining addresses as $HOME_NET or $EXTERNAL_NET in the snort.conf file.
 				</div>
-				<select name="snortlisttype" class="formfld" id="snortlisttype">
+				<select name="snortlisttype" class="formfld2" id="snortlisttype">
 				<?php
 				$updateDaysList = array('whitelist' => 'WHITELIST', 'netlist' => 'NETLIST'); 
 				snortDropDownList($updateDaysList, $a_list['snortlisttype']); 
@@ -304,7 +229,7 @@ echo '<p class="pgtitle">' . $pgtitle . '</p>';
 				<div id="addressnetworkport">IP or CIDR items</div>
 				</td>
 				<td width="78%" class="vtable">
-				<table id="maintable" data-options='{"pagetable":"SnortWhitelistips"}' > <!-- table name in db -->
+				<table >
 					<tbody class="insertrow">
 						<tr>
 							<td colspan="4">
@@ -319,22 +244,22 @@ echo '<p class="pgtitle">' . $pgtitle . '</p>';
 							<div id="onecolumn" style="width:175px;"><span class="vexpl">IP or CIDR</span></div>
 							</td>
 							<td>
-							<div id="threecolumn"><span class="vexpl">Add a Description or leave blank and a date will be added.</span></div>
+   							<div id="threecolumn"><span class="vexpl">Add a Description or leave blank and a date will be added.</span></div>
 							</td>
 						</tr>
 						</tbody>
 						<!-- Start of js loop -->
 						<tbody id="listloopblock" class="insertrow">
 						<?php echo "\r"; $i = 0; foreach ($a_list['list'] as $list): ?>
-						<tr id="rowlist_<?=$i;?>" class="icon_xrow" data-options='{"rowuuid":"<?=$list['uuid'];?>"}'>
+						<tr id="maintable_<?=$list['uuid']?>" data-options='{"pagetable":"SnortWhitelist", "pagedb":"snortDB", "DoPOST":"false"}' >
 							<td>
-							<input class="formfld" name="list[<?=$i; ?>][ip]" type="text" id="address" size="30" value="<?=$list['ip']; ?>" />
+							<input class="formfld2" name="list[<?=$i; ?>][ip]" type="text" id="address" size="30" value="<?=$list['ip']; ?>" />
 							</td>
 							<td>
-							<input class="formfld" name="list[<?=$i; ?>][description]" type="text" id="detail" size="50" value="<?=$list['description'] ?>" />
+							<input class="formfld2" name="list[<?=$i; ?>][description]" type="text" id="detail" size="50" value="<?=$list['description'] ?>" />
 							</td>
 							<td>
-							<img id="icon_x_<?=$i;?>" class="icon_click icon_x" src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="delete list" >
+							<img id="icon_x_<?=$list['uuid'];?>" class="icon_click icon_x" src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="delete list" >
 							</td>
 							<input name="list[<?=$i; ?>][uuid]" type="hidden" value="<?=$list['uuid'];?>" />
 						</tr>

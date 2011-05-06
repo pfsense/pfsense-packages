@@ -162,12 +162,6 @@ jQuery(document).ready(function() {
 <div class="body2"><!-- hack to fix the hardcoed fbegin link in header -->
 <div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
 
-<? //if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
-echo '<p class="pgtitle">' . $pgtitle . '</p>';
-?>
-
-
-
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td class="tabnavtbl">

@@ -1,8 +1,10 @@
 @charset "utf-8";
 
+/*
 a {
 	font-size: 11px;		
 }
+*/
 
 .hiddendownloadlink {
 	visibility:hidden;	
@@ -29,8 +31,50 @@ a {
   z-index: 9999;
   text-align: center;
 	
-}	
+}
 
+.listhdrr2 {
+	background-color: #BBBBBB;
+	padding-right: 13px;
+	padding-left: 6px;
+	font-weight: bold;
+	border-right: 1px solid #999999;
+	border-bottom: 1px solid #999999;
+	font-size: 11px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.listtopic2 {
+	border-bottom: 1px solid #999999;
+	font-size: 11px;
+	background-color: #eeeeee;
+	padding-right: 16px;
+	padding-left: 6px;
+	color: #000000;
+	font-weight: bold;
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.listtopic3 {
+	border-bottom: 1px solid #999999;
+	font-size: 11px;
+	background-color: #eeeeee;
+	padding-right: 6px;
+	padding-left: 16px;
+	color: #000000;
+	font-weight: bold;
+}
+
+#footer2 {
+	background-color: transparent;
+	background-image: url("/snort/images/logo22.png");
+	width: 720px;
+	height: 60px;
+	text-align: center;
+	font-size: 0.8em;	
+}
 
 .alert {
 position:absolute;
@@ -106,10 +150,22 @@ padding-bottom: 12px;
 
 .vncell2 {
 	background-color: #eeeeee;
-	padding-right: 20px;
+	padding-right: 10px;
 	padding-left: 8px;
 	border-bottom: 1px solid #999999;
 	font-size: 11px;
+}
+
+.vncelltextbox {
+background-color: #eeeeee;
+padding-top: 8px;
+padding-bottom: 8px;
+padding-right: 8px;
+padding-left: 8px;
+border-bottom-width: 1px;
+border-bottom-style: solid;
+border-bottom-color: #999999;
+font-size: 11px;
 }
 
 /* global tab, white lil box */
@@ -310,4 +366,31 @@ tr.hide {
 
 background-color: #ddd;	
 	
-}	
+}
+
+.formfld2
+{
+padding-left: 8px;
+font-size: small;
+}
+
+/*********Input Highlight*****************/
+
+.formfld2 {
+    outline:none;
+    transition: all 0.25s ease-in-out;
+    -webkit-transition: all 0.25s ease-in-out;
+    -moz-transition: all 0.25s ease-in-out;
+    border-radius:1px;
+    -webkit-border-radius:1px;
+    -moz-border-radius:1px;
+    border:1px solid rgba(0,0,0, 0.2);
+}
+
+.formfld2:focus {
+    box-shadow: 0 0 2px rgba(156, 156, 156, 1);
+    -webkit-box-shadow: 0 0 2px rgba(156, 156, 156, 1); 
+    -moz-box-shadow: 0 0 2px rgba(156, 156, 156, 1);
+    border:1px solid rgba(156,156,156, 0.8); 
+}
+
