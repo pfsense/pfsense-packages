@@ -162,7 +162,8 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	$cipher = $settings['crypto'];
 
 	// add basic settings
-	$conf  = "dev tun\n";
+	$devmode = empty($settings['dev_mode']) ? "tun" : $settings['dev_mode'];
+	$conf  = "dev {$devmode}\n";
 	if(! empty($settings['tunnel_networkv6'])) {
 		$conf .= "tun-ipv6\n";
 	}
