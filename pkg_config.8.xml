@@ -222,12 +222,11 @@
 		<descr>Trivial File Transport Protocol is a very simple file transfer protocol. Often used with routers, voip phones and more.</descr>
 		<category>Services</category>
 		<pkginfolink/>
-		<config_file>http://www.pfsense.com/packages/config/tftp/tftp.xml</config_file>
+		<config_file>http://www.pfsense.com/packages/config/tftp2/tftp.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<version>1.0.5</version>
+		<version>2.0</version>
 		<status>Stable</status>
-		<required_version>1.2.1</required_version>
-		<maintainer>markjcrane@gmail.com</maintainer>
+		<required_version>2.0</required_version>
 		<configurationfile>tftp.xml</configurationfile>
 	</package>
 	<package>
