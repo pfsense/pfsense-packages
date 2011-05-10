@@ -130,8 +130,9 @@ $brefresh_on = ($generalSettings['brefresh'] == 'on' ? 'checked' : '');
 				<span class="vexpl">Limit entries to view. <strong>Default 500</strong>.</span>
 				
         <input type="hidden" name="snortSaveSettings" value="1" /> <!-- what to do, save -->
-        <input type="hidden" name="dbTable" value="SnortSettings" /> <!-- what db-->
-        <input type="hidden" name="ifaceTab" value="snort_alerts_blocked" /> <!-- what interface tab -->
+		<input type="hidden" name="dbName" value="snortDB" /> <!-- what db -->
+        <input type="hidden" name="dbTable" value="SnortSettings" /> <!-- what db table -->
+        <input type="hidden" name="ifaceTab" value="snort_blocked" /> <!-- what interface tab -->
 				
 				</form>
 				</td>

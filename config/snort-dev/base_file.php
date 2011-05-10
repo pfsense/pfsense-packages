@@ -45,34 +45,18 @@ if ($uuid == '') {
 	exit(0);
 }
 
-$a_list = snortSql_fetchAllSettings('snortDB', 'SnortSuppress', 'uuid', $uuid);
 
-
-// $a_list returns empty use defaults
-if ($a_list == '')
-{
-  
-  $a_list = array(
-      'id' => '',
-      'date' => date(U),
-      'uuid' => $uuid,
-      'filename' => '',
-      'description' => '',
-      'suppresspassthru' => ''
-
-  );
-  
-}
+$a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $uuid);
 
 
 
 
-	$pgtitle = 'Services: Snort: Suppression: Edit: ' . $uuid;
-	include('/usr/local/pkg/snort/snort_head.inc');
+
+	$pgtitle = "Services: Snort: Interface Edit:";
+	include("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
-		
-	
+
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <div id="loadingWaiting">
@@ -90,8 +74,6 @@ if ($a_list == '')
 <div class="body2"><!-- hack to fix the hardcoed fbegin link in header -->
 <div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
 
-<form id="iform">
-
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td>
@@ -99,12 +81,12 @@ if ($a_list == '')
 		<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
 		<ul class="newtabmenu">
 			<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
-			<li><a href="/snort/snort_interfaces_global.php"><span>Global Settings</span></a></li>
+			<li class="newtabmenu_active"><a href="/snort/snort_interfaces_global.php"><span>Global Settings</span></a></li>
 			<li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
 			<li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
 			<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
 			<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
-			<li class="newtabmenu_active"><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
+			<li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
 			<li><a href="/snort/snort_help_info.php"><span>Help</span></a></li>
 			</li>			
 		</ul>
@@ -120,65 +102,13 @@ if ($a_list == '')
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<!-- START MAIN AREA -->
 		
-		<!-- table point -->
-		<input name="snortSaveSuppresslist" type="hidden" value="1" />
-		<input name="ifaceTab" type="hidden" value="snort_interfaces_suppress_edit" />
-		<input type="hidden" name="dbName" value="snortDB" /> <!-- what db -->
-        <input type="hidden" name="dbTable" value="SnortSuppress" /> <!-- what db table -->
-		<input name="date" type="hidden" value="<?=$a_list['date'];?>" />
-		<input name="uuid" type="hidden" value="<?=$a_list['uuid'];?>" />		
-	
-		<table width="100%" border="0" cellpadding="6" cellspacing="0">
-			<tr>
-				<td colspan="2" valign="top" class="listtopic">Add the name anddescription of the file.</td>
-			</tr>
-			<tr>
-				<td valign="top" class="vncellreq2">Name</td>
-				<td class="vtable">
-				<input class="formfld2" name="filename" type="text" id="filename" size="40" value="<?=$a_list['filename'] ?>" /> <br />
-				<span class="vexpl"> The list name may only consist of the characters a-z, A-Z and 0-9. <span class="red">Note: </span> No Spaces. </span>
-				</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncell2">Description</td>
-				<td width="78%" class="vtable">
-				<input class="formfld2" name="description" type="text" id="description" size="40" value="<?=$a_list['description'] ?>" /> <br />
-				<span class="vexpl"> You may enter a description here for your reference (not parsed). </span>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2" valign="top" class="listtopic"> 
-				Examples:
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2" valign="top" class="vncell2">
-				<b>Example 1;</b> suppress gen_id 1, sig_id 1852, track by_src, ip 10.1.1.54<br>
-				<b>Example 2;</b> event_filter gen_id 1, sig_id 1851, type limit,track by_src, count 1, seconds 60<br>
-				<b>Example 3;</b> rate_filter gen_id 135, sig_id 1, track by_src, count 100, seconds 1, new_action log, timeout 10
-				</td>
-			</tr>
-		</table>
-		<table width="100%" border="0" cellpadding="0" cellspacing="0">
-			<tr>
-				<td colspan="2" valign="top" class="listtopic"> 
-				Apply suppression or filters to rules. Valid keywords are 'suppress', 'event_filter' and 'rate_filter'.
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2" valign="top" class="vncelltextbox">
-				<textarea wrap="off" name="suppresspassthru" cols="101" rows="28" id="suppresspassthru" class="formfld2"><?=base64_decode($a_list['suppresspassthru']); ?></textarea>
-				</td>
-			</tr>
-		</table>
-			<tr>
-				<td style="padding-left: 160px;">
-				<input name="Submit" type="submit" class="formbtn" value="Save">
-				<input id="cancel" type="button" class="formbtn" value="Cancel">
-				</td>
-			</tr>
-	</form>
+		<form id="iform" >
+		<input type="hidden" name="snortSaveSettings" value="1" /> <!-- what to do, save -->
+		<input type="hidden" name="dbTable" value="SnortSettings" /> <!-- what db-->
+		<input type="hidden" name="ifaceTab" value="snort_interfaces_global" /> <!-- what interface tab -->
+			
 		
+		</form>
 		<!-- STOP MAIN AREA -->
 		</table>
 		</td>

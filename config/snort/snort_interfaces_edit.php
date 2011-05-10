@@ -428,7 +428,6 @@ echo "
 	document.iform.performance.disabled = endis;
 	document.iform.blockoffenders7.disabled = endis;
 	document.iform.alertsystemlog.disabled = endis;
-	document.iform.whitelistname.disabled = endis;
 	document.iform.externallistname.disabled = endis;
 	document.iform.homelistname.disabled = endis;
 	document.iform.suppresslistname.disabled = endis;

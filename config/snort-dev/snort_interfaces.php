@@ -120,12 +120,12 @@ $a_interfaces = snortSql_fetchAllInterfaceRules('Snortrules', 'snortDBrules');
 							<td class="listt">
 								<a href="?act=toggle&id=0"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_pass.gif" width="13" height="13" border="0" title="click to toggle start/stop snortsam"></a>
 							</td>
-								<td class="listbg" onClick="fr_toggle(0)" id="frd0" ondblclick="document.location='snort_interfaces_edit.php?id=0';">DISABLED</td>
-								<td class="listr" onClick="fr_toggle(0)" id="frd0" ondblclick="document.location='snort_interfaces_edit.php?id=0';">MASTER</td>
-								<td class="listr" onClick="fr_toggle(0)" id="frd0" ondblclick="document.location='snort_interfaces_edit.php?id=0';">3526</td>
-								<td class="listr" onClick="fr_toggle(0)" id="frd0" ondblclick="document.location='snort_interfaces_edit.php?id=0';">ENABLED</td>
-								<td class="listr" onClick="fr_toggle(0)" id="frd0" ondblclick="document.location='snort_interfaces_edit.php?id=0';">DISABLED</td>
-								<td class="listbg3" onClick="fr_toggle(0)" ondblclick="document.location='snort_interfaces_edit.php?id=0';"><font color="#ffffff">Mster IPs&nbsp;</td>
+								<td class="listbg" id="frd0" ondblclick="document.location='snort_interfaces_edit.php?id=0';">DISABLED</td>
+								<td class="listr" id="frd0" ondblclick="document.location='snort_interfaces_edit.php?id=0';">MASTER</td>
+								<td class="listr" id="frd0" ondblclick="document.location='snort_interfaces_edit.php?id=0';">3526</td>
+								<td class="listr" id="frd0" ondblclick="document.location='snort_interfaces_edit.php?id=0';">ENABLED</td>
+								<td class="listr" id="frd0" ondblclick="document.location='snort_interfaces_edit.php?id=0';">DISABLED</td>
+								<td class="listbg3" ondblclick="document.location='snort_interfaces_edit.php?id=0';"><font color="#ffffff">Mster IPs&nbsp;</td>
 								<td></td>
 								<td>
 									<a href="snort_interfaces_edit.php?id=0"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif" width="17" height="17" border="0" title="edit rule"></a>
@@ -202,15 +202,15 @@ $a_interfaces = snortSql_fetchAllInterfaceRules('Snortrules', 'snortDBrules');
 									<a href=\"?act=toggle&id=0\"><img src=\"/themes/{$g['theme']}/images/icons/icon_pass.gif\" width=\"13\" height=\"13\" border=\"0\" title=\"click to toggle start/stop snort\"></a>
 	
 								</td>
-									<td class=\"listbg\" onClick=\"fr_toggle(0)\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?id={$list['uuid']}';\">{$ifaceStat}</td>
-									<td class=\"listr\" onClick=\"fr_toggle(0)\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?id={$list['uuid']}';\">{$list['interface']}</td>
-									<td class=\"listr\" onClick=\"fr_toggle(0)\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?id={$list['uuid']}';\">{$list['performance']}</td>
-									<td class=\"listr\" onClick=\"fr_toggle(0)\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?id={$list['uuid']}';\">{$blockStat}</td>
-									<td class=\"listr\" onClick=\"fr_toggle(0)\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?id={$list['uuid']}';\">{$logStat}</td>
-									<td class=\"listbg3\" onClick=\"fr_toggle(0)\" ondblclick=\"document.location='snort_interfaces_edit.php?id={$list['uuid']}';\"><font color=\"#ffffff\">{$list['descr']}</td>
+									<td class=\"listbg\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?uuid={$list['uuid']}';\">{$ifaceStat}</td>
+									<td class=\"listr\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?uuid={$list['uuid']}';\">{$list['interface']}</td>
+									<td class=\"listr\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?uuid={$list['uuid']}';\">{$list['performance']}</td>
+									<td class=\"listr\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?uuid={$list['uuid']}';\">{$blockStat}</td>
+									<td class=\"listr\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?uuid={$list['uuid']}';\">{$logStat}</td>
+									<td class=\"listbg3\" ondblclick=\"document.location='snort_interfaces_edit.php?uuid={$list['uuid']}';\"><font color=\"#ffffff\">{$list['descr']}</td>
 									<td></td>
 									<td>
-										<a href=\"snort_interfaces_edit.php?id={$list['uuid']}\"><img src=\"/themes/{$g['theme']}/images/icons/icon_e.gif\" width=\"17\" height=\"17\" border=\"0\" title=\"edit rule\"></a>
+										<a href=\"snort_interfaces_edit.php?uuid={$list['uuid']}\"><img src=\"/themes/{$g['theme']}/images/icons/icon_e.gif\" width=\"17\" height=\"17\" border=\"0\" title=\"edit rule\"></a>
 							";
 						echo '
 									</td>
@@ -243,12 +243,12 @@ $a_interfaces = snortSql_fetchAllInterfaceRules('Snortrules', 'snortDBrules');
 							echo "
 									<a href=\"?act=toggle&id=0\"><img src=\"/themes/{$g['theme']}/images/icons/icon_pass.gif\" width=\"13\" height=\"13\" border=\"0\" title=\"click to toggle start/stop barnyard2\"></a>
 								</td>
-									<td class=\"listbg\" onClick=\"fr_toggle(0)\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?id=0';\">{$barnyard2Stat}</td>
-									<td class=\"listr\" onClick=\"fr_toggle(0)\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?id=0';\">{$list['interface']}</td>
-									<td class=\"listr\" onClick=\"fr_toggle(0)\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?id=0';\">{$list['uuid']}_{$list['interface']}</td>
-									<td class=\"listr\" onClick=\"fr_toggle(0)\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?id=0';\">unified2</td>
-									<td class=\"listr\" onClick=\"fr_toggle(0)\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?id=0';\">{$barnyard2Stat}</td>
-									<td class=\"listbg3\" onClick=\"fr_toggle(0)\" ondblclick=\"document.location='snort_interfaces_edit.php?id=0';\"><font color=\"#ffffff\">Mster IPs&nbsp;</td>
+									<td class=\"listbg\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?id=0';\">{$barnyard2Stat}</td>
+									<td class=\"listr\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?id=0';\">{$list['interface']}</td>
+									<td class=\"listr\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?id=0';\">{$list['uuid']}_{$list['interface']}</td>
+									<td class=\"listr\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?id=0';\">unified2</td>
+									<td class=\"listr\" id=\"frd0\" ondblclick=\"document.location='snort_interfaces_edit.php?id=0';\">{$barnyard2Stat}</td>
+									<td class=\"listbg3\" ondblclick=\"document.location='snort_interfaces_edit.php?id=0';\"><font color=\"#ffffff\">Mster IPs&nbsp;</td>
 									<td></td>
 									<td>
 									<img id=\"icon_x_{$list['uuid']}\" class=\"icon_click icon_x\" src=\"/themes/{$g['theme']}/images/icons/icon_x.gif\" width=\"17\" height=\"17\" border=\"0\" title=\"delete rule\">

@@ -143,11 +143,12 @@ $vpnips_on = ($vpnips_chk == 'on' ? 'checked' : '');
 		<!-- START MAIN AREA -->
 		
       <!-- table point -->
-      <input name="snortSaveWhitelist" type="hidden" value="1" />
-      <input name="ifaceTab" type="hidden" value="snort_interfaces_whitelist_edit" />
-      <input name="dbTable" type="hidden" value="SnortWhitelist" />
-      <input name="date" type="hidden" value="<?=$a_list['date'];?>" />
-      <input name="uuid" type="hidden" value="<?=$a_list['uuid'];?>" />
+		<input name="snortSaveWhitelist" type="hidden" value="1" />
+		<input name="ifaceTab" type="hidden" value="snort_interfaces_whitelist_edit" />
+		<input type="hidden" name="dbName" value="snortDB" /> <!-- what db -->
+        <input type="hidden" name="dbTable" value="SnortWhitelist" /> <!-- what db table -->  
+		<input name="date" type="hidden" value="<?=$a_list['date'];?>" />
+		<input name="uuid" type="hidden" value="<?=$a_list['uuid'];?>" />
 						
 			<tr>
 				<td colspan="2" valign="top" class="listtopic">Add the name and description of the file.</td>

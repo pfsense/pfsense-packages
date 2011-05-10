@@ -78,13 +78,14 @@ function snortSql_fetchAllSettingsList($table, $listFilename)
 }
 
 // Update settings to database
-function snortSql_updateSettings($settings, $type, $id_uuid) {
+function snortSql_updateSettings($dbname, $settings, $type, $id_uuid) {
   
-  $db = '/usr/local/pkg/snort/snortDB';
+  $db = "/usr/local/pkg/snort/$dbname";
   $mydb = sqlite_open("$db");
   $table = $settings['dbTable'];
 
   // unset POSTs that are markers not in db
+  unset($settings['dbName']);
   unset($settings['dbTable']);
 
   // START add new row if not set
@@ -176,7 +177,7 @@ function snortSql_fetchAllWhitelistTypes($table, $table2)
 
 
     $result = sqlite_query($db,
-            "SELECT description, filename, uuid, id FROM {$table} where id > 0;
+            "SELECT * FROM {$table} where id > 0;
      ");
      
      $chktable = sqlite_fetch_all($result, SQLITE_ASSOC);
@@ -204,6 +205,8 @@ function snortSql_fetchAllWhitelistTypes($table, $table2)
 	        $final2['uuid'] = $value['uuid'];    
 	        $final2['filename'] = $value['filename'];
 	        $final2['description'] = $value['description'];
+	        $final2['snortlisttype'] = $value['snortlisttype'];
+	        
 	          
 	        $final2['list'] = $chktable2;   
 	        

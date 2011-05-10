@@ -153,8 +153,6 @@ jQuery(document).ready(function(){
 <div class="body2"><!-- hack to fix the hardcoed fbegin link in header -->
 <div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
 
-<form id="iform" >
-
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td>
@@ -183,8 +181,10 @@ jQuery(document).ready(function(){
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<!-- START MAIN AREA -->
 		
+		<form id="iform" >
 		<input type="hidden" name="snortSaveSettings" value="1" /> <!-- what to do, save -->
-		<input type="hidden" name="dbTable" value="SnortSettings" /> <!-- what db-->
+		<input type="hidden" name="dbName" value="snortDB" /> <!-- what db -->
+		<input type="hidden" name="dbTable" value="SnortSettings" /> <!-- what db table -->
 		<input type="hidden" name="ifaceTab" value="snort_interfaces_global" /> <!-- what interface tab -->
 			
 			<tr id="maintable" data-options='{"pagetable":"SnortSettings"}'> <!-- db to lookup -->
@@ -365,23 +365,22 @@ jQuery(document).ready(function(){
 				<td width="30%" class="vtable">
 				<input name="Submit" type="submit" class="formbtn" value="Save">
 				<input id="cancel" type="button" class="formbtn" value="Cancel">
-				</form>
 				</td>
 			</tr>
+			</form>
+			<form id="iform2" >
 			<tr>
 				<td width="22%" valign="top" class="vncell2">
-				<form id="iform2" >
 				<input name="Reset" type="submit" class="formbtn" value="Reset" onclick="return confirm('Do you really want to remove all your settings ? All Snort Settings will be reset !')" >
 				<input type="hidden" name="reset_snortgeneralsettings" value="1" />
 				<span class="vexpl red"><strong>&nbsp;WARNING:</strong><br> This will reset all global and interface settings.</span>
-				</form>
 				</td>
 				<td class="vtable">
 				<span class="vexpl red"><strong>Note:</strong></span><br> 
 				<span class="vexpl">Changing any settings on this page will affect all interfaces. Please, double check if your oink code is correct and the type of snort.org account you hold.</span>
 				</td>	
 			</tr>
-
+			</form>
 		
 		<!-- STOP MAIN AREA -->
 		</table>

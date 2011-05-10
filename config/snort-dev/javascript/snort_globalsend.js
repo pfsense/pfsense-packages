@@ -212,9 +212,17 @@ function showRequest(formData, jqForm, options) {
 function showResponse(data, responseText, statusText, xhr, $form)  { 
     
 	
-	function hideLoading() {
-	  jQuery("#loadingWaiting").hide();
+	function snortUnhideTabsCall() {
+		// unhide tabs for iface edit
+		if (data.snortUnhideTabs == 'true')
+		{
+			jQuery('.hide_newtabmenu').show();
+		}
 	};
+	
+	function hideLoading() {
+		  jQuery("#loadingWaiting").hide();
+	};	
 	
 	// START of fill call to user
 	if (responseText == 'success') {
@@ -231,20 +239,24 @@ function showResponse(data, responseText, statusText, xhr, $form)  {
 		}
 		
 		// succsess display
-		if (data.snortgeneralsettings == 'success' || data.snortdelete == 'success' || data.snortreset == 'success') {
+		if (data.snortgeneralsettings == 'success' || data.snortdelete == 'success' || data.snortreset == 'success') 
+		{
 			var appendElem = jQuery('<br> <span>success...<span>');
 			appendElem.appendTo('.loadingWaitingMessage');
 			
-			// remove display
+			// After Save Calls display
 			function finnish() {
+			snortUnhideTabsCall();
 			hideLoading();
 			appendElem.remove();
 			updatestarted = 1;
 			};			
 			setTimeout(finnish, 2000);
+			
 			if (data.snortreset) {location.reload();}; // hard refresh
 			
-		};
+		}
+		
 	
 	// END of fill call to user
 	}else{
