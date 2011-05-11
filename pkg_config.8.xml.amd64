@@ -1046,7 +1046,7 @@
 		<depends_on_package>nrpe-2.12_3.tbz</depends_on_package>
 		<depends_on_package>nagios-plugins-1.4.15_1,1.tbz</depends_on_package>
 		<build_port_path>/usr/ports/net-mgmt/nrpe2</build_port_path>
-		<build_options>WITHOUT_SSL=true WITHOUT_ARGS=true</build_options>
+		<build_options>WITH_SSL=true WITHOUT_ARGS=true</build_options>
 		<config_file>http://www.pfsense.com/packages/config/nrpe2/nrpe2.xml</config_file>
 		<version>2.12_3</version>
 		<status>Beta</status>
