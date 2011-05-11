@@ -147,7 +147,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 		if (!empty($settings['ipaddr']) && is_ipaddr($settings['ipaddr'])) {
 			$server_host = $settings['ipaddr'];
 		} else {
-			if (!$interface)
+			if (!$interface || ($interface == "any"))
 				$interface = "wan";
 			$server_host = get_interface_ip($interface);
 		}
