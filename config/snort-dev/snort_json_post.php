@@ -23,6 +23,27 @@ $snortJsonReturnCode_fail = '
 }
 ';
 
+	function snortJsonReturnCode($returnStatus)
+	{
+		
+		if ($returnStatus == true)
+		{
+			echo '
+	{
+	"snortgeneralsettings": "success", "snortUnhideTabs": "true"	
+	}
+	';		
+		}else{
+			echo '
+	{
+	"snortgeneralsettings": "fail"	
+	}
+	';		
+		}
+		
+	}
+
+
 // row from db by uuid
 if ($_POST['RMlistDelRow'] == 1)
 {
@@ -65,109 +86,143 @@ if ($_POST['RMlistDelRow'] == 1)
 // general settings save
 if ($_POST['snortSaveSettings'] == 1) 
 {
-
+	
 	// Save general settings
 	if ($_POST['dbTable'] == 'SnortSettings')
-    {
- 
-      if ($_POST['ifaceTab'] == 'snort_interfaces_global')
-      {    
-        // checkboxes when set to off never get included in POST thus this code      
-        $_POST['forcekeepsettings'] = ($_POST['forcekeepsettings'] == '' ? off : $_POST['forcekeepsettings']);
-
-      }
-      
-      if ($_POST['ifaceTab'] == 'snort_alerts') 
-      {
-        
-        if (!isset($_POST['arefresh']))
-          $_POST['arefresh'] = ($_POST['arefresh'] == '' ? off : $_POST['arefresh']);         
-          
-      }
-      
-      if ($_POST['ifaceTab'] == 'snort_blocked') 
-      {
-          
-        if (!isset($_POST['brefresh']))
-          $_POST['brefresh'] = ($_POST['brefresh'] == '' ? off : $_POST['brefresh']);          
-          
-      }
-
-      // unset POSTs that are markers not in db
-      unset($_POST['snortSaveSettings']);
-      unset($_POST['ifaceTab']);
-      
-      // update date on every save
-      $_POST['date'] = date(U);    
-          
-          
-      //print_r($_POST);
-      //return true;
-    
-      conf_mount_rw();
-      snortSql_updateSettings($_POST['dbName'], $_POST, 'id', '1');
-      conf_mount_ro();      
-      
-    } // end of dbTable SnortSettings
+	{
+		 
+		if ($_POST['ifaceTab'] == 'snort_interfaces_global')
+		{    
+			// checkboxes when set to off never get included in POST thus this code      
+			$_POST['forcekeepsettings'] = ($_POST['forcekeepsettings'] == '' ? off : $_POST['forcekeepsettings']);		
+		}
+		      
+		if ($_POST['ifaceTab'] == 'snort_alerts') 
+		{
+		        
+			if (!isset($_POST['arefresh']))
+				$_POST['arefresh'] = ($_POST['arefresh'] == '' ? off : $_POST['arefresh']);
+			       		          
+		}
+		      
+		if ($_POST['ifaceTab'] == 'snort_blocked') 
+		{
+		          
+			if (!isset($_POST['brefresh']))
+				$_POST['brefresh'] = ($_POST['brefresh'] == '' ? off : $_POST['brefresh']);          
+		          
+		}
+		
+		// unset POSTs that are markers not in db
+		unset($_POST['snortSaveSettings']);
+		unset($_POST['ifaceTab']);
+		      
+		// update date on every save
+		$_POST['date'] = date(U);              
+		          
+		//print_r($_POST);
+		//return true;
+		    
+		conf_mount_rw();
+		snortSql_updateSettings($_POST['dbName'], $_POST, 'id', '1');
+		conf_mount_ro();
+		
+		echo '
+		{
+		"snortgeneralsettings": "success"	
+		}
+		';
+		return true;		
+	      
+	} // end of dbTable SnortSettings
 
     // Save rules settings
 	if ($_POST['dbTable'] == 'Snortrules')
     {
-
-	if ($_POST['ifaceTab'] == 'snort_interfaces_edit') 
-	{
-	        
-		if (!isset($_POST['enable']))
-		 	$_POST['enable'] = ($_POST['enable'] == '' ? off : $_POST['enable']);
+    	
+	    // snort interface edit
+		if ($_POST['ifaceTab'] == 'snort_interfaces_edit') 
+		{
+		        
+			if (!isset($_POST['enable']))
+			 	$_POST['enable'] = ($_POST['enable'] == '' ? off : $_POST['enable']);
+			          
+			if (!isset($_POST['blockoffenders7']))
+				$_POST['blockoffenders7'] = ($_POST['blockoffenders7'] == '' ? off : $_POST['blockoffenders7']);
+	
+			if (!isset($_POST['alertsystemlog']))
+				$_POST['alertsystemlog'] = ($_POST['alertsystemlog'] == '' ? off : $_POST['alertsystemlog']);  
+	
+			if (!isset($_POST['tcpdumplog']))
+				$_POST['tcpdumplog'] = ($_POST['tcpdumplog'] == '' ? off : $_POST['tcpdumplog']); 
+	
+			if (!isset($_POST['snortunifiedlog']))
+				$_POST['snortunifiedlog'] = ($_POST['snortunifiedlog'] == '' ? off : $_POST['snortunifiedlog']);
+				
+			// convert textbox to base64
+			$_POST['configpassthru'] = base64_encode($_POST['configpassthru']);
 		          
-		if (!isset($_POST['blockoffenders7']))
-			$_POST['blockoffenders7'] = ($_POST['blockoffenders7'] == '' ? off : $_POST['blockoffenders7']);
+		}		
+		
+		// snort preprocessor edit
+		if ($_POST['ifaceTab'] == 'snort_preprocessors') 
+		{
 
-		if (!isset($_POST['alertsystemlog']))
-			$_POST['alertsystemlog'] = ($_POST['alertsystemlog'] == '' ? off : $_POST['alertsystemlog']);  
-
-		if (!isset($_POST['tcpdumplog']))
-			$_POST['tcpdumplog'] = ($_POST['tcpdumplog'] == '' ? off : $_POST['tcpdumplog']); 
-
-		if (!isset($_POST['snortunifiedlog']))
-			$_POST['snortunifiedlog'] = ($_POST['snortunifiedlog'] == '' ? off : $_POST['snortunifiedlog']);
+			if (!isset($_POST['dce_rpc_2']))
+			 	$_POST['dce_rpc_2'] = ($_POST['dce_rpc_2'] == '' ? off : $_POST['dce_rpc_2']);
+			 	
+			if (!isset($_POST['dns_preprocessor']))
+			 	$_POST['dns_preprocessor'] = ($_POST['dns_preprocessor'] == '' ? off : $_POST['dns_preprocessor']);
+			 	
+			if (!isset($_POST['ftp_preprocessor']))
+			 	$_POST['ftp_preprocessor'] = ($_POST['ftp_preprocessor'] == '' ? off : $_POST['ftp_preprocessor']);
+			 	
+			if (!isset($_POST['http_inspect']))
+			 	$_POST['http_inspect'] = ($_POST['http_inspect'] == '' ? off : $_POST['http_inspect']);
+			 	
+			if (!isset($_POST['other_preprocs']))
+			 	$_POST['other_preprocs'] = ($_POST['other_preprocs'] == '' ? off : $_POST['other_preprocs']);
+			 	
+			if (!isset($_POST['perform_stat']))
+			 	$_POST['perform_stat'] = ($_POST['perform_stat'] == '' ? off : $_POST['perform_stat']);
+			 	
+			if (!isset($_POST['sf_portscan']))
+			 	$_POST['sf_portscan'] = ($_POST['sf_portscan'] == '' ? off : $_POST['sf_portscan']);
+			 	
+			if (!isset($_POST['smtp_preprocessor']))
+			 	$_POST['smtp_preprocessor'] = ($_POST['smtp_preprocessor'] == '' ? off : $_POST['smtp_preprocessor']);			
 			
-		// convert textbox to base64
-		$_POST['configpassthru'] = base64_encode($_POST['configpassthru']);
+		}
+
+		// snort barnyard edit
+		if ($_POST['ifaceTab'] == 'snort_barnyard') 
+		{
+			// make shure iface is lower case
+			$_POST['interface'] = strtolower($_POST['interface']);
+			
+			if (!isset($_POST['barnyard_enable']))
+			 	$_POST['barnyard_enable'] = ($_POST['barnyard_enable'] == '' ? off : $_POST['barnyard_enable']);	
+			
+		}
+		
+		
+	      // unset POSTs that are markers not in db
+	      unset($_POST['snortSaveSettings']);
+	      unset($_POST['ifaceTab']);
+	      
+	      // update date on every save
+	      $_POST['date'] = date(U);    
 	          
-	}	
-	
-    // unhide tabs Json
-    if ($_POST['ifaceTab'] == 'snort_interfaces_edit')
-    {
-    	$snortUnhideTabs = ', "snortUnhideTabs": "true"';
-    }
-	
-      // unset POSTs that are markers not in db
-      unset($_POST['snortSaveSettings']);
-      unset($_POST['ifaceTab']);
-      
-      // update date on every save
-      $_POST['date'] = date(U);    
-          
-          
-      //print_r($_POST);
-      //return true;
-    
-      conf_mount_rw();
-      snortSql_updateSettings($_POST['dbName'], $_POST, 'uuid', $_POST['uuid']);
-      conf_mount_ro();      
+	          
+	      //print_r($_POST);
+	      //return true;
+	      
+	      snortJsonReturnCode(snortSql_updateSettings($_POST['dbName'], $_POST, 'uuid', $_POST['uuid']));	      
       
     } // end of dbTable Snortrules
-    
-		echo '
-		{
-		"snortgeneralsettings": "success"' . $snortUnhideTabs . '	
-		}
-		';
-		return true;
-	
-}
+    		
+			
+} // STOP General Settings Save
 
 // Suppress settings save
 if ($_POST['snortSaveSuppresslist'] == 1) 

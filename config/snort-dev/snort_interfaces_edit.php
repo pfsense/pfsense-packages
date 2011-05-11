@@ -418,8 +418,8 @@ jQuery(document).ready(function() {
 				<td width="22%" valign="top"></td>
 				<td width="78%">
 					<input name="Submit" type="submit" class="formbtn" value="Save">
-					<input name="Submit2" type="submit" class="formbtn" value="Start" onClick="enable_change(true)"> 
-					<input type="button" class="formbtn" value="Cancel" onclick="history.back()">
+					<input name="Submit2" type="submit" class="formbtn" value="Start"> 
+					<input id="cancel" type="button" class="formbtn" value="Cancel">
 					<input name="uuid" type="hidden" value="<?=$uuid; ?>" > 
 				</td>
 			</tr>

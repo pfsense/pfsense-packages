@@ -80,15 +80,13 @@ $a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $uuid)
 
 		<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
 		<ul class="newtabmenu">
-			<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
-			<li class="newtabmenu_active"><a href="/snort/snort_interfaces_global.php"><span>Global Settings</span></a></li>
-			<li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
-			<li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
-			<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
-			<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
-			<li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
-			<li><a href="/snort/snort_help_info.php"><span>Help</span></a></li>
-			</li>			
+				<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
+				<li class="newtabmenu_active"><a href="/snort/snort_interfaces_edit.php?uuid=<?=$uuid;?>"><span>If Settings</span></a></li>
+				<li><a href="/snort/snort_rulesets.php?uuid=<?=$uuid;?>"><span>Categories</span></a></li>
+				<li><a href="/snort/snort_rules.php?uuid=<?=$uuid;?>"><span>Rules</span></a></li>
+				<li><a href="/snort/snort_define_servers.php?uuid=<?=$uuid;?>"><span>Servers</span></a></li>
+				<li><a href="/snort/snort_preprocessors.php?uuid=<?=$uuid;?>"><span>Preprocessors</span></a></li>
+				<li><a href="/snort/snort_barnyard.php?uuid=<?=$uuid;?>"><span>Barnyard2</span></a></li>			
 		</ul>
 		</div>
 
@@ -104,8 +102,11 @@ $a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $uuid)
 		
 		<form id="iform" >
 		<input type="hidden" name="snortSaveSettings" value="1" /> <!-- what to do, save -->
-		<input type="hidden" name="dbTable" value="SnortSettings" /> <!-- what db-->
-		<input type="hidden" name="ifaceTab" value="snort_interfaces_global" /> <!-- what interface tab -->
+		<input type="hidden" name="dbName" value="snortDBrules" /> <!-- what db-->
+		<input type="hidden" name="dbTable" value="Snortrules" /> <!-- what db table-->
+		<input type="hidden" name="ifaceTab" value="snort_interfaces_edit" /> <!-- what interface tab -->
+
+
 			
 		
 		</form>
