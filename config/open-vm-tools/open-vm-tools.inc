@@ -9,7 +9,7 @@ function open_vm_tools_install() {
 	if(!file_exists("/boot/loader.conf")) 
 		touch("/boot/loader.conf");
 	$load_conf = file_get_contents("/boot/loader.conf");
-	if(!strstr("vmxnet")) {
+	if(!strstr($load_conf, "vmxnet")) {
 		$load_conf .= <<<EOFA 
 vmblock_load="YES"
 vmmemct_load="YES"
