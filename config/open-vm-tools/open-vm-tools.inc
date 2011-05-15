@@ -10,13 +10,16 @@ function open_vm_tools_install() {
 		touch("/boot/loader.conf");
 	$load_conf = file_get_contents("/boot/loader.conf");
 	if(!strstr($load_conf, "vmxnet")) {
-		$load_conf .= <<<EOFA 
+		$load_conf .= <<<EOFA
 vmblock_load="YES"
 vmmemct_load="YES"
 vmhgfs_load="YES"
 vmxnet_load="YES"
+
 EOFA;
+
 	file_put_contents("/boot/loader.conf", $load_conf);
+}
 
 	$vmware_guestd = <<<EOF
 #!/bin/sh
