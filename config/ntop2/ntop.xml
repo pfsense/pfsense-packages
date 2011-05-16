@@ -3,39 +3,40 @@
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
 	<copyright>
-        <![CDATA[
+	<![CDATA[
 /* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
-    part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2008 Scott Ullrich
-    All rights reserved.                                                                              */
+	authng.xml
+	part of pfSense (http://www.pfSense.com)
+	Copyright (C) 2008 Scott Ullrich
+	All rights reserved.
+*/
 /* ========================================================================== */
 /*
-    Redistribution and use in source and binary forms, with or without
-    modification, are permitted provided that the following conditions are met:
+	Redistribution and use in source and binary forms, with or without
+	modification, are permitted provided that the following conditions are met:
 
-     1. Redistributions of source code must retain the above copyright notice,
-        this list of conditions and the following disclaimer.
+	 1. Redistributions of source code must retain the above copyright notice,
+		this list of conditions and the following disclaimer.
 
-     2. Redistributions in binary form must reproduce the above copyright
-        notice, this list of conditions and the following disclaimer in the
-        documentation and/or other materials provided with the distribution.
+	 2. Redistributions in binary form must reproduce the above copyright
+		notice, this list of conditions and the following disclaimer in the
+		documentation and/or other materials provided with the distribution.
 
-    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-    POSSIBILITY OF SUCH DAMAGE.
-                                                                              */
+	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+	POSSIBILITY OF SUCH DAMAGE.
+*/
 /* ========================================================================== */
-        ]]>
+	]]>
 	</copyright>
 	<name>ntop</name>
 	<version>3.0</version>
@@ -91,51 +92,57 @@
 			<value>lan</value>
 			<multiple>true</multiple>
 		</field>
-    </fields>
+	</fields>
 	<custom_php_global_functions>
+	<![CDATA[
 	function sync_package_ntop() {
-	    conf_mount_rw();
-	    config_lock();
-	    global $config;
-	    global $input_errors;
-	    $ntop_config =&amp; $_POST;
-	    $if_final = "";
-	    $ifaces_final = "";
-	    system("/bin/mkdir -p /var/db/ntop");
-	    system("/bin/mkdir -p /var/db/ntop/rrd");
-	    system("/bin/mkdir -p /var/db/ntop/rrd/graphics");
-	    system("/bin/chmod -R 755 /var/db/ntop");
-	    system("/usr/sbin/chown -R nobody:nobody /var/db/ntop");
-	    if($ntop_config['password'] and $ntop_config['passwordagain']) {
-		    if($ntop_config['password'] == $ntop_config['passwordagain']) {
-			    $first = 0;
-			    foreach($_POST['interface_array'] as $iface) {
+		conf_mount_rw();
+		config_lock();
+		global $config;
+		global $input_errors;
+		if ($_POST) {
+			$config['installedpackages']['ntop']['config'] = array();
+			$config['installedpackages']['ntop']['config'][0] = $_POST;
+		}
+		$ntop_config =& $config['installedpackages']['ntop']['config'][0];
+		$if_final = "";
+		$ifaces_final = "";
+		system("/bin/mkdir -p /var/db/ntop");
+		system("/bin/mkdir -p /var/db/ntop/rrd");
+		system("/bin/mkdir -p /var/db/ntop/rrd/graphics");
+		system("/bin/chmod -R 755 /var/db/ntop");
+		system("/usr/sbin/chown -R nobody:nobody /var/db/ntop");
+		if($ntop_config['password'] and $ntop_config['passwordagain']) {
+			if($ntop_config['password'] == $ntop_config['passwordagain']) {
+				$first = 0;
+				foreach($_POST['interface_array'] as $iface) {
 				$if = convert_friendly_interface_to_real_interface_name($iface);
 				if($if) {
-				    if($first == 1)
+					if($first == 1)
 					$ifaces_final .= ",";
-				    $ifaces_final .= $if;
-				    $first = 1;
+					$ifaces_final .= $if;
+					$first = 1;
 				}
-			    }
-			    exec("/usr/local/bin/ntop --set-admin-password=" . $_POST['password'] . " &amp;", $ntopout);
-			    $start = "/usr/local/bin/ntop -i " . $ifaces_final . " -u root -d --ipv4 -M -x 8102 -X 8192 &amp;";
-			    write_rcfile(array(
-						    "file" => "ntop.sh",
-						    "start" => $start,
-						    "stop" => "/usr/bin/killall ntop"
-					    )
-			    );
-			    restart_service("ntop");
-		    } else {
-			    $input_errors[] = "The provided passwords did not match.";
-		    }
-	    } else {
-		    $input_errors[] = "You must provide (and confirm) ntop's password.";
-	    }
-	    conf_mount_ro();
-	    config_unlock();
+				}
+				exec("/usr/local/bin/ntop --set-admin-password=" . $_POST['password'] . " &", $ntopout);
+				$start = "/usr/local/bin/ntop -i " . $ifaces_final . " -u root -d --ipv4 -M -x 8102 -X 8192 &";
+				write_rcfile(array(
+							"file" => "ntop.sh",
+							"start" => $start,
+							"stop" => "/usr/bin/killall ntop"
+						)
+				);
+				restart_service("ntop");
+			} else {
+				$input_errors[] = "The provided passwords did not match.";
+			}
+		} else {
+			$input_errors[] = "You must provide (and confirm) ntop's password.";
+		}
+		conf_mount_ro();
+		config_unlock();
 	}
+	]]>
 	</custom_php_global_functions>
 	<custom_add_php_command>
 		sync_package_ntop();
