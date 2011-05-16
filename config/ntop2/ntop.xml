@@ -115,7 +115,7 @@
 		if($ntop_config['password'] and $ntop_config['passwordagain']) {
 			if($ntop_config['password'] == $ntop_config['passwordagain']) {
 				$first = 0;
-				foreach($_POST['interface_array'] as $iface) {
+				foreach($ntop_config['interface_array'] as $iface) {
 				$if = convert_friendly_interface_to_real_interface_name($iface);
 				if($if) {
 					if($first == 1)
@@ -124,7 +124,7 @@
 					$first = 1;
 				}
 				}
-				exec("/usr/local/bin/ntop --set-admin-password=" . $_POST['password'] . " &", $ntopout);
+				exec("/usr/local/bin/ntop --set-admin-password=" . $ntop_config['password'] . " &", $ntopout);
 				$start = "/usr/local/bin/ntop -i " . $ifaces_final . " -u root -d --ipv4 -M -x 8102 -X 8192 &";
 				write_rcfile(array(
 							"file" => "ntop.sh",
