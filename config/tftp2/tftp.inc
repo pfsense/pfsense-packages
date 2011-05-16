@@ -115,6 +115,7 @@ function tftp_deinstall_command() {
 }
 
 function tftp_generate_rules($type) {
+	global $config, $FilterIflist;
 	if ($type != "nat")
 		return;
 	// Open inetd.conf write handle
@@ -122,5 +123,17 @@ function tftp_generate_rules($type) {
 	/* add tftp daemon */
 	fwrite($inetd_fd, "tftp\t\tdgram\tudp\twait\t\troot\t/usr/libexec/tftpd\ttftpd /tftpboot\n");
 	fclose($inetd_fd);		// Close file handle
+
+	if (!empty($config['installedpackages']['tftpd']['config'][0]['tftpdinterface'])) {
+		$tftpifs = explode(",", $config['installedpackages']['tftpd']['config'][0]['tftpdinterface']);
+		foreach($tftpifs as $tftpif) {
+			if ($FilterIflist[$tftpif]) {
+				log_error("Adding TFTP nat rules");
+				$natrules .= "rdr pass on {$FilterIflist[$tftpif]['if']} proto udp from any to {$FilterIflist[$tftpif]['ip']} port 69 -> 127.0.0.1 port 69\n";
+				$natrules .= "nat on {$FilterIflist[$tftpif]['if']} from 127.0.0.1 to any -> {$FilterIflist[$tftpif]['ip']} port 1024:65535 \n";
+			}
+		}
+	}
+	return $natrules;
 }
 ?>
