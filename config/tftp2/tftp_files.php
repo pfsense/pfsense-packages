@@ -120,7 +120,7 @@ if ($savemsg) {
 <?php
 			
 	$tab_array = array();
-	$tab_array[] = array(gettext("Files"), false, "/packages/tftp/tftp_files.php");
+	$tab_array[] = array(gettext("Files"), false, "tftp_files.php");
  	display_top_tabs($tab_array);
  	
 ?>
@@ -178,9 +178,9 @@ if ($savemsg) {
 	echo "<br /><br />\n";
 	echo "</td>\n";
 	echo "<td width='20%' valign='middle' align='right'>\n";
-	echo "  <input type='button' value='backup' onclick=\"document.location.href='/packages/tftp/tftp_files.php?a=download&t=backup';\" />\n";
+	echo "  <input type='button' value='backup' onclick=\"document.location.href='tftp_files.php?a=download&t=backup';\" />\n";
 	if (file_exists('/root/backup/tftp.bak.tgz')) {
-	  echo "  <input type='button' value='restore' onclick=\"document.location.href='/packages/tftp/tftp_files.php?a=other&t=restore';\" />\n";
+	  echo "  <input type='button' value='restore' onclick=\"document.location.href='tftp_files.php?a=other&t=restore';\" />\n";
 	}
 	echo "</td>\n";
 	echo "</tr>\n";
