@@ -4,7 +4,7 @@
 	squid.inc
 	Copyright (C) 2006-2009 Scott Ullrich
 	Copyright (C) 2006 Fernando Lemos
-	Copyright (C) 2008 Martin Fuchs	
+	Copyright (C) 2008 Martin Fuchs
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ require_once('pfsense-utils.inc');
 require_once('pkg-utils.inc');
 require_once('service-utils.inc');
 
-if(!function_exists("filter_configure")) 
+if(!function_exists("filter_configure"))
 	require_once("filter.inc");
 
 define('SQUID_CONFBASE', '/usr/local/etc/squid');
@@ -188,9 +188,9 @@ function squid_install_command() {
 			$config['installedpackages']['squidnac']['config'][0]['blacklist'] = $settingsnac['blacklist'];
 		}
 	}
-	
+
 	update_status("Writing configuration... One moment please...");
-	
+
 	write_config();
 
 	/* create cache */
@@ -347,7 +347,7 @@ function squid_validate_general($post, $input_errors) {
 	if (($post['transparent_proxy'] != 'on') && ($post['private_subnet_proxy_off'] == 'on')) {
 		$input_errors[] = "You can not bypass traffic to private subnets  without using the transparent proxy.";
 	}
-	
+
 	if (($post['transparent_proxy'] != 'on') && !empty($post['defined_ip_proxy_off'])) {
 		$input_errors[] = "You can not bypass traffic from specific IPs without using the transparent proxy.";
 	}
@@ -421,10 +421,10 @@ function squid_validate_cache($post, $input_errors) {
 	  $input_errors[] = 'You must enter a valid value for \'Low-water-mark\'';
 	}
 
-  if (!empty($post['cache_swap_high'])) {		
+  if (!empty($post['cache_swap_high'])) {
 	 $value = trim($post['cache_swap_high']);
 	 if (!is_numeric($value) || ($value > 100))
-		$input_errors[] = 'You must enter a valid value for \'High-water-mark\'';		
+		$input_errors[] = 'You must enter a valid value for \'High-water-mark\'';
   }
 
 	if ($post['donotcache'] != "") {
@@ -489,23 +489,23 @@ function squid_validate_traffic($post, $input_errors) {
 			$input_errors[] = "The field '$name' must contain a positive number";
 	}
 
-  if (!empty($post['quick_abort_min'])) {		
+  if (!empty($post['quick_abort_min'])) {
 	 $value = trim($post['quick_abort_min']);
      if (!is_numeric($value))
-	   $input_errors[] = "The field 'Finish when remaining KB' must contain a positive number";	
-  }	
-  
-  if (!empty($post['quick_abort_max'])) {		
+	   $input_errors[] = "The field 'Finish when remaining KB' must contain a positive number";
+  }
+
+  if (!empty($post['quick_abort_max'])) {
 	 $value = trim($post['quick_abort_max']);
      if (!is_numeric($value))
-	   $input_errors[] = "The field 'Abort when remaining KB' must contain a positive number";	
-  }	
-		
-  if (!empty($post['quick_abort_pct'])) {		
+	   $input_errors[] = "The field 'Abort when remaining KB' must contain a positive number";
+  }
+
+  if (!empty($post['quick_abort_pct'])) {
 	 $value = trim($post['quick_abort_pct']);
      if (!is_numeric($value) || ($value > 100))
-	   $input_errors[] = "The field 'Finish when remaining %' must contain a percentaged value";	
-  }	
+	   $input_errors[] = "The field 'Finish when remaining %' must contain a percentaged value";
+  }
 
 }
 
@@ -563,7 +563,7 @@ function squid_validate_auth($post, $input_errors) {
 
 function squid_install_cron($should_install) {
 	global $config, $g;
-	if($g['booting']==true) 
+	if($g['booting']==true)
 		return;
 	$is_installed = false;
 	if(!$config['cron']['item'])
@@ -587,7 +587,7 @@ function squid_install_cron($should_install) {
 				$cron_item['month'] = "*";
 				$cron_item['wday'] = "*";
 				$cron_item['who'] = "root";
-				$cron_item['command'] = "/usr/local/sbin/squid -k rotate";		
+				$cron_item['command'] = "/usr/local/sbin/squid -k rotate";
 				$config['cron']['item'][] = $cron_item;
 				parse_config(true);
 				write_config("Squid Log Rotation");
@@ -674,6 +674,7 @@ EOD;
 		foreach ($real_ifaces as $iface) {
 			list($ip, $mask) = $iface;
 			$ip = long2ip(ip2long($ip) & ip2long($mask));
+			$mask = 32-log((ip2long($mask) ^ ip2long('255.255.255.255'))+1,2);
 			$src .= " $ip/$mask";
 		}
 		$conf .= "# Allow local network(s) on interface(s)\n";
@@ -694,7 +695,7 @@ EOD;
 	 }
 //  $conf .= "\n";  //Kill blank line after DNS-Servers
    }
-	
+
   return $conf;
 }
 
@@ -754,7 +755,7 @@ EOD;
 	elseif (file_exists(SQUID_ACLDIR . '/donotcache.acl')) {
      unlink(SQUID_ACLDIR . '/donotcache.acl');
     }
-  
+
 	return $conf;
 }
 
@@ -768,7 +769,7 @@ function squid_resync_upstream() {
 		if ($settings['icp_port'] == '7')
 		  $conf .= "{$settings['icp_port']} no-query";
     else
-      $conf .= "{$settings['icp_port']}"; 
+      $conf .= "{$settings['icp_port']}";
 
 		if (!empty($settings['username']))
 			$conf .= " login={$settings['username']}";
@@ -797,14 +798,16 @@ function squid_resync_nac() {
   $port = ($settings['proxy_port'] ? $settings['proxy_port'] : 3128);
   $settings = $config['installedpackages']['squidnac']['config'][0];
 	$webgui_port = $config['system']['webgui']['port'];
+	$addtl_ports = $settings['addtl_ports'];
+	$addtl_sslports = $settings['addtl_sslports'];
 
 	$conf = <<<EOD
 
 # Setup some default acls
-acl all src 0.0.0.0/0.0.0.0
-acl localhost src 127.0.0.1/255.255.255.255
-acl safeports port 21 70 80 210 280 443 488 563 591 631 777 901 $webgui_port $port 1025-65535
-acl sslports port 443 563 $webgui_port
+acl all src all
+acl localhost src 127.0.0.1/32
+acl safeports port 21 70 80 210 280 443 488 563 591 631 777 901 $webgui_port $port 1025-65535 $addtl_ports
+acl sslports port 443 563 $webgui_port $addtl_sslports
 acl manager proto cache_object
 acl purge method PURGE
 acl connect method CONNECT
@@ -860,9 +863,9 @@ EOD;
     $conf .= "http_access allow manager ext_manager_".$count."\n";
     $count += 1;
 	 }}
-	
+
   $conf .= <<<EOD
-  
+
 http_access deny manager
 http_access allow purge localhost
 http_access deny purge
@@ -886,12 +889,12 @@ function squid_resync_traffic() {
 
   if (!empty($settings['quick_abort_min']) || ($settings['quick_abort_min']) == "0") $conf .= "quick_abort_min {$settings['quick_abort_min']} KB\n";
   if (!empty($settings['quick_abort_max']) || ($settings['quick_abort_max']) == "0") $conf .= "quick_abort_max {$settings['quick_abort_max']} KB\n";
-  if (!empty($settings['quick_abort_pct'])) $conf .= "quick_abort_pct {$settings['quick_abort_pct']}\n";	
+  if (!empty($settings['quick_abort_pct'])) $conf .= "quick_abort_pct {$settings['quick_abort_pct']}\n";
 
 	$up_limit = ($settings['max_upload_size'] ? $settings['max_upload_size'] : 0);
 	$down_limit = ($settings['max_download_size'] ? $settings['max_download_size'] : 0);
 	$conf .= "request_body_max_size $up_limit KB\n";
-	$conf .= 'reply_body_max_size ' . ($down_limit * 1024) . " allow all\n";
+//	$conf .= 'reply_body_max_size ' . ($down_limit * 1024) . " deny all\n";
 
 	// Only apply throttling past 10MB
 	// XXX: Should this really be hardcoded?
@@ -1154,7 +1157,7 @@ function squid_resync() {
 
 	if (!is_service_running('squid')) {
 		log_error("Starting Squid");
-		mwexec("/usr/local/sbin/squid -D");
+		mwexec("/usr/local/sbin/squid");
 	} else {
 		log_error("Reloading Squid for configuration sync");
 		mwexec("/usr/local/sbin/squid -k reconfigure");
@@ -1325,19 +1328,19 @@ function squid_generate_rules($type) {
 	$fw_aliases = filter_generate_aliases();
 	if(strstr($fw_aliases, "pptp ="))
 		$PPTP_ALIAS = "\$pptp";
-	else 
+	else
 		$PPTP_ALIAS = "\$PPTP";
 	if(strstr($fw_aliases, "PPPoE ="))
 		$PPPOE_ALIAS = "\$PPPoE";
-	else 
+	else
 		$PPPOE_ALIAS = "\$pppoe";
-		
+
 	switch($type) {
 		case 'nat':
 			$rules .= "\n# Setup Squid proxy redirect\n";
 			if ($squid_conf['private_subnet_proxy_off'] == 'on') {
 				foreach ($ifaces as $iface) {
-					$rules .= "no rdr on $iface proto tcp from any to { 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8 } port 80\n";         
+					$rules .= "no rdr on $iface proto tcp from any to { 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8 } port 80\n";
 				}
 			}
 			if (!empty($squid_conf['defined_ip_proxy_off'])) {
@@ -1353,7 +1356,7 @@ function squid_generate_rules($type) {
 				}
 				$exempt_ip = substr($exempt_ip,2);
 				foreach ($ifaces as $iface) {
-					$rules .= "no rdr on $iface proto tcp from { $exempt_ip } to any port 80\n";         
+					$rules .= "no rdr on $iface proto tcp from { $exempt_ip } to any port 80\n";
 				}
 			}
 			if (!empty($squid_conf['defined_ip_proxy_off_dest'])) {
@@ -1369,7 +1372,7 @@ function squid_generate_rules($type) {
 				}
 				$exempt_dest = substr($exempt_dest,2);
 				foreach ($ifaces as $iface) {
-					$rules .= "no rdr on $iface proto tcp from any to { $exempt_dest } port 80\n";         
+					$rules .= "no rdr on $iface proto tcp from any to { $exempt_dest } port 80\n";
 				}
 			}
 			foreach ($ifaces as $iface) {
@@ -1394,8 +1397,8 @@ function squid_generate_rules($type) {
 				$rules .= "\n";
 			};
 			if($config['pppoe']['mode'] == "server" && $config['pppoe']['localip']) {
-				$rules .= "pass in quick on $PPPOE_ALIAS proto tcp from any to !127.0.0.1 port $port flags S/SA keep state\n";			
-			}			
+				$rules .= "pass in quick on $PPPOE_ALIAS proto tcp from any to !127.0.0.1 port $port flags S/SA keep state\n";
+			}
 			if($config['pptpd']['mode'] == "server" && $config['pptpd']['localip']) {
 				$rules .= "pass in quick on $PPTP_ALIAS proto tcp from any to !127.0.0.1 port $port flags S/SA keep state\n";
 			}
