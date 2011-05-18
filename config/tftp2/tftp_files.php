@@ -32,27 +32,32 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/tftp.inc");
 
 $pconfig['tftpdinterface'] = explode(",", $config['installedpackages']['tftpd']['config'][0]['tftpdinterface']);
+$backup_dir = "/root/backup";
+$backup_filename = "tftp.bak.tgz";
+$backup_path = "{$backup_dir}/{$backup_filename}";
+$files_dir = "/tftpboot";
 
 $filename = $_GET['filename'];
+$download_dir = $files_dir;
 if (($_GET['a'] == "download") && $_GET['t'] == "backup") {
 	conf_mount_rw();
-	$tmp = '/root/backup/';
-	$filename = 'tftp.bak.tgz';
-	system('cd /;tar cvzf /root/backup/tftp.bak.tgz tftpboot');
+	$filename = $backup_filename;
+	$download_dir = $backup_dir;
+	system("tar -czC / -f {$backup_path} tftpboot");
 	conf_mount_ro();
 }
-if (($_GET['a'] == "download") && file_exists("/root/backup/".$filename)) {
+if (($_GET['a'] == "download") && file_exists("{$download_dir}/{$filename}")) {
 
 	session_cache_limiter('public');
-	$fd = fopen("/root/backup/".$filename, "rb");
+	$fd = fopen("{$download_dir}/{$filename}", "rb");
 	header("Content-Type: application/force-download");
 	header("Content-Type: application/octet-stream");
 	header("Content-Type: application/download");
 	header("Content-Description: File Transfer");
-	header('Content-Disposition: attachment; filename="'.$filename.'"');
+	header("Content-Disposition: attachment; filename=\"{$filename}\"");
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
-	header("Content-Length: " . filesize("/root/backup/".$filename));
+	header("Content-Length: " . filesize("{$download_dir}/{$filename}"));
 	fpassthru($fd);
 	exit;
 }
@@ -60,15 +65,13 @@ if (($_GET['a'] == "download") && file_exists("/root/backup/".$filename)) {
 
 if ($_GET['a'] == "other") {
 	if ($_GET['t'] == "restore") {
-		$tmp = '/root/backup/';
-		$filename = 'tftp.bak.tgz';
 
 		//extract a specific directory to /tftpboot
-		if (file_exists('/root/backup/'.$filename)) {
+		if (file_exists($backup_path)) {
 			//echo "The file $filename exists";
 			conf_mount_rw();
-			system('cd /; tar xvpfz /root/backup/'.$filename);
-			system('chmod -R 744 /tftpboot/*');
+			system("tar -xpzC / -f {$backup_path}");
+			system("chmod -R 744 {$files_dir}/*");
 			header( 'Location: tftp_files.php?savemsg=Backup+has+been+restored.' ) ;
 			conf_mount_ro();
 		} else {
@@ -90,9 +93,9 @@ if ($_POST['submit'] == "Save") {
 
 if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_name'])) {
 	conf_mount_rw();
-	move_uploaded_file($_FILES['ulfile']['tmp_name'], "/tftpboot/" . $_FILES['ulfile']['name']);
-	$savemsg = "Uploaded file to /tftpboot/" . htmlentities($_FILES['ulfile']['name']);
-	system('chmod -R 744 /tftpboot/*');
+	move_uploaded_file($_FILES['ulfile']['tmp_name'], "{$files_dir}/{$_FILES['ulfile']['name']}");
+	$savemsg = "Uploaded file to {$files_dir}/" . htmlentities($_FILES['ulfile']['name']);
+	system('chmod -R 744 {$files_dir}/*');
 	unset($_POST['txtCommand']);
 	conf_mount_ro();
 }
@@ -101,7 +104,7 @@ if (($_POST['submit'] == "Upload") && is_uploaded_file($_FILES['ulfile']['tmp_na
 if ($_GET['act'] == "del") {
 	if ($_GET['type'] == 'tftp') {
 		conf_mount_rw();
-		unlink_if_exists("/tftpboot/".$_GET['filename']);
+		unlink_if_exists("{$files_dir}/".$_GET['filename']);
 		conf_mount_ro();
 		header("Location: tftp_files.php");
 		exit;
