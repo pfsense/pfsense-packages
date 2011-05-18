@@ -43,6 +43,25 @@ $snortJsonReturnCode_fail = '
 		
 	}
 
+	
+	// row from db by uuid
+if ($_POST['snortSaveRuleSets'] == 1)
+{	
+
+	// unset POSTs that are markers not in db
+	unset($_POST['snortSaveSettings']);
+	unset($_POST['ifaceTab']);
+	
+	if(snortSql_updateRuleSetList($_POST['dbName'], $_POST['dbTable'], $_POST['filenamcheckbox'], $_POST['ifaceuuid']))
+	{
+  		echo $snortJsonReturnCode_success;
+		return true; 		
+  	}else{
+		echo $snortJsonReturnCode_fail;
+		return false; 		
+	}		
+	
+} // END of rulesSets	
 
 // row from db by uuid
 if ($_POST['RMlistDelRow'] == 1)
@@ -161,6 +180,23 @@ if ($_POST['snortSaveSettings'] == 1)
 				
 			// convert textbox to base64
 			$_POST['configpassthru'] = base64_encode($_POST['configpassthru']);
+			
+			/*
+			 * make dir for the new iface
+			 * may need to move this as a func to new_snort,inc
+			 */			
+			if (!is_dir('/usr/local/etc/snort/sn_' . $_POST['uuid'] . '_' . $_POST['interface']))
+			{
+				$newSnortDirCraete = 'mkdir -p /usr/local/etc/snort/sn_' . $_POST['uuid'] . '_' . $_POST['interface'];
+				exec($newSnortDirCraete);
+				// NOTE: code only works on php5
+				$listRulesDir = snortScanDirFilter('/usr/local/etc/snort/rules', '.rules');
+				if (!empty($listRulesDir) && file_exists('/usr/local/etc/snort/base_rules.tar.gz'))
+				{	
+					$newSnortDir = 'sn_' . $_POST['uuid'] . '_' . $_POST['interface'];					
+					exec('/usr/bin/tar xvfz /usr/local/etc/snort/base_rules.tar.gz ' . '-C /usr/local/etc/snort/' . $newSnortDir);					
+				}
+			}
 		          
 		}		
 		

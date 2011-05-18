@@ -7,6 +7,77 @@ jQuery(document).ready(function() {
 			jQuery(this).css('cursor', 'pointer');
 		});
 
+	//-------------------START Misc-------------------------------------------
+
+		
+		/*
+		 * Gives you even true or false on even numbers
+		 */
+		window.isEven = function(someNumber) {
+
+			return (someNumber%2 == 0) ? true : false;
+						
+		};	
+		
+		/*! Needs to be watched not my code <- IMPORTANT
+		* JavaScript UUID Generator, v0.0.1
+		*
+		* Copyright (c) 2009 Massimo Lombardo.
+		* Dual licensed under the MIT and the GNU GPL licenses.
+		*/
+		function genUUID() {
+		    var uuid = (function () {
+		        var i,
+		            c = "89ab",
+		            u = [];
+		        for (i = 0; i < 36; i += 1) {
+		            u[i] = (Math.random() * 16 | 0).toString(16);
+		        }
+		        u[8] = u[13] = u[18] = u[23] = "";
+		        u[14] = "4";
+		        u[19] = c.charAt(Math.random() * 4 | 0);
+		        return u.join("");
+		    })();
+		    return {
+		        toString: function () {
+		            return uuid;
+		        },
+		        valueOf: function () {
+		            return uuid;
+		        }
+		    };
+		}
+		
+  //--------------------------- START select all code ---------------------------
+		
+		jQuery('#select_all').live('click', function() {					    
+			checkAll(jQuery('.domecheck'));					    
+		});
+		
+		jQuery('#deselect_all').live('click', function() {					    
+			uncheckAll(jQuery('.domecheck'));					    
+		});
+
+			function checkAll(field)
+			{				
+				for (i = 0; i < field.length; i++)
+				{
+					field[i].checked = true;
+				}
+			}
+
+			function uncheckAll(field)
+			{
+				for (i = 0; i < field.length; i++)
+				{
+					field[i].checked = false;
+				}
+			}
+
+  //--------------------------- STOP select all code --------------------------
+		
+		
+		
   // -------------------------- START cancel form code ------------------------------------------- 
   //jQuery('#cancel').click(function() {
   jQuery('#cancel').live('click', function() {
@@ -20,23 +91,21 @@ jQuery(document).ready(function() {
   
   jQuery(".icon_plus").live('click', function() {
 	  
-	  	var NewRow_UUID = genUUID();
-	  	var rowNumCount = jQuery("#address").length;
-	  	
-	  	if (rowNumCount > 0)
-	  	{
-	  		// stop empty
-		    var prevAddressAll_ck = jQuery('tr[id^=maintable_]');
-			var prevAddress_ck = prevAddressAll_ck[prevAddressAll_ck.length-1].id;
-			var prevAddressEmpty_ck = jQuery('#' + prevAddress_ck + ' #address').val();
-			var prevAddressEmpty_ck = jQuery.trim(prevAddressEmpty_ck);
-		  	
-			if (prevAddressEmpty_ck == '') 
-			{
-				return false;    
-			}
+	var NewRow_UUID = genUUID();
+	var rowNumCount = jQuery("#address").length;
 
-	  	}
+	if (rowNumCount > 0)
+	{
+		// stop empty
+		var prevAddressAll_ck = jQuery('tr[id^=maintable_]');
+		var prevAddress_ck = prevAddressAll_ck[prevAddressAll_ck.length-1].id;
+		var prevAddressEmpty_ck = jQuery.trim(jQuery('#' + prevAddress_ck + ' #address').val());
+
+		if (prevAddressEmpty_ck === '') 
+		{
+			return false;    
+		}	
+	}
 					jQuery('#listloopblock').append(
 						"\n" + '<tr id="maintable_' +  NewRow_UUID + '" ' + 'data-options=\'{"pagetable":"SnortWhitelist", "pagedb":"snortDB", "DoPOST":"false"}\' >' +
 						'<td>' +
@@ -56,6 +125,13 @@ jQuery(document).ready(function() {
   
 
 // ------------------------------- START remove row element ---------------------------------------
+  
+
+	function removeRow() 
+	{
+		jQuery("#maintable_" + window.RemoveRow_UUID).remove();
+	}
+	
     jQuery(".icon_x").live('click', function() {
         
         var elem = getBaseElement(this.id); // this.id gets id of .icon_x
@@ -66,16 +142,12 @@ jQuery(document).ready(function() {
         window.RemoveRow_DB = jQuery("#maintable_" + window.RemoveRow_UUID).data("options").pagedb;
         window.RemoveRow_POST = jQuery("#maintable_" + window.RemoveRow_UUID).data("options").DoPOST;       
         
-        if (window.RemoveRow_POST == 'true')  // snort_interfaces_whitelist
+        if (window.RemoveRow_POST === 'true')  // snort_interfaces_whitelist
         {
           if(confirm('Do you really want to delete this list? (e.g. snort rules will fall back to the default list)!')) {
-        	  
-            jQuery("#maintable_" + window.RemoveRow_UUID).fadeOut("fast");           
-            function removeRow() 
-            {
-              jQuery("#maintable_" + window.RemoveRow_UUID).remove();
-            }
-                      
+
+            jQuery("#maintable_" + window.RemoveRow_UUID).fadeOut("fast"); 
+
             setTimeout(removeRow, 600);
             jQuery(this).ajaxSubmit(optionsRMlist); // call POST     
             return false;
@@ -83,14 +155,11 @@ jQuery(document).ready(function() {
         }
         
         // remove element NO post
-        if (window.RemoveRow_POST == 'false')
+        if (window.RemoveRow_POST === 'false')
         {
                   
           jQuery("#maintable_" + window.RemoveRow_UUID).fadeOut("fast");       
-          function removeRow()
-          {
-            jQuery("#maintable_" + window.RemoveRow_UUID).remove();
-          }          
+         
           setTimeout(removeRow, 600);
           
           return false;   
@@ -98,17 +167,8 @@ jQuery(document).ready(function() {
         }
         
     });
-    
-  // declare variable for whitelist delete
-  var optionsRMlist = {
-            beforeSubmit:  showRequestRMlist,
-            dataType:      'json', 
-            success:       showResponseRMlist,
-            type:          'POST',
-            data:          { RMlistDelRow: '1', RMlistDB: RMlistDBDelCall, RMlistTable: RMlistTableDelCall, RMlistUuid: RMlistUuidDelCall },
-            url:           './snort_json_post.php'
-        }; 
 
+    
 	function RMlistDBDelCall() {
 		return RemoveRow_DB;
 	}
@@ -135,7 +195,7 @@ jQuery(document).ready(function() {
     // post-submit callback if snort_json_post.php returns true or false
     function showResponseRMlist(data) { 
       
-    	//alert('test');
+	//alert('test');
       
     }
     
@@ -150,35 +210,111 @@ jQuery(document).ready(function() {
       return {"base": baseElem, "index": index};
       
     }
+   
+    
+  // declare variable for whitelist delete
+  var optionsRMlist = {
+            beforeSubmit:  showRequestRMlist,
+            dataType:      'json', 
+            success:       showResponseRMlist,
+            type:          'POST',
+            data:          { RMlistDelRow: '1', RMlistDB: RMlistDBDelCall, RMlistTable: RMlistTableDelCall, RMlistUuid: RMlistUuidDelCall },
+            url:           './snort_json_post.php'
+        }; 
+
+
   // STOP remove row element
 	
 // ------------------- START iform Submit/RETURN code ---------------------------------------------
 	
 	/* general form */
 	//jQuery('#iform').submit(function() { 
-	jQuery('#iform').live('submit', function() {
+	jQuery('#iform, #iform2, #iform3').live('submit', function() {
 
 		jQuery(this).ajaxSubmit(options);
 
         return false; 
     });
+
+	// pre-submit callback 
+	function showRequest(formData, jqForm, options) { 
+		
+	    var queryString = jQuery.param(formData); 
+	    
+	    // Please wait code
+		function showLoading() {
+			  jQuery("#loadingWaiting").show();
+			}
+		// call to please wait	
+		showLoading();
+	 
+	    alert('About to submit: \n\n' + queryString); 
+	    
+	    // call false to prevent the form
+	    return true; 
+	}
 	
-	/* general form2 */
-	jQuery('#iform2').submit(function() { 
-
-		jQuery(this).ajaxSubmit(options); 
-
-        return false; 
-    });	
-
-	/* general form3 */
-	jQuery('#iform3').submit(function() { 
-
-		jQuery(this).ajaxSubmit(options); 
-
-        return false; 
-    });
+	function hideLoading() 
+	{
+		  jQuery("#loadingWaiting").hide();
+	}
 	
+	function downloadsnortlogs(data)
+	{
+		jQuery('.hiddendownloadlink').append('<iframe width="1" height="1" frameborder="0" src="/snort/snort_json_get.php?snortlogdownload=1&snortlogfilename=' + data.downloadfilename + '" ></iframe>');
+		
+		var appendElem = jQuery('<br> <span>success...<span>');
+		appendElem.appendTo('.loadingWaitingMessage');
+		setTimeout(hideLoading, 3000);
+	}	
+
+	// After Save Calls display
+	var appendElem = jQuery('<br> <span>success...<span>');
+	function finnish() 
+	{
+		hideLoading();
+		appendElem.remove();
+		updatestarted = 1;
+	}
+	
+	function showResponse(data, responseText, statusText, xhr, $form)
+	{
+
+		// START of fill call to user
+		if (responseText === 'success') {
+			
+			// snort logs download success
+			if (data.downloadfilename !== '' && data.snortdownload === 'success')
+			{
+				downloadsnortlogs(data);		
+			}
+			
+			// succsess display
+			if (data.snortgeneralsettings === 'success' || data.snortdelete === 'success' || data.snortreset === 'success') 
+			{
+				// sucsses msg
+				appendElem.appendTo('.loadingWaitingMessage');
+				
+				// Clean up Waiting code
+				finnish();
+				
+				if (data.snortUnhideTabs === 'true')
+				{
+					jQuery('.hide_newtabmenu').show();
+				}
+				
+				if (data.snortreset) {location.reload();} // hard refresh
+				
+			}			
+		
+		// END of fill call to user
+		}else{
+			// On FAIL get some info back
+			alert('responseText: \n' + data.responseText + 'FAIL');
+		}
+	} 
+	// END iform code	
+
 	// declare variable for iform
 	var options = {
             beforeSubmit:  showRequest,
@@ -186,127 +322,7 @@ jQuery(document).ready(function() {
             success:       showResponse,
             type:          'POST',
             url:           './snort_json_post.php'
-        }; 
+        };
 	
-}); 
-
-// pre-submit callback 
-function showRequest(formData, jqForm, options) { 
-	
-    var queryString = jQuery.param(formData); 
-    
-    // Please wait code
-	function showLoading() {
-		  jQuery("#loadingWaiting").show();
-		}
-	// call to please wait	
-	showLoading();
- 
-    alert('About to submit: \n\n' + queryString); 
-    
-    // call false to prevent the form
-    return true; 
-} 
- 
-// post-submit callback 
-function showResponse(data, responseText, statusText, xhr, $form)  { 
-    
-	
-	function snortUnhideTabsCall() {
-		// unhide tabs for iface edit
-		if (data.snortUnhideTabs == 'true')
-		{
-			jQuery('.hide_newtabmenu').show();
-		}
-	};
-	
-	function hideLoading() {
-		  jQuery("#loadingWaiting").hide();
-	};	
-	
-	// START of fill call to user
-	if (responseText == 'success') {
-		
-		// snort logs download success
-		if (data.downloadfilename != '' && data.snortdownload == 'success') {
-			function downloadsnortlogs(){
-				jQuery('.hiddendownloadlink').append('<iframe width="1" height="1" frameborder="0" src="./snort_json_get.php?snortlogdownload=1&snortlogfilename=' + data.downloadfilename + '></iframe>');
-				var appendElem = jQuery('<br> <span>success...<span>');
-				appendElem.appendTo('.loadingWaitingMessage');
-				setTimeout(hideLoading, 3000);
-			}
-		downloadsnortlogs();
-		}
-		
-		// succsess display
-		if (data.snortgeneralsettings == 'success' || data.snortdelete == 'success' || data.snortreset == 'success') 
-		{
-			var appendElem = jQuery('<br> <span>success...<span>');
-			appendElem.appendTo('.loadingWaitingMessage');
-			
-			// After Save Calls display
-			function finnish() {
-			snortUnhideTabsCall();
-			hideLoading();
-			appendElem.remove();
-			updatestarted = 1;
-			};			
-			setTimeout(finnish, 2000);
-			
-			if (data.snortreset) {location.reload();}; // hard refresh
-			
-		}
-		
-	
-	// END of fill call to user
-	}else{
-		// On FAIL get some info back
-		alert('responseText: \n' + data.responseText + 'FAIL');
-	}
-} 
-// END iform code
-
-
-
-//-------------------START Misc-------------------------------------------
-
-/*! Needs to be watched not my code <- IMPORTANT
-* JavaScript UUID Generator, v0.0.1
-*
-* Copyright (c) 2009 Massimo Lombardo.
-* Dual licensed under the MIT and the GNU GPL licenses.
-*/
-function genUUID() {
-    var uuid = (function () {
-        var i,
-            c = "89ab",
-            u = [];
-        for (i = 0; i < 36; i += 1) {
-            u[i] = (Math.random() * 16 | 0).toString(16);
-        }
-        u[8] = u[13] = u[18] = u[23] = "";
-        u[14] = "4";
-        u[19] = c.charAt(Math.random() * 4 | 0);
-        return u.join("");
-    })();
-    return {
-        toString: function () {
-            return uuid;
-        },
-        valueOf: function () {
-            return uuid;
-        }
-    };
-}
-
-//-----------------STOP Misc----------------------------------------------
-
-
-
-
-
-
-
-
-
+}); // end of document ready
 

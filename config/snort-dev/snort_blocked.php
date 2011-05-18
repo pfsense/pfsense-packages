@@ -113,7 +113,10 @@ $brefresh_on = ($generalSettings['brefresh'] == 'on' ? 'checked' : '');
 				<span class="vexpl red"><strong>Warning:</strong></span><span class="vexpl"> all hosts will be removed.</span>
 				</form>
 				</td>
-				<div class="hiddendownloadlink"></div>
+				
+				<div class="hiddendownloadlink">
+				</div>
+				
 			</tr>
 			<tr>
 				<td class="vncell2" valign="center"><span class="vexpl">Auto Refresh and Log View</span></td>

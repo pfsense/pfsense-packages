@@ -10,15 +10,15 @@
 <?php
 
 
-//echo "\t<script type=\"text/javascript\" src=\"./javascript/jquery-1.6.min.js\"></script>\n";
+echo "\t<script type=\"text/javascript\" src=\"./javascript/jquery-1.6.min.js\"></script>\n";
 
-//echo "\t<script type=\"text/javascript\" src=\"./javascript/jquery.form.js\"></script>\n";
+echo "\t<script type=\"text/javascript\" src=\"./javascript/jquery.form.js\"></script>\n";
 
 
 //echo "\t<link href=\"./css/jquery.bubblepopup.v2.3.1.css\" rel=\"stylesheet\" type=\"text/css\" />\n";
 //echo "\t<script src=\"./javascript/jquery.bubblepopup.v2.3.1.min.js\" type=\"text/javascript\"></script>\n";
 
-//echo "\t<script type=\"text/javascript\" src=\"./javascript/snort_globalsend.js\"></script>\n";
+echo "\t<script type=\"text/javascript\" src=\"./javascript/snort_globalsend.js\"></script>\n";
 
 
 ?>
@@ -26,7 +26,7 @@
 <?php
 // this has to be loaded at the bottom
 $snort_custom_rnd_box = '
-<script>
+<script type="text/javascript" >
 	/* makes boxes round */
 	/* load at bottom    */
 	NiftyCheck();

@@ -36,7 +36,7 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_new.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 
-$new_ruleUUID = genAlphaNumMixFast(28, 28);
+$new_ruleUUID = genAlphaNumMixFast(7, 8);
 
 $a_interfaces = snortSql_fetchAllInterfaceRules('Snortrules', 'snortDBrules');
 

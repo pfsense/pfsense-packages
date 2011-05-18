@@ -7,6 +7,92 @@ if(isset($_POST['__csrf_magic']))
 }
 
 
+
+// Save ruleSets settings
+function snortSql_updateRuleSetList($dbname, $table, $ruleSetfilenames, $ifaceuuid)
+{
+	
+	$addDate = date(U);
+
+	// do let user pick the DB path
+    $db = sqlite_open("/usr/local/pkg/snort/{$dbname}"); 
+    
+    if (empty($ruleSetfilenames))
+    {
+    	$ruleSetfilenames = array();
+    }
+
+	// foreach selected rulesets do this
+    if (!empty($ruleSetfilenames))
+	{
+	    foreach ($ruleSetfilenames as $ruleSetfilename) 
+	    {
+	
+			$resultid = sqlite_query($db,
+				"SELECT id, enable FROM {$table} WHERE rulesetname = '{$ruleSetfilename}' and ifaceuuid = '{$ifaceuuid}';
+			");			
+		    
+			$chktable = sqlite_fetch_all($resultid, SQLITE_ASSOC);   
+		
+			if (empty($chktable)) 
+			{
+				
+				$rulesetUuid = genAlphaNumMixFast(11, 14);
+				
+				$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+				"INSERT INTO {$table} (date, uuid, ifaceuuid, rulesetname, enable) VALUES ('{$addDate}', '{$rulesetUuid}', '{$ifaceuuid}', '{$ruleSetfilename}', 'on');
+				");
+
+			}else{					
+				if ($chktable[0]['enable'] == 'off')
+				{					
+					$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+					"UPDATE {$table} SET enable = 'on' WHERE id = '{$chktable[0]['id']}'; 
+					");			
+				}			
+			}
+	    }	
+	} // end foreach if
+
+			
+			// clean database of old names	and turn rulesets off
+    		$listDir = snortScanDirFilter('/usr/local/etc/snort/rules/', '.rules');
+    
+		    $resultAllRulesetname = sqlite_query($db,
+		            "SELECT rulesetname FROM {$table} WHERE ifaceuuid = '{$ifaceuuid}';
+		     ");
+		    
+		    $chktable2 = sqlite_fetch_all($resultAllRulesetname, SQLITE_ASSOC);		
+		    
+		    
+		    if (!empty($chktable2))
+		    {
+			    foreach ($chktable2 as $value) 
+			    {
+					
+			    	if(!in_array($value['rulesetname'], $listDir))
+			    	{	    		
+						$deleteMissingRuleset = sqlite_query($db, // @ supress warnings use only in production
+						"DELETE FROM {$table} WHERE rulesetname = '{$value['rulesetname']}' and ifaceuuid = '{$ifaceuuid}';
+						");
+			    	}
+			    	
+			    	if(!in_array($value['rulesetname'], $ruleSetfilenames))
+			    	{
+						$ruleSetisOff = sqlite_query($db, // @ supress warnings usonly in production
+						"UPDATE {$table} SET enable = 'off' WHERE rulesetname = '{$value['rulesetname']}' and ifaceuuid = '{$ifaceuuid}'; 
+						");	    		
+			    	}	    	
+			    }
+		    }   
+	    
+	  	sqlite_close($db);
+	  	
+	  	return true;
+    
+} // END Save ruleSets settings
+
+
 function snortSql_fetchAllInterfaceRules($table, $dbname)
 {
 	// do let user pick the DB path
@@ -29,32 +115,54 @@ function snortSql_fetchAllInterfaceRules($table, $dbname)
 function snortSql_fetchAllSettings($dbname, $table, $type, $id_uuid) 
 {
 
-  if ($table == '') 
-  {
-    return false;
-  }
-  
-  $db = sqlite_open("/usr/local/pkg/snort/$dbname");
-  
-  if ($type == 'id')
-  {   
-    $result = sqlite_query($db,
-            "SELECT * FROM {$table} where id = '{$id_uuid}';
-     ");
-  }
-  
-  if ($type == 'uuid')
-  {   
-    $result = sqlite_query($db,
-            "SELECT * FROM {$table} where uuid = '{$id_uuid}';
-     ");
-  }  
+	if ($dbname == '' || $table == '' || $type == '') 
+	{
+		return false;
+	}
+	  
+	$db = sqlite_open("/usr/local/pkg/snort/$dbname");
 
-  $chktable = sqlite_fetch_array($result, SQLITE_ASSOC);
+	if ($type == 'All')
+	{   
+		$result = sqlite_query($db,
+		"SELECT * FROM {$table} WHERE id > 0;
+		");
+	}	
+	  
+	if ($type == 'id')
+	{   
+		$result = sqlite_query($db,
+		"SELECT * FROM {$table} where id = '{$id_uuid}';
+		");
+	}
+	  
+	if ($type == 'uuid')
+	{   
+		$result = sqlite_query($db,
+		"SELECT * FROM {$table} where uuid = '{$id_uuid}';
+		");
+	} 
 
-  sqlite_close($db);
-  
-  return $chktable;
+	if ($type == 'ifaceuuid')
+	{   
+		$result = sqlite_query($db,
+		"SELECT * FROM {$table} where ifaceuuid = '{$id_uuid}';
+		");
+	} 
+	
+	if ($type == 'id' || $type == 'uuid')
+	{
+		$chktable = sqlite_fetch_array($result, SQLITE_ASSOC);
+	}
+	
+	if ($type == 'All' || $type == 'ifaceuuid')
+	{
+		$chktable = sqlite_fetch_all($result, SQLITE_ASSOC);
+	}
+		
+	sqlite_close($db);
+	  
+	return $chktable;
   
   
 } // end func
@@ -669,5 +777,36 @@ function genAlphaNumMixFast($min = 14, $max = 28)
 
 }
 
+// scan a dir, build array with filetr
+function snortScanDirFilter($path, $filtername)
+{
+	// list rules in the default dir
+	$listDir = array();
+	$listDir = scandir("{$path}");
+
+	if ($filtername == '')
+	{
+			
+		return $listDir;
+		
+	}else{
+	
+		$pattern = "/{$filtername}/";
+	 	foreach ( $listDir as $val )
+	 	{
+	 		if (preg_match($pattern, $val))
+	 		{
+	 			$filterDirList[] = $val;			
+	 		}
+	 		
+	 	}
+		unset($listDir);
+		
+	}
+		
+		return $filterDirList;
+		
+}
 
 ?>
+
