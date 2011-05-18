@@ -620,6 +620,11 @@ function useproxy_changed(obj) {
 										<select name="useaddr" id="useaddr" class="formselect" onChange="useaddr_changed(this)">
 											<option value="serveraddr" >Interface IP Address</option>
 											<option value="serverhostname" >Installation hostname</option>
+											<?php if (is_array($config['dyndnses']['dyndns'])): ?>
+												<?php foreach ($config['dyndnses']['dyndns'] as $ddns): ?>
+													<option value="<?php echo $ddns["host"] ?>">DynDNS: <?php echo $ddns["host"] ?></option>
+												<?php endforeach; ?>
+											<?php endif; ?>
 											<option value="other">Other</option>
 										</select>
 										<br />
