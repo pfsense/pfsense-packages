@@ -146,13 +146,18 @@ include("head.inc");
 	if($nut_config['monitor'] == 'local') {
 		tblrow('Monitoring:','Local UPS'); 
 		$cmd = "upsc {$nut_config['name']}@localhost";
-	} else {
+	} elseif($nut_config['monitor'] == 'remote') {
 		tblrow('Monitoring:','Remote UPS');
 		$cmd = "upsc {$nut_config['remotename']}@{$nut_config['remoteaddr']}";
+	} elseif($nut_config['monitor'] == 'snmp') {
+		tblrow('Monitoring:','SNMP UPS');
+		$cmd = "upsc {$nut_config['name']}@localhost";
 	}
 
 	if($running)
 		$handle = popen($cmd, 'r');
+	elseif($nut_config['monitor'] == 'snmp')
+		tblrow('ERROR:','NUT is enabled, however the service is not running! The SNMP UPS may be unreachable.');
 	else
 		tblrow('ERROR:','NUT is enabled, however the service is not running!');
 	

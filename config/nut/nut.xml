@@ -85,6 +85,10 @@
 	</additional_files_needed>
 	<fields>
 		<field>
+			<name>General Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
 			<fielddescr>UPS Monitoring</fielddescr>
 			<fieldname>monitor</fieldname>
 			<type>select</type>
@@ -99,10 +103,23 @@
 					<value>local</value>
 				</option>
 				<option>
-					<name>Remote UPS</name>
+					<name>Remote NUT UPS</name>
 					<value>remote</value>
 				</option>
+				<option>
+					<name>Remote SNMP UPS</name>
+					<value>snmp</value>
+				</option>
 			</options>
+		</field>
+		<field>
+			<fielddescr>Power Down Instead of Halt</fielddescr>
+			<fieldname>powerdown</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<name>Local UPS Settings</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>&lt;strong&gt;Local UPS Name&lt;/strong&gt;</fielddescr>
@@ -504,11 +521,6 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>Power Down Instead of Halt</fielddescr>
-			<fieldname>powerdown</fieldname>
-			<type>checkbox</type>
-		</field>
-		<field>
 			<fielddescr>Local Remote Access Address &lt;br&gt;(ex: 192.168.1.0/24)</fielddescr>
 			<fieldname>allowaddr</fieldname>
 			<type>input</type>
@@ -522,6 +534,10 @@
 			<fielddescr>Local Remote Acces Password</fielddescr>
 			<fieldname>allowpass</fieldname>
 			<type>password</type>
+		</field>
+		<field>
+			<name>Remote NUT UPS Settings</name>
+			<type>listtopic</type>
 		</field>
 		<field>
 			<fielddescr>&lt;strong&gt;Remote UPS Name&lt;/strong&gt;</fielddescr>
@@ -543,6 +559,77 @@
 			<fieldname>remotepass</fieldname>
 			<type>password</type>
 		</field>
+		<field>
+			<name>Remote SNMP UPS Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>&lt;strong&gt;SNMP UPS Name&lt;/strong&gt;</fielddescr>
+			<fieldname>snmpname</fieldname>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>&lt;strong&gt;SNMP UPS Address&lt;/strong&gt; &lt;br&gt;(ex: 192.168.1.10)</fielddescr>
+			<fieldname>snmpaddr</fieldname>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>SNMP UPS Community&lt;br&gt;(Def: public)</fielddescr>
+			<fieldname>snmpaddr</fieldname>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>SNMP UPS Version&lt;br&gt;(Def: v2c)</fielddescr>
+			<fieldname>snmpversion</fieldname>
+			<type>select</type>
+			<options>
+				<option>
+					<name>SNMP v2c</name>
+					<value>v2c</value>
+				</option>
+				<option>
+					<name>SNMP v1</name>
+					<value>v1</value>
+				</option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>SNMP UPS MIB&lt;br&gt;(Def: IETF)</fielddescr>
+			<fieldname>snmpmib</fieldname>
+			<type>select</type>
+			<options>
+				<option>
+					<name>ietf</name>
+					<value>ietf</value>
+				</option>
+				<option>
+					<name>mge</name>
+					<value>mge</value>
+				</option>
+				<option>
+					<name>apcc</name>
+					<value>apcc</value>
+				</option>
+				<option>
+					<name>netvision</name>
+					<value>netvision</value>
+				</option>
+				<option>
+					<name>pw</name>
+					<value>pw</value>
+				</option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>SNMP UPS Polling Freq&lt;br&gt;(Def: 30)</fielddescr>
+			<fieldname>snmpfreq</fieldname>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Disable transfer OIDs&lt;br&gt;(use on APCC Symmetras)</fielddescr>
+			<fieldname>snmpdisabletransfer</fieldname>
+			<type>checkbox</type>
+		</field>
 	</fields>
 	<custom_php_command_before_form>
 		before_form_nut(&amp;$pkg);
@@ -557,3 +644,4 @@
 		deinstall_package_nut();
 	</custom_php_deinstall_command>
 </packagegui>
+ 

@@ -343,6 +343,127 @@ EOD;
 		return true;
 	}
 
+	function sync_package_nut_snmp() {
+		$name = nut_config('snmpname');
+		$driver = "snmp-ups";
+		$port = nut_config('snmpaddr');
+		$shutdownflag  = (nut_config('powerdown') == 'on') ? '-p' : '-h';
+		$snmpmib = nut_config('snmpmib');
+		$snmpversion = nut_config('snmpversion');
+		$snmpcommunity = nut_config('snmpcommunity');
+		$snmpfreq = nut_config('snmpfreq');
+		$snmpdisabletransfer = (nut_config('snmpdisabletransfer') == 'on');
+
+		if(!($name && $driver && $port))
+			return false;
+
+		/* ups.conf */
+		$ups_conf = "user=root\n";
+		$ovr_user = '-u root';
+		$ups_conf .= "[{$name}]\n";
+		$ups_conf .= "driver={$driver}\n";
+		$ups_conf .= "port={$port}\n";
+		if($snmpmib)
+			$ups_conf .= "mibs={$snmpmib}\n";
+		if($snmpversion)
+			$ups_conf .= "snmp_version={$snmpversion}\n";
+		if($snmpcommunity)
+			$ups_conf .= "community={$snmpcommunity}\n";
+		if($snmpfreq)
+			$ups_conf .= "pollfreq={$snmpfreq}\n";
+		if($snmpdisabletransfer)
+			$ups_conf .= "notransferoids=true\n";
+
+		/* upsd.conf */
+		$upsd_conf = "ACL all 0.0.0.0/0\n";
+		$upsd_conf .= "ACL localhost 127.0.0.1/32\n";
+		if($allowaddr && $allowuser) {
+			$upsd_conf .= "ACL remote {$allowaddr}\n";
+			$upsd_conf .= "ACCEPT remote\n";
+		}
+		$upsd_conf .= "ACCEPT localhost\n";
+		$upsd_conf .= "REJECT all\n";
+
+		/* upsd.users */
+		$upsd_users = "[monuser]\n";
+		$upsd_users .= "password = mypass\n";
+		$upsd_users .= "allowfrom = localhost\n";
+		$upsd_users .= "upsmon master\n";
+		if($allowaddr && $allowuser) {
+			$upsd_users .= "\n[$allowuser]\n";
+			$upsd_users .= "password = $allowpass\n";
+			$upsd_users .= "allowfrom = remote\n";
+			$upsd_users .= "upsmon master\n";
+		}
+
+		/* upsmon.conf */
+		$upsmon_conf = <<<EOD
+MONITOR {$name}@localhost 1 monuser mypass master
+MINSUPPLIES 1
+SHUTDOWNCMD "/sbin/shutdown {$shutdownflag} +0"
+POWERDOWNFLAG /etc/killpower
+EOD;
+
+		$stop = <<<EOD
+	if [ `pgrep upsmon | wc -l` != 0 ]; then
+		echo stopping upsmon
+		/usr/bin/killall upsmon
+		while [ `pgrep upsmon | wc -l` != 0 ]; do
+			sleep 1
+		done
+	fi
+	if [ `pgrep upsd | wc -l` != 0 ]; then
+		echo stopping upsd
+		/usr/bin/killall upsd
+	fi
+	if [ `pgrep {$driver} | wc -l` != 0 ]; then
+		echo stopping {$driver}
+		/usr/local/libexec/nut/upsdrvctl stop
+	fi
+	sleep 1
+	if [ `pgrep {$driver} | wc -l` != 0 ]; then
+		echo forcing {$driver} termination
+		/usr/bin/killall {$driver}
+		while [ `pgrep {$driver} | wc -l` != 0 ]; do
+			sleep 1
+		done
+	fi
+	{$port_rel}
+EOD;
+
+		$start = <<<EOD
+if [ `pgrep {$driver} | wc -l` != 0 ]; then
+	{$stop}
+	fi
+	{$port_set}
+	echo starting {$driver}
+	if /usr/local/libexec/nut/upsdrvctl start; then
+		echo starting upsd
+		/usr/local/sbin/upsd {$ovr_user}
+		echo starting upsmon
+		/usr/local/sbin/upsmon {$name}@localhost
+	else
+		echo {$driver} failed to start
+	fi
+EOD;
+
+		/* write out configuration */
+		conf_mount_rw();
+		nut_write_config(NUT_DIR.'/ups.conf', $ups_conf);
+		nut_write_config(NUT_DIR.'/upsd.conf', $upsd_conf, 0640, 'uucp');
+		nut_write_config(NUT_DIR.'/upsd.users', $upsd_users, 0640, 'uucp');
+		nut_write_config(NUT_DIR.'/upsmon.conf', $upsmon_conf, 0640, 'uucp');
+		write_rcfile(array(
+			'file' => 'nut.sh',
+		'start' => $start,
+		'stop' => $stop
+			)
+		);
+		conf_mount_ro();
+
+		return true;
+	}
+
 	function sync_package_nut() {
 		global $config;
 		global $input_errors;
@@ -362,6 +483,8 @@ EOD;
 			$return = sync_package_nut_remote();
 		elseif(nut_config('monitor') == 'local')
 			$return = sync_package_nut_local();
+		elseif(nut_config('monitor') == 'snmp')
+			$return = sync_package_nut_snmp();
 
 		if($return && $_POST['monitor']) {
 			/* only start if changing settings as we have a startup script for system boot */
