@@ -10,10 +10,6 @@ if(isset($_POST['__csrf_magic']))
   unset($_POST['__csrf_magic']);
 }
 
-// return codes
-$snortJsonReturnCode_success = '{"snortgeneralsettings":"success"}';
-
-$snortJsonReturnCode_fail = '{"snortgeneralsettings":"fail"}';
 
 function snortJsonReturnCode($returnStatus)
 {		
@@ -67,37 +63,39 @@ if ($_POST['snortSaveRuleSets'] == 1)
 if ($_POST['RMlistDelRow'] == 1)
 {
 	
-	//conf_mount_rw();
 	
 	if ($_POST['RMlistTable'] == 'Snortrules' || $_POST['RMlistTable'] == 'SnortSuppress')
-	{
-	  	if (snortSql_updatelistDelete($_POST['RMlistDB'], $_POST['RMlistTable'], 'uuid', $_POST['RMlistUuid']))
-	  	{
-	  		echo $snortJsonReturnCode_success;
-			return true; 		
-	  	}else{
-			echo $snortJsonReturnCode_fail;
-			return false; 		
-	  	}
+	{	
+		
+		// list rules in the default dir
+		$a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $_POST['RMlistUuid']);
+		$snortRuleDir = '/usr/local/etc/snort/sn_' . $_POST['RMlistUuid'] . '_' . $a_list['interface'];
+		
+		exec('/bin/rm -r ' . $snortRuleDir);
+				
+		snortSql_updatelistDelete('SnortruleSets', 'ifaceuuid', $_POST['RMlistUuid']);
+	  	snortSql_updatelistDelete('SnortruleSigs', 'ifaceuuid', $_POST['RMlistUuid']);
+	  	snortSql_updatelistDelete('Snortrules', 'uuid', $_POST['RMlistUuid']);
+	  	
+	  	snortJsonReturnCode(true);
+	  	
 	}
+	
+	if ($_POST['RMlistTable'] == 'SnortSuppress')
+	{
+	  	snortJsonReturnCode(snortSql_updatelistDelete($_POST['RMlistTable'], 'uuid', $_POST['RMlistUuid']));
+	}	
+	
+	
 	
 	if ($_POST['RMlistTable'] == 'SnortWhitelist')
 	{
 		$fetchExtraWhitelistEntries = snortSql_fetchAllSettings($_POST['RMlistDB'], $_POST['RMlistTable'], 'uuid', $_POST['RMlistUuid']);
 		
-		if (snortSql_updatelistDelete($_POST['RMlistDB'], 'SnortWhitelistips', 'filename', $fetchExtraWhitelistEntries['filename']))
-		{	
-			snortSql_updatelistDelete($_POST['RMlistDB'], $_POST['RMlistTable'], 'uuid', $_POST['RMlistUuid']);
-			
-	  		echo $snortJsonReturnCode_success;
-			return true; 		
-	  		}else{
-			echo $snortJsonReturnCode_fail;
-			return false; 			
-		}
-	}	
-	
-	//conf_mount_ro();
+		snortJsonReturnCode(snortSql_updatelistDelete('SnortWhitelistips', 'filename', $fetchExtraWhitelistEntries['filename']));	
+		snortJsonReturnCode(snortSql_updatelistDelete($_POST['RMlistTable'], 'uuid', $_POST['RMlistUuid']));
+
+	}
 	
 }
 
@@ -133,29 +131,15 @@ if ($_POST['snortSaveSettings'] == 1)
 		}
 		
 		// unset POSTs that are markers not in db
-		unset($_POST['snortSaveSettings']);
+		unset($_POST['snortSaveSettings']);		
 		unset($_POST['ifaceTab']);
-		      
-		// update date on every save
-		$_POST['date'] = date(U);              
-		          
-		//print_r($_POST);
-		//return true;
-		    
-		conf_mount_rw();
-		snortSql_updateSettings($_POST['dbName'], $_POST, 'id', '1');
-		conf_mount_ro();
+		      		    
 		
-		echo '
-		{
-		"snortgeneralsettings": "success"	
-		}
-		';
-		return true;		
+		snortJsonReturnCode(snortSql_updateSettings('id', '1'));		
 	      
 	} // end of dbTable SnortSettings
 
-    // Save rules settings
+    // Save rule settings on the interface edit tab
 	if ($_POST['dbTable'] == 'Snortrules')
     {
     	
@@ -196,9 +180,9 @@ if ($_POST['snortSaveSettings'] == 1)
 					$newSnortDir = 'sn_' . $_POST['uuid'] . '_' . $_POST['interface'];					
 					exec('/usr/bin/tar xvfz /usr/local/etc/snort/base_rules.tar.gz ' . '-C /usr/local/etc/snort/' . $newSnortDir);					
 				}
-			}
+			} //end of mkdir
 		          
-		}		
+		} // end of snort_interfaces_edit		
 		
 		// snort preprocessor edit
 		if ($_POST['ifaceTab'] == 'snort_preprocessors') 
@@ -246,17 +230,9 @@ if ($_POST['snortSaveSettings'] == 1)
 	      unset($_POST['snortSaveSettings']);
 	      unset($_POST['ifaceTab']);
 	      
-	      // update date on every save
-	      $_POST['date'] = date(U);    
-	          
-	          
-	      //print_r($_POST);
-	      //return true;
-	      
-	      snortJsonReturnCode(snortSql_updateSettings($_POST['dbName'], $_POST, 'uuid', $_POST['uuid']));	      
+	      snortJsonReturnCode(snortSql_updateSettings('uuid', $_POST['uuid']));	      
       
-    } // end of dbTable Snortrules
-    		
+    } // end of dbTable Snortrules    		
 			
 } // STOP General Settings Save
 
@@ -282,20 +258,10 @@ if ($_POST['snortSaveSuppresslist'] == 1)
 		// convert textbox to base64
 		$_POST['suppresspassthru'] = base64_encode($_POST['suppresspassthru']);
 		
-		//conf_mount_rw();
-		snortSql_updateSettings($_POST['dbName'], $_POST, 'uuid', $_POST['uuid']);
-		//conf_mount_ro();		
-		
-		echo '
-		{
-		"snortgeneralsettings": "success" 
-		}
-		';
-		return true;	  
-	  
+		// Write to database
+		snortJsonReturnCode(snortSql_updateSettings('uuid', $_POST['uuid']));		
+	  	  
 	}
-
-
 	
 }
 
@@ -322,29 +288,19 @@ if ($_POST['snortSaveWhitelist'] == 1)
   // unset POSTs that are markers not in db
   unset($_POST['snortSaveWhitelist']);
   unset($_POST['ifaceTab']);
-
-  $genSettings = $_POST;
-  unset($genSettings['list']);
   
-  $genSettings['date'] = date(U);
+  // Split the POST for 2 arraus
+  $whitelistIPs = $_POST['list'];
+  unset($_POST['list']);
   
-    //print_r($_POST);
-    //return true;
   
-  //conf_mount_rw();
-  snortSql_updateSettings($_POST['dbName'], $genSettings, 'uuid', $genSettings['uuid']);
-  if ($_POST['list'] != '')
+  if (snortSql_updateSettings('uuid', $_POST['uuid']) && snortSql_updateWhitelistIps($whitelistIPs))
   {
-    snortSql_updateWhitelistIps($_POST['dbTable'], $_POST['list'], $genSettings['filename']);
+  	snortJsonReturnCode(true);
+  }else{
+  	snortJsonReturnCode(false);
   }
-  //conf_mount_ro();
-  
-    echo '
-    {
-    "snortgeneralsettings": "success" 
-    }
-    ';
-    return true;
+
 
 }
 

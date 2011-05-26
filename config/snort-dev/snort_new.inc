@@ -250,8 +250,14 @@ function snortSql_updateRuleSigList()
 } // END Save ruleSets settings
 
 // Save ruleSets settings
-function snortSql_updateRuleSetList($dbname, $table, $ruleSetfilenames, $ifaceuuid)
+function snortSql_updateRuleSetList()
 {
+	
+	$dbname = $_POST['dbName'];
+	$table = $_POST['dbTable'];
+	$ruleSetfilenames = $_POST['filenamcheckbox'];
+	$ifaceuuid = $_POST['ifaceuuid'];
+	
 	
 	$addDate = date(U);
 
@@ -427,7 +433,13 @@ function snortSql_fetchAllSettingsList($table, $listFilename)
 }
 
 // Update settings to database
-function snortSql_updateSettings($dbname, $settings, $type, $id_uuid) {
+function snortSql_updateSettings($type, $id_uuid) 
+{
+	$dbname = $_POST['dbName'];
+	$settings = $_POST;
+	
+	// update date on every save
+	$_POST['date'] = date(U); 
   
   $db = "/usr/local/pkg/snort/$dbname";
   $mydb = sqlite_open("$db");
@@ -574,8 +586,16 @@ function snortSql_fetchAllWhitelistTypes($table, $table2)
 
 
 // Save Whitelistips Settings
-function snortSql_updateWhitelistIps($table, $newPostListips, $filename)
+function snortSql_updateWhitelistIps($newPostListips)
 {
+	
+	if($newPostListips == '')
+	{
+		return true;
+	}
+	
+	$table = $_POST['dbTable'];
+	$filename = $_POST['filename'];	
   
     $db = '/usr/local/pkg/snort/snortDB';
     $mydb = sqlite_open("$db");
@@ -712,9 +732,11 @@ function snortSql_updateWhitelistIps($table, $newPostListips, $filename)
 } // end of func
 
 // RMlist Delete
-function snortSql_updatelistDelete($usrDB, $table, $type, $uuid_filename)
+function snortSql_updatelistDelete($table, $type, $uuid_filename)
 {
   
+	$usrDB = $_POST['RMlistDB'];
+	
     $db = "/usr/local/pkg/snort/$usrDB";
     $mydb = sqlite_open("$db");
 
@@ -732,6 +754,13 @@ function snortSql_updatelistDelete($usrDB, $table, $type, $uuid_filename)
 		");
     }
     
+    if ($type == 'ifaceuuid')
+    {    
+		$query = sqlite_query($mydb, // @ supress warnings use only in production
+		"DELETE FROM {$table} WHERE ifaceuuid = '{$uuid_filename}';
+		");
+    }    
+       
       if (sqlite_changes($mydb) < 1)
       {
         sqlite_close($mydb);

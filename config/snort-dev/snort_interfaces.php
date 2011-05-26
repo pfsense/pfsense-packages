@@ -41,7 +41,7 @@ $new_ruleUUID = genAlphaNumMixFast(7, 8);
 $a_interfaces = snortSql_fetchAllInterfaceRules('Snortrules', 'snortDBrules');
 
 
-	$pgtitle = "Services: Snort 2.9.0.4 pkg v. 1.37";
+	$pgtitle = "Services: Snort 2.9.0.5 pkg v. 2.0";
 	include("/usr/local/pkg/snort/snort_head.inc");
 
 ?>

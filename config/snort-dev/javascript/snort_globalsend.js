@@ -283,7 +283,7 @@ jQuery(document).ready(function() {
 	    var queryString = jQuery.param(formData); 
 	    
 		// call to please wait	
-		showLoading();
+	    showLoading('#loadingWaiting');
 	 
 	    alert('About to submit: \n\n' + queryString); 
 	    
@@ -298,13 +298,13 @@ jQuery(document).ready(function() {
 		
 		var appendElem = jQuery('<br> <span>success...<span>');
 		appendElem.appendTo('.loadingWaitingMessage');
-		setTimeout(hideLoading, 3000);
+		setTimeout(hideLoading('#loadingWaiting'), 3000);
 	}	
 
 	// After Save Calls display
 	var appendElem = jQuery('<br> <span>success...<span>');
 	function finnish(){
-		hideLoading();
+		hideLoading('#loadingWaiting');
 		appendElem.remove();
 		updatestarted = 1;
 	}
