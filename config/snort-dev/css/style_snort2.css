@@ -6,24 +6,44 @@ a {
 }
 */
 
+
+#right {
+
+	position: relative;
+	top: -10px;
+	left: 0px;
+	width: 770px;
+	margin-top: 0px;
+	margin-left: 5px;
+	margin-right: 5px;
+	padding-top: 20px;
+	padding-left: 0px;
+	padding-right: 0px;
+	padding-bottom: 90px;
+	min-height: 400px;
+
+}
+
 .odd_ruleset2 {
+	text-align: center;
 	background-color: #ffffff;
 	border-left: 1px solid #999999;
 	border-bottom: 1px solid #999999;
 	font-size: 11px;
-	padding-right: 6px;
-	padding-left: 6px;
+	padding-right: 2px;
+	padding-left: 2px;
 	padding-top: 4px;
 	padding-bottom: 4px;
 }
 
 .even_ruleset2 {
+	text-align: center;
 	background-color: #eeeeee;
 	border-left: 1px solid #999999;
 	border-bottom: 1px solid #999999;
 	font-size: 11px;
-	padding-right: 6px;
-	padding-left: 6px;
+	padding-right: 2px;
+	padding-left: 2px;
 	padding-top: 4px;
 	padding-bottom: 4px;
 }
@@ -67,7 +87,7 @@ a {
 	visibility:hidden;	
 }	
 
-#loadingWaiting { 
+#loadingWaiting, #loadingRuleEditGUI{ 
 	display:none; 
 	position:fixed; 
 	left:0; 
@@ -75,8 +95,21 @@ a {
 	width:100%; 
 	height:100%;
     background-image:url("/snort/images/transparentbg.png"); 
-    z-index: 9999;
-    color: fff;
+    z-index: 9998;
+    color: #ffffff;
+}
+
+.loadingRuleEditGUIDiv {
+
+  position: absolute;
+  top: 2%;
+  left: 5%;
+  right: 5%;
+  bottom: 50%;
+  color: #ffffff;
+  z-index: 9999;
+  text-align: center;
+	
 }
 
 .loadingWaitingMessage {
@@ -84,7 +117,7 @@ a {
   position: absolute;
   top: 25%;
   left: 50%;
-  color: #fff;
+  color: #ffffff;
   z-index: 9999;
   text-align: center;
 	
@@ -92,8 +125,8 @@ a {
 
 .listhdrr2 {
 	background-color: #BBBBBB;
-	padding-right: 9px;
-	padding-left: 6px;
+	padding-right: 1px;
+	padding-left: 1px;
 	font-weight: bold;
 	border-right: 1px solid #999999;
 	border-bottom: 1px solid #999999;

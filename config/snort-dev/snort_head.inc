@@ -34,14 +34,6 @@ $pagetitle = gentitle( $pgtitle );
 	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 	<link rel="apple-touch-icon" href="/themes/<?php echo $g['theme']; ?>/apple-touch-icon.png"/>
 	
-	
-<!-- snort custom javascript and css -->
-
-<?php include('/usr/local/pkg/snort/snort_headbase.inc'); ?>
-
-<!-- remove Only used to test conflicts -->	
-	
-	
         <?php if (strpos($_SERVER["SCRIPT_FILENAME"], "wizard.php") !== false &&
                   file_exists("{$g['www_path']}/themes/{$g['theme']}/wizard.css")): ?>
 					<?php echo "<style type=\"text/css\" src=\"/themes/{$g['theme']}/wizard.css\"></style>"; ?>
@@ -55,7 +47,16 @@ $pagetitle = gentitle( $pgtitle );
 		<script type="text/javascript">
 			var theme = "<?php echo $g['theme']; ?>";
 		</script>
-		<?php echo "\t<script type=\"text/javascript\" src=\"/themes/{$g['theme']}/loader.js\"></script>\n"; ?>
+		<?php echo "\t<script type=\"text/javascript\" src=\"/themes/{$g['theme']}/loader.js\"></script>\n"; ?>	
+		
+<?php
+	//<!-- snort custom javascript and css -->
+	echo "\n";
+	include('/usr/local/pkg/snort/snort_headbase.inc');
+	echo "\n";
+	//<!-- snort custom javascript and css -->
+?>		
+		
 <?php
 		if($_GET['enablefirebuglite']) {
 			echo "\t<script type=\"text/javascript\" src=\"/javascript/pi.js\"></script>\n";
@@ -85,7 +86,8 @@ $pagetitle = gentitle( $pgtitle );
 			closedir($dh);
 		}
 	}
-
+	
+	
 if (!isset($closehead))
 	echo "</head>";
 

@@ -11,55 +11,55 @@ if(isset($_POST['__csrf_magic']))
 }
 
 // return codes
-$snortJsonReturnCode_success = '
-{
-"snortgeneralsettings": "success"	
-}
-';
+$snortJsonReturnCode_success = '{"snortgeneralsettings":"success"}';
 
-$snortJsonReturnCode_fail = '
-{
-"snortgeneralsettings": "fail"	
-}
-';
+$snortJsonReturnCode_fail = '{"snortgeneralsettings":"fail"}';
 
-	function snortJsonReturnCode($returnStatus)
+function snortJsonReturnCode($returnStatus)
+{		
+	if ($returnStatus == true)
 	{
-		
-		if ($returnStatus == true)
-		{
-			echo '
-	{
-	"snortgeneralsettings": "success", "snortUnhideTabs": "true"	
-	}
-	';		
-		}else{
-			echo '
-	{
-	"snortgeneralsettings": "fail"	
-	}
-	';		
-		}
-		
-	}
+		echo '{"snortgeneralsettings":"success","snortUnhideTabs":"true"}';
+	}else{
+		echo '{"snortgeneralsettings":"fail"}';
+	}		
+}
+
+// row from db by uuid
+if ($_POST['snortSidRuleEdit'] == 1)
+{
+	
+	unset($_POST['snortSidRuleEdit']);
+	
+	snortSidStringRuleEditGUI();
+	
+}
 
 	
-	// row from db by uuid
+// row from db by uuid
 if ($_POST['snortSaveRuleSets'] == 1)
 {	
 
-	// unset POSTs that are markers not in db
-	unset($_POST['snortSaveSettings']);
-	unset($_POST['ifaceTab']);
+	if ($_POST['ifaceTab'] == 'snort_rulesets')
+	{	
+		// unset POSTs that are markers not in db
+		unset($_POST['snortSaveRuleSets']);
+		unset($_POST['ifaceTab']);		
+		
+		snortJsonReturnCode(snortSql_updateRuleSetList());
+
+	}
 	
-	if(snortSql_updateRuleSetList($_POST['dbName'], $_POST['dbTable'], $_POST['filenamcheckbox'], $_POST['ifaceuuid']))
-	{
-  		echo $snortJsonReturnCode_success;
-		return true; 		
-  	}else{
-		echo $snortJsonReturnCode_fail;
-		return false; 		
-	}		
+	
+	if ($_POST['ifaceTab'] == 'snort_rules')
+	{	
+		// unset POSTs that are markers not in db
+		unset($_POST['snortSaveRuleSets']);
+		unset($_POST['ifaceTab']);
+		
+		snortJsonReturnCode(snortSql_updateRuleSigList());
+	}	
+	
 	
 } // END of rulesSets	
 

@@ -1,27 +1,17 @@
-<?php if ($config['version'] >= 6): ?>
-<link rel="stylesheet" type="text/css" href="/themes/<?php echo $g['theme']; ?>/new_tab_menu.css"media="all">
-<?php else: ?>
-<link rel="stylesheet" type="text/css" href="./css/new_tab_menu.css" media="all">
-<?php endif; ?>
 
-<link rel="stylesheet" type="text/css" href="./css/sexybuttons.css" media="all" />
+
+<!-- START of Snort Package css and javascript -->
+
 <link rel="stylesheet" type="text/css" href="./css/style_snort2.css" media="all" />
+<!-- <link rel="stylesheet" type="text/css" href="./css/jquery.bubblepopup.v2.3.1.css" media="all" /> -->
 
-<?php
+<script type="text/javascript" src="./javascript/jquery-1.6.min.js"></script>
+<script type="text/javascript" src="./javascript/snort_globalsend.js"></script>
+<script type="text/javascript" src="./javascript/jquery.form.js"></script>
+<!-- <script type="text/javascript" src="./javascript/jquery.bubblepopup.v2.3.1.min.js"></script>  -->
 
+<!-- STOP of Snort Package css and javascript -->
 
-echo "\t<script type=\"text/javascript\" src=\"./javascript/jquery-1.6.min.js\"></script>\n";
-
-echo "\t<script type=\"text/javascript\" src=\"./javascript/jquery.form.js\"></script>\n";
-
-
-//echo "\t<link href=\"./css/jquery.bubblepopup.v2.3.1.css\" rel=\"stylesheet\" type=\"text/css\" />\n";
-//echo "\t<script src=\"./javascript/jquery.bubblepopup.v2.3.1.min.js\" type=\"text/javascript\"></script>\n";
-
-echo "\t<script type=\"text/javascript\" src=\"./javascript/snort_globalsend.js\"></script>\n";
-
-
-?>
 
 <?php
 // this has to be loaded at the bottom

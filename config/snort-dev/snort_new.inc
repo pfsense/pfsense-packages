@@ -6,7 +6,248 @@ if(isset($_POST['__csrf_magic']))
   unset($_POST['__csrf_magic']);
 }
 
+// Wites selected sig  to file
+function snortSidStringRuleEditGUI()
+{
 
+	$workingFile = '/usr/local/etc/snort/sn_' . $_POST['snortSidRuleIface'] . '/rules/' . $_POST['snortSidRuleFile'];
+	
+	$splitcontents = split_rule_file($workingFile);
+	
+	if (!empty($splitcontents))
+	{
+		$sidLinePosPre = exec('/usr/bin/sed -n /sid:' . $_POST['snortSidNum'] . '\;/= ' . $workingFile);
+		$sidLinePos = $sidLinePosPre - 1;
+		
+		$splitcontents[$sidLinePos] = $_POST['sidstring'];
+		
+		
+		write_rule_file($splitcontents, $workingFile);
+		
+		return true;
+	}
+	
+	return false;
+	
+}	
+
+function sendSidStringRuleEditGUI()
+{
+	
+	$sidCall = exec('sed -n "/alert.*sid:' . $_GET['sid'] . ';.*/p" /usr/local/etc/snort/sn_' . $_GET['snortIface'] . '/rules/' . $_GET['snortRuleFile']);
+	$sidCallJsonFilter = escapeJsonString($sidCall);
+	
+	echo '{"sidstring":' . '"' . $sidCallJsonFilter . '","sid":' . '"' . $_GET['sid'] . '"}';
+	return true;
+}
+
+
+function escapeJsonString($escapeString)
+{
+	$search = array('\\', '\n', '\r', '\u', '\t', '\f', '\b', '/', '"');
+	$replace = array('\\\\', '\\n', '\\r', '\\u', '\\t', '\\f', '\\b', '\/', '\"');
+	$encoded_string = str_replace($search, $replace, $escapeString);
+	
+	return $encoded_string;
+	
+}
+
+// limit the length of the given string to $MAX_LENGTH char
+function trimLength($s) {  
+
+
+  $MAX_LENGTH = 13; 
+  $str_to_count = $s; 
+  if (strlen($str_to_count) <= $MAX_LENGTH) { 
+    return $s; 
+  } 
+
+  $s2 = substr($str_to_count, 0, $MAX_LENGTH - 3); 
+  $s2 .= "..."; 
+  return $s2; 
+}
+
+
+// builds base array with sid etc....
+function newFilterRuleSig($baseruleArray)
+{
+
+	function get_middle($source, $beginning, $ending, $init_pos) 
+	{
+	   $beginning_pos = strpos($source, $beginning, $init_pos);
+	   $middle_pos = $beginning_pos + strlen($beginning);
+	   $ending_pos = strpos($source, $ending, $beginning_pos);
+	   $middle = substr($source, $middle_pos, $ending_pos - $middle_pos);
+	   return $middle;
+	}
+	
+	
+	$i = 0;
+	$newSigArray[] = array();
+	foreach ( $baseruleArray as $value )
+	{
+		
+		// add sid
+		$newSigArray[$i]['sid'] = get_middle($value, 'sid:', ';', 0);
+		
+		// remove whitespaces
+		$rmWhitespaces = preg_replace('/\s\s+/', ' ', $value);		
+		// remove whitespace betwin # aerrt
+		$rmAlertWhitespace = preg_replace('/^# alert/', '#alert', $rmWhitespaces);				
+		$splitcontents = explode(' ', $rmAlertWhitespace);	
+				
+		// enable or disable
+		if ($splitcontents[0] === '#alert')
+		{
+			$newSigArray[$i]['enable'] = 'off';
+		}else{
+			$newSigArray[$i]['enable'] = 'on';
+		}
+		
+		// proto
+		$newSigArray[$i]['proto'] = $splitcontents[1];
+		
+		// source
+		$newSigArray[$i]['src'] = trimLength($splitcontents[2]);
+		
+		// source port
+		$newSigArray[$i]['srcport'] = trimLength($splitcontents[3]);
+
+		// Destination
+		$newSigArray[$i]['dst'] = trimLength($splitcontents[5]);
+		
+		// Destination port
+		$newSigArray[$i]['dstport'] = trimLength($splitcontents[6]);
+		
+		// sig message 
+		$newSigArray[$i]['msg'] = get_middle($value, 'msg:"', '";', 0);
+			
+		$i++;				
+	}
+	
+	return $newSigArray;
+}
+
+
+function split_rule_file($workingFile)
+{
+	$filehandle = fopen($workingFile, "r");
+	$contents = fread($filehandle, filesize($workingFile));
+
+	fclose ($filehandle);
+
+	$delimiter = "\n";
+
+	$splitcontents = explode($delimiter, $contents);
+
+	return $splitcontents;
+}
+
+
+// write rule file to disk
+function write_rule_file($content_changed, $received_file)
+{
+	//read snort file with writing enabled
+	$filehandle = fopen($received_file, "w");
+
+	//delimiter for each new rule is a new line
+	$delimiter = "\n";
+
+	//implode the array back into a string for writing purposes
+	$fullfile = implode($delimiter, $content_changed);
+
+	//write data to file
+	fwrite($filehandle, $fullfile);
+
+	//close file handle
+	fclose($filehandle);
+
+}
+
+
+// Save ruleSets settings
+function snortSql_updateRuleSigList()
+{
+
+	$snortDir = '/usr/local/etc/snort/sn_' . $_SESSION['snort']['tmp']['snort_rules']['ifaceuuid'] . '_' . $_SESSION['snort']['tmp']['snort_rules']['ifaceselected'];
+	
+	// selected snort rule file	
+	$workingFile = $snortDir . '/rules/' . $_SESSION['snort']['tmp']['snort_rules']['rulefile'];
+	
+	$splitcontents = split_rule_file($workingFile);
+	
+	// open rule file and change enable/disable sids
+	function read_rule_file($splitcontents, $enableSigsArray, $disableSigsArray)
+	{			
+		
+		foreach ($splitcontents as $sigLine)
+		{
+			$replaceChars = array('/sid:/', '/;/');
+			preg_match('/sid:[0-9]*;/', $sigLine, $matches);
+			$sidLine = preg_replace($replaceChars, '', $matches[0]);
+			
+			
+			if ($sidLine == '')
+			{
+				$tempstring[] = $sigLine;
+			}else{
+	
+				if (in_array($sidLine, $enableSigsArray))
+				{
+					$tempstring[] = str_replace("# alert", "alert", $sigLine);
+				}
+				
+				if (in_array($sidLine, $disableSigsArray))
+				{
+					$tempstring[] = str_replace("alert", "# alert", $sigLine);
+				}
+				
+				if (!in_array($sidLine, $enableSigsArray) && !in_array($sidLine, $disableSigsArray))
+				{
+					$tempstring[] = $sigLine;
+				}			
+			}		
+		}
+			
+		return $tempstring;
+	}
+	
+	// build user selected enbled and disabled arrays
+    $enableSigsArray = array();
+	$disableSigsArray = array();
+	
+	if (!isset($_POST['filenamcheckbox2']))
+	{
+		$_POST['filenamcheckbox2'] = array();
+	}
+	
+	$newFilterRuleSigArray = newFilterRuleSig($splitcontents);
+	
+	foreach ($newFilterRuleSigArray as $sigArray)
+	{		
+		// enable sig
+		if(in_array($sigArray['sid'], $_POST['filenamcheckbox2']) && $sigArray['enable'] == 'off')
+		{
+			$enableSigsArray[] = $sigArray['sid'];			
+		}
+		
+		// disable sig
+		if(!in_array($sigArray['sid'], $_POST['filenamcheckbox2']) && $sigArray['enable'] == 'on')
+		{
+			$disableSigsArray[] = $sigArray['sid'];
+		}		
+	}
+		
+	// read rule file change disable/enable then write to file if arrays  are not empty
+	if (!empty($enableSigsArray) || !empty($disableSigsArray))
+	{
+		write_rule_file(read_rule_file($splitcontents, $enableSigsArray, $disableSigsArray), $workingFile);
+	}
+	
+	return true;
+
+    
+} // END Save ruleSets settings
 
 // Save ruleSets settings
 function snortSql_updateRuleSetList($dbname, $table, $ruleSetfilenames, $ifaceuuid)
@@ -798,14 +1039,10 @@ function snortScanDirFilter($path, $filtername)
 	 		{
 	 			$filterDirList[] = $val;			
 	 		}
-	 		
 	 	}
-		unset($listDir);
-		
+		unset($listDir);		
 	}
-		
-		return $filterDirList;
-		
+		return $filterDirList;		
 }
 
 ?>

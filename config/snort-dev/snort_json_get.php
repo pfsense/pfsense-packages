@@ -18,7 +18,17 @@ if ($_GET['snortlogdownload'] == 1)
 }
 
 
+// send Json sid string
+if ($_GET['snortGetSidString'] == 1)
+{
+	
+	// unset 
+	unset($_GET['snortGetSidString']);
+	
+	// get the SID string from file	
+	sendSidStringRuleEditGUI();
 
+}
 
 
 

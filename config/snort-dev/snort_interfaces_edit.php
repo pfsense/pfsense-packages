@@ -169,7 +169,7 @@ jQuery(document).ready(function() {
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td>
-			<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
+			<div class="newtabmenu" style="margin: 1px 0px; width: 790px;"><!-- Tabbed bar code-->
 			<ul class="newtabmenu">			
 				<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
 				<li class="newtabmenu_active"><a href="/snort/snort_interfaces_edit.php?uuid=<?=$uuid;?>"><span>If Settings</span></a></li>
