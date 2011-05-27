@@ -353,6 +353,9 @@ EOD;
 		$snmpcommunity = nut_config('snmpcommunity');
 		$snmpfreq = nut_config('snmpfreq');
 		$snmpdisabletransfer = (nut_config('snmpdisabletransfer') == 'on');
+		$allowaddr = nut_config('allowaddr');
+		$allowuser = nut_config('allowuser');
+		$allowpass = nut_config('allowpass');
 
 		if(!($name && $driver && $port))
 			return false;
