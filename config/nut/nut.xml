@@ -575,7 +575,7 @@
 		</field>
 		<field>
 			<fielddescr>SNMP UPS Community&lt;br&gt;(Def: public)</fielddescr>
-			<fieldname>snmpaddr</fieldname>
+			<fieldname>snmpcommunity</fieldname>
 			<type>input</type>
 		</field>
 		<field>
