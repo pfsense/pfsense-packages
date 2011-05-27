@@ -644,4 +644,3 @@
 		deinstall_package_nut();
 	</custom_php_deinstall_command>
 </packagegui>
- 
