@@ -151,7 +151,7 @@ include("head.inc");
 		$cmd = "upsc {$nut_config['remotename']}@{$nut_config['remoteaddr']}";
 	} elseif($nut_config['monitor'] == 'snmp') {
 		tblrow('Monitoring:','SNMP UPS');
-		$cmd = "upsc {$nut_config['name']}@localhost";
+		$cmd = "upsc {$nut_config['snmpname']}@localhost";
 	}
 
 	if($running)
