@@ -6,6 +6,19 @@
 <copy_packages_to_folder_ssh>/usr/local/www/files/packages/8/All/</copy_packages_to_folder_ssh>
 <packages>
 	<package>
+		<name>Strikeback</name>
+		<descr>Detect port scans with iplog and strikeback</descr>
+		<website></website>
+		<pkginfolink>http://forum.pfsense.org/index.php/topic,37225.0.html</pkginfolink>
+		<category>Services</category>
+		<version>0.1</version>
+		<status>BETA</status>
+		<required_version>2.0</required_version>
+		<maintainer>tom@tomschaefer.org</maintainer>
+		<config_file>http://www.pfsense.com/packages/config/strikeback/strikeback.xml</config_file>
+		<configurationfile>strikeback.xml</configurationfile>
+	</package>
+	<package>
 		<name>MAC-to-Vendor</name>
 		<descr>The package make pfSense show NIC Vendor names instead of MAC addresses in the form Asustek:xx:xx:xx, full info about MAC and vendor is available in tooltip. Applies to pages Status->Interfaces, Status->DHCP leases, Status->Wireless, Diagnostics->ARP table. Vendor names are stored in the file /usr/local/pkg/mactovendor/mac-prefixes</descr>
 		<website></website>
