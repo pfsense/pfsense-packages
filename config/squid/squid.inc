@@ -1346,7 +1346,15 @@ function squid_generate_rules($type) {
 			$rules .= "\n# Setup Squid proxy redirect\n";
 			if ($squid_conf['private_subnet_proxy_off'] == 'on') {
 				foreach ($ifaces as $iface) {
-					$rules .= "no rdr on $iface proto tcp from any to { 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8 } port 80\n";         
+					$rules .= "no rdr on $iface proto tcp from any to { 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8 } port 80\n";
+				}
+				/* Handle PPPOE case */
+				if(($config['pppoe']['mode'] == "server" && $config['pppoe']['localip']) || (function_exists("is_pppoe_server_enabled") && is_pppoe_server_enabled())) {
+					$rules .= "no rdr on $PPPOE_ALIAS proto tcp from any to { 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8 } port 80\n";
+				}
+				/* Handle PPTP case */
+				if($config['pptpd']['mode'] == "server" && $config['pptpd']['localip']) {
+					$rules .= "no rdr on $PPTP_ALIAS proto tcp from any to { 192.168.0.0/16, 172.16.0.0/12, 10.0.0.0/8 } port 80\n";
 				}
 			}
 			if (!empty($squid_conf['defined_ip_proxy_off'])) {
@@ -1364,6 +1372,14 @@ function squid_generate_rules($type) {
 				foreach ($ifaces as $iface) {
 					$rules .= "no rdr on $iface proto tcp from { $exempt_ip } to any port 80\n";         
 				}
+				/* Handle PPPOE case */
+				if(($config['pppoe']['mode'] == "server" && $config['pppoe']['localip']) || (function_exists("is_pppoe_server_enabled") && is_pppoe_server_enabled())) {
+					$rules .= "no rdr on $PPPOE_ALIAS proto tcp from { $exempt_ip } to any port 80\n";
+				}
+				/* Handle PPTP case */
+				if($config['pptpd']['mode'] == "server" && $config['pptpd']['localip']) {
+					$rules .= "no rdr on $PPTP_ALIAS proto tcp from { $exempt_ip } to any port 80\n";
+				}
 			}
 			if (!empty($squid_conf['defined_ip_proxy_off_dest'])) {
 				$defined_ip_proxy_off_dest = explode(";", $squid_conf['defined_ip_proxy_off_dest']);
@@ -1378,14 +1394,22 @@ function squid_generate_rules($type) {
 				}
 				$exempt_dest = substr($exempt_dest,2);
 				foreach ($ifaces as $iface) {
-					$rules .= "no rdr on $iface proto tcp from any to { $exempt_dest } port 80\n";         
+					$rules .= "no rdr on $iface proto tcp from any to { $exempt_dest } port 80\n";
+				}
+				/* Handle PPPOE case */
+				if(($config['pppoe']['mode'] == "server" && $config['pppoe']['localip']) || (function_exists("is_pppoe_server_enabled") && is_pppoe_server_enabled())) {
+					$rules .= "no rdr on $PPPOE_ALIAS proto tcp from any to { $exempt_dest } port 80\n";
+				}
+				/* Handle PPTP case */
+				if($config['pptpd']['mode'] == "server" && $config['pptpd']['localip']) {
+					$rules .= "no rdr on $PPTP_ALIAS proto tcp from any to { $exempt_dest } port 80\n";
 				}
 			}
 			foreach ($ifaces as $iface) {
 				$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> 127.0.0.1 port 80\n";
 			}
 			/* Handle PPPOE case */
-			if($config['pppoe']['mode'] == "server" && $config['pppoe']['localip']) {
+			if(($config['pppoe']['mode'] == "server" && $config['pppoe']['localip']) || (function_exists("is_pppoe_server_enabled") && is_pppoe_server_enabled())) {
 				$rules .= "rdr on $PPPOE_ALIAS proto tcp from any to !127.0.0.1 port 80 -> 127.0.0.1 port 80\n";
 			}
 			/* Handle PPTP case */
