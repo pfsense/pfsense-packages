@@ -55,10 +55,10 @@ function php_install_command_ip()
 
 	
 	//install PERL
-	exec("pkg_add -r http://www.pfsense.org/packages/config/ipblocklist/8/perl-5.12.2_4.tbz");
-	exec("pkg_add -r http://www.pfsense.org/packages/config/ipblocklist/8/p5-Net-CIDR-0.14.tbz");
-	exec("pkg_add -r http://www.pfsense.org/packages/config/ipblocklist/8/compat7x.tbz");
-	exec("pkg_add -r http://www.pfsense.org/packages/config/ipblocklist/8/compat6x.tbz");
+	exec("pkg_add -r perl");
+	exec("pkg_add -r p5-Net-CIDR");
+	exec("pkg_add -r compat7x-i386.tbz");
+	exec("pkg_add -r compat6x-i386.tbz");
 
 	//rename PHP files from .tmp to .php
 	exec("cp /tmp/class.phpmailer.tmp /usr/local/www/packages/ipblocklist/class.phpmailer.php");

@@ -55,8 +55,8 @@ function php_install_command_ip()
 
 	
 	//install PERL
-	exec("pkg_add -r http://www.pfsense.org/packages/config/ipblocklist/7/perl-5.12.2_2.tbz");
-	exec("pkg_add -r http://www.pfsense.org/packages/config/ipblocklist/7/p5-Net-CIDR-0.14.tbz");
+	exec("pkg_add -r ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-7-stable/All/perl-5.12.3.tbz");
+	exec("pkg_add -r ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-7-stable/All/p5-Net-CIDR-0.14.tbz");
 	
 
 	//rename PHP files from .tmp to .php
