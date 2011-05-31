@@ -92,6 +92,16 @@
 			<value>lan</value>
 			<multiple>true</multiple>
 		</field>
+		<field>
+			<fielddescr>Allow merging interfaces&lt;br&gt;(Def: Do not merge)</fielddescr>
+			<fieldname>allowmerge</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Track all traffic&lt;br&gt;(Def: IPv4 only)</fielddescr>
+			<fieldname>alltraffic</fieldname>
+			<type>checkbox</type>
+		</field>
 	</fields>
 	<custom_php_global_functions>
 	<![CDATA[
@@ -115,6 +125,8 @@
 		if($ntop_config['password'] and $ntop_config['passwordagain']) {
 			if($ntop_config['password'] == $ntop_config['passwordagain']) {
 				$first = 0;
+				$mergeifs = ($ntop_config['allowmerge'] == "on") ? "" : "-M";
+				$alltraffic = ($ntop_config['alltraffic'] == "on") ? "" : "--ipv4";
 				foreach($ntop_config['interface_array'] as $iface) {
 				$if = convert_friendly_interface_to_real_interface_name($iface);
 				if($if) {
@@ -125,7 +137,7 @@
 				}
 				}
 				exec("/usr/local/bin/ntop --set-admin-password=" . $ntop_config['password'] . " &", $ntopout);
-				$start = "/usr/local/bin/ntop -i " . $ifaces_final . " -u root -d --ipv4 -M -x 8102 -X 8192 &";
+				$start = "/usr/local/bin/ntop -i {$ifaces_final} -u root -d {$alltraffic} {$mergeifs} -x 8102 -X 8192 &";
 				write_rcfile(array(
 							"file" => "ntop.sh",
 							"start" => $start,
