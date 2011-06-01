@@ -109,6 +109,7 @@
 		$rules = "";
 		switch ($type) {
 		case 'rdr':
+		case 'nat':
 			$rules = "# IMSpector rdr anchor\n";
 			$rules .= "rdr-anchor \"imspector\"\n";
 			break;
