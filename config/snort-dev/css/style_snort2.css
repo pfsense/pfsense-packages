@@ -87,7 +87,7 @@ a {
 	visibility:hidden;	
 }	
 
-#loadingWaiting, #loadingRuleEditGUI{ 
+#loadingWaiting, #loadingRuleEditGUI, #loadingRuleUpadteGUI{ 
 	display:none; 
 	position:fixed; 
 	left:0; 
@@ -99,24 +99,22 @@ a {
     color: #ffffff;
 }
 
-.loadingRuleEditGUIDiv {
+.loadingWaitingMessage{
 
   position: absolute;
-  top: 2%;
-  left: 5%;
-  right: 5%;
-  bottom: 50%;
+  top: 25%;
+  left: 50%;
   color: #ffffff;
   z-index: 9999;
   text-align: center;
 	
 }
 
-.loadingWaitingMessage {
+.loadingWaitingUpdateGUI{
 
   position: absolute;
   top: 25%;
-  left: 50%;
+  left: 35%;
   color: #ffffff;
   z-index: 9999;
   text-align: center;
@@ -241,7 +239,7 @@ padding-bottom: 12px;
 .vncell2 {
 	background-color: #eeeeee;
 	padding-right: 5px;
-	padding-left: 8px;
+	padding-left: 5px;
 	border-bottom: 1px solid #999999;
 	font-size: 11px;
 }

@@ -8,6 +8,7 @@
 <script type="text/javascript" src="./javascript/jquery-1.6.min.js"></script>
 <script type="text/javascript" src="./javascript/snort_globalsend.js"></script>
 <script type="text/javascript" src="./javascript/jquery.form.js"></script>
+<script type="text/javascript" src="./javascript/jquery.progressbar.min.js"></script>
 <!-- <script type="text/javascript" src="./javascript/jquery.bubblepopup.v2.3.1.min.js"></script>  -->
 
 <!-- STOP of Snort Package css and javascript -->
