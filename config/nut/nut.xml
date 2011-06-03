@@ -103,12 +103,12 @@
 					<value>local</value>
 				</option>
 				<option>
-					<name>Remote NUT UPS</name>
-					<value>remote</value>
-				</option>
-				<option>
 					<name>Remote SNMP UPS</name>
 					<value>snmp</value>
+				</option>
+				<option>
+					<name>Remote NUT UPS</name>
+					<value>remote</value>
 				</option>
 			</options>
 		</field>
@@ -116,6 +116,25 @@
 			<fielddescr>Power Down Instead of Halt</fielddescr>
 			<fieldname>powerdown</fieldname>
 			<type>checkbox</type>
+		</field>
+		<field>
+			<name>Remote Access Settings - Used for Local and SNMP Types to allow access</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Remote Access Address &lt;br&gt;(ex: 192.168.1.0/24)</fielddescr>
+			<fieldname>allowaddr</fieldname>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Remote Access User</fielddescr>
+			<fieldname>allowuser</fieldname>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Remote Acces Password</fielddescr>
+			<fieldname>allowpass</fieldname>
+			<type>password</type>
 		</field>
 		<field>
 			<name>Local UPS Settings</name>
@@ -521,45 +540,6 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>Local Remote Access Address &lt;br&gt;(ex: 192.168.1.0/24)</fielddescr>
-			<fieldname>allowaddr</fieldname>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Local Remote Access User</fielddescr>
-			<fieldname>allowuser</fieldname>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Local Remote Acces Password</fielddescr>
-			<fieldname>allowpass</fieldname>
-			<type>password</type>
-		</field>
-		<field>
-			<name>Remote NUT UPS Settings</name>
-			<type>listtopic</type>
-		</field>
-		<field>
-			<fielddescr>&lt;strong&gt;Remote UPS Name&lt;/strong&gt;</fielddescr>
-			<fieldname>remotename</fieldname>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>&lt;strong&gt;Remote UPS Address&lt;/strong&gt; &lt;br&gt;(ex: 192.168.1.10)</fielddescr>
-			<fieldname>remoteaddr</fieldname>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>&lt;strong&gt;Remote UPS User&lt;/strong&gt;</fielddescr>
-			<fieldname>remoteuser</fieldname>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>&lt;strong&gt;Remote UPS Password&lt;/strong&gt;</fielddescr>
-			<fieldname>remotepass</fieldname>
-			<type>password</type>
-		</field>
-		<field>
 			<name>Remote SNMP UPS Settings</name>
 			<type>listtopic</type>
 		</field>
@@ -629,6 +609,30 @@
 			<fielddescr>Disable transfer OIDs&lt;br&gt;(use on APCC Symmetras)</fielddescr>
 			<fieldname>snmpdisabletransfer</fieldname>
 			<type>checkbox</type>
+		</field>
+		<field>
+			<name>Remote NUT UPS Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>&lt;strong&gt;Remote NUT UPS Name&lt;/strong&gt;</fielddescr>
+			<fieldname>remotename</fieldname>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>&lt;strong&gt;Remote NUT UPS Address&lt;/strong&gt; &lt;br&gt;(ex: 192.168.1.10)</fielddescr>
+			<fieldname>remoteaddr</fieldname>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>&lt;strong&gt;Remote NUT UPS User&lt;/strong&gt;</fielddescr>
+			<fieldname>remoteuser</fieldname>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>&lt;strong&gt;Remote NUT UPS Password&lt;/strong&gt;</fielddescr>
+			<fieldname>remotepass</fieldname>
+			<type>password</type>
 		</field>
 	</fields>
 	<custom_php_command_before_form>
