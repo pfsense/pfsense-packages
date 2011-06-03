@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    authng.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2007 Ryan Wagoner <rswagoner@gmail.com>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>imspector</name>
+	<version>0.9</version>
+	<title>Services: IMSpector</title>
+	<savetext>Change</savetext>
+	<aftersaveredirect>/services_imspector_logs.php</aftersaveredirect>
+	<include_file>/usr/local/pkg/imspector.inc</include_file>
+	<menu>
+		<name>IMSpector</name>
+		<tooltiptext>Set IMSpector settings such as protocols to listen on.</tooltiptext>
+		<section>Services</section>
+		<url>/services_imspector_logs.php</url>
+	</menu>
+	<service>
+		<name>imspector</name>
+		<rcfile>imspector.sh</rcfile>
+		<executable>imspector</executable>
+	</service>
+	<tabs>
+		<tab>
+			<text>IMSpector Log Viewer</text>
+			<url>/services_imspector_logs.php</url>
+		</tab>
+		<tab>
+			<text>IMSpector Settings</text>
+			<url>/pkg_edit.php?xml=imspector.xml&amp;id=0</url>
+			<active/>
+		</tab>
+	</tabs>
+	<additional_files_needed>
+	    <prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/imspector/imspector.inc</item>
+	</additional_files_needed>
+	<additional_files_needed>
+	    <prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+		<item>http://www.pfsense.org/packages/config/imspector/services_imspector_logs.php</item>
+	</additional_files_needed>
+	<fields>
+		<field>
+			<fielddescr>Enable IMSpector</fielddescr>
+			<fieldname>enable</fieldname>
+			<type>checkbox</type>
+		</field>			
+		<field>
+			<fielddescr>Interfaces (generally LAN)</fielddescr>
+			<fieldname>iface_array</fieldname>
+			<description>You can use the CTRL or COMMAND key to select multiple interfaces.</description>
+			<type>interfaces_selection</type>
+			<size>3</size>
+			<required/>
+			<value>lan</value>
+			<multiple>true</multiple>
+		</field>
+		<field>
+			<fielddescr>Listen on protocols</fielddescr>
+			<fieldname>proto_array</fieldname>
+			<description>You can use the CTRL or COMMAND key to select multiple protocols.</description>
+			<type>select</type>
+			<size>4</size>
+			<required/>
+			<multiple>true</multiple>
+ 			<options>
+ 				<option>
+ 					<name>MSN</name>
+ 					<value>msn</value>
+ 				</option>
+ 				<option>
+					<name>ICQ/AIM</name>
+ 					<value>icq</value>
+				</option>
+ 				<option>
+					<name>Yahoo</name>
+ 					<value>yahoo</value>
+				</option>
+ 				<option>
+					<name>IRC</name>
+ 					<value>irc</value>
+ 				</option>			
+			</options>
+		</field>
+		<field>
+			<fielddescr>Enable file logging</fielddescr>
+			<fieldname>log_file</fieldname>
+			<description>Log files stored in /var/imspector.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Enable mySQL logging</fielddescr>
+			<fieldname>log_mysql</fieldname>
+			<description>Make sure to specify your MySQL credentials below.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>mySQL server</fielddescr>
+			<fieldname>mysql_server</fieldname>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>mySQL database</fielddescr>
+			<fieldname>mysql_database</fieldname>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>mySQL username</fielddescr>
+			<fieldname>mysql_username</fieldname>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>mySQL password</fielddescr>
+			<fieldname>mysql_password</fieldname>
+			<type>password</type>
+		</field>
+		<field>
+			<fielddescr>Enable bad word filtering</fielddescr>
+			<fieldname>filter_badwords</fieldname>
+			<description>Replace characters of matched bad word with *.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Bad words list</fielddescr>
+			<fieldname>badwords_list</fieldname>
+			<description>
+				Place one word or phrase to match per line.&lt;br /&gt;
+				If left blank the default list in /usr/local/etc/imspector/badwords.txt will be used.
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>5</rows>
+			<cols>40</cols>
+		</field>
+		<field>
+			<fielddescr>Block file transfers</fielddescr>
+			<fieldname>block_files</fieldname>
+			<description>Block file transfers on supported protocols.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Block non ACL defined</fielddescr>
+			<fieldname>block_unlisted</fieldname>
+			<description>Overide the default of allowing user's not defined the whitelist or blacklist ACLs.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>ACL whitelist</fielddescr>
+			<fieldname>acl_whitelist</fieldname>
+			<description>
+				Example (allow specifc access): localuser: remoteuser1 remoteuser2&lt;br /&gt;
+				Example (allow full access): localuser:
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>5</rows>
+			<cols>40</cols>
+		</field>
+		<field>
+			<fielddescr>ACL blacklist</fielddescr>
+			<fieldname>acl_blacklist</fieldname>
+			<description>
+				Example (block specifc access): localuser: remoteuser1 remoteuser2&lt;br /&gt;
+				Example (block all access): localuser:
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>5</rows>
+			<cols>40</cols>
+		</field>
+	</fields>
+	<custom_php_validation_command>
+		validate_form_imspector($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		sync_package_imspector();
+	</custom_php_resync_config_command>    
+	<custom_php_deinstall_command>
+		deinstall_package_imspector();
+	</custom_php_deinstall_command>
+	<filter_rules_needed>imspector_generate_rules</filter_rules_needed>
+</packagegui>
