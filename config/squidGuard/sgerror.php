@@ -1,4 +1,6 @@
 <?php
+include "globals.inc";
+include "config.inc";
 $page_info = <<<EOD
 # ----------------------------------------------------------------------------------------------------------------------
 # SquidGuard error page generator
@@ -204,13 +206,19 @@ function get_page($body) {
 function get_error_page($er_code_id, $err_msg='') {
         global $err_code;
         global $cl;
+        global $g;
+        global $config;
         $str = Array();
 
         header("HTTP/1.1 " . $err_code[$er_code_id]);
 
         $str[] = '<html>';
         $str[] = '<body>';
-        $str[] = '<h3>Request denied by pfSense proxy: ' . $err_code[$er_code_id] . '</h3>';
+	if ($config['installedpackages']['squidguarddefault']['config'][0]['deniedmessage']) {
+		$str[] = "<h3>{$config['installedpackages']['squidguarddefault']['config'][0]['deniedmessage']}: {$err_code[$er_code_id]}</h3>";
+	} else {
+		$str[] = "<h3>Request denied by {$g['product_name']} proxy: {$err_code[$er_code_id]}</h3>";
+	}
         if ($err_msg) $str[] = "<b> Reason: </b> $err_msg";
         $str[] = '<hr size="1" noshade>';
         if ($cl['a'])        $str[] = "<b> Client address: </b> {$cl['a']} <br>";

@@ -62,6 +62,15 @@
                         </description>
                         <type>checkbox</type>
                 </field>
+		<field>
+			<fielddescr>Proxy Denied Error</fielddescr>
+			<fieldname>deniedmessage</fieldname>
+			<description>The first part of the error message displayed to clients when denied. Defaults to "Request denied by $g['product_name'] proxy"</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>2</rows>
+		</field>
+
               <field>
                         <fielddescr>Redirect mode</fielddescr>
                         <fieldname>redirect_mode</fieldname>
