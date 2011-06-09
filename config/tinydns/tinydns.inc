@@ -539,7 +539,10 @@ function tinydns_create_zone_file() {
 			if($record_data) {
 				fwrite($fd, $record_data . "\n");
 				if ($domain['rdns'] || ($domain['recordtype'] == 'PTR')) {
-					$rip = tinydns_get_ip_subnet_arpa($ipaddress, 32);
+					if (is_ipaddr($ipaddress))
+						$rip = tinydns_get_ip_subnet_arpa($ipaddress, 32);
+					elseif (intval($config['version']) >= 6)
+						$rip = tinydns_get_ip6_subnet_arpa($ipaddress, 128);
 					if($rip)
 						fwrite($fd, ".{$rip[1]}::{$config['system']['hostname']}.{$config['system']['domain']}\n");
 				}
@@ -861,6 +864,19 @@ function tinydns_get_ip_subnet_arpa($ip, $ipmask) {
 			break;
 		}
 	return 	array($subnet,$arpaip);
+}
+
+/* in-add.arpa IP calculated from D.C.B.A and Mask to A.B.C.D.in-addr.arpa */
+/* subnet IP calculated from A.B.C.D and Mask */
+function tinydns_get_ip6_subnet_arpa($ip, $ipmask=128) {
+	require_once("IPv6.inc");
+	$fullip = explode(":", Net_IPv6::uncompress($ip));
+	foreach ($fullip as & $q) {
+		$q = sprintf("%04s", $q);
+	}
+	$subnet = Net_IPv6::compress(implode(":", $fullip));
+	$arpaip = implode(".", array_reverse(str_split(implode("", $fullip)))) . ".ip6.arpa";
+	return array($subnet, $arpaip);
 }
 
 /* Create a Forward and a Reverse DNS (SOA, A, PTR) records for Fully Qualififed Domain Name*/
