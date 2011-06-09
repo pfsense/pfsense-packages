@@ -246,7 +246,11 @@ function tinydns_custom_php_changeip_command() {
 				$ipmask = find_interface_subnet($dnscacheif);
 			else
 				$ipmask = $config['interfaces'][$dnsif]['subnet'];
-			$arr = tinydns_get_ip_subnet_arpa($dnscacheip, $ipmask);
+
+			if (is_ipaddr($ipaddress))
+				$arr = tinydns_get_ip_subnet_arpa($ipaddress, $ipmask);
+			elseif (intval($config['version']) >= 6)
+				$arr = tinydns_get_ip6_subnet_arpa($ipaddress, $ipmask);
 			$dnsuserip = $arr[0];
 			//exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}");
 			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog {$g['varetc_path']}/dnscache{$dnsidx} {$dnscacheip}");
@@ -891,7 +895,10 @@ function tinydns_get_ip6_subnet_arpa($ip, $ipmask=128) {
 /* Create a Forward and a Reverse DNS (SOA, A, PTR) records for Fully Qualififed Domain Name*/
 function tinydns_complete_soa_record($fd, $ip, $ipmask, $nsname, $domain) {
 	$fqdn = "{$nsname}.{$domain}";
-	$rip = tinydns_get_ip_subnet_arpa($ip, $ipmask);
+	if (is_ipaddr($ipaddress))
+		$rip = tinydns_get_ip_subnet_arpa($ipaddress, $ipmask);
+	elseif (intval($config['version']) >= 6)
+		$rip = tinydns_get_ip6_subnet_arpa($ipaddress, $ipmask);
 	$soa = ".{$domain}::{$fqdn}";
 	$rsoa = ".{$rip[1]}::{$fqdn}";
 	$a = "={$fqdn}:{$ip}";
