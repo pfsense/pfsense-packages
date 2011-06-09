@@ -4,12 +4,12 @@
 <packagegui>
         <copyright>
         <![CDATA[
-/* $Id$ */
 /* ========================================================================== */
 /*
-    authng.xml
+    imspector.xml
     part of pfSense (http://www.pfSense.com)
-    Copyright (C) 2007 Ryan Wagoner <rswagoner@gmail.com>.
+	Copyright (C) 2011 Scott Ullrich <sullrich@gmail.com>
+    Copyright (C) 2007 Ryan Wagoner <rswagoner@gmail.com>
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -84,7 +84,7 @@
 			<fielddescr>Enable IMSpector</fielddescr>
 			<fieldname>enable</fieldname>
 			<type>checkbox</type>
-		</field>			
+		</field>
 		<field>
 			<fielddescr>Interfaces (generally LAN)</fielddescr>
 			<fieldname>iface_array</fieldname>
@@ -98,7 +98,7 @@
 		<field>
 			<fielddescr>Listen on protocols</fielddescr>
 			<fieldname>proto_array</fieldname>
-			<description>You can use the CTRL or COMMAND key to select multiple protocols.</description>
+			<description>You can use the CTRL or COMMAND key to select multiple protocols.  NOTE: Gtalk/Jabber-SSL requires SSL certificates.</description>
 			<type>select</type>
 			<size>4</size>
 			<required/>
@@ -120,6 +120,18 @@
 					<name>IRC</name>
  					<value>irc</value>
  				</option>			
+ 				<option>
+					<name>Jabber</name>
+ 					<value>jabber</value>
+ 				</option>			
+ 				<option>
+					<name>Gtalk/Jabber-SSL</name>
+ 					<value>jabber-ssl</value>
+ 				</option>			
+ 				<option>
+					<name>Gadu-Gadu</name>
+ 					<value>gadu-gadu</value>
+ 				</option>
 			</options>
 		</field>
 		<field>
@@ -153,6 +165,39 @@
 			<fielddescr>mySQL password</fielddescr>
 			<fieldname>mysql_password</fieldname>
 			<type>password</type>
+		</field>
+		<field>
+			<fielddescr>SSL Certificate</fielddescr>
+			<fieldname>serverkey</fieldname>
+			<description>
+				Enter the SSL Server Certificate here.
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>5</rows>
+			<cols>40</cols>
+		</field>
+		<field>
+			<fielddescr>SSL CA Key</fielddescr>
+			<fieldname>ssl_ca_key</fieldname>
+			<description>
+				Enter the SSL CA key here.
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>5</rows>
+			<cols>40</cols>
+		</field>
+		<field>
+			<fielddescr>SSL CA Certificate</fielddescr>
+			<fieldname>ssl_ca_cert</fieldname>
+			<description>
+				Enter the SSL CA Certficate here.
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>5</rows>
+			<cols>40</cols>
 		</field>
 		<field>
 			<fielddescr>Enable bad word filtering</fielddescr>

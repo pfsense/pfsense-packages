@@ -2,7 +2,7 @@
 /*
 	imspector.inc
 	part of pfSense (http://www.pfsense.com/)
-
+	Copyright (C) 2011 Scott Ullrich <sullrich@gmail.com>.
 	Copyright (C) 2007 Ryan Wagoner <rswagoner@gmail.com>.
 	All rights reserved.
 
@@ -72,6 +72,12 @@
 	function imspector_proto_to_port ($proto)
 	{
 		switch ($proto) {
+			case 'gadu-gadu':
+				return 8074;
+			case 'jabber':
+				return 5222;
+			case 'jabber-ssl':
+				return 5223;
 			case 'msn':
 				return 1863;
 			case 'icq':
@@ -219,6 +225,32 @@
 					write_imspector_config(IMSPECTOR_ETC . '/acl_blacklist.txt', 
 						str_replace("\r", '', base64_decode($imspector_config["acl_blacklist"])));
 				}
+				
+				// Handle Jabber SSL options
+				if($imspector_config["ssl_ca_key"] && 
+				   $imspector_config["ssl_ca_cert"] &&
+				   $imspector_config["serverkey"]) {
+					if(!is_dir("/usr/local/etc/imspector/ssl"))	
+						mkdir("/usr/local/etc/imspector/ssl");
+					if(base64_decode($imspector_config["ssl_ca_key"])) {
+						file_put_contents("/usr/local/etc/imspector/ssl/ssl_ca_key.pem", 
+							base64_decode($imspector_config["ssl_ca_key"]));
+						$conf['ssl_ca_key'] = '/usr/local/etc/imspector/ssl/ssl_ca_key.pem';
+					}
+					if(base64_decode($imspector_config["ssl_ca_cert"])) {
+						file_put_contents("/usr/local/etc/imspector/ssl/ssl_ca_cert.pem", 
+							base64_decode($imspector_config["ssl_ca_cert"]));
+						$conf['ssl_ca_key'] = "/usr/local/etc/imspector/ssl/ssl_ca_cert.pem";
+					}
+					if(base64_decode($imspector_config["serverkey"])) {
+						file_put_contents("/usr/local/etc/imspector/ssl/serverkey.pem", 
+							base64_decode($imspector_config["serverkey"]));
+						$conf['ssl_key'] = '/usr/local/etc/imspector/ssl/serverkey.pem';
+					}
+				} else {
+					// SSL Not enabled.  Make sure Jabber-SSL is not processed.
+					unset($conf['jabber-ssl']);
+				}
 
 				$conftext = '';
 				foreach($conf as $var => $key)
@@ -283,4 +315,5 @@ EOD;
 
 		config_unlock();		
 	}
+
 ?>
