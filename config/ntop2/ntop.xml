@@ -122,6 +122,7 @@
 		system("/bin/mkdir -p /var/db/ntop/rrd/graphics");
 		system("/bin/chmod -R 755 /var/db/ntop");
 		system("/usr/sbin/chown -R nobody:nobody /var/db/ntop");
+		system("/bin/cp -Rp /usr/local/lib/X11/fonts/webfonts/ /usr/local/lib/X11/fonts/TTF/");
 		if($ntop_config['password'] and $ntop_config['passwordagain']) {
 			if($ntop_config['password'] == $ntop_config['passwordagain']) {
 				$first = 0;
