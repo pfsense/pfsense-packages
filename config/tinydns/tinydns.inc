@@ -866,15 +866,25 @@ function tinydns_get_ip_subnet_arpa($ip, $ipmask) {
 	return 	array($subnet,$arpaip);
 }
 
-/* ip6.arpa IP calculated from expanding IPv6 fully and reversing. Masking not yet supported. */
+/* ip6.arpa IP calculated from expanding IPv6 fully and reversing. */
 function tinydns_get_ip6_subnet_arpa($ip, $ipmask=128) {
 	require_once("IPv6.inc");
+	$subnet = Net_IPv6::compress(Net_IPv6::getNetmask($ip, $ipmask));
+
+	/* Uncompress the v6 IP so we have all of the sections we need */
 	$fullip = explode(":", Net_IPv6::uncompress($ip));
+
+	/* Expand even more so we have a digit in every possible place */
 	foreach ($fullip as & $q) {
 		$q = sprintf("%04s", $q);
 	}
-	$subnet = Net_IPv6::compress(implode(":", $fullip));
-	$arpaip = implode(".", array_reverse(str_split(implode("", $fullip)))) . ".ip6.arpa";
+
+	/* Turn the IP into an array of digits and then trim off the bits that have been masked away. */
+	$prefixlen = intval($ipmask/4);
+	$fullip = array_slice(str_split(implode("", $fullip)), 0, $prefixlen);
+
+	/* Reverse the IP and make a proper ip6.arpa of it */
+	$arpaip = implode(".", array_reverse($fullip)) . ".ip6.arpa";
 	return array($subnet, $arpaip);
 }
 
