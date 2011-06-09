@@ -866,8 +866,7 @@ function tinydns_get_ip_subnet_arpa($ip, $ipmask) {
 	return 	array($subnet,$arpaip);
 }
 
-/* in-add.arpa IP calculated from D.C.B.A and Mask to A.B.C.D.in-addr.arpa */
-/* subnet IP calculated from A.B.C.D and Mask */
+/* ip6.arpa IP calculated from expanding IPv6 fully and reversing. Masking not yet supported. */
 function tinydns_get_ip6_subnet_arpa($ip, $ipmask=128) {
 	require_once("IPv6.inc");
 	$fullip = explode(":", Net_IPv6::uncompress($ip));
