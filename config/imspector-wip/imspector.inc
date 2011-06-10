@@ -230,6 +230,7 @@
 				if($imspector_config["ssl_ca_key"] && 
 				   $imspector_config["ssl_ca_cert"] &&
 				   $imspector_config["serverkey"]) {
+					$conf['ssl'] = "on";
 					if(!is_dir("/usr/local/etc/imspector/ssl"))	
 						mkdir("/usr/local/etc/imspector/ssl");
 					if(base64_decode($imspector_config["ssl_ca_key"])) {
@@ -250,6 +251,7 @@
 				} else {
 					// SSL Not enabled.  Make sure Jabber-SSL is not processed.
 					unset($conf['jabber-ssl']);
+					unset($conf['ssl']);
 				}
 
 				$conftext = '';
