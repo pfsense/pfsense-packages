@@ -616,7 +616,7 @@
 		<website>http://www.imspector.org/</website>
 		<category>Network Management</category>
 		<maintainer>billm@pfsense.org</maintainer>
-		<version>0.9-1</version>
+		<version>0.9-2</version>
 		<required_version>2.0</required_version>
 		<status>BETA</status>
 		<pkginfolink>http://doc.pfsense.org/index.php/IMSpector_package</pkginfolink>

@@ -233,7 +233,7 @@
 			<fielddescr>ACL whitelist</fielddescr>
 			<fieldname>acl_whitelist</fieldname>
 			<description>
-				Example (allow specifc access): localuser: remoteuser1 remoteuser2&lt;br /&gt;
+				Example (allow specific access): localuser: remoteuser1 remoteuser2&lt;br /&gt;
 				Example (allow full access): localuser:
 			</description>
 			<type>textarea</type>
