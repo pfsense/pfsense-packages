@@ -258,7 +258,11 @@ function unbound_get_network_interface_addresses($subnet=false, $mask=false) {
 					foreach($config['virtualip']['vip'] as $vip) {
 						if (($vip['interface'] == $unboundif) && ($vip['mode'] == "carp")) {
 							$virtual_ip = find_interface_ip(link_ip_to_carp_interface($vip['subnet']));
-							$unbound_interfaces[] = $virtual_ip;
+							if ($virtual_ip == '') {
+								log_error("Unbound DNS: There was a problem setting up the Virtual IP for the interface ".link_ip_to_carp_interface($vip['subnet']));
+							} else {
+								$unbound_interfaces[] = $virtual_ip;
+							}
 						}
 					}
 				}
@@ -266,8 +270,7 @@ function unbound_get_network_interface_addresses($subnet=false, $mask=false) {
 		}
 	}
 	
-	return $unbound_interfaces;
-	
+	return $unbound_interfaces;	
 }
 
 function unbound_acls_config() {
@@ -289,12 +292,13 @@ function unbound_acls_config() {
 }
 
 function unbound_resync_config() {
-	global $config, $g;
+	global $config, $g, $input_errors;
 	
 	if (!is_array($config['installedpackages']['unbound']['config']))
 		$config['installedpackages']['unbound']['config'] = array();
 
 	$unbound_config = &$config['installedpackages']['unbound']['config'][0];
+	$unbound_stats = &$config['installedpackages']['unbound_statistics']['config'][0];
 	
 	// Add networks physically attached to allowed networks and then call the acls		
 	$interfaces = unbound_get_network_interface_addresses(true, true);
@@ -315,11 +319,6 @@ function unbound_resync_config() {
 	foreach($interface_ips as $ifip) {
 		$unbound_bind_interfaces .="interface: $ifip\n";
 	}
-	
-	/* Harden DNSSec responses - if DNSSec is absent, zone is marked as bogus
-	 * XXX: for now we always have this set to yes
-	 */
-	$unbound_config['harden-dnssec-stripped'] = "yes";
 	
 	// Host entries
 	$host_entries = unbound_add_host_entries();
@@ -361,6 +360,30 @@ EOF;
 
 	//Setup optimization
 	$optimization = unbound_optimization();
+	
+	$unbound_config = &$config['installedpackages']['unboundadvanced']['config'][0];
+	// Setup Advanced options
+	$log_verbosity = (isset($unbound_config['unbound_verbosity'])) ? $unbound_config['unbound_verbosity'] : "1";
+	$hide_id = ($unbound_config['hide_id'] == "on") ? "yes" : "no";
+	$hide_version = ($unbound_config['hide_version'] == "on") ? "yes" : "no";
+	$harden_glue = ($unbound_config['harden_glue'] == "on") ? "yes" : "no";
+	$harden_dnssec_stripped = ($unbound_config['harden_dnssec_stripped'] == "on") ? "yes" : "no";
+	$prefetch = ($unbound_config['prefetch'] == "on") ? "yes" : "no";
+	$prefetch_key = ($unbound_config['prefetch_key'] == "on") ? "yes" : "no";
+	$ipv6 = ($unbound_config['unbound_ipv6'] == "on") ? "yes" : "no";
+	$outgoing_num_tcp = (!empty($unbound_config['outgoing_num_tcp'])) ? $unbound_config['outgoing_num_tcp'] : "10";
+	$incoming_num_tcp = (!empty($unbound_config['incoming_num_tcp'])) ? $unbound_config['incoming_num_tcp'] : "10";
+	$edns_buffer_size = (!empty($unbound_config['edns_buffer_size'])) ? $unbound_config['edns_buffer_size'] : "4096";
+	$num_queries_per_thread = (!empty($unbound_config['num_queries_per_thread'])) ? $unbound_config['num_queries_per_thread'] : "1024";
+	$jostle_timeout = (!empty($unbound_config['jostle_timeout'])) ? $unbound_config['jostle_timeout'] : "200";
+	$cache_max_ttl = (!empty($unbound_config['cache_max_ttl'])) ? $unbound_config['cache_max_ttl'] : "86400";
+	$cache_min_ttl = (!empty($unbound_config['cache_min_ttl'])) ? $unbound_config['cache_min_ttl'] : "0";
+	$infra_host_ttl = (!empty($unbound_config['infra_host_ttl'])) ? $unbound_config['infra_host_ttl'] : "900";
+	$infra_lame_ttl = (!empty($unbound_config['infra_lame_ttl'])) ? $unbound_config['infra_lame_ttl'] : "900";
+	$infra_cache_numhosts = (!empty($unbound_config['infra_cache_numhosts'])) ? $unbound_config['infra_cache_numhosts'] : "10000";
+	$unwanted_reply_threshold = (!empty($unbound_config['unwanted_reply_threshold'])) ? $unbound_config['unwanted_reply_threshold'] : "0";
+	
+	
 
 	$unbound_conf = <<<EOD
 #########################
@@ -371,6 +394,38 @@ EOF;
 # Server config
 ###
 server:
+chroot: ""
+username: "unbound"
+directory: "/usr/local/etc/unbound"
+pidfile: "{$g['varrun_path']}/unbound.pid"
+root-hints: "root.hints"
+harden-referral-path: no
+prefetch: {$prefetch}
+prefetch-key: {$prefetch_key}
+use-syslog: yes
+port: 53
+verbosity: {$log_verbosity}
+do-ip4: yes
+do-ip6: {$ipv6}
+do-udp: yes
+do-tcp: yes
+do-daemonize: yes
+module-config: "{$module_config}"
+unwanted-reply-threshold: {$unwanted_reply_threshold}
+num-queries-per-thread: {$num_queries_per_thread}
+jostle-timeout: {$jostle_timeout}
+infra-host-ttl: {$infra_host_ttl}
+infra-lame-ttl: {$infra_lame_ttl}
+infra-cache-numhosts: {$infra_cache_numhosts}
+outgoing-num-tcp: {$outgoing_num_tcp}
+incoming-num-tcp: {$incoming_num_tcp}
+edns-buffer-size: {$edns_buffer_size}
+statistics-interval: {$stats_interval}
+extended-statistics: {$extended_stats}
+statistics-cumulative: {$cumulative_stats}
+cache-max-ttl: {$cache_max_ttl}
+cache-min-ttl: {$cache_min_ttl}
+harden-dnssec-stripped: {$harden_dnssec_stripped}
 {$optimization['number_threads']}
 {$optimization['msg_cache_slabs']}
 {$optimization['rrset_cache_slabs']}
@@ -380,32 +435,12 @@ server:
 {$optimization['rrset_cache_size']}
 {$optimization['outgoing_range']}
 {$optimization['so_rcvbuf']}
-num-queries-per-thread: 1024
-verbosity: 1
-port: 53
-do-ip4: yes
-do-ip6: no
-do-udp: yes
-do-tcp: yes
-do-daemonize: yes
-statistics-interval: {$stats_interval}
-extended-statistics: {$extended_stats}
-statistics-cumulative: {$cumulative_stats}
+
 # Interface IP(s) to bind to
 {$unbound_bind_interfaces}
-chroot: ""
-username: "unbound"
-directory: "/usr/local/etc/unbound"
-pidfile: "{$g['varrun_path']}/unbound.pid"
-root-hints: "root.hints"
-harden-dnssec-stripped: {$unbound_config['harden-dnssec-stripped']}
-harden-referral-path: no
-prefetch: yes
-prefetch-key: yes
-use-syslog: yes
-module-config: "{$module_config}"
-unwanted-reply-threshold: 10000000
+
 {$anchor_file}
+
 #### Access Control ####
 # Local attached networks allowed to utilize service and any user added ACLs
 access-control: 127.0.0.0/8 allow
@@ -480,7 +515,7 @@ function unbound_optimization() {
 		$optimization['rrset_cache_size'] = "rrset-cache-size: {$rr}m";
 	} else {
 		$optimization['msg_cache_size'] = "msg-cache-size: 4m";
-		$optimization['rrset_cache_size'] = "rrset_cache_size: 8m";
+		$optimization['rrset_cache_size'] = "rrset-cache-size: 8m";
 	}
 	
 	// More outgoing connections per thread otherwise assign a default of 4096 for a single thread
@@ -537,13 +572,14 @@ function fetch_root_hints() {
 	}
 }
 
-function unbound_validate($post, $acl=false) {
+function unbound_validate($post, $type=null) {
 	global $config, $input_errors;
 
 	if($post['unbound_status'] == "on" && isset($config['dnsmasq']['enable']))
 		$input_errors[] = "The system dns-forwarder is still active. Disable it before enabling the Unbound service.";
-		
-	if($acl) {
+	
+	/* Validate the access lists */
+	if($type == "acl") {
 		$acls = $post;
 		// Check to ensure values entered is an action that is in the list
 		if ($acls['aclaction'] != 'refuse' && $acls['aclaction'] != 'allow' && $acls['aclaction'] != 'allow_snoop' && $acls['aclaction'] != 'deny')
@@ -562,7 +598,26 @@ function unbound_validate($post, $acl=false) {
 					$input_errors[] = "{$acls['acl_network'.$i]}/{$acls['mask'.$i]} is not a valid network.";
 			}				
 		}
-	}	
+	} else if($type == "advanced") {
+	
+		if(!is_numeric($post['cache_max_ttl']))
+			$input_errors[] = "You must enter a valid number in 'Maximum TTL for RRsets and messages'.";
+		if(!is_numeric($post['cache_min_ttl']))
+			$input_errors[] = "You must enter a valid number in 'Minimum TTL for RRsets and messages'.";
+		if(!is_numeric($post['infra_host_ttl']))
+				$input_errors[] = "You must enter a valid number in 'TTL for Host cache entries'.";
+		if(!is_numeric($post['infra_lame_ttl']))
+				$input_errors[] = "You must enter a valid number in 'TTL for lame delegation'.";
+		if(!is_numeric($post['infra_cache_numhosts']))
+				$input_errors[] = "You must enter a valid number in 'Number of Hosts to cache'.";
+					
+	} else if($type == "basic") {
+		/* Validate settings */
+		if($post['active_interface'] == "")
+			$input_errors[] = "You need to select at least one interface to be used by the Unbound DNS service.";
+	}
+	
+	
 }
 
 function unbound_reconfigure() {
