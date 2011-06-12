@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+	<copyright>
+		<![CDATA[
+		/*
+		    unbound_advanced.xml
+		    part of the Unbound package for pfSense (http://www.pfSense.com)
+		    Copyright (C) 2011 Warren Baker
+		    All rights reserved.
+		                                                       						  */
+		/* ========================================================================== */
+		/*
+		    Redistribution and use in source and binary forms, with or without
+		    modification, are permitted provided that the following conditions are met:
+
+		     1. Redistributions of source code must retain the above copyright notice,
+		        this list of conditions and the following disclaimer.
+
+		     2. Redistributions in binary form must reproduce the above copyright
+		        notice, this list of conditions and the following disclaimer in the
+		        documentation and/or other materials provided with the distribution.
+
+		    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+		    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+		    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+		    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+		    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+		    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+		    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+		    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+		    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+		    POSSIBILITY OF SUCH DAMAGE.
+		                                                                              */
+		/* ========================================================================== */
+		        ]]>
+	</copyright>
+	<description>Unbound is a validating, recursive, and caching DNS resolver.</description>
+	<requirements/>
+	<faq/>
+	<name>unbound_advanced</name>
+	<version>1.4.8</version>
+	<title>Services: Unbound DNS Forwarder: Advanced Settings</title>
+	<include_file>/usr/local/pkg/unbound.inc</include_file>
+	<menu>
+		<name>Unbound DNS</name>
+		<tooltiptext>Setup Unbound specific settings</tooltiptext>
+		<section>Services</section>
+		<url>pkg_edit.php?xml=unbound.xml&amp;id=0</url>
+	</menu>
+	<service>
+		<name>unbound</name>
+		<rcfile>unbound.sh</rcfile>
+		<executable>unbound</executable>
+		<description>Unbound is a validating, recursive, and caching DNS resolver.</description>
+	</service>
+	<tabs>
+		<tab>
+			<text>Unbound DNS Settings</text>
+			<url>/pkg_edit.php?xml=unbound.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Unbound DNS Advanced Settings</text>
+			<url>/pkg_edit.php?xml=unbound_advanced.xml&amp;id=0</url>
+			<active/>
+			<no_drop_down/>
+		</tab>
+		<tab>
+			<text>Unbound DNS ACLs</text>
+			<url>/pkg.php?xml=unbound_acls.xml</url>
+		</tab>
+		<tab>
+			<text>Unbound DNS Status</text>
+			<url>/unbound_status.php</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<name>Advanced Settings</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fieldname>hide_id</fieldname>
+			<fielddescr>Hide Identity</fielddescr>
+			<description>If enabled, id.server and hostname.bind queries are refused. Default is disabled.</description>
+			<type>checkbox</type>
+			<default_value>off</default_value>
+			<advancedfield/>
+		</field>
+		<field>
+			<fieldname>hide_version</fieldname>
+			<fielddescr>Hide Version</fielddescr>
+			<description>If enabled, version.server and version.bind queries are refused. Default is disabled.</description>
+			<type>checkbox</type>
+			<default_value>off</default_value>
+			<advancedfield/>
+		</field>
+		<field>
+			<fieldname>prefetch</fieldname>
+			<fielddescr>Prefetch Support</fielddescr>
+			<description>If enabled, the message cache elements are prefetched before they expire to keep the cache up to date. Enabling this option causes an increase of about 10 percent more traffic and load on the server, but popular items do not expire form the cache. Default is disabled.</description>
+			<type>checkbox</type>
+			<default_value>off</default_value>
+			<advancedfield/>
+		</field>
+		<field>
+			<fieldname>prefetch_key</fieldname>
+			<fielddescr>Prefetch Key Support</fielddescr>
+			<description>If enabled, DNSKEY's are fetched earlier in the validation process when a &lt;a href="http://en.wikipedia.org/wiki/List_of_DNS_record_types"&gt;DS&lt;/a&gt; is encountered. This helps lower the latency of requests but does utilize a little more CPU. Default is disabled.</description>
+			<type>checkbox</type>
+			<default_value>off</default_value>
+			<advancedfield/>
+		</field>
+		<field>
+			<fieldname>harden_glue</fieldname>
+			<fielddescr>Harden Glue</fielddescr>
+			<description>If enabled, Unbound will only trust glue if it is within the servers authority. Default is enabled.</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
+			<advancedfield/>
+		</field>
+		<field>
+			<fieldname>harden_dnssec_stripped</fieldname>
+			<fielddescr>Harden DNSSEC data</fielddescr>
+			<description>If enabled, DNSSEC data is required for trust-anchored zones. If such data is absent, the zone is becomes bogus. If disabled then and no DNSSEC data is received, then the zone is made insecure. The default is enabled.</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
+			<advancedfield/>
+		</field>
+		<field>
+			<fieldname>unbound_verbosity</fieldname>
+			<fielddescr>Log level verbosity</fielddescr>
+			<description>Select the logging verbosity. &lt;br/&gt; &lt;br/&gt; The different levels are described as follows: &lt;br/&gt;
+				&lt;b&gt;Level 0:&lt;/b&gt; No verbosity, only errors are logged. &lt;br/&gt;
+				&lt;b&gt;Level 1:&lt;/b&gt; Provides operational information. &lt;br/&gt;
+				&lt;b&gt;Level 2:&lt;/b&gt; Provides detailed operational information. &lt;br/&gt;
+				&lt;b&gt;Level 3:&lt;/b&gt; Gives query level information and output per query. &lt;br/&gt;
+				&lt;b&gt;Level 4:&lt;/b&gt; Gives algorithm level information. &lt;br/&gt;
+				&lt;b&gt;Level 5:&lt;/b&gt; Logs client identification for cache misses. &lt;br/&gt;
+			</description>
+			<type>select</type>
+			<default_value>1</default_value>
+			<options>
+				<option><name>Level 0</name><value>0</value></option>	
+				<option><name>Level 1</name><value>1</value></option>
+				<option><name>Level 2</name><value>2</value></option>
+				<option><name>Level 3</name><value>3</value></option>
+				<option><name>Level 4</name><value>4</value></option>
+				<option><name>Level 5</name><value>5</value></option>
+			</options>
+			<advancedfield/>
+		</field>
+		<field>
+			<fieldname>msg_cache_size</fieldname>
+			<fielddescr>Message Cache Size</fielddescr>
+			<description>Size of the message cache. The message cache stores DNS rcodes and validation statuses. The RRSet cache will automatically be set to twice this amount. The RRSet cache contains the RR data. The default is 4 megabytes.</description>
+			<type>select</type>
+			<default_value>4</default_value>
+			<options>
+				<option><name>4MB</name><value>4</value></option>
+				<option><name>10MB</name><value>10</value></option>
+				<option><name>20MB</name><value>20</value></option>
+				<option><name>50MB</name><value>50</value></option>
+				<option><name>100MB</name><value>100</value></option>
+				<option><name>250MB</name><value>250</value></option>
+				<option><name>250MB</name><value>250</value></option>
+				<option><name>512MB</name><value>512</value></option>
+			</options>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Outgoing TCP Buffers</fielddescr>
+			<fieldname>outgoing_num_tcp</fieldname>
+			<description>The number of outgoing TCP buffers to allocate per thread. The default value is 10. If 0 is selected then no TCP queries, to authoritative servers, are done.</description>
+			<type>select</type>
+			<default_value>10</default_value>
+			<options>
+				<option><name>0</name><value>0</value></option>
+				<option><name>10</name><value>10</value></option>
+				<option><name>20</name><value>20</value></option>
+				<option><name>30</name><value>30</value></option>
+				<option><name>40</name><value>40</value></option>
+				<option><name>50</name><value>50</value></option>
+			</options>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Incoming TCP Buffers</fielddescr>
+			<fieldname>incoming_num_tcp</fieldname>
+			<description>The number of incoming TCP buffers to allocate per thread. The default value is 10. If 0 is selected then no TCP queries, from clients, are accepted.</description>
+			<type>select</type>
+			<default_value>10</default_value>
+			<options>
+				<option><name>0</name><value>0</value></option>
+				<option><name>10</name><value>10</value></option>
+				<option><name>20</name><value>20</value></option>
+				<option><name>30</name><value>30</value></option>
+				<option><name>40</name><value>40</value></option>
+				<option><name>50</name><value>50</value></option>
+			</options>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>EDNS Buffer Size</fielddescr>
+			<fieldname>edns_buffer_size</fieldname>
+			<description>Number of bytes size to advertise as the EDNS reassembly buffer size. This is the value that is used in UDP datagrams sent to peers. RFC recommendation is 4096 (which is the default). If you have fragmentation reassemble problems, usually seen as timeouts, then a value of 1480 should help. The 512 value bypasses most MTU path problems, but it can generate an excessive amount of TCP fallback.</description>
+			<type>select</type>
+			<default_value>4096</default_value>
+			<options>
+				<option><name>512</name><value>512</value></option>
+				<option><name>1480</name><value>1480</value></option>
+				<option><name>4096</name><value>4096</value></option>
+			</options>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Number of queries per thread</fielddescr>
+			<fieldname>num_queries_per_thread</fieldname>
+			<description>The number of queries that every thread will service simultaneously. If more queries arrive that need to be serviced, and no queries can be jostled, then these queries are dropped.</description>
+			<type>select</type>
+			<default_value>1024</default_value>
+			<options>
+				<option><name>512</name><value>512</value></option>
+				<option><name>1024</name><value>1024</value></option>
+				<option><name>2048</name><value>2048</value></option>
+			</options>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Jostle Timeout</fielddescr>
+			<fieldname>jostle_timeout</fieldname>
+			<description>This timeout is used for when the server is very busy. The default value is 200 milliseconds.</description>
+			<type>select</type>
+			<default_value>200</default_value>
+			<options>
+				<option><name>100</name><value>100</value></option>
+				<option><name>200</name><value>200</value></option>
+				<option><name>500</name><value>500</value></option>
+				<option><name>1000</name><value>1000</value></option>
+			</options>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Maximum TTL for RRsets and messages</fielddescr>
+			<fieldname>cache_max_ttl</fieldname>
+			<description>Configure a maximum Time to live for RRsets and messages in the cache. The default is 86400 seconds (1 day). When the internal TTL expires the cache item is expired. This can be configured to force the resolver to query for data more often and not trust (very large) TTL values.</description>
+			<type>input</type>
+			<default_value>86400</default_value>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Minimum TTL for RRsets and messages</fielddescr>
+			<fieldname>cache_min_ttl</fieldname>
+			<description>Configure a minimum Time to live for RRsets and messages in the cache. The default is 0 seconds. If the minimum value kicks in, the data is cached for longer than the domain owner intended, and thus less queries are made to look up the data. The 0 value ensures the data in the cache is as the domain owner intended. High values can lead to trouble as the data in the cache might not match up with the actual data anymore.</description>
+			<type>input</type>
+			<size>5</size>
+			<default_value>0</default_value>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>TTL for Host cache entries</fielddescr>
+			<fieldname>infra_host_ttl</fieldname>
+			<description>Time to live for entries in the host cache. The host cache contains roundtrip timing and EDNS support information. The default is 900 seconds.</description>
+			<type>input</type>
+			<size>5</size>
+			<default_value>900</default_value>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>TTL for lame delegation</fielddescr>
+			<fieldname>infra_lame_ttl</fieldname>
+			<description>Time to live for when a delegation is considered to be lame. The default is 900 seconds.</description>
+			<type>input</type>
+			<size>5</size>
+			<default_value>900</default_value>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Number of Hosts to cache</fielddescr>
+			<fieldname>infra_cache_numhosts</fieldname>
+			<description>Number of hosts for which information is cached. The default is 10,000.</description>
+			<type>input</type>
+			<size>5</size>
+			<default_value>10000</default_value>
+			<advancedfield/>
+		</field>
+		<field>
+			<fielddescr>Unwanted Reply Threshold</fielddescr>
+			<fieldname>unwanted_reply_threshold</fieldname>
+			<description>If enabled, a total number of unwanted replies is kept track of in every thread. When it reaches the threshold, a defensive action is taken and a warning is printed to the log file. This defensive action is to clear the RRSet and message caches, hopefully flushing away any poison. The default is disabled, but if enabled a a value of 10 million is suggested.</description>
+			<type>select</type>
+			<default_value>0</default_value>
+			<options>
+				<option><name>disabled</name><value>0</value></option>
+				<option><name>5 million</name><value>5000000</value></option>
+				<option><name>10 million</name><value>10000000</value></option>
+				<option><name>20 million</name><value>20000000</value></option>
+				<option><name>30 million</name><value>30000000</value></option>
+				<option><name>40 million</name><value>40000000</value></option>
+				<option><name>50 million</name><value>50000000</value></option>
+			</options>
+			<advancedfield/>
+		</field>
+	</fields>
+	<custom_add_php_command>
+	</custom_add_php_command>
+	<custom_php_command_before_form/>
+	<custom_php_validation_command>
+		unbound_validate($_POST, "advanced");
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		unbound_reconfigure();
+	</custom_php_resync_config_command>
+	<custom_php_install_command>
+		unbound_install();
+	</custom_php_install_command>
+	<custom_php_deinstall_command>
+		unbound_uninstall();
+	</custom_php_deinstall_command>
+</packagegui>
