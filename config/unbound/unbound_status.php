@@ -39,10 +39,6 @@ if(!is_process_running("unbound")) {
 $pgtitle = "Services: Unbound DNS Forwarder: Status";
 include("head.inc");
 
-$pfSversion = str_replace("\n", "", file_get_contents("/etc/version"));
-if(strstr($pfSversion, "1.2"))
-	$one_two = true;
-
 function doCmdT($title, $command, $rows) {
     echo "<p>\n";
     echo "<a name=\"" . $title . "\">\n";
@@ -121,10 +117,6 @@ function execCmds() {
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php include("fbegin.inc"); ?>
 
-<?php if($one_two): ?>
-<p class="pgtitle"><?=$pgtitle?></font></p>
-<?php endif; ?>
-
 <?php if ($savemsg) print_info_box($savemsg); ?>
 
 <div id="mainlevel">
@@ -134,9 +126,10 @@ function execCmds() {
 	<?php
 		$tab_array = array();
 		$tab_array[] = array(gettext("Unbound DNS Settings"), false, "/pkg_edit.php?xml=unbound.xml&amp;id=0");
+		$tab_array[] = array(gettext("Unbound DNS Advanced Settings"), false, "/pkg_edit.php?xml=unbound_advanced.xml&amp;id=0");
 		$tab_array[] = array(gettext("Unbound DNS ACLs"), false, "/pkg.php?xml=unbound_acls.xml");
 		$tab_array[] = array(gettext("Unbound DNS Status"), true, "/unbound_status.php");
-		display_top_tabs($tab_array);
+		display_top_tabs($tab_array, true);
 	?>
 			</td>
 		</tr>

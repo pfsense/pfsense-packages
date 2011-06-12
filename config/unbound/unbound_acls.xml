@@ -41,7 +41,7 @@
 	<faq/>
 	<name>unboundacls</name>
 	<version>1.4.8</version>
-	<title>Services: Unbound DNS Forwarder: ACLs</title>
+	<title>Services: Unbound DNS Forwarder: Access Lists</title>
 	<include_file>/usr/local/pkg/unbound.inc</include_file>
 	<menu>
 		<name>Unbound DNS</name>
@@ -55,9 +55,14 @@
 			<url>/pkg_edit.php?xml=unbound.xml&amp;id=0</url>
 		</tab>
 		<tab>
+			<text>Unbound DNS Advanced Settings</text>
+			<url>/pkg_edit.php?xml=unbound_advanced.xml&amp;id=0</url>
+		</tab>
+		<tab>
 			<text>Unbound DNS ACLs</text>
 			<url>/pkg.php?xml=unbound_acls.xml</url>
 			<active/>
+			<no_drop_down/>
 		</tab>
 		<tab>
 			<text>Unbound DNS Status</text>
