@@ -168,18 +168,31 @@ if ($_POST['snortSaveSettings'] == 1)
 			/*
 			 * make dir for the new iface
 			 * may need to move this as a func to new_snort,inc
-			 */			
-			if (!is_dir('/usr/local/etc/snort/sn_' . $_POST['uuid'] . '_' . $_POST['interface']))
-			{
-				$newSnortDirCraete = 'mkdir -p /usr/local/etc/snort/sn_' . $_POST['uuid'] . '_' . $_POST['interface'];
-				exec($newSnortDirCraete);
+			 */
+			
+			$newSnortDir = 'sn_' . $_POST['uuid'] . '_' . $_POST['interface'];
+			
+			if (!is_dir("/usr/local/etc/snort/{$newSnortDir}")) {				
+				
+				// creat iface dir and ifcae rules dir
+				exec("/bin/mkdir -p /usr/local/etc/snort/{$newSnortDir}/rules");
+				
 				// NOTE: code only works on php5
-				$listRulesDir = snortScanDirFilter('/usr/local/etc/snort/rules', '.rules');
-				if (!empty($listRulesDir) && file_exists('/usr/local/etc/snort/base_rules.tar.gz'))
-				{	
-					$newSnortDir = 'sn_' . $_POST['uuid'] . '_' . $_POST['interface'];					
-					exec('/usr/bin/tar xvfz /usr/local/etc/snort/base_rules.tar.gz ' . '-C /usr/local/etc/snort/' . $newSnortDir);					
+				$listSnortRulesDir = snortScanDirFilter('/usr/local/etc/snort/snort_rules/rules', '\.rules');
+				$listEmergingRulesDir = snortScanDirFilter('/usr/local/etc/snort/emerging_rules/rules', '\.rules');
+				$listPfsenseRulesDir = snortScanDirFilter('/usr/local/etc/snort/pfsense_rules/rules', '\.rules');
+				
+				if (!empty($listSnortRulesDir)) {											
+					exec("/bin/cp -R /usr/local/etc/snort/snort_rules/rules/* /usr/local/etc/snort/{$newSnortDir}/rules");					
 				}
+				if (!empty($listEmergingRulesDir)) {											
+					exec("/bin/cp -R /usr/local/etc/snort/emerging_rules/rules/* /usr/local/etc/snort/{$newSnortDir}/rules");					
+				}								
+				if (!empty($listPfsenseRulesDir)) {											
+					exec("/bin/cp -R /usr/local/etc/snort/pfsense_rules/rules/* /usr/local/etc/snort/{$newSnortDir}/rules");					
+				}
+				
+				
 			} //end of mkdir
 		          
 		} // end of snort_interfaces_edit		

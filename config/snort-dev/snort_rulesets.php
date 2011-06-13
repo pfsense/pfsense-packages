@@ -49,7 +49,7 @@ $a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $uuid)
 
 	// list rules in the default dir
 	$filterDirList = array();
-	$filterDirList = snortScanDirFilter('/usr/local/etc/snort/sn_' . $uuid . '_' . $a_list['interface'] . '/rules', '.rules');
+	$filterDirList = snortScanDirFilter('/usr/local/etc/snort/sn_' . $uuid . '_' . $a_list['interface'] . '/rules', '\.rules');
 	
 	// list rules in db that are on in a array
 	$listOnRules = array();
@@ -144,14 +144,14 @@ jQuery(document).ready(function() {
 			}else{
 				var rulesetChecked = '';
 			}
-		
+			
 			jQuery('.rulesetloopblock').append(
 					"\n" + '<tr>' + "\n" +
 					'<td class="' + rowIsEvenOdd + '" align="center" valign="top" width="9%">' + "\n" +
 					'	<input class="domecheck" name="filenamcheckbox[]" value="' + snortObjlist.ruleSets[i].rule + '" type="checkbox" ' + rulesetChecked + ' >' + "\n" +
 					'</td>' + "\n" +
 					'<td class="' + rowIsEvenOdd + '">' + "\n" +
-					'	<a href="snort_rules.php?uuid=0&amp;openruleset=//usr//local//etc//snort//snort_44035_em0//rules//attack-responses.rules">' + snortObjlist.ruleSets[i].rule + '</a>' + "\n" + 
+					'	<a href="/snort/snort_rules.php?uuid=<?=$uuid?>' + '&openruleset=' + snortObjlist.ruleSets[i].rule + '">' + snortObjlist.ruleSets[i].rule + '</a>' + "\n" + 
 					'</td>' + "\n" +
 					'</tr>' + "\n\n"			
 			);	
@@ -220,7 +220,9 @@ jQuery(document).ready(function() {
 		<input type="hidden" name="dbName" value="snortDBrules" /> <!-- what db-->
 		<input type="hidden" name="dbTable" value="SnortruleSets" /> <!-- what db table-->
 		<input type="hidden" name="ifaceTab" value="snort_rulesets" /> <!-- what interface tab -->
-		<input type="hidden" name="ifaceuuid" value="<?=$uuid; ?>" /> <!-- what interface to save for -->	
+		<input type="hidden" name="ifaceuuid" value="<?=$uuid;?>" /> <!-- what interface to save for -->
+		<input type="hidden" name="iface" value="<?=$a_list['interface'];?>" /> <!-- what interface to save for -->
+			
 		<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		
 		<tr >

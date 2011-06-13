@@ -57,7 +57,7 @@ $snortRuleDir = '/usr/local/etc/snort/sn_' . $uuid . '_' . $a_list['interface'];
 
 	// list rules in the default dir
 	$filterDirList = array();
-	$filterDirList = snortScanDirFilter($snortRuleDir . '/rules', '.rules');
+	$filterDirList = snortScanDirFilter($snortRuleDir . '/rules', '\.rules');
 
 	// START read rule file
 	if ($_GET['openruleset'])

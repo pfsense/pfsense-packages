@@ -257,6 +257,7 @@ function snortSql_updateRuleSetList()
 	$table = $_POST['dbTable'];
 	$ruleSetfilenames = $_POST['filenamcheckbox'];
 	$ifaceuuid = $_POST['ifaceuuid'];
+	$iface = $_POST['iface'];
 	
 	
 	$addDate = date(U);
@@ -303,7 +304,7 @@ function snortSql_updateRuleSetList()
 
 			
 			// clean database of old names	and turn rulesets off
-    		$listDir = snortScanDirFilter('/usr/local/etc/snort/rules/', '.rules');
+    		$listDir = snortScanDirFilter("/usr/local/etc/snort/sn_{$ifaceuuid}_{$iface}/rules/", '.rules');
     
 		    $resultAllRulesetname = sqlite_query($db,
 		            "SELECT rulesetname FROM {$table} WHERE ifaceuuid = '{$ifaceuuid}';
