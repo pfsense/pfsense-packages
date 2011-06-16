@@ -47,24 +47,23 @@ if ($uuid == '') {
 
 
 
-$a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $uuid);
+$a_list = snortSql_fetchAllSettings('snortDB', 'SnortIfaces', 'uuid', $uuid);
 
-	if (!is_array($a_list))
-	{
-		$a_list = array();
-	}
+$a_rules = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'All', '');
+
+if (!is_array($a_list)) {
+	$a_list = array();
+}
 
 $a_whitelist = snortSql_fetchAllWhitelistTypes('SnortWhitelist', 'SnortWhitelistips');
 
-	if (!is_array($a_whitelist))
-	{
-		$a_whitelist = array();
-	}
+if (!is_array($a_whitelist)) {
+	$a_whitelist = array();
+}
 	
 $a_suppresslist = snortSql_fetchAllWhitelistTypes('SnortSuppress', '');
 
-if (!is_array($a_suppresslist))
-{
+if (!is_array($a_suppresslist)) {
 	$a_suppresslist = array();
 }	
 	
@@ -97,16 +96,14 @@ jQuery(document).ready(function() {
 			);
 	<?php 
 	
-	if ($a_list['interface'] != '')
-	{
+	if ($a_list['interface'] != '') {
 		echo '	
 			jQuery(\'[name=interface]\').attr(\'disabled\', \'true\');
 		';
 	}
 	
 	// disable tabs if nothing in database
-	if ($a_list['uuid'] == '')
-	{
+	if ($a_list['uuid'] == '') {
 		echo '
 			jQuery(\'.hide_newtabmenu\').hide();	
 		';
@@ -114,8 +111,7 @@ jQuery(document).ready(function() {
 	
 	?>
 	
-	if (endis)
-	{
+	if (endis) {
 		for (var i = 0; i < disableInputs.length; i++)
 		{
 		jQuery('[name=' + disableInputs[i] + ']').attr('disabled', 'true');
@@ -126,8 +122,7 @@ jQuery(document).ready(function() {
 
 		endis = !(jQuery('input[name=enable]:checked').val());
 
-		if (endis)
-		{
+		if (endis) {
 			for (var i = 0; i < disableInputs.length; i++)
 			{
 			jQuery('[name=' + disableInputs[i] + ']').attr('disabled', 'true');
@@ -192,9 +187,10 @@ jQuery(document).ready(function() {
 		
 		<form id="iform" name="iform" >
 		<input type="hidden" name="snortSaveSettings" value="1" /> <!-- what to do, save -->
-		<input type="hidden" name="dbName" value="snortDBrules" /> <!-- what db-->
-		<input type="hidden" name="dbTable" value="Snortrules" /> <!-- what db table-->
+		<input type="hidden" name="dbName" value="snortDB" /> <!-- what db-->
+		<input type="hidden" name="dbTable" value="SnortIfaces" /> <!-- what db table-->
 		<input type="hidden" name="ifaceTab" value="snort_interfaces_edit" /> <!-- what interface tab -->
+		<input name="uuid" type="hidden" value="<?=$uuid; ?>" > 
 
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tr>
@@ -279,6 +275,41 @@ jQuery(document).ready(function() {
 					<br>
 				</td>
 			</tr>
+			<tr>
+				<td colspan="2" valign="top" class="listtopic">Choose the rule DB snort should use.</td>
+			</tr>
+			
+			<tr>
+				<td width="22%" valign="top" class="vncell2">Rule DB</td>
+				<td width="78%" class="vtable">
+					<select name="ruledbname" class="formfld" id="ruledbname">
+						
+					<?php
+					// find ruleDB names and value by uuid
+						$selected = '';
+						if ($a_list['ruledbname'] == 'default') {
+							$selected = 'selected';
+						}
+						echo  "\n" . '<option value="default" ' . $selected . ' >default</option>' . "\r";		
+						foreach ($a_rules as $value)
+						{
+							$selected = '';
+							if ($value['uuid'] == $a_list['ruledbname'] && $value['enable'] !== 'off') {
+								$selected = 'selected';
+							}
+								
+							echo "\n" . '<option value="' . $value['uuid'] . '" ' .  $selected . ' >' . $value['ruledbname'] . '</option>' . "\r";
+						}
+					?>
+						
+					</select>
+					<br>
+					<span class="vexpl">Choose the home net you will like this rule to use. &nbsp;<span class="red">Note:</span>&nbsp;Default homenet adds only local networks.
+					<br>
+					<span class="red">Hint:</span>&nbsp;Most users add a list offriendly ips that the firewall cant see.</span>
+				</td>
+			</tr>			
+					
 			<tr>
 				<td colspan="2" valign="top" class="listtopic">Choose the networks snort should inspect and whitelist.</td>
 			</tr>
@@ -420,7 +451,6 @@ jQuery(document).ready(function() {
 					<input name="Submit" type="submit" class="formbtn" value="Save">
 					<input name="Submit2" type="submit" class="formbtn" value="Start"> 
 					<input id="cancel" type="button" class="formbtn" value="Cancel">
-					<input name="uuid" type="hidden" value="<?=$uuid; ?>" > 
 				</td>
 			</tr>
 			<tr>

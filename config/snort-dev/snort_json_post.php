@@ -5,16 +5,14 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_new.inc");
 
 // unset crsf checks
-if(isset($_POST['__csrf_magic'])) 
-{
+if(isset($_POST['__csrf_magic']))  {
   unset($_POST['__csrf_magic']);
 }
 
 
 function snortJsonReturnCode($returnStatus)
 {		
-	if ($returnStatus == true)
-	{
+	if ($returnStatus == true) {
 		echo '{"snortgeneralsettings":"success","snortUnhideTabs":"true"}';
 	}else{
 		echo '{"snortgeneralsettings":"fail"}';
@@ -22,8 +20,7 @@ function snortJsonReturnCode($returnStatus)
 }
 
 // row from db by uuid
-if ($_POST['snortSidRuleEdit'] == 1)
-{
+if ($_POST['snortSidRuleEdit'] == 1) {
 	
 	unset($_POST['snortSidRuleEdit']);
 	
@@ -33,11 +30,9 @@ if ($_POST['snortSidRuleEdit'] == 1)
 
 	
 // row from db by uuid
-if ($_POST['snortSaveRuleSets'] == 1)
-{	
+if ($_POST['snortSaveRuleSets'] == 1) {	
 
-	if ($_POST['ifaceTab'] == 'snort_rulesets')
-	{	
+	if ($_POST['ifaceTab'] == 'snort_rulesets') {	
 		// unset POSTs that are markers not in db
 		unset($_POST['snortSaveRuleSets']);
 		unset($_POST['ifaceTab']);		
@@ -47,8 +42,7 @@ if ($_POST['snortSaveRuleSets'] == 1)
 	}
 	
 	
-	if ($_POST['ifaceTab'] == 'snort_rules')
-	{	
+	if ($_POST['ifaceTab'] == 'snort_rules') {	
 		// unset POSTs that are markers not in db
 		unset($_POST['snortSaveRuleSets']);
 		unset($_POST['ifaceTab']);
@@ -60,70 +54,90 @@ if ($_POST['snortSaveRuleSets'] == 1)
 } // END of rulesSets	
 
 // row from db by uuid
-if ($_POST['RMlistDelRow'] == 1)
-{
+if ($_POST['RMlistDelRow'] == 1) {
 	
 	
-	if ($_POST['RMlistTable'] == 'Snortrules' || $_POST['RMlistTable'] == 'SnortSuppress')
-	{	
+	$rm_row_list = snortSql_fetchAllSettings($_POST['RMlistDB'], $_POST['RMlistTable'], 'uuid', $_POST['RMlistUuid']);	
 		
-		// list rules in the default dir
-		$a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $_POST['RMlistUuid']);
-		$snortRuleDir = '/usr/local/etc/snort/sn_' . $_POST['RMlistUuid'] . '_' . $a_list['interface'];
+	// list rules in the default dir
+	if ($_POST['RMlistTable'] == 'SnortIfaces') {
+		
+		$snortRuleDir = '/usr/local/etc/snort/sn_' . $_POST['RMlistUuid'] . '_' . $rm_row_list['interface'];
 		
 		exec('/bin/rm -r ' . $snortRuleDir);
-				
-		snortSql_updatelistDelete('SnortruleSets', 'ifaceuuid', $_POST['RMlistUuid']);
-	  	snortSql_updatelistDelete('SnortruleSigs', 'ifaceuuid', $_POST['RMlistUuid']);
-	  	snortSql_updatelistDelete('Snortrules', 'uuid', $_POST['RMlistUuid']);
-	  	
-	  	snortJsonReturnCode(true);
-	  	
 	}
 	
-	if ($_POST['RMlistTable'] == 'SnortSuppress')
-	{
-	  	snortJsonReturnCode(snortSql_updatelistDelete($_POST['RMlistTable'], 'uuid', $_POST['RMlistUuid']));
-	}	
-	
-	
-	
-	if ($_POST['RMlistTable'] == 'SnortWhitelist')
-	{
-		$fetchExtraWhitelistEntries = snortSql_fetchAllSettings($_POST['RMlistDB'], $_POST['RMlistTable'], 'uuid', $_POST['RMlistUuid']);
+	// rm ruledb and files
+	if ($_POST['RMlistTable'] == 'Snortrules') {
 		
-		snortJsonReturnCode(snortSql_updatelistDelete('SnortWhitelistips', 'filename', $fetchExtraWhitelistEntries['filename']));	
-		snortJsonReturnCode(snortSql_updatelistDelete($_POST['RMlistTable'], 'uuid', $_POST['RMlistUuid']));
-
-	}
+		$snortRuleDir = "/usr/local/etc/snort/snortDBrules/DB/{$_POST['RMlistUuid']}";
+		
+		exec('/bin/rm -r ' . $snortRuleDir);
+	}	
+		
+	if ($_POST['RMlistTable'] == 'SnortWhitelist') {
+		snortSql_updatelistDelete($_POST['RMlistDB'], 'SnortWhitelistips', 'filename', $rm_row_list['filename']);	
+	}		
+	
+	snortJsonReturnCode(snortSql_updatelistDelete($_POST['RMlistDB'], $_POST['RMlistTable'], 'uuid', $_POST['RMlistUuid']));
 	
 }
 
 
 // general settings save
-if ($_POST['snortSaveSettings'] == 1) 
-{
+if ($_POST['snortSaveSettings'] == 1)  {
+	
+	
+	// Save ruleDB settings
+	if ($_POST['dbTable'] == 'Snortrules') {
+		
+		unset($_POST['snortSaveSettings']);		
+		unset($_POST['ifaceTab']);
+		
+		if (!is_dir("/usr/local/etc/snort/snortDBrules/DB/{$_POST['uuid']}/rules")) {				
+			
+			// creat iface dir and ifcae rules dir
+			exec("/bin/mkdir -p /usr/local/etc/snort/snortDBrules/DB/{$_POST['uuid']}/rules");
+			
+			
+			// NOTE: code only works on php5
+			$listSnortRulesDir = snortScanDirFilter('/usr/local/etc/snort/snortDBrules/snort_rules/rules', '\.rules');
+			$listEmergingRulesDir = snortScanDirFilter('/usr/local/etc/snort/snortDBrules/emerging_rules/rules', '\.rules');
+			$listPfsenseRulesDir = snortScanDirFilter('/usr/local/etc/snort/snortDBrules/pfsense_rules/rules', '\.rules');
+			
+			if (!empty($listSnortRulesDir)) {											
+				exec("/bin/cp -R /usr/local/etc/snort/snortDBrules/snort_rules/rules/* /usr/local/etc/snort/snortDBrules/DB/{$_POST['uuid']}/rules");					
+			}
+			if (!empty($listEmergingRulesDir)) {											
+				exec("/bin/cp -R /usr/local/etc/snort/snortDBrules/emerging_rules/rules/* /usr/local/etc/snort/snortDBrules/DB/{$_POST['uuid']}/rules");					
+			}								
+			if (!empty($listPfsenseRulesDir)) {											
+				exec("/bin/cp -R /usr/local/etc/snort/snortDBrules/pfsense_rules/rules/* /usr/local/etc/snort/snortDBrules/DB/{$_POST['uuid']}/rules");					
+			}
+					
+			
+		} //end of mkdir		
+		
+		snortJsonReturnCode(snortSql_updateSettings('uuid', $_POST['uuid']));		
+		
+	}
 	
 	// Save general settings
-	if ($_POST['dbTable'] == 'SnortSettings')
-	{
+	if ($_POST['dbTable'] == 'SnortSettings') {
 		 
-		if ($_POST['ifaceTab'] == 'snort_interfaces_global')
-		{    
+		if ($_POST['ifaceTab'] == 'snort_interfaces_global') {    
 			// checkboxes when set to off never get included in POST thus this code      
 			$_POST['forcekeepsettings'] = ($_POST['forcekeepsettings'] == '' ? off : $_POST['forcekeepsettings']);		
 		}
 		      
-		if ($_POST['ifaceTab'] == 'snort_alerts') 
-		{
+		if ($_POST['ifaceTab'] == 'snort_alerts') {
 		        
 			if (!isset($_POST['arefresh']))
 				$_POST['arefresh'] = ($_POST['arefresh'] == '' ? off : $_POST['arefresh']);
 			       		          
 		}
 		      
-		if ($_POST['ifaceTab'] == 'snort_blocked') 
-		{
+		if ($_POST['ifaceTab'] == 'snort_blocked') {
 		          
 			if (!isset($_POST['brefresh']))
 				$_POST['brefresh'] = ($_POST['brefresh'] == '' ? off : $_POST['brefresh']);          
@@ -140,12 +154,10 @@ if ($_POST['snortSaveSettings'] == 1)
 	} // end of dbTable SnortSettings
 
     // Save rule settings on the interface edit tab
-	if ($_POST['dbTable'] == 'Snortrules')
-    {
+	if ($_POST['dbTable'] == 'SnortIfaces') {
     	
 	    // snort interface edit
-		if ($_POST['ifaceTab'] == 'snort_interfaces_edit') 
-		{
+		if ($_POST['ifaceTab'] == 'snort_interfaces_edit') {
 		        
 			if (!isset($_POST['enable']))
 			 	$_POST['enable'] = ($_POST['enable'] == '' ? off : $_POST['enable']);
@@ -175,8 +187,9 @@ if ($_POST['snortSaveSettings'] == 1)
 			if (!is_dir("/usr/local/etc/snort/{$newSnortDir}")) {				
 				
 				// creat iface dir and ifcae rules dir
-				exec("/bin/mkdir -p /usr/local/etc/snort/{$newSnortDir}/rules");
+				exec("/bin/mkdir -p /usr/local/etc/snort/{$newSnortDir}");
 				
+				/*
 				// NOTE: code only works on php5
 				$listSnortRulesDir = snortScanDirFilter('/usr/local/etc/snort/snort_rules/rules', '\.rules');
 				$listEmergingRulesDir = snortScanDirFilter('/usr/local/etc/snort/emerging_rules/rules', '\.rules');
@@ -191,6 +204,7 @@ if ($_POST['snortSaveSettings'] == 1)
 				if (!empty($listPfsenseRulesDir)) {											
 					exec("/bin/cp -R /usr/local/etc/snort/pfsense_rules/rules/* /usr/local/etc/snort/{$newSnortDir}/rules");					
 				}
+				*/
 				
 				
 			} //end of mkdir
@@ -198,8 +212,7 @@ if ($_POST['snortSaveSettings'] == 1)
 		} // end of snort_interfaces_edit		
 		
 		// snort preprocessor edit
-		if ($_POST['ifaceTab'] == 'snort_preprocessors') 
-		{
+		if ($_POST['ifaceTab'] == 'snort_preprocessors') {
 
 			if (!isset($_POST['dce_rpc_2']))
 			 	$_POST['dce_rpc_2'] = ($_POST['dce_rpc_2'] == '' ? off : $_POST['dce_rpc_2']);
@@ -228,8 +241,7 @@ if ($_POST['snortSaveSettings'] == 1)
 		}
 
 		// snort barnyard edit
-		if ($_POST['ifaceTab'] == 'snort_barnyard') 
-		{
+		if ($_POST['ifaceTab'] == 'snort_barnyard') {
 			// make shure iface is lower case
 			$_POST['interface'] = strtolower($_POST['interface']);
 			
@@ -250,16 +262,13 @@ if ($_POST['snortSaveSettings'] == 1)
 } // STOP General Settings Save
 
 // Suppress settings save
-if ($_POST['snortSaveSuppresslist'] == 1) 
-{
+if ($_POST['snortSaveSuppresslist'] == 1) {
 
 	// post for supress_edit	
-	if ($_POST['ifaceTab'] == 'snort_interfaces_suppress_edit') 
-	{
+	if ($_POST['ifaceTab'] == 'snort_interfaces_suppress_edit') {
 		
 	    // make sure filename is valid  
-		if (!is_validFileName($_POST['filename']))
-		{
+		if (!is_validFileName($_POST['filename'])) {
 			echo 'Error: FileName';
 			return false;
 		}
@@ -279,13 +288,11 @@ if ($_POST['snortSaveSuppresslist'] == 1)
 }
 
 // Whitelist settings save
-if ($_POST['snortSaveWhitelist'] == 1) 
-{
+if ($_POST['snortSaveWhitelist'] == 1) {
 
   if ($_POST['ifaceTab'] == 'snort_interfaces_whitelist_edit') {
         
-		if (!is_validFileName($_POST['filename']))
-		{
+		if (!is_validFileName($_POST['filename'])) {
 			echo 'Error: FileName';
 			return false;
 		}
@@ -307,8 +314,7 @@ if ($_POST['snortSaveWhitelist'] == 1)
   unset($_POST['list']);
   
   
-  if (snortSql_updateSettings('uuid', $_POST['uuid']) && snortSql_updateWhitelistIps($whitelistIPs))
-  {
+  if (snortSql_updateSettings('uuid', $_POST['uuid']) && snortSql_updateWhitelistIps($whitelistIPs)) {
   	snortJsonReturnCode(true);
   }else{
   	snortJsonReturnCode(false);
@@ -318,8 +324,7 @@ if ($_POST['snortSaveWhitelist'] == 1)
 }
 
 // download code for alerts page
-if ($_POST['snortlogsdownload'] == 1)
-{
+if ($_POST['snortlogsdownload'] == 1) {
 	conf_mount_rw();
 	snort_downloadAllLogs();
 	conf_mount_ro();
@@ -327,8 +332,7 @@ if ($_POST['snortlogsdownload'] == 1)
 }
 
 // download code for alerts page
-if ($_POST['snortblockedlogsdownload'] == 1)
-{
+if ($_POST['snortblockedlogsdownload'] == 1) {
 	conf_mount_rw();
 	snort_downloadBlockedIPs();
 	conf_mount_ro();
@@ -337,8 +341,7 @@ if ($_POST['snortblockedlogsdownload'] == 1)
 
 
 // code neeed to be worked on when finnished rules code
-if ($_POST['snortlogsdelete'] == 1)
-{
+if ($_POST['snortlogsdelete'] == 1) {
 	
 	conf_mount_rw();
 	snortDeleteLogs();
@@ -346,8 +349,7 @@ if ($_POST['snortlogsdelete'] == 1)
 }
 
 // flushes snort2c table
-if ($_POST['snortflushpftable'] == 1)
-{
+if ($_POST['snortflushpftable'] == 1) {
 	
 	conf_mount_rw();
 	snortRemoveBlockedIPs();
@@ -355,8 +357,7 @@ if ($_POST['snortflushpftable'] == 1)
 }
 
 // reset db reset_snortgeneralsettings
-if ($_POST['reset_snortgeneralsettings'] == 1)
-{
+if ($_POST['reset_snortgeneralsettings'] == 1) {
 
 	conf_mount_rw();
 	reset_snortgeneralsettings();

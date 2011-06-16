@@ -5,7 +5,10 @@
  part of m0n0wall (http://m0n0.ch/wall)
 
  Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
- Copyright (C) 2008-2009 Robert Zelaya.
+ All rights reserved.
+ 
+ Modified for the Snaort Package By 
+ Copyright (C) 2008-2011 Robert Zelaya.
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
@@ -34,19 +37,24 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_new.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 
-$generalSettings = snortSql_fetchAllSettings('snortDB', 'SnortSettings', 'id', '1');
+$a_rules = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'All', '');
 
-$alertnumber = $generalSettings['alertnumber'];
+	if (!is_array($a_rules)) {
+		$a_rules = array();
+	}
 
-$arefresh_on = ($generalSettings['arefresh']  == 'on' ? 'checked' : '');
+	if ($a_rules == 'Error') {
+		echo 'Error';
+		exit(0);
+	}
 
-	$pgtitle = "Services: Snort: Alerts";
+	$pgtitle = "Services: Snort: Rules";
 	include("/usr/local/pkg/snort/snort_head.inc");
 
 ?>
-			
+	
+	
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
-
 
 <div id="loadingWaiting">
   <p class="loadingWaitingMessage"><img src="./images/loading.gif" /> <br>Please Wait...</p>
@@ -72,80 +80,92 @@ $arefresh_on = ($generalSettings['arefresh']  == 'on' ? 'checked' : '');
 			<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
 			<li><a href="/snort/snort_interfaces_global.php"><span>Global Settings</span></a></li>
 			<li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
-			<li class="newtabmenu_active"><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
+			<li class="newtabmenu_active"><a href="/snort/snort_interfaces_rules.php"><span>RulesDB</span></a></li>
+			<li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
 			<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
 			<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
 			<li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
-			<li><a href="/snort/snort_help_info.php"><span>Help</span></a></li>			
+			<li><a href="/snort/snort_help_info.php"><span>Help</span></a></li>
 		</ul>
 		</div>
 
 		</td>
 	</tr>
 	<tr>
-		<td id="tdbggrey">		
+		<td id="tdbggrey">
 		<table width="100%" border="0" cellpadding="10px" cellspacing="0">
 		<tr>
 		<td class="tabnavtbl">
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<!-- START MAIN AREA -->
-			
-			<tr id="maintable" data-options='{"pagetable":"SnortSettings"}'> <!-- db to lookup -->
-				<td colspan="2" valign="top" class="listtopic" width="21%">Last 255 Alert Entries</td>
-				<td colspan="2" valign="top" class="listtopic">Latest Alert Entries Are Listed First</td>
+						
+			<tr> <!-- db to lookup -->
+				<td width="30%" class="listhdrr">File Name</td>
+				<td width="70%" class="listhdr">Description</td>
+				<td width="10%" class="list"></td>
 			</tr>
-			<table width="100%" border="0" cellpadding="6" cellspacing="0">
-			<tr>
-				<td class="vncell2" valign="center" width="21%"><span class="vexpl">Save or Remove Logs</span></td>
-				<td class="vtable" width="40%">
-					<form id="iform" >
-					<input name="snortlogsdownload"  type="submit" class="formbtn" value="Download" >
-					<input type="hidden" name="snortlogsdownload" value="1" />
-					<span class="vexpl">Save All Log Files.</span>
-					</form>
+			<?php foreach ($a_rules as $list): ?>
+			<tr id="maintable_<?=$list['uuid']?>" data-options='{"pagetable":"Snortrules", "pagedb":"snortDBrules", "DoPOST":"true"}' >
+				<td class="listlr" ondblclick="document.location='snort_interfaces_suppress_edit.php?uuid=<?=$list['uuid'];?>'"><?=$list['ruledbname'];?></td>
+				<td class="listbg" ondblclick="document.location='snort_interfaces_suppress_edit.php?uuid=<?=$list['uuid'];?>'">
+				<font color="#FFFFFF"> <?=htmlspecialchars($list['description']);?>&nbsp;</font>
 				</td>
-				<td class="vtable">
-					<form id="iform2" >
-					<input name="snortlogsdelete"  type="submit" class="formbtn" value="Clear" onclick="return confirm('Do you really want to remove all your logs ? All Snort Logs will be removed !')" >
-					<input type="hidden" name="snortlogsdelete" value="1" />
-					<span class="vexpl red"><strong>Warning:</strong></span><span class="vexpl"> all logs will be deleted.</span>
-					</form>
+				<td></td>
+				<td valign="middle" nowrap class="list">
+				<table border="0" cellspacing="0" cellpadding="1">
+					<tr>
+						<td valign="middle">
+						<a href="snort_interfaces_rules_edit.php?rdbuuid=<?=$list['uuid'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"width="17" height="17" border="0" title="edit suppress list"></a>
+						</td>
+						<td>
+						<img id="icon_x_<?=$list['uuid'];?>" class="icon_click icon_x" src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="delete list" >
+						</a>
+						</td>
+					</tr>
+				</table>
 				</td>
-					<div class="hiddendownloadlink"></div>				
 			</tr>
+			<?php $i++; endforeach; ?>
 			<tr>
-				<td class="vncell2" valign="center"><span class="vexpl">Auto Refresh and Log View</span></td>
-				<td class="vtable">
-					<form id="iform3" >
-					<input name="save" type="submit" class="formbtn" value="Save">
-					<input id="cancel" type="button" class="formbtn" value="Cancel">
-					<input name="arefresh" id="arefresh" type="checkbox" value="on" <?=htmlspecialchars($arefresh_on);?> >
-					<span class="vexpl">Auto Refresh</span>
-					<span class="vexpl"><strong>Default ON</strong>.</span> 
+				<td class="list" colspan="3"></td>
+				<td class="list">
+				<table border="0" cellspacing="0" cellpadding="1">
+			<tr>
+				<td valign="middle" width="17">&nbsp;</td>
+				<td valign="middle"><a href="snort_interfaces_rules_edit.php?rdbuuid=<?=genAlphaNumMixFast(11, 12);?> "><img src="/themes/nervecenter/images/icons/icon_plus.gif" width="17" height="17" border="0" title="add a new list"></a></td>
+					</tr>
+				</table>
 				</td>
-				<td class="vtable">
-					<input name="alertnumber" type="text" class="formfld2" id="alertnumber" size="5" value="<?=htmlspecialchars($alertnumber);?>" >
-					<span class="vexpl">Limit entries to view. <strong>Default 250</strong>.</span>
-
-          <input type="hidden" name="snortSaveSettings" value="1" /> <!-- what to do, save -->
-          <input type="hidden" name="dbName" value="snortDB" /> <!-- what db -->
-          <input type="hidden" name="dbTable" value="SnortSettings" /> <!-- what db table -->
-          <input type="hidden" name="ifaceTab" value="snort_alerts" /> <!-- what interface tab -->
-
-					</form>
-				</td>				
-			</tr>			
-			</table>			
-
-			
+			</tr>
+				</table>				
+				</td>
+			</tr>	
+		
 		<!-- STOP MAIN AREA -->
 		</table>
 		</td>
-		</tr>			
+		</tr>
+			
 		</table>
 	</td>
 	</tr>
 </table>
+
+<!-- 2nd box note -->
+<br>
+<div id=mainarea4>
+<table class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+	<td width="100%">
+	<span class="vexpl">
+	<span class="red"><strong>Note:</strong></span>
+	<p><span class="vexpl">
+		Here you can create event filtering and suppression for your snort package rules.<br>
+		Please note that you must restart a running rule so that changes can take effect.<br>
+	</span></p>
+	</td>
+</table>
+</div>
+
 </div>
 
 

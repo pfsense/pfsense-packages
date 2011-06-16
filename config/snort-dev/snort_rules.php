@@ -36,24 +36,30 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_new.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 
-// set page vars
-
-$uuid = $_GET['uuid'];
-if (isset($_POST['uuid']))
-$uuid = $_POST['uuid'];
-
-if ($uuid == '') {
-	echo 'error: no uuid';
+if (isset($_GET['uuid']) && isset($_GET['rdbuuid'])) {
+	echo 'Error: more than one uuid';
 	exit(0);
+}
+
+// set page vars
+if (isset($_GET['uuid'])) {
+	$uuid = $_GET['uuid'];
+}
+
+if (isset($_GET['rdbuuid'])) {
+	$rdbuuid = $_GET['rdbuuid'];
+}else{
+	$ruledbname_pre1 = snortSql_fetchAllSettings('snortDB', 'SnortIfaces', 'uuid', $uuid);
+	$rdbuuid = $ruledbname_pre1['ruledbname'];
 }
 
 // unset Session tmp on page load
 unset($_SESSION['snort']['tmp']);
 
 // list rules in the default dir
-$a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $uuid);
+$a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $rdbuuid);
 
-$snortRuleDir = '/usr/local/etc/snort/sn_' . $uuid . '_' . $a_list['interface'];
+$snortRuleDir = '/usr/local/etc/snort/snortDBrules/DB/' . $rdbuuid;
 
 	// list rules in the default dir
 	$filterDirList = array();
@@ -117,11 +123,12 @@ function load_rule_file($incoming_file, $splitcontents)
 		
 	/*
 	 * SET GLOBAL ARRAY $_SESSION['snort']
+	 * Use SESSION instead POST for security because were writing to files.  
 	 */
+	
 	$_SESSION['snort']['tmp']['snort_rules']['dbName'] = 'snortDBrules';
 	$_SESSION['snort']['tmp']['snort_rules']['dbTable'] = 'SnortruleSigs';
-	$_SESSION['snort']['tmp']['snort_rules']['ifaceuuid'] = $uuid;
-	$_SESSION['snort']['tmp']['snort_rules']['ifaceselected'] = $a_list['interface'];
+	$_SESSION['snort']['tmp']['snort_rules']['rdbuuid'] = $rdbuuid;
 	$_SESSION['snort']['tmp']['snort_rules']['rulefile'] = $rulefile;
 	
 
@@ -141,12 +148,13 @@ function load_rule_file($incoming_file, $splitcontents)
   <p class="loadingWaitingMessage"><img src="./images/loading.gif" /> <br>Please Wait...</p>
 </div>
 
+<!-- hidden div -->
 <div id="loadingRuleEditGUI">
 	
 	<div class="loadingRuleEditGUIDiv">
 				<form id="iform2" action="">
 				<input type="hidden" name="snortSidRuleEdit" value="1" />
-				<input type="hidden" name="snortSidRuleIface" value="<?=$uuid . '_' . $a_list['interface']; ?>" /> <!-- what to do, save -->
+				<input type="hidden" name="snortSidRuleDBuuid" value="<?=$rdbuuid;?>" /> <!-- what to do, save -->
 				<input type="hidden" name="snortSidRuleFile" value="<?=$rulefile; ?>" /> <!-- what to do, save -->								
 				<input type="hidden" name="snortSidNum" value="" /> <!-- what to do, save -->
 				<table width="100%" cellpadding="9" cellspacing="9" bgcolor="#eeeeee">
@@ -200,23 +208,58 @@ function load_rule_file($incoming_file, $splitcontents)
 <div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td>
-
-		<div class="newtabmenu" style="margin: 1px 0px; width: 790px;"><!-- Tabbed bar code-->
-		<ul class="newtabmenu">
-			<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
-			<li><a href="/snort/snort_interfaces_edit.php?uuid=<?=$uuid;?>"><span>If Settings</span></a></li>
-			<li><a href="/snort/snort_rulesets.php?uuid=<?=$uuid;?>"><span>Categories</span></a></li>
-			<li class="newtabmenu_active"><a href="/snort/snort_rules.php?uuid=<?=$uuid;?>"><span>Rules</span></a></li>
-			<li><a href="/snort/snort_define_servers.php?uuid=<?=$uuid;?>"><span>Servers</span></a></li>
-			<li><a href="/snort/snort_preprocessors.php?uuid=<?=$uuid;?>"><span>Preprocessors</span></a></li>
-			<li><a href="/snort/snort_barnyard.php?uuid=<?=$uuid;?>"><span>Barnyard2</span></a></li>			
-		</ul>
-		</div>
-
-		</td>
-	</tr>
+	<?php
+	if (!empty($uuid)) { 
+		echo '
+		<tr>
+			<td>
+			<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
+			<ul class="newtabmenu">
+					<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
+					<li><a href="/snort/snort_interfaces_edit.php?uuid=' . $uuid . '"><span>If Settings</span></a></li>
+					<li><a href="/snort/snort_rulesets.php?uuid=' . $uuid . '"><span>Categories</span></a></li>
+					<li class="newtabmenu_active"><a href="/snort/snort_rules.php?uuid=' . $uuid . '"><span>Rules</span></a></li>
+					<li><a href="/snort/snort_define_servers.php?uuid=' . $uuid . '"><span>Servers</span></a></li>
+					<li><a href="/snort/snort_preprocessors.php?uuid=' . $uuid . '"><span>Preprocessors</span></a></li>
+					<li><a href="/snort/snort_barnyard.php?uuid=' . $uuid . '"><span>Barnyard2</span></a></li>			
+			</ul>
+			</div>
+			</td>
+		</tr>
+		';
+	}else{
+		echo ' 
+		<tr>
+			<td>
+			<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
+			<ul class="newtabmenu">
+				<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
+				<li><a href="/snort/snort_interfaces_global.php"><span>Global Settings</span></a></li>
+				<li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
+				<li class="newtabmenu_active"><a href="/snort/snort_interfaces_rules.php"><span>RulesDB</span></a></li>
+				<li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
+				<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
+				<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
+				<li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
+				<li><a href="/snort/snort_help_info.php"><span>Help</span></a></li>
+			</ul>
+			</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+			<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
+			<ul class="newtabmenu">
+			<li class="hide_newtabmenu"><a href="/snort/snort_interfaces_rules_edit.php?rdbuuid=' . $rdbuuid . '"><span>Rules DB Edit</span></a></li>
+			<li class="hide_newtabmenu"><a href="/snort/snort_rulesets.php?rdbuuid=' . $rdbuuid . '"><span>Categories</span></a></li>
+			<li class="hide_newtabmenu newtabmenu_active"><a href="/snort/snort_rules.php?rdbuuid=' . $rdbuuid . '"><span>Rules</span></a></li>
+			</ul>
+			</div>
+			</td>
+		</tr>	
+			';
+	}
+	?>
 	<tr>
 	<td id="tdbggrey">	
 	<div style="width:780px; margin-left: auto ; margin-right: auto ; padding-top: 10px; padding-bottom: 10px;">
@@ -230,16 +273,23 @@ function load_rule_file($incoming_file, $splitcontents)
 					Category:
 			<select name="selectbox" class="formfld" >
 				<?php
+				if(isset($_GET['uuid'])) {
+					$urlUuid = "&uuid=$uuid";
+				}
+				
+				if(isset($_GET['rdbuuid'])) {
+					$urlUuid = "&rdbuuid=$rdbuuid";
+				}
+				
 				$i=0;
 				foreach ($filterDirList as $value)
 				{
 					$selectedruleset = '';
-					if ($value === $rulefile)
-					{
+					if ($value === $rulefile) {
 						$selectedruleset = 'selected';
 					}
 					
-				echo "\n" . '<option value="?uuid=' . $uuid . '&openruleset=' . $ruledir . $value . '" ' . $selectedruleset . ' >' . $value . '</option>' . "\r";
+					echo "\n" . '<option value="?&openruleset=' . $ruledir . $value . $urlUuid . '" ' . $selectedruleset . ' >' . $value . '</option>' . "\r";
 
 				$i++;
 

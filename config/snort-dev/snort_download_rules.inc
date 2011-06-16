@@ -6,8 +6,6 @@
  * 
  */
 
-//require_once("/usr/local/pkg/snort/snort_new.inc");
-
 // fetch db Settings NONE Json
 function snortSql_fetchAllSettings($dbname, $table, $type, $id_uuid) 
 {

@@ -5,10 +5,10 @@
 <link rel="stylesheet" type="text/css" href="./css/style_snort2.css" media="all" />
 <!-- <link rel="stylesheet" type="text/css" href="./css/jquery.bubblepopup.v2.3.1.css" media="all" /> -->
 
-<script type="text/javascript" src="./javascript/jquery-1.6.min.js"></script>
-<script type="text/javascript" src="./javascript/snort_globalsend.js"></script>
-<script type="text/javascript" src="./javascript/jquery.form.js"></script>
-<script type="text/javascript" src="./javascript/jquery.progressbar.min.js"></script>
+<script type="text/javascript" src="/snort/javascript/jquery-1.6.1.min.js"></script>
+<script type="text/javascript" src="/snort/javascript/snort_globalsend.js"></script>
+<script type="text/javascript" src="/snort/javascript/jquery.form.js"></script>
+<script type="text/javascript" src="/snort/javascript/jquery.progressbar.min.js"></script>
 <!-- <script type="text/javascript" src="./javascript/jquery.bubblepopup.v2.3.1.min.js"></script>  -->
 
 <!-- STOP of Snort Package css and javascript -->

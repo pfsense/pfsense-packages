@@ -38,7 +38,7 @@ require_once("/usr/local/pkg/snort/snort_gui.inc");
 
 $new_ruleUUID = genAlphaNumMixFast(7, 8);
 
-$a_interfaces = snortSql_fetchAllInterfaceRules('Snortrules', 'snortDBrules');
+$a_interfaces = snortSql_fetchAllInterfaceRules('SnortIfaces', 'snortDB');
 
 
 	$pgtitle = "Services: Snort 2.9.0.5 pkg v. 2.0";
@@ -166,7 +166,7 @@ $a_interfaces = snortSql_fetchAllInterfaceRules('Snortrules', 'snortDBrules');
 				
 				
 				echo "
-				<div id=\"maintable_{$list['uuid']}\" data-options='{\"pagetable\":\"Snortrules\", \"pagedb\":\"snortDBrules\", \"DoPOST\":\"true\"}'>
+				<div id=\"maintable_{$list['uuid']}\" data-options='{\"pagetable\":\"SnortIfaces\", \"pagedb\":\"snortDB\", \"DoPOST\":\"true\"}'>
 					";
 				echo '
 				<table width="100%" border="0" cellpadding="0" cellspacing="0">			

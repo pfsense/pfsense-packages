@@ -2,13 +2,11 @@
 
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_new.inc");
-require_once("/usr/local/pkg/snort/snort_download_rules.inc");
 
 session_start(); // alwaya at the very top of a php page or "Cannot send session cache limiter - headers already sent"
 
 // upload created log tar to user
-if ($_GET['snortGetUpdate'] == 1)
-{
+if ($_GET['snortGetUpdate'] == 1) {
 	
 	$tmpfname = "/usr/local/etc/snort/snort_download";
 	$snort_filename = "snortrules-snapshot-2905.tar.gz";
@@ -16,11 +14,9 @@ if ($_GET['snortGetUpdate'] == 1)
 	
 	$snortSessionPath = $_SESSION['tmp']['snort']['snort_download_updates'];
 	
-	if (!file_exists("{$tmpfname}/{$snort_filename}"))
-	{		
+	if (!file_exists("{$tmpfname}/{$snort_filename}")) {		
 	
-		if ($snortSessionPath['download']['working'] != '1')
-		{
+		if ($snortSessionPath['download']['working'] != '1') {
 			unset($_SESSION['tmp']);
 			$snortSessionPath['download']['working'] = '1';
 			sendUpdateSnortLogDownload();		
@@ -29,7 +25,9 @@ if ($_GET['snortGetUpdate'] == 1)
 	}
 	
 	$time = time();
-	while((time() - $time) < 30) {
+	while((time() - $time) < 30) 
+	{
+		
 	    // query memcache, database, etc. for new data
 	    $data = $datasource->getLatest();
 	 
@@ -49,8 +47,7 @@ if ($_GET['snortGetUpdate'] == 1)
 
 
 // upload created log tar to user
-if ($_GET['snortlogdownload'] == 1)
-{
+if ($_GET['snortlogdownload'] == 1) {
 	
 	sendFileSnortLogDownload();
 
@@ -58,8 +55,7 @@ if ($_GET['snortlogdownload'] == 1)
 
 
 // send Json sid string
-if ($_GET['snortGetSidString'] == 1)
-{
+if ($_GET['snortGetSidString'] == 1) {
 	
 	// unset 
 	unset($_GET['snortGetSidString']);

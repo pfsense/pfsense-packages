@@ -167,7 +167,6 @@ jQuery(document).ready(function(){
 			<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
 			<li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
 			<li><a href="/snort/snort_help_info.php"><span>Help</span></a></li>
-			</li>			
 		</ul>
 		</div>
 

@@ -34,33 +34,37 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_new.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 
-// set page vars
-
-$uuid = $_GET['uuid'];
-if (isset($_POST['uuid']))
-$uuid = $_POST['uuid'];
-
-if ($uuid == '') {
-	echo 'error: no uuid';
+if (isset($_GET['uuid']) && isset($_GET['rdbuuid'])) {
+	echo 'Error: more than one uuid';
 	exit(0);
 }
 
-$a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $uuid);
+// set page vars
+if (isset($_GET['uuid'])) {
+	$uuid = $_GET['uuid'];
+}
+
+if (isset($_GET['rdbuuid'])) {
+	$rdbuuid = $_GET['rdbuuid'];
+}else{
+	$ruledbname_pre1 = snortSql_fetchAllSettings('snortDB', 'SnortIfaces', 'uuid', $uuid);
+	$rdbuuid = $ruledbname_pre1['ruledbname'];
+}
+
+//$a_list = snortSql_fetchAllSettings('snortDBrules', 'SnortIfaces', 'uuid', $uuid);
 
 	// list rules in the default dir
 	$filterDirList = array();
-	$filterDirList = snortScanDirFilter('/usr/local/etc/snort/sn_' . $uuid . '_' . $a_list['interface'] . '/rules', '\.rules');
+	$filterDirList = snortScanDirFilter('/usr/local/etc/snort/snortDBrules/DB/' . $rdbuuid . '/rules', '\.rules');
 	
 	// list rules in db that are on in a array
 	$listOnRules = array();
-	$listOnRules = snortSql_fetchAllSettings('snortDBrules', 'SnortRuleSets', 'ifaceuuid', $uuid);
+	$listOnRules = snortSql_fetchAllSettings('snortDBrules', 'SnortRuleSets', 'rdbuuid', $rdbuuid);
 	
-	if (!empty($listOnRules))
-	{
+	if (!empty($listOnRules)) {
 		foreach ( $listOnRules as $val2 )
 		{
-			if ($val2['enable'] == 'on')
-			{
+			if ($val2['enable'] == 'on') {
 				$rulesetOn[] = $val2['rulesetname'];
 			}			
 		}
@@ -151,7 +155,7 @@ jQuery(document).ready(function() {
 					'	<input class="domecheck" name="filenamcheckbox[]" value="' + snortObjlist.ruleSets[i].rule + '" type="checkbox" ' + rulesetChecked + ' >' + "\n" +
 					'</td>' + "\n" +
 					'<td class="' + rowIsEvenOdd + '">' + "\n" +
-					'	<a href="/snort/snort_rules.php?uuid=<?=$uuid?>' + '&openruleset=' + snortObjlist.ruleSets[i].rule + '">' + snortObjlist.ruleSets[i].rule + '</a>' + "\n" + 
+					'	<a href="/snort/snort_rules.php?openruleset=' + snortObjlist.ruleSets[i].rule + '<?php if(isset($uuid)){echo "&uuid=$uuid";}else{echo "&rdbuuid=$rdbuuid";}?>' + '">' + snortObjlist.ruleSets[i].rule + '</a>' + "\n" + 
 					'</td>' + "\n" +
 					'</tr>' + "\n\n"			
 			);	
@@ -163,9 +167,6 @@ jQuery(document).ready(function() {
 
 </script>
 
-
-
-
 <div id="loadingWaiting">
   <p class="loadingWaitingMessage"><img src="./images/loading.gif" /> <br>Please Wait...</p>
 </div>
@@ -176,23 +177,58 @@ jQuery(document).ready(function() {
 <div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0" alt="transgif" ></img></a></div>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td>
-
-		<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
-		<ul class="newtabmenu">
+	<?php
+	if (!empty($uuid)) { 
+		echo '
+		<tr>
+			<td>
+			<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
+			<ul class="newtabmenu">
+					<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
+					<li><a href="/snort/snort_interfaces_edit.php?uuid=' . $uuid . '"><span>If Settings</span></a></li>
+					<li class="newtabmenu_active"><a href="/snort/snort_rulesets.php?uuid=' . $uuid . '"><span>Categories</span></a></li>
+					<li><a href="/snort/snort_rules.php?uuid=' . $uuid . '"><span>Rules</span></a></li>
+					<li><a href="/snort/snort_define_servers.php?uuid=' . $uuid . '"><span>Servers</span></a></li>
+					<li><a href="/snort/snort_preprocessors.php?uuid=' . $uuid . '"><span>Preprocessors</span></a></li>
+					<li><a href="/snort/snort_barnyard.php?uuid=' . $uuid . '"><span>Barnyard2</span></a></li>			
+			</ul>
+			</div>
+			</td>
+		</tr>
+		';
+	}else{
+		echo ' 
+		<tr>
+			<td>
+			<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
+			<ul class="newtabmenu">
 				<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
-				<li><a href="/snort/snort_interfaces_edit.php?uuid=<?=$uuid;?>"><span>If Settings</span></a></li>
-				<li class="newtabmenu_active"><a href="/snort/snort_rulesets.php?uuid=<?=$uuid;?>"><span>Categories</span></a></li>
-				<li><a href="/snort/snort_rules.php?uuid=<?=$uuid;?>"><span>Rules</span></a></li>
-				<li><a href="/snort/snort_define_servers.php?uuid=<?=$uuid;?>"><span>Servers</span></a></li>
-				<li><a href="/snort/snort_preprocessors.php?uuid=<?=$uuid;?>"><span>Preprocessors</span></a></li>
-				<li><a href="/snort/snort_barnyard.php?uuid=<?=$uuid;?>"><span>Barnyard2</span></a></li>			
-		</ul>
-		</div>
-
-		</td>
-	</tr>
+				<li><a href="/snort/snort_interfaces_global.php"><span>Global Settings</span></a></li>
+				<li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
+				<li class="newtabmenu_active"><a href="/snort/snort_interfaces_rules.php"><span>RulesDB</span></a></li>
+				<li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
+				<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
+				<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
+				<li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
+				<li><a href="/snort/snort_help_info.php"><span>Help</span></a></li>
+			</ul>
+			</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+			<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
+			<ul class="newtabmenu">
+			<li class="hide_newtabmenu"><a href="/snort/snort_interfaces_rules_edit.php?rdbuuid=' . $rdbuuid . '"><span>Rules DB Edit</span></a></li>
+			<li class="hide_newtabmenu newtabmenu_active"><a href="/snort/snort_rulesets.php?rdbuuid=' . $rdbuuid . '"><span>Categories</span></a></li>
+			<li class="hide_newtabmenu"><a href="/snort/snort_rules.php?rdbuuid=' . $rdbuuid . '"><span>Rules</span></a></li>
+			</ul>
+			</div>
+			</td>
+		</tr>	
+			';
+	}
+	?>
 	<tr>
 		<td id="tdbggrey">		
 		<table width="100%" border="0" cellpadding="10px" cellspacing="0">
@@ -220,8 +256,7 @@ jQuery(document).ready(function() {
 		<input type="hidden" name="dbName" value="snortDBrules" /> <!-- what db-->
 		<input type="hidden" name="dbTable" value="SnortruleSets" /> <!-- what db table-->
 		<input type="hidden" name="ifaceTab" value="snort_rulesets" /> <!-- what interface tab -->
-		<input type="hidden" name="ifaceuuid" value="<?=$uuid;?>" /> <!-- what interface to save for -->
-		<input type="hidden" name="iface" value="<?=$a_list['interface'];?>" /> <!-- what interface to save for -->
+		<input type="hidden" name="rdbuuid" value="<?=$rdbuuid;?>" /> <!-- what interface to save for -->
 			
 		<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		

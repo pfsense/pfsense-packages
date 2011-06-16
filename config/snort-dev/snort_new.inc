@@ -1,8 +1,7 @@
 <?php
 
 // unset crsf checks
-if(isset($_POST['__csrf_magic'])) 
-{
+if(isset($_POST['__csrf_magic'])) {
   unset($_POST['__csrf_magic']);
 }
 
@@ -14,8 +13,7 @@ function snortSidStringRuleEditGUI()
 	
 	$splitcontents = split_rule_file($workingFile);
 	
-	if (!empty($splitcontents))
-	{
+	if (!empty($splitcontents)) {
 		$sidLinePosPre = exec('/usr/bin/sed -n /sid:' . $_POST['snortSidNum'] . '\;/= ' . $workingFile);
 		$sidLinePos = $sidLinePosPre - 1;
 		
@@ -86,43 +84,46 @@ function newFilterRuleSig($baseruleArray)
 	$newSigArray[] = array();
 	foreach ( $baseruleArray as $value )
 	{
+		if (preg_match('/^# alert/', $value) || preg_match('/^alert/', $value)) {
 		
-		// add sid
-		$newSigArray[$i]['sid'] = get_middle($value, 'sid:', ';', 0);
-		
-		// remove whitespaces
-		$rmWhitespaces = preg_replace('/\s\s+/', ' ', $value);		
-		// remove whitespace betwin # aerrt
-		$rmAlertWhitespace = preg_replace('/^# alert/', '#alert', $rmWhitespaces);				
-		$splitcontents = explode(' ', $rmAlertWhitespace);	
-				
-		// enable or disable
-		if ($splitcontents[0] === '#alert')
-		{
-			$newSigArray[$i]['enable'] = 'off';
-		}else{
-			$newSigArray[$i]['enable'] = 'on';
-		}
-		
-		// proto
-		$newSigArray[$i]['proto'] = $splitcontents[1];
-		
-		// source
-		$newSigArray[$i]['src'] = trimLength($splitcontents[2]);
-		
-		// source port
-		$newSigArray[$i]['srcport'] = trimLength($splitcontents[3]);
-
-		// Destination
-		$newSigArray[$i]['dst'] = trimLength($splitcontents[5]);
-		
-		// Destination port
-		$newSigArray[$i]['dstport'] = trimLength($splitcontents[6]);
-		
-		// sig message 
-		$newSigArray[$i]['msg'] = get_middle($value, 'msg:"', '";', 0);
+			// add sid
+			$newSigArray[$i]['sid'] = get_middle($value, 'sid:', ';', 0);
 			
-		$i++;				
+			// remove whitespaces
+			$rmWhitespaces = preg_replace('/\s\s+/', ' ', $value);		
+			// remove whitespace betwin # aerrt
+			$rmAlertWhitespace = preg_replace('/^# alert/', '#alert', $rmWhitespaces);				
+			$splitcontents = explode(' ', $rmAlertWhitespace);	
+					
+			// enable or disable
+			if ($splitcontents[0] === '#alert') {
+				$newSigArray[$i]['enable'] = 'off';
+			}else{
+				$newSigArray[$i]['enable'] = 'on';
+			}
+			
+			// proto
+			$newSigArray[$i]['proto'] = $splitcontents[1];
+			
+			// source
+			$newSigArray[$i]['src'] = trimLength($splitcontents[2]);
+			
+			// source port
+			$newSigArray[$i]['srcport'] = trimLength($splitcontents[3]);
+	
+			// Destination
+			$newSigArray[$i]['dst'] = trimLength($splitcontents[5]);
+			
+			// Destination port
+			$newSigArray[$i]['dstport'] = trimLength($splitcontents[6]);
+			
+			// sig message 
+			$newSigArray[$i]['msg'] = get_middle($value, 'msg:"', '";', 0);
+		
+		}
+			
+		$i++;
+					
 	}
 	
 	return $newSigArray;
@@ -168,11 +169,9 @@ function write_rule_file($content_changed, $received_file)
 // Save ruleSets settings
 function snortSql_updateRuleSigList()
 {
-
-	$snortDir = '/usr/local/etc/snort/sn_' . $_SESSION['snort']['tmp']['snort_rules']['ifaceuuid'] . '_' . $_SESSION['snort']['tmp']['snort_rules']['ifaceselected'];
 	
 	// selected snort rule file	
-	$workingFile = $snortDir . '/rules/' . $_SESSION['snort']['tmp']['snort_rules']['rulefile'];
+	$workingFile = "/usr/local/etc/snort/snortDBrules/DB/{$_SESSION['snort']['tmp']['snort_rules']['rdbuuid']}/rules/{$_SESSION['snort']['tmp']['snort_rules']['rulefile']}";
 	
 	$splitcontents = split_rule_file($workingFile);
 	
@@ -187,23 +186,19 @@ function snortSql_updateRuleSigList()
 			$sidLine = preg_replace($replaceChars, '', $matches[0]);
 			
 			
-			if ($sidLine == '')
-			{
+			if ($sidLine == '') {
 				$tempstring[] = $sigLine;
 			}else{
 	
-				if (in_array($sidLine, $enableSigsArray))
-				{
+				if (in_array($sidLine, $enableSigsArray)) {
 					$tempstring[] = str_replace("# alert", "alert", $sigLine);
 				}
 				
-				if (in_array($sidLine, $disableSigsArray))
-				{
+				if (in_array($sidLine, $disableSigsArray)) {
 					$tempstring[] = str_replace("alert", "# alert", $sigLine);
 				}
 				
-				if (!in_array($sidLine, $enableSigsArray) && !in_array($sidLine, $disableSigsArray))
-				{
+				if (!in_array($sidLine, $enableSigsArray) && !in_array($sidLine, $disableSigsArray)) {
 					$tempstring[] = $sigLine;
 				}			
 			}		
@@ -216,8 +211,7 @@ function snortSql_updateRuleSigList()
     $enableSigsArray = array();
 	$disableSigsArray = array();
 	
-	if (!isset($_POST['filenamcheckbox2']))
-	{
+	if (!isset($_POST['filenamcheckbox2'])) {
 		$_POST['filenamcheckbox2'] = array();
 	}
 	
@@ -226,23 +220,69 @@ function snortSql_updateRuleSigList()
 	foreach ($newFilterRuleSigArray as $sigArray)
 	{		
 		// enable sig
-		if(in_array($sigArray['sid'], $_POST['filenamcheckbox2']) && $sigArray['enable'] == 'off')
-		{
+		if(in_array($sigArray['sid'], $_POST['filenamcheckbox2']) && $sigArray['enable'] == 'off') {
 			$enableSigsArray[] = $sigArray['sid'];			
 		}
 		
 		// disable sig
-		if(!in_array($sigArray['sid'], $_POST['filenamcheckbox2']) && $sigArray['enable'] == 'on')
-		{
+		if(!in_array($sigArray['sid'], $_POST['filenamcheckbox2']) && $sigArray['enable'] == 'on') {
 			$disableSigsArray[] = $sigArray['sid'];
 		}		
 	}
 		
 	// read rule file change disable/enable then write to file if arrays  are not empty
-	if (!empty($enableSigsArray) || !empty($disableSigsArray))
-	{
+	if (!empty($enableSigsArray) || !empty($disableSigsArray)) {
 		write_rule_file(read_rule_file($splitcontents, $enableSigsArray, $disableSigsArray), $workingFile);
 	}
+	
+	// Insert into the DB for oinkmaster
+	
+	function sql_EnableDisabeSid($SigArray, $OnOff)
+	{
+	
+		$dbname = $_SESSION['snort']['tmp']['snort_rules']['dbName'];
+		$table =  $_SESSION['snort']['tmp']['snort_rules']['dbTable'];
+		$rdbuuid = $_SESSION['snort']['tmp']['snort_rules']['rdbuuid'];
+		$addDate = date(U);
+		
+		// dont let user pick the DB path
+	    $db = sqlite_open("/usr/local/pkg/snort/{$dbname}");
+	    
+	    foreach ($SigArray as $mDEanbled)
+	    {
+	
+			$resultid = sqlite_query($db,
+				"SELECT id FROM {$table} WHERE signatureid = '{$mDEanbled}';
+			");
+			
+			$chktable = sqlite_fetch_all($resultid, SQLITE_ASSOC);
+			
+			 if (empty($chktable)) {
+			 	
+				$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+				"INSERT INTO {$table} (date, rdbuuid, signatureid, enable) VALUES ('{$addDate}', '{$rdbuuid}', '{$mDEanbled}', '{$OnOff}');
+				");		 	
+			 	
+			 }else{
+				if ($chktable[0]['enable'] != $OnOff) {
+					$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+					"UPDATE {$table} SET date = {$addDate}, enable = '{$OnOff}' WHERE signatureid = '{$mDEanbled}'; 
+					");
+				} 	
+			 	
+			 	
+			 }
+	    
+	    	
+	    }    
+	    
+	    sqlite_close($db);
+    
+	} // snd of function
+	
+	sql_EnableDisabeSid($enableSigsArray, 'on');
+	sql_EnableDisabeSid($disableSigsArray, 'off');
+	
 	
 	return true;
 
@@ -256,44 +296,38 @@ function snortSql_updateRuleSetList()
 	$dbname = $_POST['dbName'];
 	$table = $_POST['dbTable'];
 	$ruleSetfilenames = $_POST['filenamcheckbox'];
-	$ifaceuuid = $_POST['ifaceuuid'];
-	$iface = $_POST['iface'];
-	
+	$rdbuuid = $_POST['rdbuuid'];
 	
 	$addDate = date(U);
 
-	// do let user pick the DB path
+	// dont let user pick the DB path
     $db = sqlite_open("/usr/local/pkg/snort/{$dbname}"); 
     
-    if (empty($ruleSetfilenames))
-    {
+    if (empty($ruleSetfilenames)) {
     	$ruleSetfilenames = array();
     }
 
 	// foreach selected rulesets do this
-    if (!empty($ruleSetfilenames))
-	{
+    if (!empty($ruleSetfilenames)) {
 	    foreach ($ruleSetfilenames as $ruleSetfilename) 
 	    {
 	
 			$resultid = sqlite_query($db,
-				"SELECT id, enable FROM {$table} WHERE rulesetname = '{$ruleSetfilename}' and ifaceuuid = '{$ifaceuuid}';
+				"SELECT id, enable FROM {$table} WHERE rulesetname = '{$ruleSetfilename}' and rdbuuid = '{$rdbuuid}';
 			");			
 		    
 			$chktable = sqlite_fetch_all($resultid, SQLITE_ASSOC);   
 		
-			if (empty($chktable)) 
-			{
+			if (empty($chktable)) {
 				
 				$rulesetUuid = genAlphaNumMixFast(11, 14);
 				
 				$query_ck = sqlite_query($db, // @ supress warnings usonly in production
-				"INSERT INTO {$table} (date, uuid, ifaceuuid, rulesetname, enable) VALUES ('{$addDate}', '{$rulesetUuid}', '{$ifaceuuid}', '{$ruleSetfilename}', 'on');
+				"INSERT INTO {$table} (date, uuid, rdbuuid, rulesetname, enable) VALUES ('{$addDate}', '{$rulesetUuid}', '{$rdbuuid}', '{$ruleSetfilename}', 'on');
 				");
 
 			}else{					
-				if ($chktable[0]['enable'] == 'off')
-				{					
+				if ($chktable[0]['enable'] == 'off') {					
 					$query_ck = sqlite_query($db, // @ supress warnings usonly in production
 					"UPDATE {$table} SET enable = 'on' WHERE id = '{$chktable[0]['id']}'; 
 					");			
@@ -304,10 +338,10 @@ function snortSql_updateRuleSetList()
 
 			
 			// clean database of old names	and turn rulesets off
-    		$listDir = snortScanDirFilter("/usr/local/etc/snort/sn_{$ifaceuuid}_{$iface}/rules/", '.rules');
+    		$listDir = snortScanDirFilter("/usr/local/etc/snort/snortDBrules/DB/{$rdbuuid}/rules/", '\.rules');
     
 		    $resultAllRulesetname = sqlite_query($db,
-		            "SELECT rulesetname FROM {$table} WHERE ifaceuuid = '{$ifaceuuid}';
+		            "SELECT rulesetname FROM {$table} WHERE rdbuuid = '{$rdbuuid}';
 		     ");
 		    
 		    $chktable2 = sqlite_fetch_all($resultAllRulesetname, SQLITE_ASSOC);		
@@ -321,14 +355,14 @@ function snortSql_updateRuleSetList()
 			    	if(!in_array($value['rulesetname'], $listDir))
 			    	{	    		
 						$deleteMissingRuleset = sqlite_query($db, // @ supress warnings use only in production
-						"DELETE FROM {$table} WHERE rulesetname = '{$value['rulesetname']}' and ifaceuuid = '{$ifaceuuid}';
+						"DELETE FROM {$table} WHERE rulesetname = '{$value['rulesetname']}' and rdbuuid = '{$rdbuuid}';
 						");
 			    	}
 			    	
 			    	if(!in_array($value['rulesetname'], $ruleSetfilenames))
 			    	{
 						$ruleSetisOff = sqlite_query($db, // @ supress warnings usonly in production
-						"UPDATE {$table} SET enable = 'off' WHERE rulesetname = '{$value['rulesetname']}' and ifaceuuid = '{$ifaceuuid}'; 
+						"UPDATE {$table} SET enable = 'off' WHERE rulesetname = '{$value['rulesetname']}' and rdbuuid = '{$rdbuuid}'; 
 						");	    		
 			    	}	    	
 			    }
@@ -363,48 +397,31 @@ function snortSql_fetchAllInterfaceRules($table, $dbname)
 function snortSql_fetchAllSettings($dbname, $table, $type, $id_uuid) 
 {
 
-	if ($dbname == '' || $table == '' || $type == '') 
-	{
+	if ($dbname == '' || $table == '' || $type == '') {
 		return false;
 	}
 	  
 	$db = sqlite_open("/usr/local/pkg/snort/$dbname");
 
-	if ($type == 'All')
-	{   
+	if ($type == 'All') {
+		
 		$result = sqlite_query($db,
 		"SELECT * FROM {$table} WHERE id > 0;
 		");
+		
+	}else{
+		
+		$result = sqlite_query($db,
+		"SELECT * FROM {$table} where {$type} = '{$id_uuid}';
+		");
+			
 	}	
-	  
-	if ($type == 'id')
-	{   
-		$result = sqlite_query($db,
-		"SELECT * FROM {$table} where id = '{$id_uuid}';
-		");
-	}
-	  
-	if ($type == 'uuid')
-	{   
-		$result = sqlite_query($db,
-		"SELECT * FROM {$table} where uuid = '{$id_uuid}';
-		");
-	} 
-
-	if ($type == 'ifaceuuid')
-	{   
-		$result = sqlite_query($db,
-		"SELECT * FROM {$table} where ifaceuuid = '{$id_uuid}';
-		");
-	} 
 	
-	if ($type == 'id' || $type == 'uuid')
-	{
+	if ($type == 'id' || $type == 'uuid') {
 		$chktable = sqlite_fetch_array($result, SQLITE_ASSOC);
 	}
 	
-	if ($type == 'All' || $type == 'ifaceuuid')
-	{
+	if ($type == 'All' || $type == 'ifaceuuid' || $type == 'ruledbname' || $type == 'rdbuuid') {
 		$chktable = sqlite_fetch_all($result, SQLITE_ASSOC);
 	}
 		
@@ -733,12 +750,11 @@ function snortSql_updateWhitelistIps($newPostListips)
 } // end of func
 
 // RMlist Delete
-function snortSql_updatelistDelete($table, $type, $uuid_filename)
+function snortSql_updatelistDelete($databse, $table, $type, $uuid_filename)
 {
-  
-	$usrDB = $_POST['RMlistDB'];
 	
-    $db = "/usr/local/pkg/snort/$usrDB";
+    $db = "/usr/local/pkg/snort/{$databse}";
+    
     $mydb = sqlite_open("$db");
 
     if ($type == 'uuid')

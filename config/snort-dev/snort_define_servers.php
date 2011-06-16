@@ -46,7 +46,7 @@ if ($uuid == '') {
 }
 
 
-$a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $uuid);
+$a_list = snortSql_fetchAllSettings('snortDB', 'SnortIfaces', 'uuid', $uuid);
 
 
 	$pgtitle = "Snort: Interface Define Servers:";
@@ -99,9 +99,10 @@ $a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $uuid)
 		
 		<form id="iform" >
 		<input type="hidden" name="snortSaveSettings" value="1" /> <!-- what to do, save -->
-		<input type="hidden" name="dbName" value="snortDBrules" /> <!-- what db-->
-		<input type="hidden" name="dbTable" value="Snortrules" /> <!-- what db table-->
+		<input type="hidden" name="dbName" value="snortDB" /> <!-- what db-->
+		<input type="hidden" name="dbTable" value="SnortIfaces" /> <!-- what db table-->
 		<input type="hidden" name="ifaceTab" value="snort_define_servers" /> <!-- what interface tab -->
+		<input name="uuid" type="hidden" value="<?=$uuid; ?>"> 
 
 			<tr>
 				<td width="22%" valign="top">&nbsp;</td>
@@ -382,7 +383,6 @@ $a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $uuid)
 				<td width="78%">
 					<input name="Submit" type="submit" class="formbtn" value="Save"> 
 					<input id="cancel" type="button" class="formbtn" value="Cancel">
-					<input name="uuid" type="hidden" value="<?=$uuid; ?>"> 
 				</td>
 			</tr>
 			<tr>
