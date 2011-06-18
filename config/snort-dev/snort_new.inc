@@ -243,6 +243,7 @@ function snortSql_updateRuleSigList()
 		$dbname = $_SESSION['snort']['tmp']['snort_rules']['dbName'];
 		$table =  $_SESSION['snort']['tmp']['snort_rules']['dbTable'];
 		$rdbuuid = $_SESSION['snort']['tmp']['snort_rules']['rdbuuid'];
+		$rulefile = $_SESSION['snort']['tmp']['snort_rules']['rulefile'];
 		$addDate = date(U);
 		
 		// dont let user pick the DB path
@@ -252,7 +253,7 @@ function snortSql_updateRuleSigList()
 	    {
 	
 			$resultid = sqlite_query($db,
-				"SELECT id FROM {$table} WHERE signatureid = '{$mDEanbled}';
+				"SELECT id FROM {$table} WHERE signatureid = '{$mDEanbled}' AND signaturefilename = '{$rulefile}';
 			");
 			
 			$chktable = sqlite_fetch_all($resultid, SQLITE_ASSOC);
@@ -260,13 +261,13 @@ function snortSql_updateRuleSigList()
 			 if (empty($chktable)) {
 			 	
 				$query_ck = sqlite_query($db, // @ supress warnings usonly in production
-				"INSERT INTO {$table} (date, rdbuuid, signatureid, enable) VALUES ('{$addDate}', '{$rdbuuid}', '{$mDEanbled}', '{$OnOff}');
+				"INSERT INTO {$table} (date, rdbuuid, signatureid, signaturefilename, enable) VALUES ('{$addDate}', '{$rdbuuid}', '{$mDEanbled}', '{$rulefile}', '{$OnOff}');
 				");		 	
 			 	
 			 }else{
 				if ($chktable[0]['enable'] != $OnOff) {
 					$query_ck = sqlite_query($db, // @ supress warnings usonly in production
-					"UPDATE {$table} SET date = {$addDate}, enable = '{$OnOff}' WHERE signatureid = '{$mDEanbled}'; 
+					"UPDATE {$table} SET date = {$addDate}, enable = '{$OnOff}' WHERE signatureid = '{$mDEanbled}' AND signaturefilename = '{$rulefile}'; 
 					");
 				} 	
 			 	

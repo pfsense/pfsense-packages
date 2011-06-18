@@ -1,5 +1,34 @@
 #!/usr/local/bin/php
 <?php
+/*
+ Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+ All rights reserved.
+ 
+ Pfsense snort GUI 
+ Copyright (C) 2008-2011 Robert Zelaya.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+
+ 1. Redistributions of source code must retain the above copyright notice,
+ this list of conditions and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+
+ THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+ */
+
 
 /*
  * WARNING: THIS FILE SHOULD NEVER BE IN WWWW DIR
@@ -7,41 +36,38 @@
  */
 
 // fetch db Settings NONE Json
+// fetch db Settings NONE Json
 function snortSql_fetchAllSettings($dbname, $table, $type, $id_uuid) 
 {
 
-	if ($dbname == '' || $table == '' || $type == ''){
+	if ($dbname == '' || $table == '' || $type == '') {
 		return false;
 	}
 	  
-	if ($dbname === 'snortDB') {
+	if ($dbname === 'snortDB' || $dbname === 'snortDBrules') {
 		$db = sqlite_open("/usr/local/pkg/snort/$dbname");
 	}
 	
 	if ($dbname === 'snortDBtemp') {
 		$db = sqlite_open("/var/snort/$dbname");
 	}	
-	  
-	if ($type == 'id'){   
+	   
+	if ($type === 'All') {
+	
 		$result = sqlite_query($db,
-		"SELECT * FROM {$table} where id = '{$id_uuid}';
+		"SELECT * FROM {$table} where id > 0;
+		");	
+
+	}else{
+		
+		$result = sqlite_query($db,
+		"SELECT * FROM {$table} where {$type} = '{$id_uuid}';
 		");
 	}
-
-	if ($type == 'uuid'){   
-		$result = sqlite_query($db,
-		"SELECT * FROM {$table} where uuid = '{$id_uuid}';
-		");
-	}
-
-	if ($type == 'filename'){   
-		$result = sqlite_query($db,
-		"SELECT * FROM {$table} where filename = '{$id_uuid}';
-		");
-	}	
 	
-	
-	if ($type == 'id' || $type == 'uuid' || $type == 'filename'){
+	if ($type == 'rdbuuid' || $type == 'All') {
+		$chktable = sqlite_fetch_all($result, SQLITE_ASSOC);
+	}else{
 		$chktable = sqlite_fetch_array($result, SQLITE_ASSOC);
 	}
 		
@@ -51,6 +77,41 @@ function snortSql_fetchAllSettings($dbname, $table, $type, $id_uuid)
   
   
 } // end func
+
+
+// reapply rule settings
+function reapplyRuleSettings_run($sidRule_array)
+{
+
+	$sid_array = snortSql_fetchAllSettings('snortDBrules', 'SnortruleSigs', 'rdbuuid', $sidRule_array);
+	
+	if (!empty($sid_array)) {
+	foreach ($sid_array as $sid)
+		{	
+			if (!empty($sid['enable']) && !empty($sid['signatureid']) && !empty($sid['rdbuuid']) && !empty($sid['signaturefilename'])) {
+				if ($sid['enable'] === 'on') {
+					exec('/usr/bin/sed -i \'\' \'s/^# \(.*sid:' . "{$sid['signatureid']}" . ';.*\)/\1/\' /usr/local/etc/snort/snortDBrules/DB/' . "{$sid['rdbuuid']}" . '/rules/' . "{$sid['signaturefilename']}");
+				}
+				
+				if ($sid['enable'] === 'off') {
+					exec('/usr/bin/sed -i \'\' \'s/^\(alert.*sid:' . "{$sid['signatureid']}" . ';.*\)/# \1/\' /usr/local/etc/snort/snortDBrules/DB/' . "{$sid['rdbuuid']}" . '/rules/' . "{$sid['signaturefilename']}");
+				}
+			}
+		}
+	}
+	
+	// NOTES: DO NOT REMOVE BELOW COMMENTS
+	// returns file pathe of the sid 
+	// $testing = exec("grep -ri 'sid: \?1225; ' /usr/local/etc/snort/snortDBrules/DB/RAjFYOrC04D6/rules | tail -n1 | awk -F: '{print $1}'");
+	// see if sid is enabled
+	// $testing2 = exec("sed -n '/^alert.*sid:1225;.*/p' /usr/local/etc/snort/snortDBrules/DB/RAjFYOrC04D6/rules/snort_x11.rules");
+	// enable a sid
+	// sed -i '' "s/^# \(.*sid:1225;.*\)/\1/" /usr/local/etc/snort/snortDBrules/DB/RAjFYOrC04D6/rules/snort_x11.rules
+	// disable a sid
+	// sed -i '' "s/^\(alert.*sid:1225;.*\)/# \1/" /usr/local/etc/snort/snortDBrules/DB/RAjFYOrC04D6/rules/snort_x11.rules	
+
+
+}
 
 function snortCmpareMD5($type, $path1, $path2, $filename_md5)
 {
@@ -217,10 +278,10 @@ $generalSettings = snortSql_fetchAllSettings('snortDB', 'SnortSettings', 'id', '
 // Setup file names and dir
 $tmpfname = '/usr/local/etc/snort/snort_download';
 $snortdir = '/usr/local/etc/snort';
-$snortdir_rules = '/usr/local/etc/snort/snort_rules';
-$emergingdir_rules = '/usr/local/etc/snort/emerging_rules';
-$pfsensedir_rules = '/usr/local/etc/snort/pfsense_rules';
-$customdir_rules = '/usr/local/etc/snort/custom_rules';
+$snortdir_rules = '/usr/local/etc/snort/snortDBrules/snort_rules';
+$emergingdir_rules = '/usr/local/etc/snort/snortDBrules/emerging_rules';
+$pfsensedir_rules = '/usr/local/etc/snort/snortDBrules/pfsense_rules';
+$customdir_rules = '/usr/local/etc/snort/snortDBrules/custom_rules';
 $snort_filename_md5 = 'snortrules-snapshot-2905.tar.gz.md5';
 $snort_filename = 'snortrules-snapshot-2905.tar.gz';
 $emergingthreats_filename_md5 = 'emerging.rules.tar.gz.md5';
@@ -407,7 +468,7 @@ function sendUpdateSnortLogDownload($console)
 
 	
 		// rm all tmp filea
-		exec("/bin/rm -r $tmpfname/*");
+		@exec("/bin/rm -r $tmpfname/*");
 
 		// Set all downloads to be false, download by default
 		
@@ -429,13 +490,13 @@ function sendUpdateSnortLogDownload($console)
 			$emerg_md5_check_ok = true;
 		}				
 
-		if ($oinkid == '' && $generalSettings['snortdownload'] === 'off') {
+		if ($oinkid == '' && $generalSettings['snortdownload'] === 'on') {
 			update_output_window2('ms1', 'You must obtain an oinkid from snort.org and set its value in the Snort settings tab.');
 			exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'You must obtain an oinkid from snort.org and set its value in the Snort settings tab.'");
 			return false;
 		}
 		
-		if ($emergingthreatscode == '' && $generalSettings['snortdownload'] === 'pro') {
+		if ($emergingthreatscode === '' && $generalSettings['snortdownload'] === 'pro') {
 			update_output_window2('ms1', 'You must obtain an emergingthreat pro id from emergingthreatspro.com and set its value in the Snort settings tab.');
 			exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'You must obtain an emergingthreat pro id from emergingthreatspro.com and set its value in the Snort settings tab.'");
 			return false;
@@ -673,6 +734,7 @@ function sendUpdateSnortLogDownload($console)
 					}
 					
 					// extract snort.org rules and  add prefix to all snort.org files
+					@exec("/bin/rm -r {$snortdir_rules}/rules");
 					exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir_rules} rules/");
 					
 					$snort_dirList = scandir("{$snortdir_rules}/rules"); // Waning: only in php 5
@@ -717,8 +779,6 @@ function sendUpdateSnortLogDownload($console)
 		
 					// extract base etc files
 					exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} etc/");
-					exec("/bin/mv -f {$snortdir}/etc/* {$snortdir}");
-					exec("/bin/rm -r {$snortdir}/etc");
 					
 			}
 			build_SnortRuleDir();
@@ -732,6 +792,7 @@ function sendUpdateSnortLogDownload($console)
 			if (file_exists("{$tmpfname}/{$emergingthreats_filename}")) {
 				update_output_window2('ms1', 'Extracting Emergingthreats Rules...');
 				update_output_window2('ms2', 'May take a while...');
+				@exec("/bin/rm -r {$emergingdir_rules}/rules");
 				exec("/usr/bin/tar xzf {$tmpfname}/{$emergingthreats_filename} -C {$emergingdir_rules} rules/");
 				exec("/bin/cp {$tmpfname}/{$emergingthreats_filename_md5} {$emergingdir_rules}/{$emergingthreats_filename_md5}");	
 				update_output_window2('ms2', 'Done extracting Emergingthreats.net Rules.');
@@ -743,6 +804,7 @@ function sendUpdateSnortLogDownload($console)
 			if (file_exists("{$tmpfname}/{$pfsense_rules_filename}")) {
 				update_output_window2('ms1', 'Extracting Pfsense rules...');
 				update_output_window2('ms1', 'May take a while...');
+				@exec("/bin/rm -r {$pfsensedir_rules}/rules");
 				exec("/usr/bin/tar xzf {$tmpfname}/{$pfsense_rules_filename} -C {$pfsensedir_rules} rules/");
 				exec("/bin/cp {$tmpfname}/{$pfsense_rules_filename_md5} {$pfsensedir_rules}/{$pfsense_rules_filename_md5}");
 				update_output_window2('ms2', 'Done extracting pfSense.org Rules.');
@@ -756,31 +818,128 @@ function sendUpdateSnortLogDownload($console)
 			exec("/bin/rm /usr/local/lib/snort/dynamicrules/lib_sfdynamic_example\*");
 		}
 		
-		/* make shure default rules are in the right format */
+		// make sure default rules are in the right format
 		update_output_window2('ms1', 'Reformatting Rules To One Standard...');
-		update_output_window2('ms2', 'Please Wait...');
-		exec("/usr/local/bin/perl -pi -e 's/#alert/# alert/g' {$snortdir_rules}/rules/*.rules");
-		exec("/usr/local/bin/perl -pi -e 's/##alert/# alert/g' {$snortdir_rules}/rules/*.rules");
-		exec("/usr/local/bin/perl -pi -e 's/## alert/# alert/g' {$snortdir_rules}/rules/*.rules");
-		
-		exec("/usr/local/bin/perl -pi -e 's/#alert/# alert/g' {$emergingdir_rules}/rules/*.rules");
-		exec("/usr/local/bin/perl -pi -e 's/##alert/# alert/g' {$emergingdir_rules}/rules/*.rules");
-		exec("/usr/local/bin/perl -pi -e 's/## alert/# alert/g' {$emergingdir_rules}/rules/*.rules");
+		update_output_window2('ms2', 'Please Wait...');		
+		exec("/usr/bin/sed -i '' 's/^[ \t]*//' {$snortdir_rules}/rules/*.rules"); // remove white spaces from begining of line
+		exec("/usr/bin/sed -i '' 's/^#alert*/\# alert/' {$snortdir_rules}/rules/*.rules");
+		exec("/usr/bin/sed -i '' 's/^##alert*/\# alert/' {$snortdir_rules}/rules/*.rules");
+		exec("/usr/bin/sed -i '' 's/^## alert*/\# alert/' {$snortdir_rules}/rules/*.rules");
 
-		exec("/usr/local/bin/perl -pi -e 's/#alert/# alert/g' {$pfsensedir_rules}/rules/*.rules");
-		exec("/usr/local/bin/perl -pi -e 's/##alert/# alert/g' {$pfsensedir_rules}/rules/*.rules");
-		exec("/usr/local/bin/perl -pi -e 's/## alert/# alert/g' {$pfsensedir_rules}/rules/*.rules");
+		exec("/usr/bin/sed -i '' 's/^[ \t]*//' {$emergingdir_rules}/rules/*.rules");
+		exec("/usr/bin/sed -i '' 's/^#alert*/\# alert/' {$emergingdir_rules}/rules/*.rules");
+		exec("/usr/bin/sed -i '' 's/^##alert*/\# alert/' {$emergingdir_rules}/rules/*.rules");
+		exec("/usr/bin/sed -i '' 's/^## alert*/\# alert/' {$emergingdir_rules}/rules/*.rules");
+		
+		exec("/usr/bin/sed -i '' 's/^[ \t]*//' {$pfsensedir_rules}/rules/*.rules");
+		exec("/usr/bin/sed -i '' 's/^#alert*/\# alert/' {$pfsensedir_rules}/rules/*.rules");
+		exec("/usr/bin/sed -i '' 's/^##alert*/\# alert/' {$pfsensedir_rules}/rules/*.rules");
+		exec("/usr/bin/sed -i '' 's/^## alert*/\# alert/' {$pfsensedir_rules}/rules/*.rules");
 		update_output_window2('ms2', 'Done...');		
 		
 		/* create a msg-map for snort  */
 		update_output_window2('ms1', 'Updating Alert Sid Messages...');
 		update_output_window2('ms2', 'Please Wait...');
-		exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl {$snortdir_rules}/rules > /usr/local/etc/snort/sid-msg.map");		
-		exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl {$emergingdir_rules}/rules >> /usr/local/etc/snort/sid-msg.map");
-		exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl {$pfsensedir_rules}/rules >> /usr/local/etc/snort/sid-msg.map");
+		exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl {$snortdir_rules}/rules > /usr/local/etc/snort/etc/sid-msg.map");		
+		exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl {$emergingdir_rules}/rules >> /usr/local/etc/snort/etc/sid-msg.map");
+		exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl {$pfsensedir_rules}/rules >> /usr/local/etc/snort/etc/sid-msg.map");
 		update_output_window2('ms2', 'Done...');
 		
+		// create default dir
+		if (!file_exists('/usr/local/etc/snort/snortDBrules/DB/default/rules')) {
+			exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/DB/default/rules');
+		}
 		
+		// cp new rules to default dir
+		exec('/bin/rm /usr/local/etc/snort/snortDBrules/DB/default/rules/*.rules');
+		exec("/bin/cp {$snortdir_rules}/rules/*.rules /usr/local/etc/snort/snortDBrules/DB/default/rules");
+		exec("/bin/cp {$emergingdir_rules}/rules/*.rules /usr/local/etc/snort/snortDBrules/DB/default/rules");
+		exec("/bin/cp {$pfsensedir_rules}/rules/*.rules /usr/local/etc/snort/snortDBrules/DB/default/rules");			
+		
+		
+		// reapplay rules from DB cp base rules to dirs
+		$sidOnOff_array = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'All', '');
+		
+		if (!empty($sidOnOff_array)) {
+			update_output_window2('ms1', 'Reapplying User Settings...');
+			update_output_window2('ms2', 'Please Wait...');
+			foreach ($sidOnOff_array as $preSid_Array)
+			{
+				if (!file_exists("/usr/local/etc/snort/snortDBrules/DB/{$preSid_Array['uuid']}/rules")) {
+					exec("/bin/mkdir -p /usr/local/etc/snort/snortDBrules/DB/{$preSid_Array['uuid']}/rules");		
+				}
+				
+				exec("/bin/rm /usr/local/etc/snort/snortDBrules/DB/{$preSid_Array['uuid']}/rules/*.rules");
+				exec("/bin/cp {$snortdir_rules}/rules/*.rules /usr/local/etc/snort/snortDBrules/DB/{$preSid_Array['uuid']}/rules");
+				exec("/bin/cp {$emergingdir_rules}/rules/*.rules /usr/local/etc/snort/snortDBrules/DB/{$preSid_Array['uuid']}/rules");
+				exec("/bin/cp {$pfsensedir_rules}/rules/*.rules /usr/local/etc/snort/snortDBrules/DB/{$preSid_Array['uuid']}/rules");
+				reapplyRuleSettings_run($preSid_Array['uuid']);
+				update_output_window2('ms2', 'Done...');
+			}
+		}
+		
+		// cp snort conf's to Ifaces		
+		$ifaceConfMaps_array = snortSql_fetchAllSettings('snortDB', 'SnortIfaces', 'All', '');
+		
+		if (!empty($ifaceConfMaps_array)) {
+			update_output_window2('ms1', 'Reapplying User Settings...');
+			update_output_window2('ms2', 'Please Wait...');
+			foreach ($ifaceConfMaps_array as $preIfaceConfMaps_array)
+			{
+				// create iface dir if missing
+				if (!file_exists("/usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}")) {
+					exec("/bin/mkdir -p /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}");		
+				}
+
+				// create rules dir soft link if setting is default
+					if ($preIfaceConfMaps_array['ruledbname'] === 'default' || $preIfaceConfMaps_array['ruledbname'] === '') {
+					if (!file_exists("/usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}/rules") && file_exists('/usr/local/etc/snort/snortDBrules/DB/default/rules')) {
+						exec("/bin/ln -s /usr/local/etc/snort/snortDBrules/DB/default/rules /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}/rules");		
+					}
+				}		
+				
+				// create rules dir soft link if setting is not default
+				if ($preIfaceConfMaps_array['ruledbname'] !== 'default' || $preIfaceConfMaps_array['ruledbname'] != '') {
+					if (!file_exists("/usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}/rules") && file_exists("/usr/local/etc/snort/snortDBrules/DB/{$preIfaceConfMaps_array['ruledbname']}/rules")) {
+						exec("/bin/ln -s /usr/local/etc/snort/snortDBrules/DB/{$preIfaceConfMaps_array['ruledbname']}/rules /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}/rules");		
+					}
+				}
+				
+				exec("/bin/cp {$snortdir}/etc/*.config /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}");
+				exec("/bin/cp {$snortdir}/etc/*.conf /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}");
+				exec("/bin/cp {$snortdir}/etc/*.map /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}");
+				exec("/bin/cp {$snortdir}/etc/generators /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}");
+				exec("/bin/cp {$snortdir}/etc/sid /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}");
+				
+				reapplyRuleSettings_run($preSid_Array['uuid']);
+				update_output_window2('ms2', 'Done...');
+			}
+		}		
+
+
+		//  remove old $tmpfname files */
+		if (file_exists('/usr/local/etc/snort/tmp')) {
+			exec("/bin/rm -r /usr/local/etc/snort/tmp/snort_rules_up");
+			exec("/bin/rm -r /usr/local/etc/snort/tmp/rules_bk");
+			apc_clear_cache();
+		}
+		
+		// php code to flush out cache some people are reportting missing files this might help
+		apc_clear_cache();
+		exec("/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync ;/bin/sync");
+		
+		// make all dirs snorts
+		exec("/usr/sbin/chown -R snort:snort /var/log/snort");
+		exec("/usr/sbin/chown -R snort:snort /usr/local/etc/snort");
+		exec("/usr/sbin/chown -R snort:snort /usr/local/lib/snort");
+		exec("/bin/chmod -R 755  /var/log/snort");
+		exec("/bin/chmod -R 755  /usr/local/etc/snort");
+		exec("/bin/chmod -R 755  /usr/local/lib/snort");
+		
+		
+		// if snort is running hardrestart, if snort is not running do nothing
+
+		// TODO: Restart Ifaces
 		
 // ----------------------------------------------------- End Code	--------------------------------------------
 			
