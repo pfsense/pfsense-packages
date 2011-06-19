@@ -694,6 +694,10 @@ function unbound_add_host_entries() {
 	$unbound_entries .= "local-data-ptr: \"127.0.0.1 localhost\"\n";
 	$unbound_entries .= "local-data: \"localhost A 127.0.0.1\"\n";
 	$unbound_entries .= "local-data: \"localhost.{$syscfg['domain']} A 127.0.0.1\"\n";
+	// IPv6 entries
+	$unbound_entries .= "local-data-ptr: \"::1 localhost\"\n";
+	$unbound_entries .= "local-data: \"localhost AAAA ::1\"\n";
+	$unbound_entries .= "local-data: \"localhost.{$syscfg['domain']} AAAA ::1\"\n";
 	
 	if ($config['interfaces']['lan']) {
 		$cfgip = get_interface_ip("lan");
