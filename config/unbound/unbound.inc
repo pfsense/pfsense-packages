@@ -31,7 +31,9 @@ if(!function_exists("get_dns_servers"))
 
 if(!function_exists("get_nameservers"))
 	require_once("system.inc");
-	
+
+if(!function_exists("gen_subnetv6") || !function_exists("gen_subnet"))
+	require_once("util.inc");
 
 function unbound_initial_setup() {
 	global $config, $g;
@@ -231,28 +233,21 @@ function unbound_control($action) {
 	
 }
 
-function unbound_get_network_interface_addresses($subnet=false, $mask=false) {
+function unbound_get_network_interface_addresses() {
 	global $config;
-	
-	/* calculate interface ip + subnet information */
-	$interfaces = explode(",", $config['installedpackages']['unbound']['config'][0]['active_interface']);
+
+	$interfaces = $config['interfaces'];
+	$unbound_config = $config['installedpackages']['unbound']['config'][0];
+	$unboundint = explode(",", $unbound_config['active_interface']);
 	$unbound_interfaces = array();
-	foreach ($interfaces as $unboundidx => $unboundif) {
-		$unboundrealif = convert_friendly_interface_to_real_interface_name($unboundif);
-		$unboundip = find_interface_ip($unboundrealif);
-		$ipmask = find_interface_subnet($unboundrealif);
 	
-		// If $subnet is passed then calculate the beginning of the network range for the IP address
-		if ($subnet)
-			$network = gen_subnet($unboundip, $ipmask);
-		else
-			$network = $unboundip;
-			
-		if ($mask) 
-			$unbound_interfaces[] = "$network/$ipmask";
-		else {
-			$unbound_interfaces[] = $network;
-			// Check for CARP addresses and also return those
+	foreach ($unboundint as $unboundidx => $unboundif) {
+		/* Configure IPv4 addresses */	
+		if (is_ipaddr($interfaces[$unboundif]['ipaddr'])) {
+			$unbound_interfaces['ipv4']['ipaddr'] = $interfaces[$unboundif]['ipaddr'];
+			$unbound_interfaces['ipv4']['subnet'] = $interfaces[$unboundif]['subnet'];
+			$unbound_interfaces['ipv4']['network'] = gen_subnet($unbound_interfaces['ipv4']['ipaddr'],$unbound_interfaces['ipv4']['subnet']);
+			// Check for CARP addresses and also return those - only IPv4 for now
 			if (isset($config['virtualip'])) {
 				if(is_array($config['virtualip']['vip'])) {
 					foreach($config['virtualip']['vip'] as $vip) {
@@ -261,21 +256,28 @@ function unbound_get_network_interface_addresses($subnet=false, $mask=false) {
 							if ($virtual_ip == '') {
 								log_error("Unbound DNS: There was a problem setting up the Virtual IP for the interface ".link_ip_to_carp_interface($vip['subnet']));
 							} else {
-								$unbound_interfaces[] = $virtual_ip;
+								$unbound_interfaces['virtual']['ipaddr'] = $virtual_ip;
 							}
 						}
 					}
 				}
 			}
 		}
-	}
 	
-	return $unbound_interfaces;	
+		/* Configure IPv6 addresses */
+		if(is_ipaddr($interfaces[$unboundif]['ipaddrv6'])) {
+			$unbound_interfaces['ipv6']['ipaddr'] = $interfaces[$unboundif]['ipaddrv6'];
+			$unbound_interfaces['ipv6']['subnet'] = $interfaces[$unboundif]['subnetv6'];
+			$unbound_interfaces['ipv6']['network'] = gen_subnetv6($unbound_interfaces['ipv6']['ipaddr'], $unbound_interfaces['ipv6']['subnet']);
+		}
+	}
+	return $unbound_interfaces;
 }
 
 function unbound_acls_config() {
 	global $config;
-	
+		
+	/* Configure the ACLs */
 	if(is_array($config['installedpackages']['unboundacls']['config'])) {
 		$unbound_acls = $config['installedpackages']['unboundacls']['config'];
 		$unboundcfg = "";
@@ -298,27 +300,23 @@ function unbound_resync_config() {
 		$config['installedpackages']['unbound']['config'] = array();
 
 	$unbound_config = &$config['installedpackages']['unbound']['config'][0];
-	$unbound_stats = &$config['installedpackages']['unbound_statistics']['config'][0];
 	
-	// Add networks physically attached to allowed networks and then call the acls		
-	$interfaces = unbound_get_network_interface_addresses(true, true);
-	foreach($interfaces as $allowed_network) {
-		$unbound_allowed_networks .= "access-control: $allowed_network allow\n";
+	// Interfaces to bind to and setup acls for nics
+	$unbound_bind_interfaces = "";
+	$unbound_allowed_networks = "";
+	$unboundnetcfg = unbound_get_network_interface_addresses();
+	foreach($unboundnetcfg as $netcfgidx => $netent) {
+		$unbound_bind_interfaces .="interface: {$netent['ipaddr']}\n";
+		$unbound_allowed_networks .= "access-control: {$netent['network']}/{$netent['subnet']} allow\n";
 	}
+	/* Configure user configured ACLs */
 	$unbound_allowed_networks .= unbound_acls_config();
 	
 	if($unbound_config['dnssec_status'] == "on") {
 		$module_config = "validator iterator";
 		$anchor_file = "auto-trust-anchor-file: /usr/local/etc/unbound/root-trust-anchor";
-	} else {
+	} else
 		$module_config = "iterator";
-	}
-	
-	// Interfaces to bind to
-	$interface_ips = unbound_get_network_interface_addresses();
-	foreach($interface_ips as $ifip) {
-		$unbound_bind_interfaces .="interface: $ifip\n";
-	}
 	
 	// Host entries
 	$host_entries = unbound_add_host_entries();
@@ -370,7 +368,6 @@ EOF;
 	$harden_dnssec_stripped = ($unbound_config['harden_dnssec_stripped'] == "on") ? "yes" : "no";
 	$prefetch = ($unbound_config['prefetch'] == "on") ? "yes" : "no";
 	$prefetch_key = ($unbound_config['prefetch_key'] == "on") ? "yes" : "no";
-	$ipv6 = ($unbound_config['unbound_ipv6'] == "on") ? "yes" : "no";
 	$outgoing_num_tcp = (!empty($unbound_config['outgoing_num_tcp'])) ? $unbound_config['outgoing_num_tcp'] : "10";
 	$incoming_num_tcp = (!empty($unbound_config['incoming_num_tcp'])) ? $unbound_config['incoming_num_tcp'] : "10";
 	$edns_buffer_size = (!empty($unbound_config['edns_buffer_size'])) ? $unbound_config['edns_buffer_size'] : "4096";
@@ -406,7 +403,7 @@ use-syslog: yes
 port: 53
 verbosity: {$log_verbosity}
 do-ip4: yes
-do-ip6: {$ipv6}
+do-ip6: yes
 do-udp: yes
 do-tcp: yes
 do-daemonize: yes
