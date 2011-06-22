@@ -142,12 +142,16 @@
 					"stop" => "/usr/bin/killall ntop"
 				)
 		);
-		stop_service("ntop");
+		if (is_service_running("ntop")) {
+			stop_service("ntop");
+			// Wait for ntop to shut down cleanly.
+			sleep(20);
+		}
 		if (empty($ntop_config['password']))
 			$ntop_config['password'] = "admin";
-		sleep(5);
 		unlink_if_exists("/var/db/ntop/ntop_pw.db");
-		exec("/usr/local/bin/ntop --set-admin-password={$ntop_config['password']});
+		exec("/usr/local/bin/ntop --set-admin-password={$ntop_config['password']}");
+		sleep(2);
 		start_service("ntop");
 		conf_mount_ro();
 		config_unlock();
