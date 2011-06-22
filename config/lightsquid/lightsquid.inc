@@ -91,25 +91,26 @@ define('LS_XML_SHEDULERTIME',                 'lightsquid_refreshsheduler_time')
 define('LS_XML_SQUID_SHEDULERTIME',           'lightsquid_squidrotatelog_sheduler_time');
 
 function lightsquid_install() {
-         update_log("lightsquid_install: started");
-         // create lightsquid report catalog
-         if (!file_exists(LS_REPORTPATH)) {
-              update_log("lightsquid_install: Create report dir " . LS_REPORTPATH);
-              mwexec("mkdir -p " . LS_REPORTPATH);
-         }
+	update_log("lightsquid_install: started");
 
-         // install templates
-         $lstpl_file = "/var/tmp/lightsquid_tpl.tbz";
-         if (file_exists($lstpl_file)) {
-              mwexec("tar zxvf $lstpl_file -C " . LS_TEMPLATEPATH);
-              update_log("lightsquid_install: Install templates from $lstpl_file");
-         }
+	// create lightsquid report catalog
+	if (!file_exists(LS_REPORTPATH)) {
+		update_log("lightsquid_install: Create report dir " . LS_REPORTPATH);
+		mwexec("mkdir -p " . LS_REPORTPATH);
+	}
 
-         # check perl
-         if (!file_exists("/usr/bin/perl"))
-              mwexec("ln -s /usr/local/bin/perl /usr/bin/perl");
+	// install templates
+	$lstpl_file = "/var/tmp/lightsquid_tpl.tbz";
+	if (file_exists($lstpl_file)) {
+		mwexec("tar zxvf $lstpl_file -C " . LS_TEMPLATEPATH);
+		update_log("lightsquid_install: Install templates from $lstpl_file");
+	}
 
-         update_log("lightsquid_install: stopped");
+	# check perl
+	if (!file_exists("/usr/bin/perl"))
+		mwexec("ln -s /usr/local/bin/perl /usr/bin/perl");
+
+	update_log("lightsquid_install: stopped");
 }
 
 function lightsquid_deinstall() {
@@ -135,6 +136,14 @@ function lightsquid_resync() {
         # check perl
         if (!file_exists("/usr/bin/perl"))
             mwexec("ln -s /usr/local/bin/perl /usr/bin/perl");
+
+	// create lightsquid report catalog
+	if (!file_exists(LS_REPORTPATH)) {
+		update_log("lightsquid_install: Create report dir " . LS_REPORTPATH);
+		mwexec("mkdir -p " . LS_REPORTPATH);
+	}
+
+	mwexec("/bin/chmod -R u+w /usr/local/etc/lightsquid");
 
         // debug
         $light_test = array();
@@ -374,6 +383,11 @@ function update_log($log) {
 function refresh_now() {
         $cmd = CRONTAB_LS_TEMPLATE . " today";
         update_log("refresh_now: execute command '$cmd'");
+	// create lightsquid report catalog
+	if (!file_exists(LS_REPORTPATH)) {
+		update_log("lightsquid_install: Create report dir " . LS_REPORTPATH);
+		mwexec("mkdir -p " . LS_REPORTPATH);
+	}
         mwexec_bg($cmd);
 }
 
@@ -382,9 +396,15 @@ function refresh_full() {
         $log_name = LS_SQUIDLOG;
         update_log("refresh_full: start");
 
+	// create lightsquid report catalog
+	if (!file_exists(LS_REPORTPATH)) {
+		update_log("lightsquid_install: Create report dir " . LS_REPORTPATH);
+		mwexec("mkdir -p " . LS_REPORTPATH);
+	}
+
         // parse access.log
         update_log("refresh_full: execute command '$cmd'");
-        mwexec_bg("$cmd $lg");
+        mwexec_bg("$cmd $log_name");
         // parse access.log.x
         for ($i=0; $i<100; $i++) {
              $lg = LS_SQUIDLOG . ".$i";
