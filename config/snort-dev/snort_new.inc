@@ -1,9 +1,55 @@
 <?php
+/* $Id$ */
+/*
+
+ part of pfSense
+ All rights reserved.
+
+ Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+ All rights reserved.
+
+ Pfsense Old snort GUI 
+ Copyright (C) 2006 Scott Ullrich.
+ 
+ Pfsense snort GUI 
+ Copyright (C) 2008-2012 Robert Zelaya.
+
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+
+ 1. Redistributions of source code must retain the above copyright notice,
+ this list of conditions and the following disclaimer.
+
+ 2. Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+
+ 3. Neither the name of the pfSense nor the names of its contributors 
+ may be used to endorse or promote products derived from this software without 
+ specific prior written permission.
+
+ THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+ AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+ OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ POSSIBILITY OF SUCH DAMAGE.
+ 
+*/
+
 
 // unset crsf checks
 if(isset($_POST['__csrf_magic'])) {
   unset($_POST['__csrf_magic']);
 }
+
+//require_once("pfsense-utils.inc");
+require_once("config.inc");
+require_once("functions.inc");
 
 // Wites selected sig  to file
 function snortSidStringRuleEditGUI()
@@ -39,6 +85,32 @@ function sendSidStringRuleEditGUI()
 	return true;
 }
 
+// create new Ifac dirs and soft links
+function createNewIfaceDir($pathToSnortDir, $newSnortDir) {
+	
+	exec("/bin/mkdir -p {$pathToSnortDir}/{$newSnortDir}");
+	
+	// create rules dir soft link if setting is default
+	if ($_POST['ruledbname'] === 'default' || $_POST['ruledbname'] === '') {
+		if (!file_exists("{$pathToSnortDir}/sn_{$_POST['uuid']}/rules") && file_exists('/usr/local/etc/snort/snortDBrules/DB/default/rules')) {
+			exec("/bin/ln -s {$pathToSnortDir}/snortDBrules/DB/default/rules {$pathToSnortDir}/sn_{$_POST['uuid']}/rules");		
+		}
+	}		
+	
+	// create rules dir soft link if setting is not default
+	if ($_POST['ruledbname'] !== 'default' || $_POST['ruledbname'] != '') {
+		if (!file_exists("{$pathToSnortDir}/sn_{$_POST['uuid']}/rules") && file_exists("{$pathToSnortDir}/snortDBrules/DB/{$_POST['ruledbname']}/rules")) {
+			exec("/bin/ln -s {$pathToSnortDir}/snortDBrules/DB/{$_POST['ruledbname']}/rules {$pathToSnortDir}/sn_{$_POST['uuid']}/rules");		
+		}
+	}
+
+	// cp new rules 
+	exec("/bin/cp {$pathToSnortDir}/etc/*.config {$pathToSnortDir}/sn_{$_POST['uuid']}");
+	exec("/bin/cp {$pathToSnortDir}/etc/*.conf {$pathToSnortDir}/sn_{$_POST['uuid']}");
+	exec("/bin/cp {$pathToSnortDir}/etc/*.map {$pathToSnortDir}/sn_{$_POST['uuid']}");
+	exec("/bin/cp {$pathToSnortDir}/etc/generators {$pathToSnortDir}/sn_{$_POST['uuid']}");
+	exec("/bin/cp {$pathToSnortDir}/etc/sid {$pathToSnortDir}/sn_{$_POST['uuid']}");
+} // end of func
 
 function escapeJsonString($escapeString)
 {
@@ -422,7 +494,7 @@ function snortSql_fetchAllSettings($dbname, $table, $type, $id_uuid)
 		$chktable = sqlite_fetch_array($result, SQLITE_ASSOC);
 	}
 	
-	if ($type == 'All' || $type == 'ifaceuuid' || $type == 'ruledbname' || $type == 'rdbuuid') {
+	if ($type == 'All' || $type == 'ifaceuuid' || $type == 'ruledbname' || $type == 'rdbuuid' || $type == 'filename') {
 		$chktable = sqlite_fetch_all($result, SQLITE_ASSOC);
 	}
 		
@@ -912,14 +984,13 @@ function post_delete_logs()
 			$id += 1;
 
 			$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-			$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
 			$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
-			if ($if_real != '' && $snort_uuid != '')
+			if ($snort_uuid != '')
 			{
 				if ($config['installedpackages']['snortglobal']['rule'][$id]['snortunifiedlog'] == 'on')
 				{
-					$snort_log_file_u2 = "{$snort_uuid}_{$if_real}.u2.";
+					$snort_log_file_u2 = "{$snort_uuid}.u2.";
 					$snort_list_u2 = snort_file_list($snort_log_dir, $snort_log_file_u2);
 					if (is_array($snort_list_u2)) {
 						usort($snort_list_u2, "snort_file_sort");
@@ -927,12 +998,12 @@ function post_delete_logs()
 						snort_remove_files($snort_u2_rm_list, $snort_u2_rm_list[0]);
 					}
 				}else{
-					exec("/bin/rm $snort_log_dir/snort_{$snort_uuid}_{$if_real}.u2*");
+					exec("/bin/rm $snort_log_dir/snort_{$snort_uuid}.u2*");
 				}
 
 				if ($config['installedpackages']['snortglobal']['rule'][$id]['tcpdumplog'] == 'on')
 				{
-					$snort_log_file_tcpd = "{$snort_uuid}_{$if_real}.tcpdump.";
+					$snort_log_file_tcpd = "{$snort_uuid}.tcpdump.";
 					$snort_list_tcpd = snort_file_list($snort_log_dir, $snort_log_file_tcpd);
 					if (is_array($snort_list_tcpd)) {
 						usort($snort_list_tcpd, "snort_file_sort");
@@ -940,7 +1011,7 @@ function post_delete_logs()
 						snort_remove_files($snort_tcpd_rm_list, $snort_tcpd_rm_list[0]);
 					}
 				}else{
-					exec("/bin/rm $snort_log_dir/snort_{$snort_uuid}_{$if_real}.tcpdump*");
+					exec("/bin/rm $snort_log_dir/snort_{$snort_uuid}.tcpdump*");
 				}
 
 				/* create barnyard2 configuration file */
@@ -949,7 +1020,7 @@ function post_delete_logs()
 
 				if ($config['installedpackages']['snortglobal']['rule'][$id]['perform_stat'] == on)
 				{
-					exec("/bin/echo '' > /var/log/snort/snort_{$snort_uuid}_{$if_real}.stats");
+					exec("/bin/echo '' > /var/log/snort/snort_{$snort_uuid}.stats");
 				}
 			}
 		}

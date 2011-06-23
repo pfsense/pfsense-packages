@@ -1,11 +1,16 @@
 #!/usr/local/bin/php
 <?php
+/* $Id$ */
 /*
- Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
+
+ part of pfSense
  All rights reserved.
+
+ Pfsense Old snort GUI 
+ Copyright (C) 2006 Scott Ullrich.
  
  Pfsense snort GUI 
- Copyright (C) 2008-2011 Robert Zelaya.
+ Copyright (C) 2008-2012 Robert Zelaya.
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -17,6 +22,10 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
+ 3. Neither the name of the pfSense nor the names of its contributors 
+ may be used to endorse or promote products derived from this software without 
+ specific prior written permission.
+
  THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
  AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
@@ -27,8 +36,8 @@
  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
- */
-
+ 
+*/
 
 /*
  * WARNING: THIS FILE SHOULD NEVER BE IN WWWW DIR
@@ -887,29 +896,29 @@ function sendUpdateSnortLogDownload($console)
 			foreach ($ifaceConfMaps_array as $preIfaceConfMaps_array)
 			{
 				// create iface dir if missing
-				if (!file_exists("/usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}")) {
-					exec("/bin/mkdir -p /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}");		
+				if (!file_exists("/usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}")) {
+					exec("/bin/mkdir -p /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}");		
 				}
 
 				// create rules dir soft link if setting is default
 					if ($preIfaceConfMaps_array['ruledbname'] === 'default' || $preIfaceConfMaps_array['ruledbname'] === '') {
-					if (!file_exists("/usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}/rules") && file_exists('/usr/local/etc/snort/snortDBrules/DB/default/rules')) {
-						exec("/bin/ln -s /usr/local/etc/snort/snortDBrules/DB/default/rules /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}/rules");		
+					if (!file_exists("/usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}/rules") && file_exists('/usr/local/etc/snort/snortDBrules/DB/default/rules')) {
+						exec("/bin/ln -s /usr/local/etc/snort/snortDBrules/DB/default/rules /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}/rules");		
 					}
 				}		
 				
 				// create rules dir soft link if setting is not default
 				if ($preIfaceConfMaps_array['ruledbname'] !== 'default' || $preIfaceConfMaps_array['ruledbname'] != '') {
-					if (!file_exists("/usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}/rules") && file_exists("/usr/local/etc/snort/snortDBrules/DB/{$preIfaceConfMaps_array['ruledbname']}/rules")) {
-						exec("/bin/ln -s /usr/local/etc/snort/snortDBrules/DB/{$preIfaceConfMaps_array['ruledbname']}/rules /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}/rules");		
+					if (!file_exists("/usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}/rules") && file_exists("/usr/local/etc/snort/snortDBrules/DB/{$preIfaceConfMaps_array['ruledbname']}/rules")) {
+						exec("/bin/ln -s /usr/local/etc/snort/snortDBrules/DB/{$preIfaceConfMaps_array['ruledbname']}/rules /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}/rules");		
 					}
 				}
 				
-				exec("/bin/cp {$snortdir}/etc/*.config /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}");
-				exec("/bin/cp {$snortdir}/etc/*.conf /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}");
-				exec("/bin/cp {$snortdir}/etc/*.map /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}");
-				exec("/bin/cp {$snortdir}/etc/generators /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}");
-				exec("/bin/cp {$snortdir}/etc/sid /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}_{$preIfaceConfMaps_array['interface']}");
+				exec("/bin/cp {$snortdir}/etc/*.config /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}");
+				exec("/bin/cp {$snortdir}/etc/*.conf /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}");
+				exec("/bin/cp {$snortdir}/etc/*.map /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}");
+				exec("/bin/cp {$snortdir}/etc/generators /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}");
+				exec("/bin/cp {$snortdir}/etc/sid /usr/local/etc/snort/sn_{$preIfaceConfMaps_array['uuid']}");
 				
 				reapplyRuleSettings_run($preSid_Array['uuid']);
 				update_output_window2('ms2', 'Done...');
@@ -937,7 +946,7 @@ function sendUpdateSnortLogDownload($console)
 		exec("/bin/chmod -R 755  /usr/local/lib/snort");
 		
 		
-		// if snort is running hardrestart, if snort is not running do nothing
+		// if snort is running hard restart, if snort is not running do nothing
 
 		// TODO: Restart Ifaces
 		

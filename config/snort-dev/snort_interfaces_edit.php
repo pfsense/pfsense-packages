@@ -1,12 +1,18 @@
 <?php
 /* $Id$ */
 /*
- snort_interfaces.php
- part of m0n0wall (http://m0n0.ch/wall)
+
+ part of pfSense
+ All rights reserved.
 
  Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
- Copyright (C) 2008-2009 Robert Zelaya.
  All rights reserved.
+
+ Pfsense Old snort GUI 
+ Copyright (C) 2006 Scott Ullrich.
+ 
+ Pfsense snort GUI 
+ Copyright (C) 2008-2012 Robert Zelaya.
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -18,6 +24,10 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
+ 3. Neither the name of the pfSense nor the names of its contributors 
+ may be used to endorse or promote products derived from this software without 
+ specific prior written permission.
+
  THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
  AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
@@ -28,6 +38,7 @@
  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
+ 
  */
 
 require_once("guiconfig.inc");
@@ -290,7 +301,7 @@ jQuery(document).ready(function() {
 						if ($a_list['ruledbname'] == 'default') {
 							$selected = 'selected';
 						}
-						echo  "\n" . '<option value="default" ' . $selected . ' >default</option>' . "\r";		
+						echo  "\n" . '<option value="default" ' . $selected . ' >DEFAULT</option>' . "\r";		
 						foreach ($a_rules as $value)
 						{
 							$selected = '';
@@ -298,7 +309,7 @@ jQuery(document).ready(function() {
 								$selected = 'selected';
 							}
 								
-							echo "\n" . '<option value="' . $value['uuid'] . '" ' .  $selected . ' >' . $value['ruledbname'] . '</option>' . "\r";
+							echo "\n" . '<option value="' . $value['uuid'] . '" ' .  $selected . ' >' . strtoupper($value['ruledbname']) . '</option>' . "\r";
 						}
 					?>
 						
@@ -322,7 +333,7 @@ jQuery(document).ready(function() {
 					/* find homelist names and filter by type */
 						$selected = '';
 						if ($a_list['homelistname'] == 'default'){$selected = 'selected';}
-						echo  "\n" . '<option value="default" ' . $selected . ' >default</option>' . "\r";		
+						echo  "\n" . '<option value="default" ' . $selected . ' >DEFAULT</option>' . "\r";		
 						foreach ($a_whitelist as $value)
 						{
 							$selected = '';
@@ -330,7 +341,7 @@ jQuery(document).ready(function() {
 							if ($value['snortlisttype'] == 'netlist') // filter
 							{
 								
-								echo "\n" . '<option value="' . $value['filename'] . '" ' .  $selected . ' >' . $value['filename'] . '</option>' . "\r";
+								echo "\n" . '<option value="' . $value['filename'] . '" ' .  $selected . ' >' . strtoupper($value['filename']) . '</option>' . "\r";
 	
 							}
 						}
@@ -352,7 +363,7 @@ jQuery(document).ready(function() {
 					/* find externallist names and filter by type */
 						$selected = '';
 						if ($a_list['externallistname'] == 'default'){$selected = 'selected';}
-						echo  "\n" . '<option value="default" ' . $selected . ' >default</option>' . "\r";		
+						echo  "\n" . '<option value="default" ' . $selected . ' >DEFAULT</option>' . "\r";		
 						foreach ($a_whitelist as $value)
 						{
 							$selected = '';
@@ -360,7 +371,7 @@ jQuery(document).ready(function() {
 							if ($value['snortlisttype'] == 'netlist') // filter
 							{
 								
-								echo "\n" . '<option value="' . $value['filename'] . '" ' .  $selected . ' >' . $value['filename'] . '</option>' . "\r";
+								echo "\n" . '<option value="' . $value['filename'] . '" ' .  $selected . ' >' . strtoupper($value['filename']) . '</option>' . "\r";
 	
 							}
 						}
@@ -391,14 +402,14 @@ jQuery(document).ready(function() {
 						$selected = '';
 						if ($a_list['suppresslistname'] == 'default'){$selected = 'selected';}
 						
-						echo  "\n" . '<option value="default" ' . $selected . ' >default</option>' . "\r";
+						echo  "\n" . '<option value="default" ' . $selected . ' >DEFAULT</option>' . "\r";
 							
 						foreach ($a_suppresslist as $value)
 						{
 							$selected = '';
 							if ($value['filename'] == $a_list['suppresslistname']){$selected = 'selected';}
 						
-							echo "\n" . '<option value="' . $value['filename'] . '" ' .  $selected . ' >' . $value['filename'] . '</option>' . "\r";
+							echo "\n" . '<option value="' . $value['filename'] . '" ' .  $selected . ' >' . strtoupper($value['filename']) . '</option>' . "\r";
 						}
 					?>						
 						
@@ -407,10 +418,25 @@ jQuery(document).ready(function() {
 					<span class="vexpl">Choose the suppression or filtering file you will like this rule to use.&nbsp;<span class="red">
 					Note:</span>&nbsp;Default option disables suppression and filtering.</span>
 				</td>
-			</tr>
+			</tr>			
 			<tr>
 				<td colspan="2" valign="top" class="listtopic">Choose the types of logs snort should create.</td>
 			</tr>
+			<tr>
+				<td width="22%" valign="top" class="vncell2">Type of Unified Logging</td>
+				<td width="78%" class="vtable">
+					<select name="snortalertlogtype" class="formfld" id="snortalertlogtype">
+	
+					<?php 					
+					$snortalertlogtypePerfList = array('full' => 'FULL', 'fast' => 'FAST', 'disable' => 'DISABLE');					
+					snortDropDownList($snortalertlogtypePerfList, $a_list['snortalertlogtype']);					
+					?>						
+						
+					</select>
+					<br>
+					<span class="vexpl">Snort will log Alerts to a file in the UNIFIED format. Full is a requirement for the snort wigdet.</span>
+				</td>
+			</tr>			
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Send alerts to mainSystem logs</td>
 				<td width="78%" class="vtable">
