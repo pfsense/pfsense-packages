@@ -75,18 +75,14 @@ $snortRuleDir = '/usr/local/etc/snort/snortDBrules/DB/' . $rdbuuid;
 	$filterDirList = snortScanDirFilter($snortRuleDir . '/rules', '\.rules');
 
 	// START read rule file
-	if ($_GET['openruleset'])
-	{
+	if ($_GET['openruleset']) {
 		$rulefile = $_GET['openruleset'];
 	}else{
 		$rulefile = $filterDirList[0];
 	}
 
+	// path of rule file
 	$workingFile = $snortRuleDir . '/rules/' . $rulefile;
-	
-	//split the contents of the string file into an array using the delimiter
-	// used by rule gui edit and table build code
-	$splitcontents = split_rule_file($workingFile);	
 	
 function load_rule_file($incoming_file, $splitcontents)
 {
@@ -119,15 +115,20 @@ function load_rule_file($incoming_file, $splitcontents)
 	return $splitcontents2;
 
 }
-
-	//Load the rule file
-	$splitcontents2 = load_rule_file($workingFile, $splitcontents);	
 	
-	$countSig = count($splitcontents2);
+	// Load the rule file
+	// split the contents of the string file into an array using the delimiter
+	// used by rule gui edit and table build code	
+	if (filesize($workingFile) > 0) {
+	$splitcontents = split_rule_file($workingFile);		
 	
-	if ($countSig > 0)
-	{
-		$newFilterRuleSigArray = newFilterRuleSig($splitcontents2);
+		$splitcontents2 = load_rule_file($workingFile, $splitcontents);	
+		
+		$countSig = count($splitcontents2);
+		
+		if ($countSig > 0) {
+			$newFilterRuleSigArray = newFilterRuleSig($splitcontents2);
+		}
 	}
 		
 	/*

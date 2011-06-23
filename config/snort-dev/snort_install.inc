@@ -136,6 +136,11 @@ function snort_postinstall()
 		exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/snort_rules');
 	}
 	
+	if (!file_exists('/usr/local/etc/snort/snortDBrules/DB/default/rules')) {
+		exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/DB/default/rules');
+		exec('/usr/bin/touch /usr/local/etc/snort/snortDBrules/DB/default/rules/local.rules');
+	}	
+	
 	if (!file_exists('/var/snort/')) {
 		exec('/bin/mkdir -p /var/snort/');
 	}
@@ -240,6 +245,7 @@ function snort_postinstall()
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/logo22.png');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/page_white_text.png');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/transparent.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/transparentbg.png');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/up.gif');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/up2.gif');
 	chdir ("/usr/local/www/snort/javascript/");

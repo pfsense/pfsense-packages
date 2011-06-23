@@ -263,8 +263,6 @@ jQuery(document).ready(function() {
     function showRequestRMlist(formData, jqForm, optionsWhitelist) { 
       
         var queryString = jQuery.param(formData);
-     
-        //alert('About to submit: \n\n' + queryString); 
         
         // call false to prevent form reload
         return true; 
@@ -272,8 +270,6 @@ jQuery(document).ready(function() {
     
     // post-submit callback if snort_json_post.php returns true or false
     function showResponseRMlist(data){ 
-      
-	//alert('test');
       
     }
     
@@ -321,7 +317,7 @@ jQuery(document).ready(function() {
 		// call to please wait	
 	    showLoading('#loadingWaiting');
 	 
-	    alert('About to submit: \n\n' + queryString); 
+	    //alert('About to submit: \n\n' + queryString); 
 	    
 	    // call false to prevent the form
 	    return true; 
@@ -374,7 +370,7 @@ jQuery(document).ready(function() {
 		// END of fill call to user
 		}else{
 			// On FAIL get some info back
-			alert('responseText: \n' + data.responseText + 'FAIL');
+			//alert('responseText: \n' + data.responseText + 'FAIL');
 		}
 	} 
 	// END iform code	
