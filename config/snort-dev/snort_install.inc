@@ -138,6 +138,10 @@ function snort_postinstall()
 	
 	if (!file_exists('/var/snort/')) {
 		exec('/bin/mkdir -p /var/snort/');
+	}
+	
+	if (!file_exists('/usr/local/pkg/snort/snortDBtemp')) {
+		exec('/bin/mv /var/snort/snortDBtemp');
 	}	
 	
 	// cleanup default files

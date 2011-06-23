@@ -305,6 +305,19 @@
 		<configurationfile>vhosts.xml</configurationfile>
 	</package>
 	<package>
+		<name>snort-dev</name>
+		<pkginfolink>http://forum.pfsense.org/index.php/topic,16847.0.html</pkginfolink>
+		<website>http://www.snort.org</website>
+		<descr>Testing Install Only, Currently Broken as of 06232011</descr>
+		<category>Security</category>
+		<config_file>http://www.pfsense.com/packages/config/snort-dev/snort.xml</config_file>
+		<version>2.9.0.5 pkg v. 2.0</version>
+		<required_version>2.0</required_version>
+		<status>UnStable</status>
+		<configurationfile>/snort.xml</configurationfile>
+		<after_install_info></after_install_info>
+	</package>
+	<package>
 		<name>snort</name>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,16847.0.html</pkginfolink>
 		<website>http://www.snort.org</website>
