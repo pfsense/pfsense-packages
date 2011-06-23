@@ -243,7 +243,7 @@ function snort_postinstall()
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/up.gif');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/up2.gif');
 	chdir ("/usr/local/www/snort/javascript/");
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/jquery-1.6.1.min.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery-1.6.1.min.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery.form.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/snort_globalsend.js');
 
