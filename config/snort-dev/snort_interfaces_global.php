@@ -83,68 +83,6 @@ $snortlogCurrentDSKsize = round(exec('df -k /var | grep -v "Filesystem" | awk \'
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <script type="text/javascript">
-<!--
-jQuery(document).ready(function(){
-
-	//create a bubble popup for each DOM element with class attribute as "text", "button" or "link" and LI, P, IMG elements.
-	jQuery('.cBubblePopup').CreateBubblePopup({
-		
-		position : 'top',		
-		align	 : 'center',	
-		//innerHtml: 'Take a look to the HTML source of this page <br /> to learn how the plugin works!',
-		innerHtmlStyle: {
-		color:
-		'#FFFFFF', 
-		'text-align':'center'
-		},		
-		themeName: 	'all-black',
-		themePath: 	'images/jquerybubblepopup-theme',
-		manageMouseEvents:	false 	
-			
-	});
-
-	// all popups of <AREA> tags are invisible
-	jQuery('cBubblePopup').data('visible', false);
-	//set a timer
-	var timer;
-
-	// add a customized mouseover event for each <AREA> tag...
-	jQuery('.cBubblePopup').mouseover(function(){
-			clearTimeout(timer);
-			if( !jQuery(this).data('visible') ){
-				// all popups must be invisible, but only this one is visible
-				jQuery('.cBubblePopup').data('visible', false);
-				jQuery(this).data('visible', true);
-				//hide all popups, update the innerHtml and show this popup
-				jQuery('.cBubblePopup').HideAllBubblePopups();
-				jQuery(this).SetBubblePopupInnerHtml( jQuery(this).attr('alt') );
-				jQuery(this).ShowBubblePopup();	
-			};
-	});
-
-	//if the mouse leaves the <AREA>, wait 2 seconds then hide all bubble poups...
-	jQuery('.cBubblePopup').mouseleave(function(){
-		if( jQuery(this).data('visible') ){
-			var seconds_to_wait = 1;
-			function doCountdown(){
-				timer = setTimeout(function(){
-					seconds_to_wait--;
-					if(seconds_to_wait > 0){
-						doCountdown();
-					}else{
-						clearTimeout(timer);
-						jQuery('.cBubblePopup').HideAllBubblePopups();
-						jQuery('.cBubblePopup').data('visible', false);
-					};
-				},1000);
-			};
-			doCountdown();
-		};
-	});				
-
-});
-
-//-->
 
 </script>
 
@@ -220,10 +158,10 @@ jQuery(document).ready(function(){
 				<table STYLE="padding-top: 5px">
 					<tr>
 						<td colspan="2">
-						<a class="vncell2 cBubblePopup" href="https://www.snort.org/signup" target="_blank" alt="Basic rules are free but 30 days old.">
+						<a class="vncell2" href="https://www.snort.org/signup" target="_blank" alt="Basic rules are free but 30 days old.">
 						Sign Up for a Basic Rule Account
 						</a><br><br>				
-						<a class="vncell2 cBubblePopup" href="http://www.snort.org/vrt/buy-a-subscription" target="_blank" alt="Premium users receive rules 30 days faster than basic users.">
+						<a class="vncell2" href="http://www.snort.org/vrt/buy-a-subscription" target="_blank" alt="Premium users receive rules 30 days faster than basic users.">
 						Sign Up for Sourcefire VRT Certified Premium Rules. This Is Highly Recommended
 						</a>
 						</td>
@@ -268,7 +206,7 @@ jQuery(document).ready(function(){
 				<table STYLE="padding-top: 5px">
 					<tr>
 						<td colspan="2">			
-						<a class="vncell2 cBubblePopup" href="http://www.emergingthreatspro.com" target="_blank" alt="Premium users receive rules 30 days faster than basic users.">
+						<a class="vncell2" href="http://www.emergingthreatspro.com" target="_blank" alt="Premium users receive rules 30 days faster than basic users.">
 						Sign Up for Emerging Threats Pro Certified Premium Rules. This Is Highly Recommended
 						</a>
 						</td>
