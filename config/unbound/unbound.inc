@@ -240,13 +240,15 @@ function unbound_get_network_interface_addresses() {
 	$unbound_config = $config['installedpackages']['unbound']['config'][0];
 	$unboundint = explode(",", $unbound_config['active_interface']);
 	$unbound_interfaces = array();
+	$i = 0;
 	
 	foreach ($unboundint as $unboundidx => $unboundif) {
-		/* Configure IPv4 addresses */	
+		/* Configure IPv4 addresses */
 		if (is_ipaddr($interfaces[$unboundif]['ipaddr'])) {
-			$unbound_interfaces['ipv4']['ipaddr'] = $interfaces[$unboundif]['ipaddr'];
-			$unbound_interfaces['ipv4']['subnet'] = $interfaces[$unboundif]['subnet'];
-			$unbound_interfaces['ipv4']['network'] = gen_subnet($unbound_interfaces['ipv4']['ipaddr'],$unbound_interfaces['ipv4']['subnet']);
+			$unbound_interfaces[$i]['ipv4']['ipaddr'] = $interfaces[$unboundif]['ipaddr'];
+			$unbound_interfaces[$i]['ipv4']['subnet'] = $interfaces[$unboundif]['subnet'];
+			$unbound_interfaces[$i]['ipv4']['network'] = gen_subnet($unbound_interfaces[$i]['ipv4']['ipaddr'],$unbound_interfaces[$i]['ipv4']['subnet']);
+			
 			// Check for CARP addresses and also return those - only IPv4 for now
 			if (isset($config['virtualip'])) {
 				if(is_array($config['virtualip']['vip'])) {
@@ -256,20 +258,29 @@ function unbound_get_network_interface_addresses() {
 							if ($virtual_ip == '') {
 								log_error("Unbound DNS: There was a problem setting up the Virtual IP for the interface ".link_ip_to_carp_interface($vip['subnet']));
 							} else {
-								$unbound_interfaces['virtual']['ipaddr'] = $virtual_ip;
+								$unbound_interfaces[$i]['virtual']['ipaddr'] = $virtual_ip;
 							}
 						}
 					}
 				}
 			}
+		} else if(isset($interfaces[$unboundif]['ipaddr'])) {
+			/* Find the interface IP address for
+			 * XXX - this only works for IPv4 currently - the pfSense module needs IPv6 love
+			 */
+			$unboundrealif = convert_friendly_interface_to_real_interface_name($unboundif);
+			$unbound_interfaces[$i]['ipv4']['ipaddr'] = find_interface_ip($unboundrealif);
+			$unbound_interfaces[$i]['ipv4']['subnet'] = find_interface_subnet($unboundrealif);
+			$unbound_interfaces[$i]['ipv4']['network'] = gen_subnet($unbound_interfaces[$i]['ipv4']['ipaddr'],$unbound_interfaces[$i]['ipv4']['subnet']);
 		}
 	
 		/* Configure IPv6 addresses */
 		if(is_ipaddr($interfaces[$unboundif]['ipaddrv6'])) {
-			$unbound_interfaces['ipv6']['ipaddr'] = $interfaces[$unboundif]['ipaddrv6'];
-			$unbound_interfaces['ipv6']['subnet'] = $interfaces[$unboundif]['subnetv6'];
-			$unbound_interfaces['ipv6']['network'] = gen_subnetv6($unbound_interfaces['ipv6']['ipaddr'], $unbound_interfaces['ipv6']['subnet']);
+			$unbound_interfaces[$i]['ipv6']['ipaddr'] = $interfaces[$unboundif]['ipaddrv6'];
+			$unbound_interfaces[$i]['ipv6']['subnet'] = $interfaces[$unboundif]['subnetv6'];
+			$unbound_interfaces[$i]['ipv6']['network'] = gen_subnetv6($unbound_interfaces[$i]['ipv6']['ipaddr'], $unbound_interfaces[$i]['ipv6']['subnet']);
 		}
+		$i++;
 	}
 	return $unbound_interfaces;
 }
@@ -305,9 +316,11 @@ function unbound_resync_config() {
 	$unbound_bind_interfaces = "";
 	$unbound_allowed_networks = "";
 	$unboundnetcfg = unbound_get_network_interface_addresses();
-	foreach($unboundnetcfg as $netcfgidx => $netent) {
-		$unbound_bind_interfaces .="interface: {$netent['ipaddr']}\n";
-		$unbound_allowed_networks .= "access-control: {$netent['network']}/{$netent['subnet']} allow\n";
+	foreach($unboundnetcfg as $netent) {
+		foreach($netent as $entry) {
+			$unbound_bind_interfaces .="interface: {$entry['ipaddr']}\n";
+			$unbound_allowed_networks .= "access-control: {$entry['network']}/{$entry['subnet']} allow\n";
+		}
 	}
 	/* Configure user configured ACLs */
 	$unbound_allowed_networks .= unbound_acls_config();
@@ -596,7 +609,6 @@ function unbound_validate($post, $type=null) {
 			}				
 		}
 	} else if($type == "advanced") {
-	
 		if(!is_numeric($post['cache_max_ttl']))
 			$input_errors[] = "You must enter a valid number in 'Maximum TTL for RRsets and messages'.";
 		if(!is_numeric($post['cache_min_ttl']))
@@ -684,7 +696,6 @@ function unbound_add_host_entries() {
 	global $config;
 	
 	/* XXX: break this out into a separate config file and make use of include */
-	
 	$unboundcfg = $config['installedpackages']['unbound']['config'][0];
 	$syscfg = $config['system'];
 	$dnsmasqcfg = $config['dnsmasq'];
