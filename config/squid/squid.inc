@@ -208,34 +208,7 @@ function squid_install_command() {
 		exec("/bin/chmod a+x /usr/local/libexec/squid/pinger");
 	if(file_exists("/usr/local/etc/rc.d/squid"))
 		exec("/bin/rm /usr/local/etc/rc.d/squid");
-	$rc = array();
-	$rc['file'] = 'squid.sh';
-	$rc['start'] = <<<EOD
-if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
-	/usr/local/sbin/squid -D
-fi
-
-EOD;
-	$rc['stop'] = <<<EOD
-/usr/local/sbin/squid -k shutdown
-# Just to be sure...
-sleep 5
-killall -9 squid 2>/dev/null
-killall pinger 2>/dev/null
-
-EOD;
-	$rc['restart'] = <<<EOD
-if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
-		/usr/local/sbin/squid -D
-	else
-		/usr/local/sbin/squid -k reconfigure
-	fi
-
-EOD;
-	update_status("Writing rc.d files... One moment please...");
-	conf_mount_rw();
-	write_rcfile($rc);
-
+	squid_write_rcfile();
 	exec("chmod a+rx /usr/local/libexec/squid/dnsserver");
 
 	foreach (array(	SQUID_CONFBASE,
@@ -1137,6 +1110,7 @@ function squid_resync() {
 	$conf .= squid_resync_traffic() . "\n";
 	$conf .= squid_resync_auth();
 	squid_resync_users();
+	squid_write_rcfile();
 
 	/* make sure pinger is executable */
 	if(file_exists("/usr/local/libexec/squid/pinger"))
@@ -1440,4 +1414,32 @@ function squid_generate_rules($type) {
 	return $rules;
 }
 
+function squid_write_rcfile() {
+	$rc = array();
+	$rc['file'] = 'squid.sh';
+	$rc['start'] = <<<EOD
+if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
+	/usr/local/sbin/squid -D
+fi
+
+EOD;
+	$rc['stop'] = <<<EOD
+/usr/local/sbin/squid -k shutdown
+# Just to be sure...
+sleep 5
+killall -9 squid 2>/dev/null
+killall pinger 2>/dev/null
+
+EOD;
+	$rc['restart'] = <<<EOD
+if [ -z "`ps auxw | grep "[s]quid -D"|awk '{print $2}'`" ];then
+		/usr/local/sbin/squid -D
+	else
+		/usr/local/sbin/squid -k reconfigure
+	fi
+
+EOD;
+	conf_mount_rw();
+	write_rcfile($rc);
+}
 ?>
