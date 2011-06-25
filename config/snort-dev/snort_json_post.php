@@ -43,6 +43,7 @@
 
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_new.inc");
+require_once("/usr/local/pkg/snort/snort_build.inc");
 
 // unset crsf checks
 if(isset($_POST['__csrf_magic']))  {
@@ -78,29 +79,32 @@ if ($_POST['snortSidRuleEdit'] == 1) {
 	
 // row from db by uuid
 if ($_POST['snortSaveRuleSets'] == 1) {	
-	
-	function snortSaveRuleSetsFunc() 
-	{
 
-		if ($_POST['ifaceTab'] == 'snort_rulesets') {	
-			// unset POSTs that are markers not in db
-			unset($_POST['snortSaveRuleSets']);
-			unset($_POST['ifaceTab']);		
+		if ($_POST['ifaceTab'] == 'snort_rulesets') {
 			
-			snortJsonReturnCode(snortSql_updateRuleSetList());	
-		}
+			function snortSaveRuleSetsRulesetsFunc()
+			{
+				// unset POSTs that are markers not in db
+				unset($_POST['snortSaveRuleSets']);
+				unset($_POST['ifaceTab']);		
+				
+				snortJsonReturnCode(snortSql_updateRuleSetList());			
+				build_snort_settings($_POST['uuid']);
+			}
+			snortSaveRuleSetsRulesetsFunc();	
+		}		
 		
-		
-		if ($_POST['ifaceTab'] == 'snort_rules') {	
-			// unset POSTs that are markers not in db
-			unset($_POST['snortSaveRuleSets']);
-			unset($_POST['ifaceTab']);
-			
-			snortJsonReturnCode(snortSql_updateRuleSigList());
-		}
-	
-	}	
-	snortSaveRuleSetsFunc();	
+		if ($_POST['ifaceTab'] == 'snort_rules') {
+			function snortSaveRuleSetsRulesFunc()
+			{			
+				// unset POSTs that are markers not in db
+				unset($_POST['snortSaveRuleSets']);
+				unset($_POST['ifaceTab']);
+				
+				snortJsonReturnCode(snortSql_updateRuleSigList());
+			}
+			snortSaveRuleSetsRulesFunc();
+		}	
 	
 } // END of rulesSets	
 
@@ -203,6 +207,10 @@ if ($_POST['snortSaveSettings'] == 1)  {
 			          
 			}
 			
+			//if (empty($_POST['oinkmastercode'])) {
+			//	$_POST['oinkmastercode'] = 'empty';
+			//}
+			
 			// unset POSTs that are markers not in db
 			unset($_POST['snortSaveSettings']);		
 			unset($_POST['ifaceTab']);
@@ -217,92 +225,112 @@ if ($_POST['snortSaveSettings'] == 1)  {
 	    	
 		    // snort interface edit
 			if ($_POST['ifaceTab'] == 'snort_interfaces_edit') {
-			        
-				if (!isset($_POST['enable']))
-				 	$_POST['enable'] = ($_POST['enable'] == '' ? off : $_POST['enable']);
-				          
-				if (!isset($_POST['blockoffenders7']))
-					$_POST['blockoffenders7'] = ($_POST['blockoffenders7'] == '' ? off : $_POST['blockoffenders7']);
-		
-				if (!isset($_POST['alertsystemlog']))
-					$_POST['alertsystemlog'] = ($_POST['alertsystemlog'] == '' ? off : $_POST['alertsystemlog']);  
-		
-				if (!isset($_POST['tcpdumplog']))
-					$_POST['tcpdumplog'] = ($_POST['tcpdumplog'] == '' ? off : $_POST['tcpdumplog']); 
-		
-				if (!isset($_POST['snortunifiedlog']))
-					$_POST['snortunifiedlog'] = ($_POST['snortunifiedlog'] == '' ? off : $_POST['snortunifiedlog']);
-					
-				// convert textbox to base64
-				$_POST['configpassthru'] = base64_encode($_POST['configpassthru']);
 				
-				/*
-				* make dir for the new iface, if iface exists or rule dir has changed redo soft link
-				* may need to move this as a func to new_snort.inc
-				*/
-			      
-					$newSnortDir = 'sn_' . $_POST['uuid'];
-					$pathToSnortDir = '/usr/local/etc/snort';			
+				function SnortIfaces_Snort_Interfaces_edit()
+				{			        
+					if (!isset($_POST['enable']))
+					 	$_POST['enable'] = ($_POST['enable'] == '' ? off : $_POST['enable']);
+					          
+					if (!isset($_POST['blockoffenders7']))
+						$_POST['blockoffenders7'] = ($_POST['blockoffenders7'] == '' ? off : $_POST['blockoffenders7']);
+			
+					if (!isset($_POST['alertsystemlog']))
+						$_POST['alertsystemlog'] = ($_POST['alertsystemlog'] == '' ? off : $_POST['alertsystemlog']);  
+			
+					if (!isset($_POST['tcpdumplog']))
+						$_POST['tcpdumplog'] = ($_POST['tcpdumplog'] == '' ? off : $_POST['tcpdumplog']); 
+			
+					if (!isset($_POST['snortunifiedlog']))
+						$_POST['snortunifiedlog'] = ($_POST['snortunifiedlog'] == '' ? off : $_POST['snortunifiedlog']);
 						
-					// creat iface dir and ifcae rules dir
-					if (!is_dir("{$pathToSnortDir}/{$newSnortDir}")) {
-						createNewIfaceDir($pathToSnortDir, $newSnortDir);
-					} //end of mkdir	 			
-						
-					// change the rule path
-					if (is_dir("{$pathToSnortDir}/{$newSnortDir}")) {
+					// convert textbox to base64
+					$_POST['configpassthru'] = base64_encode($_POST['configpassthru']);
+					
+					/*
+					* make dir for the new iface, if iface exists or rule dir has changed redo soft link
+					* may need to move this as a func to new_snort.inc
+					*/
+				      
+						$newSnortDir = 'sn_' . $_POST['uuid'];
+						$pathToSnortDir = '/usr/local/etc/snort';			
 							
-						$snortCurrentRuleDbName = snortSql_fetchAllSettings('snortDB', 'snortIfaces', 'uuid', $_POST['uuid']);
-	
-						if ($_POST['ruledbname'] !== $snortCurrentRuleDbName['ruledbname'] || !file_exists("{$pathToSnortDir}/{$newSnortDir}/rules")) {
+						// creat iface dir and ifcae rules dir
+						if (!is_dir("{$pathToSnortDir}/{$newSnortDir}")) {
+							createNewIfaceDir($pathToSnortDir, $newSnortDir);
+						} //end of mkdir	 			
 							
-							// NOTE: use full paths or link rm will not work, Freebsd love
-							exec("/bin/rm {$pathToSnortDir}/{$newSnortDir}/rules");
-							exec("/bin/ln -s /usr/local/etc/snort/snortDBrules/DB/{$_POST['ruledbname']}/rules {$pathToSnortDir}/{$newSnortDir}/rules");
+						// change the rule path
+						if (is_dir("{$pathToSnortDir}/{$newSnortDir}")) {
+								
+							$snortCurrentRuleDbName = snortSql_fetchAllSettings('snortDB', 'snortIfaces', 'uuid', $_POST['uuid']);
+		
+							if ($_POST['ruledbname'] !== $snortCurrentRuleDbName['ruledbname'] || !file_exists("{$pathToSnortDir}/{$newSnortDir}/rules")) {
+								
+								// NOTE: use full paths or link rm will not work, Freebsd love
+								exec("/bin/rm {$pathToSnortDir}/{$newSnortDir}/rules");
+								exec("/bin/ln -s /usr/local/etc/snort/snortDBrules/DB/{$_POST['ruledbname']}/rules {$pathToSnortDir}/{$newSnortDir}/rules");
+								
+							}
 							
 						}
-						
-					}					
+				}
+				SnortIfaces_Snort_Interfaces_edit();						
 			          
 			} // end of snort_interfaces_edit		
 			
 			// snort preprocessor edit
 			if ($_POST['ifaceTab'] == 'snort_preprocessors') {
-	
-				if (!isset($_POST['dce_rpc_2']))
-				 	$_POST['dce_rpc_2'] = ($_POST['dce_rpc_2'] == '' ? off : $_POST['dce_rpc_2']);
-				 	
-				if (!isset($_POST['dns_preprocessor']))
-				 	$_POST['dns_preprocessor'] = ($_POST['dns_preprocessor'] == '' ? off : $_POST['dns_preprocessor']);
-				 	
-				if (!isset($_POST['ftp_preprocessor']))
-				 	$_POST['ftp_preprocessor'] = ($_POST['ftp_preprocessor'] == '' ? off : $_POST['ftp_preprocessor']);
-				 	
-				if (!isset($_POST['http_inspect']))
-				 	$_POST['http_inspect'] = ($_POST['http_inspect'] == '' ? off : $_POST['http_inspect']);
-				 	
-				if (!isset($_POST['other_preprocs']))
-				 	$_POST['other_preprocs'] = ($_POST['other_preprocs'] == '' ? off : $_POST['other_preprocs']);
-				 	
-				if (!isset($_POST['perform_stat']))
-				 	$_POST['perform_stat'] = ($_POST['perform_stat'] == '' ? off : $_POST['perform_stat']);
-				 	
-				if (!isset($_POST['sf_portscan']))
-				 	$_POST['sf_portscan'] = ($_POST['sf_portscan'] == '' ? off : $_POST['sf_portscan']);
-				 	
-				if (!isset($_POST['smtp_preprocessor']))
-				 	$_POST['smtp_preprocessor'] = ($_POST['smtp_preprocessor'] == '' ? off : $_POST['smtp_preprocessor']);			
 				
+				function SnortIfaces_Snort_PreprocessorsFunc()
+				{				
+					if (!isset($_POST['dce_rpc_2'])) {
+					 	$_POST['dce_rpc_2'] = ($_POST['dce_rpc_2'] == '' ? off : $_POST['dce_rpc_2']);
+					}
+					 	
+					if (!isset($_POST['dns_preprocessor'])) {
+					 	$_POST['dns_preprocessor'] = ($_POST['dns_preprocessor'] == '' ? off : $_POST['dns_preprocessor']);
+					}
+					 	
+					if (!isset($_POST['ftp_preprocessor'])) {
+					 	$_POST['ftp_preprocessor'] = ($_POST['ftp_preprocessor'] == '' ? off : $_POST['ftp_preprocessor']);
+					}
+					 	
+					if (!isset($_POST['http_inspect'])) {
+					 	$_POST['http_inspect'] = ($_POST['http_inspect'] == '' ? off : $_POST['http_inspect']);
+					}
+					 	
+					if (!isset($_POST['other_preprocs'])) {
+					 	$_POST['other_preprocs'] = ($_POST['other_preprocs'] == '' ? off : $_POST['other_preprocs']);
+					}
+					 	
+					if (!isset($_POST['perform_stat'])) {
+					 	$_POST['perform_stat'] = ($_POST['perform_stat'] == '' ? off : $_POST['perform_stat']);
+					}
+					 	
+					if (!isset($_POST['sf_portscan'])) {
+					 	$_POST['sf_portscan'] = ($_POST['sf_portscan'] == '' ? off : $_POST['sf_portscan']);
+					}
+					 	
+					if (!isset($_POST['smtp_preprocessor'])) {
+					 	$_POST['smtp_preprocessor'] = ($_POST['smtp_preprocessor'] == '' ? off : $_POST['smtp_preprocessor']);
+					}
+
+				}
+				SnortIfaces_Snort_PreprocessorsFunc();				
 			}
 	
 			// snort barnyard edit
-			if ($_POST['ifaceTab'] == 'snort_barnyard') {
-				// make shure iface is lower case
-				$_POST['interface'] = strtolower($_POST['interface']);
-				
-				if (!isset($_POST['barnyard_enable']))
-				 	$_POST['barnyard_enable'] = ($_POST['barnyard_enable'] == '' ? off : $_POST['barnyard_enable']);	
-				
+			if ($_POST['ifaceTab'] == 'snort_barnyard') {				
+				function SnortIfaces_Snort_Barnyard()
+				{
+					// make shure iface is lower case
+					$_POST['interface'] = strtolower($_POST['interface']);
+					
+					if (!isset($_POST['barnyard_enable'])) {
+					 	$_POST['barnyard_enable'] = ($_POST['barnyard_enable'] == '' ? off : $_POST['barnyard_enable']);
+					}
+				}
+				SnortIfaces_Snort_Barnyard();				
 			}
 			
 			
@@ -310,7 +338,8 @@ if ($_POST['snortSaveSettings'] == 1)  {
 			unset($_POST['snortSaveSettings']);
 			unset($_POST['ifaceTab']);
 		      
-			snortJsonReturnCode(snortSql_updateSettings('uuid', $_POST['uuid']));	      
+			snortJsonReturnCode(snortSql_updateSettings('uuid', $_POST['uuid']));
+			build_snort_settings($_POST['uuid']);   
 	      
 	    } // end of dbTable SnortIfaces
 

@@ -137,8 +137,19 @@ jQuery(document).ready(function() {
 
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
+<!-- loading msg -->
 <div id="loadingWaiting">
-  <p class="loadingWaitingMessage"><img src="./images/loading.gif" /> <br>Please Wait...</p>
+	<div class="snortModal" style="top: 200px; left: 700px;">
+		<div class="snortModalTop">
+			<!-- <div class="snortModalTopClose"><a href="javascript:hideLoading('#loadingWaiting');"><img src="/snort/images/close_9x9.gif" border="0" height="9" width="9"></a></div> -->
+		</div>
+		<div class="snortModalTitle">
+	  		<p><img src="./images/loading.gif" /><br><br>Please Wait...</p>
+	  	</div>
+		<div>
+		<p class="loadingWaitingMessage"></p>
+	  	</div>
+	</div>  
 </div>
 
 <?php include("fbegin.inc"); ?>

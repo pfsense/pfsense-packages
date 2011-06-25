@@ -91,7 +91,7 @@ function createNewIfaceDir($pathToSnortDir, $newSnortDir) {
 	exec("/bin/mkdir -p {$pathToSnortDir}/{$newSnortDir}");
 	
 	// create rules dir soft link if setting is default
-	if ($_POST['ruledbname'] === 'default' || $_POST['ruledbname'] === '') {
+	if ($_POST['ruledbname'] === 'default' || empty($_POST['ruledbname'])) {
 		if (!file_exists("{$pathToSnortDir}/sn_{$_POST['uuid']}/rules") && file_exists('/usr/local/etc/snort/snortDBrules/DB/default/rules')) {
 			exec("/bin/ln -s {$pathToSnortDir}/snortDBrules/DB/default/rules {$pathToSnortDir}/sn_{$_POST['uuid']}/rules");		
 		}
@@ -258,7 +258,7 @@ function snortSql_updateRuleSigList()
 			$sidLine = preg_replace($replaceChars, '', $matches[0]);
 			
 			
-			if ($sidLine == '') {
+			if (empty($sidLine)) {
 				$tempstring[] = $sigLine;
 			}else{
 	
@@ -470,7 +470,7 @@ function snortSql_fetchAllInterfaceRules($table, $dbname)
 function snortSql_fetchAllSettings($dbname, $table, $type, $id_uuid) 
 {
 
-	if ($dbname == '' || $table == '' || $type == '') {
+	if (empty($dbname) || empty($table) || empty($type)) {
 		return false;
 	}
 	  
@@ -541,8 +541,7 @@ function snortSql_updateSettings($type, $id_uuid)
   unset($settings['dbTable']);
 
   // START add new row if not set
-  if ($type == 'uuid')
-  {
+  if ($type == 'uuid') {
   
     $query_ck = sqlite_query($mydb, // @ supress warnings usonly in production
     "SELECT * FROM {$table} WHERE uuid = '{$id_uuid}';
@@ -550,15 +549,13 @@ function snortSql_updateSettings($type, $id_uuid)
         
     $query_ckFinal = sqlite_fetch_all($query_ck, SQLITE_ASSOC);  
 
-    if (empty($query_ckFinal))
-    {
+    if (empty($query_ckFinal)) {
     
       $query_ck = sqlite_query($mydb, // @ supress warnings usonly in production
       "INSERT INTO {$table} (date, uuid) VALUES ('{$settings['date']}', '{$settings['uuid']}');
       ");
       
-      if (sqlite_changes($mydb) < 1)
-      {
+      if (sqlite_changes($mydb) < 1) {
         sqlite_close($mydb);
         return 'Error in query';   
       }           
@@ -583,7 +580,7 @@ function snortSql_updateSettings($type, $id_uuid)
     
     $i++;
     
-    if ($kv[$i] != '' && $val[$i] != '') 
+    if (!empty($kv[$i])) 
     {     
 
       if ($type == 'id')
@@ -620,8 +617,7 @@ function snortSql_updateSettings($type, $id_uuid)
 function snortSql_fetchAllWhitelistTypes($table, $table2) 
 {
 
-  if ($table == '') 
-  {
+  if (empty($table)) {
     return false;
   }
   
@@ -634,8 +630,7 @@ function snortSql_fetchAllWhitelistTypes($table, $table2)
      
      $chktable = sqlite_fetch_all($result, SQLITE_ASSOC);
  
-  if ($chktable == '')
-  {
+  if (empty($chktable)) {
     return false;
   }
  
@@ -680,7 +675,7 @@ function snortSql_fetchAllWhitelistTypes($table, $table2)
 function snortSql_updateWhitelistIps($newPostListips)
 {
 	
-	if($newPostListips == '')
+	if(empty($newPostListips))
 	{
 		return true;
 	}
@@ -912,7 +907,7 @@ function sendFileSnortLogDownload() {
 		$file_name = "snort_blocked_{$file_name_date}.tar.gz";
 	}
 	
-	if ($file_name == '') {
+	if (empty($file_name)) {
 		echo 'Error no saved file.';
 		return false;
 	}	
@@ -977,7 +972,7 @@ function post_delete_logs()
 		foreach ($rule_array as $value)
 		{
 
-			if ($id == '') {
+			if (empty($id)) {
 				$id = 0;
 			}
 
@@ -1087,17 +1082,21 @@ function snortRemoveBlockedIPs() {
 /* returns true if $name is a valid name for a whitelist file name or ip */
 function is_validFileName($name) {
 	
-	if ($name == '')
+	if (empty($name)) {
 		return false;
+	}
 	
-	if (!is_string($name))
+	if (!is_string($name)) {
 		return false;
+	}
 	
-	if (preg_match("/\s+/", $name))
+	if (preg_match("/\s+/", $name)) {
 		return false;
+	}
 
-	if (!preg_match("/[^a-zA-Z0-9\-_]/", $name))
+	if (!preg_match("/[^a-zA-Z0-9\-_]/", $name)) {
 		return true;
+	}
 
 	return false;
 }
@@ -1122,8 +1121,7 @@ function genAlphaNumMixFast($min = 14, $max = 28)
  
     $randAlpaNum = '';
     
-    if (is_array($rand_keys))
-    {
+    if (is_array($rand_keys)) {
       foreach ($rand_keys as $key)
       {
         $randAlpaNum .= $pool[$key];
@@ -1143,8 +1141,7 @@ function snortScanDirFilter($path, $filtername)
 	$listDir = array();
 	$listDir = scandir("{$path}");
 
-	if ($filtername == '')
-	{
+	if (empty($filtername)) {
 			
 		return $listDir;
 		
@@ -1153,8 +1150,7 @@ function snortScanDirFilter($path, $filtername)
 		$pattern = "/{$filtername}/";
 	 	foreach ( $listDir as $val )
 	 	{
-	 		if (preg_match($pattern, $val))
-	 		{
+	 		if (preg_match($pattern, $val)) {
 	 			$filterDirList[] = $val;			
 	 		}
 	 	}

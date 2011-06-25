@@ -178,8 +178,19 @@ jQuery(document).ready(function() {
 
 </script>
 
+<!-- loading msg -->
 <div id="loadingWaiting">
-  <p class="loadingWaitingMessage"><img src="./images/loading.gif" /> <br>Please Wait...</p>
+	<div class="snortModal" style="top: 200px; left: 700px;">
+		<div class="snortModalTop">
+			<!-- <div class="snortModalTopClose"><a href="javascript:hideLoading('#loadingWaiting');"><img src="/snort/images/close_9x9.gif" border="0" height="9" width="9"></a></div> -->
+		</div>
+		<div class="snortModalTitle">
+	  		<p><img src="./images/loading.gif" /><br><br>Please Wait...</p>
+	  	</div>
+		<div>
+		<p class="loadingWaitingMessage"></p>
+	  	</div>
+	</div>  
 </div>
 
 <?php include("fbegin.inc"); ?>
@@ -268,6 +279,7 @@ jQuery(document).ready(function() {
 		<input type="hidden" name="dbTable" value="SnortruleSets" /> <!-- what db table-->
 		<input type="hidden" name="ifaceTab" value="snort_rulesets" /> <!-- what interface tab -->
 		<input type="hidden" name="rdbuuid" value="<?=$rdbuuid;?>" /> <!-- what interface to save for -->
+		<input type="hidden" name="uuid" value="<?=$uuid;?>" /> <!-- create snort.conf -->
 			
 		<table width="100%" border="0" cellpadding="0" cellspacing="0">
 		

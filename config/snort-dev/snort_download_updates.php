@@ -64,52 +64,41 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 
+<!-- loading msg -->
 <div id="loadingWaiting">
-  <p class="loadingWaitingMessage"><img src="./images/loading.gif" /> <br>Please Wait...</p>
+	<div class="snortModal" style="top: 200px; left: 700px;">
+		<div class="snortModalTop">
+			<!-- <div class="snortModalTopClose"><a href="javascript:hideLoading('#loadingWaiting');"><img src="/snort/images/close_9x9.gif" border="0" height="9" width="9"></a></div> -->
+		</div>
+		<div class="snortModalTitle">
+	  		<p><img src="./images/loading.gif" /><br><br>Please Wait...</p>
+	  	</div>
+		<div>
+		<p class="loadingWaitingMessage"></p>
+	  	</div>
+	</div>  
 </div>
 
 <div class="pb_div" id="pb3"></div>	
 
+<!-- loading update msg -->
 <div id="loadingRuleUpadteGUI">
 
-					<div class="loadingWaitingUpdateGUI" >
-					<table>
+	<div class="snortModalUpdate">
+		<div class="snortModalTopUpdate">
+			<!-- <div class="snortModalTopClose"><a href="javascript:hideLoading('#loadingWaiting');"><img src="/snort/images/close_9x9.gif" border="0" height="9" width="9"></a></div> -->
+		</div>
+		<div class="snortModalTitleUpdate">
+				<table style='border-collapse: collapse; border: 1px solid #000000;' cellpadding='2' cellspacing='2'>
 					<tr>
-						<td>Yellow Bar</td>
+						<td>
+						<img border='0' src='../themes/<?= $g['theme']; ?>/images/misc/progress_bar.gif' width='600' height='23' name='progressbar' id='progressbar' alt='' />
+						</td>
 					</tr>
-					<tr>
-						<td><span class="progressBar" id="pb2"></span></td>
-					</tr>
-					<tr>
-						<td>Yellow Bar</td>
-					</tr>
-					</table>
-					</div>			
-				
-				
-               <!-- progress bar -->
-               <!--
-               <table id="progholder" width='800px' style='border-collapse: collapse; border: 1px solid #000000;' cellpadding='2' cellspacing='2' bgcolor="#eeeeee">
-                  <tr>
-                    <td>
-                      <img border='0' src='/themes/<?= $g['theme']; ?>/images/misc/progress_bar.gif' width='280' height='23' name='progressbar' id='progressbar' alt='' />
-                    </td>
-                  </tr>
-                </table>
-                <br />
-                      
-              <table width="800px" cellpadding="9" cellspacing="9" bgcolor="#eeeeee">
-                <tr>
-                  <td align="center" valign="top">
-                      <textarea cols="90" rows="2" name="status" id="status" wrap="hard">
-                      <?=gettext("Initializing...");?>
-                      </textarea>
-                      <textarea cols="90" rows="2" name="output" id="output" wrap="hard">
-                      </textarea>
-                  </td>
-                </tr>
-              </table>
-              -->
+				</table>
+	  	</div>
+	  			<p class="loadingWaitingMessage">CARS</p>
+	</div> 
 
 
 </div>

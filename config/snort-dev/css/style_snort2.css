@@ -101,24 +101,60 @@ a {
 
 .loadingWaitingMessage{
 
-  position: absolute;
-  top: 25%;
-  left: 50%;
-  color: #ffffff;
-  z-index: 9999;
-  text-align: center;
+	text-align: center;
+	margin-top:40px;
 	
 }
 
-.loadingWaitingUpdateGUI{
+.snortModal {
+	width:500px;
+	height:300px;
+	position:absolute;
+	z-index:999;
+	background-color:#000;
+}
 
-  position: absolute;
-  top: 25%;
-  left: 35%;
-  color: #ffffff;
-  z-index: 9999;
-  text-align: center;
-	
+.snortModalUpdate {
+	width:900px;
+	height:500px;
+	position:absolute;
+	z-index:999;
+	background-color:#000;
+}
+
+.snortModalTopUpdate {
+	width:900px;
+	height:25px;
+	background-image:url( '/snort/images/top_modal_bar_lil.jpg' );
+	background-repeat:repeat-x;
+	margin-bottom:1px;
+}
+
+.snortModalTop {
+	width:500px;
+	height:25px;
+	background-image:url( '/snort/images/top_modal_bar_lil.jpg' );
+	background-repeat:repeat-x;
+	margin-bottom:1px;
+}
+
+.snortModalTopClose {
+	width:9px;
+	height:9px;
+	float:right;
+	margin-right:10px;
+	margin-top:8px;
+}
+
+.snortModalTitle {
+	text-align: center;
+}
+
+.snortModalTitleUpdate {
+	position:absolute;
+	top: 125px;
+	left: 170px; 
+	width: 600px;	
 }
 
 .listhdrr2 {

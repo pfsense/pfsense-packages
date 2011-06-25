@@ -136,6 +136,15 @@ jQuery(document).ready(function() {
 			  jQuery(thisLocation).show();
 		};
 		
+		// this was cp from stackoverflow dot com help question
+		// used to center snort modals
+		jQuery.fn.centerModal = function () {
+		    this.css("position","absolute");
+		    this.css("top", 70 + "px");
+		    this.css("left", ((jQuery(window).width() - this.outerWidth()) / 2) + jQuery(window).scrollLeft() + "px");
+		    return this;
+		}
+		
 		
   //--------------------------- START select all code ---------------------------
 		
@@ -314,8 +323,9 @@ jQuery(document).ready(function() {
 		
 	    var queryString = jQuery.param(formData); 
 	    
-		// call to please wait	
+		// call to please wait
 	    showLoading('#loadingWaiting');
+	    jQuery('.snortModal').centerModal();
 	 
 	    //alert('About to submit: \n\n' + queryString); 
 	    
@@ -336,9 +346,12 @@ jQuery(document).ready(function() {
 	// After Save Calls display
 	var appendElem = jQuery('<br> <span>success...<span>');
 	function finnish(){
-		hideLoading('#loadingWaiting');
-		appendElem.remove();
-		updatestarted = 1;
+		// hold msg for a min
+	    setTimeout(function(){ 
+			hideLoading('#loadingWaiting');
+			appendElem.remove();
+			updatestarted = 1;
+	    }, 1200 );		
 	}
 	
 	function showResponse(data, responseText, statusText, xhr, $form){

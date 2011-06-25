@@ -241,7 +241,7 @@ jQuery(document).ready(function() {
 			
 			<p><font size="5"><strong>Change Log</strong></font></p>
             
-            <p>Changes to this package can be viewed by following <a href="https://rcs.pfsense.org/projects/pfsense-packages" target="_blank"><font size="2" color="#990000"><strong>pfSense packages repository</strong></font></a></p>
+            <p>Changes to this package can be viewed by following <a href="https://github.com/bsdperimeter/pfsense-packages/commits/master" target="_blank"><font size="2" color="#990000"><strong>pfSense packages repository</strong></font></a></p>
 
 		</div>
 		

@@ -43,7 +43,6 @@ if(isset($_POST['__csrf_magic'])) {
   unset($_POST['__csrf_magic']);
 }
 
-
 // -------------------------- START snort.conf -------------------------
 
 /* func builds custom whitelests */
@@ -133,7 +132,7 @@ function build_base_whitelist($lanip, $wanip, $wangw, $wandns, $vips, $vpns, $us
 			$vpns_list = filter_get_vpns_list();
 		}
 		
-		if ($vpns_list != '') {
+		if (!empty($vpns_list)) {
 			$home_net .= "$vpns_list ";
 		}
 	}
@@ -194,7 +193,7 @@ function create_snort_homenet($snortNet, $getSnortHomeNet) {
 		
 		$listName = $getSnortHomeNet['homelistname'];
 		
-		if ($listName == 'default' || $listName == '') {
+		if ($listName == 'default' || empty($listName)) {
 			return build_base_whitelist('on','on', 'on', 'on', 'on', 'on', 'off', '');
 		}else{
 			$getSnortWhitelist = snortSql_fetchAllSettings('snortDB', 'SnortWhitelist', 'filename', $listName);
@@ -569,7 +568,9 @@ function generate_snort_conf($uuid)
 	if(!empty($listEnabled_rulesets)) {
 		foreach($listEnabled_rulesets as $enabled_item)
 		{
-			$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item['rulesetname']}\n";
+			if ($enabled_item['enable'] !== 'off') {
+				$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item['rulesetname']}\n";
+			}
 		}
 	}	
 	
@@ -1110,8 +1111,13 @@ function create_snort_conf($uuid)
 		
 }
 
+function build_snort_settings($uuid) {
+	
+	// create snort.conf
+	create_snort_conf($uuid);
+	
+}
+
 // -------------------------- END snort.conf -------------------------
-
-
 
 ?>
