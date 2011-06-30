@@ -114,28 +114,16 @@ a {
 	background-color:#000;
 }
 
-.snortModalUpdate {
-	width:900px;
-	height:500px;
-	position:absolute;
-	z-index:999;
-	background-color:#000;
-}
-
-.snortModalTopUpdate {
-	width:900px;
-	height:25px;
-	background-image:url( '/snort/images/top_modal_bar_lil.jpg' );
-	background-repeat:repeat-x;
-	margin-bottom:1px;
-}
-
 .snortModalTop {
 	width:500px;
 	height:25px;
 	background-image:url( '/snort/images/top_modal_bar_lil.jpg' );
 	background-repeat:repeat-x;
 	margin-bottom:1px;
+}
+
+.snortModalTitle {
+	text-align: center;
 }
 
 .snortModalTopClose {
@@ -146,15 +134,41 @@ a {
 	margin-top:8px;
 }
 
-.snortModalTitle {
-	text-align: center;
+.snortModalUpdate {
+	width: 700px;
+	height: 200px;
+	z-index:999;
+	background-color:#000000;
+}
+
+.snortModalTopUpdate {
+	width: 700px;
+	height: 25px;
+	background-image:url( '/snort/images/top_modal_bar_lil.jpg' );
+	background-repeat:repeat-x;
+	margin-bottom:1px;
 }
 
 .snortModalTitleUpdate {
 	position:absolute;
-	top: 125px;
-	left: 170px; 
-	width: 600px;	
+	left: 50px; 
+	width: 600px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+.snortModalTitleUpdateMsg1 {
+	top: 50px;
+	font-weight: bold;
+	font-size: 24px;
+}
+
+.snortModalTitleUpdateBar {
+	top: 90px;
+}
+
+.snortModalTitleUpdateMsg2 {
+	top: 145px;
 }
 
 .listhdrr2 {

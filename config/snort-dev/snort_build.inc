@@ -565,10 +565,12 @@ function generate_snort_conf($uuid)
 	$listEnabled_rulesets = array();
 	$listEnabled_rulesets = snortSql_fetchAllSettings('snortDBrules', 'SnortRuleSets', 'rdbuuid', $ifaceSettingsArray['ruledbname']);
 	
+	$listCurntDirRules = array();
+	$listCurntDirRules = snortScanDirFilter("/usr/local/etc/snort/sn_{$uuid}/rules", '\.rules');
 	if(!empty($listEnabled_rulesets)) {
 		foreach($listEnabled_rulesets as $enabled_item)
 		{
-			if ($enabled_item['enable'] !== 'off') {
+			if ($enabled_item['enable'] !== 'off' && in_array($enabled_item['rulesetname'], $listCurntDirRules)) {
 				$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item['rulesetname']}\n";
 			}
 		}

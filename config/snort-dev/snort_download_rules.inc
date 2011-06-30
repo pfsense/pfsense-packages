@@ -1,4 +1,3 @@
-#!/usr/local/bin/php
 <?php
 /* $Id$ */
 /*
@@ -45,8 +44,7 @@
  */
 
 // fetch db Settings NONE Json
-// fetch db Settings NONE Json
-function snortSql_fetchAllSettings($dbname, $table, $type, $id_uuid) 
+function snortSql_fetchAllSettings2($dbname, $table, $type, $id_uuid) 
 {
 
 	if ($dbname == '' || $table == '' || $type == '') {
@@ -87,12 +85,91 @@ function snortSql_fetchAllSettings($dbname, $table, $type, $id_uuid)
   
 } // end func
 
+function snortSql_updateRuleSetList($type, $value, $file_size, $downloaded, $filename)
+{	
+
+	$dbname = 'snortDBtemp';
+	$table = 'SnortDownloads';
+	$addDate = date(U);
+	
+	// do let user pick the DB path
+    $db = sqlite_open("/var/snort/{$dbname}");
+
+	if ($type === 'percent2'){
+		$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+		"UPDATE {$table} SET date = '{$addDate}', percent = '{$value}', filesize = '{$file_size}', downloaded = '{$downloaded}' where filename = '{$filename}';
+		");
+	}    
+    
+    
+	if ($type === 'percent'){
+		$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+		"UPDATE {$table} SET date = '{$addDate}', percent = '{$value}' where filename = '{$filename}';
+		");
+	}
+
+	if ($type === 'msg1'){
+		$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+		"UPDATE SnortDownloadsMsg SET date = '{$addDate}', msg = '{$value}' where id = '1';
+		");
+	}
+
+	if ($type === 'msg2'){
+		$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+		"UPDATE SnortDownloadsMsg SET date = '{$addDate}', msg = '{$value}' where id = '2';
+		");
+	}
+
+	/*
+	 * INPORTANT:
+	 * Register worker to prevent loops and ghost process
+	 * Needs to be watched, 
+	 */
+	
+	if ($type === 'working'){
+		
+		$getmypid = getmypid();
+		$getmyfilename = $_SERVER['SCRIPT_NAME'];		
+		
+	    $resultChk = sqlite_query($db,
+	    "SELECT * FROM RegisterWorker WHERE uuid = 'jdjEf!773&h3bhFd6A';
+	    ");
+	
+	    $resultChkFinal = sqlite_fetch_all($resultChk, SQLITE_ASSOC);		
+
+	    if (!empty($resultChkFinal)) {	    
+			$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+			"UPDATE RegisterWorker SET date = '{$addDate}', processid = '{$getmypid}', filename = '{$getmyfilename}', working = '{$value}' where uuid = 'jdjEf!773&h3bhFd6A';
+			");		
+	    }else{	
+			$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+			"INSERT INTO RegisterWorker (date, processid, filename, working, uuid) VALUES ('{$addDate}', '{$getmypid}', '{$getmyfilename}', '{$value}', 'jdjEf!773&h3bhFd6A');
+			");	
+	    }		
+	}
+
+	
+	if ($type === 'snortWait'){
+		$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+		"UPDATE {$table} SET waittime = '{$addDate}' where filename = '{$filename}';
+		");
+	}	
+	
+      if (sqlite_changes($db) < 1){
+        sqlite_close($db);
+        return 'Error in query';   
+      }  
+	    
+	sqlite_close($db);
+    
+    
+}
 
 // reapply rule settings
 function reapplyRuleSettings_run($sidRule_array)
 {
 
-	$sid_array = snortSql_fetchAllSettings('snortDBrules', 'SnortruleSigs', 'rdbuuid', $sidRule_array);
+	$sid_array = snortSql_fetchAllSettings2('snortDBrules', 'SnortruleSigs', 'rdbuuid', $sidRule_array);
 	
 	if (!empty($sid_array)) {
 	foreach ($sid_array as $sid)
@@ -174,98 +251,34 @@ function snortCmpareMD5($type, $path1, $path2, $filename_md5)
  *   update_output_window: update bottom textarea dynamically.
  */
 function update_output_window2($type, $text)
-{
-
+{	
+	if ($type === 'ms1') {
+	$msg = 1;
+	}
+	
+	if ($type === 'ms2') {
+	$msg = 2;
+	}
+	
 	if ($GLOBALS['tmp']['snort']['downloadupdate']['console'] != 'on'){		
-		snortSql_updateRuleSetList($type, $text, '', '', $GLOBALS['tmp']['snort']['downloadupdate']['workingfile']); // write out msg to db	
+		echo
+		'
+<script type="text/javascript">
+jQuery("#msg' . $msg . 'Text").remove();
+jQuery("#UpdateMsg' . $msg . '").append(\'<span id="msg' . $msg . 'Text">' . $text . '</span>\');
+</script>
+		';
+		ob_flush();
+		apc_clear_cache();
+		
 	}else{
 		echo "\n" . $type . ': ' . $text;
 	}
 	
 }
 
-function snortSql_updateRuleSetList($type, $value, $file_size, $downloaded, $filename)
-{	
-
-	$dbname = 'snortDBtemp';
-	$table = 'SnortDownloads';
-	$addDate = date(U);
-	
-	// do let user pick the DB path
-    $db = sqlite_open("/var/snort/{$dbname}");
-
-	if ($type === 'percent2'){
-		$query_ck = sqlite_query($db, // @ supress warnings usonly in production
-		"UPDATE {$table} SET date = '{$addDate}', percent = '{$value}', filesize = '{$file_size}', downloaded = '{$downloaded}' where filename = '{$filename}';
-		");
-	}    
-    
-    
-	if ($type === 'percent'){
-		$query_ck = sqlite_query($db, // @ supress warnings usonly in production
-		"UPDATE {$table} SET date = '{$addDate}', percent = '{$value}' where filename = '{$filename}';
-		");
-	}
-
-	if ($type === 'msg1'){
-		$query_ck = sqlite_query($db, // @ supress warnings usonly in production
-		"UPDATE SnortDownloadsMsg SET date = '{$addDate}', msg = '{$value}' where id = '1';
-		");
-	}
-
-	if ($type === 'msg2'){
-		$query_ck = sqlite_query($db, // @ supress warnings usonly in production
-		"UPDATE SnortDownloadsMsg SET date = '{$addDate}', msg = '{$value}' where id = '2';
-		");
-	}
-
-	/*
-	 * INPORTANT:
-	 * Register worker to prevent loops and ghost process
-	 * Needs to be watched, 
-	 */
-	
-	if ($type === 'working'){
-		
-		$getmypid = getmypid();
-		$getmyfilename = $_SERVER['SCRIPT_NAME'];		
-		
-	    $resultChk = sqlite_query($db,
-	    "SELECT * FROM RegisterWorker WHERE uuid = 'jdjEf!773&h3bhFd6A';
-	    ");
-	
-	    $resultChkFinal = sqlite_fetch_all($resultChk, SQLITE_ASSOC);		
-
-	    if (!empty($resultChkFinal)) {	    
-			$query_ck = sqlite_query($db, // @ supress warnings usonly in production
-			"UPDATE RegisterWorker SET date = '{$addDate}', processid = '{$getmypid}', filename = '{$getmyfilename}', working = '{$value}' where uuid = 'jdjEf!773&h3bhFd6A';
-			");		
-	    }else{	
-			$query_ck = sqlite_query($db, // @ supress warnings usonly in production
-			"INSERT INTO RegisterWorker (date, processid, filename, working, uuid) VALUES ('{$addDate}', '{$getmypid}', '{$getmyfilename}', '{$value}', 'jdjEf!773&h3bhFd6A');
-			");	
-	    }		
-	}
-
-	
-	if ($type === 'snortWait'){
-		$query_ck = sqlite_query($db, // @ supress warnings usonly in production
-		"UPDATE {$table} SET waittime = '{$addDate}' where filename = '{$filename}';
-		");
-	}	
-	
-      if (sqlite_changes($db) < 1){
-        sqlite_close($db);
-        return 'Error in query';   
-      }  
-	    
-	sqlite_close($db);
-    
-    
-}	
-
 // returns array that matches pattern, option to replace objects in matches
-function snortScanDirFilter($arrayList, $pattmatch, $pattreplace, $pattreplacewith)
+function snortScanDirFilter2($arrayList, $pattmatch, $pattreplace, $pattreplacewith)
 {
 	foreach ( $arrayList as $val )
 	{
@@ -282,7 +295,7 @@ function snortScanDirFilter($arrayList, $pattmatch, $pattreplace, $pattreplacewi
 }
 
 // set page vars	
-$generalSettings = snortSql_fetchAllSettings('snortDB', 'SnortSettings', 'id', '1');	
+$generalSettings = snortSql_fetchAllSettings2('snortDB', 'SnortSettings', 'id', '1');	
 
 // Setup file names and dir
 $tmpfname = '/usr/local/etc/snort/snort_download';
@@ -305,6 +318,26 @@ function sendUpdateSnortLogDownload($console)
 	if ($console === 'console'){
 		$GLOBALS['tmp']['snort']['downloadupdate']['console'] = 'on';	
 	}
+	
+	if ($console !== 'console') {
+		
+		echo 
+		'
+<script type="text/javascript">
+jQuery.fn.centerModal = function () {
+    this.css("position","absolute");
+    this.css("top", 70 + "px");
+    this.css("left", ((jQuery(window).width() - this.outerWidth()) / 2) + jQuery(window).scrollLeft() + "px");
+    return this;
+}
+jQuery("#loadingRuleUpadteGUI").show();
+jQuery(".snortModalUpdate").centerModal();
+jQuery("#pb4").progressBar(0, { showText: true, barImage: "/snort/images/progress_bar2.gif", width: 560, height: 43} );
+</script>	
+		';
+		
+	}
+	
 	
 	//bring in the global vars 
 	global $generalSettings, $tmpfname, $snortdir, $snortdir_rules, $emergingdir_rules, $pfsensedir_rules, $customdir_rules, $snort_filename_md5, $snort_filename, $emergingthreats_filename_md5, $emergingthreats_filename, $pfsense_rules_filename_md5, $pfsense_rules_filename;
@@ -412,11 +445,17 @@ function sendUpdateSnortLogDownload($console)
 	 * update_progress_bar($percent): updates the javascript driven progress bar.
 	 */
 	function update_progress_bar2($percent, $file_size, $downloaded)
-	{
-	        if($percent > 100) $percent = 1;
-	        
+	{	        
 	        if ($GLOBALS['tmp']['snort']['downloadupdate']['console'] != 'on') {
-	        	snortSql_updateRuleSetList('percent2', $percent, $file_size, $downloaded, $GLOBALS['tmp']['snort']['downloadupdate']['workingfile']); // write out percent to db
+			if (!empty($percent)) {
+	        	echo 
+	        	'
+<script type="text/javascript">
+jQuery("#pb4").progressBar(' . $percent . ', { showText: true, barImage: "/snort/images/progress_bar2.gif", width: 560, height: 43} );
+</script>	        
+				';
+			}
+	        
 			}else{
 				echo "\n" . 'percent: ' . $percent . ' filesize: ' . $file_size . ' downloaded: ' . $downloaded;
 			}
@@ -500,19 +539,22 @@ function sendUpdateSnortLogDownload($console)
 		}				
 
 		if ($oinkid == '' && $generalSettings['snortdownload'] === 'on') {
-			update_output_window2('ms1', 'You must obtain an oinkid from snort.org and set its value in the Snort settings tab.');
+			update_output_window2('ms1', 'Snort Error!');
+			update_output_window2('ms2', 'You must obtain an oinkid from snort.org and set its value in the Snort settings tab.');
 			exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'You must obtain an oinkid from snort.org and set its value in the Snort settings tab.'");
 			return false;
 		}
 		
 		if ($emergingthreatscode === '' && $generalSettings['snortdownload'] === 'pro') {
-			update_output_window2('ms1', 'You must obtain an emergingthreat pro id from emergingthreatspro.com and set its value in the Snort settings tab.');
+			update_output_window2('ms1', 'Snort Error!');
+			update_output_window2('ms2', 'You must obtain an emergingthreat pro id from emergingthreatspro.com and set its value in the Snort settings tab.');
 			exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'You must obtain an emergingthreat pro id from emergingthreatspro.com and set its value in the Snort settings tab.'");
 			return false;
 		}		
 		
 		if ($generalSettings['snortdownload'] === 'off' && $generalSettings['emergingthreatsdownload'] === 'off') { // note: basic and pro
-			update_output_window2('ms1', 'SnortStartup: No rules have been selected to download.');
+			update_output_window2('ms1', 'Snort Error!');
+			update_output_window2('ms2', 'SnortStartup: No rules have been selected to download.');
 			exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'No rules have been selected to download.'");
 			return false;
 		}		
@@ -526,7 +568,7 @@ function sendUpdateSnortLogDownload($console)
 		
 		// check is we need to wait
 		update_output_window2('ms2', 'Checking Wait Status for Snort.org...');
-		$getSnort_filename_Waittime_chk = snortSql_fetchAllSettings('snortDBtemp', 'SnortDownloads', 'filename', $snort_filename);
+		$getSnort_filename_Waittime_chk = snortSql_fetchAllSettings2('snortDBtemp', 'SnortDownloads', 'filename', $snort_filename);
 		
 		if (date(U) > $getSnort_filename_Waittime_chk['waittime'] + 900) {
 			update_output_window2('ms2', 'Snort.org Wait Time Status: OK...');
@@ -538,7 +580,7 @@ function sendUpdateSnortLogDownload($console)
 
 		// check is we need to wait
 		update_output_window2('ms2', 'Checking Wait Status for Emergingthreats.net...');
-		$getEmergingthreats_filename_Waittime_chk = snortSql_fetchAllSettings('snortDBtemp', 'SnortDownloads', 'filename', $emergingthreats_filename);		
+		$getEmergingthreats_filename_Waittime_chk = snortSql_fetchAllSettings2('snortDBtemp', 'SnortDownloads', 'filename', $emergingthreats_filename);		
 
 		if (date(U) > $getEmergingthreats_filename_Waittime_chk['waittime'] + 900) {
 			update_output_window2('ms2', 'Emergingthreats.net Wait Time Status: OK...');
@@ -557,6 +599,7 @@ function sendUpdateSnortLogDownload($console)
 		if ($snort_md5_check_ok === false) {
 		
 			snort_file_get_contents($tmpfname, $snort_filename_md5, 'http://www.snort.org/pub-bin/oinkmaster.cgi/' . $oinkid);
+			snortSql_updateRuleSetList('percent', '100', '', '', $snort_filename_md5); // finsh percent
 			
 			// if snort.org md5 do not match
 			if(snortCmpareMD5('string', $tmpfname, $snortdir_rules, $snort_filename_md5)) {
@@ -569,6 +612,7 @@ function sendUpdateSnortLogDownload($console)
 		if ($emerg_md5_check_ok === false) {
 		
 			snort_file_get_contents($tmpfname, $emergingthreats_filename_md5, 'http://rules.emergingthreats.net/open/snort-2.9.0');
+			snortSql_updateRuleSetList('percent', '100', '', '', $emergingthreats_filename_md5); // finsh percent
 			
 			// if emergingthreats.net md5 do not match
 			if(snortCmpareMD5('string', $tmpfname, $emergingdir_rules, $emergingthreats_filename_md5)) {
@@ -579,6 +623,7 @@ function sendUpdateSnortLogDownload($console)
 		
 		// download pfsense.org md5 and compare
 		snort_file_get_contents($tmpfname, $pfsense_rules_filename_md5, 'http://www.pfsense.com/packages/config/snort/pfsense_rules');
+		snortSql_updateRuleSetList('percent', '100', '', '', $pfsense_rules_filename_md5); // finsh percent
 		
 		// if pfsense.org md5 do not match
 		if(snortCmpareMD5('string', $tmpfname, $pfsensedir_rules, $pfsense_rules_filename_md5)) {
@@ -633,10 +678,12 @@ function sendUpdateSnortLogDownload($console)
 		
 					$GLOBALS['tmp']['snort']['downloadupdate']['workingfile'] = $snort_filename;
 					update_output_window2('ms1', 'Snort.org: Starting Download...');
+					update_output_window2('ms2', 'May take a while...');
 					download_file_with_progress_bar2("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", $tmpfname, $snort_filename, "read_body_firmware");
 					//download_file_with_progress_bar2("http://theseusnetworking.com/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", $tmpfname, $snort_filename, "read_body_firmware");
-					snortSql_updateRuleSetList('percent', '100', '', '', $snort_filename); // finsh percent	
-					update_output_window2('ms1', 'Snort.org: Finished Download...');
+					update_progress_bar2(100, '', '');	// finsh percent
+					snortSql_updateRuleSetList('percent', '100', '', '', $snort_filename); // finsh percent, add date time finnished
+					update_output_window2('ms2', 'Snort.org: Finished Download...');
 					
 					// if md5 does not match then the file is bad or snort.org says wait 15 min
 					update_output_window2('ms1', 'Snort.org MD5 File Check ...');
@@ -651,8 +698,6 @@ function sendUpdateSnortLogDownload($console)
 						$snort_md5_check_ok = true;
 						$snort_filename_corrupted = true;
 					
-					}else{
-						snortSql_updateRuleSetList('snortWait', '', '', '', $snort_filename); // Register Worker off
 					}			
 		}		
 		
@@ -661,9 +706,11 @@ function sendUpdateSnortLogDownload($console)
 		
 					$GLOBALS['tmp']['snort']['downloadupdate']['workingfile'] = $emergingthreats_filename;
 					update_output_window2('ms1', 'Emergingthreats.net: Starting Download...');
+					update_output_window2('ms2', 'May take a while...');
 					download_file_with_progress_bar2("http://rules.emergingthreats.net/open/snort-2.9.0/{$emergingthreats_filename}", $tmpfname, $emergingthreats_filename, "read_body_firmware");
-					snortSql_updateRuleSetList('percent', '100', '', '', $emergingthreats_filename); // finsh percent	
-					update_output_window2('ms1', 'Emergingthreats.net: Finished Download...');
+					update_progress_bar2(100, '', '');	// finsh percent
+					snortSql_updateRuleSetList('percent', '100', '', '', $emergingthreats_filename); // finsh percent
+					update_output_window2('ms2', 'Emergingthreats.net: Finished Download...');
 					
 					// if md5 does not match then the file is bad or snort.org says wait 15 min
 					update_output_window2('ms1', 'Emergingthreats MD5 File Check ...');
@@ -673,9 +720,7 @@ function sendUpdateSnortLogDownload($console)
 						$emerg_md5_check_ok = true;
 						$emerg_filename_corrupted = true;
 					
-					}else{
-						snortSql_updateRuleSetList('snortWait', '', '', '', $emergingthreats_filename); // Register Worker off
-					}			
+					}		
 		}
 		
 		/* download pfsense rule file */
@@ -683,9 +728,11 @@ function sendUpdateSnortLogDownload($console)
 		
 					$GLOBALS['tmp']['snort']['downloadupdate']['workingfile'] = $pfsense_rules_filename;
 					update_output_window2('ms1', 'pfSense.org: Starting Download...');
+					update_output_window2('ms2', 'May take a while...');
 					download_file_with_progress_bar2("http://www.pfsense.com/packages/config/snort/pfsense_rules/{$pfsense_rules_filename}", $tmpfname, $pfsense_rules_filename, "read_body_firmware");
+					update_progress_bar2(100, '', '');	// finsh percent
 					snortSql_updateRuleSetList('percent', '100', '', '', $pfsense_rules_filename); // finsh percent	
-					update_output_window2('ms1', 'pfSense.org: Finished Download...');
+					update_output_window2('ms2', 'pfSense.org: Finished Download...');
 					
 					// if md5 does not match then the file is bad or snort.org says wait 15 min
 					update_output_window2('ms1', 'pfSense.org MD5 File Check ...');
@@ -694,9 +741,7 @@ function sendUpdateSnortLogDownload($console)
 						// disable snort.org download
 						$pfsense_md5_check_ok = true;
 					
-					}else{
-						snortSql_updateRuleSetList('snortWait', '', '', '', $pfsense_rules_filename); // Register Worker off
-					}			
+					}		
 		}			
 		
 		// if both files are corrupted stop
@@ -747,7 +792,7 @@ function sendUpdateSnortLogDownload($console)
 					exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir_rules} rules/");
 					
 					$snort_dirList = scandir("{$snortdir_rules}/rules"); // Waning: only in php 5
-					$snortrules_filterList = snortScanDirFilter($snort_dirList, '/.*\.rules/', '/\.rules/', '');
+					$snortrules_filterList = snortscandirfilter2($snort_dirList, '/.*\.rules/', '/\.rules/', '');
 					
 					if (!empty($snortrules_filterList)) {		
 						foreach ($snortrules_filterList as $snort_rule_move)
@@ -767,7 +812,7 @@ function sendUpdateSnortLogDownload($console)
 					$so_rulesPattw = array('', '');				
 					
 					// build list of so rules				
-					$so_rules_filterList = snortScanDirFilter($so_rules_list, '/\/.*\.rules/', $so_rulesPattr, $so_rulesPattw);
+					$so_rules_filterList = snortscandirfilter2($so_rules_list, '/\/.*\.rules/', $so_rulesPattr, $so_rulesPattw);
 					
 					if (!empty($so_rules_filterList)) {
 						// cp rule to so tmp dir
@@ -867,7 +912,7 @@ function sendUpdateSnortLogDownload($console)
 		
 		
 		// reapplay rules from DB cp base rules to dirs
-		$sidOnOff_array = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'All', '');
+		$sidOnOff_array = snortSql_fetchAllSettings2('snortDBrules', 'Snortrules', 'All', '');
 		
 		if (!empty($sidOnOff_array)) {
 			update_output_window2('ms1', 'Reapplying User Settings...');
@@ -888,7 +933,7 @@ function sendUpdateSnortLogDownload($console)
 		}
 		
 		// cp snort conf's to Ifaces		
-		$ifaceConfMaps_array = snortSql_fetchAllSettings('snortDB', 'SnortIfaces', 'All', '');
+		$ifaceConfMaps_array = snortSql_fetchAllSettings2('snortDB', 'SnortIfaces', 'All', '');
 		
 		if (!empty($ifaceConfMaps_array)) {
 			update_output_window2('ms1', 'Reapplying User Settings...');
@@ -927,11 +972,14 @@ function sendUpdateSnortLogDownload($console)
 
 
 		//  remove old $tmpfname files */
+		update_output_window2('ms1', 'Removing old files...');
+		update_output_window2('ms2', 'Working...');
 		if (file_exists('/usr/local/etc/snort/tmp')) {
 			exec("/bin/rm -r /usr/local/etc/snort/tmp/snort_rules_up");
 			exec("/bin/rm -r /usr/local/etc/snort/tmp/rules_bk");
 			apc_clear_cache();
 		}
+		update_output_window2('ms2', 'Done...');
 		
 		// php code to flush out cache some people are reportting missing files this might help
 		apc_clear_cache();
@@ -946,6 +994,10 @@ function sendUpdateSnortLogDownload($console)
 		exec("/bin/chmod -R 755  /usr/local/lib/snort");
 		
 		
+		update_output_window2('ms1', 'Finnished Updateing...');
+		update_output_window2('ms2', 'Finnished Updateing...');
+		
+		
 		// if snort is running hard restart, if snort is not running do nothing
 
 		// TODO: Restart Ifaces
@@ -956,13 +1008,13 @@ function sendUpdateSnortLogDownload($console)
 	
 //$argv[1] = 'console';
 
-	$getWorkerStat = snortSql_fetchAllSettings('snortDBtemp', 'RegisterWorker', 'uuid', 'jdjEf!773&h3bhFd6A');
+	//$getWorkerStat = snortSql_fetchAllSettings2('snortDBtemp', 'RegisterWorker', 'uuid', 'jdjEf!773&h3bhFd6A');
 	
-	if ($getWorkerStat['working'] !== 'on') {
-		snortSql_updateRuleSetList('working', 'on', '', '', ''); // Register Worker on
-		sendUpdateSnortLogDownload($argv[1]);	// start main function
-		snortSql_updateRuleSetList('working', 'off', '', '', ''); // Register Worker off
-	}	
+	//if ($getWorkerStat['working'] !== 'on') {
+		//snortSql_updateRuleSetList2('working', 'on', '', '', ''); // Register Worker on
+		//sendUpdateSnortLogDownload($argv[1]);	// start main function
+		//snortSql_updateRuleSetList2('working', 'off', '', '', ''); // Register Worker off
+	//}	
 	
 	
 	

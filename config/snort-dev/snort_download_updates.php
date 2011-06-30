@@ -41,18 +41,80 @@
  
  */
 
-require_once("guiconfig.inc");
-require_once("/usr/local/pkg/snort/snort_new.inc");
-require_once("/usr/local/pkg/snort/snort_gui.inc");
+// disable csrf for downloads, progressbar did not work because of this
+$nocsrf = true;
 
+require_once("guiconfig.inc");
+require_once("/usr/local/pkg/snort/snort_gui.inc");
+require_once("/usr/local/pkg/snort/snort_download_rules.inc");
 
 // set page vars
-
-$generalSettings = snortSql_fetchAllSettings('snortDB', 'SnortSettings', 'id', '1');
+if (isset($_GET['updatenow'])) {
+	$updatenow = $_GET['updatenow'];
+}
 
 header("Cache-Control: no-cache, must-revalidate");
 header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 
+// get dates of md5s
+
+$tmpSettingsSnort = 'N/A';
+$tmpSettingsSnortChk = snortSql_fetchAllSettings2('snortDBtemp', 'SnortDownloads', 'filename', 'snortrules-snapshot-2905.tar.gz');
+if (!empty($tmpSettingsSnortChk)) {
+	$tmpSettingsSnort = date('l jS \of F Y h:i:s A', $tmpSettingsSnortChk[date]);
+}
+
+$tmpSettingsEmerging = 'N/A';
+$tmpSettingsEmergingChk = snortSql_fetchAllSettings2('snortDBtemp', 'SnortDownloads', 'filename', 'emerging.rules.tar.gz');
+if (!empty($tmpSettingsEmergingChk)) {
+	$tmpSettingsEmerging = date('l jS \of F Y h:i:s A', $tmpSettingsEmergingChk[date]);
+}
+
+$tmpSettingsPfsense = 'N/A';
+$tmpSettingsPfsenseChk = snortSql_fetchAllSettings2('snortDBtemp', 'SnortDownloads', 'filename', 'pfsense_rules.tar.gz');
+if (!empty($tmpSettingsPfsenseChk)) {
+	$tmpSettingsPfsense = date('l jS \of F Y h:i:s A', $tmpSettingsPfsenseChk[date]);
+}
+
+// get rule on stats
+$generalSettings = snortSql_fetchAllSettings2('snortDB', 'SnortSettings', 'id', '1');
+
+$snortMd5CurrentChk = @file_get_contents('/usr/local/etc/snort/snortDBrules/snort_rules/snortrules-snapshot-2905.tar.gz.md5');
+
+$snortDownlodChkMark = '';
+if ($generalSettings[snortdownload] === 'on') {
+	$snortDownlodChkMark = 'checked="checked"';
+}
+
+$snortMd5Current = 'N/A';
+if (!empty($snortMd5CurrentChk)) {	
+	preg_match('/^\".*\"/', $snortMd5CurrentChk, $snortMd5Current);	
+	if (!empty($snortMd5Current[0])) {
+		$snortMd5Current = preg_replace('/\"/', '', $snortMd5Current[0]);
+	}
+}
+
+$emergingMd5CurrentChk = @file_get_contents('/usr/local/etc/snort/snortDBrules/emerging_rules/emerging.rules.tar.gz.md5');
+
+$emerginDownlodChkMark = '';
+if ($generalSettings[emergingthreatsdownload] !== 'off') {
+	$emerginDownlodChkMark = 'checked="checked"';
+}
+
+$emergingMd5Current = 'N/A';
+if (!empty($emergingMd5CurrentChk)) {
+	$emergingMd5Current = $emergingMd5CurrentChk;
+}
+
+$pfsenseMd5CurrentChk = @file_get_contents('/usr/local/etc/snort/snortDBrules/pfsense_rules/pfsense_rules.tar.gz.md5');
+
+$pfsenseMd5Current = 'N/A';
+if (!empty($pfsenseMd5CurrentChk)) {	
+	preg_match('/^\".*\"/', $pfsenseMd5CurrentChk, $pfsenseMd5Current);	
+	if (!empty($pfsenseMd5Current[0])) {
+		$pfsenseMd5Current = preg_replace('/\"/', '', $pfsenseMd5Current[0]);
+	}
+}
 
 	$pgtitle = 'Services: Snort: Updates';
 	include("/usr/local/pkg/snort/snort_head.inc");
@@ -63,43 +125,25 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 	
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-
-<!-- loading msg -->
-<div id="loadingWaiting">
-	<div class="snortModal" style="top: 200px; left: 700px;">
-		<div class="snortModalTop">
-			<!-- <div class="snortModalTopClose"><a href="javascript:hideLoading('#loadingWaiting');"><img src="/snort/images/close_9x9.gif" border="0" height="9" width="9"></a></div> -->
-		</div>
-		<div class="snortModalTitle">
-	  		<p><img src="./images/loading.gif" /><br><br>Please Wait...</p>
-	  	</div>
-		<div>
-		<p class="loadingWaitingMessage"></p>
-	  	</div>
-	</div>  
-</div>
-
-<div class="pb_div" id="pb3"></div>	
-
 <!-- loading update msg -->
 <div id="loadingRuleUpadteGUI">
 
 	<div class="snortModalUpdate">
 		<div class="snortModalTopUpdate">
-			<!-- <div class="snortModalTopClose"><a href="javascript:hideLoading('#loadingWaiting');"><img src="/snort/images/close_9x9.gif" border="0" height="9" width="9"></a></div> -->
+			<div class="snortModalTopClose">
+			<!-- <a href="javascript:hideLoading('#loadingRuleUpadteGUI');"><img src="/snort/images/close_9x9.gif" border="0" height="9" width="9"></a> -->
+			</div>
 		</div>
-		<div class="snortModalTitleUpdate">
-				<table style='border-collapse: collapse; border: 1px solid #000000;' cellpadding='2' cellspacing='2'>
-					<tr>
-						<td>
-						<img border='0' src='../themes/<?= $g['theme']; ?>/images/misc/progress_bar.gif' width='600' height='23' name='progressbar' id='progressbar' alt='' />
-						</td>
-					</tr>
+	  			<p id="UpdateMsg1" class="snortModalTitleUpdate snortModalTitleUpdateMsg1">
+				</p>
+		<div class="snortModalTitleUpdate snortModalTitleUpdateBar">
+				<table width="600px" height="43px" border="0" cellpadding="0" cellspacing="0">
+					<tr><td><span class="progressBar" id="pb4"></span></td></tr>
 				</table>
 	  	</div>
-	  			<p class="loadingWaitingMessage">CARS</p>
+	  			<p id="UpdateMsg2" class="snortModalTitleUpdate snortModalTitleUpdateMsg2">
+	  			</p>  	
 	</div> 
-
 
 </div>
 
@@ -134,8 +178,8 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 		<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
 		<ul class="newtabmenu">
 			<li class="newtabmenu_active"><a href="/snort/snort_download_rules.php"><span>Rule Update</span></a></li>
-			<li><a href="#"><span>Upload Custom Rules</span></a></li>
-			<li><a href="#"><span>Gui Update</span></a></li>
+			<!-- <li><a href="#"><span>Upload Custom Rules</span></a></li> -->
+			<!-- <li><a href="#"><span>Gui Update</span></a></li> -->
 		</ul>
 		</div>
 
@@ -151,7 +195,7 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 			<table width="100%" border="0" cellpadding="0" cellspacing="0">			
 				<tr id="maintable77" >
 					<td colspan="2" valign="top" class="listtopic2">
-					There are <?=$countSig; ?> rule databases that are ready to be updated. 
+					Rule databases that are ready to be updated. 
 					</td>
 					<td width="6%" colspan="2" valign="middle" class="listtopic3" >
 					</td>
@@ -176,7 +220,7 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 							<td width="1%" class="listhdrr2">On</td>
 							<td width="25%" class="listhdrr2">Signature DB Name</td>
 							<td width="35%" class="listhdrr2">MD5 Version</td>
-							<td width="38%" class="listhdrr2">New Rule DB Available</td>
+							<td width="38%" class="listhdrr2">Last Rule DB Date</td>
 							<td width="1%" class="listhdrr2">&nbsp;</td>											
 						</tr>
 						
@@ -185,11 +229,11 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 						
 <tr id="fr0" valign="top">
 <td class="odd_ruleset2">
-<input class="domecheck" name="filenamcheckbox2[]" value="1292" checked="checked" type="checkbox" disabled="disabled" >
+<input class="domecheck" name="filenamcheckbox2[]" value="1292" <?=$snortDownlodChkMark;?> type="checkbox" disabled="disabled" >
 </td>
 <td class="odd_ruleset2" id="frd0">SNORT.ORG</td>
-<td class="odd_ruleset2" id="frd0">tcp</td>
-<td class="listbg" id="frd0"><font color="white">ATTACK-RESPONSES directory listing</font></td>
+<td class="odd_ruleset2" id="frd0"><?=$snortMd5Current;?></td>
+<td class="listbg" id="frd0"><font color="white"><?=$tmpSettingsSnort;?></font></td>
 <td class="odd_ruleset2">
 <img src="/themes/pfsense_ng/images/icons/icon_alias_url_reload.gif" title="edit rule" width="17" border="0" height="17">
 </td>
@@ -197,11 +241,11 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 
 <tr id="fr0" valign="top">
 <td class="odd_ruleset2">
-<input class="domecheck" name="filenamcheckbox2[]" value="1292" checked="checked" type="checkbox" disabled="disabled" >
+<input class="domecheck" name="filenamcheckbox2[]" value="1292" <?=$emerginDownlodChkMark;?> type="checkbox" disabled="disabled" >
 </td>
 <td class="odd_ruleset2" id="frd0">EMERGINGTHREATS.NET</td>
-<td class="odd_ruleset2" id="frd0">tcp</td>
-<td class="listbg" id="frd0"><font color="white">ATTACK-RESPONSES directory listing</font></td>
+<td class="odd_ruleset2" id="frd0"><?=$emergingMd5Current;?></td>
+<td class="listbg" id="frd0"><font color="white"><?=$tmpSettingsEmerging; ?></font></td>
 <td class="odd_ruleset2">
 <img src="/themes/pfsense_ng/images/icons/icon_alias_url_reload.gif" title="edit rule" width="17" border="0" height="17">
 </td>
@@ -212,8 +256,8 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 <input class="domecheck" name="filenamcheckbox2[]" value="1292" checked="checked" type="checkbox" disabled="disabled" >
 </td>
 <td class="odd_ruleset2" id="frd0">PFSENSE.ORG</td>
-<td class="odd_ruleset2" id="frd0">tcp</td>
-<td class="listbg" id="frd0"><font color="white">ATTACK-RESPONSES directory listing</font></td>
+<td class="odd_ruleset2" id="frd0"><?=$pfsenseMd5Current;?></td>
+<td class="listbg" id="frd0"><font color="white"><?=$tmpSettingsPfsense;?></font></td>
 <td class="odd_ruleset2">
 <img src="/themes/pfsense_ng/images/icons/icon_alias_url_reload.gif" title="edit rule" width="17" border="0" height="17">
 </td>
@@ -230,7 +274,7 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 			<table width="100%" border="0" cellpadding="0" cellspacing="0">			
 			<tr>
 				<td>
-					<input name="update" type="submit" class="formbtn" value="Update">
+					<input id="openupdatebox" type="submit" class="formbtn" value="Update">
 				</td>
 			</tr>
 			</table>
@@ -272,48 +316,32 @@ header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
 //prepare the form when the DOM is ready 
 jQuery(document).ready(function() {
 
-	jQuery('input[name=update]').live('click', function(){	
+	jQuery('.closeupdatebox').live('click', function(){
+		var url = '/snort/snort_download_updates.php';
+		window.location = url;
+	});	
 
-		// jQuery("#pb2").progressBar(percent,{width: 404, height: 22, barImage: 'images/pb_orange.png'});
-		// console.log(response[0].percent);
-		// '/snort/snort_json_get.php?snortGetUpdate=1'
-		
-		showLoading('#loadingRuleUpadteGUI');
-
-		function callComplete(response) {
-			//alert("Response received is: "+response);
-			
-			while(1)
-			{				
-				console.log('HELLO: ' + response[0].percent);
-				// reconnect to the server
-				//connect();
-
-			if(response[0].percent === '100')
-			{
-				console.log('HELLO: ' + response[0].percent);
-				break;
-			}
-							
-			};
-
-			
-		};
-
-		function connect() {
-			// when the call completes, callComplete() will be called along with
-			// the response returned
-			jQuery.get('/snort/snort_json_get.php?snortGetUpdate=1', {}, callComplete, 'json');
-		};
-		 
-		connect(); // start loop
-		
-
-	}); // end of on click
+	jQuery('#openupdatebox').live('click', function(){
+		var url = '/snort/snort_download_updates.php?updatenow=1';
+		window.location = url;
+	});	
 		
 }); // end of document ready
 
 </script>
+
+<?php
+
+if ($updatenow == 1) {
+	sendUpdateSnortLogDownload('');	// start main function
+	echo '
+	<script type="text/javascript">
+		jQuery(\'.snortModalTopClose\').append(\'<img class="icon_click closeupdatebox" src="/snort/images/close_9x9.gif" border="0" height="9" width="9">\'); 
+	</script>
+	';
+}
+
+?>
 
 
 <!-- stop info box -->
