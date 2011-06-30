@@ -8,7 +8,7 @@ function open_vm_tools_install() {
 	exec("/bin/cp /usr/local/lib/vmware-tools/modules/drivers/*.ko /boot/kernel/");
 	if(!file_exists("/boot/loader.conf")) 
 		touch("/boot/loader.conf");
-	$load_conf = file_get_contents("/boot/loader.conf");
+	$load_conf = file_get_contents("/boot/loader.conf") . "\n";
 	if(!strstr($load_conf, "vmxnet")) {
 		$load_conf .= <<<EOFA
 vmblock_load="YES"
