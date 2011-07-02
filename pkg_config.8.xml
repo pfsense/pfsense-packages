@@ -26,7 +26,7 @@
 		<category>Enhancements</category>
 		<version>0.2</version>
 		<status>BETA</status>
-		<required_version>2.0</required_version>
+		<required_version>3.0</required_version>
 		<maintainer>ey@tm-k.com</maintainer>
 		<config_file>http://www.pfsense.com/packages/config/mactovendor/mactovendor.xml</config_file>
 		<configurationfile>mactovendor.xml</configurationfile>
