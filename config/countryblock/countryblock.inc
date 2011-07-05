@@ -103,8 +103,8 @@ function php_install_command_cb()
 	exec("cp /tmp/interfaces.txt /usr/local/www/packages/countryblock/interfaces.txt");
 	unlink_if_exists("/tmp/interfaces.txt");
 	
-	exec("cp /tmp/CIDR.tar.gz /usr/local/www/packages/countryblock/CIDR.tar.gz");
-	unlink_if_exists("/tmp/CIDR.tar.gz");
+	exec("cp /tmp/CIDR.php /usr/local/www/packages/countryblock/CIDR.tar.gz");
+	unlink_if_exists("/tmp/CIDR.php");
 	
 	exec("tar xzf /usr/local/www/packages/countryblock/CIDR.tar.gz -C /usr/local/www/packages/countryblock/CIDR");
 	exec("rm /usr/local/www/packages/countryblock/CIDR.tar.gz");
