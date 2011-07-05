@@ -93,10 +93,10 @@ function php_install_command_sb()
 	//unlink_if_exists("/tmp/execute.sh");
 	
 		
-	exec("pkg_add /tmp/iplog-2.2.3_3.tbz");
+	exec("pkg_add -r iplog");
 	//unlink_if_exists("/tmp/iplog-2.2.3_3.tbz");
 
-	exec("pkg_add /tmp/nmap.tbz");
+	exec("pkg_add -r nmap");
 	//unlink_if_exists("/tmp/nmap.tbz");
 	
 	exec("/usr/bin/sed -i -e 's/iplog_enable="."NO"."/iplog_enable="."YES"."/g' /usr/local/etc/rc.d/iplog");

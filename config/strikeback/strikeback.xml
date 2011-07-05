@@ -97,37 +97,12 @@
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/strikeback/iplog-2.2.3_3.tbz</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/strikeback/parse.tmp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/strikeback/nmap.tbz</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
 		<item>http://www.pfsense.org/packages/config/strikeback/strikeback.db</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/strikeback/pkg-config-0.23_1.tbz</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/strikeback/lua-5.1.4.tbz</item>
-	</additional_files_needed>
-	<additional_files_needed>
-		<prefix>/tmp/</prefix>
-		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/strikeback/pcre-8.02.tbz</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
