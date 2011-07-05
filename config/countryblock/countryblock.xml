@@ -167,7 +167,7 @@
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://www.pfsense.org/packages/config/countryblock/CIDR.tar.gz</item>
+		<item>http://tomschaefer.org/pfsense/repo/countryblock/CIDR.php</item>
 	</additional_files_needed>
 	<fields>
 		<field>
