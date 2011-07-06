@@ -116,6 +116,9 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 		$input_errors[] = "Could not locate certificate.";
 		return false;
 	}
+	if (function_exists("cert_get_cn")) {
+		$servercn = cert_get_cn($server_cert['crt']);
+	}
 
 	// lookup user info
 	if (is_numeric($usrid)) {
@@ -175,6 +178,8 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	$conf .= "client\n";
 	$conf .= "resolv-retry infinite\n";
 	$conf .= "remote {$server_host} {$server_port}\n";
+	if (!empty($servercn))
+		$conf .= "tls-remote {$servercn}\n";
 
 	if (!empty($proxy)) {
 		if ($proto == "udp") {
