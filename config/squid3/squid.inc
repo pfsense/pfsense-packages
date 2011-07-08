@@ -895,7 +895,7 @@ function squid_resync_traffic() {
 	$down_limit = ($settings['max_download_size'] ? $settings['max_download_size'] : 0);
 	$conf .= "request_body_max_size $up_limit KB\n";
 	if ($down_limit != 0)
-		$conf .= 'reply_body_max_size ' . ($down_limit * 1024) . " all \n";
+		$conf .= 'reply_body_max_size ' . $down_limit . " KB all \n";		
 
 	// Only apply throttling past 10MB
 	// XXX: Should this really be hardcoded?
