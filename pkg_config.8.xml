@@ -773,12 +773,12 @@
 		<descr>EXPERIMENTAL! Not all directives are ported yet! High performance web proxy cache.</descr>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>3.1.9_0.1</version>
+		<version>3.1.14_0.1</version>
 		<status>ALPHA</status>
 		<required_version>2.0</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>squid-3.1.9.tbz</depends_on_package>
+		<depends_on_package>squid-3.1.14.tbz</depends_on_package>
 		<depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
 		<!-- Do not add build paths please, it conflicts with squid 2.x -->
