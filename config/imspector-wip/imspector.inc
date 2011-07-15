@@ -227,26 +227,33 @@
 				}
 				
 				// Handle Jabber SSL options
-				if($imspector_config["ssl_ca_key"] && 
-				   $imspector_config["ssl_ca_cert"] &&
-				   $imspector_config["serverkey"]) {
+				if(isset($imspector_config["ssl_ca_cert"]) && $imspector_config["ssl_ca_cert"] != "none" &&
+				   isset($imspector_config["ssl_server_cert"]) && $imspector_config["ssl_server_cert"] != "none") {
 					$conf['ssl'] = "on";
 					if(!is_dir("/usr/local/etc/imspector/ssl"))	
 						mkdir("/usr/local/etc/imspector/ssl");
-					if(base64_decode($imspector_config["ssl_ca_key"])) {
-						file_put_contents("/usr/local/etc/imspector/ssl/ssl_ca_key.pem", 
-							base64_decode($imspector_config["ssl_ca_key"]));
-						$conf['ssl_ca_key'] = '/usr/local/etc/imspector/ssl/ssl_ca_key.pem';
-					}
-					if(base64_decode($imspector_config["ssl_ca_cert"])) {
-						file_put_contents("/usr/local/etc/imspector/ssl/ssl_ca_cert.pem", 
-							base64_decode($imspector_config["ssl_ca_cert"]));
-						$conf['ssl_ca_key'] = "/usr/local/etc/imspector/ssl/ssl_ca_cert.pem";
-					}
-					if(base64_decode($imspector_config["serverkey"])) {
-						file_put_contents("/usr/local/etc/imspector/ssl/serverkey.pem", 
-							base64_decode($imspector_config["serverkey"]));
-						$conf['ssl_key'] = '/usr/local/etc/imspector/ssl/serverkey.pem';
+						
+					$ca_cert = lookup_ca($imspector_config["ssl_ca_cert"]);
+					if ($ca_cert != false) {
+						if(base64_decode($ca_cert['prv'])) {
+							file_put_contents("/usr/local/etc/imspector/ssl/ssl_ca_key.pem", 
+								base64_decode($ca_cert['prv']));
+							$conf['ssl_ca_key'] = '/usr/local/etc/imspector/ssl/ssl_ca_key.pem';
+						}
+						if(base64_decode($ca_cert['crt'])) {
+							file_put_contents("/usr/local/etc/imspector/ssl/ssl_ca_cert.pem", 
+								base64_decode($ca_cert['crt']));
+							$conf['ssl_ca_key'] = "/usr/local/etc/imspector/ssl/ssl_ca_cert.pem";
+						}
+						$svr_cert = lookup_cert($imspector_config["ssl_server_cert"]);
+						if ($svr_cert != false) {
+							if(base64_decode($svr_cert['prv'])) {
+								file_put_contents("/usr/local/etc/imspector/ssl/ssl_server_key.pem", 
+									base64_decode($svr_cert['prv']));
+								$conf['ssl_key'] = '/usr/local/etc/imspector/ssl/ssl_server_key.pem';
+							}
+							
+						}
 					}
 				} else {
 					// SSL Not enabled.  Make sure Jabber-SSL is not processed.
@@ -318,4 +325,25 @@ EOD;
 		config_unlock();		
 	}
 
+	function imspector_get_ca_certs() {
+		global $config;
+
+		$ca_arr = array();
+		$ca_arr[] = array('refid' => 'none', 'descr' => 'none');
+		foreach ($config['ca'] as $ca) {
+			$ca_arr[] = array('refid' => $ca['refid'], 'descr' => $ca['descr']);
+		}
+		return $ca_arr;
+	}
+
+	function imspector_get_server_certs() {
+		global $config;
+		$cert_arr = array();
+		$cert_arr[] = array('refid' => 'none', 'descr' => 'none');
+		
+		foreach ($config['cert'] as $cert) {
+			$cert_arr[] = array('refid' => $cert['refid'], 'descr' => $cert['descr']);
+		}
+		return $cert_arr;
+	}
 ?>

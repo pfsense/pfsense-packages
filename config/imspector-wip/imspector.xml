@@ -100,7 +100,7 @@
 			<fieldname>proto_array</fieldname>
 			<description>You can use the CTRL or COMMAND key to select multiple protocols.  NOTE: Gtalk/Jabber-SSL requires SSL certificates.</description>
 			<type>select</type>
-			<size>4</size>
+			<size>7</size>
 			<required/>
 			<multiple>true</multiple>
  			<options>
@@ -168,36 +168,25 @@
 		</field>
 		<field>
 			<fielddescr>SSL Certificate</fielddescr>
-			<fieldname>serverkey</fieldname>
+			<fieldname>ssl_server_cert</fieldname>
 			<description>
-				Enter the SSL Server Certificate here.
+				Choose the SSL Server Certificate here.
 			</description>
-			<type>textarea</type>
-			<encoding>base64</encoding>
-			<rows>5</rows>
-			<cols>40</cols>
-		</field>
-		<field>
-			<fielddescr>SSL CA Key</fielddescr>
-			<fieldname>ssl_ca_key</fieldname>
-			<description>
-				Enter the SSL CA key here.
-			</description>
-			<type>textarea</type>
-			<encoding>base64</encoding>
-			<rows>5</rows>
-			<cols>40</cols>
+			<type>select_source</type>
+			<source><![CDATA[imspector_get_server_certs()]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
 		</field>
 		<field>
 			<fielddescr>SSL CA Certificate</fielddescr>
 			<fieldname>ssl_ca_cert</fieldname>
 			<description>
-				Enter the SSL CA Certficate here.
+				Choose the SSL CA Certficate here.
 			</description>
-			<type>textarea</type>
-			<encoding>base64</encoding>
-			<rows>5</rows>
-			<cols>40</cols>
+			<type>select_source</type>
+			<source><![CDATA[imspector_get_ca_certs()]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
 		</field>
 		<field>
 			<fielddescr>Enable bad word filtering</fielddescr>
