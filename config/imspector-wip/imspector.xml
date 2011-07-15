@@ -195,6 +195,60 @@
 			<type>checkbox</type>
 		</field>
 		<field>
+			<fielddescr>Enable response messages</fielddescr>
+			<fieldname>resonder</fieldname>
+			<description> 
+				Inform the users (both local and remote) that the conversation they are having is being recorded. This might be needed for legal reasons.  
+				Inform the sender that a file (or message) was blocked. This is useful because the sender will know a block occured, instead of the transfer simply failing.</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Notification frequency</fielddescr>
+			<fieldname>notice_days</fieldname>
+			<type>input</type>
+			<description>Frequency in number of days for notifying users they are being logged.  Default 1 day if responses are enabled, set to 0 to disable</description>
+		</field>		
+		<field>
+			<fielddescr>Filtered frequency</fielddescr>
+			<fieldname>filtered_minutes</fieldname>
+			<type>input</type>
+			<description>The time between sending “filtered” in minutes. Default 15 minutes if responses are enabled, set to 0 to disable</description>
+		</field>
+		<field>
+			<fielddescr>Custom message prefix</fielddescr>
+			<fieldname>prefix_message</fieldname>
+			<description>
+				Message to prepend to all IMSpector generated messages.  The default is "Message from IMSpector"
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>5</rows>
+			<cols>40</cols>
+		</field>
+		<field>
+			<fielddescr>Custom recorded message response</fielddescr>
+			<fieldname>recorded_message</fieldname>
+			<description>
+				Message to send to users to let them know they are being recorded.  The default is "Your activities are being logged"
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>5</rows>
+			<cols>40</cols>
+		</field>
+		<field>
+			<fielddescr>Custom filtered message response</fielddescr>
+			<fieldname>filtered_message</fieldname>
+			<description>
+				Message to send to users to let them know about filtered messages.
+			</description>
+			<type>textarea</type>
+			<encoding>base64</encoding>
+			<rows>5</rows>
+			<cols>40</cols>
+		</field>
+		
+		<field>
 			<fielddescr>Bad words list</fielddescr>
 			<fieldname>badwords_list</fieldname>
 			<description>
