@@ -265,7 +265,7 @@
 				if (isset($imspector_config['resonder']) && $imspector_config['resonder'] == 'on') {
 					$conf['responder_filename'] = IMSPECTOR_ETC . "/responder.db";
 					if (isset($imspector_config['prefix_message']) && $imspector_config['prefix_message'] != '' ) {
-						$conf['response_prefix'] = base64_decode($imspector_config['prefix_message']);
+						$conf['response_prefix'] = base64_decode($imspector_config['prefix_message']) . " -=";
 					}
 					if (isset($imspector_config['notice_days']) && is_numeric($imspector_config['notice_days'])) {
 						if ($imspector_config['notice_days'] != 0) {
