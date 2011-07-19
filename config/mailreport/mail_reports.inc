@@ -155,7 +155,7 @@ function set_mail_report_cron_jobs($a_mailreports) {
 		$cron_item['month'] = isset($report['monthofyear']) ? $report['monthofyear'] : "*";;
 		$cron_item['wday'] = isset($report['dayofweek']) ? $report['dayofweek'] : "*";
 		$cron_item['who'] = "root";
-		$cron_item['command'] = "/usr/local/bin/mail_reports_generate.php {$id}";
+		$cron_item['command'] = "/usr/local/bin/mail_reports_generate.php {$id} &";
 		$config['cron']['item'][] = $cron_item;
 	}
 }
