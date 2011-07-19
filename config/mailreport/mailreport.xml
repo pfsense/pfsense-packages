@@ -56,6 +56,7 @@
 		<prefix>/etc/inc/phpmailer/</prefix>
 		<item>http://www.pfsense.com/packages/config/mailreport/class.pop3.php</item>
 	</additional_files_needed>
+	<additional_files_needed>
 		<prefix>/etc/inc/phpmailer/</prefix>
 		<item>http://www.pfsense.com/packages/config/mailreport/class.smtp.php</item>
 	</additional_files_needed>
