@@ -1072,5 +1072,15 @@
 		<maintainer>erik@erikkristensen.com</maintainer>
 		<configurationfile>nrpe2.xml</configurationfile>
 	</package>
+	<package>
+		<name>mailreport</name>
+		<descr>Allows you to setup periodic e-mail reports containing RRD graphs.</descr>
+		<category>Network Management</category>
+		<version>1.0</version>
+		<status>BETA</status>
+		<required_version>2.0</required_version>
+		<config_file>http://www.pfsense.com/packages/config/mailreport/mailreport.xml</config_file>
+		<configurationfile>mailreport.xml</configurationfile>
+	</package>
 </packages>
 </pfsensepkgs>
