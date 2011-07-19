@@ -80,7 +80,7 @@
 		<field>
 			<type>listtopic</type>
 			<fieldname>temp</fieldname>
-			<name>Enbable Varnish configuration sync</name>
+			<name>Enable Varnish configuration sync</name>
 		</field>		
 		<field>
 			<fielddescr>Automatically sync Varnish configuration changes</fielddescr>
@@ -95,13 +95,13 @@
 		</field>		
 		<field>
 			<fielddescr>IP Address</fielddescr>
-			<fieldname>ipaddress</fieldname>
+			<fieldname>ipaddress1</fieldname>
 			<description>The IP address of the first host that Varnish will Sync its Varnish configuration data to.</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fielddescr>Password</fielddescr>
-			<fieldname>password</fieldname>
+			<fieldname>password1</fieldname>
 			<description>Admin password of the first host that Varnish will Sync its Varnish configuration data to.</description>
 			<type>password</type>
 		</field>
