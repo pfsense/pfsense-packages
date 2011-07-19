@@ -185,7 +185,7 @@
 		</field>		
 		<field>
 			<fielddescr>Probe URL</fielddescr>
-			<fieldname>probe_interval</fieldname>
+			<fieldname>probe_url</fieldname>
 			<description>Enter the URL that varnish will use to ensure that this backend is healthy.</description>
 			<type>input</type>
 		</field>
