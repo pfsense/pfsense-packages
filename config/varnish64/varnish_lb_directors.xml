@@ -130,6 +130,8 @@
 			<options>
 				<option><name>Round-robin</name><value>round-robin</value></option>
 				<option><name>Random</name><value>random</value></option>
+				<option><name>Client</name><value>client</value></option>
+
 			</options>
 		</field>
 		<field>
