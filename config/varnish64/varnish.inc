@@ -216,7 +216,7 @@ function get_backend_config_txt() {
 			if($backend['port'])
 				$connect_timeout = $backend['port'] . "s";
 			else 
-				$connect_timeout = "80";
+				$connect_timeout = "80s";
 			if($backend['first_byte_timeout'])
 				$first_byte_timeout = $backend['first_byte_timeout'] . "s";
 			else 
@@ -433,7 +433,7 @@ function varnish_sync_on_changes() {
 	$previous_ip = "";
 	$x=0;
 	$sh = $config['installedpackages']['varnishsync']['config'][0];
-	for($x=1; $x<isset($sh[$x]); $x++) {
+	for($x=1; $x<7); $x++) {
 		if($x > 1) 
 			$counter = $x;
 		else 
