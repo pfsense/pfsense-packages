@@ -150,7 +150,7 @@ function set_mail_report_cron_jobs($a_mailreports) {
 	foreach($a_mailreports as $id => $report) {
 		$cron_item = array();
 		$cron_item['minute'] = 0;
-		$cron_item['hour'] = isset($report['hourofday']) ? $report['hourofday'] : 0;
+		$cron_item['hour'] = isset($report['timeofday']) ? $report['timeofday'] : 0;
 		$cron_item['mday'] = isset($report['dayofmonth']) ? $report['dayofmonth'] : "*";
 		$cron_item['month'] = isset($report['monthofyear']) ? $report['monthofyear'] : "*";;
 		$cron_item['wday'] = isset($report['dayofweek']) ? $report['dayofweek'] : "*";
