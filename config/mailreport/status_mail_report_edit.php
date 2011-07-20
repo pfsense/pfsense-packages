@@ -136,8 +136,9 @@ if ($_POST) {
 
 	// Fix up cron job(s)
 	set_mail_report_cron_jobs($a_mailreports);
-
 	write_config();
+	configure_cron();
+
 	header("Location: status_mail_report.php");
 	exit;
 }

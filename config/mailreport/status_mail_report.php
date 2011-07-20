@@ -60,6 +60,7 @@ if ($_GET['act'] == "del") {
 		set_mail_report_cron_jobs($a_mailreports);
 
 		write_config("Removed Mail Report '{$name}'");
+		configure_cron();
 		header("Location: status_mail_report.php");
 		exit;
 	}
