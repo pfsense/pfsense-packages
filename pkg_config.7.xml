@@ -1089,8 +1089,8 @@
 		<name>Pre-2.0 Upgrade Check</name>
 		<descr>Pre-2.0 Upgrade Check</descr>
 		<category>System</category>
-		<depends_on_package_base_url>http://ftp-archive.freebsd.org/mirror/FreeBSD-Archive/ports/i386/packages-7.2-release/Latest/</depends_on_package_base_url>
-		<depends_on_package>libxml2.tbz</depends_on_package>
+		<depends_on_package_base_url>http://ftp-archive.freebsd.org/mirror/FreeBSD-Archive/ports/i386/packages-7.2-release/All/</depends_on_package_base_url>
+		<depends_on_package>libxml2-2.7.3.tbz</depends_on_package>
 		<config_file>http://www.pfsense.com/packages/config/pre2upgrade/pre2upgrade.xml</config_file>
 		<version>1.0</version>
 		<status>Stable</status>
