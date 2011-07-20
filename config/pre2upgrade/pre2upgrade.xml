@@ -38,7 +38,7 @@
 	</copyright>
 	<name>pre2upgrade</name>
 	<version>1.0</version>
-	<title>System: Pre-2.0 Upgrade Check</title>
+	<title>Diagnostics: Pre-2.0 Upgrade Check</title>
 	<additional_files_needed>
 		<prefix>/usr/local/www/</prefix>
 		<item>http://www.pfsense.com/packages/config/pre2upgrade/pre2upgrade.php</item>
@@ -46,7 +46,7 @@
 	<menu>
 		<name>Pre-Upgrade Check</name>
 		<tooltiptext>Check your system for potential 2.0 upgrade issues.</tooltiptext>
-		<section>System</section>
+		<section>Diagnostics</section>
 		<url>/pre2upgrade.php</url>
 	</menu>
 	<custom_php_deinstall_command>

@@ -29,7 +29,7 @@
 require_once("config.inc");
 require_once("guiconfig.inc");
 
-$pgtitle = "System: Pre 2.0 Upgrade Check";
+$pgtitle = "Diagnostics: Pre 2.0 Upgrade Check";
 include("head.inc");
 
 exec("/usr/local/bin/xmllint /conf/config.xml 2>&1", $out, $err);
