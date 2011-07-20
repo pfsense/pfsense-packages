@@ -118,6 +118,7 @@ $snortlogCurrentDSKsize = round(exec('df -k /var | grep -v "Filesystem" | awk \'
 			<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
 			<li class="newtabmenu_active"><a href="/snort/snort_interfaces_global.php"><span>Global Settings</span></a></li>
 			<li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
+			<li><a href="/snort/snort_interfaces_rules.php"><span>RulesDB</span></a></li>
 			<li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
 			<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
 			<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
