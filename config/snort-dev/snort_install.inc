@@ -141,13 +141,14 @@ function snort_postinstall()
 		exec('/usr/bin/touch /usr/local/etc/snort/snortDBrules/DB/default/rules/local.rules');
 	}	
 	
+	// create and cp to tmp db dir
 	if (!file_exists('/var/snort/')) {
 		exec('/bin/mkdir -p /var/snort/');
 	}
 	
-	if (!file_exists('/usr/local/pkg/snort/snortDBtemp')) {
-		exec('/bin/mv /var/snort/snortDBtemp');
-	}	
+	if (file_exists('/usr/local/pkg/snort/snortDBtemp')) {
+		exec('/bin/cp /usr/local/pkg/snort/snortDBtemp /var/snort/snortDBtemp');
+	}		
 	
 	// cleanup default files
 	if(file_exists('/usr/local/etc/snort/snort.conf-sample')) {
@@ -248,10 +249,15 @@ function snort_postinstall()
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/transparentbg.png');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/up.gif');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/up2.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/close_9x9.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/new_tab_menu.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/progress_bar2.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/top_modal_bar_lil.jpg');
 	chdir ("/usr/local/www/snort/javascript/");
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery-1.6.1.min.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery-1.6.2.min.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery.form.js');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/snort_globalsend.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery.progressbar.min.js');
 
 	/* back to default */
 	chdir ('/root/');
@@ -279,7 +285,7 @@ function snort_postinstall()
 
 	conf_mount_ro();
 
-}
+} // END of Post Install
 
 function snort_deinstall()
 {

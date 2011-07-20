@@ -85,18 +85,7 @@ $snortRuleDir = '/usr/local/etc/snort/snortDBrules/DB/' . $rdbuuid;
 	$workingFile = $snortRuleDir . '/rules/' . $rulefile;
 	
 function load_rule_file($incoming_file, $splitcontents)
-{
-
-	//read snort file
-	$filehandle = fopen($incoming_file, "r");
-
-	//read file into string, and get filesize
-	$contents = fread($filehandle, filesize($incoming_file));
-
-	//close handler
-	fclose ($filehandle);
-
-	
+{	
 		$pattern = '/(^alert |^# alert )/';
 	 	foreach ( $splitcontents  as $val )
 	 	{
