@@ -51,6 +51,16 @@ if(isset($_POST['__csrf_magic'])) {
 require_once("config.inc");
 require_once("functions.inc");
 
+
+// create and cp to tmp db dir
+if (!file_exists('/var/snort/')) {
+	exec('/bin/mkdir -p /var/snort/');
+}
+
+if (file_exists('/usr/local/pkg/snort/snortDBtemp')) {
+	exec('/bin/cp /usr/local/pkg/snort/snortDBtemp /var/snort/snortDBtemp');
+}
+
 // Wites selected sig  to file
 function snortSidStringRuleEditGUI()
 {

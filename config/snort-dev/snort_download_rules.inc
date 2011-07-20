@@ -43,6 +43,17 @@
  * 
  */
 
+
+// create and cp to tmp db dir
+if (!file_exists('/var/snort/')) {
+	exec('/bin/mkdir -p /var/snort/');
+}
+
+if (file_exists('/usr/local/pkg/snort/snortDBtemp')) {
+	exec('/bin/cp /usr/local/pkg/snort/snortDBtemp /var/snort/snortDBtemp');
+}
+
+
 // fetch db Settings NONE Json
 function snortSql_fetchAllSettings2($dbname, $table, $type, $id_uuid) 
 {
