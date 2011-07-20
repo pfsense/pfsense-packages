@@ -308,6 +308,69 @@ function sync_package_varnish() {
 			if($vcl['vcl_pipe_late']) 
 				$vcl_pipe_late = $vcl['vcl_pipe_late'];
 		}
+		$vcl_recv_basic='#BASIC VCL RULES'."\n";
+		foreach($config['installedpackages']['varnishsettings']['config'] as $vcl) {
+                        if($vcl['sessioncache']){
+                                $vcl_recv_basic.="\t#Disable session cache\n";
+                                $vcl_recv_basic.="\t".'if (req.http.Cookie && req.http.Cookie ~ "(JSESSION|PHPSESSID)"){return(pass);}'."\n";
+                                $vcl_recv_basic.="\t".'if (req.http.X-Requested-With == "XMLHttpRequest" || req.url ~ "nocache"){return(pass);}'."\n\n";
+                                }
+                        if($vcl['postcache']){
+                                $vcl_recv_basic.="\t#Disable post cache\n";
+                                $vcl_recv_basic.="\t".'if (req.request == "POST"){return(pass);}'."\n\n";
+                                }
+                        if($vcl['imagecache']){
+                                $vcl_recv_basic.="\t#Enable image cache\n";
+                                $vcl_recv_basic.="\t".'if (req.request=="GET" && req.url ~ "\.(css|js|gif|jpg|jpeg|bmp|png|ico|img|tga|wmf)$") {remove req.http.cookie;return(lookup);}' ."\n\n";
+                                }
+                        if($vcl['fixgzip']){
+                                $vcl_recv_basic.="\t#Fix gzip compression\n";
+                                $vcl_recv_basic.="\t".'if (req.http.Accept-Encoding) {'."\n";
+                                $vcl_recv_basic.="\t".'if (req.url ~ "\.(gif|jpg|jpeg|bmp|png|ico|img|tga|wmf|gz|tgz|bz2|tbz|mp3|ogg)$") {remove req.http.Accept-Encoding;}'."\n";
+                                $vcl_recv_basic.="\t".'else if (req.http.Accept-Encoding ~ "gzip") {set req.http.Accept-Encoding = "gzip";}'."\n";
+                                $vcl_recv_basic.="\t".'else if (req.http.Accept-Encoding ~ "deflate") {set req.http.Accept-Encoding = "deflate";}'."\n";
+                                $vcl_recv_basic.="\t".'else {remove req.http.Accept-Encoding;}}'."\n\n";
+                                }
+                        if($vcl['rfc2616']){
+                                $vcl_recv_basic.="\t#Be rfc2616 compliant\n";
+                                $vcl_recv_basic.="\t".'if (req.request != "GET" && req.request != "HEAD" && req.request != "PUT" && req.request != "POST" &&'."\n";
+                                $vcl_recv_basic.="\t".'    req.request != "TRACE" && req.request != "OPTIONS" && req.request != "DELETE") {return(pipe);}'."\n\n";
+                                }
+if($vcl['xforward']){
+                                $vcl_recv_basic.="\t#set X-forward\n";
+                                switch ($vcl['xforward']){
+                                        case 'set':
+                                                $vcl_recv_basic.="\t".'set req.http.X-Forwarded-For = client.ip;'."\n\n";
+                                        break;
+                                        case 'append':
+                                                $vcl_recv_basic.="\t".'set req.http.X-Forwarded-For = req.http.X-Forwarded-For "," client.ip;'."\n\n";
+                                        break;
+                                        case 'create':
+                                                $vcl_recv_basic.="\t".'set req.http.X-Forwarded-Varnish = client.ip;'."\n\n";
+                                        break;
+                                        case 'unset':
+                                                $vcl_recv_basic.="\t".'unset req.http.X-Forwarded-For;'."\n\n";
+                                        break;
+                                        }
+                                }
+                        if($vcl['clientbalance']){
+                                $vcl_recv_basic.="\t#set client balance identity\n";
+                                switch ($vcl['clientbalance']){
+                                        case 'url':
+                                                $vcl_recv_basic.="\t".'set client.identity = req.url;'."\n\n";
+                                        break;
+                                        case 'ip':
+                                                $vcl_recv_basic.="\t".'set client.identity = client.ip;'."\n\n";
+                                        break;
+                                        case 'agent':
+                                                $vcl_recv_basic.="\t".'set client.identity = req.http.user-agent;'."\n\n";
+                                        break;
+                                        }
+                                }
+                        if($vcl['htmlerror'] && !$errorvcl){
+                                $errorvcl=$vcl['htmlerror'];
+                                }
+		}
 	}
 
 	if(!$errorvcl) 
@@ -369,28 +432,7 @@ sub vcl_error {
 
 sub vcl_recv {
 	{$vcl_recv_early}
-	# If the client sent an X-Forwarded-For header, remove it. 
-	# It cannot betrusted.
-	unset req.http.X-Forwarded-For;
-	# Note that we don't need to add the client ip to the X-Forwarded-For 
-	# header, varnish will do that for us
-	if (req.http.Accept-Encoding) {
-		# Handle compression correctly. Varnish treats headers literally
-		# not semantically. So it is very well possible that there are
-		# cache misses because the headers sent by different browsers
-		# aren't the same.
-		# @see: http:// varnish.projects.linpro.no/wiki/FAQ/Compression
-		if (req.http.Accept-Encoding ~ "gzip") {
-			# if the browser supports it, we'll use gzip
-			set req.http.Accept-Encoding = "gzip";
-		} elsif (req.http.Accept-Encoding ~ "deflate") {
-			# next, try deflate if it is supported
-			set req.http.Accept-Encoding = "deflate";
-		} else {
-			# unknown algorithm. Probably junk, remove it
-			unset req.http.Accept-Encoding;
-		}
-	}
+	{$vcl_recv_basic}
 	{$urlmappings}
 	{$vcl_recv_late}
 	if (req.request != "GET" && req.request != "HEAD") {
