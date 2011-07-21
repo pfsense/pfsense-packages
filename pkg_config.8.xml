@@ -312,6 +312,11 @@
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>perl-5.12.4.tbz</depends_on_package>
+		<depends_on_package>daq-0.5_1.tbz</depends_on_package>
+		<depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
+		<depends_on_package>libnet11-1.1.2.1_3,1.tbz</depends_on_package>
+		<depends_on_package>libpcap-1.1.1_1.tbz</depends_on_package>
+		<depends_on_package>pcre-8.12.tbz</depends_on_package>
 		<depends_on_package>snortsam-2.70.tbz</depends_on_package>
 		<depends_on_package>snort-2.9.0.5.tbz</depends_on_package>
 		<build_port_path>/usr/home/pfsense/tools/pfPorts/snort</build_port_path>
