@@ -178,7 +178,7 @@ $a_rules = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'All', '');
 	<span class="vexpl">
 	<span class="red"><strong>Note:</strong></span>
 	<p><span class="vexpl">
-		Here you can create event filtering and suppression for your snort package rules.<br>
+		Here you can create rule databases that can be used on multiple interfaces.<br>
 		Please note that you must restart a running rule so that changes can take effect.<br>
 	</span></p>
 	</td>

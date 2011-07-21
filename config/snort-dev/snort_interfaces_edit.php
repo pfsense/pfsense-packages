@@ -326,9 +326,9 @@ jQuery(document).ready(function() {
 						
 					</select>
 					<br>
-					<span class="vexpl">Choose the home net you will like this rule to use. &nbsp;<span class="red">Note:</span>&nbsp;Default homenet adds only local networks.
+					<span class="vexpl">Choose the rule database to use. &nbsp;<span class="red">Note:</span>&nbsp;Cahnges to this database are global.
 					<br>
-					<span class="red">Hint:</span>&nbsp;Most users add a list offriendly ips that the firewall cant see.</span>
+					<span class="red">WARNING:</span>&nbsp;Never change this when snort is running.</span>
 				</td>
 			</tr>			
 					
