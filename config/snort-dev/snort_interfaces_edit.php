@@ -90,6 +90,12 @@ if (!is_array($a_suppresslist)) {
 // start a jQuery sand box
 jQuery(document).ready(function() { 
 
+	// misc call after a good save
+	jQuery.fn.miscTabCall = function () {
+		jQuery('.hide_newtabmenu').show();
+		jQuery('#interface').attr("disabled", true);
+	};	
+
 	// START disable option for snort_interfaces_edit.php
 	endis = !(jQuery('input[name=enable]:checked').val());
 		
@@ -229,7 +235,7 @@ jQuery(document).ready(function() {
 			<tr>
 				<td width="22%" valign="top" class="vncellreq2">Interface</td>
 				<td width="78%" class="vtable">
-					<select name="interface" class="formfld">
+					<select id="interface" name="interface" class="formfld">
 						
 				<?php 					
 					/* add group interfaces */
@@ -316,7 +322,7 @@ jQuery(document).ready(function() {
 						foreach ($a_rules as $value)
 						{
 							$selected = '';
-							if ($value['uuid'] == $a_list['ruledbname'] && $value['enable'] !== 'off') {
+							if ($value['uuid'] == $a_list['ruledbname']) {
 								$selected = 'selected';
 							}
 								

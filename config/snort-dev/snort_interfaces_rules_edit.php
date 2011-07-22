@@ -45,11 +45,6 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_new.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 
-// set page vars
-if (isset($_GET['uuid'])) {
-	$uuid = $_GET['uuid'];
-}
-
 if (isset($_GET['rdbuuid'])) {
 	$rdbuuid = $_GET['rdbuuid'];
 }else{
@@ -57,33 +52,88 @@ if (isset($_GET['rdbuuid'])) {
 	$rdbuuid = $ruledbname_pre1['ruledbname'];
 }
 
-$a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $rdbuuid);
+if ($rdbuuid !== 'default') {
 
+	$a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $rdbuuid);
+	
+	// $a_list returns empty use defaults
+	if ($a_list == '') {
+	  
+	  $a_list = array(
+	      'id' => '',
+	      'date' => date(U),
+	      'uuid' => $rdbuuid,
+	      'ruledbname' => '',
+	      'description' => ''
+	
+	  );
+	  
+	}
 
-// $a_list returns empty use defaults
-if ($a_list == '')
-{
-  
-  $a_list = array(
-      'id' => '',
-      'date' => date(U),
-      'uuid' => $rdbuuid,
-      'ruledbnamename' => '',
-      'description' => ''
-
-  );
-  
 }
 
+if ($rdbuuid === 'default') {
+	
+	// $a_list returns empty use defaults
+	if ($a_list == '') {
+	  
+	  $a_list = array(
+	      'id' => '1',
+	      'date' => date(U),
+	      'uuid' => $rdbuuid,
+	      'ruledbname' => 'default',
+	      'description' => 'Default database'
+	
+	  );
+	  
+	}
 
+}
+
+if ( !empty($a_list['id']) ) {
+	$disabled = 'disabled="disabled"';
+}else{
+	$disabled = '';
+}
+
+if ( $rdbuuid === 'default' ) {
+	$disabled_ckbox = 'disabled="disabled"';
+}else{
+	$disabled_ckbox = '';
+}
 
 
 	$pgtitle = 'Services: Snort: Rules: Edit: ' . $rdbuuid;
 	include('/usr/local/pkg/snort/snort_head.inc');
 
 ?>
-		
-	
+
+<!-- START page custom script -->
+<script language="JavaScript">
+
+// start a jQuery sand box
+jQuery(document).ready(function() {
+
+	// misc call after a good save
+	jQuery.fn.miscTabCall = function () {
+		jQuery('.hide_newtabmenu').show();		
+		jQuery('#ruledbname').attr("disabled", true);
+	};
+
+	<?php
+	// disable tabs if nothing in database
+	if ($a_list['id'] == '') {
+		echo '
+			jQuery(\'.hide_newtabmenu\').hide();
+		';
+	}
+	?>
+
+
+}); // end of on ready
+
+</script>
+
 <body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <!-- loading msg -->
@@ -134,7 +184,7 @@ if ($a_list == '')
 		<td>
 		<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
 		<ul class="newtabmenu">
-		<li class="hide_newtabmenu newtabmenu_active"><a href="/snort/snort_interfaces_rules.php?rdbuuid=<?=$rdbuuid;?>"><span>Rules DB Edit</span></a></li>
+		<li class="newtabmenu_active"><a href="/snort/snort_interfaces_rules_edit.php?rdbuuid=<?=$rdbuuid;?>"><span>Rules DB Edit</span></a></li>
 		<li class="hide_newtabmenu"><a href="/snort/snort_rulesets.php?rdbuuid=<?=$rdbuuid;?>"><span>Categories</span></a></li>
 		<li class="hide_newtabmenu"><a href="/snort/snort_rules.php?rdbuuid=<?=$rdbuuid;?>"><span>Rules</span></a></li>
 		</ul>
@@ -162,26 +212,18 @@ if ($a_list == '')
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">
 			<tr>
 				<td colspan="2" valign="top" class="listtopic">Add the name and description of the rule DB</td>
-			</tr>
-			<tr>
-				<td width="22%" valign="top" class="vncellreq2">RuleDB</td>
-				<td width="22%" valign="top" class="vtable">
-					&nbsp; 
-					<input name="enable" type="checkbox" value="on" <?=$ifaceEnabled = $a_list['enable'] == 'on' || $a_list['enable'] == '' ? 'checked' : '';?> ">
-					&nbsp;&nbsp;<span class="vexpl">Enable or Disable</span>
-				</td>
-			</tr>			
+			</tr>		
 			<tr>
 				<td valign="top" class="vncellreq2">Name</td>
 				<td class="vtable">
-				<input class="formfld2" name="ruledbname" type="text" id="ruledbname" size="40" value="<?=$a_list['ruledbname'] ?>" /> <br />
+				<input class="formfld2" name="ruledbname" type="text" id="ruledbname" size="40" value="<?=$a_list['ruledbname'] ?>" <?=$disabled?> /> <br />
 				<span class="vexpl"> The list name may only consist of the characters a-z, A-Z and 0-9. <span class="red">Note: </span> No Spaces. </span>
 				</td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Description</td>
 				<td width="78%" class="vtable">
-				<input class="formfld2" name="description" type="text" id="description" size="40" value="<?=$a_list['description'] ?>" /> <br />
+				<input class="formfld2" name="description" type="text" id="description" size="40" value="<?=$a_list['description'] ?>" <?=$disabled_ckbox?> /> <br />
 				<span class="vexpl"> You may enter a description here for your reference (not parsed). </span>
 				</td>
 			</tr>
@@ -197,10 +239,16 @@ if ($a_list == '')
 			</tr>
 		</table>
 			<tr>
-				<td style="padding-left: 10px;">
-				<input name="Submit" type="submit" class="formbtn" value="Save">
-				<input id="cancel" type="button" class="formbtn" value="Cancel">
-				</td>
+			<?php
+			if ($rdbuuid !== 'default') {
+				echo '
+					<td style="padding-left: 10px;">
+					<input name="Submit" type="submit" class="formbtn" value="Save" >
+					<input id="cancel" type="button" class="formbtn" value="Cancel" >
+					</td>
+					';
+			}
+			?>	
 			</tr>
 </form>
 		

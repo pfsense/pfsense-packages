@@ -143,7 +143,7 @@ jQuery(document).ready(function() {
 		    this.css("top", 70 + "px");
 		    this.css("left", ((jQuery(window).width() - this.outerWidth()) / 2) + jQuery(window).scrollLeft() + "px");
 		    return this;
-		}
+		};
 		
 		
   //--------------------------- START select all code ---------------------------
@@ -372,8 +372,8 @@ jQuery(document).ready(function() {
 				// Clean up Waiting code
 				finnish();
 				
-				if (data.snortUnhideTabs === 'true'){
-					jQuery('.hide_newtabmenu').show();
+				if (data.snortMiscTabCall === 'true'){
+					jQuery.fn.miscTabCall(); // call tab misc functions
 				}
 				
 				if (data.snortreset) {location.reload();} // hard refresh

@@ -61,6 +61,31 @@ if (file_exists('/usr/local/pkg/snort/snortDBtemp')) {
 	exec('/bin/cp /usr/local/pkg/snort/snortDBtemp /var/snort/snortDBtemp');
 }
 
+/*
+* make dir for the new iface, if iface exists or rule dir has changed redo soft link
+*/
+function snortRulesCreateSoftlink() 
+{
+	$newSnortDir = 'sn_' . $_POST['uuid'];
+	$pathToSnortDir = '/usr/local/etc/snort';			
+		
+	// change the rule path
+	if (is_dir("{$pathToSnortDir}/{$newSnortDir}")) {
+			
+		$snortCurrentRuleDbName = snortSql_fetchAllSettings('snortDB', 'snortIfaces', 'uuid', $_POST['uuid']);
+	
+		if ($_POST['ruledbname'] !== $snortCurrentRuleDbName['ruledbname'] || !file_exists("{$pathToSnortDir}/{$newSnortDir}/rules")) {
+			
+			// NOTE: use full paths or link rm will not work, Freebsd love
+			exec("/bin/rm {$pathToSnortDir}/{$newSnortDir}/rules");
+			exec("/bin/ln -s /usr/local/etc/snort/snortDBrules/DB/{$_POST['ruledbname']}/rules {$pathToSnortDir}/{$newSnortDir}/rules");
+			
+		}
+		
+	}
+}
+
+
 // Wites selected sig  to file
 function snortSidStringRuleEditGUI()
 {

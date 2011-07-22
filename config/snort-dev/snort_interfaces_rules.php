@@ -45,6 +45,7 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_new.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 
+$a_rules = array();
 $a_rules = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'All', '');
 
 	if (!is_array($a_rules)) {
@@ -55,6 +56,18 @@ $a_rules = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'All', '');
 		echo 'Error';
 		exit(0);
 	}
+	
+	// list rules in db that are on in a array
+	$listOnRules = array();
+	$listOnRules = snortSql_fetchAllSettings('snortDB', 'SnortIfaces', 'All', '');
+	
+	foreach ($listOnRules as $listOnRule)
+	{
+	
+		$listUsedRules[] = $listOnRule['ruledbname'];
+	
+	}	
+	unset($listOnRules);
 
 	$pgtitle = "Services: Snort: Rules";
 	include("/usr/local/pkg/snort/snort_head.inc");
@@ -112,53 +125,90 @@ $a_rules = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'All', '');
 	</tr>
 	<tr>
 		<td id="tdbggrey">
-		<table width="100%" border="0" cellpadding="10px" cellspacing="0">
+		<table width="100%" border="0px" cellpadding="10px" cellspacing="0px">
 		<tr>
 		<td class="tabnavtbl">
-		<table width="100%" border="0" cellpadding="6" cellspacing="0">
+		<table width="100%" border="0px" cellpadding="0px" cellspacing="0px">
 		<!-- START MAIN AREA -->
+		
+		<table width="94%">				
+			<tr > <!-- db to lookup -->
+				<td width="32%" class="listhdrr">File Name</td>
+				<td width="68%" class="listhdr">Description</td>
+			</tr>
+		</table>
+		
+		<table width="100%">
+		
+				
 						
-			<tr> <!-- db to lookup -->
-				<td width="30%" class="listhdrr">File Name</td>
-				<td width="70%" class="listhdr">Description</td>
-				<td width="10%" class="list"></td>
-			</tr>
-			<?php foreach ($a_rules as $list): ?>
-			<tr id="maintable_<?=$list['uuid']?>" data-options='{"pagetable":"Snortrules", "pagedb":"snortDBrules", "DoPOST":"true"}' >
-				<td class="listlr" ondblclick="document.location='snort_interfaces_suppress_edit.php?uuid=<?=$list['uuid'];?>'"><?=$list['ruledbname'];?></td>
-				<td class="listbg" ondblclick="document.location='snort_interfaces_suppress_edit.php?uuid=<?=$list['uuid'];?>'">
-				<font color="#FFFFFF"> <?=htmlspecialchars($list['description']);?>&nbsp;</font>
-				</td>
-				<td></td>
-				<td valign="middle" nowrap class="list">
-				<table border="0" cellspacing="0" cellpadding="1">
-					<tr>
-						<td valign="middle">
-						<a href="snort_interfaces_rules_edit.php?rdbuuid=<?=$list['uuid'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"width="17" height="17" border="0" title="edit suppress list"></a>
-						</td>
-						<td>
-						<img id="icon_x_<?=$list['uuid'];?>" class="icon_click icon_x" src="/themes/<?= $g['theme']; ?>/images/icons/icon_x.gif" width="17" height="17" border="0" title="delete list" >
-						</a>
-						</td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-			<?php $i++; endforeach; ?>
-			<tr>
-				<td class="list" colspan="3"></td>
-				<td class="list">
-				<table border="0" cellspacing="0" cellpadding="1">
-			<tr>
-				<td valign="middle" width="17">&nbsp;</td>
-				<td valign="middle"><a href="snort_interfaces_rules_edit.php?rdbuuid=<?=genAlphaNumMixFast(11, 12);?> "><img src="/themes/nervecenter/images/icons/icon_plus.gif" width="17" height="17" border="0" title="add a new list"></a></td>
-					</tr>
-				</table>
-				</td>
-			</tr>
-				</table>				
-				</td>
-			</tr>	
+		<table width="100%" >
+
+
+		<tr id="maintable_default" data-options='{"pagetable":"Snortrules", "pagedb":"snortDBrules", "DoPOST":"true"}' >
+			<td class="listlr" width="32%" ondblclick="document.location='snort_interfaces_rules_edit.php?rdbuuid=default'">Default</td>
+			<td class="listbg" width="68%" ondblclick="document.location='snort_interfaces_rules_edit.php?rdbuuid=default'">
+			<font color="#FFFFFF">Default rule database&nbsp;</font>
+			</td>
+			
+			<td valign="middle" nowrap class="list">
+			<table border="0" cellspacing="0" cellpadding="1">
+				<tr>
+					<td valign="middle">
+					<a href="snort_interfaces_rules_edit.php?rdbuuid=default"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"width="17" height="17" border="0" title="edit database"></a>
+					</td>
+					<td>
+					<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" border="0" title="delete database" >
+					</td>					
+				</tr>
+			</table>
+			</td>			
+		</tr>
+
+		
+		<?php foreach ($a_rules as $list): ?>
+		
+		<?php
+		if (in_array($list['uuid'], $listUsedRules)) {
+			$deleteObject = '<img src="/themes/' . $g['theme'] . '/images/icons/icon_x_d.gif" width="17" height="17" border="0" title="delete database" >';
+		}else{
+			$deleteObject = '<img id="icon_x_' . $list['uuid'] . '" class="icon_click icon_x" src="/themes/' . $g['theme'] . '/images/icons/icon_x.gif" width="17" height="17" border="0" title="delete database" >';
+		}
+		?>
+		
+		<tr id="maintable_<?=$list['uuid']?>" data-options='{"pagetable":"Snortrules", "pagedb":"snortDBrules", "DoPOST":"true"}' >
+			<td class="listlr" width="32%" ondblclick="document.location='snort_interfaces_rules_edit.php?rdbuuid=<?=$list['uuid'];?>'"><?=$list['ruledbname'];?></td>
+			<td class="listbg" width="68%" ondblclick="document.location='snort_interfaces_rules_edit.php?rdbuuid=<?=$list['uuid'];?>'">
+			<font color="#FFFFFF"> <?=htmlspecialchars($list['description']);?>&nbsp;</font>
+			</td>
+			
+			<td valign="middle" nowrap class="list">
+			<table border="0" cellspacing="0" cellpadding="1">
+				<tr>
+					<td valign="middle">
+					<a href="snort_interfaces_rules_edit.php?rdbuuid=<?=$list['uuid'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"width="17" height="17" border="0" title="edit database"></a>
+					</td>
+					<td>
+					<?=$deleteObject; ?>
+					</td>
+				</tr>
+			</table>
+			</td>			
+			
+		</tr>
+		<?php $i++; endforeach; ?>
+
+		</table>
+			
+		<table width="100%">	
+		<tr>
+			<td class="list" width="97%" valign="middle" width="17">&nbsp;</td>
+			<td width="3%" ></td>
+			<td class="list" valign="middle"><a href="snort_interfaces_rules_edit.php?rdbuuid=<?=genAlphaNumMixFast(11, 12);?> "><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_plus.gif" width="17" height="17" border="0" title="add a new database"></a></td>
+		</tr>
+		</table >		
+			
+		</table>
 		
 		<!-- STOP MAIN AREA -->
 		</table>
@@ -178,8 +228,11 @@ $a_rules = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'All', '');
 	<span class="vexpl">
 	<span class="red"><strong>Note:</strong></span>
 	<p><span class="vexpl">
-		Here you can create rule databases that can be used on multiple interfaces.<br>
-		Please note that you must restart a running rule so that changes can take effect.<br>
+		Here you can create rule databases that can be used on multiple interfaces.<br><br>
+		
+		Please note that you must restart a running rule so that changes can take effect.<br><br>
+		
+		You may only delete rule databases that are not asigned to an interface.<br>
 	</span></p>
 	</td>
 </table>

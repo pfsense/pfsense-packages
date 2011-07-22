@@ -54,7 +54,7 @@ if(isset($_POST['__csrf_magic']))  {
 function snortJsonReturnCode($returnStatus)
 {		
 	if ($returnStatus == true) {
-		echo '{"snortgeneralsettings":"success","snortUnhideTabs":"true"}';
+		echo '{"snortgeneralsettings":"success","snortMiscTabCall":"true"}';
 		return true;
 	}else{
 		echo '{"snortgeneralsettings":"fail"}';
@@ -250,29 +250,16 @@ if ($_POST['snortSaveSettings'] == 1)  {
 					* make dir for the new iface, if iface exists or rule dir has changed redo soft link
 					* may need to move this as a func to new_snort.inc
 					*/
-				      
-						$newSnortDir = 'sn_' . $_POST['uuid'];
-						$pathToSnortDir = '/usr/local/etc/snort';			
-							
-						// creat iface dir and ifcae rules dir
-						if (!is_dir("{$pathToSnortDir}/{$newSnortDir}")) {
-							createNewIfaceDir($pathToSnortDir, $newSnortDir);
-						} //end of mkdir	 			
-							
-						// change the rule path
-						if (is_dir("{$pathToSnortDir}/{$newSnortDir}")) {
-								
-							$snortCurrentRuleDbName = snortSql_fetchAllSettings('snortDB', 'snortIfaces', 'uuid', $_POST['uuid']);
-		
-							if ($_POST['ruledbname'] !== $snortCurrentRuleDbName['ruledbname'] || !file_exists("{$pathToSnortDir}/{$newSnortDir}/rules")) {
-								
-								// NOTE: use full paths or link rm will not work, Freebsd love
-								exec("/bin/rm {$pathToSnortDir}/{$newSnortDir}/rules");
-								exec("/bin/ln -s /usr/local/etc/snort/snortDBrules/DB/{$_POST['ruledbname']}/rules {$pathToSnortDir}/{$newSnortDir}/rules");
-								
-							}
-							
-						}
+					$newSnortDir = 'sn_' . $_POST['uuid'];
+					$pathToSnortDir = '/usr/local/etc/snort';			
+						
+					// creat iface dir and ifcae rules dir
+					if (!is_dir("{$pathToSnortDir}/{$newSnortDir}")) {
+						createNewIfaceDir($pathToSnortDir, $newSnortDir);
+					} //end of mkdir
+					
+					snortRulesCreateSoftlink();
+	
 				}
 				SnortIfaces_Snort_Interfaces_edit();						
 			          
