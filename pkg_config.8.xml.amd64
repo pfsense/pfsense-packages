@@ -357,8 +357,9 @@
 		<depends_on_package>pcre-8.12.tbz</depends_on_package>
 		<depends_on_package>snortsam-2.70.tbz</depends_on_package>
 		<depends_on_package>snort-2.9.0.5.tbz</depends_on_package>
-		<build_port_path>/usr/home/pfsense/tools/pfPorts/snort</build_port_path>
-		<build_port_path>/usr/home/pfsense/tools/pfPorts/snortsam</build_port_path>			
+		<build_port_path>/usr/ports/security/snortsam</build_port_path>
+		<build_port_path>/usr/ports/security/snort</build_port_path>
+		<build_options>WITH_IPV6=true WITH_MPLS=true WITH_GRE=true WITHOUT_TARGETBASED=true WITH_DECODERPRE=true WITH_ZLIB=true WITH_NORMALIZER=true WITH_REACT=true WITH_PERFPROFILE=true WITH_FLEXRESP3=true WITHOUT_MYSQL=true WITHOUT_ODBC=true WITHOUT_POSTGRESQL=true WITHOUT_PRELUDE=true WITH_SNORTSAM=true WITH_PFSENSE=true</build_options>		
 		<config_file>http://www.pfsense.com/packages/config/snort-dev/snort.xml</config_file>
 		<version>2.9.0.5 pkg v. 2.0</version>
 		<required_version>2.0</required_version>
