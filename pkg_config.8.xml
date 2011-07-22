@@ -312,15 +312,10 @@
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>perl-5.12.4.tbz</depends_on_package>
-		<depends_on_package>daq-0.5_1.tbz</depends_on_package>
-		<depends_on_package>libdnet-1.11_3.tbz</depends_on_package>
-		<depends_on_package>libnet11-1.1.2.1_3,1.tbz</depends_on_package>
-		<depends_on_package>libpcap-1.1.1_1.tbz</depends_on_package>
-		<depends_on_package>pcre-8.12.tbz</depends_on_package>
 		<depends_on_package>snortsam-2.70.tbz</depends_on_package>
 		<depends_on_package>snort-2.9.0.5.tbz</depends_on_package>
-		<build_port_path>/usr/ports/security/snortsam</build_port_path>
 		<build_port_path>/usr/ports/security/snort</build_port_path>
+		<build_port_path>/usr/ports/security/snortsam</build_port_path>
 		<build_options>WITH_IPV6=true WITH_MPLS=true WITH_GRE=true WITHOUT_TARGETBASED=true WITH_DECODERPRE=true WITH_ZLIB=true WITH_NORMALIZER=true WITH_REACT=true WITH_PERFPROFILE=true WITH_FLEXRESP3=true WITHOUT_MYSQL=true WITHOUT_ODBC=true WITHOUT_POSTGRESQL=true WITHOUT_PRELUDE=true WITH_SNORTSAM=true WITH_PFSENSE=true</build_options>		
 		<config_file>http://www.pfsense.com/packages/config/snort-dev/snort.xml</config_file>
 		<version>2.9.0.5 pkg v. 2.0</version>
