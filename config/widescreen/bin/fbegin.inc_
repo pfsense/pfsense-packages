@@ -1,4 +1,3 @@
-
 <script src="/javascript/sorttable.js"></script>
 
 <?php
@@ -186,8 +185,10 @@ $diagnostics_menu[] = array("DNS Lookup", "/diag_dns.php");
 $diagnostics_menu[] = array("Edit File", "/edit.php");
 $diagnostics_menu[] = array("Factory Defaults", "/diag_defaults.php");
 $diagnostics_menu[] = array("Halt System", "/halt.php" );
-$diagnostics_menu[] = array("Tables", "/diag_tables.php");
+$diagnostics_menu[] = array("Limiter Info", "/diag_limiter_info.php");
+$diagnostics_menu[] = array("NDP Table", "/diag_ndp.php");
 $diagnostics_menu[] = array("Ping", "/diag_ping.php");
+$diagnostics_menu[] = array("pfInfo", "/diag_pf_info.php");
 $diagnostics_menu[] = array("pfTOP", "/diag_system_pftop.php");
 $diagnostics_menu[] = array("Reboot", "/reboot.php");
 $diagnostics_menu[] = array("Routes", "/diag_routes.php");
@@ -195,6 +196,7 @@ $diagnostics_menu[] = array("SMART Status", "/diag_smart.php");
 $diagnostics_menu[] = array("States", "/diag_dump_states.php");
 $diagnostics_menu[] = array("States Summary", "/diag_states_summary.php");
 $diagnostics_menu[] = array("System Activity", "/diag_system_activity.php");
+$diagnostics_menu[] = array("Tables", "/diag_tables.php");
 $diagnostics_menu[] = array("Traceroute", "/diag_traceroute.php");
 $diagnostics_menu[] = array("Packet Capture", "/diag_packet_capture.php");
 if($g['platform'] == "nanobsd")
