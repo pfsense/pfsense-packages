@@ -172,10 +172,11 @@
 		<depends_on_package>gdbm-1.8.3_3.tbz</depends_on_package>
 		<depends_on_package>perl-5.12.3.tbz</depends_on_package>
 		<depends_on_package>libpcap-1.1.1_1.tbz</depends_on_package>
-		<depends_on_package>GeoIP-1.4.7.tbz</depends_on_package>
+		<depends_on_package>GeoIP-1.4.8_1.tbz</depends_on_package>
 		<depends_on_package>font-util-1.2.0.tbz</depends_on_package>
 		<depends_on_package>webfonts-0.30_6.tbz</depends_on_package>
 		<depends_on_package>ntop-4.0.1_1.tbz</depends_on_package>
+		<build_port_path>/usr/ports/net/GeoIP</build_port_path>
 		<build_port_path>/usr/ports/databases/gdbm</build_port_path>
 		<build_port_path>/usr/ports/databases/rrdtool12</build_port_path>
 		<build_port_path>/usr/ports/x11-fonts/font-util</build_port_path>
