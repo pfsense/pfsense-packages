@@ -61,6 +61,7 @@ $a_rules = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'All', '');
 	$listOnRules = array();
 	$listOnRules = snortSql_fetchAllSettings('snortDB', 'SnortIfaces', 'All', '');
 	
+	$listUsedRules = array();	
 	foreach ($listOnRules as $listOnRule)
 	{
 	

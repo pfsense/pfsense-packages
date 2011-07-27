@@ -46,6 +46,15 @@ require_once("/usr/local/pkg/snort/snort_new.inc");
 
 session_start(); // alwaya at the very top of a php page or "Cannot send session cache limiter - headers already sent"
 
+// get json blocls sids
+if ($_GET['snortsamjson'] == 1) {
+	
+	exec('cat /usr/local/etc/snort/sn_6TPXv7a/rules/dbBlockSplit/splitSidblock' . $_GET['fileid'] . '.block', $output);
+	echo $output[0];
+	
+}
+
+
 // upload created log tar to user
 if ($_GET['snortGetUpdate'] == 1) {
 	

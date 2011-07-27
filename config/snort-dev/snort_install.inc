@@ -252,6 +252,7 @@ function snort_postinstall()
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/close_9x9.gif');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/new_tab_menu.png');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/progress_bar2.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/progressbar.gif');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/top_modal_bar_lil.jpg');
 	chdir ("/usr/local/www/snort/javascript/");
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery-1.6.2.min.js');

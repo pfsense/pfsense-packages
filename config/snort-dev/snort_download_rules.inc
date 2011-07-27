@@ -207,6 +207,7 @@ function reapplyRuleSettings_run($sidRule_array)
 	// disable a sid
 	// sed -i '' "s/^\(alert.*sid:1225;.*\)/# \1/" /usr/local/etc/snort/snortDBrules/DB/RAjFYOrC04D6/rules/snort_x11.rules	
 	// grep "^alert.*sid:.*;" rules/emerging-worm.rules | grep -oh "\w*sid:[0-9][^*;]\w*" | awk -F: '{print $2}'
+	// sed -n '/^320 || .*/{p;q;}' rules/ ../etc/sid-msg.map | awk -F '|' '{print $3}' | sed -e 's/^[ \t]*//'
 
 
 }

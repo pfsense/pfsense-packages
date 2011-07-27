@@ -62,6 +62,19 @@ function snortJsonReturnCode($returnStatus)
 	}
 }
 
+// snortsam save settings
+if ($_POST['snortSamSaveSettings'] == 1) {
+
+	unset($_POST['snortSamSaveSettings']);
+	
+	function snortSamSaveFunc() 
+	{	
+		print_r($_POST[snortsam][db]);
+	}
+	snortSamSaveFunc();
+	
+}
+
 // row from db by uuid
 if ($_POST['snortSidRuleEdit'] == 1) {
 	

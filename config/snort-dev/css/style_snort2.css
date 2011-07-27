@@ -4,17 +4,16 @@
 a {
 	font-size: 11px;		
 }
-*/
-
+*/	
 
 #right {
 
 	position: relative;
 	top: -10px;
 	left: 0px;
-	width: 770px;
+	width: 800px;
 	margin-top: 0px;
-	margin-left: 5px;
+	margin-left: 0px;
 	margin-right: 5px;
 	padding-top: 20px;
 	padding-left: 0px;
