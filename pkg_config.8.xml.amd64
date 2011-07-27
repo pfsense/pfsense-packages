@@ -41,7 +41,7 @@
 		<required_version>2</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>squid-2.7.9.tbz</depends_on_package>
+		<depends_on_package>squid-2.7.9_1.tbz</depends_on_package>
 		<depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
 		<build_port_path>/usr/ports/www/squid</build_port_path>
