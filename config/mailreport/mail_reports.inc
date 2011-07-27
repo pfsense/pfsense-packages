@@ -301,16 +301,14 @@ function mail_report_generate_graph($database, $style, $graph, $start, $end) {
 	// log_error("start $start, end $end, archivestart $archivestart, average $average, scale $scale, seconds $seconds");
 
 	/* Deduce a interface if possible and use the description */
-	$curif = split("-", $curdatabase);
-	$curif = "$curif[0]";
-	$friendly = convert_friendly_interface_to_friendly_descr(strtolower($curif));
-	if($friendly == "") {
-		$friendly = $curif;
+	$curif = explode("-", $curdatabase);
+	$curif[1] = str_replace(".rrd", "", $curif[1]);
+	$friendly = convert_friendly_interface_to_friendly_descr(strtolower($curif[0]));
+	if(!empty($friendly)) {
+		$curif[0] = $friendly;
 	}
-	$search = array("-", ".rrd", $curif);
-	$replace = array(" :: ", "", $friendly);
-	$prettydb = ucwords(str_replace($search, $replace, $curdatabase));
-
+	$prettydb = ucwords(implode(" :: ", $curif));
+	$curif = $curif[0];
 
 	$rrddbpath = "/var/db/rrd/";
 	$rrdtmppath = "/tmp/";

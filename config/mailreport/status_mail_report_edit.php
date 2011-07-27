@@ -138,7 +138,6 @@ if ($_POST) {
 	set_mail_report_cron_jobs($a_mailreports);
 	write_config();
 	configure_cron();
-
 	header("Location: status_mail_report.php");
 	exit;
 }
@@ -239,10 +238,13 @@ include("head.inc");
 			<?php endif; ?>
 		</tr>
 		<?php $i = 0; foreach ($a_graphs as $graph): 
-			$optionc = split("-", $graph['graph']);
-			$search = array("-", ".rrd", $optionc);
-			$replace = array(" :: ", "", $friendly);
-			$prettyprint = ucwords(str_replace($search, $replace, $graph['graph']));
+			$optionc = explode("-", $graph['graph']);
+			$optionc[1] = str_replace(".rrd", "", $optionc[1]);
+			$friendly = convert_friendly_interface_to_friendly_descr(strtolower($optionc[0]));
+			if(!empty($friendly)) {
+				$optionc[0] = $friendly;
+			}
+			$prettyprint = ucwords(implode(" :: ", $optionc));
 		?>
 		<tr ondblclick="document.location='status_mail_report_edit.php?id=<?=$i;?>'">
 			<td class="listlr"><?php echo $prettyprint; ?></td>

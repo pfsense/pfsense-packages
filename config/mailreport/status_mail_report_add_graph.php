@@ -183,12 +183,15 @@ include("head.inc");
 				<select name="graph" class="formselect" style="z-index: -10;">
 				<?php
 				foreach ($custom_databases as $db => $database) {
-					$optionc = split("-", $database);
-					$search = array("-", ".rrd", $optionc);
-					$replace = array(" :: ", "", $friendly);
+					$optionc = explode("-", $database);
+					$optionc[1] = str_replace(".rrd", "", $optionc[1]);
+					$friendly = convert_friendly_interface_to_friendly_descr(strtolower($optionc[0]));
+					if(!empty($friendly)) {
+						$optionc[0] = $friendly;
+					}
+					$prettyprint = ucwords(implode(" :: ", $optionc));
 					echo "<option value=\"{$database}\"";
-					$prettyprint = ucwords(str_replace($search, $replace, $database));
-					if($pconfig['graph'] == $database) {
+					if ($pconfig['graph'] == $database) {
 						echo " selected";
 					}
 					echo ">" . htmlspecialchars($prettyprint) . "</option>\n";
