@@ -52,7 +52,7 @@ function havp_avdb_info($filename)
 
             # datetime
             $dt = explode(" ", $s[1]);
-            $s[1] = strftime("%d.%m.%Y", strtotime("{$dt[0]} {$dt[1]} {$dt[2]}"));
+            $s[1] = strftime("%m.%d.%Y", strtotime("{$dt[0]} {$dt[1]} {$dt[2]}"));
             if ($s[0] == 'ClamAV-VDB')
                 $r .= "<tr class='listr'><td>{$filename}</td><td $stl>{$s[1]}</td><td $stl>{$s[2]}</td><td $stl>{$s[7]}</td></tr>";
         }
@@ -66,6 +66,7 @@ function dwg_avbases_info()
     $db  = '<table width="100%" border="0" cellspacing="0" cellpadding="1" ><tbody>';
     $db .= '<tr class="vncellt" ><td>Database</td><td>Date</td><td>Ver.</td><td>Builder</td></tr>';
     $db .= havp_avdb_info("daily.cld");
+    $db .= havp_avdb_info("bytecode.cld");
     $db .= havp_avdb_info("main.cvd");
     $db .= havp_avdb_info("safebrowsing.cld");
     $db .= '</tbody></table>';
