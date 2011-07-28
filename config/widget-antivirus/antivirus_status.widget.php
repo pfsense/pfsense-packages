@@ -39,6 +39,11 @@ define('PATH_CLAMDB',   '/var/db/clamav');
 define('PATH_HAVPLOG',  '/var/log/havp/access.log');
 define('PATH_AVSTATUS', '/var/tmp/havp.status');
 
+
+if (file_exists("/usr/local/pkg/havp.inc"))
+   require_once("/usr/local/pkg/havp.inc");
+else echo "No havp.inc found";
+
 function havp_avdb_info($filename)
 {
     $stl = "style='padding-top: 0px; padding-bottom: 0px; padding-left: 4px; padding-right: 4px; border-left: 1px solid #999999;'";
@@ -52,7 +57,7 @@ function havp_avdb_info($filename)
 
             # datetime
             $dt = explode(" ", $s[1]);
-            $s[1] = strftime("%d.%m.%Y", strtotime("{$dt[0]} {$dt[1]} {$dt[2]}"));
+            $s[1] = strftime("%m.%d.%Y", strtotime("{$dt[0]} {$dt[1]} {$dt[2]}"));
             if ($s[0] == 'ClamAV-VDB')
                 $r .= "<tr class='listr'><td>{$filename}</td><td $stl>{$s[1]}</td><td $stl>{$s[2]}</td><td $stl>{$s[7]}</td></tr>";
         }
@@ -66,10 +71,19 @@ function dwg_avbases_info()
     $db  = '<table width="100%" border="0" cellspacing="0" cellpadding="1" ><tbody>';
     $db .= '<tr class="vncellt" ><td>Database</td><td>Date</td><td>Ver.</td><td>Builder</td></tr>';
     $db .= havp_avdb_info("daily.cld");
+    $db .= havp_avdb_info("bytecode.cld");
     $db .= havp_avdb_info("main.cvd");
     $db .= havp_avdb_info("safebrowsing.cld");
     $db .= '</tbody></table>';
     return $db;
+}
+
+function avupdate_status()
+{
+    $s = "Not found.";
+    if (HVDEF_UPD_STATUS_FILE && file_exists(HVDEF_UPD_STATUS_FILE))
+        $s = file_get_contents(HVDEF_UPD_STATUS_FILE);
+    return str_replace( "\n", "<br>", $s );
 }
 
 function dwg_av_statistic()
@@ -141,9 +155,7 @@ $s     = "Found $count viruses (total).";
         <td class="vncellt">Last Update</td>
         <td class="listr" width=75%>
           <?php
-              if (file_exists(PATH_AVSTATUS))
-                   echo file_get_contents(PATH_AVSTATUS);
-              else echo "Unknown."
+                echo avupdate_status();
           ?>
         </td>
       </tr>	              
