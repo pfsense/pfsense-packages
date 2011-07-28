@@ -49,7 +49,7 @@ session_start(); // alwaya at the very top of a php page or "Cannot send session
 // get json blocls sids
 if ($_GET['snortsamjson'] == 1) {
 	
-	exec('cat /usr/local/etc/snort/sn_6TPXv7a/rules/dbBlockSplit/splitSidblock' . $_GET['fileid'] . '.block', $output);
+	exec('cat /usr/local/etc/snort/sn_6TPXv7a/rules/dbBlockSplit/splitSidblock_' . $_GET['fileid'] . '.block', $output);
 	echo $output[0];
 	
 }

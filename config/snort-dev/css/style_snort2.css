@@ -6,6 +6,43 @@ a {
 }
 */	
 
+/* ips tab css */
+
+.nextClickList {
+	margin-bottom: 5px;	
+}	
+
+.nextClickListColorEven {
+	padding-top: 2px;
+	padding-bottom: 2px;	
+	padding-left: 10px;
+	padding-right: 10px;
+	background-color: #ffffff;
+	font-size: 11px;
+	border-bottom-color: #999999;	
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-right-color: #999999;	
+	border-right-width: 1px;
+	border-right-style: solid;	
+}
+
+.nextClickListColorOdd {
+	padding-top: 2px;
+	padding-bottom: 2px;	
+	padding-left: 10px;
+	padding-right: 10px;
+	background-color: #eeeeee;
+	font-size: 11px;
+	border-bottom-color: #999999;	
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-right-color: #999999;	
+	border-right-width: 1px;
+	border-right-style: solid;			
+}
+
+
 #right {
 
 	position: relative;

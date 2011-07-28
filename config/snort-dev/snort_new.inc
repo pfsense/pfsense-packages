@@ -51,7 +51,6 @@ if(isset($_POST['__csrf_magic'])) {
 require_once("config.inc");
 require_once("functions.inc");
 
-
 // create and cp to tmp db dir
 if (!file_exists('/var/snort/')) {
 	exec('/bin/mkdir -p /var/snort/');

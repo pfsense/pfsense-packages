@@ -53,18 +53,17 @@ if (isset($_GET['rdbuuid'])) {
 	$rdbuuid = $ruledbname_pre1['ruledbname'];
 }
 
-//$a_list = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'uuid', $uuid);
-
-// create dropdown list
-function snortDropDownListJson($list, $setting) {
-  foreach ($list as $iday => $iday2) {
-  
-    echo "\n" . "'<option value=\"{$iday}\"";  if($iday == $setting) echo " selected "; echo '>' . htmlspecialchars($iday2) . '</option>\' + "\n" +' . "\r";            
-      
-  } 
+if (empty($rdbuuid)) {
+	echo 'ERROR: Missing RDBUUID';
+	exit;
 }
-	
-	$countGetEnableSidArray = count($getEnableSid);	
+
+if (isset($_GET['rulefilename'])) {
+	$rulefilename = $_GET['rulefilename'];
+}else{
+	echo 'ERROR: Missing rulefilename';
+	exit;
+}
 
 	$pgtitle = "Services: Snort: Ruleset Ips:";
 	include("/usr/local/pkg/snort/snort_head.inc");
@@ -116,21 +115,6 @@ function snortDropDownListJson($list, $setting) {
 		<td class="tabnavtbl">
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<!-- START MAIN AREA -->
-		
-		<tr>
-			<td>							
-				<input id="next" name="next" type="submit" class="formbtn" value=">>" />
-			</td>
-			<td>
-				<a class="getBlockFileNum" href="#" ><span>1</span></a>
-			</td>
-			<td>
-				<a class="getBlockFileNum" href="#" ><span>2</span></a>
-			</td>
-			<td>	
-				<input id="prev" name="prev" type="submit" class="formbtn" value="<<" >
-			</td>
-		</tr>	
 
 <table width="100%" border="0" cellpadding="10px" cellspacing="0">	
 		<input type="hidden" name="snortSamSaveSettings" value="1" /> <!-- what to do, save -->
@@ -179,25 +163,109 @@ function snortDropDownListJson($list, $setting) {
 jQuery(document).ready(function() {
 
 
-	jQuery('.getBlockFileNum').live('click', function(){
-		jQuery.getJSON("/snort/snort_json_get.php?snortsamjson=1", { fileid: this.text }, function(data) {
-			jQuery('.hidemetr').remove();
-			makeLargeSidTables(data);
-		});		
-	});	
+	
+<?php 
 
-	//showLoading('#loadingWaiting');
+	/*
+	 * Builds Json long string from a snort rules file
+	 * Options: $rdbuuid, $rulefilename
+	 * Used in Ips Tab
+	 */
+	function createSidTmpBlockSpit($rdbuuid, $rulefilename) 
+	{
+	
+		function getCurrentIpsRuleArray($output)
+		{
+			
+			foreach (array_unique($output) as $line)
+			{
+				$newOutput = explode(' # ', $line);
+				$newLine[] = $newOutput;
+			}
+			
+			return $newLine;	
+		}
+		
+		function getSidBlockJsonArray($getEnableSid)
+		{
+				
+			if (!empty($getEnableSid)) {
+					
+					$i = 0;	
+												
+							$countSigList = count($getEnableSid);
+							foreach ($getEnableSid as $val3)
+							{
+								
+								$i++;
+		
+								if ($i == 1) {
+									$main .= '[';
+								}
+								
+								if ( $i == $countSigList ) {		 
+									$main .= '{"sid":"' . escapeJsonString($val3['0']) . '","enable":"' . 'on' . '","who":"' . 'src' . '","timeamount":"' . '15' . '","timetype":"' . 'minutes' . '","msg":"' . escapeJsonString($val3['1']) . '"}'; 
+								}else{
+									$main .= '{"sid":"' . escapeJsonString($val3['0']) . '","enable":"' . 'on' . '","who":"' . 'src' . '","timeamount":"' . '15' . '","timetype":"' . 'minutes' . '","msg":"' . escapeJsonString($val3['1']) . '"},';  
+								}
+								
+								if ($i == $countSigList) {
+									$main .= ']';
+								}
+								
+							} // END foreach
+		
+				return $main;		
+							
+			} // END of jSON build
+		
+			return false;
+			
+		}
+		
+			exec('rm /usr/local/etc/snort/snortDBrules/DB/' . $rdbuuid . '/rules/dbBlockSplit/*.rules');
+			exec('cp /usr/local/etc/snort/snortDBrules/DB/' . $rdbuuid . '/rules/' . $rulefilename . ' ' . '/usr/local/etc/snort/snortDBrules/DB/' . $rdbuuid . '/rules/dbBlockSplit/' . $rulefilename);
+		
+			//$getEnableSidArray = '';
+			exec('perl /usr/local/bin/make_snortsam_map.pl /usr/local/etc/snort/snortDBrules/DB/' . $rdbuuid . '/rules/dbBlockSplit/', $getEnableSidArray);
+			
+			return getSidBlockJsonArray(getCurrentIpsRuleArray($getEnableSidArray));
+		
+	} // END of build json rule func
+	
+	// Build table from json, anf $_GET
+	$getJsonRulefile = createSidTmpBlockSpit($rdbuuid, $rulefilename);
+	
+	if (!empty($getJsonRulefile)) {
+		echo 'var getLogJsonRuleFile = ' . $getJsonRulefile . ';';
+	}
 
-	// NOTE: needs to be watched
-	// change url on selected dropdown rule	
-	jQuery('select[name=selectbox]').change(function() {
-		window.location.replace(jQuery(this).val());
-	});
+?>
+
+// create option list through js
+function createDropdownOptionList(list, opselected) {
+
+	var strOut = '';
+	var selectedOptionON = '';
+	for (var key in list) {
+		
+		if (opselected.toUpperCase() == list[key]) {
+			selectedOptionON = 'selected="selected"';
+		}
+		
+		strOut = strOut + '<option value="' + list[key] + '" ' + selectedOptionON + '>' + list[key] + '</option>' + "\n";
+		selectedOptionON = '';
+	}
+	return strOut;
+}
 
 function makeLargeSidTables(snortObjlist) {
-	
-	// disable Row Append if row count is less than 0
+
+	//disable Row Append if row count is less than 0
 	var countRowAppend = snortObjlist.length;
+	
+	var timeValuePerfList = {"src":"SRC", "dst":"DST", "both":"BOTH"};
+	var timeTypePerfList = {"minutes":"MINUTES", "seconds":"SECONDS", "hours":"HOURS", "days":"DAYS", "weeks":"WEEKS", "months":"MONTHS", "ALWAYS":"ALWAYS"};
 	
 	// if rowcount is not empty do this
 	if (countRowAppend > 0){
@@ -205,7 +273,6 @@ function makeLargeSidTables(snortObjlist) {
 		// Break up append row adds by chunks of 300
 		// NOTE: ie9 is still giving me issues on deleted.rules 6000 sigs. I should break up the json code above into smaller parts.
 		incrementallyProcess(function (i){
-		  // loop code goes in here
 	
 			if (isEven(i) === true){
 				var rowIsEvenOdd = 'odd_ruleset2';
@@ -227,10 +294,7 @@ function makeLargeSidTables(snortObjlist) {
 					'<td class="' + rowIsEvenOdd + '" id="sid_' + snortObjlist[i].sid + '" >' + snortObjlist[i].sid + '</td>' + "\n" +
 					'<td class="' + rowIsEvenOdd + '">' + "\n" +
 						'<select class="formfld2" id="who_' + snortObjlist[i].sid + '" name="snortsam[db][' + snortObjlist[i].sid + '][who]">' + "\n" +
-						<?php 					
-						$memoryPerfList = array('src' => 'SRC', 'dst' => 'DST', 'both' => 'BOTH');					
-						snortDropDownListJson($memoryPerfList, 'src');					
-						?>							
+						createDropdownOptionList(timeValuePerfList, snortObjlist[i].who) +						
 						'</select>' + "\n" +
 					'</td>' + "\n" +
 					'<td class="' + rowIsEvenOdd + '">' + "\n" +
@@ -238,11 +302,7 @@ function makeLargeSidTables(snortObjlist) {
 					'</td>' + "\n" +
 						'<td class="' + rowIsEvenOdd + '">' + "\n" +
 						'<select class="formfld2" id="timetype_' + snortObjlist[i].sid + '" name="snortsam[db][' + snortObjlist[i].sid + '][timetype]" >' + "\n" +
-						<?php
-						// 'days', 'months', 'weeks', 'years', 'minutes', 'seconds', 'hours' ALWAYS		
-						$memoryPerfList = array('minutes' => 'MINUTES', 'seconds' => 'SECONDS', 'hours' => 'HOURS', 'days' => 'DAYS', 'weeks' => 'WEEKS', 'months' => 'MONTHS', 'ALWAYS' => 'ALWAYS', );					
-						snortDropDownListJson($memoryPerfList, 'days');					
-						?>
+						createDropdownOptionList(timeTypePerfList, snortObjlist[i].timetype) +
 						'</select>' + "\n" +
 					'</td>' + "\n" +
 					'<td class="listbg" id="msg_' + snortObjlist[i].sid + '"><font color="white">' + snortObjlist[i].msg + '</font></td>' + "\n" +
@@ -251,27 +311,36 @@ function makeLargeSidTables(snortObjlist) {
 		  
 		}, 
 		snortObjlist,  // Object to work with the case Json object
-		500, // chunk size
-		200, // how many secs to wait
+		300, // chunk size
+		25, // how many secs to wait
 		function (){
 		
-		// if rowcount is more than 300
-		if (countRowAppend > 200){		
-			// call to please wait	
 			hideLoading('#loadingWaiting');
-		}	
 		
 		}); // end incrament
 	} // end of if stopRowAppend
 	
 }; // END make table func
 
+	
+			// Build table call
+			function startTableBuild() {
 
-jQuery.getJSON("/snort/snort_json_get.php?snortsamjson=1", { fileid: "1" }, function(data) {
-	jQuery('.hidemetr').remove();
-	makeLargeSidTables(data);
-});	
+				showLoading('#loadingWaiting');	
+				lastTableBuild();
+			}
+			function lastTableBuild() {
+			
+				makeLargeSidTables(getLogJsonRuleFile);
+				
+			}
 
+			<?php
+			if (!empty($getJsonRulefile)) {
+				echo 'startTableBuild();';
+			}
+			?>
+			
 }); // end of document ready
 
 
