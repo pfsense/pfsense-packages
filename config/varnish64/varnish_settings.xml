@@ -135,6 +135,76 @@
 			<description>Enter the timeout time for the worker threads.</description>
 			<type>input</type>
 		</field>
+		<field>
+                        <fielddescr>BasicVCLLT</fielddescr>
+                        <fieldname>BasicVCLLT</fieldname>
+                        <type>listtopic</type>
+                        <name>Basic VCL Settings</name>
+		</field>
+		<field>
+                        <fielddescr>Client identity method</fielddescr>
+                        <fieldname>clientbalance</fieldname>
+                        <description>Select how varnish will balance clients when using client Load Balance method.</description>
+                        <type>select</type>
+                        <options>
+                                <option><name>IP address (keep sessions working)</name><value>ip</value></option>
+                                <option><name>Requested url</name><value>url</value></option>
+                                <option><name>User Agent</name><value>agent</value></option>
+                        </options>
+                </field>
+                <field>
+                        <fielddescr>Don't cache sessions</fielddescr>
+                        <fieldname>sessioncache</fieldname>
+                        <description>Don't cache pages wiht JSESSION,PHPSESSID or nocache headers/cookies</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Don't cache posts</fielddescr>
+                        <fieldname>postcache</fieldname>
+                        <description>Don't cache posts</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Cache Images and css</fielddescr>
+                        <fieldname>imagecache</fieldname>
+                        <description>cache .css .js .gif .jpg .jpeg .bmp .png .ico .img .tga and .wmf files</description>
+                        <type>checkbox</type>
+                </field>
+               <field>
+                        <fielddescr>Fix gzip compression</fielddescr>
+                        <fieldname>fixgzip</fieldname>
+                        <description>Ignore compression in images files and unknow compression algorithm</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Be RFC2616 compliant</fielddescr>
+                        <fieldname>rfc2616</fieldname>
+                        <description>Ignore request different form GET HEAD PUT POST TRACE OPTIONS DELETE</description>
+                        <type>checkbox</type>
+                </field>
+                <field>
+                        <fielddescr>Foward client IP</fielddescr>
+                        <fieldname>xforward</fieldname>
+                        <description>Select how to forward clients real IP.</description>
+                        <type>select</type>
+                        <options>
+                                <option><name>set X-Forwarded-For</name><value>set</value></option>
+                                <option><name>append X-Forwarded-For</name><value>append</value></option>
+                                <option><name>set X-Forwarded-Varnish</name><value>create</value></option>
+                                <option><name>Unset</name><value>unset</value></option>
+                        </options>
+                </field>
+                <field>
+                        <fielddescr>Custom Html error message</fielddescr>
+                        <fieldname>htmlerror</fieldname>
+                        <description>Paste your custom html error page code here. This code will be included</description>
+                        <type>textarea</type>
+                        <cols>70</cols>
+                        <rows>10</rows>
+                </field>
+
+
+
 	</fields>
 	<custom_php_resync_config_command>
 		sync_package_varnish();
