@@ -210,6 +210,7 @@ jQuery(document).ready(function() {
 					<li><a href="/snort/snort_interfaces_edit.php?uuid=' . $uuid . '"><span>If Settings</span></a></li>
 					<li class="newtabmenu_active"><a href="/snort/snort_rulesets.php?uuid=' . $uuid . '"><span>Categories</span></a></li>
 					<li><a href="/snort/snort_rules.php?uuid=' . $uuid . '"><span>Rules</span></a></li>
+					<li><a href="/snort/snort_rulesets_ips.php?uuid=' . $uuid . '"><span>Ruleset Ips</span></a></li>
 					<li><a href="/snort/snort_define_servers.php?uuid=' . $uuid . '"><span>Servers</span></a></li>
 					<li><a href="/snort/snort_preprocessors.php?uuid=' . $uuid . '"><span>Preprocessors</span></a></li>
 					<li><a href="/snort/snort_barnyard.php?uuid=' . $uuid . '"><span>Barnyard2</span></a></li>			
@@ -244,6 +245,7 @@ jQuery(document).ready(function() {
 			<li class="hide_newtabmenu"><a href="/snort/snort_interfaces_rules_edit.php?rdbuuid=' . $rdbuuid . '"><span>Rules DB Edit</span></a></li>
 			<li class="hide_newtabmenu newtabmenu_active"><a href="/snort/snort_rulesets.php?rdbuuid=' . $rdbuuid . '"><span>Categories</span></a></li>
 			<li class="hide_newtabmenu"><a href="/snort/snort_rules.php?rdbuuid=' . $rdbuuid . '"><span>Rules</span></a></li>
+			<li><a href="/snort/snort_rulesets_ips.php?rdbuuid=' . $rdbuuid . '"><span>Ruleset Ips</span></a></li>
 			</ul>
 			</div>
 			</td>
@@ -272,7 +274,7 @@ jQuery(document).ready(function() {
 		</tr>
 		</table>
 	
-	<div id="checkboxdo" style="width:750px; margin-left: auto ; margin-right: auto ; padding-top: 10px; padding-bottom: 0px;">	
+	<div id="checkboxdo" style="width: 100%; margin-left: auto ; margin-right: auto ; padding-top: 10px; padding-bottom: 0px;">	
 	<form id="iform" action="" >		
 		<input type="hidden" name="snortSaveRuleSets" value="1" /> <!-- what to do, save -->
 		<input type="hidden" name="dbName" value="snortDBrules" /> <!-- what db-->

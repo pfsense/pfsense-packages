@@ -102,6 +102,7 @@ $a_list = snortSql_fetchAllSettings('snortDB', 'SnortIfaces', 'uuid', $uuid);
 				<li><a href="/snort/snort_interfaces_edit.php?uuid=<?=$uuid;?>"><span>If Settings</span></a></li>
 				<li><a href="/snort/snort_rulesets.php?uuid=<?=$uuid;?>"><span>Categories</span></a></li>
 				<li><a href="/snort/snort_rules.php?uuid=<?=$uuid;?>"><span>Rules</span></a></li>
+				<li><a href="/snort/snort_rulesets_ips.php?uuid=<?=$uuid;?>"><span>Ruleset Ips</span></a></li>
 				<li><a href="/snort/snort_define_servers.php?uuid=<?=$uuid;?>"><span>Servers</span></a></li>
 				<li class="newtabmenu_active"><a href="/snort/snort_preprocessors.php?uuid=<?=$uuid;?>"><span>Preprocessors</span></a></li>
 				<li><a href="/snort/snort_barnyard.php?uuid=<?=$uuid;?>"><span>Barnyard2</span></a></li>			

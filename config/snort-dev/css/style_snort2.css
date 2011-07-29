@@ -1,12 +1,13 @@
 @charset "utf-8";
 
-/*
-a {
-	font-size: 11px;		
-}
-*/	
 
 /* ips tab css */
+
+#infotext_ips {
+
+	vertical-align: middle;
+		
+}	
 
 .nextClickList {
 	margin-bottom: 5px;	
@@ -86,27 +87,27 @@ a {
 
 .odd_ruleset {
 	
-	background-color: #eeeeee;	
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-bottom-color: #000;
-	border-right-width: 1px;
-	border-right-style: solid;
-	border-right-color: #000;
+	background-color: #ffffff;
+	border-left: 1px solid #999999;
+	border-bottom: 1px solid #999999;
+	font-size: 14px;
+	padding-right: 2px;
 	padding-left: 20px;
+	padding-top: 2px;
+	padding-bottom: 2px;
 	
 }
 
 .even_ruleset {
 
-	background-color: #ffffff;	
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-bottom-color: #000;
-	border-right-width: 1px;
-	border-right-style: solid;
-	border-right-color: #000;
+	background-color: #eeeeee;
+	border-left: 1px solid #999999;
+	border-bottom: 1px solid #999999;
+	font-size: 14px;
+	padding-right: 2px;
 	padding-left: 20px;
+	padding-top: 2px;
+	padding-bottom: 2px;
 		
 }	
 

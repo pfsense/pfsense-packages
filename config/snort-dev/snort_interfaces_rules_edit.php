@@ -185,8 +185,9 @@ jQuery(document).ready(function() {
 		<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
 		<ul class="newtabmenu">
 		<li class="newtabmenu_active"><a href="/snort/snort_interfaces_rules_edit.php?rdbuuid=<?=$rdbuuid;?>"><span>Rules DB Edit</span></a></li>
-		<li class="hide_newtabmenu"><a href="/snort/snort_rulesets.php?rdbuuid=<?=$rdbuuid;?>"><span>Categories</span></a></li>
-		<li class="hide_newtabmenu"><a href="/snort/snort_rules.php?rdbuuid=<?=$rdbuuid;?>"><span>Rules</span></a></li>
+		<li><a href="/snort/snort_rulesets.php?rdbuuid=<?=$rdbuuid;?>"><span>Categories</span></a></li>
+		<li><a href="/snort/snort_rules.php?rdbuuid=<?=$rdbuuid;?>"><span>Rules</span></a></li>
+		<li><a href="/snort/snort_rulesets_ips.php?rdbuuid=<?=$rdbuuid;?>"><span>Ruleset Ips</span></a></li>
 		</ul>
 		</div>
 		</td>

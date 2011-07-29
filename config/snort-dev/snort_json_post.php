@@ -66,12 +66,22 @@ function snortJsonReturnCode($returnStatus)
 if ($_POST['snortSamSaveSettings'] == 1) {
 
 	unset($_POST['snortSamSaveSettings']);
-	
-	function snortSamSaveFunc() 
-	{	
-		print_r($_POST[snortsam][db]);
+		
+	if ($_POST['ifaceTab'] === 'snort_rulesets_ips') {
+		function snortSamSaveFunc() 
+		{	
+			print_r($_POST);
+		}
+		snortSamSaveFunc();
 	}
-	snortSamSaveFunc();
+	
+	if ($_POST['ifaceTab'] === 'snort_rules_ips') {
+		function snortSamSaveFunc() 
+		{	
+			print_r($_POST);
+		}
+		snortSamSaveFunc();
+	}	
 	
 }
 
