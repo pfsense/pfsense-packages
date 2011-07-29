@@ -95,8 +95,10 @@ function openvpn_client_pem_to_pk12($outpath, $outpass, $crtpath, $keypath, $cap
 		unlink($capath);
 }
 
-function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy, $zipconf = false, $outpass = "", $skiptls=false) {
+function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy, $zipconf = false, $outpass = "", $skiptls=false, $doslines=false) {
 	global $config, $input_errors, $g;
+
+	$nl = ($doslines) ? "\r\n" : "\n";
 
 	// lookup server settings
 	$settings = $config['openvpn']['openvpn-server'][$srvid];
@@ -166,20 +168,20 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 
 	// add basic settings
 	$devmode = empty($settings['dev_mode']) ? "tun" : $settings['dev_mode'];
-	$conf  = "dev {$devmode}\n";
+	$conf  = "dev {$devmode}{$nl}";
 	if(! empty($settings['tunnel_networkv6'])) {
-		$conf .= "tun-ipv6\n";
+		$conf .= "tun-ipv6{$nl}";
 	}
-	$conf .= "persist-tun\n";
-	$conf .= "persist-key\n";
-	$conf .= "proto {$proto}\n";
-	$conf .= "cipher {$cipher}\n";
-	$conf .= "tls-client\n";
-	$conf .= "client\n";
-	$conf .= "resolv-retry infinite\n";
-	$conf .= "remote {$server_host} {$server_port}\n";
+	$conf .= "persist-tun{$nl}";
+	$conf .= "persist-key{$nl}";
+	$conf .= "proto {$proto}{$nl}";
+	$conf .= "cipher {$cipher}{$nl}";
+	$conf .= "tls-client{$nl}";
+	$conf .= "client{$nl}";
+	$conf .= "resolv-retry infinite{$nl}";
+	$conf .= "remote {$server_host} {$server_port}{$nl}";
 	if (!empty($servercn))
-		$conf .= "tls-remote {$servercn}\n";
+		$conf .= "tls-remote {$servercn}{$nl}";
 
 	if (!empty($proxy)) {
 		if ($proto == "udp") {
@@ -192,14 +194,14 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 				$proxy['passwdfile'] = openvpn_client_export_prefix($srvid) . "-proxy";
 			$conf .= " {$proxy['passwdfile']} {$proxy['proxy_authtype']}";
 		}
-		$conf .= "\n";
+		$conf .= "{$nl}";
 	}
 
 	// add user auth settings
 	switch($settings['mode']) {
 		case 'server_user':
 		case 'server_tls_user':
-			$conf .= "auth-user-pass\n";
+			$conf .= "auth-user-pass{$nl}";
 			break;
 	}
 
@@ -208,27 +210,27 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 	$cafile = "{$prefix}-ca.crt";
 	if($nokeys == false) {
 		if ($usetoken) {
-			$conf .= "ca {$cafile}\n";
-			$conf .= "cryptoapicert \"SUBJ:{$user['name']}\"\n";
+			$conf .= "ca {$cafile}{$nl}";
+			$conf .= "cryptoapicert \"SUBJ:{$user['name']}\"{$nl}";
 		} else {
-			$conf .= "pkcs12 {$prefix}.p12\n";
+			$conf .= "pkcs12 {$prefix}.p12{$nl}";
 		}
 	} else if ($settings['mode'] == "server_user")
-		$conf .= "ca {$cafile}\n";
+		$conf .= "ca {$cafile}{$nl}";
 
 	if ($settings['tls'] && !$skiptls) {
-		$conf .= "tls-auth {$prefix}-tls.key 1\n";
+		$conf .= "tls-auth {$prefix}-tls.key 1{$nl}";
 	}
 
 	// Prevent MITM attacks by verifying the server certificate.
 	// - Disable for now, it requires the server cert to include special options
-	//$conf .= "remote-cert-tls server\n";
+	//$conf .= "remote-cert-tls server{$nl}";
 
 	// add optional settings
 	if ($settings['compression'])
-		$conf .= "comp-lzo\n";
+		$conf .= "comp-lzo{$nl}";
 	if ($settings['passtos'])
-		$conf .= "passtos\n";
+		$conf .= "passtos{$nl}";
 
 	if ($zipconf == true) {
 		// create template directory
@@ -338,11 +340,11 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	$cfgfile = "{$confdir}/{$prefix}-config.ovpn";
 	if (!empty($proxy) && $proxy['proxy_authtype'] != "none") {
 		$proxy['passwdfile'] = "{$prefix}-password";
-		$pwdfle = "{$proxy['user']}\n";
-		$pwdfle .= "{$proxy['password']}\n";
+		$pwdfle = "{$proxy['user']}\r\n";
+		$pwdfle .= "{$proxy['password']}\r\n";
 		file_put_contents("{$confdir}/{$proxy['passwdfile']}", $pwdfle);
 	}
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy);
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, false, "", false, $doslines=true);
 	if (!$conf) {
 		$input_errors[] = "Could not create a config to export.";
 		return false;
