@@ -400,83 +400,115 @@ function snortSql_updateRuleSigList()
 function snortSql_updateRuleSetList()
 {
 	
-	$dbname = $_POST['dbName'];
-	$table = $_POST['dbTable'];
-	$ruleSetfilenames = $_POST['filenamcheckbox'];
-	$rdbuuid = $_POST['rdbuuid'];
+	function createUpdateRulesetTable()
+	{
+		
+		$addDate = date(U);
 	
-	$addDate = date(U);
-
-	// dont let user pick the DB path
-    $db = sqlite_open("/usr/local/pkg/snort/{$dbname}"); 
-    
-    if (empty($ruleSetfilenames)) {
-    	$ruleSetfilenames = array();
-    }
-
-	// foreach selected rulesets do this
-    if (!empty($ruleSetfilenames)) {
-	    foreach ($ruleSetfilenames as $ruleSetfilename) 
-	    {
+		// dont let user pick the DB path
+	    $db = sqlite_open("/usr/local/pkg/snort/{$_POST['dbName']}"); 
+	    
+	    if (empty($_POST['filenamcheckbox'])) {
+	    	$ruleSetfilenames = array();
+	    }
 	
+		// foreach selected rulesets do this
+	    if (!empty($_POST['filenamcheckbox'])) {
+		    foreach ($_POST['filenamcheckbox'] as $ruleSetfilename) 
+		    {
+		
+				$resultid = sqlite_query($db,
+					"SELECT id, enable FROM {$_POST['dbTable']} WHERE rulesetname = '{$ruleSetfilename}' and rdbuuid = '{$_POST['rdbuuid']}';
+				");			
+			    
+				$chktable = sqlite_fetch_all($resultid, SQLITE_ASSOC);   
+			
+				if (empty($chktable)) {
+					
+					$rulesetUuid = genAlphaNumMixFast(11, 14);
+					
+					$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+					"INSERT INTO {$_POST['dbTable']} (date, uuid, rdbuuid, rulesetname, enable) VALUES ('{$addDate}', '{$rulesetUuid}', '{$_POST['rdbuuid']}', '{$ruleSetfilename}', 'on');
+					");
+	
+				}else{					
+					if ($chktable[0]['enable'] == 'off') {					
+						$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+						"UPDATE {$_POST['dbTable']} SET enable = 'on' WHERE id = '{$chktable[0]['id']}'; 
+						");			
+					}			
+				}
+		    }	
+		} // end foreach if
+	
+				
+				// clean database of old names	and turn rulesets off
+	    		$listDir = snortScanDirFilter("/usr/local/etc/snort/snortDBrules/DB/{$_POST['rdbuuid']}/rules/", '\.rules');
+	    
+			    $resultAllRulesetname = sqlite_query($db,
+			            "SELECT rulesetname FROM {$_POST['dbTable']} WHERE rdbuuid = '{$_POST['rdbuuid']}';
+			     ");
+			    
+			    $chktable2 = sqlite_fetch_all($resultAllRulesetname, SQLITE_ASSOC);		
+			    
+			    
+			    if (!empty($chktable2)) {
+				    foreach ($chktable2 as $value) 
+				    {
+						
+				    	if(!in_array($value['rulesetname'], $listDir)) {	    		
+							$deleteMissingRuleset = sqlite_query($db, // @ supress warnings use only in production
+							"DELETE FROM {$_POST['dbTable']} WHERE rulesetname = '{$value['rulesetname']}' and rdbuuid = '{$_POST['rdbuuid']}';
+							");
+				    	}
+				    	
+				    	if(!in_array($value['rulesetname'], $_POST['filenamcheckbox'])) {
+							$ruleSetisOff = sqlite_query($db, // @ supress warnings usonly in production
+							"UPDATE {$_POST['dbTable']} SET enable = 'off' WHERE rulesetname = '{$value['rulesetname']}' and rdbuuid = '{$_POST['rdbuuid']}'; 
+							");	    		
+				    	}	    	
+				    }
+			    }   
+		  	sqlite_close($db);	  	
+	} // END createUpdateRulesetTable func
+	createUpdateRulesetTable();
+	
+	// save gen setting only if on ips tab 
+	if ($_POST['dbTable'] === 'SnortruleSetsIps') {		
+
+		function createUpdateRulesetGenTable()
+		{
+			$table = 'SnortruleGenIps';		
+			$rulesetUuid = genAlphaNumMixFast(11, 14);
+			$addDate = date(U);
+	
+			// dont let user pick the DB path
+		    $db = sqlite_open("/usr/local/pkg/snort/{$_POST['dbName']}");
+		    
 			$resultid = sqlite_query($db,
-				"SELECT id, enable FROM {$table} WHERE rulesetname = '{$ruleSetfilename}' and rdbuuid = '{$rdbuuid}';
+				"SELECT id FROM {$table} WHERE rdbuuid = '{$_POST['rdbuuid']}';
 			");			
 		    
-			$chktable = sqlite_fetch_all($resultid, SQLITE_ASSOC);   
-		
-			if (empty($chktable)) {
-				
-				$rulesetUuid = genAlphaNumMixFast(11, 14);
+			$chktable = sqlite_fetch_all($resultid, SQLITE_ASSOC);
+			
+			if (!empty($chktable)) {
 				
 				$query_ck = sqlite_query($db, // @ supress warnings usonly in production
-				"INSERT INTO {$table} (date, uuid, rdbuuid, rulesetname, enable) VALUES ('{$addDate}', '{$rulesetUuid}', '{$rdbuuid}', '{$ruleSetfilename}', 'on');
+				"UPDATE {$table} SET who = '{$_POST['snortsam']['db']['gensettings']['who']}', timeamount = '{$_POST['snortsam']['db']['gensettings']['timeamount']}', timetype = '{$_POST['snortsam']['db']['gensettings']['timetype']}' WHERE rdbuuid = '{$_POST['rdbuuid']}'; 
 				");
-
-			}else{					
-				if ($chktable[0]['enable'] == 'off') {					
-					$query_ck = sqlite_query($db, // @ supress warnings usonly in production
-					"UPDATE {$table} SET enable = 'on' WHERE id = '{$chktable[0]['id']}'; 
-					");			
-				}			
+								
+			}else{
+				
+				$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+				"INSERT INTO {$table} (date, uuid, rdbuuid, who, timeamount, timetype) VALUES ('{$addDate}', '{$rulesetUuid}', '{$_POST['rdbuuid']}', '{$_POST['snortsam']['db']['gensettings']['who']}', '{$_POST['snortsam']['db']['gensettings']['timeamount']}', '{$_POST['snortsam']['db']['gensettings']['timetype']}');
+				");			
 			}
-	    }	
-	} // end foreach if
-
 			
-			// clean database of old names	and turn rulesets off
-    		$listDir = snortScanDirFilter("/usr/local/etc/snort/snortDBrules/DB/{$rdbuuid}/rules/", '\.rules');
-    
-		    $resultAllRulesetname = sqlite_query($db,
-		            "SELECT rulesetname FROM {$table} WHERE rdbuuid = '{$rdbuuid}';
-		     ");
-		    
-		    $chktable2 = sqlite_fetch_all($resultAllRulesetname, SQLITE_ASSOC);		
-		    
-		    
-		    if (!empty($chktable2))
-		    {
-			    foreach ($chktable2 as $value) 
-			    {
-					
-			    	if(!in_array($value['rulesetname'], $listDir))
-			    	{	    		
-						$deleteMissingRuleset = sqlite_query($db, // @ supress warnings use only in production
-						"DELETE FROM {$table} WHERE rulesetname = '{$value['rulesetname']}' and rdbuuid = '{$rdbuuid}';
-						");
-			    	}
-			    	
-			    	if(!in_array($value['rulesetname'], $ruleSetfilenames))
-			    	{
-						$ruleSetisOff = sqlite_query($db, // @ supress warnings usonly in production
-						"UPDATE {$table} SET enable = 'off' WHERE rulesetname = '{$value['rulesetname']}' and rdbuuid = '{$rdbuuid}'; 
-						");	    		
-			    	}	    	
-			    }
-		    }   
-	    
-	  	sqlite_close($db);
-	  	
+			sqlite_close($db);		
+		} // END createUpdateRulesetGenTable
+		createUpdateRulesetGenTable();		
+		
+	}	  	
 	  	return true;
     
 } // END Save ruleSets settings
@@ -859,32 +891,18 @@ function snortSql_updatelistDelete($databse, $table, $type, $uuid_filename)
     
     $mydb = sqlite_open("$db");
 
-    if ($type == 'uuid')
-    {
+    if (!empty($type)) {
+    	   	
 	    $query = sqlite_query($mydb, // @ supress warnings usonly in production
-	    "DELETE FROM {$table} WHERE uuid = '{$uuid_filename}'; 
-	    ");
-    }
-
-    if ($type == 'filename')
-    {    
-		$query = sqlite_query($mydb, // @ supress warnings use only in production
-		"DELETE FROM {$table} WHERE filename = '{$uuid_filename}';
-		");
-    }
-    
-    if ($type == 'ifaceuuid')
-    {    
-		$query = sqlite_query($mydb, // @ supress warnings use only in production
-		"DELETE FROM {$table} WHERE ifaceuuid = '{$uuid_filename}';
-		");
-    }    
+	    "DELETE FROM {$table} WHERE {$type} = '{$uuid_filename}'; 
+	    ");  
        
-      if (sqlite_changes($mydb) < 1)
-      {
-        sqlite_close($mydb);
-        return 'Error in query';   
-      } 
+		if (sqlite_changes($mydb) < 1) {
+			sqlite_close($mydb);
+			return 'Error in query';   
+		} 
+      
+    }
     
     sqlite_close($mydb);
     return true;

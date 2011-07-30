@@ -103,7 +103,7 @@ if ($_POST['snortSidRuleEdit'] == 1) {
 // row from db by uuid
 if ($_POST['snortSaveRuleSets'] == 1) {	
 
-		if ($_POST['ifaceTab'] == 'snort_rulesets') {
+		if ($_POST['ifaceTab'] == 'snort_rulesets' || $_POST['ifaceTab'] == 'snort_rulesets_ips') {
 			
 			function snortSaveRuleSetsRulesetsFunc()
 			{
@@ -111,8 +111,13 @@ if ($_POST['snortSaveRuleSets'] == 1) {
 				unset($_POST['snortSaveRuleSets']);
 				unset($_POST['ifaceTab']);		
 				
-				snortJsonReturnCode(snortSql_updateRuleSetList());			
-				build_snort_settings($_POST['uuid']);
+				// save to database
+				snortJsonReturnCode(snortSql_updateRuleSetList());
+				
+				// only build if uuid is valid
+				if (!empty($_POST['uuid'])) {
+					build_snort_settings($_POST['uuid']);
+				}
 			}
 			snortSaveRuleSetsRulesetsFunc();	
 		}		
@@ -151,8 +156,14 @@ if ($_POST['RMlistDelRow'] == 1) {
 		// rm ruledb and files
 		if ($_POST['RMlistTable'] == 'Snortrules') {
 			
-			$snortRuleDir = "/usr/local/etc/snort/snortDBrules/DB/{$_POST['RMlistUuid']}";
+			// remove db tables vals
+			snortSql_updatelistDelete($_POST['RMlistDB'], 'SnortruleSets', 'rdbuuid', $_POST['RMlistUuid']);
+			snortSql_updatelistDelete($_POST['RMlistDB'], 'SnortruleGenIps', 'rdbuuid', $_POST['RMlistUuid']);	
+			snortSql_updatelistDelete($_POST['RMlistDB'], 'SnortruleSetsIps', 'rdbuuid', $_POST['RMlistUuid']);			
+			snortSql_updatelistDelete($_POST['RMlistDB'], 'SnortruleSigs', 'rdbuuid', $_POST['RMlistUuid']);
 			
+			// remove dir
+			$snortRuleDir = "/usr/local/etc/snort/snortDBrules/DB/{$_POST['RMlistUuid']}";
 			exec('/bin/rm -r ' . $snortRuleDir);
 		}	
 			
