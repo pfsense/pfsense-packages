@@ -173,7 +173,7 @@ define('F_AVSETLOG',          'avsetlog');
 define('F_TEMPLATEPATH',      'templatepath');    # internal var
 # file scanner [HVFORM_FSCAN]
 define('F_SCANFILEPATH',      'scanfilepath');
-# пока непонятно что это и что с ним делать
+# пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ пїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 define('F_DISABLEXFORWARD',   'disablexforward'); # + forwarded ip
 define('F_FORWARDEDIP',       'forwardedip');
 
@@ -915,8 +915,8 @@ function havp_config_freshclam()
     $conf[] = "Checks $chks";
 
     $conf[] = "# notification";
-    $conf[] = "OnUpdateExecute  date \"+%d-%m-%Y %H:%M:%S Antivirus update success\" > " . HVDEF_FRESHCLAM_STATUS_FILE;
-    $conf[] = "OnErrorExecute   date \"+%d-%m-%Y %H:%M:%S Antivirus update error\" > "   . HVDEF_FRESHCLAM_STATUS_FILE;
+    $conf[] = "OnUpdateExecute  date \"+%Y.%m.%d %H:%M:%S Antivirus update success\" > " . HVDEF_FRESHCLAM_STATUS_FILE;
+    $conf[] = "OnErrorExecute   date \"+%Y.%m.%d %H:%M:%S Antivirus update error\" > "   . HVDEF_FRESHCLAM_STATUS_FILE;
 
     $conf[] = "Debug  " . (HV_DEBUG === 'true' ? "yes" : "no");
 
@@ -1270,15 +1270,15 @@ $f = HVDEF_UPD_STATUS_FILE;
 $u = HVDEF_FRESHCLAM_STATUS_FILE;
 return <<<EOD
 #!/bin/sh
-date +"%d.%m.%Y %H:%M:%S Antivirus update started."  > $f
-date +"%d.%m.%Y %H:%M:%S Antivirus database already is updated." > $u
+date +"%Y.%m.%d %H:%M:%S Antivirus update started."  > $f
+date +"%Y.%m.%d %H:%M:%S Antivirus database already is updated." > $u
 /usr/local/bin/freshclam
 wait
 cat $u >> $f
 /usr/local/bin/sigtool --unpack-current daily.cvd
 /usr/local/bin/sigtool --unpack-current main.cvd
 wait
-date +"%d.%m.%Y %H:%M:%S Antivirus update end." >> $f
+date +"%Y.%m.%d %H:%M:%S Antivirus update end." >> $f
 EOD;
 
 }
@@ -1526,7 +1526,7 @@ function start_antivirus_scanner($filename)
         file_put_contents(HVDEF_CLAMSCAN_LOG, $cont);
 
         mwexec_bg("$param");
-        exec("date +\"%d.%m.%Y %H:%M:%S Starting scan file '$filename'.\" > " . HVDEF_CLAMSCAN_LOG);
+        exec("date +\"%Y.%m.%d %H:%M:%S Starting scan file '$filename'.\" > " . HVDEF_CLAMSCAN_LOG);
     }
     else log_error("Antivirus: Can't starting file scanner. File '$filename' not exists.");
 }
