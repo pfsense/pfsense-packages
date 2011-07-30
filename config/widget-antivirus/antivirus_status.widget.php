@@ -57,7 +57,7 @@ function havp_avdb_info($filename)
 
             # datetime
             $dt = explode(" ", $s[1]);
-            $s[1] = strftime("%m.%d.%Y", strtotime("{$dt[0]} {$dt[1]} {$dt[2]}"));
+            $s[1] = strftime("%Y.%m.%d", strtotime("{$dt[0]} {$dt[1]} {$dt[2]}"));
             if ($s[0] == 'ClamAV-VDB')
                 $r .= "<tr class='listr'><td>{$filename}</td><td $stl>{$s[1]}</td><td $stl>{$s[2]}</td><td $stl>{$s[7]}</td></tr>";
         }
