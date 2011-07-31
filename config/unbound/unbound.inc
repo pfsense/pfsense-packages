@@ -463,6 +463,19 @@ access-control: 127.0.0.0/8 allow
 # Domain overrides
 {$domain_overrides}
 
+EOD;
+
+# Handle custom options
+if(!empty($unbound_config['custom_options'])) {
+	$custom_options = explode(";", ($unbound_config['custom_options']));
+	$unbound_conf .= "# Unbound Custom options\n";
+	foreach ($custom_options as $ent) {
+		$unbound_conf .= $ent."\n";
+	}
+}
+
+	$unbound_conf .= <<<EOD
+
 ###
 # Remote Control Config
 ###
@@ -477,15 +490,7 @@ control-cert-file: "/usr/local/etc/unbound/unbound_control.pem"
 
 EOD;
 
-	# Handle custom options
-	if(!empty($unbound_config['custom_options'])) {
-		$custom_options = explode(";", ($unbound_config['custom_options']));
-		$unbound_conf .= "# Unbound Custom options\n";
-		foreach ($custom_options as $ent) {
-			$unbound_conf .= $ent."\n";
-		}
-	}
-	
+
 	file_put_contents("/usr/local/etc/unbound/unbound.conf", $unbound_conf);
 	
 }
