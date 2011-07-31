@@ -1024,17 +1024,17 @@
 		<descr>Unbound is a validating, recursive, and caching DNS resolver. This package is a drop in replacement for Services: DNS Forwarder and also supports DNSSEC extensions. Once installed please configure the Unbound service by visiting Services: Unbound DNS.</descr>
 		<website>http://www.unbound.net/</website>
 		<category>Services</category>
-		<version>1.4.10_03</version>
+		<version>1.4.12_00</version>
 		<status>Alpha</status>
 		<required_version>2.0</required_version>
 		<pkginfolink>http://doc.pfsense.org/index.php/Unbound_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/unbound/unbound.xml</config_file>
 		<configurationfile>unbound.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>unbound-1.4.10.tbz</depends_on_package>
+		<depends_on_package>unbound-1.4.12.tbz</depends_on_package>
+		<depends_on_package>ldns-1.6.10.tbz</depends_on_package>
 		<depends_on_package>expat-2.0.1_1.tbz</depends_on_package>
-		<depends_on_package>libevent-1.4.14b_1.tbz</depends_on_package>
-		<build_port_path>/usr/ports/dns/unbound</build_port_path>
+		<depends_on_package>libevent-1.4.14b_2.tbz</depends_on_package>
 		<build_options>WITH_LIBEVENT=true WITH_THREADS=true WITHOUT_GOST=true WITHOUT_MAN=true</build_options>
 		<logging>
 			<facilityname>unbound</facilityname>
