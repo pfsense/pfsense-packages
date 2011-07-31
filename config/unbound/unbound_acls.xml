@@ -161,7 +161,8 @@
 						<option><name>4</name><value>4</value></option>
 						<option><name>3</name><value>3</value></option>
 						<option><name>2</name><value>2</value></option>
-						<option><name>1</name><value>1</value></option>																		
+						<option><name>1</name><value>1</value></option>
+						<option><name>0</name><value>0</value></option>
 					</options>
 				</rowhelperfield>
 			</rowhelper>
