@@ -302,6 +302,14 @@
 			</options>
 			<advancedfield/>
 		</field>
+		<field>
+			<fielddescr>Custom Options</fielddescr>
+			<fieldname>custom_options</fieldname>
+			<description>You can put your own custom options here, separated by semi-colons (;). These configurations options will then be added to the configuration file. &lt;br/&gt; &lt;b&gt;Note:&lt;/b&gt; They need to be Unbound native configuration options, otherwise Unbound will &lt;b&gt;not&lt;/b&gt; work.</description>
+			<type>textarea</type>
+			<cols>65</cols>
+			<rows>5</rows>
+		</field>
 	</fields>
 	<custom_add_php_command>
 	</custom_add_php_command>

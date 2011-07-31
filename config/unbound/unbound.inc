@@ -477,6 +477,15 @@ control-cert-file: "/usr/local/etc/unbound/unbound_control.pem"
 
 EOD;
 
+	# Handle custom options
+	if(!empty($unbound_config['custom_options'])) {
+		$custom_options = explode(";", ($unbound_config['custom_options']));
+		$unbound_conf .= "# Unbound Custom options\n";
+		foreach ($custom_options as $ent) {
+			$unbound_conf .= $ent."\n";
+		}
+	}
+	
 	file_put_contents("/usr/local/etc/unbound/unbound.conf", $unbound_conf);
 	
 }
