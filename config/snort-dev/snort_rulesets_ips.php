@@ -295,8 +295,26 @@ jQuery(document).ready(function() {
 			<tr>
 				<td>			
 					<table width="100%" border="0" cellpadding="0" cellspacing="0" >
-					<tr class="hidemetr" id="ipstable_gensettings" valign="top">
+		
+					<tr class="hidemetr" id="ipstitle_gensettings" valign="top">
+					<td class="listhdrr2" width="20%"></td>
+					<td class="listhdrr2" width="1%">&nbsp;&nbsp;&nbsp;On</td>
+					<td class="listhdrr2" width="1%">&nbsp;&nbsp;&nbsp;Source</td>
+					<td class="listhdrr2" width="1%">&nbsp;&nbsp;&nbsp;Amount</td>
+					<td class="listhdrr2" width="1%">&nbsp;&nbsp;&nbsp;Duration</td>
+					</tr>
+									
+					<tr class="hidemetr" id="ipstable_gensettings" valign="top">					
 					<td class="vncell2" id="infotext_ips"><font color="#000000">Default settings for all block rules</font></td>
+					<td class="odd_ruleset2">
+					<?php 
+						$enableGenRuleSidChkBox = '';
+						if ( $listGenRules[0]['enable'] === 'on' || empty($listGenRules[0]['enable'])) {
+							$enableGenRuleSidChkBox = 'checked="checked"';
+						}				
+					?>
+						<input class="domecheck" id="checkbox_253" name="snortsam[db][gensettings][enable]" value="on" <?=$enableGenRuleSidChkBox; ?> type="checkbox">
+					</td>					
 					<td class="odd_ruleset2">
 					<select class="formfld2" id="who_gensettings" name="snortsam[db][gensettings][who]">
 					<?php 					

@@ -156,7 +156,9 @@ if (isset($_GET['rulefilename'])) {
 		<input type="hidden" name="snortSamSaveSettings" value="1" /> <!-- what to do, save -->
 		<input type="hidden" name="dbName" value="snortDBrules" /> <!-- what db-->
 		<input type="hidden" name="dbTable" value="SnortruleSigsIps" /> <!-- what db table-->
-		<input type="hidden" name="ifaceTab" value="snort_ruleset_ips" /> <!-- what interface tab -->
+		<input type="hidden" name="ifaceTab" value="snort_rules_ips" /> <!-- what interface tab -->
+		<input type="hidden" name="rdbuuid" value="<?=$rdbuuid;?>" /> <!-- what interface to save for -->
+		<input type="hidden" name="uuid" value="<?=$uuid;?>" /> <!-- create snort.conf -->		
 
 	<tr id="frheader" >
 		<td width="1%" class="listhdrr2">&nbsp;&nbsp;&nbsp;On</td>
@@ -292,7 +294,7 @@ function createDropdownOptionList(list, opselected) {
 			selectedOptionON = 'selected="selected"';
 		}
 		
-		strOut = strOut + '<option value="' + list[key] + '" ' + selectedOptionON + '>' + list[key] + '</option>' + "\n";
+		strOut = strOut + '<option value="' + list[key].toLowerCase() + '" ' + selectedOptionON + '>' + list[key] + '</option>' + "\n";
 		selectedOptionON = '';
 	}
 	return strOut;
@@ -328,24 +330,25 @@ function makeLargeSidTables(snortObjlist) {
 			jQuery('.rulesetloopblock').append(	
 					"\n" + '<tr class="hidemetr" id="ipstable_' + snortObjlist[i].sid + '" valign="top">' + "\n" +
 					'<td class="' + rowIsEvenOdd + '">' + "\n" +
-						'<input class="domecheck" id="checkbox_' + snortObjlist[i].sid + '" name="snortsam[db][' + snortObjlist[i].sid + '][enable]" value="' + snortObjlist[i].enable + '" checked="' + rulesetChecked + '" type="checkbox">' + "\n" +
+						'<input class="domecheck" id="checkbox_' + snortObjlist[i].sid + '" name="snortsam[db][' + i + '][enable]" value="' + snortObjlist[i].enable + '" checked="' + rulesetChecked + '" type="checkbox">' + "\n" +
 					'</td>' + "\n" +
 					'<td class="' + rowIsEvenOdd + '" id="sid_' + snortObjlist[i].sid + '" >' + snortObjlist[i].sid + '</td>' + "\n" +
 					'<td class="' + rowIsEvenOdd + '">' + "\n" +
-						'<select class="formfld2" id="who_' + snortObjlist[i].sid + '" name="snortsam[db][' + snortObjlist[i].sid + '][who]">' + "\n" +
+						'<select class="formfld2" id="who_' + snortObjlist[i].sid + '" name="snortsam[db][' + i + '][who]">' + "\n" +
 						createDropdownOptionList(timeValuePerfList, snortObjlist[i].who) +						
 						'</select>' + "\n" +
 					'</td>' + "\n" +
 					'<td class="' + rowIsEvenOdd + '">' + "\n" +
-						'<input class="formfld2" id="timeamount_' + snortObjlist[i].sid + '" name="snortsam[db][' + snortObjlist[i].sid + '][timeamount]" type="text" size="7" value="' + snortObjlist[i].timeamount + '">' + "\n" +
+						'<input class="formfld2" id="timeamount_' + snortObjlist[i].sid + '" name="snortsam[db][' + i + '][timeamount]" type="text" size="7" value="' + snortObjlist[i].timeamount + '">' + "\n" +
 					'</td>' + "\n" +
 						'<td class="' + rowIsEvenOdd + '">' + "\n" +
-						'<select class="formfld2" id="timetype_' + snortObjlist[i].sid + '" name="snortsam[db][' + snortObjlist[i].sid + '][timetype]" >' + "\n" +
+						'<select class="formfld2" id="timetype_' + snortObjlist[i].sid + '" name="snortsam[db][' + i + '][timetype]" >' + "\n" +
 						createDropdownOptionList(timeTypePerfList, snortObjlist[i].timetype) +
 						'</select>' + "\n" +
 					'</td>' + "\n" +
 					'<td class="listbg" id="msg_' + snortObjlist[i].sid + '"><font color="white">' + snortObjlist[i].msg + '</font></td>' + "\n" +
-				'</tr>' + "\n"					
+				'</tr>' + "\n" +
+				'<input type="hidden" name="snortsam[db][' + i + '][sig]" value="' + snortObjlist[i].sid + '" />' + "\n"			
 			);
 		  
 		}, 

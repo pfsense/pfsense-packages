@@ -396,6 +396,74 @@ function snortSql_updateRuleSigList()
     
 } // END Save ruleSets settings
 
+
+// Save rulessigs settings for snort_rules_ips
+function snortSql_updateRulesSigsIps()
+{
+
+	// get default settings
+	$listGenRules = array();
+	$listGenRules = snortSql_fetchAllSettings('snortDBrules', 'SnortruleGenIps', 'rdbuuid', $_POST['rdbuuid']);		
+	
+	
+	$addDate = date(U);
+
+	// dont let user pick the DB path
+    $db = sqlite_open("/usr/local/pkg/snort/{$_POST['dbName']}");
+    
+    // checkbox off catch
+    $listGenRulesEnable = $listGenRules[0]['enable'];
+	if ( empty($listGenRules[0]['enable']) || $listGenRules[0]['enable'] === 'off' ) {
+		
+		$listGenRulesEnable = 'off';
+	}    
+    
+	foreach ($_POST['snortsam']['db'] as $singleSig) 
+	{
+
+		$resultid = sqlite_query($db,
+			"SELECT id FROM {$_POST['dbTable']} WHERE signatureid = '{$singleSig['sig']}' and rdbuuid = '{$_POST['rdbuuid']}';
+		");			
+	    
+		$chktable = sqlite_fetch_all($resultid, SQLITE_ASSOC);
+		
+		// checkbox off catch
+		$singleSigEnable = $singleSig['enable'];
+		if ( empty($singleSig['enable']) ) {
+			
+			$singleSigEnable = 'off';
+		}
+		
+		// only do this if something change from defauts settings
+		$somthingChanged = FALSE;
+		if ( $singleSigEnable !== $listGenRulesEnable || $singleSig['who'] !== $listGenRules[0]['who'] || $singleSig['timeamount'] !== $listGenRules[0]['timeamount'] || $singleSig['timetype'] !== $listGenRules[0]['timetype'] ) {
+			$somthingChanged = TRUE;
+		}
+		
+		if ( empty($chktable) && $somthingChanged ) {
+				
+			$rulesetUuid = genAlphaNumMixFast(11, 14);
+			
+			$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+			"INSERT INTO {$_POST['dbTable']} (date, uuid, rdbuuid, enable, who, timeamount, timetype) VALUES ('{$addDate}', '{$rulesetUuid}', '{$_POST['rdbuuid']}', '{$singleSigEnable}', '{$singleSig['who']}', '{$singleSig['timeamount']}', '{$singleSig['timetype']}');
+			");								
+				
+		}
+			
+		if ( !empty($chktable) && $somthingChanged ) {
+
+			echo $singleSig['sig'];
+			
+		}
+		
+	}   // END foreach
+
+    sqlite_close($db);
+	
+}
+
+
+
 // Save ruleSets settings
 function snortSql_updateRuleSetList()
 {
@@ -481,6 +549,12 @@ function snortSql_updateRuleSetList()
 			$table = 'SnortruleGenIps';		
 			$rulesetUuid = genAlphaNumMixFast(11, 14);
 			$addDate = date(U);
+			
+			// if enable is empty then set to off
+			if (empty($_POST['snortsam']['db']['gensettings']['enable'])) {
+				
+				$_POST['snortsam']['db']['gensettings']['enable'] = 'off';
+			}
 	
 			// dont let user pick the DB path
 		    $db = sqlite_open("/usr/local/pkg/snort/{$_POST['dbName']}");
@@ -494,13 +568,13 @@ function snortSql_updateRuleSetList()
 			if (!empty($chktable)) {
 				
 				$query_ck = sqlite_query($db, // @ supress warnings usonly in production
-				"UPDATE {$table} SET who = '{$_POST['snortsam']['db']['gensettings']['who']}', timeamount = '{$_POST['snortsam']['db']['gensettings']['timeamount']}', timetype = '{$_POST['snortsam']['db']['gensettings']['timetype']}' WHERE rdbuuid = '{$_POST['rdbuuid']}'; 
+				"UPDATE {$table} SET enable = '{$_POST['snortsam']['db']['gensettings']['enable']}', who = '{$_POST['snortsam']['db']['gensettings']['who']}', timeamount = '{$_POST['snortsam']['db']['gensettings']['timeamount']}', timetype = '{$_POST['snortsam']['db']['gensettings']['timetype']}' WHERE rdbuuid = '{$_POST['rdbuuid']}'; 
 				");
 								
 			}else{
 				
 				$query_ck = sqlite_query($db, // @ supress warnings usonly in production
-				"INSERT INTO {$table} (date, uuid, rdbuuid, who, timeamount, timetype) VALUES ('{$addDate}', '{$rulesetUuid}', '{$_POST['rdbuuid']}', '{$_POST['snortsam']['db']['gensettings']['who']}', '{$_POST['snortsam']['db']['gensettings']['timeamount']}', '{$_POST['snortsam']['db']['gensettings']['timetype']}');
+				"INSERT INTO {$table} (date, uuid, rdbuuid, enable, who, timeamount, timetype) VALUES ('{$addDate}', '{$rulesetUuid}', '{$_POST['rdbuuid']}', '{$_POST['snortsam']['db']['gensettings']['enable']}', '{$_POST['snortsam']['db']['gensettings']['who']}', '{$_POST['snortsam']['db']['gensettings']['timeamount']}', '{$_POST['snortsam']['db']['gensettings']['timetype']}');
 				");			
 			}
 			

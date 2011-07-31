@@ -68,19 +68,19 @@ if ($_POST['snortSamSaveSettings'] == 1) {
 	unset($_POST['snortSamSaveSettings']);
 		
 	if ($_POST['ifaceTab'] === 'snort_rulesets_ips') {
-		function snortSamSaveFunc() 
+		function snortSamRulesetSaveFunc() 
 		{	
 			print_r($_POST);
 		}
-		snortSamSaveFunc();
+		snortSamRulesetSaveFunc();
 	}
 	
 	if ($_POST['ifaceTab'] === 'snort_rules_ips') {
-		function snortSamSaveFunc() 
+		function snortSamRulesSaveFunc() 
 		{	
-			print_r($_POST);
+			snortSql_updateRulesSigsIps();
 		}
-		snortSamSaveFunc();
+		snortSamRulesSaveFunc();
 	}	
 	
 }
