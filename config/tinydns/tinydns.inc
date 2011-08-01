@@ -564,7 +564,7 @@ function tinydns_create_zone_file() {
 						else
 							$wanpingthreshold = "";
 						$status = tinydns_get_record_status($row['failoverip'], $pingthreshold, $wanpingthreshold);
-						if($status == "DOWN") {
+						if($status == "UP") {
 							$record_data = tinydns_get_rowline_data($row['failoverip'], $domain['recordtype'], $ttl, $hostname, "", $domain['rdns'], $dist, $domain['src_port'], $domain['src_weight'], $domain['src_priority'], $domain['src_timestamp']);
 							fwrite($fd, $record_data . "\n");
 						}
