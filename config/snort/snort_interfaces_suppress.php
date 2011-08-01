@@ -40,17 +40,12 @@ require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 
+if (!is_array($config['installedpackages']['snortglobal']['suppress']))
+	$config['installedpackages']['snortglobal']['suppress'] = array();
 if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
-$config['installedpackages']['snortglobal']['suppress']['item'] = array();
-
-//aliases_sort(); << what ?
+	$config['installedpackages']['snortglobal']['suppress']['item'] = array();
 $a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
-
-if (isset($config['installedpackages']['snortglobal']['suppress']['item'])) {
-	$id_gen = count($config['installedpackages']['snortglobal']['suppress']['item']);
-}else{
-	$id_gen = '0';
-}
+$id_gen = count($config['installedpackages']['snortglobal']['suppress']['item']);
 
 $d_suppresslistdirty_path = '/var/run/snort_suppress.dirty';
 
@@ -62,13 +57,13 @@ if ($_POST) {
 		$retval = 0;
 
 		if(stristr($retval, "error") <> true)
-		$savemsg = get_std_save_message($retval);
+			$savemsg = get_std_save_message($retval);
 		else
-		$savemsg = $retval;
-		if ($retval == 0) {
-			if (file_exists($d_suppresslistdirty_path))
+			$savemsg = $retval;
+		if (file_exists($d_suppresslistdirty_path))
 			unlink($d_suppresslistdirty_path);
-		}
+
+		filter_configure();
 	}
 }
 
@@ -78,7 +73,6 @@ if ($_GET['act'] == "del") {
 
 		unset($a_suppress[$_GET['id']]);
 		write_config();
-		filter_configure();
 		touch($d_suppresslistdirty_path);
 		header("Location: /snort/snort_interfaces_suppress.php");
 		exit;

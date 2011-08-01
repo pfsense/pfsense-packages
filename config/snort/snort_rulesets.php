@@ -43,21 +43,18 @@ $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
-$id = $_POST['id'];
-
+	$id = $_POST['id'];
 
 if (isset($id) && $a_nat[$id]) {
-
 	$pconfig['enable'] = $a_nat[$id]['enable'];
 	$pconfig['interface'] = $a_nat[$id]['interface'];
 	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
+
+	/* convert fake interfaces to real */
+	$if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interface']);
+
+	$iface_uuid = $a_nat[$id]['uuid'];
 }
-
-/* convert fake interfaces to real */
-$if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interface']);
-
-
-$iface_uuid = $a_nat[$id]['uuid'];
 
 $pgtitle = "Snort: Interface $id $iface_uuid $if_real Categories";
 
@@ -132,16 +129,9 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$iface_uuid}_{$if_real}.dirty";
 if ($_POST['apply']) {
 
 	if (file_exists($d_snortconfdirty_path)) {
-			
-		write_config();
-			
-		sync_snort_package_all($id, $if_real, $iface_uuid);
 		sync_snort_package();
-			
 		unlink($d_snortconfdirty_path);
-			
 	}
-
 }
 
 if ($_POST["Submit"]) {
@@ -161,6 +151,8 @@ if ($_POST["Submit"]) {
 
 	write_config();
 
+	sync_snort_package_all($id, $if_real, $iface_uuid);
+
 	touch($d_snortconfdirty_path);
 
 	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -168,10 +160,8 @@ if ($_POST["Submit"]) {
 	header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 	header( 'Cache-Control: post-check=0, pre-check=0', false );
 	header( 'Pragma: no-cache' );
-	sleep(2);
-	sync_snort_package_all($id, $if_real, $iface_uuid);
 	header("Location: /snort/snort_rulesets.php?id=$id");
-
+	exit;
 }
 
 $enabled_rulesets = $a_nat[$id]['rulesets'];
@@ -325,22 +315,10 @@ if (file_exists($d_snortconfdirty_path)) {
 
 </div>
 
-					<?php
-
-					include("fend.inc");
-
-					echo $snort_custom_rnd_box;
-
-					?>
+<?php
+include("fend.inc");
+echo $snort_custom_rnd_box;
+?>
 
 </body>
 </html>
-
-					<?php
-
-					function get_snort_rule_file_description($filename) {
-		$filetext = file_get_contents($filename);
-
-	}
-
-?>

@@ -39,18 +39,12 @@ global $g;
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
-$id = $_POST['id'];
+	$id = $_POST['id'];
 
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
-$config['installedpackages']['snortglobal']['rule'] = array();
-
+	$config['installedpackages']['snortglobal']['rule'] = array();
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
-
-if (isset($config['installedpackages']['snortglobal']['rule'])) {
-	$id_gen = count($config['installedpackages']['snortglobal']['rule']);
-}else{
-	$id_gen = '0';
-}
+$id_gen = count($config['installedpackages']['snortglobal']['rule']);
 
 /* alert file */
 $d_snortconfdirty_path_ls = exec('/bin/ls /var/run/snort_conf_*.dirty');
@@ -59,20 +53,17 @@ $d_snortconfdirty_path_ls = exec('/bin/ls /var/run/snort_conf_*.dirty');
 if ($_POST['apply']) {
 
 	if ($d_snortconfdirty_path_ls != '') {
-			
-		write_config();
-			
+
 		sync_snort_package_empty();
 		sync_snort_package();
-			
+
 		exec('/bin/rm /var/run/snort_conf_*.dirty');
-			
+
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
-		sleep(2);
 		header("Location: /snort/snort_interfaces.php");
 			
 		exit;
@@ -81,11 +72,11 @@ if ($_POST['apply']) {
 
 }
 
-
-
 if (isset($_POST['del_x'])) {
 	/* delete selected rules */
-	if (is_array($_POST['rule']) && count($_POST['rule'])) {
+	if (is_array($_POST['rule'])) {
+		conf_mount_rw();
+
 		foreach ($_POST['rule'] as $rulei) {
 				
 			/* convert fake interfaces to real */
@@ -157,17 +148,15 @@ if (isset($_POST['del_x'])) {
 				}
 					
 			}
-			 
+
 			/* for every iface do these steps */
-			conf_mount_rw();
 			exec("/bin/rm /var/log/snort/snort.u2_{$snort_uuid}_{$if_real}*");
 			exec("/bin/rm -r /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}");
-				
-			conf_mount_ro();
-				
+
 			unset($a_nat[$rulei]);
 			 
 		}
+		conf_mount_ro();
 	  
 		write_config();
 		sleep(2);
@@ -188,17 +177,15 @@ if (isset($_POST['del_x'])) {
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
-		sleep(2);
 		header("Location: /snort/snort_interfaces.php");
-		//exit;
+		exit;
 	}
 
 }
 
 
 /* start/stop snort */
-if ($_GET['act'] == 'toggle' && $_GET['id'] != '')
-{
+if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 
 	$if_real = convert_friendly_interface_to_real_interface_name2($config['installedpackages']['snortglobal']['rule'][$id]['interface']);
 	$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
@@ -220,7 +207,6 @@ if ($_GET['act'] == 'toggle' && $_GET['id'] != '')
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
-		sleep(2);
 		header("Location: /snort/snort_interfaces.php");
 
 	}else{
@@ -235,9 +221,9 @@ if ($_GET['act'] == 'toggle' && $_GET['id'] != '')
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
-		sleep(2);
 		header("Location: /snort/snort_interfaces.php");
 	}
+	exit;
 }
 
 

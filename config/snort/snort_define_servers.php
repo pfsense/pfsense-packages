@@ -54,7 +54,7 @@ $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
-$id = $_POST['id'];
+	$id = $_POST['id'];
 
 if (isset($_GET['dup'])) {
 	$id = $_GET['dup'];
@@ -223,26 +223,25 @@ if ($_POST["Submit"]) {
 
 
 		if (isset($id) && $a_nat[$id])
-		$a_nat[$id] = $natent;
+			$a_nat[$id] = $natent;
 		else {
 			if (is_numeric($after))
-			array_splice($a_nat, $after+1, 0, array($natent));
+				array_splice($a_nat, $after+1, 0, array($natent));
 			else
-			$a_nat[] = $natent;
+				$a_nat[] = $natent;
 		}
 
 		write_config();
 
-		/* after click go to this page */
-
+		sync_snort_package_all($id, $if_real, $snort_uuid);
 		touch($d_snortconfdirty_path);
 
+		/* after click go to this page */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
-		sleep(2);
 
 		header("Location: snort_define_servers.php?id=$id");
 
@@ -254,16 +253,9 @@ if ($_POST["Submit"]) {
 if ($_POST['apply']) {
 
 	if (file_exists($d_snortconfdirty_path)) {
-			
-		write_config();
-			
-		sync_snort_package_all($id, $if_real, $snort_uuid);
 		sync_snort_package();
-			
 		unlink($d_snortconfdirty_path);
-			
 	}
-
 }
 
 $pgtitle = "Snort: Interface $id$if_real Define Servers";

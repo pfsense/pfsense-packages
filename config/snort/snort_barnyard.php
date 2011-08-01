@@ -44,15 +44,15 @@ require_once("/usr/local/pkg/snort/snort.inc");
 
 global $g;
 
-if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
+if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
-}
+
 //nat_rules_sort();
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
-$id = $_POST['id'];
+	$id = $_POST['id'];
 
 if (isset($_GET['dup'])) {
 	$id = $_GET['dup'];
@@ -130,136 +130,136 @@ if (isset($id) && $a_nat[$id]) {
 
 
 	if (!$pconfig['interface'])
+		$pconfig['interface'] = "wan";
+} else 
 	$pconfig['interface'] = "wan";
-} else {
-	$pconfig['interface'] = "wan";
-}
 
 if (isset($_GET['dup']))
-unset($id);
+	unset($id);
 
 $if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interface']);
-$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
-
+if (!empty($config['installedpackages']['snortglobal']['rule'][$id]))
+	$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
 /* alert file */
 $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 
 /* this will exec when alert says apply */
 if ($_POST['apply']) {
-
 	if (file_exists($d_snortconfdirty_path)) {
-			
 		write_config();
-			
-		sync_snort_package_all($id, $if_real, $snort_uuid);
 		sync_snort_package();
-			
 		unlink($d_snortconfdirty_path);
-			
 	}
-
 }
 
 
 if ($_POST["Submit"]) {
 
-	/* check for overlaps */
+	/* XXX: Mising error reporting?! 
+	 * check for overlaps 
 	foreach ($a_nat as $natent) {
 		if (isset($id) && ($a_nat[$id]) && ($a_nat[$id] === $natent))
-		continue;
+			continue;
 		if ($natent['interface'] != $_POST['interface'])
-		continue;
+			continue;
 	}
+	*/
 
 	/* if no errors write to conf */
 	if (!$input_errors) {
 		$natent = array();
 		/* repost the options already in conf */
-
-		if ($pconfig['interface'] != "") { $natent['interface'] = $pconfig['interface']; }
-		if ($pconfig['enable'] != "") { $natent['enable'] = $pconfig['enable']; }
-		if ($pconfig['uuid'] != "") { $natent['uuid'] = $pconfig['uuid']; }
-		if ($pconfig['descr'] != "") { $natent['descr'] = $pconfig['descr']; }
-		if ($pconfig['performance'] != "") { $natent['performance'] = $pconfig['performance']; }
-		if ($pconfig['blockoffenders7'] != "") { $natent['blockoffenders7'] = $pconfig['blockoffenders7']; }
-		if ($pconfig['alertsystemlog'] != "") { $natent['alertsystemlog'] = $pconfig['alertsystemlog']; }
-		if ($pconfig['tcpdumplog'] != "") { $natent['tcpdumplog'] = $pconfig['tcpdumplog']; }
-		if ($pconfig['snortunifiedlog'] != "") { $natent['snortunifiedlog'] = $pconfig['snortunifiedlog']; }
-		if ($pconfig['def_ssl_ports_ignore'] != "") { $natent['def_ssl_ports_ignore'] = $pconfig['def_ssl_ports_ignore']; }
-		if ($pconfig['flow_depth'] != "") { $natent['flow_depth'] = $pconfig['flow_depth']; }
-		if ($pconfig['max_queued_bytes'] != "") { $natent['max_queued_bytes'] = $pconfig['max_queued_bytes']; }
-		if ($pconfig['max_queued_segs'] != "") { $natent['max_queued_segs'] = $pconfig['max_queued_segs']; }
-		if ($pconfig['perform_stat'] != "") { $natent['perform_stat'] = $pconfig['perform_stat']; }
-		if ($pconfig['http_inspect'] != "") { $natent['http_inspect'] = $pconfig['http_inspect']; }
-		if ($pconfig['other_preprocs'] != "") { $natent['other_preprocs'] = $pconfig['other_preprocs']; }
-		if ($pconfig['ftp_preprocessor'] != "") { $natent['ftp_preprocessor'] = $pconfig['ftp_preprocessor']; }
-		if ($pconfig['smtp_preprocessor'] != "") { $natent['smtp_preprocessor'] = $pconfig['smtp_preprocessor']; }
-		if ($pconfig['sf_portscan'] != "") { $natent['sf_portscan'] = $pconfig['sf_portscan']; }
-		if ($pconfig['dce_rpc_2'] != "") { $natent['dce_rpc_2'] = $pconfig['dce_rpc_2']; }
-		if ($pconfig['dns_preprocessor'] != "") { $natent['dns_preprocessor'] = $pconfig['dns_preprocessor']; }
-		if ($pconfig['def_dns_servers'] != "") { $natent['def_dns_servers'] = $pconfig['def_dns_servers']; }
-		if ($pconfig['def_dns_ports'] != "") { $natent['def_dns_ports'] = $pconfig['def_dns_ports']; }
-		if ($pconfig['def_smtp_servers'] != "") { $natent['def_smtp_servers'] = $pconfig['def_smtp_servers']; }
-		if ($pconfig['def_smtp_ports'] != "") { $natent['def_smtp_ports'] = $pconfig['def_smtp_ports']; }
-		if ($pconfig['def_mail_ports'] != "") { $natent['def_mail_ports'] = $pconfig['def_mail_ports']; }
-		if ($pconfig['def_http_servers'] != "") { $natent['def_http_servers'] = $pconfig['def_http_servers']; }
-		if ($pconfig['def_www_servers'] != "") { $natent['def_www_servers'] = $pconfig['def_www_servers']; }
-		if ($pconfig['def_http_ports'] != "") { $natent['def_http_ports'] = $pconfig['def_http_ports'];	}
-		if ($pconfig['def_sql_servers'] != "") { $natent['def_sql_servers'] = $pconfig['def_sql_servers']; }
-		if ($pconfig['def_oracle_ports'] != "") { $natent['def_oracle_ports'] = $pconfig['def_oracle_ports']; }
-		if ($pconfig['def_mssql_ports'] != "") { $natent['def_mssql_ports'] = $pconfig['def_mssql_ports']; }
-		if ($pconfig['def_telnet_servers'] != "") { $natent['def_telnet_servers'] = $pconfig['def_telnet_servers']; }
-		if ($pconfig['def_telnet_ports'] != "") { $natent['def_telnet_ports'] = $pconfig['def_telnet_ports']; }
-		if ($pconfig['def_snmp_servers'] != "") { $natent['def_snmp_servers'] = $pconfig['def_snmp_servers']; }
-		if ($pconfig['def_snmp_ports'] != "") { $natent['def_snmp_ports'] = $pconfig['def_snmp_ports']; }
-		if ($pconfig['def_ftp_servers'] != "") { $natent['def_ftp_servers'] = $pconfig['def_ftp_servers']; }
-		if ($pconfig['def_ftp_ports'] != "") { $natent['def_ftp_ports'] = $pconfig['def_ftp_ports']; }
-		if ($pconfig['def_ssh_servers'] != "") { $natent['def_ssh_servers'] = $pconfig['def_ssh_servers']; }
-		if ($pconfig['def_ssh_ports'] != "") { $natent['def_ssh_ports'] = $pconfig['def_ssh_ports']; }
-		if ($pconfig['def_pop_servers'] != "") { $natent['def_pop_servers'] = $pconfig['def_pop_servers']; }
-		if ($pconfig['def_pop2_ports'] != "") { $natent['def_pop2_ports'] = $pconfig['def_pop2_ports']; }
-		if ($pconfig['def_pop3_ports'] != "") { $natent['def_pop3_ports'] = $pconfig['def_pop3_ports']; }
-		if ($pconfig['def_imap_servers'] != "") { $natent['def_imap_servers'] = $pconfig['def_imap_servers']; }
-		if ($pconfig['def_imap_ports'] != "") { $natent['def_imap_ports'] = $pconfig['def_imap_ports']; }
-		if ($pconfig['def_sip_proxy_ip'] != "") { $natent['def_sip_proxy_ip'] = $pconfig['def_sip_proxy_ip']; }
-		if ($pconfig['def_sip_proxy_ports'] != "") { $natent['def_sip_proxy_ports'] = $pconfig['def_sip_proxy_ports']; }
-		if ($pconfig['def_auth_ports'] != "") { $natent['def_auth_ports'] = $pconfig['def_auth_ports']; }
-		if ($pconfig['def_finger_ports'] != "") { $natent['def_finger_ports'] = $pconfig['def_finger_ports']; }
-		if ($pconfig['def_irc_ports'] != "") { $natent['def_irc_ports'] = $pconfig['def_irc_ports']; }
-		if ($pconfig['def_nntp_ports'] != "") { $natent['def_nntp_ports'] = $pconfig['def_nntp_ports']; }
-		if ($pconfig['def_rlogin_ports'] != "") { $natent['def_rlogin_ports'] = $pconfig['def_rlogin_ports']; }
-		if ($pconfig['def_rsh_ports'] != "") { $natent['def_rsh_ports'] = $pconfig['def_rsh_ports']; }
-		if ($pconfig['def_ssl_ports'] != "") { $natent['def_ssl_ports'] = $pconfig['def_ssl_ports']; }
-		if ($pconfig['snortunifiedlog'] != "") { $natent['snortunifiedlog'] = $pconfig['snortunifiedlog'];	}
-		if ($pconfig['configpassthru'] != "") { $natent['configpassthru'] = $pconfig['configpassthru'];	}
-		if ($pconfig['rulesets'] != "") { $natent['rulesets'] = $pconfig['rulesets']; }
-		if ($pconfig['rule_sid_off'] != "") { $natent['rule_sid_off'] = $pconfig['rule_sid_off']; }
-		if ($pconfig['rule_sid_on'] != "") { $natent['rule_sid_on'] = $pconfig['rule_sid_on']; }
-		if ($pconfig['whitelistname'] != "") { $natent['whitelistname'] = $pconfig['whitelistname']; }
-		if ($pconfig['homelistname'] != "") { $natent['homelistname'] = $pconfig['homelistname']; }
-		if ($pconfig['externallistname'] != "") { $natent['externallistname'] = $pconfig['externallistname']; }
-		if ($pconfig['suppresslistname'] != "") { $natent['suppresslistname'] = $pconfig['suppresslistname']; }
+		$natent = $pconfig;
 
 		/* post new options */
-		$natent['barnyard_enable'] = $_POST['barnyard_enable'] ? on : off;
+		if ($_POST['interface'] != "") { $natent['interface'] = $_POST['interface']; } else unset($natent['interface']);
+		if ($_POST['enable'] != "") { $natent['enable'] = $_POST['enable']; } else unset($natent['enable']);
+		if ($_POST['uuid'] != "") { $natent['uuid'] = $_POST['uuid']; } else unset($natent['uuid']);
+		if ($_POST['descr'] != "") { $natent['descr'] = $_POST['descr']; } else unset($natent['descr']);
+		if ($_POST['performance'] != "") { $natent['performance'] = $_POST['performance']; } else unset($natent['descr']);
+		if ($_POST['blockoffenders7'] != "") { $natent['blockoffenders7'] = $_POST['blockoffenders7']; } else unset($natent['blockoffenders7']);
+		if ($_POST['alertsystemlog'] != "") { $natent['alertsystemlog'] = $_POST['alertsystemlog']; } else unset($natent['alertsystemlog']);
+		if ($_POST['tcpdumplog'] != "") { $natent['tcpdumplog'] = $_POST['tcpdumplog']; } else unset($natent['tcpdumplog']);
+		if ($_POST['snortunifiedlog'] != "") { $natent['snortunifiedlog'] = $_POST['snortunifiedlog']; } else unset($natent['snortunifiedlog']);
+		if ($_POST['def_ssl_ports_ignore'] != "") { $natent['def_ssl_ports_ignore'] = $_POST['def_ssl_ports_ignore']; } else unset($natent['def_ssl_ports_ignore']);
+		if ($_POST['flow_depth'] != "") { $natent['flow_depth'] = $_POST['flow_depth']; } else unset($natent['flow_depth']);
+		if ($_POST['max_queued_bytes'] != "") { $natent['max_queued_bytes'] = $_POST['max_queued_bytes']; } else unset($natent['max_queued_bytes']);
+		if ($_POST['max_queued_segs'] != "") { $natent['max_queued_segs'] = $_POST['max_queued_segs']; } else unset($natent['max_queued_segs']);
+		if ($_POST['perform_stat'] != "") { $natent['perform_stat'] = $_POST['perform_stat']; } else unset($natent['perform_stat']);
+		if ($_POST['http_inspect'] != "") { $natent['http_inspect'] = $_POST['http_inspect']; } else unset($natent['http_inspect']);
+		if ($_POST['other_preprocs'] != "") { $natent['other_preprocs'] = $_POST['other_preprocs']; } else unset($natent['other_preprocs']);
+		if ($_POST['ftp_preprocessor'] != "") { $natent['ftp_preprocessor'] = $_POST['ftp_preprocessor']; } else unset($natent['ftp_preprocessor']);
+		if ($_POST['smtp_preprocessor'] != "") { $natent['smtp_preprocessor'] = $_POST['smtp_preprocessor']; } else unset($natent['smtp_preprocessor']);
+		if ($_POST['sf_portscan'] != "") { $natent['sf_portscan'] = $_POST['sf_portscan']; } else unset($natent['sf_portscan']);
+		if ($_POST['dce_rpc_2'] != "") { $natent['dce_rpc_2'] = $_POST['dce_rpc_2']; } else unset($natent['dce_rpc_2']);
+		if ($_POST['dns_preprocessor'] != "") { $natent['dns_preprocessor'] = $_POST['dns_preprocessor']; } else unset($natent['dns_preprocessor']);
+		if ($_POST['def_dns_servers'] != "") { $natent['def_dns_servers'] = $_POST['def_dns_servers']; } else unset($natent['def_dns_servers']);
+		if ($_POST['def_dns_ports'] != "") { $natent['def_dns_ports'] = $_POST['def_dns_ports']; } else unset($natent['def_dns_ports']);
+		if ($_POST['def_smtp_servers'] != "") { $natent['def_smtp_servers'] = $_POST['def_smtp_servers']; } else unset($natent['def_smtp_servers']);
+		if ($_POST['def_smtp_ports'] != "") { $natent['def_smtp_ports'] = $_POST['def_smtp_ports']; } else unset($natent['def_mail_ports']);
+		if ($_POST['def_mail_ports'] != "") { $natent['def_mail_ports'] = $_POST['def_mail_ports']; } else unset($natent['def_mail_ports']);
+		if ($_POST['def_http_servers'] != "") { $natent['def_http_servers'] = $_POST['def_http_servers']; } else unset($natent['def_http_servers']);
+		if ($_POST['def_www_servers'] != "") { $natent['def_www_servers'] = $_POST['def_www_servers']; } else unset($natent['def_www_servers']);
+		if ($_POST['def_http_ports'] != "") { $natent['def_http_ports'] = $_POST['def_http_ports'];	} else unset($natent['def_http_ports']);
+		if ($_POST['def_sql_servers'] != "") { $natent['def_sql_servers'] = $_POST['def_sql_servers']; } else unset($natent['def_sql_servers']);
+		if ($_POST['def_oracle_ports'] != "") { $natent['def_oracle_ports'] = $_POST['def_oracle_ports']; } else unset($natent['def_oracle_ports']);
+		if ($_POST['def_mssql_ports'] != "") { $natent['def_mssql_ports'] = $_POST['def_mssql_ports']; } else unset($natent['def_mssql_ports']);
+		if ($_POST['def_telnet_servers'] != "") { $natent['def_telnet_servers'] = $_POST['def_telnet_servers']; } else unset($natent['def_telnet_ports']);
+		if ($_POST['def_telnet_ports'] != "") { $natent['def_telnet_ports'] = $_POST['def_telnet_ports']; } else unset($natent['def_telnet_ports']);
+		if ($_POST['def_snmp_servers'] != "") { $natent['def_snmp_servers'] = $_POST['def_snmp_servers']; } else unset($natent['def_snmp_servers']);
+		if ($_POST['def_snmp_ports'] != "") { $natent['def_snmp_ports'] = $_POST['def_snmp_ports']; } else unset($natent['def_snmp_ports']);
+		if ($_POST['def_ftp_servers'] != "") { $natent['def_ftp_servers'] = $_POST['def_ftp_servers']; } else unset($natent['def_ftp_servers']);
+		if ($_POST['def_ftp_ports'] != "") { $natent['def_ftp_ports'] = $_POST['def_ftp_ports']; } else unset($natent['def_ftp_ports']);
+		if ($_POST['def_ssh_servers'] != "") { $natent['def_ssh_servers'] = $_POST['def_ssh_servers']; } else unset($natent['def_ssh_servers']);
+		if ($_POST['def_ssh_ports'] != "") { $natent['def_ssh_ports'] = $_POST['def_ssh_ports']; } else unset($natent['def_ssh_ports']);
+		if ($_POST['def_pop_servers'] != "") { $natent['def_pop_servers'] = $_POST['def_pop_servers']; } else unset($natent['def_pop_servers']);
+		if ($_POST['def_pop2_ports'] != "") { $natent['def_pop2_ports'] = $_POST['def_pop2_ports']; } else unset($natent['def_pop2_ports']);
+		if ($_POST['def_pop3_ports'] != "") { $natent['def_pop3_ports'] = $_POST['def_pop3_ports']; } else unset($natent['def_pop3_ports']);
+		if ($_POST['def_imap_servers'] != "") { $natent['def_imap_servers'] = $_POST['def_imap_servers']; } else unset($natent['def_imap_servers']);
+		if ($_POST['def_imap_ports'] != "") { $natent['def_imap_ports'] = $_POST['def_imap_ports']; } else unset($natent['def_imap_ports']);
+		if ($_POST['def_sip_proxy_ip'] != "") { $natent['def_sip_proxy_ip'] = $_POST['def_sip_proxy_ip']; } else unset($natent['def_sip_proxy_ip']);
+		if ($_POST['def_sip_proxy_ports'] != "") { $natent['def_sip_proxy_ports'] = $_POST['def_sip_proxy_ports']; } else unset($natent['def_sip_proxy_ports']);
+		if ($_POST['def_auth_ports'] != "") { $natent['def_auth_ports'] = $_POST['def_auth_ports']; } else unset($natent['def_auth_ports']);
+		if ($_POST['def_finger_ports'] != "") { $natent['def_finger_ports'] = $_POST['def_finger_ports']; } else unset($natent['def_finger_ports']);
+		if ($_POST['def_irc_ports'] != "") { $natent['def_irc_ports'] = $_POST['def_irc_ports']; } else unset($natent['def_irc_ports']);
+		if ($_POST['def_nntp_ports'] != "") { $natent['def_nntp_ports'] = $_POST['def_nntp_ports']; } else unset($natent['def_nntp_ports']);
+		if ($_POST['def_rlogin_ports'] != "") { $natent['def_rlogin_ports'] = $_POST['def_rlogin_ports']; } else unset($natent['def_rlogin_ports']);
+		if ($_POST['def_rsh_ports'] != "") { $natent['def_rsh_ports'] = $_POST['def_rsh_ports']; } else unset($natent['def_rsh_ports']);
+		if ($_POST['def_ssl_ports'] != "") { $natent['def_ssl_ports'] = $_POST['def_ssl_ports']; } else unset($natent['def_ssl_ports']);
+		if ($_POST['snortunifiedlog'] != "") { $natent['snortunifiedlog'] = $_POST['snortunifiedlog'];	} else unset($natent['snortunifiedlog']);
+		if ($_POST['configpassthru'] != "") { $natent['configpassthru'] = $_POST['configpassthru'];	} else unset($natent['configpassthru']);
+		if ($_POST['rulesets'] != "") { $natent['rulesets'] = $_POST['rulesets']; } else unset($natent['rulesets']);
+		if ($_POST['rule_sid_off'] != "") { $natent['rule_sid_off'] = $_POST['rule_sid_off']; } else unset($natent['rule_sid_off']);
+		if ($_POST['rule_sid_on'] != "") { $natent['rule_sid_on'] = $_POST['rule_sid_on']; } else unset($natent['rule_sid_on']);
+		if ($_POST['whitelistname'] != "") { $natent['whitelistname'] = $_POST['whitelistname']; } else unset($natent['whitelistname']);
+		if ($_POST['homelistname'] != "") { $natent['homelistname'] = $_POST['homelistname']; } else unset($natent['homelistname']);
+		if ($_POST['externallistname'] != "") { $natent['externallistname'] = $_POST['externallistname']; } else unset($natent['externallistname']);
+		if ($_POST['suppresslistname'] != "") { $natent['suppresslistname'] = $_POST['suppresslistname']; } else unset($natent['suppresslistname']);
+		$natent['barnyard_enable'] = $_POST['barnyard_enable'] ? 'on' : 'off';
 		$natent['barnyard_mysql'] = $_POST['barnyard_mysql'] ? $_POST['barnyard_mysql'] : $pconfig['barnyard_mysql'];
-		$natent['barnconfigpassthru'] = base64_encode($_POST['barnconfigpassthru']) ? base64_encode($_POST['barnconfigpassthru']) : $pconfig['barnconfigpassthru'];
-		if ($_POST['barnyard_enable'] == "on") { $natent['snortunifiedlog'] = on; }else{ $natent['snortunifiedlog'] = off; } if ($_POST['barnyard_enable'] == "") { $natent['snortunifiedlog'] = off; }
+		$natent['barnconfigpassthru'] = $_POST['barnconfigpassthru'] ? base64_encode($_POST['barnconfigpassthru']) : $pconfig['barnconfigpassthru'];
+		if ($_POST['barnyard_enable'] == "on")
+			$natent['snortunifiedlog'] = 'on';
+		else
+			$natent['snortunifiedlog'] = 'off';
+		if (empty($_POST['barnyard_enable']))
+			$natent['snortunifiedlog'] = 'off';
 
 		if (isset($id) && $a_nat[$id])
-		$a_nat[$id] = $natent;
+			$a_nat[$id] = $natent;
 		else {
 			if (is_numeric($after))
-			array_splice($a_nat, $after+1, 0, array($natent));
+				array_splice($a_nat, $after+1, 0, array($natent));
 			else
-			$a_nat[] = $natent;
+				$a_nat[] = $natent;
 		}
 
 		write_config();
+		sync_snort_package_all($id, $if_real, $snort_uuid);
+		touch($d_snortconfdirty_path);
 
 		/* after click go to this page */
-		touch($d_snortconfdirty_path);
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
@@ -422,12 +422,17 @@ echo "
 				<td width="22%" valign="top" class="vncell2">Interface</td>
 				<td width="78%" class="vtable"><select name="interface"
 					class="formfld">
-					<?php
-					$interfaces = array('wan' => 'WAN', 'lan' => 'LAN', 'pptp' => 'PPTP', 'pppoe' => 'PPPOE');
-					for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
-						$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
+				<?php
+					if (function_exists('get_configured_interface_with_descr'))
+						$interfaces = get_configured_interface_with_descr();
+					else {
+						$interfaces = array('wan' => 'WAN', 'lan' => 'LAN', 'pptp' => 'PPTP', 'pppoe' => 'PPPOE');
+						for ($i = 1; isset($config['interfaces']['opt' . $i]); $i++) {
+							$interfaces['opt' . $i] = $config['interfaces']['opt' . $i]['descr'];
+						}
 					}
-					foreach ($interfaces as $iface => $ifacename): ?>
+					foreach ($interfaces as $iface => $ifacename):
+				?>
 					<option value="<?=$iface;?>"
 					<?php if ($iface == $pconfig['interface']) echo "selected"; ?>><?=htmlspecialchars($ifacename);?>
 					</option>

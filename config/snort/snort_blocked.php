@@ -34,6 +34,9 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
+if (!is_array($config['installedpackages']['snortglobal']['alertsblocks']))
+	$config['installedpackages']['snortglobal']['alertsblocks'] = array();
+
 $pconfig['brefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['brefresh'];
 $pconfig['blertnumber'] = $config['installedpackages']['snortglobal']['alertsblocks']['blertnumber'];
 
@@ -46,17 +49,17 @@ if ($pconfig['blertnumber'] == '' || $pconfig['blertnumber'] == '0')
 
 if($_POST['todelete'] or $_GET['todelete']) {
 	if($_POST['todelete'])
-	$ip = $_POST['todelete'];
+		$ip = $_POST['todelete'];
 	if($_GET['todelete'])
-	$ip = $_GET['todelete'];
+		$ip = $_GET['todelete'];
 	exec("/sbin/pfctl -t snort2c -T delete {$ip}");
 }
 
 if ($_POST['remove']) {
-
 	exec("/sbin/pfctl -t snort2c -T flush");
 	sleep(1);
 	header("Location: /snort/snort_blocked.php");
+	exit;
 
 }
 
@@ -72,25 +75,16 @@ if ($_POST['download'])
 
 	$blocked_ips_array_save = str_replace('   ', '', array_filter(explode("\n", file_get_contents('/tmp/snort_block.pf'))));
 
-	if ($blocked_ips_array_save[0] != '')
-	{
-
+	if ($blocked_ips_array_save[0] != '') {
 		/* build the list */
-		$counter = 0;
-		foreach($blocked_ips_array_save as $fileline3)
-		{
-
-			$counter++;
-
-			exec("/bin/echo  $fileline3 >> /tmp/snort_blocked/snort_block.pf");
-
-		}
+		file_put_contents("/tmp/snort_blocked/snort_block.pf", "");
+		foreach($blocked_ips_array_save as $counter => $fileline3)
+			file_put_contents("/tmp/snort_blocked/snort_block.pf", "{$fileline3}\n", FILE_APPEND);
 	}
 
 	exec("/usr/bin/tar cfz /tmp/snort_blocked_{$save_date}.tar.gz /tmp/snort_blocked");
 
-	if(file_exists("/tmp/snort_blocked_{$save_date}.tar.gz"))
-	{
+	if(file_exists("/tmp/snort_blocked_{$save_date}.tar.gz")) {
 		$file = "/tmp/snort_blocked_{$save_date}.tar.gz";
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT\n");
 		header("Pragma: private"); // needed for IE
@@ -104,9 +98,8 @@ if ($_POST['download'])
 		exec("/bin/rm /tmp/snort_block.pf");
 		exec("/bin/rm /tmp/snort_blocked/snort_block.pf");
 		od_end_clean(); //importanr or other post will fail
-	}else{
+	} else
 		echo 'Error no saved file.';
-	}
 
 }
 
@@ -123,15 +116,11 @@ if ($_POST['save'])
 	/* no errors */
 	if (!$input_errors)
 	{
-
 		$config['installedpackages']['snortglobal']['alertsblocks']['brefresh'] = $_POST['brefresh'] ? on : off;
 		$config['installedpackages']['snortglobal']['alertsblocks']['blertnumber'] = $_POST['blertnumber'];
 
-		conf_mount_rw();
 		write_config();
-		//conf_mount_ro();
-		sleep(2);
-			
+
 		header("Location: /snort/snort_blocked.php");
 
 	}
@@ -146,24 +135,18 @@ function get_snort_alert_ip_src($fileline)
 	$re2='((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(?![\\d])'; # IPv4 IP Address 1
 
 	if ($c=preg_match_all ("/".$re1.$re2."/is", $fileline, $matches4))
-	{
 		$alert_ip_src = $matches4[1][0];
-	}
 
 	return $alert_ip_src;
-
 }
 
 function get_snort_alert_disc($fileline)
 {
 	/* disc */
 	if (preg_match("/\[\*\*\] (\[.*\]) (.*) (\[\*\*\])/", $fileline, $matches))
-	{
 		$alert_disc =  "$matches[2]";
-	}
 
 	return $alert_disc;
-
 }
 
 /* build sec filters */
@@ -171,24 +154,18 @@ function get_snort_block_ip($fileline)
 {
 	/* ip */
 	if (preg_match("/\[\d+\.\d+\.\d+\.\d+\]/", $fileline, $matches))
-	{
 		$alert_block_ip =  "$matches[0]";
-	}
 
 	return $alert_block_ip;
-
 }
 
 function get_snort_block_disc($fileline)
 {
 	/* disc */
 	if (preg_match("/\]\s\[.+\]$/", $fileline, $matches))
-	{
 		$alert_block_disc =  "$matches[0]";
-	}
 
 	return $alert_block_disc;
-
 }
 
 /* tell the user what settings they have */
@@ -247,10 +224,8 @@ include("fbegin.inc");
 echo $snort_general_css;
 
 /* refresh every 60 secs */
-if ($pconfig['brefresh'] == 'on' || $pconfig['brefresh'] == '')
-{
+if ($pconfig['brefresh'] == 'on')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_blocked.php\" />\n";
-}
 ?>
 
 <!-- hack to fix the hardcoed fbegin link in header -->
@@ -362,9 +337,7 @@ if ($pconfig['brefresh'] == 'on' || $pconfig['brefresh'] == '')
 						$alert_ip_src_array[] = get_snort_alert_ip_src($fileline);
 
 						if (in_array("$alert_ip_src", $blocked_ips_array))
-						{
 							$input[] = "[$alert_ip_src] " . "[$alert_ip_disc]\n";
-						}
 					}
 
 					foreach($blocked_ips_array as $alert_block_ip)
@@ -428,7 +401,7 @@ if ($pconfig['brefresh'] == 'on' || $pconfig['brefresh'] == '')
 					foreach($blocked_ips_array as $alert_block_ip)
 					{
 						if($logent <= $counter2)
-						continue;
+							continue;
 
 						$counter2++;
 
@@ -447,12 +420,10 @@ if ($pconfig['brefresh'] == 'on' || $pconfig['brefresh'] == '')
 
 				echo '</table>' . "\n";
 
-				if ($blocked_ips_array[0] == '')
-				{
+				if (empty($blocked_ips_array[0]))
 					echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\"><br><strong>There are currently no items being blocked by snort.</strong></td></tr>";
-				}else{
+				else
 					echo "\n<tr><td colspan='3' align=\"center\" valign=\"top\">{$counter2} items listed.</td></tr>";
-				}
 
 				?>
 				</td>

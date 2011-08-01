@@ -140,18 +140,10 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 if ($_POST['apply']) {
 
 	if (file_exists($d_snortconfdirty_path)) {
-			
-		write_config();
-			
-		sync_snort_package_all($id, $if_real, $snort_uuid);
 		sync_snort_package();
-			
 		unlink($d_snortconfdirty_path);
-			
 	}
-
 }
-
 
 if ($_POST["Submit"]) {
 
@@ -233,15 +225,17 @@ if ($_POST["Submit"]) {
 		$natent['dns_preprocessor'] = $_POST['dns_preprocessor'] ? on : off;
 
 		if (isset($id) && $a_nat[$id])
-		$a_nat[$id] = $natent;
+			$a_nat[$id] = $natent;
 		else {
 			if (is_numeric($after))
-			array_splice($a_nat, $after+1, 0, array($natent));
+				array_splice($a_nat, $after+1, 0, array($natent));
 			else
-			$a_nat[] = $natent;
+				$a_nat[] = $natent;
 		}
 
 		write_config();
+
+		sync_snort_package_all($id, $if_real, $snort_uuid);
 
 		/* after click go to this page */
 		touch($d_snortconfdirty_path);

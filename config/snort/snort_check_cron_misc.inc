@@ -44,13 +44,11 @@ require_once("/usr/local/pkg/snort/snort.inc");
 $snortloglimit = $config['installedpackages']['snortglobal']['snortloglimit'];
 $snortloglimitsize = $config['installedpackages']['snortglobal']['snortloglimitsize'];
 
-if ($g['booting']==true) {
-	exit(0);
-}
+if ($g['booting']==true)
+	return;
 
-if ($snortloglimit == 'off') {
-	exit(0);
-}
+if ($snortloglimit == 'off')
+	return;
 
 $snortloglimitDSKsize = exec('/bin/df -k /var | grep -v "Filesystem" | awk \'{print $4}\'');
 

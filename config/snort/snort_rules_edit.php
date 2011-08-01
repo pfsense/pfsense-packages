@@ -49,15 +49,13 @@ $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
-$id = $_POST['id'];
+	$id = $_POST['id'];
 
 $ids = $_GET['ids'];
 if (isset($_POST['ids']))
-$ids = $_POST['ids'];
-
+	$ids = $_POST['ids'];
 
 if (isset($id) && $a_nat[$id]) {
-
 	$pconfig['enable'] = $a_nat[$id]['enable'];
 	$pconfig['interface'] = $a_nat[$id]['interface'];
 	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
@@ -94,6 +92,7 @@ $splitcontents = explode($delimiter, $contents2);
 //copy rule contents from array into string
 $tempstring = $splitcontents[$lineid];
 
+if (!function_exists('write_rule_file')) {
 function write_rule_file($content_changed, $received_file)
 {
 	//read snort file with writing enabled
@@ -112,6 +111,7 @@ function write_rule_file($content_changed, $received_file)
 	fclose($filehandle);
 
 }
+}
 
 
 
@@ -127,14 +127,14 @@ if($_POST['highlight'] <> "") {
 }
 
 if($_POST['rows'] <> "")
-$rows = $_POST['rows'];
+	$rows = $_POST['rows'];
 else
-$rows = 1;
+	$rows = 1;
 
 if($_POST['cols'] <> "")
-$cols = $_POST['cols'];
+	$cols = $_POST['cols'];
 else
-$cols = 66;
+	$cols = 66;
 
 if ($_POST)
 {
@@ -150,7 +150,7 @@ if ($_POST)
 		write_rule_file($splitcontents, $file);
 
 		header("Location: /snort/snort_view_edit.php?id=$id&openruleset=$file&ids=$ids");
-
+		exit;
 	}
 }
 

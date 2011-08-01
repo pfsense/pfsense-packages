@@ -56,20 +56,14 @@ $pconfig['forcekeepsettings'] = $config['installedpackages']['snortglobal']['for
 if ($_POST['apply']) {
 
 	if (file_exists("$d_snort_global_dirty_path")) {
-		conf_mount_rw();
-			
+
 		/* create whitelist and homenet file  then sync files */
 		sync_snort_package_empty();
 		sync_snort_package();
 
 		unlink("$d_snort_global_dirty_path");
-			
-		write_config();
-		conf_mount_ro();
 	}
 }
-
-
 
 /* if no errors move foward */
 if (!$input_errors) {
@@ -78,19 +72,15 @@ if (!$input_errors) {
 
 		$config['installedpackages']['snortglobal']['snortdownload'] = $_POST['snortdownload'];
 		$config['installedpackages']['snortglobal']['oinkmastercode'] = $_POST['oinkmastercode'];
-		$config['installedpackages']['snortglobal']['emergingthreats'] = $_POST['emergingthreats'] ? on : off;
+		$config['installedpackages']['snortglobal']['emergingthreats'] = $_POST['emergingthreats'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['rm_blocked'] = $_POST['rm_blocked'];
 		$config['installedpackages']['snortglobal']['snortloglimit'] = $_POST['snortloglimit'];
 		$config['installedpackages']['snortglobal']['snortloglimitsize'] = $_POST['snortloglimitsize'];
 		$config['installedpackages']['snortglobal']['autorulesupdate7'] = $_POST['autorulesupdate7'];
 		$config['installedpackages']['snortglobal']['snortalertlogtype'] = $_POST['snortalertlogtype'];
-		$config['installedpackages']['snortglobal']['forcekeepsettings'] = $_POST['forcekeepsettings'] ? on : off;
-
-		write_config();
-		sleep(2);
+		$config['installedpackages']['snortglobal']['forcekeepsettings'] = $_POST['forcekeepsettings'] ? 'on' : 'off';
 
 		$retval = 0;
-
 
 		$snort_snortloglimit_info_ck = $config['installedpackages']['snortglobal']['snortloglimit'];
 		if ($snort_snortloglimit_info_ck == 'on') {
@@ -106,9 +96,9 @@ if (!$input_errors) {
 		/* set the snort block hosts time IMPORTANT */
 		$snort_rm_blocked_info_ck = $config['installedpackages']['snortglobal']['rm_blocked'];
 		if ($snort_rm_blocked_info_ck == "never_b")
-		$snort_rm_blocked_false = "";
+			$snort_rm_blocked_false = "";
 		else
-		$snort_rm_blocked_false = "true";
+			$snort_rm_blocked_false = "true";
 
 		if ($snort_rm_blocked_info_ck != "")
 		{
@@ -119,9 +109,9 @@ if (!$input_errors) {
 		/* set the snort rules update time */
 		$snort_rules_up_info_ck = $config['installedpackages']['snortglobal']['autorulesupdate7'];
 		if ($snort_rules_up_info_ck == "never_up")
-		$snort_rules_up_false = "";
+			$snort_rules_up_false = "";
 		else
-		$snort_rules_up_false = "true";
+			$snort_rules_up_false = "true";
 
 		if ($snort_rules_up_info_ck != "")
 		{
@@ -143,7 +133,7 @@ if (!$input_errors) {
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
 		header("Location: /snort/snort_interfaces_global.php");
-
+		exit;
 	}
 }
 
@@ -151,10 +141,7 @@ if (!$input_errors) {
 if ($_POST["Reset"]) {
 
 	function snort_deinstall_settings() {
-
 		global $config, $g, $id, $if_real;
-		conf_mount_rw();
-
 
 		exec("/usr/usr/bin/killall snort");
 		sleep(2);
@@ -166,100 +153,54 @@ if ($_POST["Reset"]) {
 		sleep(2);
 
 		/* Remove snort cron entries Ugly code needs smoothness*/
-		function snort_rm_blocked_deinstall_cron($should_install)
-		{
-			global $config, $g;
-			conf_mount_rw();
+		if (!function_exists('snort_deinstall_cron')) {
+			function snort_deinstall_cron($cronmatch) {
+				global $config, $g;
 
-			$is_installed = false;
 
-			if(!$config['cron']['item'])
-			return;
+				if(!$config['cron']['item'])
+					return;
 
-			$x=0;
-			foreach($config['cron']['item'] as $item)
-			{
-				if (strstr($item['command'], "snort2c"))
-				{
-					$is_installed = true;
-					break;
+				$x=0;
+				$is_installed = false;
+				foreach($config['cron']['item'] as $item) {
+					if (strstr($item['command'], "snort2c")) {
+						$is_installed = true;
+						break;
+					}
+					$x++;
 				}
-
-				$x++;
-					
-			}
-			if($is_installed == true)
-			{
-				if($x > 0)
-				{
+				if($is_installed == true)
 					unset($config['cron']['item'][$x]);
-					write_config();
-					conf_mount_rw();
-				}
 
-				configure_cron();
-
-			}
-			conf_mount_ro();
-
-		}
-
-		function snort_rules_up_deinstall_cron($should_install)
-		{
-			global $config, $g;
-			conf_mount_rw();
-
-			$is_installed = false;
-
-			if(!$config['cron']['item'])
-			return;
-
-			$x=0;
-			foreach($config['cron']['item'] as $item) {
-				if (strstr($item['command'], "snort_check_for_rule_updates.php")) {
-					$is_installed = true;
-					break;
-				}
-				$x++;
-			}
-			if($is_installed == true) {
-				if($x > 0) {
-					unset($config['cron']['item'][$x]);
-					write_config();
-					conf_mount_rw();
-				}
 				configure_cron();
 			}
 		}
 
-		snort_rm_blocked_deinstall_cron("");
-		snort_rules_up_deinstall_cron("");
+		snort_deinstall_cron("snort2c");
+		snort_deinstall_cron("snort_check_for_rule_updates.php");
 
 
 		/* Unset snort registers in conf.xml IMPORTANT snort will not start with out this */
 		/* Keep this as a last step */
 		unset($config['installedpackages']['snortglobal']);
-		write_config();
-		conf_mount_rw();
 
 		/* remove all snort iface dir */
 		exec('rm -r /usr/local/etc/snort/snort_*');
 		exec('rm /var/log/snort/*');
 
-		conf_mount_ro();
-
+		write_config();
 	}
 
 	snort_deinstall_settings();
+	write_config(); /* XXX */
 
 	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 	header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 	header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 	header( 'Cache-Control: post-check=0, pre-check=0', false );
 	header( 'Pragma: no-cache' );
-	sleep(2);
 	header("Location: /snort/snort_interfaces_global.php");
-
 	exit;
 }
 

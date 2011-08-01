@@ -35,19 +35,15 @@ require_once("/usr/local/pkg/snort/snort.inc");
 
 global $g;
 
-if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
+if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
-}
-
-//nat_rules_sort();
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
-$id = $_POST['id'];
+	$id = $_POST['id'];
 
 if (isset($id) && $a_nat[$id]) {
-
 	$pconfig['enable'] = $a_nat[$id]['enable'];
 	$pconfig['interface'] = $a_nat[$id]['interface'];
 	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];

@@ -39,28 +39,33 @@ require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
+if (!is_array($config['installedpackages']['snortglobal']['suppress']))
+	$config['installedpackages']['snortglobal']['suppress'] = array();
 if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
-$config['installedpackages']['snortglobal']['suppress']['item'] = array();
-
+	$config['installedpackages']['snortglobal']['suppress']['item'] = array();
 $a_suppress = &$config['installedpackages']['snortglobal']['suppress']['item'];
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
-$id = $_POST['id'];
+	$id = $_POST['id'];
+if (!is_numeric($id))
+	$id = 0; // XXX: safety belt
 
 
 /* gen uuid for each iface !inportant */
-if ($config['installedpackages']['snortglobal']['suppress']['item'][$id]['uuid'] == '') {
-	//$snort_uuid = gen_snort_uuid(strrev(uniqid(true)));
-	$suppress_uuid = 0;
-	while ($suppress_uuid > 65535 || $suppress_uuid == 0) {
-		$suppress_uuid = mt_rand(1, 65535);
-		$pconfig['uuid'] = $suppress_uuid;
+if (!is_array($config['installedpackages']['snortglobal']['suppress']['item'][$id])) {
+	if ($config['installedpackages']['snortglobal']['suppress']['item'][$id]['uuid'] == '') {
+		//$snort_uuid = gen_snort_uuid(strrev(uniqid(true)));
+		$suppress_uuid = 0;
+		while ($suppress_uuid > 65535 || $suppress_uuid == 0) {
+			$suppress_uuid = mt_rand(1, 65535);
+			$pconfig['uuid'] = $suppress_uuid;
+		}
 	}
-}
 
-if ($config['installedpackages']['snortglobal']['suppress']['item'][$id]['uuid'] != '') {
-	$suppress_uuid = $config['installedpackages']['snortglobal']['suppress']['item'][$id]['uuid'];
+	if ($config['installedpackages']['snortglobal']['suppress']['item'][$id]['uuid'] != '') {
+		$suppress_uuid = $config['installedpackages']['snortglobal']['suppress']['item'][$id]['uuid'];
+	}
 }
 
 $d_snort_suppress_dirty_path = '/var/run/snort_suppress.dirty';
@@ -68,14 +73,13 @@ $d_snort_suppress_dirty_path = '/var/run/snort_suppress.dirty';
 /* returns true if $name is a valid name for a whitelist file name or ip */
 function is_validwhitelistname($name) {
 	if (!is_string($name))
-	return false;
+		return false;
 
 	if (!preg_match("/[^a-zA-Z0-9\.\/]/", $name))
-	return true;
+		return true;
 
 	return false;
 }
-
 
 if (isset($id) && $a_suppress[$id]) {
 
@@ -84,25 +88,16 @@ if (isset($id) && $a_suppress[$id]) {
 	$pconfig['uuid'] = $a_suppress[$id]['uuid'];
 	$pconfig['descr'] = $a_suppress[$id]['descr'];
 	$pconfig['suppresspassthru'] = base64_decode($a_suppress[$id]['suppresspassthru']);
-
-
-
 }
 
 /* this will exec when alert says apply */
 if ($_POST['apply']) {
 
 	if (file_exists("$d_snort_suppress_dirty_path")) {
-			
-		write_config();
-			
 		sync_snort_package_config();
 		sync_snort_package();
-
 		unlink("$d_snort_suppress_dirty_path");
-			
 	}
-
 }
 
 if ($_POST['submit']) {
@@ -127,7 +122,7 @@ if ($_POST['submit']) {
 	/* check for name conflicts */
 	foreach ($a_suppress as $s_list) {
 		if (isset($id) && ($a_suppress[$id]) && ($a_suppress[$id] === $s_list))
-		continue;
+			continue;
 
 		if ($s_list['name'] == $_POST['name']) {
 			$input_errors[] = "A whitelist file name with this name already exists.";
@@ -136,21 +131,17 @@ if ($_POST['submit']) {
 	}
 
 
-	$s_list = array();
-	/* post user input */
-
 	if (!$input_errors) {
-
+		$s_list = array();
 		$s_list['name'] = $_POST['name'];
 		$s_list['uuid'] = $suppress_uuid;
 		$s_list['descr']  =  mb_convert_encoding($_POST['descr'],"HTML-ENTITIES","auto");
 		$s_list['suppresspassthru'] = base64_encode($_POST['suppresspassthru']);
 
-
 		if (isset($id) && $a_suppress[$id])
-		$a_suppress[$id] = $s_list;
+			$a_suppress[$id] = $s_list;
 		else
-		$a_suppress[] = $s_list;
+			$a_suppress[] = $s_list;
 
 		touch($d_snort_suppress_dirty_path);
 

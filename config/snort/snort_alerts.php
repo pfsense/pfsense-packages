@@ -45,19 +45,18 @@ $snort_load_mootools = 'yes';
 $snortalertlogt = $config['installedpackages']['snortglobal']['snortalertlogtype'];
 $snort_logfile = '/var/log/snort/alert';
 
-$pconfig['arefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['arefresh'];
-$pconfig['alertnumber'] = $config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'];
-
-if ($pconfig['alertnumber'] == '' || $pconfig['alertnumber'] == '0')
-{
-	$anentries = '250';
-}else{
+if (is_array($config['installedpackages']['snortglobal']['alertsblocks'])) {
+	$pconfig['arefresh'] = $config['installedpackages']['snortglobal']['alertsblocks']['arefresh'];
+	$pconfig['alertnumber'] = $config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'];
 	$anentries = $pconfig['alertnumber'];
+} else {
+	$anentries = '250';
+	$pconfig['alertnumber'] = '250';
+	$pconfig['arefresh'] = 'off';
 }
 
 if ($_POST['save'])
 {
-
 	//unset($input_errors);
 	//$pconfig = $_POST;
 
@@ -72,19 +71,15 @@ if ($_POST['save'])
 	}
 
 	/* no errors */
-	if (!$input_errors)
-	{
-
-		$config['installedpackages']['snortglobal']['alertsblocks']['arefresh'] = $_POST['arefresh'] ? on : off;
+	if (!$input_errors) {
+		if (!is_array($config['installedpackages']['snortglobal']['alertsblocks']))
+			$config['installedpackages']['snortglobal']['alertsblocks'] = array();
+		$config['installedpackages']['snortglobal']['alertsblocks']['arefresh'] = $_POST['arefresh'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['alertsblocks']['alertnumber'] = $_POST['alertnumber'];
 
-		conf_mount_rw();
 		write_config();
-		//conf_mount_ro();
-		sleep(2);
-			
-		header("Location: /snort/snort_alerts.php");
 
+		header("Location: /snort/snort_alerts.php");
 	}
 
 }
@@ -112,8 +107,7 @@ if ($_POST['download'])
 	$file_name = "snort_logs_{$save_date}.tar.gz";
 	exec("/usr/bin/tar cfz /tmp/snort_logs_{$save_date}.tar.gz /var/log/snort");
 
-	if(file_exists("/tmp/snort_logs_{$save_date}.tar.gz"))
-	{
+	if (file_exists("/tmp/snort_logs_{$save_date}.tar.gz")) {
 		$file = "/tmp/snort_logs_{$save_date}.tar.gz";
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT\n");
 		header("Pragma: private"); // needed for IE
@@ -125,86 +119,65 @@ if ($_POST['download'])
 		readfile("$file");
 		exec("/bin/rm /tmp/snort_logs_{$save_date}.tar.gz");
 		od_end_clean(); //importanr or other post will fail
-	}else{
+	} else
 		echo 'Error no saved file.';
-	}
-
 }
 
 
 /* WARNING: took me forever to figure reg expression, dont lose */
 // $fileline = '12/09-18:12:02.086733  [**] [122:6:0] (portscan) TCP Filtered Decoy Portscan [**] [Priority: 3] {PROTO:255} 125.135.214.166 -> 70.61.243.50';
-
 function get_snort_alert_date($fileline)
 {
 	/* date full date \d+\/\d+-\d+:\d+:\d+\.\d+\s */
 	if (preg_match("/\d+\/\d+-\d+:\d+:\d\d/", $fileline, $matches1))
-	{
 		$alert_date =  "$matches1[0]";
-	}
 
 	return $alert_date;
-
 }
 
 function get_snort_alert_disc($fileline)
 {
 	/* disc */
 	if (preg_match("/\[\*\*\] (\[.*\]) (.*) (\[\*\*\])/", $fileline, $matches))
-	{
 		$alert_disc =  "$matches[2]";
-	}
 
 	return $alert_disc;
-
 }
 
 function get_snort_alert_class($fileline)
 {
 	/* class */
 	if (preg_match('/\[Classification:\s.+[^\d]\]/', $fileline, $matches2))
-	{
 		$alert_class = "$matches2[0]";
-	}
 
 	return $alert_class;
-
 }
 
 function get_snort_alert_priority($fileline)
 {
 	/* Priority */
 	if (preg_match('/Priority:\s\d/', $fileline, $matches3))
-	{
 		$alert_priority = "$matches3[0]";
-	}
 
 	return $alert_priority;
-
 }
 
 function get_snort_alert_proto($fileline)
 {
 	/* Priority */
 	if (preg_match('/\{.+\}/', $fileline, $matches3))
-	{
 		$alert_proto = "$matches3[0]";
-	}
 
 	return $alert_proto;
-
 }
 
 function get_snort_alert_proto_full($fileline)
 {
 	/* Protocal full */
 	if (preg_match('/.+\sTTL/', $fileline, $matches2))
-	{
 		$alert_proto_full = "$matches2[0]";
-	}
 
 	return $alert_proto_full;
-
 }
 
 function get_snort_alert_ip_src($fileline)
@@ -214,36 +187,27 @@ function get_snort_alert_ip_src($fileline)
 	$re2='((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(?![\\d])'; # IPv4 IP Address 1
 
 	if ($c=preg_match_all ("/".$re1.$re2."/is", $fileline, $matches4))
-	{
 		$alert_ip_src = $matches4[1][0];
-	}
 
 	return $alert_ip_src;
-
 }
 
 function get_snort_alert_src_p($fileline)
 {
 	/* source port */
 	if (preg_match('/:\d+\s-/', $fileline, $matches5))
-	{
 		$alert_src_p = "$matches5[0]";
-	}
 
 	return $alert_src_p;
-
 }
 
 function get_snort_alert_flow($fileline)
 {
 	/* source port */
 	if (preg_match('/(->|<-)/', $fileline, $matches5))
-	{
 		$alert_flow = "$matches5[0]";
-	}
 
 	return $alert_flow;
-
 }
 
 function get_snort_alert_ip_dst($fileline)
@@ -255,51 +219,37 @@ function get_snort_alert_ip_dst($fileline)
 	$re4dp='((?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?))(?![\\d])'; # IPv4 IP Address 1
 
 	if ($c=preg_match_all ("/".$re1dp.$re2dp.$re3dp.$re4dp."/is", $fileline, $matches6))
-	{
 		$alert_ip_dst = $matches6[1][0];
-	}
 
 	return $alert_ip_dst;
-
 }
 
 function get_snort_alert_dst_p($fileline)
 {
 	/* dst port */
 	if (preg_match('/:\d+$/', $fileline, $matches7))
-	{
 		$alert_dst_p = "$matches7[0]";
-	}
 
 	return $alert_dst_p;
-
 }
 
 function get_snort_alert_dst_p_full($fileline)
 {
 	/* dst port full */
 	if (preg_match('/:\d+\n[A-Z]+\sTTL/', $fileline, $matches7))
-	{
 		$alert_dst_p = "$matches7[0]";
-	}
 
 	return $alert_dst_p;
-
 }
 
 function get_snort_alert_sid($fileline)
 {
 	/* SID */
 	if (preg_match('/\[\d+:\d+:\d+\]/', $fileline, $matches8))
-	{
 		$alert_sid = "$matches8[0]";
-	}
 
 	return $alert_sid;
-
 }
-
-//
 
 $pgtitle = "Services: Snort: Snort Alerts";
 include("/usr/local/pkg/snort/snort_head.inc");
@@ -324,10 +274,8 @@ include("fbegin.inc");
 echo $snort_general_css;
 
 /* refresh every 60 secs */
-if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
-{
+if ($pconfig['arefresh'] == 'on')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php\" />\n";
-}
 ?>
 
 <!-- hack to fix the hardcoed fbegin link in header -->
@@ -439,26 +387,19 @@ if ($pconfig['arefresh'] == 'on' || $pconfig['arefresh'] == '')
 
 		/* make sure alert file exists */
 		if(!file_exists('/var/log/snort/alert'))
-		{
-			conf_mount_rw();
 			exec('/usr/bin/touch /var/log/snort/alert');
-			conf_mount_ro();
-		}
 
 		$logent = $anentries;
 
 		/* detect the alert file type */
 		if ($snortalertlogt == 'full')
-		{
 			$alerts_array = array_reverse(array_filter(explode("\n\n", file_get_contents('/var/log/snort/alert'))));
-		}else{
+		else
 			$alerts_array = array_reverse(array_filter(split("\n", file_get_contents('/var/log/snort/alert'))));
-		}
 
 
 
-		if (is_array($alerts_array))
-		{
+		if (is_array($alerts_array)) {
 
 			$counter = 0;
 			foreach($alerts_array as $fileline)

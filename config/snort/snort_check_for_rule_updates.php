@@ -40,18 +40,20 @@ require_once("/usr/local/pkg/snort/snort.inc");
 
 function read_header2($ch, $string) {
 	global $file_size, $fout;
+
 	$length = strlen($string);
 	$regs = "";
 	ereg("(Content-Length:) (.*)", $string, $regs);
-	if($regs[2] <> "") {
+	if($regs[2] <> "")
 		$file_size = intval($regs[2]);
-	}
+
 	ob_flush();
 	return $length;
 }
 
 function read_body2($ch, $string) {
 	global $fout, $file_size, $downloaded, $sendto, $static_status, $static_output, $lastseen, $pkg_interface;
+
 	$length = strlen($string);
 	$downloaded += intval($length);
 	$downloadProgress = round(100 * (1 - $downloaded / $file_size), 0);
@@ -77,6 +79,7 @@ function read_body2($ch, $string) {
 
 function read_body_firmware($ch, $string) {
 	global $fout, $file_size, $downloaded, $counter, $version, $latest_version, $current_installed_pfsense_version;
+
 	$length = strlen($string);
 	$downloaded += intval($length);
 	$downloadProgress = round(100 * (1 - $downloaded / $file_size), 0);
@@ -101,6 +104,7 @@ function read_body_firmware($ch, $string) {
 
 function download_file_with_progress_bar2($url_file, $destination_file, $readbody = 'read_body') {
 	global $ch, $fout, $file_size, $downloaded;
+
 	$file_size  = 1;
 	$downloaded = 1;
 	/* open destination file */
@@ -173,13 +177,6 @@ echo "\n\n";
 
 exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Checking for needed updates...'");
 
-/* Begin main code */
-conf_mount_rw();
-
-if (!file_exists('/usr/local/etc/snort/tmp')) {
-	exec('/bin/mkdir -p /usr/local/etc/snort/tmp');
-}
-
 /* Set user agent to Mozilla */
 ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
 ini_set("memory_limit","150M");
@@ -191,12 +188,8 @@ $config['installedpackages']['snortglobal']['last_md5_download'] = date("Y-M-jS-
 ob_flush();
 conf_mount_rw();
 
-/* send current buffer */
-ob_flush();
-conf_mount_rw();
-
 /*  remove old $tmpfname files */
-if (file_exists("{$tmpfname}")) {
+if (is_dir("{$tmpfname}")) {
 	echo 'Removing old tmp files...' . "\n";
 	exec("/bin/rm -r {$tmpfname}");
 	apc_clear_cache();
@@ -208,22 +201,17 @@ exec("/bin/mkdir -p {$snortdir}/rules");
 exec("/bin/mkdir -p {$snortdir}/signatures");
 exec("/bin/mkdir -p /usr/local/lib/snort/dynamicrules/");
 
-/* send current buffer */
-ob_flush();
-conf_mount_rw();
-
 /* If tmp dir does not exist create it */
-if (file_exists($tmpfname)) {
+if (is_dir($tmpfname))
 	echo 'The directory tmp exists...' . "\n";
-} else {
-	mkdir("{$tmpfname}", 700);
-}
+else
+	@mkdir("{$tmpfname}", 700);
 
 /*  download md5 sig from snort.org */
 if ($snortdownload == 'on')
 {
 	if (file_exists("{$tmpfname}/{$snort_filename_md5}") &&
-	filesize("{$tmpfname}/{$snort_filename_md5}") > 0) {
+	    filesize("{$tmpfname}/{$snort_filename_md5}") > 0) {
 		echo 'snort.org md5 temp file exists...' . "\n";
 	} else {
 		echo 'Downloading snort.org md5 file...' . "\n";
@@ -271,7 +259,7 @@ if ($snortdownload == 'on')
 		echo 'Please wait... You may only check for New Rules every 15 minutes...' . "\n";
 		echo 'Rules are released every month from snort.org. You may download the Rules at any time.' . "\n";
 		conf_mount_ro();
-		exit(0);
+		return;
 	}
 }
 
@@ -282,7 +270,7 @@ if (0 == filesize("{$tmpfname}/$pfsense_rules_filename_md5")){
 	echo 'Please wait... You may only check for New Pfsense Rules every 15 minutes...' . "\n";
 	echo 'Rules are released to support Pfsense packages.' . "\n";
 	conf_mount_ro();
-	exit(0);
+	return;
 }
 
 /* Check if were up to date snort.org */
@@ -294,9 +282,6 @@ if ($snortdownload == 'on')
 		$md5_check_new = `/bin/echo "{$md5_check_new_parse}" | /usr/bin/awk '{ print $1 }'`;
 		$md5_check_old_parse = file_get_contents("{$snortdir}/{$snort_filename_md5}");
 		$md5_check_old = `/bin/echo "{$md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
-		/* Write out time of last sucsessful md5 to cache */
-		write_config(); // Will cause switch back to read-only on nanobsd
-		conf_mount_rw();
 		if ($md5_check_new == $md5_check_old)
 		{
 			echo 'Your rules are up to date...' . "\n";
@@ -315,14 +300,8 @@ if ($emergingthreats == "on")
 		$emerg_md5_check_new = `/bin/echo "{$emerg_md5_check_new_parse}" | /usr/bin/awk '{ print $1 }'`;
 		$emerg_md5_check_old_parse = file_get_contents("{$snortdir}/{$emergingthreats_filename_md5}");
 		$emerg_md5_check_old = `/bin/echo "{$emerg_md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
-		/* Write out time of last sucsessful md5 to cache */
-		// Will cause switch back to read-only on nanobsd
-		write_config();
-		conf_mount_rw();
 		if ($emerg_md5_check_new == $emerg_md5_check_old)
-		{
 			$emerg_md5_check_ok = on;
-		}
 	}
 }
 
@@ -334,13 +313,8 @@ if (file_exists("{$snortdir}/pfsense_rules.tar.gz.md5"))
 	$pfsense_md5_check_old_parse = file_get_contents("{$snortdir}/pfsense_rules.tar.gz.md5");
 	$pfsense_md5_check_old = `/bin/echo "{$pfsense_md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
 	/* Write out time of last sucsessful md5 to cache */
-	// Will cause switch back to read-only on nanobsd
-	write_config();
-	conf_mount_rw();
 	if ($pfsense_md5_check_new == $pfsense_md5_check_old)
-	{
 		$pfsense_md5_check_ok = on;
-	}
 }
 
 /* Check if were up to date is so, exit */
@@ -352,7 +326,7 @@ if ($snortdownload == 'on' && $emergingthreats == 'on')
 		echo 'All your rules are up to date...' . "\n";
 		echo 'You may start Snort now...' . "\n";
 		conf_mount_ro();
-		exit(0);
+		return;
 	}
 }
 
@@ -363,7 +337,7 @@ if ($snortdownload == 'on' && $emergingthreats == 'off')
 		echo 'Your snort.org rules are up to date...' . "\n";
 		echo 'You may start Snort now...' . "\n";
 		conf_mount_ro();
-		exit(0);
+		return;
 	}
 }
 
@@ -374,7 +348,7 @@ if ($snortdownload == 'off' && $emergingthreats == 'on')
 		echo 'Your Emergingthreats rules are up to date...' . "\n";
 		echo 'You may start Snort now...' . "\n";
 		conf_mount_ro();
-		exit(0);
+		return;
 	}
 }
 
@@ -397,14 +371,13 @@ if ($snortdownload == 'on')
 		} else {
 			echo 'There is a new set of Snort.org rules posted. Downloading...' . "\n";
 			echo 'May take 4 to 10 min...' . "\n";
-			conf_mount_rw();
 			download_file_with_progress_bar2("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
 			echo 'Done downloading rules file.' . "\n";
 			if (150000 > filesize("{$tmpfname}/$snort_filename")){
 				echo 'Error with the snort rules download...' . "\n";
 				echo 'Snort rules file downloaded failed...' . "\n";
 				conf_mount_ro();
-				exit(0);
+				return;
 			}
 		}
 	}
@@ -477,7 +450,7 @@ if ($snortdownload == 'on')
 			{
 				$freebsd_version_so = 'FreeBSD-7-2';
 			}else{
-				$freebsd_version_so = 'FreeBSD-8-0';
+				$freebsd_version_so = 'FreeBSD-8-1';
 			}
 
 			echo 'Extracting Snort.org rules...' . "\n";
@@ -686,13 +659,11 @@ exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl /usr/local/etc/snort/r
 /* open oinkmaster_conf for writing" function */
 function oinkmaster_conf($id, $if_real, $iface_uuid)
 {
-
 	global $config, $g, $id, $if_real, $snortdir_wan, $snortdir, $snort_md5_check_ok, $emerg_md5_check_ok, $pfsense_md5_check_ok;
-	conf_mount_rw();
 
 	/*  enable disable setting will carry over with updates */
 	/*  TODO carry signature changes with the updates */
-	if ($snort_md5_check_ok != on || $emerg_md5_check_ok != on || $pfsense_md5_check_ok != on) {
+	if ($snort_md5_check_ok != 'on' || $emerg_md5_check_ok != 'on' || $pfsense_md5_check_ok != 'on') {
 
 		if (!empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on'])) {
 			$enabled_sid_on = $config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on'];
@@ -744,11 +715,9 @@ EOD;
 /*  TODO add per interface settings here */
 function oinkmaster_run($id, $if_real, $iface_uuid)
 {
-
 	global $config, $g, $id, $if_real, $snortdir_wan, $snortdir, $snort_md5_check_ok, $emerg_md5_check_ok, $pfsense_md5_check_ok;
-	conf_mount_rw();
 
-	if ($snort_md5_check_ok != on || $emerg_md5_check_ok != on || $pfsense_md5_check_ok != on)
+	if ($snort_md5_check_ok != 'on' || $emerg_md5_check_ok != 'on' || $pfsense_md5_check_ok != 'on')
 	{
 
 		if ($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on'] == '' && $config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off'] == '')
@@ -783,19 +752,15 @@ function oinkmaster_run($id, $if_real, $iface_uuid)
 
 /* Start the proccess for every interface rule */
 /* TODO: try to make the code smother */
-
-if (!empty($config['installedpackages']['snortglobal']['rule']))
+if (is_array($config['installedpackages']['snortglobal']['rule']))
 {
 
 	$rule_array = $config['installedpackages']['snortglobal']['rule'];
-	$id = -1;
-	foreach ($rule_array as $value) {
+	foreach ($config['installedpackages']['snortglobal']['rule'] as $value) {
 
-		$id += 1;
-
-		$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
+		$result_lan = $value['interface'];
 		$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
-		$iface_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
+		$iface_uuid = $value['uuid'];
 
 		/* make oinkmaster.conf for each interface rule */
 		oinkmaster_conf($id, $if_real, $iface_uuid);
@@ -810,9 +775,11 @@ if (!empty($config['installedpackages']['snortglobal']['rule']))
 
 /* mark the time update finnished */
 $config['installedpackages']['snortglobal']['last_rules_install'] = date("Y-M-jS-h:i-A");
+write_config(); /* XXX */
+conf_mount_rw();
 
 /*  remove old $tmpfname files */
-if (file_exists('/usr/local/etc/snort/tmp'))
+if (is_dir('/usr/local/etc/snort/tmp'))
 {
 	echo 'Cleaning up...' . "\n";
 	exec("/bin/rm -r /usr/local/etc/snort/tmp/snort_rules_up");
