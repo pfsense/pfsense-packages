@@ -312,7 +312,7 @@ if (isset($_GET['dup']))
 	{
 
 		Running_Stop($snort_uuid, $if_real, $id);
-			
+
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );

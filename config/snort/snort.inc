@@ -317,9 +317,9 @@ function Running_Stop($snort_uuid, $if_real, $id) {
 
 		/* Log Iface stop */
 		exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule STOP for {$snort_uuid}_{$if_real}...'");
+		sleep(2); // Give time so GUI displays correctly
 	}
 }
-
 
 function Running_Start($snort_uuid, $if_real, $id) {
 	global $config;
@@ -340,6 +340,7 @@ function Running_Start($snort_uuid, $if_real, $id) {
 
 	/* Log Iface stop */
 	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule START for {$id}_{$snort_uuid}_{$if_real}...'");
+	sleep(2); // Give time so GUI displays correctly
 }
 
 /* get the real iface name of wan */
