@@ -121,8 +121,8 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 		case "pppoe":
 		case "pptp":
 		case "l2tp":
-			if (function_exists('get_real_interface'))
-				$subnet = find_interface_ip(get_real_interface($int));
+			if (function_exists('get_interface_ip'))
+				$subnet = get_interface_ip($int);
 			else
 				$subnet = find_interface_ip("ng0");
 
@@ -130,7 +130,7 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 				$home_net .= "{$subnet} ";
 			break;
 		case "dhcp":
-			$subnet = find_interface_ip($int);
+			$subnet = find_interface_ip(snort_get_real_interface($int));
 			if (is_ipaddr($subnet))
 				$home_net .= "{$subnet} ";
 			break;
@@ -178,7 +178,7 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 	}
 
 	/* Add loopback to whitelist (ftphelper) */
-	$home_net .= "127.0.0.1";
+	$home_net .= "127.0.0.1 ";
 
 	/* grab a list of vpns and whitelist if user desires added by nestorfish 954 */
 	if ($vpns == 'yes') {
