@@ -489,9 +489,9 @@ echo "
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncellreq2">Interface</td>
-				<td width="78%" class="vtable"><select name="interface"
-					class="formfld">
-					<?php
+				<td width="78%" class="vtable">
+					<select name="interface" class="formfld">
+				<?php
 					if (function_exists('get_configured_interface_with_descr'))
 						$interfaces = get_configured_interface_with_descr();
 					else {
@@ -501,10 +501,13 @@ echo "
 						}
 					}
 					foreach ($interfaces as $iface => $ifacename): ?>
-					<option value="<?=$iface;?>"
+						<option value="<?=$iface;?>"
 					<?php if ($iface == $pconfig['interface']) echo "selected"; ?>><?=htmlspecialchars($ifacename);?>
 					</option>
-					<?php endforeach; ?>
+				<?php 	endforeach;
+					if ($pconfig['enable'] == "on" && !empty($pconfig['interface']))
+						echo "<input type='hidden' name='interface' id='interface' value='{$pconfig['interface']}'/>\n";
+				?>
 				</select><br>
 				<span class="vexpl">Choose which interface this rule applies to.<br>
 				Hint: in most cases, you'll want to use WAN here.</span></td>

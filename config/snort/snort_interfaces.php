@@ -64,7 +64,7 @@ if (isset($_POST['del_x'])) {
 			if ($snort_up_ck != "")
 			{
 					
-				$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}{$if_real}\" | awk '{print \$1;}'");
+				$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}\" | awk '{print \$1;}'");
 				$start_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
 				$start_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
 					
@@ -73,53 +73,27 @@ if (isset($_POST['del_x'])) {
 				$start2_upb_r = exec("/usr/bin/top -U root -u | grep barnyard2 | grep {$start2_upb_pre} | awk '{ print $1; }'");
 
 					
-				if ($start_up_s != "" || $start_up_r != "" || $start2_upb_s != "" || $start2_upb_r != "")
-				{
-
-					/* dont flood the syslog code */
-					//exec("/bin/cp /var/log/system.log /var/log/system.log.bk");
-					//sleep(3);
-						
-						 	
+				if ($start_up_s != "" || $start_up_r != "" || $start2_upb_s != "" || $start2_upb_r != "") {
 					/* remove only running instances */
-					if ($start_up_s != "")
-					{
+					if ($start_up_s != "") {
 						exec("/bin/kill {$start_up_s}");
 						exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}*");
 					}
 
-					if ($start2_upb_s != "")
-					{
+					if ($start2_upb_s != "") {
 						exec("/bin/kill {$start2_upb_s}");
 						exec("/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}*");
 					}
 
-					if ($start_up_r != "")
-					{
+					if ($start_up_r != "") {
 						exec("/bin/kill {$start_up_r}");
 						exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}*");
 					}
 
-					if ($start2_upb_r != "")
-					{
+					if ($start2_upb_r != "") {
 						exec("/bin/kill {$start2_upb_r}");
 						exec("/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}*");
 					}
-
-					/* stop syslog flood code */
-					//$if_real_wan_rulei = $a_nat[$rulei]['interface'];
-					//$if_real_wan_rulei2 = snort_get_real_interface($if_real_wan_rulei);
-					//exec("/sbin/ifconfig $if_real_wan_rulei2 -promisc");
-					//exec("/bin/cp /var/log/system.log /var/log/snort/snort_sys_$rulei$if_real.log");
-					//exec("/usr/bin/killall syslogd");
-					//exec("/usr/sbin/clog -i -s 262144 /var/log/system.log");
-					//exec("/usr/sbin/syslogd -c -ss -f /var/etc/syslog.conf");
-					//sleep(2);
-					//exec("/bin/cp /var/log/system.log.bk /var/log/system.log");
-					//$after_mem = exec("/usr/bin/top | /usr/bin/grep Wired | /usr/bin/awk '{ print $2 }'");
-					//exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'MEM after {$rulei}{$if_real} STOP {$after_mem}'");
-					//exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule removed for {$rulei}{$if_real}...'");
-						
 				}
 					
 			}
@@ -129,7 +103,6 @@ if (isset($_POST['del_x'])) {
 			exec("/bin/rm -r /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}");
 
 			unset($a_nat[$rulei]);
-			 
 		}
 		conf_mount_ro();
 	  
@@ -306,12 +279,12 @@ enable JavaScript to view this content
 			}
 
 			?>
-				<td class="listt"><a href="?act=toggle&id=<?=$i;?>"><img
-					src="../themes/<?= $g['theme']; ?>/images/icons/icon_<?=$iconfn;?>.gif"
-					width="13" height="13" border="0"
-					title="click to toggle start/stop snort"></a><input type="checkbox"
-					id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>"
-					onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0;"></td>
+				<td class="listt">
+					<a href="?act=toggle&id=<?=$i;?>">
+						<img src="../themes/<?= $g['theme']; ?>/images/icons/icon_<?=$iconfn;?>.gif"
+						width="13" height="13" border="0"
+						title="click to toggle start/stop snort"></a>
+					<input type="checkbox" id="frc<?=$nnats;?>" name="rule[]" value="<?=$i;?>" onClick="fr_bgcolor('<?=$nnats;?>')" style="margin: 0; padding: 0;"></td>
 				<td class="listt" align="center"></td>
 				<td class="<?=$class_color_up;?>" onClick="fr_toggle(<?=$nnats;?>)"
 					id="frd<?=$nnats;?>"
