@@ -73,6 +73,8 @@ $pfsense_theme_is = $config['theme'];
 function find_whitelist_key($find_wlist_number) {
 	global $config, $g;
 
+	if (!is_array($config['installedpackages']['snortglobal']['whitelist']))
+		$config['installedpackages']['snortglobal']['whitelist'] = array();
 	if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item']))
 		return 0; /* XXX */
 
@@ -86,6 +88,8 @@ function find_whitelist_key($find_wlist_number) {
 function find_suppress_key($find_slist_number) {
 	global $config, $g;
 
+	if (!is_array($config['installedpackages']['snortglobal']['suppress']))
+		$config['installedpackages']['snortglobal']['suppress'] = array();
 	if (!is_array($config['installedpackages']['snortglobal']['suppress']['item']))
 		return 0; /* XXX */
 
