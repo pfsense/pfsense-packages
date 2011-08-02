@@ -101,25 +101,6 @@ if (isset($id) && $a_whitelist[$id]) {
 	$addresssubnettest = false;
 }
 
-/* this will exec when alert says apply */
-if ($_POST['apply']) {
-
-	if (file_exists("$d_snort_whitelist_dirty_path")) {
-		conf_mount_rw();
-			
-		/* create whitelist and homenet file  then sync files */
-		sync_snort_package_empty();
-		sync_snort_package();
-
-		unlink("$d_snort_whitelist_dirty_path");
-			
-		write_config();
-		conf_mount_ro();
-			
-	}
-
-}
-
 if ($_POST['submit']) {
 
 	conf_mount_rw();
@@ -218,13 +199,14 @@ if ($_POST['submit']) {
 		$w_list['detail'] = $final_address_details;
 
 		if (isset($id) && $a_whitelist[$id])
-		$a_whitelist[$id] = $w_list;
+			$a_whitelist[$id] = $w_list;
 		else
-		$a_whitelist[] = $w_list;
-
-		touch($d_snort_whitelist_dirty_path);
+			$a_whitelist[] = $w_list;
 
 		write_config();
+
+		/* create whitelist and homenet file  then sync files */
+		sync_snort_package_empty();
 
 		header("Location: /snort/snort_interfaces_whitelist_edit.php?id=$id");
 		exit;
@@ -240,32 +222,16 @@ if ($_POST['submit']) {
 }
 
 $pgtitle = "Services: Snort: Whitelist: Edit $whitelist_uuid";
-include("/usr/local/pkg/snort/snort_head.inc");
+include_once("head.inc");
 
 ?>
 
-<body
-	link="#0000CC" vlink="#0000CC" alink="#0000CC"
-	onload="<?= $jsevents["body"]["onload"] ?>">
-
-<script>
-			jQuery(document).ready(function(){
-			
-				//Examples of how to assign the ColorBox event to elements
-				jQuery(".example8").colorbox({width:"820px", height:"700px", iframe:true, overlayClose:false});
-				
-			});
-		</script>
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC" >
 
 <?php
 include("fbegin.inc");
 echo $snort_general_css;
 ?>
-
-<!-- hack to fix the hardcoed fbegin link in header -->
-<div id="header-left2"><a href="../index.php" id="status-link2"><img
-	src="./images/transparent.gif" border="0"></img></a></div>
-
 <div class="body2"><script type="text/javascript"
 	src="/snort/javascript/row_helper.js"></script> <input type='hidden'
 	name='address_type' value='textbox' /> <script type="text/javascript">

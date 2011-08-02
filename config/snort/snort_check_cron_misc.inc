@@ -74,5 +74,4 @@ if (snort_Getdirsize('/var/log/snort/') >= $snortloglimitsizeKB ) {
 
 }
 
-
 ?>

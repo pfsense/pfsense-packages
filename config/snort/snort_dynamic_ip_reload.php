@@ -40,8 +40,6 @@ if (file_exists('/var/run/snort_dynamic_ip_reload.dirty')) {
 exec('/usr/bin/touch /var/run/snort_dynamic_ip_reload.dirty');
 
 sync_snort_package_config();
-sync_snort_package();
-
-exec('/bin/rm /var/run/snort_dynamic_ip_reload.dirty');
+@unlink("/var/run/snort_dynamic_ip_reload.dirty");
 
 ?>

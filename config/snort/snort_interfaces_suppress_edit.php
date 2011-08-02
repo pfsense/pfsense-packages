@@ -90,16 +90,6 @@ if (isset($id) && $a_suppress[$id]) {
 	$pconfig['suppresspassthru'] = base64_decode($a_suppress[$id]['suppresspassthru']);
 }
 
-/* this will exec when alert says apply */
-if ($_POST['apply']) {
-
-	if (file_exists("$d_snort_suppress_dirty_path")) {
-		sync_snort_package_config();
-		sync_snort_package();
-		unlink("$d_snort_suppress_dirty_path");
-	}
-}
-
 if ($_POST['submit']) {
 
 	unset($input_errors);
@@ -143,9 +133,9 @@ if ($_POST['submit']) {
 		else
 			$a_suppress[] = $s_list;
 
-		touch($d_snort_suppress_dirty_path);
-
 		write_config();
+
+		sync_snort_package_config();
 
 		header("Location: /snort/snort_interfaces_suppress_edit.php?id=$id");
 		exit;
@@ -154,31 +144,16 @@ if ($_POST['submit']) {
 }
 
 $pgtitle = "Services: Snort: Suppression: Edit $suppress_uuid";
-include("/usr/local/pkg/snort/snort_head.inc");
+include_once("head.inc");
 
 ?>
 
-<body
-	link="#0000CC" vlink="#0000CC" alink="#0000CC"
-	onload="<?= $jsevents["body"]["onload"] ?>">
-
-<script>
-			jQuery(document).ready(function(){
-			
-				//Examples of how to assign the ColorBox event to elements
-				jQuery(".example8").colorbox({width:"820px", height:"700px", iframe:true, overlayClose:false});
-				
-			});
-		</script>
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <?php
 include("fbegin.inc");
 echo $snort_general_css;
 ?>
-
-<!-- hack to fix the hardcoed fbegin link in header -->
-<div id="header-left2"><a href="../index.php" id="status-link2"><img
-	src="./images/transparent.gif" border="0"></img></a></div>
 
 <div class="body2"><?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 

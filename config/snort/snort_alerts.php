@@ -252,25 +252,15 @@ function get_snort_alert_sid($fileline)
 }
 
 $pgtitle = "Services: Snort: Snort Alerts";
-include("/usr/local/pkg/snort/snort_head.inc");
+include_once("head.inc");
 
 ?>
 
-<body
-	link="#0000CC" vlink="#0000CC" alink="#0000CC">
-
-<script>
-			jQuery(document).ready(function(){
-			
-				//Examples of how to assign the ColorBox event to elements
-				jQuery(".example8").colorbox({width:"820px", height:"700px", iframe:true, overlayClose:false});
-				
-			});
-		</script>
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
 <?php
 
-include("fbegin.inc");
+include_once("fbegin.inc");
 echo $snort_general_css;
 
 /* refresh every 60 secs */
@@ -278,34 +268,25 @@ if ($pconfig['arefresh'] == 'on')
 	echo "<meta http-equiv=\"refresh\" content=\"60;url=/snort/snort_alerts.php\" />\n";
 ?>
 
-<!-- hack to fix the hardcoed fbegin link in header -->
-<div id="header-left2"><a href="../index.php" id="status-link2"><img
-	src="./images/transparent.gif" border="0"></img></a></div>
-
 <div class="body2"><?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td>
-
-		<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
-		<ul class="newtabmenu">
-			<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
-			<li><a href="/snort/snort_interfaces_global.php"><span>Global
-			Settings</span></a></li>
-			<li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
-			<li class="newtabmenu_active"><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
-			<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
-			<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
-			<li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
-			<li><a class="example8" href="/snort/help_and_info.php"><span>Help</span></a></li>
-		</ul>
-		</div>
-
-		</td>
-	</tr>
-	<tr>
-		<td>
+<tr><td>
+<?php
+        $tab_array = array();
+        $tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
+        $tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
+        $tab_array[3] = array(gettext("Alerts"), true, "/snort/snort_alerts.php");
+        $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
+        $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+        $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+        $tab_array[7] = array(gettext("Help"), false, "/snort/help_and_info.php");
+        display_top_tabs($tab_array);
+?>
+</td></tr>
+<tr>
+	<td>
 		<div id="mainarea2">
 		<table class="tabcont" width="100%" border="1" cellspacing="0"
 			cellpadding="0">

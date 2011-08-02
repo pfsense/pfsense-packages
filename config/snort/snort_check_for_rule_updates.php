@@ -759,7 +759,7 @@ if (is_array($config['installedpackages']['snortglobal']['rule']))
 	foreach ($config['installedpackages']['snortglobal']['rule'] as $value) {
 
 		$result_lan = $value['interface'];
-		$if_real = convert_friendly_interface_to_real_interface_name2($result_lan);
+		$if_real = snort_get_real_interface($result_lan);
 		$iface_uuid = $value['uuid'];
 
 		/* make oinkmaster.conf for each interface rule */

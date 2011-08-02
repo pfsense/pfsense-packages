@@ -61,59 +61,22 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
 }
 
-/* convert fake interfaces to real */
-$if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interface']);
-
-
-$file = $_GET['openruleset'];
-
-//read snort file
-$filehandle = fopen($file, "r");
-
 //get rule id
 $lineid = $_GET['ids'];
 
+$file = $_GET['openruleset'];
 //read file into string, and get filesize also chk for empty files
 if (filesize($file) > 0 ) {
-	$contents2 = fread($filehandle, filesize($file));
+	$contents2 = file_get_contents($file);
 }else{
 	$contents2 = '';
 }
-
-//close handler
-fclose ($filehandle);
 
 //delimiter for each new rule is a new line
 $delimiter = "\n";
 
 //split the contents of the string file into an array using the delimiter
 $splitcontents = explode($delimiter, $contents2);
-
-//copy rule contents from array into string
-$tempstring = $splitcontents[$lineid];
-
-if (!function_exists('write_rule_file')) {
-function write_rule_file($content_changed, $received_file)
-{
-	//read snort file with writing enabled
-	$filehandle = fopen($received_file, "w");
-
-	//delimiter for each new rule is a new line
-	$delimiter = "\n";
-
-	//implode the array back into a string for writing purposes
-	$fullfile = implode($delimiter, $content_changed);
-
-	//write data to file
-	fwrite($filehandle, $fullfile);
-
-	//close file handle
-	fclose($filehandle);
-
-}
-}
-
-
 
 if($_POST['highlight'] <> "") {
 	if($_POST['highlight'] == "yes" or
@@ -147,16 +110,16 @@ if ($_POST)
 		$splitcontents[$lineid] = $rule_content2;
 
 		//write the new .rules file
-		write_rule_file($splitcontents, $file);
+		@file_put_contents($file, implode($delimiter, $splitcontents));
 
-		header("Location: /snort/snort_view_edit.php?id=$id&openruleset=$file&ids=$ids");
+		echo "<script> window.close(); </script>";
+		//header("Location: /snort/snort_view_edit.php?id=$id&openruleset=$file&ids=$ids");
 		exit;
 	}
 }
 
 $pgtitle = array(gettext("Advanced"), gettext("File Editor"));
 
-//
 ?>
 
 <?php include("head.inc");?>
@@ -165,45 +128,38 @@ $pgtitle = array(gettext("Advanced"), gettext("File Editor"));
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<tr>
 		<td class="tabcont">
-		<form
-			action="snort_view_edit.php?id=<?=$id; ?>&openruleset=<?=$file; ?>&ids=<?=$ids; ?>"
-			method="post"><?php if ($savemsg) print_info_box($savemsg);?> <?php 
-			if ($file != '/usr/local/etc/snort/snort_update.log')
-			{
+		<form action="snort_rules_edit.php?id=<?=$id; ?>&openruleset=<?=$file; ?>&ids=<?=$ids; ?>" method="post">
 
-				echo '
-				<table width="100%" cellpadding="9" cellspacing="9" bgcolor="#eeeeee">
-					<tr>
-						<td>
-							<input name="save" type="submit" class="formbtn" id="save" value="save" /> <input type="button" class="formbtn" value="Cancel" onclick="history.back()">
-							<hr noshade="noshade" />
-					' . "\n";
+	<?php if ($savemsg) print_info_box($savemsg); 
+		if ($file != '/usr/local/etc/snort/snort_update.log'):
+	?>
+		<table width="100%" cellpadding="9" cellspacing="9" bgcolor="#eeeeee">
+		<tr>
+			<td>
+				<input name="save" type="submit" class="formbtn" id="save" value="save" />
+				<input type="button" class="formbtn" value="Cancel" onclick="window.close()">
+				<hr noshade="noshade" />
+				Disable original rule :<br/>
 
-				echo 'Disable original rule :';
-					
-
-				echo '	<input id="highlighting_enabled" name="highlight2" type="radio" value="yes"'; if($highlight == "yes") echo " checked=\"checked\""; echo '/>
-							<label for="highlighting_enabled">'; gettext("Enabled"); echo '</label>
-							<input id="highlighting_disabled" name="highlight2" type="radio" value="no"'; if($highlight == "no") echo " checked=\"checked\""; echo '	/>
-							<label for="highlighting_disabled">'; gettext("Disabled"); echo '	</label>
-						</td>
-					</tr>
-				</table>
-				
-				<table width="100%">
-					<tr>
-						<td valign="top" class="label">
-							<div style="background: #eeeeee;" id="textareaitem">
-							<!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
-							<textarea wrap="off" style="width: 98%; margin: 7px;" class="'; echo $language; echo '	:showcolumns" rows="'; echo $rows; echo '	" cols="'; echo $cols;	echo '	" name="code">'; echo $tempstring; echo ' </textarea>
-							</div>
-						</td>
-					</tr>
-				</table>';
-
-			}
-			?>
-
+				<input id="highlighting_enabled" name="highlight2" type="radio" value="yes" <?php if($highlight == "yes") echo " checked=\"checked\""; ?> />
+				<label for="highlighting_enabled"><?=gettext("Enabled");?> </label>
+				<input id="highlighting_disabled" name="highlight2" type="radio" value="no" <?php if($highlight == "no") echo " checked=\"checked\""; ?> />
+				<label for="highlighting_disabled"> <?=gettext("Disabled");?></label>
+			</td>
+		</tr>
+		</table>
+		<table width="100%">
+		<tr>
+			<td valign="top" class="label">
+				<div style="background: #eeeeee;" id="textareaitem">
+				<!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
+				<textarea wrap="off" style="width: 98%; margin: 7px;" class="<?=$language;?>:showcolumns" rows="<?=$rows;?>" cols="<?=$cols;?>" name="code">
+				<?=$tempstring;?> </textarea>
+				</div>
+			</td>
+		</tr>
+		</table>
+	<?php endif; ?>
 		<table width='100%'>
 			<tr>
 				<td valign="top" class="label">
@@ -212,17 +168,16 @@ $pgtitle = array(gettext("Advanced"), gettext("File Editor"));
 				<? if ($file != '/usr/local/etc/snort/snort_update.log') { echo 'disabled'; } ?>
 					wrap="off" style="width: 98%; margin: 7px;"
 					class="<?php echo $language; ?>:showcolumns" rows="33"
-					cols="<?php echo $cols; ?>" name="code2"><?php echo $contents2;?></textarea>
+					cols="<?=$cols;?>" name="code2"><?=$contents2;?></textarea>
 				</div>
 				</td>
 			</tr>
 		</table>
-		<?php // include("formend.inc");?></form>
 		<? echo "$file\n"; ?></td>
 	</tr>
 </table>
 
-		<?php //include("fend.inc");?>
+<?php include("fend.inc");?>
 
 </body>
 </html>

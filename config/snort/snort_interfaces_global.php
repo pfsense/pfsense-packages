@@ -52,19 +52,6 @@ $pconfig['autorulesupdate7'] = $config['installedpackages']['snortglobal']['auto
 $pconfig['snortalertlogtype'] = $config['installedpackages']['snortglobal']['snortalertlogtype'];
 $pconfig['forcekeepsettings'] = $config['installedpackages']['snortglobal']['forcekeepsettings'];
 
-/* this will exec when alert says apply */
-if ($_POST['apply']) {
-
-	if (file_exists("$d_snort_global_dirty_path")) {
-
-		/* create whitelist and homenet file  then sync files */
-		sync_snort_package_empty();
-		sync_snort_package();
-
-		unlink("$d_snort_global_dirty_path");
-	}
-}
-
 /* if no errors move foward */
 if (!$input_errors) {
 
@@ -83,48 +70,31 @@ if (!$input_errors) {
 		$retval = 0;
 
 		$snort_snortloglimit_info_ck = $config['installedpackages']['snortglobal']['snortloglimit'];
-		if ($snort_snortloglimit_info_ck == 'on') {
-			snort_snortloglimit_install_cron('');
-			snort_snortloglimit_install_cron('true');
-		}
-
-		if ($snort_snortloglimit_info_ck == 'off') {
-			snort_snortloglimit_install_cron('');
-		}
-
+		snort_snortloglimit_install_cron($snort_snortloglimit_info_ck == 'ok' ? true : false);
 
 		/* set the snort block hosts time IMPORTANT */
 		$snort_rm_blocked_info_ck = $config['installedpackages']['snortglobal']['rm_blocked'];
 		if ($snort_rm_blocked_info_ck == "never_b")
-			$snort_rm_blocked_false = "";
+			$snort_rm_blocked_false = false;
 		else
-			$snort_rm_blocked_false = "true";
+			$snort_rm_blocked_false = true;
 
-		if ($snort_rm_blocked_info_ck != "")
-		{
-			snort_rm_blocked_install_cron("");
-			snort_rm_blocked_install_cron($snort_rm_blocked_false);
-		}
+		snort_rm_blocked_install_cron($snort_rm_blocked_false);
 
 		/* set the snort rules update time */
 		$snort_rules_up_info_ck = $config['installedpackages']['snortglobal']['autorulesupdate7'];
 		if ($snort_rules_up_info_ck == "never_up")
-			$snort_rules_up_false = "";
+			$snort_rules_up_false = false;
 		else
-			$snort_rules_up_false = "true";
+			$snort_rules_up_false = true;
 
-		if ($snort_rules_up_info_ck != "")
-		{
-			snort_rules_up_install_cron("");
-			snort_rules_up_install_cron($snort_rules_up_false);
-		}
+		snort_rules_up_install_cron($snort_rules_up_false);
 
-
-		touch($d_snort_global_dirty_path);
-		$savemsg = get_std_save_message($retval);
 		write_config();
+		$savemsg = get_std_save_message($retval);
 
-		sync_snort_package();
+		/* create whitelist and homenet file  then sync files */
+		sync_snort_package_empty();
 
 		/* forces page to reload new settings */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -188,8 +158,6 @@ if ($_POST["Reset"]) {
 		/* remove all snort iface dir */
 		exec('rm -r /usr/local/etc/snort/snort_*');
 		exec('rm /var/log/snort/*');
-
-		write_config();
 	}
 
 	snort_deinstall_settings();
@@ -204,35 +172,22 @@ if ($_POST["Reset"]) {
 	exit;
 }
 
-
 $pgtitle = 'Services: Snort: Global Settings';
-include_once("/usr/local/pkg/snort/snort_head.inc");
+include_once("head.inc");
 
 ?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
 
-<script>
-			jQuery(document).ready(function(){
-			
-				//Examples of how to assign the ColorBox event to elements
-				jQuery(".example8").colorbox({width:"820px", height:"700px", iframe:true, overlayClose:false});
-				
-			});
-		</script>
-
 <?php
 echo "{$snort_general_css}\n";
 echo "$snort_interfaces_css\n";
+
+include_once("fbegin.inc");
+
+if($pfsense_stable == 'yes')
+	echo '<p class="pgtitle">' . $pgtitle . '</p>';
 ?>
-
-<?php include("fbegin.inc"); ?>
-
-<div class="body2"><!-- hack to fix the hardcoed fbegin link in header -->
-<div id="header-left2"><a href="../index.php" id="status-link2"><img
-	src="./images/transparent.gif" border="0"></img></a></div>
-
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <noscript>
 <div class="alert" ALIGN=CENTER><img
@@ -241,48 +196,39 @@ enable JavaScript to view this content
 </CENTER></div>
 </noscript>
 
-
-<form action="snort_interfaces_global.php" method="post"
-	enctype="multipart/form-data" name="iform" id="iform"><?php
+<form action="snort_interfaces_global.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
+<?php
 	/* Display Alert message, under form tag or no refresh */
-	if ($input_errors) {
+	if ($input_errors)
 		print_input_errors($input_errors); // TODO: add checks
-	}
 
 	if (!$input_errors) {
 		if (file_exists($d_snort_global_dirty_path)) {
-
 			print_info_box_np2('
 			The Snort configuration has changed and snort needs to be restarted on this interface.<br>
 			You must apply the changes in order for them to take effect.<br>
 			');
 		}
 	}
-	?>
+?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td>
-
-		<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
-		<ul class="newtabmenu">
-			<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
-			<li class="newtabmenu_active"><a
-				href="/snort/snort_interfaces_global.php"><span>Global Settings</span></a></li>
-			<li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
-			<li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
-			<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
-			<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
-			<li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
-			<li><a class="example8" href="/snort/help_and_info.php"><span>Help</span></a></li>
-		</ul>
-		</div>
-
-		</td>
-	</tr>
-
-	<tr>
-		<td class="tabcont">
+<tr><td>
+<?php
+        $tab_array = array();
+        $tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tab_array[1] = array(gettext("Global Settings"), true, "/snort/snort_interfaces_global.php");
+        $tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
+        $tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+        $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
+        $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+        $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+        $tab_array[7] = array(gettext("Help"), false, "/snort/help_and_info.php");
+        display_top_tabs($tab_array);
+?>
+</td></tr>
+<tr>
+	<td class="tabcont">
 		<table id="maintable2" width="100%" border="0" cellpadding="6"
 			cellspacing="0">
 			<tr>
@@ -297,7 +243,7 @@ enable JavaScript to view this content
 						<td colspan="2"><input name="snortdownload" type="radio"
 							id="snortdownload" value="off" onClick="enable_change(false)"
 	<?php if($pconfig['snortdownload']=='off' || $pconfig['snortdownload']=='') echo 'checked'; ?>>
-						Do <strong>NOT</strong> Install</td>
+			Do <strong>NOT</strong> Install</td>
 					</tr>
 					<tr>
 						<td colspan="2"><input name="snortdownload" type="radio"
@@ -456,8 +402,8 @@ enable JavaScript to view this content
 					class="red"><strong>&nbsp;WARNING:</strong><br>
 				This will reset all global and interface settings.</span></td>
 				<td width="78%"><input name="Submit" type="submit" class="formbtn"
-					value="Save" onClick="enable_change(true)"> <input type="button"
-					class="formbtn" value="Cancel" onclick="history.back()"></td>
+					value="Save" onClick="enable_change(true)"> 
+				</td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top">&nbsp;</td>

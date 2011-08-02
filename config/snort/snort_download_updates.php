@@ -105,23 +105,11 @@ header( "Pragma: no-cache" );
 
 
 $pgtitle = "Services: Snort: Updates";
-include_once("/usr/local/pkg/snort/snort_head.inc");
+include_once("head.inc");
 
 ?>
 
-<body
-	link="#000000" vlink="#000000" alink="#000000">
-
-<script>
-			jQuery(document).ready(function(){
-			
-				//Examples of how to assign the ColorBox event to elements
-				jQuery(".example7").colorbox({width:"900px", height:"400px", iframe:true, overlayClose:false});
-				jQuery(".example8").colorbox({width:"820px", height:"700px", iframe:true, overlayClose:false});
-				jQuery(".example9").colorbox({width:"90%", height:"65%", iframe:true, overlayClose:false});
-				
-			});
-		</script>
+<body link="#000000" vlink="#000000" alink="#000000">
 
 <?php
 echo "{$snort_general_css}\n";
@@ -129,10 +117,6 @@ echo "$snort_interfaces_css\n";
 ?>
 
 <?php include("fbegin.inc"); ?>
-
-<div class="body2"><!-- hack to fix the hardcoed fbegin link in header -->
-<div id="header-left2"><a href="../index.php" id="status-link2"><img
-	src="./images/transparent.gif" border="0"></img></a></div>
 
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
@@ -144,45 +128,21 @@ enable JavaScript to view this content
 </noscript>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td>
-
-		<div class="newtabmenu" style="margin: 1px 10px; width: 760px;"><!-- Tabbed bar code-->
-		<ul class="newtabmenu">
-			<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
-			<li><a href="/snort/snort_interfaces_global.php"><span>Global
-			Settings</span></a></li>
-			<li class="newtabmenu_active"><a
-				href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
-			<li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
-			<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
-			<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
-			<li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
-			<li><a class="example8" href="/snort/help_and_info.php?id_d=up"><span>Help</span></a></li>
-		</ul>
-		</div>
-
-		</td>
-	</tr>
-
-	<tr>
-		<td>
-
-		<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
-		<ul class="newtabmenu">
-
-			<li class="newtabmenu_active"><a
-				href="/snort/snort_download_rules.php"><span>Rule Update</span></a></li>
-			<li><a href="#"><span>Upload Custom Rules</span></a></li>
-			<li><a href="#"><span>Gui Update</span></a></li>
-
-		</ul>
-		</div>
-
-		</td>
-	</tr>
-
-	<tr>
+<tr><td>
+<?php
+        $tab_array = array();
+        $tab_array[0] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
+        $tab_array[2] = array(gettext("Updates"), true, "/snort/snort_download_updates.php");
+        $tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+        $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
+        $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+        $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+        $tab_array[7] = array(gettext("Help"), false, "/snort/help_and_info.php");
+        display_top_tabs($tab_array);
+?>
+</td></tr>
+<tr>
 		<td>
 		<div id="mainarea3">
 		<table id="maintable4" class="tabcont" width="100%" border="0"
@@ -247,22 +207,19 @@ enable JavaScript to view this content
 						<font color='#777777' size='1.5px'><b>UPDATE YOUR RULES</b></font><br>
 						<br>
 
-						<?php
+			<?php
 
 						if ($error_stop == 'true') {
-
 							echo '
 		
-			<button class="sexybutton disabled" disabled="disabled" href="/snort/snort_download_rules.php?$id_d=up"><span class="download">Update Rules&nbsp;&nbsp;&nbsp;&nbsp;</span></button><br>
+			<a href="/snort/snort_download_rules.php"><button class="sexybutton disabled" disabled="disabled"><span class="download">Update Rules&nbsp;&nbsp;&nbsp;&nbsp;</span></button></a><br/>
 			<p style="text-align:left; margin-left:150px;">
-			<font color="#fc3608" size="2px"><b>WARNING:</b></font><font size="1px" color="#000000">&nbsp;&nbsp;No rule types have been selected for download. "Global Settings Tab"</font><br>
-		';
+			<font color="#fc3608" size="2px"><b>WARNING:</b></font><font size="1px" color="#000000">&nbsp;&nbsp;No rule types have been selected for download. "Global Settings Tab"</font><br>';
 
 							if ($mfolder_chk == 'empty') {
 
 								echo '
-			<font color="#fc3608" size="2px"><b>WARNING:</b></font><font size="1px" color="#000000">&nbsp;&nbsp;The main rules directory is empty. /usr/local/etc/snort/rules</font>
-			' . "\n";
+			<font color="#fc3608" size="2px"><b>WARNING:</b></font><font size="1px" color="#000000">&nbsp;&nbsp;The main rules directory is empty. /usr/local/etc/snort/rules</font>' ."\n";
 							}
 
 							echo '</p>' . "\n";
@@ -271,17 +228,14 @@ enable JavaScript to view this content
 
 							echo '
 		
-		<button class="sexybutton sexysimple example7" href="/snort/snort_download_rules.php?$id_d=up"><span class="download">Update Rules&nbsp;&nbsp;&nbsp;&nbsp;</span></button>
-		
-		' . "\n";
+			<a href="/snort/snort_download_rules.php"><button class="sexybutton disabled"><span class="download">Update Rules&nbsp;&nbsp;&nbsp;&nbsp;</span></button></a><br/>' . "\n";
 
 							if ($mfolder_chk == 'empty') {
 
 								echo '
 			<p style="text-align:left; margin-left:150px;">
 			<font color="#fc3608" size="2px"><b>WARNING:</b></font><font size="1px" color="#000000">&nbsp;&nbsp;The main rules directory is empty. /usr/local/etc/snort/rules</font>
-			</p>
-			';
+			</p>';
 							}
 
 						}
@@ -378,25 +332,7 @@ enable JavaScript to view this content
 </table>
 <!-- end of final table --></div>
 
-						<?php //include("fend.inc"); ?>
-
-</div>
-<!-- Right DIV -->
-</div>
-<!-- Content DIV -->
-<div id="footer"><a target="_blank"
-	href="<?=$g['product_website_footer']?>" class="redlnk"><?=$g['product_name']?></a>
-is &copy; <?=$g['product_copyright_years']?> by <a
-	href="<?=$g['product_copyright_url']?>" class="tblnk"><?=$g['product_copyright']?></a>.
-All Rights Reserved. [<a href="/license.php" class="tblnk">view license</a>]
-<br />
-[<a target="_blank" href="https://portal.pfsense.org/?guilead=true"
-	class="tblnk">Commercial Support Available</a>]</div>
-<!-- Footer DIV -->
-</div>
-<!-- Wrapper Div -->
-<script type="text/javascript"
-	src="/themes/<?php echo $g['theme']; ?>/bottom-loader.js"></script>
+<?php include("fend.inc"); ?>
 
 <?php echo "$snort_custom_rnd_box\n"; ?>
 

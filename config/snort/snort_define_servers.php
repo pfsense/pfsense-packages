@@ -136,7 +136,7 @@ if (isset($id) && $a_nat[$id]) {
 }
 
 /* convert fake interfaces to real */
-$if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interface']);
+$if_real = snort_get_real_interface($pconfig['interface']);
 
 $snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
@@ -234,7 +234,6 @@ if ($_POST["Submit"]) {
 		write_config();
 
 		sync_snort_package_all($id, $if_real, $snort_uuid);
-		touch($d_snortconfdirty_path);
 
 		/* after click go to this page */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -249,32 +248,19 @@ if ($_POST["Submit"]) {
 	}
 }
 
-/* this will exec when alert says apply */
-if ($_POST['apply']) {
-
-	if (file_exists($d_snortconfdirty_path)) {
-		sync_snort_package();
-		unlink($d_snortconfdirty_path);
-	}
-}
-
 $pgtitle = "Snort: Interface $id$if_real Define Servers";
-include("/usr/local/pkg/snort/snort_head.inc");
+include_once("head.inc");
 
 ?>
 <body
 	link="#0000CC" vlink="#0000CC" alink="#0000CC">
 
-<?php include("fbegin.inc"); ?>
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+<?php 
+include("fbegin.inc"); 
+if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 
-<?php
 echo "{$snort_general_css}\n";
 ?>
-
-<!-- hack to fix the hardcoed fbegin link in header -->
-<div id="header-left2"><a href="../index.php" id="status-link2"><img
-	src="./images/transparent.gif" border="0"></img></a></div>
 
 <div class="body2">
 
@@ -315,28 +301,27 @@ enable JavaScript to view this content
 	?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td class="tabnavtbl"><?php
-		if($id != "")
-		{
-
-			echo '<div class="newtabmenu" style="margin:1px 0px; width:775px;">' . "\n";
-			echo '<!-- Tabbed bar code -->' . "\n";
-			echo '<ul class="newtabmenu">' . "\n";
-			echo '<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>' . "\n";
-			echo "<li><a href=\"/snort/snort_interfaces_edit.php?id={$id}\"><span>If Settings</span></a></li>\n";
-			echo "<li><a href=\"/snort/snort_rulesets.php?id={$id}\"><span>Categories</span></a></li>\n";
-			echo "<li><a href=\"/snort/snort_rules.php?id={$id}\"><span>Rules</span></a></li>\n";
-			echo "<li class=\"newtabmenu_active\"><a href=\"/snort/snort_define_servers.php?id={$id}\"><span>Servers</span></a></li>\n";
-			echo "<li><a href=\"/snort/snort_preprocessors.php?id={$id}\"><span>Preprocessors</span></a></li>\n";
-			echo "<li><a href=\"/snort/snort_barnyard.php?id={$id}\"><span>Barnyard2</span></a></li>\n";
-			echo '</ul>' . "\n";
-			echo '</div>' . "\n";
-
-		}
-		?></td>
-	</tr>
-	<tr>
+<tr><td>
+<?php
+        $tab_array = array();
+        $tabid = 0;
+        $tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Servers"), true, "/snort/snort_define_servers.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+        display_top_tabs($tab_array);
+?>
+</td></tr>
+<tr>
 		<td class="tabcont">
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">
 		<?php
@@ -637,10 +622,11 @@ enable JavaScript to view this content
 			</tr>
 			<tr>
 				<td width="22%" valign="top">&nbsp;</td>
-				<td width="78%"><input name="Submit" type="submit" class="formbtn"
-					value="Save"> <input type="button" class="formbtn" value="Cancel"
-					onclick="history.back()"> <?php if (isset($id) && $a_nat[$id]): ?>
-				<input name="id" type="hidden" value="<?=$id;?>"> <?php endif; ?></td>
+				<td width="78%">
+					<input name="Submit" type="submit" class="formbtn" value="Save"> 
+					<?php if (isset($id) && $a_nat[$id]): ?>
+						<input name="id" type="hidden" value="<?=$id;?>">
+					<?php endif; ?></td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top">&nbsp;</td>

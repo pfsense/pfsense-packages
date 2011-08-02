@@ -51,7 +51,7 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
 
 	/* convert fake interfaces to real */
-	$if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interface']);
+	$if_real = snort_get_real_interface($pconfig['interface']);
 
 	$iface_uuid = $a_nat[$id]['uuid'];
 }
@@ -64,7 +64,7 @@ $pgtitle = "Snort: Interface $id $iface_uuid $if_real Categories";
 $isrulesfolderempty = exec("ls -A /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
 if ($isrulesfolderempty == "") {
 
-	include("/usr/local/pkg/snort/snort_head.inc");
+	include_once("head.inc");
 	include("fbegin.inc");
 
 	echo "<p class=\"pgtitle\">";
@@ -75,24 +75,26 @@ if ($isrulesfolderempty == "") {
 
 	echo "
 <table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
-   <tr>\n
-   		<td>\n";
+	<tr><td>\n";
 
-	echo '<div class="newtabmenu" style="margin:1px 0px; width:775px;">' . "\n";
-	echo '<!-- Tabbed bar code -->' . "\n";
-	echo '<ul class="newtabmenu">' . "\n";
-	echo '<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>' . "\n";
-	echo "<li><a href=\"/snort/snort_interfaces_edit.php?id={$id}\"><span>If Settings</span></a></li>\n";
-	echo "<li class=\"newtabmenu_active\"><a href=\"/snort/snort_rulesets.php?id={$id}\"><span>Categories</span></a></li>\n";
-	echo "<li><a href=\"/snort/snort_rules.php?id={$id}\"><span>Rules</span></a></li>\n";
-	echo "<li><a href=\"/snort/snort_define_servers.php?id={$id}\"><span>Servers</span></a></li>\n";
-	echo "<li><a href=\"/snort/snort_preprocessors.php?id={$id}\"><span>Preprocessors</span></a></li>\n";
-	echo "<li><a href=\"/snort/snort_barnyard.php?id={$id}\"><span>Barnyard2</span></a></li>\n";
-	echo '</ul>' . "\n";
-	echo '</div>' . "\n";
-
-	echo  		"</td>\n
-  </tr>\n
+        $tab_array = array();
+        $tabid = 0;
+        $tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+        display_top_tabs($tab_array);
+echo " 
+</td></tr>
   <tr>\n
     <td>\n
 		<div id=\"mainarea\">\n
@@ -119,21 +121,10 @@ if ($isrulesfolderempty == "") {
 	echo "</html>";
 
 	exit(0);
-
 }
 
 /* alert file */
 $d_snortconfdirty_path = "/var/run/snort_conf_{$iface_uuid}_{$if_real}.dirty";
-
-/* this will exec when alert says apply */
-if ($_POST['apply']) {
-
-	if (file_exists($d_snortconfdirty_path)) {
-		sync_snort_package();
-		unlink($d_snortconfdirty_path);
-	}
-}
-
 if ($_POST["Submit"]) {
 	$enabled_items = "";
 	$isfirst = true;
@@ -150,10 +141,7 @@ if ($_POST["Submit"]) {
 	$a_nat[$id]['rulesets'] = $enabled_items;
 
 	write_config();
-
 	sync_snort_package_all($id, $if_real, $iface_uuid);
-
-	touch($d_snortconfdirty_path);
 
 	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 	header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -166,14 +154,13 @@ if ($_POST["Submit"]) {
 
 $enabled_rulesets = $a_nat[$id]['rulesets'];
 if($enabled_rulesets)
-$enabled_rulesets_array = split("\|\|", $enabled_rulesets);
+	$enabled_rulesets_array = split("\|\|", $enabled_rulesets);
 
-include("/usr/local/pkg/snort/snort_head.inc");
+include_once("head.inc");
 
 ?>
 
-<body
-	link="#000000" vlink="#000000" alink="#000000">
+<body link="#000000" vlink="#000000" alink="#000000">
 
 <?php include("fbegin.inc"); ?>
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
@@ -181,10 +168,6 @@ include("/usr/local/pkg/snort/snort_head.inc");
 <?php
 echo "{$snort_general_css}\n";
 ?>
-
-<!-- hack to fix the hardcoed fbegin link in header -->
-<div id="header-left2"><a href="../index.php" id="status-link2"><img
-	src="./images/transparent.gif" border="0"></img></a></div>
 
 <div class="body2">
 
@@ -227,22 +210,26 @@ if (file_exists($d_snortconfdirty_path)) {
 ?>
 
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td><?php
-		echo '<div class="newtabmenu" style="margin:1px 0px; width:775px;">' . "\n";
-		echo '<!-- Tabbed bar code -->' . "\n";
-		echo '<ul class="newtabmenu">' . "\n";
-		echo '<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>' . "\n";
-		echo "<li><a href=\"/snort/snort_interfaces_edit.php?id={$id}\"><span>If Settings</span></a></li>\n";
-		echo "<li class=\"newtabmenu_active\"><a href=\"/snort/snort_rulesets.php?id={$id}\"><span>Categories</span></a></li>\n";
-		echo "<li><a href=\"/snort/snort_rules.php?id={$id}\"><span>Rules</span></a></li>\n";
-		echo "<li><a href=\"/snort/snort_define_servers.php?id={$id}\"><span>Servers</span></a></li>\n";
-		echo "<li><a href=\"/snort/snort_preprocessors.php?id={$id}\"><span>Preprocessors</span></a></li>\n";
-		echo "<li><a href=\"/snort/snort_barnyard.php?id={$id}\"><span>Barnyard2</span></a></li>\n";
-		echo '</ul>' . "\n";
-		echo '</div>' . "\n";
-		?></td>
-	</tr>
+<tr><td>
+<?php
+        $tab_array = array();
+        $tabid = 0;
+        $tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+        display_top_tabs($tab_array);
+?>
+</td></tr>
 	<tr>
 		<td>
 		<div id="mainarea2">

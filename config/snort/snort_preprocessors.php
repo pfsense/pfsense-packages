@@ -129,21 +129,12 @@ if (isset($id) && $a_nat[$id]) {
 }
 
 /* convert fake interfaces to real */
-$if_real = convert_friendly_interface_to_real_interface_name2($pconfig['interface']);
+$if_real = snort_get_real_interface($pconfig['interface']);
 
 $snort_uuid = $pconfig['uuid'];
 
 /* alert file */
 $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
-
-/* this will exec when alert says apply */
-if ($_POST['apply']) {
-
-	if (file_exists($d_snortconfdirty_path)) {
-		sync_snort_package();
-		unlink($d_snortconfdirty_path);
-	}
-}
 
 if ($_POST["Submit"]) {
 
@@ -215,14 +206,14 @@ if ($_POST["Submit"]) {
 		if ($_POST['max_queued_bytes'] != "") { $natent['max_queued_bytes'] = $_POST['max_queued_bytes']; }else{ $natent['max_queued_bytes'] = ""; }
 		if ($_POST['max_queued_segs'] != "") { $natent['max_queued_segs'] = $_POST['max_queued_segs']; }else{ $natent['max_queued_segs'] = ""; }
 
-		$natent['perform_stat'] = $_POST['perform_stat'] ? on : off;
-		$natent['http_inspect'] = $_POST['http_inspect'] ? on : off;
-		$natent['other_preprocs'] = $_POST['other_preprocs'] ? on : off;
-		$natent['ftp_preprocessor'] = $_POST['ftp_preprocessor'] ? on : off;
-		$natent['smtp_preprocessor'] = $_POST['smtp_preprocessor'] ? on : off;
-		$natent['sf_portscan'] = $_POST['sf_portscan'] ? on : off;
-		$natent['dce_rpc_2'] = $_POST['dce_rpc_2'] ? on : off;
-		$natent['dns_preprocessor'] = $_POST['dns_preprocessor'] ? on : off;
+		$natent['perform_stat'] = $_POST['perform_stat'] ? 'on' : 'off';
+		$natent['http_inspect'] = $_POST['http_inspect'] ? 'on' : 'off';
+		$natent['other_preprocs'] = $_POST['other_preprocs'] ? 'on' : 'off';
+		$natent['ftp_preprocessor'] = $_POST['ftp_preprocessor'] ? 'on' : 'off';
+		$natent['smtp_preprocessor'] = $_POST['smtp_preprocessor'] ? 'on' : 'off';
+		$natent['sf_portscan'] = $_POST['sf_portscan'] ? 'on' : 'off';
+		$natent['dce_rpc_2'] = $_POST['dce_rpc_2'] ? 'on' : 'off';
+		$natent['dns_preprocessor'] = $_POST['dns_preprocessor'] ? 'on' : 'off';
 
 		if (isset($id) && $a_nat[$id])
 			$a_nat[$id] = $natent;
@@ -234,24 +225,21 @@ if ($_POST["Submit"]) {
 		}
 
 		write_config();
-
 		sync_snort_package_all($id, $if_real, $snort_uuid);
 
 		/* after click go to this page */
-		touch($d_snortconfdirty_path);
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
-		sleep(2);
 		header("Location: snort_preprocessors.php?id=$id");
 		exit;
 	}
 }
 
 $pgtitle = "Snort: Interface $id$if_real Preprocessors and Flow";
-include("/usr/local/pkg/snort/snort_head.inc");
+include_once("head.inc");
 
 ?>
 <body
@@ -263,10 +251,6 @@ include("/usr/local/pkg/snort/snort_head.inc");
 <?php
 echo "{$snort_general_css}\n";
 ?>
-
-<!-- hack to fix the hardcoed fbegin link in header -->
-<div id="header-left2"><a href="../index.php" id="status-link2"><img
-	src="./images/transparent.gif" border="0"></img></a></div>
 
 <div class="body2">
 
@@ -307,27 +291,26 @@ enable JavaScript to view this content
 	?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td class="tabnavtbl"><?php
-		if($id != "")
-		{
-
-			echo '<div class="newtabmenu" style="margin:1px 0px; width:775px;">' . "\n";
-			echo '<!-- Tabbed bar code -->' . "\n";
-			echo '<ul class="newtabmenu">' . "\n";
-			echo '<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>' . "\n";
-			echo "<li><a href=\"/snort/snort_interfaces_edit.php?id={$id}\"><span>If Settings</span></a></li>\n";
-			echo "<li><a href=\"/snort/snort_rulesets.php?id={$id}\"><span>Categories</span></a></li>\n";
-			echo "<li><a href=\"/snort/snort_rules.php?id={$id}\"><span>Rules</span></a></li>\n";
-			echo "<li><a href=\"/snort/snort_define_servers.php?id={$id}\"><span>Servers</span></a></li>\n";
-			echo "<li class=\"newtabmenu_active\"><a href=\"/snort/snort_preprocessors.php?id={$id}\"><span>Preprocessors</span></a></li>\n";
-			echo "<li><a href=\"/snort/snort_barnyard.php?id={$id}\"><span>Barnyard2</span></a></li>\n";
-			echo '</ul>' . "\n";
-			echo '</div>' . "\n";
-
-		}
-		?></td>
-	</tr>
+<tr><td>
+<?php
+        $tab_array = array();
+        $tabid = 0;
+        $tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Preprocessors"), true, "/snort/snort_preprocessors.php?id={$id}");
+        $tabid++;
+        $tab_array[$tabid] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+        display_top_tabs($tab_array);
+?>
+</td></tr>
 	<tr>
 		<td class="tabcont">
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">
@@ -511,10 +494,10 @@ enable JavaScript to view this content
 			</tr>
 			<tr>
 				<td width="22%" valign="top">&nbsp;</td>
-				<td width="78%"><input name="Submit" type="submit" class="formbtn"
-					value="Save"> <input type="button" class="formbtn" value="Cancel"
-					onclick="history.back()"> <?php if (isset($id) && $a_nat[$id]): ?>
-				<input name="id" type="hidden" value="<?=$id;?>"> <?php endif; ?></td>
+				<td width="78%">
+					<input name="Submit" type="submit" class="formbtn" value="Save">
+					<?php if (isset($id) && $a_nat[$id]): ?>
+						<input name="id" type="hidden" value="<?=$id;?>"> <?php endif; ?></td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top">&nbsp;</td>

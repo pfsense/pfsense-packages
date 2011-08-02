@@ -46,32 +46,6 @@ if (!is_array($config['installedpackages']['snortglobal']['rule']))
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 $id_gen = count($config['installedpackages']['snortglobal']['rule']);
 
-/* alert file */
-$d_snortconfdirty_path_ls = exec('/bin/ls /var/run/snort_conf_*.dirty');
-
-/* this will exec when alert says apply */
-if ($_POST['apply']) {
-
-	if ($d_snortconfdirty_path_ls != '') {
-
-		sync_snort_package_empty();
-		sync_snort_package();
-
-		exec('/bin/rm /var/run/snort_conf_*.dirty');
-
-		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
-		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-		header( 'Cache-Control: post-check=0, pre-check=0', false );
-		header( 'Pragma: no-cache' );
-		header("Location: /snort/snort_interfaces.php");
-			
-		exit;
-			
-	}
-
-}
-
 if (isset($_POST['del_x'])) {
 	/* delete selected rules */
 	if (is_array($_POST['rule'])) {
@@ -80,7 +54,7 @@ if (isset($_POST['del_x'])) {
 		foreach ($_POST['rule'] as $rulei) {
 				
 			/* convert fake interfaces to real */
-			$if_real = convert_friendly_interface_to_real_interface_name2($a_nat[$rulei]['interface']);
+			$if_real = snort_get_real_interface($a_nat[$rulei]['interface']);
 			$snort_uuid = $a_nat[$rulei]['uuid'];
 
 			/* cool code to check if any snort is up */
@@ -133,7 +107,7 @@ if (isset($_POST['del_x'])) {
 
 					/* stop syslog flood code */
 					//$if_real_wan_rulei = $a_nat[$rulei]['interface'];
-					//$if_real_wan_rulei2 = convert_friendly_interface_to_real_interface_name2($if_real_wan_rulei);
+					//$if_real_wan_rulei2 = snort_get_real_interface($if_real_wan_rulei);
 					//exec("/sbin/ifconfig $if_real_wan_rulei2 -promisc");
 					//exec("/bin/cp /var/log/system.log /var/log/snort/snort_sys_$rulei$if_real.log");
 					//exec("/usr/bin/killall syslogd");
@@ -170,7 +144,7 @@ if (isset($_POST['del_x'])) {
 			conf_mount_ro();
 		}
 	  
-		//touch("/var/run/snort_conf_delete.dirty");
+		sync_snort_package_empty();
 	  
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -187,7 +161,7 @@ if (isset($_POST['del_x'])) {
 /* start/stop snort */
 if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 
-	$if_real = convert_friendly_interface_to_real_interface_name2($config['installedpackages']['snortglobal']['rule'][$id]['interface']);
+	$if_real = snort_get_real_interface($config['installedpackages']['snortglobal']['rule'][$id]['interface']);
 	$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
 	/* Log Iface stop */
@@ -212,8 +186,6 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 	}else{
 
 		sync_snort_package_all($id, $if_real, $snort_uuid);
-		sync_snort_package();
-
 		Running_Start($snort_uuid, $if_real, $id);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -228,33 +200,19 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 
 
 $pgtitle = "Services: $snort_package_version";
-include_once("/usr/local/pkg/snort/snort_head.inc");
+include_once("head.inc");
 
 ?>
-
 <body link="#000000" vlink="#000000" alink="#000000">
-
-<script>
-			jQuery(document).ready(function(){
-			
-				//Examples of how to assign the ColorBox event to elements
-				jQuery(".example8").colorbox({width:"820px", height:"700px", iframe:true, overlayClose:false});
-				
-			});
-		</script>
 
 <?php
 echo "{$snort_general_css}\n";
 echo "$snort_interfaces_css\n";
+
+include_once("fbegin.inc");
+if ($pfsense_stable == 'yes')
+	echo '<p class="pgtitle">' . $pgtitle . '</p>';
 ?>
-
-<?php include("fbegin.inc"); ?>
-
-<div class="body2"><!-- hack to fix the hardcoed fbegin link in header -->
-<div id="header-left2"><a href="../index.php" id="status-link2"><img
-	src="./images/transparent.gif" border="0"></img></a></div>
-
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <noscript>
 <div class="alert" ALIGN=CENTER><img
@@ -263,60 +221,47 @@ enable JavaScript to view this content
 </CENTER></div>
 </noscript>
 
-
 <form action="snort_interfaces.php" method="post" enctype="multipart/form-data" name="iform" id="iform">
-
-	<?php
-
+<?php
 	/* Display Alert message */
-
-	if ($input_errors) {
+	if ($input_errors)
 		print_input_errors($input_errors); // TODO: add checks
-	}
 
-	if ($savemsg) {
+	if ($savemsg)
 		print_info_box2($savemsg);
-	}
 
 	//if (file_exists($d_snortconfdirty_path)) {
 	if ($d_snortconfdirty_path_ls != '') {
 		echo '<p>';
 
-		if($savemsg) {
+		if($savemsg)
 			print_info_box_np2("{$savemsg}");
-		}else{
+		else {
 			print_info_box_np2('
 			The Snort configuration has changed for one or more interfaces.<br>
 			You must apply the changes in order for them to take effect.<br>
 			');
 		}
 	}
-
-	?>
+?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td>
-
-		<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
-		<ul class="newtabmenu">
-			<li class="newtabmenu_active"><a href="/snort/snort_interfaces.php"><span>Snort
-			Interfaces</span></a></li>
-			<li><a href="/snort/snort_interfaces_global.php"><span>Global
-			Settings</span></a></li>
-			<li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
-			<li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
-			<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
-			<li><a href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
-			<li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
-			<li><a class="example8" href="/snort/help_and_info.php"><span>Help</span></a></li>
-		</ul>
-		</div>
-
-		</td>
-	</tr>
-	<tr>
-		<td>
+<tr><td>
+<?php
+        $tab_array = array();
+        $tab_array[0] = array(gettext("Snort Interfaces"), true, "/snort/snort_interfaces.php");
+        $tab_array[1] = array(gettext("Global Settings"), false, "/snort/snort_interfaces_global.php");
+        $tab_array[2] = array(gettext("Updates"), false, "/snort/snort_download_updates.php");
+        $tab_array[3] = array(gettext("Alerts"), false, "/snort/snort_alerts.php");
+        $tab_array[4] = array(gettext("Blocked"), false, "/snort/snort_blocked.php");
+        $tab_array[5] = array(gettext("Whitelists"), false, "/snort/snort_interfaces_whitelist.php");
+        $tab_array[6] = array(gettext("Suppress"), false, "/snort/snort_interfaces_suppress.php");
+        $tab_array[7] = array(gettext("Help"), false, "/snort/help_and_info.php");
+        display_top_tabs($tab_array);
+?>
+</td></tr>
+<tr>
+	<td>
 		<div id="mainarea2">
 		<table class="tabcont" width="100%" border="0" cellpadding="0"
 			cellspacing="0">
@@ -346,7 +291,7 @@ enable JavaScript to view this content
 
 			/* convert fake interfaces to real and check if iface is up */
 			/* There has to be a smarter way to do this */
-			$if_real = convert_friendly_interface_to_real_interface_name2($natent['interface']);
+			$if_real = snort_get_real_interface($natent['interface']);
 			$snort_uuid = $natent['uuid'];
 			
 			$tester2 = Running_Ck($snort_uuid, $if_real, $id);
