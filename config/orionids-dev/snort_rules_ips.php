@@ -153,7 +153,7 @@ if (isset($_GET['rulefilename'])) {
 		<!-- START MAIN AREA -->
 
 <table width="100%" border="0" cellpadding="10px" cellspacing="0">	
-		<input type="hidden" name="snortSamSaveSettings" value="1" /> <!-- what to do, save -->
+		<input type="hidden" name="snortSaveRuleSets" value="1" /> <!-- what to do, save -->
 		<input type="hidden" name="dbName" value="snortDBrules" /> <!-- what db-->
 		<input type="hidden" name="dbTable" value="SnortruleSigsIps" /> <!-- what db table-->
 		<input type="hidden" name="ifaceTab" value="snort_rules_ips" /> <!-- what interface tab -->
@@ -348,7 +348,8 @@ function makeLargeSidTables(snortObjlist) {
 					'</td>' + "\n" +
 					'<td class="listbg" id="msg_' + snortObjlist[i].sid + '"><font color="white">' + snortObjlist[i].msg + '</font></td>' + "\n" +
 				'</tr>' + "\n" +
-				'<input type="hidden" name="snortsam[db][' + i + '][sig]" value="' + snortObjlist[i].sid + '" />' + "\n"			
+				'<input type="hidden" name="snortsam[db][' + i + '][siguuid]" value="' + snortObjlist[i].sid + '" />' + "\n" +
+				'<input type="hidden" name="snortsam[db][' + i + '][sigfilename]" value="<?=$rulefilename; ?>" />' + "\n"			
 			);
 		  
 		}, 

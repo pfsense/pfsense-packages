@@ -62,29 +62,6 @@ function snortJsonReturnCode($returnStatus)
 	}
 }
 
-// snortsam save settings
-if ($_POST['snortSamSaveSettings'] == 1) {
-
-	unset($_POST['snortSamSaveSettings']);
-		
-	if ($_POST['ifaceTab'] === 'snort_rulesets_ips') {
-		function snortSamRulesetSaveFunc() 
-		{	
-			print_r($_POST);
-		}
-		snortSamRulesetSaveFunc();
-	}
-	
-	if ($_POST['ifaceTab'] === 'snort_rules_ips') {
-		function snortSamRulesSaveFunc() 
-		{	
-			snortSql_updateRulesSigsIps();
-		}
-		snortSamRulesSaveFunc();
-	}	
-	
-}
-
 // row from db by uuid
 if ($_POST['snortSidRuleEdit'] == 1) {
 	
@@ -94,45 +71,54 @@ if ($_POST['snortSidRuleEdit'] == 1) {
 		unset($_POST['snortSidRuleEdit']);		
 		snortSidStringRuleEditGUI();
 	
-	}	
-	snortSidRuleEditFunc();
+	}	snortSidRuleEditFunc();
 	
 }
 
 	
 // row from db by uuid
-if ($_POST['snortSaveRuleSets'] == 1) {	
-
-		if ($_POST['ifaceTab'] == 'snort_rulesets' || $_POST['ifaceTab'] == 'snort_rulesets_ips') {
+if ($_POST['snortSaveRuleSets'] == 1) {
+	
+	
+	if ($_POST['ifaceTab'] === 'snort_rules_ips') {
+		function snortSamRulesSaveFunc() 
+		{	
+			snortJsonReturnCode(snortSql_updateRulesSigsIps());
 			
-			function snortSaveRuleSetsRulesetsFunc()
-			{
-				// unset POSTs that are markers not in db
-				unset($_POST['snortSaveRuleSets']);
-				unset($_POST['ifaceTab']);		
-				
-				// save to database
-				snortJsonReturnCode(snortSql_updateRuleSetList());
-				
-				// only build if uuid is valid
-				if (!empty($_POST['uuid'])) {
-					build_snort_settings($_POST['uuid']);
-				}
-			}
-			snortSaveRuleSetsRulesetsFunc();	
-		}		
+		} snortSamRulesSaveFunc();
+	}	
+	
+
+	if ($_POST['ifaceTab'] == 'snort_rulesets' || $_POST['ifaceTab'] == 'snort_rulesets_ips') {
 		
-		if ($_POST['ifaceTab'] == 'snort_rules') {
-			function snortSaveRuleSetsRulesFunc()
-			{			
-				// unset POSTs that are markers not in db
-				unset($_POST['snortSaveRuleSets']);
-				unset($_POST['ifaceTab']);
-				
-				snortJsonReturnCode(snortSql_updateRuleSigList());
+		function snortSaveRuleSetsRulesetsFunc()
+		{
+			// unset POSTs that are markers not in db
+			unset($_POST['snortSaveRuleSets']);
+			unset($_POST['ifaceTab']);		
+			
+			// save to database
+			snortJsonReturnCode(snortSql_updateRuleSetList());
+			
+			// only build if uuid is valid
+			if (!empty($_POST['uuid'])) {
+				build_snort_settings($_POST['uuid']);
 			}
-			snortSaveRuleSetsRulesFunc();
-		}	
+			
+		} snortSaveRuleSetsRulesetsFunc();	
+	}		
+	
+	if ($_POST['ifaceTab'] == 'snort_rules') {
+		function snortSaveRuleSetsRulesFunc()
+		{			
+			// unset POSTs that are markers not in db
+			unset($_POST['snortSaveRuleSets']);
+			unset($_POST['ifaceTab']);
+			
+			snortJsonReturnCode(snortSql_updateRuleSigList());
+			
+		} snortSaveRuleSetsRulesFunc();
+	}	
 	
 } // END of rulesSets	
 
@@ -196,6 +182,12 @@ if ($_POST['snortSaveSettings'] == 1)  {
 				// creat iface dir and ifcae rules dir
 				exec("/bin/mkdir -p /usr/local/etc/snort/snortDBrules/DB/{$_POST['uuid']}/rules");
 				
+				// create at least one file
+				if (!file_exists('/usr/local/etc/snort/snortDBrules/DB/' . $_POST['uuid'] . '/rules/local.rules')) {
+
+					exec('touch /usr/local/etc/snort/snortDBrules/DB/' . $_POST['uuid'] . '/rules/local.rules');
+					
+				}				
 				
 				// NOTE: code only works on php5
 				$listSnortRulesDir = snortScanDirFilter('/usr/local/etc/snort/snortDBrules/snort_rules/rules', '\.rules');
@@ -203,13 +195,13 @@ if ($_POST['snortSaveSettings'] == 1)  {
 				$listPfsenseRulesDir = snortScanDirFilter('/usr/local/etc/snort/snortDBrules/pfsense_rules/rules', '\.rules');
 				
 				if (!empty($listSnortRulesDir)) {											
-					exec("/bin/cp -R /usr/local/etc/snort/snortDBrules/snort_rules/rules/* /usr/local/etc/snort/snortDBrules/DB/{$_POST['uuid']}/rules");					
+					exec("/bin/cp -R /usr/local/etc/snort/snortDBrules/snort_rules/rules/*.rules /usr/local/etc/snort/snortDBrules/DB/{$_POST['uuid']}/rules");					
 				}
 				if (!empty($listEmergingRulesDir)) {											
-					exec("/bin/cp -R /usr/local/etc/snort/snortDBrules/emerging_rules/rules/* /usr/local/etc/snort/snortDBrules/DB/{$_POST['uuid']}/rules");					
+					exec("/bin/cp -R /usr/local/etc/snort/snortDBrules/emerging_rules/rules/*.rules /usr/local/etc/snort/snortDBrules/DB/{$_POST['uuid']}/rules");					
 				}								
 				if (!empty($listPfsenseRulesDir)) {											
-					exec("/bin/cp -R /usr/local/etc/snort/snortDBrules/pfsense_rules/rules/* /usr/local/etc/snort/snortDBrules/DB/{$_POST['uuid']}/rules");					
+					exec("/bin/cp -R /usr/local/etc/snort/snortDBrules/pfsense_rules/rules/*.rules /usr/local/etc/snort/snortDBrules/DB/{$_POST['uuid']}/rules");					
 				}
 						
 				

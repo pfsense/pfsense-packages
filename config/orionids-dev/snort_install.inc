@@ -121,19 +121,19 @@ function snort_postinstall()
 	}
 
 	if (!file_exists('/usr/local/etc/snort/snortDBrules/custom_rules')) {
-		exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/custom_rules');
+		exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/custom_rules/rules');
 	}
 
 	if (!file_exists('/usr/local/etc/snort/snortDBrules/emerging_rules')) {
-		exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/emerging_rules');
+		exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/emerging_rules/rules');
 	}	
 
 	if (!file_exists('/usr/local/etc/snort/snortDBrules/pfsense_rules')) {
-		exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/pfsense_rules');
+		exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/pfsense_rules/rules');
 	}
 
 	if (!file_exists('/usr/local/etc/snort/snortDBrules/snort_rules')) {
-		exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/snort_rules');
+		exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/snort_rules/rules');
 	}
 	
 	if (!file_exists('/usr/local/etc/snort/snortDBrules/DB/default/rules')) {
@@ -226,39 +226,39 @@ function snort_postinstall()
 	exec('/bin/mkdir -p /usr/local/www/snort/javascript');
 
 	chdir ("/usr/local/www/snort/css/");
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/css/style_snort2.css');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/css/new_tab_menu.css');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/css/style_snort2.css');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/css/new_tab_menu.css');
 	chdir ("/usr/local/www/snort/images/");
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/alert.jpg');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/arrow_down.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/awesome-overlay-sprite.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/controls.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/down.gif');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/down2.gif');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/footer.jpg');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/footer2.jpg');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/icon-table-sort-asc.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/icon-table-sort-desc.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/icon-table-sort.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/icon_excli.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/loading.gif');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/logo.jpg');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/logo22.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/page_white_text.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/transparent.gif');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/transparentbg.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/up.gif');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/up2.gif');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/close_9x9.gif');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/new_tab_menu.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/progress_bar2.gif');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/progressbar.gif');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/images/top_modal_bar_lil.jpg');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/alert.jpg');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/arrow_down.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/awesome-overlay-sprite.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/controls.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/down.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/down2.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/footer.jpg');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/footer2.jpg');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/icon-table-sort-asc.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/icon-table-sort-desc.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/icon-table-sort.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/icon_excli.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/loading.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/logo.jpg');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/logo22.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/page_white_text.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/transparent.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/transparentbg.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/up.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/up2.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/close_9x9.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/new_tab_menu.png');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/progress_bar2.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/progressbar.gif');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/images/top_modal_bar_lil.jpg');
 	chdir ("/usr/local/www/snort/javascript/");
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery-1.6.2.min.js');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery.form.js');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/snort_globalsend.js');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort-dev/javascript/jquery.progressbar.min.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/javascript/jquery-1.6.2.min.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/javascript/jquery.form.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/javascript/snort_globalsend.js');
+	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/orionids-dev/javascript/jquery.progressbar.min.js');
 
 	/* back to default */
 	chdir ('/root/');

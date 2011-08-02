@@ -102,8 +102,8 @@ jQuery(document).ready(function() {
 			 * NOTE: I could have used a php loop to build the table but off loading to client is faster 
 			 * use jQuery jason parse, make sure its in one line
 			 */
-			if (!empty($filterDirList))
-			{
+			if (!empty($filterDirList)) {
+				
 				$countDirList = count($filterDirList);
 				
 				echo "\n";
@@ -134,27 +134,27 @@ jQuery(document).ready(function() {
 						}
 						
 				echo ' ]}\');' . "\n";
-			}	
+				
+			}else{
 
+				echo 'var snortObjlist = jQuery.parseJSON(\' { "ruleSets": [] } \');' . "\n";
+				
+			}
 	
 			
 	?>
 	
 	// loop through object, dont use .each in jQuery as its slow
-	if(snortObjlist.ruleSets.length > 0)
-	{
-		for (var i = 0; i < snortObjlist.ruleSets.length; i++)
-		{
+	if(snortObjlist.ruleSets.length > 0) {
+		for (var i = 0; i < snortObjlist.ruleSets.length; i++) {
 	
-			if (isEven(i) === true)
-			{
+			if (isEven(i) === true) {
 				var rowIsEvenOdd = 'even_ruleset';
 			}else{
 				var rowIsEvenOdd = 'odd_ruleset';
 			}
 	
-			if (snortObjlist.ruleSets[i].enable === 'on')
-			{
+			if (snortObjlist.ruleSets[i].enable === 'on') {
 				var rulesetChecked = 'checked'; 
 			}else{
 				var rulesetChecked = '';

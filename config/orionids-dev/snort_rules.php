@@ -434,43 +434,48 @@ jQuery(document).ready(function() {
 	
 <?php
 
-			/* 
-			 * NOTE:
-			 * I could have used a php loop to build the table but I wanted to see if off loading to client is faster.
-			 * Seems to be faster on embeded systems with low specs. On higher end systems there is no difference that I can see.
-			 * WARNING:
-			 * If Json string is to long browsers start asking to terminate javascript.
-			 * FIX: 
-			 * Use julienlecomte()net/blog/2007/10/28/, the more reading I do about this subject it seems that off loading to a client is not recomended.
-			 */
-			if (!empty($newFilterRuleSigArray))
-			{
-				$countSigList = count($newFilterRuleSigArray);
-				
-				echo "\n";
-				
-				echo 'var snortObjlist = [';	
-						$i = 0;
-						foreach ($newFilterRuleSigArray as $val3)
-						{
-					
-							$i++;	
-							
-							if ( $i !== $countSigList )
-							{//		 
-								echo '{"sid":"' . $val3['sid'] . '","enable":"' . $val3['enable'] . '","proto":"' . $val3['proto'] . '","src":"' . $val3['src'] . '","srcport":"' . $val3['srcport'] . '","dst":"' . $val3['dst'] . '", "dstport":"' . $val3['dstport'] . '","msg":"' . escapeJsonString($val3['msg']) . '"},'; 
-							}else{
-								echo '{"sid":"' . $val3['sid'] . '","enable":"' . $val3['enable'] . '","proto":"' . $val3['proto'] . '","src":"' . $val3['src'] . '","srcport":"' . $val3['srcport'] . '","dst":"' . $val3['dst'] . '", "dstport":"' . $val3['dstport'] . '","msg":"' . escapeJsonString($val3['msg']) . '"}'; 
-							}
-						}
-						
-				echo '];' . "\n";
-			}	
+	/* 
+	 * NOTE:
+	 * I could have used a php loop to build the table but I wanted to see if off loading to client is faster.
+	 * Seems to be faster on embeded systems with low specs. On higher end systems there is no difference that I can see.
+	 * WARNING:
+	 * If Json string is to long browsers start asking to terminate javascript.
+	 * FIX: 
+	 * Use julienlecomte()net/blog/2007/10/28/, the more reading I do about this subject it seems that off loading to a client is not recomended.
+	 */
+	if (!empty($newFilterRuleSigArray))
+	{
+		$countSigList = count($newFilterRuleSigArray);
+		
+		echo "\n";
+		
+		echo 'var snortObjlist = [';	
+				$i = 0;
+				foreach ($newFilterRuleSigArray as $val3)
+				{
 			
-?>
+					$i++;	
+					
+					if ( $i !== $countSigList )
+					{//		 
+						echo '{"sid":"' . $val3['sid'] . '","enable":"' . $val3['enable'] . '","proto":"' . $val3['proto'] . '","src":"' . $val3['src'] . '","srcport":"' . $val3['srcport'] . '","dst":"' . $val3['dst'] . '", "dstport":"' . $val3['dstport'] . '","msg":"' . escapeJsonString($val3['msg']) . '"},'; 
+					}else{
+						echo '{"sid":"' . $val3['sid'] . '","enable":"' . $val3['enable'] . '","proto":"' . $val3['proto'] . '","src":"' . $val3['src'] . '","srcport":"' . $val3['srcport'] . '","dst":"' . $val3['dst'] . '", "dstport":"' . $val3['dstport'] . '","msg":"' . escapeJsonString($val3['msg']) . '"}'; 
+					}
+				}
+				
+		echo '];' . "\n";
+	}	
+			
 
-	// disable Row Append if row count is less than 0
-	var countRowAppend = <?=$countSig; ?>;
+	
+	if (!empty($countSig)) {
+		echo 'var countRowAppend = ' . $countSig . ';' . "\n";	
+	}else{
+		echo 'var countRowAppend = 0;' . "\n";		
+	}	
+	
+?>
 
 	// if rowcount is not empty do this
 	if (countRowAppend > 0){

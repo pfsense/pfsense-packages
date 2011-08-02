@@ -401,64 +401,108 @@ function snortSql_updateRuleSigList()
 function snortSql_updateRulesSigsIps()
 {
 
-	// get default settings
-	$listGenRules = array();
-	$listGenRules = snortSql_fetchAllSettings('snortDBrules', 'SnortruleGenIps', 'rdbuuid', $_POST['rdbuuid']);		
-	
-	
-	$addDate = date(U);
-
 	// dont let user pick the DB path
-    $db = sqlite_open("/usr/local/pkg/snort/{$_POST['dbName']}");
+    $db = sqlite_open("/usr/local/pkg/snort/{$_POST['dbName']}");	
     
-    // checkbox off catch
-    $listGenRulesEnable = $listGenRules[0]['enable'];
-	if ( empty($listGenRules[0]['enable']) || $listGenRules[0]['enable'] === 'off' ) {
+    function insertUpdateDB($db)
+    {
+    
+		// get default settings
+		$listGenRules = array();
+		$listGenRules = snortSql_fetchAllSettings('snortDBrules', 'SnortruleGenIps', 'rdbuuid', $_POST['rdbuuid']);
 		
-		$listGenRulesEnable = 'off';
-	}    
-    
-	foreach ($_POST['snortsam']['db'] as $singleSig) 
-	{
-
-		$resultid = sqlite_query($db,
-			"SELECT id FROM {$_POST['dbTable']} WHERE signatureid = '{$singleSig['sig']}' and rdbuuid = '{$_POST['rdbuuid']}';
-		");			
+		// if $listGenRules empty list defaults
+		if (empty($listGenRules)) {
+			$listGenRules[0] = array(		
+				'rdbuuid' => $_POST['rdbuuid'],
+				'enable' => 'on',
+				'who' => 'src',
+				'timeamount' => 15,
+				'timetype' => 'minutes'			
+			);
+		}
+		
+		$addDate = date(U);
 	    
-		$chktable = sqlite_fetch_all($resultid, SQLITE_ASSOC);
-		
-		// checkbox off catch
-		$singleSigEnable = $singleSig['enable'];
-		if ( empty($singleSig['enable']) ) {
+	    // checkbox off catch
+	    $listGenRulesEnable = $listGenRules[0]['enable'];
+		if ( empty($listGenRules[0]['enable']) || $listGenRules[0]['enable'] === 'off' ) {
 			
-			$singleSigEnable = 'off';
+			$listGenRulesEnable = 'off';
 		}
 		
-		// only do this if something change from defauts settings
-		$somthingChanged = FALSE;
-		if ( $singleSigEnable !== $listGenRulesEnable || $singleSig['who'] !== $listGenRules[0]['who'] || $singleSig['timeamount'] !== $listGenRules[0]['timeamount'] || $singleSig['timetype'] !== $listGenRules[0]['timetype'] ) {
-			$somthingChanged = TRUE;
-		}
-		
-		if ( empty($chktable) && $somthingChanged ) {
+		foreach ($_POST['snortsam']['db'] as $singleSig) 
+		{
+	
+			$resultid = sqlite_query($db,
+				"SELECT id FROM {$_POST['dbTable']} WHERE siguuid = '{$singleSig['siguuid']}' and rdbuuid = '{$_POST['rdbuuid']}';
+			");			
+		    
+			$chktable = sqlite_fetch_all($resultid, SQLITE_ASSOC);
+			
+			// checkbox off catch
+			$singleSigEnable = $singleSig['enable'];
+			if ( empty($singleSig['enable']) ) {
 				
-			$rulesetUuid = genAlphaNumMixFast(11, 14);
+				$singleSigEnable = 'off';
+			}
 			
-			$query_ck = sqlite_query($db, // @ supress warnings usonly in production
-			"INSERT INTO {$_POST['dbTable']} (date, uuid, rdbuuid, enable, who, timeamount, timetype) VALUES ('{$addDate}', '{$rulesetUuid}', '{$_POST['rdbuuid']}', '{$singleSigEnable}', '{$singleSig['who']}', '{$singleSig['timeamount']}', '{$singleSig['timetype']}');
-			");								
+			// only do this if something change from defauts settings, note: timeamount Not equal
+			$somthingChanged = FALSE;
+			if ( $singleSigEnable !== $listGenRulesEnable || $singleSig['who'] !== $listGenRules[0]['who'] || $singleSig['timeamount'] != $listGenRules[0]['timeamount'] || $singleSig['timetype'] !== $listGenRules[0]['timetype'] ) {
+				$somthingChanged = TRUE;
+			}
+			
+			if ( empty($chktable) && $somthingChanged ) {
 				
-		}
+				$rulesetUuid = genAlphaNumMixFast(11, 14);
+				
+				$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+				"INSERT INTO {$_POST['dbTable']} (date, uuid, rdbuuid, enable, siguuid, sigfilename, who, timeamount, timetype) VALUES ('{$addDate}', '{$rulesetUuid}', '{$_POST['rdbuuid']}', '{$singleSigEnable}', '{$singleSig['siguuid']}', '{$singleSig['sigfilename']}', '{$singleSig['who']}', '{$singleSig['timeamount']}', '{$singleSig['timetype']}');
+				");
+	
+					
+			}
+				
+			if ( !empty($chktable) ) {
+	
+				$query_ck = sqlite_query($db, // @ supress warnings usonly in production
+				"UPDATE {$_POST['dbTable']} SET date ='{$addDate}', enable = '{$singleSigEnable}', who = '{$singleSig['who']}', timeamount = '{$singleSig['timeamount']}', timetype = '{$singleSig['timetype']}' WHERE rdbuuid = '{$_POST['rdbuuid']}' and sigfilename = '{$singleSig['sigfilename']}'; 
+				");	
+				
+			}
 			
-		if ( !empty($chktable) && $somthingChanged ) {
+		}   // END foreach
+	
+    } insertUpdateDB($db);
 
-			echo $singleSig['sig'];
-			
+	function cleanupDB($db)
+	{
+		// clean database of old names	and turn rulesets off
+		$listDir = snortScanDirFilter("/usr/local/etc/snort/snortDBrules/DB/{$_POST['rdbuuid']}/rules/", '\.rules');
+	
+		$resultAllRulesetname = sqlite_query($db,
+			"SELECT sigfilename FROM {$_POST['dbTable']} WHERE rdbuuid = '{$_POST['rdbuuid']}';
+		");
+	
+		$chktable2 = sqlite_fetch_all($resultAllRulesetname, SQLITE_ASSOC);
+	
+		if (!empty($chktable2)) {
+			foreach ($chktable2 as $value) 
+			{
+	
+				if(!in_array($value['sigfilename'], $listDir)) {	    		
+					$deleteMissingRuleset = sqlite_query($db, // @ supress warnings use only in production
+					"DELETE FROM {$_POST['dbTable']} WHERE sigfilename = '{$value['sigfilename']}' and rdbuuid = '{$_POST['rdbuuid']}';
+					");
+				}
+	
+			}
 		}
-		
-	}   // END foreach
+	} cleanupDB($db);	    
 
     sqlite_close($db);
+    return true;
 	
 }
 
