@@ -44,8 +44,10 @@ $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 $id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
-if (!is_numeric($id))
-	$id = 0; /* XXX: Safety belt */
+if (is_null($id)) {
+        header("Location: /snort/snort_interfaces.php");
+        exit;
+}
 
 if (isset($_GET['dup'])) {
 	$id = $_GET['dup'];

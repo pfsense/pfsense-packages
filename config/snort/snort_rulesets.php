@@ -45,6 +45,10 @@ $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 $id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
+if (is_null($id)) {
+	header("Location: /snort/snort_interfaces.php");
+	exit;
+}
 
 if (isset($id) && $a_nat[$id]) {
 	$pconfig['enable'] = $a_nat[$id]['enable'];
