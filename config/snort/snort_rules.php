@@ -61,65 +61,69 @@ if (!is_dir("/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules"))
 
 $isrulesfolderempty = exec("ls -A /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
 if ($isrulesfolderempty == "") {
+	//$isrulesfolderempty = exec("ls -A /usr/local/etc/snort/rules/*.rules");
+	//if ($isrulesfolderempty == "") {
+		include_once("head.inc");
+		include_once("fbegin.inc");
 
-	include_once("head.inc");
-	include_once("fbegin.inc");
+		echo "<body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\">";
 
-	echo "<body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\">";
+		if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 
-	if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
+		echo "<script src=\"/row_toggle.js\" type=\"text/javascript\"></script>\n
+			<script src=\"/javascript/sorttable.js\" type=\"text/javascript\"></script>\n
+		<table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
+		   <tr>\n
+			<td>\n";
 
-	echo "<script src=\"/row_toggle.js\" type=\"text/javascript\"></script>\n
-<script src=\"/javascript/sorttable.js\" type=\"text/javascript\"></script>\n
-<table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
-   <tr>\n
-   		<td>\n";
+		$tab_array = array();
+		$tabid = 0;
+		$tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+		$tabid++;
+		$tab_array[$tabid] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+		$tabid++;
+		$tab_array[$tabid] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
+		$tabid++;
+		$tab_array[$tabid] = array(gettext("Rules"), true, "/snort/snort_rules.php?id={$id}");
+		$tabid++;
+		$tab_array[$tabid] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
+		$tabid++;
+		$tab_array[$tabid] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+		$tabid++;
+		$tab_array[$tabid] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+		display_top_tabs($tab_array);
+		echo  		"</td>\n
+		  </tr>\n
+		  <tr>\n
+		    <td>\n
+				<div id=\"mainarea\">\n
+					<table id=\"maintable\" class=\"tabcont\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
+						<tr>\n
+							<td>\n
+		# The rules directory is empty.\n
+						</td>\n
+						</tr>\n
+					</table>\n
+				</div>\n
+			</td>\n
+		  </tr>\n
+		</table>\n
+		\n
+		</form>\n
+		\n
+		<p>\n\n";
 
-        $tab_array = array();
-        $tabid = 0;
-        $tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Categories"), false, "/snort/snort_rulesets.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Rules"), true, "/snort/snort_rules.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
-        display_top_tabs($tab_array);
-echo  		"</td>\n
-  </tr>\n
-  <tr>\n
-    <td>\n
-		<div id=\"mainarea\">\n
-			<table id=\"maintable\" class=\"tabcont\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
-				<tr>\n
-					<td>\n
-# The rules directory is empty.\n
-		    		</td>\n
-		  		</tr>\n
-			</table>\n
-		</div>\n
-	</td>\n
-  </tr>\n
-</table>\n
-\n
-</form>\n
-\n
-<p>\n\n";
+		echo "Please click on the Update Rules tab to install your selected rule sets.";
+		include("fend.inc");
 
-	echo "Please click on the Update Rules tab to install your selected rule sets.";
-	include("fend.inc");
+		echo "</body>";
+		echo "</html>";
 
-	echo "</body>";
-	echo "</html>";
-
-	exit(0);
-
+		exit(0);
+	//} else {
+		/* Make sure that we have the rules */
+	//	mwexec("/bin/cp /usr/local/etc/snort/rules/*.rules /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules", true);
+	//}
 }
 
 function get_middle($source, $beginning, $ending, $init_pos) {
@@ -182,7 +186,8 @@ if ($_GET['openruleset'] != '' && $_GET['ids'] != '') {
 }
 */
 
-$ruledir = "/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/";
+//$ruledir = "/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/";
+$ruledir = "/usr/local/etc/snort/rules/";
 $dh  = opendir($ruledir);
 while (false !== ($filename = readdir($dh)))
 {

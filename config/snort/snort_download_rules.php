@@ -46,9 +46,9 @@ $emergingthreats_filename = "emerging.rules.tar.gz";
 $pfsense_rules_filename_md5 = "pfsense_rules.tar.gz.md5";
 $pfsense_rules_filename = "pfsense_rules.tar.gz";
 
-$id_d = $_GET['id_d'];
-if (isset($_POST['id_d']))
-	$id_d = $_POST['id_d'];
+$id = $_GET['id'];
+if (isset($_POST['id']))
+	$id = $_POST['id'];
 
 /*  Time stamps define */
 $last_md5_download = $config['installedpackages']['snortglobal']['last_md5_download'];
@@ -137,6 +137,10 @@ if (!is_dir('/usr/local/etc/snort/tmp')) {
 	exec('/bin/mkdir -p /usr/local/etc/snort/tmp');
 }
 
+$snort_md5_check_ok = 'off';
+$emerg_md5_check_ok = 'off';
+$pfsense_md5_check_ok = 'off';
+
 /* Set user agent to Mozilla */
 ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
 ini_set("memory_limit","150M");
@@ -164,20 +168,16 @@ if (is_dir("{$tmpfname}")) {
 exec("/bin/mkdir -p {$snortdir}");
 exec("/bin/mkdir -p {$snortdir}/rules");
 exec("/bin/mkdir -p {$snortdir}/signatures");
+exec("/bin/mkdir -p {$tmpfname}");
 exec("/bin/mkdir -p /usr/local/lib/snort/dynamicrules/");
 
 /* send current buffer */
 ob_flush();
 
-/* If tmp dir does not exist create it */
-if (is_dir($tmpfname)) {
-	update_status(gettext("The directory tmp exists..."));
-} else {
-	@mkdir("{$tmpfname}", 700);
-}
-
 /* unhide progress bar and lets end this party */
 unhide_progress_bar_status();
+
+$pfsensedownload = 'on';
 
 /*  download md5 sig from snort.org */
 if ($snortdownload == 'on')
@@ -191,23 +191,19 @@ if ($snortdownload == 'on')
 
 		//$image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}");
 		$image = @file_get_contents("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename_md5}");
-		$f = fopen("{$tmpfname}/{$snort_filename_md5}", 'w');
-		fwrite($f, $image);
-		fclose($f);
+		@file_put_contents("{$tmpfname}/{$snort_filename_md5}", $image);
 		update_status(gettext("Done downloading snort.org md5"));
 	}
 }
 
 /*  download md5 sig from emergingthreats.net */
-if ($emergingthreats == "on")
+if ($emergingthreats == 'on')
 {
 	update_status(gettext("Downloading emergingthreats md5 file..."));
 	ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
 	// $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/version.txt");
 	$image = @file_get_contents('http://rules.emergingthreats.net/open/snort-2.8.6/emerging.rules.tar.gz.md5');
-	$f = fopen("{$tmpfname}/{$emergingthreats_filename_md5}", 'w');
-	fwrite($f, $image);
-	fclose($f);
+	@file_put_contents("{$tmpfname}/{$emergingthreats_filename_md5}", $image);
 	update_status(gettext("Done downloading emergingthreats md5"));
 }
 
@@ -219,9 +215,7 @@ if (file_exists("{$tmpfname}/{$pfsense_rules_filename_md5}")) {
 	ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
 	//$image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz.md5");
 	$image = @file_get_contents("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz.md5");
-	$f = fopen("{$tmpfname}/pfsense_rules.tar.gz.md5", 'w');
-	fwrite($f, $image);
-	fclose($f);
+	@file_put_contents("{$tmpfname}/pfsense_rules.tar.gz.md5", $image);
 	update_status(gettext("Done downloading pfsense md5."));
 }
 
@@ -233,20 +227,16 @@ if ($snortdownload == 'on')
 		update_status(gettext("Please wait... You may only check for New Rules every 15 minutes..."));
 		update_output_window(gettext("Rules are released every month from snort.org. You may download the Rules at any time."));
 		hide_progress_bar_status();
-		conf_mount_ro();
-		return;
+		$snortdownload = 'off';
 	}
 }
-
-/* If emergingthreats md5 file is empty wait 15min exit not needed */
 
 /* If pfsense md5 file is empty wait 15min exit */
 if (0 == filesize("{$tmpfname}/$pfsense_rules_filename_md5")){
 	update_status(gettext("Please wait... You may only check for New Pfsense Rules every 15 minutes..."));
 	update_output_window(gettext("Rules are released to support Pfsense packages."));
 	hide_progress_bar_status();
-	conf_mount_ro();
-	return;
+	$pfsensedownload = 'off';
 }
 
 /* Check if were up to date snort.org */
@@ -263,13 +253,16 @@ if ($snortdownload == 'on')
 			update_status(gettext("Your rules are up to date..."));
 			update_output_window(gettext("You may start Snort now, check update."));
 			hide_progress_bar_status();
-			$snort_md5_check_ok = on;
+			$snort_md5_check_ok = 'on';
+		} else {
+			update_status(gettext("Your rules are not up to date..."));
+			$snort_md5_check_ok = 'off';
 		}
 	}
 }
 
 /* Check if were up to date emergingthreats.net */
-if ($emergingthreats == "on")
+if ($emergingthreats == 'on')
 {
 	if (file_exists("{$snortdir}/{$emergingthreats_filename_md5}"))
 	{
@@ -280,13 +273,14 @@ if ($emergingthreats == "on")
 		if ($emerg_md5_check_new == $emerg_md5_check_old)
 		{
 			hide_progress_bar_status();
-			$emerg_md5_check_ok = on;
-		}
+			$emerg_md5_check_ok = 'on';
+		} else
+			$emerg_md5_check_ok = 'off';
 	}
 }
 
 /* Check if were up to date pfsense.org */
-if (file_exists("{$snortdir}/pfsense_rules.tar.gz.md5"))
+if ($pfsensedownload == 'on' && file_exists("{$snortdir}/pfsense_rules.tar.gz.md5"))
 {
 	$pfsense_check_new_parse = file_get_contents("{$tmpfname}/pfsense_rules.tar.gz.md5");
 	$pfsense_md5_check_new = `/bin/echo "{$pfsense_md5_check_new_parse}" | /usr/bin/awk '{ print $1 }'`;
@@ -295,59 +289,32 @@ if (file_exists("{$snortdir}/pfsense_rules.tar.gz.md5"))
 	if ($pfsense_md5_check_new == $pfsense_md5_check_old)
 	{
 		hide_progress_bar_status();
-		$pfsense_md5_check_ok = on;
-	}
+		$pfsense_md5_check_ok = 'on';
+	} else
+		$pfsense_md5_check_ok = 'off';
 }
 
-/* Check if were up to date is so, exit */
-/* WARNING This code needs constant checks */
-if ($snortdownload == 'on' && $emergingthreats == 'on')
-{
-	if ($snort_md5_check_ok == 'on' && $emerg_md5_check_ok == 'on')
-	{
-		update_status(gettext("All your rules are up to date..."));
-		update_output_window(gettext("You may start Snort now..."));
-		conf_mount_ro();
-		return;
-	}
-}
-
-if ($snortdownload == 'on' && $emergingthreats == 'off')
-{
+if ($snortdownload == 'on') {
 	if ($snort_md5_check_ok == 'on')
 	{
 		update_status(gettext("Your snort.org rules are up to date..."));
 		update_output_window(gettext("You may start Snort now..."));
-		conf_mount_ro();
-		return;
+		$snortdownload = 'off';
 	}
 }
-
-if ($snortdownload == 'off' && $emergingthreats == 'on')
-{
+if ($emergingthreats == 'on') {
 	if ($emerg_md5_check_ok == 'on')
 	{
 		update_status(gettext("Your Emergingthreats rules are up to date..."));
 		update_output_window(gettext("You may start Snort now..."));
-		conf_mount_ro();
-		return;
+		$emergingthreats = 'off';
 	}
-}
-
-/* You are Not Up to date, always stop snort when updating rules for low end machines */;
-update_status(gettext("You are NOT up to date..."));
-update_output_window(gettext("Stopping Snort service..."));
-$chk_if_snort_up = exec("pgrep -x snort");
-if ($chk_if_snort_up != "") {
-	exec("/usr/bin/touch /tmp/snort_download_halt.pid");
-	exec("/bin/sh /usr/local/etc/rc.d/snort.sh stop");
-	sleep(2);
 }
 
 /* download snortrules file */
 if ($snortdownload == 'on')
 {
-	if ($snort_md5_check_ok != on) {
+	if ($snort_md5_check_ok != 'on') {
 		if (file_exists("{$tmpfname}/{$snort_filename}")) {
 			update_status(gettext("Snortrule tar file exists..."));
 		} else {
@@ -362,8 +329,7 @@ if ($snortdownload == 'on')
 				update_status(gettext("Error with the snort rules download..."));
 
 				update_output_window(gettext("Snort rules file downloaded failed..."));
-				conf_mount_ro();
-				return;
+				$snortdownload = 'off';
 			}
 		}
 	}
@@ -372,7 +338,7 @@ if ($snortdownload == 'on')
 /* download emergingthreats rules file */
 if ($emergingthreats == "on")
 {
-	if ($emerg_md5_check_ok != on)
+	if ($emerg_md5_check_ok != 'on')
 	{
 		if (file_exists("{$tmpfname}/{$emergingthreats_filename}"))
 		{
@@ -380,24 +346,21 @@ if ($emergingthreats == "on")
 		}else{
 			update_status(gettext("There is a new set of Emergingthreats rules posted. Downloading..."));
 			update_output_window(gettext("May take 4 to 10 min..."));
-			// download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/emerging.rules.tar.gz", $tmpfname . "/{$emergingthreats_filename}", "read_body_firmware");
-			download_file_with_progress_bar('http://rules.emergingthreats.net/open/snort-2.8.6/emerging.rules.tar.gz', $tmpfname . "/{$emergingthreats_filename}", 'read_body_firmware');
-			update_all_status($static_output);
+			download_file_with_progress_bar('http://rules.emergingthreats.net/open/snort-2.8.6/emerging.rules.tar.gz', "{$tmpfname}/{$emergingthreats_filename}");
 			update_status(gettext('Done downloading Emergingthreats rules file.'));
 		}
 	}
 }
 
 /* download pfsense rules file */
-if ($pfsense_md5_check_ok != on) {
+if ($pfsensedownload == 'on' && $pfsense_md5_check_ok != 'on') {
 	if (file_exists("{$tmpfname}/{$pfsense_rules_filename}")) {
 		update_status(gettext("Snortrule tar file exists..."));
 	} else {
 		unhide_progress_bar_status();
 		update_status(gettext("There is a new set of Pfsense rules posted. Downloading..."));
 		update_output_window(gettext("May take 4 to 10 min..."));
-		// download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
-		download_file_with_progress_bar("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}", "read_body_firmware");
+		download_file_with_progress_bar("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}");
 		update_all_status($static_output);
 		update_status(gettext("Done downloading rules file."));
 	}
@@ -434,7 +397,7 @@ if ($pfsense_md5_check_ok != on) {
 /* Untar snort rules file individually to help people with low system specs */
 if ($snortdownload == 'on')
 {
-	if ($snort_md5_check_ok != on) {
+	if ($snort_md5_check_ok != 'on') {
 		if (file_exists("{$tmpfname}/{$snort_filename}")) {
 
 			if ($pfsense_stable == 'yes')
@@ -508,16 +471,15 @@ if ($snortdownload == 'on')
 		}else{
 			update_status(gettext("Error extracting Snort.org Rules..."));
 			update_output_window(gettext("Error Line 755"));
-			conf_mount_ro();
-			return;
+			$snortdownload = 'off';
 		}
 	}
 }
 
 /* Untar emergingthreats rules to tmp */
-if ($emergingthreats == "on")
+if ($emergingthreats == 'on')
 {
-	if ($emerg_md5_check_ok != on)
+	if ($emerg_md5_check_ok != 'on')
 	{
 		if (file_exists("{$tmpfname}/{$emergingthreats_filename}"))
 		{
@@ -529,7 +491,7 @@ if ($emergingthreats == "on")
 }
 
 /* Untar Pfsense rules to tmp */
-if ($pfsense_md5_check_ok != on) {
+if ($pfsensedownload == 'on' && $pfsense_md5_check_ok != 'on') {
 	if (file_exists("{$tmpfname}/{$pfsense_rules_filename}")) {
 		update_status(gettext("Extracting Pfsense rules..."));
 		update_output_window(gettext("May take a while..."));
@@ -538,10 +500,10 @@ if ($pfsense_md5_check_ok != on) {
 }
 
 /* Untar snort signatures */
-if ($snort_md5_check_ok != on) {
+if ($snortdownload == 'on' && $snort_md5_check_ok != 'on') {
 	if (file_exists("{$tmpfname}/{$snort_filename}")) {
 		$signature_info_chk = $config['installedpackages']['snortglobal']['signatureinfo'];
-		if ($premium_url_chk == on) {
+		if ($premium_url_chk == 'on') {
 			update_status(gettext("Extracting Signatures..."));
 			update_output_window(gettext("May take a while..."));
 			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} doc/signatures/");
@@ -553,15 +515,14 @@ if ($snort_md5_check_ok != on) {
 /*  Copy md5 sig to snort dir */
 if ($snortdownload == 'on')
 {
-	if ($snort_md5_check_ok != on) {
+	if ($snort_md5_check_ok != 'on') {
 		if (file_exists("{$tmpfname}/$snort_filename_md5")) {
 			update_status(gettext("Copying md5 sig to snort directory..."));
 			exec("/bin/cp {$tmpfname}/$snort_filename_md5 {$snortdir}/$snort_filename_md5");
 		}else{
 			update_status(gettext("The md5 file does not exist..."));
 			update_output_window(gettext("Error copying config..."));
-			conf_mount_ro();
-			return;
+			$snortdownload = 'off';
 		}
 	}
 }
@@ -569,7 +530,7 @@ if ($snortdownload == 'on')
 /*  Copy emergingthreats md5 sig to snort dir */
 if ($emergingthreats == "on")
 {
-	if ($emerg_md5_check_ok != on)
+	if ($emerg_md5_check_ok != 'on')
 	{
 		if (file_exists("{$tmpfname}/$emergingthreats_filename_md5"))
 		{
@@ -578,32 +539,30 @@ if ($emergingthreats == "on")
 		}else{
 			update_status(gettext("The emergingthreats md5 file does not exist..."));
 			update_output_window(gettext("Error copying config..."));
-			conf_mount_ro();
-			return;
+			$emergingthreats = 'off';
 		}
 	}
 }
 
 /*  Copy Pfsense md5 sig to snort dir */
-if ($pfsense_md5_check_ok != on) {
+if ($pfsensedownload == 'on' && $pfsense_md5_check_ok != 'on') {
 	if (file_exists("{$tmpfname}/$pfsense_rules_filename_md5")) {
 		update_status(gettext("Copying Pfsense md5 sig to snort directory..."));
 		exec("/bin/cp {$tmpfname}/$pfsense_rules_filename_md5 {$snortdir}/$pfsense_rules_filename_md5");
 	} else {
 		update_status(gettext("The Pfsense md5 file does not exist..."));
 		update_output_window(gettext("Error copying config..."));
-		conf_mount_ro();
-		return;
+		$pfsensedownload = 'off';
 	}
 }
 
 /*  Copy signatures dir to snort dir */
 if ($snortdownload == 'on')
 {
-	if ($snort_md5_check_ok != on)
+	if ($snort_md5_check_ok != 'on')
 	{
 		$signature_info_chk = $config['installedpackages']['snortglobal']['signatureinfo'];
-		if ($premium_url_chk == on)
+		if ($premium_url_chk == 'on')
 		{
 			if (file_exists("{$snortdir}/doc/signatures")) {
 				update_status(gettext("Copying signatures..."));
@@ -614,8 +573,7 @@ if ($snortdownload == 'on')
 			}else{
 				update_status(gettext("Directory signatures exist..."));
 				update_output_window(gettext("Error copying signature..."));
-				conf_mount_ro();
-				return;
+				$snortdownload = 'off';
 			}
 		}
 	}
@@ -658,7 +616,7 @@ function oinkmaster_conf($id, $if_real, $iface_uuid)
 
 	/*  enable disable setting will carry over with updates */
 	/*  TODO carry signature changes with the updates */
-	if ($snort_md5_check_ok != on || $emerg_md5_check_ok != on || $pfsense_md5_check_ok != on) {
+	if ($snort_md5_check_ok != 'on' || $emerg_md5_check_ok != 'on' || $pfsense_md5_check_ok != 'on') {
 
 		if (!empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on'])) {
 			$enabled_sid_on = $config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on'];
@@ -694,12 +652,8 @@ $selected_sid_off_sections
 
 EOD;
 
-/* open snort's oinkmaster.conf for writing */
-$oinkmasterlist = fopen("/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/oinkmaster_{$iface_uuid}_{$if_real}.conf", "w");
-fwrite($oinkmasterlist, "$snort_sid_text");
-/* close snort's oinkmaster.conf file */
-fclose($oinkmasterlist);
-
+		/* open snort's oinkmaster.conf for writing */
+		@file_put_contents("/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/oinkmaster_{$iface_uuid}_{$if_real}.conf", $snort_sid_text);
 	}
 }
 
@@ -710,7 +664,7 @@ function oinkmaster_run($id, $if_real, $iface_uuid)
 {
 	global $config, $g, $snortdir_wan, $snortdir, $snort_md5_check_ok, $emerg_md5_check_ok, $pfsense_md5_check_ok;
 
-	if ($snort_md5_check_ok != on || $emerg_md5_check_ok != on || $pfsense_md5_check_ok != on)
+	if ($snort_md5_check_ok != 'on' || $emerg_md5_check_ok != 'on' || $pfsense_md5_check_ok != 'on')
 	{
 
 		if ($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on'] == '' && $config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off'] == '')
@@ -779,11 +733,6 @@ if (is_dir('/usr/local/etc/snort/tmp')) {
 	exec("/bin/rm -r /usr/local/etc/snort/tmp/rules_bk");
 }
 
-/* php code to flush out cache some people are reportting missing files this might help  */
-sleep(2);
-apc_clear_cache();
-exec("/bin/sync; /bin/sync");
-
 /* make all dirs snorts */
 exec("/usr/sbin/chown -R snort:snort /var/log/snort");
 exec("/usr/sbin/chown -R snort:snort /usr/local/etc/snort");
@@ -792,23 +741,34 @@ exec("/bin/chmod -R 755  /var/log/snort");
 exec("/bin/chmod -R 755  /usr/local/etc/snort");
 exec("/bin/chmod -R 755  /usr/local/lib/snort");
 
+/* hide progress bar and lets end this party */
+hide_progress_bar_status();
 
-/* if snort is running hardrestart, if snort is not running do nothing */
-if (file_exists("/tmp/snort_download_halt.pid")) {
+if ($snortdownload == 'off' && $emergingthreats == 'off' && $pfsensedownload == 'off')
+	update_output_window(gettext("Finished..."));
+else if ($snort_md5_check_ok == 'on' && $emerg_md5_check_ok == 'on' && $pfsense_md5_check_ok == 'on')
+	update_output_window(gettext("Finished..."));
+else {
+	/* You are Not Up to date, always stop snort when updating rules for low end machines */;
+	update_status(gettext("You are NOT up to date..."));
+	$chk_if_snort_up = exec("pgrep -x snort");
+	if ($chk_if_snort_up != "") {
+		update_output_window(gettext("Stopping Snort service..."));
+		exec("/usr/bin/touch /tmp/snort_download_halt.pid");
+		exec("/bin/sh /usr/local/etc/rc.d/snort.sh stop");
+		sleep(2);
+	}
+
 	exec("/bin/sh /usr/local/etc/rc.d/snort.sh start");
 	update_status(gettext("The Rules update finished..."));
 	update_output_window(gettext("Snort has restarted with your new set of rules..."));
 	exec("/bin/rm /tmp/snort_download_halt.pid");
-} else {
-	update_status(gettext("The Rules update finished..."));
-	update_output_window(gettext("You may start snort now..."));
 }
 
-/* hide progress bar and lets end this party */
-hide_progress_bar_status();
+update_status(gettext("The Rules update finished..."));
 conf_mount_ro();
 
-if (!functions_exists('read_body_firmware')) {
+if (!function_exists('read_body_firmware')) {
 function read_body_firmware($ch, $string) {
 	global $fout, $file_size, $downloaded, $counter, $version, $latest_version, $current_installed_pfsense_version;
 	$length = strlen($string);

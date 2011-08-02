@@ -212,7 +212,7 @@ enable JavaScript to view this content
 						if ($error_stop == 'true') {
 							echo '
 		
-			<a href="/snort/snort_download_rules.php"><button class="sexybutton disabled" disabled="disabled"><span class="download">Update Rules&nbsp;&nbsp;&nbsp;&nbsp;</span></button></a><br/>
+			<button class="sexybutton disabled" disabled="disabled"><span class="download">Update Rules&nbsp;&nbsp;&nbsp;&nbsp;</span></button><br/>
 			<p style="text-align:left; margin-left:150px;">
 			<font color="#fc3608" size="2px"><b>WARNING:</b></font><font size="1px" color="#000000">&nbsp;&nbsp;No rule types have been selected for download. "Global Settings Tab"</font><br>';
 
