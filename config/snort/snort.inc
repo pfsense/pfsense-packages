@@ -117,35 +117,41 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 	 */
 	foreach ($int_array as $int) {
 		/* calculate interface subnet information */
-		$ifcfg = $config['interfaces'][$int];
-		switch ($ifcfg['ipaddr']) {
-		case "pppoe":
-		case "pptp":
-		case "l2tp":
-			if (function_exists('get_interface_ip'))
-				$subnet = get_interface_ip($int);
-			else
-				$subnet = find_interface_ip("ng0");
+		if (function_exists('get_interface_ip')) {
+			$subnet = get_interface_ip($int);
+			$sn = get_interface_subnet($int);
+			$home_net .= "{$subnet}/{$sn} ";
+		} else {
+			$ifcfg = $config['interfaces'][$int];
+			switch ($ifcfg['ipaddr']) {
+			case "pppoe":
+			case "pptp":
+			case "l2tp":
+				if (function_exists('get_interface_ip'))
+					$subnet = get_interface_ip($int);
+				else
+					$subnet = find_interface_ip("ng0");
 
-			if (is_ipaddr($subnet))
-				$home_net .= "{$subnet} ";
-			break;
-		case "dhcp":
-			$subnet = find_interface_ip(snort_get_real_interface($int));
-			if (is_ipaddr($subnet))
-				$home_net .= "{$subnet} ";
-			break;
-		default:
-			if (is_ipaddr($ifcfg['ipaddr'])) {
-				$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
-				if ($ifcfg['subnet'])
-					$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
+				if (is_ipaddr($subnet))
+					$home_net .= "{$subnet} ";
+				break;
+			case "dhcp":
+				$subnet = find_interface_ip(snort_get_real_interface($int));
+				if (is_ipaddr($subnet))
+					$home_net .= "{$subnet} ";
+				break;
+			default:
+				if (is_ipaddr($ifcfg['ipaddr'])) {
+					$subnet = gen_subnet($ifcfg['ipaddr'], $ifcfg['subnet']);
+					if ($ifcfg['subnet'])
+						$home_net .= "{$subnet}/{$ifcfg['subnet']} ";
+				}
+				break;
 			}
-			break;
 		}
 	}
 
-	if($wanip == 'yes') {
+	if ($snort_pfsense_basever == 'yes' && $wanip == 'yes') {
 		/* add all WAN ips to the whitelist */
 		$wan_if = get_real_wan_interface();
 		$ip = find_interface_ip($wan_if);
@@ -153,7 +159,7 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 			$home_net .= "{$ip} ";
 	}
 
-	if($wangw == 'yes') {
+	if ($wangw == 'yes') {
 		/* Add Gateway on WAN interface to whitelist (For RRD graphs) */
 		$gw = get_interface_gateway('wan');
 		if($gw)

@@ -317,16 +317,20 @@ enable JavaScript to view this content
 					id="frd<?=$nnats;?>"
 					ondblclick="document.location='snort_interfaces_edit.php?id=<?=$nnats;?>';">
 					<?php
-					if (!$natent['interface'] || ($natent['interface'] == "wan"))
-					echo "WAN";
-					else if(strtolower($natent['interface']) == "lan")
-					echo "LAN";
-					else if(strtolower($natent['interface']) == "pppoe")
-					echo "PPPoE";
-					else if(strtolower($natent['interface']) == "pptp")
-					echo "PPTP";
-					else
-					echo strtoupper($natent['interface']);
+					if (function_exists('convert_friendly_interface_to_friendly_descr'))
+						echo convert_friendly_interface_to_friendly_descr($natent['interface']);
+					else {
+						if (!$natent['interface'] || ($natent['interface'] == "wan"))
+						echo "WAN";
+						else if(strtolower($natent['interface']) == "lan")
+						echo "LAN";
+						else if(strtolower($natent['interface']) == "pppoe")
+						echo "PPPoE";
+						else if(strtolower($natent['interface']) == "pptp")
+						echo "PPTP";
+						else
+						echo strtoupper($natent['interface']);
+					}
 					?></td>
 				<td class="listr" onClick="fr_toggle(<?=$nnats;?>)"
 					id="frd<?=$nnats;?>"
