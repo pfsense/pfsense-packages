@@ -68,64 +68,69 @@ $pgtitle = "Snort: Interface $id $iface_uuid $if_real Categories";
 /* TODO give the user the option to delete the installed rules rules */
 $isrulesfolderempty = exec("ls -A /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
 if ($isrulesfolderempty == "") {
+	$isrulesfolderempty = exec("ls -A /usr/local/etc/snort/rules/*.rules");
+	if ($isrulesfolderempty == "") {
+		include_once("head.inc");
+		include("fbegin.inc");
 
-	include_once("head.inc");
-	include("fbegin.inc");
+		echo "<p class=\"pgtitle\">";
+		if($pfsense_stable == 'yes'){echo $pgtitle;}
+		echo "</p>\n";
 
-	echo "<p class=\"pgtitle\">";
-	if($pfsense_stable == 'yes'){echo $pgtitle;}
-	echo "</p>\n";
+		echo "<body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\">";
 
-	echo "<body link=\"#000000\" vlink=\"#000000\" alink=\"#000000\">";
+		echo "
+	<table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
+		<tr><td>\n";
 
-	echo "
-<table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
-	<tr><td>\n";
+		$tab_array = array();
+		$tabid = 0;
+		$tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
+		$tabid++;
+		$tab_array[$tabid] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
+		$tabid++;
+		$tab_array[$tabid] = array(gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
+		$tabid++;
+		$tab_array[$tabid] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
+		$tabid++;
+		$tab_array[$tabid] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
+		$tabid++;
+		$tab_array[$tabid] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
+		$tabid++;
+		$tab_array[$tabid] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
+		display_top_tabs($tab_array);
+		echo " 
+		</td></tr>
+		  <tr>\n
+		    <td>\n
+				<div id=\"mainarea\">\n
+					<table id=\"maintable\" class=\"tabcont\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
+						<tr>\n
+							<td>\n
+		# The rules directory is empty. /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules \n
+						</td>\n
+						</tr>\n
+					</table>\n
+				</div>\n
+			</td>\n
+		  </tr>\n
+		</table>\n
+		\n
+		</form>\n
+		\n
+		<p>\n\n";
 
-        $tab_array = array();
-        $tabid = 0;
-        $tab_array[$tabid] = array(gettext("Snort Interfaces"), false, "/snort/snort_interfaces.php");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("If Settings"), false, "/snort/snort_interfaces_edit.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Categories"), true, "/snort/snort_rulesets.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Rules"), false, "/snort/snort_rules.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Servers"), false, "/snort/snort_define_servers.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Preprocessors"), false, "/snort/snort_preprocessors.php?id={$id}");
-        $tabid++;
-        $tab_array[$tabid] = array(gettext("Barnyard2"), false, "/snort/snort_barnyard.php?id={$id}");
-        display_top_tabs($tab_array);
-echo " 
-</td></tr>
-  <tr>\n
-    <td>\n
-		<div id=\"mainarea\">\n
-			<table id=\"maintable\" class=\"tabcont\" width=\"100%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
-				<tr>\n
-					<td>\n
-# The rules directory is empty. /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules \n
-		    		</td>\n
-		  		</tr>\n
-			</table>\n
-		</div>\n
-	</td>\n
-  </tr>\n
-</table>\n
-\n
-</form>\n
-\n
-<p>\n\n";
+		echo "Please click on the Update Rules tab to install your selected rule sets. $isrulesfolderempty";
+		include("fend.inc");
 
-	echo "Please click on the Update Rules tab to install your selected rule sets. $isrulesfolderempty";
-	include("fend.inc");
+		echo "</body>";
+		echo "</html>";
 
-	echo "</body>";
-	echo "</html>";
-
-	exit(0);
+		exit(0);
+	} else {
+		/* Make sure that we have the rules */
+		mwexec("/bin/cp /usr/local/etc/snort/rules/*.rules /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules", true);
+	}
 }
 
 /* alert file */

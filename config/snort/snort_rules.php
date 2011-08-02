@@ -62,8 +62,8 @@ if (!is_dir("/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules"))
 
 $isrulesfolderempty = exec("ls -A /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/*.rules");
 if ($isrulesfolderempty == "") {
-	//$isrulesfolderempty = exec("ls -A /usr/local/etc/snort/rules/*.rules");
-	//if ($isrulesfolderempty == "") {
+	$isrulesfolderempty = exec("ls -A /usr/local/etc/snort/rules/*.rules");
+	if ($isrulesfolderempty == "") {
 		include_once("head.inc");
 		include_once("fbegin.inc");
 
@@ -119,10 +119,10 @@ if ($isrulesfolderempty == "") {
 		echo "</html>";
 
 		exit(0);
-	//} else {
+	} else {
 		/* Make sure that we have the rules */
-	//	mwexec("/bin/cp /usr/local/etc/snort/rules/*.rules /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules", true);
-	//}
+		mwexec("/bin/cp /usr/local/etc/snort/rules/*.rules /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules", true);
+	}
 }
 
 function get_middle($source, $beginning, $ending, $init_pos) {
