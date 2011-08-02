@@ -71,9 +71,7 @@ if ($isrulesfolderempty == "") {
 
 		if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 
-		echo "<script src=\"/row_toggle.js\" type=\"text/javascript\"></script>\n
-			<script src=\"/javascript/sorttable.js\" type=\"text/javascript\"></script>\n
-		<table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
+		echo "<table width=\"99%\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">\n
 		   <tr>\n
 			<td>\n";
 
@@ -438,8 +436,6 @@ enable JavaScript to view this content
 echo "<form action=\"snort_rules.php?id={$id}\" method=\"post\" name=\"iform\" id=\"iform\">";
 ?> <?php if ($_GET['saved'] == 'yes') {print_info_box_np2($message);}?>
 </form>
-<script type="text/javascript" language="javascript" src="row_toggle.js">
-    <script src="/javascript/sorttable.js" type="text/javascript">
 </script> <script language="javascript" type="text/javascript">
 <!--
 function go()

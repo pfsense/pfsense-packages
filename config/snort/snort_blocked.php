@@ -221,10 +221,7 @@ if ($pconfig['brefresh'] == 'on')
 
 <div class="body2"><?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
-<!-- not needed maybe 
-<script src="/javascript/row_toggle.js" type="text/javascript"></script>
-<script src="/javascript/sorttable.js" type="text/javascript"></script>
---> <?php if ($savemsg) print_info_box($savemsg); ?>
+<?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="99%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
