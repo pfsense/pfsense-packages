@@ -278,6 +278,9 @@ if (isset($_GET['dup']))
 
 			write_config();
 
+			sync_snort_package_all($id, $if_real, $snort_uuid);
+			sleep(1);
+
 			/* if snort.sh crashed this will remove the pid */
 			exec('/bin/rm /tmp/snort.sh.pid');
 
