@@ -279,6 +279,7 @@ if (isset($_GET['dup']))
 
 			write_config();
 
+			$if_real = snort_get_real_interface($natent['interface']);
 			sync_snort_package_all($id, $if_real, $snort_uuid);
 			sleep(1);
 
