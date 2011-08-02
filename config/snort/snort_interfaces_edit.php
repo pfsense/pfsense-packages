@@ -496,10 +496,7 @@ function enable_change(enable_change) {
 						<option value="<?=$iface;?>"
 					<?php if ($iface == $pconfig['interface']) echo "selected"; ?>><?=htmlspecialchars($ifacename);?>
 					</option>
-				<?php 	endforeach;
-					if ($pconfig['enable'] == "on" && !empty($pconfig['interface']))
-						echo "<input type='hidden' name='interface' id='interface' value='{$pconfig['interface']}'/>\n";
-				?>
+				<?php 	endforeach; ?>
 				</select><br>
 				<span class="vexpl">Choose which interface this rule applies to.<br>
 				Hint: in most cases, you'll want to use WAN here.</span></td>
