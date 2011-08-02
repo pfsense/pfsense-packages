@@ -1168,13 +1168,15 @@ function sync_snort_package_config()
 /* Start of main config files */
 
 /* create threshold file */
-/* TODO: other func should mirror this code */
 function create_snort_suppress($id, $if_real) {
 	global $config, $g;
 
 	/* make sure dir is there */
 	if (!is_dir('/usr/local/etc/snort/suppress'))
 		exec('/bin/mkdir -p /usr/local/etc/snort/suppress');
+
+	if (!is_array($config['installedpackages']['snortglobal']['rule']))
+		return;
 
 	if ($config['installedpackages']['snortglobal']['rule'][$id]['suppresslistname'] != 'default') {
 
