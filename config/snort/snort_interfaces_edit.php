@@ -270,9 +270,13 @@ if (isset($_GET['dup']))
 			if ($pconfig['rule_sid_on'] != "") { $natent['rule_sid_on'] = $pconfig['rule_sid_on'];	}
 
 
-			if (isset($id) && $a_nat[$id])
+			$if_real = snort_get_real_interface($natent['interface']);
+
+			if (isset($id) && $a_nat[$id]) {
+				if ($natent['interface'] != $a_nat[$id]['interface'])
+					Running_Stop($snort_uuid, $if_real, $id);
 				$a_nat[$id] = $natent;
-			else {
+			} else {
 				if (is_numeric($after))
 				array_splice($a_nat, $after+1, 0, array($natent));
 				else
@@ -281,7 +285,6 @@ if (isset($_GET['dup']))
 
 			write_config();
 
-			$if_real = snort_get_real_interface($natent['interface']);
 			sync_snort_package_all($id, $if_real, $snort_uuid);
 			sleep(1);
 
@@ -367,17 +370,6 @@ function enable_change(enable_change) {
 	endis = !(document.iform.enable.checked || enable_change);
 	// make shure a default answer is called if this is envoked.
 	endis2 = (document.iform.enable);
-
-<?php
-/* make shure all the settings exist or function hide will not work */
-/* if $id is emty allow if and discr to be open */
-if($config['installedpackages']['snortglobal']['rule'][$id]['interface'] != '') 
-{
-echo "	
-	document.iform.interface.disabled = endis2;
-	document.iform.descr.disabled = endis;\n";
-}
-?>
 	document.iform.performance.disabled = endis;
 	document.iform.blockoffenders7.disabled = endis;
 	document.iform.alertsystemlog.disabled = endis;
