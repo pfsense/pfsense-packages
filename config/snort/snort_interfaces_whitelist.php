@@ -3,6 +3,7 @@
 /*
  firewall_aliases.php
  Copyright (C) 2004 Scott Ullrich
+ Copyright (C) 2011 Ermal Luci
  All rights reserved.
 
  originially part of m0n0wall (http://m0n0.ch/wall)

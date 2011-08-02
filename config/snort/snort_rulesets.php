@@ -4,6 +4,7 @@
  snort_rulesets.php
  Copyright (C) 2006 Scott Ullrich
  Copyright (C) 2009 Robert Zelaya
+ Copyright (C) 2011 Ermal Luci
  All rights reserved.
 
  Redistribution and use in source and binary forms, with or without

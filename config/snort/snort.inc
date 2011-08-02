@@ -4,6 +4,7 @@
  snort.inc
  Copyright (C) 2006 Scott Ullrich
  Copyright (C) 2009-2010 Robert Zelaya
+ Copyright (C) 2011 Ermal Luci
  part of pfSense
  All rights reserved.
 

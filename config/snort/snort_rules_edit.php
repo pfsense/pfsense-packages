@@ -2,6 +2,7 @@
 /*
  system_edit.php
  Copyright (C) 2004, 2005 Scott Ullrich
+ Copyright (C) 2011 Ermal Luci
  All rights reserved.
 
  Adapted for FreeNAS by Volker Theile (votdev@gmx.de)

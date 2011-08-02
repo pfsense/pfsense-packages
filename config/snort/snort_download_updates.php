@@ -4,6 +4,7 @@
  halt.php
  part of pfSense
  Copyright (C) 2004 Scott Ullrich
+ Copyright (C) 2011 Ermal Luci
  All rights reserved.
 
  part of m0n0wall as reboot.php (http://m0n0.ch/wall)
