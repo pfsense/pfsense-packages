@@ -1471,6 +1471,7 @@ EOD;
 	}
 	fwrite($bconf, $snort_sh_text);
 	fclose($bconf);
+	@chmod("/usr/local/etc/rc.d/snort.sh", 0755);
 }
 
 
