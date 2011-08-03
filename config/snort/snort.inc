@@ -520,7 +520,7 @@ function snort_postinstall()
 	if (!is_dir('/usr/local/etc/snort'))
 		exec('/bin/mkdir -p /usr/local/etc/snort/custom_rules');
 
-	if (!file_exists('/usr/local/etc/snort/whitelist'))
+	if (!is_dir('/usr/local/etc/snort/whitelist'))
 		exec('/bin/mkdir -p /usr/local/etc/snort/whitelist/');
 
 	if (!is_dir('/var/log/snort/run'))
@@ -1151,8 +1151,6 @@ function create_snort_suppress($id, $if_real) {
 
 	if ($config['installedpackages']['snortglobal']['rule'][$id]['suppresslistname'] != 'default') {
 		$whitelist_key_s = find_suppress_key($config['installedpackages']['snortglobal']['rule'][$id]['suppresslistname']);
-		if (empty($whitelist_key_s))
-			return "";
 
 		/* file name */
 		$suppress_file_name = $config['installedpackages']['snortglobal']['suppress']['item'][$whitelist_key_s]['name'];

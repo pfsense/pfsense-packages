@@ -537,30 +537,24 @@ function enable_change(enable_change) {
 				<td width="78%" class="vtable"><select name="homelistname"
 					class="formfld" id="homelistname">
 				<?php
+					echo "<option value='default' >default</option>";
 					/* find whitelist names and filter by type */
-					$hlist_select = $config['installedpackages']['snortglobal']['whitelist']['item'];
-					$hid = -1;
-					if ($pconfig['homelistname'] == 'default'){ $selected  = 'selected'; }
-					$wlist_sub2 = preg_match('/^([a-zA-z0-9]+)/', $pconfig['homelistname'], $hlist_sub);
-					echo "<option value=\"default\" $selected>default</option>
-							";
-					foreach ($hlist_select as $value):
-					$hid += 1;
-					if ($config['installedpackages']['snortglobal']['whitelist']['item'][$hid]['snortlisttype'] == 'netlist') {
-						$ilistname = $config['installedpackages']['snortglobal']['whitelist']['item'][$hid]['name'];
-						$whitelist_uuid = $config['installedpackages']['snortglobal']['whitelist']['item'][$hid]['uuid'];
-						if ($ilistname == $hlist_sub[0]){
-							echo "<option value=\"$ilistname $whitelist_uuid\" selected>";
-						}else{
-							echo "<option value=\"$ilistname $whitelist_uuid\">";
+					if (is_array($config['installedpackages']['snortglobal']['whitelist']['item'])) {
+						foreach ($config['installedpackages']['snortglobal']['whitelist']['item'] as $value) {
+							if ($value['snortlisttype'] == 'netlist') {
+								$ilistname = $value['name'];
+								if ($ilistname == $pconfig['homelistname'])
+									echo "<option value='$ilistname' selected>";
+								else
+									echo "<option value='$ilistname'>";
+								echo htmlspecialchars($ilistname) . '</option>';
+							}
 						}
-						echo htmlspecialchars($ilistname) . '</option>';
 					}
-					endforeach;
 				?>
 				</select><br>
 				<span class="vexpl">Choose the home net you will like this rule to
-				use. </span>&nbsp;<span class="red">Note:</span>&nbsp;Default home
+				use. </span>&nbsp;<br/><span class="red">Note:</span>&nbsp;Default home
 				net adds only local networks.<br>
 				<span class="red">Hint:</span>&nbsp;Most users add a list of
 				friendly ips that the firewall cant see.</td>
@@ -570,31 +564,24 @@ function enable_change(enable_change) {
 				<td width="78%" class="vtable"><select name="externallistname"
 					class="formfld" id="externallistname">
 				<?php
+					echo "<option value='default' >default</option>";
 					/* find whitelist names and filter by type */
-					$exlist_select = $config['installedpackages']['snortglobal']['whitelist']['item'];
-					$exid = -1;
-					if ($pconfig['externallistname'] == 'default'){ $selected  = 'selected'; }
-					preg_match('/^([a-zA-z0-9]+)/', $pconfig['externallistname'], $exlist_sub);
-					echo "<option value=\"default\" $selected>default</option>
-							";
-					foreach ($exlist_select as $value):
-					$exid += 1;
-					if ($config['installedpackages']['snortglobal']['whitelist']['item'][$exid]['snortlisttype'] == 'netlist') {
-						$ilistname = $config['installedpackages']['snortglobal']['whitelist']['item'][$exid]['name'];
-						$whitelist_uuid = $config['installedpackages']['snortglobal']['whitelist']['item'][$exid]['uuid'];
-						if ($ilistname == $exlist_sub[0]){
-							echo "<option value=\"$ilistname $whitelist_uuid\" selected>";
-						}else{
-							echo "<option value=\"$ilistname $whitelist_uuid\">";
+					if (is_array($config['installedpackages']['snortglobal']['whitelist']['item'])) {
+						foreach ($config['installedpackages']['snortglobal']['whitelist']['item'] as $value) {
+							if ($value['snortlisttype'] == 'netlist') {
+								$ilistname = $value['name'];
+								if ($ilistname == $pconfig['externallistname'])
+									echo "<option value='$ilistname' selected>";
+								else
+									echo "<option value='$ilistname'>";
+								echo htmlspecialchars($ilistname) . '</option>';
+							}
 						}
-						echo htmlspecialchars($ilistname) . '</option>
-								';
 					}
-					endforeach;
 				?>
-				</select><br>
+				</select><br/>
 				<span class="vexpl">Choose the external net you will like this rule
-				to use. </span>&nbsp;<span class="red">Note:</span>&nbsp;Default
+				to use. </span>&nbsp;<br/><span class="red">Note:</span>&nbsp;Default
 				external net, networks that are not home net.<br>
 				<span class="red">Hint:</span>&nbsp;Most users should leave this
 				setting at default.</td>
@@ -610,46 +597,37 @@ function enable_change(enable_change) {
 			</tr>
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Whitelist</td>
-				<td width="78%" class="vtable"><select name="whitelistname"
-					class="formfld" id="whitelistname">
+				<td width="78%" class="vtable">
+					<select name="whitelist" class="formfld" id="whitelistname">
 				<?php
 					/* find whitelist names and filter by type, make sure to track by uuid */
-					$wlist_select = $config['installedpackages']['snortglobal']['whitelist']['item'];
-					$wid = -1;
-					if ($pconfig['whitelistname'] == 'default'){ $selected  = 'selected'; }
-					preg_match('/^([a-zA-z0-9]+)/', $pconfig['whitelistname'], $wlist_sub);
-					echo "<option value=\"default\" $selected>default</option>
-							";
-					foreach ($wlist_select as $value):
-					$wid += 1;
-					if ($config['installedpackages']['snortglobal']['whitelist']['item'][$wid]['snortlisttype'] == 'whitelist') {
-						$ilistname = $config['installedpackages']['snortglobal']['whitelist']['item'][$wid]['name'];
-						$whitelist_uuid = $config['installedpackages']['snortglobal']['whitelist']['item'][$wid]['uuid'];
-						if ($ilistname == $wlist_sub[0]){
-							echo "<option value=\"$ilistname $whitelist_uuid\" selected>";
-						}else{
-							echo "<option value=\"$ilistname $whitelist_uuid\">";
+					echo "<option value='default' >default</option>\n";
+					if (is_array($config['installedpackages']['snortglobal']['whitelist']['item'])) {
+						foreach ($config['installedpackages']['snortglobal']['whitelist']['item'] as $value) {
+							if ($value['snortlisttype'] == 'whitelist') {
+								if ($value['name'] == $pconfig['whitelist'])
+									echo "<option value='{$value['name']}' selected>";
+								else
+									echo "<option value='{$value['name']}'>";
+								echo htmlspecialchars($value['name']) . '</option>';
+							}
 						}
-						echo htmlspecialchars($ilistname) . '</option>
-								';
 					}
-					endforeach;
 				?>
 				</select><br>
 				<span class="vexpl">Choose the whitelist you will like this rule to
-				use. </span>&nbsp;<span class="red">Note:</span>&nbsp;Default
-				whitelist adds only local networks.</td>
+				use. </span>&nbsp;<br/><span class="red">Note:</span>&nbsp;Default
+				whitelist adds only local networks.<br/>
+				<span class="red">Note:</span>&nbsp;This option will only be used when block offenders is on.
+				</td>
 			</tr>
-
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Suppression and
 				filtering</td>
-				<td width="78%" class="vtable"><select name="suppresslistname"
-					class="formfld" id="suppresslistname">
+				<td width="78%" class="vtable">
+					<select name="suppresslistname" class="formfld" id="suppresslistname">
 				<?php
-					/* find whitelist names and filter by type, make sure to track by uuid */
-					if ($pconfig['suppresslistname'] == 'default'){ $selected  = 'selected'; }
-						echo "<option value=\"default\" $selected>default</option>";
+					echo "<option value='default' >default</option>\n";
 					if (is_array($config['installedpackages']['snortglobal']['suppress']['item'])) {
 						$slist_select = $config['installedpackages']['snortglobal']['suppress']['item'];
 						foreach ($slist_select as $value) {
@@ -664,7 +642,7 @@ function enable_change(enable_change) {
 				?>
 				</select><br>
 				<span class="vexpl">Choose the suppression or filtering file you
-				will like this rule to use. </span>&nbsp;<span class="red">Note:</span>&nbsp;Default
+				will like this rule to use. </span>&nbsp;<br/><span class="red">Note:</span>&nbsp;Default
 				option disables suppression and filtering.</td>
 			</tr>
 
