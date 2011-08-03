@@ -597,14 +597,14 @@ function enable_change(enable_change) {
 			<tr>
 				<td width="22%" valign="top" class="vncell2">Whitelist</td>
 				<td width="78%" class="vtable">
-					<select name="whitelist" class="formfld" id="whitelistname">
+					<select name="whitelistname" class="formfld" id="whitelistname">
 				<?php
 					/* find whitelist names and filter by type, make sure to track by uuid */
 					echo "<option value='default' >default</option>\n";
 					if (is_array($config['installedpackages']['snortglobal']['whitelist']['item'])) {
 						foreach ($config['installedpackages']['snortglobal']['whitelist']['item'] as $value) {
 							if ($value['snortlisttype'] == 'whitelist') {
-								if ($value['name'] == $pconfig['whitelist'])
+								if ($value['name'] == $pconfig['whitelistname'])
 									echo "<option value='{$value['name']}' selected>";
 								else
 									echo "<option value='{$value['name']}'>";
