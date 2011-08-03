@@ -58,9 +58,7 @@ if ($config['installedpackages']['snortglobal']['whitelist']['item'][$id]['uuid'
 		$whitelist_uuid = mt_rand(1, 65535);
 		$pconfig['uuid'] = $whitelist_uuid;
 	}
-}
-
-if ($config['installedpackages']['snortglobal']['whitelist']['item'][$id]['uuid'] != '') {
+} else if ($config['installedpackages']['snortglobal']['whitelist']['item'][$id]['uuid'] != '') {
 	$whitelist_uuid = $config['installedpackages']['snortglobal']['whitelist']['item'][$id]['uuid'];
 }
 
@@ -209,7 +207,7 @@ if ($_POST['submit']) {
 		/* create whitelist and homenet file  then sync files */
 		sync_snort_package_empty();
 
-		header("Location: /snort/snort_interfaces_whitelist_edit.php?id=$id");
+		header("Location: /snort/snort_interfaces_whitelist.php");
 		exit;
 	}
 	//we received input errors, copy data to prevent retype

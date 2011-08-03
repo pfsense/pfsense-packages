@@ -157,7 +157,6 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
-		header("Location: /snort/snort_interfaces.php");
 
 	}else{
 
@@ -168,8 +167,8 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
-		header("Location: /snort/snort_interfaces.php");
 	}
+	header("Location: /snort/snort_interfaces.php");
 	exit;
 }
 

@@ -52,8 +52,8 @@ if (!is_numeric($id))
 	$id = 0; // XXX: safety belt
 
 
-/* gen uuid for each iface !inportant */
-if (!is_array($config['installedpackages']['snortglobal']['suppress']['item'][$id])) {
+/* gen uuid for each iface */
+if (is_array($config['installedpackages']['snortglobal']['suppress']['item'][$id])) {
 	if ($config['installedpackages']['snortglobal']['suppress']['item'][$id]['uuid'] == '') {
 		//$snort_uuid = gen_snort_uuid(strrev(uniqid(true)));
 		$suppress_uuid = 0;
@@ -61,9 +61,7 @@ if (!is_array($config['installedpackages']['snortglobal']['suppress']['item'][$i
 			$suppress_uuid = mt_rand(1, 65535);
 			$pconfig['uuid'] = $suppress_uuid;
 		}
-	}
-
-	if ($config['installedpackages']['snortglobal']['suppress']['item'][$id]['uuid'] != '') {
+	} else if ($config['installedpackages']['snortglobal']['suppress']['item'][$id]['uuid'] != '') {
 		$suppress_uuid = $config['installedpackages']['snortglobal']['suppress']['item'][$id]['uuid'];
 	}
 }
@@ -98,14 +96,14 @@ if ($_POST['submit']) {
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
 	if(strtolower($_POST['name']) == "defaultwhitelist")
-	$input_errors[] = "Whitelist file names may not be named defaultwhitelist.";
+		$input_errors[] = "Whitelist file names may not be named defaultwhitelist.";
 
 	$x = is_validwhitelistname($_POST['name']);
 	if (!isset($x)) {
 		$input_errors[] = "Reserved word used for whitelist file name.";
 	} else {
 		if (is_validwhitelistname($_POST['name']) == false)
-		$input_errors[] = "Whitelist file name may only consist of the characters a-z, A-Z and 0-9 _. Note: No Spaces. Press Cancel to reset.";
+			$input_errors[] = "Whitelist file name may only consist of the characters a-z, A-Z and 0-9 _. Note: No Spaces. Press Cancel to reset.";
 	}
 
 
@@ -137,7 +135,7 @@ if ($_POST['submit']) {
 
 		sync_snort_package_config();
 
-		header("Location: /snort/snort_interfaces_suppress_edit.php?id=$id");
+		header("Location: /snort/snort_interfaces_suppress.php");
 		exit;
 	}
 

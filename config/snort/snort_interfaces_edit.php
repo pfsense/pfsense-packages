@@ -648,24 +648,19 @@ function enable_change(enable_change) {
 					class="formfld" id="suppresslistname">
 				<?php
 					/* find whitelist names and filter by type, make sure to track by uuid */
-					$slist_select = $config['installedpackages']['snortglobal']['suppress']['item'];
-					$sid = -1;
 					if ($pconfig['suppresslistname'] == 'default'){ $selected  = 'selected'; }
-					preg_match('/^([a-zA-z0-9]+)/', $pconfig['suppresslistname'], $slist_sub);
-					echo "<option value=\"default\" $selected>default</option>
-							";
-					foreach ($slist_select as $value):
-					$sid += 1;
-					$ilistname = $config['installedpackages']['snortglobal']['suppress']['item'][$sid]['name'];
-					$suppress_uuid = $config['installedpackages']['snortglobal']['suppress']['item'][$sid]['uuid'];
-					if ($ilistname == $slist_sub[0]){
-						echo "<option value=\"$ilistname $suppress_uuid\" selected>";
-					}else{
-						echo "<option value=\"$ilistname $suppress_uuid\">";
+						echo "<option value=\"default\" $selected>default</option>";
+					if (is_array($config['installedpackages']['snortglobal']['suppress']['item'])) {
+						$slist_select = $config['installedpackages']['snortglobal']['suppress']['item'];
+						foreach ($slist_select as $value) {
+							$ilistname = $value['name'];
+							if ($ilistname == $pconfig['suppresslistname'])
+								echo "<option value='$ilistname' selected>";
+							else
+								echo "<option value='$ilistname'>";
+							echo htmlspecialchars($ilistname) . '</option>';
+						}
 					}
-					echo htmlspecialchars($ilistname) . '</option>
-								';
-					endforeach;
 				?>
 				</select><br>
 				<span class="vexpl">Choose the suppression or filtering file you
