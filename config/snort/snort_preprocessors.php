@@ -41,12 +41,11 @@ global $g;
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
 }
-//nat_rules_sort();
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
-$id = $_POST['id'];
+	$id = $_POST['id'];
 
 if (isset($_GET['dup'])) {
 	$id = $_GET['dup'];
@@ -126,7 +125,7 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['rule_sid_on'] = $a_nat[$id]['rule_sid_on'];
 
 	if (isset($_GET['dup']))
-	unset($id);
+		unset($id);
 }
 
 /* convert fake interfaces to real */
@@ -226,6 +225,8 @@ if ($_POST["Submit"]) {
 		}
 
 		write_config();
+
+		$if_real = snort_get_real_interface($pconfig['interface']);
 		sync_snort_package_all($id, $if_real, $snort_uuid);
 
 		/* after click go to this page */
@@ -274,19 +275,6 @@ enable JavaScript to view this content
 
 	if ($savemsg) {
 		print_info_box2($savemsg);
-	}
-
-	if (file_exists($d_snortconfdirty_path)) {
-		echo '<p>';
-
-		if($savemsg) {
-			print_info_box_np2("{$savemsg}");
-		}else{
-			print_info_box_np2('
-			The Snort configuration has changed and snort needs to be restarted on this interface.<br>
-			You must apply the changes in order for them to take effect.<br>
-			');
-		}
 	}
 
 	?>
