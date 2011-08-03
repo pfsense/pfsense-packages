@@ -41,7 +41,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>varnishcustomvcl</name>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<title>Varnish custom VCL</title>
 	<aftersaveredirect>pkg_edit.php?xml=varnish_settings.xml&amp;id=0</aftersaveredirect>
 	<include_file>/usr/local/pkg/varnish.inc</include_file>
@@ -84,6 +84,7 @@
 			<type>textarea</type>
 			<cols>50</cols>
 			<rows>10</rows>
+			<encoding>base64</encoding>
 		</field>
 		<field>
 			<fielddescr>vcl_recv_late</fielddescr>
@@ -92,6 +93,7 @@
 			<type>textarea</type>
 			<cols>50</cols>
 			<rows>10</rows>
+			<encoding>base64</encoding>
 		</field>
 		<field>
 			<fielddescr>vcl_fetch_early</fielddescr>
@@ -100,6 +102,7 @@
 			<type>textarea</type>
 			<cols>50</cols>
 			<rows>10</rows>
+			<encoding>base64</encoding>
 		</field>
 		<field>
 			<fielddescr>vcl_fetch_late</fielddescr>
@@ -108,6 +111,7 @@
 			<type>textarea</type>
 			<cols>50</cols>
 			<rows>10</rows>
+			<encoding>base64</encoding>
 		</field>
 		<field>
 			<fielddescr>vcl_pipe_early</fielddescr>
@@ -116,6 +120,7 @@
 			<type>textarea</type>
 			<cols>50</cols>
 			<rows>10</rows>
+			<encoding>base64</encoding>
 		</field>
 		<field>
 			<fielddescr>vcl_pipe_late</fielddescr>
@@ -124,6 +129,7 @@
 			<type>textarea</type>
 			<cols>50</cols>
 			<rows>10</rows>
+			<encoding>base64</encoding>
 		</field>
 	</fields>
 	<custom_php_validation_command>
