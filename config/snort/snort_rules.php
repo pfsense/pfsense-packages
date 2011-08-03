@@ -530,7 +530,6 @@ function popup(url)
 							<option
 								value="?id=<?=$id;?>&openruleset=<?=$ruledir;?><?=$files[$i];?>"
 								<?=$selectedruleset;?>><?=$files[$i];?></option>
-							"
 							<?php
 							$i++;
 
