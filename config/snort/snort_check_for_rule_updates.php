@@ -52,6 +52,13 @@ $pfsense_rules_filename = "pfsense_rules.tar.gz";
 $last_md5_download = $config['installedpackages']['snortglobal']['last_md5_download'];
 $last_rules_install = $config['installedpackages']['snortglobal']['last_rules_install'];
 
+$up_date_time = date('l jS \of F Y h:i:s A');
+echo "\n";
+echo "#########################\n";
+echo "$up_date_time\n";
+echo "#########################\n";
+echo "\n\n";
+
 /* define checks */
 $oinkid = $config['installedpackages']['snortglobal']['oinkmastercode'];
 $snortdownload = $config['installedpackages']['snortglobal']['snortdownload'];
@@ -98,9 +105,6 @@ $config['installedpackages']['snortglobal']['last_md5_download'] = date("Y-M-jS-
 /* send current buffer */
 ob_flush();
 
-/* hide progress bar */
-hide_progress_bar_status();
-
 /* send current buffer */
 ob_flush();
 
@@ -120,9 +124,6 @@ exec("/bin/mkdir -p /usr/local/lib/snort/dynamicrules/");
 
 /* send current buffer */
 ob_flush();
-
-/* unhide progress bar and lets end this party */
-unhide_progress_bar_status();
 
 $pfsensedownload = 'on';
 
@@ -173,7 +174,6 @@ if ($snortdownload == 'on')
 	{
 		update_status(gettext("Please wait... You may only check for New Rules every 15 minutes..."));
 		update_output_window(gettext("Rules are released every month from snort.org. You may download the Rules at any time."));
-		hide_progress_bar_status();
 		$snortdownload = 'off';
 	}
 }
@@ -182,7 +182,6 @@ if ($snortdownload == 'on')
 if (0 == filesize("{$tmpfname}/$pfsense_rules_filename_md5")){
 	update_status(gettext("Please wait... You may only check for New Pfsense Rules every 15 minutes..."));
 	update_output_window(gettext("Rules are released to support Pfsense packages."));
-	hide_progress_bar_status();
 	$pfsensedownload = 'off';
 }
 
@@ -199,7 +198,6 @@ if ($snortdownload == 'on')
 		{
 			update_status(gettext("Your rules are up to date..."));
 			update_output_window(gettext("You may start Snort now, check update."));
-			hide_progress_bar_status();
 			$snort_md5_check_ok = 'on';
 		} else {
 			update_status(gettext("Your rules are not up to date..."));
@@ -219,7 +217,6 @@ if ($emergingthreats == 'on')
 		$emerg_md5_check_old = `/bin/echo "{$emerg_md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
 		if ($emerg_md5_check_new == $emerg_md5_check_old)
 		{
-			hide_progress_bar_status();
 			$emerg_md5_check_ok = 'on';
 		} else
 			$emerg_md5_check_ok = 'off';
@@ -235,7 +232,6 @@ if ($pfsensedownload == 'on' && file_exists("{$snortdir}/pfsense_rules.tar.gz.md
 	$pfsense_md5_check_old = `/bin/echo "{$pfsense_md5_check_old_parse}" | /usr/bin/awk '{ print $1 }'`;
 	if ($pfsense_md5_check_new == $pfsense_md5_check_old)
 	{
-		hide_progress_bar_status();
 		$pfsense_md5_check_ok = 'on';
 	} else
 		$pfsense_md5_check_ok = 'off';
@@ -265,15 +261,13 @@ if ($snortdownload == 'on')
 		if (file_exists("{$tmpfname}/{$snort_filename}")) {
 			update_status(gettext("Snortrule tar file exists..."));
 		} else {
-			unhide_progress_bar_status();
 			update_status(gettext("There is a new set of Snort.org rules posted. Downloading..."));
 			update_output_window(gettext("May take 4 to 10 min..."));
 			download_file_with_progress_bar("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", "{$tmpfname}/{$snort_filename}");
 			update_all_status($static_output);
 			update_status(gettext("Done downloading rules file."));
-			if (150000 > filesize("{$tmpfname}/$snort_filename")){
+			if (300000 > filesize("{$tmpfname}/$snort_filename")){
 				update_status(gettext("Error with the snort rules download..."));
-
 				update_output_window(gettext("Snort rules file downloaded failed..."));
 				$snortdownload = 'off';
 			}
@@ -303,7 +297,6 @@ if ($pfsensedownload == 'on' && $pfsense_md5_check_ok != 'on') {
 	if (file_exists("{$tmpfname}/{$pfsense_rules_filename}")) {
 		update_status(gettext("Snortrule tar file exists..."));
 	} else {
-		unhide_progress_bar_status();
 		update_status(gettext("There is a new set of Pfsense rules posted. Downloading..."));
 		update_output_window(gettext("May take 4 to 10 min..."));
 		download_file_with_progress_bar("http://www.pfsense.com/packages/config/snort/pfsense_rules/pfsense_rules.tar.gz", $tmpfname . "/{$pfsense_rules_filename}");
@@ -686,9 +679,6 @@ exec("/usr/sbin/chown -R snort:snort /usr/local/lib/snort");
 exec("/bin/chmod -R 755  /var/log/snort");
 exec("/bin/chmod -R 755  /usr/local/etc/snort");
 exec("/bin/chmod -R 755  /usr/local/lib/snort");
-
-/* hide progress bar and lets end this party */
-hide_progress_bar_status();
 
 if ($snortdownload == 'off' && $emergingthreats == 'off' && $pfsensedownload == 'off')
 	update_output_window(gettext("Finished..."));
