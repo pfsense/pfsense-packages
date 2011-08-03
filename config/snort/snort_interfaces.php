@@ -141,6 +141,8 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 	/* Log Iface stop */
 	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Toggle for {$snort_uuid}_{$if_real}...'");
 
+	sync_snort_package_all($id, $if_real, $snort_uuid);
+
 	$tester2 = Running_Ck($snort_uuid, $if_real, $id);
 
 	if ($tester2 == 'yes') {
@@ -159,7 +161,6 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 
 	}else{
 
-		sync_snort_package_all($id, $if_real, $snort_uuid);
 		Running_Start($snort_uuid, $if_real, $id);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );

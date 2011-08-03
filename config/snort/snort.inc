@@ -123,8 +123,10 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 		/* calculate interface subnet information */
 		if (function_exists('get_interface_ip')) {
 			$subnet = get_interface_ip($int);
-			$sn = get_interface_subnet($int);
-			$home_net .= "{$subnet}/{$sn} ";
+			if (is_ipaddr($subnet)) {
+				$sn = get_interface_subnet($int);
+				$home_net .= "{$subnet}/{$sn} ";
+			}
 		} else {
 			$ifcfg = $config['interfaces'][$int];
 			switch ($ifcfg['ipaddr']) {
@@ -1646,11 +1648,6 @@ function snort_deinstall()
 	sleep(2);
 	mwexec('/usr/sbin/pw userdel snort; /usr/sbin/pw groupdel snort', true);
 	mwexec('/bin/rm -rf /usr/local/etc/snort*; /bin/rm -rf /usr/local/pkg/snort*; /bin/rm -rf /usr/local/pkg/pf/snort*', true);
-
-	/* XXX */
-	mwexec("/usr/sbin/pkg_delete -x snort", true);
-	mwexec("/usr/sbin/pkg_delete -x perl-threaded", true);
-	mwexec("/usr/sbin/pkg_delete -x mysql-client-5.1.50_1", true);
 	mwexec('/bin/rm -r /usr/local/bin/barnyard2', true);
 	mwexec('/bin/rm -rf /usr/local/www/snort; /bin/rm -rf /usr/local/lib/snort; /bin/rm -rf /var/log/snort; /bin/rm -rf /usr/local/pkg/snort, true');
 
@@ -1769,6 +1766,7 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 	}
 
 	/* define threshold file */
+	$threshold_file_name = "";
 	if ($snortcfg['suppresslistname'] != 'default') {
 		if (preg_match('/^([a-zA-z0-9]+)/', $snortcfg['suppresslistname'], $slist_name_file2)) {
 			$threshold_name = $slist_name_file2[0];
