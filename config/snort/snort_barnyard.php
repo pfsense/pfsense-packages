@@ -47,7 +47,6 @@ global $g;
 if (!is_array($config['installedpackages']['snortglobal']['rule']))
 	$config['installedpackages']['snortglobal']['rule'] = array();
 
-//nat_rules_sort();
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
 $id = $_GET['id'];
@@ -60,7 +59,6 @@ if (isset($_GET['dup'])) {
 }
 
 if (isset($id) && $a_nat[$id]) {
-
 	/* old options */
 	$pconfig['def_ssl_ports_ignore'] = $a_nat[$id]['def_ssl_ports_ignore'];
 	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
@@ -292,15 +290,6 @@ function enable_change(enable_change) {
 	// make shure a default answer is called if this is envoked.
 	endis2 = (document.iform.barnyard_enable);
 
-<?php
-/* make shure all the settings exist or function hide will not work */
-/* if $id is emty allow if and discr to be open */
-if($id != "") 
-{
-echo "	
-	document.iform.interface.disabled = endis2;\n";
-}
-?>
     document.iform.barnyard_mysql.disabled = endis;
     document.iform.barnconfigpassthru.disabled = endis;
 }
@@ -317,19 +306,6 @@ echo "
 
 	if ($savemsg) {
 		print_info_box2($savemsg);
-	}
-
-	if (0 && file_exists($d_snortconfdirty_path)) {
-		echo '<p>';
-
-		if($savemsg) {
-			print_info_box_np2("{$savemsg}");
-		}else{
-			print_info_box_np2('
-			The Snort configuration has changed and snort needs to be restarted on this interface.<br>
-			You must apply the changes in order for them to take effect.<br>
-			');
-		}
 	}
 
 	?>
@@ -416,14 +392,15 @@ echo "
 						}
 					}
 					foreach ($interfaces as $iface => $ifacename):
+						if ($iface != $pconfig['interface'])
+							continue;
 				?>
-					<option value="<?=$iface;?>"
-					<?php if ($iface == $pconfig['interface']) echo "selected"; ?>><?=htmlspecialchars($ifacename);?>
-					</option>
-					<?php endforeach; ?>
+					<option value="<?=$iface;?>" selected><?=htmlspecialchars($ifacename);?></option>
+
+				<?php	endforeach; ?>
 				</select><br>
-				<span class="vexpl">Choose which interface this rule applies to.<br>
-				Hint: in most cases, you'll want to use WAN here.</span></td>
+				<span class="vexpl">The interface this rule applies to.</span><br/>
+				</td>
 			</tr>
 			<tr>
 				<td colspan="2" valign="top" class="listtopic">Mysql Settings</td>
