@@ -212,7 +212,7 @@
 			<fielddescr>Filtered frequency</fielddescr>
 			<fieldname>filtered_minutes</fieldname>
 			<type>input</type>
-			<description>The time between sending “filtered” in minutes. Default 15 minutes if responses are enabled, set to 0 to disable</description>
+			<description>The time between sending "filtered" in minutes. Default 15 minutes if responses are enabled, set to 0 to disable</description>
 		</field>
 		<field>
 			<fielddescr>Custom message prefix</fielddescr>
