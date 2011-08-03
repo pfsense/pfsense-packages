@@ -1,5 +1,4 @@
 <?php
-/* $Id$ */
 /*
  snort.inc
  Copyright (C) 2006 Scott Ullrich
@@ -38,7 +37,7 @@ require_once("functions.inc");
 require_once("filter.inc");
 
 /* package version */
-$snort_package_version = 'Snort 2.8.6.1 pkg v. 1.34';
+$snort_package_version = 'Snort 2.8.6.1 pkg v. 2.0';
 
 /* Allow additional execution time 0 = no limit. */
 ini_set('max_execution_time', '9999');
@@ -51,7 +50,6 @@ else
 	$config['installedpackages']['snortglobal'] = array();
 
 /* find out if were in 1.2.3-RELEASE */
-$pfsense_ver_chk = trim(file_get_contents("/etc/version"), " \n");
 if (intval($config['version']) > 6)
 	$snort_pfsense_basever = 'no';
 else
