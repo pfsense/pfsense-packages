@@ -322,8 +322,7 @@ if ($snortdownload == 'on')
 			unhide_progress_bar_status();
 			update_status(gettext("There is a new set of Snort.org rules posted. Downloading..."));
 			update_output_window(gettext("May take 4 to 10 min..."));
-			//snort_download_file_with_progress_bar("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
-			snort_download_file_with_progress_bar("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", $tmpfname . "/{$snort_filename}", "read_body_firmware");
+			download_file_with_progress_bar("http://www.snort.org/pub-bin/oinkmaster.cgi/{$oinkid}/{$snort_filename}", "{$tmpfname}/{$snort_filename}");
 			update_all_status($static_output);
 			update_status(gettext("Done downloading rules file."));
 			if (150000 > filesize("{$tmpfname}/$snort_filename")){
@@ -769,59 +768,4 @@ else {
 update_status(gettext("The Rules update finished..."));
 conf_mount_ro();
 
-if (!function_exists('read_body_firmware')) {
-function read_body_firmware($ch, $string) {
-	global $fout, $file_size, $downloaded, $counter, $version, $latest_version, $current_installed_pfsense_version;
-	$length = strlen($string);
-	$downloaded += intval($length);
-	$downloadProgress = round(100 * (1 - $downloaded / $file_size), 0);
-	$downloadProgress = 100 - $downloadProgress;
-	$a = $file_size;
-	$b = $downloaded;
-	$c = $downloadProgress;
-	$text  = "  Snort download in progress\\n";
-	$text .= "----------------------------------------------------\\n";
-	$text .= "  Downloaded      : {$b}\\n";
-	$text .= "----------------------------------------------------\\n";
-	$counter++;
-	if($counter > 150) {
-		update_output_window($text);
-		update_progress_bar($downloadProgress);
-		flush();
-		$counter = 0;
-	}
-	fwrite($fout, $string);
-	return $length;
-}
-}
-
-function snort_download_file_with_progress_bar($url_file, $destination_file, $readbody = 'read_body') {
-	global $ch, $fout, $file_size, $downloaded;
-	$file_size  = 1;
-	$downloaded = 1;
-	/* open destination file */
-	$fout = fopen($destination_file, "wb");
-
-	/*
-	 *      Originally by Author: Keyvan Minoukadeh
-	 *      Modified by Scott Ullrich to return Content-Length size
-	 */
-
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $url_file);
-	curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'read_header');
-	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-	curl_setopt($ch, CURLOPT_WRITEFUNCTION, $readbody);
-	curl_setopt($ch, CURLOPT_NOPROGRESS, '1');
-	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, '5');
-	curl_setopt($ch, CURLOPT_TIMEOUT, 0);
-
-	curl_exec($ch);
-	$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-	if($fout)
-	fclose($fout);
-	curl_close($ch);
-	return ($http_code == 200) ? true : $http_code;
-}
 ?>
