@@ -484,12 +484,12 @@ function snort_postinstall()
 {
 	global $config, $g, $snort_pfsense_basever, $snort_arch;
 
-	conf_mount_rw();
-
 	/* snort -> advanced features */
-	$bpfbufsize = $config['installedpackages']['snortglobal']['bpfbufsize'];
-	$bpfmaxbufsize = $config['installedpackages']['snortglobal']['bpfmaxbufsize'];
-	$bpfmaxinsns = $config['installedpackages']['snortglobal']['bpfmaxinsns'];
+	if (is_array($config['installedpackages']['snortglobal'])) {
+		$bpfbufsize = $config['installedpackages']['snortglobal']['bpfbufsize'];
+		$bpfmaxbufsize = $config['installedpackages']['snortglobal']['bpfmaxbufsize'];
+		$bpfmaxinsns = $config['installedpackages']['snortglobal']['bpfmaxinsns'];
+	}
 
 	/* cleanup default files */
 	@unlink('/usr/local/etc/snort/snort.conf-sample');
@@ -631,7 +631,7 @@ function snort_postinstall()
 	}
 
 	/* make sure snort-old is deinstalled */
-	unset($config['installedpackages']['snort'], $config['installedpackages']['snortdefservers'], $config['installedpackages']['snortwhitelist']);
+	unset($config['installedpackages']['snortdefservers'], $config['installedpackages']['snortwhitelist']);
 	unset($config['installedpackages']['snortthreshold'], $config['installedpackages']['snortadvanced']);
 
 	/* remake saved settings */
@@ -641,8 +641,6 @@ function snort_postinstall()
 		sync_snort_package_empty();
 		update_output_window(gettext("Finnished Rebuilding files..."));
 	}
-
-	conf_mount_ro();
 }
 
 function sync_package_snort_reinstall()
@@ -980,22 +978,7 @@ function sync_snort_package()
 	$snortloglimitsize = $config['installedpackages']['snortglobal']['snortloglimitsize'];
 	$snortloglimit = $config['installedpackages']['snortglobal']['snortloglimit'];
 
-	if ($snortloglimit == '')
-		/* code will set limit to 21% of slice that is unused */
-		$config['installedpackages']['snortglobal']['snortloglimit'] = 'on';
-
-	if ($snortloglimitsize == '') {
-		/* code will set limit to 21% of slice that is unused */
-		$snortloglimitDSKsize = round(exec('df -k /var | grep -v "Filesystem" | awk \'{print $4}\'') * .22 / 1024);
-		$config['installedpackages']['snortglobal']['snortloglimitsize'] = $snortloglimitDSKsize;
-	}
-
 	snort_snortloglimit_install_cron($config['installedpackages']['snortglobal']['snortloglimit'] == 'on' ? true : false);
-
-	/* XXX: Really need write_config here? */
-	write_config();
-	/* XXX: Restore rw mode since write_config sets ro */
-	conf_mount_rw();
 }
 
 /* only run when a single iface needs to sync */
@@ -1589,8 +1572,7 @@ function create_snort_conf($id, $if_real, $snort_uuid)
 	}
 }
 
-function snort_deinstall()
-{
+function snort_deinstall() {
 	global $config, $g;
 
 	/* remove custom sysctl */
@@ -1642,9 +1624,6 @@ function snort_deinstall()
 	/* Keep this as a last step */
 	if ($config['installedpackages']['snortglobal']['forcekeepsettings'] != 'on')
 		unset($config['installedpackages']['snortglobal']);
-
-	write_config(); /* XXX */
-	conf_mount_rw();
 }
 
 function generate_snort_conf($id, $if_real, $snort_uuid)
@@ -1681,7 +1660,6 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 	exec("/bin/cp /usr/local/etc/snort/sid-msg.map /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/sid-msg.map");
 	exec("/bin/cp /usr/local/etc/snort/unicode.map /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/unicode.map");
 	exec("/bin/cp /usr/local/etc/snort/threshold.conf /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/threshold.conf");
-	exec("/bin/cp /usr/local/etc/snort/snort.conf /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf");
 	exec("/usr/bin/touch /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf");
 
 	if (!is_dir("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/rules"))

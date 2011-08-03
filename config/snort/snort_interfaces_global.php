@@ -62,8 +62,16 @@ if (!$input_errors) {
 		$config['installedpackages']['snortglobal']['oinkmastercode'] = $_POST['oinkmastercode'];
 		$config['installedpackages']['snortglobal']['emergingthreats'] = $_POST['emergingthreats'] ? 'on' : 'off';
 		$config['installedpackages']['snortglobal']['rm_blocked'] = $_POST['rm_blocked'];
-		$config['installedpackages']['snortglobal']['snortloglimit'] = $_POST['snortloglimit'];
-		$config['installedpackages']['snortglobal']['snortloglimitsize'] = $_POST['snortloglimitsize'];
+		if ($_POST['snortloglimitsize']) {
+			$config['installedpackages']['snortglobal']['snortloglimit'] = $_POST['snortloglimit'];
+			$config['installedpackages']['snortglobal']['snortloglimitsize'] = $_POST['snortloglimitsize'];
+		} else {
+			$config['installedpackages']['snortglobal']['snortloglimit'] = 'on';
+
+			/* code will set limit to 21% of slice that is unused */
+			$snortloglimitDSKsize = round(exec('df -k /var | grep -v "Filesystem" | awk \'{print $4}\'') * .22 / 1024);
+			$config['installedpackages']['snortglobal']['snortloglimitsize'] = $snortloglimitDSKsize;
+		}
 		$config['installedpackages']['snortglobal']['autorulesupdate7'] = $_POST['autorulesupdate7'];
 		$config['installedpackages']['snortglobal']['snortalertlogtype'] = $_POST['snortalertlogtype'];
 		$config['installedpackages']['snortglobal']['forcekeepsettings'] = $_POST['forcekeepsettings'] ? 'on' : 'off';
@@ -323,7 +331,7 @@ enable JavaScript to view this content
 					<tr>
 						<td colspan="2"><input name="snortloglimit" type="radio"
 							id="snortloglimit" value="on" onClick="enable_change(false)"
-			<?php if($pconfig['snortloglimit']=='on' || $pconfig['snortloglimit']=='') echo 'checked'; ?>>
+			<?php if($pconfig['snortloglimit']=='on') echo 'checked'; ?>>
 						<strong>Enable</strong> directory size limit (<strong>Default</strong>)</td>
 					</tr>
 					<tr>
