@@ -296,18 +296,19 @@ function sync_package_varnish() {
 	if($config['installedpackages']['varnishcustomvcl']['config'] != "") {
 		foreach($config['installedpackages']['varnishcustomvcl']['config'] as $vcl) {
 			if($vcl['vcl_recv_early']) 
-				$vcl_recv_early = $vcl['vcl_recv_early'];
+				$vcl_recv_early = base64_decode($vcl['vcl_recv_early']);
 			if($vcl['vcl_recv_late']) 
-				$vcl_recv_late = $vcl['vcl_recv_late'];
+				$vcl_recv_late = base64_decode($vcl['vcl_recv_late']);
 			if($vcl['vcl_fetch_early']) 
-				$vcl_fetch_early = $vcl['vcl_fetch_early'];
+				$vcl_fetch_early = base64_decode($vcl['vcl_fetch_early']);
 			if($vcl['vcl_fetch_late']) 
-				$vcl_fetch_late = $vcl['vcl_fetch_late'];
+				$vcl_fetch_late = base64_decode($vcl['vcl_fetch_late']);
 			if($vcl['vcl_pipe_early']) 
-				$vcl_pipe_early = $vcl['vcl_pipe_early'];
+				$vcl_pipe_early = base64_decode($vcl['vcl_pipe_early']);
 			if($vcl['vcl_pipe_late']) 
-				$vcl_pipe_late = $vcl['vcl_pipe_late'];
+				$vcl_pipe_late = base64_decode($vcl['vcl_pipe_late']);
 		}
+	}
 		$vcl_recv_basic='#BASIC VCL RULES'."\n";
 		foreach($config['installedpackages']['varnishsettings']['config'] as $vcl) {
                         if($vcl['sessioncache']){
@@ -336,7 +337,7 @@ function sync_package_varnish() {
                                 $vcl_recv_basic.="\t".'if (req.request != "GET" && req.request != "HEAD" && req.request != "PUT" && req.request != "POST" &&'."\n";
                                 $vcl_recv_basic.="\t".'    req.request != "TRACE" && req.request != "OPTIONS" && req.request != "DELETE") {return(pipe);}'."\n\n";
                                 }
-if($vcl['xforward']){
+						if($vcl['xforward']){
                                 $vcl_recv_basic.="\t#set X-forward\n";
                                 switch ($vcl['xforward']){
                                         case 'set':
@@ -368,10 +369,9 @@ if($vcl['xforward']){
                                         }
                                 }
                         if($vcl['htmlerror'] && !$errorvcl){
-                                $errorvcl=$vcl['htmlerror'];
+                                $errorvcl=base64_decode($vcl['htmlerror']);
                                 }
 		}
-	}
 
 	if(!$errorvcl) 
 		$errorvcl = <<<EOF
