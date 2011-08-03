@@ -569,12 +569,9 @@ function snort_postinstall()
 	/* move files around, make it look clean */
 	exec('/bin/mkdir -p /usr/local/www/snort/css');
 	exec('/bin/mkdir -p /usr/local/www/snort/images');
-	exec('/bin/mkdir -p /usr/local/www/snort/javascript');
 
 	chdir ("/usr/local/www/snort/css/");
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/css/style.css');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/css/colorbox.css');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/css/new_tab_menu.css');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/css/sexybuttons.css');
 	chdir("/usr/local/www/snort/images/");
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/alert.jpg');
@@ -589,18 +586,8 @@ function snort_postinstall()
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/icon_excli.png');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/arrow_down.png');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/awesome-overlay-sprite.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/controls.png');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/logo22.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/new_tab_menu.png');
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/page_white_text.png');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/transparent.gif');
-	chdir ("/usr/local/www/snort/javascript/");
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/jquery.colorbox.js');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/jquery-1.4.2.min.js');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/mootools.js');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/sortableTable.js');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/row_helper.js');
-	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/javascript/prototype.js');
 
 	/* install barnyard2 for 2.0 x86 x64 and 1.2.3 x86 */
 	chdir("/usr/local/bin/");
@@ -616,16 +603,15 @@ function snort_postinstall()
 
 	exec('/bin/chmod 755 /usr/local/bin/barnyard2');
 
-	/* install perl-threaded */
-	/* TODO: invoke this through pkg_util.inc */
-	if (!is_dir('/tmp/pkg_s'))
-		exec('/bin/mkdir -p /tmp/pkg_s');
-
-	$snort_tmp_pkg_dir = "{$g['tmp_path']}/pkg_s";
-	chdir('$snort_tmp_pkg_dir');
-
 	/* XXX: remove compeletely? */
 	if ($snort_pfsense_basever == 'yes') {
+		if (!is_dir('/tmp/pkg_s'))
+			exec('/bin/mkdir -p /tmp/pkg_s');
+
+		$snort_tmp_pkg_dir = "{$g['tmp_path']}/pkg_s";
+		chdir('$snort_tmp_pkg_dir');
+
+		/* install perl-threaded */
 		update_status(gettext("Installing perl-threaded for {$snort_arch}..."));
 		update_output_window(gettext("Please wait downloading..."));
 		exec("/usr/bin/fetch http://files.pfsense.org/packages/snort/7.3x86/perl-threaded-5.12.1_1.tbz");
@@ -635,14 +621,14 @@ function snort_postinstall()
 			exec("/usr/sbin/pkg_add -f {$snort_tmp_pkg_dir}/perl-threaded-5.12.1_1.tbz");
 
 		update_output_window(gettext("Finnished Installing perl-threaded..."));
+
+		update_output_window(gettext("Please wait Cleaning Up..."));
+		if (is_dir($snort_tmp_pkg_dir))
+			exec("/bin/rm -r {$snort_tmp_pkg_dir}");
+
+		/* back to default */
+		chdir('/root/');
 	}
-
-	update_output_window(gettext("Please wait Cleaning Up..."));
-	if (is_dir($snort_tmp_pkg_dir))
-		exec("/bin/rm -r {$snort_tmp_pkg_dir}");
-
-	/* back to default */
-	chdir('/root/');
 
 	/* make sure snort-old is deinstalled */
 	unset($config['installedpackages']['snort'], $config['installedpackages']['snortdefservers'], $config['installedpackages']['snortwhitelist']);
@@ -1670,14 +1656,13 @@ function snort_deinstall()
 			}
 			if ($is_installed == true)
 				unset($config['cron']['item'][$x]);
-
-			configure_cron();
 		}
 	}
 
 	snort_deinstall_cron("snort2c");
 	snort_deinstall_cron("snort_check_for_rule_updates.php");
 	snort_deinstall_cron("/usr/local/pkg/snort/snort_check_cron_misc.inc");
+	configure_cron();
 
 	/* Unset snort registers in conf.xml IMPORTANT snort will not start with out this */
 	/* Keep this as a last step */
