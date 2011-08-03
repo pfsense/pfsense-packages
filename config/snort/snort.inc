@@ -628,10 +628,6 @@ function snort_postinstall()
 		chdir('/root/');
 	}
 
-	/* make sure snort-old is deinstalled */
-	unset($config['installedpackages']['snortdefservers'], $config['installedpackages']['snortwhitelist']);
-	unset($config['installedpackages']['snortthreshold'], $config['installedpackages']['snortadvanced']);
-
 	/* remake saved settings */
 	if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		update_status(gettext("Saved settings detected..."));
@@ -1585,9 +1581,9 @@ function snort_deinstall() {
 	mwexec('/usr/bin/killall -9 barnyard2', true);
 	sleep(2);
 	mwexec('/usr/sbin/pw userdel snort; /usr/sbin/pw groupdel snort', true);
-	mwexec('/bin/rm -rf /usr/local/etc/snort*; /bin/rm -rf /usr/local/pkg/snort*; /bin/rm -rf /usr/local/pkg/pf/snort*', true);
+	mwexec('/bin/rm -rf /usr/local/etc/snort*; /bin/rm -rf /usr/local/pkg/snort*', true);
 	mwexec('/bin/rm -r /usr/local/bin/barnyard2', true);
-	mwexec('/bin/rm -rf /usr/local/www/snort; /bin/rm -rf /usr/local/lib/snort; /bin/rm -rf /var/log/snort; /bin/rm -rf /usr/local/pkg/snort, true');
+	mwexec('/bin/rm -rf /usr/local/www/snort; /bin/rm -rf /var/log/snort', true);
 
 	/* Remove snort cron entries Ugly code needs smoothness*/
 	if (!function_exists('snort_deinstall_cron')) {
