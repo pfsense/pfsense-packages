@@ -475,7 +475,7 @@ function varnish_sync_on_changes() {
 	$previous_ip = "";
 	$x=0;
 	$sh = $config['installedpackages']['varnishsync']['config'][0];
-	for($x=1; $x<7); $x++) {
+	for($x=1; $x<7; $x++) {
 		$sync_to_ip = "";
 		$password = "";
 		if($sh['ipaddress' . $counter]) {
