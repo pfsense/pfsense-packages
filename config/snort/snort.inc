@@ -1696,7 +1696,7 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 	$threshold_file_name = "";
 	if ($snortcfg['suppresslistname'] != 'default') {
 		if (file_exists("/usr/local/etc/snort/suppress/{$snortcfg['suppresslistname']}"))
-			$threshold_file_name = "include /usr/local/etc/snort/suppress/{$threshold_name}";
+			$threshold_file_name = "include /usr/local/etc/snort/suppress/{$snortcfg['suppresslistname']}";
 	}
 
 	/* define servers and ports snortdefservers */
