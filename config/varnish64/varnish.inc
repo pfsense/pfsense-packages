@@ -84,25 +84,6 @@ function varnish_start() {
 	mwexec("/usr/local/etc/rc.d/varnish.sh");
 }
 
-/* Return true if a backend is in use */
-function is_varnish_backend_in_use($backendname) {
-	global $config, $g;
-	if($config['installedpackages']['varnishlbdirectors']['config'] != "") 
-		foreach($config['installedpackages']['varnishlbdirectors']['config'] as $url) 
-			if($url['row'])
-				foreach($url['row'] as $urlmapping) 
-					if($urlmapping['backendname'] == $backendname) 
-						return true;
-	if($config['installedpackages']['varnishbackends']['config'] != "") 
-		foreach($config['installedpackages']['varnishbackends']['config'] as $backend) 
-			if($backend['backendname'] == $backendname)
-				if($backend['row'])	
-					foreach($backend['row'] as $row)
-						if($row['urlmapping'])
-							return true;
-	return false;
-}
-
 /* Build the URL mappings logic VCL config txt */
 function varnish_get_url_mappings_txt() {
 	global $g, $config, $urlmappings;
@@ -192,6 +173,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
 	sync_package_varnish();
 ?>
 ENDOFF
+
 /usr/local/sbin/varnishd \
 	{$listeningport} \
 	-f /var/etc/default.vcl \
@@ -206,7 +188,7 @@ EOF;
 
 function get_backend_config_txt() {
 	global $config, $g;
-	$backends_used = array();
+	$backends="";
 	if($config['installedpackages']['varnishbackends']['config'] != "") {
     	foreach($config['installedpackages']['varnishbackends']['config'] as $backend) {
 			if($backend['connect_timeout'])
@@ -214,17 +196,25 @@ function get_backend_config_txt() {
 			else 
 				$connect_timeout = "25s";
 			if($backend['port'])
-				$connect_timeout = $backend['port'] . "s";
+				$connect_port = $backend['port'];
 			else 
-				$connect_timeout = "80s";
+				$connect_port = "80";
 			if($backend['first_byte_timeout'])
 				$first_byte_timeout = $backend['first_byte_timeout'] . "s";
 			else 
 				$first_byte_timeout = "300s";
 			if($backend['probe_url'])
-				$probe_url = $backend['probe_url'];
+				if (preg_match("@^(http)://(.*)(/.*|/)$@",$backend['probe_url'],$matches)){
+					$probe_url=".request =\n";
+					$probe_url.="\t\t\t".'"GET '.$matches[3].' HTTP/1.1"'."\n";
+					$probe_url.="\t\t\t".'"Host: '.$matches[2].'"'."\n";
+					$probe_url.="\t\t\t".'"Connection: Close";';
+				}
+				else{
+				$probe_url = '.url = "'.$backend['probe_url'].'";';
+				}
 			else 
-				$probe_url = "/";
+				$probe_url ='.url = "/";';
 			if($backend['probe_interval'])
 				$probe_interval = $backend['probe_interval'] . "s";
 			else 
@@ -241,16 +231,16 @@ function get_backend_config_txt() {
 				$probe_threshold = $backend['probe_threshold'];
 			else 
 				$probe_threshold = "5";
-			if(is_varnish_backend_in_use($backend['backendname'])) 
-				if(!in_array($backend['backendname'], $backends_used))
-					$backends .= <<<EOFA
+			if (isset($probe_threshold)){
+				#last parameter set ,so write conf
+				$backends .= <<<EOFA
 backend {$backend['backendname']}BACKEND {
 	.host = "{$backend['ipaddress']}";
 	.port = "{$backend['port']}";
 	.first_byte_timeout = {$first_byte_timeout};
 	.connect_timeout = {$connect_timeout};
 	.probe = {
-		.url = "{$probe_url}";
+		{$probe_url}
 		.interval = {$probe_interval};
 		.timeout = {$probe_timeout};
 		.window = {$probe_window};
@@ -260,7 +250,7 @@ backend {$backend['backendname']}BACKEND {
 
 
 EOFA;
-			$backends_used[] = $backend['backendname'];
+			}
 		}
 	}
 	return $backends;
@@ -271,14 +261,24 @@ function get_lb_directors_config_txt() {
 	if($config['installedpackages']['varnishlbdirectors']['config'] != "") {
     	foreach($config['installedpackages']['varnishlbdirectors']['config'] as $backend) {
 			$director = "";
-			if($backend['row'])
-				foreach($backend['row'] as $be) {
-					if($be['weight']) 
-						$weight = "\t\t\t.weight = {$be['weight']};\n";
-					else 
-						$weight = "";
-					$director .=  "\t{\n\t\t.backend = {$be['backendname']}BACKEND;\n{$weight}\t}";
+			if($backend['directortype']){
+				switch($backend['directortype']){
+					case "round-robin" :
+					case "hash" :
+						$weight=" ";
+					break;
 				}
+					
+				}
+			if($backend['row']){
+				foreach($backend['row'] as $be) {
+					if($be['weight'] && $weight != " ")
+						$weight = "\t\t.weight = {$be['weight']};\n";
+					elseif($weight != " ")
+						$weight = "\t\t.weight = 100;\n";
+				
+			$director .=  "\t{\n\t\t.backend = {$be['backendname']}BACKEND;\n{$weight}\t}";
+			}
 			$backends .= <<<EOFA
 director {$backend['directorname']} {$backend['directortype']} {
 {$director}
@@ -286,6 +286,8 @@ director {$backend['directorname']} {$backend['directortype']} {
 
 
 EOFA;
+				
+			}
 		}
 	}
 	return $backends;
@@ -473,14 +475,13 @@ function varnish_sync_on_changes() {
 		return;
 	$sync_hosts = $config['installedpackages']['varnishsync']['config'];
 	$previous_ip = "";
-	$x=0;
 	$sh = $config['installedpackages']['varnishsync']['config'][0];
 	for($x=1; $x<7; $x++) {
 		$sync_to_ip = "";
 		$password = "";
-		if($sh['ipaddress' . $counter]) {
-			$sync_to_ip = $sh['ipaddress' . $counter];
-			$password   = $sh['password'  . $counter];
+		if($sh['ipaddress' . $x]) {
+			$sync_to_ip = $sh['ipaddress' . $x];
+			$password   = $sh['password'  . $x];
 		}
 		if($password && $sync_to_ip)
 			varnish_do_xmlrpc_sync($sync_to_ip, $password);
