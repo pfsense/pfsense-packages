@@ -41,7 +41,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>varnishbackends</name>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<title>Varnish: Backends</title>
 	<include_file>/usr/local/pkg/varnish.inc</include_file>
    	<additional_files_needed>
@@ -130,7 +130,7 @@
 		<columnitem>
 			<fielddescr>Name</fielddescr>
 			<fieldname>backendname</fieldname>
-		</columnitem>		
+		</columnitem>	
 	</adddeleteeditpagefields>
 	<fields>
 		<field>
@@ -186,8 +186,9 @@
 		<field>
 			<fielddescr>Probe URL</fielddescr>
 			<fieldname>probe_url</fieldname>
-			<description>Enter the URL that varnish will use to ensure that this backend is healthy.</description>
+			<description><![CDATA[Enter the URL that varnish will use to ensure that this backend is healthy.<BR>It can be a url like "/", "/teste.htm" or a request "http://www.pfsense.org/"]]></description>
 			<type>input</type>
+			<size>40</size> 
 		</field>
 		<field>
 			<fielddescr>Probe Interval</fielddescr>
