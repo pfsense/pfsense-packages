@@ -41,18 +41,20 @@ require_once("/usr/local/pkg/snort/snort_gui.inc");
 require_once("/usr/local/pkg/snort/snort.inc");
 
 if (!is_array($config['installedpackages']['snortglobal']['whitelist']['item']))
-$config['installedpackages']['snortglobal']['whitelist']['item'] = array();
+	$config['installedpackages']['snortglobal']['whitelist']['item'] = array();
 
 $a_whitelist = &$config['installedpackages']['snortglobal']['whitelist']['item'];
 
 $id = $_GET['id'];
 if (isset($_POST['id']))
-$id = $_POST['id'];
-
+	$id = $_POST['id'];
+if (is_null($id)) {
+	header("Location: /snort/snort_interfaces_whitelist.php");
+	exit;
+}
 
 /* gen uuid for each iface !inportant */
 if ($config['installedpackages']['snortglobal']['whitelist']['item'][$id]['uuid'] == '') {
-	//$snort_uuid = gen_snort_uuid(strrev(uniqid(true)));
 	$whitelist_uuid = 0;
 	while ($whitelist_uuid > 65535 || $whitelist_uuid == 0) {
 		$whitelist_uuid = mt_rand(1, 65535);
@@ -231,9 +233,11 @@ include_once("head.inc");
 include("fbegin.inc");
 echo $snort_general_css;
 ?>
-<div class="body2"><script type="text/javascript"
-	src="/snort/javascript/row_helper.js"></script> <input type='hidden'
-	name='address_type' value='textbox' /> <script type="text/javascript">
+<div class="body2">
+<script type="text/javascript" src="/javascript/row_helper.js"></script>
+	<input type='hidden' name='address_type' value='textbox' />
+	<script type="text/javascript">
+	
 	rowname[0] = "address";
 	rowtype[0] = "textbox";
 	rowsize[0] = "30";
@@ -241,13 +245,15 @@ echo $snort_general_css;
 	rowname[1] = "detail";
 	rowtype[1] = "textbox";
 	rowsize[1] = "50";
-</script> <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
+</script>
+
+<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
 
 <?php if ($input_errors) print_input_errors($input_errors); ?>
 <div id="inputerrors"></div>
 
-<form action="snort_interfaces_whitelist_edit.php?id=<?=$id?>"
-	method="post" name="iform" id="iform"><?php
+<form action="snort_interfaces_whitelist_edit.php" method="post" name="iform" id="iform">
+<?php
 	/* Display Alert message */
 	if ($input_errors) {
 		print_input_errors($input_errors); // TODO: add checks
@@ -448,11 +454,12 @@ echo $snort_general_css;
 			</tr>
 			<tr>
 				<td width="22%" valign="top">&nbsp;</td>
-				<td width="78%"><input id="submit" name="submit" type="submit"
-					class="formbtn" value="Save" /> <input id="cancelbutton"
-					name="cancelbutton" type="button" class="formbtn" value="Cancel"
-					onclick="history.back()" /> <?php if (isset($id) && $a_whitelist[$id]): ?>
-				<input name="id" type="hidden" value="<?=$id;?>" /> <?php endif; ?>
+				<td width="78%">
+					<input id="submit" name="submit" type="submit" class="formbtn" value="Save" />
+					<input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" value="Cancel" onclick="history.back()" />
+					<?php if (isset($id) && $a_whitelist[$id]): ?>
+						<input name="id" type="hidden" value="<?=$id;?>" />
+					<?php endif; ?>
 				</td>
 			</tr>
 		</table>

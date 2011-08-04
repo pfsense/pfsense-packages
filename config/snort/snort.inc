@@ -813,7 +813,6 @@ function snort_rm_blocked_install_cron($should_install)
 			unset($config['cron']['item'][$x]);
 		break;
 	}
-	configure_cron();
 }
 
 /* func to install snort update */
@@ -896,7 +895,6 @@ function snort_rules_up_install_cron($should_install) {
 			unset($config['cron']['item'][$x]);
 		break;
 	}
-	configure_cron();
 }
 
 function sync_snort_package_remove_old()

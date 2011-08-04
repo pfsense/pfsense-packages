@@ -99,8 +99,8 @@ if (!$input_errors) {
 
 		snort_rules_up_install_cron($snort_rules_up_false);
 
+		configure_cron();
 		write_config();
-		$savemsg = get_std_save_message($retval);
 
 		/* create whitelist and homenet file  then sync files */
 		sync_snort_package_empty();
