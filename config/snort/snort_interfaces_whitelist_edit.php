@@ -81,6 +81,7 @@ function is_validwhitelistname($name) {
 if (isset($id) && $a_whitelist[$id]) {
 
 	/* old settings */
+	$pconfig = array();
 	$pconfig['name'] = $a_whitelist[$id]['name'];
 	$pconfig['uuid'] = $a_whitelist[$id]['uuid'];
 	$pconfig['detail'] = $a_whitelist[$id]['detail'];
@@ -92,14 +93,8 @@ if (isset($id) && $a_whitelist[$id]) {
 	$pconfig['wandnsips'] = $a_whitelist[$id]['wandnsips'];
 	$pconfig['vips'] = $a_whitelist[$id]['vips'];
 	$pconfig['vpnips'] = $a_whitelist[$id]['vpnips'];
-
-
 	$addresses = explode(' ', $pconfig['address']);
 	$address = explode(" ", $addresses[0]);
-	if ($address[1])
-	$addresssubnettest = true;
-	else
-	$addresssubnettest = false;
 }
 
 if ($_POST['submit']) {
@@ -110,30 +105,26 @@ if ($_POST['submit']) {
 	$pconfig = $_POST;
 
 	/* input validation */
-	$reqdfields = explode(" ", "name address");
-	$reqdfieldsn = explode(",", "Name,Address");
+	$reqdfields = explode(" ", "name");
+	$reqdfieldsn = explode(",", "Name");
 
 	do_input_validation($_POST, $reqdfields, $reqdfieldsn, &$input_errors);
 
 	if(strtolower($_POST['name']) == "defaultwhitelist")
-	$input_errors[] = "Whitelist file names may not be named defaultwhitelist.";
+		$input_errors[] = "Whitelist file names may not be named defaultwhitelist.";
 
 	$x = is_validwhitelistname($_POST['name']);
 	if (!isset($x)) {
 		$input_errors[] = "Reserved word used for whitelist file name.";
 	} else {
 		if (is_validwhitelistname($_POST['name']) == false)
-		$input_errors[] = "Whitelist file name may only consist of the characters a-z, A-Z and 0-9 _. Note: No Spaces. Press Cancel to reset.";
+			$input_errors[] = "Whitelist file name may only consist of the characters a-z, A-Z and 0-9 _. Note: No Spaces. Press Cancel to reset.";
 	}
-
-	if (is_validwhitelistname($_POST['address']) == false)
-	$input_errors[] = "Whitelist address may only consist of the characters 0-9 and /. Note: No Spaces. Press Cancel to reset.";
-
 
 	/* check for name conflicts */
 	foreach ($a_whitelist as $w_list) {
 		if (isset($id) && ($a_whitelist[$id]) && ($a_whitelist[$id] === $w_list))
-		continue;
+			continue;
 
 		if ($w_list['name'] == $_POST['name']) {
 			$input_errors[] = "A whitelist file name with this name already exists.";
@@ -141,60 +132,46 @@ if ($_POST['submit']) {
 		}
 	}
 
-
-	$w_list = array();
-	/* post user input */
-	$w_list['name'] = $_POST['name'];
-	$w_list['uuid'] = $whitelist_uuid;
-	$w_list['snortlisttype'] = $_POST['snortlisttype'];
-	$w_list['address'] = $_POST['address'];
-	$w_list['wanips'] = $_POST['wanips']? yes : no;
-	$w_list['wangateips'] = $_POST['wangateips']? yes : no;
-	$w_list['wandnsips'] = $_POST['wandnsips']? yes : no;
-	$w_list['vips'] = $_POST['vips']? yes : no;
-	$w_list['vpnips'] = $_POST['vpnips']? yes : no;
-
-
-	$address = $w_list['address'];
-	$final_address_detail = mb_convert_encoding($_POST['detail'],"HTML-ENTITIES","auto");
-	if($final_address_detail <> "") {
-		$final_address_details .= $final_address_detail;
-	} else {
-		$final_address_details .= "Entry added" . " ";
-		$final_address_details .= date('r');
-	}
-	$final_address_details .= "||";
 	$isfirst = 0;
-
-
+	$address = "";
+	$final_address_details .= "";
 	/* add another entry code */
-	for($x=0; $x<299; $x++) {
-		$comd = "\$subnet = \$_POST['address" . $x . "'];";
-		eval($comd);
-		$comd = "\$subnet_address = \$_POST['address_subnet" . $x . "'];";
-		eval($comd);
-		if($subnet <> "") {
-			$address .= " ";
-			$address .= $subnet;
-			if($subnet_address <> "") $address .= "" . $subnet_address;
+	for($x=0; $x<499; $x++) {
+		if (!empty($_POST["address{$x}"])) {
+			if ($is_first > 0)
+				$address .= " ";
+			$address .= $_POST["address{$x}"];
+			if ($_POST["address_subnet{$x}"] <> "")
+				$address .= "" . $_POST["address_subnet{$x}"];
 
 			/* Compress in details to a single key, data separated by pipes.
 			 Pulling details here lets us only pull in details for valid
 			 address entries, saving us from having to track which ones to
 			 process later. */
-			$comd  =  "\$final_address_detail  =  mb_convert_encoding(\$_POST['detail"  .  $x  .  "'],'HTML-ENTITIES','auto');";
-			eval($comd);
-			if($final_address_detail <> "") {
+			$final_address_detail = mb_convert_encoding($_POST["detail{$x}"],'HTML-ENTITIES','auto');
+			if ($final_address_detail <> "")
 				$final_address_details .= $final_address_detail;
-			} else {
+			else {
 				$final_address_details .= "Entry added" . " ";
 				$final_address_details .= date('r');
 			}
 			$final_address_details .= "||";
+			$is_first++;
 		}
 	}
 
 	if (!$input_errors) {
+		$w_list = array();
+		/* post user input */
+		$w_list['name'] = $_POST['name'];
+		$w_list['uuid'] = $whitelist_uuid;
+		$w_list['snortlisttype'] = $_POST['snortlisttype'];
+		$w_list['wanips'] = $_POST['wanips']? 'yes' : 'no';
+		$w_list['wangateips'] = $_POST['wangateips']? 'yes' : 'no';
+		$w_list['wandnsips'] = $_POST['wandnsips']? 'yes' : 'no';
+		$w_list['vips'] = $_POST['vips']? 'yes' : 'no';
+		$w_list['vpnips'] = $_POST['vpnips']? 'yes' : 'no';
+
 		$w_list['address'] = $address;
 		$w_list['descr']  =  mb_convert_encoding($_POST['descr'],"HTML-ENTITIES","auto");
 		$w_list['detail'] = $final_address_details;
@@ -211,10 +188,7 @@ if ($_POST['submit']) {
 
 		header("Location: /snort/snort_interfaces_whitelist.php");
 		exit;
-	}
-	//we received input errors, copy data to prevent retype
-	else
-	{
+	} else {
 		$pconfig['descr']  =  mb_convert_encoding($_POST['descr'],"HTML-ENTITIES","auto");
 		$pconfig['address'] = $address;
 		$pconfig['detail'] = $final_address_details;
@@ -233,18 +207,17 @@ include_once("head.inc");
 include("fbegin.inc");
 echo $snort_general_css;
 ?>
-<div class="body2">
 <script type="text/javascript" src="/javascript/row_helper.js"></script>
 	<input type='hidden' name='address_type' value='textbox' />
 	<script type="text/javascript">
 	
 	rowname[0] = "address";
 	rowtype[0] = "textbox";
-	rowsize[0] = "30";
+	rowsize[0] = "20";
 
 	rowname[1] = "detail";
 	rowtype[1] = "textbox";
-	rowsize[1] = "50";
+	rowsize[1] = "30";
 </script>
 
 <?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
@@ -255,50 +228,15 @@ echo $snort_general_css;
 <form action="snort_interfaces_whitelist_edit.php" method="post" name="iform" id="iform">
 <?php
 	/* Display Alert message */
-	if ($input_errors) {
+	if ($input_errors)
 		print_input_errors($input_errors); // TODO: add checks
-	}
 
-	if ($savemsg) {
+	if ($savemsg)
 		print_info_box2($savemsg);
-	}
 
-	//if (file_exists($d_snortconfdirty_path)) {
-	if (file_exists($d_snort_whitelist_dirty_path)) {
-		echo '<p>';
-
-		if($savemsg) {
-			print_info_box_np2("{$savemsg}");
-		}else{
-			print_info_box_np2('
-			The Snort configuration has changed and snort needs to be restarted on this interface.<br>
-			You must apply the changes in order for them to take effect.<br>
-			');
-		}
-	}
-	?>
+?>
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td class="tabnavtbl">
-
-		<div class="newtabmenu" style="margin: 1px 0px; width: 775px;"><!-- Tabbed bar code-->
-		<ul class="newtabmenu">
-			<li><a href="/snort/snort_interfaces.php"><span>Snort Interfaces</span></a></li>
-			<li><a href="/snort/snort_interfaces_global.php"><span>Global
-			Settings</span></a></li>
-			<li><a href="/snort/snort_download_updates.php"><span>Updates</span></a></li>
-			<li><a href="/snort/snort_alerts.php"><span>Alerts</span></a></li>
-			<li><a href="/snort/snort_blocked.php"><span>Blocked</span></a></li>
-			<li class="newtabmenu_active"><a
-				href="/snort/snort_interfaces_whitelist.php"><span>Whitelists</span></a></li>
-			<li><a href="/snort/snort_interfaces_suppress.php"><span>Suppress</span></a></li>
-			<li><a class="example8" href="/snort/help_and_info.php"><span>Help</span></a></li>
-		</ul>
-		</div>
-
-		</td>
-	</tr>
 	<tr>
 		<td class="tabcont">
 
@@ -417,34 +355,29 @@ echo $snort_general_css;
 							</td>
 						</tr>
 
-						<?php
+					<?php
 						/* cleanup code */
 						$counter = 0;
 						$address = $pconfig['address'];
+						if ($address <> ""):
 						$item = explode(" ", $address);
 						$item3 = explode("||", $pconfig['detail']);
-						foreach($item as $ww) {
+						foreach($item as $ww):
 							$address = $item[$counter];
 							$item4 = $item3[$counter];
-							if($counter > 0) $tracker = $counter + 1;
-							?>
+					?>
 						<tr>
-							<td><input name="address<?php echo $tracker; ?>" type="text"
-								id="address<?php echo $tracker; ?>" size="30"
-								value="<?=htmlspecialchars($address);?>" /></td>
-							<td><input name="detail<?php echo $tracker; ?>" type="text"
-								id="detail<?php echo $tracker; ?>" size="50"
-								value="<?=$item4;?>" /></td>
-							<td><?php
-							if($counter > 0)
-							echo "<input type=\"image\" src=\"/themes/".$g['theme']."/images/icons/icon_x.gif\" onclick=\"removeRow(this); return false;\" value=\"Delete\" />";
-							?></td>
+							<td><input name="address<?php echo $counter; ?>" class="formfld unknown" type="text" id="address<?php echo $counter; ?>" size="30" value="<?=htmlspecialchars($address);?>" /></td>
+							<td><input name="detail<?php echo $counter; ?>" class="formfld unknown" type="text" id="address<?php echo $counter; ?>" size="50" value="<?=$item4;?>" /></td>
+							<td>
+								<?php echo "<input type=\"image\" src=\"/themes/".$g['theme']."/images/icons/icon_x.gif\" onclick=\"removeRow(this); return false;\" value=\"Delete\" />"; ?>
+							</td>
 						</tr>
-						<?php
+					<?php
 						$counter++;
 
-						} // end foreach
-						?>
+						endforeach; endif;
+					?>
 					</tbody>
 				</table>
 				<a onclick="javascript:addRowTo('maintable'); return false;"
@@ -457,9 +390,7 @@ echo $snort_general_css;
 				<td width="78%">
 					<input id="submit" name="submit" type="submit" class="formbtn" value="Save" />
 					<input id="cancelbutton" name="cancelbutton" type="button" class="formbtn" value="Cancel" onclick="history.back()" />
-					<?php if (isset($id) && $a_whitelist[$id]): ?>
-						<input name="id" type="hidden" value="<?=$id;?>" />
-					<?php endif; ?>
+					<input name="id" type="hidden" value="<?=$id;?>" />
 				</td>
 			</tr>
 		</table>
@@ -476,9 +407,8 @@ echo $snort_general_css;
 	totalrows = <?php echo $counter; ?>;
 	loaded = <?php echo $counter; ?>;
 	
-</script></div>
+</script>
 
-						<?php include("fend.inc"); ?>
-
+<?php include("fend.inc"); ?>
 </body>
 </html>
