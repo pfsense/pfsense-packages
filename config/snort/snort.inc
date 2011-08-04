@@ -667,8 +667,6 @@ function snort_Getdirsize($node) {
 function snort_snortloglimit_install_cron($should_install) {
 	global $config, $g;
 
-	if ($g['booting']==true)
-		return;
 	if (!is_array($config['cron']['item']))
 		$config['cron']['item'] = array();
 
@@ -681,9 +679,6 @@ function snort_snortloglimit_install_cron($should_install) {
 		}
 		$x++;
 	}
-
-	$snort_snortloglimit_info_ck = $config['installedpackages']['snortglobal']['snortloglimit'];
-	$snort_snortloglimitsize_info_ck = $config['installedpackages']['snortglobal']['snortloglimitsize'];
 
 	switch($should_install) {
 		case true:
@@ -708,12 +703,9 @@ function snort_snortloglimit_install_cron($should_install) {
 }
 
 /* func for updating cron */
-function snort_rm_blocked_install_cron($should_install)
-{
+function snort_rm_blocked_install_cron($should_install) {
 	global $config, $g;
 
-	if ($g['booting']==true)
-		return;
 	if (!is_array($config['cron']['item']))
 		$config['cron']['item'] = array();
 
@@ -817,8 +809,6 @@ function snort_rm_blocked_install_cron($should_install)
 function snort_rules_up_install_cron($should_install) {
 	global $config, $g;
 
-	if ($g['booting']==true)
-		return;
 	if(!$config['cron']['item'])
 		$config['cron']['item'] = array();
 
@@ -1579,7 +1569,7 @@ function snort_deinstall() {
 		function snort_deinstall_cron($crontask) {
 			global $config, $g;
 
-			if(!$config['cron']['item'])
+			if(!is_array($config['cron']['item']))
 				return;
 
 			$x=0;
@@ -1925,9 +1915,6 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 		$def_ssl_ports_type = "443,465,563,636,989,990,992,993,994,995";
 	else
 		$def_ssl_ports_type = "$def_ssl_ports_info_chk";
-
-	/* should we install a automatic update crontab entry? */
-	$automaticrulesupdate = $config['installedpackages']['snortglobal']['automaticrulesupdate7'];
 
 	/* if user is on pppoe, we really want to use ng0 interface */
 	if ($snort_pfsense_basever == 'yes' && $snort_ext_int == "wan")
