@@ -705,9 +705,7 @@ function snort_snortloglimit_install_cron($should_install) {
 				unset($config['cron']['item'][$x]);
 			break;
 	}
-	configure_cron();
 }
-
 
 /* func for updating cron */
 function snort_rm_blocked_install_cron($should_install)
@@ -934,8 +932,7 @@ function sync_snort_package_remove_old()
 }
 
 /* make sure this func on writes to files and does not start snort */
-function sync_snort_package()
-{
+function sync_snort_package() {
 	global $config, $g;
 
 	/* all new files are for the user snort nologin */
@@ -965,12 +962,6 @@ function sync_snort_package()
 	exec('/bin/chmod -R 770 /var/log/snort');
 	exec('/bin/chmod -R 770 /usr/local/lib/snort');
 	exec('/bin/chmod -R 770 /usr/local/etc/snort/');
-
-	/* auto install loglimit dfault if value not set */
-	$snortloglimitsize = $config['installedpackages']['snortglobal']['snortloglimitsize'];
-	$snortloglimit = $config['installedpackages']['snortglobal']['snortloglimit'];
-
-	snort_snortloglimit_install_cron($config['installedpackages']['snortglobal']['snortloglimit'] == 'on' ? true : false);
 }
 
 /* only run when a single iface needs to sync */
