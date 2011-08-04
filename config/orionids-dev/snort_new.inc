@@ -41,7 +41,6 @@
  
 */
 
-
 // unset crsf checks
 if(isset($_POST['__csrf_magic'])) {
   unset($_POST['__csrf_magic']);

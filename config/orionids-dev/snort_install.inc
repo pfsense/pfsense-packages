@@ -120,19 +120,19 @@ function snort_postinstall()
 		exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/DB');
 	}
 
-	if (!file_exists('/usr/local/etc/snort/snortDBrules/custom_rules')) {
+	if (!file_exists('/usr/local/etc/snort/snortDBrules/custom_rules/rules')) {
 		exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/custom_rules/rules');
 	}
 
-	if (!file_exists('/usr/local/etc/snort/snortDBrules/emerging_rules')) {
+	if (!file_exists('/usr/local/etc/snort/snortDBrules/emerging_rules/rules')) {
 		exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/emerging_rules/rules');
 	}	
 
-	if (!file_exists('/usr/local/etc/snort/snortDBrules/pfsense_rules')) {
+	if (!file_exists('/usr/local/etc/snort/snortDBrules/pfsense_rules/rules')) {
 		exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/pfsense_rules/rules');
 	}
 
-	if (!file_exists('/usr/local/etc/snort/snortDBrules/snort_rules')) {
+	if (!file_exists('/usr/local/etc/snort/snortDBrules/snort_rules/rules')) {
 		exec('/bin/mkdir -p /usr/local/etc/snort/snortDBrules/snort_rules/rules');
 	}
 	
