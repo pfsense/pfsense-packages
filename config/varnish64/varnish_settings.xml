@@ -41,7 +41,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>varnishsettings</name>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<title>Varnish Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=varnish_settings.xml&amp;id=0</aftersaveredirect>
 	<include_file>/usr/local/pkg/varnish.inc</include_file>
@@ -108,7 +108,7 @@
 		<field>
 			<fielddescr>Listening port</fielddescr>
 			<fieldname>listeningport</fieldname>
-			<description>Enter the port you would like varnish to listen on.  Defaults to 80.</description>
+			<description><![CDATA[Enter the port you would like varnish to listen on.  Defaults to 80.<BR><BR><strong>When listening on port 80, you must check 'Disable webConfigurator redirect rule' option in system advanced options.</strong>]]></description>
 			<type>input</type>
 		</field>
 		<field>
