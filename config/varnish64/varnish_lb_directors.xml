@@ -41,7 +41,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>varnishlbdirectors</name>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<title>Varnish: Backends</title>
 	<include_file>/usr/local/pkg/varnish.inc</include_file>
    	<additional_files_needed>
@@ -131,6 +131,7 @@
 				<option><name>Round-robin</name><value>round-robin</value></option>
 				<option><name>Random</name><value>random</value></option>
 				<option><name>Client</name><value>client</value></option>
+				<option><name>Hash</name><value>hash</value></option>
 
 			</options>
 		</field>
