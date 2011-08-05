@@ -734,12 +734,12 @@ if (is_dir('/usr/local/etc/snort/tmp')) {
 }
 
 /* make all dirs snorts */
-exec("/usr/sbin/chown -R snort:snort /var/log/snort");
-exec("/usr/sbin/chown -R snort:snort /usr/local/etc/snort");
-exec("/usr/sbin/chown -R snort:snort /usr/local/lib/snort");
-exec("/bin/chmod -R 755  /var/log/snort");
-exec("/bin/chmod -R 755  /usr/local/etc/snort");
-exec("/bin/chmod -R 755  /usr/local/lib/snort");
+mwexec("/usr/sbin/chown -R snort:snort /var/log/snort", true);
+mwexec("/usr/sbin/chown -R snort:snort /usr/local/etc/snort", true);
+mwexec("/usr/sbin/chown -R snort:snort /usr/local/lib/snort", true);
+mwexec("/bin/chmod -R 755  /var/log/snort", true);
+mwexec("/bin/chmod -R 755  /usr/local/etc/snort", true);
+mwexec("/bin/chmod -R 755  /usr/local/lib/snort", true);
 
 /* hide progress bar and lets end this party */
 hide_progress_bar_status();

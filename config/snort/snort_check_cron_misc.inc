@@ -65,10 +65,8 @@ if (snort_Getdirsize('/var/log/snort/') >= $snortloglimitsizeKB ) {
 			exec('/bin/echo "" > /var/log/snort/alert');
 		}
 		post_delete_logs();
-		exec('/usr/sbin/chown snort:snort /var/log/snort/*');
-		exec('/bin/chmod 660 /var/log/snort/*');
-		//sleep(2);
-		//exec('/usr/bin/killall -HUP snort');
+		mwexec('/usr/sbin/chown snort:snort /var/log/snort/*', true);
+		mwexec('/bin/chmod 660 /var/log/snort/*', true);
 	}
 	conf_mount_ro();
 

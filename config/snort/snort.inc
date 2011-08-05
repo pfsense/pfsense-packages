@@ -546,27 +546,27 @@ function snort_postinstall()
 		@unlink('/usr/local/bin/barnyard2');
 
 	/* important  */
-	exec('/usr/sbin/chown -R snort:snort /var/log/snort');
-	exec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort');
-	exec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort');
-	exec('/usr/sbin/chown snort:snort /tmp/snort*');
-	exec('/usr/sbin/chown snort:snort /var/db/whitelist');
-	exec('/bin/chmod 660 /var/log/snort/alert');
-	exec('/bin/chmod 660 /var/db/whitelist');
-	exec('/bin/chmod -R 660  /usr/local/etc/snort/*');
-	exec('/bin/chmod -R 660  /tmp/snort*');
-	exec('/bin/chmod -R 660  /var/run/snort*');
-	exec('/bin/chmod -R 660  /var/snort/run/*');
-	exec('/bin/chmod 770 /usr/local/lib/snort');
-	exec('/bin/chmod 770 /usr/local/etc/snort');
-	exec('/bin/chmod 770 /usr/local/etc/whitelist');
-	exec('/bin/chmod 770 /var/log/snort');
-	exec('/bin/chmod 770 /var/log/snort/run');
-	exec('/bin/chmod 770 /var/log/snort/barnyard2');
+	mwexec('/usr/sbin/chown -R snort:snort /var/log/snort', true);
+	mwexec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort', true);
+	mwexec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort', true);
+	mwexec('/usr/sbin/chown snort:snort /tmp/snort*', true);
+	mwexec('/usr/sbin/chown snort:snort /var/db/whitelist', true);
+	mwexec('/bin/chmod 660 /var/log/snort/alert', true);
+	mwexec('/bin/chmod 660 /var/db/whitelist', true);
+	mwexec('/bin/chmod -R 660  /usr/local/etc/snort/*', true);
+	mwexec('/bin/chmod -R 660  /tmp/snort*', true);
+	mwexec('/bin/chmod -R 660  /var/run/snort*', true);
+	mwexec('/bin/chmod -R 660  /var/snort/run/*', true);
+	mwexec('/bin/chmod 770 /usr/local/lib/snort', true);
+	mwexec('/bin/chmod 770 /usr/local/etc/snort', true);
+	mwexec('/bin/chmod 770 /usr/local/etc/whitelist', true);
+	mwexec('/bin/chmod 770 /var/log/snort', true);
+	mwexec('/bin/chmod 770 /var/log/snort/run', true);
+	mwexec('/bin/chmod 770 /var/log/snort/barnyard2', true);
 
 	/* move files around, make it look clean */
-	exec('/bin/mkdir -p /usr/local/www/snort/css');
-	exec('/bin/mkdir -p /usr/local/www/snort/images');
+	mwexec('/bin/mkdir -p /usr/local/www/snort/css');
+	mwexec('/bin/mkdir -p /usr/local/www/snort/images');
 
 	chdir ("/usr/local/www/snort/css/");
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/css/style.css');
@@ -940,18 +940,18 @@ function sync_snort_package() {
 		exec('/usr/bin/touch /var/log/snort/alert');
 
 	/* important  */
-	exec('/usr/sbin/chown -R snort:snort /var/log/snort');
-	exec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort');
-	exec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort');
-	exec('/usr/sbin/chown snort:snort /tmp/snort*');
-	exec('/usr/sbin/chown snort:snort /var/db/whitelist');
+	mwexec('/usr/sbin/chown -R snort:snort /var/log/snort', true);
+	mwexec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort', true);
+	mwexec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort', true);
+	mwexec('/usr/sbin/chown snort:snort /tmp/snort*', true);
+	mwexec('/usr/sbin/chown snort:snort /var/db/whitelist', true);
 
-	exec('/bin/chmod 770 /var/db/whitelist');
-	exec('/bin/chmod 770 /var/run/snort*');
-	exec('/bin/chmod 770 /tmp/snort*');
-	exec('/bin/chmod -R 770 /var/log/snort');
-	exec('/bin/chmod -R 770 /usr/local/lib/snort');
-	exec('/bin/chmod -R 770 /usr/local/etc/snort/');
+	mwexec('/bin/chmod 770 /var/db/whitelist', true);
+	mwexec('/bin/chmod 770 /var/run/snort*', true);
+	mwexec('/bin/chmod 770 /tmp/snort*', true);
+	mwexec('/bin/chmod -R 770 /var/log/snort', true);
+	mwexec('/bin/chmod -R 770 /usr/local/lib/snort', true);
+	mwexec('/bin/chmod -R 770 /usr/local/etc/snort/', true);
 }
 
 /* only run when a single iface needs to sync */
@@ -1428,9 +1428,9 @@ function create_barnyard2_conf($id, $if_real, $snort_uuid) {
 		exec("/usr/bin/touch /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf");
 
 	if (!file_exists("/var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo")) {
-		exec("/usr/bin/touch /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo");
-		exec("/usr/sbin/chown snort:snort /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo");
-		exec("/bin/chmod 770 /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo");
+		mwexec("/usr/bin/touch /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo", true);
+		mwexec("/usr/sbin/chown snort:snort /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo", true);
+		mwexec("/bin/chmod 770 /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo", true);
 	}
 
 	$barnyard2_conf_text = generate_barnyard2_conf($id, $if_real, $snort_uuid);

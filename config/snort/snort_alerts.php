@@ -89,12 +89,12 @@ if ($_POST['delete'])
 	conf_mount_rw();
 	if(file_exists('/var/log/snort/alert'))
 	{
-		exec('/bin/echo "" > /var/log/snort/alert');
+		@file_put_content("/var/log/snort/alert", "");
 		post_delete_logs();
-		exec('/usr/sbin/chown snort:snort /var/log/snort/*');
-		exec('/bin/chmod 660 /var/log/snort/*');
+		mwexec('/usr/sbin/chown snort:snort /var/log/snort/*', true);
+		mwexec('/bin/chmod 660 /var/log/snort/*', true);
 		sleep(2);
-		exec('/usr/bin/killall -HUP snort');
+		mwexec('/usr/bin/killall -HUP snort', true);
 	}
 	conf_mount_ro();
 }

@@ -79,29 +79,28 @@ $delimiter = "\n";
 //split the contents of the string file into an array using the delimiter
 $splitcontents = explode($delimiter, $contents2);
 
-if($_POST['highlight'] <> "") {
-	if($_POST['highlight'] == "yes" or
-	$_POST['highlight'] == "enabled") {
-		$highlight = "yes";
+if ($_POST) {
+	if($_POST['highlight'] <> "") {
+		if($_POST['highlight'] == "yes" or
+		$_POST['highlight'] == "enabled") {
+			$highlight = "yes";
+		} else {
+			$highlight = "no";
+		}
 	} else {
 		$highlight = "no";
 	}
-} else {
-	$highlight = "no";
-}
 
-if($_POST['rows'] <> "")
-	$rows = $_POST['rows'];
-else
-	$rows = 1;
+	if($_POST['rows'] <> "")
+		$rows = $_POST['rows'];
+	else
+		$rows = 1;
 
-if($_POST['cols'] <> "")
-	$cols = $_POST['cols'];
-else
-	$cols = 66;
+	if($_POST['cols'] <> "")
+		$cols = $_POST['cols'];
+	else
+		$cols = 66;
 
-if ($_POST)
-{
 	if ($_POST['save']) {
 
 		/* get the changes */
@@ -114,7 +113,6 @@ if ($_POST)
 		@file_put_contents($file, implode($delimiter, $splitcontents));
 
 		echo "<script> window.close(); </script>";
-		//header("Location: /snort/snort_view_edit.php?id=$id&openruleset=$file&ids=$ids");
 		exit;
 	}
 }
