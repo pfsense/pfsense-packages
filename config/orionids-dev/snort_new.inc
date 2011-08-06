@@ -59,6 +59,7 @@ if (file_exists('/usr/local/pkg/snort/snortDBtemp')) {
 	exec('/bin/cp /usr/local/pkg/snort/snortDBtemp /var/snort/snortDBtemp');
 }
 
+
 /*
 * make dir for the new iface, if iface exists or rule dir has changed redo soft link
 */
@@ -147,8 +148,9 @@ function createNewIfaceDir($pathToSnortDir, $newSnortDir) {
 
 function escapeJsonString($escapeString)
 {
+	// NOTE: foward slash has added spaces on each side ie and chrome were giving issues with
 	$search = array('\\', '\n', '\r', '\u', '\t', '\f', '\b', '/', '"');
-	$replace = array('\\\\', '\\n', '\\r', '\\u', '\\t', '\\f', '\\b', '\/', '\"');
+	$replace = array('\\\\', '\\n', '\\r', '\\u', '\\t', '\\f', '\\b', ' \/ ', '\"');
 	$encoded_string = str_replace($search, $replace, $escapeString);
 	
 	return $encoded_string;
@@ -412,7 +414,8 @@ function snortSql_updateRulesSigsIps()
 		
 		// if $listGenRules empty list defaults
 		if (empty($listGenRules)) {
-			$listGenRules[0] = array(		
+			$listGenRules[0] = array(
+				'id' => 1,	
 				'rdbuuid' => $_POST['rdbuuid'],
 				'enable' => 'on',
 				'who' => 'src',
@@ -430,6 +433,7 @@ function snortSql_updateRulesSigsIps()
 			$listGenRulesEnable = 'off';
 		}
 		
+		// TODO: inprove this foreach so we only interact with db once
 		foreach ($_POST['snortsam']['db'] as $singleSig) 
 		{
 	
@@ -461,9 +465,7 @@ function snortSql_updateRulesSigsIps()
 				");
 	
 					
-			}
-				
-			if ( !empty($chktable) ) {
+			}else{
 	
 				$query_ck = sqlite_query($db, // @ supress warnings usonly in production
 				"UPDATE {$_POST['dbTable']} SET date ='{$addDate}', enable = '{$singleSigEnable}', who = '{$singleSig['who']}', timeamount = '{$singleSig['timeamount']}', timetype = '{$singleSig['timetype']}' WHERE rdbuuid = '{$_POST['rdbuuid']}' and sigfilename = '{$singleSig['sigfilename']}'; 

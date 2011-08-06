@@ -1,12 +1,18 @@
 <?php
 /* $Id$ */
 /*
- snort_interfaces.php
- part of m0n0wall (http://m0n0.ch/wall)
+
+ part of pfSense
+ All rights reserved.
 
  Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
- Copyright (C) 2008-2009 Robert Zelaya.
  All rights reserved.
+
+ Pfsense Old snort GUI 
+ Copyright (C) 2006 Scott Ullrich.
+ 
+ Pfsense snort GUI 
+ Copyright (C) 2008-2012 Robert Zelaya.
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -18,6 +24,10 @@
  notice, this list of conditions and the following disclaimer in the
  documentation and/or other materials provided with the distribution.
 
+ 3. Neither the name of the pfSense nor the names of its contributors 
+ may be used to endorse or promote products derived from this software without 
+ specific prior written permission.
+
  THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
  AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
@@ -28,11 +38,19 @@
  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
- */
+ 
+*/
 
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_new.inc");
 require_once("/usr/local/pkg/snort/snort_gui.inc");
+
+//Set no caching
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 
 // set page vars
 
@@ -65,6 +83,34 @@ if (isset($_GET['rulefilename'])) {
 	exit;
 }
 
+
+function snortSearchArray($array, $key, $value)
+{
+	$results = array();
+	
+	if (is_array($array))
+	{
+		foreach ($array as $subarray)
+		{
+			if ($subarray[$key] == $value) {
+				$results = 	$subarray;				
+			}
+			
+		}
+	
+	}
+	
+	return $results;
+}
+
+// get default settings
+$listGenRules = array();
+$listGenRules = snortSql_fetchAllSettings('snortDBrules', 'SnortruleGenIps', 'rdbuuid', $rdbuuid);
+
+// get sigs in db
+$listSigRules = array();
+$listSigRules = snortSql_fetchAllSettings('snortDBrules', 'SnortruleSigsIps', 'rdbuuid', $rdbuuid);
+
 	$pgtitle = "Services: Snort: Ruleset Ips:";
 	include("/usr/local/pkg/snort/snort_head.inc");
 
@@ -86,8 +132,6 @@ if (isset($_GET['rulefilename'])) {
 
 <div class="body2"><!-- hack to fix the hardcoed fbegin link in header -->
 <div id="header-left2"><a href="../index.php" id="status-link2"><img src="./images/transparent.gif" border="0"></img></a></div>
-
-<form id="iform" >
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 	<?php
@@ -150,41 +194,59 @@ if (isset($_GET['rulefilename'])) {
 		<tr>
 		<td class="tabnavtbl">
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">
-		<!-- START MAIN AREA -->
-
-<table width="100%" border="0" cellpadding="10px" cellspacing="0">	
-		<input type="hidden" name="snortSaveRuleSets" value="1" /> <!-- what to do, save -->
-		<input type="hidden" name="dbName" value="snortDBrules" /> <!-- what db-->
-		<input type="hidden" name="dbTable" value="SnortruleSigsIps" /> <!-- what db table-->
-		<input type="hidden" name="ifaceTab" value="snort_rules_ips" /> <!-- what interface tab -->
-		<input type="hidden" name="rdbuuid" value="<?=$rdbuuid;?>" /> <!-- what interface to save for -->
-		<input type="hidden" name="uuid" value="<?=$uuid;?>" /> <!-- create snort.conf -->		
-
-	<tr id="frheader" >
-		<td width="1%" class="listhdrr2">&nbsp;&nbsp;&nbsp;On</td>
-		<td width="1%" class="listhdrr2">&nbsp;&nbsp;&nbsp;Sid</td>
-		<td width="1%" class="listhdrr2">&nbsp;&nbsp;&nbsp;Source</td>
-		<td width="1%" class="listhdrr2">&nbsp;&nbsp;&nbsp;Amount</td>
-		<td width="1%" class="listhdrr2">&nbsp;&nbsp;&nbsp;Duration</td>
-		<td width="20%" class="listhdrr2">Message</td>												
-	</tr>
-	
-	<tbody class="rulesetloopblock">
-	
-	</tbody>
-	
-</table>
-<br>
-<table>
-<tr>
-	<td>
-		<input name="Submit" type="submit" class="formbtn" value="Save">
-		<input id="cancel" type="button" class="formbtn" value="Cancel">
-	</td>	
-</tr>
-</table>
-
+		<!-- START MAIN AREA -->			
+		
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" >
+		<tr>
+			<td>
+			</td>
+			<td>
+				<input id="select_all" type="button" class="formbtn" value="Select All"  >
+				<input id="deselect_all" type="button" class="formbtn" value="Deselect All" >
+			</td>
+		</tr>
+		</table>
+		
+		<div id="checkboxdo" style="width:100%; margin-left: auto ; margin-right: auto ; padding-top: 10px; padding-bottom: 0px;">	
+		<form id="iform" action="" >
+		
+				<input type="hidden" name="snortSaveRuleSets" value="1" /> <!-- what to do, save -->
+				<input type="hidden" name="dbName" value="snortDBrules" /> <!-- what db-->
+				<input type="hidden" name="dbTable" value="SnortruleSigsIps" /> <!-- what db table-->
+				<input type="hidden" name="ifaceTab" value="snort_rules_ips" /> <!-- what interface tab -->
+				<input type="hidden" name="rdbuuid" value="<?=$rdbuuid;?>" /> <!-- what interface to save for -->
+				<input type="hidden" name="uuid" value="<?=$uuid;?>" /> <!-- create snort.conf -->	
+				
+		<table width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 10px;">
+			<tr>
+				<td colspan="2" valign="top" class="listtopic">Rule File Ips Settings</td>
+			</tr>
+		</table>					
+		
+		<table class="rulesetloopblock" width="100%" border="0" cellpadding="0" cellspacing="0" style="margin-bottom: 10px;">
+			<tr id="frheader" >
+				<td width="1%" class="listhdrr2">&nbsp;&nbsp;&nbsp;On</td>
+				<td width="1%" class="listhdrr2">&nbsp;&nbsp;&nbsp;Sid</td>
+				<td width="1%" class="listhdrr2">&nbsp;&nbsp;&nbsp;Source</td>
+				<td width="1%" class="listhdrr2">&nbsp;&nbsp;&nbsp;Amount</td>
+				<td width="1%" class="listhdrr2">&nbsp;&nbsp;&nbsp;Duration</td>
+				<td width="20%" class="listhdrr2">Message</td>												
+			</tr>
+			
+		</table>
+		<br>
+		<table>
+		<tr>
+			<td>
+				<input name="Submit" type="submit" class="formbtn" value="Save">
+				<input id="cancel" type="button" class="formbtn" value="Cancel">
+			</td>	
+		</tr>
+		</table>
+		</div>
 		</form >
+		
+		
 		<!-- STOP MAIN AREA -->
 		</table>
 		</td>
@@ -226,6 +288,7 @@ jQuery(document).ready(function() {
 		
 		function getSidBlockJsonArray($getEnableSid)
 		{
+			global $listGenRules, $listSigRules;
 				
 			if (!empty($getEnableSid)) {
 					
@@ -235,16 +298,38 @@ jQuery(document).ready(function() {
 							foreach ($getEnableSid as $val3)
 							{
 								
+								//$listGenRules $listSigRules 								
+								$snortSigIpsExists = snortSearchArray($listSigRules, 'siguuid', trim($val3['0']));
+								
+								// if sig is in db use its settings else use default settings
+								if(!empty($snortSigIpsExists['siguuid'])) {
+
+									$getSid = $snortSigIpsExists['siguuid'];
+									$getEnable = $snortSigIpsExists['enable'];
+									$getWho = $snortSigIpsExists['who'];
+									$getTimeamount = $snortSigIpsExists['timeamount'];
+									$getTimetype = $snortSigIpsExists['timetype'];
+									
+								}else{
+									
+									$getSid = escapeJsonString(trim($val3['0']));
+									$getEnable = $listGenRules[0]['enable'];
+									$getWho = $listGenRules[0]['who'];
+									$getTimeamount = $listGenRules[0]['timeamount'];
+									$getTimetype = $listGenRules[0]['timetype'];									
+									
+								}
+								
 								$i++;
-		
+								
 								if ($i == 1) {
 									$main .= '[';
 								}
 								
 								if ( $i == $countSigList ) {		 
-									$main .= '{"sid":"' . escapeJsonString($val3['0']) . '","enable":"' . 'on' . '","who":"' . 'src' . '","timeamount":"' . '15' . '","timetype":"' . 'minutes' . '","msg":"' . escapeJsonString($val3['1']) . '"}'; 
+									$main .= '{"sid":"' . $getSid . '","enable":"' . $getEnable . '","who":"' . $getWho . '","timeamount":"' . $getTimeamount . '","timetype":"' . $getTimetype . '","msg":"' . escapeJsonString($val3['1']) . '"}'; 
 								}else{
-									$main .= '{"sid":"' . escapeJsonString($val3['0']) . '","enable":"' . 'on' . '","who":"' . 'src' . '","timeamount":"' . '15' . '","timetype":"' . 'minutes' . '","msg":"' . escapeJsonString($val3['1']) . '"},';  
+									$main .= '{"sid":"' . $getSid . '","enable":"' . $getEnable . '","who":"' . $getWho . '","timeamount":"' . $getTimeamount . '","timetype":"' . $getTimetype . '","msg":"' . escapeJsonString($val3['1']) . '"},';  
 								}
 								
 								if ($i == $countSigList) {
@@ -321,8 +406,8 @@ function makeLargeSidTables(snortObjlist) {
 				var rowIsEvenOdd = 'even_ruleset2';
 			}
 			
-			if (snortObjlist[i].enable === 'on'){
-				var rulesetChecked = 'checked'; 
+			if (snortObjlist[i].enable == 'on'){
+				var rulesetChecked = 'checked="checked"'; 
 			}else{
 				var rulesetChecked = '';
 			}
@@ -330,7 +415,7 @@ function makeLargeSidTables(snortObjlist) {
 			jQuery('.rulesetloopblock').append(	
 					"\n" + '<tr class="hidemetr" id="ipstable_' + snortObjlist[i].sid + '" valign="top">' + "\n" +
 					'<td class="' + rowIsEvenOdd + '">' + "\n" +
-						'<input class="domecheck" id="checkbox_' + snortObjlist[i].sid + '" name="snortsam[db][' + i + '][enable]" value="' + snortObjlist[i].enable + '" checked="' + rulesetChecked + '" type="checkbox">' + "\n" +
+						'<input class="domecheck" id="checkbox_' + snortObjlist[i].sid + '" name="snortsam[db][' + i + '][enable]" value="on" ' + rulesetChecked + ' type="checkbox">' + "\n" +
 					'</td>' + "\n" +
 					'<td class="' + rowIsEvenOdd + '" id="sid_' + snortObjlist[i].sid + '" >' + snortObjlist[i].sid + '</td>' + "\n" +
 					'<td class="' + rowIsEvenOdd + '">' + "\n" +

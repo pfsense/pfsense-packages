@@ -44,7 +44,12 @@
 require_once("guiconfig.inc");
 require_once("/usr/local/pkg/snort/snort_new.inc");
 
-session_start(); // alwaya at the very top of a php page or "Cannot send session cache limiter - headers already sent"
+//Set no caching
+header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
+header("Cache-Control: no-store, no-cache, must-revalidate");
+header("Cache-Control: post-check=0, pre-check=0", false);
+header("Pragma: no-cache");
 
 // get json blocls sids
 if ($_GET['snortsamjson'] == 1) {

@@ -252,48 +252,48 @@
 }
 
 .alert {
-position:absolute;
-top:10px;
-left:-25px;
-width:100%;
-height:90%;
-z-index:999;
-background:#FCE9C0;
-background-position: 15px; 
-border-top:2px solid #DBAC48;
-border-bottom:2px solid #DBAC48;
-padding: 15px 10px 85% 50px;
+	position:absolute;
+	top:10px;
+	left:-25px;
+	width:100%;
+	height:90%;
+	z-index:999;
+	background:#FCE9C0;
+	background-position: 15px; 
+	border-top:2px solid #DBAC48;
+	border-bottom:2px solid #DBAC48;
+	padding: 15px 10px 85% 50px;
 }	
 
 .formpre {
-font-family:arial;
-font-size: 1.1em;
+	font-family:arial;
+	font-size: 1.1em;
 }
 
 #download_rules {
-font-family: arial;
-font-size: 13px;
-font-weight: bold;
-text-align: center
+	font-family: arial;
+	font-size: 13px;
+	font-weight: bold;
+	text-align: center;
 }
 
 #download_rules_td {
-font-family: arial;
-font-size: 13px;
-font-weight: bold;
-text-align: center
+	font-family: arial;
+	font-size: 13px;
+	font-weight: bold;
+	text-align: center;
 }
 
 /* hack fix the hard coded fbegin link */
 #header-left2 {
-position: absolute;
-background-position: center center;
-height: 67px;
-width: 147px;
-top: -77px;
-left: 8px;
-float: left;
-z-index:999;
+	position: absolute;
+	background-position: center center;
+	height: 67px;
+	width: 147px;
+	top: -77px;
+	left: 8px;
+	float: left;
+	z-index:999;
 }
 #header-left2 #status-link2 {
 	position: relative;
@@ -303,24 +303,24 @@ z-index:999;
 /* end of fbegin hack */
 
 .body2 {
-font-family:arial;
-font-size:12px;
+	font-family:arial;
+	font-size:12px;
 }
 
 .tabcont {
-background-color: #dddddd;
-padding-right: 12px;
-padding-left: 12px;
-padding-top: 12px;
-padding-bottom: 12px;
+	background-color: #dddddd;
+	padding-right: 12px;
+	padding-left: 12px;
+	padding-top: 12px;
+	padding-bottom: 12px;
 }
 
 .tabcont2 {
-background-color: #eeeeee;
-padding-right: 12px;
-padding-left: 12px;
-padding-top: 12px;
-padding-bottom: 12px;
+	background-color: #eeeeee;
+	padding-right: 12px;
+	padding-left: 12px;
+	padding-top: 12px;
+	padding-bottom: 12px;
 }
 
 .vncell2 {
@@ -332,15 +332,15 @@ padding-bottom: 12px;
 }
 
 .vncelltextbox {
-background-color: #eeeeee;
-padding-top: 8px;
-padding-bottom: 8px;
-padding-right: 8px;
-padding-left: 8px;
-border-bottom-width: 1px;
-border-bottom-style: solid;
-border-bottom-color: #999999;
-font-size: 11px;
+	background-color: #eeeeee;
+	padding-top: 8px;
+	padding-bottom: 8px;
+	padding-right: 8px;
+	padding-left: 8px;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+	border-bottom-color: #999999;
+	font-size: 11px;
 }
 
 /* global tab, white lil box */

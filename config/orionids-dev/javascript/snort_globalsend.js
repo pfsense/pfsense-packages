@@ -146,6 +146,7 @@ jQuery(document).ready(function() {
 		};
 		
 		
+		
   //--------------------------- START select all code ---------------------------
 		
 		jQuery('#select_all').live('click', function(){					    
