@@ -81,7 +81,11 @@ function varnish_deinstall() {
 }
 
 function varnish_start() {
-	mwexec("/usr/local/etc/rc.d/varnish.sh");
+	global $g, $config;
+	if ($config['installedpackages']['varnishsettings']['config'][0]['enablevarnish'])
+		mwexec("/usr/local/etc/rc.d/varnish.sh");
+	else
+		mwexec("/usr/bin/killall varnishd");
 }
 
 /* Build the URL mappings logic VCL config txt */
@@ -137,6 +141,10 @@ function create_varnish_rcd_file() {
 				$listeningport = "-a :{$vs['listeningport']}";
 			else 
 				$listeningport = "-a :80";
+			if($vs['managment'])
+				$managment = "-T {$vs['managment']}";
+			else 
+				$managment = "";
 			if($vs['minworkers'])
 				$minworkers = "{$vs['minworkers']}";
 			else 
@@ -178,7 +186,8 @@ ENDOFF
 	{$listeningport} \
 	-f /var/etc/default.vcl \
 	{$storage_type} \
-	-w {$minworkers},{$maxworkers},{$timeoutworkers}
+	-w {$minworkers},{$maxworkers},{$timeoutworkers} \
+	{$managment} 
 
 EOF;
 	fwrite($fd, $rc_file);
