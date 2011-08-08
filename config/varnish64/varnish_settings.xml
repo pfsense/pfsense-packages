@@ -144,7 +144,7 @@
 		<field>
                         <fielddescr>Client identity method</fielddescr>
                         <fieldname>clientbalance</fieldname>
-                        <description>Select how varnish will balance clients when using client Load Balance method.</description>
+                        <description><![CDATA[Select how varnish will balance clients when using client Load Balance method. (Choose IP address on i386 systems)]]></description>
                         <type>select</type>
                         <options>
                                 <option><name>IP address (keep sessions working)</name><value>ip</value></option>
