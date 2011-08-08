@@ -261,15 +261,7 @@ function get_lb_directors_config_txt() {
 	if($config['installedpackages']['varnishlbdirectors']['config'] != "") {
     	foreach($config['installedpackages']['varnishlbdirectors']['config'] as $backend) {
 			$director = "";
-			if($backend['directortype']){
-				switch($backend['directortype']){
-					case "round-robin" :
-					case "hash" :
-						$weight=" ";
-					break;
-				}
-					
-				}
+			if($backend['directortype'] == "round-robin" ){$weight=" ";}
 			if($backend['row']){
 				foreach($backend['row'] as $be) {
 					if($be['weight'] && $weight != " ")
@@ -356,7 +348,8 @@ function sync_package_varnish() {
                                         break;
                                         }
                                 }
-                        if($vcl['clientbalance']){
+                        $plataform=system('uname -m');
+                        if($vcl['clientbalance'] && $plataform == 'amd64'){
                                 $vcl_recv_basic.="\t#set client balance identity\n";
                                 switch ($vcl['clientbalance']){
                                         case 'url':
