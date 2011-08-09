@@ -78,6 +78,29 @@
 	</tabs>
 	<fields>
 		<field>
+			<fielddescr>Listening</fielddescr>
+			<fieldname>Listening</fieldname>
+			<type>listtopic</type>
+			<name>Daemon options</name>
+		</field>
+		<field>
+			<fielddescr>Enable Varnish</fielddescr>
+			<fieldname>enablevarnish</fieldname>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Listening port</fielddescr>
+			<fieldname>listeningport</fieldname>
+			<description><![CDATA[Enter the port you would like varnish to listen on.  Defaults to 80.<BR><BR><strong>When listening on port 80, you must check 'Disable webConfigurator redirect rule' in system advanced options.</strong>]]></description>
+			<type>input</type>
+		</field>
+		<field>
+			<fielddescr>Managment interface</fielddescr>
+			<fieldname>managment</fieldname>
+			<description>Enter the Ip address and port for managment interface. HINT 127.0.0.1:81</description>
+			<type>input</type>
+		</field>
+		<field>
 			<fielddescr>StorageTypeLT</fielddescr>
 			<fieldname>StorageTypeLT</fieldname>
 			<type>listtopic</type>
@@ -99,18 +122,7 @@
 			<description>Enter the size of the varnish cache in megabytes.  HINT: 1024 == 1 Gigabyte</description>
 			<type>input</type>
 		</field>
-		<field>
-			<fielddescr>ListeningPortLT</fielddescr>
-			<fieldname>ListeningPortLT</fieldname>
-			<type>listtopic</type>
-			<name>Listening port</name>
-		</field>
-		<field>
-			<fielddescr>Listening port</fielddescr>
-			<fieldname>listeningport</fieldname>
-			<description><![CDATA[Enter the port you would like varnish to listen on.  Defaults to 80.<BR><BR><strong>When listening on port 80, you must check 'Disable webConfigurator redirect rule' option in system advanced options.</strong>]]></description>
-			<type>input</type>
-		</field>
+
 		<field>
 			<fielddescr>WorkerThreadLT</fielddescr>
 			<fieldname>WorkerThreadLT</fieldname>
@@ -136,76 +148,73 @@
 			<type>input</type>
 		</field>
 		<field>
-                        <fielddescr>BasicVCLLT</fielddescr>
-                        <fieldname>BasicVCLLT</fieldname>
-                        <type>listtopic</type>
-                        <name>Basic VCL Settings</name>
+			<fielddescr>BasicVCLLT</fielddescr>
+			<fieldname>BasicVCLLT</fieldname>
+			<type>listtopic</type>
+			<name>Basic VCL Settings</name>
 		</field>
 		<field>
-                        <fielddescr>Client identity method</fielddescr>
-                        <fieldname>clientbalance</fieldname>
-                        <description><![CDATA[Select how varnish will balance clients when using client Load Balance method. (Choose IP address on i386 systems)]]></description>
-                        <type>select</type>
-                        <options>
-                                <option><name>IP address (keep sessions working)</name><value>ip</value></option>
-                                <option><name>Requested url</name><value>url</value></option>
-                                <option><name>User Agent</name><value>agent</value></option>
-                        </options>
-                </field>
-                <field>
-                        <fielddescr>Don't cache sessions</fielddescr>
-                        <fieldname>sessioncache</fieldname>
-                        <description>Don't cache pages wiht JSESSION,PHPSESSID or nocache headers/cookies</description>
-                        <type>checkbox</type>
-                </field>
-                <field>
-                        <fielddescr>Don't cache posts</fielddescr>
-                        <fieldname>postcache</fieldname>
-                        <description>Don't cache posts</description>
-                        <type>checkbox</type>
-                </field>
-                <field>
-                        <fielddescr>Cache Images and css</fielddescr>
-                        <fieldname>imagecache</fieldname>
-                        <description>cache .css .js .gif .jpg .jpeg .bmp .png .ico .img .tga and .wmf files</description>
-                        <type>checkbox</type>
-                </field>
-               <field>
-                        <fielddescr>Fix gzip compression</fielddescr>
-                        <fieldname>fixgzip</fieldname>
-                        <description>Ignore compression in images files and unknow compression algorithm</description>
-                        <type>checkbox</type>
-                </field>
-                <field>
-                        <fielddescr>Be RFC2616 compliant</fielddescr>
-                        <fieldname>rfc2616</fieldname>
-                        <description>Ignore request different form GET HEAD PUT POST TRACE OPTIONS DELETE</description>
-                        <type>checkbox</type>
-                </field>
-                <field>
-                        <fielddescr>Foward client IP</fielddescr>
-                        <fieldname>xforward</fieldname>
-                        <description>Select how to forward clients real IP.</description>
-                        <type>select</type>
-                        <options>
-                                <option><name>set X-Forwarded-For</name><value>set</value></option>
-                                <option><name>append X-Forwarded-For</name><value>append</value></option>
-                                <option><name>set X-Forwarded-Varnish</name><value>create</value></option>
-                                <option><name>Unset</name><value>unset</value></option>
-                        </options>
-                </field>
-                <field>
-                        <fielddescr>Custom Html error message</fielddescr>
-                        <fieldname>htmlerror</fieldname>
-                        <description>Paste your custom html error page code here. This code will be included</description>
-                        <type>textarea</type>
-                        <cols>70</cols>
-                        <rows>10</rows>
-                        <encoding>base64</encoding>
-                </field>
-
-
-
+			<fielddescr>Client identity method</fielddescr>
+			<fieldname>clientbalance</fieldname>
+			<description><![CDATA[Select how varnish will balance clients when using client Load Balance method. (Choose IP address on i386 systems)]]></description>
+			<type>select</type>
+			<options>
+				<option><name>IP address (keep sessions working)</name><value>ip</value></option>
+				<option><name>Requested url</name><value>url</value></option>
+				<option><name>User Agent</name><value>agent</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Don't cache sessions</fielddescr>
+			<fieldname>sessioncache</fieldname>
+			<description>Don't cache pages wiht JSESSION,PHPSESSID or nocache headers/cookies</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Don't cache posts</fielddescr>
+			<fieldname>postcache</fieldname>
+			<description>Don't cache posts</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Cache Images and css</fielddescr>
+			<fieldname>imagecache</fieldname>
+			<description>cache .css .js .gif .jpg .jpeg .bmp .png .ico .img .tga and .wmf files</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Fix gzip compression</fielddescr>
+			<fieldname>fixgzip</fieldname>
+			<description>Ignore compression in images files and unknow compression algorithm</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Be RFC2616 compliant</fielddescr>
+			<fieldname>rfc2616</fieldname>
+			<description>Ignore request different form GET HEAD PUT POST TRACE OPTIONS DELETE</description>
+			<type>checkbox</type>
+		</field>
+		<field>
+			<fielddescr>Foward client IP</fielddescr>
+			<fieldname>xforward</fieldname>
+			<description>Select how to forward clients real IP.</description>
+			<type>select</type>
+			<options>
+				<option><name>set X-Forwarded-For</name><value>set</value></option>
+				<option><name>append X-Forwarded-For</name><value>append</value></option>
+				<option><name>set X-Forwarded-Varnish</name><value>create</value></option>
+				<option><name>Unset</name><value>unset</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Custom Html error message</fielddescr>
+			<fieldname>htmlerror</fieldname>
+			<description>Paste your custom html error page code here. This code will be included</description>
+			<type>textarea</type>
+			<cols>70</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+		</field>
 	</fields>
 	<custom_php_resync_config_command>
 		sync_package_varnish();
