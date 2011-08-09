@@ -102,6 +102,7 @@ if ($_POST['snortSaveRuleSets'] == 1) {
 		function snortSamRulesSaveFunc() 
 		{	
 			snortJsonReturnCode(snortSql_updateRulesSigsIps());
+			buildSnortSamSidBlockMap($_POST['rdbuuid']); //
 			
 		} snortSamRulesSaveFunc();
 	}	
@@ -118,6 +119,10 @@ if ($_POST['snortSaveRuleSets'] == 1) {
 			// save to database
 			snortJsonReturnCode(snortSql_updateRuleSetList());
 			
+			if (!empty($_POST['rdbuuid'])) {
+				buildSnortSamSidBlockMap($_POST['rdbuuid']); //
+			}			
+			
 			// only build if uuid is valid
 			if (!empty($_POST['uuid'])) {
 				build_snort_settings($_POST['uuid']);
@@ -130,7 +135,7 @@ if ($_POST['snortSaveRuleSets'] == 1) {
 } // END of rulesSets	
 
 // row from db by uuid
-if ($_POST['RMlistDelRow'] == 1) {
+if ( $_POST['RMlistDelRow'] == 1 || $_POST['RSTlistRow'] == 1 ) {
 	
 	
 	function RMlistDelRowFunc() 
@@ -167,7 +172,45 @@ if ($_POST['RMlistDelRow'] == 1) {
 		
 		snortJsonReturnCode(snortSql_updatelistDelete($_POST['RMlistDB'], $_POST['RMlistTable'], 'uuid', $_POST['RMlistUuid']));
 	
-	} RMlistDelRowFunc();
+	} if ( $_POST['RMlistDelRow'] == 1 ) { RMlistDelRowFunc(); }
+	
+	function RSTlistDelRowFunc() 
+	{
+		
+		// rm ruledb and files
+		if ($_POST['RSTlistTable'] == 'Snortrules') {
+			
+			// remove dir
+			$snortRuleDir = "/usr/local/etc/snort/snortDBrules/DB/{$_POST['RSTlistUuid']}";
+			exec('/bin/rm -r ' . $snortRuleDir . '/rules/*.rules');			
+			
+			// remove db tables vals
+			snortSql_updatelistDelete($_POST['RSTlistDB'], 'SnortruleSets', 'rdbuuid', $_POST['RSTlistUuid']);
+			snortSql_updatelistDelete($_POST['RSTlistDB'], 'SnortruleSigs', 'rdbuuid', $_POST['RSTlistUuid']);
+			snortSql_updatelistDelete($_POST['RSTlistDB'], 'SnortruleSigsIps', 'rdbuuid', $_POST['RSTlistUuid']);
+			snortSql_updatelistDelete($_POST['RSTlistDB'], 'SnortruleSetsIps', 'rdbuuid', $_POST['RSTlistUuid']);
+			snortSql_updatelistDelete($_POST['RSTlistDB'], 'SnortruleGenIps', 'rdbuuid', $_POST['RSTlistUuid']);
+			
+			// NOTE: code only works on php5
+			$listSnortRulesDir = snortScanDirFilter('/usr/local/etc/snort/snortDBrules/snort_rules/rules', '\.rules');
+			$listEmergingRulesDir = snortScanDirFilter('/usr/local/etc/snort/snortDBrules/emerging_rules/rules', '\.rules');
+			$listPfsenseRulesDir = snortScanDirFilter('/usr/local/etc/snort/snortDBrules/pfsense_rules/rules', '\.rules');
+			
+			if (!empty($listSnortRulesDir)) {											
+				exec("/bin/cp -R /usr/local/etc/snort/snortDBrules/snort_rules/rules/*.rules /usr/local/etc/snort/snortDBrules/DB/{$_POST['RSTlistUuid']}/rules");					
+			}
+			if (!empty($listEmergingRulesDir)) {											
+				exec("/bin/cp -R /usr/local/etc/snort/snortDBrules/emerging_rules/rules/*.rules /usr/local/etc/snort/snortDBrules/DB/{$_POST['RSTlistUuid']}/rules");					
+			}								
+			if (!empty($listPfsenseRulesDir)) {											
+				exec("/bin/cp -R /usr/local/etc/snort/snortDBrules/pfsense_rules/rules/*.rules /usr/local/etc/snort/snortDBrules/DB/{$_POST['RSTlistUuid']}/rules");					
+			}			
+			
+			
+		}
+		
+	} if ( $_POST['RSTlistRow'] == 1 ) { RSTlistDelRowFunc(); }
+	
 	
 }
 

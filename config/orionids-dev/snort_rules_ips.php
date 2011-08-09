@@ -84,24 +84,7 @@ if (isset($_GET['rulefilename'])) {
 }
 
 
-function snortSearchArray($array, $key, $value)
-{
-	$results = array();
-	
-	if (is_array($array))
-	{
-		foreach ($array as $subarray)
-		{
-			if ($subarray[$key] == $value) {
-				$results = 	$subarray;				
-			}
-			
-		}
-	
-	}
-	
-	return $results;
-}
+
 
 // get default settings
 $listGenRules = array();
@@ -110,6 +93,18 @@ $listGenRules = snortSql_fetchAllSettings('snortDBrules', 'SnortruleGenIps', 'rd
 // get sigs in db
 $listSigRules = array();
 $listSigRules = snortSql_fetchAllSettings('snortDBrules', 'SnortruleSigsIps', 'rdbuuid', $rdbuuid);
+
+// if $listGenRules empty list defaults
+if (empty($listGenRules)) {
+	$listGenRules[0] = array(
+		'id' => 1,	
+		'rdbuuid' => $_POST['rdbuuid'],
+		'enable' => 'on',
+		'who' => 'src',
+		'timeamount' => 15,
+		'timetype' => 'minutes'			
+	);
+}
 
 	$pgtitle = "Services: Snort: Ruleset Ips:";
 	include("/usr/local/pkg/snort/snort_head.inc");
@@ -273,18 +268,6 @@ jQuery(document).ready(function() {
 	 */
 	function createSidTmpBlockSpit($rdbuuid, $rulefilename) 
 	{
-	
-		function getCurrentIpsRuleArray($output)
-		{
-			
-			foreach (array_unique($output) as $line)
-			{
-				$newOutput = explode(' # ', $line);
-				$newLine[] = $newOutput;
-			}
-			
-			return $newLine;	
-		}
 		
 		function getSidBlockJsonArray($getEnableSid)
 		{

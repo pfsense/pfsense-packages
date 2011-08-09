@@ -139,10 +139,10 @@ $a_rules = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'All', '');
 		<table width="100%" border="0px" cellpadding="0px" cellspacing="0px">
 		<!-- START MAIN AREA -->
 		
-		<table width="94%">				
+		<table width="100%">				
 			<tr > <!-- db to lookup -->
-				<td width="32%" class="listhdrr">File Name</td>
-				<td width="68%" class="listhdr">Description</td>
+				<td width="25%" class="listhdrr">File Name</td>
+				<td width="60%" class="listhdr">Description</td>
 			</tr>
 		</table>
 		
@@ -154,48 +154,77 @@ $a_rules = snortSql_fetchAllSettings('snortDBrules', 'Snortrules', 'All', '');
 
 
 		<tr id="maintable_default" data-options='{"pagetable":"Snortrules", "pagedb":"snortDBrules", "DoPOST":"true"}' >
-			<td class="listlr" width="32%" ondblclick="document.location='snort_interfaces_rules_edit.php?rdbuuid=default'">Default</td>
-			<td class="listbg" width="68%" ondblclick="document.location='snort_interfaces_rules_edit.php?rdbuuid=default'">
+			<td class="listlr" width="30%" ondblclick="document.location='snort_interfaces_rules_edit.php?rdbuuid=default'">Default</td>
+			<td class="listbg" width="63%" ondblclick="document.location='snort_interfaces_rules_edit.php?rdbuuid=default'">
 			<font color="#FFFFFF">Default rule database&nbsp;</font>
 			</td>
 			
 			<td valign="middle" nowrap class="list">
-			<table border="0" cellspacing="0" cellpadding="1">
+			<table border="0" cellspacing="0" cellpadding="2">			
+			<?php
+			/*
+			 * TODO: Must add snort process id to the rest disable block
+			 * Example: only disable reset when snort is running and database is selected
+			 */
+			if (in_array('default', $listUsedRules)) {
+				$resetObjectDf = '<img src="/themes/' . $g['theme'] . '/images/icons/icon_reinstall_d.gif" width="17" height="17" border="0" title="reset database" >';
+			}else{
+				$resetObjectDf = '<img id="icon_r_default" class="icon_click icon_r" src="/themes/' . $g['theme'] . '/images/icons/icon_reinstall.gif" width="17" height="17" border="0" title="reset database" >';
+			}		
+			
+			?>			
 				<tr>
 					<td valign="middle">
 					<a href="snort_interfaces_rules_edit.php?rdbuuid=default"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"width="17" height="17" border="0" title="edit database"></a>
 					</td>
 					<td>
+					<?=$resetObjectDf; ?>
+					</td>
+					<td>
 					<img src="/themes/<?= $g['theme']; ?>/images/icons/icon_x_d.gif" width="17" height="17" border="0" title="delete database" >
-					</td>					
+					</td>
+					</td>										
 				</tr>
 			</table>
 			</td>			
 		</tr>
-
 		
 		<?php foreach ($a_rules as $list): ?>
 		
 		<?php
+		/*
+		 * TODO: Must add snort process id to the rest disable block
+		 * Example: only disable reset when snort is running and database is selected
+		 */	
 		if (in_array($list['uuid'], $listUsedRules)) {
 			$deleteObject = '<img src="/themes/' . $g['theme'] . '/images/icons/icon_x_d.gif" width="17" height="17" border="0" title="delete database" >';
 		}else{
 			$deleteObject = '<img id="icon_x_' . $list['uuid'] . '" class="icon_click icon_x" src="/themes/' . $g['theme'] . '/images/icons/icon_x.gif" width="17" height="17" border="0" title="delete database" >';
 		}
+		
+		if (in_array($list['uuid'], $listUsedRules)) {
+			$resetObject = '<img src="/themes/' . $g['theme'] . '/images/icons/icon_reinstall_d.gif" width="17" height="17" border="0" title="reset database" >';
+		}else{
+			$resetObject = '<img id="icon_r_' . $list['uuid'] . '" class="icon_click icon_r" src="/themes/' . $g['theme'] . '/images/icons/icon_reinstall.gif" width="17" height="17" border="0" title="reset database" >';
+		}		
+		
 		?>
 		
 		<tr id="maintable_<?=$list['uuid']?>" data-options='{"pagetable":"Snortrules", "pagedb":"snortDBrules", "DoPOST":"true"}' >
-			<td class="listlr" width="32%" ondblclick="document.location='snort_interfaces_rules_edit.php?rdbuuid=<?=$list['uuid'];?>'"><?=$list['ruledbname'];?></td>
-			<td class="listbg" width="68%" ondblclick="document.location='snort_interfaces_rules_edit.php?rdbuuid=<?=$list['uuid'];?>'">
+			<td class="listlr" width="30%" ondblclick="document.location='snort_interfaces_rules_edit.php?rdbuuid=<?=$list['uuid'];?>'"><?=$list['ruledbname'];?></td>
+			<td class="listbg" width="63%" ondblclick="document.location='snort_interfaces_rules_edit.php?rdbuuid=<?=$list['uuid'];?>'">
 			<font color="#FFFFFF"> <?=htmlspecialchars($list['description']);?>&nbsp;</font>
 			</td>
 			
 			<td valign="middle" nowrap class="list">
-			<table border="0" cellspacing="0" cellpadding="1">
+			<table border="0" cellspacing="0" cellpadding="2">
 				<tr>
 					<td valign="middle">
 					<a href="snort_interfaces_rules_edit.php?rdbuuid=<?=$list['uuid'];?>"><img src="/themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"width="17" height="17" border="0" title="edit database"></a>
 					</td>
+					<td>
+					<?=$resetObject; ?>
+					</td>					
 					<td>
 					<?=$deleteObject; ?>
 					</td>

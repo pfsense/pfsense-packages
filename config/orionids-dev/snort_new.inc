@@ -59,6 +59,38 @@ if (file_exists('/usr/local/pkg/snort/snortDBtemp')) {
 	exec('/bin/cp /usr/local/pkg/snort/snortDBtemp /var/snort/snortDBtemp');
 }
 
+// used in snort_rules_ips.php and create sid block map
+function snortSearchArray($array, $key, $value)
+{
+	$results = array();
+	
+	if (is_array($array))
+	{
+		foreach ($array as $subarray)
+		{
+			if ($subarray[$key] == $value) {
+				$results = 	$subarray;				
+			}
+			
+		}
+	
+	}
+	
+	return $results;
+}
+
+// used in snort_rules_ips.php and create sid block map
+function getCurrentIpsRuleArray($output)
+{
+	
+	foreach (array_unique($output) as $line)
+	{
+		$newOutput = explode(' # ', $line);
+		$newLine[] = $newOutput;
+	}
+	
+	return $newLine;	
+}
 
 /*
 * make dir for the new iface, if iface exists or rule dir has changed redo soft link
@@ -255,6 +287,7 @@ function split_rule_file($workingFile)
 // write rule file to disk
 function write_rule_file($content_changed, $received_file)
 {
+	
 	//read snort file with writing enabled
 	$filehandle = fopen($received_file, "w");
 
@@ -431,7 +464,7 @@ function snortSql_updateRulesSigsIps()
 		if ( empty($listGenRules[0]['enable']) || $listGenRules[0]['enable'] === 'off' ) {
 			
 			$listGenRulesEnable = 'off';
-		}
+		}	
 		
 		// TODO: inprove this foreach so we only interact with db once
 		foreach ($_POST['snortsam']['db'] as $singleSig) 
@@ -441,20 +474,20 @@ function snortSql_updateRulesSigsIps()
 				"SELECT id FROM {$_POST['dbTable']} WHERE siguuid = '{$singleSig['siguuid']}' and rdbuuid = '{$_POST['rdbuuid']}';
 			");			
 		    
-			$chktable = sqlite_fetch_all($resultid, SQLITE_ASSOC);
+			$chktable = sqlite_fetch_all($resultid, SQLITE_ASSOC);				
 			
 			// checkbox off catch
 			$singleSigEnable = $singleSig['enable'];
 			if ( empty($singleSig['enable']) ) {
 				
 				$singleSigEnable = 'off';
-			}
+			}			
 			
 			// only do this if something change from defauts settings, note: timeamount Not equal
 			$somthingChanged = FALSE;
 			if ( $singleSigEnable !== $listGenRulesEnable || $singleSig['who'] !== $listGenRules[0]['who'] || $singleSig['timeamount'] != $listGenRules[0]['timeamount'] || $singleSig['timetype'] !== $listGenRules[0]['timetype'] ) {
 				$somthingChanged = TRUE;
-			}
+			}			
 			
 			if ( empty($chktable) && $somthingChanged ) {
 				
@@ -463,10 +496,11 @@ function snortSql_updateRulesSigsIps()
 				$query_ck = sqlite_query($db, // @ supress warnings usonly in production
 				"INSERT INTO {$_POST['dbTable']} (date, uuid, rdbuuid, enable, siguuid, sigfilename, who, timeamount, timetype) VALUES ('{$addDate}', '{$rulesetUuid}', '{$_POST['rdbuuid']}', '{$singleSigEnable}', '{$singleSig['siguuid']}', '{$singleSig['sigfilename']}', '{$singleSig['who']}', '{$singleSig['timeamount']}', '{$singleSig['timetype']}');
 				");
-	
 					
-			}else{
-	
+			}
+
+			if ( !empty($chktable) && $somthingChanged ) {			
+			
 				$query_ck = sqlite_query($db, // @ supress warnings usonly in production
 				"UPDATE {$_POST['dbTable']} SET date ='{$addDate}', enable = '{$singleSigEnable}', who = '{$singleSig['who']}', timeamount = '{$singleSig['timeamount']}', timetype = '{$singleSig['timetype']}' WHERE rdbuuid = '{$_POST['rdbuuid']}' and sigfilename = '{$singleSig['sigfilename']}'; 
 				");	

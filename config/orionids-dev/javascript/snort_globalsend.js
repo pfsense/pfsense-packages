@@ -216,7 +216,8 @@ jQuery(document).ready(function() {
 
 // ------------------------------- START remove row element ---------------------------------------
   
-
+  
+  	// removes row and deletes db entries
 	function removeRow(){
 		jQuery("#maintable_" + window.RemoveRow_UUID).remove();
 	}
@@ -255,6 +256,35 @@ jQuery(document).ready(function() {
         }
         
     });
+    
+  	// resets db entries
+	function removeRow(){
+		jQuery("#maintable_" + window.RemoveRow_UUID).remove();
+	}
+	
+    jQuery(".icon_r").live('click', function(){
+        
+        var elem = getBaseElement(this.id); // this.id gets id of .icon_x
+
+        // window.RemoveRow_UUID = jQuery("#rowlist_" + elem.index).data("options").rowuuid;
+        window.RemoveRow_UUID = elem.index;        
+        window.RemoveRow_Table = jQuery("#maintable_" + window.RemoveRow_UUID).data("options").pagetable;
+        window.RemoveRow_DB = jQuery("#maintable_" + window.RemoveRow_UUID).data("options").pagedb;
+        window.RemoveRow_POST = jQuery("#maintable_" + window.RemoveRow_UUID).data("options").DoPOST;       
+        
+        // snort_interfaces_whitelist
+        if (window.RemoveRow_POST === 'true'){
+          if(confirm('Do you really want to reset this list ? (e.g. DB will reset, all saved settings will be lost!)')) {
+
+            jQuery("#maintable_" + window.RemoveRow_UUID).fadeOut("fast");
+            jQuery("#maintable_" + window.RemoveRow_UUID).fadeIn("fast");
+
+            jQuery(this).ajaxSubmit(optionsRSTlist); // call POST     
+            return false;
+          }
+        }
+        
+    });    
 
     
 	function RMlistDBDelCall(){
@@ -303,7 +333,17 @@ jQuery(document).ready(function() {
             type:          'POST',
             data:          { RMlistDelRow: '1', RMlistDB: RMlistDBDelCall, RMlistTable: RMlistTableDelCall, RMlistUuid: RMlistUuidDelCall },
             url:           './snort_json_post.php'
-        }; 
+        };
+  
+  // declare variable for DB reset
+  var optionsRSTlist = {
+            beforeSubmit:  showRequestRMlist,
+            dataType:      'json', 
+            success:       showResponseRMlist,
+            type:          'POST',
+            data:          { RSTlistRow: '1', RSTlistDB: RMlistDBDelCall, RSTlistTable: RMlistTableDelCall, RSTlistUuid: RMlistUuidDelCall },
+            url:           './snort_json_post.php'
+        };  
 
 
   // STOP remove row element

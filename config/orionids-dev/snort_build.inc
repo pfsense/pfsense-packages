@@ -43,6 +43,86 @@ if(isset($_POST['__csrf_magic'])) {
   unset($_POST['__csrf_magic']);
 }
 
+
+/*
+ * Builds sid-block.map for snortsam
+ * May have to break this down into smaller funcs so that there is no namespace conflick
+ */
+function buildSnortSamSidBlockMap($rdbuuid)
+{
+	
+	
+	function buildSidMap($rdbuuid)
+	{
+		// list rules in the default dir
+		$filterDirList = array();
+		$filterDirList = snortScanDirFilter('/usr/local/etc/snort/snortDBrules/DB/' . $rdbuuid . '/rules', '\.rules');
+		
+		// list rules in db that are on in a array
+		$listOnRules = array();
+		$listOnRules = snortSql_fetchAllSettings('snortDBrules', 'SnortRuleSetsIps', 'rdbuuid', $rdbuuid);
+		
+		// list rules in db that are on in a array
+		$listGenRules = array();
+		$listGenRules = snortSql_fetchAllSettings('snortDBrules', 'SnortruleGenIps', 'rdbuuid', $rdbuuid);
+		
+		// get sigs in db
+		$listSigRules = array();
+		$listSigRules = snortSql_fetchAllSettings('snortDBrules', 'SnortruleSigsIps', 'rdbuuid', $rdbuuid);	
+	
+		// clear tmp db
+		exec('rm /usr/local/etc/snort/snortDBrules/DB/' . $rdbuuid . '/dbBlockSplit/*.rules');	
+		
+		foreach ($listOnRules as $listRule)
+		{
+			if ( $listRule['enable'] === 'on' ) {
+				exec('cp /usr/local/etc/snort/snortDBrules/DB/' . $rdbuuid . '/rules/' . $listRule['rulesetname'] . ' /usr/local/etc/snort/snortDBrules/DB/' . $rdbuuid . '/dbBlockSplit/' . $listRule['rulesetname']);
+			}
+		}
+		
+		// get list of sids
+		exec('perl /usr/local/bin/make_snortsam_map.pl /usr/local/etc/snort/snortDBrules/DB/' . $rdbuuid . '/dbBlockSplit/', $getEnableSidArray);
+		
+		// make sidMapFile lines 1023: src, 15 min
+		// remember to chech is Gen enable is on
+		foreach ( getCurrentIpsRuleArray($getEnableSidArray) as $sidLineMap )
+		{
+			
+			$snortSigIpsExists = snortSearchArray($listSigRules, 'siguuid', $sidLineMap[0]);
+			
+			// if sig is in db use its settings else use default settings
+			if(!empty($snortSigIpsExists['siguuid'])) {
+		
+				$getSid = $snortSigIpsExists['siguuid'];
+				$getEnable = $snortSigIpsExists['enable'];
+				$getWho = $snortSigIpsExists['who'];
+				$getTimeamount = $snortSigIpsExists['timeamount'];
+				$getTimetype = $snortSigIpsExists['timetype'];
+				
+			}else{
+				
+				$getSid = $sidLineMap[0];
+				$getEnable = $listGenRules[0]['enable'];
+				$getWho = $listGenRules[0]['who'];
+				$getTimeamount = $listGenRules[0]['timeamount'];
+				$getTimetype = $listGenRules[0]['timetype'];									
+				
+			}
+			
+			
+			if ( $getEnable === 'on' ) {
+				$newMapFileLine[] = $getSid . ': ' . $getWho . ', ' . $getTimeamount . ' ' . $getTimetype . "\n"; 
+			}
+			
+		} // END forech
+		
+		return $newMapFileLine;	
+	} // END  buildSidMap Func
+	
+	write_rule_file(buildSidMap($rdbuuid), '/usr/local/etc/snort/snortDBrules/DB/' . $rdbuuid . '/sid-block.map');
+	
+} // END Func buildSnortSidBlockMap
+
 // -------------------------- START snort.conf -------------------------
 
 /* func builds custom whitelests */
@@ -264,7 +344,7 @@ function generate_snort_conf($uuid)
 	// define snortsam
 	$snortsam_info_chk = $ifaceSettingsArray['blockoffenders7'];
 	if ($snortsam_info_chk === 'on') {
-		$snortsam_type = "output alert_fwsam: 127.0.0.1:898/addpasshere";
+		$snortsam_type = "output alert_fwsam: 127.0.0.1:786/snortsam1234";
 	}else{
 		$snortsam_type = '';
 	}
@@ -834,14 +914,14 @@ EOD;
 	if (empty($def_max_queued_bytes_info_chk)) {
 		$def_max_queued_bytes_type = '';
 	}else{
-		$def_max_queued_bytes_type = ' max_queued_bytes ' . $config['installedpackages']['snortglobal']['rule'][$id]['max_queued_bytes'] . ',';
+		$def_max_queued_bytes_type = ' max_queued_bytes ' . $ifaceSettingsArray['max_queued_bytes'] . ',';
 	}
 
 	$def_max_queued_segs_info_chk = $ifaceSettingsArray['max_queued_segs'];
 	if (empty($def_max_queued_segs_info_chk)) {
 		$def_max_queued_segs_type = '';
 	}else{
-		$def_max_queued_segs_type = ' max_queued_segs ' . $config['installedpackages']['snortglobal']['rule'][$id]['max_queued_segs'] . ',';
+		$def_max_queued_segs_type = ' max_queued_segs ' . $ifaceSettingsArray['max_queued_segs'] . ',';
 	}
 
 
