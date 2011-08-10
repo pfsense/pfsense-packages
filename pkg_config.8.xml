@@ -995,6 +995,17 @@
 		<website>http://doc.pfsense.org/index.php/BlinkLED_Package</website>
 	</package>
 	<package>
+		<name>gwled</name>
+		<descr>Allows you to use LEDs for gateway status on supported platforms (ALIX, WRAP, Soekris, etc)</descr>
+		<category>System</category>
+		<version>0.1</version>
+		<status>Beta</status>
+		<maintainer>jimp@pfsense.org</maintainer>
+		<required_version>2.0</required_version>
+		<config_file>http://www.pfsense.org/packages/config/gwled/gwled.xml</config_file>
+		<configurationfile>gwled.xml</configurationfile>
+	</package>
+	<package>
 		<name>Dashboard Widget: Snort</name>
 		<descr>Dashboard widget for Snort.</descr>
 		<category>System</category>
