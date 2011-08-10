@@ -22,8 +22,10 @@ function gwled_start() {
 		return;
 
 	if (($gwled_config['enable_led2']) && ($gwled_config['gw_led2'])
-	|| ($gwled_config['enable_led3']) && ($gwled_config['gw_led3']))
+	|| ($gwled_config['enable_led3']) && ($gwled_config['gw_led3'])) {
 		mwexec("/usr/local/bin/minicron 30 /var/run/gwled.pid /usr/local/bin/gwled.php");
+		mwexec_bg("/usr/local/bin/gwled.php");
+	}
 }
 
 function gwled_stop() {
