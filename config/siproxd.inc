@@ -84,9 +84,6 @@ function siproxd_generate_rules($type) {
 			}
 		}
 		break;
-	default:
-		log_error("Siproxd.inc -- error -- should not hit default case statement.");
-		break;
 	}
 
 	return $rules;
