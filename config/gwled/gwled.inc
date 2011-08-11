@@ -21,9 +21,12 @@ function gwled_start() {
 	if (!($gwled_config['enable']))
 		return;
 
+	// How often to run the check, in seconds.
+	$interval = 15;
+
 	if (($gwled_config['enable_led2']) && ($gwled_config['gw_led2'])
 	|| ($gwled_config['enable_led3']) && ($gwled_config['gw_led3'])) {
-		mwexec("/usr/local/bin/minicron 30 /var/run/gwled.pid /usr/local/bin/gwled.php");
+		mwexec("/usr/local/bin/minicron {$interval} /var/run/gwled.pid /usr/local/bin/gwled.php");
 		mwexec_bg("/usr/local/bin/gwled.php");
 	}
 }
@@ -66,7 +69,7 @@ function gwled_set_status($gateway, $led) {
 		elseif ($status == "none")
 			led_on($led);
 	} else
-		led_on($led);
+		led_blink($led, "veryfast");
 }
 
 ?>
