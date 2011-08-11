@@ -8,6 +8,7 @@ function gwled_running () {
 function sync_package_gwled() {
 	global $config;
 	$gwled_config = $config['installedpackages']['gwled']['config'][0];
+	led_normalize();
 	/* kill all instances of gwled */
 	if(gwled_running()) {
 		gwled_stop();
