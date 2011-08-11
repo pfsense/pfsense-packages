@@ -33,8 +33,7 @@
 			<type>checkbox</type>
 			<enablefields>enable_led2,enable_led3,gw_led2,gw_led3</enablefields>
 			<description>if this is enabled, it will use LED #2 and #3 to 
-				indicate network activity. Be aware, however, that this will 
-				possibly consume some system resources in the process.</description>
+				indicate gateway status with a peridic poll.</description>
 		</field>			
 		<field>
 			<fielddescr>Enable LED #2</fielddescr>
