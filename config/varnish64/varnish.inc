@@ -42,6 +42,13 @@ function varnish_settings_post_validate($post, $input_errors) {
 		$input_errors[] = "A valid number is required for the field 'Maximum worker threads'";	
 	if($post['timeoutworkers'] && !is_numeric($post['timeoutworkers'])) 
 		$input_errors[] = "A valid number is required for the field 'Worker thread timeout'";
+	if($post['managment'] && !preg_match("/^\w+:\d+$/",$post['managment'])) 
+		$input_errors[] = "A valid host/ip:port is required for the field 'managment'";
+	if($post['grace'] &&  ! preg_match("/^\d+(h|m|s)$/",$post['grace']))
+		$input_errors[] = "A valid number with a time reference is required for the field 'Fetch grace'";
+	if($post['saint'] &&  ! preg_match("/^\d+(h|m|s)$/",$post['saint']))
+		$input_errors[] = "A valid number with a time reference is required for the field 'Saint mode'";
+		
 }
 
 function varnish_lb_directors_post_validate($post, $input_errors) {
@@ -49,10 +56,12 @@ function varnish_lb_directors_post_validate($post, $input_errors) {
 		$input_errors[] = "The directorname name must only contain the characters a-Z or 0-9";
 	if(stristr($post['directorurl'], 'http'))
 		$input_errors[] = "You do not need to include the http:// string in the director URL";
+	if($post['grace'] && ! preg_match("/^\d+(h|m|s)$/",$post['grace']))
+		$input_errors[] = "A valid number with a time reference is required for the field 'Req grace'";
 }
 
 function varnish_backends_post_validate($post, $input_errors) {
- 	if (preg_match("/[^a-zA-Z0-9]/", $post['backendname']))
+ 	if (!$post['backendname'] || preg_match("/[^a-zA-Z0-9]/", $post['backendname']))
 		$input_errors[] = "The backend name must only contain the characters a-Z or 0-9";
 	if(!is_ipaddr($post['ipaddress'])) 
 		$input_errors[] = "A valid IP address is required for the field 'IPAddress'";
@@ -70,6 +79,15 @@ function varnish_backends_post_validate($post, $input_errors) {
 		$input_errors[] = "A valid number is required for the field 'probe window'";
 	if($post['probe_threshold'] && !is_numeric($post['probe_threshold'])) 
 		$input_errors[] = "A valid number is required for the field 'probe threshold'";
+	$x=0;
+	while ($post['maptype'.$x] != ""){
+	if($post['grace'.$x] && ! preg_match("/^\d+(h|m|s)$/",$post['grace'.$x])){
+		$input_errors[] = "A valid number with a time reference is required for the field 'grace' in map ".($x +1);
+		}
+		$x++;
+		
+}
+
 }
 
 function varnish_install() {
@@ -80,53 +98,79 @@ function varnish_deinstall() {
 	create_varnish_rcd_file();
 }
 
+function text_area_decode($text){
+	return preg_replace('/\r\n/', "\n",base64_decode($text));	
+}
 function varnish_start() {
 	global $g, $config;
-	if ($config['installedpackages']['varnishsettings']['config'][0]['enablevarnish'])
-		mwexec("/usr/local/etc/rc.d/varnish.sh");
-	else
-		mwexec("/usr/bin/killall varnishd");
+	if ($config['installedpackages']['varnishsettings']['config'][0]['enablevarnish']){
+		mwexec("/usr/local/etc/rc.d/varnish.sh");}
+	else{
+		mwexec("/usr/bin/killall varnishd");}
 }
 
 /* Build the URL mappings logic VCL config txt */
 function varnish_get_url_mappings_txt() {
-	global $g, $config, $urlmappings;
-	$backends = "";
+	global $g, $config, $urlmappings,$backends_in_use;
+	$catch_all= "unset";
 	$isfirst = true;
 	if($config['installedpackages']['varnishlbdirectors']['config'] != "") {
   		foreach($config['installedpackages']['varnishlbdirectors']['config'] as $url) {
+  			#check options
+  			$directo_grace_time=($url['grace']?"\n\t\tset req.grace=".$url['grace'].";":"");
+  			$fieldtype = ($url['fieldtype']?$url['fieldtype']:"==");
+  			$req=($url['directorurl2']?"url":"http.host");
+			$director_prefix=($url['directorurl'] && $url['directorurl2']?"^http://":"");
+  			if ( $url['directorurl'] || $url['directorurl2'] || $catch_all == "unset"){
+			if($url['directorurl']== "" && $url['directorurl2']== ""){
+				#director with no host or url, so director for catch all traffic not specified in config
+				$lasturlmappings = "\n\telse{\n\t\tset req.backend = ".$url['directorname'].";\n\t\t}\n";
+				$catch_all = "set";
+				}
+			else{
 			if(!$isfirst) 
-				$urlmappings .= "else ";
+				$urlmappings .= "\telse ";
 			$urlmappings .= <<<EOAU
-if (req.http.host == "{$url['directorurl']}") {
-		set req.backend = {$url['directorname']};
-		set req.http.host = "{$url['directorurl']}";
-	} 
+if (req.{$req} {$fieldtype} "{$director_prefix}{$url['directorurl']}{$url['directorurl2']}") { 
+		set req.backend = {$url['directorname']};{$directo_grace_time}
+		}
+
 EOAU;
+#set req.http.host = "{$url['directorurl']}";
+			}
 			$isfirst = false;
+			}
 		}
 	}
 	if($config['installedpackages']['varnishbackends']['config'])	 		
 		foreach($config['installedpackages']['varnishbackends']['config'] as $urlmapping) {
 			if($urlmapping['row'])
 				foreach($urlmapping['row'] as $url) {
-					if($url['fieldtype']) 
-						$fieldtype = $url['fieldtype'];
-					else 
-						$fieldtype = "==";
-					if(!$isfirst) 
-						$urlmappings .= "else ";
-					$urlmappings .= <<<EOAU
-if (req.http.host {$fieldtype} "{$url['urlmapping']}") {
-		set req.backend = {$urlmapping['backendname']}BACKEND;
-		set req.http.host = "{$url['urlmapping']}";
+					$directo_grace_time=($url['grace']?"\n\t\tset req.grace=".$url['grace'].";":"");
+					$req=($url['maptype']?$url['maptype']:"http.host");
+					$fieldtype=($url['fieldtype']?$url['fieldtype']:"==");
+						if ($url['urlmapping'] != "" || $catch_all == 'unset'){
+							if($url['urlmapping'] == ""){
+							$catch_all = "set";
+							$lasturlmappings = "\n\telse{\n\t\tset req.backend = ".$urlmapping['backendname']."BACKEND;\n\t\t}\n";
+							}
+							else{
+							if(!$isfirst) 
+							$urlmappings .= "\telse ";
+							$urlmappings .= <<<EOAU
+if (req.{$req} {$fieldtype} "{$url['urlmapping']}") {
+		set req.backend = {$urlmapping['backendname']}BACKEND;{$directo_grace_time}
 	} 
+	
 EOAU;
-					$isfirst = false;
+							}
+							$backends_in_use[$urlmapping['backendname']].=($url['directorurl'] == ""?"catch_all ":"url_map ");
+							$isfirst = false;
+							}
 		}
 	}
 	
-	return $urlmappings;
+	return $urlmappings.$lasturlmappings;
 }
 
 function create_varnish_rcd_file() {
@@ -142,9 +186,11 @@ function create_varnish_rcd_file() {
 			else 
 				$listeningport = "-a :80";
 			if($vs['managment'])
-				$managment = "-T {$vs['managment']}";
+				$advancedstartup = "-T {$vs['managment']} ";
 			else 
-				$managment = "";
+				$advancedstartup = "";
+			if($vs['advancedstartup'])
+				$advancedstartup .= text_area_decode($vs['advancedstartup'])."\n";
 			if($vs['minworkers'])
 				$minworkers = "{$vs['minworkers']}";
 			else 
@@ -187,16 +233,17 @@ ENDOFF
 	-f /var/etc/default.vcl \
 	{$storage_type} \
 	-w {$minworkers},{$maxworkers},{$timeoutworkers} \
-	{$managment} 
+	{$advancedstartup} 
 
 EOF;
+
 	fwrite($fd, $rc_file);
 	fclose($fd);
 	exec("chmod a+rx /usr/local/etc/rc.d/varnish.sh");
 }
 
 function get_backend_config_txt() {
-	global $config, $g;
+	global $config, $g, $backends_in_use;
 	$backends="";
 	if($config['installedpackages']['varnishbackends']['config'] != "") {
     	foreach($config['installedpackages']['varnishbackends']['config'] as $backend) {
@@ -216,6 +263,8 @@ function get_backend_config_txt() {
 				if (preg_match("@^(http)://(.*)(/.*|/)$@",$backend['probe_url'],$matches)){
 					$probe_url=".request =\n";
 					$probe_url.="\t\t\t".'"GET '.$matches[3].' HTTP/1.1"'."\n";
+                                        $probe_url.="\t\t\t".'"Accept: text/*"'."\n";
+                                        $probe_url.="\t\t\t".'"User-Agent: Varnish"'."\n";
 					$probe_url.="\t\t\t".'"Host: '.$matches[2].'"'."\n";
 					$probe_url.="\t\t\t".'"Connection: Close";';
 				}
@@ -241,9 +290,12 @@ function get_backend_config_txt() {
 			else 
 				$probe_threshold = "5";
 			if (isset($probe_threshold)){
-				#last parameter set ,so write conf
+				#last parameter set ,so write conf if backend is in use
+				if ($backends_in_use[$backend['backendname']] != ""){
 				$backends .= <<<EOFA
+
 backend {$backend['backendname']}BACKEND {
+	# used in {$backends_in_use[$backend['backendname']]}
 	.host = "{$backend['ipaddress']}";
 	.port = "{$backend['port']}";
 	.first_byte_timeout = {$first_byte_timeout};
@@ -259,14 +311,19 @@ backend {$backend['backendname']}BACKEND {
 
 
 EOFA;
+				}
+				else {
+				 $backends .= "\n".'# backend '.$backend['backendname']." not in use.\n";	
+				}
 			}
-		}
+    	}
 	}
 	return $backends;
 }
 
 function get_lb_directors_config_txt() {
-	global $config, $g;
+	global $config, $g, $backends_in_use;
+	$backends="";
 	if($config['installedpackages']['varnishlbdirectors']['config'] != "") {
     	foreach($config['installedpackages']['varnishlbdirectors']['config'] as $backend) {
 			$director = "";
@@ -279,6 +336,7 @@ function get_lb_directors_config_txt() {
 						$weight = "\t\t.weight = 100;\n";
 				
 			$director .=  "\t{\n\t\t.backend = {$be['backendname']}BACKEND;\n{$weight}\t}";
+			$backends_in_use[$be['backendname']].= $backend['directorname']." ";
 			}
 			$backends .= <<<EOFA
 director {$backend['directorname']} {$backend['directortype']} {
@@ -299,17 +357,17 @@ function sync_package_varnish() {
 	if($config['installedpackages']['varnishcustomvcl']['config'] != "") {
 		foreach($config['installedpackages']['varnishcustomvcl']['config'] as $vcl) {
 			if($vcl['vcl_recv_early']) 
-				$vcl_recv_early = base64_decode($vcl['vcl_recv_early']);
+				$vcl_recv_early = text_area_decode($vcl['vcl_recv_early']);
 			if($vcl['vcl_recv_late']) 
-				$vcl_recv_late = base64_decode($vcl['vcl_recv_late']);
+				$vcl_recv_late = text_area_decode($vcl['vcl_recv_late']);
 			if($vcl['vcl_fetch_early']) 
-				$vcl_fetch_early = base64_decode($vcl['vcl_fetch_early']);
+				$vcl_fetch_early = text_area_decode($vcl['vcl_fetch_early']);
 			if($vcl['vcl_fetch_late']) 
-				$vcl_fetch_late = base64_decode($vcl['vcl_fetch_late']);
+				$vcl_fetch_late = text_area_decode($vcl['vcl_fetch_late']);
 			if($vcl['vcl_pipe_early']) 
-				$vcl_pipe_early = base64_decode($vcl['vcl_pipe_early']);
+				$vcl_pipe_early = text_area_decode($vcl['vcl_pipe_early']);
 			if($vcl['vcl_pipe_late']) 
-				$vcl_pipe_late = base64_decode($vcl['vcl_pipe_late']);
+				$vcl_pipe_late = text_area_decode($vcl['vcl_pipe_late']);
 		}
 	}
 		$vcl_recv_basic='#BASIC VCL RULES'."\n";
@@ -340,6 +398,18 @@ function sync_package_varnish() {
                                 $vcl_recv_basic.="\t".'if (req.request != "GET" && req.request != "HEAD" && req.request != "PUT" && req.request != "POST" &&'."\n";
                                 $vcl_recv_basic.="\t".'    req.request != "TRACE" && req.request != "OPTIONS" && req.request != "DELETE") {return(pipe);}'."\n\n";
                                 }
+                        else	{
+                        		$vcl_recv_basic.="\t".'if (req.request != "GET" && req.request != "HEAD") {return(pipe);}'."\n";
+	                        	}
+                        if($vcl['restarts']){
+                        		$vcl_restarts=$vcl['restarts'];
+                        }
+                        if($vcl['grace'] ){
+                        		$vcl_grace_time="set beresp.grace = ".$vcl['grace'].";";
+                        		}
+						if($vcl['saint'] ){
+                        		$vcl_saint_mode="set beresp.saintmode = ".$vcl['saint'].";";
+                        		}	
 						if($vcl['xforward']){
                                 $vcl_recv_basic.="\t#set X-forward\n";
                                 switch ($vcl['xforward']){
@@ -372,18 +442,13 @@ function sync_package_varnish() {
                                         break;
                                         }
                                 }
-                        if($vcl['htmlerror'] && !$errorvcl){
-                                $errorvcl=base64_decode($vcl['htmlerror']);
+                        if($vcl['htmlerror']){
+                                $errorvcl=text_area_decode($vcl['htmlerror']);
                                 }
 		}
 
 	if(!$errorvcl) 
 		$errorvcl = <<<EOF
-set obj.http.Content-Type = "text/html; charset=utf-8";
-synthetic {"
-<?xml version="1.0" encoding="utf-8"?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
 <title>"} obj.status " " obj.response {"</title>
@@ -397,29 +462,18 @@ synthetic {"
 <p>"} obj.response {"</p>
 <h3>Guru Meditation:</h3>
 <p>XID: "} req.xid {"</p>
-
 </body>
 </html>
-"};
-return(deliver);
-
 EOF;
 
-if($vcl_fetch_early or $vcl_fetch_late) {
-	$vcl_fetch = <<<FETCH
-sub vcl_fetch {
-	{$vcl_fetch_early}
-	{$vcl_fetch_late}
-	return(deliver);
-}
-
-FETCH;
-}
-
 /* Grab configuration txt blocks */
+/* Please keep this sequence to determine witch backends are in use */
+$backends_in_use=array();
+$lb_config= get_lb_directors_config_txt();
 $urlmappings = varnish_get_url_mappings_txt();
-$backends = get_backend_config_txt();
-$backends .= get_lb_directors_config_txt();
+$backends = get_backend_config_txt() . $lb_config ;
+#$backends .= get_lb_directors_config_txt();
+
 
 /* Start to build varnish default.vcl configurationf file */
 $varnish_config_file = <<<EOF
@@ -429,19 +483,26 @@ $varnish_config_file = <<<EOF
 # This file is located in /var/etc/default.vcl
 
 sub vcl_error {
-	{$errorvcl}
+		if (obj.status == 503 && req.restarts < {$vcl_restarts}) {
+			restart;
+		}
+	
+	set obj.http.Content-Type = "text/html; charset=utf-8";
+	synthetic {"<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+{$errorvcl}"};
+	return(deliver);
+	
 }
-
+        
 {$backends}
 
 sub vcl_recv {
 	{$vcl_recv_early}
-	{$vcl_recv_basic}
 	{$urlmappings}
 	{$vcl_recv_late}
-	if (req.request != "GET" && req.request != "HEAD") {
-		return(pipe);
-	}
+	{$vcl_recv_basic}
 	return(lookup);
 }
 
@@ -457,8 +518,21 @@ sub vcl_pipe {
 	{$vcl_pipe_late}
 }
 
-{$vcl_fetch}
-
+sub vcl_fetch {
+	{$vcl_fetch_early}
+    ## If the request to the backend returns a code other than 200, restart the loop
+    ## If the number of restarts reaches the value of the parameter max_restarts,
+    ## the request will be error'ed.  max_restarts defaults to 4.  This prevents
+    ## an eternal loop in the event that, e.g., the object does not exist at all.
+    if (beresp.status != 200 && beresp.status != 403 && beresp.status != 404 && beresp.status != 302 && beresp.status != 301) {
+		{$vcl_saint_mode}
+    	restart;
+        }
+	{$vcl_fetch_late}
+	{$vcl_grace_time}
+	return(deliver);
+}
+	
 EOF;
 
 		$fd = fopen("/var/etc/default.vcl", "w");
