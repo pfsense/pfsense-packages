@@ -119,6 +119,7 @@ function unbound_rc_setup() {
 	require_once(\"/usr/local/pkg/unbound.inc\");
 	echo \"Starting and configuring Unbound...\";
 	fetch_root_hints();
+	unbound_control(\"anchor_update\");
 	unbound_control(\"start\");
 	unbound_control(\"forward\");
 	unbound_control(\"restore_cache\");
@@ -225,7 +226,10 @@ function unbound_control($action) {
 						unbound_ctl_exec("load_cache < /var/tmp/unbound_cache");
 				}
 				break;
-		
+		case "anchor_update":
+				//Update the Root Trust Anchor
+				mwexec("/usr/local/sbin/unbound-anchor -a /usr/local/etc/unbound/root-trust-anchor", true);
+				break;
 		default:
 				break;
 				
@@ -280,6 +284,11 @@ function unbound_get_network_interface_addresses() {
 			$unbound_interfaces[$i]['ipv6']['subnet'] = $interfaces[$unboundif]['subnetv6'];
 			$unbound_interfaces[$i]['ipv6']['network'] = gen_subnetv6($unbound_interfaces[$i]['ipv6']['ipaddr'], $unbound_interfaces[$i]['ipv6']['subnet']);
 		}
+		/* Lastly check for loopback addresses*/
+		if($unboundif == "lo0") {
+			$unbound_interfaces[$i]['loopback']['ipaddr'] = "127.0.0.1";
+			$unbound_interfaces[$i]['loopback6']['ipaddr'] = "::1";
+		}
 		$i++;
 	}
 	return $unbound_interfaces;
@@ -319,7 +328,8 @@ function unbound_resync_config() {
 	foreach($unboundnetcfg as $netent) {
 		foreach($netent as $entry) {
 			$unbound_bind_interfaces .="interface: {$entry['ipaddr']}\n";
-			$unbound_allowed_networks .= "access-control: {$entry['network']}/{$entry['subnet']} allow\n";
+			if($entry['ipaddr'] != "127.0.0.1" && $entry['ipaddr'] != "::1" )
+				$unbound_allowed_networks .= "access-control: {$entry['network']}/{$entry['subnet']} allow\n";
 		}
 	}
 	/* Configure user configured ACLs */
@@ -454,6 +464,7 @@ harden-dnssec-stripped: {$harden_dnssec_stripped}
 #### Access Control ####
 # Local attached networks allowed to utilize service and any user added ACLs
 access-control: 127.0.0.0/8 allow
+access-control: ::1 allow
 {$unbound_allowed_networks}
 {$pvt_addr}
 {$private_domains}
@@ -482,6 +493,7 @@ if(!empty($unbound_config['custom_options'])) {
 remote-control:
 control-enable: yes
 control-interface: 127.0.0.1
+control-interface: ::1
 control-port: 953
 server-key-file: "/usr/local/etc/unbound/unbound_server.key"
 server-cert-file: "/usr/local/etc/unbound/unbound_server.pem"
