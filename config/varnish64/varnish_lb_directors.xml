@@ -41,7 +41,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>varnishlbdirectors</name>
-	<version>0.0.2</version>
+	<version>0.0.4</version>
 	<title>Varnish: Backends</title>
 	<include_file>/usr/local/pkg/varnish.inc</include_file>
    	<additional_files_needed>
@@ -102,12 +102,21 @@
 			<fieldname>directorname</fieldname>
 		</columnitem>	
 		<columnitem>
-			<fielddescr>URL</fielddescr>
+			<fielddescr>HOST</fielddescr>
 			<fieldname>directorurl</fieldname>
 		</columnitem>
 		<columnitem>
+			<fielddescr>URL</fielddescr>
+			<fieldname>directorurl2</fieldname>
+		</columnitem>
+		
+		<columnitem>
 			<fielddescr>Type</fielddescr>
 			<fieldname>directortype</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Grace</fielddescr>
+			<fieldname>grace</fieldname>
 		</columnitem>		
 	</adddeleteeditpagefields>
 	<fields>
@@ -118,21 +127,52 @@
 			<size>40</size>
 		</field>
 		<field>
-			<fielddescr>URL</fielddescr>
+		<fielddescr>Match type</fielddescr>
+				    <fieldname>fieldtype</fieldname>
+				    <description>Select the field type that you would like to use in matching the HOST/URL.</description>
+					<type>select</type>
+					<options>
+						<option>
+							<name>Equals</name>
+							<value>==</value>
+						</option>
+						<option>
+							<name>Regex</name>
+							<value>~</value>
+						</option>
+			</options>
+			</field>
+		<field>
+			<fielddescr>Host</fielddescr>
 			<fieldname>directorurl</fieldname>
+			<description>Hint www.mysite.com</description>
 			<type>input</type>
 			<size>40</size>
 		</field>
 		<field>
-			<fielddescr>Type</fielddescr>
+			<fielddescr>URL</fielddescr>
+			<fieldname>directorurl2</fieldname>
+			<description>Hint /images</description>
+			<type>input</type>
+			<size>40</size>
+		</field>
+		<field>
+			<fielddescr>Req Grace</fielddescr>
+			<fieldname>grace</fieldname>
+			<description><![CDATA[<a href="https://www.varnish-cache.org/trac/wiki/VCLExampleGrace">How many time varnish will keep cached objects for this director.</a> HINT 60s, 30m, 1h]]></description>
+	    	<type>input</type>
+	    	<size>5</size>
+ 		</field>
+		<field>
+			<fielddescr>Algorithms</fielddescr>
 			<fieldname>directortype</fieldname>
+			<description><![CDATA[<a href="https://www.varnish-cache.org/docs/2.1/reference/vcl.html#the-client-director">Choose how varnish will balance clientes.</a>]]></description>
 			<type>select</type>
 			<options>
 				<option><name>Round-robin</name><value>round-robin</value></option>
 				<option><name>Random</name><value>random</value></option>
 				<option><name>Client</name><value>client</value></option>
 				<option><name>Hash</name><value>hash</value></option>
-
 			</options>
 		</field>
 		<field>
