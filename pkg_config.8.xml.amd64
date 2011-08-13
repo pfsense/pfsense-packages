@@ -619,7 +619,7 @@
 	</package>
 	<package>
 		<name>imspector</name>
-		<descr>Work in progress package, incompatible with the 0.8 IMSpector package, do not install if the imspector package is installed - IMSpector is an Instant Messenger transparent proxy with logging capabilities. Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees.</descr>
+		<descr>IMSpector is an Instant Messenger transparent proxy with logging capabilities. Currently it supports MSN, AIM, ICQ, Yahoo and IRC to different degrees.</descr>
 		<website>http://www.imspector.org/</website>
 		<category>Network Management</category>
 		<maintainer>billm@pfsense.org</maintainer>
