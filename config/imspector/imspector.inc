@@ -2,7 +2,8 @@
 /*
 	imspector.inc
 	part of pfSense (http://www.pfsense.com/)
-
+	Copyright (C) 2011 Scott Ullrich <sullrich@gmail.com>.
+	Copyright (C) 2011 Bill Marquette <billm@gmail.com>.
 	Copyright (C) 2007 Ryan Wagoner <rswagoner@gmail.com>.
 	All rights reserved.
 
@@ -72,6 +73,12 @@
 	function imspector_proto_to_port ($proto)
 	{
 		switch ($proto) {
+			case 'gadu-gadu':
+				return 8074;
+			case 'jabber':
+				return 5222;
+			case 'jabber-ssl':
+				return 5223;
 			case 'msn':
 				return 1863;
 			case 'icq':
@@ -219,6 +226,65 @@
 					write_imspector_config(IMSPECTOR_ETC . '/acl_blacklist.txt', 
 						str_replace("\r", '', base64_decode($imspector_config["acl_blacklist"])));
 				}
+				
+				// Handle Jabber SSL options
+				if(isset($imspector_config["ssl_ca_cert"]) && $imspector_config["ssl_ca_cert"] != "none" &&
+				   isset($imspector_config["ssl_server_cert"]) && $imspector_config["ssl_server_cert"] != "none") {
+					$conf['ssl'] = "on";
+					if(!is_dir(IMSPECTOR_ETC . "/ssl"))	
+						mkdir(IMSPECTOR_ETC . "/ssl");
+						
+					$ca_cert = lookup_ca($imspector_config["ssl_ca_cert"]);
+					if ($ca_cert != false) {
+						if(base64_decode($ca_cert['prv'])) {
+							file_put_contents(IMSPECTOR_ETC . "/ssl/ssl_ca_key.pem", 
+								base64_decode($ca_cert['prv']));
+							$conf['ssl_ca_key'] = IMSPECTOR_ETC . '/ssl/ssl_ca_key.pem';
+						}
+						if(base64_decode($ca_cert['crt'])) {
+							file_put_contents(IMSPECTOR_ETC . "/ssl/ssl_ca_cert.pem", 
+								base64_decode($ca_cert['crt']));
+							$conf['ssl_ca_cert'] = IMSPECTOR_ETC . "/ssl/ssl_ca_cert.pem";
+						}
+						$svr_cert = lookup_cert($imspector_config["ssl_server_cert"]);
+						if ($svr_cert != false) {
+							if(base64_decode($svr_cert['prv'])) {
+								file_put_contents(IMSPECTOR_ETC . "/ssl/ssl_server_key.pem", 
+									base64_decode($svr_cert['prv']));
+								$conf['ssl_key'] = IMSPECTOR_ETC . '/ssl/ssl_server_key.pem';
+							}
+							
+						}
+						$conf['ssl_cert_dir'] = IMSPECTOR_ETC . '/ssl';
+					}
+				} else {
+					// SSL Not enabled.  Make sure Jabber-SSL is not processed.
+					unset($conf['jabber-ssl']);
+					unset($conf['ssl']);
+				}
+
+				if (isset($imspector_config['resonder']) && $imspector_config['resonder'] == 'on') {
+					$conf['responder_filename'] = IMSPECTOR_ETC . "/responder.db";
+					if (isset($imspector_config['prefix_message']) && $imspector_config['prefix_message'] != '' ) {
+						$conf['response_prefix'] = base64_decode($imspector_config['prefix_message']) . " -=";
+					}
+					if (isset($imspector_config['notice_days']) && is_numeric($imspector_config['notice_days'])) {
+						if ($imspector_config['notice_days'] != 0) {
+							$conf['notice_days'] = $imspector_config['notice_days'];
+						}
+					} else {
+							$conf['notice_days'] = 1;
+					}
+					$conf['notice_response'] = "Your activities are being logged";
+					if (isset($imspector_config['filtered_minutes']) && is_numeric($imspector_config['filtered_minutes'])) {
+						if ($imspector_config['filtered_minutes'] != 0) {
+							$conf['filtered_mins'] = $imspector_config['filtered_minutes'];
+						}
+					} else {
+							$conf['filtered_mins'] = 15;
+					}
+					$conf['filtered_response'] = "Your message has been filtered";
+				}
 
 				$conftext = '';
 				foreach($conf as $var => $key)
@@ -282,5 +348,27 @@ EOD;
 		}	
 
 		config_unlock();		
+	}
+
+	function imspector_get_ca_certs() {
+		global $config;
+
+		$ca_arr = array();
+		$ca_arr[] = array('refid' => 'none', 'descr' => 'none');
+		foreach ($config['ca'] as $ca) {
+			$ca_arr[] = array('refid' => $ca['refid'], 'descr' => $ca['descr']);
+		}
+		return $ca_arr;
+	}
+
+	function imspector_get_server_certs() {
+		global $config;
+		$cert_arr = array();
+		$cert_arr[] = array('refid' => 'none', 'descr' => 'none');
+		
+		foreach ($config['cert'] as $cert) {
+			$cert_arr[] = array('refid' => $cert['refid'], 'descr' => $cert['descr']);
+		}
+		return $cert_arr;
 	}
 ?>
