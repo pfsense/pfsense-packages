@@ -767,7 +767,10 @@ function unbound_add_host_entries() {
 			$current_host = $host['host'];
 			if(!$added_item[$current_host]) {
 				$host_entries .= "local-data-ptr: \"{$host['ip']} {$host['host']}.{$host['domain']}\"\n";
-				$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} IN A {$host['ip']}\"\n";
+				if (is_ipaddrv6($host['ip']))
+					$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} IN AAAA {$host['ip']}\"\n";
+				else
+					$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} IN A {$host['ip']}\"\n";
 				if (!empty($host['descr']) && $unboundcfg['txtsupport'] == 'on')
 					$host_entries .= "local-data: '{$host['host']}.{$host['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
 					
