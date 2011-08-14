@@ -493,7 +493,6 @@ if(!empty($unbound_config['custom_options'])) {
 remote-control:
 control-enable: yes
 control-interface: 127.0.0.1
-control-interface: ::1
 control-port: 953
 server-key-file: "/usr/local/etc/unbound/unbound_server.key"
 server-cert-file: "/usr/local/etc/unbound/unbound_server.pem"
