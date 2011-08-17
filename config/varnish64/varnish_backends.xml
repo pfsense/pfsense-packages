@@ -9,6 +9,7 @@
     varnish_backends.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
+    Copyright (C) 2011 Marcello Coutinho
     All rights reserved.                                                      
 */
 /* ========================================================================== */
@@ -41,7 +42,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>varnishbackends</name>
-	<version>0.0.4</version>
+	<version>0.0.5</version>
 	<title>Varnish: Backends</title>
 	<include_file>/usr/local/pkg/varnish.inc</include_file>
    	<additional_files_needed>
@@ -221,7 +222,7 @@
 			<name>Backend Mappings</name>
 		</field>
 		<field>
-			<fielddescr><![CDATA[<a href="https://www.varnish-cache.org/docs/master/tutorial/advanced_backend_servers.html">Leave empty if you plan to include this server in Load Balance (LB Directors)</a>]]></fielddescr>
+			<fielddescr><![CDATA[<a href="https://www.varnish-cache.org/docs/master/tutorial/advanced_backend_servers.html">Leave empty if you plan to include this server in Load Balance (LB Directors)</a><br><br>use 0s grace time to force no cache.]]></fielddescr>
 			<fieldname>MapURLs</fieldname>
 		    <type>rowhelper</type>
 		    <rowhelper>
