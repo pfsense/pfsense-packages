@@ -9,6 +9,8 @@
     varnish_lb_directors.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
+    Copyright (C) 2011 Marcello Coutinho
+    
     All rights reserved.                                                      
 */
 /* ========================================================================== */
@@ -41,7 +43,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>varnishlbdirectors</name>
-	<version>0.0.4</version>
+	<version>0.0.5</version>
 	<title>Varnish: Backends</title>
 	<include_file>/usr/local/pkg/varnish.inc</include_file>
    	<additional_files_needed>
@@ -117,9 +119,19 @@
 		<columnitem>
 			<fielddescr>Grace</fielddescr>
 			<fieldname>grace</fieldname>
+		</columnitem>
+		<columnitem>
+			<fielddescr>Failover</fielddescr>
+			<fieldname>failover</fieldname>
 		</columnitem>		
 	</adddeleteeditpagefields>
 	<fields>
+		<field>
+			<fielddescr>DirectorSettings</fielddescr>
+			<fieldname>Director Settings</fieldname>
+			<type>listtopic</type>
+			<name>Director settings</name>
+		</field>
 		<field>
 			<fielddescr>Director name</fielddescr>
 			<fieldname>directorname</fieldname>
@@ -159,10 +171,16 @@
 		<field>
 			<fielddescr>Req Grace</fielddescr>
 			<fieldname>grace</fieldname>
-			<description><![CDATA[<a href="https://www.varnish-cache.org/trac/wiki/VCLExampleGrace">How many time varnish will keep cached objects for this director.</a> HINT 60s, 30m, 1h]]></description>
+			<description><![CDATA[<a href="https://www.varnish-cache.org/trac/wiki/VCLExampleGrace">How many time varnish will keep cached objects for this director.</a> HINT 60s, 30m, 1h<br>Use 0s grace time to force no cache.]]></description>
 	    	<type>input</type>
 	    	<size>5</size>
  		</field>
+		<field>
+			<fielddescr>Backendlist</fielddescr>
+			<fieldname>Backendlist</fieldname>
+			<type>listtopic</type>
+			<name>Backend Settings</name>
+		</field>
 		<field>
 			<fielddescr>Algorithms</fielddescr>
 			<fieldname>directortype</fieldname>
@@ -196,6 +214,21 @@
 				    <type>input</type>
 				</rowhelperfield>
 			</rowhelper>
+		</field>
+		<field>
+			<fielddescr>FailoverSettings</fielddescr>
+			<fieldname>FailoverSettings</fieldname>
+			<type>listtopic</type>
+			<name>Failover Settings</name>
+		</field>
+		<field>
+			<fielddescr>Failover Director</fielddescr>
+			<fieldname>failover</fieldname>
+			<description>Select a Director for failover or choose same director to do not configure it.</description>
+			<source><![CDATA[$config['installedpackages']['varnishlbdirectors']['config']]]></source>
+			<source_name>directorname</source_name>
+			<source_value>directorname</source_value>
+			<type>select_source</type>
 		</field>
 	</fields>
 	<custom_php_command_before_form>
