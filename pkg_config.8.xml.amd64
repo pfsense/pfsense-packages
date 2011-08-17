@@ -350,6 +350,7 @@
 		<descr>Snort is an open source network intrusion prevention and detection system (IDS/IPS). Combining the benefits of signature, protocol, and anomaly-based inspection.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>libpcap-1.1.1_1.tbz</depends_on_package>
 		<depends_on_package>pcre-8.10.tbz</depends_on_package>
 		<depends_on_package>mysql-client-5.1.53.tbz</depends_on_package>
 		<depends_on_package>snort-2.8.6.1.tbz</depends_on_package>
