@@ -35,6 +35,9 @@ if(!function_exists("get_nameservers"))
 if(!function_exists("gen_subnetv6") || !function_exists("gen_subnet"))
 	require_once("util.inc");
 
+if(function_exists("is_ipaddrv6"))
+	$do_ipv6 = true;
+
 function unbound_initial_setup() {
 	global $config, $g;
 
@@ -238,7 +241,7 @@ function unbound_control($action) {
 }
 
 function unbound_get_network_interface_addresses() {
-	global $config;
+	global $config, $do_ipv6;
 
 	$interfaces = $config['interfaces'];
 	$unbound_config = $config['installedpackages']['unbound']['config'][0];
@@ -279,15 +282,18 @@ function unbound_get_network_interface_addresses() {
 		}
 	
 		/* Configure IPv6 addresses */
-		if(is_ipaddr($interfaces[$unboundif]['ipaddrv6'])) {
-			$unbound_interfaces[$i]['ipv6']['ipaddr'] = $interfaces[$unboundif]['ipaddrv6'];
-			$unbound_interfaces[$i]['ipv6']['subnet'] = $interfaces[$unboundif]['subnetv6'];
-			$unbound_interfaces[$i]['ipv6']['network'] = gen_subnetv6($unbound_interfaces[$i]['ipv6']['ipaddr'], $unbound_interfaces[$i]['ipv6']['subnet']);
+		if($do_ipv6 == true) {
+			if(is_ipaddrv6($interfaces[$unboundif]['ipaddrv6'])) {
+				$unbound_interfaces[$i]['ipv6']['ipaddr'] = $interfaces[$unboundif]['ipaddrv6'];
+				$unbound_interfaces[$i]['ipv6']['subnet'] = $interfaces[$unboundif]['subnetv6'];
+				$unbound_interfaces[$i]['ipv6']['network'] = gen_subnetv6($unbound_interfaces[$i]['ipv6']['ipaddr'], $unbound_interfaces[$i]['ipv6']['subnet']);
+			}
 		}
 		/* Lastly check for loopback addresses*/
 		if($unboundif == "lo0") {
 			$unbound_interfaces[$i]['loopback']['ipaddr'] = "127.0.0.1";
-			$unbound_interfaces[$i]['loopback6']['ipaddr'] = "::1";
+			if ($do_ipv6 == true)
+				$unbound_interfaces[$i]['loopback6']['ipaddr'] = "::1";
 		}
 		$i++;
 	}
@@ -369,8 +375,8 @@ private-address: 10.0.0.0/8
 private-address: 172.16.0.0/12
 private-address: 192.168.0.0/16
 private-address: 192.254.0.0/16
-# private-address: fd00::/8
-# private-address: fe80::/10
+private-address: fd00::/8
+private-address: fe80::/10
 # Set private domains in case authorative name server returns a RFC1918 IP address
 EOF;
 
@@ -650,8 +656,6 @@ function unbound_validate($post, $type=null) {
 		if($post['active_interface'] == "")
 			$input_errors[] = "You need to select at least one interface to be used by the Unbound DNS service.";
 	}
-	
-	
 }
 
 function unbound_reconfigure() {
@@ -718,7 +722,7 @@ function read_hosts() {
 /* Setup /etc/hosts entries by overriding with local-data
  */
 function unbound_add_host_entries() {
-	global $config;
+	global $config, $do_ipv6;
 	
 	/* XXX: break this out into a separate config file and make use of include */
 	$unboundcfg = $config['installedpackages']['unbound']['config'][0];
@@ -731,9 +735,11 @@ function unbound_add_host_entries() {
 	$unbound_entries .= "local-data: \"localhost A 127.0.0.1\"\n";
 	$unbound_entries .= "local-data: \"localhost.{$syscfg['domain']} A 127.0.0.1\"\n";
 	// IPv6 entries
-	$unbound_entries .= "local-data-ptr: \"::1 localhost\"\n";
-	$unbound_entries .= "local-data: \"localhost AAAA ::1\"\n";
-	$unbound_entries .= "local-data: \"localhost.{$syscfg['domain']} AAAA ::1\"\n";
+	if($do_ipv6 == true) {
+		$unbound_entries .= "local-data-ptr: \"::1 localhost\"\n";
+		$unbound_entries .= "local-data: \"localhost AAAA ::1\"\n";
+		$unbound_entries .= "local-data: \"localhost.{$syscfg['domain']} AAAA ::1\"\n";
+	}
 	
 	if ($config['interfaces']['lan']) {
 		$cfgip = get_interface_ip("lan");
@@ -766,9 +772,12 @@ function unbound_add_host_entries() {
 			$current_host = $host['host'];
 			if(!$added_item[$current_host]) {
 				$host_entries .= "local-data-ptr: \"{$host['ip']} {$host['host']}.{$host['domain']}\"\n";
-				if (is_ipaddrv6($host['ip']))
-					$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} IN AAAA {$host['ip']}\"\n";
-				else
+				if($do_ipv6 == true) {
+					if (is_ipaddrv6($host['ip']))
+						$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} IN AAAA {$host['ip']}\"\n";
+					else
+						$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} IN A {$host['ip']}\"\n";
+				} else
 					$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} IN A {$host['ip']}\"\n";
 				if (!empty($host['descr']) && $unboundcfg['txtsupport'] == 'on')
 					$host_entries .= "local-data: '{$host['host']}.{$host['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
