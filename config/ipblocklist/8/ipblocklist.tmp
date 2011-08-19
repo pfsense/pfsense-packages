@@ -1,5 +1,5 @@
 <?php
-	//Version 2.2
+	//Version 3.3
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 	require_once('config.inc');
@@ -126,7 +126,7 @@ if(isset($_POST['formSubmit']))
 	$tab_array[2] = array("Whitelist", false, "whitelist.php");
 	$tab_array[3] = array("Interfaces", false, "ipblocklist_if.php");
 	$tab_array[4] = array("Help", false, "http://doc.pfsense.org/index.php/IP_Blocklist");
-	$tab_array[5] = array("Email", false, "email.php");
+	//$tab_array[5] = array("Email", false, "email.php");
 	display_top_tabs($tab_array);
 ?> 
 </form>
@@ -229,6 +229,8 @@ if(isset($_POST['formSubmit']))
 	?>
 <br><br>
 <small>Created by <a href="http://www.tomschaefer.org/pfsense">TomSchaefer</a></small>
+<br />
+<small><a href="http://www.iblocklist.com/">I-Blocklist.com</a></small>
 <!--<input type="submit" value="Save/Update"><br><br>
 --><p>
 </p>

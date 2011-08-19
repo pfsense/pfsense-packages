@@ -51,13 +51,13 @@ done
 
 #clean up ipfw.ipfw (duplicates)
 rm /usr/local/www/packages/ipblocklist/lists/ipfw.ipfwTEMP
-/usr/bin/sort /usr/local/www/packages/ipblocklist/lists/ipfw.ipfw | uniq -u >> /usr/local/www/packages/ipblocklist/lists/ipfw.ipfwTEMP
+/usr/bin/sort /usr/local/www/packages/ipblocklist/lists/ipfw.ipfw | uniq >> /usr/local/www/packages/ipblocklist/lists/ipfw.ipfwTEMP
 mv /usr/local/www/packages/ipblocklist/lists/ipfw.ipfwTEMP /usr/local/www/packages/ipblocklist/lists/ipfw.ipfw
 #echo "ipfw clean"
 
 #clean up whitelist (duplicates)
 rm /usr/local/www/packages/ipblocklist/Wlists/whitelistTEMP
-/usr/bin/sort Wlists/whitelist | uniq -u >> /usr/local/www/packages/ipblocklist/Wlists/whitelistTEMP
+/usr/bin/sort Wlists/whitelist | uniq >> /usr/local/www/packages/ipblocklist/Wlists/whitelistTEMP
 mv /usr/local/www/packages/ipblocklist/Wlists/whitelistTEMP /usr/local/www/packages/ipblocklist/Wlists/whitelist
 #echo "whitelist clean"
 
