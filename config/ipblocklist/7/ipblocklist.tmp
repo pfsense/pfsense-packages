@@ -229,7 +229,7 @@ if(isset($_POST['formSubmit']))
 	?>
 <br><br>
 <small>Created by <a href="http://www.tomschaefer.org/pfsense">TomSchaefer</a></small>
-<br /><small><a href="http://www.iblocklist.com/pfsense">I-Blocklist.com</a></small>
+<br /><small><a href="http://www.iblocklist.com/">I-Blocklist.com</a></small>
 <!--<input type="submit" value="Save/Update"><br><br>
 --><p>
 </p>
