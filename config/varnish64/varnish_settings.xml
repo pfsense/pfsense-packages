@@ -42,7 +42,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>varnishsettings</name>
-	<version>0.0.5</version>
+	<version>0.0.6</version>
 	<title>Varnish Settings</title>
 	<aftersaveredirect>pkg_edit.php?xml=varnish_settings.xml&amp;id=0</aftersaveredirect>
 	<include_file>/usr/local/pkg/varnish.inc</include_file>
@@ -161,7 +161,7 @@
 			<fielddescr>BasicVCLLT</fielddescr>
 			<fieldname>BasicVCLLT</fieldname>
 			<type>listtopic</type>
-			<name>Basic VCL Settings</name>
+			<name>General VCL Settings</name>
 		</field>
 		<field>
 			<fielddescr>Client identity method</fielddescr>
@@ -175,27 +175,41 @@
 			</options>
 		</field>
 		<field>
-			<fielddescr>Don't cache sessions</fielddescr>
-			<fieldname>sessioncache</fieldname>
-			<description>Don't cache pages wiht JSESSION,PHPSESSID or nocache headers/cookies</description>
-			<type>checkbox</type>
-		</field>
-		<field>
 			<fielddescr>Don't cache posts</fielddescr>
 			<fieldname>postcache</fieldname>
 			<description>Don't cache posts</description>
 			<type>checkbox</type>
 		</field>
 		<field>
-			<fielddescr>Cache Images and css</fielddescr>
-			<fieldname>imagecache</fieldname>
-			<description>cache .css .js .gif .jpg .jpeg .bmp .png .ico .img .tga and .wmf files</description>
-			<type>checkbox</type>
+			<fielddescr>Session Cache</fielddescr>
+			<fieldname>sessioncache</fieldname>
+			<description><![CDATA[<strong>Never</strong> Don't cache anything with JSESSION,PHPSESSID set.<br>
+								<strong>Per User</strong><a href="https://www.varnish-cache.org/trac/wiki/VCLExampleCacheCookies"> This causes a lookup for a given object to include the Cookie.</a><br><br>								
+								Note: <strong>no-cache no-store private</strong> header directives are respected by default.]]></description>
+			<type>select</type>
+			<options>
+				<option><name>Never</name><value>never</value></option>
+				<option><name>Per User</name><value>user</value></option>
+			</options>
+		</field>
+		<field>
+			<fielddescr>Cache static content</fielddescr>
+			<fieldname>staticache</fieldname>
+			<description><![CDATA[cache images, css and javascript files (.css .js .txt .gif .jpg .jpeg .bmp .png .ico .img .tga and .wmf .mp3 .ogg)<BR>
+									<strong>Always</strong><a href="https://www.varnish-cache.org/trac/wiki/VCLExampleCacheCookies"> Cache all static content. When cookies are present, varnish will unset it from object before caching.</a><br>
+									<strong>Never</strong> Do not cache static content.<br>
+									<strong>When possible</strong> Cache only static content and per user objects when session cache is set to it.<br>]]></description>
+			<type>select</type>
+			<options>
+				<option><name>When Possible</name><value>yes</value></option>
+				<option><name>Always</name><value>all</value></option>
+				<option><name>Never</name><value>no</value></option>
+			</options>
 		</field>
 		<field>
 			<fielddescr>Fix gzip compression</fielddescr>
 			<fieldname>fixgzip</fieldname>
-			<description>Ignore compression in images files and unknow compression algorithm</description>
+			<description>Ignore compression for images files and unknow compression algorithm</description>
 			<type>checkbox</type>
 		</field>
 		<field>
