@@ -2,7 +2,7 @@
 header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 
-echo "<a href=\"whitelist.php\"><img src=\"../../themes/nervecenter/images/icons/icon_plus.gif\" ALT=\"Whitelist\" ALIGN=RIGHT></a>\n"; 
+//echo "<a href=\"whitelist.php\"><img src=\"../../themes/nervecenter/images/icons/icon_plus.gif\" ALT=\"Whitelist\" ALIGN=RIGHT></a>\n"; 
 echo "Add List URL: <form method=\"post\" action=\"\">\n"; 
 echo "<input name=\"content\" type=\"text\" />\n"; 
 echo "<input type=\"image\" src=\"../../themes/nervecenter/images/icons/icon_plus.gif\" value=\"submit\">\n"; 

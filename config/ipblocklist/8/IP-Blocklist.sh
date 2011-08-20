@@ -10,62 +10,62 @@ if [ "$resultr" -gt "0" ]; then
 else
 	echo not running
 	/usr/bin/logger -s "IP-Blocklist was found not running"
-	echo "IP-Blocklist not running" | /usr/local/bin/php /usr/local/www/packages/ipblocklist/email_send.php
+	#echo "IP-Blocklist not running" | /usr/local/bin/php /usr/local/www/packages/ipblocklist/email_send.php
 fi
 
 
-#kill tables to elminate dups
+##kill tables to elminate dups
 /sbin/pfctl -t ipblocklist -T kill
 /sbin/pfctl -t ipblocklistW -T kill
 /usr/bin/sed -i -e '/ipblocklist/d' /tmp/rules.debug
 /usr/bin/sed -i -e '/ipblocklistW/d' /tmp/rules.debug
 
-#Generate lists to process
-ls /usr/local/www/packages/ipblocklist/lists > /usr/local/www/packages/ipblocklist/file_list.txt
-ls /usr/local/www/packages/ipblocklist/Wlists > /usr/local/www/packages/ipblocklist/file_Wlist.txt
+##Generate lists to process
+#ls /usr/local/www/packages/ipblocklist/lists > /usr/local/www/packages/ipblocklist/file_list.txt
+#ls /usr/local/www/packages/ipblocklist/Wlists > /usr/local/www/packages/ipblocklist/file_Wlist.txt
 filelist="/usr/local/www/packages/ipblocklist/file_list.txt"
 Wfilelist="/usr/local/www/packages/ipblocklist/file_Wlist.txt"
 
-#READ contents in file_list.txt and process as file
-for fileline in $(cat $filelist); do
-iplist="/usr/local/www/packages/ipblocklist/lists/$fileline"
-iplistout="/usr/local/www/packages/ipblocklist/lists/ipfw.ipfw"
-#sleep 5
-#echo "file name: "
-#echo $iplist
-#sleep 5
-if [ "$iplist" != "/usr/local/www/packages/ipblocklist/lists/ipfw.ipfw" ]; then
-	#/usr/bin/perl /usr/local/www/packages/ipblocklist/convert.pl $iplist $iplistout
-	#echo "THIS JUST RAN"
-fi
-#sleep 5
-done
+##READ contents in file_list.txt and process as file
+#for fileline in $(cat $filelist); do
+#iplist="/usr/local/www/packages/ipblocklist/lists/$fileline"
+#iplistout="/usr/local/www/packages/ipblocklist/lists/ipfw.ipfw"
+##sleep 5
+##echo "file name: "
+##echo $iplist
+##sleep 5
+#if [ "$iplist" != "/usr/local/www/packages/ipblocklist/lists/ipfw.ipfw" ]; then
+#	#/usr/bin/perl /usr/local/www/packages/ipblocklist/convert.pl $iplist $iplistout
+#	#echo "THIS JUST RAN"
+#fi
+##sleep 5
+#done
 
 #Whitelist
-for Wfileline in $(cat $Wfilelist); do
-Wiplist="/usr/local/www/packages/ipblocklist/Wlists/$Wfileline"
-Wiplistout="/usr/local/www/packages/ipblocklist/Wlists/whitelist"
-/usr/bin/perl /usr/local/www/packages/ipblocklist/convert.pl $Wiplist $Wiplistout
-done
+#for Wfileline in $(cat $Wfilelist); do
+#Wiplist="/usr/local/www/packages/ipblocklist/Wlists/$Wfileline"
+#Wiplistout="/usr/local/www/packages/ipblocklist/Wlists/whitelist"
+#/usr/bin/perl /usr/local/www/packages/ipblocklist/convert.pl $Wiplist $Wiplistout
+#done
 #echo "ipfw made"
 
-#clean up ipfw.ipfw (duplicates)
-rm /usr/local/www/packages/ipblocklist/lists/ipfw.ipfwTEMP
-/usr/bin/sort /usr/local/www/packages/ipblocklist/lists/ipfw.ipfw | uniq >> /usr/local/www/packages/ipblocklist/lists/ipfw.ipfwTEMP
-mv /usr/local/www/packages/ipblocklist/lists/ipfw.ipfwTEMP /usr/local/www/packages/ipblocklist/lists/ipfw.ipfw
-#echo "ipfw clean"
+##clean up ipfw.ipfw (duplicates)
+#rm /usr/local/www/packages/ipblocklist/lists/ipfw.ipfwTEMP
+#/usr/bin/sort /usr/local/www/packages/ipblocklist/lists/ipfw.ipfw | uniq >> /usr/local/www/packages/ipblocklist/lists/ipfw.ipfwTEMP
+#mv /usr/local/www/packages/ipblocklist/lists/ipfw.ipfwTEMP /usr/local/www/packages/ipblocklist/lists/ipfw.ipfw
+##echo "ipfw clean"
 
-#clean up whitelist (duplicates)
-rm /usr/local/www/packages/ipblocklist/Wlists/whitelistTEMP
-/usr/bin/sort Wlists/whitelist | uniq >> /usr/local/www/packages/ipblocklist/Wlists/whitelistTEMP
-mv /usr/local/www/packages/ipblocklist/Wlists/whitelistTEMP /usr/local/www/packages/ipblocklist/Wlists/whitelist
-#echo "whitelist clean"
+##clean up whitelist (duplicates)
+#rm /usr/local/www/packages/ipblocklist/Wlists/whitelistTEMP
+#/usr/bin/sort Wlists/whitelist | uniq >> /usr/local/www/packages/ipblocklist/Wlists/whitelistTEMP
+#mv /usr/local/www/packages/ipblocklist/Wlists/whitelistTEMP /usr/local/www/packages/ipblocklist/Wlists/whitelist
+##echo "whitelist clean"
 
 
 
-#Now edit /tmp/rules.debug
+##Now edit /tmp/rules.debug
 
-#find my line for table
+##find my line for table
 export i=`grep -n 'block quick from any to <snort2c>' /tmp/rules.debug | grep -o '[0-9]\{2,4\}'`
 export t=`grep -n 'User Aliases' /tmp/rules.debug |grep -o '[0-9]\{1,2\}'`
 

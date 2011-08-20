@@ -4,7 +4,7 @@
 /* ========================================================================== */
 /*
 	ipblocklist.inc
-	Copyright (C) 2010 Tom Schaefer
+	Copyright (C) 2011 Tom Schaefer
 	All rights reserved.
 																			*/
 /* ========================================================================== */
@@ -60,6 +60,7 @@ function php_install_command_ip()
 	
 
 	//rename PHP files from .tmp to .php
+	exec("cp /tmp/lists.txt /usr/local/www/packages/ipblocklist/lists.txt");
 	exec("cp /tmp/class.phpmailer.tmp /usr/local/www/packages/ipblocklist/class.phpmailer.php");
 	unlink_if_exists("/tmp/class.phpmailer.tmp ");
 	exec("cp /tmp/class.smtp.tmp /usr/local/www/packages/ipblocklist/class.smtp.php");

@@ -1,5 +1,5 @@
 <?php
-	//Version 3.3
+	//Version 3.4
 	header("Cache-Control: no-cache, must-revalidate"); // HTTP/1.1
 	header("Expires: Sat, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 	require_once('config.inc');
@@ -100,14 +100,14 @@ if(isset($_POST['formSubmit']))
     {
 		
 	
-		if(isset($_POST['formlogging'])) 
-        {
-			exec("/usr/bin/touch logging");
-		} 
-        else 
-        {
-			exec("/bin/rm logging");
-		}
+		//if(isset($_POST['formlogging'])) 
+        //{
+		//	exec("/usr/bin/touch logging");
+		//} 
+        //else 
+        //{
+		//	exec("/bin/rm logging");
+		//}
 		
 	}
 ?>
@@ -199,9 +199,7 @@ if(isset($_POST['formSubmit']))
 	<a href="http://iblocklist.whitacrecomputers.com/files/bt_level2.gz">Level2</a>,
 	<a href="http://iblocklist.whitacrecomputers.com/files/bt_level3.gz">Level3</a>)
 	<br/>
-	Compressed lists should have .gz extention and follows PeerBlock syntax	<br/>
-		
-	<br/><span style="color:red">Warning!</span> - Apply after firewall change or state reset. Use at your own risk.
+	Compressed lists should have .gz extention and follows PeerBlock syntax			
 	<?php 
 	echo "<br/><br/>Current Status = ";
 	ob_start();
@@ -229,8 +227,7 @@ if(isset($_POST['formSubmit']))
 	?>
 <br><br>
 <small>Created by <a href="http://www.tomschaefer.org/pfsense">TomSchaefer</a></small>
-<br />
-<small><a href="http://www.iblocklist.com/">I-Blocklist.com</a></small>
+<br /><small><a href="http://www.iblocklist.com/">I-Blocklist.com</a></small>
 <!--<input type="submit" value="Save/Update"><br><br>
 --><p>
 </p>
