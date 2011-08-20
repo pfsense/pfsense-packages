@@ -9,6 +9,7 @@
     varnish_sync.xml
     part of pfSense (http://www.pfSense.com)
     Copyright (C) 2008 Scott Ullrich <sullrich@gmail.com>
+    Copyright (C) 2011 Marcello Coutinho
     All rights reserved.
                                                                               */
 /* ========================================================================== */
@@ -41,7 +42,7 @@
     <requirements>Describe your package requirements here</requirements>
     <faq>Currently there are no FAQ items provided.</faq>
 	<name>varnishsync</name>
-	<version>1.0</version>
+	<version>1.1</version>
 	<title>Varnish: Manual Sync</title>
 	<include_file>/usr/local/pkg/varnish.inc</include_file>
 	<tabs>
@@ -89,106 +90,25 @@
 			<type>checkbox</type>
 		</field>
 		<field>
-			<type>listtopic</type>
-			<name>Sync host #1</name>
-			<fieldname>temp</fieldname>			
-		</field>		
-		<field>
-			<fielddescr>IP Address</fielddescr>
-			<fieldname>ipaddress1</fieldname>
-			<description>The IP address of the first host that Varnish will Sync its Varnish configuration data to.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Password</fielddescr>
-			<fieldname>password1</fieldname>
-			<description>Admin password of the first host that Varnish will Sync its Varnish configuration data to.</description>
-			<type>password</type>
-		</field>
-		<field>
-			<type>listtopic</type>
-			<name>Sync host #2</name>
-			<fieldname>temp</fieldname>
-		</field>
-		<field>
-			<fielddescr>IP Address 2</fielddescr>
-			<fieldname>ipaddress2</fieldname>
-			<description>OPTIONAL.  The IP address of the second host that Varnish will Sync its Varnish configuration data to.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Password 2</fielddescr>
-			<fieldname>password2</fieldname>
-			<description>Admin password of the second host that Varnish will Sync its Varnish configuration data to.</description>
-			<type>password</type>
-		</field>
-		<field>
-			<type>listtopic</type>
-			<name>Sync host #3</name>
-			<fieldname>temp</fieldname>
-		</field>				
-		<field>
-			<fielddescr>IP Address 3</fielddescr>
-			<fieldname>ipaddress3</fieldname>
-			<description>OPTIONAL. The IP address of the third host that Varnish will Sync its Varnish configuration data to.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Password 3</fielddescr>
-			<fieldname>password3</fieldname>
-			<description>Admin password of the third host that Varnish will Sync its Varnish configuration data to.</description>
-			<type>password</type>
-		</field>
-		<field>
-			<type>listtopic</type>
-			<name>Sync host #4</name>
-			<fieldname>temp</fieldname>
-		</field>
-		<field>
-			<fielddescr>IP Address 4</fielddescr>
-			<fieldname>ipaddress4</fieldname>
-			<description>OPTIONAL. The IP address of the third host that Varnish will Sync its Varnish configuration data to.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Password 4</fielddescr>
-			<fieldname>password4</fieldname>
-			<description>Admin password of the third host that Varnish will Sync its Varnish configuration data to.</description>
-			<type>password</type>
-		</field>
-		<field>
-			<type>listtopic</type>
-			<name>Sync host #5</name>
-			<fieldname>temp</fieldname>
-		</field>
-		<field>
-			<fielddescr>IP Address 5</fielddescr>
-			<fieldname>ipaddress5</fieldname>
-			<description>OPTIONAL. The IP address of the third host that Varnish will Sync its Varnish configuration data to.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Password 5</fielddescr>
-			<fieldname>password5</fieldname>
-			<description>Admin password of the third host that Varnish will Sync its Varnish configuration data to.</description>
-			<type>password</type>
-		</field>
-		<field>
-			<type>listtopic</type>
-			<name>Sync host #6</name>
-			<fieldname>temp</fieldname>
-		</field>
-		<field>
-			<fielddescr>IP Address 6</fielddescr>
-			<fieldname>ipaddress6</fieldname>
-			<description>OPTIONAL. The IP address of the third host that Varnish will Sync its Varnish configuration data to.</description>
-			<type>input</type>
-		</field>
-		<field>
-			<fielddescr>Password 6</fielddescr>
-			<fieldname>password6</fieldname>
-			<description>Admin password of the third host that Varnish will Sync its Varnish configuration data to.</description>
-			<type>password</type>
+			<fielddescr>Remote Server</fielddescr>
+			<fieldname>none</fieldname>
+			<type>rowhelper</type>
+			<rowhelper>
+			<rowhelperfield>
+				<fielddescr>IP Address</fielddescr>
+				<fieldname>ipaddress</fieldname>
+				<description>IP Address of remote server</description>
+				<type>input</type>
+				<size>20</size>
+			</rowhelperfield>
+			<rowhelperfield>
+				<fielddescr>Password</fielddescr>
+				<fieldname>password</fieldname>
+				<description>Password for remote server.</description>
+				<type>password</type>
+				<size>20</size>
+			</rowhelperfield>
+			</rowhelper>
 		</field>
 	</fields>
 	<custom_php_resync_config_command>
