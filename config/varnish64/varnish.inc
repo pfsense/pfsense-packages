@@ -105,8 +105,10 @@ function text_area_decode($text){
 function varnish_start() {
 	global $g, $config;
 	if ($config['installedpackages']['varnishsettings']['config'][0]['enablevarnish']){
+		exec("chmod +x /usr/local/etc/rc.d/varnish.sh");
 		mwexec("/usr/local/etc/rc.d/varnish.sh");}
 	else{
+		exec("chmod -x /usr/local/etc/rc.d/varnish.sh");
 		mwexec("/usr/bin/killall varnishd");}
 }
 
@@ -119,8 +121,10 @@ function varnish_get_url_mappings_txt() {
 		foreach($config['installedpackages']['varnishlbdirectors']['config'] as $url) {
   			#check options
 			$directo_grace_time="";
+			if ($url['customapping'])
+			$directo_grace_time.=text_area_decode($url['customapping'])."\n\t\t";
 			if($url['grace'])
-  			$directo_grace_time=($url['grace']=="0s"?"return(pass);":"set req.grace=".$url['grace'].";");
+  			$directo_grace_time.=($url['grace']=="0s"?"return(pass);":"set req.grace=".$url['grace'].";");
   			$fieldtype = ($url['fieldtype']?$url['fieldtype']:"==");
   			$req=($url['directorurl2']?"url":"http.host");
 			$director_prefix=($url['directorurl'] && $url['directorurl2']?"^http://":"");
@@ -239,6 +243,8 @@ PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin \
 	require_once("pkg-utils.inc");
 	require_once("varnish.inc");
 	sync_package_varnish();
+	#varnish_start();
+
 ?>
 ENDOFF
 
@@ -274,7 +280,7 @@ function get_backend_config_txt() {
 			else 
 				$first_byte_timeout = "300s";
 			if($backend['probe_url'])
-				if (preg_match("@^(http)://([a-zA-Z0-9.:]*)/(.*)$@",$backend['probe_url'],$matches)){
+				if (preg_match("@^(http)://([a-zA-Z0-9.]*)/(.*)$@",$backend['probe_url'],$matches)){
 					$probe_url=".request =\n";
 					$probe_url.="\t\t\t".'"GET /'.$matches[3].' HTTP/1.1"'."\n";
                                         $probe_url.="\t\t\t".'"Accept: text/*"'."\n";
@@ -386,7 +392,7 @@ function sync_package_varnish() {
 	}
 		$vcl_recv_set_basic='#BASIC VCL RULES SETTING'."\n";
 		$vcl_recv_action_basic='#BASIC VCL RULES ACTIONS'."\n";
-		$plataform=system('uname -m');
+		$plataform=posix_uname();
 		foreach($config['installedpackages']['varnishsettings']['config'] as $vcl) {
 			if($vcl['fixgzip']){
 				$vcl_recv_set_basic.="\t#Fix gzip compression\n";
@@ -396,7 +402,7 @@ function sync_package_varnish() {
 				$vcl_recv_set_basic.="\t".'else if (req.http.Accept-Encoding ~ "deflate") {'."\n\t\tset req.http.Accept-Encoding = ".'"deflate"'.";\n\t\t}\n";
 				$vcl_recv_set_basic.="\telse\t{\n\t\tunset req.http.Accept-Encoding;\n\t\t}\n\t}\n";
 				}
-			if($vcl['clientbalance'] && $plataform == 'amd64'){
+			if($vcl['clientbalance'] && $plataform['machine'] == 'amd64'){
 				$vcl_recv_set_basic.="\t#set client balance identity\n";
 				switch ($vcl['clientbalance']){
 					case 'url':
@@ -433,20 +439,54 @@ function sync_package_varnish() {
 					break;
 					}
 				}
-			if($vcl['sessioncache']){
-				$vcl_recv_action_basic.="\t#Disable session cache\n";
-				$vcl_recv_action_basic.="\t".'if (req.http.Cookie && req.http.Cookie ~ "(JSESSION|PHPSESSID)") {'."\n\t\treturn(pass);\n\t\t}\n";
-				$vcl_recv_action_basic.="\t".'if (req.http.X-Requested-With == "XMLHttpRequest" || req.url ~ "nocache") {'."\n\t\treturn(pass);\n\t\t}\n";
-				}
 			if($vcl['postcache']){
 				$vcl_recv_action_basic.="\t#Disable post cache\n";
 				$vcl_recv_action_basic.="\t".'if (req.request == "POST") {'."\n\t\treturn(pass);\n\t\t}\n";
 				}
-			if($vcl['imagecache']){
-			$vcl_recv_action_basic.="\t#Enable image cache\n";
-			$vcl_recv_action_basic.="\t".'if (req.request=="GET" && req.url ~ "\.(css|js)$") {'."\n\t\treturn(lookup);\n\t\t}\n";
-			$vcl_recv_action_basic.="\t".'if (req.request=="GET" && req.url ~ "\.(gif|jpg|jpeg|bmp|png|ico|img|tga|wmf|mp3|ogg)$") {'."\n\t\tremove req.http.cookie;\n\t\treturn(lookup);\n\t\t}\n";
+				
+			$vcl_fetch_session ="#Disable cache when backend is starting a session\n";
+			$vcl_fetch_session.="\t".'if (beresp.http.Set-Cookie && beresp.http.Set-Cookie ~ "(PHPSESSID|phpsessid)") {'."\n\t\treturn(pass);\n\t\t}\n";
+			$vcl_fetch_session.="\t".'if (beresp.http.Set-Cookie && beresp.http.Set-Cookie ~ "(JSESSION|jsession)") {'."\n\t\treturn(pass);\n\t\t}\n";
+					
+			if($vcl['sessioncache']== "never"){
+				$vcl_recv_session ="\t#Disable session cache\n";
+				$vcl_recv_session.="\t".'if (req.http.Cookie && req.http.Cookie ~ "(PHPSESSID|phpsessid)") {'."\n\t\treturn(pass);\n\t\t}\n";
+				$vcl_recv_session.="\t".'if (req.http.Cookie && req.http.Cookie ~ "(JSESSION|jsession)") {'."\n\t\treturn(pass);\n\t\t}\n";
+				$vcl_recv_session.="\t".'if (req.http.X-Requested-With == "XMLHttpRequest" || req.url ~ "nocache") {'."\n\t\treturn(pass);\n\t\t}\n";
+				$vcl_fetch_session.="\t".'if (beresp.http.X-Requested-With == "XMLHttpRequest" || req.url ~ "nocache") {'."\n\t\treturn(pass);\n\t\t}\n";
+				$vcl_recv_static_prefix=($vcl['staticache']=="no"?"":"\n\t\tunset req.http.cookie;");
+				}
+			else
+				{
+				$vcl_hash = "#Enable Per user session cache.\n";
+				$vcl_hash.= "sub vcl_hash {\n\tset req.hash += req.http.cookie;\n}\n";
+				}
+			#set static content var
+			$vcl_recv_static_sufix=($vcl['staticache']=='no'?"pass":"lookup");
+			$vcl_recv_static ="\t#Enable static cache\n";
+			$vcl_recv_static.="\t".'if (req.request=="GET" && req.url ~ "\.(css|js|txt|zip|pdf|rtf|flv|swf|html|htm)$") {'.$vcl_recv_static_prefix."\n\t\treturn($vcl_recv_static_sufix);\n\t\t}\n";
+			$vcl_recv_static.="\t".'if (req.request=="GET" && req.url ~ "\.(gif|jpg|jpeg|bmp|png|ico|img|tga|wmf|mp3|ogg)$") {'.$vcl_recv_static_prefix."\n\t\treturn($vcl_recv_static_sufix);\n\t\t}\n";
+			$vcl_fetch_static ="#Enable static cache\n";
+			$vcl_fetch_static.='if (req.url ~ "\.(css|js|txt|zip|pdf|rtf|flv|swf|html|htm)$") {'."\n\tunset beresp.http.set-cookie;\n\t}\n";
+			$vcl_fetch_static.='if (req.url ~ "\.(gif|jpg|jpeg|bmp|png|ico|img|tga|wmf|mp3|ogg)$") {'."\n\tunset beresp.http.set-cookie;\n\t}\n";
+			
+			switch ($vcl['staticache']){
+				case "all":
+					# cache all static content, unseting cookie when present
+					$vcl_recv_action_basic.=($vcl['sessioncache']=="never"?$vcl_recv_static.$vcl_recv_session:$vcl_recv_static);
+					$vcl_fetch_action=($vcl['sessioncache']=="never"?$vcl_fetch_static.$vcl_fetch_session:$vcl_fetch_static);
+					break;
+				case "yes":
+					# cache only object without cookie set
+					$vcl_recv_action_basic.=($vcl['sessioncache']=="never"?$vcl_recv_session.$vcl_recv_static:$vcl_recv_static);
+					$vcl_fetch_action=$vcl_fetch_session;
+					break;
+				default:
+					# no static cache at all
+					$vcl_recv_action_basic.=$vcl_recv_static.$vcl_recv_session;
+					$vcl_fetch_action=$vcl_fetch_session;
 			}
+				
 			if($vcl['rfc2616']){
 				$vcl_recv_action_basic.="\t#Be rfc2616 compliant\n";
 				$vcl_recv_action_basic.="\t".'if (req.request ~ "^(GET|HEAD|PUT|POST|TRACE|OPTIONS|DELETE)$") {'."\n\t\treturn(lookup);\n\t\t}\n\telse\t{\n\t\treturn(pipe);\n\t\t}\n";
@@ -514,12 +554,18 @@ sub vcl_error {
 }
         
 {$backends}
-
+{$vcl_hash}
 sub vcl_recv {
 	{$vcl_recv_early}
 	{$vcl_recv_set_basic}
 	{$urlmappings}
 	{$vcl_recv_late}
+	#respect client wish to refresh the page
+	if (req.http.Pragma ~ "no-cache")
+		{
+		return(pass);
+		}
+	
 	{$vcl_recv_action_basic}
 	return(lookup);
 }
@@ -538,6 +584,11 @@ sub vcl_pipe {
 
 sub vcl_fetch {
 	{$vcl_fetch_early}
+	{$vcl_fetch_action}
+	# Varnish respects the wishes of the backend application.
+	if (beresp.http.Pragma ~ "no-cache" || beresp.http.Cache-Control ~ "(no-cache|no-store|private)") {
+	return(pass);
+	}
     ## If the request to the backend returns a code other than 200, restart the loop
     ## If the number of restarts reaches the value of the parameter max_restarts,
     ## the request will be error'ed.  max_restarts defaults to 4.  This prevents
@@ -546,8 +597,21 @@ sub vcl_fetch {
     	beresp.status != 303 && beresp.status != 302 && beresp.status != 301) {
 		{$vcl_saint_mode}restart;
         }
+
+    
 	{$vcl_fetch_late}
 	{$vcl_grace_time}return(deliver);
+}
+
+sub vcl_deliver {
+	##set resp.http.X-Served-By = server.hostname;
+  	if (obj.hits > 0) {
+    	set resp.http.X-Cache = "HIT";	
+    	set resp.http.X-Cache-Hits = obj.hits;
+  	} else {
+    	set resp.http.X-Cache = "MISS";	
+  	}
+	return(deliver);
 }
 	
 EOF;
@@ -566,22 +630,16 @@ function varnish_sync_on_changes() {
 	$synconchanges = $config['installedpackages']['varnishsync']['config'][0]['synconchanges'];	
 	if(!$synconchanges) 
 		return;
-	$sync_hosts = $config['installedpackages']['varnishsync']['config'];
-	$previous_ip = "";
-	$sh = $config['installedpackages']['varnishsync']['config'][0];
-	for($x=1; $x<7; $x++) {
-		$sync_to_ip = "";
-		$password = "";
-		if($sh['ipaddress' . $x]) {
-			$sync_to_ip = $sh['ipaddress' . $x];
-			$password   = $sh['password'  . $x];
-		}
+	foreach ($config['installedpackages']['varnishsync']['config'] as $rs ){
+		foreach($rs['row'] as $sh){
+		$sync_to_ip = $sh['ipaddress'];
+		$password   = $sh['password'];
 		if($password && $sync_to_ip)
 			varnish_do_xmlrpc_sync($sync_to_ip, $password);
+		}
 	}
 	log_error("[varnish] varnish_xmlrpc_sync.php is ending.");
 }
-
 /* Do the actual XMLRPC sync */
 function varnish_do_xmlrpc_sync($sync_to_ip, $password) {
 	global $config, $g;
@@ -654,7 +712,7 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $password) {
 		XML_RPC_encode($password),
 		XML_RPC_encode($execcmd)
 	);
-	/*
+	
 	log_error("varnish XMLRPC reload data {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
@@ -673,7 +731,7 @@ function varnish_do_xmlrpc_sync($sync_to_ip, $password) {
 	} else {
 		log_error("varnish XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
 	}
-	*/
+	
 }
 
 ?>
