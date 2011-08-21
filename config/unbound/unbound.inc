@@ -35,9 +35,6 @@ if(!function_exists("get_nameservers"))
 if(!function_exists("gen_subnetv6") || !function_exists("gen_subnet"))
 	require_once("util.inc");
 
-if(function_exists("is_ipaddrv6"))
-	$do_ipv6 = true;
-
 function unbound_initial_setup() {
 	global $config, $g;
 
@@ -190,6 +187,7 @@ function unbound_control($action) {
 						unbound_ctl_exec("forward $dns_servers");
 					} else {
 						unbound_control("start");
+						sleep(1);
 						unbound_control("forward");
 					}
 				}
@@ -198,9 +196,9 @@ function unbound_control($action) {
 		case "start":
 				//Start unbound
 				if($unbound_config['unbound_status'] == "on") {
-					unbound_ctl_exec("start");
+					if(!is_service_running("unbound"))
+						unbound_ctl_exec("start");
 					fetch_root_hints();
-					sleep(1);
 				}
 				break;
 		
@@ -224,7 +222,7 @@ function unbound_control($action) {
 				
 		case "restore_cache":
 				//Restore Unbound's Cache
-				if($unbound_config['dumpcache'] == "on") {
+				if ((is_service_running("unbound")) && ($unbound_config['dumpcache'] == "on")) {
 					if(file_exists($cache_dumpfile) && filesize($cache_dumpfile) > 0)
 						unbound_ctl_exec("load_cache < /var/tmp/unbound_cache");
 				}
@@ -241,7 +239,7 @@ function unbound_control($action) {
 }
 
 function unbound_get_network_interface_addresses() {
-	global $config, $do_ipv6;
+	global $config;
 
 	$interfaces = $config['interfaces'];
 	$unbound_config = $config['installedpackages']['unbound']['config'][0];
@@ -282,7 +280,7 @@ function unbound_get_network_interface_addresses() {
 		}
 	
 		/* Configure IPv6 addresses */
-		if($do_ipv6 == true) {
+		if(function_exists("is_ipaddrv6")) {
 			if(is_ipaddrv6($interfaces[$unboundif]['ipaddrv6'])) {
 				$unbound_interfaces[$i]['ipv6']['ipaddr'] = $interfaces[$unboundif]['ipaddrv6'];
 				$unbound_interfaces[$i]['ipv6']['subnet'] = $interfaces[$unboundif]['subnetv6'];
@@ -292,7 +290,7 @@ function unbound_get_network_interface_addresses() {
 		/* Lastly check for loopback addresses*/
 		if($unboundif == "lo0") {
 			$unbound_interfaces[$i]['loopback']['ipaddr'] = "127.0.0.1";
-			if ($do_ipv6 == true)
+			if (function_exists("is_ipaddrv6"))
 				$unbound_interfaces[$i]['loopback6']['ipaddr'] = "::1";
 		}
 		$i++;
@@ -719,10 +717,11 @@ function read_hosts() {
 	return $etc_hosts;
 }
 
-/* Setup /etc/hosts entries by overriding with local-data
+/*
+ * Setup /etc/hosts entries by overriding with local-data
  */
 function unbound_add_host_entries() {
-	global $config, $do_ipv6;
+	global $config;
 	
 	/* XXX: break this out into a separate config file and make use of include */
 	$unboundcfg = $config['installedpackages']['unbound']['config'][0];
@@ -735,7 +734,7 @@ function unbound_add_host_entries() {
 	$unbound_entries .= "local-data: \"localhost A 127.0.0.1\"\n";
 	$unbound_entries .= "local-data: \"localhost.{$syscfg['domain']} A 127.0.0.1\"\n";
 	// IPv6 entries
-	if($do_ipv6 == true) {
+	if(function_exists("is_ipaddrv6")) {
 		$unbound_entries .= "local-data-ptr: \"::1 localhost\"\n";
 		$unbound_entries .= "local-data: \"localhost AAAA ::1\"\n";
 		$unbound_entries .= "local-data: \"localhost.{$syscfg['domain']} AAAA ::1\"\n";
@@ -772,7 +771,7 @@ function unbound_add_host_entries() {
 			$current_host = $host['host'];
 			if(!$added_item[$current_host]) {
 				$host_entries .= "local-data-ptr: \"{$host['ip']} {$host['host']}.{$host['domain']}\"\n";
-				if($do_ipv6 == true) {
+				if(function_exists("is_ipaddrv6")) {
 					if (is_ipaddrv6($host['ip']))
 						$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} IN AAAA {$host['ip']}\"\n";
 					else
