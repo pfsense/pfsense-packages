@@ -43,8 +43,11 @@ function varnish_settings_post_validate($post, $input_errors) {
 		$input_errors[] = "A valid number is required for the field 'Maximum worker threads'";	
 	if($post['timeoutworkers'] && !is_numeric($post['timeoutworkers'])) 
 		$input_errors[] = "A valid number is required for the field 'Worker thread timeout'";
-	if($post['managment'] && !preg_match("/^\w+:\d+$/",$post['managment'])) 
-		$input_errors[] = "A valid host/ip:port is required for the field 'managment'";
+	if($post['managment']){
+		$mgm= explode(":",$post['managment']);
+		if(!is_ipaddr($mgm[0]) || !is_numeric($mgm[1]))
+		$input_errors[] = "A valid ip:port is required for the field 'managment'";
+		}
 	if($post['grace'] &&  ! preg_match("/^\d+(h|m|s)$/",$post['grace']))
 		$input_errors[] = "A valid number with a time reference is required for the field 'Fetch grace'";
 	if($post['saint'] &&  ! preg_match("/^\d+(h|m|s)$/",$post['saint']))
