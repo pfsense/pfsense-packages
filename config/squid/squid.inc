@@ -604,7 +604,7 @@ function squid_resync_general() {
 		}
 	}
 	if (($settings['transparent_proxy'] == 'on')) {
-		$conf .= "http_port 127.0.0.1:80 transparent\n";
+		$conf .= "http_port 127.0.0.1:" . $settings['proxy_port'] . " transparent\n";
 	}
 	$icp_port = ($settings['icp_port'] ? $settings['icp_port'] : 0);
 
@@ -1380,15 +1380,15 @@ function squid_generate_rules($type) {
 				}
 			}
 			foreach ($ifaces as $iface) {
-				$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> 127.0.0.1 port 80\n";
+				$rules .= "rdr on $iface proto tcp from any to !($iface) port 80 -> 127.0.0.1 port " . $squid_conf['proxy_port'] . "\n";
 			}
 			/* Handle PPPOE case */
 			if(($config['pppoe']['mode'] == "server" && $config['pppoe']['localip']) || (function_exists("is_pppoe_server_enabled") && is_pppoe_server_enabled())) {
-				$rules .= "rdr on $PPPOE_ALIAS proto tcp from any to !127.0.0.1 port 80 -> 127.0.0.1 port 80\n";
+				$rules .= "rdr on $PPPOE_ALIAS proto tcp from any to !127.0.0.1 port 80 -> 127.0.0.1 port " . $squid_conf['proxy_port'] . "\n";
 			}
 			/* Handle PPTP case */
 			if($config['pptpd']['mode'] == "server" && $config['pptpd']['localip']) {
-				$rules .= "rdr on $PPTP_ALIAS proto tcp from any to !127.0.0.1 port 80 -> 127.0.0.1 port 80\n";
+				$rules .= "rdr on $PPTP_ALIAS proto tcp from any to !127.0.0.1 port 80 -> 127.0.0.1 port " . $squid_conf['proxy_port'] . "\n";
 			}
 			$rules .= "\n";
 			break;
