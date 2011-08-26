@@ -66,6 +66,7 @@
 		<name>lcdproc</name>
 		<rcfile>lcdproc.sh</rcfile>
 		<executable>LCDd</executable>
+		<description>LCD Driver</description>
 	</service>
 	<fields>
 		<field>
