@@ -78,6 +78,16 @@
 			<fieldname>scr_interfaces</fieldname>
 			<type>checkbox</type>
 		</field>
+		<field>
+			<fielddescr>Enable Mbuf</fielddescr>
+			<fieldname>scr_mbuf</fieldname>
+			<type>checkbox</type>
+		</field>	
+		<field>
+			<fielddescr>Enable CPU Frequency</fielddescr>
+			<fieldname>scr_cpufrequency</fieldname>
+			<type>checkbox</type>
+		</field>		
 	</fields>
 	<custom_php_command_before_form>
 		before_form_lcdproc_screens(&amp;$pkg);

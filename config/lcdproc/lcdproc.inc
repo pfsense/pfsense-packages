@@ -106,6 +106,15 @@
 				case "lpt1":
 					continue;
 					break;
+				case "ugen0.2":
+					continue;
+					break;
+				case "ugen1.2":
+					continue;
+					break;
+				case "ugen2.2":
+					continue;
+					break;
 				default:
 					$input_errors[] = "The chosen com port is not valid";
 					break;
@@ -178,6 +187,15 @@
 				case "lpt1":
 					$realport = "/dev/lpt0";
 					break;
+				case "ugen0.2":
+					$realport = "/dev/ugen0.2";
+					break;
+				case "ugen1.2":
+					$realport = "/dev/ugen1.2";
+					break;
+				case "ugen2.2":
+					$realport = "/dev/ugen2.2";
+					break;
 				default:
 					lcdproc_warn("The selected com port is not valid!");
 					return;
@@ -211,6 +229,16 @@
 
 			/* lcdproc default driver definitions */
 			switch($lcdproc_config[driver]) {
+				case "SureElec":
+					$config_text .= "[{$lcdproc_config['driver']}]\n";
+					$config_text .= "driverpath =/usr/local/lib/lcdproc/\n";
+					$config_text .= "Device={$realport}\n";
+					$config_text .= "Size={$lcdproc_config['size']}\n";
+					$config_text .= "Edition=2\n";					
+					$config_text .= "Contrast=200\n";
+					$config_text .= "Brightness=480\n";	
+					$config_text .= "Speed=19200\n";
+					break;			
 				case "nexcom":
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "driverpath =/usr/local/lib/lcdproc/\n";
@@ -222,6 +250,23 @@
 					$config_text .= "Device={$realport}\n";
 					$config_text .= "Speed=9600\n";
 					break;
+				case "picolcd":
+					 $config_text .= "[{$lcdproc_config['driver']}]\n";
+					 $config_text .= "driverpath=/usr/local/lib/lcdproc/\n";
+					 $config_text .= "Device={$realport}\n";
+					 $config_text .= "Size={$lcdproc_config['size']}\n";
+					 $config_text .= "KeyTimeout=500\n";
+					 $config_text .= "Brightness=1000\n";
+					 $config_text .= "Blacklight_Timer=60\n";
+					 $config_text .= "Contrast=1000\n";
+					 $config_text .= "Keylights=on\n";
+					 $config_text .= "Key0Light=on\n";
+					 $config_text .= "Key1Light=off\n";
+					 $config_text .= "Key2Light=off\n";
+					 $config_text .= "Key3Light=off\n";
+					 $config_text .= "Key4Light=off\n";
+					 $config_text .= "Key5Light=off\n";
+					 break;					
 				case "CFontz":
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "Device={$realport}\n";
