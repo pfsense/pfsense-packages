@@ -42,6 +42,26 @@
 	    <prefix>/usr/local/lib/lcdproc/</prefix>
 	    <chmod>0755</chmod>
 	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/lcdproc/bin/SureElec.so</item>
+	    <prefix>/usr/local/lib/lcdproc/</prefix>
+	    <chmod>0755</chmod>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/lcdproc/bin/picolcd.so</item>
+	    <prefix>/usr/local/lib/lcdproc/</prefix>
+	    <chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/lcdproc/bin/libusb.so.2</item>
+	    <prefix>/usr/local/lib/lcdproc/</prefix>
+	    <chmod>0755</chmod>
+	</additional_files_needed>	
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/lcdproc/bin/libkvm.so.5</item>
+	    <prefix>/usr/local/lib/lcdproc/</prefix>
+	    <chmod>0755</chmod>
+	</additional_files_needed>	
 	<service>
 		<name>lcdproc</name>
 		<rcfile>lcdproc.sh</rcfile>
@@ -79,6 +99,18 @@
 					<value>lpt1</value>
 					<name>Parallel port 1 (/dev/lpt0)</name>
 				</option>
+				<option>
+					<value>ugen0.2</value>
+					<name>USB Com port 1 alternate (/dev/ugen0.2)</name>
+				</option>				
+				<option>
+					<value>ugen1.2</value>
+					<name>USB Com port 2 alternate (/dev/ugen1.2)</name>
+				</option>
+				<option>
+					<value>ugen2.2</value>
+					<name>USB Com port 3 alternate (/dev/ugen2.2)</name>
+				</option>				
 			</options>
 			<default_value>ucom1</default_value>
 		</field>
@@ -244,6 +276,10 @@
 				<option>
 					<value>pyramid</value>
 					<name>pyramid</name>
+				</option>				
+				<option>
+					<value>picolcd</value>
+					<name>picolcd</name>
 				</option>
 				<option>
 					<value>Sed1330</value>
@@ -269,6 +305,10 @@
 					<value>stv5730</value>
 					<name>stv5730</name>
 				</option>
+				<option>
+					<value>SureElec</value>
+					<name>SureElec</name>
+				</option>				
 				<option>
 					<value>svga</value>
 					<name>svga</name>
@@ -296,6 +336,35 @@
 			</options>
 			<default_value>pyramid</default_value>
 		</field>
+		<field>
+			<fieldname>refresh_frequency</fieldname>
+			<fielddescr>Refresh frequency</fielddescr>
+			<description>Set the refresh frequency of the information on the LCD Panel</description>
+			<type>select</type>
+			<options>
+				<option>
+					<value>1</value>
+					<name>1 second</name>
+				</option>
+				<option>
+					<value>2</value>
+					<name>2 seconds</name>
+				</option>
+				<option>
+					<value>3</value>
+					<name>3 seconds</name>
+				</option>
+				<option>
+					<value>5</value>
+					<name>5 seconds</name>
+				</option>
+				<option>
+					<value>10</value>
+					<name>10 seconds</name>
+				</option>
+			</options>
+			<default_value>5</default_value>
+		</field>		
 	</fields>
 	<custom_php_command_before_form>
 		before_form_lcdproc(&amp;$pkg);
