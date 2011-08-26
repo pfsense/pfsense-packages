@@ -944,6 +944,15 @@ function squid_resync_auth() {
 	$settingsconfig = $config['installedpackages']['squid']['config'][0];
 	$conf = '';
 
+	// Custom Options
+	if(!empty($config['installedpackages']['squid']['config'][0]['custom_options'])) {
+		$custopts = explode(";", ($config['installedpackages']['squid']['config'][0]['custom_options']));
+		$conf .= "# Custom options\n";
+		foreach ($custopts as $custopt) {
+			$conf .= $custopt."\n";
+		}
+	}
+
 	// Deny the banned guys before allowing the good guys
 	if(! empty($settingsnac['banned_hosts'])) {
 		if (squid_is_valid_acl('banned_hosts')) {
@@ -1056,14 +1065,6 @@ EOD;
 		// Allow the other ACLs as long as they authenticate
 		foreach ($password as $acl)
 			$conf .= "http_access allow password $acl\n";
-	}
-
-  if(!empty($config['installedpackages']['squid']['config'][0]['custom_options'])) {
-	 $custopts = explode(";", ($config['installedpackages']['squid']['config'][0]['custom_options']));
-	 $conf .= "# Custom options\n";
-	 foreach ($custopts as $custopt) {
-			$conf .= $custopt."\n";
-	 }
 	}
 
 	$conf .= "# Default block all to be sure\n";
