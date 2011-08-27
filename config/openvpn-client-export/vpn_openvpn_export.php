@@ -3,7 +3,7 @@
 	vpn_openvpn_export.php
 
 	Copyright (C) 2008 Shrew Soft Inc.
-	Copyright (C) 2010 Ermal Luçi
+	Copyright (C) 2010 Ermal Luï¿½i
 	All rights reserved. 
 
 	Redistribution and use in source and binary forms, with or without
@@ -136,6 +136,8 @@ if($act == "conf" || $act == "confall") {
 		$input_errors[] = "You need to specify an IP or hostname.";
 	} else
 		$useaddr = $_GET['useaddr'];
+		
+	$advancedoptions = $_GET['advancedoptions'];
 
 	$usetoken = $_GET['usetoken'];
 	$password = "";
@@ -173,7 +175,7 @@ if($act == "conf" || $act == "confall") {
 	$exp_name = openvpn_client_export_prefix($srvid);
 	if ($act == "confall")
 		$zipconf = true;
-	$exp_data = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, $zipconf, $password);
+	$exp_data = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, $zipconf, $password, false, false, $advancedoptions);
 	if (!$exp_data) {
 		$input_errors[] = "Failed to export config files!";
 		$error = true;
@@ -220,6 +222,8 @@ if($act == "visc") {
 	} else
 		$useaddr = $_GET['useaddr'];
 
+	$advancedoptions = $_GET['advancedoptions'];
+		
 	$usetoken = $_GET['usetoken'];
 	$password = "";
 	if ($_GET['password'])
@@ -255,7 +259,7 @@ if($act == "visc") {
 
 	$exp_name = openvpn_client_export_prefix($srvid);
 	$exp_name = urlencode($exp_name."-Viscosity.visc.zip");
-	$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $password, $proxy);
+	$exp_path = viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $password, $proxy,  $advancedoptions);
 	if (!$exp_path) {
 		$input_errors[] = "Failed to export config files!";
 		$error = true;
@@ -292,6 +296,8 @@ if($act == "inst") {
 	} else
 		$useaddr = $_GET['useaddr'];
 
+	$advancedoptions = $_GET['advancedoptions'];
+	
 	$usetoken = $_GET['usetoken'];
 	$password = "";
 	if ($_GET['password'])
@@ -327,7 +333,7 @@ if($act == "inst") {
 
 	$exp_name = openvpn_client_export_prefix($srvid);
 	$exp_name = urlencode($exp_name."-install.exe");
-	$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $password, $proxy);
+	$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $password, , $advancedoptions);
 	if (!$exp_path) {
 		$input_errors[] = "Failed to export config files!";
 		$error = true;
@@ -385,6 +391,8 @@ function download_begin(act, i, j) {
 	var users = servers[index][1];
 	var certs = servers[index][3];
 	var useaddr;
+	
+	var advancedoptions;
 
 	if (document.getElementById("useaddr").value == "other") {
 		if (document.getElementById("useaddr_hostname").value == "") {
@@ -394,6 +402,8 @@ function download_begin(act, i, j) {
 		useaddr = document.getElementById("useaddr_hostname").value;
 	} else
 		useaddr = document.getElementById("useaddr").value;
+		
+	advancedoptions = document.getElementById("advancedoptions").value;
 
 	var usetoken = 0;
 	if (document.getElementById("usetoken").checked)
@@ -475,6 +485,8 @@ function download_begin(act, i, j) {
 			dlurl += "&proxy_password=" + escape(proxypass);
 		}
 	}
+	
+	dlurl += "&advancedoptions=" + escape(advancedoptions);
 
 	window.open(dlurl,"_self");
 }
@@ -779,6 +791,14 @@ function useproxy_changed(obj) {
 					</tr>
 					<tr>
 						<td colspan="2" class="list" height="12">&nbsp;</td>
+					</tr>
+					<tr>
+						<td width="22%" valign="top" class="vncell">Additional configuration options</td>
+						<td width="78%" class="vtable">
+							<textarea rows="6" cols="78" name="advancedoptions" id="advancedoptions"></textarea><br/>
+							<?=gettext("Enter any additional options you would like to add to the OpenVPN client export configuration here, separated by a line break or semicolon"); ?><br/>
+							<?=gettext("EXAMPLE: remote-random"); ?>;
+						</td>
 					</tr>
 					<tr>
 						<td colspan="2" valign="top" class="listtopic">Client Install Packages</td>
