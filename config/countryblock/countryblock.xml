@@ -41,7 +41,7 @@
 	<requirements>Active Internet</requirements>
 	<faq>http://forum.pfsense.org/index.php/topic,25732.0.html</faq>
 	<name>Country Block Settings</name>
-	<version>0.2.1</version>
+	<version>0.2.2</version>
 	<title>Settings</title>
 	<include_file>/usr/local/pkg/countryblock.inc</include_file>
 	<menu>
@@ -167,7 +167,7 @@
 	<additional_files_needed>
 		<prefix>/tmp/</prefix>
 		<chmod>0755</chmod>
-		<item>http://tomschaefer.org/pfsense/repo/countryblock/CIDR.php</item>
+		<item>https://raw.github.com/tommyboy180/pfsense-bin/2812cb9e1c9357bbf2027eff82096773bc4ddc5d/countryblock/CIDR.tar.gz</item>
 	</additional_files_needed>
 	<fields>
 		<field>

@@ -103,8 +103,8 @@ function php_install_command_cb()
 	exec("cp /tmp/interfaces.txt /usr/local/www/packages/countryblock/interfaces.txt");
 	unlink_if_exists("/tmp/interfaces.txt");
 	
-	exec("cp /tmp/CIDR.php /usr/local/www/packages/countryblock/CIDR.tar.gz");
-	unlink_if_exists("/tmp/CIDR.php");
+	exec("cp /tmp/CIDR.tar.gz /usr/local/www/packages/countryblock/CIDR.tar.gz");
+	unlink_if_exists("/tmp/CIDR.tar.gz");
 	
 	exec("tar xzf /usr/local/www/packages/countryblock/CIDR.tar.gz -C /usr/local/www/packages/countryblock/CIDR");
 	exec("rm /usr/local/www/packages/countryblock/CIDR.tar.gz");
@@ -127,6 +127,7 @@ function deinstall_command_cb()
 	exec("rm -R /usr/local/www/packages/countryblock/countryblocks");
 	exec("rm -R /usr/local/www/packages/countryblock");
 	exec("rm /usr/local/etc/rc.d/countryblock.sh");
+	exec("rm /usr/local/pkg/pf/countryblock.sh");
 	exec("pfctl -t countryblock -T kill");
 	exec("sed -i -e '/countryblock/d' /tmp/rules.debug");
 	exec("pfctl -o basic -f /tmp/rules.debug");
