@@ -103,6 +103,8 @@ function php_install_command_cb()
 	exec("cp /tmp/interfaces.txt /usr/local/www/packages/countryblock/interfaces.txt");
 	unlink_if_exists("/tmp/interfaces.txt");
 	
+	exec("/usr/bin/fetch -o /tmp https://raw.github.com/tommyboy180/pfsense-bin/2812cb9e1c9357bbf2027eff82096773bc4ddc5d/countryblock/CIDR.tar.gz");	
+
 	exec("cp /tmp/CIDR.tar.gz /usr/local/www/packages/countryblock/CIDR.tar.gz");
 	unlink_if_exists("/tmp/CIDR.tar.gz");
 	
@@ -111,7 +113,6 @@ function php_install_command_cb()
 
 	exec("mkdir /usr/local/www/packages/countryblock/lists");
 	exec("touch /usr/local/www/packages/countryblock/lists/countries.txt");
-
 
 	conf_mount_ro();
 	config_unlock();
