@@ -52,7 +52,7 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,25732.0.html</pkginfolink>
 		<config_file>http://pfsense.org/packages/config/countryblock/countryblock.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
-		<version>0.2.1</version>
+		<version>0.2.2</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
@@ -692,7 +692,7 @@
 		<website>http://www.freeradius.org/</website>
 		<descr>A free implementation of the RADIUS protocol.</descr>
 		<category>System</category>
-		<version>1.1.8</version>
+		<version>1.1.8 pkg v1.0</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<maintainer>none</maintainer>
