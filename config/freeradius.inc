@@ -26,7 +26,7 @@ function freeradius_install_command() {
 
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
-	$rcfile['start'] = 'killall -9 radiusd  ; sleep 5 && radiusd -s &';;
+	$rcfile['start'] = 'killall -9 radiusd  ; sleep 5 && radiusd -s &';
 	$rcfile['stop'] = 'killall -9 radiusd ; sleep 5';
         conf_mount_rw();
 	write_rcfile($rcfile);
