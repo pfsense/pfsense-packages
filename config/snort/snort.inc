@@ -599,7 +599,7 @@ function snort_postinstall()
 			exec("/usr/bin/fetch -o /usr/local/bin/barnyard2 http://files.pfsense.org/packages/amd64/{$snort_freebsd_ver}/All/barnyard2");
 		else
 			exec("/usr/bin/fetch -o /usr/local/bin/barnyard2 http://files.pfsense.org/packages/{$snort_freebsd_ver}/All/barnyard2");
-		exec('/bin/chmod 755 /usr/local/bin/barnyard2');
+		exec('/bin/chmod 0755 /usr/local/bin/barnyard2');
 	}
 	update_output_window(gettext("Finnished Installing Barnyard2..."));
 
