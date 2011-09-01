@@ -43,6 +43,10 @@ $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 $id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
+if (is_null($id)) {
+        header("Location: /snort/snort_interfaces.php");
+        exit;
+}
 
 if (isset($id) && $a_nat[$id]) {
 	$pconfig['enable'] = $a_nat[$id]['enable'];
@@ -185,8 +189,8 @@ if ($_GET['openruleset'] != '' && $_GET['ids'] != '') {
 }
 */
 
-//$ruledir = "/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/";
-$ruledir = "/usr/local/etc/snort/rules/";
+$ruledir = "/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/";
+//$ruledir = "/usr/local/etc/snort/rules/";
 $dh  = opendir($ruledir);
 while (false !== ($filename = readdir($dh)))
 {

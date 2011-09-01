@@ -1,6 +1,6 @@
 <?php
 /*
- system_edit.php
+ snort_rules_edit.php
  Copyright (C) 2004, 2005 Scott Ullrich
  Copyright (C) 2011 Ermal Luci
  All rights reserved.
@@ -44,8 +44,6 @@ require_once("/usr/local/pkg/snort/snort_gui.inc");
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
 }
-
-//nat_rules_sort();
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
 $id = $_GET['id'];
@@ -64,8 +62,13 @@ if (isset($id) && $a_nat[$id]) {
 
 //get rule id
 $lineid = $_GET['ids'];
+if (isset($_POST['ids']))
+	$lineid = $_POST['ids'];
 
 $file = $_GET['openruleset'];
+if (isset($_POST['openruleset']))
+	$file = $_POST['openruleset'];
+
 //read file into string, and get filesize also chk for empty files
 if (filesize($file) > 0 ) {
 	$contents2 = file_get_contents($file);
@@ -80,23 +83,16 @@ $delimiter = "\n";
 $splitcontents = explode($delimiter, $contents2);
 
 if ($_POST) {
-	if($_POST['highlight'] <> "") {
-		if($_POST['highlight'] == "yes" or
-		$_POST['highlight'] == "enabled") {
-			$highlight = "yes";
-		} else {
-			$highlight = "no";
-		}
-	} else {
-		$highlight = "no";
-	}
+	$highlight = "no";
+	if($_POST['highlight'] == "yes")
+		$highlight = "yes";
 
-	if($_POST['rows'] <> "")
+	if ($_POST['rows'] <> "")
 		$rows = $_POST['rows'];
 	else
 		$rows = 1;
 
-	if($_POST['cols'] <> "")
+	if ($_POST['cols'] <> "")
 		$cols = $_POST['cols'];
 	else
 		$cols = 66;
@@ -125,17 +121,19 @@ $pgtitle = array(gettext("Advanced"), gettext("File Editor"));
 
 <body link="#000000" vlink="#000000" alink="#000000">
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
-	<tr>
-		<td class="tabcont">
-		<form action="snort_rules_edit.php?id=<?=$id; ?>&openruleset=<?=$file; ?>&ids=<?=$ids; ?>" method="post">
+<tr>
+	<td class="tabcont">
+	<form action="snort_rules_edit.php?id=<?=$id; ?>&openruleset=<?=$file; ?>&ids=<?=$ids; ?>" method="post">
 
-	<?php if ($savemsg) print_info_box($savemsg); 
-		if ($file != '/usr/local/etc/snort/snort_update.log'):
-	?>
+	<?php if ($savemsg) print_info_box($savemsg); ?>
+
 		<table width="100%" cellpadding="9" cellspacing="9" bgcolor="#eeeeee">
 		<tr>
 			<td>
 				<input name="save" type="submit" class="formbtn" id="save" value="save" />
+				<input type='hidden' name='id' value='<?=$id;?>' />
+				<input type='hidden' name='ids' value='<?=$ids;?>' />
+				<input type='hidden' name='openruleset' value='<?=$file;?>' />
 				<input type="button" class="formbtn" value="Cancel" onclick="window.close()">
 				<hr noshade="noshade" />
 				Disable original rule :<br/>
@@ -146,37 +144,20 @@ $pgtitle = array(gettext("Advanced"), gettext("File Editor"));
 				<label for="highlighting_disabled"> <?=gettext("Disabled");?></label>
 			</td>
 		</tr>
-		</table>
-		<table width="100%">
 		<tr>
 			<td valign="top" class="label">
-				<div style="background: #eeeeee;" id="textareaitem">
-				<!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
-				<textarea wrap="off" style="width: 98%; margin: 7px;" class="<?=$language;?>:showcolumns" rows="<?=$rows;?>" cols="<?=$cols;?>" name="code">
-				<?=$tempstring;?> </textarea>
-				</div>
+			<div style="background: #eeeeee;" id="textareaitem"><!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
+			<textarea
+				wrap="off" style="width: 98%; margin: 7px;"
+				class="<?php echo $language; ?>:showcolumns" rows="33"
+				cols="<?=$cols;?>" name="code"><?=$contents2;?></textarea>
+			</div>
 			</td>
 		</tr>
 		</table>
-	<?php endif; ?>
-		<table width='100%'>
-			<tr>
-				<td valign="top" class="label">
-				<div style="background: #eeeeee;" id="textareaitem"><!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
-				<textarea
-				<? if ($file != '/usr/local/etc/snort/snort_update.log') { echo 'disabled'; } ?>
-					wrap="off" style="width: 98%; margin: 7px;"
-					class="<?php echo $language; ?>:showcolumns" rows="33"
-					cols="<?=$cols;?>" name="code2"><?=$contents2;?></textarea>
-				</div>
-				</td>
-			</tr>
-		</table>
-		<? echo "$file\n"; ?></td>
-	</tr>
+	</td>
+</tr>
 </table>
-
 <?php include("fend.inc");?>
-
 </body>
 </html>
