@@ -1245,7 +1245,7 @@ function create_snort_sh()
 ###### For Each Iface
 
 # If Snort proc is NOT running
-if [ "`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}{$if_real}" | /usr/bin/awk '{print $2;}'`" = "" ]; then
+if [ "`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/awk '{print $2;}'`" = "" ]; then
 
 	/bin/echo "snort.sh run" > /tmp/snort.sh.pid
 		
@@ -1268,9 +1268,9 @@ EOD;
 
 #### Fake start only used on bootup and Pfsense IP changes
 #### Only try to restart if snort is running on Iface
-if [ "`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}{$if_real}" | /usr/bin/awk '{print $2;}'`" != "" ]; then
+if [ "`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/awk '{print $2;}'`" != "" ]; then
 
-	snort_pid="`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}{$if_real}" | /usr/bin/awk '{print $2;}'`"
+	snort_pid=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/awk '{print $2;}'`
 	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort already running, soft restart"
 
 	#### Restart Iface
@@ -1283,7 +1283,7 @@ EOE;
 
 			$snort_sh_text4[] = <<<EOF
 
-pid_s=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}{$if_real}" | /usr/bin/awk '{print \$2;}'`
+pid_s=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/awk '{print \$2;}'`
 sleep 3
 pid_b=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "snort_{$snort_uuid}_{$if_real}.u2" | /usr/bin/awk '{print \$2;}'`
 
@@ -1339,7 +1339,7 @@ rc_start() {
 	/bin/rm /tmp/snort.sh.pid
 
 	#### If on Fake start snort is NOT running DO a real start.
-	if [ "`/bin/ps -auwx | grep -v grep | grep "R {$snort_uuid}{$if_real}" | awk '{print $2;}'`" = "" ]; then
+	if [ "`/bin/ps -auwx | grep -v grep | grep "R {$snort_uuid}" | awk '{print $2;}'`" = "" ]; then
 
 		rc_start_real
 
