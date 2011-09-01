@@ -55,8 +55,6 @@ if (intval($config['version']) > 6)
 else
 	$snort_pfsense_basever = 'yes';
 
-$snort_freebsd_ver = php_uname("r");
-$snort_freebsd_ver = $snort_freebsd_ver[0];
 /* find out what arch where in x86 , x64 */
 $snort_arch_ck = php_uname("m");
 if ($snort_arch_ck == 'i386')
@@ -482,7 +480,7 @@ function post_delete_logs()
 
 function snort_postinstall()
 {
-	global $config, $g, $snort_pfsense_basever, $snort_arch, $snort_freebsd_ver;
+	global $config, $g, $snort_pfsense_basever, $snort_arch;
 
 	/* snort -> advanced features */
 	if (is_array($config['installedpackages']['snortglobal'])) {
@@ -596,9 +594,9 @@ function snort_postinstall()
 		exec('/usr/bin/fetch -o /usr/local/bin/barnyard2 http://www.pfsense.com/packages/config/snort/bin/7.3.x86/barnyard2');
 	else if ($snort_pfsense_basever == 'no') {
 		if ($snort_arch == 'x64')
-			exec("/usr/bin/fetch -o /usr/local/bin/barnyard2 http://files.pfsense.org/packages/amd64/{$snort_freebsd_ver}/All/barnyard2");
+			exec("/usr/bin/fetch -o /usr/local/bin/barnyard2 http://files.pfsense.org/packages/amd64/8/All/barnyard2");
 		else
-			exec("/usr/bin/fetch -o /usr/local/bin/barnyard2 http://files.pfsense.org/packages/{$snort_freebsd_ver}/All/barnyard2");
+			exec("/usr/bin/fetch -o /usr/local/bin/barnyard2 http://files.pfsense.org/packages/8/All/barnyard2");
 		exec('/bin/chmod 0755 /usr/local/bin/barnyard2');
 	}
 	update_output_window(gettext("Finnished Installing Barnyard2..."));
