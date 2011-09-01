@@ -1,7 +1,7 @@
 <?php
 /* $Id$ */
 /*
- snort_interfaces.php
+ snort_define_servers.php
  part of m0n0wall (http://m0n0.ch/wall)
 
  Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
@@ -45,38 +45,24 @@ require_once("/usr/local/pkg/snort/snort.inc");
 
 global $g;
 
-if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
-	$config['installedpackages']['snortglobal']['rule'] = array();
-}
-
-//nat_rules_sort();
-$a_nat = &$config['installedpackages']['snortglobal']['rule'];
-
 $id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
-
-if (isset($_GET['dup'])) {
-	$id = $_GET['dup'];
-	$after = $_GET['dup'];
+if (is_null($id)) {
+        header("Location: /snort/snort_interfaces.php");
+        exit;
 }
 
+if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
+	$config['installedpackages']['snortglobal']['rule'] = array();
+}
+$a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
+$pconfig = array();
 if (isset($id) && $a_nat[$id]) {
+	$pconfig = $a_nat[$id];
 
 	/* old options */
-	$pconfig['def_ssl_ports_ignore'] = $a_nat[$id]['def_ssl_ports_ignore'];
-	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
-	$pconfig['max_queued_bytes'] = $a_nat[$id]['max_queued_bytes'];
-	$pconfig['max_queued_segs'] = $a_nat[$id]['max_queued_segs'];
-	$pconfig['perform_stat'] = $a_nat[$id]['perform_stat'];
-	$pconfig['http_inspect'] = $a_nat[$id]['http_inspect'];
-	$pconfig['other_preprocs'] = $a_nat[$id]['other_preprocs'];
-	$pconfig['ftp_preprocessor'] = $a_nat[$id]['ftp_preprocessor'];
-	$pconfig['smtp_preprocessor'] = $a_nat[$id]['smtp_preprocessor'];
-	$pconfig['sf_portscan'] = $a_nat[$id]['sf_portscan'];
-	$pconfig['dce_rpc_2'] = $a_nat[$id]['dce_rpc_2'];
-	$pconfig['dns_preprocessor'] = $a_nat[$id]['dns_preprocessor'];
 	$pconfig['def_dns_servers'] = $a_nat[$id]['def_dns_servers'];
 	$pconfig['def_dns_ports'] = $a_nat[$id]['def_dns_ports'];
 	$pconfig['def_smtp_servers'] = $a_nat[$id]['def_smtp_servers'];
@@ -110,82 +96,22 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['def_rlogin_ports'] = $a_nat[$id]['def_rlogin_ports'];
 	$pconfig['def_rsh_ports'] = $a_nat[$id]['def_rsh_ports'];
 	$pconfig['def_ssl_ports'] = $a_nat[$id]['def_ssl_ports'];
-	$pconfig['barnyard_enable'] = $a_nat[$id]['barnyard_enable'];
-	$pconfig['barnyard_mysql'] = $a_nat[$id]['barnyard_mysql'];
-	$pconfig['enable'] = $a_nat[$id]['enable'];
-	$pconfig['uuid'] = $a_nat[$id]['uuid'];
-	$pconfig['interface'] = $a_nat[$id]['interface'];
-	$pconfig['whitelistname'] = $a_nat[$id]['whitelistname'];
-	$pconfig['homelistname'] = $a_nat[$id]['homelistname'];
-	$pconfig['externallistname'] = $a_nat[$id]['externallistname'];
-	$pconfig['suppresslistname'] = $a_nat[$id]['suppresslistname'];
-	$pconfig['descr'] = $a_nat[$id]['descr'];
-	$pconfig['performance'] = $a_nat[$id]['performance'];
-	$pconfig['blockoffenders7'] = $a_nat[$id]['blockoffenders7'];
-	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
-	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
-	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];
-	$pconfig['configpassthru'] = $a_nat[$id]['configpassthru'];
-	$pconfig['barnconfigpassthru'] = $a_nat[$id]['barnconfigpassthru'];
-	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
-	$pconfig['rule_sid_off'] = $a_nat[$id]['rule_sid_off'];
-	$pconfig['rule_sid_on'] = $a_nat[$id]['rule_sid_on'];
-
-	if (isset($_GET['dup']))
-	unset($id);
 }
 
 /* convert fake interfaces to real */
 $if_real = snort_get_real_interface($pconfig['interface']);
-
 $snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
 
 /* alert file */
 $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 
+if ($_POST) {
 
-if ($_POST["Submit"]) {
-
-	/* check for overlaps */
+	$natent = array();
+	$natent = $pconfig;
 
 	/* if no errors write to conf */
 	if (!$input_errors) {
-		$natent = array();
-		/* repost the options already in conf */
-		if ($pconfig['interface'] != "") { $natent['interface'] = $pconfig['interface']; }
-		if ($pconfig['enable'] != "") { $natent['enable'] = $pconfig['enable']; }
-		if ($pconfig['uuid'] != "") { $natent['uuid'] = $pconfig['uuid']; }
-		if ($pconfig['descr'] != "") { $natent['descr'] = $pconfig['descr']; }
-		if ($pconfig['performance'] != "") { $natent['performance'] = $pconfig['performance']; }
-		if ($pconfig['blockoffenders7'] != "") { $natent['blockoffenders7'] = $pconfig['blockoffenders7']; }
-		if ($pconfig['alertsystemlog'] != "") { $natent['alertsystemlog'] = $pconfig['alertsystemlog']; }
-		if ($pconfig['tcpdumplog'] != "") { $natent['tcpdumplog'] = $pconfig['tcpdumplog']; }
-		if ($pconfig['snortunifiedlog'] != "") { $natent['snortunifiedlog'] = $pconfig['snortunifiedlog']; }
-		if ($pconfig['def_ssl_ports_ignore'] != "") { $natent['def_ssl_ports_ignore'] = $pconfig['def_ssl_ports_ignore']; }
-		if ($pconfig['flow_depth'] != "") { $natent['flow_depth'] = $pconfig['flow_depth']; }
-		if ($pconfig['max_queued_bytes'] != "") { $natent['max_queued_bytes'] = $pconfig['max_queued_bytes']; }
-		if ($pconfig['max_queued_segs'] != "") { $natent['max_queued_segs'] = $pconfig['max_queued_segs']; }
-		if ($pconfig['perform_stat'] != "") { $natent['perform_stat'] = $pconfig['perform_stat']; }
-		if ($pconfig['http_inspect'] != "") { $natent['http_inspect'] = $pconfig['http_inspect']; }
-		if ($pconfig['other_preprocs'] != "") { $natent['other_preprocs'] = $pconfig['other_preprocs']; }
-		if ($pconfig['ftp_preprocessor'] != "") { $natent['ftp_preprocessor'] = $pconfig['ftp_preprocessor']; }
-		if ($pconfig['smtp_preprocessor'] != "") { $natent['smtp_preprocessor'] = $pconfig['smtp_preprocessor']; }
-		if ($pconfig['sf_portscan'] != "") { $natent['sf_portscan'] = $pconfig['sf_portscan']; }
-		if ($pconfig['dce_rpc_2'] != "") { $natent['dce_rpc_2'] = $pconfig['dce_rpc_2']; }
-		if ($pconfig['dns_preprocessor'] != "") { $natent['dns_preprocessor'] = $pconfig['dns_preprocessor']; }
-		if ($pconfig['barnyard_enable'] != "") { $natent['barnyard_enable'] = $pconfig['barnyard_enable']; }
-		if ($pconfig['barnyard_mysql'] != "") { $natent['barnyard_mysql'] = $pconfig['barnyard_mysql']; }
-		if ($pconfig['rulesets'] != "") { $natent['rulesets'] = $pconfig['rulesets']; }
-		if ($pconfig['rule_sid_off'] != "") { $natent['rule_sid_off'] = $pconfig['rule_sid_off']; }
-		if ($pconfig['rule_sid_on'] != "") { $natent['rule_sid_on'] = $pconfig['rule_sid_on']; }
-		if ($pconfig['configpassthru'] != "") { $natent['configpassthru'] = $pconfig['configpassthru'];	}
-		if ($pconfig['barnconfigpassthru'] != "") { $natent['barnconfigpassthru'] = $pconfig['barnconfigpassthru'];	}
-		if ($pconfig['whitelistname'] != "") { $natent['whitelistname'] = $pconfig['whitelistname']; }
-		if ($pconfig['homelistname'] != "") { $natent['homelistname'] = $pconfig['homelistname'];	}
-		if ($pconfig['externallistname'] != "") { $natent['externallistname'] = $pconfig['externallistname'];	}
-		if ($pconfig['suppresslistname'] != "") { $natent['suppresslistname'] = $pconfig['suppresslistname'];	}
-
-
 		/* post new options */
 		if ($_POST['def_dns_servers'] != "") { $natent['def_dns_servers'] = $_POST['def_dns_servers']; }else{ $natent['def_dns_servers'] = ""; }
 		if ($_POST['def_dns_ports'] != "") { $natent['def_dns_ports'] = $_POST['def_dns_ports']; }else{ $natent['def_dns_ports'] = ""; }
@@ -241,9 +167,7 @@ if ($_POST["Submit"]) {
 		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
-
 		header("Location: snort_define_servers.php?id=$id");
-
 		exit;
 	}
 }
@@ -262,15 +186,6 @@ if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 echo "{$snort_general_css}\n";
 ?>
 
-<div class="body2">
-
-<noscript>
-<div class="alert" ALIGN=CENTER><img
-	src="../themes/<?php echo $g['theme']; ?>/images/icons/icon_alert.gif" /><strong>Please
-enable JavaScript to view this content
-</CENTER></div>
-</noscript>
-
 <form action="snort_define_servers.php" method="post"
 	enctype="multipart/form-data" name="iform" id="iform"><?php
 
@@ -282,20 +197,6 @@ enable JavaScript to view this content
 
 	if ($savemsg) {
 		print_info_box2($savemsg);
-	}
-
-	//if (file_exists($d_snortconfdirty_path)) {
-	if (file_exists($d_snortconfdirty_path) || file_exists("/var/run/snort_conf_{$snort_uuid}_.dirty")) {
-		echo '<p>';
-
-		if($savemsg) {
-			print_info_box_np2("{$savemsg}");
-		}else{
-			print_info_box_np2('
-			The Snort configuration has changed and snort needs to be restarted on this interface.<br>
-			You must apply the changes in order for them to take effect.<br>
-			');
-		}
 	}
 
 	?>
@@ -324,28 +225,6 @@ enable JavaScript to view this content
 <tr>
 		<td class="tabcont">
 		<table width="100%" border="0" cellpadding="6" cellspacing="0">
-		<?php
-		/* display error code if there is no id */
-		if($id == "")
-		{
-			echo "
-				<style type=\"text/css\">
-				.noid {
-				position:absolute;
-				top:10px;
-				left:0px;
-				width:94%;
-				background:#FCE9C0;
-				background-position: 15px; 
-				border-top:2px solid #DBAC48;
-				border-bottom:2px solid #DBAC48;
-				padding: 15px 10px 85% 50px;
-				}
-				</style> 
-				<div class=\"alert\" ALIGN=CENTER><img src=\"/themes/{$g['theme']}/images/icons/icon_alert.gif\"/><strong>You can not edit options without an interface ID.</CENTER></div>\n";
-
-		}
-		?>
 			<tr>
 				<td width="22%" valign="top">&nbsp;</td>
 				<td width="78%"><span class="vexpl"><span class="red"><strong>Note:</strong></span><br>
@@ -624,9 +503,8 @@ enable JavaScript to view this content
 				<td width="22%" valign="top">&nbsp;</td>
 				<td width="78%">
 					<input name="Submit" type="submit" class="formbtn" value="Save"> 
-					<?php if (isset($id) && $a_nat[$id]): ?>
-						<input name="id" type="hidden" value="<?=$id;?>">
-					<?php endif; ?></td>
+					<input name="id" type="hidden" value="<?=$id;?>">
+				</td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top">&nbsp;</td>
@@ -638,10 +516,6 @@ enable JavaScript to view this content
 
 </table>
 </form>
-
-</div>
-
-
-		<?php include("fend.inc"); ?>
+<?php include("fend.inc"); ?>
 </body>
 </html>

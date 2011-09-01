@@ -50,14 +50,13 @@ if (is_null($id)) {
         header("Location: /snort/snort_interfaces.php");
         exit;
 }
-if (isset($_GET['dup'])) {
-	$id = $_GET['dup'];
-	$after = $_GET['dup'];
-}
 
+$pconfig = array();
 if (isset($id) && $a_nat[$id]) {
+	$pconfig = $a_nat[$id];
 
 	/* new options */
+	$pconfig['perform_stat'] = $a_nat[$id]['perform_stat'];
 	$pconfig['def_ssl_ports_ignore'] = $a_nat[$id]['def_ssl_ports_ignore'];
 	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
 	$pconfig['max_queued_bytes'] = $a_nat[$id]['max_queued_bytes'];
@@ -70,65 +69,6 @@ if (isset($id) && $a_nat[$id]) {
 	$pconfig['sf_portscan'] = $a_nat[$id]['sf_portscan'];
 	$pconfig['dce_rpc_2'] = $a_nat[$id]['dce_rpc_2'];
 	$pconfig['dns_preprocessor'] = $a_nat[$id]['dns_preprocessor'];
-
-	/* old options */
-	$pconfig['def_dns_servers'] = $a_nat[$id]['def_dns_servers'];
-	$pconfig['def_dns_ports'] = $a_nat[$id]['def_dns_ports'];
-	$pconfig['def_smtp_servers'] = $a_nat[$id]['def_smtp_servers'];
-	$pconfig['def_smtp_ports'] = $a_nat[$id]['def_smtp_ports'];
-	$pconfig['def_mail_ports'] = $a_nat[$id]['def_mail_ports'];
-	$pconfig['def_http_servers'] = $a_nat[$id]['def_http_servers'];
-	$pconfig['def_www_servers'] = $a_nat[$id]['def_www_servers'];
-	$pconfig['def_http_ports'] = $a_nat[$id]['def_http_ports'];
-	$pconfig['def_sql_servers'] = $a_nat[$id]['def_sql_servers'];
-	$pconfig['def_oracle_ports'] = $a_nat[$id]['def_oracle_ports'];
-	$pconfig['def_mssql_ports'] = $a_nat[$id]['def_mssql_ports'];
-	$pconfig['def_telnet_servers'] = $a_nat[$id]['def_telnet_servers'];
-	$pconfig['def_telnet_ports'] = $a_nat[$id]['def_telnet_ports'];
-	$pconfig['def_snmp_servers'] = $a_nat[$id]['def_snmp_servers'];
-	$pconfig['def_snmp_ports'] = $a_nat[$id]['def_snmp_ports'];
-	$pconfig['def_ftp_servers'] = $a_nat[$id]['def_ftp_servers'];
-	$pconfig['def_ftp_ports'] = $a_nat[$id]['def_ftp_ports'];
-	$pconfig['def_ssh_servers'] = $a_nat[$id]['def_ssh_servers'];
-	$pconfig['def_ssh_ports'] = $a_nat[$id]['def_ssh_ports'];
-	$pconfig['def_pop_servers'] = $a_nat[$id]['def_pop_servers'];
-	$pconfig['def_pop2_ports'] = $a_nat[$id]['def_pop2_ports'];
-	$pconfig['def_pop3_ports'] = $a_nat[$id]['def_pop3_ports'];
-	$pconfig['def_imap_servers'] = $a_nat[$id]['def_imap_servers'];
-	$pconfig['def_imap_ports'] = $a_nat[$id]['def_imap_ports'];
-	$pconfig['def_sip_proxy_ip'] = $a_nat[$id]['def_sip_proxy_ip'];
-	$pconfig['def_sip_proxy_ports'] = $a_nat[$id]['def_sip_proxy_ports'];
-	$pconfig['def_auth_ports'] = $a_nat[$id]['def_auth_ports'];
-	$pconfig['def_finger_ports'] = $a_nat[$id]['def_finger_ports'];
-	$pconfig['def_irc_ports'] = $a_nat[$id]['def_irc_ports'];
-	$pconfig['def_nntp_ports'] = $a_nat[$id]['def_nntp_ports'];
-	$pconfig['def_rlogin_ports'] = $a_nat[$id]['def_rlogin_ports'];
-	$pconfig['def_rsh_ports'] = $a_nat[$id]['def_rsh_ports'];
-	$pconfig['def_ssl_ports'] = $a_nat[$id]['def_ssl_ports'];
-	$pconfig['barnyard_enable'] = $a_nat[$id]['barnyard_enable'];
-	$pconfig['barnyard_mysql'] = $a_nat[$id]['barnyard_mysql'];
-	$pconfig['enable'] = $a_nat[$id]['enable'];
-	$pconfig['uuid'] = $a_nat[$id]['uuid'];
-	$pconfig['interface'] = $a_nat[$id]['interface'];
-	$pconfig['descr'] = $a_nat[$id]['descr'];
-	$pconfig['whitelistname'] = $a_nat[$id]['whitelistname'];
-	$pconfig['homelistname'] = $a_nat[$id]['homelistname'];
-	$pconfig['externallistname'] = $a_nat[$id]['externallistname'];
-	$pconfig['suppresslistname'] = $a_nat[$id]['suppresslistname'];
-	$pconfig['performance'] = $a_nat[$id]['performance'];
-	$pconfig['blockoffenders7'] = $a_nat[$id]['blockoffenders7'];
-	$pconfig['alertsystemlog'] = $a_nat[$id]['alertsystemlog'];
-	$pconfig['tcpdumplog'] = $a_nat[$id]['tcpdumplog'];
-	$pconfig['snortunifiedlog'] = $a_nat[$id]['snortunifiedlog'];
-	$pconfig['flow_depth'] = $a_nat[$id]['flow_depth'];
-	$pconfig['configpassthru'] = $a_nat[$id]['configpassthru'];
-	$pconfig['barnconfigpassthru'] = $a_nat[$id]['barnconfigpassthru'];
-	$pconfig['rulesets'] = $a_nat[$id]['rulesets'];
-	$pconfig['rule_sid_off'] = $a_nat[$id]['rule_sid_off'];
-	$pconfig['rule_sid_on'] = $a_nat[$id]['rule_sid_on'];
-
-	if (isset($_GET['dup']))
-		unset($id);
 }
 
 /* convert fake interfaces to real */
@@ -138,68 +78,13 @@ $snort_uuid = $pconfig['uuid'];
 /* alert file */
 $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 
-if ($_POST["Submit"]) {
+if ($_POST) {
 
 	$natent = array();
+	$natent = $pconfig;
 
 	/* if no errors write to conf */
 	if (!$input_errors) {
-		/* repost the options already in conf */
-		$natent['uuid'] = $pconfig['uuid'];
-		$natent['interface'] = $pconfig['interface'];
-		if ($pconfig['enable'] != "") { $natent['enable'] = $pconfig['enable']; }
-		if ($pconfig['descr'] != "") { $natent['descr'] = $pconfig['descr']; }
-		if ($pconfig['performance'] != "") { $natent['performance'] = $pconfig['performance']; }
-		if ($pconfig['blockoffenders7'] != "") { $natent['blockoffenders7'] = $pconfig['blockoffenders7']; }
-		if ($pconfig['alertsystemlog'] != "") { $natent['alertsystemlog'] = $pconfig['alertsystemlog']; }
-		if ($pconfig['tcpdumplog'] != "") { $natent['tcpdumplog'] = $pconfig['tcpdumplog']; }
-		if ($pconfig['snortunifiedlog'] != "") { $natent['snortunifiedlog'] = $pconfig['snortunifiedlog']; }
-		if ($pconfig['barnyard_enable'] != "") { $natent['barnyard_enable'] = $pconfig['barnyard_enable']; }
-		if ($pconfig['barnyard_mysql'] != "") { $natent['barnyard_mysql'] = $pconfig['barnyard_mysql']; }
-		if ($pconfig['def_dns_servers'] != "") { $natent['def_dns_servers'] = $pconfig['def_dns_servers']; }
-		if ($pconfig['def_dns_ports'] != "") { $natent['def_dns_ports'] = $pconfig['def_dns_ports']; }
-		if ($pconfig['def_smtp_servers'] != "") { $natent['def_smtp_servers'] = $pconfig['def_smtp_servers']; }
-		if ($pconfig['def_smtp_ports'] != "") { $natent['def_smtp_ports'] = $pconfig['def_smtp_ports']; }
-		if ($pconfig['def_mail_ports'] != "") { $natent['def_mail_ports'] = $pconfig['def_mail_ports']; }
-		if ($pconfig['def_http_servers'] != "") { $natent['def_http_servers'] = $pconfig['def_http_servers']; }
-		if ($pconfig['def_www_servers'] != "") { $natent['def_www_servers'] = $pconfig['def_www_servers']; }
-		if ($pconfig['def_http_ports'] != "") { $natent['def_http_ports'] = $pconfig['def_http_ports'];	}
-		if ($pconfig['def_sql_servers'] != "") { $natent['def_sql_servers'] = $pconfig['def_sql_servers']; }
-		if ($pconfig['def_oracle_ports'] != "") { $natent['def_oracle_ports'] = $pconfig['def_oracle_ports']; }
-		if ($pconfig['def_mssql_ports'] != "") { $natent['def_mssql_ports'] = $pconfig['def_mssql_ports']; }
-		if ($pconfig['def_telnet_servers'] != "") { $natent['def_telnet_servers'] = $pconfig['def_telnet_servers']; }
-		if ($pconfig['def_telnet_ports'] != "") { $natent['def_telnet_ports'] = $pconfig['def_telnet_ports']; }
-		if ($pconfig['def_snmp_servers'] != "") { $natent['def_snmp_servers'] = $pconfig['def_snmp_servers']; }
-		if ($pconfig['def_snmp_ports'] != "") { $natent['def_snmp_ports'] = $pconfig['def_snmp_ports']; }
-		if ($pconfig['def_ftp_servers'] != "") { $natent['def_ftp_servers'] = $pconfig['def_ftp_servers']; }
-		if ($pconfig['def_ftp_ports'] != "") { $natent['def_ftp_ports'] = $pconfig['def_ftp_ports']; }
-		if ($pconfig['def_ssh_servers'] != "") { $natent['def_ssh_servers'] = $pconfig['def_ssh_servers']; }
-		if ($pconfig['def_ssh_ports'] != "") { $natent['def_ssh_ports'] = $pconfig['def_ssh_ports']; }
-		if ($pconfig['def_pop_servers'] != "") { $natent['def_pop_servers'] = $pconfig['def_pop_servers']; }
-		if ($pconfig['def_pop2_ports'] != "") { $natent['def_pop2_ports'] = $pconfig['def_pop2_ports']; }
-		if ($pconfig['def_pop3_ports'] != "") { $natent['def_pop3_ports'] = $pconfig['def_pop3_ports']; }
-		if ($pconfig['def_imap_servers'] != "") { $natent['def_imap_servers'] = $pconfig['def_imap_servers']; }
-		if ($pconfig['def_imap_ports'] != "") { $natent['def_imap_ports'] = $pconfig['def_imap_ports']; }
-		if ($pconfig['def_sip_proxy_ip'] != "") { $natent['def_sip_proxy_ip'] = $pconfig['def_sip_proxy_ip']; }
-		if ($pconfig['def_sip_proxy_ports'] != "") { $natent['def_sip_proxy_ports'] = $pconfig['def_sip_proxy_ports']; }
-		if ($pconfig['def_auth_ports'] != "") { $natent['def_auth_ports'] = $pconfig['def_auth_ports']; }
-		if ($pconfig['def_finger_ports'] != "") { $natent['def_finger_ports'] = $pconfig['def_finger_ports']; }
-		if ($pconfig['def_irc_ports'] != "") { $natent['def_irc_ports'] = $pconfig['def_irc_ports']; }
-		if ($pconfig['def_nntp_ports'] != "") { $natent['def_nntp_ports'] = $pconfig['def_nntp_ports']; }
-		if ($pconfig['def_rlogin_ports'] != "") { $natent['def_rlogin_ports'] = $pconfig['def_rlogin_ports']; }
-		if ($pconfig['def_rsh_ports'] != "") { $natent['def_rsh_ports'] = $pconfig['def_rsh_ports']; }
-		if ($pconfig['def_ssl_ports'] != "") { $natent['def_ssl_ports'] = $pconfig['def_ssl_ports']; }
-		if ($pconfig['configpassthru'] != "") { $natent['configpassthru'] = $pconfig['configpassthru'];	}
-		if ($pconfig['barnconfigpassthru'] != "") { $natent['barnconfigpassthru'] = $pconfig['barnconfigpassthru']; }
-		if ($pconfig['rulesets'] != "") { $natent['rulesets'] = $pconfig['rulesets']; }
-		if ($pconfig['rule_sid_off'] != "") { $natent['rule_sid_off'] = $pconfig['rule_sid_off']; }
-		if ($pconfig['rule_sid_on'] != "") { $natent['rule_sid_on'] = $pconfig['rule_sid_on']; }
-		if ($pconfig['whitelistname'] != "") { $natent['whitelistname'] = $pconfig['whitelistname']; }
-		if ($pconfig['homelistname'] != "") { $natent['homelistname'] = $pconfig['homelistname']; }
-		if ($pconfig['externallistname'] != "") { $natent['externallistname'] = $pconfig['externallistname']; }
-		if ($pconfig['suppresslistname'] != "") { $natent['suppresslistname'] = $pconfig['suppresslistname']; }
-
-
 		/* post new options */
 		$natent['perform_stat'] = $_POST['perform_stat'];
 		if ($_POST['def_ssl_ports_ignore'] != "") { $natent['def_ssl_ports_ignore'] = $_POST['def_ssl_ports_ignore']; }else{ $natent['def_ssl_ports_ignore'] = ""; }
@@ -486,8 +371,7 @@ enable JavaScript to view this content
 				<td width="22%" valign="top">&nbsp;</td>
 				<td width="78%">
 					<input name="Submit" type="submit" class="formbtn" value="Save">
-					<?php if (isset($id) && $a_nat[$id]): ?>
-						<input name="id" type="hidden" value="<?=$id;?>"> <?php endif; ?></td>
+					<input name="id" type="hidden" value="<?=$id;?>"></td>
 			</tr>
 			<tr>
 				<td width="22%" valign="top">&nbsp;</td>
