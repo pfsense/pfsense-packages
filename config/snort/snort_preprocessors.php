@@ -1,7 +1,7 @@
 <?php
 /* $Id$ */
 /*
- snort_interfaces.php
+ snort_preprocessors.php
  part of m0n0wall (http://m0n0.ch/wall)
 
  Copyright (C) 2003-2004 Manuel Kasper <mk@neon1.net>.
@@ -46,7 +46,10 @@ $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 $id = $_GET['id'];
 if (isset($_POST['id']))
 	$id = $_POST['id'];
-
+if (is_null($id)) {
+        header("Location: /snort/snort_interfaces.php");
+        exit;
+}
 if (isset($_GET['dup'])) {
 	$id = $_GET['dup'];
 	$after = $_GET['dup'];
@@ -130,7 +133,6 @@ if (isset($id) && $a_nat[$id]) {
 
 /* convert fake interfaces to real */
 $if_real = snort_get_real_interface($pconfig['interface']);
-
 $snort_uuid = $pconfig['uuid'];
 
 /* alert file */
@@ -138,15 +140,14 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$snort_uuid}_{$if_real}.dirty";
 
 if ($_POST["Submit"]) {
 
-	/* check for overlaps */
+	$natent = array();
 
 	/* if no errors write to conf */
 	if (!$input_errors) {
-		$natent = array();
 		/* repost the options already in conf */
-		if ($pconfig['interface'] != "") { $natent['interface'] = $pconfig['interface']; }
+		$natent['uuid'] = $pconfig['uuid'];
+		$natent['interface'] = $pconfig['interface'];
 		if ($pconfig['enable'] != "") { $natent['enable'] = $pconfig['enable']; }
-		if ($pconfig['uuid'] != "") { $natent['uuid'] = $pconfig['uuid']; }
 		if ($pconfig['descr'] != "") { $natent['descr'] = $pconfig['descr']; }
 		if ($pconfig['performance'] != "") { $natent['performance'] = $pconfig['performance']; }
 		if ($pconfig['blockoffenders7'] != "") { $natent['blockoffenders7'] = $pconfig['blockoffenders7']; }
