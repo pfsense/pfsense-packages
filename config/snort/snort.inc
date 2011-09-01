@@ -492,14 +492,14 @@ function snort_postinstall()
 	}
 
 	/* cleanup default files */
-	@unlink('/usr/local/etc/snort/snort.conf-sample');
-	@unlink('/usr/local/etc/snort/threshold.conf-sample');
-	@unlink('/usr/local/etc/snort/sid-msg.map-sample');
-	@unlink('/usr/local/etc/snort/unicode.map-sample');
-	@unlink('/usr/local/etc/snort/classification.config-sample');
-	@unlink('/usr/local/etc/snort/generators-sample');
-	@unlink('/usr/local/etc/snort/reference.config-sample');
-	@unlink('/usr/local/etc/snort/gen-msg.map-sample');
+	@rename('/usr/local/etc/snort/snort.conf-sample', '/usr/local/etc/snort/snort.conf');
+	@rename('/usr/local/etc/snort/threshold.conf-sample', '/usr/local/etc/snort/threshold.conf');
+	@rename('/usr/local/etc/snort/sid-msg.map-sample', '/usr/local/etc/snort/sid-msg.map');
+	@rename('/usr/local/etc/snort/unicode.map-sample', '/usr/local/etc/snort/unicode.map');
+	@rename('/usr/local/etc/snort/classification.config-sample', '/usr/local/etc/snort/classification.config');
+	@rename('/usr/local/etc/snort/generators-sample', '/usr/local/etc/snort/generators');
+	@rename('/usr/local/etc/snort/reference.config-sample', '/usr/local/etc/snort/reference.config');
+	@rename('/usr/local/etc/snort/gen-msg.map-sample', '/usr/local/etc/snort/gen-msg.map');
 	@unlink('/usr/local/etc/snort/sid');
 	@unlink('/usr/local/etc/rc.d/snort');
 	@unlink('/usr/local/etc/rc.d/bardyard2');
