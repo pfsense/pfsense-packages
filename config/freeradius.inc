@@ -26,8 +26,8 @@ function freeradius_install_command() {
 
 	$rcfile = array();
 	$rcfile['file'] = 'radiusd.sh';
-	$rcfile['start'] = 'killall -9 radiusd  ; sleep 5 && radiusd -s &';
-	$rcfile['stop'] = 'killall -9 radiusd ; sleep 5';
+	$rcfile['start'] = 'logger -f /var/log/system.log "freeRADIUS rc_start: killing all existing radiusd processes" && killall -9 radiusd  ; sleep 5 && logger -f /var/log/system.log "freeRADIUS rc_start: starting radiusd " ; radiusd -s &';
+	$rcfile['stop'] = 'logger -f /var/log/system.log "freeRADIUS rc_stop: killing all existing radiusd processes" && killall -9 radiusd  ; sleep 5 && logger -f /var/log/system.log "freeRADIUS rc_stop: radiusd has quit"';
         conf_mount_rw();
 	write_rcfile($rcfile);
         conf_mount_ro();
