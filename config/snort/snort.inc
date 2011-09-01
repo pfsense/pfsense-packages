@@ -61,7 +61,7 @@ $snort_freebsd_ver = $snort_freebsd_ver[0];
 $snort_arch_ck = php_uname("m");
 if ($snort_arch_ck == 'i386')
 	$snort_arch = 'x86';
-else if ($snort_arch_ck = "amd64")
+else if ($snort_arch_ck == "amd64")
 	$snort_arch = 'x64';
 else
 	$snort_arch = "Unknown";
