@@ -143,7 +143,7 @@ if ($_POST["Reset"]) {
 				$x=0;
 				$is_installed = false;
 				foreach($config['cron']['item'] as $item) {
-					if (strstr($item['command'], "snort2c")) {
+					if (strstr($item['command'], $cronmatch)) {
 						$is_installed = true;
 						break;
 					}
