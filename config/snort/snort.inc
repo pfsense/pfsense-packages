@@ -293,7 +293,7 @@ function Running_Stop($snort_uuid, $if_real, $id) {
 	global $config;
 
 	/* if snort.sh crashed this will remove the pid */
-	exec('/bin/rm /tmp/snort.sh.pid');
+	@unlink('/tmp/snort.sh.pid');
 	
 	$start_up_s = exec("/bin/ps -U snort | grep \"\-R {$snort_uuid}\" | awk '{ print \$1; }'");
 	$start_up_r = exec("/bin/ps -U root | grep \"\-R {$snort_uuid}\" | awk '{ print \$1; }'");
@@ -1251,7 +1251,6 @@ if [ "`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}" |
 		
 	# Start snort and barnyard2
 	/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid
-	/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid.lck
 
 	/usr/local/bin/snort -u snort -g snort -R {$snort_uuid} -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
 	$start_barnyard2
@@ -1296,7 +1295,6 @@ if [ \${pid_s} ] ; then
 	sleep 3
 	/bin/kill \${pid_b}
 
-	/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid.lck
 	/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid
 
 fi
