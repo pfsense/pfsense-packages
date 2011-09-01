@@ -55,6 +55,8 @@ if (intval($config['version']) > 6)
 else
 	$snort_pfsense_basever = 'yes';
 
+$snort_freebsd_ver = php_uname("r");
+$snort_freebsd_ver = $snort_freebsd_ver[0];
 /* find out what arch where in x86 , x64 */
 $snort_arch_ck = php_uname("m");
 if ($snort_arch_ck == 'i386')
@@ -480,7 +482,7 @@ function post_delete_logs()
 
 function snort_postinstall()
 {
-	global $config, $g, $snort_pfsense_basever, $snort_arch;
+	global $config, $g, $snort_pfsense_basever, $snort_arch, $snort_freebsd_ver;
 
 	/* snort -> advanced features */
 	if (is_array($config['installedpackages']['snortglobal'])) {
@@ -588,18 +590,18 @@ function snort_postinstall()
 	exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/images/page_white_text.png');
 
 	/* install barnyard2 for 2.0 x86 x64 and 1.2.3 x86 */
-	chdir("/usr/local/bin/");
-
 	update_status(gettext("Installing Barnyard2 for $snort_arch..."));
 	update_output_window(gettext("Please wait..."));
 	if ($snort_pfsense_basever == 'yes')
-		exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/bin/7.3.x86/barnyard2');
-	else if ($snort_pfsense_basever == 'no')
-		exec('/usr/bin/fetch http://www.pfsense.com/packages/config/snort/bin/8.1{$snort_arch}/barnyard2');
-
+		exec('/usr/bin/fetch -o /usr/local/bin/barnyard2 http://www.pfsense.com/packages/config/snort/bin/7.3.x86/barnyard2');
+	else if ($snort_pfsense_basever == 'no') {
+		if ($snort_arch == 'x64')
+			exec("/usr/bin/fetch -o /usr/local/bin/barnyard2 http://files.pfsense.org/packages/amd64/{$snort_freebsd_ver}/All/barnyard2");
+		else
+			exec("/usr/bin/fetch -o /usr/local/bin/barnyard2 http://files.pfsense.org/packages/{$snort_freebsd_ver}/All/barnyard2");
+		exec('/bin/chmod 755 /usr/local/bin/barnyard2');
+	}
 	update_output_window(gettext("Finnished Installing Barnyard2..."));
-
-	exec('/bin/chmod 755 /usr/local/bin/barnyard2');
 
 	/* XXX: remove compeletely? */
 	if ($snort_pfsense_basever == 'yes') {
@@ -1422,7 +1424,7 @@ function create_rules_iface($id, $if_real, $snort_uuid)
 
 /* open barnyard2.conf for writing */
 function create_barnyard2_conf($id, $if_real, $snort_uuid) {
-	global $bconfig, $g;
+	global $config, $g;
 
 	if (!file_exists("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf"))
 		exec("/usr/bin/touch /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf");
@@ -1439,7 +1441,7 @@ function create_barnyard2_conf($id, $if_real, $snort_uuid) {
 	$bconf = fopen("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf", "w");
 	if(!$bconf) {
 		log_error("Could not open /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf for writing.");
-		exit;
+		return;
 	}
 	fwrite($bconf, $barnyard2_conf_text);
 	fclose($bconf);
