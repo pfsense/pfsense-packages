@@ -70,10 +70,10 @@ function dwg_avbases_info()
 {
     $db  = '<table width="100%" border="0" cellspacing="0" cellpadding="1" ><tbody>';
     $db .= '<tr class="vncellt" ><td>Database</td><td>Date</td><td>Ver.</td><td>Builder</td></tr>';
-    $db .= havp_avdb_info("daily.cld");
-    $db .= havp_avdb_info("bytecode.cld");
+    $db .= havp_avdb_info("daily.cvd");
+    $db .= havp_avdb_info("bytecode.cvd");
     $db .= havp_avdb_info("main.cvd");
-    $db .= havp_avdb_info("safebrowsing.cld");
+    $db .= havp_avdb_info("safebrowsing.cvd");
     $db .= '</tbody></table>';
     return $db;
 }
