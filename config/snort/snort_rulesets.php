@@ -38,8 +38,6 @@ global $g;
 if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
 	$config['installedpackages']['snortglobal']['rule'] = array();
 }
-
-//nat_rules_sort();
 $a_nat = &$config['installedpackages']['snortglobal']['rule'];
 
 $id = $_GET['id'];

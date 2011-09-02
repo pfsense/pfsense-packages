@@ -2373,16 +2373,6 @@ preprocessor stream5_icmp:
 
 	{$def_sf_portscan_type}
 
-############################
-                           #
-# OLD                      #
-# preprocessor dcerpc: \   #
-#    autodetect \          #
-#    max_frag_size 3000 \  #
-#    memcap 100000         #
-                           #
-############################
-
 	{$def_dce_rpc_2_type}
 
 	{$def_dns_preprocessor_type}
