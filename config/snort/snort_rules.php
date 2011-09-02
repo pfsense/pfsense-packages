@@ -1,7 +1,6 @@
 <?php
-/* $Id$ */
 /*
- edit_snortrule.php
+ snort_rules.php
  Copyright (C) 2004, 2005 Scott Ullrich
  Copyright (C) 2008, 2009 Robert Zelaya
  Copyright (C) 2011 Ermal Luci
