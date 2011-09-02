@@ -139,55 +139,17 @@ function get_middle($source, $beginning, $ending, $init_pos) {
 
 function write_rule_file($content_changed, $received_file)
 {
-	//read snort file with writing enabled
-	$filehandle = fopen($received_file, "w");
-
-	//delimiter for each new rule is a new line
-	$delimiter = "\n";
-
-	//implode the array back into a string for writing purposes
-	$fullfile = implode($delimiter, $content_changed);
-
-	//write data to file
-	fwrite($filehandle, $fullfile);
-
-	//close file handle
-	fclose($filehandle);
-
+	@file_put_contents($received_file, implode("\n", $content_changed));
 }
 
 function load_rule_file($incoming_file)
 {
-
-	//read snort file
-	$filehandle = fopen($incoming_file, "r");
-
 	//read file into string, and get filesize
-	$contents = fread($filehandle, filesize($incoming_file));
-
-	//close handler
-	fclose ($filehandle);
-
-
-	//string for populating category select
-	$currentruleset = basename($rulefile);
-
-	//delimiter for each new rule is a new line
-	$delimiter = "\n";
+	$contents = @file_get_contents($incoming_file);
 
 	//split the contents of the string file into an array using the delimiter
-	$splitcontents = explode($delimiter, $contents);
-
-	return $splitcontents;
-
+	return explode("\n", $contents);
 }
-
-/*
-if ($_GET['openruleset'] != '' && $_GET['ids'] != '') {
-	header("Location: /snort/snort_rules.php?id=$id&openruleset={$_GET['openruleset']}&saved=yes");
-	exit;
-}
-*/
 
 $ruledir = "/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/";
 //$ruledir = "/usr/local/etc/snort/rules/";
@@ -206,8 +168,6 @@ if ($_GET['openruleset'])
 else
 	$rulefile = $ruledir.$files[0];
 
-//Load the rule file
-$splitcontents = load_rule_file($rulefile);
 
 if ($_POST)
 {
@@ -413,50 +373,26 @@ require_once("guiconfig.inc");
 include_once("head.inc");
 
 $pgtitle = "Snort: $id $iface_uuid $if_real Category: $currentruleset";
-
 ?>
 
-<body
-	link="#0000CC" vlink="#0000CC" alink="#0000CC">
-
-<?php include("fbegin.inc"); ?>
-<?if($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}?>
-
+<body link="#0000CC" vlink="#0000CC" alink="#0000CC">
 <?php
+include("fbegin.inc");
+if ($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
+
 echo "{$snort_general_css}\n";
 ?>
+<form action="snort_rules.php" method="post" name="iform" id="iform">
+<?php if ($_GET['saved'] == 'yes') {print_info_box_np2($message);}?>
 
-<div class="body2">
-
-<noscript>
-<div class="alert" ALIGN=CENTER><img
-	src="../themes/<?php echo $g['theme']; ?>/images/icons/icon_alert.gif" /><strong>Please
-enable JavaScript to view this content
-</CENTER></div>
-</noscript>
-
-
-<?php
-echo "<form action=\"snort_rules.php?id={$id}\" method=\"post\" name=\"iform\" id=\"iform\">";
-?> <?php if ($_GET['saved'] == 'yes') {print_info_box_np2($message);}?>
-</form>
-</script> <script language="javascript" type="text/javascript">
-<!--
+<script language="javascript" type="text/javascript">
 function go()
 {
-    var agt=navigator.userAgent.toLowerCase();
-    if (agt.indexOf("msie") != -1) {
-        box = document.forms.selectbox;
-    } else {
-        box = document.forms[1].selectbox;
-	}
+    var box = document.iform.selectbox;
     destination = box.options[box.selectedIndex].value;
     if (destination) 
 		location.href = destination;
 }
-// -->
-</script> <script type="text/javascript">
-<!--
 function popup(url) 
 {
  params  = 'width='+screen.width;
@@ -468,10 +404,9 @@ function popup(url)
  if (window.focus) {newwin.focus()}
  return false;
 }
-// -->
 </script>
 
-<table width="99%" border="0" cellpadding="0" cellspacing="0">
+<table style="table-layout:fixed;" width="99%" border="0" cellpadding="0" cellspacing="0">
 <tr><td>
 <?php
         $tab_array = array();
@@ -492,199 +427,156 @@ function popup(url)
         display_top_tabs($tab_array);
 ?>
 </td></tr>
-	<tr>
-		<td>
-		<div id="mainarea2">
-		<table id="maintable" class="tabcont" width="100%" border="0"
-			cellpadding="0" cellspacing="0">
-			<tr>
-				<td>
-				<table id="ruletable1" class="sortable" width="100%" border="0"
-					cellpadding="0" cellspacing="0">
-					<tr id="frheader">
-						<td width="3%" class="list">&nbsp;</td>
-						<td width="5%" class="listhdr">SID</td>
-						<td width="6%" class="listhdrr">Proto</td>
-						<td width="15%" class="listhdrr">Source</td>
-						<td width="10%" class="listhdrr">Port</td>
-						<td width="15%" class="listhdrr">Destination</td>
-						<td width="10%" class="listhdrr">Port</td>
-						<td width="32%" class="listhdrr">Message</td>
+<tr>
+	<td>
+	<div id="mainarea2">
+	<table id="maintable" class="tabcont" width="100%" border="0" cellpadding="0" cellspacing="0">
+		<tr>
+			<td class="listt" colspan="8">
+			<br>Category: 
+			<select id="selectbox" name="selectbox" class="formfld" onChange="go()">
+			<?php
+				foreach ($files as $value) {
+					echo "<option value='?id={$id}&openruleset={$ruledir}{$value}' ";
+					if ($value === $currentruleset)
+						echo "selected";
+					echo ">{$value}</option>\n";
+				}
+			?>
+			</select>
+			</td>
+		</tr>
+		<tr id="frheader">
+			<td width="3%" class="list">&nbsp;</td>
+			<td width="5%" class="listhdr">SID</td>
+			<td width="6%" class="listhdrr">Proto</td>
+			<td width="15%" class="listhdrr">Source</td>
+			<td width="10%" class="listhdrr">Port</td>
+			<td width="15%" class="listhdrr">Destination</td>
+			<td width="10%" class="listhdrr">Port</td>
+			<td width="32%" class="listhdrr">Message</td>
+		</tr>
+		<?php
+			//Load the rule file
+			$splitcontents = load_rule_file($rulefile);
+			foreach ( $splitcontents as $counter => $value )
+			{
+				$disabled = "False";
+				$comments = "False";
+				$findme = "# alert"; //find string for disabled alerts
+				$disabled_pos = strstr($value, $findme);
 
-					</tr>
-					<tr>
-					<?php
+				$counter2 = 1;
+				$sid = get_middle($value, 'sid:', ';', 0);
+				//check to see if the sid is numberical
+				if (!is_numeric($sid))
+					continue;
 
-					echo "<br>Category: ";
+				//if find alert is false, then rule is disabled
+				if ($disabled_pos !== false){
+					$counter2 = $counter2+1;
+					$textss = "<span class=\"gray\">";
+					$textse = "</span>";
+					$iconb = "icon_block_d.gif";
 
-					//string for populating category select
-					$currentruleset = basename($rulefile);
+					$ischecked = "";
+				} else {
+					$textss = $textse = "";
+					$iconb = "icon_block.gif";
 
-					?>
-						<form name="forms"><select name="selectbox" class="formfld"
-							onChange="go()">
-							<?php
-							$i=0;
-							foreach ($files as $value)
-							{
-								$selectedruleset = "";
-								if ($files[$i] === $currentruleset)
-									$selectedruleset = "selected";
-								?>
-							<option
-								value="?id=<?=$id;?>&openruleset=<?=$ruledir;?><?=$files[$i];?>"
-								<?=$selectedruleset;?>><?=$files[$i];?></option>
-							<?php
-							$i++;
+					$ischecked = "checked";
+				}
 
-							}
-							?>
-						</select></form>
-					</tr>
-					<?php
+				$rule_content = explode(' ', $value);
 
-					$counter = 0;
-					$printcounter = 0;
+				$protocol = $rule_content[$counter2];//protocol location
+				$counter2++;
+				$source = substr($rule_content[$counter2], 0, 20) . "...";//source location
+				$counter2++;
+				$source_port = $rule_content[$counter2];//source port location
+				$counter2 = $counter2+2;
+				$destination = substr($rule_content[$counter2], 0, 20) . "...";//destination location
+				$counter2++;
+				$destination_port = $rule_content[$counter2];//destination port location
 
-					foreach ( $splitcontents as $value )
-					{
+				if (strstr($value, 'msg: "'))
+					$message = get_middle($value, 'msg: "', '";', 0);
+				else if (strstr($value, 'msg:"'))
+					$message = get_middle($value, 'msg:"', '";', 0);
 
-						$counter++;
-						$disabled = "False";
-						$comments = "False";
-
-						$tempstring = $splitcontents[$counter];
-						$findme = "# alert"; //find string for disabled alerts
-
-						//find alert
-						$disabled_pos = strstr($tempstring, $findme);
-
-
-						//do soemthing, this rule is enabled
-						$counter2 = 1;
-
-						//retrieve sid value
-						$sid = get_middle($tempstring, 'sid:', ';', 0);
-
-						//check to see if the sid is numberical
-						$is_sid_num = is_numeric($sid);
-
-						//if SID is numerical, proceed
-						if ($is_sid_num)
-						{
-
-							//if find alert is false, then rule is disabled
-							if ($disabled_pos !== false){
-								$counter2 = $counter2+1;
-								$textss = "<span class=\"gray\">";
-								$textse = "</span>";
-								$iconb = "icon_block_d.gif";
-							}
-							else
-							{
-								$textss = $textse = "";
-								$iconb = "icon_block.gif";
-							}
-
-							if ($disabled_pos !== false){
-								$ischecked = "";
-							}else{
-								$ischecked = "checked";
-							}
-
-							$rule_content = explode(' ', $tempstring);
-
-							$protocol = $rule_content[$counter2];//protocol location
-							$counter2++;
-							$source = $rule_content[$counter2];//source location
-							$counter2++;
-							$source_port = $rule_content[$counter2];//source port location
-							$counter2 = $counter2+2;
-							$destination = $rule_content[$counter2];//destination location
-							$counter2++;
-							$destination_port = $rule_content[$counter2];//destination port location
-
-							if (strstr($tempstring, 'msg: "'))
-							$message = get_middle($tempstring, 'msg: "', '";', 0);
-							if (strstr($tempstring, 'msg:"'))
-							$message = get_middle($tempstring, 'msg:"', '";', 0);
-
-							echo "<tr>
-                                        <td class=\"listt\">
-                                        $textss\n";
-                                        ?>
-					<a
-						href="?id=<?=$id;?>&openruleset=<?=$rulefile;?>&act=toggle&ids=<?=$counter;?>"><img
-						src="../themes/<?= $g['theme']; ?>/images/icons/<?=$iconb;?>"
-						width="10" height="10" border="0"
-						title="click to toggle enabled/disabled status"></a>
-					<!-- <input name="enable" type="checkbox" value="yes" <?= $ischecked; ?> onClick="enable_change(false)"> -->
-					<!-- TODO: add checkbox and save so that that disabling is nicer -->
-						<?php
-						echo "$textse
-                                        </td>
-                                        <td class=\"listlr\">
-                                        $textss
-                                        $sid
-                                        $textse
-                                        </td>
-                                        <td class=\"listlr\">
-                                        $textss
-                                        $protocol";
-                                        ?>
-                                        <?php
-                                        $printcounter++;
-                                        echo "$textse
-                                        </td>
-                                        <td class=\"listlr\">
-                                        $textss
-                                        $source
-                                        $textse
-                                        </td>
-                                        <td class=\"listlr\">
-                                        $textss
-                                        $source_port
-                                        $textse
-                                        </td>
-                                        <td class=\"listlr\">
-                                        $textss
-                                        $destination
-                                        $textse
-                                        </td>
-                                        <td class=\"listlr\">
-                                        $textss
-                                        $destination_port
-                                        $textse
-                                        </td>";
-                                        ?>
-					<td class="listbg"><font color="white"> <?php
-					echo "$textss
+                                       echo "<tr><td class=\"listt\"> $textss\n";
+		?>
+				<a href="?id=<?=$id;?>&openruleset=<?=$rulefile;?>&act=toggle&ids=<?=$counter;?>"><img
+					src="../themes/<?= $g['theme']; ?>/images/icons/<?=$iconb;?>"
+					width="10" height="10" border="0"
+					title="click to toggle enabled/disabled status"></a>
+				<!-- <input name="enable" type="checkbox" value="yes" <?= $ischecked; ?> onClick="enable_change(false)"> -->
+				<!-- TODO: add checkbox and save so that that disabling is nicer -->
+		<?php
+				echo "$textse
+                                       </td>
+                                       <td width='5%' class=\"listlr\">
+					$textss
+					$sid
+					$textse
+                                       </td>
+                                       <td width='6%' class=\"listlr\">
+					$textss
+					$protocol";
+					echo "$textse
+                                       </td>
+                                       <td width='20%' class=\"listlr\">
+					$textss
+					$source
+					$textse
+                                       </td>
+                                       <td width='5%' class=\"listlr\">
+					$textss
+					$source_port
+					$textse
+                                       </td>
+                                       <td width='20%' class=\"listlr\">
+					$textss
+					$destination
+					$textse
+                                       </td>
+                                       <td width='5%' class=\"listlr\">
+                                       $textss
+                                       $destination_port
+                                       $textse
+                                       </td>
+				<td width='30%' class=\"listbg\"><font color=\"white\"> 
+					$textss
 					$message
 					$textse
-                                        </td>";
-					?>
-					<td valign="middle" nowrap class="list">
+                                       </td>";
+		?>
+				<td valign="middle" nowrap class="list">
 					<table border="0" cellspacing="0" cellpadding="1">
-						<tr>
-							<td><a href="javascript: void(0)"
-								onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$rulefile;?>&ids=<?=$counter;?>')"><img
-								src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
-								title="edit rule" width="17" height="17" border="0"></a></td>
+					<tr>
+						<td><a href="javascript: void(0)"
+							onclick="popup('snort_rules_edit.php?id=<?=$id;?>&openruleset=<?=$rulefile;?>&ids=<?=$counter;?>')"><img
+							src="../themes/<?= $g['theme']; ?>/images/icons/icon_e.gif"
+							title="edit rule" width="17" height="17" border="0"></a></td>
 							<!-- Codes by Quackit.com -->
-						</tr>
+					</tr>
 					</table>
-					</td>
-					<?php
-						}
-					}
-					echo "   There are $printcounter rules in this category. <br><br>";
-					?>
-				
-				</table>
 				</td>
-			</tr>
-			<table class="tabcont" width="100%" border="0" cellspacing="0"
-				cellpadding="0">
+		<?php
+			}
+		?>
+				
+			</table>
+			</td>
+		</tr>
+		<tr>
+			<td class="listlr">
+			<?php echo "  <strong><span class='red'>There are {$counter} rules in this category. <br/><br/></span></strong>"; ?>
+			</td>
+		</tr>
+		<tr>
+			<td>
+			<table class="tabcont" width="100%" border="0" cellspacing="0" cellpadding="0">
 				<tr>
 					<td width="16"><img
 						src="../themes/<?= $g['theme']; ?>/images/icons/icon_block.gif"
@@ -697,36 +589,23 @@ function popup(url)
 						width="11" height="11"></td>
 					<td nowrap>Rule Disabled</td>
 				</tr>
-				<table class="tabcont" width="100%" border="0" cellspacing="0"
-					cellpadding="0">
-					<tr>
+				<tr>
 						<!-- TODO: add save and cancel for checkbox options -->
 						<!-- <td><pre><input name="Submit" type="submit" class="formbtn" value="Save">	<input type="button" class="formbtn" value="Cancel" onclick="history.back()"><pre></td> -->
-					</tr>
-				</table>
+				</tr>
 				<tr>
 					<td colspan="10">
-					<p><!--<strong><span class="red">Warning:<br>
-                  </span></strong>Editing these r</p>-->
-					
+					<p><!--<strong><span class="red">Warning:<br/> </span></strong>Editing these r</p>-->
 					</td>
 				</tr>
 			</table>
-		</table>
-		
-		</td>
-	</tr>
-
+			</td>
+		</tr>
+	</table>
+	</td>
+</tr>
 </table>
-
-</div>
-
-<?php
-
-include("fend.inc");
-echo $snort_custom_rnd_box;
-?>
-
-</div>
+</form>
+<?php include("fend.inc"); ?>
 </body>
 </html>

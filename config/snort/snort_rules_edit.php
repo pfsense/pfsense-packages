@@ -70,45 +70,35 @@ if (isset($_POST['openruleset']))
 	$file = $_POST['openruleset'];
 
 //read file into string, and get filesize also chk for empty files
-if (filesize($file) > 0 ) {
-	$contents2 = file_get_contents($file);
-}else{
-	$contents2 = '';
-}
+$contents = '';
+if (filesize($file) > 0 )
+	$contents = file_get_contents($file);
 
 //delimiter for each new rule is a new line
 $delimiter = "\n";
 
 //split the contents of the string file into an array using the delimiter
-$splitcontents = explode($delimiter, $contents2);
+$splitcontents = explode($delimiter, $contents);
+$findme = "# alert"; //find string for disabled alerts
+$highlight = "yes";
+if (strstr($splitcontents[$lineid], $findme))
+	$highlight = "no";
+if ($highlight == "no")
+	$splitcontents[$lineid] = substr($splitcontents[$lineid], 2);
 
 if ($_POST) {
-	$highlight = "no";
-	if($_POST['highlight'] == "yes")
-		$highlight = "yes";
-
-	if ($_POST['rows'] <> "")
-		$rows = $_POST['rows'];
-	else
-		$rows = 1;
-
-	if ($_POST['cols'] <> "")
-		$cols = $_POST['cols'];
-	else
-		$cols = 66;
-
 	if ($_POST['save']) {
 
-		/* get the changes */
-		$rule_content2 = $_POST['code'];
-
 		//copy string into file array for writing
-		$splitcontents[$lineid] = $rule_content2;
+		if ($_POST['highlight'] == "yes")
+			$splitcontents[$lineid] = $_POST['code'];
+		else
+			$splitcontents[$lineid] = "# " . $_POST['code'];
 
 		//write the new .rules file
 		@file_put_contents($file, implode($delimiter, $splitcontents));
 
-		echo "<script> window.close(); </script>";
+		echo "<script> opener.window.location.reload(); window.close(); </script>";
 		exit;
 	}
 }
@@ -120,12 +110,12 @@ $pgtitle = array(gettext("Advanced"), gettext("File Editor"));
 <?php include("head.inc");?>
 
 <body link="#000000" vlink="#000000" alink="#000000">
+<form action="snort_rules_edit.php" method="post">
+	<?php if ($savemsg) print_info_box($savemsg); ?>
 <table width="100%" border="0" cellpadding="0" cellspacing="0">
 <tr>
 	<td class="tabcont">
-	<form action="snort_rules_edit.php?id=<?=$id; ?>&openruleset=<?=$file; ?>&ids=<?=$ids; ?>" method="post">
 
-	<?php if ($savemsg) print_info_box($savemsg); ?>
 
 		<table width="100%" cellpadding="9" cellspacing="9" bgcolor="#eeeeee">
 		<tr>
@@ -144,13 +134,21 @@ $pgtitle = array(gettext("Advanced"), gettext("File Editor"));
 				<label for="highlighting_disabled"> <?=gettext("Disabled");?></label>
 			</td>
 		</tr>
+		<tr> 
+			<td valign="top" class="label"> 
+			<textarea wrap="off" style="width: 98%; margin: 7px;" 
+			class="<?php echo $language; ?>:showcolumns" rows="3" 
+			cols="66" name="code"><?=$splitcontents[$lineid];?></textarea>
+			</div> 
+			</td> 
+		</tr> 
 		<tr>
 			<td valign="top" class="label">
 			<div style="background: #eeeeee;" id="textareaitem"><!-- NOTE: The opening *and* the closing textarea tag must be on the same line. -->
-			<textarea
+			<textarea disabled
 				wrap="off" style="width: 98%; margin: 7px;"
 				class="<?php echo $language; ?>:showcolumns" rows="33"
-				cols="<?=$cols;?>" name="code"><?=$contents2;?></textarea>
+				cols="66" name="code2"><?=$contents;?></textarea>
 			</div>
 			</td>
 		</tr>
@@ -158,6 +156,7 @@ $pgtitle = array(gettext("Advanced"), gettext("File Editor"));
 	</td>
 </tr>
 </table>
+</form>
 <?php include("fend.inc");?>
 </body>
 </html>
