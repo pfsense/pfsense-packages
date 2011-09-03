@@ -769,17 +769,19 @@ function unbound_add_host_entries() {
 		$added_item = array();
 		foreach ($hosts as $host) {
 			$current_host = $host['host'];
+			if ($host['host'] != "")
+				$host['ip'] = $host['ip'].".";
 			if(!$added_item[$current_host]) {
-				$host_entries .= "local-data-ptr: \"{$host['ip']} {$host['host']}.{$host['domain']}\"\n";
+				$host_entries .= "local-data-ptr: \"{$host['ip']} {$host['host']}{$host['domain']}\"\n";
 				if(function_exists("is_ipaddrv6")) {
 					if (is_ipaddrv6($host['ip']))
-						$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} IN AAAA {$host['ip']}\"\n";
+						$host_entries .= "local-data: \"{$host['host']}{$host['domain']} IN AAAA {$host['ip']}\"\n";
 					else
-						$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} IN A {$host['ip']}\"\n";
+						$host_entries .= "local-data: \"{$host['host']}{$host['domain']} IN A {$host['ip']}\"\n";
 				} else
-					$host_entries .= "local-data: \"{$host['host']}.{$host['domain']} IN A {$host['ip']}\"\n";
+					$host_entries .= "local-data: \"{$host['host']}{$host['domain']} IN A {$host['ip']}\"\n";
 				if (!empty($host['descr']) && $unboundcfg['txtsupport'] == 'on')
-					$host_entries .= "local-data: '{$host['host']}.{$host['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
+					$host_entries .= "local-data: '{$host['host']}{$host['domain']} TXT \"".addslashes($host['descr'])."\"'\n";
 					
 				// Do not add duplicate entries
 				$added_item[$current_host] = true;
