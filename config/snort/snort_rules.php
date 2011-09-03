@@ -55,7 +55,6 @@ if (isset($id) && $a_nat[$id]) {
 
 /* convert fake interfaces to real */
 $if_real = snort_get_real_interface($pconfig['interface']);
-
 $iface_uuid = $a_nat[$id]['uuid'];
 
 /* Check if the rules dir is empy if so warn the user */
@@ -167,201 +166,53 @@ if ($_GET['openruleset'])
 else
 	$rulefile = $ruledir.$files[0];
 
+//Load the rule file
+$splitcontents = load_rule_file($rulefile);
 
-if ($_POST)
-{
+if ($_GET['act'] == "toggle" && $_GET['ids']) {
 
-	conf_mount_rw();
-
-	if (!$_POST['apply']) {
-		//retrieve POST data
-		$post_lineid = $_POST['lineid'];
-		$post_enabled = $_POST['enabled'];
-		$post_src = $_POST['src'];
-		$post_srcport = $_POST['srcport'];
-		$post_dest = $_POST['dest'];
-		$post_destport = $_POST['destport'];
-
-		//clean up any white spaces insert by accident
-		$post_src = str_replace(" ", "", $post_src);
-		$post_srcport = str_replace(" ", "", $post_srcport);
-		$post_dest = str_replace(" ", "", $post_dest);
-		$post_destport = str_replace(" ", "", $post_destport);
-
-		//copy rule contents from array into string
-		$tempstring = $splitcontents[$post_lineid];
-
-		//search string
-		$findme = "# alert"; //find string for disabled alerts
-
-		//find if alert is disabled
-		$disabled = strstr($tempstring, $findme);
-
-		//if find alert is false, then rule is disabled
-		if ($disabled !== false)
-		{
-			//has rule been enabled
-			if ($post_enabled == "yes")
-			{
-				//move counter up 1, so we do not retrieve the # in the rule_content array
-				$tempstring = str_replace("# alert", "alert", $tempstring);
-				$counter2 = 1;
-			}
-			else
-			{
-				//rule is staying disabled
-				$counter2 = 2;
-			}
-		}
-		else
-		{
-			//has rule been disabled
-			if ($post_enabled != "yes")
-			{
-				//move counter up 1, so we do not retrieve the # in the rule_content array
-				$tempstring = str_replace("alert", "# alert", $tempstring);
-				$counter2 = 2;
-			}
-			else
-			{
-				//rule is staying enabled
-				$counter2 = 1;
-			}
-		}
-
-		//explode rule contents into an array, (delimiter is space)
-		$rule_content = explode(' ', $tempstring);
-
-		//insert new values
-		$counter2++;
-		$rule_content[$counter2] = $post_src;//source location
-		$counter2++;
-		$rule_content[$counter2] = $post_srcport;//source port location
-		$counter2 = $counter2+2;
-		$rule_content[$counter2] = $post_dest;//destination location
-		$counter2++;
-		$rule_content[$counter2] = $post_destport;//destination port location
-
-		//implode the array back into string
-		$tempstring = implode(' ', $rule_content);
-
-		//copy string into file array for writing
-		$splitcontents[$post_lineid] = $tempstring;
-
-		//write the new .rules file
-		write_rule_file($splitcontents, $rulefile);
-
-		//once file has been written, reload file
-		$splitcontents = load_rule_file($rulefile);
-	  
-		$stopMsg = true;
-	}
-	conf_mount_ro();
-}
-else if ($_GET['act'] == "toggle")
-{
-
-	conf_mount_rw();
-
-	$toggleid = $_GET['ids'];
+	$lineid= $_GET['ids'];
 
 	//copy rule contents from array into string
-	$tempstring = $splitcontents[$toggleid];
+	$tempstring = $splitcontents[$lineid];
 
 	//explode rule contents into an array, (delimiter is space)
 	$rule_content = explode(' ', $tempstring);
 
-	//search string
 	$findme = "# alert"; //find string for disabled alerts
-
-	//find if alert is disabled
 	$disabled = strstr($tempstring, $findme);
 
 	//if find alert is false, then rule is disabled
-	if ($disabled !== false)
-	{
+	if ($disabled !== false) {
 		//rule has been enabled
-		//move counter up 1, so we do not retrieve the # in the rule_content array
-		$tempstring = str_replace("# alert", "alert", $tempstring);
-
-	}
-	else
-	{
-		//has rule been disabled
-		//move counter up 1, so we do not retrieve the # in the rule_content array
-		$tempstring = str_replace("alert", "# alert", $tempstring);
-
-	}
+		$tempstring = substr($tempstring, 2);
+	} else
+		$tempstring = "# ". $tempstring;
 
 	//copy string into array for writing
-	$splitcontents[$toggleid] = $tempstring;
+	$splitcontents[$lineid] = $tempstring;
 
 	//write the new .rules file
 	write_rule_file($splitcontents, $rulefile);
 
-	//once file has been written, reload file
-	$splitcontents = load_rule_file($rulefile);
-
-	$stopMsg = true;
-
 	//write disable/enable sid to config.xml
-	if ($disabled == false) {
-		$string_sid = strstr($tempstring, 'sid:');
-		$sid_pieces = explode(";", $string_sid);
-		$sid_off_cut = $sid_pieces[0];
-		// sid being turned off
-		$sid_off  = str_replace("sid:", "", $sid_off_cut);
+	$sid = get_middle($tempstring, 'sid:', ';', 0);
+	if (is_numeric($sid)) {
 		// rule_sid_on registers
-		$sid_on_pieces = $a_nat[$id]['rule_sid_on'];
-		// if off sid is the same as on sid remove it
-		$sid_on_old = str_replace("||enablesid $sid_off", "", "$sid_on_pieces");
-		// write the replace sid back as empty
-		$a_nat[$id]['rule_sid_on'] = $sid_on_old;
-		// rule sid off registers
-		$sid_off_pieces = $a_nat[$id]['rule_sid_off'];
-		// if off sid is the same as off sid remove it
-		$sid_off_old = str_replace("||disablesid $sid_off", "", "$sid_off_pieces");
-		// write the replace sid back as empty
-		$a_nat[$id]['rule_sid_off'] = $sid_off_old;
-		// add sid off registers to new off sid
-		$a_nat[$id]['rule_sid_off'] = "||disablesid $sid_off" . $a_nat[$id]['rule_sid_off'];
+		if (!empty($a_nat[$id]['rule_sid_on']))
+			$a_nat[$id]['rule_sid_on'] = str_replace("||enablesid $sid", "", $a_nat[$id]['rule_sid_on']);
+		if (!empty($a_nat[$id]['rule_sid_on']))
+			$a_nat[$id]['rule_sid_off'] = str_replace("||disablesid $sid", "", $a_nat[$id]['rule_sid_off']);
+		if ($disabled === false)
+			$a_nat[$id]['rule_sid_off'] = "||disablesid $sid_off" . $a_nat[$id]['rule_sid_off'];
+		else
+			$a_nat[$id]['rule_sid_on'] = "||enablesid $sid_on" . $a_nat[$id]['rule_sid_on'];
 	}
-	else
-	{
-		$string_sid = strstr($tempstring, 'sid:');
-		$sid_pieces = explode(";", $string_sid);
-		$sid_on_cut = $sid_pieces[0];
-		// sid being turned off
-		$sid_on  = str_replace("sid:", "", $sid_on_cut);
-		// rule_sid_off registers
-		$sid_off_pieces = $a_nat[$id]['rule_sid_off'];
-		// if off sid is the same as on sid remove it
-		$sid_off_old = str_replace("||disablesid $sid_on", "", "$sid_off_pieces");
-		// write the replace sid back as empty
-		$a_nat[$id]['rule_sid_off'] = $sid_off_old;
-		// rule sid on registers
-		$sid_on_pieces = $a_nat[$id]['rule_sid_on'];
-		// if on sid is the same as on sid remove it
-		$sid_on_old = str_replace("||enablesid $sid_on", "", "$sid_on_pieces");
-		// write the replace sid back as empty
-		$a_nat[$id]['rule_sid_on'] = $sid_on_old;
-		// add sid on registers to new on sid
-		$a_nat[$id]['rule_sid_on'] = "||enablesid $sid_on" . $a_nat[$id]['rule_sid_on'];
-	}
+
 	write_config();
-	conf_mount_ro();
 
-}
-
-if ($_GET['saved'] == 'yes')
-{
-	$message = "The Snort rule configuration has been changed.<br>You must restart this snort interface in order for the changes to take effect.";
-
-	//		stop_service("snort");
-	//		sleep(2);
-	//		start_service("snort");
-	//		$savemsg = "";
-	//		$stopMsg = false;
+	header("Location: /snort/snort_rules.php?id={$id}&openruleset={$rulefile}");
+	exit;
 }
 
 $currentruleset = basename($rulefile);
@@ -382,7 +233,6 @@ if ($pfsense_stable == 'yes'){echo '<p class="pgtitle">' . $pgtitle . '</p>';}
 echo "{$snort_general_css}\n";
 ?>
 <form action="snort_rules.php" method="post" name="iform" id="iform">
-<?php if ($_GET['saved'] == 'yes') {print_info_box_np2($message);}?>
 
 <script language="javascript" type="text/javascript">
 function go()
@@ -456,8 +306,6 @@ function popup(url)
 			<td width="32%" class="listhdrr">Message</td>
 		</tr>
 		<?php
-			//Load the rule file
-			$splitcontents = load_rule_file($rulefile);
 			foreach ( $splitcontents as $counter => $value )
 			{
 				$disabled = "False";

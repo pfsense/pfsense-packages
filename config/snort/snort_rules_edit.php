@@ -95,8 +95,24 @@ if ($_POST) {
 		else
 			$splitcontents[$lineid] = "# " . $_POST['code'];
 
+		//write disable/enable sid to config.xml
+		$sid = get_middle($splitcontents[$lineid], 'sid:', ';', 0);
+		if (is_numeric($sid)) {
+			// rule_sid_on registers
+			if (!empty($a_nat[$id]['rule_sid_on']))
+				$a_nat[$id]['rule_sid_on'] = str_replace("||enablesid $sid", "", $a_nat[$id]['rule_sid_on']);
+			if (!empty($a_nat[$id]['rule_sid_on']))
+				$a_nat[$id]['rule_sid_off'] = str_replace("||disablesid $sid", "", $a_nat[$id]['rule_sid_off']);
+			if ($_POST['highlight'] == "yes")
+				$a_nat[$id]['rule_sid_on'] = "||enablesid $sid" . $a_nat[$id]['rule_sid_on'];
+			else
+				$a_nat[$id]['rule_sid_off'] = "||disablesid $sid" . $a_nat[$id]['rule_sid_off'];
+		}
+
 		//write the new .rules file
 		@file_put_contents($file, implode($delimiter, $splitcontents));
+
+		write_config();
 
 		echo "<script> opener.window.location.reload(); window.close(); </script>";
 		exit;
