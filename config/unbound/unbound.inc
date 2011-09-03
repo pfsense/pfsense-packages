@@ -770,7 +770,7 @@ function unbound_add_host_entries() {
 		foreach ($hosts as $host) {
 			$current_host = $host['host'];
 			if ($host['host'] != "")
-				$host['ip'] = $host['ip'].".";
+				$host['host'] = $host['host'].".";
 			if(!$added_item[$current_host]) {
 				$host_entries .= "local-data-ptr: \"{$host['ip']} {$host['host']}{$host['domain']}\"\n";
 				if(function_exists("is_ipaddrv6")) {
