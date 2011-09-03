@@ -45,9 +45,9 @@ $snort_load_jquery_colorbox = 'yes';
 
 
 /* quick md5s chk */
-if(file_exists('/usr/local/etc/snort/snortrules-snapshot-2861.tar.gz.md5'))
+if(file_exists('/usr/local/etc/snort/snortrules-snapshot-2905.tar.gz.md5'))
 {
-	$snort_org_sig_chk_local = exec('/bin/cat /usr/local/etc/snort/snortrules-snapshot-2861.tar.gz.md5');
+	$snort_org_sig_chk_local = exec('/bin/cat /usr/local/etc/snort/snortrules-snapshot-2905.tar.gz.md5');
 }else{
 	$snort_org_sig_chk_local = 'N/A';
 }
