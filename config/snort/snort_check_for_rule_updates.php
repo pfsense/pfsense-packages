@@ -342,7 +342,7 @@ if ($snortdownload == 'on')
 			if ($pfsense_stable == 'yes')
 				$freebsd_version_so = 'FreeBSD-7-2';
 			else
-				$freebsd_version_so = 'FreeBSD-8-2';
+				$freebsd_version_so = 'FreeBSD-8-1';
 
 			update_status(gettext("Extracting Snort.org rules..."));
 			update_output_window(gettext("May take a while..."));
@@ -354,14 +354,17 @@ if ($snortdownload == 'on')
 			sleep(2);
 			exec('/usr/local/bin/perl /usr/local/bin/snort_rename.pl s/^/snort_/ *.rules');
 
-			/* extract so rules on for x86 for now */
-			/* TODO: ask snort.org to build x64 version of so rules for Freebsd 8.1 Sept 05,2010 */
+			/* extract so rules */
+			exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
 			if($snort_arch == 'x86'){
 				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/i386/2.9.0.5/");
-				exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
 				exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/i386/2.9.0.5/* /usr/local/lib/snort/dynamicrules/");
-				/* extract so rules none bin and rename */
-				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules/" .
+			} else if ($snort_arch == 'x64') {
+				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/x86-64/2.9.0.5/");
+				exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/x86-64/2.9.0.5/* /usr/local/lib/snort/dynamicrules/");
+                        }
+			/* extract so rules none bin and rename */
+			exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules/" .
 			" so_rules/chat.rules/" .
 			" so_rules/dos.rules/" .
 			" so_rules/exploit.rules/" .
