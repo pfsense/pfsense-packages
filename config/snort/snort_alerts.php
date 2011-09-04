@@ -80,34 +80,36 @@ if ($_POST['save'])
 		write_config();
 
 		header("Location: /snort/snort_alerts.php");
+		exit;
 	}
 
 }
 
 if ($_POST['delete'])
 {
-	conf_mount_rw();
 	if(file_exists('/var/log/snort/alert'))
 	{
+		conf_mount_rw();
 		@file_put_content("/var/log/snort/alert", "");
 		post_delete_logs();
 		mwexec('/usr/sbin/chown snort:snort /var/log/snort/*', true);
 		mwexec('/bin/chmod 660 /var/log/snort/*', true);
-		sleep(2);
 		mwexec('/usr/bin/killall -HUP snort', true);
+		conf_mount_ro();
+
+		header("Location: /snort/snort_alerts.php");
+		exit;
 	}
-	conf_mount_ro();
 }
 
 if ($_POST['download'])
 {
 
-	ob_start(); //importanr or other post will fail
 	$save_date = exec('/bin/date "+%Y-%m-%d-%H-%M-%S"');
 	$file_name = "snort_logs_{$save_date}.tar.gz";
-	exec("/usr/bin/tar cfz /tmp/snort_logs_{$save_date}.tar.gz /var/log/snort");
+	exec("/usr/bin/tar cfz /tmp/{$file_name} /var/log/snort");
 
-	if (file_exists("/tmp/snort_logs_{$save_date}.tar.gz")) {
+	if (file_exists("/tmp/{$file_name}")) {
 		$file = "/tmp/snort_logs_{$save_date}.tar.gz";
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT\n");
 		header("Pragma: private"); // needed for IE
@@ -117,10 +119,11 @@ if ($_POST['download'])
 		header("Content-length: ".filesize($file));
 		header("Content-disposition: attachment; filename = {$file_name}");
 		readfile("$file");
-		exec("/bin/rm /tmp/snort_logs_{$save_date}.tar.gz");
-		od_end_clean(); //importanr or other post will fail
-	} else
-		echo 'Error no saved file.';
+		exec("/bin/rm /tmp/{$file_name}");
+	}
+
+	header("Location: /snort/snort_alerts.php");
+	exit;
 }
 
 
