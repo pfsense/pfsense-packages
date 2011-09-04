@@ -697,12 +697,6 @@ function oinkmaster_run($id, $if_real, $iface_uuid)
 
 			/*  might have to add a sleep for 3sec for flash drives or old drives */
 			exec("/usr/local/bin/perl /usr/local/bin/oinkmaster.pl -C /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/oinkmaster_{$iface_uuid}_{$if_real}.conf -o /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules > /usr/local/etc/snort/oinkmaster_{$iface_uuid}_{$if_real}.log");
-
-			/* TODO: Remove this code when x64 so rules are ready */
-			if($snort_arch == 'x64'){
-				exec("/bin/rm -r /usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/*.so.rules");
-			}
-
 		}
 	}
 }
