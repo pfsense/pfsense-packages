@@ -477,7 +477,6 @@ if ($snortdownload == 'on')
 			update_output_window(gettext("Error Line 755"));
 			$snortdownload = 'off';
 		}
-	}
 }
 
 /* Untar emergingthreats rules to tmp */
