@@ -203,7 +203,7 @@ if ($emergingthreats == 'on')
 	update_status(gettext("Downloading emergingthreats md5 file..."));
 	ini_set('user_agent','Mozilla/4.0 (compatible; MSIE 6.0)');
 	// $image = @file_get_contents("http://www.mtest.local/pub-bin/oinkmaster.cgi/{$oinkid}/version.txt");
-	$image = @file_get_contents('http://rules.emergingthreats.net/open/snort-2.8.6/emerging.rules.tar.gz.md5');
+	$image = @file_get_contents('http://rules.emergingthreats.net/open/snort-2.9.0/emerging.rules.tar.gz.md5');
 	@file_put_contents("{$tmpfname}/{$emergingthreats_filename_md5}", $image);
 	update_status(gettext("Done downloading emergingthreats md5"));
 }
@@ -346,7 +346,7 @@ if ($emergingthreats == "on")
 		}else{
 			update_status(gettext("There is a new set of Emergingthreats rules posted. Downloading..."));
 			update_output_window(gettext("May take 4 to 10 min..."));
-			download_file_with_progress_bar('http://rules.emergingthreats.net/open/snort-2.8.6/emerging.rules.tar.gz', "{$tmpfname}/{$emergingthreats_filename}");
+			download_file_with_progress_bar('http://rules.emergingthreats.net/open/snort-2.9.0/emerging.rules.tar.gz', "{$tmpfname}/{$emergingthreats_filename}");
 			update_status(gettext('Done downloading Emergingthreats rules file.'));
 		}
 	}
@@ -420,9 +420,9 @@ if ($snortdownload == 'on')
 			/* extract so rules on for x86 for now */
 			/* TODO: ask snort.org to build x64 version of so rules for Freebsd 8.1 Sept 05,2010 */
 			if($snort_arch == 'x86'){
-				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/i386/2.8.6.1/");
+				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/precompiled/$freebsd_version_so/i386/2.9.0.5/");
 				exec('/bin/mkdir -p /usr/local/lib/snort/dynamicrules/');
-				exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/i386/2.8.6.1/* /usr/local/lib/snort/dynamicrules/");
+				exec("/bin/mv -f {$snortdir}/so_rules/precompiled/$freebsd_version_so/i386/2.9.0.5/* /usr/local/lib/snort/dynamicrules/");
 				/* extract so rules none bin and rename */
 				exec("/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C {$snortdir} so_rules/bad-traffic.rules/" .
 			" so_rules/chat.rules/" .
