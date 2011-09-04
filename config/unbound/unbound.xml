@@ -47,7 +47,7 @@
 		<name>Unbound DNS</name>
 		<tooltiptext>Setup Unbound specific settings</tooltiptext>
 		<section>Services</section>
-		<url>pkg_edit.php?xml=unbound.xml&amp;id=0</url>
+		<url>/pkg_edit.php?xml=unbound.xml&amp;id=0</url>
 	</menu>
 	<service>
 		<name>unbound</name>
