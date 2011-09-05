@@ -2357,7 +2357,7 @@ preprocessor frag3_engine: policy bsd detect_anomalies
 
 preprocessor stream5_global: track_tcp yes, track_udp yes, track_icmp yes
 
-preprocessor stream5_tcp: policy BSD, ports both all, protocol both all, {$def_max_queued_bytes_type}{$def_max_queued_segs_type} use_static_footprint_sizes
+preprocessor stream5_tcp: policy BSD, ports both all, {$def_max_queued_bytes_type}{$def_max_queued_segs_type}
 preprocessor stream5_udp:
 preprocessor stream5_icmp:
 
