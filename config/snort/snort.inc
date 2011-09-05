@@ -1927,8 +1927,8 @@ function generate_snort_conf($id, $if_real, $snort_uuid)
 
 	/* generate rule sections to load */
 	$enabled_rulesets = $snortcfg['rulesets'];
+	$selected_rules_sections = "";
 	if (!empty($enabled_rulesets)) {
-		$selected_rules_sections = "";
 		$enabled_rulesets_array = split("\|\|", $enabled_rulesets);
 		foreach($enabled_rulesets_array as $enabled_item)
 			$selected_rules_sections  .= "include \$RULE_PATH/{$enabled_item}\n";
@@ -2314,7 +2314,7 @@ portvar DCERPC_BRIGHTSTORE [6503,6504]
 #####################
 
 var RULE_PATH /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/rules
-# var PREPROC_RULE_PATH ./preproc_rules
+var PREPROC_RULE_PATH /usr/local/etc/snort/preproc_rules
 
 ################################
                                #
@@ -2408,10 +2408,12 @@ preprocessor ssl: ports { {$def_ssl_ports_ignore_type} }, trustservers, noinspec
 
 include /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/reference.config
 include /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/classification.config
-	$threshold_file_name
+include \$PREPROC_RULE_PATH/preprocessor.rules
+include \$PREPROC_RULE_PATH/decoder.rules
+$threshold_file_name
 
 # Snort user pass through configuration
-	{$snort_config_pass_thru}
+{$snort_config_pass_thru}
 
 ###################
                   #
