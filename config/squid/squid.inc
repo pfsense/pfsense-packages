@@ -690,6 +690,7 @@ function squid_resync_cache() {
 	$memory_cache_size = ($settings['memory_cache_size'] ? $settings['memory_cache_size'] : 8);
 	$max_objsize = ($settings['maximum_object_size'] ? $settings['maximum_object_size'] : 10);
 	$min_objsize = ($settings['minimum_object_size'] ? $settings['minimum_object_size'] : 0);
+	$max_objsize_in_mem = ($settings['maximum_objsize_in_mem'] ? $settings['maximum_objsize_in_mem'] : 32);
 	$cache_policy = ($settings['cache_replacement_policy'] ? $settings['cache_replacement_policy'] : 'heap LFUDA');
 	$memory_policy = ($settings['memory_replacement_policy'] ? $settings['memory_replacement_policy'] : 'heap GDSF');
 	$offline_mode = ($settings['enable_offline'] == 'on' ? 'on' : 'off');
@@ -712,7 +713,7 @@ function squid_resync_cache() {
 
 	$conf = <<<EOD
 cache_mem $memory_cache_size MB
-maximum_object_size_in_memory 32 KB
+maximum_object_size_in_memory $max_objsize_in_mem KB
 memory_replacement_policy $memory_policy
 cache_replacement_policy $cache_policy
 cache_dir $disk_cache_opts
