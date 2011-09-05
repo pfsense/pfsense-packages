@@ -168,6 +168,7 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
 	}
+	sleep(4); // So the GUI reports correctly
 	header("Location: /snort/snort_interfaces.php");
 	exit;
 }
