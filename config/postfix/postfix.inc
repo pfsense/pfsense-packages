@@ -190,6 +190,9 @@ function sync_package_postfix() {
             	else	
             		$new_sys_log .= $new_line;
             }
+            if (!file_exists('/root/system.inc.backup')) {
+            	copy ($sys_log_file,'/root/system.inc.backup');
+            }
             file_put_contents($sys_log_file,$new_sys_log, LOCK_EX);
             #mwexec('/usr/local/bin/php -q /usr/local/www/postfix_syslog.php');
             #restart syslog daemon	
@@ -594,7 +597,7 @@ function postfix_validate_input($post, &$input_errors) {
 function postfix_php_install_command() {
 	#small freebsd packages for full functional ldap and spf options
 	system('/usr/sbin/pkg_add -r postfix-policyd-spf');
-	system('/usr/sbin/pkg_add -r p5-perl-ldap');
+	#system('/usr/sbin/pkg_add -r p5-perl-ldap');
 	sync_package_postfix();
 }
 
