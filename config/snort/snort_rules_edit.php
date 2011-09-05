@@ -86,6 +86,16 @@ if (strstr($splitcontents[$lineid], $findme))
 if ($highlight == "no")
 	$splitcontents[$lineid] = substr($splitcontents[$lineid], 2);
 
+if (!function_exists('get_middle')) {
+	function get_middle($source, $beginning, $ending, $init_pos) {
+		$beginning_pos = strpos($source, $beginning, $init_pos);
+		$middle_pos = $beginning_pos + strlen($beginning);
+		$ending_pos = strpos($source, $ending, $beginning_pos);
+		$middle = substr($source, $middle_pos, $ending_pos - $middle_pos);
+		return $middle;
+	}
+}
+
 if ($_POST) {
 	if ($_POST['save']) {
 
