@@ -248,7 +248,7 @@
 		<field>
 			<fielddescr>Policydv2 Location</fielddescr>
 			<fieldname>antispam_location</fieldname>
-			<description>inet:ipaddress:port of antispam server if it is not installed local.</description>
+			<description><![CDATA[inet:ipaddress:port of antispam server.<br><strong>NEVER try to install policyd on pfsense base system. It will never boot again.</strong>]]></description>
 			<type>input</type>
 			<size>50</size>
 		</field>
