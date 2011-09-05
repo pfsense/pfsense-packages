@@ -7,13 +7,11 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    postfix.xml
+    postfix_recipients.xml
     part of the Postfix package for pfSense
-    Copyright (C) 2010 Erik Fonnesbeck
     Copyright (C) 2011 Marcello Coutinho
-
     All rights reserved.            
-			                                                                  */
+*/
 /* ========================================================================== */
 /*
     Redistribution and use in source and binary forms, with or without
@@ -43,12 +41,12 @@
 	<description>Describe your package here</description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
-	<name>postfix</name>
-	<version>1.2</version>
+	<name>postfixrecipients</name>
+	<version>1.0</version>
 	<title>Services: Postfix relay and antispam</title>
 	<include_file>/usr/local/pkg/postfix.inc</include_file>
 	<menu>
-		<name>Postfix Forwarder</name>
+		<name>Postfix Antispam and mail Relay</name>
 		<tooltiptext>Configure Postfix Forwarder</tooltiptext>
 		<section>Services</section>
 		<url>pkg_edit.php?xml=postfix.xml&amp;id=0</url>
@@ -78,7 +76,8 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
-	<additional_files_needed>
+
+		<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/postfix/postfix_sync.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
@@ -93,16 +92,10 @@
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
-	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/postfix/adexport.pl</item>
-		<prefix>/usr/local/etc/postfix</prefix>
-		<chmod>0755</chmod>
-	</additional_files_needed>
 <tabs>
 		<tab>
 			<text>General</text>
 			<url>/pkg_edit.php?xml=postfix.xml&amp;id=0</url>
-			<active/>
 		</tab>
 		<tab>
 			<text>ACLs / Filter Maps</text>
@@ -111,6 +104,7 @@
 		<tab>
 			<text>Valid recipients</text>
 			<url>/pkg_edit.php?xml=postfix_recipients.xml&amp;id=0</url>
+			<active/>
 		</tab>
 		<tab>
 			<text>Antispam</text>
@@ -127,117 +121,75 @@
 </tabs>
 	<fields>
 		<field>
-			<name>Postfix General Settings</name>
+			<name>Get Valid recipients from Active Directory</name>
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Enable Postfix  </fielddescr>
-			<fieldname>enable_postfix</fieldname>
+			<fielddescr>Enable LDAP fetch</fielddescr>
+			<fieldname>enable_ldap</fieldname>
 			<type>checkbox</type>
-			<description></description>
+			<description>Extract valid email addresses from Active Directory.</description>
 		</field>
 		<field>
-			<fielddescr>Listen interface(s)</fielddescr>
-			<fieldname>enabled_interface</fieldname>
-			<description><![CDATA[Interface(s) that daemon will bind to.<br>Do not listen on WAN without a good "antispam/close relay" configuration.]]></description>
-			<type>interfaces_selection</type>
-			<required/>
-			<default_value>loopback</default_value>
-			<multiple/>
-		</field>
-		<field>
-			<fielddescr>Maximum message size</fielddescr>
-			<fieldname>message_size_limit</fieldname>
+			<fielddescr>Frequency</fielddescr>
+			<fieldname>freq</fieldname>
+			<description>Wait time between each fetch HINT 30m(30 minutes), 1h(one hour), 1d(one day)</description>
 			<type>input</type>
-			<size>10</size>
-			<description>
-				This setting governs the largest message size that will be accepted by this mail server. Ensure you have enough space to accommodate this size, and ensure this setting matches or is lower than the destination server(s).&lt;br/&gt;Default: 10240000 (10MB).
-			</description>
+			<size>15</size>
 		</field>
 		<field>
-			<fielddescr>Process Limit</fielddescr>
-			<fieldname>process_limit</fieldname>
-			<type>input</type>
-			<size>10</size>
-			<description>
-				The default maximal number of Postfix child processes that provide a given service.&lt;br/&gt;Default: 100
-			</description>
-		</field>
-		<field>
-			<fielddescr>custom main.cf options</fielddescr>
-			<fieldname>maincf</fieldname>
-			<description>Paste your custom code here.  This code will be included at main.cf postfix file</description>
-			<type>textarea</type>
-			<cols>70</cols>
-			<rows>03</rows>
-			<encoding>base64</encoding>
-		</field>
-		<field>
-			<name>Logging</name>
-		<type>listtopic</type>
-		</field>
-		<field>
-			<fielddescr>Destination</fielddescr>
-			<fieldname>log_to</fieldname>
-			<description><![CDATA[Choose where you want to save log information about mails on this server.<br>
-									Using system log you can forward logging to a syslog server.<BR>
-									Status -> system Logs -> Settings]]></description>
-	    	<type>select</type>
- 				<options>
-				<option><name>System log</name><value>system</value></option>
-				<option><name>/var/log/maillog</name><value>maillog</value></option>
-				<option><name>Disable logging</name><value>none</value></option>
-				</options>
-		</field>
-		
-		<field>
-			<fielddescr>Debug peer list</fielddescr>
-			<fieldname>debug_list</fieldname>
-			<description><![CDATA[The "debug_peer_list" parameter specifies an optional list of domain or network patterns, /file/name patterns or type:name tables.<br>
-								  When an SMTP client or server host name or address matches a pattern, increase the verbose logging level by the amount specified in the "debug_peer_level" parameter.]]></description>
-			<type>textarea</type>
-			<cols>70</cols>
-			<rows>3</rows>
-			<encoding>base64</encoding>
-		</field>
-		<field>
-			<fielddescr>Debug peer level</fielddescr>
-			<fieldname>debug_level</fieldname>
-			<description><![CDATA[The "debug_peer_level" parameter specifies the increment in verbose logging level when an SMTP client or server host name or address matches a pattern in the "debug_peer_list" parameter.]]></description>
-	    	<type>select</type>
- 				<options>
-				<option><name>2</name><value>2</value></option>
-				<option><name>3</name><value>3</value></option>
-				<option><name>4</name><value>4</value></option>
-				<option><name>5</name><value>5</value></option>
-				<option><name>6</name><value>6</value></option>
-				</options>
-		</field>
-
-		<field>
-			<name>Domains to Forward</name>
-			<type>listtopic</type>
-		</field>
-		<field>
-			<fielddescr>Forwarding</fielddescr>
+			<fielddescr><![CDATA[<strong>HINTS</strong><br>Hostname:<br>dc1.mysite.com<br><br>Domain:<br>dc=mysite,dc=com<br><br>Username:<br>cn=antispam,cn=Users<br>]]></fielddescr>
 			<fieldname>none</fieldname>
 			<type>rowhelper</type>
 			<rowhelper>
 			<rowhelperfield>
-				<fielddescr>Domain</fielddescr>
-				<fieldname>domain</fieldname>
-				<description>Enter the domain here (ex: example.com)</description>
+				<fielddescr>Hostname</fielddescr>
+				<fieldname>dc</fieldname>
 				<type>input</type>
-				<size>30</size>
+				<size>20</size>
 			</rowhelperfield>
 			<rowhelperfield>
-				<fielddescr>Mail Server IP</fielddescr>
-				<fieldname>mailserverip</fieldname>
-				<description>Enter the mail server IP to forward to here.</description>
+				<fielddescr>Domain</fielddescr>
+				<fieldname>cn</fieldname>
 				<type>input</type>
-				<size>40</size>
+				<size>22</size>
+			</rowhelperfield>
+			<rowhelperfield>
+				<fielddescr>Username</fielddescr>
+				<fieldname>username</fieldname>
+				<type>input</type>
+				<size>20</size>
+			</rowhelperfield>
+			<rowhelperfield>
+				<fielddescr>Password</fielddescr>
+				<fieldname>password</fieldname>
+				<type>password</type>
+				<size>10</size>
 			</rowhelperfield>
 			</rowhelper>
+		</field>
+		<field>
+			<name>Get Valid recipients from local file</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Location</fielddescr>
+			<name>location</name>
+			<type>input</type>
+			<size>80</size>
+		</field>
+		<field>
+			<name>Custom Valid recipients</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Custom list</fielddescr>
+			<fieldname>custom_recipients</fieldname>
+			<description><![CDATA[Paste your valid recipients here, one per line. <strong>HINT user@mycompany.com OK</strong>]]></description>
+			<type>textarea</type>
+			<cols>60</cols>
+			<rows>15</rows>
+			<encoding>base64</encoding>
 		</field>
 	</fields>
 	<custom_php_install_command>
