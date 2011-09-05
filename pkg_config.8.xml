@@ -783,11 +783,11 @@
 		<build_port_path>/usr/ports/net/mtr</build_port_path>
 	</package>
 	<package>
-		<name>squid</name>
+		<name>squid2</name>
 		<descr>High performance web proxy cache.</descr>
 		<website>http://www.squid-cache.org/</website>
 		<category>Network</category>
-		<version>2.7.9_4.1</version>
+		<version>2.7.9_4.2</version>
 		<status>Stable</status>
 		<required_version>2</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
