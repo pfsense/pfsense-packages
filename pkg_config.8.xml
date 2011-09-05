@@ -370,12 +370,14 @@
 	<package>
 		<name>Postfix Forwarder</name>
 		<website>http://www.postfix.org/</website>
-		<descr>Postfix mail forwarder acts as a relay to send incoming mail to the designated mail server for each domain.</descr>
+		<descr><![CDATA[Postfix mail forwarder acts as a relay server for your domain.<br>
+				It can do first and second line antispam combat before sending incoming mail to local mail servers.<br>
+				Postfix also can check RBLS, SPF, seach ldap for valid recipients and use third part antispam engines like policyd and mailscanner for better antispam solution.]]></descr>
 		<category>Services</category>
 		<config_file>http://www.pfsense.com/packages/config/postfix/postfix.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<depends_on_package>postfix-2.7.2,1.tbz</depends_on_package>
-		<version>2.7.2,1_1.1</version>
+		<depends_on_package>postfix-2.8.4,1.tbz</depends_on_package>
+		<version>2.8.4,1 pkg v.2.0</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<configurationfile>postfix.xml</configurationfile>
