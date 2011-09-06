@@ -36,16 +36,18 @@ function freeradius_install_command() {
 
 function freeradius_settings_resync() {
 	global $config;
-
 	$settings = $config['installedpackages']['freeradiussettings']['config'][0];
-
 	$iface = ($settings['interface'] ? $settings['interface'] : 'LAN');
 	$iface = convert_friendly_interface_to_real_interface_name($iface);
 	$iface_ip = find_interface_ip($iface);
 	$port = ($settings['port'] != '' ? $settings['port'] : 0);
-  $radiuslogging = $settings['radiuslogging'];
-  $radiuslogbadpass = $settings['radiuslogbadpass'];
-  $radiusloggoodpass = $settings['radiusloggoodpass'];
+	$radiuslogging = $settings['radiuslogging'];
+	$radiuslogbadpass = $settings['radiuslogbadpass'];
+	$radiusloggoodpass = $settings['radiusloggoodpass'];
+	$max_requests_var = $settings['max_requests_var'];
+	$max_request_time_var = $settings['max_request_time_var'];
+	$cleanup_delay_var = $settings['cleanup_delay_var'];
+	$logdir_var = $settings['logdir_var'];
 
 	// FreeRADIUS's configuration is huge
 	// This is the standard default config file, trimmed down a bit. Somebody might want to implement more options. It should be as simple as editing this, then also providing the settings in each file that was included here (or maybe just put the config inlined here).
@@ -55,7 +57,7 @@ exec_prefix = \${prefix}
 sysconfdir = \${prefix}/etc
 localstatedir = /var
 sbindir = \${exec_prefix}/sbin
-logdir = /var/log
+logdir = $logdir_var
 raddbdir = \${sysconfdir}/raddb
 radacctdir = \${logdir}/radacct
 confdir = \${raddbdir}
@@ -65,10 +67,10 @@ libdir = \${exec_prefix}/lib
 pidfile = \${run_dir}/radiusd.pid
 #user = nobody
 #group = nobody
-max_request_time = 30
+max_request_time = $max_request_time_var
 delete_blocked_requests = no
-cleanup_delay = 5
-max_requests = 1024
+cleanup_delay = $cleanup_delay_var
+max_requests = $max_requests_var
 bind_address = $iface_ip
 port = $port
 hostname_lookups = no
