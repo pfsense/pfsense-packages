@@ -2198,6 +2198,11 @@ EOD;
 	else
 		$def_max_queued_segs_type = ' max_queued_segs ' . $snortcfg['max_queued_segs'] . ',';
 
+	$snort_preprocessor_decoder_rules = "";
+	if (file_exists("/usr/local/etc/snort/preproc_rules/preprocessor.rules"))
+		$snort_preprocessor_decoder_rules .= "include \$PREPROC_RULE_PATH/preprocessor.rules\n";
+	if (file_exists("/usr/local/etc/snort/preproc_rules/decoder.rules"))
+		$snort_preprocessor_decoder_rules .= "include \$PREPROC_RULE_PATH/decoder.rules\n";
 
 	/* build snort configuration file */
 	/* TODO; feed back from pfsense users to reduce false positives */
@@ -2408,8 +2413,8 @@ preprocessor ssl: ports { {$def_ssl_ports_ignore_type} }, trustservers, noinspec
 
 include /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/reference.config
 include /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/classification.config
-include \$PREPROC_RULE_PATH/preprocessor.rules
-include \$PREPROC_RULE_PATH/decoder.rules
+{$snort_preprocessor_decoder_rules}
+
 $threshold_file_name
 
 # Snort user pass through configuration
