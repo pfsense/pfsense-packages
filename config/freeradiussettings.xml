@@ -80,58 +80,96 @@
 			<type>input</type>
 			<default_value>1812</default_value>
 		</field>
-	<field>
-      <fielddescr>Radius Logging</fielddescr>
-      <fieldname>radiuslogging</fieldname>
-      <description>Enable radius logging to /var/log/radius.log?</description>
-      <type>select</type>
-      <default_value>no</default_value>
-      <options>
-        <option>
-          <name>no</name>
-          <value>no</value>
-        </option>
-        <option>
-          <name>yes</name>
-          <value>yes</value>
-        </option>
-      </options>
-    </field>
-    <field>
-      <fielddescr>Log bad authentication attempts?</fielddescr>
-      <fieldname>radiuslogbadpass</fieldname>
-      <description>Specifies whether to log bad authentication attempts to the radius.log file. Radius Logging must be enabled for this to work.</description>
-      <type>select</type>
-      <default_value>no</default_value>
-      <options>
-        <option>
-          <name>no</name>
-          <value>no</value>
-        </option>
-        <option>
-          <name>yes</name>
-          <value>yes</value>
-        </option>
-      </options>
-    </field>
-    <field>
-      <fielddescr>Log good authentication attempts?</fielddescr>
-      <fieldname>radiusloggoodpass</fieldname>
-      <description>Specifies whether to log good authentication attempts to the radius.log file. Radius Logging must be enabled for this to work.</description>
-      <type>select</type>
-      <default_value>no</default_value>
-      <options>
-        <option>
-          <name>no</name>
-          <value>no</value>
-        </option>
-        <option>
-          <name>yes</name>
-          <value>yes</value>
-        </option>
-      </options>
-    </field>
-  </fields>
+		<field>
+			<fielddescr>Maximum requests server</fielddescr>
+			<fieldname>max_requests_var</fieldname>
+			<description>The maximum number of requests the RADIUS server can handle. Default is 1024. It should be 256 * number of clients e.g.: 4 Switches * 256 = 1024.</description>
+			<type>input</type>
+			<default_value>1024</default_value>
+		</field>
+		<field>
+			<fielddescr>Max request time</fielddescr>
+			<fieldname>max_request_time_var</fieldname>
+			<description>The maximum time (in seconds) to handle a request. Default is 30. Useful range of values: 5 to 120.</description>
+			<type>input</type>
+			<default_value>30</default_value>
+		</field>
+		<field>
+			<fielddescr>Cleanup delay</fielddescr>
+			<fieldname>cleanup_delay_var</fieldname>
+			<description>The time to wait (in seconds) before cleaning up a reply which was sent to the NAS. Default is 5. Useful range of values: 2 to 10.</description>
+			<type>input</type>
+			<default_value>5</default_value>
+		</field>
+		<field>
+			<fielddescr>Radius Logging Destination</fielddescr>
+			<fieldname>logdir_var</fieldname>
+			<description>Logging to "syslog" or "/var/log/radius.log" ?</description>
+			<type>select</type>
+			<default_value>/var/log</default_value>
+					<options>
+						<option>
+						<name>radius.log</name>
+						<value>/var/log</value>
+						</option>
+						<option>
+						<name>syslog</name>
+						<value>syslog</value>
+						</option>
+					</options>
+		</field>		
+		<field>
+			<fielddescr>Radius Logging</fielddescr>
+			<fieldname>radiuslogging</fieldname>
+			<description>Enable logging?</description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option>
+						<name>no</name>
+						<value>no</value>
+						</option>
+						<option>
+						<name>yes</name>
+						<value>yes</value>
+						</option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Log bad authentication attempts?</fielddescr>
+			<fieldname>radiuslogbadpass</fieldname>
+			<description>Specifies whether to log bad authentication attempts to the radius.log file. Radius Logging must be enabled for this to work.</description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option>
+						<name>no</name>
+						<value>no</value>
+						</option>
+						<option>
+						<name>yes</name>
+						<value>yes</value>
+						</option>
+					</options>
+		</field>
+		<field>
+			<fielddescr>Log good authentication attempts?</fielddescr>
+			<fieldname>radiusloggoodpass</fieldname>
+			<description>Specifies whether to log good authentication attempts to the radius.log file. Radius Logging must be enabled for this to work.</description>
+			<type>select</type>
+			<default_value>no</default_value>
+					<options>
+						<option>
+						<name>no</name>
+						<value>no</value>
+						</option>
+						<option>
+						<name>yes</name>
+						<value>yes</value>
+						</option>
+					</options>
+		</field>
+	</fields>
 	<custom_delete_php_command>
 		freeradius_settings_resync();
 	</custom_delete_php_command>
