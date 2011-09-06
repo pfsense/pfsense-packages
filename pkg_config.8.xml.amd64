@@ -57,13 +57,30 @@
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>http://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
 		<category>Services</category>
-		<version>0.8.9</version>
-		<status>BETA</status>
+		<version>2.1.5 pkg v.0.8.9</version>
+		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>varnish-2.1.5.tbz</depends_on_package>
+		<depends_on_package>gcc-4.2.5.20090325_5.tbz</depends_on_package>
+		<build_port_path>/usr/ports/www/varnish2</build_port_path>
+		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
+	</package>
+	<package>
+		<name>Varnish-dev</name>
+		<descr>Varnish is a state-of-the-art, high-performance HTTP accelerator. It uses the advanced features in  FreeBSD 6/7/8 to achieve its high performance. BACKUP your custom vcl data before upgrading from 0.8</descr>
+		<website>http://varnish-cache.org</website>
+		<pkginfolink>http://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
+		<category>Services</category>
+		<version>3.0.1 pkg v.0.8.9</version>
+		<status>BETA</status>
+		<required_version>2.0</required_version>
+		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
+		<configurationfile>varnish_backends.xml</configurationfile>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package>varnish-3.0.1.tbz</depends_on_package>
 		<depends_on_package>gcc-4.2.5.20090325_5.tbz</depends_on_package>
 		<build_port_path>/usr/ports/www/varnish</build_port_path>
 		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
