@@ -437,7 +437,7 @@
 		<required_version>2.0</required_version>
 		<configurationfile>postfix.xml</configurationfile>
 		<build_port_path>/usr/ports/mail/postfix</build_port_path>
-		<build_options>WITHOUT_PCRE=true</build_options>
+		<build_options>WITHOUT_PCRE=false</build_options>
 	</package>
 	<package>
 		<name>siproxd</name>
