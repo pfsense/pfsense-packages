@@ -455,14 +455,14 @@
 		<website>http://varnish-cache.org</website>
 		<pkginfolink>http://doc.pfsense.org/index.php/Varnish_package</pkginfolink>
 		<category>Services</category>
-		<version>2.1.2 pkg v.0.8.9</version>
+		<version>2.1.5 pkg v.0.8.9</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
 		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
-		<depends_on_package_base_url>http://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8.1-release/Latest</depends_on_package_base_url>
-		<depends_on_package>varnish-2.1.2.tbz</depends_on_package>
-		<depends_on_package>gcc-4.2.5.20090325_4.tbz</depends_on_package>
+		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
+		<depends_on_package>varnish-2.1.5.tbz</depends_on_package>
+		<depends_on_package>gcc-4.2.5.20090325_5.tbz</depends_on_package>
 		<build_port_path>/usr/ports/www/varnish2</build_port_path>
 		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
 	</package>
