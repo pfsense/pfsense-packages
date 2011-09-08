@@ -1,7 +1,6 @@
 <?php
-/* $Id$ */
 /*
- snort_rulesets.php
+ snort_download_rules.php
  Copyright (C) 2006 Scott Ullrich
  Copyright (C) 2009 Robert Zelaya
  Copyright (C) 2011 Ermal Luci
@@ -748,14 +747,6 @@ else if ($snort_md5_check_ok == 'on' && $emerg_md5_check_ok == 'on' && $pfsense_
 else {
 	/* You are Not Up to date, always stop snort when updating rules for low end machines */;
 	update_status(gettext("You are NOT up to date..."));
-	$chk_if_snort_up = exec("pgrep -x snort");
-	if ($chk_if_snort_up != "") {
-		update_output_window(gettext("Stopping Snort service..."));
-		exec("/usr/bin/touch /tmp/snort_download_halt.pid");
-		exec("/bin/sh /usr/local/etc/rc.d/snort.sh stop");
-		sleep(2);
-	}
-
 	exec("/bin/sh /usr/local/etc/rc.d/snort.sh start");
 	update_status(gettext("The Rules update finished..."));
 	update_output_window(gettext("Snort has restarted with your new set of rules..."));
