@@ -59,7 +59,7 @@ function sync_relay_recipients($via_cron="cron"){
 			if($postfix_recipients_config['enable_ldap']){
 				#validate cront job
 				if(preg_match("/(\d+)(\w)/",$postfix_recipients_config['freq'],$matches)){
-					$cron_sufix="\t*\t*\troot\t/usr/local/bin/php /usr/local/www/postfix_recipients.php";
+					$cron_sufix="\t*\t*\troot\t/usr/local/bin/php /usr/local/www/postfix_recipientes.php";
 					switch ($matches[2]){
 						case m:
 							$cron= "*/".$matches[1]."\t*\t*".$cron_sufix;
@@ -76,9 +76,9 @@ function sync_relay_recipients($via_cron="cron"){
 					#update cront job file
 					$crontab = file('/etc/crontab');
 					foreach ($crontab as $line)
-						$new_cron.=(preg_match("/postfix_recipients.php/",$line)?$cron."\n":$line);
+						$new_cron.=(preg_match("/postfix_recipientes.php/",$line)?$cron."\n":$line);
 					#include if conf does not exist in crontab
-					$new_cron.=(!preg_match("/postfix_recipients.php/",$new_cron)?"\n".$cron."\n\n":"");	
+					$new_cron.=(!preg_match("/postfix_recipientes.php/",$new_cron)?"\n".$cron."\n\n":"");	
 					file_put_contents("/etc/crontab",$new_cron, LOCK_EX);
 					#check crontab changes
 					$md5_new_file = trim(md5_file('/etc/crontab'));
@@ -139,12 +139,12 @@ function sync_relay_recipients($via_cron="cron"){
 				}
 		}
 	#save all relay recipients and reload postfix
-	file_put_contents("/usr/local/etc/postfix/relay_recipients",$relay_ldap_recipients."\n".$relay_recipients, LOCK_EX);
-	exec("/usr/local/sbin/postmap /usr/local/etc/postfix/relay_recipients");
+	file_put_contents("/usr/local/etc/postfix/relay_recipientes",$relay_ldap_recipients."\n".$relay_recipients, LOCK_EX);
+	exec("/usr/local/sbin/postmap /usr/local/etc/postfix/relay_recipientes");
 	mwexec("/usr/local/sbin/postfix reload");
 	}
 	if($relay_recipients !="" || $relay_ldap_recipients!="")
-		return("relay_recipient_maps = hash:/usr/local/etc/postfix/relay_recipients\n");
+		return("relay_recipient_maps = hash:/usr/local/etc/postfix/relay_recipientes\n");
 }
 function sync_package_postfix() {
 	global $config;
@@ -414,22 +414,22 @@ switch ($antispam['zombie_blocker'])
 			$postfix_main.='postscreen_greet_wait = ${stress?'.$greet[1].'}${stress:'.$greet[2].'}'.$greet[3]."\n";
 			}
 		$ag=$antispam['after_greeting'];
-		if($ag["postscreen_disable_vrfy_command"]){
+		if(preg_match("/postscreen_disable_vrfy_command/",$antispam['after_greeting'])){
 			$postfix_main.="postscreen_disable_vrfy_command = yes\n";
 			}
-		if($ag["postscreen_non_smtp_command_enable"]){
+		if(preg_match("/postscreen_non_smtp_command_enable/",$antispam['after_greeting'])){
 			$postfix_main.="postscreen_non_smtp_command_enable = yes\n";
 			$postfix_main.="postscreen_non_smtp_command_action = ".$antispam['zombie_blocker']."\n";
 			}
-		if($ag["postscreen_pipelining_enable"]){
+		if(preg_match("/postscreen_pipelining_enable/",$antispam['after_greeting'])){
 			$postfix_main.="postscreen_pipelining_enable = yes\n";
 			$postfix_main.="postscreen_pipelining_action = ".$antispam['zombie_blocker']."\n";
 			}
-		if($ag["postscreen_bare_newline_enable"]){
+		if(preg_match("/postscreen_bare_newline_enable/",$antispam['after_greeting'])){
 			$postfix_main.="postscreen_bare_newline_enable = yes\n";
 			$postfix_main.="postscreen_bare_newline_action = ".$antispam['zombie_blocker']."\n";
 			}
-		if($ag["postscreen_greet_check"]){
+		if(preg_match("/postscreen_greet_check/",$antispam['after_greeting'])){
 			$postfix_main.="postscreen_greet_action = ".$antispam['zombie_blocker']."\n";
 			}
 	
@@ -444,8 +444,8 @@ switch ($antispam['zombie_blocker'])
 	foreach (explode(",", $ifaces) as $i => $iface) {
 		$real_ifaces[] = px_get_real_interface_address($iface);
 		if($real_ifaces[$i][0]) {
-			$postfix_master .=$real_ifaces[$i][0].":25	inet  n       -       n       -       1       postscreen\n";
-			$postfix_master .=($antispam['soft_bounce'] == "postscreen"?"   -o soft_bounce=yes\n":"");
+			$postfix_master .=$real_ifaces[$i][0].":25	inet  n       -       n       -       1       postscreen\n\t-o user=postfix\n";
+			$postfix_master .=($antispam['soft_bounce'] == "postscreen"?"\t-o soft_bounce=yes\n":"");
 		}
 	}
 	$postfix_master .= $postfix_inets.<<<MASTEREOF
@@ -481,7 +481,7 @@ MASTEREOF;
 	foreach (explode(",", $ifaces) as $i => $iface) {
 		$real_ifaces[] = px_get_real_interface_address($iface);
 		if($real_ifaces[$i][0]) {
-			$postfix_master .=$real_ifaces[$i][0].":25	inet  n       -       n       -       1       smtpd\n";
+			$postfix_master .=$real_ifaces[$i][0].":25	inet  n       -       n       -       1       smtpd\n\t-o user=postfix\n";
 		}
 	}
 		
@@ -515,8 +515,6 @@ anvil     unix  -       -       n       -       1       anvil
 scache    unix  -       -       n       -       1       scache
 spf    unix	-       n       n       -       -       spawn
 	user=nobody argv=/usr/local/sbin/postfix-policyd-spf
-#	-o user=nobody
-# 	-o argv=/usr/local/sbin/postfix-policyd-spf
 
 MASTEREOF2;
 	
