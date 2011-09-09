@@ -59,7 +59,7 @@ function sync_relay_recipients($via_cron="cron"){
 			if($postfix_recipients_config['enable_ldap']){
 				#validate cront job
 				if(preg_match("/(\d+)(\w)/",$postfix_recipients_config['freq'],$matches)){
-					$cron_sufix="\t*\t*\troot\t/usr/local/bin/php /usr/local/www/postfix_recipientes.php";
+					$cron_sufix="\t*\t*\troot\t/usr/local/bin/php /usr/local/www/postfix_recipients.php";
 					switch ($matches[2]){
 						case m:
 							$cron= "*/".$matches[1]."\t*\t*".$cron_sufix;
@@ -76,9 +76,9 @@ function sync_relay_recipients($via_cron="cron"){
 					#update cront job file
 					$crontab = file('/etc/crontab');
 					foreach ($crontab as $line)
-						$new_cron.=(preg_match("/postfix_recipientes.php/",$line)?$cron."\n":$line);
+						$new_cron.=(preg_match("/postfix_recipients.php/",$line)?$cron."\n":$line);
 					#include if conf does not exist in crontab
-					$new_cron.=(!preg_match("/postfix_recipientes.php/",$new_cron)?"\n".$cron."\n\n":"");	
+					$new_cron.=(!preg_match("/postfix_recipients.php/",$new_cron)?"\n".$cron."\n\n":"");	
 					file_put_contents("/etc/crontab",$new_cron, LOCK_EX);
 					#check crontab changes
 					$md5_new_file = trim(md5_file('/etc/crontab'));
@@ -139,12 +139,12 @@ function sync_relay_recipients($via_cron="cron"){
 				}
 		}
 	#save all relay recipients and reload postfix
-	file_put_contents("/usr/local/etc/postfix/relay_recipientes",$relay_ldap_recipients."\n".$relay_recipients, LOCK_EX);
-	exec("/usr/local/sbin/postmap /usr/local/etc/postfix/relay_recipientes");
+	file_put_contents("/usr/local/etc/postfix/relay_recipients",$relay_ldap_recipients."\n".$relay_recipients, LOCK_EX);
+	exec("/usr/local/sbin/postmap /usr/local/etc/postfix/relay_recipients");
 	mwexec("/usr/local/sbin/postfix reload");
 	}
 	if($relay_recipients !="" || $relay_ldap_recipients!="")
-		return("relay_recipient_maps = hash:/usr/local/etc/postfix/relay_recipientes\n");
+		return("relay_recipient_maps = hash:/usr/local/etc/postfix/relay_recipients\n");
 }
 function sync_package_postfix() {
 	global $config;
