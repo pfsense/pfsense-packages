@@ -259,17 +259,17 @@ ABOUT;
 	$postfix_main="#main.cf\n".$copyright;
 	#Header Maps
 	if ($config['installedpackages']['postfixacl']['config'][0]['header_maps']){
-		$postfix_main .= "header_checks = regexp:/usr/local/etc/postfix/header_check\n";
+		$postfix_main .= "header_checks = pcre:/usr/local/etc/postfix/header_check\n";
 		$header_check = px_text_area_decode($config['installedpackages']['postfixacl']['config'][0]['header_maps']);
 		}
 	#MIME Maps
 	if ($config['installedpackages']['postfixacl']['config'][0]['mime_maps']){
-		$postfix_main .= "mime_header_checks = regexp:/usr/local/etc/postfix/mime_check\n";
+		$postfix_main .= "mime_header_checks = pcre:/usr/local/etc/postfix/mime_check\n";
 		$mime_check = px_text_area_decode($config['installedpackages']['postfixacl']['config'][0]['mime_maps']);
 		}
 	#Body Maps
 	if ($config['installedpackages']['postfixacl']['config'][0]['body_maps']){
-		$postfix_main .= "body_checks = regexp:/usr/local/etc/postfix/body_check\n";
+		$postfix_main .= "body_checks = pcre:/usr/local/etc/postfix/body_check\n";
 		$body_check = px_text_area_decode($config['installedpackages']['postfixacl']['config'][0]['body_maps']);
 		}
 	#Client CIDR
@@ -281,9 +281,9 @@ ABOUT;
 			$cal_cidr_tmp = px_text_area_decode($config['installedpackages']['postfixacl']['config'][0]['cal_cidr']); 	
 			$cal_cidr = preg_replace('/ ok/i'," permit",$cal_cidr_tmp);
 		}
-	#Client REGEXP
-	if ($config['installedpackages']['postfixacl']['config'][0]['cal_regexp']){
-		$cal_regexp = px_text_area_decode($config['installedpackages']['postfixacl']['config'][0]['cal_regexp']);
+	#Client PCRE
+	if ($config['installedpackages']['postfixacl']['config'][0]['cal_pcre']){
+		$cal_pcre = px_text_area_decode($config['installedpackages']['postfixacl']['config'][0]['cal_pcre']);
 		}
 	$postfix_main .= px_text_area_decode($postfix_config['maincf'])."\n". 
 		"relay_domains ={$relay_domains}\n" .
@@ -300,7 +300,7 @@ ABOUT;
 	if($antispam['antispam_enabled']){
 		switch ($antispam['antispam_software']){
 			case "mailscanner":
-			$header_check .= (!preg_match("/^Received:/",$header_check)?"\n/^Received:/ HOLD\n":"");
+			$header_check .= (!preg_match('@/ HOLD@',$header_check)?"\n/^Received:/ HOLD\n":"\n");
 			$postfix_main_antispam = "#Saving all mail after header/body/rbl/spf checks to mailscanner\n\n";
 			break;
 			case "policyd2":
@@ -344,7 +344,7 @@ smtpd_sender_restrictions = reject_non_fqdn_sender,
 				permit
 
 # Allow connections from specified local clients and strong check everybody else.								
-smtpd_client_restrictions = check_client_access regexp:/usr/local/etc/postfix/cal_regexp,
+smtpd_client_restrictions = check_client_access pcre:/usr/local/etc/postfix/cal_pcre,
 				check_client_access cidr:/usr/local/etc/postfix/cal_cidr,
 				reject_unknown_client_hostname,
 				reject_unauth_pipelining,
@@ -377,7 +377,7 @@ smtpd_sender_restrictions = reject_unknown_sender_domain,
 				RBLRBLRBL							
 
 # Allow connections from specified local clients and rbl check everybody else if rbl check are set.
-smtpd_client_restrictions = check_client_access regexp:/usr/local/etc/postfix/cal_regexp,
+smtpd_client_restrictions = check_client_access pcre:/usr/local/etc/postfix/cal_pcre,
 				check_client_access cidr:/usr/local/etc/postfix/cal_cidr,
 				RBLRBLRBL
 
@@ -525,7 +525,7 @@ MASTEREOF2;
 	file_put_contents("/usr/local/etc/postfix/master.cf", $postfix_master, LOCK_EX);
 	file_put_contents("/usr/local/etc/postfix/transport", $transport, LOCK_EX);
 	file_put_contents("/usr/local/etc/postfix/cal_cidr", $cal_cidr, LOCK_EX);
-	file_put_contents("/usr/local/etc/postfix/cal_regexp", $cal_regexp, LOCK_EX);
+	file_put_contents("/usr/local/etc/postfix/cal_pcre", $cal_pcre, LOCK_EX);
 	file_put_contents("/usr/local/etc/postfix/header_check", $header_check, LOCK_EX);
 	file_put_contents("/usr/local/etc/postfix/mime_check", $mime_check, LOCK_EX);
 	file_put_contents("/usr/local/etc/postfix/body_check", $body_check, LOCK_EX);

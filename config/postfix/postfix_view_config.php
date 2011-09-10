@@ -76,8 +76,8 @@ include("head.inc");
 						<input type="button" onClick="location.href='./postfix_view_config.php?file=3'" value="header_check">&nbsp;
 						<input type="button" onClick="location.href='./postfix_view_config.php?file=4'" value="mime_check">&nbsp;
 						<input type="button" onClick="location.href='./postfix_view_config.php?file=5'" value="body_check">&nbsp;
-						<input type="button" onClick="location.href='./postfix_view_config.php?file=6'" value="clients CIDR">&nbsp;
-						<input type="button" onClick="location.href='./postfix_view_config.php?file=7'" value="clients REGEXP">&nbsp;
+						<input type="button" onClick="location.href='./postfix_view_config.php?file=6'" value="client CIDR">&nbsp;
+						<input type="button" onClick="location.href='./postfix_view_config.php?file=7'" value="client PCRE">&nbsp;
 						</td>
 							</tr>
 							<tr>						
@@ -86,12 +86,12 @@ include("head.inc");
 <?php
 	$files_array[]="/usr/local/etc/postfix/main.cf";
 	$files_array[]="/usr/local/etc/postfix/master.cf";
-	$files_array[]="/usr/local/etc/postfix/relay_recipients";
+	$files_array[]="/usr/local/etc/postfix/relay_recipientes";
 	$files_array[]="/usr/local/etc/postfix/header_check";
 	$files_array[]="/usr/local/etc/postfix/mime_check";
 	$files_array[]="/usr/local/etc/postfix/body_check";
-	$files_array[]="/usr/local/etc/postfix/clients_cidr";
-	$files_array[]="/usr/local/etc/postfix/clients_regexp";
+	$files_array[]="/usr/local/etc/postfix/cal_cidr";
+	$files_array[]="/usr/local/etc/postfix/cal_pcre";
 	$id=($_REQUEST['file']?$_REQUEST['file']:"0");
 	$config_file = file_get_contents("$files_array[$id]");
 	echo $files_array[$id]."\n".$config_file;

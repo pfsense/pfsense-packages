@@ -127,39 +127,39 @@
 		<field>
 			<fielddescr>Header</fielddescr>
 			<fieldname>header_maps</fieldname>
-			<description><![CDATA[<strong>REGEXP filters</strong><a href=http://www.postfix.org/regexp_table.5.html> that are applied to initial message headers(except for the headers that are processed with mime_header_checks</a> Hint:<br>
-								/^Subject: viagra|cialis|levitra|day price:/i REJECT<br>
-								/^From: spammer@myspam.net/i REJECT<br>
-								/^From: *@mytrustdomain OK<br>
+			<description><![CDATA[<strong>PCRE filters</strong><a href=http://www.postfix.org/pcre_table.5.html> that are applied to initial message headers(except for the headers that are processed with mime_header_checks</a> Hint:<br>
+								/^Subject:.*(viagra|cialis|levitra|day price):/ REJECT<br>
+								/^From:.*spammer@myspam.net/ REJECT<br>
+								/^From:.*@mytrustdomain OK<br>
 								See http://www.postfix.org/header_checks.5.html for more help]]>
 			</description>
 			<type>textarea</type>
-			<cols>80</cols>
-			<rows>10</rows>
+			<cols>83</cols>
+			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
 		<field>
 			<fielddescr>MIME</fielddescr>
 			<fieldname>mime_maps</fieldname>
-			<description><![CDATA[<strong>REGEXP filters</strong><a href=http://www.postfix.org/regexp_table.5.html> that are applied to MIME related message headers only.</a> Hint:<br>
+			<description><![CDATA[<strong>PCRE filters</strong><a href=http://www.postfix.org/pcre_table.5.html> that are applied to MIME related message headers only.</a> Hint:<br>
 								/^name=[^>]*\.(com|vbs|js|jse|exe|bat|cmd|vxd|scr|hlp|pif|shs|ini|dll)/ REJECT W do not allow files of type "$3" because of security concerns - "$2" caused the block.<br>
 								/^Content-(Disposition|Type):\s+.+?(?:file)?name="?.+?\.(386|ad[ept]|drv|em(ai)?l|ex[_e]|xms|\{[\da-f]{8}(?:-[\da-f]{4}){3}-[\da-f]{12}\})\b/ REJECT ".$2" file attachment types not allowed]]>
 			</description>
 			<type>textarea</type>
-			<cols>80</cols>
-			<rows>10</rows>
+			<cols>83</cols>
+			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
 		<field>
 			<fielddescr>body</fielddescr>
 			<fieldname>body_maps</fieldname>
-			<description><![CDATA[<strong>REGEXP filters</strong><a href=http://www.postfix.org/regexp_table.5.html> that are applied to all other content, including multi-part message boundaries.</a> Hint:<br>
+			<description><![CDATA[<strong>PCRE filters</strong><a href=http://www.postfix.org/pcre_table.5.html> that are applied to all other content, including multi-part message boundaries.</a> Hint:<br>
 								# First skip over base 64 encoded text to save CPU cycles.<br>
        							~^[[:alnum:]+/]{60,}$~          OK]]>
 			</description>
 			<type>textarea</type>
-			<cols>80</cols>
-			<rows>10</rows>
+			<cols>83</cols>
+			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
 		
@@ -175,21 +175,21 @@
 								192.168.3.2 OK<br>spammer.junkdomain.com REJECT]]>
 			</description>
 			<type>textarea</type>
-			<cols>80</cols>
-			<rows>10</rows>
+			<cols>83</cols>
+			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
 		<field>
-			<fielddescr>REGEXP</fielddescr>
-			<fieldname>cal_regexp</fieldname>
-			<description><![CDATA[Paste your client access list in REGEXP format one per line.<br>
+			<fielddescr>PCRE</fielddescr>
+			<fieldname>cal_pcre</fieldname>
+			<description><![CDATA[Paste your client access list in PCRE format one per line.<br>
 							This list is used by postfix to check who has access or not to this relay.Hint:<br>
 							/.*\.dsl\..*/  REJECT DSLs not allowed<br>
   							/.*\.adsl\..*/ REJECT DSLs not allowed]]>
 			</description>
 			<type>textarea</type>
-			<cols>80</cols>
-			<rows>10</rows>
+			<cols>83</cols>
+			<rows>15</rows>
 			<encoding>base64</encoding>
 		</field>
 	</fields>
