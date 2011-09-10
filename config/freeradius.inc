@@ -461,7 +461,7 @@ function freeradius_users_resync() {
       if ($multiconnect <> '') {
         $head .=", Simultaneous-Use += $multiconnect";
        }
-      if ($x <> '') {
+      if ($userexpiration <> '') {
         $head .=", Expiration := ".'"'.$userexpiration.'"';
        }
       if ($onlinetime <> '') {
