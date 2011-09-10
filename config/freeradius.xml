@@ -93,7 +93,7 @@
     </columnitem>
     <columnitem>
 			<fielddescr>Multiple Connection</fielddescr>
-			<fieldname>multiconnet</fieldname>
+			<fieldname>multiconnect</fieldname>
 		</columnitem>
 		<columnitem>
 			<fielddescr>Expiration</fielddescr>
@@ -152,7 +152,7 @@ different IP address to multiple simultaneous connections).   IMPORTANT, you MUS
 			<type>input</type>
     </field>
 		<field>
-			<fieldname>multiconnet</fieldname>
+			<fieldname>multiconnect</fieldname>
 			<fielddescr>Number of Multiple connection</fielddescr>
 			<description>The available number of multiple simultaneous connections with this username.</description>
 			<required/>
