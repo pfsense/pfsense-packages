@@ -449,7 +449,7 @@ function freeradius_users_resync() {
 		foreach ($users as $user) {
 			$username = $user['username'];
 			$password = $user['password'];
-      $multiconnet = $user['multiconnet'];
+      $multiconnect = $user['multiconnect'];
 			$ip = $user['ip'];
       $userexpiration=$user['expiration'];
       $sessiontime=$user['sessiontime'];
@@ -459,7 +459,7 @@ function freeradius_users_resync() {
       $atrib=''; 
       $head="$username User-Password == ".'"'.$password.'"';
       if ($multiconnect <> '') {
-        $head .=", Simultaneous-Use += $multiconnet";
+        $head .=", Simultaneous-Use += $multiconnect";
        }
       if ($x <> '') {
         $head .=", Expiration := ".'"'.$userexpiration.'"';
