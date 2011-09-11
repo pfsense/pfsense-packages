@@ -160,7 +160,7 @@ different IP address to multiple simultaneous connections).   IMPORTANT, you MUS
 			<field>
 			<fieldname>gateway</fieldname>
 			<fielddescr>gateway</fielddescr>
-			<description>Framed-Routing</description>
+			<description>Framed-Route</description>
 			<type>input</type>
     </field>
 		<field>
