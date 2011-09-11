@@ -450,7 +450,9 @@ function freeradius_users_resync() {
 			$username = $user['username'];
 			$password = $user['password'];
       $multiconnect = $user['multiconnect'];
-			$ip = $user['ip'];
+	$ip = $user['ip'];
+	$subnetmask = $user['subnetmask'];
+	$gateway = $user['gateway'];
       $userexpiration=$user['expiration'];
       $sessiontime=$user['sessiontime'];
       $onlinetime=$user['onlinetime'];
@@ -471,6 +473,14 @@ function freeradius_users_resync() {
         if ($atrib <> '') { $atrib .=","; }
         $atrib .="\r\n\tFramed-IP-Address = $ip";
        }
+      if ($subnetmask <> '') {
+        if ($atrib <> '') { $atrib .=","; }
+        $atrib .="\r\n\tFramed-IP-Netmask = $subnetmask";
+       }
+      if ($gateway <> '') {
+        if ($atrib <> '') { $atrib .=","; }
+        $atrib .="\r\n\tFramed-Routing = $gateway";
+       }       
       if ($sessiontime <> '') {
         if ($atrib <> '') { $atrib .=","; }
         $atrib .="\r\n\tSession-Timeout := $sessiontime";
