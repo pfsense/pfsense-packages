@@ -479,7 +479,7 @@ function freeradius_users_resync() {
        }
       if ($gateway <> '') {
         if ($atrib <> '') { $atrib .=","; }
-        $atrib .="\r\n\tFramed-Routing = $gateway";
+        $atrib .="\r\n\tFramed-Route = $gateway";
        }       
       if ($sessiontime <> '') {
         if ($atrib <> '') { $atrib .=","; }
