@@ -166,6 +166,7 @@
 			<fieldname>transparent_proxy</fieldname>
 			<description>If transparent mode is enabled, all requests for destination port 80 will be forwarded to the proxy server without any additional configuration necessary.</description>
 			<type>checkbox</type>
+			<enablefields>private_subnet_proxy_off</enablefields>			
 			<required/>
 		</field>
 		<field>
