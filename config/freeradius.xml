@@ -83,15 +83,19 @@
 			<fielddescr>Username</fielddescr>
 			<fieldname>username</fieldname>
 		</columnitem>
-    <columnitem>
-      <fielddescr>Description</fielddescr>
-      <fieldname>description</fieldname>
-    </columnitem>
-    <columnitem>
-      <fielddescr>IP address</fielddescr>
-      <fieldname>ip</fieldname>
-    </columnitem>
-    <columnitem>
+    		<columnitem>
+      			<fielddescr>Description</fielddescr>
+      			<fieldname>description</fieldname>
+    		</columnitem>
+    		<columnitem>
+      			<fielddescr>IP address</fielddescr>
+      			<fieldname>ip</fieldname>
+    		</columnitem>
+    		<columnitem>
+      			<fielddescr>Subnet Mask/fielddescr>
+      			<fieldname>subnetmask</fieldname>
+    		</columnitem>    		
+    		<columnitem>
 			<fielddescr>Multiple Connection</fielddescr>
 			<fieldname>multiconnect</fieldname>
 		</columnitem>
@@ -99,18 +103,18 @@
 			<fielddescr>Expiration</fielddescr>
 			<fieldname>expiration</fieldname>
 		</columnitem>
-    <columnitem>
+    		<columnitem>
 			<fielddescr>Session time</fielddescr>
 			<fieldname>sessiontime</fieldname>
 		</columnitem>
-    <columnitem>
-      <fielddescr>Online time</fielddescr>
-      <fieldname>onlinetime</fieldname>
-    </columnitem>
-    <columnitem>
-      <fielddescr>VLAN ID</fielddescr>
-      <fieldname>vlanid</fieldname>
-    </columnitem>
+    		<columnitem>
+      			<fielddescr>Online time</fielddescr>
+      			<fieldname>onlinetime</fieldname>
+    		</columnitem>
+    		<columnitem>
+      			<fielddescr>VLAN ID</fielddescr>
+      			<fieldname>vlanid</fieldname>
+    		</columnitem>
   </adddeleteeditpagefields>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/</prefix>
@@ -150,19 +154,19 @@ address here. Continuous IP address is available with "+" suffix(example:192.168
 different IP address to multiple simultaneous connections).   IMPORTANT, you MUST enter an IP address here if you checked 
 "RADIUS issued IP" on vpn pptp or vpn pppoe configuration.</description>
 			<type>input</type>
-    </field>
+    		</field>
 			<field>
 			<fieldname>subnetmask</fieldname>
 			<fielddescr>subnetmask</fielddescr>
 			<description>Framed-IP-Netmask</description>
 			<type>input</type>
-    </field>
+    		</field>
 			<field>
 			<fieldname>gateway</fieldname>
 			<fielddescr>gateway</fielddescr>
 			<description>Framed-Route</description>
 			<type>input</type>
-    </field>
+   		</field>
 		<field>
 			<fieldname>multiconnect</fieldname>
 			<fielddescr>Number of Multiple connection</fielddescr>
@@ -176,13 +180,13 @@ different IP address to multiple simultaneous connections).   IMPORTANT, you MUS
 			<description>You may enter the date that this account will stop working here.use Mmm dd yyyy example: 01 Jan 2007  will be Jan 01 2007</description>
 			<type>input</type>
 		</field>
-    <field>
+    		<field>
 			<fieldname>sessiontime</fieldname>
 			<fielddescr>Session time</fielddescr>
 			<description>Time this user has until relogin in seconds</description>
 			<type>input</type>
 		</field>
-   <field>
+   		<field>
 			<fieldname>onlinetime</fieldname>
 			<fielddescr>Online time</fielddescr>
 			<description>A time string may be a list of simple time strings separated with vertical bars `|' or commas `,'.
@@ -209,16 +213,16 @@ Here are a few sample time strings with an explanation of what they mean.
 
 			<type>input</type>
 		</field>
-    <field>
-      <fieldname>description</fieldname>
-      <fielddescr>Description</fielddescr>
-      <description>You may enter a description here for your reference (not parsed).</description>
-      <type>input</type>
-    </field>
-    <field>
-      <fieldname>vlanid</fieldname>
-      <fielddescr>VLAN ID</fielddescr>
-      <description><![CDATA[ 
+    		<field>
+      			<fieldname>description</fieldname>
+      			<fielddescr>Description</fielddescr>
+      			<description>You may enter a description here for your reference (not parsed).</description>
+      			<type>input</type>
+    		</field>
+    		<field>
+      			<fieldname>vlanid</fieldname>
+      			<fielddescr>VLAN ID</fielddescr>
+      			<description><![CDATA[ 
         Enter the VLAN ID (integer from 1-4095) OR the VLAN name that this user/device should be assigned. In general, this parameter is used in conjunction with switches and access points that support mac-based authentication.<br><br>
 
         This setting can be used for switches/wireless access points that support the following radius parameters:<br>
@@ -228,24 +232,24 @@ Here are a few sample time strings with an explanation of what they mean.
           
         This was implemented and tested with HP Procurve Switches (3500yl, and 2626). HP Procurve switches support using either the VLAN ID or the VLAN name, while other switches will only work using the VLAN ID.
         ]]>
-      </description>
-      <type>input</type>
-    </field>
-    <field>
-      <fieldname>additionaloptions</fieldname>
-      <fielddescr>Additional RADIUS Options</fielddescr>
-      <description>
+      			</description>
+      			<type>input</type>
+    		</field>
+   		 <field>
+      			<fieldname>additionaloptions</fieldname>
+      			<fielddescr>Additional RADIUS Options</fielddescr>
+      			<description>
         <![CDATA[ 
         Experts only.<br>
         You may append extra custom RADIUS options to this user account (separated by commas).<br>
         IMPORTANT: If you don't format this field correctly, FreeRADIUS may not properly start because the users file will contain a syntax error.
         ]]>
-      </description>
-      <type>textarea</type>
-      <rows>10</rows>
-      <cols>75</cols>
-    </field>
-  </fields>
+      			</description>
+      			<type>textarea</type>
+      			<rows>10</rows>
+      			<cols>75</cols>
+    		</field>
+  		</fields>
 	<custom_delete_php_command>
 		freeradius_users_resync();
 	</custom_delete_php_command>
