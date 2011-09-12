@@ -92,10 +92,6 @@
       			<fieldname>ip</fieldname>
     		</columnitem>
     		<columnitem>
-      			<fielddescr>Subnet Mask/fielddescr>
-      			<fieldname>subnetmask</fieldname>
-    		</columnitem>    		
-    		<columnitem>
 			<fielddescr>Multiple Connection</fielddescr>
 			<fieldname>multiconnect</fieldname>
 		</columnitem>
@@ -155,18 +151,6 @@ different IP address to multiple simultaneous connections).   IMPORTANT, you MUS
 "RADIUS issued IP" on vpn pptp or vpn pppoe configuration.</description>
 			<type>input</type>
     		</field>
-			<field>
-			<fieldname>subnetmask</fieldname>
-			<fielddescr>subnetmask</fielddescr>
-			<description>Framed-IP-Netmask</description>
-			<type>input</type>
-    		</field>
-			<field>
-			<fieldname>gateway</fieldname>
-			<fielddescr>gateway</fielddescr>
-			<description>Framed-Route</description>
-			<type>input</type>
-   		</field>
 		<field>
 			<fieldname>multiconnect</fieldname>
 			<fielddescr>Number of Multiple connection</fielddescr>
