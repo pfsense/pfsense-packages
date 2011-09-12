@@ -92,7 +92,7 @@
       			<fieldname>ip</fieldname>
     		</columnitem>
     		<columnitem>
-      			<fielddescr>Subnet Mask/fielddescr>
+			<fielddescr>Subnet Mask</fielddescr>
       			<fieldname>subnetmask</fieldname>
     		</columnitem>    		
     		<columnitem>
