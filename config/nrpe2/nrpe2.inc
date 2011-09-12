@@ -143,6 +143,7 @@ function nrpe2_custom_php_write_config() {
 	global $g, $config, $nagios_check_path;
 	conf_mount_rw();
 
+	$cmds = array();
 	foreach ($config['installedpackages']['nrpe2']['config'][0]['row'] as $cmd) {
 		if (is_executable("{$nagios_check_path}/{$cmd['command']}"))
 			$cmds[] = "command[{$cmd['name']}]={$nagios_check_path}/{$cmd['command']} -w {$cmd['warning']} -c {$cmd['critical']} {$cmd['extra']}\n";
