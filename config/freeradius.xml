@@ -155,13 +155,13 @@ different IP address to multiple simultaneous connections).   IMPORTANT, you MUS
 "RADIUS issued IP" on vpn pptp or vpn pppoe configuration.]]></description>
 			<type>input</type>
 		</field>
-			<field>
+		<field>
 			<fieldname>subnetmask</fieldname>
 			<fielddescr>subnetmask</fielddescr>
 			<description>Framed-IP-Netmask</description>
 			<type>input</type>
 		</field>
-			<field>
+		<field>
 			<fieldname>gateway</fieldname>
 			<fielddescr>gateway</fielddescr>
 			<description>Framed-Route</description>
