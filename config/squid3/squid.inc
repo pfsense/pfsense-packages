@@ -344,19 +344,6 @@ function squid_validate_general($post, $input_errors) {
 		$input_errors[] = "You can not run squid on the same port as the webgui";
 	}
 
-/*
-	if (($post['transparent_proxy'] != 'on') && ($post['private_subnet_proxy_off'] == 'on')) {
-		$input_errors[] = "You can not bypass traffic to private subnets  without using the transparent proxy.";
-	}
-
-	if (($post['transparent_proxy'] != 'on') && !empty($post['defined_ip_proxy_off'])) {
-		$input_errors[] = "You can not bypass traffic from specific IPs without using the transparent proxy.";
-	}
-	if (($post['transparent_proxy'] != 'on') && !empty($post['defined_ip_proxy_off_dest'])) {
-		$input_errors[] = "You can not bypass traffic to specific IPs without using the transparent proxy.";
-	}
-*/
-
 	foreach (array('defined_ip_proxy_off') as $hosts) {
 		foreach (explode(";", $post[$hosts]) as $host) {
 			$host = trim($host);
