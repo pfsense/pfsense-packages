@@ -158,13 +158,13 @@ different IP address to multiple simultaneous connections).   IMPORTANT, you MUS
 		<field>
 			<fieldname>subnetmask</fieldname>
 			<fielddescr>subnetmask</fielddescr>
-			<description>Framed-IP-Netmask</description>
+			<description>Framed-IP-Netmask. Example: 255.255.255.0</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fieldname>gateway</fieldname>
 			<fielddescr>gateway</fielddescr>
-			<description>Framed-Route</description>
+			<description>Framed-Route. Example: 192.168.1.1</description>
 			<type>input</type>
 		</field>
 		<field>
