@@ -449,20 +449,28 @@ function freeradius_users_resync() {
 		foreach ($users as $user) {
 			$username = $user['username'];
 			$password = $user['password'];
-      $multiconnect = $user['multiconnect'];
+	$multiconnect = $user['multiconnect'];
 	$ip = $user['ip'];
-      $userexpiration=$user['expiration'];
-      $sessiontime=$user['sessiontime'];
-      $onlinetime=$user['onlinetime'];
-      $vlanid=$user['vlanid'];
-      $additionaloptions=$user['additionaloptions'];
-      $atrib=''; 
-      $head="$username User-Password == ".'"'.$password.'"';
+        $subnetmask = $user['subnetmask'];
+        $gateway = $user['gateway'];
+	$userexpiration=$user['expiration'];
+	$sessiontime=$user['sessiontime'];
+	$onlinetime=$user['onlinetime'];
+	$vlanid=$user['vlanid'];
+	$additionaloptions=$user['additionaloptions'];
+	$atrib=''; 
+	$head="$username User-Password == ".'"'.$password.'"';
       if ($multiconnect <> '') {
         $head .=", Simultaneous-Use += $multiconnect";
        }
       if ($userexpiration <> '') {
         $head .=", Expiration := ".'"'.$userexpiration.'"';
+       }
+      if ($subnetmask<> '') {
+        $head .=", Framed-IP-Netmask = $subnetmask";
+       }
+      if ($gateway<> '') {
+        $head .=", Framed-Route = $gateway";
        }
       if ($onlinetime <> '') {
         $head .=", Login-Time := ". '"' . $onlinetime .'"';
