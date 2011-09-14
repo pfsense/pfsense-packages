@@ -3,6 +3,8 @@
 	postfix.inc
 	part of the Postfix package for pfSense
 	Copyright (C) 2010 Erik Fonnesbeck
+	Copyright (C) 2011 Marcello Coutinho
+
 	All rights reserved.
 
 	Redistribution and use in source and binary forms, with or without
@@ -198,46 +200,7 @@ function sync_package_postfix() {
             #restart syslog daemon	
             system_syslogd_start();
 		}
-            
-				/*
-            	#insert new syslog definition
-                if (preg_match("/.*mail.crit.(.*)/",$line,$matches)){
-                	if ($postfix_config['log_to'] == "/var/log/system.log"){
-                		system("/usr/bin/touch /var/log/maillog");
-                    	$new_sys_log .= $postfix_log.$matches[1]."\n".$line;
-                		}
-                	else 
-                	{$new_sys_log .= $postfix_log.$postfix_log_sufix."\n".$line;}
-                }
-                else{
-                	#remove previous syslog definition
-                    $new_sys_log .= (preg_match("/mail.(info|debug|log)/",$line)?"":$line);
-                    }
-                }
-                file_put_contents($sys_log_file,$new_sys_log, LOCK_EX);
-                
-		}
-
-                #update /var/etc/syslog.conf
-		$sys_log_file="/var/etc/syslog.conf";
-		$sys_log = file($sys_log_file);
-                $postfix_log .= $postfix_log_sufix;
-                $new_sys_log="";
-		foreach ($sys_log as $line)
-			$new_sys_log.=(preg_match("/mail.(info|debug|log)/",$line)?$postfix_log."\n":$line);
-		#include if conf does not exist in crontab
-		$new_sys_log.=(!preg_match("/mail.(info|debug|log)/",$new_sys_log)?"\n".$postfix_log."\n\n":"");	
-		file_put_contents($sys_log_file,$new_sys_log, LOCK_EX);
-		#check crontab changes
-		$md5_new_file = trim(md5_file($sys_log_file));
-		$md5_old_file = trim(file_get_contents($sys_log_file.'.md5'));
-		if($md5_new_file <> $md5_old_file){
-			mwexec('/usr/bin/killall -HUP syslogd');
-			file_put_contents($sys_log_file.'.md5',$md5_new_file, LOCK_EX);
-		}
-		*/
-	#}
-
+           
 	#check_debug
 	if($postfix_config['debug_list'] && $postfix_config['debug_list']!=""){
 	$check_debug ="\n#Debugging postfix\n";
@@ -388,7 +351,18 @@ smtpd_recipient_restrictions = reject_unauth_destination,
 EOF;
 	}
 #check spf option
-$spf=($antispam['postfix_spf']?"check_policy_service unix:private/spf,\n\t\t\t\t":"");
+switch($antispam['postfix_spf']){
+	case 'spf_mark_only':
+		$postfix_main.= "spf_mark_only = yes\n";
+		$spf="reject_spf_invalid_sender,\n\t\t\t\t";
+		break;
+	case 'disable':
+		$spf="";
+		break;
+	default:
+		$spf=$antispam['postfix_spf'].",\n\t\t\t\t";
+		break;
+}
 $postfix_main=preg_replace("/SPFSPFSPF/",$spf,$postfix_main);
 $postfix_main .= $postfix_main_antispam.$check_debug;
 switch ($antispam['zombie_blocker'])
@@ -513,8 +487,6 @@ virtual   unix  -       n       n       -       -       virtual
 lmtp      unix  -       -       n       -       -       lmtp
 anvil     unix  -       -       n       -       1       anvil
 scache    unix  -       -       n       -       1       scache
-spf    unix	-       n       n       -       -       spawn
-	user=nobody argv=/usr/local/sbin/postfix-policyd-spf
 
 MASTEREOF2;
 	
@@ -545,7 +517,16 @@ MASTEREOF2;
 }
 function postfix_start(){
 	global $config;
-	$start = "/usr/local/sbin/postfix start\n";
+	$start=<<<EOF
+	
+	sysctl kern.ipc.nmbclusters=65536
+	sysctl kern.ipc.somaxconn=16384
+	sysctl kern.maxfiles=131072
+	sysctl kern.maxfilesperproc=104856
+	sysctl kern.threads.max_threads_per_proc=4096
+	/usr/local/sbin/postfix start
+	
+EOF;
 	$stop = "/usr/local/sbin/postfix stop\n";
 	log_error("Writing rc_file");		
 	write_rcfile(array("file" => "postfix.sh", "start" => $start, "stop" => $stop));
@@ -556,7 +537,7 @@ function postfix_start(){
 	if ($config['installedpackages']['postfix']['config'][0]['enable_postfix']){
 		log_error("Reloading/starting postfix");
 		system('/bin/chmod +x /usr/local/etc/rc.d/postfix.sh');
-		mwexec_bg("/usr/local/sbin/postfix reload || /usr/local/sbin/postfix start");
+		mwexec_bg("/usr/local/sbin/postfix reload || /usr/local/etc/rc.d/postfix.sh start");
 		log_error("Postfix setup completed");
 		}
 	else{
@@ -593,9 +574,6 @@ function postfix_validate_input($post, &$input_errors) {
 }
 
 function postfix_php_install_command() {
-	#small freebsd packages for full functional ldap and spf options
-	system('/usr/sbin/pkg_add -r postfix-policyd-spf');
-	#system('/usr/sbin/pkg_add -r p5-perl-ldap');
 	sync_package_postfix();
 }
 

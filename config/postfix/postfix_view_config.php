@@ -86,7 +86,7 @@ include("head.inc");
 <?php
 	$files_array[]="/usr/local/etc/postfix/main.cf";
 	$files_array[]="/usr/local/etc/postfix/master.cf";
-	$files_array[]="/usr/local/etc/postfix/relay_recipientes";
+	$files_array[]="/usr/local/etc/postfix/relay_recipients";
 	$files_array[]="/usr/local/etc/postfix/header_check";
 	$files_array[]="/usr/local/etc/postfix/mime_check";
 	$files_array[]="/usr/local/etc/postfix/body_check";

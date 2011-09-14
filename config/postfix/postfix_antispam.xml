@@ -174,7 +174,7 @@
 				<option><name>postscreen_pipelining_enable</name><value>postscreen_pipelining_enable</value></option>
 				<option><name>postscreen_greet_check</name><value>postscreen_greet_check</value></option>
 				</options>
-				<rows>10</rows>
+				<size>06</size>
 				<multiple/>
 		</field>
 		<field>
@@ -202,7 +202,7 @@
 			</description>
 			<type>textarea</type>
 			<cols>70</cols>
-			<rows>03</rows>
+			<rows>05</rows>
 		</field>
 		<field>
 			<fielddescr>RBL threshold</fielddescr>
@@ -220,7 +220,13 @@
 		<field>
 			<fielddescr>SPF lookup</fielddescr>
 			<fieldname>postfix_spf</fieldname>
-			<type>checkbox</type>
+			<type>select</type>
+ 				<options>
+				<option><name>REJECT the mail when the sender credentials FAILS (Recomended)</name><value>reject_spf_invalid_sender</value></option>
+				<option><name>PERMIT the mail when the sender credentials SUCCEED</name><value>permit_spf_valid_sender</value></option>
+				<option><name>Just show in header that the mail failed the test</name><value>spf_mark_only</value></option>
+				<option><name>Do not check SPF records</name><value>disable</value></option>
+				</options>
 			<description>
 			<![CDATA[<a target=_new href='http://www.openspf.org/Introduction'>The Sender Policy Framework (SPF) is an open standard specifying a technical method to prevent sender address forgery.</a>]]>
 			</description>
