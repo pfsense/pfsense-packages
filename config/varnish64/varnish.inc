@@ -141,7 +141,6 @@ function varnish_get_url_mappings_txt() {
 			else{
 				if(!$isfirst) 
 					$urlmappings .= "\telse ";
-					#req.http.host == "procesual.trf1.jus.br"
 				$urlmappings .= "if (req.$req $fieldtype ".'"'.$url['directorurl'].$url['directorurl2'].'") {'."\n";
 				#check failover
 				$urlbackend = "\t\t\tset req.backend = ".$url['directorname'].";";
@@ -283,7 +282,7 @@ function get_backend_config_txt() {
 			else 
 				$first_byte_timeout = "300s";
 			if($backend['probe_url'])
-				if (preg_match("@^(http)://([a-zA-Z0-9.]*)/(.*)$@",$backend['probe_url'],$matches)){
+				if (preg_match("@^(http)://([a-zA-Z0-9.-]*)/(.*)$@",$backend['probe_url'],$matches)){
 					$probe_url=".request =\n";
 					$probe_url.="\t\t\t".'"GET /'.$matches[3].' HTTP/1.1"'."\n";
                                         $probe_url.="\t\t\t".'"Accept: text/*"'."\n";
@@ -395,7 +394,7 @@ function sync_package_varnish() {
 	}
 		$vcl_recv_set_basic='#BASIC VCL RULES SETTING'."\n";
 		$vcl_recv_action_basic='#BASIC VCL RULES ACTIONS'."\n";
-		$plataform=posix_uname();
+		#$plataform=posix_uname();
 		foreach($config['installedpackages']['varnishsettings']['config'] as $vcl) {
 			if($vcl['fixgzip']){
 				$vcl_recv_set_basic.="\t#Fix gzip compression\n";
@@ -405,7 +404,7 @@ function sync_package_varnish() {
 				$vcl_recv_set_basic.="\t".'else if (req.http.Accept-Encoding ~ "deflate") {'."\n\t\tset req.http.Accept-Encoding = ".'"deflate"'.";\n\t\t}\n";
 				$vcl_recv_set_basic.="\telse\t{\n\t\tunset req.http.Accept-Encoding;\n\t\t}\n\t}\n";
 				}
-			if($vcl['clientbalance'] && $plataform['machine'] == 'amd64'){
+			#if($vcl['clientbalance'] && $plataform['machine'] == 'amd64'){
 				$vcl_recv_set_basic.="\t#set client balance identity\n";
 				switch ($vcl['clientbalance']){
 					case 'url':
@@ -418,7 +417,7 @@ function sync_package_varnish() {
 						$vcl_recv_set_basic.="\t".'set client.identity = req.http.user-agent;'."\n\n";
 						break;
 					}
-				}
+				#}
 			if($vcl['grace'] ){
 				$vcl_grace_time="set beresp.grace = ".$vcl['grace'].";\n\t\t";
 				}
