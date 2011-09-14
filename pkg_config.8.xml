@@ -828,7 +828,7 @@
 		<category>Network</category>
 		<version>3.1.9_0.1</version>
 		<status>ALPHA</status>
-		<required_version>3.0</required_version>
+		<required_version>2.0</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>squid-3.1.9.tbz</depends_on_package>
@@ -847,7 +847,7 @@
 		<category>Network</category>
 		<version>3.1.14_0.1</version>
 		<status>PRE-ALPHA</status>
-		<required_version>2.0</required_version>
+		<required_version>3.0</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
 		<depends_on_package>squid-3.1.14.tbz</depends_on_package>
