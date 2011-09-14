@@ -771,11 +771,11 @@
     </package>
     <package>
       <name>squid3</name>
-      <descr>EXPERIMENTAL! Not all directives are ported yet! High performance web proxy cache.</descr>
+      <descr>DISCONTINUED on pfSense 1.2.x [EXPERIMENTAL! Not all directives are ported yet! High performance web proxy cache.]</descr>
       <website>http://www.squid-cache.org/</website>
       <category>Network</category>
 		<version>3.1.14_0.1</version>
-      <status>ALPHA</status>
+      <status>DISCONTINUED on pfSense 1.2.x</status>
       <required_version>1.2.1</required_version>
       <maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com</maintainer>
       <depends_on_package_base_url>http://files.pfsense.org/packages/7/All/</depends_on_package_base_url>
