@@ -3,7 +3,7 @@
 	openvpn-client-export.inc
 	Copyright (C) 2009 Scott Ullrich <sullrich@gmail.com>
 	Copyright (C) 2008 Shrew Soft Inc
-	Copyright (C) 2010 Ermal Luçi
+	Copyright (C) 2010 Ermal Luï¿½i
 	All rights reserved.
 
 	Parts of this code was originally based on vpn_ipsec_sad.php
@@ -95,7 +95,7 @@ function openvpn_client_pem_to_pk12($outpath, $outpass, $crtpath, $keypath, $cap
 		unlink($capath);
 }
 
-function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy, $zipconf = false, $outpass = "", $skiptls=false, $doslines=false) {
+function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy, $zipconf = false, $outpass = "", $skiptls=false, $doslines=false, $advancedoptions) {
 	global $config, $input_errors, $g;
 
 	$nl = ($doslines) ? "\r\n" : "\n";
@@ -231,6 +231,11 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 		$conf .= "comp-lzo{$nl}";
 	if ($settings['passtos'])
 		$conf .= "passtos{$nl}";
+		
+	// add advanced options
+	$advancedoptions = str_replace(";", $nl, $advancedoptions);
+	$conf .= $advancedoptions;
+	$conf .= $nl;
 
 	if ($zipconf == true) {
 		// create template directory
@@ -270,7 +275,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 		return $conf;
 }
 
-function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass, $proxy) {
+function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass, $proxy, $advancedoptions) {
 	global $config, $g, $input_errors;
 
 	$ovpndir = "/usr/local/share/openvpn";
@@ -344,7 +349,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 		$pwdfle .= "{$proxy['password']}\r\n";
 		file_put_contents("{$confdir}/{$proxy['passwdfile']}", $pwdfle);
 	}
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, false, "", false, $doslines=true);
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys, $proxy, false, "", false, $doslines=true, $advancedoptions);
 	if (!$conf) {
 		$input_errors[] = "Could not create a config to export.";
 		return false;
@@ -400,7 +405,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	return $outfile;
 }
 
-function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass, $proxy) {
+function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass, $proxy, $advancedoptions) {
 	global $config, $g;
 
 	$ovpndir = "/usr/local/share/openvpn/";
@@ -461,7 +466,7 @@ function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $usead
 		file_put_contents("{$tempdir}/{$proxy['passwdfile']}", $pwdfle);
 	}
 
-	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, true, $proxy, false, "", true);
+	$conf = openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, true, $proxy, false, "", true, $advancedoptions);
 	if (!$conf)
 		return false;
 
