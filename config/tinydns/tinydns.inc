@@ -247,10 +247,16 @@ function tinydns_custom_php_changeip_command() {
 			else
 				$ipmask = $config['interfaces'][$dnsif]['subnet'];
 
-			if (is_ipaddr($ipaddress))
-				$arr = tinydns_get_ip_subnet_arpa($ipaddress, $ipmask);
-			elseif (intval($config['version']) >= 6)
-				$arr = tinydns_get_ip6_subnet_arpa($ipaddress, $ipmask);
+			if (intval($config['version']) <= 8) {
+				if (is_ipaddr($ipaddress))
+					$arr = tinydns_get_ip_subnet_arpa($ipaddress, $ipmask);
+			} else {
+				if (is_ipaddrv4($ipaddress)) {
+					$arr = tinydns_get_ip_subnet_arpa($ipaddress, $ipmask);
+				} elseif (is_ipaddrv6($ipaddress)) {
+					$arr = tinydns_get_ip6_subnet_arpa($ipaddress, $ipmask);
+				}
+			}
 			$dnsuserip = $arr[0];
 			//exec("/bin/mkdir -p {$g['varetc_path']}/dnscache{$dnsidx}");
 			exec("/usr/local/bin/dnscache-conf Gdnscache Gdnslog {$g['varetc_path']}/dnscache{$dnsidx} {$dnscacheip}");
@@ -543,10 +549,17 @@ function tinydns_create_zone_file() {
 			if($record_data) {
 				fwrite($fd, $record_data . "\n");
 				if ($domain['rdns'] || ($domain['recordtype'] == 'PTR')) {
-					if (is_ipaddr($ipaddress))
-						$rip = tinydns_get_ip_subnet_arpa($ipaddress, 32);
-					elseif (intval($config['version']) >= 6)
-						$rip = tinydns_get_ip6_subnet_arpa($ipaddress, 128);
+					if (intval($config['version']) <= 8) {
+						if (is_ipaddr($ipaddress))
+							$rip = tinydns_get_ip_subnet_arpa($ipaddress, 32);
+					} else {
+						if (is_ipaddrv4($ipaddress)) {
+							$rip = tinydns_get_ip_subnet_arpa($ipaddress, 32);
+						} elseif (is_ipaddrv6($ipaddress)) {
+							$rip = tinydns_get_ip6_subnet_arpa($ipaddress, 128);
+						}
+					}
+
 					if($rip)
 						fwrite($fd, ".{$rip[1]}::{$config['system']['hostname']}.{$config['system']['domain']}\n");
 				}
@@ -704,6 +717,7 @@ function tinydns_do_xmlrpc_sync($sync_to_ip, $password) {
 
 /* formats data as a tinydns data row item */
 function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns, $dist, $srv_port = "5000", $srv_weight = "0", $srv_priority = "0", $srv_timestamp = "") {
+		global $config;
 		if($ttl)
 			$ttl_string = ":{$ttl}";
 		else
@@ -746,7 +760,18 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 			case "PTR":
 				/* "^" creates "PTR" record only to allow reverse DNS */
 				//		^fqdn:p:ttl:timestamp:lo
-				$record_data = "^{$hostname}:{$recordip}{$ttl_string}";
+
+				if (intval($config['version']) <= 8) {
+					if (is_ipaddr($recordip))
+						$record_data = "^{$hostname}:{$recordip}{$ttl_string}";
+				} else {
+					if (is_ipaddrv4($recordip)) {
+						$record_data = "^{$hostname}:{$recordip}{$ttl_string}";
+					} elseif (is_ipaddrv6($recordip)) {
+						$ip6_arpa = tinydns_get_ip6_subnet_arpa($recordip, 128);
+						$record_data = "^{$ip6_arpa[1]}:{$hostname}{$ttl_string}";
+					}
+				}
 				break;
 			case "A":
 				/* "=" creates both "A" and "PTR" records to allow both forward and reverse DNS */
@@ -760,11 +785,12 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 				}
 				break;
 			case "AAAA":
+				$recip_san = tinydns_get_ip6_format($recordip);
+				$record_data = ":{$hostname}:28:{$recip_san}{$ttl_string}";
 				if($rdns) {
-					$record_data = "^{$hostname}:{$recordip}{$ttl_string}";
-				} else {
-					$recip_san = str_replace(":", "", $recordip);
-					$record_data = "6{$hostname}:{$recip_san}{$ttl_string}";
+					$ip6_arpa = tinydns_get_ip6_subnet_arpa($recordip, 128);
+					// Need some way to add a second record...
+					//$record_data = "\n^{$hostname}:{$ip6_arpa[1]}{$ttl_string}";
 				}
 				break;
 			case "SRV":
@@ -892,13 +918,43 @@ function tinydns_get_ip6_subnet_arpa($ip, $ipmask=128) {
 	return array($subnet, $arpaip);
 }
 
+function tinydns_get_ip6_format($ip) {
+	require_once("IPv6.inc");
+	$subnet = Net_IPv6::compress(Net_IPv6::getNetmask($ip, 128));
+
+	/* Uncompress the v6 IP so we have all of the sections we need */
+	$fullip = explode(":", Net_IPv6::uncompress($ip));
+
+	/* Expand even more so we have a digit in every possible place */
+	foreach ($fullip as & $q) {
+		$q = sprintf("%04s", $q);
+		$a = sprintf("\\%03lo", hexdec(substr($q, 0, 2)));
+		$b = sprintf("\\%03lo", hexdec(substr($q, 2, 2)));
+		$q = $a.$b;
+	}
+
+	/* Turn the IP into an array of digits and then trim off the bits that have been masked away. */
+	$fullip = implode("", $fullip);
+
+	return $fullip;
+}
+
 /* Create a Forward and a Reverse DNS (SOA, A, PTR) records for Fully Qualififed Domain Name*/
 function tinydns_complete_soa_record($fd, $ip, $ipmask, $nsname, $domain) {
+	global $config;
 	$fqdn = "{$nsname}.{$domain}";
-	if (is_ipaddr($ipaddress))
-		$rip = tinydns_get_ip_subnet_arpa($ipaddress, $ipmask);
-	elseif (intval($config['version']) >= 6)
-		$rip = tinydns_get_ip6_subnet_arpa($ipaddress, $ipmask);
+
+	if (intval($config['version']) <= 8) {
+		if (is_ipaddr($ipaddress))
+			$rip = tinydns_get_ip_subnet_arpa($ipaddress, $ipmask);
+	} else {
+		if (is_ipaddrv4($ipaddress)) {
+			$rip = tinydns_get_ip_subnet_arpa($ipaddress, $ipmask);
+		} elseif (is_ipaddrv6($ipaddress)) {
+			$rip = tinydns_get_ip6_subnet_arpa($ipaddress, $ipmask);
+		}
+	}
+
 	$soa = ".{$domain}::{$fqdn}";
 	$rsoa = ".{$rip[1]}::{$fqdn}";
 	$a = "={$fqdn}:{$ip}";
