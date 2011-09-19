@@ -95,7 +95,7 @@ function openvpn_client_pem_to_pk12($outpath, $outpass, $crtpath, $keypath, $cap
 		unlink($capath);
 }
 
-function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy, $zipconf = false, $outpass = "", $skiptls=false, $doslines=false, $advancedoptions) {
+function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoken, $nokeys = false, $proxy, $zipconf = false, $outpass = "", $skiptls=false, $doslines=false, $advancedoptions = "") {
 	global $config, $input_errors, $g;
 
 	$nl = ($doslines) ? "\r\n" : "\n";
