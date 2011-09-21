@@ -54,8 +54,8 @@
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
 	<name>Orion</name>
-	<version>2.9.0.5</version>
-	<title>Services:2.9.0.5 pkg v. 2.0</title>
+	<version>2.9.1</version>
+	<title>Services:2.9.1 pkg v. 2.0</title>
 	<include_file>/usr/local/pkg/snort/snort_install.inc</include_file>
 	<menu>
 		<name>Orion</name>
@@ -64,8 +64,8 @@
 		<url>/snort/snort_interfaces.php</url>
 	</menu>
 	<service>
-		<name>orion</name>
-		<rcfile>orion.sh</rcfile>
+		<name>snort</name>
+		<rcfile>snort.sh</rcfile>
 		<executable>snort</executable>
 		<description>Snort is the most widely deployed IDS/IPS technology worldwide.</description>
 	</service>
@@ -74,167 +74,167 @@
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/orion.xml</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort.xml</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snortDB</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snortDB</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snortDBrules</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snortDBrules</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snortDBtemp</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snortDBtemp</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_build.inc</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_build.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_download_rules.inc</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_download_rules.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_gui.inc</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_gui.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_head.inc</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_head.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_headbase.inc</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_headbase.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_install.inc</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_install.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/pkg/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_new.inc</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_new.inc</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_alerts.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_alerts.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_barnyard.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_barnyard.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_blocked.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_blocked.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_define_servers.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_define_servers.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_download_updates.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_download_updates.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_help_info.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_help_info.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_interfaces.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_interfaces.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_interfaces_edit.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_interfaces_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_interfaces_global.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_interfaces_global.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_interfaces_rules.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_interfaces_rules.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_interfaces_rules_edit.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_interfaces_rules_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_interfaces_suppress.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_interfaces_suppress.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_interfaces_suppress_edit.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_interfaces_suppress_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_interfaces_whitelist.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_interfaces_whitelist.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_interfaces_whitelist_edit.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_interfaces_whitelist_edit.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_json_get.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_json_get.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_json_post.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_json_post.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_preprocessors.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_preprocessors.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_rules.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_rules.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_rulesets.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_rulesets.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_rules_ips.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_rules_ips.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/orionids-dev/snort_rulesets_ips.php</item>
+		<item>http://www.pfsense.com/packages/config/snort-dev/snort_rulesets_ips.php</item>
 	</additional_files_needed>
 	<additional_files_needed>
 		<prefix>/usr/local/bin/</prefix>
