@@ -728,7 +728,18 @@ function tinydns_get_rowline_data($recordip, $recordtype, $ttl, $hostname, $rdns
 			/* Note that some of these are simplistic versions of TinyDNS record handling.  Uber-users can always do "raw" entries...  */
 			case "SOA":	
 				//     .fqdn:ip:x:ttl:timestamp:lo
-				$record_data = ".{$hostname}::{$recordip}{$ttl_string}";
+				if (intval($config['version']) <= 8) {
+					$record_data = ".{$hostname}::{$recordip}{$ttl_string}";
+				} else {
+					if (is_ipaddrv6($hostname)) {
+						list($rip, $rmask) = explode("/", $hostname);
+						$rmask = empty($rmask) ? 128 : $rmask;
+						$ip6_arpa = tinydns_get_ip6_subnet_arpa($rip, $rmask);
+						$record_data = ".{$ip6_arpa[1]}::{$recordip}{$ttl_string}";
+					} else {
+						$record_data = ".{$hostname}::{$recordip}{$ttl_string}";
+					}
+				}
 				break;
 			case "NS":
 				//      &serious.panic.mil:1.8.248.6:a
