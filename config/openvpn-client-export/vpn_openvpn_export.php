@@ -333,7 +333,7 @@ if($act == "inst") {
 
 	$exp_name = openvpn_client_export_prefix($srvid);
 	$exp_name = urlencode($exp_name."-install.exe");
-	$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $password, $advancedoptions);
+	$exp_path = openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $password, $proxy, $advancedoptions);
 	if (!$exp_path) {
 		$input_errors[] = "Failed to export config files!";
 		$error = true;
