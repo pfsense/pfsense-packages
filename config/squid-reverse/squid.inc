@@ -485,6 +485,10 @@ function squid_validate_traffic($post, $input_errors) {
      if (!is_numeric($value) || ($value > 100))
 	   $input_errors[] = "The field 'Finish when remaining %' must contain a percentaged value";	
   }	
+}
+
+function squid_validate_reverse($post, $input_errors) {
+
 
 }
 
@@ -942,6 +946,8 @@ function squid_resync_reverse() {
 		return;
 	$settings = $config['installedpackages']['squidreverse']['config'][0];
 	$conf = '';
+
+
 
 	return $conf;
 }
