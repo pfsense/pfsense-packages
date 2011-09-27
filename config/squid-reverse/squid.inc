@@ -936,6 +936,16 @@ EOD;
 	return $conf;
 }
 
+function squid_resync_reverse() {
+	global $config, $valid_acls;
+	if(!is_array($valid_acls))
+		return;
+	$settings = $config['installedpackages']['squidreverse']['config'][0];
+	$conf = '';
+
+	return $conf;
+}
+
 function squid_resync_auth() {
 	global $config, $valid_acls;
 
@@ -1109,6 +1119,7 @@ function squid_resync() {
 	$conf .= squid_resync_upstream() . "\n";
 	$conf .= squid_resync_nac() . "\n";
 	$conf .= squid_resync_traffic() . "\n";
+	$conf .= squid_resync_reverse() . "\n";	
 	$conf .= squid_resync_auth();
 	squid_resync_users();
 	squid_write_rcfile();
