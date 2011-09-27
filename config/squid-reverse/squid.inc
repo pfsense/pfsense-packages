@@ -117,6 +117,16 @@ function squid_is_valid_acl($acl) {
 	return in_array($acl, $valid_acls);
 }
 
+function squid_get_server_certs() {
+	global $config;
+	$cert_arr = array();
+	$cert_arr[] = array('refid' => 'none', 'descr' => 'none');
+	foreach ($config['cert'] as $cert) {
+		$cert_arr[] = array('refid' => $cert['refid'], 'descr' => $cert['descr']);
+	}
+	return $cert_arr;
+}	
+
 function squid_install_command() {
 	global $config;
 	global $g;
