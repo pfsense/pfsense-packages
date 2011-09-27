@@ -114,7 +114,6 @@
 			<description>This is the port the HTTP reverse-proxy will listen on.</description>
 			<type>input</type>
 			<size>5</size>
-			<required/>
 			<default_value>80</default_value>
 		</field>
 		<field>
@@ -123,7 +122,6 @@
 			<description>This is the HTTP reverse default site.</description>
 			<type>input</type>
 			<size>60</size>
-			<required/>			
 			<default_value>localhost</default_value>
 		</field>		
 
@@ -142,7 +140,6 @@
 			<description>This is the port the HTTPS reverse-proxy will listen on.</description>
 			<type>input</type>
 			<size>5</size>
-			<required/>
 			<default_value>443</default_value>
 		</field>
 		<field>
@@ -151,7 +148,6 @@
 			<description>This is the HTTPS reverse default site.</description>
 			<type>input</type>
 			<size>60</size>
-			<required/>			
 			<default_value>localhost</default_value>
 		</field>
 
@@ -195,7 +191,6 @@
 			<description>This is the internal published server peer IP.</description>
 			<type>input</type>
 			<size>15</size>
-			<required/>			
 			<default_value>internalhost</default_value>
 		</field>
 
@@ -205,7 +200,6 @@
 			<description>This is the internal published server peer port.</description>
 			<type>input</type>
 			<size>5</size>
-			<required/>
 			<default_value>80</default_value>
 		</field>
     
@@ -215,7 +209,6 @@
 			<description>This is the URL to publish.</description>
 			<type>input</type>
 			<size>60</size>
-			<required/>			
 		</field>
 
 	</fields>
