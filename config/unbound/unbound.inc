@@ -526,7 +526,7 @@ function unbound_ctl_exec($cmd) {
 function unbound_optimization() {
 	global $config;
 
-	$unbound_config = $config['installedpackages']['unbound']['config'][0];	
+	$unbound_config = $config['installedpackages']['unboundadvanced']['config'][0];
 	$optimization_settings = array();
 	
 	// Set the number of threads equal to number of CPUs.
