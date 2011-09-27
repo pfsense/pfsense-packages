@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE packagegui SYSTEM "../schema/packages.dtd">
+<?xml-stylesheet type="text/xsl" href="../xsl/package.xsl"?>
+<packagegui>
+        <copyright>
+        <![CDATA[
+/* $Id$ */
+/* ========================================================================== */
+/*
+    authng.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2007 to whom it may belong
+    All rights reserved.
+
+    Based on m0n0wall (http://m0n0.ch/wall)
+    Copyright (C) 2003-2006 Manuel Kasper <mk@neon1.net>.
+    All rights reserved.
+                                                                              */
+/* ========================================================================== */
+/*
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are met:
+
+     1. Redistributions of source code must retain the above copyright notice,
+        this list of conditions and the following disclaimer.
+
+     2. Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
+    INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+    AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
+    OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+                                                                              */
+/* ========================================================================== */
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>squidreverse</name>
+	<version>none</version>
+	<title>Proxy server: Reverse Proxy</title>
+	<include_file>squid.inc</include_file>
+	<tabs>
+		<tab>
+			<text>General</text>
+			<url>/pkg_edit.php?xml=squid.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Upstream Proxy</text>
+			<url>/pkg_edit.php?xml=squid_upstream.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Cache Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_cache.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Access Control</text>
+			<url>/pkg_edit.php?xml=squid_nac.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Traffic Mgmt</text>
+			<url>/pkg_edit.php?xml=squid_traffic.xml&amp;id=0</url>
+    </tab>
+		<tab>
+			<text>Reverse Proxy</text>
+			<url>/pkg_edit.php?xml=squid_reverse.xml&amp;id=0</url>
+			<active/>
+		</tab>
+		<tab>
+			<text>Reverse Settings</text>
+			<url>/pkg_edit.php?xml=squid_reverse.xml&amp;id=0</url>
+			<active/>
+		</tab>		
+		<tab>
+			<text>Auth Settings</text>
+			<url>/pkg_edit.php?xml=squid_auth.xml&amp;id=0</url>
+		</tab>
+		<tab>
+			<text>Local Users</text>
+			<url>/pkg.php?xml=squid_users.xml</url>
+		</tab>
+	</tabs>
+	<fields>
+		<field>
+			<fielddescr>Reverse Proxy interface</fielddescr>
+			<fieldname>reverse_interface</fieldname>
+			<description>The interface(s) the reverse-proxy server will bind to.</description>
+			<type>interfaces_selection</type>
+			<required/>
+			<default_value>wan</default_value>
+			<multiple/>
+		</field>
+		<field>
+			<fielddescr>Enable HTTP reverse mode.</fielddescr>
+			<fieldname>reverse_http</fieldname>
+			<description>If this field is checked, the proxy-server will act in HTTP reverse mode.</description>
+			<type>checkbox</type>
+			<enablefields>reverse_http_port,reverse_http_defsite</enablefields>			
+			<required/>
+			<default_value>off</default_value>
+		</field>
+		<field>
+			<fielddescr>reverse HTTP port</fielddescr>
+			<fieldname>reverse_http_port</fieldname>
+			<description>This is the port the HTTP reverse-proxy will listen on.</description>
+			<type>input</type>
+			<size>5</size>
+			<required/>
+			<default_value>80</default_value>
+		</field>
+		<field>
+			<fielddescr>reverse HTTP default site</fielddescr>
+			<fieldname>reverse_http_defsite</fieldname>
+			<description>This is the HTTP reverse default site.</description>
+			<type>input</type>
+			<size>60</size>
+			<required/>			
+			<default_value>localhost</default_value>
+		</field>		
+
+		<field>
+			<fielddescr>Enable HTTPS reverse mode.</fielddescr>
+			<fieldname>reverse_https</fieldname>
+			<description>If this field is checked, the proxy-server will act in HTTPS reverse mode.</description>
+			<type>checkbox</type>
+			<enablefields>reverse_https_port,reverse_ssl_cert,reverse_https_defsite,ignore_ssl_valid</enablefields>			
+			<required/>
+			<default_value>off</default_value>
+		</field>
+		<field>
+			<fielddescr>reverse HTTPS port</fielddescr>
+			<fieldname>reverse_https_port</fieldname>
+			<description>This is the port the HTTPS reverse-proxy will listen on.</description>
+			<type>input</type>
+			<size>5</size>
+			<required/>
+			<default_value>443</default_value>
+		</field>
+		<field>
+			<fielddescr>reverse HTTPS default site</fielddescr>
+			<fieldname>reverse_https_defsite</fieldname>
+			<description>This is the HTTPS reverse default site.</description>
+			<type>input</type>
+			<size>60</size>
+			<required/>			
+			<default_value>localhost</default_value>
+		</field>
+
+		<field>
+			<fielddescr>reverse SSL Certificate</fielddescr>
+			<fieldname>reverse_ssl_cert</fieldname>
+			<description>Choose the SSL Server Certificate here.</description>
+			<type>select_source</type>
+			<source><![CDATA[squid_get_server_certs()]]></source>
+			<source_name>descr</source_name>
+			<source_value>refid</source_value>
+		</field>
+		
+		<field>
+			<fielddescr>Ignore internal Certificate validation.</fielddescr>
+			<fieldname>ignore_ssl_valid</fieldname>
+			<description>If this field is checked, internal certificate validation will be ignored.</description>
+			<type>checkbox</type>
+			<required/>
+			<default_value>on</default_value>
+		</field>
+		<field>
+			<fielddescr>extension methods</fielddescr>
+			<fieldname>extension_methods</fieldname>
+			<description>This field defines more extension methods for the proxy to use.</description>
+			<type>input</type>
+			<size>60</size>
+			<default_value>RPC_IN_DATA RPC_OUT_DATA</default_value>
+		</field>
+		<field>
+			<fielddescr>Reset TCP connections if request is unauthorized.</fielddescr>
+			<fieldname>deny_info_tcp_reset</fieldname>
+			<description>If this field is checked, the reverse-proxy will reset the TCP connection if the request is unauthorized.</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
+		</field>
+    		
+		<field>
+			<fielddescr>published server peer IP</fielddescr>
+			<fieldname>reverse_cache_peer</fieldname>
+			<description>This is the internal published server peer IP.</description>
+			<type>input</type>
+			<size>15</size>
+			<required/>			
+			<default_value>internalhost</default_value>
+		</field>
+
+		<field>
+			<fielddescr>published server peer port</fielddescr>
+			<fieldname>reverse_cache_peer_port</fieldname>
+			<description>This is the internal published server peer port.</description>
+			<type>input</type>
+			<size>5</size>
+			<required/>
+			<default_value>80</default_value>
+		</field>
+    
+		<field>
+			<fielddescr>published URL</fielddescr>
+			<fieldname>reverse_acl</fieldname>
+			<description>This is the URL to publish.</description>
+			<type>input</type>
+			<size>60</size>
+			<required/>			
+		</field>
+
+	</fields>
+	<custom_php_command_before_form>
+		squid_before_form_general(&amp;$pkg);
+	</custom_php_command_before_form>
+	<custom_php_validation_command>
+		squid_validate_general($_POST, &amp;$input_errors);
+	</custom_php_validation_command>
+	<custom_php_resync_config_command>
+		squid_resync_reverse();
+	</custom_php_resync_config_command>
+</packagegui>
