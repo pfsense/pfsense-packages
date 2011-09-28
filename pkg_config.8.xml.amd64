@@ -434,6 +434,7 @@
 		<config_file>http://www.pfsense.com/packages/config/postfix/postfix.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>postfix-2.8.5,1.tbz</depends_on_package>
+		<depends_on_package_pbi>spamd-4.9.1-amd64.pbi</depends_on_package_pbi>
 		<version>2.8.5,1 pkg v.2.1</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
