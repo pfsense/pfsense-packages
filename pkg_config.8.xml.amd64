@@ -368,6 +368,7 @@
 		<descr>Snort is an open source network intrusion prevention and detection system (IDS/IPS). Combining the benefits of signature, protocol, and anomaly-based inspection.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>snort-2.9.1-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>mysql-client-5.1.53.tbz</depends_on_package>
 		<depends_on_package>snort-2.9.0.5.tbz</depends_on_package>
 		<depends_on_package>perl-threaded-5.10.1_3.tbz</depends_on_package>
