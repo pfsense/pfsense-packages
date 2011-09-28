@@ -210,6 +210,7 @@
 		<build_port_path>/usr/ports/net/avahi</build_port_path>
 		<build_port_path>/usr/ports/net/avahi-app</build_port_path>
 		<depends_on_package>avahi-0.6.28.tbz</depends_on_package>
+		<depends_on_package_pbi>avahi-0.6.29-amd64.pbi</depends_on_package_pbi>
 		<version>0.6.25_1</version>
 		<status>ALPHA</status>
 		<required_version>1.2.3</required_version>
