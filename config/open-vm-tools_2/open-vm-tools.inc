@@ -11,6 +11,7 @@ function open_vm_tools_install() {
 	$load_conf = file_get_contents("/boot/loader.conf");
 	if(!strstr($load_conf, "vmxnet")) {
 		$load_conf .= <<<EOFA
+
 vmblock_load="YES"
 vmmemct_load="YES"
 vmhgfs_load="YES"
