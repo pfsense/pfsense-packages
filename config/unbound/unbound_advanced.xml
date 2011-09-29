@@ -68,7 +68,7 @@
 		</tab>
 		<tab>
 			<text>Unbound DNS ACLs</text>
-			<url>/pkg.php?xml=unbound_acls.xml</url>
+			<url>/unbound_acls.php</url>
 		</tab>
 		<tab>
 			<text>Unbound DNS Status</text>
