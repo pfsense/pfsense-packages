@@ -311,6 +311,8 @@ function unbound_acls_config() {
 		foreach($unbound_acls as $unbound_acl){
 			$unboundcfg .= "#{$unbound_acl['aclname']}\n";
 			foreach($unbound_acl['row'] as $network) {
+				if ($unbound_acl['aclaction'] == "allow snoop")
+					$unbound_acl['aclaction'] = "allow_snoop";
 				$unboundcfg .= "access-control: {$network['acl_network']}/{$network['mask']} {$unbound_acl['aclaction']}\n";
 			}			
 		}
@@ -623,7 +625,6 @@ function unbound_validate($post, $type=null) {
 	/* Validate the access lists */
 	if($type == "acl") {
 		$acls = $post;
-		$acls['aclaction'] = preg_replace(" ", "_", $acls['aclaction']);
 		// Check to ensure values entered is an action that is in the list
 		if ($acls['aclaction'] != 'refuse' && $acls['aclaction'] != 'allow' && $acls['aclaction'] != 'allow_snoop' && $acls['aclaction'] != 'deny')
 			$input_errors[] = "{$acls['aclaction']} is not a valid ACL Action. Please select one of the four actions defined in the list.";
