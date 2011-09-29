@@ -110,7 +110,7 @@
 		<field>
 			<fielddescr>Enable HTTP reverse mode.</fielddescr>
 			<fieldname>reverse_http</fieldname>
-			<description>If this field is checked, the proxy-server will act in HTTP reverse mode. (You have to add a rule with destination "WAN-address")</description>
+			<description>If this field is checked, the proxy-server will act in HTTP reverse mode. &lt;br&gt;(You have to add a rule with destination "WAN-address")</description>
 			<type>checkbox</type>
 			<enablefields>reverse_http_port,reverse_http_defsite</enablefields>			
 			<required/>
@@ -132,11 +132,10 @@
 			<size>60</size>
 			<default_value>localhost</default_value>
 		</field>		
-
 		<field>
 			<fielddescr>Enable HTTPS reverse mode.</fielddescr>
 			<fieldname>reverse_https</fieldname>
-			<description>If this field is checked, the proxy-server will act in HTTPS reverse mode. (You have to add a rule with destination "WAN-address")</description>
+			<description>If this field is checked, the proxy-server will act in HTTPS reverse mode. &lt;br&gt;(You have to add a rule with destination "WAN-address")</description>
 			<type>checkbox</type>
 			<enablefields>reverse_https_port,reverse_ssl_cert,reverse_https_defsite,ignore_ssl_valid</enablefields>			
 			<required/>
@@ -158,32 +157,14 @@
 			<size>60</size>
 			<default_value>localhost</default_value>
 		</field>
-
 		<field>
-			<fielddescr>reverse SSL Certificate</fielddescr>
+			<fielddescr>reverse SSL certificate</fielddescr>
 			<fieldname>reverse_ssl_cert</fieldname>
 			<description>Choose the SSL Server Certificate here.</description>
 			<type>select_source</type>
 			<source><![CDATA[squid_get_server_certs()]]></source>
 			<source_name>descr</source_name>
 			<source_value>refid</source_value>
-		</field>
-		
-		<field>
-			<fielddescr>Ignore internal Certificate validation.</fielddescr>
-			<fieldname>ignore_ssl_valid</fieldname>
-			<description>If this field is checked, internal certificate validation will be ignored.</description>
-			<type>checkbox</type>
-			<required/>
-			<default_value>on</default_value>
-		</field>
-		<field>
-			<fielddescr>extension methods</fielddescr>
-			<fieldname>extension_methods</fieldname>
-			<description>This field defines additional extension methods for the proxy to use. (RPC_IN_DATA RPC_OUT_DATA for RPC over HTTP -> Outlook Anywhere)</description>
-			<type>input</type>
-			<size>80</size>
-			<default_value>RPC_IN_DATA RPC_OUT_DATA</default_value>
 		</field>
 		<field>
 			<fielddescr>Reset TCP connections if request is unauthorized.</fielddescr>
@@ -192,32 +173,107 @@
 			<type>checkbox</type>
 			<default_value>on</default_value>
 		</field>
-    		
 		<field>
-			<fielddescr>published server peer IP</fielddescr>
-			<fieldname>reverse_cache_peer</fieldname>
-			<description>This is the internal published server peer IP.</description>
+			<fielddescr>extension methods</fielddescr>
+			<fieldname>extension_methods</fieldname>
+			<description>This field defines additional extension methods for the proxy to use. &lt;br&gt;(RPC_IN_DATA RPC_OUT_DATA for RPC over HTTP -> Outlook Anywhere)</description>
 			<type>input</type>
-			<size>15</size>
-			<default_value>internalhost</default_value>
+			<size>80</size>
+			<default_value>RPC_IN_DATA RPC_OUT_DATA</default_value>
+		</field>
+		<field>
+			<fielddescr>Ignore internal Certificate validation.</fielddescr>
+			<fieldname>reverse_ignore_ssl_valid</fieldname>
+			<description>If this field is checked, internal certificate validation will be ignored.</description>
+			<type>checkbox</type>
+			<default_value>on</default_value>
+		</field>
+		
+		<field>
+			<fielddescr>&lt;b&gt;peer definitions&lt;/b&gt; &lt;br&gt;publishing hosts</fielddescr>
+			<fieldname>reverse_cache_peer</fieldname>
+			<description>Enter each peer definition on a new line. Directives have to be separated by a semicolon(;). &lt;br&gt;syntax: [peer alias];[internal ip address]:[port];[HTTP / HTTPS] &lt;br&gt;example: HOST1;192.168.0.1:80;HTTP &lt;br&gt;&lt;i&gt;WRONG SYNTAX USAGE WILL RESULT IN SQUID NOT STARTING&lt;/i&gt;
+      </description>
+			<type>textarea</type>
+			<cols>60</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+		</field>
+		<field>
+			<fielddescr>&lt;b&gt;URI definitions&lt;/b&gt; &lt;br&gt;published URIs</fielddescr>
+			<fieldname>revrse_uri</fieldname>
+      <description>Enter each reverse acl definition on a new line. Directives have to be separated by a semicolon(;).&lt;br&gt;syntax: [group the uri belongs to];[URI to publish] (a group can contain multiple URIs) &lt;br&gt;example: URI1;public &lt;br&gt;&lt;i&gt;WRONG SYNTAX USAGE WILL RESULT IN SQUID NOT STARTING&lt;/i&gt;
+      </description>
+			<type>textarea</type>
+			<cols>60</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+		</field>		
+		<field>
+			<fielddescr>&lt;b&gt;ACL definitions&lt;/b&gt; &lt;br&gt;published URIs</fielddescr>
+			<fieldname>reverse_acl</fieldname>
+      <description>Enter each reverse acl definition on a new line. Directives have to be separated by a semicolon(;). &lt;br&gt;syntax: [peer alias];[uri group alias] &lt;br&gt;example: HOST1;URI1 &lt;br&gt;&lt;i&gt;WRONG SYNTAX USAGE WILL RESULT IN SQUID NOT STARTING&lt;/i&gt;
+      </description>
+			<type>textarea</type>
+			<cols>60</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+		</field>	
+
+<!--
+		<field>
+			<fielddescr>internal hosts</fielddescr>
+			<type>rowhelper</type>
+			<rowhelper>
+				<rowhelperfield>
+					<fielddescr>IP address</fielddescr>
+					<fieldname>reverse_cache_peer_ip</fieldname>
+					<type>input</type>
+					<size>15</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>Protocol</fielddescr>
+					<fieldname>reverse_cache_peer_proto</fieldname>
+					<type>select</type>
+            <options>
+              <option> <name>HTTP</name> <value>HTTP</value> </option>
+              <option> <name>HTTPS</name> <value>HTTPS</value> </option>
+            </options>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>port</fielddescr>
+					<fieldname>reverse_cache_peer_port</fieldname>
+					<type>input</type>
+					<size>5</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>peer name</fielddescr>
+					<fieldname>reverse_cache_peer_name</fieldname>
+					<type>input</type>
+					<size>25</size>
+				</rowhelperfield>
+			</rowhelper>
 		</field>
 
 		<field>
-			<fielddescr>published server peer port</fielddescr>
-			<fieldname>reverse_cache_peer_port</fieldname>
-			<description>This is the internal published server peer port.</description>
-			<type>input</type>
-			<size>5</size>
-			<default_value>80</default_value>
+			<fielddescr>published URI</fielddescr>
+			<type>rowhelper</type>
+			<rowhelper>
+				<rowhelperfield>
+					<fielddescr>URI</fielddescr>
+					<fieldname>reverse_cache_peer_uri</fieldname>
+					<type>input</type>
+					<size>50</size>
+				</rowhelperfield>
+				<rowhelperfield>
+					<fielddescr>peer name</fielddescr>
+					<fieldname>reverse_cache_peer</fieldname>
+					<type>input</type>
+					<size>25</size>
+				</rowhelperfield>
+			</rowhelper>
 		</field>
-    
-		<field>
-			<fielddescr>published URL</fielddescr>
-			<fieldname>reverse_acl</fieldname>
-			<description>This is the URL to publish.</description>
-			<type>input</type>
-			<size>60</size>
-		</field>
+-->
 
 	</fields>
 	<custom_php_command_before_form>
