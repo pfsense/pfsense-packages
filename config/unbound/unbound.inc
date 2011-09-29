@@ -623,6 +623,7 @@ function unbound_validate($post, $type=null) {
 	/* Validate the access lists */
 	if($type == "acl") {
 		$acls = $post;
+		$acls['aclaction'] = preg_replace(" ", "_", $acls['aclaction']);
 		// Check to ensure values entered is an action that is in the list
 		if ($acls['aclaction'] != 'refuse' && $acls['aclaction'] != 'allow' && $acls['aclaction'] != 'allow_snoop' && $acls['aclaction'] != 'deny')
 			$input_errors[] = "{$acls['aclaction']} is not a valid ACL Action. Please select one of the four actions defined in the list.";
@@ -859,6 +860,26 @@ function unbound_add_domain_overrides($pvt=false) {
 		}
 		return $domain_entries;
 	}	
+}
+
+function unbound_acl_id_used($id) {
+	global $config;
+
+	if (is_array($config['installedpackages']['unboundacls']['config']))
+		foreach ($config['installedpackages']['unboundacls']['config'] as & $acls)
+			if ($id == $acls['aclid'])
+				return true;
+
+	return false;
+}
+
+function unbound_get_next_id() {
+
+	$aclid = 0;
+	while(unbound_acl_id_used($aclid))
+		$aclid++;
+
+	return $aclid;
 }
 
 ?>
