@@ -100,6 +100,14 @@
 			<multiple/>
 		</field>
 		<field>
+			<fielddescr>external FQDN</fielddescr>
+			<fieldname>reverse_external_fqdn</fieldname>
+			<description>The external full-qualified-domain-name of the WAN address.</description>
+			<type>input</type>
+			<required/>
+			<size>80</size>
+		</field>
+		<field>
 			<fielddescr>Enable HTTP reverse mode.</fielddescr>
 			<fieldname>reverse_http</fieldname>
 			<description>If this field is checked, the proxy-server will act in HTTP reverse mode.</description>
@@ -172,9 +180,9 @@
 		<field>
 			<fielddescr>extension methods</fielddescr>
 			<fieldname>extension_methods</fieldname>
-			<description>This field defines more extension methods for the proxy to use.</description>
+			<description>This field defines more extension methods for the proxy to use. (RPC_IN_DATA RPC_OUT_DATA for RPC over HTTP -> Outlook Anywhere)</description>
 			<type>input</type>
-			<size>60</size>
+			<size>80</size>
 			<default_value>RPC_IN_DATA RPC_OUT_DATA</default_value>
 		</field>
 		<field>
