@@ -85,7 +85,7 @@ if ($_POST['save'])
 
 }
 
-if ($_POST['delete'])
+if ($_GET['clear'])
 {
 	if(file_exists('/var/log/snort/alert'))
 	{
@@ -96,10 +96,9 @@ if ($_POST['delete'])
 		mwexec('/bin/chmod 660 /var/log/snort/*', true);
 		mwexec('/usr/bin/killall -HUP snort', true);
 		conf_mount_ro();
-
-		header("Location: /snort/snort_alerts.php");
-		exit;
 	}
+	header("Location: /snort/snort_alerts.php");
+	exit;
 }
 
 if ($_POST['download'])
@@ -304,9 +303,9 @@ if ($pconfig['arefresh'] == 'on')
 				<td width="78%" class="vtable">
 				<form action="/snort/snort_alerts.php" method="post"><input
 					name="download" type="submit" class="formbtn" value="Download"> All
-				log files will be saved. <input name="delete" type="submit"
+				log files will be saved. <a href="/snort/snort_alerts.php?action=clear"><input name="delete" type="button"
 					class="formbtn" value="Clear"
-					onclick="return confirm('Do you really want to remove all your logs ? All snort rule interfces may have to be restarted.')">
+					onclick="return confirm('Do you really want to remove all your logs ? All snort rule interfces may have to be restarted.')"></a>
 				<span class="red"><strong>Warning:</strong></span> all log files
 				will be deleted.</form>
 				</td>
@@ -561,21 +560,11 @@ if ($pconfig['arefresh'] == 'on')
 
 </div>
 
-		<?php
+<?php
+include("fend.inc");
 
-		include("fend.inc");
+echo $snort_custom_rnd_box;
 
-		echo $snort_custom_rnd_box;
-
-		?>
-
-
-<script type="text/javascript">
-			var myTable = {};
-			window.addEvent('domready', function(){
-				myTable = new sortableTable('myTable', {overCls: 'over'});
-			});
-		</script>
-
+?>
 </body>
 </html>
