@@ -203,7 +203,7 @@ if ($savemsg)
 						<td width="22%" valign="top" class="vncellreq"><?=gettext("Action");?></td>
 						<td width="78%" class="vtable">
 							<select name="aclaction" class="formselect">
-								<?php $types = explode(",", "Deny,Refuse,Allow,Allow Snoop"); foreach ($types as $type): ?>
+								<?php $types = explode(",", "Allow,Deny,Refuse,Allow Snoop"); foreach ($types as $type): ?>
 								<option value="<?=strtolower($type);?>" <?php if (strtolower($type) == strtolower($pconfig['aclaction'])) echo "selected"; ?>>
 								<?=htmlspecialchars($type);?>
 								</option>
