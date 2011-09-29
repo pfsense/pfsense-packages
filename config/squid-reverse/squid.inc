@@ -979,15 +979,15 @@ function squid_resync_reverse() {
 		$real_ifaces[] = squid_get_real_interface_address($iface);
 		if($real_ifaces[$i][0]) {
       //HTTP
-      if (!empty($settings['reverse_http']) && empty($settings['reverse_http_port']) && empty($settings['reverse_http_defsite'])) $conf .= "# http_port {$real_ifaces[$i][0]}:80 accel defaultsite={$settings['reverse_external_fqdn']} vhost\n";
-      if (!empty($settings['reverse_http']) && (!empty($settings['reverse_http_port'])) && empty($settings['reverse_http_defsite'])) $conf .= "# http_port {$real_ifaces[$i][0]}:{$settings['reverse_http_port']} accel defaultsite={$settings['reverse_external_fqdn']} vhost\n";
-      if (!empty($settings['reverse_http']) && empty($settings['reverse_http_port']) && (!empty($settings['reverse_http_defsite']))) $conf .= "# http_port {$real_ifaces[$i][0]}:80 accel defaultsite={$settings['reverse_http_defsite']} vhost\n";
-      if (!empty($settings['reverse_http']) && (!empty($settings['reverse_http_port'])) && (!empty($settings['reverse_http_defsite']))) $conf .= "# http_port {$real_ifaces[$i][0]}:{$settings['reverse_http_port']} accel defaultsite={$settings['reverse_http_defsite']} vhost\n";
+      if (!empty($settings['reverse_http']) && empty($settings['reverse_http_port']) && empty($settings['reverse_http_defsite'])) $conf .= "http_port {$real_ifaces[$i][0]}:80 accel defaultsite={$settings['reverse_external_fqdn']} vhost\n";
+      if (!empty($settings['reverse_http']) && (!empty($settings['reverse_http_port'])) && empty($settings['reverse_http_defsite'])) $conf .= "http_port {$real_ifaces[$i][0]}:{$settings['reverse_http_port']} accel defaultsite={$settings['reverse_external_fqdn']} vhost\n";
+      if (!empty($settings['reverse_http']) && empty($settings['reverse_http_port']) && (!empty($settings['reverse_http_defsite']))) $conf .= "http_port {$real_ifaces[$i][0]}:80 accel defaultsite={$settings['reverse_http_defsite']} vhost\n";
+      if (!empty($settings['reverse_http']) && (!empty($settings['reverse_http_port'])) && (!empty($settings['reverse_http_defsite']))) $conf .= "http_port {$real_ifaces[$i][0]}:{$settings['reverse_http_port']} accel defaultsite={$settings['reverse_http_defsite']} vhost\n";
       //HTTPS
-      if (!empty($settings['reverse_https']) && empty($settings['reverse_https_port']) && empty($settings['reverse_https_defsite'])) $conf .= "# https_port {$real_ifaces[$i][0]}:443 cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_external_fqdn']}\n";
-      if (!empty($settings['reverse_https']) && (!empty($settings['reverse_https_port'])) && empty($settings['reverse_https_defsite'])) $conf .= "# https_port {$real_ifaces[$i][0]}:{$settings['reverse_https_port']} cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_external_fqdn']} vhost\n";
-      if (!empty($settings['reverse_https']) && empty($settings['reverse_https_port']) && (!empty($settings['reverse_https_defsite']))) $conf .= "# https_port {$real_ifaces[$i][0]}:443 cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_https_defsite']} vhost\n";
-      if (!empty($settings['reverse_https']) && (!empty($settings['reverse_https_port'])) && (!empty($settings['reverse_https_defsite']))) $conf .= "# https_port {$real_ifaces[$i][0]}:{$settings['reverse_https_port']} cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_https_defsite']} vhost\n";
+      if (!empty($settings['reverse_https']) && empty($settings['reverse_https_port']) && empty($settings['reverse_https_defsite'])) $conf .= "https_port {$real_ifaces[$i][0]}:443 cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_external_fqdn']}\n";
+      if (!empty($settings['reverse_https']) && (!empty($settings['reverse_https_port'])) && empty($settings['reverse_https_defsite'])) $conf .= "https_port {$real_ifaces[$i][0]}:{$settings['reverse_https_port']} cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_external_fqdn']} vhost\n";
+      if (!empty($settings['reverse_https']) && empty($settings['reverse_https_port']) && (!empty($settings['reverse_https_defsite']))) $conf .= "https_port {$real_ifaces[$i][0]}:443 cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_https_defsite']} vhost\n";
+      if (!empty($settings['reverse_https']) && (!empty($settings['reverse_https_port'])) && (!empty($settings['reverse_https_defsite']))) $conf .= "https_port {$real_ifaces[$i][0]}:{$settings['reverse_https_port']} cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_https_defsite']} vhost\n";
 		}
 	}
 	
