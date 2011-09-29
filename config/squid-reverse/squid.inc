@@ -117,16 +117,6 @@ function squid_is_valid_acl($acl) {
 	return in_array($acl, $valid_acls);
 }
 
-function squid_get_server_certs() {
-	global $config;
-	$cert_arr = array();
-	$cert_arr[] = array('refid' => 'none', 'descr' => 'none');
-	foreach ($config['cert'] as $cert) {
-		$cert_arr[] = array('refid' => $cert['refid'], 'descr' => $cert['descr']);
-	}
-	return $cert_arr;
-}	
-
 function squid_install_command() {
 	global $config;
 	global $g;
@@ -489,7 +479,16 @@ function squid_validate_traffic($post, $input_errors) {
 
 function squid_validate_reverse($post, $input_errors) {
 
-// CONF
+		$port = trim($post['reverse_http_port']);
+		if (!empty($port) && !is_port($port))
+			$input_errors[] = 'The field \'reverse HTTP port\' must contain a valid port number';
+
+		$port = trim($post['reverse_https_port']);
+		if (!empty($port) && !is_port($port))
+			$input_errors[] = 'The field \'reverse HTTPS port\' must contain a valid port number';
+
+		if ($post['reverse_ssl_cert'] == 'none')
+ 			$input_errors[] = 'A valid certificate for the external interface must be selected';
 
 }
 
@@ -941,6 +940,16 @@ EOD;
 	return $conf;
 }
 
+function squid_get_server_certs() {
+	global $config;
+	$cert_arr = array();
+	$cert_arr[] = array('refid' => 'none', 'descr' => 'none');
+	foreach ($config['cert'] as $cert) {
+		$cert_arr[] = array('refid' => $cert['refid'], 'descr' => $cert['descr']);
+	}
+	return $cert_arr;
+}	
+
 function squid_resync_reverse() {
 	global $config, $valid_acls;
 	if(!is_array($valid_acls))
@@ -948,8 +957,25 @@ function squid_resync_reverse() {
 	$settings = $config['installedpackages']['squidreverse']['config'][0];
 	$conf = '';
                                                                                          
-// CONF
 	$conf .= "# Reverse Proxy settings\n";
+	$ifaces = ($settings['reverse_interface'] ? $settings['reverse_interface'] : 'wan');
+	$real_ifaces = array();
+	foreach (explode(",", $ifaces) as $i => $iface) {
+		$real_ifaces[] = squid_get_real_interface_address($iface);
+		if($real_ifaces[$i][0]) {
+      //HTTP
+      if (!empty($settings['reverse_http']) && empty($settings['reverse_http_port']) && empty($settings['reverse_http_defsite'])) $conf .= "# http_port {$real_ifaces[$i][0]}:80 accel defaultsite={$settings['reverse_external_fqdn']} vhost\n";
+      if (!empty($settings['reverse_http']) && (!empty($settings['reverse_http_port'])) && empty($settings['reverse_http_defsite'])) $conf .= "# http_port {$real_ifaces[$i][0]}:{$settings['reverse_http_port']} accel defaultsite={$settings['reverse_external_fqdn']} vhost\n";
+      if (!empty($settings['reverse_http']) && empty($settings['reverse_http_port']) && (!empty($settings['reverse_http_defsite']))) $conf .= "# http_port {$real_ifaces[$i][0]}:80 accel defaultsite={$settings['reverse_http_defsite']} vhost\n";
+      if (!empty($settings['reverse_http']) && (!empty($settings['reverse_http_port'])) && (!empty($settings['reverse_http_defsite']))) $conf .= "# http_port {$real_ifaces[$i][0]}:{$settings['reverse_http_port']} accel defaultsite={$settings['reverse_http_defsite']} vhost\n";
+      //HTTPS
+      if (!empty($settings['reverse_https']) && empty($settings['reverse_https_port']) && empty($settings['reverse_https_defsite'])) $conf .= "# https_port {$real_ifaces[$i][0]}:443 cert=/usr/local/etc/squid/XXX.crt key=/usr/local/etc/squid/XXX.key defaultsite={$settings['reverse_external_fqdn']}\n";
+      if (!empty($settings['reverse_https']) && (!empty($settings['reverse_https_port'])) && empty($settings['reverse_https_defsite'])) $conf .= "# https_port {$real_ifaces[$i][0]}:{$settings['reverse_https_port']} cert=/usr/local/etc/squid/XXX.crt key=/usr/local/etc/squid/XXX.key defaultsite={$settings['reverse_external_fqdn']} vhost\n";
+      if (!empty($settings['reverse_https']) && empty($settings['reverse_https_port']) && (!empty($settings['reverse_https_defsite']))) $conf .= "# https_port {$real_ifaces[$i][0]}:443 cert=/usr/local/etc/squid/XXX.crt key=/usr/local/etc/squid/XXX.key defaultsite={$settings['reverse_https_defsite']} vhost\n";
+      if (!empty($settings['reverse_https']) && (!empty($settings['reverse_https_port'])) && (!empty($settings['reverse_https_defsite']))) $conf .= "# https_port {$real_ifaces[$i][0]}:{$settings['reverse_https_port']} cert=/usr/local/etc/squid/XXX.crt key=/usr/local/etc/squid/XXX.key defaultsite={$settings['reverse_https_defsite']} vhost\n";
+		}
+	}
+	
   if (!empty($settings['extension_methods'])) $conf .= "extension_methods {$settings['extension_methods']}\n";
   if (!empty($settings['deny_info_tcp_reset'])) $conf .= "deny_info TCP_RESET all\n";                                                                                           
                                                                                                                                                                                   

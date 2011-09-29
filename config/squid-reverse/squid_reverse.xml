@@ -119,7 +119,7 @@
 		<field>
 			<fielddescr>reverse HTTP port</fielddescr>
 			<fieldname>reverse_http_port</fieldname>
-			<description>This is the port the HTTP reverse-proxy will listen on.</description>
+			<description>This is the port the HTTP reverse-proxy will listen on. (leave empty to use 80)</description>
 			<type>input</type>
 			<size>5</size>
 			<default_value>80</default_value>
@@ -127,7 +127,7 @@
 		<field>
 			<fielddescr>reverse HTTP default site</fielddescr>
 			<fieldname>reverse_http_defsite</fieldname>
-			<description>This is the HTTP reverse default site.</description>
+			<description>This is the HTTP reverse default site. (leave empty to use the external fqdn)</description>
 			<type>input</type>
 			<size>60</size>
 			<default_value>localhost</default_value>
@@ -145,7 +145,7 @@
 		<field>
 			<fielddescr>reverse HTTPS port</fielddescr>
 			<fieldname>reverse_https_port</fieldname>
-			<description>This is the port the HTTPS reverse-proxy will listen on.</description>
+			<description>This is the port the HTTPS reverse-proxy will listen on. (leave empty to use 443)</description>
 			<type>input</type>
 			<size>5</size>
 			<default_value>443</default_value>
@@ -153,7 +153,7 @@
 		<field>
 			<fielddescr>reverse HTTPS default site</fielddescr>
 			<fieldname>reverse_https_defsite</fieldname>
-			<description>This is the HTTPS reverse default site.</description>
+			<description>This is the HTTPS reverse default site. (leave empty to use the external fqdn)</description>
 			<type>input</type>
 			<size>60</size>
 			<default_value>localhost</default_value>
@@ -180,7 +180,7 @@
 		<field>
 			<fielddescr>extension methods</fielddescr>
 			<fieldname>extension_methods</fieldname>
-			<description>This field defines more extension methods for the proxy to use. (RPC_IN_DATA RPC_OUT_DATA for RPC over HTTP -> Outlook Anywhere)</description>
+			<description>This field defines additional extension methods for the proxy to use. (RPC_IN_DATA RPC_OUT_DATA for RPC over HTTP -> Outlook Anywhere)</description>
 			<type>input</type>
 			<size>80</size>
 			<default_value>RPC_IN_DATA RPC_OUT_DATA</default_value>
