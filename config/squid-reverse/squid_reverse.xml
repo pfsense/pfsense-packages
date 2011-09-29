@@ -110,7 +110,7 @@
 		<field>
 			<fielddescr>Enable HTTP reverse mode.</fielddescr>
 			<fieldname>reverse_http</fieldname>
-			<description>If this field is checked, the proxy-server will act in HTTP reverse mode.</description>
+			<description>If this field is checked, the proxy-server will act in HTTP reverse mode. (You have to add a rule with destination "WAN-address")</description>
 			<type>checkbox</type>
 			<enablefields>reverse_http_port,reverse_http_defsite</enablefields>			
 			<required/>
@@ -136,7 +136,7 @@
 		<field>
 			<fielddescr>Enable HTTPS reverse mode.</fielddescr>
 			<fieldname>reverse_https</fieldname>
-			<description>If this field is checked, the proxy-server will act in HTTPS reverse mode.</description>
+			<description>If this field is checked, the proxy-server will act in HTTPS reverse mode. (You have to add a rule with destination "WAN-address")</description>
 			<type>checkbox</type>
 			<enablefields>reverse_https_port,reverse_ssl_cert,reverse_https_defsite,ignore_ssl_valid</enablefields>			
 			<required/>

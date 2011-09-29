@@ -958,6 +958,21 @@ function squid_resync_reverse() {
 	$conf = '';
                                                                                          
 	$conf .= "# Reverse Proxy settings\n";
+
+	if(isset($settings["reverse_ssl_cert"]) && $settings["reverse_ssl_cert"] != "none") {
+    $svr_cert = lookup_cert($settings["reverse_ssl_cert"]);
+		  if ($svr_cert != false) {
+			 if(base64_decode($svr_cert['crt'])) {
+        file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt", 
+  			base64_decode($svr_cert['crt']));
+				$reverse_crt = SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt";
+				}
+			if(base64_decode($svr_cert['prv'])) {
+			 file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.key", 
+			 base64_decode($svr_cert['prv']));
+			 $reverse_key = SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.key";
+       }}}
+
 	$ifaces = ($settings['reverse_interface'] ? $settings['reverse_interface'] : 'wan');
 	$real_ifaces = array();
 	foreach (explode(",", $ifaces) as $i => $iface) {
@@ -969,10 +984,10 @@ function squid_resync_reverse() {
       if (!empty($settings['reverse_http']) && empty($settings['reverse_http_port']) && (!empty($settings['reverse_http_defsite']))) $conf .= "# http_port {$real_ifaces[$i][0]}:80 accel defaultsite={$settings['reverse_http_defsite']} vhost\n";
       if (!empty($settings['reverse_http']) && (!empty($settings['reverse_http_port'])) && (!empty($settings['reverse_http_defsite']))) $conf .= "# http_port {$real_ifaces[$i][0]}:{$settings['reverse_http_port']} accel defaultsite={$settings['reverse_http_defsite']} vhost\n";
       //HTTPS
-      if (!empty($settings['reverse_https']) && empty($settings['reverse_https_port']) && empty($settings['reverse_https_defsite'])) $conf .= "# https_port {$real_ifaces[$i][0]}:443 cert=/usr/local/etc/squid/XXX.crt key=/usr/local/etc/squid/XXX.key defaultsite={$settings['reverse_external_fqdn']}\n";
-      if (!empty($settings['reverse_https']) && (!empty($settings['reverse_https_port'])) && empty($settings['reverse_https_defsite'])) $conf .= "# https_port {$real_ifaces[$i][0]}:{$settings['reverse_https_port']} cert=/usr/local/etc/squid/XXX.crt key=/usr/local/etc/squid/XXX.key defaultsite={$settings['reverse_external_fqdn']} vhost\n";
-      if (!empty($settings['reverse_https']) && empty($settings['reverse_https_port']) && (!empty($settings['reverse_https_defsite']))) $conf .= "# https_port {$real_ifaces[$i][0]}:443 cert=/usr/local/etc/squid/XXX.crt key=/usr/local/etc/squid/XXX.key defaultsite={$settings['reverse_https_defsite']} vhost\n";
-      if (!empty($settings['reverse_https']) && (!empty($settings['reverse_https_port'])) && (!empty($settings['reverse_https_defsite']))) $conf .= "# https_port {$real_ifaces[$i][0]}:{$settings['reverse_https_port']} cert=/usr/local/etc/squid/XXX.crt key=/usr/local/etc/squid/XXX.key defaultsite={$settings['reverse_https_defsite']} vhost\n";
+      if (!empty($settings['reverse_https']) && empty($settings['reverse_https_port']) && empty($settings['reverse_https_defsite'])) $conf .= "# https_port {$real_ifaces[$i][0]}:443 cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_external_fqdn']}\n";
+      if (!empty($settings['reverse_https']) && (!empty($settings['reverse_https_port'])) && empty($settings['reverse_https_defsite'])) $conf .= "# https_port {$real_ifaces[$i][0]}:{$settings['reverse_https_port']} cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_external_fqdn']} vhost\n";
+      if (!empty($settings['reverse_https']) && empty($settings['reverse_https_port']) && (!empty($settings['reverse_https_defsite']))) $conf .= "# https_port {$real_ifaces[$i][0]}:443 cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_https_defsite']} vhost\n";
+      if (!empty($settings['reverse_https']) && (!empty($settings['reverse_https_port'])) && (!empty($settings['reverse_https_defsite']))) $conf .= "# https_port {$real_ifaces[$i][0]}:{$settings['reverse_https_port']} cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_https_defsite']} vhost\n";
 		}
 	}
 	
