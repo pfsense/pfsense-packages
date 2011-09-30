@@ -1034,15 +1034,16 @@ function squid_resync_reverse() {
 
 
 	$contents = base64_decode($settings['revrse_uri']);
-	if(!empty($contents)) {
+  if(!empty($contents)) {
 $conf .= "# -= TESTING AREA =-\n";
     $defs = explode("\r\n", ($contents));
       foreach ($defs as $def) {
-        $cfg = explode(";",($def));
-        $conf .= "# acl {$cfg[0]} url_regex -i {$settings['reverse_external_fqdn']} {$cfg[1]}.*$\n";
-//        if($cfg[3] == 'HTTPS')
-//          $conf .= "login=PASS ssl sslflags=DONT_VERIFY_PEER front-end-https=auto ";
-//        $conf .= "name={$cfg[0]}\n";
+        if (($cfg[0]) != '' && ($cfg[1]) != '') 
+          $cfg = explode(";",($def));
+          $conf .= "# acl {$cfg[0]} url_regex -i {$settings['reverse_external_fqdn']} {$cfg[1]}.*$\n";
+//          if($cfg[3] == 'HTTPS')
+//            $conf .= "login=PASS ssl sslflags=DONT_VERIFY_PEER front-end-https=auto ";
+//          $conf .= "name={$cfg[0]}\n";
   }}
 
 
