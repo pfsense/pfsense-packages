@@ -165,7 +165,7 @@
 			<source_value>refid</source_value>
 		</field>
     <field>
-			<fielddescr>intermediate CA certificate</fielddescr>
+			<fielddescr>intermediate CA certificate (if needed)</fielddescr>
 			<fieldname>reverse_int_ca</fieldname>
 			<description>Paste a signed certificate in X.509 PEM format here.</description>
 			<type>textarea</type>

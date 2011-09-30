@@ -503,6 +503,21 @@ function squid_validate_reverse($post, $input_errors) {
 		if (!empty($rowa) && !is_ipaddr($rowa))
 			$input_errors[] = 'The field \'OWA frontend IP address\' must contain a valid IP address';
 
+/*	
+  $contents = base64_decode($post['reverse_cache_peer']);
+	if(!empty($contents)) {
+    $defs = explode("\r\n", ($contents));
+      foreach ($defs as $def) {
+        $cfg = explode(";",($def));
+        if (!is_ipaddr($cfg[1])) 
+          $input_errors[] = "please choose a valid IP in the cache peer configuration.";
+        if (!is_port($cfg[2]))
+          $input_errors[] = "please choose a valid port in the cache peer configuration.";
+        if (($cfg[3] != 'HTTPS') && ($cfg[3] != 'HTTP'))
+          $input_errors[] = "please choose HTTP or HTTPS in the cache peer configuration.";
+  }}
+*/
+
 }
 
 function squid_validate_auth($post, $input_errors) {
@@ -1059,20 +1074,30 @@ function squid_resync_reverse() {
     $conf .= "http_access allow OWA_URI_pfs\n";        
 	  }
 
-
 	$contents = base64_decode($settings['reverse_acl']);
 	if(!empty($contents)) {
-$conf .= "# -= TESTING AREA =-\n";
     $defs = explode("\r\n", ($contents));
       foreach ($defs as $def) {
         $cfg = explode(";",($def));
         if (($cfg[0]) != '' && ($cfg[1]) != ''){
-          $conf .= "# cache_peer_access {$cfg[0]} allow {$cfg[1]}\n";
-          $conf .= "# cache_peer_access {$cfg[0]} deny all\n";
-          $conf .= "# never direct allow {$cfg[1]}\n";
-          $conf .= "# http_access allow {$cfg[1]}\n";                
-  }}}
-
+          $conf .= "cache_peer_access {$cfg[0]} allow {$cfg[1]}\n";
+      }}
+      foreach ($defs as $def) {
+        $cfg = explode(";",($def));
+        if (($cfg[0]) != '' && ($cfg[1]) != ''){
+          $conf .= "cache_peer_access {$cfg[0]} deny all\n";
+      }}
+      foreach ($defs as $def) {
+        $cfg = explode(";",($def));
+        if (($cfg[0]) != '' && ($cfg[1]) != ''){
+          $conf .= "never direct allow {$cfg[1]}\n";
+      }}
+      foreach ($defs as $def) {
+        $cfg = explode(";",($def));
+        if (($cfg[0]) != '' && ($cfg[1]) != ''){
+          $conf .= "http_access allow {$cfg[1]}\n";
+      }}      
+  }
 
   $conf .= "\n";
 
