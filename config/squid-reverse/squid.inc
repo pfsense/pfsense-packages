@@ -1029,25 +1029,7 @@ function squid_resync_reverse() {
     $conf .= "http_access allow OWA_URI_pfs\n";        
 	  }
     	  
-  /*
-	acl OWA url_regex -i ^https://xg1.fuchs-kiel.de/owa.*$;
-  acl OWA url_regex -i ^https://xg1.fuchs-kiel.de/exchange.*$;
-  acl OWA url_regex -i ^https://xg1.fuchs-kiel.de/public.*$;
-  acl OWA url_regex -i ^https://xg1.fuchs-kiel.de/exchweb.*$;
-  
-  acl OWA url_regex -i ^https://xg1.fuchs-kiel.de/Microsoft-Server-ActiveSync.*$;
-  acl OWA url_regex -i ^https://xg1.fuchs-kiel.de/rpc/rpcproxy.dll.*$;
-  
-  cache_peer_access CYGNUS_SSL allow OWA;
-  cache_peer_access CYGNUS_SSL deny all;
-  
-  never_direct allow OWA;
-  
-  http_access allow OWA;
 
-  #miss_access allow OWA;
-	*/
-	
   if (!empty($settings['deny_info_tcp_reset'])) $conf .= "deny_info TCP_RESET all\n";                                                                                           
                                                                                                                                                                                   
 	return $conf;
