@@ -206,12 +206,11 @@
 			<type>checkbox</type>
 			<enablefields>extension_methods</enablefields>			
 		</field>
-       		
 
 		<field>
 			<fielddescr>&lt;b&gt;peer definitions&lt;/b&gt; &lt;br&gt;publishing hosts</fielddescr>
 			<fieldname>reverse_cache_peer</fieldname>
-			<description>Enter each peer definition on a new line. Directives have to be separated by a semicolon(;). &lt;br&gt;syntax: [peer alias];[internal ip address]:[port];[HTTP / HTTPS] &lt;br&gt;example: HOST1;192.168.0.1:80;HTTP &lt;br&gt;&lt;i&gt;WRONG SYNTAX USAGE WILL RESULT IN SQUID NOT STARTING&lt;/i&gt;
+			<description>Enter each peer definition on a new line. Directives have to be separated by a semicolon(;). &lt;br&gt;syntax: [peer alias];[internal ip address];[port];[HTTP / HTTPS] &lt;br&gt;example: HOST1;192.168.0.1;80;HTTP &lt;br&gt;&lt;i&gt;WRONG SYNTAX USAGE WILL RESULT IN SQUID NOT STARTING&lt;/i&gt;
       </description>
 			<type>textarea</type>
 			<cols>60</cols>
