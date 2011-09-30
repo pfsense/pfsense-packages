@@ -985,6 +985,11 @@ function squid_resync_reverse() {
 			 base64_decode($svr_cert['prv']));
 			 $reverse_key = SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.key";
        }}}
+       
+  if (!empty($settings['reverse_int_ca'])) {
+        file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt","\n",FILE_APPEND | LOCK_EX);
+        file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt",base64_decode($settings['reverse_int_ca']),FILE_APPEND | LOCK_EX);
+  }     
 
 	$ifaces = ($settings['reverse_interface'] ? $settings['reverse_interface'] : 'wan');
 	$real_ifaces = array();

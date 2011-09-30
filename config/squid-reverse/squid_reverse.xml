@@ -136,7 +136,7 @@
 			<fieldname>reverse_https</fieldname>
 			<description>If this field is checked, squid will act as an accelerator/SSL offload for Outlook Web Access.</description>
 			<type>checkbox</type>
-			<enablefields>reverse_https_port,reverse_https_defsite,reverse_ssl_cert,reverse_ignore_ssl_valid</enablefields>
+			<enablefields>reverse_https_port,reverse_https_defsite,reverse_ssl_cert,reverse_ignore_ssl_valid,reverse_ssl_chain</enablefields>
 			<required/>
 			<default_value>off</default_value>
     </field> 
@@ -163,6 +163,15 @@
 			<source><![CDATA[squid_get_server_certs()]]></source>
 			<source_name>descr</source_name>
 			<source_value>refid</source_value>
+		</field>
+    <field>
+			<fielddescr>intermediate CA certificate</fielddescr>
+			<fieldname>reverse_int_ca</fieldname>
+			<description>Paste a signed certificate in X.509 PEM format here.</description>
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>5</rows>
+			<encoding>base64</encoding>
 		</field>
 		<field>
 			<fielddescr>Reset TCP connections if request is unauthorized</fielddescr>
