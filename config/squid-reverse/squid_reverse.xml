@@ -136,7 +136,7 @@
 			<fieldname>reverse_https</fieldname>
 			<description>If this field is checked, squid will act as an accelerator/SSL offload for Outlook Web Access.</description>
 			<type>checkbox</type>
-			<enablefields>reverse_owa,reverse_https_port,reverse_https_defsite,reverse_ssl_cert,reverse_ignore_ssl_valid</enablefields>
+			<enablefields>reverse_https_port,reverse_https_defsite,reverse_ssl_cert,reverse_ignore_ssl_valid</enablefields>
 			<required/>
 			<default_value>off</default_value>
     </field> 
@@ -205,14 +205,6 @@
 			<description>If this field is checked, RPC over HTTP support will be enabled.</description>
 			<type>checkbox</type>
 			<enablefields>extension_methods</enablefields>			
-		</field>
-		<field>
-			<fielddescr>extension methods</fielddescr>
-			<fieldname>extension_methods</fieldname>
-			<description>This field defines additional extension methods for the proxy to use. &lt;br&gt;(RPC_IN_DATA RPC_OUT_DATA for RPC over HTTP -> Outlook Anywhere)</description>
-			<type>input</type>
-			<size>80</size>
-			<default_value>RPC_IN_DATA RPC_OUT_DATA</default_value>
 		</field>
        		
 

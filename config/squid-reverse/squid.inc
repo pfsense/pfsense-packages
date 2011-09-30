@@ -310,6 +310,7 @@ function squid_validate_general($post, $input_errors) {
 
 	$log_rotate = trim($post['log_rotate']);
 	if (!empty($log_rotate) && (!is_numeric($log_rotate) or ($log_rotate < 1)))
+
 		$input_errors[] = 'You must enter a valid number of days \'Log rotate\' field';
 
 	$webgui_port = $config['system']['webgui']['port'];
@@ -479,6 +480,10 @@ function squid_validate_traffic($post, $input_errors) {
 
 function squid_validate_reverse($post, $input_errors) {
 
+		$fqdn = trim($post['reverse_external_fqdn']);
+		if (!empty($fqdn) && !is_domain($fqdn))
+			$input_errors[] = 'The field \'external FQDN\' must contain a valid domain name';
+
 		$port = trim($post['reverse_http_port']);
 		if (!empty($port) && !is_port($port))
 			$input_errors[] = 'The field \'reverse HTTP port\' must contain a valid port number';
@@ -489,6 +494,14 @@ function squid_validate_reverse($post, $input_errors) {
 
 		if ($post['reverse_ssl_cert'] == 'none')
  			$input_errors[] = 'A valid certificate for the external interface must be selected';
+
+    if (($post['reverse_https'] != 'on') && ($post['reverse_owa'] == 'on')) {
+      $input_errors[] = "You have to enable reverse HTTPS before enabling OWA support.";
+      }
+
+		$rowa = trim($post['reverse_owa_ip']);
+		if (!empty($rowa) && !is_ipaddr($rowa))
+			$input_errors[] = 'The field \'OWA frontend IP address\' must contain a valid IP address';
 
 }
 
@@ -990,8 +1003,51 @@ function squid_resync_reverse() {
       if (!empty($settings['reverse_https']) && (!empty($settings['reverse_https_port'])) && (!empty($settings['reverse_https_defsite']))) $conf .= "https_port {$real_ifaces[$i][0]}:{$settings['reverse_https_port']} cert={$reverse_crt} key={$reverse_key} defaultsite={$settings['reverse_https_defsite']} vhost\n";
 		}
 	}
+  //PEERS	
+  if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip']))) $conf .= "cache_peer {$settings['reverse_owa_ip']} parent 443 0 proxy-only no-query originserver login=PASS ssl sslflags=DONT_VERIFY_PEER front-end-https=auto name=OWA_HOST_pfs\n";
+  	
+  //ACLs
+  if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip']))) {
+    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/owa.*$\n";
+    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/exchange.*$\n";
+    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/public.*$\n";
+    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/exchwebexchweb.*$\n";
+    }
+  if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip'])) && ($settings['reverse_owa_activesync'] == 'on')) {
+    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/Microsoft-Server-ActiveSync.*$\n";
+    }
+  if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip'])) && ($settings['reverse_owa_rpchttp'] == 'on')) {
+    $conf .= "acl OWA_URI_pfs url_regex -i ^https://{$settings['reverse_external_fqdn']}/rpc/rpcproxy.dll.*$\n";
+    $conf .= "extension_methods RPC_IN_DATA RPC_OUT_DATA\n";
+    }    
+
+  //ACCESS
+  if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip']))) {
+    $conf .= "cache_peer_access OWA_HOST_pfs allow OWA_URI_pfs\n";
+    $conf .= "cache_peer_access OWA_HOST_pfs deny all\n";
+    $conf .= "never_direct allow OWA_URI_pfs\n";
+    $conf .= "http_access allow OWA_URI_pfs\n";        
+	  }
+    	  
+  /*
+	acl OWA url_regex -i ^https://xg1.fuchs-kiel.de/owa.*$;
+  acl OWA url_regex -i ^https://xg1.fuchs-kiel.de/exchange.*$;
+  acl OWA url_regex -i ^https://xg1.fuchs-kiel.de/public.*$;
+  acl OWA url_regex -i ^https://xg1.fuchs-kiel.de/exchweb.*$;
+  
+  acl OWA url_regex -i ^https://xg1.fuchs-kiel.de/Microsoft-Server-ActiveSync.*$;
+  acl OWA url_regex -i ^https://xg1.fuchs-kiel.de/rpc/rpcproxy.dll.*$;
+  
+  cache_peer_access CYGNUS_SSL allow OWA;
+  cache_peer_access CYGNUS_SSL deny all;
+  
+  never_direct allow OWA;
+  
+  http_access allow OWA;
+
+  #miss_access allow OWA;
+	*/
 	
-  if (!empty($settings['extension_methods'])) $conf .= "extension_methods {$settings['extension_methods']}\n";
   if (!empty($settings['deny_info_tcp_reset'])) $conf .= "deny_info TCP_RESET all\n";                                                                                           
                                                                                                                                                                                   
 	return $conf;
