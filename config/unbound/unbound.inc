@@ -199,8 +199,10 @@ function unbound_control($action) {
 					if(!is_service_running("unbound"))
 						unbound_ctl_exec("start");
 						/* Link dnsmasq.pid to prevent dhcpleases logging error */
-						if (!file_exists("/var/run/dnsmasq.pid"))
+						if (!is_link("/var/run/dnsmasq.pid")) {
+							@unlink("/var/run/dnsmasq.pid");
 							mwexec("/bin/ln -s /var/run/unbound.pid /var/run/dnsmasq.pid");
+						}
 					fetch_root_hints();
 				}
 				break;
