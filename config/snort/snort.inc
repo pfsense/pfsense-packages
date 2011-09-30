@@ -473,7 +473,7 @@ function post_delete_logs()
 			//create_barnyard2_conf($id, $if_real, $snort_uuid);
 
 			if ($value['perform_stat'] == 'on')
-				file_put_contents("/var/log/snort/snort_{$snort_uuid}_{$if_real}.stats", "");
+				@file_put_contents("/var/log/snort/snort_{$snort_uuid}_{$if_real}.stats", "");
 		}
 	}
 }

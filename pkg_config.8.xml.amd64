@@ -42,6 +42,7 @@
 		<maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>squid-2.7.9_1.tbz</depends_on_package>
+		<depends_on_package_pbi>squid-2.7.9_1-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
 		<build_port_path>/usr/ports/www/squid</build_port_path>
@@ -82,6 +83,7 @@
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>varnish-2.1.5.tbz</depends_on_package>
+		<depends_on_package_pbi>varnish-3.0.1_2-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>gcc-4.2.5.20090325_5.tbz</depends_on_package>
 		<build_port_path>/usr/ports/www/varnish</build_port_path>
 		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
@@ -228,6 +230,7 @@
 		<build_port_path>/usr/ports/net/avahi</build_port_path>
 		<build_port_path>/usr/ports/net/avahi-app</build_port_path>
 		<depends_on_package>avahi-0.6.28.tbz</depends_on_package>
+		<depends_on_package_pbi>avahi-0.6.29-amd64.pbi</depends_on_package_pbi>
 		<version>0.6.25_1</version>
 		<status>ALPHA</status>
 		<required_version>1.2.3</required_version>
@@ -241,6 +244,7 @@
 		<descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>ntop-4.1.0_1-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>rrdtool-1.2.26_1.tbz</depends_on_package>
 		<depends_on_package>gdbm-1.8.3_3.tbz</depends_on_package>
 		<depends_on_package>perl-5.12.3.tbz</depends_on_package>
@@ -385,6 +389,7 @@
 		<descr>Snort is an open source network intrusion prevention and detection system (IDS/IPS). Combining the benefits of signature, protocol, and anomaly-based inspection.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>snort-2.9.1-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>mysql-client-5.1.53.tbz</depends_on_package>
 		<depends_on_package>snort-2.9.0.5.tbz</depends_on_package>
 		<depends_on_package>perl-threaded-5.10.1_3.tbz</depends_on_package>
@@ -450,6 +455,7 @@
 		<config_file>http://www.pfsense.com/packages/config/postfix/postfix.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>postfix-2.8.5,1.tbz</depends_on_package>
+		<depends_on_package_pbi>spamd-4.9.1-amd64.pbi</depends_on_package_pbi>
 		<version>2.8.5,1 pkg v.2.1</version>
 		<status>RC1</status>
 		<required_version>2.0</required_version>
@@ -1074,7 +1080,7 @@
 		<descr>Unbound is a validating, recursive, and caching DNS resolver. This package is a drop in replacement for Services: DNS Forwarder and also supports DNSSEC extensions. Once installed please configure the Unbound service by visiting Services: Unbound DNS.</descr>
 		<website>http://www.unbound.net/</website>
 		<category>Services</category>
-		<version>1.4.12_03</version>
+		<version>1.4.13_00</version>
 		<status>Alpha</status>
 		<maintainer>warren@decoy.co.za</maintainer>
 		<required_version>2.0</required_version>
@@ -1082,7 +1088,7 @@
 		<config_file>http://www.pfsense.com/packages/config/unbound/unbound.xml</config_file>
 		<configurationfile>unbound.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package>unbound-1.4.12.tbz</depends_on_package>
+		<depends_on_package>unbound-1.4.13.tbz</depends_on_package>
 		<depends_on_package>ldns-1.6.10.tbz</depends_on_package>
 		<depends_on_package>expat-2.0.1_1.tbz</depends_on_package>
 		<depends_on_package>libevent-1.4.14b_2.tbz</depends_on_package>

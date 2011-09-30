@@ -200,7 +200,7 @@ function unbound_control($action) {
 						unbound_ctl_exec("start");
 						/* Link dnsmasq.pid to prevent dhcpleases logging error */
 						if (!file_exists("/var/run/dnsmasq.pid"))
-							mwexec("/bin/ln -s /var/run/dnsmasq.pid /var/run/unbound.pid");
+							mwexec("/bin/ln -s /var/run/unbound.pid /var/run/dnsmasq.pid");
 					fetch_root_hints();
 				}
 				break;
@@ -311,6 +311,8 @@ function unbound_acls_config() {
 		foreach($unbound_acls as $unbound_acl){
 			$unboundcfg .= "#{$unbound_acl['aclname']}\n";
 			foreach($unbound_acl['row'] as $network) {
+				if ($unbound_acl['aclaction'] == "allow snoop")
+					$unbound_acl['aclaction'] = "allow_snoop";
 				$unboundcfg .= "access-control: {$network['acl_network']}/{$network['mask']} {$unbound_acl['aclaction']}\n";
 			}			
 		}
@@ -526,7 +528,7 @@ function unbound_ctl_exec($cmd) {
 function unbound_optimization() {
 	global $config;
 
-	$unbound_config = $config['installedpackages']['unbound']['config'][0];	
+	$unbound_config = $config['installedpackages']['unboundadvanced']['config'][0];
 	$optimization_settings = array();
 	
 	// Set the number of threads equal to number of CPUs.
@@ -859,6 +861,26 @@ function unbound_add_domain_overrides($pvt=false) {
 		}
 		return $domain_entries;
 	}	
+}
+
+function unbound_acl_id_used($id) {
+	global $config;
+
+	if (is_array($config['installedpackages']['unboundacls']['config']))
+		foreach ($config['installedpackages']['unboundacls']['config'] as & $acls)
+			if ($id == $acls['aclid'])
+				return true;
+
+	return false;
+}
+
+function unbound_get_next_id() {
+
+	$aclid = 0;
+	while(unbound_acl_id_used($aclid))
+		$aclid++;
+
+	return $aclid;
 }
 
 ?>
