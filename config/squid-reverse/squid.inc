@@ -1032,6 +1032,20 @@ function squid_resync_reverse() {
     $conf .= "extension_methods RPC_IN_DATA RPC_OUT_DATA\n";
     }    
 
+
+	$contents = base64_decode($settings['revrse_uri']);
+	if(!empty($contents)) {
+$conf .= "# -= TESTING AREA =-\n";
+    $defs = explode("\r\n", ($contents));
+      foreach ($defs as $def) {
+        $cfg = explode(";",($def));
+        $conf .= "# acl {$cfg[0]} url_regex -i {$settings['reverse_external_fqdn']} {$cfg[1]}.*$\n";
+//        if($cfg[3] == 'HTTPS')
+//          $conf .= "login=PASS ssl sslflags=DONT_VERIFY_PEER front-end-https=auto ";
+//        $conf .= "name={$cfg[0]}\n";
+  }}
+
+
   //ACCESS
   if (($settings['reverse_owa'] == 'on') && (!empty($settings['reverse_owa_ip']))) {
     $conf .= "cache_peer_access OWA_HOST_pfs allow OWA_URI_pfs\n";
@@ -1040,18 +1054,19 @@ function squid_resync_reverse() {
     $conf .= "http_access allow OWA_URI_pfs\n";        
 	  }
 
-/*
-	$contents = base64_decode($settings['reverse_cache_peer']);
+
+	$contents = base64_decode($settings['reverse_acl']);
 	if(!empty($contents)) {
+$conf .= "# -= TESTING AREA =-\n";
     $defs = explode("\r\n", ($contents));
       foreach ($defs as $def) {
         $cfg = explode(";",($def));
-        $conf .= "# cache_peer {$cfg[1]} parent {$cfg[2]} 0 proxy-only no-query originserver ";
-        if($cfg[3] == 'HTTPS')
-          $conf .= "login=PASS ssl sslflags=DONT_VERIFY_PEER front-end-https=auto ";
-        $conf .= "name={$cfg[0]}\n";
+        $conf .= "# cache_peer_access {$cfg[0]} allow {$cfg[1]}\n";
+        $conf .= "# cache_peer_access {$cfg[0]} deny all\n";
+        $conf .= "# never direct allow {$cfg[1]}\n";
+        $conf .= "# http_access allow {$cfg[1]}\n";                
   }}
-*/
+
 
   $conf .= "\n";
 
