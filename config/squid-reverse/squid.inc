@@ -1040,8 +1040,11 @@ $conf .= "# -= TESTING AREA =-\n";
       foreach ($defs as $def) {
         $cfg = explode(";",($def));
         if (($cfg[0]) != '' && ($cfg[1]) != ''){
-          $conf .= "# acl {$cfg[0]} url_regex -i {$settings['reverse_external_fqdn']} {$cfg[1]}.*$\n";
-//          if($cfg[3] == 'HTTPS')
+        if($cfg[2] != '')
+          $conf .= "# acl {$cfg[0]} url_regex -i {$cfg[2]}/{$cfg[1]}.*$\n";
+        if($cfg[2] == '')
+          $conf .= "# acl {$cfg[0]} url_regex -i {$settings['reverse_external_fqdn']}/{$cfg[1]}.*$\n";          
+//          if($cfg[2] == 'HTTPS')
 //            $conf .= "login=PASS ssl sslflags=DONT_VERIFY_PEER front-end-https=auto ";
 //          $conf .= "name={$cfg[0]}\n";
   }}}

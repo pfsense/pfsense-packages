@@ -220,7 +220,7 @@
 		<field>
 			<fielddescr>&lt;b&gt;URI definitions&lt;/b&gt; &lt;br&gt;published URIs</fielddescr>
 			<fieldname>revrse_uri</fieldname>
-      <description>Enter each reverse acl definition on a new line. Directives have to be separated by a semicolon(;).&lt;br&gt;syntax: [group the uri belongs to];[URI to publish] (a group can contain multiple URIs) &lt;br&gt;example: URI1;public &lt;br&gt;&lt;i&gt;WRONG SYNTAX USAGE WILL RESULT IN SQUID NOT STARTING&lt;/i&gt;
+      <description>Enter each reverse acl definition on a new line. Directives have to be separated by a semicolon(;).&lt;br&gt;syntax: [group the uri belongs to];[URI to publish](;[vhost fqdn]) &lt;br&gt;(a group can contain multiple URIs, without vhost fqdn the external fqdn is used, you also can specity http:// or https://) &lt;br&gt;example: URI1;public;server.pfsense.org. &lt;br&gt;&lt;i&gt;WRONG SYNTAX USAGE WILL RESULT IN SQUID NOT STARTING&lt;/i&gt;
       </description>
 			<type>textarea</type>
 			<cols>60</cols>
