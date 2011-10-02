@@ -58,7 +58,7 @@ if (count($_POST)>0) {
 		exec("/bin/sh convert-execute.sh");
 
 	//Attempt to create a backup of user lists
-	mwexec("cp /usr/local/www/packages/ipblocklist/lists.txt /usr/local/www/packages/ipbloclist_bkup/lists.txt");
+	mwexec("cp /usr/local/www/packages/ipblocklist/lists.txt /usr/local/www/packages/ipblocklist_bkup/lists.txt");
 				
 	}
 	else {

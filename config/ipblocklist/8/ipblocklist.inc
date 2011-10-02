@@ -55,8 +55,8 @@ function php_install_command_ip()
 
 	
 	//install PERL
-	exec("pkg_add -r ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/All/perl-5.12-4_2.tbz");
-	exec("pkg_add -r ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/All/p5-Net-CIDR.tbz");
+	exec("pkg_add -r ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/All/perl-5.12.4_2.tbz");
+	exec("pkg_add -r ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/All/p5-Net-CIDR-0.14.tbz");
 	//exec("pkg_add -r compat7x-i386.tbz");
 	//exec("pkg_add -r compat6x-i386.tbz");
 	exec("rehash");
