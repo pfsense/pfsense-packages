@@ -55,9 +55,8 @@ function php_install_command_ip()
 
 	
 	//install PERL
-	exec("setenv PACKAGESITE \"ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/Latest/\"");
-	exec("pkg_add -r perl");
-	exec("pkg_add -r p5-Net-CIDR");
+	exec("pkg_add -r ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/All/perl-5.12-4_2.tbz");
+	exec("pkg_add -r ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/All/p5-Net-CIDR.tbz");
 	//exec("pkg_add -r compat7x-i386.tbz");
 	//exec("pkg_add -r compat6x-i386.tbz");
 	exec("rehash");
@@ -111,6 +110,9 @@ function php_install_command_ip()
 	exec("/usr/bin/touch /usr/local/www/packages/ipblocklist/OUTBOUND");
 	
 	
+	//Attempt to pull from a backup
+	exec("/bin/mkdir /usr/local/www/packages/ipblocklist_bkup");
+	exec("cp /usr/local/www/packages/ipblocklist_bkup/lists.txt /usr/local/www/packages/ipblocklist/lists.txt");
 
 	conf_mount_ro();
 	config_unlock();
