@@ -1069,6 +1069,7 @@
 		<pkginfolink>http://doc.pfsense.org/index.php/Unbound_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/unbound/unbound.xml</config_file>
 		<configurationfile>unbound.xml</configurationfile>
+		<depends_on_package_pbi>unbound-1.4.13-i386.pbi</depends_on_package_pbi>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>unbound-1.4.13.tbz</depends_on_package>
 		<depends_on_package>ldns-1.6.10.tbz</depends_on_package>
