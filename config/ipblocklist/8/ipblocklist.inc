@@ -55,10 +55,12 @@ function php_install_command_ip()
 
 	
 	//install PERL
+	exec("setenv PACKAGESITE \"ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/Latest/\"");
 	exec("pkg_add -r perl");
 	exec("pkg_add -r p5-Net-CIDR");
-	exec("pkg_add -r compat7x-i386.tbz");
-	exec("pkg_add -r compat6x-i386.tbz");
+	//exec("pkg_add -r compat7x-i386.tbz");
+	//exec("pkg_add -r compat6x-i386.tbz");
+	exec("rehash");
 
 	//rename PHP files from .tmp to .php
 	exec("cp /tmp/lists.txt /usr/local/www/packages/ipblocklist/lists.txt");
@@ -121,11 +123,12 @@ function deinstall_command_ip()
 	$handle = popen("/usr/local/etc/rc.d/ipblocklist.sh stop", "r");
 	unlink_if_exists("/usr/local/pkg/ipblocklist.xml");
 	unlink_if_exists("/usr/local/pkg/ipblocklist.inc");
+	unlink_if_exists("/usr/local/pkg/pf/IP-Blocklist.sh");
 	exec("rm -R /usr/local/www/packages/ipblocklist/ipblocklists");
 	exec("rm -R /usr/local/www/packages/ipblocklist");
 	exec("rm /usr/local/etc/rc.d/IP-Blocklist.sh");
 	exec("pfctl -t ipblocklist -T kill");
-	exec("ipfw -f flush");
+	//exec("ipfw -f flush");
 	conf_mount_ro();
 }
 

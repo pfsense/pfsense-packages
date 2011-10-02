@@ -62,7 +62,7 @@ if (count($_POST)>0) {
 		//echo "disabled";
 		$config['installedpackages']['ipblocklist_settings']['config'][0]['enable'] = 0;
 		//Clear Lists
-		mwexec("ipfw -f flush"); 
+		//mwexec("ipfw -f flush"); 
 		mwexec("pfctl -t ipblocklist -T kill");
 		mwexec("rm -R /usr/local/www/packages/ipblocklist/lists");
 		mwexec("sed -i -e '/ipblocklist/d' /tmp/rules.debug");
