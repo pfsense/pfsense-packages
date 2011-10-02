@@ -34,7 +34,7 @@ $pgtitle = "Firewall: Countryblock - Help";
 	$tab_array[2] = array("Whitelist", false, "whitelist.php");
 	$tab_array[3] = array("Interfaces", false, "countryblock_if.php");
 	$tab_array[4] = array("Help", true, "help.php");
-	$tab_array[5] = array("Email", false, "email.php");
+	//$tab_array[5] = array("Email", false, "email.php");
 	display_top_tabs($tab_array);
 ?>  
   </td></tr>
@@ -91,7 +91,7 @@ To run countryblock as a cron job use /usr/local/etc/rc.d/countryblock.sh <br>
 
 <span style="color:red">Warning!</span> - Apply after every firewall change or state reset. Use at your own risk. 
 --->
-<a href="http://doc.pfsense.org/index.php/Country_Block">Please see wiki for help</a>
+<a href="http://doc.pfsense.org/index.php/Country_Block">Please see wiki for help</a> or the <a href="http://forum.pfsense.org/index.php/topic,25732.0.html">Forum</a>
 
 </div>
 
