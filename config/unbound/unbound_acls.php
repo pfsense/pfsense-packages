@@ -32,11 +32,6 @@
 require("guiconfig.inc");
 require("unbound.inc");
 
-if(!is_process_running("unbound")) {
-	Header("Location: /pkg_edit.php?xml=unbound.xml&id=0");
-	exit;
-}
-
 if (!is_array($config['installedpackages']['unboundacls']['config']))
 	$config['installedpackages']['unboundacls']['config'] = array();
 
