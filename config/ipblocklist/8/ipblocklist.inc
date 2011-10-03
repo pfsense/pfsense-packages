@@ -62,6 +62,11 @@ function php_install_command_ip()
 	exec("rehash");
 
 	//rename PHP files from .tmp to .php
+	exec("cp /tmp/countryblock_IPBlocklist.widget.tmp /usr/local/www/widgets/widgets/countryblock_IPBlocklist.widget.php");
+	unlink_if_exists("/tmp/countryblock_IPBlocklist.widget.tmp");
+	exec("cp /tmp/countryblock_ipblocklist_widget.tmp /usr/local/www/widgets/widgets/countryblock_ipblocklist_widget.php");
+	unlink_if_exists("/tmp/ccountryblock_ipblocklist_widget.tmp");
+
 	exec("cp /tmp/lists.txt /usr/local/www/packages/ipblocklist/lists.txt");
 	exec("cp /tmp/class.phpmailer.tmp /usr/local/www/packages/ipblocklist/class.phpmailer.php");
 	unlink_if_exists("/tmp/class.phpmailer.tmp ");
