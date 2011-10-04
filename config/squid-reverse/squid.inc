@@ -499,24 +499,29 @@ function squid_validate_reverse($post, $input_errors) {
       $input_errors[] = "You have to enable reverse HTTPS before enabling OWA support.";
       }
 
+/*
+		if (!is_cert($post['reverse_int_ca']))
+ 			$input_errors[] = 'A valid certificate for the external interface must be selected';
+*/
+
 		$rowa = trim($post['reverse_owa_ip']);
 		if (!empty($rowa) && !is_ipaddr($rowa))
 			$input_errors[] = 'The field \'OWA frontend IP address\' must contain a valid IP address';
 
-/*	
-  $contents = base64_decode($post['reverse_cache_peer']);
-	if(!empty($contents)) {
-    $defs = explode("\r\n", ($contents));
-      foreach ($defs as $def) {
-        $cfg = explode(";",($def));
-        if (!is_ipaddr($cfg[1])) 
-          $input_errors[] = "please choose a valid IP in the cache peer configuration.";
-        if (!is_port($cfg[2]))
-          $input_errors[] = "please choose a valid port in the cache peer configuration.";
-        if (($cfg[3] != 'HTTPS') && ($cfg[3] != 'HTTP'))
-          $input_errors[] = "please choose HTTP or HTTPS in the cache peer configuration.";
-  }}
-*/
+	
+    $contents = $post['reverse_cache_peer'];
+    if(!empty($contents)) {
+      $defs = explode("\r\n", ($contents));
+        foreach ($defs as $def) {
+          $cfg = explode(";",($def));
+            if (!is_ipaddr($cfg[1])) 
+              $input_errors[] = "please choose a valid IP in the cache peer configuration.";
+            if (!is_port($cfg[2]))
+              $input_errors[] = "please choose a valid port in the cache peer configuration.";
+            if (($cfg[3] != 'HTTPS') && ($cfg[3] != 'HTTP'))
+              $input_errors[] = "please choose HTTP or HTTPS in the cache peer configuration.";
+    }}
+
 
 }
 
@@ -991,20 +996,15 @@ function squid_resync_reverse() {
     $svr_cert = lookup_cert($settings["reverse_ssl_cert"]);
 		  if ($svr_cert != false) {
 			 if(base64_decode($svr_cert['crt'])) {
-        file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt", 
-  			base64_decode($svr_cert['crt']));
+        file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt",base64_decode($svr_cert['crt']));
 				$reverse_crt = SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt";
 				}
 			if(base64_decode($svr_cert['prv'])) {
-			 file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.key", 
-			 base64_decode($svr_cert['prv']));
+			 file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.key",base64_decode($svr_cert['prv']));
 			 $reverse_key = SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.key";
        }}}
        
-  if (!empty($settings['reverse_int_ca'])) {
-        file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt","\n",FILE_APPEND | LOCK_EX);
-        file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt",base64_decode($settings['reverse_int_ca']),FILE_APPEND | LOCK_EX);
-  }     
+  if (!empty($settings['reverse_int_ca'])) file_put_contents(SQUID_CONFBASE . "/{$settings["reverse_ssl_cert"]}.crt","\n" . base64_decode($settings['reverse_int_ca']),FILE_APPEND | LOCK_EX);
 
 	$ifaces = ($settings['reverse_interface'] ? $settings['reverse_interface'] : 'wan');
 	$real_ifaces = array();
