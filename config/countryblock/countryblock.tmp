@@ -60,6 +60,9 @@ if (count($_POST)>0) {
 	   	//mwexec("pfctl -t countryblock -T kill");
 		//mwexec("sed -i -e '/countryblock/d' /tmp/rules.debug");
 		mwexec("sh execute.sh");
+
+		//attempt to create a backup of countries.txt
+		mwexec("cp /usr/local/www/packages/countryblock/countries.txt /usr/local/www/packages/countryblock_bkup/countries.txt");
 				
 	}
 	else {
@@ -118,7 +121,7 @@ else {
 	$tab_array[2] = array("Whitelist", false, "whitelist.php");
 	$tab_array[3] = array("Interfaces", false, "countryblock_if.php");
 	$tab_array[4] = array("Help", false, "help.php");
-	$tab_array[5] = array("Email", false, "email.php");
+	//$tab_array[5] = array("Email", false, "email.php");
 	display_top_tabs($tab_array);
 ?>  
   </td></tr>

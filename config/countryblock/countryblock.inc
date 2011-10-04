@@ -62,6 +62,9 @@ function php_install_command_cb()
 	
 	
 	//rename PHP files from .tmp to .php
+	exec("cp /tmp/countryblock_IPBlocklist.widget.tmp /usr/local/www/widgets/widgets/countryblock_IPBlocklist.widget.php");
+	unlink_if_exists("/tmp/countryblock_IPBlocklist.widget.tmp");
+
 	exec("cp /tmp/class.phpmailer.tmp /usr/local/www/packages/countryblock/class.phpmailer.php");
 	unlink_if_exists("/tmp/class.phpmailer.tmp ");
 	exec("cp /tmp/class.smtp.tmp /usr/local/www/packages/countryblock/class.smtp.php");
@@ -114,6 +117,10 @@ function php_install_command_cb()
 	exec("mkdir /usr/local/www/packages/countryblock/lists");
 	exec("touch /usr/local/www/packages/countryblock/lists/countries.txt");
 
+	//Attempt to restore from backup
+	exec("mkdir /usr/local/www/packages/countryblock_bkup");
+	exec("cp /usr/local/www/packages/countryblock_bkup/countries.txt /usr/local/www/packages/countryblock/countries.txt");
+
 	conf_mount_ro();
 	config_unlock();
 }
@@ -125,6 +132,7 @@ function deinstall_command_cb()
 	$handle = popen("/usr/local/etc/rc.d/countryblock.sh stop", "r");
 	unlink_if_exists("/usr/local/pkg/countryblock.xml");
 	unlink_if_exists("/usr/local/pkg/countryblock.inc");
+	//unlink_if_exists("/usr/local/pkg/pf/countryblock.sh");
 	exec("rm -R /usr/local/www/packages/countryblock/countryblocks");
 	exec("rm -R /usr/local/www/packages/countryblock");
 	exec("rm /usr/local/etc/rc.d/countryblock.sh");

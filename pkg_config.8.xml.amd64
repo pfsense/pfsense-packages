@@ -126,7 +126,7 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,25732.0.html</pkginfolink>
 		<config_file>http://pfsense.org/packages/config/countryblock/countryblock.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<version>0.2.2</version>
+		<version>0.2.4</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
@@ -140,7 +140,7 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,24769.0.html</pkginfolink>
 		<config_file>http://pfsense.org/packages/config/ipblocklist/8/ipblocklist.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<version>0.3.3</version>
+		<version>0.3.5</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<maintainer>tom@tomschaefer.org</maintainer>
@@ -1080,13 +1080,14 @@
 		<descr>Unbound is a validating, recursive, and caching DNS resolver. This package is a drop in replacement for Services: DNS Forwarder and also supports DNSSEC extensions. Once installed please configure the Unbound service by visiting Services: Unbound DNS.</descr>
 		<website>http://www.unbound.net/</website>
 		<category>Services</category>
-		<version>1.4.13_01</version>
+		<version>1.4.13_02</version>
 		<status>Alpha</status>
 		<maintainer>warren@decoy.co.za</maintainer>
 		<required_version>2.0</required_version>
 		<pkginfolink>http://doc.pfsense.org/index.php/Unbound_package</pkginfolink>
 		<config_file>http://www.pfsense.com/packages/config/unbound/unbound.xml</config_file>
 		<configurationfile>unbound.xml</configurationfile>
+		<depends_on_package_pbi>unbound-1.4.13-i386.pbi</depends_on_package_pbi>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>unbound-1.4.13.tbz</depends_on_package>
 		<depends_on_package>ldns-1.6.10.tbz</depends_on_package>

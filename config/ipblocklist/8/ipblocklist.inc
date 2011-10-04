@@ -55,12 +55,16 @@ function php_install_command_ip()
 
 	
 	//install PERL
-	exec("pkg_add -r perl");
-	exec("pkg_add -r p5-Net-CIDR");
-	exec("pkg_add -r compat7x-i386.tbz");
-	exec("pkg_add -r compat6x-i386.tbz");
+	exec("pkg_add -r ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/All/perl-5.12.4_2.tbz");
+	exec("pkg_add -r ftp://ftp.freebsd.org/pub/FreeBSD/ports/i386/packages-8-stable/All/p5-Net-CIDR-0.14.tbz");
+	//exec("pkg_add -r compat7x-i386.tbz");
+	//exec("pkg_add -r compat6x-i386.tbz");
+	exec("rehash");
 
 	//rename PHP files from .tmp to .php
+	exec("cp /tmp/countryblock_IPBlocklist.widget.tmp /usr/local/www/widgets/widgets/countryblock_IPBlocklist.widget.php");
+	unlink_if_exists("/tmp/countryblock_IPBlocklist.widget.tmp");
+
 	exec("cp /tmp/lists.txt /usr/local/www/packages/ipblocklist/lists.txt");
 	exec("cp /tmp/class.phpmailer.tmp /usr/local/www/packages/ipblocklist/class.phpmailer.php");
 	unlink_if_exists("/tmp/class.phpmailer.tmp ");
@@ -109,6 +113,9 @@ function php_install_command_ip()
 	exec("/usr/bin/touch /usr/local/www/packages/ipblocklist/OUTBOUND");
 	
 	
+	//Attempt to pull from a backup
+	exec("/bin/mkdir /usr/local/www/packages/ipblocklist_bkup");
+	exec("cp /usr/local/www/packages/ipblocklist_bkup/lists.txt /usr/local/www/packages/ipblocklist/lists.txt");
 
 	conf_mount_ro();
 	config_unlock();
@@ -121,11 +128,12 @@ function deinstall_command_ip()
 	$handle = popen("/usr/local/etc/rc.d/ipblocklist.sh stop", "r");
 	unlink_if_exists("/usr/local/pkg/ipblocklist.xml");
 	unlink_if_exists("/usr/local/pkg/ipblocklist.inc");
+	unlink_if_exists("/usr/local/pkg/pf/IP-Blocklist.sh");
 	exec("rm -R /usr/local/www/packages/ipblocklist/ipblocklists");
 	exec("rm -R /usr/local/www/packages/ipblocklist");
 	exec("rm /usr/local/etc/rc.d/IP-Blocklist.sh");
 	exec("pfctl -t ipblocklist -T kill");
-	exec("ipfw -f flush");
+	//exec("ipfw -f flush");
 	conf_mount_ro();
 }
 
