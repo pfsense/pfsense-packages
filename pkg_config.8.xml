@@ -714,6 +714,12 @@
 		<configurationfile>freeradius.xml</configurationfile>
 		<build_port_path>/usr/ports/net/freeradius</build_port_path>
 		<build_port_path>/usr/ports/devel/libltdl</build_port_path>
+		<logging>
+			<facilityname>freeradius</facilityname>
+			<logfilename>radius.log</logfilename>
+			<logtab>freeRADIUS</logtab>
+		</logging>
+		<after_install_info>Please visit Services: freeRADIUS</after_install_info>
 	</package>
 	<package>
 		<name>bandwidthd</name>
