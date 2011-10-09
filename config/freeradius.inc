@@ -461,7 +461,7 @@ function freeradius_users_resync() {
 	$atrib=''; 
 	$head="$username User-Password == ".'"'.$password.'"';
       if ($multiconnect <> '') {
-        $head .=", Simultaneous-Use += $multiconnect";
+        $head .=", Simultaneous-Use := $multiconnect";
        }
       if ($userexpiration <> '') {
         $head .=", Expiration := ".'"'.$userexpiration.'"';
