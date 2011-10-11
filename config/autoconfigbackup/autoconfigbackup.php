@@ -267,7 +267,7 @@ EOF;
 						$configtype = "Encrypted";
 						if (!tagfile_deformat($data, $data, "config.xml")) 
 							$input_errors[] = "The downloaded file does not appear to contain an encrypted pfSense configuration.";
-						$data = decrypt_data($data, $decrypt_password);
+						$data = htmlentities(decrypt_data($data, $decrypt_password));
 						if(!strstr($data, "pfsense")) {
 							$data = "Could not decrypt.  Different encryption key?";
 							$input_errors[] = "Could not decrypt config.xml";
