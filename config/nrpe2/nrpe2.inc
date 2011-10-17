@@ -25,8 +25,6 @@
 
 require_once('filter.inc');
 
-$nagios_check_path = "/usr/local/libexec/nagios";
-
 function nrpe2_custom_php_install_command() {
 	global $g, $config;
 	conf_mount_rw();
@@ -140,9 +138,10 @@ function nrpe2_custom_php_deinstall_command() {
 }
 
 function nrpe2_custom_php_write_config() {
-	global $g, $config, $nagios_check_path;
-	conf_mount_rw();
+	global $g, $config;
+	$nagios_check_path = "/usr/local/libexec/nagios";
 
+	conf_mount_rw();
 	$cmds = array();
 	foreach ($config['installedpackages']['nrpe2']['config'][0]['row'] as $cmd) {
 		if (is_executable("{$nagios_check_path}/{$cmd['command']}"))
@@ -186,7 +185,7 @@ function nrpe2_custom_php_service() {
 }
 
 function nrpe2_get_commands() {
-	global $nagios_check_path;
+	$nagios_check_path = "/usr/local/libexec/nagios";
 	$commands = glob("{$nagios_check_path}/check_*");
 	$cmdarr = array();
 	foreach ($commands as $cmd)
