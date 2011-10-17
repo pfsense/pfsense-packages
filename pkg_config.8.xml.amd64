@@ -1158,5 +1158,20 @@
 		<config_file>http://www.pfsense.com/packages/config/mailreport/mailreport.xml</config_file>
 		<configurationfile>mailreport.xml</configurationfile>
 	</package>
+	<package>
+		<name>zebedee</name>
+		<descr><![CDATA[Zebedee is a simple program to establish an encrypted, compressed "tunnel" for TCP/IP or UDP data transfer between two systems.<br>
+					This allows traffic such as telnet, ftp and X to be protected from snooping as well as potentially gaining performance over low-bandwidth networks from compression.]]></descr>
+		<category>Services</category>
+		<version>1.0</version>
+		<status>BETA</status>
+		<website>www.winton.org.uk/zebedee/</website>
+		<maintainer>jorgelustosa@gmail.com marcellocoutinho@gmail.com</maintainer>
+		<required_version>2.0</required_version>
+		<depends_on_package_base_url>http://ftp-archive.freebsd.org/pub/FreeBSD-Archive/ports/amd64/packages-8.1-release/Latest/</depends_on_package_base_url>
+		<depends_on_package>zebedee.tbz</depends_on_package>
+		<config_file>http://www.pfsense.com/packages/config/zebedee/zebedee.xml</config_file>
+		<configurationfile>zebedee.xml</configurationfile>
+	</package>
 </packages>
 </pfsensepkgs>
