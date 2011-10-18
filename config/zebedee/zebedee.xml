@@ -80,8 +80,13 @@
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
-		<additional_files_needed>
+	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/zebedee/zebedee_del_key.php</item>
+		<prefix>/usr/local/www/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/zebedee/zebedee_get_key.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
