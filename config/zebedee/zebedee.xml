@@ -58,7 +58,8 @@
 	<service>
 		<name>zebedee</name>
 		<rcfile>zebedee.sh</rcfile>
-		<executable>master</executable>
+		<executable>zebedee</executable>
+		<description>Tunneling Service</description>
 	</service>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/zebedee/zebedee.inc</item>
@@ -72,6 +73,11 @@
 	</additional_files_needed>
 	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/zebedee/zebedee_key_details.xml</item>
+		<prefix>/usr/local/pkg/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/zebedee/zebedee_get_details.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
