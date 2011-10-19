@@ -462,7 +462,7 @@
 		<required_version>2.0</required_version>
 		<configurationfile>postfix.xml</configurationfile>
 		<build_port_path>/usr/ports/mail/postfix</build_port_path>
-		<build_options>WITH_PCRE=true WITH_SPF=true</build_options>
+		<build_options>WITH_PCRE=true WITH_SPF=true WITH_SASL2=true WITH_TLS=true</build_options>
 	</package>
 	<package>
 		<name>siproxd</name>
