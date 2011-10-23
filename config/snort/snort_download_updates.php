@@ -1,7 +1,6 @@
 <?php
-/* $Id$ */
 /*
- halt.php
+ snort_download_updates.php
  part of pfSense
  Copyright (C) 2004 Scott Ullrich
  Copyright (C) 2011 Ermal Luci

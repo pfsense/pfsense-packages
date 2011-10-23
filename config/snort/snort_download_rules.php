@@ -614,27 +614,33 @@ exec("/usr/local/bin/perl /usr/local/bin/create-sidmap.pl /usr/local/etc/snort/r
 /* open oinkmaster_conf for writing" function */
 function oinkmaster_conf($id, $if_real, $iface_uuid)
 {
-	global $config, $g, $snortdir_wan, $snortdir, $snort_md5_check_ok, $emerg_md5_check_ok, $pfsense_md5_check_ok;
+	global $config, $snort_md5_check_ok, $emerg_md5_check_ok, $pfsense_md5_check_ok;
+
+	@unlink("/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/oinkmaster_{$iface_uuid}_{$if_real}.conf");
 
 	/*  enable disable setting will carry over with updates */
 	/*  TODO carry signature changes with the updates */
 	if ($snort_md5_check_ok != 'on' || $emerg_md5_check_ok != 'on' || $pfsense_md5_check_ok != 'on') {
 
+		$selected_sid_on_sections = "";
+		$selected_sid_off_sections = "";
+
 		if (!empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on'])) {
-			$enabled_sid_on = $config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on'];
+			$enabled_sid_on = trim($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on']);
 			$enabled_sid_on_array = split('\|\|', $enabled_sid_on);
 			foreach($enabled_sid_on_array as $enabled_item_on)
 				$selected_sid_on_sections .= "$enabled_item_on\n";
 		}
 
 		if (!empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off'])) {
-			$enabled_sid_off = $config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off'];
+			$enabled_sid_off = trim($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off']);
 			$enabled_sid_off_array = split('\|\|', $enabled_sid_off);
 			foreach($enabled_sid_off_array as $enabled_item_off)
 				$selected_sid_off_sections .= "$enabled_item_off\n";
 		}
 
-		$snort_sid_text = <<<EOD
+		if (!empty($selected_sid_on_sections) || !empty($selected_sid_off_sections)) {
+			$snort_sid_text = <<<EOD
 
 ###########################################
 #                                         #
@@ -654,8 +660,9 @@ $selected_sid_off_sections
 
 EOD;
 
-		/* open snort's oinkmaster.conf for writing */
-		@file_put_contents("/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/oinkmaster_{$iface_uuid}_{$if_real}.conf", $snort_sid_text);
+			/* open snort's oinkmaster.conf for writing */
+			@file_put_contents("/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/oinkmaster_{$iface_uuid}_{$if_real}.conf", $snort_sid_text);
+		}
 	}
 }
 
@@ -666,11 +673,8 @@ function oinkmaster_run($id, $if_real, $iface_uuid)
 {
 	global $config, $g, $snortdir_wan, $snortdir, $snort_md5_check_ok, $emerg_md5_check_ok, $pfsense_md5_check_ok;
 
-	if ($snort_md5_check_ok != 'on' || $emerg_md5_check_ok != 'on' || $pfsense_md5_check_ok != 'on')
-	{
-
-		if ($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on'] == '' && $config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off'] == '')
-		{
+	if ($snort_md5_check_ok != 'on' || $emerg_md5_check_ok != 'on' || $pfsense_md5_check_ok != 'on') {
+		if (empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_on']) && empty($config['installedpackages']['snortglobal']['rule'][$id]['rule_sid_off'])) {
 			update_status(gettext("Your first set of rules are being copied..."));
 			update_output_window(gettext("May take a while..."));
 			exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}/rules/");
@@ -681,7 +685,7 @@ function oinkmaster_run($id, $if_real, $iface_uuid)
 			exec("/bin/cp {$snortdir}/sid {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
 			exec("/bin/cp {$snortdir}/sid-msg.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
 			exec("/bin/cp {$snortdir}/unicode.map {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}");
-		}else{
+		} else {
 			update_status(gettext("Your enable and disable changes are being applied to your fresh set of rules..."));
 			update_output_window(gettext("May take a while..."));
 			exec("/bin/cp {$snortdir}/rules/* {$snortdir_wan}/snort_{$iface_uuid}_{$if_real}/rules/");
