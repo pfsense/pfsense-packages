@@ -195,7 +195,8 @@
 			<fielddescr>RBL server List</fielddescr>
 			<fieldname>rbl_servers</fieldname>
 			<description><![CDATA[
-			ex: dnsbl.sorbs.net, bl.spamcop.net*2, dnslb.local*-5, cbl.abuseat.org, b.barracudacentral.org, dnsbl.invaluement.com<BR>
+                        <strong>THIS IS JUST AN EXAMPLE, CHECK IF ANY LIST YOU CHOOSE IS PAID OR FREE!</strong><BR>
+			ex: dnsbl.sorbs.net, bl.spamcop.net*2, dnslb.local*-5, b.barracudacentral.org, dnsbl.invaluement.com<BR>
 			Check some rbl servers at http://www.anti-abuse.org/multi-rbl-check/<br><br>
 			You can also create a local rbl dns server to whitelist some hosts/domains<br>
 			See how it works in http://www.postfix.org/postconf.5.html#postscreen_dnsbl_sites]]>
