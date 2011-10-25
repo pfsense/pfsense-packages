@@ -333,7 +333,7 @@
 					$config_text .= "OffBrightness=0\n";
 					$config_text .= "Brightness=500\n";
 					break;
-				case "bayrad":
+				case "RhinoOSLI":
 					$config_text .= "[{$lcdproc_config['driver']}]\n";
 					$config_text .= "Device={$realport}\n";
 					break;
