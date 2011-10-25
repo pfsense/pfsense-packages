@@ -24,6 +24,8 @@ $files= array (	"Africa" => "/usr/loca/pkg/Africa_cidr.txt",
 				"Oceania" => "/usr/loca/pkg/Oceania_cidr.txt",
 				"South America"=>"/usr/loca/pkg/South_America_cidr.txt");
 $cdir='/usr/local/pkg/countryblock';
+if (! is_dir($cdir))
+	mkdir ($cdir,0755);
 foreach ($files as $cont => $file){
 	$ips=file_get_contents($file);	
 	$convert = explode("\n", $ips);
@@ -34,8 +36,6 @@ foreach ($files as $cont => $file){
 	foreach ($convert as $line){
 		if (preg_match('/#(.*):\s+(.*)$/',$line,$matches)){
 			if ($ISOCode <> "" && $ISOCode <> $matches[2] && preg_match("/ISO Code/",$line)){
-				if (! is_dir($cdir))
-					mkdir ($cdir,755);
 				file_put_contents($cdir.'/'.$ISOCode.'.txt',${$ISOCode},LOCK_EX);
 				$total++;
 				}
@@ -61,8 +61,8 @@ $xml= <<<EOF
 /* \$Id$ */
 /* ========================================================================== */
 /*
-    postfix_{$cont_name}.xml
-    part of the Postfix package for pfSense
+    countryblock_{$cont_name}.xml
+    part of the Countryblock package for pfSense
     Copyright (C) 2011 Marcello Coutinho
     All rights reserved.            
                                                                   */

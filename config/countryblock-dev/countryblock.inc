@@ -1,6 +1,6 @@
 <?php
 /*
-	postfix.inc
+	countryblock.inc
 	part of the Postfix package for pfSense
 	Copyright (C) 2010 Erik Fonnesbeck
 	Copyright (C) 2011 Marcello Coutinho
