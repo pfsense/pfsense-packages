@@ -74,50 +74,51 @@ function sync_package_countryblock() {
 		$ips.=file_get_contents('/usr/local/pkg/countryblock/'.$iso.'.txt');
 		}
 	}
-	#create all ip block lists based on gui and force alias update
+	#create all ip block lists based on gui
 	file_put_contents('/usr/local/pkg/cb.txt',$ips, LOCK_EX);
-	file_put_contents('/var/db/aliastables/Countryblock.txt',$ips, LOCK_EX);
 	
-	#write white_list to filesystem and force alias update
+	#write white_list to filesystem
 	file_put_contents('/usr/local/pkg/cbw.txt',cb_text_area_decode($countryblock_config['whitelist']), LOCK_EX);
-	file_put_contents('/var/db/aliastables/CountryblockWL.txt',cb_text_area_decode($countryblock_config['whitelist']), LOCK_EX);
 
 	#edit or assign alias "Countryblock" and "CountryblockWL" 
 	$aliases=$config['aliases']['alias'];
 	#print "<pre>";
+	$new_aliases=array();
+	if ($ips != ""){
+		#create or reaply alias
+		$new_aliases[]=array("name"=> 'Countryblock',
+					  		 "url"=> $web_local.'?cb=1',
+					  		 "updatefreq"=> "7",
+					  		 "address"=>"",
+					  		 "descr"=> "Countryblock deny list",
+					  		 "type"=> "urltable",
+					  		 "detail"=> "DO NOT EDIT THIS ALIAS");
+		#force alias file update
+		file_put_contents('/var/db/aliastables/Countryblock.txt',$ips, LOCK_EX);
+	}
+	if (cb_text_area_decode($countryblock_config['whitelist']) != ""){
+		#create or reaply alias
+		$new_aliases[]=array("name"=> 'CountryblockWL',
+						  	 "url"=> $web_local.'?cbw=1',
+						  	 "updatefreq"=> "7",
+						  	 "address"=>"",
+						  	 "descr"=> "Countryblock white list",
+						  	 "type"=> "urltable",
+						  	 "detail"=> "DO NOT EDIT THIS ALIAS");
+		#force alias file update
+		file_put_contents('/var/db/aliastables/CountryblockWL.txt',cb_text_area_decode($countryblock_config['whitelist']), LOCK_EX);
+	}
 	foreach($aliases as $cbalias){
-		$cb_id =($cb_id == "name"?"name":array_search('Countryblock', $cbalias));
-		$cbw_id =($cb_id == "name"?"name":array_search('CountryblockWL', $cbalias));
+		if (! preg_match("/Countryblock.*list/",$cbalias['descr']))
+			$new_aliases[]=	$cbalias;
 	}
-	if ($cb_id <> 'name'){
-		$config['aliases']['alias'][]=array(
-					"name"=> 'Countryblock',
-				  	"url"=> $web_local.'?cb=1',
-				  	"updatefreq"=> "7",
-				  	"address"=>"",
-				  	"descr"=> "Countryblock deny list",
-				  	"type"=> "urltable",
-				  	"detail"=> "DO NOT EDIT THIS ALIAS");
-	}
-	if ($cbw_id <> 'name'){
-		$config['aliases']['alias'][]=array(
-					"name"=> 'CountryblockWL',
-				  	"url"=> $web_local.'?cbw=1',
-				  	"updatefreq"=> "7",
-				  	"address"=>"",
-				  	"descr"=> "Countryblock white list",
-				  	"type"=> "urltable",
-				  	"detail"=> "DO NOT EDIT THIS ALIAS");
-	}
-	if ($cb_id <> 'name' || $cbw_id <> 'name'){
-		write_config();
-	}
-	
+	$config['aliases']['alias']=$new_aliases;
 	# check contryblock filter options
 	$rules=$config['filter']['rule'];
 	$ifaces = $countryblock_config['inbound_interface'];
     foreach (explode(",", $ifaces) as $i => $iface) {
-		${$iface}[0]=array("id" => "",
+    	if (cb_text_area_decode($countryblock_config['whitelist']) != ""){
+			${$iface}[0]=array("id" => "",
 					"type"=>"pass",
 					"tag"=>	"",
 					"interface" => $iface,
@@ -132,8 +133,12 @@ function sync_package_countryblock() {
 					"source"=>array("address"=>"CoutryblockWL"),
     				"destination"=>array("any"=>""),
     				"descr"=>"Countryblock inbound whitelist rule");
-		
-		${$iface}[1]=array(	"id" => "",
+
+			if ($countryblock_config['enable_log'])
+				${$iface}[0]["log"]="";
+    	}
+		if ($ips != ""){
+			${$iface}[1]=array(	"id" => "",
 							"type"=>"block",
 							"tag"=>	"",
 							"interface" => $iface,
@@ -149,14 +154,14 @@ function sync_package_countryblock() {
     						"destination"=>array("any"=>""),
     						"descr"=>"Countryblock inbound deny rule");
 
-		if ($countryblock_config['enable_log']){
-				${$iface}[0]["log"]="";
+			if ($countryblock_config['enable_log'])
 				${$iface}[1]["log"]="";
 		}
 	}
 	$ifaces = $countryblock_config['outbound_interface'];
     foreach (explode(",", $ifaces) as $i => $iface) {
-		${$iface}[2]=array(	"id" => "",
+    	if (cb_text_area_decode($countryblock_config['whitelist']) != ""){
+			${$iface}[2]=array(	"id" => "",
 							"type"=>"pass",
 							"tag"=>	"",
 							"interface" => $iface,
@@ -171,7 +176,11 @@ function sync_package_countryblock() {
     						"source"=>array("any"=>""),
     						"destination"=>array("address"=>"CoutryblockWL"),
     						"descr"=>"Countryblock outbound whitelist rule");
-		${$iface}[3]= array("id" => "",
+		if ($countryblock_config['enable_log'])
+				${$iface}[2]["log"]="";			
+    	}
+		if ($ips != ""){
+			${$iface}[3]= array("id" => "",
 							"type"=>"block",
 							"tag"=>	"",
 							"interface" => $iface,
@@ -186,11 +195,11 @@ function sync_package_countryblock() {
     						"source"=>array("any"=>""),
     						"destination"=>array("address"=>"Coutryblock"),
     						"descr"=>"Countryblock inbound deny rule");
-
-		if ($countryblock_config['enable_log']){
-				${$iface}[2]["log"]="";
+			if ($countryblock_config['enable_log'])
 				${$iface}[3]["log"]="";
+			
 		}
+
 	}
 	$last_iface="";
 	foreach ($rules as $rule){
@@ -205,6 +214,8 @@ function sync_package_countryblock() {
 			$new_rules[]=$rule;	
 	}
 	$config['filter']['rule']=$new_rules;
+
+	#save all changes to xml
 	write_config();
 		
 	countryblock_sync_on_changes();
