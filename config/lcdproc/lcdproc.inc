@@ -149,7 +149,7 @@
 				case "20x4":
 					continue;
 					break;
-				case "42x6":
+				case "42x7":
 					continue;
 					break;
 				default:
