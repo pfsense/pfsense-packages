@@ -74,11 +74,13 @@ function sync_package_countryblock() {
 		$ips.=file_get_contents('/usr/local/pkg/countryblock/'.$iso.'.txt');
 		}
 	}
-	#create all ip block lists based on gui
+	#create all ip block lists based on gui and force alias update
 	file_put_contents('/usr/local/pkg/cb.txt',$ips, LOCK_EX);
+	file_put_contents('/var/db/aliastables/Countryblock.txt',$ips, LOCK_EX);
 	
-	#write white_list to filesystem
+	#write white_list to filesystem and force alias update
 	file_put_contents('/usr/local/pkg/cbw.txt',cb_text_area_decode($countryblock_config['whitelist']), LOCK_EX);
+	file_put_contents('/var/db/aliastables/CountryblockWL.txt',cb_text_area_decode($countryblock_config['whitelist']), LOCK_EX);
 
 	#edit or assign alias "Countryblock" and "CountryblockWL" 
 	$aliases=$config['aliases']['alias'];
