@@ -82,7 +82,7 @@ function sync_package_countryblock() {
 
 	#edit or assign alias "Countryblock" and "CountryblockWL" 
 	$aliases=$config['aliases']['alias'];
-	print "<pre>";
+	#print "<pre>";
 	foreach($aliases as $cbalias){
 		$cb_id =($cb_id == "name"?"name":array_search('Countryblock', $cbalias));
 		$cbw_id =($cb_id == "name"?"name":array_search('CountryblockWL', $cbalias));

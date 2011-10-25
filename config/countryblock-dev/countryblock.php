@@ -4,7 +4,7 @@ function get_networks($cb){
 		$return= file_get_contents('/usr/local/pkg/cb.txt');
 	if ($cb==2)
 		$return=file_get_contents('/usr/local/pkg/cbw.txt');
-		print "<pre>";
+		#print "<pre>";
 		print $return;
 }
 
