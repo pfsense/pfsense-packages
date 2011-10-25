@@ -16,13 +16,13 @@ if ($_REQUEST['cbw']== 1){# and $_SERVER['REMOTE_ADDR']== '127.0.0.1'){
 }
 
 function countryblock_get_countries(){
-$files= array (	"Africa" => "/usr/loca/pkg/Africa_cidr.txt",
-				"Antartica" => "/usr/loca/pkg/Antartica_cidr.txt",
-				"Asia" => "/usr/loca/pkg/Asia_cidr.txt",
-				"Europe" => "/usr/loca/pkg/Europe_cidr.txt",
-				"North America" => "/usr/loca/pkg/North_America_cidr.txt",
-				"Oceania" => "/usr/loca/pkg/Oceania_cidr.txt",
-				"South America"=>"/usr/loca/pkg/South_America_cidr.txt");
+$files= array (	"Africa" => "/usr/local/pkg/Africa_cidr.txt",
+				"Antartica" => "/usr/local/pkg/Antartica_cidr.txt",
+				"Asia" => "/usr/local/pkg/Asia_cidr.txt",
+				"Europe" => "/usr/local/pkg/Europe_cidr.txt",
+				"North America" => "/usr/local/pkg/North_America_cidr.txt",
+				"Oceania" => "/usr/local/pkg/Oceania_cidr.txt",
+				"South America"=>"/usr/local/pkg/South_America_cidr.txt");
 $cdir='/usr/local/pkg/countryblock';
 if (! is_dir($cdir))
 	mkdir ($cdir,0755);
