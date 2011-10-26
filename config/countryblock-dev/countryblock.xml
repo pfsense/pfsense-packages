@@ -47,7 +47,7 @@
 	<title>Firewall: Countryblock</title>
 	<include_file>/usr/local/pkg/countryblock.inc</include_file>
 	<menu>
-		<name>Countryblock</name>
+		<name>Country Block</name>
 		<tooltiptext>Configure Countryblock</tooltiptext>
 		<section>Firewall</section>
 		<url>pkg_edit.php?xml=countryblock.xml&amp;id=0</url>
@@ -171,7 +171,6 @@
 								If you want to create custom inbound rules for blocked countries based on Countryblock firewall alias, leave this list empty.]]></description>
 			<type>interfaces_selection</type>
 			<required/>
-			<default_value>wan</default_value>
 			<multiple/>
 		</field>
 		<field>
@@ -181,7 +180,6 @@
 								If you want to create custom outbound rules for blocked countries based on Countryblock firewall alias, leave this list empty.]]></description>
 			<type>interfaces_selection</type>
 			<required/>
-			<default_value>lan</default_value>
 			<multiple/>
 		</field>
 		<field>

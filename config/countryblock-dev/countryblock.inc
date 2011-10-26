@@ -306,10 +306,13 @@ function countryblock_do_xmlrpc_sync($sync_to_ip, $password) {
 	/* xml will hold the sections to sync */
 	$xml = array();
 	$xml['countryblock'] = $config['installedpackages']['countryblock'];
-	$xml['countryblockacl'] = $config['installedpackages']['countryblockacl'];
-	$xml['countryblockrecipients'] = $config['installedpackages']['countryblockrecipients'];
-	$xml['countryblockantispam'] = $config['installedpackages']['countryblockantispam'];
-	
+	$xml['countryblockafrica'] = $config['installedpackages']['countryblockafrica'];
+	$xml['countryblockantartica'] = $config['installedpackages']['countryblockantartica'];
+	$xml['countryblockasia'] = $config['installedpackages']['countryblockasia'];
+	$xml['countryblockeurope'] = $config['installedpackages']['countryblockeurope'];
+	$xml['countryblocknorthamerica'] = $config['installedpackages']['countryblocknorthamerica'];
+	$xml['countryblockoceania'] = $config['installedpackages']['countryblockoceania'];
+	$xml['countryblocksouthamerica'] = $config['installedpackages']['countryblocksouthamerica'];
 	/* assemble xmlrpc payload */
 	$params = array(
 		XML_RPC_encode($password),

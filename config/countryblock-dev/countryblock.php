@@ -50,6 +50,7 @@ foreach ($files as $cont => $file){
 		}
 	}
 $cont_name= preg_replace("/ /","",$cont);
+$cont_name_lower= strtolower($cont_name);
 #file_put_contents($cdir.'/'.$cont_name.'.txt',$ips,LOCK_EX);
 $xml= <<<EOF
 <?xml version="1.0" encoding="utf-8" ?>
@@ -95,8 +96,8 @@ $xml= <<<EOF
 	<description>Describe your package here</description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
-	<name>countryblock_{$cont_name}</name>
-	<version>1.0</version>
+	<name>countryblock{$cont_name_lower}</name>
+	<version>1.0.1</version>
 	<title>Firewall: Countryblock</title>
 	<include_file>/usr/local/pkg/countryblock.inc</include_file>
 	<menu>
@@ -187,8 +188,6 @@ $xml= <<<EOF
 EOF;
 	file_put_contents('/usr/local/pkg/countryblock_'.$cont_name.'.xml',$xml,LOCK_EX);
 	
-	#var_dump($ips);
-
 }
 	
 }
