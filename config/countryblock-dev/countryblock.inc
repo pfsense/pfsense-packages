@@ -136,7 +136,7 @@ function sync_package_countryblock() {
 					"statetimeout"=>"",
 					"statetype"=>"keep state",
 					"os"=> "",
-					"source"=>array("address"=>"CoutryblockWL"),
+					"source"=>array("address"=>"CountryblockWL"),
     				"destination"=>array("any"=>""),
     				"descr"=>"Countryblock inbound whitelist rule");
 
@@ -156,7 +156,7 @@ function sync_package_countryblock() {
 							"statetimeout"=>"",
 						    "statetype"=>"keep state",
 							"os"=> "",
-							"source"=>array("address"=>"Coutryblock"),
+							"source"=>array("address"=>"Countryblock"),
     						"destination"=>array("any"=>""),
     						"descr"=>"Countryblock inbound deny rule");
 
@@ -180,7 +180,7 @@ function sync_package_countryblock() {
 							"statetype"=>"keep state",
 							"os"=> "",
     						"source"=>array("any"=>""),
-    						"destination"=>array("address"=>"CoutryblockWL"),
+    						"destination"=>array("address"=>"CountryblockWL"),
     						"descr"=>"Countryblock outbound whitelist rule");
 		if ($countryblock_config['enable_log'])
 				${$iface}[2]["log"]="";			
@@ -199,7 +199,7 @@ function sync_package_countryblock() {
 							"statetype"=>"keep state",
 							"os"=> "",
     						"source"=>array("any"=>""),
-    						"destination"=>array("address"=>"Coutryblock"),
+    						"destination"=>array("address"=>"Countryblock"),
     						"descr"=>"Countryblock inbound deny rule");
 			if ($countryblock_config['enable_log'])
 				${$iface}[3]["log"]="";
