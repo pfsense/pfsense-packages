@@ -165,16 +165,16 @@
 			<description></description>
 		</field>
 		<field>
-			<fielddescr>Inbound FilterInterface(s)</fielddescr>
+			<fielddescr>Inbound Interface(s)</fielddescr>
 			<fieldname>inbound_interface</fieldname>
-			<description><![CDATA[Default: <strong>WAN</strong><br>Select interface(s) that you do not want to block incoming traffic.<br>
+			<description><![CDATA[Default: <strong>WAN</strong><br>Select interface(s) that you want to block incoming traffic.<br>
 								If you want to create custom inbound rules for blocked countries based on Countryblock firewall alias, leave this list empty.]]></description>
 			<type>interfaces_selection</type>
 			<required/>
 			<multiple/>
 		</field>
 		<field>
-			<fielddescr>Outbound Filter Interface(s)</fielddescr>
+			<fielddescr>Outbound Interface(s)</fielddescr>
 			<fieldname>outbound_interface</fieldname>
 			<description><![CDATA[Default:<strong>LAN</strong><br>Select interface(s) that you do not want to send outgoing traffic.<br>
 								If you want to create custom outbound rules for blocked countries based on Countryblock firewall alias, leave this list empty.]]></description>
