@@ -65,7 +65,8 @@ function sync_package_countryblock() {
 	#get all selected countries
 	$countries=$config['installedpackages']['countryblock']['config'][0]['topspammers'].",";
 	foreach ($continents as $continent){
-		$countries.=$config['installedpackages']['countryblock'.strtolower(preg_replace('/ /','',$continent))]['config'][0]['countries'].",";
+		if (is_array($config['installedpackages']['countryblock'.strtolower(preg_replace('/ /','',$continent))]['config']))
+			$countries.=$config['installedpackages']['countryblock'.strtolower(preg_replace('/ /','',$continent))]['config'][0]['countries'].",";
 	}
 	$cb_files = explode(",", $countries);
 	$ips="";
