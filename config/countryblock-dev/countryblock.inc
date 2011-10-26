@@ -33,7 +33,7 @@ require_once("util.inc");
 require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("globals.inc");
-
+	
 function cb_text_area_decode($text){
 	return preg_replace('/\r\n/', "\n",base64_decode($text));	
 }
@@ -71,7 +71,8 @@ function sync_package_countryblock() {
 	$ips="";
     foreach ($cb_files as $iso){
 		if ($iso <> ""){
-		$ips.=file_get_contents('/usr/local/pkg/countryblock/'.$iso.'.txt');
+			if (file_exists('/usr/local/pkg/countryblock/'.$iso.'.txt'))
+				$ips.=file_get_contents('/usr/local/pkg/countryblock/'.$iso.'.txt');
 		}
 	}
 	#create all ip block lists based on gui
@@ -94,7 +95,9 @@ function sync_package_countryblock() {
 					  		 "type"=> "urltable",
 					  		 "detail"=> "DO NOT EDIT THIS ALIAS");
 		#force alias file update
-		file_put_contents('/var/db/aliastables/Countryblock.txt',$ips, LOCK_EX);
+	if (! is_dir('/var/db/aliastables/'))
+		mkdir ('/var/db/aliastables/',0755);
+	file_put_contents('/var/db/aliastables/Countryblock.txt',$ips, LOCK_EX);
 	}
 	if (cb_text_area_decode($countryblock_config['whitelist']) != ""){
 		#create or reaply alias
@@ -106,9 +109,12 @@ function sync_package_countryblock() {
 						  	 "type"=> "urltable",
 						  	 "detail"=> "DO NOT EDIT THIS ALIAS");
 		#force alias file update
-		file_put_contents('/var/db/aliastables/CountryblockWL.txt',cb_text_area_decode($countryblock_config['whitelist']), LOCK_EX);
+	if (! is_dir('/var/db/aliastables/'))
+		mkdir ('/var/db/aliastables/',0755);
+	file_put_contents('/var/db/aliastables/CountryblockWL.txt',cb_text_area_decode($countryblock_config['whitelist']), LOCK_EX);
 	}
-	foreach($aliases as $cbalias){
+	if (is_array($aliases))
+	  foreach($aliases as $cbalias){
 		if (! preg_match("/Countryblock.*list/",$cbalias['descr']))
 			$new_aliases[]=	$cbalias;
 	}
@@ -206,7 +212,7 @@ function sync_package_countryblock() {
 		if ($rule['interface'] <> $last_iface){
 			$last_iface = $rule['interface'];
 			#apply countryblock rules if enabled
-			if ($config['installedpackages']['countryblock']['config'][0]['enable_cb'] == "on")
+			if ($config['installedpackages']['countryblock']['config'][0]['enable_cb'] == "on" && is_array(${$rule['interface']}))
 				foreach (${$rule['interface']} as $cb_rules)
 					$new_rules[]=$cb_rules;
 		}
@@ -367,7 +373,7 @@ function countryblock_do_xmlrpc_sync($sync_to_ip, $password) {
 	} elseif($resp->faultCode()) {
 		$cli->setDebug(1);
 		$resp = $cli->send($msg, "250");
-		$error = "An error code was received while attempting countryblock XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		$error = "An error code was received while attempting countryblock XMLRPC exec with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
 		file_notice("sync_settings", $error, "countryblock Settings Sync", "");
 	} else {

@@ -49,6 +49,8 @@ foreach ($files as $cont => $file){
 			${$ISOCode}.=$line."\n";
 		}
 	}
+#save last country networks
+file_put_contents($cdir.'/'.$ISOCode.'.txt',${$ISOCode},LOCK_EX);
 $cont_name= preg_replace("/ /","",$cont);
 $cont_name_lower= strtolower($cont_name);
 #file_put_contents($cdir.'/'.$cont_name.'.txt',$ips,LOCK_EX);
