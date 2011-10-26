@@ -33,6 +33,7 @@ require_once("util.inc");
 require_once("functions.inc");
 require_once("pkg-utils.inc");
 require_once("globals.inc");
+require_once("filter.inc");
 	
 function cb_text_area_decode($text){
 	return preg_replace('/\r\n/', "\n",base64_decode($text));	
@@ -96,10 +97,17 @@ function sync_package_countryblock() {
 					  		 "type"=> "urltable",
 					  		 "detail"=> "DO NOT EDIT THIS ALIAS");
 		#force alias file update
-	if (! is_dir('/var/db/aliastables/'))
-		mkdir ('/var/db/aliastables/',0755);
-	file_put_contents('/var/db/aliastables/Countryblock.txt',$ips, LOCK_EX);
+		if (! is_dir('/var/db/aliastables/'))
+			mkdir ('/var/db/aliastables/',0755);
+		if (file_exists('/var/db/aliastables/Countryblock.txt'))
+			file_put_contents('/var/db/aliastables/Countryblock.txt',$ips, LOCK_EX);
+		}
+	else{
+		#remove previous aliastable if exist
+		if (file_exists('/var/db/aliastables/Countryblock.txt'))
+			unlink('/var/db/aliastables/Countryblock.txt');
 	}
+	
 	if (cb_text_area_decode($countryblock_config['whitelist']) != ""){
 		#create or reaply alias
 		$new_aliases[]=array("name"=> 'CountryblockWL',
@@ -110,10 +118,17 @@ function sync_package_countryblock() {
 						  	 "type"=> "urltable",
 						  	 "detail"=> "DO NOT EDIT THIS ALIAS");
 		#force alias file update
-	if (! is_dir('/var/db/aliastables/'))
-		mkdir ('/var/db/aliastables/',0755);
-	file_put_contents('/var/db/aliastables/CountryblockWL.txt',cb_text_area_decode($countryblock_config['whitelist']), LOCK_EX);
+		if (! is_dir('/var/db/aliastables/'))
+			mkdir ('/var/db/aliastables/',0755);
+		if (file_exists('/var/db/aliastables/CountryblockWL.txt'))
+			file_put_contents('/var/db/aliastables/CountryblockWL.txt',cb_text_area_decode($countryblock_config['whitelist']), LOCK_EX);
+		}
+	else{
+		#remove previous aliastable if exist
+		if (file_exists('/var/db/aliastables/CountryblockWL.txt'))
+			unlink('/var/db/aliastables/CountryblockWL.txt');
 	}
+	
 	if (is_array($aliases))
 	  foreach($aliases as $cbalias){
 		if (! preg_match("/Countryblock.*list/",$cbalias['descr']))
@@ -222,8 +237,9 @@ function sync_package_countryblock() {
 	}
 	$config['filter']['rule']=$new_rules;
 
-	#save all changes to xml
+	#save and apply all changes
 	write_config();
+	filter_configure();
 		
 	countryblock_sync_on_changes();
 }
