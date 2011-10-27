@@ -133,7 +133,7 @@
 		<configurationfile>countryblock.xml</configurationfile>
 	</package>
 	<package>
-		<name>PF-Blocker</name>
+		<name>pfBlocker-dev</name>
 		<website/>
 		<descr>Block countries and IP ranges. Replaces Countryblock and IPblocklist</descr>
 		<category>Firewall</category>

@@ -1,6 +1,6 @@
 <?php
 /*
-	countryblock.inc
+	pfblocker.inc
 	part of the Postfix package for pfSense
 	Copyright (C) 2010 Erik Fonnesbeck
 	Copyright (C) 2011 Marcello Coutinho
@@ -35,7 +35,7 @@ require_once("pkg-utils.inc");
 require_once("globals.inc");
 require_once("filter.inc");
 	
-function cb_text_area_decode($text){
+function pfb_text_area_decode($text){
 	return preg_replace('/\r\n/', "\n",base64_decode($text));	
 }
 
@@ -47,9 +47,9 @@ function cb_get_real_interface_address($iface) {
 	return array($ip, long2ip(hexdec($netmask)));
 }
 
-function sync_package_countryblock() {
+function sync_package_pfblocker() {
 	global $config;
-	$countryblock_config=$config['installedpackages']['countryblock']['config'][0];
+	$pfblocker_config=$config['installedpackages']['pfblocker']['config'][0];
 	$continents= array("Africa","Antartica","Asia","Europe","North America","Oceania","South America");
 
 	#get local web gui configuration
@@ -61,85 +61,85 @@ function sync_package_countryblock() {
 		else 
 			$port = "443";
     }
-    $web_local .= "://127.0.0.1:".$port.'/countryblock.php';
+    $web_local .= "://127.0.0.1:".$port.'/pfblocker.php';
 	
 	#get all selected countries
-	$countries=$config['installedpackages']['countryblock']['config'][0]['topspammers'].",";
+	$countries=$config['installedpackages']['pfblocker']['config'][0]['topspammers'].",";
 	foreach ($continents as $continent){
-		if (is_array($config['installedpackages']['countryblock'.strtolower(preg_replace('/ /','',$continent))]['config']))
-			$countries.=$config['installedpackages']['countryblock'.strtolower(preg_replace('/ /','',$continent))]['config'][0]['countries'].",";
+		if (is_array($config['installedpackages']['pfblocker'.strtolower(preg_replace('/ /','',$continent))]['config']))
+			$countries.=$config['installedpackages']['pfblocker'.strtolower(preg_replace('/ /','',$continent))]['config'][0]['countries'].",";
 	}
 	$cb_files = explode(",", $countries);
 	$ips="";
     foreach ($cb_files as $iso){
 		if ($iso <> ""){
-			if (file_exists('/usr/local/pkg/countryblock/'.$iso.'.txt'))
-				$ips.=file_get_contents('/usr/local/pkg/countryblock/'.$iso.'.txt');
+			if (file_exists('/usr/local/pkg/pfblocker/'.$iso.'.txt'))
+				$ips.=file_get_contents('/usr/local/pkg/pfblocker/'.$iso.'.txt');
 		}
 	}
-	#create all ip block lists based on gui
+	#create all country block lists based on gui
 	file_put_contents('/usr/local/pkg/cb.txt',$ips, LOCK_EX);
 	
 	#write white_list to filesystem
-	file_put_contents('/usr/local/pkg/cbw.txt',cb_text_area_decode($countryblock_config['whitelist']), LOCK_EX);
+	file_put_contents('/usr/local/pkg/cbw.txt',pfb_text_area_decode($pfblocker_config['whitelist']), LOCK_EX);
 
-	#edit or assign alias "Countryblock" and "CountryblockWL" 
+	#edit or assign alias "pfblocker" and "pfblockerWL" 
 	$aliases=$config['aliases']['alias'];
 	#print "<pre>";
 	$new_aliases=array();
 	if ($ips != ""){
 		#create or reaply alias
-		$new_aliases[]=array("name"=> 'Countryblock',
+		$new_aliases[]=array("name"=> 'pfblocker',
 					  		 "url"=> $web_local.'?cb=1',
 					  		 "updatefreq"=> "7",
 					  		 "address"=>"",
-					  		 "descr"=> "Countryblock deny list",
+					  		 "descr"=> "pfblocker deny list",
 					  		 "type"=> "urltable",
 					  		 "detail"=> "DO NOT EDIT THIS ALIAS");
 		#force alias file update
 		if (! is_dir('/var/db/aliastables/'))
 			mkdir ('/var/db/aliastables/',0755);
-		if (file_exists('/var/db/aliastables/Countryblock.txt'))
-			file_put_contents('/var/db/aliastables/Countryblock.txt',$ips, LOCK_EX);
+		if (file_exists('/var/db/aliastables/pfblocker.txt'))
+			file_put_contents('/var/db/aliastables/pfblocker.txt',$ips, LOCK_EX);
 		}
 	else{
 		#remove previous aliastable if exist
-		if (file_exists('/var/db/aliastables/Countryblock.txt'))
-			unlink('/var/db/aliastables/Countryblock.txt');
+		if (file_exists('/var/db/aliastables/pfblocker.txt'))
+			unlink('/var/db/aliastables/pfblocker.txt');
 	}
 	
-	if (cb_text_area_decode($countryblock_config['whitelist']) != ""){
+	if (pfb_text_area_decode($pfblocker_config['whitelist']) != ""){
 		#create or reaply alias
-		$new_aliases[]=array("name"=> 'CountryblockWL',
+		$new_aliases[]=array("name"=> 'pfblockerWL',
 						  	 "url"=> $web_local.'?cbw=1',
 						  	 "updatefreq"=> "7",
 						  	 "address"=>"",
-						  	 "descr"=> "Countryblock white list",
+						  	 "descr"=> "pfblocker white list",
 						  	 "type"=> "urltable",
 						  	 "detail"=> "DO NOT EDIT THIS ALIAS");
 		#force alias file update
 		if (! is_dir('/var/db/aliastables/'))
 			mkdir ('/var/db/aliastables/',0755);
-		if (file_exists('/var/db/aliastables/CountryblockWL.txt'))
-			file_put_contents('/var/db/aliastables/CountryblockWL.txt',cb_text_area_decode($countryblock_config['whitelist']), LOCK_EX);
+		if (file_exists('/var/db/aliastables/pfblockerWL.txt'))
+			file_put_contents('/var/db/aliastables/pfblockerWL.txt',pfb_text_area_decode($pfblocker_config['whitelist']), LOCK_EX);
 		}
 	else{
 		#remove previous aliastable if exist
-		if (file_exists('/var/db/aliastables/CountryblockWL.txt'))
-			unlink('/var/db/aliastables/CountryblockWL.txt');
+		if (file_exists('/var/db/aliastables/pfblockerWL.txt'))
+			unlink('/var/db/aliastables/pfblockerWL.txt');
 	}
 	
 	if (is_array($aliases))
 	  foreach($aliases as $cbalias){
-		if (! preg_match("/Countryblock.*list/",$cbalias['descr']))
+		if (! preg_match("/pfblocker.*list/",$cbalias['descr']))
 			$new_aliases[]=	$cbalias;
 	}
 	$config['aliases']['alias']=$new_aliases;
 	# check contryblock filter options
 	$rules=$config['filter']['rule'];
-	$ifaces = $countryblock_config['inbound_interface'];
+	$ifaces = $pfblocker_config['inbound_interface'];
     foreach (explode(",", $ifaces) as $i => $iface) {
-    	if (cb_text_area_decode($countryblock_config['whitelist']) != ""){
+    	if (pfb_text_area_decode($pfblocker_config['whitelist']) != ""){
 			${$iface}[0]=array("id" => "",
 					"type"=>"pass",
 					"tag"=>	"",
@@ -152,11 +152,11 @@ function sync_package_countryblock() {
 					"statetimeout"=>"",
 					"statetype"=>"keep state",
 					"os"=> "",
-					"source"=>array("address"=>"CountryblockWL"),
+					"source"=>array("address"=>"pfblockerWL"),
     				"destination"=>array("any"=>""),
-    				"descr"=>"Countryblock inbound whitelist rule");
+    				"descr"=>"pfblocker inbound whitelist rule");
 
-			if ($countryblock_config['enable_log'])
+			if ($pfblocker_config['enable_log'])
 				${$iface}[0]["log"]="";
     	}
 		if ($ips != ""){
@@ -172,17 +172,17 @@ function sync_package_countryblock() {
 							"statetimeout"=>"",
 						    "statetype"=>"keep state",
 							"os"=> "",
-							"source"=>array("address"=>"Countryblock"),
+							"source"=>array("address"=>"pfblocker"),
     						"destination"=>array("any"=>""),
-    						"descr"=>"Countryblock inbound deny rule");
+    						"descr"=>"pfblocker inbound deny rule");
 
-			if ($countryblock_config['enable_log'])
+			if ($pfblocker_config['enable_log'])
 				${$iface}[1]["log"]="";
 		}
 	}
-	$ifaces = $countryblock_config['outbound_interface'];
+	$ifaces = $pfblocker_config['outbound_interface'];
     foreach (explode(",", $ifaces) as $i => $iface) {
-    	if (cb_text_area_decode($countryblock_config['whitelist']) != ""){
+    	if (pfb_text_area_decode($pfblocker_config['whitelist']) != ""){
 			${$iface}[2]=array(	"id" => "",
 							"type"=>"pass",
 							"tag"=>	"",
@@ -196,9 +196,9 @@ function sync_package_countryblock() {
 							"statetype"=>"keep state",
 							"os"=> "",
     						"source"=>array("any"=>""),
-    						"destination"=>array("address"=>"CountryblockWL"),
-    						"descr"=>"Countryblock outbound whitelist rule");
-		if ($countryblock_config['enable_log'])
+    						"destination"=>array("address"=>"pfblockerWL"),
+    						"descr"=>"pfblocker outbound whitelist rule");
+		if ($pfblocker_config['enable_log'])
 				${$iface}[2]["log"]="";			
     	}
 		if ($ips != ""){
@@ -215,9 +215,9 @@ function sync_package_countryblock() {
 							"statetype"=>"keep state",
 							"os"=> "",
     						"source"=>array("any"=>""),
-    						"destination"=>array("address"=>"Countryblock"),
-    						"descr"=>"Countryblock inbound deny rule");
-			if ($countryblock_config['enable_log'])
+    						"destination"=>array("address"=>"pfblocker"),
+    						"descr"=>"pfblocker inbound deny rule");
+			if ($pfblocker_config['enable_log'])
 				${$iface}[3]["log"]="";
 			
 		}
@@ -227,12 +227,12 @@ function sync_package_countryblock() {
 	foreach ($rules as $rule){
 		if ($rule['interface'] <> $last_iface){
 			$last_iface = $rule['interface'];
-			#apply countryblock rules if enabled
-			if ($config['installedpackages']['countryblock']['config'][0]['enable_cb'] == "on" && is_array(${$rule['interface']}))
+			#apply pfblocker rules if enabled
+			if ($config['installedpackages']['pfblocker']['config'][0]['enable_cb'] == "on" && is_array(${$rule['interface']}))
 				foreach (${$rule['interface']} as $cb_rules)
 					$new_rules[]=$cb_rules;
 		}
-		if (!preg_match("/Countryblock.*rule/",$rule['descr']))
+		if (!preg_match("/pfblocker.*rule/",$rule['descr']))
 			$new_rules[]=$rule;	
 	}
 	$config['filter']['rule']=$new_rules;
@@ -241,10 +241,10 @@ function sync_package_countryblock() {
 	write_config();
 	filter_configure();
 		
-	countryblock_sync_on_changes();
+	pfblocker_sync_on_changes();
 }
 
-function countryblock_validate_input($post, &$input_errors) {
+function pfblocker_validate_input($post, &$input_errors) {
 	foreach ($post as $key => $value) {
 		if (empty($value))
 			continue;
@@ -270,39 +270,39 @@ function countryblock_validate_input($post, &$input_errors) {
 	}
 }
 
-function countryblock_php_install_command() {
-	include_once '/usr/local/www/countryblock.php';
-	countryblock_get_countries();
-	sync_package_countryblock();
+function pfblocker_php_install_command() {
+	include_once '/usr/local/www/pfblocker.php';
+	pfblocker_get_countries();
+	sync_package_pfblocker();
 }
 
-function countryblock_php_deinstall_command() {
+function pfblocker_php_deinstall_command() {
 	global $config;
-	$config['installedpackages']['countryblock']['config'][0]['enable_cb']="";
+	$config['installedpackages']['pfblocker']['config'][0]['enable_cb']="";
 	write_config();
-	sync_package_countryblock();
+	sync_package_pfblocker();
 }
 
 /* Uses XMLRPC to synchronize the changes to a remote node */
-function countryblock_sync_on_changes() {
+function pfblocker_sync_on_changes() {
 	global $config, $g;
-	log_error("[countryblock] countryblock_xmlrpc_sync.php is starting.");
-	$synconchanges = $config['installedpackages']['countryblocksync']['config'][0]['synconchanges'];	
+	log_error("[pfblocker] pfblocker_xmlrpc_sync.php is starting.");
+	$synconchanges = $config['installedpackages']['pfblockersync']['config'][0]['synconchanges'];	
 	if(!$synconchanges) 
 		return;
-	foreach ($config['installedpackages']['countryblocksync']['config'] as $rs ){
+	foreach ($config['installedpackages']['pfblockersync']['config'] as $rs ){
 		foreach($rs['row'] as $sh){
 		$sync_to_ip = $sh['ipaddress'];
 		$password   = $sh['password'];
 		if($password && $sync_to_ip)
-			countryblock_do_xmlrpc_sync($sync_to_ip, $password);
+			pfblocker_do_xmlrpc_sync($sync_to_ip, $password);
 		}
 	}
-	log_error("[countryblock] countryblock_xmlrpc_sync.php is ending.");
+	log_error("[pfblocker] pfblocker_xmlrpc_sync.php is ending.");
 }
 
 /* Do the actual XMLRPC sync */
-function countryblock_do_xmlrpc_sync($sync_to_ip, $password) {
+function pfblocker_do_xmlrpc_sync($sync_to_ip, $password) {
 	global $config, $g;
 
 	if(!$password)
@@ -328,14 +328,14 @@ function countryblock_do_xmlrpc_sync($sync_to_ip, $password) {
 
 	/* xml will hold the sections to sync */
 	$xml = array();
-	$xml['countryblock'] = $config['installedpackages']['countryblock'];
-	$xml['countryblockafrica'] = $config['installedpackages']['countryblockafrica'];
-	$xml['countryblockantartica'] = $config['installedpackages']['countryblockantartica'];
-	$xml['countryblockasia'] = $config['installedpackages']['countryblockasia'];
-	$xml['countryblockeurope'] = $config['installedpackages']['countryblockeurope'];
-	$xml['countryblocknorthamerica'] = $config['installedpackages']['countryblocknorthamerica'];
-	$xml['countryblockoceania'] = $config['installedpackages']['countryblockoceania'];
-	$xml['countryblocksouthamerica'] = $config['installedpackages']['countryblocksouthamerica'];
+	$xml['pfblocker'] = $config['installedpackages']['pfblocker'];
+	$xml['pfblockerafrica'] = $config['installedpackages']['pfblockerafrica'];
+	$xml['pfblockerantartica'] = $config['installedpackages']['pfblockerantartica'];
+	$xml['pfblockerasia'] = $config['installedpackages']['pfblockerasia'];
+	$xml['pfblockereurope'] = $config['installedpackages']['pfblockereurope'];
+	$xml['pfblockernorthamerica'] = $config['installedpackages']['pfblockernorthamerica'];
+	$xml['pfblockeroceania'] = $config['installedpackages']['pfblockeroceania'];
+	$xml['pfblockersouthamerica'] = $config['installedpackages']['pfblockersouthamerica'];
 	/* assemble xmlrpc payload */
 	$params = array(
 		XML_RPC_encode($password),
@@ -344,7 +344,7 @@ function countryblock_do_xmlrpc_sync($sync_to_ip, $password) {
 
 	/* set a few variables needed for sync code borrowed from filter.inc */
 	$url = $synchronizetoip;
-	log_error("Beginning countryblock XMLRPC sync to {$url}:{$port}.");
+	log_error("Beginning pfblocker XMLRPC sync to {$url}:{$port}.");
 	$method = 'pfsense.merge_installedpackages_section_xmlrpc';
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
@@ -354,23 +354,23 @@ function countryblock_do_xmlrpc_sync($sync_to_ip, $password) {
 	/* send our XMLRPC message and timeout after 250 seconds */
 	$resp = $cli->send($msg, "250");
 	if(!$resp) {
-		$error = "A communications error occurred while attempting countryblock XMLRPC sync with {$url}:{$port}.";
+		$error = "A communications error occurred while attempting pfblocker XMLRPC sync with {$url}:{$port}.";
 		log_error($error);
-		file_notice("sync_settings", $error, "countryblock Settings Sync", "");
+		file_notice("sync_settings", $error, "pfblocker Settings Sync", "");
 	} elseif($resp->faultCode()) {
 		$cli->setDebug(1);
 		$resp = $cli->send($msg, "250");
-		$error = "An error code was received while attempting countryblock XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		$error = "An error code was received while attempting pfblocker XMLRPC sync with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
-		file_notice("sync_settings", $error, "countryblock Settings Sync", "");
+		file_notice("sync_settings", $error, "pfblocker Settings Sync", "");
 	} else {
-		log_error("countryblock XMLRPC sync successfully completed with {$url}:{$port}.");
+		log_error("pfblocker XMLRPC sync successfully completed with {$url}:{$port}.");
 	}
 	
-	/* tell countryblock to reload our settings on the destionation sync host. */
+	/* tell pfblocker to reload our settings on the destionation sync host. */
 	$method = 'pfsense.exec_php';
-	$execcmd  = "require_once('/usr/local/pkg/countryblock.inc');\n";
-	$execcmd .= "sync_package_countryblock();";
+	$execcmd  = "require_once('/usr/local/pkg/pfblocker.inc');\n";
+	$execcmd .= "sync_package_pfblocker();";
 	
 	/* assemble xmlrpc payload */
 	$params = array(
@@ -378,23 +378,23 @@ function countryblock_do_xmlrpc_sync($sync_to_ip, $password) {
 		XML_RPC_encode($execcmd)
 	);
 
-	log_error("countryblock XMLRPC reload data {$url}:{$port}.");
+	log_error("pfblocker XMLRPC reload data {$url}:{$port}.");
 	$msg = new XML_RPC_Message($method, $params);
 	$cli = new XML_RPC_Client('/xmlrpc.php', $url, $port);
 	$cli->setCredentials('admin', $password);
 	$resp = $cli->send($msg, "250");
 	if(!$resp) {
-		$error = "A communications error occurred while attempting countryblock XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
+		$error = "A communications error occurred while attempting pfblocker XMLRPC sync with {$url}:{$port} (pfsense.exec_php).";
 		log_error($error);
-		file_notice("sync_settings", $error, "countryblock Settings Sync", "");
+		file_notice("sync_settings", $error, "pfblocker Settings Sync", "");
 	} elseif($resp->faultCode()) {
 		$cli->setDebug(1);
 		$resp = $cli->send($msg, "250");
-		$error = "An error code was received while attempting countryblock XMLRPC exec with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
+		$error = "An error code was received while attempting pfblocker XMLRPC exec with {$url}:{$port} - Code " . $resp->faultCode() . ": " . $resp->faultString();
 		log_error($error);
-		file_notice("sync_settings", $error, "countryblock Settings Sync", "");
+		file_notice("sync_settings", $error, "pfblocker Settings Sync", "");
 	} else {
-		log_error("countryblock XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
+		log_error("pfblocker XMLRPC reload data success with {$url}:{$port} (pfsense.exec_php).");
 	}
 
 }

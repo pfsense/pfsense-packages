@@ -7,8 +7,8 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    Countryblock_sync.xml
-    part of the Countryblock package for pfSense
+    pfblocker_sync.xml
+    part of the pfblocker package for pfSense
     Copyright (C) 2011 Marcello Coutinho
     All rights reserved.            
                                                                   */
@@ -41,68 +41,65 @@
 	<description>Describe your package here</description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
-	<name>countryblock_sync</name>
+	<name>pfblocker_sync</name>
 	<version>1.0</version>
-	<title>Firewall: Countryblock</title>
-	<include_file>/usr/local/pkg/countryblock.inc</include_file>
+	<title>Firewall: pfBlocker</title>
+	<include_file>/usr/local/pkg/pfblocker.inc</include_file>
 	<menu>
-		<name>Countryblock</name>
-		<tooltiptext>Configure Countryblock</tooltiptext>
+		<name>pfBlocker</name>
+		<tooltiptext>Configure pfBlocker</tooltiptext>
 		<section>Services</section>
-		<url>pkg_edit.php?xml=countryblock.xml&amp;id=0</url>
+		<url>pkg_edit.php?xml=pfblocker.xml&amp;id=0</url>
 	</menu>
-	<service>
-		<name>countryblock</name>
-	</service>
 <tabs>
 		<tab>
 			<text>General</text>
-			<url>/pkg_edit.php?xml=countryblock.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Africa</text>
-			<url>/pkg_edit.php?xml=countryblock_Africa.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_Africa.xml&amp;id=0</url>
 			
 		</tab>
 		<tab>
 			<text>Antartica</text>
-			<url>/pkg_edit.php?xml=countryblock_Antartica.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_Antartica.xml&amp;id=0</url>
 			
 		</tab>
 		<tab>
 			<text>Asia</text>
-			<url>/pkg_edit.php?xml=countryblock_Asia.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_Asia.xml&amp;id=0</url>
 			
 		</tab>
 		<tab>
 			<text>Europe</text>
-			<url>/pkg_edit.php?xml=countryblock_Europe.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_Europe.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>North America</text>
-			<url>/pkg_edit.php?xml=countryblock_NorthAmerica.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_NorthAmerica.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Oceania</text>
-			<url>/pkg_edit.php?xml=countryblock_Oceania.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_Oceania.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>South America</text>
-			<url>/pkg_edit.php?xml=countryblock_SouthAmerica.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_SouthAmerica.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>XMLRPC Sync</text>
-			<url>/pkg_edit.php?xml=countryblock_sync.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_sync.xml&amp;id=0</url>
 			<active/>
 		</tab>
 </tabs>
 	<fields>
 		<field>
-			<name>countryblock XMLRPC Sync</name>
+			<name>pfBlocker XMLRPC Sync</name>
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Automatically sync countryblock configuration changes</fielddescr>
+			<fielddescr>Automatically sync pfBlocker configuration changes</fielddescr>
 			<fieldname>synconchanges</fieldname>
 			<description>pfSense will automatically sync changes to the hosts defined below.</description>
 			<type>checkbox</type>
@@ -130,15 +127,15 @@
 		</field>
 	</fields>
 	<custom_php_install_command>
-		countryblock_php_install_command();
+		pfblocker_php_install_command();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		countryblock_php_deinstall_command();
+		pfblocker_php_deinstall_command();
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		countryblock_validate_input($_POST, &amp;$input_errors);
+		pfblocker_validate_input($_POST, &amp;$input_errors);
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
-		sync_package_countryblock();
+		sync_package_pfblocker();
 	</custom_php_resync_config_command>
 </packagegui>

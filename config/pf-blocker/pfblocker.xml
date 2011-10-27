@@ -7,8 +7,8 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    Countryblock.xml
-    part of the Countryblock for pfSense
+    pfblocker.xml
+    part of the pfblocker for pfSense
     Copyright (C) 2011 Marcello Coutinho
 
     All rights reserved.            
@@ -42,31 +42,28 @@
 	<description>Describe your package here</description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
-	<name>countryblock</name>
+	<name>pfblocker</name>
 	<version>1.0</version>
-	<title>Firewall: Countryblock</title>
-	<include_file>/usr/local/pkg/countryblock.inc</include_file>
+	<title>Firewall: pfBlocker</title>
+	<include_file>/usr/local/pkg/pfblocker.inc</include_file>
 	<menu>
-		<name>Country Block</name>
-		<tooltiptext>Configure Countryblock</tooltiptext>
+		<name>pfBlocker</name>
+		<tooltiptext>Configure pfblocker</tooltiptext>
 		<section>Firewall</section>
-		<url>pkg_edit.php?xml=countryblock.xml&amp;id=0</url>
+		<url>pkg_edit.php?xml=pfblocker.xml&amp;id=0</url>
 	</menu>
-	<service>
-		<name>countryblock</name>
-	</service>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/countryblock-dev/countryblock.inc</item>
+		<item>http://www.pfsense.org/packages/config/pfblocker-dev/pfblocker.inc</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/countryblock-dev/countryblock.php</item>
+		<item>http://www.pfsense.org/packages/config/pfblocker-dev/pfblocker.php</item>
 		<prefix>/usr/local/www/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/countryblock-dev/countryblock_sync.xml</item>
+		<item>http://www.pfsense.org/packages/config/pfblocker-dev/pfblocker_sync.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
 	</additional_files_needed>
@@ -108,58 +105,58 @@
 <tabs>
 		<tab>
 			<text>General</text>
-			<url>/pkg_edit.php?xml=countryblock.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker.xml&amp;id=0</url>
 			<active/>
 		</tab>
 		<tab>
 			<text>Africa</text>
-			<url>/pkg_edit.php?xml=countryblock_Africa.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_Africa.xml&amp;id=0</url>
 			
 		</tab>
 		<tab>
 			<text>Antartica</text>
-			<url>/pkg_edit.php?xml=countryblock_Antartica.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_Antartica.xml&amp;id=0</url>
 			
 		</tab>
 		<tab>
 			<text>Asia</text>
-			<url>/pkg_edit.php?xml=countryblock_Asia.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_Asia.xml&amp;id=0</url>
 			
 		</tab>
 		<tab>
 			<text>Europe</text>
-			<url>/pkg_edit.php?xml=countryblock_Europe.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_Europe.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>North America</text>
-			<url>/pkg_edit.php?xml=countryblock_NorthAmerica.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_NorthAmerica.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>Oceania</text>
-			<url>/pkg_edit.php?xml=countryblock_Oceania.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_Oceania.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>South America</text>
-			<url>/pkg_edit.php?xml=countryblock_SouthAmerica.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_SouthAmerica.xml&amp;id=0</url>
 		</tab>
 		<tab>
 			<text>XMLRPC Sync</text>
-			<url>/pkg_edit.php?xml=countryblock_sync.xml&amp;id=0</url>
+			<url>/pkg_edit.php?xml=pfblocker_sync.xml&amp;id=0</url>
 		</tab>
 </tabs>
 	<fields>
 		<field>
-			<name>Countryblock General Settings</name>
+			<name>pfBlocker General Settings</name>
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Enable Countryblock  </fielddescr>
+			<fielddescr>Enable pfBlocker</fielddescr>
 			<fieldname>enable_cb</fieldname>
 			<type>checkbox</type>
 			<description></description>
 		</field>
 		<field>
-			<fielddescr>Enable Logging  </fielddescr>
+			<fielddescr>Enable Logging</fielddescr>
 			<fieldname>enable_log</fieldname>
 			<type>checkbox</type>
 			<description></description>
@@ -168,7 +165,7 @@
 			<fielddescr>Inbound Interface(s)</fielddescr>
 			<fieldname>inbound_interface</fieldname>
 			<description><![CDATA[Default: <strong>WAN</strong><br>Select interface(s) that you want to block incoming traffic.<br>
-								If you want to create custom inbound rules for blocked countries based on Countryblock firewall alias, leave this list empty.]]></description>
+								If you want to create custom inbound rules for blocked countries based on pfBlocker firewall alias, leave this list empty.]]></description>
 			<type>interfaces_selection</type>
 			<required/>
 			<multiple/>
@@ -177,7 +174,7 @@
 			<fielddescr>Outbound Interface(s)</fielddescr>
 			<fieldname>outbound_interface</fieldname>
 			<description><![CDATA[Default:<strong>LAN</strong><br>Select interface(s) that you do not want to send outgoing traffic.<br>
-								If you want to create custom outbound rules for blocked countries based on Countryblock firewall alias, leave this list empty.]]></description>
+								If you want to create custom outbound rules for blocked countries based on pfBlocker firewall alias, leave this list empty.]]></description>
 			<type>interfaces_selection</type>
 			<required/>
 			<multiple/>
@@ -220,15 +217,15 @@
 		</field>
 	</fields>
 	<custom_php_install_command>
-		countryblock_php_install_command();
+		pfblocker_php_install_command();
 	</custom_php_install_command>
 	<custom_php_deinstall_command>
-		countryblock_php_deinstall_command();
+		pfblocker_php_deinstall_command();
 	</custom_php_deinstall_command>
 	<custom_php_validation_command>
-		countryblock_validate_input($_POST, &amp;$input_errors);
+		pfblocker_validate_input($_POST, &amp;$input_errors);
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
-		sync_package_countryblock();
+		sync_package_pfblocker();
 	</custom_php_resync_config_command>
 </packagegui>
