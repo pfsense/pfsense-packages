@@ -109,13 +109,13 @@
 			<active/>
 		</tab>
 		<tab>
+			<text>Top Spammers</text>
+			<url>/pkg_edit.php?xml=pfblocker_topspammers.xml&amp;id=0</url>
+		</tab>
+	
+		<tab>
 			<text>Africa</text>
 			<url>/pkg_edit.php?xml=pfblocker_Africa.xml&amp;id=0</url>
-			
-		</tab>
-		<tab>
-			<text>Antartica</text>
-			<url>/pkg_edit.php?xml=pfblocker_Antartica.xml&amp;id=0</url>
 			
 		</tab>
 		<tab>
@@ -173,47 +173,120 @@
 		<field>
 			<fielddescr>Outbound Interface(s)</fielddescr>
 			<fieldname>outbound_interface</fieldname>
-			<description><![CDATA[Default:<strong>LAN</strong><br>Select interface(s) that you do not want to send outgoing traffic.<br>
+			<description><![CDATA[Default:<strong>LAN</strong> or none.<br>Select interface(s) that you do not want to send outgoing traffic.<br>
 								If you want to create custom outbound rules for blocked countries based on pfBlocker firewall alias, leave this list empty.]]></description>
 			<type>interfaces_selection</type>
 			<required/>
 			<multiple/>
 		</field>
 		<field>
-			<fielddescr>Whitelist</fielddescr>
-			<fieldname>whitelist</fieldname>
-			<description><![CDATA[Enter a CIDR range for the Address you wish to whitlist. One network per line.<br>	
-								  Example: 192.168.1.0/24]]></description>
-			<type>textarea</type>
-			<cols>20</cols>
-			<rows>06</rows>
-			<encoding>base64</encoding>
+			<name>Network ranges / CIDR lists</name>
+			<type>listtopic</type>
+		</field>
+			<field>
+			<fielddescr>Country Action</fielddescr>
+			<fieldname>countryblock</fieldname>
+			<description><![CDATA[Default:<strong>Block Inbound</strong><br>
+							Select action for countries you have selected<br><br>
+							<strong>Note: </strong><br>'Block Inbound' traffic will deny access from selected countries to your network.<br>
+									'Block Outgoing' traffic will deny access from your users to countries you selected to block<br>
+									'Whitelist' will allow access from and to selected countries to your network.<br>
+									'None' will not apply rules to selected countries.]]></description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Block Inbound</name><value>inbound</value></option>
+				<option><name>Block Outbound</name><value>outbound</value></option>
+				<option><name>Block Inbound and Outbound</name><value>both</value></option>
+				<option><name>whitelist</name><value>whitelist</value></option>
+				<option><name>None</name><value>none</value></option>
+				</options>
+			</field>
+		<field>
+			<fielddescr>Update frequency</fielddescr>
+			<fieldname>update</fieldname>
+			<description><![CDATA[Default:<strong>Never</strong><br>
+							Select how often pfsense will download Lists files]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Never</name><value>never</value></option>
+				<option><name>Every Hour</name><value>hour</value></option>
+				<option><name>Every 4 Hours</name><value>4hours</value></option>
+				<option><name>Every 12 Hours</name><value>12hours</value></option>
+				<option><name>Once a day</name><value>day</value></option>
+				<option><name>Once a week</name><value>week</value></option>
+				</options>
+		</field>	
+
+		<field>
+			<fielddescr><![CDATA[Lists]]></fielddescr>
+			<fieldname>none</fieldname>
+			<description><![CDATA[In 'list action' choose the way you want to use the list and in 'Format' choose the file format on url.<br>
+								  ON url field, add direct link to list (Example: <a target=_new href='http://list.iblocklist.com/?list=bt_ads&fileformat=p2p&archiveformat=gz'>Ads</a>,
+																	<a target=_new href='http://list.iblocklist.com/?list=bt_spyware&fileformat=p2p&archiveformat=gz'>Spyware</a>,
+																	<a target=_new href='http://list.iblocklist.com/?list=bt_proxy&fileformat=p2p&archiveformat=gz'>Proxies</a> )<br> 
+									Compressed lists must be in gz format.<br>
+									File must have only one network per line and could follows PeerBlock syntax	or this below:<br>
+									Network ranges: <strong>172.16.1.0-172.16.1.255</strong><br>
+									CIDR: <strong>172.16.1.0/24</strong>
+								   ]]></description>
+			<type>rowhelper</type>
+			<rowhelper>
+			<rowhelperfield>
+			<fielddescr>List Action</fielddescr>
+			<fieldname>action</fieldname>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Block Inbound</name><value>ips_in</value></option>
+				<option><name>Block Outbound</name><value>ips_out</value></option>
+				<option><name>whitelist</name><value>whitelist</value></option>
+				<option><name>None</name><value>none</value></option>
+				</options>
+			</rowhelperfield>
+			<rowhelperfield>
+			<fielddescr>Format</fielddescr>
+			<fieldname>format</fieldname>
+	    	<type>select</type>
+ 				<options>
+				<option><name>gz</name><value>gz</value></option>
+				<option><name>txt</name><value>txt</value></option>
+				</options>
+			</rowhelperfield>		
+			<rowhelperfield>
+				<fielddescr>Url</fielddescr>
+				<fieldname>url</fieldname>
+				<type>input</type>
+				<size>57</size>
+			</rowhelperfield>
+			</rowhelper>
 		</field>
 		<field>
-			<name>Shortcut</name>
+			<name>List info help</name>
+			<fieldname>list_info</fieldname>
+			<description><![CDATA[In 'list action' choose the way you want to use the list and in 'Format' choose the file format on url.<br>
+								  ON url field, add direct link to list (Example: <a target=_new href='http://list.iblocklist.com/?list=bt_ads&fileformat=p2p&archiveformat=gz'>Ads</a>,
+																	<a target=_new href='http://list.iblocklist.com/?list=bt_spyware&fileformat=p2p&archiveformat=gz'>Spyware</a>,
+																	<a target=_new href='http://list.iblocklist.com/?list=bt_proxy&fileformat=p2p&archiveformat=gz'>Proxies</a> )<br> 
+									Compressed lists must be in gz format.<br>	
+									File must have only one network per line and could follows PeerBlock syntax	or this below:<br>
+									Network ranges: <strong>172.16.1.0-172.16.1.255</strong><br>
+									CIDR: <strong>172.16.1.0/24</strong>
+								   ]]></description>
+			<type>checkbox</type>
+			
+		</field>
+		<field>
+			<name>Custom list</name>
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Top Spammers</fielddescr>
-			<fieldname>topspammers</fieldname>
-			<description>
-			<![CDATA[Select top spammers countries you want to block.]]>
-			</description>
-	    	<type>select</type>
- 				<options>
-				<option><name>Korea</name><value>KR</value></option>
-				<option><name>China</name><value>CN</value></option>
-				<option><name>India</name><value>IN</value></option>
-				<option><name>Russia</name><value>RU</value></option>
-				<option><name>Turkey</name><value>TR</value></option>
-				<option><name>Vietnam</name><value>VN</value></option>
-				<option><name>Ukraine</name><value>UA</value></option>
-				<option><name>Brazil</name><value>BR</value></option>
-				<option><name>Venezuela </name><value>VE</value></option>
-				<option><name>Pakistan</name><value>PK</value></option>
-				</options>
-				<size>10</size>
-				<multiple/>
+			<fielddescr>Whitelist</fielddescr>
+			<fieldname>whitelist</fieldname>
+			<description><![CDATA[Enter CIDR network ranges you want to whitlist. One network per line.<br>	
+								  Example: 192.168.1.0/24]]></description>
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>06</rows>
+			<encoding>base64</encoding>
 		</field>
 	</fields>
 	<custom_php_install_command>

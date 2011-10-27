@@ -7,11 +7,12 @@
 /* $Id$ */
 /* ========================================================================== */
 /*
-    pfblocker_sync.xml
-    part of the pfblocker package for pfSense
+    pfblocker_topspammers.xml
+    part of the pfblocker for pfSense
     Copyright (C) 2011 Marcello Coutinho
+
     All rights reserved.            
-                                                                  */
+			                                                                  */
 /* ========================================================================== */
 /*
     Redistribution and use in source and binary forms, with or without
@@ -41,14 +42,14 @@
 	<description>Describe your package here</description>
 	<requirements>Describe your package requirements here</requirements>
 	<faq>Currently there are no FAQ items provided.</faq>
-	<name>pfblocker_sync</name>
+	<name>pfblockertopspammers</name>
 	<version>1.0</version>
 	<title>Firewall: pfBlocker</title>
 	<include_file>/usr/local/pkg/pfblocker.inc</include_file>
 	<menu>
 		<name>pfBlocker</name>
-		<tooltiptext>Configure pfBlocker</tooltiptext>
-		<section>Services</section>
+		<tooltiptext>Configure pfblocker</tooltiptext>
+		<section>Firewall</section>
 		<url>pkg_edit.php?xml=pfblocker.xml&amp;id=0</url>
 	</menu>
 <tabs>
@@ -59,6 +60,7 @@
 		<tab>
 			<text>Top Spammers</text>
 			<url>/pkg_edit.php?xml=pfblocker_topspammers.xml&amp;id=0</url>
+			<active/>
 		</tab>
 		<tab>
 			<text>Africa</text>
@@ -89,40 +91,34 @@
 		<tab>
 			<text>XMLRPC Sync</text>
 			<url>/pkg_edit.php?xml=pfblocker_sync.xml&amp;id=0</url>
-			<active/>
 		</tab>
 </tabs>
 	<fields>
 		<field>
-			<name>pfBlocker XMLRPC Sync</name>
+			<name>Countries Shortcut</name>
 			<type>listtopic</type>
 		</field>
 		<field>
-			<fielddescr>Automatically sync pfBlocker configuration changes</fielddescr>
-			<fieldname>synconchanges</fieldname>
-			<description>pfSense will automatically sync changes to the hosts defined below.</description>
-			<type>checkbox</type>
-		</field>
-		<field>
-			<fielddescr>Remote Server</fielddescr>
-			<fieldname>none</fieldname>
-			<type>rowhelper</type>
-			<rowhelper>
-			<rowhelperfield>
-				<fielddescr>IP Address</fielddescr>
-				<fieldname>ipaddress</fieldname>
-				<description>IP Address of remote server</description>
-				<type>input</type>
-				<size>20</size>
-			</rowhelperfield>
-			<rowhelperfield>
-				<fielddescr>Password</fielddescr>
-				<fieldname>password</fieldname>
-				<description>Password for remote server.</description>
-				<type>password</type>
-				<size>20</size>
-			</rowhelperfield>
-			</rowhelper>
+			<fielddescr>Top Spammers</fielddescr>
+			<fieldname>countries</fieldname>
+			<description>
+			<![CDATA[Select top spammers countries you want to block.]]>
+			</description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Korea</name><value>KR</value></option>
+				<option><name>China</name><value>CN</value></option>
+				<option><name>India</name><value>IN</value></option>
+				<option><name>Russia</name><value>RU</value></option>
+				<option><name>Turkey</name><value>TR</value></option>
+				<option><name>Vietnam</name><value>VN</value></option>
+				<option><name>Ukraine</name><value>UA</value></option>
+				<option><name>Brazil</name><value>BR</value></option>
+				<option><name>Venezuela </name><value>VE</value></option>
+				<option><name>Pakistan</name><value>PK</value></option>
+				</options>
+				<size>10</size>
+				<multiple/>
 		</field>
 	</fields>
 	<custom_php_install_command>

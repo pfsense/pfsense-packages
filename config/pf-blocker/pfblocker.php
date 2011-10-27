@@ -1,28 +1,38 @@
 <?php 
-function get_networks($cb){
-	if ($cb==1)
-		$return= file_get_contents('/usr/local/pkg/cb.txt');
-	if ($cb==2)
-		$return=file_get_contents('/usr/local/pkg/cbw.txt');
+function get_networks($pfb){
+	if ($pfb==1)
+		$return= file_get_contents('/usr/local/pkg/pfb_in.txt');
+	if ($pfb==2)
+		$return= file_get_contents('/usr/local/pkg/pfb_out.txt');
+	if ($pfb==3)
+		$return=file_get_contents('/usr/local/pkg/pfb_w.txt');
 		#print "<pre>";
 		print $return;
 }
 
-if ($_REQUEST['cb']== 1){# and $_SERVER['REMOTE_ADDR']== '127.0.0.1'){
-	get_networks(1);
+# to be uncomented when this packages gets stable state
+#if($_SERVER['REMOTE_ADDR']== '127.0.0.1'){
+switch ($_REQUEST['pfb']){
+	case "in":
+		get_networks(1);
+	break;	
+	case "out":
+		get_networks(2);
+	break;
+	case "white":
+		get_networks(3);
+	break;
 }
-if ($_REQUEST['cbw']== 1){# and $_SERVER['REMOTE_ADDR']== '127.0.0.1'){
-	get_networks(2);
-}
-
+#}
+	
 function pfblocker_get_countries(){
 $files= array (	"Africa" => "/usr/local/pkg/Africa_cidr.txt",
-				"Antartica" => "/usr/local/pkg/Antartica_cidr.txt",
 				"Asia" => "/usr/local/pkg/Asia_cidr.txt",
 				"Europe" => "/usr/local/pkg/Europe_cidr.txt",
 				"North America" => "/usr/local/pkg/North_America_cidr.txt",
 				"Oceania" => "/usr/local/pkg/Oceania_cidr.txt",
 				"South America"=>"/usr/local/pkg/South_America_cidr.txt");
+
 $cdir='/usr/local/pkg/pfblocker';
 if (! is_dir($cdir))
 	mkdir ($cdir,0755);
@@ -44,7 +54,7 @@ foreach ($files as $cont => $file){
 		else{
 			if (${$ISOCode}==0){
 				${$ISOCode}++;
-			$options.= '<option><name>'.$Country.' </name><value>'.$ISOCode.'</value></option>'."\n";
+			$options.= '<option><name>'.$Country .'-'.$ISOCode.' ('.$TotalNetworks.') '.' </name><value>'.$ISOCode.'</value></option>'."\n";
 			}
 			${$ISOCode}.=$line."\n";
 		}
@@ -114,14 +124,15 @@ $xml= <<<EOF
 			<url>/pkg_edit.php?xml=pfblocker.xml&amp;id=0</url>
 		</tab>
 		<tab>
+			<text>Top Spammers</text>
+			<url>/pkg_edit.php?xml=pfblocker_topspammers.xml&amp;id=0</url>
+			{$active['top']}
+		</tab>
+		
+		<tab>
 			<text>Africa</text>
 			<url>/pkg_edit.php?xml=pfblocker_Africa.xml&amp;id=0</url>
 			{$active['Africa']}
-		</tab>
-		<tab>
-			<text>Antartica</text>
-			<url>/pkg_edit.php?xml=pfblocker_Antartica.xml&amp;id=0</url>
-			{$active['Antartica']}
 		</tab>
 		<tab>
 			<text>Asia</text>
