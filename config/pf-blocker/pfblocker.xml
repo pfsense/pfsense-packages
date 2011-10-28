@@ -63,6 +63,11 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
+		<item>http://www.pfsense.org/packages/config/pf-blocker/pfBlocker.widget.php</item>
+		<prefix>/usr/local/www/widgets/widgets/</prefix>
+		<chmod>0755</chmod>
+	</additional_files_needed>
+	<additional_files_needed>
 		<item>http://www.pfsense.org/packages/config/pf-blocker/pfblocker_topspammers.xml</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0755</chmod>
@@ -279,7 +284,7 @@
 				<fielddescr>Url</fielddescr>
 				<fieldname>url</fieldname>
 				<type>input</type>
-				<size>65</size>
+				<size>55</size>
 			</rowhelperfield>
 			</rowhelper>
 		</field>

@@ -173,9 +173,8 @@ function sync_package_pfblocker() {
 	file_put_contents('/usr/local/pkg/pfb_w.txt',$whitelist, LOCK_EX);
 
 	
-	#edit or assign alias "pfblocker" and "pfblockerWL" 
+	#edit or assign alias "pfblockerInbound", "pfblockerOutbound" and "pfblockerWL" 
 	$aliases=$config['aliases']['alias'];
-	#print "<pre>";
 	$new_aliases=array();
 	$pfBlockerInbound='/var/db/aliastables/pfBlockerInbound.txt';
 	if ($ips_in != "" && $config['installedpackages']['pfblocker']['config'][0]['enable_cb'] == "on"){
@@ -242,11 +241,12 @@ function sync_package_pfblocker() {
 			$new_aliases[]=	$cbalias;
 	}
 	$config['aliases']['alias']=$new_aliases;
-	# check contryblock filter options
-	$rules=$config['filter']['rule'];
+	
+	# check pfBlocker filter options
 	$ifaces = $pfblocker_config['inbound_interface'];
-    foreach (explode(",", $ifaces) as $i => $iface) {
-    	if ($whitelist != ""){
+	if ($ifaces != "")
+      foreach (explode(",", $ifaces) as $i => $iface) {
+    	if ($whitelist != "" && $iface != ""){
 			${$iface}[0]=array("id" => "",
 					"type"=>"pass",
 					"tag"=>	"",
@@ -266,7 +266,7 @@ function sync_package_pfblocker() {
 			if ($pfblocker_config['enable_log'])
 				${$iface}[0]["log"]="";
     	}
-		if ($ips_in != ""){
+		if ($ips_in != "" && $iface != ""){
 			$action=($pfblocker_config['inbound_deny_action']!= ""?$pfblocker_config['inbound_deny_action']:"block");
 			${$iface}[1]=array(	"id" => "",
 							"type"=>$action,
@@ -289,8 +289,9 @@ function sync_package_pfblocker() {
 		}
 	}
 	$ifaces = $pfblocker_config['outbound_interface'];
-    foreach (explode(",", $ifaces) as $i => $iface) {
-    	if ($whitelist != ""){
+	if ($ifaces != "")
+      foreach (explode(",", $ifaces) as $i => $iface) {
+    	if ($whitelist != "" && $iface != ""){
 			${$iface}[2]=array(	"id" => "",
 							"type"=>"pass",
 							"tag"=>	"",
@@ -309,7 +310,7 @@ function sync_package_pfblocker() {
 		if ($pfblocker_config['enable_log'])
 				${$iface}[2]["log"]="";			
     	}
-		if ($ips_out != ""){
+		if ($ips_out != "" && $iface != ""){
 			$action=($pfblocker_config['outbound_deny_action']!= ""?$pfblocker_config['outbound_deny_action']:"block");
 			${$iface}[3]= array("id" => "",
 							"type"=>$action,
@@ -333,6 +334,7 @@ function sync_package_pfblocker() {
 
 	}
 	$last_iface="";
+	$rules=$config['filter']['rule'];
 	foreach ($rules as $rule){
 		if ($rule['interface'] <> $last_iface){
 			$last_iface = $rule['interface'];
