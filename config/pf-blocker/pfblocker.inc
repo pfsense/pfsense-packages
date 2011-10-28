@@ -246,7 +246,7 @@ function sync_package_pfblocker() {
 	$rules=$config['filter']['rule'];
 	$ifaces = $pfblocker_config['inbound_interface'];
     foreach (explode(",", $ifaces) as $i => $iface) {
-    	if (pfb_text_area_decode($pfblocker_config['whitelist']) != ""){
+    	if ($whitelist != ""){
 			${$iface}[0]=array("id" => "",
 					"type"=>"pass",
 					"tag"=>	"",
@@ -290,7 +290,7 @@ function sync_package_pfblocker() {
 	}
 	$ifaces = $pfblocker_config['outbound_interface'];
     foreach (explode(",", $ifaces) as $i => $iface) {
-    	if (pfb_text_area_decode($pfblocker_config['whitelist']) != ""){
+    	if ($whitelist != ""){
 			${$iface}[2]=array(	"id" => "",
 							"type"=>"pass",
 							"tag"=>	"",
