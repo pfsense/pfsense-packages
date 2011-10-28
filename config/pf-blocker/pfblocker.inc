@@ -197,7 +197,7 @@ function sync_package_pfblocker() {
 			unlink($pfBlockerInbound);
 	}
 	$pfBlockerOutbound='/var/db/aliastables/pfBlockerOutbound.txt';
-	if ($ips_out != "" && $pfblocker_config['outbound_interface'] != ""){
+	if ($ips_out != ""){
 		#create or reaply alias
 		$new_aliases[]=array("name"=> 'pfBlockerOutbound',
 					  		 "url"=> $web_local.'?pfb=out',
