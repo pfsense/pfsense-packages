@@ -68,12 +68,12 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.pfsense.org/packages/config/pf-blocker/pfblocker_topspammers.xml</item>
+		<item>http://www.countryipblocks.net/e_country_data/Africa_cidr.txt</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0555</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.countryipblocks.net/e_country_data/Africa_cidr.txt</item>
+		<item>http://www.countryipblocks.net/e_country_data/Antartica_cidr.txt</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0555</chmod>
 	</additional_files_needed>
@@ -171,6 +171,17 @@
 			<multiple/>
 		</field>
 		<field>
+			<fielddescr>Inbound deny action</fielddescr>
+			<fieldname>inbound_deny_action</fieldname>
+			<description><![CDATA[Default:<strong>Block</strong><br>
+							Select deny action for inbound rules]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Block</name><value>block</value></option>
+				<option><name>Reject</name><value>reject</value></option>
+				</options>
+		</field>	
+		<field>
 			<fielddescr>Outbound Interface(s)</fielddescr>
 			<fieldname>outbound_interface</fieldname>
 			<description><![CDATA[Default:<strong>LAN</strong> or none.<br>Select interface(s) that you do not want to send outgoing traffic.<br>
@@ -179,24 +190,37 @@
 			<required/>
 			<multiple/>
 		</field>
+			<field>
+			<fielddescr>Outbound deny action</fielddescr>
+			<fieldname>outbound_deny_action</fieldname>
+			<description><![CDATA[Default:<strong>Reject</strong><br>
+							Select deny action for outbound rules]]></description>
+	    	<type>select</type>
+ 				<options>
+				<option><name>Reject</name><value>reject</value></option>
+				<option><name>Block</name><value>block</value></option>
+				</options>
+		</field>	
+	
 		<field>
 			<name>Network ranges / CIDR lists</name>
 			<type>listtopic</type>
 		</field>
+	
 			<field>
 			<fielddescr>Country Action</fielddescr>
 			<fieldname>countryblock</fieldname>
 			<description><![CDATA[Default:<strong>Block Inbound</strong><br>
 							Select action for countries you have selected<br><br>
-							<strong>Note: </strong><br>'Block Inbound' traffic will deny access from selected countries to your network.<br>
-									'Block Outgoing' traffic will deny access from your users to countries you selected to block<br>
+							<strong>Note: </strong><br>'Deny Inbound' traffic will deny access from selected countries to your network.<br>
+									'Deny Outgoing' traffic will deny access from your users to countries you selected to block<br>
 									'Whitelist' will allow access from and to selected countries to your network.<br>
 									'None' will not apply rules to selected countries.]]></description>
 	    	<type>select</type>
  				<options>
-				<option><name>Block Inbound</name><value>inbound</value></option>
-				<option><name>Block Outbound</name><value>outbound</value></option>
-				<option><name>Block Inbound and Outbound</name><value>both</value></option>
+				<option><name>Deny Inbound</name><value>inbound</value></option>
+				<option><name>Deny Outbound</name><value>outbound</value></option>
+				<option><name>Deny Inbound and Outbound</name><value>both</value></option>
 				<option><name>whitelist</name><value>whitelist</value></option>
 				<option><name>None</name><value>none</value></option>
 				</options>
@@ -205,7 +229,7 @@
 			<fielddescr>Update frequency</fielddescr>
 			<fieldname>update</fieldname>
 			<description><![CDATA[Default:<strong>Never</strong><br>
-							Select how often pfsense will download Lists files]]></description>
+							Select how often pfsense will download List files]]></description>
 	    	<type>select</type>
  				<options>
  				<option><name>Never</name><value>never</value></option>
@@ -236,8 +260,8 @@
 			<fieldname>action</fieldname>
 	    	<type>select</type>
  				<options>
-				<option><name>Block Inbound</name><value>ips_in</value></option>
-				<option><name>Block Outbound</name><value>ips_out</value></option>
+				<option><name>Deny Inbound</name><value>ips_in</value></option>
+				<option><name>Deny Outbound</name><value>ips_out</value></option>
 				<option><name>whitelist</name><value>whitelist</value></option>
 				<option><name>None</name><value>none</value></option>
 				</options>
@@ -255,7 +279,7 @@
 				<fielddescr>Url</fielddescr>
 				<fieldname>url</fieldname>
 				<type>input</type>
-				<size>57</size>
+				<size>65</size>
 			</rowhelperfield>
 			</rowhelper>
 		</field>
@@ -281,7 +305,7 @@
 		<field>
 			<fielddescr>Whitelist</fielddescr>
 			<fieldname>whitelist</fieldname>
-			<description><![CDATA[Enter CIDR network ranges you want to whitlist. One network per line.<br>	
+			<description><![CDATA[Enter network you want to whitlist in CIDR format. One network per line.<br>	
 								  Example: 192.168.1.0/24]]></description>
 			<type>textarea</type>
 			<cols>50</cols>

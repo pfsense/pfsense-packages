@@ -178,7 +178,7 @@ function sync_package_pfblocker() {
 	#print "<pre>";
 	$new_aliases=array();
 	$pfBlockerInbound='/var/db/aliastables/pfBlockerInbound.txt';
-	if ($ips_in != ""){
+	if ($ips_in != "" && $config['installedpackages']['pfblocker']['config'][0]['enable_cb'] == "on"){
 		#create or reaply alias
 		$new_aliases[]=array("name"=> 'pfBlockerInbound',
 					  		 "url"=> $web_local.'?pfb=in',
@@ -197,7 +197,7 @@ function sync_package_pfblocker() {
 			unlink($pfBlockerInbound);
 	}
 	$pfBlockerOutbound='/var/db/aliastables/pfBlockerOutbound.txt';
-	if ($ips_out != ""){
+	if ($ips_out != "" && $config['installedpackages']['pfblocker']['config'][0]['enable_cb'] == "on"){
 		#create or reaply alias
 		$new_aliases[]=array("name"=> 'pfBlockerOutbound',
 					  		 "url"=> $web_local.'?pfb=out',
@@ -217,7 +217,7 @@ function sync_package_pfblocker() {
 	}
 	
 	$pfblockerWL='/var/db/aliastables/pfBlockerWL.txt';
-	if ($whitelist != ""){
+	if ($whitelist != "" && $config['installedpackages']['pfblocker']['config'][0]['enable_cb'] == "on"){
 		#create or reaply alias
 		$new_aliases[]=array("name"=> 'pfBlockerWL',
 						  	 "url"=> $web_local.'?pfb=white',
@@ -267,8 +267,9 @@ function sync_package_pfblocker() {
 				${$iface}[0]["log"]="";
     	}
 		if ($ips_in != ""){
+			$action=($pfblocker_config['inbound_deny_action']!= ""?$pfblocker_config['inbound_deny_action']:"block");
 			${$iface}[1]=array(	"id" => "",
-							"type"=>"block",
+							"type"=>$action,
 							"tag"=>	"",
 							"interface" => $iface,
 							"tagged"=> "",
@@ -309,8 +310,9 @@ function sync_package_pfblocker() {
 				${$iface}[2]["log"]="";			
     	}
 		if ($ips_out != ""){
+			$action=($pfblocker_config['outbound_deny_action']!= ""?$pfblocker_config['outbound_deny_action']:"block");
 			${$iface}[3]= array("id" => "",
-							"type"=>"block",
+							"type"=>$action,
 							"tag"=>	"",
 							"interface" => $iface,
 							"tagged"=> "",
