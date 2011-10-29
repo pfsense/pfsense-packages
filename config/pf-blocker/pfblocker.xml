@@ -230,7 +230,7 @@
 				<option><name>None</name><value>none</value></option>
 				</options>
 			</field>
-		<field>
+			<field>
 			<fielddescr>Update frequency</fielddescr>
 			<fieldname>update</fieldname>
 			<description><![CDATA[Default:<strong>Never</strong><br>
@@ -238,14 +238,12 @@
 	    	<type>select</type>
  				<options>
  				<option><name>Never</name><value>never</value></option>
-				<option><name>Every Hour</name><value>hour</value></option>
 				<option><name>Every 4 Hours</name><value>4hours</value></option>
 				<option><name>Every 12 Hours</name><value>12hours</value></option>
 				<option><name>Once a day</name><value>day</value></option>
 				<option><name>Once a week</name><value>week</value></option>
 				</options>
 		</field>	
-
 		<field>
 			<fielddescr><![CDATA[Lists]]></fielddescr>
 			<fieldname>none</fieldname>

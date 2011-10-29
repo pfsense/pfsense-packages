@@ -52,8 +52,8 @@ foreach ($files as $cont => $file){
 			${preg_replace("/\s/","",$matches[1])}=$matches[2];
 			}
 		else{
-			if (${$ISOcount}==0){
-				${$ISOCount}++;
+			if (${$ISOCode."c"}==""){
+				${$ISOCode."c"}="ok";
 			$options.= '<option><name>'.$Country .'-'.$ISOCode.' ('.$TotalNetworks.') '.' </name><value>'.$ISOCode.'</value></option>'."\n";
 			}
 			${$ISOCode}.=$line."\n";

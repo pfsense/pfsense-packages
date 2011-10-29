@@ -348,11 +348,44 @@ function sync_package_pfblocker() {
 	}
 	$config['filter']['rule']=$new_rules;
 
-	#save and apply all changes
-	write_config();
-	filter_configure();
-		
-	pfblocker_sync_on_changes();
+	#check aliastable size
+	preg_match("/(\d+)/",exec("/usr/bin/wc -l /usr/local/pkg/pfb_in.txt"),$matches);
+	$count_ips_in = $matches[1];
+	preg_match("/(\d+)/",exec("/usr/bin/wc -l /usr/local/pkg/pfb_out.txt"),$matches);
+	$count_ips_out = $matches[1];
+	preg_match("/(\d+)/",exec("/usr/bin/wc -l /usr/local/pkg/pfb_w.txt"),$matches);
+	$count_ips_w = $matches[1];
+	
+	#get higher value
+	$max=$count_ips_in;
+	if ($max < $count_ips_out)
+		$max = $count_ips_out;
+	if ($max < $count_ips_w)
+		$max = $count_ips_w;
+	$sum=($count_ips_in + $count_ips_out + $count_ips_w);
+	#check table size client option
+	$table_limit =($config['system']['maximumtableentries']!= ""?$config['system']['maximumtableentries']:"100000");
+
+	#check for possible table size erros
+	$error_message="";
+    if ($count_ips_in >= $table_limit )
+    	$message='pfBlockerInbound alias table is too large. Reduce Inbound list or increase "Firewall Maximum Table Entries" value to at least '.($sum +1000).' in "system - advanced - Firewall/NAT".';
+	if ($count_ips_out >= $table_limit )
+    	$message='pfBlockerOutbound alias table is too large. Reduce Outbound List or  increase "Firewall Maximum Table Entries" value to at least '.($sum +1000).' in "system - advanced - Firewall/NAT".';
+	if ($count_ips_w >= $table_limit )
+    	$message='pfBlockerWL alias table is too large. Reduce whitelist or increase "Firewall Maximum Table Entries" value to at least '.($sum +1000).' in "system - advanced - Firewall/NAT ".';
+    	
+	if ($message == ""){
+		#save and apply all changes*/
+   		write_config();
+   		#load filter file after editing
+		filter_configure();
+		pfblocker_sync_on_changes();
+		}
+	else{
+		log_error("[pfBlocker] ".$message);
+		file_notice("pfBlocker", $message, "pfblocker rule apply", "");
+	}
 }
 
 function pfblocker_validate_input($post, &$input_errors) {
