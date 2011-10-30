@@ -138,7 +138,7 @@ function sync_package_pfblocker() {
 			if ($row['format'] == "gz")
 				$url_list= gzfile($row['url']);
 			else
-				$url_list= file_get_contents($row['url']);
+				$url_list= file($row['url']);
 			#extract range lists
 			$new_file="";
 			foreach ($url_list as $line){
@@ -377,9 +377,21 @@ function sync_package_pfblocker() {
     	
 	if ($message == ""){
 		#save and apply all changes*/
+
+		#update pfctrl tables
+		$tables = array ('pfBlockerOutbound' => 'pfb_out.txt',
+				 'pfBlockerInbound'  => 'pfb_in.txt',
+				 'pfBlockerWL'  => 'pfb_w.txt');
+		foreach ($tables as $table => $pfb_file)
+			exec("/sbin/pfctl -t " . escapeshellarg($table) . " -T replace -f /usr/local/pkg/" . escapeshellarg($pfb_file) . " 2>&1", $result_pfb);
+
+		#write config
    		write_config();
-   		#load filter file after editing
+
+		#load filter file after editing
 		filter_configure();
+
+		#sync config
 		pfblocker_sync_on_changes();
 		}
 	else{
