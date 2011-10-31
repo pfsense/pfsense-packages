@@ -1971,7 +1971,7 @@ EOD;
                 #
 #################
 
-preprocessor http_inspect: global iis_unicode_map unicode.map 1252
+preprocessor http_inspect: global iis_unicode_map unicode.map 1252 compress_depth 65535 decompress_depth 65535
 
 preprocessor http_inspect_server: server default \
                         ports  { 80 8080 }  \
@@ -1982,6 +1982,9 @@ preprocessor http_inspect_server: server default \
                         directory no \
                         iis_backslash no \
                         u_encode yes \
+			inspect_gzip \
+			normalize_utf \
+			unlimited_decompress \
                         ascii no \
                         chunk_length 500000 \
                         bare_byte yes \
