@@ -71,5 +71,4 @@ foreach ($pfb_table as $alias => $values){
 }
 echo"  </tr>";
 echo"</table>";
-exit;
 ?>
