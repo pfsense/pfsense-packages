@@ -33,49 +33,43 @@ echo "<table style=\"padding-top:0px; padding-bottom:0px; padding-left:0px; padd
 cellspacing=\"0\"";
 echo"  <tr>";
 
-$in="";
-$out="";
-$white="";
+$pfb_table=array();
+$out="<img src ='/themes/{$g['theme']}/images/icons/icon_interface_down.gif'>";
+$in="<img src ='/themes/{$g['theme']}/images/icons/icon_interface_up.gif'>";
+if (is_array($config['aliases']['alias']))
+foreach ($config['aliases']['alias'] as $cbalias){
+	if (preg_match("/pfBlocker/",$cbalias['name'])){
+	
+		if (file_exists('/var/db/aliastables/'.$cbalias['name'].'.txt')){
+				preg_match("/(\d+)/",exec("/usr/bin/wc -l /var/db/aliastables/".$cbalias['name'].".txt"),$matches);
+				$pfb_table[$cbalias['name']]=array("count" => $matches[1],
+													"img"=> $out);
+				}
+		}
+	}
 $rules=$config['filter']['rule'];
 #echo "<pre>";
 foreach($rules as $rule){
-	if ($rule['destination']['address'] == 'pfBlockerOutbound' && $out == ""){
-		#print_r($rule);
-		$out="<img src ='/themes/{$g['theme']}/images/icons/icon_interface_up.gif'>";
-	}
+	if (preg_match("/pfBlocker/",$rule['source']['address']))
+		$pfb_table[$rule['source']['address']]["img"]=$in;
 		
-	if ($rule['source']['address']== 'pfBlockerInbound' && $in == "")
-		$in="<img src ='/themes/{$g['theme']}/images/icons/icon_interface_up.gif'>";
-		
-	if ($rule['source']['address']== 'pfBlockerWL' && $white == "")
-		$white="<img src ='/themes/{$g['theme']}/images/icons/icon_interface_up.gif'>";
-		
-	if ($rule['destination']['address']== 'pfBlockerWL' && $white == "")
-		$white="<img src ='/themes/{$g['theme']}/images/icons/icon_interface_up.gif'>";
+	if (preg_match("/pfBlocker/",$rule['destination']['address']))
+		$pfb_table[$rule['destination']['address']]["img"]=$in;
 }
+print "<pre>";
+#var_dump($pfb_table);
+#exit;
+	print "<td class=\"listlr\"><strong>Alias</strong></td>";
+	print "<td class=\"listlr\"><strong>CIDRs</strong></td>";
+	print "<td class=\"listlr\"><strong>Status</strong></td></tr>";	
 
-$in=($in != ""?$in:"<img src ='/themes/{$g['theme']}/images/icons/icon_interface_down.gif'>");
-$out=($out != ""?$out:"<img src ='/themes/{$g['theme']}/images/icons/icon_interface_down.gif'>");
-$white=($white != ""?$white:"<img src ='/themes/{$g['theme']}/images/icons/icon_interface_down.gif'>");
 
-echo "    <td class=\"listhdrr\">pfBlockerInbound".$in."</td>";
-echo "    <td class=\"listhdrr\">pfBlockerOutbound".$out."</td>";
-echo "    <td class=\"listhdrr\">pfBlockerWL".$white."</td>";
-
-echo"  </tr>";
-echo"  <tr>";
-if (file_exists("/usr/local/pkg/pfb_in.txt")) {
-         $resultsIP = preg_match_all("/\//",file_get_contents("/usr/local/pkg/pfb_in.txt"),$matches);
-         echo "    <td class=\"listlr\">". count($matches[0])." Networks</td>";
+foreach ($pfb_table as $alias => $values){
+	print "<td class=\"listlr\">".$alias ."</td>";
+	print "<td class=\"listlr\">".$values["count"]."</td>";
+	print "<td class=\"listlr\">".$values["img"]."</td></tr>";	
 }
-if (file_exists("/usr/local/pkg/pfb_out.txt")) {
-         $resultsIP = preg_match_all("/\//",file_get_contents("/usr/local/pkg/pfb_out.txt"),$matches);
-         echo "    <td class=\"listlr\">" . count($matches[0])." Networks</td>";
-}
-if (file_exists("/usr/local/pkg/pfb_w.txt")) {
-         $resultsIP = preg_match_all("/\//",file_get_contents("/usr/local/pkg/pfb_w.txt"),$matches);
-         echo "    <td class=\"listlr\">" . count($matches[0])." Networks</td>";}
-
 echo"  </tr>";
 echo"</table>";
+exit;
 ?>

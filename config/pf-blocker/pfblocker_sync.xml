@@ -57,9 +57,15 @@
 			<url>/pkg_edit.php?xml=pfblocker.xml&amp;id=0</url>
 		</tab>
 		<tab>
+			<text>Lists</text>
+			<url>/pkg.php?xml=pfblocker_lists.xml</url>
+		</tab>
+
+		<tab>
 			<text>Top Spammers</text>
 			<url>/pkg_edit.php?xml=pfblocker_topspammers.xml&amp;id=0</url>
 		</tab>
+	
 		<tab>
 			<text>Africa</text>
 			<url>/pkg_edit.php?xml=pfblocker_Africa.xml&amp;id=0</url>

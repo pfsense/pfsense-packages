@@ -72,9 +72,9 @@ function pfblocker_Range2CIDR($ip_min, $ip_max) {
 
 function sync_package_pfblocker() {
 	global $config;
+	$pfblocker_enable=$config['installedpackages']['pfblocker']['config'][0]['enable_cb'];
 	$pfblocker_config=$config['installedpackages']['pfblocker']['config'][0];
-	$continents= array("Africa","Antartica","Asia","Europe","North America","Oceania","South America");
-
+	$table_limit =($config['system']['maximumtableentries']!= ""?$config['system']['maximumtableentries']:"100000");
 	#get local web gui configuration
     $web_local=($config['system']['webgui']['protocol'] != ""?$config['system']['webgui']['protocol']:"http");
     $port = $config['system']['webgui']['port'];
@@ -86,304 +86,355 @@ function sync_package_pfblocker() {
     }
     $web_local .= "://127.0.0.1:".$port.'/pfblocker.php';
 	
-	#get all selected countries
-	$countries=$config['installedpackages']['pfblockertopspammers']['config'][0]['countries'].",";
-	foreach ($continents as $continent){
-		if (is_array($config['installedpackages']['pfblocker'.strtolower(preg_replace('/ /','',$continent))]['config']))
-			$countries.=$config['installedpackages']['pfblocker'.strtolower(preg_replace('/ /','',$continent))]['config'][0]['countries'].",";
-	}
-	$cb_files = explode(",", $countries);
-
-	$pfbdir='/usr/local/pkg/pfblocker';
-
 	#check folders
+	$pfbdir='/usr/local/pkg/pfblocker';
+	$pfb_alias_dir='/usr/local/pkg/pfblocker_aliases';
 	if (!is_dir($pfbdir))
 		mkdir ($pfbdir,0755);
+	if (!is_dir($pfb_alias_dir))
+		mkdir ($pfb_alias_dir,0755);
 	if (! is_dir('/var/db/aliastables/'))
 		mkdir ('/var/db/aliastables/',0755);
-		
-	#get custom lists
-	$whitelist=pfb_text_area_decode($pfblocker_config['whitelist']);
-	$ips_in="";
-	$ips_out="";
-    foreach ($cb_files as $iso){
-		if ($iso <> ""){
-			if (file_exists($pfbdir.'/'.$iso.'.txt'))
-				switch ($pfblocker_config['countryblock']){
-					case "inbound":
-						$ips_in.=file_get_contents($pfbdir.'/'.$iso.'.txt');
-						break;
-					case "outbound":
-						$ips_out.=file_get_contents($pfbdir.'/'.$iso.'.txt');
-						break;
-					case "both":
-						$ips_in.=file_get_contents($pfbdir.'/'.$iso.'.txt');
-						$ips_out.=file_get_contents($pfbdir.'/'.$iso.'.txt');
-						break;
-					case "whitelist":
-						$whitelist.=file_get_contents($pfbdir.'/'.$iso.'.txt');
-					break;		
-				}
-		}
-	}
+    
+	$continents= array(	"Africa" => "pfBlockerAfrica",
+						"Antartica" => "pfBlockerAntartica",
+						"Asia" => "pfBlockerAsia",
+						"Europe" => "pfBlockerEurope",
+						"North America" => "pfBlockerNorthAmerica",
+						"Oceania" => "pfBlockerOceania",
+						"South America" => "pfBlockerSouthAmerica",
+						"Top Spammers" => "pfBlockerTopSpammers");
 	
-	#Assign IP range lists
-	foreach ($pfblocker_config['row'] as $row){
-		$md5_url = md5($row['url']);
-		#print $row['action']."<br>";
-		if (file_exists($pfbdir."/".$md5_url.".txt")){
-			${$row['action']}.= file_get_contents($pfbdir.'/'.$md5_url.'.txt');
-			}
-		else{
-			if ($row['format'] == "gz")
-				$url_list= gzfile($row['url']);
-			else
-				$url_list= file($row['url']);
-			#extract range lists
-			$new_file="";
-			foreach ($url_list as $line){
-				# CIDR format 192.168.0.0/16
-				if (preg_match("/(\d+\.\d+\.\d+\.\d+\/\d+)/",$line,$matches)){
-					${$row['action']}.= $matches[1]."\n";
-					$new_file.= $matches[1]."\n";
-				}
-					
-				# Network range 192.168.0.0-192.168.0.254
-				if (preg_match("/(\d+\.\d+\.\d+\.\d+)-(\d+\.\d+\.\d+\.\d+)/",$line,$matches))
-					$cidr= pfblocker_Range2CIDR($matches[1],$matches[2]);
-					if ($cidr != ""){
-						${$row['action']}.= $cidr."\n";
-						$new_file.= $cidr."\n";
-					}
-			}
-			if ($new_file != "")
-				file_put_contents($pfbdir.'/'.$md5_url.'.txt',$new_file, LOCK_EX);
-		}
-		#print $row['url']."<br>" .$md5_url.".txt<br>";
-		#var_dump(gzfile($row['url']));
-	}
-	
-	#create all country block lists based on gui
-	file_put_contents('/usr/local/pkg/pfb_in.txt',$ips_in, LOCK_EX);
-	
-	#create all country block lists based on gui
-	file_put_contents('/usr/local/pkg/pfb_out.txt',$ips_out, LOCK_EX);
-	
-	#write white_list to filesystem
-	file_put_contents('/usr/local/pkg/pfb_w.txt',$whitelist, LOCK_EX);
-
-	
-	#edit or assign alias "pfblockerInbound", "pfblockerOutbound" and "pfblockerWL" 
-	$aliases=$config['aliases']['alias'];
+	#create rules vars and arrays
 	$new_aliases=array();
-	$pfBlockerInbound='/var/db/aliastables/pfBlockerInbound.txt';
-	if ($ips_in != "" && $config['installedpackages']['pfblocker']['config'][0]['enable_cb'] == "on"){
-		#create or reaply alias
-		$new_aliases[]=array("name"=> 'pfBlockerInbound',
-					  		 "url"=> $web_local.'?pfb=in',
-					  		 "updatefreq"=> "7",
-					  		 "address"=>"",
-					  		 "descr"=> "pfBlocker Inbound deny list",
-					  		 "type"=> "urltable",
-					  		 "detail"=> "DO NOT EDIT THIS ALIAS");
-		#force alias file update
-		if (file_exists($pfBlockerInbound))
-			file_put_contents($pfBlockerInbound,$ips_in, LOCK_EX);
-		}
-	else{
-		#remove previous aliastable if exist
-		if (file_exists($pfBlockerInbound))
-			unlink($pfBlockerInbound);
-	}
-	$pfBlockerOutbound='/var/db/aliastables/pfBlockerOutbound.txt';
-	if ($ips_out != "" && $config['installedpackages']['pfblocker']['config'][0]['enable_cb'] == "on"){
-		#create or reaply alias
-		$new_aliases[]=array("name"=> 'pfBlockerOutbound',
-					  		 "url"=> $web_local.'?pfb=out',
-					  		 "updatefreq"=> "7",
-					  		 "address"=>"",
-					  		 "descr"=> "pfBlocker Outbound deny list",
-					  		 "type"=> "urltable",
-					  		 "detail"=> "DO NOT EDIT THIS ALIAS");
-		#force alias file update
-		if (file_exists($pfBlockerOutbound))
-			file_put_contents($pfBlockerOutbound,$ips_out, LOCK_EX);
-		}
-	else{
-		#remove previous aliastable if exist
-		if (file_exists($pfBlockerOutbound))
-			unlink($pfBlockerOutbound);
-	}
-	
-	$pfblockerWL='/var/db/aliastables/pfBlockerWL.txt';
-	if ($whitelist != "" && $config['installedpackages']['pfblocker']['config'][0]['enable_cb'] == "on"){
-		#create or reaply alias
-		$new_aliases[]=array("name"=> 'pfBlockerWL',
-						  	 "url"=> $web_local.'?pfb=white',
-						  	 "updatefreq"=> "7",
-						  	 "address"=>"",
-						  	 "descr"=> "pfBlocker White list",
-						  	 "type"=> "urltable",
-						  	 "detail"=> "DO NOT EDIT THIS ALIAS");
-		#force alias file update
-		if (file_exists($pfblockerWL))
-			file_put_contents($pfblockerWL,$whitelist, LOCK_EX);
-		}
-	else{
-		#remove previous aliastable if exist
-		if (file_exists($pfblockerWL))
-			unlink($pfblockerWL);
-	}
-	
-	if (is_array($aliases))
-	  foreach($aliases as $cbalias){
-		if (! preg_match("/pfBlocker.*list/",$cbalias['descr']))
-			$new_aliases[]=	$cbalias;
-	}
-	$config['aliases']['alias']=$new_aliases;
-	
-	# check pfBlocker filter options
-	$ifaces = $pfblocker_config['inbound_interface'];
-	if ($ifaces != "")
-      foreach (explode(",", $ifaces) as $i => $iface) {
-    	if ($whitelist != "" && $iface != ""){
-			${$iface}[0]=array("id" => "",
-					"type"=>"pass",
-					"tag"=>	"",
-					"interface" => $iface,
-					"tagged"=> "",
-					"max"=>	 "",
-					"max-src-nodes"=>"",
-					"max-src-conn"=> "",
-					"max-src-states"=>"",
-					"statetimeout"=>"",
-					"statetype"=>"keep state",
-					"os"=> "",
-					"source"=>array("address"=>"pfBlockerWL"),
-    				"destination"=>array("any"=>""),
-    				"descr"=>"pfBlocker Whitelist rule");
-
-			if ($pfblocker_config['enable_log'])
-				${$iface}[0]["log"]="";
-    	}
-		if ($ips_in != "" && $iface != ""){
-			$action=($pfblocker_config['inbound_deny_action']!= ""?$pfblocker_config['inbound_deny_action']:"block");
-			${$iface}[1]=array(	"id" => "",
-							"type"=>$action,
-							"tag"=>	"",
-							"interface" => $iface,
-							"tagged"=> "",
-							"max"=>	 "",
-							"max-src-nodes"=>"",
-							"max-src-conn"=> "",
-							"max-src-states"=>"",
-							"statetimeout"=>"",
-						    "statetype"=>"keep state",
-							"os"=> "",
-							"source"=>array("address"=>"pfBlockerInbound"),
-    						"destination"=>array("any"=>""),
-    						"descr"=>"pfBlocker Inbound deny rule");
-
-			if ($pfblocker_config['enable_log'])
-				${$iface}[1]["log"]="";
-		}
-	}
-	$ifaces = $pfblocker_config['outbound_interface'];
-	if ($ifaces != "")
-      foreach (explode(",", $ifaces) as $i => $iface) {
-    	if ($whitelist != "" && $iface != ""){
-			${$iface}[2]=array(	"id" => "",
-							"type"=>"pass",
-							"tag"=>	"",
-							"interface" => $iface,
-							"tagged"=> "",
-							"max"=>	 "",
-							"max-src-nodes"=>"",
-							"max-src-conn"=> "",
-							"max-src-states"=>"",
-							"statetimeout"=>"",
-							"statetype"=>"keep state",
-							"os"=> "",
-    						"source"=>array("any"=>""),
-    						"destination"=>array("address"=>"pfBlockerWL"),
-    						"descr"=>"pfBlocker Whitelist rule");
-		if ($pfblocker_config['enable_log'])
-				${$iface}[2]["log"]="";			
-    	}
-		if ($ips_out != "" && $iface != ""){
-			$action=($pfblocker_config['outbound_deny_action']!= ""?$pfblocker_config['outbound_deny_action']:"block");
-			${$iface}[3]= array("id" => "",
-							"type"=>$action,
-							"tag"=>	"",
-							"interface" => $iface,
-							"tagged"=> "",
-							"max"=>	 "",
-							"max-src-nodes"=>"",
-							"max-src-conn"=> "",
-							"max-src-states"=>"",
-							"statetimeout"=>"",
-							"statetype"=>"keep state",
-							"os"=> "",
-    						"source"=>array("any"=>""),
-    						"destination"=>array("address"=>"pfBlockerOutbound"),
-    						"descr"=>"pfBlocker Outbound deny rule");
-			if ($pfblocker_config['enable_log'])
-				${$iface}[3]["log"]="";
+	$permit_inbound=array();
+	$permit_outbound=array();
+	$deny_inbound=array();
+	$deny_outbound=array();
+	$aliases_list=array();
+			#check if pfblocker is enabled or not.
+	$deny_action_inbound=($pfblocker_config['inbound_deny_action']!= ""?$pfblocker_config['inbound_deny_action']:"block");
+	$deny_action_outbound=($pfblocker_config['outbound_deny_action']!= ""?$pfblocker_config['outbound_deny_action']:"reject");
+	$base_rule= array(	"id" => "",
+						"tag"=>	"",
+						"tagged"=> "",
+						"max"=>	 "",
+						"max-src-nodes"=>"",
+						"max-src-conn"=> "",
+						"max-src-states"=>"",
+						"statetimeout"=>"",
+						"statetype"=>"keep state",
+						"os"=> "");
+#############################################
+#          Assign Countries 				#
+#############################################
+	foreach ($continents as $continent => $pfb_alias){
+	  ${$continent}="";
+	  if (is_array($config['installedpackages']['pfblocker'.strtolower(preg_replace('/ /','',$continent))]['config'])){
+		$continent_config=$config['installedpackages']['pfblocker'.strtolower(preg_replace('/ /','',$continent))]['config'][0];
+		if ($continent_config['action'] != 'Disabled' && $continent_config['action'] != '' && $pfblocker_enable == "on")
+			foreach (explode(",", $continent_config['countries']) as $iso){
+				#var_dump ($iso);
+				if ($iso <> "" && file_exists($pfbdir.'/'.$iso.'.txt'))
+						${$continent} .= file_get_contents($pfbdir.'/'.$iso.'.txt');
+		 		}
+		if($continent_config['countries'] != "" && $pfblocker_enable == "on"){
+			#write alias file
+			file_put_contents($pfb_alias_dir.'/'.$pfb_alias.'.txt',${$continent},LOCK_EX);
+			#Create alias config
+			$new_aliases[]=array("name"=> $pfb_alias,
+					  		 	 "url"=> $web_local.'?pfb='.$pfb_alias,
+					  		 	 "updatefreq"=> "32",
+					  		 	 "address"=>"",
+					  		 	 "descr"=> "pfBlocker country list",
+					  		 	 "type"=> "urltable",
+					  		 	 "detail"=> "DO NOT EDIT THIS ALIAS");
+			#force alias file update
+			if (file_exists($pfb_alias_dir.'/'.$pfb_alias.'.txt'))
+				file_put_contents($pfb_alias_dir.'/'.$pfb_alias.'.txt',${$continent}, LOCK_EX);
+			#Create rule if action permits
+			  switch($continent_config['action']){
+				case "Deny_Outbound":
+						$rule = $base_rule;
+						$rule["type"] = $deny_action_outbound;
+						$rule["descr"]= "pfBlocker Outbound rule";
+						$rule["source"]=array("any"=>"");
+						$rule["destination"]= array("address"=> $pfb_alias);
+						if ($pfblocker_config['enable_log'])
+								$rule["log"]="";
+						$deny_outbound[]=$rule;					
+						break;
+				case "Deny_Inbound":
+						$rule = $base_rule;
+						$rule["type"] = $deny_action_inbound;
+						$rule["descr"]= "pfBlocker Inbound rule";
+						$rule["source"]= array("address"=> $pfb_alias);
+						$rule["destination"]=array("any"=>"");
+						if ($pfblocker_config['enable_log'])
+								$rule["log"]="";
+						$deny_inbound[]=$rule;					
+						break;
+				case "Permit_Outbound":
+						$rule = $base_rule;
+						$rule["type"] = "pass";
+						$rule["descr"]= "pfBlocker Outbound rule";
+						$rule["source"]=array("any"=>"");
+						$rule["destination"]= array("address"=> $pfb_alias);
+						if ($pfblocker_config['enable_log'])
+								$rule["log"]="";
+						$permit_outbound[]=$rule;					
+						break;
+				case "Permit_Inbound":
+						$rule = $base_rule;
+						$rule["type"] = "pass";
+						$rule["descr"]= "pfBlocker Inbound rule";
+						$rule["source"]= array("address"=> $pfb_alias);
+						$rule["destination"]=array("any"=>"");
+						if ($pfblocker_config['enable_log'])
+								$rule["log"]="";
+						$permit_inbound[]=$rule;					
+						break;
+				}
 			
 		}
-
 	}
-	$last_iface="";
-	$rules=$config['filter']['rule'];
-	foreach ($rules as $rule){
-		if ($rule['interface'] <> $last_iface){
-			$last_iface = $rule['interface'];
-			#apply pfblocker rules if enabled
-			if ($config['installedpackages']['pfblocker']['config'][0]['enable_cb'] == "on" && is_array(${$rule['interface']}))
-				foreach (${$rule['interface']} as $cb_rules)
-					$new_rules[]=$cb_rules;
-		}
-		if (!preg_match("/pfBlocker.*rule/",$rule['descr']))
-			$new_rules[]=$rule;	
+	#mark pfctl aliastable for cleanup
+	if (!in_array($pfb_alias, $aliases_list)) 
+				$aliases_list[]=$pfb_alias;
 	}
-	$config['filter']['rule']=$new_rules;
-
-	#check aliastable size
-	preg_match("/(\d+)/",exec("/usr/bin/wc -l /usr/local/pkg/pfb_in.txt"),$matches);
-	$count_ips_in = $matches[1];
-	preg_match("/(\d+)/",exec("/usr/bin/wc -l /usr/local/pkg/pfb_out.txt"),$matches);
-	$count_ips_out = $matches[1];
-	preg_match("/(\d+)/",exec("/usr/bin/wc -l /usr/local/pkg/pfb_w.txt"),$matches);
-	$count_ips_w = $matches[1];
 	
-	#get higher value
-	$max=$count_ips_in;
-	if ($max < $count_ips_out)
-		$max = $count_ips_out;
-	if ($max < $count_ips_w)
-		$max = $count_ips_w;
-	$sum=($count_ips_in + $count_ips_out + $count_ips_w);
-	#check table size client option
-	$table_limit =($config['system']['maximumtableentries']!= ""?$config['system']['maximumtableentries']:"100000");
+	#############################################
+	#          Assign lists 					#
+	#############################################
+	#print "<pre>";
+	if($config['installedpackages']['pfblockerlists']['config'] != "")
+		foreach($config['installedpackages']['pfblockerlists']['config'] as $list){
+		 $alias="pfBlocker".preg_replace("/\W/","",$list['aliasname']);
+		 #print $list['aliasname'].$list['action']." ".$alias." ".$row['url']."<br>";
+			if ($alias != "pfBlocker" && $list['action'] != "" && $list['action'] != 'Disabled' && $pfblocker_enable == "on"){
+			  #remove empty lists files if any
+			  if (is_array($list['row']))
+			  foreach ($list['row'] as $row){
+			  	#print $list['aliasname'].$list['action'].$list['cron']." ".$alias." ".$row['url']."$update_local<br>";
+				if ($row['url'] != ""){
+					$md5_url = md5($row['url']);
+					if (file_exists($pfbdir."/".$md5_url.".txt")){ 
+						${$alias}.= file_get_contents($pfbdir.'/'.$md5_url.'.txt');
+						}
+					else{
+						if ($row['format'] == "gz")
+							$url_list= gzfile($row['url']);
+						else
+							$url_list= file($row['url']);
+						#extract range lists
+						$new_file="";
+						if (is_array($url_list))
+						  foreach ($url_list as $line){
+							# CIDR format 192.168.0.0/16
+							if (preg_match("/(\d+\.\d+\.\d+\.\d+\/\d+)/",$line,$matches)){
+							${$alias}.= $matches[1]."\n";
+							$new_file.= $matches[1]."\n";
+							}
+							# Network range 192.168.0.0-192.168.0.254
+							if (preg_match("/(\d+\.\d+\.\d+\.\d+)-(\d+\.\d+\.\d+\.\d+)/",$line,$matches)){
+								$cidr= pfblocker_Range2CIDR($matches[1],$matches[2]);
+								if ($cidr != ""){
+									${$alias}.= $cidr."\n";
+									$new_file.= $cidr."\n";
+								}
+							}
+						}
+						if ($new_file != "")
+							file_put_contents($pfbdir.'/'.$md5_url.'.txt',$new_file, LOCK_EX);
+						}
+					}
+				}
+				#check custom network list
+				if (pfb_text_area_decode($list['custom']) != "")
+					${$alias}.=pfb_text_area_decode($list['custom'])."\n";
+				#save alias file if not empty
+				if (${$alias} == ""){
+					if (file_exists($pfb_alias_dir.'/'.$alias.'.txt'))
+			  			unlink($pfb_alias_dir.'/'.$alias.'.txt');
+					}
+				else{
+					file_put_contents($pfb_alias_dir.'/'.$alias.'.txt',${$alias}, LOCK_EX);
+					#create alias
+					$new_aliases[]=array("name"=> $alias,
+					  		 	 "url"=> $web_local.'?pfb='.$alias,
+					  		 	 "updatefreq"=> "32",
+					  		 	 "address"=>"",
+					  		 	 "descr"=> "pfBlocker user list",
+					  		 	 "type"=> "urltable",
+					  		 	 "detail"=> "DO NOT EDIT THIS ALIAS");
+					#Create rule if action permits
+					switch($list['action']){
+						case "Deny_Outbound":
+							$rule = $base_rule;
+							$rule["type"] = $deny_action_outbound;
+							$rule["descr"]= "pfBlocker Outbound rule";
+							$rule["source"]=array("any"=>"");
+							$rule["destination"]= array("address"=> $alias);
+							if ($pfblocker_config['enable_log'])
+								$rule["log"]="";
+							$deny_outbound[]=$rule;					
+							break;
+						case "Deny_Inbound":
+							$rule = $base_rule;
+							$rule["type"] = $deny_action_inbound;
+							$rule["descr"]= "pfBlocker Inbound rule";
+							$rule["source"]= array("address"=> $alias);
+							$rule["destination"]=array("any"=>"");
+							if ($pfblocker_config['enable_log'])
+								$rule["log"]="";
+							$deny_inbound[]=$rule;					
+							break;
+						case "Permit_Outbound":
+							$rule = $base_rule;
+							$rule["type"] = "pass";
+							$rule["descr"]= "pfBlocker Outbound rule";
+							$rule["source"]=array("any"=>"");
+							$rule["destination"]= array("address"=> $alias);
+							if ($pfblocker_config['enable_log'])
+								$rule["log"]="";
+							$permit_outbound[]=$rule;					
+							break;
+						case "Permit_Inbound":
+							$rule = $base_rule;
+							$rule["type"] = "pass";
+							$rule["descr"]= "pfBlocker Inbound rule";
+							$rule["source"]= array("address"=> $alias);
+							$rule["destination"]=array("any"=>"");
+							if ($pfblocker_config['enable_log'])
+									$rule["log"]="";
+							$permit_inbound[]=$rule;					
+							break;
+						}
+				}
+			#mark pfctl aliastable for cleanup
+			if (!in_array($alias, $aliases_list)) 
+				$aliases_list[]=$alias;
+			}
+		else{
+			#unlink previous pfblocker alias list if any
+				if (file_exists($pfb_alias_dir.'/'.$alias.'.txt'))
+					unlink($pfb_alias_dir.'/'.$alias.'.txt');
+			}
+		}
+		#update pfsense alias table
+		$aliases=$config['aliases']['alias'];
+		foreach($aliases as $cbalias){
+			if (preg_match("/pfBlocker/",$cbalias['name'])){
+				#mark pfctl aliastable for cleaning
+				if (!in_array($cbalias['name'], $aliases_list)) 
+						$aliases_list[]=$cbalias['name']; #mark aliastable for cleaning
+				#remove previous aliastable file if exist
+				$aliastablefile="/var/db/aliastables/".$cbalias['name'].".txt";
+				if (file_exists($aliastablefile))
+					unlink($aliastablefile);
+			}
+			else{
+				$new_aliases[]=	$cbalias;
+				if (file_exists($pfb_alias_dir.'/'.$alias.'.txt') && $message ==""){
+				preg_match("/(\d+)/",exec("/usr/bin/wc -l ".$pfb_alias_dir.'/'.$alias.'.txt'),$matches);
+				}
+				if (($matches[1] * 2.1)>= $table_limit )
+					#alias table too large
+    				$message= $alias .' alias table is too large. Reduce networks in list or increase "Firewall Maximum Table Entries" value to at least '. (int)($matches[1] * 2.1) .' in "system - advanced - Firewall/NAT".';
+			}
+		}
+		#apply new alias table to xml
+		if ($message == "")
+			$config['aliases']['alias']=$new_aliases;
+		#exit;	
+	#############################################
+	#          Assign rules 					#
+	#############################################
+	#print "<pre>";
+	#var_dump($permit_inbound);
+	#var_dump($permit_outbound);
+	#var_dump($deny_inbound);
+	#var_dump($deny_outbound);			
+	#var_dump($pfblocker_config['inbound_interface']);
+	#print count($deny_inbound) .count($deny_inbound);
+	
+	# Inbound filter options
+	$inbound_interface = $pfblocker_config['inbound_interface'];
+	if (count($deny_inbound) > 0 || count($permit_inbound) > 0){
+		if($inbound_interface == "")
+			$message="Unable to apply rules.Inbound Interface option not configured.";
+		 if ($inbound_interface == "lo0")
+			$message="Floating rules are not implemented in pfBlocker yet, choose Inbound Interface other than loopback or change action to Alias only.";
+		}
+		
+	# Outbound filter options
+	$outbound_interface = $pfblocker_config['outbound_interface'];
+	if (count($deny_outbound) > 0 || count($permit_outbound) > 0){
+		if($outbound_interface == "")
+			$message="Unable to apply rules.Outbound Interface option not configured.";
+		 if ($outbound_interface == "lo0")
+			$message="Floating rules are not implemented in pfBlocker yet, choose Outbound Interface other than loopback or change action to Alias only.";
+		}
+		
+	if ($message == "")
+		{
+		$last_iface="";
+		$rules=$config['filter']['rule'];
+		$new_rules=array();
+		foreach ($rules as $rule){
+			if ($rule['interface'] <> $last_iface){
+				$last_iface = $rule['interface'];
+				#apply pfblocker rules if enabled
+				
+				#Inbound
+				if (preg_match("/$last_iface/",$inbound_interface)){
+					#permit rules
+					if (is_array($permit_inbound))
+						foreach ($permit_inbound as $cb_rules){
+							$cb_rules['interface']=$rule['interface'];
+							$new_rules[]=$cb_rules;	
+						}
+					#deny rules
+					if (is_array($deny_inbound))
+						foreach ($deny_inbound as $cb_rules){
+							$cb_rules['interface']=$rule['interface'];
+							$new_rules[]=$cb_rules;	
+						}
+				}
+				#Outbound
+				if (preg_match("/$last_iface/",$outbound_interface)){
+					#permit rules
+					if (is_array($permit_outbound))
+						foreach ($permit_outbound as $cb_rules){
+							$cb_rules['interface']=$rule['interface'];
+							$new_rules[]=$cb_rules;	
+						}
+					#deny rules
+					if (is_array($deny_outbound))
+						foreach ($deny_outbound as $cb_rules){
+							$cb_rules['interface']=$rule['interface'];
+							$new_rules[]=$cb_rules;	
+						}
+				}
+			}
+		  #include all rules that is not from pfBlocker
+		  if (!preg_match("/pfBlocker.*rule/",$rule['descr']) && $rule['interface'] != "")
+					$new_rules[]=$rule;
+		}
+		$config['filter']['rule']=$new_rules;
+		}	
 
-	#check for possible table size erros
-	$error_message="";
-    if ($count_ips_in >= $table_limit )
-    	$message='pfBlockerInbound alias table is too large. Reduce Inbound list or increase "Firewall Maximum Table Entries" value to at least '.($sum +1000).' in "system - advanced - Firewall/NAT".';
-	if ($count_ips_out >= $table_limit )
-    	$message='pfBlockerOutbound alias table is too large. Reduce Outbound List or  increase "Firewall Maximum Table Entries" value to at least '.($sum +1000).' in "system - advanced - Firewall/NAT".';
-	if ($count_ips_w >= $table_limit )
-    	$message='pfBlockerWL alias table is too large. Reduce whitelist or increase "Firewall Maximum Table Entries" value to at least '.($sum +1000).' in "system - advanced - Firewall/NAT ".';
-    	
 	if ($message == ""){
-		#save and apply all changes*/
+		#save and apply all changes
 
+		# to be removed in final version
+		$aliases_list[]="pfBlockerInbound"; #remove previous version lists
+		$aliases_list[]="pfBlockerOutbound";#remove previous version lists
+		$aliases_list[]="pfBlockerWL";		#remove previous version lists
+		#exit;
 		#update pfctrl tables
-		$tables = array ('pfBlockerOutbound' => 'pfb_out.txt',
-				 'pfBlockerInbound'  => 'pfb_in.txt',
-				 'pfBlockerWL'  => 'pfb_w.txt');
-		foreach ($tables as $table => $pfb_file)
-			exec("/sbin/pfctl -t " . escapeshellarg($table) . " -T replace -f /usr/local/pkg/" . escapeshellarg($pfb_file) . " 2>&1", $result_pfb);
+		foreach ($aliases_list as $table)
+			exec("/sbin/pfctl -t " . escapeshellarg($table) . " -T kill 2>&1", $result_pfb);
 
 		#write config
    		write_config();
@@ -485,6 +536,7 @@ function pfblocker_do_xmlrpc_sync($sync_to_ip, $password) {
 	/* xml will hold the sections to sync */
 	$xml = array();
 	$xml['pfblocker'] = $config['installedpackages']['pfblocker'];
+	$xml['pfblockerlists'] = $config['installedpackages']['pfblockerlists'];
 	$xml['pfblockertopspammers'] = $config['installedpackages']['pfblockertopspammers'];
 	$xml['pfblockerafrica'] = $config['installedpackages']['pfblockerafrica'];
 	$xml['pfblockerantartica'] = $config['installedpackages']['pfblockerantartica'];

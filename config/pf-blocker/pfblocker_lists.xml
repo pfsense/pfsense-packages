@@ -2,17 +2,17 @@
 <!DOCTYPE packagegui SYSTEM "./schema/packages.dtd">
 <?xml-stylesheet type="text/xsl" href="./xsl/package.xsl"?>
 <packagegui>
-	<copyright>
-	<![CDATA[
-/* $Id$ */
+        <copyright>
+        <![CDATA[
 /* ========================================================================== */
 /*
-    pfblocker_topspammers.xml
-    part of the pfblocker for pfSense
+    pfblocker_lists.xml
+    part of pfSense (http://www.pfSense.com)
+    Copyright (C) 2010 Scott Ullrich <sullrich@gmail.com>
     Copyright (C) 2011 Marcello Coutinho
-
-    All rights reserved.            
-			                                                                  */
+    
+    All rights reserved.                                                      
+*/
 /* ========================================================================== */
 /*
     Redistribution and use in source and binary forms, with or without
@@ -37,20 +37,20 @@
     POSSIBILITY OF SUCH DAMAGE.
                                                                               */
 /* ========================================================================== */
-	]]>
-	</copyright>
-	<description>Describe your package here</description>
-	<requirements>Describe your package requirements here</requirements>
-	<faq>Currently there are no FAQ items provided.</faq>
-	<name>pfblockertopspammers</name>
+        ]]>
+        </copyright>
+    <description>Describe your package here</description>
+    <requirements>Describe your package requirements here</requirements>
+    <faq>Currently there are no FAQ items provided.</faq>
+	<name>pfblockerlists</name>
 	<version>1.0</version>
 	<title>Firewall: pfBlocker</title>
 	<include_file>/usr/local/pkg/pfblocker.inc</include_file>
 	<menu>
-		<name>pfBlocker</name>
-		<tooltiptext>Configure pfblocker</tooltiptext>
+		<name>pfBlocker </name>
+		<tooltiptext></tooltiptext>
 		<section>Firewall</section>
-		<url>pkg_edit.php?xml=pfblocker.xml&amp;id=0</url>
+		<configfile>pfblocker_lists.xml</configfile>
 	</menu>
 <tabs>
 		<tab>
@@ -60,12 +60,14 @@
 		<tab>
 			<text>Lists</text>
 			<url>/pkg.php?xml=pfblocker_lists.xml</url>
+			<active/>
 		</tab>
+
 		<tab>
 			<text>Top Spammers</text>
 			<url>/pkg_edit.php?xml=pfblocker_topspammers.xml&amp;id=0</url>
-			<active/>
 		</tab>
+	
 		<tab>
 			<text>Africa</text>
 			<url>/pkg_edit.php?xml=pfblocker_Africa.xml&amp;id=0</url>
@@ -97,45 +99,90 @@
 			<url>/pkg_edit.php?xml=pfblocker_sync.xml&amp;id=0</url>
 		</tab>
 </tabs>
+	<adddeleteeditpagefields>
+		<columnitem>
+			<fielddescr>Alias</fielddescr>
+			<fieldname>aliasname</fieldname>
+		</columnitem>	
+		<columnitem>
+			<fielddescr>Description</fielddescr>
+			<fieldname>description</fieldname>
+		</columnitem>	
+
+		<columnitem>
+			<fielddescr>Action</fielddescr>
+			<fieldname>action</fieldname>
+		</columnitem>
+				<columnitem>
+			<fielddescr>Update Frequency</fielddescr>
+			<fieldname>cron</fieldname>
+		</columnitem>
+	</adddeleteeditpagefields>
 	<fields>
 		<field>
-			<name>Countries Shortcut</name>
+			<name>Network ranges / CIDR lists</name>
 			<type>listtopic</type>
-		</field>
+	</field>
+			<field>
+			<fielddescr>Alias Name</fielddescr>
+			<fieldname>aliasname</fieldname>
+			<description><![CDATA[Enter lists Alias Names.<br>	
+								  Example: Badguys<br>
+								  Do not include pfBlocker name, it's done by package.<br>
+								  <strong>International, special or space caracters will be ignored in pfsense alias name.</strong><br>]]></description>
+			<type>input</type>
+			<size>20</size>
+		</field>	
+			<field>
+			<fielddescr>List Description</fielddescr>
+			<fieldname>description</fieldname>
+			<type>input</type>
+			<size>90</size>
+		</field>	
 		<field>
-			<fielddescr>Top Spammers</fielddescr>
-			<fieldname>countries</fieldname>
-			<description>
-			<![CDATA[Select top spammers countries you want to take an action.<br>
-					<strong>Use CTRL + CLICK to unselect countries</strong>]]>
-			</description>
+			<fielddescr><![CDATA[Lists]]></fielddescr>
+			<fieldname>none</fieldname>
+			<description><![CDATA['Format' - Choose the file format that url will retrieve or local file format.<br>
+								  'Url or local file' - Add direct link to list (Example: <a target=_new href='http://list.iblocklist.com/?list=bt_ads&fileformat=p2p&archiveformat=gz'>Ads</a>,
+																	<a target=_new href='http://list.iblocklist.com/?list=bt_spyware&fileformat=p2p&archiveformat=gz'>Spyware</a>,
+																	<a target=_new href='http://list.iblocklist.com/?list=bt_proxy&fileformat=p2p&archiveformat=gz'>Proxies</a> )<br> 
+									<br><strong>Note: </strong><br>
+									Compressed lists must be in gz format.<br>
+									Downloaded or local file must have only one network per line and could follows PeerBlock syntax	or this below:<br>
+									Network ranges: <strong>172.16.1.0-172.16.1.255</strong><br>
+									IP Address: <strong>172.16.1.10</strong><br>
+									CIDR: <strong>172.16.1.0/24</strong>
+								   ]]></description>
+			<type>rowhelper</type>
+			<rowhelper>
+			<rowhelperfield>
+			<fielddescr>Format</fielddescr>
+			<fieldname>format</fieldname>
 	    	<type>select</type>
  				<options>
-				<option><name>Korea</name><value>KR</value></option>
-				<option><name>China</name><value>CN</value></option>
-				<option><name>India</name><value>IN</value></option>
-				<option><name>Russia</name><value>RU</value></option>
-				<option><name>Turkey</name><value>TR</value></option>
-				<option><name>Vietnam</name><value>VN</value></option>
-				<option><name>Ukraine</name><value>UA</value></option>
-				<option><name>Brazil</name><value>BR</value></option>
-				<option><name>Venezuela </name><value>VE</value></option>
-				<option><name>Pakistan</name><value>PK</value></option>
+				<option><name>gz</name><value>gz</value></option>
+				<option><name>txt</name><value>txt</value></option>
 				</options>
-				<size>10</size>
-				<multiple/>
+			</rowhelperfield>	
+			<rowhelperfield>
+				<fielddescr>Url or localfile</fielddescr>
+				<fieldname>url</fieldname>
+				<type>input</type>
+				<size>75</size>
+			</rowhelperfield>
+			</rowhelper>
 		</field>
-				<field>
-		<fielddescr>Action</fielddescr>
-		<fieldname>action</fieldname>
+			<field>
+			<fielddescr>List Action</fielddescr>
 		<description><![CDATA[Default:<strong>Deny Inbound</strong><br>
-						Select action for countries you have selected.<br><br>
+						Select action for network on lists you have selected.<br><br>
 						<strong>Note: </strong><br>'Deny Inbound' - Will deny access from selected countries to your network.<br>
 								'Deny Outbound' - Will deny access from your users to countries you selected to block<br>
 								'Permit Inbound' - Will allow access from selected countries to your network.<br>
 								'Permit Outbound' - Will allow access from your users to countries you selected to block<br>
-								'Alias Only' - Will create alias <strong>pfBlockerTopSpammers</strong> with selected countries to help custom rule assignments.
+								'Alias Only' - Will create an alias with selected countries to help custom rule assignments.<br>
 								'Disabled' - Will just keep selection and do nothing to selected countries.<br>]]></description>
+			<fieldname>action</fieldname>
 	    	<type>select</type>
  				<options>
 				<option><name>Deny Inbound</name><value>Deny_Inbound</value></option>
@@ -146,7 +193,35 @@
 				<option><name>Disabled</name><value>Disabled</value></option>
 				</options>
 			</field>
-	</fields>
+			<field>
+			<fielddescr>Update frequency</fielddescr>
+			<fieldname>cron</fieldname>
+			<description><![CDATA[Default:<strong>Never</strong><br>
+							Select how often pfsense will download List files]]></description>
+	    	<type>select</type>
+ 				<options>
+ 				<option><name>Never</name><value>Never</value></option>
+				<option><name>Every 4 Hours</name><value>04hours</value></option>
+				<option><name>Every 12 Hours</name><value>12hours</value></option>
+				<option><name>Once a day</name><value>Day</value></option>
+				<option><name>Once a week</name><value>Week</value></option>
+				</options>
+		</field>
+			<field>
+			<name>Custom list</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>CIDR</fielddescr>
+			<fieldname>custom</fieldname>
+			<description><![CDATA[Enter networks you want to include in this alias. One network per line in CIDR format.<br>	
+								  Example: 192.168.1.0/24]]></description>
+			<type>textarea</type>
+			<cols>50</cols>
+			<rows>10</rows>
+			<encoding>base64</encoding>
+		</field>
+		</fields>
 	<custom_php_install_command>
 		pfblocker_php_install_command();
 	</custom_php_install_command>
@@ -158,5 +233,5 @@
 	</custom_php_validation_command>	
 	<custom_php_resync_config_command>
 		sync_package_pfblocker();
-	</custom_php_resync_config_command>
+	</custom_php_resync_config_command>	
 </packagegui>

@@ -61,12 +61,15 @@
 	<package>
 		<name>pfBlocker-dev</name>
 		<website/>
-		<descr>Block countries and IP ranges. Replaces Countryblock and IPblocklist</descr>
+		<descr><![CDATA[Introduce Enhanced Aliastable Feature to pfsense.<br>
+					   Assign many IP urls lists from sites like I-blocklist to a single alias and then choose rule action to take.<br>
+					   This package also Block countries and IP ranges.<br>
+					   pfBlocker replaces Countryblock and IPblocklist.]]></descr>
 		<category>Firewall</category>
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,25732.0.html</pkginfolink>
 		<config_file>http://pfsense.org/packages/config/pf-blocker/pfblocker.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/8/All/</depends_on_package_base_url>
-		<version>0.1.3</version>
+		<version>0.1.4</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<maintainer>tom@tomschaefer.org marcellocoutinho@gmail.com</maintainer>

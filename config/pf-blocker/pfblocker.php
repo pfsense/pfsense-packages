@@ -1,29 +1,27 @@
 <?php 
 function get_networks($pfb){
-	if ($pfb==1)
-		$return= file_get_contents('/usr/local/pkg/pfb_in.txt');
-	if ($pfb==2)
-		$return= file_get_contents('/usr/local/pkg/pfb_out.txt');
-	if ($pfb==3)
-		$return=file_get_contents('/usr/local/pkg/pfb_w.txt');
-		#print "<pre>";
-		print $return;
+	$file='/usr/local/pkg/pfblocker_aliases/'.$pfb.'.txt';
+	if ($file)
+		$return= file_get_contents($file);
+	print $return;
 }
 
 # to be uncomented when this packages gets stable state
 #if($_SERVER['REMOTE_ADDR']== '127.0.0.1'){
-switch ($_REQUEST['pfb']){
-	case "in":
-		get_networks(1);
-	break;	
-	case "out":
-		get_networks(2);
-	break;
-	case "white":
-		get_networks(3);
-	break;
-}
+if (preg_match("/(\w+)/",$_REQUEST['pfb'],$matches))
+	get_networks($matches[1]);
 #}
+
+if ($argv[1]=='cron' && preg_match("/\d+/",$argv[2],$matches)){
+        #require_once("/etc/inc/util.inc");
+        #require_once("/etc/inc/functions.inc");
+        #require_once("/etc/inc/etpkg-utils.inc");
+        #require_once("/etc/inc/globals.inc");
+        #require_once("/etc/inc/filter.inc");
+        include "/usr/local/pkg/pfblocker.inc";
+        print "id".$argv[2];
+        sync_package_pfblocker($argv[2]);
+        }
 	
 function pfblocker_get_countries(){
 $files= array (	"Africa" => "/usr/local/pkg/Africa_cidr.txt",
@@ -124,6 +122,10 @@ $xml= <<<EOF
 			<url>/pkg_edit.php?xml=pfblocker.xml&amp;id=0</url>
 		</tab>
 		<tab>
+			<text>Lists</text>
+			<url>/pkg.php?xml=pfblocker_lists.xml</url>
+		</tab>
+		<tab>
 			<text>Top Spammers</text>
 			<url>/pkg_edit.php?xml=pfblocker_topspammers.xml&amp;id=0</url>
 			{$active['top']}
@@ -166,22 +168,45 @@ $xml= <<<EOF
 </tabs>
 	<fields>
 	<field>
-			<name>Continent {$cont}</name>
-			<type>listtopic</type>
+		<name>Continent {$cont}</name>
+		<type>listtopic</type>
+	</field>
+	<field>	
+		<fielddescr>Countries</fielddescr>
+		<fieldname>countries</fieldname>
+		<description>
+		<![CDATA[Select Countries you want to take an action.<br>
+				<strong>Use CTRL + CLICK to unselect countries</strong>]]>
+		</description>
+		<type>select</type>
+ 			<options>
+			{$options}
+ 			</options>
+			<size>{$total}</size>
+			<multiple/>
 		</field>
 		<field>
-			<fielddescr>Countries</fielddescr>
-			<fieldname>countries</fieldname>
-			<description>
-			<![CDATA[Select Countries you want to block.]]>
-			</description>
+		<fielddescr>Action</fielddescr>
+		<fieldname>action</fieldname>
+		<description><![CDATA[Default:<strong>Disabled</strong><br>
+						Select action for countries you have selected in {$cont}<br><br>
+						<strong>Note: </strong><br>'Deny Inbound' - Will deny access from selected countries to your network.<br>
+								'Deny Outbound' - Will deny access from your users to countries you selected to block<br>
+								'Permit Inbound' - Will allow access from selected countries to your network.<br>
+								'Permit Outbound' - Will allow access from your users to countries you selected to block<br>
+								'Alias Only' - Will create alias <strong>{$cont}</strong> with selected countries to help custom rule assignments.<br>
+								'Disabled' - Will just keep selection and do nothing to selected countries.<br>]]></description>
 	    	<type>select</type>
  				<options>
-				{$options}
- 				</options>
-				<size>{$total}</size>
-				<multiple/>
-		</field>	</fields>
+				<option><name>Disabled</name><value>Disabled</value></option>
+ 				<option><name>Deny Inbound</name><value>Deny_Inbound</value></option>
+				<option><name>Deny Outbound</name><value>Deny_Outbound</value></option>
+				<option><name>Permit Inbound</name><value>Permit_Inbound</value></option>
+				<option><name>Permit Outbound</name><value>Permit_Outbound</value></option>
+				<option><name>Alias only</name><value>Alias_only</value></option>			
+				</options>
+			</field>
+		</fields>
 	<custom_php_install_command>
 		pfblocker_php_install_command();
 	</custom_php_install_command>
