@@ -1982,6 +1982,7 @@ preprocessor http_inspect_server: server default \
                         directory no \
                         iis_backslash no \
                         u_encode yes \
+			extended_response_inspection \
 			inspect_gzip \
 			normalize_utf \
 			unlimited_decompress \
