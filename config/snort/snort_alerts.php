@@ -85,12 +85,12 @@ if ($_POST['save'])
 
 }
 
-if ($_GET['clear'])
+if ($_GET['action'] == "clear" || $_POST['clear'])
 {
 	if(file_exists('/var/log/snort/alert'))
 	{
 		conf_mount_rw();
-		@file_put_content("/var/log/snort/alert", "");
+		@file_put_contents("/var/log/snort/alert", "");
 		post_delete_logs();
 		mwexec('/usr/sbin/chown snort:snort /var/log/snort/*', true);
 		mwexec('/bin/chmod 660 /var/log/snort/*', true);
