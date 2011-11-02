@@ -42,7 +42,7 @@
 		<maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
 		<depends_on_package>squid-2.7.9_1.tbz</depends_on_package>
-		<depends_on_package_pbi>squid-2.7.9_1-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>squid-2.7.9_1-amd64.pbi squid_radius_auth-1.10-amd64.pbi libwww-5.4.0_4-amd64.pbi</depends_on_package_pbi>		
 		<depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
 		<build_port_path>/usr/ports/www/squid</build_port_path>
@@ -62,7 +62,7 @@
 		<required_version>2.0</required_version>
 		<maintainer>fernando@netfilter.com.br seth.mos@xs4all.nl mfuchs77@googlemail.com jimp@pfsense.org</maintainer>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>squid-2.7.9_1-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>squid-2.7.9_1-amd64.pbi squid_radius_auth-1.10-amd64.pbi libwww-5.4.0_4-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>squid-2.7.9_1.tbz</depends_on_package>
 		<depends_on_package>squid_radius_auth-1.10.tbz</depends_on_package>
 		<depends_on_package>libwww-5.4.0_4.tbz</depends_on_package>
@@ -83,6 +83,7 @@
 		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
+		<depends_on_package_pbi>varnish-3.0.1_2-amd64.pbi gcc-4.2.5.20090325_5-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>varnish-2.1.5.tbz</depends_on_package>
 		<depends_on_package>gcc-4.2.5.20090325_5.tbz</depends_on_package>
 		<build_port_path>/usr/ports/www/varnish</build_port_path>
@@ -100,7 +101,7 @@
 		<config_file>http://www.pfsense.com/packages/config/varnish64/varnish_backends.xml</config_file>
 		<configurationfile>varnish_backends.xml</configurationfile>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>varnish-3.0.1_2-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>varnish-3.0.1_2-amd64.pbi gcc-4.2.5.20090325_5-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>gcc-4.2.5.20090325_5.tbz</depends_on_package>
 		<build_port_path>/usr/ports/www/varnish</build_port_path>
 		<build_port_path>/usr/ports/lang/gcc42</build_port_path>
@@ -261,7 +262,7 @@
 		<descr>ntop is a network probe that shows network usage in a way similar to what top does for processes. In interactive mode, it displays the network status on the user's terminal. In Web mode it acts as a Web server, creating an HTML dump of the network status. It sports a NetFlow/sFlow emitter/collector, an HTTP-based client interface for creating ntop-centric monitoring applications, and RRD for persistently storing traffic statistics.</descr>
 		<category>Network Management</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>ntop-4.1.0_1-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>rrdtool-1.2.30_1-amd64.pbi gdbm-1.9.1-amd64.pbi perl-5.12.4_2-amd64.pbi libpcap-1.1.1_1-amd64.pbi geoip-1.4.8_1-amd64.pbi font-util-1.2.0-amd64.pbi webfonts-0.30_6-amd64.pbi ntop-4.1.0_1-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>rrdtool-1.2.26_1.tbz</depends_on_package>
 		<depends_on_package>gdbm-1.8.3_3.tbz</depends_on_package>
 		<depends_on_package>perl-5.12.3.tbz</depends_on_package>
@@ -440,7 +441,7 @@
 		<build_options>WITH_IPV6=true WITH_MPLS=true WITH_GRE=true WITHOUT_TARGETBASED=true WITH_DECODERPRE=true WITH_ZLIB=true WITH_NORMALIZER=true WITH_REACT=true WITH_PERFPROFILE=true WITH_FLEXRESP3=true WITHOUT_MYSQL=true WITHOUT_ODBC=true WITHOUT_POSTGRESQL=true WITHOUT_PRELUDE=true WITH_SNORTSAM=true WITH_PFSENSE=true</build_options>		
 		<config_file>http://www.pfsense.com/packages/config/snort-dev/snort.xml</config_file>
 		<version>2.9.0.5 pkg v. 2.0</version>
-		<required_version>2.0</required_version>
+		<required_version>2.1</required_version>
 		<status>UnStable</status>
 		<configurationfile>/snort.xml</configurationfile>
 		<after_install_info></after_install_info>
