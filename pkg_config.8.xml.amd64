@@ -990,7 +990,7 @@
 		<descr>Allows a pre-configured OpenVPN Windows Client or  or Mac OSX's Viscosity configuration bundle to be exported directly from pfSense.</descr>
 		<category>Security</category>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<depends_on_package_pbi>p7zip-9.20.1-amd64.pbi</depends_on_package_pbi>
+		<depends_on_package_pbi>p7zip-9.20.1-amd64.pbi zip-3.0-amd64.pbi</depends_on_package_pbi>
 		<depends_on_package>p7zip-9.13.tbz</depends_on_package>
 		<depends_on_package>zip-3.0.tbz</depends_on_package>
 		<build_port_path>/usr/ports/archivers/p7zip</build_port_path>

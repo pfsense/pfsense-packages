@@ -277,6 +277,7 @@ function openvpn_client_export_config($srvid, $usrid, $crtid, $useaddr, $usetoke
 
 function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass, $proxy, $advancedoptions) {
 	global $config, $g, $input_errors;
+	$uname_p = trim(exec("uname -p"));
 
 	$ovpndir = "/usr/local/share/openvpn";
 	$workdir = "{$ovpndir}/client-export";
@@ -389,7 +390,10 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 	else
 		$files .= "procchain-standard";
 
-	exec("/usr/local/libexec/p7zip/7z -y a archive.7z {$files}");
+	if(file_exists("/usr/pbi/p7zip-{$uname_p}/bin/7z"))
+		exec("/usr/pbi/p7zip-{$uname_p}/bin/7z -y a archive.7z {$files}");
+	else
+		exec("/usr/local/libexec/p7zip/7z -y a archive.7z {$files}");
 
 	// create the final installer
 	$outfile = "{$tempdir}-install.exe";
@@ -407,6 +411,7 @@ function openvpn_client_export_installer($srvid, $usrid, $crtid, $useaddr, $uset
 
 function viscosity_openvpn_client_config_exporter($srvid, $usrid, $crtid, $useaddr, $usetoken, $outpass, $proxy, $advancedoptions) {
 	global $config, $g;
+	$uname_p = trim(exec("uname -p"));
 
 	$ovpndir = "/usr/local/share/openvpn/";
 	if (!file_exists($workdir . "/template/openvpn-install.exe"))
@@ -525,7 +530,10 @@ EOF;
 	}
 
 	// Zip Viscosity file
-	exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$zipfile} Viscosity.visc");
+	if(file_exists())
+		
+	else
+		exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$zipfile} Viscosity.visc");
 
 	// Remove temporary directory
 	exec("rm -rf {$tempdir}");
