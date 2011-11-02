@@ -530,8 +530,8 @@ EOF;
 	}
 
 	// Zip Viscosity file
-	if(file_exists())
-		
+	if(file_exists("/usr/pbi/zip-{$uname_p}/bin/zip"))
+		exec("cd {$tempdir}/.. && /usr/pbi/zip-{$uname_p}/bin/zip -r {$zipfile} Viscosity.visc");
 	else
 		exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$zipfile} Viscosity.visc");
 
