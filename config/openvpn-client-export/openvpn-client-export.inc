@@ -639,7 +639,10 @@ function openvpn_client_export_sharedkey_config($srvid, $useaddr, $proxy, $zipco
 		$shkeyfile = "{$tempdir}/{$shkeyfile}";
 		file_put_contents("{$shkeyfile}", base64_decode($settings['shared_key']));
 
-		exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$g['tmp_path']}/{$prefix}-config.zip {$prefix}");
+		if(file_exists("/usr/pbi/zip-{$uname_p}/bin/zip"))
+			exec("cd {$tempdir}/.. && /usr/pbi/zip-{$uname_p}/bin/zip -r {$g['tmp_path']}/{$prefix}-config.zip {$prefix}");
+		else
+			exec("cd {$tempdir}/.. && /usr/local/bin/zip -r {$g['tmp_path']}/{$prefix}-config.zip {$prefix}");
 
 		// Remove temporary directory
 		exec("rm -rf {$tempdir}");
