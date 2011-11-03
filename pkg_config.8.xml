@@ -504,7 +504,7 @@
 		<depends_on_package>vnstat-1.10_2.tbz</depends_on_package>
 		<build_port_path>/usr/ports/net/vnstat</build_port_path>
 		<version>1.10_2</version>
-		<status>Beta</status>
+		<status>Stable</status>
 		<required_version>2.0</required_version>
 		<maintainer>crazypark2@yahoo.dk</maintainer>
 		<config_file>http://www.pfsense.com/packages/config/vnstat2/vnstat2.xml</config_file>
