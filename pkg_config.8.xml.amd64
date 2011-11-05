@@ -144,7 +144,7 @@
 		<pkginfolink>http://forum.pfsense.org/index.php/topic,42543.0.html</pkginfolink>
 		<config_file>http://pfsense.org/packages/config/pf-blocker/pfblocker.xml</config_file>
 		<depends_on_package_base_url>http://files.pfsense.org/packages/amd64/8/All/</depends_on_package_base_url>
-		<version>0.1.4</version>
+		<version>0.1.4.1</version>
 		<status>Beta</status>
 		<required_version>2.0</required_version>
 		<maintainer>tom@tomschaefer.org marcellocoutinho@gmail.com</maintainer>

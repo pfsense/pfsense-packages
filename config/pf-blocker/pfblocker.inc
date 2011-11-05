@@ -71,7 +71,12 @@ function pfblocker_Range2CIDR($ip_min, $ip_max) {
 	}
 
 function sync_package_pfblocker() {
-	global $config;
+	global $g,$config;
+	if ($g['booting'] == true){
+		print "no action during boot process...\n";
+	}
+	else{
+	conf_mount_rw();
 	$pfblocker_enable=$config['installedpackages']['pfblocker']['config'][0]['enable_cb'];
 	$pfblocker_config=$config['installedpackages']['pfblocker']['config'][0];
 	$table_limit =($config['system']['maximumtableentries']!= ""?$config['system']['maximumtableentries']:"100000");
@@ -89,12 +94,13 @@ function sync_package_pfblocker() {
 	#check folders
 	$pfbdir='/usr/local/pkg/pfblocker';
 	$pfb_alias_dir='/usr/local/pkg/pfblocker_aliases';
+	$pfsense_alias_dir='/var/db/aliastables/';
 	if (!is_dir($pfbdir))
 		mkdir ($pfbdir,0755);
 	if (!is_dir($pfb_alias_dir))
 		mkdir ($pfb_alias_dir,0755);
-	if (! is_dir('/var/db/aliastables/'))
-		mkdir ('/var/db/aliastables/',0755);
+	if (! is_dir($pfsense_alias_dir))
+		mkdir ($pfsense_alias_dir,0755);
     
 	$continents= array(	"Africa" => "pfBlockerAfrica",
 						"Antartica" => "pfBlockerAntartica",
@@ -107,6 +113,7 @@ function sync_package_pfblocker() {
 	
 	#create rules vars and arrays
 	$new_aliases=array();
+	$new_aliases_list=array();
 	$permit_inbound=array();
 	$permit_outbound=array();
 	$deny_inbound=array();
@@ -132,16 +139,18 @@ function sync_package_pfblocker() {
 	  ${$continent}="";
 	  if (is_array($config['installedpackages']['pfblocker'.strtolower(preg_replace('/ /','',$continent))]['config'])){
 		$continent_config=$config['installedpackages']['pfblocker'.strtolower(preg_replace('/ /','',$continent))]['config'][0];
-		if ($continent_config['action'] != 'Disabled' && $continent_config['action'] != '' && $pfblocker_enable == "on")
+		if ($continent_config['action'] != 'Disabled' && $continent_config['action'] != '' && $pfblocker_enable == "on"){
 			foreach (explode(",", $continent_config['countries']) as $iso){
 				#var_dump ($iso);
 				if ($iso <> "" && file_exists($pfbdir.'/'.$iso.'.txt'))
 						${$continent} .= file_get_contents($pfbdir.'/'.$iso.'.txt');
 		 		}
 		if($continent_config['countries'] != "" && $pfblocker_enable == "on"){
-			#write alias file
+			#write alias files
 			file_put_contents($pfb_alias_dir.'/'.$pfb_alias.'.txt',${$continent},LOCK_EX);
+			file_put_contents($pfsense_alias_dir.'/'.$pfb_alias.'.txt',${$continent}, LOCK_EX);
 			#Create alias config
+			$new_aliases_list[]=$pfb_alias;
 			$new_aliases[]=array("name"=> $pfb_alias,
 					  		 	 "url"=> $web_local.'?pfb='.$pfb_alias,
 					  		 	 "updatefreq"=> "32",
@@ -149,9 +158,6 @@ function sync_package_pfblocker() {
 					  		 	 "descr"=> "pfBlocker country list",
 					  		 	 "type"=> "urltable",
 					  		 	 "detail"=> "DO NOT EDIT THIS ALIAS");
-			#force alias file update
-			if (file_exists($pfb_alias_dir.'/'.$pfb_alias.'.txt'))
-				file_put_contents($pfb_alias_dir.'/'.$pfb_alias.'.txt',${$continent}, LOCK_EX);
 			#Create rule if action permits
 			  switch($continent_config['action']){
 				case "Deny_Outbound":
@@ -197,6 +203,12 @@ function sync_package_pfblocker() {
 				}
 			
 		}
+	  }
+	  else{
+	  	#unlink continent list if any
+	  	unlink_if_exists($pfb_alias_dir.'/'.$pfb_alias.'.txt');
+	  }
+	  
 	}
 	#mark pfctl aliastable for cleanup
 	if (!in_array($pfb_alias, $aliases_list)) 
@@ -254,12 +266,13 @@ function sync_package_pfblocker() {
 					${$alias}.=pfb_text_area_decode($list['custom'])."\n";
 				#save alias file if not empty
 				if (${$alias} == ""){
-					if (file_exists($pfb_alias_dir.'/'.$alias.'.txt'))
-			  			unlink($pfb_alias_dir.'/'.$alias.'.txt');
+					unlink_if_exists($pfb_alias_dir.'/'.$alias.'.txt');
 					}
 				else{
 					file_put_contents($pfb_alias_dir.'/'.$alias.'.txt',${$alias}, LOCK_EX);
+					file_put_contents($pfsense_alias_dir.'/'.$alias.'.txt',${$alias}, LOCK_EX);
 					#create alias
+					$new_aliases_list[]=$alias;
 					$new_aliases[]=array("name"=> $alias,
 					  		 	 "url"=> $web_local.'?pfb='.$alias,
 					  		 	 "updatefreq"=> "32",
@@ -317,8 +330,7 @@ function sync_package_pfblocker() {
 			}
 		else{
 			#unlink previous pfblocker alias list if any
-				if (file_exists($pfb_alias_dir.'/'.$alias.'.txt'))
-					unlink($pfb_alias_dir.'/'.$alias.'.txt');
+			unlink_if_exists($pfb_alias_dir.'/'.$alias.'.txt');
 			}
 		}
 		#update pfsense alias table
@@ -328,10 +340,9 @@ function sync_package_pfblocker() {
 				#mark pfctl aliastable for cleaning
 				if (!in_array($cbalias['name'], $aliases_list)) 
 						$aliases_list[]=$cbalias['name']; #mark aliastable for cleaning
-				#remove previous aliastable file if exist
-				$aliastablefile="/var/db/aliastables/".$cbalias['name'].".txt";
-				if (file_exists($aliastablefile))
-					unlink($aliastablefile);
+				#remove previous aliastable file if alias is not defined any more
+				if (!in_array($cbalias['name'], $new_aliases_list))
+					unlink_if_exists("/var/db/aliastables/".$cbalias['name'].".txt");
 			}
 			else{
 				$new_aliases[]=	$cbalias;
@@ -448,6 +459,8 @@ function sync_package_pfblocker() {
 	else{
 		log_error("[pfBlocker] ".$message);
 		file_notice("pfBlocker", $message, "pfblocker rule apply", "");
+	}
+	conf_mount_ro();
 	}
 }
 

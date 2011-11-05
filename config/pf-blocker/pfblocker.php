@@ -1,7 +1,7 @@
 <?php 
 function get_networks($pfb){
 	$file='/usr/local/pkg/pfblocker_aliases/'.$pfb.'.txt';
-	if ($file)
+	if (file_exists($file))
 		$return= file_get_contents($file);
 	print $return;
 }
