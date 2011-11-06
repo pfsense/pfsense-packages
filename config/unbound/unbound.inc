@@ -72,7 +72,7 @@ function unbound_initial_setup() {
 	 *
 	 */
 	if(!isset($unbound_config['active_interface'])) {
-		if(count($config['interfaces']) > 1)
+		if (count($config['interfaces']) > 1)
 			$unbound_config['active_interface'] = "lan";
 		else
 			$unbound_config['active_interface'] = "wan";
@@ -303,6 +303,71 @@ function unbound_get_network_interface_addresses() {
 	return $unbound_interfaces;
 }
 
+function unbound_get_query_interface_addresses() {
+	global $config;
+
+	$interfaces = $config['interfaces'];
+	$unbound_config = $config['installedpackages']['unbound']['config'][0];
+	/* If no query interface is configured then just return false */
+	if (empty($unbound_config['query_interface']))
+		return false;
+	else
+		$unboundint = explode(",", $unbound_config['query_interface']);
+	$unbound_interfaces = array();
+	$i = 0;
+
+	foreach ($unboundint as $unboundidx => $unboundif) {
+		/* Configure IPv4 addresses */
+		if (is_ipaddr($interfaces[$unboundif]['ipaddr'])) {
+			$unbound_interfaces[$i]['ipv4']['ipaddr'] = $interfaces[$unboundif]['ipaddr'];
+			$unbound_interfaces[$i]['ipv4']['subnet'] = $interfaces[$unboundif]['subnet'];
+			$unbound_interfaces[$i]['ipv4']['network'] = gen_subnet($unbound_interfaces[$i]['ipv4']['ipaddr'],$unbound_interfaces[$i]['ipv4']['subnet']);
+
+			// Check for CARP addresses and also return those - only IPv4 for now
+			if (isset($config['virtualip'])) {
+				if(is_array($config['virtualip']['vip'])) {
+					foreach($config['virtualip']['vip'] as $vip) {
+						if (($vip['interface'] == $unboundif) && ($vip['mode'] == "carp")) {
+							$virtual_ip = find_interface_ip(link_ip_to_carp_interface($vip['subnet']));
+							if ($virtual_ip == '') {
+								log_error("Unbound DNS: There was a problem setting up the Virtual IP for the interface ".link_ip_to_carp_interface($vip['subnet']));
+							} else {
+								$unbound_interfaces[$i]['virtual']['ipaddr'] = $virtual_ip;
+							}
+						}
+					}
+				}
+			}
+		} else if(isset($interfaces[$unboundif]['ipaddr'])) {
+			/* Find the interface IP address for
+			 * XXX - this only works for IPv4 currently - the pfSense module needs IPv6 love
+			 */
+			$unboundrealif = convert_friendly_interface_to_real_interface_name($unboundif);
+			$unbound_interfaces[$i]['ipv4']['ipaddr'] = find_interface_ip($unboundrealif);
+			$unbound_interfaces[$i]['ipv4']['subnet'] = find_interface_subnet($unboundrealif);
+			$unbound_interfaces[$i]['ipv4']['network'] = gen_subnet($unbound_interfaces[$i]['ipv4']['ipaddr'],$unbound_interfaces[$i]['ipv4']['subnet']);
+		}
+
+		/* Configure IPv6 addresses */
+		if(function_exists("is_ipaddrv6")) {
+			if(is_ipaddrv6($interfaces[$unboundif]['ipaddrv6'])) {
+				$unbound_interfaces[$i]['ipv6']['ipaddr'] = $interfaces[$unboundif]['ipaddrv6'];
+				$unbound_interfaces[$i]['ipv6']['subnet'] = $interfaces[$unboundif]['subnetv6'];
+				$unbound_interfaces[$i]['ipv6']['network'] = gen_subnetv6($unbound_interfaces[$i]['ipv6']['ipaddr'], $unbound_interfaces[$i]['ipv6']['subnet']);
+			}
+		}
+		/* Lastly check for loopback addresses*/
+		if($unboundif == "lo0") {
+			$unbound_interfaces[$i]['loopback']['ipaddr'] = "127.0.0.1";
+			if (function_exists("is_ipaddrv6"))
+				$unbound_interfaces[$i]['loopback6']['ipaddr'] = "::1";
+		}
+		$i++;
+	}
+	return $unbound_interfaces;
+}
+
+
 function unbound_acls_config() {
 	global $config;
 		
@@ -343,6 +408,14 @@ function unbound_resync_config() {
 				$unbound_allowed_networks .= "access-control: {$entry['network']}/{$entry['subnet']} allow\n";
 		}
 	}
+	if($unboundquerycfg = unbound_get_query_interface_addresses()) {
+		foreach($unboundquerycfg as $qent) {
+			$unbound_query_interfaces = "# Interfaces to query from\n";
+			foreach($qent as $entry)
+				$unbound_query_interfaces .= "outgoing-interface: {$entry['ipaddr']}\n";
+		}
+	}
+
 	/* Configure user configured ACLs */
 	$unbound_allowed_networks .= unbound_acls_config();
 	
@@ -360,10 +433,7 @@ function unbound_resync_config() {
 	
 	// Unbound Statistics
 	if($unbound_config['stats'] == "on") {
-		if ($unbound_config['stats_interval'] == 'Disabled')
-			$stats_interval = 0;
-		else
-			$stats_interval = $unbound_config['stats_interval'];
+		$stats_interval = $unbound_config['stats_interval'];
 		$cumulative_stats = $unbound_config['cumulative_stats'];
 		if ($unbound_config['extended_stats'] == "on")
 			$extended_stats = "yes";
@@ -472,6 +542,8 @@ harden-dnssec-stripped: {$harden_dnssec_stripped}
 
 # Interface IP(s) to bind to
 {$unbound_bind_interfaces}
+
+{$unbound_query_interfaces}
 
 {$anchor_file}
 
