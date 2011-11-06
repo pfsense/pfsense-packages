@@ -1182,7 +1182,6 @@
 		<build_port_path>/usr/ports/dns/ldns</build_port_path>
 		<build_port_path>/usr/ports/textproc/expat2</build_port_path>
 		<build_port_path>/usr/ports/devel/libevent2</build_port_path>
-		<build_port_path>/usr/ports/dns/unbound</build_port_path>
 		<build_options>WITH_LIBEVENT=true WITH_THREADS=true WITHOUT_GOST=true WITHOUT_MAN=true</build_options>
 		<logging>
 			<facilityname>unbound</facilityname>
