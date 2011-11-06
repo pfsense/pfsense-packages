@@ -110,7 +110,7 @@
 		<field>
 			<fielddescr>Network interface</fielddescr>
 			<fieldname>active_interface</fieldname>
-			<description>The network interface(s) the Unbound DNS server will query from.</description>
+			<description>The network interface(s) the Unbound DNS server will listen on.</description>
 			<type>interfaces_selection</type>
 			<required/>
 			<default_value>wan</default_value>
