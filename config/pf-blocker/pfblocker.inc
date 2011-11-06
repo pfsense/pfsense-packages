@@ -77,6 +77,12 @@ function sync_package_pfblocker() {
 	}
 	else{
 	conf_mount_rw();
+	#apply fetch timeout to pfsense-utils.inc
+	$pfsense_utils=file_get_contents('/etc/inc/pfsense-utils.inc');
+	$new_pfsense_utils=preg_replace("/\/usr\/bin\/fetch -q/","/usr/bin/fetch -T 5 -q",$pfsense_utils);
+	if ($new_pfsense_utils != $pfsense_utils)
+			file_put_contents('/etc/inc/pfsense-utils.inc',$new_pfsense_utils, LOCK_EX);
+			
 	$pfblocker_enable=$config['installedpackages']['pfblocker']['config'][0]['enable_cb'];
 	$pfblocker_config=$config['installedpackages']['pfblocker']['config'][0];
 	$table_limit =($config['system']['maximumtableentries']!= ""?$config['system']['maximumtableentries']:"100000");
