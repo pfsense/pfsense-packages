@@ -360,7 +360,10 @@ function unbound_resync_config() {
 	
 	// Unbound Statistics
 	if($unbound_config['stats'] == "on") {
-		$stats_interval = $unbound_config['stats_interval'];
+		if ($unbound_config['stats_interval'] == 'Disabled')
+			$stats_interval = 0;
+		else
+			$stats_interval = $unbound_config['stats_interval'];
 		$cumulative_stats = $unbound_config['cumulative_stats'];
 		if ($unbound_config['extended_stats'] == "on")
 			$extended_stats = "yes";

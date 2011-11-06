@@ -183,6 +183,7 @@
 			<type>select</type>
 			<default_value>3600</default_value>
 			<options>
+				<option><name>Disabled</name><value>Disabled</value></option>
 				<option><name>5 minutes</name><value>300</value></option>
 				<option><name>10 minutes</name><value>600</value></option>
 				<option><name>20 minutes</name><value>1200</value></option>
