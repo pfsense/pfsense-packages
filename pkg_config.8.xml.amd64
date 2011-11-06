@@ -1129,6 +1129,10 @@
 		<depends_on_package>ldns-1.6.10.tbz</depends_on_package>
 		<depends_on_package>expat-2.0.1_1.tbz</depends_on_package>
 		<depends_on_package>libevent-1.4.14b_2.tbz</depends_on_package>
+		<build_port_path>/usr/ports/dns/unbound/</build_port_path>
+		<build_port_path>/usr/ports/dns/ldns</build_port_path>
+		<build_port_path>/usr/ports/textproc/expat2</build_port_path>
+		<build_port_path>/usr/ports/devel/libevent2</build_port_path>
 		<build_options>WITH_LIBEVENT=true WITH_THREADS=true WITHOUT_GOST=true WITHOUT_MAN=true</build_options>
 		<logging>
 			<facilityname>unbound</facilityname>
