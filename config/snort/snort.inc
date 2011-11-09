@@ -1334,6 +1334,9 @@ rc_start() {
 
 	/bin/rm /tmp/snort.sh.pid
 
+	# XXX: Do not remove this since snort apparenty needs some time to startup!
+	sleep 10
+
 	#### If on Fake start snort is NOT running DO a real start.
 	if [ "`/bin/ps -auwx | grep -v grep | grep "R {$snort_uuid}" | awk '{print $2;}'`" = "" ]; then
 
