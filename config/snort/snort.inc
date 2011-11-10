@@ -1276,14 +1276,6 @@ if [ "`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}" |
 	#### Restart Iface
 	/bin/kill -HUP \${snort_pid}
 	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort Soft Reload For {$snort_uuid}_{$if_real}..."
-
-	# XXX: Do not remove this since snort apparenty needs some time to startup!
-	sleep 5
-
-	#### If on Fake start snort is NOT running DO a real start.
-	if [ "`/bin/ps -auwx | /usr/bin/grep "R {$snort_uuid}" | | /usr/bin/grep -v grep  | /usr/bin/awk '{print $2;}'`" = "" ]; then
-		rc_start_real
-	fi
 fi
 
 EOE;
