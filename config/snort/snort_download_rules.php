@@ -733,10 +733,12 @@ if (is_dir('/usr/local/etc/snort/tmp')) {
 	exec("/bin/rm -r /usr/local/etc/snort/tmp/rules_bk");
 }
 
-/* make all dirs snorts */
+/* XXX: These are needed if snort is run as snort user
 mwexec("/usr/sbin/chown -R snort:snort /var/log/snort", true);
 mwexec("/usr/sbin/chown -R snort:snort /usr/local/etc/snort", true);
 mwexec("/usr/sbin/chown -R snort:snort /usr/local/lib/snort", true);
+*/
+/* make all dirs snorts */
 mwexec("/bin/chmod -R 755  /var/log/snort", true);
 mwexec("/bin/chmod -R 755  /usr/local/etc/snort", true);
 mwexec("/bin/chmod -R 755  /usr/local/lib/snort", true);

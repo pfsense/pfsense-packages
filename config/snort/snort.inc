@@ -340,13 +340,13 @@ function Running_Start($snort_uuid, $if_real, $id) {
 
 	$snort_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['enable'];
 	if ($snort_info_chk == 'on')
-		exec("/usr/local/bin/snort -u snort -g snort -R \"{$snort_uuid}\" -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+		exec("/usr/local/bin/snort -R \"{$snort_uuid}\" -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
 	/* define snortbarnyardlog_chk */
 	/* top will have trouble if the uuid is to far back */
 	$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
 	$snortbarnyardlog_mysql_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_mysql'];
 	if ($snortbarnyardlog_info_chk == 'on' && $snortbarnyardlog_mysql_info_chk != '' && $snort_info_chk == 'on') {
-		exec("/usr/local/bin/barnyard2 -f \"snort_{$snort_uuid}_{$if_real}.u2\" -u snort -g snort --pid-path /var/log/snort/run -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort -D -q");
+		exec("/usr/local/bin/barnyard2 -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path /var/log/snort/run -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort -D -q");
 	}
 
 	/* Log Iface stop */
@@ -509,9 +509,11 @@ function snort_postinstall()
 	if (file_exists('/usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example.so'))
 		exec('/bin/rm /usr/local/lib/snort/dynamicpreprocessor/lib_sfdynamic_preprocessor_example*');
 
-	/* add snort user and group note: 920 keep the numbers < 2000, above this is reserved in pfSense 2.0 */
+	/* XXX: In pfSense this really does not add much!
+	 * add snort user and group note: 920 keep the numbers < 2000, above this is reserved in pfSense 2.0
 	exec('/usr/sbin/pw groupadd snort -g 920');
 	exec('/usr/sbin/pw useradd snort -u 920 -c "Snort User" -d /nonexistent -g snort -s /sbin/nologin');
+	 */
 
 
 	/* create a few directories and ensure the sample files are in place */
@@ -545,12 +547,14 @@ function snort_postinstall()
 	if (!file_exists('/usr/local/bin/barnyard2'))
 		@unlink('/usr/local/bin/barnyard2');
 
-	/* important  */
+	/* XXX: These are needed if you run snort as snort user
 	mwexec('/usr/sbin/chown -R snort:snort /var/log/snort', true);
 	mwexec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort', true);
 	mwexec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort', true);
 	mwexec('/usr/sbin/chown snort:snort /tmp/snort*', true);
 	mwexec('/usr/sbin/chown snort:snort /var/db/whitelist', true);
+	*/
+	/* important  */
 	mwexec('/bin/chmod 660 /var/log/snort/alert', true);
 	mwexec('/bin/chmod 660 /var/db/whitelist', true);
 	mwexec('/bin/chmod -R 660  /usr/local/etc/snort/*', true);
@@ -939,13 +943,15 @@ function sync_snort_package() {
 	if (!file_exists('/var/log/snort/alert'))
 		exec('/usr/bin/touch /var/log/snort/alert');
 
-	/* important  */
+	/* XXX: These are needed if snort is run as snort user
 	mwexec('/usr/sbin/chown -R snort:snort /var/log/snort', true);
 	mwexec('/usr/sbin/chown -R snort:snort /usr/local/etc/snort', true);
 	mwexec('/usr/sbin/chown -R snort:snort /usr/local/lib/snort', true);
 	mwexec('/usr/sbin/chown snort:snort /tmp/snort*', true);
 	mwexec('/usr/sbin/chown snort:snort /var/db/whitelist', true);
+	*/
 
+	/* important  */
 	mwexec('/bin/chmod 770 /var/db/whitelist', true);
 	mwexec('/bin/chmod 770 /var/run/snort*', true);
 	mwexec('/bin/chmod 770 /tmp/snort*', true);
@@ -1236,25 +1242,23 @@ function create_snort_sh()
 			$snortbarnyardlog_mysql_info_chk = $value['barnyard_mysql'];
 
 			if ($snortbarnyardlog_info_chk == 'on' && $snortbarnyardlog_mysql_info_chk != '')
-				$start_barnyard2 = "sleep 4;/usr/local/bin/barnyard2 -f snort_{$snort_uuid}_{$if_real}.u2 -u snort -g snort --pid-path /var/log/snort/run -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort -D -q";
+				$start_barnyard2 = "sleep 4;/usr/local/bin/barnyard2 -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path /var/log/snort/run -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort -D -q";
 
 			/* Get all interface startup commands ready */
 			$snort_sh_text2[] = <<<EOD
 ###### For Each Iface
 
 # If Snort proc is NOT running
-if [ "`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/awk '{print $2;}'`" = "" ]; then
-
+if [ "`/bin/ps -auwx | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/grep -v grep | /usr/bin/awk '{print $2;}'`" = "" ]; then
 	/bin/echo "snort.sh run" > /tmp/snort.sh.pid
-		
+
 	# Start snort and barnyard2
 	/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid
 
-	/usr/local/bin/snort -u snort -g snort -R {$snort_uuid} -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
+	/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
 	$start_barnyard2
 
 	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD Reload For {$snort_uuid}_{$if_real}..."
-
 fi
 
 EOD;
@@ -1266,7 +1270,6 @@ EOD;
 #### Fake start only used on bootup and Pfsense IP changes
 #### Only try to restart if snort is running on Iface
 if [ "`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/awk '{print $2;}'`" != "" ]; then
-
 	snort_pid=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/awk '{print $2;}'`
 	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort already running, soft restart"
 
@@ -1274,16 +1277,22 @@ if [ "`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}" |
 	/bin/kill -HUP \${snort_pid}
 	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort Soft Reload For {$snort_uuid}_{$if_real}..."
 
+	# XXX: Do not remove this since snort apparenty needs some time to startup!
+	sleep 5
+
+	#### If on Fake start snort is NOT running DO a real start.
+	if [ "`/bin/ps -auwx | /usr/bin/grep "R {$snort_uuid}" | | /usr/bin/grep -v grep  | /usr/bin/awk '{print $2;}'`" = "" ]; then
+		rc_start_real
+	fi
 fi
 
 EOE;
 
 			$snort_sh_text4[] = <<<EOF
 
-pid_s=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/awk '{print \$2;}'`
+pid_s=`/bin/ps -auwx | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/grep -v grep |  /usr/bin/awk '{print \$2;}'`
 sleep 3
-pid_b=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "snort_{$snort_uuid}_{$if_real}.u2" | /usr/bin/awk '{print \$2;}'`
-
+pid_b=`/bin/ps -auwx | /usr/bin/grep "snort_{$snort_uuid}_{$if_real}.u2" | /usr/bin/grep -v grep | /usr/bin/awk '{print \$2;}'`
 if [ \${pid_s} ] ; then
 		
 	/bin/echo "snort.sh run" > /tmp/snort.sh.pid
@@ -1294,7 +1303,6 @@ if [ \${pid_s} ] ; then
 	/bin/kill \${pid_b}
 
 	/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid
-
 fi
 
 EOF;
@@ -1333,16 +1341,6 @@ rc_start() {
 	$start_snort_iface_restart
 
 	/bin/rm /tmp/snort.sh.pid
-
-	# XXX: Do not remove this since snort apparenty needs some time to startup!
-	sleep 10
-
-	#### If on Fake start snort is NOT running DO a real start.
-	if [ "`/bin/ps -auwx | grep -v grep | grep "R {$snort_uuid}" | awk '{print $2;}'`" = "" ]; then
-
-		rc_start_real
-
-	fi
 }
 
 rc_start_real() {
@@ -1430,7 +1428,8 @@ function create_barnyard2_conf($id, $if_real, $snort_uuid) {
 
 	if (!file_exists("/var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo")) {
 		mwexec("/usr/bin/touch /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo", true);
-		mwexec("/usr/sbin/chown snort:snort /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo", true);
+		/* XXX: This is needed if snort is run as snort user */
+		//mwexec("/usr/sbin/chown snort:snort /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo", true);
 		mwexec("/bin/chmod 770 /var/log/snort/barnyard2/{$snort_uuid}_{$if_real}.waldo", true);
 	}
 

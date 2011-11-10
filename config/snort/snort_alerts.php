@@ -92,7 +92,8 @@ if ($_GET['action'] == "clear" || $_POST['clear'])
 		conf_mount_rw();
 		@file_put_contents("/var/log/snort/alert", "");
 		post_delete_logs();
-		mwexec('/usr/sbin/chown snort:snort /var/log/snort/*', true);
+		/* XXX: This is needed is snort is run as snort user */
+		//mwexec('/usr/sbin/chown snort:snort /var/log/snort/*', true);
 		mwexec('/bin/chmod 660 /var/log/snort/*', true);
 		mwexec('/usr/bin/killall -HUP snort', true);
 		conf_mount_ro();
