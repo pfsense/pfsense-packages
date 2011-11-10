@@ -544,7 +544,7 @@ function snort_postinstall()
 	}
 
 	/* rm barnyard2 important */
-	if (!file_exists('/usr/local/bin/barnyard2'))
+	if (file_exists('/usr/local/bin/barnyard2'))
 		@unlink('/usr/local/bin/barnyard2');
 
 	/* XXX: These are needed if you run snort as snort user
