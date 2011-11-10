@@ -112,7 +112,7 @@
 		<required_version>1.2.3</required_version>
 		<config_file>http://www.pfsense.com/packages/config/haproxy/haproxy.xml</config_file>
 		<configurationfile>haproxy.xml</configurationfile>
-		<build_port_path>/usr/ports/net/haproxy-devel</build_port_path>
+		<build_port_path>/usr/ports/net/haproxy</build_port_path>
 	</package>
 	<package>
 		<name>Proxy Server with mod_security</name>
