@@ -1244,38 +1244,28 @@ function create_snort_sh()
 			if ($snortbarnyardlog_info_chk == 'on' && $snortbarnyardlog_mysql_info_chk != '')
 				$start_barnyard2 = "sleep 4;/usr/local/bin/barnyard2 -f snort_{$snort_uuid}_{$if_real}.u2 --pid-path /var/log/snort/run -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort -D -q";
 
-			/* Get all interface startup commands ready */
-			$snort_sh_text2[] = <<<EOD
-###### For Each Iface
-
-# If Snort proc is NOT running
-if [ "`/bin/ps -auwx | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/grep -v grep | /usr/bin/awk '{print $2;}'`" = "" ]; then
-	/bin/echo "snort.sh run" > /tmp/snort.sh.pid
-
-	# Start snort and barnyard2
-	/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid
-
-	/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
-	$start_barnyard2
-
-	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD Reload For {$snort_uuid}_{$if_real}..."
-fi
-
-EOD;
-
 			$snort_sh_text3[] = <<<EOE
 
 ###### For Each Iface
 
 #### Fake start only used on bootup and Pfsense IP changes
 #### Only try to restart if snort is running on Iface
-if [ "`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/awk '{print $2;}'`" != "" ]; then
+if [ "`/bin/ps -auwx | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/grep -v grep | /usr/bin/awk '{print $2;}'`" != "" ]; then
 	snort_pid=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/awk '{print $2;}'`
 	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort already running, soft restart"
 
 	#### Restart Iface
 	/bin/kill -HUP \${snort_pid}
 	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort Soft Reload For {$snort_uuid}_{$if_real}..."
+else
+	# Start snort and barnyard2
+	/bin/echo "snort.sh run" > /tmp/snort.sh.pid
+	/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}.pid
+
+	/usr/local/bin/snort -R {$snort_uuid} -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}
+	$start_barnyard2
+
+	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort HARD START For {$snort_uuid}_{$if_real}..."
 fi
 
 EOE;
@@ -1302,8 +1292,7 @@ EOF;
 	}
 
 
-	$start_snort_iface_start = implode("\n\n", $snort_sh_text2);
-	$start_snort_iface_restart = implode("\n\n", $snort_sh_text3);
+	$start_snort_iface_start = implode("\n\n", $snort_sh_text3);
 	$start_snort_iface_stop = implode("\n\n", $snort_sh_text4);
 
 	$snort_sh_text = <<<EOD
@@ -1316,37 +1305,15 @@ EOF;
 
 rc_start() {
 
-	#### Check for double starts, Pfsense has problems with that
-	if /bin/ls /tmp/snort.sh.pid > /dev/null ; then
-
-		/usr/bin/logger -p daemon.info -i -t SnortStartup "Error: snort.sh IS running"
-		exit 0
-
-	fi
-
 	/bin/echo "snort.sh run" > /tmp/snort.sh.pid
 
 	#### Remake the configs on boot Important!
 	/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php &
 	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort Startup files Sync..."
 
-	$start_snort_iface_restart
-
-	/bin/rm /tmp/snort.sh.pid
-}
-
-rc_start_real() {
-
-	#### Check for double starts, Pfsense has problems with that
-	if /bin/ls /tmp/snort.sh.pid > /dev/null ; then
-		/usr/bin/logger -p daemon.info -i -t SnortStartup "Error: snort.sh IS running"
-		exit 0
-	fi
-
 	$start_snort_iface_start
 
 	/bin/rm /tmp/snort.sh.pid
-
 }
 
 rc_stop() {
@@ -1368,15 +1335,11 @@ case $1 in
 	start)
 		rc_start
 		;;
-	start_real)
-		rc_start_real
-		;;
 	stop)
 		rc_stop
 		;;
 	restart)
-		rc_stop
-		rc_start_real
+		rc_start
 		;;
 esac
 
