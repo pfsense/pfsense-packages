@@ -40,6 +40,7 @@ function freeradius_settings_resync() {
 	$iface = ($settings['interface'] ? $settings['interface'] : 'LAN');
 	$iface = convert_friendly_interface_to_real_interface_name($iface);
 	$iface_ip = find_interface_ip($iface);
+	$interface_ip = $settings['interface_ip'];
 	$port = ($settings['port'] != '' ? $settings['port'] : 0);
 	$radiuslogging = $settings['radiuslogging'];
 	$radiuslogbadpass = $settings['radiuslogbadpass'];
@@ -71,7 +72,7 @@ max_request_time = $max_request_time_var
 delete_blocked_requests = no
 cleanup_delay = $cleanup_delay_var
 max_requests = $max_requests_var
-bind_address = $iface_ip
+bind_address = $interface_ip
 port = $port
 hostname_lookups = no
 allow_core_dumps = no
