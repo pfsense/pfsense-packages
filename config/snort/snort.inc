@@ -1149,7 +1149,9 @@ function create_rules_iface($id, $if_real, $snort_uuid)
 	$folder_chk = (count(glob("{$if_rule_dir}/rules/*")) === 0) ? 'empty' : 'full';
 
 	if ($folder_chk == "empty") {
-		exec("/bin/cp -R /usr/local/etc/snort/rules {$if_rule_dir}/rules");
+		if (!is_dir("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/rules"))
+                        exec("/bin/mkdir -p /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/rules");
+		exec("/bin/cp /usr/local/etc/snort/rules/* {$if_rule_dir}/rules");
 		if (file_exists("/usr/local/etc/snort/custom_rules/local_{$snort_uuid}_{$if_real}.rules"))
 			exec("/bin/cp /usr/local/etc/snort/custom_rules/local_{$snort_uuid}_{$if_real}.rules {$if_rule_dir}/local_{$snort_uuid}_{$if_real}.rules");
 	}
