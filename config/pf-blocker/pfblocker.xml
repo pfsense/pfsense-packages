@@ -83,32 +83,32 @@
 		<chmod>0755</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.countryipblocks.net/e_country_data/Africa_cidr.txt</item>
+		<item>http://www.pfsense.org/packages/config/pf-blocker/lists/Africa_cidr.txt</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0555</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.countryipblocks.net/e_country_data/Asia_cidr.txt</item>
+		<item>http://www.pfsense.org/packages/config/pf-blocker/lists/Asia_cidr.txt</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0555</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.countryipblocks.net/e_country_data/Europe_cidr.txt</item>
+		<item>http://www.pfsense.org/packages/config/pf-blocker/lists/Europe_cidr.txt</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0555</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.countryipblocks.net/e_country_data/North_America_cidr.txt</item>
+		<item>http://www.pfsense.org/packages/config/pf-blocker/lists/North_America_cidr.txt</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0555</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.countryipblocks.net/e_country_data/Oceania_cidr.txt</item>
+		<item>http://www.pfsense.org/packages/config/pf-blocker/lists/Oceania_cidr.txt</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0555</chmod>
 	</additional_files_needed>
 	<additional_files_needed>
-		<item>http://www.countryipblocks.net/e_country_data/South_America_cidr.txt</item>
+		<item>http://www.pfsense.org/packages/config/pf-blocker/lists/South_America_cidr.txt</item>
 		<prefix>/usr/local/pkg/</prefix>
 		<chmod>0555</chmod>
 	</additional_files_needed>
