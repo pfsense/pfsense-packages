@@ -37,7 +37,7 @@ require_once("functions.inc");
 require_once("filter.inc");
 
 /* package version */
-$snort_package_version = 'Snort 2.9.0.5 pkg v. 2.0';
+$snort_package_version = 'Snort 2.9.1 pkg v. 2.0';
 
 /* Allow additional execution time 0 = no limit. */
 ini_set('max_execution_time', '9999');
@@ -56,6 +56,8 @@ else
 	$snort_pfsense_basever = 'yes';
 
 /* find out what arch where in x86 , x64 */
+global $snort_arch;
+$snort_arch  = 'x86';
 $snort_arch_ck = php_uname("m");
 if ($snort_arch_ck == 'i386')
 	$snort_arch = 'x86';
@@ -597,24 +599,6 @@ function snort_postinstall()
 	}
 }
 
-function sync_package_snort_reinstall()
-{
-	global $config;
-
-	conf_mount_rw();
-
-	if (!$config['installedpackages']['snortglobal'])
-		return;
-
-	/* create snort configuration file */
-	create_snort_conf();
-
-	/* start snort service */
-	// start_service("snort"); // do not start, may be needed latter.
-
-	conf_mount_ro();
-}
-
 function snort_Getdirsize($node) {
 	if(!is_readable($node))
 		return false;
@@ -1040,7 +1024,6 @@ function create_snort_sh()
 
 	$snortconf =& $config['installedpackages']['snortglobal']['rule'];
 
-	$snort_sh_text2 = array();
 	$snort_sh_text3 = array();
 	$snort_sh_text4 = array();
 
@@ -1157,9 +1140,6 @@ EOD;
 	@chmod("/usr/local/etc/rc.d/snort.sh", 0755);
 }
 
-
-///////////////////////// >>>>>>>>>>>>
-
 /* if rules exist copy to new interfaces */
 function create_rules_iface($id, $if_real, $snort_uuid)
 {
@@ -1218,29 +1198,6 @@ function generate_barnyard2_conf($id, $if_real, $snort_uuid) {
 #	barnyard2.conf
 #   barnyard2 can be found at http://www.securixlive.com/barnyard2/index.php
 #
-#	Copyright (C) 2006 Robert Zelaya
-#	part of pfSense
-#	All rights reserved.
-#
-#	1. Redistributions of source code must retain the above copyright notice,
-#	   this list of conditions and the following disclaimer.
-#
-#	2. Redistributions in binary form must reproduce the above copyright
-#	   notice, this list of conditions and the following disclaimer in the
-#	   documentation and/or other materials provided with the distribution.
-#
-#	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-#	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-#	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-#	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-#	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-#	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-#	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-#	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-#	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-#	POSSIBILITY OF SUCH DAMAGE.
-#
-
 # set the appropriate paths to the file(s) your Snort process is using
 
 config reference_file:	    /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/reference.config
@@ -2169,125 +2126,6 @@ EOD;
 	return $snort_conf_text;
 }
 
-/*   check downloaded text from snort.org to make sure that an error did not occur
- *   for example, if you are not a premium subscriber you can only download rules
- *   so often, etc. TO BE: Removed unneeded.
- */
-function check_for_common_errors($filename) {
-	global $snort_filename, $snort_filename_md5, $console_mode;
-
-	// ob_flush();
-	$contents = file_get_contents($filename);
-	if (!$contents) {
-		if(!$console_mode) {
-			update_all_status("An error occured while downloading {$filename}.");
-			hide_progress_bar_status();
-		} else
-			log_error("An error occured.  Scroll down to inspect it's contents.");
-
-		if (!$console_mode)
-			update_output_window(strip_tags("$contents"));
-		else {
-			$contents = strip_tags($contents);
-			log_error("Error downloading snort rules: {$contents}");
-			echo "Error downloading snort rules: {$contents}";
-		}
-
-		scroll_down_to_bottom_of_page();
-
-		return;
-	}
-}
-
-/* force browser to scroll all the way down */
-function scroll_down_to_bottom_of_page() {
-	global $snort_filename, $console_mode;
-
-	ob_flush();
-	if(!$console_mode)
-		echo "\n<script type=\"text/javascript\">parent.scrollTo(0,1500);\n</script>";
-}
-
-/* ensure downloaded file looks sane */
-function verify_downloaded_file($filename) {
-	global $snort_filename, $snort_filename_md5, $console_mode;
-
-	ob_flush();
-	if (filesize($filename) < 9500) {
-		if(!$console_mode) {
-			update_all_status("Checking {$filename}...");
-			check_for_common_errors($filename);
-		}
-	}
-	update_all_status("Verifying {$filename}...");
-	if(!file_exists($filename)) {
-		if(!$console_mode) {
-			update_all_status("Could not fetch snort rules ({$filename}).  Check oinkid key and dns and try again.");
-			hide_progress_bar_status();
-		} else {
-			log_error("Could not fetch snort rules ({$filename}).  Check oinkid key and dns and try again.");
-			echo "Could not fetch snort rules ({$filename}).  Check oinkid key and dns and try again.";
-		}
-		return;
-	}
-	update_all_status("Verified {$filename}.");
-}
-
-/* extract rules */
-function extract_snort_rules_md5($tmpfname) {
-	global $snort_filename, $snort_filename_md5, $console_mode;
-
-	ob_flush();
-	if(!$console_mode) {
-		$static_output = gettext("Extracting snort rules...");
-		update_all_status($static_output);
-	}
-	if(!is_dir("/usr/local/etc/snort/rules/"))
-		@mkdir("/usr/local/etc/snort/rules/");
-
-	$cmd = "/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C /usr/local/etc/snort/ rules/";
-	$handle = popen("{$cmd} 2>&1", 'r');
-	while(!feof($handle)) {
-		$buffer = fgets($handle);
-		update_output_window($buffer);
-	}
-	pclose($handle);
-
-	if(!$console_mode) {
-		$static_output = gettext("Snort rules extracted.");
-		update_all_status($static_output);
-	} else {
-		log_error("Snort rules extracted.");
-		echo "Snort rules extracted.";
-	}
-}
-
-/* verify MD5 against downloaded item */
-function verify_snort_rules_md5($tmpfname) {
-	global $snort_filename, $snort_filename_md5, $console_mode;
-
-	ob_flush();
-	if(!$console_mode) {
-		$static_output = gettext("Verifying md5 signature...");
-		update_all_status($static_output);
-	}
-
-	$md555 = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
-	$md5 = `echo "{$md555}" | /usr/bin/awk '{ print $4 }'`;
-	$file_md5_ondisk = `/sbin/md5 {$tmpfname}/{$snort_filename} | /usr/bin/awk '{ print $4 }'`;
-	if($md5 == $file_md5_ondisk) {
-		if(!$console_mode) {
-			$static_output = gettext("snort rules: md5 signature of rules mismatch.");
-			update_all_status($static_output);
-			hide_progress_bar_status();
-		} else {
-			log_error("snort rules: md5 signature of rules mismatch.");
-			echo "snort rules: md5 signature of rules mismatch.";
-		}
-		return;
-	}
-}
-
 /* hide progress bar */
 function hide_progress_bar_status() {
 	global $snort_filename, $snort_filename_md5, $console_mode;
@@ -2315,89 +2153,6 @@ function update_all_status($status) {
 		update_status($status);
 		update_output_window($status);
 	}
-}
-
-/* obtain alert description for an ip address */
-function get_snort_alert($ip) {
-	global $snort_alert_file_split, $snort_config;
-
-	if(!file_exists("/var/log/snort/alert"))
-		return;
-	if(!$snort_config)
-		$snort_config = read_snort_config_cache();
-	if($snort_config[$ip])
-		return $snort_config[$ip];
-	if(!$snort_alert_file_split)
-		$snort_alert_file_split = split("\n", file_get_contents("/var/log/snort/alert"));
-
-	foreach($snort_alert_file_split as $fileline) {
-		if (preg_match("/\[\*\*\] (\[.*\]) (.*) (\[\*\*\])/", $fileline, $matches))
-			$alert_title = $matches[2];
-		if (preg_match("/(\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b)/", $fileline, $matches))
-			$alert_ip = $matches[$id];
-		if($alert_ip == $ip) {
-			if(!$snort_config[$ip])
-				$snort_config[$ip] = $alert_title;
-
-			return $alert_title;
-		}
-	}
-	return "n/a";
-}
-
-function make_clickable($buffer) {
-	global $config, $g;
-
-	/* if clickable urls is disabled, simply return buffer back to caller */
-	$clickablalerteurls = $config['installedpackages']['snort']['config'][$id]['oinkmastercode'];
-	if(!$clickablalerteurls)
-		return $buffer;
-
-	$buffer = eregi_replace("(^|[ \n\r\t])((http(s?)://)(www\.)?([a-z0-9_-]+(\.[a-z0-9_-]+)+)(/[^/ \n\r]*)*)","\\1<a href=\"\\2\" target=\"_blank\">\\2</a>", $buffer);
-	$buffer = eregi_replace("(^|[ \n\r\t])((ftp://)(www\.)?([a-z0-9_-]+(\.[a-z0-9_-]+)+)(/[^/ \n\r]*)*)","\\1<a href=\"\\2\" target=\"_blank\">\\2</a>", $buffer);
-	$buffer = eregi_replace("([a-z_-][a-z0-9\._-]*@[a-z0-9_-]+(\.[a-z0-9_-]+)+)","<a href=\"mailto:\\1\">\\1</a>", $buffer);
-	$buffer = eregi_replace("(^|[ \n\r\t])(www\.([a-z0-9_-]+(\.[a-z0-9_-]+)+)(/[^/ \n\r]*)*)","\\1<a href=\"http://\\2\" target=\"_blank\">\\2</a>", $buffer);
-	$buffer = eregi_replace("(^|[ \n\r\t])(ftp\.([a-z0-9_-]+(\.[a-z0-9_-]+)+)(/[^/ \n\r]*)*)","\\1<a href=\"ftp://\\2\" target=\"_blank\">\\2</a>", $buffer);
-
-	return $buffer;
-}
-
-function read_snort_config_cache() {
-	global $g, $config, $snort_config;
-
-	if($snort_config)
-		return $snort_config;
-
-	if(file_exists($g['tmp_path'] . '/snort_config.cache'))
-		$snort_config = unserialize(file_get_contents($g['tmp_path'] . '/snort_config.cache'));
-
-	return $snort_config;
-}
-
-function write_snort_config_cache($snort_config) {
-	global $g, $config;
-
-	$configcache = fopen($g['tmp_path'] . '/snort_config.cache', "w");
-	if(!$configcache) {
-		log_error("Could not open {$g['tmp_path']}/snort_config.cache  for writing.");
-		return false;
-	}
-	fwrite($configcache, serialize($snort_config));
-	fclose($configcache);
-
-	return true;
-}
-
-function snort_advanced() {
-	global $g, $config;
-
-	sync_package_snort();
-}
-
-function snort_define_servers() {
-	global $g, $config;
-
-	sync_package_snort();
 }
 
 ?>
