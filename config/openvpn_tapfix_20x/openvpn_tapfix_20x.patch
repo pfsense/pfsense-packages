@@ -96,9 +96,9 @@ index 0ef67a7..bd9f527 100644
 +		if (($pconfig['serverbridge_dhcp_start'] && !$pconfig['serverbridge_dhcp_end']) 
 +		|| (!$pconfig['serverbridge_dhcp_start'] && $pconfig['serverbridge_dhcp_end']))
 +			$input_errors[] = gettext("Server Bridge DHCP Start and End must both be empty, or defined.");
-+		if (($pconfig['serverbridge_dhcp_start'] && !is_ipaddrv4($pconfig['serverbridge_dhcp_start'])))
++		if (($pconfig['serverbridge_dhcp_start'] && !is_ipaddr($pconfig['serverbridge_dhcp_start'])))
 +			$input_errors[] = gettext("Server Bridge DHCP Start must be an IPv4 address.");
-+		if (($pconfig['serverbridge_dhcp_end'] && !is_ipaddrv4($pconfig['serverbridge_dhcp_end'])))
++		if (($pconfig['serverbridge_dhcp_end'] && !is_ipaddr($pconfig['serverbridge_dhcp_end'])))
 +			$input_errors[] = gettext("Server Bridge DHCP End must be an IPv4 address.");
 +		if (ip2ulong($pconfig['serverbridge_dhcp_start']) > ip2ulong($pconfig['serverbridge_dhcp_end']))
 +			$input_errors[] = gettext("The Server Bridge DHCP range is invalid (start higher than end).");
@@ -198,7 +198,7 @@ index 0ef67a7..bd9f527 100644
  					</tr>
  					<tr>
 -						<td width="22%" valign="top" class="vncellreq"><?=gettext("Tunnel Network"); ?></td>
-+						<td width="22%" valign="top" class="vncellreq" id="ipv4_tunnel_network"><?=gettext("IPv4 Tunnel Network"); ?></td>
++						<td width="22%" valign="top" class="vncellreq" id="ipv4_tunnel_network"><?=gettext("Tunnel Network"); ?></td>
  						<td width="78%" class="vtable">
  							<input name="tunnel_network" type="text" class="formfld unknown" size="20" value="<?=htmlspecialchars($pconfig['tunnel_network']);?>">
  							<br>
