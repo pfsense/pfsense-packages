@@ -445,22 +445,31 @@ function sync_package_pfblocker() {
 	if ($message == ""){
 		#check cron
 		$cron_found=0;
+		$cron_cmd="/usr/local/bin/php -q /usr/local/www/pfblocker.php cron";
 		if (is_array($config['cron']['item'])){
 			$new_cron=array();
 			foreach($config['cron']['item'] as $cron){
-					if ($cron["command"] == "/usr/local/www/pfblocker.php cron")
-						$cron_found=1;
-					$new_cron['item'][]=$cron;
+					if (preg_match("/usr.local.www.pfblocker.php cron/",$cron["command"])){
+						#fix 0.1.4.6 missing php path
+						if($cron["command"]==$cron_cmd && $pfblocker_enable == "on"){
+							$new_cron['item'][]=$cron;
+							$cron_found=1;
+							}
+						}
+					else{
+						$new_cron['item'][]=$cron;
+						}
 				}
 				if ($cron_found == 0){
-					$new_cron['item'][]=array(	"minute" =>	"0",
-												"hour"	 =>	"*",
-												"mday" 	 =>	"*",
-												"month"  =>	"*",
-												"wday"	 =>	"*",
-												"who"	 =>	"root",
-												"command"=>	"/usr/local/www/pfblocker.php cron");
-					$config['cron']=$new_cron;
+					if($pfblocker_enable == "on")
+						$new_cron['item'][]=array(	"minute" =>	"0",
+													"hour"	 =>	"*",
+													"mday" 	 =>	"*",
+													"month"  =>	"*",
+													"wday"	 =>	"*",
+													"who"	 =>	"root",
+													"command"=>	$cron_cmd);
+						$config['cron']=$new_cron;
 				}
 		}
 		
