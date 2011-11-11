@@ -68,9 +68,9 @@
 	<fields>
 		<field>
 			<fielddescr>Listening Interface(s)</fielddescr>
-			<fieldname>interface</fieldname>
-			<description>Enter the desired listening interface here.</description>
-			<type>interfaces_selection</type>
+			<fieldname>interface_ip</fieldname>
+			<description>Enter the desired listening interface IP here ( 192.168.1.0 ) or use "*" (without "") for any interface.</description>
+			<type>input</type>
 			<required/>
 		</field>
 		<field>
