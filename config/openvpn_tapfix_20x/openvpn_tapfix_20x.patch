@@ -48,6 +48,18 @@ index 777b395..701a032 100644
 +				}
  				break;
  		}
+
+@@ -452,7 +452,9 @@ function openvpn_reconfigure($mode, $settings) {
+                        case 'server_user':
+                                $conf .= "client-cert-not-required\n";
+                        case 'server_tls_user':
+-                               $conf .= "username-as-common-name\n";
++                               /* username-as-common-name is not compatible with server-bridge */
++                               if (stristr($conf, "server-bridge") === false)
++                                       $conf .= "username-as-common-name\n";
+                                if (!empty($settings['authmode'])) {
+                                        $authcfgs = explode(",", $settings['authmode']);
+                                        $sed = "\$authmodes=array(";
  
 @@ -1021,4 +1039,4 @@ function openvpn_refresh_crls() {
  	}
