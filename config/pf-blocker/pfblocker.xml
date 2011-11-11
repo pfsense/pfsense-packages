@@ -214,7 +214,25 @@
 				<option><name>Block</name><value>block</value></option>
 				</options>
 		</field>	
-
+		<field>
+			<name>About pfBlocker</name>
+			<type>listtopic</type>
+		</field>
+		<field>
+			<fielddescr>Credits</fielddescr>
+			<fieldname>credits</fieldname>
+			<type>checkbox</type>
+			<description><![CDATA[Continent Lists are provided by <a target=_new href='http://www.countryipblocks.net/'>countryipblocks.net</a>.<br>
+									Dynamic rules can be found in <a target=_new href='http://www.iblocklist.com/'>I-Blocklist.com</a>.</br>
+									Created by <a target=_new href='http://forum.pfsense.org/index.php?action=profile;u=4710'>Marcello Coutinho</a> and <a target=_new href='http://www.tomschaefer.org/pfsense'>TomSchaefer</a>.<br>]]></description>
+		</field>
+		<field>
+			<fielddescr>Donation</fielddescr>
+			<fieldname>donation</fieldname>
+			<type>checkbox</type>
+			<description><![CDATA[If you like this package, please <a target=_new href='http://www.pfsense.org/index.php?option=com_content&task=view&id=47&Itemid=77'>donate to pfSense project</a>.<br>
+								 If you want that your donation goes to these package developers, make a note on donation forwarding it to us.<br>]]></description>
+		</field>
 	</fields>
 	<custom_php_install_command>
 		pfblocker_php_install_command();

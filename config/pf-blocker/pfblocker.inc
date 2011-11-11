@@ -436,7 +436,7 @@ function sync_package_pfblocker() {
 				}
 			}
 		  #include all rules that is not from pfBlocker
-		  if (!preg_match("/pfBlocker.*rule/",$rule['descr']) && $rule['interface'] != "")
+		  if (!preg_match("/pfBlocker.*rule/",$rule['descr']) && ($rule['interface'] != "" || $rule['floating']=="yes"))
 					$new_rules[]=$rule;
 		}
 		$config['filter']['rule']=$new_rules;
@@ -472,7 +472,10 @@ function sync_package_pfblocker() {
 		#update pfctrl tables
 		foreach ($aliases_list as $table)
 			exec("/sbin/pfctl -t " . escapeshellarg($table) . " -T kill 2>&1", $result_pfb);
-	
+
+		#uncheck donation and credits check box
+		$config['installedpackages']['pfblocker']['config'][0]['donation']="";
+		$config['installedpackages']['pfblocker']['config'][0]['credits']="";
 		#write config
    		write_config();
 
