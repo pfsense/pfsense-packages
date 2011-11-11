@@ -136,20 +136,14 @@ $d_snortconfdirty_path = "/var/run/snort_conf_{$iface_uuid}_{$if_real}.dirty";
 if ($_POST["Submit"]) {
 	$enabled_items = "";
 	$isfirst = true;
-	if (is_array($_POST['toenable'])) {
-		foreach($_POST['toenable'] as $toenable) {
-			if(!$isfirst)
-			$enabled_items .= "||";
-			$enabled_items .= "{$toenable}";
-			$isfirst = false;
-		}
-	}else{
+	if (is_array($_POST['toenable']))
+		$enabled_items = implode("||", $_POST['toenable']);
+	else
 		$enabled_items = $_POST['toenable'];
-	}
 	$a_nat[$id]['rulesets'] = $enabled_items;
 
 	write_config();
-	sync_snort_package_all($id, $if_real, $iface_uuid);
+	sync_snort_package_config();
 
 	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 	header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -256,7 +250,7 @@ if (file_exists($d_snortconfdirty_path)) {
 					$dir = "/usr/local/etc/snort/snort_{$iface_uuid}_{$if_real}/rules/";
 					$dh  = opendir($dir);
 					while (false !== ($filename = readdir($dh))) {
-						$files[] = $filename;
+						$files[] = basename($filename);
 					}
 					sort($files);
 					foreach($files as $file) {

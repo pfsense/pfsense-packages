@@ -95,11 +95,6 @@
 		<item>http://www.pfsense.com/packages/config/snort/bin/oinkmaster_contrib/snort_rename.pl</item>
 	</additional_files_needed>
 	<additional_files_needed>
-		<prefix>/usr/local/pkg/pf/</prefix>
-		<chmod>077</chmod>
-		<item>http://www.pfsense.com/packages/config/snort/snort_dynamic_ip_reload.php</item>
-	</additional_files_needed>
-	<additional_files_needed>
 		<prefix>/usr/local/www/snort/</prefix>
 		<chmod>077</chmod>
 		<item>http://www.pfsense.com/packages/config/snort/snort_alerts.php</item>
@@ -199,7 +194,7 @@
 	<custom_add_php_command>
 	</custom_add_php_command>
 	<custom_php_resync_config_command>
-		sync_snort_package();
+		sync_snort_package_config();
 	</custom_php_resync_config_command>
 	<custom_php_install_command>
 		snort_postinstall();

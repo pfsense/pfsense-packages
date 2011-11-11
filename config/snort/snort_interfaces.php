@@ -51,56 +51,13 @@ if (isset($_POST['del_x'])) {
 	/* delete selected rules */
 	if (is_array($_POST['rule'])) {
 		conf_mount_rw();
-
 		foreach ($_POST['rule'] as $rulei) {
 				
 			/* convert fake interfaces to real */
 			$if_real = snort_get_real_interface($a_nat[$rulei]['interface']);
 			$snort_uuid = $a_nat[$rulei]['uuid'];
 
-			/* cool code to check if any snort is up */
-			$snort_up_ck = exec("/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep snort | /usr/bin/awk '{print \$2;}' | sed 1q");
-				
-			if ($snort_up_ck != "")
-			{
-					
-				$start_up_pre = exec("/usr/bin/top -a -U snort -u | grep -v grep | grep \"R {$snort_uuid}\" | awk '{print \$1;}'");
-				$start_up_s = exec("/usr/bin/top -U snort -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
-				$start_up_r = exec("/usr/bin/top -U root -u | grep snort | grep {$start_up_pre} | awk '{ print $1; }'");
-					
-				$start2_upb_pre = exec("/bin/cat /var/run/barnyard2_{$snort_uuid}_{$if_real}.pid");
-				$start2_upb_s = exec("/usr/bin/top -U snort -u | grep barnyard2 | grep {$start2_upb_pre} | awk '{ print $1; }'");
-				$start2_upb_r = exec("/usr/bin/top -U root -u | grep barnyard2 | grep {$start2_upb_pre} | awk '{ print $1; }'");
-
-					
-				if ($start_up_s != "" || $start_up_r != "" || $start2_upb_s != "" || $start2_upb_r != "") {
-					/* remove only running instances */
-					if ($start_up_s != "") {
-						exec("/bin/kill {$start_up_s}");
-						exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}*");
-					}
-
-					if ($start2_upb_s != "") {
-						exec("/bin/kill {$start2_upb_s}");
-						exec("/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}*");
-					}
-
-					if ($start_up_r != "") {
-						exec("/bin/kill {$start_up_r}");
-						exec("/bin/rm /var/run/snort_{$snort_uuid}_{$if_real}*");
-					}
-
-					if ($start2_upb_r != "") {
-						exec("/bin/kill {$start2_upb_r}");
-						exec("/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}*");
-					}
-				}
-					
-			}
-
-			/* for every iface do these steps */
-			exec("/bin/rm /var/log/snort/snort.u2_{$snort_uuid}_{$if_real}*");
-			exec("/bin/rm -r /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}");
+			Running_Stop($snort_uuid,$if_real, $rulei);
 
 			unset($a_nat[$rulei]);
 		}
@@ -110,15 +67,15 @@ if (isset($_POST['del_x'])) {
 		sleep(2);
 	  
 		/* if there are no ifaces do not create snort.sh */
-		if (isset($config['installedpackages']['snortglobal']['rule'][0]['enable'])) {
+		if (!empty($config['installedpackages']['snortglobal']['rule']))
 			create_snort_sh();
-		}else{
+		else {
 			conf_mount_rw();
 			exec('/bin/rm /usr/local/etc/rc.d/snort.sh');
 			conf_mount_ro();
 		}
 	  
-		sync_snort_package_empty();
+		sync_snort_package_config();
 	  
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
 		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
@@ -141,15 +98,11 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 	/* Log Iface stop */
 	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Toggle for {$snort_uuid}_{$if_real}...'");
 
-	sync_snort_package_all($id, $if_real, $snort_uuid);
+	sync_snort_package_config();
 
 	$tester2 = Running_Ck($snort_uuid, $if_real, $id);
 
 	if ($tester2 == 'yes') {
-
-		/* Log Iface stop */
-		exec("/usr/bin/logger -p daemon.info -i -t SnortStartup '{$tester2} yn for {$snort_uuid}_{$if_real}...'");
-
 		Running_Stop($snort_uuid, $if_real, $id);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
@@ -158,8 +111,7 @@ if ($_GET['act'] == 'toggle' && is_numeric($id)) {
 		header( 'Cache-Control: post-check=0, pre-check=0', false );
 		header( 'Pragma: no-cache' );
 
-	}else{
-
+	} else {
 		Running_Start($snort_uuid, $if_real, $id);
 
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );

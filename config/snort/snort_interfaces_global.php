@@ -103,7 +103,7 @@ if (!$input_errors) {
 		write_config();
 
 		/* create whitelist and homenet file  then sync files */
-		sync_snort_package_empty();
+		sync_snort_package_config();
 
 		/* forces page to reload new settings */
 		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );

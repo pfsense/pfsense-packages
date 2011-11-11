@@ -37,7 +37,7 @@ require_once("functions.inc");
 require_once("filter.inc");
 
 /* package version */
-$snort_package_version = 'Snort 2.9.0.5 pkg v. 2.0';
+$snort_package_version = 'Snort 2.9.1 pkg v. 2.0';
 
 /* Allow additional execution time 0 = no limit. */
 ini_set('max_execution_time', '9999');
@@ -56,6 +56,8 @@ else
 	$snort_pfsense_basever = 'yes';
 
 /* find out what arch where in x86 , x64 */
+global $snort_arch;
+$snort_arch  = 'x86';
 $snort_arch_ck = php_uname("m");
 if ($snort_arch_ck == 'i386')
 	$snort_arch = 'x86';
@@ -238,25 +240,10 @@ function build_base_whitelist($build_netlist, $wanip, $wangw, $wandns, $vips, $v
 function Running_Ck($snort_uuid, $if_real, $id) {
 	global $config;
 
-	$snort_up_ck = exec("/bin/ps -U snort | /usr/bin/grep snort | /usr/bin/awk '{print \$1;}'");
-
-	if(snort_up_ck == '') {
-		$snort_up = 'no';
-		return $snort_up;
-	}
-
-	if(snort_up_ck != ''){
-
-		/* use ob_clean to clear output buffer, this code needs to be watched */
-		ob_clean();
-		$snort_up_prell = exec("/bin/ps -U snort | /usr/bin/grep \"\-R {$snort_uuid}\" | /usr/bin/awk '{print \$1;}'");
-
-		if ($snort_up_prell != '') {
-			$snort_uph = 'yes';
-		}else{
-			$snort_uph = 'no';
-		}
-	}
+	$snort_uph = 'no';
+	$snort_up_prell = exec("/bin/ps -ax | /usr/bin/grep \"R {$snort_uuid}\" | /usr/bin/grep -v grep  | /usr/bin/awk '{print \$1;}'");
+	if ($snort_up_prell != '')
+		$snort_uph = 'yes';
 
 	return $snort_uph;
 }
@@ -265,24 +252,10 @@ function Running_Ck($snort_uuid, $if_real, $id) {
 function Running_Ck_b($snort_uuid, $if_real, $id) {
 	global $config;
 
-	$snort_up_ck_b = exec("/bin/ps -U snort | /usr/bin/grep barnyard2 | /usr/bin/awk '{print \$1;}'");
-
-	if($snort_up_ck_b == ''){
-		$snort_up_b = 'no';
-		return $snort_up_b;
-	}
-
-	if(snort_up_ck_b != '') {
-		
-		ob_clean();
-		$snort_up_pre_b = exec("/bin/ps -U snort | grep \"f snort_{$snort_uuid}_{$if_real}.u2\" | awk '{print \$1;}'");
-
-		if ($snort_up_pre_b != '') {
-			$snort_up_b = 'yes';
-		}else{
-			$snort_up_b = 'no';
-		}
-	}
+	$snort_up_b = 'no';
+	$snort_up_pre_b = exec("/bin/ps -ax | /usr/bin/grep barnyard2 | /usr/bin/grep \"f snort_{$snort_uuid}_{$if_real}.u2\" | /usr/bin/grep -v grep | /usr/bin/awk '{print \$1;}'");
+	if ($snort_up_pre_b != '')
+		$snort_up_b = 'yes';
 
 	return $snort_up_b;
 }
@@ -293,43 +266,25 @@ function Running_Stop($snort_uuid, $if_real, $id) {
 	/* if snort.sh crashed this will remove the pid */
 	@unlink('/tmp/snort.sh.pid');
 	
-	$start_up_s = exec("/bin/ps -U snort | grep \"\-R {$snort_uuid}\" | awk '{ print \$1; }'");
-	$start_up_r = exec("/bin/ps -U root | grep \"\-R {$snort_uuid}\" | awk '{ print \$1; }'");
-	
-	$start2_upb_s = exec("/bin/ps -U snort | grep \"snort_{$snort_uuid}_{$if_real}.u2\" | awk '{ print \$1; }'");
-	$start2_upb_r = exec("/bin/ps -U root | grep \"snort_{$snort_uuid}_{$if_real}.u2\" | awk '{ print \$1; }'");
+	$start_up = exec("/bin/ps -ax | /usr/bin/grep \"R {$snort_uuid}\" | /usr/bin/grep -v grep | /usr/bin/awk '{ print \$1; }'");
+	$start_upb = exec("/bin/ps -ax | /usr/bin/grep \"snort_{$snort_uuid}_{$if_real}.u2\" | /usr/bin/grep -v grep | /usr/bin/awk '{ print \$1; }'");
 
-	if ($start_up_s != '' || $start_up_r != '' || $start2_upb_s != '' || $start2_upb_r != '') {
-		if ($start_up_s != '')
-		{
-			exec("/bin/kill {$start_up_s}");
-			exec("rm /var/log/snort/run/snort_{$if_real}{$snort_uuid}*");
-			exec("rm /var/log/snort/snort_{$snort_uuid}_{$if_real}*");
-		}
-
-		if ($start2_upb_s != '')
-		{
-			exec("/bin/kill {$start2_upb_s}");
-			exec("/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}*");
-		}
-
-		if ($start_up_r != '')
-		{
-			exec("/bin/kill {$start_up_r}");
-			exec("rm /var/log/snort/run/snort_{$if_real}{$snort_uuid}*");
-			exec("rm /var/log/snort/snort_{$snort_uuid}_{$if_real}*");
-		}
-
-		if ($start2_upb_r != '')
-		{
-			exec("/bin/kill {$start2_upb_r}");
-			exec("/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}*");
-		}
-
-		/* Log Iface stop */
-		exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule STOP for {$snort_uuid}_{$if_real}...'");
-		sleep(2); // Give time so GUI displays correctly
+	if ($start_up != '') {
+		exec("/bin/kill {$start_up}");
+		exec("/bin/rm /var/log/snort/run/snort_{$if_real}{$snort_uuid}*");
+		exec("/bin/rm /var/log/snort/snort_{$snort_uuid}_{$if_real}*");
+		exec("/bin/rm -r /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}");
 	}
+
+	if ($start_upb != '') {
+		exec("/bin/kill {$start_upb}");
+		exec("/bin/rm /var/run/barnyard2_{$snort_uuid}_{$if_real}*");
+		exec("/bin/rm /var/log/snort/snort.u2_{$snort_uuid}_{$if_real}*");
+	}
+
+	/* Log Iface stop */
+	exec("/usr/bin/logger -p daemon.info -i -t SnortStartup 'Interface Rule STOP for {$snort_uuid}_{$if_real}...'");
+	sleep(2); // Give time so GUI displays correctly
 }
 
 function Running_Start($snort_uuid, $if_real, $id) {
@@ -341,11 +296,14 @@ function Running_Start($snort_uuid, $if_real, $id) {
 	$snort_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['enable'];
 	if ($snort_info_chk == 'on')
 		exec("/usr/local/bin/snort -R \"{$snort_uuid}\" -D -q -l /var/log/snort --pid-path /var/log/snort/run -G {$snort_uuid} -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/snort.conf -i {$if_real}");
+	else
+		return;
+
 	/* define snortbarnyardlog_chk */
 	/* top will have trouble if the uuid is to far back */
 	$snortbarnyardlog_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'];
 	$snortbarnyardlog_mysql_info_chk = $config['installedpackages']['snortglobal']['rule'][$id]['barnyard_mysql'];
-	if ($snortbarnyardlog_info_chk == 'on' && $snortbarnyardlog_mysql_info_chk != '' && $snort_info_chk == 'on') {
+	if ($snortbarnyardlog_info_chk == 'on' && $snortbarnyardlog_mysql_info_chk != '') {
 		exec("/usr/local/bin/barnyard2 -f \"snort_{$snort_uuid}_{$if_real}.u2\" --pid-path /var/log/snort/run -c /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/barnyard2.conf -d /var/log/snort -D -q");
 	}
 
@@ -396,7 +354,7 @@ function snort_file_list($snort_log_dir, $snort_log_file)
 	$dir = opendir ("$snort_log_dir");
 	while (false !== ($file = readdir($dir))) {
 		if (strpos($file, "$snort_log_file",1) )
-			$file_list[] = $file;
+			$file_list[] = basename($file);
 	}
 	return $file_list;
 }
@@ -636,27 +594,9 @@ function snort_postinstall()
 	if ($config['installedpackages']['snortglobal']['forcekeepsettings'] == 'on') {
 		update_status(gettext("Saved settings detected..."));
 		update_output_window(gettext("Please wait... rebuilding files..."));
-		sync_snort_package_empty();
+		sync_snort_package_config();
 		update_output_window(gettext("Finnished Rebuilding files..."));
 	}
-}
-
-function sync_package_snort_reinstall()
-{
-	global $config;
-
-	conf_mount_rw();
-
-	if (!$config['installedpackages']['snortglobal'])
-		return;
-
-	/* create snort configuration file */
-	create_snort_conf();
-
-	/* start snort service */
-	// start_service("snort"); // do not start, may be needed latter.
-
-	conf_mount_ro();
 }
 
 function snort_Getdirsize($node) {
@@ -889,45 +829,56 @@ function snort_rules_up_install_cron($should_install) {
 	}
 }
 
-function sync_snort_package_remove_old()
+/* Only run when all ifaces needed to sync. Expects filesystem rw */
+function sync_snort_package_config()
 {
 	global $config, $g;
 
-	$snort_dir_scan = '/usr/local/etc/snort';
+	/* RedDevil suggested code */
+	/* TODO: more testing needs to be done */
+	/* may cause voip to fail */
+	//exec("/sbin/sysctl net.bpf.bufsize=8388608");
+	//exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
+	//exec("/sbin/sysctl net.bpf.maxinsns=512");
+	//exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
 
-	// scan dirm might have to make this into a funtion
-	$dh_scan  = opendir($snort_dir_scan);
-	while (false !== ($dir_filename = readdir($dh_scan))) {
-		$list_dir_files[] = $dir_filename;
+	conf_mount_rw();
+
+	/* do not start config build if rules is empty */
+	if (!is_array($config['installedpackages']['snortglobal']['rule'])) {
+		exec('/bin/rm /usr/local/etc/rc.d/snort.sh');
+		conf_mount_ro();
+		return;
 	}
 
-	// find  patern in a array, very cool code
-	class array_ereg {
-		function array_ereg($pattern) { $this->pattern = $pattern; }
-		function ereg($string) {
-			return ereg($this->pattern, $string);
+	foreach ($config['installedpackages']['snortglobal']['rule'] as $id => $value) {
+		$if_real = snort_get_real_interface($value['interface']);
+		$snort_uuid = $value['uuid'];
+
+		if ($if_real != '' && $snort_uuid != '') {
+
+			/* only build whitelist when needed */
+			if ($value['blockoffenders7'] == 'on')
+				create_snort_whitelist($id, $if_real);
+
+			/* only build threshold when needed */
+			if ($value['suppresslistname'] != 'default')
+				create_snort_suppress($id, $if_real);
+
+			/* create snort configuration file */
+			create_snort_conf($id, $if_real, $snort_uuid);
+
+			/* if rules exist cp rules to each iface */
+			create_rules_iface($id, $if_real, $snort_uuid);
+
+			/* create barnyard2 configuration file */
+			if ($value['barnyard_enable'] == 'on')
+				create_barnyard2_conf($id, $if_real, $snort_uuid);
 		}
 	}
 
-	$rule_array2 = $config['installedpackages']['snortglobal']['rule'];
-	foreach ($rule_array2 as $id => $value) {
-		$result_lan = $value['interface'];
-		$if_real = snort_get_real_interface($result_lan);
-
-		$snort_rules_list[] = "snort_{$id}{$if_real}";
-	}
-
-	$snort_dir_filter = array_filter($list_dir_files, array(new array_ereg("snort_"), 'ereg'));
-	$snort_dir_filter_search_result = array_diff($snort_dir_filter, $snort_rules_list);
-
-	foreach ($snort_dir_filter_search_result as $value)
-		exec("/bin/rm -r /usr/local/etc/snort/$value");
-
-}
-
-/* make sure this func on writes to files and does not start snort */
-function sync_snort_package() {
-	global $config, $g;
+	/* create snort bootup file snort.sh only create once */
+	create_snort_sh();
 
 	/* all new files are for the user snort nologin */
 	if (!is_dir('/var/log/snort'))
@@ -958,162 +909,9 @@ function sync_snort_package() {
 	mwexec('/bin/chmod -R 770 /var/log/snort', true);
 	mwexec('/bin/chmod -R 770 /usr/local/lib/snort', true);
 	mwexec('/bin/chmod -R 770 /usr/local/etc/snort/', true);
-}
-
-/* only run when a single iface needs to sync */
-function sync_snort_package_all($id, $if_real, $snort_uuid)
-{
-	global $config, $g;
-
-	/* RedDevil suggested code */
-	/* TODO: more testing needs to be done */
-	/* may cause voip to fail */
-	//exec("/sbin/sysctl net.bpf.bufsize=8388608");
-	//exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
-	//exec("/sbin/sysctl net.bpf.maxinsns=512");
-	//exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
-
-	/* do not start config build if rules is empty */
-	if (!is_array($config['installedpackages']['snortglobal']['rule']))
-		return;
-	if (!is_array($config['installedpackages']['snortglobal']['rule'][$id]))
-		return;
-
-	conf_mount_rw();
-
-	$snort_uuid = $config['installedpackages']['snortglobal']['rule'][$id]['uuid'];
-	$result_lan = $config['installedpackages']['snortglobal']['rule'][$id]['interface'];
-	$if_real = snort_get_real_interface($result_lan);
-
-	/* only build whitelist when needed */
-	if ($config['installedpackages']['snortglobal']['rule'][$id]['blockoffenders7'] == 'on')
-		create_snort_whitelist($id, $if_real);
-
-	/* only build threshold when needed */
-	if ($config['installedpackages']['snortglobal']['rule'][$id]['suppresslistname'] != 'default')
-		create_snort_suppress($id, $if_real);
-
-	/* create snort configuration file */
-	create_snort_conf($id, $if_real, $snort_uuid);
-
-	/* if rules exist cp rules to each iface */
-	create_rules_iface($id, $if_real, $snort_uuid);
-
-	/* create snort bootup file snort.sh only create once */
-	create_snort_sh();
-
-	/* create barnyard2 configuration file */
-	if ($config['installedpackages']['snortglobal']['rule'][$id]['barnyard_enable'] == 'on')
-		create_barnyard2_conf($id, $if_real, $snort_uuid);
-
-	sync_snort_package();
 
 	conf_mount_ro();
 }
-
-/* Only run when all ifaces needed to sync. Expects filesystem rw */
-function sync_snort_package_empty()
-{
-	global $config, $g;
-
-	/* RedDevil suggested code */
-	/* TODO: more testing needs to be done */
-	/* may cause voip to fail */
-	//exec("/sbin/sysctl net.bpf.bufsize=8388608");
-	//exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
-	//exec("/sbin/sysctl net.bpf.maxinsns=512");
-	//exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
-
-	/* do not start config build if rules is empty */
-	if (!is_array($config['installedpackages']['snortglobal']['rule']))
-		return;
-
-	conf_mount_rw();
-
-	foreach ($config['installedpackages']['snortglobal']['rule'] as $id => $value) {
-		$if_real = snort_get_real_interface($value['interface']);
-		$snort_uuid = $value['uuid'];
-
-		if ($if_real != '' && $snort_uuid != '') {
-
-			/* only build whitelist when needed */
-			if ($value['blockoffenders7'] == 'on')
-				create_snort_whitelist($id, $if_real);
-
-			/* only build threshold when needed */
-			if ($value['suppresslistname'] != 'default')
-				create_snort_suppress($id, $if_real);
-
-			/* create snort configuration file */
-			create_snort_conf($id, $if_real, $snort_uuid);
-
-			/* if rules exist cp rules to each iface */
-			create_rules_iface($id, $if_real, $snort_uuid);
-
-			/* create barnyard2 configuration file */
-			$snortbarnyardlog_info_chk = $value['barnyard_enable'];
-			if ($snortbarnyardlog_info_chk == 'on')
-				create_barnyard2_conf($id, $if_real, $snort_uuid);
-		}
-	}
-
-	/* create snort bootup file snort.sh only create once */
-	create_snort_sh();
-
-	sync_snort_package();
-
-	conf_mount_ro();
-}
-
-/* only bootup and ip refresh */
-function sync_snort_package_config()
-{
-	global $config, $g;
-
-	/* RedDevil suggested code */
-	/* TODO: more testing needs to be done */
-	/* may cause voip to fail */
-	//exec("/sbin/sysctl net.bpf.bufsize=8388608");
-	//exec("/sbin/sysctl net.bpf.maxbufsize=4194304");
-	//exec("/sbin/sysctl net.bpf.maxinsns=512");
-	//exec("/sbin/sysctl net.inet.tcp.rfc1323=1");
-
-	/* do not start config build if rules is empty */
-	if (!is_array($config['installedpackages']['snortglobal']['rule']))
-		return;
-
-	conf_mount_rw();
-
-	foreach ($config['installedpackages']['snortglobal']['rule'] as $id => $value) {
-
-		$result_lan = $value['interface'];
-		$if_real = snort_get_real_interface($result_lan);
-		$snort_uuid = $value['uuid'];
-
-		if (!empty($if_real) && !empty($snort_uuid)) {
-
-			/* only build whitelist when needed */
-			if ($value['blockoffenders7'] == 'on')
-				create_snort_whitelist($id, $if_real);
-
-			/* only build threshold when needed */
-			if ($value['suppresslistname'] != 'default')
-				create_snort_suppress($id, $if_real);
-
-			/* create snort configuration file */
-			create_snort_conf($id, $if_real, $snort_uuid);
-
-			/* create barnyard2 configuration file */
-			if ($value['barnyard_enable'] == 'on')
-				create_barnyard2_conf($id, $if_real, $snort_uuid);
-		}
-	}
-
-	sync_snort_package();
-
-	conf_mount_ro();
-}
-
 
 /* Start of main config files */
 
@@ -1226,7 +1024,6 @@ function create_snort_sh()
 
 	$snortconf =& $config['installedpackages']['snortglobal']['rule'];
 
-	$snort_sh_text2 = array();
 	$snort_sh_text3 = array();
 	$snort_sh_text4 = array();
 
@@ -1250,8 +1047,8 @@ function create_snort_sh()
 
 #### Fake start only used on bootup and Pfsense IP changes
 #### Only try to restart if snort is running on Iface
-if [ "`/bin/ps -auwx | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/grep -v grep | /usr/bin/awk '{print $2;}'`" != "" ]; then
-	snort_pid=`/bin/ps -auwx | /usr/bin/grep -v grep | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/awk '{print $2;}'`
+if [ "`/bin/ps -ax | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/grep -v grep | /usr/bin/awk '{print $1;}'`" != "" ]; then
+	snort_pid=`/bin/ps -ax | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/grep -v grep | /usr/bin/awk '{print $1;}'`
 	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort already running, soft restart"
 
 	#### Restart Iface
@@ -1272,9 +1069,9 @@ EOE;
 
 			$snort_sh_text4[] = <<<EOF
 
-pid_s=`/bin/ps -auwx | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/grep -v grep |  /usr/bin/awk '{print \$2;}'`
+pid_s=`/bin/ps -ax | /usr/bin/grep "R {$snort_uuid}" | /usr/bin/grep -v grep |  /usr/bin/awk '{print \$1;}'`
 sleep 3
-pid_b=`/bin/ps -auwx | /usr/bin/grep "snort_{$snort_uuid}_{$if_real}.u2" | /usr/bin/grep -v grep | /usr/bin/awk '{print \$2;}'`
+pid_b=`/bin/ps -ax | /usr/bin/grep "snort_{$snort_uuid}_{$if_real}.u2" | /usr/bin/grep -v grep | /usr/bin/awk '{print \$1;}'`
 if [ \${pid_s} ] ; then
 		
 	/bin/echo "snort.sh run" > /tmp/snort.sh.pid
@@ -1306,26 +1103,13 @@ EOF;
 rc_start() {
 
 	/bin/echo "snort.sh run" > /tmp/snort.sh.pid
-
-	#### Remake the configs on boot Important!
-	/usr/local/bin/php -f /usr/local/pkg/pf/snort_dynamic_ip_reload.php &
-	/usr/bin/logger -p daemon.info -i -t SnortStartup "Snort Startup files Sync..."
-
 	$start_snort_iface_start
-
 	/bin/rm /tmp/snort.sh.pid
 }
 
 rc_stop() {
 
-	#### Check for double starts, Pfsense has problems with that
-	if /bin/ls /tmp/snort.sh.pid > /dev/null ; then
-		/usr/bin/logger -p daemon.info -i -t SnortStartup "Error: snort.sh IS running"
-		exit 0
-	fi
-
 	$start_snort_iface_stop
-
 	/bin/rm /tmp/snort.sh.pid
 	/bin/rm /var/run/snort*
 
@@ -1356,9 +1140,6 @@ EOD;
 	@chmod("/usr/local/etc/rc.d/snort.sh", 0755);
 }
 
-
-///////////////////////// >>>>>>>>>>>>
-
 /* if rules exist copy to new interfaces */
 function create_rules_iface($id, $if_real, $snort_uuid)
 {
@@ -1368,7 +1149,9 @@ function create_rules_iface($id, $if_real, $snort_uuid)
 	$folder_chk = (count(glob("{$if_rule_dir}/rules/*")) === 0) ? 'empty' : 'full';
 
 	if ($folder_chk == "empty") {
-		exec("/bin/cp -R /usr/local/etc/snort/rules {$if_rule_dir}/rules");
+		if (!is_dir("/usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/rules"))
+                        exec("/bin/mkdir -p /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/rules");
+		exec("/bin/cp /usr/local/etc/snort/rules/* {$if_rule_dir}/rules");
 		if (file_exists("/usr/local/etc/snort/custom_rules/local_{$snort_uuid}_{$if_real}.rules"))
 			exec("/bin/cp /usr/local/etc/snort/custom_rules/local_{$snort_uuid}_{$if_real}.rules {$if_rule_dir}/local_{$snort_uuid}_{$if_real}.rules");
 	}
@@ -1417,29 +1200,6 @@ function generate_barnyard2_conf($id, $if_real, $snort_uuid) {
 #	barnyard2.conf
 #   barnyard2 can be found at http://www.securixlive.com/barnyard2/index.php
 #
-#	Copyright (C) 2006 Robert Zelaya
-#	part of pfSense
-#	All rights reserved.
-#
-#	1. Redistributions of source code must retain the above copyright notice,
-#	   this list of conditions and the following disclaimer.
-#
-#	2. Redistributions in binary form must reproduce the above copyright
-#	   notice, this list of conditions and the following disclaimer in the
-#	   documentation and/or other materials provided with the distribution.
-#
-#	THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES,
-#	INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
-#	AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-#	AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY,
-#	OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-#	SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-#	INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-#	CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-#	ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-#	POSSIBILITY OF SUCH DAMAGE.
-#
-
 # set the appropriate paths to the file(s) your Snort process is using
 
 config reference_file:	    /usr/local/etc/snort/snort_{$snort_uuid}_{$if_real}/reference.config
@@ -2368,125 +2128,6 @@ EOD;
 	return $snort_conf_text;
 }
 
-/*   check downloaded text from snort.org to make sure that an error did not occur
- *   for example, if you are not a premium subscriber you can only download rules
- *   so often, etc. TO BE: Removed unneeded.
- */
-function check_for_common_errors($filename) {
-	global $snort_filename, $snort_filename_md5, $console_mode;
-
-	// ob_flush();
-	$contents = file_get_contents($filename);
-	if (!$contents) {
-		if(!$console_mode) {
-			update_all_status("An error occured while downloading {$filename}.");
-			hide_progress_bar_status();
-		} else
-			log_error("An error occured.  Scroll down to inspect it's contents.");
-
-		if (!$console_mode)
-			update_output_window(strip_tags("$contents"));
-		else {
-			$contents = strip_tags($contents);
-			log_error("Error downloading snort rules: {$contents}");
-			echo "Error downloading snort rules: {$contents}";
-		}
-
-		scroll_down_to_bottom_of_page();
-
-		return;
-	}
-}
-
-/* force browser to scroll all the way down */
-function scroll_down_to_bottom_of_page() {
-	global $snort_filename, $console_mode;
-
-	ob_flush();
-	if(!$console_mode)
-		echo "\n<script type=\"text/javascript\">parent.scrollTo(0,1500);\n</script>";
-}
-
-/* ensure downloaded file looks sane */
-function verify_downloaded_file($filename) {
-	global $snort_filename, $snort_filename_md5, $console_mode;
-
-	ob_flush();
-	if (filesize($filename) < 9500) {
-		if(!$console_mode) {
-			update_all_status("Checking {$filename}...");
-			check_for_common_errors($filename);
-		}
-	}
-	update_all_status("Verifying {$filename}...");
-	if(!file_exists($filename)) {
-		if(!$console_mode) {
-			update_all_status("Could not fetch snort rules ({$filename}).  Check oinkid key and dns and try again.");
-			hide_progress_bar_status();
-		} else {
-			log_error("Could not fetch snort rules ({$filename}).  Check oinkid key and dns and try again.");
-			echo "Could not fetch snort rules ({$filename}).  Check oinkid key and dns and try again.";
-		}
-		return;
-	}
-	update_all_status("Verified {$filename}.");
-}
-
-/* extract rules */
-function extract_snort_rules_md5($tmpfname) {
-	global $snort_filename, $snort_filename_md5, $console_mode;
-
-	ob_flush();
-	if(!$console_mode) {
-		$static_output = gettext("Extracting snort rules...");
-		update_all_status($static_output);
-	}
-	if(!is_dir("/usr/local/etc/snort/rules/"))
-		@mkdir("/usr/local/etc/snort/rules/");
-
-	$cmd = "/usr/bin/tar xzf {$tmpfname}/{$snort_filename} -C /usr/local/etc/snort/ rules/";
-	$handle = popen("{$cmd} 2>&1", 'r');
-	while(!feof($handle)) {
-		$buffer = fgets($handle);
-		update_output_window($buffer);
-	}
-	pclose($handle);
-
-	if(!$console_mode) {
-		$static_output = gettext("Snort rules extracted.");
-		update_all_status($static_output);
-	} else {
-		log_error("Snort rules extracted.");
-		echo "Snort rules extracted.";
-	}
-}
-
-/* verify MD5 against downloaded item */
-function verify_snort_rules_md5($tmpfname) {
-	global $snort_filename, $snort_filename_md5, $console_mode;
-
-	ob_flush();
-	if(!$console_mode) {
-		$static_output = gettext("Verifying md5 signature...");
-		update_all_status($static_output);
-	}
-
-	$md555 = file_get_contents("{$tmpfname}/{$snort_filename_md5}");
-	$md5 = `echo "{$md555}" | /usr/bin/awk '{ print $4 }'`;
-	$file_md5_ondisk = `/sbin/md5 {$tmpfname}/{$snort_filename} | /usr/bin/awk '{ print $4 }'`;
-	if($md5 == $file_md5_ondisk) {
-		if(!$console_mode) {
-			$static_output = gettext("snort rules: md5 signature of rules mismatch.");
-			update_all_status($static_output);
-			hide_progress_bar_status();
-		} else {
-			log_error("snort rules: md5 signature of rules mismatch.");
-			echo "snort rules: md5 signature of rules mismatch.";
-		}
-		return;
-	}
-}
-
 /* hide progress bar */
 function hide_progress_bar_status() {
 	global $snort_filename, $snort_filename_md5, $console_mode;
@@ -2514,89 +2155,6 @@ function update_all_status($status) {
 		update_status($status);
 		update_output_window($status);
 	}
-}
-
-/* obtain alert description for an ip address */
-function get_snort_alert($ip) {
-	global $snort_alert_file_split, $snort_config;
-
-	if(!file_exists("/var/log/snort/alert"))
-		return;
-	if(!$snort_config)
-		$snort_config = read_snort_config_cache();
-	if($snort_config[$ip])
-		return $snort_config[$ip];
-	if(!$snort_alert_file_split)
-		$snort_alert_file_split = split("\n", file_get_contents("/var/log/snort/alert"));
-
-	foreach($snort_alert_file_split as $fileline) {
-		if (preg_match("/\[\*\*\] (\[.*\]) (.*) (\[\*\*\])/", $fileline, $matches))
-			$alert_title = $matches[2];
-		if (preg_match("/(\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b)/", $fileline, $matches))
-			$alert_ip = $matches[$id];
-		if($alert_ip == $ip) {
-			if(!$snort_config[$ip])
-				$snort_config[$ip] = $alert_title;
-
-			return $alert_title;
-		}
-	}
-	return "n/a";
-}
-
-function make_clickable($buffer) {
-	global $config, $g;
-
-	/* if clickable urls is disabled, simply return buffer back to caller */
-	$clickablalerteurls = $config['installedpackages']['snort']['config'][$id]['oinkmastercode'];
-	if(!$clickablalerteurls)
-		return $buffer;
-
-	$buffer = eregi_replace("(^|[ \n\r\t])((http(s?)://)(www\.)?([a-z0-9_-]+(\.[a-z0-9_-]+)+)(/[^/ \n\r]*)*)","\\1<a href=\"\\2\" target=\"_blank\">\\2</a>", $buffer);
-	$buffer = eregi_replace("(^|[ \n\r\t])((ftp://)(www\.)?([a-z0-9_-]+(\.[a-z0-9_-]+)+)(/[^/ \n\r]*)*)","\\1<a href=\"\\2\" target=\"_blank\">\\2</a>", $buffer);
-	$buffer = eregi_replace("([a-z_-][a-z0-9\._-]*@[a-z0-9_-]+(\.[a-z0-9_-]+)+)","<a href=\"mailto:\\1\">\\1</a>", $buffer);
-	$buffer = eregi_replace("(^|[ \n\r\t])(www\.([a-z0-9_-]+(\.[a-z0-9_-]+)+)(/[^/ \n\r]*)*)","\\1<a href=\"http://\\2\" target=\"_blank\">\\2</a>", $buffer);
-	$buffer = eregi_replace("(^|[ \n\r\t])(ftp\.([a-z0-9_-]+(\.[a-z0-9_-]+)+)(/[^/ \n\r]*)*)","\\1<a href=\"ftp://\\2\" target=\"_blank\">\\2</a>", $buffer);
-
-	return $buffer;
-}
-
-function read_snort_config_cache() {
-	global $g, $config, $snort_config;
-
-	if($snort_config)
-		return $snort_config;
-
-	if(file_exists($g['tmp_path'] . '/snort_config.cache'))
-		$snort_config = unserialize(file_get_contents($g['tmp_path'] . '/snort_config.cache'));
-
-	return $snort_config;
-}
-
-function write_snort_config_cache($snort_config) {
-	global $g, $config;
-
-	$configcache = fopen($g['tmp_path'] . '/snort_config.cache', "w");
-	if(!$configcache) {
-		log_error("Could not open {$g['tmp_path']}/snort_config.cache  for writing.");
-		return false;
-	}
-	fwrite($configcache, serialize($snort_config));
-	fclose($configcache);
-
-	return true;
-}
-
-function snort_advanced() {
-	global $g, $config;
-
-	sync_package_snort();
-}
-
-function snort_define_servers() {
-	global $g, $config;
-
-	sync_package_snort();
 }
 
 ?>

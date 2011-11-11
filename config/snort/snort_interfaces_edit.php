@@ -284,7 +284,7 @@ if (isset($_GET['dup']))
 
 			write_config();
 
-			sync_snort_package_all($id, $if_real, $snort_uuid);
+			sync_snort_package_config();
 			sleep(1);
 
 			/* if snort.sh crashed this will remove the pid */
@@ -295,7 +295,7 @@ if (isset($_GET['dup']))
 			header( 'Cache-Control: no-store, no-cache, must-revalidate' );
 			header( 'Cache-Control: post-check=0, pre-check=0', false );
 			header( 'Pragma: no-cache' );
-			header("Location: /snort/snort_interfaces_edit.php?id=$id");
+			header("Location: /snort/snort_interfaces.php");
 
 			exit;
 		}
@@ -303,7 +303,7 @@ if (isset($_GET['dup']))
 
 	if ($_POST["Submit2"]) {
 
-		sync_snort_package_all($id, $if_real, $snort_uuid);
+		sync_snort_package_config();
 		sleep(1);
 
 		Running_Start($snort_uuid, $if_real, $id);
@@ -316,35 +316,6 @@ if (isset($_GET['dup']))
 		header("Location: /snort/snort_interfaces_edit.php?id=$id");
 		exit;
 	}
-
-	if ($_POST["Submit3"])
-	{
-
-		Running_Stop($snort_uuid, $if_real, $id);
-
-		header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );
-		header( 'Last-Modified: ' . gmdate( 'D, d M Y H:i:s' ) . ' GMT' );
-		header( 'Cache-Control: no-store, no-cache, must-revalidate' );
-		header( 'Cache-Control: post-check=0, pre-check=0', false );
-		header( 'Pragma: no-cache' );
-		header("Location: /snort/snort_interfaces_edit.php?id=$id");
-		exit;
-
-	}
-
-	/* This code needs to be below headers */
-	if (isset($config['installedpackages']['snortglobal']['rule'][$id]['interface']))
-	{
-
-		$snort_up_ck2_info = Running_Ck($snort_uuid, $if_real, $id);
-
-		if ($snort_up_ck2_info == 'no')
-			$snort_up_ck = '<input name="Submit2" type="submit" class="formbtn" value="Start" onClick="enable_change(true)">';
-		else
-			$snort_up_ck = '<input name="Submit3" type="submit" class="formbtn" value="Stop" onClick="enable_change(true)">';
-	} else
-		$snort_up_ck = '';
-
 
 $pgtitle = "Snort: Interface Edit: $id $snort_uuid $if_real";
 include_once("head.inc");
@@ -694,7 +665,6 @@ function enable_change(enable_change) {
 			<tr>
 				<td width="22%" valign="top"></td>
 				<td width="78%"><input name="Submit" type="submit" class="formbtn" value="Save">
-					<?php echo $snort_up_ck; ?> 
 				<?php if (isset($id) && $a_nat[$id]): ?>
 					<input name="id" type="hidden" value="<?=$id;?>">
 				<?php endif; ?></td>
