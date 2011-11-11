@@ -158,13 +158,13 @@ different IP address to multiple simultaneous connections).   IMPORTANT, you MUS
 		<field>
 			<fieldname>subnetmask</fieldname>
 			<fielddescr>subnetmask</fielddescr>
-			<description>Framed-IP-Netmask. Example: 255.255.255.0</description>
+			<description>Framed-IP-Netmask. Needs support of the NAS (Switch) Example: 255.255.255.0</description>
 			<type>input</type>
 		</field>
 		<field>
 			<fieldname>gateway</fieldname>
 			<fielddescr>gateway</fielddescr>
-			<description>Framed-Route. Example: 192.168.1.1</description>
+			<description>Framed-Route. Needs support of the NAS (Switch). Order is: Subnet Gateway Metric Example: 192.168.10.0 192.168.10.1 1</description>
 			<type>input</type>
 		</field>
 		<field>
